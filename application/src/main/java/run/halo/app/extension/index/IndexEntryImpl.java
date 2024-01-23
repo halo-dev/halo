@@ -1,5 +1,6 @@
 package run.halo.app.extension.index;
 
+import com.google.common.collect.ImmutableListMultimap;
 import com.google.common.collect.ListMultimap;
 import com.google.common.collect.MultimapBuilder;
 import java.util.Collection;
@@ -150,9 +151,7 @@ public class IndexEntryImpl implements IndexEntry {
     public Collection<Map.Entry<String, String>> immutableEntries() {
         readLock.lock();
         try {
-            return indexKeyObjectNamesMap.entries().stream()
-                .map(entry -> Map.entry(entry.getKey(), entry.getValue()))
-                .toList();
+            return ImmutableListMultimap.copyOf(indexKeyObjectNamesMap).entries();
         } finally {
             readLock.unlock();
         }

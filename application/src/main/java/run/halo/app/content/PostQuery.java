@@ -5,8 +5,6 @@ import static run.halo.app.extension.router.selector.SelectorUtil.labelAndFieldS
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import io.swagger.v3.oas.annotations.media.ArraySchema;
 import io.swagger.v3.oas.annotations.media.Schema;
-import java.util.List;
-import java.util.Set;
 import org.apache.commons.lang3.BooleanUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.data.domain.Sort;
@@ -50,33 +48,9 @@ public class PostQuery extends IListRequest.QueryListRequest {
     }
 
     @Nullable
-    @Schema(name = "contributor")
-    public Set<String> getContributors() {
-        return listToSet(queryParams.get("contributor"));
-    }
-
-    @Nullable
-    @Schema(name = "category")
-    public Set<String> getCategories() {
-        return listToSet(queryParams.get("category"));
-    }
-
-    @Nullable
-    @Schema(name = "tag")
-    public Set<String> getTags() {
-        return listToSet(queryParams.get("tag"));
-    }
-
-    @Nullable
     public Post.PostPhase getPublishPhase() {
         String publishPhase = queryParams.getFirst("publishPhase");
         return Post.PostPhase.from(publishPhase);
-    }
-
-    @Nullable
-    public Post.VisibleEnum getVisible() {
-        String visible = queryParams.getFirst("visible");
-        return Post.VisibleEnum.from(visible);
     }
 
     @Nullable
@@ -94,11 +68,6 @@ public class PostQuery extends IListRequest.QueryListRequest {
             example = "creationTimestamp,desc"))
     public Sort getSort() {
         return SortResolver.defaultInstance.resolve(exchange);
-    }
-
-    @Nullable
-    private Set<String> listToSet(List<String> param) {
-        return param == null ? null : Set.copyOf(param);
     }
 
     /**
@@ -136,13 +105,6 @@ public class PostQuery extends IListRequest.QueryListRequest {
             } else {
                 labelSelectorBuilder.eq(Post.PUBLISHED_LABEL, BooleanUtils.FALSE);
             }
-        }
-
-        Post.VisibleEnum visible = getVisible();
-        if (visible != null) {
-            fieldQuery = QueryFactory.and(fieldQuery, QueryFactory.equal(
-                "spec.visible", visible.name())
-            );
         }
 
         if (StringUtils.isNotBlank(username)) {
