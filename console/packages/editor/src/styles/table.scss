@@ -20,7 +20,22 @@
           top: 0;
           width: 8px;
           z-index: 2;
-          margin-top: 14px;
+          margin-top: 27px;
+        }
+      }
+
+      &.table-left-shadow {
+        &::before {
+          bottom: 15px;
+          background: linear-gradient(-90deg, transparent, rgba(0, 0, 0, 0.08));
+          left: 0;
+          content: " ";
+          position: absolute;
+          pointer-events: none;
+          top: 0;
+          width: 8px;
+          z-index: 2;
+          margin-top: 27px;
         }
       }
     }

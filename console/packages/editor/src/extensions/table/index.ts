@@ -8,12 +8,16 @@ import {
   type Range,
   mergeAttributes,
   isNodeActive,
-} from "@/tiptap/vue-3";
+  CoreEditor,
+} from "@/tiptap";
 import {
   type Node as ProseMirrorNode,
   type NodeView,
   type EditorState,
   type DOMOutputSpec,
+  Plugin,
+  DecorationSet,
+  Decoration,
 } from "@/tiptap/pm";
 import TableCell from "./table-cell";
 import TableRow from "./table-row";
@@ -94,6 +98,8 @@ function updateColumns(
   }
 }
 
+let editor: CoreEditor | undefined = undefined;
+
 class TableView implements NodeView {
   node: ProseMirrorNode;
 
@@ -122,6 +128,15 @@ class TableView implements NodeView {
     this.containerDOM.className = "tableWrapper";
     this.containerDOM.addEventListener("wheel", (e) => {
       return this.handleHorizontalWheel(this.containerDOM, e);
+    });
+    this.containerDOM.addEventListener("scroll", () => {
+      if (!editor) {
+        return false;
+      }
+      const { state, view } = editor;
+      const { tr } = state;
+      view.dispatch(tr);
+      return false;
     });
 
     this.scrollDom = document.createElement("div");
@@ -465,6 +480,53 @@ const Table = TiptapTable.extend<ExtensionOptions & TableOptions>({
     ];
 
     return table;
+  },
+
+  onTransaction() {
+    editor = this.editor;
+  },
+
+  addProseMirrorPlugins() {
+    const plugins = this.parent?.() ?? [];
+    return [
+      ...plugins,
+      new Plugin({
+        props: {
+          decorations: (state) => {
+            const { doc, tr } = state;
+            const decorations: Decoration[] = [];
+            doc.descendants((node, pos) => {
+              if (node.type.name === Table.name) {
+                const { view } = this.editor;
+                const nodeDom = view.nodeDOM(pos) || view.domAtPos(pos)?.node;
+                if (!nodeDom) {
+                  return true;
+                }
+                const { scrollWidth, clientWidth, scrollLeft } =
+                  nodeDom.firstChild as HTMLElement;
+                let classNames = "";
+                if (
+                  scrollWidth > clientWidth &&
+                  scrollLeft < scrollWidth - clientWidth
+                ) {
+                  classNames += "table-right-shadow ";
+                }
+                if (scrollLeft > 0) {
+                  classNames += "table-left-shadow ";
+                }
+                console.log(classNames);
+                decorations.push(
+                  Decoration.node(pos, pos + node.nodeSize, {
+                    class: classNames,
+                  })
+                );
+              }
+            });
+            return DecorationSet.create(tr.doc, decorations);
+          },
+        },
+      }),
+    ];
   },
 }).configure({ resizable: true });
 
