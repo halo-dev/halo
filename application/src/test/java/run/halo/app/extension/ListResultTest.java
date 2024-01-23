@@ -60,10 +60,9 @@ class ListResultTest {
         result = ListResult.subList(list, 0, 1);
         assertEquals(list.subList(0, 1), result);
 
-        result = ListResult.subList(list, 0, 0);
-        assertEquals(list, result);
-
         result = ListResult.subList(list, 1, 0);
         assertEquals(list, result);
+
+        assertEquals(list.subList(0, 1), ListResult.subList(list, -1, 1));
     }
 }
