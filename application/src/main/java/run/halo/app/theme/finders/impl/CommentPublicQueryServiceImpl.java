@@ -272,7 +272,7 @@ public class CommentPublicQueryServiceImpl implements CommentPublicQueryService 
 
             var creationTimeComparator = Comparator.<Comment, Instant>comparing(
                 comment -> comment.getSpec().getCreationTime(),
-                Comparators.nullsLow(Comparator.<Instant>reverseOrder()));
+                Comparators.nullsHigh(Comparator.<Instant>reverseOrder()));
 
             var nameComparator = Comparator.<Comment, String>comparing(
                 comment -> comment.getMetadata().getName());
