@@ -27,6 +27,7 @@ import org.springframework.boot.autoconfigure.web.WebProperties;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.DependsOn;
 import org.springframework.web.reactive.accept.RequestedContentTypeResolver;
 import org.springframework.web.reactive.function.BodyInserters;
 import org.springframework.web.reactive.function.server.RouterFunction;
@@ -75,7 +76,8 @@ public class PluginAutoConfiguration {
     }
 
     @Bean
-    public HaloPluginManager pluginManager() {
+    @DependsOn({"gcControllerInitializer", "controllerManager"})
+    public PluginManager pluginManager() {
         // Setup RuntimeMode
         System.setProperty("pf4j.mode", pluginProperties.getRuntimeMode().toString());
 

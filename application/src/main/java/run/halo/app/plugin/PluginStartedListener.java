@@ -4,6 +4,7 @@ import static run.halo.app.plugin.PluginConst.PLUGIN_NAME_LABEL_NAME;
 import static run.halo.app.plugin.PluginExtensionLoaderUtils.isSetting;
 import static run.halo.app.plugin.PluginExtensionLoaderUtils.lookupExtensions;
 
+import java.time.Duration;
 import java.util.HashMap;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.event.EventListener;
@@ -43,14 +44,14 @@ public class PluginStartedListener {
     }
 
     @EventListener
-    public Mono<Void> onApplicationEvent(HaloPluginStartedEvent event) {
+    public void onApplicationEvent(HaloPluginStartedEvent event) {
         var pluginWrapper = event.getPlugin();
         var pluginApplicationContext = ExtensionContextRegistry.getInstance()
             .getByPluginId(pluginWrapper.getPluginId());
 
         var pluginName = pluginWrapper.getPluginId();
 
-        return client.get(Plugin.class, pluginName)
+        client.get(Plugin.class, pluginName)
             .flatMap(plugin -> Flux.fromStream(
                     () -> {
                         log.debug("Collecting extensions for plugin {}", pluginName);
@@ -74,6 +75,7 @@ public class PluginStartedListener {
                     labels.put(PLUGIN_NAME_LABEL_NAME, plugin.getMetadata().getName());
                 })
                 .flatMap(this::createOrUpdate)
-                .then());
+                .then())
+            .block(Duration.ofMinutes(1));
     }
 }

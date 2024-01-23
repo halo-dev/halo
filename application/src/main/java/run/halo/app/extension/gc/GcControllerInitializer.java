@@ -6,7 +6,7 @@ import org.springframework.stereotype.Component;
 import run.halo.app.extension.controller.Controller;
 import run.halo.app.infra.ExtensionInitializedEvent;
 
-@Component
+@Component("gcControllerInitializer")
 public class GcControllerInitializer
     implements ApplicationListener<ExtensionInitializedEvent>, DisposableBean {
 

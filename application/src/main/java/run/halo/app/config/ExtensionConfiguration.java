@@ -27,7 +27,7 @@ public class ExtensionConfiguration {
         matchIfMissing = true)
     static class ExtensionControllerConfiguration {
 
-        @Bean
+        @Bean("controllerManager")
         DefaultControllerManager controllerManager(ExtensionClient client) {
             return new DefaultControllerManager(client);
         }
