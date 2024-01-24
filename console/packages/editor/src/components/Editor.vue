@@ -36,14 +36,12 @@ watch(
   <div v-if="editor" class="halo-rich-text-editor">
     <editor-bubble-menu :editor="editor" />
     <editor-header :editor="editor" />
-    <div class="h-full flex flex-row w-full">
-      <div class="overflow-y-auto overflow-x-hidden flex-1 relative bg-white">
-        <editor-content
-          :editor="editor"
-          :style="contentStyles"
-          class="editor-content markdown-body"
-        />
-      </div>
+    <div class="h-full flex flex-row w-full overflow-hidden">
+      <editor-content
+        :editor="editor"
+        :style="contentStyles"
+        class="editor-content markdown-body flex-1 relative bg-white overflow-y-auto"
+      />
       <div
         v-if="$slots.extra"
         class="h-full hidden sm:!block w-72 flex-shrink-0"
