@@ -514,7 +514,6 @@ const Table = TiptapTable.extend<ExtensionOptions & TableOptions>({
                 if (scrollLeft > 0) {
                   classNames += "table-left-shadow ";
                 }
-                console.log(classNames);
                 decorations.push(
                   Decoration.node(pos, pos + node.nodeSize, {
                     class: classNames,
