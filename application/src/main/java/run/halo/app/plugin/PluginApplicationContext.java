@@ -2,7 +2,7 @@ package run.halo.app.plugin;
 
 import java.util.List;
 import java.util.concurrent.locks.StampedLock;
-import org.springframework.context.support.GenericApplicationContext;
+import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 import org.springframework.util.Assert;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
@@ -16,18 +16,18 @@ import run.halo.app.extension.GroupVersionKind;
  * @author guqing
  * @since 2.0.0
  */
-public class PluginApplicationContext extends GenericApplicationContext {
+public class PluginApplicationContext extends AnnotationConfigApplicationContext {
 
     private final GvkExtensionMapping gvkExtensionMapping = new GvkExtensionMapping();
 
-    private String pluginId;
+    private final String pluginId;
+
+    public PluginApplicationContext(String pluginId) {
+        this.pluginId = pluginId;
+    }
 
     public String getPluginId() {
         return pluginId;
-    }
-
-    public void setPluginId(String pluginId) {
-        this.pluginId = pluginId;
     }
 
     /**

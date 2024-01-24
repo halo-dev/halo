@@ -10,24 +10,20 @@ import lombok.extern.slf4j.Slf4j;
 import org.pf4j.DefaultPluginManager;
 import org.pf4j.ExtensionFactory;
 import org.pf4j.ExtensionFinder;
-import org.pf4j.PluginDependency;
 import org.pf4j.PluginDescriptor;
 import org.pf4j.PluginDescriptorFinder;
 import org.pf4j.PluginFactory;
 import org.pf4j.PluginRuntimeException;
 import org.pf4j.PluginState;
 import org.pf4j.PluginStateEvent;
+import org.pf4j.PluginStateListener;
 import org.pf4j.PluginWrapper;
-import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.DisposableBean;
-import org.springframework.beans.factory.InitializingBean;
 import org.springframework.context.ApplicationContext;
-import org.springframework.context.ApplicationContextAware;
-import org.springframework.lang.NonNull;
+import org.springframework.data.util.Lazy;
 import run.halo.app.plugin.event.HaloPluginBeforeStopEvent;
 import run.halo.app.plugin.event.HaloPluginLoadedEvent;
 import run.halo.app.plugin.event.HaloPluginStartedEvent;
-import run.halo.app.plugin.event.HaloPluginStateChangedEvent;
 import run.halo.app.plugin.event.HaloPluginStoppedEvent;
 
 /**
@@ -39,22 +35,27 @@ import run.halo.app.plugin.event.HaloPluginStoppedEvent;
  */
 @Slf4j
 public class HaloPluginManager extends DefaultPluginManager
-    implements ApplicationContextAware, InitializingBean, DisposableBean {
+    implements DisposableBean, SpringPluginManager {
 
     private final Map<String, PluginStartingError> startingErrors = new HashMap<>();
 
-    private ApplicationContext rootApplicationContext;
+    private final ApplicationContext rootContext;
 
-    private PluginApplicationInitializer pluginApplicationInitializer;
+    private final Lazy<ApplicationContext> sharedContext;
 
-    private PluginRequestMappingManager requestMappingManager;
-
-    public HaloPluginManager() {
-        super();
+    public HaloPluginManager(Path pluginsRoot, ApplicationContext rootContext) {
+        super(pluginsRoot);
+        this.rootContext = rootContext;
+        // We have to initialize share context lazily because the root context has not refreshed
+        this.sharedContext = Lazy.of(() -> SharedApplicationContextFactory.create(rootContext));
     }
 
-    public HaloPluginManager(Path pluginsRoot) {
-        super(pluginsRoot);
+    @Override
+    protected void initialize() {
+        super.initialize();
+
+        // add additional listener
+        addPluginStateListener(new PluginStartedEventAdapter());
     }
 
     @Override
@@ -64,31 +65,15 @@ public class HaloPluginManager extends DefaultPluginManager
 
     @Override
     protected ExtensionFinder createExtensionFinder() {
-        return new SpringComponentsFinder(this);
-    }
-
-    @Override
-    public final void setApplicationContext(@NonNull ApplicationContext rootApplicationContext)
-        throws BeansException {
-        this.rootApplicationContext = rootApplicationContext;
-    }
-
-    final PluginApplicationContext getPluginApplicationContext(String pluginId) {
-        return pluginApplicationInitializer.getPluginApplicationContext(pluginId);
+        var finder = new SpringComponentsFinder(this);
+        addPluginStateListener(finder);
+        return finder;
     }
 
     @Override
     protected PluginFactory createPluginFactory() {
-        return new BasePluginFactory();
-    }
-
-    @Override
-    public final void afterPropertiesSet() {
-        this.pluginApplicationInitializer =
-            new PluginApplicationInitializer(this, rootApplicationContext);
-
-        this.requestMappingManager =
-            rootApplicationContext.getBean(PluginRequestMappingManager.class);
+        var contextFactory = new DefaultPluginApplicationContextFactory(this);
+        return new SpringPluginFactory(contextFactory);
     }
 
     @Override
@@ -101,17 +86,10 @@ public class HaloPluginManager extends DefaultPluginManager
         ClassLoader pluginClassLoader) {
         // create the plugin wrapper
         log.debug("Creating wrapper for plugin '{}'", pluginPath);
-        HaloPluginWrapper pluginWrapper =
+        var pluginWrapper =
             new HaloPluginWrapper(this, pluginDescriptor, pluginPath, pluginClassLoader);
         pluginWrapper.setPluginFactory(getPluginFactory());
         return pluginWrapper;
-    }
-
-    @Override
-    protected void firePluginStateEvent(PluginStateEvent event) {
-        rootApplicationContext.publishEvent(
-            new HaloPluginStateChangedEvent(this, event.getPlugin(), event.getOldState()));
-        super.firePluginStateEvent(event);
     }
 
     @Override
@@ -131,7 +109,7 @@ public class HaloPluginManager extends DefaultPluginManager
             return pluginState;
         }
 
-        rootApplicationContext.publishEvent(new HaloPluginBeforeStopEvent(this, pluginWrapper));
+        rootContext.publishEvent(new HaloPluginBeforeStopEvent(this, pluginWrapper));
 
         if (stopDependents) {
             List<String> dependents = dependencyResolver.getDependents(pluginId);
@@ -141,153 +119,42 @@ public class HaloPluginManager extends DefaultPluginManager
                 dependents.addAll(0, dependencyResolver.getDependents(dependent));
             }
         }
-        try {
-            log.info("Stop plugin '{}'", getPluginLabel(pluginDescriptor));
-            if (pluginWrapper.getPlugin() != null) {
-                pluginWrapper.getPlugin().stop();
-            }
-            pluginWrapper.setPluginState(PluginState.STOPPED);
-            // release plugin resources
-            releaseAdditionalResources(pluginId);
 
-            startedPlugins.remove(pluginWrapper);
+        log.info("Stop plugin '{}'", getPluginLabel(pluginDescriptor));
+        pluginWrapper.getPlugin().stop();
+        pluginWrapper.setPluginState(PluginState.STOPPED);
+        // release plugin resources
+        releaseAdditionalResources(pluginId);
 
-            rootApplicationContext.publishEvent(new HaloPluginStoppedEvent(this, pluginWrapper));
-            firePluginStateEvent(new PluginStateEvent(this, pluginWrapper, pluginState));
-        } catch (Exception e) {
-            log.error(e.getMessage(), e);
-            startingErrors.put(pluginWrapper.getPluginId(), PluginStartingError.of(
-                pluginWrapper.getPluginId(), e.getMessage(), e.toString()));
-        }
+        startedPlugins.remove(pluginWrapper);
+
+        rootContext.publishEvent(new HaloPluginStoppedEvent(this, pluginWrapper));
+        firePluginStateEvent(new PluginStateEvent(this, pluginWrapper, pluginState));
+
         return pluginWrapper.getPluginState();
     }
 
     @Override
-    public PluginState stopPlugin(String pluginId) {
-        return this.stopPlugin(pluginId, true);
-    }
-
-    @Override
     public void startPlugins() {
-        startingErrors.clear();
-        long ts = System.currentTimeMillis();
-
-        for (PluginWrapper pluginWrapper : resolvedPlugins) {
-            checkExtensionFinderReady(pluginWrapper);
-            PluginState pluginState = pluginWrapper.getPluginState();
-            if ((PluginState.DISABLED != pluginState) && (PluginState.STARTED != pluginState)) {
-                try {
-                    log.info("Start plugin '{}'", getPluginLabel(pluginWrapper.getDescriptor()));
-                    // inject bean
-                    pluginApplicationInitializer.onStartUp(pluginWrapper.getPluginId());
-
-                    pluginWrapper.getPlugin().start();
-
-                    requestMappingManager.registerHandlerMappings(pluginWrapper);
-
-                    pluginWrapper.setPluginState(PluginState.STARTED);
-                    pluginWrapper.setFailedException(null);
-                    startedPlugins.add(pluginWrapper);
-
-                    rootApplicationContext.publishEvent(
-                        new HaloPluginStartedEvent(this, pluginWrapper));
-                } catch (Exception | LinkageError e) {
-                    pluginWrapper.setPluginState(PluginState.FAILED);
-                    pluginWrapper.setFailedException(e);
-                    startingErrors.put(pluginWrapper.getPluginId(), PluginStartingError.of(
-                        pluginWrapper.getPluginId(), e.getMessage(), e.toString()));
-                    releaseAdditionalResources(pluginWrapper.getPluginId());
-                    log.error("Unable to start plugin '{}'",
-                        getPluginLabel(pluginWrapper.getDescriptor()), e);
-                } finally {
-                    firePluginStateEvent(new PluginStateEvent(this, pluginWrapper, pluginState));
-                }
-            }
-        }
-
-        log.info("[Halo] {} plugins are started in {}ms. {} failed",
-            getPlugins(PluginState.STARTED).size(),
-            System.currentTimeMillis() - ts, startingErrors.size());
+        throw new UnsupportedOperationException(
+            "The operation of starting all plugins is not supported."
+        );
     }
 
     @Override
     public PluginState startPlugin(String pluginId) {
-        return doStartPlugin(pluginId);
+        try {
+            return super.startPlugin(pluginId);
+        } catch (Throwable t) {
+            // TODO Do not release additional resources here.
+            // releaseAdditionalResources(pluginId);
+            throw t;
+        }
     }
 
     @Override
     public void stopPlugins() {
         doStopPlugins();
-    }
-
-    private PluginState doStartPlugin(String pluginId) {
-        checkPluginId(pluginId);
-
-        PluginWrapper pluginWrapper = getPlugin(pluginId);
-
-        checkExtensionFinderReady(pluginWrapper);
-
-        PluginDescriptor pluginDescriptor = pluginWrapper.getDescriptor();
-        PluginState pluginState = pluginWrapper.getPluginState();
-        if (PluginState.STARTED == pluginState) {
-            log.debug("Already started plugin '{}'", getPluginLabel(pluginDescriptor));
-            return PluginState.STARTED;
-        }
-
-        if (!resolvedPlugins.contains(pluginWrapper)) {
-            log.warn("Cannot start an unresolved plugin '{}'", getPluginLabel(pluginDescriptor));
-            return pluginState;
-        }
-
-        if (PluginState.DISABLED == pluginState) {
-            // automatically enable plugin on manual plugin start
-            if (!enablePlugin(pluginId)) {
-                return pluginState;
-            }
-        }
-
-        for (PluginDependency dependency : pluginDescriptor.getDependencies()) {
-            // start dependency only if it marked as required (non-optional) or if it's optional
-            // and loaded
-            if (!dependency.isOptional() || plugins.containsKey(dependency.getPluginId())) {
-                startPlugin(dependency.getPluginId());
-            }
-        }
-        log.info("Start plugin '{}'", getPluginLabel(pluginDescriptor));
-
-        try {
-            // load and inject bean
-            pluginApplicationInitializer.onStartUp(pluginId);
-
-            // create plugin instance and start it
-            pluginWrapper.getPlugin().start();
-
-            requestMappingManager.registerHandlerMappings(pluginWrapper);
-
-            pluginWrapper.setPluginState(PluginState.STARTED);
-            startedPlugins.add(pluginWrapper);
-
-            rootApplicationContext.publishEvent(new HaloPluginStartedEvent(this, pluginWrapper));
-        } catch (Exception e) {
-            log.error("Unable to start plugin '{}'",
-                getPluginLabel(pluginWrapper.getDescriptor()), e);
-            pluginWrapper.setPluginState(PluginState.FAILED);
-            startingErrors.put(pluginWrapper.getPluginId(), PluginStartingError.of(
-                pluginWrapper.getPluginId(), e.getMessage(), e.toString()));
-            releaseAdditionalResources(pluginId);
-        } finally {
-            firePluginStateEvent(new PluginStateEvent(this, pluginWrapper, pluginState));
-        }
-        return pluginWrapper.getPluginState();
-    }
-
-    private void checkExtensionFinderReady(PluginWrapper pluginWrapper) {
-        if (extensionFinder instanceof SpringComponentsFinder springComponentsFinder) {
-            springComponentsFinder.readPluginStorageToMemory(pluginWrapper);
-            return;
-        }
-        // should never happen
-        throw new PluginRuntimeException("Plugin component classes may not loaded yet.");
     }
 
     private void doStopPlugins() {
@@ -300,7 +167,7 @@ public class HaloPluginManager extends DefaultPluginManager
             PluginState pluginState = pluginWrapper.getPluginState();
             if (PluginState.STARTED == pluginState) {
                 try {
-                    rootApplicationContext.publishEvent(
+                    rootContext.publishEvent(
                         new HaloPluginBeforeStopEvent(this, pluginWrapper));
                     log.info("Stop plugin '{}'", getPluginLabel(pluginWrapper.getDescriptor()));
                     if (pluginWrapper.getPlugin() != null) {
@@ -310,7 +177,7 @@ public class HaloPluginManager extends DefaultPluginManager
                     itr.remove();
                     releaseAdditionalResources(pluginWrapper.getPluginId());
 
-                    rootApplicationContext.publishEvent(
+                    rootContext.publishEvent(
                         new HaloPluginStoppedEvent(this, pluginWrapper));
                     firePluginStateEvent(new PluginStateEvent(this, pluginWrapper, pluginState));
                 } catch (PluginRuntimeException e) {
@@ -326,32 +193,41 @@ public class HaloPluginManager extends DefaultPluginManager
      * Release plugin holding release on stop.
      */
     public void releaseAdditionalResources(String pluginId) {
-        removePluginComponentsCache(pluginId);
-        // release request mapping
-        requestMappingManager.removeHandlerMappings(pluginId);
-        try {
-            pluginApplicationInitializer.contextDestroyed(pluginId);
-        } catch (Exception e) {
-            log.warn("Plugin application context close failed. ", e);
-        }
     }
 
     @Override
     protected PluginWrapper loadPluginFromPath(Path pluginPath) {
         PluginWrapper pluginWrapper = super.loadPluginFromPath(pluginPath);
-        rootApplicationContext.publishEvent(new HaloPluginLoadedEvent(this, pluginWrapper));
+        rootContext.publishEvent(new HaloPluginLoadedEvent(this, pluginWrapper));
         return pluginWrapper;
     }
 
-    private void removePluginComponentsCache(String pluginId) {
-        if (extensionFinder instanceof SpringComponentsFinder springComponentsFinder) {
-            springComponentsFinder.removeComponentsStorage(pluginId);
-        }
-    }
 
     @Override
     public void destroy() throws Exception {
         stopPlugins();
     }
-    // end-region
+
+    @Override
+    public ApplicationContext getRootContext() {
+        return rootContext;
+    }
+
+    @Override
+    public ApplicationContext getSharedContext() {
+        return sharedContext.get();
+    }
+
+    private class PluginStartedEventAdapter implements PluginStateListener {
+
+        @Override
+        public void pluginStateChanged(PluginStateEvent event) {
+            if (!PluginState.STARTED.equals(event.getPluginState())) {
+                return;
+            }
+            // Indicate the state is started.
+            var pluginWrapper = event.getPlugin();
+            rootContext.publishEvent(new HaloPluginStartedEvent(event.getSource(), pluginWrapper));
+        }
+    }
 }

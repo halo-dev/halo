@@ -8,6 +8,7 @@ import java.lang.reflect.Constructor;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.time.Instant;
+import java.util.Objects;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.pf4j.CompoundPluginLoader;
@@ -25,6 +26,7 @@ import org.pf4j.RuntimeMode;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.autoconfigure.web.WebProperties;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
+import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.reactive.accept.RequestedContentTypeResolver;
@@ -70,18 +72,12 @@ public class PluginAutoConfiguration {
     }
 
     @Bean
-    public PluginRequestMappingManager pluginRequestMappingManager() {
-        return new PluginRequestMappingManager(pluginRequestMappingHandlerMapping());
-    }
-
-    @Bean
-    public HaloPluginManager pluginManager() {
+    public PluginManager pluginManager(ApplicationContext context) {
         // Setup RuntimeMode
         System.setProperty("pf4j.mode", pluginProperties.getRuntimeMode().toString());
 
         // Setup Plugin folder
-        String pluginsRoot =
-            StringUtils.defaultString(pluginProperties.getPluginsRoot(), "plugins");
+        String pluginsRoot = Objects.toString(pluginProperties.getPluginsRoot(), "plugins");
 
         System.setProperty("pf4j.pluginsDir", pluginsRoot);
         String appHome = System.getProperty("app.home");
@@ -90,49 +86,48 @@ public class PluginAutoConfiguration {
             System.setProperty("pf4j.pluginsDir", appHome + File.separator + pluginsRoot);
         }
 
-        HaloPluginManager pluginManager =
-            new HaloPluginManager(new File(pluginsRoot).toPath()) {
-                @Override
-                protected PluginLoader createPluginLoader() {
-                    if (pluginProperties.getCustomPluginLoader() != null) {
-                        Class<PluginLoader> clazz = pluginProperties.getCustomPluginLoader();
-                        try {
-                            Constructor<?> constructor = clazz.getConstructor(PluginManager.class);
-                            return (PluginLoader) constructor.newInstance(this);
-                        } catch (Exception ex) {
-                            throw new IllegalArgumentException(
-                                String.format("Create custom PluginLoader %s failed. Make sure"
-                                        + "there is a constructor with one argument that accepts "
-                                        + "PluginLoader",
-                                    clazz.getName()));
-                        }
-                    } else {
-                        return new CompoundPluginLoader()
-                            .add(createDevelopmentPluginLoader(this), this::isDevelopment)
-                            .add(new JarPluginLoader(this));
+        var pluginManager = new HaloPluginManager(new File(pluginsRoot).toPath(), context) {
+            @Override
+            protected PluginLoader createPluginLoader() {
+                if (pluginProperties.getCustomPluginLoader() != null) {
+                    Class<PluginLoader> clazz = pluginProperties.getCustomPluginLoader();
+                    try {
+                        Constructor<?> constructor = clazz.getConstructor(PluginManager.class);
+                        return (PluginLoader) constructor.newInstance(this);
+                    } catch (Exception ex) {
+                        throw new IllegalArgumentException(
+                            String.format("Create custom PluginLoader %s failed. Make sure"
+                                    + "there is a constructor with one argument that accepts "
+                                    + "PluginLoader",
+                                clazz.getName()));
                     }
+                } else {
+                    return new CompoundPluginLoader()
+                        .add(createDevelopmentPluginLoader(this), this::isDevelopment)
+                        .add(new JarPluginLoader(this));
                 }
+            }
 
-                @Override
-                protected PluginStatusProvider createPluginStatusProvider() {
-                    if (PropertyPluginStatusProvider.isPropertySet(pluginProperties)) {
-                        return new PropertyPluginStatusProvider(pluginProperties);
-                    }
-                    return super.createPluginStatusProvider();
+            @Override
+            protected PluginStatusProvider createPluginStatusProvider() {
+                if (PropertyPluginStatusProvider.isPropertySet(pluginProperties)) {
+                    return new PropertyPluginStatusProvider(pluginProperties);
                 }
+                return super.createPluginStatusProvider();
+            }
 
-                @Override
-                protected PluginRepository createPluginRepository() {
-                    var developmentPluginRepository =
-                        new DefaultDevelopmentPluginRepository(getPluginsRoots());
-                    developmentPluginRepository
-                        .setFixedPaths(pluginProperties.getFixedPluginPath());
-                    return new CompoundPluginRepository()
-                        .add(developmentPluginRepository, this::isDevelopment)
-                        .add(new JarPluginRepository(getPluginsRoots()))
-                        .add(new DefaultPluginRepository(getPluginsRoots()));
-                }
-            };
+            @Override
+            protected PluginRepository createPluginRepository() {
+                var developmentPluginRepository =
+                    new DefaultDevelopmentPluginRepository(getPluginsRoots());
+                developmentPluginRepository
+                    .setFixedPaths(pluginProperties.getFixedPluginPath());
+                return new CompoundPluginRepository()
+                    .add(developmentPluginRepository, this::isDevelopment)
+                    .add(new JarPluginRepository(getPluginsRoots()))
+                    .add(new DefaultPluginRepository(getPluginsRoots()));
+            }
+        };
 
         pluginManager.setExactVersionAllowed(pluginProperties.isExactVersionAllowed());
         // only for development mode

@@ -8,8 +8,7 @@ import org.springframework.beans.factory.InitializingBean;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Component;
-import run.halo.app.plugin.ExtensionContextRegistry;
-import run.halo.app.plugin.PluginApplicationContext;
+import run.halo.app.plugin.SpringPlugin;
 import run.halo.app.plugin.event.HaloPluginStartedEvent;
 import run.halo.app.plugin.event.HaloPluginStoppedEvent;
 
@@ -92,17 +91,19 @@ public class FinderRegistry implements InitializingBean {
      */
     @EventListener(HaloPluginStartedEvent.class)
     public void onPluginStarted(HaloPluginStartedEvent event) {
-        String pluginId = event.getPlugin().getPluginId();
-        PluginApplicationContext pluginApplicationContext = ExtensionContextRegistry.getInstance()
-            .getByPluginId(pluginId);
-        pluginApplicationContext.getBeansWithAnnotation(Finder.class)
-            .forEach((beanName, finderObject) -> {
-                // register finder
-                String finderName = registerFinder(finderObject);
-                // add to plugin finder lookup
-                pluginFindersLookup.computeIfAbsent(pluginId, k -> new ArrayList<>())
-                    .add(finderName);
-            });
+        var plugin = event.getPlugin().getPlugin();
+        var pluginId = event.getPlugin().getPluginId();
+        if (plugin instanceof SpringPlugin springPlugin) {
+            var context = springPlugin.getApplicationContext();
+            context.getBeansWithAnnotation(Finder.class)
+                .forEach((beanName, finderObject) -> {
+                    // register finder
+                    String finderName = registerFinder(finderObject);
+                    // add to plugin finder lookup
+                    pluginFindersLookup.computeIfAbsent(pluginId, k -> new ArrayList<>())
+                        .add(finderName);
+                });
+        }
     }
 
     /**
@@ -118,6 +119,20 @@ public class FinderRegistry implements InitializingBean {
             return;
         }
         pluginFindersLookup.get(pluginId).forEach(this::removeFinder);
+    }
+
+    public void register(String pluginId, ApplicationContext pluginContext) {
+        pluginContext.getBeansWithAnnotation(Finder.class)
+            .forEach((beanName, finder) -> {
+                var finderName = registerFinder(finder);
+                pluginFindersLookup.computeIfAbsent(pluginId, igored -> new ArrayList<>())
+                    .add(finderName);
+            });
+    }
+
+    public void unregister(String pluginId) {
+        pluginFindersLookup.getOrDefault(pluginId, List.of())
+            .forEach(this::removeFinder);
     }
 
     /**

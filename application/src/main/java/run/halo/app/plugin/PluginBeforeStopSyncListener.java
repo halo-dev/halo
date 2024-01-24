@@ -26,12 +26,15 @@ public class PluginBeforeStopSyncListener {
     @EventListener
     public Mono<Void> onApplicationEvent(@NonNull HaloPluginBeforeStopEvent event) {
         var pluginWrapper = event.getPlugin();
-        ExtensionContextRegistry registry = ExtensionContextRegistry.getInstance();
-        if (!registry.containsContext(pluginWrapper.getPluginId())) {
+        var p = pluginWrapper.getPlugin();
+        if (!(p instanceof SpringPlugin springPlugin)) {
             return Mono.empty();
         }
-        var pluginContext = registry.getByPluginId(pluginWrapper.getPluginId());
-        return cleanUpPluginExtensionResources(pluginContext);
+        var applicationContext = springPlugin.getApplicationContext();
+        if (!(applicationContext instanceof PluginApplicationContext pluginApplicationContext)) {
+            return Mono.empty();
+        }
+        return cleanUpPluginExtensionResources(pluginApplicationContext);
     }
 
     private Mono<Void> cleanUpPluginExtensionResources(PluginApplicationContext context) {
