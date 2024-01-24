@@ -6,6 +6,7 @@ import { rbacAnnotations } from "@/constants/annotations";
 import { apiClient } from "@/utils/api-client";
 import { Toast } from "@halo-dev/components";
 import { useI18n } from "vue-i18n";
+import { resolveDeepDependencies } from "@/utils/role";
 
 interface RoleTemplateGroup {
   module: string | null | undefined;
@@ -38,7 +39,7 @@ interface useRoleFormReturn {
   initialFormState: Role;
   saving: Ref<boolean>;
   isUpdateMode: ComputedRef<boolean>;
-  handleCreateOrUpdate: () => void;
+  handleCreateOrUpdate: () => Promise<void>;
 }
 
 interface useRoleTemplateSelectionReturn {
@@ -271,15 +272,15 @@ export function useRoleTemplateSelection(
     const role = roleTemplates.value?.find(
       (role) => role.metadata.name === value
     );
-    const dependencies =
-      role?.metadata.annotations?.[rbacAnnotations.DEPENDENCIES];
-    if (!dependencies) {
+
+    if (!role) {
       return;
     }
-    const dependenciesArray = JSON.parse(dependencies);
-    dependenciesArray.forEach((role) => {
-      selectedRoleTemplates.value.add(role);
-    });
+
+    selectedRoleTemplates.value = new Set([
+      role.metadata.name,
+      ...resolveDeepDependencies(role, roleTemplates.value || []),
+    ]);
   };
 
   return {

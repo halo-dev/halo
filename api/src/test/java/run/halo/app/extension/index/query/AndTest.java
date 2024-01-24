@@ -36,16 +36,18 @@ public class AndTest {
             Map.entry("17", "johnniang")
         );
         var entries = Map.of("dept", deptEntry, "age", ageEntry);
-        var indexView = new QueryIndexViewImpl(entries);
 
+        var indexView = new QueryIndexViewImpl(entries);
         var query = and(equal("dept", "B"), equal("age", "18"));
         var resultSet = query.matches(indexView);
         assertThat(resultSet).containsExactly("zhangsan");
 
+        indexView = new QueryIndexViewImpl(entries);
         query = and(equal("dept", "C"), equal("age", "18"));
         resultSet = query.matches(indexView);
         assertThat(resultSet).isEmpty();
 
+        indexView = new QueryIndexViewImpl(entries);
         query = and(
             // guqing, halo, lisi, zhangsan
             or(equal("dept", "A"), equal("dept", "B")),
@@ -55,6 +57,7 @@ public class AndTest {
         resultSet = query.matches(indexView);
         assertThat(resultSet).containsExactlyInAnyOrder("guqing", "halo", "zhangsan");
 
+        indexView = new QueryIndexViewImpl(entries);
         query = and(
             // guqing, halo, lisi, zhangsan
             or(equal("dept", "A"), equal("dept", "B")),
@@ -64,6 +67,7 @@ public class AndTest {
         resultSet = query.matches(indexView);
         assertThat(resultSet).containsExactlyInAnyOrder("guqing", "halo", "zhangsan");
 
+        indexView = new QueryIndexViewImpl(entries);
         query = and(
             // guqing, halo, lisi, zhangsan
             or(equal("dept", "A"), equal("dept", "C")),
@@ -76,7 +80,7 @@ public class AndTest {
 
     @Test
     void andMatch2() {
-        var indexView = EmployeeDataSet.createEmployeeIndexView();
+        var indexView = IndexViewDataSet.createEmployeeIndexView();
         var query = and(equal("lastName", "Fay"),
             and(
                 equal("hireDate", "17"),

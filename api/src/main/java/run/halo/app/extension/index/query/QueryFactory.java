@@ -20,7 +20,21 @@ public class QueryFactory {
         return new All(fieldName);
     }
 
+    public static Query isNull(String fieldName) {
+        return new IsNull(fieldName);
+    }
+
+    public static Query isNotNull(String fieldName) {
+        return new IsNotNull(fieldName);
+    }
+
+    /**
+     * Create a {@link NotEqual} for the given {@code fieldName} and {@code attributeValue}.
+     */
     public static Query notEqual(String fieldName, String attributeValue) {
+        if (attributeValue == null) {
+            return new IsNotNull(fieldName);
+        }
         return new NotEqual(fieldName, attributeValue);
     }
 
@@ -28,7 +42,13 @@ public class QueryFactory {
         return new NotEqual(fieldName, otherFieldName, true);
     }
 
+    /**
+     * Create a {@link EqualQuery} for the given {@code fieldName} and {@code attributeValue}.
+     */
     public static Query equal(String fieldName, String attributeValue) {
+        if (attributeValue == null) {
+            return new IsNull(fieldName);
+        }
         return new EqualQuery(fieldName, attributeValue);
     }
 
@@ -73,6 +93,9 @@ public class QueryFactory {
         return in(fieldName, Set.of(attributeValues));
     }
 
+    /**
+     * Create an {@link InQuery} for the given {@code fieldName} and {@code values}.
+     */
     public static Query in(String fieldName, Collection<String> values) {
         Assert.notNull(values, "Values must not be null");
         if (values.size() == 1) {
@@ -85,6 +108,9 @@ public class QueryFactory {
         return new InQuery(fieldName, valueSet);
     }
 
+    /**
+     * Create an {@link And} for the given {@link Query}s.
+     */
     public static Query and(Collection<Query> queries) {
         Assert.notEmpty(queries, "Queries must not be empty");
         if (queries.size() == 1) {
@@ -98,6 +124,9 @@ public class QueryFactory {
         return new And(queries);
     }
 
+    /**
+     * Create an {@link And} for the given {@link Query}s.
+     */
     public static Query and(Query query1, Query query2, Query... additionalQueries) {
         var queries = new ArrayList<Query>(2 + additionalQueries.length);
         queries.add(query1);
@@ -106,6 +135,9 @@ public class QueryFactory {
         return new And(queries);
     }
 
+    /**
+     * Create an {@link And} for the given {@link Query}s.
+     */
     public static Query and(Query query1, Query query2, Collection<Query> additionalQueries) {
         var queries = new ArrayList<Query>(2 + additionalQueries.size());
         queries.add(query1);
@@ -119,6 +151,9 @@ public class QueryFactory {
         return new Or(queries);
     }
 
+    /**
+     * Create an {@link Or} for the given {@link Query}s.
+     */
     public static Query or(Query query1, Query query2, Query... additionalQueries) {
         var queries = new ArrayList<Query>(2 + additionalQueries.length);
         queries.add(query1);
@@ -127,6 +162,9 @@ public class QueryFactory {
         return new Or(queries);
     }
 
+    /**
+     * Create an {@link Or} for the given {@link Query}s.
+     */
     public static Query or(Query query1, Query query2, Collection<Query> additionalQueries) {
         var queries = new ArrayList<Query>(2 + additionalQueries.size());
         queries.add(query1);

@@ -1,6 +1,5 @@
 package run.halo.app.extension.index;
 
-import com.google.common.collect.ImmutableListMultimap;
 import com.google.common.collect.ListMultimap;
 import com.google.common.collect.MultimapBuilder;
 import java.util.Collection;
@@ -40,39 +39,6 @@ public class IndexEntryImpl implements IndexEntry {
             return KeyComparator.INSTANCE;
         }
         return KeyComparator.INSTANCE.reversed();
-    }
-
-    static class KeyComparator implements Comparator<String> {
-        public static final KeyComparator INSTANCE = new KeyComparator();
-
-        @Override
-        public int compare(String a, String b) {
-            int i = 0;
-            int j = 0;
-            while (i < a.length() && j < b.length()) {
-                if (Character.isDigit(a.charAt(i)) && Character.isDigit(b.charAt(j))) {
-                    // handle number part
-                    int num1 = 0;
-                    int num2 = 0;
-                    while (i < a.length() && Character.isDigit(a.charAt(i))) {
-                        num1 = num1 * 10 + (a.charAt(i++) - '0');
-                    }
-                    while (j < b.length() && Character.isDigit(b.charAt(j))) {
-                        num2 = num2 * 10 + (b.charAt(j++) - '0');
-                    }
-                    if (num1 != num2) {
-                        return num1 - num2;
-                    }
-                } else if (a.charAt(i) != b.charAt(j)) {
-                    // handle non-number part
-                    return a.charAt(i) - b.charAt(j);
-                } else {
-                    i++;
-                    j++;
-                }
-            }
-            return a.length() - b.length();
-        }
     }
 
     @Override
@@ -151,7 +117,10 @@ public class IndexEntryImpl implements IndexEntry {
     public Collection<Map.Entry<String, String>> immutableEntries() {
         readLock.lock();
         try {
-            return ImmutableListMultimap.copyOf(indexKeyObjectNamesMap).entries();
+            // Copy to a new list to avoid ConcurrentModificationException
+            return indexKeyObjectNamesMap.entries().stream()
+                .map(entry -> Map.entry(entry.getKey(), entry.getValue()))
+                .toList();
         } finally {
             readLock.unlock();
         }

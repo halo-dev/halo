@@ -11,7 +11,7 @@ import {
   VDescriptionItem,
 } from "@halo-dev/components";
 import { useRoute } from "vue-router";
-import { computed, onMounted, ref, watch } from "vue";
+import { computed, ref, watch } from "vue";
 import { apiClient } from "@/utils/api-client";
 import { pluginLabels, roleLabels } from "@/constants/labels";
 import { rbacAnnotations } from "@/constants/annotations";
@@ -20,6 +20,8 @@ import { SUPER_ROLE_NAME } from "@/constants/constants";
 import { useI18n } from "vue-i18n";
 import { formatDatetime } from "@/utils/date";
 import { useQuery } from "@tanstack/vue-query";
+import type { Role } from "packages/api-client/dist";
+import { resolveDeepDependencies } from "@/utils/role";
 
 const route = useRoute();
 const { t } = useI18n();
@@ -58,12 +60,14 @@ const getRoleCountText = computed(() => {
     return t("core.role.common.text.contains_all_permissions");
   }
 
-  const dependenciesCount = JSON.parse(
-    formState.value.metadata.annotations?.[rbacAnnotations.DEPENDENCIES] || "[]"
-  ).length;
+  const dependencies = new Set<string>(
+    resolveDeepDependencies(formState.value, roleTemplates.value || [])
+  );
+
+  console.log(dependencies);
 
   return t("core.role.common.text.contains_n_permissions", {
-    count: dependenciesCount,
+    count: dependencies.size || 0,
   });
 });
 
@@ -77,31 +81,27 @@ watch(
   }
 );
 
-const handleFetchRole = async () => {
-  try {
-    const response = await apiClient.extension.role.getv1alpha1Role({
+const { refetch } = useQuery<Role>({
+  queryKey: ["role", route.params.name],
+  queryFn: async () => {
+    const { data } = await apiClient.extension.role.getv1alpha1Role({
       name: route.params.name as string,
     });
-    formState.value = response.data;
-    selectedRoleTemplates.value = new Set(
-      JSON.parse(
-        response.data.metadata.annotations?.[rbacAnnotations.DEPENDENCIES] ||
-          "[]"
-      )
+    return data;
+  },
+  onSuccess(data) {
+    formState.value = data;
+    selectedRoleTemplates.value = new Set<string>(
+      resolveDeepDependencies(data, roleTemplates.value || [])
     );
-  } catch (error) {
-    console.error(error);
-  }
-};
+  },
+  enabled: computed(() => !!roleTemplates.value),
+});
 
 const handleUpdateRole = async () => {
   await handleCreateOrUpdate();
-  await handleFetchRole();
+  await refetch();
 };
-
-onMounted(() => {
-  handleFetchRole();
-});
 </script>
 <template>
   <VPageHeader :title="$t('core.role.detail.title')">

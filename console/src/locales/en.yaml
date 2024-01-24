@@ -1322,6 +1322,11 @@ core:
     role-template-view-tags: Tag View
     role-template-manage-categories: Category Manage
     role-template-view-categories: Category View
+    role-template-manage-posts: Post Manage
+    role-template-post-author: Allows you to manage your own posts
+    role-template-post-contributor: Contributions allowed
+    role-template-post-publisher: Allow to publish own posts
+    role-template-post-attachment-manager: Allow images to be uploaded in posts
     Roles Management: Roles
     Role Manage: Role Manage
     Role View: Role View
@@ -1352,9 +1357,8 @@ core:
     Notification Configuration: Notification Configuration
     Configure Notifier: Configure Notifier
     Post Attachment Manager: Allow images to be uploaded in posts
-    Post Author: Contributions allowed
-    Post Contributor: Allows you to manage your own posts
-    Post Editor: Allow management of all posts
+    Post Author: Allows you to manage your own posts
+    Post Contributor: Contributions allowed
     Post Publisher: Allow to publish own posts
   components:
     submit_button:
