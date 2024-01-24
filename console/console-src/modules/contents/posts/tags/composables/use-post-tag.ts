@@ -26,6 +26,7 @@ export function usePostTag(): usePostTagReturn {
         await apiClient.extension.tag.listcontentHaloRunV1alpha1Tag({
           page: 0,
           size: 0,
+          sort: ["metadata.creationTimestamp,desc"],
         });
 
       return data.items;
