@@ -30,6 +30,7 @@ withDefaults(
     ]"
     class="p-1 rounded-sm"
     :disabled="disabled"
+    tabindex="-1"
     @click="action"
   >
     <component :is="icon" />

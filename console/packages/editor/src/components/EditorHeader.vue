@@ -63,7 +63,7 @@ function getToolboxItemsFromExtensions() {
   >
     <div class="inline-flex items-center justify-center">
       <VMenu>
-        <button class="p-1 rounded-sm hover:bg-gray-100">
+        <button class="p-1 rounded-sm hover:bg-gray-100" tabindex="-1">
           <MdiPlusCircle class="text-[#4CCBA0]" />
         </button>
         <template #popper>
@@ -75,6 +75,7 @@ function getToolboxItemsFromExtensions() {
               v-for="(toolboxItem, index) in getToolboxItemsFromExtensions()"
               v-bind="toolboxItem.props"
               :key="index"
+              tabindex="-1"
             />
           </div>
         </template>
@@ -90,9 +91,10 @@ function getToolboxItemsFromExtensions() {
         :is="item.component"
         v-if="!item.children?.length"
         v-bind="item.props"
+        tabindex="-1"
       />
-      <VMenu v-else class="inline-flex">
-        <component :is="item.component" v-bind="item.props" />
+      <VMenu v-else class="inline-flex" tabindex="-1">
+        <component :is="item.component" v-bind="item.props" tabindex="-1" />
         <template #popper>
           <div
             class="relative rounded-md bg-white overflow-hidden drop-shadow w-48 p-1 max-h-72 overflow-y-auto"
@@ -102,6 +104,7 @@ function getToolboxItemsFromExtensions() {
               :is="child.component"
               v-for="(child, childIndex) in item.children"
               :key="childIndex"
+              tabindex="-1"
             />
           </div>
         </template>

@@ -69,6 +69,20 @@ editor:
       add_column_before: Add column before
       add_column_after: Add column after
       delete_column: Delete column
+    search_and_replace:
+      title: Search and Replace
+      search_placeholder: Search
+      not_found: Not Found
+      occurrence_found: "{index} of {total} occurrences"
+      find_previous: Find Previous
+      find_next: Find Next
+      replace_placeholder: Replace
+      replace: Replace
+      replace_all: Replace All
+      case_sensitive: Case Sensitive
+      match_word: Match Whole Word
+      use_regex: Use Regular Expression
+      close: Close
   components:
     color_picker:
       more_color: More

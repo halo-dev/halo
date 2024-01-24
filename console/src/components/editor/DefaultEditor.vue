@@ -49,6 +49,7 @@ import {
   PluginKey,
   DecorationSet,
   ExtensionListKeymap,
+  ExtensionSearchAndReplace,
 } from "@halo-dev/richtext-editor";
 // ui custom extension
 import { UiExtensionImage, UiExtensionUpload } from "./extensions";
@@ -388,6 +389,7 @@ onMounted(() => {
       }),
       ExtensionListKeymap,
       UiExtensionUpload,
+      ExtensionSearchAndReplace,
     ],
     autofocus: "start",
     onUpdate: () => {
