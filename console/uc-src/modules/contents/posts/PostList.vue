@@ -69,7 +69,7 @@ const {
     size.value = data.size;
   },
   refetchInterval: (data) => {
-    const abnormalPosts = data?.items.filter((post) => {
+    const hasAbnormalPost = data?.items.some((post) => {
       const { spec, metadata, status } = post.post;
       return (
         spec.deleted ||
@@ -78,7 +78,7 @@ const {
       );
     });
 
-    return abnormalPosts?.length ? 1000 : false;
+    return hasAbnormalPost ? 1000 : false;
   },
 });
 </script>
