@@ -1,7 +1,7 @@
 <script lang="ts" setup>
 // core libs
-import { computed, ref, watch } from "vue";
-import type { Role } from "@halo-dev/api-client";
+import { computed, ref } from "vue";
+import type { Role, RoleList } from "@halo-dev/api-client";
 
 // components
 import {
@@ -25,9 +25,6 @@ import RoleEditingModal from "./components/RoleEditingModal.vue";
 import { rbacAnnotations } from "@/constants/annotations";
 import { formatDatetime } from "@/utils/date";
 
-// hooks
-import { useFetchRole } from "@/composables/use-role";
-
 // libs
 import { apiClient } from "@/utils/api-client";
 import Fuse from "fuse.js";
@@ -35,6 +32,8 @@ import { usePermission } from "@/utils/permission";
 import { roleLabels } from "@/constants/labels";
 import { SUPER_ROLE_NAME } from "@/constants/constants";
 import { useI18n } from "vue-i18n";
+import { useQuery } from "@tanstack/vue-query";
+import { resolveDeepDependencies } from "@/utils/role";
 
 const { currentUserHasPermission } = usePermission();
 const { t } = useI18n();
@@ -42,26 +41,65 @@ const { t } = useI18n();
 const editingModal = ref<boolean>(false);
 const selectedRole = ref<Role>();
 
-const { roles, handleFetchRoles, loading } = useFetchRole();
-
 let fuse: Fuse<Role> | undefined = undefined;
 
-watch(
-  () => roles.value,
-  (value) => {
-    fuse = new Fuse(value, {
-      keys: ["spec.displayName", "metadata.name"],
+const { data: roleTemplates } = useQuery({
+  queryKey: ["role-templates"],
+  queryFn: async () => {
+    const { data } = await apiClient.extension.role.listv1alpha1Role({
+      page: 0,
+      size: 0,
+      labelSelector: [`${roleLabels.TEMPLATE}=true`, "!halo.run/hidden"],
+    });
+    return data.items;
+  },
+});
+
+const {
+  data: roles,
+  isLoading,
+  refetch,
+} = useQuery<RoleList>({
+  queryKey: ["roles"],
+  queryFn: async () => {
+    const { data } = await apiClient.extension.role.listv1alpha1Role({
+      page: 0,
+      size: 0,
+      labelSelector: [`!${roleLabels.TEMPLATE}`],
+    });
+    return data;
+  },
+  refetchInterval(data) {
+    const hasDeletingRole = data?.items.some(
+      (item) => !!item.metadata.deletionTimestamp
+    );
+    return hasDeletingRole ? 1000 : false;
+  },
+  onSuccess(data) {
+    fuse = new Fuse(data.items, {
+      keys: [
+        {
+          name: "displayName",
+          getFn: (role) => {
+            return (
+              role.metadata.annotations?.[rbacAnnotations.DISPLAY_NAME] || ""
+            );
+          },
+        },
+        "metadata.name",
+      ],
       useExtendedSearch: true,
       threshold: 0.2,
     });
-  }
-);
+  },
+  enabled: computed(() => !!roleTemplates.value),
+});
 
 const keyword = ref("");
 
 const searchResults = computed(() => {
   if (!fuse || !keyword.value) {
-    return roles.value;
+    return roles.value?.items || [];
   }
 
   return fuse?.search(keyword.value).map((item) => item.item);
@@ -76,12 +114,12 @@ const getRoleCountText = (role: Role) => {
     return t("core.role.common.text.contains_all_permissions");
   }
 
-  const dependenciesCount = JSON.parse(
-    role.metadata.annotations?.[rbacAnnotations.DEPENDENCIES] || "[]"
-  ).length;
+  const dependencies = new Set<string>(
+    resolveDeepDependencies(role, roleTemplates.value || [])
+  );
 
   return t("core.role.common.text.contains_n_permissions", {
-    count: dependenciesCount,
+    count: dependencies.size || 0,
   });
 };
 
@@ -92,7 +130,7 @@ const handleOpenEditingModal = (role: Role) => {
 
 const onEditingModalClose = () => {
   selectedRole.value = undefined;
-  handleFetchRoles();
+  refetch();
 };
 
 const handleCloneRole = async (role: Role) => {
@@ -152,7 +190,7 @@ const handleDelete = async (role: Role) => {
       } catch (e) {
         console.error("Failed to delete role", e);
       } finally {
-        handleFetchRoles();
+        refetch();
       }
     },
   });
@@ -200,7 +238,7 @@ const handleDelete = async (role: Role) => {
           </div>
         </div>
       </template>
-      <VLoading v-if="loading" />
+      <VLoading v-if="isLoading" />
       <Transition v-else appear name="fade">
         <ul
           class="box-border h-full w-full divide-y divide-gray-100"

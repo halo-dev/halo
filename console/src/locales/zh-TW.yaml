@@ -1236,6 +1236,11 @@ core:
     role-template-view-tags: 標籤查看
     role-template-manage-categories: 分類管理
     role-template-view-categories: 分類查看
+    role-template-manage-posts: 文章管理
+    role-template-post-author: 允许管理自己的文章
+    role-template-post-contributor: 允许投稿
+    role-template-post-publisher: 允許發布自己的文章
+    role-template-post-attachment-manager: 允許在文章中上傳圖片
     Roles Management: 角色
     Role Manage: 角色管理
     Role View: 角色查看
@@ -1268,7 +1273,6 @@ core:
     Post Attachment Manager: 允許在文章中上傳圖片
     Post Author: 允许管理自己的文章
     Post Contributor: 允许投稿
-    Post Editor: 允许管理所有文章
     Post Publisher: 允許發布自己的文章
   components:
     submit_button:
