@@ -1,6 +1,8 @@
 package run.halo.app.extension.index.query;
 
+import java.util.List;
 import java.util.NavigableSet;
+import org.springframework.data.domain.Sort;
 import run.halo.app.extension.Metadata;
 import run.halo.app.extension.index.IndexSpec;
 
@@ -37,13 +39,20 @@ public interface QueryIndexView {
     NavigableSet<String> getAllValuesForField(String fieldName);
 
     /**
-     * Gets all object ids for a given field name.
+     * Gets all object ids for a given field name without null cells.
      *
      * @param fieldName the field name
      * @return all indexed object ids for the given field name
      * @throws IllegalArgumentException if the field name is not indexed
      */
     NavigableSet<String> getAllIdsForField(String fieldName);
+
+    /**
+     * Gets all object ids in this view.
+     *
+     * @return all object ids in this view
+     */
+    NavigableSet<String> getAllIds();
 
     NavigableSet<String> findIdsForFieldValueEqual(String fieldName1, String fieldName2);
 
@@ -53,5 +62,7 @@ public interface QueryIndexView {
     NavigableSet<String> findIdsForFieldValueLessThan(String fieldName1, String fieldName2,
         boolean orEqual);
 
-    void removeAllFieldValuesByIdNotIn(NavigableSet<String> ids);
+    void removeByIdNotIn(NavigableSet<String> ids);
+
+    List<String> sortBy(Sort sort);
 }

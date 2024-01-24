@@ -2,20 +2,17 @@ package run.halo.app.extension.index;
 
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.PriorityQueue;
 import java.util.Set;
+import java.util.TreeSet;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Sort;
-import org.springframework.lang.NonNull;
 import org.springframework.stereotype.Component;
 import org.springframework.util.CollectionUtils;
 import org.springframework.util.StopWatch;
@@ -23,7 +20,7 @@ import run.halo.app.extension.GroupVersionKind;
 import run.halo.app.extension.ListOptions;
 import run.halo.app.extension.ListResult;
 import run.halo.app.extension.PageRequest;
-import run.halo.app.extension.index.query.Query;
+import run.halo.app.extension.index.query.All;
 import run.halo.app.extension.index.query.QueryIndexViewImpl;
 import run.halo.app.extension.router.selector.FieldSelector;
 import run.halo.app.extension.router.selector.LabelSelector;
@@ -134,8 +131,9 @@ public class IndexedQueryEngineImpl implements IndexedQueryEngine {
         StopWatch stopWatch = new StopWatch();
         stopWatch.start("build index entry map");
         var fieldPathEntryMap = fieldPathIndexEntryMap(indexer);
-        stopWatch.stop();
         var primaryEntry = getIndexEntry(PrimaryKeySpecUtils.PRIMARY_INDEX_NAME, fieldPathEntryMap);
+        stopWatch.stop();
+
         // O(n) time complexity
         stopWatch.start("retrieve all metadata names");
         var allMetadataNames = new ArrayList<String>();
@@ -147,36 +145,38 @@ public class IndexedQueryEngineImpl implements IndexedQueryEngine {
         }
         stopWatch.stop();
 
+        stopWatch.start("build index view");
+        var indexViewMap = new HashMap<String, Collection<Map.Entry<String, String>>>();
+        for (Map.Entry<String, IndexEntry> entry : fieldPathEntryMap.entrySet()) {
+            indexViewMap.put(entry.getKey(), entry.getValue().immutableEntries());
+        }
+        // TODO optimize build indexView time
+        var indexView = new QueryIndexViewImpl(indexViewMap);
+        stopWatch.stop();
+
         stopWatch.start("retrieve matched metadata names");
         var hasLabelSelector = hasLabelSelector(options.getLabelSelector());
         final List<String> matchedByLabels = hasLabelSelector
             ? retrieveForLabelMatchers(options.getLabelSelector().getMatchers(), fieldPathEntryMap,
             allMetadataNames)
             : allMetadataNames;
+        indexView.removeByIdNotIn(new TreeSet<>(matchedByLabels));
         stopWatch.stop();
 
         stopWatch.start("retrieve matched metadata names by fields");
         final var hasFieldSelector = hasFieldSelector(options.getFieldSelector());
-        var matchedByFields = hasFieldSelector
-            ? retrieveForFieldSelector(options.getFieldSelector().query(), fieldPathEntryMap)
-            : allMetadataNames;
-        stopWatch.stop();
-
-        stopWatch.start("merge result");
-        List<String> foundObjectKeys;
-        if (!hasLabelSelector && !hasFieldSelector) {
-            foundObjectKeys = allMetadataNames;
-        } else if (!hasLabelSelector) {
-            foundObjectKeys = matchedByFields;
-        } else {
-            foundObjectKeys = intersection(matchedByFields, matchedByLabels);
+        if (hasFieldSelector) {
+            var fieldSelector = options.getFieldSelector();
+            var query = fieldSelector.query();
+            var resultSet = query.matches(indexView);
+            indexView.removeByIdNotIn(resultSet);
         }
         stopWatch.stop();
 
         stopWatch.start("sort result");
-        ResultSorter resultSorter = new ResultSorter(fieldPathEntryMap, foundObjectKeys);
-        var result = resultSorter.sortBy(sort);
+        var result = indexView.sortBy(sort);
         stopWatch.stop();
+
         if (log.isTraceEnabled()) {
             log.trace("Retrieve result from indexer, {}", stopWatch.prettyPrint());
         }
@@ -188,109 +188,8 @@ public class IndexedQueryEngineImpl implements IndexedQueryEngine {
     }
 
     boolean hasFieldSelector(FieldSelector fieldSelector) {
-        return fieldSelector != null && fieldSelector.query() != null;
-    }
-
-    List<String> retrieveForFieldSelector(Query query, Map<String, IndexEntry> fieldPathEntryMap) {
-        Map<String, Collection<Map.Entry<String, String>>> indexView = new HashMap<>();
-        for (Map.Entry<String, IndexEntry> entry : fieldPathEntryMap.entrySet()) {
-            indexView.put(entry.getKey(), entry.getValue().immutableEntries());
-        }
-        // TODO optimize build indexView time
-        var queryIndexView = new QueryIndexViewImpl(indexView);
-        var resultSet = query.matches(queryIndexView);
-        return new ArrayList<>(resultSet);
-    }
-
-    /**
-     * Sort the given list by the given {@link Sort}.
-     */
-    static class ResultSorter {
-        private final Map<String, IndexEntry> fieldPathEntryMap;
-        private final List<String> list;
-
-        public ResultSorter(Map<String, IndexEntry> fieldPathEntryMap, List<String> list) {
-            this.fieldPathEntryMap = fieldPathEntryMap;
-            this.list = list;
-        }
-
-        public List<String> sortBy(@NonNull Sort sort) {
-            if (sort.isUnsorted()) {
-                return list;
-            }
-            var sortedLists = new ArrayList<List<String>>();
-            for (Sort.Order order : sort) {
-                var indexEntry = fieldPathEntryMap.get(order.getProperty());
-                if (indexEntry == null) {
-                    throwNotIndexedException(order.getProperty());
-                }
-                var set = new HashSet<>(list);
-                var objectNames = new ArrayList<String>();
-                indexEntry.acquireReadLock();
-                try {
-                    for (var entry : indexEntry.entries()) {
-                        var objectName = entry.getValue();
-                        if (set.contains(objectName)) {
-                            objectNames.add(objectName);
-                        }
-                    }
-                } finally {
-                    indexEntry.releaseReadLock();
-                }
-                var indexOrder = indexEntry.getIndexDescriptor().getSpec().getOrder();
-                var asc = IndexSpec.OrderType.ASC.equals(indexOrder);
-                if (asc != order.isAscending()) {
-                    Collections.reverse(objectNames);
-                }
-                sortedLists.add(objectNames);
-            }
-            return mergeSortedLists(sortedLists);
-        }
-
-        /**
-         * <p>Merge the given sorted lists into one sorted list.</p>
-         * <p>The time complexity is O(n * log(m)), n is the number of all elements in the
-         * sortedLists, m is the number of sortedLists.</p>
-         */
-        private List<String> mergeSortedLists(List<List<String>> sortedLists) {
-            List<String> result = new ArrayList<>();
-            // Use a priority queue to store the current element of each list and its index in
-            // the list
-            PriorityQueue<Pair> minHeap = new PriorityQueue<>(
-                Comparator.comparing(pair -> pair.value));
-
-            // Initialize the priority queue and add the first element of each list to the queue
-            for (int i = 0; i < sortedLists.size(); i++) {
-                if (!sortedLists.get(i).isEmpty()) {
-                    minHeap.add(new Pair(i, 0, sortedLists.get(i).get(0)));
-                }
-            }
-
-            while (!minHeap.isEmpty()) {
-                Pair current = minHeap.poll();
-                result.add(current.value());
-
-                // Add the next element of this list to the priority queue
-                if (current.indexInList() + 1 < sortedLists.get(current.listIndex()).size()) {
-                    var list = sortedLists.get(current.listIndex());
-                    minHeap.add(new Pair(current.listIndex(),
-                        current.indexInList() + 1,
-                        list.get(current.indexInList() + 1))
-                    );
-                }
-            }
-            return result;
-        }
-
-        /**
-         * <p>A pair of element and its position in the original list.</p>
-         * <pre>
-         * listIndex: column index.
-         * indexInList: element index in the list.
-         * value: element value.
-         * </pre>
-         */
-        private record Pair(int listIndex, int indexInList, String value) {
-        }
+        return fieldSelector != null
+            && fieldSelector.query() != null
+            && !(fieldSelector.query() instanceof All);
     }
 }
