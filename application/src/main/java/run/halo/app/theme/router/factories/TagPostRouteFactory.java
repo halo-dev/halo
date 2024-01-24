@@ -15,7 +15,12 @@ import org.springframework.web.reactive.function.server.ServerResponse;
 import org.springframework.web.server.i18n.LocaleContextResolver;
 import reactor.core.publisher.Mono;
 import run.halo.app.core.extension.content.Tag;
+import run.halo.app.extension.ListOptions;
+import run.halo.app.extension.ListResult;
+import run.halo.app.extension.PageRequestImpl;
 import run.halo.app.extension.ReactiveExtensionClient;
+import run.halo.app.extension.index.query.QueryFactory;
+import run.halo.app.extension.router.selector.FieldSelector;
 import run.halo.app.infra.SystemConfigurableEnvironmentFetcher;
 import run.halo.app.infra.SystemSetting;
 import run.halo.app.infra.exception.NotFoundException;
@@ -95,9 +100,14 @@ public class TagPostRouteFactory implements RouteFactory {
     }
 
     private Mono<TagVo> tagBySlug(String slug) {
-        return client.list(Tag.class, tag -> tag.getSpec().getSlug().equals(slug)
-                && tag.getMetadata().getDeletionTimestamp() == null, null)
-            .next()
+        var listOptions = new ListOptions();
+        listOptions.setFieldSelector(FieldSelector.of(
+            QueryFactory.and(QueryFactory.equal("spec.slug", slug),
+                QueryFactory.isNull("metadata.deletionTimestamp")
+            )
+        ));
+        return client.listBy(Tag.class, listOptions, PageRequestImpl.ofSize(1))
+            .mapNotNull(result -> ListResult.first(result).orElse(null))
             .flatMap(tag -> tagFinder.getByName(tag.getMetadata().getName()))
             .switchIfEmpty(
                 Mono.error(new NotFoundException("Tag not found with slug: " + slug)));

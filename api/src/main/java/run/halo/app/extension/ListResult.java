@@ -8,6 +8,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Optional;
 import java.util.function.Supplier;
 import java.util.stream.Stream;
 import lombok.Data;
@@ -142,6 +143,15 @@ public class ListResult<T> implements Iterable<T>, Supplier<Stream<T>> {
             listSort = list.subList(pageStart, pageEnd);
         }
         return listSort;
+    }
+
+    /**
+     * Gets the first element of the list result.
+     */
+    public static <T> Optional<T> first(ListResult<T> listResult) {
+        return Optional.ofNullable(listResult)
+            .map(ListResult::getItems)
+            .map(list -> list.isEmpty() ? null : list.get(0));
     }
 
     @Override

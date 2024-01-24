@@ -72,13 +72,13 @@ public class ExtensionPermalinkPatternUpdater
 
     private void updateCategoryPermalink(String pattern) {
         log.debug("Update category and categories permalink by new policy [{}]", pattern);
-        client.list(Category.class, null, null)
+        client.listAll(Category.class, new ListOptions(), Sort.unsorted())
             .forEach(category -> updateIfPermalinkPatternChanged(category, pattern));
     }
 
     private void updateTagPermalink(String pattern) {
         log.debug("Update tag and tags permalink by new policy [{}]", pattern);
-        client.list(Tag.class, null, null)
+        client.listAll(Tag.class, new ListOptions(), Sort.unsorted())
             .forEach(tag -> updateIfPermalinkPatternChanged(tag, pattern));
     }
 }

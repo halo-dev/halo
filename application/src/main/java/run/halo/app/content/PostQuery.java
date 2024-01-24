@@ -68,9 +68,8 @@ public class PostQuery extends IListRequest.QueryListRequest {
             example = "creationTimestamp,desc"))
     public Sort getSort() {
         var sort = SortResolver.defaultInstance.resolve(exchange);
-        sort.and(Sort.Order.desc("metadata.creationTimestamp"),
-            Sort.Order.desc("metadata.name")
-        );
+        sort = sort.and(Sort.by(Sort.Direction.DESC, "metadata.creationTimestamp"));
+        sort = sort.and(Sort.by(Sort.Direction.DESC, "metadata.name"));
         return sort;
     }
 

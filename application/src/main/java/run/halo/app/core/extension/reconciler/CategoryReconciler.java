@@ -190,7 +190,7 @@ public class CategoryReconciler implements Reconciler<Reconciler.Request> {
     }
 
     private List<Category> listChildrenByName(String name) {
-        List<Category> categories = client.list(Category.class, null, null);
+        var categories = client.listAll(Category.class, new ListOptions(), Sort.unsorted());
         Map<String, Category> nameIdentityMap = categories.stream()
             .collect(Collectors.toMap(category -> category.getMetadata().getName(),
                 Function.identity()));

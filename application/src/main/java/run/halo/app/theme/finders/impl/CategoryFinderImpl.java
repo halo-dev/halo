@@ -11,11 +11,16 @@ import java.util.stream.Collectors;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.ObjectUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.springframework.data.domain.Sort;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import run.halo.app.core.extension.content.Category;
+import run.halo.app.extension.ListOptions;
 import run.halo.app.extension.ListResult;
+import run.halo.app.extension.PageRequestImpl;
 import run.halo.app.extension.ReactiveExtensionClient;
+import run.halo.app.extension.index.query.QueryFactory;
+import run.halo.app.extension.router.selector.FieldSelector;
 import run.halo.app.theme.finders.CategoryFinder;
 import run.halo.app.theme.finders.Finder;
 import run.halo.app.theme.finders.vo.CategoryTreeVo;
@@ -51,10 +56,17 @@ public class CategoryFinderImpl implements CategoryFinder {
             .flatMap(this::getByName);
     }
 
+    static Sort defaultSort() {
+        return Sort.by(Sort.Order.desc("spec.priority"),
+            Sort.Order.desc("metadata.creationTimestamp"),
+            Sort.Order.desc("metadata.name"));
+    }
+
     @Override
     public Mono<ListResult<CategoryVo>> list(Integer page, Integer size) {
-        return client.list(Category.class, null,
-                defaultComparator(), pageNullSafe(page), sizeNullSafe(size))
+        return client.listBy(Category.class, new ListOptions(),
+                PageRequestImpl.of(pageNullSafe(page), sizeNullSafe(size), defaultSort())
+            )
             .map(list -> {
                 List<CategoryVo> categoryVos = list.get()
                     .map(CategoryVo::from)
@@ -63,12 +75,6 @@ public class CategoryFinderImpl implements CategoryFinder {
                     categoryVos);
             })
             .defaultIfEmpty(new ListResult<>(page, size, 0L, List.of()));
-    }
-
-    @Override
-    public Flux<CategoryVo> listAll() {
-        return client.list(Category.class, null, defaultComparator())
-            .map(CategoryVo::from);
     }
 
     @Override
@@ -82,20 +88,9 @@ public class CategoryFinderImpl implements CategoryFinder {
     }
 
     @Override
-    public Mono<CategoryVo> getParentByName(String name) {
-        if (StringUtils.isBlank(name)) {
-            return Mono.empty();
-        }
-        return client.list(Category.class,
-                category -> {
-                    List<String> children = category.getSpec().getChildren();
-                    if (children == null) {
-                        return false;
-                    }
-                    return children.contains(name);
-                },
-                defaultComparator())
-            .next().map(CategoryVo::from);
+    public Flux<CategoryVo> listAll() {
+        return client.listAll(Category.class, new ListOptions(), defaultSort())
+            .map(CategoryVo::from);
     }
 
     Flux<CategoryTreeVo> toCategoryTreeVoFlux(String name) {
@@ -167,6 +162,22 @@ public class CategoryFinderImpl implements CategoryFinder {
             .thenComparing(creationTimestamp)
             .thenComparing(name)
             .reversed();
+    }
+
+    @Override
+    public Mono<CategoryVo> getParentByName(String name) {
+        if (StringUtils.isBlank(name)) {
+            return Mono.empty();
+        }
+        var listOptions = new ListOptions();
+        listOptions.setFieldSelector(FieldSelector.of(
+            QueryFactory.equal("spec.children", name)
+        ));
+        return client.listBy(Category.class, listOptions,
+                PageRequestImpl.of(1, 1, defaultSort())
+            )
+            .map(ListResult::first)
+            .mapNotNull(item -> item.map(CategoryVo::from).orElse(null));
     }
 
     int pageNullSafe(Integer page) {

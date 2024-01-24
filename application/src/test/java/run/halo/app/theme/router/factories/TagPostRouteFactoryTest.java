@@ -4,16 +4,18 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.when;
 
+import java.util.List;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.test.web.reactive.server.WebTestClient;
-import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import run.halo.app.core.extension.content.Tag;
+import run.halo.app.extension.ListResult;
 import run.halo.app.extension.Metadata;
+import run.halo.app.extension.PageRequest;
 import run.halo.app.extension.ReactiveExtensionClient;
 import run.halo.app.theme.finders.PostFinder;
 import run.halo.app.theme.finders.TagFinder;
@@ -39,7 +41,8 @@ class TagPostRouteFactoryTest extends RouteFactoryTestSuite {
 
     @Test
     void create() {
-        when(client.list(eq(Tag.class), any(), eq(null))).thenReturn(Flux.empty());
+        when(client.listBy(eq(Tag.class), any(), any(PageRequest.class)))
+            .thenReturn(Mono.just(ListResult.emptyResult()));
         WebTestClient webTestClient = getWebTestClient(tagPostRouteFactory.create("/new-tags"));
 
         webTestClient.get()
@@ -52,7 +55,8 @@ class TagPostRouteFactoryTest extends RouteFactoryTestSuite {
         tag.getMetadata().setName("fake-tag-name");
         tag.setSpec(new Tag.TagSpec());
         tag.getSpec().setSlug("tag-slug-2");
-        when(client.list(eq(Tag.class), any(), eq(null))).thenReturn(Flux.just(tag));
+        when(client.listBy(eq(Tag.class), any(), any(PageRequest.class)))
+            .thenReturn(Mono.just(new ListResult<>(List.of(tag))));
         when(tagFinder.getByName(eq(tag.getMetadata().getName())))
             .thenReturn(Mono.just(TagVo.from(tag)));
         webTestClient.get()

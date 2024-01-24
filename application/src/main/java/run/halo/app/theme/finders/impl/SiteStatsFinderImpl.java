@@ -10,6 +10,7 @@ import run.halo.app.core.extension.Counter;
 import run.halo.app.core.extension.content.Category;
 import run.halo.app.core.extension.content.Post;
 import run.halo.app.extension.ListOptions;
+import run.halo.app.extension.ListResult;
 import run.halo.app.extension.PageRequestImpl;
 import run.halo.app.extension.ReactiveExtensionClient;
 import run.halo.app.extension.router.selector.FieldSelector;
@@ -62,8 +63,8 @@ public class SiteStatsFinderImpl implements SiteStatsFinder {
     }
 
     Mono<Integer> categoryCount() {
-        return client.list(Category.class, null, null)
-            .count()
+        return client.listBy(Category.class, new ListOptions(), PageRequestImpl.ofSize(1))
+            .map(ListResult::getTotal)
             .map(Long::intValue);
     }
 

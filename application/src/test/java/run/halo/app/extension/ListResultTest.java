@@ -6,6 +6,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.lang.reflect.ParameterizedType;
 import java.util.List;
+import java.util.Optional;
 import org.junit.jupiter.api.Test;
 
 class ListResultTest {
@@ -51,6 +52,15 @@ class ListResultTest {
 
         list = List.of(1);
         assertSubList(list);
+    }
+
+    @Test
+    void firstTest() {
+        var listResult = new ListResult<>(List.of());
+        assertEquals(Optional.empty(), ListResult.first(listResult));
+
+        listResult = new ListResult<>(1, 10, 1, List.of("A"));
+        assertEquals(Optional.of("A"), ListResult.first(listResult));
     }
 
     private void assertSubList(List<Integer> list) {

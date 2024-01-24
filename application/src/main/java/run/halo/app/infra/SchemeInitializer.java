@@ -1,5 +1,6 @@
 package run.halo.app.infra;
 
+import static org.apache.commons.lang3.ObjectUtils.defaultIfNull;
 import static run.halo.app.extension.index.IndexAttributeFactory.multiValueAttribute;
 import static run.halo.app.extension.index.IndexAttributeFactory.simpleAttribute;
 
@@ -146,8 +147,23 @@ public class SchemeInitializer implements ApplicationListener<ApplicationContext
                 .setIndexFunc(
                     simpleAttribute(Post.class, post -> post.getStatusOrDefault().getExcerpt())));
         });
-        schemeManager.register(Category.class);
-        schemeManager.register(Tag.class);
+        schemeManager.register(Category.class, indexSpecs -> {
+            indexSpecs.add(new IndexSpec()
+                .setName("spec.slug")
+                .setIndexFunc(
+                    simpleAttribute(Category.class, category -> category.getSpec().getSlug()))
+            );
+            indexSpecs.add(new IndexSpec()
+                .setName("spec.priority")
+                .setIndexFunc(simpleAttribute(Category.class,
+                    category -> defaultIfNull(category.getSpec().getPriority(), 0).toString())));
+        });
+        schemeManager.register(Tag.class, indexSpecs -> {
+            indexSpecs.add(new IndexSpec()
+                .setName("spec.slug")
+                .setIndexFunc(simpleAttribute(Tag.class, tag -> tag.getSpec().getSlug()))
+            );
+        });
         schemeManager.register(Snapshot.class, indexSpecs -> {
             indexSpecs.add(new IndexSpec()
                 .setName("spec.subjectRef")

@@ -114,12 +114,7 @@ public class CategoryQueryEndpoint implements CustomEndpoint {
 
     private Mono<ServerResponse> listCategories(ServerRequest request) {
         CategoryPublicQuery query = new CategoryPublicQuery(request.exchange());
-        return client.list(Category.class,
-                query.toPredicate(),
-                query.toComparator(),
-                query.getPage(),
-                query.getSize()
-            )
+        return client.listBy(Category.class, query.toListOptions(), query.toPageRequest())
             .map(listResult -> toAnotherListResult(listResult, CategoryVo::from))
             .flatMap(result -> ServerResponse.ok()
                 .contentType(MediaType.APPLICATION_JSON)

@@ -92,7 +92,7 @@ class CategoryReconcilerTest {
 
         lenient().when(client.listAll(eq(Post.class), any(ListOptions.class), any(Sort.class)))
             .thenReturn(posts());
-        lenient().when(client.list(eq(Category.class), any(), any()))
+        lenient().when(client.listAll(eq(Category.class), any(), any()))
             .thenReturn(categories());
 
         Reconciler.Result result =
