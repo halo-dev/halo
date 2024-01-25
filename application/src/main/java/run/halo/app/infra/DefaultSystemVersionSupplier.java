@@ -1,10 +1,9 @@
 package run.halo.app.infra;
 
 import com.github.zafarkhaja.semver.Version;
-import org.apache.commons.lang3.StringUtils;
-import org.springframework.beans.factory.annotation.Autowired;
+import java.util.Objects;
+import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.boot.info.BuildProperties;
-import org.springframework.lang.Nullable;
 import org.springframework.stereotype.Component;
 
 /**
@@ -17,21 +16,19 @@ import org.springframework.stereotype.Component;
 public class DefaultSystemVersionSupplier implements SystemVersionSupplier {
     private static final String DEFAULT_VERSION = "0.0.0";
 
-    @Nullable
-    private BuildProperties buildProperties;
+    private final ObjectProvider<BuildProperties> buildProperties;
 
-    @Autowired(required = false)
-    public void setBuildProperties(@Nullable BuildProperties buildProperties) {
+    public DefaultSystemVersionSupplier(ObjectProvider<BuildProperties> buildProperties) {
         this.buildProperties = buildProperties;
     }
 
     @Override
     public Version get() {
-        if (buildProperties == null) {
+        var properties = buildProperties.getIfUnique();
+        if (properties == null) {
             return Version.valueOf(DEFAULT_VERSION);
         }
-        String projectVersion =
-            StringUtils.defaultString(buildProperties.getVersion(), DEFAULT_VERSION);
+        var projectVersion = Objects.toString(properties.getVersion(), DEFAULT_VERSION);
         return Version.valueOf(projectVersion);
     }
 }

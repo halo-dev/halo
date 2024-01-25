@@ -26,6 +26,7 @@ public enum SharedApplicationContextFactory {
     public static ApplicationContext create(ApplicationContext rootContext) {
         // TODO Optimize creation timing
         var sharedContext = new GenericApplicationContext();
+        sharedContext.registerShutdownHook();
 
         var beanFactory = sharedContext.getBeanFactory();
 

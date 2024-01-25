@@ -11,6 +11,7 @@ import run.halo.app.PluginApplicationContextFactory;
  * <p>Get a {@link BasePlugin} instance from the {@link PluginApplicationContext}.</p>
  *
  * @author guqing
+ * @author johnniang
  * @since 2.0.0
  */
 @Slf4j

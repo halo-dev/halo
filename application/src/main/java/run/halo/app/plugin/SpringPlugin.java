@@ -4,6 +4,9 @@ import org.pf4j.Plugin;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ConfigurableApplicationContext;
 import run.halo.app.PluginApplicationContextFactory;
+import run.halo.app.plugin.event.SpringPluginStartedEvent;
+import run.halo.app.plugin.event.SpringPluginStartingEvent;
+import run.halo.app.plugin.event.SpringPluginStoppingEvent;
 
 public class SpringPlugin extends Plugin {
 
@@ -30,6 +33,7 @@ public class SpringPlugin extends Plugin {
         var pluginOpt = context.getBeanProvider(Plugin.class)
             .stream()
             .findFirst();
+        context.publishEvent(new SpringPluginStartingEvent(this, this));
         if (pluginOpt.isPresent()) {
             this.delegate = pluginOpt.get();
             if (this.delegate instanceof BasePlugin basePlugin) {
@@ -37,10 +41,14 @@ public class SpringPlugin extends Plugin {
             }
             this.delegate.start();
         }
+        context.publishEvent(new SpringPluginStartedEvent(this, this));
     }
 
     @Override
     public void stop() {
+        if (context != null) {
+            context.publishEvent(new SpringPluginStoppingEvent(this, this));
+        }
         if (this.delegate != null) {
             this.delegate.stop();
         }
@@ -62,4 +70,7 @@ public class SpringPlugin extends Plugin {
         return context;
     }
 
+    public PluginContext getPluginContext() {
+        return pluginContext;
+    }
 }

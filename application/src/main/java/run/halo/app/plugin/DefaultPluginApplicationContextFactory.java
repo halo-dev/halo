@@ -12,6 +12,7 @@ import org.pf4j.PluginRuntimeException;
 import org.springframework.boot.env.PropertySourceLoader;
 import org.springframework.boot.env.YamlPropertySourceLoader;
 import org.springframework.context.ApplicationContext;
+import org.springframework.context.ApplicationListener;
 import org.springframework.context.event.ContextClosedEvent;
 import org.springframework.context.event.ContextRefreshedEvent;
 import org.springframework.context.event.EventListener;
@@ -27,6 +28,12 @@ import reactor.core.Exceptions;
 import run.halo.app.PluginApplicationContextFactory;
 import run.halo.app.extension.ReactiveExtensionClient;
 import run.halo.app.infra.properties.HaloProperties;
+import run.halo.app.plugin.event.HaloPluginBeforeStopEvent;
+import run.halo.app.plugin.event.HaloPluginStartedEvent;
+import run.halo.app.plugin.event.HaloPluginStoppedEvent;
+import run.halo.app.plugin.event.SpringPluginStartedEvent;
+import run.halo.app.plugin.event.SpringPluginStoppedEvent;
+import run.halo.app.plugin.event.SpringPluginStoppingEvent;
 import run.halo.app.theme.DefaultTemplateNameResolver;
 import run.halo.app.theme.ViewNameResolver;
 import run.halo.app.theme.finders.FinderRegistry;
@@ -41,7 +48,8 @@ public class DefaultPluginApplicationContextFactory implements PluginApplication
     }
 
     /**
-     * Create and refresh application context.
+     * Create and refresh application context. Make sure the plugin has already loaded
+     * before.
      *
      * @param pluginId plugin id
      * @return refresh application context for the plugin.
@@ -52,6 +60,7 @@ public class DefaultPluginApplicationContextFactory implements PluginApplication
         var pluginWrapper = pluginManager.getPlugin(pluginId);
 
         var context = new PluginApplicationContext(pluginId);
+        context.registerShutdownHook();
         context.setParent(pluginManager.getSharedContext());
 
         var classLoader = pluginWrapper.getPluginClassLoader();
@@ -103,6 +112,9 @@ public class DefaultPluginApplicationContextFactory implements PluginApplication
             });
 
         context.registerBean(PluginControllerManager.class);
+        beanFactory.registerSingleton("springPluginStoppedEventAdapter",
+            new SpringPluginStoppedEventAdapter(pluginId));
+        beanFactory.registerSingleton("haloPluginEventBridge", new HaloPluginEventBridge());
 
         rootContext.getBeanProvider(FinderRegistry.class)
             .ifAvailable(finderRegistry -> {
@@ -139,7 +151,7 @@ public class DefaultPluginApplicationContextFactory implements PluginApplication
         }
 
         @EventListener
-        public void onApplicationEvent(ContextClosedEvent event) {
+        public void onApplicationEvent(ContextClosedEvent ignored) {
             this.finderRegistry.unregister(this.pluginId);
         }
 
@@ -161,7 +173,7 @@ public class DefaultPluginApplicationContextFactory implements PluginApplication
         }
 
         @EventListener
-        public void onApplicationEvent(ContextClosedEvent event) {
+        public void onApplicationEvent(ContextClosedEvent ignored) {
             if (routerFunctions != null) {
                 routerFunctionRegistry.unregister(routerFunctions);
             }
@@ -203,9 +215,57 @@ public class DefaultPluginApplicationContextFactory implements PluginApplication
         }
 
         @EventListener
-        public void onApplicationEvent(ContextClosedEvent event) {
+        public void onApplicationEvent(ContextClosedEvent ignored) {
             handlerMapping.unregister(this.pluginId);
         }
+    }
+
+    private class SpringPluginStoppedEventAdapter
+        implements ApplicationListener<ContextClosedEvent> {
+
+        private final String pluginId;
+
+        private SpringPluginStoppedEventAdapter(String pluginId) {
+            this.pluginId = pluginId;
+        }
+
+        @Override
+        public void onApplicationEvent(ContextClosedEvent event) {
+            var plugin = pluginManager.getPlugin(pluginId).getPlugin();
+            if (plugin instanceof SpringPlugin springPlugin) {
+                event.getApplicationContext()
+                    .publishEvent(new SpringPluginStoppedEvent(this, springPlugin));
+            }
+        }
+    }
+
+    private class HaloPluginEventBridge {
+
+        @EventListener
+        public void onApplicationEvent(SpringPluginStartedEvent event) {
+            var pluginContext = event.getSpringPlugin().getPluginContext();
+            var pluginWrapper = pluginManager.getPlugin(pluginContext.getName());
+
+            pluginManager.getRootContext()
+                .publishEvent(new HaloPluginStartedEvent(this, pluginWrapper));
+        }
+
+        @EventListener
+        public void onApplicationEvent(SpringPluginStoppingEvent event) {
+            var pluginContext = event.getSpringPlugin().getPluginContext();
+            var pluginWrapper = pluginManager.getPlugin(pluginContext.getName());
+            pluginManager.getRootContext()
+                .publishEvent(new HaloPluginBeforeStopEvent(this, pluginWrapper));
+        }
+
+        @EventListener
+        public void onApplicationEvent(SpringPluginStoppedEvent event) {
+            var pluginContext = event.getSpringPlugin().getPluginContext();
+            var pluginWrapper = pluginManager.getPlugin(pluginContext.getName());
+            pluginManager.getRootContext()
+                .publishEvent(new HaloPluginStoppedEvent(this, pluginWrapper));
+        }
+
     }
 
     private List<PropertySource<?>> resolvePropertySources(String pluginId,
