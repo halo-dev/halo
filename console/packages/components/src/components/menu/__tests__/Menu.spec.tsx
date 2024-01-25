@@ -14,7 +14,7 @@ describe("Menu", () => {
     const wrapper = await mount({
       setup() {
         return () => (
-          <VMenu openIds={["3"]}>
+          <VMenu>
             <VMenuItem id="1" title="Menu Item 1" />
             <VMenuItem id="2" title="Menu Item 2" />
             <VMenuItem id="3" title="Menu Item 3">
@@ -29,17 +29,24 @@ describe("Menu", () => {
     // toggling sub menu
     expect(
       wrapper.find(".has-submenus .sub-menu-items").attributes().style
-    ).toBeUndefined(); // visible
+    ).toBe("display: none;");
 
     await wrapper.find(".has-submenus").trigger("click");
+
     expect(
       wrapper.find(".has-submenus .sub-menu-items").attributes().style
-    ).toBe("display: none;");
+    ).toBe(""); // visible
 
     await wrapper.find(".has-submenus").trigger("click");
     expect(
       wrapper.find(".has-submenus .sub-menu-items").attributes().style
     ).toBe(""); // visible
+
+    await wrapper.find(".has-submenus .menu-icon-collapse").trigger("click");
+
+    expect(
+      wrapper.find(".has-submenus .sub-menu-items").attributes().style
+    ).toBe("display: none;");
   });
 
   it("should work with openIds prop", function () {
@@ -90,7 +97,7 @@ describe("Menu", () => {
         item.trigger("click");
         expect(item.emitted().select).toBeDefined();
 
-        expect(item.vm.open).toBe(false);
+        expect(item.vm.open).toBe(true);
 
         item.trigger("click");
         expect(item.vm.open).toBe(true);
