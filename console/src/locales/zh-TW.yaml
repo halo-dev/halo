@@ -75,6 +75,7 @@ core:
         settings: 設置
         actuator: 概覽
         backup: 備份
+        tools: 工具
     operations:
       logout:
         tooltip: 登出
@@ -1407,6 +1408,7 @@ core:
       view_all: 查看全部
       modify: 修改
       verify: 驗證
+      access: 访问
     radio:
       "yes": 是
       "no": 否
@@ -1509,3 +1511,8 @@ core:
       send:
         label: 發送驗證郵件
         toast_success: 如果你的用戶名和郵箱地址匹配，我們將會發送一封郵件到你的郵箱。
+  tool:
+    title: 工具
+    empty:
+      title: 沒有可用工具
+      message: 目前沒有可用的工具，系統工具可能由外掛提供

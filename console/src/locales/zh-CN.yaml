@@ -75,6 +75,7 @@ core:
         settings: 设置
         actuator: 概览
         backup: 备份
+        tools: 工具
     operations:
       logout:
         tooltip: 退出登录
@@ -1441,6 +1442,7 @@ core:
       view_all: 查看全部
       verify: 验证
       modify: 修改
+      access: 访问
     radio:
       "yes": 是
       "no": 否
@@ -1509,3 +1511,8 @@ core:
       recovering: 恢复中
     fields:
       post_count: "{count} 篇文章"
+  tool:
+    title: 工具
+    empty:
+      title: 没有可用工具
+      message: 当前没有可用的工具，系统工具可能由插件提供
