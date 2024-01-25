@@ -96,6 +96,8 @@ public final class SelectorUtil {
         listOptions.setLabelSelector(new LabelSelector().setMatchers(labelMatchers));
         if (!fieldQuery.isEmpty()) {
             listOptions.setFieldSelector(FieldSelector.of(QueryFactory.and(fieldQuery)));
+        } else {
+            listOptions.setFieldSelector(FieldSelector.all());
         }
         return listOptions;
     }

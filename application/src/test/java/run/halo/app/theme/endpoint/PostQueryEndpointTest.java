@@ -2,7 +2,6 @@ package run.halo.app.theme.endpoint;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -20,6 +19,7 @@ import reactor.core.publisher.Mono;
 import run.halo.app.extension.GroupVersion;
 import run.halo.app.extension.ListResult;
 import run.halo.app.extension.Metadata;
+import run.halo.app.extension.PageRequest;
 import run.halo.app.theme.finders.PostFinder;
 import run.halo.app.theme.finders.PostPublicQueryService;
 import run.halo.app.theme.finders.vo.ListedPostVo;
@@ -55,7 +55,7 @@ class PostQueryEndpointTest {
     @Test
     public void listPosts() {
         ListResult<ListedPostVo> result = new ListResult<>(List.of());
-        when(postPublicQueryService.list(anyInt(), anyInt(), any(), any()))
+        when(postPublicQueryService.list(any(), any(PageRequest.class)))
             .thenReturn(Mono.just(result));
 
         webClient.get().uri("/posts")
@@ -65,7 +65,7 @@ class PostQueryEndpointTest {
             .expectBody()
             .jsonPath("$.items").isArray();
 
-        verify(postPublicQueryService).list(anyInt(), anyInt(), any(), any());
+        verify(postPublicQueryService).list(any(), any(PageRequest.class));
     }
 
     @Test

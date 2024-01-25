@@ -149,7 +149,9 @@ const handleBuildSearchIndex = () => {
       });
 
     apiClient.extension.category
-      .listcontentHaloRunV1alpha1Category()
+      .listcontentHaloRunV1alpha1Category({
+        sort: ["metadata.creationTimestamp,desc"],
+      })
       .then((response) => {
         response.data.items.forEach((category) => {
           fuse.add({
@@ -168,23 +170,27 @@ const handleBuildSearchIndex = () => {
         });
       });
 
-    apiClient.extension.tag.listcontentHaloRunV1alpha1Tag().then((response) => {
-      response.data.items.forEach((tag) => {
-        fuse.add({
-          title: tag.spec.displayName,
-          icon: {
-            component: markRaw(IconBookRead),
-          },
-          group: t("core.components.global_search.groups.tag"),
-          route: {
-            name: "Tags",
-            query: {
-              name: tag.metadata.name,
+    apiClient.extension.tag
+      .listcontentHaloRunV1alpha1Tag({
+        sort: ["metadata.creationTimestamp,desc"],
+      })
+      .then((response) => {
+        response.data.items.forEach((tag) => {
+          fuse.add({
+            title: tag.spec.displayName,
+            icon: {
+              component: markRaw(IconBookRead),
             },
-          },
+            group: t("core.components.global_search.groups.tag"),
+            route: {
+              name: "Tags",
+              query: {
+                name: tag.metadata.name,
+              },
+            },
+          });
         });
       });
-    });
   }
 
   if (currentUserHasPermission(["system:singlepages:view"])) {

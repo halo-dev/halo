@@ -113,21 +113,23 @@ const {
     keyword,
   ],
   queryFn: async () => {
-    let categories: string[] | undefined;
-    let tags: string[] | undefined;
-    let contributors: string[] | undefined;
     const labelSelector: string[] = ["content.halo.run/deleted=false"];
+    const fieldSelector: string[] = [];
 
     if (selectedCategory.value) {
-      categories = [selectedCategory.value];
+      fieldSelector.push(`spec.categories=${selectedCategory.value}`);
     }
 
     if (selectedTag.value) {
-      tags = [selectedTag.value];
+      fieldSelector.push(`spec.tags=${selectedTag.value}`);
     }
 
     if (selectedContributor.value) {
-      contributors = [selectedContributor.value];
+      fieldSelector.push(`status.contributors=${selectedContributor.value}`);
+    }
+
+    if (selectedVisible.value) {
+      fieldSelector.push(`spec.visible=${selectedVisible.value}`);
     }
 
     if (selectedPublishStatus.value !== undefined) {
@@ -138,14 +140,11 @@ const {
 
     const { data } = await apiClient.post.listPosts({
       labelSelector,
+      fieldSelector,
       page: page.value,
       size: size.value,
-      visible: selectedVisible.value,
       sort: [selectedSort.value].filter(Boolean) as string[],
       keyword: keyword.value,
-      category: categories,
-      tag: tags,
-      contributor: contributors,
     });
 
     total.value = data.total;
@@ -155,7 +154,7 @@ const {
     return data.items;
   },
   refetchInterval: (data) => {
-    const abnormalPosts = data?.filter((post) => {
+    const abnormalPosts = data?.some((post) => {
       const { spec, metadata, status } = post.post;
       return (
         spec.deleted ||
@@ -164,7 +163,7 @@ const {
       );
     });
 
-    return abnormalPosts?.length ? 1000 : false;
+    return abnormalPosts ? 1000 : false;
   },
 });
 
@@ -407,19 +406,19 @@ watch(selectedPostNames, (newValue) => {
                   },
                   {
                     label: t('core.post.filters.sort.items.publish_time_desc'),
-                    value: 'publishTime,desc',
+                    value: 'spec.publishTime,desc',
                   },
                   {
                     label: t('core.post.filters.sort.items.publish_time_asc'),
-                    value: 'publishTime,asc',
+                    value: 'spec.publishTime,asc',
                   },
                   {
                     label: t('core.post.filters.sort.items.create_time_desc'),
-                    value: 'creationTimestamp,desc',
+                    value: 'metadata.creationTimestamp,desc',
                   },
                   {
                     label: t('core.post.filters.sort.items.create_time_asc'),
-                    value: 'creationTimestamp,asc',
+                    value: 'metadata.creationTimestamp,asc',
                   },
                 ]"
               />

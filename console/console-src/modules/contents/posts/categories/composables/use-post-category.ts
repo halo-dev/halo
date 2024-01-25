@@ -32,6 +32,7 @@ export function usePostCategory(): usePostCategoryReturn {
         await apiClient.extension.category.listcontentHaloRunV1alpha1Category({
           page: 0,
           size: 0,
+          sort: ["metadata.creationTimestamp,desc"],
         });
 
       return data.items;

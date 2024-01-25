@@ -2,7 +2,6 @@ package run.halo.app.theme.finders.impl;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.Mockito.when;
 
 import java.time.Instant;
@@ -11,8 +10,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.function.Predicate;
-import org.apache.commons.lang3.tuple.Pair;
-import org.apache.logging.log4j.util.Strings;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -23,6 +20,7 @@ import run.halo.app.content.PostService;
 import run.halo.app.core.extension.content.Post;
 import run.halo.app.extension.ListResult;
 import run.halo.app.extension.Metadata;
+import run.halo.app.extension.PageRequest;
 import run.halo.app.extension.ReactiveExtensionClient;
 import run.halo.app.metrics.CounterService;
 import run.halo.app.theme.finders.CategoryFinder;
@@ -68,15 +66,6 @@ class PostFinderImplTest {
     private PostFinderImpl postFinder;
 
     @Test
-    void compare() {
-        List<String> strings = posts().stream().sorted(PostFinderImpl.defaultComparator())
-            .map(post -> post.getMetadata().getName())
-            .toList();
-        assertThat(strings).isEqualTo(
-            List.of("post-6", "post-2", "post-1", "post-5", "post-4", "post-3"));
-    }
-
-    @Test
     void predicate() {
         Predicate<Post> predicate = new DefaultQueryPostPredicateResolver().getPredicate().block();
         assertThat(predicate).isNotNull();
@@ -93,7 +82,7 @@ class PostFinderImplTest {
             .map(ListedPostVo::from)
             .toList();
         ListResult<ListedPostVo> listResult = new ListResult<>(1, 10, 3, listedPostVos);
-        when(publicQueryService.list(anyInt(), anyInt(), any(), any()))
+        when(publicQueryService.list(any(), any(PageRequest.class)))
             .thenReturn(Mono.just(listResult));
 
         ListResult<PostArchiveVo> archives = postFinder.archives(1, 10).block();
@@ -113,22 +102,6 @@ class PostFinderImplTest {
     }
 
     @Test
-    void fixedSizeSlidingWindow() {
-        PostFinderImpl.FixedSizeSlidingWindow<Integer>
-            window = new PostFinderImpl.FixedSizeSlidingWindow<>(3);
-
-        List<String> list = new ArrayList<>();
-        for (int i = 0; i < 10; i++) {
-            window.add(i);
-            list.add(Strings.join(window.elements(), ','));
-        }
-        assertThat(list).isEqualTo(
-            List.of("0", "0,1", "0,1,2", "1,2,3", "2,3,4", "3,4,5", "4,5,6", "5,6,7", "6,7,8",
-                "7,8,9")
-        );
-    }
-
-    @Test
     void postPreviousNextPair() {
         List<String> postNames = new ArrayList<>();
         for (int i = 0; i < 10; i++) {
@@ -136,28 +109,27 @@ class PostFinderImplTest {
         }
 
         // post-0, post-1, post-2
-        Pair<String, String> previousNextPair =
-            PostFinderImpl.postPreviousNextPair(postNames, "post-0");
-        assertThat(previousNextPair.getLeft()).isNull();
-        assertThat(previousNextPair.getRight()).isEqualTo("post-1");
+        var previousNextPair = PostFinderImpl.findPostNavigation(postNames, "post-0");
+        assertThat(previousNextPair.prev()).isNull();
+        assertThat(previousNextPair.next()).isEqualTo("post-1");
 
-        previousNextPair = PostFinderImpl.postPreviousNextPair(postNames, "post-1");
-        assertThat(previousNextPair.getLeft()).isEqualTo("post-0");
-        assertThat(previousNextPair.getRight()).isEqualTo("post-2");
+        previousNextPair = PostFinderImpl.findPostNavigation(postNames, "post-1");
+        assertThat(previousNextPair.prev()).isEqualTo("post-0");
+        assertThat(previousNextPair.next()).isEqualTo("post-2");
 
         // post-1, post-2, post-3
-        previousNextPair = PostFinderImpl.postPreviousNextPair(postNames, "post-2");
-        assertThat(previousNextPair.getLeft()).isEqualTo("post-1");
-        assertThat(previousNextPair.getRight()).isEqualTo("post-3");
+        previousNextPair = PostFinderImpl.findPostNavigation(postNames, "post-2");
+        assertThat(previousNextPair.prev()).isEqualTo("post-1");
+        assertThat(previousNextPair.next()).isEqualTo("post-3");
 
         // post-7, post-8, post-9
-        previousNextPair = PostFinderImpl.postPreviousNextPair(postNames, "post-8");
-        assertThat(previousNextPair.getLeft()).isEqualTo("post-7");
-        assertThat(previousNextPair.getRight()).isEqualTo("post-9");
+        previousNextPair = PostFinderImpl.findPostNavigation(postNames, "post-8");
+        assertThat(previousNextPair.prev()).isEqualTo("post-7");
+        assertThat(previousNextPair.next()).isEqualTo("post-9");
 
-        previousNextPair = PostFinderImpl.postPreviousNextPair(postNames, "post-9");
-        assertThat(previousNextPair.getLeft()).isEqualTo("post-8");
-        assertThat(previousNextPair.getRight()).isNull();
+        previousNextPair = PostFinderImpl.findPostNavigation(postNames, "post-9");
+        assertThat(previousNextPair.prev()).isEqualTo("post-8");
+        assertThat(previousNextPair.next()).isNull();
     }
 
     List<Post> postsForArchives() {

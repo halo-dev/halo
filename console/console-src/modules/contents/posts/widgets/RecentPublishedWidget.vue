@@ -21,7 +21,7 @@ const { data } = useQuery<ListedPost[]>({
         `${postLabels.DELETED}=false`,
         `${postLabels.PUBLISHED}=true`,
       ],
-      sort: ["publishTime,desc"],
+      sort: ["spec.publishTime,desc"],
       page: 1,
       size: 10,
     });

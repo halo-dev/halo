@@ -1,5 +1,9 @@
 package run.halo.app.core.extension.reconciler;
 
+import static org.apache.commons.lang3.BooleanUtils.isFalse;
+import static run.halo.app.extension.MetadataUtil.nullSafeLabels;
+import static run.halo.app.extension.index.query.QueryFactory.equal;
+
 import java.time.Duration;
 import java.util.HashSet;
 import java.util.Map;
@@ -7,17 +11,19 @@ import java.util.Set;
 import lombok.RequiredArgsConstructor;
 import org.apache.commons.lang3.BooleanUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Component;
-import run.halo.app.content.PostIndexInformer;
 import run.halo.app.content.permalinks.TagPermalinkPolicy;
 import run.halo.app.core.extension.content.Constant;
 import run.halo.app.core.extension.content.Post;
 import run.halo.app.core.extension.content.Tag;
 import run.halo.app.extension.ExtensionClient;
+import run.halo.app.extension.ListOptions;
 import run.halo.app.extension.MetadataUtil;
 import run.halo.app.extension.controller.Controller;
 import run.halo.app.extension.controller.ControllerBuilder;
 import run.halo.app.extension.controller.Reconciler;
+import run.halo.app.extension.router.selector.FieldSelector;
 import run.halo.app.infra.utils.JsonUtils;
 
 /**
@@ -32,7 +38,6 @@ public class TagReconciler implements Reconciler<Reconciler.Request> {
     private static final String FINALIZER_NAME = "tag-protection";
     private final ExtensionClient client;
     private final TagPermalinkPolicy tagPermalinkPolicy;
-    private final PostIndexInformer postIndexInformer;
 
     @Override
     public Result reconcile(Request request) {
@@ -128,20 +133,22 @@ public class TagReconciler implements Reconciler<Reconciler.Request> {
     }
 
     private void populatePosts(Tag tag) {
-        // populate post count
-        Set<String> postNames = postIndexInformer.getByTagName(tag.getMetadata().getName());
-        tag.getStatusOrDefault().setPostCount(postNames.size());
+        // populate post-count
+        var listOptions = new ListOptions();
+        listOptions.setFieldSelector(FieldSelector.of(
+            equal("spec.tags", tag.getMetadata().getName()))
+        );
+        var posts = client.listAll(Post.class, listOptions, Sort.unsorted());
+        tag.getStatusOrDefault().setPostCount(posts.size());
 
-        // populate visible post count
-        Map<String, String> labelToQuery = Map.of(Post.PUBLISHED_LABEL, BooleanUtils.TRUE,
-            Post.VISIBLE_LABEL, Post.VisibleEnum.PUBLIC.name(),
-            Post.DELETED_LABEL, BooleanUtils.FALSE);
-        Set<String> hasAllLabelPosts = postIndexInformer.getByLabels(labelToQuery);
-
-        // retain all posts that has all labels
-        Set<String> postNamesWithTag = new HashSet<>(postNames);
-        postNamesWithTag.retainAll(hasAllLabelPosts);
-        tag.getStatusOrDefault().setVisiblePostCount(postNamesWithTag.size());
+        var publicPosts = posts.stream()
+            .filter(post -> post.getMetadata().getDeletionTimestamp() == null
+                && isFalse(post.getSpec().getDeleted())
+                && BooleanUtils.TRUE.equals(nullSafeLabels(post).get(Post.PUBLISHED_LABEL))
+                && Post.VisibleEnum.PUBLIC.equals(post.getSpec().getVisible())
+            )
+            .toList();
+        tag.getStatusOrDefault().setVisiblePostCount(publicPosts.size());
     }
 
     private boolean isDeleted(Tag tag) {
