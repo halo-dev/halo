@@ -10,6 +10,7 @@ import java.util.concurrent.TimeUnit;
 import java.util.stream.Stream;
 import lombok.extern.slf4j.Slf4j;
 import org.pf4j.PluginRuntimeException;
+import org.springframework.beans.factory.support.DefaultBeanNameGenerator;
 import org.springframework.boot.env.PropertySourceLoader;
 import org.springframework.boot.env.YamlPropertySourceLoader;
 import org.springframework.context.ApplicationContext;
@@ -65,6 +66,7 @@ public class DefaultPluginApplicationContextFactory implements PluginApplication
 
         sw.start("Create");
         var context = new PluginApplicationContext(pluginId);
+        context.setBeanNameGenerator(DefaultBeanNameGenerator.INSTANCE);
         context.registerShutdownHook();
         context.setParent(pluginManager.getSharedContext());
 
@@ -84,6 +86,10 @@ public class DefaultPluginApplicationContextFactory implements PluginApplication
         var beanFactory = context.getBeanFactory();
         context.registerBean(AggregatedRouterFunction.class);
         beanFactory.registerSingleton("pluginWrapper", pluginWrapper);
+
+        if (pluginWrapper.getPlugin() instanceof SpringPlugin springPlugin) {
+            beanFactory.registerSingleton("pluginContext", springPlugin.getPluginContext());
+        }
 
         var rootContext = pluginManager.getRootContext();
         rootContext.getBeanProvider(ViewNameResolver.class)
