@@ -37,9 +37,6 @@ const routes = computed(() => {
     ?.children.filter((route) => route.path !== "")
     .filter((route) => isRouteValid(route));
 });
-
-console.log(routes);
-console.log(router.currentRoute.value.matched[0]);
 </script>
 
 <template>
