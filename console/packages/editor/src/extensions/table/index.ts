@@ -8,12 +8,16 @@ import {
   type Range,
   mergeAttributes,
   isNodeActive,
-} from "@/tiptap/vue-3";
+  CoreEditor,
+} from "@/tiptap";
 import {
   type Node as ProseMirrorNode,
   type NodeView,
   type EditorState,
   type DOMOutputSpec,
+  Plugin,
+  DecorationSet,
+  Decoration,
 } from "@/tiptap/pm";
 import TableCell from "./table-cell";
 import TableRow from "./table-row";
@@ -94,6 +98,8 @@ function updateColumns(
   }
 }
 
+let editor: CoreEditor | undefined = undefined;
+
 class TableView implements NodeView {
   node: ProseMirrorNode;
 
@@ -109,15 +115,33 @@ class TableView implements NodeView {
 
   contentDOM: HTMLElement;
 
+  containerDOM: HTMLElement;
+
   constructor(node: ProseMirrorNode, cellMinWidth: number) {
     this.node = node;
     this.cellMinWidth = cellMinWidth;
     this.dom = document.createElement("div");
-    this.dom.className = "tableWrapper";
+    this.dom.className = "table-container";
+
+    this.containerDOM = this.dom.appendChild(document.createElement("div"));
+
+    this.containerDOM.className = "tableWrapper";
+    this.containerDOM.addEventListener("wheel", (e) => {
+      return this.handleHorizontalWheel(this.containerDOM, e);
+    });
+    this.containerDOM.addEventListener("scroll", () => {
+      if (!editor) {
+        return false;
+      }
+      const { state, view } = editor;
+      const { tr } = state;
+      view.dispatch(tr);
+      return false;
+    });
 
     this.scrollDom = document.createElement("div");
     this.scrollDom.className = "scrollWrapper";
-    this.dom.appendChild(this.scrollDom);
+    this.containerDOM.appendChild(this.scrollDom);
 
     this.table = this.scrollDom.appendChild(document.createElement("table"));
     this.colgroup = this.table.appendChild(document.createElement("colgroup"));
@@ -132,7 +156,6 @@ class TableView implements NodeView {
 
     this.node = node;
     updateColumns(node, this.colgroup, this.table, this.cellMinWidth);
-
     return true;
   }
 
@@ -144,6 +167,16 @@ class TableView implements NodeView {
       (mutation.target === this.table ||
         this.colgroup.contains(mutation.target))
     );
+  }
+
+  handleHorizontalWheel(dom: HTMLElement, event: WheelEvent) {
+    const { scrollWidth, clientWidth } = dom;
+    const hasScrollWidth = scrollWidth > clientWidth;
+    if (hasScrollWidth) {
+      event.stopPropagation();
+      event.preventDefault();
+      dom.scrollBy({ left: event.deltaY });
+    }
   }
 }
 
@@ -449,6 +482,52 @@ const Table = TiptapTable.extend<ExtensionOptions & TableOptions>({
     ];
 
     return table;
+  },
+
+  onTransaction() {
+    editor = this.editor;
+  },
+
+  addProseMirrorPlugins() {
+    const plugins = this.parent?.() ?? [];
+    return [
+      ...plugins,
+      new Plugin({
+        props: {
+          decorations: (state) => {
+            const { doc, tr } = state;
+            const decorations: Decoration[] = [];
+            doc.descendants((node, pos) => {
+              if (node.type.name === Table.name) {
+                const { view } = this.editor;
+                const nodeDom = view.nodeDOM(pos) || view.domAtPos(pos)?.node;
+                if (!nodeDom) {
+                  return true;
+                }
+                const { scrollWidth, clientWidth, scrollLeft } =
+                  nodeDom.firstChild as HTMLElement;
+                let classNames = "";
+                if (
+                  scrollWidth > clientWidth &&
+                  scrollLeft < scrollWidth - clientWidth
+                ) {
+                  classNames += "table-right-shadow ";
+                }
+                if (scrollLeft > 0) {
+                  classNames += "table-left-shadow ";
+                }
+                decorations.push(
+                  Decoration.node(pos, pos + node.nodeSize, {
+                    class: classNames,
+                  })
+                );
+              }
+            });
+            return DecorationSet.create(tr.doc, decorations);
+          },
+        },
+      }),
+    ];
   },
 }).configure({ resizable: true });
 
