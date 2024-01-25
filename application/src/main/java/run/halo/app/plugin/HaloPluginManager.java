@@ -18,16 +18,11 @@ import org.pf4j.PluginDescriptorFinder;
 import org.pf4j.PluginFactory;
 import org.pf4j.PluginLoader;
 import org.pf4j.PluginRepository;
-import org.pf4j.PluginState;
-import org.pf4j.PluginStateEvent;
-import org.pf4j.PluginStateListener;
 import org.pf4j.PluginStatusProvider;
 import org.pf4j.PluginWrapper;
 import org.springframework.context.ApplicationContext;
 import org.springframework.data.util.Lazy;
 import run.halo.app.infra.SystemVersionSupplier;
-import run.halo.app.plugin.event.HaloPluginStartedEvent;
-import run.halo.app.plugin.event.HaloPluginStoppedEvent;
 
 /**
  * PluginManager to hold the main ApplicationContext.
@@ -162,28 +157,4 @@ public class HaloPluginManager extends DefaultPluginManager implements SpringPlu
         return sharedContext.get();
     }
 
-    private class PluginStoppedEventAdapter implements PluginStateListener {
-
-        @Override
-        public void pluginStateChanged(PluginStateEvent event) {
-            if (!PluginState.STOPPED.equals(event.getPluginState())) {
-                return;
-            }
-            var pluginWrapper = event.getPlugin();
-            rootContext.publishEvent(new HaloPluginStoppedEvent(event.getSource(), pluginWrapper));
-        }
-    }
-
-    private class PluginStartedEventAdapter implements PluginStateListener {
-
-        @Override
-        public void pluginStateChanged(PluginStateEvent event) {
-            if (!PluginState.STARTED.equals(event.getPluginState())) {
-                return;
-            }
-            // Indicate the state is started.
-            var pluginWrapper = event.getPlugin();
-            rootContext.publishEvent(new HaloPluginStartedEvent(event.getSource(), pluginWrapper));
-        }
-    }
 }

@@ -6,6 +6,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 import java.util.stream.Stream;
 import lombok.extern.slf4j.Slf4j;
 import org.pf4j.PluginRuntimeException;
@@ -22,6 +23,7 @@ import org.springframework.core.io.DefaultResourceLoader;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.ResourceLoader;
 import org.springframework.stereotype.Controller;
+import org.springframework.util.StopWatch;
 import org.springframework.web.reactive.function.server.RouterFunction;
 import org.springframework.web.reactive.function.server.ServerResponse;
 import reactor.core.Exceptions;
@@ -59,6 +61,9 @@ public class DefaultPluginApplicationContextFactory implements PluginApplication
         log.debug("Preparing to create application context for plugin {}", pluginId);
         var pluginWrapper = pluginManager.getPlugin(pluginId);
 
+        var sw = new StopWatch("CreateApplicationContextFor" + pluginId);
+
+        sw.start("Create");
         var context = new PluginApplicationContext(pluginId);
         context.registerShutdownHook();
         context.setParent(pluginManager.getSharedContext());
@@ -66,11 +71,16 @@ public class DefaultPluginApplicationContextFactory implements PluginApplication
         var classLoader = pluginWrapper.getPluginClassLoader();
         var resourceLoader = new DefaultResourceLoader(classLoader);
         context.setResourceLoader(resourceLoader);
+        sw.stop();
+
+        sw.start("LoadPropertySources");
         var mutablePropertySources = context.getEnvironment().getPropertySources();
 
         resolvePropertySources(pluginId, resourceLoader)
             .forEach(mutablePropertySources::addLast);
+        sw.stop();
 
+        sw.start("RegisterBeans");
         var beanFactory = context.getBeanFactory();
         context.registerBean(AggregatedRouterFunction.class);
         beanFactory.registerSingleton("pluginWrapper", pluginWrapper);
@@ -84,25 +94,12 @@ public class DefaultPluginApplicationContextFactory implements PluginApplication
             });
 
         rootContext.getBeanProvider(ReactiveExtensionClient.class)
-            .ifAvailable(client -> {
+            .ifUnique(client -> {
                 var reactiveSettingFetcher = new DefaultReactiveSettingFetcher(client, pluginId);
                 var settingFetcher = new DefaultSettingFetcher(reactiveSettingFetcher);
                 beanFactory.registerSingleton("reactiveSettingFetcher", reactiveSettingFetcher);
                 beanFactory.registerSingleton("settingFetcher", settingFetcher);
             });
-
-        var classNames = pluginManager.getExtensionClassNames(pluginId);
-        classNames.stream()
-            .map(className -> {
-                try {
-                    return classLoader.loadClass(className);
-                } catch (ClassNotFoundException e) {
-                    throw new PluginRuntimeException(String.format("""
-                        Failed to load class %s for plugin %s.\
-                        """, className, pluginId), e);
-                }
-            })
-            .forEach(context::register);
 
         rootContext.getBeanProvider(PluginRequestMappingHandlerMapping.class)
             .ifAvailable(handlerMapping -> {
@@ -130,12 +127,32 @@ public class DefaultPluginApplicationContextFactory implements PluginApplication
                     pluginRouterFunctionManager
                 );
             });
+        sw.stop();
 
+        sw.start("LoadComponents");
+        var classNames = pluginManager.getExtensionClassNames(pluginId);
+        classNames.stream()
+            .map(className -> {
+                try {
+                    return classLoader.loadClass(className);
+                } catch (ClassNotFoundException e) {
+                    throw new PluginRuntimeException(String.format("""
+                        Failed to load class %s for plugin %s.\
+                        """, className, pluginId), e);
+                }
+            })
+            .forEach(clazzName -> context.registerBean(clazzName));
+        sw.stop();
         log.debug("Created application context for plugin {}", pluginId);
-        log.debug("Refreshing application context for plugin {}", pluginId);
 
+        log.debug("Refreshing application context for plugin {}", pluginId);
+        sw.start("Refresh");
         context.refresh();
+        sw.stop();
         log.debug("Refreshed application context for plugin {}", pluginId);
+        if (log.isDebugEnabled()) {
+            log.debug("\n{}", sw.prettyPrint(TimeUnit.MILLISECONDS));
+        }
         return context;
     }
 
@@ -295,7 +312,7 @@ public class DefaultPluginApplicationContextFactory implements PluginApplication
         // resolve default config
         Stream.of(
                 CLASSPATH_URL_PREFIX + "/config.yaml",
-                CLASSPATH_URL_PREFIX + "/config.yaml"
+                CLASSPATH_URL_PREFIX + "/config.yml"
             )
             .map(resourceLoader::getResource)
             .forEach(resource -> {
