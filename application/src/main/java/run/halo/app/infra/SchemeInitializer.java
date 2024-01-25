@@ -153,8 +153,11 @@ public class SchemeInitializer implements ApplicationListener<ApplicationContext
                 .setIndexFunc(simpleAttribute(Post.class, post -> {
                     var version = post.getMetadata().getVersion();
                     var observedVersion = post.getStatusOrDefault().getObservedVersion();
+                    if (observedVersion == null || observedVersion < version) {
+                        return BooleanUtils.TRUE;
+                    }
                     // do not care about the false case so return null to avoid indexing
-                    return observedVersion >= version ? BooleanUtils.TRUE : null;
+                    return null;
                 })));
         });
         schemeManager.register(Category.class, indexSpecs -> {

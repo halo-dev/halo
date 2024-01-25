@@ -159,7 +159,7 @@ public class Post extends AbstractExtension {
 
         private Instant lastModifyTime;
 
-        private long observedVersion;
+        private Long observedVersion;
 
         @JsonIgnore
         public ConditionList getConditionsOrDefault() {

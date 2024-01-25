@@ -358,7 +358,8 @@ class CommentServiceImplTest {
                             "apiVersion": "content.halo.run/v1alpha1",
                             "kind": "Post",
                             "metadata": {
-                                "name": "fake-post"
+                                "name": "fake-post",
+                                "version": 1
                             }
                         },
                         "stats": {
@@ -403,7 +404,8 @@ class CommentServiceImplTest {
                             "apiVersion": "content.halo.run/v1alpha1",
                             "kind": "Post",
                             "metadata": {
-                                "name": "fake-post"
+                                "name": "fake-post",
+                                "version": 1
                             }
                         },
                         "stats": {
@@ -447,7 +449,8 @@ class CommentServiceImplTest {
                             "apiVersion": "content.halo.run/v1alpha1",
                             "kind": "Post",
                             "metadata": {
-                                "name": "fake-post"
+                                "name": "fake-post",
+                                "version": 1
                             }
                         },
                         "stats": {
