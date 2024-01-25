@@ -4,6 +4,7 @@ import static java.nio.charset.StandardCharsets.UTF_8;
 import static org.apache.commons.lang3.ObjectUtils.defaultIfNull;
 import static run.halo.app.extension.ExtensionUtil.addFinalizers;
 import static run.halo.app.extension.ExtensionUtil.removeFinalizers;
+import static run.halo.app.extension.index.query.QueryFactory.equal;
 
 import com.google.common.hash.Hashing;
 import java.time.Instant;
@@ -36,6 +37,7 @@ import run.halo.app.event.post.PostPublishedEvent;
 import run.halo.app.event.post.PostUnpublishedEvent;
 import run.halo.app.event.post.PostUpdatedEvent;
 import run.halo.app.event.post.PostVisibleChangedEvent;
+import run.halo.app.extension.DefaultExtensionMatcher;
 import run.halo.app.extension.ExtensionClient;
 import run.halo.app.extension.ExtensionOperator;
 import run.halo.app.extension.ListOptions;
@@ -211,7 +213,11 @@ public class PostReconciler implements Reconciler<Reconciler.Request> {
                 status.setInProgress(
                     !StringUtils.equals(headSnapshot, post.getSpec().getReleaseSnapshot()));
 
+                // version + 1 is required to truly equal version
+                // as a version will be incremented after the update
+                status.setObservedVersion(post.getMetadata().getVersion() + 1);
                 client.update(post);
+
                 // fire event after updating post
                 events.forEach(eventPublisher::publishEvent);
             });
@@ -222,8 +228,12 @@ public class PostReconciler implements Reconciler<Reconciler.Request> {
     public Controller setupWith(ControllerBuilder builder) {
         return builder
             .extension(new Post())
-            // TODO Make it configurable
-            .workerCount(1)
+            .onAddMatcher(DefaultExtensionMatcher.builder(client, Post.GVK)
+                .fieldSelector(FieldSelector.of(
+                    equal(Post.REQUIRE_SYNC_ON_STARTUP_INDEX_NAME, BooleanUtils.TRUE))
+                )
+                .build()
+            )
             .build();
     }
 

@@ -19,6 +19,7 @@ public class TestPost {
         post.setApiVersion(getApiVersion(Post.class));
         Metadata metadata = new Metadata();
         metadata.setName("post-A");
+        metadata.setVersion(1L);
         post.setMetadata(metadata);
 
         Post.PostSpec postSpec = new Post.PostSpec();
@@ -38,6 +39,7 @@ public class TestPost {
         snapshot.setApiVersion(getApiVersion(Snapshot.class));
         Metadata metadata = new Metadata();
         metadata.setName("snapshot-A");
+        metadata.setVersion(1L);
         metadata.setCreationTimestamp(Instant.now());
         snapshot.setMetadata(metadata);
         MetadataUtil.nullSafeAnnotations(snapshot).put(Snapshot.KEEP_RAW_ANNO, "true");
