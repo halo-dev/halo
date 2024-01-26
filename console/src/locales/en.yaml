@@ -77,6 +77,7 @@ core:
         settings: Settings
         actuator: Actuator
         backup: Backup
+        tools: Tools
     operations:
       logout:
         tooltip: Logout
@@ -1495,6 +1496,7 @@ core:
       view_all: View all
       verify: Verify
       modify: Modify
+      access: Access
     radio:
       "yes": "Yes"
       "no": "No"
@@ -1601,3 +1603,10 @@ core:
         toast_success: >-
           If your username and email address match, we will send an email to
           your email address.
+  tool:
+    title: Tools
+    empty:
+      title: There are no tools available
+      message: >-
+        There are currently no tools available, and system tools may be provided
+        by plugins
