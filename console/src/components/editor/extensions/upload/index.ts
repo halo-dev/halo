@@ -57,6 +57,10 @@ export const Upload = Extension.create({
             if (files.length) {
               event.preventDefault();
               files.forEach((file: File) => {
+                // TODO: For drag-and-drop uploaded files,
+                // perhaps it is necessary to determine the
+                // current position of the drag-and-drop
+                // instead of inserting them directly at the cursor.
                 handleFileEvent({ editor, file });
               });
               return true;

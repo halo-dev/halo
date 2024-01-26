@@ -2,6 +2,7 @@
 import { CoreEditor } from "@halo-dev/richtext-editor";
 import type { Attachment } from "@halo-dev/api-client";
 import Image from "../extensions/image";
+import ExtensionVideo from "../extensions/video";
 import type { AxiosRequestConfig } from "axios";
 
 export interface FileProps {
@@ -25,6 +26,11 @@ export const handleFileEvent = ({ file, editor }: FileProps) => {
     return true;
   }
 
+  if (file.type.startsWith("video/")) {
+    uploadVideo({ file, editor });
+    return true;
+  }
+
   return true;
 };
 
@@ -36,6 +42,19 @@ export const handleFileEvent = ({ file, editor }: FileProps) => {
 export const uploadImage = ({ file, editor }: FileProps) => {
   const { view } = editor;
   const node = view.props.state.schema.nodes[Image.name].create({
+    file: file,
+  });
+  editor.view.dispatch(editor.view.state.tr.replaceSelectionWith(node));
+};
+
+/**
+ * Uploads a video file and inserts it into the editor.
+ *
+ * @param {FileProps} { file, editor } - File to be uploaded and the editor instance
+ */
+export const uploadVideo = ({ file, editor }: FileProps) => {
+  const { view } = editor;
+  const node = view.props.state.schema.nodes[ExtensionVideo.name].create({
     file: file,
   });
   editor.view.dispatch(editor.view.state.tr.replaceSelectionWith(node));
