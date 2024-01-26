@@ -1,4 +1,4 @@
-package run.halo.app;
+package run.halo.app.plugin;
 
 import org.springframework.context.ApplicationContext;
 

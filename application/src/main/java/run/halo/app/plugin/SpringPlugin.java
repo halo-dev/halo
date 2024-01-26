@@ -3,7 +3,6 @@ package run.halo.app.plugin;
 import org.pf4j.Plugin;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ConfigurableApplicationContext;
-import run.halo.app.PluginApplicationContextFactory;
 import run.halo.app.plugin.event.SpringPluginStartedEvent;
 import run.halo.app.plugin.event.SpringPluginStartingEvent;
 import run.halo.app.plugin.event.SpringPluginStoppingEvent;
