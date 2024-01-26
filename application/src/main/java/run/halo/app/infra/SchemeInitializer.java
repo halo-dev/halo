@@ -5,6 +5,7 @@ import static run.halo.app.extension.index.IndexAttributeFactory.multiValueAttri
 import static run.halo.app.extension.index.IndexAttributeFactory.simpleAttribute;
 
 import java.util.Set;
+import org.apache.commons.lang3.BooleanUtils;
 import org.springframework.boot.context.event.ApplicationContextInitializedEvent;
 import org.springframework.context.ApplicationListener;
 import org.springframework.lang.NonNull;
@@ -146,6 +147,18 @@ public class SchemeInitializer implements ApplicationListener<ApplicationContext
                 .setName("status.excerpt")
                 .setIndexFunc(
                     simpleAttribute(Post.class, post -> post.getStatusOrDefault().getExcerpt())));
+
+            indexSpecs.add(new IndexSpec()
+                .setName(Post.REQUIRE_SYNC_ON_STARTUP_INDEX_NAME)
+                .setIndexFunc(simpleAttribute(Post.class, post -> {
+                    var version = post.getMetadata().getVersion();
+                    var observedVersion = post.getStatusOrDefault().getObservedVersion();
+                    if (observedVersion == null || observedVersion < version) {
+                        return BooleanUtils.TRUE;
+                    }
+                    // do not care about the false case so return null to avoid indexing
+                    return null;
+                })));
         });
         schemeManager.register(Category.class, indexSpecs -> {
             indexSpecs.add(new IndexSpec()
