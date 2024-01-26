@@ -1,5 +1,7 @@
 package run.halo.app.plugin.resources;
 
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+
 import java.util.List;
 import java.util.Map;
 import org.junit.jupiter.api.Test;
@@ -7,11 +9,10 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.pf4j.PluginManager;
 import org.springframework.context.ApplicationContext;
-import reactor.test.StepVerifier;
 import run.halo.app.core.extension.ReverseProxy;
 import run.halo.app.extension.Metadata;
-import run.halo.app.plugin.HaloPluginManager;
 import run.halo.app.plugin.PluginConst;
 
 /**
@@ -24,7 +25,7 @@ import run.halo.app.plugin.PluginConst;
 class ReverseProxyRouterFunctionFactoryTest {
 
     @Mock
-    private HaloPluginManager haloPluginManager;
+    private PluginManager pluginManager;
 
     @Mock
     private ApplicationContext applicationContext;
@@ -34,11 +35,8 @@ class ReverseProxyRouterFunctionFactoryTest {
 
     @Test
     void create() {
-        var routerFunction =
-            reverseProxyRouterFunctionFactory.create(mockReverseProxy(), "fakeA");
-        StepVerifier.create(routerFunction)
-            .expectNextCount(1)
-            .verifyComplete();
+        var routerFunction = reverseProxyRouterFunctionFactory.create(mockReverseProxy(), "fakeA");
+        assertNotNull(routerFunction);
     }
 
     private ReverseProxy mockReverseProxy() {

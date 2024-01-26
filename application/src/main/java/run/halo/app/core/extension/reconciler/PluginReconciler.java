@@ -262,8 +262,8 @@ public class PluginReconciler implements Reconciler<Request> {
         var p = pluginManager.getPlugin(pluginName);
         var classLoader = p.getPluginClassLoader();
         var resLoader = new DefaultResourceLoader(classLoader);
-        var entryRes = resLoader.getResource("classpath:/console/main.js");
-        var cssRes = resLoader.getResource("classpath:/console/style.css");
+        var entryRes = resLoader.getResource("classpath:console/main.js");
+        var cssRes = resLoader.getResource("classpath:console/style.css");
         if (entryRes.exists()) {
             var entry = UriComponentsBuilder.newInstance()
                 .pathSegment("plugins", pluginName, "assets", "console", "main.js")

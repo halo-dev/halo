@@ -45,9 +45,14 @@ public class PluginStartedListener {
     @EventListener
     public Mono<Void> onApplicationEvent(HaloPluginStartedEvent event) {
         var pluginWrapper = event.getPlugin();
-        var pluginApplicationContext = ExtensionContextRegistry.getInstance()
-            .getByPluginId(pluginWrapper.getPluginId());
-
+        var p = pluginWrapper.getPlugin();
+        if (!(p instanceof SpringPlugin springPlugin)) {
+            return Mono.empty();
+        }
+        var applicationContext = springPlugin.getApplicationContext();
+        if (!(applicationContext instanceof PluginApplicationContext pluginApplicationContext)) {
+            return Mono.empty();
+        }
         var pluginName = pluginWrapper.getPluginId();
 
         return client.get(Plugin.class, pluginName)

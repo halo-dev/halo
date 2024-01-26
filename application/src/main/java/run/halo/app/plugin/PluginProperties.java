@@ -4,7 +4,6 @@ import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
 import lombok.Data;
-import org.pf4j.PluginLoader;
 import org.pf4j.RuntimeMode;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 
@@ -67,8 +66,4 @@ public class PluginProperties {
      */
     private String pluginsRoot;
 
-    /**
-     * Allows providing custom plugin loaders.
-     */
-    private Class<PluginLoader> customPluginLoader;
 }
