@@ -240,7 +240,7 @@ public class PluginReconciler implements Reconciler<Request> {
             log.info("Resolving logo resource for plugin {}", pluginName);
             // the logo might be:
             // 1. URL
-            // 2. file name
+            // 2. relative path to "resources" folder
             // 3. base64 format data image
             var logo = specLogo;
             if (!specLogo.startsWith("data:image")) {
@@ -249,7 +249,8 @@ public class PluginReconciler implements Reconciler<Request> {
                 } catch (MalformedURLException ignored) {
                     // indicate the logo is a path
                     logo = UriComponentsBuilder.newInstance()
-                        .pathSegment("plugins", pluginName, "assets", specLogo)
+                        .pathSegment("plugins", pluginName, "assets")
+                        .path(specLogo)
                         .queryParam("version", pluginVersion)
                         .build(true)
                         .toString();
