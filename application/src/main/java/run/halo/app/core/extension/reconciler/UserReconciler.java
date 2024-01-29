@@ -27,6 +27,7 @@ import run.halo.app.extension.controller.Controller;
 import run.halo.app.extension.controller.ControllerBuilder;
 import run.halo.app.extension.controller.Reconciler;
 import run.halo.app.extension.controller.Reconciler.Request;
+import run.halo.app.extension.controller.RequeueException;
 import run.halo.app.infra.AnonymousUserConst;
 import run.halo.app.infra.ExternalUrlSupplier;
 import run.halo.app.infra.utils.JsonUtils;
@@ -83,7 +84,10 @@ public class UserReconciler implements Reconciler<Request> {
                     .ifPresent(attachment -> {
                         URI avatarUri = attachmentService.getPermalink(attachment).block();
                         if (avatarUri == null) {
-                            throw new IllegalStateException("User avatar attachment not found.");
+                            log.warn("Failed to get avatar permalink for user [{}] with attachment "
+                                + "[{}], re-enqueuing...", name, avatarAttachmentName);
+                            throw new RequeueException(new Result(true, null),
+                                "Failed to get avatar permalink.");
                         }
                         user.getSpec().setAvatar(avatarUri.toString());
                     });
