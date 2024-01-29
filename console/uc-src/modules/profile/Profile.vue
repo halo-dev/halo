@@ -5,7 +5,6 @@ import {
   VTabbar,
   VDropdown,
   VDropdownItem,
-  VLoading,
 } from "@halo-dev/components";
 import { computed, provide, ref, type Ref } from "vue";
 import type { DetailedUser } from "@halo-dev/api-client";
@@ -13,7 +12,6 @@ import ProfileEditingModal from "./components/ProfileEditingModal.vue";
 import PasswordChangeModal from "./components/PasswordChangeModal.vue";
 import { useQuery } from "@tanstack/vue-query";
 import { useI18n } from "vue-i18n";
-import { rbacAnnotations } from "@/constants/annotations";
 import UserAvatar from "@/components/user-avatar/UserAvatar.vue";
 import type { Raw } from "vue";
 import type { Component } from "vue";
@@ -41,7 +39,6 @@ const passwordChangeModal = ref(false);
 
 const {
   data: user,
-  isFetching,
   isLoading,
   refetch,
 } = useQuery({
@@ -49,13 +46,6 @@ const {
   queryFn: async () => {
     const { data } = await apiClient.user.getCurrentUserDetail();
     return data;
-  },
-  refetchInterval: (data) => {
-    const annotations = data?.user.metadata.annotations;
-    return annotations?.[rbacAnnotations.AVATAR_ATTACHMENT_NAME] !==
-      annotations?.[rbacAnnotations.LAST_AVATAR_ATTACHMENT_NAME]
-      ? 1000
-      : false;
   },
 });
 
@@ -110,8 +100,7 @@ const activeTab = useRouteQuery<string>("tab", tabs[0].id, {
       <div class="flex items-center justify-between">
         <div class="flex flex-row items-center gap-5">
           <div class="group relative h-20 w-20">
-            <VLoading v-if="isFetching" class="h-full w-full" />
-            <UserAvatar v-else is-current-user />
+            <UserAvatar :name="user?.user.metadata.name" is-current-user />
           </div>
           <div class="block">
             <h1 class="truncate text-lg font-bold text-gray-900">

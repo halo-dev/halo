@@ -151,6 +151,7 @@
     "vite-plugin-html": "^3.2.0",
     "vite-plugin-pwa": "^0.16.4",
     "vite-plugin-static-copy": "^0.17.0",
+    "vite-plugin-vue-devtools": "^7.0.13",
     "vitest": "^0.34.1",
     "vue-tsc": "^1.8.8"
   }
