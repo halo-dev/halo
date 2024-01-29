@@ -11,21 +11,23 @@ import {
   VSpace,
   Toast,
   Dialog,
+  VLoading,
 } from "@halo-dev/components";
 import { ref, defineAsyncComponent, type Ref } from "vue";
-import type { DetailedUser } from "@halo-dev/api-client";
 import { usePermission } from "@/utils/permission";
-import { useQueryClient } from "@tanstack/vue-query";
+import { useQuery, useQueryClient } from "@tanstack/vue-query";
 import { useI18n } from "vue-i18n";
 import { useFileDialog } from "@vueuse/core";
-import { inject } from "vue";
 import { computed } from "vue";
+import { rbacAnnotations } from "@/constants/annotations";
 
 const props = withDefaults(
   defineProps<{
+    name?: string;
     isCurrentUser?: boolean;
   }>(),
   {
+    name: "-",
     isCurrentUser: false,
   }
 );
@@ -33,6 +35,31 @@ const props = withDefaults(
 const queryClient = useQueryClient();
 const { currentUserHasPermission } = usePermission();
 const { t } = useI18n();
+
+const { data: avatar, isFetching } = useQuery({
+  queryKey: ["user-avatar", props.name, props.isCurrentUser],
+  queryFn: async () => {
+    const { data } = props.isCurrentUser
+      ? await apiClient.user.getCurrentUserDetail()
+      : await apiClient.user.getUserDetail({
+          name: props.name,
+        });
+
+    const annotations = data?.user.metadata.annotations;
+
+    // Check avatar has been updated. if not, we need retry.
+    if (
+      annotations?.[rbacAnnotations.AVATAR_ATTACHMENT_NAME] !==
+      annotations?.[rbacAnnotations.LAST_AVATAR_ATTACHMENT_NAME]
+    ) {
+      throw new Error("Avatar is not updated");
+    }
+
+    return data.user.spec.avatar || "";
+  },
+  retry: 5,
+  retryDelay: 1000,
+});
 
 const UserAvatarCropper = defineAsyncComponent(
   () => import("./UserAvatarCropper.vue")
@@ -47,8 +74,6 @@ const { open, reset, onChange } = useFileDialog({
   accept: ".jpg, .jpeg, .png",
   multiple: false,
 });
-
-const user = inject<Ref<DetailedUser | undefined>>("user");
 
 const userAvatarCropper = ref<IUserAvatarCropperType>();
 const visibleCropperModal = ref(false);
@@ -67,18 +92,15 @@ onChange((files) => {
 const uploadSaving = ref(false);
 const handleUploadAvatar = () => {
   userAvatarCropper.value?.getCropperFile().then((file) => {
-    if (!user?.value) {
-      return;
-    }
-
     uploadSaving.value = true;
 
     apiClient.user
       .uploadUserAvatar({
-        name: props.isCurrentUser ? "-" : user.value.user.metadata.name,
+        name: props.isCurrentUser ? "-" : props.name,
         file: file,
       })
       .then(() => {
+        queryClient.invalidateQueries({ queryKey: ["user-avatar"] });
         queryClient.invalidateQueries({ queryKey: ["user-detail"] });
         handleCloseCropperModal();
       })
@@ -99,15 +121,12 @@ const handleRemoveCurrentAvatar = () => {
     confirmText: t("core.common.buttons.confirm"),
     cancelText: t("core.common.buttons.cancel"),
     onConfirm: async () => {
-      if (!user?.value) {
-        return;
-      }
-
       apiClient.user
         .deleteUserAvatar({
-          name: props.isCurrentUser ? "-" : user.value.user.metadata.name,
+          name: props.isCurrentUser ? "-" : props.name,
         })
         .then(() => {
+          queryClient.invalidateQueries({ queryKey: ["user-avatar"] });
           queryClient.invalidateQueries({ queryKey: ["user-detail"] });
         })
         .catch(() => {
@@ -128,15 +147,16 @@ const changeUploadAvatar = () => {
 };
 
 const hasAvatar = computed(() => {
-  return !!user?.value?.user.spec.avatar;
+  return !!avatar.value;
 });
 </script>
 
 <template>
-  <div class="group h-full w-full">
+  <VLoading v-if="isFetching" class="h-full w-full" />
+  <div v-else class="group h-full w-full">
     <VAvatar
-      :src="user?.user.spec.avatar"
-      :alt="user?.user.spec.displayName"
+      :src="avatar"
+      :alt="props.name"
       circle
       width="100%"
       height="100%"

@@ -5,7 +5,6 @@ import {
   VTabbar,
   VDropdown,
   VDropdownItem,
-  VLoading,
 } from "@halo-dev/components";
 import { computed, provide, ref, type Ref } from "vue";
 import { useRoute } from "vue-router";
@@ -15,7 +14,6 @@ import UserPasswordChangeModal from "./components/UserPasswordChangeModal.vue";
 import { usePermission } from "@/utils/permission";
 import { useQuery } from "@tanstack/vue-query";
 import { useI18n } from "vue-i18n";
-import { rbacAnnotations } from "@/constants/annotations";
 import UserAvatar from "@/components/user-avatar/UserAvatar.vue";
 import type { Raw } from "vue";
 import type { Component } from "vue";
@@ -45,7 +43,6 @@ const { params } = useRoute();
 
 const {
   data: user,
-  isFetching,
   isLoading,
   refetch,
 } = useQuery({
@@ -55,13 +52,6 @@ const {
       name: params.name as string,
     });
     return data;
-  },
-  refetchInterval: (data) => {
-    const annotations = data?.user.metadata.annotations;
-    return annotations?.[rbacAnnotations.AVATAR_ATTACHMENT_NAME] !==
-      annotations?.[rbacAnnotations.LAST_AVATAR_ATTACHMENT_NAME]
-      ? 1000
-      : false;
   },
   enabled: computed(() => !!params.name),
 });
@@ -105,8 +95,7 @@ function handleRouteToUC() {
       <div class="flex items-center justify-between">
         <div class="flex flex-row items-center gap-5">
           <div class="group relative h-20 w-20">
-            <VLoading v-if="isFetching" class="h-full w-full" />
-            <UserAvatar v-else />
+            <UserAvatar :name="user?.user.metadata.name" />
           </div>
           <div class="block">
             <h1 class="truncate text-lg font-bold text-gray-900">
