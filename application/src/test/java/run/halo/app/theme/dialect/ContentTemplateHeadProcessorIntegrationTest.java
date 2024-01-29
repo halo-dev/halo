@@ -146,8 +146,8 @@ class ContentTemplateHeadProcessorIntegrationTest {
              <head>
               <meta charset="UTF-8">
               <title>Post detail</title>
-              <meta name="description" content="post-description">
               <meta name="keyword" content="postK1,postK2">
+              <meta name="description" content="post-description">
               <meta name="other" content="post-other-meta">
              </head>
              <body>

@@ -12,6 +12,7 @@ import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
 import org.thymeleaf.context.ITemplateContext;
 import org.thymeleaf.model.IModel;
+import org.thymeleaf.model.IProcessableElementTag;
 import org.thymeleaf.model.ITemplateEvent;
 import org.thymeleaf.model.IText;
 import org.thymeleaf.processor.element.IElementModelStructureHandler;
@@ -59,9 +60,19 @@ public class DuplicateMetaTagProcessor implements TemplateHeadProcessor {
                 IText otherText = context.getModelFactory()
                     .createText(text);
                 otherModel.add(new IndexedModel(i, otherText));
-            } else {
-                otherModel.add(new IndexedModel(i, templateEvent));
+                continue;
             }
+            if (templateEvent instanceof IProcessableElementTag tag) {
+                var indexedModel = new IndexedModel(i, tag);
+                if ("meta".equals(tag.getElementCompleteName())) {
+                    var attribute = tag.getAttribute("name");
+                    if (attribute != null) {
+                        uniqueMetaTags.put(attribute.getValue(), indexedModel);
+                        continue;
+                    }
+                }
+            }
+            otherModel.add(new IndexedModel(i, templateEvent));
         }
 
         otherModel.addAll(uniqueMetaTags.values());
