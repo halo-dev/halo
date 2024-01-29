@@ -174,9 +174,9 @@ class HaloProcessorDialectTest {
                 <title>Post</title>
               <meta name="global-head-test" content="test" />
             <meta name="content-head-test" content="test" />
-            <meta content="post-meta-V1" name="post-meta-V1" />
-            <meta content="post-meta-V2" name="post-meta-V2" />
-            <meta name="description" content="" />
+            <meta content="post-meta-V1" name="post-meta-V1"/>\
+            <meta content="post-meta-V2" name="post-meta-V2"/>\
+            <meta name="description" content=""/>\
             </head>
               <body>
                 <p>post</p>

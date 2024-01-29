@@ -2,11 +2,13 @@ package run.halo.app.theme.dialect;
 
 import static org.apache.commons.lang3.ObjectUtils.defaultIfNull;
 import static org.apache.commons.lang3.StringUtils.defaultIfBlank;
+import static org.thymeleaf.model.AttributeValueQuotes.DOUBLE;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 import lombok.AllArgsConstructor;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.core.annotation.Order;
@@ -15,6 +17,7 @@ import org.springframework.web.util.HtmlUtils;
 import org.thymeleaf.context.ITemplateContext;
 import org.thymeleaf.model.IModel;
 import org.thymeleaf.model.IModelFactory;
+import org.thymeleaf.model.ITemplateEvent;
 import org.thymeleaf.processor.element.IElementModelStructureHandler;
 import reactor.core.publisher.Mono;
 import run.halo.app.theme.DefaultTemplateEnum;
@@ -62,11 +65,9 @@ public class ContentTemplateHeadProcessor implements TemplateHeadProcessor {
         }
 
         return htmlMetasMono
-            .doOnNext(htmlMetas -> {
-                String metaHtml = headMetaBuilder(htmlMetas);
-                IModelFactory modelFactory = context.getModelFactory();
-                model.add(modelFactory.createText(metaHtml));
-            })
+            .doOnNext(
+                htmlMetas -> buildMetas(context.getModelFactory(), htmlMetas).forEach(model::add)
+            )
             .then();
     }
 
@@ -97,19 +98,12 @@ public class ContentTemplateHeadProcessor implements TemplateHeadProcessor {
         String CONTENT = "content";
     }
 
-    private String headMetaBuilder(List<Map<String, String>> htmlMetas) {
-        if (htmlMetas == null) {
-            return StringUtils.EMPTY;
-        }
-        StringBuilder sb = new StringBuilder();
-        for (Map<String, String> htmlMeta : htmlMetas) {
-            sb.append("<meta");
-            htmlMeta.forEach((k, v) -> {
-                sb.append(" ").append(k).append("=\"").append(v).append("\"");
-            });
-            sb.append(" />\n");
-        }
-        return sb.toString();
+    private List<ITemplateEvent> buildMetas(IModelFactory modelFactory,
+        List<Map<String, String>> metas) {
+        return metas.stream()
+            .map(metaMap ->
+                modelFactory.createStandaloneElementTag("meta", metaMap, DOUBLE, false, true)
+            ).collect(Collectors.toList());
     }
 
     private boolean isPostTemplate(ITemplateContext context) {
