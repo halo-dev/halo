@@ -277,10 +277,10 @@ export function useRoleTemplateSelection(
       return;
     }
 
-    selectedRoleTemplates.value = new Set([
-      role.metadata.name,
-      ...resolveDeepDependencies(role, roleTemplates.value || []),
-    ]);
+    selectedRoleTemplates.value.add(role.metadata.name);
+    resolveDeepDependencies(role, roleTemplates.value || []).forEach((name) => {
+      selectedRoleTemplates.value.add(name);
+    });
   };
 
   return {
