@@ -8,6 +8,7 @@ import Icons from "unplugin-icons/vite";
 import { setupLibraryExternal } from "./library-external";
 import GzipPlugin from "rollup-plugin-gzip";
 import path from "path";
+import VueDevTools from "vite-plugin-vue-devtools";
 
 interface Options {
   base: string;
@@ -43,6 +44,7 @@ export const sharedPlugins = [
     },
     disable: true,
   }),
+  VueDevTools(),
 ];
 
 export function createViteConfig(options: Options) {
