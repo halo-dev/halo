@@ -1,5 +1,5 @@
 import { i18n } from "@/locales";
-import { coreModules } from "@console/modules";
+import modules from "@console/modules";
 import router from "@console/router";
 import { usePluginModuleStore } from "@/stores/plugin";
 import type { PluginModule, RouteRecordAppend } from "@halo-dev/console-shared";
@@ -10,7 +10,7 @@ import type { RouteRecordRaw } from "vue-router";
 import { loadStyle } from "@/utils/load-style";
 
 export function setupCoreModules(app: App) {
-  coreModules.forEach((module) => {
+  modules.forEach((module) => {
     registerModule(app, module, true);
   });
 }
@@ -73,7 +73,14 @@ function registerModule(app: App, pluginModule: PluginModule, core: boolean) {
 
     for (const route of pluginModule.routes) {
       if ("parentName" in route) {
-        router.addRoute(route.parentName, route.route);
+        const parentRoute = router
+          .getRoutes()
+          .find((item) => item.name === route.parentName);
+        if (parentRoute) {
+          router.removeRoute(route.parentName);
+          parentRoute.children = [...parentRoute.children, route.route];
+          router.addRoute(parentRoute);
+        }
       } else {
         router.addRoute(route);
       }

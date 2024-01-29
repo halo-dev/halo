@@ -14,6 +14,7 @@ metadata:
         "role-template-stats",
         "role-template-annotation-setting",
         "role-template-manage-own-pat",
+        "role-template-manage-own-authentications",
         "role-template-user-notification"
       ]
 rules:
@@ -115,6 +116,19 @@ rules:
   - apiGroups: [ "api.security.halo.run" ]
     resources: [ "personalaccesstokens/actions" ]
     verbs: [ "update" ]
+
+---
+apiVersion: v1alpha1
+kind: "Role"
+metadata:
+  name: role-template-manage-own-authentications
+  labels:
+    halo.run/role-template: "true"
+    halo.run/hidden: "true"
+rules:
+  - apiGroups: [ "api.security.halo.run" ]
+    resources: [ "authentications", "authentications/totp" ]
+    verbs: [ "*" ]
 ---
 apiVersion: v1alpha1
 kind: Role

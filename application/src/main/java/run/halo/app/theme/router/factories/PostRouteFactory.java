@@ -15,6 +15,7 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.Getter;
 import org.apache.commons.lang3.StringUtils;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.MediaType;
 import org.springframework.lang.NonNull;
 import org.springframework.stereotype.Component;
@@ -32,6 +33,7 @@ import reactor.core.publisher.Mono;
 import run.halo.app.core.extension.content.Post;
 import run.halo.app.extension.MetadataUtil;
 import run.halo.app.extension.ReactiveExtensionClient;
+import run.halo.app.extension.index.query.QueryFactory;
 import run.halo.app.infra.exception.NotFoundException;
 import run.halo.app.infra.utils.JsonUtils;
 import run.halo.app.theme.DefaultTemplateEnum;
@@ -159,11 +161,14 @@ public class PostRouteFactory implements RouteFactory {
     }
 
     private Flux<Post> fetchPostsBySlug(String slug) {
-        return queryPostPredicateResolver.getPredicate()
-            .flatMapMany(predicate -> client.list(Post.class,
-                predicate.and(post -> matchIfPresent(slug, post.getSpec().getSlug())),
-                null)
-            );
+        return queryPostPredicateResolver.getListOptions()
+            .flatMapMany(listOptions -> {
+                if (StringUtils.isNotBlank(slug)) {
+                    var other = QueryFactory.equal("spec.slug", slug);
+                    listOptions.setFieldSelector(listOptions.getFieldSelector().andQuery(other));
+                }
+                return client.listAll(Post.class, listOptions, Sort.unsorted());
+            });
     }
 
     private boolean matchIfPresent(String variable, String target) {

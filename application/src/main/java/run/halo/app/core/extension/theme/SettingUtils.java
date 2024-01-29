@@ -96,6 +96,15 @@ public class SettingUtils {
             });
     }
 
+    public static ConfigMap populateDefaultConfig(Setting setting, String configMapName) {
+        var data = settingDefinedDefaultValueMap(setting);
+        ConfigMap configMap = new ConfigMap();
+        configMap.setMetadata(new Metadata());
+        configMap.getMetadata().setName(configMapName);
+        configMap.setData(data);
+        return configMap;
+    }
+
     /**
      * Construct a JsonMergePatch from a difference between two Maps and apply patch to
      * {@code source}.

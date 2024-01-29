@@ -107,8 +107,7 @@ public class PostQueryEndpoint implements CustomEndpoint {
 
     private Mono<ServerResponse> listPosts(ServerRequest request) {
         PostPublicQuery query = new PostPublicQuery(request.exchange());
-        return postPublicQueryService.list(query.getPage(), query.getSize(), query.toPredicate(),
-                query.toComparator())
+        return postPublicQueryService.list(query.toListOptions(), query.toPageRequest())
             .flatMap(result -> ServerResponse.ok().contentType(MediaType.APPLICATION_JSON)
                 .bodyValue(result)
             );

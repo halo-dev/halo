@@ -20,6 +20,10 @@ public enum AuthorityUtils {
 
     public static final String SUPER_ROLE_NAME = "super-role";
 
+    public static final String AUTHENTICATED_ROLE_NAME = "authenticated";
+
+    public static final String ANONYMOUS_ROLE_NAME = "anonymous";
+
     /**
      * Converts an array of GrantedAuthority objects to a role set.
      *

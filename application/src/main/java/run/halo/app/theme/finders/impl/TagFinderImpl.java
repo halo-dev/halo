@@ -6,11 +6,16 @@ import java.util.Optional;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 import org.apache.commons.lang3.ObjectUtils;
+import org.springframework.data.domain.Sort;
 import org.springframework.lang.Nullable;
+import org.springframework.util.CollectionUtils;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import run.halo.app.core.extension.content.Tag;
+import run.halo.app.extension.ListOptions;
 import run.halo.app.extension.ListResult;
+import run.halo.app.extension.PageRequest;
+import run.halo.app.extension.PageRequestImpl;
 import run.halo.app.extension.ReactiveExtensionClient;
 import run.halo.app.theme.finders.Finder;
 import run.halo.app.theme.finders.TagFinder;
@@ -48,7 +53,8 @@ public class TagFinderImpl implements TagFinder {
 
     @Override
     public Mono<ListResult<TagVo>> list(Integer page, Integer size) {
-        return list(page, size, null, null);
+        return listBy(new ListOptions(),
+            PageRequestImpl.of(pageNullSafe(page), sizeNullSafe(size)));
     }
 
     @Override
@@ -69,10 +75,31 @@ public class TagFinderImpl implements TagFinder {
     }
 
     @Override
+    public List<TagVo> convertToVo(List<Tag> tags) {
+        if (CollectionUtils.isEmpty(tags)) {
+            return List.of();
+        }
+        return tags.stream()
+            .map(TagVo::from)
+            .collect(Collectors.toList());
+    }
+
+    @Override
     public Flux<TagVo> listAll() {
-        return client.list(Tag.class, null,
-                DEFAULT_COMPARATOR.reversed())
+        return client.listAll(Tag.class, new ListOptions(),
+                Sort.by(Sort.Order.desc("metadata.creationTimestamp")))
             .map(TagVo::from);
+    }
+
+    private Mono<ListResult<TagVo>> listBy(ListOptions listOptions, PageRequest pageRequest) {
+        return client.listBy(Tag.class, listOptions, pageRequest)
+            .map(result -> {
+                List<TagVo> tagVos = result.get()
+                    .map(TagVo::from)
+                    .collect(Collectors.toList());
+                return new ListResult<>(result.getPage(), result.getSize(), result.getTotal(),
+                    tagVos);
+            });
     }
 
     int pageNullSafe(Integer page) {

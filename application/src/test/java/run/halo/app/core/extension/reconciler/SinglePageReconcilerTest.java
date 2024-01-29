@@ -95,7 +95,7 @@ class SinglePageReconcilerTest {
         Snapshot snapshotV2 = TestPost.snapshotV2();
         snapshotV1.getSpec().setContributors(Set.of("guqing"));
         snapshotV2.getSpec().setContributors(Set.of("guqing", "zhangsan"));
-        when(client.list(eq(Snapshot.class), any(), any()))
+        when(client.listAll(eq(Snapshot.class), any(), any()))
             .thenReturn(List.of(snapshotV1, snapshotV2));
         when(externalUrlSupplier.get()).thenReturn(URI.create(""));
 
@@ -156,7 +156,7 @@ class SinglePageReconcilerTest {
             when(client.fetch(eq(Snapshot.class), eq(page.getSpec().getReleaseSnapshot())))
                 .thenReturn(Optional.of(snapshotV2));
 
-            when(client.list(eq(Snapshot.class), any(), any()))
+            when(client.listAll(eq(Snapshot.class), any(), any()))
                 .thenReturn(List.of());
 
             ArgumentCaptor<SinglePage> captor = ArgumentCaptor.forClass(SinglePage.class);
@@ -186,7 +186,7 @@ class SinglePageReconcilerTest {
                     .build())
                 );
 
-            when(client.list(eq(Snapshot.class), any(), any()))
+            when(client.listAll(eq(Snapshot.class), any(), any()))
                 .thenReturn(List.of());
 
             ArgumentCaptor<SinglePage> captor = ArgumentCaptor.forClass(SinglePage.class);

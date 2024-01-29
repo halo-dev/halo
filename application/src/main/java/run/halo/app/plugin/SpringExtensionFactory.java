@@ -3,7 +3,6 @@ package run.halo.app.plugin;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.util.Comparator;
-import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Stream;
 import lombok.RequiredArgsConstructor;
@@ -11,7 +10,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.pf4j.Extension;
 import org.pf4j.ExtensionFactory;
 import org.pf4j.PluginManager;
-import org.pf4j.PluginRuntimeException;
 import org.pf4j.PluginWrapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.config.AutowireCapableBeanFactory;
@@ -65,16 +63,9 @@ public class SpringExtensionFactory implements ExtensionFactory {
     @Override
     @Nullable
     public <T> T create(Class<T> extensionClass) {
-        Optional<PluginApplicationContext> contextOptional =
-            getPluginApplicationContextBy(extensionClass);
-        if (contextOptional.isPresent()) {
-            // When the plugin starts, the class has been loaded into the plugin application
-            // context,
-            // so you only need to get it directly
-            PluginApplicationContext pluginApplicationContext = contextOptional.get();
-            return pluginApplicationContext.getBean(extensionClass);
-        }
-        return createWithoutSpring(extensionClass);
+        return getPluginApplicationContextBy(extensionClass)
+            .map(context -> context.getBean(extensionClass))
+            .orElseGet(() -> createWithoutSpring(extensionClass));
     }
 
     /**
@@ -97,8 +88,10 @@ public class SpringExtensionFactory implements ExtensionFactory {
                     () -> new IllegalArgumentException("Extension class '" + nameOf(extensionClass)
                         + "' must have at least one public constructor."));
         try {
-            log.debug("Instantiate '" + nameOf(extensionClass) + "' by calling '" + constructor
-                + "'with standard Java reflection.");
+            if (log.isTraceEnabled()) {
+                log.trace("Instantiate '" + nameOf(extensionClass) + "' by calling '" + constructor
+                    + "'with standard Java reflection.");
+            }
             // Creating the instance by calling the constructor with null-parameters (if there
             // are any).
             return (T) constructor.newInstance(nullParameters(constructor));
@@ -125,41 +118,13 @@ public class SpringExtensionFactory implements ExtensionFactory {
         return new Object[constructor.getParameterCount()];
     }
 
-    protected <T> Optional<PluginApplicationContext> getPluginApplicationContextBy(
+    protected <T> Optional<ApplicationContext> getPluginApplicationContextBy(
         final Class<T> extensionClass) {
         return Optional.ofNullable(this.pluginManager.whichPlugin(extensionClass))
             .map(PluginWrapper::getPlugin)
-            .map(plugin -> {
-                if (plugin instanceof BasePlugin basePlugin) {
-                    return basePlugin;
-                }
-                throw new PluginRuntimeException(
-                    "The plugin must be an instance of BasePlugin");
-            })
-            .map(plugin -> {
-                var pluginName = plugin.getContext().getName();
-                if (this.pluginManager instanceof HaloPluginManager haloPluginManager) {
-                    log.debug("  Extension class ' " + nameOf(extensionClass)
-                        + "' belongs to a non halo-plugin (or main application)"
-                        + " '" + nameOf(plugin)
-                        + ", but the used Halo plugin-manager is a spring-plugin-manager. Therefore"
-                        + " the extension class will be autowired by using the managers "
-                        + "application "
-                        + "contexts");
-                    return haloPluginManager.getPluginApplicationContext(pluginName);
-                }
-                log.debug(
-                    "  Extension class ' " + nameOf(extensionClass) + "' belongs to halo-plugin '"
-                        + nameOf(plugin)
-                        + "' and will be autowired by using its application context.");
-                return ExtensionContextRegistry.getInstance().getByPluginId(pluginName);
-            });
-    }
-
-    private String nameOf(final BasePlugin plugin) {
-        return Objects.nonNull(plugin)
-            ? plugin.getContext().getName()
-            : "system";
+            .filter(SpringPlugin.class::isInstance)
+            .map(plugin -> (SpringPlugin) plugin)
+            .map(SpringPlugin::getApplicationContext);
     }
 
     private <T> String nameOf(final Class<T> clazz) {

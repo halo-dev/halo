@@ -34,18 +34,23 @@ const hasSubmenus = computed(() => {
 });
 
 function handleClick() {
-  if (hasSubmenus.value) {
-    open.value = !open.value;
-    return;
+  if (!open.value) {
+    handleExpand();
   }
   emit("select", props.id);
+}
+
+function handleExpand() {
+  if (hasSubmenus.value) {
+    open.value = !open.value;
+  }
 }
 </script>
 
 <template>
   <li
     :class="{ 'has-submenus': hasSubmenus }"
-    class="menu-item"
+    class="menu-item group"
     @click.stop="handleClick"
   >
     <div :class="{ active }" class="menu-item-title">
@@ -59,6 +64,7 @@ function handleClick() {
         v-if="$slots.default"
         :class="{ open }"
         class="menu-icon-collapse self-center transition-all"
+        @click.stop="handleExpand"
       >
         <IconArrowRight />
       </span>
@@ -83,7 +89,8 @@ function handleClick() {
   flex
   select-none
   relative
-  p-2
+  px-2
+  py-[0.4rem]
   font-normal
   rounded-base;
 
@@ -105,21 +112,30 @@ function handleClick() {
   }
 }
 
-.menu-icon-collapse.open {
-  transform: rotate(90deg);
+.menu-icon-collapse {
+  @apply group-hover:bg-gray-200 p-0.5 rounded-full;
+
+  &.open {
+    @apply bg-gray-200;
+    transform: rotate(90deg);
+  }
 }
 
-.submenus-show-enter-active {
-  transition: all 0.1s ease-out;
-}
-
+.submenus-show-enter-active,
 .submenus-show-leave-active {
-  transition: all 0.8s cubic-bezier(1, 0.5, 0.8, 1);
+  transition: all 0.1s ease;
 }
 
 .submenus-show-enter-from,
 .submenus-show-enter-to {
-  transform: translateY(-10px);
   opacity: 0;
+}
+
+.sub-menu-items {
+  @apply pl-5 my-1;
+
+  .menu-item-title {
+    @apply p-1.5 text-sm;
+  }
 }
 </style>

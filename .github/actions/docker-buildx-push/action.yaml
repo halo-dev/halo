@@ -1,0 +1,74 @@
+name: "Docker buildx and push"
+description: "Buildx and push the Docker image."
+
+inputs:
+  ghcr-token:
+    description: Token of current GitHub account in GitHub container registry.
+    required: false
+    default: ""
+  dockerhub-user:
+    description: "User name for the DockerHub account"
+    required: false
+    default: ""
+  dockerhub-token:
+    description: Token for the DockerHub account
+    required: false
+    default: ""
+  push:
+    description: Should push the docker image or not.
+    required: false
+    default: "false"
+  platforms:
+    description: Target platforms for building image
+    required: false
+    default: "linux/amd64,linux/arm/v7,linux/arm64/v8,linux/ppc64le,linux/s390x"
+  image-name:
+    description: The basic name of docker.
+    required: false
+    default: "halo"
+
+runs:
+  using: "composite"
+  steps:
+    - name: Docker meta for Halo
+      id: meta
+      uses: docker/metadata-action@v5
+      with:
+        images: |
+          ghcr.io/${{ github.repository_owner }}/${{ inputs.image-name }}
+          halohub/${{ inputs.image-name }}
+        tags: |
+          type=schedule,pattern=nightly-{{date 'YYYYMMDD'}},enabled=${{ github.event_name == 'schedule' }}
+          type=ref,event=branch,enabled=${{ github.event_name == 'push' }}
+          type=ref,event=pr,enabled=${{ github.event_name == 'pull_request' }}
+          type=semver,pattern={{ version }}
+          type=semver,pattern={{major}}.{{minor}}
+          type=sha,enabled=${{ github.event_name == 'push' }}
+        flavor: |
+          latest=false
+    - name: Set up QEMU
+      uses: docker/setup-qemu-action@v2
+    - name: Set up Docker Buildx
+      uses: docker/setup-buildx-action@v2
+    - name: Login to GHCR
+      uses: docker/login-action@v3
+      if: inputs.ghcr-token != '' && github.event_name != 'pull_request'
+      with:
+        registry: ghcr.io
+        username: ${{ github.repository_owner }}
+        password: ${{ inputs.ghcr-token }}
+    - name: Login to DockerHub
+      if: inputs.dockerhub-token != '' && github.event_name != 'pull_request'
+      uses: docker/login-action@v2
+      with:
+        username: ${{ inputs.dockerhub-user }}
+        password: ${{ inputs.dockerhub-token }}
+    - name: Build and push
+      uses: docker/build-push-action@v5
+      with:
+        context: .
+        file: ./Dockerfile
+        platforms: ${{ inputs.platforms }}
+        labels: ${{ steps.meta.outputs.labels }}
+        tags: ${{ steps.meta.outputs.tags }}
+        push: ${{ (inputs.ghcr-token != '' || inputs.dockerhub-token != '') && inputs.push == 'true' }}

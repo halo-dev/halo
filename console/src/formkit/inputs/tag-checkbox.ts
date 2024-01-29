@@ -15,7 +15,9 @@ declare module "@formkit/inputs" {
 function optionsHandler(node: FormKitNode) {
   node.on("created", async () => {
     const { data } =
-      await apiClient.extension.tag.listcontentHaloRunV1alpha1Tag();
+      await apiClient.extension.tag.listcontentHaloRunV1alpha1Tag({
+        sort: ["metadata.creationTimestamp,desc"],
+      });
 
     node.props.options = data.items.map((tag) => {
       return {

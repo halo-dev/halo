@@ -31,6 +31,8 @@ logging:
     run.halo.app: DEBUG
     org.springframework.boot.autoconfigure.web.reactive.error.AbstractErrorWebExceptionHandler: DEBUG
 springdoc:
+  cache:
+    disabled: true
   api-docs:
     enabled: true
     version: OPENAPI_3_1

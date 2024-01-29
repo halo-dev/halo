@@ -181,6 +181,19 @@ const disallowAccessConsole = computed(() => {
     <main class="content w-full pb-12 mb-safe md:w-[calc(100%-16rem)] md:pb-0">
       <slot v-if="$slots.default" />
       <RouterView v-else />
+      <footer
+        v-if="!route.meta.hideFooter"
+        class="mt-auto p-4 text-center text-sm"
+      >
+        <span class="text-gray-600">Powered by </span>
+        <a
+          href="https://www.halo.run"
+          target="_blank"
+          class="hover:text-gray-600"
+        >
+          Halo
+        </a>
+      </footer>
     </main>
 
     <!--bottom nav bar-->

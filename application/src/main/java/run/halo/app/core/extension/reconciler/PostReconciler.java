@@ -4,11 +4,13 @@ import static java.nio.charset.StandardCharsets.UTF_8;
 import static org.apache.commons.lang3.ObjectUtils.defaultIfNull;
 import static run.halo.app.extension.ExtensionUtil.addFinalizers;
 import static run.halo.app.extension.ExtensionUtil.removeFinalizers;
+import static run.halo.app.extension.index.query.QueryFactory.equal;
 
 import com.google.common.hash.Hashing;
 import java.time.Instant;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
@@ -18,6 +20,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.jsoup.Jsoup;
 import org.springframework.context.ApplicationEvent;
 import org.springframework.context.ApplicationEventPublisher;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Component;
 import run.halo.app.content.ContentWrapper;
 import run.halo.app.content.NotificationReasonConst;
@@ -34,12 +37,16 @@ import run.halo.app.event.post.PostPublishedEvent;
 import run.halo.app.event.post.PostUnpublishedEvent;
 import run.halo.app.event.post.PostUpdatedEvent;
 import run.halo.app.event.post.PostVisibleChangedEvent;
+import run.halo.app.extension.DefaultExtensionMatcher;
 import run.halo.app.extension.ExtensionClient;
 import run.halo.app.extension.ExtensionOperator;
+import run.halo.app.extension.ListOptions;
 import run.halo.app.extension.Ref;
 import run.halo.app.extension.controller.Controller;
 import run.halo.app.extension.controller.ControllerBuilder;
 import run.halo.app.extension.controller.Reconciler;
+import run.halo.app.extension.index.query.QueryFactory;
+import run.halo.app.extension.router.selector.FieldSelector;
 import run.halo.app.infra.Condition;
 import run.halo.app.infra.ConditionStatus;
 import run.halo.app.infra.utils.HaloUtils;
@@ -189,8 +196,7 @@ public class PostReconciler implements Reconciler<Reconciler.Request> {
                 var ref = Ref.of(post);
                 // handle contributors
                 var headSnapshot = post.getSpec().getHeadSnapshot();
-                var contributors = client.list(Snapshot.class,
-                        snapshot -> ref.equals(snapshot.getSpec().getSubjectRef()), null)
+                var contributors = listSnapshots(ref)
                     .stream()
                     .map(snapshot -> {
                         Set<String> usernames = snapshot.getSpec().getContributors();
@@ -207,7 +213,11 @@ public class PostReconciler implements Reconciler<Reconciler.Request> {
                 status.setInProgress(
                     !StringUtils.equals(headSnapshot, post.getSpec().getReleaseSnapshot()));
 
+                // version + 1 is required to truly equal version
+                // as a version will be incremented after the update
+                status.setObservedVersion(post.getMetadata().getVersion() + 1);
                 client.update(post);
+
                 // fire event after updating post
                 events.forEach(eventPublisher::publishEvent);
             });
@@ -218,8 +228,12 @@ public class PostReconciler implements Reconciler<Reconciler.Request> {
     public Controller setupWith(ControllerBuilder builder) {
         return builder
             .extension(new Post())
-            // TODO Make it configurable
-            .workerCount(1)
+            .onAddMatcher(DefaultExtensionMatcher.builder(client, Post.GVK)
+                .fieldSelector(FieldSelector.of(
+                    equal(Post.REQUIRE_SYNC_ON_STARTUP_INDEX_NAME, BooleanUtils.TRUE))
+                )
+                .build()
+            )
             .build();
     }
 
@@ -292,7 +306,7 @@ public class PostReconciler implements Reconciler<Reconciler.Request> {
         }
         var labels = post.getMetadata().getLabels();
         labels.put(Post.PUBLISHED_LABEL, Boolean.FALSE.toString());
-        var status = post.getStatus();
+        final var status = post.getStatus();
 
         var condition = new Condition();
         condition.setType("CancelledPublish");
@@ -310,9 +324,7 @@ public class PostReconciler implements Reconciler<Reconciler.Request> {
     private void cleanUpResources(Post post) {
         // clean up snapshots
         final Ref ref = Ref.of(post);
-        client.list(Snapshot.class,
-                snapshot -> ref.equals(snapshot.getSpec().getSubjectRef()), null)
-            .forEach(client::delete);
+        listSnapshots(ref).forEach(client::delete);
 
         // clean up comments
         client.list(Comment.class, comment -> ref.equals(comment.getSpec().getSubjectRef()),
@@ -329,5 +341,12 @@ public class PostReconciler implements Reconciler<Reconciler.Request> {
         String text = Jsoup.parse(shortHtmlContent).text();
         // TODO The default capture 150 words as excerpt
         return StringUtils.substring(text, 0, 150);
+    }
+
+    List<Snapshot> listSnapshots(Ref ref) {
+        var snapshotListOptions = new ListOptions();
+        snapshotListOptions.setFieldSelector(FieldSelector.of(
+            QueryFactory.equal("spec.subjectRef", Snapshot.toSubjectRefKey(ref))));
+        return client.listAll(Snapshot.class, snapshotListOptions, Sort.unsorted());
     }
 }

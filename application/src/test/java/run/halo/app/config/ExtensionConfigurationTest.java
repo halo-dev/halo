@@ -22,17 +22,21 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
 import org.springframework.security.test.context.support.WithMockUser;
+import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.web.reactive.server.WebTestClient;
 import reactor.core.publisher.Flux;
 import run.halo.app.core.extension.Role;
 import run.halo.app.core.extension.service.RoleService;
 import run.halo.app.extension.ExtensionClient;
 import run.halo.app.extension.FakeExtension;
+import run.halo.app.extension.GroupVersionKind;
 import run.halo.app.extension.Metadata;
 import run.halo.app.extension.Scheme;
 import run.halo.app.extension.SchemeManager;
+import run.halo.app.extension.index.IndexerFactory;
 import run.halo.app.extension.store.ExtensionStoreRepository;
 
+@DirtiesContext
 @SpringBootTest
 @AutoConfigureWebTestClient
 class ExtensionConfigurationTest {
@@ -66,8 +70,15 @@ class ExtensionConfigurationTest {
     }
 
     @AfterEach
-    void cleanUp(@Autowired ExtensionStoreRepository repository) {
-        repository.deleteAll().subscribe();
+    void cleanUp(@Autowired ExtensionStoreRepository repository,
+        @Autowired IndexerFactory indexerFactory) {
+        var gvk = Scheme.buildFromType(FakeExtension.class).groupVersionKind();
+        if (indexerFactory.contains(gvk)) {
+            indexerFactory.getIndexer(gvk).removeIndexRecords(descriptor -> true);
+        }
+        repository.deleteAll().block();
+        schemeManager.fetch(GroupVersionKind.fromExtension(FakeExtension.class))
+            .ifPresent(scheme -> schemeManager.unregister(scheme));
     }
 
     @Test
@@ -116,12 +127,16 @@ class ExtensionConfigurationTest {
 
         @BeforeEach
         void setUp() {
-
             var metadata = new Metadata();
             metadata.setName("my-fake");
             metadata.setLabels(Map.of("label-key", "label-value"));
             var fake = new FakeExtension();
             fake.setMetadata(metadata);
+
+            webClient.get()
+                .uri("/apis/fake.halo.run/v1alpha1/fakes/{}", metadata.getName())
+                .exchange()
+                .expectStatus().isNotFound();
 
             createdFake = webClient.post()
                 .uri("/apis/fake.halo.run/v1alpha1/fakes")

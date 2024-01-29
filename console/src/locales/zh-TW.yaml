@@ -75,6 +75,7 @@ core:
         settings: 設置
         actuator: 概覽
         backup: 備份
+        tools: 工具
     operations:
       logout:
         tooltip: 登出
@@ -1236,6 +1237,11 @@ core:
     role-template-view-tags: 標籤查看
     role-template-manage-categories: 分類管理
     role-template-view-categories: 分類查看
+    role-template-manage-posts: 文章管理
+    role-template-post-author: 允许管理自己的文章
+    role-template-post-contributor: 允许投稿
+    role-template-post-publisher: 允許發布自己的文章
+    role-template-post-attachment-manager: 允許在文章中上傳圖片
     Roles Management: 角色
     Role Manage: 角色管理
     Role View: 角色查看
@@ -1268,7 +1274,6 @@ core:
     Post Attachment Manager: 允許在文章中上傳圖片
     Post Author: 允许管理自己的文章
     Post Contributor: 允许投稿
-    Post Editor: 允许管理所有文章
     Post Publisher: 允許發布自己的文章
   components:
     submit_button:
@@ -1295,6 +1300,19 @@ core:
         placeholder:
           options:
             placeholder: 輸入 / 以選擇輸入類型
+        image:
+          upload:
+            error: 上傳失敗
+            click_retry: 點擊重試
+            loading: 等待中
+          attachment:
+            title: 附件庫
+          permalink:
+            title: 輸入連結
+            placeholder: 輸入連結，按回車確定
+          operations:
+            replace:
+              button: 替换
       toolbox:
         attachment: 選擇附件
         show_hide_sidebar: 顯示 / 隱藏側邊欄
@@ -1390,6 +1408,7 @@ core:
       view_all: 查看全部
       modify: 修改
       verify: 驗證
+      access: 访问
     radio:
       "yes": 是
       "no": 否
@@ -1492,3 +1511,8 @@ core:
       send:
         label: 發送驗證郵件
         toast_success: 如果你的用戶名和郵箱地址匹配，我們將會發送一封郵件到你的郵箱。
+  tool:
+    title: 工具
+    empty:
+      title: 沒有可用工具
+      message: 目前沒有可用的工具，系統工具可能由外掛提供

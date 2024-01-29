@@ -72,4 +72,21 @@ public record Scheme(Class<? extends Extension> type,
             "Missing annotation " + GVK.class.getName() + " on type " + type.getName());
         return gvk;
     }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) {
+            return true;
+        }
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
+        Scheme scheme = (Scheme) o;
+        return groupVersionKind.equals(scheme.groupVersionKind);
+    }
+
+    @Override
+    public int hashCode() {
+        return groupVersionKind.hashCode();
+    }
 }

@@ -2,22 +2,32 @@ package run.halo.app.extension.controller;
 
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.Mockito.lenient;
 
 import java.time.Duration;
 import java.time.Instant;
-import java.util.Objects;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import run.halo.app.extension.ExtensionClient;
 import run.halo.app.extension.FakeExtension;
+import run.halo.app.extension.index.IndexedQueryEngine;
 
 @ExtendWith(MockitoExtension.class)
 class ControllerBuilderTest {
 
     @Mock
     ExtensionClient client;
+
+    @Mock
+    IndexedQueryEngine indexedQueryEngine;
+
+    @BeforeEach
+    void setUp() {
+        lenient().when(client.indexedQueryEngine()).thenReturn(indexedQueryEngine);
+    }
 
     @Test
     void buildWithNullReconciler() {
@@ -51,9 +61,9 @@ class ControllerBuilderTest {
             .syncAllOnStart(true)
             .minDelay(Duration.ofMillis(5))
             .maxDelay(Duration.ofSeconds(1000))
-            .onAddPredicate(Objects::nonNull)
-            .onUpdatePredicate(Objects::equals)
-            .onDeletePredicate(Objects::nonNull)
+            .onAddMatcher(null)
+            .onUpdateMatcher(null)
+            .onDeleteMatcher(null)
             .build()
         );
     }

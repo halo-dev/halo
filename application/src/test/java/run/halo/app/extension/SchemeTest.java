@@ -1,9 +1,11 @@
 package run.halo.app.extension;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
+import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import org.junit.jupiter.api.Test;
 
@@ -66,4 +68,47 @@ class SchemeTest {
         assertEquals(FakeExtension.class, scheme.type());
     }
 
+    @Test
+    void equalsAndHashCodeTest() {
+        var scheme1 = Scheme.buildFromType(FakeExtension.class);
+        var scheme2 = Scheme.buildFromType(FakeExtension.class);
+        assertEquals(scheme1, scheme2);
+        assertEquals(scheme1.hashCode(), scheme2.hashCode());
+
+        // openApiSchema is not included in equals and hashCode.
+        var scheme3 = new Scheme(FakeExtension.class, scheme1.groupVersionKind(),
+            scheme1.plural(), scheme1.singular(), JsonNodeFactory.instance.objectNode());
+        assertEquals(scheme1, scheme3);
+
+        // singular and plural are not included in equals and hashCode.
+        var scheme4 = new Scheme(FakeExtension.class, scheme1.groupVersionKind(),
+            scheme1.plural(), "other", scheme1.openApiSchema());
+        assertEquals(scheme1, scheme4);
+
+        // plural is not included in equals and hashCode.
+        var scheme5 = new Scheme(FakeExtension.class, scheme1.groupVersionKind(),
+            "other", scheme1.singular(), scheme1.openApiSchema());
+        assertEquals(scheme1, scheme5);
+
+        // type is not included in equals and hashCode.
+        var scheme6 = new Scheme(FakeExtension.class, scheme1.groupVersionKind(),
+            scheme1.plural(), scheme1.singular(), scheme1.openApiSchema());
+        assertEquals(scheme1, scheme6);
+
+        // groupVersionKind is included in equals and hashCode.
+        var scheme7 = new Scheme(FakeExtension.class,
+            new GroupVersionKind("other.halo.run", "v1alpha1", "Fake"),
+            scheme1.plural(), scheme1.singular(), scheme1.openApiSchema());
+        assertNotEquals(scheme1, scheme7);
+
+        scheme7 = new Scheme(FakeExtension.class,
+            new GroupVersionKind("fake.halo.run", "v1alpha2", "Fake"),
+            scheme1.plural(), scheme1.singular(), scheme1.openApiSchema());
+        assertNotEquals(scheme1, scheme7);
+
+        scheme7 = new Scheme(FakeExtension.class,
+            new GroupVersionKind("fake.halo.run", "v1alpha1", "Other"),
+            scheme1.plural(), scheme1.singular(), scheme1.openApiSchema());
+        assertNotEquals(scheme1, scheme7);
+    }
 }

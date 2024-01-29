@@ -1,11 +1,11 @@
 package run.halo.app.theme.finders;
 
-import java.util.Comparator;
-import java.util.function.Predicate;
 import org.springframework.lang.NonNull;
 import reactor.core.publisher.Mono;
 import run.halo.app.core.extension.content.Post;
+import run.halo.app.extension.ListOptions;
 import run.halo.app.extension.ListResult;
+import run.halo.app.extension.PageRequest;
 import run.halo.app.theme.ReactivePostContentHandler;
 import run.halo.app.theme.finders.vo.ContentVo;
 import run.halo.app.theme.finders.vo.ListedPostVo;
@@ -14,17 +14,13 @@ import run.halo.app.theme.finders.vo.PostVo;
 public interface PostPublicQueryService {
 
     /**
-     * Lists posts page by predicate and comparator.
+     * Lists public posts by the given list options and page request.
      *
-     * @param page page number
-     * @param size page size
-     * @param postPredicate post predicate
-     * @param comparator post comparator
-     * @return list result
+     * @param listOptions additional list options
+     * @param page page request must not be null
+     * @return a list of listed post vo
      */
-    Mono<ListResult<ListedPostVo>> list(Integer page, Integer size,
-        Predicate<Post> postPredicate,
-        Comparator<Post> comparator);
+    Mono<ListResult<ListedPostVo>> list(ListOptions listOptions, PageRequest page);
 
     /**
      * Converts post to listed post vo.

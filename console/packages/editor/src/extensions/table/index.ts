@@ -1,9 +1,23 @@
-import TiptapTable, { type TableOptions } from "@tiptap/extension-table";
-import { isActive, type Editor, type Range } from "@/tiptap/vue-3";
-import type {
-  Node as ProseMirrorNode,
-  NodeView,
-  EditorState,
+import TiptapTable, {
+  type TableOptions,
+  createColGroup,
+} from "@tiptap/extension-table";
+import {
+  isActive,
+  type Editor,
+  type Range,
+  mergeAttributes,
+  isNodeActive,
+  CoreEditor,
+} from "@/tiptap";
+import {
+  type Node as ProseMirrorNode,
+  type NodeView,
+  type EditorState,
+  type DOMOutputSpec,
+  Plugin,
+  DecorationSet,
+  Decoration,
 } from "@/tiptap/pm";
 import TableCell from "./table-cell";
 import TableRow from "./table-row";
@@ -25,6 +39,7 @@ import { markRaw } from "vue";
 import { i18n } from "@/locales";
 import type { ExtensionOptions, NodeBubbleMenu } from "@/types";
 import { BlockActionSeparator, ToolboxItem } from "@/components";
+import { hasTableBefore, isTableSelected } from "./util";
 
 function updateColumns(
   node: ProseMirrorNode,
@@ -83,6 +98,8 @@ function updateColumns(
   }
 }
 
+let editor: CoreEditor | undefined = undefined;
+
 class TableView implements NodeView {
   node: ProseMirrorNode;
 
@@ -98,15 +115,33 @@ class TableView implements NodeView {
 
   contentDOM: HTMLElement;
 
+  containerDOM: HTMLElement;
+
   constructor(node: ProseMirrorNode, cellMinWidth: number) {
     this.node = node;
     this.cellMinWidth = cellMinWidth;
     this.dom = document.createElement("div");
-    this.dom.className = "tableWrapper";
+    this.dom.className = "table-container";
+
+    this.containerDOM = this.dom.appendChild(document.createElement("div"));
+
+    this.containerDOM.className = "tableWrapper";
+    this.containerDOM.addEventListener("wheel", (e) => {
+      return this.handleHorizontalWheel(this.containerDOM, e);
+    });
+    this.containerDOM.addEventListener("scroll", () => {
+      if (!editor) {
+        return false;
+      }
+      const { state, view } = editor;
+      const { tr } = state;
+      view.dispatch(tr);
+      return false;
+    });
 
     this.scrollDom = document.createElement("div");
     this.scrollDom.className = "scrollWrapper";
-    this.dom.appendChild(this.scrollDom);
+    this.containerDOM.appendChild(this.scrollDom);
 
     this.table = this.scrollDom.appendChild(document.createElement("table"));
     this.colgroup = this.table.appendChild(document.createElement("colgroup"));
@@ -121,7 +156,6 @@ class TableView implements NodeView {
 
     this.node = node;
     updateColumns(node, this.colgroup, this.table, this.cellMinWidth);
-
     return true;
   }
 
@@ -133,6 +167,16 @@ class TableView implements NodeView {
       (mutation.target === this.table ||
         this.colgroup.contains(mutation.target))
     );
+  }
+
+  handleHorizontalWheel(dom: HTMLElement, event: WheelEvent) {
+    const { scrollWidth, clientWidth } = dom;
+    const hasScrollWidth = scrollWidth > clientWidth;
+    if (hasScrollWidth) {
+      event.stopPropagation();
+      event.preventDefault();
+      dom.scrollBy({ left: event.deltaY });
+    }
   }
 }
 
@@ -374,6 +418,116 @@ const Table = TiptapTable.extend<ExtensionOptions & TableOptions>({
         };
       },
     };
+  },
+
+  addKeyboardShortcuts() {
+    const handleBackspace = () => {
+      const { editor } = this;
+      if (editor.commands.undoInputRule()) {
+        return true;
+      }
+
+      const { selection } = editor.state;
+      // the node in the current active state is not a table
+      // and the previous node is a table
+      if (
+        !isNodeActive(editor.state, Table.name) &&
+        hasTableBefore(editor.state) &&
+        selection.empty
+      ) {
+        editor.commands.selectNodeBackward();
+        return true;
+      }
+
+      if (!isNodeActive(editor.state, Table.name)) {
+        return false;
+      }
+
+      // If the table is currently selected,
+      // then delete the whole table
+      if (isTableSelected(editor.state.selection)) {
+        editor.commands.deleteTable();
+        return true;
+      }
+
+      return false;
+    };
+
+    return {
+      Backspace: () => handleBackspace(),
+
+      "Mod-Backspace": () => handleBackspace(),
+    };
+  },
+
+  renderHTML({ node, HTMLAttributes }) {
+    const { colgroup, tableWidth, tableMinWidth } = createColGroup(
+      node,
+      this.options.cellMinWidth
+    );
+
+    const table: DOMOutputSpec = [
+      "div",
+      { style: "overflow-x: auto; overflow-y: hidden;" },
+      [
+        "table",
+        mergeAttributes(this.options.HTMLAttributes, HTMLAttributes, {
+          style: tableWidth
+            ? `width: ${tableWidth}`
+            : `minWidth: ${tableMinWidth}`,
+        }),
+        colgroup,
+        ["tbody", 0],
+      ],
+    ];
+
+    return table;
+  },
+
+  onTransaction() {
+    editor = this.editor;
+  },
+
+  addProseMirrorPlugins() {
+    const plugins = this.parent?.() ?? [];
+    return [
+      ...plugins,
+      new Plugin({
+        props: {
+          decorations: (state) => {
+            const { doc, tr } = state;
+            const decorations: Decoration[] = [];
+            doc.descendants((node, pos) => {
+              if (node.type.name === Table.name) {
+                const { view } = this.editor;
+                const nodeDom = view.nodeDOM(pos) || view.domAtPos(pos)?.node;
+                if (!nodeDom) {
+                  return true;
+                }
+                const { scrollWidth, clientWidth, scrollLeft } =
+                  nodeDom.firstChild as HTMLElement;
+                let classNames = "";
+                if (
+                  scrollWidth > clientWidth &&
+                  scrollLeft < scrollWidth - clientWidth
+                ) {
+                  classNames += "table-right-shadow ";
+                }
+                if (scrollLeft > 0) {
+                  classNames += "table-left-shadow ";
+                }
+                decorations.push(
+                  Decoration.node(pos, pos + node.nodeSize, {
+                    class: classNames,
+                  })
+                );
+              }
+            });
+            return DecorationSet.create(tr.doc, decorations);
+          },
+        },
+      }),
+    ];
   },
 }).configure({ resizable: true });
 

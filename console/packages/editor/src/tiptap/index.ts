@@ -12,6 +12,7 @@ export {
   textblockTypeInputRule,
   wrappingInputRule,
 } from "./vue-3";
+export { Editor as CoreEditor } from "./core";
 export {
   type Command as PMCommand,
   InputRule as PMInputRule,

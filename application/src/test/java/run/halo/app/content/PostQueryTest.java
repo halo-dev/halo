@@ -3,6 +3,7 @@ package run.halo.app.content;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.mock;
 
+import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import org.junit.jupiter.api.Test;
@@ -12,7 +13,7 @@ import org.springframework.mock.web.reactive.function.server.MockServerRequest;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.server.ServerWebExchange;
-import run.halo.app.core.extension.content.Post;
+import run.halo.app.extension.index.query.QueryIndexViewImpl;
 
 /**
  * Tests for {@link PostQuery}.
@@ -32,61 +33,20 @@ class PostQueryTest {
             .build();
 
         PostQuery postQuery = new PostQuery(request, "faker");
-        var spec = new Post.PostSpec();
-        var post = new Post();
-        post.setSpec(spec);
 
-        spec.setOwner("another-faker");
-        assertThat(postQuery.toPredicate().test(post)).isFalse();
+        var listOptions = postQuery.toListOptions();
+        assertThat(listOptions).isNotNull();
+        assertThat(listOptions.getFieldSelector()).isNotNull();
+        var nameEntry =
+            (Collection<Map.Entry<String, String>>) List.of(Map.entry("metadata.name", "faker"));
+        var entry = (Collection<Map.Entry<String, String>>) List.of(Map.entry("faker", "faker"));
+        var indexView =
+            new QueryIndexViewImpl(Map.of("spec.owner", entry, "metadata.name", nameEntry));
+        assertThat(listOptions.getFieldSelector().query().matches(indexView))
+            .containsExactly("faker");
 
-        spec.setOwner("faker");
-        assertThat(postQuery.toPredicate().test(post)).isTrue();
-    }
-
-    @Test
-    void toPredicate() {
-        MultiValueMap<String, String> multiValueMap = new LinkedMultiValueMap<>();
-        multiValueMap.put("category", List.of("category1", "category2"));
-        MockServerRequest request = MockServerRequest.builder()
-            .queryParams(multiValueMap)
-            .exchange(mock(ServerWebExchange.class))
-            .build();
-        PostQuery postQuery = new PostQuery(request);
-
-        Post post = TestPost.postV1();
-        post.getSpec().setTags(null);
-        post.getStatusOrDefault().setContributors(null);
-        post.getSpec().setCategories(List.of("category1"));
-        boolean test = postQuery.toPredicate().test(post);
-        assertThat(test).isTrue();
-
-        post.getSpec().setTags(List.of("tag1"));
-        test = postQuery.toPredicate().test(post);
-        assertThat(test).isTrue();
-
-        // Do not include tags
-        multiValueMap.put("tag", List.of("tag2"));
-        post.getSpec().setTags(List.of("tag1"));
-        post.getSpec().setCategories(null);
-        test = postQuery.toPredicate().test(post);
-        assertThat(test).isFalse();
-
-        multiValueMap.put("tag", List.of());
-        multiValueMap.remove("category");
-        request = MockServerRequest.builder()
-            .exchange(mock(ServerWebExchange.class))
-            .queryParams(multiValueMap).build();
-        postQuery = new PostQuery(request);
-        post.getSpec().setTags(List.of());
-        test = postQuery.toPredicate().test(post);
-        assertThat(test).isTrue();
-
-        multiValueMap.put("labelSelector", List.of("hello"));
-        test = postQuery.toPredicate().test(post);
-        assertThat(test).isFalse();
-
-        post.getMetadata().setLabels(Map.of("hello", "world"));
-        test = postQuery.toPredicate().test(post);
-        assertThat(test).isTrue();
+        entry = List.of(Map.entry("another-faker", "user1"));
+        indexView = new QueryIndexViewImpl(Map.of("spec.owner", entry, "metadata.name", nameEntry));
+        assertThat(listOptions.getFieldSelector().query().matches(indexView)).isEmpty();
     }
 }

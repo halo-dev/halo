@@ -48,7 +48,11 @@ import {
   Plugin,
   PluginKey,
   DecorationSet,
+  ExtensionListKeymap,
+  ExtensionSearchAndReplace,
 } from "@halo-dev/richtext-editor";
+// ui custom extension
+import { UiExtensionImage, UiExtensionUpload } from "./extensions";
 import {
   IconCalendar,
   IconCharacterRecognition,
@@ -77,18 +81,18 @@ import {
   type ComputedRef,
 } from "vue";
 import { formatDatetime } from "@/utils/date";
-import { useAttachmentSelect } from "@console/modules/contents/attachments/composables/use-attachment";
-import * as fastq from "fastq";
-import type { queueAsPromised } from "fastq";
+import { useAttachmentSelect } from "./composables/use-attachment";
 import type { Attachment } from "@halo-dev/api-client";
 import { useI18n } from "vue-i18n";
 import { i18n } from "@/locales";
 import { OverlayScrollbarsComponent } from "overlayscrollbars-vue";
 import { usePluginModuleStore } from "@/stores/plugin";
-import type { PluginModule } from "@halo-dev/console-shared";
+import type { AttachmentLike, PluginModule } from "@halo-dev/console-shared";
 import { useDebounceFn, useLocalStorage } from "@vueuse/core";
 import { onBeforeUnmount } from "vue";
 import { usePermission } from "@/utils/permission";
+import type { AxiosRequestConfig } from "axios";
+import { getContents } from "./utils/attachment";
 
 const { t } = useI18n();
 const { currentUserHasPermission } = usePermission();
@@ -97,7 +101,10 @@ const props = withDefaults(
   defineProps<{
     raw?: string;
     content: string;
-    uploadImage?: (file: File) => Promise<Attachment>;
+    uploadImage?: (
+      file: File,
+      options?: AxiosRequestConfig
+    ) => Promise<Attachment>;
   }>(),
   {
     raw: "",
@@ -115,6 +122,21 @@ const emit = defineEmits<{
 const owner = inject<ComputedRef<string | undefined>>("owner");
 const publishTime = inject<ComputedRef<string | undefined>>("publishTime");
 const permalink = inject<ComputedRef<string | undefined>>("permalink");
+
+declare module "@halo-dev/richtext-editor" {
+  interface Commands<ReturnType> {
+    global: {
+      openAttachmentSelector: (
+        callback: (attachments: AttachmentLike[]) => void,
+        options?: {
+          accepts?: string[];
+          min?: number;
+          max?: number;
+        }
+      ) => ReturnType;
+    };
+  }
+}
 
 interface HeadingNode {
   id: string;
@@ -136,11 +158,28 @@ const selectedHeadingNode = ref<HeadingNode>();
 const extraActiveId = ref("toc");
 const attachmentSelectorModal = ref(false);
 
+const { onAttachmentSelect, attachmentResult } = useAttachmentSelect();
+
 const editor = shallowRef<Editor>();
 
 const { pluginModules } = usePluginModuleStore();
 
 const showSidebar = useLocalStorage("halo:editor:show-sidebar", true);
+
+const initAttachmentOptions = {
+  accepts: ["*/*"],
+  min: undefined,
+  max: undefined,
+};
+const attachmentOptions = ref<{
+  accepts?: string[];
+  min?: number;
+  max?: number;
+}>(initAttachmentOptions);
+
+const handleCloseAttachmentSelectorModal = () => {
+  attachmentOptions.value = initAttachmentOptions;
+};
 
 onMounted(() => {
   const extensionsFromPlugins: AnyExtension[] = [];
@@ -165,6 +204,10 @@ onMounted(() => {
     emit("update", html);
   }, 250);
 
+  const image = currentUserHasPermission(["uc:attachments:manage"])
+    ? UiExtensionImage
+    : ExtensionImage;
+
   editor.value = new Editor({
     content: props.raw,
     extensions: [
@@ -187,12 +230,13 @@ onMounted(() => {
       ExtensionOrderedList,
       ExtensionStrike,
       ExtensionText,
-      ExtensionImage.configure({
+      image.configure({
         inline: true,
         allowBase64: false,
         HTMLAttributes: {
           loading: "lazy",
         },
+        uploadImage: props.uploadImage,
       }),
       ExtensionTaskList,
       ExtensionLink.configure({
@@ -259,7 +303,16 @@ onMounted(() => {
                     title: i18n.global.t(
                       "core.components.default_editor.toolbox.attachment"
                     ),
-                    action: () => (attachmentSelectorModal.value = true),
+                    action: () => {
+                      editor.commands.openAttachmentSelector((attachment) => {
+                        editor
+                          .chain()
+                          .focus()
+                          .insertContent(getContents(attachment))
+                          .run();
+                      });
+                      return true;
+                    },
                   },
                 },
               ];
@@ -280,6 +333,22 @@ onMounted(() => {
                   },
                 },
               };
+            },
+          };
+        },
+        addCommands() {
+          return {
+            openAttachmentSelector: (callback, options) => () => {
+              if (options) {
+                attachmentOptions.value = options;
+              }
+              attachmentSelectorModal.value = true;
+              attachmentResult.updateAttachment = (
+                attachments: AttachmentLike[]
+              ) => {
+                callback(attachments);
+              };
+              return true;
             },
           };
         },
@@ -318,95 +387,13 @@ onMounted(() => {
           ];
         },
       }),
+      ExtensionListKeymap,
+      UiExtensionUpload,
+      ExtensionSearchAndReplace,
     ],
     autofocus: "start",
     onUpdate: () => {
       debounceOnUpdate();
-    },
-    editorProps: {
-      handleDrop: (view, event: DragEvent, _, moved) => {
-        if (!moved && event.dataTransfer && event.dataTransfer.files) {
-          const images = Array.from(event.dataTransfer.files).filter((file) =>
-            file.type.startsWith("image/")
-          ) as File[];
-
-          if (images.length === 0) {
-            return;
-          }
-
-          event.preventDefault();
-
-          images.forEach((file, index) => {
-            uploadQueue.push({
-              file,
-              process: (url: string) => {
-                const { schema } = view.state;
-                const coordinates = view.posAtCoords({
-                  left: event.clientX,
-                  top: event.clientY,
-                });
-
-                if (!coordinates) return;
-
-                const node = schema.nodes.image.create({
-                  src: url,
-                });
-
-                const transaction = view.state.tr.insert(
-                  coordinates.pos + index,
-                  node
-                );
-
-                editor.value?.view.dispatch(transaction);
-              },
-            });
-          });
-
-          return true;
-        }
-        return false;
-      },
-      handlePaste: (view, event: ClipboardEvent) => {
-        const types = Array.from(event.clipboardData?.types || []);
-
-        if (["text/plain", "text/html"].includes(types[0])) {
-          return;
-        }
-
-        const images = Array.from(event.clipboardData?.items || [])
-          .map((item) => {
-            return item.getAsFile();
-          })
-          .filter((file) => {
-            return file && file.type.startsWith("image/");
-          }) as File[];
-
-        if (images.length === 0) {
-          return;
-        }
-
-        event.preventDefault();
-
-        images.forEach((file) => {
-          uploadQueue.push({
-            file,
-            process: (url: string) => {
-              editor.value
-                ?.chain()
-                .focus()
-                .insertContent([
-                  {
-                    type: "image",
-                    attrs: {
-                      src: url,
-                    },
-                  },
-                ])
-                .run();
-            },
-          });
-        });
-      },
     },
   });
 });
@@ -415,32 +402,10 @@ onBeforeUnmount(() => {
   editor.value?.destroy();
 });
 
-// image drag and paste upload
-type Task = {
-  file: File;
-  process: (permalink: string) => void;
-};
-
-const uploadQueue: queueAsPromised<Task> = fastq.promise(asyncWorker, 1);
-
-async function asyncWorker(arg: Task): Promise<void> {
-  if (!props.uploadImage) {
-    return;
-  }
-
-  const attachmentData = await props.uploadImage(arg.file);
-
-  if (attachmentData.status?.permalink) {
-    arg.process(attachmentData.status.permalink);
-  }
-}
-
 const handleSelectHeadingNode = (node: HeadingNode) => {
   selectedHeadingNode.value = node;
   document.getElementById(node.id)?.scrollIntoView({ behavior: "smooth" });
 };
-
-const { onAttachmentSelect } = useAttachmentSelect(editor);
 
 watch(
   () => props.raw,
@@ -465,8 +430,10 @@ const currentLocale = i18n.global.locale.value as
 <template>
   <div>
     <AttachmentSelectorModal
+      v-bind="attachmentOptions"
       v-model:visible="attachmentSelectorModal"
       @select="onAttachmentSelect"
+      @close="handleCloseAttachmentSelectorModal"
     />
     <RichTextEditor v-if="editor" :editor="editor" :locale="currentLocale">
       <template v-if="showSidebar" #extra>

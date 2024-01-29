@@ -84,4 +84,7 @@ public class Snapshot extends AbstractExtension {
         return Boolean.parseBoolean(annotations.get(Snapshot.KEEP_RAW_ANNO));
     }
 
+    public static String toSubjectRefKey(Ref subjectRef) {
+        return subjectRef.getGroup() + "/" + subjectRef.getKind() + "/" + subjectRef.getName();
+    }
 }

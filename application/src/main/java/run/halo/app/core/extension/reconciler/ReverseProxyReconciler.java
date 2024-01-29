@@ -55,12 +55,12 @@ public class ReverseProxyReconciler implements Reconciler<Reconciler.Request> {
 
     private void registerReverseProxy(ReverseProxy reverseProxy) {
         String pluginId = getPluginId(reverseProxy);
-        routerFunctionRegistry.register(pluginId, reverseProxy).block();
+        routerFunctionRegistry.register(pluginId, reverseProxy);
     }
 
     private void cleanUpResources(ReverseProxy reverseProxy) {
         String pluginId = getPluginId(reverseProxy);
-        routerFunctionRegistry.remove(pluginId, reverseProxy.getMetadata().getName()).block();
+        routerFunctionRegistry.remove(pluginId, reverseProxy.getMetadata().getName());
     }
 
     private void addFinalizerIfNecessary(ReverseProxy oldReverseProxy) {

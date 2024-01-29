@@ -19,24 +19,25 @@ export default definePlugin({
   routes: [
     {
       path: "/posts",
+      name: "PostsRoot",
       component: BasicLayout,
+      meta: {
+        title: "core.post.title",
+        searchable: true,
+        permissions: ["system:posts:view"],
+        menu: {
+          name: "core.sidebar.menu.items.posts",
+          group: "content",
+          icon: markRaw(IconBookRead),
+          priority: 0,
+          mobile: true,
+        },
+      },
       children: [
         {
           path: "",
           name: "Posts",
           component: PostList,
-          meta: {
-            title: "core.post.title",
-            searchable: true,
-            permissions: ["system:posts:view"],
-            menu: {
-              name: "core.sidebar.menu.items.posts",
-              group: "content",
-              icon: markRaw(IconBookRead),
-              priority: 0,
-              mobile: true,
-            },
-          },
         },
         {
           path: "deleted",
@@ -55,6 +56,7 @@ export default definePlugin({
           meta: {
             title: "core.post_editor.title",
             searchable: true,
+            hideFooter: true,
             permissions: ["system:posts:manage"],
           },
         },

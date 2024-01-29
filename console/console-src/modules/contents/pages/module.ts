@@ -14,23 +14,24 @@ export default definePlugin({
   routes: [
     {
       path: "/single-pages",
+      name: "SinglePagesRoot",
       component: BasicLayout,
+      meta: {
+        title: "core.page.title",
+        searchable: true,
+        permissions: ["system:singlepages:view"],
+        menu: {
+          name: "core.sidebar.menu.items.single_pages",
+          group: "content",
+          icon: markRaw(IconPages),
+          priority: 1,
+        },
+      },
       children: [
         {
           path: "",
           name: "SinglePages",
           component: SinglePageList,
-          meta: {
-            title: "core.page.title",
-            searchable: true,
-            permissions: ["system:singlepages:view"],
-            menu: {
-              name: "core.sidebar.menu.items.single_pages",
-              group: "content",
-              icon: markRaw(IconPages),
-              priority: 1,
-            },
-          },
         },
         {
           path: "deleted",
@@ -49,6 +50,7 @@ export default definePlugin({
           meta: {
             title: "core.page_editor.title",
             searchable: true,
+            hideFooter: true,
             permissions: ["system:singlepages:manage"],
           },
         },

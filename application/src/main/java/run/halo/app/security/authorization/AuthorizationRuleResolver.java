@@ -1,6 +1,6 @@
 package run.halo.app.security.authorization;
 
-import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.Authentication;
 import reactor.core.publisher.Mono;
 
 /**
@@ -9,5 +9,5 @@ import reactor.core.publisher.Mono;
  */
 public interface AuthorizationRuleResolver {
 
-    Mono<AuthorizingVisitor> visitRules(UserDetails user, RequestInfo requestInfo);
+    Mono<AuthorizingVisitor> visitRules(Authentication authentication, RequestInfo requestInfo);
 }

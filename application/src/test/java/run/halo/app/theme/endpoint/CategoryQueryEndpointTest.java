@@ -2,7 +2,6 @@ package run.halo.app.theme.endpoint;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.when;
 
@@ -19,8 +18,10 @@ import org.springframework.web.reactive.function.server.ServerResponse;
 import reactor.core.publisher.Mono;
 import run.halo.app.core.extension.content.Category;
 import run.halo.app.extension.GroupVersion;
+import run.halo.app.extension.ListOptions;
 import run.halo.app.extension.ListResult;
 import run.halo.app.extension.Metadata;
+import run.halo.app.extension.PageRequest;
 import run.halo.app.extension.ReactiveExtensionClient;
 import run.halo.app.theme.finders.PostPublicQueryService;
 import run.halo.app.theme.finders.vo.ListedPostVo;
@@ -52,7 +53,7 @@ class CategoryQueryEndpointTest {
     @Test
     void listCategories() {
         ListResult<Category> listResult = new ListResult<>(List.of());
-        when(client.list(eq(Category.class), any(), any(), anyInt(), anyInt()))
+        when(client.listBy(eq(Category.class), any(ListOptions.class), any(PageRequest.class)))
             .thenReturn(Mono.just(listResult));
 
         webTestClient.get()
@@ -84,7 +85,7 @@ class CategoryQueryEndpointTest {
     @Test
     void listPostsByCategoryName() {
         ListResult<ListedPostVo> listResult = new ListResult<>(List.of());
-        when(postPublicQueryService.list(anyInt(), anyInt(), any(), any()))
+        when(postPublicQueryService.list(any(), any(PageRequest.class)))
             .thenReturn(Mono.just(listResult));
 
         webTestClient.get()

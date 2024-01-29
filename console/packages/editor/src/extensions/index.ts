@@ -13,6 +13,7 @@ import ExtensionSubscript from "./subscript";
 import ExtensionBulletList from "./bullet-list";
 import ExtensionOrderedList from "./ordered-list";
 import ExtensionTaskList from "./task-list";
+import ExtensionListKeymap from "./list-keymap";
 import ExtensionTable from "./table";
 import ExtensionTextAlign from "./text-align";
 import ExtensionTextStyle from "@tiptap/extension-text-style";
@@ -41,6 +42,7 @@ import ExtensionText from "./text";
 import ExtensionDraggable from "./draggable";
 import ExtensionNodeSelected from "./node-selected";
 import ExtensionTrailingNode from "./trailing-node";
+import ExtensionSearchAndReplace from "./search-and-replace";
 
 const allExtensions = [
   ExtensionBlockquote,
@@ -97,6 +99,7 @@ const allExtensions = [
   ExtensionColumn,
   ExtensionNodeSelected,
   ExtensionTrailingNode,
+  ExtensionSearchAndReplace,
 ];
 
 export {
@@ -142,4 +145,6 @@ export {
   ExtensionColumn,
   ExtensionNodeSelected,
   ExtensionTrailingNode,
+  ExtensionListKeymap,
+  ExtensionSearchAndReplace,
 };

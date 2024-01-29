@@ -6,11 +6,46 @@
   $tableResizeHandleBgColor: #adf;
 
   .ProseMirror {
+    .table-container {
+      position: relative;
+
+      &.table-right-shadow {
+        &::after {
+          bottom: 15px;
+          background: linear-gradient(90deg, transparent, rgba(0, 0, 0, 0.08));
+          right: 0;
+          content: " ";
+          position: absolute;
+          pointer-events: none;
+          top: 0;
+          width: 8px;
+          z-index: 2;
+          margin-top: 27px;
+        }
+      }
+
+      &.table-left-shadow {
+        &::before {
+          bottom: 15px;
+          background: linear-gradient(-90deg, transparent, rgba(0, 0, 0, 0.08));
+          left: 0;
+          content: " ";
+          position: absolute;
+          pointer-events: none;
+          top: 0;
+          width: 8px;
+          z-index: 2;
+          margin-top: 27px;
+        }
+      }
+    }
+
     .tableWrapper {
       position: relative;
       margin: 0.5em 0px;
       overflow-x: auto;
       overflow-y: hidden;
+      cursor: default;
 
       &.has-focus {
         .scrollWrapper {
@@ -44,6 +79,7 @@
       tr {
         position: relative;
         border-bottom: 1px solid $tableBorderColor;
+        cursor: text;
       }
 
       th {
@@ -281,13 +317,8 @@
       right: -2px;
       bottom: -2px;
       width: 4px;
-      pointer-events: none;
       background-color: $tableResizeHandleBgColor;
       z-index: 1;
-    }
-
-    &.resize-cursor {
-      cursor: ew-resize;
       cursor: col-resize;
     }
   }

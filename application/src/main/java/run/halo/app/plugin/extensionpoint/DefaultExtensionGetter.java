@@ -6,6 +6,7 @@ import java.util.Set;
 import java.util.stream.Stream;
 import lombok.RequiredArgsConstructor;
 import org.pf4j.ExtensionPoint;
+import org.pf4j.PluginManager;
 import org.springframework.context.ApplicationContext;
 import org.springframework.core.annotation.AnnotationAwareOrderComparator;
 import org.springframework.lang.NonNull;
@@ -15,7 +16,6 @@ import reactor.core.publisher.Mono;
 import run.halo.app.extension.ReactiveExtensionClient;
 import run.halo.app.infra.SystemConfigurableEnvironmentFetcher;
 import run.halo.app.infra.SystemSetting.ExtensionPointEnabled;
-import run.halo.app.plugin.HaloPluginManager;
 
 @Component
 @RequiredArgsConstructor
@@ -23,7 +23,7 @@ public class DefaultExtensionGetter implements ExtensionGetter {
 
     private final SystemConfigurableEnvironmentFetcher systemConfigFetcher;
 
-    private final HaloPluginManager pluginManager;
+    private final PluginManager pluginManager;
 
     private final ApplicationContext applicationContext;
 

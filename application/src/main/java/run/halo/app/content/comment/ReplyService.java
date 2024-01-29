@@ -31,7 +31,7 @@ public interface ReplyService {
             reply -> reply.getMetadata().getCreationTimestamp();
         // ascending order by creation time
         // asc nulls high will be placed at the end
-        return Comparator.comparing(creationTime, Comparators.nullsLow())
+        return Comparator.comparing(creationTime, Comparators.nullsHigh())
             .thenComparing(metadataCreationTime)
             .thenComparing(reply -> reply.getMetadata().getName());
     }

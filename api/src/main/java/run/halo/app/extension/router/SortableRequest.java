@@ -3,6 +3,7 @@ package run.halo.app.extension.router;
 import static run.halo.app.extension.Comparators.compareCreationTimestamp;
 import static run.halo.app.extension.Comparators.compareName;
 import static run.halo.app.extension.Comparators.nullsComparator;
+import static run.halo.app.extension.router.selector.SelectorUtil.labelAndFieldSelectorToListOptions;
 import static run.halo.app.extension.router.selector.SelectorUtil.labelAndFieldSelectorToPredicate;
 
 import io.swagger.v3.oas.annotations.media.ArraySchema;
@@ -17,6 +18,9 @@ import org.springframework.data.domain.Sort;
 import org.springframework.web.server.ServerWebExchange;
 import run.halo.app.core.extension.endpoint.SortResolver;
 import run.halo.app.extension.Extension;
+import run.halo.app.extension.ListOptions;
+import run.halo.app.extension.PageRequest;
+import run.halo.app.extension.PageRequestImpl;
 
 public class SortableRequest extends IListRequest.QueryListRequest {
 
@@ -46,6 +50,19 @@ public class SortableRequest extends IListRequest.QueryListRequest {
      */
     public <T extends Extension> Predicate<T> toPredicate() {
         return labelAndFieldSelectorToPredicate(getLabelSelector(), getFieldSelector());
+    }
+
+    /**
+     * Build {@link ListOptions} from query params.
+     *
+     * @return a list options.
+     */
+    public ListOptions toListOptions() {
+        return labelAndFieldSelectorToListOptions(getLabelSelector(), getFieldSelector());
+    }
+
+    public PageRequest toPageRequest() {
+        return PageRequestImpl.of(getPage(), getSize(), getSort());
     }
 
     /**

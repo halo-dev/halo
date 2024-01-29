@@ -6,9 +6,9 @@ metadata:
     rbac.authorization.halo.run/system-reserved: "true"
   annotations:
     # Currently, yaml definition does not support i18n, please see https://github.com/halo-dev/halo/issues/3573
-    rbac.authorization.halo.run/display-name: "编辑者"
+    rbac.authorization.halo.run/display-name: "文章管理员"
     rbac.authorization.halo.run/dependencies: |
-      ["role-template-post-editor"]
+      ["role-template-manage-posts"]
 rules: [ ]
 
 ---
@@ -16,6 +16,8 @@ apiVersion: v1alpha1
 kind: "Role"
 metadata:
   name: role-template-post-editor
+  # Deprecated, will be removed in the future
+  deletionTimestamp: 2023-12-01T03:36:25.875373Z
   labels:
     halo.run/role-template: "true"
   annotations:

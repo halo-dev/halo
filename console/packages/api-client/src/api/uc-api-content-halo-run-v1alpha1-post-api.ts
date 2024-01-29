@@ -222,8 +222,6 @@ export const UcApiContentHaloRunV1alpha1PostApiAxiosParamCreator = function (
     },
     /**
      * List posts owned by the current user.
-     * @param {Array<string>} [category]
-     * @param {Array<string>} [contributor]
      * @param {Array<string>} [fieldSelector] Field selector for filtering.
      * @param {string} [keyword] Posts filtered by keyword.
      * @param {Array<string>} [labelSelector] Label selector for filtering.
@@ -231,14 +229,10 @@ export const UcApiContentHaloRunV1alpha1PostApiAxiosParamCreator = function (
      * @param {'DRAFT' | 'PENDING_APPROVAL' | 'PUBLISHED' | 'FAILED'} [publishPhase]
      * @param {number} [size] Size of one page. Zero indicates no limit.
      * @param {Array<string>} [sort] Sort property and direction of the list result. Supported fields: creationTimestamp,publishTime
-     * @param {Array<string>} [tag]
-     * @param {'PUBLIC' | 'INTERNAL' | 'PRIVATE'} [visible]
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      */
     listMyPosts: async (
-      category?: Array<string>,
-      contributor?: Array<string>,
       fieldSelector?: Array<string>,
       keyword?: string,
       labelSelector?: Array<string>,
@@ -246,8 +240,6 @@ export const UcApiContentHaloRunV1alpha1PostApiAxiosParamCreator = function (
       publishPhase?: "DRAFT" | "PENDING_APPROVAL" | "PUBLISHED" | "FAILED",
       size?: number,
       sort?: Array<string>,
-      tag?: Array<string>,
-      visible?: "PUBLIC" | "INTERNAL" | "PRIVATE",
       options: AxiosRequestConfig = {}
     ): Promise<RequestArgs> => {
       const localVarPath = `/apis/uc.api.content.halo.run/v1alpha1/posts`;
@@ -273,14 +265,6 @@ export const UcApiContentHaloRunV1alpha1PostApiAxiosParamCreator = function (
       // authentication BearerAuth required
       // http bearer authentication required
       await setBearerAuthToObject(localVarHeaderParameter, configuration);
-
-      if (category) {
-        localVarQueryParameter["category"] = Array.from(category);
-      }
-
-      if (contributor) {
-        localVarQueryParameter["contributor"] = Array.from(contributor);
-      }
 
       if (fieldSelector) {
         localVarQueryParameter["fieldSelector"] = fieldSelector;
@@ -308,14 +292,6 @@ export const UcApiContentHaloRunV1alpha1PostApiAxiosParamCreator = function (
 
       if (sort) {
         localVarQueryParameter["sort"] = Array.from(sort);
-      }
-
-      if (tag) {
-        localVarQueryParameter["tag"] = Array.from(tag);
-      }
-
-      if (visible !== undefined) {
-        localVarQueryParameter["visible"] = visible;
       }
 
       setSearchParams(localVarUrlObj, localVarQueryParameter);
@@ -653,8 +629,6 @@ export const UcApiContentHaloRunV1alpha1PostApiFp = function (
     },
     /**
      * List posts owned by the current user.
-     * @param {Array<string>} [category]
-     * @param {Array<string>} [contributor]
      * @param {Array<string>} [fieldSelector] Field selector for filtering.
      * @param {string} [keyword] Posts filtered by keyword.
      * @param {Array<string>} [labelSelector] Label selector for filtering.
@@ -662,14 +636,10 @@ export const UcApiContentHaloRunV1alpha1PostApiFp = function (
      * @param {'DRAFT' | 'PENDING_APPROVAL' | 'PUBLISHED' | 'FAILED'} [publishPhase]
      * @param {number} [size] Size of one page. Zero indicates no limit.
      * @param {Array<string>} [sort] Sort property and direction of the list result. Supported fields: creationTimestamp,publishTime
-     * @param {Array<string>} [tag]
-     * @param {'PUBLIC' | 'INTERNAL' | 'PRIVATE'} [visible]
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      */
     async listMyPosts(
-      category?: Array<string>,
-      contributor?: Array<string>,
       fieldSelector?: Array<string>,
       keyword?: string,
       labelSelector?: Array<string>,
@@ -677,15 +647,11 @@ export const UcApiContentHaloRunV1alpha1PostApiFp = function (
       publishPhase?: "DRAFT" | "PENDING_APPROVAL" | "PUBLISHED" | "FAILED",
       size?: number,
       sort?: Array<string>,
-      tag?: Array<string>,
-      visible?: "PUBLIC" | "INTERNAL" | "PRIVATE",
       options?: AxiosRequestConfig
     ): Promise<
       (axios?: AxiosInstance, basePath?: string) => AxiosPromise<ListedPostList>
     > {
       const localVarAxiosArgs = await localVarAxiosParamCreator.listMyPosts(
-        category,
-        contributor,
         fieldSelector,
         keyword,
         labelSelector,
@@ -693,8 +659,6 @@ export const UcApiContentHaloRunV1alpha1PostApiFp = function (
         publishPhase,
         size,
         sort,
-        tag,
-        visible,
         options
       );
       return createRequestFunction(
@@ -875,8 +839,6 @@ export const UcApiContentHaloRunV1alpha1PostApiFactory = function (
     ): AxiosPromise<ListedPostList> {
       return localVarFp
         .listMyPosts(
-          requestParameters.category,
-          requestParameters.contributor,
           requestParameters.fieldSelector,
           requestParameters.keyword,
           requestParameters.labelSelector,
@@ -884,8 +846,6 @@ export const UcApiContentHaloRunV1alpha1PostApiFactory = function (
           requestParameters.publishPhase,
           requestParameters.size,
           requestParameters.sort,
-          requestParameters.tag,
-          requestParameters.visible,
           options
         )
         .then((request) => request(axios, basePath));
@@ -1009,20 +969,6 @@ export interface UcApiContentHaloRunV1alpha1PostApiGetMyPostDraftRequest {
  */
 export interface UcApiContentHaloRunV1alpha1PostApiListMyPostsRequest {
   /**
-   *
-   * @type {Array<string>}
-   * @memberof UcApiContentHaloRunV1alpha1PostApiListMyPosts
-   */
-  readonly category?: Array<string>;
-
-  /**
-   *
-   * @type {Array<string>}
-   * @memberof UcApiContentHaloRunV1alpha1PostApiListMyPosts
-   */
-  readonly contributor?: Array<string>;
-
-  /**
    * Field selector for filtering.
    * @type {Array<string>}
    * @memberof UcApiContentHaloRunV1alpha1PostApiListMyPosts
@@ -1070,20 +1016,6 @@ export interface UcApiContentHaloRunV1alpha1PostApiListMyPostsRequest {
    * @memberof UcApiContentHaloRunV1alpha1PostApiListMyPosts
    */
   readonly sort?: Array<string>;
-
-  /**
-   *
-   * @type {Array<string>}
-   * @memberof UcApiContentHaloRunV1alpha1PostApiListMyPosts
-   */
-  readonly tag?: Array<string>;
-
-  /**
-   *
-   * @type {'PUBLIC' | 'INTERNAL' | 'PRIVATE'}
-   * @memberof UcApiContentHaloRunV1alpha1PostApiListMyPosts
-   */
-  readonly visible?: "PUBLIC" | "INTERNAL" | "PRIVATE";
 }
 
 /**
@@ -1228,8 +1160,6 @@ export class UcApiContentHaloRunV1alpha1PostApi extends BaseAPI {
   ) {
     return UcApiContentHaloRunV1alpha1PostApiFp(this.configuration)
       .listMyPosts(
-        requestParameters.category,
-        requestParameters.contributor,
         requestParameters.fieldSelector,
         requestParameters.keyword,
         requestParameters.labelSelector,
@@ -1237,8 +1167,6 @@ export class UcApiContentHaloRunV1alpha1PostApi extends BaseAPI {
         requestParameters.publishPhase,
         requestParameters.size,
         requestParameters.sort,
-        requestParameters.tag,
-        requestParameters.visible,
         options
       )
       .then((request) => request(this.axios, this.basePath));

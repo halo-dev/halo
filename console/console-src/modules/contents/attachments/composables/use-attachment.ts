@@ -1,10 +1,8 @@
 import type { Attachment, Group, Policy } from "@halo-dev/api-client";
 import { computed, nextTick, type Ref } from "vue";
 import { ref, watch } from "vue";
-import type { AttachmentLike } from "@halo-dev/console-shared";
 import { apiClient } from "@/utils/api-client";
 import { Dialog, Toast } from "@halo-dev/components";
-import type { Content, Editor } from "@halo-dev/richtext-editor";
 import { useQuery } from "@tanstack/vue-query";
 import { useI18n } from "vue-i18n";
 import { useClipboard } from "@vueuse/core";
@@ -26,10 +24,6 @@ interface useAttachmentControlReturn {
   handleSelect: (attachment: Attachment | undefined) => void;
   isChecked: (attachment: Attachment) => boolean;
   handleReset: () => void;
-}
-
-interface useAttachmentSelectReturn {
-  onAttachmentSelect: (attachments: AttachmentLike[]) => void;
 }
 
 export function useAttachmentControl(filterOptions: {
@@ -216,86 +210,6 @@ export function useAttachmentControl(filterOptions: {
     handleSelect,
     isChecked,
     handleReset,
-  };
-}
-
-export function useAttachmentSelect(
-  editor: Ref<Editor | undefined>
-): useAttachmentSelectReturn {
-  const onAttachmentSelect = (attachments: AttachmentLike[]) => {
-    const contents: Content[] = attachments
-      .map((attachment) => {
-        if (typeof attachment === "string") {
-          return {
-            type: "image",
-            attrs: {
-              src: attachment,
-            },
-          };
-        }
-
-        if ("url" in attachment) {
-          return {
-            type: "image",
-            attrs: {
-              src: attachment.url,
-              alt: attachment.type,
-            },
-          };
-        }
-
-        if ("spec" in attachment) {
-          const { mediaType, displayName } = attachment.spec;
-          const { permalink } = attachment.status || {};
-          if (mediaType?.startsWith("image/")) {
-            return {
-              type: "image",
-              attrs: {
-                src: permalink,
-                alt: displayName,
-              },
-            };
-          }
-
-          if (mediaType?.startsWith("video/")) {
-            return {
-              type: "video",
-              attrs: {
-                src: permalink,
-              },
-            };
-          }
-
-          if (mediaType?.startsWith("audio/")) {
-            return {
-              type: "audio",
-              attrs: {
-                src: permalink,
-              },
-            };
-          }
-
-          return {
-            type: "text",
-            marks: [
-              {
-                type: "link",
-                attrs: {
-                  href: permalink,
-                },
-              },
-            ],
-            text: displayName,
-          };
-        }
-      })
-      .filter(Boolean) as Content[];
-
-    editor.value?.chain().focus().insertContent(contents).run();
-  };
-
-  return {
-    onAttachmentSelect,
   };
 }
 

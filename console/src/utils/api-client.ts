@@ -45,6 +45,7 @@ import {
   NotificationHaloRunV1alpha1NotifierDescriptorApi,
   ApiSecurityHaloRunV1alpha1PersonalAccessTokenApi,
   SecurityHaloRunV1alpha1PersonalAccessTokenApi,
+  ApiSecurityHaloRunV1alpha1AuthenticationTwoFactorApi,
   UcApiContentHaloRunV1alpha1AttachmentApi,
   UcApiContentHaloRunV1alpha1PostApi,
   UcApiContentHaloRunV1alpha1SnapshotApi,
@@ -75,6 +76,10 @@ axiosInstance.interceptors.response.use(
     return response;
   },
   async (error: AxiosError<ProblemDetail>) => {
+    if (error.code === "ERR_CANCELED") {
+      return Promise.reject(error);
+    }
+
     if (/Network Error/.test(error.message)) {
       // @ts-ignore
       Toast.error(i18n.global.t("core.common.toast.network_error"));
@@ -243,6 +248,11 @@ function setupApiClient(axios: AxiosInstance) {
       axios
     ),
     pat: new ApiSecurityHaloRunV1alpha1PersonalAccessTokenApi(
+      undefined,
+      baseURL,
+      axios
+    ),
+    twoFactor: new ApiSecurityHaloRunV1alpha1AuthenticationTwoFactorApi(
       undefined,
       baseURL,
       axios

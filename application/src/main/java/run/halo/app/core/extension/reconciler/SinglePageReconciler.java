@@ -14,6 +14,7 @@ import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.jsoup.Jsoup;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Component;
 import org.springframework.util.Assert;
 import run.halo.app.content.NotificationReasonConst;
@@ -26,11 +27,14 @@ import run.halo.app.core.extension.notification.Subscription;
 import run.halo.app.extension.ExtensionClient;
 import run.halo.app.extension.ExtensionOperator;
 import run.halo.app.extension.ExtensionUtil;
+import run.halo.app.extension.ListOptions;
 import run.halo.app.extension.MetadataUtil;
 import run.halo.app.extension.Ref;
 import run.halo.app.extension.controller.Controller;
 import run.halo.app.extension.controller.ControllerBuilder;
 import run.halo.app.extension.controller.Reconciler;
+import run.halo.app.extension.index.query.QueryFactory;
+import run.halo.app.extension.router.selector.FieldSelector;
 import run.halo.app.infra.Condition;
 import run.halo.app.infra.ConditionList;
 import run.halo.app.infra.ConditionStatus;
@@ -243,9 +247,7 @@ public class SinglePageReconciler implements Reconciler<Reconciler.Request> {
     private void cleanUpResources(SinglePage singlePage) {
         // clean up snapshot
         Ref ref = Ref.of(singlePage);
-        client.list(Snapshot.class,
-                snapshot -> ref.equals(snapshot.getSpec().getSubjectRef()), null)
-            .forEach(client::delete);
+        listSnapshots(ref).forEach(client::delete);
 
         // clean up comments
         client.list(Comment.class, comment -> comment.getSpec().getSubjectRef().equals(ref),
@@ -332,8 +334,7 @@ public class SinglePageReconciler implements Reconciler<Reconciler.Request> {
 
             // handle contributors
             String headSnapshot = singlePage.getSpec().getHeadSnapshot();
-            List<String> contributors = client.list(Snapshot.class,
-                    snapshot -> Ref.of(singlePage).equals(snapshot.getSpec().getSubjectRef()), null)
+            List<String> contributors = listSnapshots(Ref.of(singlePage))
                 .stream()
                 .peek(snapshot -> {
                     snapshot.getSpec().setContentPatch(StringUtils.EMPTY);
@@ -376,5 +377,12 @@ public class SinglePageReconciler implements Reconciler<Reconciler.Request> {
     private boolean isDeleted(SinglePage singlePage) {
         return Objects.equals(true, singlePage.getSpec().getDeleted())
             || singlePage.getMetadata().getDeletionTimestamp() != null;
+    }
+
+    List<Snapshot> listSnapshots(Ref ref) {
+        var snapshotListOptions = new ListOptions();
+        snapshotListOptions.setFieldSelector(FieldSelector.of(
+            QueryFactory.equal("spec.subjectRef", Snapshot.toSubjectRefKey(ref))));
+        return client.listAll(Snapshot.class, snapshotListOptions, Sort.unsorted());
     }
 }

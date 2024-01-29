@@ -16,9 +16,11 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.skyscreamer.jsonassert.JSONAssert;
+import org.springframework.data.domain.Sort;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import run.halo.app.core.extension.content.Tag;
+import run.halo.app.extension.ListOptions;
 import run.halo.app.extension.Metadata;
 import run.halo.app.extension.ReactiveExtensionClient;
 import run.halo.app.infra.utils.JsonUtils;
@@ -77,7 +79,7 @@ class TagFinderImplTest {
 
     @Test
     void listAll() {
-        when(client.list(eq(Tag.class), eq(null), any()))
+        when(client.listAll(eq(Tag.class), any(ListOptions.class), any(Sort.class)))
             .thenReturn(Flux.fromIterable(
                     tags().stream().sorted(TagFinderImpl.DEFAULT_COMPARATOR.reversed()).toList()
                 )

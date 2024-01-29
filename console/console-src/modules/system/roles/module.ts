@@ -7,11 +7,11 @@ export default definePlugin({
   components: {},
   routes: [
     {
-      path: "/users",
+      path: "/users/roles",
       component: BasicLayout,
       children: [
         {
-          path: "roles",
+          path: "",
           name: "Roles",
           component: RoleList,
           meta: {
@@ -21,7 +21,7 @@ export default definePlugin({
           },
         },
         {
-          path: "roles/:name",
+          path: ":name",
           name: "RoleDetail",
           component: RoleDetail,
           meta: {

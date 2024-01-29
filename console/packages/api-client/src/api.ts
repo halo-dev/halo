@@ -40,6 +40,7 @@ export * from "./api/api-notification-halo-run-v1alpha1-notification-api";
 export * from "./api/api-notification-halo-run-v1alpha1-notifier-api";
 export * from "./api/api-notification-halo-run-v1alpha1-subscription-api";
 export * from "./api/api-plugin-halo-run-v1alpha1-plugin-api";
+export * from "./api/api-security-halo-run-v1alpha1-authentication-two-factor-api";
 export * from "./api/api-security-halo-run-v1alpha1-personal-access-token-api";
 export * from "./api/auth-halo-run-v1alpha1-auth-provider-api";
 export * from "./api/auth-halo-run-v1alpha1-user-connection-api";

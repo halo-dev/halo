@@ -69,6 +69,20 @@ editor:
       add_column_before: 向前插入列
       add_column_after: 向后插入列
       delete_column: 删除当前列
+    search_and_replace:
+      title: 查找替换
+      search_placeholder: 查找
+      not_found: 无结果
+      occurrence_found: 第 {index} 项，共 {total} 项
+      find_previous: 上一个匹配项
+      find_next: 下一个匹配项
+      replace_placeholder: 替换
+      replace: 替换
+      replace_all: 全部替换
+      case_sensitive: 区分大小写
+      match_word: 全字匹配
+      use_regex: 使用正则表达式
+      close: 关闭
   components:
     color_picker:
       more_color: 更多颜色

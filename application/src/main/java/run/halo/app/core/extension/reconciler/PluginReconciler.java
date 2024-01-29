@@ -1,524 +1,434 @@
 package run.halo.app.core.extension.reconciler;
 
-import static org.pf4j.util.FileUtils.isJarFile;
+import static run.halo.app.core.extension.Plugin.PluginStatus.nullSafeConditions;
+import static run.halo.app.extension.ExtensionUtil.addFinalizers;
+import static run.halo.app.extension.ExtensionUtil.removeFinalizers;
 import static run.halo.app.extension.MetadataUtil.nullSafeAnnotations;
-import static run.halo.app.extension.MetadataUtil.nullSafeLabels;
-import static run.halo.app.plugin.PluginConst.DELETE_STAGE;
 import static run.halo.app.plugin.PluginConst.PLUGIN_PATH;
 import static run.halo.app.plugin.PluginConst.RELOAD_ANNO;
+import static run.halo.app.plugin.PluginConst.RUNTIME_MODE_ANNO;
+import static run.halo.app.plugin.PluginExtensionLoaderUtils.isSetting;
+import static run.halo.app.plugin.PluginExtensionLoaderUtils.lookupExtensions;
+import static run.halo.app.plugin.PluginUtils.generateFileName;
+import static run.halo.app.plugin.PluginUtils.isDevelopmentMode;
 
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.net.MalformedURLException;
-import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.time.Instant;
+import java.time.Clock;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Map;
 import java.util.Objects;
-import java.util.Optional;
 import java.util.Set;
-import java.util.function.Function;
-import java.util.function.UnaryOperator;
-import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.lang3.BooleanUtils;
 import org.apache.commons.lang3.StringUtils;
-import org.pf4j.PluginDescriptor;
-import org.pf4j.PluginRuntimeException;
+import org.pf4j.PluginManager;
 import org.pf4j.PluginState;
-import org.pf4j.PluginWrapper;
 import org.pf4j.RuntimeMode;
-import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.core.io.DefaultResourceLoader;
-import org.springframework.core.io.Resource;
-import org.springframework.lang.NonNull;
-import org.springframework.lang.Nullable;
-import org.springframework.retry.support.RetryTemplate;
 import org.springframework.stereotype.Component;
-import org.springframework.util.Assert;
 import org.springframework.util.ResourceUtils;
 import org.springframework.web.util.UriComponentsBuilder;
 import run.halo.app.core.extension.Plugin;
 import run.halo.app.core.extension.ReverseProxy;
 import run.halo.app.core.extension.Setting;
 import run.halo.app.core.extension.theme.SettingUtils;
+import run.halo.app.extension.ConfigMap;
 import run.halo.app.extension.ExtensionClient;
-import run.halo.app.extension.GroupVersionKind;
+import run.halo.app.extension.ExtensionUtil;
 import run.halo.app.extension.Metadata;
 import run.halo.app.extension.Unstructured;
 import run.halo.app.extension.controller.Controller;
 import run.halo.app.extension.controller.ControllerBuilder;
 import run.halo.app.extension.controller.Reconciler;
 import run.halo.app.extension.controller.Reconciler.Request;
+import run.halo.app.extension.controller.RequeueException;
 import run.halo.app.infra.Condition;
 import run.halo.app.infra.ConditionStatus;
-import run.halo.app.infra.utils.FileUtils;
-import run.halo.app.infra.utils.JsonUtils;
 import run.halo.app.infra.utils.PathUtils;
 import run.halo.app.infra.utils.YamlUnstructuredLoader;
-import run.halo.app.plugin.HaloPluginManager;
-import run.halo.app.plugin.HaloPluginWrapper;
 import run.halo.app.plugin.PluginConst;
-import run.halo.app.plugin.PluginExtensionLoaderUtils;
-import run.halo.app.plugin.PluginStartingError;
-import run.halo.app.plugin.PluginUtils;
-import run.halo.app.plugin.YamlPluginFinder;
-import run.halo.app.plugin.event.PluginCreatedEvent;
-import run.halo.app.plugin.resources.BundleResourceUtils;
+import run.halo.app.plugin.PluginProperties;
 
 /**
  * Plugin reconciler.
  *
  * @author guqing
+ * @author johnniang
  * @since 2.0.0
  */
 @Slf4j
 @Component
-@AllArgsConstructor
 public class PluginReconciler implements Reconciler<Request> {
     private static final String FINALIZER_NAME = "plugin-protection";
     private final ExtensionClient client;
-    private final HaloPluginManager haloPluginManager;
-    private final ApplicationEventPublisher eventPublisher;
-    private final RetryTemplate retryTemplate = RetryTemplate.builder()
-        .maxAttempts(20)
-        .fixedBackoff(300)
-        .retryOn(IllegalStateException.class)
-        .build();
+    private final PluginManager pluginManager;
+
+    private final PluginProperties pluginProperties;
+
+    private Clock clock;
+
+    public PluginReconciler(ExtensionClient client, PluginManager pluginManager,
+        PluginProperties pluginProperties) {
+        this.client = client;
+        this.pluginManager = pluginManager;
+        this.pluginProperties = pluginProperties;
+        this.clock = Clock.systemUTC();
+    }
+
+    /**
+     * Only for testing.
+     *
+     * @param clock new clock.
+     */
+    void setClock(Clock clock) {
+        this.clock = clock;
+    }
 
     @Override
     public Result reconcile(Request request) {
-        try {
-            return client.fetch(Plugin.class, request.name())
-                .map(plugin -> {
-                    if (plugin.getMetadata().getDeletionTimestamp() != null) {
-                        cleanUpResourcesAndRemoveFinalizer(request.name());
-                        return Result.doNotRetry();
-                    }
-                    addFinalizerIfNecessary(plugin);
-
-                    // if true returned, it means it is not ready
-                    if (readinessDetection(request.name())) {
-                        return new Result(true, null);
-                    }
-
-                    reconcilePluginState(plugin.getMetadata().getName());
-                    return Result.doNotRetry();
-                })
-                .orElse(Result.doNotRetry());
-        } catch (DoNotRetryException e) {
-            log.error("Failed to reconcile plugin: [{}]", request.name(), e);
-            persistenceFailureStatus(request.name(), e);
-            return Result.doNotRetry();
-        } catch (Exception e) {
-            persistenceFailureStatus(request.name(), e);
-            throw e;
-        }
-    }
-
-    private void updatePluginPathAnno(String name) {
-        // TODO do it in a better way
-        client.fetch(Plugin.class, name).ifPresent(plugin -> {
-            Map<String, String> annotations = nullSafeAnnotations(plugin);
-            String oldPluginPath = annotations.get(PLUGIN_PATH);
-            String pluginPath = StringUtils.isBlank(oldPluginPath)
-                ? Optional.ofNullable(plugin.statusNonNull().getLoadLocation())
-                .map(URI::getPath)
-                .orElseGet(() -> PluginUtils.generateFileName(plugin)) : oldPluginPath;
-            String pluginPathAnno = resolvePluginPathForAnno(pluginPath);
-            annotations.put(PLUGIN_PATH, pluginPathAnno);
-            if (!StringUtils.equals(pluginPathAnno, oldPluginPath)) {
-                client.update(plugin);
-            }
-        });
-    }
-
-    boolean readinessDetection(String name) {
-        updatePluginPathAnno(name);
-        return client.fetch(Plugin.class, name)
+        return client.fetch(Plugin.class, request.name())
             .map(plugin -> {
-                if (waitForSettingCreation(plugin)) {
-                    return true;
-                }
-                recreateDefaultReverseProxy(plugin);
-
-                updateStatus(name, status -> {
-                    String logoUrl = generateAccessibleLogoUrl(plugin);
-                    status.setLogo(logoUrl);
-
-                    // If phase in status is not equal to plugin state, then reset plugin to
-                    // stopped state and keep the state in memory consistent with the database
-                    PluginState pluginState = getPluginWrapper(name).getPluginState();
-                    status.setPhase(pluginState);
-                    if (!Objects.equals(status.getPhase(), pluginState)) {
-                        // stop and set phase
-                        status.setPhase(haloPluginManager.stopPlugin(name));
-                        status.setEntry(StringUtils.EMPTY);
-                        status.setStylesheet(StringUtils.EMPTY);
+                if (ExtensionUtil.isDeleted(plugin)) {
+                    // CleanUp resources and remove finalizer.
+                    if (removeFinalizers(plugin.getMetadata(), Set.of(FINALIZER_NAME))) {
+                        cleanupResources(plugin);
+                        syncPluginState(plugin);
+                        client.update(plugin);
                     }
-                    return status;
-                });
-                return false;
-            })
-            .orElse(false);
-    }
-
-    String generateAccessibleLogoUrl(Plugin plugin) {
-        String logo = plugin.getSpec().getLogo();
-        if (StringUtils.isBlank(logo)) {
-            return null;
-        }
-        if (!PathUtils.isAbsoluteUri(logo)) {
-            String assetsPrefix =
-                PluginConst.assertsRoutePrefix(plugin.getMetadata().getName());
-            String versionedLogo =
-                applyVersioningToStaticResource(logo, plugin.getSpec().getVersion());
-            return PathUtils.combinePath(assetsPrefix, versionedLogo);
-        }
-        return logo;
-    }
-
-    Optional<Setting> lookupPluginSetting(String name, String settingName) {
-        Assert.notNull(name, "Plugin name must not be null");
-        Assert.notNull(settingName, "Setting name must not be null");
-        PluginWrapper pluginWrapper = getPluginWrapper(name);
-        var runtimeMode = getRuntimeMode(name);
-
-        var resourceLoader =
-            new DefaultResourceLoader(pluginWrapper.getPluginClassLoader());
-        return PluginExtensionLoaderUtils.lookupExtensions(pluginWrapper.getPluginPath(),
-                runtimeMode)
-            .stream()
-            .map(resourceLoader::getResource)
-            .filter(Resource::exists)
-            .map(resource -> new YamlUnstructuredLoader(resource).load())
-            .flatMap(Collection::stream)
-            .filter(unstructured -> {
-                GroupVersionKind groupVersionKind =
-                    GroupVersionKind.fromAPIVersionAndKind(unstructured.getApiVersion(),
-                        unstructured.getKind());
-                GroupVersionKind settingGvk = GroupVersionKind.fromExtension(Setting.class);
-                return settingGvk.groupKind().equals(groupVersionKind.groupKind())
-                    && settingName.equals(unstructured.getMetadata().getName());
-            })
-            .findFirst()
-            .map(unstructured -> Unstructured.OBJECT_MAPPER.convertValue(unstructured,
-                Setting.class));
-    }
-
-    boolean waitForSettingCreation(Plugin plugin) {
-        final String pluginName = plugin.getMetadata().getName();
-
-        final String settingName = plugin.getSpec().getSettingName();
-        if (StringUtils.isBlank(settingName)) {
-            return false;
-        }
-
-        var runtimeMode = getRuntimeMode(pluginName);
-        Optional<Setting> settingOption = lookupPluginSetting(pluginName, settingName)
-            .map(setting -> {
-                // This annotation is added to prevent it from being deleted when stopped.
-                Map<String, String> settingAnnotations = nullSafeAnnotations(setting);
-                settingAnnotations.put(DELETE_STAGE, PluginConst.DeleteStage.UNINSTALL.name());
-                return setting;
-            })
-            .map(settingFromYaml -> {
-                client.fetch(Setting.class, settingName)
-                    .ifPresentOrElse(setting -> {
-                        settingFromYaml.getMetadata()
-                            .setVersion(setting.getMetadata().getVersion());
-                        client.update(settingFromYaml);
-                    }, () -> client.create(settingFromYaml));
-                return settingFromYaml;
-            });
-
-        // Fix gh-3224
-        // Maybe Setting is being created and cannot be queried. so try again.
-        if (settingOption.isEmpty()) {
-            updateStatus(plugin.getMetadata().getName(), status -> {
-                status.setPhase(PluginState.FAILED);
-                var condition = Condition.builder()
-                    .type("BackOff")
-                    .reason("BackOff")
-                    .message("Wait for setting [" + settingName + "] creation")
-                    .status(ConditionStatus.FALSE)
-                    .lastTransitionTime(Instant.now())
-                    .build();
-                Plugin.PluginStatus.nullSafeConditions(status)
-                    .addAndEvictFIFO(condition);
-                return status;
-            });
-            // need requeue
-            return true;
-        }
-
-        final String configMapNameToUse = plugin.getSpec().getConfigMapName();
-        if (StringUtils.isBlank(configMapNameToUse)) {
-            return false;
-        }
-
-        SettingUtils.createOrUpdateConfigMap(client, settingName, configMapNameToUse);
-        return false;
-    }
-
-    void startAction(String name) {
-        stateTransition(name, currentState -> {
-            boolean termination = false;
-            switch (currentState) {
-                case CREATED -> getPluginWrapper(name);
-                case STARTED -> termination = true;
-                // plugin can be started when it is stopped or failed
-                case RESOLVED, STOPPED, FAILED -> doStart(name);
-                default -> {
+                    return Result.doNotRetry();
                 }
-            }
-            return termination;
-        }, PluginState.STARTED);
-    }
+                addFinalizers(plugin.getMetadata(), Set.of(FINALIZER_NAME));
+                plugin.statusNonNull().setPhase(Plugin.Phase.PENDING);
 
-    void stopAction(String name) {
-        stateTransition(name, currentState -> {
-            boolean termination = false;
-            switch (currentState) {
-                case CREATED -> getPluginWrapper(name);
-                case RESOLVED, STARTED -> doStop(name);
-                case FAILED, STOPPED -> termination = true;
-                default -> {
-                }
-            }
-            return termination;
-        }, PluginState.STOPPED);
-    }
-
-    void stateTransition(String name, Function<PluginState, Boolean> stateAction,
-        PluginState desiredState) {
-        PluginState currentState = getPluginWrapper(name).getPluginState();
-        int maxRetries = PluginState.values().length;
-        for (int i = 0; i < maxRetries && currentState != desiredState; i++) {
-            try {
-                if (log.isDebugEnabled() && i > 2) {
-                    log.debug("Plugin [{}] state transition from [{}] to [{}]", name, currentState,
-                        desiredState);
-                }
-                // When true is returned, the status loop is ended directly
-                if (BooleanUtils.isTrue(stateAction.apply(currentState))) {
-                    break;
-                }
-                // update current state
-                currentState = getPluginWrapper(name).getPluginState();
-            } catch (Throwable e) {
-                persistenceFailureStatus(name, e);
-                throw e;
-            }
-        }
-
-        if (currentState != desiredState) {
-            log.error("Plugin [{}] state transition failed: {}", name,
-                haloPluginManager.getPluginStartingError(name));
-            throw new DoNotRetryException("Plugin [" + name + "] state transition from ["
-                + currentState + "] to [" + desiredState + "] failed");
-        }
-    }
-
-    void persistenceFailureStatus(String pluginName, Throwable e) {
-        updateStatus(pluginName, status -> {
-            PluginWrapper pluginWrapper = haloPluginManager.getPlugin(pluginName);
-            if (pluginWrapper != null) {
-                haloPluginManager.stopPlugin(pluginName);
-                pluginWrapper.setPluginState(PluginState.FAILED);
-                pluginWrapper.setFailedException(e);
-            }
-
-            status.setPhase(PluginState.FAILED);
-
-            Condition condition = Condition.builder()
-                .type(PluginState.FAILED.toString())
-                .reason("UnexpectedState")
-                .message(StringUtils.defaultString(e.getMessage()))
-                .status(ConditionStatus.FALSE)
-                .lastTransitionTime(Instant.now())
-                .build();
-            Plugin.PluginStatus.nullSafeConditions(status)
-                .addAndEvictFIFO(condition);
-            return status;
-        });
-    }
-
-    @NonNull
-    private PluginWrapper getPluginWrapper(String name) {
-        PluginWrapper pluginWrapper = haloPluginManager.getPlugin(name);
-        if (pluginWrapper == null) {
-            ensurePluginLoaded(name);
-            pluginWrapper = haloPluginManager.getPlugin(name);
-        }
-
-        if (pluginWrapper == null) {
-            String errorMsg = "Plugin " + name + " not found in plugin manager.";
-            updateStatus(name, status -> {
-                status.setPhase(PluginState.FAILED);
-
-                Condition condition = Condition.builder()
-                    .type(PluginState.FAILED.toString())
-                    .reason("PluginNotFound")
-                    .message(errorMsg)
-                    .status(ConditionStatus.FALSE)
-                    .lastTransitionTime(Instant.now())
-                    .build();
-                Plugin.PluginStatus.nullSafeConditions(status)
-                    .addAndEvictFIFO(condition);
-                return status;
-            });
-            throw new DoNotRetryException(errorMsg);
-        }
-        return pluginWrapper;
-    }
-
-    void updateStatus(String name, UnaryOperator<Plugin.PluginStatus> operator) {
-        try {
-            retryTemplate.execute(callback -> {
+                // Prepare
                 try {
-                    doUpdateStatus(name, operator);
-                } catch (Exception e) {
-                    // trigger retry
-                    throw new IllegalStateException(e);
+                    resolveLoadLocation(plugin);
+
+                    loadOrReload(plugin);
+                    createOrUpdateSetting(plugin);
+                    createOrUpdateReverseProxy(plugin);
+                    resolveStaticResources(plugin);
+
+                    if (requestToEnable(plugin)) {
+                        // Start
+                        startPlugin(plugin);
+                    } else {
+                        // stop the plugin and disable it
+                        stopAndDisablePlugin(plugin);
+                    }
+                } catch (Throwable t) {
+                    // populate condition
+                    var condition = Condition.builder()
+                        .type(PluginState.FAILED.toString())
+                        .reason("UnexpectedState")
+                        .message(t.getMessage())
+                        .status(ConditionStatus.FALSE)
+                        .lastTransitionTime(clock.instant())
+                        .build();
+                    var status = plugin.statusNonNull();
+                    nullSafeConditions(status).addAndEvictFIFO(condition);
+                    status.setPhase(Plugin.Phase.FAILED);
+                    throw t;
+                } finally {
+                    syncPluginState(plugin);
+                    client.update(plugin);
                 }
-                return null;
+
+                return Result.doNotRetry();
+            })
+            .orElseGet(Result::doNotRetry);
+    }
+
+    private void syncPluginState(Plugin plugin) {
+        var pluginName = plugin.getMetadata().getName();
+        var p = pluginManager.getPlugin(pluginName);
+        if (p != null) {
+            plugin.statusNonNull().setLastProbeState(p.getPluginState());
+        } else {
+            plugin.statusNonNull().setLastProbeState(null);
+        }
+    }
+
+    private static boolean requestToReload(Plugin plugin) {
+        var annotations = plugin.getMetadata().getAnnotations();
+        return annotations != null && annotations.remove(RELOAD_ANNO) != null;
+    }
+
+    private void cleanupResources(Plugin plugin) {
+        var pluginName = plugin.getMetadata().getName();
+        var reverseProxyName = buildReverseProxyName(pluginName);
+        log.info("Deleting reverse proxy {} for plugin {}", reverseProxyName, pluginName);
+        client.fetch(ReverseProxy.class, reverseProxyName)
+            .ifPresent(reverseProxy -> {
+                client.delete(reverseProxy);
+                throw new RequeueException(Result.requeue(null),
+                    String.format("""
+                        Waiting for reverse proxy %s to be deleted.""", reverseProxyName)
+                );
             });
-        } catch (Exception e) {
-            PluginWrapper pluginWrapper = haloPluginManager.getPlugin(name);
-            if (pluginWrapper != null) {
-                haloPluginManager.stopPlugin(name);
-                pluginWrapper.setPluginState(PluginState.FAILED);
+        var settingName = plugin.getSpec().getSettingName();
+        if (StringUtils.isNotBlank(settingName)) {
+            log.info("Deleting settings {} for plugin {}", settingName, pluginName);
+            client.fetch(Setting.class, settingName)
+                .ifPresent(setting -> {
+                    client.delete(setting);
+                    throw new RequeueException(Result.requeue(null), String.format("""
+                        Waiting for setting %s to be deleted.""", settingName));
+                });
+        }
+        if (pluginManager.getPlugin(pluginName) != null) {
+            log.info("Deleting plugin {} in plugin manager.", pluginName);
+            var deleted = pluginManager.deletePlugin(pluginName);
+            if (!deleted) {
+                log.warn("Failed to delete plugin {}", pluginName);
             }
-            throw e;
         }
     }
 
-    void doUpdateStatus(String name, UnaryOperator<Plugin.PluginStatus> operator) {
-        client.fetch(Plugin.class, name).ifPresent(plugin -> {
-            Plugin.PluginStatus oldStatus = JsonUtils.deepCopy(plugin.statusNonNull());
-            Plugin.PluginStatus newStatus =
-                Optional.ofNullable(operator.apply(plugin.statusNonNull()))
-                    .orElse(new Plugin.PluginStatus());
-            plugin.setStatus(newStatus);
-
-            URI loadLocation = newStatus.getLoadLocation();
-            if (loadLocation == null) {
-                String pluginPath = nullSafeAnnotations(plugin).get(PLUGIN_PATH);
-                if (StringUtils.isNotBlank(pluginPath)) {
-                    String absolutePath = buildPluginLocation(name, pluginPath);
-                    loadLocation = toUri(absolutePath);
-                } else {
-                    loadLocation = getPluginWrapper(name).getPluginPath().toUri();
-                }
-                newStatus.setLoadLocation(loadLocation);
+    private void startPlugin(Plugin plugin) {
+        // start the plugin
+        var pluginName = plugin.getMetadata().getName();
+        var wrapper = pluginManager.getPlugin(pluginName);
+        plugin.statusNonNull().setPhase(Plugin.Phase.STARTING);
+        if (!PluginState.STARTED.equals(wrapper.getPluginState())) {
+            var pluginState = pluginManager.startPlugin(pluginName);
+            if (!PluginState.STARTED.equals(pluginState)) {
+                throw new IllegalStateException("Failed to start plugin " + pluginName);
             }
-            if (!Objects.equals(oldStatus, newStatus)) {
-                client.update(plugin);
-            }
-        });
-    }
-
-    void doStart(String name) {
-        PluginWrapper pluginWrapper = getPluginWrapper(name);
-        // Check if this plugin version is match requires param.
-        if (!haloPluginManager.validatePluginVersion(pluginWrapper)) {
-            PluginDescriptor descriptor = pluginWrapper.getDescriptor();
-            String message = String.format(
-                "Plugin requires a minimum system version of [%s], and you have [%s].",
-                descriptor.getRequires(), haloPluginManager.getSystemVersion());
-            throw new IllegalStateException(message);
-        }
-
-        if (PluginState.DISABLED.equals(pluginWrapper.getPluginState())) {
-            throw new IllegalStateException(
-                "The plugin is disabled for some reason and cannot be started.");
-        }
-
-        PluginState currentState = haloPluginManager.startPlugin(name);
-        if (!PluginState.STARTED.equals(currentState)) {
-            PluginStartingError staringErrorInfo = getStaringErrorInfo(name);
-            log.debug("Failed to start plugin: " + staringErrorInfo.getDevMessage(),
-                pluginWrapper.getFailedException());
-            throw new IllegalStateException(staringErrorInfo.getMessage(),
-                pluginWrapper.getFailedException());
-        }
-
-        String pluginVersion = pluginWrapper.getDescriptor().getVersion();
-        updateStatus(name, status -> {
-            status.setLastStartTime(Instant.now());
-
-            String jsBundlePath =
-                BundleResourceUtils.getJsBundlePath(haloPluginManager, name);
-            jsBundlePath = applyVersioningToStaticResource(jsBundlePath, pluginVersion);
-            status.setEntry(jsBundlePath);
-
-            String cssBundlePath =
-                BundleResourceUtils.getCssBundlePath(haloPluginManager, name);
-            cssBundlePath = applyVersioningToStaticResource(cssBundlePath, pluginVersion);
-            status.setStylesheet(cssBundlePath);
-
-            status.setPhase(currentState);
-            Condition condition = Condition.builder()
+            plugin.statusNonNull().setLastStartTime(clock.instant());
+            var condition = Condition.builder()
                 .type(PluginState.STARTED.toString())
                 .reason(PluginState.STARTED.toString())
                 .message("Started successfully")
-                .lastTransitionTime(Instant.now())
+                .lastTransitionTime(clock.instant())
                 .status(ConditionStatus.TRUE)
                 .build();
-            Plugin.PluginStatus.nullSafeConditions(status)
-                .addAndEvictFIFO(condition);
-            return status;
-        });
+            nullSafeConditions(plugin.statusNonNull()).addAndEvictFIFO(condition);
+        }
+        plugin.statusNonNull().setPhase(Plugin.Phase.STARTED);
     }
 
-    private String applyVersioningToStaticResource(@Nullable String path, String pluginVersion) {
-        if (StringUtils.isNotBlank(path)) {
-            return UriComponentsBuilder.fromUriString(path)
+    private void stopAndDisablePlugin(Plugin plugin) {
+        var pluginName = plugin.getMetadata().getName();
+        if (pluginManager.getPlugin(pluginName) != null) {
+            pluginManager.disablePlugin(pluginName);
+        }
+        plugin.statusNonNull().setPhase(Plugin.Phase.DISABLED);
+    }
+
+    private static boolean requestToEnable(Plugin plugin) {
+        var enabled = plugin.getSpec().getEnabled();
+        return enabled != null && enabled;
+    }
+
+    private void resolveStaticResources(Plugin plugin) {
+        var pluginName = plugin.getMetadata().getName();
+        var pluginVersion = plugin.getSpec().getVersion();
+        if (isDevelopmentMode(plugin)) {
+            // when we are in dev mode, the plugin version is not always changed.
+            pluginVersion = String.valueOf(clock.instant().toEpochMilli());
+        }
+        var status = plugin.statusNonNull();
+        var specLogo = plugin.getSpec().getLogo();
+        if (StringUtils.isNotBlank(specLogo)) {
+            log.info("Resolving logo resource for plugin {}", pluginName);
+            // the logo might be:
+            // 1. URL
+            // 2. relative path to "resources" folder
+            // 3. base64 format data image
+            var logo = specLogo;
+            if (!specLogo.startsWith("data:image")) {
+                try {
+                    logo = new URL(specLogo).toString();
+                } catch (MalformedURLException ignored) {
+                    // indicate the logo is a path
+                    logo = UriComponentsBuilder.newInstance()
+                        .pathSegment("plugins", pluginName, "assets")
+                        .path(specLogo)
+                        .queryParam("version", pluginVersion)
+                        .build(true)
+                        .toString();
+                }
+            }
+            status.setLogo(logo);
+        }
+
+        log.info("Resolving main.js and style.css for plugin {}", pluginName);
+        var p = pluginManager.getPlugin(pluginName);
+        var classLoader = p.getPluginClassLoader();
+        var resLoader = new DefaultResourceLoader(classLoader);
+        var entryRes = resLoader.getResource("classpath:console/main.js");
+        var cssRes = resLoader.getResource("classpath:console/style.css");
+        if (entryRes.exists()) {
+            var entry = UriComponentsBuilder.newInstance()
+                .pathSegment("plugins", pluginName, "assets", "console", "main.js")
                 .queryParam("version", pluginVersion)
-                .build().toString();
+                .build(true)
+                .toString();
+            status.setEntry(entry);
         }
-        return path;
+        if (cssRes.exists()) {
+            var stylesheet = UriComponentsBuilder.newInstance()
+                .pathSegment("plugins", pluginName, "assets", "console", "style.css")
+                .queryParam("version", pluginVersion)
+                .build(true)
+                .toString();
+            status.setStylesheet(stylesheet);
+        }
     }
 
-    PluginStartingError getStaringErrorInfo(String name) {
-        PluginStartingError startingError =
-            haloPluginManager.getPluginStartingError(name);
-        if (startingError == null) {
-            startingError = PluginStartingError.of(name, "Unknown error", "");
+    private void loadOrReload(Plugin plugin) {
+        // TODO Try to check dependencies before.
+        var pluginName = plugin.getMetadata().getName();
+        try {
+            var p = pluginManager.getPlugin(pluginName);
+            var requestToReload = requestToReload(plugin);
+            if (requestToReload) {
+                log.info("Unloading plugin {}", pluginName);
+                if (p != null) {
+                    pluginManager.unloadPlugin(pluginName);
+                }
+            }
+            if (p == null || requestToReload) {
+                log.info("Loading plugin {}", pluginName);
+                var loadLocation = plugin.getStatus().getLoadLocation();
+                pluginManager.loadPlugin(Paths.get(loadLocation));
+                log.info("Loaded plugin {}", pluginName);
+            }
+        } catch (Throwable t) {
+            // unload the plugin
+            if (pluginManager.getPlugin(pluginName) != null) {
+                pluginManager.unloadPlugin(pluginName);
+            }
+            throw t;
         }
-        return startingError;
     }
 
-    void doStop(String name) {
-        PluginState currentState = haloPluginManager.stopPlugin(name);
-        if (!PluginState.STOPPED.equals(currentState)) {
-            throw new IllegalStateException("Failed to stop plugin: " + name);
+    private void createOrUpdateSetting(Plugin plugin) {
+        log.info("Initializing setting and config map for plugin {}",
+            plugin.getMetadata().getName());
+        var settingName = plugin.getSpec().getSettingName();
+        if (StringUtils.isBlank(settingName)) {
+            // do nothing if no setting name provided.
+            return;
         }
-        updateStatus(name, status -> {
-            status.setPhase(currentState);
-            // reset js bundle path
-            status.setStylesheet(StringUtils.EMPTY);
-            status.setEntry(StringUtils.EMPTY);
 
-            Condition condition = Condition.builder()
-                .type(PluginState.STOPPED.toString())
-                .reason(PluginState.STOPPED.toString())
-                .message("Stopped successfully")
-                .lastTransitionTime(Instant.now())
-                .status(ConditionStatus.TRUE)
-                .build();
-            Plugin.PluginStatus.nullSafeConditions(status)
-                .addAndEvictFIFO(condition);
-            return status;
-        });
+        var pluginName = plugin.getMetadata().getName();
+        var p = pluginManager.getPlugin(pluginName);
+        var resources = lookupExtensions(p.getPluginClassLoader());
+        var loader = new YamlUnstructuredLoader(resources);
+        var setting = loader.load().stream()
+            .filter(isSetting(settingName))
+            .findFirst()
+            .map(u -> Unstructured.OBJECT_MAPPER.convertValue(u, Setting.class))
+            .orElseThrow(() -> new IllegalStateException(String.format("""
+                    Setting name %s was provided but setting extension \
+                    was not found in plugin %s.""",
+                settingName, pluginName)));
+
+        client.fetch(Setting.class, settingName)
+            .ifPresentOrElse(oldSetting -> {
+                // overwrite the setting
+                var version = oldSetting.getMetadata().getVersion();
+                setting.getMetadata().setVersion(version);
+                // TODO Remove this line in the future
+                removeFinalizers(setting.getMetadata(), Set.of("plugin-protector"));
+                client.update(setting);
+            }, () -> client.create(setting));
+
+        log.info("Initialized setting {} for plugin {}", settingName, pluginName);
+
+        // create default config map
+        var configMapName = plugin.getSpec().getConfigMapName();
+        if (StringUtils.isBlank(configMapName)) {
+            return;
+        }
+
+        var defaultConfigMap = SettingUtils.populateDefaultConfig(setting, configMapName);
+
+        client.fetch(ConfigMap.class, configMapName)
+            .ifPresentOrElse(configMap -> {
+                // merge data
+                var oldData = configMap.getData();
+                var defaultData = defaultConfigMap.getData();
+                var mergedData = SettingUtils.mergePatch(oldData, defaultData);
+                configMap.setData(mergedData);
+                client.update(configMap);
+            }, () -> client.create(defaultConfigMap));
+        log.info("Initialized config map {} for plugin {}", configMapName, pluginName);
+    }
+
+    private void resolveLoadLocation(Plugin plugin) {
+        log.debug("Resolving load location for plugin {}", plugin.getMetadata().getName());
+
+        // populate load location from annotations
+        var pluginName = plugin.getMetadata().getName();
+        var annotations = nullSafeAnnotations(plugin);
+        var pluginPathAnno = annotations.get(PLUGIN_PATH);
+        var status = plugin.statusNonNull();
+        if (isDevelopmentMode(plugin)) {
+            if (!isInDevEnvironment()) {
+                throw new IllegalStateException(String.format("""
+                    Cannot run the plugin %s with dev mode in non-development environment.\
+                    """, pluginName));
+            }
+            log.debug("Plugin {} is in development mode", pluginName);
+            if (StringUtils.isBlank(pluginPathAnno)) {
+                // should never happen.
+                throw new IllegalArgumentException(String.format("""
+                        Please set plugin path annotation "%s" \
+                        in development mode for plugin %s.""",
+                    RUNTIME_MODE_ANNO, pluginName));
+            }
+            try {
+                var loadLocation = ResourceUtils.getURL(pluginPathAnno).toURI();
+                status.setLoadLocation(loadLocation);
+            } catch (URISyntaxException | FileNotFoundException e) {
+                throw new IllegalArgumentException(
+                    "Invalid plugin path " + pluginPathAnno + " configured.", e);
+            }
+        } else {
+            // reset annotation PLUGIN_PATH in non-dev mode
+            pluginPathAnno = generateFileName(plugin);
+            annotations.put(PLUGIN_PATH, pluginPathAnno);
+            var pluginPath = Paths.get(pluginPathAnno);
+            var pluginsRoot = getPluginsRoot();
+            if (pluginPath.isAbsolute()) {
+                if (pluginPath.startsWith(pluginsRoot)) {
+                    // ensure the plugin path is a relative path.
+                    annotations.put(PLUGIN_PATH, pluginsRoot.relativize(pluginPath).toString());
+                }
+            } else {
+                pluginPath = pluginsRoot.resolve(pluginPath);
+            }
+
+            // delete old load location if changed.
+            var oldLoadLocation = status.getLoadLocation();
+            var newLoadLocation = pluginPath.toUri();
+            if (oldLoadLocation != null && !Objects.equals(oldLoadLocation, newLoadLocation)) {
+                // delete the old load location
+                log.info("Deleting old plugin file {} for plugin {}, and new load location is {}.",
+                    oldLoadLocation, pluginName, newLoadLocation);
+                try {
+                    var deleted = Files.deleteIfExists(Path.of(oldLoadLocation));
+                    if (deleted) {
+                        log.info("Deleted old plugin file {} for plugin {}.",
+                            oldLoadLocation, pluginName);
+                    }
+                } catch (IOException e) {
+                    log.warn("Failed to delete old plugin file {} for plugin {}",
+                        oldLoadLocation, pluginName, e);
+                }
+            }
+            status.setLoadLocation(newLoadLocation);
+        }
+        log.debug("Populated load location {} for plugin {}", status.getLoadLocation(), pluginName);
     }
 
     @Override
@@ -528,260 +438,9 @@ public class PluginReconciler implements Reconciler<Request> {
             .build();
     }
 
-    private void reconcilePluginState(String name) {
-        client.fetch(Plugin.class, name).ifPresent(plugin -> {
-            // reload detection
-            Map<String, String> annotations = nullSafeAnnotations(plugin);
-            if (annotations.containsKey(RELOAD_ANNO)) {
-                reload(plugin);
-                // update will requeue to make next reconciliation
-                return;
-            }
-
-            // Transition plugin status if necessary
-            if (shouldReconcileStartState(plugin)) {
-                startAction(name);
-            }
-
-            if (shouldReconcileStopState(plugin)) {
-                stopAction(name);
-            }
-        });
-    }
-
-    void reload(Plugin plugin) {
-        String newPluginPath = nullSafeAnnotations(plugin).get(RELOAD_ANNO);
-        if (StringUtils.isBlank(newPluginPath)) {
-            return;
-        }
-        final String pluginName = plugin.getMetadata().getName();
-        URI oldPluginLocation = plugin.statusNonNull().getLoadLocation();
-        if (shouldDeleteFile(newPluginPath, oldPluginLocation)) {
-            try {
-                // delete old plugin jar file
-                Files.deleteIfExists(Paths.get(oldPluginLocation.getPath()));
-            } catch (IOException e) {
-                throw new PluginRuntimeException(e);
-            }
-        }
-        final var pluginFinder = new YamlPluginFinder();
-        final var pluginInPath = pluginFinder.find(toPath(newPluginPath));
-        client.fetch(Plugin.class, plugin.getMetadata().getName())
-            .ifPresent(persisted -> {
-                if (!persisted.getMetadata().getName()
-                    .equals(pluginInPath.getMetadata().getName())) {
-                    throw new DoNotRetryException("Plugin name is not match, skip reload.");
-                }
-                persisted.setSpec(pluginInPath.getSpec());
-                // merge annotations and labels
-                Map<String, String> newAnnotations = nullSafeAnnotations(persisted);
-                newAnnotations.putAll(nullSafeAnnotations(pluginInPath));
-
-                newAnnotations.put(PLUGIN_PATH, resolvePluginPathForAnno(newPluginPath));
-                newAnnotations.remove(RELOAD_ANNO);
-                nullSafeLabels(persisted).putAll(nullSafeLabels(pluginInPath));
-                persisted.statusNonNull().setLoadLocation(toUri(newPluginPath));
-
-                // reload
-                haloPluginManager.reloadPluginWithPath(pluginName, toPath(newPluginPath));
-                // update plugin
-                client.update(persisted);
-            });
-    }
-
-    String resolvePluginPathForAnno(String pluginPathString) {
-        Path pluginsRoot = toPath(haloPluginManager.getPluginsRoot().toString());
-        Path pluginPath = toPath(pluginPathString);
-        if (pluginPath.startsWith(pluginsRoot)) {
-            return pluginsRoot.relativize(pluginPath).toString();
-        }
-        return pluginPath.toString();
-    }
-
-    /**
-     * Returns an absolute plugin path.
-     * if a plugin path is absolute, use it directly in development mode.
-     * otherwise, combine a plugin path with a plugin root path.
-     * Note: plugin location without a scheme
-     */
-    String buildPluginLocation(String name, String pluginPathString) {
-        Assert.notNull(name, "Plugin name must not be null");
-        Assert.notNull(pluginPathString, "Plugin path must not be null");
-        Path pluginsRoot = toPath(haloPluginManager.getPluginsRoot().toString());
-        Path pluginPath = toPath(pluginPathString);
-        // if a plugin path is absolute, use it directly in development mode
-        if (pluginPath.isAbsolute()) {
-            if (!isDevelopmentMode(name) && !pluginPath.startsWith(pluginsRoot)) {
-                throw new DoNotRetryException(
-                    "Plugin path must be relative path or relative to plugin root path.");
-            }
-            return pluginPath.toString();
-        }
-        var result = pluginsRoot.resolve(pluginPath);
-        if (!isDevelopmentMode(name)) {
-            FileUtils.checkDirectoryTraversal(pluginsRoot, result);
-        }
-        return result.toString();
-    }
-
-    boolean shouldDeleteFile(String newPluginPath, URI oldPluginLocation) {
-        if (oldPluginLocation == null) {
-            return false;
-        }
-
-        if (oldPluginLocation.equals(toUri(newPluginPath))) {
-            return false;
-        }
-        return isJarFile(Paths.get(oldPluginLocation));
-    }
-
-    private void ensurePluginLoaded(String name) {
-        client.fetch(Plugin.class, name).ifPresent(plugin -> {
-            PluginWrapper pluginWrapper = haloPluginManager.getPlugin(name);
-            if (pluginWrapper != null) {
-                return;
-            }
-            Path pluginLocation = determinePluginLocation(plugin);
-            if (!Files.exists(pluginLocation)) {
-                return;
-            }
-            haloPluginManager.loadPlugin(pluginLocation);
-        });
-    }
-
-    Path toPath(String pathString) {
-        if (StringUtils.isBlank(pathString)) {
-            return null;
-        }
-        try {
-            var pathURL = new URL(pathString);
-            if (!ResourceUtils.isFileURL(pathURL)) {
-                throw new IllegalArgumentException("The path cannot be resolved to absolute file"
-                    + " path because it does not reside in the file system: "
-                    + pathString);
-            }
-            var pathURI = ResourceUtils.toURI(pathURL);
-            return Paths.get(pathURI);
-        } catch (MalformedURLException | URISyntaxException ignored) {
-            // the given path string is not a valid URL.
-        }
-        return Paths.get(pathString);
-    }
-
-    URI toUri(String pathString) {
-        if (StringUtils.isBlank(pathString)) {
-            throw new IllegalArgumentException("Path string must not be blank");
-        }
-        return Paths.get(pathString).toUri();
-    }
-
-    boolean shouldReconcileStartState(Plugin plugin) {
-        PluginWrapper pluginWrapper = getPluginWrapper(plugin.getMetadata().getName());
-        if (BooleanUtils.isNotTrue(plugin.getSpec().getEnabled())) {
-            return false;
-        }
-        // phase is not started, or plugin state is not started should start
-        return !PluginState.STARTED.equals(plugin.statusNonNull().getPhase())
-            || !PluginState.STARTED.equals(pluginWrapper.getPluginState());
-    }
-
-    boolean shouldReconcileStopState(Plugin plugin) {
-        PluginWrapper pluginWrapper = getPluginWrapper(plugin.getMetadata().getName());
-        if (BooleanUtils.isNotFalse(plugin.getSpec().getEnabled())) {
-            return false;
-        }
-        // phase is not stopped, or plugin state is not stopped should stop
-        return !PluginState.STOPPED.equals(plugin.statusNonNull().getPhase())
-            || !PluginState.STOPPED.equals(pluginWrapper.getPluginState());
-    }
-
-    private void addFinalizerIfNecessary(Plugin oldPlugin) {
-        Set<String> finalizers = oldPlugin.getMetadata().getFinalizers();
-        if (finalizers != null && finalizers.contains(FINALIZER_NAME)) {
-            return;
-        }
-        client.fetch(Plugin.class, oldPlugin.getMetadata().getName())
-            .ifPresent(plugin -> {
-                Set<String> newFinalizers = plugin.getMetadata().getFinalizers();
-                if (newFinalizers == null) {
-                    newFinalizers = new HashSet<>();
-                    plugin.getMetadata().setFinalizers(newFinalizers);
-                }
-                newFinalizers.add(FINALIZER_NAME);
-                client.update(plugin);
-
-                eventPublisher.publishEvent(
-                    new PluginCreatedEvent(this, plugin.getMetadata().getName()));
-            });
-    }
-
-    private void cleanUpResourcesAndRemoveFinalizer(String pluginName) {
-        client.fetch(Plugin.class, pluginName).ifPresent(plugin -> {
-            cleanUpResources(plugin);
-            if (plugin.getMetadata().getFinalizers() != null) {
-                plugin.getMetadata().getFinalizers().remove(FINALIZER_NAME);
-            }
-            client.update(plugin);
-        });
-    }
-
-    private void cleanUpResources(Plugin plugin) {
-        String name = plugin.getMetadata().getName();
-        // delete initial reverse proxy
-        String initialReverseProxyName = initialReverseProxyName(name);
-        client.fetch(ReverseProxy.class, initialReverseProxyName)
-            .ifPresent(client::delete);
-        retryTemplate.execute(callback -> {
-            client.fetch(ReverseProxy.class, initialReverseProxyName).ifPresent(item -> {
-                throw new IllegalStateException(
-                    "Waiting for reverseproxy [" + initialReverseProxyName + "] to be deleted.");
-            });
-            return null;
-        });
-
-        // delete plugin setting form
-        String settingName = plugin.getSpec().getSettingName();
-        if (StringUtils.isNotBlank(settingName)) {
-            client.fetch(Setting.class, settingName)
-                .ifPresent(client::delete);
-            retryTemplate.execute(callback -> {
-                client.fetch(Setting.class, settingName).ifPresent(setting -> {
-                    throw new IllegalStateException("Waiting for setting to be deleted.");
-                });
-                return null;
-            });
-        }
-
-        PluginWrapper pluginWrapper = haloPluginManager.getPlugin(name);
-        if (pluginWrapper != null) {
-            // pluginWrapper must not be null in below code
-            // stop and unload plugin, see also PluginBeforeStopSyncListener
-            if (!haloPluginManager.deletePlugin(name)) {
-                throw new IllegalStateException("Failed to delete plugin: " + name);
-            }
-        }
-    }
-
-    @NonNull
-    Path determinePluginLocation(Plugin plugin) {
-        String pluginPath = nullSafeAnnotations(plugin).get(PLUGIN_PATH);
-        String name = plugin.getMetadata().getName();
-        if (StringUtils.isBlank(pluginPath)) {
-            URI loadLocation = plugin.statusNonNull().getLoadLocation();
-            if (loadLocation != null) {
-                pluginPath = loadLocation.getPath();
-            } else {
-                throw new DoNotRetryException(
-                    "Cannot determine plugin path for plugin: " + name);
-            }
-        }
-        String pluginLocation = buildPluginLocation(name, pluginPath);
-        return Paths.get(pluginLocation);
-    }
-
-    void recreateDefaultReverseProxy(Plugin plugin) {
+    void createOrUpdateReverseProxy(Plugin plugin) {
         String pluginName = plugin.getMetadata().getName();
-        String reverseProxyName = initialReverseProxyName(pluginName);
+        String reverseProxyName = buildReverseProxyName(pluginName);
         ReverseProxy reverseProxy = new ReverseProxy();
         reverseProxy.setMetadata(new Metadata());
         reverseProxy.getMetadata().setName(reverseProxyName);
@@ -806,30 +465,19 @@ public class PluginReconciler implements Reconciler<Request> {
             }, () -> client.create(reverseProxy));
     }
 
-    static class DoNotRetryException extends PluginRuntimeException {
-        public DoNotRetryException(String message) {
-            super(message);
-        }
+    private Path getPluginsRoot() {
+        return pluginManager.getPluginsRoots().stream()
+            .findFirst()
+            .orElseThrow(
+                () -> new IllegalStateException("pluginsRoots have not been initialized, yet."));
     }
 
-    static String initialReverseProxyName(String pluginName) {
+    private boolean isInDevEnvironment() {
+        return RuntimeMode.DEVELOPMENT.equals(pluginProperties.getRuntimeMode());
+    }
+
+    static String buildReverseProxyName(String pluginName) {
         return pluginName + "-system-generated-reverse-proxy";
     }
 
-    private boolean isDevelopmentMode(String name) {
-        return RuntimeMode.DEVELOPMENT.equals(getRuntimeMode(name));
-    }
-
-    private RuntimeMode getRuntimeMode(String name) {
-        var pluginWrapper = haloPluginManager.getPlugin(name);
-        if (pluginWrapper == null) {
-            return haloPluginManager.getRuntimeMode();
-        }
-        if (pluginWrapper instanceof HaloPluginWrapper haloPluginWrapper) {
-            return haloPluginWrapper.getRuntimeMode();
-        }
-        return Files.isDirectory(pluginWrapper.getPluginPath())
-            ? RuntimeMode.DEVELOPMENT
-            : RuntimeMode.DEPLOYMENT;
-    }
 }

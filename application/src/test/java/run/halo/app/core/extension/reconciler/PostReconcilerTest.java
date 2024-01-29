@@ -85,7 +85,7 @@ class PostReconcilerTest {
         Snapshot snapshotV2 = TestPost.snapshotV2();
         snapshotV1.getSpec().setContributors(Set.of("guqing"));
         snapshotV2.getSpec().setContributors(Set.of("guqing", "zhangsan"));
-        when(client.list(eq(Snapshot.class), any(), any()))
+        when(client.listAll(eq(Snapshot.class), any(), any()))
             .thenReturn(List.of(snapshotV1, snapshotV2));
 
         ArgumentCaptor<Post> captor = ArgumentCaptor.forClass(Post.class);
@@ -126,7 +126,7 @@ class PostReconcilerTest {
         Snapshot snapshotV1 = TestPost.snapshotV1();
         snapshotV1.getSpec().setContributors(Set.of("guqing"));
 
-        when(client.list(eq(Snapshot.class), any(), any()))
+        when(client.listAll(eq(Snapshot.class), any(), any()))
             .thenReturn(List.of(snapshotV1, snapshotV2));
 
         ArgumentCaptor<Post> captor = ArgumentCaptor.forClass(Post.class);
@@ -162,7 +162,7 @@ class PostReconcilerTest {
             when(client.fetch(eq(Snapshot.class), eq(post.getSpec().getReleaseSnapshot())))
                 .thenReturn(Optional.of(snapshotV2));
 
-            when(client.list(eq(Snapshot.class), any(), any()))
+            when(client.listAll(eq(Snapshot.class), any(), any()))
                 .thenReturn(List.of());
 
             ArgumentCaptor<Post> captor = ArgumentCaptor.forClass(Post.class);
@@ -191,7 +191,7 @@ class PostReconcilerTest {
                     .rawType("markdown")
                     .build()));
 
-            when(client.list(eq(Snapshot.class), any(), any()))
+            when(client.listAll(eq(Snapshot.class), any(), any()))
                 .thenReturn(List.of());
 
             ArgumentCaptor<Post> captor = ArgumentCaptor.forClass(Post.class);
