@@ -20,7 +20,7 @@ ext {
     jsonPatch = "1.13"
     springDocOpenAPI = "2.3.0"
     lucene = "9.9.1"
-    resilience4jVersion = "2.0.2"
+    resilience4jVersion = "2.2.0"
     twoFactorAuth = "1.3"
 }
 
