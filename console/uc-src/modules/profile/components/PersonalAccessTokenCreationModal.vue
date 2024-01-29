@@ -7,7 +7,6 @@ import { Dialog, Toast, VButton, VModal, VSpace } from "@halo-dev/components";
 import { useMutation, useQueryClient } from "@tanstack/vue-query";
 import { useClipboard } from "@vueuse/core";
 import type { PatSpec, PersonalAccessToken } from "@halo-dev/api-client";
-import { computed } from "vue";
 import { ref } from "vue";
 import { useRoleTemplateSelection } from "@/composables/use-role";
 import { useRoleStore } from "@/stores/role";
@@ -49,11 +48,11 @@ const { permissions } = useRoleStore();
 const { roleTemplateGroups, handleRoleTemplateSelect, selectedRoleTemplates } =
   useRoleTemplateSelection(toRefs(permissions).permissions);
 
-const {
-  mutate,
-  isLoading,
-  data: token,
-} = useMutation({
+const { copy } = useClipboard({
+  legacy: true,
+});
+
+const { mutate, isLoading } = useMutation({
   mutationKey: ["pat-creation"],
   mutationFn: async () => {
     if (formState.value.spec?.expiresAt) {
@@ -74,27 +73,22 @@ const {
     queryClient.invalidateQueries({ queryKey: ["personal-access-tokens"] });
     emit("close");
 
+    const token = data.metadata.annotations?.[patAnnotations.ACCESS_TOKEN];
+
     setTimeout(() => {
       Dialog.info({
         title: t("core.uc_profile.pat.operations.copy.title"),
-        description: data.metadata.annotations?.[patAnnotations.ACCESS_TOKEN],
+        description: token,
         confirmType: "secondary",
         confirmText: t("core.common.buttons.copy"),
         showCancel: false,
         onConfirm: () => {
-          copy();
+          copy(token || "");
           Toast.success(t("core.common.toast.copy_success"));
         },
       });
     });
   },
-});
-
-const { copy } = useClipboard({
-  source: computed(
-    () => token.value?.metadata.annotations?.[patAnnotations.ACCESS_TOKEN] || ""
-  ),
-  legacy: true,
 });
 </script>
 
