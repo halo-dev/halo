@@ -3,14 +3,14 @@ package run.halo.app.plugin;
 import static org.springframework.core.ResolvableType.forClassWithGenerics;
 
 import java.util.concurrent.ConcurrentHashMap;
-import org.springframework.context.event.ContextClosedEvent;
-import org.springframework.context.event.ContextRefreshedEvent;
 import org.springframework.context.event.EventListener;
 import reactor.core.Disposable;
 import run.halo.app.extension.ExtensionClient;
 import run.halo.app.extension.controller.Controller;
 import run.halo.app.extension.controller.ControllerBuilder;
 import run.halo.app.extension.controller.Reconciler;
+import run.halo.app.plugin.event.SpringPluginStartedEvent;
+import run.halo.app.plugin.event.SpringPluginStoppingEvent;
 
 public class PluginControllerManager {
 
@@ -24,8 +24,8 @@ public class PluginControllerManager {
     }
 
     @EventListener
-    public void onApplicationEvent(ContextRefreshedEvent event) {
-        event.getApplicationContext()
+    public void onApplicationEvent(SpringPluginStartedEvent event) {
+        event.getSpringPlugin().getApplicationContext()
             .<Reconciler<Reconciler.Request>>getBeanProvider(
                 forClassWithGenerics(Reconciler.class, Reconciler.Request.class))
             .orderedStream()
@@ -33,7 +33,7 @@ public class PluginControllerManager {
     }
 
     @EventListener
-    public void onApplicationEvent(ContextClosedEvent event) throws Exception {
+    public void onApplicationEvent(SpringPluginStoppingEvent event) throws Exception {
         controllers.values()
             .forEach(Disposable::dispose);
         controllers.clear();
