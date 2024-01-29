@@ -13,7 +13,7 @@ import {
   VSpace,
 } from "@halo-dev/components";
 import EditorProviderSelector from "@/components/dropdown-selector/EditorProviderSelector.vue";
-import { ref } from "vue";
+import { ref, toRef } from "vue";
 import { useLocalStorage } from "@vueuse/core";
 import type { Post, Content, Snapshot } from "@halo-dev/api-client";
 import { randomUUID } from "@/utils/id";
@@ -35,6 +35,8 @@ import type { ComputedRef } from "vue";
 import { useSessionKeepAlive } from "@/composables/use-session-keep-alive";
 import { usePermission } from "@/utils/permission";
 import type { AxiosRequestConfig } from "axios";
+import { useContentCache } from "@/composables/use-content-cache";
+import { useAutoSaveContent } from "@/composables/use-auto-save-content";
 
 const router = useRouter();
 const { t } = useI18n();
@@ -126,6 +128,7 @@ onMounted(async () => {
     formState.value = post;
 
     await handleFetchContent();
+    handleResetCache();
     return;
   }
 
@@ -141,6 +144,48 @@ onMounted(async () => {
     formState.value.metadata.annotations = {
       [contentAnnotations.PREFERRED_EDITOR]: provider.name,
     };
+  }
+  handleResetCache();
+});
+
+const snapshotVersion = computed(() => snapshot.value?.metadata.version || 0);
+
+// Post content cache
+const {
+  currentCache,
+  handleSetContentCache,
+  handleResetCache,
+  handleClearCache,
+} = useContentCache(
+  "post-content-cache",
+  name,
+  toRef(content.value, "raw"),
+  snapshotVersion
+);
+
+useAutoSaveContent(currentCache, toRef(content.value, "raw"), async () => {
+  // Do not save when the setting modal is open
+  if (postSettingEditModal.value) {
+    return;
+  }
+  if (isUpdateMode.value) {
+    handleSave({ mute: true });
+  } else {
+    formState.value.metadata.annotations = {
+      ...formState.value.metadata.annotations,
+      [contentAnnotations.CONTENT_JSON]: JSON.stringify(content.value),
+    };
+    // Set default title and slug
+    if (!formState.value.spec.title) {
+      formState.value.spec.title = t("core.post_editor.untitled");
+    }
+    if (!formState.value.spec.slug) {
+      formState.value.spec.slug = new Date().getTime().toString();
+    }
+    const { data: createdPost } = await apiClient.uc.post.createMyPost({
+      post: formState.value,
+    });
+    onCreatePostSuccess(createdPost);
   }
 });
 
@@ -235,6 +280,7 @@ async function onCreatePostSuccess(data: Post) {
   // Update route query params
   name.value = data.metadata.name;
   await handleFetchContent();
+  handleClearCache();
 }
 
 // Save post
@@ -276,6 +322,7 @@ const { mutateAsync: handleSave, isLoading: isSaving } = useMutation({
   onSuccess(_, variables) {
     if (!variables.mute) Toast.success(t("core.common.toast.save_success"));
     handleFetchContent();
+    handleClearCache(name.value);
   },
   onError() {
     Toast.error(t("core.common.toast.save_failed_and_retry"));
@@ -297,6 +344,7 @@ function handlePublishClick() {
 }
 
 function onPublishPostSuccess() {
+  handleClearCache();
   router.push({ name: "Posts" });
 }
 
@@ -313,7 +361,7 @@ const { mutateAsync: handlePublish, isLoading: isPublishing } = useMutation({
     Toast.success(t("core.common.toast.publish_success"), {
       duration: 2000,
     });
-
+    handleClearCache(formState.value.metadata.name);
     router.push({ name: "Posts" });
   },
   onError() {
@@ -332,6 +380,7 @@ function handleOpenPostSettingEditModal() {
 function onUpdatePostSuccess(data: Post) {
   formState.value = data;
   handleFetchContent();
+  handleClearCache(data.metadata.name);
 }
 
 // Upload image
@@ -433,6 +482,7 @@ useSessionKeepAlive();
       v-model:content="content.content"
       :upload-image="handleUploadImage"
       class="h-full"
+      @update="handleSetContentCache"
     />
   </div>
 
