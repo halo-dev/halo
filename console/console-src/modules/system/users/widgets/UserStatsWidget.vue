@@ -1,9 +1,8 @@
 <script lang="ts" setup>
 import { VCard, IconUserSettings } from "@halo-dev/components";
-import { inject, type Ref } from "vue";
-import type { DashboardStats } from "@halo-dev/api-client";
+import { useDashboardStats } from "@console/composables/use-dashboard-stats";
 
-const dashboardStats = inject<Ref<DashboardStats>>("dashboardStats");
+const { data: stats } = useDashboardStats();
 </script>
 <template>
   <VCard class="h-full" :body-class="['h-full']">
@@ -20,7 +19,7 @@ const dashboardStats = inject<Ref<DashboardStats>>("dashboardStats");
             {{ $t("core.dashboard.widgets.presets.user_stats.title") }}
           </span>
           <p class="text-2xl font-medium text-gray-900">
-            {{ dashboardStats?.users }}
+            {{ stats?.users }}
           </p>
         </div>
       </div>

@@ -1,24 +1,23 @@
 <script lang="ts" setup>
 import { VCard, IconPages } from "@halo-dev/components";
-import { onMounted, ref } from "vue";
 import { apiClient } from "@/utils/api-client";
 import { singlePageLabels } from "@/constants/labels";
+import { useQuery } from "@tanstack/vue-query";
 
-const singlePageTotal = ref<number>(0);
-
-const handleFetchSinglePages = async () => {
-  const { data } = await apiClient.singlePage.listSinglePages({
-    labelSelector: [
-      `${singlePageLabels.DELETED}=false`,
-      `${singlePageLabels.PUBLISHED}=true`,
-    ],
-    page: 0,
-    size: 0,
-  });
-  singlePageTotal.value = data.total;
-};
-
-onMounted(handleFetchSinglePages);
+const { data: total } = useQuery({
+  queryKey: ["widget-singlePage-count"],
+  queryFn: async () => {
+    const { data } = await apiClient.singlePage.listSinglePages({
+      labelSelector: [
+        `${singlePageLabels.DELETED}=false`,
+        `${singlePageLabels.PUBLISHED}=true`,
+      ],
+      page: 0,
+      size: 0,
+    });
+    return data.total;
+  },
+});
 </script>
 <template>
   <VCard class="h-full" :body-class="['h-full']">
@@ -35,7 +34,7 @@ onMounted(handleFetchSinglePages);
             {{ $t("core.dashboard.widgets.presets.page_stats.title") }}
           </span>
           <p class="text-2xl font-medium text-gray-900">
-            {{ singlePageTotal || 0 }}
+            {{ total || 0 }}
           </p>
         </div>
       </div>
