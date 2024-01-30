@@ -19,6 +19,10 @@ halo:
     proxy:
       endpoint: http://localhost:3000/
       enabled: true
+  uc:
+    proxy:
+      endpoint: http://localhost:4000/
+      enabled: true
   plugin:
     runtime-mode: development # development, deployment
   work-dir: ${user.home}/halo2-dev
@@ -27,6 +31,8 @@ logging:
     run.halo.app: DEBUG
     org.springframework.boot.autoconfigure.web.reactive.error.AbstractErrorWebExceptionHandler: DEBUG
 springdoc:
+  cache:
+    disabled: true
   api-docs:
     enabled: true
     version: OPENAPI_3_1

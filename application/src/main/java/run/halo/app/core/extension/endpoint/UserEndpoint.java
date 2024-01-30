@@ -13,14 +13,20 @@ import static org.springframework.web.reactive.function.server.RequestPredicates
 import static run.halo.app.extension.ListResult.generateGenericClass;
 import static run.halo.app.extension.router.QueryParamBuildUtil.buildParametersFromType;
 import static run.halo.app.extension.router.selector.SelectorUtil.labelAndFieldSelectorToPredicate;
+import static run.halo.app.security.authorization.AuthorityUtils.authoritiesToRoles;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.google.common.io.Files;
+import io.github.resilience4j.ratelimiter.RateLimiterRegistry;
+import io.github.resilience4j.ratelimiter.RequestNotPermitted;
+import io.github.resilience4j.reactor.ratelimiter.operator.RateLimiterOperator;
 import io.swagger.v3.oas.annotations.enums.ParameterIn;
 import io.swagger.v3.oas.annotations.media.ArraySchema;
 import io.swagger.v3.oas.annotations.media.Schema;
+import java.security.Principal;
 import java.time.Duration;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -31,8 +37,9 @@ import java.util.Objects;
 import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.atomic.AtomicInteger;
-import java.util.function.Function;
 import java.util.function.Predicate;
+import java.util.stream.Collectors;
+import lombok.Data;
 import lombok.RequiredArgsConstructor;
 import org.apache.commons.lang3.StringUtils;
 import org.springdoc.core.fn.builders.requestbody.Builder;
@@ -60,11 +67,13 @@ import org.springframework.web.server.ServerWebExchange;
 import org.springframework.web.server.ServerWebInputException;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
+import reactor.util.function.Tuples;
 import reactor.util.retry.Retry;
 import run.halo.app.core.extension.Role;
 import run.halo.app.core.extension.User;
 import run.halo.app.core.extension.attachment.Attachment;
 import run.halo.app.core.extension.service.AttachmentService;
+import run.halo.app.core.extension.service.EmailVerificationService;
 import run.halo.app.core.extension.service.RoleService;
 import run.halo.app.core.extension.service.UserService;
 import run.halo.app.extension.Comparators;
@@ -73,9 +82,13 @@ import run.halo.app.extension.Metadata;
 import run.halo.app.extension.MetadataUtil;
 import run.halo.app.extension.ReactiveExtensionClient;
 import run.halo.app.extension.router.IListRequest;
+import run.halo.app.infra.AnonymousUserConst;
 import run.halo.app.infra.SystemConfigurableEnvironmentFetcher;
 import run.halo.app.infra.SystemSetting;
+import run.halo.app.infra.ValidationUtils;
+import run.halo.app.infra.exception.RateLimitExceededException;
 import run.halo.app.infra.utils.JsonUtils;
+import run.halo.app.security.authentication.twofactor.TwoFactorAuthentication;
 
 @Component
 @RequiredArgsConstructor
@@ -89,6 +102,8 @@ public class UserEndpoint implements CustomEndpoint {
     private final UserService userService;
     private final RoleService roleService;
     private final AttachmentService attachmentService;
+    private final EmailVerificationService emailVerificationService;
+    private final RateLimiterRegistry rateLimiterRegistry;
     private final SystemConfigurableEnvironmentFetcher environmentFetcher;
 
     @Override
@@ -198,7 +213,100 @@ public class UserEndpoint implements CustomEndpoint {
                 )
                 .response(responseBuilder().implementation(User.class))
                 .build())
+            .POST("users/-/send-email-verification-code",
+                this::sendEmailVerificationCode,
+                builder -> builder
+                    .tag(tag)
+                    .operationId("SendEmailVerificationCode")
+                    .requestBody(requestBodyBuilder()
+                        .implementation(EmailVerifyRequest.class)
+                        .required(true)
+                    )
+                    .description("Send email verification code for user")
+                    .response(responseBuilder().implementation(Void.class))
+                    .build()
+            )
+            .POST("users/-/verify-email", this::verifyEmail,
+                builder -> builder
+                    .tag(tag)
+                    .operationId("VerifyEmail")
+                    .description("Verify email for user by code.")
+                    .requestBody(requestBodyBuilder()
+                        .required(true)
+                        .implementation(VerifyCodeRequest.class))
+                    .response(responseBuilder().implementation(Void.class))
+                    .build()
+            )
             .build();
+    }
+
+    private Mono<ServerResponse> verifyEmail(ServerRequest request) {
+        return request.bodyToMono(VerifyCodeRequest.class)
+            .switchIfEmpty(Mono.error(
+                () -> new ServerWebInputException("Request body is required."))
+            )
+            .flatMap(verifyEmailRequest -> ReactiveSecurityContextHolder.getContext()
+                .map(SecurityContext::getAuthentication)
+                .map(Principal::getName)
+                .map(username -> Tuples.of(username, verifyEmailRequest.code()))
+            )
+            .flatMap(tuple2 -> {
+                var username = tuple2.getT1();
+                var code = tuple2.getT2();
+                return Mono.just(username)
+                    .transformDeferred(verificationEmailRateLimiter(username))
+                    .flatMap(name -> emailVerificationService.verify(username, code))
+                    .onErrorMap(RequestNotPermitted.class, RateLimitExceededException::new);
+            })
+            .then(ServerResponse.ok().build());
+    }
+
+    public record EmailVerifyRequest(@Schema(requiredMode = REQUIRED) String email) {
+    }
+
+    public record VerifyCodeRequest(@Schema(requiredMode = REQUIRED, minLength = 1) String code) {
+    }
+
+    private Mono<ServerResponse> sendEmailVerificationCode(ServerRequest request) {
+        return request.bodyToMono(EmailVerifyRequest.class)
+            .switchIfEmpty(Mono.error(
+                () -> new ServerWebInputException("Request body is required."))
+            )
+            .doOnNext(emailRequest -> {
+                if (!ValidationUtils.isValidEmail(emailRequest.email())) {
+                    throw new ServerWebInputException("Invalid email address.");
+                }
+            })
+            .flatMap(emailRequest -> {
+                var email = emailRequest.email();
+                return ReactiveSecurityContextHolder.getContext()
+                    .map(SecurityContext::getAuthentication)
+                    .map(Principal::getName)
+                    .map(username -> Tuples.of(username, email));
+            })
+            .flatMap(tuple -> {
+                var username = tuple.getT1();
+                var email = tuple.getT2();
+                return Mono.just(username)
+                    .transformDeferred(sendEmailVerificationCodeRateLimiter(username, email))
+                    .flatMap(u -> emailVerificationService.sendVerificationCode(username, email))
+                    .onErrorMap(RequestNotPermitted.class, RateLimitExceededException::new);
+            })
+            .then(ServerResponse.ok().build());
+    }
+
+    <T> RateLimiterOperator<T> verificationEmailRateLimiter(String username) {
+        String rateLimiterKey = "verify-email-" + username;
+        var rateLimiter =
+            rateLimiterRegistry.rateLimiter(rateLimiterKey, "verify-email");
+        return RateLimiterOperator.of(rateLimiter);
+    }
+
+    <T> RateLimiterOperator<T> sendEmailVerificationCodeRateLimiter(String username, String email) {
+        String rateLimiterKey = "send-email-verification-code-" + username + ":" + email;
+        var rateLimiter =
+            rateLimiterRegistry.rateLimiter(rateLimiterKey, "send-email-verification-code");
+        return RateLimiterOperator.of(rateLimiter);
     }
 
     private Mono<ServerResponse> deleteUserAvatar(ServerRequest request) {
@@ -241,6 +349,7 @@ public class UserEndpoint implements CustomEndpoint {
             .flatMap(user -> ServerResponse.ok().bodyValue(user));
     }
 
+    @Schema(types = "object")
     public interface IAvatarUploadRequest {
         @Schema(requiredMode = REQUIRED, description = "Avatar file")
         FilePart getFile();
@@ -392,6 +501,8 @@ public class UserEndpoint implements CustomEndpoint {
                             oldAnnotations.get(User.LAST_AVATAR_ATTACHMENT_NAME_ANNO));
                         newAnnotations.put(User.AVATAR_ATTACHMENT_NAME_ANNO,
                             oldAnnotations.get(User.AVATAR_ATTACHMENT_NAME_ANNO));
+                        newAnnotations.put(User.EMAIL_TO_VERIFY,
+                            oldAnnotations.get(User.EMAIL_TO_VERIFY));
                         currentUser.getMetadata().setAnnotations(newAnnotations);
                     }
                     var spec = currentUser.getSpec();
@@ -399,7 +510,6 @@ public class UserEndpoint implements CustomEndpoint {
                     spec.setBio(newSpec.getBio());
                     spec.setDisplayName(newSpec.getDisplayName());
                     spec.setTwoFactorAuthEnabled(newSpec.getTwoFactorAuthEnabled());
-                    spec.setEmail(newSpec.getEmail());
                     spec.setPhone(newSpec.getPhone());
                     return currentUser;
                 })
@@ -434,10 +544,11 @@ public class UserEndpoint implements CustomEndpoint {
     @NonNull
     Mono<ServerResponse> me(ServerRequest request) {
         return ReactiveSecurityContextHolder.getContext()
-            .flatMap(ctx -> {
-                var name = ctx.getAuthentication().getName();
-                return userService.getUser(name);
-            })
+            .map(SecurityContext::getAuthentication)
+            .filter(obj -> !(obj instanceof TwoFactorAuthentication))
+            .map(Authentication::getName)
+            .defaultIfEmpty(AnonymousUserConst.PRINCIPAL)
+            .flatMap(userService::getUser)
             .flatMap(this::toDetailedUser)
             .flatMap(user -> ServerResponse.ok()
                 .contentType(MediaType.APPLICATION_JSON)
@@ -483,45 +594,86 @@ public class UserEndpoint implements CustomEndpoint {
 
     @NonNull
     private Mono<ServerResponse> getUserPermission(ServerRequest request) {
-        String name = request.pathVariable("name");
-        return ReactiveSecurityContextHolder.getContext()
-            .map(ctx -> SELF_USER.equals(name) ? ctx.getAuthentication().getName() : name)
-            .flatMapMany(userService::listRoles)
-            .reduce(new LinkedHashSet<Role>(), (list, role) -> {
-                list.add(role);
-                return list;
-            })
-            .flatMap(roles -> uiPermissions(roles)
-                .collectList()
-                .map(uiPermissions -> new UserPermission(roles, Set.copyOf(uiPermissions)))
-                .defaultIfEmpty(new UserPermission(roles, Set.of()))
-            )
-            .flatMap(result -> ServerResponse.ok()
-                .contentType(MediaType.APPLICATION_JSON)
-                .bodyValue(result)
-            );
+        var name = request.pathVariable("name");
+        Mono<UserPermission> userPermission;
+        if (SELF_USER.equals(name)) {
+            userPermission = ReactiveSecurityContextHolder.getContext()
+                .map(SecurityContext::getAuthentication)
+                .flatMap(auth -> {
+                    var roleNames = authoritiesToRoles(auth.getAuthorities());
+                    var up = new UserPermission();
+                    var roles = roleService.list(roleNames)
+                        .collect(Collectors.toSet())
+                        .doOnNext(up::setRoles)
+                        .then();
+                    var permissions = roleService.listPermissions(roleNames)
+                        .distinct()
+                        .collectList()
+                        .doOnNext(up::setPermissions)
+                        .doOnNext(perms -> {
+                            var uiPermissions = uiPermissions(new HashSet<>(perms));
+                            up.setUiPermissions(uiPermissions);
+                        })
+                        .then();
+                    return roles.and(permissions).thenReturn(up);
+                });
+        } else {
+            // get roles from username
+            userPermission = userService.listRoles(name)
+                .collect(Collectors.toSet())
+                .flatMap(roles -> {
+                    var up = new UserPermission();
+                    var setRoles = Mono.fromRunnable(() -> up.setRoles(roles)).then();
+                    var roleNames = roles.stream()
+                        .map(role -> role.getMetadata().getName())
+                        .collect(Collectors.toSet());
+                    var setPermissions = roleService.listPermissions(roleNames)
+                        .distinct()
+                        .collectList()
+                        .doOnNext(up::setPermissions)
+                        .doOnNext(perms -> {
+                            var uiPermissions = uiPermissions(new HashSet<>(perms));
+                            up.setUiPermissions(uiPermissions);
+                        })
+                        .then();
+                    return setRoles.and(setPermissions).thenReturn(up);
+                });
+        }
+
+        return ServerResponse.ok().body(userPermission, UserPermission.class);
     }
 
-    private Flux<String> uiPermissions(Set<Role> roles) {
-        return Flux.fromIterable(roles)
-            .map(role -> role.getMetadata().getName())
-            .collectList()
-            .flatMapMany(roleNames -> roleService.listDependenciesFlux(Set.copyOf(roleNames)))
-            .map(role -> {
-                Map<String, String> annotations = MetadataUtil.nullSafeAnnotations(role);
-                String uiPermissionStr = annotations.get(Role.UI_PERMISSIONS_ANNO);
-                if (StringUtils.isBlank(uiPermissionStr)) {
-                    return new HashSet<String>();
+    private Set<String> uiPermissions(Set<Role> roles) {
+        if (CollectionUtils.isEmpty(roles)) {
+            return Collections.emptySet();
+        }
+        return roles.stream()
+            .<Set<String>>map(role -> {
+                var annotations = role.getMetadata().getAnnotations();
+                if (annotations == null) {
+                    return Set.of();
                 }
-                return JsonUtils.jsonToObject(uiPermissionStr,
+                var uiPermissionsJson = annotations.get(Role.UI_PERMISSIONS_ANNO);
+                if (StringUtils.isBlank(uiPermissionsJson)) {
+                    return Set.of();
+                }
+                return JsonUtils.jsonToObject(uiPermissionsJson,
                     new TypeReference<LinkedHashSet<String>>() {
                     });
             })
-            .flatMapIterable(Function.identity());
+            .flatMap(Set::stream)
+            .collect(Collectors.toSet());
     }
 
-    record UserPermission(@Schema(requiredMode = REQUIRED) Set<Role> roles,
-                          @Schema(requiredMode = REQUIRED) Set<String> uiPermissions) {
+    @Data
+    public static class UserPermission {
+        @Schema(requiredMode = REQUIRED)
+        private Set<Role> roles;
+        @Schema(requiredMode = REQUIRED)
+        private List<Role> permissions;
+        @Schema(requiredMode = REQUIRED)
+        private Set<String> uiPermissions;
+
     }
 
     public class ListRequest extends IListRequest.QueryListRequest {

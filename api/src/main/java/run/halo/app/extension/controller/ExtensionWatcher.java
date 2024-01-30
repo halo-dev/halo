@@ -2,7 +2,7 @@ package run.halo.app.extension.controller;
 
 import run.halo.app.extension.Extension;
 import run.halo.app.extension.Watcher;
-import run.halo.app.extension.WatcherPredicates;
+import run.halo.app.extension.WatcherExtensionMatchers;
 import run.halo.app.extension.controller.Reconciler.Request;
 
 public class ExtensionWatcher implements Watcher {
@@ -12,16 +12,25 @@ public class ExtensionWatcher implements Watcher {
     private volatile boolean disposed = false;
 
     private Runnable disposeHook;
-    private final WatcherPredicates predicates;
 
-    public ExtensionWatcher(RequestQueue<Request> queue, WatcherPredicates predicates) {
+    private final WatcherExtensionMatchers matchers;
+
+    public ExtensionWatcher(RequestQueue<Request> queue, WatcherExtensionMatchers matchers) {
         this.queue = queue;
-        this.predicates = predicates;
+        this.matchers = matchers;
+    }
+
+    @Override
+    public void onAdd(Request request) {
+        if (isDisposed()) {
+            return;
+        }
+        queue.addImmediately(request);
     }
 
     @Override
     public void onAdd(Extension extension) {
-        if (isDisposed() || !predicates.onAddPredicate().test(extension)) {
+        if (isDisposed() || !matchers.onAddMatcher().match(extension)) {
             return;
         }
         // TODO filter the event
@@ -30,7 +39,7 @@ public class ExtensionWatcher implements Watcher {
 
     @Override
     public void onUpdate(Extension oldExtension, Extension newExtension) {
-        if (isDisposed() || !predicates.onUpdatePredicate().test(oldExtension, newExtension)) {
+        if (isDisposed() || !matchers.onUpdateMatcher().match(newExtension)) {
             return;
         }
         // TODO filter the event
@@ -39,7 +48,7 @@ public class ExtensionWatcher implements Watcher {
 
     @Override
     public void onDelete(Extension extension) {
-        if (isDisposed() || !predicates.onDeletePredicate().test(extension)) {
+        if (isDisposed() || !matchers.onDeleteMatcher().match(extension)) {
             return;
         }
         // TODO filter the event

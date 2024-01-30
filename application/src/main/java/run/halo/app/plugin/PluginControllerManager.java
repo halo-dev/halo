@@ -1,58 +1,49 @@
 package run.halo.app.plugin;
 
-import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.stream.Stream;
-import org.springframework.context.event.EventListener;
-import org.springframework.core.ResolvableType;
-import org.springframework.stereotype.Component;
-import run.halo.app.extension.ExtensionClient;
-import run.halo.app.extension.controller.ControllerManager;
-import run.halo.app.extension.controller.DefaultControllerManager;
-import run.halo.app.extension.controller.Reconciler;
-import run.halo.app.extension.controller.Reconciler.Request;
-import run.halo.app.plugin.event.HaloPluginBeforeStopEvent;
-import run.halo.app.plugin.event.HaloPluginStartedEvent;
+import static org.springframework.core.ResolvableType.forClassWithGenerics;
 
-@Component
+import java.util.concurrent.ConcurrentHashMap;
+import org.springframework.context.event.EventListener;
+import reactor.core.Disposable;
+import run.halo.app.extension.ExtensionClient;
+import run.halo.app.extension.controller.Controller;
+import run.halo.app.extension.controller.ControllerBuilder;
+import run.halo.app.extension.controller.Reconciler;
+import run.halo.app.plugin.event.SpringPluginStartedEvent;
+import run.halo.app.plugin.event.SpringPluginStoppingEvent;
+
 public class PluginControllerManager {
 
-    private final Map<String, ControllerManager> controllerManagerMap;
+    private final ConcurrentHashMap<String, Controller> controllers;
 
     private final ExtensionClient client;
 
     public PluginControllerManager(ExtensionClient client) {
         this.client = client;
-        controllerManagerMap = new ConcurrentHashMap<>();
+        controllers = new ConcurrentHashMap<>();
     }
 
     @EventListener
-    public void onPluginStarted(HaloPluginStartedEvent event) {
-        var plugin = event.getPlugin();
-
-        var controllerManager = controllerManagerMap.computeIfAbsent(plugin.getPluginId(),
-            id -> new DefaultControllerManager(client));
-
-        getReconcilers(plugin.getPluginId())
-            .forEach(controllerManager::start);
+    public void onApplicationEvent(SpringPluginStartedEvent event) {
+        event.getSpringPlugin().getApplicationContext()
+            .<Reconciler<Reconciler.Request>>getBeanProvider(
+                forClassWithGenerics(Reconciler.class, Reconciler.Request.class))
+            .orderedStream()
+            .forEach(this::start);
     }
 
     @EventListener
-    public void onPluginBeforeStop(HaloPluginBeforeStopEvent event) {
-        // remove controller manager
-        var plugin = event.getPlugin();
-        var controllerManager = controllerManagerMap.remove(plugin.getPluginId());
-        if (controllerManager != null) {
-            // stop all reconcilers
-            getReconcilers(plugin.getPluginId())
-                .forEach(controllerManager::stop);
-        }
+    public void onApplicationEvent(SpringPluginStoppingEvent event) throws Exception {
+        controllers.values()
+            .forEach(Disposable::dispose);
+        controllers.clear();
     }
 
-    private Stream<Reconciler<Request>> getReconcilers(String pluginId) {
-        var context = ExtensionContextRegistry.getInstance().getByPluginId(pluginId);
-        return context.<Reconciler<Request>>getBeanProvider(
-                ResolvableType.forClassWithGenerics(Reconciler.class, Request.class))
-            .orderedStream();
+    private void start(Reconciler<Reconciler.Request> reconciler) {
+        var builder = new ControllerBuilder(reconciler, client);
+        var controller = reconciler.setupWith(builder);
+        controllers.put(reconciler.getClass().getName(), controller);
+        controller.start();
     }
+
 }

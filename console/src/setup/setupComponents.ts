@@ -1,5 +1,5 @@
 import { defineAsyncComponent, type App } from "vue";
-import { VClosePopper, VTooltip } from "@halo-dev/components";
+import { VClosePopper, VLoading, VTooltip } from "@halo-dev/components";
 import { Dropdown } from "floating-vue";
 import "floating-vue/dist/style.css";
 // @ts-ignore
@@ -11,6 +11,7 @@ import FilterCleanButton from "@/components/filter/FilterCleanButton.vue";
 import SearchInput from "@/components/input/SearchInput.vue";
 import AnnotationsForm from "@/components/form/AnnotationsForm.vue";
 import AttachmentFileTypeIcon from "@/components/icon/AttachmentFileTypeIcon.vue";
+import HasPermission from "@/components/permission/HasPermission.vue";
 
 export function setupComponents(app: App) {
   app.use(VueGridLayout);
@@ -37,4 +38,12 @@ export function setupComponents(app: App) {
   app.component("SearchInput", SearchInput);
   app.component("AnnotationsForm", AnnotationsForm);
   app.component("AttachmentFileTypeIcon", AttachmentFileTypeIcon);
+  app.component("HasPermission", HasPermission);
+  app.component(
+    "UppyUpload",
+    defineAsyncComponent({
+      loader: () => import("@/components/upload/UppyUpload.vue"),
+      loadingComponent: VLoading,
+    })
+  );
 }

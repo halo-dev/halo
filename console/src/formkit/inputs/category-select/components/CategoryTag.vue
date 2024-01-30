@@ -1,6 +1,6 @@
 <script lang="ts" setup>
-import type { CategoryTree } from "@/modules/contents/posts/categories/utils";
-import { getCategoryPath } from "@/modules/contents/posts/categories/utils";
+import type { CategoryTree } from "@console/modules/contents/posts/categories/utils";
+import { getCategoryPath } from "@console/modules/contents/posts/categories/utils";
 import type { Category } from "@halo-dev/api-client";
 import { computed, inject, ref, type Ref } from "vue";
 import { IconClose } from "@halo-dev/components";

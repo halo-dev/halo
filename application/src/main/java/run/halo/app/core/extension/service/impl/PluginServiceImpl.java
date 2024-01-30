@@ -1,6 +1,7 @@
 package run.halo.app.core.extension.service.impl;
 
 import static java.nio.file.StandardCopyOption.REPLACE_EXISTING;
+import static run.halo.app.plugin.PluginConst.RELOAD_ANNO;
 
 import com.github.zafarkhaja.semver.Version;
 import com.google.common.hash.Hashing;
@@ -9,20 +10,23 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.ArrayList;
 import java.util.Comparator;
+import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.Objects;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.lang3.Validate;
 import org.pf4j.PluginWrapper;
+import org.pf4j.RuntimeMode;
 import org.springframework.core.io.Resource;
+import org.springframework.core.io.buffer.DataBuffer;
+import org.springframework.core.io.buffer.DataBufferUtils;
+import org.springframework.core.io.buffer.DefaultDataBufferFactory;
 import org.springframework.core.io.support.PathMatchingResourcePatternResolver;
 import org.springframework.stereotype.Component;
 import org.springframework.util.Assert;
+import org.springframework.util.CollectionUtils;
 import org.springframework.web.server.ServerWebInputException;
 import reactor.core.Exceptions;
 import reactor.core.publisher.Flux;
@@ -30,7 +34,6 @@ import reactor.core.publisher.Mono;
 import reactor.core.scheduler.Schedulers;
 import run.halo.app.core.extension.Plugin;
 import run.halo.app.core.extension.service.PluginService;
-import run.halo.app.extension.MetadataUtil;
 import run.halo.app.extension.ReactiveExtensionClient;
 import run.halo.app.infra.SystemVersionSupplier;
 import run.halo.app.infra.exception.PluginAlreadyExistsException;
@@ -103,7 +106,8 @@ public class PluginServiceImpl implements PluginService {
         return findPluginManifest(path)
             .flatMap(pluginInPath -> {
                 // pre-check the plugin in the path
-                Validate.notNull(pluginInPath.statusNonNull().getLoadLocation());
+                Assert.notNull(pluginInPath.statusNonNull().getLoadLocation(),
+                    "plugin.status.load-location must not be null");
                 satisfiesRequiresVersion(pluginInPath);
                 if (!Objects.equals(name, pluginInPath.getMetadata().getName())) {
                     return Mono.error(new ServerWebInputException(
@@ -116,80 +120,97 @@ public class PluginServiceImpl implements PluginService {
                     .switchIfEmpty(Mono.error(() -> new ServerWebInputException(
                         "The given plugin with name " + name + " was not found.")))
                     // copy plugin into plugin home
-                    .flatMap(prevPlugin -> copyToPluginHome(pluginInPath))
-                    .flatMap(pluginPath -> updateReloadAnno(name, pluginPath));
+                    .flatMap(oldPlugin -> copyToPluginHome(pluginInPath).thenReturn(oldPlugin))
+                    .doOnNext(oldPlugin -> updatePlugin(oldPlugin, pluginInPath))
+                    .flatMap(client::update);
             });
     }
 
     @Override
     public Mono<Plugin> reload(String name) {
-        PluginWrapper pluginWrapper = pluginManager.getPlugin(name);
-        if (pluginWrapper == null) {
-            return Mono.error(() -> new ServerWebInputException(
-                "The given plugin with name " + name + " was not found."));
-        }
-        return updateReloadAnno(name, pluginWrapper.getPluginPath());
+        return client.get(Plugin.class, name)
+            .flatMap(oldPlugin -> {
+                if (oldPlugin.getStatus() == null
+                    || oldPlugin.getStatus().getLoadLocation() == null) {
+                    return Mono.error(new IllegalStateException(
+                        "Load location of plugin has not been populated."));
+                }
+                var loadLocation = oldPlugin.getStatus().getLoadLocation();
+                var loadPath = Path.of(loadLocation);
+                return findPluginManifest(loadPath)
+                    .doOnNext(newPlugin -> updatePlugin(oldPlugin, newPlugin))
+                    .thenReturn(oldPlugin);
+            })
+            .flatMap(client::update);
     }
 
     @Override
-    public Mono<String> uglifyJsBundle() {
-        return Mono.fromSupplier(() -> {
-            StringBuilder jsBundle = new StringBuilder();
-            List<String> pluginNames = new ArrayList<>();
-            for (PluginWrapper pluginWrapper : pluginManager.getStartedPlugins()) {
-                String pluginName = pluginWrapper.getPluginId();
-                pluginNames.add(pluginName);
-                Resource jsBundleResource =
-                    BundleResourceUtils.getJsBundleResource(pluginManager, pluginName,
-                        BundleResourceUtils.JS_BUNDLE);
-                if (jsBundleResource != null) {
-                    try {
-                        jsBundle.append(
-                            jsBundleResource.getContentAsString(StandardCharsets.UTF_8));
-                        jsBundle.append("\n");
-                    } catch (IOException e) {
-                        log.error("Failed to read js bundle of plugin [{}]", pluginName, e);
-                    }
+    public Flux<DataBuffer> uglifyJsBundle() {
+        var startedPlugins = List.copyOf(pluginManager.getStartedPlugins());
+        String plugins = """
+            this.enabledPluginNames = [%s];
+            """.formatted(startedPlugins.stream()
+            .map(PluginWrapper::getPluginId)
+            .collect(Collectors.joining("','", "'", "'")));
+        return Flux.fromIterable(startedPlugins)
+            .mapNotNull(pluginWrapper -> {
+                var pluginName = pluginWrapper.getPluginId();
+                return BundleResourceUtils.getJsBundleResource(pluginManager, pluginName,
+                    BundleResourceUtils.JS_BUNDLE);
+            })
+            .flatMap(resource -> {
+                try {
+                    // Specifying bufferSize as resource content length is
+                    // to append line breaks at the end of each plugin
+                    return DataBufferUtils.read(resource, DefaultDataBufferFactory.sharedInstance,
+                            (int) resource.contentLength())
+                        .doOnNext(dataBuffer -> {
+                            // add a new line after each plugin bundle to avoid syntax error
+                            dataBuffer.write("\n".getBytes(StandardCharsets.UTF_8));
+                        });
+                } catch (IOException e) {
+                    log.error("Failed to read plugin bundle resource", e);
+                    return Flux.empty();
                 }
-            }
-
-            String plugins = """
-                this.enabledPluginNames = [%s];
-                """.formatted(pluginNames.stream()
-                .collect(Collectors.joining("','", "'", "'")));
-            return jsBundle + plugins;
-        });
+            })
+            .concatWith(Flux.defer(() -> {
+                var dataBuffer = DefaultDataBufferFactory.sharedInstance
+                    .wrap(plugins.getBytes(StandardCharsets.UTF_8));
+                return Flux.just(dataBuffer);
+            }));
     }
 
     @Override
-    public Mono<String> uglifyCssBundle() {
-        return Mono.fromSupplier(() -> {
-            StringBuilder cssBundle = new StringBuilder();
-            for (PluginWrapper pluginWrapper : pluginManager.getStartedPlugins()) {
+    public Flux<DataBuffer> uglifyCssBundle() {
+        return Flux.fromIterable(pluginManager.getStartedPlugins())
+            .mapNotNull(pluginWrapper -> {
                 String pluginName = pluginWrapper.getPluginId();
-                Resource cssBundleResource =
-                    BundleResourceUtils.getJsBundleResource(pluginManager, pluginName,
-                        BundleResourceUtils.CSS_BUNDLE);
-                if (cssBundleResource != null) {
-                    try {
-                        cssBundle.append(
-                            cssBundleResource.getContentAsString(StandardCharsets.UTF_8));
-                    } catch (IOException e) {
-                        log.error("Failed to read css bundle of plugin [{}]", pluginName, e);
-                    }
+                return BundleResourceUtils.getJsBundleResource(pluginManager, pluginName,
+                    BundleResourceUtils.CSS_BUNDLE);
+            })
+            .flatMap(resource -> {
+                try {
+                    return DataBufferUtils.read(resource, DefaultDataBufferFactory.sharedInstance,
+                        (int) resource.contentLength());
+                } catch (IOException e) {
+                    log.error("Failed to read plugin css bundle resource", e);
+                    return Flux.empty();
                 }
-            }
-            return cssBundle.toString();
-        });
+            });
     }
 
     @Override
     public Mono<String> generateJsBundleVersion() {
         return Mono.fromSupplier(() -> {
+            if (RuntimeMode.DEVELOPMENT.equals(pluginManager.getRuntimeMode())) {
+                return String.valueOf(System.currentTimeMillis());
+            }
             var compactVersion = pluginManager.getStartedPlugins()
                 .stream()
                 .sorted(Comparator.comparing(PluginWrapper::getPluginId))
-                .map(pluginWrapper -> pluginWrapper.getDescriptor().getVersion())
+                .map(pluginWrapper -> pluginWrapper.getPluginId() + ":"
+                    + pluginWrapper.getDescriptor().getVersion()
+                )
                 .collect(Collectors.joining());
             return Hashing.sha256().hashUnencodedChars(compactVersion).toString();
         });
@@ -204,16 +225,6 @@ public class PluginServiceImpl implements PluginService {
             .onErrorMap(e -> new PluginInstallationException("Failed to parse the plugin manifest",
                 "problemDetail.plugin.missingManifest", null)
             );
-    }
-
-    private Mono<Plugin> updateReloadAnno(String name, Path pluginPath) {
-        return client.get(Plugin.class, name)
-            .flatMap(plugin -> {
-                // add reload annotation to flag the plugin to be reloaded
-                Map<String, String> annotations = MetadataUtil.nullSafeAnnotations(plugin);
-                annotations.put(PluginConst.RELOAD_ANNO, pluginPath.toString());
-                return client.update(plugin);
-            });
     }
 
     /**
@@ -240,7 +251,17 @@ public class PluginServiceImpl implements PluginService {
                     FileUtils.copy(path, pluginFilePath, REPLACE_EXISTING);
                     return pluginFilePath;
                 })
-            .subscribeOn(Schedulers.boundedElastic());
+            .subscribeOn(Schedulers.boundedElastic())
+            .doOnNext(loadLocation -> {
+                // reset load location and annotation PLUGIN_PATH
+                plugin.getStatus().setLoadLocation(loadLocation.toUri());
+                var annotations = plugin.getMetadata().getAnnotations();
+                if (annotations == null) {
+                    annotations = new HashMap<>();
+                    plugin.getMetadata().setAnnotations(annotations);
+                }
+                annotations.put(PluginConst.PLUGIN_PATH, loadLocation.toString());
+            });
     }
 
     private void satisfiesRequiresVersion(Plugin newPlugin) {
@@ -253,7 +274,7 @@ public class PluginServiceImpl implements PluginService {
         if (!VersionUtils.satisfiesRequires(systemVersion, requires)) {
             throw new UnsatisfiedAttributeValueException(String.format(
                 "Plugin requires a minimum system version of [%s], but the current version is "
-                + "[%s].",
+                    + "[%s].",
                 requires, systemVersion),
                 "problemDetail.plugin.version.unsatisfied.requires",
                 new String[] {requires, systemVersion});
@@ -276,5 +297,39 @@ public class PluginServiceImpl implements PluginService {
         } catch (IOException e) {
             throw Exceptions.propagate(e);
         }
+    }
+
+    private static void updatePlugin(Plugin oldPlugin, Plugin newPlugin) {
+        var oldMetadata = oldPlugin.getMetadata();
+        var newMetadata = newPlugin.getMetadata();
+        // merge labels
+        if (!CollectionUtils.isEmpty(newMetadata.getLabels())) {
+            var labels = oldMetadata.getLabels();
+            if (labels == null) {
+                labels = new HashMap<>();
+                oldMetadata.setLabels(labels);
+            }
+            labels.putAll(newMetadata.getLabels());
+        }
+
+        var annotations = oldMetadata.getAnnotations();
+        if (annotations == null) {
+            annotations = new HashMap<>();
+            oldMetadata.setAnnotations(annotations);
+        }
+
+        // merge annotations
+        if (!CollectionUtils.isEmpty(newMetadata.getAnnotations())) {
+            annotations.putAll(newMetadata.getAnnotations());
+        }
+
+        // request to reload
+        annotations.put(RELOAD_ANNO,
+            newPlugin.getStatus().getLoadLocation().toString());
+
+        // apply spec and keep enabled request
+        var enabled = oldPlugin.getSpec().getEnabled();
+        oldPlugin.setSpec(newPlugin.getSpec());
+        oldPlugin.getSpec().setEnabled(enabled);
     }
 }

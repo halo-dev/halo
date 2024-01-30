@@ -4,7 +4,7 @@ const textClassification = {
   inner:
     "inline-flex items-center w-full relative box-border border border-gray-300 formkit-invalid:border-red-500 h-9 rounded-base overflow-hidden focus-within:border-primary focus-within:shadow-sm w-full sm:max-w-lg transition-all",
   input:
-    "outline-0 bg-white antialiased resize-none w-full text-black block transition-all appearance-none h-full px-3 text-sm",
+    "bg-white resize-none w-full text-black block transition-all h-full px-3 text-sm",
 };
 
 const boxClassification = {
@@ -15,8 +15,7 @@ const boxClassification = {
   wrapper:
     "flex items-center mb-1 cursor-pointer group-[.formkit-fieldset]:px-2",
   help: "mb-2 mt-0 px-2",
-  input:
-    "form-check-input h-4 w-4 mr-2 border border-gray-500 rounded-sm bg-white checked:bg-primary focus:outline-none focus:ring-0 transition duration-200",
+  input: "form-check-input mr-2 bg-white",
   inner: "flex items-center",
 };
 
@@ -89,7 +88,10 @@ const theme: Record<string, Record<string, string>> = {
     items: "flex flex-col w-full gap-2 rounded-base",
     item: "border rounded-base grid grid-cols-12 focus-within:border-primary transition-all overflow-visible focus-within:shadow-sm",
     content: "flex-1 p-2 col-span-11 divide-y divide-gray-100",
-    controls: "bg-gray-200 col-span-1 flex items-center justify-center",
+    controls:
+      "flex flex-col items-center justify-center gap-1.5 py-2 bg-gray-200 col-span-1 flex items-center justify-center",
+    control:
+      "cursor-pointer text-gray-500 transition-all hover:text-primary disabled:!cursor-not-allowed disabled:opacity-50 disabled:hover:!text-gray-500",
   },
   group: {
     label: textClassification.label,
@@ -102,7 +104,7 @@ const theme: Record<string, Record<string, string>> = {
   tagSelect: {
     ...textClassification,
     inner: `${textClassification.inner} !overflow-visible !h-auto min-h-[2.25rem]`,
-    input: `w-0 flex-grow outline-0 bg-transparent py-1 px-3 block transition-all appearance-none text-sm antialiased`,
+    input: `w-0 flex-grow bg-transparent py-1 px-3 block transition-all text-sm`,
     "post-tags-wrapper": "flex w-full items-center",
     "post-tags": "flex w-full flex-wrap items-center",
     "post-tag-wrapper": "inline-flex items-center p-1",
@@ -115,7 +117,7 @@ const theme: Record<string, Record<string, string>> = {
   categorySelect: {
     ...textClassification,
     inner: `${textClassification.inner} !overflow-visible !h-auto min-h-[2.25rem]`,
-    input: `w-0 flex-grow outline-0 bg-transparent py-1 px-3 block transition-all appearance-none text-sm antialiased`,
+    input: `w-0 flex-grow bg-transparent py-1 px-3 block transition-all text-sm`,
     "post-categories-wrapper": "flex w-full items-center",
     "post-categories": "flex w-full flex-wrap items-center",
     "post-categories-button":

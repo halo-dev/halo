@@ -5,6 +5,7 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.springframework.mock.http.server.reactive.MockServerHttpRequest.method;
+import static org.springframework.security.authentication.UsernamePasswordAuthenticationToken.authenticated;
 import static org.springframework.security.core.authority.AuthorityUtils.createAuthorityList;
 
 import java.util.List;
@@ -34,22 +35,52 @@ class DefaultRuleResolverTest {
 
     @Test
     void visitRules() {
-        when(roleService.listDependenciesFlux(Set.of("authenticated", "anonymous", "ruleReadPost")))
+        when(roleService.listDependenciesFlux(Set.of("ruleReadPost")))
             .thenReturn(Flux.just(mockRole()));
         var fakeUser = new User("admin", "123456", createAuthorityList("ruleReadPost"));
+        var authentication = authenticated(fakeUser, fakeUser.getPassword(),
+            fakeUser.getAuthorities());
+
         var cases = getRequestResolveCases();
         cases.forEach(requestResolveCase -> {
             var httpMethod = HttpMethod.valueOf(requestResolveCase.method);
             var request = method(httpMethod, requestResolveCase.url).build();
             var requestInfo = RequestInfoFactory.INSTANCE.newRequestInfo(request);
-            StepVerifier.create(ruleResolver.visitRules(fakeUser, requestInfo))
+            StepVerifier.create(ruleResolver.visitRules(authentication, requestInfo))
                 .assertNext(
                     visitor -> assertEquals(requestResolveCase.expected, visitor.isAllowed()))
                 .verifyComplete();
         });
 
-        verify(roleService, times(cases.size())).listDependenciesFlux(
-            Set.of("authenticated", "anonymous", "ruleReadPost"));
+        verify(roleService, times(cases.size())).listDependenciesFlux(Set.of("ruleReadPost"));
+    }
+
+    @Test
+    void visitRulesForUserspaceScope() {
+        when(roleService.listDependenciesFlux(Set.of("ruleReadPost")))
+            .thenReturn(Flux.just(mockRole()));
+        var fakeUser = new User("admin", "123456", createAuthorityList("ruleReadPost"));
+        var authentication =
+            authenticated(fakeUser, fakeUser.getPassword(), fakeUser.getAuthorities());
+        var cases = List.of(
+            new RequestResolveCase("/api/v1/categories", "POST", true),
+            new RequestResolveCase("/api/v1/categories", "DELETE", true),
+            new RequestResolveCase("/api/v1/userspaces/bar/categories", "DELETE", false),
+            new RequestResolveCase("/api/v1/userspaces/admin/categories", "DELETE", true),
+            new RequestResolveCase("/api/v1/posts", "GET", true),
+
+            new RequestResolveCase("/api/v1/userspaces/foo/posts", "GET", false),
+            new RequestResolveCase("/api/v1/userspaces/admin/posts", "GET", true)
+        );
+        cases.forEach(requestResolveCase -> {
+            var httpMethod = HttpMethod.valueOf(requestResolveCase.method);
+            var request = method(httpMethod, requestResolveCase.url).build();
+            var requestInfo = RequestInfoFactory.INSTANCE.newRequestInfo(request);
+            StepVerifier.create(ruleResolver.visitRules(authentication, requestInfo))
+                .assertNext(
+                    visitor -> assertEquals(requestResolveCase.expected, visitor.isAllowed()))
+                .verifyComplete();
+        });
     }
 
     Role mockRole() {

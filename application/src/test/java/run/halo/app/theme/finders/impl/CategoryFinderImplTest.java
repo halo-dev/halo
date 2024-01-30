@@ -2,7 +2,6 @@ package run.halo.app.theme.finders.impl;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.when;
 
@@ -18,11 +17,14 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.skyscreamer.jsonassert.JSONAssert;
+import org.springframework.data.domain.Sort;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import run.halo.app.core.extension.content.Category;
+import run.halo.app.extension.ListOptions;
 import run.halo.app.extension.ListResult;
 import run.halo.app.extension.Metadata;
+import run.halo.app.extension.PageRequest;
 import run.halo.app.extension.ReactiveExtensionClient;
 import run.halo.app.infra.utils.JsonUtils;
 import run.halo.app.theme.finders.vo.CategoryTreeVo;
@@ -85,7 +87,7 @@ class CategoryFinderImplTest {
             categories().stream()
                 .sorted(CategoryFinderImpl.defaultComparator())
                 .toList());
-        when(client.list(eq(Category.class), eq(null), any(), anyInt(), anyInt()))
+        when(client.listBy(eq(Category.class), any(ListOptions.class), any(PageRequest.class)))
             .thenReturn(Mono.just(categories));
         ListResult<CategoryVo> list = categoryFinder.list(1, 10).block();
         assertThat(list.getItems()).hasSize(3);
@@ -95,7 +97,7 @@ class CategoryFinderImplTest {
 
     @Test
     void listAsTree() {
-        when(client.list(eq(Category.class), eq(null), any()))
+        when(client.listAll(eq(Category.class), any(ListOptions.class), any(Sort.class)))
             .thenReturn(Flux.fromIterable(categoriesForTree()));
         List<CategoryTreeVo> treeVos = categoryFinder.listAsTree().collectList().block();
         assertThat(treeVos).hasSize(1);
@@ -103,7 +105,7 @@ class CategoryFinderImplTest {
 
     @Test
     void listSubTreeByName() {
-        when(client.list(eq(Category.class), eq(null), any()))
+        when(client.listAll(eq(Category.class), any(ListOptions.class), any(Sort.class)))
             .thenReturn(Flux.fromIterable(categoriesForTree()));
         List<CategoryTreeVo> treeVos = categoryFinder.listAsTree("E").collectList().block();
         assertThat(treeVos.get(0).getMetadata().getName()).isEqualTo("E");
@@ -119,7 +121,7 @@ class CategoryFinderImplTest {
      */
     @Test
     void listAsTreeMore() {
-        when(client.list(eq(Category.class), eq(null), any()))
+        when(client.listAll(eq(Category.class), any(ListOptions.class), any(Sort.class)))
             .thenReturn(Flux.fromIterable(moreCategories()));
         List<CategoryTreeVo> treeVos = categoryFinder.listAsTree().collectList().block();
         String s = visualizeTree(treeVos);

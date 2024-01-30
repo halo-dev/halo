@@ -26,10 +26,6 @@ public class DefaultDevelopmentPluginRepository extends DevelopmentPluginReposit
         super(pluginsRoots);
     }
 
-    public void addFixedPath(Path path) {
-        fixedPaths.add(path);
-    }
-
     public void setFixedPaths(List<Path> paths) {
         if (CollectionUtils.isEmpty(paths)) {
             return;
@@ -47,7 +43,10 @@ public class DefaultDevelopmentPluginRepository extends DevelopmentPluginReposit
 
     @Override
     public boolean deletePluginPath(Path pluginPath) {
-        // do nothing
-        return true;
+        // If the plugin path is not included in the fixed paths,
+        // return false and give another repository a chance.
+        //
+        // Meanwhile, there is no need to physically delete the plugin here.
+        return fixedPaths.remove(pluginPath);
     }
 }

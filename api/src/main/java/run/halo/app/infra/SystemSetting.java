@@ -79,6 +79,10 @@ public class SystemSetting {
         Integer categoryPageSize;
         Integer tagPageSize;
         Boolean review;
+        String slugGenerationStrategy;
+
+        String attachmentPolicyName;
+        String attachmentGroupName;
     }
 
     @Data

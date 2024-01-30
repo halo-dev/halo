@@ -18,6 +18,7 @@ import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.dao.OptimisticLockingFailureException;
 import org.springframework.test.web.reactive.server.WebTestClient;
 import reactor.core.publisher.Mono;
+import run.halo.app.content.Content;
 import run.halo.app.content.PostRequest;
 import run.halo.app.content.PostService;
 import run.halo.app.content.TestPost;
@@ -50,6 +51,7 @@ class PostEndpointTest {
 
     @BeforeEach
     void setUp() {
+        postEndpoint.setMaxAttemptsWaitForPublish(3);
         webTestClient = WebTestClient
             .bindToRouterFunction(postEndpoint.endpoint())
             .build();
@@ -170,11 +172,11 @@ class PostEndpointTest {
             .is5xxServerError();
 
         // Verify WebClient retry behavior
-        verify(client, times(12)).get(eq(Post.class), eq("post-1"));
+        verify(client, times(5)).get(eq(Post.class), eq("post-1"));
         verify(client).update(any(Post.class));
     }
 
     PostRequest postRequest(Post post) {
-        return new PostRequest(post, new PostRequest.Content("B", "<p>B</p>", "MARKDOWN"));
+        return new PostRequest(post, new Content("B", "<p>B</p>", "MARKDOWN"));
     }
 }

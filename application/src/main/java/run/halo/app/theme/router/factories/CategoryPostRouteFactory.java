@@ -17,12 +17,18 @@ import org.springframework.web.reactive.function.server.ServerResponse;
 import org.springframework.web.server.i18n.LocaleContextResolver;
 import reactor.core.publisher.Mono;
 import run.halo.app.core.extension.content.Category;
+import run.halo.app.extension.ListOptions;
+import run.halo.app.extension.ListResult;
+import run.halo.app.extension.PageRequestImpl;
 import run.halo.app.extension.ReactiveExtensionClient;
+import run.halo.app.extension.index.query.QueryFactory;
+import run.halo.app.extension.router.selector.FieldSelector;
 import run.halo.app.infra.SystemConfigurableEnvironmentFetcher;
 import run.halo.app.infra.SystemSetting;
 import run.halo.app.infra.exception.NotFoundException;
 import run.halo.app.infra.utils.PathUtils;
 import run.halo.app.theme.DefaultTemplateEnum;
+import run.halo.app.theme.ViewNameResolver;
 import run.halo.app.theme.finders.PostFinder;
 import run.halo.app.theme.finders.vo.CategoryVo;
 import run.halo.app.theme.finders.vo.ListedPostVo;
@@ -30,7 +36,6 @@ import run.halo.app.theme.router.ModelConst;
 import run.halo.app.theme.router.PageUrlUtils;
 import run.halo.app.theme.router.TitleVisibilityIdentifyCalculator;
 import run.halo.app.theme.router.UrlContextListResult;
-import run.halo.app.theme.router.ViewNameResolver;
 
 /**
  * The {@link CategoryPostRouteFactory} for generate {@link RouterFunction} specific to the template
@@ -81,10 +86,18 @@ public class CategoryPostRouteFactory implements RouteFactory {
     }
 
     Mono<CategoryVo> fetchBySlug(String slug) {
-        return client.list(Category.class, category -> category.getSpec().getSlug().equals(slug)
-                && category.getMetadata().getDeletionTimestamp() == null, null)
-            .next()
-            .map(CategoryVo::from);
+        var listOptions = new ListOptions();
+        listOptions.setFieldSelector(FieldSelector.of(
+            QueryFactory.and(
+                QueryFactory.equal("spec.slug", slug),
+                QueryFactory.isNull("metadata.deletionTimestamp")
+            )
+        ));
+        return client.listBy(Category.class, listOptions, PageRequestImpl.ofSize(1))
+            .mapNotNull(result -> ListResult.first(result)
+                .map(CategoryVo::from)
+                .orElse(null)
+            );
     }
 
     private Mono<UrlContextListResult<ListedPostVo>> postListByCategoryName(String name,

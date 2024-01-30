@@ -13,10 +13,10 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
+import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import run.halo.app.core.extension.content.Comment;
@@ -42,14 +42,10 @@ class CommentReconcilerTest {
     @Mock
     SchemeManager schemeManager;
 
+    @InjectMocks
     private CommentReconciler commentReconciler;
 
     private final Instant now = Instant.now();
-
-    @BeforeEach
-    void setUp() {
-        commentReconciler = new CommentReconciler(client, schemeManager);
-    }
 
     @Test
     void reconcileDelete() {

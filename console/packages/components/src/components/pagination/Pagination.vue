@@ -166,7 +166,7 @@ const next = () => {
   }
 
   &__select {
-    @apply h-8 border outline-none rounded-base px-2 text-gray-800 text-sm border-gray-300;
+    @apply h-8 border outline-none rounded-base pr-10 border-solid px-2 text-gray-800 text-sm border-gray-300 focus:border-primary;
   }
 
   &__select-label {

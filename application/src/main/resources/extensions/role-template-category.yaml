@@ -7,6 +7,8 @@ metadata:
     halo.run/hidden: "true"
   annotations:
     rbac.authorization.halo.run/dependencies: "[ \"role-template-view-categories\" ]"
+    rbac.authorization.halo.run/ui-permissions: |
+      [ "system:categories:manage", "uc:categories:manage" ]
 rules:
   - apiGroups: [ "content.halo.run" ]
     resources: [ "categories" ]
@@ -19,6 +21,9 @@ metadata:
   labels:
     halo.run/role-template: "true"
     halo.run/hidden: "true"
+  annotations:
+    rbac.authorization.halo.run/ui-permissions: |
+      [ "system:categories:view", "uc:categories:view" ]
 rules:
   - apiGroups: [ "content.halo.run" ]
     resources: [ "categories" ]

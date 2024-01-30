@@ -43,3 +43,6 @@ rules:
   - apiGroups: [ "api.plugin.halo.run" ]
     resources: [ "*" ]
     verbs: [ "get", "list" ]
+  - apiGroups: [ "api.notification.halo.run" ]
+    resources: [ "subscriptions/unsubscribe" ]
+    verbs: [ "get", "list" ]

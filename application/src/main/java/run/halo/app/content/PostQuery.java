@@ -1,16 +1,11 @@
 package run.halo.app.content;
 
-import static java.util.Comparator.comparing;
-import static run.halo.app.extension.router.selector.SelectorUtil.labelAndFieldSelectorToPredicate;
+import static run.halo.app.extension.router.selector.SelectorUtil.labelAndFieldSelectorToListOptions;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import io.swagger.v3.oas.annotations.media.ArraySchema;
 import io.swagger.v3.oas.annotations.media.Schema;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Comparator;
-import java.util.List;
-import java.util.Set;
-import java.util.function.Predicate;
+import org.apache.commons.lang3.BooleanUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.data.domain.Sort;
 import org.springframework.lang.Nullable;
@@ -18,8 +13,11 @@ import org.springframework.web.reactive.function.server.ServerRequest;
 import org.springframework.web.server.ServerWebExchange;
 import run.halo.app.core.extension.content.Post;
 import run.halo.app.core.extension.endpoint.SortResolver;
-import run.halo.app.extension.Comparators;
+import run.halo.app.extension.ListOptions;
+import run.halo.app.extension.index.query.QueryFactory;
 import run.halo.app.extension.router.IListRequest;
+import run.halo.app.extension.router.selector.FieldSelector;
+import run.halo.app.extension.router.selector.LabelSelector;
 
 /**
  * A query object for {@link Post} list.
@@ -31,39 +29,28 @@ public class PostQuery extends IListRequest.QueryListRequest {
 
     private final ServerWebExchange exchange;
 
+    private final String username;
+
     public PostQuery(ServerRequest request) {
+        this(request, null);
+    }
+
+    public PostQuery(ServerRequest request, @Nullable String username) {
         super(request.queryParams());
         this.exchange = request.exchange();
+        this.username = username;
     }
 
-    @Nullable
-    @Schema(name = "contributor")
-    public Set<String> getContributors() {
-        return listToSet(queryParams.get("contributor"));
-    }
-
-    @Nullable
-    @Schema(name = "category")
-    public Set<String> getCategories() {
-        return listToSet(queryParams.get("category"));
-    }
-
-    @Nullable
-    @Schema(name = "tag")
-    public Set<String> getTags() {
-        return listToSet(queryParams.get("tag"));
+    @Schema(hidden = true)
+    @JsonIgnore
+    public String getUsername() {
+        return username;
     }
 
     @Nullable
     public Post.PostPhase getPublishPhase() {
         String publishPhase = queryParams.getFirst("publishPhase");
         return Post.PostPhase.from(publishPhase);
-    }
-
-    @Nullable
-    public Post.VisibleEnum getVisible() {
-        String visible = queryParams.getFirst("visible");
-        return Post.VisibleEnum.from(visible);
     }
 
     @Nullable
@@ -80,112 +67,58 @@ public class PostQuery extends IListRequest.QueryListRequest {
             implementation = String.class,
             example = "creationTimestamp,desc"))
     public Sort getSort() {
-        return SortResolver.defaultInstance.resolve(exchange);
-    }
-
-    @Nullable
-    private Set<String> listToSet(List<String> param) {
-        return param == null ? null : Set.copyOf(param);
-    }
-
-    /**
-     * Build a comparator from the query object.
-     *
-     * @return a comparator
-     */
-    public Comparator<Post> toComparator() {
-        var sort = getSort();
-        var creationTimestampOrder = sort.getOrderFor("creationTimestamp");
-        List<Comparator<Post>> comparators = new ArrayList<>();
-        if (creationTimestampOrder != null) {
-            Comparator<Post> comparator =
-                comparing(post -> post.getMetadata().getCreationTimestamp());
-            if (creationTimestampOrder.isDescending()) {
-                comparator = comparator.reversed();
-            }
-            comparators.add(comparator);
-        }
-
-        var publishTimeOrder = sort.getOrderFor("publishTime");
-        if (publishTimeOrder != null) {
-            Comparator<Object> nullsComparator = publishTimeOrder.isAscending()
-                ? org.springframework.util.comparator.Comparators.nullsLow()
-                : org.springframework.util.comparator.Comparators.nullsHigh();
-            Comparator<Post> comparator =
-                comparing(post -> post.getSpec().getPublishTime(), nullsComparator);
-            if (publishTimeOrder.isDescending()) {
-                comparator = comparator.reversed();
-            }
-            comparators.add(comparator);
-        }
-        comparators.add(Comparators.compareCreationTimestamp(false));
-        comparators.add(Comparators.compareName(true));
-        return comparators.stream()
-            .reduce(Comparator::thenComparing)
-            .orElse(null);
+        var sort = SortResolver.defaultInstance.resolve(exchange);
+        sort = sort.and(Sort.by(Sort.Direction.DESC, "metadata.creationTimestamp"));
+        sort = sort.and(Sort.by(Sort.Direction.DESC, "metadata.name"));
+        return sort;
     }
 
     /**
-     * Build a predicate from the query object.
+     * Build a list options from the query object.
      *
-     * @return a predicate
+     * @return a list options
      */
-    public Predicate<Post> toPredicate() {
-        Predicate<Post> paramPredicate = post ->
-            contains(getCategories(), post.getSpec().getCategories())
-                && contains(getTags(), post.getSpec().getTags())
-                && contains(getContributors(), post.getStatusOrDefault().getContributors());
+    public ListOptions toListOptions() {
+        var listOptions =
+            labelAndFieldSelectorToListOptions(getLabelSelector(), getFieldSelector());
+        if (listOptions.getFieldSelector() == null) {
+            listOptions.setFieldSelector(FieldSelector.all());
+        }
+        var labelSelectorBuilder = LabelSelector.builder();
+        var fieldQuery = QueryFactory.all();
 
         String keyword = getKeyword();
         if (keyword != null) {
-            paramPredicate = paramPredicate.and(post -> {
-                String excerpt = post.getStatusOrDefault().getExcerpt();
-                return StringUtils.containsIgnoreCase(excerpt, keyword)
-                    || StringUtils.containsIgnoreCase(post.getSpec().getSlug(), keyword)
-                    || StringUtils.containsIgnoreCase(post.getSpec().getTitle(), keyword);
-            });
+            fieldQuery = QueryFactory.and(fieldQuery, QueryFactory.or(
+                QueryFactory.contains("status.excerpt", keyword),
+                QueryFactory.contains("spec.slug", keyword),
+                QueryFactory.contains("spec.title", keyword)
+            ));
         }
 
         Post.PostPhase publishPhase = getPublishPhase();
         if (publishPhase != null) {
-            paramPredicate = paramPredicate.and(post -> {
-                if (Post.PostPhase.PENDING_APPROVAL.equals(publishPhase)) {
-                    return !post.isPublished()
-                        && Post.PostPhase.PENDING_APPROVAL.name()
-                        .equalsIgnoreCase(post.getStatusOrDefault().getPhase());
-                }
-                // published
-                if (Post.PostPhase.PUBLISHED.equals(publishPhase)) {
-                    return post.isPublished();
-                }
-                // draft
-                return !post.isPublished();
-            });
+            if (Post.PostPhase.PENDING_APPROVAL.equals(publishPhase)) {
+                fieldQuery = QueryFactory.and(fieldQuery, QueryFactory.equal(
+                    "status.phase", Post.PostPhase.PENDING_APPROVAL.name())
+                );
+                labelSelectorBuilder.eq(Post.PUBLISHED_LABEL, BooleanUtils.FALSE);
+            } else if (Post.PostPhase.PUBLISHED.equals(publishPhase)) {
+                labelSelectorBuilder.eq(Post.PUBLISHED_LABEL, BooleanUtils.TRUE);
+            } else {
+                labelSelectorBuilder.eq(Post.PUBLISHED_LABEL, BooleanUtils.FALSE);
+            }
         }
 
-        Post.VisibleEnum visible = getVisible();
-        if (visible != null) {
-            paramPredicate =
-                paramPredicate.and(post -> visible.equals(post.getSpec().getVisible()));
+        if (StringUtils.isNotBlank(username)) {
+            fieldQuery = QueryFactory.and(fieldQuery, QueryFactory.equal(
+                "spec.owner", username)
+            );
         }
 
-        Predicate<Post> predicate = labelAndFieldSelectorToPredicate(getLabelSelector(),
-            getFieldSelector());
-        return predicate.and(paramPredicate);
-    }
-
-    boolean contains(Collection<String> left, List<String> right) {
-        // parameter is null, it means that ignore this condition
-        if (left == null) {
-            return true;
-        }
-        // else, it means that right is empty
-        if (left.isEmpty()) {
-            return right.isEmpty();
-        }
-        if (right == null) {
-            return false;
-        }
-        return right.stream().anyMatch(left::contains);
+        listOptions.setFieldSelector(listOptions.getFieldSelector().andQuery(fieldQuery));
+        listOptions.setLabelSelector(
+            listOptions.getLabelSelector().and(labelSelectorBuilder.build()));
+        return listOptions;
     }
 }

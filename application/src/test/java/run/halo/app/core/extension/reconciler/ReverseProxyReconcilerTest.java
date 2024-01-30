@@ -3,6 +3,7 @@ package run.halo.app.core.extension.reconciler;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
@@ -17,7 +18,6 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import reactor.core.publisher.Mono;
 import run.halo.app.core.extension.ReverseProxy;
 import run.halo.app.extension.ExtensionClient;
 import run.halo.app.extension.Metadata;
@@ -54,7 +54,7 @@ class ReverseProxyReconcilerTest {
             .setLabels(Map.of(PluginConst.PLUGIN_NAME_LABEL_NAME, "fake-plugin"));
         reverseProxy.setRules(List.of());
 
-        when(routerFunctionRegistry.remove(anyString(), anyString())).thenReturn(Mono.empty());
+        doNothing().when(routerFunctionRegistry).remove(anyString(), anyString());
         when(client.fetch(ReverseProxy.class, "fake-reverse-proxy"))
             .thenReturn(Optional.of(reverseProxy));
 
@@ -62,7 +62,6 @@ class ReverseProxyReconcilerTest {
 
         verify(routerFunctionRegistry, never()).register(anyString(), any(ReverseProxy.class));
 
-        verify(routerFunctionRegistry, never()).remove(eq("fake-plugin"));
         verify(routerFunctionRegistry, times(1))
             .remove(eq("fake-plugin"), eq("fake-reverse-proxy"));
     }

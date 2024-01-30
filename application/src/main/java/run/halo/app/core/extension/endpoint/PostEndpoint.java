@@ -8,7 +8,7 @@ import static org.springdoc.core.fn.builders.requestbody.Builder.requestBodyBuil
 import io.swagger.v3.oas.annotations.enums.ParameterIn;
 import java.time.Duration;
 import java.util.Objects;
-import lombok.AllArgsConstructor;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springdoc.core.fn.builders.schema.Builder;
 import org.springdoc.webflux.core.fn.SpringdocRouteBuilder;
@@ -23,6 +23,7 @@ import org.springframework.web.server.ServerErrorException;
 import reactor.core.Exceptions;
 import reactor.core.publisher.Mono;
 import reactor.util.retry.Retry;
+import run.halo.app.content.Content;
 import run.halo.app.content.ContentWrapper;
 import run.halo.app.content.ListedPost;
 import run.halo.app.content.PostQuery;
@@ -42,9 +43,10 @@ import run.halo.app.extension.router.QueryParamBuildUtil;
  */
 @Slf4j
 @Component
-@AllArgsConstructor
+@RequiredArgsConstructor
 public class PostEndpoint implements CustomEndpoint {
 
+    private int maxAttemptsWaitForPublish = 10;
     private final PostService postService;
     private final ReactiveExtensionClient client;
 
@@ -131,7 +133,7 @@ public class PostEndpoint implements CustomEndpoint {
                         .content(contentBuilder()
                             .mediaType(MediaType.APPLICATION_JSON_VALUE)
                             .schema(Builder.schemaBuilder()
-                                .implementation(PostRequest.Content.class))
+                                .implementation(Content.class))
                         ))
                     .response(responseBuilder()
                         .implementation(Post.class))
@@ -190,7 +192,7 @@ public class PostEndpoint implements CustomEndpoint {
 
     Mono<ServerResponse> updateContent(ServerRequest request) {
         String postName = request.pathVariable("name");
-        return request.bodyToMono(PostRequest.Content.class)
+        return request.bodyToMono(Content.class)
             .flatMap(content -> client.fetch(Post.class, postName)
                 .flatMap(post -> {
                     PostRequest postRequest = new PostRequest(post, content);
@@ -243,7 +245,7 @@ public class PostEndpoint implements CustomEndpoint {
                 })
                 .switchIfEmpty(Mono.error(
                     () -> new RetryException("Retry to check post publish status"))))
-            .retryWhen(Retry.fixedDelay(10, Duration.ofMillis(200))
+            .retryWhen(Retry.backoff(maxAttemptsWaitForPublish, Duration.ofMillis(100))
                 .filter(t -> t instanceof RetryException));
     }
 
@@ -277,5 +279,12 @@ public class PostEndpoint implements CustomEndpoint {
         PostQuery postQuery = new PostQuery(request);
         return postService.listPost(postQuery)
             .flatMap(listedPosts -> ServerResponse.ok().bodyValue(listedPosts));
+    }
+
+    /**
+     * Convenient for testing, to avoid waiting too long for post published when testing.
+     */
+    public void setMaxAttemptsWaitForPublish(int maxAttempts) {
+        this.maxAttemptsWaitForPublish = maxAttempts;
     }
 }

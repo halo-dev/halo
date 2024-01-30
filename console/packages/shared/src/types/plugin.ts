@@ -1,14 +1,22 @@
-import type { Component } from "vue";
+import type { Component, Ref } from "vue";
 import type { RouteRecordRaw, RouteRecordName } from "vue-router";
 import type { FunctionalPage } from "../states/pages";
 import type { AttachmentSelectProvider } from "../states/attachment-selector";
 import type { EditorProvider, PluginTab } from "..";
-import type { AnyExtension } from "@tiptap/vue-3";
+import type { AnyExtension } from "@halo-dev/richtext-editor";
 import type { CommentSubjectRefProvider } from "@/states/comment-subject-ref";
 import type { BackupTab } from "@/states/backup";
 import type { PluginInstallationTab } from "@/states/plugin-installation-tabs";
-import type { EntityDropdownItem } from "@/states/entity";
-import type { ListedPost, Plugin } from "@halo-dev/api-client";
+import type { EntityFieldItem } from "@/states/entity";
+import type { OperationItem } from "@/states/operation";
+import type { ThemeListTab } from "@/states/theme-list-tabs";
+import type {
+  Attachment,
+  Backup,
+  ListedPost,
+  Plugin,
+  Theme,
+} from "@halo-dev/api-client";
 
 export interface RouteRecordAppend {
   parentName: RouteRecordName;
@@ -39,13 +47,35 @@ export interface ExtensionPoint {
     | PluginInstallationTab[]
     | Promise<PluginInstallationTab[]>;
 
-  "post:list-item:operation:create"?: () =>
-    | EntityDropdownItem<ListedPost>[]
-    | Promise<EntityDropdownItem<ListedPost>[]>;
+  "post:list-item:operation:create"?: (
+    post: Ref<ListedPost>
+  ) => OperationItem<ListedPost>[] | Promise<OperationItem<ListedPost>[]>;
 
-  "plugin:list-item:operation:create"?: () =>
-    | EntityDropdownItem<Plugin>[]
-    | Promise<EntityDropdownItem<Plugin>[]>;
+  "plugin:list-item:operation:create"?: (
+    plugin: Ref<Plugin>
+  ) => OperationItem<Plugin>[] | Promise<OperationItem<Plugin>[]>;
+
+  "backup:list-item:operation:create"?: (
+    backup: Ref<Backup>
+  ) => OperationItem<Backup>[] | Promise<OperationItem<Backup>[]>;
+
+  "attachment:list-item:operation:create"?: (
+    attachment: Ref<Attachment>
+  ) => OperationItem<Attachment>[] | Promise<OperationItem<Attachment>[]>;
+
+  "plugin:list-item:field:create"?: (
+    plugin: Ref<Plugin>
+  ) => EntityFieldItem[] | Promise<EntityFieldItem[]>;
+
+  "post:list-item:field:create"?: (
+    post: Ref<ListedPost>
+  ) => EntityFieldItem[] | Promise<EntityFieldItem[]>;
+
+  "theme:list:tabs:create"?: () => ThemeListTab[] | Promise<ThemeListTab[]>;
+
+  "theme:list-item:operation:create"?: (
+    theme: Ref<Theme>
+  ) => OperationItem<Theme>[] | Promise<OperationItem<Theme>[]>;
 }
 
 export interface PluginModule {
@@ -65,6 +95,8 @@ export interface PluginModule {
   deactivated?: () => void;
 
   routes?: RouteRecordRaw[] | RouteRecordAppend[];
+
+  ucRoutes?: RouteRecordRaw[] | RouteRecordAppend[];
 
   extensionPoints?: ExtensionPoint;
 }

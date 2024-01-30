@@ -12,6 +12,10 @@
  * Do not edit the class manually.
  */
 
+// May contain unused imports in some cases
+// @ts-ignore
+import { Metadata } from "./metadata";
+
 /**
  *
  * @export
@@ -36,6 +40,12 @@ export interface ContributorVo {
    * @memberof ContributorVo
    */
   displayName?: string;
+  /**
+   *
+   * @type {Metadata}
+   * @memberof ContributorVo
+   */
+  metadata: Metadata;
   /**
    *
    * @type {string}

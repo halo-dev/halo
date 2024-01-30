@@ -16,7 +16,7 @@ import { computed, markRaw, ref, watch, type Component } from "vue";
 import Fuse from "fuse.js";
 import { apiClient } from "@/utils/api-client";
 import { usePermission } from "@/utils/permission";
-import { useThemeStore } from "@/stores/theme";
+import { useThemeStore } from "@console/stores/theme";
 import { storeToRefs } from "pinia";
 import { useI18n } from "vue-i18n";
 
@@ -149,7 +149,9 @@ const handleBuildSearchIndex = () => {
       });
 
     apiClient.extension.category
-      .listcontentHaloRunV1alpha1Category()
+      .listcontentHaloRunV1alpha1Category({
+        sort: ["metadata.creationTimestamp,desc"],
+      })
       .then((response) => {
         response.data.items.forEach((category) => {
           fuse.add({
@@ -168,23 +170,27 @@ const handleBuildSearchIndex = () => {
         });
       });
 
-    apiClient.extension.tag.listcontentHaloRunV1alpha1Tag().then((response) => {
-      response.data.items.forEach((tag) => {
-        fuse.add({
-          title: tag.spec.displayName,
-          icon: {
-            component: markRaw(IconBookRead),
-          },
-          group: t("core.components.global_search.groups.tag"),
-          route: {
-            name: "Tags",
-            query: {
-              name: tag.metadata.name,
+    apiClient.extension.tag
+      .listcontentHaloRunV1alpha1Tag({
+        sort: ["metadata.creationTimestamp,desc"],
+      })
+      .then((response) => {
+        response.data.items.forEach((tag) => {
+          fuse.add({
+            title: tag.spec.displayName,
+            icon: {
+              component: markRaw(IconBookRead),
             },
-          },
+            group: t("core.components.global_search.groups.tag"),
+            route: {
+              name: "Tags",
+              query: {
+                name: tag.metadata.name,
+              },
+            },
+          });
         });
       });
-    });
   }
 
   if (currentUserHasPermission(["system:singlepages:view"])) {
@@ -382,7 +388,7 @@ const onVisibleChange = (visible: boolean) => {
         ref="globalSearchInput"
         v-model="keyword"
         :placeholder="$t('core.components.global_search.placeholder')"
-        class="w-full py-1 text-base outline-none"
+        class="w-full px-0 py-1 text-base outline-none"
         autocomplete="off"
         autocorrect="off"
         spellcheck="false"

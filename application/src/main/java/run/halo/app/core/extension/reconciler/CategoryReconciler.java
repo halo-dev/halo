@@ -1,5 +1,9 @@
 package run.halo.app.core.extension.reconciler;
 
+import static run.halo.app.extension.index.query.QueryFactory.and;
+import static run.halo.app.extension.index.query.QueryFactory.equal;
+import static run.halo.app.extension.index.query.QueryFactory.isNull;
+
 import java.time.Duration;
 import java.util.ArrayDeque;
 import java.util.ArrayList;
@@ -13,6 +17,7 @@ import java.util.function.Function;
 import java.util.stream.Collectors;
 import lombok.AllArgsConstructor;
 import org.apache.commons.lang3.StringUtils;
+import org.springframework.data.domain.Sort;
 import org.springframework.lang.Nullable;
 import org.springframework.stereotype.Component;
 import run.halo.app.content.permalinks.CategoryPermalinkPolicy;
@@ -20,10 +25,12 @@ import run.halo.app.core.extension.content.Category;
 import run.halo.app.core.extension.content.Constant;
 import run.halo.app.core.extension.content.Post;
 import run.halo.app.extension.ExtensionClient;
+import run.halo.app.extension.ListOptions;
 import run.halo.app.extension.MetadataUtil;
 import run.halo.app.extension.controller.Controller;
 import run.halo.app.extension.controller.ControllerBuilder;
 import run.halo.app.extension.controller.Reconciler;
+import run.halo.app.extension.router.selector.FieldSelector;
 import run.halo.app.infra.utils.JsonUtils;
 
 /**
@@ -138,7 +145,12 @@ public class CategoryReconciler implements Reconciler<Reconciler.Request> {
             .map(item -> item.getMetadata().getName())
             .toList();
 
-        List<Post> posts = client.list(Post.class, post -> !post.isDeleted(), null);
+        var postListOptions = new ListOptions();
+        postListOptions.setFieldSelector(FieldSelector.of(
+            and(isNull("metadata.deletionTimestamp"),
+                equal("spec.deleted", "false")))
+        );
+        var posts = client.listAll(Post.class, postListOptions, Sort.unsorted());
 
         // populate post to status
         List<Post.CompactPost> compactPosts = posts.stream()
@@ -178,7 +190,7 @@ public class CategoryReconciler implements Reconciler<Reconciler.Request> {
     }
 
     private List<Category> listChildrenByName(String name) {
-        List<Category> categories = client.list(Category.class, null, null);
+        var categories = client.listAll(Category.class, new ListOptions(), Sort.unsorted());
         Map<String, Category> nameIdentityMap = categories.stream()
             .collect(Collectors.toMap(category -> category.getMetadata().getName(),
                 Function.identity()));

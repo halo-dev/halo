@@ -4,6 +4,7 @@ import lombok.Builder;
 import lombok.ToString;
 import lombok.Value;
 import run.halo.app.core.extension.User;
+import run.halo.app.extension.MetadataOperator;
 
 /**
  * A value object for {@link run.halo.app.core.extension.User}.
@@ -14,7 +15,8 @@ import run.halo.app.core.extension.User;
 @Value
 @ToString
 @Builder
-public class ContributorVo {
+public class ContributorVo implements ExtensionVoOperator {
+
     String name;
 
     String displayName;
@@ -24,6 +26,8 @@ public class ContributorVo {
     String bio;
 
     String permalink;
+
+    MetadataOperator metadata;
 
     /**
      * Convert {@link User} to {@link ContributorVo}.
@@ -39,6 +43,7 @@ public class ContributorVo {
             .avatar(user.getSpec().getAvatar())
             .bio(user.getSpec().getBio())
             .permalink(permalink)
+            .metadata(user.getMetadata())
             .build();
     }
 }

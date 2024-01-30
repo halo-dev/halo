@@ -45,26 +45,6 @@ class BundleResourceUtilsTest {
     }
 
     @Test
-    void getCssBundlePath() {
-        String cssBundlePath =
-            BundleResourceUtils.getCssBundlePath(pluginManager, "nothing-plugin");
-        assertThat(cssBundlePath).isNull();
-
-        cssBundlePath = BundleResourceUtils.getCssBundlePath(pluginManager, "fake-plugin");
-        assertThat(cssBundlePath).isEqualTo("/plugins/fake-plugin/assets/console/style.css");
-    }
-
-    @Test
-    void getJsBundlePath() {
-        String jsBundlePath =
-            BundleResourceUtils.getJsBundlePath(pluginManager, "nothing-plugin");
-        assertThat(jsBundlePath).isNull();
-
-        jsBundlePath = BundleResourceUtils.getJsBundlePath(pluginManager, "fake-plugin");
-        assertThat(jsBundlePath).isEqualTo("/plugins/fake-plugin/assets/console/main.js");
-    }
-
-    @Test
     void getJsBundleResource() {
         Resource jsBundleResource =
             BundleResourceUtils.getJsBundleResource(pluginManager, "fake-plugin", "main.js");

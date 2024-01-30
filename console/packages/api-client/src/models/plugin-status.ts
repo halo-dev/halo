@@ -39,6 +39,12 @@ export interface PluginStatus {
    * @type {string}
    * @memberof PluginStatus
    */
+  lastProbeState?: PluginStatusLastProbeStateEnum;
+  /**
+   *
+   * @type {string}
+   * @memberof PluginStatus
+   */
   lastStartTime?: string;
   /**
    * Load location of the plugin, often a path.
@@ -66,13 +72,27 @@ export interface PluginStatus {
   stylesheet?: string;
 }
 
-export const PluginStatusPhaseEnum = {
+export const PluginStatusLastProbeStateEnum = {
   Created: "CREATED",
   Disabled: "DISABLED",
   Resolved: "RESOLVED",
   Started: "STARTED",
   Stopped: "STOPPED",
   Failed: "FAILED",
+} as const;
+
+export type PluginStatusLastProbeStateEnum =
+  (typeof PluginStatusLastProbeStateEnum)[keyof typeof PluginStatusLastProbeStateEnum];
+export const PluginStatusPhaseEnum = {
+  Pending: "PENDING",
+  Starting: "STARTING",
+  Created: "CREATED",
+  Disabled: "DISABLED",
+  Resolved: "RESOLVED",
+  Started: "STARTED",
+  Stopped: "STOPPED",
+  Failed: "FAILED",
+  Unknown: "UNKNOWN",
 } as const;
 
 export type PluginStatusPhaseEnum =

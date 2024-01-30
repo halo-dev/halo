@@ -64,8 +64,9 @@ class FileUtilsTest {
                 unzip(zis, unzipTarget);
             }
 
-            var content = Files.readString(unzipTarget.resolve("examplefile"));
-            assertEquals("Here is an example file.\n", content);
+            var lines = Files.readAllLines(unzipTarget.resolve("examplefile"));
+            assertEquals(1, lines.size());
+            assertEquals("Here is an example file.", lines.get(0));
         }
 
         @Test
@@ -79,9 +80,9 @@ class FileUtilsTest {
             try (var zis = new ZipInputStream(Files.newInputStream(zipPath))) {
                 unzip(zis, unzipTarget);
             }
-
-            var content = Files.readString(unzipTarget.resolve("examplefile"));
-            assertEquals("Here is an example file.\n", content);
+            var lines = Files.readAllLines(unzipTarget.resolve("examplefile"));
+            assertEquals(1, lines.size());
+            assertEquals("Here is an example file.", lines.get(0));
         }
 
         @Test

@@ -14,20 +14,27 @@ import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.jsoup.Jsoup;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Component;
 import org.springframework.util.Assert;
+import run.halo.app.content.NotificationReasonConst;
 import run.halo.app.content.SinglePageService;
 import run.halo.app.core.extension.content.Comment;
 import run.halo.app.core.extension.content.Post;
 import run.halo.app.core.extension.content.SinglePage;
 import run.halo.app.core.extension.content.Snapshot;
+import run.halo.app.core.extension.notification.Subscription;
 import run.halo.app.extension.ExtensionClient;
 import run.halo.app.extension.ExtensionOperator;
+import run.halo.app.extension.ExtensionUtil;
+import run.halo.app.extension.ListOptions;
 import run.halo.app.extension.MetadataUtil;
 import run.halo.app.extension.Ref;
 import run.halo.app.extension.controller.Controller;
 import run.halo.app.extension.controller.ControllerBuilder;
 import run.halo.app.extension.controller.Reconciler;
+import run.halo.app.extension.index.query.QueryFactory;
+import run.halo.app.extension.router.selector.FieldSelector;
 import run.halo.app.infra.Condition;
 import run.halo.app.infra.ConditionList;
 import run.halo.app.infra.ConditionStatus;
@@ -35,6 +42,7 @@ import run.halo.app.infra.ExternalUrlSupplier;
 import run.halo.app.infra.utils.JsonUtils;
 import run.halo.app.metrics.CounterService;
 import run.halo.app.metrics.MeterUtils;
+import run.halo.app.notification.NotificationCenter;
 
 /**
  * <p>Reconciler for {@link SinglePage}.</p>
@@ -59,16 +67,22 @@ public class SinglePageReconciler implements Reconciler<Reconciler.Request> {
 
     private final ExternalUrlSupplier externalUrlSupplier;
 
+    private final NotificationCenter notificationCenter;
+
     @Override
     public Result reconcile(Request request) {
         client.fetch(SinglePage.class, request.name())
             .ifPresent(singlePage -> {
-                SinglePage oldPage = JsonUtils.deepCopy(singlePage);
                 if (ExtensionOperator.isDeleted(singlePage)) {
                     cleanUpResourcesAndRemoveFinalizer(request.name());
                     return;
                 }
-                addFinalizerIfNecessary(oldPage);
+
+                if (ExtensionUtil.addFinalizers(singlePage.getMetadata(), Set.of(FINALIZER_NAME))) {
+                    client.update(singlePage);
+                }
+
+                subscribeNewCommentNotification(singlePage);
 
                 // reconcile spec first
                 reconcileSpec(request.name());
@@ -86,8 +100,26 @@ public class SinglePageReconciler implements Reconciler<Reconciler.Request> {
             .build();
     }
 
+    void subscribeNewCommentNotification(SinglePage page) {
+        var subscriber = new Subscription.Subscriber();
+        subscriber.setName(page.getSpec().getOwner());
+
+        var interestReason = new Subscription.InterestReason();
+        interestReason.setReasonType(NotificationReasonConst.NEW_COMMENT_ON_PAGE);
+        interestReason.setSubject(Subscription.ReasonSubject.builder()
+            .apiVersion(page.getApiVersion())
+            .kind(page.getKind())
+            .name(page.getMetadata().getName())
+            .build());
+        notificationCenter.subscribe(subscriber, interestReason).block();
+    }
+
     private void reconcileSpec(String name) {
         client.fetch(SinglePage.class, name).ifPresent(page -> {
+            if (page.isPublished() && page.getSpec().getPublishTime() == null) {
+                page.getSpec().setPublishTime(Instant.now());
+            }
+
             // un-publish if necessary
             if (page.isPublished() && Objects.equals(false, page.getSpec().getPublish())) {
                 unPublish(name);
@@ -212,29 +244,10 @@ public class SinglePageReconciler implements Reconciler<Reconciler.Request> {
         });
     }
 
-    private void addFinalizerIfNecessary(SinglePage oldSinglePage) {
-        Set<String> finalizers = oldSinglePage.getMetadata().getFinalizers();
-        if (finalizers != null && finalizers.contains(FINALIZER_NAME)) {
-            return;
-        }
-        client.fetch(SinglePage.class, oldSinglePage.getMetadata().getName())
-            .ifPresent(singlePage -> {
-                Set<String> newFinalizers = singlePage.getMetadata().getFinalizers();
-                if (newFinalizers == null) {
-                    newFinalizers = new HashSet<>();
-                    singlePage.getMetadata().setFinalizers(newFinalizers);
-                }
-                newFinalizers.add(FINALIZER_NAME);
-                client.update(singlePage);
-            });
-    }
-
     private void cleanUpResources(SinglePage singlePage) {
         // clean up snapshot
         Ref ref = Ref.of(singlePage);
-        client.list(Snapshot.class,
-                snapshot -> ref.equals(snapshot.getSpec().getSubjectRef()), null)
-            .forEach(client::delete);
+        listSnapshots(ref).forEach(client::delete);
 
         // clean up comments
         client.list(Comment.class, comment -> comment.getSpec().getSubjectRef().equals(ref),
@@ -321,8 +334,7 @@ public class SinglePageReconciler implements Reconciler<Reconciler.Request> {
 
             // handle contributors
             String headSnapshot = singlePage.getSpec().getHeadSnapshot();
-            List<String> contributors = client.list(Snapshot.class,
-                    snapshot -> Ref.of(singlePage).equals(snapshot.getSpec().getSubjectRef()), null)
+            List<String> contributors = listSnapshots(Ref.of(singlePage))
                 .stream()
                 .peek(snapshot -> {
                     snapshot.getSpec().setContentPatch(StringUtils.EMPTY);
@@ -365,5 +377,12 @@ public class SinglePageReconciler implements Reconciler<Reconciler.Request> {
     private boolean isDeleted(SinglePage singlePage) {
         return Objects.equals(true, singlePage.getSpec().getDeleted())
             || singlePage.getMetadata().getDeletionTimestamp() != null;
+    }
+
+    List<Snapshot> listSnapshots(Ref ref) {
+        var snapshotListOptions = new ListOptions();
+        snapshotListOptions.setFieldSelector(FieldSelector.of(
+            QueryFactory.equal("spec.subjectRef", Snapshot.toSubjectRefKey(ref))));
+        return client.listAll(Snapshot.class, snapshotListOptions, Sort.unsorted());
     }
 }

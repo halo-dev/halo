@@ -1,0 +1,13 @@
+plugins {
+    id "org.sonarqube" version "4.4.1.3373"
+}
+
+group = "run.halo.app"
+
+sonar {
+    properties {
+        property "sonar.projectKey", "halo-dev_halo"
+        property "sonar.organization", "halo-dev"
+        property "sonar.host.url", "https://sonarcloud.io"
+    }
+}

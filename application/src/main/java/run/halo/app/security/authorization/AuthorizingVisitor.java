@@ -10,7 +10,7 @@ import run.halo.app.core.extension.Role;
  * @author guqing
  * @since 2.0.0
  */
-class AuthorizingVisitor implements RuleAccumulator {
+public class AuthorizingVisitor implements RuleAccumulator {
     private final RbacRequestEvaluation requestEvaluation = new RbacRequestEvaluation();
 
     private final Attributes requestAttributes;

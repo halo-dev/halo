@@ -16,7 +16,6 @@ import run.halo.app.extension.AbstractExtension;
 import run.halo.app.extension.GVK;
 import run.halo.app.extension.GroupVersionKind;
 import run.halo.app.extension.MetadataOperator;
-import run.halo.app.extension.MetadataUtil;
 import run.halo.app.infra.ConditionList;
 
 /**
@@ -34,6 +33,8 @@ import run.halo.app.infra.ConditionList;
 public class Post extends AbstractExtension {
 
     public static final String KIND = "Post";
+
+    public static final String REQUIRE_SYNC_ON_STARTUP_INDEX_NAME = "requireSyncOnStartup";
 
     public static final GroupVersionKind GVK = GroupVersionKind.fromExtension(Post.class);
 
@@ -79,6 +80,10 @@ public class Post extends AbstractExtension {
     public static boolean isPublished(MetadataOperator metadata) {
         var labels = metadata.getLabels();
         return labels != null && parseBoolean(labels.getOrDefault(PUBLISHED_LABEL, "false"));
+    }
+
+    public static boolean isPublic(PostSpec spec) {
+        return spec.getVisible() == null || VisibleEnum.PUBLIC.equals(spec.getVisible());
     }
 
     @Data
@@ -153,6 +158,8 @@ public class Post extends AbstractExtension {
         private List<String> contributors;
 
         private Instant lastModifyTime;
+
+        private Long observedVersion;
 
         @JsonIgnore
         public ConditionList getConditionsOrDefault() {
@@ -263,10 +270,5 @@ public class Post extends AbstractExtension {
                 return compactPost;
             }
         }
-    }
-
-    public static void changePublishedState(Post post, boolean value) {
-        Map<String, String> labels = MetadataUtil.nullSafeLabels(post);
-        labels.put(PUBLISHED_LABEL, String.valueOf(value));
     }
 }

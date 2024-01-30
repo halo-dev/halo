@@ -9,6 +9,9 @@ public class ValidationUtils {
     public static final Pattern NAME_PATTERN =
         Pattern.compile("^[a-z0-9]([-a-z0-9]*[a-z0-9])?(\\.[a-z0-9]([-a-z0-9]*[a-z0-9])?)*$");
 
+    public static final String EMAIL_REGEX =
+        "^[a-zA-Z0-9_+&*-]+(?:\\.[a-zA-Z0-9_+&*-]+)*@(?:[a-zA-Z0-9-]+\\.)+[a-zA-Z]{2,7}$";
+
     public static final String NAME_VALIDATION_MESSAGE = """
         Super administrator username must be a valid subdomain name, the name must:
         1. contain no more than 63 characters
@@ -29,5 +32,9 @@ public class ValidationUtils {
         }
         boolean matches = NAME_PATTERN.matcher(name).matches();
         return matches && name.length() <= 63;
+    }
+
+    public static boolean isValidEmail(String email) {
+        return StringUtils.isNotBlank(email) && email.matches(EMAIL_REGEX);
     }
 }

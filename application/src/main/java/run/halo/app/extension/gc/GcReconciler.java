@@ -10,11 +10,13 @@ import run.halo.app.extension.Extension;
 import run.halo.app.extension.ExtensionClient;
 import run.halo.app.extension.ExtensionConverter;
 import run.halo.app.extension.SchemeManager;
+import run.halo.app.extension.SchemeWatcherManager;
 import run.halo.app.extension.controller.Controller;
 import run.halo.app.extension.controller.ControllerBuilder;
 import run.halo.app.extension.controller.DefaultController;
 import run.halo.app.extension.controller.DefaultQueue;
 import run.halo.app.extension.controller.Reconciler;
+import run.halo.app.extension.index.IndexerFactory;
 import run.halo.app.extension.store.ExtensionStoreClient;
 
 @Slf4j
@@ -29,14 +31,22 @@ class GcReconciler implements Reconciler<GcRequest> {
 
     private final SchemeManager schemeManager;
 
-    GcReconciler(ExtensionClient client, ExtensionStoreClient storeClient,
-        ExtensionConverter converter, SchemeManager schemeManager) {
+    private final IndexerFactory indexerFactory;
+
+    private final SchemeWatcherManager schemeWatcherManager;
+
+    GcReconciler(ExtensionClient client,
+        ExtensionStoreClient storeClient,
+        ExtensionConverter converter,
+        SchemeManager schemeManager, IndexerFactory indexerFactory,
+        SchemeWatcherManager schemeWatcherManager) {
         this.client = client;
         this.storeClient = storeClient;
         this.converter = converter;
         this.schemeManager = schemeManager;
+        this.indexerFactory = indexerFactory;
+        this.schemeWatcherManager = schemeWatcherManager;
     }
-
 
     @Override
     public Result reconcile(GcRequest request) {
@@ -47,6 +57,9 @@ class GcReconciler implements Reconciler<GcRequest> {
             .ifPresent(extension -> {
                 var extensionStore = converter.convertTo(extension);
                 storeClient.delete(extensionStore.getName(), extensionStore.getVersion());
+                // drop index for this extension
+                var indexer = indexerFactory.getIndexer(extension.groupVersionKind());
+                indexer.unIndexRecord(request.name());
                 log.debug("Extension {} was deleted", request);
             });
 
@@ -56,7 +69,7 @@ class GcReconciler implements Reconciler<GcRequest> {
     @Override
     public Controller setupWith(ControllerBuilder builder) {
         var queue = new DefaultQueue<GcRequest>(Instant::now, Duration.ofMillis(500));
-        var synchronizer = new GcSynchronizer(client, queue, schemeManager);
+        var synchronizer = new GcSynchronizer(client, queue, schemeManager, schemeWatcherManager);
         return new DefaultController<>(
             "garbage-collector-controller",
             this,

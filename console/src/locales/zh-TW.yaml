@@ -18,6 +18,8 @@ core:
         label: 已有帳號
         button: 立即登入
       return_site: 返回到首頁
+      reset_password:
+        button: 找回密碼
     button: 登入
     modal:
       title: 重新登入
@@ -28,6 +30,8 @@ core:
         placeholder: 用戶名
       display_name:
         placeholder: 名稱
+      email:
+        placeholder: 電子郵箱
       password:
         placeholder: 密碼
       password_confirm:
@@ -71,14 +75,24 @@ core:
         settings: 設置
         actuator: 概覽
         backup: 備份
+        tools: 工具
     operations:
       logout:
-        button: 登出
+        tooltip: 登出
         title: 確定要登出嗎？
       profile:
-        button: 個人資料
+        tooltip: 個人中心
       visit_homepage:
         title: 訪問首頁
+  uc_sidebar:
+    menu:
+      items:
+        profile: 我的
+        notification: 消息
+        posts: 文章
+    operations:
+      console:
+        tooltip: 管理控制台
   dashboard:
     title: 儀表板
     actions:
@@ -100,14 +114,18 @@ core:
           title: 頁面
         recent_published:
           title: 最近文章
-          visits: "訪問量 {visits}"
-          comments: "留言 {comments}"
-          publishTime: "發佈日期 {publishTime}"
+          visits: 訪問量 {visits}
+          comments: 留言 {comments}
+          publishTime: 發佈日期 {publishTime}
+        notification:
+          title: 通知
+          empty:
+            title: 当前没有未读的消息
         quicklink:
           title: 快捷訪問
           actions:
-            user_profile:
-              title: 個人資料
+            user_center:
+              title: 個人中心
             view_site:
               title: 查看站點
             new_post:
@@ -161,19 +179,19 @@ core:
           draft: 未發布
       visible:
         label: 可見性
-        result: "可見性：{visible}"
+        result: 可見性：{visible}
         items:
           public: 公開
           private: 私有
       category:
         label: 分類
-        result: "分類：{category}"
+        result: 分類：{category}
       tag:
         label: 標籤
-        result: "標籤：{tag}"
+        result: 標籤：{tag}
       author:
         label: 作者
-        result: "作者：{author}"
+        result: 作者：{author}
       sort:
         items:
           publish_time_desc: 較近發布
@@ -183,8 +201,8 @@ core:
     list:
       fields:
         categories: 分類：
-        visits: "訪問量 {visits}"
-        comments: "留言 {comments}"
+        visits: 訪問量 {visits}
+        comments: 留言 {comments}
         pinned: 已置頂
     settings:
       title: 文章設置
@@ -329,13 +347,13 @@ core:
           draft: 未發布
       visible:
         label: 可見性
-        result: "可見性：{visible}"
+        result: 可見性：{visible}
         items:
           public: 公開
           private: 私有
       author:
         label: 作者
-        result: "作者：{author}"
+        result: 作者：{author}
       sort:
         items:
           publish_time_desc: 較近發布
@@ -344,8 +362,8 @@ core:
           create_time_asc: 較早創建
     list:
       fields:
-        visits: "訪問量 {visits}"
-        comments: "留言 {comments}"
+        visits: 訪問量 {visits}
+        comments: 留言 {comments}
     settings:
       title: 頁面設置
       groups:
@@ -431,7 +449,7 @@ core:
           pending_review: 待審核
       owner:
         label: 留言者
-        result: "留言者：{owner}"
+        result: 留言者：{owner}
       sort:
         items:
           last_reply_time_desc: 較近回覆
@@ -482,10 +500,10 @@ core:
     filters:
       storage_policy:
         label: 存儲策略
-        result: "存儲策略：{storage_policy}"
+        result: 存儲策略：{storage_policy}
       owner:
         label: 上傳者
-        result: "上傳者：{owner}"
+        result: 上傳者：{owner}
       sort:
         items:
           create_time_desc: 較近上傳
@@ -609,27 +627,18 @@ core:
       remote_download:
         title: 偵測到遠端下載地址，是否需要下載？
         description: 請仔細鑑別此地址是否可信：{url}
-    upload_modal:
-      titles:
-        install: 安裝主題
-        upgrade: 升級主題（{display_name}）
-      operations:
-        existed_during_installation:
-          title: 主題已存在
-          description: 當前安裝的主題已存在，是否升級？
-      tabs:
-        local: 本地上傳
-        remote:
-          title: 遠端下載
-          fields:
-            url: 下載地址
+      existed_during_installation:
+        title: 主題已存在
+        description: 當前安裝的主題已存在，是否升級？
     list_modal:
-      titles:
-        installed_themes: 已安裝的主題
-        not_installed_themes: 未安裝的主題
       tabs:
         installed: 已安裝
-        not_installed: 未安裝
+        not_installed: 本地未安裝
+        local_upload: 上傳安裝 / 升級
+        remote_download:
+          label: 遠端下載
+          fields:
+            url: 下載地址
       empty:
         title: 當前沒有已安裝的主題
         message: 當前沒有已安裝的主題，你可以嘗試刷新或者安裝新主題
@@ -698,7 +707,7 @@ core:
           placeholder: 選擇上級選單項
         ref_kind:
           label: 類型
-          placeholder: "請選擇{label}"
+          placeholder: 請選擇{label}
           options:
             custom: 自定義連結
             post: 文章
@@ -790,8 +799,8 @@ core:
         last_starttime: 最近一次啟動
     loader:
       toast:
-        entry_load_failed: "讀取插件入口文件失敗"
-        style_load_failed: "讀取插件樣式文件失敗"
+        entry_load_failed: 讀取插件入口文件失敗
+        style_load_failed: 讀取插件樣式文件失敗
     extension_points:
       editor:
         providers:
@@ -866,12 +875,8 @@ core:
           title: 修改資料
         change_password:
           title: 修改密碼
-      operations:
-        bind:
-          button: 綁定
-        unbind:
-          button: 解綁
-          title: "確定要取消綁定 {display_name} 的登入方式嗎？"
+        profile:
+          title: 個人中心
       fields:
         display_name: 顯示名稱
         username: 用戶名
@@ -880,21 +885,6 @@ core:
         bio: 描述
         creation_time: 註冊時間
         identity_authentication: 登入方式
-      avatar:
-        title: 頭像
-        toast_upload_failed: 上傳頭像失敗
-        toast_remove_failed: 刪除頭像失敗
-        cropper_modal:
-          title: 裁剪頭像
-        remove:
-          title: 確定要刪除頭像嗎？
-        tooltips:
-          upload: 上傳
-          zoom_in: 放大
-          zoom_out: 縮小
-          flip_horizontal: 水平翻轉
-          flip_vertical: 垂直翻轉
-          reset: 重置
   role:
     title: 角色
     common:
@@ -935,6 +925,10 @@ core:
         permissions: 權限
       fields:
         display_name: 名稱
+        redirect_on_login: 登入之後預設跳轉位置
+        disallow_access_console:
+          label: 禁止訪問 Console
+          help: 勾選之後，該角色將無法存取 Console
   identity_authentication:
     title: 身份認證
     tabs:
@@ -955,6 +949,143 @@ core:
         website: 網站
         help_page: 幫助頁面
         authentication_url: 登入入口
+  uc_profile:
+    title: 我的
+    tabs:
+      detail: 詳情
+      notification-preferences: 通知配置
+      pat: 個人令牌
+    actions:
+      update_profile:
+        title: 修改資料
+      change_password:
+        title: 修改密碼
+    detail:
+      fields:
+        display_name: 顯示名稱
+        username: 用戶名
+        email: 電子郵箱
+        roles: 角色
+        bio: 描述
+        creation_time: 註冊時間
+        identity_authentication: 登入方式
+      operations:
+        bind:
+          button: 綁定
+        unbind:
+          button: 解綁
+          title: 確定要取消綁定 {display_name} 的登入方式嗎？
+      email_not_set:
+        description: 電子郵件地址尚未設置，點擊下方按鈕進行設置
+        title: 設定電子郵件信箱
+      email_not_verified:
+        description: 電子郵件地址尚未驗證，點擊下方按鈕進行驗證
+        title: 驗證電子郵件信箱
+    pat:
+      operations:
+        delete:
+          title: 刪除個人令牌
+          description: 您確定要刪除此個人令牌嗎？
+        revoke:
+          button: 撤銷
+          title: 撤銷個人令牌
+          description: 您確定要撤銷此個人令牌嗎？
+          toast_success: 撤銷成功
+        copy:
+          title: 請立即複製並保存，令牌僅顯示一次。
+        restore:
+          button: 還原
+          toast_success: 還原成功
+      list:
+        empty:
+          title: 目前尚未建立個人令牌
+          message: 您可以嘗試重新整理或建立新的個人令牌
+        fields:
+          expiresAt:
+            dynamic: 到期於 {expiresAt}
+            forever: 永久有效
+          status:
+            normal: 正常
+            revoked: 已撤銷
+            expired: 已過期
+      creation_modal:
+        title: 建立個人令牌
+        groups:
+          general: 基本資訊
+          permissions: 權限
+        fields:
+          name:
+            label: 名稱
+          expiresAt:
+            label: 到期時間
+            help: 留空代表永不過期
+          description:
+            label: 描述
+    notification-preferences:
+      fields:
+        type: 通知類型
+    editing_modal:
+      title: 編輯資料
+      groups:
+        general: 常規
+        annotations: 元數據
+      fields:
+        username:
+          label: 用戶名
+          validation: 請輸入有效的用戶名
+        display_name:
+          label: 顯示名稱
+        email:
+          label: 電子郵箱
+        phone:
+          label: 手機號
+        avatar:
+          label: 頭像
+        bio:
+          label: 描述
+    change_password_modal:
+      title: 密碼修改
+      fields:
+        new_password:
+          label: 新密碼
+        confirm_password:
+          label: 確認密碼
+    email_verify_modal:
+      fields:
+        code:
+          label: 驗證碼
+        email:
+          label: 電子郵件信箱
+        new_email:
+          label: 新電子郵件信箱
+      operations:
+        send_code:
+          buttons:
+            countdown: "{timer} 秒後重發"
+            send: 發送驗證碼
+            sending: 發送中
+          toast_email_empty: 請輸入電子郵件信箱
+          toast_success: 驗證碼已發送
+        verify:
+          toast_success: 驗證成功
+      titles:
+        modify: 修改電子郵件信箱
+        verify: 驗證電子郵件信箱
+  uc_notification:
+    title: 訊息
+    tabs:
+      unread: 未讀
+      read: 已讀
+    empty:
+      titles:
+        unread: 目前沒有未讀的訊息
+        read: 目前沒有已讀的訊息
+    operations:
+      mark_as_read:
+        button: 標記為已讀
+      delete:
+        description: 確定要刪除該訊息嗎？
+        title: 刪除訊息
   setting:
     title: 設置
   actuator:
@@ -969,13 +1100,15 @@ core:
     fields:
       external_url: 外部訪問地址
       start_time: 啟動時間
-      timezone: 時區
-      locale: 語言
+      timezone: 系統時區
+      locale: 系統語言
       version: 版本
       build_time: 構建時間
       database: 資料庫
       os: 操作系統
       log: 運行日誌
+      activated_theme: 已啟動主題
+      enabled_plugins: 已啟動插件
     fields_values:
       external_url:
         not_setup: 未設置
@@ -988,6 +1121,9 @@ core:
       os: 操作系統：{os}
     alert:
       external_url_invalid: 檢測到外部訪問地址與當前訪問地址不一致，可能會導致部分連結無法正常跳轉，請檢查外部訪問地址設置。
+      h2_warning: |-
+        H2 資料庫僅用於開發環境和測試環境，不建議在生產環境中使用 H2 資料庫。
+        如果必須要使用，請按時進行資料備份。
   backup:
     title: 備份與還原
     tabs:
@@ -1010,6 +1146,11 @@ core:
         description: 還原成功後，需要重新啟動 Halo 才能正常載入系統資源，點擊確定之後，我們會自動重啟 Halo。
       restart:
         toast_success: 已請求重啟
+      remote_download:
+        button: 下載並還原
+      restore_by_backup:
+        button: 還原
+        title: 確認要從此備份進行還原嗎？
     list:
       phases:
         pending: 準備中
@@ -1023,15 +1164,24 @@ core:
         first: 1. 還原過程可能需要較長時間，期間請勿重新整理頁面。
         second: 2. 在還原過程中，雖然已有的資料不會被清除，但若有衝突的資料將被覆蓋。
         third: 3. 還原完成後需要重新啟動 Halo 才能正常載入系統資源。
-        complete: 恢復完成，等待重啟...
+        complete: 還原完成，等待重啟...
       start: 開始還原
+      tabs:
+        local:
+          label: 上傳
+        remote:
+          label: 遠程還原
+          fields:
+            url: 下載地址
+        backup:
+          label: 從備份還原
   exception:
     not_found:
       message: 沒有找到該頁面
     forbidden:
       message: 沒有權限訪問此頁面
     actions:
-      dashboard: 儀表盤
+      home: 返回首頁
   setup:
     title: 系統初始化
     operations:
@@ -1087,6 +1237,11 @@ core:
     role-template-view-tags: 標籤查看
     role-template-manage-categories: 分類管理
     role-template-view-categories: 分類查看
+    role-template-manage-posts: 文章管理
+    role-template-post-author: 允许管理自己的文章
+    role-template-post-contributor: 允许投稿
+    role-template-post-publisher: 允許發布自己的文章
+    role-template-post-attachment-manager: 允許在文章中上傳圖片
     Roles Management: 角色
     Role Manage: 角色管理
     Role View: 角色查看
@@ -1110,6 +1265,16 @@ core:
     Migration Manage: 備份與還原管理
     role-template-view-users: 用戶查看
     role-template-change-password: 修改密碼
+    Actuator Management: 系統指標
+    Actuator Manage: 訪問系統指標
+    Cache Management: 緩存
+    Cache Manage: 緩存管理
+    Configure Notifier: 配置通知器
+    Notification Configuration: 通知配置
+    Post Attachment Manager: 允許在文章中上傳圖片
+    Post Author: 允许管理自己的文章
+    Post Contributor: 允许投稿
+    Post Publisher: 允許發布自己的文章
   components:
     submit_button:
       computed_text: "{text}（{shortcut}）"
@@ -1134,13 +1299,23 @@ core:
       extensions:
         placeholder:
           options:
-            placeholder: "輸入 / 以選擇輸入類型"
+            placeholder: 輸入 / 以選擇輸入類型
+        image:
+          upload:
+            error: 上傳失敗
+            click_retry: 點擊重試
+            loading: 等待中
+          attachment:
+            title: 附件庫
+          permalink:
+            title: 輸入連結
+            placeholder: 輸入連結，按回車確定
+          operations:
+            replace:
+              button: 替换
       toolbox:
         attachment: 選擇附件
-      upload_attachment:
-        toast:
-          no_available_policy: 目前沒有可用的存儲策略
-          failed_fetch_permalink: 獲取附件永久連結失敗：{display_name}
+        show_hide_sidebar: 顯示 / 隱藏側邊欄
     global_search:
       placeholder: 輸入關鍵字以搜尋
       no_results: 沒有搜尋結果
@@ -1166,8 +1341,26 @@ core:
     app_download_alert:
       description: Halo 的主題和插件可以在以下地址下載：
       sources:
-        app_store: "官方應用市場：{url}"
-        github: "GitHub：{url}"
+        app_store: 官方應用市場：{url}
+        github: GitHub：{url}
+    user_avatar:
+      title: 頭像
+      toast_upload_failed: 上傳頭像失敗
+      toast_remove_failed: 刪除頭像失敗
+      cropper_modal:
+        title: 裁剪頭像
+      remove:
+        title: 確定要刪除頭像嗎？
+      tooltips:
+        upload: 上傳
+        zoom_in: 放大
+        zoom_out: 縮小
+        flip_horizontal: 水平翻轉
+        flip_vertical: 垂直翻轉
+        reset: 重置
+    editor_provider_selector:
+      tooltips:
+        disallow: 內容格式不同，無法切換
   composables:
     content_cache:
       toast_recovered: 已從緩存中恢復未保存的內容
@@ -1211,6 +1404,11 @@ core:
       add: 添加
       submit: 提交
       detail: 詳情
+      select: 選擇
+      view_all: 查看全部
+      modify: 修改
+      verify: 驗證
+      access: 访问
     radio:
       "yes": 是
       "no": 否
@@ -1224,7 +1422,7 @@ core:
       delete_success: 刪除成功
       save_success: 保存成功
       publish_success: 發布成功
-      cancel_publish_success: 發布成功
+      cancel_publish_success: 取消發布成功
       recovery_success: 恢復成功
       uninstall_success: 卸載成功
       active_success: 啟用成功
@@ -1252,9 +1450,9 @@ core:
         editor_not_found: 未找到符合 {raw_type} 格式的編輯器，請檢查是否已安裝編輯器插件。
     filters:
       results:
-        keyword: "關鍵字：{keyword}"
-        sort: "排序：{sort}"
-        status: "狀態：{status}"
+        keyword: 關鍵字：{keyword}
+        sort: 排序：{sort}
+        status: 狀態：{status}
       labels:
         sort: 排序
         status: 狀態
@@ -1279,3 +1477,42 @@ core:
       recovering: 還原中
     fields:
       post_count: "{count} 篇文章"
+  uc_post:
+    creation_modal:
+      title: 創建文章
+    operations:
+      cancel_publish:
+        description: 確定要取消發布嗎？
+        title: 取消發布
+    publish_modal:
+      title: 發布文章
+    setting_modal:
+      title: 文章設定
+    title: 我的文章
+  uc_reset_password:
+    fields:
+      username:
+        label: 用户名
+      password:
+        label: 新密碼
+      password_confirm:
+        label: 確認密碼
+    operations:
+      reset:
+        button: 重設密碼
+        toast_success: 重置成功
+  reset_password:
+    fields:
+      username:
+        label: 使用者名稱
+      email:
+        label: 郵件地址
+    operations:
+      send:
+        label: 發送驗證郵件
+        toast_success: 如果你的用戶名和郵箱地址匹配，我們將會發送一封郵件到你的郵箱。
+  tool:
+    title: 工具
+    empty:
+      title: 沒有可用工具
+      message: 目前沒有可用的工具，系統工具可能由外掛提供

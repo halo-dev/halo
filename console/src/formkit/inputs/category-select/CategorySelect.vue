@@ -3,9 +3,9 @@ import type { FormKitFrameworkContext } from "@formkit/core";
 import type { Category } from "@halo-dev/api-client";
 import { computed, provide, ref, watch, type PropType, type Ref } from "vue";
 import { IconArrowRight } from "@halo-dev/components";
-import { usePostCategory } from "@/modules/contents/posts/categories/composables/use-post-category";
-import type { CategoryTree } from "@/modules/contents/posts/categories/utils";
-import { convertTreeToCategories } from "@/modules/contents/posts/categories/utils";
+import { usePostCategory } from "@console/modules/contents/posts/categories/composables/use-post-category";
+import type { CategoryTree } from "@console/modules/contents/posts/categories/utils";
+import { convertTreeToCategories } from "@console/modules/contents/posts/categories/utils";
 import CategoryListItem from "./components/CategoryListItem.vue";
 import { onClickOutside } from "@vueuse/core";
 import Fuse from "fuse.js";
@@ -14,6 +14,7 @@ import SearchResultListItem from "./components/SearchResultListItem.vue";
 import { apiClient } from "@/utils/api-client";
 import { usePermission } from "@/utils/permission";
 import { slugify } from "transliteration";
+import HasPermission from "@/components/permission/HasPermission.vue";
 
 const { currentUserHasPermission } = usePermission();
 
@@ -289,17 +290,24 @@ const handleDelete = () => {
 
     <div v-if="dropdownVisible" :class="context.classes['dropdown-wrapper']">
       <ul class="p-1">
-        <li
+        <HasPermission
           v-if="text.trim() && !searchResults?.length"
-          v-permission="['system:posts:manage']"
-          class="group flex cursor-pointer items-center justify-between rounded bg-gray-100 p-2"
+          :permissions="['system:posts:manage']"
         >
-          <span class="text-xs text-gray-700 group-hover:text-gray-900">
-            {{
-              $t("core.formkit.category_select.creation_label", { text: text })
-            }}
-          </span>
-        </li>
+          <li
+            class="group flex cursor-pointer items-center justify-between rounded bg-gray-100 p-2"
+            @click="handleCreateCategory"
+          >
+            <span class="text-xs text-gray-700 group-hover:text-gray-900">
+              {{
+                $t("core.formkit.category_select.creation_label", {
+                  text: text,
+                })
+              }}
+            </span>
+          </li>
+        </HasPermission>
+
         <template v-if="text">
           <SearchResultListItem
             v-for="category in searchResults"

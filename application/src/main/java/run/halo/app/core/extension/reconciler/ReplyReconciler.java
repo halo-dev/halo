@@ -1,12 +1,15 @@
 package run.halo.app.core.extension.reconciler;
 
-import java.util.HashSet;
+import static run.halo.app.extension.ExtensionUtil.addFinalizers;
+
 import java.util.Set;
 import lombok.AllArgsConstructor;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Component;
+import run.halo.app.content.comment.ReplyNotificationSubscriptionHelper;
 import run.halo.app.core.extension.content.Reply;
 import run.halo.app.event.post.ReplyChangedEvent;
+import run.halo.app.event.post.ReplyCreatedEvent;
 import run.halo.app.event.post.ReplyDeletedEvent;
 import run.halo.app.extension.ExtensionClient;
 import run.halo.app.extension.controller.Controller;
@@ -27,6 +30,8 @@ public class ReplyReconciler implements Reconciler<Reconciler.Request> {
     private final ExtensionClient client;
     private final ApplicationEventPublisher eventPublisher;
 
+    private final ReplyNotificationSubscriptionHelper replyNotificationSubscriptionHelper;
+
     @Override
     public Result reconcile(Request request) {
         client.fetch(Reply.class, request.name())
@@ -35,9 +40,13 @@ public class ReplyReconciler implements Reconciler<Reconciler.Request> {
                     cleanUpResourcesAndRemoveFinalizer(request.name());
                     return;
                 }
+                if (addFinalizers(reply.getMetadata(), Set.of(FINALIZER_NAME))) {
+                    client.update(reply);
+                    eventPublisher.publishEvent(new ReplyCreatedEvent(this, reply));
+                }
 
-                addFinalizerIfNecessary(reply);
-                // on reply created
+                replyNotificationSubscriptionHelper.subscribeNewReplyReasonForReply(reply);
+
                 eventPublisher.publishEvent(new ReplyChangedEvent(this, reply));
             });
         return new Result(false, null);
@@ -50,26 +59,9 @@ public class ReplyReconciler implements Reconciler<Reconciler.Request> {
             }
             client.update(reply);
 
-            // on reply removed
+            // on reply removing
             eventPublisher.publishEvent(new ReplyDeletedEvent(this, reply));
         });
-    }
-
-    private void addFinalizerIfNecessary(Reply oldReply) {
-        Set<String> finalizers = oldReply.getMetadata().getFinalizers();
-        if (finalizers != null && finalizers.contains(FINALIZER_NAME)) {
-            return;
-        }
-        client.fetch(Reply.class, oldReply.getMetadata().getName())
-            .ifPresent(reply -> {
-                Set<String> newFinalizers = reply.getMetadata().getFinalizers();
-                if (newFinalizers == null) {
-                    newFinalizers = new HashSet<>();
-                    reply.getMetadata().setFinalizers(newFinalizers);
-                }
-                newFinalizers.add(FINALIZER_NAME);
-                client.update(reply);
-            });
     }
 
     @Override

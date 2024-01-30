@@ -16,6 +16,7 @@ import org.springframework.context.i18n.SimpleLocaleContext;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.reactive.server.WebTestClient;
 import org.springframework.web.reactive.function.server.RouterFunction;
+import org.springframework.web.reactive.function.server.ServerRequest;
 import org.springframework.web.reactive.function.server.ServerResponse;
 import org.springframework.web.server.ServerWebExchange;
 import org.springframework.web.server.i18n.LocaleContextResolver;
@@ -26,6 +27,7 @@ import run.halo.app.extension.GroupVersionKind;
 import run.halo.app.extension.MetadataUtil;
 import run.halo.app.extension.ReactiveExtensionClient;
 import run.halo.app.theme.DefaultTemplateEnum;
+import run.halo.app.theme.ViewNameResolver;
 import run.halo.app.theme.finders.PostFinder;
 import run.halo.app.theme.finders.vo.PostVo;
 import run.halo.app.theme.router.DefaultQueryPostPredicateResolver;
@@ -33,7 +35,6 @@ import run.halo.app.theme.router.EmptyView;
 import run.halo.app.theme.router.ModelConst;
 import run.halo.app.theme.router.ReactiveQueryPostPredicateResolver;
 import run.halo.app.theme.router.TitleVisibilityIdentifyCalculator;
-import run.halo.app.theme.router.ViewNameResolver;
 
 /**
  * Tests for {@link PostRouteFactory}.
@@ -77,7 +78,7 @@ class PostRouteFactoryTest extends RouteFactoryTestSuite {
 
         when(client.fetch(eq(Post.class), eq("fake-name"))).thenReturn(Mono.just(post));
 
-        when(viewNameResolver.resolveViewNameOrDefault(any(), any(), any()))
+        when(viewNameResolver.resolveViewNameOrDefault(any(ServerRequest.class), any(), any()))
             .thenReturn(Mono.just(DefaultTemplateEnum.POST.getValue()));
         when(predicateResolver.getPredicate())
             .thenReturn(new DefaultQueryPostPredicateResolver().getPredicate());

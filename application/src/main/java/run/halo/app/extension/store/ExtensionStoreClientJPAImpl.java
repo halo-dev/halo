@@ -1,10 +1,10 @@
 package run.halo.app.extension.store;
 
-import jakarta.persistence.EntityNotFoundException;
 import java.util.List;
 import java.util.Optional;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
-import reactor.core.publisher.Mono;
 
 /**
  * An implementation of ExtensionStoreClient using JPA.
@@ -14,44 +14,44 @@ import reactor.core.publisher.Mono;
 @Service
 public class ExtensionStoreClientJPAImpl implements ExtensionStoreClient {
 
-    private final ExtensionStoreRepository repository;
+    private final ReactiveExtensionStoreClient storeClient;
 
-    public ExtensionStoreClientJPAImpl(ExtensionStoreRepository repository) {
-        this.repository = repository;
+    public ExtensionStoreClientJPAImpl(ReactiveExtensionStoreClient storeClient) {
+        this.storeClient = storeClient;
     }
 
     @Override
     public List<ExtensionStore> listByNamePrefix(String prefix) {
-        return repository.findAllByNameStartingWith(prefix).collectList().block();
+        return storeClient.listByNamePrefix(prefix).collectList().block();
+    }
+
+    @Override
+    public Page<ExtensionStore> listByNamePrefix(String prefix, Pageable pageable) {
+        return storeClient.listByNamePrefix(prefix, pageable).block();
+    }
+
+    @Override
+    public List<ExtensionStore> listByNames(List<String> names) {
+        return storeClient.listByNames(names).collectList().block();
     }
 
     @Override
     public Optional<ExtensionStore> fetchByName(String name) {
-        return repository.findById(name).blockOptional();
+        return storeClient.fetchByName(name).blockOptional();
     }
 
     @Override
     public ExtensionStore create(String name, byte[] data) {
-        var store = new ExtensionStore(name, data);
-        return repository.save(store).block();
+        return storeClient.create(name, data).block();
     }
 
     @Override
     public ExtensionStore update(String name, Long version, byte[] data) {
-        var store = new ExtensionStore(name, data, version);
-        return repository.save(store).block();
+        return storeClient.update(name, version, data).block();
     }
 
     @Override
     public ExtensionStore delete(String name, Long version) {
-        return repository.findById(name)
-            .switchIfEmpty(Mono.error(() -> new EntityNotFoundException(
-                "Extension store with name " + name + " was not found.")))
-            .flatMap(deleting -> {
-                deleting.setVersion(version);
-                return repository.delete(deleting).thenReturn(deleting);
-            })
-            .block();
+        return storeClient.delete(name, version).block();
     }
-
 }

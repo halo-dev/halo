@@ -33,3 +33,14 @@ spec:
   extensionPointName: additional-webfilter
   displayName: "DelegatingLogoutPageGeneratingWebFilter"
   description: "Generates a default log out page."
+
+---
+apiVersion: plugin.halo.run/v1alpha1
+kind: ExtensionDefinition
+metadata:
+  name: halo-email-notifier
+spec:
+  className: run.halo.app.notification.EmailNotifier
+  extensionPointName: reactive-notifier
+  displayName: "EmailNotifier"
+  description: "Support sending notifications to users via email"

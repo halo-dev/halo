@@ -21,6 +21,7 @@ body:
     id: description
     attributes:
       label: "描述一下此特性"
+      description: "为了方便我们管理，请不要在同一个 issue 下提交多个没有相关性的特性。"
     validations:
       required: true
   - type: textarea

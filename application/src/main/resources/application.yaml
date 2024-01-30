@@ -64,7 +64,7 @@ management:
   endpoints:
     web:
       exposure:
-        include: ["health", "info", "startup", "globalinfo", "logfile", "shutdown", "restart"]
+        include: "*"
   endpoint:
     shutdown:
       enabled: true
@@ -90,4 +90,16 @@ resilience4j.ratelimiter:
     signup:
       limitForPeriod: 3
       limitRefreshPeriod: 1h
+      timeoutDuration: 0s
+    send-email-verification-code:
+      limitForPeriod: 1
+      limitRefreshPeriod: 1m
+      timeoutDuration: 0s
+    verify-email:
+      limitForPeriod: 3
+      limitRefreshPeriod: 1h
+      timeoutDuration: 0s
+    send-reset-password-email:
+      limitForPeriod: 2
+      limitRefreshPeriod: 1m
       timeoutDuration: 0s

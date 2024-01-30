@@ -55,6 +55,27 @@ spec:
           min: 1
           max: 100
           validation: required
+        - $formkit: select
+          label: "别名生成策略"
+          name: slugGenerationStrategy
+          value: 'generateByTitle'
+          options:
+            - label: '根据标题'
+              value: 'generateByTitle'
+            - label: '时间戳'
+              value: 'timestamp'
+            - label: 'Short UUID'
+              value: 'shortUUID'
+            - label: 'UUID'
+              value: 'UUID'
+        - $formkit: attachmentPolicySelect
+          name: attachmentPolicyName
+          label: "附件存储策略"
+          value: "default-policy"
+        - $formkit: attachmentGroupSelect
+          name: attachmentGroupName
+          label: "附件存储组"
+          value: ""
     - group: seo
       label: SEO 设置
       formSchema:

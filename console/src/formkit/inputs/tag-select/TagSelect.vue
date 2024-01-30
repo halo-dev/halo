@@ -3,7 +3,7 @@ import { apiClient } from "@/utils/api-client";
 import type { FormKitFrameworkContext } from "@formkit/core";
 import type { Tag } from "@halo-dev/api-client";
 import { computed, ref, watch, type PropType } from "vue";
-import PostTag from "@/modules/contents/posts/tags/components/PostTag.vue";
+import PostTag from "@console/modules/contents/posts/tags/components/PostTag.vue";
 import {
   IconCheckboxCircle,
   IconArrowRight,
@@ -13,7 +13,8 @@ import { onClickOutside } from "@vueuse/core";
 import Fuse from "fuse.js";
 import { usePermission } from "@/utils/permission";
 import { slugify } from "transliteration";
-import { usePostTag } from "@/modules/contents/posts/tags/composables/use-post-tag";
+import { usePostTag } from "@console/modules/contents/posts/tags/composables/use-post-tag";
+import HasPermission from "@/components/permission/HasPermission.vue";
 
 const { currentUserHasPermission } = usePermission();
 
@@ -279,16 +280,19 @@ const handleDelete = () => {
 
     <div v-if="dropdownVisible" :class="context.classes['dropdown-wrapper']">
       <ul class="p-1">
-        <li
+        <HasPermission
           v-if="text.trim() && !searchResults?.length"
-          v-permission="['system:posts:manage']"
-          class="group flex cursor-pointer items-center justify-between rounded bg-gray-100 p-2"
-          @click="handleCreateTag"
+          :permissions="['system:posts:manage']"
         >
-          <span class="text-xs text-gray-700 group-hover:text-gray-900">
-            {{ $t("core.formkit.tag_select.creation_label", { text: text }) }}
-          </span>
-        </li>
+          <li
+            class="group flex cursor-pointer items-center justify-between rounded bg-gray-100 p-2"
+            @click="handleCreateTag"
+          >
+            <span class="text-xs text-gray-700 group-hover:text-gray-900">
+              {{ $t("core.formkit.tag_select.creation_label", { text: text }) }}
+            </span>
+          </li>
+        </HasPermission>
         <li
           v-for="tag in searchResults"
           :id="tag.metadata.name"

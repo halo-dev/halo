@@ -54,6 +54,7 @@ class UserVoTest {
                         "displayName": "fake-user-display-name",
                         "avatar": "avatar",
                         "email": "example@example.com",
+                        "emailVerified": false,
                         "phone": "123456789",
                         "password": "[PROTECTED]",
                         "bio": "user bio",

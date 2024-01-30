@@ -4,21 +4,26 @@ import static java.nio.charset.StandardCharsets.UTF_8;
 import static org.apache.commons.lang3.ObjectUtils.defaultIfNull;
 import static run.halo.app.extension.ExtensionUtil.addFinalizers;
 import static run.halo.app.extension.ExtensionUtil.removeFinalizers;
+import static run.halo.app.extension.index.query.QueryFactory.equal;
 
 import com.google.common.hash.Hashing;
 import java.time.Instant;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 import lombok.AllArgsConstructor;
+import org.apache.commons.lang3.BooleanUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.jsoup.Jsoup;
 import org.springframework.context.ApplicationEvent;
 import org.springframework.context.ApplicationEventPublisher;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Component;
 import run.halo.app.content.ContentWrapper;
+import run.halo.app.content.NotificationReasonConst;
 import run.halo.app.content.PostService;
 import run.halo.app.content.permalinks.PostPermalinkPolicy;
 import run.halo.app.core.extension.content.Comment;
@@ -27,21 +32,27 @@ import run.halo.app.core.extension.content.Post;
 import run.halo.app.core.extension.content.Post.PostPhase;
 import run.halo.app.core.extension.content.Post.VisibleEnum;
 import run.halo.app.core.extension.content.Snapshot;
+import run.halo.app.core.extension.notification.Subscription;
 import run.halo.app.event.post.PostPublishedEvent;
 import run.halo.app.event.post.PostUnpublishedEvent;
 import run.halo.app.event.post.PostUpdatedEvent;
 import run.halo.app.event.post.PostVisibleChangedEvent;
+import run.halo.app.extension.DefaultExtensionMatcher;
 import run.halo.app.extension.ExtensionClient;
 import run.halo.app.extension.ExtensionOperator;
+import run.halo.app.extension.ListOptions;
 import run.halo.app.extension.Ref;
 import run.halo.app.extension.controller.Controller;
 import run.halo.app.extension.controller.ControllerBuilder;
 import run.halo.app.extension.controller.Reconciler;
+import run.halo.app.extension.index.query.QueryFactory;
+import run.halo.app.extension.router.selector.FieldSelector;
 import run.halo.app.infra.Condition;
 import run.halo.app.infra.ConditionStatus;
 import run.halo.app.infra.utils.HaloUtils;
 import run.halo.app.metrics.CounterService;
 import run.halo.app.metrics.MeterUtils;
+import run.halo.app.notification.NotificationCenter;
 
 /**
  * <p>Reconciler for {@link Post}.</p>
@@ -65,6 +76,7 @@ public class PostReconciler implements Reconciler<Reconciler.Request> {
     private final CounterService counterService;
 
     private final ApplicationEventPublisher eventPublisher;
+    private final NotificationCenter notificationCenter;
 
     @Override
     public Result reconcile(Request request) {
@@ -81,7 +93,10 @@ public class PostReconciler implements Reconciler<Reconciler.Request> {
                     events.forEach(eventPublisher::publishEvent);
                     return;
                 }
+
                 addFinalizers(post.getMetadata(), Set.of(FINALIZER_NAME));
+
+                subscribeNewCommentNotification(post);
 
                 var labels = post.getMetadata().getLabels();
                 if (labels == null) {
@@ -95,10 +110,18 @@ public class PostReconciler implements Reconciler<Reconciler.Request> {
                     post.getMetadata().setAnnotations(annotations);
                 }
 
+                if (!annotations.containsKey(Post.PUBLISHED_LABEL)) {
+                    labels.put(Post.PUBLISHED_LABEL, BooleanUtils.FALSE);
+                }
+
                 var status = post.getStatus();
                 if (status == null) {
                     status = new Post.PostStatus();
                     post.setStatus(status);
+                }
+
+                if (post.isPublished() && post.getSpec().getPublishTime() == null) {
+                    post.getSpec().setPublishTime(Instant.now());
                 }
 
                 // calculate the sha256sum
@@ -173,8 +196,7 @@ public class PostReconciler implements Reconciler<Reconciler.Request> {
                 var ref = Ref.of(post);
                 // handle contributors
                 var headSnapshot = post.getSpec().getHeadSnapshot();
-                var contributors = client.list(Snapshot.class,
-                        snapshot -> ref.equals(snapshot.getSpec().getSubjectRef()), null)
+                var contributors = listSnapshots(ref)
                     .stream()
                     .map(snapshot -> {
                         Set<String> usernames = snapshot.getSpec().getContributors();
@@ -191,7 +213,11 @@ public class PostReconciler implements Reconciler<Reconciler.Request> {
                 status.setInProgress(
                     !StringUtils.equals(headSnapshot, post.getSpec().getReleaseSnapshot()));
 
+                // version + 1 is required to truly equal version
+                // as a version will be incremented after the update
+                status.setObservedVersion(post.getMetadata().getVersion() + 1);
                 client.update(post);
+
                 // fire event after updating post
                 events.forEach(eventPublisher::publishEvent);
             });
@@ -202,9 +228,27 @@ public class PostReconciler implements Reconciler<Reconciler.Request> {
     public Controller setupWith(ControllerBuilder builder) {
         return builder
             .extension(new Post())
-            // TODO Make it configurable
-            .workerCount(1)
+            .onAddMatcher(DefaultExtensionMatcher.builder(client, Post.GVK)
+                .fieldSelector(FieldSelector.of(
+                    equal(Post.REQUIRE_SYNC_ON_STARTUP_INDEX_NAME, BooleanUtils.TRUE))
+                )
+                .build()
+            )
             .build();
+    }
+
+    void subscribeNewCommentNotification(Post post) {
+        var subscriber = new Subscription.Subscriber();
+        subscriber.setName(post.getSpec().getOwner());
+
+        var interestReason = new Subscription.InterestReason();
+        interestReason.setReasonType(NotificationReasonConst.NEW_COMMENT_ON_POST);
+        interestReason.setSubject(Subscription.ReasonSubject.builder()
+            .apiVersion(post.getApiVersion())
+            .kind(post.getKind())
+            .name(post.getMetadata().getName())
+            .build());
+        notificationCenter.subscribe(subscriber, interestReason).block();
     }
 
     private void publishPost(Post post, Set<ApplicationEvent> events) {
@@ -262,7 +306,7 @@ public class PostReconciler implements Reconciler<Reconciler.Request> {
         }
         var labels = post.getMetadata().getLabels();
         labels.put(Post.PUBLISHED_LABEL, Boolean.FALSE.toString());
-        var status = post.getStatus();
+        final var status = post.getStatus();
 
         var condition = new Condition();
         condition.setType("CancelledPublish");
@@ -280,9 +324,7 @@ public class PostReconciler implements Reconciler<Reconciler.Request> {
     private void cleanUpResources(Post post) {
         // clean up snapshots
         final Ref ref = Ref.of(post);
-        client.list(Snapshot.class,
-                snapshot -> ref.equals(snapshot.getSpec().getSubjectRef()), null)
-            .forEach(client::delete);
+        listSnapshots(ref).forEach(client::delete);
 
         // clean up comments
         client.list(Comment.class, comment -> ref.equals(comment.getSpec().getSubjectRef()),
@@ -299,5 +341,12 @@ public class PostReconciler implements Reconciler<Reconciler.Request> {
         String text = Jsoup.parse(shortHtmlContent).text();
         // TODO The default capture 150 words as excerpt
         return StringUtils.substring(text, 0, 150);
+    }
+
+    List<Snapshot> listSnapshots(Ref ref) {
+        var snapshotListOptions = new ListOptions();
+        snapshotListOptions.setFieldSelector(FieldSelector.of(
+            QueryFactory.equal("spec.subjectRef", Snapshot.toSubjectRefKey(ref))));
+        return client.listAll(Snapshot.class, snapshotListOptions, Sort.unsorted());
     }
 }

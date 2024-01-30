@@ -11,6 +11,8 @@ import {
   ApiConsoleHaloRunV1alpha1IndicesApi,
   ApiConsoleHaloRunV1alpha1AuthProviderApi,
   ApiConsoleHaloRunV1alpha1SystemApi,
+  ApiConsoleHaloRunV1alpha1NotifierApi,
+  ApiNotificationHaloRunV1alpha1NotificationApi,
   ContentHaloRunV1alpha1CategoryApi,
   ContentHaloRunV1alpha1CommentApi,
   ContentHaloRunV1alpha1PostApi,
@@ -28,7 +30,6 @@ import {
   V1alpha1ConfigMapApi,
   V1alpha1MenuApi,
   V1alpha1MenuItemApi,
-  V1alpha1PersonalAccessTokenApi,
   V1alpha1RoleApi,
   V1alpha1RoleBindingApi,
   V1alpha1SettingApi,
@@ -41,12 +42,19 @@ import {
   ApiHaloRunV1alpha1UserApi,
   MigrationHaloRunV1alpha1BackupApi,
   ApiConsoleMigrationHaloRunV1alpha1MigrationApi,
+  NotificationHaloRunV1alpha1NotifierDescriptorApi,
+  ApiSecurityHaloRunV1alpha1PersonalAccessTokenApi,
+  SecurityHaloRunV1alpha1PersonalAccessTokenApi,
+  ApiSecurityHaloRunV1alpha1AuthenticationTwoFactorApi,
+  UcApiContentHaloRunV1alpha1AttachmentApi,
+  UcApiContentHaloRunV1alpha1PostApi,
+  UcApiContentHaloRunV1alpha1SnapshotApi,
 } from "@halo-dev/api-client";
 import type { AxiosError, AxiosInstance } from "axios";
 import axios from "axios";
 import { useUserStore } from "@/stores/user";
 import { Toast } from "@halo-dev/components";
-import { i18n } from "../locales";
+import { i18n } from "@/locales";
 
 const baseURL = import.meta.env.VITE_API_URL;
 
@@ -68,6 +76,10 @@ axiosInstance.interceptors.response.use(
     return response;
   },
   async (error: AxiosError<ProblemDetail>) => {
+    if (error.code === "ERR_CANCELED") {
+      return Promise.reject(error);
+    }
+
     if (/Network Error/.test(error.message)) {
       // @ts-ignore
       Toast.error(i18n.global.t("core.common.toast.network_error"));
@@ -117,11 +129,6 @@ function setupApiClient(axios: AxiosInstance) {
   return {
     extension: {
       configMap: new V1alpha1ConfigMapApi(undefined, baseURL, axios),
-      personalAccessToken: new V1alpha1PersonalAccessTokenApi(
-        undefined,
-        baseURL,
-        axios
-      ),
       roleBinding: new V1alpha1RoleBindingApi(undefined, baseURL, axios),
       role: new V1alpha1RoleApi(undefined, baseURL, axios),
       setting: new V1alpha1SettingApi(undefined, baseURL, axios),
@@ -184,6 +191,16 @@ function setupApiClient(axios: AxiosInstance) {
         axios
       ),
       backup: new MigrationHaloRunV1alpha1BackupApi(undefined, baseURL, axios),
+      notifierDescriptors: new NotificationHaloRunV1alpha1NotifierDescriptorApi(
+        undefined,
+        baseURL,
+        axios
+      ),
+      pat: new SecurityHaloRunV1alpha1PersonalAccessTokenApi(
+        undefined,
+        baseURL,
+        axios
+      ),
     },
     // custom endpoints
     user: new ApiConsoleHaloRunV1alpha1UserApi(undefined, baseURL, axios),
@@ -220,6 +237,39 @@ function setupApiClient(axios: AxiosInstance) {
       axios
     ),
     system: new ApiConsoleHaloRunV1alpha1SystemApi(undefined, baseURL, axios),
+    notifier: new ApiConsoleHaloRunV1alpha1NotifierApi(
+      undefined,
+      baseURL,
+      axios
+    ),
+    notification: new ApiNotificationHaloRunV1alpha1NotificationApi(
+      undefined,
+      baseURL,
+      axios
+    ),
+    pat: new ApiSecurityHaloRunV1alpha1PersonalAccessTokenApi(
+      undefined,
+      baseURL,
+      axios
+    ),
+    twoFactor: new ApiSecurityHaloRunV1alpha1AuthenticationTwoFactorApi(
+      undefined,
+      baseURL,
+      axios
+    ),
+    uc: {
+      post: new UcApiContentHaloRunV1alpha1PostApi(undefined, baseURL, axios),
+      attachment: new UcApiContentHaloRunV1alpha1AttachmentApi(
+        undefined,
+        baseURL,
+        axios
+      ),
+      snapshot: new UcApiContentHaloRunV1alpha1SnapshotApi(
+        undefined,
+        baseURL,
+        axios
+      ),
+    },
   };
 }
 

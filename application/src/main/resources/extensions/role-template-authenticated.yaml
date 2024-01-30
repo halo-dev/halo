@@ -12,7 +12,10 @@ metadata:
         "role-template-own-permissions",
         "role-template-change-own-password",
         "role-template-stats",
-        "role-template-annotation-setting"
+        "role-template-annotation-setting",
+        "role-template-manage-own-pat",
+        "role-template-manage-own-authentications",
+        "role-template-user-notification"
       ]
 rules:
   - apiGroups: [ "" ]
@@ -43,6 +46,10 @@ rules:
     resources: [ "users/avatar" ]
     resourceNames: [ "-" ]
     verbs: [ "create", "delete" ]
+  - apiGroups: [ "api.console.halo.run" ]
+    resources: [ "users/send-email-verification-code", "users/verify-email" ]
+    resourceNames: [ "-" ]
+    verbs: [ "create" ]
 ---
 apiVersion: v1alpha1
 kind: "Role"
@@ -94,3 +101,52 @@ rules:
   - apiGroups: [ "" ]
     resources: [ "annotationsettings" ]
     verbs: [ "get", "list" ]
+---
+apiVersion: v1alpha1
+kind: "Role"
+metadata:
+  name: role-template-manage-own-pat
+  labels:
+    halo.run/role-template: "true"
+    halo.run/hidden: "true"
+rules:
+  - apiGroups: [ "api.security.halo.run" ]
+    resources: [ "personalaccesstokens" ]
+    verbs: [ "*" ]
+  - apiGroups: [ "api.security.halo.run" ]
+    resources: [ "personalaccesstokens/actions" ]
+    verbs: [ "update" ]
+
+---
+apiVersion: v1alpha1
+kind: "Role"
+metadata:
+  name: role-template-manage-own-authentications
+  labels:
+    halo.run/role-template: "true"
+    halo.run/hidden: "true"
+rules:
+  - apiGroups: [ "api.security.halo.run" ]
+    resources: [ "authentications", "authentications/totp" ]
+    verbs: [ "*" ]
+---
+apiVersion: v1alpha1
+kind: Role
+metadata:
+  name: role-template-user-notification
+  labels:
+    halo.run/role-template: "true"
+    halo.run/hidden: "true"
+rules:
+  - apiGroups: [ "api.notification.halo.run" ]
+    resources: [ "notifications" ]
+    verbs: [ "get", "list", "delete" ]
+  - apiGroups: [ "api.notification.halo.run" ]
+    resources: [ "notifications/mark-as-read", "notifications/mark-specified-as-read" ]
+    verbs: [ "update" ]
+  - apiGroups: [ "api.notification.halo.run" ]
+    resources: [ "notifiers/receiver-config" ]
+    verbs: [ "get", "update" ]
+  - apiGroups: [ "api.notification.halo.run" ]
+    resources: [ "notification-preferences" ]
+    verbs: [ "create", "list" ]

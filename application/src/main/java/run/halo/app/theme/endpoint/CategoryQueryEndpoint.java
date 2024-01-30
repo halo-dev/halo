@@ -2,11 +2,9 @@ package run.halo.app.theme.endpoint;
 
 import static org.springdoc.core.fn.builders.apiresponse.Builder.responseBuilder;
 import static org.springdoc.core.fn.builders.parameter.Builder.parameterBuilder;
-import static run.halo.app.theme.endpoint.PublicApiUtils.containsElement;
 import static run.halo.app.theme.endpoint.PublicApiUtils.toAnotherListResult;
 
 import io.swagger.v3.oas.annotations.enums.ParameterIn;
-import java.util.function.Predicate;
 import lombok.RequiredArgsConstructor;
 import org.springdoc.webflux.core.fn.SpringdocRouteBuilder;
 import org.springframework.http.MediaType;
@@ -17,11 +15,11 @@ import org.springframework.web.reactive.function.server.ServerResponse;
 import org.springframework.web.server.ServerWebExchange;
 import reactor.core.publisher.Mono;
 import run.halo.app.core.extension.content.Category;
-import run.halo.app.core.extension.content.Post;
 import run.halo.app.core.extension.endpoint.CustomEndpoint;
 import run.halo.app.extension.GroupVersion;
 import run.halo.app.extension.ListResult;
 import run.halo.app.extension.ReactiveExtensionClient;
+import run.halo.app.extension.index.query.QueryFactory;
 import run.halo.app.extension.router.QueryParamBuildUtil;
 import run.halo.app.extension.router.SortableRequest;
 import run.halo.app.theme.finders.PostPublicQueryService;
@@ -93,13 +91,11 @@ public class CategoryQueryEndpoint implements CustomEndpoint {
     private Mono<ServerResponse> listPostsByCategoryName(ServerRequest request) {
         final var name = request.pathVariable("name");
         final var query = new PostPublicQuery(request.exchange());
-        Predicate<Post> categoryContainsPredicate =
-            post -> containsElement(post.getSpec().getCategories(), name);
-        return postPublicQueryService.list(query.getPage(),
-                query.getSize(),
-                categoryContainsPredicate.and(query.toPredicate()),
-                query.toComparator()
-            )
+        var listOptions = query.toListOptions();
+        var newFieldSelector = listOptions.getFieldSelector()
+            .andQuery(QueryFactory.equal("spec.categories", name));
+        listOptions.setFieldSelector(newFieldSelector);
+        return postPublicQueryService.list(listOptions, query.toPageRequest())
             .flatMap(result -> ServerResponse.ok()
                 .contentType(MediaType.APPLICATION_JSON)
                 .bodyValue(result)
@@ -118,12 +114,7 @@ public class CategoryQueryEndpoint implements CustomEndpoint {
 
     private Mono<ServerResponse> listCategories(ServerRequest request) {
         CategoryPublicQuery query = new CategoryPublicQuery(request.exchange());
-        return client.list(Category.class,
-                query.toPredicate(),
-                query.toComparator(),
-                query.getPage(),
-                query.getSize()
-            )
+        return client.listBy(Category.class, query.toListOptions(), query.toPageRequest())
             .map(listResult -> toAnotherListResult(listResult, CategoryVo::from))
             .flatMap(result -> ServerResponse.ok()
                 .contentType(MediaType.APPLICATION_JSON)

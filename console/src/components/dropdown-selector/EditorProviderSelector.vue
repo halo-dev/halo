@@ -41,6 +41,15 @@ const { editorProviders } = useEditorExtensionPoints();
       <VDropdownItem
         v-for="(editorProvider, index) in editorProviders"
         :key="index"
+        v-tooltip="{
+          disabled:
+            allowForcedSelect ||
+            provider?.rawType.toLowerCase() ===
+              editorProvider.rawType.toLowerCase(),
+          content: $t(
+            'core.components.editor_provider_selector.tooltips.disallow'
+          ),
+        }"
         :selected="provider?.name === editorProvider.name"
         :disabled="
           !allowForcedSelect &&

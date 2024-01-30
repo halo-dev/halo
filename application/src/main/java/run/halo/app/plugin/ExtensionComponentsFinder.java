@@ -3,6 +3,7 @@ package run.halo.app.plugin;
 import java.util.ArrayList;
 import java.util.List;
 import org.pf4j.ExtensionPoint;
+import org.pf4j.PluginManager;
 import org.springframework.context.ApplicationContext;
 import org.springframework.stereotype.Component;
 
@@ -15,12 +16,12 @@ import org.springframework.stereotype.Component;
 @Component
 public class ExtensionComponentsFinder {
     public static final String SYSTEM_PLUGIN_ID = "system";
-    private final HaloPluginManager haloPluginManager;
+    private final PluginManager pluginManager;
     private final ApplicationContext applicationContext;
 
-    public ExtensionComponentsFinder(HaloPluginManager haloPluginManager,
+    public ExtensionComponentsFinder(PluginManager pluginManager,
         ApplicationContext applicationContext) {
-        this.haloPluginManager = haloPluginManager;
+        this.pluginManager = pluginManager;
         this.applicationContext = applicationContext;
     }
 
@@ -33,7 +34,7 @@ public class ExtensionComponentsFinder {
      */
     public <T> List<T> getExtensions(Class<T> type) {
         assertExtensionPoint(type);
-        List<T> components = new ArrayList<>(haloPluginManager.getExtensions(type));
+        List<T> components = new ArrayList<>(pluginManager.getExtensions(type));
         components.addAll(applicationContext.getBeansOfType(type).values());
         return List.copyOf(components);
     }
@@ -53,7 +54,7 @@ public class ExtensionComponentsFinder {
             components.addAll(applicationContext.getBeansOfType(type).values());
             return components;
         } else {
-            components.addAll(haloPluginManager.getExtensions(type, pluginId));
+            components.addAll(pluginManager.getExtensions(type, pluginId));
         }
         return components;
     }
