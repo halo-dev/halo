@@ -170,7 +170,7 @@ public class PostServiceImpl extends AbstractContentService implements PostServi
             return Flux.empty();
         }
         return Flux.fromIterable(usernames)
-            .flatMap(userService::getUserOrGhost)
+            .concatMap(userService::getUserOrGhost)
             .map(user -> {
                 Contributor contributor = new Contributor();
                 contributor.setName(user.getMetadata().getName());
