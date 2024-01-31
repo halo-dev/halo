@@ -33,12 +33,7 @@ jobs:
         run: ./gradlew check
       - name: Upload coverage reports to Codecov
         uses: codecov/codecov-action@v3
-      - name: Analyze code
-        if: ${{ github.event_name == 'push' && env.SONAR_TOKEN != '' }} # Due to inability to access secrets during PR, only the code pushed into the branch can be analyzed.
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}  # Needed to get PR information, if any
-          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
-        run: ./gradlew sonar --info
+
   build:
     runs-on: ubuntu-latest
     if: always() && (needs.test.result == 'skipped' || needs.test.result == 'success')

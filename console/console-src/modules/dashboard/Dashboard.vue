@@ -60,11 +60,12 @@
   </div>
 
   <VModal
-    v-model:visible="widgetsModal"
+    v-if="widgetsModal"
     height="calc(100vh - 20px)"
     :width="1280"
     :layer-closable="true"
     :title="$t('core.dashboard.widgets.modal_title')"
+    @close="widgetsModal = false"
   >
     <VTabbar
       v-model:active-id="activeId"
@@ -121,11 +122,9 @@ import {
   VSpace,
   VTabbar,
 } from "@halo-dev/components";
-import { onMounted, provide, ref, type Ref } from "vue";
+import { ref } from "vue";
 import { useStorage } from "@vueuse/core";
 import { cloneDeep } from "lodash-es";
-import { apiClient } from "@/utils/api-client";
-import type { DashboardStats } from "@halo-dev/api-client";
 import { useI18n } from "vue-i18n";
 import { usePermission } from "@/utils/permission";
 
@@ -271,25 +270,6 @@ function handleRemove(item: any) {
     };
   });
 }
-
-// Dashboard basic stats
-
-const dashboardStats = ref<DashboardStats>({
-  posts: 0,
-  comments: 0,
-  approvedComments: 0,
-  users: 0,
-  visits: 0,
-});
-
-provide<Ref<DashboardStats>>("dashboardStats", dashboardStats);
-
-const handleFetchStats = async () => {
-  const { data } = await apiClient.stats.getStats();
-  dashboardStats.value = data;
-};
-
-onMounted(handleFetchStats);
 </script>
 
 <style>
