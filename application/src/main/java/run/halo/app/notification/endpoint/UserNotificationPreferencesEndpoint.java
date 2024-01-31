@@ -5,17 +5,20 @@ import static org.springdoc.core.fn.builders.apiresponse.Builder.responseBuilder
 import static org.springdoc.core.fn.builders.parameter.Builder.parameterBuilder;
 import static org.springdoc.core.fn.builders.requestbody.Builder.requestBodyBuilder;
 
+import com.fasterxml.jackson.core.type.TypeReference;
 import io.swagger.v3.oas.annotations.enums.ParameterIn;
 import io.swagger.v3.oas.annotations.media.Schema;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
 import java.util.function.Function;
 import java.util.function.Supplier;
 import lombok.Data;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.Accessors;
+import org.apache.commons.lang3.StringUtils;
 import org.springdoc.webflux.core.fn.SpringdocRouteBuilder;
 import org.springframework.lang.NonNull;
 import org.springframework.stereotype.Component;
@@ -25,12 +28,15 @@ import org.springframework.web.reactive.function.server.ServerRequest;
 import org.springframework.web.reactive.function.server.ServerResponse;
 import reactor.core.publisher.Mono;
 import reactor.util.function.Tuples;
+import run.halo.app.core.extension.Role;
 import run.halo.app.core.extension.endpoint.CustomEndpoint;
 import run.halo.app.core.extension.notification.NotifierDescriptor;
 import run.halo.app.core.extension.notification.ReasonType;
 import run.halo.app.extension.Comparators;
 import run.halo.app.extension.GroupVersion;
+import run.halo.app.extension.MetadataUtil;
 import run.halo.app.extension.ReactiveExtensionClient;
+import run.halo.app.infra.utils.JsonUtils;
 import run.halo.app.notification.UserNotificationPreference;
 import run.halo.app.notification.UserNotificationPreferenceService;
 
@@ -135,10 +141,7 @@ public class UserNotificationPreferencesEndpoint implements CustomEndpoint {
 
     Mono<ReasonTypeNotifierMatrix> listReasonTypeNotifierMatrix(String username) {
         return client.list(ReasonType.class, null, Comparators.defaultComparator())
-            .map(reasonType -> new ReasonTypeInfo(reasonType.getMetadata().getName(),
-                reasonType.getSpec().getDisplayName(),
-                reasonType.getSpec().getDescription())
-            )
+            .map(ReasonTypeInfo::from)
             .collectList()
             .flatMap(reasonTypes -> client.list(NotifierDescriptor.class, null,
                     Comparators.defaultComparator())
@@ -188,7 +191,23 @@ public class UserNotificationPreferencesEndpoint implements CustomEndpoint {
         private boolean[][] stateMatrix;
     }
 
-    record ReasonTypeInfo(String name, String displayName, String description) {
+    record ReasonTypeInfo(String name, String displayName, String description,
+                          Set<String> uiPermissions) {
+
+        public static ReasonTypeInfo from(ReasonType reasonType) {
+            var uiPermissions = Optional.of(MetadataUtil.nullSafeAnnotations(reasonType))
+                .map(annotations -> annotations.get(Role.UI_PERMISSIONS_ANNO))
+                .filter(StringUtils::isNotBlank)
+                .map(uiPermissionStr -> JsonUtils.jsonToObject(uiPermissionStr,
+                    new TypeReference<Set<String>>() {
+                    })
+                )
+                .orElse(Set.of());
+            return new ReasonTypeInfo(reasonType.getMetadata().getName(),
+                reasonType.getSpec().getDisplayName(),
+                reasonType.getSpec().getDescription(),
+                uiPermissions);
+        }
     }
 
     record NotifierInfo(String name, String displayName, String description) {
