@@ -60,6 +60,12 @@ export interface PostStatus {
   lastModifyTime?: string;
   /**
    *
+   * @type {number}
+   * @memberof PostStatus
+   */
+  observedVersion?: number;
+  /**
+   *
    * @type {string}
    * @memberof PostStatus
    */
