@@ -60,6 +60,12 @@ export interface SinglePageStatus {
   lastModifyTime?: string;
   /**
    *
+   * @type {number}
+   * @memberof SinglePageStatus
+   */
+  observedVersion?: number;
+  /**
+   *
    * @type {string}
    * @memberof SinglePageStatus
    */

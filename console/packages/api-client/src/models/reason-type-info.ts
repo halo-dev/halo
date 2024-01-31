@@ -36,4 +36,10 @@ export interface ReasonTypeInfo {
    * @memberof ReasonTypeInfo
    */
   name?: string;
+  /**
+   *
+   * @type {Array<string>}
+   * @memberof ReasonTypeInfo
+   */
+  uiPermissions?: Array<string>;
 }

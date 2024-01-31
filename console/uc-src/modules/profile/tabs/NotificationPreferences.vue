@@ -8,6 +8,7 @@ import { computed } from "vue";
 import { inject } from "vue";
 import { cloneDeep } from "lodash-es";
 import type { ReasonTypeNotifierRequest } from "@halo-dev/api-client";
+import HasPermission from "@/components/permission/HasPermission.vue";
 
 const queryClient = useQueryClient();
 
@@ -114,37 +115,41 @@ const {
           </tr>
         </thead>
         <tbody class="divide-y divide-gray-100 bg-white">
-          <tr
+          <template
             v-for="(reasonType, index) in data?.reasonTypes"
             :key="reasonType.name"
           >
-            <td
-              class="whitespace-nowrap px-4 py-3 text-sm font-medium text-gray-900"
-            >
-              {{ reasonType.displayName }}
-            </td>
-            <td
-              v-for="(notifier, notifierIndex) in data?.notifiers"
-              :key="notifier.name"
-              class="whitespace-nowrap px-4 py-3 text-sm text-gray-500"
-            >
-              <VSwitch
-                :model-value="data?.stateMatrix?.[index][notifierIndex]"
-                :loading="
-                  mutating &&
-                  variables?.reasonTypeIndex === index &&
-                  variables?.notifierIndex === notifierIndex
-                "
-                @change="
-                  mutate({
-                    state: !data?.stateMatrix?.[index][notifierIndex],
-                    reasonTypeIndex: index,
-                    notifierIndex: notifierIndex,
-                  })
-                "
-              />
-            </td>
-          </tr>
+            <HasPermission :permissions="reasonType.uiPermissions || []">
+              <tr>
+                <td
+                  class="whitespace-nowrap px-4 py-3 text-sm font-medium text-gray-900"
+                >
+                  {{ reasonType.displayName }}
+                </td>
+                <td
+                  v-for="(notifier, notifierIndex) in data?.notifiers"
+                  :key="notifier.name"
+                  class="whitespace-nowrap px-4 py-3 text-sm text-gray-500"
+                >
+                  <VSwitch
+                    :model-value="data?.stateMatrix?.[index][notifierIndex]"
+                    :loading="
+                      mutating &&
+                      variables?.reasonTypeIndex === index &&
+                      variables?.notifierIndex === notifierIndex
+                    "
+                    @change="
+                      mutate({
+                        state: !data?.stateMatrix?.[index][notifierIndex],
+                        reasonTypeIndex: index,
+                        notifierIndex: notifierIndex,
+                      })
+                    "
+                  />
+                </td>
+              </tr>
+            </HasPermission>
+          </template>
         </tbody>
       </table>
     </div>

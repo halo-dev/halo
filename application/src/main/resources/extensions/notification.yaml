@@ -64,6 +64,9 @@ apiVersion: notification.halo.run/v1alpha1
 kind: ReasonType
 metadata:
   name: new-comment-on-post
+  annotations:
+    rbac.authorization.halo.run/ui-permissions: |
+      [ "uc:posts:publish" ]
 spec:
   displayName: "我的文章收到新评论"
   description: "如果有读者在你的文章下方留下了新的评论，你将会收到一条通知，告诉你有新的评论。
@@ -90,6 +93,9 @@ apiVersion: notification.halo.run/v1alpha1
 kind: ReasonType
 metadata:
   name: new-comment-on-single-page
+  annotations:
+    rbac.authorization.halo.run/ui-permissions: |
+      [ "system:singlepages:manage" ]
 spec:
   displayName: "我的自定义页面收到新评论"
   description: "当你创建的自定义页面收到新评论时，你将会收到一条通知，告诉你有新的评论。"
