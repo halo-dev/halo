@@ -112,6 +112,9 @@ const editor = useEditor({
     ExtensionListKeymap,
     ExtensionSearchAndReplace,
   ],
+  parseOptions: {
+    preserveWhitespace: true,
+  },
   onUpdate: () => {
     content.value = editor.value?.getHTML() + "";
   },

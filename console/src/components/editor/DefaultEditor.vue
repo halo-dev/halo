@@ -392,6 +392,9 @@ onMounted(() => {
       ExtensionSearchAndReplace,
     ],
     autofocus: "start",
+    parseOptions: {
+      preserveWhitespace: true,
+    },
     onUpdate: () => {
       debounceOnUpdate();
     },
