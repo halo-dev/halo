@@ -127,7 +127,7 @@ metadata:
     halo.run/hidden: "true"
 rules:
   - apiGroups: [ "api.security.halo.run" ]
-    resources: [ "authentications", "authentications/totp" ]
+    resources: [ "authentications", "authentications/totp", "authentications/settings" ]
     verbs: [ "*" ]
 ---
 apiVersion: v1alpha1
