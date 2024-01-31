@@ -6,6 +6,7 @@ export enum pluginLabels {
 // role
 export enum roleLabels {
   TEMPLATE = "halo.run/role-template",
+  HIDDEN = "halo.run/hidden",
   SYSTEM_RESERVED = "rbac.authorization.halo.run/system-reserved",
 }
 
