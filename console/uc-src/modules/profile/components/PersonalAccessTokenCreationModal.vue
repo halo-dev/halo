@@ -7,11 +7,11 @@ import { Dialog, Toast, VButton, VModal, VSpace } from "@halo-dev/components";
 import { useMutation, useQueryClient } from "@tanstack/vue-query";
 import { useClipboard } from "@vueuse/core";
 import type { PatSpec, PersonalAccessToken } from "@halo-dev/api-client";
-import { ref } from "vue";
+import { computed, ref } from "vue";
 import { useRoleTemplateSelection } from "@/composables/use-role";
 import { useRoleStore } from "@/stores/role";
-import { toRefs } from "vue";
 import { useI18n } from "vue-i18n";
+import { roleLabels } from "@/constants/labels";
 
 const queryClient = useQueryClient();
 const { t } = useI18n();
@@ -45,8 +45,17 @@ const formState = ref<
 
 const { permissions } = useRoleStore();
 
+const availableRoleTemplates = computed(() => {
+  return permissions.permissions.filter((role) => {
+    return (
+      role.metadata.labels?.[roleLabels.TEMPLATE] === "true" &&
+      role.metadata.labels?.[roleLabels.HIDDEN] !== "true"
+    );
+  });
+});
+
 const { roleTemplateGroups, handleRoleTemplateSelect, selectedRoleTemplates } =
-  useRoleTemplateSelection(toRefs(permissions).permissions);
+  useRoleTemplateSelection(availableRoleTemplates);
 
 const { copy } = useClipboard({
   legacy: true,
