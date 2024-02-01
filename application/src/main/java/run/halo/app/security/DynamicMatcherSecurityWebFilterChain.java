@@ -1,10 +1,13 @@
 package run.halo.app.security;
 
+import java.util.Set;
 import org.springframework.core.Ordered;
 import org.springframework.core.annotation.AnnotationAwareOrderComparator;
 import org.springframework.lang.NonNull;
 import org.springframework.security.web.server.SecurityWebFilterChain;
 import org.springframework.security.web.server.util.matcher.ServerWebExchangeMatcher;
+import org.springframework.util.Assert;
+import org.springframework.util.CollectionUtils;
 import org.springframework.web.server.ServerWebExchange;
 import org.springframework.web.server.WebFilter;
 import org.springframework.web.server.WebFilterChain;
@@ -25,10 +28,23 @@ public class DynamicMatcherSecurityWebFilterChain implements SecurityWebFilterCh
 
     private final ExtensionGetter extensionGetter;
 
+    private final Set<AdditionalWebFilter.Scope> matchScopes;
+
+    /**
+     * Creates an aggregated {@link SecurityWebFilterChain} using the provided original and
+     * additional filters.
+     *
+     * @param matchScopes Only matched the given scopes will be added to the filter chain
+     */
     public DynamicMatcherSecurityWebFilterChain(ExtensionGetter extensionGetter,
-        SecurityWebFilterChain delegate) {
+        SecurityWebFilterChain delegate,
+        Set<AdditionalWebFilter.Scope> matchScopes) {
+        Assert.isTrue(!CollectionUtils.isEmpty(matchScopes), "Match scopes must not be empty");
+        Assert.notNull(extensionGetter, "Extension getter must not be null");
+        Assert.notNull(delegate, "Delegate must not be null");
         this.delegate = delegate;
         this.extensionGetter = extensionGetter;
+        this.matchScopes = matchScopes;
     }
 
     @Override
@@ -44,6 +60,10 @@ public class DynamicMatcherSecurityWebFilterChain implements SecurityWebFilterCh
 
     private Flux<WebFilter> getAdditionalFilters() {
         return extensionGetter.getEnabledExtensionByDefinition(AdditionalWebFilter.class)
+            .filter(additionalWebFilter -> {
+                var scope = additionalWebFilter.getScope();
+                return scope == AdditionalWebFilter.Scope.ALL || matchScopes.contains(scope);
+            })
             .map(additionalWebFilter -> new OrderedWebFilter(additionalWebFilter,
                 additionalWebFilter.getOrder())
             );

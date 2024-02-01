@@ -22,4 +22,14 @@ public interface AdditionalWebFilter extends WebFilter, ExtensionPoint, Ordered 
     default int getOrder() {
         return Ordered.LOWEST_PRECEDENCE;
     }
+
+    default Scope getScope() {
+        return Scope.PROTECTED_API;
+    }
+
+    enum Scope {
+        PROTECTED_API,
+        PORTAL,
+        ALL
+    }
 }

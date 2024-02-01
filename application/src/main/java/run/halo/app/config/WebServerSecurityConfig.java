@@ -31,6 +31,7 @@ import run.halo.app.extension.ReactiveExtensionClient;
 import run.halo.app.infra.AnonymousUserConst;
 import run.halo.app.infra.properties.HaloProperties;
 import run.halo.app.plugin.extensionpoint.ExtensionGetter;
+import run.halo.app.security.AdditionalWebFilter;
 import run.halo.app.security.DefaultUserDetailService;
 import run.halo.app.security.DynamicMatcherSecurityWebFilterChain;
 import run.halo.app.security.authentication.SecurityConfigurer;
@@ -92,14 +93,16 @@ public class WebServerSecurityConfig {
         // Integrate with other configurers separately
         securityConfigurers.orderedStream()
             .forEach(securityConfigurer -> securityConfigurer.configure(http));
-        return new DynamicMatcherSecurityWebFilterChain(extensionGetter, http.build());
+        return new DynamicMatcherSecurityWebFilterChain(extensionGetter, http.build(),
+            Set.of(AdditionalWebFilter.Scope.PROTECTED_API));
     }
 
     @Bean
     @Order(Ordered.HIGHEST_PRECEDENCE + 1)
     SecurityWebFilterChain portalFilterChain(ServerHttpSecurity http,
         ServerSecurityContextRepository securityContextRepository,
-        HaloProperties haloProperties) {
+        HaloProperties haloProperties,
+        ExtensionGetter extensionGetter) {
         var pathMatcher = pathMatchers(HttpMethod.GET, "/**");
         var mediaTypeMatcher = new MediaTypeServerWebExchangeMatcher(MediaType.TEXT_HTML);
         mediaTypeMatcher.setIgnoredMediaTypes(Set.of(MediaType.ALL));
@@ -126,7 +129,8 @@ public class WebServerSecurityConfig {
                 new HaloAnonymousAuthenticationWebFilter("portal", AnonymousUserConst.PRINCIPAL,
                     AuthorityUtils.createAuthorityList(AnonymousUserConst.Role),
                     securityContextRepository)));
-        return http.build();
+        return new DynamicMatcherSecurityWebFilterChain(extensionGetter, http.build(),
+            Set.of(AdditionalWebFilter.Scope.PORTAL));
     }
 
     @Bean
