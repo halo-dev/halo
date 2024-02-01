@@ -1,6 +1,6 @@
 {
   "name": "@halo-dev/richtext-editor",
-  "version": "2.12.0",
+  "version": "2.13.0",
   "description": "Default editor for Halo",
   "homepage": "https://github.com/halo-dev/halo/tree/main/console/packages/editor#readme",
   "bugs": {
