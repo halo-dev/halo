@@ -1,6 +1,6 @@
 <p align="center">
-    <a href="https://halo.run" target="_blank" rel="noopener noreferrer">
-        <img width="100" src="https://halo.run/logo" alt="Halo logo" />
+    <a href="https://www.halo.run" target="_blank" rel="noopener noreferrer">
+        <img width="100" src="https://www.halo.run/logo" alt="Halo logo" />
     </a>
 </p>
 
@@ -14,7 +14,7 @@
 <a href="https://codecov.io/gh/halo-dev/halo"><img alt="Codecov percentage" src="https://img.shields.io/codecov/c/github/halo-dev/halo/main?style=flat-square&token=YsRUg9fall"/></a>
 <a href="https://www.producthunt.com/posts/halo-6b401e75-bb58-4dff-9fe9-2ada3323c874?utm_source=badge-featured&utm_medium=badge&utm_souce=badge-halo&#0045;6b401e75&#0045;bb58&#0045;4dff&#0045;9fe9&#0045;2ada3323c874" target="_blank"><img src="https://api.producthunt.com/widgets/embed-image/v1/featured.svg?post_id=407442&theme=light" alt="Halo - Powerful&#0032;and&#0032;easy&#0045;to&#0045;use&#0032;Open&#0045;Source&#0032;website&#0032;building&#0032;tool | Product Hunt" style="height: 20px;" height="20px" /></a>
 <br />
-<a href="https://halo.run">官网</a>
+<a href="https://www.halo.run">官网</a>
 <a href="https://docs.halo.run">文档</a>
 <a href="https://bbs.halo.run">社区</a>
 <a href="https://gitee.com/halo-dev">Gitee</a>
@@ -26,7 +26,7 @@
 ## 快速开始
 
 ```bash
-docker run -it -d --name halo -p 8090:8090 -v ~/.halo2:/root/.halo2 halohub/halo:2.11
+docker run -it -d --name halo -p 8090:8090 -v ~/.halo2:/root/.halo2 halohub/halo:2.12
 ```
 
 以上仅作为体验使用，详细部署文档请查阅：<https://docs.halo.run/getting-started/install/docker-compose>
@@ -40,8 +40,7 @@ docker run -it -d --name halo -p 8090:8090 -v ~/.halo2:/root/.halo2 halohub/halo
 
 ## 生态
 
-可访问 [官方应用市场](https://halo.run/store/apps) 或 [awesome-halo 仓库](https://github.com/halo-sigs/awesome-halo) 查看已经适用于 Halo 2.x 的主题和插件，以及适用于 Halo
-1.x 的相关仓库。
+可访问 [官方应用市场](https://www.halo.run/store/apps) 或 [awesome-halo 仓库](https://github.com/halo-sigs/awesome-halo) 查看适用于 Halo 2.x 的主题和插件。
 
 ## 许可证
 
