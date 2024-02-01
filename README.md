@@ -40,8 +40,7 @@ docker run -it -d --name halo -p 8090:8090 -v ~/.halo2:/root/.halo2 halohub/halo
 
 ## 生态
 
-可访问 [官方应用市场](https://www.halo.run/store/apps) 或 [awesome-halo 仓库](https://github.com/halo-sigs/awesome-halo) 查看已经适用于 Halo 2.x 的主题和插件，以及适用于 Halo
-1.x 的相关仓库。
+可访问 [官方应用市场](https://www.halo.run/store/apps) 或 [awesome-halo 仓库](https://github.com/halo-sigs/awesome-halo) 查看适用于 Halo 2.x 的主题和插件。
 
 ## 许可证
 
