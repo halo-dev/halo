@@ -13,8 +13,12 @@ public class PageRequestImpl implements PageRequest {
 
     public PageRequestImpl(int pageNumber, int pageSize, Sort sort) {
         Assert.notNull(sort, "Sort must not be null");
-        Assert.isTrue(pageNumber >= 0, "Page index must not be less than zero!");
-        Assert.isTrue(pageSize >= 0, "Page size must not be less than one!");
+        if (pageNumber < 1) {
+            pageNumber = 1;
+        }
+        if (pageSize < 0) {
+            pageSize = 0;
+        }
         this.pageNumber = pageNumber;
         this.pageSize = pageSize;
         this.sort = sort;
