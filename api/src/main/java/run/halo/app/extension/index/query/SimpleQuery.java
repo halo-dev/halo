@@ -1,8 +1,10 @@
 package run.halo.app.extension.index.query;
 
+import lombok.Getter;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.util.Assert;
 
+@Getter
 public abstract class SimpleQuery implements Query {
     protected final String fieldName;
     protected final String value;
