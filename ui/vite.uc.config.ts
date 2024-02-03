@@ -8,7 +8,7 @@ export default ({ mode }: { mode: string }) => {
     base: "/uc/",
     entryFile: "/uc-src/main.ts",
     port: 4000,
-    outDir: path.resolve("../application/src/main/resources/uc"),
+    outDir: path.resolve("build/dist/uc"),
     mode,
     plugins: [
       VueI18nPlugin({

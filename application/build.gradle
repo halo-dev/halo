@@ -82,6 +82,11 @@ tasks.register('createChecksums', Checksum) {
     checksumAlgorithm = Checksum.Algorithm.SHA256
 }
 
+tasks.named('processResources', ProcessResources) {
+    from project(':ui').tasks.named('build')
+    into layout.buildDirectory.dir('resources/main')
+}
+
 tasks.named('build') {
     dependsOn tasks.named('createChecksums')
 }

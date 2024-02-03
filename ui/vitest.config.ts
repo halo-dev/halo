@@ -20,6 +20,8 @@ export default defineConfig({
   },
   test: {
     dir: "./src",
+    reporters: "html",
+    outputFile: "build/test-result/index.html",
     transformMode: {
       web: [/\.[jt]sx$/],
     },
