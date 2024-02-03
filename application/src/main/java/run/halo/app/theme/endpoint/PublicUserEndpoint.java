@@ -246,7 +246,8 @@ public class PublicUserEndpoint implements CustomEndpoint {
             .switchIfEmpty(Mono.error(
                 () -> new ServerWebInputException("Request body is required."))
             )
-            .flatMap(emailReq -> environmentFetcher.fetch(SystemSetting.User.GROUP,
+            .map(RegisterVerifyEmailRequest::email)
+            .flatMap(email -> environmentFetcher.fetch(SystemSetting.User.GROUP,
                     SystemSetting.User.class)
                 .switchIfEmpty(
                     Mono.error(new IllegalStateException("User setting is not configured"))
@@ -259,11 +260,11 @@ public class PublicUserEndpoint implements CustomEndpoint {
                 })
                 .map(SystemSetting.User::getAllowedEmailProvider)
                 .flatMap(allowedEmailProvider -> {
-                    if (!emailReq.email.matches(allowedEmailProvider)) {
+                    if (!email.matches(allowedEmailProvider)) {
                         throw new ServerWebInputException("Invalid email address.");
                     }
-                    emailVerificationService.sendRegisterVerificationCode(emailReq.email);
-                    return Mono.empty();
+                    return emailVerificationService.sendRegisterVerificationCode(email)
+                        .onErrorMap(RequestNotPermitted.class, RateLimitExceededException::new);
                 })
             )
             .then(ServerResponse.ok().build());
