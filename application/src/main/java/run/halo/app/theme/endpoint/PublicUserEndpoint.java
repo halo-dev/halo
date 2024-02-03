@@ -1,5 +1,6 @@
 package run.halo.app.theme.endpoint;
 
+import static io.swagger.v3.oas.annotations.media.Schema.RequiredMode.NOT_REQUIRED;
 import static io.swagger.v3.oas.annotations.media.Schema.RequiredMode.REQUIRED;
 import static org.springdoc.core.fn.builders.apiresponse.Builder.responseBuilder;
 import static org.springdoc.core.fn.builders.parameter.Builder.parameterBuilder;
@@ -30,6 +31,7 @@ import reactor.core.publisher.Mono;
 import run.halo.app.core.extension.User;
 import run.halo.app.core.extension.endpoint.CustomEndpoint;
 import run.halo.app.core.extension.service.EmailPasswordRecoveryService;
+import run.halo.app.core.extension.service.EmailVerificationService;
 import run.halo.app.core.extension.service.UserService;
 import run.halo.app.extension.GroupVersion;
 import run.halo.app.infra.SystemConfigurableEnvironmentFetcher;
@@ -52,6 +54,7 @@ public class PublicUserEndpoint implements CustomEndpoint {
     private final EmailPasswordRecoveryService emailPasswordRecoveryService;
     private final RateLimiterRegistry rateLimiterRegistry;
     private final SystemConfigurableEnvironmentFetcher environmentFetcher;
+    private final EmailVerificationService emailVerificationService;
 
     @Override
     public RouterFunction<ServerResponse> endpoint() {
@@ -75,6 +78,22 @@ public class PublicUserEndpoint implements CustomEndpoint {
                     .tag(tag)
                     .requestBody(requestBodyBuilder().required(false))
                     .response(responseBuilder().implementation(Map.class))
+            )
+            .POST("/users/-/send-register-verify-email", this::sendRegisterVerifyEmail,
+                builder -> builder.operationId("SendRegisterVerifyEmail")
+                    .description(
+                        "Send registration verification email, which can be called when "
+                            + "regRequireVerifyEmail in user settings is true"
+                    )
+                    .tag(tag)
+                    .requestBody(requestBodyBuilder()
+                        .required(true)
+                        .implementation(RegisterVerifyEmailRequest.class)
+                    )
+                    .response(responseBuilder()
+                        .responseCode(HttpStatus.NO_CONTENT.toString())
+                        .implementation(Void.class)
+                    )
             )
             .POST("/users/-/send-password-reset-email", this::sendPasswordResetEmail,
                 builder -> builder.operationId("SendPasswordResetEmail")
@@ -140,6 +159,9 @@ public class PublicUserEndpoint implements CustomEndpoint {
                                 @Schema(requiredMode = REQUIRED) String token) {
     }
 
+    record RegisterVerifyEmailRequest(@Schema(requiredMode = REQUIRED) String email) {
+    }
+
     private Mono<ServerResponse> sendPasswordResetEmail(ServerRequest request) {
         return request.bodyToMono(PasswordResetEmailRequest.class)
             .flatMap(passwordResetRequest -> {
@@ -168,6 +190,28 @@ public class PublicUserEndpoint implements CustomEndpoint {
 
     private Mono<ServerResponse> signUp(ServerRequest request) {
         return request.bodyToMono(SignUpRequest.class)
+            .flatMap(signUpRequest -> environmentFetcher.fetch(SystemSetting.User.GROUP,
+                    SystemSetting.User.class)
+                .switchIfEmpty(
+                    Mono.error(new IllegalStateException("User setting is not configured"))
+                )
+                .flatMap(userSetting -> {
+                    if (userSetting.getRegRequireVerifyEmail()) {
+                        if (!StringUtils.isNumeric(signUpRequest.verifyCode)) {
+                            throw new ServerWebInputException("Require verify code");
+                        }
+                        Boolean verified =
+                            emailVerificationService.verifyRegisterVerificationCode(
+                                signUpRequest.user().getSpec().getEmail(),
+                                signUpRequest.verifyCode).block();
+                        if (Boolean.FALSE.equals(verified)) {
+                            throw new ServerWebInputException("Wrong verify code");
+                        }
+                        signUpRequest.user().getSpec().setEmailVerified(true);
+                    }
+                    return Mono.just(signUpRequest);
+                })
+            )
             .flatMap(signUpRequest ->
                 userService.signUp(signUpRequest.user(), signUpRequest.password())
             )
@@ -193,8 +237,36 @@ public class PublicUserEndpoint implements CustomEndpoint {
                 : Map.of("regRequireVerifyEmail", false)
             )
             .flatMap(
-                list -> ServerResponse.ok().contentType(MediaType.APPLICATION_JSON).bodyValue(list)
+                map -> ServerResponse.ok().contentType(MediaType.APPLICATION_JSON).bodyValue(map)
             );
+    }
+
+    private Mono<ServerResponse> sendRegisterVerifyEmail(ServerRequest request) {
+        return request.bodyToMono(RegisterVerifyEmailRequest.class)
+            .switchIfEmpty(Mono.error(
+                () -> new ServerWebInputException("Request body is required."))
+            )
+            .flatMap(emailReq -> environmentFetcher.fetch(SystemSetting.User.GROUP,
+                    SystemSetting.User.class)
+                .switchIfEmpty(
+                    Mono.error(new IllegalStateException("User setting is not configured"))
+                )
+                .flatMap(userSetting -> {
+                    if (!userSetting.getRegRequireVerifyEmail()) {
+                        throw new ServerWebInputException("regRequireVerifyEmail is false");
+                    }
+                    return Mono.just(userSetting);
+                })
+                .map(SystemSetting.User::getAllowedEmailProvider)
+                .flatMap(allowedEmailProvider -> {
+                    if (!emailReq.email.matches(allowedEmailProvider)) {
+                        throw new ServerWebInputException("Invalid email address.");
+                    }
+                    emailVerificationService.sendRegisterVerificationCode(emailReq.email);
+                    return Mono.empty();
+                })
+            )
+            .then(ServerResponse.ok().build());
     }
 
     private <T> RateLimiterOperator<T> getRateLimiterForSignUp(ServerWebExchange exchange) {
@@ -217,6 +289,9 @@ public class PublicUserEndpoint implements CustomEndpoint {
     }
 
     record SignUpRequest(@Schema(requiredMode = REQUIRED) User user,
-                         @Schema(requiredMode = REQUIRED, minLength = 6) String password) {
+                         @Schema(requiredMode = REQUIRED, minLength = 6) String password,
+                         @Schema(requiredMode = NOT_REQUIRED, minLength = 6, maxLength = 6)
+                         String verifyCode
+    ) {
     }
 }

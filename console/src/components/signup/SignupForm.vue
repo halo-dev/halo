@@ -1,10 +1,12 @@
 <script lang="ts" setup>
-import { ref, onMounted } from "vue";
+import { ref, onMounted, reactive, computed } from "vue";
 import { submitForm } from "@formkit/core";
 import { Toast, VButton } from "@halo-dev/components";
 import { apiClient } from "@/utils/api-client";
 import { useRouteQuery } from "@vueuse/router";
 import { useI18n } from "vue-i18n";
+import { useMutation } from "@tanstack/vue-query";
+import { useIntervalFn } from "@vueuse/shared";
 
 const { t } = useI18n();
 
@@ -31,6 +33,7 @@ const formState = ref({
       email: "",
     },
   },
+  verifyCode: "",
 });
 const loading = ref(false);
 
@@ -40,14 +43,41 @@ const emit = defineEmits<{
 
 const login = useRouteQuery<string>("login");
 const name = useRouteQuery<string>("name");
+const signUpCond = reactive({
+  regRequireVerifyEmail: false,
+  allowedEmailProvider: "",
+});
 
 onMounted(() => {
+  getSignupCond();
   if (login.value) {
     formState.value.user.metadata.name = login.value;
   }
   if (name.value) {
     formState.value.user.spec.displayName = name.value;
   }
+});
+
+const getSignupCond = () => {
+  apiClient.common.user
+    .signUpCondition()
+    .then((resp) => {
+      const data = resp.data;
+      signUpCond.regRequireVerifyEmail = data.regRequireVerifyEmail;
+      if (signUpCond.regRequireVerifyEmail) {
+        signUpCond.allowedEmailProvider = data.allowedEmailProvider;
+      }
+    })
+    .catch((e) => console.log(e));
+};
+
+const emailValidation = computed(() => {
+  if (signUpCond.regRequireVerifyEmail)
+    return [
+      ["required"],
+      ["matches", new RegExp(signUpCond.allowedEmailProvider)],
+    ];
+  else return "required|email|length:0,100";
 });
 
 const handleSignup = async () => {
@@ -71,6 +101,66 @@ const handleSignup = async () => {
 const inputClasses = {
   outer: "!py-3 first:!pt-0 last:!pb-0",
 };
+
+// the code below is copied from console/uc-src/modules/profile/components/EmailVerifyModal.vue
+const timer = ref(0);
+const { pause, resume, isActive } = useIntervalFn(
+  () => {
+    if (timer.value <= 0) {
+      pause();
+    } else {
+      timer.value--;
+    }
+  },
+  1000,
+  {
+    immediate: false,
+  }
+);
+
+const { mutate: sendVerifyCode, isLoading: isSending } = useMutation({
+  mutationKey: ["send-verify-code"],
+  mutationFn: async () => {
+    if (
+      !formState.value.user.spec.email.match(
+        new RegExp(signUpCond.allowedEmailProvider)
+      )
+    ) {
+      Toast.error(
+        t(
+          "core.uc_profile.email_verify_modal.operations.send_code.toast_email_empty"
+        )
+      );
+      throw new Error("email is illegal");
+    }
+    return await apiClient.common.user.sendRegisterVerifyEmail({
+      registerVerifyEmailRequest: {
+        email: formState.value.user.spec.email,
+      },
+    });
+  },
+  onSuccess() {
+    Toast.success(
+      t("core.uc_profile.email_verify_modal.operations.send_code.toast_success")
+    );
+    timer.value = 60;
+    resume();
+  },
+});
+
+const sendVerifyCodeButtonText = computed(() => {
+  if (isSending.value) {
+    return t(
+      "core.uc_profile.email_verify_modal.operations.send_code.buttons.sending"
+    );
+  }
+  return isActive.value
+    ? t(
+        "core.uc_profile.email_verify_modal.operations.send_code.buttons.countdown",
+        { timer: timer.value }
+      )
+    : t("core.uc_profile.email_verify_modal.operations.send_code.buttons.send");
+});
 </script>
 
 <template>
@@ -123,8 +213,27 @@ const inputClasses = {
       :validation-label="$t('core.signup.fields.email.placeholder')"
       type="email"
       name="email"
-      validation="required|email|length:0,100"
+      :validation="emailValidation"
     ></FormKit>
+    <FormKit
+      v-if="signUpCond.regRequireVerifyEmail"
+      v-model="formState.verifyCode"
+      type="number"
+      name="code"
+      :placeholder="$t('core.uc_profile.email_verify_modal.fields.code.label')"
+      validation="required"
+    >
+      <template #suffix>
+        <VButton
+          :loading="isSending"
+          :disabled="isActive"
+          class="rounded-none border-y-0 border-l border-r-0 tabular-nums"
+          @click="sendVerifyCode"
+        >
+          {{ sendVerifyCodeButtonText }}
+        </VButton>
+      </template>
+    </FormKit>
     <FormKit
       v-model="formState.password"
       name="password"
