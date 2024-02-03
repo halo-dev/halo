@@ -67,6 +67,8 @@ public class SystemSetting {
     public static class User {
         public static final String GROUP = "user";
         Boolean allowRegistration;
+        Boolean regRequireVerifyEmail;
+        String allowedEmailProvider;
         String defaultRole;
         String avatarPolicy;
     }
