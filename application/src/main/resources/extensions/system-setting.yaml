@@ -98,11 +98,11 @@ spec:
           value: false
         - $formkit: checkbox
           name: regRequireVerifyEmail
-          label: "注册需验证邮箱"
+          label: "注册需验证邮箱（请确保启用邮件通知）"
           value: false
         - $formkit: text
           name: allowedEmailProvider
-          label: "允许的邮件服务商"
+          label: "允许的邮件服务商（请填写正则）"
           value: "^[a-zA-Z0-9._%+-]+@(gmail\\.com|yahoo\\.com|hotmail\\.com|outlook\\.com|qq\\.com|163\\.com)$"
         - $formkit: roleSelect
           name: defaultRole
