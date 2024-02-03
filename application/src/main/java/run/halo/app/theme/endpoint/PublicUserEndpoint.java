@@ -258,6 +258,7 @@ public class PublicUserEndpoint implements CustomEndpoint {
                     }
                     return Mono.just(userSetting);
                 })
+                .transformDeferred(sendEmailVerificationCodeRateLimiter(email))
                 .map(SystemSetting.User::getAllowedEmailProvider)
                 .flatMap(allowedEmailProvider -> {
                     if (!email.matches(allowedEmailProvider)) {
@@ -287,6 +288,13 @@ public class PublicUserEndpoint implements CustomEndpoint {
                 securityContext.setAuthentication(authentication);
                 return securityContextRepository.save(exchange, securityContext);
             });
+    }
+
+    private <T> RateLimiterOperator<T> sendEmailVerificationCodeRateLimiter(String email) {
+        String rateLimiterKey = "send-register-verify-email:" + email;
+        var rateLimiter =
+            rateLimiterRegistry.rateLimiter(rateLimiterKey, "send-email-verification-code");
+        return RateLimiterOperator.of(rateLimiter);
     }
 
     record SignUpRequest(@Schema(requiredMode = REQUIRED) User user,
