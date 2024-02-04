@@ -1,9 +1,6 @@
 package run.halo.app.extension.gc;
 
-import static run.halo.app.extension.Comparators.compareCreationTimestamp;
-
 import java.util.List;
-import java.util.function.Predicate;
 import org.springframework.data.domain.Sort;
 import run.halo.app.extension.Extension;
 import run.halo.app.extension.ExtensionClient;
@@ -64,8 +61,6 @@ class GcSynchronizer implements Synchronizer<GcRequest> {
             if (event instanceof SchemeRegistered registeredEvent) {
                 var newScheme = registeredEvent.getNewScheme();
                 listDeleted(newScheme.type()).forEach(watcher::onDelete);
-                client.list(newScheme.type(), deleted(), compareCreationTimestamp(true))
-                    .forEach(watcher::onDelete);
             }
         });
         client.watch(watcher);
@@ -77,16 +72,8 @@ class GcSynchronizer implements Synchronizer<GcRequest> {
     <E extends Extension> List<E> listDeleted(Class<E> type) {
         var options = new ListOptions()
             .setFieldSelector(
-                FieldSelector.of(QueryFactory.all("metadata.deletionTimestamp"))
+                FieldSelector.of(QueryFactory.isNotNull("metadata.deletionTimestamp"))
             );
-        return client.listAll(type, options, Sort.by("metadata.creationTimestamp"))
-            .stream()
-            .sorted(compareCreationTimestamp(true))
-            .toList();
+        return client.listAll(type, options, Sort.by(Sort.Order.asc("metadata.creationTimestamp")));
     }
-
-    private <E extends Extension> Predicate<E> deleted() {
-        return extension -> extension.getMetadata().getDeletionTimestamp() != null;
-    }
-
 }
