@@ -13,7 +13,7 @@
  */
 
 import type { Configuration } from "../configuration";
-import type { AxiosPromise, AxiosInstance, AxiosRequestConfig } from "axios";
+import type { AxiosPromise, AxiosInstance, RawAxiosRequestConfig } from "axios";
 import globalAxios from "axios";
 // Some imports not used depending on template conditions
 // @ts-ignore
@@ -36,9 +36,12 @@ import {
   RequestArgs,
   BaseAPI,
   RequiredError,
+  operationServerMap,
 } from "../base";
 // @ts-ignore
 import { PasswordResetEmailRequest } from "../models";
+// @ts-ignore
+import { RegisterVerifyEmailRequest } from "../models";
 // @ts-ignore
 import { ResetPasswordRequest } from "../models";
 // @ts-ignore
@@ -63,7 +66,7 @@ export const ApiHaloRunV1alpha1UserApiAxiosParamCreator = function (
     resetPasswordByToken: async (
       name: string,
       resetPasswordRequest: ResetPasswordRequest,
-      options: AxiosRequestConfig = {}
+      options: RawAxiosRequestConfig = {}
     ): Promise<RequestArgs> => {
       // verify required parameter 'name' is not null or undefined
       assertParamExists("resetPasswordByToken", "name", name);
@@ -130,7 +133,7 @@ export const ApiHaloRunV1alpha1UserApiAxiosParamCreator = function (
      */
     sendPasswordResetEmail: async (
       passwordResetEmailRequest: PasswordResetEmailRequest,
-      options: AxiosRequestConfig = {}
+      options: RawAxiosRequestConfig = {}
     ): Promise<RequestArgs> => {
       // verify required parameter 'passwordResetEmailRequest' is not null or undefined
       assertParamExists(
@@ -184,6 +187,67 @@ export const ApiHaloRunV1alpha1UserApiAxiosParamCreator = function (
       };
     },
     /**
+     * Send registration verification email, which can be called when regRequireVerifyEmail in user settings is true
+     * @param {RegisterVerifyEmailRequest} registerVerifyEmailRequest
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     */
+    sendRegisterVerifyEmail: async (
+      registerVerifyEmailRequest: RegisterVerifyEmailRequest,
+      options: RawAxiosRequestConfig = {}
+    ): Promise<RequestArgs> => {
+      // verify required parameter 'registerVerifyEmailRequest' is not null or undefined
+      assertParamExists(
+        "sendRegisterVerifyEmail",
+        "registerVerifyEmailRequest",
+        registerVerifyEmailRequest
+      );
+      const localVarPath = `/apis/api.halo.run/v1alpha1/users/-/send-register-verify-email`;
+      // use dummy base URL string because the URL constructor only accepts absolute URLs.
+      const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+      let baseOptions;
+      if (configuration) {
+        baseOptions = configuration.baseOptions;
+      }
+
+      const localVarRequestOptions = {
+        method: "POST",
+        ...baseOptions,
+        ...options,
+      };
+      const localVarHeaderParameter = {} as any;
+      const localVarQueryParameter = {} as any;
+
+      // authentication BasicAuth required
+      // http basic authentication required
+      setBasicAuthToObject(localVarRequestOptions, configuration);
+
+      // authentication BearerAuth required
+      // http bearer authentication required
+      await setBearerAuthToObject(localVarHeaderParameter, configuration);
+
+      localVarHeaderParameter["Content-Type"] = "application/json";
+
+      setSearchParams(localVarUrlObj, localVarQueryParameter);
+      let headersFromBaseOptions =
+        baseOptions && baseOptions.headers ? baseOptions.headers : {};
+      localVarRequestOptions.headers = {
+        ...localVarHeaderParameter,
+        ...headersFromBaseOptions,
+        ...options.headers,
+      };
+      localVarRequestOptions.data = serializeDataIfNeeded(
+        registerVerifyEmailRequest,
+        localVarRequestOptions,
+        configuration
+      );
+
+      return {
+        url: toPathString(localVarUrlObj),
+        options: localVarRequestOptions,
+      };
+    },
+    /**
      * Sign up a new user
      * @param {SignUpRequest} signUpRequest
      * @param {*} [options] Override http request option.
@@ -191,7 +255,7 @@ export const ApiHaloRunV1alpha1UserApiAxiosParamCreator = function (
      */
     signUp: async (
       signUpRequest: SignUpRequest,
-      options: AxiosRequestConfig = {}
+      options: RawAxiosRequestConfig = {}
     ): Promise<RequestArgs> => {
       // verify required parameter 'signUpRequest' is not null or undefined
       assertParamExists("signUp", "signUpRequest", signUpRequest);
@@ -240,6 +304,52 @@ export const ApiHaloRunV1alpha1UserApiAxiosParamCreator = function (
         options: localVarRequestOptions,
       };
     },
+    /**
+     * Obtain registration conditions, such as whether email verification is required
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     */
+    signUpCondition: async (
+      options: RawAxiosRequestConfig = {}
+    ): Promise<RequestArgs> => {
+      const localVarPath = `/apis/api.halo.run/v1alpha1/users/-/signup/cond`;
+      // use dummy base URL string because the URL constructor only accepts absolute URLs.
+      const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+      let baseOptions;
+      if (configuration) {
+        baseOptions = configuration.baseOptions;
+      }
+
+      const localVarRequestOptions = {
+        method: "GET",
+        ...baseOptions,
+        ...options,
+      };
+      const localVarHeaderParameter = {} as any;
+      const localVarQueryParameter = {} as any;
+
+      // authentication BasicAuth required
+      // http basic authentication required
+      setBasicAuthToObject(localVarRequestOptions, configuration);
+
+      // authentication BearerAuth required
+      // http bearer authentication required
+      await setBearerAuthToObject(localVarHeaderParameter, configuration);
+
+      setSearchParams(localVarUrlObj, localVarQueryParameter);
+      let headersFromBaseOptions =
+        baseOptions && baseOptions.headers ? baseOptions.headers : {};
+      localVarRequestOptions.headers = {
+        ...localVarHeaderParameter,
+        ...headersFromBaseOptions,
+        ...options.headers,
+      };
+
+      return {
+        url: toPathString(localVarUrlObj),
+        options: localVarRequestOptions,
+      };
+    },
   };
 };
 
@@ -263,7 +373,7 @@ export const ApiHaloRunV1alpha1UserApiFp = function (
     async resetPasswordByToken(
       name: string,
       resetPasswordRequest: ResetPasswordRequest,
-      options?: AxiosRequestConfig
+      options?: RawAxiosRequestConfig
     ): Promise<
       (axios?: AxiosInstance, basePath?: string) => AxiosPromise<void>
     > {
@@ -273,12 +383,18 @@ export const ApiHaloRunV1alpha1UserApiFp = function (
           resetPasswordRequest,
           options
         );
-      return createRequestFunction(
-        localVarAxiosArgs,
-        globalAxios,
-        BASE_PATH,
-        configuration
-      );
+      const index = configuration?.serverIndex ?? 0;
+      const operationBasePath =
+        operationServerMap["ApiHaloRunV1alpha1UserApi.resetPasswordByToken"]?.[
+          index
+        ]?.url;
+      return (axios, basePath) =>
+        createRequestFunction(
+          localVarAxiosArgs,
+          globalAxios,
+          BASE_PATH,
+          configuration
+        )(axios, operationBasePath || basePath);
     },
     /**
      * Send password reset email when forgot password
@@ -288,7 +404,7 @@ export const ApiHaloRunV1alpha1UserApiFp = function (
      */
     async sendPasswordResetEmail(
       passwordResetEmailRequest: PasswordResetEmailRequest,
-      options?: AxiosRequestConfig
+      options?: RawAxiosRequestConfig
     ): Promise<
       (axios?: AxiosInstance, basePath?: string) => AxiosPromise<void>
     > {
@@ -297,12 +413,48 @@ export const ApiHaloRunV1alpha1UserApiFp = function (
           passwordResetEmailRequest,
           options
         );
-      return createRequestFunction(
-        localVarAxiosArgs,
-        globalAxios,
-        BASE_PATH,
-        configuration
-      );
+      const index = configuration?.serverIndex ?? 0;
+      const operationBasePath =
+        operationServerMap[
+          "ApiHaloRunV1alpha1UserApi.sendPasswordResetEmail"
+        ]?.[index]?.url;
+      return (axios, basePath) =>
+        createRequestFunction(
+          localVarAxiosArgs,
+          globalAxios,
+          BASE_PATH,
+          configuration
+        )(axios, operationBasePath || basePath);
+    },
+    /**
+     * Send registration verification email, which can be called when regRequireVerifyEmail in user settings is true
+     * @param {RegisterVerifyEmailRequest} registerVerifyEmailRequest
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     */
+    async sendRegisterVerifyEmail(
+      registerVerifyEmailRequest: RegisterVerifyEmailRequest,
+      options?: RawAxiosRequestConfig
+    ): Promise<
+      (axios?: AxiosInstance, basePath?: string) => AxiosPromise<void>
+    > {
+      const localVarAxiosArgs =
+        await localVarAxiosParamCreator.sendRegisterVerifyEmail(
+          registerVerifyEmailRequest,
+          options
+        );
+      const index = configuration?.serverIndex ?? 0;
+      const operationBasePath =
+        operationServerMap[
+          "ApiHaloRunV1alpha1UserApi.sendRegisterVerifyEmail"
+        ]?.[index]?.url;
+      return (axios, basePath) =>
+        createRequestFunction(
+          localVarAxiosArgs,
+          globalAxios,
+          BASE_PATH,
+          configuration
+        )(axios, operationBasePath || basePath);
     },
     /**
      * Sign up a new user
@@ -312,7 +464,7 @@ export const ApiHaloRunV1alpha1UserApiFp = function (
      */
     async signUp(
       signUpRequest: SignUpRequest,
-      options?: AxiosRequestConfig
+      options?: RawAxiosRequestConfig
     ): Promise<
       (axios?: AxiosInstance, basePath?: string) => AxiosPromise<User>
     > {
@@ -320,12 +472,41 @@ export const ApiHaloRunV1alpha1UserApiFp = function (
         signUpRequest,
         options
       );
-      return createRequestFunction(
-        localVarAxiosArgs,
-        globalAxios,
-        BASE_PATH,
-        configuration
+      const index = configuration?.serverIndex ?? 0;
+      const operationBasePath =
+        operationServerMap["ApiHaloRunV1alpha1UserApi.signUp"]?.[index]?.url;
+      return (axios, basePath) =>
+        createRequestFunction(
+          localVarAxiosArgs,
+          globalAxios,
+          BASE_PATH,
+          configuration
+        )(axios, operationBasePath || basePath);
+    },
+    /**
+     * Obtain registration conditions, such as whether email verification is required
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     */
+    async signUpCondition(
+      options?: RawAxiosRequestConfig
+    ): Promise<
+      (axios?: AxiosInstance, basePath?: string) => AxiosPromise<any>
+    > {
+      const localVarAxiosArgs = await localVarAxiosParamCreator.signUpCondition(
+        options
       );
+      const index = configuration?.serverIndex ?? 0;
+      const operationBasePath =
+        operationServerMap["ApiHaloRunV1alpha1UserApi.signUpCondition"]?.[index]
+          ?.url;
+      return (axios, basePath) =>
+        createRequestFunction(
+          localVarAxiosArgs,
+          globalAxios,
+          BASE_PATH,
+          configuration
+        )(axios, operationBasePath || basePath);
     },
   };
 };
@@ -349,7 +530,7 @@ export const ApiHaloRunV1alpha1UserApiFactory = function (
      */
     resetPasswordByToken(
       requestParameters: ApiHaloRunV1alpha1UserApiResetPasswordByTokenRequest,
-      options?: AxiosRequestConfig
+      options?: RawAxiosRequestConfig
     ): AxiosPromise<void> {
       return localVarFp
         .resetPasswordByToken(
@@ -367,11 +548,28 @@ export const ApiHaloRunV1alpha1UserApiFactory = function (
      */
     sendPasswordResetEmail(
       requestParameters: ApiHaloRunV1alpha1UserApiSendPasswordResetEmailRequest,
-      options?: AxiosRequestConfig
+      options?: RawAxiosRequestConfig
     ): AxiosPromise<void> {
       return localVarFp
         .sendPasswordResetEmail(
           requestParameters.passwordResetEmailRequest,
+          options
+        )
+        .then((request) => request(axios, basePath));
+    },
+    /**
+     * Send registration verification email, which can be called when regRequireVerifyEmail in user settings is true
+     * @param {ApiHaloRunV1alpha1UserApiSendRegisterVerifyEmailRequest} requestParameters Request parameters.
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     */
+    sendRegisterVerifyEmail(
+      requestParameters: ApiHaloRunV1alpha1UserApiSendRegisterVerifyEmailRequest,
+      options?: RawAxiosRequestConfig
+    ): AxiosPromise<void> {
+      return localVarFp
+        .sendRegisterVerifyEmail(
+          requestParameters.registerVerifyEmailRequest,
           options
         )
         .then((request) => request(axios, basePath));
@@ -384,10 +582,20 @@ export const ApiHaloRunV1alpha1UserApiFactory = function (
      */
     signUp(
       requestParameters: ApiHaloRunV1alpha1UserApiSignUpRequest,
-      options?: AxiosRequestConfig
+      options?: RawAxiosRequestConfig
     ): AxiosPromise<User> {
       return localVarFp
         .signUp(requestParameters.signUpRequest, options)
+        .then((request) => request(axios, basePath));
+    },
+    /**
+     * Obtain registration conditions, such as whether email verification is required
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     */
+    signUpCondition(options?: RawAxiosRequestConfig): AxiosPromise<any> {
+      return localVarFp
+        .signUpCondition(options)
         .then((request) => request(axios, basePath));
     },
   };
@@ -429,6 +637,20 @@ export interface ApiHaloRunV1alpha1UserApiSendPasswordResetEmailRequest {
 }
 
 /**
+ * Request parameters for sendRegisterVerifyEmail operation in ApiHaloRunV1alpha1UserApi.
+ * @export
+ * @interface ApiHaloRunV1alpha1UserApiSendRegisterVerifyEmailRequest
+ */
+export interface ApiHaloRunV1alpha1UserApiSendRegisterVerifyEmailRequest {
+  /**
+   *
+   * @type {RegisterVerifyEmailRequest}
+   * @memberof ApiHaloRunV1alpha1UserApiSendRegisterVerifyEmail
+   */
+  readonly registerVerifyEmailRequest: RegisterVerifyEmailRequest;
+}
+
+/**
  * Request parameters for signUp operation in ApiHaloRunV1alpha1UserApi.
  * @export
  * @interface ApiHaloRunV1alpha1UserApiSignUpRequest
@@ -458,7 +680,7 @@ export class ApiHaloRunV1alpha1UserApi extends BaseAPI {
    */
   public resetPasswordByToken(
     requestParameters: ApiHaloRunV1alpha1UserApiResetPasswordByTokenRequest,
-    options?: AxiosRequestConfig
+    options?: RawAxiosRequestConfig
   ) {
     return ApiHaloRunV1alpha1UserApiFp(this.configuration)
       .resetPasswordByToken(
@@ -478,11 +700,30 @@ export class ApiHaloRunV1alpha1UserApi extends BaseAPI {
    */
   public sendPasswordResetEmail(
     requestParameters: ApiHaloRunV1alpha1UserApiSendPasswordResetEmailRequest,
-    options?: AxiosRequestConfig
+    options?: RawAxiosRequestConfig
   ) {
     return ApiHaloRunV1alpha1UserApiFp(this.configuration)
       .sendPasswordResetEmail(
         requestParameters.passwordResetEmailRequest,
+        options
+      )
+      .then((request) => request(this.axios, this.basePath));
+  }
+
+  /**
+   * Send registration verification email, which can be called when regRequireVerifyEmail in user settings is true
+   * @param {ApiHaloRunV1alpha1UserApiSendRegisterVerifyEmailRequest} requestParameters Request parameters.
+   * @param {*} [options] Override http request option.
+   * @throws {RequiredError}
+   * @memberof ApiHaloRunV1alpha1UserApi
+   */
+  public sendRegisterVerifyEmail(
+    requestParameters: ApiHaloRunV1alpha1UserApiSendRegisterVerifyEmailRequest,
+    options?: RawAxiosRequestConfig
+  ) {
+    return ApiHaloRunV1alpha1UserApiFp(this.configuration)
+      .sendRegisterVerifyEmail(
+        requestParameters.registerVerifyEmailRequest,
         options
       )
       .then((request) => request(this.axios, this.basePath));
@@ -497,10 +738,22 @@ export class ApiHaloRunV1alpha1UserApi extends BaseAPI {
    */
   public signUp(
     requestParameters: ApiHaloRunV1alpha1UserApiSignUpRequest,
-    options?: AxiosRequestConfig
+    options?: RawAxiosRequestConfig
   ) {
     return ApiHaloRunV1alpha1UserApiFp(this.configuration)
       .signUp(requestParameters.signUpRequest, options)
+      .then((request) => request(this.axios, this.basePath));
+  }
+
+  /**
+   * Obtain registration conditions, such as whether email verification is required
+   * @param {*} [options] Override http request option.
+   * @throws {RequiredError}
+   * @memberof ApiHaloRunV1alpha1UserApi
+   */
+  public signUpCondition(options?: RawAxiosRequestConfig) {
+    return ApiHaloRunV1alpha1UserApiFp(this.configuration)
+      .signUpCondition(options)
       .then((request) => request(this.axios, this.basePath));
   }
 }
