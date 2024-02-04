@@ -26,7 +26,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.util.Predicates;
 import org.springframework.stereotype.Component;
-import org.springframework.transaction.annotation.Transactional;
+import org.springframework.transaction.reactive.TransactionalOperator;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import reactor.util.retry.Retry;
@@ -56,6 +56,8 @@ public class ReactiveExtensionClientImpl implements ReactiveExtensionClient {
     private final IndexerFactory indexerFactory;
 
     private final IndexedQueryEngine indexedQueryEngine;
+
+    private final TransactionalOperator transactionalOperator;
 
     private final ConcurrentMap<GroupKind, AtomicBoolean> indexBuildingState =
         new ConcurrentHashMap<>();
@@ -151,7 +153,6 @@ public class ReactiveExtensionClientImpl implements ReactiveExtensionClient {
     }
 
     @Override
-    @Transactional
     public <E extends Extension> Mono<E> create(E extension) {
         checkClientWritable(extension);
         return Mono.just(extension)
@@ -176,6 +177,9 @@ public class ReactiveExtensionClientImpl implements ReactiveExtensionClient {
             .map(converter::convertTo)
             .flatMap(extStore -> doCreate(extension, extStore.getName(), extStore.getData())
                 .doOnNext(watchers::onAdd)
+                .doOnNext(e -> {
+                    System.out.println(e);
+                })
             )
             .retryWhen(Retry.backoff(3, Duration.ofMillis(100))
                 // retry when generateName is set
@@ -185,7 +189,6 @@ public class ReactiveExtensionClientImpl implements ReactiveExtensionClient {
     }
 
     @Override
-    @Transactional
     public <E extends Extension> Mono<E> update(E extension) {
         checkClientWritable(extension);
         // Refactor the atomic reference if we have a better solution.
@@ -223,7 +226,6 @@ public class ReactiveExtensionClientImpl implements ReactiveExtensionClient {
     }
 
     @Override
-    @Transactional
     public <E extends Extension> Mono<E> delete(E extension) {
         checkClientWritable(extension);
         // set deletionTimestamp
@@ -246,8 +248,12 @@ public class ReactiveExtensionClientImpl implements ReactiveExtensionClient {
             var type = (Class<E>) oldExtension.getClass();
             var indexer = indexerFactory.getIndexer(gvk);
             return client.create(name, data)
-                .map(created -> converter.convertFrom(type, created))
-                .doOnNext(indexer::indexRecord);
+                .map(created -> {
+                    E result = converter.convertFrom(type, created);
+                    indexer.indexRecord(result);
+                    return result;
+                })
+                .as(transactionalOperator::transactional);
         });
     }
 
@@ -257,8 +263,12 @@ public class ReactiveExtensionClientImpl implements ReactiveExtensionClient {
             var type = (Class<E>) oldExtension.getClass();
             var indexer = indexerFactory.getIndexer(oldExtension.groupVersionKind());
             return client.update(name, version, data)
-                .map(updated -> converter.convertFrom(type, updated))
-                .doOnNext(indexer::updateRecord);
+                .map(updated -> {
+                    E result = converter.convertFrom(type, updated);
+                    indexer.updateRecord(result);
+                    return result;
+                })
+                .as(transactionalOperator::transactional);
         });
     }
 
