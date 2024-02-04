@@ -35,6 +35,14 @@ core:
         matchFailed: 郵箱格式錯誤或服務商不受支援
       verify_code:
         placeholder: 驗證碼
+        operations:
+          send_code:
+            buttons:
+              countdown: "{timer} 秒後重發"
+              send: 發送驗證碼
+              sending: 發送中
+            toast_email_empty: 請輸入電子郵件信箱
+            toast_success: 驗證碼已發送
       password:
         placeholder: 密碼
       password_confirm:

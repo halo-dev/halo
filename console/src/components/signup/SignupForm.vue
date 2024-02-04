@@ -137,7 +137,7 @@ const { mutate: sendVerifyCode, isLoading: isSending } = useMutation({
   },
   onSuccess() {
     Toast.success(
-      t("core.uc_profile.email_verify_modal.operations.send_code.toast_success")
+      t("core.signup.fields.verify_code.operations.send_code.toast_success")
     );
     timer.value = 60;
     resume();
@@ -147,15 +147,17 @@ const { mutate: sendVerifyCode, isLoading: isSending } = useMutation({
 const sendVerifyCodeButtonText = computed(() => {
   if (isSending.value) {
     return t(
-      "core.uc_profile.email_verify_modal.operations.send_code.buttons.sending"
+      "core.signup.fields.verify_code.operations.send_code.buttons.sending"
     );
   }
   return isActive.value
     ? t(
-        "core.uc_profile.email_verify_modal.operations.send_code.buttons.countdown",
-        { timer: timer.value }
+        "core.signup.fields.verify_code.operations.send_code.buttons.countdown",
+        {
+          timer: timer.value,
+        }
       )
-    : t("core.uc_profile.email_verify_modal.operations.send_code.buttons.send");
+    : t("core.signup.fields.verify_code.operations.send_code.buttons.send");
 });
 </script>
 

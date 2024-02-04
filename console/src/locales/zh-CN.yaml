@@ -35,6 +35,14 @@ core:
         matchFailed: 邮箱格式错误或服务商不受支持
       verify_code:
         placeholder: 验证码
+        operations:
+          send_code:
+            buttons:
+              sending: 发送中
+              send: 发送验证码
+              countdown: "{timer} 秒后重发"
+            toast_success: 验证码已发送
+            toast_email_empty: 请输入电子邮箱
       password:
         placeholder: 密码
       password_confirm:
