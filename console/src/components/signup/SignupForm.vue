@@ -126,11 +126,7 @@ const { mutate: sendVerifyCode, isLoading: isSending } = useMutation({
         new RegExp(signUpCond.allowedEmailProvider)
       )
     ) {
-      Toast.error(
-        t(
-          "core.uc_profile.email_verify_modal.operations.send_code.toast_email_empty"
-        )
-      );
+      Toast.error(t("core.signup.fields.email.matchFailed"));
       throw new Error("email is illegal");
     }
     return await apiClient.common.user.sendRegisterVerifyEmail({
@@ -214,13 +210,16 @@ const sendVerifyCodeButtonText = computed(() => {
       type="email"
       name="email"
       :validation="emailValidation"
+      :validation-messages="{
+        matches: $t('core.signup.fields.email.matchFailed'),
+      }"
     ></FormKit>
     <FormKit
       v-if="signUpCond.regRequireVerifyEmail"
       v-model="formState.verifyCode"
       type="number"
       name="code"
-      :placeholder="$t('core.uc_profile.email_verify_modal.fields.code.label')"
+      :placeholder="$t('core.signup.fields.verify_code.placeholder')"
       validation="required"
     >
       <template #suffix>

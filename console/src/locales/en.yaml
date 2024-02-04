@@ -32,6 +32,9 @@ core:
         placeholder: Display name
       email:
         placeholder: Email
+        matchFailed: The email format is wrong or the service provider is not supported.
+      verify_code:
+        placeholder: Verification code
       password:
         placeholder: Password
       password_confirm:

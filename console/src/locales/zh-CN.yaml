@@ -32,6 +32,9 @@ core:
         placeholder: 名称
       email:
         placeholder: 电子邮箱
+        matchFailed: 邮箱格式错误或服务商不受支持
+      verify_code:
+        placeholder: 验证码
       password:
         placeholder: 密码
       password_confirm:

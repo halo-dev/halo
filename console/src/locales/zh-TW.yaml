@@ -32,6 +32,9 @@ core:
         placeholder: 名稱
       email:
         placeholder: 電子郵箱
+        matchFailed: 郵箱格式錯誤或服務商不受支援
+      verify_code:
+        placeholder: 驗證碼
       password:
         placeholder: 密碼
       password_confirm:
