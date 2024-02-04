@@ -6,6 +6,8 @@ import org.springframework.boot.autoconfigure.jackson.Jackson2ObjectMapperBuilde
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.scheduling.annotation.EnableAsync;
+import org.springframework.transaction.ReactiveTransactionManager;
+import org.springframework.transaction.reactive.TransactionalOperator;
 
 @Configuration(proxyBeanMethods = false)
 @EnableAsync
@@ -17,5 +19,10 @@ public class HaloConfiguration {
             builder.serializationInclusion(JsonInclude.Include.NON_NULL);
             builder.featuresToEnable(MapperFeature.ACCEPT_CASE_INSENSITIVE_ENUMS);
         };
+    }
+
+    @Bean
+    TransactionalOperator transactionTemplate(ReactiveTransactionManager transactionManager) {
+        return TransactionalOperator.create(transactionManager);
     }
 }
