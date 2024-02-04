@@ -267,6 +267,7 @@ public class PublicUserEndpoint implements CustomEndpoint {
                     return emailVerificationService.sendRegisterVerificationCode(email)
                         .onErrorMap(RequestNotPermitted.class, RateLimitExceededException::new);
                 })
+                .onErrorMap(RequestNotPermitted.class, RateLimitExceededException::new)
             )
             .then(ServerResponse.ok().build());
     }
