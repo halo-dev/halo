@@ -177,9 +177,6 @@ public class ReactiveExtensionClientImpl implements ReactiveExtensionClient {
             .map(converter::convertTo)
             .flatMap(extStore -> doCreate(extension, extStore.getName(), extStore.getData())
                 .doOnNext(watchers::onAdd)
-                .doOnNext(e -> {
-                    System.out.println(e);
-                })
             )
             .retryWhen(Retry.backoff(3, Duration.ofMillis(100))
                 // retry when generateName is set
@@ -248,11 +245,8 @@ public class ReactiveExtensionClientImpl implements ReactiveExtensionClient {
             var type = (Class<E>) oldExtension.getClass();
             var indexer = indexerFactory.getIndexer(gvk);
             return client.create(name, data)
-                .map(created -> {
-                    E result = converter.convertFrom(type, created);
-                    indexer.indexRecord(result);
-                    return result;
-                })
+                .map(created -> converter.convertFrom(type, created))
+                .doOnNext(indexer::indexRecord)
                 .as(transactionalOperator::transactional);
         });
     }
@@ -263,11 +257,8 @@ public class ReactiveExtensionClientImpl implements ReactiveExtensionClient {
             var type = (Class<E>) oldExtension.getClass();
             var indexer = indexerFactory.getIndexer(oldExtension.groupVersionKind());
             return client.update(name, version, data)
-                .map(updated -> {
-                    E result = converter.convertFrom(type, updated);
-                    indexer.updateRecord(result);
-                    return result;
-                })
+                .map(updated -> converter.convertFrom(type, updated))
+                .doOnNext(indexer::updateRecord)
                 .as(transactionalOperator::transactional);
         });
     }
