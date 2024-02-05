@@ -20,7 +20,6 @@ import run.halo.app.extension.GroupVersionKind;
 import run.halo.app.extension.ListOptions;
 import run.halo.app.extension.ListResult;
 import run.halo.app.extension.PageRequest;
-import run.halo.app.extension.index.query.All;
 import run.halo.app.extension.index.query.QueryIndexViewImpl;
 import run.halo.app.extension.router.selector.FieldSelector;
 import run.halo.app.extension.router.selector.LabelSelector;
@@ -155,12 +154,13 @@ public class IndexedQueryEngineImpl implements IndexedQueryEngine {
         stopWatch.stop();
 
         stopWatch.start("retrieve matched metadata names");
-        var hasLabelSelector = hasLabelSelector(options.getLabelSelector());
-        final List<String> matchedByLabels = hasLabelSelector
-            ? retrieveForLabelMatchers(options.getLabelSelector().getMatchers(), fieldPathEntryMap,
-            allMetadataNames)
-            : allMetadataNames;
-        indexView.removeByIdNotIn(new TreeSet<>(matchedByLabels));
+        if (hasLabelSelector(options.getLabelSelector())) {
+            var matchedByLabels = retrieveForLabelMatchers(options.getLabelSelector().getMatchers(),
+                fieldPathEntryMap, allMetadataNames);
+            if (allMetadataNames.size() != matchedByLabels.size()) {
+                indexView.removeByIdNotIn(new TreeSet<>(matchedByLabels));
+            }
+        }
         stopWatch.stop();
 
         stopWatch.start("retrieve matched metadata names by fields");
@@ -188,8 +188,6 @@ public class IndexedQueryEngineImpl implements IndexedQueryEngine {
     }
 
     boolean hasFieldSelector(FieldSelector fieldSelector) {
-        return fieldSelector != null
-            && fieldSelector.query() != null
-            && !(fieldSelector.query() instanceof All);
+        return fieldSelector != null;
     }
 }

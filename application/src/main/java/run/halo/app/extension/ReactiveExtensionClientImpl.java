@@ -26,7 +26,8 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.util.Predicates;
 import org.springframework.stereotype.Component;
-import org.springframework.transaction.annotation.Transactional;
+import org.springframework.transaction.ReactiveTransactionManager;
+import org.springframework.transaction.reactive.TransactionalOperator;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import reactor.util.retry.Retry;
@@ -40,7 +41,6 @@ import run.halo.app.extension.store.ReactiveExtensionStoreClient;
 
 @Slf4j
 @Component
-@RequiredArgsConstructor
 public class ReactiveExtensionClientImpl implements ReactiveExtensionClient {
 
     private final ReactiveExtensionStoreClient client;
@@ -59,6 +59,28 @@ public class ReactiveExtensionClientImpl implements ReactiveExtensionClient {
 
     private final ConcurrentMap<GroupKind, AtomicBoolean> indexBuildingState =
         new ConcurrentHashMap<>();
+
+    private TransactionalOperator transactionalOperator;
+
+    public ReactiveExtensionClientImpl(ReactiveExtensionStoreClient client,
+        ExtensionConverter converter, SchemeManager schemeManager, ObjectMapper objectMapper,
+        IndexerFactory indexerFactory, IndexedQueryEngine indexedQueryEngine,
+        ReactiveTransactionManager reactiveTransactionManager) {
+        this.client = client;
+        this.converter = converter;
+        this.schemeManager = schemeManager;
+        this.objectMapper = objectMapper;
+        this.indexerFactory = indexerFactory;
+        this.indexedQueryEngine = indexedQueryEngine;
+        this.transactionalOperator = TransactionalOperator.create(reactiveTransactionManager);
+    }
+
+    /**
+     * Only for test.
+     */
+    void setTransactionalOperator(TransactionalOperator transactionalOperator) {
+        this.transactionalOperator = transactionalOperator;
+    }
 
     @Override
     public <E extends Extension> Flux<E> list(Class<E> type, Predicate<E> predicate,
@@ -151,7 +173,6 @@ public class ReactiveExtensionClientImpl implements ReactiveExtensionClient {
     }
 
     @Override
-    @Transactional
     public <E extends Extension> Mono<E> create(E extension) {
         checkClientWritable(extension);
         return Mono.just(extension)
@@ -185,7 +206,6 @@ public class ReactiveExtensionClientImpl implements ReactiveExtensionClient {
     }
 
     @Override
-    @Transactional
     public <E extends Extension> Mono<E> update(E extension) {
         checkClientWritable(extension);
         // Refactor the atomic reference if we have a better solution.
@@ -223,7 +243,6 @@ public class ReactiveExtensionClientImpl implements ReactiveExtensionClient {
     }
 
     @Override
-    @Transactional
     public <E extends Extension> Mono<E> delete(E extension) {
         checkClientWritable(extension);
         // set deletionTimestamp
@@ -247,7 +266,8 @@ public class ReactiveExtensionClientImpl implements ReactiveExtensionClient {
             var indexer = indexerFactory.getIndexer(gvk);
             return client.create(name, data)
                 .map(created -> converter.convertFrom(type, created))
-                .doOnNext(indexer::indexRecord);
+                .doOnNext(indexer::indexRecord)
+                .as(transactionalOperator::transactional);
         });
     }
 
@@ -258,7 +278,8 @@ public class ReactiveExtensionClientImpl implements ReactiveExtensionClient {
             var indexer = indexerFactory.getIndexer(oldExtension.groupVersionKind());
             return client.update(name, version, data)
                 .map(updated -> converter.convertFrom(type, updated))
-                .doOnNext(indexer::updateRecord);
+                .doOnNext(indexer::updateRecord)
+                .as(transactionalOperator::transactional);
         });
     }
 
