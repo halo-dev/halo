@@ -5,11 +5,11 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.context.event.ApplicationStartedEvent;
 import org.springframework.context.event.EventListener;
 import org.springframework.scheduling.annotation.Async;
-import org.springframework.stereotype.Component;
 import org.springframework.util.StopWatch;
 
 @Slf4j
-@Component
+// @Component
+// TODO Remove this class on next version
 public class IndicesInitializer {
 
     private final IndicesService indicesService;
