@@ -36,6 +36,7 @@ import org.mockito.Mock;
 import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.dao.DataIntegrityViolationException;
+import org.springframework.transaction.ReactiveTransactionManager;
 import org.springframework.transaction.reactive.TransactionalOperator;
 import reactor.core.Exceptions;
 import reactor.core.publisher.Flux;
@@ -65,7 +66,7 @@ class ReactiveExtensionClientTest {
     IndexerFactory indexerFactory;
 
     @Mock
-    TransactionalOperator transactionalOperator;
+    ReactiveTransactionManager reactiveTransactionManager;
 
     @Spy
     ObjectMapper objectMapper = JsonMapper.builder()
@@ -80,6 +81,8 @@ class ReactiveExtensionClientTest {
         lenient().when(schemeManager.get(eq(FakeExtension.class)))
             .thenReturn(fakeScheme);
         lenient().when(schemeManager.get(eq(fakeScheme.groupVersionKind()))).thenReturn(fakeScheme);
+        var transactionalOperator = mock(TransactionalOperator.class);
+        client.setTransactionalOperator(transactionalOperator);
         lenient().when(transactionalOperator.transactional(any(Mono.class)))
             .thenAnswer(invocation -> invocation.getArgument(0));
     }

@@ -26,6 +26,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.util.Predicates;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.ReactiveTransactionManager;
 import org.springframework.transaction.reactive.TransactionalOperator;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
@@ -40,7 +41,6 @@ import run.halo.app.extension.store.ReactiveExtensionStoreClient;
 
 @Slf4j
 @Component
-@RequiredArgsConstructor
 public class ReactiveExtensionClientImpl implements ReactiveExtensionClient {
 
     private final ReactiveExtensionStoreClient client;
@@ -57,10 +57,30 @@ public class ReactiveExtensionClientImpl implements ReactiveExtensionClient {
 
     private final IndexedQueryEngine indexedQueryEngine;
 
-    private final TransactionalOperator transactionalOperator;
-
     private final ConcurrentMap<GroupKind, AtomicBoolean> indexBuildingState =
         new ConcurrentHashMap<>();
+
+    private TransactionalOperator transactionalOperator;
+
+    public ReactiveExtensionClientImpl(ReactiveExtensionStoreClient client,
+        ExtensionConverter converter, SchemeManager schemeManager, ObjectMapper objectMapper,
+        IndexerFactory indexerFactory, IndexedQueryEngine indexedQueryEngine,
+        ReactiveTransactionManager reactiveTransactionManager) {
+        this.client = client;
+        this.converter = converter;
+        this.schemeManager = schemeManager;
+        this.objectMapper = objectMapper;
+        this.indexerFactory = indexerFactory;
+        this.indexedQueryEngine = indexedQueryEngine;
+        this.transactionalOperator = TransactionalOperator.create(reactiveTransactionManager);
+    }
+
+    /**
+     * Only for test.
+     */
+    void setTransactionalOperator(TransactionalOperator transactionalOperator) {
+        this.transactionalOperator = transactionalOperator;
+    }
 
     @Override
     public <E extends Extension> Flux<E> list(Class<E> type, Predicate<E> predicate,
