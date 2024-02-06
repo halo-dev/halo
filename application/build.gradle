@@ -83,8 +83,11 @@ tasks.register('createChecksums', Checksum) {
 }
 
 tasks.named('processResources', ProcessResources) {
-    from project(':ui').tasks.named('build')
+    from project(':ui').layout.buildDirectory.dir('dist')
     into layout.buildDirectory.dir('resources/main')
+    configure {
+        mustRunAfter project(':ui').tasks.named('build')
+    }
 }
 
 tasks.named('build') {
