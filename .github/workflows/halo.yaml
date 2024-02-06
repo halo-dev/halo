@@ -27,9 +27,7 @@ jobs:
       - uses: actions/checkout@v3
       - name: Setup Environment
         uses: ./.github/actions/setup-env
-      - name: Check Halo console
-        run: make -C console check
-      - name: Check Halo core
+      - name: Check Halo
         run: ./gradlew check
       - name: Upload coverage reports to Codecov
         uses: codecov/codecov-action@v3
@@ -42,8 +40,6 @@ jobs:
       - uses: actions/checkout@v3
       - name: Setup Environment
         uses: ./.github/actions/setup-env
-      - name: Build Halo console
-        run: make -C console build
       - name: Reset version of Halo
         if: github.event_name == 'release'
         shell: bash
@@ -52,7 +48,7 @@ jobs:
           version=${{ github.event.release.tag_name }}
           version=${version#v}
           sed -i "s/version=.*-SNAPSHOT$/version=$version/1" gradle.properties
-      - name: Build Halo core
+      - name: Build Halo
         run: ./gradlew clean && ./gradlew downloadPluginPresets && ./gradlew build -x check
       - name: Upload Artifacts
         uses: actions/upload-artifact@v4

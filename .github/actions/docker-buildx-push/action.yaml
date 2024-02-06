@@ -41,8 +41,9 @@ runs:
           type=schedule,pattern=nightly-{{date 'YYYYMMDD'}},enabled=${{ github.event_name == 'schedule' }}
           type=ref,event=branch,enabled=${{ github.event_name == 'push' }}
           type=ref,event=pr,enabled=${{ github.event_name == 'pull_request' }}
-          type=semver,pattern={{ version }}
+          type=semver,pattern={{major}}
           type=semver,pattern={{major}}.{{minor}}
+          type=semver,pattern={{ version }}
           type=sha,enabled=${{ github.event_name == 'push' }}
         flavor: |
           latest=false
