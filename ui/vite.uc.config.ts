@@ -1,15 +1,14 @@
 import path from "path";
-import { loadEnv, Plugin } from "vite";
 import VueI18nPlugin from "@intlify/unplugin-vue-i18n/vite";
 import { createViteConfig } from "./src/vite/config-builder";
+import { Plugin } from "vite";
 
 export default ({ mode }: { mode: string }) => {
-  const env = loadEnv(mode, process.cwd(), "");
   return createViteConfig({
-    base: env.VITE_BASE_URL,
-    entryFile: "/console-src/main.ts",
-    port: 3000,
-    outDir: path.resolve("../application/src/main/resources/console"),
+    base: "/uc/",
+    entryFile: "/uc-src/main.ts",
+    port: 4000,
+    outDir: path.resolve("build/dist/uc"),
     mode,
     plugins: [
       VueI18nPlugin({
