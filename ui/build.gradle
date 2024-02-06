@@ -1,0 +1,60 @@
+plugins {
+  id "com.github.node-gradle.node" version "7.0.1"
+}
+
+tasks.register('clean', Delete) {
+  delete layout.buildDirectory
+  delete fileTree('packages') {
+    include '*/dist/**'
+  }
+}
+
+tasks.register('build', PnpmTask) {
+  dependsOn tasks.named('check'), tasks.named('buildPackages')
+  pnpmCommand = ['run', 'build']
+  inputs.files(fileTree(layout.projectDirectory) {
+    include 'console-src/**', 'uc-src/**', 'src/**', 'public/**', '*.js', '*.json', '*.yaml', 'index.html'
+    exclude '**/node_modules/**', '**/build/**', '**/dist/**'
+  })
+  outputs.dir(layout.buildDirectory.dir('dist'))
+  configure {
+    shouldRunAfter tasks.named('clean')
+  }
+}
+
+tasks.register('buildPackages', PnpmTask) {
+  dependsOn tasks.named('pnpmInstall')
+  inputs.files(fileTree('packages') {
+    exclude '**/node_modules/**', '**/dist/**'
+  })
+  inputs.file('package.json')
+  pnpmCommand = ['run', 'build:packages']
+  outputs.files(fileTree('packages') {
+    include '*/dist/**'
+  })
+}
+
+tasks.register('test', PnpmTask) {
+  dependsOn tasks.named('buildPackages')
+  pnpmCommand = ['run', 'test:unit']
+  shouldRunAfter tasks.named('lint'), tasks.named('typecheck')
+}
+
+tasks.register('lint', PnpmTask) {
+  dependsOn tasks.named('buildPackages')
+  pnpmCommand = ['run', 'lint']
+}
+
+tasks.register('typecheck', PnpmTask) {
+  dependsOn tasks.named('buildPackages')
+  pnpmCommand = ['run', 'typecheck']
+}
+
+tasks.register('check') {
+  dependsOn tasks.named('lint'), tasks.named('typecheck'), tasks.named('test')
+}
+
+tasks.register('dev', PnpmTask) {
+  dependsOn tasks.named('buildPackages')
+  pnpmCommand = ['run', 'dev']
+}
