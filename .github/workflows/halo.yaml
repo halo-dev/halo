@@ -24,20 +24,20 @@ jobs:
     if: github.event_name == 'pull_request' || github.event_name == 'push'
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
       - name: Setup Environment
         uses: ./.github/actions/setup-env
       - name: Check Halo
         run: ./gradlew check
       - name: Upload coverage reports to Codecov
-        uses: codecov/codecov-action@v3
+        uses: codecov/codecov-action@v4
 
   build:
     runs-on: ubuntu-latest
     if: always() && (needs.test.result == 'skipped' || needs.test.result == 'success')
     needs: test
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
       - name: Setup Environment
         uses: ./.github/actions/setup-env
       - name: Reset version of Halo
@@ -62,7 +62,7 @@ jobs:
     if: always() && needs.build.result == 'success' && github.event_name == 'release'
     needs: build
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
       - name: Download Artifacts
         uses: actions/download-artifact@v4
         with:
@@ -78,7 +78,7 @@ jobs:
     runs-on: ubuntu-latest
     needs: build
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
       - name: Download Artifacts
         uses: actions/download-artifact@v4
         with:
@@ -99,7 +99,7 @@ jobs:
     runs-on: ubuntu-latest
     needs: build
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
       - name: Download Artifacts
         uses: actions/download-artifact@v4
         with:
