@@ -68,10 +68,12 @@ const getSignupCond = () => {
         signUpCond.allowedEmailProvider = data.allowedEmailProvider;
       }
     })
-    .catch((e) => console.log(e));
+    .catch((e) => console.error("Failed to sign up", e));
 };
 
-const emailValidation: ComputedRef<string | [rule: string, ...args: any[]][] | undefined> = computed(() => {
+const emailValidation: ComputedRef<
+  string | [rule: string, ...args: any[]][] | undefined
+> = computed(() => {
   if (signUpCond.regRequireVerifyEmail)
     return [
       ["required"],
