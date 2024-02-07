@@ -198,16 +198,19 @@ public class PublicUserEndpoint implements CustomEndpoint {
                 .flatMap(userSetting -> {
                     if (userSetting.getRegRequireVerifyEmail()) {
                         if (!StringUtils.isNumeric(signUpRequest.verifyCode)) {
-                            throw new ServerWebInputException("Require verify code");
+                            return Mono.error(new ServerWebInputException("Require verify code"));
                         }
-                        Boolean verified =
-                            emailVerificationService.verifyRegisterVerificationCode(
+                        return emailVerificationService.verifyRegisterVerificationCode(
                                 signUpRequest.user().getSpec().getEmail(),
-                                signUpRequest.verifyCode).block();
-                        if (Boolean.FALSE.equals(verified)) {
-                            throw new ServerWebInputException("Wrong verify code");
-                        }
-                        signUpRequest.user().getSpec().setEmailVerified(true);
+                                signUpRequest.verifyCode)
+                            .flatMap(verified -> {
+                                if (Boolean.FALSE.equals(verified)) {
+                                    return Mono.error(
+                                        new ServerWebInputException("Wrong verify code"));
+                                }
+                                signUpRequest.user().getSpec().setEmailVerified(true);
+                                return Mono.just(signUpRequest);
+                            });
                     }
                     return Mono.just(signUpRequest);
                 })

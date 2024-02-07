@@ -105,10 +105,7 @@ public class EmailVerificationServiceImpl implements EmailVerificationService {
     @Override
     public Mono<Void> sendRegisterVerificationCode(String email) {
         Assert.state(StringUtils.isNotBlank(email), "Email must not be blank");
-        return Mono.empty()
-            .retryWhen(Retry.backoff(8, Duration.ofMillis(100))
-                .filter(OptimisticLockingFailureException.class::isInstance))
-            .then(sendVerificationNotification(email, email));
+        return sendVerificationNotification(email, email);
     }
 
     @Override
