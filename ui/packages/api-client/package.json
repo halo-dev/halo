@@ -22,12 +22,12 @@
   "repository": {
     "type": "git",
     "url": "https://github.com/halo-dev/halo.git",
-    "directory": "console/packages/api-client"
+    "directory": "ui/packages/api-client"
   },
   "bugs": {
     "url": "https://github.com/halo-dev/halo/issues"
   },
-  "homepage": "https://github.com/halo-dev/halo/tree/main/console/packages/api-client#readme",
+  "homepage": "https://github.com/halo-dev/halo/tree/main/ui/packages/api-client#readme",
   "license": "GPL-3.0",
   "exports": {
     ".": {

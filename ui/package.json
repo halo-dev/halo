@@ -1,6 +1,6 @@
 {
   "scripts": {
-    "prepare": "cd .. && husky install console/.husky",
+    "prepare": "cd .. && husky install ui/.husky",
     "dev": "run-p dev:console dev:uc",
     "dev:uc": "vite --host --config ./vite.uc.config.ts",
     "dev:console": "vite --host --config ./vite.config.ts",
