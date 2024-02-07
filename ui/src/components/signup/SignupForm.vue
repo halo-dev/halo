@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import { ref, onMounted, reactive, computed } from "vue";
+import { ref, onMounted, reactive, computed, type ComputedRef } from "vue";
 import { submitForm } from "@formkit/core";
 import { Toast, VButton } from "@halo-dev/components";
 import { apiClient } from "@/utils/api-client";
@@ -71,11 +71,11 @@ const getSignupCond = () => {
     .catch((e) => console.log(e));
 };
 
-const emailValidation = computed(() => {
+const emailValidation: ComputedRef<string | [rule: string, ...args: any[]][] | undefined> = computed(() => {
   if (signUpCond.regRequireVerifyEmail)
     return [
       ["required"],
-      ["matches", new RegExp(signUpCond.allowedEmailProvider)],
+      ["matches", new RegExp(signUpCond.allowedEmailProvider) as RegExp],
     ];
   else return "required|email|length:0,100";
 });
