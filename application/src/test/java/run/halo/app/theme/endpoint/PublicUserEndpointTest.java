@@ -74,7 +74,7 @@ class PublicUserEndpointTest {
         webClient.post()
             .uri("/users/-/signup")
             .header("X-Forwarded-For", "127.0.0.1")
-            .bodyValue(new PublicUserEndpoint.SignUpRequest(user, "fake-password"))
+            .bodyValue(new PublicUserEndpoint.SignUpRequest(user, "fake-password", ""))
             .exchange()
             .expectStatus().isOk();
 
