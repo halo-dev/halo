@@ -219,42 +219,6 @@ export const ApiHaloRunV1alpha1UserApiAxiosParamCreator = function(configuration
         url: toPathString(localVarUrlObj),
         options: localVarRequestOptions
       };
-    },
-    /**
-     * Obtain registration conditions, such as whether email verification is required
-     * @param {*} [options] Override http request option.
-     * @throws {RequiredError}
-     */
-    signUpCondition: async (options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
-      const localVarPath = `/apis/api.halo.run/v1alpha1/users/-/signup/cond`;
-      // use dummy base URL string because the URL constructor only accepts absolute URLs.
-      const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
-      let baseOptions;
-      if (configuration) {
-        baseOptions = configuration.baseOptions;
-      }
-
-      const localVarRequestOptions = { method: "GET", ...baseOptions, ...options };
-      const localVarHeaderParameter = {} as any;
-      const localVarQueryParameter = {} as any;
-
-      // authentication BasicAuth required
-      // http basic authentication required
-      setBasicAuthToObject(localVarRequestOptions, configuration);
-
-      // authentication BearerAuth required
-      // http bearer authentication required
-      await setBearerAuthToObject(localVarHeaderParameter, configuration);
-
-
-      setSearchParams(localVarUrlObj, localVarQueryParameter);
-      let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
-      localVarRequestOptions.headers = { ...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers };
-
-      return {
-        url: toPathString(localVarUrlObj),
-        options: localVarRequestOptions
-      };
     }
   };
 };
@@ -314,17 +278,6 @@ export const ApiHaloRunV1alpha1UserApiFp = function(configuration?: Configuratio
       const index = configuration?.serverIndex ?? 0;
       const operationBasePath = operationServerMap["ApiHaloRunV1alpha1UserApi.signUp"]?.[index]?.url;
       return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, operationBasePath || basePath);
-    },
-    /**
-     * Obtain registration conditions, such as whether email verification is required
-     * @param {*} [options] Override http request option.
-     * @throws {RequiredError}
-     */
-    async signUpCondition(options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<any>> {
-      const localVarAxiosArgs = await localVarAxiosParamCreator.signUpCondition(options);
-      const index = configuration?.serverIndex ?? 0;
-      const operationBasePath = operationServerMap["ApiHaloRunV1alpha1UserApi.signUpCondition"]?.[index]?.url;
-      return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, operationBasePath || basePath);
     }
   };
 };
@@ -371,14 +324,6 @@ export const ApiHaloRunV1alpha1UserApiFactory = function(configuration?: Configu
      */
     signUp(requestParameters: ApiHaloRunV1alpha1UserApiSignUpRequest, options?: AxiosRequestConfig): AxiosPromise<User> {
       return localVarFp.signUp(requestParameters.signUpRequest, options).then((request) => request(axios, basePath));
-    },
-    /**
-     * Obtain registration conditions, such as whether email verification is required
-     * @param {*} [options] Override http request option.
-     * @throws {RequiredError}
-     */
-    signUpCondition(options?: AxiosRequestConfig): AxiosPromise<any> {
-      return localVarFp.signUpCondition(options).then((request) => request(axios, basePath));
     }
   };
 };
@@ -496,14 +441,5 @@ export class ApiHaloRunV1alpha1UserApi extends BaseAPI {
   public signUp(requestParameters: ApiHaloRunV1alpha1UserApiSignUpRequest, options?: AxiosRequestConfig) {
     return ApiHaloRunV1alpha1UserApiFp(this.configuration).signUp(requestParameters.signUpRequest, options).then((request) => request(this.axios, this.basePath));
   }
-
-  /**
-   * Obtain registration conditions, such as whether email verification is required
-   * @param {*} [options] Override http request option.
-   * @throws {RequiredError}
-   * @memberof ApiHaloRunV1alpha1UserApi
-   */
-  public signUpCondition(options?: AxiosRequestConfig) {
-    return ApiHaloRunV1alpha1UserApiFp(this.configuration).signUpCondition(options).then((request) => request(this.axios, this.basePath));
-  }
 }
+

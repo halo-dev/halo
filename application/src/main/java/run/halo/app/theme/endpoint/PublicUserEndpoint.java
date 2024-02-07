@@ -11,7 +11,6 @@ import io.github.resilience4j.ratelimiter.RequestNotPermitted;
 import io.github.resilience4j.reactor.ratelimiter.operator.RateLimiterOperator;
 import io.swagger.v3.oas.annotations.enums.ParameterIn;
 import io.swagger.v3.oas.annotations.media.Schema;
-import java.util.Map;
 import lombok.RequiredArgsConstructor;
 import org.apache.commons.lang3.StringUtils;
 import org.springdoc.webflux.core.fn.SpringdocRouteBuilder;
@@ -68,16 +67,6 @@ public class PublicUserEndpoint implements CustomEndpoint {
                         .implementation(SignUpRequest.class)
                     )
                     .response(responseBuilder().implementation(User.class))
-            )
-            .GET("/users/-/signup/cond", this::signUpCond,
-                builder -> builder.operationId("SignUpCondition")
-                    .description(
-                        "Obtain registration conditions, such as whether email verification is "
-                            + "required"
-                    )
-                    .tag(tag)
-                    .requestBody(requestBodyBuilder().required(false))
-                    .response(responseBuilder().implementation(Map.class))
             )
             .POST("/users/-/send-register-verify-email", this::sendRegisterVerifyEmail,
                 builder -> builder.operationId("SendRegisterVerifyEmail")
@@ -227,21 +216,6 @@ public class PublicUserEndpoint implements CustomEndpoint {
             )
             .transformDeferred(getRateLimiterForSignUp(request.exchange()))
             .onErrorMap(RequestNotPermitted.class, RateLimitExceededException::new);
-    }
-
-    private Mono<ServerResponse> signUpCond(ServerRequest request) {
-        return environmentFetcher.fetch(SystemSetting.User.GROUP, SystemSetting.User.class)
-            .switchIfEmpty(
-                Mono.error(new IllegalStateException("User setting is not configured"))
-            )
-            .map(userSetting -> userSetting.getRegRequireVerifyEmail() ? Map.of(
-                "regRequireVerifyEmail", true,
-                "allowedEmailProvider", userSetting.getAllowedEmailProvider())
-                : Map.of("regRequireVerifyEmail", false)
-            )
-            .flatMap(
-                map -> ServerResponse.ok().contentType(MediaType.APPLICATION_JSON).bodyValue(map)
-            );
     }
 
     private Mono<ServerResponse> sendRegisterVerifyEmail(ServerRequest request) {

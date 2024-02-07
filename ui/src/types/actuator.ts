@@ -13,6 +13,8 @@ export interface GlobalInfo {
   dataInitialized: boolean;
   favicon?: string;
   postSlugGenerationStrategy: ModeType;
+  regRequireVerifyEmail: boolean;
+  allowedEmailProvider: string;
 }
 
 export interface Info {

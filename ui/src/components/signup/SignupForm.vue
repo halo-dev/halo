@@ -7,6 +7,7 @@ import { useRouteQuery } from "@vueuse/router";
 import { useI18n } from "vue-i18n";
 import { useMutation } from "@tanstack/vue-query";
 import { useIntervalFn } from "@vueuse/shared";
+import { useGlobalInfoStore } from "@/stores/global-info";
 
 const { t } = useI18n();
 
@@ -43,13 +44,15 @@ const emit = defineEmits<{
 
 const login = useRouteQuery<string>("login");
 const name = useRouteQuery<string>("name");
+const globalInfoStore = useGlobalInfoStore();
 const signUpCond = reactive({
   regRequireVerifyEmail: false,
   allowedEmailProvider: "",
 });
 
 onMounted(() => {
-  getSignupCond();
+  signUpCond.regRequireVerifyEmail = globalInfoStore.globalInfo?.regRequireVerifyEmail || false;
+  signUpCond.allowedEmailProvider = globalInfoStore.globalInfo?.allowedEmailProvider || "";
   if (login.value) {
     formState.value.user.metadata.name = login.value;
   }
@@ -57,19 +60,6 @@ onMounted(() => {
     formState.value.user.spec.displayName = name.value;
   }
 });
-
-const getSignupCond = () => {
-  apiClient.common.user
-    .signUpCondition()
-    .then((resp) => {
-      const data = resp.data;
-      signUpCond.regRequireVerifyEmail = data.regRequireVerifyEmail;
-      if (signUpCond.regRequireVerifyEmail) {
-        signUpCond.allowedEmailProvider = data.allowedEmailProvider;
-      }
-    })
-    .catch((e) => console.error("Failed to sign up", e));
-};
 
 const emailValidation: ComputedRef<
   string | [rule: string, ...args: any[]][] | undefined
