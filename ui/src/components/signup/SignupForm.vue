@@ -51,8 +51,10 @@ const signUpCond = reactive({
 });
 
 onMounted(() => {
-  signUpCond.regRequireVerifyEmail = globalInfoStore.globalInfo?.regRequireVerifyEmail || false;
-  signUpCond.allowedEmailProvider = globalInfoStore.globalInfo?.allowedEmailProvider || "";
+  signUpCond.regRequireVerifyEmail =
+    globalInfoStore.globalInfo?.regRequireVerifyEmail || false;
+  signUpCond.allowedEmailProvider =
+    globalInfoStore.globalInfo?.allowedEmailProvider || "";
   if (login.value) {
     formState.value.user.metadata.name = login.value;
   }
@@ -62,7 +64,9 @@ onMounted(() => {
 });
 
 const emailValidation: ComputedRef<
-  string | [rule: string, ...args: any[]][] | undefined
+  // please see https://github.com/formkit/formkit/blob/bd5cf1c378d358ed3aba7b494713af20b6c909ab/packages/inputs/src/props.ts#L660
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  string | Array<[rule: string, ...args: any]>
 > = computed(() => {
   if (signUpCond.regRequireVerifyEmail)
     return [
