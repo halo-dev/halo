@@ -36,12 +36,12 @@
   "repository": {
     "type": "git",
     "url": "https://github.com/halo-dev/halo.git",
-    "directory": "console/packages/components"
+    "directory": "ui/packages/components"
   },
   "bugs": {
     "url": "https://github.com/halo-dev/halo/issues"
   },
-  "homepage": "https://github.com/halo-dev/halo/tree/main/console/packages/components#readme",
+  "homepage": "https://github.com/halo-dev/halo/tree/main/ui/packages/components#readme",
   "license": "MIT",
   "devDependencies": {
     "@iconify-json/ri": "^1.1.15",

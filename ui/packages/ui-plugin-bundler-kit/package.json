@@ -1,14 +1,14 @@
 {
   "name": "@halo-dev/ui-plugin-bundler-kit",
   "version": "2.13.0",
-  "homepage": "https://github.com/halo-dev/halo/tree/main/console/packages/ui-plugin-bundler-kit#readme",
+  "homepage": "https://github.com/halo-dev/halo/tree/main/ui/packages/ui-plugin-bundler-kit#readme",
   "bugs": {
     "url": "https://github.com/halo-dev/halo/issues"
   },
   "repository": {
     "type": "git",
     "url": "https://github.com/halo-dev/halo.git",
-    "directory": "console/packages/ui-plugin-bundler-kit"
+    "directory": "ui/packages/ui-plugin-bundler-kit"
   },
   "license": "GPL-3.0",
   "author": "@halo-dev",
