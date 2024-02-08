@@ -2,14 +2,14 @@
   "name": "@halo-dev/richtext-editor",
   "version": "2.13.0",
   "description": "Default editor for Halo",
-  "homepage": "https://github.com/halo-dev/halo/tree/main/console/packages/editor#readme",
+  "homepage": "https://github.com/halo-dev/halo/tree/main/ui/packages/editor#readme",
   "bugs": {
     "url": "https://github.com/halo-dev/halo/issues"
   },
   "repository": {
     "type": "git",
     "url": "https://github.com/halo-dev/halo.git",
-    "directory": "console/packages/editor"
+    "directory": "ui/packages/editor"
   },
   "license": "GPL-3.0",
   "author": "@halo-dev",
