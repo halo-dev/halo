@@ -59,6 +59,10 @@ spec:
               value: "TLS"
             - label: "不加密"
               value: "NONE"
+        - $formkit: text
+          if: "$enable"
+          label: "发送邮件地址"
+          name: "sender"
 ---
 apiVersion: notification.halo.run/v1alpha1
 kind: ReasonType
