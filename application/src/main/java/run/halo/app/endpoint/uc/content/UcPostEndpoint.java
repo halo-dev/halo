@@ -265,6 +265,7 @@ public class UcPostEndpoint implements CustomEndpoint {
                     spec.setReleaseSnapshot(oldSpec.getReleaseSnapshot());
                     spec.setDeleted(oldSpec.getDeleted());
                     post.getMetadata().setName(oldPost.getMetadata().getName());
+                    post.getMetadata().setVersion(oldPost.getMetadata().getVersion());
                 }))
             .flatMap(postService::updateBy);
         return ServerResponse.ok().body(updatedPost, Post.class);
