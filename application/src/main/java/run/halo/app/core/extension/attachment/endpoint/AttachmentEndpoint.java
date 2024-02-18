@@ -21,6 +21,7 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import java.util.List;
 import java.util.Optional;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.BooleanUtils;
 import org.springdoc.core.fn.builders.requestbody.Builder;
 import org.springdoc.webflux.core.fn.SpringdocRouteBuilder;
 import org.springframework.data.domain.Sort;
@@ -188,7 +189,7 @@ public class AttachmentEndpoint implements CustomEndpoint {
                 fieldQuery = and(fieldQuery, contains("spec.displayName", getKeyword().get()));
             }
 
-            if (getUngrouped().isPresent()) {
+            if (getUngrouped().isPresent() && BooleanUtils.isTrue(getUngrouped().get())) {
                 fieldQuery = and(fieldQuery, isNull("spec.groupName"));
             }
 

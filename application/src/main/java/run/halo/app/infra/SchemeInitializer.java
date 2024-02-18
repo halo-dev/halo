@@ -215,6 +215,14 @@ public class SchemeInitializer implements ApplicationListener<ApplicationContext
                 .setIndexFunc(simpleAttribute(Attachment.class,
                     attachment -> attachment.getSpec().getOwnerName()))
             );
+            indexSpecs.add(new IndexSpec()
+                .setName("spec.size")
+                .setIndexFunc(simpleAttribute(Attachment.class,
+                    attachment -> {
+                        var size = attachment.getSpec().getSize();
+                        return size != null ? size.toString() : null;
+                    }))
+            );
         });
         schemeManager.register(PolicyTemplate.class);
         // metrics.halo.run
