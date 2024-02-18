@@ -497,33 +497,41 @@ const Table = TiptapTable.extend<ExtensionOptions & TableOptions>({
           decorations: (state) => {
             const { doc, tr } = state;
             const decorations: Decoration[] = [];
-            doc.descendants((node, pos) => {
-              if (node.type.name === Table.name) {
-                const { view } = this.editor;
-                const nodeDom = view.nodeDOM(pos) || view.domAtPos(pos)?.node;
-                if (!nodeDom) {
-                  return true;
+            if (this.editor.state.tr.doc.nodeSize == tr.doc.nodeSize) {
+              doc.descendants((node, pos) => {
+                if (node.type.name === Table.name) {
+                  // state is a new EditorState, while view is an old EditorView
+                  // View should not be used in decorations because the view
+                  // has not been updated at this time
+                  // But currently, there is no better solution
+                  const { view } = this.editor;
+                  const domAtPos = view.domAtPos(pos).node as HTMLElement;
+                  const nodeDOM = view.nodeDOM(pos) as HTMLElement;
+                  const tableNodeDOM = nodeDOM || domAtPos;
+                  if (!tableNodeDOM || !tableNodeDOM.firstChild) {
+                    return true;
+                  }
+                  const { scrollWidth, clientWidth, scrollLeft } =
+                    tableNodeDOM.firstChild as HTMLElement;
+                  let classNames = "";
+                  if (
+                    scrollWidth > clientWidth &&
+                    scrollLeft < scrollWidth - clientWidth
+                  ) {
+                    classNames += "table-right-shadow ";
+                  }
+                  if (scrollLeft > 0) {
+                    classNames += "table-left-shadow ";
+                  }
+                  decorations.push(
+                    Decoration.node(pos, pos + node.nodeSize, {
+                      class: classNames,
+                    })
+                  );
                 }
-                const { scrollWidth, clientWidth, scrollLeft } =
-                  nodeDom.firstChild as HTMLElement;
-                let classNames = "";
-                if (
-                  scrollWidth > clientWidth &&
-                  scrollLeft < scrollWidth - clientWidth
-                ) {
-                  classNames += "table-right-shadow ";
-                }
-                if (scrollLeft > 0) {
-                  classNames += "table-left-shadow ";
-                }
-                decorations.push(
-                  Decoration.node(pos, pos + node.nodeSize, {
-                    class: classNames,
-                  })
-                );
-              }
-            });
-            return DecorationSet.create(tr.doc, decorations);
+              });
+            }
+            return DecorationSet.create(doc, decorations);
           },
         },
       }),
