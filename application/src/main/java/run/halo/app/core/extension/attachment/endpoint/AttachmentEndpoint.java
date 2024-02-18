@@ -185,15 +185,15 @@ public class AttachmentEndpoint implements CustomEndpoint {
 
             var fieldQuery = all();
             if (getKeyword().isPresent()) {
-                fieldQuery = and(fieldQuery, contains("displayName", getKeyword().get()));
+                fieldQuery = and(fieldQuery, contains("spec.displayName", getKeyword().get()));
             }
 
             if (getUngrouped().isPresent()) {
-                fieldQuery = and(fieldQuery, isNull("groupName"));
+                fieldQuery = and(fieldQuery, isNull("spec.groupName"));
             }
 
             if (!hiddenGroups.isEmpty()) {
-                fieldQuery = and(fieldQuery, not(in("groupName", hiddenGroups)));
+                fieldQuery = and(fieldQuery, not(in("spec.groupName", hiddenGroups)));
             }
 
             listOptions.setFieldSelector(listOptions.getFieldSelector().andQuery(fieldQuery));
