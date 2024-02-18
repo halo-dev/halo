@@ -1,9 +1,11 @@
+# TODO Remove the username-password-authenticator in the future.
 apiVersion: plugin.halo.run/v1alpha1
 kind: ExtensionDefinition
 metadata:
   name: username-password-authenticator
   labels:
     auth.halo.run/extension-point-name: "additional-webfilter"
+  deletionTimestamp: 2024-02-18T08:27:41.257531Z
 spec:
   className: run.halo.app.security.authentication.login.UsernamePasswordAuthenticator
   extensionPointName: additional-webfilter
