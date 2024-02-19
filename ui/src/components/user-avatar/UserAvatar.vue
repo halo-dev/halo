@@ -13,7 +13,7 @@ import {
   Dialog,
   VLoading,
 } from "@halo-dev/components";
-import { ref, defineAsyncComponent, type Ref } from "vue";
+import { ref, defineAsyncComponent, type Ref, toRefs } from "vue";
 import { usePermission } from "@/utils/permission";
 import { useQuery, useQueryClient } from "@tanstack/vue-query";
 import { useI18n } from "vue-i18n";
@@ -32,12 +32,14 @@ const props = withDefaults(
   }
 );
 
+const { isCurrentUser, name } = toRefs(props);
+
 const queryClient = useQueryClient();
 const { currentUserHasPermission } = usePermission();
 const { t } = useI18n();
 
 const { data: avatar, isFetching } = useQuery({
-  queryKey: ["user-avatar", props.name, props.isCurrentUser],
+  queryKey: ["user-avatar", name, isCurrentUser],
   queryFn: async () => {
     const { data } = props.isCurrentUser
       ? await apiClient.user.getCurrentUserDetail()
