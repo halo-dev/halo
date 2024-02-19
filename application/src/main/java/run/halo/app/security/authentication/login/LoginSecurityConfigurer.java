@@ -2,14 +2,13 @@ package run.halo.app.security.authentication.login;
 
 import io.github.resilience4j.ratelimiter.RateLimiterRegistry;
 import io.micrometer.observation.ObservationRegistry;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.MessageSource;
 import org.springframework.http.HttpMethod;
-import org.springframework.lang.NonNull;
 import org.springframework.security.authentication.ObservationReactiveAuthenticationManager;
 import org.springframework.security.authentication.ReactiveAuthenticationManager;
 import org.springframework.security.authentication.UserDetailsRepositoryReactiveAuthenticationManager;
 import org.springframework.security.config.web.server.SecurityWebFiltersOrder;
+import org.springframework.security.config.web.server.ServerHttpSecurity;
 import org.springframework.security.core.userdetails.ReactiveUserDetailsPasswordService;
 import org.springframework.security.core.userdetails.ReactiveUserDetailsService;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -18,21 +17,11 @@ import org.springframework.security.web.server.context.ServerSecurityContextRepo
 import org.springframework.security.web.server.util.matcher.ServerWebExchangeMatchers;
 import org.springframework.stereotype.Component;
 import org.springframework.web.reactive.function.server.ServerResponse;
-import org.springframework.web.server.ServerWebExchange;
-import org.springframework.web.server.WebFilterChain;
-import reactor.core.publisher.Mono;
 import run.halo.app.plugin.extensionpoint.ExtensionGetter;
-import run.halo.app.security.AdditionalWebFilter;
+import run.halo.app.security.authentication.SecurityConfigurer;
 
-/**
- * Authentication filter for username and password.
- *
- * @author guqing
- * @since 2.4.0
- */
-@Slf4j
 @Component
-public class UsernamePasswordAuthenticator implements AdditionalWebFilter {
+public class LoginSecurityConfigurer implements SecurityConfigurer {
 
     private final ObservationRegistry observationRegistry;
 
@@ -46,16 +35,17 @@ public class UsernamePasswordAuthenticator implements AdditionalWebFilter {
 
     private final CryptoService cryptoService;
 
-    private final AuthenticationWebFilter authenticationWebFilter;
-
     private final ExtensionGetter extensionGetter;
+    private final ServerResponse.Context context;
+    private final MessageSource messageSource;
+    private final RateLimiterRegistry rateLimiterRegistry;
 
-    public UsernamePasswordAuthenticator(ServerResponse.Context context,
-        ObservationRegistry observationRegistry, ReactiveUserDetailsService userDetailsService,
+    public LoginSecurityConfigurer(ObservationRegistry observationRegistry,
+        ReactiveUserDetailsService userDetailsService,
         ReactiveUserDetailsPasswordService passwordService, PasswordEncoder passwordEncoder,
         ServerSecurityContextRepository securityContextRepository, CryptoService cryptoService,
-        RateLimiterRegistry rateLimiterRegistry, MessageSource messageSource,
-        ExtensionGetter extensionGetter) {
+        ExtensionGetter extensionGetter, ServerResponse.Context context,
+        MessageSource messageSource, RateLimiterRegistry rateLimiterRegistry) {
         this.observationRegistry = observationRegistry;
         this.userDetailsService = userDetailsService;
         this.passwordService = passwordService;
@@ -63,27 +53,14 @@ public class UsernamePasswordAuthenticator implements AdditionalWebFilter {
         this.securityContextRepository = securityContextRepository;
         this.cryptoService = cryptoService;
         this.extensionGetter = extensionGetter;
-
-        this.authenticationWebFilter = new AuthenticationWebFilter(authenticationManager());
-        configureAuthenticationWebFilter(this.authenticationWebFilter, context, messageSource,
-            rateLimiterRegistry);
+        this.context = context;
+        this.messageSource = messageSource;
+        this.rateLimiterRegistry = rateLimiterRegistry;
     }
 
     @Override
-    @NonNull
-    public Mono<Void> filter(@NonNull ServerWebExchange exchange, @NonNull WebFilterChain chain) {
-        return authenticationWebFilter.filter(exchange, chain);
-    }
-
-    @Override
-    public int getOrder() {
-        return SecurityWebFiltersOrder.FORM_LOGIN.getOrder();
-    }
-
-    void configureAuthenticationWebFilter(AuthenticationWebFilter filter,
-        ServerResponse.Context context,
-        MessageSource messageSource,
-        RateLimiterRegistry rateLimiterRegistry) {
+    public void configure(ServerHttpSecurity http) {
+        var filter = new AuthenticationWebFilter(authenticationManager());
         var requiresMatcher = ServerWebExchangeMatchers.pathMatchers(HttpMethod.POST, "/login");
         var handler = new UsernamePasswordHandler(context, messageSource);
         var authConverter = new LoginAuthenticationConverter(cryptoService, rateLimiterRegistry);
@@ -92,6 +69,8 @@ public class UsernamePasswordAuthenticator implements AdditionalWebFilter {
         filter.setAuthenticationSuccessHandler(handler);
         filter.setServerAuthenticationConverter(authConverter);
         filter.setSecurityContextRepository(securityContextRepository);
+
+        http.addFilterAt(filter, SecurityWebFiltersOrder.FORM_LOGIN);
     }
 
     ReactiveAuthenticationManager authenticationManager() {
@@ -106,5 +85,4 @@ public class UsernamePasswordAuthenticator implements AdditionalWebFilter {
         manager.setUserDetailsPasswordService(passwordService);
         return manager;
     }
-
 }
