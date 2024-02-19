@@ -378,9 +378,9 @@ const { mutateAsync: handlePublish, isLoading: isPublishing } = useMutation({
 // Post setting
 const postSettingEditModal = ref(false);
 
-function handleOpenPostSettingEditModal() {
+async function handleOpenPostSettingEditModal() {
   handleSave({ mute: true });
-  getLatestPost();
+  await getLatestPost();
   postSettingEditModal.value = true;
 }
 
