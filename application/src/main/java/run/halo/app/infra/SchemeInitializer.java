@@ -6,6 +6,7 @@ import static run.halo.app.extension.index.IndexAttributeFactory.simpleAttribute
 
 import java.util.Set;
 import org.apache.commons.lang3.BooleanUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.boot.context.event.ApplicationContextInitializedEvent;
 import org.springframework.context.ApplicationListener;
 import org.springframework.lang.NonNull;
@@ -191,7 +192,38 @@ public class SchemeInitializer implements ApplicationListener<ApplicationContext
         // storage.halo.run
         schemeManager.register(Group.class);
         schemeManager.register(Policy.class);
-        schemeManager.register(Attachment.class);
+        schemeManager.register(Attachment.class, indexSpecs -> {
+            indexSpecs.add(new IndexSpec()
+                .setName("spec.displayName")
+                .setIndexFunc(simpleAttribute(Attachment.class,
+                    attachment -> attachment.getSpec().getDisplayName()))
+            );
+            indexSpecs.add(new IndexSpec()
+                .setName("spec.policyName")
+                .setIndexFunc(simpleAttribute(Attachment.class,
+                    attachment -> attachment.getSpec().getPolicyName()))
+            );
+            indexSpecs.add(new IndexSpec()
+                .setName("spec.groupName")
+                .setIndexFunc(simpleAttribute(Attachment.class, attachment -> {
+                    var group = attachment.getSpec().getGroupName();
+                    return StringUtils.isBlank(group) ? null : group;
+                }))
+            );
+            indexSpecs.add(new IndexSpec()
+                .setName("spec.ownerName")
+                .setIndexFunc(simpleAttribute(Attachment.class,
+                    attachment -> attachment.getSpec().getOwnerName()))
+            );
+            indexSpecs.add(new IndexSpec()
+                .setName("spec.size")
+                .setIndexFunc(simpleAttribute(Attachment.class,
+                    attachment -> {
+                        var size = attachment.getSpec().getSize();
+                        return size != null ? size.toString() : null;
+                    }))
+            );
+        });
         schemeManager.register(PolicyTemplate.class);
         // metrics.halo.run
         schemeManager.register(Counter.class);

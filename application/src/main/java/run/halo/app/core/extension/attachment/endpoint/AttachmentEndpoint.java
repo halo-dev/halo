@@ -1,25 +1,27 @@
 package run.halo.app.core.extension.attachment.endpoint;
 
 import static io.swagger.v3.oas.annotations.media.Schema.RequiredMode.REQUIRED;
-import static java.util.Comparator.comparing;
 import static org.springdoc.core.fn.builders.apiresponse.Builder.responseBuilder;
 import static org.springdoc.core.fn.builders.content.Builder.contentBuilder;
 import static org.springdoc.core.fn.builders.schema.Builder.schemaBuilder;
 import static org.springframework.boot.convert.ApplicationConversionService.getSharedInstance;
 import static org.springframework.web.reactive.function.server.RequestPredicates.contentType;
 import static run.halo.app.extension.ListResult.generateGenericClass;
+import static run.halo.app.extension.index.query.QueryFactory.all;
+import static run.halo.app.extension.index.query.QueryFactory.and;
+import static run.halo.app.extension.index.query.QueryFactory.contains;
+import static run.halo.app.extension.index.query.QueryFactory.in;
+import static run.halo.app.extension.index.query.QueryFactory.isNull;
+import static run.halo.app.extension.index.query.QueryFactory.not;
 import static run.halo.app.extension.router.QueryParamBuildUtil.buildParametersFromType;
-import static run.halo.app.extension.router.selector.SelectorUtil.labelAndFieldSelectorToPredicate;
+import static run.halo.app.extension.router.selector.SelectorUtil.labelAndFieldSelectorToListOptions;
 
 import io.swagger.v3.oas.annotations.media.ArraySchema;
 import io.swagger.v3.oas.annotations.media.Schema;
-import java.util.ArrayList;
-import java.util.Comparator;
 import java.util.List;
-import java.util.Objects;
 import java.util.Optional;
-import java.util.function.Predicate;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.BooleanUtils;
 import org.springdoc.core.fn.builders.requestbody.Builder;
 import org.springdoc.webflux.core.fn.SpringdocRouteBuilder;
 import org.springframework.data.domain.Sort;
@@ -42,11 +44,12 @@ import run.halo.app.core.extension.attachment.Group;
 import run.halo.app.core.extension.endpoint.CustomEndpoint;
 import run.halo.app.core.extension.endpoint.SortResolver;
 import run.halo.app.core.extension.service.AttachmentService;
-import run.halo.app.extension.Comparators;
-import run.halo.app.extension.MetadataUtil;
+import run.halo.app.extension.ListOptions;
+import run.halo.app.extension.PageRequestImpl;
 import run.halo.app.extension.ReactiveExtensionClient;
 import run.halo.app.extension.router.IListRequest;
 import run.halo.app.extension.router.IListRequest.QueryListRequest;
+import run.halo.app.extension.router.selector.LabelSelector;
 
 @Slf4j
 @Component
@@ -107,49 +110,34 @@ public class AttachmentEndpoint implements CustomEndpoint {
 
     Mono<ServerResponse> search(ServerRequest request) {
         var searchRequest = new SearchRequest(request);
-        return client.list(Group.class, group -> MetadataUtil.nullSafeLabels(group)
-                .containsKey(Group.HIDDEN_LABEL), null)
+        var groupListOptions = new ListOptions();
+        groupListOptions.setLabelSelector(LabelSelector.builder()
+            .exists(Group.HIDDEN_LABEL)
+            .build());
+        return client.listAll(Group.class, groupListOptions, Sort.unsorted())
             .map(group -> group.getMetadata().getName())
             .collectList()
             .defaultIfEmpty(List.of())
-            .flatMap(groups -> client.list(Attachment.class,
-                    searchRequest.toPredicate().and(visibleGroupPredicate(groups)),
-                    searchRequest.toComparator(),
-                    searchRequest.getPage(), searchRequest.getSize())
-                .flatMap(listResult -> ServerResponse.ok()
-                    .contentType(MediaType.APPLICATION_JSON)
-                    .bodyValue(listResult)
-                )
+            .flatMap(hiddenGroups -> client.listBy(Attachment.class,
+                        searchRequest.toListOptions(hiddenGroups),
+                        PageRequestImpl.of(searchRequest.getPage(), searchRequest.getSize(),
+                            searchRequest.getSort())
+                    )
+                    .flatMap(listResult -> ServerResponse.ok()
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .bodyValue(listResult)
+                    )
             );
-
-    }
-
-    static Predicate<Attachment> visibleGroupPredicate(List<String> hiddenGroups) {
-        return attachment -> {
-            if (!StringUtils.hasText(attachment.getSpec().getGroupName())) {
-                return true;
-            }
-            return !hiddenGroups.contains(attachment.getSpec().getGroupName());
-        };
     }
 
     public interface ISearchRequest extends IListRequest {
 
-        @Schema(description = "Display name of attachment")
-        Optional<String> getDisplayName();
-
-        @Schema(description = "Name of policy")
-        Optional<String> getPolicy();
-
-        @Schema(description = "Name of group")
-        Optional<String> getGroup();
+        @Schema(description = "Keyword for searching.")
+        Optional<String> getKeyword();
 
         @Schema(description = "Filter attachments without group. This parameter will ignore group"
             + " parameter.")
         Optional<Boolean> getUngrouped();
-
-        @Schema(description = "Name of user who uploaded the attachment")
-        Optional<String> getUploadedBy();
 
         @ArraySchema(uniqueItems = true,
             arraySchema = @Schema(name = "sort",
@@ -159,7 +147,6 @@ public class AttachmentEndpoint implements CustomEndpoint {
                 implementation = String.class,
                 example = "creationTimestamp,desc"))
         Sort getSort();
-
     }
 
     public static class SearchRequest extends QueryListRequest implements ISearchRequest {
@@ -172,20 +159,8 @@ public class AttachmentEndpoint implements CustomEndpoint {
         }
 
         @Override
-        public Optional<String> getDisplayName() {
-            return Optional.ofNullable(queryParams.getFirst("displayName"))
-                .filter(StringUtils::hasText);
-        }
-
-        @Override
-        public Optional<String> getPolicy() {
-            return Optional.ofNullable(queryParams.getFirst("policy"))
-                .filter(StringUtils::hasText);
-        }
-
-        @Override
-        public Optional<String> getGroup() {
-            return Optional.ofNullable(queryParams.getFirst("group"))
+        public Optional<String> getKeyword() {
+            return Optional.ofNullable(queryParams.getFirst("keyword"))
                 .filter(StringUtils::hasText);
         }
 
@@ -196,80 +171,34 @@ public class AttachmentEndpoint implements CustomEndpoint {
         }
 
         @Override
-        public Optional<String> getUploadedBy() {
-            return Optional.ofNullable(queryParams.getFirst("uploadedBy"))
-                .filter(StringUtils::hasText);
-        }
-
-        @Override
         public Sort getSort() {
-            return SortResolver.defaultInstance.resolve(exchange);
+            var sort = SortResolver.defaultInstance.resolve(exchange);
+            sort = sort.and(Sort.by(
+                Sort.Order.desc("metadata.creationTimestamp"),
+                Sort.Order.asc("metadata.name")
+            ));
+            return sort;
         }
 
-        public Predicate<Attachment> toPredicate() {
-            Predicate<Attachment> displayNamePred = attachment -> getDisplayName()
-                .map(displayNameInParam -> {
-                    String displayName = attachment.getSpec().getDisplayName();
-                    return displayName.contains(displayNameInParam);
-                }).orElse(true);
+        public ListOptions toListOptions(List<String> hiddenGroups) {
+            final var listOptions =
+                labelAndFieldSelectorToListOptions(getLabelSelector(), getFieldSelector());
 
-            Predicate<Attachment> policyPred = attachment -> getPolicy()
-                .map(policy -> Objects.equals(policy, attachment.getSpec().getPolicyName()))
-                .orElse(true);
-
-            Predicate<Attachment> groupPred = attachment -> getGroup()
-                .map(group -> Objects.equals(group, attachment.getSpec().getGroupName()))
-                .orElse(true);
-
-            Predicate<Attachment> ungroupedPred = attachment -> getUngrouped()
-                .filter(Boolean::booleanValue)
-                .map(ungrouped -> !StringUtils.hasText(attachment.getSpec().getGroupName()))
-                .orElseGet(() -> groupPred.test(attachment));
-
-            Predicate<Attachment> uploadedByPred = attachment -> getUploadedBy()
-                .map(uploadedBy -> Objects.equals(uploadedBy, attachment.getSpec().getOwnerName()))
-                .orElse(true);
-
-
-            var selectorPred =
-                labelAndFieldSelectorToPredicate(getLabelSelector(), getFieldSelector());
-
-            return displayNamePred
-                .and(policyPred)
-                .and(ungroupedPred)
-                .and(uploadedByPred)
-                .and(selectorPred);
-        }
-
-        public Comparator<Attachment> toComparator() {
-            var sort = getSort();
-            List<Comparator<Attachment>> comparators = new ArrayList<>();
-            var creationOrder = sort.getOrderFor("creationTimestamp");
-            if (creationOrder != null) {
-                Comparator<Attachment> comparator = comparing(
-                    attachment -> attachment.getMetadata().getCreationTimestamp());
-                if (creationOrder.isDescending()) {
-                    comparator = comparator.reversed();
-                }
-                comparators.add(comparator);
+            var fieldQuery = all();
+            if (getKeyword().isPresent()) {
+                fieldQuery = and(fieldQuery, contains("spec.displayName", getKeyword().get()));
             }
 
-            var sizeOrder = sort.getOrderFor("size");
-            if (sizeOrder != null) {
-                Comparator<Attachment> comparator =
-                    comparing(attachment -> attachment.getSpec().getSize());
-                if (sizeOrder.isDescending()) {
-                    comparator = comparator.reversed();
-                }
-                comparators.add(comparator);
+            if (getUngrouped().isPresent() && BooleanUtils.isTrue(getUngrouped().get())) {
+                fieldQuery = and(fieldQuery, isNull("spec.groupName"));
             }
 
-            // add default comparator
-            comparators.add(Comparators.compareCreationTimestamp(false));
-            comparators.add(Comparators.compareName(true));
-            return comparators.stream()
-                .reduce(Comparator::thenComparing)
-                .orElse(null);
+            if (!hiddenGroups.isEmpty()) {
+                fieldQuery = and(fieldQuery, not(in("spec.groupName", hiddenGroups)));
+            }
+
+            listOptions.setFieldSelector(listOptions.getFieldSelector().andQuery(fieldQuery));
+            return listOptions;
         }
     }
 
