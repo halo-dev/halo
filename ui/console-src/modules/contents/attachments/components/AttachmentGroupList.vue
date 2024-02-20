@@ -102,7 +102,7 @@ const handleDelete = (group: Group) => {
     onConfirm: async () => {
       // TODO: 后续将修改为在后端进行批量操作处理
       const { data } = await apiClient.attachment.searchAttachments({
-        group: group.metadata.name,
+        fieldSelector: [`spec.groupName=${group.metadata.name}`],
         page: 0,
         size: 0,
       });
@@ -151,7 +151,7 @@ const handleDeleteWithAttachments = (group: Group) => {
     onConfirm: async () => {
       // TODO: 后续将修改为在后端进行批量操作处理
       const { data } = await apiClient.attachment.searchAttachments({
-        group: group.metadata.name,
+        fieldSelector: [`spec.groupName=${group.metadata.name}`],
         page: 0,
         size: 0,
       });
