@@ -121,12 +121,7 @@ const name = useRouteQuery<string | undefined>("name");
 
 onMounted(async () => {
   if (name.value) {
-    const { data: post } = await apiClient.uc.post.getMyPost({
-      name: name.value,
-    });
-
-    formState.value = post;
-
+    await getLatestPost();
     await handleFetchContent();
     handleResetCache();
     return;
@@ -188,6 +183,17 @@ useAutoSaveContent(currentCache, toRef(content.value, "raw"), async () => {
     onCreatePostSuccess(createdPost);
   }
 });
+
+async function getLatestPost() {
+  if (!name.value) {
+    return;
+  }
+  const { data: latestPost } = await apiClient.uc.post.getMyPost({
+    name: name.value,
+  });
+
+  formState.value = latestPost;
+}
 
 /**
  * Fetch content from the head snapshot.
@@ -372,8 +378,9 @@ const { mutateAsync: handlePublish, isLoading: isPublishing } = useMutation({
 // Post setting
 const postSettingEditModal = ref(false);
 
-function handleOpenPostSettingEditModal() {
+async function handleOpenPostSettingEditModal() {
   handleSave({ mute: true });
+  await getLatestPost();
   postSettingEditModal.value = true;
 }
 
