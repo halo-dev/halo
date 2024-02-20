@@ -173,6 +173,10 @@ public class QueryFactory {
         return new Or(queries);
     }
 
+    public static Query not(Query query) {
+        return new Not(query);
+    }
+
     public static Query betweenLowerExclusive(String fieldName, String lowerValue,
         String upperValue) {
         return new Between(fieldName, lowerValue, false, upperValue, true);

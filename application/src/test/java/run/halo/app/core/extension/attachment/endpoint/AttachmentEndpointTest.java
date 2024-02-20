@@ -1,10 +1,6 @@
 package run.halo.app.core.extension.attachment.endpoint;
 
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.ArgumentMatchers.same;
 import static org.mockito.Mockito.mock;
@@ -17,32 +13,28 @@ import static org.springframework.security.test.web.reactive.server.SecurityMock
 import java.util.List;
 import java.util.Map;
 import java.util.function.Consumer;
-import java.util.function.Predicate;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.MediaType;
 import org.springframework.http.client.MultipartBodyBuilder;
-import org.springframework.mock.http.server.reactive.MockServerHttpRequest;
-import org.springframework.mock.web.reactive.function.server.MockServerRequest;
-import org.springframework.mock.web.server.MockServerWebExchange;
 import org.springframework.test.web.reactive.server.WebTestClient;
 import org.springframework.web.reactive.function.BodyInserters;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import run.halo.app.core.extension.attachment.Attachment;
-import run.halo.app.core.extension.attachment.Attachment.AttachmentSpec;
 import run.halo.app.core.extension.attachment.Group;
 import run.halo.app.core.extension.attachment.Policy;
 import run.halo.app.core.extension.attachment.Policy.PolicySpec;
-import run.halo.app.core.extension.attachment.endpoint.AttachmentEndpoint.SearchRequest;
 import run.halo.app.core.extension.service.impl.DefaultAttachmentService;
 import run.halo.app.extension.ConfigMap;
 import run.halo.app.extension.ListResult;
 import run.halo.app.extension.Metadata;
+import run.halo.app.extension.PageRequest;
 import run.halo.app.extension.ReactiveExtensionClient;
 import run.halo.app.plugin.ExtensionComponentsFinder;
 
@@ -241,10 +233,10 @@ class AttachmentEndpointTest {
 
         @Test
         void shouldListUngroupedAttachments() {
-            when(client.list(eq(Group.class), any(), any()))
+            when(client.listAll(eq(Group.class), any(), any(Sort.class)))
                 .thenReturn(Flux.empty());
 
-            when(client.list(same(Attachment.class), any(), any(), anyInt(), anyInt()))
+            when(client.listBy(same(Attachment.class), any(), any(PageRequest.class)))
                 .thenReturn(Mono.just(ListResult.emptyResult()));
 
             webClient
@@ -257,34 +249,11 @@ class AttachmentEndpointTest {
         }
 
         @Test
-        void shouldFilterWithUngrouped() {
-            var httpRequest = MockServerHttpRequest.get("/attachments")
-                .build();
-            var exchange = new MockServerWebExchange.Builder(httpRequest)
-                .build();
-            MockServerRequest request = MockServerRequest.builder()
-                .queryParam("ungrouped", "true")
-                .queryParam("group", "halo")
-                .exchange(exchange)
-                .build();
-            var searchRequest = new SearchRequest(request);
-            var pred = searchRequest.toPredicate();
-            var attachment = new Attachment();
-            var spec = new AttachmentSpec();
-            attachment.setSpec(spec);
-
-            assertTrue(pred.test(attachment));
-
-            spec.setGroupName("halo");
-            assertFalse(pred.test(attachment));
-        }
-
-        @Test
         void searchAttachmentWhenGroupIsEmpty() {
-            when(client.list(eq(Group.class), any(), any()))
+            when(client.listAll(eq(Group.class), any(), any(Sort.class)))
                 .thenReturn(Flux.empty());
 
-            when(client.list(eq(Attachment.class), any(), any(), anyInt(), anyInt()))
+            when(client.listBy(eq(Attachment.class), any(), any(PageRequest.class)))
                 .thenReturn(Mono.empty());
 
             webClient
@@ -293,32 +262,7 @@ class AttachmentEndpointTest {
                 .exchange()
                 .expectStatus().isOk();
 
-            verify(client).list(eq(Attachment.class), any(), any(), anyInt(), anyInt());
+            verify(client).listBy(eq(Attachment.class), any(), any(PageRequest.class));
         }
     }
-
-    @Test
-    void visibleGroupPredicate() {
-        Predicate<Attachment> noHiddenGroupPredicate =
-            AttachmentEndpoint.visibleGroupPredicate(List.of());
-
-        Attachment attachment = mock(Attachment.class);
-        AttachmentSpec spec = mock(AttachmentSpec.class);
-        when(attachment.getSpec()).thenReturn(spec);
-
-        when(spec.getGroupName()).thenReturn("");
-        assertThat(noHiddenGroupPredicate.test(attachment)).isTrue();
-
-        when(spec.getGroupName()).thenReturn("test");
-        assertThat(noHiddenGroupPredicate.test(attachment)).isTrue();
-
-        Predicate<Attachment> hasHiddenGroupPredicate =
-            AttachmentEndpoint.visibleGroupPredicate(List.of("hidden-group"));
-        when(spec.getGroupName()).thenReturn("fake");
-        assertThat(hasHiddenGroupPredicate.test(attachment)).isTrue();
-
-        when(spec.getGroupName()).thenReturn("hidden-group");
-        assertThat(hasHiddenGroupPredicate.test(attachment)).isFalse();
-    }
-
 }

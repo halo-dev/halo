@@ -248,4 +248,14 @@ class QueryFactoryTest {
             "104", "105"
         );
     }
+
+    @Test
+    void notTest() {
+        var indexView = IndexViewDataSet.createEmployeeIndexView();
+        var resultSet =
+            QueryFactory.not(QueryFactory.contains("firstName", "i")).matches(indexView);
+        assertThat(resultSet).containsExactlyInAnyOrder(
+            "100", "101", "103", "104", "105"
+        );
+    }
 }

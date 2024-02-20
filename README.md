@@ -60,7 +60,7 @@ Halo 使用 GPL-v3.0 协议开源，请遵守开源协议。
 
 ## 贡献
 
-参考 [CONTRIBUTING](https://github.com/halo-dev/halo/blob/master/CONTRIBUTING.md)。
+参考 [CONTRIBUTING](https://github.com/halo-dev/halo/blob/main/CONTRIBUTING.md)。
 
 <a href="https://github.com/halo-dev/halo/graphs/contributors"><img src="https://opencollective.com/halo/contributors.svg?width=890&button=false" /></a>
 

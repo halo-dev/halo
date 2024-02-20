@@ -30,12 +30,12 @@
   "repository": {
     "type": "git",
     "url": "https://github.com/halo-dev/halo.git",
-    "directory": "console/packages/shared"
+    "directory": "ui/packages/shared"
   },
   "bugs": {
     "url": "https://github.com/halo-dev/halo/issues"
   },
-  "homepage": "https://github.com/halo-dev/halo/tree/main/console/packages/shared#readme",
+  "homepage": "https://github.com/halo-dev/halo/tree/main/ui/packages/shared#readme",
   "license": "MIT",
   "devDependencies": {
     "vite-plugin-dts": "^2.3.0"
