@@ -138,7 +138,6 @@ public class UserScopedPatHandlerImpl implements UserScopedPatHandler {
                                     .id(tokenId)
                                     .subject(auth.getName())
                                     .issuedAt(clock.instant())
-                                    .claim("roles", roles)
                                     .claim("pat_name", createdPat.getMetadata().getName());
                                 var expiresAt = createdPat.getSpec().getExpiresAt();
                                 if (expiresAt != null) {
@@ -149,7 +148,6 @@ public class UserScopedPatHandlerImpl implements UserScopedPatHandler {
                                 var jwt = patEncoder.encode(JwtEncoderParameters.from(
                                     headerBuilder.build(),
                                     claimsBuilder.build()));
-                                // TODO Create PAT for the token.
                                 var annotations =
                                     createdPat.getMetadata().getAnnotations();
                                 if (annotations == null) {
