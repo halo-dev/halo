@@ -15,9 +15,6 @@ import {
   type NodeView,
   type EditorState,
   type DOMOutputSpec,
-  Plugin,
-  DecorationSet,
-  Decoration,
 } from "@/tiptap/pm";
 import TableCell from "./table-cell";
 import TableRow from "./table-row";
@@ -129,14 +126,22 @@ class TableView implements NodeView {
     this.containerDOM.addEventListener("wheel", (e) => {
       return this.handleHorizontalWheel(this.containerDOM, e);
     });
+
+    let mouseX = 0;
+    let mouseY = 0;
+    document.addEventListener("mousemove", function (event) {
+      mouseX = event.clientX;
+      mouseY = event.clientY;
+    });
+
     this.containerDOM.addEventListener("scroll", () => {
       if (!editor) {
         return false;
       }
-      const { state, view } = editor;
-      const { tr } = state;
-      view.dispatch(tr);
-      return false;
+      const { view } = editor;
+      const coords = { left: mouseX, top: mouseY };
+      const pos = view.posAtCoords(coords);
+      editor.commands.setTextSelection(pos?.pos || 0);
     });
 
     this.scrollDom = document.createElement("div");
@@ -147,6 +152,11 @@ class TableView implements NodeView {
     this.colgroup = this.table.appendChild(document.createElement("colgroup"));
     updateColumns(node, this.colgroup, this.table, cellMinWidth);
     this.contentDOM = this.table.appendChild(document.createElement("tbody"));
+    // delay execution during initialization, otherwise
+    // the correct scrollWidth cannot be obtained.
+    setTimeout(() => {
+      this.updateTableShadow();
+    });
   }
 
   update(node: ProseMirrorNode) {
@@ -156,7 +166,23 @@ class TableView implements NodeView {
 
     this.node = node;
     updateColumns(node, this.colgroup, this.table, this.cellMinWidth);
+    this.updateTableShadow();
     return true;
+  }
+
+  updateTableShadow() {
+    const { scrollWidth, clientWidth, scrollLeft } = this
+      .containerDOM as HTMLElement;
+    if (scrollWidth > clientWidth && scrollLeft < scrollWidth - clientWidth) {
+      this.dom.classList.add("table-right-shadow");
+    } else {
+      this.dom.classList.remove("table-right-shadow");
+    }
+    if (scrollLeft > 0) {
+      this.dom.classList.add("table-left-shadow");
+    } else {
+      this.dom.classList.remove("table-left-shadow");
+    }
   }
 
   ignoreMutation(
@@ -165,6 +191,7 @@ class TableView implements NodeView {
     return (
       mutation.type === "attributes" &&
       (mutation.target === this.table ||
+        mutation.target === this.dom ||
         this.colgroup.contains(mutation.target))
     );
   }
@@ -486,56 +513,6 @@ const Table = TiptapTable.extend<ExtensionOptions & TableOptions>({
 
   onTransaction() {
     editor = this.editor;
-  },
-
-  addProseMirrorPlugins() {
-    const plugins = this.parent?.() ?? [];
-    return [
-      ...plugins,
-      new Plugin({
-        props: {
-          decorations: (state) => {
-            const { doc, tr } = state;
-            const decorations: Decoration[] = [];
-            if (this.editor.state.tr.doc.nodeSize == tr.doc.nodeSize) {
-              doc.descendants((node, pos) => {
-                if (node.type.name === Table.name) {
-                  // state is a new EditorState, while view is an old EditorView
-                  // View should not be used in decorations because the view
-                  // has not been updated at this time
-                  // But currently, there is no better solution
-                  const { view } = this.editor;
-                  const domAtPos = view.domAtPos(pos).node as HTMLElement;
-                  const nodeDOM = view.nodeDOM(pos) as HTMLElement;
-                  const tableNodeDOM = nodeDOM || domAtPos;
-                  if (!tableNodeDOM || !tableNodeDOM.firstChild) {
-                    return true;
-                  }
-                  const { scrollWidth, clientWidth, scrollLeft } =
-                    tableNodeDOM.firstChild as HTMLElement;
-                  let classNames = "";
-                  if (
-                    scrollWidth > clientWidth &&
-                    scrollLeft < scrollWidth - clientWidth
-                  ) {
-                    classNames += "table-right-shadow ";
-                  }
-                  if (scrollLeft > 0) {
-                    classNames += "table-left-shadow ";
-                  }
-                  decorations.push(
-                    Decoration.node(pos, pos + node.nodeSize, {
-                      class: classNames,
-                    })
-                  );
-                }
-              });
-            }
-            return DecorationSet.create(doc, decorations);
-          },
-        },
-      }),
-    ];
   },
 }).configure({ resizable: true });
 
