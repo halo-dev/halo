@@ -12,6 +12,7 @@ import io.github.resilience4j.reactor.ratelimiter.operator.RateLimiterOperator;
 import io.swagger.v3.oas.annotations.enums.ParameterIn;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.RequiredArgsConstructor;
+import org.apache.commons.lang3.BooleanUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springdoc.webflux.core.fn.SpringdocRouteBuilder;
 import org.springframework.http.HttpStatus;
@@ -35,6 +36,9 @@ import run.halo.app.core.extension.service.UserService;
 import run.halo.app.extension.GroupVersion;
 import run.halo.app.infra.SystemConfigurableEnvironmentFetcher;
 import run.halo.app.infra.SystemSetting;
+import run.halo.app.infra.ValidationUtils;
+import run.halo.app.infra.exception.AccessDeniedException;
+import run.halo.app.infra.exception.EmailVerificationFailed;
 import run.halo.app.infra.exception.RateLimitExceededException;
 import run.halo.app.infra.utils.IpAddressUtils;
 
@@ -179,29 +183,28 @@ public class PublicUserEndpoint implements CustomEndpoint {
 
     private Mono<ServerResponse> signUp(ServerRequest request) {
         return request.bodyToMono(SignUpRequest.class)
+            .doOnNext(signUpRequest -> signUpRequest.user().getSpec().setEmailVerified(false))
             .flatMap(signUpRequest -> environmentFetcher.fetch(SystemSetting.User.GROUP,
                     SystemSetting.User.class)
-                .switchIfEmpty(
-                    Mono.error(new IllegalStateException("User setting is not configured"))
-                )
-                .flatMap(userSetting -> {
-                    if (userSetting.getMustVerifyEmailOnRegistration()) {
-                        if (!StringUtils.isNumeric(signUpRequest.verifyCode)) {
-                            return Mono.error(new ServerWebInputException("Require verify code"));
-                        }
-                        return emailVerificationService.verifyRegisterVerificationCode(
-                                signUpRequest.user().getSpec().getEmail(),
-                                signUpRequest.verifyCode)
-                            .flatMap(verified -> {
-                                if (Boolean.FALSE.equals(verified)) {
-                                    return Mono.error(
-                                        new ServerWebInputException("Wrong verify code"));
-                                }
-                                signUpRequest.user().getSpec().setEmailVerified(true);
-                                return Mono.just(signUpRequest);
-                            });
+                .map(user -> BooleanUtils.isTrue(user.getMustVerifyEmailOnRegistration()))
+                .defaultIfEmpty(false)
+                .flatMap(mustVerifyEmailOnRegistration -> {
+                    if (!mustVerifyEmailOnRegistration) {
+                        return Mono.just(signUpRequest);
                     }
-                    return Mono.just(signUpRequest);
+                    if (!StringUtils.isNumeric(signUpRequest.verifyCode)) {
+                        return Mono.error(new EmailVerificationFailed());
+                    }
+                    return emailVerificationService.verifyRegisterVerificationCode(
+                            signUpRequest.user().getSpec().getEmail(),
+                            signUpRequest.verifyCode)
+                        .flatMap(verified -> {
+                            if (BooleanUtils.isNotTrue(verified)) {
+                                return Mono.error(new EmailVerificationFailed());
+                            }
+                            signUpRequest.user().getSpec().setEmailVerified(true);
+                            return Mono.just(signUpRequest);
+                        });
                 })
             )
             .flatMap(signUpRequest ->
@@ -221,28 +224,26 @@ public class PublicUserEndpoint implements CustomEndpoint {
     private Mono<ServerResponse> sendRegisterVerifyEmail(ServerRequest request) {
         return request.bodyToMono(RegisterVerifyEmailRequest.class)
             .switchIfEmpty(Mono.error(
-                () -> new ServerWebInputException("Request body is required."))
+                () -> new ServerWebInputException("Required request body is missing."))
             )
             .map(emailReq -> {
                 var email = emailReq.email();
-                if (StringUtils.isBlank(email)) {
-                    throw new ServerWebInputException("Email address cannot be blank.");
+                if (ValidationUtils.isValidEmail(email)) {
+                    throw new ServerWebInputException("Invalid email address.");
                 }
                 return email;
             })
             .flatMap(email -> environmentFetcher.fetch(SystemSetting.User.GROUP,
                     SystemSetting.User.class)
-                .switchIfEmpty(
-                    Mono.error(new IllegalStateException("User setting is not configured"))
-                )
-                .flatMap(userSetting -> {
-                    if (!userSetting.getMustVerifyEmailOnRegistration()) {
-                        throw new ServerWebInputException("regRequireVerifyEmail is false");
+                .map(config -> BooleanUtils.isTrue(config.getMustVerifyEmailOnRegistration()))
+                .defaultIfEmpty(false)
+                .doOnNext(mustVerifyEmailOnRegistration -> {
+                    if (!mustVerifyEmailOnRegistration) {
+                        throw new AccessDeniedException("Email verification is not required.");
                     }
-                    return Mono.just(userSetting);
                 })
                 .transformDeferred(sendEmailVerificationCodeRateLimiter(email))
-                .flatMap(userSetting -> emailVerificationService.sendRegisterVerificationCode(email)
+                .flatMap(s -> emailVerificationService.sendRegisterVerificationCode(email)
                     .onErrorMap(RequestNotPermitted.class, RateLimitExceededException::new))
                 .onErrorMap(RequestNotPermitted.class, RateLimitExceededException::new)
             )
