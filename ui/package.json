@@ -74,7 +74,7 @@
     "@vueuse/integrations": "^10.5.0",
     "@vueuse/router": "^10.3.0",
     "@vueuse/shared": "^10.3.0",
-    "axios": "^0.27.2",
+    "axios": "^1.6.7",
     "codemirror": "^6.0.1",
     "colorjs.io": "^0.4.3",
     "cropperjs": "^1.5.13",

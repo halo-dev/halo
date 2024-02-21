@@ -112,7 +112,7 @@ importers:
         version: 10.3.0(vue@3.3.4)
       '@vueuse/integrations':
         specifier: ^10.5.0
-        version: 10.7.1(axios@0.27.2)(fuse.js@6.6.2)(qrcode@1.5.3)(vue@3.3.4)
+        version: 10.7.1(axios@1.6.7)(fuse.js@6.6.2)(qrcode@1.5.3)(vue@3.3.4)
       '@vueuse/router':
         specifier: ^10.3.0
         version: 10.3.0(vue-router@4.2.4)(vue@3.3.4)
@@ -120,8 +120,8 @@ importers:
         specifier: ^10.3.0
         version: 10.3.0(vue@3.3.4)
       axios:
-        specifier: ^0.27.2
-        version: 0.27.2
+        specifier: ^1.6.7
+        version: 1.6.7
       codemirror:
         specifier: ^6.0.1
         version: 6.0.1(@lezer/common@1.0.1)
@@ -364,8 +364,8 @@ importers:
         specifier: ^18.13.0
         version: 18.13.0
       axios:
-        specifier: ^0.27.2
-        version: 0.27.2
+        specifier: ^1.6.7
+        version: 1.6.7
       bumpp:
         specifier: ^8.2.1
         version: 8.2.1
@@ -7343,7 +7343,7 @@ packages:
       - vue
     dev: false
 
-  /@vueuse/integrations@10.7.1(axios@0.27.2)(fuse.js@6.6.2)(qrcode@1.5.3)(vue@3.3.4):
+  /@vueuse/integrations@10.7.1(axios@1.6.7)(fuse.js@6.6.2)(qrcode@1.5.3)(vue@3.3.4):
     resolution: {integrity: sha512-cKo5LEeKVHdBRBtMTOrDPdR0YNtrmN9IBfdcnY2P3m5LHVrsD0xiHUtAH1WKjHQRIErZG6rJUa6GA4tWZt89Og==}
     peerDependencies:
       async-validator: '*'
@@ -7386,7 +7386,7 @@ packages:
     dependencies:
       '@vueuse/core': 10.7.1(vue@3.3.4)
       '@vueuse/shared': 10.7.1(vue@3.3.4)
-      axios: 0.27.2
+      axios: 1.6.7
       fuse.js: 6.6.2
       qrcode: 1.5.3
       vue-demi: 0.14.6(vue@3.3.4)
@@ -7971,7 +7971,7 @@ packages:
   /axios@0.21.4(debug@4.3.2):
     resolution: {integrity: sha512-ut5vewkiu8jjGBdqpM44XxjuCjq9LAKeHVmoVfHVzy8eHgxxq8SbAVQNovDA8mVi05kP0Ea/n/UzcSHcTJQfNg==}
     dependencies:
-      follow-redirects: 1.15.2(debug@4.3.2)
+      follow-redirects: 1.15.5(debug@4.3.2)
     transitivePeerDependencies:
       - debug
     dev: true
@@ -7979,16 +7979,17 @@ packages:
   /axios@0.26.1:
     resolution: {integrity: sha512-fPwcX4EvnSHuInCMItEhAGnaSEXRBjtzh9fOtsE6E1G6p7vl7edEeZe11QHf18+6+9gR5PbKV/sGKNaD8YaMeA==}
     dependencies:
-      follow-redirects: 1.15.2(debug@4.3.2)
+      follow-redirects: 1.15.5(debug@4.3.2)
     transitivePeerDependencies:
       - debug
     dev: true
 
-  /axios@0.27.2:
-    resolution: {integrity: sha512-t+yRIyySRTp/wua5xEr+z1q60QmLq8ABsS5O9Me1AsE5dfKqgnCFzwiCZZ/cGNd1lq4/7akDWMxdhVlucjmnOQ==}
+  /axios@1.6.7:
+    resolution: {integrity: sha512-/hDJGff6/c7u0hDkvkGxR/oy6CbCs8ziCsC7SqmhjfozqiJGc8Z11wrv9z9lYfY4K8l+H9TpjcMDX0xOZmx+RA==}
     dependencies:
-      follow-redirects: 1.15.2(debug@4.3.2)
+      follow-redirects: 1.15.5(debug@4.3.2)
       form-data: 4.0.0
+      proxy-from-env: 1.1.0
     transitivePeerDependencies:
       - debug
 
@@ -10922,8 +10923,8 @@ packages:
     engines: {node: '>=0.4.0'}
     dev: true
 
-  /follow-redirects@1.15.2(debug@4.3.2):
-    resolution: {integrity: sha512-VQLG33o04KaQ8uYi2tVNbdrWp1QWxNNea+nmIB4EVM28v0hmP17z7aG1+wAkNzVq4KeXTq3221ye5qTJP91JwA==}
+  /follow-redirects@1.15.5(debug@4.3.2):
+    resolution: {integrity: sha512-vSFWUON1B+yAw1VN4xMfxgn5fTUiaOzAJCKBwIIgT/+7CuGy9+r+5gITvP62j3RmaD5Ph65UaERdOSRGUzZtgw==}
     engines: {node: '>=4.0'}
     peerDependencies:
       debug: '*'
@@ -14755,7 +14756,6 @@ packages:
 
   /proxy-from-env@1.1.0:
     resolution: {integrity: sha512-D+zkORCbA9f1tdWRK0RaCR3GPv50cMxcrz4X8k5LTSUD1Dkw47mKJEZQNunItRTkWwgtaUSo1RVFRIG9ZXiFYg==}
-    dev: true
 
   /prr@1.0.1:
     resolution: {integrity: sha512-yPw4Sng1gWghHQWj0B3ZggWUm4qVbPwPFcRG8KyxiU7J2OHFSoEHKS+EZ3fv5l1t9CyCiop6l/ZYeWbrgoQejw==}
