@@ -66,7 +66,7 @@ export const uploadFile = async (
     signal,
     onUploadProgress(progressEvent) {
       const progress = Math.round(
-        (progressEvent.loaded * 100) / progressEvent.total
+        (progressEvent.loaded * 100) / (progressEvent.total || 0)
       );
       uploadResponse.onUploadProgress(progress);
     },
