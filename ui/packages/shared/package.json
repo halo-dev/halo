@@ -41,8 +41,8 @@
     "vite-plugin-dts": "^2.3.0"
   },
   "peerDependencies": {
-    "vue": "^3.3.4",
-    "vue-router": "^4.2.4"
+    "vue": "^3.4.19",
+    "vue-router": "^4.2.5"
   },
   "dependencies": {
     "@halo-dev/api-client": "workspace:*"
