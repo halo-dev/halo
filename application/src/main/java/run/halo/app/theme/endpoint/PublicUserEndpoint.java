@@ -228,7 +228,7 @@ public class PublicUserEndpoint implements CustomEndpoint {
             )
             .map(emailReq -> {
                 var email = emailReq.email();
-                if (ValidationUtils.isValidEmail(email)) {
+                if (!ValidationUtils.isValidEmail(email)) {
                     throw new ServerWebInputException("Invalid email address.");
                 }
                 return email;
@@ -242,7 +242,7 @@ public class PublicUserEndpoint implements CustomEndpoint {
                         throw new AccessDeniedException("Email verification is not required.");
                     }
                 })
-                .transformDeferred(sendEmailVerificationCodeRateLimiter(email))
+                .transformDeferred(sendRegisterEmailVerificationCodeRateLimiter(email))
                 .flatMap(s -> emailVerificationService.sendRegisterVerificationCode(email)
                     .onErrorMap(RequestNotPermitted.class, RateLimitExceededException::new))
                 .onErrorMap(RequestNotPermitted.class, RateLimitExceededException::new)
@@ -269,7 +269,7 @@ public class PublicUserEndpoint implements CustomEndpoint {
             });
     }
 
-    private <T> RateLimiterOperator<T> sendEmailVerificationCodeRateLimiter(String email) {
+    private <T> RateLimiterOperator<T> sendRegisterEmailVerificationCodeRateLimiter(String email) {
         String rateLimiterKey = "send-register-verify-email:" + email;
         var rateLimiter =
             rateLimiterRegistry.rateLimiter(rateLimiterKey, "send-email-verification-code");
