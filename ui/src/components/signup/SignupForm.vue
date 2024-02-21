@@ -47,14 +47,11 @@ const name = useRouteQuery<string>("name");
 const globalInfoStore = useGlobalInfoStore();
 const signUpCond = reactive({
   mustVerifyEmailOnRegistration: false,
-  allowedEmailProvider: "",
 });
 
 onMounted(() => {
   signUpCond.mustVerifyEmailOnRegistration =
     globalInfoStore.globalInfo?.mustVerifyEmailOnRegistration || false;
-  signUpCond.allowedEmailProvider =
-    globalInfoStore.globalInfo?.allowedEmailProvider || "";
   if (login.value) {
     formState.value.user.metadata.name = login.value;
   }
@@ -62,17 +59,14 @@ onMounted(() => {
     formState.value.user.spec.displayName = name.value;
   }
 });
-
+const emailRegex = new RegExp("^[\\w\\-.]+@([\\w-]+\\.)+[\\w-]{2,}$");
 const emailValidation: ComputedRef<
   // please see https://github.com/formkit/formkit/blob/bd5cf1c378d358ed3aba7b494713af20b6c909ab/packages/inputs/src/props.ts#L660
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   string | Array<[rule: string, ...args: any]>
 > = computed(() => {
   if (signUpCond.mustVerifyEmailOnRegistration)
-    return [
-      ["required"],
-      ["matches", new RegExp(signUpCond.allowedEmailProvider) as RegExp],
-    ];
+    return [["required"], ["matches", emailRegex]];
   else return "required|email|length:0,100";
 });
 
@@ -117,11 +111,7 @@ const { pause, resume, isActive } = useIntervalFn(
 const { mutate: sendVerifyCode, isLoading: isSending } = useMutation({
   mutationKey: ["send-verify-code"],
   mutationFn: async () => {
-    if (
-      !formState.value.user.spec.email.match(
-        new RegExp(signUpCond.allowedEmailProvider)
-      )
-    ) {
+    if (!formState.value.user.spec.email.match(emailRegex)) {
       Toast.error(t("core.signup.fields.email.matchFailed"));
       throw new Error("email is illegal");
     }

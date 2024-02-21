@@ -85,8 +85,6 @@ public class GlobalInfoEndpoint {
         private List<SocialAuthProvider> socialAuthProviders;
 
         private Boolean mustVerifyEmailOnRegistration;
-
-        private String allowedEmailProvider;
     }
 
     @Data
@@ -123,14 +121,10 @@ public class GlobalInfoEndpoint {
         if (userSetting == null) {
             info.setAllowRegistration(false);
             info.setMustVerifyEmailOnRegistration(false);
-            info.setAllowedEmailProvider("");
         } else {
             info.setAllowRegistration(
                 userSetting.getAllowRegistration() != null && userSetting.getAllowRegistration());
             info.setMustVerifyEmailOnRegistration(userSetting.getMustVerifyEmailOnRegistration());
-            if (userSetting.getMustVerifyEmailOnRegistration()) {
-                info.setAllowedEmailProvider(userSetting.getAllowedEmailProvider());
-            }
         }
     }
 

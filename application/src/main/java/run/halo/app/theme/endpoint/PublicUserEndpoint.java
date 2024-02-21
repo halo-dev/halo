@@ -223,7 +223,13 @@ public class PublicUserEndpoint implements CustomEndpoint {
             .switchIfEmpty(Mono.error(
                 () -> new ServerWebInputException("Request body is required."))
             )
-            .map(RegisterVerifyEmailRequest::email)
+            .map(emailReq -> {
+                var email = emailReq.email();
+                if (StringUtils.isBlank(email)) {
+                    throw new ServerWebInputException("Email address cannot be blank.");
+                }
+                return email;
+            })
             .flatMap(email -> environmentFetcher.fetch(SystemSetting.User.GROUP,
                     SystemSetting.User.class)
                 .switchIfEmpty(
@@ -236,14 +242,8 @@ public class PublicUserEndpoint implements CustomEndpoint {
                     return Mono.just(userSetting);
                 })
                 .transformDeferred(sendEmailVerificationCodeRateLimiter(email))
-                .map(SystemSetting.User::getAllowedEmailProvider)
-                .flatMap(allowedEmailProvider -> {
-                    if (!email.matches(allowedEmailProvider)) {
-                        throw new ServerWebInputException("Invalid email address.");
-                    }
-                    return emailVerificationService.sendRegisterVerificationCode(email)
-                        .onErrorMap(RequestNotPermitted.class, RateLimitExceededException::new);
-                })
+                .flatMap(userSetting -> emailVerificationService.sendRegisterVerificationCode(email)
+                    .onErrorMap(RequestNotPermitted.class, RateLimitExceededException::new))
                 .onErrorMap(RequestNotPermitted.class, RateLimitExceededException::new)
             )
             .then(ServerResponse.ok().build());
