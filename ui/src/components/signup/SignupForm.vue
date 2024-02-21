@@ -46,13 +46,13 @@ const login = useRouteQuery<string>("login");
 const name = useRouteQuery<string>("name");
 const globalInfoStore = useGlobalInfoStore();
 const signUpCond = reactive({
-  regRequireVerifyEmail: false,
+  mustVerifyEmailOnRegistration: false,
   allowedEmailProvider: "",
 });
 
 onMounted(() => {
-  signUpCond.regRequireVerifyEmail =
-    globalInfoStore.globalInfo?.regRequireVerifyEmail || false;
+  signUpCond.mustVerifyEmailOnRegistration =
+    globalInfoStore.globalInfo?.mustVerifyEmailOnRegistration || false;
   signUpCond.allowedEmailProvider =
     globalInfoStore.globalInfo?.allowedEmailProvider || "";
   if (login.value) {
@@ -68,7 +68,7 @@ const emailValidation: ComputedRef<
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   string | Array<[rule: string, ...args: any]>
 > = computed(() => {
-  if (signUpCond.regRequireVerifyEmail)
+  if (signUpCond.mustVerifyEmailOnRegistration)
     return [
       ["required"],
       ["matches", new RegExp(signUpCond.allowedEmailProvider) as RegExp],
@@ -213,7 +213,7 @@ const sendVerifyCodeButtonText = computed(() => {
       }"
     ></FormKit>
     <FormKit
-      v-if="signUpCond.regRequireVerifyEmail"
+      v-if="signUpCond.mustVerifyEmailOnRegistration"
       v-model="formState.verifyCode"
       type="number"
       name="code"

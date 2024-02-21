@@ -72,7 +72,7 @@ public class PublicUserEndpoint implements CustomEndpoint {
                 builder -> builder.operationId("SendRegisterVerifyEmail")
                     .description(
                         "Send registration verification email, which can be called when "
-                            + "regRequireVerifyEmail in user settings is true"
+                            + "mustVerifyEmailOnRegistration in user settings is true"
                     )
                     .tag(tag)
                     .requestBody(requestBodyBuilder()
@@ -185,7 +185,7 @@ public class PublicUserEndpoint implements CustomEndpoint {
                     Mono.error(new IllegalStateException("User setting is not configured"))
                 )
                 .flatMap(userSetting -> {
-                    if (userSetting.getRegRequireVerifyEmail()) {
+                    if (userSetting.getMustVerifyEmailOnRegistration()) {
                         if (!StringUtils.isNumeric(signUpRequest.verifyCode)) {
                             return Mono.error(new ServerWebInputException("Require verify code"));
                         }
@@ -230,7 +230,7 @@ public class PublicUserEndpoint implements CustomEndpoint {
                     Mono.error(new IllegalStateException("User setting is not configured"))
                 )
                 .flatMap(userSetting -> {
-                    if (!userSetting.getRegRequireVerifyEmail()) {
+                    if (!userSetting.getMustVerifyEmailOnRegistration()) {
                         throw new ServerWebInputException("regRequireVerifyEmail is false");
                     }
                     return Mono.just(userSetting);
