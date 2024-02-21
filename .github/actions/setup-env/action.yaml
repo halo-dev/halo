@@ -20,7 +20,7 @@ inputs:
 runs:
   using: "composite"
   steps:
-    - uses: pnpm/action-setup@v2
+    - uses: pnpm/action-setup@v3
       name: Setup pnpm
       with:
         version: ${{ inputs.pnpm-version }}

@@ -78,7 +78,7 @@ const handleOpenCreateNewPolicyModal = (policyTemplate: PolicyTemplate) => {
 
 const handleDelete = async (policy: Policy) => {
   const { data } = await apiClient.attachment.searchAttachments({
-    policy: policy.metadata.name,
+    fieldSelector: [`spec.policyName=${policy.metadata.name}`],
   });
 
   if (data.total > 0) {

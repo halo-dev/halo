@@ -131,7 +131,7 @@ core:
         notification:
           title: 通知
           empty:
-            title: 当前没有未读的消息
+            title: 當前沒有未讀的消息
         quicklink:
           title: 快捷訪問
           actions:
@@ -1249,8 +1249,8 @@ core:
     role-template-manage-categories: 分類管理
     role-template-view-categories: 分類查看
     role-template-manage-posts: 文章管理
-    role-template-post-author: 允许管理自己的文章
-    role-template-post-contributor: 允许投稿
+    role-template-post-author: 允許管理自己的文章
+    role-template-post-contributor: 允許投稿
     role-template-post-publisher: 允許發布自己的文章
     role-template-post-attachment-manager: 允許在文章中上傳圖片
     Roles Management: 角色
@@ -1283,8 +1283,8 @@ core:
     Configure Notifier: 配置通知器
     Notification Configuration: 通知配置
     Post Attachment Manager: 允許在文章中上傳圖片
-    Post Author: 允许管理自己的文章
-    Post Contributor: 允许投稿
+    Post Author: 允許管理自己的文章
+    Post Contributor: 允許投稿
     Post Publisher: 允許發布自己的文章
   components:
     submit_button:
@@ -1323,7 +1323,7 @@ core:
             placeholder: 輸入連結，按回車確定
           operations:
             replace:
-              button: 替换
+              button: 替換
       toolbox:
         attachment: 選擇附件
         show_hide_sidebar: 顯示 / 隱藏側邊欄
@@ -1419,7 +1419,7 @@ core:
       view_all: 查看全部
       modify: 修改
       verify: 驗證
-      access: 访问
+      access: 訪問
     radio:
       "yes": 是
       "no": 否
@@ -1503,7 +1503,7 @@ core:
   uc_reset_password:
     fields:
       username:
-        label: 用户名
+        label: 用戶名
       password:
         label: 新密碼
       password_confirm:

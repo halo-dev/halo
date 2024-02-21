@@ -50,14 +50,28 @@ export function useAttachmentControl(filterOptions: {
   const { data, isLoading, isFetching, refetch } = useQuery<Attachment[]>({
     queryKey: ["attachments", policy, keyword, group, user, page, size, sort],
     queryFn: async () => {
+      const isUnGrouped = group?.value?.metadata.name === "ungrouped";
+
+      const fieldSelectorMap: Record<string, string | undefined> = {
+        "spec.policyName": policy?.value?.metadata.name,
+        "spec.ownerName": user?.value,
+        "spec.groupName": isUnGrouped ? undefined : group?.value?.metadata.name,
+      };
+
+      const fieldSelector = Object.entries(fieldSelectorMap)
+        .map(([key, value]) => {
+          if (value) {
+            return `${key}=${value}`;
+          }
+        })
+        .filter(Boolean) as string[];
+
       const { data } = await apiClient.attachment.searchAttachments({
-        policy: policy?.value?.metadata.name,
-        displayName: keyword?.value,
-        group: group?.value?.metadata.name,
-        ungrouped: group?.value?.metadata.name === "ungrouped",
-        uploadedBy: user?.value,
-        page: page?.value,
-        size: size?.value,
+        fieldSelector,
+        page: page.value,
+        size: size.value,
+        ungrouped: isUnGrouped,
+        keyword: keyword?.value,
         sort: [sort?.value as string].filter(Boolean),
       });
 

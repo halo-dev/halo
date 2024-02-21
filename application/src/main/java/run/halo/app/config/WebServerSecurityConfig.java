@@ -30,9 +30,7 @@ import run.halo.app.core.extension.service.UserService;
 import run.halo.app.extension.ReactiveExtensionClient;
 import run.halo.app.infra.AnonymousUserConst;
 import run.halo.app.infra.properties.HaloProperties;
-import run.halo.app.plugin.extensionpoint.ExtensionGetter;
 import run.halo.app.security.DefaultUserDetailService;
-import run.halo.app.security.DynamicMatcherSecurityWebFilterChain;
 import run.halo.app.security.authentication.SecurityConfigurer;
 import run.halo.app.security.authentication.login.CryptoService;
 import run.halo.app.security.authentication.login.PublicKeyRouteBuilder;
@@ -60,7 +58,6 @@ public class WebServerSecurityConfig {
         RoleService roleService,
         ObjectProvider<SecurityConfigurer> securityConfigurers,
         ServerSecurityContextRepository securityContextRepository,
-        ExtensionGetter extensionGetter,
         ReactiveExtensionClient client,
         PatJwkSupplier patJwkSupplier) {
 
@@ -92,7 +89,7 @@ public class WebServerSecurityConfig {
         // Integrate with other configurers separately
         securityConfigurers.orderedStream()
             .forEach(securityConfigurer -> securityConfigurer.configure(http));
-        return new DynamicMatcherSecurityWebFilterChain(extensionGetter, http.build());
+        return http.build();
     }
 
     @Bean
