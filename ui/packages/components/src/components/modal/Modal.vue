@@ -34,7 +34,7 @@ const emit = defineEmits<{
   (event: "close"): void;
 }>();
 
-const internalVisible = ref(false);
+const internalVisible = ref<boolean | undefined>(false);
 const rootVisible = ref(false);
 const modelWrapper = ref<HTMLElement>();
 
