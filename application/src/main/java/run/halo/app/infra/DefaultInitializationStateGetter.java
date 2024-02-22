@@ -1,6 +1,7 @@
 package run.halo.app.infra;
 
 import static org.apache.commons.lang3.BooleanUtils.isTrue;
+import static run.halo.app.extension.index.query.QueryFactory.isNull;
 
 import java.util.concurrent.atomic.AtomicBoolean;
 import lombok.RequiredArgsConstructor;
@@ -8,8 +9,11 @@ import org.springframework.stereotype.Component;
 import reactor.core.publisher.Mono;
 import run.halo.app.core.extension.User;
 import run.halo.app.extension.ConfigMap;
-import run.halo.app.extension.MetadataUtil;
+import run.halo.app.extension.ListOptions;
+import run.halo.app.extension.PageRequestImpl;
 import run.halo.app.extension.ReactiveExtensionClient;
+import run.halo.app.extension.router.selector.FieldSelector;
+import run.halo.app.extension.router.selector.LabelSelector;
 
 /**
  * <p>A cache that caches system setup state.</p>
@@ -50,16 +54,15 @@ public class DefaultInitializationStateGetter implements InitializationStateGett
     }
 
     private Mono<Boolean> hasUser() {
-        return client.list(User.class,
-                user -> {
-                    var labels = MetadataUtil.nullSafeLabels(user);
-                    return isNotTrue(labels.get("halo.run/hidden-user"));
-                }, null, 1, 10)
+        var listOptions = new ListOptions();
+        listOptions.setLabelSelector(LabelSelector.builder()
+            .notEq(User.HIDDEN_USER_LABEL, "true")
+            .build()
+        );
+        listOptions.setFieldSelector(
+            FieldSelector.of(isNull("metadata.deletionTimestamp")));
+        return client.listBy(User.class, listOptions, PageRequestImpl.ofSize(1))
             .map(result -> result.getTotal() > 0)
             .defaultIfEmpty(false);
-    }
-
-    static boolean isNotTrue(String value) {
-        return !Boolean.parseBoolean(value);
     }
 }

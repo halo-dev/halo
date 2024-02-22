@@ -2,10 +2,8 @@ package run.halo.app.core.extension.endpoint;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.ArgumentMatchers.anySet;
 import static org.mockito.ArgumentMatchers.anyString;
-import static org.mockito.ArgumentMatchers.argThat;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.ArgumentMatchers.same;
 import static org.mockito.Mockito.mock;
@@ -18,11 +16,9 @@ import static org.springframework.test.web.reactive.server.WebTestClient.bindToR
 import static run.halo.app.extension.GroupVersionKind.fromExtension;
 
 import java.time.Instant;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 import java.util.Set;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -48,6 +44,7 @@ import run.halo.app.core.extension.service.RoleService;
 import run.halo.app.core.extension.service.UserService;
 import run.halo.app.extension.ListResult;
 import run.halo.app.extension.Metadata;
+import run.halo.app.extension.PageRequest;
 import run.halo.app.extension.ReactiveExtensionClient;
 import run.halo.app.extension.exception.ExtensionNotFoundException;
 import run.halo.app.infra.SystemConfigurableEnvironmentFetcher;
@@ -91,7 +88,7 @@ class UserEndpointTest {
 
         @Test
         void shouldListEmptyUsersWhenNoUsers() {
-            when(client.list(same(User.class), any(), any(), anyInt(), anyInt()))
+            when(client.listBy(same(User.class), any(), any(PageRequest.class)))
                 .thenReturn(Mono.just(ListResult.emptyResult()));
 
             bindToRouterFunction(endpoint.endpoint())
@@ -113,7 +110,7 @@ class UserEndpointTest {
             );
             var expectResult = new ListResult<>(users);
             when(roleService.list(anySet())).thenReturn(Flux.empty());
-            when(client.list(same(User.class), any(), any(), anyInt(), anyInt()))
+            when(client.listBy(same(User.class), any(), any(PageRequest.class)))
                 .thenReturn(Mono.just(expectResult));
 
             bindToRouterFunction(endpoint.endpoint())
@@ -141,35 +138,11 @@ class UserEndpointTest {
                         }
                     }
                     """, User.class);
-            var unexpectedUser1 =
-                JsonUtils.jsonToObject("""
-                    {
-                        "apiVersion": "v1alpha1",
-                        "kind": "User",
-                        "metadata": {
-                            "name": "admin",
-                            "annotations": {
-                                "rbac.authorization.halo.run/role-names": "[\\"super-role\\"]"
-                            }
-                        }
-                    }
-                    """, User.class);
-            var unexpectedUser2 =
-                JsonUtils.jsonToObject("""
-                    {
-                        "apiVersion": "v1alpha1",
-                        "kind": "User",
-                        "metadata": {
-                            "name": "joey",
-                            "annotations": {}
-                        }
-                    }
-                    """, User.class);
             var users = List.of(
                 expectUser
             );
             var expectResult = new ListResult<>(users);
-            when(client.list(same(User.class), any(), any(), anyInt(), anyInt()))
+            when(client.listBy(same(User.class), any(), any(PageRequest.class)))
                 .thenReturn(Mono.just(expectResult));
             when(roleService.list(anySet())).thenReturn(Flux.empty());
 
@@ -178,24 +151,14 @@ class UserEndpointTest {
                 .get().uri("/users?role=guest")
                 .exchange()
                 .expectStatus().isOk();
-
-            verify(client).list(same(User.class), argThat(
-                    predicate -> predicate.test(expectUser)
-                        && !predicate.test(unexpectedUser1)
-                        && !predicate.test(unexpectedUser2)),
-                any(), anyInt(), anyInt());
         }
 
         @Test
         void shouldSortUsersWhenCreationTimestampSet() {
             var expectUser =
                 createUser("fake-user-2", "expected display name");
-            var unexpectedUser1 =
-                createUser("fake-user-1", "first fake display name");
-            var unexpectedUser2 =
-                createUser("fake-user-3", "second fake display name");
             var expectResult = new ListResult<>(List.of(expectUser));
-            when(client.list(same(User.class), any(), any(), anyInt(), anyInt()))
+            when(client.listBy(same(User.class), any(), any(PageRequest.class)))
                 .thenReturn(Mono.just(expectResult));
             when(roleService.list(anySet())).thenReturn(Flux.empty());
 
@@ -204,21 +167,6 @@ class UserEndpointTest {
                 .get().uri("/users?sort=creationTimestamp,desc")
                 .exchange()
                 .expectStatus().isOk();
-
-            verify(client).list(same(User.class), any(), argThat(comparator -> {
-                var now = Instant.now();
-                var users = new ArrayList<>(List.of(
-                    createUser("fake-user-a", now),
-                    createUser("fake-user-b", now.plusSeconds(1)),
-                    createUser("fake-user-c", now.plusSeconds(2))
-                ));
-                users.sort(comparator);
-                return Objects.deepEquals(users, List.of(
-                    createUser("fake-user-c", now.plusSeconds(2)),
-                    createUser("fake-user-b", now.plusSeconds(1)),
-                    createUser("fake-user-a", now)
-                ));
-            }), anyInt(), anyInt());
         }
 
         User createUser(String name) {
