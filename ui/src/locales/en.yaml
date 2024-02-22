@@ -32,6 +32,17 @@ core:
         placeholder: Display name
       email:
         placeholder: Email
+        matchFailed: The email format is wrong or the service provider is not supported.
+      verify_code:
+        placeholder: Verification code
+        operations:
+          send_code:
+            buttons:
+              sending: sending
+              send: Send Code
+              countdown: "resend after {timer} seconds"
+            toast_success: verification code sent
+            toast_email_empty: please enter your email address
       password:
         placeholder: Password
       password_confirm:

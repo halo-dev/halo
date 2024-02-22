@@ -13,19 +13,12 @@
  */
 
 export interface ConfigurationParameters {
-  apiKey?:
-    | string
-    | Promise<string>
-    | ((name: string) => string)
-    | ((name: string) => Promise<string>);
+  apiKey?: string | Promise<string> | ((name: string) => string) | ((name: string) => Promise<string>);
   username?: string;
   password?: string;
-  accessToken?:
-    | string
-    | Promise<string>
-    | ((name?: string, scopes?: string[]) => string)
-    | ((name?: string, scopes?: string[]) => Promise<string>);
+  accessToken?: string | Promise<string> | ((name?: string, scopes?: string[]) => string) | ((name?: string, scopes?: string[]) => Promise<string>);
   basePath?: string;
+  serverIndex?: number;
   baseOptions?: any;
   formDataCtor?: new () => any;
 }
@@ -36,11 +29,7 @@ export class Configuration {
    * @param name security name
    * @memberof Configuration
    */
-  apiKey?:
-    | string
-    | Promise<string>
-    | ((name: string) => string)
-    | ((name: string) => Promise<string>);
+  apiKey?: string | Promise<string> | ((name: string) => string) | ((name: string) => Promise<string>);
   /**
    * parameter for basic security
    *
@@ -61,11 +50,7 @@ export class Configuration {
    * @param scopes oauth2 scope
    * @memberof Configuration
    */
-  accessToken?:
-    | string
-    | Promise<string>
-    | ((name?: string, scopes?: string[]) => string)
-    | ((name?: string, scopes?: string[]) => Promise<string>);
+  accessToken?: string | Promise<string> | ((name?: string, scopes?: string[]) => string) | ((name?: string, scopes?: string[]) => Promise<string>);
   /**
    * override base path
    *
@@ -73,6 +58,13 @@ export class Configuration {
    * @memberof Configuration
    */
   basePath?: string;
+  /**
+   * override server index
+   *
+   * @type {number}
+   * @memberof Configuration
+   */
+  serverIndex?: number;
   /**
    * base options for axios calls
    *
@@ -95,6 +87,7 @@ export class Configuration {
     this.password = param.password;
     this.accessToken = param.accessToken;
     this.basePath = param.basePath;
+    this.serverIndex = param.serverIndex;
     this.baseOptions = param.baseOptions;
     this.formDataCtor = param.formDataCtor;
   }
@@ -110,14 +103,7 @@ export class Configuration {
    * @return True if the given MIME is JSON, false otherwise.
    */
   public isJsonMime(mime: string): boolean {
-    const jsonMime: RegExp = new RegExp(
-      "^(application/json|[^;/ \t]+/[^;/ \t]+[+]json)[ \t]*(;.*)?$",
-      "i"
-    );
-    return (
-      mime !== null &&
-      (jsonMime.test(mime) ||
-        mime.toLowerCase() === "application/json-patch+json")
-    );
+    const jsonMime: RegExp = new RegExp("^(application\/json|[^;/ \t]+\/[^;/ \t]+[+]json)[ \t]*(;.*)?$", "i");
+    return mime !== null && (jsonMime.test(mime) || mime.toLowerCase() === "application/json-patch+json");
   }
 }

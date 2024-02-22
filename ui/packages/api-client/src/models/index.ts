@@ -148,6 +148,7 @@ export * from "./reason-type-notifier-matrix";
 export * from "./reason-type-notifier-request";
 export * from "./reason-type-spec";
 export * from "./ref";
+export * from "./register-verify-email-request";
 export * from "./reply";
 export * from "./reply-list";
 export * from "./reply-request";

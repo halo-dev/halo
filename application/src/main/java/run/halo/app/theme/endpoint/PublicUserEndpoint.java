@@ -1,5 +1,6 @@
 package run.halo.app.theme.endpoint;
 
+import static io.swagger.v3.oas.annotations.media.Schema.RequiredMode.NOT_REQUIRED;
 import static io.swagger.v3.oas.annotations.media.Schema.RequiredMode.REQUIRED;
 import static org.springdoc.core.fn.builders.apiresponse.Builder.responseBuilder;
 import static org.springdoc.core.fn.builders.parameter.Builder.parameterBuilder;
@@ -11,6 +12,7 @@ import io.github.resilience4j.reactor.ratelimiter.operator.RateLimiterOperator;
 import io.swagger.v3.oas.annotations.enums.ParameterIn;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.RequiredArgsConstructor;
+import org.apache.commons.lang3.BooleanUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springdoc.webflux.core.fn.SpringdocRouteBuilder;
 import org.springframework.http.HttpStatus;
@@ -29,8 +31,14 @@ import reactor.core.publisher.Mono;
 import run.halo.app.core.extension.User;
 import run.halo.app.core.extension.endpoint.CustomEndpoint;
 import run.halo.app.core.extension.service.EmailPasswordRecoveryService;
+import run.halo.app.core.extension.service.EmailVerificationService;
 import run.halo.app.core.extension.service.UserService;
 import run.halo.app.extension.GroupVersion;
+import run.halo.app.infra.SystemConfigurableEnvironmentFetcher;
+import run.halo.app.infra.SystemSetting;
+import run.halo.app.infra.ValidationUtils;
+import run.halo.app.infra.exception.AccessDeniedException;
+import run.halo.app.infra.exception.EmailVerificationFailed;
 import run.halo.app.infra.exception.RateLimitExceededException;
 import run.halo.app.infra.utils.IpAddressUtils;
 
@@ -48,6 +56,8 @@ public class PublicUserEndpoint implements CustomEndpoint {
     private final ReactiveUserDetailsService reactiveUserDetailsService;
     private final EmailPasswordRecoveryService emailPasswordRecoveryService;
     private final RateLimiterRegistry rateLimiterRegistry;
+    private final SystemConfigurableEnvironmentFetcher environmentFetcher;
+    private final EmailVerificationService emailVerificationService;
 
     @Override
     public RouterFunction<ServerResponse> endpoint() {
@@ -61,6 +71,22 @@ public class PublicUserEndpoint implements CustomEndpoint {
                         .implementation(SignUpRequest.class)
                     )
                     .response(responseBuilder().implementation(User.class))
+            )
+            .POST("/users/-/send-register-verify-email", this::sendRegisterVerifyEmail,
+                builder -> builder.operationId("SendRegisterVerifyEmail")
+                    .description(
+                        "Send registration verification email, which can be called when "
+                            + "mustVerifyEmailOnRegistration in user settings is true"
+                    )
+                    .tag(tag)
+                    .requestBody(requestBodyBuilder()
+                        .required(true)
+                        .implementation(RegisterVerifyEmailRequest.class)
+                    )
+                    .response(responseBuilder()
+                        .responseCode(HttpStatus.NO_CONTENT.toString())
+                        .implementation(Void.class)
+                    )
             )
             .POST("/users/-/send-password-reset-email", this::sendPasswordResetEmail,
                 builder -> builder.operationId("SendPasswordResetEmail")
@@ -126,6 +152,9 @@ public class PublicUserEndpoint implements CustomEndpoint {
                                 @Schema(requiredMode = REQUIRED) String token) {
     }
 
+    record RegisterVerifyEmailRequest(@Schema(requiredMode = REQUIRED) String email) {
+    }
+
     private Mono<ServerResponse> sendPasswordResetEmail(ServerRequest request) {
         return request.bodyToMono(PasswordResetEmailRequest.class)
             .flatMap(passwordResetRequest -> {
@@ -154,6 +183,30 @@ public class PublicUserEndpoint implements CustomEndpoint {
 
     private Mono<ServerResponse> signUp(ServerRequest request) {
         return request.bodyToMono(SignUpRequest.class)
+            .doOnNext(signUpRequest -> signUpRequest.user().getSpec().setEmailVerified(false))
+            .flatMap(signUpRequest -> environmentFetcher.fetch(SystemSetting.User.GROUP,
+                    SystemSetting.User.class)
+                .map(user -> BooleanUtils.isTrue(user.getMustVerifyEmailOnRegistration()))
+                .defaultIfEmpty(false)
+                .flatMap(mustVerifyEmailOnRegistration -> {
+                    if (!mustVerifyEmailOnRegistration) {
+                        return Mono.just(signUpRequest);
+                    }
+                    if (!StringUtils.isNumeric(signUpRequest.verifyCode)) {
+                        return Mono.error(new EmailVerificationFailed());
+                    }
+                    return emailVerificationService.verifyRegisterVerificationCode(
+                            signUpRequest.user().getSpec().getEmail(),
+                            signUpRequest.verifyCode)
+                        .flatMap(verified -> {
+                            if (BooleanUtils.isNotTrue(verified)) {
+                                return Mono.error(new EmailVerificationFailed());
+                            }
+                            signUpRequest.user().getSpec().setEmailVerified(true);
+                            return Mono.just(signUpRequest);
+                        });
+                })
+            )
             .flatMap(signUpRequest ->
                 userService.signUp(signUpRequest.user(), signUpRequest.password())
             )
@@ -166,6 +219,35 @@ public class PublicUserEndpoint implements CustomEndpoint {
             )
             .transformDeferred(getRateLimiterForSignUp(request.exchange()))
             .onErrorMap(RequestNotPermitted.class, RateLimitExceededException::new);
+    }
+
+    private Mono<ServerResponse> sendRegisterVerifyEmail(ServerRequest request) {
+        return request.bodyToMono(RegisterVerifyEmailRequest.class)
+            .switchIfEmpty(Mono.error(
+                () -> new ServerWebInputException("Required request body is missing."))
+            )
+            .map(emailReq -> {
+                var email = emailReq.email();
+                if (!ValidationUtils.isValidEmail(email)) {
+                    throw new ServerWebInputException("Invalid email address.");
+                }
+                return email;
+            })
+            .flatMap(email -> environmentFetcher.fetch(SystemSetting.User.GROUP,
+                    SystemSetting.User.class)
+                .map(config -> BooleanUtils.isTrue(config.getMustVerifyEmailOnRegistration()))
+                .defaultIfEmpty(false)
+                .doOnNext(mustVerifyEmailOnRegistration -> {
+                    if (!mustVerifyEmailOnRegistration) {
+                        throw new AccessDeniedException("Email verification is not required.");
+                    }
+                })
+                .transformDeferred(sendRegisterEmailVerificationCodeRateLimiter(email))
+                .flatMap(s -> emailVerificationService.sendRegisterVerificationCode(email)
+                    .onErrorMap(RequestNotPermitted.class, RateLimitExceededException::new))
+                .onErrorMap(RequestNotPermitted.class, RateLimitExceededException::new)
+            )
+            .then(ServerResponse.ok().build());
     }
 
     private <T> RateLimiterOperator<T> getRateLimiterForSignUp(ServerWebExchange exchange) {
@@ -187,7 +269,17 @@ public class PublicUserEndpoint implements CustomEndpoint {
             });
     }
 
+    private <T> RateLimiterOperator<T> sendRegisterEmailVerificationCodeRateLimiter(String email) {
+        String rateLimiterKey = "send-register-verify-email:" + email;
+        var rateLimiter =
+            rateLimiterRegistry.rateLimiter(rateLimiterKey, "send-email-verification-code");
+        return RateLimiterOperator.of(rateLimiter);
+    }
+
     record SignUpRequest(@Schema(requiredMode = REQUIRED) User user,
-                         @Schema(requiredMode = REQUIRED, minLength = 6) String password) {
+                         @Schema(requiredMode = REQUIRED, minLength = 6) String password,
+                         @Schema(requiredMode = NOT_REQUIRED, minLength = 6, maxLength = 6)
+                         String verifyCode
+    ) {
     }
 }

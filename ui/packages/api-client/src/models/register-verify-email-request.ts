@@ -12,32 +12,16 @@
  * Do not edit the class manually.
  */
 
-// May contain unused imports in some cases
-// @ts-ignore
-import { User } from "./user";
-
 /**
  *
  * @export
- * @interface SignUpRequest
+ * @interface RegisterVerifyEmailRequest
  */
-export interface SignUpRequest {
+export interface RegisterVerifyEmailRequest {
   /**
    *
-   * @type {any}
-   * @memberof SignUpRequest
+   * @type {string}
+   * @memberof RegisterVerifyEmailRequest
    */
-  password: any;
-  /**
-   *
-   * @type {User}
-   * @memberof SignUpRequest
-   */
-  user: User;
-  /**
-   *
-   * @type {any}
-   * @memberof SignUpRequest
-   */
-  verifyCode?: any;
+  email: string;
 }

@@ -3,6 +3,7 @@ package run.halo.app.theme.endpoint;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -21,6 +22,8 @@ import reactor.core.publisher.Mono;
 import run.halo.app.core.extension.User;
 import run.halo.app.core.extension.service.UserService;
 import run.halo.app.extension.Metadata;
+import run.halo.app.infra.SystemConfigurableEnvironmentFetcher;
+import run.halo.app.infra.SystemSetting;
 
 /**
  * Tests for {@link PublicUserEndpoint}.
@@ -36,7 +39,8 @@ class PublicUserEndpointTest {
     private ServerSecurityContextRepository securityContextRepository;
     @Mock
     private ReactiveUserDetailsService reactiveUserDetailsService;
-
+    @Mock
+    SystemConfigurableEnvironmentFetcher environmentFetcher;
     @Mock
     RateLimiterRegistry rateLimiterRegistry;
 
@@ -67,6 +71,9 @@ class PublicUserEndpointTest {
                 .password("123456")
                 .authorities("test-role")
                 .build()));
+        SystemSetting.User userSetting = mock(SystemSetting.User.class);
+        when(environmentFetcher.fetch(SystemSetting.User.GROUP, SystemSetting.User.class))
+            .thenReturn(Mono.just(userSetting));
 
         when(rateLimiterRegistry.rateLimiter("signup-from-ip-127.0.0.1", "signup"))
             .thenReturn(RateLimiter.ofDefaults("signup"));
@@ -74,7 +81,7 @@ class PublicUserEndpointTest {
         webClient.post()
             .uri("/users/-/signup")
             .header("X-Forwarded-For", "127.0.0.1")
-            .bodyValue(new PublicUserEndpoint.SignUpRequest(user, "fake-password"))
+            .bodyValue(new PublicUserEndpoint.SignUpRequest(user, "fake-password", ""))
             .exchange()
             .expectStatus().isOk();
 
