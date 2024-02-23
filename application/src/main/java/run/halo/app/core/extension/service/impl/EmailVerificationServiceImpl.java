@@ -102,6 +102,19 @@ public class EmailVerificationServiceImpl implements EmailVerificationService {
             .then();
     }
 
+    @Override
+    public Mono<Void> sendRegisterVerificationCode(String email) {
+        Assert.state(StringUtils.isNotBlank(email), "Email must not be blank");
+        return sendVerificationNotification(email, email);
+    }
+
+    @Override
+    public Mono<Boolean> verifyRegisterVerificationCode(String email, String code) {
+        Assert.state(StringUtils.isNotBlank(email), "Username must not be blank");
+        Assert.state(StringUtils.isNotBlank(code), "Code must not be blank");
+        return Mono.just(emailVerificationManager.verifyCode(email, email, code));
+    }
+
     Mono<Void> sendVerificationNotification(String username, String email) {
         var code = emailVerificationManager.generateCode(username, email);
         var subscribeNotification = autoSubscribeVerificationEmailNotification(email);

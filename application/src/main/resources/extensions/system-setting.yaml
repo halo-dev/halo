@@ -96,6 +96,10 @@ spec:
           name: allowRegistration
           label: "开放注册"
           value: false
+        - $formkit: checkbox
+          name: mustVerifyEmailOnRegistration
+          label: "注册需验证邮箱（请确保启用邮件通知）"
+          value: false
         - $formkit: roleSelect
           name: defaultRole
           label: "默认角色"
