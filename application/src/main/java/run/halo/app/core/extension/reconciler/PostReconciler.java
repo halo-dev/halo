@@ -33,6 +33,7 @@ import run.halo.app.core.extension.content.Post.PostPhase;
 import run.halo.app.core.extension.content.Post.VisibleEnum;
 import run.halo.app.core.extension.content.Snapshot;
 import run.halo.app.core.extension.notification.Subscription;
+import run.halo.app.event.post.PostDeletedEvent;
 import run.halo.app.event.post.PostPublishedEvent;
 import run.halo.app.event.post.PostUnpublishedEvent;
 import run.halo.app.event.post.PostUpdatedEvent;
@@ -86,6 +87,7 @@ public class PostReconciler implements Reconciler<Reconciler.Request> {
                 if (ExtensionOperator.isDeleted(post)) {
                     removeFinalizers(post.getMetadata(), Set.of(FINALIZER_NAME));
                     unPublishPost(post, events);
+                    events.add(new PostDeletedEvent(this, post));
                     cleanUpResources(post);
                     // update post to be able to be collected by gc collector.
                     client.update(post);
@@ -126,7 +128,7 @@ public class PostReconciler implements Reconciler<Reconciler.Request> {
 
                 // calculate the sha256sum
                 var configSha256sum = Hashing.sha256().hashString(post.getSpec().toString(), UTF_8)
-                        .toString();
+                    .toString();
 
                 var oldConfigChecksum = annotations.get(Constant.CHECKSUM_CONFIG_ANNO);
                 if (!Objects.equals(oldConfigChecksum, configSha256sum)) {
