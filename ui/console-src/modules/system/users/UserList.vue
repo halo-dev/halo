@@ -116,11 +116,11 @@ const {
     return data.items;
   },
   refetchInterval(data) {
-    const deletingUsers = data?.filter(
+    const hasDeletingData = data?.some(
       (user) => !!user.user.metadata.deletionTimestamp
     );
 
-    return deletingUsers?.length ? 1000 : false;
+    return hasDeletingData ? 1000 : false;
   },
   onSuccess() {
     selectedUser.value = undefined;
@@ -347,11 +347,11 @@ onMounted(() => {
                   },
                   {
                     label: t('core.user.filters.sort.items.create_time_desc'),
-                    value: 'creationTimestamp,desc',
+                    value: 'metadata.creationTimestamp,desc',
                   },
                   {
                     label: t('core.user.filters.sort.items.create_time_asc'),
-                    value: 'creationTimestamp,asc',
+                    value: 'metadata.creationTimestamp,asc',
                   },
                 ]"
               />
