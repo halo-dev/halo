@@ -14,6 +14,7 @@ import org.springframework.stereotype.Component;
  * @since 2.0.0
  */
 @Component
+@Deprecated(forRemoval = true)
 public class ExtensionComponentsFinder {
     public static final String SYSTEM_PLUGIN_ID = "system";
     private final PluginManager pluginManager;
