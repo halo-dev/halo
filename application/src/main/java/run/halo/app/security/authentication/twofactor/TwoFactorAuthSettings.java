@@ -17,6 +17,6 @@ public class TwoFactorAuthSettings {
      * @return true if 2FA is enabled and configured, false otherwise.
      */
     public boolean isAvailable() {
-        return enabled && (emailVerified || totpConfigured);
+        return enabled && totpConfigured;
     }
 }
