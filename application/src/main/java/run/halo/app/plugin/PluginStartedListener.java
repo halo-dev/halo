@@ -38,6 +38,7 @@ public class PluginStartedListener {
             .doOnNext(old -> {
                 unstructured.getMetadata().setVersion(old.getMetadata().getVersion());
             })
+            .map(ignored -> unstructured)
             .flatMap(client::update)
             .switchIfEmpty(Mono.defer(() -> client.create(unstructured)));
     }
