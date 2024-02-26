@@ -1,7 +1,6 @@
 package run.halo.app.infra;
 
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -19,6 +18,7 @@ import run.halo.app.core.extension.User;
 import run.halo.app.extension.ConfigMap;
 import run.halo.app.extension.ListResult;
 import run.halo.app.extension.Metadata;
+import run.halo.app.extension.PageRequest;
 import run.halo.app.extension.ReactiveExtensionClient;
 
 /**
@@ -37,7 +37,7 @@ class InitializationStateGetterTest {
 
     @Test
     void userInitialized() {
-        when(client.list(eq(User.class), any(), any(), anyInt(), anyInt()))
+        when(client.listBy(eq(User.class), any(), any(PageRequest.class)))
             .thenReturn(Mono.empty());
         initializationStateGetter.userInitialized()
             .as(StepVerifier::create)
@@ -52,7 +52,7 @@ class InitializationStateGetterTest {
         user.getSpec().setDisplayName("fake-hidden-user");
         ListResult<User> listResult = new ListResult<>(List.of(user));
 
-        when(client.list(eq(User.class), any(), any(), anyInt(), anyInt()))
+        when(client.listBy(eq(User.class), any(), any(PageRequest.class)))
             .thenReturn(Mono.just(listResult));
         initializationStateGetter.userInitialized()
             .as(StepVerifier::create)
