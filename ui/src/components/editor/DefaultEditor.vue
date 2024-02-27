@@ -52,7 +52,11 @@ import {
   ExtensionSearchAndReplace,
 } from "@halo-dev/richtext-editor";
 // ui custom extension
-import { UiExtensionImage, UiExtensionUpload } from "./extensions";
+import {
+  UiExtensionImage,
+  UiExtensionUpload,
+  UiExtensionVideo,
+} from "./extensions";
 import {
   IconCalendar,
   IconCharacterRecognition,
@@ -263,7 +267,11 @@ onMounted(() => {
         lowlight,
       }),
       ExtensionIframe,
-      ExtensionVideo,
+      currentUserHasPermission(["uc:attachments:manage"])
+        ? UiExtensionVideo.configure({
+            uploadVideo: props.uploadImage,
+          })
+        : ExtensionVideo,
       ExtensionAudio,
       ExtensionCharacterCount,
       ExtensionFontSize,
