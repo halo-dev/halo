@@ -4,6 +4,7 @@ import static org.apache.commons.lang3.ObjectUtils.defaultIfNull;
 import static run.halo.app.extension.index.IndexAttributeFactory.multiValueAttribute;
 import static run.halo.app.extension.index.IndexAttributeFactory.simpleAttribute;
 
+import com.fasterxml.jackson.core.type.TypeReference;
 import java.util.Set;
 import org.apache.commons.lang3.BooleanUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -44,9 +45,11 @@ import run.halo.app.core.extension.notification.Subscription;
 import run.halo.app.extension.ConfigMap;
 import run.halo.app.extension.DefaultSchemeManager;
 import run.halo.app.extension.DefaultSchemeWatcherManager;
+import run.halo.app.extension.MetadataUtil;
 import run.halo.app.extension.Secret;
 import run.halo.app.extension.index.IndexSpec;
 import run.halo.app.extension.index.IndexSpecRegistryImpl;
+import run.halo.app.infra.utils.JsonUtils;
 import run.halo.app.migration.Backup;
 import run.halo.app.plugin.extensionpoint.ExtensionDefinition;
 import run.halo.app.plugin.extensionpoint.ExtensionPointDefinition;
@@ -69,7 +72,24 @@ public class SchemeInitializer implements ApplicationListener<ApplicationContext
         schemeManager.register(ExtensionDefinition.class);
 
         schemeManager.register(RoleBinding.class);
-        schemeManager.register(User.class);
+        schemeManager.register(User.class, indexSpecs -> {
+            indexSpecs.add(new IndexSpec()
+                .setName("spec.displayName")
+                .setIndexFunc(
+                    simpleAttribute(User.class, user -> user.getSpec().getDisplayName())));
+            indexSpecs.add(new IndexSpec()
+                .setName(User.USER_RELATED_ROLES_INDEX)
+                .setIndexFunc(multiValueAttribute(User.class, user -> {
+                    var roleNamesAnno = MetadataUtil.nullSafeAnnotations(user)
+                        .get(User.ROLE_NAMES_ANNO);
+                    if (StringUtils.isBlank(roleNamesAnno)) {
+                        return Set.of();
+                    }
+                    return JsonUtils.jsonToObject(roleNamesAnno,
+                        new TypeReference<>() {
+                        });
+                })));
+        });
         schemeManager.register(ReverseProxy.class);
         schemeManager.register(Setting.class);
         schemeManager.register(AnnotationSetting.class);

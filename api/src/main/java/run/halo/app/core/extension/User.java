@@ -33,6 +33,8 @@ public class User extends AbstractExtension {
     public static final String VERSION = "v1alpha1";
     public static final String KIND = "User";
 
+    public static final String USER_RELATED_ROLES_INDEX = "roles";
+
     public static final String ROLE_NAMES_ANNO = "rbac.authorization.halo.run/role-names";
 
     public static final String EMAIL_TO_VERIFY = "halo.run/email-to-verify";

@@ -1,6 +1,5 @@
 package run.halo.app.core.extension.endpoint;
 
-import static java.lang.Boolean.parseBoolean;
 import static org.springdoc.core.fn.builders.apiresponse.Builder.responseBuilder;
 import static run.halo.app.extension.index.query.QueryFactory.and;
 import static run.halo.app.extension.index.query.QueryFactory.equal;
@@ -17,10 +16,10 @@ import run.halo.app.core.extension.Counter;
 import run.halo.app.core.extension.User;
 import run.halo.app.core.extension.content.Post;
 import run.halo.app.extension.ListOptions;
-import run.halo.app.extension.MetadataUtil;
 import run.halo.app.extension.PageRequestImpl;
 import run.halo.app.extension.ReactiveExtensionClient;
 import run.halo.app.extension.router.selector.FieldSelector;
+import run.halo.app.extension.router.selector.LabelSelector;
 
 /**
  * Stats endpoint.
@@ -61,18 +60,18 @@ public class StatsEndpoint implements CustomEndpoint {
                 stats.setUpvotes(stats.getUpvotes() + counter.getUpvote());
                 return stats;
             })
-            .flatMap(stats -> client.list(User.class,
-                    user -> {
-                        var labels = MetadataUtil.nullSafeLabels(user);
-                        return user.getMetadata().getDeletionTimestamp() == null
-                            && !parseBoolean(labels.getOrDefault(User.HIDDEN_USER_LABEL, "false"));
-                    },
-                    null)
-                .count()
-                .map(count -> {
-                    stats.setUsers(count.intValue());
-                    return stats;
-                }))
+            .flatMap(stats -> {
+                var listOptions = new ListOptions();
+                listOptions.setLabelSelector(LabelSelector.builder()
+                    .notEq(User.HIDDEN_USER_LABEL, "true")
+                    .build()
+                );
+                listOptions.setFieldSelector(
+                    FieldSelector.of(isNull("metadata.deletionTimestamp")));
+                return client.listBy(User.class, listOptions, PageRequestImpl.ofSize(1))
+                    .doOnNext(result -> stats.setUsers((int) result.getTotal()))
+                    .thenReturn(stats);
+            })
             .flatMap(stats -> {
                 var listOptions = new ListOptions();
                 listOptions.setFieldSelector(FieldSelector.of(
