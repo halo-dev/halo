@@ -29,14 +29,6 @@ body:
         - Docker Compose
         - Fat Jar
         - Source Code
-  - type: input
-    id: site-url
-    attributes:
-      label: "在线站点地址"
-      description: "如果可以的话，请提供你的站点地址。这可能会帮助我们更好的定位问题。"
-      placeholder: "ex. https://halo.run"
-    validations:
-      required: false
   - type: markdown
     id: details
     attributes:
