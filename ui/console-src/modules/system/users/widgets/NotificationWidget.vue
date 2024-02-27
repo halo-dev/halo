@@ -28,7 +28,7 @@ const {
       username: currentUser?.metadata.name as string,
       page: 1,
       size: 20,
-      unRead: true,
+      fieldSelector: ["spec.unread=true"],
     });
 
     return data.items;

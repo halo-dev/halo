@@ -229,6 +229,7 @@ models/reason-type-spec.ts
 models/reason-type.ts
 models/reason.ts
 models/ref.ts
+models/register-verify-email-request.ts
 models/reply-list.ts
 models/reply-request.ts
 models/reply-spec.ts
