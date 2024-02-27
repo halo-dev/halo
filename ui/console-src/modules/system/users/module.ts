@@ -3,10 +3,8 @@ import BasicLayout from "@console/layouts/BasicLayout.vue";
 import UserStatsWidget from "./widgets/UserStatsWidget.vue";
 import UserList from "./UserList.vue";
 import UserDetail from "./UserDetail.vue";
-import Login from "./Login.vue";
 import { IconUserSettings } from "@halo-dev/components";
 import { markRaw } from "vue";
-import Binding from "./Binding.vue";
 import NotificationWidget from "./widgets/NotificationWidget.vue";
 
 export default definePlugin({
@@ -15,22 +13,6 @@ export default definePlugin({
     NotificationWidget,
   },
   routes: [
-    {
-      path: "/login",
-      name: "Login",
-      component: Login,
-      meta: {
-        title: "core.login.title",
-      },
-    },
-    {
-      path: "/binding/:provider",
-      name: "Binding",
-      component: Binding,
-      meta: {
-        title: "core.binding.title",
-      },
-    },
     {
       path: "/users",
       name: "UsersRoot",
