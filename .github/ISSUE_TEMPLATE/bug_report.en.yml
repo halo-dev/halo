@@ -28,14 +28,6 @@ body:
         - Docker Compose
         - Fat Jar
         - Source Code
-  - type: input
-    id: site-url
-    attributes:
-      label: "Your site address."
-      description: "Note your online address, if possible."
-      placeholder: "ex. https://halo.run"
-    validations:
-      required: false
   - type: markdown
     id: details
     attributes:
