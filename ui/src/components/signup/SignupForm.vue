@@ -208,6 +208,7 @@ const sendVerifyCodeButtonText = computed(() => {
       type="number"
       name="code"
       :placeholder="$t('core.signup.fields.verify_code.placeholder')"
+      :validation-label="$t('core.signup.fields.verify_code.placeholder')"
       validation="required"
     >
       <template #suffix>
