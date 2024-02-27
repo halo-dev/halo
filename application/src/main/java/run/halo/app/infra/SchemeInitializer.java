@@ -260,10 +260,58 @@ public class SchemeInitializer implements ApplicationListener<ApplicationContext
         // notification.halo.run
         schemeManager.register(ReasonType.class);
         schemeManager.register(Reason.class);
-        schemeManager.register(NotificationTemplate.class);
-        schemeManager.register(Subscription.class);
+        schemeManager.register(NotificationTemplate.class, indexSpecs -> {
+            indexSpecs.add(new IndexSpec()
+                .setName("spec.reasonSelector.reasonType")
+                .setIndexFunc(simpleAttribute(NotificationTemplate.class,
+                    template -> template.getSpec().getReasonSelector().getReasonType()))
+            );
+        });
+        schemeManager.register(Subscription.class, indexSpecs -> {
+            indexSpecs.add(new IndexSpec()
+                .setName("spec.reason.reasonType")
+                .setIndexFunc(simpleAttribute(Subscription.class,
+                    subscription -> subscription.getSpec().getReason().getReasonType()))
+            );
+            indexSpecs.add(new IndexSpec()
+                .setName("spec.reason.subject")
+                .setIndexFunc(simpleAttribute(Subscription.class,
+                    subscription -> subscription.getSpec().getReason().getSubject().toString()))
+            );
+            indexSpecs.add(new IndexSpec()
+                .setName("spec.subscriber")
+                .setIndexFunc(simpleAttribute(Subscription.class,
+                    subscription -> subscription.getSpec().getSubscriber().toString()))
+            );
+        });
         schemeManager.register(NotifierDescriptor.class);
-        schemeManager.register(Notification.class);
+        schemeManager.register(Notification.class, indexSpecs -> {
+            indexSpecs.add(new IndexSpec()
+                .setName("spec.unread")
+                .setIndexFunc(simpleAttribute(Notification.class,
+                    notification -> String.valueOf(notification.getSpec().isUnread())))
+            );
+            indexSpecs.add(new IndexSpec()
+                .setName("spec.reason")
+                .setIndexFunc(simpleAttribute(Notification.class,
+                    notification -> notification.getSpec().getReason()))
+            );
+            indexSpecs.add(new IndexSpec()
+                .setName("spec.recipient")
+                .setIndexFunc(simpleAttribute(Notification.class,
+                    notification -> notification.getSpec().getRecipient()))
+            );
+            indexSpecs.add(new IndexSpec()
+                .setName("spec.title")
+                .setIndexFunc(simpleAttribute(Notification.class,
+                    notification -> notification.getSpec().getTitle()))
+            );
+            indexSpecs.add(new IndexSpec()
+                .setName("spec.rawContent")
+                .setIndexFunc(simpleAttribute(Notification.class,
+                    notification -> notification.getSpec().getRawContent()))
+            );
+        });
     }
 
     private static DefaultSchemeManager createSchemeManager(

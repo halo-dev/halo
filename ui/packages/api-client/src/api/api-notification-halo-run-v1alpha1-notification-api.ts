@@ -176,10 +176,8 @@ export const ApiNotificationHaloRunV1alpha1NotificationApiAxiosParamCreator =
        * @param {string} [keyword]
        * @param {Array<string>} [labelSelector] Label selector for filtering.
        * @param {number} [page] The page number. Zero indicates no page.
-       * @param {string} [reason] Filter by notification reason
        * @param {number} [size] Size of one page. Zero indicates no limit.
-       * @param {Array<string>} [sort] Sort property and direction of the list result. Supported fields: creationTimestamp
-       * @param {boolean} [unRead] true for unread, false for read, null for all
+       * @param {Array<string>} [sort] Sort property and direction of the list result. Supported fields: metadata.creationTimestamp
        * @param {*} [options] Override http request option.
        * @throws {RequiredError}
        */
@@ -189,10 +187,8 @@ export const ApiNotificationHaloRunV1alpha1NotificationApiAxiosParamCreator =
         keyword?: string,
         labelSelector?: Array<string>,
         page?: number,
-        reason?: string,
         size?: number,
         sort?: Array<string>,
-        unRead?: boolean,
         options: AxiosRequestConfig = {}
       ): Promise<RequestArgs> => {
         // verify required parameter 'username' is not null or undefined
@@ -241,20 +237,12 @@ export const ApiNotificationHaloRunV1alpha1NotificationApiAxiosParamCreator =
           localVarQueryParameter["page"] = page;
         }
 
-        if (reason !== undefined) {
-          localVarQueryParameter["reason"] = reason;
-        }
-
         if (size !== undefined) {
           localVarQueryParameter["size"] = size;
         }
 
         if (sort) {
           localVarQueryParameter["sort"] = Array.from(sort);
-        }
-
-        if (unRead !== undefined) {
-          localVarQueryParameter["unRead"] = unRead;
         }
 
         setSearchParams(localVarUrlObj, localVarQueryParameter);
@@ -540,10 +528,8 @@ export const ApiNotificationHaloRunV1alpha1NotificationApiFp = function (
      * @param {string} [keyword]
      * @param {Array<string>} [labelSelector] Label selector for filtering.
      * @param {number} [page] The page number. Zero indicates no page.
-     * @param {string} [reason] Filter by notification reason
      * @param {number} [size] Size of one page. Zero indicates no limit.
-     * @param {Array<string>} [sort] Sort property and direction of the list result. Supported fields: creationTimestamp
-     * @param {boolean} [unRead] true for unread, false for read, null for all
+     * @param {Array<string>} [sort] Sort property and direction of the list result. Supported fields: metadata.creationTimestamp
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      */
@@ -553,10 +539,8 @@ export const ApiNotificationHaloRunV1alpha1NotificationApiFp = function (
       keyword?: string,
       labelSelector?: Array<string>,
       page?: number,
-      reason?: string,
       size?: number,
       sort?: Array<string>,
-      unRead?: boolean,
       options?: AxiosRequestConfig
     ): Promise<
       (
@@ -571,10 +555,8 @@ export const ApiNotificationHaloRunV1alpha1NotificationApiFp = function (
           keyword,
           labelSelector,
           page,
-          reason,
           size,
           sort,
-          unRead,
           options
         );
       return createRequestFunction(
@@ -732,10 +714,8 @@ export const ApiNotificationHaloRunV1alpha1NotificationApiFactory = function (
           requestParameters.keyword,
           requestParameters.labelSelector,
           requestParameters.page,
-          requestParameters.reason,
           requestParameters.size,
           requestParameters.sort,
-          requestParameters.unRead,
           options
         )
         .then((request) => request(axios, basePath));
@@ -874,13 +854,6 @@ export interface ApiNotificationHaloRunV1alpha1NotificationApiListUserNotificati
   readonly page?: number;
 
   /**
-   * Filter by notification reason
-   * @type {string}
-   * @memberof ApiNotificationHaloRunV1alpha1NotificationApiListUserNotifications
-   */
-  readonly reason?: string;
-
-  /**
    * Size of one page. Zero indicates no limit.
    * @type {number}
    * @memberof ApiNotificationHaloRunV1alpha1NotificationApiListUserNotifications
@@ -888,18 +861,11 @@ export interface ApiNotificationHaloRunV1alpha1NotificationApiListUserNotificati
   readonly size?: number;
 
   /**
-   * Sort property and direction of the list result. Supported fields: creationTimestamp
+   * Sort property and direction of the list result. Supported fields: metadata.creationTimestamp
    * @type {Array<string>}
    * @memberof ApiNotificationHaloRunV1alpha1NotificationApiListUserNotifications
    */
   readonly sort?: Array<string>;
-
-  /**
-   * true for unread, false for read, null for all
-   * @type {boolean}
-   * @memberof ApiNotificationHaloRunV1alpha1NotificationApiListUserNotifications
-   */
-  readonly unRead?: boolean;
 }
 
 /**
@@ -1026,10 +992,8 @@ export class ApiNotificationHaloRunV1alpha1NotificationApi extends BaseAPI {
         requestParameters.keyword,
         requestParameters.labelSelector,
         requestParameters.page,
-        requestParameters.reason,
         requestParameters.size,
         requestParameters.sort,
-        requestParameters.unRead,
         options
       )
       .then((request) => request(this.axios, this.basePath));

@@ -31,7 +31,7 @@ const {
   queryFn: async () => {
     const { data } = await apiClient.notification.listUserNotifications({
       username: currentUser?.metadata.name as string,
-      unRead: activeTab.value === "unread",
+      fieldSelector: [`spec.unread=${activeTab.value === "unread"}`],
     });
 
     return data;

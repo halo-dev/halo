@@ -13,7 +13,6 @@ import static org.mockito.Mockito.when;
 
 import java.util.List;
 import java.util.Locale;
-import java.util.function.Predicate;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -362,63 +361,8 @@ class DefaultNotificationCenterTest {
         verify(notificationTemplateSelector).select(eq(reasonTypeName), any());
     }
 
-    @Test
-    @SuppressWarnings("unchecked")
-    void listSubscriptionTest() {
-        var subscriptions = createSubscriptions();
-
-        when(client.list(eq(Subscription.class), any(Predicate.class), any()))
-            .thenAnswer(answer -> {
-                var predicate = (Predicate<Subscription>) answer.getArgument(1, Predicate.class);
-                return Flux.fromIterable(subscriptions)
-                    .filter(predicate);
-            });
-
-        var subscription = subscriptions.get(0);
-        var subscriber = subscription.getSpec().getSubscriber();
-        notificationCenter.listSubscription(subscriber)
-            .as(StepVerifier::create)
-            .expectNext(subscription)
-            .verifyComplete();
-
-        verify(client).list(eq(Subscription.class), any(Predicate.class), any());
-
-        var otherSubscriber = JsonUtils.deepCopy(subscriber);
-        otherSubscriber.setName("other");
-        notificationCenter.listSubscription(otherSubscriber)
-            .as(StepVerifier::create)
-            .verifyComplete();
-    }
 
     @Test
-    @SuppressWarnings("unchecked")
-    void listObserversTest() {
-        var subscriptions = createSubscriptions();
-
-        when(client.list(eq(Subscription.class), any(Predicate.class), any()))
-            .thenAnswer(answer -> {
-                var predicate = (Predicate<Subscription>) answer.getArgument(1, Predicate.class);
-                return Flux.fromIterable(subscriptions)
-                    .filter(predicate);
-            });
-
-        var subscription = subscriptions.get(0);
-        var reasonTypeName = subscription.getSpec().getReason().getReasonType();
-        var reasonSubject = subscription.getSpec().getReason().getSubject();
-        notificationCenter.listObservers(reasonTypeName, reasonSubject)
-            .as(StepVerifier::create)
-            .expectNext(subscription)
-            .verifyComplete();
-
-        verify(client).list(eq(Subscription.class), any(Predicate.class), any());
-
-        notificationCenter.listObservers("other-reason", reasonSubject)
-            .as(StepVerifier::create)
-            .verifyComplete();
-    }
-
-    @Test
-    @SuppressWarnings("unchecked")
     void listObserverWhenDuplicateSubscribers() {
         var sourceSubscriptions = createSubscriptions();
         var subscriptionA = sourceSubscriptions.get(0);
@@ -427,26 +371,11 @@ class DefaultNotificationCenterTest {
         var subscriptionC = JsonUtils.deepCopy(subscriptionA);
         subscriptionC.getSpec().getReason().getSubject().setName(null);
 
-        var subscriptions = List.of(subscriptionA, subscriptionB, subscriptionC);
-        when(client.list(eq(Subscription.class), any(Predicate.class), any()))
-            .thenAnswer(answer -> {
-                var predicate = (Predicate<Subscription>) answer.getArgument(1, Predicate.class);
-                return Flux.fromIterable(subscriptions)
-                    .filter(predicate);
-            });
+        var subscriptions = Flux.just(subscriptionA, subscriptionB, subscriptionC);
 
-        var subscription = subscriptions.get(0);
-        var reasonTypeName = subscription.getSpec().getReason().getReasonType();
-        var reasonSubject = subscription.getSpec().getReason().getSubject();
-        notificationCenter.listObservers(reasonTypeName, reasonSubject)
+        DefaultNotificationCenter.distinctByKey(subscriptions)
             .as(StepVerifier::create)
-            .expectNext(subscription)
-            .verifyComplete();
-
-        verify(client).list(eq(Subscription.class), any(Predicate.class), any());
-
-        notificationCenter.listObservers("other-reason", reasonSubject)
-            .as(StepVerifier::create)
+            .expectNext(subscriptionA)
             .verifyComplete();
     }
 
