@@ -26,10 +26,7 @@ public class DefaultNotificationService implements UserNotificationService {
 
     @Override
     public Mono<ListResult<Notification>> listByUser(String username, UserNotificationQuery query) {
-        var predicate = query.toPredicate()
-            .and(notification -> isRecipient(notification, username));
-        return client.list(Notification.class, predicate, query.toComparator(),
-            query.getPage(), query.getSize());
+        return client.listBy(Notification.class, query.toListOptions(), query.toPageRequest());
     }
 
     @Override

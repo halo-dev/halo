@@ -17,6 +17,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.data.domain.Sort;
 import reactor.core.publisher.Flux;
 import reactor.test.StepVerifier;
 import run.halo.app.core.extension.notification.NotificationTemplate;
@@ -41,7 +42,7 @@ class ReasonNotificationTemplateSelectorImplTest {
 
     @Test
     void select() {
-        when(client.list(eq(NotificationTemplate.class), any(), any()))
+        when(client.listAll(eq(NotificationTemplate.class), any(), any(Sort.class)))
             .thenReturn(Flux.fromIterable(templates()));
         // language priority: zh_CN -> zh -> default
         // if language is same, then compare creationTimestamp to get the latest one

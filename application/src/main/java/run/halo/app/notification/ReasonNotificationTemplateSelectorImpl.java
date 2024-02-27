@@ -1,6 +1,7 @@
 package run.halo.app.notification;
 
 import static org.apache.commons.lang3.StringUtils.defaultIfBlank;
+import static run.halo.app.extension.index.query.QueryFactory.equal;
 
 import java.util.Collections;
 import java.util.Comparator;
@@ -12,11 +13,14 @@ import java.util.function.Predicate;
 import java.util.stream.Collectors;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Sort;
 import org.springframework.lang.Nullable;
 import org.springframework.stereotype.Component;
 import reactor.core.publisher.Mono;
 import run.halo.app.core.extension.notification.NotificationTemplate;
+import run.halo.app.extension.ListOptions;
 import run.halo.app.extension.ReactiveExtensionClient;
+import run.halo.app.extension.router.selector.FieldSelector;
 
 /**
  * A default implementation of {@link ReasonNotificationTemplateSelector}.
@@ -32,7 +36,11 @@ public class ReasonNotificationTemplateSelectorImpl implements ReasonNotificatio
 
     @Override
     public Mono<NotificationTemplate> select(String reasonType, Locale locale) {
-        return client.list(NotificationTemplate.class, matchReasonType(reasonType), null)
+        var listOptions = new ListOptions();
+        listOptions.setFieldSelector(FieldSelector.of(
+            equal("spec.reasonSelector.reasonType", reasonType))
+        );
+        return client.listAll(NotificationTemplate.class, listOptions, Sort.unsorted())
             .collect(Collectors.groupingBy(
                 getLanguageKey(),
                 Collectors.maxBy(Comparator.comparing(t -> t.getMetadata().getCreationTimestamp()))
