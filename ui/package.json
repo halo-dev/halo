@@ -50,6 +50,7 @@
     "@formkit/core": "^1.5.9",
     "@formkit/i18n": "^1.5.9",
     "@formkit/inputs": "^1.5.9",
+    "@formkit/pro": "^0.122.2",
     "@formkit/themes": "^1.5.9",
     "@formkit/utils": "^1.5.9",
     "@formkit/validation": "^1.5.9",
