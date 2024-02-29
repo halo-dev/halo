@@ -53,6 +53,7 @@ import {
 } from "@halo-dev/richtext-editor";
 // ui custom extension
 import {
+  UiExtensionAudio,
   UiExtensionImage,
   UiExtensionUpload,
   UiExtensionVideo,
@@ -272,7 +273,11 @@ onMounted(() => {
             uploadVideo: props.uploadImage,
           })
         : ExtensionVideo,
-      ExtensionAudio,
+      currentUserHasPermission(["uc:attachments:manage"])
+        ? UiExtensionAudio.configure({
+            uploadAudio: props.uploadImage,
+          })
+        : ExtensionAudio,
       ExtensionCharacterCount,
       ExtensionFontSize,
       ExtensionColor,
