@@ -47,9 +47,6 @@ importers:
       '@formkit/inputs':
         specifier: ^1.5.9
         version: 1.5.9
-      '@formkit/pro':
-        specifier: ^0.122.2
-        version: 0.122.2(@formkit/core@1.5.9)(@formkit/inputs@1.5.9)
       '@formkit/themes':
         specifier: ^1.5.9
         version: 1.5.9(tailwindcss@3.3.0)
@@ -3037,10 +3034,6 @@ packages:
       '@formkit/utils': 1.5.9
     dev: false
 
-  /@formkit/drag-and-drop@0.0.23:
-    resolution: {integrity: sha512-gO9r2tOW5jpnCTVCCR5siyi5ATUNf4cIRNyXJTjBM6sZ3vOYQONRs7myI1QWWf+VgQoPdEdL6kKU69paIi/8Yg==}
-    dev: false
-
   /@formkit/i18n@1.5.9:
     resolution: {integrity: sha512-4FVqE1YciXSwl2KUuGRvpizZXBnwZACVRMrNjSn2WokVsOPYdmgwP1+35nG6LVU6i8bcOv/8fASCLUO3ADe7mw==}
     dependencies:
@@ -3063,28 +3056,12 @@ packages:
       '@formkit/utils': 1.5.9
     dev: false
 
-  /@formkit/pro@0.122.2(@formkit/core@1.5.9)(@formkit/inputs@1.5.9):
-    resolution: {integrity: sha512-c0RWChRW+yzoPK+ImNjWo42SC9JsiDw2f7gHK0sVcG2wOnQ3nyewrls3iMRwxmwZV7RpQERr5IILc5J1coOILA==}
-    peerDependencies:
-      '@formkit/core': ^1.5.9
-      '@formkit/inputs': ^1.5.9
-    dependencies:
-      '@formkit/core': 1.5.9
-      '@formkit/drag-and-drop': 0.0.23
-      '@formkit/inputs': 1.5.9
-      '@formkit/tempo': 0.0.8
-    dev: false
-
   /@formkit/rules@1.5.9:
     resolution: {integrity: sha512-kslIu91gs6CmStnbUl+wzerLt0Dzm3jb4VisfUTlmrtXfMpQCD4BwF6Dic90weVbbYlEyeFroY3vONvIIRruTw==}
     dependencies:
       '@formkit/core': 1.5.9
       '@formkit/utils': 1.5.9
       '@formkit/validation': 1.5.9
-    dev: false
-
-  /@formkit/tempo@0.0.8:
-    resolution: {integrity: sha512-q9Ch3Epjb5yFVNV2vAruHyPwcvZujiPcBQ7r6if+HmOciMhwkQccL9NOm9LNmN23hNk2y3+El/ygUH2/x539sg==}
     dev: false
 
   /@formkit/themes@1.5.9(tailwindcss@3.3.0):
