@@ -1,21 +1,23 @@
 package run.halo.app.notification;
 
-import static java.util.Comparator.comparing;
+import static run.halo.app.extension.index.query.QueryFactory.and;
+import static run.halo.app.extension.index.query.QueryFactory.contains;
+import static run.halo.app.extension.index.query.QueryFactory.equal;
+import static run.halo.app.extension.index.query.QueryFactory.or;
+import static run.halo.app.extension.router.selector.SelectorUtil.labelAndFieldSelectorToListOptions;
 
 import io.swagger.v3.oas.annotations.media.ArraySchema;
 import io.swagger.v3.oas.annotations.media.Schema;
-import java.util.ArrayList;
-import java.util.Comparator;
-import java.util.List;
-import java.util.function.Predicate;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.data.domain.Sort;
 import org.springframework.lang.Nullable;
 import org.springframework.web.server.ServerWebExchange;
 import run.halo.app.core.extension.endpoint.SortResolver;
-import run.halo.app.core.extension.notification.Notification;
-import run.halo.app.extension.Comparators;
+import run.halo.app.extension.ListOptions;
+import run.halo.app.extension.PageRequest;
+import run.halo.app.extension.PageRequestImpl;
 import run.halo.app.extension.router.IListRequest;
+import run.halo.app.extension.router.selector.FieldSelector;
 
 /**
  * Notification query object for authenticated user.
@@ -27,9 +29,12 @@ public class UserNotificationQuery extends IListRequest.QueryListRequest {
 
     private final ServerWebExchange exchange;
 
-    public UserNotificationQuery(ServerWebExchange exchange) {
+    private final String username;
+
+    public UserNotificationQuery(ServerWebExchange exchange, String username) {
         super(exchange.getRequest().getQueryParams());
         this.exchange = exchange;
+        this.username = username;
     }
 
     @Nullable
@@ -37,79 +42,44 @@ public class UserNotificationQuery extends IListRequest.QueryListRequest {
         return StringUtils.defaultIfBlank(queryParams.getFirst("keyword"), null);
     }
 
-    @Nullable
-    @Schema(description = "true for unread, false for read, null for all")
-    public Boolean getUnRead() {
-        var unreadStr = queryParams.getFirst("unRead");
-        return StringUtils.isBlank(unreadStr) ? null : Boolean.parseBoolean(unreadStr);
-    }
-
-    @Nullable
-    @Schema(description = "Filter by notification reason")
-    public String getReason() {
-        return StringUtils.defaultIfBlank(queryParams.getFirst("reason"), null);
-    }
-
     @ArraySchema(uniqueItems = true,
         arraySchema = @Schema(name = "sort",
             description = "Sort property and direction of the list result. Supported fields: "
-                + "creationTimestamp"),
+                + "metadata.creationTimestamp"),
         schema = @Schema(description = "like field,asc or field,desc",
             implementation = String.class,
             example = "creationTimestamp,desc"))
     public Sort getSort() {
-        return SortResolver.defaultInstance.resolve(exchange);
+        var sort = SortResolver.defaultInstance.resolve(exchange);
+        return sort.and(Sort.by(
+            Sort.Order.desc("metadata.creationTimestamp"),
+            Sort.Order.desc("metadata.name"))
+        );
     }
 
     /**
-     * Build a predicate from the query object.
-     *
-     * @return a predicate
+     * Build a list options from the query object.
      */
-    public Predicate<Notification> toPredicate() {
-        var unRead = getUnRead();
-        var reason = getReason();
-        Predicate<Notification> predicate = notification -> true;
-        if (unRead != null) {
-            predicate = predicate.and(notification
-                -> notification.getSpec().isUnread() == unRead);
+    public ListOptions toListOptions() {
+        var listOptions =
+            labelAndFieldSelectorToListOptions(getLabelSelector(), getFieldSelector());
+        var filedQuery = listOptions.getFieldSelector().query();
+        if (StringUtils.isNotBlank(getKeyword())) {
+            filedQuery = and(filedQuery,
+                or(
+                    contains("spec.title", getKeyword()),
+                    contains("spec.rawContent", getKeyword())
+                )
+            );
         }
-
-        if (reason != null) {
-            predicate = predicate.and(notification
-                -> reason.equals(notification.getSpec().getReason()));
+        if (StringUtils.isNotBlank(username)) {
+            filedQuery = and(filedQuery, equal("spec.recipient", username));
         }
-
-        if (getKeyword() != null) {
-            predicate = predicate.and(notification
-                -> notification.getSpec().getTitle().contains(getKeyword())
-                || notification.getSpec().getHtmlContent().contains(getKeyword())
-                || notification.getSpec().getRawContent().contains(getKeyword()));
-        }
-        return predicate;
+        listOptions.setFieldSelector(FieldSelector.of(filedQuery));
+        return listOptions;
     }
 
-    /**
-     * Build a comparator from the query object.
-     *
-     * @return a comparator
-     */
-    public Comparator<Notification> toComparator() {
-        var sort = getSort();
-        var creationTimestampOrder = sort.getOrderFor("creationTimestamp");
-        List<Comparator<Notification>> comparators = new ArrayList<>();
-        if (creationTimestampOrder != null) {
-            Comparator<Notification> comparator =
-                comparing(notification -> notification.getMetadata().getCreationTimestamp());
-            if (creationTimestampOrder.isDescending()) {
-                comparator = comparator.reversed();
-            }
-            comparators.add(comparator);
-        }
-
-        comparators.add(Comparators.defaultComparator());
-        return comparators.stream()
-            .reduce(Comparator::thenComparing)
-            .orElse(null);
+    public PageRequest toPageRequest() {
+        return PageRequestImpl.of(getPage(), getSize(), getSort());
     }
 }

@@ -1311,11 +1311,10 @@ core:
         placeholder:
           options:
             placeholder: 輸入 / 以選擇輸入類型
-        image:
-          upload:
-            error: 上傳失敗
-            click_retry: 點擊重試
-            loading: 等待中
+        upload:
+          error: 上傳失敗
+          click_retry: 點擊重試
+          loading: 等待中
           attachment:
             title: 附件庫
           permalink:

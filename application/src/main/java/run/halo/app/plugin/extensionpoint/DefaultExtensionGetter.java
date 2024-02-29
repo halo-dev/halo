@@ -1,5 +1,6 @@
 package run.halo.app.plugin.extensionpoint;
 
+import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Set;
@@ -84,6 +85,15 @@ public class DefaultExtensionGetter implements ExtensionGetter {
                 // TODO If the type is sortable, may need to process the returned order.
                 return Flux.fromIterable(getAllExtensions(extensionPoint));
             });
+    }
+
+    @Override
+    public <T extends ExtensionPoint> Flux<T> getExtensions(Class<T> extensionPointClass) {
+        var extensions = new ArrayList<>(pluginManager.getExtensions(extensionPointClass));
+        applicationContext.getBeanProvider(extensionPointClass)
+            .orderedStream()
+            .forEach(extensions::add);
+        return Flux.fromIterable(extensions);
     }
 
     @NonNull

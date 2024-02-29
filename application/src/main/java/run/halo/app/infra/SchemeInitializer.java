@@ -4,6 +4,7 @@ import static org.apache.commons.lang3.ObjectUtils.defaultIfNull;
 import static run.halo.app.extension.index.IndexAttributeFactory.multiValueAttribute;
 import static run.halo.app.extension.index.IndexAttributeFactory.simpleAttribute;
 
+import com.fasterxml.jackson.core.type.TypeReference;
 import java.util.Set;
 import org.apache.commons.lang3.BooleanUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -44,9 +45,11 @@ import run.halo.app.core.extension.notification.Subscription;
 import run.halo.app.extension.ConfigMap;
 import run.halo.app.extension.DefaultSchemeManager;
 import run.halo.app.extension.DefaultSchemeWatcherManager;
+import run.halo.app.extension.MetadataUtil;
 import run.halo.app.extension.Secret;
 import run.halo.app.extension.index.IndexSpec;
 import run.halo.app.extension.index.IndexSpecRegistryImpl;
+import run.halo.app.infra.utils.JsonUtils;
 import run.halo.app.migration.Backup;
 import run.halo.app.plugin.extensionpoint.ExtensionDefinition;
 import run.halo.app.plugin.extensionpoint.ExtensionPointDefinition;
@@ -69,7 +72,24 @@ public class SchemeInitializer implements ApplicationListener<ApplicationContext
         schemeManager.register(ExtensionDefinition.class);
 
         schemeManager.register(RoleBinding.class);
-        schemeManager.register(User.class);
+        schemeManager.register(User.class, indexSpecs -> {
+            indexSpecs.add(new IndexSpec()
+                .setName("spec.displayName")
+                .setIndexFunc(
+                    simpleAttribute(User.class, user -> user.getSpec().getDisplayName())));
+            indexSpecs.add(new IndexSpec()
+                .setName(User.USER_RELATED_ROLES_INDEX)
+                .setIndexFunc(multiValueAttribute(User.class, user -> {
+                    var roleNamesAnno = MetadataUtil.nullSafeAnnotations(user)
+                        .get(User.ROLE_NAMES_ANNO);
+                    if (StringUtils.isBlank(roleNamesAnno)) {
+                        return Set.of();
+                    }
+                    return JsonUtils.jsonToObject(roleNamesAnno,
+                        new TypeReference<>() {
+                        });
+                })));
+        });
         schemeManager.register(ReverseProxy.class);
         schemeManager.register(Setting.class);
         schemeManager.register(AnnotationSetting.class);
@@ -240,10 +260,58 @@ public class SchemeInitializer implements ApplicationListener<ApplicationContext
         // notification.halo.run
         schemeManager.register(ReasonType.class);
         schemeManager.register(Reason.class);
-        schemeManager.register(NotificationTemplate.class);
-        schemeManager.register(Subscription.class);
+        schemeManager.register(NotificationTemplate.class, indexSpecs -> {
+            indexSpecs.add(new IndexSpec()
+                .setName("spec.reasonSelector.reasonType")
+                .setIndexFunc(simpleAttribute(NotificationTemplate.class,
+                    template -> template.getSpec().getReasonSelector().getReasonType()))
+            );
+        });
+        schemeManager.register(Subscription.class, indexSpecs -> {
+            indexSpecs.add(new IndexSpec()
+                .setName("spec.reason.reasonType")
+                .setIndexFunc(simpleAttribute(Subscription.class,
+                    subscription -> subscription.getSpec().getReason().getReasonType()))
+            );
+            indexSpecs.add(new IndexSpec()
+                .setName("spec.reason.subject")
+                .setIndexFunc(simpleAttribute(Subscription.class,
+                    subscription -> subscription.getSpec().getReason().getSubject().toString()))
+            );
+            indexSpecs.add(new IndexSpec()
+                .setName("spec.subscriber")
+                .setIndexFunc(simpleAttribute(Subscription.class,
+                    subscription -> subscription.getSpec().getSubscriber().toString()))
+            );
+        });
         schemeManager.register(NotifierDescriptor.class);
-        schemeManager.register(Notification.class);
+        schemeManager.register(Notification.class, indexSpecs -> {
+            indexSpecs.add(new IndexSpec()
+                .setName("spec.unread")
+                .setIndexFunc(simpleAttribute(Notification.class,
+                    notification -> String.valueOf(notification.getSpec().isUnread())))
+            );
+            indexSpecs.add(new IndexSpec()
+                .setName("spec.reason")
+                .setIndexFunc(simpleAttribute(Notification.class,
+                    notification -> notification.getSpec().getReason()))
+            );
+            indexSpecs.add(new IndexSpec()
+                .setName("spec.recipient")
+                .setIndexFunc(simpleAttribute(Notification.class,
+                    notification -> notification.getSpec().getRecipient()))
+            );
+            indexSpecs.add(new IndexSpec()
+                .setName("spec.title")
+                .setIndexFunc(simpleAttribute(Notification.class,
+                    notification -> notification.getSpec().getTitle()))
+            );
+            indexSpecs.add(new IndexSpec()
+                .setName("spec.rawContent")
+                .setIndexFunc(simpleAttribute(Notification.class,
+                    notification -> notification.getSpec().getRawContent()))
+            );
+        });
     }
 
     private static DefaultSchemeManager createSchemeManager(
