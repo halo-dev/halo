@@ -24,10 +24,10 @@ import { User } from "./user";
 export interface SignUpRequest {
   /**
    *
-   * @type {any}
+   * @type {string}
    * @memberof SignUpRequest
    */
-  password: any;
+  password: string;
   /**
    *
    * @type {User}
@@ -36,8 +36,8 @@ export interface SignUpRequest {
   user: User;
   /**
    *
-   * @type {any}
+   * @type {string}
    * @memberof SignUpRequest
    */
-  verifyCode?: any;
+  verifyCode?: string;
 }

@@ -1,7 +1,6 @@
 package run.halo.app.core.extension.endpoint;
 
 import static io.swagger.v3.oas.annotations.media.Schema.RequiredMode.REQUIRED;
-import static java.util.Comparator.comparing;
 import static org.apache.commons.lang3.ObjectUtils.defaultIfNull;
 import static org.apache.commons.lang3.StringUtils.defaultIfBlank;
 import static org.springdoc.core.fn.builders.apiresponse.Builder.responseBuilder;
@@ -11,8 +10,12 @@ import static org.springdoc.core.fn.builders.requestbody.Builder.requestBodyBuil
 import static org.springdoc.core.fn.builders.schema.Builder.schemaBuilder;
 import static org.springframework.web.reactive.function.server.RequestPredicates.contentType;
 import static run.halo.app.extension.ListResult.generateGenericClass;
+import static run.halo.app.extension.index.query.QueryFactory.and;
+import static run.halo.app.extension.index.query.QueryFactory.contains;
+import static run.halo.app.extension.index.query.QueryFactory.equal;
+import static run.halo.app.extension.index.query.QueryFactory.or;
 import static run.halo.app.extension.router.QueryParamBuildUtil.buildParametersFromType;
-import static run.halo.app.extension.router.selector.SelectorUtil.labelAndFieldSelectorToPredicate;
+import static run.halo.app.extension.router.selector.SelectorUtil.labelAndFieldSelectorToListOptions;
 import static run.halo.app.security.authorization.AuthorityUtils.authoritiesToRoles;
 
 import com.fasterxml.jackson.core.type.TypeReference;
@@ -25,9 +28,7 @@ import io.swagger.v3.oas.annotations.media.ArraySchema;
 import io.swagger.v3.oas.annotations.media.Schema;
 import java.security.Principal;
 import java.time.Duration;
-import java.util.ArrayList;
 import java.util.Collections;
-import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedHashSet;
@@ -37,7 +38,6 @@ import java.util.Objects;
 import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.atomic.AtomicInteger;
-import java.util.function.Predicate;
 import java.util.stream.Collectors;
 import lombok.Data;
 import lombok.RequiredArgsConstructor;
@@ -76,12 +76,14 @@ import run.halo.app.core.extension.service.AttachmentService;
 import run.halo.app.core.extension.service.EmailVerificationService;
 import run.halo.app.core.extension.service.RoleService;
 import run.halo.app.core.extension.service.UserService;
-import run.halo.app.extension.Comparators;
+import run.halo.app.extension.ListOptions;
 import run.halo.app.extension.ListResult;
 import run.halo.app.extension.Metadata;
 import run.halo.app.extension.MetadataUtil;
+import run.halo.app.extension.PageRequestImpl;
 import run.halo.app.extension.ReactiveExtensionClient;
 import run.halo.app.extension.router.IListRequest;
+import run.halo.app.extension.router.selector.FieldSelector;
 import run.halo.app.infra.AnonymousUserConst;
 import run.halo.app.infra.SystemConfigurableEnvironmentFetcher;
 import run.halo.app.infra.SystemSetting;
@@ -676,7 +678,7 @@ public class UserEndpoint implements CustomEndpoint {
 
     }
 
-    public class ListRequest extends IListRequest.QueryListRequest {
+    public static class ListRequest extends IListRequest.QueryListRequest {
 
         private final ServerWebExchange exchange;
 
@@ -703,63 +705,38 @@ public class UserEndpoint implements CustomEndpoint {
                 implementation = String.class,
                 example = "creationTimestamp,desc"))
         public Sort getSort() {
-            return SortResolver.defaultInstance.resolve(exchange);
+            var sort = SortResolver.defaultInstance.resolve(exchange);
+            sort = sort.and(Sort.by("metadata.creationTimestamp", "metadata.name").descending());
+            return sort;
         }
 
         /**
-         * Converts query parameters to user predicate.
-         *
-         * @return user predicate to filter users
+         * Converts query parameters to list options.
          */
-        public Predicate<User> toPredicate() {
-            Predicate<User> keywordPredicate = user -> {
-                var keyword = getKeyword();
-                if (StringUtils.isBlank(keyword)) {
-                    return true;
-                }
-                var username = user.getMetadata().getName();
-                var displayName = user.getSpec().getDisplayName();
-                return StringUtils.containsIgnoreCase(displayName, keyword)
-                    || keyword.equalsIgnoreCase(username);
-            };
+        public ListOptions toListOptions() {
+            var listOptions =
+                labelAndFieldSelectorToListOptions(getLabelSelector(), getFieldSelector());
 
-            Predicate<User> rolePredicate = user -> {
-                var roleName = getRole();
-                if (StringUtils.isBlank(roleName)) {
-                    return true;
-                }
-                var roleNamesAnno = MetadataUtil.nullSafeAnnotations(user)
-                    .get(User.ROLE_NAMES_ANNO);
-                if (StringUtils.isBlank(roleNamesAnno)) {
-                    return false;
-                }
-                Set<String> roleNames = JsonUtils.jsonToObject(roleNamesAnno,
-                    new TypeReference<>() {
-                    });
-                return roleNames.contains(roleName);
-            };
-            return keywordPredicate
-                .and(rolePredicate)
-                .and(labelAndFieldSelectorToPredicate(getLabelSelector(), getFieldSelector()));
-        }
-
-        public Comparator<User> toComparator() {
-            var sort = getSort();
-            var ctOrder = sort.getOrderFor("creationTimestamp");
-            List<Comparator<User>> comparators = new ArrayList<>();
-            if (ctOrder != null) {
-                Comparator<User> comparator =
-                    comparing(user -> user.getMetadata().getCreationTimestamp());
-                if (ctOrder.isDescending()) {
-                    comparator = comparator.reversed();
-                }
-                comparators.add(comparator);
+            var fieldQuery = listOptions.getFieldSelector().query();
+            if (StringUtils.isNotBlank(getKeyword())) {
+                fieldQuery = and(
+                    fieldQuery,
+                    or(
+                        contains("spec.displayName", getKeyword()),
+                        equal("metadata.name", getKeyword())
+                    )
+                );
             }
-            comparators.add(Comparators.compareCreationTimestamp(false));
-            comparators.add(Comparators.compareName(true));
-            return comparators.stream()
-                .reduce(Comparator::thenComparing)
-                .orElse(null);
+
+            if (StringUtils.isNotBlank(getRole())) {
+                fieldQuery = and(
+                    fieldQuery,
+                    equal(User.USER_RELATED_ROLES_INDEX, getRole())
+                );
+            }
+
+            listOptions.setFieldSelector(FieldSelector.of(fieldQuery));
+            return listOptions;
         }
     }
 
@@ -770,15 +747,12 @@ public class UserEndpoint implements CustomEndpoint {
     Mono<ServerResponse> list(ServerRequest request) {
         return Mono.just(request)
             .map(UserEndpoint.ListRequest::new)
-            .flatMap(listRequest -> {
-                var predicate = listRequest.toPredicate();
-                var comparator = listRequest.toComparator();
-                return client.list(User.class,
-                    predicate,
-                    comparator,
-                    listRequest.getPage(),
-                    listRequest.getSize());
-            })
+            .flatMap(listRequest -> client.listBy(User.class, listRequest.toListOptions(),
+                PageRequestImpl.of(
+                    listRequest.getPage(), listRequest.getSize(),
+                    listRequest.getSort()
+                )
+            ))
             .flatMap(this::toListedUser)
             .flatMap(listResult -> ServerResponse.ok().bodyValue(listResult));
     }

@@ -36,7 +36,6 @@ import {
   RequestArgs,
   BaseAPI,
   RequiredError,
-  operationServerMap,
 } from "../base";
 // @ts-ignore
 import { PasswordResetEmailRequest } from "../models";
@@ -48,7 +47,6 @@ import { ResetPasswordRequest } from "../models";
 import { SignUpRequest } from "../models";
 // @ts-ignore
 import { User } from "../models";
-
 /**
  * ApiHaloRunV1alpha1UserApi - axios parameter creator
  * @export
@@ -338,18 +336,12 @@ export const ApiHaloRunV1alpha1UserApiFp = function (
           resetPasswordRequest,
           options
         );
-      const index = configuration?.serverIndex ?? 0;
-      const operationBasePath =
-        operationServerMap["ApiHaloRunV1alpha1UserApi.resetPasswordByToken"]?.[
-          index
-        ]?.url;
-      return (axios, basePath) =>
-        createRequestFunction(
-          localVarAxiosArgs,
-          globalAxios,
-          BASE_PATH,
-          configuration
-        )(axios, operationBasePath || basePath);
+      return createRequestFunction(
+        localVarAxiosArgs,
+        globalAxios,
+        BASE_PATH,
+        configuration
+      );
     },
     /**
      * Send password reset email when forgot password
@@ -368,18 +360,12 @@ export const ApiHaloRunV1alpha1UserApiFp = function (
           passwordResetEmailRequest,
           options
         );
-      const index = configuration?.serverIndex ?? 0;
-      const operationBasePath =
-        operationServerMap[
-          "ApiHaloRunV1alpha1UserApi.sendPasswordResetEmail"
-        ]?.[index]?.url;
-      return (axios, basePath) =>
-        createRequestFunction(
-          localVarAxiosArgs,
-          globalAxios,
-          BASE_PATH,
-          configuration
-        )(axios, operationBasePath || basePath);
+      return createRequestFunction(
+        localVarAxiosArgs,
+        globalAxios,
+        BASE_PATH,
+        configuration
+      );
     },
     /**
      * Send registration verification email, which can be called when mustVerifyEmailOnRegistration in user settings is true
@@ -398,18 +384,12 @@ export const ApiHaloRunV1alpha1UserApiFp = function (
           registerVerifyEmailRequest,
           options
         );
-      const index = configuration?.serverIndex ?? 0;
-      const operationBasePath =
-        operationServerMap[
-          "ApiHaloRunV1alpha1UserApi.sendRegisterVerifyEmail"
-        ]?.[index]?.url;
-      return (axios, basePath) =>
-        createRequestFunction(
-          localVarAxiosArgs,
-          globalAxios,
-          BASE_PATH,
-          configuration
-        )(axios, operationBasePath || basePath);
+      return createRequestFunction(
+        localVarAxiosArgs,
+        globalAxios,
+        BASE_PATH,
+        configuration
+      );
     },
     /**
      * Sign up a new user
@@ -427,16 +407,12 @@ export const ApiHaloRunV1alpha1UserApiFp = function (
         signUpRequest,
         options
       );
-      const index = configuration?.serverIndex ?? 0;
-      const operationBasePath =
-        operationServerMap["ApiHaloRunV1alpha1UserApi.signUp"]?.[index]?.url;
-      return (axios, basePath) =>
-        createRequestFunction(
-          localVarAxiosArgs,
-          globalAxios,
-          BASE_PATH,
-          configuration
-        )(axios, operationBasePath || basePath);
+      return createRequestFunction(
+        localVarAxiosArgs,
+        globalAxios,
+        BASE_PATH,
+        configuration
+      );
     },
   };
 };

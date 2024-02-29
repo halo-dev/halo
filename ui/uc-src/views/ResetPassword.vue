@@ -46,8 +46,10 @@ const inputClasses = {
 </script>
 
 <template>
-  <div class="flex h-screen flex-col items-center bg-white/90 pt-[30vh]">
-    <IconLogo class="mb-8" />
+  <div
+    class="flex h-screen flex-col items-center overflow-auto bg-white/90 pt-[30vh]"
+  >
+    <IconLogo class="mb-8 flex-none" />
     <div class="flex w-72 flex-col">
       <FormKit
         id="reset-password-form"

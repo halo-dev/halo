@@ -43,7 +43,7 @@ public class YamlPluginDescriptorFinder implements PluginDescriptorFinder {
         return convert(plugin);
     }
 
-    private DefaultPluginDescriptor convert(Plugin plugin) {
+    public static PluginDescriptor convert(Plugin plugin) {
         String pluginId = plugin.getMetadata().getName();
         Plugin.PluginSpec spec = plugin.getSpec();
         Plugin.PluginAuthor author = spec.getAuthor();
@@ -66,7 +66,7 @@ public class YamlPluginDescriptorFinder implements PluginDescriptorFinder {
         return defaultPluginDescriptor;
     }
 
-    private String joinLicense(List<Plugin.License> licenses) {
+    private static String joinLicense(List<Plugin.License> licenses) {
         if (CollectionUtils.isEmpty(licenses)) {
             return StringUtils.EMPTY;
         }

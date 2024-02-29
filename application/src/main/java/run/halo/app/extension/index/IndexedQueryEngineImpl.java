@@ -4,12 +4,14 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Comparator;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.TreeSet;
 import java.util.stream.Collectors;
+import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Sort;
@@ -20,6 +22,7 @@ import run.halo.app.extension.GroupVersionKind;
 import run.halo.app.extension.ListOptions;
 import run.halo.app.extension.ListResult;
 import run.halo.app.extension.PageRequest;
+import run.halo.app.extension.index.query.QueryFactory;
 import run.halo.app.extension.index.query.QueryIndexViewImpl;
 import run.halo.app.extension.router.selector.FieldSelector;
 import run.halo.app.extension.router.selector.LabelSelector;
@@ -145,8 +148,12 @@ public class IndexedQueryEngineImpl implements IndexedQueryEngine {
         stopWatch.stop();
 
         stopWatch.start("build index view");
+        var fieldNamesUsedInQuery = getFieldNamesUsedInListOptions(options, sort);
         var indexViewMap = new HashMap<String, Collection<Map.Entry<String, String>>>();
         for (Map.Entry<String, IndexEntry> entry : fieldPathEntryMap.entrySet()) {
+            if (!fieldNamesUsedInQuery.contains(entry.getKey())) {
+                continue;
+            }
             indexViewMap.put(entry.getKey(), entry.getValue().immutableEntries());
         }
         // TODO optimize build indexView time
@@ -181,6 +188,22 @@ public class IndexedQueryEngineImpl implements IndexedQueryEngine {
             log.trace("Retrieve result from indexer, {}", stopWatch.prettyPrint());
         }
         return result;
+    }
+
+    @NonNull
+    private Set<String> getFieldNamesUsedInListOptions(ListOptions options, Sort sort) {
+        var fieldNamesUsedInQuery = new HashSet<String>();
+        fieldNamesUsedInQuery.add(PrimaryKeySpecUtils.PRIMARY_INDEX_NAME);
+        for (Sort.Order order : sort) {
+            fieldNamesUsedInQuery.add(order.getProperty());
+        }
+        var hasFieldSelector = hasFieldSelector(options.getFieldSelector());
+        if (hasFieldSelector) {
+            var fieldQuery = options.getFieldSelector().query();
+            var fieldNames = QueryFactory.getFieldNamesUsedInQuery(fieldQuery);
+            fieldNamesUsedInQuery.addAll(fieldNames);
+        }
+        return fieldNamesUsedInQuery;
     }
 
     boolean hasLabelSelector(LabelSelector labelSelector) {

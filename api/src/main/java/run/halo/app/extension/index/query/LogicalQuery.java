@@ -2,7 +2,9 @@ package run.halo.app.extension.index.query;
 
 import java.util.Collection;
 import java.util.Objects;
+import lombok.Getter;
 
+@Getter
 public abstract class LogicalQuery implements Query {
     protected final Collection<Query> childQueries;
     protected final int size;

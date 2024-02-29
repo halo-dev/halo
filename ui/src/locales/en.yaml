@@ -1397,11 +1397,10 @@ core:
         placeholder:
           options:
             placeholder: Enter / to select input type.
-        image:
-          upload:
-            error: Upload failed
-            click_retry: Click to retry
-            loading: Loading
+        upload:
+          error: Upload failed
+          click_retry: Click to retry
+          loading: Loading
           attachment:
             title: Attachment Library
           permalink:

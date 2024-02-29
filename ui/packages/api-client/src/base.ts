@@ -73,16 +73,3 @@ export class RequiredError extends Error {
     this.name = "RequiredError";
   }
 }
-
-interface ServerMap {
-  [key: string]: {
-    url: string,
-    description: string,
-  }[];
-}
-
-/**
- *
- * @export
- */
-export const operationServerMap: ServerMap = {};
