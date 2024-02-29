@@ -4,6 +4,7 @@ import {
   type FormKitSchemaNode,
   type FormKitExtendableSchemaRoot,
   type FormKitSchemaCondition,
+  type FormKitSectionsSchema,
 } from "@formkit/core";
 import {
   extendSchema,
@@ -37,9 +38,7 @@ function createSection(
       FormKitSchemaExtendableSection | string | FormKitSchemaCondition
     >
   ) => {
-    const extendable = (
-      extensions: Record<string, Partial<FormKitSchemaNode>>
-    ) => {
+    const extendable = (extensions: FormKitSectionsSchema) => {
       const node = !el || typeof el === "string" ? { $el: el } : el();
       if ("string" != typeof node) {
         if (isDOM(node) || isComponent(node) || "$formkit" in node) {
@@ -91,7 +90,7 @@ function createSection(
 export function createRoot(
   rootSection: FormKitSchemaExtendableSection
 ): FormKitExtendableSchemaRoot {
-  return (extensions: Record<string, Partial<FormKitSchemaNode>>) => {
+  return (extensions: FormKitSectionsSchema) => {
     return [rootSection(extensions)];
   };
 }
