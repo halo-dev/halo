@@ -22,9 +22,6 @@ const Image = ExtensionImage.extend<UiImageOptions>({
   addAttributes() {
     return {
       ...this.parent?.(),
-      file: {
-        default: null,
-      },
       width: {
         default: "100%",
         parseHTML: (element) => {
@@ -49,6 +46,15 @@ const Image = ExtensionImage.extend<UiImageOptions>({
           return {
             height: attributes.height,
           };
+        },
+      },
+      file: {
+        default: null,
+        renderHTML() {
+          return {};
+        },
+        parseHTML() {
+          return null;
         },
       },
     };
