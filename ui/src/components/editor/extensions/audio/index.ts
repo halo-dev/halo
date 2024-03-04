@@ -24,6 +24,12 @@ const Audio = ExtensionAudio.extend<UiAudioOptions>({
       ...this.parent?.(),
       file: {
         default: null,
+        renderHTML() {
+          return {};
+        },
+        parseHTML() {
+          return null;
+        },
       },
     };
   },
