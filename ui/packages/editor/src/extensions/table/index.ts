@@ -9,6 +9,7 @@ import {
   mergeAttributes,
   isNodeActive,
   CoreEditor,
+  findParentNode,
 } from "@/tiptap";
 import {
   type Node as ProseMirrorNode,
@@ -36,7 +37,12 @@ import { markRaw } from "vue";
 import { i18n } from "@/locales";
 import type { ExtensionOptions, NodeBubbleMenu } from "@/types";
 import { BlockActionSeparator, ToolboxItem } from "@/components";
-import { hasTableBefore, isTableSelected } from "./util";
+import {
+  hasTableBefore,
+  isCellSelection,
+  isTableSelected,
+  selectTable,
+} from "./util";
 
 function updateColumns(
   node: ProseMirrorNode,
@@ -484,6 +490,38 @@ const Table = TiptapTable.extend<ExtensionOptions & TableOptions>({
       Backspace: () => handleBackspace(),
 
       "Mod-Backspace": () => handleBackspace(),
+
+      "Mod-a": ({ editor }) => {
+        if (!isNodeActive(editor.state, Table.name)) {
+          return false;
+        }
+
+        const { tr, selection } = editor.state;
+        // If the entire table is already selected, no longer perform the select all operation.
+        if (isTableSelected(selection)) {
+          return true;
+        }
+
+        if (isCellSelection(selection)) {
+          selectTable(tr);
+          editor.view.dispatch(tr);
+          return true;
+        }
+
+        let cellNodePos = findParentNode(
+          (node) => node.type.name === TableCell.name
+        )(selection);
+        if (!cellNodePos) {
+          cellNodePos = findParentNode(
+            (node) => node.type.name === TableHeader.name
+          )(selection);
+        }
+        if (!cellNodePos) {
+          return false;
+        }
+        editor.commands.setNodeSelection(cellNodePos.pos);
+        return true;
+      },
     };
   },
 
