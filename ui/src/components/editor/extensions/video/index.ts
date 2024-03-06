@@ -24,6 +24,12 @@ const Video = ExtensionVideo.extend<UiVideoOptions>({
       ...this.parent?.(),
       file: {
         default: null,
+        renderHTML() {
+          return {};
+        },
+        parseHTML() {
+          return null;
+        },
       },
     };
   },
