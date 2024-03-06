@@ -94,4 +94,23 @@ public class AndTest {
         var resultSet = query.matches(indexView);
         assertThat(resultSet).containsExactly("100");
     }
+
+    @Test
+    void orAndMatch() {
+        var indexView = IndexViewDataSet.createEmployeeIndexView();
+        // test the case when the data matched by the query does not intersect with the data
+        // matched by the and query
+        // or(query, and(otherQuery1, otherQuery2))
+        var query = or(
+            // matched with id 101
+            and(equal("lastName", "Day"), equal("managerId", "102")),
+            // matched with id 100, 103
+            and(
+                equal("hireDate", "17"),
+                greaterThan("salary", "1800")
+            )
+        );
+        var resultSet = query.matches(indexView);
+        assertThat(resultSet).containsExactly("100", "101", "103");
+    }
 }
