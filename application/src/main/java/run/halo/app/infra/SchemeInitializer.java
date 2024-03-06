@@ -1,5 +1,7 @@
 package run.halo.app.infra;
 
+import static org.apache.commons.lang3.BooleanUtils.isTrue;
+import static org.apache.commons.lang3.BooleanUtils.toStringTrueFalse;
 import static org.apache.commons.lang3.ObjectUtils.defaultIfNull;
 import static run.halo.app.extension.index.IndexAttributeFactory.multiValueAttribute;
 import static run.halo.app.extension.index.IndexAttributeFactory.simpleAttribute;
@@ -206,7 +208,69 @@ public class SchemeInitializer implements ApplicationListener<ApplicationContext
                 )
             );
         });
-        schemeManager.register(Comment.class);
+        schemeManager.register(Comment.class, indexSpecs -> {
+            indexSpecs.add(new IndexSpec()
+                .setName("spec.creationTime")
+                .setIndexFunc(simpleAttribute(Comment.class,
+                    comment -> comment.getSpec().getCreationTime().toString())
+                ));
+            indexSpecs.add(new IndexSpec()
+                .setName("spec.approved")
+                .setIndexFunc(simpleAttribute(Comment.class,
+                    comment -> toStringTrueFalse(isTrue(comment.getSpec().getApproved())))
+                ));
+            indexSpecs.add(new IndexSpec()
+                .setName("spec.owner")
+                .setIndexFunc(simpleAttribute(Comment.class, comment -> {
+                    var owner = comment.getSpec().getOwner();
+                    return Comment.CommentOwner.ownerIdentity(owner.getKind(), owner.getName());
+                })));
+            indexSpecs.add(new IndexSpec()
+                .setName("spec.subjectRef")
+                .setIndexFunc(simpleAttribute(Comment.class,
+                    comment -> Comment.toSubjectRefKey(comment.getSpec().getSubjectRef()))
+                ));
+            indexSpecs.add(new IndexSpec()
+                .setName("spec.top")
+                .setIndexFunc(simpleAttribute(Comment.class,
+                    comment -> toStringTrueFalse(isTrue(comment.getSpec().getTop())))
+                ));
+            indexSpecs.add(new IndexSpec()
+                .setName("spec.hidden")
+                .setIndexFunc(simpleAttribute(Comment.class,
+                    comment -> toStringTrueFalse(isTrue(comment.getSpec().getHidden())))
+                ));
+            indexSpecs.add(new IndexSpec()
+                .setName("spec.priority")
+                .setIndexFunc(simpleAttribute(Comment.class,
+                    comment -> {
+                        var isTop = comment.getSpec().getTop();
+                        // only top comments have priority
+                        if (!isTop) {
+                            return "0";
+                        }
+                        return defaultIfNull(comment.getSpec().getPriority(), 0).toString();
+                    })
+                ));
+            indexSpecs.add(new IndexSpec()
+                .setName("spec.raw")
+                .setIndexFunc(simpleAttribute(Comment.class,
+                    comment -> comment.getSpec().getRaw())
+                ));
+            indexSpecs.add(new IndexSpec()
+                .setName("status.lastReplyTime")
+                .setIndexFunc(simpleAttribute(Comment.class, comment -> {
+                    var lastReplyTime = comment.getStatusOrDefault().getLastReplyTime();
+                    return defaultIfNull(lastReplyTime,
+                        comment.getSpec().getCreationTime()).toString();
+                })));
+            indexSpecs.add(new IndexSpec()
+                .setName("status.replyCount")
+                .setIndexFunc(simpleAttribute(Comment.class, comment -> {
+                    var replyCount = comment.getStatusOrDefault().getReplyCount();
+                    return defaultIfNull(replyCount, 0).toString();
+                })));
+        });
         schemeManager.register(Reply.class);
         schemeManager.register(SinglePage.class);
         // storage.halo.run
