@@ -97,6 +97,7 @@ const resetUpload = () => {
     props.updateAttributes({
       width: undefined,
       height: undefined,
+      file: undefined,
     });
   }
 };
