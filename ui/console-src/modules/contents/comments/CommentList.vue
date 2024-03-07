@@ -89,10 +89,22 @@ const {
     keyword,
   ],
   queryFn: async () => {
+    const fieldSelectorMap: Record<string, string | boolean | undefined> = {
+      "spec.approved": selectedApprovedStatus.value,
+    };
+
+    const fieldSelector = Object.entries(fieldSelectorMap)
+      .map(([key, value]) => {
+        if (value !== undefined) {
+          return `${key}=${value}`;
+        }
+      })
+      .filter(Boolean) as string[];
+
     const { data } = await apiClient.comment.listComments({
+      fieldSelector,
       page: page.value,
       size: size.value,
-      approved: selectedApprovedStatus.value,
       sort: [selectedSort.value].filter(Boolean) as string[],
       keyword: keyword.value,
       ownerName: selectedUser.value,
@@ -105,10 +117,10 @@ const {
     return data.items;
   },
   refetchInterval(data) {
-    const deletingComments = data?.filter(
+    const hasDeletingData = data?.some(
       (comment) => !!comment.comment.metadata.deletionTimestamp
     );
-    return deletingComments?.length ? 1000 : false;
+    return hasDeletingData ? 1000 : false;
   },
 });
 
@@ -299,33 +311,33 @@ const handleApproveInBatch = async () => {
                     label: t(
                       'core.comment.filters.sort.items.last_reply_time_desc'
                     ),
-                    value: 'lastReplyTime,desc',
+                    value: 'status.lastReplyTime,desc',
                   },
                   {
                     label: t(
                       'core.comment.filters.sort.items.last_reply_time_asc'
                     ),
-                    value: 'lastReplyTime,asc',
+                    value: 'status.lastReplyTime,asc',
                   },
                   {
                     label: t(
                       'core.comment.filters.sort.items.reply_count_desc'
                     ),
-                    value: 'replyCount,desc',
+                    value: 'status.replyCount,desc',
                   },
                   {
                     label: t('core.comment.filters.sort.items.reply_count_asc'),
-                    value: 'replyCount,asc',
+                    value: 'status.replyCount,asc',
                   },
                   {
                     label: t(
                       'core.comment.filters.sort.items.create_time_desc'
                     ),
-                    value: 'creationTimestamp,desc',
+                    value: 'metadata.creationTimestamp,desc',
                   },
                   {
                     label: t('core.comment.filters.sort.items.create_time_asc'),
-                    value: 'creationTimestamp,asc',
+                    value: 'metadata.creationTimestamp,asc',
                   },
                 ]"
               />
