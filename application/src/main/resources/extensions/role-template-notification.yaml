@@ -13,3 +13,6 @@ rules:
   - apiGroups: [ "api.console.halo.run" ]
     resources: [ "notifiers/sender-config" ]
     verbs: [ "get", "update" ]
+  - apiGroups: [ "console.api.notification.halo.run" ]
+    resources: [ "notifiers/validation" ]
+    verbs: [ "default-email-notifier" ]

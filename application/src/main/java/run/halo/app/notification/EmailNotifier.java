@@ -1,23 +1,21 @@
 package run.halo.app.notification;
 
 import com.fasterxml.jackson.databind.JsonNode;
-import java.nio.charset.StandardCharsets;
-import java.util.Properties;
 import java.util.concurrent.atomic.AtomicReference;
-import lombok.Data;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.data.util.Pair;
+import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.JavaMailSenderImpl;
-import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.mail.javamail.MimeMessagePreparator;
 import org.springframework.stereotype.Component;
 import reactor.core.publisher.Mono;
 import reactor.core.scheduler.Schedulers;
 import run.halo.app.core.extension.notification.Subscription;
 import run.halo.app.infra.utils.JsonUtils;
+import run.halo.app.notification.EmailSenderHelper.EmailSenderConfig;
 
 /**
  * <p>A notifier that can send email.</p>
@@ -34,7 +32,8 @@ public class EmailNotifier implements ReactiveNotifier {
 
     private final SubscriberEmailResolver subscriberEmailResolver;
     private final NotificationTemplateRender notificationTemplateRender;
-    private final AtomicReference<Pair<EmailSenderConfig, JavaMailSenderImpl>>
+    private final EmailSenderHelper emailSenderHelper;
+    private final AtomicReference<Pair<EmailSenderConfig, JavaMailSender>>
         emailSenderConfigPairRef = new AtomicReference<>();
 
     @Override
@@ -48,7 +47,7 @@ public class EmailNotifier implements ReactiveNotifier {
             return Mono.empty();
         }
 
-        JavaMailSenderImpl javaMailSender = getJavaMailSender(emailSenderConfig);
+        JavaMailSender javaMailSender = getJavaMailSender(emailSenderConfig);
 
         String recipient = context.getMessage().getRecipient();
         var subscriber = new Subscription.Subscriber();
@@ -83,55 +82,20 @@ public class EmailNotifier implements ReactiveNotifier {
     }
 
     @NonNull
-    private static MimeMessagePreparator getMimeMessagePreparator(String toEmail,
+    private MimeMessagePreparator getMimeMessagePreparator(String toEmail,
         EmailSenderConfig emailSenderConfig, NotificationContext.MessagePayload payload) {
-        return mimeMessage -> {
-            MimeMessageHelper helper =
-                new MimeMessageHelper(mimeMessage, true, StandardCharsets.UTF_8.name());
-            helper.setFrom(emailSenderConfig.getUsername(), emailSenderConfig.getDisplayName());
-
-            helper.setSubject(payload.getTitle());
-            helper.setText(payload.getRawBody(), payload.getHtmlBody());
-            helper.setTo(toEmail);
-        };
+        return emailSenderHelper.createMimeMessagePreparator(emailSenderConfig, toEmail,
+            payload.getTitle(),
+            payload.getRawBody(), payload.getHtmlBody());
     }
 
-    @NonNull
-    private static JavaMailSenderImpl createJavaMailSender(EmailSenderConfig emailSenderConfig) {
-        JavaMailSenderImpl javaMailSender = new JavaMailSenderImpl();
-        javaMailSender.setHost(emailSenderConfig.getHost());
-        javaMailSender.setPort(emailSenderConfig.getPort());
-        javaMailSender.setUsername(emailSenderConfig.getUsername());
-        javaMailSender.setPassword(emailSenderConfig.getPassword());
-
-        Properties props = javaMailSender.getJavaMailProperties();
-        props.put("mail.transport.protocol", "smtp");
-        props.put("mail.smtp.auth", "true");
-        if ("SSL".equals(emailSenderConfig.getEncryption())) {
-            props.put("mail.smtp.ssl.enable", "true");
-        }
-
-        if ("TLS".equals(emailSenderConfig.getEncryption())) {
-            props.put("mail.smtp.starttls.enable", "true");
-        }
-
-        if ("NONE".equals(emailSenderConfig.getEncryption())) {
-            props.put("mail.smtp.ssl.enable", "false");
-            props.put("mail.smtp.starttls.enable", "false");
-        }
-
-        if (log.isDebugEnabled()) {
-            props.put("mail.debug", "true");
-        }
-        return javaMailSender;
-    }
-
-    JavaMailSenderImpl getJavaMailSender(EmailSenderConfig emailSenderConfig) {
+    JavaMailSender getJavaMailSender(EmailSenderConfig emailSenderConfig) {
         return emailSenderConfigPairRef.updateAndGet(pair -> {
             if (pair != null && pair.getFirst().equals(emailSenderConfig)) {
                 return pair;
             }
-            return Pair.of(emailSenderConfig, createJavaMailSender(emailSenderConfig));
+            return Pair.of(emailSenderConfig,
+                emailSenderHelper.createJavaMailSender(emailSenderConfig));
         }).getSecond();
     }
 
@@ -155,25 +119,5 @@ public class EmailNotifier implements ReactiveNotifier {
             </p>
             </div>
             """, attributes);
-    }
-
-    @Data
-    static class EmailSenderConfig {
-        private boolean enable;
-        private String displayName;
-        private String username;
-        private String password;
-        private String host;
-        private Integer port;
-        private String encryption;
-
-        /**
-         * Gets email display name.
-         *
-         * @return display name if not blank, otherwise username.
-         */
-        public String getDisplayName() {
-            return StringUtils.defaultIfBlank(displayName, username);
-        }
     }
 }
