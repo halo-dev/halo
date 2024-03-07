@@ -1381,6 +1381,10 @@ core:
       creation_label: 創建 {text} 標籤
     validation:
       trim: 不能以空格開頭或結尾
+    verify_form:
+      no_action_defined: 未定義{label}介面
+      verify_success: "{label}成功"
+      verify_failed: "{label}失敗"
   common:
     buttons:
       save: 保存
