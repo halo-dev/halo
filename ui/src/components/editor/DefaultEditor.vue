@@ -103,6 +103,7 @@ const { currentUserHasPermission } = usePermission();
 
 const props = withDefaults(
   defineProps<{
+    title?: string;
     raw?: string;
     content: string;
     uploadImage?: (
@@ -111,6 +112,7 @@ const props = withDefaults(
     ) => Promise<Attachment>;
   }>(),
   {
+    title: "",
     raw: "",
     content: "",
     uploadImage: undefined,
@@ -118,6 +120,7 @@ const props = withDefaults(
 );
 
 const emit = defineEmits<{
+  (event: "update:title", value: string): void;
   (event: "update:raw", value: string): void;
   (event: "update:content", value: string): void;
   (event: "update", value: string): void;
@@ -399,7 +402,6 @@ onMounted(() => {
       UiExtensionUpload,
       ExtensionSearchAndReplace,
     ],
-    autofocus: "start",
     parseOptions: {
       preserveWhitespace: true,
     },
@@ -436,6 +438,10 @@ const currentLocale = i18n.global.locale.value as
   | "en"
   | "zh"
   | "en-US";
+
+function onTitleInput(event: Event) {
+  emit("update:title", (event.target as HTMLInputElement).value);
+}
 </script>
 
 <template>
@@ -447,6 +453,16 @@ const currentLocale = i18n.global.locale.value as
       @close="handleCloseAttachmentSelectorModal"
     />
     <RichTextEditor v-if="editor" :editor="editor" :locale="currentLocale">
+      <template #content>
+        <input
+          :value="title"
+          type="text"
+          autofocus
+          placeholder="请输入标题"
+          class="w-full border-x-0 !border-b border-t-0 !border-solid !border-gray-100 p-0 !py-2 text-4xl font-semibold placeholder:text-gray-300"
+          @change="onTitleInput"
+        />
+      </template>
       <template v-if="showSidebar" #extra>
         <OverlayScrollbarsComponent
           element="div"
