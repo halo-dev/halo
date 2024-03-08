@@ -4,6 +4,17 @@ import type { ExtensionOptions } from "@/types";
 import { mergeAttributes } from "@/tiptap/vue-3";
 
 const Link = TiptapLink.extend<ExtensionOptions & LinkOptions>({
+  addOptions() {
+    return {
+      ...this.parent?.(),
+      ...{
+        HTMLAttributes: {
+          rel: null,
+        },
+      },
+    };
+  },
+
   renderHTML({ HTMLAttributes }) {
     const href = HTMLAttributes.href;
     // False positive; we're explicitly checking for javascript: links to ignore them
