@@ -31,6 +31,7 @@ import run.halo.app.content.comment.ReplyService;
 import run.halo.app.core.extension.content.Comment;
 import run.halo.app.core.extension.content.Reply;
 import run.halo.app.extension.ListResult;
+import run.halo.app.extension.PageRequest;
 import run.halo.app.extension.Ref;
 import run.halo.app.infra.SystemConfigurableEnvironmentFetcher;
 import run.halo.app.theme.finders.CommentFinder;
@@ -77,7 +78,7 @@ class CommentFinderEndpointTest {
 
     @Test
     void listComments() {
-        when(commentPublicQueryService.list(any(), anyInt(), anyInt(), any()))
+        when(commentPublicQueryService.list(any(), any(PageRequest.class)))
             .thenReturn(Mono.just(new ListResult<>(1, 10, 0, List.of())));
 
         Ref ref = new Ref();
@@ -86,21 +87,20 @@ class CommentFinderEndpointTest {
         ref.setKind("Post");
         ref.setName("test");
         webTestClient.get()
-            .uri(uriBuilder -> {
-                return uriBuilder.path("/comments")
-                    .queryParam("group", ref.getGroup())
-                    .queryParam("version", ref.getVersion())
-                    .queryParam("kind", ref.getKind())
-                    .queryParam("name", ref.getName())
-                    .queryParam("page", 1)
-                    .queryParam("size", 10)
-                    .build();
-            })
+            .uri(uriBuilder -> uriBuilder.path("/comments")
+                .queryParam("group", ref.getGroup())
+                .queryParam("version", ref.getVersion())
+                .queryParam("kind", ref.getKind())
+                .queryParam("name", ref.getName())
+                .queryParam("page", 1)
+                .queryParam("size", 10)
+                .build())
             .exchange()
             .expectStatus()
             .isOk();
         ArgumentCaptor<Ref> refCaptor = ArgumentCaptor.forClass(Ref.class);
-        verify(commentPublicQueryService, times(1)).list(refCaptor.capture(), eq(1), eq(10), any());
+        verify(commentPublicQueryService, times(1))
+            .list(refCaptor.capture(), any(PageRequest.class));
         Ref value = refCaptor.getValue();
         assertThat(value).isEqualTo(ref);
     }

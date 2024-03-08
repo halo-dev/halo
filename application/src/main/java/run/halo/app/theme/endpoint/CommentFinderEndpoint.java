@@ -1,7 +1,6 @@
 package run.halo.app.theme.endpoint;
 
 import static io.swagger.v3.oas.annotations.media.Schema.RequiredMode.REQUIRED;
-import static java.util.Comparator.comparing;
 import static org.apache.commons.lang3.BooleanUtils.isFalse;
 import static org.apache.commons.lang3.BooleanUtils.isTrue;
 import static org.springdoc.core.fn.builders.apiresponse.Builder.responseBuilder;
@@ -16,8 +15,6 @@ import io.github.resilience4j.reactor.ratelimiter.operator.RateLimiterOperator;
 import io.swagger.v3.oas.annotations.enums.ParameterIn;
 import io.swagger.v3.oas.annotations.media.ArraySchema;
 import io.swagger.v3.oas.annotations.media.Schema;
-import java.util.ArrayList;
-import java.util.Comparator;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.apache.commons.lang3.StringUtils;
@@ -43,9 +40,10 @@ import run.halo.app.core.extension.content.Comment;
 import run.halo.app.core.extension.content.Reply;
 import run.halo.app.core.extension.endpoint.CustomEndpoint;
 import run.halo.app.core.extension.endpoint.SortResolver;
-import run.halo.app.extension.Comparators;
 import run.halo.app.extension.GroupVersion;
 import run.halo.app.extension.ListResult;
+import run.halo.app.extension.PageRequest;
+import run.halo.app.extension.PageRequestImpl;
 import run.halo.app.extension.Ref;
 import run.halo.app.extension.router.IListRequest;
 import run.halo.app.extension.router.QueryParamBuildUtil;
@@ -213,9 +211,7 @@ public class CommentFinderEndpoint implements CustomEndpoint {
 
     Mono<ServerResponse> listComments(ServerRequest request) {
         CommentQuery commentQuery = new CommentQuery(request);
-        var comparator = commentQuery.toComparator();
-        return commentPublicQueryService.list(commentQuery.toRef(), commentQuery.getPage(),
-                commentQuery.getSize(), comparator)
+        return commentPublicQueryService.list(commentQuery.toRef(), commentQuery.toPageRequest())
             .flatMap(list -> ServerResponse.ok().bodyValue(list));
     }
 
@@ -302,26 +298,12 @@ public class CommentFinderEndpoint implements CustomEndpoint {
             return ref;
         }
 
-        String emptyToNull(String str) {
-            return StringUtils.isBlank(str) ? null : str;
+        public PageRequest toPageRequest() {
+            return PageRequestImpl.of(getPage(), getSize(), getSort());
         }
 
-        public Comparator<Comment> toComparator() {
-            var sort = getSort();
-            var ctOrder = sort.getOrderFor("creationTimestamp");
-            List<Comparator<Comment>> comparators = new ArrayList<>();
-            if (ctOrder != null) {
-                Comparator<Comment> comparator =
-                    comparing(comment -> comment.getMetadata().getCreationTimestamp());
-                if (ctOrder.isDescending()) {
-                    comparator = comparator.reversed();
-                }
-                comparators.add(comparator);
-                comparators.add(Comparators.compareName(true));
-            }
-            return comparators.stream()
-                .reduce(Comparator::thenComparing)
-                .orElse(null);
+        String emptyToNull(String str) {
+            return StringUtils.isBlank(str) ? null : str;
         }
     }
 
