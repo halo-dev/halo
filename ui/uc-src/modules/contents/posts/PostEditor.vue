@@ -487,6 +487,7 @@ useSessionKeepAlive();
       v-if="currentEditorProvider"
       v-model:raw="content.raw"
       v-model:content="content.content"
+      v-model:title="formState.spec.title"
       :upload-image="handleUploadImage"
       class="h-full"
       @update="handleSetContentCache"

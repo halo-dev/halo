@@ -477,6 +477,7 @@ async function handleUploadImage(file: File, options?: AxiosRequestConfig) {
       v-if="currentEditorProvider"
       v-model:raw="formState.content.raw"
       v-model:content="formState.content.content"
+      v-model:title="formState.page.spec.title"
       :upload-image="handleUploadImage"
       class="h-full"
       @update="handleSetContentCache"

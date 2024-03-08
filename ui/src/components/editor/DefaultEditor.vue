@@ -460,7 +460,8 @@ function onTitleInput(event: Event) {
           autofocus
           placeholder="请输入标题"
           class="w-full border-x-0 !border-b border-t-0 !border-solid !border-gray-100 p-0 !py-2 text-4xl font-semibold placeholder:text-gray-300"
-          @change="onTitleInput"
+          @input="onTitleInput"
+          @keydown.enter="() => editor?.commands.focus('start')"
         />
       </template>
       <template v-if="showSidebar" #extra>

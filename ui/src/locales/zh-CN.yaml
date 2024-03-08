@@ -436,7 +436,7 @@ core:
         description: 该操作会将自定义页面恢复到被删除之前的状态。
   page_editor:
     title: 页面编辑
-    untitled: Untitled page
+    untitled: 未命名页面
   comment:
     title: 评论
     empty:
