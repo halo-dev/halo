@@ -21,9 +21,10 @@ export function setIncompleteMessage(node: FormKitNode) {
   );
 }
 
-function buildVerifyFormValue(node: FormkitNode) {
+function buildVerifyFormValue(node: FormKitNode) {
+  if (!node.parent) return {};
   const parentValue = {
-    ...node.parent.value,
+    ...(node.parent.value as Record<string, unknown>),
   };
   delete parentValue[node.name];
   return parentValue;
