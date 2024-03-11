@@ -1,6 +1,5 @@
 <script lang="ts" setup>
-import type { PMNode, Decoration } from "@halo-dev/richtext-editor";
-import type { Editor, Node } from "@halo-dev/richtext-editor";
+import type { NodeViewProps } from "@halo-dev/richtext-editor";
 import { NodeViewWrapper } from "@halo-dev/richtext-editor";
 import { computed, ref } from "vue";
 import type { AttachmentAttr } from "../../utils/attachment";
@@ -8,16 +7,7 @@ import RiFileMusicLine from "~icons/ri/file-music-line";
 import { EditorLinkObtain } from "../../components";
 import { VButton } from "@halo-dev/components";
 
-const props = defineProps<{
-  editor: Editor;
-  node: PMNode;
-  decorations: Decoration[];
-  selected: boolean;
-  extension: Node;
-  getPos: () => number;
-  updateAttributes: (attributes: Record<string, unknown>) => void;
-  deleteNode: () => void;
-}>();
+const props = defineProps<NodeViewProps>();
 
 const src = computed({
   get: () => {
