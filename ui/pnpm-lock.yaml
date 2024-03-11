@@ -39,26 +39,26 @@ importers:
         specifier: ^1.0.8
         version: 1.0.8
       '@formkit/core':
-        specifier: ^1.4.0
-        version: 1.4.0
+        specifier: ^1.5.9
+        version: 1.5.9
       '@formkit/i18n':
-        specifier: ^1.4.0
-        version: 1.4.0
+        specifier: ^1.5.9
+        version: 1.5.9
       '@formkit/inputs':
-        specifier: ^1.4.0
-        version: 1.4.0
+        specifier: ^1.5.9
+        version: 1.5.9
       '@formkit/themes':
-        specifier: ^1.4.0
-        version: 1.4.0(tailwindcss@3.3.0)
+        specifier: ^1.5.9
+        version: 1.5.9(tailwindcss@3.3.0)
       '@formkit/utils':
-        specifier: ^1.4.0
-        version: 1.4.0
+        specifier: ^1.5.9
+        version: 1.5.9
       '@formkit/validation':
-        specifier: ^1.4.0
-        version: 1.4.0
+        specifier: ^1.5.9
+        version: 1.5.9
       '@formkit/vue':
-        specifier: ^1.4.0
-        version: 1.4.0(tailwindcss@3.3.0)(typescript@5.3.3)
+        specifier: ^1.5.9
+        version: 1.5.9(tailwindcss@3.3.0)(typescript@5.3.3)
       '@halo-dev/api-client':
         specifier: workspace:*
         version: link:packages/api-client
@@ -150,11 +150,11 @@ importers:
         specifier: ^4.17.21
         version: 4.17.21
       overlayscrollbars:
-        specifier: ^2.1.1
-        version: 2.1.1
+        specifier: ^2.5.0
+        version: 2.5.0
       overlayscrollbars-vue:
-        specifier: ^0.5.1
-        version: 0.5.1(overlayscrollbars@2.1.1)(vue@3.4.19)
+        specifier: ^0.5.7
+        version: 0.5.7(overlayscrollbars@2.5.0)(vue@3.4.19)
       path-browserify:
         specifier: ^1.0.1
         version: 1.0.1
@@ -3021,51 +3021,51 @@ packages:
     resolution: {integrity: sha512-OfX7E2oUDYxtBvsuS4e/jSn4Q9Qb6DzgeYtsAdkPZ47znpoNsMgZw0+tVijiv3uGNR6dgNlty6r9rzIzHjtd/A==}
     dev: true
 
-  /@formkit/core@1.4.0:
-    resolution: {integrity: sha512-LQYICzYWTC+ZXPyfizHDRJTBx6WLM3eRk9T4tzU8YPV58AYWPq3E4dbN5CKl7mPApAcJX6NxQOCYuNrdNKZvQA==}
+  /@formkit/core@1.5.9:
+    resolution: {integrity: sha512-hkF2uwmXcyeGqrYAO1RN3me77NdRWhuH4pZP+A2xlGZqBLx98nvABYUfTiQsCmdnPv9RkGHHB7qTq9BOvFATHQ==}
     dependencies:
-      '@formkit/utils': 1.4.0
+      '@formkit/utils': 1.5.9
     dev: false
 
-  /@formkit/dev@1.4.0:
-    resolution: {integrity: sha512-y71zSZGAWdqjuj5p7IvptJXgDXYFTZrJSjZ9HeQjNYJ1n3Nwc7latTzJSEQyOHuboSzRWafATYNeB3pqiTvBYg==}
+  /@formkit/dev@1.5.9:
+    resolution: {integrity: sha512-aeD53iH6WD/3jKiYyGmZgvocGQv77NHHD4MF5+I/DvApu0IP1gTArsmBFaBDEVr7t5o/xO2zH06Up7sJcA0+mA==}
     dependencies:
-      '@formkit/core': 1.4.0
-      '@formkit/utils': 1.4.0
+      '@formkit/core': 1.5.9
+      '@formkit/utils': 1.5.9
     dev: false
 
-  /@formkit/i18n@1.4.0:
-    resolution: {integrity: sha512-NRqw3ummnboUVkxN68jdy/T/mvgnf0/8v76160V3dTdt4OK9Q1Eq0a7pgonm0gBqisezX/0pELRWD0NPgUZSPw==}
+  /@formkit/i18n@1.5.9:
+    resolution: {integrity: sha512-4FVqE1YciXSwl2KUuGRvpizZXBnwZACVRMrNjSn2WokVsOPYdmgwP1+35nG6LVU6i8bcOv/8fASCLUO3ADe7mw==}
     dependencies:
-      '@formkit/core': 1.4.0
-      '@formkit/utils': 1.4.0
-      '@formkit/validation': 1.4.0
+      '@formkit/core': 1.5.9
+      '@formkit/utils': 1.5.9
+      '@formkit/validation': 1.5.9
     dev: false
 
-  /@formkit/inputs@1.4.0:
-    resolution: {integrity: sha512-6IvgjOZnvtYq2oSEXkarDCaabxl4o29FhFmD64d0lC8WTaVLcRPKgo9BsLaVvLYfJgVKDzFyPIMGLFNhTsiJ/Q==}
+  /@formkit/inputs@1.5.9:
+    resolution: {integrity: sha512-UYv0MxDMaADSd3w+pXsmt83WwQ0Z00MOABjL3bgTxc4uxDRJ5L6kRV2Qz4Wp82azOuBKnAqXa1Uen17VZb4J/A==}
     dependencies:
-      '@formkit/core': 1.4.0
-      '@formkit/utils': 1.4.0
+      '@formkit/core': 1.5.9
+      '@formkit/utils': 1.5.9
     dev: false
 
-  /@formkit/observer@1.4.0:
-    resolution: {integrity: sha512-sNjLqi+deN2TCnuRDWdOJ1OjTyxavFKg9pVK1E1KRrbQr0pvPDaS4qYIjrIIWg0YMsQiea487r03elLVesMWWw==}
+  /@formkit/observer@1.5.9:
+    resolution: {integrity: sha512-FrrHFuieSdBUBCYaHZFD4VfGCoK1+qNI8EJguIUgRx4L3p22T1rvfsVr20xGi4Si3Ghq2A9o2M5wou0/8usVTA==}
     dependencies:
-      '@formkit/core': 1.4.0
-      '@formkit/utils': 1.4.0
+      '@formkit/core': 1.5.9
+      '@formkit/utils': 1.5.9
     dev: false
 
-  /@formkit/rules@1.4.0:
-    resolution: {integrity: sha512-NEVDjN89Zwx26Ze0gwqd/Bml3d4QIzp3SDps3uND9IE1Ssd3yvvSSjF5jVeHLE7ZMDLUDfOepf5xyqhPE1UbqA==}
+  /@formkit/rules@1.5.9:
+    resolution: {integrity: sha512-kslIu91gs6CmStnbUl+wzerLt0Dzm3jb4VisfUTlmrtXfMpQCD4BwF6Dic90weVbbYlEyeFroY3vONvIIRruTw==}
     dependencies:
-      '@formkit/core': 1.4.0
-      '@formkit/utils': 1.4.0
-      '@formkit/validation': 1.4.0
+      '@formkit/core': 1.5.9
+      '@formkit/utils': 1.5.9
+      '@formkit/validation': 1.5.9
     dev: false
 
-  /@formkit/themes@1.4.0(tailwindcss@3.3.0):
-    resolution: {integrity: sha512-isyHZALh6S3BM+0G5NeRQkI12gydDRXEkI6oGt5uTn3Ju2olLt8RwOXNYgJ9lWSb8HrfuHh7/89SozdIRNVuCA==}
+  /@formkit/themes@1.5.9(tailwindcss@3.3.0):
+    resolution: {integrity: sha512-hQ2paR/ycOsq25/44M6WQtniYmri9/WIU59zGyx0c34kPBh1kZTdHOkXNL/Er9nITA5O+Dlax5PseO5UH2/jYQ==}
     peerDependencies:
       tailwindcss: ^3.2.0
       unocss: ^0.31.0
@@ -3078,34 +3078,34 @@ packages:
       windicss:
         optional: true
     dependencies:
-      '@formkit/core': 1.4.0
+      '@formkit/core': 1.5.9
       tailwindcss: 3.3.0(postcss@8.4.21)
     dev: false
 
-  /@formkit/utils@1.4.0:
-    resolution: {integrity: sha512-HAkULL7/0PnRZmMJyFHZ3wxxTYl+tuJrSk13/LQyxB77luwlq8sCvlGaF5cz+0JX70HSVVc0ZJjJT4o0uTVeYQ==}
+  /@formkit/utils@1.5.9:
+    resolution: {integrity: sha512-Jaa9Q89WovxMkNcRE0IK1G8WfHwg7MDkCx9FJRhqJ+e9wGW0C2+t/vAYp0D3kS42jpNK7TTPIcozh9q2VGSUdg==}
     dev: false
 
-  /@formkit/validation@1.4.0:
-    resolution: {integrity: sha512-KF25aU5ouwg+dFryyDGPTEFgik2TzbiT824PkIQJn7Fgepplo3Dj/UvjHmM2u0hBvIE2CS6XtgE0XVhn1kRG+A==}
+  /@formkit/validation@1.5.9:
+    resolution: {integrity: sha512-E2d9pVA++PQkiwanLvp4GW+tBGGg0JBsZTAe/Lobjuc8k4Skt3sjaRtczSFQx2Cwf+S8C4OMPvYx9alGF7vl1A==}
     dependencies:
-      '@formkit/core': 1.4.0
-      '@formkit/observer': 1.4.0
-      '@formkit/utils': 1.4.0
+      '@formkit/core': 1.5.9
+      '@formkit/observer': 1.5.9
+      '@formkit/utils': 1.5.9
     dev: false
 
-  /@formkit/vue@1.4.0(tailwindcss@3.3.0)(typescript@5.3.3):
-    resolution: {integrity: sha512-qxLJLG/rc0Mv75h9aaBu1SIFo8AZq1mMCa+u4aWQdXf0k/e8Mfuyhkch25c9pfbzSjEpFzs7G7L5U1gMuTcmtQ==}
+  /@formkit/vue@1.5.9(tailwindcss@3.3.0)(typescript@5.3.3):
+    resolution: {integrity: sha512-4tVYmu22ub2X+qHafmoh7kZgI61DFLDcSIt3A8R+vS1a0593odQY3TIgy8WJSWCFQ6QeS/chOzqdinXyFtuC8g==}
     dependencies:
-      '@formkit/core': 1.4.0
-      '@formkit/dev': 1.4.0
-      '@formkit/i18n': 1.4.0
-      '@formkit/inputs': 1.4.0
-      '@formkit/observer': 1.4.0
-      '@formkit/rules': 1.4.0
-      '@formkit/themes': 1.4.0(tailwindcss@3.3.0)
-      '@formkit/utils': 1.4.0
-      '@formkit/validation': 1.4.0
+      '@formkit/core': 1.5.9
+      '@formkit/dev': 1.5.9
+      '@formkit/i18n': 1.5.9
+      '@formkit/inputs': 1.5.9
+      '@formkit/observer': 1.5.9
+      '@formkit/rules': 1.5.9
+      '@formkit/themes': 1.5.9(tailwindcss@3.3.0)
+      '@formkit/utils': 1.5.9
+      '@formkit/validation': 1.5.9
       vue: 3.4.19(typescript@5.3.3)
     transitivePeerDependencies:
       - tailwindcss
@@ -5618,7 +5618,7 @@ packages:
       ts-dedent: 2.2.0
       type-fest: 2.19.0
       vue: 3.4.19(typescript@5.3.3)
-      vue-component-type-helpers: 1.8.27
+      vue-component-type-helpers: 2.0.6
     transitivePeerDependencies:
       - encoding
       - supports-color
@@ -13718,18 +13718,18 @@ packages:
     resolution: {integrity: sha512-/jHxFIzoMXdqPzTaCpFzAAWhpkSjZPF4Vsn6jAfNpmbH/ymsmd7Qc6VE9BGn0L6YMj6uwpQLxCECpus4ukKS9Q==}
     dev: true
 
-  /overlayscrollbars-vue@0.5.1(overlayscrollbars@2.1.1)(vue@3.4.19):
-    resolution: {integrity: sha512-hYoS7qm1xq4Kv7GpCTpo1YSUmgSXF2z9OcWbwGloGO8ZXefhADwDlYy6e35r2g5Gh04slZPsyQIqEXA/CptFMA==}
+  /overlayscrollbars-vue@0.5.7(overlayscrollbars@2.5.0)(vue@3.4.19):
+    resolution: {integrity: sha512-i+jjyFXcCWlDhN3nOo0kt81NgwaixEvY60H/G2iixF2pAm4BnXi/i6muSWb5+rATd4I5TYnA+k5QYHmdI/Wvew==}
     peerDependencies:
       overlayscrollbars: ^2.0.0
       vue: ^3.2.25
     dependencies:
-      overlayscrollbars: 2.1.1
+      overlayscrollbars: 2.5.0
       vue: 3.4.19(typescript@5.3.3)
     dev: false
 
-  /overlayscrollbars@2.1.1:
-    resolution: {integrity: sha512-xvs2g8Tcq9+CZDpLEUchN3YUzjJhnTWw9kwqT/qcC53FIkOyP9mqnRMot5sW16tcsPT1KaMyzF0AMXw/7E4a8g==}
+  /overlayscrollbars@2.5.0:
+    resolution: {integrity: sha512-CWVC2dwS07XZfLHDm5GmZN1iYggiJ8Vufnvzwt0gwR9Yz1hVckKeTxg7VILZeYVGhDYJHZ1Xc8Xfys5dWZ1qiA==}
     dev: false
 
   /p-cancelable@3.0.0:
@@ -17564,6 +17564,10 @@ packages:
 
   /vue-component-type-helpers@1.8.27:
     resolution: {integrity: sha512-0vOfAtI67UjeO1G6UiX5Kd76CqaQ67wrRZiOe7UAb9Jm6GzlUr/fC7CV90XfwapJRjpCMaZFhv1V0ajWRmE9Dg==}
+    dev: true
+
+  /vue-component-type-helpers@2.0.6:
+    resolution: {integrity: sha512-qdGXCtoBrwqk1BT6r2+1Wcvl583ZVkuSZ3or7Y1O2w5AvWtlvvxwjGhmz5DdPJS9xqRdDlgTJ/38ehWnEi0tFA==}
     dev: true
 
   /vue-demi@0.13.11(vue@3.4.19):

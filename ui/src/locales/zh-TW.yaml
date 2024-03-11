@@ -521,6 +521,8 @@ core:
           create_time_asc: 較晚上傳
           size_desc: 文件大小降序
           size_asc: 文件大小升序
+          display_name_asc: 文件名升序
+          display_name_desc: 文件名降序
       view_type:
         items:
           grid: 網格模式

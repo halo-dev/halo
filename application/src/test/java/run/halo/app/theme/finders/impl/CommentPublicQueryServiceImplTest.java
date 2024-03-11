@@ -9,7 +9,6 @@ import java.time.Instant;
 import java.util.HashMap;
 import java.util.List;
 import java.util.function.Predicate;
-import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import org.json.JSONException;
 import org.junit.jupiter.api.BeforeEach;
@@ -33,7 +32,6 @@ import run.halo.app.core.extension.service.UserService;
 import run.halo.app.extension.GroupVersionKind;
 import run.halo.app.extension.ListResult;
 import run.halo.app.extension.Metadata;
-import run.halo.app.extension.MetadataOperator;
 import run.halo.app.extension.ReactiveExtensionClient;
 import run.halo.app.extension.Ref;
 import run.halo.app.infra.AnonymousUserConst;
@@ -70,103 +68,6 @@ class CommentPublicQueryServiceImplTest {
 
     @Nested
     class ListCommentTest {
-        @Test
-        void listWhenUserNotLogin() {
-            // Mock
-            mockWhenListComment();
-
-            Ref ref = Ref.of("fake-post", GroupVersionKind.fromExtension(Post.class));
-            commentPublicQueryService.list(ref, 1, 10)
-                .as(StepVerifier::create)
-                .consumeNextWith(listResult -> {
-                    assertThat(listResult.getTotal()).isEqualTo(2);
-                    assertThat(listResult.getItems().size()).isEqualTo(2);
-                    assertThat(listResult.getItems().get(0).getMetadata().getName())
-                        .isEqualTo("comment-approved");
-                })
-                .verifyComplete();
-        }
-
-        @Test
-        @WithMockUser(username = AnonymousUserConst.PRINCIPAL)
-        void listWhenUserIsAnonymous() {
-            // Mock
-            mockWhenListComment();
-
-            Ref ref = Ref.of("fake-post", GroupVersionKind.fromExtension(Post.class));
-            commentPublicQueryService.list(ref, 1, 10)
-                .as(StepVerifier::create)
-                .consumeNextWith(listResult -> {
-                    assertThat(listResult.getTotal()).isEqualTo(2);
-                    assertThat(listResult.getItems().size()).isEqualTo(2);
-                    assertThat(listResult.getItems().get(0).getMetadata().getName())
-                        .isEqualTo("comment-approved");
-                    assertThat(listResult.getItems().get(0).getStats().getUpvote()).isEqualTo(9);
-                })
-                .verifyComplete();
-        }
-
-        @Test
-        @WithMockUser(username = "fake-user")
-        void listWhenUserLoggedIn() {
-            mockWhenListComment();
-
-            Ref ref = Ref.of("fake-post", GroupVersionKind.fromExtension(Post.class));
-            commentPublicQueryService.list(ref, 1, 10)
-                .as(StepVerifier::create)
-                .consumeNextWith(listResult -> {
-                    assertThat(listResult.getTotal()).isEqualTo(3);
-                    assertThat(listResult.getItems().size()).isEqualTo(3);
-                    assertThat(listResult.getItems().get(0).getMetadata().getName())
-                        .isEqualTo("comment-not-approved");
-                    assertThat(listResult.getItems().get(1).getMetadata().getName())
-                        .isEqualTo("comment-approved");
-                })
-                .verifyComplete();
-        }
-
-
-        @Test
-        void commentComparator() {
-            // 1, now + 1s, top, 0
-            // 2, now + 2s, top, 1
-            // 3, now + 3s, top, 2
-            // 4, now + 4s, top, 2
-            // 5, now + 4s, top, 3
-            // 6, now + 1s, no, 0
-            // 7, now + 2s, no, 0
-            // 8, now + 3s, no, 0
-            // 9, now + 3s, no, 0
-            // 10, null, no, 0
-            // 11, null, no, 1
-            // 12, null, no, 3
-            // 13, now + 3s, no, 3
-            Instant now = Instant.now();
-            var comment1 = commentForCompare("1", now.plusSeconds(1), true, 0);
-            var comment2 = commentForCompare("2", now.plusSeconds(2), true, 1);
-            var comment3 = commentForCompare("3", now.plusSeconds(3), true, 2);
-            var comment4 = commentForCompare("4", now.plusSeconds(4), true, 2);
-            var comment5 = commentForCompare("5", now.plusSeconds(4), true, 3);
-            var comment6 = commentForCompare("6", now.plusSeconds(4), true, 3);
-            var comment7 = commentForCompare("7", now.plusSeconds(1), false, 0);
-            var comment8 = commentForCompare("8", now.plusSeconds(2), false, 0);
-            var comment9 = commentForCompare("9", now.plusSeconds(3), false, 0);
-            var comment10 = commentForCompare("10", now.plusSeconds(3), false, 0);
-            var comment11 = commentForCompare("11", null, false, 0);
-            var comment12 = commentForCompare("12", null, false, 1);
-            var comment13 = commentForCompare("13", null, false, 3);
-            var comment14 = commentForCompare("14", now.plusSeconds(3), false, 3);
-
-            var result = Stream.of(comment1, comment2, comment3, comment4, comment5, comment6,
-                    comment7, comment8, comment9, comment10, comment11, comment12, comment13,
-                    comment14)
-                .sorted(CommentPublicQueryServiceImpl.defaultComparator())
-                .map(Comment::getMetadata)
-                .map(MetadataOperator::getName)
-                .collect(Collectors.joining(", "));
-            assertThat(result).isEqualTo("1, 2, 4, 3, 5, 6, 10, 14, 9, 8, 7, 11, 12, 13");
-        }
-
         @Test
         void desensitizeComment() throws JSONException {
             var commentOwner = new Comment.CommentOwner();

@@ -116,6 +116,10 @@ public class Comment extends AbstractExtension {
         public String getAnnotation(String key) {
             return annotations == null ? null : annotations.get(key);
         }
+
+        public static String ownerIdentity(String kind, String name) {
+            return kind + "#" + name;
+        }
     }
 
     @Data
@@ -130,6 +134,10 @@ public class Comment extends AbstractExtension {
         private Integer unreadReplyCount;
 
         private Boolean hasNewReply;
+    }
+
+    public static String toSubjectRefKey(Ref subjectRef) {
+        return subjectRef.getGroup() + "/" + subjectRef.getKind() + "/" + subjectRef.getName();
     }
 
     public static int getUnreadReplyCount(List<Reply> replies, Instant lastReadTime) {
