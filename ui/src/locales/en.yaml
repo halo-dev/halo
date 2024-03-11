@@ -40,7 +40,7 @@ core:
             buttons:
               sending: sending
               send: Send Code
-              countdown: "resend after {timer} seconds"
+              countdown: resend after {timer} seconds
             toast_success: verification code sent
             toast_email_empty: please enter your email address
       password:
@@ -545,6 +545,8 @@ core:
           create_time_asc: Earliest uploaded
           size_desc: Descending order by file size
           size_asc: Ascending order by file size
+          display_name_asc: Ascending order by display name
+          display_name_desc: Descending order by display name
       view_type:
         items:
           grid: Grid Mode
