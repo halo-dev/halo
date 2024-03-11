@@ -106,13 +106,6 @@ function verifyActions() {
         })
       );
     })
-    .catch(() => {
-      Toast.error(
-        i18n.global.t("core.formkit.verify_form.verify_failed", {
-          label: node.props.submitLabel,
-        })
-      );
-    })
     .finally(() => {
       node.store.remove("loading");
       loadingState.value = false;
@@ -125,7 +118,6 @@ function verifyActions() {
     <VButton
       :disabled="context.node.props.submitAttrs.disabled"
       :loading="loadingState"
-      type="secondary"
     >
       {{ context.node.props.submitLabel }}
     </VButton>

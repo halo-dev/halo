@@ -21,6 +21,14 @@ export function setIncompleteMessage(node: FormKitNode) {
   );
 }
 
+function buildVerifyFormValue(node: FormkitNode) {
+  const parentValue = {
+    ...node.parent.value,
+  };
+  delete parentValue[node.name];
+  return parentValue;
+}
+
 /**
  * A feature to add a submit handler and actions section.
  *
@@ -46,13 +54,22 @@ export default function form(node: FormKitNode): void {
   node.on("created", () => {
     if (node.parent) {
       node.parent.hook.commit((val) => {
-        const verifyFormVal = val[node.name] || {};
-        delete val[node.name];
-        return { ...val, ...verifyFormVal };
+        const parentValue = {
+          ...val,
+        };
+        const verifyFormVal = parentValue[node.name] || {};
+        delete parentValue[node.name];
+        return { ...parentValue, ...verifyFormVal };
       });
-      node.input(node.parent.value);
+
+      node.hook.input(() => {
+        return buildVerifyFormValue(node);
+      });
+
+      node.input(buildVerifyFormValue(node));
     }
   });
+
   node.on("prop:incompleteMessage", () => {
     if (node.store.incomplete) setIncompleteMessage(node);
   });
