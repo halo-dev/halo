@@ -166,21 +166,7 @@ useAutoSaveContent(currentCache, toRef(content.value, "raw"), async () => {
   if (isUpdateMode.value) {
     handleSave({ mute: true });
   } else {
-    formState.value.metadata.annotations = {
-      ...formState.value.metadata.annotations,
-      [contentAnnotations.CONTENT_JSON]: JSON.stringify(content.value),
-    };
-    // Set default title and slug
-    if (!formState.value.spec.title) {
-      formState.value.spec.title = t("core.post_editor.untitled");
-    }
-    if (!formState.value.spec.slug) {
-      formState.value.spec.slug = new Date().getTime().toString();
-    }
-    const { data: createdPost } = await apiClient.uc.post.createMyPost({
-      post: formState.value,
-    });
-    onCreatePostSuccess(createdPost);
+    handleCreate();
   }
 });
 
@@ -271,14 +257,32 @@ async function handleSetEditorProviderFromRemote() {
 }
 
 // Create post
-const postCreationModal = ref(false);
-
 function handleSaveClick() {
   if (isUpdateMode.value) {
     handleSave({ mute: false });
   } else {
-    postCreationModal.value = true;
+    handleCreate();
   }
+}
+
+async function handleCreate() {
+  formState.value.metadata.annotations = {
+    ...formState.value.metadata.annotations,
+    [contentAnnotations.CONTENT_JSON]: JSON.stringify(content.value),
+  };
+  // Set default title and slug
+  if (!formState.value.spec.title) {
+    formState.value.spec.title = t("core.post_editor.untitled");
+  }
+  if (!formState.value.spec.slug) {
+    formState.value.spec.slug = new Date().getTime().toString();
+  }
+
+  const { data: createdPost } = await apiClient.uc.post.createMyPost({
+    post: formState.value,
+  });
+
+  await onCreatePostSuccess(createdPost);
 }
 
 async function onCreatePostSuccess(data: Post) {
@@ -396,24 +400,7 @@ async function handleUploadImage(file: File, options?: AxiosRequestConfig) {
     return;
   }
   if (!isUpdateMode.value) {
-    formState.value.metadata.annotations = {
-      ...formState.value.metadata.annotations,
-      [contentAnnotations.CONTENT_JSON]: JSON.stringify(content.value),
-    };
-
-    if (!formState.value.spec.title) {
-      formState.value.spec.title = t("core.post_editor.untitled");
-    }
-
-    if (!formState.value.spec.slug) {
-      formState.value.spec.slug = new Date().getTime().toString();
-    }
-
-    const { data } = await apiClient.uc.post.createMyPost({
-      post: formState.value,
-    });
-
-    await onCreatePostSuccess(data);
+    await handleCreate();
   }
 
   const { data } = await apiClient.uc.attachment.createAttachmentForPost(
@@ -493,14 +480,6 @@ useSessionKeepAlive();
       @update="handleSetContentCache"
     />
   </div>
-
-  <PostCreationModal
-    v-if="postCreationModal"
-    :title="$t('core.uc_post.creation_modal.title')"
-    :content="content"
-    @close="postCreationModal = false"
-    @success="onCreatePostSuccess"
-  />
 
   <PostCreationModal
     v-if="postPublishModal"
