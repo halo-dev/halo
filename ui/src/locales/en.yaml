@@ -40,7 +40,7 @@ core:
             buttons:
               sending: sending
               send: Send Code
-              countdown: "resend after {timer} seconds"
+              countdown: resend after {timer} seconds
             toast_success: verification code sent
             toast_email_empty: please enter your email address
       password:
@@ -1412,6 +1412,7 @@ core:
       toolbox:
         attachment: Attachment
         show_hide_sidebar: Show/Hide Sidebar
+      title_placeholder: Please enter the title
     global_search:
       placeholder: Enter keywords to search
       no_results: No search results

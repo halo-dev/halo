@@ -458,7 +458,7 @@ function onTitleInput(event: Event) {
           :value="title"
           type="text"
           autofocus
-          placeholder="请输入标题"
+          :placeholder="$t('core.components.default_editor.title_placeholder')"
           class="w-full border-x-0 !border-b border-t-0 !border-solid !border-gray-100 p-0 !py-2 text-4xl font-semibold placeholder:text-gray-300"
           @input="onTitleInput"
           @keydown.enter="() => editor?.commands.focus('start')"

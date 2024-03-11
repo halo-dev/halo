@@ -1326,6 +1326,7 @@ core:
       toolbox:
         attachment: 選擇附件
         show_hide_sidebar: 顯示 / 隱藏側邊欄
+      title_placeholder: 請輸入標題
     global_search:
       placeholder: 輸入關鍵字以搜尋
       no_results: 沒有搜尋結果
