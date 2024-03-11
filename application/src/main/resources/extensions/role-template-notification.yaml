@@ -14,5 +14,6 @@ rules:
     resources: [ "notifiers/sender-config" ]
     verbs: [ "get", "update" ]
   - apiGroups: [ "console.api.notification.halo.run" ]
-    resources: [ "notifiers/validation" ]
-    verbs: [ "default-email-notifier" ]
+    resources: [ "notifiers/verify-connection" ]
+    resourceNames: [ "default-email-notifier" ]
+    verbs: [ "create" ]

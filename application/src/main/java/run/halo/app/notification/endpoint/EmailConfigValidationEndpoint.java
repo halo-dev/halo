@@ -38,9 +38,9 @@ import run.halo.app.notification.EmailSenderHelper;
 public class EmailConfigValidationEndpoint implements CustomEndpoint {
     private static final String EMAIL_SUBJECT = "测试邮件 - 验证邮箱连通性";
     private static final String EMAIL_BODY = """
-        你好！
-        这是一封测试邮件，旨在验证您的邮箱发件配置是否正确。
-        此邮件由系统自动发送，请勿回复。
+        你好！<br/>
+        这是一封测试邮件，旨在验证您的邮箱发件配置是否正确。<br/>
+        此邮件由系统自动发送，请勿回复。<br/>
         祝好
         """;
 
