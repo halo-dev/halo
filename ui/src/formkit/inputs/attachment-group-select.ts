@@ -7,6 +7,7 @@ function optionsHandler(node: FormKitNode) {
     const { data } =
       await apiClient.extension.storage.group.liststorageHaloRunV1alpha1Group({
         labelSelector: ["!halo.run/hidden"],
+        sort: ["metadata.creationTimestamp,desc"],
       });
 
     node.props.options = data.items.map((group) => {
