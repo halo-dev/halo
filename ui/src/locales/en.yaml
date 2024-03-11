@@ -1367,7 +1367,7 @@ core:
     Cache Management: Cache
     Cache Manage: Cache Manage
     Notification Configuration: Notification Configuration
-    Configure Notifier: Configure Notifier
+    role-template-notifier-config: Configure Notifier
     Post Attachment Manager: Allow images to be uploaded in posts
     Post Author: Allows you to manage your own posts
     Post Contributor: Contributions allowed

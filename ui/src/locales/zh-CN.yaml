@@ -1315,7 +1315,7 @@ core:
     Cache Management: 缓存
     Cache Manage: 缓存管理
     Notification Configuration: 通知配置
-    Configure Notifier: 配置通知器
+    role-template-notifier-config: 配置通知器
     Post Contributor: 允许投稿
     Post Author: 允许管理自己的文章
     Post Attachment Manager: 允许在文章中上传图片

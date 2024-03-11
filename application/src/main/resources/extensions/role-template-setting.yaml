@@ -5,11 +5,11 @@ metadata:
   labels:
     halo.run/role-template: "true"
   annotations:
-    rbac.authorization.halo.run/dependencies: "[ \"role-template-view-settings\" ]"
+    rbac.authorization.halo.run/dependencies: "[ \"role-template-view-settings\", \"role-template-notifier-config\" ]"
     rbac.authorization.halo.run/module: "Settings Management"
     rbac.authorization.halo.run/display-name: "Setting Manage"
     rbac.authorization.halo.run/ui-permissions: |
-      ["system:settings:manage"]
+      ["system:settings:manage", "system:notifier:configuration"]
 rules:
   - apiGroups: [ "" ]
     resources: [ "settings" ]
