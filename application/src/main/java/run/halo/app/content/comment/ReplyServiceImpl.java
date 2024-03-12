@@ -79,9 +79,7 @@ public class ReplyServiceImpl implements ReplyService {
 
     @Override
     public Mono<ListResult<ListedReply>> list(ReplyQuery query) {
-        return client.list(Reply.class, getReplyPredicate(query),
-                ReplyService.creationTimeAscComparator(),
-                query.getPage(), query.getSize())
+        return client.listBy(Reply.class, query.toListOptions(), query.toPageRequest())
             .flatMap(list -> Flux.fromStream(list.get()
                     .map(this::toListedReply))
                 .concatMap(Function.identity())
