@@ -21,8 +21,8 @@ import {
   ref,
   toRef,
   type ComputedRef,
+  watch,
 } from "vue";
-import { cloneDeep } from "lodash-es";
 import { apiClient } from "@/utils/api-client";
 import { useRouteQuery } from "@vueuse/router";
 import { useRouter } from "vue-router";
@@ -80,7 +80,7 @@ interface PostRequestWithContent extends PostRequest {
 }
 
 // Post form
-const initialFormState: PostRequestWithContent = {
+const formState = ref<PostRequestWithContent>({
   post: {
     spec: {
       title: "",
@@ -114,12 +114,18 @@ const initialFormState: PostRequestWithContent = {
     content: "",
     rawType: "HTML",
   },
-};
-
-const formState = ref<PostRequestWithContent>(cloneDeep(initialFormState));
+});
 const settingModal = ref(false);
 const saving = ref(false);
 const publishing = ref(false);
+
+const title = ref("");
+watch(
+  () => formState.value.post.spec.title,
+  (value) => {
+    title.value = value;
+  }
+);
 
 const isUpdateMode = computed(() => {
   return !!formState.value.post.metadata.creationTimestamp;
@@ -155,6 +161,14 @@ const handleSave = async (options?: { mute?: boolean }) => {
     }
 
     if (isUpdateMode.value) {
+      // Save post title
+      if (title.value !== formState.value.post.spec.title) {
+        formState.value.post.spec.title = title.value;
+        formState.value.post = (
+          await postUpdateMutate(formState.value.post)
+        ).data;
+      }
+
       const { data } = await apiClient.post.updatePostContent({
         name: formState.value.post.metadata.name,
         content: formState.value.content,
@@ -503,7 +517,7 @@ async function handleUploadImage(file: File, options?: AxiosRequestConfig) {
       v-if="currentEditorProvider"
       v-model:raw="formState.content.raw"
       v-model:content="formState.content.content"
-      v-model:title="formState.post.spec.title"
+      v-model:title="title"
       :upload-image="handleUploadImage"
       class="h-full"
       @update="handleSetContentCache"

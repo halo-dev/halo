@@ -13,7 +13,7 @@ import {
   VSpace,
 } from "@halo-dev/components";
 import EditorProviderSelector from "@/components/dropdown-selector/EditorProviderSelector.vue";
-import { ref, toRef } from "vue";
+import { ref, toRef, watch } from "vue";
 import { useLocalStorage } from "@vueuse/core";
 import type { Post, Content, Snapshot } from "@halo-dev/api-client";
 import { randomUUID } from "@/utils/id";
@@ -81,6 +81,15 @@ const content = ref<Content>({
   rawType: "",
 });
 const snapshot = ref<Snapshot>();
+
+const title = ref();
+
+watch(
+  () => formState.value.spec.title,
+  (value) => {
+    title.value = value;
+  }
+);
 
 // provide some data to editor
 provide<ComputedRef<string | undefined>>(
@@ -304,6 +313,17 @@ const { mutateAsync: handleSave, isLoading: isSaving } = useMutation({
     mute: false,
   },
   mutationFn: async () => {
+    // Update title
+    // TODO: needs retry
+    if (title.value !== formState.value.spec.title) {
+      formState.value.spec.title = title.value;
+      const { data: updatedPost } = await apiClient.uc.post.updateMyPost({
+        name: formState.value.metadata.name,
+        post: formState.value,
+      });
+      formState.value = updatedPost;
+    }
+
     // Snapshot always exists in update mode
     if (!snapshot.value) {
       return;
@@ -474,7 +494,7 @@ useSessionKeepAlive();
       v-if="currentEditorProvider"
       v-model:raw="content.raw"
       v-model:content="content.content"
-      v-model:title="formState.spec.title"
+      v-model:title="title"
       :upload-image="handleUploadImage"
       class="h-full"
       @update="handleSetContentCache"

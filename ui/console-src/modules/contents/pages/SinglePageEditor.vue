@@ -21,10 +21,10 @@ import {
   ref,
   toRef,
   type ComputedRef,
+  watch,
 } from "vue";
 import { apiClient } from "@/utils/api-client";
 import { useRouteQuery } from "@vueuse/router";
-import { cloneDeep } from "lodash-es";
 import { useRouter } from "vue-router";
 import { randomUUID } from "@/utils/id";
 import { useContentCache } from "@/composables/use-content-cache";
@@ -69,7 +69,7 @@ const handleChangeEditorProvider = async (provider: EditorProvider) => {
 };
 
 // SinglePage form
-const initialFormState: SinglePageRequest = {
+const formState = ref<SinglePageRequest>({
   page: {
     spec: {
       title: "",
@@ -101,12 +101,18 @@ const initialFormState: SinglePageRequest = {
     content: "",
     rawType: "HTML",
   },
-};
-
-const formState = ref<SinglePageRequest>(cloneDeep(initialFormState));
+});
 const saving = ref(false);
 const publishing = ref(false);
 const settingModal = ref(false);
+
+const title = ref("");
+watch(
+  () => formState.value.page.spec.title,
+  (value) => {
+    title.value = value;
+  }
+);
 
 const isUpdateMode = computed(() => {
   return !!formState.value.page.metadata.creationTimestamp;
@@ -143,6 +149,13 @@ const handleSave = async (options?: { mute?: boolean }) => {
     }
 
     if (isUpdateMode.value) {
+      if (title.value !== formState.value.page.spec.title) {
+        formState.value.page.spec.title = title.value;
+        formState.value.page = (
+          await singlePageUpdateMutate(formState.value.page)
+        ).data;
+      }
+
       const { data } = await apiClient.singlePage.updateSinglePageContent({
         name: formState.value.page.metadata.name,
         content: formState.value.content,
@@ -477,7 +490,7 @@ async function handleUploadImage(file: File, options?: AxiosRequestConfig) {
       v-if="currentEditorProvider"
       v-model:raw="formState.content.raw"
       v-model:content="formState.content.content"
-      v-model:title="formState.page.spec.title"
+      v-model:title="title"
       :upload-image="handleUploadImage"
       class="h-full"
       @update="handleSetContentCache"
