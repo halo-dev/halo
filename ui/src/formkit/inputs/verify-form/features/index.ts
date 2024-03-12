@@ -58,9 +58,18 @@ export default function form(node: FormKitNode): void {
         const parentValue = {
           ...val,
         };
-        const verifyFormVal = parentValue[node.name] || {};
+        const verifyFormVal = (parentValue[node.name] || {}) as Record<
+          string,
+          unknown
+        >;
         delete parentValue[node.name];
-        return { ...parentValue, ...verifyFormVal };
+        const mergeFormValue = {};
+        Object.keys(verifyFormVal).forEach((key) => {
+          if (node.children.find((child) => child.name === key)) {
+            mergeFormValue[key] = verifyFormVal[key];
+          }
+        });
+        return { ...parentValue, ...mergeFormValue };
       });
 
       node.hook.input(() => {
@@ -69,6 +78,10 @@ export default function form(node: FormKitNode): void {
 
       node.input(buildVerifyFormValue(node));
     }
+  });
+
+  node.on("reset", () => {
+    console.log("reset");
   });
 
   node.on("prop:incompleteMessage", () => {
