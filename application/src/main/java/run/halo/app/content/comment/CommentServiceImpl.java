@@ -50,9 +50,8 @@ public class CommentServiceImpl implements CommentService {
 
     @Override
     public Mono<ListResult<ListedComment>> listComment(CommentQuery commentQuery) {
-        return this.client.list(Comment.class, commentQuery.toPredicate(),
-                commentQuery.toComparator(),
-                commentQuery.getPage(), commentQuery.getSize())
+        return this.client.listBy(Comment.class, commentQuery.toListOptions(),
+                commentQuery.toPageRequest())
             .flatMap(comments -> Flux.fromStream(comments.get()
                     .map(this::toListedComment))
                 .concatMap(Function.identity())
@@ -138,32 +137,21 @@ public class CommentServiceImpl implements CommentService {
     }
 
     private Mono<ListedComment> toListedComment(Comment comment) {
-        ListedComment.ListedCommentBuilder commentBuilder = ListedComment.builder()
-            .comment(comment);
-        return Mono.just(commentBuilder)
-            .flatMap(builder -> {
-                Comment.CommentOwner owner = comment.getSpec().getOwner();
-                // not empty
-                return getCommentOwnerInfo(owner)
-                    .map(builder::owner);
-            })
-            .flatMap(builder -> getCommentSubject(comment.getSpec().getSubjectRef())
-                .map(subject -> {
-                    builder.subject(subject);
-                    return builder;
-                })
-                .switchIfEmpty(Mono.just(builder))
-            )
-            .map(ListedComment.ListedCommentBuilder::build)
-            .flatMap(lc -> fetchStats(comment)
-                .doOnNext(lc::setStats)
-                .thenReturn(lc));
+        var builder = ListedComment.builder().comment(comment);
+        // not empty
+        var ownerInfoMono = getCommentOwnerInfo(comment.getSpec().getOwner())
+            .doOnNext(builder::owner);
+        var subjectMono = getCommentSubject(comment.getSpec().getSubjectRef())
+            .doOnNext(builder::subject);
+        var statsMono = fetchStats(comment.getMetadata().getName())
+            .doOnNext(builder::stats);
+        return Mono.when(ownerInfoMono, subjectMono, statsMono)
+            .then(Mono.fromSupplier(builder::build));
     }
 
-    Mono<CommentStats> fetchStats(Comment comment) {
-        Assert.notNull(comment, "The comment must not be null.");
-        String name = comment.getMetadata().getName();
-        return counterService.getByName(MeterUtils.nameOf(Comment.class, name))
+    Mono<CommentStats> fetchStats(String commentName) {
+        Assert.notNull(commentName, "The commentName must not be null.");
+        return counterService.getByName(MeterUtils.nameOf(Comment.class, commentName))
             .map(counter -> CommentStats.builder()
                 .upvote(counter.getUpvote())
                 .build()
