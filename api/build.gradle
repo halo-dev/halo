@@ -8,6 +8,11 @@ plugins {
 group = 'run.halo.app'
 description = 'API of halo project, connecting by other projects.'
 
+java {
+    sourceCompatibility = JavaVersion.VERSION_17
+    targetCompatibility = JavaVersion.VERSION_17
+}
+
 compileJava.options.encoding = "UTF-8"
 compileTestJava.options.encoding = "UTF-8"
 javadoc.options.encoding = "UTF-8"
