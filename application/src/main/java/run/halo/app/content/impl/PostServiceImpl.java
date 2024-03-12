@@ -94,48 +94,24 @@ public class PostServiceImpl extends AbstractContentService implements PostServi
 
     private Mono<ListedPost> getListedPost(Post post) {
         Assert.notNull(post, "The post must not be null.");
-        return Mono.just(post)
-            .map(p -> {
-                ListedPost listedPost = new ListedPost();
-                listedPost.setPost(p);
-                return listedPost;
-            })
-            .flatMap(lp -> fetchStats(post)
-                .doOnNext(lp::setStats)
-                .thenReturn(lp)
-            )
-            .flatMap(lp -> setTags(post.getSpec().getTags(), lp))
-            .flatMap(lp -> setCategories(post.getSpec().getCategories(), lp))
-            .flatMap(lp -> setContributors(post.getStatusOrDefault().getContributors(), lp))
-            .flatMap(lp -> setOwner(post.getSpec().getOwner(), lp));
-    }
+        var listedPost = new ListedPost().setPost(post);
 
-    private Mono<ListedPost> setTags(List<String> tagNames, ListedPost post) {
-        return listTags(tagNames)
+        var statsMono = fetchStats(post)
+            .doOnNext(listedPost::setStats);
+
+        var tagsMono = listTags(post.getSpec().getTags())
             .collectList()
-            .doOnNext(post::setTags)
-            .map(tags -> post)
-            .switchIfEmpty(Mono.defer(() -> Mono.just(post)));
-    }
+            .doOnNext(listedPost::setTags);
 
-    private Mono<ListedPost> setCategories(List<String> categoryNames, ListedPost post) {
-        return listCategories(categoryNames)
+        var categoriesMono = listCategories(post.getSpec().getCategories())
             .collectList()
-            .doOnNext(post::setCategories)
-            .map(categories -> post)
-            .switchIfEmpty(Mono.defer(() -> Mono.just(post)));
-    }
+            .doOnNext(listedPost::setCategories);
 
-    private Mono<ListedPost> setContributors(List<String> contributorNames, ListedPost post) {
-        return listContributors(contributorNames)
+        var contributorsMono = listContributors(post.getStatusOrDefault().getContributors())
             .collectList()
-            .doOnNext(post::setContributors)
-            .map(contributors -> post)
-            .switchIfEmpty(Mono.defer(() -> Mono.just(post)));
-    }
+            .doOnNext(listedPost::setContributors);
 
-    private Mono<ListedPost> setOwner(String ownerName, ListedPost post) {
-        return userService.getUserOrGhost(ownerName)
+        var ownerMono = userService.getUserOrGhost(post.getSpec().getOwner())
             .map(user -> {
                 Contributor contributor = new Contributor();
                 contributor.setName(user.getMetadata().getName());
@@ -143,8 +119,9 @@ public class PostServiceImpl extends AbstractContentService implements PostServi
                 contributor.setAvatar(user.getSpec().getAvatar());
                 return contributor;
             })
-            .doOnNext(post::setOwner)
-            .thenReturn(post);
+            .doOnNext(listedPost::setOwner);
+        return Mono.when(statsMono, tagsMono, categoriesMono, contributorsMono, ownerMono)
+            .thenReturn(listedPost);
     }
 
     private Flux<Tag> listTags(List<String> tagNames) {
@@ -184,15 +161,11 @@ public class PostServiceImpl extends AbstractContentService implements PostServi
     public Mono<Post> draftPost(PostRequest postRequest) {
         return Mono.defer(
                 () -> {
-                    Post post = postRequest.post();
+                    var post = postRequest.post();
                     return getContextUsername()
-                        .map(username -> {
-                            post.getSpec().setOwner(username);
-                            return post;
-                        })
-                        .defaultIfEmpty(post);
-                }
-            )
+                        .doOnNext(username -> post.getSpec().setOwner(username))
+                        .thenReturn(post);
+                })
             .flatMap(client::create)
             .flatMap(post -> {
                 if (postRequest.content() == null) {
@@ -292,22 +265,19 @@ public class PostServiceImpl extends AbstractContentService implements PostServi
 
     @Override
     public Mono<Post> publish(Post post) {
-        return Mono.just(post)
-            .doOnNext(p -> {
-                var spec = post.getSpec();
-                spec.setPublish(true);
-                if (spec.getHeadSnapshot() == null) {
-                    spec.setHeadSnapshot(spec.getBaseSnapshot());
-                }
-                spec.setReleaseSnapshot(spec.getHeadSnapshot());
-            }).flatMap(client::update);
+        var spec = post.getSpec();
+        spec.setPublish(true);
+        if (spec.getHeadSnapshot() == null) {
+            spec.setHeadSnapshot(spec.getBaseSnapshot());
+        }
+        spec.setReleaseSnapshot(spec.getHeadSnapshot());
+        return client.update(post);
     }
 
     @Override
     public Mono<Post> unpublish(Post post) {
-        return Mono.just(post)
-            .doOnNext(p -> p.getSpec().setPublish(false))
-            .flatMap(client::update);
+        post.getSpec().setPublish(false);
+        return client.update(post);
     }
 
     @Override
