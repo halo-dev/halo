@@ -1,5 +1,10 @@
 <script lang="ts" setup>
-import { VButton, Toast } from "@halo-dev/components";
+import {
+  VButton,
+  Toast,
+  IconCheckboxCircle,
+  IconErrorWarning,
+} from "@halo-dev/components";
 import {
   createMessage,
   type FormKitFrameworkContext,
@@ -9,7 +14,7 @@ import type { PropType } from "vue";
 import { i18n } from "@/locales";
 import { axiosInstance } from "@/utils/api-client";
 import { setIncompleteMessage } from "./features";
-import { ref } from "vue";
+import { nextTick, onMounted, ref } from "vue";
 
 const props = defineProps({
   context: {
@@ -19,6 +24,12 @@ const props = defineProps({
 });
 
 const loadingState = ref<boolean>(false);
+const stateMessage = ref<{
+  state: "default" | "success" | "error";
+  message?: string;
+}>({
+  state: "default",
+});
 
 const loading = createMessage({
   key: "loading",
@@ -86,11 +97,17 @@ function verifyActions() {
   const node = props.context.node;
   const actions = node.props.actions;
   if (!actions) {
-    Toast.error(
-      i18n.global.t("core.formkit.verify_form.no_action_defined", {
+    const message = i18n.global.t(
+      "core.formkit.verify_form.no_action_defined",
+      {
         label: node.props.submitLabel,
-      })
+      }
     );
+    stateMessage.value = {
+      state: "error",
+      message,
+    };
+    Toast.error(message);
     return;
   }
   loadingState.value = true;
@@ -100,26 +117,61 @@ function verifyActions() {
   axiosInstance
     .post(actions, val)
     .then(() => {
+      stateMessage.value = {
+        state: "success",
+      };
       Toast.success(
         i18n.global.t("core.formkit.verify_form.verify_success", {
           label: node.props.submitLabel,
         })
       );
     })
+    .catch((error) => {
+      stateMessage.value = {
+        state: "error",
+      };
+      const errorResponse = error.response;
+      const { title, detail } = errorResponse.data;
+      if (title || detail) {
+        stateMessage.value.message = detail || title;
+      }
+    })
     .finally(() => {
       node.store.remove("loading");
       loadingState.value = false;
     });
 }
+
+onMounted(() => {
+  nextTick(() => {
+    const node = props.context.node;
+    node.on("commit", () => {
+      stateMessage.value = {
+        state: "default",
+      };
+    });
+  });
+});
 </script>
 
 <template>
   <div :class="context.classes.submit" @click="handleSubmit">
     <VButton
+      v-tooltip="stateMessage.message"
       :disabled="context.node.props.submitAttrs.disabled"
       :loading="loadingState"
     >
       {{ context.node.props.submitLabel }}
+      <template v-if="stateMessage.state !== 'default'" #icon>
+        <IconCheckboxCircle
+          v-if="stateMessage.state === 'success'"
+          class="h-full w-full text-green-500"
+        />
+        <IconErrorWarning
+          v-else-if="stateMessage.state === 'error'"
+          class="h-full w-full text-red-500"
+        />
+      </template>
     </VButton>
   </div>
 </template>

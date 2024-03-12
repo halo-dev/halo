@@ -80,10 +80,6 @@ export default function form(node: FormKitNode): void {
     }
   });
 
-  node.on("reset", () => {
-    console.log("reset");
-  });
-
   node.on("prop:incompleteMessage", () => {
     if (node.store.incomplete) setIncompleteMessage(node);
   });
