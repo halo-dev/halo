@@ -374,6 +374,18 @@ onMounted(() => {
                       },
                       {
                         label: t(
+                          'core.attachment.filters.sort.items.display_name_desc'
+                        ),
+                        value: 'spec.displayName,desc',
+                      },
+                      {
+                        label: t(
+                          'core.attachment.filters.sort.items.display_name_asc'
+                        ),
+                        value: 'spec.displayName,asc',
+                      },
+                      {
+                        label: t(
                           'core.attachment.filters.sort.items.size_desc'
                         ),
                         value: 'spec.size,desc',

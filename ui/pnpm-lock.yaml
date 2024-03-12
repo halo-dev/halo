@@ -150,11 +150,11 @@ importers:
         specifier: ^4.17.21
         version: 4.17.21
       overlayscrollbars:
-        specifier: ^2.1.1
-        version: 2.1.1
+        specifier: ^2.5.0
+        version: 2.5.0
       overlayscrollbars-vue:
-        specifier: ^0.5.1
-        version: 0.5.1(overlayscrollbars@2.1.1)(vue@3.4.19)
+        specifier: ^0.5.7
+        version: 0.5.7(overlayscrollbars@2.5.0)(vue@3.4.19)
       path-browserify:
         specifier: ^1.0.1
         version: 1.0.1
@@ -5618,7 +5618,7 @@ packages:
       ts-dedent: 2.2.0
       type-fest: 2.19.0
       vue: 3.4.19(typescript@5.3.3)
-      vue-component-type-helpers: 1.8.27
+      vue-component-type-helpers: 2.0.6
     transitivePeerDependencies:
       - encoding
       - supports-color
@@ -13718,18 +13718,18 @@ packages:
     resolution: {integrity: sha512-/jHxFIzoMXdqPzTaCpFzAAWhpkSjZPF4Vsn6jAfNpmbH/ymsmd7Qc6VE9BGn0L6YMj6uwpQLxCECpus4ukKS9Q==}
     dev: true
 
-  /overlayscrollbars-vue@0.5.1(overlayscrollbars@2.1.1)(vue@3.4.19):
-    resolution: {integrity: sha512-hYoS7qm1xq4Kv7GpCTpo1YSUmgSXF2z9OcWbwGloGO8ZXefhADwDlYy6e35r2g5Gh04slZPsyQIqEXA/CptFMA==}
+  /overlayscrollbars-vue@0.5.7(overlayscrollbars@2.5.0)(vue@3.4.19):
+    resolution: {integrity: sha512-i+jjyFXcCWlDhN3nOo0kt81NgwaixEvY60H/G2iixF2pAm4BnXi/i6muSWb5+rATd4I5TYnA+k5QYHmdI/Wvew==}
     peerDependencies:
       overlayscrollbars: ^2.0.0
       vue: ^3.2.25
     dependencies:
-      overlayscrollbars: 2.1.1
+      overlayscrollbars: 2.5.0
       vue: 3.4.19(typescript@5.3.3)
     dev: false
 
-  /overlayscrollbars@2.1.1:
-    resolution: {integrity: sha512-xvs2g8Tcq9+CZDpLEUchN3YUzjJhnTWw9kwqT/qcC53FIkOyP9mqnRMot5sW16tcsPT1KaMyzF0AMXw/7E4a8g==}
+  /overlayscrollbars@2.5.0:
+    resolution: {integrity: sha512-CWVC2dwS07XZfLHDm5GmZN1iYggiJ8Vufnvzwt0gwR9Yz1hVckKeTxg7VILZeYVGhDYJHZ1Xc8Xfys5dWZ1qiA==}
     dev: false
 
   /p-cancelable@3.0.0:
@@ -17564,6 +17564,10 @@ packages:
 
   /vue-component-type-helpers@1.8.27:
     resolution: {integrity: sha512-0vOfAtI67UjeO1G6UiX5Kd76CqaQ67wrRZiOe7UAb9Jm6GzlUr/fC7CV90XfwapJRjpCMaZFhv1V0ajWRmE9Dg==}
+    dev: true
+
+  /vue-component-type-helpers@2.0.6:
+    resolution: {integrity: sha512-qdGXCtoBrwqk1BT6r2+1Wcvl583ZVkuSZ3or7Y1O2w5AvWtlvvxwjGhmz5DdPJS9xqRdDlgTJ/38ehWnEi0tFA==}
     dev: true
 
   /vue-demi@0.13.11(vue@3.4.19):
