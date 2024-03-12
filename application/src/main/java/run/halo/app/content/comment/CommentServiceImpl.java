@@ -1,8 +1,14 @@
 package run.halo.app.content.comment;
 
+import static run.halo.app.extension.index.query.QueryFactory.and;
+import static run.halo.app.extension.index.query.QueryFactory.equal;
+import static run.halo.app.extension.index.query.QueryFactory.isNull;
+
 import java.time.Instant;
 import java.util.function.Function;
 import org.apache.commons.lang3.BooleanUtils;
+import org.springframework.data.domain.Sort;
+import org.springframework.lang.NonNull;
 import org.springframework.security.core.context.ReactiveSecurityContextHolder;
 import org.springframework.stereotype.Component;
 import org.springframework.util.Assert;
@@ -12,9 +18,13 @@ import run.halo.app.core.extension.User;
 import run.halo.app.core.extension.content.Comment;
 import run.halo.app.core.extension.service.UserService;
 import run.halo.app.extension.Extension;
+import run.halo.app.extension.ListOptions;
 import run.halo.app.extension.ListResult;
+import run.halo.app.extension.PageRequest;
+import run.halo.app.extension.PageRequestImpl;
 import run.halo.app.extension.ReactiveExtensionClient;
 import run.halo.app.extension.Ref;
+import run.halo.app.extension.router.selector.FieldSelector;
 import run.halo.app.infra.SystemConfigurableEnvironmentFetcher;
 import run.halo.app.infra.exception.AccessDeniedException;
 import run.halo.app.metrics.CounterService;
@@ -112,6 +122,31 @@ public class CommentServiceImpl implements CommentService {
                         Mono.error(new IllegalStateException("The owner must not be null.")));
             })
             .flatMap(client::create);
+    }
+
+    @Override
+    public Mono<Void> removeBySubject(@NonNull Ref subjectRef) {
+        Assert.notNull(subjectRef, "The subjectRef must not be null.");
+        // ascending order by creation time and name
+        var pageRequest = PageRequestImpl.of(1, 200,
+            Sort.by("metadata.creationTimestamp", "metadata.name"));
+        return Flux.defer(() -> listCommentsByRef(subjectRef, pageRequest))
+            .expand(page -> page.hasNext()
+                ? listCommentsByRef(subjectRef, pageRequest)
+                : Mono.empty()
+            )
+            .flatMap(page -> Flux.fromIterable(page.getItems()))
+            .flatMap(client::delete)
+            .then();
+    }
+
+    Mono<ListResult<Comment>> listCommentsByRef(Ref subjectRef, PageRequest pageRequest) {
+        var listOptions = new ListOptions();
+        listOptions.setFieldSelector(FieldSelector.of(
+            and(equal("spec.subjectRef", Comment.toSubjectRefKey(subjectRef)),
+                isNull("metadata.deletionTimestamp"))
+        ));
+        return client.listBy(Comment.class, listOptions, pageRequest);
     }
 
     private boolean checkCommentOwner(Comment comment, Boolean onlySystemUser) {

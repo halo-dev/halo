@@ -28,7 +28,7 @@ import run.halo.app.extension.Extension;
 class DefaultExtensionIteratorTest {
 
     @Mock
-    private ExtensionPaginatedLister lister;
+    private ExtensionPaginatedLister<Extension> lister;
 
     @Test
     @SuppressWarnings("unchecked")

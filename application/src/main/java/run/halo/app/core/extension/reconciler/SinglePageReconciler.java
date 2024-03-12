@@ -19,7 +19,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.util.Assert;
 import run.halo.app.content.NotificationReasonConst;
 import run.halo.app.content.SinglePageService;
-import run.halo.app.core.extension.content.Comment;
+import run.halo.app.content.comment.CommentService;
 import run.halo.app.core.extension.content.Post;
 import run.halo.app.core.extension.content.SinglePage;
 import run.halo.app.core.extension.content.Snapshot;
@@ -64,6 +64,7 @@ public class SinglePageReconciler implements Reconciler<Reconciler.Request> {
     private final ExtensionClient client;
     private final SinglePageService singlePageService;
     private final CounterService counterService;
+    private final CommentService commentService;
 
     private final ExternalUrlSupplier externalUrlSupplier;
 
@@ -250,9 +251,7 @@ public class SinglePageReconciler implements Reconciler<Reconciler.Request> {
         listSnapshots(ref).forEach(client::delete);
 
         // clean up comments
-        client.list(Comment.class, comment -> comment.getSpec().getSubjectRef().equals(ref),
-                null)
-            .forEach(client::delete);
+        commentService.removeBySubject(ref).block();
 
         // delete counter for single page
         counterService.deleteByName(
