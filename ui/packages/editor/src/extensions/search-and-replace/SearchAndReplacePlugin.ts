@@ -30,15 +30,24 @@ export class SearchAndReplacePluginView {
 
   public containerElement: HTMLElement;
 
+  public init: boolean;
+
   constructor({ view, editor, element }: SearchAndReplacePluginViewProps) {
     this.editor = editor;
     this.view = view;
     this.containerElement = element;
-    const { element: editorElement } = this.editor.options;
-    editorElement.insertAdjacentElement("afterbegin", this.containerElement);
+    this.init = false;
   }
 
   update() {
+    const { parentElement: editorParentElement } = this.editor.options.element;
+    if (!this.init && editorParentElement) {
+      editorParentElement.insertAdjacentElement(
+        "afterbegin",
+        this.containerElement
+      );
+      this.init = true;
+    }
     return false;
   }
 
