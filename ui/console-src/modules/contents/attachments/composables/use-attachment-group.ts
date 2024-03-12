@@ -17,6 +17,7 @@ export function useFetchAttachmentGroup(): useFetchAttachmentGroupReturn {
         await apiClient.extension.storage.group.liststorageHaloRunV1alpha1Group(
           {
             labelSelector: ["!halo.run/hidden"],
+            sort: ["metadata.creationTimestamp,asc"],
           }
         );
       return data.items;

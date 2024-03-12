@@ -199,6 +199,17 @@ public class SchemeInitializer implements ApplicationListener<ApplicationContext
                 .setName("spec.slug")
                 .setIndexFunc(simpleAttribute(Tag.class, tag -> tag.getSpec().getSlug()))
             );
+            indexSpecs.add(new IndexSpec()
+                .setName(Tag.REQUIRE_SYNC_ON_STARTUP_INDEX_NAME)
+                .setIndexFunc(simpleAttribute(Tag.class, tag -> {
+                    var version = tag.getMetadata().getVersion();
+                    var observedVersion = tag.getStatusOrDefault().getObservedVersion();
+                    if (observedVersion == null || observedVersion < version) {
+                        return BooleanUtils.TRUE;
+                    }
+                    // do not care about the false case so return null to avoid indexing
+                    return null;
+                })));
         });
         schemeManager.register(Snapshot.class, indexSpecs -> {
             indexSpecs.add(new IndexSpec()
