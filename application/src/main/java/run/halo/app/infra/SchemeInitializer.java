@@ -223,7 +223,8 @@ public class SchemeInitializer implements ApplicationListener<ApplicationContext
             indexSpecs.add(new IndexSpec()
                 .setName("spec.creationTime")
                 .setIndexFunc(simpleAttribute(Comment.class,
-                    comment -> comment.getSpec().getCreationTime().toString())
+                    comment -> defaultIfNull(comment.getSpec().getCreationTime(),
+                        comment.getMetadata().getCreationTimestamp()).toString())
                 ));
             indexSpecs.add(new IndexSpec()
                 .setName("spec.approved")
@@ -286,7 +287,8 @@ public class SchemeInitializer implements ApplicationListener<ApplicationContext
             indexSpecs.add(new IndexSpec()
                 .setName("spec.creationTime")
                 .setIndexFunc(simpleAttribute(Reply.class,
-                    reply -> reply.getSpec().getCreationTime().toString())
+                    reply -> defaultIfNull(reply.getSpec().getCreationTime(),
+                        reply.getMetadata().getCreationTimestamp()).toString())
                 ));
             indexSpecs.add(new IndexSpec()
                 .setName("spec.commentName")

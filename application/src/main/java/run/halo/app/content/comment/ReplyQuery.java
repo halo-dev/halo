@@ -41,8 +41,9 @@ public class ReplyQuery extends SortableRequest {
     public ListOptions toListOptions() {
         var listOptions =
             labelAndFieldSelectorToListOptions(getLabelSelector(), getFieldSelector());
-        listOptions.getFieldSelector()
+        var newFieldSelector = listOptions.getFieldSelector()
             .andQuery(equal("spec.commentName", getCommentName()));
+        listOptions.setFieldSelector(newFieldSelector);
         return listOptions;
     }
 
