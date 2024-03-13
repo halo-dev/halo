@@ -20,6 +20,12 @@
 export interface TagStatus {
   /**
    *
+   * @type {number}
+   * @memberof TagStatus
+   */
+  observedVersion?: number;
+  /**
+   *
    * @type {string}
    * @memberof TagStatus
    */

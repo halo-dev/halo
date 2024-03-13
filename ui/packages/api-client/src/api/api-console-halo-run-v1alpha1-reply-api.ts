@@ -54,6 +54,7 @@ export const ApiConsoleHaloRunV1alpha1ReplyApiAxiosParamCreator = function (
      * @param {Array<string>} [labelSelector] Label selector for filtering.
      * @param {number} [page] The page number. Zero indicates no page.
      * @param {number} [size] Size of one page. Zero indicates no limit.
+     * @param {Array<string>} [sort] Sort property and direction of the list result. Support sorting based on attribute name path.
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      */
@@ -63,6 +64,7 @@ export const ApiConsoleHaloRunV1alpha1ReplyApiAxiosParamCreator = function (
       labelSelector?: Array<string>,
       page?: number,
       size?: number,
+      sort?: Array<string>,
       options: AxiosRequestConfig = {}
     ): Promise<RequestArgs> => {
       const localVarPath = `/apis/api.console.halo.run/v1alpha1/replies`;
@@ -109,6 +111,10 @@ export const ApiConsoleHaloRunV1alpha1ReplyApiAxiosParamCreator = function (
         localVarQueryParameter["size"] = size;
       }
 
+      if (sort) {
+        localVarQueryParameter["sort"] = Array.from(sort);
+      }
+
       setSearchParams(localVarUrlObj, localVarQueryParameter);
       let headersFromBaseOptions =
         baseOptions && baseOptions.headers ? baseOptions.headers : {};
@@ -143,6 +149,7 @@ export const ApiConsoleHaloRunV1alpha1ReplyApiFp = function (
      * @param {Array<string>} [labelSelector] Label selector for filtering.
      * @param {number} [page] The page number. Zero indicates no page.
      * @param {number} [size] Size of one page. Zero indicates no limit.
+     * @param {Array<string>} [sort] Sort property and direction of the list result. Support sorting based on attribute name path.
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      */
@@ -152,6 +159,7 @@ export const ApiConsoleHaloRunV1alpha1ReplyApiFp = function (
       labelSelector?: Array<string>,
       page?: number,
       size?: number,
+      sort?: Array<string>,
       options?: AxiosRequestConfig
     ): Promise<
       (
@@ -165,6 +173,7 @@ export const ApiConsoleHaloRunV1alpha1ReplyApiFp = function (
         labelSelector,
         page,
         size,
+        sort,
         options
       );
       return createRequestFunction(
@@ -205,6 +214,7 @@ export const ApiConsoleHaloRunV1alpha1ReplyApiFactory = function (
           requestParameters.labelSelector,
           requestParameters.page,
           requestParameters.size,
+          requestParameters.sort,
           options
         )
         .then((request) => request(axios, basePath));
@@ -252,6 +262,13 @@ export interface ApiConsoleHaloRunV1alpha1ReplyApiListRepliesRequest {
    * @memberof ApiConsoleHaloRunV1alpha1ReplyApiListReplies
    */
   readonly size?: number;
+
+  /**
+   * Sort property and direction of the list result. Support sorting based on attribute name path.
+   * @type {Array<string>}
+   * @memberof ApiConsoleHaloRunV1alpha1ReplyApiListReplies
+   */
+  readonly sort?: Array<string>;
 }
 
 /**
@@ -279,6 +296,7 @@ export class ApiConsoleHaloRunV1alpha1ReplyApi extends BaseAPI {
         requestParameters.labelSelector,
         requestParameters.page,
         requestParameters.size,
+        requestParameters.sort,
         options
       )
       .then((request) => request(this.axios, this.basePath));
