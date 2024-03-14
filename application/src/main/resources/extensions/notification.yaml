@@ -23,7 +23,7 @@ spec:
           label: "启用邮件通知器"
           value: false
           name: enable
-        - $formkit: verifyForm
+        - $formkit: verificationForm
           if: "$enable"
           actions: /apis/console.api.notification.halo.run/v1alpha1/notifiers/default-email-notifier/verify-connection
           label: 测试邮箱

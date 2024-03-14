@@ -58,7 +58,7 @@ function verifyActions() {
   const actions = node.props.actions;
   if (!actions) {
     const message = i18n.global.t(
-      "core.formkit.verify_form.no_action_defined",
+      "core.formkit.verification_form.no_action_defined",
       {
         label: node.props.label,
       }
@@ -81,7 +81,7 @@ function verifyActions() {
         state: "success",
       };
       Toast.success(
-        i18n.global.t("core.formkit.verify_form.verify_success", {
+        i18n.global.t("core.formkit.verification_form.verify_success", {
           label: node.props.label,
         })
       );

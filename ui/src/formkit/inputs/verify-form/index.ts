@@ -35,7 +35,7 @@ export const verificationButton = createSection("verificationButton", () => ({
  * Input definition for a form.
  * @public
  */
-export const verifyForm: FormKitTypeDefinition = {
+export const verificationForm: FormKitTypeDefinition = {
   /**
    * The actual schema of the input, or a function that returns the schema.
    */

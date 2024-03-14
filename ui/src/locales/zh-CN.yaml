@@ -1415,7 +1415,7 @@ core:
       creation_label: 创建 {text} 标签
     validation:
       trim: 不能以空格开头或结尾
-    verify_form:
+    verification_form:
       no_action_defined: 未定义{label}接口
       verify_success: "{label}成功"
       verify_failed: "{label}失败"
