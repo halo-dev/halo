@@ -69,7 +69,7 @@ core:
         plugins: Complementos
         users: Usuarios
         settings: Configuraciones
-        overview: Actuador
+        overview: Visión general
         backup: Respaldo
     operations:
       logout:
@@ -954,7 +954,7 @@ core:
   setting:
     title: Configuraciones
   overview:
-    title: Actuador
+    title: Visión general
     actions:
       copy:
         toast_browser_not_supported: El navegador actual no admite la función de copiado
