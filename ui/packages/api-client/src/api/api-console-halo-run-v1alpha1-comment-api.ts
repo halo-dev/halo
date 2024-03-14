@@ -186,7 +186,7 @@ export const ApiConsoleHaloRunV1alpha1CommentApiAxiosParamCreator = function (
      * @param {string} [ownerName] Commenter name.
      * @param {number} [page] The page number. Zero indicates no page.
      * @param {number} [size] Size of one page. Zero indicates no limit.
-     * @param {Array<string>} [sort] Sort property and direction of the list result. Supported fields: creationTimestamp,replyCount,lastReplyTime
+     * @param {Array<string>} [sort] Sort property and direction of the list result. Supported fields: metadata.creationTimestamp,status.replyCount,status.lastReplyTime
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      */
@@ -342,7 +342,7 @@ export const ApiConsoleHaloRunV1alpha1CommentApiFp = function (
      * @param {string} [ownerName] Commenter name.
      * @param {number} [page] The page number. Zero indicates no page.
      * @param {number} [size] Size of one page. Zero indicates no limit.
-     * @param {Array<string>} [sort] Sort property and direction of the list result. Supported fields: creationTimestamp,replyCount,lastReplyTime
+     * @param {Array<string>} [sort] Sort property and direction of the list result. Supported fields: metadata.creationTimestamp,status.replyCount,status.lastReplyTime
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      */
@@ -544,7 +544,7 @@ export interface ApiConsoleHaloRunV1alpha1CommentApiListCommentsRequest {
   readonly size?: number;
 
   /**
-   * Sort property and direction of the list result. Supported fields: creationTimestamp,replyCount,lastReplyTime
+   * Sort property and direction of the list result. Supported fields: metadata.creationTimestamp,status.replyCount,status.lastReplyTime
    * @type {Array<string>}
    * @memberof ApiConsoleHaloRunV1alpha1CommentApiListComments
    */

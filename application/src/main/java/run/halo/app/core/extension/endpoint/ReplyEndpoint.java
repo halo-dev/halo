@@ -48,7 +48,7 @@ public class ReplyEndpoint implements CustomEndpoint {
     }
 
     Mono<ServerResponse> listReplies(ServerRequest request) {
-        ReplyQuery replyQuery = new ReplyQuery(request.queryParams());
+        ReplyQuery replyQuery = new ReplyQuery(request.exchange());
         return replyService.list(replyQuery)
             .flatMap(listedReplies -> ServerResponse.ok().bodyValue(listedReplies));
     }

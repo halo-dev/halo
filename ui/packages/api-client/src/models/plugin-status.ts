@@ -79,6 +79,7 @@ export const PluginStatusLastProbeStateEnum = {
   Started: "STARTED",
   Stopped: "STOPPED",
   Failed: "FAILED",
+  Unloaded: "UNLOADED",
 } as const;
 
 export type PluginStatusLastProbeStateEnum =
