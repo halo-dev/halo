@@ -120,7 +120,7 @@ public class QueryFactory {
         return new And(queries);
     }
 
-    public static Query and(Query query1, Query query2) {
+    public static And and(Query query1, Query query2) {
         Collection<Query> queries = Arrays.asList(query1, query2);
         return new And(queries);
     }
