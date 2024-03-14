@@ -178,6 +178,8 @@ const handleSave = async (options?: { mute?: boolean }) => {
     } else {
       // Clear new post content cache
       handleClearCache();
+
+      formState.value.post.spec.title = title.value;
       const { data } = await apiClient.post.draftPost({
         postRequest: formState.value,
       });

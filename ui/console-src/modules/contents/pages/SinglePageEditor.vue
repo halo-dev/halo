@@ -165,6 +165,8 @@ const handleSave = async (options?: { mute?: boolean }) => {
     } else {
       // Clear new page content cache
       handleClearCache();
+
+      formState.value.page.spec.title = title.value;
       const { data } = await apiClient.singlePage.draftSinglePage({
         singlePageRequest: formState.value,
       });

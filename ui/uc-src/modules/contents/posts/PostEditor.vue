@@ -275,6 +275,7 @@ function handleSaveClick() {
 }
 
 async function handleCreate() {
+  formState.value.spec.title = title.value;
   formState.value.metadata.annotations = {
     ...formState.value.metadata.annotations,
     [contentAnnotations.CONTENT_JSON]: JSON.stringify(content.value),
