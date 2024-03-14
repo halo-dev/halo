@@ -33,6 +33,7 @@ const theme: Record<string, Record<string, string>> = {
     help: "text-xs mt-2 text-gray-500",
     messages: "list-none p-0 mt-1.5 mb-0 transition-all",
     message: "text-red-500 mt-2 text-xs",
+    verificationForm: "divide-y divide-gray-100",
   },
   button: buttonClassification,
   color: {

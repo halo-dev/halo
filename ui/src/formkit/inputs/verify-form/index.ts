@@ -2,21 +2,30 @@ import type { FormKitTypeDefinition } from "@formkit/core";
 import {
   createSection,
   disablesChildren,
-  formInput,
   message,
   messages,
 } from "@formkit/inputs";
-import { default as forms } from "./features";
-import SubmitButton from "./SubmitButton.vue";
+import { default as verifyFeature } from "./features";
+import VerificationButton from "./VerificationButton.vue";
+
+export const verifyInput = createSection("verificationForm", () => ({
+  $el: "div",
+  bind: "$attrs",
+  attrs: {
+    id: "$id",
+    name: "$node.name",
+    "data-loading": "$state.loading || undefined",
+  },
+}));
 
 export const actions = createSection("actions", () => ({
   $el: "div",
 }));
 
-export const submitInput = createSection("submitButton", () => ({
-  $cmp: "SubmitButton",
-  type: "submit",
-  bind: "$submitAttrs",
+export const verificationButton = createSection("verificationButton", () => ({
+  $cmp: "VerificationButton",
+  type: "button",
+  bind: "$buttonAttrs",
   props: {
     context: "$node.context",
   },
@@ -30,10 +39,10 @@ export const verifyForm: FormKitTypeDefinition = {
   /**
    * The actual schema of the input, or a function that returns the schema.
    */
-  schema: formInput(
+  schema: verifyInput(
     "$slots.default",
     messages(message("$message.value")),
-    actions(submitInput())
+    actions(verificationButton())
   ),
   /**
    * The type of node, can be a list, group, or input.
@@ -42,17 +51,14 @@ export const verifyForm: FormKitTypeDefinition = {
   /**
    * An array of extra props to accept for this input.
    */
-  props: ["actions", "submitLabel", "submitAttrs", "incompleteMessage"],
+  props: ["actions", "label", "buttonAttrs"],
 
-  family: "verify-form",
-
-  forceTypeProp: "form",
   /**
    * Additional features that should be added to your input
    */
-  features: [forms, disablesChildren],
+  features: [verifyFeature, disablesChildren],
 
   library: {
-    SubmitButton,
+    VerificationButton,
   },
 };

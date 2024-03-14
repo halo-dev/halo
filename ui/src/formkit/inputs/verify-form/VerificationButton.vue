@@ -5,15 +5,10 @@ import {
   IconCheckboxCircle,
   IconErrorWarning,
 } from "@halo-dev/components";
-import {
-  createMessage,
-  type FormKitFrameworkContext,
-  type FormKitNode,
-} from "@formkit/core";
+import { createMessage, type FormKitFrameworkContext } from "@formkit/core";
 import type { PropType } from "vue";
 import { i18n } from "@/locales";
 import { axiosInstance } from "@/utils/api-client";
-import { setIncompleteMessage } from "./features";
 import { nextTick, onMounted, ref } from "vue";
 
 const props = defineProps({
@@ -38,53 +33,18 @@ const loading = createMessage({
 });
 
 /**
- * Handle the submit event.
+ * Handle the verify event.
  *
  * @param e - The event
  *
  * @internal
  */
-async function handleSubmit(submitEvent: Event) {
+async function handleVerification(event: Event) {
   const node = props.context.node;
-  const submitNonce = Math.random();
-  node.props._submitNonce = submitNonce;
-  submitEvent.preventDefault();
+  event.preventDefault();
   await node.settled;
 
-  if (node.ledger.value("validating")) {
-    // There are validation rules still pending.
-    node.store.set(loading);
-    await node.ledger.settled("validating");
-    node.store.remove("loading");
-    // If this was not the same submit event, bail out.
-    if (node.props._submitNonce !== submitNonce) return;
-  }
-  // Set the submitted state on all children
-  const setSubmitted = (n: FormKitNode) =>
-    n.store.set(
-      createMessage({
-        key: "submitted",
-        value: true,
-        visible: false,
-      })
-    );
-  node.walk(setSubmitted);
-  setSubmitted(node);
-
-  node.emit("submit-raw");
-  if (typeof node.props.onSubmitRaw === "function") {
-    node.props.onSubmitRaw(submitEvent, node);
-  }
-
-  if (node.ledger.value("blocking")) {
-    if (typeof node.props.onSubmitInvalid === "function") {
-      node.props.onSubmitInvalid(node);
-    }
-    // There is still a blocking message in the store.
-    if (node.props.incompleteMessage !== false) {
-      setIncompleteMessage(node);
-    }
-  } else {
+  if (!node.ledger.value("blocking")) {
     verifyActions();
   }
 }
@@ -100,7 +60,7 @@ function verifyActions() {
     const message = i18n.global.t(
       "core.formkit.verify_form.no_action_defined",
       {
-        label: node.props.submitLabel,
+        label: node.props.label,
       }
     );
     stateMessage.value = {
@@ -122,7 +82,7 @@ function verifyActions() {
       };
       Toast.success(
         i18n.global.t("core.formkit.verify_form.verify_success", {
-          label: node.props.submitLabel,
+          label: node.props.label,
         })
       );
     })
@@ -155,13 +115,13 @@ onMounted(() => {
 </script>
 
 <template>
-  <div :class="context.classes.submit" @click="handleSubmit">
+  <div :class="context.classes.submit" class="py-4" @click="handleVerification">
     <VButton
       v-tooltip="stateMessage.message"
-      :disabled="context.node.props.submitAttrs.disabled"
+      :disabled="context.node.props.buttonAttrs.disabled"
       :loading="loadingState"
     >
-      {{ context.node.props.submitLabel }}
+      {{ context.node.props.label }}
       <template v-if="stateMessage.state !== 'default'" #icon>
         <IconCheckboxCircle
           v-if="stateMessage.state === 'success'"

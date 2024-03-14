@@ -1,25 +1,5 @@
 import { i18n } from "@/locales";
-import { createMessage, type FormKitNode } from "@formkit/core";
-
-/**
- * Set the incomplete message on a specific node.
- * @param node - The node to set the incomplete message on.
- */
-export function setIncompleteMessage(node: FormKitNode) {
-  node.store.set(
-    createMessage({
-      blocking: false,
-      key: `incomplete`,
-      meta: {
-        localize: node.props.incompleteMessage === undefined,
-        i18nArgs: [{ node }],
-        showAsMessage: true,
-      },
-      type: "ui",
-      value: node.props.incompleteMessage || "Form incomplete.",
-    })
-  );
-}
+import { type FormKitNode } from "@formkit/core";
 
 function buildVerifyFormValue(node: FormKitNode) {
   if (!node.parent) return {};
@@ -37,19 +17,15 @@ function buildVerifyFormValue(node: FormKitNode) {
  *
  * @public
  */
-export default function form(node: FormKitNode): void {
-  node.props.isForm = true;
-  node.ledger.count("validating", (m) => m.key === "validating");
-
-  node.props.submitAttrs ??= {
+export default function verify(node: FormKitNode): void {
+  node.props.buttonAttrs ??= {
     disabled: node.props.disabled,
   };
 
-  node.props.submitLabel ??=
-    node.props.label || i18n.global.t("core.common.buttons.verify");
+  node.props.label ??= i18n.global.t("core.common.buttons.verify");
 
   node.on("prop:disabled", ({ payload: disabled }) => {
-    node.props.submitAttrs = { ...node.props.submitAttrs, disabled };
+    node.props.buttonAttrs = { ...node.props.buttonAttrs, disabled };
   });
 
   node.on("created", () => {
@@ -79,9 +55,4 @@ export default function form(node: FormKitNode): void {
       node.input(buildVerifyFormValue(node));
     }
   });
-
-  node.on("prop:incompleteMessage", () => {
-    if (node.store.incomplete) setIncompleteMessage(node);
-  });
-  node.on("settled:blocking", () => node.store.remove("incomplete"));
 }
