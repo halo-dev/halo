@@ -21,8 +21,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.event.ContextRefreshedEvent;
 import org.springframework.context.event.EventListener;
 import org.springframework.dao.DataIntegrityViolationException;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.util.Predicates;
 import org.springframework.stereotype.Component;
@@ -34,7 +32,6 @@ import reactor.util.retry.Retry;
 import run.halo.app.extension.exception.ExtensionNotFoundException;
 import run.halo.app.extension.index.DefaultExtensionIterator;
 import run.halo.app.extension.index.ExtensionIterator;
-import run.halo.app.extension.index.ExtensionPaginatedLister;
 import run.halo.app.extension.index.IndexedQueryEngine;
 import run.halo.app.extension.index.IndexerFactory;
 import run.halo.app.extension.store.ReactiveExtensionStoreClient;
@@ -341,18 +338,13 @@ public class ReactiveExtensionClientImpl implements ReactiveExtensionClient {
         private ExtensionIterator<Extension> createExtensionIterator(Scheme scheme) {
             var type = scheme.type();
             var prefix = ExtensionStoreUtil.buildStoreNamePrefix(scheme);
-            var lister = new ExtensionPaginatedLister() {
-                @Override
-                @SuppressWarnings("unchecked")
-                public <E extends Extension> Page<E> list(Pageable pageable) {
-                    return client.listByNamePrefix(prefix, pageable)
-                        .map(page -> page.map(
-                            store -> (E) converter.convertFrom(type, store))
-                        )
-                        .block();
-                }
-            };
-            return new DefaultExtensionIterator<>(lister);
+            return new DefaultExtensionIterator<>(pageable ->
+                client.listByNamePrefix(prefix, pageable)
+                    .map(page ->
+                        page.map(store -> (Extension) converter.convertFrom(type, store))
+                    )
+                    .block()
+            );
         }
 
         @EventListener(ContextRefreshedEvent.class)

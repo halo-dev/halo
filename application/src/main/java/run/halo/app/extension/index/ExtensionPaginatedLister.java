@@ -10,14 +10,14 @@ import run.halo.app.extension.Extension;
  * @author guqing
  * @since 2.12.0
  */
-public interface ExtensionPaginatedLister {
+@FunctionalInterface
+public interface ExtensionPaginatedLister<E extends Extension> {
 
     /**
      * List extensions with pagination.
      *
      * @param pageable pageable
-     * @param <E> extension type
      * @return page of extensions
      */
-    <E extends Extension> Page<E> list(Pageable pageable);
+    Page<E> list(Pageable pageable);
 }

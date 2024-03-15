@@ -25,8 +25,8 @@ import org.springframework.stereotype.Component;
 import run.halo.app.content.ContentWrapper;
 import run.halo.app.content.NotificationReasonConst;
 import run.halo.app.content.PostService;
+import run.halo.app.content.comment.CommentService;
 import run.halo.app.content.permalinks.PostPermalinkPolicy;
-import run.halo.app.core.extension.content.Comment;
 import run.halo.app.core.extension.content.Constant;
 import run.halo.app.core.extension.content.Post;
 import run.halo.app.core.extension.content.Post.PostPhase;
@@ -75,6 +75,7 @@ public class PostReconciler implements Reconciler<Reconciler.Request> {
     private final PostService postService;
     private final PostPermalinkPolicy postPermalinkPolicy;
     private final CounterService counterService;
+    private final CommentService commentService;
 
     private final ApplicationEventPublisher eventPublisher;
     private final NotificationCenter notificationCenter;
@@ -329,9 +330,7 @@ public class PostReconciler implements Reconciler<Reconciler.Request> {
         listSnapshots(ref).forEach(client::delete);
 
         // clean up comments
-        client.list(Comment.class, comment -> ref.equals(comment.getSpec().getSubjectRef()),
-                null)
-            .forEach(client::delete);
+        commentService.removeBySubject(ref).block();
 
         // delete counter
         counterService.deleteByName(MeterUtils.nameOf(Post.class, post.getMetadata().getName()))
