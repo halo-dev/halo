@@ -95,11 +95,8 @@ public class SinglePageServiceImpl extends AbstractContentService implements Sin
                 () -> {
                     SinglePage page = pageRequest.page();
                     return getContextUsername()
-                        .map(username -> {
-                            page.getSpec().setOwner(username);
-                            return page;
-                        })
-                        .defaultIfEmpty(page);
+                        .doOnNext(username -> page.getSpec().setOwner(username))
+                        .thenReturn(page);
                 }
             )
             .flatMap(client::create)
@@ -170,32 +167,17 @@ public class SinglePageServiceImpl extends AbstractContentService implements Sin
 
     private Mono<ListedSinglePage> getListedSinglePage(SinglePage singlePage) {
         Assert.notNull(singlePage, "The singlePage must not be null.");
-        return Mono.just(singlePage)
-            .map(sp -> {
-                ListedSinglePage listedSinglePage = new ListedSinglePage();
-                listedSinglePage.setPage(singlePage);
-                return listedSinglePage;
-            })
-            .flatMap(sp -> fetchStats(singlePage)
-                .doOnNext(sp::setStats)
-                .thenReturn(sp)
-            )
-            .flatMap(lsp ->
-                setContributors(singlePage.getStatusOrDefault().getContributors(), lsp))
-            .flatMap(lsp -> setOwner(singlePage.getSpec().getOwner(), lsp));
-    }
+        var listedSinglePage = new ListedSinglePage()
+            .setPage(singlePage);
 
-    private Mono<ListedSinglePage> setContributors(List<String> usernames,
-        ListedSinglePage singlePage) {
-        return listContributors(usernames)
+        var statsMono = fetchStats(singlePage)
+            .doOnNext(listedSinglePage::setStats);
+
+        var contributorsMono = listContributors(singlePage.getStatusOrDefault().getContributors())
             .collectList()
-            .doOnNext(singlePage::setContributors)
-            .map(contributors -> singlePage)
-            .defaultIfEmpty(singlePage);
-    }
+            .doOnNext(listedSinglePage::setContributors);
 
-    private Mono<ListedSinglePage> setOwner(String ownerName, ListedSinglePage page) {
-        return userService.getUserOrGhost(ownerName)
+        var ownerMono = userService.getUserOrGhost(singlePage.getSpec().getOwner())
             .map(user -> {
                 Contributor contributor = new Contributor();
                 contributor.setName(user.getMetadata().getName());
@@ -203,8 +185,9 @@ public class SinglePageServiceImpl extends AbstractContentService implements Sin
                 contributor.setAvatar(user.getSpec().getAvatar());
                 return contributor;
             })
-            .doOnNext(page::setOwner)
-            .thenReturn(page);
+            .doOnNext(listedSinglePage::setOwner);
+        return Mono.when(statsMono, contributorsMono, ownerMono)
+            .thenReturn(listedSinglePage);
     }
 
     Mono<Stats> fetchStats(SinglePage singlePage) {
