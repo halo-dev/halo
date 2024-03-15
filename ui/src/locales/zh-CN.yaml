@@ -84,7 +84,7 @@ core:
         plugins: 插件
         users: 用户
         settings: 设置
-        actuator: 概览
+        overview: 概览
         backup: 备份
         tools: 工具
     operations:
@@ -1113,7 +1113,7 @@ core:
         description: 确定要删除该消息吗？
   setting:
     title: 设置
-  actuator:
+  overview:
     title: 系统概览
     actions:
       copy:

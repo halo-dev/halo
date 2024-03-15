@@ -84,7 +84,7 @@ core:
         plugins: 插件
         users: 用戶
         settings: 設置
-        actuator: 概覽
+        overview: 概覽
         backup: 備份
         tools: 工具
     operations:
@@ -1101,7 +1101,7 @@ core:
         title: 刪除訊息
   setting:
     title: 設置
-  actuator:
+  overview:
     title: 系統概覽
     actions:
       copy:

@@ -86,7 +86,7 @@ core:
         plugins: Plugins
         users: Users
         settings: Settings
-        actuator: Actuator
+        overview: Overview
         backup: Backup
         tools: Tools
     operations:
@@ -1171,8 +1171,8 @@ core:
         title: Delete
   setting:
     title: Settings
-  actuator:
-    title: Actuator
+  overview:
+    title: Overview
     actions:
       copy:
         toast_browser_not_supported: The current browser does not support copying
