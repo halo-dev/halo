@@ -20,7 +20,6 @@ import lombok.RequiredArgsConstructor;
 import org.apache.commons.lang3.StringUtils;
 import org.springdoc.core.fn.builders.schema.Builder;
 import org.springdoc.webflux.core.fn.SpringdocRouteBuilder;
-import org.springframework.context.MessageSource;
 import org.springframework.data.domain.Sort;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Component;
@@ -55,6 +54,7 @@ import run.halo.app.infra.utils.IpAddressUtils;
 import run.halo.app.theme.finders.CommentFinder;
 import run.halo.app.theme.finders.CommentPublicQueryService;
 import run.halo.app.theme.finders.vo.CommentVo;
+import run.halo.app.theme.finders.vo.CommentWithReplyVo;
 import run.halo.app.theme.finders.vo.ReplyVo;
 
 /**
@@ -69,7 +69,6 @@ public class CommentFinderEndpoint implements CustomEndpoint {
     private final ReplyService replyService;
     private final SystemConfigurableEnvironmentFetcher environmentFetcher;
     private final RateLimiterRegistry rateLimiterRegistry;
-    private final MessageSource messageSource;
 
     @Override
     public RouterFunction<ServerResponse> endpoint() {
@@ -112,7 +111,7 @@ public class CommentFinderEndpoint implements CustomEndpoint {
                     .description("List comments.")
                     .tag(tag)
                     .response(responseBuilder()
-                        .implementation(ListResult.generateGenericClass(CommentVo.class))
+                        .implementation(ListResult.generateGenericClass(CommentWithReplyVo.class))
                     );
                 QueryParamBuildUtil.buildParametersFromType(builder, CommentQuery.class);
             })
@@ -212,6 +211,13 @@ public class CommentFinderEndpoint implements CustomEndpoint {
     Mono<ServerResponse> listComments(ServerRequest request) {
         CommentQuery commentQuery = new CommentQuery(request);
         return commentPublicQueryService.list(commentQuery.toRef(), commentQuery.toPageRequest())
+            .flatMap(result -> {
+                if (commentQuery.getWithReplies()) {
+                    return commentPublicQueryService.convertToWithReplyVo(result,
+                        commentQuery.getReplySize());
+                }
+                return Mono.just(result);
+            })
             .flatMap(list -> ServerResponse.ok().bodyValue(list));
     }
 
@@ -276,6 +282,20 @@ public class CommentFinderEndpoint implements CustomEndpoint {
                 throw new ServerWebInputException("The name must not be null.");
             }
             return name;
+        }
+
+        @Schema(description = "Whether to include replies. Default is false.",
+            defaultValue = "false")
+        public Boolean getWithReplies() {
+            var withReplies = queryParams.getFirst("withReplies");
+            return StringUtils.isNotBlank(withReplies) && Boolean.parseBoolean(withReplies);
+        }
+
+        @Schema(description = "Reply size of the comment, default is 10, only works when "
+            + "withReplies is true.", defaultValue = "10")
+        public int getReplySize() {
+            var replySize = queryParams.getFirst("replySize");
+            return StringUtils.isNotBlank(replySize) ? Integer.parseInt(replySize) : 10;
         }
 
         @ArraySchema(uniqueItems = true,
