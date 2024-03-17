@@ -370,6 +370,8 @@ function handlePublishClick() {
   if (isUpdateMode.value) {
     handlePublish();
   } else {
+    // Set editor title to post
+    formState.value.spec.title = title.value;
     postPublishModal.value = true;
   }
 }
@@ -505,6 +507,7 @@ useSessionKeepAlive();
   <PostCreationModal
     v-if="postPublishModal"
     :title="$t('core.uc_post.publish_modal.title')"
+    :post="formState"
     :content="content"
     publish
     @close="postPublishModal = false"

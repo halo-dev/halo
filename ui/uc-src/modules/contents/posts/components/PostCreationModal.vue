@@ -17,6 +17,7 @@ const props = withDefaults(
     title: string;
     content: Content;
     publish?: boolean;
+    post: Post;
   }>(),
   {
     publish: false,
@@ -107,7 +108,17 @@ function onSubmit(data: PostFormState) {
     centered
     @close="emit('close')"
   >
-    <PostSettingForm @submit="onSubmit" />
+    <PostSettingForm
+      :form-state="{
+        title: props.post.spec.title,
+        slug: props.post.spec.slug,
+        allowComment: props.post.spec.allowComment,
+        visible: props.post.spec.visible,
+        pinned: props.post.spec.pinned,
+        excerptAutoGenerate: props.post.spec.excerpt.autoGenerate,
+      }"
+      @submit="onSubmit"
+    />
 
     <template #footer>
       <VSpace>

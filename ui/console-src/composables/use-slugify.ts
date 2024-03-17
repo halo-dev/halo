@@ -32,15 +32,6 @@ export default function useSlugify(
   auto: Ref<boolean>,
   formType: FormType
 ) {
-  watch(
-    () => source.value,
-    () => {
-      if (auto.value) {
-        handleGenerateSlug(false, formType);
-      }
-    }
-  );
-
   const handleGenerateSlug = (forceUpdate = false, formType: FormType) => {
     const globalInfoStore = useGlobalInfoStore();
     const mode = globalInfoStore.globalInfo?.postSlugGenerationStrategy;
@@ -59,6 +50,18 @@ export default function useSlugify(
     if (onceList.includes(mode) && target.value) return;
     target.value = Strategy[mode](source.value);
   };
+
+  watch(
+    () => source.value,
+    () => {
+      if (auto.value) {
+        handleGenerateSlug(false, formType);
+      }
+    },
+    {
+      immediate: true,
+    }
+  );
 
   return {
     handleGenerateSlug,

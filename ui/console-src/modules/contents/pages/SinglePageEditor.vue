@@ -239,6 +239,8 @@ const handlePublishClick = () => {
   if (isUpdateMode.value) {
     handlePublish();
   } else {
+    // Set editor title to page
+    formState.value.page.spec.title = title.value;
     settingModal.value = true;
   }
 };
