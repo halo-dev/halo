@@ -209,7 +209,7 @@ onMounted(() => {
         class="mt-auto p-4 text-center text-sm"
       >
         <span class="text-gray-600">Powered by </span>
-        <RouterLink to="/actuator" class="hover:text-gray-600">
+        <RouterLink to="/overview" class="hover:text-gray-600">
           Halo
         </RouterLink>
       </footer>

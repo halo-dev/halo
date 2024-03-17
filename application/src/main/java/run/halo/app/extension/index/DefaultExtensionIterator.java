@@ -17,19 +17,23 @@ import run.halo.app.extension.Extension;
  */
 public class DefaultExtensionIterator<E extends Extension> implements ExtensionIterator<E> {
     static final int DEFAULT_PAGE_SIZE = 500;
-    private final ExtensionPaginatedLister lister;
+    private final ExtensionPaginatedLister<E> lister;
     private Pageable currentPageable;
     private List<E> currentData;
     private int currentIndex;
+
+    public DefaultExtensionIterator(ExtensionPaginatedLister<E> lister) {
+        this(PageRequest.of(0, DEFAULT_PAGE_SIZE, Sort.by("name")), lister);
+    }
 
     /**
      * Constructs a new DefaultExtensionIterator with the given lister.
      *
      * @param lister the lister to use to load data.
      */
-    public DefaultExtensionIterator(ExtensionPaginatedLister lister) {
+    public DefaultExtensionIterator(Pageable initPageable, ExtensionPaginatedLister<E> lister) {
         this.lister = lister;
-        this.currentPageable = PageRequest.of(0, DEFAULT_PAGE_SIZE, Sort.by("name"));
+        this.currentPageable = initPageable;
         this.currentData = loadData();
     }
 

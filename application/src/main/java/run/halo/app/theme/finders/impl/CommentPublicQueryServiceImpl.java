@@ -40,6 +40,7 @@ import run.halo.app.metrics.MeterUtils;
 import run.halo.app.theme.finders.CommentPublicQueryService;
 import run.halo.app.theme.finders.vo.CommentStatsVo;
 import run.halo.app.theme.finders.vo.CommentVo;
+import run.halo.app.theme.finders.vo.CommentWithReplyVo;
 import run.halo.app.theme.finders.vo.ExtensionVoOperator;
 import run.halo.app.theme.finders.vo.ReplyVo;
 
@@ -92,6 +93,26 @@ public class CommentPublicQueryServiceImpl implements CommentPublicQueryService 
                     );
             })
             .defaultIfEmpty(ListResult.emptyResult());
+    }
+
+    @Override
+    public Mono<ListResult<CommentWithReplyVo>> convertToWithReplyVo(ListResult<CommentVo> comments,
+        int replySize) {
+        return Flux.fromIterable(comments.getItems())
+            .flatMap(commentVo -> {
+                var commentName = commentVo.getMetadata().getName();
+                return listReply(commentName, 1, replySize)
+                    .map(replyList -> CommentWithReplyVo.from(commentVo)
+                        .setReplies(replyList)
+                    );
+            })
+            .collectList()
+            .map(result -> new ListResult<>(
+                comments.getPage(),
+                comments.getSize(),
+                comments.getTotal(),
+                result)
+            );
     }
 
     @Override

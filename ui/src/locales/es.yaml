@@ -69,7 +69,7 @@ core:
         plugins: Complementos
         users: Usuarios
         settings: Configuraciones
-        actuator: Actuador
+        overview: Visión general
         backup: Respaldo
     operations:
       logout:
@@ -953,8 +953,8 @@ core:
         authentication_url: URL de inicio de sesión
   setting:
     title: Configuraciones
-  actuator:
-    title: Actuador
+  overview:
+    title: Visión general
     actions:
       copy:
         toast_browser_not_supported: El navegador actual no admite la función de copiado

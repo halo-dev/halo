@@ -6,6 +6,7 @@ import run.halo.app.extension.ListResult;
 import run.halo.app.extension.PageRequest;
 import run.halo.app.extension.Ref;
 import run.halo.app.theme.finders.vo.CommentVo;
+import run.halo.app.theme.finders.vo.CommentWithReplyVo;
 import run.halo.app.theme.finders.vo.ReplyVo;
 
 /**
@@ -20,6 +21,9 @@ public interface CommentPublicQueryService {
         @Nullable Integer size);
 
     Mono<ListResult<CommentVo>> list(Ref ref, @Nullable PageRequest pageRequest);
+
+    Mono<ListResult<CommentWithReplyVo>> convertToWithReplyVo(ListResult<CommentVo> comments,
+        int replySize);
 
     Mono<ListResult<ReplyVo>> listReply(String commentName, @Nullable Integer page,
         @Nullable Integer size);

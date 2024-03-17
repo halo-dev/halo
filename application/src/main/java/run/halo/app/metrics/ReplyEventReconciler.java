@@ -14,10 +14,10 @@ import org.apache.commons.lang3.BooleanUtils;
 import org.springframework.context.SmartLifecycle;
 import org.springframework.context.event.EventListener;
 import org.springframework.data.domain.Sort;
-import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Component;
 import run.halo.app.core.extension.content.Comment;
 import run.halo.app.core.extension.content.Reply;
+import run.halo.app.event.post.CommentUnreadReplyCountChangedEvent;
 import run.halo.app.event.post.ReplyEvent;
 import run.halo.app.extension.ExtensionClient;
 import run.halo.app.extension.ListOptions;
@@ -39,11 +39,12 @@ import run.halo.app.extension.router.selector.FieldSelector;
  */
 @Slf4j
 @Component
-public class ReplyEventReconciler implements Reconciler<ReplyEvent>, SmartLifecycle {
+public class ReplyEventReconciler
+    implements Reconciler<ReplyEventReconciler.CommentName>, SmartLifecycle {
     private volatile boolean running = false;
 
     private final ExtensionClient client;
-    private final RequestQueue<ReplyEvent> replyEventQueue;
+    private final RequestQueue<CommentName> replyEventQueue;
     private final Controller replyEventController;
 
     public ReplyEventReconciler(ExtensionClient client) {
@@ -53,9 +54,8 @@ public class ReplyEventReconciler implements Reconciler<ReplyEvent>, SmartLifecy
     }
 
     @Override
-    public Result reconcile(ReplyEvent request) {
-        Reply requestReply = request.getReply();
-        String commentName = requestReply.getSpec().getCommentName();
+    public Result reconcile(CommentName request) {
+        String commentName = request.name();
 
         client.fetch(Comment.class, commentName)
             // if the comment has been deleted, then do nothing.
@@ -110,6 +110,12 @@ public class ReplyEventReconciler implements Reconciler<ReplyEvent>, SmartLifecy
         return new Result(false, null);
     }
 
+    public record CommentName(String name) {
+        public static CommentName of(String name) {
+            return new CommentName(name);
+        }
+    }
+
     static ListOptions listOptionsWithFieldQuery(Query query) {
         var listOptions = new ListOptions();
         listOptions.setFieldSelector(FieldSelector.of(query));
@@ -144,13 +150,14 @@ public class ReplyEventReconciler implements Reconciler<ReplyEvent>, SmartLifecy
         return this.running;
     }
 
-    @Component
-    public class ReplyEventListener {
+    @EventListener(ReplyEvent.class)
+    public void onReplyEvent(ReplyEvent replyEvent) {
+        var commentName = replyEvent.getReply().getSpec().getCommentName();
+        replyEventQueue.addImmediately(CommentName.of(commentName));
+    }
 
-        @Async
-        @EventListener(ReplyEvent.class)
-        public void onReplyEvent(ReplyEvent replyEvent) {
-            replyEventQueue.addImmediately(replyEvent);
-        }
+    @EventListener(CommentUnreadReplyCountChangedEvent.class)
+    public void onUnreadReplyCountChangedEvent(CommentUnreadReplyCountChangedEvent event) {
+        replyEventQueue.addImmediately(CommentName.of(event.getCommentName()));
     }
 }

@@ -2,15 +2,15 @@ import de.undercouch.gradle.tasks.download.Download
 import org.gradle.crypto.checksum.Checksum
 
 plugins {
-    id 'org.springframework.boot' version '3.2.3'
-    id 'io.spring.dependency-management' version '1.1.0'
-    id "com.gorylenko.gradle-git-properties" version "2.3.2"
+    id 'org.springframework.boot'
+    id 'io.spring.dependency-management'
+    id "com.gorylenko.gradle-git-properties"
     id "checkstyle"
     id 'java'
     id 'jacoco'
-    id "de.undercouch.download" version "5.3.1"
-    id "io.freefair.lombok" version "8.4"
-    id 'org.gradle.crypto.checksum' version '1.4.0'
+    id "de.undercouch.download"
+    id "io.freefair.lombok"
+    id 'org.gradle.crypto.checksum'
 }
 
 group = 'run.halo.app'
