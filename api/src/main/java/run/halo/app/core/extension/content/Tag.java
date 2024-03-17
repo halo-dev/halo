@@ -27,6 +27,8 @@ public class Tag extends AbstractExtension {
 
     public static final GroupVersionKind GVK = GroupVersionKind.fromExtension(Tag.class);
 
+    public static final String REQUIRE_SYNC_ON_STARTUP_INDEX_NAME = "requireSyncOnStartup";
+
     @Schema(requiredMode = REQUIRED)
     private TagSpec spec;
 
@@ -77,5 +79,7 @@ public class Tag extends AbstractExtension {
         public Integer visiblePostCount;
 
         public Integer postCount;
+
+        private Long observedVersion;
     }
 }

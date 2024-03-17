@@ -2,13 +2,18 @@ package run.halo.app.theme.finders.impl;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 import java.time.Instant;
+import java.util.HashMap;
 import java.util.List;
 import java.util.stream.Collectors;
+import org.json.JSONException;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
+import org.skyscreamer.jsonassert.JSONAssert;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.security.test.context.support.WithMockUser;
@@ -19,6 +24,7 @@ import reactor.test.StepVerifier;
 import run.halo.app.core.extension.User;
 import run.halo.app.core.extension.content.Comment;
 import run.halo.app.core.extension.content.Post;
+import run.halo.app.core.extension.content.Reply;
 import run.halo.app.extension.Extension;
 import run.halo.app.extension.ExtensionStoreUtil;
 import run.halo.app.extension.GroupVersionKind;
@@ -223,7 +229,7 @@ class CommentPublicQueryServiceIntegrationTest {
         void sortTest() {
             var comments =
                 client.listAll(Comment.class, new ListOptions(),
-                        CommentPublicQueryServiceImpl.defaultSort())
+                        CommentPublicQueryServiceImpl.defaultCommentSort())
                     .collectList()
                     .block();
             assertThat(comments).isNotNull();
@@ -276,6 +282,192 @@ class CommentPublicQueryServiceIntegrationTest {
             comment.getSpec().setTop(top);
             comment.getSpec().setPriority(priority);
             return comment;
+        }
+    }
+
+    @Nested
+    class ListReplyTest {
+        private final List<Reply> storedReplies = mockRelies();
+        @Autowired
+        private CommentPublicQueryServiceImpl commentPublicQueryService;
+
+        @BeforeEach
+        void setUp() {
+            Flux.fromIterable(storedReplies)
+                .flatMap(reply -> client.create(reply))
+                .as(StepVerifier::create)
+                .expectNextCount(storedReplies.size())
+                .verifyComplete();
+        }
+
+        @AfterEach
+        void tearDown() {
+            Flux.fromIterable(storedReplies)
+                .flatMap(CommentPublicQueryServiceIntegrationTest.this::deleteImmediately)
+                .as(StepVerifier::create)
+                .expectNextCount(storedReplies.size())
+                .verifyComplete();
+        }
+
+        @Test
+        void listWhenUserNotLogin() {
+            commentPublicQueryService.listReply("fake-comment", 1, 10)
+                .as(StepVerifier::create)
+                .consumeNextWith(listResult -> {
+                    assertThat(listResult.getTotal()).isEqualTo(2);
+                    assertThat(listResult.getItems().size()).isEqualTo(2);
+                    assertThat(listResult.getItems().get(0).getMetadata().getName())
+                        .isEqualTo("reply-approved");
+                })
+                .verifyComplete();
+        }
+
+        @Test
+        @WithMockUser(username = AnonymousUserConst.PRINCIPAL)
+        void listWhenUserIsAnonymous() {
+            commentPublicQueryService.listReply("fake-comment", 1, 10)
+                .as(StepVerifier::create)
+                .consumeNextWith(listResult -> {
+                    assertThat(listResult.getTotal()).isEqualTo(2);
+                    assertThat(listResult.getItems().size()).isEqualTo(2);
+                    assertThat(listResult.getItems().get(0).getMetadata().getName())
+                        .isEqualTo("reply-approved");
+                })
+                .verifyComplete();
+        }
+
+        @Test
+        @WithMockUser(username = "fake-user")
+        void listWhenUserLoggedIn() {
+            commentPublicQueryService.listReply("fake-comment", 1, 10)
+                .as(StepVerifier::create)
+                .consumeNextWith(listResult -> {
+                    assertThat(listResult.getTotal()).isEqualTo(3);
+                    assertThat(listResult.getItems().size()).isEqualTo(3);
+                    assertThat(listResult.getItems().get(0).getMetadata().getName())
+                        .isEqualTo("reply-approved");
+                    assertThat(listResult.getItems().get(1).getMetadata().getName())
+                        .isEqualTo("reply-approved-but-another-owner");
+                    assertThat(listResult.getItems().get(2).getMetadata().getName())
+                        .isEqualTo("reply-not-approved");
+                })
+                .verifyComplete();
+        }
+
+        @Test
+        void desensitizeReply() throws JSONException {
+            var reply = createReply();
+            reply.getSpec().getOwner()
+                .setAnnotations(new HashMap<>() {
+                    {
+                        put(Comment.CommentOwner.KIND_EMAIL, "mail@halo.run");
+                    }
+                });
+            reply.getSpec().setIpAddress("127.0.0.1");
+
+            var result = commentPublicQueryService.toReplyVo(reply).block();
+            result.getMetadata().setCreationTimestamp(null);
+            var jsonObject = JsonUtils.jsonToObject(fakeReplyJson(), JsonNode.class);
+            ((ObjectNode) jsonObject.get("owner"))
+                .put("displayName", "已删除用户");
+            JSONAssert.assertEquals(jsonObject.toString(),
+                JsonUtils.objectToJson(result),
+                true);
+        }
+
+        String fakeReplyJson() {
+            return """
+                    {
+                        "metadata":{
+                            "name":"fake-reply"
+                        },
+                        "spec":{
+                            "raw":"fake-raw",
+                            "content":"fake-content",
+                            "owner":{
+                                "kind":"User",
+                                "name":"",
+                                "displayName":"fake-display-name",
+                                "annotations":{
+
+                                }
+                            },
+                            "creationTime": "2024-03-11T06:23:42.923294424Z",
+                            "ipAddress":"",
+                            "hidden": false,
+                            "allowNotification": false,
+                            "top": false,
+                            "priority": 0,
+                            "commentName":"fake-comment"
+                        },
+                        "owner":{
+                            "kind":"User",
+                            "displayName":"fake-display-name"
+                        },
+                        "stats":{
+                            "upvote":0
+                        }
+                    }
+                """;
+        }
+
+        private List<Reply> mockRelies() {
+            // Mock
+            Reply notApproved = createReply();
+            notApproved.getMetadata().setName("reply-not-approved");
+            notApproved.getSpec().setApproved(false);
+
+            Reply approved = createReply();
+            approved.getMetadata().setName("reply-approved");
+            approved.getSpec().setApproved(true);
+
+            Reply notApprovedWithAnonymous = createReply();
+            notApprovedWithAnonymous.getMetadata().setName("reply-not-approved-anonymous");
+            notApprovedWithAnonymous.getSpec().setApproved(false);
+            notApprovedWithAnonymous.getSpec().getOwner().setName(AnonymousUserConst.PRINCIPAL);
+
+            Reply approvedButAnotherOwner = createReply();
+            approvedButAnotherOwner.getMetadata()
+                .setName("reply-approved-but-another-owner");
+            approvedButAnotherOwner.getSpec().setApproved(true);
+            approvedButAnotherOwner.getSpec().getOwner().setName("another");
+
+            Reply notApprovedAndAnotherOwner = createReply();
+            notApprovedAndAnotherOwner.getMetadata()
+                .setName("reply-not-approved-and-another");
+            notApprovedAndAnotherOwner.getSpec().setApproved(false);
+            notApprovedAndAnotherOwner.getSpec().getOwner().setName("another");
+
+            Reply notApprovedAndAnotherCommentName = createReply();
+            notApprovedAndAnotherCommentName.getMetadata()
+                .setName("reply-approved-and-another-comment-name");
+            notApprovedAndAnotherCommentName.getSpec().setApproved(false);
+            notApprovedAndAnotherCommentName.getSpec().setCommentName("another-fake-comment");
+
+            return List.of(
+                notApproved,
+                approved,
+                approvedButAnotherOwner,
+                notApprovedAndAnotherOwner,
+                notApprovedWithAnonymous,
+                notApprovedAndAnotherCommentName
+            );
+        }
+
+        Reply createReply() {
+            var reply = JsonUtils.jsonToObject(fakeReplyJson(), Reply.class);
+            reply.getMetadata().setName("fake-reply");
+
+            reply.getSpec().setRaw("fake-raw");
+            reply.getSpec().setContent("fake-content");
+            reply.getSpec().setHidden(false);
+            reply.getSpec().setCommentName("fake-comment");
+            Comment.CommentOwner commentOwner = new Comment.CommentOwner();
+            commentOwner.setKind(User.KIND);
+            commentOwner.setName("fake-user");
+            commentOwner.setDisplayName("fake-display-name");
+            reply.getSpec().setOwner(commentOwner);
+            return reply;
         }
     }
 

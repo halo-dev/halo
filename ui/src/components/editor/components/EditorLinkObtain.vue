@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { VButton, VSpace, VDropdown } from "@halo-dev/components";
-import type { Editor } from "@halo-dev/richtext-editor";
+import type { CoreEditor } from "@halo-dev/richtext-editor";
 import { useFileDialog } from "@vueuse/core";
 import type { AttachmentLike } from "@halo-dev/console-shared";
 import { getAttachmentUrl, type AttachmentAttr } from "../utils/attachment";
@@ -13,7 +13,7 @@ import type { AxiosRequestConfig } from "axios";
 
 const props = withDefaults(
   defineProps<{
-    editor: Editor;
+    editor: CoreEditor;
     accept: string;
     uploadedFile: File;
     uploadToAttachmentFile: (

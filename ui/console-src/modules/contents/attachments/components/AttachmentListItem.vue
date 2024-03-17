@@ -7,6 +7,7 @@ import {
   Toast,
   VDropdownItem,
   Dialog,
+  VDropdownDivider,
 } from "@halo-dev/components";
 import { computed, ref } from "vue";
 import type { Attachment } from "@halo-dev/api-client";
@@ -100,6 +101,29 @@ const { operationItems } = useOperationItemExtensionPoint<Attachment>(
     },
     {
       priority: 20,
+      component: markRaw(VDropdownItem),
+      label: t("core.common.buttons.download"),
+      action: () => {
+        const { permalink } = attachment.value.status || {};
+
+        if (!permalink) {
+          throw new Error("Attachment has no permalink");
+        }
+
+        const a = document.createElement("a");
+        a.href = permalink;
+        a.download = attachment.value.spec.displayName || "unknown";
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+      },
+    },
+    {
+      priority: 30,
+      component: markRaw(VDropdownDivider),
+    },
+    {
+      priority: 40,
       component: markRaw(VDropdownItem),
       props: {
         type: "danger",

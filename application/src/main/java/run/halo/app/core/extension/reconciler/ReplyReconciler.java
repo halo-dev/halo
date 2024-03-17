@@ -1,5 +1,6 @@
 package run.halo.app.core.extension.reconciler;
 
+import static org.apache.commons.lang3.ObjectUtils.defaultIfNull;
 import static run.halo.app.extension.ExtensionUtil.addFinalizers;
 
 import java.util.Set;
@@ -44,6 +45,15 @@ public class ReplyReconciler implements Reconciler<Reconciler.Request> {
                     client.update(reply);
                     eventPublisher.publishEvent(new ReplyCreatedEvent(this, reply));
                 }
+
+                if (reply.getSpec().getCreationTime() == null) {
+                    reply.getSpec().setCreationTime(
+                        defaultIfNull(reply.getSpec().getApprovedTime(),
+                            reply.getMetadata().getCreationTimestamp()
+                        )
+                    );
+                }
+                client.update(reply);
 
                 replyNotificationSubscriptionHelper.subscribeNewReplyReasonForReply(reply);
 

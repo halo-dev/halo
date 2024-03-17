@@ -84,7 +84,7 @@ core:
         plugins: 插件
         users: 用户
         settings: 设置
-        actuator: 概览
+        overview: 概览
         backup: 备份
         tools: 工具
     operations:
@@ -533,6 +533,8 @@ core:
           create_time_asc: 较晚上传
           size_desc: 文件大小降序
           size_asc: 文件大小升序
+          display_name_asc: 文件名升序
+          display_name_desc: 文件名降序
       view_type:
         items:
           grid: 网格模式
@@ -1111,7 +1113,7 @@ core:
         description: 确定要删除该消息吗？
   setting:
     title: 设置
-  actuator:
+  overview:
     title: 系统概览
     actions:
       copy:
@@ -1315,7 +1317,7 @@ core:
     Cache Management: 缓存
     Cache Manage: 缓存管理
     Notification Configuration: 通知配置
-    Configure Notifier: 配置通知器
+    role-template-notifier-config: 配置通知器
     Post Contributor: 允许投稿
     Post Author: 允许管理自己的文章
     Post Attachment Manager: 允许在文章中上传图片

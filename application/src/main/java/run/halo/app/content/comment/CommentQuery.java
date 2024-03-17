@@ -56,13 +56,16 @@ public class CommentQuery extends IListRequest.QueryListRequest {
     @ArraySchema(uniqueItems = true,
         arraySchema = @Schema(name = "sort",
             description = "Sort property and direction of the list result. Supported fields: "
-                + "creationTimestamp,replyCount,lastReplyTime"),
+                + "metadata.creationTimestamp,status.replyCount,status.lastReplyTime"),
         schema = @Schema(description = "like field,asc or field,desc",
             implementation = String.class,
             example = "creationTimestamp,desc"))
     public Sort getSort() {
         var sort = SortResolver.defaultInstance.resolve(exchange);
-        return sort.and(Sort.by("spec.creationTime", "metadata.name").descending());
+        return sort.and(Sort.by("status.lastReplyTime",
+            "spec.creationTime",
+            "metadata.name"
+        ).descending());
     }
 
     public PageRequest toPageRequest() {

@@ -3,6 +3,7 @@ import { CoreEditor } from "@halo-dev/richtext-editor";
 import type { Attachment } from "@halo-dev/api-client";
 import Image from "../extensions/image";
 import ExtensionVideo from "../extensions/video";
+import ExtensionAudio from "../extensions/audio";
 import type { AxiosRequestConfig } from "axios";
 
 export interface FileProps {
@@ -31,6 +32,11 @@ export const handleFileEvent = ({ file, editor }: FileProps) => {
     return true;
   }
 
+  if (file.type.startsWith("audio/")) {
+    uploadAudio({ file, editor });
+    return true;
+  }
+
   return true;
 };
 
@@ -55,6 +61,19 @@ export const uploadImage = ({ file, editor }: FileProps) => {
 export const uploadVideo = ({ file, editor }: FileProps) => {
   const { view } = editor;
   const node = view.props.state.schema.nodes[ExtensionVideo.name].create({
+    file: file,
+  });
+  editor.view.dispatch(editor.view.state.tr.replaceSelectionWith(node));
+};
+
+/**
+ * Uploads an audio file and inserts it into the editor.
+ *
+ * @param {FileProps} { file, editor } - File to be uploaded and the editor instance
+ */
+export const uploadAudio = ({ file, editor }: FileProps) => {
+  const { view } = editor;
+  const node = view.props.state.schema.nodes[ExtensionAudio.name].create({
     file: file,
   });
   editor.view.dispatch(editor.view.state.tr.replaceSelectionWith(node));

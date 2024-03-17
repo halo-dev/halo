@@ -1,6 +1,5 @@
 package run.halo.app.theme.finders.impl;
 
-import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.when;
@@ -19,15 +18,12 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.stubbing.Answer;
 import org.skyscreamer.jsonassert.JSONAssert;
-import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import reactor.core.publisher.Mono;
-import reactor.test.StepVerifier;
 import run.halo.app.core.extension.Counter;
 import run.halo.app.core.extension.User;
 import run.halo.app.core.extension.content.Comment;
 import run.halo.app.core.extension.content.Post;
-import run.halo.app.core.extension.content.Reply;
 import run.halo.app.core.extension.service.UserService;
 import run.halo.app.extension.GroupVersionKind;
 import run.halo.app.extension.ListResult;
@@ -211,190 +207,6 @@ class CommentPublicQueryServiceImplTest {
             commentOwner.setDisplayName("fake-display-name");
             comment.getSpec().setOwner(commentOwner);
             return comment;
-        }
-    }
-
-    @Nested
-    class ListReplyTest {
-        @Test
-        void listWhenUserNotLogin() {
-            // Mock
-            mockWhenListRely();
-
-            commentPublicQueryService.listReply("fake-comment", 1, 10)
-                .as(StepVerifier::create)
-                .consumeNextWith(listResult -> {
-                    assertThat(listResult.getTotal()).isEqualTo(2);
-                    assertThat(listResult.getItems().size()).isEqualTo(2);
-                    assertThat(listResult.getItems().get(0).getMetadata().getName())
-                        .isEqualTo("reply-approved");
-                    assertThat(listResult.getItems().get(0).getStats().getUpvote()).isEqualTo(9);
-                })
-                .verifyComplete();
-        }
-
-        @Test
-        @WithMockUser(username = AnonymousUserConst.PRINCIPAL)
-        void listWhenUserIsAnonymous() {
-            // Mock
-            mockWhenListRely();
-
-            commentPublicQueryService.listReply("fake-comment", 1, 10)
-                .as(StepVerifier::create)
-                .consumeNextWith(listResult -> {
-                    assertThat(listResult.getTotal()).isEqualTo(2);
-                    assertThat(listResult.getItems().size()).isEqualTo(2);
-                    assertThat(listResult.getItems().get(0).getMetadata().getName())
-                        .isEqualTo("reply-approved");
-                })
-                .verifyComplete();
-        }
-
-        @Test
-        @WithMockUser(username = "fake-user")
-        void listWhenUserLoggedIn() {
-            mockWhenListRely();
-
-            commentPublicQueryService.listReply("fake-comment", 1, 10)
-                .as(StepVerifier::create)
-                .consumeNextWith(listResult -> {
-                    assertThat(listResult.getTotal()).isEqualTo(3);
-                    assertThat(listResult.getItems().size()).isEqualTo(3);
-                    assertThat(listResult.getItems().get(0).getMetadata().getName())
-                        .isEqualTo("reply-not-approved");
-                    assertThat(listResult.getItems().get(1).getMetadata().getName())
-                        .isEqualTo("reply-approved");
-                })
-                .verifyComplete();
-        }
-
-        @Test
-        void desensitizeReply() throws JSONException {
-            var reply = createReply();
-            reply.getSpec().getOwner()
-                .setAnnotations(new HashMap<>() {
-                    {
-                        put(Comment.CommentOwner.KIND_EMAIL, "mail@halo.run");
-                    }
-                });
-            reply.getSpec().setIpAddress("127.0.0.1");
-
-            Counter counter = new Counter();
-            counter.setUpvote(0);
-            when(counterService.getByName(any())).thenReturn(Mono.just(counter));
-
-            var result = commentPublicQueryService.toReplyVo(reply).block();
-            result.getMetadata().setCreationTimestamp(null);
-            result.getSpec().setCreationTime(null);
-            JSONAssert.assertEquals("""
-                        {
-                            "metadata":{
-                                "name":"fake-reply"
-                            },
-                            "spec":{
-                                "raw":"fake-raw",
-                                "content":"fake-content",
-                                "owner":{
-                                    "kind":"User",
-                                    "name":"",
-                                    "displayName":"fake-display-name",
-                                    "annotations":{
-
-                                    }
-                                },
-                                "ipAddress":"",
-                                "hidden":false,
-                                "commentName":"fake-comment"
-                            },
-                            "owner":{
-                                "kind":"User",
-                                "displayName":"fake-display-name"
-                            },
-                            "stats":{
-                                "upvote":0
-                            }
-                        }
-                    """,
-                JsonUtils.objectToJson(result),
-                true);
-        }
-
-        @SuppressWarnings("unchecked")
-        private void mockWhenListRely() {
-            // Mock
-            Reply notApproved = createReply();
-            notApproved.getMetadata().setName("reply-not-approved");
-            notApproved.getSpec().setApproved(false);
-
-            Reply approved = createReply();
-            approved.getMetadata().setName("reply-approved");
-            approved.getSpec().setApproved(true);
-
-            Reply notApprovedWithAnonymous = createReply();
-            notApprovedWithAnonymous.getMetadata().setName("reply-not-approved-anonymous");
-            notApprovedWithAnonymous.getSpec().setApproved(false);
-            notApprovedWithAnonymous.getSpec().getOwner().setName(AnonymousUserConst.PRINCIPAL);
-
-            Reply approvedButAnotherOwner = createReply();
-            approvedButAnotherOwner.getMetadata()
-                .setName("reply-approved-but-another-owner");
-            approvedButAnotherOwner.getSpec().setApproved(true);
-            approvedButAnotherOwner.getSpec().getOwner().setName("another");
-
-            Reply notApprovedAndAnotherOwner = createReply();
-            notApprovedAndAnotherOwner.getMetadata()
-                .setName("reply-not-approved-and-another");
-            notApprovedAndAnotherOwner.getSpec().setApproved(false);
-            notApprovedAndAnotherOwner.getSpec().getOwner().setName("another");
-
-            Reply notApprovedAndAnotherCommentName = createReply();
-            notApprovedAndAnotherCommentName.getMetadata()
-                .setName("reply-approved-and-another-comment-name");
-            notApprovedAndAnotherCommentName.getSpec().setApproved(false);
-            notApprovedAndAnotherCommentName.getSpec().setCommentName("another-fake-comment");
-
-            when(client.list(eq(Reply.class), any(),
-                any(),
-                eq(1),
-                eq(10))
-            ).thenAnswer((Answer<Mono<ListResult<Reply>>>) invocation -> {
-                Predicate<Reply> predicate =
-                    invocation.getArgument(1, Predicate.class);
-                List<Reply> replies = Stream.of(
-                    notApproved,
-                    approved,
-                    approvedButAnotherOwner,
-                    notApprovedAndAnotherOwner,
-                    notApprovedWithAnonymous,
-                    notApprovedAndAnotherCommentName
-                ).filter(predicate).toList();
-                return Mono.just(new ListResult<>(1, 10, replies.size(), replies));
-            });
-
-            extractedUser();
-            when(client.fetch(eq(User.class), any())).thenReturn(Mono.just(createUser()));
-
-            Counter counter = new Counter();
-            counter.setUpvote(9);
-            when(counterService.getByName(any())).thenReturn(Mono.just(counter));
-        }
-
-        Reply createReply() {
-            Reply reply = new Reply();
-            reply.setMetadata(new Metadata());
-            reply.getMetadata().setName("fake-reply");
-            reply.setSpec(new Reply.ReplySpec());
-
-            reply.getSpec().setRaw("fake-raw");
-            reply.getSpec().setContent("fake-content");
-            reply.getSpec().setHidden(false);
-            reply.getSpec().setCommentName("fake-comment");
-            Comment.CommentOwner commentOwner = new Comment.CommentOwner();
-            commentOwner.setKind(User.KIND);
-            commentOwner.setName("fake-user");
-            commentOwner.setDisplayName("fake-display-name");
-            reply.getSpec().setOwner(commentOwner);
-            return reply;
         }
     }
 

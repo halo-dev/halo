@@ -1,28 +1,35 @@
 package run.halo.app.metrics;
 
-import static org.apache.commons.lang3.BooleanUtils.isFalse;
-import static org.apache.commons.lang3.BooleanUtils.isTrue;
 import static org.apache.commons.lang3.ObjectUtils.defaultIfNull;
+import static run.halo.app.extension.index.query.QueryFactory.and;
+import static run.halo.app.extension.index.query.QueryFactory.equal;
+import static run.halo.app.extension.index.query.QueryFactory.greaterThan;
+import static run.halo.app.extension.index.query.QueryFactory.isNull;
 
 import java.time.Duration;
 import java.time.Instant;
-import java.util.List;
+import java.util.Optional;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.BooleanUtils;
 import org.springframework.context.SmartLifecycle;
 import org.springframework.context.event.EventListener;
-import org.springframework.scheduling.annotation.Async;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Component;
-import run.halo.app.content.comment.ReplyService;
 import run.halo.app.core.extension.content.Comment;
 import run.halo.app.core.extension.content.Reply;
+import run.halo.app.event.post.CommentUnreadReplyCountChangedEvent;
 import run.halo.app.event.post.ReplyEvent;
 import run.halo.app.extension.ExtensionClient;
+import run.halo.app.extension.ListOptions;
+import run.halo.app.extension.PageRequestImpl;
 import run.halo.app.extension.controller.Controller;
 import run.halo.app.extension.controller.ControllerBuilder;
 import run.halo.app.extension.controller.DefaultController;
 import run.halo.app.extension.controller.DefaultQueue;
 import run.halo.app.extension.controller.Reconciler;
 import run.halo.app.extension.controller.RequestQueue;
+import run.halo.app.extension.index.query.Query;
+import run.halo.app.extension.router.selector.FieldSelector;
 
 /**
  * Update the comment status after receiving the reply event.
@@ -32,11 +39,12 @@ import run.halo.app.extension.controller.RequestQueue;
  */
 @Slf4j
 @Component
-public class ReplyEventReconciler implements Reconciler<ReplyEvent>, SmartLifecycle {
+public class ReplyEventReconciler
+    implements Reconciler<ReplyEventReconciler.CommentName>, SmartLifecycle {
     private volatile boolean running = false;
 
     private final ExtensionClient client;
-    private final RequestQueue<ReplyEvent> replyEventQueue;
+    private final RequestQueue<CommentName> replyEventQueue;
     private final Controller replyEventController;
 
     public ReplyEventReconciler(ExtensionClient client) {
@@ -46,48 +54,72 @@ public class ReplyEventReconciler implements Reconciler<ReplyEvent>, SmartLifecy
     }
 
     @Override
-    public Result reconcile(ReplyEvent request) {
-        Reply requestReply = request.getReply();
-        String commentName = requestReply.getSpec().getCommentName();
+    public Result reconcile(CommentName request) {
+        String commentName = request.name();
 
         client.fetch(Comment.class, commentName)
             // if the comment has been deleted, then do nothing.
             .filter(comment -> comment.getMetadata().getDeletionTimestamp() == null)
             .ifPresent(comment -> {
-
                 // order by reply creation time desc to get first as last reply time
-                List<Reply> replies = client.list(Reply.class,
-                    record -> commentName.equals(record.getSpec().getCommentName())
-                        && record.getMetadata().getDeletionTimestamp() == null,
-                    ReplyService.creationTimeAscComparator().reversed());
+                var baseQuery = and(
+                    equal("spec.commentName", commentName),
+                    isNull("metadata.deletionTimestamp")
+                );
+                var pageRequest = PageRequestImpl.ofSize(1).withSort(
+                    Sort.by("spec.creationTime", "metadata.name").descending()
+                );
+                final Comment.CommentStatus status = comment.getStatusOrDefault();
 
-                Comment.CommentStatus status = comment.getStatusOrDefault();
+                var replyPageResult =
+                    client.listBy(Reply.class, listOptionsWithFieldQuery(baseQuery), pageRequest);
                 // total reply count
-                status.setReplyCount(replies.size());
+                status.setReplyCount((int) replyPageResult.getTotal());
 
-                long visibleReplyCount = replies.stream()
-                    .filter(reply -> isTrue(reply.getSpec().getApproved())
-                        && isFalse(reply.getSpec().getHidden())
-                    )
-                    .count();
-                status.setVisibleReplyCount((int) visibleReplyCount);
-
-                // calculate last reply time
-                Instant lastReplyTime = replies.stream()
+                // calculate last reply time from total replies(top 1)
+                Instant lastReplyTime = replyPageResult.get()
+                    .map(reply -> reply.getSpec().getCreationTime())
                     .findFirst()
-                    .map(reply -> defaultIfNull(reply.getSpec().getCreationTime(),
-                        reply.getMetadata().getCreationTimestamp())
-                    )
                     .orElse(null);
                 status.setLastReplyTime(lastReplyTime);
 
-                Instant lastReadTime = comment.getSpec().getLastReadTime();
-                status.setUnreadReplyCount(Comment.getUnreadReplyCount(replies, lastReadTime));
+                // calculate visible reply count(only approved and not hidden)
+                var visibleReplyPageResult =
+                    client.listBy(Reply.class, listOptionsWithFieldQuery(and(
+                        baseQuery,
+                        equal("spec.approved", BooleanUtils.TRUE),
+                        equal("spec.hidden", BooleanUtils.FALSE)
+                    )), pageRequest);
+                status.setVisibleReplyCount((int) visibleReplyPageResult.getTotal());
+
+                // calculate unread reply count(after last read time)
+                var unReadQuery = Optional.ofNullable(comment.getSpec().getLastReadTime())
+                    .map(lastReadTime -> and(
+                        baseQuery,
+                        greaterThan("spec.creationTime", lastReadTime.toString())
+                    ))
+                    .orElse(baseQuery);
+                var unReadPageResult =
+                    client.listBy(Reply.class, listOptionsWithFieldQuery(unReadQuery), pageRequest);
+                status.setUnreadReplyCount((int) unReadPageResult.getTotal());
+
                 status.setHasNewReply(defaultIfNull(status.getUnreadReplyCount(), 0) > 0);
 
                 client.update(comment);
             });
         return new Result(false, null);
+    }
+
+    public record CommentName(String name) {
+        public static CommentName of(String name) {
+            return new CommentName(name);
+        }
+    }
+
+    static ListOptions listOptionsWithFieldQuery(Query query) {
+        var listOptions = new ListOptions();
+        listOptions.setFieldSelector(FieldSelector.of(query));
+        return listOptions;
     }
 
     @Override
@@ -118,13 +150,14 @@ public class ReplyEventReconciler implements Reconciler<ReplyEvent>, SmartLifecy
         return this.running;
     }
 
-    @Component
-    public class ReplyEventListener {
+    @EventListener(ReplyEvent.class)
+    public void onReplyEvent(ReplyEvent replyEvent) {
+        var commentName = replyEvent.getReply().getSpec().getCommentName();
+        replyEventQueue.addImmediately(CommentName.of(commentName));
+    }
 
-        @Async
-        @EventListener(ReplyEvent.class)
-        public void onReplyEvent(ReplyEvent replyEvent) {
-            replyEventQueue.addImmediately(replyEvent);
-        }
+    @EventListener(CommentUnreadReplyCountChangedEvent.class)
+    public void onUnreadReplyCountChangedEvent(CommentUnreadReplyCountChangedEvent event) {
+        replyEventQueue.addImmediately(CommentName.of(event.getCommentName()));
     }
 }

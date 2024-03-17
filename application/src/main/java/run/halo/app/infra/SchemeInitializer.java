@@ -199,6 +199,17 @@ public class SchemeInitializer implements ApplicationListener<ApplicationContext
                 .setName("spec.slug")
                 .setIndexFunc(simpleAttribute(Tag.class, tag -> tag.getSpec().getSlug()))
             );
+            indexSpecs.add(new IndexSpec()
+                .setName(Tag.REQUIRE_SYNC_ON_STARTUP_INDEX_NAME)
+                .setIndexFunc(simpleAttribute(Tag.class, tag -> {
+                    var version = tag.getMetadata().getVersion();
+                    var observedVersion = tag.getStatusOrDefault().getObservedVersion();
+                    if (observedVersion == null || observedVersion < version) {
+                        return BooleanUtils.TRUE;
+                    }
+                    // do not care about the false case so return null to avoid indexing
+                    return null;
+                })));
         });
         schemeManager.register(Snapshot.class, indexSpecs -> {
             indexSpecs.add(new IndexSpec()
@@ -212,7 +223,8 @@ public class SchemeInitializer implements ApplicationListener<ApplicationContext
             indexSpecs.add(new IndexSpec()
                 .setName("spec.creationTime")
                 .setIndexFunc(simpleAttribute(Comment.class,
-                    comment -> comment.getSpec().getCreationTime().toString())
+                    comment -> defaultIfNull(comment.getSpec().getCreationTime(),
+                        comment.getMetadata().getCreationTimestamp()).toString())
                 ));
             indexSpecs.add(new IndexSpec()
                 .setName("spec.approved")
@@ -271,7 +283,35 @@ public class SchemeInitializer implements ApplicationListener<ApplicationContext
                     return defaultIfNull(replyCount, 0).toString();
                 })));
         });
-        schemeManager.register(Reply.class);
+        schemeManager.register(Reply.class, indexSpecs -> {
+            indexSpecs.add(new IndexSpec()
+                .setName("spec.creationTime")
+                .setIndexFunc(simpleAttribute(Reply.class,
+                    reply -> defaultIfNull(reply.getSpec().getCreationTime(),
+                        reply.getMetadata().getCreationTimestamp()).toString())
+                ));
+            indexSpecs.add(new IndexSpec()
+                .setName("spec.commentName")
+                .setIndexFunc(simpleAttribute(Reply.class,
+                    reply -> reply.getSpec().getCommentName())
+                ));
+            indexSpecs.add(new IndexSpec()
+                .setName("spec.hidden")
+                .setIndexFunc(simpleAttribute(Reply.class,
+                    reply -> toStringTrueFalse(isTrue(reply.getSpec().getHidden())))
+                ));
+            indexSpecs.add(new IndexSpec()
+                .setName("spec.approved")
+                .setIndexFunc(simpleAttribute(Reply.class,
+                    reply -> toStringTrueFalse(isTrue(reply.getSpec().getApproved())))
+                ));
+            indexSpecs.add(new IndexSpec()
+                .setName("spec.owner")
+                .setIndexFunc(simpleAttribute(Reply.class, reply -> {
+                    var owner = reply.getSpec().getOwner();
+                    return Comment.CommentOwner.ownerIdentity(owner.getKind(), owner.getName());
+                })));
+        });
         schemeManager.register(SinglePage.class);
         // storage.halo.run
         schemeManager.register(Group.class);
