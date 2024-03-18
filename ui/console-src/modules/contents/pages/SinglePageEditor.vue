@@ -106,11 +106,11 @@ const saving = ref(false);
 const publishing = ref(false);
 const settingModal = ref(false);
 
-const title = ref("");
+const isTitleChanged = ref(false);
 watch(
   () => formState.value.page.spec.title,
-  (value) => {
-    title.value = value;
+  (newValue, oldValue) => {
+    isTitleChanged.value = newValue !== oldValue;
   }
 );
 
@@ -149,8 +149,7 @@ const handleSave = async (options?: { mute?: boolean }) => {
     }
 
     if (isUpdateMode.value) {
-      if (title.value !== formState.value.page.spec.title) {
-        formState.value.page.spec.title = title.value;
+      if (isTitleChanged.value) {
         formState.value.page = (
           await singlePageUpdateMutate(formState.value.page)
         ).data;
@@ -162,11 +161,11 @@ const handleSave = async (options?: { mute?: boolean }) => {
       });
 
       formState.value.page = data;
+      isTitleChanged.value = false;
     } else {
       // Clear new page content cache
       handleClearCache();
 
-      formState.value.page.spec.title = title.value;
       const { data } = await apiClient.singlePage.draftSinglePage({
         singlePageRequest: formState.value,
       });
@@ -198,6 +197,12 @@ const handlePublish = async () => {
     if (isUpdateMode.value) {
       const { name: singlePageName } = formState.value.page.metadata;
       const { permalink } = formState.value.page.status || {};
+
+      if (isTitleChanged.value) {
+        formState.value.page = (
+          await singlePageUpdateMutate(formState.value.page)
+        ).data;
+      }
 
       await apiClient.singlePage.updateSinglePageContent({
         name: singlePageName,
@@ -240,7 +245,6 @@ const handlePublishClick = () => {
     handlePublish();
   } else {
     // Set editor title to page
-    formState.value.page.spec.title = title.value;
     settingModal.value = true;
   }
 };
@@ -494,7 +498,7 @@ async function handleUploadImage(file: File, options?: AxiosRequestConfig) {
       v-if="currentEditorProvider"
       v-model:raw="formState.content.raw"
       v-model:content="formState.content.content"
-      v-model:title="title"
+      v-model:title="formState.page.spec.title"
       :upload-image="handleUploadImage"
       class="h-full"
       @update="handleSetContentCache"

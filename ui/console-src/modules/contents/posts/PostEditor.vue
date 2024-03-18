@@ -119,11 +119,11 @@ const settingModal = ref(false);
 const saving = ref(false);
 const publishing = ref(false);
 
-const title = ref("");
+const isTitleChanged = ref(false);
 watch(
   () => formState.value.post.spec.title,
-  (value) => {
-    title.value = value;
+  (newValue, oldValue) => {
+    isTitleChanged.value = newValue !== oldValue;
   }
 );
 
@@ -162,8 +162,7 @@ const handleSave = async (options?: { mute?: boolean }) => {
 
     if (isUpdateMode.value) {
       // Save post title
-      if (title.value !== formState.value.post.spec.title) {
-        formState.value.post.spec.title = title.value;
+      if (isTitleChanged.value) {
         formState.value.post = (
           await postUpdateMutate(formState.value.post)
         ).data;
@@ -175,11 +174,12 @@ const handleSave = async (options?: { mute?: boolean }) => {
       });
 
       formState.value.post = data;
+
+      isTitleChanged.value = false;
     } else {
       // Clear new post content cache
       handleClearCache();
 
-      formState.value.post.spec.title = title.value;
       const { data } = await apiClient.post.draftPost({
         postRequest: formState.value,
       });
@@ -210,6 +210,12 @@ const handlePublish = async () => {
     if (isUpdateMode.value) {
       const { name: postName } = formState.value.post.metadata;
       const { permalink } = formState.value.post.status || {};
+
+      if (isTitleChanged.value) {
+        formState.value.post = (
+          await postUpdateMutate(formState.value.post)
+        ).data;
+      }
 
       await apiClient.post.updatePostContent({
         name: postName,
@@ -257,7 +263,6 @@ const handlePublishClick = () => {
     handlePublish();
   } else {
     // Set editor title to post
-    formState.value.post.spec.title = title.value;
     settingModal.value = true;
   }
 };
@@ -521,7 +526,7 @@ async function handleUploadImage(file: File, options?: AxiosRequestConfig) {
       v-if="currentEditorProvider"
       v-model:raw="formState.content.raw"
       v-model:content="formState.content.content"
-      v-model:title="title"
+      v-model:title="formState.post.spec.title"
       :upload-image="handleUploadImage"
       class="h-full"
       @update="handleSetContentCache"

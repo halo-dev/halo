@@ -82,12 +82,11 @@ const content = ref<Content>({
 });
 const snapshot = ref<Snapshot>();
 
-const title = ref();
-
+const isTitleChanged = ref(false);
 watch(
   () => formState.value.spec.title,
-  (value) => {
-    title.value = value;
+  (newValue, oldValue) => {
+    isTitleChanged.value = newValue !== oldValue;
   }
 );
 
@@ -275,7 +274,6 @@ function handleSaveClick() {
 }
 
 async function handleCreate() {
-  formState.value.spec.title = title.value;
   formState.value.metadata.annotations = {
     ...formState.value.metadata.annotations,
     [contentAnnotations.CONTENT_JSON]: JSON.stringify(content.value),
@@ -316,13 +314,13 @@ const { mutateAsync: handleSave, isLoading: isSaving } = useMutation({
   mutationFn: async () => {
     // Update title
     // TODO: needs retry
-    if (title.value !== formState.value.spec.title) {
-      formState.value.spec.title = title.value;
+    if (isTitleChanged.value) {
       const { data: updatedPost } = await apiClient.uc.post.updateMyPost({
         name: formState.value.metadata.name,
         post: formState.value,
       });
       formState.value = updatedPost;
+      isTitleChanged.value = false;
     }
 
     // Snapshot always exists in update mode
@@ -371,7 +369,6 @@ function handlePublishClick() {
     handlePublish();
   } else {
     // Set editor title to post
-    formState.value.spec.title = title.value;
     postPublishModal.value = true;
   }
 }
@@ -497,7 +494,7 @@ useSessionKeepAlive();
       v-if="currentEditorProvider"
       v-model:raw="content.raw"
       v-model:content="content.content"
-      v-model:title="title"
+      v-model:title="formState.spec.title"
       :upload-image="handleUploadImage"
       class="h-full"
       @update="handleSetContentCache"
