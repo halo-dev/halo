@@ -93,13 +93,13 @@ public class EmailConfigValidationEndpoint implements CustomEndpoint {
             .map(SecurityContext::getAuthentication)
             .map(Principal::getName)
             .flatMap(username -> client.fetch(User.class, username))
-            .map(user -> user.getSpec().getEmail())
-            .defaultIfEmpty(StringUtils.EMPTY)
-            .doOnNext(email -> {
+            .flatMap(user -> {
+                var email = user.getSpec().getEmail();
                 if (StringUtils.isBlank(email)) {
-                    throw new ServerWebInputException(
-                        "Your email is missing, please set it in your profile.");
+                    return Mono.error(new ServerWebInputException(
+                        "Your email is missing, please set it in your profile."));
                 }
+                return Mono.just(email);
             });
     }
 
