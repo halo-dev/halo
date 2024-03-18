@@ -98,6 +98,7 @@ import { onBeforeUnmount } from "vue";
 import { usePermission } from "@/utils/permission";
 import type { AxiosRequestConfig } from "axios";
 import { getContents } from "./utils/attachment";
+import { nextTick } from "vue";
 
 const { t } = useI18n();
 const { currentUserHasPermission } = usePermission();
@@ -447,6 +448,22 @@ const currentLocale = i18n.global.locale.value as
 function onTitleInput(event: Event) {
   emit("update:title", (event.target as HTMLInputElement).value);
 }
+
+// Set focus
+const editorTitleRef = ref();
+onMounted(() => {
+  // if name is empty, it means the editor is in the creation mode
+  const urlParams = new URLSearchParams(window.location.search);
+  const name = urlParams.get("name");
+
+  if (!name) {
+    nextTick(() => {
+      editorTitleRef.value.focus();
+    });
+  } else {
+    editor.value?.commands.focus();
+  }
+});
 </script>
 
 <template>
@@ -460,9 +477,9 @@ function onTitleInput(event: Event) {
     <RichTextEditor v-if="editor" :editor="editor" :locale="currentLocale">
       <template #content>
         <input
+          ref="editorTitleRef"
           :value="title"
           type="text"
-          autofocus
           :placeholder="$t('core.components.default_editor.title_placeholder')"
           class="w-full border-x-0 !border-b border-t-0 !border-solid !border-gray-100 p-0 !py-2 text-4xl font-semibold placeholder:text-gray-300"
           @input="onTitleInput"
