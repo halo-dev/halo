@@ -21,8 +21,8 @@ import {
   ref,
   toRef,
   type ComputedRef,
+  watch,
 } from "vue";
-import { cloneDeep } from "lodash-es";
 import { apiClient } from "@/utils/api-client";
 import { useRouteQuery } from "@vueuse/router";
 import { useRouter } from "vue-router";
@@ -80,7 +80,7 @@ interface PostRequestWithContent extends PostRequest {
 }
 
 // Post form
-const initialFormState: PostRequestWithContent = {
+const formState = ref<PostRequestWithContent>({
   post: {
     spec: {
       title: "",
@@ -114,12 +114,18 @@ const initialFormState: PostRequestWithContent = {
     content: "",
     rawType: "HTML",
   },
-};
-
-const formState = ref<PostRequestWithContent>(cloneDeep(initialFormState));
+});
 const settingModal = ref(false);
 const saving = ref(false);
 const publishing = ref(false);
+
+const isTitleChanged = ref(false);
+watch(
+  () => formState.value.post.spec.title,
+  (newValue, oldValue) => {
+    isTitleChanged.value = newValue !== oldValue;
+  }
+);
 
 const isUpdateMode = computed(() => {
   return !!formState.value.post.metadata.creationTimestamp;
@@ -155,15 +161,25 @@ const handleSave = async (options?: { mute?: boolean }) => {
     }
 
     if (isUpdateMode.value) {
+      // Save post title
+      if (isTitleChanged.value) {
+        formState.value.post = (
+          await postUpdateMutate(formState.value.post)
+        ).data;
+      }
+
       const { data } = await apiClient.post.updatePostContent({
         name: formState.value.post.metadata.name,
         content: formState.value.content,
       });
 
       formState.value.post = data;
+
+      isTitleChanged.value = false;
     } else {
       // Clear new post content cache
       handleClearCache();
+
       const { data } = await apiClient.post.draftPost({
         postRequest: formState.value,
       });
@@ -194,6 +210,12 @@ const handlePublish = async () => {
     if (isUpdateMode.value) {
       const { name: postName } = formState.value.post.metadata;
       const { permalink } = formState.value.post.status || {};
+
+      if (isTitleChanged.value) {
+        formState.value.post = (
+          await postUpdateMutate(formState.value.post)
+        ).data;
+      }
 
       await apiClient.post.updatePostContent({
         name: postName,
@@ -240,6 +262,7 @@ const handlePublishClick = () => {
   if (isUpdateMode.value) {
     handlePublish();
   } else {
+    // Set editor title to post
     settingModal.value = true;
   }
 };
@@ -503,6 +526,7 @@ async function handleUploadImage(file: File, options?: AxiosRequestConfig) {
       v-if="currentEditorProvider"
       v-model:raw="formState.content.raw"
       v-model:content="formState.content.content"
+      v-model:title="formState.post.spec.title"
       :upload-image="handleUploadImage"
       class="h-full"
       @update="handleSetContentCache"

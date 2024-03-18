@@ -436,7 +436,7 @@ core:
         description: 该操作会将自定义页面恢复到被删除之前的状态。
   page_editor:
     title: 页面编辑
-    untitled: Untitled page
+    untitled: 未命名页面
   comment:
     title: 评论
     empty:
@@ -1362,6 +1362,7 @@ core:
       toolbox:
         attachment: 选择附件
         show_hide_sidebar: 显示 / 隐藏侧边栏
+      title_placeholder: 请输入标题
     global_search:
       placeholder: 输入关键词以搜索
       no_results: 没有搜索结果
