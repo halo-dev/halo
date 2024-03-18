@@ -1479,6 +1479,7 @@ core:
       not_activated: 未啟用
       installed: 已安裝
       not_installed: 未安裝
+      starting_up: 启动中
     text:
       none: 無
       tip: 提示

@@ -9,7 +9,7 @@ import {
 } from "@halo-dev/components";
 import { inject, toRefs, markRaw } from "vue";
 import { usePluginLifeCycle } from "../composables/use-plugin";
-import type { Plugin } from "@halo-dev/api-client";
+import { PluginStatusPhaseEnum, type Plugin } from "@halo-dev/api-client";
 import { formatDatetime } from "@/utils/date";
 import { usePermission } from "@/utils/permission";
 import { apiClient } from "@/utils/api-client";
@@ -149,86 +149,112 @@ const { operationItems } = useOperationItemExtensionPoint<Plugin>(
 const { startFields, endFields } = useEntityFieldItemExtensionPoint<Plugin>(
   "plugin:list-item:field:create",
   plugin,
-  computed((): EntityFieldItem[] => [
-    {
-      position: "start",
-      priority: 10,
-      component: markRaw(LogoField),
-      props: {
-        plugin: props.plugin,
-      },
-    },
-    {
-      position: "start",
-      priority: 20,
-      component: markRaw(VEntityField),
-      props: {
-        title: props.plugin.spec.displayName,
-        description: props.plugin.spec.description,
-        route: {
-          name: "PluginDetail",
-          params: { name: props.plugin.metadata.name },
+  computed((): EntityFieldItem[] => {
+    const { enabled } = props.plugin.spec || {};
+    const { phase } = props.plugin.status || {};
+
+    const shouldHideStatusDot =
+      !enabled || (enabled && phase === PluginStatusPhaseEnum.Started);
+
+    const statusDotText =
+      enabled &&
+      phase !== (PluginStatusPhaseEnum.Started || PluginStatusPhaseEnum.Failed)
+        ? t("core.common.status.starting_up")
+        : undefined;
+
+    const getStatusDotState = () => {
+      if (
+        enabled &&
+        phase !==
+          (PluginStatusPhaseEnum.Started || PluginStatusPhaseEnum.Failed)
+      ) {
+        return "default";
+      }
+      return "error";
+    };
+
+    return [
+      {
+        position: "start",
+        priority: 10,
+        component: markRaw(LogoField),
+        props: {
+          plugin: props.plugin,
         },
       },
-    },
-    {
-      position: "end",
-      priority: 10,
-      component: markRaw(StatusDotField),
-      props: {
-        tooltip: getFailedMessage(),
-        state: "error",
-        animate: true,
+      {
+        position: "start",
+        priority: 20,
+        component: markRaw(VEntityField),
+        props: {
+          title: props.plugin.spec.displayName,
+          description: props.plugin.spec.description,
+          route: {
+            name: "PluginDetail",
+            params: { name: props.plugin.metadata.name },
+          },
+        },
       },
-      hidden: props.plugin.status?.phase !== "FAILED",
-    },
-    {
-      position: "end",
-      priority: 20,
-      component: markRaw(StatusDotField),
-      props: {
-        tooltip: t("core.common.status.deleting"),
-        state: "warning",
-        animate: true,
+      {
+        position: "end",
+        priority: 10,
+        component: markRaw(StatusDotField),
+        props: {
+          tooltip: getFailedMessage(),
+          state: getStatusDotState(),
+          animate: true,
+          text: statusDotText,
+        },
+        hidden: shouldHideStatusDot,
       },
-      hidden: !props.plugin.metadata.deletionTimestamp,
-    },
-    {
-      position: "end",
-      priority: 30,
-      component: markRaw(AuthorField),
-      props: {
-        plugin: props.plugin,
+      {
+        position: "end",
+        priority: 20,
+        component: markRaw(StatusDotField),
+        props: {
+          tooltip: t("core.common.status.deleting"),
+          state: "warning",
+          animate: true,
+        },
+        hidden: !props.plugin.metadata.deletionTimestamp,
       },
-      hidden: !props.plugin.spec.author,
-    },
-    {
-      position: "end",
-      priority: 40,
-      component: markRaw(VEntityField),
-      props: {
-        description: props.plugin.spec.version,
+      {
+        position: "end",
+        priority: 30,
+        component: markRaw(AuthorField),
+        props: {
+          plugin: props.plugin,
+        },
+        hidden: !props.plugin.spec.author,
       },
-    },
-    {
-      position: "end",
-      priority: 50,
-      component: markRaw(VEntityField),
-      props: {
-        description: formatDatetime(props.plugin.metadata.creationTimestamp),
+      {
+        position: "end",
+        priority: 40,
+        component: markRaw(VEntityField),
+        props: {
+          description: props.plugin.spec.version,
+        },
       },
-      hidden: !props.plugin.metadata.creationTimestamp,
-    },
-    {
-      position: "end",
-      priority: 60,
-      component: markRaw(SwitchField),
-      props: {
-        plugin: props.plugin,
+      {
+        position: "end",
+        priority: 50,
+        component: markRaw(VEntityField),
+        props: {
+          description: formatDatetime(props.plugin.metadata.creationTimestamp),
+        },
+        hidden: !props.plugin.metadata.creationTimestamp,
       },
-      permissions: ["system:plugins:manage"],
-    },
-  ])
+      {
+        position: "end",
+        priority: 60,
+        component: markRaw(SwitchField),
+        props: {
+          plugin: props.plugin,
+        },
+        permissions: ["system:plugins:manage"],
+      },
+    ];
+  })
 );
 </script>
 <template>

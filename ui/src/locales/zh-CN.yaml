@@ -1513,6 +1513,7 @@ core:
       not_activated: 未启用
       installed: 已安装
       not_installed: 未安装
+      starting_up: 启动中
     text:
       none: 无
       tip: 提示
