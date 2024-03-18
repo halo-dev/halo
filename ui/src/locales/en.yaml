@@ -1414,6 +1414,7 @@ core:
       toolbox:
         attachment: Attachment
         show_hide_sidebar: Show/Hide Sidebar
+      title_placeholder: Please enter the title
     global_search:
       placeholder: Enter keywords to search
       no_results: No search results
