@@ -171,19 +171,23 @@ const handleKeydown = (e: KeyboardEvent) => {
       : convertTreeToCategories(categoriesTree.value);
 
     const index = categoryIndices.findIndex(
-      (tag) => tag.metadata.name === selectedCategory.value?.metadata.name
+      (category) =>
+        category.metadata.name === selectedCategory.value?.metadata.name
     );
     if (index > 0) {
       selectedCategory.value = categoryIndices[index - 1];
+    } else {
+      selectedCategory.value = undefined;
     }
     scrollToSelected();
   }
 
   if (e.key === "Enter") {
-    if (searchResults.value.length === 0 && text.value) {
+    if (!selectedCategory.value && text.value) {
       handleCreateCategory();
       return;
     }
+
     if (selectedCategory.value) {
       handleSelect(selectedCategory.value);
       text.value = "";
@@ -193,12 +197,10 @@ const handleKeydown = (e: KeyboardEvent) => {
 };
 
 const scrollToSelected = () => {
-  if (!selectedCategory.value) {
-    return;
-  }
-  const selectedNode = document.getElementById(
-    `category-${selectedCategory.value?.metadata.name}`
-  );
+  const selectedNodeName = selectedCategory.value
+    ? selectedCategory.value?.metadata.name
+    : "create";
+  const selectedNode = document.getElementById(`category-${selectedNodeName}`);
   if (selectedNode) {
     selectedNode.scrollIntoView({
       behavior: "smooth",
@@ -291,11 +293,15 @@ const handleDelete = () => {
     <div v-if="dropdownVisible" :class="context.classes['dropdown-wrapper']">
       <ul class="p-1">
         <HasPermission
-          v-if="text.trim() && !searchResults?.length"
+          v-if="text.trim()"
           :permissions="['system:posts:manage']"
         >
           <li
-            class="group flex cursor-pointer items-center justify-between rounded bg-gray-100 p-2"
+            id="category-create"
+            class="group flex cursor-pointer items-center justify-between rounded p-2"
+            :class="{
+              'bg-gray-100': selectedCategory === undefined,
+            }"
             @click="handleCreateCategory"
           >
             <span class="text-xs text-gray-700 group-hover:text-gray-900">
