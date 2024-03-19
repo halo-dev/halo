@@ -99,6 +99,7 @@ public class SystemSetting {
         public static final String GROUP = "comment";
         Boolean enable;
         Boolean requireReviewForNew;
+        Boolean autoApproveAdminComment;
         Boolean systemUserOnly;
     }
 
