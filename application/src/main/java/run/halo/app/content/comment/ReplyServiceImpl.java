@@ -6,8 +6,10 @@ import static run.halo.app.extension.index.query.QueryFactory.isNull;
 import static run.halo.app.extension.router.selector.SelectorUtil.labelAndFieldSelectorToPredicate;
 
 import java.time.Instant;
+import java.util.Set;
 import java.util.function.Function;
 import java.util.function.Predicate;
+import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import org.apache.commons.lang3.BooleanUtils;
 import org.springframework.data.domain.Sort;
@@ -19,6 +21,7 @@ import reactor.core.publisher.Mono;
 import run.halo.app.core.extension.User;
 import run.halo.app.core.extension.content.Comment;
 import run.halo.app.core.extension.content.Reply;
+import run.halo.app.core.extension.service.RoleService;
 import run.halo.app.core.extension.service.UserService;
 import run.halo.app.extension.Extension;
 import run.halo.app.extension.ListOptions;
@@ -42,6 +45,7 @@ public class ReplyServiceImpl implements ReplyService {
 
     private final ReactiveExtensionClient client;
     private final UserService userService;
+    private final RoleService roleService;
     private final CounterService counterService;
 
     @Override
@@ -75,10 +79,26 @@ public class ReplyServiceImpl implements ReplyService {
                 }
                 // populate owner from current user
                 return fetchCurrentUser()
-                    .map(user -> {
-                        replyToUse.getSpec().setOwner(toCommentOwner(user));
-                        return replyToUse;
-                    })
+                    .flatMap(user ->
+                        ReactiveSecurityContextHolder.getContext()
+                            .flatMap(securityContext -> {
+                                var authentication = securityContext.getAuthentication();
+                                var roles = authentication.getAuthorities().stream()
+                                    // remove prefix: ROLE_
+                                    .map(o -> o.getAuthority().substring(5))
+                                    .collect(Collectors.toSet());
+                                return roleService.contains(roles,
+                                        Set.of("role-template-manage-comments"))
+                                    .map(result -> {
+                                        if (result) {
+                                            reply.getSpec().setApproved(true);
+                                            reply.getSpec().setApprovedTime(Instant.now());
+                                        }
+                                        replyToUse.getSpec().setOwner(toCommentOwner(user));
+                                        return replyToUse;
+                                    });
+                            })
+                    )
                     .switchIfEmpty(
                         Mono.error(new IllegalArgumentException("Reply owner must not be null.")));
             })
