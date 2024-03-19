@@ -2,7 +2,7 @@
 import ThemePreviewListItem from "./ThemePreviewListItem.vue";
 import { useSettingFormConvert } from "@console/composables/use-setting-form";
 import { useThemeStore } from "@console/stores/theme";
-import { apiClient } from "@/utils/api-client";
+import { apiClient, axiosInstance } from "@/utils/api-client";
 import type {
   ConfigMap,
   Setting,
@@ -22,28 +22,27 @@ import {
   IconTablet,
   IconRefreshLine,
   Toast,
+  VLoading,
 } from "@halo-dev/components";
 import { storeToRefs } from "pinia";
-import { computed, markRaw, ref, toRaw, watch } from "vue";
+import { computed, markRaw, ref, toRaw } from "vue";
 import { useI18n } from "vue-i18n";
 import { OverlayScrollbarsComponent } from "overlayscrollbars-vue";
 import { useQuery } from "@tanstack/vue-query";
+import { onMounted } from "vue";
 
 const props = withDefaults(
   defineProps<{
-    visible: boolean;
     title?: string;
     theme?: Theme;
   }>(),
   {
-    visible: false,
     title: undefined,
     theme: undefined,
   }
 );
 
 const emit = defineEmits<{
-  (event: "update:visible", visible: boolean): void;
   (event: "close"): void;
 }>();
 
@@ -56,7 +55,6 @@ interface SettingTab {
 
 const { activatedTheme } = storeToRefs(useThemeStore());
 
-const previewFrame = ref<HTMLIFrameElement | null>(null);
 const themesVisible = ref(false);
 const switching = ref(false);
 const selectedTheme = ref<Theme>();
@@ -71,29 +69,11 @@ const { data: themes } = useQuery<Theme[]>({
     });
     return data.items;
   },
-  enabled: computed(() => props.visible),
 });
 
-watch(
-  () => props.visible,
-  (visible) => {
-    if (visible) {
-      selectedTheme.value = props.theme || activatedTheme?.value;
-    } else {
-      setTimeout(() => {
-        themesVisible.value = false;
-        settingsVisible.value = false;
-      }, 200);
-    }
-  }
-);
-
-const onVisibleChange = (visible: boolean) => {
-  emit("update:visible", visible);
-  if (!visible) {
-    emit("close");
-  }
-};
+onMounted(() => {
+  selectedTheme.value = toRaw(props.theme) || toRaw(activatedTheme?.value);
+});
 
 const handleOpenThemes = () => {
   settingsVisible.value = false;
@@ -120,6 +100,26 @@ const modalTitle = computed(() => {
   return t("core.theme.preview_model.title", {
     display_name: selectedTheme.value?.spec.displayName,
   });
+});
+
+const {
+  data: previewHTML,
+  isLoading,
+  refetch: refetchPreviewHTML,
+} = useQuery({
+  queryKey: ["site-preview", previewUrl],
+  queryFn: async () => {
+    const { data } = await axiosInstance.get(previewUrl.value, {
+      headers: {
+        Accept: "text/html",
+        "Cache-Control": "no-cache",
+        Pragma: "no-cache",
+        Expires: "0",
+      },
+    });
+    return data;
+  },
+  enabled: computed(() => !!previewUrl.value),
 });
 
 // theme settings
@@ -150,9 +150,7 @@ const { data: setting } = useQuery<Setting>({
 
     activeSettingTab.value = settingTabs.value[0].id;
   },
-  enabled: computed(
-    () => props.visible && !!selectedTheme.value?.spec.settingName
-  ),
+  enabled: computed(() => !!selectedTheme.value?.spec.settingName),
 });
 
 const { data: configMap, refetch: handleFetchConfigMap } = useQuery<ConfigMap>({
@@ -195,7 +193,7 @@ const handleSaveConfigMap = async () => {
 
   saving.value = false;
 
-  handleRefresh();
+  refetchPreviewHTML();
 };
 
 const handleOpenSettings = (theme?: Theme) => {
@@ -204,10 +202,6 @@ const handleOpenSettings = (theme?: Theme) => {
   }
   themesVisible.value = false;
   settingsVisible.value = !settingsVisible.value;
-};
-
-const handleRefresh = () => {
-  previewFrame.value?.contentWindow?.location.reload();
 };
 
 // mock devices
@@ -241,11 +235,10 @@ const iframeClasses = computed(() => {
 <template>
   <VModal
     :body-class="['!p-0']"
-    :visible="visible"
     fullscreen
     :title="modalTitle"
     :mount-to-body="true"
-    @update:visible="onVisibleChange"
+    @close="emit('close')"
   >
     <template #center>
       <!-- TODO: Reactor VTabbar component to support icon prop -->
@@ -281,7 +274,7 @@ const iframeClasses = computed(() => {
           content: $t('core.common.buttons.refresh'),
           delay: 300,
         }"
-        @click="handleRefresh"
+        @click="refetchPreviewHTML()"
       >
         <IconRefreshLine />
       </span>
@@ -432,12 +425,12 @@ const iframeClasses = computed(() => {
       <div
         class="flex h-full flex-1 items-center justify-center transition-all duration-300"
       >
+        <VLoading v-if="isLoading" />
         <iframe
-          v-if="visible"
-          ref="previewFrame"
+          v-else
           class="border-none transition-all duration-500"
           :class="iframeClasses"
-          :src="previewUrl"
+          :srcdoc="previewHTML"
         ></iframe>
       </div>
     </div>

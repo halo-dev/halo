@@ -106,8 +106,9 @@ const handleOpenPreview = (theme: Theme) => {
       </ul>
     </Transition>
     <ThemePreviewModal
-      v-model:visible="previewVisible"
+      v-if="previewVisible"
       :theme="selectedPreviewTheme"
+      @close="previewVisible = false"
     />
   </div>
 </template>
