@@ -30,11 +30,12 @@ import run.halo.app.extension.PageRequest;
 import run.halo.app.extension.PageRequestImpl;
 import run.halo.app.extension.ReactiveExtensionClient;
 import run.halo.app.extension.router.selector.FieldSelector;
+import run.halo.app.infra.SystemConfigurableEnvironmentFetcher;
 import run.halo.app.metrics.CounterService;
 import run.halo.app.metrics.MeterUtils;
 
 /**
- * A default implementation of {@link ReplyService}.
+ * A default implementation of {@link run.halo.app.content.comment.ReplyService}.
  *
  * @author guqing
  * @since 2.0.0
@@ -47,6 +48,7 @@ public class ReplyServiceImpl implements ReplyService {
     private final UserService userService;
     private final RoleService roleService;
     private final CounterService counterService;
+    private final SystemConfigurableEnvironmentFetcher environmentFetcher;
 
     @Override
     public Mono<Reply> create(String commentName, Reply reply) {
@@ -80,25 +82,34 @@ public class ReplyServiceImpl implements ReplyService {
                 // populate owner from current user
                 return fetchCurrentUser()
                     .flatMap(user ->
-                        ReactiveSecurityContextHolder.getContext()
-                            .flatMap(securityContext -> {
-                                var authentication = securityContext.getAuthentication();
-                                var roles = authentication.getAuthorities().stream()
-                                    // remove prefix: ROLE_
-                                    .map(o -> o.getAuthority().substring(5))
-                                    .collect(Collectors.toSet());
-                                return roleService.contains(roles,
-                                        Set.of("role-template-manage-comments"))
-                                    .map(result -> {
-                                        if (result) {
-                                            reply.getSpec().setApproved(true);
-                                            reply.getSpec().setApprovedTime(Instant.now());
+                        environmentFetcher.fetchComment()
+                            .flatMap(commentSetting ->
+                                ReactiveSecurityContextHolder.getContext()
+                                    .doOnNext(securityContext -> {
+                                        if (commentSetting.getAutoApproveAdminComment()) {
+                                            var authentication =
+                                                securityContext.getAuthentication();
+                                            var roles = authentication.getAuthorities().stream()
+                                                // remove prefix: ROLE_
+                                                .map(o -> o.getAuthority().substring(5))
+                                                .collect(Collectors.toSet());
+                                            roleService.contains(roles,
+                                                    Set.of("role-template-manage-comments"))
+                                                .doOnNext(result -> {
+                                                    if (result) {
+                                                        reply.getSpec().setApproved(true);
+                                                        reply.getSpec()
+                                                            .setApprovedTime(Instant.now());
+                                                    }
+                                                })
+                                                .subscribe();
                                         }
+                                    })
+                                    .flatMap(securityContext -> {
                                         replyToUse.getSpec().setOwner(toCommentOwner(user));
-                                        return replyToUse;
-                                    });
-                            })
-                    )
+                                        return Mono.just(replyToUse);
+                                    })
+                            ))
                     .switchIfEmpty(
                         Mono.error(new IllegalArgumentException("Reply owner must not be null.")));
             })

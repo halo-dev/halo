@@ -121,28 +121,31 @@ public class CommentServiceImpl implements CommentService {
                 // populate owner from current user
                 return fetchCurrentUser()
                     .flatMap(currentUser -> ReactiveSecurityContextHolder.getContext()
-                        .flatMap(securityContext -> {
-                            var authentication = securityContext.getAuthentication();
-                            var roles = authentication.getAuthorities().stream()
-                                // remove prefix: ROLE_
-                                .map(o -> o.getAuthority().substring(5))
-                                .collect(Collectors.toSet());
-                            return roleService.contains(roles,
-                                    Set.of("role-template-manage-comments"))
-                                .doOnNext(result -> {
-                                    if (result) {
-                                        comment.getSpec().setApproved(true);
-                                        comment.getSpec().setApprovedTime(Instant.now());
-                                    }
-                                })
-                                .thenReturn(toCommentOwner(currentUser));
-                        }))
-                    .map(owner -> {
-                        comment.getSpec().setOwner(owner);
-                        return comment;
-                    })
-                    .switchIfEmpty(
-                        Mono.error(new IllegalStateException("The owner must not be null.")));
+                        .doOnNext(securityContext -> {
+                            if (commentSetting.getAutoApproveAdminComment()) {
+                                var authentication = securityContext.getAuthentication();
+                                var roles = authentication.getAuthorities().stream()
+                                    // remove prefix: ROLE_
+                                    .map(o -> o.getAuthority().substring(5))
+                                    .collect(Collectors.toSet());
+                                roleService.contains(roles, Set.of("role-template-manage-comments"))
+                                    .doOnNext(result -> {
+                                        if (result) {
+                                            comment.getSpec().setApproved(true);
+                                            comment.getSpec().setApprovedTime(Instant.now());
+                                        }
+                                    })
+                                    .subscribe();
+                            }
+                        })
+                        .flatMap(securityContext -> Mono.just(toCommentOwner(currentUser)))
+                        .map(owner -> {
+                            comment.getSpec().setOwner(owner);
+                            return comment;
+                        })
+                        .switchIfEmpty(
+                            Mono.error(new IllegalStateException("The owner must not be null."))
+                        ));
             })
             .flatMap(client::create);
     }
