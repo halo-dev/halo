@@ -255,6 +255,9 @@ watch(
       formState.value = toRaw(value);
       publishTime.value = toDatetimeLocal(formState.value.spec.publishTime);
     }
+  },
+  {
+    immediate: true,
   }
 );
 

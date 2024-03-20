@@ -10,6 +10,11 @@
     height: 48px;
   }
 
+  .editor-header-extra {
+    width: 100%;
+    padding: $editorVerticalPadding 20px;
+  }
+
   .editor-content {
     width: 100%;
     position: relative;
@@ -78,7 +83,8 @@
   }
 
   @media screen {
-    .ProseMirror {
+    .ProseMirror,
+    .editor-header-extra {
       @media (min-width: 640px) {
         padding: $editorVerticalPadding min($editorHorizontalPadding, 10%) !important;
       }
