@@ -249,6 +249,7 @@ class CommentServiceImplTest {
         SystemSetting.Comment commentSetting = new SystemSetting.Comment();
         commentSetting.setEnable(true);
         commentSetting.setSystemUserOnly(true);
+        commentSetting.setAutoApproveAdminComment(false);
         commentSetting.setRequireReviewForNew(true);
         return commentSetting;
     }
