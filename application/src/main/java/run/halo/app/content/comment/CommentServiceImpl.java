@@ -78,7 +78,6 @@ public class CommentServiceImpl implements CommentService {
             );
     }
 
-    @SuppressWarnings({"checkstyle:WhitespaceAfter", "checkstyle:Indentation"})
     @Override
     public Mono<Comment> create(Comment comment) {
         return environmentFetcher.fetchComment()
