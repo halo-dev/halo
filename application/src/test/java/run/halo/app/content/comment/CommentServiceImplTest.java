@@ -10,6 +10,7 @@ import static org.mockito.Mockito.when;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import org.json.JSONException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -33,6 +34,7 @@ import run.halo.app.core.extension.Counter;
 import run.halo.app.core.extension.User;
 import run.halo.app.core.extension.content.Comment;
 import run.halo.app.core.extension.content.Post;
+import run.halo.app.core.extension.service.RoleService;
 import run.halo.app.core.extension.service.UserService;
 import run.halo.app.extension.ListOptions;
 import run.halo.app.extension.ListResult;
@@ -46,6 +48,7 @@ import run.halo.app.infra.utils.JsonUtils;
 import run.halo.app.metrics.CounterService;
 import run.halo.app.metrics.MeterUtils;
 import run.halo.app.plugin.ExtensionComponentsFinder;
+import run.halo.app.security.authorization.AuthorityUtils;
 
 /**
  * Tests for {@link CommentServiceImpl}.
@@ -64,6 +67,9 @@ class CommentServiceImplTest {
 
     @Mock
     private UserService userService;
+
+    @Mock
+    private RoleService roleService;
 
     @Mock
     private ExtensionComponentsFinder extensionComponentsFinder;
@@ -89,6 +95,10 @@ class CommentServiceImplTest {
             .thenReturn(Mono.just(createUser("B-owner")));
         when(client.fetch(eq(User.class), eq("C-owner")))
             .thenReturn(Mono.empty());
+
+        when(roleService.contains(Set.of("USER"),
+            Set.of(AuthorityUtils.COMMENT_MANAGEMENT_ROLE_NAME)))
+            .thenReturn(Mono.just(false));
 
         PostCommentSubject postCommentSubject = Mockito.mock(PostCommentSubject.class);
         when(extensionComponentsFinder.getExtensions(eq(CommentSubject.class)))
