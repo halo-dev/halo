@@ -7,7 +7,6 @@ import static run.halo.app.extension.index.query.QueryFactory.isNull;
 import java.time.Instant;
 import java.util.Set;
 import java.util.function.Function;
-import java.util.stream.Collectors;
 import org.apache.commons.lang3.BooleanUtils;
 import org.springframework.data.domain.Sort;
 import org.springframework.lang.NonNull;
@@ -33,6 +32,7 @@ import run.halo.app.infra.exception.AccessDeniedException;
 import run.halo.app.metrics.CounterService;
 import run.halo.app.metrics.MeterUtils;
 import run.halo.app.plugin.ExtensionComponentsFinder;
+import run.halo.app.security.authorization.AuthorityUtils;
 
 /**
  * Comment service implementation.
@@ -122,12 +122,10 @@ public class CommentServiceImpl implements CommentService {
                     .flatMap(currentUser -> ReactiveSecurityContextHolder.getContext()
                         .flatMap(securityContext -> {
                             var authentication = securityContext.getAuthentication();
-                            var roles = authentication.getAuthorities().stream()
-                                // remove prefix: ROLE_
-                                .map(o -> o.getAuthority().substring(5))
-                                .collect(Collectors.toSet());
+                            var roles = AuthorityUtils.authoritiesToRoles(
+                                authentication.getAuthorities());
                             return roleService.contains(roles,
-                                    Set.of("role-template-manage-comments"))
+                                    Set.of(AuthorityUtils.COMMENT_MANAGEMENT_ROLE_NAME))
                                 .doOnNext(result -> {
                                     if (result) {
                                         comment.getSpec().setApproved(true);

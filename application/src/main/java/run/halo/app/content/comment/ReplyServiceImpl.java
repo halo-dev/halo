@@ -9,7 +9,6 @@ import java.time.Instant;
 import java.util.Set;
 import java.util.function.Function;
 import java.util.function.Predicate;
-import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import org.apache.commons.lang3.BooleanUtils;
 import org.springframework.data.domain.Sort;
@@ -32,6 +31,7 @@ import run.halo.app.extension.ReactiveExtensionClient;
 import run.halo.app.extension.router.selector.FieldSelector;
 import run.halo.app.metrics.CounterService;
 import run.halo.app.metrics.MeterUtils;
+import run.halo.app.security.authorization.AuthorityUtils;
 
 /**
  * A default implementation of {@link ReplyService}.
@@ -83,20 +83,18 @@ public class ReplyServiceImpl implements ReplyService {
                         ReactiveSecurityContextHolder.getContext()
                             .flatMap(securityContext -> {
                                 var authentication = securityContext.getAuthentication();
-                                var roles = authentication.getAuthorities().stream()
-                                    // remove prefix: ROLE_
-                                    .map(o -> o.getAuthority().substring(5))
-                                    .collect(Collectors.toSet());
+                                var roles = AuthorityUtils.authoritiesToRoles(
+                                    authentication.getAuthorities());
                                 return roleService.contains(roles,
-                                        Set.of("role-template-manage-comments"))
-                                    .map(result -> {
+                                        Set.of(AuthorityUtils.COMMENT_MANAGEMENT_ROLE_NAME))
+                                    .doOnNext(result -> {
                                         if (result) {
                                             reply.getSpec().setApproved(true);
                                             reply.getSpec().setApprovedTime(Instant.now());
                                         }
                                         replyToUse.getSpec().setOwner(toCommentOwner(user));
-                                        return replyToUse;
-                                    });
+                                    })
+                                    .thenReturn(replyToUse);
                             })
                     )
                     .switchIfEmpty(
