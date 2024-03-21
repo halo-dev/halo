@@ -229,9 +229,10 @@ const actions: Action[] = [
     </OverlayScrollbarsComponent>
   </VCard>
   <ThemePreviewModal
-    v-model:visible="themePreviewVisible"
+    v-if="themePreviewVisible"
     :title="
       $t('core.dashboard.widgets.presets.quicklink.actions.view_site.title')
     "
+    @close="themePreviewVisible = false"
   />
 </template>
