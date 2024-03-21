@@ -51,7 +51,7 @@ export const verificationForm: FormKitTypeDefinition = {
   /**
    * An array of extra props to accept for this input.
    */
-  props: ["actions", "label", "buttonAttrs"],
+  props: ["action", "label", "buttonAttrs"],
 
   /**
    * Additional features that should be added to your input

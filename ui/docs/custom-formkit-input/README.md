@@ -40,7 +40,7 @@
 - `tagCheckbox`：选择多个标签
 - `verificationForm`: 远程验证一组数据是否符合某个规则
   - 参数
-    1. actions: 对目标数据进行验证的接口地址
+    1. action: 对目标数据进行验证的接口地址
     2. label: 验证按钮文本
     3. buttonAttrs: 验证按钮的额外属性
 

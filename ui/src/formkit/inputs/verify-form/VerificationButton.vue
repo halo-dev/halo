@@ -45,18 +45,18 @@ async function handleVerification(event: Event) {
   await node.settled;
 
   if (!node.ledger.value("blocking")) {
-    verifyActions();
+    verifyAction();
   }
 }
 
 /**
- * verify actions
+ * verify action
  * @param node
  */
-function verifyActions() {
+function verifyAction() {
   const node = props.context.node;
-  const actions = node.props.actions;
-  if (!actions) {
+  const action = node.props.action;
+  if (!action) {
     const message = i18n.global.t(
       "core.formkit.verification_form.no_action_defined",
       {
@@ -75,7 +75,7 @@ function verifyActions() {
   node.store.set(loading);
   // call onSubmit
   axiosInstance
-    .post(actions, val)
+    .post(action, val)
     .then(() => {
       stateMessage.value = {
         state: "success",
