@@ -461,10 +461,10 @@ async function handleUploadImage(file: File, options?: AxiosRequestConfig) {
   />
 
   <UrlPreviewModal
-    v-if="isUpdateMode"
-    v-model:visible="previewModal"
+    v-if="previewModal"
     :title="formState.post.spec.title"
     :url="`/preview/posts/${formState.post.metadata.name}`"
+    @close="previewModal = false"
   />
 
   <VPageHeader :title="$t('core.post.title')">

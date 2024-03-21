@@ -269,6 +269,10 @@ onMounted(() => {
     </div>
 
     <ThemeListModal v-model:visible="themesModal" @select="onSelectTheme" />
-    <ThemePreviewModal v-model:visible="previewModal" :theme="selectedTheme" />
+    <ThemePreviewModal
+      v-if="previewModal"
+      :theme="selectedTheme"
+      @close="previewModal = false"
+    />
   </BasicLayout>
 </template>

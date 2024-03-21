@@ -153,13 +153,15 @@ const handleKeydown = (e: KeyboardEvent) => {
     );
     if (index > 0) {
       selectedTag.value = searchResults.value[index - 1];
+    } else {
+      selectedTag.value = undefined;
     }
 
     scrollToSelected();
   }
 
   if (e.key === "Enter") {
-    if (searchResults.value.length === 0 && text.value) {
+    if (!selectedTag.value && text.value) {
       handleCreateTag();
       return;
     }
@@ -174,13 +176,11 @@ const handleKeydown = (e: KeyboardEvent) => {
 };
 
 const scrollToSelected = () => {
-  if (!selectedTag.value) {
-    return;
-  }
+  const selectedNodeName = selectedTag.value
+    ? selectedTag.value?.metadata.name
+    : "tag-create";
 
-  const selectedNode = document.getElementById(
-    selectedTag.value?.metadata.name
-  );
+  const selectedNode = document.getElementById(selectedNodeName);
 
   if (selectedNode) {
     selectedNode.scrollIntoView({
@@ -281,11 +281,15 @@ const handleDelete = () => {
     <div v-if="dropdownVisible" :class="context.classes['dropdown-wrapper']">
       <ul class="p-1">
         <HasPermission
-          v-if="text.trim() && !searchResults?.length"
+          v-if="text.trim()"
           :permissions="['system:posts:manage']"
         >
           <li
-            class="group flex cursor-pointer items-center justify-between rounded bg-gray-100 p-2"
+            id="tag-create"
+            class="group flex cursor-pointer items-center justify-between rounded p-2"
+            :class="{
+              'bg-gray-100': selectedTag === undefined,
+            }"
             @click="handleCreateTag"
           >
             <span class="text-xs text-gray-700 group-hover:text-gray-900">

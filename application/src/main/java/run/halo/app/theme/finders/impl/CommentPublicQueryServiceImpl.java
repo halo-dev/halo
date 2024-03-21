@@ -99,7 +99,7 @@ public class CommentPublicQueryServiceImpl implements CommentPublicQueryService 
     public Mono<ListResult<CommentWithReplyVo>> convertToWithReplyVo(ListResult<CommentVo> comments,
         int replySize) {
         return Flux.fromIterable(comments.getItems())
-            .flatMap(commentVo -> {
+            .concatMap(commentVo -> {
                 var commentName = commentVo.getMetadata().getName();
                 return listReply(commentName, 1, replySize)
                     .map(replyList -> CommentWithReplyVo.from(commentVo)

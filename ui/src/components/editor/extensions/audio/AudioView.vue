@@ -1,11 +1,11 @@
 <script lang="ts" setup>
 import type { NodeViewProps } from "@halo-dev/richtext-editor";
-import { NodeViewWrapper } from "@halo-dev/richtext-editor";
 import { computed, ref } from "vue";
 import type { AttachmentAttr } from "../../utils/attachment";
 import RiFileMusicLine from "~icons/ri/file-music-line";
 import { EditorLinkObtain } from "../../components";
 import { VButton } from "@halo-dev/components";
+import InlineBlockBox from "../../components/InlineBlockBox.vue";
 
 const props = defineProps<NodeViewProps>();
 
@@ -66,7 +66,7 @@ const handleResetInit = () => {
 </script>
 
 <template>
-  <node-view-wrapper as="div" class="inline-block w-full">
+  <InlineBlockBox>
     <div
       class="relative inline-block h-full max-w-full overflow-hidden rounded-md text-center transition-all"
       :class="{
@@ -192,5 +192,5 @@ const handleResetInit = () => {
         </EditorLinkObtain>
       </div>
     </div>
-  </node-view-wrapper>
+  </InlineBlockBox>
 </template>

@@ -119,5 +119,10 @@ declare module "@formkit/inputs" {
       type: "menuCheckbox";
       value?: string[];
     };
+
+    code: {
+      type: "code";
+      value?: string;
+    };
   }
 }
