@@ -47,7 +47,10 @@ const theme: Record<string, Record<string, string>> = {
     fileItem: "block flex text-gray-800 text-sm mb-1",
     fileRemove: "ml-auto text-blue-500 text-sm",
   },
-  checkbox: boxClassification,
+  checkbox: {
+    ...boxClassification,
+    wrapper: "flex items-center mb-1 cursor-pointer",
+  },
   radio: {
     ...boxClassification,
     input: boxClassification.input.replace("rounded-sm", "rounded-full"),
