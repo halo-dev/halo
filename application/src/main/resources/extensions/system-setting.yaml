@@ -126,11 +126,6 @@ spec:
           label: "新评论审核"
           help: 开启之后，新评论需要管理员审核后才会显示
         - $formkit: checkbox
-          name: autoApproveAdminComment
-          value: false
-          label: "管理员评论免审核"
-          help: 开启之后，有评论管理权限的用户发布的评论不需要审核
-        - $formkit: checkbox
           name: systemUserOnly
           value: true
           label: "仅允许注册用户评论"
