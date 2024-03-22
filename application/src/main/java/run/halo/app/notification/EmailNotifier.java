@@ -185,5 +185,5 @@ public class EmailNotifier implements ReactiveNotifier {
         public String getSender() {
             return StringUtils.defaultIfBlank(sender, username);
         }
-            }
+    }
 }
