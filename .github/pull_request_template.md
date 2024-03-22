@@ -1,6 +1,6 @@
 <!--  Thanks for sending a pull request!  Here are some tips for you:
-1. 如果这是你的第一次，请阅读我们的贡献指南：<https://github.com/halo-dev/halo/blob/master/CONTRIBUTING.md>。
-1. If this is your first time, please read our contributor guidelines: <https://github.com/halo-dev/halo/blob/master/CONTRIBUTING.md>.
+1. 如果这是你的第一次，请阅读我们的贡献指南：<https://github.com/halo-dev/halo/blob/main/CONTRIBUTING.md>。
+1. If this is your first time, please read our contributor guidelines: <https://github.com/halo-dev/halo/blob/main/CONTRIBUTING.md>.
 2. 请根据你解决问题的类型为 Pull Request 添加合适的标签。
 2. Please label this pull request according to what type of issue you are addressing, especially if this is a release targeted pull request.
 3. 请确保你已经添加并运行了适当的测试。

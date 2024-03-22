@@ -6,7 +6,7 @@ import {
   VModal,
   VSpace,
 } from "@halo-dev/components";
-import { computed, nextTick, ref, watchEffect } from "vue";
+import { computed, nextTick, ref, toRaw, watch } from "vue";
 import type { SinglePage } from "@halo-dev/api-client";
 import { cloneDeep } from "lodash-es";
 import { apiClient } from "@/utils/api-client";
@@ -76,6 +76,7 @@ const saving = ref(false);
 const publishing = ref(false);
 const publishCanceling = ref(false);
 const submitType = ref<"publish" | "save">();
+const publishTime = ref<string | undefined>(undefined);
 
 const isUpdateMode = computed(() => {
   return !!formState.value.metadata.creationTimestamp;
@@ -247,25 +248,28 @@ const handleUnpublish = async () => {
   }
 };
 
-watchEffect(() => {
-  if (props.singlePage) {
-    formState.value = cloneDeep(props.singlePage);
+watch(
+  () => props.singlePage,
+  (value) => {
+    if (value) {
+      formState.value = toRaw(value);
+      publishTime.value = toDatetimeLocal(formState.value.spec.publishTime);
+    }
+  },
+  {
+    immediate: true,
   }
-});
+);
+
+watch(
+  () => publishTime.value,
+  (value) => {
+    formState.value.spec.publishTime = value ? toISOString(value) : undefined;
+  }
+);
 
 // custom templates
 const { templates } = useThemeCustomTemplates("page");
-
-// publishTime
-const publishTime = computed({
-  get() {
-    const { publishTime } = formState.value.spec;
-    return publishTime ? toDatetimeLocal(publishTime) : undefined;
-  },
-  set(value) {
-    formState.value.spec.publishTime = value ? toISOString(value) : undefined;
-  },
-});
 
 // slug
 const { handleGenerateSlug } = useSlugify(

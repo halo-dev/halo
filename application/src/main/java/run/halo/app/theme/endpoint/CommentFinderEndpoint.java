@@ -1,7 +1,6 @@
 package run.halo.app.theme.endpoint;
 
 import static io.swagger.v3.oas.annotations.media.Schema.RequiredMode.REQUIRED;
-import static java.util.Comparator.comparing;
 import static org.apache.commons.lang3.BooleanUtils.isFalse;
 import static org.apache.commons.lang3.BooleanUtils.isTrue;
 import static org.springdoc.core.fn.builders.apiresponse.Builder.responseBuilder;
@@ -16,14 +15,11 @@ import io.github.resilience4j.reactor.ratelimiter.operator.RateLimiterOperator;
 import io.swagger.v3.oas.annotations.enums.ParameterIn;
 import io.swagger.v3.oas.annotations.media.ArraySchema;
 import io.swagger.v3.oas.annotations.media.Schema;
-import java.util.ArrayList;
-import java.util.Comparator;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.apache.commons.lang3.StringUtils;
 import org.springdoc.core.fn.builders.schema.Builder;
 import org.springdoc.webflux.core.fn.SpringdocRouteBuilder;
-import org.springframework.context.MessageSource;
 import org.springframework.data.domain.Sort;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Component;
@@ -43,9 +39,10 @@ import run.halo.app.core.extension.content.Comment;
 import run.halo.app.core.extension.content.Reply;
 import run.halo.app.core.extension.endpoint.CustomEndpoint;
 import run.halo.app.core.extension.endpoint.SortResolver;
-import run.halo.app.extension.Comparators;
 import run.halo.app.extension.GroupVersion;
 import run.halo.app.extension.ListResult;
+import run.halo.app.extension.PageRequest;
+import run.halo.app.extension.PageRequestImpl;
 import run.halo.app.extension.Ref;
 import run.halo.app.extension.router.IListRequest;
 import run.halo.app.extension.router.QueryParamBuildUtil;
@@ -57,6 +54,7 @@ import run.halo.app.infra.utils.IpAddressUtils;
 import run.halo.app.theme.finders.CommentFinder;
 import run.halo.app.theme.finders.CommentPublicQueryService;
 import run.halo.app.theme.finders.vo.CommentVo;
+import run.halo.app.theme.finders.vo.CommentWithReplyVo;
 import run.halo.app.theme.finders.vo.ReplyVo;
 
 /**
@@ -71,7 +69,6 @@ public class CommentFinderEndpoint implements CustomEndpoint {
     private final ReplyService replyService;
     private final SystemConfigurableEnvironmentFetcher environmentFetcher;
     private final RateLimiterRegistry rateLimiterRegistry;
-    private final MessageSource messageSource;
 
     @Override
     public RouterFunction<ServerResponse> endpoint() {
@@ -114,7 +111,7 @@ public class CommentFinderEndpoint implements CustomEndpoint {
                     .description("List comments.")
                     .tag(tag)
                     .response(responseBuilder()
-                        .implementation(ListResult.generateGenericClass(CommentVo.class))
+                        .implementation(ListResult.generateGenericClass(CommentWithReplyVo.class))
                     );
                 QueryParamBuildUtil.buildParametersFromType(builder, CommentQuery.class);
             })
@@ -213,9 +210,14 @@ public class CommentFinderEndpoint implements CustomEndpoint {
 
     Mono<ServerResponse> listComments(ServerRequest request) {
         CommentQuery commentQuery = new CommentQuery(request);
-        var comparator = commentQuery.toComparator();
-        return commentPublicQueryService.list(commentQuery.toRef(), commentQuery.getPage(),
-                commentQuery.getSize(), comparator)
+        return commentPublicQueryService.list(commentQuery.toRef(), commentQuery.toPageRequest())
+            .flatMap(result -> {
+                if (commentQuery.getWithReplies()) {
+                    return commentPublicQueryService.convertToWithReplyVo(result,
+                        commentQuery.getReplySize());
+                }
+                return Mono.just(result);
+            })
             .flatMap(list -> ServerResponse.ok().bodyValue(list));
     }
 
@@ -282,6 +284,20 @@ public class CommentFinderEndpoint implements CustomEndpoint {
             return name;
         }
 
+        @Schema(description = "Whether to include replies. Default is false.",
+            defaultValue = "false")
+        public Boolean getWithReplies() {
+            var withReplies = queryParams.getFirst("withReplies");
+            return StringUtils.isNotBlank(withReplies) && Boolean.parseBoolean(withReplies);
+        }
+
+        @Schema(description = "Reply size of the comment, default is 10, only works when "
+            + "withReplies is true.", defaultValue = "10")
+        public int getReplySize() {
+            var replySize = queryParams.getFirst("replySize");
+            return StringUtils.isNotBlank(replySize) ? Integer.parseInt(replySize) : 10;
+        }
+
         @ArraySchema(uniqueItems = true,
             arraySchema = @Schema(name = "sort",
                 description = "Sort property and direction of the list result. Supported fields: "
@@ -302,26 +318,12 @@ public class CommentFinderEndpoint implements CustomEndpoint {
             return ref;
         }
 
-        String emptyToNull(String str) {
-            return StringUtils.isBlank(str) ? null : str;
+        public PageRequest toPageRequest() {
+            return PageRequestImpl.of(getPage(), getSize(), getSort());
         }
 
-        public Comparator<Comment> toComparator() {
-            var sort = getSort();
-            var ctOrder = sort.getOrderFor("creationTimestamp");
-            List<Comparator<Comment>> comparators = new ArrayList<>();
-            if (ctOrder != null) {
-                Comparator<Comment> comparator =
-                    comparing(comment -> comment.getMetadata().getCreationTimestamp());
-                if (ctOrder.isDescending()) {
-                    comparator = comparator.reversed();
-                }
-                comparators.add(comparator);
-                comparators.add(Comparators.compareName(true));
-            }
-            return comparators.stream()
-                .reduce(Comparator::thenComparing)
-                .orElse(null);
+        String emptyToNull(String str) {
+            return StringUtils.isBlank(str) ? null : str;
         }
     }
 

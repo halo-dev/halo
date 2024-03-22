@@ -10,6 +10,7 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
@@ -17,6 +18,9 @@ import java.util.Objects;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.pf4j.DependencyResolver;
+import org.pf4j.PluginDescriptor;
+import org.pf4j.PluginManager;
 import org.pf4j.PluginWrapper;
 import org.pf4j.RuntimeMode;
 import org.springframework.core.io.Resource;
@@ -37,14 +41,15 @@ import run.halo.app.core.extension.service.PluginService;
 import run.halo.app.extension.ReactiveExtensionClient;
 import run.halo.app.infra.SystemVersionSupplier;
 import run.halo.app.infra.exception.PluginAlreadyExistsException;
+import run.halo.app.infra.exception.PluginDependencyException;
 import run.halo.app.infra.exception.PluginInstallationException;
 import run.halo.app.infra.exception.UnsatisfiedAttributeValueException;
 import run.halo.app.infra.utils.FileUtils;
 import run.halo.app.infra.utils.VersionUtils;
-import run.halo.app.plugin.HaloPluginManager;
 import run.halo.app.plugin.PluginConst;
 import run.halo.app.plugin.PluginProperties;
 import run.halo.app.plugin.PluginUtils;
+import run.halo.app.plugin.YamlPluginDescriptorFinder;
 import run.halo.app.plugin.YamlPluginFinder;
 import run.halo.app.plugin.resources.BundleResourceUtils;
 
@@ -62,7 +67,7 @@ public class PluginServiceImpl implements PluginService {
 
     private final PluginProperties pluginProperties;
 
-    private final HaloPluginManager pluginManager;
+    private final PluginManager pluginManager;
 
     @Override
     public Flux<Plugin> getPresets() {
@@ -82,11 +87,13 @@ public class PluginServiceImpl implements PluginService {
     @Override
     public Mono<Plugin> install(Path path) {
         return findPluginManifest(path)
-            .flatMap(pluginInPath -> {
+            .doOnNext(plugin -> {
                 // validate the plugin version
-                satisfiesRequiresVersion(pluginInPath);
-
-                return client.fetch(Plugin.class, pluginInPath.getMetadata().getName())
+                satisfiesRequiresVersion(plugin);
+                checkDependencies(plugin);
+            })
+            .flatMap(pluginInPath ->
+                client.fetch(Plugin.class, pluginInPath.getMetadata().getName())
                     .flatMap(oldPlugin -> Mono.<Plugin>error(
                         new PluginAlreadyExistsException(oldPlugin.getMetadata().getName())))
                     .switchIfEmpty(Mono.defer(
@@ -97,18 +104,47 @@ public class PluginServiceImpl implements PluginService {
                                 p.getSpec().setEnabled(false);
                             })
                             .flatMap(client::create))
-                    );
-            });
+                    ));
+    }
+
+    private void checkDependencies(Plugin plugin) {
+        var resolvedPlugins = new ArrayList<>(pluginManager.getResolvedPlugins());
+        var pluginDescriptors = new ArrayList<PluginDescriptor>(resolvedPlugins.size() + 1);
+
+        resolvedPlugins.stream()
+            .map(PluginWrapper::getDescriptor)
+            .forEach(pluginDescriptors::add);
+
+        var pluginDescriptor = YamlPluginDescriptorFinder.convert(plugin);
+        pluginDescriptors.add(pluginDescriptor);
+
+        var deptResolver = new DependencyResolver(pluginManager.getVersionManager());
+        var result = deptResolver.resolve(pluginDescriptors);
+        if (result.hasCyclicDependency()) {
+            throw new PluginDependencyException.CyclicException();
+        }
+        var notFoundDependencies = result.getNotFoundDependencies();
+        if (!CollectionUtils.isEmpty(notFoundDependencies)) {
+            throw new PluginDependencyException.NotFoundException(notFoundDependencies);
+        }
+
+        var wrongVersionDependencies = result.getWrongVersionDependencies();
+        if (!CollectionUtils.isEmpty(wrongVersionDependencies)) {
+            throw new PluginDependencyException.WrongVersionsException(wrongVersionDependencies);
+        }
     }
 
     @Override
     public Mono<Plugin> upgrade(String name, Path path) {
         return findPluginManifest(path)
+            .doOnNext(plugin -> {
+                satisfiesRequiresVersion(plugin);
+                checkDependencies(plugin);
+            })
             .flatMap(pluginInPath -> {
                 // pre-check the plugin in the path
                 Assert.notNull(pluginInPath.statusNonNull().getLoadLocation(),
                     "plugin.status.load-location must not be null");
-                satisfiesRequiresVersion(pluginInPath);
                 if (!Objects.equals(name, pluginInPath.getMetadata().getName())) {
                     return Mono.error(new ServerWebInputException(
                         "The provided plugin " + pluginInPath.getMetadata().getName()

@@ -1,10 +1,13 @@
 <script lang="ts" setup>
-import { ref, onMounted } from "vue";
+import { ref, onMounted, reactive, computed, type ComputedRef } from "vue";
 import { submitForm } from "@formkit/core";
 import { Toast, VButton } from "@halo-dev/components";
 import { apiClient } from "@/utils/api-client";
 import { useRouteQuery } from "@vueuse/router";
 import { useI18n } from "vue-i18n";
+import { useMutation } from "@tanstack/vue-query";
+import { useIntervalFn } from "@vueuse/shared";
+import { useGlobalInfoStore } from "@/stores/global-info";
 
 const { t } = useI18n();
 
@@ -31,6 +34,7 @@ const formState = ref({
       email: "",
     },
   },
+  verifyCode: "",
 });
 const loading = ref(false);
 
@@ -40,14 +44,30 @@ const emit = defineEmits<{
 
 const login = useRouteQuery<string>("login");
 const name = useRouteQuery<string>("name");
+const globalInfoStore = useGlobalInfoStore();
+const signUpCond = reactive({
+  mustVerifyEmailOnRegistration: false,
+});
 
 onMounted(() => {
+  signUpCond.mustVerifyEmailOnRegistration =
+    globalInfoStore.globalInfo?.mustVerifyEmailOnRegistration || false;
   if (login.value) {
     formState.value.user.metadata.name = login.value;
   }
   if (name.value) {
     formState.value.user.spec.displayName = name.value;
   }
+});
+const emailRegex = new RegExp("^[\\w\\-.]+@([\\w-]+\\.)+[\\w-]{2,}$");
+const emailValidation: ComputedRef<
+  // please see https://github.com/formkit/formkit/blob/bd5cf1c378d358ed3aba7b494713af20b6c909ab/packages/inputs/src/props.ts#L660
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  string | Array<[rule: string, ...args: any]>
+> = computed(() => {
+  if (signUpCond.mustVerifyEmailOnRegistration)
+    return [["required"], ["matches", emailRegex]];
+  else return "required|email|length:0,100";
 });
 
 const handleSignup = async () => {
@@ -71,6 +91,60 @@ const handleSignup = async () => {
 const inputClasses = {
   outer: "!py-3 first:!pt-0 last:!pb-0",
 };
+
+// the code below is copied from console/uc-src/modules/profile/components/EmailVerifyModal.vue
+const timer = ref(0);
+const { pause, resume, isActive } = useIntervalFn(
+  () => {
+    if (timer.value <= 0) {
+      pause();
+    } else {
+      timer.value--;
+    }
+  },
+  1000,
+  {
+    immediate: false,
+  }
+);
+
+const { mutate: sendVerifyCode, isLoading: isSending } = useMutation({
+  mutationKey: ["send-verify-code"],
+  mutationFn: async () => {
+    if (!formState.value.user.spec.email.match(emailRegex)) {
+      Toast.error(t("core.signup.fields.email.matchFailed"));
+      throw new Error("email is illegal");
+    }
+    return await apiClient.common.user.sendRegisterVerifyEmail({
+      registerVerifyEmailRequest: {
+        email: formState.value.user.spec.email,
+      },
+    });
+  },
+  onSuccess() {
+    Toast.success(
+      t("core.signup.fields.verify_code.operations.send_code.toast_success")
+    );
+    timer.value = 60;
+    resume();
+  },
+});
+
+const sendVerifyCodeButtonText = computed(() => {
+  if (isSending.value) {
+    return t(
+      "core.signup.fields.verify_code.operations.send_code.buttons.sending"
+    );
+  }
+  return isActive.value
+    ? t(
+        "core.signup.fields.verify_code.operations.send_code.buttons.countdown",
+        {
+          timer: timer.value,
+        }
+      )
+    : t("core.signup.fields.verify_code.operations.send_code.buttons.send");
+});
 </script>
 
 <template>
@@ -123,8 +197,31 @@ const inputClasses = {
       :validation-label="$t('core.signup.fields.email.placeholder')"
       type="email"
       name="email"
-      validation="required|email|length:0,100"
+      :validation="emailValidation"
+      :validation-messages="{
+        matches: $t('core.signup.fields.email.matchFailed'),
+      }"
     ></FormKit>
+    <FormKit
+      v-if="signUpCond.mustVerifyEmailOnRegistration"
+      v-model="formState.verifyCode"
+      type="number"
+      name="code"
+      :placeholder="$t('core.signup.fields.verify_code.placeholder')"
+      :validation-label="$t('core.signup.fields.verify_code.placeholder')"
+      validation="required"
+    >
+      <template #suffix>
+        <VButton
+          :loading="isSending"
+          :disabled="isActive"
+          class="rounded-none border-y-0 border-l border-r-0 tabular-nums"
+          @click="sendVerifyCode"
+        >
+          {{ sendVerifyCodeButtonText }}
+        </VButton>
+      </template>
+    </FormKit>
     <FormKit
       v-model="formState.password"
       name="password"

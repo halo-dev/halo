@@ -25,8 +25,6 @@ public class And extends LogicalQuery {
         NavigableSet<String> resultSet = null;
         for (Query query : childQueries) {
             NavigableSet<String> currentResult = query.matches(indexView);
-            // Trim unneeded rows to shrink the dataset for the next query
-            indexView.removeByIdNotIn(currentResult);
             if (resultSet == null) {
                 resultSet = Sets.newTreeSet(currentResult);
             } else {

@@ -37,14 +37,20 @@ watch(
     <editor-bubble-menu :editor="editor" />
     <editor-header :editor="editor" />
     <div class="h-full flex flex-row w-full overflow-hidden">
-      <editor-content
-        :editor="editor"
-        :style="contentStyles"
-        class="editor-content markdown-body flex-1 relative bg-white overflow-y-auto"
-      />
+      <div class="overflow-y-auto flex-1 bg-white relative">
+        <div v-if="$slots.content" class="editor-header-extra">
+          <slot name="content" />
+        </div>
+
+        <editor-content
+          :editor="editor"
+          :style="contentStyles"
+          class="editor-content markdown-body relative"
+        />
+      </div>
       <div
         v-if="$slots.extra"
-        class="h-full hidden sm:!block w-72 flex-shrink-0"
+        class="h-full hidden sm:!block w-72 flex-shrink-0 flex-none"
       >
         <slot name="extra"></slot>
       </div>

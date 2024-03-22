@@ -143,8 +143,8 @@ public class UserNotificationEndpoint implements CustomEndpoint {
     }
 
     private Mono<ServerResponse> listNotification(ServerRequest request) {
-        var query = new UserNotificationQuery(request.exchange());
         var username = request.pathVariable("username");
+        var query = new UserNotificationQuery(request.exchange(), username);
         return notificationService.listByUser(username, query)
             .flatMap(notifications -> ServerResponse.ok().bodyValue(notifications));
     }

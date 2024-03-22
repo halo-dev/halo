@@ -32,6 +32,17 @@ core:
         placeholder: 名称
       email:
         placeholder: 电子邮箱
+        matchFailed: 邮箱格式错误或服务商不受支持
+      verify_code:
+        placeholder: 验证码
+        operations:
+          send_code:
+            buttons:
+              sending: 发送中
+              send: 发送验证码
+              countdown: "{timer} 秒后重发"
+            toast_success: 验证码已发送
+            toast_email_empty: 请输入电子邮箱
       password:
         placeholder: 密码
       password_confirm:
@@ -73,7 +84,7 @@ core:
         plugins: 插件
         users: 用户
         settings: 设置
-        actuator: 概览
+        overview: 概览
         backup: 备份
         tools: 工具
     operations:
@@ -425,7 +436,7 @@ core:
         description: 该操作会将自定义页面恢复到被删除之前的状态。
   page_editor:
     title: 页面编辑
-    untitled: Untitled page
+    untitled: 未命名页面
   comment:
     title: 评论
     empty:
@@ -522,6 +533,8 @@ core:
           create_time_asc: 较晚上传
           size_desc: 文件大小降序
           size_asc: 文件大小升序
+          display_name_asc: 文件名升序
+          display_name_desc: 文件名降序
       view_type:
         items:
           grid: 网格模式
@@ -1100,7 +1113,7 @@ core:
         description: 确定要删除该消息吗？
   setting:
     title: 设置
-  actuator:
+  overview:
     title: 系统概览
     actions:
       copy:
@@ -1304,7 +1317,7 @@ core:
     Cache Management: 缓存
     Cache Manage: 缓存管理
     Notification Configuration: 通知配置
-    Configure Notifier: 配置通知器
+    role-template-notifier-config: 配置通知器
     Post Contributor: 允许投稿
     Post Author: 允许管理自己的文章
     Post Attachment Manager: 允许在文章中上传图片
@@ -1334,11 +1347,10 @@ core:
         placeholder:
           options:
             placeholder: 输入 / 以选择输入类型
-        image:
-          upload:
-            error: 上传失败
-            click_retry: 点击重试
-            loading: 等待中
+        upload:
+          error: 上传失败
+          click_retry: 点击重试
+          loading: 等待中
           attachment:
             title: 附件库
           permalink:
@@ -1350,6 +1362,7 @@ core:
       toolbox:
         attachment: 选择附件
         show_hide_sidebar: 显示 / 隐藏侧边栏
+      title_placeholder: 请输入标题
     global_search:
       placeholder: 输入关键词以搜索
       no_results: 没有搜索结果

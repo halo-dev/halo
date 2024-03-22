@@ -1,4 +1,5 @@
 <script lang="ts" setup>
+import { axiosInstance } from "@/utils/api-client";
 import {
   VModal,
   IconLink,
@@ -6,33 +7,28 @@ import {
   IconComputer,
   IconTablet,
   IconPhone,
+  VLoading,
 } from "@halo-dev/components";
+import { useQuery } from "@tanstack/vue-query";
+import { toRefs } from "vue";
 import { computed, markRaw, ref } from "vue";
 
-withDefaults(
+const props = withDefaults(
   defineProps<{
-    visible: boolean;
     title?: string;
     url?: string;
   }>(),
   {
-    visible: false,
     title: undefined,
     url: "",
   }
 );
 
+const { url } = toRefs(props);
+
 const emit = defineEmits<{
-  (event: "update:visible", visible: boolean): void;
   (event: "close"): void;
 }>();
-
-const onVisibleChange = (visible: boolean) => {
-  emit("update:visible", visible);
-  if (!visible) {
-    emit("close");
-  }
-};
 
 const mockDevices = [
   {
@@ -59,15 +55,30 @@ const iframeClasses = computed(() => {
   }
   return "w-96 h-[50rem] ring-2 rounded ring-gray-300";
 });
+
+const { data: html, isLoading } = useQuery({
+  queryKey: ["url-preview", url],
+  queryFn: async () => {
+    const { data } = await axiosInstance.get(url.value, {
+      headers: {
+        Accept: "text/html",
+        "Cache-Control": "no-cache",
+        Pragma: "no-cache",
+        Expires: "0",
+      },
+    });
+    return data;
+  },
+  enabled: computed(() => !!url.value),
+});
 </script>
 <template>
   <VModal
     :body-class="['!p-0']"
-    :visible="visible"
     fullscreen
     :title="title"
     :layer-closable="true"
-    @update:visible="onVisibleChange"
+    @close="emit('close')"
   >
     <template #center>
       <!-- TODO: Reactor VTabbar component to support icon prop -->
@@ -86,11 +97,12 @@ const iframeClasses = computed(() => {
       </span>
     </template>
     <div class="flex h-full items-center justify-center">
+      <VLoading v-if="isLoading" />
       <iframe
-        v-if="visible"
+        v-else
         class="border-none transition-all duration-500"
         :class="iframeClasses"
-        :src="url"
+        :srcdoc="html"
       ></iframe>
     </div>
   </VModal>

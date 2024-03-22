@@ -32,6 +32,17 @@ core:
         placeholder: Display name
       email:
         placeholder: Email
+        matchFailed: The email format is wrong or the service provider is not supported.
+      verify_code:
+        placeholder: Verification code
+        operations:
+          send_code:
+            buttons:
+              sending: sending
+              send: Send Code
+              countdown: resend after {timer} seconds
+            toast_success: verification code sent
+            toast_email_empty: please enter your email address
       password:
         placeholder: Password
       password_confirm:
@@ -75,7 +86,7 @@ core:
         plugins: Plugins
         users: Users
         settings: Settings
-        actuator: Actuator
+        overview: Overview
         backup: Backup
         tools: Tools
     operations:
@@ -534,6 +545,8 @@ core:
           create_time_asc: Earliest uploaded
           size_desc: Descending order by file size
           size_asc: Ascending order by file size
+          display_name_asc: Ascending order by display name
+          display_name_desc: Descending order by display name
       view_type:
         items:
           grid: Grid Mode
@@ -1158,8 +1171,8 @@ core:
         title: Delete
   setting:
     title: Settings
-  actuator:
-    title: Actuator
+  overview:
+    title: Overview
     actions:
       copy:
         toast_browser_not_supported: The current browser does not support copying
@@ -1356,7 +1369,7 @@ core:
     Cache Management: Cache
     Cache Manage: Cache Manage
     Notification Configuration: Notification Configuration
-    Configure Notifier: Configure Notifier
+    role-template-notifier-config: Configure Notifier
     Post Attachment Manager: Allow images to be uploaded in posts
     Post Author: Allows you to manage your own posts
     Post Contributor: Contributions allowed
@@ -1386,11 +1399,10 @@ core:
         placeholder:
           options:
             placeholder: Enter / to select input type.
-        image:
-          upload:
-            error: Upload failed
-            click_retry: Click to retry
-            loading: Loading
+        upload:
+          error: Upload failed
+          click_retry: Click to retry
+          loading: Loading
           attachment:
             title: Attachment Library
           permalink:
@@ -1402,6 +1414,7 @@ core:
       toolbox:
         attachment: Attachment
         show_hide_sidebar: Show/Hide Sidebar
+      title_placeholder: Please enter the title
     global_search:
       placeholder: Enter keywords to search
       no_results: No search results

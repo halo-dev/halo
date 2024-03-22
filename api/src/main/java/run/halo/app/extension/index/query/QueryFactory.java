@@ -5,6 +5,7 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 import lombok.experimental.UtilityClass;
 import org.springframework.util.Assert;
@@ -173,6 +174,10 @@ public class QueryFactory {
         return new Or(queries);
     }
 
+    public static Query not(Query query) {
+        return new Not(query);
+    }
+
     public static Query betweenLowerExclusive(String fieldName, String lowerValue,
         String upperValue) {
         return new Between(fieldName, lowerValue, false, upperValue, true);
@@ -202,5 +207,27 @@ public class QueryFactory {
 
     public static Query contains(String fieldName, String value) {
         return new StringContains(fieldName, value);
+    }
+
+    /**
+     * Get all the field names used in the given query.
+     *
+     * @param query the query
+     * @return the field names used in the given query
+     */
+    public static List<String> getFieldNamesUsedInQuery(Query query) {
+        List<String> fieldNames = new ArrayList<>();
+
+        if (query instanceof SimpleQuery simpleQuery) {
+            if (simpleQuery.isFieldRef()) {
+                fieldNames.add(simpleQuery.getValue());
+            }
+            fieldNames.add(simpleQuery.getFieldName());
+        } else if (query instanceof LogicalQuery logicalQuery) {
+            for (Query childQuery : logicalQuery.getChildQueries()) {
+                fieldNames.addAll(getFieldNamesUsedInQuery(childQuery));
+            }
+        }
+        return fieldNames;
     }
 }

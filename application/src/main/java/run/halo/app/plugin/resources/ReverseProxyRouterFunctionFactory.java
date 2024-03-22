@@ -4,11 +4,14 @@ import static org.springframework.http.MediaType.ALL;
 import static org.springframework.web.reactive.function.server.RequestPredicates.GET;
 import static org.springframework.web.reactive.function.server.RequestPredicates.accept;
 
+import java.io.IOException;
+import java.time.Instant;
 import java.util.List;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.pf4j.PluginManager;
+import org.springframework.boot.autoconfigure.web.WebProperties;
 import org.springframework.context.ApplicationContext;
 import org.springframework.core.io.DefaultResourceLoader;
 import org.springframework.core.io.Resource;
@@ -18,11 +21,13 @@ import org.springframework.lang.NonNull;
 import org.springframework.lang.Nullable;
 import org.springframework.stereotype.Component;
 import org.springframework.util.Assert;
+import org.springframework.web.reactive.function.BodyInserters;
 import org.springframework.web.reactive.function.server.RouterFunction;
 import org.springframework.web.reactive.function.server.RouterFunctions;
 import org.springframework.web.reactive.function.server.ServerRequest;
 import org.springframework.web.reactive.function.server.ServerResponse;
 import org.springframework.web.util.pattern.PathPatternParser;
+import reactor.core.publisher.Mono;
 import run.halo.app.core.extension.ReverseProxy;
 import run.halo.app.core.extension.ReverseProxy.FileReverseProxyProvider;
 import run.halo.app.core.extension.ReverseProxy.ReverseProxyRule;
@@ -45,6 +50,7 @@ public class ReverseProxyRouterFunctionFactory {
 
     private final PluginManager pluginManager;
     private final ApplicationContext applicationContext;
+    private final WebProperties webProperties;
 
     /**
      * <p>Create {@link RouterFunction} according to the {@link ReverseProxy} custom resource
@@ -76,8 +82,23 @@ public class ReverseProxyRouterFunctionFactory {
                     if (!resource.exists()) {
                         return ServerResponse.notFound().build();
                     }
-                    return ServerResponse.ok()
-                        .bodyValue(resource);
+                    var cacheProperties = webProperties.getResources().getCache();
+                    var useLastModified = cacheProperties.isUseLastModified();
+                    var bodyBuilder = ServerResponse.ok()
+                        .cacheControl(cacheProperties.getCachecontrol().toHttpCacheControl());
+                    try {
+                        if (useLastModified) {
+                            var lastModified = Instant.ofEpochMilli(resource.lastModified());
+                            return request.checkNotModified(lastModified)
+                                .switchIfEmpty(Mono.defer(
+                                    () -> bodyBuilder.lastModified(lastModified)
+                                        .body(BodyInserters.fromResource(resource)))
+                                );
+                        }
+                        return bodyBuilder.body(BodyInserters.fromResource(resource));
+                    } catch (IOException e) {
+                        throw new RuntimeException(e);
+                    }
                 });
         }).reduce(RouterFunction::and).orElse(null);
     }

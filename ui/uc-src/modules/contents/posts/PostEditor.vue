@@ -13,7 +13,7 @@ import {
   VSpace,
 } from "@halo-dev/components";
 import EditorProviderSelector from "@/components/dropdown-selector/EditorProviderSelector.vue";
-import { ref, toRef } from "vue";
+import { ref, toRef, watch } from "vue";
 import { useLocalStorage } from "@vueuse/core";
 import type { Post, Content, Snapshot } from "@halo-dev/api-client";
 import { randomUUID } from "@/utils/id";
@@ -82,6 +82,14 @@ const content = ref<Content>({
 });
 const snapshot = ref<Snapshot>();
 
+const isTitleChanged = ref(false);
+watch(
+  () => formState.value.spec.title,
+  (newValue, oldValue) => {
+    isTitleChanged.value = newValue !== oldValue;
+  }
+);
+
 // provide some data to editor
 provide<ComputedRef<string | undefined>>(
   "owner",
@@ -121,12 +129,7 @@ const name = useRouteQuery<string | undefined>("name");
 
 onMounted(async () => {
   if (name.value) {
-    const { data: post } = await apiClient.uc.post.getMyPost({
-      name: name.value,
-    });
-
-    formState.value = post;
-
+    await getLatestPost();
     await handleFetchContent();
     handleResetCache();
     return;
@@ -171,23 +174,20 @@ useAutoSaveContent(currentCache, toRef(content.value, "raw"), async () => {
   if (isUpdateMode.value) {
     handleSave({ mute: true });
   } else {
-    formState.value.metadata.annotations = {
-      ...formState.value.metadata.annotations,
-      [contentAnnotations.CONTENT_JSON]: JSON.stringify(content.value),
-    };
-    // Set default title and slug
-    if (!formState.value.spec.title) {
-      formState.value.spec.title = t("core.post_editor.untitled");
-    }
-    if (!formState.value.spec.slug) {
-      formState.value.spec.slug = new Date().getTime().toString();
-    }
-    const { data: createdPost } = await apiClient.uc.post.createMyPost({
-      post: formState.value,
-    });
-    onCreatePostSuccess(createdPost);
+    handleCreate();
   }
 });
+
+async function getLatestPost() {
+  if (!name.value) {
+    return;
+  }
+  const { data: latestPost } = await apiClient.uc.post.getMyPost({
+    name: name.value,
+  });
+
+  formState.value = latestPost;
+}
 
 /**
  * Fetch content from the head snapshot.
@@ -265,14 +265,32 @@ async function handleSetEditorProviderFromRemote() {
 }
 
 // Create post
-const postCreationModal = ref(false);
-
 function handleSaveClick() {
   if (isUpdateMode.value) {
     handleSave({ mute: false });
   } else {
-    postCreationModal.value = true;
+    handleCreate();
   }
+}
+
+async function handleCreate() {
+  formState.value.metadata.annotations = {
+    ...formState.value.metadata.annotations,
+    [contentAnnotations.CONTENT_JSON]: JSON.stringify(content.value),
+  };
+  // Set default title and slug
+  if (!formState.value.spec.title) {
+    formState.value.spec.title = t("core.post_editor.untitled");
+  }
+  if (!formState.value.spec.slug) {
+    formState.value.spec.slug = new Date().getTime().toString();
+  }
+
+  const { data: createdPost } = await apiClient.uc.post.createMyPost({
+    post: formState.value,
+  });
+
+  await onCreatePostSuccess(createdPost);
 }
 
 async function onCreatePostSuccess(data: Post) {
@@ -294,6 +312,17 @@ const { mutateAsync: handleSave, isLoading: isSaving } = useMutation({
     mute: false,
   },
   mutationFn: async () => {
+    // Update title
+    // TODO: needs retry
+    if (isTitleChanged.value) {
+      const { data: updatedPost } = await apiClient.uc.post.updateMyPost({
+        name: formState.value.metadata.name,
+        post: formState.value,
+      });
+      formState.value = updatedPost;
+      isTitleChanged.value = false;
+    }
+
     // Snapshot always exists in update mode
     if (!snapshot.value) {
       return;
@@ -339,6 +368,7 @@ function handlePublishClick() {
   if (isUpdateMode.value) {
     handlePublish();
   } else {
+    // Set editor title to post
     postPublishModal.value = true;
   }
 }
@@ -372,8 +402,9 @@ const { mutateAsync: handlePublish, isLoading: isPublishing } = useMutation({
 // Post setting
 const postSettingEditModal = ref(false);
 
-function handleOpenPostSettingEditModal() {
+async function handleOpenPostSettingEditModal() {
   handleSave({ mute: true });
+  await getLatestPost();
   postSettingEditModal.value = true;
 }
 
@@ -389,24 +420,7 @@ async function handleUploadImage(file: File, options?: AxiosRequestConfig) {
     return;
   }
   if (!isUpdateMode.value) {
-    formState.value.metadata.annotations = {
-      ...formState.value.metadata.annotations,
-      [contentAnnotations.CONTENT_JSON]: JSON.stringify(content.value),
-    };
-
-    if (!formState.value.spec.title) {
-      formState.value.spec.title = t("core.post_editor.untitled");
-    }
-
-    if (!formState.value.spec.slug) {
-      formState.value.spec.slug = new Date().getTime().toString();
-    }
-
-    const { data } = await apiClient.uc.post.createMyPost({
-      post: formState.value,
-    });
-
-    await onCreatePostSuccess(data);
+    await handleCreate();
   }
 
   const { data } = await apiClient.uc.attachment.createAttachmentForPost(
@@ -480,6 +494,7 @@ useSessionKeepAlive();
       v-if="currentEditorProvider"
       v-model:raw="content.raw"
       v-model:content="content.content"
+      v-model:title="formState.spec.title"
       :upload-image="handleUploadImage"
       class="h-full"
       @update="handleSetContentCache"
@@ -487,16 +502,9 @@ useSessionKeepAlive();
   </div>
 
   <PostCreationModal
-    v-if="postCreationModal"
-    :title="$t('core.uc_post.creation_modal.title')"
-    :content="content"
-    @close="postCreationModal = false"
-    @success="onCreatePostSuccess"
-  />
-
-  <PostCreationModal
     v-if="postPublishModal"
     :title="$t('core.uc_post.publish_modal.title')"
+    :post="formState"
     :content="content"
     publish
     @close="postPublishModal = false"

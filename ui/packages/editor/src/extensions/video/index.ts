@@ -96,7 +96,7 @@ const Video = Node.create<ExtensionOptions>({
         },
       },
       controls: {
-        default: null,
+        default: true,
         parseHTML: (element) => {
           return element.getAttribute("controls");
         },

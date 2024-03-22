@@ -5,23 +5,13 @@ import {
   type PMNode,
   type Decoration,
 } from "@halo-dev/richtext-editor";
-import { NodeViewWrapper } from "@halo-dev/richtext-editor";
 import { computed, onMounted, ref } from "vue";
 import Image from "./index";
-import { watch } from "vue";
-import { fileToBase64, uploadFile } from "../../utils/upload";
-import type { Attachment } from "@halo-dev/api-client";
-import type { AttachmentLike } from "@halo-dev/console-shared";
-import { useFileDialog } from "@vueuse/core";
-import { onUnmounted } from "vue";
-import {
-  VButton,
-  VSpace,
-  IconImageAddLine,
-  VDropdown,
-} from "@halo-dev/components";
-import { getAttachmentUrl } from "../../utils/attachment";
-import { i18n } from "@/locales";
+import { fileToBase64 } from "../../utils/upload";
+import { VButton, IconImageAddLine } from "@halo-dev/components";
+import { type AttachmentAttr } from "../../utils/attachment";
+import { EditorLinkObtain } from "../../components";
+import InlineBlockBox from "../../components/InlineBlockBox.vue";
 
 const props = defineProps<{
   editor: Editor;
@@ -63,135 +53,62 @@ const href = computed({
   },
 });
 
-const originalFile = ref<File>();
 const fileBase64 = ref<string>();
 const uploadProgress = ref<number | undefined>(undefined);
 const retryFlag = ref<boolean>(false);
-const controller = ref<AbortController>();
-const initSrc = ref<string>();
+const editorLinkObtain = ref();
+
+const handleUploadAbort = () => {
+  editorLinkObtain.value?.abort();
+};
 
 const initialization = computed(() => {
   return !src.value && !fileBase64.value;
 });
 
-const handleEnterSetSrc = () => {
-  if (!initSrc.value) {
-    return;
-  }
-  props.updateAttributes({ src: initSrc.value });
-};
-
-const openAttachmentSelector = () => {
-  props.editor.commands.openAttachmentSelector(
-    (attachments: AttachmentLike[]) => {
-      if (attachments.length > 0) {
-        const attachment = attachments[0];
-        const attachmentAttr = getAttachmentUrl(attachment);
-        props.updateAttributes({
-          src: attachmentAttr.url,
-          alt: attachmentAttr.name,
-        });
-      }
-    },
-    {
-      accepts: ["image/*"],
-      min: 1,
-      max: 1,
-    }
-  );
-};
-
-const { open, reset, onChange } = useFileDialog({
-  accept: "image/*",
-  multiple: false,
-});
-
-const handleUploadAbort = () => {
-  if (!controller.value) {
-    return;
-  }
-  controller.value.abort();
-  resetUpload();
-};
-
-const handleUploadRetry = () => {
-  if (!originalFile.value) {
-    return;
-  }
-  handleUploadImage(originalFile.value);
-};
-
-const handleUploadImage = async (file: File) => {
-  originalFile.value = file;
+const handleUploadReady = async (file: File) => {
   fileBase64.value = await fileToBase64(file);
   retryFlag.value = false;
-  controller.value = new AbortController();
-  uploadFile(file, props.extension.options.uploadImage, {
-    controller: controller.value,
-    onUploadProgress: (progress) => {
-      uploadProgress.value = progress;
-    },
+};
 
-    onFinish: (attachment?: Attachment) => {
-      if (attachment) {
-        props.updateAttributes({
-          src: attachment.status?.permalink,
-        });
-      }
-
-      resetUpload();
-    },
-
-    onError: () => {
-      retryFlag.value = true;
-    },
+const handleSetExternalLink = (attachment: AttachmentAttr) => {
+  props.updateAttributes({
+    src: attachment.url,
+    alt: attachment.name,
   });
 };
 
+const handleUploadRetry = () => {
+  editorLinkObtain.value?.retry();
+};
+
+const handleUploadProgress = (progress: number) => {
+  uploadProgress.value = progress;
+};
+
+const handleUploadError = () => {
+  retryFlag.value = true;
+};
+
 const resetUpload = () => {
-  reset();
-  originalFile.value = undefined;
   fileBase64.value = undefined;
   uploadProgress.value = undefined;
-  controller.value?.abort();
-  controller.value = undefined;
   if (props.getPos()) {
     props.updateAttributes({
       width: undefined,
       height: undefined,
+      file: undefined,
     });
   }
 };
 
 const handleResetInit = () => {
-  resetUpload();
+  editorLinkObtain.value?.reset();
   props.updateAttributes({
     src: "",
     file: undefined,
   });
 };
-
-onChange((files) => {
-  if (!files) {
-    return;
-  }
-  if (files.length > 0) {
-    handleUploadImage(files[0]);
-  }
-});
-
-watch(
-  () => props.node?.attrs.file,
-  async (file) => {
-    if (!file) {
-      return;
-    }
-    handleUploadImage(file);
-  },
-  {
-    immediate: true,
-  }
-);
 
 const aspectRatio = ref<number>(0);
 const resizeRef = ref<HTMLDivElement>();
@@ -238,14 +155,10 @@ onMounted(() => {
     document.documentElement.removeEventListener("mouseup", stopDrag, false);
   }
 });
-
-onUnmounted(() => {
-  handleUploadAbort();
-});
 </script>
 
 <template>
-  <node-view-wrapper as="div" class="inline-block w-full">
+  <InlineBlockBox>
     <div
       ref="resizeRef"
       class="group relative inline-block max-w-full overflow-hidden rounded-md text-center"
@@ -275,7 +188,7 @@ onUnmounted(() => {
           <VButton size="sm" type="secondary" @click="handleResetInit">
             {{
               $t(
-                "core.components.default_editor.extensions.image.operations.replace.button"
+                "core.components.default_editor.extensions.upload.operations.replace.button"
               )
             }}
           </VButton>
@@ -297,7 +210,7 @@ onUnmounted(() => {
                   >
                     {{
                       $t(
-                        "core.components.default_editor.extensions.image.upload.error"
+                        "core.components.default_editor.extensions.upload.error"
                       )
                     }}
                   </div>
@@ -309,7 +222,7 @@ onUnmounted(() => {
               >
                 {{
                   $t(
-                    "core.components.default_editor.extensions.image.upload.click_retry"
+                    "core.components.default_editor.extensions.upload.click_retry"
                   )
                 }}
               </div>
@@ -332,7 +245,7 @@ onUnmounted(() => {
                       uploadProgress
                         ? `${uploadProgress}%`
                         : `${$t(
-                            "core.components.default_editor.extensions.image.upload.loading"
+                            "core.components.default_editor.extensions.upload.loading"
                           )}...`
                     }}
                   </div>
@@ -349,54 +262,29 @@ onUnmounted(() => {
           </div>
         </div>
       </div>
-      <div v-else>
-        <div class="flex w-full items-center justify-center">
-          <div
-            class="flex h-64 w-full cursor-pointer flex-col items-center justify-center border-2 border-dashed border-gray-300 bg-gray-50"
-          >
+      <div v-show="!src && !fileBase64">
+        <EditorLinkObtain
+          ref="editorLinkObtain"
+          :accept="'image/*'"
+          :editor="editor"
+          :upload-to-attachment-file="extension.options.uploadImage"
+          :uploaded-file="node?.attrs.file"
+          @set-external-link="handleSetExternalLink"
+          @on-upload-ready="handleUploadReady"
+          @on-upload-progress="handleUploadProgress"
+          @on-upload-finish="resetUpload"
+          @on-upload-error="handleUploadError"
+          @on-upload-abort="resetUpload"
+        >
+          <template #icon>
             <div
-              class="flex flex-col items-center justify-center space-y-7 pb-6 pt-5"
+              class="flex h-14 w-14 items-center justify-center rounded-full bg-primary/20"
             >
-              <div
-                class="flex h-14 w-14 items-center justify-center rounded-full bg-primary/20"
-              >
-                <IconImageAddLine class="text-xl text-primary" />
-              </div>
-              <VSpace>
-                <VButton @click="open()">
-                  {{ $t("core.common.buttons.upload") }}
-                </VButton>
-                <VButton @click="openAttachmentSelector">
-                  {{
-                    $t(
-                      "core.components.default_editor.extensions.image.attachment.title"
-                    )
-                  }}</VButton
-                >
-                <VDropdown>
-                  <VButton>{{
-                    $t(
-                      "core.components.default_editor.extensions.image.permalink.title"
-                    )
-                  }}</VButton>
-                  <template #popper>
-                    <input
-                      v-model="initSrc"
-                      class="block w-full rounded-md border border-gray-300 bg-gray-50 px-2 py-1.5 text-sm text-gray-900 hover:bg-gray-100"
-                      :placeholder="
-                        i18n.global.t(
-                          'core.components.default_editor.extensions.image.permalink.placeholder'
-                        )
-                      "
-                      @keydown.enter="handleEnterSetSrc"
-                    />
-                  </template>
-                </VDropdown>
-              </VSpace>
+              <IconImageAddLine class="text-xl text-primary" />
             </div>
-          </div>
-        </div>
+          </template>
+        </EditorLinkObtain>
       </div>
     </div>
-  </node-view-wrapper>
+  </InlineBlockBox>
 </template>

@@ -52,7 +52,12 @@ import {
   ExtensionSearchAndReplace,
 } from "@halo-dev/richtext-editor";
 // ui custom extension
-import { UiExtensionImage, UiExtensionUpload } from "./extensions";
+import {
+  UiExtensionAudio,
+  UiExtensionImage,
+  UiExtensionUpload,
+  UiExtensionVideo,
+} from "./extensions";
 import {
   IconCalendar,
   IconCharacterRecognition,
@@ -93,12 +98,14 @@ import { onBeforeUnmount } from "vue";
 import { usePermission } from "@/utils/permission";
 import type { AxiosRequestConfig } from "axios";
 import { getContents } from "./utils/attachment";
+import { nextTick } from "vue";
 
 const { t } = useI18n();
 const { currentUserHasPermission } = usePermission();
 
 const props = withDefaults(
   defineProps<{
+    title?: string;
     raw?: string;
     content: string;
     uploadImage?: (
@@ -107,6 +114,7 @@ const props = withDefaults(
     ) => Promise<Attachment>;
   }>(),
   {
+    title: "",
     raw: "",
     content: "",
     uploadImage: undefined,
@@ -114,6 +122,7 @@ const props = withDefaults(
 );
 
 const emit = defineEmits<{
+  (event: "update:title", value: string): void;
   (event: "update:raw", value: string): void;
   (event: "update:content", value: string): void;
   (event: "update", value: string): void;
@@ -263,8 +272,16 @@ onMounted(() => {
         lowlight,
       }),
       ExtensionIframe,
-      ExtensionVideo,
-      ExtensionAudio,
+      currentUserHasPermission(["uc:attachments:manage"])
+        ? UiExtensionVideo.configure({
+            uploadVideo: props.uploadImage,
+          })
+        : ExtensionVideo,
+      currentUserHasPermission(["uc:attachments:manage"])
+        ? UiExtensionAudio.configure({
+            uploadAudio: props.uploadImage,
+          })
+        : ExtensionAudio,
       ExtensionCharacterCount,
       ExtensionFontSize,
       ExtensionColor,
@@ -391,7 +408,6 @@ onMounted(() => {
       UiExtensionUpload,
       ExtensionSearchAndReplace,
     ],
-    autofocus: "start",
     parseOptions: {
       preserveWhitespace: true,
     },
@@ -428,6 +444,26 @@ const currentLocale = i18n.global.locale.value as
   | "en"
   | "zh"
   | "en-US";
+
+function onTitleInput(event: Event) {
+  emit("update:title", (event.target as HTMLInputElement).value);
+}
+
+// Set focus
+const editorTitleRef = ref();
+onMounted(() => {
+  // if name is empty, it means the editor is in the creation mode
+  const urlParams = new URLSearchParams(window.location.search);
+  const name = urlParams.get("name");
+
+  if (!name) {
+    nextTick(() => {
+      editorTitleRef.value.focus();
+    });
+  } else {
+    editor.value?.commands.focus();
+  }
+});
 </script>
 
 <template>
@@ -439,6 +475,17 @@ const currentLocale = i18n.global.locale.value as
       @close="handleCloseAttachmentSelectorModal"
     />
     <RichTextEditor v-if="editor" :editor="editor" :locale="currentLocale">
+      <template #content>
+        <input
+          ref="editorTitleRef"
+          :value="title"
+          type="text"
+          :placeholder="$t('core.components.default_editor.title_placeholder')"
+          class="w-full border-x-0 !border-b border-t-0 !border-solid !border-gray-100 p-0 !py-2 text-4xl font-semibold placeholder:text-gray-300"
+          @input="onTitleInput"
+          @keydown.enter="() => editor?.commands.focus('start')"
+        />
+      </template>
       <template v-if="showSidebar" #extra>
         <OverlayScrollbarsComponent
           element="div"

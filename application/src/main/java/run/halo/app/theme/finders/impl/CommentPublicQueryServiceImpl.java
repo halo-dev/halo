@@ -2,40 +2,45 @@ package run.halo.app.theme.finders.impl;
 
 
 import static org.apache.commons.lang3.ObjectUtils.defaultIfNull;
+import static run.halo.app.extension.index.query.QueryFactory.and;
+import static run.halo.app.extension.index.query.QueryFactory.equal;
+import static run.halo.app.extension.index.query.QueryFactory.isNull;
+import static run.halo.app.extension.index.query.QueryFactory.or;
 
 import java.security.Principal;
-import java.time.Instant;
-import java.util.Comparator;
-import java.util.List;
-import java.util.Objects;
+import java.util.Optional;
 import java.util.function.Function;
-import java.util.function.Predicate;
 import lombok.RequiredArgsConstructor;
 import org.apache.commons.lang3.BooleanUtils;
-import org.apache.commons.lang3.StringUtils;
+import org.springframework.data.domain.Sort;
 import org.springframework.lang.Nullable;
 import org.springframework.security.core.context.ReactiveSecurityContextHolder;
 import org.springframework.security.core.context.SecurityContext;
 import org.springframework.stereotype.Component;
 import org.springframework.util.Assert;
-import org.springframework.util.comparator.Comparators;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import run.halo.app.content.comment.OwnerInfo;
-import run.halo.app.content.comment.ReplyService;
+import run.halo.app.core.extension.User;
 import run.halo.app.core.extension.content.Comment;
 import run.halo.app.core.extension.content.Reply;
 import run.halo.app.core.extension.service.UserService;
 import run.halo.app.extension.AbstractExtension;
+import run.halo.app.extension.ListOptions;
 import run.halo.app.extension.ListResult;
+import run.halo.app.extension.PageRequest;
+import run.halo.app.extension.PageRequestImpl;
 import run.halo.app.extension.ReactiveExtensionClient;
 import run.halo.app.extension.Ref;
+import run.halo.app.extension.index.query.Query;
+import run.halo.app.extension.router.selector.FieldSelector;
 import run.halo.app.infra.AnonymousUserConst;
 import run.halo.app.metrics.CounterService;
 import run.halo.app.metrics.MeterUtils;
 import run.halo.app.theme.finders.CommentPublicQueryService;
 import run.halo.app.theme.finders.vo.CommentStatsVo;
 import run.halo.app.theme.finders.vo.CommentVo;
+import run.halo.app.theme.finders.vo.CommentWithReplyVo;
 import run.halo.app.theme.finders.vo.ExtensionVoOperator;
 import run.halo.app.theme.finders.vo.ReplyVo;
 
@@ -43,6 +48,7 @@ import run.halo.app.theme.finders.vo.ReplyVo;
  * comment public query service implementation.
  *
  * @author LIlGG
+ * @author guqing
  */
 @Component
 @RequiredArgsConstructor
@@ -61,54 +67,79 @@ public class CommentPublicQueryServiceImpl implements CommentPublicQueryService 
 
     @Override
     public Mono<ListResult<CommentVo>> list(Ref ref, Integer page, Integer size) {
-        return list(ref, page, size, defaultComparator());
+        return list(ref,
+            PageRequestImpl.of(pageNullSafe(page), sizeNullSafe(size), defaultCommentSort()));
     }
 
     @Override
-    public Mono<ListResult<CommentVo>> list(Ref ref, Integer page, Integer size,
-        Comparator<Comment> comparator) {
-        final Comparator<Comment> commentComparator =
-            Objects.isNull(comparator) ? defaultComparator()
-                : comparator.thenComparing(defaultComparator());
-        return fixedCommentPredicate(ref)
-            .flatMap(fixedPredicate ->
-                client.list(Comment.class, fixedPredicate,
-                        commentComparator,
-                        pageNullSafe(page), sizeNullSafe(size))
-                    .flatMap(list -> Flux.fromStream(list.get().map(this::toCommentVo))
+    public Mono<ListResult<CommentVo>> list(Ref ref, PageRequest pageParam) {
+        var pageRequest = Optional.ofNullable(pageParam)
+            .map(page -> page.withSort(page.getSort().and(defaultCommentSort())))
+            .orElse(PageRequestImpl.ofSize(0));
+        return fixedCommentFieldSelector(ref)
+            .flatMap(fieldSelector -> {
+                var listOptions = new ListOptions();
+                listOptions.setFieldSelector(fieldSelector);
+                return client.listBy(Comment.class, listOptions, pageRequest)
+                    .flatMap(listResult -> Flux.fromStream(listResult.get())
+                        .map(this::toCommentVo)
                         .concatMap(Function.identity())
                         .collectList()
-                        .map(commentVos -> new ListResult<>(list.getPage(), list.getSize(),
-                            list.getTotal(),
+                        .map(commentVos -> new ListResult<>(listResult.getPage(),
+                            listResult.getSize(),
+                            listResult.getTotal(),
                             commentVos)
                         )
-                    )
-                    .defaultIfEmpty(new ListResult<>(page, size, 0L, List.of()))
+                    );
+            })
+            .defaultIfEmpty(ListResult.emptyResult());
+    }
+
+    @Override
+    public Mono<ListResult<CommentWithReplyVo>> convertToWithReplyVo(ListResult<CommentVo> comments,
+        int replySize) {
+        return Flux.fromIterable(comments.getItems())
+            .concatMap(commentVo -> {
+                var commentName = commentVo.getMetadata().getName();
+                return listReply(commentName, 1, replySize)
+                    .map(replyList -> CommentWithReplyVo.from(commentVo)
+                        .setReplies(replyList)
+                    );
+            })
+            .collectList()
+            .map(result -> new ListResult<>(
+                comments.getPage(),
+                comments.getSize(),
+                comments.getTotal(),
+                result)
             );
     }
 
     @Override
     public Mono<ListResult<ReplyVo>> listReply(String commentName, Integer page, Integer size) {
-        return listReply(commentName, page, size, ReplyService.creationTimeAscComparator());
+        return listReply(commentName, PageRequestImpl.of(pageNullSafe(page), sizeNullSafe(size),
+            defaultReplySort()));
     }
 
     @Override
-    public Mono<ListResult<ReplyVo>> listReply(String commentName, Integer page, Integer size,
-        Comparator<Reply> comparator) {
-        return fixedReplyPredicate(commentName)
-            .flatMap(fixedPredicate ->
-                client.list(Reply.class, fixedPredicate,
-                        comparator,
-                        pageNullSafe(page), sizeNullSafe(size))
+    public Mono<ListResult<ReplyVo>> listReply(String commentName, PageRequest pageParam) {
+        return fixedReplyFieldSelector(commentName)
+            .flatMap(fieldSelector -> {
+                var listOptions = new ListOptions();
+                listOptions.setFieldSelector(fieldSelector);
+                var pageRequest = Optional.ofNullable(pageParam)
+                    .map(page -> page.withSort(page.getSort().and(defaultReplySort())))
+                    .orElse(PageRequestImpl.ofSize(0));
+                return client.listBy(Reply.class, listOptions, pageRequest)
                     .flatMap(list -> Flux.fromStream(list.get().map(this::toReplyVo))
                         .concatMap(Function.identity())
                         .collectList()
                         .map(replyVos -> new ListResult<>(list.getPage(), list.getSize(),
                             list.getTotal(),
                             replyVos))
-                    )
-                    .defaultIfEmpty(new ListResult<>(page, size, 0L, List.of()))
-            );
+                    );
+            })
+            .defaultIfEmpty(ListResult.emptyResult());
     }
 
     Mono<CommentVo> toCommentVo(Comment comment) {
@@ -193,51 +224,46 @@ public class CommentPublicQueryServiceImpl implements CommentPublicQueryService 
             .map(OwnerInfo::from);
     }
 
-    private Mono<Predicate<Comment>> fixedCommentPredicate(@Nullable Ref ref) {
-        Predicate<Comment> basePredicate =
-            comment -> comment.getMetadata().getDeletionTimestamp() == null;
-        if (ref != null) {
-            basePredicate = basePredicate
-                .and(comment -> comment.getSpec().getSubjectRef().equals(ref));
-        }
-
-        // is approved and not hidden
-        Predicate<Comment> approvedPredicate =
-            comment -> BooleanUtils.isFalse(comment.getSpec().getHidden())
-                && BooleanUtils.isTrue(comment.getSpec().getApproved());
-        return getCurrentUserWithoutAnonymous()
-            .map(username -> {
-                Predicate<Comment> isOwner = comment -> {
-                    Comment.CommentOwner owner = comment.getSpec().getOwner();
-                    return owner != null && StringUtils.equals(username, owner.getName());
-                };
-                return approvedPredicate.or(isOwner);
-            })
-            .defaultIfEmpty(approvedPredicate)
-            .map(basePredicate::and);
+    private Mono<FieldSelector> fixedCommentFieldSelector(@Nullable Ref ref) {
+        return Mono.fromSupplier(
+                () -> {
+                    var baseQuery = isNull("metadata.deletionTimestamp");
+                    if (ref != null) {
+                        baseQuery =
+                            and(baseQuery,
+                                equal("spec.subjectRef", Comment.toSubjectRefKey(ref)));
+                    }
+                    return baseQuery;
+                })
+            .flatMap(this::concatVisibleQuery)
+            .map(FieldSelector::of);
     }
 
-    private Mono<Predicate<Reply>> fixedReplyPredicate(String commentName) {
+    private Mono<Query> concatVisibleQuery(Query query) {
+        Assert.notNull(query, "The query must not be null");
+        var approvedQuery = and(
+            equal("spec.approved", BooleanUtils.TRUE),
+            equal("spec.hidden", BooleanUtils.FALSE)
+        );
+        // we should list all comments that the user owns
+        return getCurrentUserWithoutAnonymous()
+            .map(username -> or(approvedQuery, equal("spec.owner",
+                Comment.CommentOwner.ownerIdentity(User.KIND, username)))
+            )
+            .defaultIfEmpty(approvedQuery)
+            .map(compositeQuery -> and(query, compositeQuery));
+    }
+
+    private Mono<FieldSelector> fixedReplyFieldSelector(String commentName) {
         Assert.notNull(commentName, "The commentName must not be null");
         // The comment name must be equal to the comment name of the reply
-        Predicate<Reply> commentNamePredicate =
-            reply -> reply.getSpec().getCommentName().equals(commentName)
-                && reply.getMetadata().getDeletionTimestamp() == null;
-
         // is approved and not hidden
-        Predicate<Reply> approvedPredicate =
-            reply -> BooleanUtils.isFalse(reply.getSpec().getHidden())
-                && BooleanUtils.isTrue(reply.getSpec().getApproved());
-        return getCurrentUserWithoutAnonymous()
-            .map(username -> {
-                Predicate<Reply> isOwner = reply -> {
-                    Comment.CommentOwner owner = reply.getSpec().getOwner();
-                    return owner != null && StringUtils.equals(username, owner.getName());
-                };
-                return approvedPredicate.or(isOwner);
-            })
-            .defaultIfEmpty(approvedPredicate)
-            .map(commentNamePredicate::and);
+        return Mono.fromSupplier(() -> and(
+                equal("spec.commentName", commentName),
+                isNull("metadata.deletionTimestamp")
+            ))
+            .flatMap(this::concatVisibleQuery)
+            .map(FieldSelector::of);
     }
 
     Mono<String> getCurrentUserWithoutAnonymous() {
@@ -247,43 +273,18 @@ public class CommentPublicQueryServiceImpl implements CommentPublicQueryService 
             .filter(username -> !AnonymousUserConst.PRINCIPAL.equals(username));
     }
 
-    static Comparator<Comment> defaultComparator() {
-        return new CommentComparator();
+    static Sort defaultCommentSort() {
+        return Sort.by(Sort.Order.desc("spec.top"),
+            Sort.Order.asc("spec.priority"),
+            Sort.Order.desc("spec.creationTime"),
+            Sort.Order.asc("metadata.name")
+        );
     }
 
-    static class CommentComparator implements Comparator<Comment> {
-        @Override
-        public int compare(Comment c1, Comment c2) {
-            boolean c1Top = BooleanUtils.isTrue(c1.getSpec().getTop());
-            boolean c2Top = BooleanUtils.isTrue(c2.getSpec().getTop());
-
-            // c1 top = true && c2 top = false
-            if (c1Top && !c2Top) {
-                return -1;
-            }
-
-            // c1 top = false && c2 top = true
-            if (!c1Top && c2Top) {
-                return 1;
-            }
-            // c1 top = c2 top = true || c1 top = c2 top = false
-            var priorityComparator = Comparator.<Comment, Integer>comparing(
-                comment -> defaultIfNull(comment.getSpec().getPriority(), 0));
-
-            var creationTimeComparator = Comparator.<Comment, Instant>comparing(
-                comment -> comment.getSpec().getCreationTime(),
-                Comparators.nullsHigh(Comparator.<Instant>reverseOrder()));
-
-            var nameComparator = Comparator.<Comment, String>comparing(
-                comment -> comment.getMetadata().getName());
-
-            if (c1Top) {
-                return priorityComparator.thenComparing(creationTimeComparator)
-                    .thenComparing(nameComparator)
-                    .compare(c1, c2);
-            }
-            return creationTimeComparator.thenComparing(nameComparator).compare(c1, c2);
-        }
+    static Sort defaultReplySort() {
+        return Sort.by(Sort.Order.asc("spec.creationTime"),
+            Sort.Order.asc("metadata.name")
+        );
     }
 
     int pageNullSafe(Integer page) {

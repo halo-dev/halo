@@ -34,4 +34,10 @@ export interface SignUpRequest {
    * @memberof SignUpRequest
    */
   user: User;
+  /**
+   *
+   * @type {string}
+   * @memberof SignUpRequest
+   */
+  verifyCode?: string;
 }

@@ -26,7 +26,7 @@
 ## 快速开始
 
 ```bash
-docker run -it -d --name halo -p 8090:8090 -v ~/.halo2:/root/.halo2 halohub/halo:2.12
+docker run -it -d --name halo -p 8090:8090 -v ~/.halo2:/root/.halo2 halohub/halo:2.13
 ```
 
 以上仅作为体验使用，详细部署文档请查阅：<https://docs.halo.run/getting-started/install/docker-compose>
@@ -60,7 +60,7 @@ Halo 使用 GPL-v3.0 协议开源，请遵守开源协议。
 
 ## 贡献
 
-参考 [CONTRIBUTING](https://github.com/halo-dev/halo/blob/master/CONTRIBUTING.md)。
+参考 [CONTRIBUTING](https://github.com/halo-dev/halo/blob/main/CONTRIBUTING.md)。
 
 <a href="https://github.com/halo-dev/halo/graphs/contributors"><img src="https://opencollective.com/halo/contributors.svg?width=890&button=false" /></a>
 

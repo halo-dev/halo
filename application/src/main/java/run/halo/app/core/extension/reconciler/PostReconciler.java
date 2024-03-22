@@ -25,14 +25,15 @@ import org.springframework.stereotype.Component;
 import run.halo.app.content.ContentWrapper;
 import run.halo.app.content.NotificationReasonConst;
 import run.halo.app.content.PostService;
+import run.halo.app.content.comment.CommentService;
 import run.halo.app.content.permalinks.PostPermalinkPolicy;
-import run.halo.app.core.extension.content.Comment;
 import run.halo.app.core.extension.content.Constant;
 import run.halo.app.core.extension.content.Post;
 import run.halo.app.core.extension.content.Post.PostPhase;
 import run.halo.app.core.extension.content.Post.VisibleEnum;
 import run.halo.app.core.extension.content.Snapshot;
 import run.halo.app.core.extension.notification.Subscription;
+import run.halo.app.event.post.PostDeletedEvent;
 import run.halo.app.event.post.PostPublishedEvent;
 import run.halo.app.event.post.PostUnpublishedEvent;
 import run.halo.app.event.post.PostUpdatedEvent;
@@ -74,6 +75,7 @@ public class PostReconciler implements Reconciler<Reconciler.Request> {
     private final PostService postService;
     private final PostPermalinkPolicy postPermalinkPolicy;
     private final CounterService counterService;
+    private final CommentService commentService;
 
     private final ApplicationEventPublisher eventPublisher;
     private final NotificationCenter notificationCenter;
@@ -86,6 +88,7 @@ public class PostReconciler implements Reconciler<Reconciler.Request> {
                 if (ExtensionOperator.isDeleted(post)) {
                     removeFinalizers(post.getMetadata(), Set.of(FINALIZER_NAME));
                     unPublishPost(post, events);
+                    events.add(new PostDeletedEvent(this, post));
                     cleanUpResources(post);
                     // update post to be able to be collected by gc collector.
                     client.update(post);
@@ -126,7 +129,7 @@ public class PostReconciler implements Reconciler<Reconciler.Request> {
 
                 // calculate the sha256sum
                 var configSha256sum = Hashing.sha256().hashString(post.getSpec().toString(), UTF_8)
-                        .toString();
+                    .toString();
 
                 var oldConfigChecksum = annotations.get(Constant.CHECKSUM_CONFIG_ANNO);
                 if (!Objects.equals(oldConfigChecksum, configSha256sum)) {
@@ -327,9 +330,7 @@ public class PostReconciler implements Reconciler<Reconciler.Request> {
         listSnapshots(ref).forEach(client::delete);
 
         // clean up comments
-        client.list(Comment.class, comment -> ref.equals(comment.getSpec().getSubjectRef()),
-                null)
-            .forEach(client::delete);
+        commentService.removeBySubject(ref).block();
 
         // delete counter
         counterService.deleteByName(MeterUtils.nameOf(Post.class, post.getMetadata().getName()))

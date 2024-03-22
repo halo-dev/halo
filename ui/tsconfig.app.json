@@ -11,6 +11,7 @@
     "baseUrl": ".",
     "composite": true,
     "noImplicitAny": false,
+    "noEmit": false,
     "paths": {
       "@/*": ["./src/*"],
       "@uc/*": ["./uc-src/*"],

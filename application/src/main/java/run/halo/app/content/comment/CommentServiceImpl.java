@@ -1,8 +1,15 @@
 package run.halo.app.content.comment;
 
+import static run.halo.app.extension.index.query.QueryFactory.and;
+import static run.halo.app.extension.index.query.QueryFactory.equal;
+import static run.halo.app.extension.index.query.QueryFactory.isNull;
+
 import java.time.Instant;
+import java.util.Set;
 import java.util.function.Function;
 import org.apache.commons.lang3.BooleanUtils;
+import org.springframework.data.domain.Sort;
+import org.springframework.lang.NonNull;
 import org.springframework.security.core.context.ReactiveSecurityContextHolder;
 import org.springframework.stereotype.Component;
 import org.springframework.util.Assert;
@@ -10,16 +17,22 @@ import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import run.halo.app.core.extension.User;
 import run.halo.app.core.extension.content.Comment;
+import run.halo.app.core.extension.service.RoleService;
 import run.halo.app.core.extension.service.UserService;
 import run.halo.app.extension.Extension;
+import run.halo.app.extension.ListOptions;
 import run.halo.app.extension.ListResult;
+import run.halo.app.extension.PageRequest;
+import run.halo.app.extension.PageRequestImpl;
 import run.halo.app.extension.ReactiveExtensionClient;
 import run.halo.app.extension.Ref;
+import run.halo.app.extension.router.selector.FieldSelector;
 import run.halo.app.infra.SystemConfigurableEnvironmentFetcher;
 import run.halo.app.infra.exception.AccessDeniedException;
 import run.halo.app.metrics.CounterService;
 import run.halo.app.metrics.MeterUtils;
 import run.halo.app.plugin.ExtensionComponentsFinder;
+import run.halo.app.security.authorization.AuthorityUtils;
 
 /**
  * Comment service implementation.
@@ -32,6 +45,7 @@ public class CommentServiceImpl implements CommentService {
 
     private final ReactiveExtensionClient client;
     private final UserService userService;
+    private final RoleService roleService;
     private final ExtensionComponentsFinder extensionComponentsFinder;
 
     private final SystemConfigurableEnvironmentFetcher environmentFetcher;
@@ -40,19 +54,20 @@ public class CommentServiceImpl implements CommentService {
     public CommentServiceImpl(ReactiveExtensionClient client,
         UserService userService, ExtensionComponentsFinder extensionComponentsFinder,
         SystemConfigurableEnvironmentFetcher environmentFetcher,
-        CounterService counterService) {
+        CounterService counterService, RoleService roleService
+    ) {
         this.client = client;
         this.userService = userService;
         this.extensionComponentsFinder = extensionComponentsFinder;
         this.environmentFetcher = environmentFetcher;
         this.counterService = counterService;
+        this.roleService = roleService;
     }
 
     @Override
     public Mono<ListResult<ListedComment>> listComment(CommentQuery commentQuery) {
-        return this.client.list(Comment.class, commentQuery.toPredicate(),
-                commentQuery.toComparator(),
-                commentQuery.getPage(), commentQuery.getSize())
+        return this.client.listBy(Comment.class, commentQuery.toListOptions(),
+                commentQuery.toPageRequest())
             .flatMap(comments -> Flux.fromStream(comments.get()
                     .map(this::toListedComment))
                 .concatMap(Function.identity())
@@ -104,7 +119,21 @@ public class CommentServiceImpl implements CommentService {
                 }
                 // populate owner from current user
                 return fetchCurrentUser()
-                    .map(this::toCommentOwner)
+                    .flatMap(currentUser -> ReactiveSecurityContextHolder.getContext()
+                        .flatMap(securityContext -> {
+                            var authentication = securityContext.getAuthentication();
+                            var roles = AuthorityUtils.authoritiesToRoles(
+                                authentication.getAuthorities());
+                            return roleService.contains(roles,
+                                    Set.of(AuthorityUtils.COMMENT_MANAGEMENT_ROLE_NAME))
+                                .doOnNext(result -> {
+                                    if (result) {
+                                        comment.getSpec().setApproved(true);
+                                        comment.getSpec().setApprovedTime(Instant.now());
+                                    }
+                                })
+                                .thenReturn(toCommentOwner(currentUser));
+                        }))
                     .map(owner -> {
                         comment.getSpec().setOwner(owner);
                         return comment;
@@ -113,6 +142,31 @@ public class CommentServiceImpl implements CommentService {
                         Mono.error(new IllegalStateException("The owner must not be null.")));
             })
             .flatMap(client::create);
+    }
+
+    @Override
+    public Mono<Void> removeBySubject(@NonNull Ref subjectRef) {
+        Assert.notNull(subjectRef, "The subjectRef must not be null.");
+        // ascending order by creation time and name
+        var pageRequest = PageRequestImpl.of(1, 200,
+            Sort.by("metadata.creationTimestamp", "metadata.name"));
+        return Flux.defer(() -> listCommentsByRef(subjectRef, pageRequest))
+            .expand(page -> page.hasNext()
+                ? listCommentsByRef(subjectRef, pageRequest)
+                : Mono.empty()
+            )
+            .flatMap(page -> Flux.fromIterable(page.getItems()))
+            .flatMap(client::delete)
+            .then();
+    }
+
+    Mono<ListResult<Comment>> listCommentsByRef(Ref subjectRef, PageRequest pageRequest) {
+        var listOptions = new ListOptions();
+        listOptions.setFieldSelector(FieldSelector.of(
+            and(equal("spec.subjectRef", Comment.toSubjectRefKey(subjectRef)),
+                isNull("metadata.deletionTimestamp"))
+        ));
+        return client.listBy(Comment.class, listOptions, pageRequest);
     }
 
     private boolean checkCommentOwner(Comment comment, Boolean onlySystemUser) {
@@ -138,32 +192,21 @@ public class CommentServiceImpl implements CommentService {
     }
 
     private Mono<ListedComment> toListedComment(Comment comment) {
-        ListedComment.ListedCommentBuilder commentBuilder = ListedComment.builder()
-            .comment(comment);
-        return Mono.just(commentBuilder)
-            .flatMap(builder -> {
-                Comment.CommentOwner owner = comment.getSpec().getOwner();
-                // not empty
-                return getCommentOwnerInfo(owner)
-                    .map(builder::owner);
-            })
-            .flatMap(builder -> getCommentSubject(comment.getSpec().getSubjectRef())
-                .map(subject -> {
-                    builder.subject(subject);
-                    return builder;
-                })
-                .switchIfEmpty(Mono.just(builder))
-            )
-            .map(ListedComment.ListedCommentBuilder::build)
-            .flatMap(lc -> fetchStats(comment)
-                .doOnNext(lc::setStats)
-                .thenReturn(lc));
+        var builder = ListedComment.builder().comment(comment);
+        // not empty
+        var ownerInfoMono = getCommentOwnerInfo(comment.getSpec().getOwner())
+            .doOnNext(builder::owner);
+        var subjectMono = getCommentSubject(comment.getSpec().getSubjectRef())
+            .doOnNext(builder::subject);
+        var statsMono = fetchStats(comment.getMetadata().getName())
+            .doOnNext(builder::stats);
+        return Mono.when(ownerInfoMono, subjectMono, statsMono)
+            .then(Mono.fromSupplier(builder::build));
     }
 
-    Mono<CommentStats> fetchStats(Comment comment) {
-        Assert.notNull(comment, "The comment must not be null.");
-        String name = comment.getMetadata().getName();
-        return counterService.getByName(MeterUtils.nameOf(Comment.class, name))
+    Mono<CommentStats> fetchStats(String commentName) {
+        Assert.notNull(commentName, "The commentName must not be null.");
+        return counterService.getByName(MeterUtils.nameOf(Comment.class, commentName))
             .map(counter -> CommentStats.builder()
                 .upvote(counter.getUpvote())
                 .build()

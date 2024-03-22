@@ -9,15 +9,13 @@ import {
   mergeAttributes,
   isNodeActive,
   CoreEditor,
+  findParentNode,
 } from "@/tiptap";
 import {
   type Node as ProseMirrorNode,
   type NodeView,
   type EditorState,
   type DOMOutputSpec,
-  Plugin,
-  DecorationSet,
-  Decoration,
 } from "@/tiptap/pm";
 import TableCell from "./table-cell";
 import TableRow from "./table-row";
@@ -39,7 +37,12 @@ import { markRaw } from "vue";
 import { i18n } from "@/locales";
 import type { ExtensionOptions, NodeBubbleMenu } from "@/types";
 import { BlockActionSeparator, ToolboxItem } from "@/components";
-import { hasTableBefore, isTableSelected } from "./util";
+import {
+  hasTableBefore,
+  isCellSelection,
+  isTableSelected,
+  selectTable,
+} from "./util";
 
 function updateColumns(
   node: ProseMirrorNode,
@@ -129,14 +132,22 @@ class TableView implements NodeView {
     this.containerDOM.addEventListener("wheel", (e) => {
       return this.handleHorizontalWheel(this.containerDOM, e);
     });
+
+    let mouseX = 0;
+    let mouseY = 0;
+    document.addEventListener("mousemove", function (event) {
+      mouseX = event.clientX;
+      mouseY = event.clientY;
+    });
+
     this.containerDOM.addEventListener("scroll", () => {
       if (!editor) {
         return false;
       }
-      const { state, view } = editor;
-      const { tr } = state;
-      view.dispatch(tr);
-      return false;
+      const { view } = editor;
+      const coords = { left: mouseX, top: mouseY };
+      const pos = view.posAtCoords(coords);
+      editor.commands.setTextSelection(pos?.pos || 0);
     });
 
     this.scrollDom = document.createElement("div");
@@ -147,6 +158,11 @@ class TableView implements NodeView {
     this.colgroup = this.table.appendChild(document.createElement("colgroup"));
     updateColumns(node, this.colgroup, this.table, cellMinWidth);
     this.contentDOM = this.table.appendChild(document.createElement("tbody"));
+    // delay execution during initialization, otherwise
+    // the correct scrollWidth cannot be obtained.
+    setTimeout(() => {
+      this.updateTableShadow();
+    });
   }
 
   update(node: ProseMirrorNode) {
@@ -156,7 +172,23 @@ class TableView implements NodeView {
 
     this.node = node;
     updateColumns(node, this.colgroup, this.table, this.cellMinWidth);
+    this.updateTableShadow();
     return true;
+  }
+
+  updateTableShadow() {
+    const { scrollWidth, clientWidth, scrollLeft } = this
+      .containerDOM as HTMLElement;
+    if (scrollWidth > clientWidth && scrollLeft < scrollWidth - clientWidth) {
+      this.dom.classList.add("table-right-shadow");
+    } else {
+      this.dom.classList.remove("table-right-shadow");
+    }
+    if (scrollLeft > 0) {
+      this.dom.classList.add("table-left-shadow");
+    } else {
+      this.dom.classList.remove("table-left-shadow");
+    }
   }
 
   ignoreMutation(
@@ -165,6 +197,7 @@ class TableView implements NodeView {
     return (
       mutation.type === "attributes" &&
       (mutation.target === this.table ||
+        mutation.target === this.dom ||
         this.colgroup.contains(mutation.target))
     );
   }
@@ -457,6 +490,38 @@ const Table = TiptapTable.extend<ExtensionOptions & TableOptions>({
       Backspace: () => handleBackspace(),
 
       "Mod-Backspace": () => handleBackspace(),
+
+      "Mod-a": ({ editor }) => {
+        if (!isNodeActive(editor.state, Table.name)) {
+          return false;
+        }
+
+        const { tr, selection } = editor.state;
+        // If the entire table is already selected, no longer perform the select all operation.
+        if (isTableSelected(selection)) {
+          return true;
+        }
+
+        if (isCellSelection(selection)) {
+          selectTable(tr);
+          editor.view.dispatch(tr);
+          return true;
+        }
+
+        let cellNodePos = findParentNode(
+          (node) => node.type.name === TableCell.name
+        )(selection);
+        if (!cellNodePos) {
+          cellNodePos = findParentNode(
+            (node) => node.type.name === TableHeader.name
+          )(selection);
+        }
+        if (!cellNodePos) {
+          return false;
+        }
+        editor.commands.setNodeSelection(cellNodePos.pos);
+        return true;
+      },
     };
   },
 
@@ -486,48 +551,6 @@ const Table = TiptapTable.extend<ExtensionOptions & TableOptions>({
 
   onTransaction() {
     editor = this.editor;
-  },
-
-  addProseMirrorPlugins() {
-    const plugins = this.parent?.() ?? [];
-    return [
-      ...plugins,
-      new Plugin({
-        props: {
-          decorations: (state) => {
-            const { doc, tr } = state;
-            const decorations: Decoration[] = [];
-            doc.descendants((node, pos) => {
-              if (node.type.name === Table.name) {
-                const { view } = this.editor;
-                const nodeDom = view.nodeDOM(pos) || view.domAtPos(pos)?.node;
-                if (!nodeDom) {
-                  return true;
-                }
-                const { scrollWidth, clientWidth, scrollLeft } =
-                  nodeDom.firstChild as HTMLElement;
-                let classNames = "";
-                if (
-                  scrollWidth > clientWidth &&
-                  scrollLeft < scrollWidth - clientWidth
-                ) {
-                  classNames += "table-right-shadow ";
-                }
-                if (scrollLeft > 0) {
-                  classNames += "table-left-shadow ";
-                }
-                decorations.push(
-                  Decoration.node(pos, pos + node.nodeSize, {
-                    class: classNames,
-                  })
-                );
-              }
-            });
-            return DecorationSet.create(tr.doc, decorations);
-          },
-        },
-      }),
-    ];
   },
 }).configure({ resizable: true });
 

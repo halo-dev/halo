@@ -34,7 +34,7 @@ git push origin {BRANCH_NAME}
 
 #### 5. 提交 pull request
 
-回到自己的仓库页面，选择 `New pull request` 按钮，创建 `Pull request` 到原仓库的 `master` 分支。
+回到自己的仓库页面，选择 `New pull request` 按钮，创建 `Pull request` 到原仓库的 `main` 分支。
 
 然后等待我们 Review 即可，如有 `Change Request`，再本地修改之后再次提交即可。
 
@@ -43,7 +43,7 @@ git push origin {BRANCH_NAME}
 ```bash
 git remote add upstream git@github.com:halo-dev/halo.git
 
-git pull upstream master
+git pull upstream main
 
 git push
 ```

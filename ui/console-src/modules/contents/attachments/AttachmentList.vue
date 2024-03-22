@@ -364,23 +364,35 @@ onMounted(() => {
                         label: t(
                           'core.attachment.filters.sort.items.create_time_desc'
                         ),
-                        value: 'creationTimestamp,desc',
+                        value: 'metadata.creationTimestamp,desc',
                       },
                       {
                         label: t(
                           'core.attachment.filters.sort.items.create_time_asc'
                         ),
-                        value: 'creationTimestamp,asc',
+                        value: 'metadata.creationTimestamp,asc',
+                      },
+                      {
+                        label: t(
+                          'core.attachment.filters.sort.items.display_name_desc'
+                        ),
+                        value: 'spec.displayName,desc',
+                      },
+                      {
+                        label: t(
+                          'core.attachment.filters.sort.items.display_name_asc'
+                        ),
+                        value: 'spec.displayName,asc',
                       },
                       {
                         label: t(
                           'core.attachment.filters.sort.items.size_desc'
                         ),
-                        value: 'size,desc',
+                        value: 'spec.size,desc',
                       },
                       {
                         label: t('core.attachment.filters.sort.items.size_asc'),
-                        value: 'size,asc',
+                        value: 'spec.size,asc',
                       },
                     ]"
                   />

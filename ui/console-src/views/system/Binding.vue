@@ -1,7 +1,6 @@
 <script lang="ts" setup>
 import { computed, onBeforeMount, onMounted } from "vue";
 import router from "@console/router";
-import IconLogo from "~icons/core/logo?width=5rem&height=2rem";
 import { useUserStore } from "@/stores/user";
 import LoginForm from "@/components/login/LoginForm.vue";
 import { useRoute } from "vue-router";
@@ -51,41 +50,38 @@ function handleChangeType() {
 const isLoginType = computed(() => type.value !== "signup");
 </script>
 <template>
-  <div class="flex h-screen flex-col items-center bg-white/90 pt-[30vh]">
-    <IconLogo class="mb-8" />
-    <div class="flex w-72 flex-col">
-      <SignupForm
-        v-if="type === 'signup'"
-        button-text="core.binding.operations.signup_and_bind.button"
-        @succeed="handleBinding"
-      />
-      <LoginForm
-        v-else
-        button-text="core.binding.operations.login_and_bind.button"
-        @succeed="handleBinding"
-      />
-      <div
-        v-if="globalInfo?.allowRegistration"
-        class="flex justify-center gap-1 pt-3.5 text-xs"
+  <div class="flex w-72 flex-col">
+    <SignupForm
+      v-if="type === 'signup'"
+      button-text="core.binding.operations.signup_and_bind.button"
+      @succeed="handleBinding"
+    />
+    <LoginForm
+      v-else
+      button-text="core.binding.operations.login_and_bind.button"
+      @succeed="handleBinding"
+    />
+    <div
+      v-if="globalInfo?.allowRegistration"
+      class="flex justify-center gap-1 pt-3.5 text-xs"
+    >
+      <span class="text-slate-500">
+        {{
+          isLoginType
+            ? $t("core.login.operations.signup.label")
+            : $t("core.login.operations.return_login.label")
+        }}
+      </span>
+      <span
+        class="cursor-pointer text-secondary hover:text-gray-600"
+        @click="handleChangeType"
       >
-        <span class="text-slate-500">
-          {{
-            isLoginType
-              ? $t("core.login.operations.signup.label")
-              : $t("core.login.operations.return_login.label")
-          }}
-        </span>
-        <span
-          class="cursor-pointer text-secondary hover:text-gray-600"
-          @click="handleChangeType"
-        >
-          {{
-            isLoginType
-              ? $t("core.login.operations.signup.button")
-              : $t("core.login.operations.return_login.button")
-          }}
-        </span>
-      </div>
+        {{
+          isLoginType
+            ? $t("core.login.operations.signup.button")
+            : $t("core.login.operations.return_login.button")
+        }}
+      </span>
     </div>
   </div>
 </template>

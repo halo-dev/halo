@@ -110,25 +110,25 @@ interface CopyItem {
 
 const handleCopy = () => {
   if (!isSupported.value) {
-    Toast.warning(t("core.actuator.actions.copy.toast_browser_not_supported"));
+    Toast.warning(t("core.overview.actions.copy.toast_browser_not_supported"));
     return;
   }
 
   const copyItems: CopyItem[] = [
     {
-      label: t("core.actuator.fields.external_url"),
+      label: t("core.overview.fields.external_url"),
       value: globalInfo.value?.externalUrl || "",
     },
     {
-      label: t("core.actuator.fields.start_time"),
+      label: t("core.overview.fields.start_time"),
       value: formatDatetime(startup.value?.timeline.startTime) || "",
     },
     {
-      label: t("core.actuator.fields.version"),
+      label: t("core.overview.fields.version"),
       value: info.value?.build?.version || "",
     },
     {
-      label: t("core.actuator.fields.build_time"),
+      label: t("core.overview.fields.build_time"),
       value: formatDatetime(info.value?.build?.time) || "",
     },
     {
@@ -144,28 +144,28 @@ const handleCopy = () => {
           .trim() || "",
     },
     {
-      label: t("core.actuator.fields.database"),
+      label: t("core.overview.fields.database"),
       value:
         [info.value?.database.name, info.value?.database.version]
           .filter(Boolean)
           .join(" / ") || "",
     },
     {
-      label: t("core.actuator.fields.os"),
+      label: t("core.overview.fields.os"),
       value:
         [info.value?.os.name, info.value?.os.version]
           .filter(Boolean)
           .join(" / ") || "",
     },
     {
-      label: t("core.actuator.fields.activated_theme"),
+      label: t("core.overview.fields.activated_theme"),
       value: themeStore.activatedTheme?.spec.displayName || "",
       href:
         themeStore.activatedTheme?.spec.repo ||
         themeStore.activatedTheme?.spec.homepage,
     },
     {
-      label: t("core.actuator.fields.enabled_plugins"),
+      label: t("core.overview.fields.enabled_plugins"),
       children: plugins.value?.map((plugin) => ({
         value: plugin.spec.displayName,
         href: plugin.spec.repo || plugin.spec.homepage,
@@ -223,7 +223,7 @@ const handleDownloadLogfile = () => {
 </script>
 
 <template>
-  <VPageHeader :title="$t('core.actuator.title')">
+  <VPageHeader :title="$t('core.overview.title')">
     <template #icon>
       <IconTerminalBoxLine class="mr-2 self-center" />
     </template>
@@ -245,18 +245,18 @@ const handleDownloadLogfile = () => {
         >
           <div>
             <h3 class="text-lg font-medium leading-6 text-gray-900">
-              {{ $t("core.actuator.header.titles.general") }}
+              {{ $t("core.overview.header.titles.general") }}
             </h3>
           </div>
         </div>
         <div class="border-t border-gray-200">
           <VDescription>
-            <VDescriptionItem :label="$t('core.actuator.fields.external_url')">
+            <VDescriptionItem :label="$t('core.overview.fields.external_url')">
               <span v-if="globalInfo?.externalUrl">
                 {{ globalInfo?.externalUrl }}
               </span>
               <span v-else>
-                {{ $t("core.actuator.fields_values.external_url.not_setup") }}
+                {{ $t("core.overview.fields_values.external_url.not_setup") }}
               </span>
               <VAlert
                 v-if="!isExternalUrlValid"
@@ -266,18 +266,18 @@ const handleDownloadLogfile = () => {
                 :closable="false"
               >
                 <template #description>
-                  {{ $t("core.actuator.alert.external_url_invalid") }}
+                  {{ $t("core.overview.alert.external_url_invalid") }}
                 </template>
               </VAlert>
             </VDescriptionItem>
             <VDescriptionItem
               v-if="startup?.timeline.startTime"
-              :label="$t('core.actuator.fields.start_time')"
+              :label="$t('core.overview.fields.start_time')"
               :content="formatDatetime(startup?.timeline.startTime)"
             />
             <VDescriptionItem
               v-if="themeStore.activatedTheme"
-              :label="$t('core.actuator.fields.activated_theme')"
+              :label="$t('core.overview.fields.activated_theme')"
             >
               <VTag @click="$router.push({ name: 'ThemeDetail' })">
                 <template v-if="themeStore.activatedTheme.spec.logo" #leftIcon>
@@ -292,7 +292,7 @@ const handleDownloadLogfile = () => {
             </VDescriptionItem>
             <VDescriptionItem
               v-permission="['system:plugins:view']"
-              :label="$t('core.actuator.fields.enabled_plugins')"
+              :label="$t('core.overview.fields.enabled_plugins')"
             >
               <VLoading v-if="isPluginsLoading" />
               <span v-else-if="!plugins?.length">
@@ -331,7 +331,7 @@ const handleDownloadLogfile = () => {
         >
           <div>
             <h3 class="text-lg font-medium leading-6 text-gray-900">
-              {{ $t("core.actuator.header.titles.environment") }}
+              {{ $t("core.overview.header.titles.environment") }}
             </h3>
           </div>
         </div>
@@ -339,7 +339,7 @@ const handleDownloadLogfile = () => {
           <VDescription>
             <VDescriptionItem
               v-if="info.build"
-              :label="$t('core.actuator.fields.version')"
+              :label="$t('core.overview.fields.version')"
             >
               <a
                 :href="`https://github.com/halo-dev/halo/releases/tag/v${info.build.version}`"
@@ -351,7 +351,7 @@ const handleDownloadLogfile = () => {
             </VDescriptionItem>
             <VDescriptionItem
               v-if="info.build"
-              :label="$t('core.actuator.fields.build_time')"
+              :label="$t('core.overview.fields.build_time')"
               :content="formatDatetime(info.build.time)"
             />
             <VDescriptionItem v-if="info.git" label="Git Commit">
@@ -369,7 +369,7 @@ const handleDownloadLogfile = () => {
                 [info.java.runtime.name, info.java.runtime.version].join(' / ')
               "
             />
-            <VDescriptionItem :label="$t('core.actuator.fields.database')">
+            <VDescriptionItem :label="$t('core.overview.fields.database')">
               <span>
                 {{ [info.database.name, info.database.version].join(" / ") }}
               </span>
@@ -381,23 +381,23 @@ const handleDownloadLogfile = () => {
                 :closable="false"
               >
                 <template #description>
-                  {{ $t("core.actuator.alert.h2_warning") }}
+                  {{ $t("core.overview.alert.h2_warning") }}
                 </template>
               </VAlert>
             </VDescriptionItem>
-            <VDescriptionItem :label="$t('core.actuator.fields.os')">
+            <VDescriptionItem :label="$t('core.overview.fields.os')">
               {{ info.os.name }} {{ info.os.version }} / {{ info.os.arch }}
             </VDescriptionItem>
             <VDescriptionItem
-              :label="$t('core.actuator.fields.timezone')"
+              :label="$t('core.overview.fields.timezone')"
               :content="globalInfo?.timeZone"
             />
             <VDescriptionItem
-              :label="$t('core.actuator.fields.locale')"
+              :label="$t('core.overview.fields.locale')"
               :content="globalInfo?.locale"
             />
             <VDescriptionItem
-              :label="$t('core.actuator.fields.log')"
+              :label="$t('core.overview.fields.log')"
               vertical-center
             >
               <VButton size="sm" @click="handleDownloadLogfile()">

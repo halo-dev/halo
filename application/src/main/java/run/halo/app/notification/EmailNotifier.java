@@ -149,7 +149,7 @@ public class EmailNotifier implements ReactiveNotifier {
             <a th:href="${site.url}" th:text="${site.title}"></a>
             <p class="unsubscribe">
             &mdash;<br />请勿直接回复此邮件，
-            <a th:href="|${site.url}/console/users/-/notifications|">查看通知</a>
+            <a th:href="|${site.url}/uc/notifications|">查看通知</a>
             或
             <a th:href="${unsubscribeUrl}">取消订阅</a>。
             </p>

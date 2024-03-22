@@ -68,14 +68,17 @@ spec:
               value: 'shortUUID'
             - label: 'UUID'
               value: 'UUID'
+          help: 此选项仅在创建文章时生效，修改此选项不会影响已有文章
         - $formkit: attachmentPolicySelect
           name: attachmentPolicyName
           label: "附件存储策略"
           value: "default-policy"
+          help: 用于指定在文章编辑器中上传的默认附件存储策略
         - $formkit: attachmentGroupSelect
           name: attachmentGroupName
           label: "附件存储组"
           value: ""
+          help: 用于指定在文章编辑器中上传的默认附件存储分组
     - group: seo
       label: SEO 设置
       formSchema:
@@ -96,13 +99,20 @@ spec:
           name: allowRegistration
           label: "开放注册"
           value: false
+        - $formkit: checkbox
+          name: mustVerifyEmailOnRegistration
+          label: "注册需验证邮箱"
+          help: "需要确保已经正确配置邮件通知器"
+          value: false
         - $formkit: roleSelect
           name: defaultRole
           label: "默认角色"
+          help: 用户注册之后默认为用户分配的角色
         - $formkit: attachmentPolicySelect
           name: avatarPolicy
           label: "头像存储位置"
           value: "default-policy"
+          help: 指定用户上传头像的存储策略
     - group: comment
       label: 评论设置
       formSchema:
@@ -114,6 +124,7 @@ spec:
           name: requireReviewForNew
           value: true
           label: "新评论审核"
+          help: 开启之后，新评论需要管理员审核后才会显示
         - $formkit: checkbox
           name: systemUserOnly
           value: true

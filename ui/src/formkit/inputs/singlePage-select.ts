@@ -2,16 +2,6 @@ import { singlePageLabels } from "@/constants/labels";
 import { apiClient } from "@/utils/api-client";
 import type { FormKitNode, FormKitTypeDefinition } from "@formkit/core";
 import { select, selects, defaultIcon } from "@formkit/inputs";
-import type { FormKitInputs } from "@formkit/inputs";
-
-declare module "@formkit/inputs" {
-  interface FormKitInputProps<Props extends FormKitInputs<Props>> {
-    singlePageSelect: {
-      type: "singlePageSelect";
-      value?: string;
-    };
-  }
-}
 
 function optionsHandler(node: FormKitNode) {
   node.on("created", async () => {
