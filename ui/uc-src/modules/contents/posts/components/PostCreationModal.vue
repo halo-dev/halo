@@ -32,7 +32,7 @@ const emit = defineEmits<{
 const modal = ref();
 
 const { mutate, isLoading } = useMutation({
-  mutationKey: ["create-post"],
+  mutationKey: ["uc:create-post"],
   mutationFn: async ({ data }: { data: PostFormState }) => {
     const post: Post = {
       apiVersion: "content.halo.run/v1alpha1",
