@@ -88,7 +88,7 @@ public class EmailNotifier implements ReactiveNotifier {
         return mimeMessage -> {
             MimeMessageHelper helper =
                 new MimeMessageHelper(mimeMessage, true, StandardCharsets.UTF_8.name());
-            helper.setFrom(emailSenderConfig.getUsername(), emailSenderConfig.getDisplayName());
+            helper.setFrom(emailSenderConfig.getSender(), emailSenderConfig.getDisplayName());
 
             helper.setSubject(payload.getTitle());
             helper.setText(payload.getRawBody(), payload.getHtmlBody());
@@ -166,6 +166,7 @@ public class EmailNotifier implements ReactiveNotifier {
         private String host;
         private Integer port;
         private String encryption;
+        private String sender;
 
         /**
          * Gets email display name.
@@ -174,6 +175,15 @@ public class EmailNotifier implements ReactiveNotifier {
          */
         public String getDisplayName() {
             return StringUtils.defaultIfBlank(displayName, username);
+        }
+        
+        /**
+         * Gets email sender address.
+         *
+         * @return sender if not blank, otherwise username.
+         */
+        public String getSender() {
+            return StringUtils.defaultIfBlank(sender, username);
         }
     }
 }
