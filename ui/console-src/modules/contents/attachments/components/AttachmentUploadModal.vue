@@ -1,10 +1,10 @@
 <script lang="ts" setup>
 import {
-  VModal,
   IconAddCircle,
   VAlert,
   VDropdown,
   VDropdownItem,
+  VModal,
 } from "@halo-dev/components";
 import { ref, watch } from "vue";
 import type { Policy, PolicyTemplate } from "@halo-dev/api-client";
@@ -119,6 +119,7 @@ watch(
     :body-class="['!p-0']"
     :visible="visible"
     :width="650"
+    :centered="false"
     :title="$t('core.attachment.upload_modal.title')"
     @update:visible="onVisibleChange"
   >

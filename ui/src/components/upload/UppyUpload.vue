@@ -2,9 +2,11 @@
 import { Dashboard } from "@uppy/vue";
 import "@uppy/core/dist/style.css";
 import "@uppy/dashboard/dist/style.css";
-import Uppy, { type SuccessResponse } from "@uppy/core";
 import type { Restrictions } from "@uppy/core";
+import Uppy, { type SuccessResponse } from "@uppy/core";
 import XHRUpload from "@uppy/xhr-upload";
+import ImageEditor from "@uppy/image-editor";
+import "@uppy/image-editor/dist/style.min.css";
 import zh_CN from "@uppy/locales/lib/zh_CN";
 import zh_TW from "@uppy/locales/lib/zh_TW";
 import en_US from "@uppy/locales/lib/en_US";
@@ -62,38 +64,61 @@ const uppy = computed(() => {
     meta: props.meta,
     restrictions: props.restrictions,
     autoProceed: props.autoProceed,
-  }).use(XHRUpload, {
-    endpoint: `${import.meta.env.VITE_API_URL}${props.endpoint}`,
-    allowedMetaFields: props.allowedMetaFields,
-    withCredentials: true,
-    formData: true,
-    fieldName: props.name,
-    method: props.method,
-    limit: 5,
-    timeout: 0,
-    getResponseError: (responseText: string, response: unknown) => {
-      try {
-        const response = JSON.parse(responseText);
-        if (typeof response === "object" && response && response) {
-          const { title, detail } = (response || {}) as ProblemDetail;
-          const message = [title, detail].filter(Boolean).join(": ");
+  })
+    .use(XHRUpload, {
+      endpoint: `${import.meta.env.VITE_API_URL}${props.endpoint}`,
+      allowedMetaFields: props.allowedMetaFields,
+      withCredentials: true,
+      formData: true,
+      fieldName: props.name,
+      method: props.method,
+      limit: 5,
+      timeout: 0,
+      getResponseError: (responseText: string, response: unknown) => {
+        try {
+          const response = JSON.parse(responseText);
+          if (typeof response === "object" && response && response) {
+            const { title, detail } = (response || {}) as ProblemDetail;
+            const message = [title, detail].filter(Boolean).join(": ");
 
-          if (message) {
-            Toast.error(message, { duration: 5000 });
+            if (message) {
+              Toast.error(message, { duration: 5000 });
 
-            return new Error(message);
+              return new Error(message);
+            }
           }
+        } catch (e) {
+          const responseBody = response as XMLHttpRequest;
+          const { status, statusText } = responseBody;
+          const defaultMessage = [status, statusText].join(": ");
+          Toast.error(defaultMessage, { duration: 5000 });
+          return new Error(defaultMessage);
         }
-      } catch (e) {
-        const responseBody = response as XMLHttpRequest;
-        const { status, statusText } = responseBody;
-        const defaultMessage = [status, statusText].join(": ");
-        Toast.error(defaultMessage, { duration: 5000 });
-        return new Error(defaultMessage);
-      }
-      return new Error("Internal Server Error");
-    },
-  });
+        return new Error("Internal Server Error");
+      },
+    })
+    .use(ImageEditor, {
+      locale: {
+        strings: {
+          revert: i18n.global.t("core.components.uppy.image_editor.revert"),
+          rotate: i18n.global.t("core.components.uppy.image_editor.rotate"),
+          zoomIn: i18n.global.t("core.components.uppy.image_editor.zoom_in"),
+          zoomOut: i18n.global.t("core.components.uppy.image_editor.zoom_out"),
+          flipHorizontal: i18n.global.t(
+            "core.components.uppy.image_editor.flip_horizontal"
+          ),
+          aspectRatioSquare: i18n.global.t(
+            "core.components.uppy.image_editor.aspect_ratio_square"
+          ),
+          aspectRatioLandscape: i18n.global.t(
+            "core.components.uppy.image_editor.aspect_ratio_landscape"
+          ),
+          aspectRatioPortrait: i18n.global.t(
+            "core.components.uppy.image_editor.aspect_ratio_portrait"
+          ),
+        },
+      },
+    });
 });
 
 uppy.value.on("upload-success", (_, response: SuccessResponse) => {
