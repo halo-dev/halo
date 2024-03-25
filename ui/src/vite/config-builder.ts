@@ -79,6 +79,24 @@ export function createViteConfig(options: Options) {
       outDir: path.resolve(rootDir, outDir),
       emptyOutDir: true,
       chunkSizeWarningLimit: 2048,
+      rollupOptions: {
+        output: {
+          manualChunks: {
+            vendor: [
+              "lodash-es",
+              "axios",
+              "vue-grid-layout",
+              "transliteration",
+              "vuedraggable",
+              "emoji-mart",
+              "colorjs.io",
+              "jsencrypt",
+              "overlayscrollbars",
+              "overlayscrollbars-vue",
+            ],
+          },
+        },
+      },
     },
   });
 }
