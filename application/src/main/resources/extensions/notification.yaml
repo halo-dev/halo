@@ -32,6 +32,11 @@ spec:
               label: "用户名"
               name: username
               validation: required
+            - $formkit: text
+              if: "$enable"
+              label: "发信地址"
+              name: "sender"
+              help: "如果用户名为实际发信地址，可忽略"
             - $formkit: password
               label: "密码"
               name: password

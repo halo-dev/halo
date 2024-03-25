@@ -20,6 +20,7 @@ public interface EmailSenderHelper {
         private boolean enable;
         private String displayName;
         private String username;
+        private String sender;
         private String password;
         private String host;
         private Integer port;
@@ -32,6 +33,15 @@ public interface EmailSenderHelper {
          */
         public String getDisplayName() {
             return StringUtils.defaultIfBlank(displayName, username);
+        }
+
+        /**
+         * Gets email sender address.
+         *
+         * @return sender if not blank, otherwise username
+         */
+        public String getSender() {
+            return StringUtils.defaultIfBlank(sender, username);
         }
     }
 }

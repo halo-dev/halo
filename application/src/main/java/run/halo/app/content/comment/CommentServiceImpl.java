@@ -5,6 +5,7 @@ import static run.halo.app.extension.index.query.QueryFactory.equal;
 import static run.halo.app.extension.index.query.QueryFactory.isNull;
 
 import java.time.Instant;
+import java.util.Set;
 import java.util.function.Function;
 import org.apache.commons.lang3.BooleanUtils;
 import org.springframework.data.domain.Sort;
@@ -16,6 +17,7 @@ import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import run.halo.app.core.extension.User;
 import run.halo.app.core.extension.content.Comment;
+import run.halo.app.core.extension.service.RoleService;
 import run.halo.app.core.extension.service.UserService;
 import run.halo.app.extension.Extension;
 import run.halo.app.extension.ListOptions;
@@ -30,6 +32,7 @@ import run.halo.app.infra.exception.AccessDeniedException;
 import run.halo.app.metrics.CounterService;
 import run.halo.app.metrics.MeterUtils;
 import run.halo.app.plugin.ExtensionComponentsFinder;
+import run.halo.app.security.authorization.AuthorityUtils;
 
 /**
  * Comment service implementation.
@@ -42,6 +45,7 @@ public class CommentServiceImpl implements CommentService {
 
     private final ReactiveExtensionClient client;
     private final UserService userService;
+    private final RoleService roleService;
     private final ExtensionComponentsFinder extensionComponentsFinder;
 
     private final SystemConfigurableEnvironmentFetcher environmentFetcher;
@@ -50,12 +54,14 @@ public class CommentServiceImpl implements CommentService {
     public CommentServiceImpl(ReactiveExtensionClient client,
         UserService userService, ExtensionComponentsFinder extensionComponentsFinder,
         SystemConfigurableEnvironmentFetcher environmentFetcher,
-        CounterService counterService) {
+        CounterService counterService, RoleService roleService
+    ) {
         this.client = client;
         this.userService = userService;
         this.extensionComponentsFinder = extensionComponentsFinder;
         this.environmentFetcher = environmentFetcher;
         this.counterService = counterService;
+        this.roleService = roleService;
     }
 
     @Override
@@ -113,7 +119,21 @@ public class CommentServiceImpl implements CommentService {
                 }
                 // populate owner from current user
                 return fetchCurrentUser()
-                    .map(this::toCommentOwner)
+                    .flatMap(currentUser -> ReactiveSecurityContextHolder.getContext()
+                        .flatMap(securityContext -> {
+                            var authentication = securityContext.getAuthentication();
+                            var roles = AuthorityUtils.authoritiesToRoles(
+                                authentication.getAuthorities());
+                            return roleService.contains(roles,
+                                    Set.of(AuthorityUtils.COMMENT_MANAGEMENT_ROLE_NAME))
+                                .doOnNext(result -> {
+                                    if (result) {
+                                        comment.getSpec().setApproved(true);
+                                        comment.getSpec().setApprovedTime(Instant.now());
+                                    }
+                                })
+                                .thenReturn(toCommentOwner(currentUser));
+                        }))
                     .map(owner -> {
                         comment.getSpec().setOwner(owner);
                         return comment;

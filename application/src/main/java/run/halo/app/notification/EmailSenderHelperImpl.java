@@ -58,7 +58,7 @@ public class EmailSenderHelperImpl implements EmailSenderHelper {
         return mimeMessage -> {
             MimeMessageHelper helper =
                 new MimeMessageHelper(mimeMessage, true, StandardCharsets.UTF_8.name());
-            helper.setFrom(senderConfig.getUsername(), senderConfig.getDisplayName());
+            helper.setFrom(senderConfig.getSender(), senderConfig.getDisplayName());
 
             helper.setSubject(subject);
             helper.setText(raw, html);
