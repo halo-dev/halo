@@ -3,14 +3,20 @@ import ImageView from "./ImageView.vue";
 import type { AxiosRequestConfig } from "axios";
 import type { Attachment } from "@halo-dev/api-client";
 
-interface UiImageOptions {
+export interface ImageOptions {
+  inline: boolean;
+  allowBase64: boolean;
+  HTMLAttributes: Record<string, unknown>;
+}
+
+export interface UiImageOptions {
   uploadImage?: (
     file: File,
     options?: AxiosRequestConfig
   ) => Promise<Attachment>;
 }
 
-const Image = ExtensionImage.extend<UiImageOptions>({
+const Image = ExtensionImage.extend<ImageOptions & UiImageOptions>({
   addOptions() {
     const { parent } = this;
     return {
