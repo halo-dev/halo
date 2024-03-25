@@ -64,6 +64,7 @@
     "@uppy/dashboard": "^3.7.1",
     "@uppy/drag-drop": "^3.0.3",
     "@uppy/file-input": "^3.0.4",
+    "@uppy/image-editor": "^2.4.4",
     "@uppy/locales": "^3.5.0",
     "@uppy/progress-bar": "^3.0.4",
     "@uppy/status-bar": "^3.2.5",

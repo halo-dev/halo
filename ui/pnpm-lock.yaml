@@ -89,6 +89,9 @@ importers:
       '@uppy/file-input':
         specifier: ^3.0.4
         version: 3.0.4(@uppy/core@3.8.0)
+      '@uppy/image-editor':
+        specifier: ^2.4.4
+        version: 2.4.4(@uppy/core@3.8.0)
       '@uppy/locales':
         specifier: ^3.5.0
         version: 3.5.0
@@ -5618,7 +5621,7 @@ packages:
       ts-dedent: 2.2.0
       type-fest: 2.19.0
       vue: 3.4.19(typescript@5.3.3)
-      vue-component-type-helpers: 2.0.6
+      vue-component-type-helpers: 2.0.7
     transitivePeerDependencies:
       - encoding
       - supports-color
@@ -6698,6 +6701,17 @@ packages:
       preact: 10.11.2
     dev: false
 
+  /@uppy/image-editor@2.4.4(@uppy/core@3.8.0):
+    resolution: {integrity: sha512-ASjv2Mh4mhlhkh1isDvIj3tlbERG77jo/ETwtajRSERGV6Ga9w1QGG7vL19bmNW9McHPFMZvOKNojAgv4SAtPg==}
+    peerDependencies:
+      '@uppy/core': ^3.9.3
+    dependencies:
+      '@uppy/core': 3.8.0
+      '@uppy/utils': 5.7.4
+      cropperjs: 1.5.7
+      preact: 10.11.2
+    dev: false
+
   /@uppy/informer@3.0.4(@uppy/core@3.8.0):
     resolution: {integrity: sha512-gzocdxn8qAFsW2EryehwjghladaBgv6Isjte53FTBV7o/vjaHPP6huKGbYpljyuQi8i9V+KrmvNGslofssgJ4g==}
     peerDependencies:
@@ -6772,6 +6786,13 @@ packages:
 
   /@uppy/utils@5.7.0:
     resolution: {integrity: sha512-AJj7gAx5YfMgyevwOxVdIP2h4Nw/O6h57wKA6gj+Lce6tMORcqzGt4yQiKBsrBI0bPyFWCbzA3vX5t0//1JCBA==}
+    dependencies:
+      lodash: 4.17.21
+      preact: 10.11.2
+    dev: false
+
+  /@uppy/utils@5.7.4:
+    resolution: {integrity: sha512-0Xsr7Xqdrb9mgfY3hi0YdhIaAxUw6qJasAflNMwNsyLGt3kH4pLfQHucolBKfWglVGtk1vfb49hZYvJGpcpzYA==}
     dependencies:
       lodash: 4.17.21
       preact: 10.11.2
@@ -8761,6 +8782,10 @@ packages:
 
   /cropperjs@1.5.13:
     resolution: {integrity: sha512-by7jKAo73y5/Do0K6sxdTKHgndY0NMjG2bEdgeJxycbcmHuCiMXqw8sxy5C5Y5WTOTcDGmbT7Sr5CgKOXR06OA==}
+    dev: false
+
+  /cropperjs@1.5.7:
+    resolution: {integrity: sha512-sGj+G/ofKh+f6A4BtXLJwtcKJgMUsXYVUubfTo9grERiDGXncttefmue/fyQFvn8wfdyoD1KhDRYLfjkJFl0yw==}
     dev: false
 
   /cross-spawn@5.1.0:
@@ -17566,8 +17591,8 @@ packages:
     resolution: {integrity: sha512-0vOfAtI67UjeO1G6UiX5Kd76CqaQ67wrRZiOe7UAb9Jm6GzlUr/fC7CV90XfwapJRjpCMaZFhv1V0ajWRmE9Dg==}
     dev: true
 
-  /vue-component-type-helpers@2.0.6:
-    resolution: {integrity: sha512-qdGXCtoBrwqk1BT6r2+1Wcvl583ZVkuSZ3or7Y1O2w5AvWtlvvxwjGhmz5DdPJS9xqRdDlgTJ/38ehWnEi0tFA==}
+  /vue-component-type-helpers@2.0.7:
+    resolution: {integrity: sha512-7e12Evdll7JcTIocojgnCgwocX4WzIYStGClBQ+QuWPinZo/vQolv2EMq4a3lg16TKfwWafLimG77bxb56UauA==}
     dev: true
 
   /vue-demi@0.13.11(vue@3.4.19):

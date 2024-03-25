@@ -1374,6 +1374,16 @@ core:
     editor_provider_selector:
       tooltips:
         disallow: 內容格式不同，無法切換
+    uppy:
+      image_editor:
+        revert: "還原"
+        rotate: "旋轉"
+        zoom_in: "放大"
+        zoom_out: "縮小"
+        flip_horizontal: "水平翻轉"
+        aspect_ratio_square: "裁剪為正方形"
+        aspect_ratio_landscape: "裁剪為橫向 (16:9)"
+        aspect_ratio_portrait: "裁剪為縱向 (9:16)"
   composables:
     content_cache:
       toast_recovered: 已從緩存中恢復未保存的內容
