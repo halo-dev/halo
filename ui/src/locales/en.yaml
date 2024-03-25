@@ -1462,6 +1462,16 @@ core:
     editor_provider_selector:
       tooltips:
         disallow: The content format is different and cannot be switched
+    uppy:
+      image_editor:
+        revert: "Revert"
+        rotate: "Rotate"
+        zoom_in: "Zoom in"
+        zoom_out: "Zoom out"
+        flip_horizontal: "Flip horizontal"
+        aspect_ratio_square: "Crop square"
+        aspect_ratio_landscape: "Crop landscape (16:9)"
+        aspect_ratio_portrait: "Crop portrait (9:16)"
   composables:
     content_cache:
       toast_recovered: Recovered unsaved content from cache
