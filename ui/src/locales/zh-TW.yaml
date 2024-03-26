@@ -280,6 +280,8 @@ core:
       delete:
         title: 確定要刪除該標籤嗎？
         description: 刪除此標籤之後，對應文章的關聯將被解除。該操作不可恢復。
+      delete_in_batch:
+        title: 確定要刪除選中的標籤嗎？
     editing_modal:
       titles:
         update: 編輯文章標籤
