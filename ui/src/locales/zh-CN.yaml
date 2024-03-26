@@ -1410,14 +1410,14 @@ core:
         disallow: 内容格式不同，无法切换
     uppy:
       image_editor:
-        revert: "恢复"
-        rotate: "旋转"
-        zoom_in: "放大"
-        zoom_out: "缩小"
-        flip_horizontal: "水平翻转"
-        aspect_ratio_square: "裁剪为正方形"
-        aspect_ratio_landscape: "裁剪为横向 (16:9)"
-        aspect_ratio_portrait: "裁剪为纵向 (9:16)"
+        revert: 恢复
+        rotate: 旋转
+        zoom_in: 放大
+        zoom_out: 缩小
+        flip_horizontal: 水平翻转
+        aspect_ratio_square: 裁剪为正方形
+        aspect_ratio_landscape: 裁剪为横向 (16:9)
+        aspect_ratio_portrait: 裁剪为纵向 (9:16)
   composables:
     content_cache:
       toast_recovered: 已从缓存中恢复未保存的内容
@@ -1470,6 +1470,7 @@ core:
       verify: 验证
       modify: 修改
       access: 访问
+      view_more: 查看更多
     radio:
       "yes": 是
       "no": 否
