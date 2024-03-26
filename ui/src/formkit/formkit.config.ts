@@ -21,6 +21,7 @@ import { roleSelect } from "./inputs/role-select";
 import { attachmentPolicySelect } from "./inputs/attachment-policy-select";
 import { attachmentGroupSelect } from "./inputs/attachment-group-select";
 import { password } from "./inputs/password";
+import { verificationForm } from "./inputs/verify-form";
 
 import radioAlt from "./plugins/radio-alt";
 import stopImplicitSubmission from "./plugins/stop-implicit-submission";
@@ -59,6 +60,7 @@ const config: DefaultConfigOptions = {
     roleSelect,
     attachmentPolicySelect,
     attachmentGroupSelect,
+    verificationForm,
   },
   locales: { zh, en },
   locale: "zh",

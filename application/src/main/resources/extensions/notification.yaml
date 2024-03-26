@@ -23,47 +23,46 @@ spec:
           label: "启用邮件通知器"
           value: false
           name: enable
-        - $formkit: text
+        - $formkit: verificationForm
           if: "$enable"
-          label: "用户名"
-          name: username
-          validation: required
-        - $formkit: text
-          if: "$enable"
-          label: "发信地址"
-          name: "sender"
-          help: "如果用户名为实际发信地址，可忽略"
-        - $formkit: password
-          if: "$enable"
-          label: "密码"
-          name: password
-          validation: required
-        - $formkit: text
-          if: "$enable"
-          label: "显示名称"
-          name: displayName
-        - $formkit: text
-          if: "$enable"
-          label: "SMTP 服务器地址"
-          name: host
-          validation: required
-        - $formkit: text
-          if: "$enable"
-          label: "端口号"
-          name: port
-          validation: required
-        - $formkit: select
-          if: "$enable"
-          label: "加密方式"
-          name: encryption
-          value: "SSL"
-          options:
-            - label: "SSL"
+          action: /apis/console.api.notification.halo.run/v1alpha1/notifiers/default-email-notifier/verify-connection
+          label: 测试邮箱
+          children:
+            - $formkit: text
+              label: "用户名"
+              name: username
+              validation: required
+            - $formkit: text
+              if: "$enable"
+              label: "发信地址"
+              name: "sender"
+              help: "如果用户名为实际发信地址，可忽略"
+            - $formkit: password
+              label: "密码"
+              name: password
+              validation: required
+            - $formkit: text
+              label: "显示名称"
+              name: displayName
+            - $formkit: text
+              label: "SMTP 服务器地址"
+              name: host
+              validation: required
+            - $formkit: text
+              label: "端口号"
+              name: port
+              validation: required
+            - $formkit: select
+              label: "加密方式"
+              name: encryption
               value: "SSL"
-            - label: "TLS"
-              value: "TLS"
-            - label: "不加密"
-              value: "NONE"
+              options:
+                - label: "SSL"
+                  value: "SSL"
+                - label: "TLS"
+                  value: "TLS"
+                - label: "不加密"
+                  value: "NONE"
 ---
 apiVersion: notification.halo.run/v1alpha1
 kind: ReasonType

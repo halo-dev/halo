@@ -1482,6 +1482,10 @@ core:
       creation_label: Create {text} tag
     validation:
       trim: Please remove the leading and trailing spaces
+    verification_form:
+      no_action_defined: "{label} interface not defined"
+      verify_success: "{label} successful"
+      verify_failed: "{label} failed"
   common:
     buttons:
       save: Save
