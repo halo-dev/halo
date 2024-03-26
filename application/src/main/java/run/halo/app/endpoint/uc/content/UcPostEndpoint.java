@@ -259,7 +259,6 @@ public class UcPostEndpoint implements CustomEndpoint {
                     var spec = post.getSpec();
                     spec.setOwner(oldSpec.getOwner());
                     spec.setPublish(oldSpec.getPublish());
-                    spec.setPublishTime(oldSpec.getPublishTime());
                     spec.setHeadSnapshot(oldSpec.getHeadSnapshot());
                     spec.setBaseSnapshot(oldSpec.getBaseSnapshot());
                     spec.setReleaseSnapshot(oldSpec.getReleaseSnapshot());
