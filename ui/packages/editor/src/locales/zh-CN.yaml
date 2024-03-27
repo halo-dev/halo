@@ -83,6 +83,10 @@ editor:
       match_word: 全字匹配
       use_regex: 使用正则表达式
       close: 关闭
+    format_brush:
+      toolbar_item:
+        title: 格式刷
+        cancel: 取消格式刷
   components:
     color_picker:
       more_color: 更多颜色

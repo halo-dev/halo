@@ -47,6 +47,7 @@ import {
   DecorationSet,
   ExtensionListKeymap,
   ExtensionSearchAndReplace,
+  ExtensionFormatBrush,
 } from "@halo-dev/richtext-editor";
 // ui custom extension
 import {
@@ -396,6 +397,7 @@ onMounted(() => {
       ExtensionListKeymap,
       UiExtensionUpload,
       ExtensionSearchAndReplace,
+      ExtensionFormatBrush,
     ],
     parseOptions: {
       preserveWhitespace: true,
