@@ -59,7 +59,7 @@ export const setMarks = (
   const tr = transaction || state.tr;
   const { from, to } = selection;
 
-  // 当 selection 为 CellSelection 时，遍历 ranges
+  // When selection is CellSelection, iterate through ranges
   if (selection instanceof CellSelection) {
     selection.ranges.forEach((cellRange) => {
       const range = {
