@@ -181,7 +181,7 @@ core:
         title: 刪除文章
         description: 該操作會將文章放入回收站，後續可以從回收站恢復。
       delete_in_batch:
-        title: 刪除選中的文章
+        title: 刪除所選文章
         description: 該操作會將文章放入回收站，後續可以從回收站恢復。
     filters:
       status:
@@ -258,13 +258,13 @@ core:
         title: 刪除文章
         description: 刪除之後將無法恢復。
       delete_in_batch:
-        title: 刪除選中的文章
+        title: 刪除所選文章
         description: 刪除之後將無法恢復。
       recovery:
         title: 恢復文章
         description: 該操作會將文章恢復到被刪除之前的狀態。
       recovery_in_batch:
-        title: 恢復選中的文章
+        title: 恢復所選文章
         description: 該操作會將文章恢復到被刪除之前的狀態。
   post_editor:
     title: 文章編輯
@@ -349,7 +349,7 @@ core:
         title: 刪除頁面
         description: 該操作會將自定義頁面放入回收站，後續可以從回收站恢復。
       delete_in_batch:
-        title: 刪除選中的頁面
+        title: 刪除所選頁面
         description: 該操作會將自定義頁面放入回收站，後續可以從回收站恢復。
     filters:
       status:
@@ -414,13 +414,13 @@ core:
         title: 刪除頁面
         description: 刪除之後將無法恢復。
       delete_in_batch:
-        title: 刪除選中的頁面
+        title: 刪除所選頁面
         description: 刪除之後將無法恢復。
       recovery:
         title: 恢復頁面
         description: 該操作會將自定義頁面恢復到被刪除之前的狀態。
       recovery_in_batch:
-        title: 恢復選中的頁面
+        title: 恢復所選頁面
         description: 該操作會將自定義頁面恢復到被刪除之前的狀態。
   page_editor:
     title: 頁面編輯
@@ -439,7 +439,7 @@ core:
         title: 刪除留言
         description: 將同時刪除所有留言下的回覆，該操作不可恢復。
       delete_comment_in_batch:
-        title: 刪除選中的留言
+        title: 刪除所選留言
         description: 將同時刪除所有留言下的回覆，該操作不可恢復。
       approve_comment_in_batch:
         button: 審核通過
@@ -502,7 +502,7 @@ core:
       delete:
         title: 刪除附件
       delete_in_batch:
-        title: 刪除選中的附件
+        title: 刪除所選附件
       deselect_items:
         button: 取消選擇
       move:
@@ -755,19 +755,19 @@ core:
       uninstall:
         title: 卸載插件
       uninstall_in_batch:
-        title: 卸載選中插件
+        title: 卸載所選插件
       uninstall_and_delete_config:
         button: 卸載並刪除配置
         title: 卸載插件以及對應的配置
       uninstall_and_delete_config_in_batch:
         button: 卸載並刪除配置
-        title: 卸載選中插件以及對應的配置
+        title: 卸載所選插件以及對應的配置
       uninstall_when_enabled:
         confirm_text: 停止運行並卸載
         description: 當前插件還在啟用狀態，將在停止運行後卸載，該操作不可恢復。
       change_status_in_batch:
-        activate_title: 啟用選中插件
-        inactivate_title: 停用選中插件
+        activate_title: 啟用所選插件
+        inactivate_title: 停用所選插件
       remote_download:
         title: 偵測到遠端下載地址，是否需要下載？
         description: 請仔細鑑別此地址是否可信：{url}
@@ -830,7 +830,7 @@ core:
       delete:
         title: 刪除用戶
       delete_in_batch:
-        title: 刪除選中的用戶
+        title: 刪除所選用戶
       update_profile:
         title: 修改資料
       change_password:
