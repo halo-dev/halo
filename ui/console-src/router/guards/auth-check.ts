@@ -52,7 +52,7 @@ export function setupAuthCheckGuard(router: Router) {
         return;
       }
 
-      if (whiteList.includes(to.name)) {
+      if (to.name && whiteList.includes(to.name as string)) {
         next();
         return;
       }
