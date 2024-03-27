@@ -1518,6 +1518,7 @@ core:
       verify: Verify
       modify: Modify
       access: Access
+      view_more: View more
     radio:
       "yes": "Yes"
       "no": "No"

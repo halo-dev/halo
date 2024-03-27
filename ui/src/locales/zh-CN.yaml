@@ -1470,6 +1470,7 @@ core:
       verify: 验证
       modify: 修改
       access: 访问
+      view_more: 查看更多
     radio:
       "yes": 是
       "no": 否

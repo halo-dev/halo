@@ -1436,6 +1436,7 @@ core:
       modify: 修改
       verify: 驗證
       access: 訪問
+      view_more: 查看更多
     radio:
       "yes": 是
       "no": 否
