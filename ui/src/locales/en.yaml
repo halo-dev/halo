@@ -92,7 +92,7 @@ core:
     operations:
       logout:
         tooltip: Logout
-        title: Are you sure you want to log out?
+        title: Logout
       profile:
         tooltip: Profile
       visit_homepage:
@@ -155,14 +155,14 @@ core:
               title: New User
             refresh_search_engine:
               title: Refresh Search Engine
-              dialog_title: Do you want to refresh the search engine index?
+              dialog_title: Refresh the search engine index
               dialog_content: >-
                 This operation will recreate search engine indexes for all
                 published posts.
               success_message: Refresh search engine index successfully.
             evict_page_cache:
               title: Refresh Page Cache
-              dialog_title: Do you want to refresh the page cache?
+              dialog_title: Refresh the page cache
               dialog_content: This operation will clear the cache for all pages.
               success_message: Refresh page cache successfully.
         user_stats:
@@ -182,12 +182,12 @@ core:
       message: You can try to refresh or create a new post.
     operations:
       delete:
-        title: Are you sure you want to delete this post?
+        title: Delete post
         description: >-
           This operation will move the post to the recycle bin, and it can be
           restored from the recycle bin later.
       delete_in_batch:
-        title: Are you sure you want to delete the selected posts?
+        title: Delete the selected posts
         description: >-
           This operation will move the posts to the recycle bin, and it can be
           restored from the recycle bin later.
@@ -263,16 +263,16 @@ core:
       message: You can try to refresh or go back to the previous page.
     operations:
       delete:
-        title: Are you sure you want to permanently delete this post?
+        title: Delete post
         description: After deletion, it will not be possible to recover.
       delete_in_batch:
-        title: Are you sure you want to permanently delete the selected posts?
+        title: Delete the selected posts
         description: After deletion, it will not be possible to recover.
       recovery:
-        title: Do you want to restore this post?
+        title: Restore post
         description: This operation will restore the post to its state before deletion.
       recovery_in_batch:
-        title: Are you sure you want to restore the selected posts?
+        title: Restore the selected posts
         description: This operation will restore the posts to its state before deletion.
   post_editor:
     title: Post edit
@@ -286,7 +286,7 @@ core:
       message: You can try to refresh or create a new tag.
     operations:
       delete:
-        title: Are you sure you want to delete this tag?
+        title: Delete tag
         description: >-
           After deleting this tag, the association with the corresponding
           article will be removed. This operation cannot be undone.
@@ -319,7 +319,7 @@ core:
       message: You can try to refresh or create a new category.
     operations:
       delete:
-        title: Are you sure you want to delete this category?
+        title: Delete category
         description: >-
           After deleting this category, the association with corresponding
           articles will be removed. This operation cannot be undone.
@@ -358,12 +358,12 @@ core:
       message: You can try to refresh or create a new page.
     operations:
       delete:
-        title: Are you sure you want to delete this page?
+        title: Delete page
         description: >-
           This operation will move the page to the recycle bin, and it can be
           restored from the recycle bin later.
       delete_in_batch:
-        title: Are you sure you want to delete the selected pages?
+        title: Delete the selected pages
         description: >-
           This operation will move the pages to the recycle bin, and it can be
           restored from the recycle bin later.
@@ -427,16 +427,16 @@ core:
       message: You can try to refresh or go back to the previous page.
     operations:
       delete:
-        title: Are you sure you want to permanently delete this page?
+        title: Delete page
         description: After deletion, it will not be possible to recover.
       delete_in_batch:
-        title: Are you sure you want to permanently delete the selected pages?
+        title: Delete the selected pages
         description: After deletion, it will not be possible to recover.
       recovery:
-        title: Do you want to restore this page?
+        title: Restore page
         description: This operation will restore the page to its state before deletion.
       recovery_in_batch:
-        title: Are you sure you want to restore the selected pages?
+        title: Restore the selected pages
         description: This operation will restore the pages to its state before deletion.
   page_editor:
     title: Page edit
@@ -452,12 +452,12 @@ core:
       new: New Reply
     operations:
       delete_comment:
-        title: Are you sure you want to delete this comment?
+        title: Delete comment
         description: >-
           All replies under the comments will be deleted at the same time, and
           this operation cannot be undone.
       delete_comment_in_batch:
-        title: Are you sure you want to delete the selected comments?
+        title: Delete the selected comments
         description: >-
           All replies under the comments will be deleted at the same time, and
           this operation cannot be undone.
@@ -470,7 +470,7 @@ core:
           Are you sure you want to approve all replies to this comment for
           review?
       delete_reply:
-        title: Are you sure you want to delete this reply?
+        title: Delete reply
       approve_reply:
         button: Approve
       reply:
@@ -524,9 +524,9 @@ core:
         upload: Upload Attachment
     operations:
       delete:
-        title: Are you sure you want to delete this attachment?
+        title: Delete attachment
       delete_in_batch:
-        title: Are you sure you want to delete the selected attachments?
+        title: Delete the selected attachments
       deselect_items:
         button: Deselect items
       move:
@@ -583,7 +583,7 @@ core:
           button: Rename
         delete:
           button: And move attachment to ungrouped
-          title: Are you sure you want to delete this group?
+          title: Delete attachment group
           description: >-
             The group will be deleted, and the attachments under the group will
             be moved to ungrouped. This operation cannot be undone.
@@ -592,7 +592,7 @@ core:
             ungrouped
         delete_with_attachments:
           button: Also delete attachments
-          title: Are you sure you want to delete this group?
+          title: Delete attachment group
           description: >-
             Deleting the group and all attachments within it, this action cannot
             be undone.
@@ -608,7 +608,7 @@ core:
           refreshing or creating a new policy.
       operations:
         delete:
-          title: Are you sure you want to delete this policy?
+          title: Delete attachment policy
           description: There are no uploaded attachments under the current policy.
         can_not_delete:
           title: Deletion failed
@@ -657,28 +657,26 @@ core:
         switch: Switch Theme
     operations:
       active:
-        title: Are you sure to active the current theme?
+        title: Active theme
         toast_success: Active theme successful
       reset:
-        title: Are you sure you want to reset all configurations of the theme?
+        title: Reset configurations of the theme
         description: >-
           This operation will delete the saved configuration and reset it to
           default settings.
         toast_success: Reset configuration successful
       reload:
         button: Reload
-        title: Are you sure you want to reload all configurations of the theme?
+        title: Reload configurations of the theme
         description: >-
           This operation will only reload the theme configuration and settings
           form definition, and will not delete any saved configurations.
         toast_success: Reload configuration successful
       uninstall:
-        title: Are you sure you want to uninstall this theme?
+        title: Uninstall theme
       uninstall_and_delete_config:
         button: Uninstall and delete config
-        title: >-
-          Are you sure you want to uninstall this theme and its corresponding
-          settings?
+        title: Uninstall this theme and its corresponding settings
       remote_download:
         title: Remote download address detected, do you want to download?
         description: "Please carefully verify whether this address can be trusted: {url}"
@@ -733,12 +731,12 @@ core:
         button: Set as primary menu
         toast_success: Setting successful
       delete_menu:
-        title: Are you sure you want to delete this menu?
+        title: Delete menu
         description: >-
           All menu items under this menu will be deleted at the same time, and
           this operation cannot be undone.
       delete_menu_item:
-        title: Are you sure you want to delete this menu item?
+        title: Delete menu item
         description: >-
           All sub-menu items will be deleted at the same time, and cannot be
           restored after deletion.
@@ -799,33 +797,29 @@ core:
         install: Install Plugin
     operations:
       reset:
-        title: Are you sure you want to reset all configurations of the plugin?
+        title: Reset configurations of the plugin
         description: >-
           This operation will delete the saved configuration and reset it to
           default settings.
         toast_success: Reset configuration successfully
       uninstall:
-        title: Are you sure you want to uninstall this plugin?
+        title: Uninstall plugin
       uninstall_in_batch:
-        title: Are you sure you want to uninstall these plugin?
+        title: Uninstall the selected plugins
       uninstall_and_delete_config:
         button: Uninstall and delete config
-        title: >-
-          Are you sure you want to uninstall this plugin and its corresponding
-          configuration?
+        title: Uninstall plugin and its corresponding configuration
       uninstall_and_delete_config_in_batch:
         button: Uninstall and delete config
-        title: >-
-          Are you sure you want to uninstall these plugin and its corresponding
-          configuration?
+        title: Uninstall the selected plugins and its corresponding configuration
       uninstall_when_enabled:
         confirm_text: Stop running and uninstall
         description: >-
           The current plugin is still in the enabled state and will be
           uninstalled after it stops running. This operation cannot be undone.
       change_status_in_batch:
-        activate_title: Are you sure you want to activate these plugins?
-        inactivate_title: Are you sure you want to inactivate these plugins?
+        activate_title: Activate the selected plugins
+        inactivate_title: Inactivate the selected plugins
       remote_download:
         title: Remote download address detected, do you want to download?
         description: "Please carefully verify whether this address can be trusted: {url}"
@@ -890,9 +884,9 @@ core:
         try refreshing or creating a new user.
     operations:
       delete:
-        title: Are you sure you want to delete this user?
+        title: Delete user
       delete_in_batch:
-        title: Are you sure you want to delete the selected users?
+        title: Delete the selected users
       update_profile:
         title: Update profile
       change_password:
@@ -972,7 +966,7 @@ core:
         provided_by_plugin: Provided by {plugin}
     operations:
       delete:
-        title: Are you sure you want to delete this role?
+        title: Delete role
         description: >-
           After the role is deleted, the associated users will have their role
           bindings removed and this operation cannot be undone.
@@ -1015,9 +1009,9 @@ core:
       setting: Settings
     operations:
       enable:
-        title: Are you sure you want to enable this identity authentication method?
+        title: Enable identity authentication method
       disable:
-        title: Are you sure you want to disable this identity authentication method?
+        title: Disable identity authentication method
       disable_privileged:
         tooltip: The authentication method reserved by the system cannot be disabled
     detail:
@@ -1053,7 +1047,7 @@ core:
           button: Bind
         unbind:
           button: Unbind
-          title: Are you sure you want to unbind the login method for {display_name}?
+          title: Unbind the login method for {display_name}
       email_not_set:
         description: >-
           Your email address has not been set yet. Click the button below to set
@@ -1243,7 +1237,7 @@ core:
         button: Download and restore
       restore_by_backup:
         button: Restore
-        title: Are you sure you want to restore from this backup?
+        title: Restore from this backup
     list:
       phases:
         pending: Pending
@@ -1451,7 +1445,7 @@ core:
       cropper_modal:
         title: Crop Avatar
       remove:
-        title: Are you sure you want to delete the avatar?
+        title: Delete avatar
       tooltips:
         upload: Upload
         zoom_in: Zoom In
@@ -1464,14 +1458,14 @@ core:
         disallow: The content format is different and cannot be switched
     uppy:
       image_editor:
-        revert: "Revert"
-        rotate: "Rotate"
-        zoom_in: "Zoom in"
-        zoom_out: "Zoom out"
-        flip_horizontal: "Flip horizontal"
-        aspect_ratio_square: "Crop square"
-        aspect_ratio_landscape: "Crop landscape (16:9)"
-        aspect_ratio_portrait: "Crop portrait (9:16)"
+        revert: Revert
+        rotate: Rotate
+        zoom_in: Zoom in
+        zoom_out: Zoom out
+        flip_horizontal: Flip horizontal
+        aspect_ratio_square: Crop square
+        aspect_ratio_landscape: Crop landscape (16:9)
+        aspect_ratio_portrait: Crop portrait (9:16)
   composables:
     content_cache:
       toast_recovered: Recovered unsaved content from cache
@@ -1618,6 +1612,7 @@ core:
       reset:
         button: Reset Password
         toast_success: Reset successful
+    title: Reset password
   reset_password:
     fields:
       username:
@@ -1630,6 +1625,7 @@ core:
         toast_success: >-
           If your username and email address match, we will send an email to
           your email address.
+    title: Reset password
   tool:
     title: Tools
     empty:

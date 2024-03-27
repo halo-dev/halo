@@ -95,7 +95,7 @@ const onEditingModalClose = () => {
 const handleDelete = (group: Group) => {
   Dialog.warning({
     title: t("core.attachment.group_list.operations.delete.title"),
-    description: t("core.attachment.group_list.operations.delete.title"),
+    description: t("core.attachment.group_list.operations.delete.description"),
     confirmType: "danger",
     confirmText: t("core.common.buttons.confirm"),
     cancelText: t("core.common.buttons.cancel"),
