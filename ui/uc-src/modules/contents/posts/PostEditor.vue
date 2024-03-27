@@ -234,7 +234,8 @@ async function handleSetEditorProviderFromRemote() {
   const provider =
     preferredEditor ||
     editorProviders.value.find(
-      (provider) => provider.rawType === content.value.rawType
+      (provider) =>
+        provider.rawType.toLowerCase() === content.value.rawType?.toLowerCase()
     );
 
   if (provider) {
