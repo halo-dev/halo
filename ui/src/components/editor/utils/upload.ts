@@ -5,11 +5,14 @@ import Image from "../extensions/image";
 import ExtensionVideo from "../extensions/video";
 import ExtensionAudio from "../extensions/audio";
 import type { AxiosRequestConfig } from "axios";
+import { usePermission } from "@/utils/permission";
 
 export interface FileProps {
   file: File;
   editor: CoreEditor;
 }
+
+const { currentUserHasPermission } = usePermission();
 
 /**
  * Handles file events, determining if the file is an image and triggering the appropriate upload process.
@@ -19,6 +22,10 @@ export interface FileProps {
  */
 export const handleFileEvent = ({ file, editor }: FileProps) => {
   if (!file) {
+    return false;
+  }
+
+  if (!currentUserHasPermission(["uc:attachments:manage"])) {
     return false;
   }
 

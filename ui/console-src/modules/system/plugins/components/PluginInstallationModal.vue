@@ -1,21 +1,25 @@
 <script lang="ts" setup>
-import { VModal, VButton, VTabbar } from "@halo-dev/components";
+import { VButton, VModal, VTabbar } from "@halo-dev/components";
 import type { Plugin } from "@halo-dev/api-client";
-import { computed, ref, watch } from "vue";
+import {
+  computed,
+  markRaw,
+  nextTick,
+  onMounted,
+  provide,
+  type Ref,
+  ref,
+  toRefs,
+} from "vue";
 import { useI18n } from "vue-i18n";
 import { useRouteQuery } from "@vueuse/router";
-import { provide } from "vue";
-import { toRefs } from "vue";
-import type { Ref } from "vue";
 import LocalUpload from "./installation-tabs/LocalUpload.vue";
 import RemoteDownload from "./installation-tabs/RemoteDownload.vue";
-import { markRaw } from "vue";
 import type {
   PluginInstallationTab,
   PluginModule,
 } from "@halo-dev/console-shared";
 import { usePluginModuleStore } from "@/stores/plugin";
-import { onMounted } from "vue";
 import { usePermission } from "@/utils/permission";
 
 const { t } = useI18n();
@@ -23,22 +27,21 @@ const { currentUserHasPermission } = usePermission();
 
 const props = withDefaults(
   defineProps<{
-    visible: boolean;
     pluginToUpgrade?: Plugin;
   }>(),
   {
-    visible: false,
     pluginToUpgrade: undefined,
   }
 );
 
 const emit = defineEmits<{
-  (event: "update:visible", visible: boolean): void;
   (event: "close"): void;
 }>();
 
 const { pluginToUpgrade } = toRefs(props);
 provide<Ref<Plugin | undefined>>("pluginToUpgrade", pluginToUpgrade);
+
+const modal = ref();
 
 const tabs = ref<PluginInstallationTab[]>([
   {
@@ -65,26 +68,18 @@ const modalTitle = computed(() => {
     : t("core.plugin.upload_modal.titles.install");
 });
 
-const handleVisibleChange = (visible: boolean) => {
-  emit("update:visible", visible);
-  if (!visible) {
-    emit("close");
-  }
-};
-
 // handle remote download url from route
 const routeRemoteDownloadUrl = useRouteQuery<string | null>(
   "remote-download-url"
 );
 
-watch(
-  () => props.visible,
-  (visible) => {
-    if (visible && routeRemoteDownloadUrl.value) {
+onMounted(() => {
+  if (routeRemoteDownloadUrl.value) {
+    nextTick(() => {
       activeTabId.value = "remote";
-    }
+    });
   }
-);
+});
 
 const { pluginModules } = usePluginModuleStore();
 onMounted(() => {
@@ -114,12 +109,12 @@ onMounted(() => {
 </script>
 <template>
   <VModal
-    :visible="visible"
+    ref="modal"
     :title="modalTitle"
     :centered="true"
     :width="920"
     height="calc(100vh - 20px)"
-    @update:visible="handleVisibleChange"
+    @close="emit('close')"
   >
     <VTabbar
       v-model:active-id="activeTabId"
@@ -136,12 +131,12 @@ onMounted(() => {
           :is="tab.component"
           v-bind="tab.props"
           v-if="tab.id === activeTabId"
-          @close-modal="handleVisibleChange(false)"
+          @close-modal="modal.close()"
         />
       </template>
     </div>
     <template #footer>
-      <VButton @click="handleVisibleChange(false)">
+      <VButton @click="modal.close()">
         {{ $t("core.common.buttons.close") }}
       </VButton>
     </template>

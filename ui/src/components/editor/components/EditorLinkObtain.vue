@@ -10,6 +10,7 @@ import { watch } from "vue";
 import { uploadFile } from "../utils/upload";
 import type { Attachment } from "@halo-dev/api-client";
 import type { AxiosRequestConfig } from "axios";
+import HasPermission from "@/components/permission/HasPermission.vue";
 
 const props = withDefaults(
   defineProps<{
@@ -188,22 +189,30 @@ defineExpose({
       >
         <slot v-if="$slots.icon" name="icon"></slot>
         <VSpace>
-          <VButton @click="open()">
-            {{ $t("core.common.buttons.upload") }}
-          </VButton>
-          <VButton @click="openAttachmentSelector">
-            {{
-              $t(
-                "core.components.default_editor.extensions.upload.attachment.title"
-              )
-            }}</VButton
-          >
+          <HasPermission :permissions="['uc:attachments:manage']">
+            <VButton @click="open()">
+              {{ $t("core.common.buttons.upload") }}
+            </VButton>
+          </HasPermission>
+
+          <HasPermission :permissions="['system:attachments:manage']">
+            <VButton @click="openAttachmentSelector">
+              {{
+                $t(
+                  "core.components.default_editor.extensions.upload.attachment.title"
+                )
+              }}
+            </VButton>
+          </HasPermission>
+
           <VDropdown>
-            <VButton>{{
-              $t(
-                "core.components.default_editor.extensions.upload.permalink.title"
-              )
-            }}</VButton>
+            <VButton>
+              {{
+                $t(
+                  "core.components.default_editor.extensions.upload.permalink.title"
+                )
+              }}
+            </VButton>
             <template #popper>
               <input
                 v-model="externalLink"

@@ -379,12 +379,14 @@ export interface DraggableItem {
     slice,
     insertPos,
     node,
+    selection,
   }: {
     view: EditorView;
     event: DragEvent;
     slice: Slice;
     insertPos: number;
     node: Node;
+    selection: Selection;
   }) => boolean | void;
   allowPropagationDownward?: boolean;   // 是否允许拖拽事件向内部传播，
 }
