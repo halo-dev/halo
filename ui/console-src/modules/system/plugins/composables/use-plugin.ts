@@ -1,6 +1,6 @@
 import type { ComputedRef, Ref } from "vue";
 import { computed } from "vue";
-import { type Plugin } from "@halo-dev/api-client";
+import { PluginStatusPhaseEnum, type Plugin } from "@halo-dev/api-client";
 import { cloneDeep } from "lodash-es";
 import { apiClient } from "@/utils/api-client";
 import { Dialog, Toast } from "@halo-dev/components";
@@ -22,7 +22,8 @@ export function usePluginLifeCycle(
 
   const isStarted = computed(() => {
     return (
-      plugin?.value?.status?.phase === "STARTED" && plugin.value?.spec.enabled
+      plugin?.value?.status?.phase === PluginStatusPhaseEnum.Started &&
+      plugin.value?.spec.enabled
     );
   });
 
@@ -33,7 +34,9 @@ export function usePluginLifeCycle(
       const lastCondition = plugin.value.status?.conditions?.[0];
 
       return (
-        [lastCondition?.reason, lastCondition?.message].join(":") || "Unknown"
+        [lastCondition?.reason, lastCondition?.message]
+          .filter(Boolean)
+          .join(":") || "Unknown"
       );
     }
   };
