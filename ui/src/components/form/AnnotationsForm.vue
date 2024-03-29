@@ -16,7 +16,6 @@ import { cloneDeep } from "lodash-es";
 import { getValidationMessages } from "@formkit/validation";
 import { useThemeStore } from "@console/stores/theme";
 import { randomUUID } from "@/utils/id";
-import { useSessionStorage } from "@vueuse/core";
 
 const themeStore = useThemeStore();
 
@@ -201,7 +200,7 @@ defineExpose({
   customAnnotations,
 });
 
-const showCustomForm = useSessionStorage("annotations-show-custom-form", false);
+const showCustomForm = ref(false);
 
 function onCustomFormToggle(e: Event) {
   showCustomForm.value = (e.target as HTMLDetailsElement).open;
@@ -237,7 +236,13 @@ function onCustomFormToggle(e: Event) {
     >
       <summary class="group flex items-center justify-between">
         <div class="block text-sm font-medium text-gray-700">
-          {{ $t("core.common.buttons.view_more") }}
+          {{
+            $t(
+              showCustomForm
+                ? "core.components.annotations_form.buttons.collapse"
+                : "core.components.annotations_form.buttons.expand"
+            )
+          }}
         </div>
         <div
           class="-mr-1 inline-flex items-center justify-center rounded-full p-1 group-hover:bg-gray-100"

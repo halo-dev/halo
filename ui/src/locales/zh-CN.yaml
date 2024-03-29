@@ -1329,6 +1329,9 @@ core:
       custom_fields:
         label: 自定义
         validation: 当前 Key 已被占用
+      buttons:
+        expand: 查看更多
+        collapse: 收起
     default_editor:
       tabs:
         toc:
@@ -1470,7 +1473,6 @@ core:
       verify: 验证
       modify: 修改
       access: 访问
-      view_more: 查看更多
     radio:
       "yes": 是
       "no": 否

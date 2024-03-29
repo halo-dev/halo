@@ -1381,6 +1381,9 @@ core:
       custom_fields:
         label: Custom
         validation: The current Key is already in use
+      buttons:
+        expand: View more
+        collapse: Collapse
     default_editor:
       tabs:
         toc:
@@ -1524,7 +1527,6 @@ core:
       verify: Verify
       modify: Modify
       access: Access
-      view_more: View more
     radio:
       "yes": "Yes"
       "no": "No"
