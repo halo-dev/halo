@@ -5,6 +5,7 @@ import type {
   Slice,
   EditorState,
   EditorView,
+  Selection,
 } from "@/tiptap/pm";
 import type { Component } from "vue";
 export interface ToolbarItem {
@@ -120,12 +121,14 @@ export interface DraggableItem {
     slice,
     insertPos,
     node,
+    selection,
   }: {
     view: EditorView;
     event: DragEvent;
     slice: Slice;
     insertPos: number;
     node: Node;
+    selection: Selection;
   }) => boolean | void;
   // allow drag-and-drop query propagation downward
   allowPropagationDownward?: boolean;

@@ -1,26 +1,26 @@
 <script lang="ts" setup>
 import {
+  Dialog,
   IconBookRead,
+  IconEye,
   IconSave,
-  IconSettings,
   IconSendPlaneFill,
+  IconSettings,
+  Toast,
   VButton,
   VPageHeader,
   VSpace,
-  Toast,
-  Dialog,
-  IconEye,
 } from "@halo-dev/components";
 import PostSettingModal from "./components/PostSettingModal.vue";
 import type { Post, PostRequest } from "@halo-dev/api-client";
 import {
   computed,
+  type ComputedRef,
   nextTick,
   onMounted,
   provide,
   ref,
   toRef,
-  type ComputedRef,
   watch,
 } from "vue";
 import { apiClient } from "@/utils/api-client";
@@ -291,7 +291,8 @@ const handleFetchContent = async () => {
     const provider =
       preferredEditor ||
       editorProviders.value.find(
-        (provider) => provider.rawType === data.rawType
+        (provider) =>
+          provider.rawType.toLowerCase() === data.rawType?.toLowerCase()
       );
 
     if (provider) {

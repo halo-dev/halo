@@ -470,11 +470,12 @@ const Draggable = Extension.create({
               const pos = view.posAtCoords(coords);
               if (!pos || !pos.pos) return false;
 
-              const nodeDom =
-                view.nodeDOM(pos.pos) ||
-                view.domAtPos(pos.pos)?.node ||
-                event.target;
+              const nodePos = pos.inside > -1 ? pos.inside : pos.pos;
 
+              const nodeDom =
+                view.nodeDOM(nodePos) ||
+                view.domAtPos(nodePos)?.node ||
+                event.target;
               if (!nodeDom) {
                 hideDragHandleDOM();
                 return false;
@@ -555,6 +556,7 @@ const Draggable = Extension.create({
                   slice,
                   insertPos,
                   node: activeNode?.node as Node,
+                  selection: activeSelection,
                 });
                 if (typeof handleDrop === "boolean") {
                   isDisableDrop = handleDrop;
