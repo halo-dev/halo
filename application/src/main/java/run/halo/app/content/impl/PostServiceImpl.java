@@ -225,13 +225,11 @@ public class PostServiceImpl extends AbstractContentService implements PostServi
                     return client.update(post);
                 });
         }
-        return Mono.defer(() -> updateContent(baseSnapshot, postRequest.contentRequest())
-                .flatMap(contentWrapper -> {
-                    post.getSpec().setHeadSnapshot(contentWrapper.getSnapshotName());
-                    return client.update(post);
-                }))
-            .retryWhen(Retry.backoff(5, Duration.ofMillis(100))
-                .filter(throwable -> throwable instanceof OptimisticLockingFailureException));
+        return updateContent(baseSnapshot, postRequest.contentRequest())
+            .flatMap(contentWrapper -> {
+                post.getSpec().setHeadSnapshot(contentWrapper.getSnapshotName());
+                return client.update(post);
+            });
     }
 
     @Override
