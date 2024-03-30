@@ -182,6 +182,19 @@ public class SchemeInitializer implements ApplicationListener<ApplicationContext
                     // do not care about the false case so return null to avoid indexing
                     return null;
                 })));
+
+            indexSpecs.add(new IndexSpec()
+                .setName(Post.COUNTER_VISIT_ANNO)
+                .setIndexFunc(
+                    simpleAttribute(Post.class,
+                        post -> post.getMetadata().getAnnotations().get(Post.COUNTER_VISIT_ANNO))));
+
+            indexSpecs.add(new IndexSpec()
+                .setName(Post.COUNTER_COMMENT_ANNO)
+                .setIndexFunc(
+                    simpleAttribute(Post.class,
+                        post -> post.getMetadata().getAnnotations()
+                            .get(Post.COUNTER_COMMENT_ANNO))));
         });
         schemeManager.register(Category.class, indexSpecs -> {
             indexSpecs.add(new IndexSpec()

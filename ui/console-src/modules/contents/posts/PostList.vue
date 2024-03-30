@@ -420,6 +420,14 @@ watch(selectedPostNames, (newValue) => {
                     label: t('core.post.filters.sort.items.create_time_asc'),
                     value: 'metadata.creationTimestamp,asc',
                   },
+                  {
+                    label: t('core.post.filters.sort.items.visit_desc'),
+                    value: 'counter.visit,desc',
+                  },
+                  {
+                    label: t('core.post.filters.sort.items.comment_desc'),
+                    value: 'counter.comment,desc',
+                  },
                 ]"
               />
               <div class="flex flex-row gap-2">

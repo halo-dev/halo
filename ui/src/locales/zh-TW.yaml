@@ -209,6 +209,8 @@ core:
           publish_time_asc: 較早發布
           create_time_desc: 較近創建
           create_time_asc: 較早創建
+          visit_desc: 最多訪問量
+          comment_desc: 最多評論量
     list:
       fields:
         categories: 分類：
