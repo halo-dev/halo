@@ -1,21 +1,19 @@
 package run.halo.app.core.extension.reconciler;
 
 import java.time.Instant;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Component;
 import run.halo.app.core.extension.Counter;
 import run.halo.app.core.extension.content.Post;
+import run.halo.app.event.post.CounterUpdatedEvent;
 import run.halo.app.event.post.PostChangeEvent;
 import run.halo.app.extension.ExtensionClient;
-import run.halo.app.extension.GroupVersionKind;
 import run.halo.app.extension.controller.Controller;
 import run.halo.app.extension.controller.ControllerBuilder;
 import run.halo.app.extension.controller.DefaultQueue;
 import run.halo.app.extension.controller.Reconciler;
 import run.halo.app.extension.controller.RequestQueue;
-import run.halo.app.extension.index.Indexer;
-import run.halo.app.extension.index.IndexerFactoryImpl;
-import run.halo.app.infra.utils.JsonUtils;
 import run.halo.app.metrics.MeterUtils;
 
 
@@ -23,15 +21,14 @@ import run.halo.app.metrics.MeterUtils;
 public class PostCounterReconciler implements Reconciler<Reconciler.Request> {
 
     private final ExtensionClient client;
-
-    private final IndexerFactoryImpl indexerFactory;
-
     private final RequestQueue<Request> queue;
+    private final ApplicationEventPublisher eventPublisher;
 
 
-    public PostCounterReconciler(ExtensionClient client, IndexerFactoryImpl indexerFactory) {
+    public PostCounterReconciler(ExtensionClient client,
+        ApplicationEventPublisher eventPublisher) {
         this.client = client;
-        this.indexerFactory = indexerFactory;
+        this.eventPublisher = eventPublisher;
         this.queue = new DefaultQueue<>(Instant::now);
     }
 
@@ -40,22 +37,12 @@ public class PostCounterReconciler implements Reconciler<Reconciler.Request> {
         String name = request.name();
         if (isPostCounter(name)) {
             client.fetch(Counter.class, getCounterName(name)).ifPresent(counter -> {
-                updateIndexByPost(counter, getPostName(name));
+                eventPublisher.publishEvent(new CounterUpdatedEvent(this, counter));
             });
         }
         return Result.doNotRetry();
     }
 
-    private void updateIndexByPost(Counter counter, String postName) {
-        client.fetch(Post.class, postName)
-            .ifPresent(post -> {
-                post.getMetadata().getAnnotations()
-                    .put(Post.COUNTER_ANNO, JsonUtils.objectToJson(counter));
-                GroupVersionKind gvk = GroupVersionKind.fromExtension(Post.class);
-                Indexer indexer = indexerFactory.getIndexer(gvk);
-                indexer.updateRecord(post);
-            });
-    }
 
     @Override
     public Controller setupWith(ControllerBuilder builder) {
