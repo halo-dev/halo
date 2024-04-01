@@ -1,24 +1,21 @@
 package run.halo.app.core.extension.reconciler;
 
-import java.util.Iterator;
-import java.util.Set;
-import java.util.concurrent.CopyOnWriteArraySet;
-import org.springframework.boot.context.event.ApplicationStartedEvent;
+import java.time.Instant;
 import org.springframework.context.event.EventListener;
-import org.springframework.data.domain.Sort;
-import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 import run.halo.app.core.extension.Counter;
 import run.halo.app.core.extension.content.Post;
 import run.halo.app.event.post.PostChangeEvent;
 import run.halo.app.extension.ExtensionClient;
 import run.halo.app.extension.GroupVersionKind;
-import run.halo.app.extension.ListOptions;
 import run.halo.app.extension.controller.Controller;
 import run.halo.app.extension.controller.ControllerBuilder;
+import run.halo.app.extension.controller.DefaultQueue;
 import run.halo.app.extension.controller.Reconciler;
+import run.halo.app.extension.controller.RequestQueue;
 import run.halo.app.extension.index.Indexer;
 import run.halo.app.extension.index.IndexerFactoryImpl;
+import run.halo.app.infra.utils.JsonUtils;
 import run.halo.app.metrics.MeterUtils;
 
 
@@ -29,84 +26,69 @@ public class PostCounterReconciler implements Reconciler<Reconciler.Request> {
 
     private final IndexerFactoryImpl indexerFactory;
 
-    private final Set<String> set;
+    private final RequestQueue<Request> queue;
+
 
     public PostCounterReconciler(ExtensionClient client, IndexerFactoryImpl indexerFactory) {
         this.client = client;
         this.indexerFactory = indexerFactory;
-        this.set = new CopyOnWriteArraySet<>();
+        this.queue = new DefaultQueue<>(Instant::now);
     }
 
     @Override
     public Result reconcile(Request request) {
         String name = request.name();
-        client.fetch(Counter.class, name).ifPresent(counter -> {
-            set.add(getPostName(name));
-        });
+        if (isPostCounter(name)) {
+            client.fetch(Counter.class, getCounterName(name)).ifPresent(counter -> {
+                updateIndexByPost(counter, getPostName(name));
+            });
+        }
         return Result.doNotRetry();
     }
 
-
-    @Scheduled(cron = "0/3 * * * * ?")
-    public void handleSetRequest() {
-        Iterator<String> iterator = set.iterator();
-        while (iterator.hasNext()) {
-            String name = iterator.next();
-            updateCounter(name);
-            set.remove(name);
-        }
-    }
-
-    private void updateCounter(String postName) {
-
+    private void updateIndexByPost(Counter counter, String postName) {
         client.fetch(Post.class, postName)
             .ifPresent(post -> {
-                client.fetch(Counter.class,
-                        MeterUtils.nameOf(Post.class, post.getMetadata().getName()))
-                    .ifPresent(queryCounter -> {
-                        post.getMetadata().getAnnotations()
-                            .put(Post.COUNTER_VISIT_ANNO, queryCounter.getVisit().toString());
-                        post.getMetadata().getAnnotations()
-                            .put(Post.COUNTER_COMMENT_ANNO,
-                                queryCounter.getTotalComment().toString());
-                        updateIndexByPost(post);
-                    });
+                post.getMetadata().getAnnotations()
+                    .put(Post.COUNTER_ANNO, JsonUtils.objectToJson(counter));
+                GroupVersionKind gvk = GroupVersionKind.fromExtension(Post.class);
+                Indexer indexer = indexerFactory.getIndexer(gvk);
+                indexer.updateRecord(post);
             });
-    }
-
-    public void updateIndexByPost(Post post) {
-        GroupVersionKind gvk = GroupVersionKind.fromExtension(Post.class);
-        Indexer indexer = indexerFactory.getIndexer(gvk);
-        indexer.updateRecord(post);
     }
 
     @Override
     public Controller setupWith(ControllerBuilder builder) {
         return builder
             .extension(new Counter())
-            .syncAllOnStart(false).build();
-    }
-
-    @EventListener(ApplicationStartedEvent.class)
-    public void preBuildCounterIndexes() {
-        client.listAll(Counter.class, new ListOptions(), Sort.unsorted()).forEach(counter -> {
-            client.fetch(Post.class, getPostName(counter.getMetadata().getName()))
-                .ifPresent(post -> {
-                    post.getMetadata().getAnnotations()
-                        .put(Post.COUNTER_VISIT_ANNO, counter.getVisit().toString());
-                    post.getMetadata().getAnnotations()
-                        .put(Post.COUNTER_COMMENT_ANNO, counter.getTotalComment().toString());
-                    updateIndexByPost(post);
-                });
-        });
+            .syncAllOnStart(true)
+            .queue(queue)
+            .build();
     }
 
     @EventListener(PostChangeEvent.class)
     public void onPostChanged(PostChangeEvent event) {
-        set.add(event.getName());
+        queue.addImmediately(new Request(event.getName()));
     }
 
-    public String getPostName(String counterName) {
-        return counterName.split("/")[1];
+    String getPostName(String name) {
+        if (name.contains("/")) {
+            return name.split("/")[1];
+        }
+        return name;
+    }
+
+    String getCounterName(String name) {
+        if (name.contains("/")) {
+            return name;
+        }
+        return MeterUtils.nameOf(Post.class, name);
+    }
+
+    boolean isPostCounter(String counterName) {
+        if (counterName.contains("/")) {
+            return MeterUtils.nameOf(Post.class, getPostName(counterName)).equals(counterName);
+        }
+        return true;
     }
 }

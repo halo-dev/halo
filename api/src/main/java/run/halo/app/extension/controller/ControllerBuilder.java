@@ -35,6 +35,7 @@ public class ControllerBuilder {
     private boolean syncAllOnStart = true;
 
     private int workerCount = 1;
+    private RequestQueue<Request> queue;
 
     public ControllerBuilder(Reconciler<Request> reconciler, ExtensionClient client) {
         Assert.notNull(reconciler, "Reconciler must not be null");
@@ -89,6 +90,11 @@ public class ControllerBuilder {
         return this;
     }
 
+    public ControllerBuilder queue(RequestQueue<Request> queue) {
+        this.queue = queue;
+        return this;
+    }
+
     public Controller build() {
         if (nowSupplier == null) {
             nowSupplier = Instant::now;
@@ -104,7 +110,9 @@ public class ControllerBuilder {
         Assert.notNull(extension, "Extension must not be null");
         Assert.notNull(reconciler, "Reconciler must not be null");
 
-        var queue = new DefaultQueue<Request>(nowSupplier, minDelay);
+        if (queue == null) {
+            queue = new DefaultQueue<>(nowSupplier, minDelay);
+        }
         var extensionMatchers = WatcherExtensionMatchers.builder(client,
                 extension.groupVersionKind())
             .onAddMatcher(onAddMatcher)

@@ -184,17 +184,34 @@ public class SchemeInitializer implements ApplicationListener<ApplicationContext
                 })));
 
             indexSpecs.add(new IndexSpec()
-                .setName(Post.COUNTER_VISIT_ANNO)
+                .setName("counter.visit")
                 .setIndexFunc(
                     simpleAttribute(Post.class,
-                        post -> post.getMetadata().getAnnotations().get(Post.COUNTER_VISIT_ANNO))));
+                        post -> {
+                            String counterJson =
+                                post.getMetadata().getAnnotations().get(Post.COUNTER_ANNO);
+                            if (counterJson != null) {
+                                return JsonUtils.jsonToObject(counterJson, Counter.class)
+                                    .getVisit().toString();
+                            }
+                            return "0";
+                        }
+                    )));
 
             indexSpecs.add(new IndexSpec()
-                .setName(Post.COUNTER_COMMENT_ANNO)
+                .setName("counter.comment")
                 .setIndexFunc(
                     simpleAttribute(Post.class,
-                        post -> post.getMetadata().getAnnotations()
-                            .get(Post.COUNTER_COMMENT_ANNO))));
+                        post -> {
+                            String counterJson =
+                                post.getMetadata().getAnnotations().get(Post.COUNTER_ANNO);
+                            if (counterJson != null) {
+                                return JsonUtils.jsonToObject(counterJson, Counter.class)
+                                    .getTotalComment().toString();
+                            }
+                            return "0";
+                        }
+                    )));
         });
         schemeManager.register(Category.class, indexSpecs -> {
             indexSpecs.add(new IndexSpec()
