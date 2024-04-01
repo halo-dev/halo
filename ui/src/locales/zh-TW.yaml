@@ -90,7 +90,7 @@ core:
     operations:
       logout:
         tooltip: 登出
-        title: 確定要登出嗎？
+        title: 登出
       profile:
         tooltip: 個人中心
       visit_homepage:
@@ -153,12 +153,12 @@ core:
               title: 新建用戶
             refresh_search_engine:
               title: 刷新搜尋引擎
-              dialog_title: 確定要刷新搜尋引擎索引嗎？
+              dialog_title: 刷新搜尋引擎索引
               dialog_content: 此操作會對所有已發佈的文章重新創建本地搜尋引擎的索引。
               success_message: 刷新成功
             evict_page_cache:
               title: 重新整理頁面快取
-              dialog_title: 確定要重新整理頁面快取嗎？
+              dialog_title: 整理頁面快取
               dialog_content: 這個操作會清空所有頁面的快取。
               success_message: 刷新成功
         user_stats:
@@ -178,10 +178,10 @@ core:
       message: 你可以嘗試刷新或者新建文章
     operations:
       delete:
-        title: 確定要刪除該文章嗎？
+        title: 刪除文章
         description: 該操作會將文章放入回收站，後續可以從回收站恢復。
       delete_in_batch:
-        title: 確定要刪除選中的文章嗎？
+        title: 刪除所選文章
         description: 該操作會將文章放入回收站，後續可以從回收站恢復。
     filters:
       status:
@@ -257,16 +257,16 @@ core:
       message: 你可以嘗試刷新或者返回文章管理
     operations:
       delete:
-        title: 確定要永久刪除該文章嗎？
+        title: 刪除文章
         description: 刪除之後將無法恢復。
       delete_in_batch:
-        title: 確定要永久刪除選中的文章嗎？
+        title: 刪除所選文章
         description: 刪除之後將無法恢復。
       recovery:
-        title: 確定要恢復該文章嗎？
+        title: 恢復文章
         description: 該操作會將文章恢復到被刪除之前的狀態。
       recovery_in_batch:
-        title: 確定要恢復選中的文章嗎？
+        title: 恢復所選文章
         description: 該操作會將文章恢復到被刪除之前的狀態。
   post_editor:
     title: 文章編輯
@@ -280,7 +280,7 @@ core:
       message: 你可以嘗試刷新或者新建標籤
     operations:
       delete:
-        title: 確定要刪除該標籤嗎？
+        title: 刪除標籤
         description: 刪除此標籤之後，對應文章的關聯將被解除。該操作不可恢復。
     editing_modal:
       titles:
@@ -311,7 +311,7 @@ core:
       message: 你可以嘗試刷新或者新建分類
     operations:
       delete:
-        title: 確定要刪除該分類嗎？
+        title: 刪除分類
         description: 刪除此分類之後，對應文章的關聯將被解除。該操作不可恢復。
       add_sub_category:
         button: 新增子分類
@@ -348,10 +348,10 @@ core:
       message: 你可以嘗試刷新或者新建頁面
     operations:
       delete:
-        title: 確定要刪除該自定義頁面嗎？
+        title: 刪除頁面
         description: 該操作會將自定義頁面放入回收站，後續可以從回收站恢復。
       delete_in_batch:
-        title: 確定要刪除選中的自定義頁面嗎？
+        title: 刪除所選頁面
         description: 該操作會將自定義頁面放入回收站，後續可以從回收站恢復。
     filters:
       status:
@@ -413,16 +413,16 @@ core:
       message: 你可以嘗試刷新或者返回自定義頁面管理
     operations:
       delete:
-        title: 確認要永久刪除該自定義頁面嗎？
+        title: 刪除頁面
         description: 刪除之後將無法恢復。
       delete_in_batch:
-        title: 確定要確認永久刪除選中的自定義頁面嗎？
+        title: 刪除所選頁面
         description: 刪除之後將無法恢復。
       recovery:
-        title: 確認要恢復該自定義頁面嗎？
+        title: 恢復頁面
         description: 該操作會將自定義頁面恢復到被刪除之前的狀態。
       recovery_in_batch:
-        title: 確認要恢復選中的自定義頁面嗎？
+        title: 恢復所選頁面
         description: 該操作會將自定義頁面恢復到被刪除之前的狀態。
   page_editor:
     title: 頁面編輯
@@ -438,10 +438,10 @@ core:
       new: 創建新回覆
     operations:
       delete_comment:
-        title: 確認要刪除該留言嗎？
+        title: 刪除留言
         description: 將同時刪除所有留言下的回覆，該操作不可恢復。
       delete_comment_in_batch:
-        title: 確定要刪除所選的留言嗎？
+        title: 刪除所選留言
         description: 將同時刪除所有留言下的回覆，該操作不可恢復。
       approve_comment_in_batch:
         button: 審核通過
@@ -450,7 +450,7 @@ core:
         button: 審核通過所有回覆
         title: 確定要審核通過該留言的所有回覆嗎？
       delete_reply:
-        title: 確認要刪除該回覆嗎？
+        title: 刪除回覆
       approve_reply:
         button: 審核通過
       reply:
@@ -502,9 +502,9 @@ core:
         upload: 上傳附件
     operations:
       delete:
-        title: 確定要刪除該附件嗎？
+        title: 刪除附件
       delete_in_batch:
-        title: 確定要刪除所選的附件嗎？
+        title: 刪除所選附件
       deselect_items:
         button: 取消選擇
       move:
@@ -561,12 +561,12 @@ core:
           button: 重命名
         delete:
           button: 刪除並將附件移動至未分組
-          title: 確定要刪除該分組嗎？
+          title: 刪除附件分組
           description: 將刪除分組，並將分組下的附件移動至未分組，該操作不可恢復。
           toast_success: 刪除成功，{total} 個附件已移動至未分組
         delete_with_attachments:
           button: 刪除並同時刪除附件
-          title: 確定要刪除該分組嗎？
+          title: 刪除附件分組
           description: 將刪除分組以及分組下的所有附件，該操作不可恢復。
           toast_success: 刪除成功，{total} 個附件已被同時刪除
     policies_modal:
@@ -576,7 +576,7 @@ core:
         message: 當前沒有可用的存儲策略，你可以嘗試刷新或者新建策略
       operations:
         delete:
-          title: 確定要刪除該策略嗎？
+          title: 刪除附件策略
           description: 當前策略下沒有已上傳的附件。
         can_not_delete:
           title: 刪除失敗
@@ -623,22 +623,22 @@ core:
         switch: 切換主題
     operations:
       active:
-        title: 是否確認啟用當前主題
+        title: 啟用主題
         toast_success: 啟用成功
       reset:
-        title: 確定要重置主題的所有配置嗎？
+        title: 重置主題配置
         description: 該操作會刪除已保存的配置，重置為預設配置。
         toast_success: 重置配置成功
       reload:
         button: 重載主題配置
-        title: 確定要重載主題的所有配置嗎？
+        title: 重載主題配置
         description: 該操作僅會重載主題配置和設置表單定義，不會刪除已保存的配置。
         toast_success: 重載配置成功
       uninstall:
-        title: 確定要卸載該主題嗎？
+        title: 卸載主題
       uninstall_and_delete_config:
         button: 卸載並刪除配置
-        title: 確定要卸載該主題以及對應的配置嗎？
+        title: 卸載主題以及對應的配置
       remote_download:
         title: 偵測到遠端下載地址，是否需要下載？
         description: 請仔細鑑別此地址是否可信：{url}
@@ -691,10 +691,10 @@ core:
         button: 設置為主選單
         toast_success: 設置成功
       delete_menu:
-        title: 確定要刪除該選單嗎？
+        title: 刪除選單
         description: 將同時刪除該選單下的所有選單項，該操作不可恢復。
       delete_menu_item:
-        title: 確定要刪除該選單項嗎？
+        title: 刪除選單項
         description: 將同時刪除所有子選單項，刪除後將無法恢復。
       add_sub_menu_item:
         button: 新增子選單項
@@ -751,25 +751,25 @@ core:
         install: 安裝插件
     operations:
       reset:
-        title: 確定要重置插件的所有配置嗎？
+        title: 重置插件配置
         description: 該操作會刪除已保存的配置，重置為默認配置。
         toast_success: 重置配置成功
       uninstall:
-        title: 確定要卸載該插件嗎？
+        title: 卸載插件
       uninstall_in_batch:
-        title: 確定要卸載所選插件嗎？
+        title: 卸載所選插件
       uninstall_and_delete_config:
         button: 卸載並刪除配置
-        title: 確定要卸載該插件以及對應的配置嗎？
+        title: 卸載插件以及對應的配置
       uninstall_and_delete_config_in_batch:
         button: 卸載並刪除配置
-        title: 確定要卸載所選插件以及對應的配置嗎？
+        title: 卸載所選插件以及對應的配置
       uninstall_when_enabled:
         confirm_text: 停止運行並卸載
         description: 當前插件還在啟用狀態，將在停止運行後卸載，該操作不可恢復。
       change_status_in_batch:
-        activate_title: 確定要啟用所選插件嗎？
-        inactivate_title: 確定要停用所選插件嗎？
+        activate_title: 啟用所選插件
+        inactivate_title: 停用所選插件
       remote_download:
         title: 偵測到遠端下載地址，是否需要下載？
         description: 請仔細鑑別此地址是否可信：{url}
@@ -830,9 +830,9 @@ core:
       message: 當前沒有符合篩選條件的用戶，你可以嘗試刷新或者創建新用戶
     operations:
       delete:
-        title: 確定要刪除該用戶嗎？
+        title: 刪除用戶
       delete_in_batch:
-        title: 確定要刪除選中的用戶嗎？
+        title: 刪除所選用戶
       update_profile:
         title: 修改資料
       change_password:
@@ -912,7 +912,7 @@ core:
         provided_by_plugin: 由 {plugin} 提供
     operations:
       delete:
-        title: 確定要刪除該角色嗎？
+        title: 刪除角色
         description: 該角色刪除後，相關聯的用戶將被刪除角色綁定，該操作不可恢復。
       create_based_on_this_role:
         button: 基於此角色創建
@@ -951,9 +951,9 @@ core:
       setting: 設置
     operations:
       enable:
-        title: 確定要啟用該身份認證方式嗎？
+        title: 啟用認證方式
       disable:
-        title: 確定要停用該身份認證方式嗎？
+        title: 停用認證方式
       disable_privileged:
         tooltip: 系統保留的認證方式，無法禁用
     detail:
@@ -989,7 +989,7 @@ core:
           button: 綁定
         unbind:
           button: 解綁
-          title: 確定要取消綁定 {display_name} 的登入方式嗎？
+          title: 取消綁定 {display_name} 登入方式
       email_not_set:
         description: 電子郵件地址尚未設置，點擊下方按鈕進行設置
         title: 設定電子郵件信箱
@@ -1000,11 +1000,11 @@ core:
       operations:
         delete:
           title: 刪除個人令牌
-          description: 您確定要刪除此個人令牌嗎？
+          description: 刪除個人令牌
         revoke:
           button: 撤銷
           title: 撤銷個人令牌
-          description: 您確定要撤銷此個人令牌嗎？
+          description: 撤銷個人令牌
           toast_success: 撤銷成功
         copy:
           title: 請立即複製並保存，令牌僅顯示一次。
@@ -1297,6 +1297,9 @@ core:
       custom_fields:
         label: 自定義
         validation: 當前 Key 已被占用
+      buttons:
+        expand: 查看更多
+        collapse: 收起
     default_editor:
       tabs:
         toc:
@@ -1365,7 +1368,7 @@ core:
       cropper_modal:
         title: 裁剪頭像
       remove:
-        title: 確定要刪除頭像嗎？
+        title: 刪除頭像
       tooltips:
         upload: 上傳
         zoom_in: 放大
@@ -1378,14 +1381,14 @@ core:
         disallow: 內容格式不同，無法切換
     uppy:
       image_editor:
-        revert: "還原"
-        rotate: "旋轉"
-        zoom_in: "放大"
-        zoom_out: "縮小"
-        flip_horizontal: "水平翻轉"
-        aspect_ratio_square: "裁剪為正方形"
-        aspect_ratio_landscape: "裁剪為橫向 (16:9)"
-        aspect_ratio_portrait: "裁剪為縱向 (9:16)"
+        revert: 還原
+        rotate: 旋轉
+        zoom_in: 放大
+        zoom_out: 縮小
+        flip_horizontal: 水平翻轉
+        aspect_ratio_square: 裁剪為正方形
+        aspect_ratio_landscape: 裁剪為橫向 (16:9)
+        aspect_ratio_portrait: 裁剪為縱向 (9:16)
   composables:
     content_cache:
       toast_recovered: 已從緩存中恢復未保存的內容
@@ -1530,6 +1533,7 @@ core:
       reset:
         button: 重設密碼
         toast_success: 重置成功
+    title: 重設密碼
   reset_password:
     fields:
       username:
@@ -1540,6 +1544,7 @@ core:
       send:
         label: 發送驗證郵件
         toast_success: 如果你的用戶名和郵箱地址匹配，我們將會發送一封郵件到你的郵箱。
+    title: 重設密碼
   tool:
     title: 工具
     empty:

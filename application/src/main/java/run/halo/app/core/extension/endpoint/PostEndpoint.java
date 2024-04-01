@@ -193,11 +193,13 @@ public class PostEndpoint implements CustomEndpoint {
     Mono<ServerResponse> updateContent(ServerRequest request) {
         String postName = request.pathVariable("name");
         return request.bodyToMono(Content.class)
-            .flatMap(content -> client.fetch(Post.class, postName)
-                .flatMap(post -> {
-                    PostRequest postRequest = new PostRequest(post, content);
-                    return postService.updatePost(postRequest);
-                })
+            .flatMap(content -> Mono.defer(() -> client.fetch(Post.class, postName)
+                    .flatMap(post -> {
+                        PostRequest postRequest = new PostRequest(post, content);
+                        return postService.updatePost(postRequest);
+                    }))
+                .retryWhen(Retry.backoff(5, Duration.ofMillis(100))
+                    .filter(throwable -> throwable instanceof OptimisticLockingFailureException))
             )
             .flatMap(post -> ServerResponse.ok().bodyValue(post));
     }

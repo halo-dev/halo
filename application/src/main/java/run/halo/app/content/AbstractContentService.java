@@ -1,16 +1,19 @@
 package run.halo.app.content;
 
 import java.security.Principal;
+import java.time.Duration;
 import java.time.Instant;
 import java.util.UUID;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
+import org.springframework.dao.OptimisticLockingFailureException;
 import org.springframework.lang.Nullable;
 import org.springframework.security.core.context.ReactiveSecurityContextHolder;
 import org.springframework.security.core.context.SecurityContext;
 import org.springframework.util.Assert;
 import reactor.core.publisher.Mono;
+import reactor.util.retry.Retry;
 import run.halo.app.core.extension.content.Snapshot;
 import run.halo.app.extension.MetadataUtil;
 import run.halo.app.extension.ReactiveExtensionClient;
@@ -94,20 +97,23 @@ public abstract class AbstractContentService {
         Assert.notNull(contentRequest, "The contentRequest must not be null");
         Assert.notNull(baseSnapshotName, "The baseSnapshotName must not be null");
         Assert.notNull(contentRequest.headSnapshotName(), "The headSnapshotName must not be null");
-        return client.fetch(Snapshot.class, contentRequest.headSnapshotName())
-            .flatMap(headSnapshot -> client.fetch(Snapshot.class, baseSnapshotName)
-                .map(baseSnapshot -> determineRawAndContentPatch(headSnapshot, baseSnapshot,
-                    contentRequest)
+        return Mono.defer(() -> client.fetch(Snapshot.class, contentRequest.headSnapshotName())
+                .flatMap(headSnapshot -> client.fetch(Snapshot.class, baseSnapshotName)
+                    .map(baseSnapshot -> determineRawAndContentPatch(headSnapshot, baseSnapshot,
+                        contentRequest)
+                    )
                 )
+                .flatMap(headSnapshot -> getContextUsername()
+                    .map(username -> {
+                        Snapshot.addContributor(headSnapshot, username);
+                        return headSnapshot;
+                    })
+                    .defaultIfEmpty(headSnapshot)
+                )
+                .flatMap(client::update)
             )
-            .flatMap(headSnapshot -> getContextUsername()
-                .map(username -> {
-                    Snapshot.addContributor(headSnapshot, username);
-                    return headSnapshot;
-                })
-                .defaultIfEmpty(headSnapshot)
-            )
-            .flatMap(client::update)
+            .retryWhen(Retry.backoff(5, Duration.ofMillis(100))
+                .filter(throwable -> throwable instanceof OptimisticLockingFailureException))
             .flatMap(head -> restoredContent(baseSnapshotName, head));
     }
 

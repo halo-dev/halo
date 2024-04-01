@@ -1,11 +1,14 @@
 <script lang="ts" setup>
 import {
-  reset,
-  submitForm,
   type FormKitNode,
   type FormKitSchemaCondition,
   type FormKitSchemaNode,
+  reset,
+  submitForm,
 } from "@formkit/core";
+
+import { IconArrowRight } from "@halo-dev/components";
+
 import { computed, nextTick, onMounted, ref, watch } from "vue";
 import { apiClient } from "@/utils/api-client";
 import type { AnnotationSetting } from "@halo-dev/api-client";
@@ -196,6 +199,12 @@ defineExpose({
   annotations,
   customAnnotations,
 });
+
+const showCustomForm = ref(false);
+
+function onCustomFormToggle(e: Event) {
+  showCustomForm.value = (e.target as HTMLDetailsElement).open;
+}
 </script>
 
 <template>
@@ -219,34 +228,73 @@ defineExpose({
         />
       </template>
     </FormKit>
-    <FormKit
-      v-if="annotations"
-      :id="customFormId"
-      type="form"
-      :preserve="true"
-      :form-class="`${avaliableAnnotationSettings.length ? 'py-4' : ''}`"
-      @submit-invalid="onCustomFormSubmitCheck"
-      @submit="customFormInvalid = false"
+
+    <details
+      :open="showCustomForm"
+      class="flex cursor-pointer space-y-4 py-4 transition-all first:pt-0"
+      @toggle="onCustomFormToggle"
     >
+      <summary class="group flex items-center justify-between">
+        <div class="block text-sm font-medium text-gray-700">
+          {{
+            $t(
+              showCustomForm
+                ? "core.components.annotations_form.buttons.collapse"
+                : "core.components.annotations_form.buttons.expand"
+            )
+          }}
+        </div>
+        <div
+          class="-mr-1 inline-flex items-center justify-center rounded-full p-1 group-hover:bg-gray-100"
+          :class="{ 'bg-gray-100': showCustomForm }"
+        >
+          <IconArrowRight
+            :class="{ 'rotate-90 !text-gray-900': showCustomForm }"
+            class="text-gray-600 transition-all"
+          />
+        </div>
+      </summary>
+
       <FormKit
-        v-model="customAnnotationsState"
-        type="repeater"
-        :label="$t('core.components.annotations_form.custom_fields.label')"
+        v-if="annotations"
+        :id="customFormId"
+        type="form"
+        :preserve="true"
+        :form-class="`${avaliableAnnotationSettings.length ? 'py-4' : ''}`"
+        @submit-invalid="onCustomFormSubmitCheck"
+        @submit="customFormInvalid = false"
       >
         <FormKit
-          type="text"
-          label="Key"
-          name="key"
-          validation="required:trim|keyValidationRule"
-          :validation-rules="{ keyValidationRule }"
-          :validation-messages="{
-            keyValidationRule: $t(
-              'core.components.annotations_form.custom_fields.validation'
-            ),
-          }"
-        ></FormKit>
-        <FormKit type="text" label="Value" name="value" value=""></FormKit>
+          v-model="customAnnotationsState"
+          type="repeater"
+          :label="$t('core.components.annotations_form.custom_fields.label')"
+        >
+          <FormKit
+            type="text"
+            label="Key"
+            name="key"
+            validation="required:trim|keyValidationRule"
+            :validation-rules="{ keyValidationRule }"
+            :validation-messages="{
+              keyValidationRule: $t(
+                'core.components.annotations_form.custom_fields.validation'
+              ),
+            }"
+          ></FormKit>
+          <FormKit type="text" label="Value" name="value" value=""></FormKit>
+        </FormKit>
       </FormKit>
-    </FormKit>
+    </details>
   </div>
 </template>
+
+<style scoped>
+details > summary {
+  list-style: none;
+}
+
+/** Hide the default marker **/
+details > summary::-webkit-details-marker {
+  display: none;
+}
+</style>

@@ -90,7 +90,7 @@ core:
     operations:
       logout:
         tooltip: 退出登录
-        title: 确定要退出登录吗？
+        title: 退出登录
       profile:
         tooltip: 个人中心
       visit_homepage:
@@ -153,12 +153,12 @@ core:
               title: 新建用户
             refresh_search_engine:
               title: 刷新搜索引擎
-              dialog_title: 确定要刷新搜索引擎索引吗？
+              dialog_title: 刷新搜索引擎索引
               dialog_content: 此操作会对所有已发布的文章重新创建本地搜索引擎的索引。
               success_message: 刷新成功
             evict_page_cache:
               title: 刷新页面缓存
-              dialog_title: 确定要刷新页面缓存吗？
+              dialog_title: 刷新页面缓存
               dialog_content: 此操作会清空所有页面的缓存。
               success_message: 刷新成功
         user_stats:
@@ -178,10 +178,10 @@ core:
       message: 你可以尝试刷新或者新建文章
     operations:
       delete:
-        title: 确定要删除该文章吗？
+        title: 删除文章
         description: 该操作会将文章放入回收站，后续可以从回收站恢复。
       delete_in_batch:
-        title: 确定要删除选中的文章吗？
+        title: 删除所选文章
         description: 该操作会将文章放入回收站，后续可以从回收站恢复。
     filters:
       status:
@@ -257,16 +257,16 @@ core:
       message: 你可以尝试刷新或者返回文章管理
     operations:
       delete:
-        title: 确定要永久删除该文章吗？
+        title: 删除文章
         description: 删除之后将无法恢复。
       delete_in_batch:
-        title: 确定要永久删除选中的文章吗？
+        title: 删除所选文章
         description: 删除之后将无法恢复。
       recovery:
-        title: 确定要恢复该文章吗？
+        title: 恢复文章
         description: 该操作会将文章恢复到被删除之前的状态。
       recovery_in_batch:
-        title: 确定要恢复选中的文章吗？
+        title: 恢复所选文章
         description: 该操作会将文章恢复到被删除之前的状态。
   uc_post:
     title: 我的文章
@@ -292,7 +292,7 @@ core:
       message: 你可以尝试刷新或者新建标签
     operations:
       delete:
-        title: 确定要删除该标签吗？
+        title: 删除标签
         description: 删除此标签之后，对应文章的关联将被解除。该操作不可恢复。
     editing_modal:
       titles:
@@ -323,7 +323,7 @@ core:
       message: 你可以尝试刷新或者新建分类
     operations:
       delete:
-        title: 确定要删除该分类吗？
+        title: 删除分类
         description: 删除此分类之后，对应文章的关联将被解除。该操作不可恢复。
       add_sub_category:
         button: 新增子分类
@@ -360,10 +360,10 @@ core:
       message: 你可以尝试刷新或者新建页面
     operations:
       delete:
-        title: 确定要删除该自定义页面吗？
+        title: 删除页面
         description: 该操作会将自定义页面放入回收站，后续可以从回收站恢复。
       delete_in_batch:
-        title: 确定要删除选中的自定义页面吗？
+        title: 删除所选页面
         description: 该操作会将自定义页面放入回收站，后续可以从回收站恢复。
     filters:
       status:
@@ -425,16 +425,16 @@ core:
       message: 你可以尝试刷新或者返回自定义页面管理
     operations:
       delete:
-        title: 确认要永久删除该自定义页面吗？
+        title: 删除页面
         description: 删除之后将无法恢复。
       delete_in_batch:
-        title: 确定要确认永久删除选中的自定义页面吗？
+        title: 删除所选页面
         description: 删除之后将无法恢复。
       recovery:
-        title: 确认要恢复该自定义页面吗？
+        title: 恢复页面
         description: 该操作会将自定义页面恢复到被删除之前的状态。
       recovery_in_batch:
-        title: 确认要恢复选中的自定义页面吗？
+        title: 恢复所选页面
         description: 该操作会将自定义页面恢复到被删除之前的状态。
   page_editor:
     title: 页面编辑
@@ -450,10 +450,10 @@ core:
       new: 创建新回复
     operations:
       delete_comment:
-        title: 确认要删除该评论吗？
+        title: 删除评论
         description: 将同时删除所有评论下的回复，该操作不可恢复。
       delete_comment_in_batch:
-        title: 确定要删除所选的评论吗？
+        title: 删除所选评论
         description: 将同时删除所有评论下的回复，该操作不可恢复。
       approve_comment_in_batch:
         button: 审核通过
@@ -462,7 +462,7 @@ core:
         button: 审核通过所有回复
         title: 确定要审核通过该评论的所有回复吗？
       delete_reply:
-        title: 确认要删除该回复吗？
+        title: 删除回复
       approve_reply:
         button: 审核通过
       reply:
@@ -514,9 +514,9 @@ core:
         upload: 上传附件
     operations:
       delete:
-        title: 确定要删除该附件吗？
+        title: 删除附件
       delete_in_batch:
-        title: 确定要删除所选的附件吗？
+        title: 删除所选附件
       deselect_items:
         button: 取消选择
       move:
@@ -573,12 +573,12 @@ core:
           button: 重命名
         delete:
           button: 删除并将附件移动至未分组
-          title: 确定要删除该分组吗？
+          title: 删除附件分组
           description: 将删除分组，并将分组下的附件移动至未分组，该操作不可恢复。
           toast_success: 删除成功，{total} 个附件已移动至未分组
         delete_with_attachments:
           button: 删除并同时删除附件
-          title: 确定要删除该分组吗？
+          title: 删除附件分组
           description: 将删除分组以及分组下的所有附件，该操作不可恢复。
           toast_success: 删除成功，{total} 个附件已被同时删除
     policies_modal:
@@ -588,7 +588,7 @@ core:
         message: 当前没有可用的存储策略，你可以尝试刷新或者新建策略
       operations:
         delete:
-          title: 确定要删除该策略吗？
+          title: 删除附件策略
           description: 当前策略下没有已上传的附件。
         can_not_delete:
           title: 删除失败
@@ -635,22 +635,22 @@ core:
         switch: 切换主题
     operations:
       active:
-        title: 是否确认启用当前主题
+        title: 启用主题
         toast_success: 启用成功
       reset:
-        title: 确定要重置主题的所有配置吗？
+        title: 重置主题配置
         description: 该操作会删除已保存的配置，重置为默认配置。
         toast_success: 重置配置成功
       reload:
         button: 重载主题配置
-        title: 确定要重载主题的所有配置吗？
+        title: 重载主题配置
         description: 该操作仅会重载主题配置和设置表单定义，不会删除已保存的配置。
         toast_success: 重载配置成功
       uninstall:
-        title: 确定要卸载该主题吗？
+        title: 卸载主题
       uninstall_and_delete_config:
         button: 卸载并删除配置
-        title: 确定要卸载该主题以及对应的配置吗？
+        title: 卸载主题以及对应的配置
       remote_download:
         title: 检测到了远程下载地址，是否需要下载？
         description: 请仔细鉴别此地址是否可信：{url}
@@ -703,10 +703,10 @@ core:
         button: 设置为主菜单
         toast_success: 设置成功
       delete_menu:
-        title: 确定要删除该菜单吗？
+        title: 删除菜单
         description: 将同时删除该菜单下的所有菜单项，该操作不可恢复。
       delete_menu_item:
-        title: 确定要删除该菜单项吗？
+        title: 删除菜单项
         description: 将同时删除所有子菜单项，删除后将无法恢复。
       add_sub_menu_item:
         button: 新增子菜单项
@@ -763,25 +763,25 @@ core:
         install: 安装插件
     operations:
       reset:
-        title: 确定要重置插件的所有配置吗？
+        title: 重置插件配置
         description: 该操作会删除已保存的配置，重置为默认配置。
         toast_success: 重置配置成功
       uninstall:
-        title: 确定要卸载该插件吗？
+        title: 卸载插件
       uninstall_in_batch:
-        title: 确定要卸载所选插件吗？
+        title: 卸载所选插件
       uninstall_and_delete_config:
         button: 卸载并删除配置
-        title: 确定要卸载该插件以及对应的配置吗？
+        title: 卸载插件以及对应的配置
       uninstall_and_delete_config_in_batch:
         button: 卸载并删除配置
-        title: 确定要卸载所选插件以及对应的配置吗？
+        title: 卸载所选插件以及对应的配置
       uninstall_when_enabled:
         confirm_text: 停止运行并卸载
         description: 当前插件还在启用状态，将在停止运行后卸载，该操作不可恢复。
       change_status_in_batch:
-        activate_title: 确定要启用所选插件吗？
-        inactivate_title: 确定要停用所选插件吗？
+        activate_title: 启用所选插件
+        inactivate_title: 停用所选插件
       remote_download:
         title: 检测到了远程下载地址，是否需要下载？
         description: 请仔细鉴别此地址是否可信：{url}
@@ -842,9 +842,9 @@ core:
       message: 当前没有符合筛选条件的用户，你可以尝试刷新或者创建新用户
     operations:
       delete:
-        title: 确定要删除该用户吗？
+        title: 删除用户
       delete_in_batch:
-        title: 确定要删除选中的用户吗？
+        title: 删除所选用户
       update_profile:
         title: 修改资料
       change_password:
@@ -924,7 +924,7 @@ core:
         provided_by_plugin: 由 {plugin} 提供
     operations:
       delete:
-        title: 确定要删除该角色吗？
+        title: 删除角色
         description: 该角色删除后，相关联的用户将被删除角色绑定，该操作不可恢复。
       create_based_on_this_role:
         button: 基于此角色创建
@@ -963,9 +963,9 @@ core:
       setting: 设置
     operations:
       enable:
-        title: 确定要启用该身份认证方式吗？
+        title: 启用认证方式
       disable:
-        title: 确定要停用该身份认证方式吗？
+        title: 停用认证方式
       disable_privileged:
         tooltip: 系统保留的认证方式，无法禁用
     detail:
@@ -1001,7 +1001,7 @@ core:
           button: 绑定
         unbind:
           button: 解绑
-          title: 确定要取消绑定 {display_name} 的登录方式吗？
+          title: 取消绑定 {display_name} 登录方式
       email_not_set:
         title: 设置电子邮箱
         description: 电子邮箱地址还未设置，点击下方按钮进行设置
@@ -1016,7 +1016,7 @@ core:
         revoke:
           button: 撤销
           title: 撤销个人令牌
-          description: 确定要撤销该个人令牌吗？
+          description: 撤销个人令牌
           toast_success: 撤销成功
         copy:
           title: 请立即复制并保存，Token 将仅显示一次。
@@ -1175,7 +1175,7 @@ core:
         button: 下载并恢复
       restore_by_backup:
         button: 恢复
-        title: 确认要从此备份进行恢复吗？
+        title: 从此备份进行恢复
     list:
       phases:
         pending: 准备中
@@ -1331,6 +1331,9 @@ core:
       custom_fields:
         label: 自定义
         validation: 当前 Key 已被占用
+      buttons:
+        expand: 查看更多
+        collapse: 收起
     default_editor:
       tabs:
         toc:
@@ -1399,7 +1402,7 @@ core:
       cropper_modal:
         title: 裁剪头像
       remove:
-        title: 确定要删除头像吗？
+        title: 删除头像
       tooltips:
         upload: 上传
         zoom_in: 放大
@@ -1412,14 +1415,14 @@ core:
         disallow: 内容格式不同，无法切换
     uppy:
       image_editor:
-        revert: "恢复"
-        rotate: "旋转"
-        zoom_in: "放大"
-        zoom_out: "缩小"
-        flip_horizontal: "水平翻转"
-        aspect_ratio_square: "裁剪为正方形"
-        aspect_ratio_landscape: "裁剪为横向 (16:9)"
-        aspect_ratio_portrait: "裁剪为纵向 (9:16)"
+        revert: 恢复
+        rotate: 旋转
+        zoom_in: 放大
+        zoom_out: 缩小
+        flip_horizontal: 水平翻转
+        aspect_ratio_square: 裁剪为正方形
+        aspect_ratio_landscape: 裁剪为横向 (16:9)
+        aspect_ratio_portrait: 裁剪为纵向 (9:16)
   composables:
     content_cache:
       toast_recovered: 已从缓存中恢复未保存的内容
