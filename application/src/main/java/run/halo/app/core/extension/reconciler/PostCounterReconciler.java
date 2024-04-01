@@ -1,5 +1,8 @@
 package run.halo.app.core.extension.reconciler;
 
+import java.util.Iterator;
+import java.util.Set;
+import java.util.concurrent.CopyOnWriteArraySet;
 import org.springframework.boot.context.event.ApplicationStartedEvent;
 import org.springframework.context.event.EventListener;
 import org.springframework.data.domain.Sort;
@@ -17,9 +20,7 @@ import run.halo.app.extension.controller.Reconciler;
 import run.halo.app.extension.index.Indexer;
 import run.halo.app.extension.index.IndexerFactoryImpl;
 import run.halo.app.metrics.MeterUtils;
-import java.util.Iterator;
-import java.util.Set;
-import java.util.concurrent.CopyOnWriteArraySet;
+
 
 @Component
 public class PostCounterReconciler implements Reconciler<Reconciler.Request> {
@@ -81,7 +82,9 @@ public class PostCounterReconciler implements Reconciler<Reconciler.Request> {
 
     @Override
     public Controller setupWith(ControllerBuilder builder) {
-        return builder.extension(new Counter()).syncAllOnStart(false).build();
+        return builder
+            .extension(new Counter())
+            .syncAllOnStart(false).build();
     }
 
     @EventListener(ApplicationStartedEvent.class)
