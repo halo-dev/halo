@@ -218,7 +218,7 @@ export const MigrationHaloRunV1alpha1BackupApiAxiosParamCreator = function (
      * @param {Array<string>} [labelSelector] Label selector for filtering.
      * @param {number} [page] The page number. Zero indicates no page.
      * @param {number} [size] Size of one page. Zero indicates no limit.
-     * @param {Array<string>} [sort] Sort property and direction of the list result. Support sorting based on attribute name path.
+     * @param {Array} [sort]
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      */
@@ -227,7 +227,7 @@ export const MigrationHaloRunV1alpha1BackupApiAxiosParamCreator = function (
       labelSelector?: Array<string>,
       page?: number,
       size?: number,
-      sort?: Array<string>,
+      sort?: Array,
       options: AxiosRequestConfig = {}
     ): Promise<RequestArgs> => {
       const localVarPath = `/apis/migration.halo.run/v1alpha1/backups`;
@@ -270,8 +270,8 @@ export const MigrationHaloRunV1alpha1BackupApiAxiosParamCreator = function (
         localVarQueryParameter["size"] = size;
       }
 
-      if (sort) {
-        localVarQueryParameter["sort"] = Array.from(sort);
+      if (sort !== undefined) {
+        localVarQueryParameter["sort"] = sort;
       }
 
       setSearchParams(localVarUrlObj, localVarQueryParameter);
@@ -442,7 +442,7 @@ export const MigrationHaloRunV1alpha1BackupApiFp = function (
      * @param {Array<string>} [labelSelector] Label selector for filtering.
      * @param {number} [page] The page number. Zero indicates no page.
      * @param {number} [size] Size of one page. Zero indicates no limit.
-     * @param {Array<string>} [sort] Sort property and direction of the list result. Support sorting based on attribute name path.
+     * @param {Array} [sort]
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      */
@@ -451,7 +451,7 @@ export const MigrationHaloRunV1alpha1BackupApiFp = function (
       labelSelector?: Array<string>,
       page?: number,
       size?: number,
-      sort?: Array<string>,
+      sort?: Array,
       options?: AxiosRequestConfig
     ): Promise<
       (axios?: AxiosInstance, basePath?: string) => AxiosPromise<BackupList>
@@ -674,11 +674,11 @@ export interface MigrationHaloRunV1alpha1BackupApiListmigrationHaloRunV1alpha1Ba
   readonly size?: number;
 
   /**
-   * Sort property and direction of the list result. Support sorting based on attribute name path.
-   * @type {Array<string>}
+   *
+   * @type {Array}
    * @memberof MigrationHaloRunV1alpha1BackupApiListmigrationHaloRunV1alpha1Backup
    */
-  readonly sort?: Array<string>;
+  readonly sort?: Array;
 }
 
 /**

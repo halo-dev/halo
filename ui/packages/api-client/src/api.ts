@@ -44,6 +44,7 @@ export * from "./api/api-security-halo-run-v1alpha1-authentication-two-factor-ap
 export * from "./api/api-security-halo-run-v1alpha1-personal-access-token-api";
 export * from "./api/auth-halo-run-v1alpha1-auth-provider-api";
 export * from "./api/auth-halo-run-v1alpha1-user-connection-api";
+export * from "./api/console-api-notification-halo-run-v1alpha1-notifier-api";
 export * from "./api/content-halo-run-v1alpha1-category-api";
 export * from "./api/content-halo-run-v1alpha1-comment-api";
 export * from "./api/content-halo-run-v1alpha1-post-api";

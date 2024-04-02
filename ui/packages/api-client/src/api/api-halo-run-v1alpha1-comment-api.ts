@@ -44,6 +44,8 @@ import { CommentRequest } from "../models";
 // @ts-ignore
 import { CommentVoList } from "../models";
 // @ts-ignore
+import { CommentWithReplyVoList } from "../models";
+// @ts-ignore
 import { Reply } from "../models";
 // @ts-ignore
 import { ReplyRequest } from "../models";
@@ -306,8 +308,10 @@ export const ApiHaloRunV1alpha1CommentApiAxiosParamCreator = function (
      * @param {string} version The comment subject version.
      * @param {string} [group] The comment subject group.
      * @param {number} [page] The page number. Zero indicates no page.
+     * @param {number} [replySize] Reply size of the comment, default is 10, only works when withReplies is true.
      * @param {number} [size] Size of one page. Zero indicates no limit.
      * @param {Array<string>} [sort] Sort property and direction of the list result. Supported fields: creationTimestamp
+     * @param {boolean} [withReplies] Whether to include replies. Default is false.
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      */
@@ -317,8 +321,10 @@ export const ApiHaloRunV1alpha1CommentApiAxiosParamCreator = function (
       version: string,
       group?: string,
       page?: number,
+      replySize?: number,
       size?: number,
       sort?: Array<string>,
+      withReplies?: boolean,
       options: AxiosRequestConfig = {}
     ): Promise<RequestArgs> => {
       // verify required parameter 'kind' is not null or undefined
@@ -367,6 +373,10 @@ export const ApiHaloRunV1alpha1CommentApiAxiosParamCreator = function (
         localVarQueryParameter["page"] = page;
       }
 
+      if (replySize !== undefined) {
+        localVarQueryParameter["replySize"] = replySize;
+      }
+
       if (size !== undefined) {
         localVarQueryParameter["size"] = size;
       }
@@ -377,6 +387,10 @@ export const ApiHaloRunV1alpha1CommentApiAxiosParamCreator = function (
 
       if (version !== undefined) {
         localVarQueryParameter["version"] = version;
+      }
+
+      if (withReplies !== undefined) {
+        localVarQueryParameter["withReplies"] = withReplies;
       }
 
       setSearchParams(localVarUrlObj, localVarQueryParameter);
@@ -515,8 +529,10 @@ export const ApiHaloRunV1alpha1CommentApiFp = function (
      * @param {string} version The comment subject version.
      * @param {string} [group] The comment subject group.
      * @param {number} [page] The page number. Zero indicates no page.
+     * @param {number} [replySize] Reply size of the comment, default is 10, only works when withReplies is true.
      * @param {number} [size] Size of one page. Zero indicates no limit.
      * @param {Array<string>} [sort] Sort property and direction of the list result. Supported fields: creationTimestamp
+     * @param {boolean} [withReplies] Whether to include replies. Default is false.
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      */
@@ -526,11 +542,16 @@ export const ApiHaloRunV1alpha1CommentApiFp = function (
       version: string,
       group?: string,
       page?: number,
+      replySize?: number,
       size?: number,
       sort?: Array<string>,
+      withReplies?: boolean,
       options?: AxiosRequestConfig
     ): Promise<
-      (axios?: AxiosInstance, basePath?: string) => AxiosPromise<CommentVoList>
+      (
+        axios?: AxiosInstance,
+        basePath?: string
+      ) => AxiosPromise<CommentWithReplyVoList>
     > {
       const localVarAxiosArgs = await localVarAxiosParamCreator.listComments1(
         kind,
@@ -538,8 +559,10 @@ export const ApiHaloRunV1alpha1CommentApiFp = function (
         version,
         group,
         page,
+        replySize,
         size,
         sort,
+        withReplies,
         options
       );
       return createRequestFunction(
@@ -637,7 +660,7 @@ export const ApiHaloRunV1alpha1CommentApiFactory = function (
     listComments1(
       requestParameters: ApiHaloRunV1alpha1CommentApiListComments1Request,
       options?: AxiosRequestConfig
-    ): AxiosPromise<CommentVoList> {
+    ): AxiosPromise<CommentWithReplyVoList> {
       return localVarFp
         .listComments1(
           requestParameters.kind,
@@ -645,8 +668,10 @@ export const ApiHaloRunV1alpha1CommentApiFactory = function (
           requestParameters.version,
           requestParameters.group,
           requestParameters.page,
+          requestParameters.replySize,
           requestParameters.size,
           requestParameters.sort,
+          requestParameters.withReplies,
           options
         )
         .then((request) => request(axios, basePath));
@@ -773,6 +798,13 @@ export interface ApiHaloRunV1alpha1CommentApiListComments1Request {
   readonly page?: number;
 
   /**
+   * Reply size of the comment, default is 10, only works when withReplies is true.
+   * @type {number}
+   * @memberof ApiHaloRunV1alpha1CommentApiListComments1
+   */
+  readonly replySize?: number;
+
+  /**
    * Size of one page. Zero indicates no limit.
    * @type {number}
    * @memberof ApiHaloRunV1alpha1CommentApiListComments1
@@ -785,6 +817,13 @@ export interface ApiHaloRunV1alpha1CommentApiListComments1Request {
    * @memberof ApiHaloRunV1alpha1CommentApiListComments1
    */
   readonly sort?: Array<string>;
+
+  /**
+   * Whether to include replies. Default is false.
+   * @type {boolean}
+   * @memberof ApiHaloRunV1alpha1CommentApiListComments1
+   */
+  readonly withReplies?: boolean;
 }
 
 /**
@@ -885,8 +924,10 @@ export class ApiHaloRunV1alpha1CommentApi extends BaseAPI {
         requestParameters.version,
         requestParameters.group,
         requestParameters.page,
+        requestParameters.replySize,
         requestParameters.size,
         requestParameters.sort,
+        requestParameters.withReplies,
         options
       )
       .then((request) => request(this.axios, this.basePath));

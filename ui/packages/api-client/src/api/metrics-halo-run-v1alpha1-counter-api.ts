@@ -218,7 +218,7 @@ export const MetricsHaloRunV1alpha1CounterApiAxiosParamCreator = function (
      * @param {Array<string>} [labelSelector] Label selector for filtering.
      * @param {number} [page] The page number. Zero indicates no page.
      * @param {number} [size] Size of one page. Zero indicates no limit.
-     * @param {Array<string>} [sort] Sort property and direction of the list result. Support sorting based on attribute name path.
+     * @param {Array} [sort]
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      */
@@ -227,7 +227,7 @@ export const MetricsHaloRunV1alpha1CounterApiAxiosParamCreator = function (
       labelSelector?: Array<string>,
       page?: number,
       size?: number,
-      sort?: Array<string>,
+      sort?: Array,
       options: AxiosRequestConfig = {}
     ): Promise<RequestArgs> => {
       const localVarPath = `/apis/metrics.halo.run/v1alpha1/counters`;
@@ -270,8 +270,8 @@ export const MetricsHaloRunV1alpha1CounterApiAxiosParamCreator = function (
         localVarQueryParameter["size"] = size;
       }
 
-      if (sort) {
-        localVarQueryParameter["sort"] = Array.from(sort);
+      if (sort !== undefined) {
+        localVarQueryParameter["sort"] = sort;
       }
 
       setSearchParams(localVarUrlObj, localVarQueryParameter);
@@ -442,7 +442,7 @@ export const MetricsHaloRunV1alpha1CounterApiFp = function (
      * @param {Array<string>} [labelSelector] Label selector for filtering.
      * @param {number} [page] The page number. Zero indicates no page.
      * @param {number} [size] Size of one page. Zero indicates no limit.
-     * @param {Array<string>} [sort] Sort property and direction of the list result. Support sorting based on attribute name path.
+     * @param {Array} [sort]
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      */
@@ -451,7 +451,7 @@ export const MetricsHaloRunV1alpha1CounterApiFp = function (
       labelSelector?: Array<string>,
       page?: number,
       size?: number,
-      sort?: Array<string>,
+      sort?: Array,
       options?: AxiosRequestConfig
     ): Promise<
       (axios?: AxiosInstance, basePath?: string) => AxiosPromise<CounterList>
@@ -674,11 +674,11 @@ export interface MetricsHaloRunV1alpha1CounterApiListmetricsHaloRunV1alpha1Count
   readonly size?: number;
 
   /**
-   * Sort property and direction of the list result. Support sorting based on attribute name path.
-   * @type {Array<string>}
+   *
+   * @type {Array}
    * @memberof MetricsHaloRunV1alpha1CounterApiListmetricsHaloRunV1alpha1Counter
    */
-  readonly sort?: Array<string>;
+  readonly sort?: Array;
 }
 
 /**

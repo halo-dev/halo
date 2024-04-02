@@ -225,7 +225,7 @@ export const NotificationHaloRunV1alpha1NotificationApiAxiosParamCreator =
        * @param {Array<string>} [labelSelector] Label selector for filtering.
        * @param {number} [page] The page number. Zero indicates no page.
        * @param {number} [size] Size of one page. Zero indicates no limit.
-       * @param {Array<string>} [sort] Sort property and direction of the list result. Support sorting based on attribute name path.
+       * @param {Array} [sort]
        * @param {*} [options] Override http request option.
        * @throws {RequiredError}
        */
@@ -234,7 +234,7 @@ export const NotificationHaloRunV1alpha1NotificationApiAxiosParamCreator =
         labelSelector?: Array<string>,
         page?: number,
         size?: number,
-        sort?: Array<string>,
+        sort?: Array,
         options: AxiosRequestConfig = {}
       ): Promise<RequestArgs> => {
         const localVarPath = `/apis/notification.halo.run/v1alpha1/notifications`;
@@ -277,8 +277,8 @@ export const NotificationHaloRunV1alpha1NotificationApiAxiosParamCreator =
           localVarQueryParameter["size"] = size;
         }
 
-        if (sort) {
-          localVarQueryParameter["sort"] = Array.from(sort);
+        if (sort !== undefined) {
+          localVarQueryParameter["sort"] = sort;
         }
 
         setSearchParams(localVarUrlObj, localVarQueryParameter);
@@ -453,7 +453,7 @@ export const NotificationHaloRunV1alpha1NotificationApiFp = function (
      * @param {Array<string>} [labelSelector] Label selector for filtering.
      * @param {number} [page] The page number. Zero indicates no page.
      * @param {number} [size] Size of one page. Zero indicates no limit.
-     * @param {Array<string>} [sort] Sort property and direction of the list result. Support sorting based on attribute name path.
+     * @param {Array} [sort]
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      */
@@ -462,7 +462,7 @@ export const NotificationHaloRunV1alpha1NotificationApiFp = function (
       labelSelector?: Array<string>,
       page?: number,
       size?: number,
-      sort?: Array<string>,
+      sort?: Array,
       options?: AxiosRequestConfig
     ): Promise<
       (
@@ -698,11 +698,11 @@ export interface NotificationHaloRunV1alpha1NotificationApiListnotificationHaloR
   readonly size?: number;
 
   /**
-   * Sort property and direction of the list result. Support sorting based on attribute name path.
-   * @type {Array<string>}
+   *
+   * @type {Array}
    * @memberof NotificationHaloRunV1alpha1NotificationApiListnotificationHaloRunV1alpha1Notification
    */
-  readonly sort?: Array<string>;
+  readonly sort?: Array;
 }
 
 /**
