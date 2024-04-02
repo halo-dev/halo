@@ -43,7 +43,7 @@ public class Post extends AbstractExtension {
         "content.halo.run/last-released-snapshot";
     public static final String LAST_ASSOCIATED_TAGS_ANNO = "content.halo.run/last-associated-tags";
 
-    public static final String COUNTER_ANNO = "content.halo.run/counter";
+    public static final String STATS_ANNO = "content.halo.run/stats";
 
     public static final String DELETED_LABEL = "content.halo.run/deleted";
     public static final String PUBLISHED_LABEL = "content.halo.run/published";

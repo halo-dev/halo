@@ -422,11 +422,11 @@ watch(selectedPostNames, (newValue) => {
                   },
                   {
                     label: t('core.post.filters.sort.items.visit_desc'),
-                    value: 'counter.visit,desc',
+                    value: 'stats.visit,desc',
                   },
                   {
                     label: t('core.post.filters.sort.items.comment_desc'),
-                    value: 'counter.comment,desc',
+                    value: 'stats.totalComment,desc',
                   },
                 ]"
               />

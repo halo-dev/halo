@@ -9,11 +9,13 @@ import static run.halo.app.extension.index.IndexAttributeFactory.simpleAttribute
 import com.fasterxml.jackson.core.type.TypeReference;
 import java.util.Set;
 import org.apache.commons.lang3.BooleanUtils;
+import org.apache.commons.lang3.ObjectUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.boot.context.event.ApplicationContextInitializedEvent;
 import org.springframework.context.ApplicationListener;
 import org.springframework.lang.NonNull;
 import org.springframework.stereotype.Component;
+import run.halo.app.content.Stats;
 import run.halo.app.core.extension.AnnotationSetting;
 import run.halo.app.core.extension.AuthProvider;
 import run.halo.app.core.extension.Counter;
@@ -184,34 +186,28 @@ public class SchemeInitializer implements ApplicationListener<ApplicationContext
                 })));
 
             indexSpecs.add(new IndexSpec()
-                .setName("counter.visit")
-                .setIndexFunc(
-                    simpleAttribute(Post.class,
-                        post -> {
-                            String counterJson =
-                                post.getMetadata().getAnnotations().get(Post.COUNTER_ANNO);
-                            if (counterJson != null) {
-                                return JsonUtils.jsonToObject(counterJson, Counter.class)
-                                    .getVisit().toString();
-                            }
-                            return "0";
-                        }
-                    )));
+                .setName("stats.visit")
+                .setIndexFunc(simpleAttribute(Post.class, post -> {
+                    var annotations = MetadataUtil.nullSafeAnnotations(post);
+                    var statsStr = annotations.get(Post.STATS_ANNO);
+                    if (StringUtils.isBlank(statsStr)) {
+                        return "0";
+                    }
+                    var stats = JsonUtils.jsonToObject(statsStr, Stats.class);
+                    return ObjectUtils.defaultIfNull(stats.getVisit(), 0).toString();
+                })));
 
             indexSpecs.add(new IndexSpec()
-                .setName("counter.comment")
-                .setIndexFunc(
-                    simpleAttribute(Post.class,
-                        post -> {
-                            String counterJson =
-                                post.getMetadata().getAnnotations().get(Post.COUNTER_ANNO);
-                            if (counterJson != null) {
-                                return JsonUtils.jsonToObject(counterJson, Counter.class)
-                                    .getTotalComment().toString();
-                            }
-                            return "0";
-                        }
-                    )));
+                .setName("stats.totalComment")
+                .setIndexFunc(simpleAttribute(Post.class, post -> {
+                    var annotations = MetadataUtil.nullSafeAnnotations(post);
+                    var statsStr = annotations.get(Post.STATS_ANNO);
+                    if (StringUtils.isBlank(statsStr)) {
+                        return "0";
+                    }
+                    var stats = JsonUtils.jsonToObject(statsStr, Stats.class);
+                    return ObjectUtils.defaultIfNull(stats.getTotalComment(), 0).toString();
+                })));
         });
         schemeManager.register(Category.class, indexSpecs -> {
             indexSpecs.add(new IndexSpec()

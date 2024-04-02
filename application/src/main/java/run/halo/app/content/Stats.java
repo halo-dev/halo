@@ -1,7 +1,7 @@
 package run.halo.app.content;
 
 import lombok.Builder;
-import lombok.Value;
+import lombok.Data;
 
 /**
  * Stats value object.
@@ -9,17 +9,27 @@ import lombok.Value;
  * @author guqing
  * @since 2.0.0
  */
-@Value
-@Builder
+@Data
 public class Stats {
 
-    Integer visit;
+    private Integer visit;
 
-    Integer upvote;
+    private Integer upvote;
 
-    Integer totalComment;
+    private Integer totalComment;
 
-    Integer approvedComment;
+    private Integer approvedComment;
+
+    public Stats() {
+    }
+
+    @Builder
+    public Stats(Integer visit, Integer upvote, Integer totalComment, Integer approvedComment) {
+        this.visit = visit;
+        this.upvote = upvote;
+        this.totalComment = totalComment;
+        this.approvedComment = approvedComment;
+    }
 
     public static Stats empty() {
         return Stats.builder()

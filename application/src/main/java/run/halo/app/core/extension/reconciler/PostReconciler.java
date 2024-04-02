@@ -33,7 +33,6 @@ import run.halo.app.core.extension.content.Post.PostPhase;
 import run.halo.app.core.extension.content.Post.VisibleEnum;
 import run.halo.app.core.extension.content.Snapshot;
 import run.halo.app.core.extension.notification.Subscription;
-import run.halo.app.event.post.PostChangeEvent;
 import run.halo.app.event.post.PostDeletedEvent;
 import run.halo.app.event.post.PostPublishedEvent;
 import run.halo.app.event.post.PostUnpublishedEvent;
@@ -84,7 +83,6 @@ public class PostReconciler implements Reconciler<Reconciler.Request> {
     @Override
     public Result reconcile(Request request) {
         var events = new HashSet<ApplicationEvent>();
-        events.add(new PostChangeEvent(this, request.name()));
         client.fetch(Post.class, request.name())
             .ifPresent(post -> {
                 if (ExtensionOperator.isDeleted(post)) {
