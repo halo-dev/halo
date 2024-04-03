@@ -18,6 +18,7 @@ import org.springframework.security.core.context.ReactiveSecurityContextHolder;
 import org.springframework.security.core.context.SecurityContext;
 import org.springframework.stereotype.Component;
 import org.springframework.util.Assert;
+import org.springframework.util.DigestUtils;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import run.halo.app.content.comment.OwnerInfo;
@@ -169,6 +170,11 @@ public class CommentPublicQueryServiceImpl implements CommentPublicQueryService 
         specOwner.setName("");
         if (specOwner.getAnnotations() != null) {
             specOwner.getAnnotations().remove("Email");
+            if (Comment.CommentOwner.KIND_EMAIL.equals(owner.getKind())) {
+                specOwner.getAnnotations()
+                    .put(Comment.CommentOwner.AVATAR_ANNO, "https://gravatar.com/avatar/"
+                        + DigestUtils.md5DigestAsHex(owner.getEmail().getBytes()));
+            }
         }
         return Mono.just(commentVo);
     }
@@ -212,6 +218,11 @@ public class CommentPublicQueryServiceImpl implements CommentPublicQueryService 
         specOwner.setName("");
         if (specOwner.getAnnotations() != null) {
             specOwner.getAnnotations().remove("Email");
+            if (Comment.CommentOwner.KIND_EMAIL.equals(owner.getKind())) {
+                specOwner.getAnnotations()
+                    .put(Comment.CommentOwner.AVATAR_ANNO, "https://gravatar.com/avatar/"
+                        + DigestUtils.md5DigestAsHex(owner.getEmail().getBytes()));
+            }
         }
         return Mono.just(replyVo);
     }
