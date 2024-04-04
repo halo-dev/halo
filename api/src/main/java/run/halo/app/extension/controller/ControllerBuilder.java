@@ -105,7 +105,6 @@ public class ControllerBuilder {
         Assert.notNull(reconciler, "Reconciler must not be null");
 
         var queue = new DefaultQueue<Request>(nowSupplier, minDelay);
-
         var extensionMatchers = WatcherExtensionMatchers.builder(client,
                 extension.groupVersionKind())
             .onAddMatcher(onAddMatcher)
