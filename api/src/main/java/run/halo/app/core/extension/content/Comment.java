@@ -100,6 +100,7 @@ public class Comment extends AbstractExtension {
         public static final String KIND_EMAIL = "Email";
         public static final String AVATAR_ANNO = "avatar";
         public static final String WEBSITE_ANNO = "website";
+        public static final String EMAIL_HASH_ANNO = "emailHash";
 
         @Schema(requiredMode = REQUIRED, minLength = 1)
         private String kind;

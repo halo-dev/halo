@@ -8,6 +8,7 @@ import static run.halo.app.extension.index.query.QueryFactory.isNull;
 import static run.halo.app.extension.index.query.QueryFactory.or;
 
 import java.security.Principal;
+import java.util.Map;
 import java.util.Optional;
 import java.util.function.Function;
 import lombok.RequiredArgsConstructor;
@@ -170,11 +171,12 @@ public class CommentPublicQueryServiceImpl implements CommentPublicQueryService 
         specOwner.setName("");
         if (specOwner.getAnnotations() != null) {
             specOwner.getAnnotations().remove("Email");
-            if (Comment.CommentOwner.KIND_EMAIL.equals(owner.getKind())) {
-                specOwner.getAnnotations()
-                    .put(Comment.CommentOwner.AVATAR_ANNO, "https://gravatar.com/avatar/"
-                        + DigestUtils.md5DigestAsHex(owner.getEmail().getBytes()));
-            }
+            specOwner.getAnnotations()
+                .put(Comment.CommentOwner.EMAIL_HASH_ANNO,
+                    DigestUtils.md5DigestAsHex(owner.getEmail().getBytes()));
+        } else {
+            specOwner.setAnnotations(Map.of(Comment.CommentOwner.EMAIL_HASH_ANNO,
+                DigestUtils.md5DigestAsHex(owner.getEmail().getBytes())));
         }
         return Mono.just(commentVo);
     }
@@ -218,11 +220,12 @@ public class CommentPublicQueryServiceImpl implements CommentPublicQueryService 
         specOwner.setName("");
         if (specOwner.getAnnotations() != null) {
             specOwner.getAnnotations().remove("Email");
-            if (Comment.CommentOwner.KIND_EMAIL.equals(owner.getKind())) {
-                specOwner.getAnnotations()
-                    .put(Comment.CommentOwner.AVATAR_ANNO, "https://gravatar.com/avatar/"
-                        + DigestUtils.md5DigestAsHex(owner.getEmail().getBytes()));
-            }
+            specOwner.getAnnotations()
+                .put(Comment.CommentOwner.EMAIL_HASH_ANNO,
+                    DigestUtils.md5DigestAsHex(owner.getEmail().getBytes()));
+        } else {
+            specOwner.setAnnotations(Map.of(Comment.CommentOwner.EMAIL_HASH_ANNO,
+                DigestUtils.md5DigestAsHex(owner.getEmail().getBytes())));
         }
         return Mono.just(replyVo);
     }
