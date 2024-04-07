@@ -59,7 +59,7 @@
     "@halo-dev/console-shared": "workspace:*",
     "@halo-dev/richtext-editor": "workspace:*",
     "@tanstack/vue-query": "^4.29.1",
-    "@tiptap/extension-character-count": "^2.2.3",
+    "@tiptap/extension-character-count": "^2.2.6",
     "@uppy/core": "^3.8.0",
     "@uppy/dashboard": "^3.7.1",
     "@uppy/drag-drop": "^3.0.3",
