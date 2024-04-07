@@ -9,6 +9,7 @@ import static run.halo.app.extension.index.query.QueryFactory.or;
 
 import java.security.Principal;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.function.Function;
 import lombok.RequiredArgsConstructor;
@@ -169,14 +170,20 @@ public class CommentPublicQueryServiceImpl implements CommentPublicQueryService 
         commentVo.getSpec().setIpAddress("");
         var specOwner = commentVo.getSpec().getOwner();
         specOwner.setName("");
+        String emailHash = null;
+        if (Objects.nonNull(owner.getEmail())) {
+            emailHash = DigestUtils.md5DigestAsHex(owner.getEmail().getBytes());
+        }
         if (specOwner.getAnnotations() != null) {
             specOwner.getAnnotations().remove("Email");
-            specOwner.getAnnotations()
-                .put(Comment.CommentOwner.EMAIL_HASH_ANNO,
-                    DigestUtils.md5DigestAsHex(owner.getEmail().getBytes()));
+            if (Objects.nonNull(emailHash)) {
+                specOwner.getAnnotations()
+                    .put(Comment.CommentOwner.EMAIL_HASH_ANNO, emailHash);
+            }
         } else {
-            specOwner.setAnnotations(Map.of(Comment.CommentOwner.EMAIL_HASH_ANNO,
-                DigestUtils.md5DigestAsHex(owner.getEmail().getBytes())));
+            if (Objects.nonNull(emailHash)) {
+                specOwner.setAnnotations(Map.of(Comment.CommentOwner.EMAIL_HASH_ANNO, emailHash));
+            }
         }
         return Mono.just(commentVo);
     }
@@ -218,14 +225,20 @@ public class CommentPublicQueryServiceImpl implements CommentPublicQueryService 
         replyVo.getSpec().setIpAddress("");
         var specOwner = replyVo.getSpec().getOwner();
         specOwner.setName("");
+        String emailHash = null;
+        if (Objects.nonNull(owner.getEmail())) {
+            emailHash = DigestUtils.md5DigestAsHex(owner.getEmail().getBytes());
+        }
         if (specOwner.getAnnotations() != null) {
             specOwner.getAnnotations().remove("Email");
-            specOwner.getAnnotations()
-                .put(Comment.CommentOwner.EMAIL_HASH_ANNO,
-                    DigestUtils.md5DigestAsHex(owner.getEmail().getBytes()));
+            if (Objects.nonNull(emailHash)) {
+                specOwner.getAnnotations()
+                    .put(Comment.CommentOwner.EMAIL_HASH_ANNO, emailHash);
+            }
         } else {
-            specOwner.setAnnotations(Map.of(Comment.CommentOwner.EMAIL_HASH_ANNO,
-                DigestUtils.md5DigestAsHex(owner.getEmail().getBytes())));
+            if (Objects.nonNull(emailHash)) {
+                specOwner.setAnnotations(Map.of(Comment.CommentOwner.EMAIL_HASH_ANNO, emailHash));
+            }
         }
         return Mono.just(replyVo);
     }
