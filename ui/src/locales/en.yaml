@@ -291,7 +291,7 @@ core:
           After deleting this tag, the association with the corresponding
           article will be removed. This operation cannot be undone.
       delete_in_batch:
-        title: Are you sure you want to delete the selected tags?
+        title: Delete the selected tags
     editing_modal:
       titles:
         update: Update post tag
