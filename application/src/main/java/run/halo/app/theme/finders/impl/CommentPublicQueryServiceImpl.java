@@ -8,12 +8,12 @@ import static run.halo.app.extension.index.query.QueryFactory.isNull;
 import static run.halo.app.extension.index.query.QueryFactory.or;
 
 import java.security.Principal;
-import java.util.Map;
-import java.util.Objects;
+import java.util.HashMap;
 import java.util.Optional;
 import java.util.function.Function;
 import lombok.RequiredArgsConstructor;
 import org.apache.commons.lang3.BooleanUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.data.domain.Sort;
 import org.springframework.lang.Nullable;
 import org.springframework.security.core.context.ReactiveSecurityContextHolder;
@@ -170,20 +170,17 @@ public class CommentPublicQueryServiceImpl implements CommentPublicQueryService 
         commentVo.getSpec().setIpAddress("");
         var specOwner = commentVo.getSpec().getOwner();
         specOwner.setName("");
-        String emailHash = null;
-        if (Objects.nonNull(owner.getEmail())) {
-            emailHash = DigestUtils.md5DigestAsHex(owner.getEmail().getBytes());
+        var email = owner.getEmail();
+        if (StringUtils.isNotBlank(email)) {
+            var emailHash = DigestUtils.md5DigestAsHex(email.getBytes());
+            if (specOwner.getAnnotations() == null) {
+                specOwner.setAnnotations(new HashMap<>(2));
+            }
+            specOwner.getAnnotations()
+                .put(Comment.CommentOwner.EMAIL_HASH_ANNO, emailHash);
         }
         if (specOwner.getAnnotations() != null) {
             specOwner.getAnnotations().remove("Email");
-            if (Objects.nonNull(emailHash)) {
-                specOwner.getAnnotations()
-                    .put(Comment.CommentOwner.EMAIL_HASH_ANNO, emailHash);
-            }
-        } else {
-            if (Objects.nonNull(emailHash)) {
-                specOwner.setAnnotations(Map.of(Comment.CommentOwner.EMAIL_HASH_ANNO, emailHash));
-            }
         }
         return Mono.just(commentVo);
     }
@@ -225,20 +222,17 @@ public class CommentPublicQueryServiceImpl implements CommentPublicQueryService 
         replyVo.getSpec().setIpAddress("");
         var specOwner = replyVo.getSpec().getOwner();
         specOwner.setName("");
-        String emailHash = null;
-        if (Objects.nonNull(owner.getEmail())) {
-            emailHash = DigestUtils.md5DigestAsHex(owner.getEmail().getBytes());
+        var email = owner.getEmail();
+        if (StringUtils.isNotBlank(email)) {
+            var emailHash = DigestUtils.md5DigestAsHex(email.getBytes());
+            if (specOwner.getAnnotations() == null) {
+                specOwner.setAnnotations(new HashMap<>(2));
+            }
+            specOwner.getAnnotations()
+                .put(Comment.CommentOwner.EMAIL_HASH_ANNO, emailHash);
         }
         if (specOwner.getAnnotations() != null) {
             specOwner.getAnnotations().remove("Email");
-            if (Objects.nonNull(emailHash)) {
-                specOwner.getAnnotations()
-                    .put(Comment.CommentOwner.EMAIL_HASH_ANNO, emailHash);
-            }
-        } else {
-            if (Objects.nonNull(emailHash)) {
-                specOwner.setAnnotations(Map.of(Comment.CommentOwner.EMAIL_HASH_ANNO, emailHash));
-            }
         }
         return Mono.just(replyVo);
     }
