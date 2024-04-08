@@ -1377,6 +1377,9 @@ core:
       custom_fields:
         label: Custom
         validation: The current Key is already in use
+      buttons:
+        expand: View more
+        collapse: Collapse
     default_editor:
       tabs:
         toc:

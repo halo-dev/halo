@@ -1297,6 +1297,9 @@ core:
       custom_fields:
         label: 自定義
         validation: 當前 Key 已被占用
+      buttons:
+        expand: 查看更多
+        collapse: 收起
     default_editor:
       tabs:
         toc:

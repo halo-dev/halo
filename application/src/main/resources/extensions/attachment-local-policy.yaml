@@ -3,7 +3,7 @@ kind: PolicyTemplate
 metadata:
   name: local
 spec:
-  displayName: Local Storage
+  displayName: 本地存储
   settingName: local-policy-template-setting
 ---
 apiVersion: storage.halo.run/v1alpha1
