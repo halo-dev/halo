@@ -2,6 +2,7 @@ package run.halo.app.core.extension.reconciler;
 
 import static run.halo.app.extension.index.query.QueryFactory.and;
 import static run.halo.app.extension.index.query.QueryFactory.equal;
+import static run.halo.app.extension.index.query.QueryFactory.in;
 import static run.halo.app.extension.index.query.QueryFactory.isNull;
 
 import java.time.Duration;
@@ -11,14 +12,13 @@ import java.util.Deque;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 import java.util.Set;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 import lombok.AllArgsConstructor;
+import org.apache.commons.lang3.BooleanUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.data.domain.Sort;
-import org.springframework.lang.Nullable;
 import org.springframework.stereotype.Component;
 import run.halo.app.content.permalinks.CategoryPermalinkPolicy;
 import run.halo.app.core.extension.content.Category;
@@ -27,10 +27,13 @@ import run.halo.app.core.extension.content.Post;
 import run.halo.app.extension.ExtensionClient;
 import run.halo.app.extension.ListOptions;
 import run.halo.app.extension.MetadataUtil;
+import run.halo.app.extension.PageRequestImpl;
 import run.halo.app.extension.controller.Controller;
 import run.halo.app.extension.controller.ControllerBuilder;
 import run.halo.app.extension.controller.Reconciler;
+import run.halo.app.extension.index.query.Query;
 import run.halo.app.extension.router.selector.FieldSelector;
+import run.halo.app.extension.router.selector.LabelSelector;
 import run.halo.app.infra.utils.JsonUtils;
 
 /**
@@ -42,7 +45,7 @@ import run.halo.app.infra.utils.JsonUtils;
 @Component
 @AllArgsConstructor
 public class CategoryReconciler implements Reconciler<Reconciler.Request> {
-    private static final String FINALIZER_NAME = "category-protection";
+    static final String FINALIZER_NAME = "category-protection";
     private final ExtensionClient client;
     private final CategoryPermalinkPolicy categoryPermalinkPolicy;
 
@@ -140,53 +143,46 @@ public class CategoryReconciler implements Reconciler<Reconciler.Request> {
 
     private void populatePosts(Category category) {
         String name = category.getMetadata().getName();
-        List<String> categoryNames = listChildrenByName(name)
+        Set<String> categoryNames = listChildrenByName(name)
             .stream()
             .map(item -> item.getMetadata().getName())
-            .toList();
+            .collect(Collectors.toSet());
 
-        var postListOptions = new ListOptions();
-        postListOptions.setFieldSelector(FieldSelector.of(
-            and(isNull("metadata.deletionTimestamp"),
-                equal("spec.deleted", "false")))
-        );
-        var posts = client.listAll(Post.class, postListOptions, Sort.unsorted());
+        var totalPostCount = countTotalPosts(categoryNames);
+        category.getStatusOrDefault().setPostCount(totalPostCount);
 
-        // populate post to status
-        List<Post.CompactPost> compactPosts = posts.stream()
-            .filter(post -> includes(post.getSpec().getCategories(), categoryNames))
-            .map(post -> Post.CompactPost.builder()
-                .name(post.getMetadata().getName())
-                .visible(post.getSpec().getVisible())
-                .published(post.isPublished())
-                .build())
-            .toList();
-        category.getStatusOrDefault().setPostCount(compactPosts.size());
-
-        long visiblePostCount = compactPosts.stream()
-            .filter(post -> Objects.equals(true, post.getPublished())
-                && Post.VisibleEnum.PUBLIC.equals(post.getVisible()))
-            .count();
-        category.getStatusOrDefault().setVisiblePostCount((int) visiblePostCount);
+        var visiblePostCount = countVisiblePosts(categoryNames);
+        category.getStatusOrDefault().setVisiblePostCount(visiblePostCount);
     }
 
-    /**
-     * whether {@code categoryRefs} contains elements in {@code categoryNames}.
-     *
-     * @param categoryRefs category left to judge
-     * @param categoryNames category right to judge
-     * @return true if {@code categoryRefs} contains elements in {@code categoryNames}.
-     */
-    private boolean includes(@Nullable List<String> categoryRefs, List<String> categoryNames) {
-        if (categoryRefs == null || categoryNames == null) {
-            return false;
-        }
-        for (String categoryRef : categoryRefs) {
-            if (categoryNames.contains(categoryRef)) {
-                return true;
-            }
-        }
-        return false;
+    int countTotalPosts(Set<String> categoryNames) {
+        var postListOptions = new ListOptions();
+        postListOptions.setFieldSelector(FieldSelector.of(
+            basePostQuery(categoryNames)
+        ));
+        return (int) client.listBy(Post.class, postListOptions, PageRequestImpl.ofSize(1))
+            .getTotal();
+    }
+
+    int countVisiblePosts(Set<String> categoryNames) {
+        var postListOptions = new ListOptions();
+        var fieldQuery = and(basePostQuery(categoryNames),
+            equal("spec.visible", Post.VisibleEnum.PUBLIC.name())
+        );
+        var labelSelector = LabelSelector.builder()
+            .eq(Post.PUBLISHED_LABEL, BooleanUtils.TRUE)
+            .build();
+        postListOptions.setFieldSelector(FieldSelector.of(fieldQuery));
+        postListOptions.setLabelSelector(labelSelector);
+        return (int) client.listBy(Post.class, postListOptions, PageRequestImpl.ofSize(1))
+            .getTotal();
+    }
+
+    private static Query basePostQuery(Set<String> categoryNames) {
+        return and(isNull("metadata.deletionTimestamp"),
+            equal("spec.deleted", BooleanUtils.FALSE),
+            in("spec.categories", categoryNames)
+        );
     }
 
     private List<Category> listChildrenByName(String name) {
