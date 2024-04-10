@@ -242,7 +242,7 @@ onMounted(() => {
       }),
       ExtensionTaskList,
       ExtensionLink.configure({
-        autolink: true,
+        autolink: false,
         openOnClick: false,
       }),
       ExtensionTextAlign.configure({

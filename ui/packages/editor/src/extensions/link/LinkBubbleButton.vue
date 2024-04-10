@@ -3,7 +3,9 @@ import { computed, type Component } from "vue";
 import { VTooltip, Dropdown as VDropdown } from "floating-vue";
 import MdiLinkVariant from "~icons/mdi/link-variant";
 import { i18n } from "@/locales";
-import type { Editor } from "@/tiptap/vue-3";
+import { type Editor } from "@/tiptap/vue-3";
+import { test } from "linkifyjs";
+import { TextSelection } from "@tiptap/pm/state";
 
 const props = defineProps<{
   editor: Editor;
@@ -39,10 +41,44 @@ const target = computed({
     });
   },
 });
+
+/**
+ * Convert the currently selected text when clicking the link
+ */
+const handleLinkBubbleButton = () => {
+  if (props.isActive({ editor: props.editor })) {
+    return;
+  }
+  const { state } = props.editor;
+  const { selection } = state;
+  const { empty } = selection;
+
+  if (selection instanceof TextSelection) {
+    if (empty) {
+      return false;
+    }
+    const { content } = selection.content();
+    if (!content || content.childCount !== 1) {
+      return false;
+    }
+    const text = content.firstChild?.textContent;
+    if (text && test(text)) {
+      props.editor.commands.setLink({
+        href: text,
+        target: "_self",
+      });
+    }
+  }
+};
 </script>
 
 <template>
-  <VDropdown class="inline-flex" :triggers="['click']" :distance="10">
+  <VDropdown
+    class="inline-flex"
+    :triggers="['click']"
+    :distance="10"
+    @click="handleLinkBubbleButton"
+  >
     <button
       v-tooltip="
         isActive({ editor })
