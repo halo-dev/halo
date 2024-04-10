@@ -62,7 +62,7 @@ const handleLinkBubbleButton = () => {
       return false;
     }
     const text = content.firstChild?.textContent;
-    if (text && test(text)) {
+    if (text && test(text, "url")) {
       props.editor.commands.setLink({
         href: text,
         target: "_self",
