@@ -4,9 +4,7 @@ import { markRaw } from "vue";
 import ColorBubbleItem from "@/extensions/color/ColorBubbleItem.vue";
 import HighlightBubbleItem from "@/extensions/highlight/HighlightBubbleItem.vue";
 import LinkBubbleButton from "@/extensions/link/LinkBubbleButton.vue";
-import MdiFormatQuoteOpen from "~icons/mdi/format-quote-open";
 import MdiCodeTags from "~icons/mdi/code-tags";
-import MdiCodeBracesBox from "~icons/mdi/code-braces-box";
 import MdiFormatColor from "~icons/mdi/format-color";
 import MdiFormatColorHighlight from "~icons/mdi/format-color-highlight";
 import MdiFormatItalic from "~icons/mdi/format-italic";
@@ -15,10 +13,6 @@ import MdiShare from "~icons/mdi/share";
 import MdiFormatStrikethrough from "~icons/mdi/format-strikethrough";
 import MdiFormatSubscript from "~icons/mdi/format-subscript";
 import MdiFormatSuperscript from "~icons/mdi/format-superscript";
-import MdiFormatAlignLeft from "~icons/mdi/format-align-left";
-import MdiFormatAlignCenter from "~icons/mdi/format-align-center";
-import MdiFormatAlignRight from "~icons/mdi/format-align-right";
-import MdiFormatAlignJustify from "~icons/mdi/format-align-justify";
 import MdiFormatUnderline from "~icons/mdi/format-underline";
 import { isActive, isTextSelection } from "@/tiptap/vue-3";
 import type { EditorState } from "@/tiptap/pm";
@@ -125,7 +119,7 @@ const Text = TiptapText.extend<ExtensionOptions>({
               },
             },
             {
-              priority: 51,
+              priority: 60,
               component: markRaw(ColorBubbleItem),
               props: {
                 isActive: ({ editor }) => editor.isActive("color"),
@@ -134,18 +128,7 @@ const Text = TiptapText.extend<ExtensionOptions>({
               },
             },
             {
-              priority: 60,
-              props: {
-                isActive: ({ editor }) => editor.isActive("blockquote"),
-                icon: markRaw(MdiFormatQuoteOpen),
-                title: i18n.global.t("editor.common.quote"),
-                action: ({ editor }) => {
-                  return editor.commands.toggleBlockquote();
-                },
-              },
-            },
-            {
-              priority: 80,
+              priority: 70,
               props: {
                 isActive: ({ editor }) => editor.isActive("code"),
                 icon: markRaw(MdiCodeTags),
@@ -155,17 +138,7 @@ const Text = TiptapText.extend<ExtensionOptions>({
               },
             },
             {
-              priority: 90,
-              props: {
-                isActive: ({ editor }) => editor.isActive("codeBlock"),
-                icon: markRaw(MdiCodeBracesBox),
-                title: i18n.global.t("editor.common.codeblock"),
-                action: ({ editor }) =>
-                  editor.chain().focus().toggleCodeBlock().run(),
-              },
-            },
-            {
-              priority: 100,
+              priority: 80,
               props: {
                 isActive: ({ editor }) => editor.isActive("superscript"),
                 icon: markRaw(MdiFormatSuperscript),
@@ -175,7 +148,7 @@ const Text = TiptapText.extend<ExtensionOptions>({
               },
             },
             {
-              priority: 110,
+              priority: 90,
               props: {
                 isActive: ({ editor }) => editor.isActive("subscript"),
                 icon: markRaw(MdiFormatSubscript),
@@ -185,58 +158,14 @@ const Text = TiptapText.extend<ExtensionOptions>({
               },
             },
             {
-              priority: 120,
-              props: {
-                isActive: ({ editor }) =>
-                  editor.isActive({ textAlign: "left" }),
-                icon: markRaw(MdiFormatAlignLeft),
-                title: i18n.global.t("editor.common.align_left"),
-                action: ({ editor }) =>
-                  editor.chain().focus().setTextAlign("left").run(),
-              },
-            },
-            {
-              priority: 130,
-              props: {
-                isActive: ({ editor }) =>
-                  editor.isActive({ textAlign: "center" }),
-                icon: markRaw(MdiFormatAlignCenter),
-                title: i18n.global.t("editor.common.align_center"),
-                action: ({ editor }) =>
-                  editor.chain().focus().setTextAlign("center").run(),
-              },
-            },
-            {
-              priority: 140,
-              props: {
-                isActive: ({ editor }) =>
-                  editor.isActive({ textAlign: "right" }),
-                icon: markRaw(MdiFormatAlignRight),
-                title: i18n.global.t("editor.common.align_right"),
-                action: ({ editor }) =>
-                  editor.chain().focus().setTextAlign("right").run(),
-              },
-            },
-            {
-              priority: 150,
-              props: {
-                isActive: ({ editor }) =>
-                  editor.isActive({ textAlign: "justify" }),
-                icon: markRaw(MdiFormatAlignJustify),
-                title: i18n.global.t("editor.common.align_justify"),
-                action: ({ editor }) =>
-                  editor.chain().focus().setTextAlign("justify").run(),
-              },
-            },
-            {
-              priority: 160,
+              priority: 100,
               component: markRaw(LinkBubbleButton),
               props: {
                 isActive: ({ editor }) => editor.isActive("link"),
               },
             },
             {
-              priority: 170,
+              priority: 110,
               props: {
                 isActive: () => false,
                 visible: ({ editor }) => editor.isActive("link"),
@@ -246,7 +175,7 @@ const Text = TiptapText.extend<ExtensionOptions>({
               },
             },
             {
-              priority: 180,
+              priority: 120,
               props: {
                 isActive: () => false,
                 visible: ({ editor }) => editor.isActive("link"),

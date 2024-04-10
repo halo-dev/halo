@@ -87,6 +87,7 @@ editor:
     color_picker:
       more_color: 更多颜色
   common:
+    align_method: 对齐方式
     align_left: 左对齐
     align_center: 居中
     align_right: 右对齐
