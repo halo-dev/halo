@@ -131,3 +131,4 @@ editor:
       restore_default: 恢复为默认
     text:
       default: 默认
+    clear_format: 清除格式
