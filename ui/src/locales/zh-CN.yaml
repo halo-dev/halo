@@ -292,6 +292,8 @@ core:
       delete:
         title: 删除标签
         description: 删除此标签之后，对应文章的关联将被解除。该操作不可恢复。
+      delete_in_batch:
+        title: 删除所选标签
     editing_modal:
       titles:
         update: 编辑文章标签
