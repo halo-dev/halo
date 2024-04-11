@@ -131,4 +131,5 @@ editor:
       restore_default: Restore default
     text:
       default: Default
+    line_height: Line height
     clear_format: Clear format

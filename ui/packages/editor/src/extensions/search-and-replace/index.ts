@@ -59,7 +59,7 @@ const SearchAndReplace = Extension.create<ExtensionOptions>({
       getToolbarItems({ editor }: { editor: Editor }) {
         return [
           {
-            priority: 210,
+            priority: 230,
             component: markRaw(ToolbarItem),
             props: {
               editor,
