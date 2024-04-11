@@ -97,6 +97,8 @@ spec:
       formSchema:
         - $formkit: checkbox
           name: allowRegistration
+          id: allowRegistration
+          key: allowRegistration
           label: "开放注册"
           value: false
         - $formkit: checkbox
@@ -107,6 +109,8 @@ spec:
         - $formkit: roleSelect
           name: defaultRole
           label: "默认角色"
+          validation: 'required'
+          if: "$get(allowRegistration).value === true"
           help: 用户注册之后默认为用户分配的角色
         - $formkit: attachmentPolicySelect
           name: avatarPolicy
