@@ -156,13 +156,11 @@ public class SinglePageServiceImpl extends AbstractContentService implements Sin
                     return client.update(page);
                 });
         }
-        return Mono.defer(() -> updateContent(baseSnapshot, pageRequest.contentRequest())
-                .flatMap(contentWrapper -> {
-                    page.getSpec().setHeadSnapshot(contentWrapper.getSnapshotName());
-                    return client.update(page);
-                }))
-            .retryWhen(Retry.backoff(5, Duration.ofMillis(100))
-                .filter(throwable -> throwable instanceof OptimisticLockingFailureException));
+        return updateContent(baseSnapshot, pageRequest.contentRequest())
+            .flatMap(contentWrapper -> {
+                page.getSpec().setHeadSnapshot(contentWrapper.getSnapshotName());
+                return client.update(page);
+            });
     }
 
     private Mono<ListedSinglePage> getListedSinglePage(SinglePage singlePage) {
