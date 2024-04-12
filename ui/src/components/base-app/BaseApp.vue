@@ -19,16 +19,19 @@ const globalInfoStore = useGlobalInfoStore();
 
 const route = useRoute();
 const title = useTitle();
+const siteTitle = computed(
+  () => globalInfoStore.globalInfo?.siteTitle || AppName
+);
 
 watch(
   () => route.name,
   () => {
     const { title: routeTitle } = route.meta;
     if (routeTitle) {
-      title.value = `${t(routeTitle)} - ${AppName}`;
+      title.value = `${t(routeTitle)} - ${siteTitle.value}`;
       return;
     }
-    title.value = AppName;
+    title.value = siteTitle.value;
   }
 );
 

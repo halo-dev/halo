@@ -31,6 +31,7 @@ function handleChangeType() {
 }
 
 const isLoginType = computed(() => type.value !== SIGNUP_TYPE);
+const siteTitle = computed(() => globalInfo.value?.siteTitle || AppName);
 
 // page title
 const title = useTitle();
@@ -40,7 +41,7 @@ watch(
     const routeTitle = t(
       `core.${value === SIGNUP_TYPE ? SIGNUP_TYPE : "login"}.title`
     );
-    title.value = [routeTitle, AppName].join(" - ");
+    title.value = [routeTitle, siteTitle.value].join(" - ");
   }
 );
 </script>
