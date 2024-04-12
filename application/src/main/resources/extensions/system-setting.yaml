@@ -104,6 +104,7 @@ spec:
         - $formkit: checkbox
           name: mustVerifyEmailOnRegistration
           label: "注册需验证邮箱"
+          if: "$get(allowRegistration).value === true"
           help: "需要确保已经正确配置邮件通知器"
           value: false
         - $formkit: roleSelect
