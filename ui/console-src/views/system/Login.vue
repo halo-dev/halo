@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import { computed, watch } from "vue";
+import { computed } from "vue";
 import LoginForm from "@/components/login/LoginForm.vue";
 import { useRouteQuery } from "@vueuse/router";
 import SignupForm from "@/components/signup/SignupForm.vue";
@@ -32,16 +32,14 @@ function handleChangeType() {
 
 const isLoginType = computed(() => type.value !== SIGNUP_TYPE);
 
-// page title
-const title = useTitle();
-watch(
-  () => type.value,
-  (value) => {
+useTitle(
+  computed(() => {
+    const siteTitle = globalInfo.value?.siteTitle || AppName;
     const routeTitle = t(
-      `core.${value === SIGNUP_TYPE ? SIGNUP_TYPE : "login"}.title`
+      `core.${type.value === SIGNUP_TYPE ? SIGNUP_TYPE : "login"}.title`
     );
-    title.value = [routeTitle, AppName].join(" - ");
-  }
+    return [routeTitle, siteTitle].join(" - ");
+  })
 );
 </script>
 <template>
