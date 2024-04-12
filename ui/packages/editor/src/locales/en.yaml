@@ -132,3 +132,4 @@ editor:
     text:
       default: Default
     line_height: Line height
+    clear_format: Clear format
