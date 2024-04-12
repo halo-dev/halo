@@ -1,6 +1,6 @@
 <script lang="ts" setup>
 import { RouterView, useRoute } from "vue-router";
-import { computed, watch, reactive, onMounted, inject } from "vue";
+import { computed, reactive, onMounted, inject } from "vue";
 import { useTitle } from "@vueuse/core";
 import { useFavicon } from "@vueuse/core";
 import { useI18n } from "vue-i18n";
@@ -12,33 +12,25 @@ import type { FormKitConfig } from "@formkit/core";
 import { i18n } from "@/locales";
 import { AppName } from "@/constants/app";
 import { useGlobalInfoStore } from "@/stores/global-info";
+import { storeToRefs } from "pinia";
 
 const { t } = useI18n();
 
-const globalInfoStore = useGlobalInfoStore();
+const { globalInfo } = storeToRefs(useGlobalInfoStore());
 
 const route = useRoute();
-const title = useTitle();
-const siteTitle = computed(
-  () => globalInfoStore.globalInfo?.siteTitle || AppName
-);
-
-watch(
-  () => route.name,
-  () => {
+useTitle(
+  computed(() => {
     const { title: routeTitle } = route.meta;
-    if (routeTitle) {
-      title.value = `${t(routeTitle)} - ${siteTitle.value}`;
-      return;
-    }
-    title.value = siteTitle.value;
-  }
+    const siteTitle = globalInfo.value?.siteTitle || AppName;
+    return [t(routeTitle || ""), siteTitle].filter(Boolean).join(" - ");
+  })
 );
 
 // Favicon
 const defaultFavicon = "/console/favicon.ico";
 const favicon = computed(() => {
-  return globalInfoStore.globalInfo?.favicon || defaultFavicon;
+  return globalInfo.value?.favicon || defaultFavicon;
 });
 
 useFavicon(favicon);
