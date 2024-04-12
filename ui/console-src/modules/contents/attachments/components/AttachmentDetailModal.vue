@@ -183,7 +183,7 @@ const getGroupName = (name: string | undefined) => {
     </div>
     <template #footer>
       <VSpace>
-        <VButton type="default" @click="onVisibleChange(false)">
+        <VButton type="default" @click="emit('close')">
           {{ $t("core.common.buttons.close_and_shortcut") }}
         </VButton>
         <slot name="footer" />

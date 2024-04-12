@@ -225,6 +225,7 @@ onMounted(() => {
     })
     .then((response) => {
       nameQueryAttachment.value = response.data;
+      detailVisible.value = true;
     });
 });
 </script>
