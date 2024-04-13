@@ -112,7 +112,7 @@ onMounted(() => {
 </script>
 
 <template>
-  <div class="flex h-full">
+  <div class="flex min-h-screen">
     <aside
       class="navbar fixed hidden h-full overflow-y-auto md:flex md:flex-col"
     >
