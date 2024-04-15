@@ -308,6 +308,17 @@ public class SchemeInitializer implements ApplicationListener<ApplicationContext
                     var replyCount = comment.getStatusOrDefault().getReplyCount();
                     return defaultIfNull(replyCount, 0).toString();
                 })));
+            indexSpecs.add(new IndexSpec()
+                .setName(Comment.REQUIRE_SYNC_ON_STARTUP_INDEX_NAME)
+                .setIndexFunc(simpleAttribute(Comment.class, comment -> {
+                    var version = comment.getMetadata().getVersion();
+                    var observedVersion = comment.getStatusOrDefault().getObservedVersion();
+                    if (observedVersion == null || observedVersion < version) {
+                        return BooleanUtils.TRUE;
+                    }
+                    // do not care about the false case so return null to avoid indexing
+                    return null;
+                })));
         });
         schemeManager.register(Reply.class, indexSpecs -> {
             indexSpecs.add(new IndexSpec()
@@ -336,6 +347,17 @@ public class SchemeInitializer implements ApplicationListener<ApplicationContext
                 .setIndexFunc(simpleAttribute(Reply.class, reply -> {
                     var owner = reply.getSpec().getOwner();
                     return Comment.CommentOwner.ownerIdentity(owner.getKind(), owner.getName());
+                })));
+            indexSpecs.add(new IndexSpec()
+                .setName(Reply.REQUIRE_SYNC_ON_STARTUP_INDEX_NAME)
+                .setIndexFunc(simpleAttribute(Reply.class, reply -> {
+                    var version = reply.getMetadata().getVersion();
+                    var observedVersion = reply.getStatus().getObservedVersion();
+                    if (observedVersion == null || observedVersion < version) {
+                        return BooleanUtils.TRUE;
+                    }
+                    // do not care about the false case so return null to avoid indexing
+                    return null;
                 })));
         });
         schemeManager.register(SinglePage.class);
