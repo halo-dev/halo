@@ -45,6 +45,7 @@ import {
   ExtensionTrailingNode,
   ExtensionListKeymap,
   ExtensionSearchAndReplace,
+  ExtensionClearFormat,
   ExtensionFormatBrush,
 } from "../index";
 
@@ -112,6 +113,7 @@ const editor = useEditor({
     ExtensionTrailingNode,
     ExtensionListKeymap,
     ExtensionSearchAndReplace,
+    ExtensionClearFormat,
     ExtensionFormatBrush,
   ],
   parseOptions: {

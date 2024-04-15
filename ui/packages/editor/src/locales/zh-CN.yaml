@@ -136,3 +136,4 @@ editor:
     text:
       default: 默认
     line_height: 行高
+    clear_format: 清除格式
