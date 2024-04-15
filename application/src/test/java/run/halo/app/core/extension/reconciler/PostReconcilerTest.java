@@ -149,7 +149,7 @@ class PostReconcilerTest {
             when(client.fetch(eq(Post.class), eq(name)))
                 .thenReturn(Optional.of(post));
             when(postService.getContent(eq(post.getSpec().getReleaseSnapshot()),
-                    eq(post.getSpec().getBaseSnapshot())))
+                eq(post.getSpec().getBaseSnapshot())))
                 .thenReturn(Mono.just(ContentWrapper.builder()
                     .snapshotName(post.getSpec().getHeadSnapshot())
                     .raw("hello world")
@@ -215,11 +215,7 @@ class PostReconcilerTest {
             assertArg(argReason -> {
                 var interestReason = new Subscription.InterestReason();
                 interestReason.setReasonType(NotificationReasonConst.NEW_COMMENT_ON_POST);
-                interestReason.setSubject(Subscription.ReasonSubject.builder()
-                    .apiVersion(post.getApiVersion())
-                    .kind(post.getKind())
-                    .name(post.getMetadata().getName())
-                    .build());
+                interestReason.setExpression("props.postOwner == 'null'");
                 assertThat(argReason).isEqualTo(interestReason);
             }));
     }

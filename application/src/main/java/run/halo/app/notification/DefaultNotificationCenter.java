@@ -6,15 +6,11 @@ import static run.halo.app.extension.index.query.QueryFactory.equal;
 import static run.halo.app.extension.index.query.QueryFactory.or;
 
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Locale;
 import java.util.Optional;
-import java.util.function.BiPredicate;
-import java.util.function.Function;
 import lombok.Builder;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.lang3.StringUtils;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Component;
 import org.springframework.util.Assert;
@@ -27,7 +23,6 @@ import run.halo.app.core.extension.notification.NotifierDescriptor;
 import run.halo.app.core.extension.notification.Reason;
 import run.halo.app.core.extension.notification.ReasonType;
 import run.halo.app.core.extension.notification.Subscription;
-import run.halo.app.extension.GroupVersionKind;
 import run.halo.app.extension.ListOptions;
 import run.halo.app.extension.ListResult;
 import run.halo.app.extension.Metadata;
@@ -55,22 +50,17 @@ public class DefaultNotificationCenter implements NotificationCenter {
     private final UserNotificationPreferenceService userNotificationPreferenceService;
     private final NotificationTemplateRender notificationTemplateRender;
     private final SubscriptionRouter subscriptionRouter;
+    private final RecipientResolver recipientResolver;
 
     @Override
     public Mono<Void> notify(Reason reason) {
-        var reasonSubject = reason.getSpec().getSubject();
-        var subscriptionReasonSubject = Subscription.ReasonSubject.builder()
-            .apiVersion(reasonSubject.getApiVersion())
-            .kind(reasonSubject.getKind())
-            .name(reasonSubject.getName())
-            .build();
-        return listObservers(reason.getSpec().getReasonType(), subscriptionReasonSubject)
-            .doOnNext(subscription -> {
+        return recipientResolver.resolve(reason)
+            .doOnNext(subscriber -> {
                 log.debug("Dispatching notification to subscriber [{}] for reason [{}]",
-                    subscription.getSpec().getSubscriber(), reason.getMetadata().getName());
+                    subscriber, reason.getMetadata().getName());
             })
             .publishOn(Schedulers.boundedElastic())
-            .flatMap(subscription -> dispatchNotification(reason, subscription))
+            .flatMap(subscriber -> dispatchNotification(reason, subscriber))
             .then();
     }
 
@@ -125,43 +115,49 @@ public class DefaultNotificationCenter implements NotificationCenter {
     Flux<Subscription> listSubscription(Subscription.Subscriber subscriber,
         Subscription.InterestReason reason) {
         var listOptions = new ListOptions();
-        var fieldQuery = and(
-            getSubscriptionFieldQuery(reason.getReasonType(), reason.getSubject()),
-            equal("spec.subscriber", subscriber.getName())
-        );
+        var fieldQuery = equal("spec.subscriber", subscriber.getName());
+        if (reason.getSubject() != null) {
+            fieldQuery = and(
+                fieldQuery,
+                getSubscriptionFieldQuery(reason.getReasonType(), reason.getSubject())
+            );
+        }
         listOptions.setFieldSelector(FieldSelector.of(fieldQuery));
         return client.listAll(Subscription.class, listOptions, defaultSort());
     }
 
-    Flux<String> getNotifiersBySubscriber(Subscription.Subscriber subscriber, Reason reason) {
+    Flux<String> getNotifiersBySubscriber(Subscriber subscriber, Reason reason) {
         var reasonType = reason.getSpec().getReasonType();
-        return userNotificationPreferenceService.getByUser(subscriber.getName())
+        return userNotificationPreferenceService.getByUser(subscriber.name())
             .map(UserNotificationPreference::getReasonTypeNotifier)
             .map(reasonTypeNotification -> reasonTypeNotification.getNotifiers(reasonType))
             .flatMapMany(Flux::fromIterable);
     }
 
-    Mono<Void> dispatchNotification(Reason reason, Subscription subscription) {
-        var subscriber = subscription.getSpec().getSubscriber();
+    Mono<Void> dispatchNotification(Reason reason, Subscriber subscriber) {
         return getNotifiersBySubscriber(subscriber, reason)
             .flatMap(notifierName -> client.fetch(NotifierDescriptor.class, notifierName))
-            .flatMap(descriptor -> prepareNotificationElement(subscription, reason, descriptor))
+            .flatMap(descriptor -> prepareNotificationElement(subscriber, reason, descriptor))
             .flatMap(element -> {
                 var dispatchMono = sendNotification(element);
+                if (subscriber.isAnonymous()) {
+                    return dispatchMono;
+                }
+                // create notification for user
                 var innerNofificationMono = createNotification(element);
                 return Mono.when(dispatchMono, innerNofificationMono);
             })
             .then();
     }
 
-    Mono<NotificationElement> prepareNotificationElement(Subscription subscription, Reason reason,
+    Mono<NotificationElement> prepareNotificationElement(Subscriber subscriber, Reason reason,
         NotifierDescriptor descriptor) {
-        return getLocaleFromSubscriber(subscription)
-            .flatMap(locale -> inferenceTemplate(reason, subscription, locale))
+        return getLocaleFromSubscriber(subscriber)
+            .flatMap(locale -> inferenceTemplate(reason, subscriber, locale))
             .map(notificationContent -> NotificationElement.builder()
                 .descriptor(descriptor)
                 .reason(reason)
-                .subscription(subscription)
+                .subscriber(subscriber)
                 .reasonType(notificationContent.reasonType())
                 .notificationTitle(notificationContent.title())
                 .reasonAttributes(notificationContent.reasonAttributes())
@@ -173,7 +169,7 @@ public class DefaultNotificationCenter implements NotificationCenter {
 
     Mono<Void> sendNotification(NotificationElement notificationElement) {
         var descriptor = notificationElement.descriptor();
-        var subscription = notificationElement.subscription();
+        var subscriber = notificationElement.subscriber();
         final var notifierExtName = descriptor.getSpec().getNotifierExtName();
         return notificationContextFrom(notificationElement)
             .flatMap(notificationContext -> notificationSender.sendNotification(notifierExtName,
@@ -181,7 +177,7 @@ public class DefaultNotificationCenter implements NotificationCenter {
                 .onErrorResume(throwable -> {
                     log.error(
                         "Failed to send notification to subscriber [{}] through notifier [{}]",
-                        subscription.getSpec().getSubscriber(),
+                        subscriber,
                         descriptor.getSpec().getDisplayName(),
                         throwable);
                     return Mono.empty();
@@ -192,9 +188,8 @@ public class DefaultNotificationCenter implements NotificationCenter {
 
     Mono<Notification> createNotification(NotificationElement notificationElement) {
         var reason = notificationElement.reason();
-        var subscription = notificationElement.subscription();
-        var subscriber = subscription.getSpec().getSubscriber();
-        return client.fetch(User.class, subscriber.getName())
+        var subscriber = notificationElement.subscriber();
+        return client.fetch(User.class, subscriber.name())
             .flatMap(user -> {
                 Notification notification = new Notification();
                 notification.setMetadata(new Metadata());
@@ -203,7 +198,7 @@ public class DefaultNotificationCenter implements NotificationCenter {
                 notification.getSpec().setTitle(notificationElement.notificationTitle());
                 notification.getSpec().setRawContent(notificationElement.notificationRawBody());
                 notification.getSpec().setHtmlContent(notificationElement.notificationHtmlBody);
-                notification.getSpec().setRecipient(subscriber.getName());
+                notification.getSpec().setRecipient(subscriber.name());
                 notification.getSpec().setReason(reason.getMetadata().getName());
                 notification.getSpec().setUnread(true);
                 return client.create(notification);
@@ -223,7 +218,7 @@ public class DefaultNotificationCenter implements NotificationCenter {
         final var descriptorName = element.descriptor().getMetadata().getName();
         final var reason = element.reason();
         final var descriptor = element.descriptor();
-        final var subscription = element.subscription();
+        final var subscriber = element.subscriber();
 
         var messagePayload = new NotificationContext.MessagePayload();
         messagePayload.setTitle(element.notificationTitle());
@@ -232,7 +227,7 @@ public class DefaultNotificationCenter implements NotificationCenter {
         messagePayload.setAttributes(element.reasonAttributes());
 
         var message = new NotificationContext.Message();
-        message.setRecipient(subscription.getSpec().getSubscriber().getName());
+        message.setRecipient(subscriber.name());
         message.setPayload(messagePayload);
         message.setTimestamp(reason.getMetadata().getCreationTimestamp());
         var reasonSubject = reason.getSpec().getSubject();
@@ -270,25 +265,25 @@ public class DefaultNotificationCenter implements NotificationCenter {
             });
     }
 
-    Mono<NotificationContent> inferenceTemplate(Reason reason, Subscription subscription,
+    Mono<NotificationContent> inferenceTemplate(Reason reason, Subscriber subscriber,
         Locale locale) {
         var reasonTypeName = reason.getSpec().getReasonType();
-        var subscriber = subscription.getSpec().getSubscriber();
         return getReasonType(reasonTypeName)
             .flatMap(reasonType -> notificationTemplateSelector.select(reasonTypeName, locale)
                 .flatMap(template -> {
                     final var templateContent = template.getSpec().getTemplate();
                     var model = toReasonAttributes(reason);
-                    var identity = UserIdentity.of(subscriber.getName());
                     var subscriberInfo = new HashMap<>();
-                    if (identity.isAnonymous()) {
-                        subscriberInfo.put("displayName", identity.getEmail().orElse(""));
+                    if (subscriber.isAnonymous()) {
+                        subscriberInfo.put("displayName", subscriber.getEmail().orElseThrow());
                     } else {
-                        subscriberInfo.put("displayName", "@" + identity.name());
+                        subscriberInfo.put("displayName", "@" + subscriber.username());
                     }
-                    subscriberInfo.put("id", subscriber.getName());
+                    subscriberInfo.put("id", subscriber.name());
                     model.put("subscriber", subscriberInfo);
-                    model.put("unsubscribeUrl", getUnsubscribeUrl(subscription));
+
+                    var unsubscriptionMono = getUnsubscribeUrl(subscriber.subscriptionName())
+                        .doOnNext(url -> model.put("unsubscribeUrl", url));
 
                     var builder = NotificationContent.builder()
                         .reasonType(reasonType)
@@ -305,7 +300,7 @@ public class DefaultNotificationCenter implements NotificationCenter {
                     var htmlBodyMono = notificationTemplateRender
                         .render(templateContent.getHtmlBody(), model)
                         .doOnNext(builder::htmlBody);
-                    return Mono.when(titleMono, rawBodyMono, htmlBodyMono)
+                    return Mono.when(unsubscriptionMono, titleMono, rawBodyMono, htmlBodyMono)
                         .then(Mono.fromSupplier(builder::build));
                 })
             );
@@ -316,13 +311,14 @@ public class DefaultNotificationCenter implements NotificationCenter {
                                ReasonAttributes reasonAttributes) {
     }
 
-    String getUnsubscribeUrl(Subscription subscription) {
-        return subscriptionRouter.getUnsubscribeUrl(subscription);
+    Mono<String> getUnsubscribeUrl(String subscriptionName) {
+        return client.get(Subscription.class, subscriptionName)
+            .map(subscriptionRouter::getUnsubscribeUrl);
     }
 
     @Builder
     record NotificationElement(ReasonType reasonType, Reason reason,
-                               Subscription subscription, NotifierDescriptor descriptor,
+                               Subscriber subscriber, NotifierDescriptor descriptor,
                                String notificationTitle,
                                String notificationRawBody,
                                String notificationHtmlBody,
@@ -333,23 +329,14 @@ public class DefaultNotificationCenter implements NotificationCenter {
         return client.get(ReasonType.class, reasonTypeName);
     }
 
-    Mono<Locale> getLocaleFromSubscriber(Subscription subscription) {
+    Mono<Locale> getLocaleFromSubscriber(Subscriber subscriber) {
         // TODO get locale from subscriber
         return Mono.just(Locale.getDefault());
     }
 
-    Flux<Subscription> listObservers(String reasonTypeName,
-        Subscription.ReasonSubject reasonSubject) {
-        Assert.notNull(reasonTypeName, "The reasonTypeName must not be null");
-        Assert.notNull(reasonSubject, "The reasonSubject must not be null");
-        final var listOptions = new ListOptions();
-        var fieldQuery = getSubscriptionFieldQuery(reasonTypeName, reasonSubject);
-        listOptions.setFieldSelector(FieldSelector.of(fieldQuery));
-        return distinctByKey(client.listAll(Subscription.class, listOptions, defaultSort()));
-    }
-
     private static Query getSubscriptionFieldQuery(String reasonTypeName,
         Subscription.ReasonSubject reasonSubject) {
+        Assert.notNull(reasonSubject, "The reasonSubject must not be null");
         var matchAllSubject = new Subscription.ReasonSubject();
         matchAllSubject.setKind(reasonSubject.getKind());
         matchAllSubject.setApiVersion(reasonSubject.getApiVersion());
@@ -361,52 +348,8 @@ public class DefaultNotificationCenter implements NotificationCenter {
         );
     }
 
-    static Flux<Subscription> distinctByKey(Flux<Subscription> source) {
-        final var distinctKeyPredicate = subscriptionDistinctKeyPredicate();
-        return source.distinct(Function.identity(), HashSet<Subscription>::new,
-            (set, val) -> {
-                for (Subscription subscription : set) {
-                    if (distinctKeyPredicate.test(subscription, val)) {
-                        return false;
-                    }
-                }
-                // no duplicated return true
-                set.add(val);
-                return true;
-            },
-            HashSet::clear);
-    }
-
     Sort defaultSort() {
         return Sort.by(Sort.Order.asc("metadata.creationTimestamp"),
             Sort.Order.asc("metadata.name"));
-    }
-
-    static BiPredicate<Subscription, Subscription> subscriptionDistinctKeyPredicate() {
-        return (a, b) -> {
-            if (!a.getSpec().getSubscriber().equals(b.getSpec().getSubscriber())) {
-                return false;
-            }
-            var reasonA = a.getSpec().getReason();
-            var reasonB = b.getSpec().getReason();
-            if (!reasonA.getReasonType().equals(reasonB.getReasonType())) {
-                return false;
-            }
-            var ars = reasonA.getSubject();
-            var brs = reasonB.getSubject();
-            var gvkForA =
-                GroupVersionKind.fromAPIVersionAndKind(ars.getApiVersion(), ars.getKind());
-            var gvkForB =
-                GroupVersionKind.fromAPIVersionAndKind(brs.getApiVersion(), brs.getKind());
-
-            if (!gvkForA.groupKind().equals(gvkForB.groupKind())) {
-                return false;
-            }
-            // name is blank present match all
-            if (StringUtils.isBlank(ars.getName()) || StringUtils.isBlank(brs.getName())) {
-                return true;
-            }
-            return ars.getName().equals(brs.getName());
-        };
     }
 }

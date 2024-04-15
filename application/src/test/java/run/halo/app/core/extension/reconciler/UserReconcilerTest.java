@@ -22,6 +22,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import reactor.core.publisher.Flux;
+import reactor.core.publisher.Mono;
 import run.halo.app.core.extension.Role;
 import run.halo.app.core.extension.RoleBinding;
 import run.halo.app.core.extension.User;
@@ -31,6 +32,7 @@ import run.halo.app.extension.Metadata;
 import run.halo.app.extension.controller.Reconciler;
 import run.halo.app.infra.AnonymousUserConst;
 import run.halo.app.infra.ExternalUrlSupplier;
+import run.halo.app.notification.NotificationCenter;
 
 /**
  * Tests for {@link UserReconciler}.
@@ -47,6 +49,9 @@ class UserReconcilerTest {
     private ExtensionClient client;
 
     @Mock
+    private NotificationCenter notificationCenter;
+
+    @Mock
     private RoleService roleService;
 
     @InjectMocks
@@ -54,6 +59,7 @@ class UserReconcilerTest {
 
     @BeforeEach
     void setUp() {
+        lenient().when(notificationCenter.unsubscribe(any(), any())).thenReturn(Mono.empty());
         lenient().when(roleService.listRoleRefs(any())).thenReturn(Flux.empty());
     }
 

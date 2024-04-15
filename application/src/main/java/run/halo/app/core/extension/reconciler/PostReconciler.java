@@ -246,11 +246,8 @@ public class PostReconciler implements Reconciler<Reconciler.Request> {
 
         var interestReason = new Subscription.InterestReason();
         interestReason.setReasonType(NotificationReasonConst.NEW_COMMENT_ON_POST);
-        interestReason.setSubject(Subscription.ReasonSubject.builder()
-            .apiVersion(post.getApiVersion())
-            .kind(post.getKind())
-            .name(post.getMetadata().getName())
-            .build());
+        interestReason.setExpression(
+            "props.postOwner == '%s'".formatted(post.getSpec().getOwner()));
         notificationCenter.subscribe(subscriber, interestReason).block();
     }
 

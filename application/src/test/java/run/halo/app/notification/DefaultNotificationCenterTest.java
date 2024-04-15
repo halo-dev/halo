@@ -13,7 +13,6 @@ import static org.mockito.Mockito.when;
 
 import java.util.List;
 import java.util.Locale;
-import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -29,7 +28,6 @@ import run.halo.app.core.extension.notification.NotifierDescriptor;
 import run.halo.app.core.extension.notification.Reason;
 import run.halo.app.core.extension.notification.ReasonType;
 import run.halo.app.core.extension.notification.Subscription;
-import run.halo.app.extension.GroupVersion;
 import run.halo.app.extension.ListResult;
 import run.halo.app.extension.Metadata;
 import run.halo.app.extension.PageRequest;
@@ -60,6 +58,9 @@ class DefaultNotificationCenterTest {
     @Mock
     private NotificationSender notificationSender;
 
+    @Mock
+    private RecipientResolver recipientResolver;
+
     @InjectMocks
     private DefaultNotificationCenter notificationCenter;
 
@@ -78,21 +79,17 @@ class DefaultNotificationCenterTest {
         reason.setMetadata(new Metadata());
         reason.getMetadata().setName("reason-a");
 
-        var subscriptionReasonSubject = createNewReplyOnCommentSubject();
-
         var spyNotificationCenter = spy(notificationCenter);
-        var subscriptions = createSubscriptions();
-        doReturn(Flux.fromIterable(subscriptions))
-            .when(spyNotificationCenter).listObservers(eq("new-reply-on-comment"),
-                eq(subscriptionReasonSubject));
+        var subscriber = new Subscriber(UserIdentity.anonymousWithEmail("A"), "fake-name");
+        when(recipientResolver.resolve(reason)).thenReturn(Flux.just(subscriber));
+
         doReturn(Mono.empty()).when(spyNotificationCenter)
             .dispatchNotification(eq(reason), any());
 
         spyNotificationCenter.notify(reason).block();
 
         verify(spyNotificationCenter).dispatchNotification(eq(reason), any());
-        verify(spyNotificationCenter).listObservers(eq("new-reply-on-comment"),
-            eq(subscriptionReasonSubject));
+        verify(recipientResolver).resolve(eq(reason));
     }
 
     List<Subscription> createSubscriptions() {
@@ -203,8 +200,7 @@ class DefaultNotificationCenterTest {
         reason.getMetadata().setName("reason-a");
         reason.setSpec(new Reason.Spec());
         reason.getSpec().setReasonType("new-reply-on-comment");
-        var subscriber = new Subscription.Subscriber();
-        subscriber.setName("anonymousUser#A");
+        var subscriber = new Subscriber(UserIdentity.anonymousWithEmail("A"), "fake-name");
 
         notificationCenter.getNotifiersBySubscriber(subscriber, reason)
             .collectList()
@@ -215,7 +211,7 @@ class DefaultNotificationCenterTest {
             })
             .verifyComplete();
 
-        verify(userNotificationPreferenceService).getByUser(eq(subscriber.getName()));
+        verify(userNotificationPreferenceService).getByUser(eq(subscriber.name()));
     }
 
     @Test
@@ -234,7 +230,6 @@ class DefaultNotificationCenterTest {
             .when(spyNotificationCenter).prepareNotificationElement(any(), any(), any());
 
         doReturn(Mono.empty()).when(spyNotificationCenter).sendNotification(any());
-        doReturn(Mono.empty()).when(spyNotificationCenter).createNotification(any());
 
         var reason = new Reason();
         reason.setMetadata(new Metadata());
@@ -243,11 +238,15 @@ class DefaultNotificationCenterTest {
         reason.getSpec().setReasonType("new-reply-on-comment");
 
         var subscription = createSubscriptions().get(0);
-        spyNotificationCenter.dispatchNotification(reason, subscription).block();
+        var subscriptionName = subscription.getMetadata().getName();
+        var subscriber =
+            new Subscriber(UserIdentity.of(subscription.getSpec().getSubscriber().getName()),
+                subscriptionName);
+        spyNotificationCenter.dispatchNotification(reason, subscriber).block();
 
         verify(client).fetch(eq(NotifierDescriptor.class), eq("email-notifier"));
         verify(spyNotificationCenter).sendNotification(any());
-        verify(spyNotificationCenter).createNotification(any());
+        verify(spyNotificationCenter, times(0)).createNotification(any());
     }
 
     @Test
@@ -282,7 +281,7 @@ class DefaultNotificationCenterTest {
         var element = mock(DefaultNotificationCenter.NotificationElement.class);
         var mockDescriptor = mock(NotifierDescriptor.class);
         when(element.descriptor()).thenReturn(mockDescriptor);
-        when(element.subscription()).thenReturn(mock(Subscription.class));
+        when(element.subscriber()).thenReturn(mock(Subscriber.class));
         var notifierDescriptorSpec = mock(NotifierDescriptor.Spec.class);
         when(mockDescriptor.getSpec()).thenReturn(notifierDescriptorSpec);
         when(notifierDescriptorSpec.getNotifierExtName()).thenReturn("fake-notifier-ext");
@@ -299,9 +298,12 @@ class DefaultNotificationCenterTest {
         var subscription = createSubscriptions().get(0);
         var user = mock(User.class);
 
-        var subscriberName = subscription.getSpec().getSubscriber().getName();
-        when(client.fetch(eq(User.class), eq(subscriberName))).thenReturn(Mono.just(user));
-        when(element.subscription()).thenReturn(subscription);
+        var subscriptionName = subscription.getMetadata().getName();
+        var subscriber =
+            new Subscriber(UserIdentity.of(subscription.getSpec().getSubscriber().getName()),
+                subscriptionName);
+        when(client.fetch(eq(User.class), eq(subscriber.name()))).thenReturn(Mono.just(user));
+        when(element.subscriber()).thenReturn(subscriber);
 
         when(client.create(any(Notification.class))).thenReturn(Mono.empty());
 
@@ -314,7 +316,7 @@ class DefaultNotificationCenterTest {
 
         notificationCenter.createNotification(element).block();
 
-        verify(client).fetch(eq(User.class), eq(subscriberName));
+        verify(client).fetch(eq(User.class), eq(subscriber.name()));
         verify(client).create(any(Notification.class));
     }
 
@@ -334,8 +336,8 @@ class DefaultNotificationCenterTest {
 
         doReturn(Mono.just(reasonType))
             .when(spyNotificationCenter).getReasonType(eq(reasonTypeName));
-        doReturn("fake-url")
-            .when(spyNotificationCenter).getUnsubscribeUrl(any());
+        doReturn(Mono.just("fake-unsubscribe-url"))
+            .when(spyNotificationCenter).getUnsubscribeUrl(anyString());
 
         final var locale = Locale.CHINESE;
 
@@ -356,98 +358,17 @@ class DefaultNotificationCenterTest {
         when(notificationTemplateSelector.select(eq(reasonTypeName), any()))
             .thenReturn(Mono.just(template));
 
-        var subscription = new Subscription();
-        subscription.setSpec(new Subscription.Spec());
-        var subscriber = new Subscription.Subscriber();
-        subscriber.setName("anonymousUser#A");
-        subscription.getSpec().setSubscriber(subscriber);
+        var subscriber = new Subscriber(UserIdentity.anonymousWithEmail("A"), "fake-name");
 
-        spyNotificationCenter.inferenceTemplate(reason, subscription, locale).block();
+        spyNotificationCenter.inferenceTemplate(reason, subscriber, locale).block();
 
         verify(spyNotificationCenter).getReasonType(eq(reasonTypeName));
         verify(notificationTemplateSelector).select(eq(reasonTypeName), any());
     }
 
-
-    @Test
-    void listObserverWhenDuplicateSubscribers() {
-        var sourceSubscriptions = createSubscriptions();
-        var subscriptionA = sourceSubscriptions.get(0);
-        var subscriptionB = JsonUtils.deepCopy(subscriptionA);
-
-        var subscriptionC = JsonUtils.deepCopy(subscriptionA);
-        subscriptionC.getSpec().getReason().getSubject().setName(null);
-
-        var subscriptions = Flux.just(subscriptionA, subscriptionB, subscriptionC);
-
-        DefaultNotificationCenter.distinctByKey(subscriptions)
-            .as(StepVerifier::create)
-            .expectNext(subscriptionA)
-            .verifyComplete();
-    }
-
-    @Nested
-    class SubscriptionDistinctKeyPredicateTest {
-
-        @Test
-        void differentSubjectName() {
-            var subscriptionA = createSubscriptions().get(0);
-            var subscriptionB = JsonUtils.deepCopy(subscriptionA);
-            assertThat(DefaultNotificationCenter.subscriptionDistinctKeyPredicate()
-                .test(subscriptionA, subscriptionB)).isTrue();
-
-            subscriptionB.getSpec().getReason().getSubject().setName("other");
-            assertThat(DefaultNotificationCenter.subscriptionDistinctKeyPredicate()
-                .test(subscriptionA, subscriptionB)).isFalse();
-
-            subscriptionB.getSpec().getReason().getSubject().setName(null);
-            assertThat(DefaultNotificationCenter.subscriptionDistinctKeyPredicate()
-                .test(subscriptionA, subscriptionB)).isTrue();
-        }
-
-        @Test
-        void differentSubjectApiVersion() {
-            var subscriptionA = createSubscriptions().get(0);
-            var subscriptionB = JsonUtils.deepCopy(subscriptionA);
-            assertThat(DefaultNotificationCenter.subscriptionDistinctKeyPredicate()
-                .test(subscriptionA, subscriptionB)).isTrue();
-
-            var subjectA = subscriptionA.getSpec().getReason().getSubject();
-            var gvForA = GroupVersion.parseAPIVersion(subjectA.getApiVersion());
-            subscriptionB.getSpec().getReason().getSubject()
-                .setApiVersion(gvForA.group() + "/otherVersion");
-            assertThat(DefaultNotificationCenter.subscriptionDistinctKeyPredicate()
-                .test(subscriptionA, subscriptionB)).isTrue();
-        }
-
-        @Test
-        void differentReasonType() {
-            var subscriptionA = createSubscriptions().get(0);
-            var subscriptionB = JsonUtils.deepCopy(subscriptionA);
-            assertThat(DefaultNotificationCenter.subscriptionDistinctKeyPredicate()
-                .test(subscriptionA, subscriptionB)).isTrue();
-
-            subscriptionB.getSpec().getReason().setReasonType("other");
-            assertThat(DefaultNotificationCenter.subscriptionDistinctKeyPredicate()
-                .test(subscriptionA, subscriptionB)).isFalse();
-        }
-
-        @Test
-        void differentSubscriber() {
-            var subscriptionA = createSubscriptions().get(0);
-            var subscriptionB = JsonUtils.deepCopy(subscriptionA);
-            assertThat(DefaultNotificationCenter.subscriptionDistinctKeyPredicate()
-                .test(subscriptionA, subscriptionB)).isTrue();
-
-            subscriptionB.getSpec().getSubscriber().setName("other");
-            assertThat(DefaultNotificationCenter.subscriptionDistinctKeyPredicate()
-                .test(subscriptionA, subscriptionB)).isFalse();
-        }
-    }
-
     @Test
     void getLocaleFromSubscriberTest() {
-        var subscription = mock(Subscription.class);
+        var subscription = mock(Subscriber.class);
 
         notificationCenter.getLocaleFromSubscriber(subscription)
             .as(StepVerifier::create)

@@ -7,6 +7,7 @@ import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+import static run.halo.app.content.comment.ReplyNotificationSubscriptionHelper.identityFrom;
 
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -24,9 +25,8 @@ import run.halo.app.core.extension.notification.Subscription;
 import run.halo.app.extension.GroupVersionKind;
 import run.halo.app.extension.Metadata;
 import run.halo.app.extension.Ref;
-import run.halo.app.infra.AnonymousUserConst;
 import run.halo.app.notification.NotificationCenter;
-import run.halo.app.notification.SubscriberEmailResolver;
+import run.halo.app.notification.UserIdentity;
 
 /**
  * Tests for {@link ReplyNotificationSubscriptionHelper}.
@@ -40,9 +40,6 @@ class ReplyNotificationSubscriptionHelperTest {
     @Mock
     NotificationCenter notificationCenter;
 
-    @Mock
-    SubscriberEmailResolver subscriberEmailResolver;
-
     @InjectMocks
     ReplyNotificationSubscriptionHelper notificationSubscriptionHelper;
 
@@ -51,17 +48,12 @@ class ReplyNotificationSubscriptionHelperTest {
         var comment = createComment();
         var spyNotificationSubscriptionHelper = spy(notificationSubscriptionHelper);
 
-        doNothing().when(spyNotificationSubscriptionHelper).subscribeReply(any(), any());
+        doNothing().when(spyNotificationSubscriptionHelper).subscribeReply(any(UserIdentity.class));
 
         spyNotificationSubscriptionHelper.subscribeNewReplyReasonForComment(comment);
 
-        var reasonSubject = Subscription.ReasonSubject.builder()
-            .apiVersion(comment.getApiVersion())
-            .kind(comment.getKind())
-            .name(comment.getMetadata().getName())
-            .build();
-        verify(spyNotificationSubscriptionHelper).subscribeReply(eq(reasonSubject),
-            eq(ReplyNotificationSubscriptionHelper.Identity.fromCommentOwner(
+        verify(spyNotificationSubscriptionHelper).subscribeReply(
+            eq(ReplyNotificationSubscriptionHelper.identityFrom(
                 comment.getSpec().getOwner()))
         );
     }
@@ -80,17 +72,12 @@ class ReplyNotificationSubscriptionHelperTest {
 
         var spyNotificationSubscriptionHelper = spy(notificationSubscriptionHelper);
 
-        doNothing().when(spyNotificationSubscriptionHelper).subscribeReply(any(), any());
+        doNothing().when(spyNotificationSubscriptionHelper).subscribeReply(any(UserIdentity.class));
 
         spyNotificationSubscriptionHelper.subscribeNewReplyReasonForReply(reply);
 
-        var reasonSubject = Subscription.ReasonSubject.builder()
-            .apiVersion(reply.getApiVersion())
-            .kind(reply.getKind())
-            .name(reply.getMetadata().getName())
-            .build();
-        verify(spyNotificationSubscriptionHelper).subscribeReply(eq(reasonSubject),
-            eq(ReplyNotificationSubscriptionHelper.Identity.fromCommentOwner(
+        verify(spyNotificationSubscriptionHelper).subscribeReply(
+            eq(ReplyNotificationSubscriptionHelper.identityFrom(
                 reply.getSpec().getOwner()))
         );
     }
@@ -98,48 +85,38 @@ class ReplyNotificationSubscriptionHelperTest {
     @Test
     void subscribeReplyTest() {
         var comment = createComment();
-        var reasonSubject = Subscription.ReasonSubject.builder()
-            .apiVersion(comment.getApiVersion())
-            .kind(comment.getKind())
-            .name(comment.getMetadata().getName())
-            .build();
-        var identity = ReplyNotificationSubscriptionHelper.Identity.fromCommentOwner(
+        var identity = ReplyNotificationSubscriptionHelper.identityFrom(
             comment.getSpec().getOwner());
 
         when(notificationCenter.subscribe(any(), any())).thenReturn(Mono.empty());
 
         var subscriber = new Subscription.Subscriber();
-        subscriber.setName(AnonymousUserConst.PRINCIPAL + "#" + identity.name());
-        when(subscriberEmailResolver.ofEmail(eq(identity.name())))
-            .thenReturn(subscriber);
+        subscriber.setName(identity.name());
 
-        notificationSubscriptionHelper.subscribeReply(reasonSubject, identity);
+        notificationSubscriptionHelper.subscribeReply(identity);
 
         var interestReason = new Subscription.InterestReason();
         interestReason.setReasonType(NotificationReasonConst.SOMEONE_REPLIED_TO_YOU);
-        interestReason.setSubject(reasonSubject);
+        interestReason.setExpression("props.repliedOwner == '%s'".formatted(subscriber.getName()));
         verify(notificationCenter).subscribe(eq(subscriber), eq(interestReason));
-        verify(subscriberEmailResolver).ofEmail(eq(identity.name()));
     }
 
     @Nested
     class IdentityTest {
 
         @Test
-        void createForCommentOwner() {
-            var commentOwner = new Comment.CommentOwner();
-            commentOwner.setKind(Comment.CommentOwner.KIND_EMAIL);
-            commentOwner.setName("example@example.com");
+        void identityFromTest() {
+            var owner = new Comment.CommentOwner();
+            owner.setKind(User.KIND);
+            owner.setName("fake-user");
 
-            var sub = ReplyNotificationSubscriptionHelper.Identity.fromCommentOwner(commentOwner);
-            assertThat(sub.isEmail()).isTrue();
-            assertThat(sub.name()).isEqualTo(commentOwner.getName());
+            assertThat(identityFrom(owner))
+                .isEqualTo(UserIdentity.of(owner.getName()));
 
-            commentOwner.setKind(User.KIND);
-            commentOwner.setName("fake-user");
-            sub = ReplyNotificationSubscriptionHelper.Identity.fromCommentOwner(commentOwner);
-            assertThat(sub.isEmail()).isFalse();
-            assertThat(sub.name()).isEqualTo(commentOwner.getName());
+            owner.setKind(Comment.CommentOwner.KIND_EMAIL);
+            owner.setName("example@example.com");
+            assertThat(identityFrom(owner))
+                .isEqualTo(UserIdentity.anonymousWithEmail(owner.getName()));
         }
     }
 

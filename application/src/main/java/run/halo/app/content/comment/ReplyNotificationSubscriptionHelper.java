@@ -9,7 +9,7 @@ import run.halo.app.core.extension.content.Comment;
 import run.halo.app.core.extension.content.Reply;
 import run.halo.app.core.extension.notification.Subscription;
 import run.halo.app.notification.NotificationCenter;
-import run.halo.app.notification.SubscriberEmailResolver;
+import run.halo.app.notification.UserIdentity;
 
 /**
  * Reply notification subscription helper.
@@ -22,7 +22,6 @@ import run.halo.app.notification.SubscriberEmailResolver;
 public class ReplyNotificationSubscriptionHelper {
 
     private final NotificationCenter notificationCenter;
-    private final SubscriberEmailResolver subscriberEmailResolver;
 
     /**
      * Subscribe new reply reason for comment.
@@ -30,13 +29,7 @@ public class ReplyNotificationSubscriptionHelper {
      * @param comment comment
      */
     public void subscribeNewReplyReasonForComment(Comment comment) {
-        var reasonSubject = Subscription.ReasonSubject.builder()
-            .apiVersion(comment.getApiVersion())
-            .kind(comment.getKind())
-            .name(comment.getMetadata().getName())
-            .build();
-        subscribeReply(reasonSubject,
-            Identity.fromCommentOwner(comment.getSpec().getOwner()));
+        subscribeReply(identityFrom(comment.getSpec().getOwner()));
     }
 
     /**
@@ -45,50 +38,36 @@ public class ReplyNotificationSubscriptionHelper {
      * @param reply reply
      */
     public void subscribeNewReplyReasonForReply(Reply reply) {
-        var reasonSubject = Subscription.ReasonSubject.builder()
-            .apiVersion(reply.getApiVersion())
-            .kind(reply.getKind())
-            .name(reply.getMetadata().getName())
-            .build();
         var subjectOwner = reply.getSpec().getOwner();
-        subscribeReply(reasonSubject,
-            Identity.fromCommentOwner(subjectOwner));
+        subscribeReply(identityFrom(subjectOwner));
     }
 
-    void subscribeReply(Subscription.ReasonSubject reasonSubject,
-        Identity identity) {
+    void subscribeReply(UserIdentity identity) {
         var subscriber = createSubscriber(identity);
         if (subscriber == null) {
             return;
         }
         var interestReason = new Subscription.InterestReason();
         interestReason.setReasonType(NotificationReasonConst.SOMEONE_REPLIED_TO_YOU);
-        interestReason.setSubject(reasonSubject);
+        interestReason.setExpression("props.repliedOwner == '%s'".formatted(identity.name()));
         notificationCenter.subscribe(subscriber, interestReason).block();
     }
 
     @Nullable
-    private Subscription.Subscriber createSubscriber(Identity author) {
+    private Subscription.Subscriber createSubscriber(UserIdentity author) {
         if (StringUtils.isBlank(author.name())) {
             return null;
         }
 
-        Subscription.Subscriber subscriber;
-        if (author.isEmail()) {
-            subscriber = subscriberEmailResolver.ofEmail(author.name());
-        } else {
-            subscriber = new Subscription.Subscriber();
-            subscriber.setName(author.name());
-        }
+        Subscription.Subscriber subscriber = new Subscription.Subscriber();
+        subscriber.setName(author.name());
         return subscriber;
     }
 
-    record Identity(String name, boolean isEmail) {
-        public static Identity fromCommentOwner(Comment.CommentOwner commentOwner) {
-            if (Comment.CommentOwner.KIND_EMAIL.equals(commentOwner.getKind())) {
-                return new Identity(commentOwner.getName(), true);
-            }
-            return new Identity(commentOwner.getName(), false);
+    public static UserIdentity identityFrom(Comment.CommentOwner owner) {
+        if (Comment.CommentOwner.KIND_EMAIL.equals(owner.getKind())) {
+            return UserIdentity.anonymousWithEmail(owner.getName());
         }
+        return UserIdentity.of(owner.getName());
     }
 }

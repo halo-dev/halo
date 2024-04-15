@@ -56,9 +56,12 @@ public class Subscription extends AbstractExtension {
             + "interested in")
         private String reasonType;
 
-        @Schema(requiredMode = REQUIRED, description = "The subject name of reason type to be"
+        @Schema(requiredMode = NOT_REQUIRED, description = "The subject name of reason type to be"
             + " interested in")
         private ReasonSubject subject;
+
+        @Schema(requiredMode = NOT_REQUIRED, description = "The expression to be interested in")
+        private String expression;
     }
 
     @Data
