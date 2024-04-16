@@ -2,7 +2,7 @@
 // types
 import type { Ref } from "vue";
 // core libs
-import { computed, inject, ref } from "vue";
+import { inject, ref } from "vue";
 import { useThemeLifeCycle } from "./composables/use-theme";
 
 // components
@@ -57,13 +57,6 @@ const handleReloadTheme = async () => {
     },
   });
 };
-
-// Fields computed
-const homepage = computed(() => {
-  return (
-    selectedTheme?.value?.spec.homepage || selectedTheme?.value?.spec.website
-  );
-});
 </script>
 
 <template>
@@ -154,18 +147,16 @@ const homepage = computed(() => {
           />
           <VDescriptionItem
             :label="$t('core.theme.detail.fields.requires')"
-            :content="
-              selectedTheme?.spec.require || selectedTheme?.spec.requires
-            "
+            :content="selectedTheme?.spec.requires"
           />
           <VDescriptionItem :label="$t('core.theme.detail.fields.homepage')">
             <a
-              v-if="homepage"
-              :href="homepage"
+              v-if="selectedTheme?.spec.homepage"
+              :href="selectedTheme.spec.homepage"
               class="hover:text-gray-600"
               target="_blank"
             >
-              {{ homepage }}
+              {{ selectedTheme.spec.homepage }}
             </a>
             <span v-else>
               {{ $t("core.common.text.none") }}
