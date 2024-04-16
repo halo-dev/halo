@@ -827,6 +827,7 @@ core:
         last_starttime: 最近一次启动
         homepage: 网站
         repo: 源码仓库
+        load_location: 存储位置
     loader:
       toast:
         entry_load_failed: 加载插件入口文件失败

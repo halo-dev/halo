@@ -228,6 +228,10 @@ const pluginRoleTemplateGroups = computed<RoleTemplateGroup[]>(() => {
             :label="$t('core.plugin.detail.fields.last_starttime')"
             :content="formatDatetime(plugin?.status?.lastStartTime)"
           />
+          <VDescriptionItem
+            :label="$t('core.plugin.detail.fields.load_location')"
+            :content="plugin?.status?.loadLocation"
+          ></VDescriptionItem>
         </VDescription>
       </div>
     </div>

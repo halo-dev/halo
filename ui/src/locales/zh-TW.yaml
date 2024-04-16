@@ -815,6 +815,7 @@ core:
         last_starttime: 最近一次啟動
         homepage: 網站
         repo: 源碼倉庫
+        load_location: 存儲位置
     loader:
       toast:
         entry_load_failed: 讀取插件入口文件失敗

@@ -869,6 +869,7 @@ core:
         last_starttime: Last Start Time
         homepage: Homepage
         repo: Source Repository
+        load_location: Storage Location
     loader:
       toast:
         entry_load_failed: Failed to load plugins entry file
