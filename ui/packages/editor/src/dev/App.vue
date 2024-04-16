@@ -45,6 +45,7 @@ import {
   ExtensionTrailingNode,
   ExtensionListKeymap,
   ExtensionSearchAndReplace,
+  ExtensionClearFormat,
 } from "../index";
 
 const content = useLocalStorage("content", "");
@@ -111,6 +112,7 @@ const editor = useEditor({
     ExtensionTrailingNode,
     ExtensionListKeymap,
     ExtensionSearchAndReplace,
+    ExtensionClearFormat,
   ],
   parseOptions: {
     preserveWhitespace: true,

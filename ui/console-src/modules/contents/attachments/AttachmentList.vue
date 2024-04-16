@@ -166,6 +166,7 @@ const onDetailModalClose = () => {
   selectedAttachment.value = undefined;
   nameQuery.value = undefined;
   nameQueryAttachment.value = undefined;
+  detailVisible.value = false;
   handleFetchAttachments();
 };
 
@@ -230,7 +231,7 @@ onMounted(() => {
 </script>
 <template>
   <AttachmentDetailModal
-    v-model:visible="detailVisible"
+    v-if="detailVisible"
     :attachment="selectedAttachment || nameQueryAttachment"
     @close="onDetailModalClose"
   >

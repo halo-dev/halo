@@ -85,6 +85,8 @@ public class GlobalInfoEndpoint {
         private List<SocialAuthProvider> socialAuthProviders;
 
         private Boolean mustVerifyEmailOnRegistration;
+
+        private String siteTitle;
     }
 
     @Data
@@ -139,6 +141,7 @@ public class GlobalInfoEndpoint {
         var basic = SystemSetting.get(configMap, Basic.GROUP, Basic.class);
         if (basic != null) {
             info.setFavicon(basic.getFavicon());
+            info.setSiteTitle(basic.getTitle());
         }
     }
 
