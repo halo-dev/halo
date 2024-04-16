@@ -672,10 +672,12 @@ core:
         author: 作者
         website: 網站
         repo: 源碼倉庫
-        version: 當前版本
-        requires: 版本要求
+        version: 版本
+        requires: Halo 版本要求
         storage_location: 存儲位置
         plugin_requires: 插件依賴
+        description: 描述
+        license: 協議
     settings:
       title: 主題設置
     custom_templates:
