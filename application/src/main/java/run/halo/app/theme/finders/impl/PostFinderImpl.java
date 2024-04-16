@@ -1,7 +1,9 @@
 package run.halo.app.theme.finders.impl;
 
+import static run.halo.app.extension.index.query.QueryFactory.all;
 import static run.halo.app.extension.index.query.QueryFactory.and;
 import static run.halo.app.extension.index.query.QueryFactory.equal;
+import static run.halo.app.extension.index.query.QueryFactory.or;
 
 import java.util.Comparator;
 import java.util.List;
@@ -15,12 +17,14 @@ import org.springframework.lang.NonNull;
 import org.springframework.util.Assert;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
+import run.halo.app.core.extension.content.Category;
 import run.halo.app.core.extension.content.Post;
 import run.halo.app.extension.ListOptions;
 import run.halo.app.extension.ListResult;
 import run.halo.app.extension.PageRequestImpl;
 import run.halo.app.extension.ReactiveExtensionClient;
 import run.halo.app.extension.exception.ExtensionNotFoundException;
+import run.halo.app.extension.index.query.Query;
 import run.halo.app.extension.index.query.QueryFactory;
 import run.halo.app.extension.router.selector.FieldSelector;
 import run.halo.app.extension.router.selector.LabelSelector;
@@ -141,13 +145,45 @@ public class PostFinderImpl implements PostFinder {
     @Override
     public Mono<ListResult<ListedPostVo>> listByCategory(Integer page, Integer size,
         String categoryName) {
-        var fieldQuery = QueryFactory.all();
-        if (StringUtils.isNotBlank(categoryName)) {
-            fieldQuery = and(fieldQuery, equal("spec.categories", categoryName));
-        }
         var listOptions = new ListOptions();
-        listOptions.setFieldSelector(FieldSelector.of(fieldQuery));
-        return postPublicQueryService.list(listOptions, getPageRequest(page, size));
+        var pageRequest = getPageRequest(page, size);
+
+        if (StringUtils.isNotBlank(categoryName)) {
+            return childrenCategoryQuery(categoryName).flatMap(fieldQuery -> {
+                listOptions.setFieldSelector(FieldSelector.of(fieldQuery));
+                return postPublicQueryService.list(listOptions, pageRequest);
+            });
+        } else {
+            return postPublicQueryService.list(listOptions, pageRequest);
+        }
+    }
+
+    private Mono<Query> childrenCategoryQuery(String categoryName) {
+        if (categoryName == null) {
+            return Mono.empty();
+        }
+
+        return traverseCategories(categoryName)
+            .map(childrenCategory -> equal("spec.categories", childrenCategory))
+            .collect(Collectors.toList())
+            .flatMap(this::mergeQuery);
+    }
+
+    Mono<Query> mergeQuery(List<Query> childrenQueryList) {
+        if (childrenQueryList.size() < 2) {
+            return Mono.just(and(all(), childrenQueryList.get(0)));
+        }
+        return Mono.just(
+            or(childrenQueryList.get(0), childrenQueryList.get(1), childrenQueryList)
+        );
+    }
+
+    private Flux<String> traverseCategories(String categoryName) {
+        return client.fetch(Category.class, categoryName).expand(
+            rootCategory -> Flux.fromIterable(rootCategory.getSpec().getChildren())
+                .flatMap(childCategory -> client.fetch(Category.class, childCategory)
+                    .filter(category -> !category.getSpec().isIndependent()))
+        ).map(category -> category.getMetadata().getName());
     }
 
     @Override

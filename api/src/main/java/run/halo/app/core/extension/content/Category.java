@@ -59,6 +59,8 @@ public class Category extends AbstractExtension {
         private Integer priority;
 
         private List<String> children;
+
+        private boolean independent;
     }
 
     @JsonIgnore

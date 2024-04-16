@@ -303,6 +303,9 @@ core:
           refresh_message: Regenerar slug basado en el nombre para mostrar.
         template:
           label: Plantilla personalizada
+        independent:
+          label: Categoría independiente
+          help: El número de artículos y artículos no se incluirá en la categoría padre.
         cover:
           label: Portada
           help: Se requiere adaptación del tema para ser compatible

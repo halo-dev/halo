@@ -28,6 +28,12 @@ export interface CategorySpec {
     'children'?: Array<string>;
     /**
      * 
+     * @type {boolean}
+     * @memberof CategorySpec
+     */
+    'independent'?: boolean;
+    /**
+     *
      * @type {string}
      * @memberof CategorySpec
      */

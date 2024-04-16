@@ -335,6 +335,9 @@ core:
           refresh_message: 根據名稱重新生成別名
         template:
           label: 自定義模板
+        independent:
+          label: 獨立分類
+          help: 文章和文章數將不計入父級分類
         cover:
           label: 封面圖
           help: 需要主題適配以支持

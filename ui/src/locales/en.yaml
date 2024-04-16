@@ -347,6 +347,9 @@ core:
           refresh_message: Regenerate slug based on display name.
         template:
           label: Custom template
+        independent:
+          label: Independent Category
+          help: Articles and the number of articles will not be counted towards the parent category.
         cover:
           label: Cover
           help: Theme adaptation is required to support

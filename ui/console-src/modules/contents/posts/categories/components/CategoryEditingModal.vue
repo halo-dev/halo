@@ -55,6 +55,7 @@ const initialFormState: Category = {
     template: "",
     priority: 0,
     children: [],
+    isIndependent: false,
   },
   status: {},
   apiVersion: "content.halo.run/v1alpha1",
@@ -278,6 +279,17 @@ const { handleGenerateSlug } = useSlugify(
               "
               type="select"
               name="template"
+            ></FormKit>
+            <FormKit
+              v-model="formState.spec.independent"
+              :label="
+                $t('core.post_category.editing_modal.fields.independent.label')
+              "
+              :help="
+                $t('core.post_category.editing_modal.fields.independent.help')
+              "
+              type="checkbox"
+              name="includeChildren"
             ></FormKit>
             <FormKit
               v-model="formState.spec.cover"
