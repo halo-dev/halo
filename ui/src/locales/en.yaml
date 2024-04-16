@@ -860,7 +860,6 @@ core:
       header:
         title: Plugin information
       fields:
-        display_name: Display Name
         description: Description
         version: Version
         requires: Requires
@@ -868,6 +867,8 @@ core:
         license: License
         role_templates: Role Templates
         last_starttime: Last Start Time
+        homepage: Homepage
+        repo: Source Repository
     loader:
       toast:
         entry_load_failed: Failed to load plugins entry file

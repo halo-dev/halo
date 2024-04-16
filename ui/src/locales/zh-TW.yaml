@@ -806,14 +806,15 @@ core:
       header:
         title: 插件信息
       fields:
-        display_name: 名稱
         description: 描述
         version: 版本
         requires: Halo 版本要求
-        author: 提供方
+        author: 作者
         license: 協議
         role_templates: 權限模板
         last_starttime: 最近一次啟動
+        homepage: 網站
+        repo: 源碼倉庫
     loader:
       toast:
         entry_load_failed: 讀取插件入口文件失敗

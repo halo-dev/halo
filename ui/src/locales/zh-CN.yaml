@@ -818,14 +818,15 @@ core:
       header:
         title: 插件信息
       fields:
-        display_name: 名称
         description: 描述
         version: 版本
         requires: Halo 版本要求
-        author: 提供方
+        author: 作者
         license: 协议
         role_templates: 权限模板
         last_starttime: 最近一次启动
+        homepage: 网站
+        repo: 源码仓库
     loader:
       toast:
         entry_load_failed: 加载插件入口文件失败
