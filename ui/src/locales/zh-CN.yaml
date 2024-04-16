@@ -682,7 +682,7 @@ core:
     detail:
       fields:
         author: 作者
-        website: 网站
+        homepage: 网站
         repo: 源码仓库
         version: 版本
         requires: Halo 版本要求

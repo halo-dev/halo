@@ -670,7 +670,7 @@ core:
     detail:
       fields:
         author: 作者
-        website: 網站
+        homepage: 網站
         repo: 源碼倉庫
         version: 版本
         requires: Halo 版本要求

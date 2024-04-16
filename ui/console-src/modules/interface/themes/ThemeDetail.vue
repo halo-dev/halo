@@ -2,7 +2,7 @@
 // types
 import type { Ref } from "vue";
 // core libs
-import { inject, ref } from "vue";
+import { computed, inject, ref } from "vue";
 import { useThemeLifeCycle } from "./composables/use-theme";
 
 // components
@@ -57,6 +57,13 @@ const handleReloadTheme = async () => {
     },
   });
 };
+
+// Fields computed
+const homepage = computed(() => {
+  return (
+    selectedTheme?.value?.spec.homepage || selectedTheme?.value?.spec.website
+  );
+});
 </script>
 
 <template>
@@ -151,16 +158,18 @@ const handleReloadTheme = async () => {
               selectedTheme?.spec.require || selectedTheme?.spec.requires
             "
           />
-          <VDescriptionItem :label="$t('core.theme.detail.fields.website')">
+          <VDescriptionItem :label="$t('core.theme.detail.fields.homepage')">
             <a
-              :href="
-                selectedTheme?.spec.homepage || selectedTheme?.spec.website
-              "
+              v-if="homepage"
+              :href="homepage"
               class="hover:text-gray-600"
               target="_blank"
             >
-              {{ selectedTheme?.spec.homepage || selectedTheme?.spec.website }}
+              {{ homepage }}
             </a>
+            <span v-else>
+              {{ $t("core.common.text.none") }}
+            </span>
           </VDescriptionItem>
           <VDescriptionItem :label="$t('core.theme.detail.fields.repo')">
             <a

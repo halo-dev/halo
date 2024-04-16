@@ -712,7 +712,7 @@ core:
     detail:
       fields:
         author: Author
-        website: Website
+        homepage: Website
         repo: Source Repository
         version: Version
         requires: Requires
