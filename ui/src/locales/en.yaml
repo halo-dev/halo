@@ -219,6 +219,8 @@ core:
           create_time_asc: Earliest Created
           visit_desc: Most Visits
           comment_desc: Most Comments
+          last_modify_time_desc: Recently Updated
+          last_modify_time_asc: Earliest Updated
     list:
       fields:
         categories: "Categories:"

@@ -211,6 +211,8 @@ core:
           create_time_asc: 较早创建
           visit_desc: 最多访问量
           comment_desc: 最多评论量
+          last_modify_time_desc: 最近更新
+          last_modify_time_asc: 较早更新
     list:
       fields:
         categories: 分类：
