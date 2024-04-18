@@ -19,6 +19,10 @@ on:
     types:
       - published
 
+concurrency: 
+  group: ${{github.workflow}} - ${{github.ref}}
+  cancel-in-progress: true
+
 jobs:
   test:
     if: github.event_name == 'pull_request' || github.event_name == 'push'
@@ -30,6 +34,7 @@ jobs:
       - name: Check Halo
         run: ./gradlew check
       - name: Upload coverage reports to Codecov
+        if: github.repository == 'halo-dev/halo'
         uses: codecov/codecov-action@v4
 
   build:
@@ -51,6 +56,7 @@ jobs:
       - name: Build Halo
         run: ./gradlew clean && ./gradlew downloadPluginPresets && ./gradlew build -x check
       - name: Upload Artifacts
+        if: github.repository == 'halo-dev/halo'
         uses: actions/upload-artifact@v4
         with:
           name: halo-artifacts
@@ -69,6 +75,7 @@ jobs:
           name: halo-artifacts
           path: application/build/libs
       - name: Upload Artifacts
+        if: github.repository == 'halo-dev/halo'
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: gh release upload ${{ github.event.release.tag_name }} application/build/libs/*
