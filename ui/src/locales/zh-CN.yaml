@@ -871,7 +871,7 @@ core:
       fields:
         username:
           label: 用户名
-          validation: 请输入有效的用户名
+          validation: 只能包含数字、小写字母、. 和 - 符号，且不能以 . 和 - 符号开头和结尾
         display_name:
           label: 显示名称
         email:
@@ -1061,7 +1061,7 @@ core:
       fields:
         username:
           label: 用户名
-          validation: 请输入有效的用户名
+          validation: 只能包含数字、小写字母、. 和 - 符号，且不能以 . 和 - 符号开头和结尾
         display_name:
           label: 显示名称
         email:

@@ -915,7 +915,7 @@ core:
       fields:
         username:
           label: Username
-          validation: Please enter a valid username.
+          validation: Can only contain numbers, lowercase letters, periods (.), and hyphens (-), and cannot start or end with a period (.) or hyphen (-).
         display_name:
           label: Display name
         email:
@@ -1113,7 +1113,7 @@ core:
       fields:
         username:
           label: Username
-          validation: Please enter a valid username.
+          validation: Can only contain numbers, lowercase letters, periods (.), and hyphens (-), and cannot start or end with a period (.) or hyphen (-).
         display_name:
           label: Display name
         email:
