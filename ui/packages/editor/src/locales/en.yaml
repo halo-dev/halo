@@ -83,6 +83,10 @@ editor:
       match_word: Match Whole Word
       use_regex: Use Regular Expression
       close: Close
+    format_brush:
+      toolbar_item:
+        title: Format Brush
+        cancel: Cancel Format Brush
   components:
     color_picker:
       more_color: More
