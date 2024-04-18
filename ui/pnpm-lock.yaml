@@ -75,7 +75,7 @@ importers:
         specifier: ^4.29.1
         version: 4.29.1(vue@3.4.19)
       '@tiptap/extension-character-count':
-        specifier: ^2.2.6
+        specifier: ^2.3.0
         version: 2.3.0(@tiptap/core@2.3.0)(@tiptap/pm@2.3.0)
       '@uppy/core':
         specifier: ^3.8.0
@@ -446,118 +446,118 @@ importers:
         specifier: ^1.5.0
         version: 1.5.0(vue@3.4.19)
       '@tiptap/core':
-        specifier: ^2.2.6
+        specifier: ^2.3.0
         version: 2.3.0(@tiptap/pm@2.3.0)
       '@tiptap/extension-blockquote':
-        specifier: ^2.2.6
+        specifier: ^2.3.0
         version: 2.3.0(@tiptap/core@2.3.0)
       '@tiptap/extension-bold':
-        specifier: ^2.2.6
+        specifier: ^2.3.0
         version: 2.3.0(@tiptap/core@2.3.0)
       '@tiptap/extension-bullet-list':
-        specifier: ^2.2.6
+        specifier: ^2.3.0
         version: 2.3.0(@tiptap/core@2.3.0)
       '@tiptap/extension-code':
-        specifier: ^2.2.6
+        specifier: ^2.3.0
         version: 2.3.0(@tiptap/core@2.3.0)
       '@tiptap/extension-code-block':
-        specifier: ^2.2.6
+        specifier: ^2.3.0
         version: 2.3.0(@tiptap/core@2.3.0)(@tiptap/pm@2.3.0)
       '@tiptap/extension-code-block-lowlight':
-        specifier: ^2.2.6
+        specifier: ^2.3.0
         version: 2.3.0(@tiptap/core@2.3.0)(@tiptap/extension-code-block@2.3.0)(@tiptap/pm@2.3.0)
       '@tiptap/extension-color':
-        specifier: ^2.2.6
+        specifier: ^2.3.0
         version: 2.3.0(@tiptap/core@2.3.0)(@tiptap/extension-text-style@2.3.0)
       '@tiptap/extension-document':
-        specifier: ^2.2.6
+        specifier: ^2.3.0
         version: 2.3.0(@tiptap/core@2.3.0)
       '@tiptap/extension-dropcursor':
-        specifier: ^2.2.6
+        specifier: ^2.3.0
         version: 2.3.0(@tiptap/core@2.3.0)(@tiptap/pm@2.3.0)
       '@tiptap/extension-gapcursor':
-        specifier: ^2.2.6
+        specifier: ^2.3.0
         version: 2.3.0(@tiptap/core@2.3.0)(@tiptap/pm@2.3.0)
       '@tiptap/extension-hard-break':
-        specifier: ^2.2.6
+        specifier: ^2.3.0
         version: 2.3.0(@tiptap/core@2.3.0)
       '@tiptap/extension-heading':
-        specifier: ^2.2.6
+        specifier: ^2.3.0
         version: 2.3.0(@tiptap/core@2.3.0)
       '@tiptap/extension-highlight':
-        specifier: ^2.2.6
+        specifier: ^2.3.0
         version: 2.3.0(@tiptap/core@2.3.0)
       '@tiptap/extension-history':
-        specifier: ^2.2.6
+        specifier: ^2.3.0
         version: 2.3.0(@tiptap/core@2.3.0)(@tiptap/pm@2.3.0)
       '@tiptap/extension-horizontal-rule':
-        specifier: ^2.2.6
+        specifier: ^2.3.0
         version: 2.3.0(@tiptap/core@2.3.0)(@tiptap/pm@2.3.0)
       '@tiptap/extension-image':
-        specifier: ^2.2.6
+        specifier: ^2.3.0
         version: 2.3.0(@tiptap/core@2.3.0)
       '@tiptap/extension-italic':
-        specifier: ^2.2.6
+        specifier: ^2.3.0
         version: 2.3.0(@tiptap/core@2.3.0)
       '@tiptap/extension-link':
-        specifier: ^2.2.6
+        specifier: ^2.3.0
         version: 2.3.0(@tiptap/core@2.3.0)(@tiptap/pm@2.3.0)
       '@tiptap/extension-list-item':
-        specifier: ^2.2.6
+        specifier: ^2.3.0
         version: 2.3.0(@tiptap/core@2.3.0)
       '@tiptap/extension-list-keymap':
-        specifier: ^2.2.6
+        specifier: ^2.3.0
         version: 2.3.0(@tiptap/core@2.3.0)
       '@tiptap/extension-ordered-list':
-        specifier: ^2.2.6
+        specifier: ^2.3.0
         version: 2.3.0(@tiptap/core@2.3.0)
       '@tiptap/extension-paragraph':
-        specifier: ^2.2.6
+        specifier: ^2.3.0
         version: 2.3.0(@tiptap/core@2.3.0)
       '@tiptap/extension-placeholder':
-        specifier: ^2.2.6
+        specifier: ^2.3.0
         version: 2.3.0(@tiptap/core@2.3.0)(@tiptap/pm@2.3.0)
       '@tiptap/extension-strike':
-        specifier: ^2.2.6
+        specifier: ^2.3.0
         version: 2.3.0(@tiptap/core@2.3.0)
       '@tiptap/extension-subscript':
-        specifier: ^2.2.6
+        specifier: ^2.3.0
         version: 2.3.0(@tiptap/core@2.3.0)
       '@tiptap/extension-superscript':
-        specifier: ^2.2.6
+        specifier: ^2.3.0
         version: 2.3.0(@tiptap/core@2.3.0)
       '@tiptap/extension-table':
-        specifier: ^2.2.6
+        specifier: ^2.3.0
         version: 2.3.0(@tiptap/core@2.3.0)(@tiptap/pm@2.3.0)
       '@tiptap/extension-table-row':
-        specifier: ^2.2.6
+        specifier: ^2.3.0
         version: 2.3.0(@tiptap/core@2.3.0)
       '@tiptap/extension-task-item':
-        specifier: ^2.2.6
+        specifier: ^2.3.0
         version: 2.3.0(@tiptap/core@2.3.0)(@tiptap/pm@2.3.0)
       '@tiptap/extension-task-list':
-        specifier: ^2.2.6
+        specifier: ^2.3.0
         version: 2.3.0(@tiptap/core@2.3.0)
       '@tiptap/extension-text':
-        specifier: ^2.2.6
+        specifier: ^2.3.0
         version: 2.3.0(@tiptap/core@2.3.0)
       '@tiptap/extension-text-align':
-        specifier: ^2.2.6
+        specifier: ^2.3.0
         version: 2.3.0(@tiptap/core@2.3.0)
       '@tiptap/extension-text-style':
-        specifier: ^2.2.6
+        specifier: ^2.3.0
         version: 2.3.0(@tiptap/core@2.3.0)
       '@tiptap/extension-underline':
-        specifier: ^2.2.6
+        specifier: ^2.3.0
         version: 2.3.0(@tiptap/core@2.3.0)
       '@tiptap/pm':
-        specifier: ^2.2.6
+        specifier: ^2.3.0
         version: 2.3.0
       '@tiptap/suggestion':
-        specifier: ^2.2.6
+        specifier: ^2.3.0
         version: 2.3.0(@tiptap/core@2.3.0)(@tiptap/pm@2.3.0)
       '@tiptap/vue-3':
-        specifier: ^2.2.6
+        specifier: ^2.3.0
         version: 2.3.0(@tiptap/core@2.3.0)(@tiptap/pm@2.3.0)(vue@3.4.19)
       floating-vue:
         specifier: 2.0.0-beta.24
