@@ -33,7 +33,6 @@ import run.halo.app.core.extension.content.Post;
 import run.halo.app.extension.ListResult;
 import run.halo.app.extension.MetadataUtil;
 import run.halo.app.extension.ReactiveExtensionClient;
-import run.halo.app.extension.router.QueryParamBuildUtil;
 
 /**
  * Endpoint for managing posts.
@@ -61,7 +60,7 @@ public class PostEndpoint implements CustomEndpoint {
                         .response(responseBuilder()
                             .implementation(ListResult.generateGenericClass(ListedPost.class))
                         );
-                    QueryParamBuildUtil.buildParametersFromType(builder, PostQuery.class);
+                    PostQuery.buildParameters(builder);
                 }
             )
             .GET("posts/{name}/head-content", this::fetchHeadContent,

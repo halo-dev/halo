@@ -3,6 +3,8 @@ package run.halo.app.core.extension.attachment.endpoint;
 import static io.swagger.v3.oas.annotations.media.Schema.RequiredMode.REQUIRED;
 import static org.springdoc.core.fn.builders.apiresponse.Builder.responseBuilder;
 import static org.springdoc.core.fn.builders.content.Builder.contentBuilder;
+import static org.springdoc.core.fn.builders.parameter.Builder.parameterBuilder;
+import static org.springdoc.core.fn.builders.requestbody.Builder.requestBodyBuilder;
 import static org.springdoc.core.fn.builders.schema.Builder.schemaBuilder;
 import static org.springframework.boot.convert.ApplicationConversionService.getSharedInstance;
 import static org.springframework.web.reactive.function.server.RequestPredicates.contentType;
@@ -13,16 +15,16 @@ import static run.halo.app.extension.index.query.QueryFactory.contains;
 import static run.halo.app.extension.index.query.QueryFactory.in;
 import static run.halo.app.extension.index.query.QueryFactory.isNull;
 import static run.halo.app.extension.index.query.QueryFactory.not;
-import static run.halo.app.extension.router.QueryParamBuildUtil.buildParametersFromType;
 import static run.halo.app.extension.router.selector.SelectorUtil.labelAndFieldSelectorToListOptions;
 
+import io.swagger.v3.oas.annotations.enums.ParameterIn;
 import io.swagger.v3.oas.annotations.media.ArraySchema;
 import io.swagger.v3.oas.annotations.media.Schema;
 import java.util.List;
 import java.util.Optional;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.BooleanUtils;
-import org.springdoc.core.fn.builders.requestbody.Builder;
+import org.springdoc.core.fn.builders.operation.Builder;
 import org.springdoc.webflux.core.fn.SpringdocRouteBuilder;
 import org.springframework.data.domain.Sort;
 import org.springframework.http.MediaType;
@@ -49,6 +51,7 @@ import run.halo.app.extension.PageRequestImpl;
 import run.halo.app.extension.ReactiveExtensionClient;
 import run.halo.app.extension.router.IListRequest;
 import run.halo.app.extension.router.IListRequest.QueryListRequest;
+import run.halo.app.extension.router.QueryParamBuildUtil;
 import run.halo.app.extension.router.selector.LabelSelector;
 
 @Slf4j
@@ -86,7 +89,7 @@ public class AttachmentEndpoint implements CustomEndpoint {
                 builder -> builder
                     .operationId("UploadAttachment")
                     .tag(tag)
-                    .requestBody(Builder.requestBodyBuilder()
+                    .requestBody(requestBodyBuilder()
                         .required(true)
                         .content(contentBuilder()
                             .mediaType(MediaType.MULTIPART_FORM_DATA_VALUE)
@@ -102,7 +105,7 @@ public class AttachmentEndpoint implements CustomEndpoint {
                         .response(
                             responseBuilder().implementation(generateGenericClass(Attachment.class))
                         );
-                    buildParametersFromType(builder, ISearchRequest.class);
+                    ISearchRequest.buildParameters(builder);
                 }
             )
             .build();
@@ -147,6 +150,26 @@ public class AttachmentEndpoint implements CustomEndpoint {
                 implementation = String.class,
                 example = "creationTimestamp,desc"))
         Sort getSort();
+
+        public static void buildParameters(Builder builder) {
+            IListRequest.buildParameters(builder);
+            builder.parameter(QueryParamBuildUtil.sortParameter())
+                .parameter(parameterBuilder()
+                    .in(ParameterIn.QUERY)
+                    .name("ungrouped")
+                    .required(false)
+                    .description("""
+                        Filter attachments without group. This parameter will ignore group \
+                        parameter.\
+                        """)
+                    .implementation(Boolean.class))
+                .parameter(parameterBuilder()
+                    .in(ParameterIn.QUERY)
+                    .name("keyword")
+                    .required(false)
+                    .description("Keyword for searching.")
+                    .implementation(String.class));
+        }
     }
 
     public static class SearchRequest extends QueryListRequest implements ISearchRequest {

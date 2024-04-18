@@ -54,7 +54,7 @@ public class ExtensionRouterFunctionFactory {
                         .response(responseBuilder().responseCode("200")
                             .description("Response " + scheme.plural())
                             .implementation(ListResult.generateGenericClass(scheme)));
-                    QueryParamBuildUtil.buildParametersFromType(builder, SortableRequest.class);
+                    SortableRequest.buildParameters(builder);
                 })
             .POST(createHandler.pathPattern(), createHandler,
                 builder -> builder.operationId("Create" + gvk)

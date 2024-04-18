@@ -7,6 +7,8 @@ import static org.springdoc.core.fn.builders.apiresponse.Builder.responseBuilder
 import static org.springdoc.core.fn.builders.content.Builder.contentBuilder;
 import static org.springdoc.core.fn.builders.parameter.Builder.parameterBuilder;
 import static org.springdoc.core.fn.builders.requestbody.Builder.requestBodyBuilder;
+import static org.springdoc.core.fn.builders.schema.Builder.schemaBuilder;
+import static run.halo.app.extension.router.QueryParamBuildUtil.sortParameter;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import io.github.resilience4j.ratelimiter.RateLimiterRegistry;
@@ -18,7 +20,7 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.apache.commons.lang3.StringUtils;
-import org.springdoc.core.fn.builders.schema.Builder;
+import org.springdoc.core.fn.builders.operation.Builder;
 import org.springdoc.webflux.core.fn.SpringdocRouteBuilder;
 import org.springframework.data.domain.Sort;
 import org.springframework.http.MediaType;
@@ -45,7 +47,6 @@ import run.halo.app.extension.PageRequest;
 import run.halo.app.extension.PageRequestImpl;
 import run.halo.app.extension.Ref;
 import run.halo.app.extension.router.IListRequest;
-import run.halo.app.extension.router.QueryParamBuildUtil;
 import run.halo.app.infra.SystemConfigurableEnvironmentFetcher;
 import run.halo.app.infra.exception.AccessDeniedException;
 import run.halo.app.infra.exception.RateLimitExceededException;
@@ -82,7 +83,7 @@ public class CommentFinderEndpoint implements CustomEndpoint {
                         .required(true)
                         .content(contentBuilder()
                             .mediaType(MediaType.APPLICATION_JSON_VALUE)
-                            .schema(Builder.schemaBuilder()
+                            .schema(schemaBuilder()
                                 .implementation(CommentRequest.class))
                         ))
                     .response(responseBuilder()
@@ -100,7 +101,7 @@ public class CommentFinderEndpoint implements CustomEndpoint {
                         .required(true)
                         .content(contentBuilder()
                             .mediaType(MediaType.APPLICATION_JSON_VALUE)
-                            .schema(Builder.schemaBuilder()
+                            .schema(schemaBuilder()
                                 .implementation(ReplyRequest.class))
                         ))
                     .response(responseBuilder()
@@ -113,7 +114,7 @@ public class CommentFinderEndpoint implements CustomEndpoint {
                     .response(responseBuilder()
                         .implementation(ListResult.generateGenericClass(CommentWithReplyVo.class))
                     );
-                QueryParamBuildUtil.buildParametersFromType(builder, CommentQuery.class);
+                CommentQuery.buildParameters(builder);
             })
             .GET("comments/{name}", this::getComment, builder -> {
                 builder.operationId("GetComment")
@@ -138,7 +139,7 @@ public class CommentFinderEndpoint implements CustomEndpoint {
                     .response(responseBuilder()
                         .implementation(ListResult.generateGenericClass(ReplyVo.class))
                     );
-                QueryParamBuildUtil.buildParametersFromType(builder, PageableRequest.class);
+                PageableRequest.buildParameters(builder);
             })
             .build();
     }
@@ -325,6 +326,49 @@ public class CommentFinderEndpoint implements CustomEndpoint {
         String emptyToNull(String str) {
             return StringUtils.isBlank(str) ? null : str;
         }
+
+        public static void buildParameters(Builder builder) {
+            PageableRequest.buildParameters(builder);
+            builder.parameter(sortParameter())
+                .parameter(parameterBuilder()
+                    .in(ParameterIn.QUERY)
+                    .name("group")
+                    .description("The comment subject group.")
+                    .required(false)
+                    .implementation(String.class))
+                .parameter(parameterBuilder()
+                    .in(ParameterIn.QUERY)
+                    .name("version")
+                    .description("The comment subject version.")
+                    .required(true)
+                    .implementation(String.class))
+                .parameter(parameterBuilder()
+                    .in(ParameterIn.QUERY)
+                    .name("kind")
+                    .description("The comment subject kind.")
+                    .required(true))
+                .parameter(parameterBuilder()
+                    .in(ParameterIn.QUERY)
+                    .name("name")
+                    .description("The comment subject name.")
+                    .required(true)
+                    .implementation(String.class))
+                .parameter(parameterBuilder()
+                    .in(ParameterIn.QUERY)
+                    .name("withReplies")
+                    .description("Whether to include replies. Default is false.")
+                    .required(false)
+                    .implementation(Boolean.class))
+                .parameter(parameterBuilder()
+                    .in(ParameterIn.QUERY)
+                    .name("replySize")
+                    .description("Reply size of the comment, default is 10, only works when "
+                        + "withReplies is true.")
+                    .required(false)
+                    .schema(schemaBuilder()
+                        .implementation(Integer.class)
+                        .defaultValue("10")));
+        }
     }
 
     public static class PageableRequest extends IListRequest.QueryListRequest {
@@ -344,5 +388,21 @@ public class CommentFinderEndpoint implements CustomEndpoint {
         public List<String> getFieldSelector() {
             throw new UnsupportedOperationException("Unsupported this parameter");
         }
+
+        public static void buildParameters(Builder builder) {
+            builder.parameter(parameterBuilder()
+                    .in(ParameterIn.QUERY)
+                    .name("page")
+                    .implementation(Integer.class)
+                    .required(false)
+                    .description("Page number. Default is 0."))
+                .parameter(parameterBuilder()
+                    .in(ParameterIn.QUERY)
+                    .name("size")
+                    .implementation(Integer.class)
+                    .required(false)
+                    .description("Size number. Default is 0."));
+        }
+
     }
 }

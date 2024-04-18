@@ -5,7 +5,6 @@ import static org.springdoc.core.fn.builders.parameter.Builder.parameterBuilder;
 import static org.springdoc.core.fn.builders.requestbody.Builder.requestBodyBuilder;
 import static org.springdoc.webflux.core.fn.SpringdocRouteBuilder.route;
 import static org.springframework.web.reactive.function.server.RequestPredicates.path;
-import static run.halo.app.extension.router.QueryParamBuildUtil.buildParametersFromType;
 
 import io.swagger.v3.oas.annotations.enums.ParameterIn;
 import java.util.Objects;
@@ -65,7 +64,7 @@ public class UcPostEndpoint implements CustomEndpoint {
                                 .tag(tag)
                                 .response(responseBuilder().implementation(
                                     ListResult.generateGenericClass(ListedPost.class)));
-                            buildParametersFromType(builder, PostQuery.class);
+                            PostQuery.buildParameters(builder);
                         }
                     )
                     .POST(this::createMyPost, builder -> builder.operationId("CreateMyPost")

@@ -14,7 +14,7 @@ import static run.halo.app.extension.index.query.QueryFactory.and;
 import static run.halo.app.extension.index.query.QueryFactory.contains;
 import static run.halo.app.extension.index.query.QueryFactory.equal;
 import static run.halo.app.extension.index.query.QueryFactory.or;
-import static run.halo.app.extension.router.QueryParamBuildUtil.buildParametersFromType;
+import static run.halo.app.extension.router.QueryParamBuildUtil.sortParameter;
 import static run.halo.app.extension.router.selector.SelectorUtil.labelAndFieldSelectorToListOptions;
 import static run.halo.app.security.authorization.AuthorityUtils.authoritiesToRoles;
 
@@ -42,7 +42,7 @@ import java.util.stream.Collectors;
 import lombok.Data;
 import lombok.RequiredArgsConstructor;
 import org.apache.commons.lang3.StringUtils;
-import org.springdoc.core.fn.builders.requestbody.Builder;
+import org.springdoc.core.fn.builders.operation.Builder;
 import org.springdoc.webflux.core.fn.SpringdocRouteBuilder;
 import org.springframework.core.io.buffer.DataBuffer;
 import org.springframework.dao.OptimisticLockingFailureException;
@@ -181,7 +181,7 @@ public class UserEndpoint implements CustomEndpoint {
                     .description("List users")
                     .response(responseBuilder()
                         .implementation(generateGenericClass(ListedUser.class)));
-                buildParametersFromType(builder, ListRequest.class);
+                ListRequest.buildParameters(builder);
             })
             .POST("users/{name}/avatar", contentType(MediaType.MULTIPART_FORM_DATA),
                 this::uploadUserAvatar,
@@ -195,7 +195,7 @@ public class UserEndpoint implements CustomEndpoint {
                         .description("User name")
                         .required(true)
                     )
-                    .requestBody(Builder.requestBodyBuilder()
+                    .requestBody(requestBodyBuilder()
                         .required(true)
                         .content(contentBuilder()
                             .mediaType(MediaType.MULTIPART_FORM_DATA_VALUE)
@@ -738,6 +738,24 @@ public class UserEndpoint implements CustomEndpoint {
             listOptions.setFieldSelector(FieldSelector.of(fieldQuery));
             return listOptions;
         }
+
+        public static void buildParameters(Builder builder) {
+            IListRequest.buildParameters(builder);
+            builder.parameter(sortParameter())
+                .parameter(parameterBuilder()
+                    .in(ParameterIn.QUERY)
+                    .name("keyword")
+                    .description("Keyword to search")
+                    .implementation(String.class)
+                    .required(false))
+                .parameter(parameterBuilder()
+                    .in(ParameterIn.QUERY)
+                    .name("role")
+                    .description("Role name")
+                    .implementation(String.class)
+                    .required(false));
+        }
+
     }
 
     record ListedUser(@Schema(requiredMode = REQUIRED) User user,
