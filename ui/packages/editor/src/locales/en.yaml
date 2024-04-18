@@ -91,6 +91,7 @@ editor:
     color_picker:
       more_color: More
   common:
+    align_method: Align method
     align_left: Align left
     align_center: Align center
     align_right: Align right
