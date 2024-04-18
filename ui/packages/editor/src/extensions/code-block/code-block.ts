@@ -285,7 +285,7 @@ export default CodeBlockLowlight.extend<
 
             const { selection } = tr;
             // Whether the current position is code block, if not, move forward to code block.
-            let codeBlockPos = Math.max(0, selection.from);
+            let codeBlockPos = Math.max(0, selection.from - 1);
             while (
               codeBlockPos > 0 &&
               tr.doc.resolve(codeBlockPos).parent.type.name !== this.type.name
