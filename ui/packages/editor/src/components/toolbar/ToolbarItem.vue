@@ -1,5 +1,6 @@
 <script lang="ts" setup>
 import type { Component } from "vue";
+import { VTooltip } from "floating-vue";
 import IconArrowDown from "~icons/ri/arrow-down-s-fill";
 import type { ToolbarItem } from "@/types";
 
