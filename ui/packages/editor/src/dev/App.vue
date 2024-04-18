@@ -46,6 +46,7 @@ import {
   ExtensionListKeymap,
   ExtensionSearchAndReplace,
   ExtensionClearFormat,
+  ExtensionFormatBrush,
 } from "../index";
 
 const content = useLocalStorage("content", "");
@@ -113,6 +114,7 @@ const editor = useEditor({
     ExtensionListKeymap,
     ExtensionSearchAndReplace,
     ExtensionClearFormat,
+    ExtensionFormatBrush,
   ],
   parseOptions: {
     preserveWhitespace: true,
