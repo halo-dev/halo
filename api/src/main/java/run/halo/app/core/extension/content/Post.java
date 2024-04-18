@@ -43,6 +43,8 @@ public class Post extends AbstractExtension {
         "content.halo.run/last-released-snapshot";
     public static final String LAST_ASSOCIATED_TAGS_ANNO = "content.halo.run/last-associated-tags";
 
+    public static final String STATS_ANNO = "content.halo.run/stats";
+
     public static final String DELETED_LABEL = "content.halo.run/deleted";
     public static final String PUBLISHED_LABEL = "content.halo.run/published";
     public static final String OWNER_LABEL = "content.halo.run/owner";
@@ -220,56 +222,6 @@ public class Post extends AbstractExtension {
                 }
             }
             return null;
-        }
-    }
-
-    @Data
-    public static class CompactPost {
-        private String name;
-
-        private VisibleEnum visible;
-
-        private Boolean published;
-
-        public static Builder builder() {
-            return new Builder();
-        }
-
-        /**
-         * <p>Compact post builder.</p>
-         * <p>Can not replace with lombok builder.</p>
-         * <p>The class used by subclasses of {@link AbstractExtension} must have a no-args
-         * constructor.</p>
-         */
-        public static class Builder {
-            private String name;
-
-            private VisibleEnum visible;
-
-            private Boolean published;
-
-            public Builder name(String name) {
-                this.name = name;
-                return this;
-            }
-
-            public Builder visible(VisibleEnum visible) {
-                this.visible = visible;
-                return this;
-            }
-
-            public Builder published(Boolean published) {
-                this.published = published;
-                return this;
-            }
-
-            public CompactPost build() {
-                CompactPost compactPost = new CompactPost();
-                compactPost.setName(name);
-                compactPost.setVisible(visible);
-                compactPost.setPublished(published);
-                return compactPost;
-            }
         }
     }
 }

@@ -6,7 +6,13 @@ import {
   findParentNode,
   VueNodeViewRenderer,
 } from "@/tiptap/vue-3";
-import { EditorState, TextSelection, type Transaction } from "@/tiptap/pm";
+import {
+  EditorState,
+  Plugin,
+  PluginKey,
+  TextSelection,
+  type Transaction,
+} from "@/tiptap/pm";
 import CodeBlockLowlight from "@tiptap/extension-code-block-lowlight";
 import type { CodeBlockLowlightOptions } from "@tiptap/extension-code-block-lowlight";
 import CodeBlockViewRenderer from "./CodeBlockViewRenderer.vue";
@@ -236,5 +242,71 @@ export default CodeBlockLowlight.extend<
         };
       },
     };
+  },
+
+  addProseMirrorPlugins() {
+    return [
+      // Solve the paste problem. Because the upstream has not been
+      // able to deal with this problem for a long time, it is
+      // handled manually locally.
+      // see: https://github.com/ueberdosis/tiptap/pull/3606
+      new Plugin({
+        key: new PluginKey("codeBlockVSCodeHandlerFixPaste"),
+        props: {
+          handlePaste: (view, event) => {
+            if (!event.clipboardData) {
+              return false;
+            }
+            // don’t create a new code block within code blocks
+            if (this.editor.isActive(this.type.name)) {
+              return false;
+            }
+
+            const text = event.clipboardData.getData("text/plain");
+            const vscode = event.clipboardData.getData("vscode-editor-data");
+            const vscodeData = vscode ? JSON.parse(vscode) : undefined;
+            const language = vscodeData?.mode;
+
+            if (!text || !language) {
+              return false;
+            }
+
+            const { tr, schema } = view.state;
+
+            // add text to code block
+            // strip carriage return chars from text pasted as code
+            // see: https://github.com/ProseMirror/prosemirror-view/commit/a50a6bcceb4ce52ac8fcc6162488d8875613aacd
+            const contentTextNode = schema.text(text.replace(/\r\n?/g, "\n"));
+
+            // create an empty code block
+            tr.replaceSelectionWith(
+              this.type.create({ language }, contentTextNode)
+            );
+
+            const { selection } = tr;
+            // Whether the current position is code block, if not, move forward to code block.
+            let codeBlockPos = Math.max(0, selection.from - 1);
+            while (
+              codeBlockPos > 0 &&
+              tr.doc.resolve(codeBlockPos).parent.type.name !== this.type.name
+            ) {
+              codeBlockPos--;
+            }
+            // put cursor inside the newly created code block
+            tr.setSelection(TextSelection.near(tr.doc.resolve(codeBlockPos)));
+
+            // store meta information
+            // this is useful for other plugins that depends on the paste event
+            // like the paste rule plugin
+            tr.setMeta("paste", true);
+
+            view.dispatch(tr);
+
+            return true;
+          },
+        },
+      }),
+      ...(this.parent?.() || []),
+    ];
   },
 });

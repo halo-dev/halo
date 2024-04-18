@@ -163,6 +163,7 @@ const handleCreateUser = async () => {
         v-model="selectedRole"
         :label="$t('core.user.grant_permission_modal.fields.role.label')"
         type="roleSelect"
+        validation="required"
       ></FormKit>
       <FormKit
         v-model="formState.bio"
