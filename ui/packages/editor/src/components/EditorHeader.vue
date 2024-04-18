@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import { Menu as VMenu } from "floating-vue";
+import { Menu as VMenu, Dropdown as VDropdown } from "floating-vue";
 import { Editor, type AnyExtension } from "@/tiptap/vue-3";
 import MdiPlusCircle from "~icons/mdi/plus-circle";
 import type { ToolbarItem, ToolboxItem } from "@/types";
@@ -93,22 +93,34 @@ function getToolboxItemsFromExtensions() {
         v-bind="item.props"
         tabindex="-1"
       />
-      <VMenu v-else class="inline-flex" tabindex="-1">
-        <component :is="item.component" v-bind="item.props" tabindex="-1" />
-        <template #popper>
-          <div
-            class="relative rounded-md bg-white overflow-hidden drop-shadow w-48 p-1 max-h-72 overflow-y-auto"
-          >
-            <component
-              v-bind="child.props"
-              :is="child.component"
-              v-for="(child, childIndex) in item.children"
-              :key="childIndex"
-              tabindex="-1"
-            />
-          </div>
-        </template>
-      </VMenu>
+      <template v-else>
+        <VDropdown
+          class="inline-flex"
+          tabindex="-1"
+          :triggers="['click']"
+          :popper-triggers="['click']"
+        >
+          <component
+            :is="item.component"
+            v-bind="item.props"
+            :children="item.children"
+            tabindex="-1"
+          />
+          <template #popper>
+            <div
+              class="relative rounded-md bg-white overflow-hidden drop-shadow w-48 p-1 max-h-72 overflow-y-auto"
+            >
+              <component
+                v-bind="child.props"
+                :is="child.component"
+                v-for="(child, childIndex) in item.children"
+                :key="childIndex"
+                tabindex="-1"
+              />
+            </div>
+          </template>
+        </VDropdown>
+      </template>
     </div>
   </div>
 </template>
