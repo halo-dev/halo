@@ -682,12 +682,14 @@ core:
     detail:
       fields:
         author: 作者
-        website: 网站
+        homepage: 网站
         repo: 源码仓库
-        version: 当前版本
-        requires: 版本要求
+        version: 版本
+        requires: Halo 版本要求
         storage_location: 存储位置
         plugin_requires: 插件依赖
+        description: 描述
+        license: 协议
     settings:
       title: 主题设置
     custom_templates:

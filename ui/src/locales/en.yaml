@@ -712,12 +712,14 @@ core:
     detail:
       fields:
         author: Author
-        website: Website
+        homepage: Website
         repo: Source Repository
         version: Version
         requires: Requires
         storage_location: Storage Location
         plugin_requires: Plugin Requires
+        description: Description
+        license: License
     settings:
       title: Theme settings
     custom_templates:
