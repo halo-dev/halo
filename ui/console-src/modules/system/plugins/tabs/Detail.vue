@@ -95,14 +95,24 @@ const pluginRoleTemplateGroups = computed<RoleTemplateGroup[]>(() => {
       </div>
       <div class="border-t border-gray-200">
         <VDescription>
-          <VDescriptionItem
-            :label="$t('core.plugin.detail.fields.display_name')"
-            :content="plugin?.spec.displayName"
-          />
+          <VDescriptionItem label="ID" :content="plugin?.metadata.name" />
           <VDescriptionItem
             :label="$t('core.plugin.detail.fields.description')"
-            :content="plugin?.spec.description"
+            :content="plugin?.spec.description || $t('core.common.text.none')"
           />
+          <VDescriptionItem :label="$t('core.plugin.detail.fields.author')">
+            <a
+              v-if="plugin?.spec.author"
+              :href="plugin?.spec.author.website"
+              class="hover:text-gray-600"
+              target="_blank"
+            >
+              {{ plugin?.spec.author.name }}
+            </a>
+            <span v-else>
+              {{ $t("core.common.text.none") }}
+            </span>
+          </VDescriptionItem>
           <VDescriptionItem
             :label="$t('core.plugin.detail.fields.version')"
             :content="plugin?.spec.version"
@@ -111,13 +121,27 @@ const pluginRoleTemplateGroups = computed<RoleTemplateGroup[]>(() => {
             :label="$t('core.plugin.detail.fields.requires')"
             :content="plugin?.spec.requires"
           />
-          <VDescriptionItem :label="$t('core.plugin.detail.fields.author')">
+          <VDescriptionItem :label="$t('core.plugin.detail.fields.homepage')">
             <a
-              v-if="plugin?.spec.author"
-              :href="plugin?.spec.author.website"
+              v-if="plugin?.spec.homepage"
+              :href="plugin?.spec.homepage"
+              class="hover:text-gray-600"
               target="_blank"
             >
-              {{ plugin?.spec.author.name }}
+              {{ plugin?.spec.homepage }}
+            </a>
+            <span v-else>
+              {{ $t("core.common.text.none") }}
+            </span>
+          </VDescriptionItem>
+          <VDescriptionItem :label="$t('core.plugin.detail.fields.repo')">
+            <a
+              v-if="plugin?.spec.repo"
+              :href="plugin.spec.repo"
+              class="hover:text-gray-600"
+              target="_blank"
+            >
+              {{ plugin.spec.repo }}
             </a>
             <span v-else>
               {{ $t("core.common.text.none") }}
@@ -138,6 +162,9 @@ const pluginRoleTemplateGroups = computed<RoleTemplateGroup[]>(() => {
                 </span>
               </li>
             </ul>
+            <span v-else>
+              {{ $t("core.common.text.none") }}
+            </span>
           </VDescriptionItem>
           <VDescriptionItem
             :label="$t('core.plugin.detail.fields.role_templates')"
@@ -201,6 +228,10 @@ const pluginRoleTemplateGroups = computed<RoleTemplateGroup[]>(() => {
             :label="$t('core.plugin.detail.fields.last_starttime')"
             :content="formatDatetime(plugin?.status?.lastStartTime)"
           />
+          <VDescriptionItem
+            :label="$t('core.plugin.detail.fields.load_location')"
+            :content="plugin?.status?.loadLocation"
+          ></VDescriptionItem>
         </VDescription>
       </div>
     </div>
