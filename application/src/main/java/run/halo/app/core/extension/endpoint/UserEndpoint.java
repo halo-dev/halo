@@ -89,6 +89,7 @@ import run.halo.app.infra.SystemConfigurableEnvironmentFetcher;
 import run.halo.app.infra.SystemSetting;
 import run.halo.app.infra.ValidationUtils;
 import run.halo.app.infra.exception.RateLimitExceededException;
+import run.halo.app.infra.exception.UnsatisfiedAttributeValueException;
 import run.halo.app.infra.utils.JsonUtils;
 import run.halo.app.security.authentication.twofactor.TwoFactorAuthentication;
 
@@ -529,6 +530,17 @@ public class UserEndpoint implements CustomEndpoint {
                 .switchIfEmpty(Mono.defer(() ->
                     Mono.error(new ServerWebInputException("Request body is empty"))))
                 .flatMap(changePasswordRequest -> {
+                    var rawOldPassword = changePasswordRequest.oldPassword();
+                    return userService.confirmPassword(username, rawOldPassword)
+                        .filter(Boolean::booleanValue)
+                        .switchIfEmpty(Mono.error(new UnsatisfiedAttributeValueException(
+                            "Old password is incorrect.",
+                            "problemDetail.user.password.notMatch",
+                            null))
+                        )
+                        .thenReturn(changePasswordRequest);
+                })
+                .flatMap(changePasswordRequest -> {
                     var password = changePasswordRequest.password();
                     // encode password
                     return userService.updateWithRawPassword(username, password);
@@ -539,6 +551,8 @@ public class UserEndpoint implements CustomEndpoint {
     }
 
     record ChangePasswordRequest(
+        @Schema(description = "Old password.", requiredMode = REQUIRED)
+        String oldPassword,
         @Schema(description = "New password.", requiredMode = REQUIRED, minLength = 6)
         String password) {
     }
