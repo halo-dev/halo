@@ -1,13 +1,14 @@
 package run.halo.app.content.comment;
 
+import static org.springdoc.core.fn.builders.parameter.Builder.parameterBuilder;
 import static run.halo.app.extension.index.query.QueryFactory.and;
 import static run.halo.app.extension.index.query.QueryFactory.contains;
 import static run.halo.app.extension.index.query.QueryFactory.equal;
 import static run.halo.app.extension.router.selector.SelectorUtil.labelAndFieldSelectorToListOptions;
 
-import io.swagger.v3.oas.annotations.media.ArraySchema;
-import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.enums.ParameterIn;
 import org.apache.commons.lang3.StringUtils;
+import org.springdoc.core.fn.builders.operation.Builder;
 import org.springframework.data.domain.Sort;
 import org.springframework.web.reactive.function.server.ServerRequest;
 import org.springframework.web.server.ServerWebExchange;
@@ -18,6 +19,7 @@ import run.halo.app.extension.ListOptions;
 import run.halo.app.extension.PageRequest;
 import run.halo.app.extension.PageRequestImpl;
 import run.halo.app.extension.router.IListRequest;
+import run.halo.app.extension.router.QueryParamBuildUtil;
 import run.halo.app.extension.router.selector.FieldSelector;
 
 /**
@@ -35,31 +37,21 @@ public class CommentQuery extends IListRequest.QueryListRequest {
         this.exchange = request.exchange();
     }
 
-    @Schema(description = "Comments filtered by keyword.")
     public String getKeyword() {
         String keyword = queryParams.getFirst("keyword");
         return StringUtils.isBlank(keyword) ? null : keyword;
     }
 
-    @Schema(description = "Commenter kind.")
     public String getOwnerKind() {
         String ownerKind = queryParams.getFirst("ownerKind");
         return StringUtils.isBlank(ownerKind) ? null : ownerKind;
     }
 
-    @Schema(description = "Commenter name.")
     public String getOwnerName() {
         String ownerName = queryParams.getFirst("ownerName");
         return StringUtils.isBlank(ownerName) ? null : ownerName;
     }
 
-    @ArraySchema(uniqueItems = true,
-        arraySchema = @Schema(name = "sort",
-            description = "Sort property and direction of the list result. Supported fields: "
-                + "metadata.creationTimestamp,status.replyCount,status.lastReplyTime"),
-        schema = @Schema(description = "like field,asc or field,desc",
-            implementation = String.class,
-            example = "creationTimestamp,desc"))
     public Sort getSort() {
         var sort = SortResolver.defaultInstance.resolve(exchange);
         return sort.and(Sort.by("status.lastReplyTime",
@@ -94,5 +86,25 @@ public class CommentQuery extends IListRequest.QueryListRequest {
 
         listOptions.setFieldSelector(FieldSelector.of(fieldQuery));
         return listOptions;
+    }
+
+    public static void buildParameters(Builder builder) {
+        IListRequest.buildParameters(builder);
+        builder.parameter(QueryParamBuildUtil.sortParameter())
+            .parameter(parameterBuilder()
+                .in(ParameterIn.QUERY)
+                .name("keyword")
+                .description("Comments filtered by keyword.")
+                .implementation(String.class))
+            .parameter(parameterBuilder()
+                .in(ParameterIn.QUERY)
+                .name("ownerKind")
+                .description("Commenter kind.")
+                .implementation(String.class))
+            .parameter(parameterBuilder()
+                .in(ParameterIn.QUERY)
+                .name("ownerName")
+                .description("Commenter name.")
+                .implementation(String.class));
     }
 }

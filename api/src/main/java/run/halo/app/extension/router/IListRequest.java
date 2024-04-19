@@ -1,8 +1,12 @@
 package run.halo.app.extension.router;
 
+import static org.springdoc.core.fn.builders.parameter.Builder.parameterBuilder;
+
+import io.swagger.v3.oas.annotations.enums.ParameterIn;
 import io.swagger.v3.oas.annotations.media.Schema;
 import java.util.Collections;
 import java.util.List;
+import org.springdoc.core.fn.builders.operation.Builder;
 import org.springframework.boot.convert.ApplicationConversionService;
 import org.springframework.core.convert.ConversionService;
 import org.springframework.util.MultiValueMap;
@@ -60,5 +64,33 @@ public interface IListRequest {
         public List<String> getFieldSelector() {
             return queryParams.getOrDefault("fieldSelector", Collections.emptyList());
         }
+    }
+
+    static void buildParameters(Builder builder) {
+        builder.parameter(parameterBuilder()
+                .in(ParameterIn.QUERY)
+                .name("page")
+                .implementation(Integer.class)
+                .required(false)
+                .description("Page number. Default is 0."))
+            .parameter(parameterBuilder()
+                .in(ParameterIn.QUERY)
+                .name("size")
+                .implementation(Integer.class)
+                .required(false)
+                .description("Size number. Default is 0."))
+            .parameter(parameterBuilder()
+                .in(ParameterIn.QUERY)
+                .name("labelSelector")
+                .required(false)
+                .description("Label selector. e.g.: hidden!=true")
+                .implementationArray(String.class))
+            .parameter(parameterBuilder()
+                .in(ParameterIn.QUERY)
+                .name("fieldSelector")
+                .required(false)
+                .description("Field selector. e.g.: metadata.name==halo")
+                .implementationArray(String.class)
+            );
     }
 }

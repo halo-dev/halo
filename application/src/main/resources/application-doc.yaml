@@ -1,0 +1,17 @@
+springdoc:
+  cache:
+    disabled: true
+  api-docs:
+    enabled: true
+    version: OPENAPI_3_0
+
+spring:
+  main:
+    banner-mode: off
+  r2dbc:
+    url: r2dbc:h2:mem:///halo
+
+halo:
+  extension:
+    controller:
+      disabled: true

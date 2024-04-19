@@ -32,7 +32,6 @@ import run.halo.app.core.extension.content.SinglePage;
 import run.halo.app.extension.ListResult;
 import run.halo.app.extension.MetadataUtil;
 import run.halo.app.extension.ReactiveExtensionClient;
-import run.halo.app.extension.router.QueryParamBuildUtil;
 
 /**
  * Endpoint for managing {@link SinglePage}.
@@ -59,7 +58,7 @@ public class SinglePageEndpoint implements CustomEndpoint {
                         .response(responseBuilder()
                             .implementation(ListResult.generateGenericClass(ListedSinglePage.class))
                         );
-                    QueryParamBuildUtil.buildParametersFromType(builder, SinglePageQuery.class);
+                    SinglePageQuery.buildParameters(builder);
                 }
             )
             .GET("singlepages/{name}/head-content", this::fetchHeadContent,

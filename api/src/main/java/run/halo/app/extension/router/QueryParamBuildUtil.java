@@ -33,7 +33,11 @@ public final class QueryParamBuildUtil {
         return obj == null ? null : obj.toString();
     }
 
+    /**
+     * @deprecated Build parameters manually instead.
+     */
     @SuppressWarnings({"rawtypes", "unchecked"})
+    @Deprecated(since = "2.15.0")
     public static void buildParametersFromType(Builder operationBuilder, Type queryParamType) {
         var resolvedSchema =
             ModelConverters.getInstance().readAllAsResolvedSchema(queryParamType);
@@ -87,5 +91,17 @@ public final class QueryParamBuildUtil {
             .allowableValues(allowableValues)
             .defaultValue(toStringOrNull(schema.getDefault()))
             .example(toStringOrNull(schema.getExample()));
+    }
+
+    public static org.springdoc.core.fn.builders.parameter.Builder sortParameter() {
+        return parameterBuilder()
+            .in(ParameterIn.QUERY)
+            .name("sort")
+            .required(false)
+            .description("""
+                Sorting criteria in the format: property,(asc|desc). \
+                Default sort order is ascending. Multiple sort criteria are supported.\
+                """)
+            .array(arraySchemaBuilder().schema(schemaBuilder().type("string")));
     }
 }

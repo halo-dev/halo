@@ -11,6 +11,7 @@ plugins {
     id "de.undercouch.download"
     id "io.freefair.lombok"
     id 'org.gradle.crypto.checksum'
+    id 'org.springdoc.openapi-gradle-plugin'
 }
 
 group = 'run.halo.app'
@@ -106,15 +107,15 @@ tasks.named('jacocoTestReport', JacocoReport) {
 }
 
 ext.presetPluginUrls = [
-    'https://github.com/halo-dev/plugin-comment-widget/releases/download/v1.9.0/plugin-comment-widget-1.9.0.jar': 'plugin-comment-widget.jar',
-    'https://github.com/halo-dev/plugin-search-widget/releases/download/v1.3.1/plugin-search-widget-1.3.1.jar': 'plugin-search-widget.jar',
-    'https://github.com/halo-dev/plugin-sitemap/releases/download/v1.1.1/plugin-sitemap-1.1.1.jar': 'plugin-sitemap.jar',
-    'https://github.com/halo-dev/plugin-feed/releases/download/v1.2.1/plugin-feed-1.2.1.jar': 'plugin-feed.jar',
+        'https://github.com/halo-dev/plugin-comment-widget/releases/download/v1.9.0/plugin-comment-widget-1.9.0.jar'  : 'plugin-comment-widget.jar',
+        'https://github.com/halo-dev/plugin-search-widget/releases/download/v1.3.1/plugin-search-widget-1.3.1.jar'    : 'plugin-search-widget.jar',
+        'https://github.com/halo-dev/plugin-sitemap/releases/download/v1.1.1/plugin-sitemap-1.1.1.jar'                : 'plugin-sitemap.jar',
+        'https://github.com/halo-dev/plugin-feed/releases/download/v1.2.1/plugin-feed-1.2.1.jar'                      : 'plugin-feed.jar',
 
-    // Currently, plugin-app-store is not open source, so we need to download it from the official website.
-    // Please see https://github.com/halo-dev/plugin-app-store/issues/55
-    // https://www.halo.run/store/apps/app-VYJbF
-    'https://www.halo.run/store/apps/app-VYJbF/releases/download/app-release-cWbLS/assets/app-release-cWbLS-fZYSx': 'appstore.jar',
+        // Currently, plugin-app-store is not open source, so we need to download it from the official website.
+        // Please see https://github.com/halo-dev/plugin-app-store/issues/55
+        // https://www.halo.run/store/apps/app-VYJbF
+        'https://www.halo.run/store/apps/app-VYJbF/releases/download/app-release-cWbLS/assets/app-release-cWbLS-fZYSx': 'appstore.jar',
 ]
 
 tasks.register('downloadPluginPresets', Download) {
@@ -128,5 +129,27 @@ tasks.register('downloadPluginPresets', Download) {
 
     eachFile { f ->
         f.name = presetPluginUrls[f.sourceURL.toString()]
+    }
+}
+
+openApi {
+    outputDir = file("$rootDir/api-docs/openapi/v3_0")
+    groupedApiMappings = [
+            'http://localhost:8091/v3/api-docs/all-api': 'aggregated.json',
+    ]
+    customBootRun {
+        args = ['--server.port=8091',
+                '--spring.profiles.active=doc',
+                "--halo.work-dir=${layout.buildDirectory.get()}/tmp/workdir-for-generating-apidocs"]
+    }
+}
+
+tasks.named('forkedSpringBootRun') {
+    dependsOn ':api:jar'
+}
+
+tasks.named('generateOpenApiDocs') {
+    outputs.upToDateWhen {
+        false
     }
 }

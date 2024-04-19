@@ -18,6 +18,7 @@ import java.util.List;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
+import org.springdoc.core.fn.builders.operation.Builder;
 import org.springdoc.webflux.core.fn.SpringdocRouteBuilder;
 import org.springframework.dao.OptimisticLockingFailureException;
 import org.springframework.http.MediaType;
@@ -40,7 +41,6 @@ import run.halo.app.extension.ConfigMap;
 import run.halo.app.extension.ListResult;
 import run.halo.app.extension.ReactiveExtensionClient;
 import run.halo.app.extension.router.IListRequest;
-import run.halo.app.extension.router.QueryParamBuildUtil;
 import run.halo.app.infra.ReactiveUrlDataBufferFetcher;
 import run.halo.app.infra.SystemConfigurableEnvironmentFetcher;
 import run.halo.app.infra.SystemSetting;
@@ -195,7 +195,7 @@ public class ThemeEndpoint implements CustomEndpoint {
                         .tag(tag)
                         .response(responseBuilder()
                             .implementation(ListResult.generateGenericClass(Theme.class)));
-                    QueryParamBuildUtil.buildParametersFromType(builder, ThemeQuery.class);
+                    ThemeQuery.buildParameters(builder);
                 }
             )
             .GET("themes/-/activation", this::fetchActivatedTheme,
@@ -302,7 +302,7 @@ public class ThemeEndpoint implements CustomEndpoint {
                         if (!configMapName.equals(configMapNameToUpdate)) {
                             throw new ServerWebInputException(
                                 "The name from the request body does not match the theme "
-                                + "configMapName name.");
+                                    + "configMapName name.");
                         }
                     })
                     .flatMap(configMapToUpdate -> client.fetch(ConfigMap.class, configMapName)
@@ -367,6 +367,16 @@ public class ThemeEndpoint implements CustomEndpoint {
         @NonNull
         public Boolean getUninstalled() {
             return Boolean.parseBoolean(queryParams.getFirst("uninstalled"));
+        }
+
+        public static void buildParameters(Builder builder) {
+            IListRequest.buildParameters(builder);
+            builder.parameter(parameterBuilder()
+                .name("uninstalled")
+                .description("Whether to list uninstalled themes.")
+                .in(ParameterIn.QUERY)
+                .implementation(Boolean.class)
+                .required(false));
         }
     }
 
