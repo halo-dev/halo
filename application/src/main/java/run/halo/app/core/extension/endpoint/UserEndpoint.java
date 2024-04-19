@@ -535,7 +535,7 @@ public class UserEndpoint implements CustomEndpoint {
                         .filter(Boolean::booleanValue)
                         .switchIfEmpty(Mono.error(new UnsatisfiedAttributeValueException(
                             "Old password is incorrect.",
-                            "problemDetail.user.password.notMatch",
+                            "problemDetail.user.oldPassword.notMatch",
                             null))
                         )
                         .thenReturn(changePasswordRequest);

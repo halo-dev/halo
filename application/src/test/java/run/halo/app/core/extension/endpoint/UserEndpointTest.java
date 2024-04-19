@@ -306,8 +306,10 @@ class UserEndpointTest {
             var user = new User();
             when(userService.updateWithRawPassword("fake-user", "new-password"))
                 .thenReturn(Mono.just(user));
+            when(userService.confirmPassword("fake-user", "old-password"))
+                .thenReturn(Mono.just(true));
             webClient.put().uri("/users/-/password")
-                .bodyValue(new UserEndpoint.ChangePasswordRequest("new-password"))
+                .bodyValue(new UserEndpoint.ChangePasswordRequest("old-password", "new-password"))
                 .exchange()
                 .expectStatus().isOk()
                 .expectBody(User.class)
@@ -319,11 +321,13 @@ class UserEndpointTest {
         @Test
         void shouldUpdateOtherPasswordCorrectly() {
             var user = new User();
+            when(userService.confirmPassword("another-fake-user", "old-password"))
+                .thenReturn(Mono.just(true));
             when(userService.updateWithRawPassword("another-fake-user", "new-password"))
                 .thenReturn(Mono.just(user));
             webClient.put()
                 .uri("/users/another-fake-user/password")
-                .bodyValue(new UserEndpoint.ChangePasswordRequest("new-password"))
+                .bodyValue(new UserEndpoint.ChangePasswordRequest("old-password", "new-password"))
                 .exchange()
                 .expectStatus().isOk()
                 .expectBody(User.class)
