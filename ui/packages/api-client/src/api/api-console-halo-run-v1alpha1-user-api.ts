@@ -22,6 +22,8 @@ import { DUMMY_BASE_URL, assertParamExists, setApiKeyToObject, setBasicAuthToObj
 // @ts-ignore
 import { BASE_PATH, COLLECTION_FORMATS, RequestArgs, BaseAPI, RequiredError, operationServerMap } from '../base';
 // @ts-ignore
+import { ChangeOwnPasswordRequest } from '../models';
+// @ts-ignore
 import { ChangePasswordRequest } from '../models';
 // @ts-ignore
 import { CreateUserRequest } from '../models';
@@ -46,17 +48,17 @@ import { VerifyCodeRequest } from '../models';
 export const ApiConsoleHaloRunV1alpha1UserApiAxiosParamCreator = function (configuration?: Configuration) {
     return {
         /**
-         * Change password of user.
+         * Change anyone password of user for admin.
          * @param {string} name Name of user. If the name is equal to \&#39;-\&#39;, it will change the password of current user.
          * @param {ChangePasswordRequest} changePasswordRequest 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        changePassword: async (name: string, changePasswordRequest: ChangePasswordRequest, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+        changeAnyonePassword: async (name: string, changePasswordRequest: ChangePasswordRequest, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
             // verify required parameter 'name' is not null or undefined
-            assertParamExists('changePassword', 'name', name)
+            assertParamExists('changeAnyonePassword', 'name', name)
             // verify required parameter 'changePasswordRequest' is not null or undefined
-            assertParamExists('changePassword', 'changePasswordRequest', changePasswordRequest)
+            assertParamExists('changeAnyonePassword', 'changePasswordRequest', changePasswordRequest)
             const localVarPath = `/apis/api.console.halo.run/v1alpha1/users/{name}/password`
                 .replace(`{${"name"}}`, encodeURIComponent(String(name)));
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
@@ -86,6 +88,49 @@ export const ApiConsoleHaloRunV1alpha1UserApiAxiosParamCreator = function (confi
             let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
             localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
             localVarRequestOptions.data = serializeDataIfNeeded(changePasswordRequest, localVarRequestOptions, configuration)
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+        /**
+         * Change own password of user.
+         * @param {ChangeOwnPasswordRequest} changeOwnPasswordRequest 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        changeOwnPassword: async (changeOwnPasswordRequest: ChangeOwnPasswordRequest, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+            // verify required parameter 'changeOwnPasswordRequest' is not null or undefined
+            assertParamExists('changeOwnPassword', 'changeOwnPasswordRequest', changeOwnPasswordRequest)
+            const localVarPath = `/apis/api.console.halo.run/v1alpha1/users/-/password`;
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'PUT', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+            // authentication BasicAuth required
+            // http basic authentication required
+            setBasicAuthToObject(localVarRequestOptions, configuration)
+
+            // authentication BearerAuth required
+            // http bearer authentication required
+            await setBearerAuthToObject(localVarHeaderParameter, configuration)
+
+
+    
+            localVarHeaderParameter['Content-Type'] = 'application/json';
+
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+            localVarRequestOptions.data = serializeDataIfNeeded(changeOwnPasswordRequest, localVarRequestOptions, configuration)
 
             return {
                 url: toPathString(localVarUrlObj),
@@ -606,16 +651,28 @@ export const ApiConsoleHaloRunV1alpha1UserApiFp = function(configuration?: Confi
     const localVarAxiosParamCreator = ApiConsoleHaloRunV1alpha1UserApiAxiosParamCreator(configuration)
     return {
         /**
-         * Change password of user.
+         * Change anyone password of user for admin.
          * @param {string} name Name of user. If the name is equal to \&#39;-\&#39;, it will change the password of current user.
          * @param {ChangePasswordRequest} changePasswordRequest 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async changePassword(name: string, changePasswordRequest: ChangePasswordRequest, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<User>> {
-            const localVarAxiosArgs = await localVarAxiosParamCreator.changePassword(name, changePasswordRequest, options);
+        async changeAnyonePassword(name: string, changePasswordRequest: ChangePasswordRequest, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<User>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.changeAnyonePassword(name, changePasswordRequest, options);
             const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
-            const localVarOperationServerBasePath = operationServerMap['ApiConsoleHaloRunV1alpha1UserApi.changePassword']?.[localVarOperationServerIndex]?.url;
+            const localVarOperationServerBasePath = operationServerMap['ApiConsoleHaloRunV1alpha1UserApi.changeAnyonePassword']?.[localVarOperationServerIndex]?.url;
+            return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
+        },
+        /**
+         * Change own password of user.
+         * @param {ChangeOwnPasswordRequest} changeOwnPasswordRequest 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async changeOwnPassword(changeOwnPasswordRequest: ChangeOwnPasswordRequest, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<User>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.changeOwnPassword(changeOwnPasswordRequest, options);
+            const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
+            const localVarOperationServerBasePath = operationServerMap['ApiConsoleHaloRunV1alpha1UserApi.changeOwnPassword']?.[localVarOperationServerIndex]?.url;
             return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
         },
         /**
@@ -768,13 +825,22 @@ export const ApiConsoleHaloRunV1alpha1UserApiFactory = function (configuration?:
     const localVarFp = ApiConsoleHaloRunV1alpha1UserApiFp(configuration)
     return {
         /**
-         * Change password of user.
-         * @param {ApiConsoleHaloRunV1alpha1UserApiChangePasswordRequest} requestParameters Request parameters.
+         * Change anyone password of user for admin.
+         * @param {ApiConsoleHaloRunV1alpha1UserApiChangeAnyonePasswordRequest} requestParameters Request parameters.
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        changePassword(requestParameters: ApiConsoleHaloRunV1alpha1UserApiChangePasswordRequest, options?: RawAxiosRequestConfig): AxiosPromise<User> {
-            return localVarFp.changePassword(requestParameters.name, requestParameters.changePasswordRequest, options).then((request) => request(axios, basePath));
+        changeAnyonePassword(requestParameters: ApiConsoleHaloRunV1alpha1UserApiChangeAnyonePasswordRequest, options?: RawAxiosRequestConfig): AxiosPromise<User> {
+            return localVarFp.changeAnyonePassword(requestParameters.name, requestParameters.changePasswordRequest, options).then((request) => request(axios, basePath));
+        },
+        /**
+         * Change own password of user.
+         * @param {ApiConsoleHaloRunV1alpha1UserApiChangeOwnPasswordRequest} requestParameters Request parameters.
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        changeOwnPassword(requestParameters: ApiConsoleHaloRunV1alpha1UserApiChangeOwnPasswordRequest, options?: RawAxiosRequestConfig): AxiosPromise<User> {
+            return localVarFp.changeOwnPassword(requestParameters.changeOwnPasswordRequest, options).then((request) => request(axios, basePath));
         },
         /**
          * Creates a new user.
@@ -878,24 +944,38 @@ export const ApiConsoleHaloRunV1alpha1UserApiFactory = function (configuration?:
 };
 
 /**
- * Request parameters for changePassword operation in ApiConsoleHaloRunV1alpha1UserApi.
+ * Request parameters for changeAnyonePassword operation in ApiConsoleHaloRunV1alpha1UserApi.
  * @export
- * @interface ApiConsoleHaloRunV1alpha1UserApiChangePasswordRequest
+ * @interface ApiConsoleHaloRunV1alpha1UserApiChangeAnyonePasswordRequest
  */
-export interface ApiConsoleHaloRunV1alpha1UserApiChangePasswordRequest {
+export interface ApiConsoleHaloRunV1alpha1UserApiChangeAnyonePasswordRequest {
     /**
      * Name of user. If the name is equal to \&#39;-\&#39;, it will change the password of current user.
      * @type {string}
-     * @memberof ApiConsoleHaloRunV1alpha1UserApiChangePassword
+     * @memberof ApiConsoleHaloRunV1alpha1UserApiChangeAnyonePassword
      */
     readonly name: string
 
     /**
      * 
      * @type {ChangePasswordRequest}
-     * @memberof ApiConsoleHaloRunV1alpha1UserApiChangePassword
+     * @memberof ApiConsoleHaloRunV1alpha1UserApiChangeAnyonePassword
      */
     readonly changePasswordRequest: ChangePasswordRequest
+}
+
+/**
+ * Request parameters for changeOwnPassword operation in ApiConsoleHaloRunV1alpha1UserApi.
+ * @export
+ * @interface ApiConsoleHaloRunV1alpha1UserApiChangeOwnPasswordRequest
+ */
+export interface ApiConsoleHaloRunV1alpha1UserApiChangeOwnPasswordRequest {
+    /**
+     * 
+     * @type {ChangeOwnPasswordRequest}
+     * @memberof ApiConsoleHaloRunV1alpha1UserApiChangeOwnPassword
+     */
+    readonly changeOwnPasswordRequest: ChangeOwnPasswordRequest
 }
 
 /**
@@ -1102,14 +1182,25 @@ export interface ApiConsoleHaloRunV1alpha1UserApiVerifyEmailRequest {
  */
 export class ApiConsoleHaloRunV1alpha1UserApi extends BaseAPI {
     /**
-     * Change password of user.
-     * @param {ApiConsoleHaloRunV1alpha1UserApiChangePasswordRequest} requestParameters Request parameters.
+     * Change anyone password of user for admin.
+     * @param {ApiConsoleHaloRunV1alpha1UserApiChangeAnyonePasswordRequest} requestParameters Request parameters.
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      * @memberof ApiConsoleHaloRunV1alpha1UserApi
      */
-    public changePassword(requestParameters: ApiConsoleHaloRunV1alpha1UserApiChangePasswordRequest, options?: RawAxiosRequestConfig) {
-        return ApiConsoleHaloRunV1alpha1UserApiFp(this.configuration).changePassword(requestParameters.name, requestParameters.changePasswordRequest, options).then((request) => request(this.axios, this.basePath));
+    public changeAnyonePassword(requestParameters: ApiConsoleHaloRunV1alpha1UserApiChangeAnyonePasswordRequest, options?: RawAxiosRequestConfig) {
+        return ApiConsoleHaloRunV1alpha1UserApiFp(this.configuration).changeAnyonePassword(requestParameters.name, requestParameters.changePasswordRequest, options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
+     * Change own password of user.
+     * @param {ApiConsoleHaloRunV1alpha1UserApiChangeOwnPasswordRequest} requestParameters Request parameters.
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof ApiConsoleHaloRunV1alpha1UserApi
+     */
+    public changeOwnPassword(requestParameters: ApiConsoleHaloRunV1alpha1UserApiChangeOwnPasswordRequest, options?: RawAxiosRequestConfig) {
+        return ApiConsoleHaloRunV1alpha1UserApiFp(this.configuration).changeOwnPassword(requestParameters.changeOwnPasswordRequest, options).then((request) => request(this.axios, this.basePath));
     }
 
     /**

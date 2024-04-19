@@ -165,11 +165,6 @@ public class UserEndpoint implements CustomEndpoint {
                 builder -> builder.operationId("ChangeOwnPassword")
                     .description("Change own password of user.")
                     .tag(tag)
-                    .parameter(parameterBuilder().in(ParameterIn.PATH).name("name")
-                        .description(
-                            "Name of user. If the name is equal to '-', it will change the "
-                                + "password of current user.")
-                        .required(true))
                     .requestBody(requestBodyBuilder()
                         .required(true)
                         .implementation(ChangeOwnPasswordRequest.class))
@@ -180,6 +175,11 @@ public class UserEndpoint implements CustomEndpoint {
                 builder -> builder.operationId("ChangeAnyonePassword")
                     .description("Change anyone password of user for admin.")
                     .tag(tag)
+                    .parameter(parameterBuilder().in(ParameterIn.PATH).name("name")
+                        .description(
+                            "Name of user. If the name is equal to '-', it will change the "
+                                + "password of current user.")
+                        .required(true))
                     .requestBody(requestBodyBuilder()
                         .required(true)
                         .implementation(ChangePasswordRequest.class))

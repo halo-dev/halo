@@ -17,13 +17,19 @@
 /**
  * 
  * @export
- * @interface ChangePasswordRequest
+ * @interface ChangeOwnPasswordRequest
  */
-export interface ChangePasswordRequest {
+export interface ChangeOwnPasswordRequest {
+    /**
+     * Old password.
+     * @type {string}
+     * @memberof ChangeOwnPasswordRequest
+     */
+    'oldPassword': string;
     /**
      * New password.
      * @type {string}
-     * @memberof ChangePasswordRequest
+     * @memberof ChangeOwnPasswordRequest
      */
     'password': string;
 }
