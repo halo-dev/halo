@@ -98,7 +98,7 @@ public class DefaultNotificationCenter implements NotificationCenter {
             Sort.by("metadata.creationTimestamp", "metadata.name"));
         return Flux.defer(() -> pageSubscriptionBy(subscriber, pageRequest))
             .expand(page -> page.hasNext()
-                ? pageSubscriptionBy(subscriber, pageRequest)
+                ? pageSubscriptionBy(subscriber, pageRequest.next())
                 : Mono.empty()
             )
             .flatMap(page -> Flux.fromIterable(page.getItems()))
