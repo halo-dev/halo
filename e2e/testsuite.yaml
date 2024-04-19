@@ -117,7 +117,6 @@ items:
       Content-Type: application/json
     body: |
       {
-        "oldPassword": "123456",
         "password": "{{randAlpha 3}}"
       }
 - name: grantPermission

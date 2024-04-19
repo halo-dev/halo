@@ -161,15 +161,25 @@ public class UserEndpoint implements CustomEndpoint {
                         .description("User name")
                         .required(true))
                     .response(responseBuilder().implementation(UserPermission.class)))
-            .PUT("/users/{name}/password", this::changePassword,
-                builder -> builder.operationId("ChangePassword")
-                    .description("Change password of user.")
+            .PUT("/users/-/password", this::changeOwnPassword,
+                builder -> builder.operationId("ChangeOwnPassword")
+                    .description("Change own password of user.")
                     .tag(tag)
                     .parameter(parameterBuilder().in(ParameterIn.PATH).name("name")
                         .description(
                             "Name of user. If the name is equal to '-', it will change the "
                                 + "password of current user.")
                         .required(true))
+                    .requestBody(requestBodyBuilder()
+                        .required(true)
+                        .implementation(ChangeOwnPasswordRequest.class))
+                    .response(responseBuilder()
+                        .implementation(User.class))
+            )
+            .PUT("/users/{name}/password", this::changeAnyonePasswordForAdmin,
+                builder -> builder.operationId("ChangeAnyonePassword")
+                    .description("Change anyone password of user for admin.")
+                    .tag(tag)
                     .requestBody(requestBodyBuilder()
                         .required(true)
                         .implementation(ChangePasswordRequest.class))
@@ -521,12 +531,28 @@ public class UserEndpoint implements CustomEndpoint {
             .flatMap(updatedUser -> ServerResponse.ok().bodyValue(updatedUser));
     }
 
-    Mono<ServerResponse> changePassword(ServerRequest request) {
+    Mono<ServerResponse> changeAnyonePasswordForAdmin(ServerRequest request) {
         final var nameInPath = request.pathVariable("name");
         return ReactiveSecurityContextHolder.getContext()
             .map(ctx -> SELF_USER.equals(nameInPath) ? ctx.getAuthentication().getName()
                 : nameInPath)
             .flatMap(username -> request.bodyToMono(ChangePasswordRequest.class)
+                .switchIfEmpty(Mono.defer(() ->
+                    Mono.error(new ServerWebInputException("Request body is empty"))))
+                .flatMap(changePasswordRequest -> {
+                    var password = changePasswordRequest.password();
+                    // encode password
+                    return userService.updateWithRawPassword(username, password);
+                }))
+            .flatMap(updatedUser -> ServerResponse.ok()
+                .contentType(MediaType.APPLICATION_JSON)
+                .bodyValue(updatedUser));
+    }
+
+    Mono<ServerResponse> changeOwnPassword(ServerRequest request) {
+        return ReactiveSecurityContextHolder.getContext()
+            .map(ctx -> ctx.getAuthentication().getName())
+            .flatMap(username -> request.bodyToMono(ChangeOwnPasswordRequest.class)
                 .switchIfEmpty(Mono.defer(() ->
                     Mono.error(new ServerWebInputException("Request body is empty"))))
                 .flatMap(changePasswordRequest -> {
@@ -550,9 +576,14 @@ public class UserEndpoint implements CustomEndpoint {
                 .bodyValue(updatedUser));
     }
 
-    record ChangePasswordRequest(
+    record ChangeOwnPasswordRequest(
         @Schema(description = "Old password.", requiredMode = REQUIRED)
         String oldPassword,
+        @Schema(description = "New password.", requiredMode = REQUIRED, minLength = 6)
+        String password) {
+    }
+
+    record ChangePasswordRequest(
         @Schema(description = "New password.", requiredMode = REQUIRED, minLength = 6)
         String password) {
     }

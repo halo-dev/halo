@@ -309,7 +309,8 @@ class UserEndpointTest {
             when(userService.confirmPassword("fake-user", "old-password"))
                 .thenReturn(Mono.just(true));
             webClient.put().uri("/users/-/password")
-                .bodyValue(new UserEndpoint.ChangePasswordRequest("old-password", "new-password"))
+                .bodyValue(
+                    new UserEndpoint.ChangeOwnPasswordRequest("old-password", "new-password"))
                 .exchange()
                 .expectStatus().isOk()
                 .expectBody(User.class)
@@ -327,7 +328,8 @@ class UserEndpointTest {
                 .thenReturn(Mono.just(user));
             webClient.put()
                 .uri("/users/another-fake-user/password")
-                .bodyValue(new UserEndpoint.ChangePasswordRequest("old-password", "new-password"))
+                .bodyValue(
+                    new UserEndpoint.ChangeOwnPasswordRequest("old-password", "new-password"))
                 .exchange()
                 .expectStatus().isOk()
                 .expectBody(User.class)
