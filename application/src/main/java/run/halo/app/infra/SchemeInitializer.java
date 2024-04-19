@@ -222,6 +222,9 @@ public class SchemeInitializer implements ApplicationListener<ApplicationContext
         });
         schemeManager.register(Tag.class, indexSpecs -> {
             indexSpecs.add(new IndexSpec()
+                .setName("spec.displayName")
+                .setIndexFunc(simpleAttribute(Tag.class, tag -> tag.getSpec().getDisplayName())));
+            indexSpecs.add(new IndexSpec()
                 .setName("spec.slug")
                 .setIndexFunc(simpleAttribute(Tag.class, tag -> tag.getSpec().getSlug()))
             );

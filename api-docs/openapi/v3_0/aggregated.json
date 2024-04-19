@@ -3585,6 +3585,109 @@
         ]
       }
     },
+    "/apis/api.console.halo.run/v1alpha1/tags": {
+      "get": {
+        "description": "List Post Tags.",
+        "operationId": "ListPostTags",
+        "parameters": [
+          {
+            "description": "Field selector for filtering.",
+            "explode": true,
+            "in": "query",
+            "name": "fieldSelector",
+            "schema": {
+              "maxItems": 2147483647,
+              "minItems": 0,
+              "type": "array",
+              "items": {
+                "type": "string",
+                "description": "Field selector for filtering."
+              }
+            },
+            "style": "form"
+          },
+          {
+            "description": "Keyword for searching.",
+            "in": "query",
+            "name": "keyword",
+            "schema": {
+              "type": "string",
+              "description": "Keyword for searching."
+            },
+            "style": "form"
+          },
+          {
+            "description": "Label selector for filtering.",
+            "explode": true,
+            "in": "query",
+            "name": "labelSelector",
+            "schema": {
+              "maxItems": 2147483647,
+              "minItems": 0,
+              "type": "array",
+              "items": {
+                "type": "string",
+                "description": "Label selector for filtering."
+              }
+            },
+            "style": "form"
+          },
+          {
+            "description": "The page number. Zero indicates no page.",
+            "in": "query",
+            "name": "page",
+            "schema": {
+              "type": "integer",
+              "description": "The page number. Zero indicates no page.",
+              "format": "int32"
+            },
+            "style": "form"
+          },
+          {
+            "description": "Size of one page. Zero indicates no limit.",
+            "in": "query",
+            "name": "size",
+            "schema": {
+              "type": "integer",
+              "description": "Size of one page. Zero indicates no limit.",
+              "format": "int32"
+            },
+            "style": "form"
+          },
+          {
+            "description": "Sort property and direction of the list result. Supported fields: creationTimestamp, name",
+            "explode": true,
+            "in": "query",
+            "name": "sort",
+            "schema": {
+              "maxItems": 2147483647,
+              "minItems": 0,
+              "uniqueItems": true,
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            },
+            "style": "form"
+          }
+        ],
+        "responses": {
+          "default": {
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/TagList"
+                }
+              }
+            },
+            "description": "default response"
+          }
+        },
+        "tags": [
+          "api.console.halo.run/v1alpha1/Tag"
+        ]
+      }
+    },
     "/apis/api.console.halo.run/v1alpha1/themes": {
       "get": {
         "description": "List themes.",
@@ -16913,12 +17016,12 @@
           },
           "visible": {
             "type": "string",
+            "default": "PUBLIC",
             "enum": [
               "PUBLIC",
               "INTERNAL",
               "PRIVATE"
-            ],
-            "default": "PUBLIC"
+            ]
           }
         }
       },
@@ -18531,12 +18634,12 @@
           },
           "visible": {
             "type": "string",
+            "default": "PUBLIC",
             "enum": [
               "PUBLIC",
               "INTERNAL",
               "PRIVATE"
-            ],
-            "default": "PUBLIC"
+            ]
           }
         }
       },

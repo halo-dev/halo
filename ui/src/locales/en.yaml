@@ -258,6 +258,14 @@ core:
           label: Template
         cover:
           label: Cover
+    tag:
+      filters:
+        sort:
+          items:
+            create_time_desc: Latest Created
+            create_time_asc: Earliest Created
+            display_name_desc: Descending order by tag name
+            display_name_asc: Ascending order by tag name
   deleted_post:
     title: Deleted Posts
     empty:
