@@ -66,12 +66,11 @@ const handleChangePassword = async () => {
   try {
     saving.value = true;
 
-    const changePasswordRequest = cloneDeep(formState.value);
-    delete changePasswordRequest.password_confirm;
+    const changeOwnPasswordRequest = cloneDeep(formState.value);
+    delete changeOwnPasswordRequest.password_confirm;
 
-    await apiClient.user.changePassword({
-      name: "-",
-      changePasswordRequest,
+    await apiClient.user.changeOwnPassword({
+      changeOwnPasswordRequest,
     });
 
     onVisibleChange(false);
