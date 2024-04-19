@@ -182,11 +182,10 @@ public class UserServiceImpl implements UserService {
         return getUser(username)
             .filter(user -> {
                 if (!StringUtils.hasText(user.getSpec().getPassword())) {
-                    // Check if the old password is set before, or the passwordEncoder#matches
-                    // will complain an error due to null password.
+                    // If the password is not set, return true directly.
                     return true;
                 }
-                return !passwordEncoder.matches(rawPassword, user.getSpec().getPassword());
+                return passwordEncoder.matches(rawPassword, user.getSpec().getPassword());
             })
             .hasElement();
     }
