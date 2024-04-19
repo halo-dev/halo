@@ -35,7 +35,7 @@ springdoc:
     disabled: true
   api-docs:
     enabled: true
-    version: OPENAPI_3_1
+    version: OPENAPI_3_0
   swagger-ui:
     enabled: true
   show-actuator: true

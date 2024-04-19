@@ -712,12 +712,14 @@ core:
     detail:
       fields:
         author: Author
-        website: Website
+        homepage: Website
         repo: Source Repository
         version: Version
         requires: Requires
         storage_location: Storage Location
         plugin_requires: Plugin Requires
+        description: Description
+        license: License
     settings:
       title: Theme settings
     custom_templates:
@@ -860,7 +862,6 @@ core:
       header:
         title: Plugin information
       fields:
-        display_name: Display Name
         description: Description
         version: Version
         requires: Requires
@@ -868,6 +869,9 @@ core:
         license: License
         role_templates: Role Templates
         last_starttime: Last Start Time
+        homepage: Homepage
+        repo: Source Repository
+        load_location: Storage Location
     loader:
       toast:
         entry_load_failed: Failed to load plugins entry file
@@ -915,7 +919,7 @@ core:
       fields:
         username:
           label: Username
-          validation: Please enter a valid username.
+          validation: Can only contain numbers, lowercase letters, periods (.), and hyphens (-), and cannot start or end with a period (.) or hyphen (-).
         display_name:
           label: Display name
         email:
@@ -1113,7 +1117,7 @@ core:
       fields:
         username:
           label: Username
-          validation: Please enter a valid username.
+          validation: Can only contain numbers, lowercase letters, periods (.), and hyphens (-), and cannot start or end with a period (.) or hyphen (-).
         display_name:
           label: Display name
         email:

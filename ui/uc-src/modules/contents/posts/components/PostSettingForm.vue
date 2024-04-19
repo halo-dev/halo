@@ -187,6 +187,8 @@ const { handleGenerateSlug } = useSlugify(
             name="publishTime"
             :label="$t('core.post.settings.fields.publish_time.label')"
             type="datetime-local"
+            min="0000-01-01T00:00"
+            max="9999-12-31T23:59"
           ></FormKit>
           <HasPermission :permissions="['system:attachments:view']">
             <FormKit

@@ -682,12 +682,14 @@ core:
     detail:
       fields:
         author: 作者
-        website: 网站
+        homepage: 网站
         repo: 源码仓库
-        version: 当前版本
-        requires: 版本要求
+        version: 版本
+        requires: Halo 版本要求
         storage_location: 存储位置
         plugin_requires: 插件依赖
+        description: 描述
+        license: 协议
     settings:
       title: 主题设置
     custom_templates:
@@ -818,14 +820,16 @@ core:
       header:
         title: 插件信息
       fields:
-        display_name: 名称
         description: 描述
         version: 版本
         requires: Halo 版本要求
-        author: 提供方
+        author: 作者
         license: 协议
         role_templates: 权限模板
         last_starttime: 最近一次启动
+        homepage: 网站
+        repo: 源码仓库
+        load_location: 存储位置
     loader:
       toast:
         entry_load_failed: 加载插件入口文件失败
@@ -871,7 +875,7 @@ core:
       fields:
         username:
           label: 用户名
-          validation: 请输入有效的用户名
+          validation: 只能包含数字、小写字母、. 和 - 符号，且不能以 . 和 - 符号开头和结尾
         display_name:
           label: 显示名称
         email:
@@ -1061,7 +1065,7 @@ core:
       fields:
         username:
           label: 用户名
-          validation: 请输入有效的用户名
+          validation: 只能包含数字、小写字母、. 和 - 符号，且不能以 . 和 - 符号开头和结尾
         display_name:
           label: 显示名称
         email:

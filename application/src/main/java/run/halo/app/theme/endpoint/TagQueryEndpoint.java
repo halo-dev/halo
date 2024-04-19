@@ -5,6 +5,7 @@ import static org.springdoc.core.fn.builders.parameter.Builder.parameterBuilder;
 
 import io.swagger.v3.oas.annotations.enums.ParameterIn;
 import lombok.RequiredArgsConstructor;
+import org.springdoc.core.fn.builders.operation.Builder;
 import org.springdoc.webflux.core.fn.SpringdocRouteBuilder;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Component;
@@ -19,7 +20,6 @@ import run.halo.app.extension.GroupVersion;
 import run.halo.app.extension.ListResult;
 import run.halo.app.extension.ReactiveExtensionClient;
 import run.halo.app.extension.index.query.QueryFactory;
-import run.halo.app.extension.router.QueryParamBuildUtil;
 import run.halo.app.extension.router.SortableRequest;
 import run.halo.app.theme.finders.PostPublicQueryService;
 import run.halo.app.theme.finders.TagFinder;
@@ -53,7 +53,7 @@ public class TagQueryEndpoint implements CustomEndpoint {
                             .implementation(
                                 ListResult.generateGenericClass(TagVo.class))
                         );
-                    QueryParamBuildUtil.buildParametersFromType(builder, TagPublicQuery.class);
+                    TagPublicQuery.buildParameters(builder);
                 }
             )
             .GET("tags/{name}", this::getTagByName,
@@ -84,7 +84,7 @@ public class TagQueryEndpoint implements CustomEndpoint {
                         .response(responseBuilder()
                             .implementation(ListedPostVo.class)
                         );
-                    QueryParamBuildUtil.buildParametersFromType(builder, PostPublicQuery.class);
+                    PostPublicQuery.buildParameters(builder);
                 }
             )
             .build();
@@ -130,6 +130,10 @@ public class TagQueryEndpoint implements CustomEndpoint {
     static class TagPublicQuery extends SortableRequest {
         public TagPublicQuery(ServerWebExchange exchange) {
             super(exchange);
+        }
+
+        public static void buildParameters(Builder builder) {
+            SortableRequest.buildParameters(builder);
         }
     }
 

@@ -12,6 +12,7 @@ import java.util.Comparator;
 import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.stream.Stream;
+import org.springdoc.core.fn.builders.operation.Builder;
 import org.springframework.beans.BeanWrapper;
 import org.springframework.beans.BeanWrapperImpl;
 import org.springframework.data.domain.Sort;
@@ -94,5 +95,10 @@ public class SortableRequest extends IListRequest.QueryListRequest {
         return Stream.concat(comparatorStream, fallbackComparator)
             .reduce(Comparator::thenComparing)
             .orElse(null);
+    }
+
+    public static void buildParameters(Builder builder) {
+        IListRequest.buildParameters(builder);
+        builder.parameter(QueryParamBuildUtil.sortParameter());
     }
 }

@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import { ref, onMounted, reactive, computed, type ComputedRef } from "vue";
+import { computed, type ComputedRef, onMounted, reactive, ref } from "vue";
 import { submitForm } from "@formkit/core";
 import { Toast, VButton } from "@halo-dev/components";
 import { apiClient } from "@/utils/api-client";
@@ -170,7 +170,7 @@ const sendVerifyCodeButtonText = computed(() => {
       type="text"
       :validation="[
         ['required'],
-        ['length:0,63'],
+        ['length', '4', '63'],
         [
           'matches',
           /^[a-z0-9]([-a-z0-9]*[a-z0-9])?(\.[a-z0-9]([-a-z0-9]*[a-z0-9])?)*$/,

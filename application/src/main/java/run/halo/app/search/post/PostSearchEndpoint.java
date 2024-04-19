@@ -1,6 +1,5 @@
 package run.halo.app.search.post;
 
-import static run.halo.app.extension.router.QueryParamBuildUtil.buildParametersFromType;
 import static run.halo.app.infra.utils.GenericClassUtils.generateConcreteClass;
 
 import org.springdoc.core.fn.builders.apiresponse.Builder;
@@ -40,7 +39,7 @@ public class PostSearchEndpoint implements CustomEndpoint {
                         .response(Builder.responseBuilder().implementation(
                             generateConcreteClass(SearchResult.class, PostHit.class,
                                 () -> "PostHits")));
-                    buildParametersFromType(builder, SearchParam.class);
+                    SearchParam.buildParameters(builder);
                 }
             )
             .build();

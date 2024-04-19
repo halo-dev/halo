@@ -24,7 +24,6 @@ import run.halo.app.content.comment.ReplyService;
 import run.halo.app.core.extension.content.Comment;
 import run.halo.app.core.extension.content.Reply;
 import run.halo.app.extension.ListResult;
-import run.halo.app.extension.router.QueryParamBuildUtil;
 import run.halo.app.infra.utils.HaloUtils;
 import run.halo.app.infra.utils.IpAddressUtils;
 
@@ -57,7 +56,7 @@ public class CommentEndpoint implements CustomEndpoint {
                         .response(responseBuilder()
                             .implementation(ListResult.generateGenericClass(ListedComment.class))
                         );
-                    QueryParamBuildUtil.buildParametersFromType(builder, CommentQuery.class);
+                    CommentQuery.buildParameters(builder);
                 }
             )
             .POST("comments", this::createComment,

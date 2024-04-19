@@ -670,12 +670,14 @@ core:
     detail:
       fields:
         author: 作者
-        website: 網站
+        homepage: 網站
         repo: 源碼倉庫
-        version: 當前版本
-        requires: 版本要求
+        version: 版本
+        requires: Halo 版本要求
         storage_location: 存儲位置
         plugin_requires: 插件依賴
+        description: 描述
+        license: 協議
     settings:
       title: 主題設置
     custom_templates:
@@ -806,14 +808,16 @@ core:
       header:
         title: 插件信息
       fields:
-        display_name: 名稱
         description: 描述
         version: 版本
         requires: Halo 版本要求
-        author: 提供方
+        author: 作者
         license: 協議
         role_templates: 權限模板
         last_starttime: 最近一次啟動
+        homepage: 網站
+        repo: 源碼倉庫
+        load_location: 存儲位置
     loader:
       toast:
         entry_load_failed: 讀取插件入口文件失敗
@@ -859,7 +863,7 @@ core:
       fields:
         username:
           label: 用戶名
-          validation: 請輸入有效的用戶名
+          validation: 只能包含數字、小寫字母、. 和 - 符號，且不能以 . 和 - 符號開頭和結尾。
         display_name:
           label: 顯示名稱
         email:
@@ -1049,7 +1053,7 @@ core:
       fields:
         username:
           label: 用戶名
-          validation: 請輸入有效的用戶名
+          validation: 只能包含數字、小寫字母、. 和 - 符號，且不能以 . 和 - 符號開頭和結尾。
         display_name:
           label: 顯示名稱
         email:

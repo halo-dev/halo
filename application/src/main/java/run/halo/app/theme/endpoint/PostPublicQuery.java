@@ -1,5 +1,6 @@
 package run.halo.app.theme.endpoint;
 
+import org.springdoc.core.fn.builders.operation.Builder;
 import org.springframework.web.server.ServerWebExchange;
 import run.halo.app.extension.router.SortableRequest;
 
@@ -13,5 +14,9 @@ public class PostPublicQuery extends SortableRequest {
 
     public PostPublicQuery(ServerWebExchange exchange) {
         super(exchange);
+    }
+
+    public static void buildParameters(Builder builder) {
+        SortableRequest.buildParameters(builder);
     }
 }

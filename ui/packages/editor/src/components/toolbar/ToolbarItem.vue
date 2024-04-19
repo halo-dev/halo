@@ -1,6 +1,8 @@
 <script lang="ts" setup>
 import type { Component } from "vue";
 import { VTooltip } from "floating-vue";
+import IconArrowDown from "~icons/ri/arrow-down-s-fill";
+import type { ToolbarItem } from "@/types";
 
 withDefaults(
   defineProps<{
@@ -9,6 +11,7 @@ withDefaults(
     title?: string;
     action?: () => void;
     icon?: Component;
+    children: ToolbarItem[];
   }>(),
   {
     isActive: false,
@@ -16,6 +19,7 @@ withDefaults(
     title: undefined,
     action: undefined,
     icon: undefined,
+    children: undefined,
   }
 );
 </script>
@@ -28,11 +32,12 @@ withDefaults(
       { 'cursor-not-allowed opacity-70': disabled },
       { 'hover:bg-gray-100': !disabled },
     ]"
-    class="p-1 rounded-sm"
+    class="inline-flex items-center space-x-1 p-1 rounded-sm"
     :disabled="disabled"
     tabindex="-1"
     @click="action"
   >
     <component :is="icon" />
+    <IconArrowDown v-if="children?.length" />
   </button>
 </template>
