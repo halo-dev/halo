@@ -21,6 +21,12 @@
  */
 export interface ChangePasswordRequest {
     /**
+     * Old password.
+     * @type {string}
+     * @memberof ChangePasswordRequest
+     */
+    'oldPassword': string;
+    /**
      * New password.
      * @type {string}
      * @memberof ChangePasswordRequest

@@ -25,11 +25,13 @@ const emit = defineEmits<{
 }>();
 
 interface PasswordChangeFormState {
+  oldPassword: string;
   password: string;
   password_confirm?: string;
 }
 
 const initialFormState: PasswordChangeFormState = {
+  oldPassword: "",
   password: "",
   password_confirm: "",
 };
@@ -99,6 +101,14 @@ const handleChangePassword = async () => {
     >
       <FormKit
         id="passwordInput"
+        :label="
+          $t('core.uc_profile.change_password_modal.fields.old_password.label')
+        "
+        name="oldPassword"
+        type="password"
+        validation="required:trim"
+      ></FormKit>
+      <FormKit
         :label="
           $t('core.uc_profile.change_password_modal.fields.new_password.label')
         "
