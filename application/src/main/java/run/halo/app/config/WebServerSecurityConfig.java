@@ -5,6 +5,7 @@ import static org.springframework.security.web.server.authentication.ServerWebEx
 import static org.springframework.security.web.server.util.matcher.ServerWebExchangeMatchers.pathMatchers;
 
 import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.context.annotation.Bean;
@@ -23,6 +24,8 @@ import org.springframework.security.web.server.context.ServerSecurityContextRepo
 import org.springframework.security.web.server.context.WebSessionServerSecurityContextRepository;
 import org.springframework.security.web.server.util.matcher.AndServerWebExchangeMatcher;
 import org.springframework.security.web.server.util.matcher.MediaTypeServerWebExchangeMatcher;
+import org.springframework.session.MapSession;
+import org.springframework.session.config.annotation.web.server.EnableSpringWebSession;
 import org.springframework.web.reactive.function.server.RouterFunction;
 import org.springframework.web.reactive.function.server.ServerResponse;
 import run.halo.app.core.extension.service.RoleService;
@@ -41,6 +44,8 @@ import run.halo.app.security.authentication.pat.PatJwkSupplier;
 import run.halo.app.security.authentication.pat.PatServerWebExchangeMatcher;
 import run.halo.app.security.authentication.twofactor.TwoFactorAuthorizationManager;
 import run.halo.app.security.authorization.RequestInfoAuthorizationManager;
+import run.halo.app.security.session.InMemoryReactiveIndexedSessionRepository;
+import run.halo.app.security.session.ReactiveIndexedSessionRepository;
 
 /**
  * Security configuration for WebFlux.
@@ -48,6 +53,7 @@ import run.halo.app.security.authorization.RequestInfoAuthorizationManager;
  * @author johnniang
  */
 @Configuration
+@EnableSpringWebSession
 @EnableWebFluxSecurity
 @RequiredArgsConstructor
 public class WebServerSecurityConfig {
@@ -129,6 +135,11 @@ public class WebServerSecurityConfig {
     @Bean
     ServerSecurityContextRepository securityContextRepository() {
         return new WebSessionServerSecurityContextRepository();
+    }
+
+    @Bean
+    public ReactiveIndexedSessionRepository<MapSession> reactiveSessionRepository() {
+        return new InMemoryReactiveIndexedSessionRepository(new ConcurrentHashMap<>());
     }
 
     @Bean
