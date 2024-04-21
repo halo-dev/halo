@@ -1073,6 +1073,8 @@ core:
           label: 新密碼
         confirm_password:
           label: 確認密碼
+        old_password:
+          label: 舊密碼
     email_verify_modal:
       fields:
         code:

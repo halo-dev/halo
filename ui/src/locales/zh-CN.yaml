@@ -1085,6 +1085,8 @@ core:
           label: 新密码
         confirm_password:
           label: 确认密码
+        old_password:
+          label: 旧密码
     email_verify_modal:
       titles:
         modify: 修改电子邮箱
