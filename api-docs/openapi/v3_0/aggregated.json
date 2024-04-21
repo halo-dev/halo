@@ -16329,6 +16329,9 @@
           "homepage": {
             "type": "string"
           },
+          "issues": {
+            "type": "string"
+          },
           "license": {
             "type": "array",
             "items": {
@@ -16913,12 +16916,12 @@
           },
           "visible": {
             "type": "string",
+            "default": "PUBLIC",
             "enum": [
               "PUBLIC",
               "INTERNAL",
               "PRIVATE"
-            ],
-            "default": "PUBLIC"
+            ]
           }
         }
       },
@@ -18531,12 +18534,12 @@
           },
           "visible": {
             "type": "string",
+            "default": "PUBLIC",
             "enum": [
               "PUBLIC",
               "INTERNAL",
               "PRIVATE"
-            ],
-            "default": "PUBLIC"
+            ]
           }
         }
       },
@@ -19322,6 +19325,9 @@
             "type": "string"
           },
           "homepage": {
+            "type": "string"
+          },
+          "issues": {
             "type": "string"
           },
           "license": {

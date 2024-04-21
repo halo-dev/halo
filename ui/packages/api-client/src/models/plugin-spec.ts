@@ -64,6 +64,12 @@ export interface PluginSpec {
     'homepage'?: string;
     /**
      * 
+     * @type {string}
+     * @memberof PluginSpec
+     */
+    'issues'?: string;
+    /**
+     * 
      * @type {Array<License>}
      * @memberof PluginSpec
      */

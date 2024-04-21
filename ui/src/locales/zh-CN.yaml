@@ -690,6 +690,7 @@ core:
         plugin_requires: 插件依赖
         description: 描述
         license: 协议
+        issues: 问题反馈
     settings:
       title: 主题设置
     custom_templates:
@@ -830,6 +831,7 @@ core:
         homepage: 网站
         repo: 源码仓库
         load_location: 存储位置
+        issues: 问题反馈
     loader:
       toast:
         entry_load_failed: 加载插件入口文件失败

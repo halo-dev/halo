@@ -175,6 +175,19 @@ const handleReloadTheme = async () => {
               {{ $t("core.common.text.none") }}
             </span>
           </VDescriptionItem>
+          <VDescriptionItem :label="$t('core.theme.detail.fields.issues')">
+            <a
+              v-if="selectedTheme?.spec.issues"
+              :href="selectedTheme.spec.issues"
+              class="hover:text-gray-600"
+              target="_blank"
+            >
+              {{ selectedTheme.spec.issues }}
+            </a>
+            <span v-else>
+              {{ $t("core.common.text.none") }}
+            </span>
+          </VDescriptionItem>
           <VDescriptionItem :label="$t('core.theme.detail.fields.license')">
             <ul
               v-if="
