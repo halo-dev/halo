@@ -25,11 +25,13 @@ const emit = defineEmits<{
 }>();
 
 interface PasswordChangeFormState {
+  oldPassword: string;
   password: string;
   password_confirm?: string;
 }
 
 const initialFormState: PasswordChangeFormState = {
+  oldPassword: "",
   password: "",
   password_confirm: "",
 };
@@ -64,12 +66,11 @@ const handleChangePassword = async () => {
   try {
     saving.value = true;
 
-    const changePasswordRequest = cloneDeep(formState.value);
-    delete changePasswordRequest.password_confirm;
+    const changeOwnPasswordRequest = cloneDeep(formState.value);
+    delete changeOwnPasswordRequest.password_confirm;
 
-    await apiClient.user.changePassword({
-      name: "-",
-      changePasswordRequest,
+    await apiClient.user.changeOwnPassword({
+      changeOwnPasswordRequest,
     });
 
     onVisibleChange(false);
@@ -99,6 +100,14 @@ const handleChangePassword = async () => {
     >
       <FormKit
         id="passwordInput"
+        :label="
+          $t('core.uc_profile.change_password_modal.fields.old_password.label')
+        "
+        name="oldPassword"
+        type="password"
+        validation="required:trim"
+      ></FormKit>
+      <FormKit
         :label="
           $t('core.uc_profile.change_password_modal.fields.new_password.label')
         "

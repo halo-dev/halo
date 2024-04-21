@@ -176,4 +176,21 @@ public class UserServiceImpl implements UserService {
                 .flatMap(newUser -> grantRoles(user.getMetadata().getName(), roleNames)))
             );
     }
+
+    @Override
+    public Mono<Boolean> confirmPassword(String username, String rawPassword) {
+
+        return getUser(username)
+            .filter(user -> {
+                if (!StringUtils.hasText(user.getSpec().getPassword())) {
+                    // If the password is not set, return true directly.
+                    return true;
+                }
+                if (!StringUtils.hasText(rawPassword)) {
+                    return false;
+                }
+                return passwordEncoder.matches(rawPassword, user.getSpec().getPassword());
+            })
+            .hasElement();
+    }
 }

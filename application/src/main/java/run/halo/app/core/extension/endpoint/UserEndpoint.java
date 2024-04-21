@@ -89,6 +89,7 @@ import run.halo.app.infra.SystemConfigurableEnvironmentFetcher;
 import run.halo.app.infra.SystemSetting;
 import run.halo.app.infra.ValidationUtils;
 import run.halo.app.infra.exception.RateLimitExceededException;
+import run.halo.app.infra.exception.UnsatisfiedAttributeValueException;
 import run.halo.app.infra.utils.JsonUtils;
 import run.halo.app.security.authentication.twofactor.TwoFactorAuthentication;
 
@@ -160,9 +161,19 @@ public class UserEndpoint implements CustomEndpoint {
                         .description("User name")
                         .required(true))
                     .response(responseBuilder().implementation(UserPermission.class)))
-            .PUT("/users/{name}/password", this::changePassword,
-                builder -> builder.operationId("ChangePassword")
-                    .description("Change password of user.")
+            .PUT("/users/-/password", this::changeOwnPassword,
+                builder -> builder.operationId("ChangeOwnPassword")
+                    .description("Change own password of user.")
+                    .tag(tag)
+                    .requestBody(requestBodyBuilder()
+                        .required(true)
+                        .implementation(ChangeOwnPasswordRequest.class))
+                    .response(responseBuilder()
+                        .implementation(User.class))
+            )
+            .PUT("/users/{name}/password", this::changeAnyonePasswordForAdmin,
+                builder -> builder.operationId("ChangeAnyonePassword")
+                    .description("Change anyone password of user for admin.")
                     .tag(tag)
                     .parameter(parameterBuilder().in(ParameterIn.PATH).name("name")
                         .description(
@@ -520,7 +531,7 @@ public class UserEndpoint implements CustomEndpoint {
             .flatMap(updatedUser -> ServerResponse.ok().bodyValue(updatedUser));
     }
 
-    Mono<ServerResponse> changePassword(ServerRequest request) {
+    Mono<ServerResponse> changeAnyonePasswordForAdmin(ServerRequest request) {
         final var nameInPath = request.pathVariable("name");
         return ReactiveSecurityContextHolder.getContext()
             .map(ctx -> SELF_USER.equals(nameInPath) ? ctx.getAuthentication().getName()
@@ -536,6 +547,40 @@ public class UserEndpoint implements CustomEndpoint {
             .flatMap(updatedUser -> ServerResponse.ok()
                 .contentType(MediaType.APPLICATION_JSON)
                 .bodyValue(updatedUser));
+    }
+
+    Mono<ServerResponse> changeOwnPassword(ServerRequest request) {
+        return ReactiveSecurityContextHolder.getContext()
+            .map(ctx -> ctx.getAuthentication().getName())
+            .flatMap(username -> request.bodyToMono(ChangeOwnPasswordRequest.class)
+                .switchIfEmpty(Mono.defer(() ->
+                    Mono.error(new ServerWebInputException("Request body is empty"))))
+                .flatMap(changePasswordRequest -> {
+                    var rawOldPassword = changePasswordRequest.oldPassword();
+                    return userService.confirmPassword(username, rawOldPassword)
+                        .filter(Boolean::booleanValue)
+                        .switchIfEmpty(Mono.error(new UnsatisfiedAttributeValueException(
+                            "Old password is incorrect.",
+                            "problemDetail.user.oldPassword.notMatch",
+                            null))
+                        )
+                        .thenReturn(changePasswordRequest);
+                })
+                .flatMap(changePasswordRequest -> {
+                    var password = changePasswordRequest.password();
+                    // encode password
+                    return userService.updateWithRawPassword(username, password);
+                }))
+            .flatMap(updatedUser -> ServerResponse.ok()
+                .contentType(MediaType.APPLICATION_JSON)
+                .bodyValue(updatedUser));
+    }
+
+    record ChangeOwnPasswordRequest(
+        @Schema(description = "Old password.", requiredMode = REQUIRED)
+        String oldPassword,
+        @Schema(description = "New password.", requiredMode = REQUIRED, minLength = 6)
+        String password) {
     }
 
     record ChangePasswordRequest(
