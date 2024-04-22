@@ -152,7 +152,7 @@ public class CommentServiceImpl implements CommentService {
             Sort.by("metadata.creationTimestamp", "metadata.name"));
         return Flux.defer(() -> listCommentsByRef(subjectRef, pageRequest))
             .expand(page -> page.hasNext()
-                ? listCommentsByRef(subjectRef, pageRequest)
+                ? listCommentsByRef(subjectRef, pageRequest.next())
                 : Mono.empty()
             )
             .flatMap(page -> Flux.fromIterable(page.getItems()))

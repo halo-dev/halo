@@ -123,7 +123,7 @@ public class ReplyServiceImpl implements ReplyService {
             Sort.by("metadata.creationTimestamp", "metadata.name"));
         return Flux.defer(() -> listRepliesByComment(commentName, pageRequest))
             .expand(page -> page.hasNext()
-                ? listRepliesByComment(commentName, pageRequest)
+                ? listRepliesByComment(commentName, pageRequest.next())
                 : Mono.empty()
             )
             .flatMap(page -> Flux.fromIterable(page.getItems()))

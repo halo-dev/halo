@@ -19,6 +19,7 @@ export * from './category-spec';
 export * from './category-status';
 export * from './category-vo';
 export * from './category-vo-list';
+export * from './change-own-password-request';
 export * from './change-password-request';
 export * from './comment';
 export * from './comment-email-owner';

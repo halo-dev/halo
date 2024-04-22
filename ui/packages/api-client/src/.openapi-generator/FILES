@@ -100,6 +100,7 @@ models/category-status.ts
 models/category-vo-list.ts
 models/category-vo.ts
 models/category.ts
+models/change-own-password-request.ts
 models/change-password-request.ts
 models/comment-email-owner.ts
 models/comment-list.ts

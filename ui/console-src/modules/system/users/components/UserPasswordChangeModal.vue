@@ -67,7 +67,7 @@ const handleChangePassword = async () => {
     const changePasswordRequest = cloneDeep(formState.value);
     delete changePasswordRequest.password_confirm;
 
-    await apiClient.user.changePassword({
+    await apiClient.user.changeAnyonePassword({
       name: props.user?.metadata.name || "",
       changePasswordRequest,
     });

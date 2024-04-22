@@ -485,4 +485,21 @@ class UserServiceImplTest {
             return user;
         }
     }
+
+    @Test
+    void confirmPasswordWhenPasswordNotSet() {
+        var user = new User();
+        user.setSpec(new User.UserSpec());
+        when(client.get(User.class, "fake-user")).thenReturn(Mono.just(user));
+        userService.confirmPassword("fake-user", "fake-password")
+            .as(StepVerifier::create)
+            .expectNext(true)
+            .verifyComplete();
+
+        user.getSpec().setPassword("");
+        userService.confirmPassword("fake-user", "fake-password")
+            .as(StepVerifier::create)
+            .expectNext(true)
+            .verifyComplete();
+    }
 }
