@@ -13,23 +13,15 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.retry.support.RetryTemplate;
 import org.springframework.stereotype.Component;
-import run.halo.app.content.NotificationReasonConst;
 import run.halo.app.core.extension.Role;
 import run.halo.app.core.extension.RoleBinding;
 import run.halo.app.core.extension.User;
 import run.halo.app.core.extension.UserConnection;
 import run.halo.app.core.extension.attachment.Attachment;
-import run.halo.app.core.extension.content.Comment;
-import run.halo.app.core.extension.content.Post;
-import run.halo.app.core.extension.content.Reply;
-import run.halo.app.core.extension.content.SinglePage;
-import run.halo.app.core.extension.notification.Subscription;
 import run.halo.app.core.extension.service.AttachmentService;
 import run.halo.app.core.extension.service.RoleService;
-import run.halo.app.extension.Extension;
 import run.halo.app.extension.ExtensionClient;
 import run.halo.app.extension.GroupKind;
-import run.halo.app.extension.GroupVersionKind;
 import run.halo.app.extension.MetadataUtil;
 import run.halo.app.extension.controller.Controller;
 import run.halo.app.extension.controller.ControllerBuilder;
@@ -40,7 +32,6 @@ import run.halo.app.infra.AnonymousUserConst;
 import run.halo.app.infra.ExternalUrlSupplier;
 import run.halo.app.infra.utils.JsonUtils;
 import run.halo.app.infra.utils.PathUtils;
-import run.halo.app.notification.NotificationCenter;
 
 @Slf4j
 @Component
@@ -51,7 +42,6 @@ public class UserReconciler implements Reconciler<Request> {
     private final ExternalUrlSupplier externalUrlSupplier;
     private final RoleService roleService;
     private final AttachmentService attachmentService;
-    private final NotificationCenter notificationCenter;
     private final RetryTemplate retryTemplate = RetryTemplate.builder()
         .maxAttempts(20)
         .fixedBackoff(300)
@@ -70,9 +60,6 @@ public class UserReconciler implements Reconciler<Request> {
             ensureRoleNamesAnno(request.name());
             updatePermalink(request.name());
             handleAvatar(request.name());
-
-            // cleanup history data and remove this line in the future
-            removeInternalSubscription(request.name());
         });
         return new Result(false, null);
     }
@@ -115,40 +102,6 @@ public class UserReconciler implements Reconciler<Request> {
 
             client.update(user);
         });
-    }
-
-    private void removeInternalSubscription(String username) {
-        var subscriber = new Subscription.Subscriber();
-        subscriber.setName(username);
-
-        var commentOnPost =
-            createInterestReason(NotificationReasonConst.NEW_COMMENT_ON_POST, Post.class);
-        notificationCenter.unsubscribe(subscriber, commentOnPost).block();
-
-        var commentOnPage =
-            createInterestReason(NotificationReasonConst.NEW_COMMENT_ON_PAGE, SinglePage.class);
-        notificationCenter.unsubscribe(subscriber, commentOnPage).block();
-
-        var replyOnComment =
-            createInterestReason(NotificationReasonConst.SOMEONE_REPLIED_TO_YOU, Comment.class);
-        notificationCenter.unsubscribe(subscriber, replyOnComment).block();
-
-        var replyOnReply =
-            createInterestReason(NotificationReasonConst.SOMEONE_REPLIED_TO_YOU, Reply.class);
-        notificationCenter.unsubscribe(subscriber, replyOnReply).block();
-    }
-
-    <E extends Extension> Subscription.InterestReason createInterestReason(String type,
-        Class<E> extensionClass) {
-        var interestReason = new Subscription.InterestReason();
-        interestReason.setReasonType(type);
-
-        var reasonSubject = new Subscription.ReasonSubject();
-        var gvk = GroupVersionKind.fromExtension(extensionClass);
-        reasonSubject.setKind(gvk.kind());
-        reasonSubject.setApiVersion(gvk.groupVersion().toString());
-        interestReason.setSubject(reasonSubject);
-        return interestReason;
     }
 
     private void ensureRoleNamesAnno(String name) {

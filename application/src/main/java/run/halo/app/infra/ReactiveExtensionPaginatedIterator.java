@@ -11,6 +11,10 @@ import run.halo.app.extension.PageRequest;
 import run.halo.app.extension.PageRequestImpl;
 import run.halo.app.extension.ReactiveExtensionClient;
 
+/**
+ * <p>Note that: This class can not be used for <code>deletion</code> operation, because deletion
+ * operation will change the total records.</p>
+ */
 public class ReactiveExtensionPaginatedIterator<E extends Extension> {
     private static final int DEFAULT_PAGE_SIZE = 200;
     private final PageRequest pageRequest;

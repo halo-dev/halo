@@ -406,10 +406,12 @@ public class SchemeInitializer implements ApplicationListener<ApplicationContext
             indexSpecs.add(new IndexSpec()
                 .setName("spec.reason.subject")
                 .setIndexFunc(simpleAttribute(Subscription.class,
-                    subscription -> {
-                        var subject = subscription.getSpec().getReason().getSubject();
-                        return subject == null ? null : subject.toString();
-                    }))
+                    subscription -> subscription.getSpec().getReason().getSubject().toString()))
+            );
+            indexSpecs.add(new IndexSpec()
+                .setName("spec.reason.expression")
+                .setIndexFunc(simpleAttribute(Subscription.class,
+                    subscription -> subscription.getSpec().getReason().getExpression()))
             );
             indexSpecs.add(new IndexSpec()
                 .setName("spec.subscriber")

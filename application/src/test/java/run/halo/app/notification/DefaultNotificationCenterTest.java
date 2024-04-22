@@ -28,9 +28,7 @@ import run.halo.app.core.extension.notification.NotifierDescriptor;
 import run.halo.app.core.extension.notification.Reason;
 import run.halo.app.core.extension.notification.ReasonType;
 import run.halo.app.core.extension.notification.Subscription;
-import run.halo.app.extension.ListResult;
 import run.halo.app.extension.Metadata;
-import run.halo.app.extension.PageRequest;
 import run.halo.app.extension.ReactiveExtensionClient;
 import run.halo.app.infra.utils.JsonUtils;
 
@@ -60,6 +58,9 @@ class DefaultNotificationCenterTest {
 
     @Mock
     private RecipientResolver recipientResolver;
+
+    @Mock
+    private SubscriptionService subscriptionService;
 
     @InjectMocks
     private DefaultNotificationCenter notificationCenter;
@@ -126,21 +127,13 @@ class DefaultNotificationCenterTest {
 
         var reason = subscription.getSpec().getReason();
 
-        doReturn(Flux.just(subscription))
-            .when(spyNotificationCenter).listSubscription(eq(subscriber), eq(reason));
+        doReturn(Mono.empty())
+            .when(spyNotificationCenter).unsubscribe(eq(subscriber), eq(reason));
 
         when(client.create(any(Subscription.class))).thenReturn(Mono.empty());
 
         spyNotificationCenter.subscribe(subscriber, reason).block();
 
-        verify(client, times(0)).create(any(Subscription.class));
-
-        // not exists subscription will create a new subscription
-        var newReason = JsonUtils.deepCopy(reason);
-        newReason.setReasonType("fake-reason-type");
-        doReturn(Flux.empty())
-            .when(spyNotificationCenter).listSubscription(eq(subscriber), eq(newReason));
-        spyNotificationCenter.subscribe(subscriber, newReason).block();
         verify(client).create(any(Subscription.class));
     }
 
@@ -151,14 +144,13 @@ class DefaultNotificationCenterTest {
         var spyNotificationCenter = spy(notificationCenter);
         var subscriptions = createSubscriptions();
 
-        doReturn(Mono.just(new ListResult<>(subscriptions)))
-            .when(spyNotificationCenter).pageSubscriptionBy(eq(subscriber), any(PageRequest.class));
+        when(subscriptionService.list(eq(subscriber))).thenReturn(Flux.fromIterable(subscriptions));
 
-        when(client.delete(any(Subscription.class))).thenReturn(Mono.empty());
+        when(subscriptionService.remove(any(Subscription.class))).thenReturn(Mono.empty());
 
         spyNotificationCenter.unsubscribe(subscriber).block();
 
-        verify(client).delete(any(Subscription.class));
+        verify(subscriptionService).remove(any(Subscription.class));
     }
 
 
@@ -175,18 +167,18 @@ class DefaultNotificationCenterTest {
 
         var newReason = JsonUtils.deepCopy(reason);
         newReason.setReasonType("fake-reason-type");
-        doReturn(Flux.empty())
-            .when(spyNotificationCenter).listSubscription(eq(subscriber), eq(newReason));
-        when(client.delete(any(Subscription.class))).thenReturn(Mono.empty());
+        when(subscriptionService.list(eq(subscriber), eq(newReason))).thenReturn(Flux.empty());
+
+        when(subscriptionService.remove(any(Subscription.class))).thenReturn(Mono.empty());
         spyNotificationCenter.unsubscribe(subscriber, newReason).block();
         verify(client, times(0)).delete(any(Subscription.class));
 
-        doReturn(Flux.just(subscription))
-            .when(spyNotificationCenter).listSubscription(eq(subscriber), eq(reason));
+        when(subscriptionService.list(eq(subscriber), eq(reason))).thenReturn(
+            Flux.just(subscription));
 
         // exists subscription will be deleted
         spyNotificationCenter.unsubscribe(subscriber, reason).block();
-        verify(client).delete(any(Subscription.class));
+        verify(subscriptionService).remove(any(Subscription.class));
     }
 
     @Test

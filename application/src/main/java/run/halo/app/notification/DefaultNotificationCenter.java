@@ -1,9 +1,6 @@
 package run.halo.app.notification;
 
 import static org.apache.commons.lang3.StringUtils.defaultString;
-import static run.halo.app.extension.index.query.QueryFactory.and;
-import static run.halo.app.extension.index.query.QueryFactory.equal;
-import static run.halo.app.extension.index.query.QueryFactory.or;
 
 import java.util.HashMap;
 import java.util.Locale;
@@ -11,9 +8,7 @@ import java.util.Optional;
 import lombok.Builder;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Component;
-import org.springframework.util.Assert;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import reactor.core.scheduler.Schedulers;
@@ -23,14 +18,8 @@ import run.halo.app.core.extension.notification.NotifierDescriptor;
 import run.halo.app.core.extension.notification.Reason;
 import run.halo.app.core.extension.notification.ReasonType;
 import run.halo.app.core.extension.notification.Subscription;
-import run.halo.app.extension.ListOptions;
-import run.halo.app.extension.ListResult;
 import run.halo.app.extension.Metadata;
-import run.halo.app.extension.PageRequest;
-import run.halo.app.extension.PageRequestImpl;
 import run.halo.app.extension.ReactiveExtensionClient;
-import run.halo.app.extension.index.query.Query;
-import run.halo.app.extension.router.selector.FieldSelector;
 import run.halo.app.notification.endpoint.SubscriptionRouter;
 
 /**
@@ -51,6 +40,7 @@ public class DefaultNotificationCenter implements NotificationCenter {
     private final NotificationTemplateRender notificationTemplateRender;
     private final SubscriptionRouter subscriptionRouter;
     private final RecipientResolver recipientResolver;
+    private final SubscriptionService subscriptionService;
 
     @Override
     public Mono<Void> notify(Reason reason) {
@@ -67,15 +57,15 @@ public class DefaultNotificationCenter implements NotificationCenter {
     @Override
     public Mono<Subscription> subscribe(Subscription.Subscriber subscriber,
         Subscription.InterestReason reason) {
-        return listSubscription(subscriber, reason)
-            .next()
-            .switchIfEmpty(Mono.defer(() -> {
+        return unsubscribe(subscriber, reason)
+            .then(Mono.defer(() -> {
                 var subscription = new Subscription();
                 subscription.setMetadata(new Metadata());
                 subscription.getMetadata().setGenerateName("subscription-");
                 subscription.setSpec(new Subscription.Spec());
                 subscription.getSpec().setUnsubscribeToken(Subscription.generateUnsubscribeToken());
                 subscription.getSpec().setSubscriber(subscriber);
+                Subscription.InterestReason.ensureSubjectHasValue(reason);
                 subscription.getSpec().setReason(reason);
                 return client.create(subscription);
             }));
@@ -83,47 +73,17 @@ public class DefaultNotificationCenter implements NotificationCenter {
 
     @Override
     public Mono<Void> unsubscribe(Subscription.Subscriber subscriber) {
-        // pagination query all subscriptions of the subscriber to avoid large data
-        var pageRequest = PageRequestImpl.of(1, 200,
-            Sort.by("metadata.creationTimestamp", "metadata.name"));
-        return Flux.defer(() -> pageSubscriptionBy(subscriber, pageRequest))
-            .expand(page -> page.hasNext()
-                ? pageSubscriptionBy(subscriber, pageRequest.next())
-                : Mono.empty()
-            )
-            .flatMap(page -> Flux.fromIterable(page.getItems()))
-            .flatMap(client::delete)
+        return subscriptionService.list(subscriber)
+            .flatMap(subscriptionService::remove)
             .then();
     }
 
     @Override
     public Mono<Void> unsubscribe(Subscription.Subscriber subscriber,
         Subscription.InterestReason reason) {
-        return listSubscription(subscriber, reason)
-            .flatMap(client::delete)
+        return subscriptionService.list(subscriber, reason)
+            .flatMap(subscriptionService::remove)
             .then();
-    }
-
-    Mono<ListResult<Subscription>> pageSubscriptionBy(Subscription.Subscriber subscriber,
-        PageRequest pageRequest) {
-        var listOptions = new ListOptions();
-        var fieldQuery = equal("spec.subscriber", subscriber.getName());
-        listOptions.setFieldSelector(FieldSelector.of(fieldQuery));
-        return client.listBy(Subscription.class, listOptions, pageRequest);
-    }
-
-    Flux<Subscription> listSubscription(Subscription.Subscriber subscriber,
-        Subscription.InterestReason reason) {
-        var listOptions = new ListOptions();
-        var fieldQuery = equal("spec.subscriber", subscriber.getName());
-        if (reason.getSubject() != null) {
-            fieldQuery = and(
-                fieldQuery,
-                getSubscriptionFieldQuery(reason.getReasonType(), reason.getSubject())
-            );
-        }
-        listOptions.setFieldSelector(FieldSelector.of(fieldQuery));
-        return client.listAll(Subscription.class, listOptions, defaultSort());
     }
 
     Flux<String> getNotifiersBySubscriber(Subscriber subscriber, Reason reason) {
@@ -332,24 +292,5 @@ public class DefaultNotificationCenter implements NotificationCenter {
     Mono<Locale> getLocaleFromSubscriber(Subscriber subscriber) {
         // TODO get locale from subscriber
         return Mono.just(Locale.getDefault());
-    }
-
-    private static Query getSubscriptionFieldQuery(String reasonTypeName,
-        Subscription.ReasonSubject reasonSubject) {
-        Assert.notNull(reasonSubject, "The reasonSubject must not be null");
-        var matchAllSubject = new Subscription.ReasonSubject();
-        matchAllSubject.setKind(reasonSubject.getKind());
-        matchAllSubject.setApiVersion(reasonSubject.getApiVersion());
-        return and(equal("spec.reason.reasonType", reasonTypeName),
-            or(equal("spec.reason.subject", reasonSubject.toString()),
-                // source reason subject name is blank present match all
-                equal("spec.reason.subject", matchAllSubject.toString())
-            )
-        );
-    }
-
-    Sort defaultSort() {
-        return Sort.by(Sort.Order.asc("metadata.creationTimestamp"),
-            Sort.Order.asc("metadata.name"));
     }
 }

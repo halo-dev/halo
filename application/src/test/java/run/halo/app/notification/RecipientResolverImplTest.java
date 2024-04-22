@@ -1,16 +1,13 @@
 package run.halo.app.notification;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
-import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.Mockito.doReturn;
-import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import reactor.core.publisher.Flux;
@@ -18,7 +15,6 @@ import reactor.test.StepVerifier;
 import run.halo.app.core.extension.notification.Reason;
 import run.halo.app.core.extension.notification.Subscription;
 import run.halo.app.extension.Metadata;
-import run.halo.app.extension.ReactiveExtensionClient;
 
 /**
  * Tests for {@link RecipientResolverImpl}.
@@ -30,14 +26,10 @@ import run.halo.app.extension.ReactiveExtensionClient;
 class RecipientResolverImplTest {
 
     @Mock
-    private ReactiveExtensionClient client;
+    private SubscriptionService subscriptionService;
 
+    @InjectMocks
     private RecipientResolverImpl recipientResolver;
-
-    @BeforeEach
-    void setUp() {
-        recipientResolver = spy(new RecipientResolverImpl(client));
-    }
 
     @Test
     void testExpressionMatch() {
@@ -66,16 +58,15 @@ class RecipientResolverImplTest {
         reasonAttributes.put("owner", "guqing");
         reason.getSpec().setAttributes(reasonAttributes);
 
-        doReturn(Flux.just(subscription1, subscription2))
-            .when(recipientResolver).listSubscriptions(anyString());
+        when(subscriptionService.list(anyString()))
+            .thenReturn(Flux.just(subscription1, subscription2));
 
         recipientResolver.resolve(reason)
             .as(StepVerifier::create)
             .expectNext(new Subscriber(UserIdentity.of("guqing"), "guqing-subscription"))
             .verifyComplete();
 
-        verify(recipientResolver).listSubscriptions(any());
-        verify(recipientResolver).resolve(eq(reason));
+        verify(subscriptionService).list(anyString());
     }
 
     @Test
@@ -84,8 +75,8 @@ class RecipientResolverImplTest {
         subscriber.setName("test");
         Subscription subscription = createSubscription(subscriber);
 
-        doReturn(Flux.just(subscription))
-            .when(recipientResolver).listSubscriptions(any());
+        when(subscriptionService.list(anyString()))
+            .thenReturn(Flux.just(subscription));
 
         var reason = new Reason();
         reason.setSpec(new Reason.Spec());
@@ -100,8 +91,7 @@ class RecipientResolverImplTest {
             .expectNext(new Subscriber(UserIdentity.of("test"), "fake-subscription"))
             .verifyComplete();
 
-        verify(recipientResolver).listSubscriptions(any());
-        verify(recipientResolver).resolve(eq(reason));
+        verify(subscriptionService).list(anyString());
     }
 
     @Test
@@ -118,8 +108,8 @@ class RecipientResolverImplTest {
         subscription2.getSpec().getReason().setSubject(null);
         subscription2.getSpec().getReason().setExpression("props.owner == 'guqing'");
 
-        doReturn(Flux.just(subscription1, subscription2))
-            .when(recipientResolver).listSubscriptions(any());
+        when(subscriptionService.list(anyString()))
+            .thenReturn(Flux.just(subscription1, subscription2));
 
         var reason = new Reason();
         reason.setSpec(new Reason.Spec());
@@ -137,8 +127,7 @@ class RecipientResolverImplTest {
             .expectNextCount(1)
             .verifyComplete();
 
-        verify(recipientResolver).listSubscriptions(any());
-        verify(recipientResolver).resolve(eq(reason));
+        verify(subscriptionService).list(anyString());
     }
 
     @Test

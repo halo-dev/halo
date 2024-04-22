@@ -1,7 +1,6 @@
 package run.halo.app.notification;
 
 import static org.apache.commons.lang3.ObjectUtils.defaultIfNull;
-import static run.halo.app.extension.index.query.QueryFactory.equal;
 
 import com.google.common.base.Throwables;
 import java.util.Collections;
@@ -27,10 +26,6 @@ import org.springframework.util.Assert;
 import reactor.core.publisher.Flux;
 import run.halo.app.core.extension.notification.Reason;
 import run.halo.app.core.extension.notification.Subscription;
-import run.halo.app.extension.ListOptions;
-import run.halo.app.extension.ReactiveExtensionClient;
-import run.halo.app.extension.router.selector.FieldSelector;
-import run.halo.app.infra.ReactiveExtensionPaginatedIterator;
 
 @Slf4j
 @Component
@@ -38,16 +33,16 @@ import run.halo.app.infra.ReactiveExtensionPaginatedIterator;
 public class RecipientResolverImpl implements RecipientResolver {
     private final ExpressionParser expressionParser = new SpelExpressionParser();
     private final EvaluationContext evaluationContext = createEvaluationContext();
-
-    private final ReactiveExtensionClient client;
+    private final SubscriptionService subscriptionService;
 
     @Override
     public Flux<Subscriber> resolve(Reason reason) {
         var reasonType = reason.getSpec().getReasonType();
-        return listSubscriptions(reasonType)
+        return subscriptionService.list(reasonType)
+            .filter(this::isNotDisabled)
             .filter(subscription -> {
                 var interestReason = subscription.getSpec().getReason();
-                if (interestReason.getSubject() != null) {
+                if (hasSubject(interestReason)) {
                     return subjectMatch(subscription, reason.getSpec().getSubject());
                 } else if (StringUtils.isNotBlank(interestReason.getExpression())) {
                     return expressionMatch(subscription.getMetadata().getName(),
@@ -60,6 +55,10 @@ public class RecipientResolverImpl implements RecipientResolver {
                 return new Subscriber(id, subscription.getMetadata().getName());
             })
             .distinct(Subscriber::name);
+    }
+
+    boolean hasSubject(Subscription.InterestReason interestReason) {
+        return !Subscription.InterestReason.isFallbackSubject(interestReason.getSubject());
     }
 
     boolean expressionMatch(String subscriptionName, String expressionStr, Reason reason) {
@@ -99,16 +98,6 @@ public class RecipientResolverImpl implements RecipientResolver {
         }
         matchSubject.setName(reasonSubject.getName());
         return sourceSubject.equals(matchSubject);
-    }
-
-    Flux<Subscription> listSubscriptions(String reasonType) {
-        final var listOptions = new ListOptions();
-        var fieldQuery = equal("spec.reason.reasonType", reasonType);
-        listOptions.setFieldSelector(FieldSelector.of(fieldQuery));
-        var iterator =
-            new ReactiveExtensionPaginatedIterator<>(client, Subscription.class, listOptions);
-        return iterator.list()
-            .filter(this::isNotDisabled);
     }
 
     boolean isNotDisabled(Subscription subscription) {
