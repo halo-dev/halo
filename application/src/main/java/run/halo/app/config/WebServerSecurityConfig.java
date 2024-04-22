@@ -8,6 +8,8 @@ import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.ObjectProvider;
+import org.springframework.boot.autoconfigure.session.SessionProperties;
+import org.springframework.boot.autoconfigure.web.ServerProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.Ordered;
@@ -138,8 +140,14 @@ public class WebServerSecurityConfig {
     }
 
     @Bean
-    public ReactiveIndexedSessionRepository<MapSession> reactiveSessionRepository() {
-        return new InMemoryReactiveIndexedSessionRepository(new ConcurrentHashMap<>());
+    public ReactiveIndexedSessionRepository<MapSession> reactiveSessionRepository(
+        SessionProperties sessionProperties,
+        ServerProperties serverProperties) {
+        var repository = new InMemoryReactiveIndexedSessionRepository(new ConcurrentHashMap<>());
+        var timeout = sessionProperties.determineTimeout(
+            () -> serverProperties.getServlet().getSession().getTimeout());
+        repository.setDefaultMaxInactiveInterval(timeout);
+        return repository;
     }
 
     @Bean
