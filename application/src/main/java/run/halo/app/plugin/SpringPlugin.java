@@ -25,37 +25,47 @@ public class SpringPlugin extends Plugin {
 
     @Override
     public void start() {
-        // initialize context
-        var pluginId = pluginContext.getName();
-        this.context = contextFactory.create(pluginId);
+        try {
+            // initialize context
+            var pluginId = pluginContext.getName();
+            this.context = contextFactory.create(pluginId);
 
-        var pluginOpt = context.getBeanProvider(Plugin.class)
-            .stream()
-            .findFirst();
-        context.publishEvent(new SpringPluginStartingEvent(this, this));
-        if (pluginOpt.isPresent()) {
-            this.delegate = pluginOpt.get();
-            if (this.delegate instanceof BasePlugin basePlugin) {
-                basePlugin.setContext(pluginContext);
+            var pluginOpt = context.getBeanProvider(Plugin.class)
+                .stream()
+                .findFirst();
+            context.publishEvent(new SpringPluginStartingEvent(this, this));
+            if (pluginOpt.isPresent()) {
+                this.delegate = pluginOpt.get();
+                if (this.delegate instanceof BasePlugin basePlugin) {
+                    basePlugin.setContext(pluginContext);
+                }
+                this.delegate.start();
             }
-            this.delegate.start();
+            context.publishEvent(new SpringPluginStartedEvent(this, this));
+        } catch (Throwable t) {
+            // try to stop plugin for cleaning resources if something went wrong
+            this.stop();
+            // propagate exception to invoker.
+            throw t;
         }
-        context.publishEvent(new SpringPluginStartedEvent(this, this));
     }
 
     @Override
     public void stop() {
-        if (context != null) {
-            context.publishEvent(new SpringPluginStoppingEvent(this, this));
+        try {
+            if (context != null) {
+                context.publishEvent(new SpringPluginStoppingEvent(this, this));
+            }
+            if (this.delegate != null) {
+                this.delegate.stop();
+            }
+        } finally {
+            if (context instanceof ConfigurableApplicationContext configurableContext) {
+                configurableContext.close();
+            }
+            // reset application context
+            context = null;
         }
-        if (this.delegate != null) {
-            this.delegate.stop();
-        }
-        if (context instanceof ConfigurableApplicationContext configurableContext) {
-            configurableContext.close();
-        }
-        // reset application context
-        context = null;
     }
 
     @Override
@@ -63,6 +73,7 @@ public class SpringPlugin extends Plugin {
         if (delegate != null) {
             delegate.delete();
         }
+        this.delegate = null;
     }
 
     public ApplicationContext getApplicationContext() {
