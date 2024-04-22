@@ -145,7 +145,7 @@ public class WebServerSecurityConfig {
         ServerProperties serverProperties) {
         var repository = new InMemoryReactiveIndexedSessionRepository(new ConcurrentHashMap<>());
         var timeout = sessionProperties.determineTimeout(
-            () -> serverProperties.getServlet().getSession().getTimeout());
+            () -> serverProperties.getReactive().getSession().getTimeout());
         repository.setDefaultMaxInactiveInterval(timeout);
         return repository;
     }

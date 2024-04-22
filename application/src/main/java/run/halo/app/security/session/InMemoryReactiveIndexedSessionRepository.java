@@ -1,5 +1,8 @@
 package run.halo.app.security.session;
 
+import com.google.common.cache.Cache;
+import com.google.common.cache.CacheBuilder;
+import java.time.Duration;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
@@ -25,20 +28,36 @@ public class InMemoryReactiveIndexedSessionRepository extends ReactiveMapSession
     private final ConcurrentMap<IndexKey, Set<String>> indexSessionIdMap =
         new ConcurrentHashMap<>();
 
+    /**
+     * Prevent other requests from being parsed and acquiring the session during its deletion,
+     * which could result in an unintended renewal. Currently, it acts as a buffer, and having a
+     * slightly prolonged expiration period is sufficient.
+     */
+    private final Cache<String, Boolean> invalidateSessionIds = CacheBuilder.newBuilder()
+        .expireAfterWrite(Duration.ofMinutes(10))
+        .maximumSize(10_000)
+        .build();
+
     public InMemoryReactiveIndexedSessionRepository(Map<String, Session> sessions) {
         super(sessions);
     }
 
     @Override
     public Mono<Void> save(MapSession session) {
+        if (invalidateSessionIds.getIfPresent(session.getId()) != null) {
+            return this.deleteById(session.getId());
+        }
         return super.save(session)
             .then(updateIndex(session));
     }
 
     @Override
     public Mono<Void> deleteById(String id) {
-        return super.deleteById(id)
-            .then(removeIndex(id));
+        return removeIndex(id)
+            .then(Mono.defer(() -> {
+                invalidateSessionIds.put(id, true);
+                return super.deleteById(id);
+            }));
     }
 
     @Override
@@ -47,6 +66,7 @@ public class InMemoryReactiveIndexedSessionRepository extends ReactiveMapSession
         var indexKey = new IndexKey(indexName, indexValue);
         return Flux.fromIterable(indexSessionIdMap.getOrDefault(indexKey, Set.of()))
             .flatMap(this::findById)
+            .filter(session -> invalidateSessionIds.getIfPresent(session.getId()) == null)
             .collectMap(Session::getId);
     }
 
@@ -59,6 +79,7 @@ public class InMemoryReactiveIndexedSessionRepository extends ReactiveMapSession
     public void destroy() {
         sessionIdIndexMap.clear();
         indexSessionIdMap.clear();
+        invalidateSessionIds.invalidateAll();
     }
 
     Mono<Void> removeIndex(String sessionId) {
