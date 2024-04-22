@@ -18,7 +18,7 @@ public class InMemoryReactiveIndexedSessionRepository extends ReactiveMapSession
     implements ReactiveIndexedSessionRepository<MapSession>, DisposableBean {
 
     final IndexResolver<MapSession> indexResolver =
-        new DelegatingIndexResolver<>(new PrincipalNameIndexResolver<>());
+        new DelegatingIndexResolver<>(new PrincipalNameIndexResolver<>(PRINCIPAL_NAME_INDEX_NAME));
 
     private final ConcurrentMap<String, Set<IndexKey>> sessionIdIndexMap =
         new ConcurrentHashMap<>();
@@ -35,14 +35,49 @@ public class InMemoryReactiveIndexedSessionRepository extends ReactiveMapSession
             .then(updateIndex(session));
     }
 
-    Mono<Void> updateIndex(MapSession session) {
-        return getIndexes(session.getId())
-            .doOnNext(originalIndex -> indexSessionIdMap.computeIfPresent(originalIndex,
+    @Override
+    public Mono<Void> deleteById(String id) {
+        return super.deleteById(id)
+            .then(removeIndex(id));
+    }
+
+    @Override
+    public Mono<Map<String, MapSession>> findByIndexNameAndIndexValue(String indexName,
+        String indexValue) {
+        var indexKey = new IndexKey(indexName, indexValue);
+        return Flux.fromIterable(indexSessionIdMap.getOrDefault(indexKey, Set.of()))
+            .flatMap(this::findById)
+            .collectMap(Session::getId);
+    }
+
+    @Override
+    public Mono<Map<String, MapSession>> findByPrincipalName(String principalName) {
+        return this.findByIndexNameAndIndexValue(PRINCIPAL_NAME_INDEX_NAME, principalName);
+    }
+
+    @Override
+    public void destroy() {
+        sessionIdIndexMap.clear();
+        indexSessionIdMap.clear();
+    }
+
+    Mono<Void> removeIndex(String sessionId) {
+        return getIndexes(sessionId)
+            .doOnNext(indexKey -> indexSessionIdMap.computeIfPresent(indexKey,
                 (key, sessionIdSet) -> {
-                    sessionIdSet.remove(session.getId());
+                    sessionIdSet.remove(sessionId);
                     return sessionIdSet.isEmpty() ? null : sessionIdSet;
                 })
             )
+            .then(Mono.defer(() -> {
+                sessionIdIndexMap.remove(sessionId);
+                return Mono.empty();
+            }))
+            .then();
+    }
+
+    Mono<Void> updateIndex(MapSession session) {
+        return removeIndex(session.getId())
             .then(Mono.defer(() -> {
                 indexResolver.resolveIndexesFor(session)
                     .forEach((name, value) -> {
@@ -64,19 +99,18 @@ public class InMemoryReactiveIndexedSessionRepository extends ReactiveMapSession
         return Flux.fromIterable(sessionIdIndexMap.getOrDefault(sessionId, Set.of()));
     }
 
-    @Override
-    public Mono<Map<String, MapSession>> findByIndexNameAndIndexValue(String indexName,
-        String indexValue) {
-        var indexKey = new IndexKey(indexName, indexValue);
-        return Flux.fromIterable(indexSessionIdMap.getOrDefault(indexKey, Set.of()))
-            .flatMap(this::findById)
-            .collectMap(Session::getId);
+    /**
+     * For testing purpose.
+     */
+    ConcurrentMap<String, Set<IndexKey>> getSessionIdIndexMap() {
+        return sessionIdIndexMap;
     }
 
-    @Override
-    public void destroy() {
-        sessionIdIndexMap.clear();
-        indexSessionIdMap.clear();
+    /**
+     * For testing purpose.
+     */
+    ConcurrentMap<IndexKey, Set<String>> getIndexSessionIdMap() {
+        return indexSessionIdMap;
     }
 
     record IndexKey(String attributeName, String attributeValue) {
