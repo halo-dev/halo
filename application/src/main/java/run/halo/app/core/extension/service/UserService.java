@@ -23,4 +23,6 @@ public interface UserService {
     Mono<User> signUp(User user, String password);
 
     Mono<User> createUser(User user, Set<String> roles);
+
+    Mono<Boolean> confirmPassword(String username, String rawPassword);
 }

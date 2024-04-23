@@ -31,6 +31,8 @@ public class Comment extends AbstractExtension {
 
     public static final String KIND = "Comment";
 
+    public static final String REQUIRE_SYNC_ON_STARTUP_INDEX_NAME = "requireSyncOnStartup";
+
     @Schema(requiredMode = REQUIRED)
     private CommentSpec spec;
 
@@ -135,6 +137,8 @@ public class Comment extends AbstractExtension {
         private Integer unreadReplyCount;
 
         private Boolean hasNewReply;
+
+        private Long observedVersion;
     }
 
     public static String toSubjectRefKey(Ref subjectRef) {

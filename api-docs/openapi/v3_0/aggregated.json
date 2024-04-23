@@ -4276,6 +4276,37 @@
         ]
       }
     },
+    "/apis/api.console.halo.run/v1alpha1/users/-/password": {
+      "put": {
+        "description": "Change own password of user.",
+        "operationId": "ChangeOwnPassword",
+        "requestBody": {
+          "content": {
+            "*/*": {
+              "schema": {
+                "$ref": "#/components/schemas/ChangeOwnPasswordRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "default": {
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/User"
+                }
+              }
+            },
+            "description": "default response"
+          }
+        },
+        "tags": [
+          "api.console.halo.run/v1alpha1/User"
+        ]
+      }
+    },
     "/apis/api.console.halo.run/v1alpha1/users/-/send-email-verification-code": {
       "post": {
         "description": "Send email verification code for user",
@@ -4432,8 +4463,8 @@
     },
     "/apis/api.console.halo.run/v1alpha1/users/{name}/password": {
       "put": {
-        "description": "Change password of user.",
-        "operationId": "ChangePassword",
+        "description": "Change anyone password of user for admin.",
+        "operationId": "ChangeAnyonePassword",
         "parameters": [
           {
             "description": "Name of user. If the name is equal to \u0027-\u0027, it will change the password of current user.",
@@ -13252,6 +13283,24 @@
             "type": "integer",
             "description": "Indicates total pages.",
             "format": "int64"
+          }
+        }
+      },
+      "ChangeOwnPasswordRequest": {
+        "required": [
+          "oldPassword",
+          "password"
+        ],
+        "type": "object",
+        "properties": {
+          "oldPassword": {
+            "type": "string",
+            "description": "Old password."
+          },
+          "password": {
+            "minLength": 6,
+            "type": "string",
+            "description": "New password."
           }
         }
       },

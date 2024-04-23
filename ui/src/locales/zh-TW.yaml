@@ -211,6 +211,8 @@ core:
           create_time_asc: 較早創建
           visit_desc: 最多訪問量
           comment_desc: 最多評論量
+          last_modify_time_asc: 較早更新
+          last_modify_time_desc: 最近更新
     list:
       fields:
         categories: 分類：
@@ -1071,6 +1073,8 @@ core:
           label: 新密碼
         confirm_password:
           label: 確認密碼
+        old_password:
+          label: 舊密碼
     email_verify_modal:
       fields:
         code:

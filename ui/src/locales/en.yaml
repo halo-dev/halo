@@ -219,6 +219,8 @@ core:
           create_time_asc: Earliest Created
           visit_desc: Most Visits
           comment_desc: Most Comments
+          last_modify_time_desc: Recently Updated
+          last_modify_time_asc: Earliest Updated
     list:
       fields:
         categories: "Categories:"
@@ -927,7 +929,10 @@ core:
       fields:
         username:
           label: Username
-          validation: Can only contain numbers, lowercase letters, periods (.), and hyphens (-), and cannot start or end with a period (.) or hyphen (-).
+          validation: >-
+            Can only contain numbers, lowercase letters, periods (.), and
+            hyphens (-), and cannot start or end with a period (.) or hyphen
+            (-).
         display_name:
           label: Display name
         email:
@@ -1125,7 +1130,10 @@ core:
       fields:
         username:
           label: Username
-          validation: Can only contain numbers, lowercase letters, periods (.), and hyphens (-), and cannot start or end with a period (.) or hyphen (-).
+          validation: >-
+            Can only contain numbers, lowercase letters, periods (.), and
+            hyphens (-), and cannot start or end with a period (.) or hyphen
+            (-).
         display_name:
           label: Display name
         email:
@@ -1143,6 +1151,8 @@ core:
           label: New password
         confirm_password:
           label: Confirm password
+        old_password:
+          label: Old password
     email_verify_modal:
       fields:
         code:
