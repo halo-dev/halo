@@ -1,6 +1,6 @@
 import type { ComputedRef, Ref } from "vue";
 import { computed } from "vue";
-import { PluginStatusPhaseEnum, type Plugin } from "@halo-dev/api-client";
+import { type Plugin, PluginStatusPhaseEnum } from "@halo-dev/api-client";
 import { cloneDeep } from "lodash-es";
 import { apiClient } from "@/utils/api-client";
 import { Dialog, Toast } from "@halo-dev/components";
@@ -9,7 +9,7 @@ import { useMutation } from "@tanstack/vue-query";
 
 interface usePluginLifeCycleReturn {
   isStarted: ComputedRef<boolean | undefined>;
-  getFailedMessage: () => string | undefined;
+  getStatusMessage: () => string | undefined;
   changeStatus: () => void;
   changingStatus: Ref<boolean>;
   uninstall: (deleteExtensions?: boolean) => void;
@@ -27,9 +27,21 @@ export function usePluginLifeCycle(
     );
   });
 
-  const getFailedMessage = () => {
+  const getStatusMessage = () => {
     if (!plugin?.value) return;
 
+    const { enabled } = plugin.value.spec || {};
+    const { phase } = plugin.value.status || {};
+
+    // Starting up
+    if (
+      enabled &&
+      phase !== (PluginStatusPhaseEnum.Started || PluginStatusPhaseEnum.Failed)
+    ) {
+      return t("core.common.status.starting_up");
+    }
+
+    // Starting failed
     if (!isStarted.value) {
       const lastCondition = plugin.value.status?.conditions?.[0];
 
@@ -141,7 +153,7 @@ export function usePluginLifeCycle(
 
   return {
     isStarted,
-    getFailedMessage,
+    getStatusMessage,
     changeStatus,
     changingStatus,
     uninstall,

@@ -10,7 +10,7 @@ import {
 import type { Ref } from "vue";
 import { computed, inject, markRaw, ref, toRefs } from "vue";
 import { usePluginLifeCycle } from "../composables/use-plugin";
-import { PluginStatusPhaseEnum, type Plugin } from "@halo-dev/api-client";
+import { type Plugin, PluginStatusPhaseEnum } from "@halo-dev/api-client";
 import { formatDatetime } from "@/utils/date";
 import { usePermission } from "@/utils/permission";
 import { apiClient } from "@/utils/api-client";
@@ -43,7 +43,7 @@ const { plugin } = toRefs(props);
 
 const selectedNames = inject<Ref<string[]>>("selectedNames", ref([]));
 
-const { getFailedMessage, uninstall } = usePluginLifeCycle(plugin);
+const { getStatusMessage, uninstall } = usePluginLifeCycle(plugin);
 
 const pluginUpgradeModalVisible = ref(false);
 
@@ -153,12 +153,6 @@ const { startFields, endFields } = useEntityFieldItemExtensionPoint<Plugin>(
     const shouldHideStatusDot =
       !enabled || (enabled && phase === PluginStatusPhaseEnum.Started);
 
-    const statusDotText =
-      enabled &&
-      phase !== (PluginStatusPhaseEnum.Started || PluginStatusPhaseEnum.Failed)
-        ? t("core.common.status.starting_up")
-        : undefined;
-
     const getStatusDotState = () => {
       if (
         enabled &&
@@ -197,10 +191,9 @@ const { startFields, endFields } = useEntityFieldItemExtensionPoint<Plugin>(
         priority: 10,
         component: markRaw(StatusDotField),
         props: {
-          tooltip: getFailedMessage(),
+          tooltip: getStatusMessage(),
           state: getStatusDotState(),
           animate: true,
-          text: statusDotText,
         },
         hidden: shouldHideStatusDot,
       },
