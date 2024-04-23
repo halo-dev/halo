@@ -121,14 +121,16 @@ public class ReplyServiceImpl implements ReplyService {
         // ascending order by creation time and name
         var pageRequest = PageRequestImpl.of(1, 200,
             Sort.by("metadata.creationTimestamp", "metadata.name"));
-        return Flux.defer(() -> listRepliesByComment(commentName, pageRequest))
-            .expand(page -> page.hasNext()
-                ? listRepliesByComment(commentName, pageRequest.next())
-                : Mono.empty()
-            )
-            .flatMap(page -> Flux.fromIterable(page.getItems()))
-            .flatMap(client::delete)
-            .then();
+        return deleteByPage(commentName, pageRequest);
+    }
+
+    private Mono<Void> deleteByPage(String commentName, PageRequest pageRequest) {
+        // forever loop first page until no more to delete
+        return listRepliesByComment(commentName, pageRequest)
+            .flatMap(page -> Flux.fromIterable(page.getItems())
+                .flatMap(client::delete)
+                .then(page.hasNext() ? deleteByPage(commentName, pageRequest) : Mono.empty())
+            );
     }
 
     Mono<ListResult<Reply>> listRepliesByComment(String commentName, PageRequest pageRequest) {

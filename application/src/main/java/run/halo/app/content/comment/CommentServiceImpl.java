@@ -150,14 +150,16 @@ public class CommentServiceImpl implements CommentService {
         // ascending order by creation time and name
         var pageRequest = PageRequestImpl.of(1, 200,
             Sort.by("metadata.creationTimestamp", "metadata.name"));
-        return Flux.defer(() -> listCommentsByRef(subjectRef, pageRequest))
-            .expand(page -> page.hasNext()
-                ? listCommentsByRef(subjectRef, pageRequest.next())
-                : Mono.empty()
-            )
-            .flatMap(page -> Flux.fromIterable(page.getItems()))
-            .flatMap(client::delete)
-            .then();
+        return deleteByPage(subjectRef, pageRequest);
+    }
+
+    private Mono<Void> deleteByPage(Ref subjectRef, PageRequest pageRequest) {
+        // forever loop first page until no more to delete
+        return listCommentsByRef(subjectRef, pageRequest)
+            .flatMap(page -> Flux.fromIterable(page.getItems())
+                .flatMap(client::delete)
+                .then(page.hasNext() ? deleteByPage(subjectRef, pageRequest) : Mono.empty())
+            );
     }
 
     Mono<ListResult<Comment>> listCommentsByRef(Ref subjectRef, PageRequest pageRequest) {
