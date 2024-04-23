@@ -172,7 +172,12 @@ public class SchemeInitializer implements ApplicationListener<ApplicationContext
                 .setName("status.excerpt")
                 .setIndexFunc(
                     simpleAttribute(Post.class, post -> post.getStatusOrDefault().getExcerpt())));
-
+            indexSpecs.add(new IndexSpec()
+                .setName("status.lastModifyTime")
+                .setIndexFunc(simpleAttribute(Post.class, post -> {
+                    var lastModifyTime = post.getStatus().getLastModifyTime();
+                    return lastModifyTime == null ? null : lastModifyTime.toString();
+                })));
             indexSpecs.add(new IndexSpec()
                 .setName(Post.REQUIRE_SYNC_ON_STARTUP_INDEX_NAME)
                 .setIndexFunc(simpleAttribute(Post.class, post -> {
