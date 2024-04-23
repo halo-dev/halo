@@ -258,26 +258,38 @@ public class UserEndpoint implements CustomEndpoint {
             .switchIfEmpty(Mono.error(
                 () -> new ServerWebInputException("Request body is required."))
             )
-            .flatMap(verifyEmailRequest -> ReactiveSecurityContextHolder.getContext()
-                .map(SecurityContext::getAuthentication)
-                .map(Principal::getName)
-                .map(username -> Tuples.of(username, verifyEmailRequest.code()))
-            )
-            .flatMap(tuple2 -> {
-                var username = tuple2.getT1();
-                var code = tuple2.getT2();
-                return Mono.just(username)
-                    .transformDeferred(verificationEmailRateLimiter(username))
-                    .flatMap(name -> emailVerificationService.verify(username, code))
-                    .onErrorMap(RequestNotPermitted.class, RateLimitExceededException::new);
-            })
+            .flatMap(this::doVerifyCode)
             .then(ServerResponse.ok().build());
+    }
+
+    private Mono<Void> doVerifyCode(VerifyCodeRequest verifyCodeRequest) {
+        return ReactiveSecurityContextHolder.getContext()
+            .map(SecurityContext::getAuthentication)
+            .map(Principal::getName)
+            .flatMap(username -> verifyPasswordAndCode(username, verifyCodeRequest));
+    }
+
+    private Mono<Void> verifyPasswordAndCode(String username, VerifyCodeRequest verifyCodeRequest) {
+        return userService.confirmPassword(username, verifyCodeRequest.password())
+            .filter(Boolean::booleanValue)
+            .switchIfEmpty(Mono.error(new UnsatisfiedAttributeValueException(
+                "Password is incorrect.", "problemDetail.user.password.notMatch", null)))
+            .flatMap(verified -> verifyEmailCode(username, verifyCodeRequest.code()));
+    }
+
+    private Mono<Void> verifyEmailCode(String username, String code) {
+        return Mono.just(username)
+            .transformDeferred(verificationEmailRateLimiter(username))
+            .flatMap(name -> emailVerificationService.verify(username, code))
+            .onErrorMap(RequestNotPermitted.class, RateLimitExceededException::new);
     }
 
     public record EmailVerifyRequest(@Schema(requiredMode = REQUIRED) String email) {
     }
 
-    public record VerifyCodeRequest(@Schema(requiredMode = REQUIRED, minLength = 1) String code) {
+    public record VerifyCodeRequest(
+        @Schema(requiredMode = REQUIRED) String password,
+        @Schema(requiredMode = REQUIRED, minLength = 1) String code) {
     }
 
     private Mono<ServerResponse> sendEmailVerificationCode(ServerRequest request) {
