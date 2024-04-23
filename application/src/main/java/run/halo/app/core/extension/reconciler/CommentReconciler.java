@@ -23,6 +23,7 @@ import run.halo.app.core.extension.content.Comment;
 import run.halo.app.core.extension.content.Constant;
 import run.halo.app.event.post.CommentCreatedEvent;
 import run.halo.app.event.post.CommentUnreadReplyCountChangedEvent;
+import run.halo.app.extension.DefaultExtensionMatcher;
 import run.halo.app.extension.ExtensionClient;
 import run.halo.app.extension.GroupVersionKind;
 import run.halo.app.extension.ListOptions;
@@ -86,8 +87,15 @@ public class CommentReconciler implements Reconciler<Reconciler.Request> {
 
     @Override
     public Controller setupWith(ControllerBuilder builder) {
+        var extension = new Comment();
         return builder
-            .extension(new Comment())
+            .extension(extension)
+            .onAddMatcher(DefaultExtensionMatcher.builder(client, extension.groupVersionKind())
+                .fieldSelector(FieldSelector.of(
+                    equal(Comment.REQUIRE_SYNC_ON_STARTUP_INDEX_NAME, BooleanUtils.TRUE))
+                )
+                .build()
+            )
             .build();
     }
 
