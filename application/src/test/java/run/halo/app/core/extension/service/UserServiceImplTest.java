@@ -28,6 +28,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
@@ -35,6 +36,7 @@ import reactor.test.StepVerifier;
 import run.halo.app.core.extension.Role;
 import run.halo.app.core.extension.RoleBinding;
 import run.halo.app.core.extension.User;
+import run.halo.app.event.user.PasswordChangedEvent;
 import run.halo.app.extension.Metadata;
 import run.halo.app.extension.ReactiveExtensionClient;
 import run.halo.app.extension.exception.ExtensionNotFoundException;
@@ -56,6 +58,9 @@ class UserServiceImplTest {
 
     @Mock
     PasswordEncoder passwordEncoder;
+
+    @Mock
+    ApplicationEventPublisher eventPublisher;
 
     @InjectMocks
     UserServiceImpl userService;
@@ -99,6 +104,8 @@ class UserServiceImplTest {
             var user = (User) extension;
             return "new-fake-password".equals(user.getSpec().getPassword());
         }));
+
+        verify(eventPublisher).publishEvent(any(PasswordChangedEvent.class));
     }
 
     @Test
@@ -240,6 +247,7 @@ class UserServiceImplTest {
                 var user = (User) extension;
                 return "encoded-new-password".equals(user.getSpec().getPassword());
             }));
+            verify(eventPublisher).publishEvent(any(PasswordChangedEvent.class));
         }
 
         @Test
@@ -262,6 +270,7 @@ class UserServiceImplTest {
                 return "encoded-new-password".equals(user.getSpec().getPassword());
             }));
             verify(client).get(User.class, "fake-user");
+            verify(eventPublisher).publishEvent(any(PasswordChangedEvent.class));
         }
 
         @Test
@@ -281,6 +290,7 @@ class UserServiceImplTest {
             verify(passwordEncoder, never()).encode(any());
             verify(client, never()).update(any());
             verify(client).get(User.class, "fake-user");
+            verify(eventPublisher, times(0)).publishEvent(any(PasswordChangedEvent.class));
         }
 
         @Test
