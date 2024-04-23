@@ -1,6 +1,6 @@
 import { apiClient } from "@/utils/api-client";
 import type { Tag } from "@halo-dev/api-client";
-import { ref, type Ref } from "vue";
+import { ref, watch, type Ref } from "vue";
 import { Dialog, Toast } from "@halo-dev/components";
 import { useQuery, type QueryObserverResult } from "@tanstack/vue-query";
 import { useI18n } from "vue-i18n";
@@ -11,19 +11,21 @@ interface usePostTagReturn {
   hasPrevious: Ref<boolean>;
   hasNext: Ref<boolean>;
   isLoading: Ref<boolean>;
+  isFetching: Ref<boolean>;
   handleFetchTags: () => Promise<QueryObserverResult<Tag[], unknown>>;
   handleDelete: (tag: Tag) => void;
   handleDeleteInBatch: (tagNames: string[]) => Promise<void>;
 }
 
 export function usePostTag(filterOptions?: {
-  sort?: Ref<string[]>;
+  sort?: Ref<string | undefined>;
   page?: Ref<number>;
   size?: Ref<number>;
+  keyword?: Ref<string>;
 }): usePostTagReturn {
   const { t } = useI18n();
 
-  const { sort, page, size } = filterOptions || {};
+  const { sort, page, size, keyword } = filterOptions || {};
 
   const total = ref(0);
   const hasPrevious = ref(false);
@@ -32,16 +34,19 @@ export function usePostTag(filterOptions?: {
   const {
     data: tags,
     isLoading,
+    isFetching,
     refetch,
   } = useQuery({
-    queryKey: ["post-tags", sort, page, size],
+    queryKey: ["post-tags", sort, page, size, keyword],
     queryFn: async () => {
-      const { data } =
-        await apiClient.extension.tag.listcontentHaloRunV1alpha1Tag({
-          page: page?.value || 0,
-          size: size?.value || 0,
-          sort: sort?.value || ["metadata.creationTimestamp,desc"],
-        });
+      const { data } = await apiClient.tag.listPostTags({
+        page: page?.value || 0,
+        size: size?.value || 0,
+        sort: [sort?.value as string].filter(Boolean) || [
+          "metadata.creationTimestamp,desc",
+        ],
+        keyword: keyword?.value,
+      });
 
       total.value = data.total;
       hasPrevious.value = data.hasPrevious;
@@ -110,12 +115,22 @@ export function usePostTag(filterOptions?: {
     });
   };
 
+  watch(
+    () => [sort?.value, keyword?.value],
+    () => {
+      if (page?.value) {
+        page.value = 1;
+      }
+    }
+  );
+
   return {
     tags,
     total,
     hasPrevious,
     hasNext,
     isLoading,
+    isFetching,
     handleFetchTags: refetch,
     handleDelete,
     handleDeleteInBatch,

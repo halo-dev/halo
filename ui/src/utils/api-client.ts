@@ -1,6 +1,7 @@
 import {
   ApiConsoleHaloRunV1alpha1PluginApi,
   ApiConsoleHaloRunV1alpha1PostApi,
+  ApiConsoleHaloRunV1alpha1TagApi,
   ApiConsoleHaloRunV1alpha1SinglePageApi,
   ApiConsoleHaloRunV1alpha1ThemeApi,
   ApiConsoleHaloRunV1alpha1UserApi,
@@ -207,6 +208,7 @@ function setupApiClient(axios: AxiosInstance) {
     plugin: new ApiConsoleHaloRunV1alpha1PluginApi(undefined, baseURL, axios),
     theme: new ApiConsoleHaloRunV1alpha1ThemeApi(undefined, baseURL, axios),
     post: new ApiConsoleHaloRunV1alpha1PostApi(undefined, baseURL, axios),
+    tag: new ApiConsoleHaloRunV1alpha1TagApi(undefined, baseURL, axios),
     singlePage: new ApiConsoleHaloRunV1alpha1SinglePageApi(
       undefined,
       baseURL,

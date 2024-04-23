@@ -11,6 +11,7 @@ import {
   VSpace,
   VLoading,
   VPagination,
+  IconRefreshLine,
 } from "@halo-dev/components";
 import HasPermission from "@/components/permission/HasPermission.vue";
 import TagEditingModal from "./components/TagEditingModal.vue";
@@ -18,6 +19,12 @@ import { useRouteQuery } from "@vueuse/router";
 import { apiClient } from "@/utils/api-client";
 import { usePostTag } from "./composables/use-post-tag";
 import TagListItem from "./components/TagListItem.vue";
+import SearchInput from "@/components/input/SearchInput.vue";
+import FilterCleanButton from "@/components/filter/FilterCleanButton.vue";
+import { computed } from "vue";
+import { useI18n } from "vue-i18n";
+
+const { t } = useI18n();
 
 const editingModal = ref(false);
 const selectedTag = ref<Tag | null>(null);
@@ -25,12 +32,22 @@ const selectedTag = ref<Tag | null>(null);
 const selectedTagNames = ref<string[]>([]);
 const checkedAll = ref(false);
 
+const keyword = useRouteQuery<string>("keyword", "");
 const page = useRouteQuery<number>("page", 1, {
   transform: Number,
 });
 const size = useRouteQuery<number>("size", 20, {
   transform: Number,
 });
+const selectedSort = useRouteQuery<string | undefined>("sort");
+
+const hasFilters = computed(() => {
+  return !!selectedSort.value;
+});
+
+const handleClearFilters = () => {
+  selectedSort.value = undefined;
+};
 
 const {
   tags,
@@ -38,12 +55,15 @@ const {
   hasNext,
   hasPrevious,
   isLoading,
+  isFetching,
   handleFetchTags,
   handleDelete,
   handleDeleteInBatch,
 } = usePostTag({
   page,
   size,
+  keyword,
+  sort: selectedSort,
 });
 
 const handleOpenEditingModal = (tag: Tag | null) => {
@@ -66,10 +86,6 @@ const handleCheckAllChange = () => {
 };
 
 const handleSelectPrevious = async () => {
-  if (!hasPrevious.value) {
-    return;
-  }
-
   if (!tags.value) return;
 
   const currentIndex = tags.value.findIndex(
@@ -84,15 +100,14 @@ const handleSelectPrevious = async () => {
   if (currentIndex === 0 && hasPrevious.value) {
     page.value--;
     await handleFetchTags();
-    selectedTag.value = tags.value[tags.value.length - 1];
+    setTimeout(() => {
+      if (!tags.value) return;
+      selectedTag.value = tags.value[tags.value.length - 1];
+    });
   }
 };
 
 const handleSelectNext = async () => {
-  if (!hasNext.value) {
-    return;
-  }
-
   if (!tags.value) return;
 
   if (!selectedTag.value) {
@@ -109,7 +124,10 @@ const handleSelectNext = async () => {
   if (currentIndex === tags.value.length - 1 && hasNext.value) {
     page.value++;
     await handleFetchTags();
-    selectedTag.value = tags.value[0];
+    setTimeout(() => {
+      if (!tags.value) return;
+      selectedTag.value = tags.value[0];
+    });
   }
 };
 
@@ -184,7 +202,59 @@ watch(selectedTagNames, (newVal) => {
                   {{ $t("core.common.buttons.delete") }}
                 </VButton>
               </VSpace>
+              <SearchInput v-else v-model="keyword" />
             </div>
+            <VSpace spacing="lg" class="flex-wrap">
+              <FilterCleanButton
+                v-if="hasFilters"
+                @click="handleClearFilters"
+              />
+              <FilterDropdown
+                v-model="selectedSort"
+                :label="$t('core.common.filters.labels.sort')"
+                :items="[
+                  {
+                    label: t('core.common.filters.item_labels.default'),
+                  },
+                  {
+                    label: t(
+                      'core.post.tag.filters.sort.items.create_time_desc'
+                    ),
+                    value: 'metadata.creationTimestamp,desc',
+                  },
+                  {
+                    label: t(
+                      'core.post.tag.filters.sort.items.create_time_asc'
+                    ),
+                    value: 'metadata.creationTimestamp,asc',
+                  },
+                  {
+                    label: t(
+                      'core.post.tag.filters.sort.items.display_name_desc'
+                    ),
+                    value: 'spec.displayName,desc',
+                  },
+                  {
+                    label: t(
+                      'core.post.tag.filters.sort.items.display_name_asc'
+                    ),
+                    value: 'spec.displayName,asc',
+                  },
+                ]"
+              />
+              <div class="flex flex-row gap-2">
+                <div
+                  class="group cursor-pointer rounded p-1 hover:bg-gray-200"
+                  @click="handleFetchTags()"
+                >
+                  <IconRefreshLine
+                    v-tooltip="$t('core.common.buttons.refresh')"
+                    :class="{ 'animate-spin text-gray-900': isFetching }"
+                    class="h-4 w-4 text-gray-600 group-hover:text-gray-900"
+                  />
+                </div>
+              </div>
+            </VSpace>
           </div>
         </div>
       </template>

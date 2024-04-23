@@ -252,6 +252,14 @@ core:
           label: 自定义模板
         cover:
           label: 封面图
+    tag:
+      filters:
+        sort:
+          items:
+            create_time_desc: 较近创建
+            create_time_asc: 较早创建
+            display_name_desc: 标签名降序
+            display_name_asc: 标签名升序
   deleted_post:
     title: 文章回收站
     empty:
