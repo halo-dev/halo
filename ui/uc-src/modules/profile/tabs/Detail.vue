@@ -9,7 +9,7 @@ import {
   VTag,
 } from "@halo-dev/components";
 import type { Ref } from "vue";
-import { inject, computed } from "vue";
+import { computed, inject, ref } from "vue";
 import type { DetailedUser, ListedAuthProvider } from "@halo-dev/api-client";
 import { rbacAnnotations } from "@/constants/annotations";
 import { formatDatetime } from "@/utils/date";
@@ -18,7 +18,7 @@ import { apiClient } from "@/utils/api-client";
 import axios from "axios";
 import { useI18n } from "vue-i18n";
 import EmailVerifyModal from "../components/EmailVerifyModal.vue";
-import { ref } from "vue";
+import RiVerifiedBadgeLine from "~icons/ri/verified-badge-line";
 
 const user = inject<Ref<DetailedUser | undefined>>("user");
 
@@ -105,7 +105,14 @@ const emailVerifyModal = ref(false);
           </VAlert>
 
           <div v-else>
-            <span>{{ user.user.spec.email }}</span>
+            <div class="flex items-center space-x-2">
+              <span>{{ user.user.spec.email }}</span>
+              <RiVerifiedBadgeLine
+                v-if="user.user.spec.emailVerified"
+                v-tooltip="$t('core.uc_profile.detail.email_verified.tooltip')"
+                class="text-xs text-blue-600"
+              />
+            </div>
             <div v-if="!user.user.spec.emailVerified" class="mt-3">
               <VAlert
                 :title="$t('core.uc_profile.detail.email_not_verified.title')"

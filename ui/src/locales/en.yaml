@@ -1079,6 +1079,8 @@ core:
           Your email address has not been verified yet, click the button below
           to verify it
         title: Verify email
+      email_verified:
+        tooltip: Verified
     pat:
       operations:
         delete:

@@ -1024,6 +1024,8 @@ core:
       email_not_verified:
         title: 验证电子邮箱
         description: 电子邮箱地址还未验证，点击下方按钮进行验证
+      email_verified:
+        tooltip: 已验证
     pat:
       operations:
         delete:

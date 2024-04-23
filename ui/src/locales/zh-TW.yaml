@@ -1004,6 +1004,8 @@ core:
       email_not_verified:
         description: 電子郵件地址尚未驗證，點擊下方按鈕進行驗證
         title: 驗證電子郵件信箱
+      email_verified:
+        tooltip: 已驗證
     pat:
       operations:
         delete:
