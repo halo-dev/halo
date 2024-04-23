@@ -1,14 +1,18 @@
 package run.halo.app.core.extension.endpoint;
 
 import static org.springdoc.core.fn.builders.apiresponse.Builder.responseBuilder;
+import static org.springdoc.core.fn.builders.parameter.Builder.parameterBuilder;
 import static run.halo.app.extension.index.query.QueryFactory.all;
+import static run.halo.app.extension.router.QueryParamBuildUtil.sortParameter;
 import static run.halo.app.extension.router.selector.SelectorUtil.labelAndFieldSelectorToListOptions;
 
+import io.swagger.v3.oas.annotations.enums.ParameterIn;
 import io.swagger.v3.oas.annotations.media.ArraySchema;
 import io.swagger.v3.oas.annotations.media.Schema;
 import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springdoc.core.fn.builders.operation.Builder;
 import org.springdoc.webflux.core.fn.SpringdocRouteBuilder;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Component;
@@ -18,6 +22,7 @@ import org.springframework.web.reactive.function.server.ServerRequest;
 import org.springframework.web.reactive.function.server.ServerResponse;
 import org.springframework.web.server.ServerWebExchange;
 import reactor.core.publisher.Mono;
+import run.halo.app.core.extension.content.Post;
 import run.halo.app.core.extension.content.Tag;
 import run.halo.app.extension.ListOptions;
 import run.halo.app.extension.ListResult;
@@ -51,7 +56,7 @@ public class TagEndpoint implements CustomEndpoint {
                             responseBuilder()
                                 .implementation(ListResult.generateGenericClass(Tag.class))
                         );
-                    QueryParamBuildUtil.buildParametersFromType(builder, ITagQuery.class);
+                    TagQuery.buildParameters(builder);
                 }
             )
             .build();
@@ -120,6 +125,17 @@ public class TagEndpoint implements CustomEndpoint {
 
             listOptions.setFieldSelector(listOptions.getFieldSelector().andQuery(fieldQuery));
             return listOptions;
+        }
+
+        public static void buildParameters(Builder builder) {
+            IListRequest.buildParameters(builder);
+            builder.parameter(sortParameter())
+                .parameter(parameterBuilder()
+                    .in(ParameterIn.QUERY)
+                    .name("keyword")
+                    .description("Post tags filtered by keyword.")
+                    .implementation(String.class)
+                    .required(false));
         }
     }
 }

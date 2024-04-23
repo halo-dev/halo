@@ -3591,84 +3591,63 @@
         "operationId": "ListPostTags",
         "parameters": [
           {
-            "description": "Field selector for filtering.",
-            "explode": true,
-            "in": "query",
-            "name": "fieldSelector",
-            "schema": {
-              "maxItems": 2147483647,
-              "minItems": 0,
-              "type": "array",
-              "items": {
-                "type": "string",
-                "description": "Field selector for filtering."
-              }
-            },
-            "style": "form"
-          },
-          {
-            "description": "Keyword for searching.",
-            "in": "query",
-            "name": "keyword",
-            "schema": {
-              "type": "string",
-              "description": "Keyword for searching."
-            },
-            "style": "form"
-          },
-          {
-            "description": "Label selector for filtering.",
-            "explode": true,
-            "in": "query",
-            "name": "labelSelector",
-            "schema": {
-              "maxItems": 2147483647,
-              "minItems": 0,
-              "type": "array",
-              "items": {
-                "type": "string",
-                "description": "Label selector for filtering."
-              }
-            },
-            "style": "form"
-          },
-          {
-            "description": "The page number. Zero indicates no page.",
+            "description": "Page number. Default is 0.",
             "in": "query",
             "name": "page",
             "schema": {
               "type": "integer",
-              "description": "The page number. Zero indicates no page.",
               "format": "int32"
-            },
-            "style": "form"
+            }
           },
           {
-            "description": "Size of one page. Zero indicates no limit.",
+            "description": "Size number. Default is 0.",
             "in": "query",
             "name": "size",
             "schema": {
               "type": "integer",
-              "description": "Size of one page. Zero indicates no limit.",
               "format": "int32"
-            },
-            "style": "form"
+            }
           },
           {
-            "description": "Sort property and direction of the list result. Supported fields: creationTimestamp, name",
-            "explode": true,
+            "description": "Label selector. e.g.: hidden!\u003dtrue",
             "in": "query",
-            "name": "sort",
+            "name": "labelSelector",
             "schema": {
-              "maxItems": 2147483647,
-              "minItems": 0,
-              "uniqueItems": true,
               "type": "array",
               "items": {
                 "type": "string"
               }
-            },
-            "style": "form"
+            }
+          },
+          {
+            "description": "Field selector. e.g.: metadata.name\u003d\u003dhalo",
+            "in": "query",
+            "name": "fieldSelector",
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            }
+          },
+          {
+            "description": "Sorting criteria in the format: property,(asc|desc). Default sort order is ascending. Multiple sort criteria are supported.",
+            "in": "query",
+            "name": "sort",
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            }
+          },
+          {
+            "description": "Post tags filtered by keyword.",
+            "in": "query",
+            "name": "keyword",
+            "schema": {
+              "type": "string"
+            }
           }
         ],
         "responses": {
@@ -13570,6 +13549,10 @@
             "type": "string",
             "format": "date-time"
           },
+          "observedVersion": {
+            "type": "integer",
+            "format": "int64"
+          },
           "replyCount": {
             "type": "integer",
             "format": "int32"
@@ -16540,8 +16523,7 @@
               "RESOLVED",
               "STARTED",
               "STOPPED",
-              "FAILED",
-              "UNLOADED"
+              "FAILED"
             ]
           },
           "lastStartTime": {
@@ -17572,7 +17554,8 @@
           "apiVersion",
           "kind",
           "metadata",
-          "spec"
+          "spec",
+          "status"
         ],
         "type": "object",
         "properties": {
@@ -17587,6 +17570,9 @@
           },
           "spec": {
             "$ref": "#/components/schemas/ReplySpec"
+          },
+          "status": {
+            "$ref": "#/components/schemas/ReplyStatus"
           }
         }
       },
@@ -17742,6 +17728,15 @@
           },
           "userAgent": {
             "type": "string"
+          }
+        }
+      },
+      "ReplyStatus": {
+        "type": "object",
+        "properties": {
+          "observedVersion": {
+            "type": "integer",
+            "format": "int64"
           }
         }
       },
