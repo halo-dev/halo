@@ -250,3 +250,50 @@ export const hasTableBefore = (editorState: EditorState) => {
 
   return true;
 };
+
+export const findNextCell = (selection: Selection) => {
+  return findAdjacentCell(1)(selection);
+};
+
+export const findPreviousCell = (selection: Selection) => {
+  return findAdjacentCell(-1)(selection);
+};
+
+export const findAdjacentCell = (dir: number) => (selection: Selection) => {
+  // 获取 table map
+  const { $anchor } = selection;
+  const table = findTable(selection);
+  if (table) {
+    const map = TableMap.get(table.node);
+    // currentPos is the position of the current cell in the table map, which is between two cells.
+    const tableStart = table.start;
+    const currentPos = $anchor.pos - tableStart - 1;
+    const currentMap = {
+      index: 0,
+      row: 0,
+      col: 0,
+    };
+    for (let i = 0; i < map.map.length; i++) {
+      if (map.map[i] > currentPos) {
+        currentMap.index = i - 1;
+        break;
+      }
+      if (i === map.map.length - 1) {
+        currentMap.index = i;
+      }
+    }
+    currentMap.index += dir;
+    if (currentMap.index < 0 || currentMap.index >= map.map.length) {
+      return undefined;
+    }
+    currentMap.col = currentMap.index % map.width;
+    currentMap.row = Math.floor(currentMap.index / map.width);
+    // nextPos is the position of the next cell in the table map, which is between two cells.
+    const pos = map.positionAt(currentMap.row, currentMap.col, table.node);
+    return {
+      map: currentMap,
+      start: pos + tableStart + 2,
+      node: table.node.nodeAt(pos),
+    };
+  }
+};
