@@ -1,5 +1,8 @@
 package run.halo.app.theme.finders.impl;
 
+import static run.halo.app.extension.index.query.QueryFactory.and;
+import static run.halo.app.extension.index.query.QueryFactory.equal;
+
 import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
@@ -104,27 +107,25 @@ public class PostFinderImpl implements PostFinder {
     @Override
     public Mono<NavigationPostVo> cursor(String currentName) {
         return postPredicateResolver.getListOptions()
-            .flatMapMany(postListOption ->
-                client.listAll(Post.class, postListOption, defaultSort())
-            )
-            .map(post -> post.getMetadata().getName())
-            .collectList()
-            .flatMap(postNames -> Mono.just(NavigationPostVo.builder())
-                .flatMap(builder -> getByName(currentName)
-                    .doOnNext(builder::current)
-                    .thenReturn(builder)
-                )
-                .flatMap(builder -> {
-                    var previousNextPair = findPostNavigation(postNames, currentName);
-                    String previousPostName = previousNextPair.prev();
-                    String nextPostName = previousNextPair.next();
-                    return fetchByName(previousPostName)
-                        .doOnNext(builder::previous)
-                        .then(fetchByName(nextPostName))
-                        .doOnNext(builder::next)
-                        .thenReturn(builder);
-                })
-                .map(NavigationPostVo.NavigationPostVoBuilder::build))
+            .flatMap(postListOption -> {
+                var postNames = client.indexedQueryEngine()
+                    .retrieve(Post.GVK, postListOption,
+                        PageRequestImpl.ofSize(0).withSort(defaultSort())
+                    )
+                    .getItems();
+                var previousNextPair = findPostNavigation(postNames, currentName);
+                String previousPostName = previousNextPair.prev();
+                String nextPostName = previousNextPair.next();
+                var builder = NavigationPostVo.builder();
+                var currentMono = getByName(currentName)
+                    .doOnNext(builder::current);
+                var prevMono = fetchByName(previousPostName)
+                    .doOnNext(builder::previous);
+                var nextMono = fetchByName(nextPostName)
+                    .doOnNext(builder::next);
+                return Mono.when(currentMono, prevMono, nextMono)
+                    .then(Mono.fromSupplier(builder::build));
+            })
             .defaultIfEmpty(NavigationPostVo.empty());
     }
 
@@ -142,8 +143,7 @@ public class PostFinderImpl implements PostFinder {
         String categoryName) {
         var fieldQuery = QueryFactory.all();
         if (StringUtils.isNotBlank(categoryName)) {
-            fieldQuery =
-                QueryFactory.and(fieldQuery, QueryFactory.equal("spec.categories", categoryName));
+            fieldQuery = and(fieldQuery, equal("spec.categories", categoryName));
         }
         var listOptions = new ListOptions();
         listOptions.setFieldSelector(FieldSelector.of(fieldQuery));
@@ -154,8 +154,7 @@ public class PostFinderImpl implements PostFinder {
     public Mono<ListResult<ListedPostVo>> listByTag(Integer page, Integer size, String tag) {
         var fieldQuery = QueryFactory.all();
         if (StringUtils.isNotBlank(tag)) {
-            fieldQuery =
-                QueryFactory.and(fieldQuery, QueryFactory.equal("spec.tags", tag));
+            fieldQuery = and(fieldQuery, equal("spec.tags", tag));
         }
         var listOptions = new ListOptions();
         listOptions.setFieldSelector(FieldSelector.of(fieldQuery));
@@ -166,8 +165,7 @@ public class PostFinderImpl implements PostFinder {
     public Mono<ListResult<ListedPostVo>> listByOwner(Integer page, Integer size, String owner) {
         var fieldQuery = QueryFactory.all();
         if (StringUtils.isNotBlank(owner)) {
-            fieldQuery =
-                QueryFactory.and(fieldQuery, QueryFactory.equal("spec.owner", owner));
+            fieldQuery = and(fieldQuery, equal("spec.owner", owner));
         }
         var listOptions = new ListOptions();
         listOptions.setFieldSelector(FieldSelector.of(fieldQuery));

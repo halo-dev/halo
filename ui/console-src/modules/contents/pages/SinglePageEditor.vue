@@ -1,26 +1,26 @@
 <script lang="ts" setup>
 import {
-  VPageHeader,
-  IconPages,
-  IconSettings,
-  IconSendPlaneFill,
-  VSpace,
-  VButton,
-  IconSave,
-  Toast,
   Dialog,
   IconEye,
+  IconPages,
+  IconSave,
+  IconSendPlaneFill,
+  IconSettings,
+  Toast,
+  VButton,
+  VPageHeader,
+  VSpace,
 } from "@halo-dev/components";
 import SinglePageSettingModal from "./components/SinglePageSettingModal.vue";
 import type { SinglePage, SinglePageRequest } from "@halo-dev/api-client";
 import {
   computed,
+  type ComputedRef,
   nextTick,
   onMounted,
   provide,
   ref,
   toRef,
-  type ComputedRef,
   watch,
 } from "vue";
 import { apiClient } from "@/utils/api-client";
@@ -271,7 +271,8 @@ const handleFetchContent = async () => {
     const provider =
       preferredEditor ||
       editorProviders.value.find(
-        (provider) => provider.rawType === data.rawType
+        (provider) =>
+          provider.rawType.toLowerCase() === data.rawType?.toLowerCase()
       );
     if (provider) {
       currentEditorProvider.value = provider;
@@ -433,10 +434,10 @@ async function handleUploadImage(file: File, options?: AxiosRequestConfig) {
   />
 
   <UrlPreviewModal
-    v-if="isUpdateMode"
-    v-model:visible="previewModal"
+    v-if="previewModal"
     :title="formState.page.spec.title"
     :url="`/preview/singlepages/${formState.page.metadata.name}`"
+    @close="previewModal = false"
   />
 
   <VPageHeader :title="$t('core.page.title')">

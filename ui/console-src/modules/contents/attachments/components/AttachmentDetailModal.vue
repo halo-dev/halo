@@ -19,19 +19,16 @@ import AttachmentPermalinkList from "./AttachmentPermalinkList.vue";
 
 const props = withDefaults(
   defineProps<{
-    visible: boolean;
     attachment: Attachment | undefined;
     mountToBody?: boolean;
   }>(),
   {
-    visible: false,
     attachment: undefined,
     mountToBody: false,
   }
 );
 
 const emit = defineEmits<{
-  (event: "update:visible", visible: boolean): void;
   (event: "close"): void;
 }>();
 
@@ -64,17 +61,6 @@ const getGroupName = (name: string | undefined) => {
   const group = groups.value?.find((group) => group.metadata.name === name);
   return group?.spec.displayName || name;
 };
-
-const onVisibleChange = (visible: boolean) => {
-  emit("update:visible", visible);
-  if (!visible) {
-    onlyPreview.value = false;
-
-    setTimeout(() => {
-      emit("close");
-    }, 200);
-  }
-};
 </script>
 <template>
   <VModal
@@ -83,13 +69,12 @@ const onVisibleChange = (visible: boolean) => {
         display_name: attachment?.spec.displayName || '',
       })
     "
-    :visible="visible"
     :width="1000"
     :mount-to-body="mountToBody"
     :layer-closable="true"
     height="calc(100vh - 20px)"
     :body-class="['!p-0']"
-    @update:visible="onVisibleChange"
+    @close="emit('close')"
   >
     <template #actions>
       <slot name="actions"></slot>
@@ -198,7 +183,7 @@ const onVisibleChange = (visible: boolean) => {
     </div>
     <template #footer>
       <VSpace>
-        <VButton type="default" @click="onVisibleChange(false)">
+        <VButton type="default" @click="emit('close')">
           {{ $t("core.common.buttons.close_and_shortcut") }}
         </VButton>
         <slot name="footer" />

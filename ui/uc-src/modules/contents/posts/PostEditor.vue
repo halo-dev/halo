@@ -13,30 +13,27 @@ import {
   VSpace,
 } from "@halo-dev/components";
 import EditorProviderSelector from "@/components/dropdown-selector/EditorProviderSelector.vue";
-import { ref, toRef, watch } from "vue";
+import type { ComputedRef } from "vue";
+import { computed, nextTick, onMounted, provide, ref, toRef, watch } from "vue";
 import { useLocalStorage } from "@vueuse/core";
-import type { Post, Content, Snapshot } from "@halo-dev/api-client";
+import type { Content, Post, Snapshot } from "@halo-dev/api-client";
 import { randomUUID } from "@/utils/id";
 import { contentAnnotations } from "@/constants/annotations";
 import { useRouteQuery } from "@vueuse/router";
-import { onMounted } from "vue";
 import { apiClient } from "@/utils/api-client";
-import { nextTick } from "vue";
 import { useRouter } from "vue-router";
 import { useI18n } from "vue-i18n";
 import { useMutation } from "@tanstack/vue-query";
-import { computed } from "vue";
 import { useSaveKeybinding } from "@console/composables/use-save-keybinding";
 import PostCreationModal from "./components/PostCreationModal.vue";
 import PostSettingEditModal from "./components/PostSettingEditModal.vue";
 import HasPermission from "@/components/permission/HasPermission.vue";
-import { provide } from "vue";
-import type { ComputedRef } from "vue";
 import { useSessionKeepAlive } from "@/composables/use-session-keep-alive";
 import { usePermission } from "@/utils/permission";
 import type { AxiosRequestConfig } from "axios";
 import { useContentCache } from "@/composables/use-content-cache";
 import { useAutoSaveContent } from "@/composables/use-auto-save-content";
+import { usePostUpdateMutate } from "@uc/modules/contents/posts/composables/use-post-update-mutate";
 
 const router = useRouter();
 const { t } = useI18n();
@@ -237,7 +234,8 @@ async function handleSetEditorProviderFromRemote() {
   const provider =
     preferredEditor ||
     editorProviders.value.find(
-      (provider) => provider.rawType === content.value.rawType
+      (provider) =>
+        provider.rawType.toLowerCase() === content.value.rawType?.toLowerCase()
     );
 
   if (provider) {
@@ -306,19 +304,20 @@ const isUpdateMode = computed(
   () => !!formState.value.metadata.creationTimestamp
 );
 
+const { mutateAsync: postUpdateMutate } = usePostUpdateMutate();
+
 const { mutateAsync: handleSave, isLoading: isSaving } = useMutation({
-  mutationKey: ["save-post"],
+  mutationKey: ["uc:save-post-content"],
   variables: {
     mute: false,
   },
   mutationFn: async () => {
     // Update title
-    // TODO: needs retry
     if (isTitleChanged.value) {
-      const { data: updatedPost } = await apiClient.uc.post.updateMyPost({
-        name: formState.value.metadata.name,
-        post: formState.value,
+      const { data: updatedPost } = await postUpdateMutate({
+        postToUpdate: formState.value,
       });
+
       formState.value = updatedPost;
       isTitleChanged.value = false;
     }
@@ -379,7 +378,7 @@ function onPublishPostSuccess() {
 }
 
 const { mutateAsync: handlePublish, isLoading: isPublishing } = useMutation({
-  mutationKey: ["publish-post"],
+  mutationKey: ["uc:publish-post"],
   mutationFn: async () => {
     await handleSave({ mute: true });
 
@@ -403,7 +402,7 @@ const { mutateAsync: handlePublish, isLoading: isPublishing } = useMutation({
 const postSettingEditModal = ref(false);
 
 async function handleOpenPostSettingEditModal() {
-  handleSave({ mute: true });
+  await handleSave({ mute: true });
   await getLatestPost();
   postSettingEditModal.value = true;
 }

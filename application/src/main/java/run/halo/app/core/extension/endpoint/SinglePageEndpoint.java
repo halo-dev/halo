@@ -32,7 +32,6 @@ import run.halo.app.core.extension.content.SinglePage;
 import run.halo.app.extension.ListResult;
 import run.halo.app.extension.MetadataUtil;
 import run.halo.app.extension.ReactiveExtensionClient;
-import run.halo.app.extension.router.QueryParamBuildUtil;
 
 /**
  * Endpoint for managing {@link SinglePage}.
@@ -59,7 +58,7 @@ public class SinglePageEndpoint implements CustomEndpoint {
                         .response(responseBuilder()
                             .implementation(ListResult.generateGenericClass(ListedSinglePage.class))
                         );
-                    QueryParamBuildUtil.buildParametersFromType(builder, SinglePageQuery.class);
+                    SinglePageQuery.buildParameters(builder);
                 }
             )
             .GET("singlepages/{name}/head-content", this::fetchHeadContent,
@@ -171,11 +170,13 @@ public class SinglePageEndpoint implements CustomEndpoint {
     Mono<ServerResponse> updateContent(ServerRequest request) {
         String pageName = request.pathVariable("name");
         return request.bodyToMono(Content.class)
-            .flatMap(content -> client.fetch(SinglePage.class, pageName)
-                .flatMap(page -> {
-                    SinglePageRequest pageRequest = new SinglePageRequest(page, content);
-                    return singlePageService.update(pageRequest);
-                })
+            .flatMap(content -> Mono.defer(() -> client.fetch(SinglePage.class, pageName)
+                    .flatMap(page -> {
+                        SinglePageRequest pageRequest = new SinglePageRequest(page, content);
+                        return singlePageService.update(pageRequest);
+                    }))
+                .retryWhen(Retry.backoff(5, Duration.ofMillis(100))
+                    .filter(throwable -> throwable instanceof OptimisticLockingFailureException))
             )
             .flatMap(post -> ServerResponse.ok().bodyValue(post));
     }

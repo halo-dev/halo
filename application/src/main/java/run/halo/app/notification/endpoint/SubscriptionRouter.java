@@ -49,6 +49,7 @@ public class SubscriptionRouter {
                         .name("name")
                         .description("Subscription name")
                         .required(true)
+                    ).parameter(parameterBuilder()
                         .in(ParameterIn.QUERY)
                         .name("token")
                         .description("Unsubscribe token")

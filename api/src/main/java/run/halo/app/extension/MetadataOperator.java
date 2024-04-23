@@ -27,11 +27,11 @@ public interface MetadataOperator {
         + "according to the given generateName field")
     String getGenerateName();
 
-    @Schema(name = "labels", nullable = true)
+    @Schema(name = "labels")
     @JsonProperty("labels")
     Map<String, String> getLabels();
 
-    @Schema(name = "annotations", nullable = true)
+    @Schema(name = "annotations")
     @JsonProperty("annotations")
     Map<String, String> getAnnotations();
 

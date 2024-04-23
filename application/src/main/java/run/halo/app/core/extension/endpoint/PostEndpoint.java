@@ -33,7 +33,6 @@ import run.halo.app.core.extension.content.Post;
 import run.halo.app.extension.ListResult;
 import run.halo.app.extension.MetadataUtil;
 import run.halo.app.extension.ReactiveExtensionClient;
-import run.halo.app.extension.router.QueryParamBuildUtil;
 
 /**
  * Endpoint for managing posts.
@@ -61,7 +60,7 @@ public class PostEndpoint implements CustomEndpoint {
                         .response(responseBuilder()
                             .implementation(ListResult.generateGenericClass(ListedPost.class))
                         );
-                    QueryParamBuildUtil.buildParametersFromType(builder, PostQuery.class);
+                    PostQuery.buildParameters(builder);
                 }
             )
             .GET("posts/{name}/head-content", this::fetchHeadContent,
@@ -193,11 +192,13 @@ public class PostEndpoint implements CustomEndpoint {
     Mono<ServerResponse> updateContent(ServerRequest request) {
         String postName = request.pathVariable("name");
         return request.bodyToMono(Content.class)
-            .flatMap(content -> client.fetch(Post.class, postName)
-                .flatMap(post -> {
-                    PostRequest postRequest = new PostRequest(post, content);
-                    return postService.updatePost(postRequest);
-                })
+            .flatMap(content -> Mono.defer(() -> client.fetch(Post.class, postName)
+                    .flatMap(post -> {
+                        PostRequest postRequest = new PostRequest(post, content);
+                        return postService.updatePost(postRequest);
+                    }))
+                .retryWhen(Retry.backoff(5, Duration.ofMillis(100))
+                    .filter(throwable -> throwable instanceof OptimisticLockingFailureException))
             )
             .flatMap(post -> ServerResponse.ok().bodyValue(post));
     }

@@ -9,11 +9,13 @@ import static run.halo.app.extension.index.IndexAttributeFactory.simpleAttribute
 import com.fasterxml.jackson.core.type.TypeReference;
 import java.util.Set;
 import org.apache.commons.lang3.BooleanUtils;
+import org.apache.commons.lang3.ObjectUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.boot.context.event.ApplicationContextInitializedEvent;
 import org.springframework.context.ApplicationListener;
 import org.springframework.lang.NonNull;
 import org.springframework.stereotype.Component;
+import run.halo.app.content.Stats;
 import run.halo.app.core.extension.AnnotationSetting;
 import run.halo.app.core.extension.AuthProvider;
 import run.halo.app.core.extension.Counter;
@@ -170,7 +172,12 @@ public class SchemeInitializer implements ApplicationListener<ApplicationContext
                 .setName("status.excerpt")
                 .setIndexFunc(
                     simpleAttribute(Post.class, post -> post.getStatusOrDefault().getExcerpt())));
-
+            indexSpecs.add(new IndexSpec()
+                .setName("status.lastModifyTime")
+                .setIndexFunc(simpleAttribute(Post.class, post -> {
+                    var lastModifyTime = post.getStatus().getLastModifyTime();
+                    return lastModifyTime == null ? null : lastModifyTime.toString();
+                })));
             indexSpecs.add(new IndexSpec()
                 .setName(Post.REQUIRE_SYNC_ON_STARTUP_INDEX_NAME)
                 .setIndexFunc(simpleAttribute(Post.class, post -> {
@@ -181,6 +188,30 @@ public class SchemeInitializer implements ApplicationListener<ApplicationContext
                     }
                     // do not care about the false case so return null to avoid indexing
                     return null;
+                })));
+
+            indexSpecs.add(new IndexSpec()
+                .setName("stats.visit")
+                .setIndexFunc(simpleAttribute(Post.class, post -> {
+                    var annotations = MetadataUtil.nullSafeAnnotations(post);
+                    var statsStr = annotations.get(Post.STATS_ANNO);
+                    if (StringUtils.isBlank(statsStr)) {
+                        return "0";
+                    }
+                    var stats = JsonUtils.jsonToObject(statsStr, Stats.class);
+                    return ObjectUtils.defaultIfNull(stats.getVisit(), 0).toString();
+                })));
+
+            indexSpecs.add(new IndexSpec()
+                .setName("stats.totalComment")
+                .setIndexFunc(simpleAttribute(Post.class, post -> {
+                    var annotations = MetadataUtil.nullSafeAnnotations(post);
+                    var statsStr = annotations.get(Post.STATS_ANNO);
+                    if (StringUtils.isBlank(statsStr)) {
+                        return "0";
+                    }
+                    var stats = JsonUtils.jsonToObject(statsStr, Stats.class);
+                    return ObjectUtils.defaultIfNull(stats.getTotalComment(), 0).toString();
                 })));
         });
         schemeManager.register(Category.class, indexSpecs -> {
@@ -282,6 +313,17 @@ public class SchemeInitializer implements ApplicationListener<ApplicationContext
                     var replyCount = comment.getStatusOrDefault().getReplyCount();
                     return defaultIfNull(replyCount, 0).toString();
                 })));
+            indexSpecs.add(new IndexSpec()
+                .setName(Comment.REQUIRE_SYNC_ON_STARTUP_INDEX_NAME)
+                .setIndexFunc(simpleAttribute(Comment.class, comment -> {
+                    var version = comment.getMetadata().getVersion();
+                    var observedVersion = comment.getStatusOrDefault().getObservedVersion();
+                    if (observedVersion == null || observedVersion < version) {
+                        return BooleanUtils.TRUE;
+                    }
+                    // do not care about the false case so return null to avoid indexing
+                    return null;
+                })));
         });
         schemeManager.register(Reply.class, indexSpecs -> {
             indexSpecs.add(new IndexSpec()
@@ -310,6 +352,17 @@ public class SchemeInitializer implements ApplicationListener<ApplicationContext
                 .setIndexFunc(simpleAttribute(Reply.class, reply -> {
                     var owner = reply.getSpec().getOwner();
                     return Comment.CommentOwner.ownerIdentity(owner.getKind(), owner.getName());
+                })));
+            indexSpecs.add(new IndexSpec()
+                .setName(Reply.REQUIRE_SYNC_ON_STARTUP_INDEX_NAME)
+                .setIndexFunc(simpleAttribute(Reply.class, reply -> {
+                    var version = reply.getMetadata().getVersion();
+                    var observedVersion = reply.getStatus().getObservedVersion();
+                    if (observedVersion == null || observedVersion < version) {
+                        return BooleanUtils.TRUE;
+                    }
+                    // do not care about the false case so return null to avoid indexing
+                    return null;
                 })));
         });
         schemeManager.register(SinglePage.class);

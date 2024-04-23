@@ -26,7 +26,7 @@ editor:
       audio: Audio
       table: Table
       no_results: No results
-      placeholder: "Enter / to select input type"
+      placeholder: Enter / to select input type
     link:
       add_link: Add link
       edit_link: Edit link
@@ -83,10 +83,15 @@ editor:
       match_word: Match Whole Word
       use_regex: Use Regular Expression
       close: Close
+    format_brush:
+      toolbar_item:
+        title: Format Brush
+        cancel: Cancel Format Brush
   components:
     color_picker:
       more_color: More
   common:
+    align_method: Align method
     align_left: Align left
     align_center: Align center
     align_right: Align right
@@ -131,3 +136,5 @@ editor:
       restore_default: Restore default
     text:
       default: Default
+    line_height: Line height
+    clear_format: Clear format

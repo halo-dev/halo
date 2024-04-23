@@ -5,6 +5,7 @@ import static org.springdoc.core.fn.builders.parameter.Builder.parameterBuilder;
 
 import io.swagger.v3.oas.annotations.enums.ParameterIn;
 import lombok.RequiredArgsConstructor;
+import org.springdoc.core.fn.builders.operation.Builder;
 import org.springdoc.webflux.core.fn.SpringdocRouteBuilder;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Component;
@@ -17,7 +18,6 @@ import run.halo.app.core.extension.content.SinglePage;
 import run.halo.app.core.extension.endpoint.CustomEndpoint;
 import run.halo.app.extension.GroupVersion;
 import run.halo.app.extension.ListResult;
-import run.halo.app.extension.router.QueryParamBuildUtil;
 import run.halo.app.extension.router.SortableRequest;
 import run.halo.app.theme.finders.SinglePageFinder;
 import run.halo.app.theme.finders.vo.ListedSinglePageVo;
@@ -48,8 +48,7 @@ public class SinglePageQueryEndpoint implements CustomEndpoint {
                             .implementation(
                                 ListResult.generateGenericClass(ListedSinglePageVo.class))
                         );
-                    QueryParamBuildUtil.buildParametersFromType(builder,
-                        SinglePagePublicQuery.class);
+                    SinglePagePublicQuery.buildParameters(builder);
                 }
             )
             .GET("singlepages/{name}", this::getByName,
@@ -95,6 +94,10 @@ public class SinglePageQueryEndpoint implements CustomEndpoint {
 
         public SinglePagePublicQuery(ServerWebExchange exchange) {
             super(exchange);
+        }
+
+        public static void buildParameters(Builder builder) {
+            SortableRequest.buildParameters(builder);
         }
     }
 

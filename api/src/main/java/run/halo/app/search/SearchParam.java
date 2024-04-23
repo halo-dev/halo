@@ -1,8 +1,12 @@
 package run.halo.app.search;
 
 import static io.swagger.v3.oas.annotations.media.Schema.RequiredMode.REQUIRED;
+import static org.springdoc.core.fn.builders.parameter.Builder.parameterBuilder;
+import static org.springdoc.core.fn.builders.schema.Builder.schemaBuilder;
 
+import io.swagger.v3.oas.annotations.enums.ParameterIn;
 import io.swagger.v3.oas.annotations.media.Schema;
+import org.springdoc.core.fn.builders.operation.Builder;
 import org.springframework.util.MultiValueMap;
 import org.springframework.util.StringUtils;
 import org.springframework.web.server.ServerWebInputException;
@@ -61,5 +65,43 @@ public class SearchParam {
             highlightPostTag = DEFAULT_HIGHLIGHT_POST_TAG;
         }
         return highlightPostTag;
+    }
+
+    public static void buildParameters(Builder builder) {
+        builder.parameter(parameterBuilder()
+                .in(ParameterIn.QUERY)
+                .name("keyword")
+                .description("Keyword to search")
+                .implementation(String.class)
+                .required(true))
+            .parameter(parameterBuilder()
+                .in(ParameterIn.QUERY)
+                .name("limit")
+                .description("Limit of search results")
+                .required(false)
+                .schema(schemaBuilder()
+                    .implementation(Integer.class)
+                    .maximum("1000")
+                    .defaultValue(String.valueOf(DEFAULT_LIMIT))))
+            .parameter(parameterBuilder()
+                .in(ParameterIn.QUERY)
+                .name("highlightPreTag")
+                .description("Highlight pre tag")
+                .required(false)
+                .schema(schemaBuilder()
+                    .implementation(String.class)
+                    .defaultValue(DEFAULT_HIGHLIGHT_PRE_TAG)
+                ))
+            .parameter(parameterBuilder()
+                .in(ParameterIn.QUERY)
+                .name("highlightPostTag")
+                .description("Highlight post tag")
+                .required(false)
+                .schema(schemaBuilder()
+                    .implementation(String.class)
+                    .defaultValue(DEFAULT_HIGHLIGHT_POST_TAG)
+                )
+            );
+
     }
 }

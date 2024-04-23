@@ -33,6 +33,7 @@ api/api-security-halo-run-v1alpha1-authentication-two-factor-api.ts
 api/api-security-halo-run-v1alpha1-personal-access-token-api.ts
 api/auth-halo-run-v1alpha1-auth-provider-api.ts
 api/auth-halo-run-v1alpha1-user-connection-api.ts
+api/console-api-notification-halo-run-v1alpha1-notifier-api.ts
 api/content-halo-run-v1alpha1-category-api.ts
 api/content-halo-run-v1alpha1-comment-api.ts
 api/content-halo-run-v1alpha1-post-api.ts
@@ -99,6 +100,7 @@ models/category-status.ts
 models/category-vo-list.ts
 models/category-vo.ts
 models/category.ts
+models/change-own-password-request.ts
 models/change-password-request.ts
 models/comment-email-owner.ts
 models/comment-list.ts
@@ -110,6 +112,8 @@ models/comment-stats.ts
 models/comment-status.ts
 models/comment-vo-list.ts
 models/comment-vo.ts
+models/comment-with-reply-vo-list.ts
+models/comment-with-reply-vo.ts
 models/comment.ts
 models/condition.ts
 models/config-map-list.ts
@@ -127,6 +131,7 @@ models/create-user-request.ts
 models/custom-templates.ts
 models/dashboard-stats.ts
 models/detailed-user.ts
+models/email-config-validation-request.ts
 models/email-verify-request.ts
 models/excerpt.ts
 models/extension-definition-list.ts
@@ -148,6 +153,7 @@ models/install-from-uri-request.ts
 models/interest-reason-subject.ts
 models/interest-reason.ts
 models/license.ts
+models/list-result-reply-vo.ts
 models/listed-auth-provider.ts
 models/listed-comment-list.ts
 models/listed-comment.ts

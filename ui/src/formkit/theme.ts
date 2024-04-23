@@ -14,7 +14,7 @@ const boxClassification = {
     "group border border-gray-300 rounded-base px-2 py-2 focus-within:border-primary max-w-lg",
   wrapper:
     "flex items-center mb-1 cursor-pointer group-[.formkit-fieldset]:px-2",
-  help: "mb-2 mt-0 px-2",
+  help: "mb-2 mt-0",
   input: "form-check-input mr-2 bg-white",
   inner: "flex items-center",
 };
@@ -33,6 +33,7 @@ const theme: Record<string, Record<string, string>> = {
     help: "text-xs mt-2 text-gray-500",
     messages: "list-none p-0 mt-1.5 mb-0 transition-all",
     message: "text-red-500 mt-2 text-xs",
+    verificationForm: "pt-4 divide-y divide-gray-100",
   },
   button: buttonClassification,
   color: {
@@ -47,10 +48,14 @@ const theme: Record<string, Record<string, string>> = {
     fileItem: "block flex text-gray-800 text-sm mb-1",
     fileRemove: "ml-auto text-blue-500 text-sm",
   },
-  checkbox: boxClassification,
+  checkbox: {
+    ...boxClassification,
+    wrapper: "flex items-center mb-1 cursor-pointer",
+  },
   radio: {
     ...boxClassification,
     input: boxClassification.input.replace("rounded-sm", "rounded-full"),
+    help: `${boxClassification.help} px-2`,
   },
   range: {
     ...textClassification,
@@ -83,7 +88,7 @@ const theme: Record<string, Record<string, string>> = {
     legend: `${textClassification.label} px-2`,
     fieldset: boxClassification.fieldset,
     wrapper: boxClassification.wrapper,
-    help: boxClassification.wrapper,
+    help: `${boxClassification.wrapper} mb-2`,
     inner: "flex flex-col gap-4",
     items: "flex flex-col w-full gap-2 rounded-base",
     item: "border rounded-base grid grid-cols-12 focus-within:border-primary transition-all overflow-visible focus-within:shadow-sm",
@@ -98,7 +103,7 @@ const theme: Record<string, Record<string, string>> = {
     legend: `${textClassification.label} px-2`,
     fieldset: boxClassification.fieldset,
     wrapper: boxClassification.wrapper,
-    help: boxClassification.wrapper,
+    help: `${boxClassification.wrapper} mb-2`,
     inner: "flex flex-col px-2 divide-y divide-gray-100",
   },
   tagSelect: {

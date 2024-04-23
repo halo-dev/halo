@@ -197,7 +197,7 @@ const handleSelectPrevious = async () => {
     selectedPost.value = previousPost;
     return;
   }
-  if (index === 0 && hasPrevious) {
+  if (index === 0 && hasPrevious.value) {
     page.value--;
     await refetch();
     selectedPost.value = posts.value[posts.value.length - 1].post;
@@ -419,6 +419,26 @@ watch(selectedPostNames, (newValue) => {
                   {
                     label: t('core.post.filters.sort.items.create_time_asc'),
                     value: 'metadata.creationTimestamp,asc',
+                  },
+                  {
+                    label: t(
+                      'core.post.filters.sort.items.last_modify_time_desc'
+                    ),
+                    value: 'status.lastModifyTime,desc',
+                  },
+                  {
+                    label: t(
+                      'core.post.filters.sort.items.last_modify_time_asc'
+                    ),
+                    value: 'status.lastModifyTime,asc',
+                  },
+                  {
+                    label: t('core.post.filters.sort.items.visit_desc'),
+                    value: 'stats.visit,desc',
+                  },
+                  {
+                    label: t('core.post.filters.sort.items.comment_desc'),
+                    value: 'stats.totalComment,desc',
                   },
                 ]"
               />

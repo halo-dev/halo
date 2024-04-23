@@ -5,13 +5,13 @@ import {
   type PMNode,
   type Decoration,
 } from "@halo-dev/richtext-editor";
-import { NodeViewWrapper } from "@halo-dev/richtext-editor";
 import { computed, onMounted, ref } from "vue";
 import Image from "./index";
 import { fileToBase64 } from "../../utils/upload";
 import { VButton, IconImageAddLine } from "@halo-dev/components";
 import { type AttachmentAttr } from "../../utils/attachment";
 import { EditorLinkObtain } from "../../components";
+import InlineBlockBox from "../../components/InlineBlockBox.vue";
 
 const props = defineProps<{
   editor: Editor;
@@ -158,7 +158,7 @@ onMounted(() => {
 </script>
 
 <template>
-  <node-view-wrapper as="div" class="inline-block w-full">
+  <InlineBlockBox>
     <div
       ref="resizeRef"
       class="group relative inline-block max-w-full overflow-hidden rounded-md text-center"
@@ -286,5 +286,5 @@ onMounted(() => {
         </EditorLinkObtain>
       </div>
     </div>
-  </node-view-wrapper>
+  </InlineBlockBox>
 </template>

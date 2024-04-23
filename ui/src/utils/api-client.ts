@@ -273,4 +273,4 @@ function setupApiClient(axios: AxiosInstance) {
   };
 }
 
-export { apiClient };
+export { apiClient, axiosInstance };

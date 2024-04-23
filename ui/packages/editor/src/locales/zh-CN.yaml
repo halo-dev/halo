@@ -83,10 +83,15 @@ editor:
       match_word: 全字匹配
       use_regex: 使用正则表达式
       close: 关闭
+    format_brush:
+      toolbar_item:
+        title: 格式刷
+        cancel: 取消格式刷
   components:
     color_picker:
       more_color: 更多颜色
   common:
+    align_method: 对齐方式
     align_left: 左对齐
     align_center: 居中
     align_right: 右对齐
@@ -131,3 +136,5 @@ editor:
       restore_default: 恢复为默认
     text:
       default: 默认
+    line_height: 行高
+    clear_format: 清除格式

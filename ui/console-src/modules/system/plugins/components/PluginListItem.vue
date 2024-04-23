@@ -1,21 +1,20 @@
 <script lang="ts" setup>
 import {
-  VEntity,
-  VEntityField,
   Dialog,
   Toast,
-  VDropdownItem,
   VDropdownDivider,
+  VDropdownItem,
+  VEntity,
+  VEntityField,
 } from "@halo-dev/components";
-import { inject, toRefs, markRaw } from "vue";
+import type { Ref } from "vue";
+import { computed, inject, markRaw, ref, toRefs } from "vue";
 import { usePluginLifeCycle } from "../composables/use-plugin";
 import { PluginStatusPhaseEnum, type Plugin } from "@halo-dev/api-client";
 import { formatDatetime } from "@/utils/date";
 import { usePermission } from "@/utils/permission";
 import { apiClient } from "@/utils/api-client";
 import { useI18n } from "vue-i18n";
-import type { Ref } from "vue";
-import { ref } from "vue";
 import { useEntityFieldItemExtensionPoint } from "@console/composables/use-entity-extension-points";
 import { useOperationItemExtensionPoint } from "@console/composables/use-operation-extension-points";
 import { useRouter } from "vue-router";
@@ -25,8 +24,8 @@ import LogoField from "./entity-fields/LogoField.vue";
 import StatusDotField from "@/components/entity-fields/StatusDotField.vue";
 import AuthorField from "./entity-fields/AuthorField.vue";
 import SwitchField from "./entity-fields/SwitchField.vue";
-import { computed } from "vue";
 import type { EntityFieldItem, OperationItem } from "@halo-dev/console-shared";
+import PluginInstallationModal from "@console/modules/system/plugins/components/PluginInstallationModal.vue";
 
 const { currentUserHasPermission } = usePermission();
 const { t } = useI18n();
@@ -40,15 +39,13 @@ const props = withDefaults(
   { isSelected: false }
 );
 
-const emit = defineEmits<{
-  (event: "open-upgrade-modal", plugin?: Plugin): void;
-}>();
-
 const { plugin } = toRefs(props);
 
 const selectedNames = inject<Ref<string[]>>("selectedNames", ref([]));
 
 const { getFailedMessage, uninstall } = usePluginLifeCycle(plugin);
+
+const pluginUpgradeModalVisible = ref(false);
 
 const handleResetSettingConfig = async () => {
   Dialog.warning({
@@ -97,7 +94,7 @@ const { operationItems } = useOperationItemExtensionPoint<Plugin>(
       label: t("core.common.buttons.upgrade"),
       permissions: [],
       action: () => {
-        emit("open-upgrade-modal", props.plugin);
+        pluginUpgradeModalVisible.value = true;
       },
     },
     {
@@ -283,4 +280,13 @@ const { startFields, endFields } = useEntityFieldItemExtensionPoint<Plugin>(
       <EntityDropdownItems :dropdown-items="operationItems" :item="plugin" />
     </template>
   </VEntity>
+
+  <PluginInstallationModal
+    v-if="
+      pluginUpgradeModalVisible &&
+      currentUserHasPermission(['system:plugins:manage'])
+    "
+    :plugin-to-upgrade="plugin"
+    @close="pluginUpgradeModalVisible = false"
+  />
 </template>

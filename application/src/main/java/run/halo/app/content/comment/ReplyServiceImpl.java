@@ -6,6 +6,7 @@ import static run.halo.app.extension.index.query.QueryFactory.isNull;
 import static run.halo.app.extension.router.selector.SelectorUtil.labelAndFieldSelectorToPredicate;
 
 import java.time.Instant;
+import java.util.Set;
 import java.util.function.Function;
 import java.util.function.Predicate;
 import lombok.RequiredArgsConstructor;
@@ -19,6 +20,7 @@ import reactor.core.publisher.Mono;
 import run.halo.app.core.extension.User;
 import run.halo.app.core.extension.content.Comment;
 import run.halo.app.core.extension.content.Reply;
+import run.halo.app.core.extension.service.RoleService;
 import run.halo.app.core.extension.service.UserService;
 import run.halo.app.extension.Extension;
 import run.halo.app.extension.ListOptions;
@@ -29,6 +31,7 @@ import run.halo.app.extension.ReactiveExtensionClient;
 import run.halo.app.extension.router.selector.FieldSelector;
 import run.halo.app.metrics.CounterService;
 import run.halo.app.metrics.MeterUtils;
+import run.halo.app.security.authorization.AuthorityUtils;
 
 /**
  * A default implementation of {@link ReplyService}.
@@ -42,6 +45,7 @@ public class ReplyServiceImpl implements ReplyService {
 
     private final ReactiveExtensionClient client;
     private final UserService userService;
+    private final RoleService roleService;
     private final CounterService counterService;
 
     @Override
@@ -75,10 +79,24 @@ public class ReplyServiceImpl implements ReplyService {
                 }
                 // populate owner from current user
                 return fetchCurrentUser()
-                    .map(user -> {
-                        replyToUse.getSpec().setOwner(toCommentOwner(user));
-                        return replyToUse;
-                    })
+                    .flatMap(user ->
+                        ReactiveSecurityContextHolder.getContext()
+                            .flatMap(securityContext -> {
+                                var authentication = securityContext.getAuthentication();
+                                var roles = AuthorityUtils.authoritiesToRoles(
+                                    authentication.getAuthorities());
+                                return roleService.contains(roles,
+                                        Set.of(AuthorityUtils.COMMENT_MANAGEMENT_ROLE_NAME))
+                                    .doOnNext(result -> {
+                                        if (result) {
+                                            reply.getSpec().setApproved(true);
+                                            reply.getSpec().setApprovedTime(Instant.now());
+                                        }
+                                        replyToUse.getSpec().setOwner(toCommentOwner(user));
+                                    })
+                                    .thenReturn(replyToUse);
+                            })
+                    )
                     .switchIfEmpty(
                         Mono.error(new IllegalArgumentException("Reply owner must not be null.")));
             })
@@ -105,7 +123,7 @@ public class ReplyServiceImpl implements ReplyService {
             Sort.by("metadata.creationTimestamp", "metadata.name"));
         return Flux.defer(() -> listRepliesByComment(commentName, pageRequest))
             .expand(page -> page.hasNext()
-                ? listRepliesByComment(commentName, pageRequest)
+                ? listRepliesByComment(commentName, pageRequest.next())
                 : Mono.empty()
             )
             .flatMap(page -> Flux.fromIterable(page.getItems()))

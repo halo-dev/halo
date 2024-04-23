@@ -1,10 +1,13 @@
 package run.halo.app.content.comment;
 
+import static org.springdoc.core.fn.builders.parameter.Builder.parameterBuilder;
 import static run.halo.app.extension.index.query.QueryFactory.equal;
 import static run.halo.app.extension.router.selector.SelectorUtil.labelAndFieldSelectorToListOptions;
 
+import io.swagger.v3.oas.annotations.enums.ParameterIn;
 import io.swagger.v3.oas.annotations.media.Schema;
 import org.apache.commons.lang3.StringUtils;
+import org.springdoc.core.fn.builders.operation.Builder;
 import org.springframework.data.domain.Sort;
 import org.springframework.web.server.ServerWebExchange;
 import org.springframework.web.server.ServerWebInputException;
@@ -50,5 +53,15 @@ public class ReplyQuery extends SortableRequest {
     public PageRequest toPageRequest() {
         var sort = getSort().and(Sort.by("spec.creationTime").ascending());
         return PageRequestImpl.of(getPage(), getSize(), sort);
+    }
+
+    public static void buildParameters(Builder builder) {
+        SortableRequest.buildParameters(builder);
+        builder.parameter(parameterBuilder()
+            .in(ParameterIn.QUERY)
+            .name("commentName")
+            .description("Replies filtered by commentName.")
+            .implementation(String.class)
+            .required(true));
     }
 }

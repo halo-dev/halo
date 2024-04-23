@@ -5,9 +5,8 @@ import type { PostFormState } from "../types";
 import type { Post } from "@halo-dev/api-client";
 import { ref } from "vue";
 import { useI18n } from "vue-i18n";
-import { useMutation } from "@tanstack/vue-query";
-import { apiClient } from "@/utils/api-client";
 import { toDatetimeLocal } from "@/utils/date";
+import { usePostUpdateMutate } from "@uc/modules/contents/posts/composables/use-post-update-mutate";
 
 const { t } = useI18n();
 
@@ -25,46 +24,34 @@ const emit = defineEmits<{
 
 const modal = ref();
 
-const { mutate, isLoading } = useMutation({
-  mutationKey: ["edit-post"],
-  mutationFn: async ({ data }: { data: PostFormState }) => {
-    const postToUpdate: Post = {
-      ...props.post,
-      spec: {
-        ...props.post.spec,
-        allowComment: data.allowComment,
-        categories: data.categories,
-        cover: data.cover,
-        excerpt: {
-          autoGenerate: data.excerptAutoGenerate,
-          raw: data.excerptRaw,
-        },
-        pinned: data.pinned,
-        publishTime: data.publishTime,
-        slug: data.slug,
-        tags: data.tags,
-        title: data.title,
-        visible: data.visible,
-      },
-    };
-    const { data: updatedPost } = await apiClient.uc.post.updateMyPost({
-      name: props.post.metadata.name,
-      post: postToUpdate,
-    });
-    return updatedPost;
-  },
-  onSuccess(data) {
-    Toast.success(t("core.common.toast.save_success"));
-    emit("success", data);
-    modal.value.close();
-  },
-  onError() {
-    Toast.error(t("core.common.toast.save_failed_and_retry"));
-  },
-});
+const { mutateAsync, isLoading } = usePostUpdateMutate();
 
-function onSubmit(data: PostFormState) {
-  mutate({ data });
+async function onSubmit(data: PostFormState) {
+  const postToUpdate: Post = {
+    ...props.post,
+    spec: {
+      ...props.post.spec,
+      allowComment: data.allowComment,
+      categories: data.categories,
+      cover: data.cover,
+      excerpt: {
+        autoGenerate: data.excerptAutoGenerate,
+        raw: data.excerptRaw,
+      },
+      pinned: data.pinned,
+      publishTime: data.publishTime,
+      slug: data.slug,
+      tags: data.tags,
+      title: data.title,
+      visible: data.visible,
+    },
+  };
+
+  const { data: newPost } = await mutateAsync({ postToUpdate });
+
+  Toast.success(t("core.common.toast.save_success"));
+  emit("success", newPost);
+  modal.value.close();
 }
 </script>
 

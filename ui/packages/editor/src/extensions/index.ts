@@ -43,6 +43,8 @@ import ExtensionDraggable from "./draggable";
 import ExtensionNodeSelected from "./node-selected";
 import ExtensionTrailingNode from "./trailing-node";
 import ExtensionSearchAndReplace from "./search-and-replace";
+import ExtensionClearFormat from "./clear-format";
+import ExtensionFormatBrush from "./format-brush";
 
 const allExtensions = [
   ExtensionBlockquote,
@@ -100,6 +102,8 @@ const allExtensions = [
   ExtensionNodeSelected,
   ExtensionTrailingNode,
   ExtensionSearchAndReplace,
+  ExtensionClearFormat,
+  ExtensionFormatBrush,
 ];
 
 export {
@@ -147,4 +151,6 @@ export {
   ExtensionTrailingNode,
   ExtensionListKeymap,
   ExtensionSearchAndReplace,
+  ExtensionClearFormat,
+  ExtensionFormatBrush,
 };

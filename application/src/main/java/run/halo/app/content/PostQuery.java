@@ -1,12 +1,16 @@
 package run.halo.app.content;
 
+import static org.springdoc.core.fn.builders.parameter.Builder.parameterBuilder;
+import static run.halo.app.extension.router.QueryParamBuildUtil.sortParameter;
 import static run.halo.app.extension.router.selector.SelectorUtil.labelAndFieldSelectorToListOptions;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import io.swagger.v3.oas.annotations.enums.ParameterIn;
 import io.swagger.v3.oas.annotations.media.ArraySchema;
 import io.swagger.v3.oas.annotations.media.Schema;
 import org.apache.commons.lang3.BooleanUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.springdoc.core.fn.builders.operation.Builder;
 import org.springframework.data.domain.Sort;
 import org.springframework.lang.Nullable;
 import org.springframework.web.reactive.function.server.ServerRequest;
@@ -120,5 +124,22 @@ public class PostQuery extends IListRequest.QueryListRequest {
         listOptions.setLabelSelector(
             listOptions.getLabelSelector().and(labelSelectorBuilder.build()));
         return listOptions;
+    }
+
+    public static void buildParameters(Builder builder) {
+        IListRequest.buildParameters(builder);
+        builder.parameter(sortParameter())
+            .parameter(parameterBuilder()
+                .in(ParameterIn.QUERY)
+                .name("publishPhase")
+                .description("Posts filtered by publish phase.")
+                .implementation(Post.PostPhase.class)
+                .required(false))
+            .parameter(parameterBuilder()
+                .in(ParameterIn.QUERY)
+                .name("keyword")
+                .description("Posts filtered by keyword.")
+                .implementation(String.class)
+                .required(false));
     }
 }

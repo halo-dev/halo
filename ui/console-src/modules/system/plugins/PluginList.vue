@@ -1,42 +1,34 @@
 <script lang="ts" setup>
 import {
+  Dialog,
   IconAddCircle,
   IconPlug,
   IconRefreshLine,
   VButton,
   VCard,
-  VEmpty,
-  VPageHeader,
-  VSpace,
-  VLoading,
-  Dialog,
   VDropdown,
   VDropdownItem,
+  VEmpty,
+  VLoading,
+  VPageHeader,
+  VSpace,
 } from "@halo-dev/components";
 import PluginListItem from "./components/PluginListItem.vue";
 import PluginInstallationModal from "./components/PluginInstallationModal.vue";
-import { computed, ref, onMounted } from "vue";
+import type { Ref } from "vue";
+import { computed, onMounted, provide, ref, watch } from "vue";
 import { apiClient } from "@/utils/api-client";
 import { usePermission } from "@/utils/permission";
 import { useQuery } from "@tanstack/vue-query";
 import { PluginStatusPhaseEnum, type Plugin } from "@halo-dev/api-client";
 import { useI18n } from "vue-i18n";
 import { useRouteQuery } from "@vueuse/router";
-import { watch } from "vue";
-import { provide } from "vue";
-import type { Ref } from "vue";
 import { usePluginBatchOperations } from "./composables/use-plugin";
 
 const { t } = useI18n();
 const { currentUserHasPermission } = usePermission();
 
-const pluginInstallationModal = ref(false);
-const pluginToUpgrade = ref<Plugin>();
-
-function handleOpenUploadModal(plugin?: Plugin) {
-  pluginToUpgrade.value = plugin;
-  pluginInstallationModal.value = true;
-}
+const pluginInstallationModalVisible = ref(false);
 
 const keyword = ref("");
 
@@ -135,7 +127,7 @@ onMounted(() => {
       confirmText: t("core.common.buttons.download"),
       cancelText: t("core.common.buttons.cancel"),
       onConfirm() {
-        handleOpenUploadModal();
+        pluginInstallationModalVisible.value = true;
       },
       onCancel() {
         routeRemoteDownloadUrl.value = null;
@@ -146,9 +138,11 @@ onMounted(() => {
 </script>
 <template>
   <PluginInstallationModal
-    v-if="currentUserHasPermission(['system:plugins:manage'])"
-    v-model:visible="pluginInstallationModal"
-    :plugin-to-upgrade="pluginToUpgrade"
+    v-if="
+      pluginInstallationModalVisible &&
+      currentUserHasPermission(['system:plugins:manage'])
+    "
+    @close="pluginInstallationModalVisible = false"
   />
 
   <VPageHeader :title="$t('core.plugin.title')">
@@ -159,7 +153,7 @@ onMounted(() => {
       <VButton
         v-permission="['system:plugins:manage']"
         type="secondary"
-        @click="handleOpenUploadModal()"
+        @click="pluginInstallationModalVisible = true"
       >
         <template #icon>
           <IconAddCircle class="h-full w-full" />
@@ -291,7 +285,7 @@ onMounted(() => {
               <VButton
                 v-permission="['system:plugins:manage']"
                 type="secondary"
-                @click="handleOpenUploadModal"
+                @click="pluginInstallationModalVisible = true"
               >
                 <template #icon>
                   <IconAddCircle class="h-full w-full" />
@@ -312,7 +306,6 @@ onMounted(() => {
             <PluginListItem
               :plugin="plugin"
               :is-selected="selectedNames.includes(plugin.metadata.name)"
-              @open-upgrade-modal="handleOpenUploadModal"
             />
           </li>
         </ul>

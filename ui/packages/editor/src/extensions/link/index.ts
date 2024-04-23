@@ -15,6 +15,11 @@ const Link = TiptapLink.extend<ExtensionOptions & LinkOptions>({
     };
   },
 
+  addPasteRules() {
+    // Remove the function of pasted text parsing as a link
+    return [];
+  },
+
   renderHTML({ HTMLAttributes }) {
     const href = HTMLAttributes.href;
     // False positive; we're explicitly checking for javascript: links to ignore them

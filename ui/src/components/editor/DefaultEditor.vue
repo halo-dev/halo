@@ -17,7 +17,6 @@ import {
   ExtensionOrderedList,
   ExtensionStrike,
   ExtensionText,
-  ExtensionImage,
   ExtensionTaskList,
   ExtensionLink,
   ExtensionTextAlign,
@@ -29,8 +28,6 @@ import {
   ExtensionHighlight,
   ExtensionCommands,
   ExtensionIframe,
-  ExtensionVideo,
-  ExtensionAudio,
   ExtensionCodeBlock,
   ExtensionFontSize,
   ExtensionColor,
@@ -50,6 +47,8 @@ import {
   DecorationSet,
   ExtensionListKeymap,
   ExtensionSearchAndReplace,
+  ExtensionClearFormat,
+  ExtensionFormatBrush,
 } from "@halo-dev/richtext-editor";
 // ui custom extension
 import {
@@ -213,10 +212,6 @@ onMounted(() => {
     emit("update", html);
   }, 250);
 
-  const image = currentUserHasPermission(["uc:attachments:manage"])
-    ? UiExtensionImage
-    : ExtensionImage;
-
   editor.value = new Editor({
     content: props.raw,
     extensions: [
@@ -239,7 +234,7 @@ onMounted(() => {
       ExtensionOrderedList,
       ExtensionStrike,
       ExtensionText,
-      image.configure({
+      UiExtensionImage.configure({
         inline: true,
         allowBase64: false,
         HTMLAttributes: {
@@ -249,7 +244,7 @@ onMounted(() => {
       }),
       ExtensionTaskList,
       ExtensionLink.configure({
-        autolink: true,
+        autolink: false,
         openOnClick: false,
       }),
       ExtensionTextAlign.configure({
@@ -272,16 +267,12 @@ onMounted(() => {
         lowlight,
       }),
       ExtensionIframe,
-      currentUserHasPermission(["uc:attachments:manage"])
-        ? UiExtensionVideo.configure({
-            uploadVideo: props.uploadImage,
-          })
-        : ExtensionVideo,
-      currentUserHasPermission(["uc:attachments:manage"])
-        ? UiExtensionAudio.configure({
-            uploadAudio: props.uploadImage,
-          })
-        : ExtensionAudio,
+      UiExtensionVideo.configure({
+        uploadVideo: props.uploadImage,
+      }),
+      UiExtensionAudio.configure({
+        uploadAudio: props.uploadImage,
+      }),
       ExtensionCharacterCount,
       ExtensionFontSize,
       ExtensionColor,
@@ -407,6 +398,8 @@ onMounted(() => {
       ExtensionListKeymap,
       UiExtensionUpload,
       ExtensionSearchAndReplace,
+      ExtensionClearFormat,
+      ExtensionFormatBrush,
     ],
     parseOptions: {
       preserveWhitespace: true,

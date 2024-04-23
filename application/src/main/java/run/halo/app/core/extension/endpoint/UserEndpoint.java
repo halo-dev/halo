@@ -14,7 +14,7 @@ import static run.halo.app.extension.index.query.QueryFactory.and;
 import static run.halo.app.extension.index.query.QueryFactory.contains;
 import static run.halo.app.extension.index.query.QueryFactory.equal;
 import static run.halo.app.extension.index.query.QueryFactory.or;
-import static run.halo.app.extension.router.QueryParamBuildUtil.buildParametersFromType;
+import static run.halo.app.extension.router.QueryParamBuildUtil.sortParameter;
 import static run.halo.app.extension.router.selector.SelectorUtil.labelAndFieldSelectorToListOptions;
 import static run.halo.app.security.authorization.AuthorityUtils.authoritiesToRoles;
 
@@ -42,7 +42,7 @@ import java.util.stream.Collectors;
 import lombok.Data;
 import lombok.RequiredArgsConstructor;
 import org.apache.commons.lang3.StringUtils;
-import org.springdoc.core.fn.builders.requestbody.Builder;
+import org.springdoc.core.fn.builders.operation.Builder;
 import org.springdoc.webflux.core.fn.SpringdocRouteBuilder;
 import org.springframework.core.io.buffer.DataBuffer;
 import org.springframework.dao.OptimisticLockingFailureException;
@@ -89,6 +89,7 @@ import run.halo.app.infra.SystemConfigurableEnvironmentFetcher;
 import run.halo.app.infra.SystemSetting;
 import run.halo.app.infra.ValidationUtils;
 import run.halo.app.infra.exception.RateLimitExceededException;
+import run.halo.app.infra.exception.UnsatisfiedAttributeValueException;
 import run.halo.app.infra.utils.JsonUtils;
 import run.halo.app.security.authentication.twofactor.TwoFactorAuthentication;
 
@@ -160,9 +161,19 @@ public class UserEndpoint implements CustomEndpoint {
                         .description("User name")
                         .required(true))
                     .response(responseBuilder().implementation(UserPermission.class)))
-            .PUT("/users/{name}/password", this::changePassword,
-                builder -> builder.operationId("ChangePassword")
-                    .description("Change password of user.")
+            .PUT("/users/-/password", this::changeOwnPassword,
+                builder -> builder.operationId("ChangeOwnPassword")
+                    .description("Change own password of user.")
+                    .tag(tag)
+                    .requestBody(requestBodyBuilder()
+                        .required(true)
+                        .implementation(ChangeOwnPasswordRequest.class))
+                    .response(responseBuilder()
+                        .implementation(User.class))
+            )
+            .PUT("/users/{name}/password", this::changeAnyonePasswordForAdmin,
+                builder -> builder.operationId("ChangeAnyonePassword")
+                    .description("Change anyone password of user for admin.")
                     .tag(tag)
                     .parameter(parameterBuilder().in(ParameterIn.PATH).name("name")
                         .description(
@@ -181,7 +192,7 @@ public class UserEndpoint implements CustomEndpoint {
                     .description("List users")
                     .response(responseBuilder()
                         .implementation(generateGenericClass(ListedUser.class)));
-                buildParametersFromType(builder, ListRequest.class);
+                ListRequest.buildParameters(builder);
             })
             .POST("users/{name}/avatar", contentType(MediaType.MULTIPART_FORM_DATA),
                 this::uploadUserAvatar,
@@ -195,7 +206,7 @@ public class UserEndpoint implements CustomEndpoint {
                         .description("User name")
                         .required(true)
                     )
-                    .requestBody(Builder.requestBodyBuilder()
+                    .requestBody(requestBodyBuilder()
                         .required(true)
                         .content(contentBuilder()
                             .mediaType(MediaType.MULTIPART_FORM_DATA_VALUE)
@@ -520,7 +531,7 @@ public class UserEndpoint implements CustomEndpoint {
             .flatMap(updatedUser -> ServerResponse.ok().bodyValue(updatedUser));
     }
 
-    Mono<ServerResponse> changePassword(ServerRequest request) {
+    Mono<ServerResponse> changeAnyonePasswordForAdmin(ServerRequest request) {
         final var nameInPath = request.pathVariable("name");
         return ReactiveSecurityContextHolder.getContext()
             .map(ctx -> SELF_USER.equals(nameInPath) ? ctx.getAuthentication().getName()
@@ -536,6 +547,40 @@ public class UserEndpoint implements CustomEndpoint {
             .flatMap(updatedUser -> ServerResponse.ok()
                 .contentType(MediaType.APPLICATION_JSON)
                 .bodyValue(updatedUser));
+    }
+
+    Mono<ServerResponse> changeOwnPassword(ServerRequest request) {
+        return ReactiveSecurityContextHolder.getContext()
+            .map(ctx -> ctx.getAuthentication().getName())
+            .flatMap(username -> request.bodyToMono(ChangeOwnPasswordRequest.class)
+                .switchIfEmpty(Mono.defer(() ->
+                    Mono.error(new ServerWebInputException("Request body is empty"))))
+                .flatMap(changePasswordRequest -> {
+                    var rawOldPassword = changePasswordRequest.oldPassword();
+                    return userService.confirmPassword(username, rawOldPassword)
+                        .filter(Boolean::booleanValue)
+                        .switchIfEmpty(Mono.error(new UnsatisfiedAttributeValueException(
+                            "Old password is incorrect.",
+                            "problemDetail.user.oldPassword.notMatch",
+                            null))
+                        )
+                        .thenReturn(changePasswordRequest);
+                })
+                .flatMap(changePasswordRequest -> {
+                    var password = changePasswordRequest.password();
+                    // encode password
+                    return userService.updateWithRawPassword(username, password);
+                }))
+            .flatMap(updatedUser -> ServerResponse.ok()
+                .contentType(MediaType.APPLICATION_JSON)
+                .bodyValue(updatedUser));
+    }
+
+    record ChangeOwnPasswordRequest(
+        @Schema(description = "Old password.", requiredMode = REQUIRED)
+        String oldPassword,
+        @Schema(description = "New password.", requiredMode = REQUIRED, minLength = 6)
+        String password) {
     }
 
     record ChangePasswordRequest(
@@ -738,6 +783,24 @@ public class UserEndpoint implements CustomEndpoint {
             listOptions.setFieldSelector(FieldSelector.of(fieldQuery));
             return listOptions;
         }
+
+        public static void buildParameters(Builder builder) {
+            IListRequest.buildParameters(builder);
+            builder.parameter(sortParameter())
+                .parameter(parameterBuilder()
+                    .in(ParameterIn.QUERY)
+                    .name("keyword")
+                    .description("Keyword to search")
+                    .implementation(String.class)
+                    .required(false))
+                .parameter(parameterBuilder()
+                    .in(ParameterIn.QUERY)
+                    .name("role")
+                    .description("Role name")
+                    .implementation(String.class)
+                    .required(false));
+        }
+
     }
 
     record ListedUser(@Schema(requiredMode = REQUIRED) User user,

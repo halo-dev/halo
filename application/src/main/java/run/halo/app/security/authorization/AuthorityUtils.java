@@ -24,6 +24,8 @@ public enum AuthorityUtils {
 
     public static final String ANONYMOUS_ROLE_NAME = "anonymous";
 
+    public static final String COMMENT_MANAGEMENT_ROLE_NAME = "role-template-manage-comments";
+
     /**
      * Converts an array of GrantedAuthority objects to a role set.
      *

@@ -22,7 +22,6 @@ import run.halo.app.core.extension.endpoint.CustomEndpoint;
 import run.halo.app.core.extension.notification.Notification;
 import run.halo.app.extension.GroupVersion;
 import run.halo.app.extension.ListResult;
-import run.halo.app.extension.router.QueryParamBuildUtil;
 import run.halo.app.notification.UserNotificationQuery;
 import run.halo.app.notification.UserNotificationService;
 
@@ -64,8 +63,7 @@ public class UserNotificationEndpoint implements CustomEndpoint {
                         .response(responseBuilder()
                             .implementation(ListResult.generateGenericClass(Notification.class))
                         );
-                    QueryParamBuildUtil.buildParametersFromType(builder,
-                        UserNotificationQuery.class);
+                    UserNotificationQuery.buildParameters(builder);
                 }
             )
             .PUT("/notifications/{name}/mark-as-read", this::markNotificationAsRead,

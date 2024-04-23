@@ -179,6 +179,8 @@ core:
           publish_time_asc: Publicado más antiguo
           create_time_desc: Creado más reciente
           create_time_asc: Creado más antiguo
+          visit_desc: Máximo de visitas
+          comment_desc: Número máximo de comentarios
     list:
       fields:
         categories: "Categorías:"

@@ -8,16 +8,19 @@ import static run.halo.app.extension.index.query.QueryFactory.isNull;
 import static run.halo.app.extension.index.query.QueryFactory.or;
 
 import java.security.Principal;
+import java.util.HashMap;
 import java.util.Optional;
 import java.util.function.Function;
 import lombok.RequiredArgsConstructor;
 import org.apache.commons.lang3.BooleanUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.data.domain.Sort;
 import org.springframework.lang.Nullable;
 import org.springframework.security.core.context.ReactiveSecurityContextHolder;
 import org.springframework.security.core.context.SecurityContext;
 import org.springframework.stereotype.Component;
 import org.springframework.util.Assert;
+import org.springframework.util.DigestUtils;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import run.halo.app.content.comment.OwnerInfo;
@@ -99,7 +102,7 @@ public class CommentPublicQueryServiceImpl implements CommentPublicQueryService 
     public Mono<ListResult<CommentWithReplyVo>> convertToWithReplyVo(ListResult<CommentVo> comments,
         int replySize) {
         return Flux.fromIterable(comments.getItems())
-            .flatMap(commentVo -> {
+            .concatMap(commentVo -> {
                 var commentName = commentVo.getMetadata().getName();
                 return listReply(commentName, 1, replySize)
                     .map(replyList -> CommentWithReplyVo.from(commentVo)
@@ -167,6 +170,15 @@ public class CommentPublicQueryServiceImpl implements CommentPublicQueryService 
         commentVo.getSpec().setIpAddress("");
         var specOwner = commentVo.getSpec().getOwner();
         specOwner.setName("");
+        var email = owner.getEmail();
+        if (StringUtils.isNotBlank(email)) {
+            var emailHash = DigestUtils.md5DigestAsHex(email.getBytes());
+            if (specOwner.getAnnotations() == null) {
+                specOwner.setAnnotations(new HashMap<>(2));
+            }
+            specOwner.getAnnotations()
+                .put(Comment.CommentOwner.EMAIL_HASH_ANNO, emailHash);
+        }
         if (specOwner.getAnnotations() != null) {
             specOwner.getAnnotations().remove("Email");
         }
@@ -210,6 +222,15 @@ public class CommentPublicQueryServiceImpl implements CommentPublicQueryService 
         replyVo.getSpec().setIpAddress("");
         var specOwner = replyVo.getSpec().getOwner();
         specOwner.setName("");
+        var email = owner.getEmail();
+        if (StringUtils.isNotBlank(email)) {
+            var emailHash = DigestUtils.md5DigestAsHex(email.getBytes());
+            if (specOwner.getAnnotations() == null) {
+                specOwner.setAnnotations(new HashMap<>(2));
+            }
+            specOwner.getAnnotations()
+                .put(Comment.CommentOwner.EMAIL_HASH_ANNO, emailHash);
+        }
         if (specOwner.getAnnotations() != null) {
             specOwner.getAnnotations().remove("Email");
         }
