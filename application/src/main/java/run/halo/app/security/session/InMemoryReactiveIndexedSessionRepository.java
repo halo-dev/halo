@@ -64,9 +64,8 @@ public class InMemoryReactiveIndexedSessionRepository extends ReactiveMapSession
     public Mono<Map<String, MapSession>> findByIndexNameAndIndexValue(String indexName,
         String indexValue) {
         var indexKey = new IndexKey(indexName, indexValue);
-        return Flux.fromIterable(indexSessionIdMap.getOrDefault(indexKey, Set.of()))
+        return Flux.fromStream((() -> indexSessionIdMap.getOrDefault(indexKey, Set.of()).stream()))
             .flatMap(this::findById)
-            .filter(session -> invalidateSessionIds.getIfPresent(session.getId()) == null)
             .collectMap(Session::getId);
     }
 

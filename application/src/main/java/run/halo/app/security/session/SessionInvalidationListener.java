@@ -32,7 +32,7 @@ public class SessionInvalidationListener {
             .map(Map::keySet)
             .flatMapMany(Flux::fromIterable)
             .flatMap(sessionRepository::deleteById)
-            .collectList()
-            .blockOptional();
+            .then()
+            .block();
     }
 }
