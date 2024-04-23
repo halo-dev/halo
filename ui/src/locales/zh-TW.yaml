@@ -1083,6 +1083,9 @@ core:
           label: 電子郵件信箱
         new_email:
           label: 新電子郵件信箱
+        password:
+          label: 驗證密碼
+          help: 目前帳號的登入密碼
       operations:
         send_code:
           buttons:

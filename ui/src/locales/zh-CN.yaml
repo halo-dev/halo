@@ -1106,6 +1106,9 @@ core:
           label: 电子邮箱
         code:
           label: 验证码
+        password:
+          label: 验证密码
+          help: 当前账号的登录密码
       operations:
         send_code:
           buttons:

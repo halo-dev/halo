@@ -37,6 +37,12 @@ export interface CommentStatus {
      * @type {number}
      * @memberof CommentStatus
      */
+    'observedVersion'?: number;
+    /**
+     * 
+     * @type {number}
+     * @memberof CommentStatus
+     */
     'replyCount'?: number;
     /**
      * 

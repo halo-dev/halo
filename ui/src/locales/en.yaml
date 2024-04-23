@@ -1161,6 +1161,9 @@ core:
           label: Email address
         new_email:
           label: New email address
+        password:
+          label: Password
+          help: The login password for the current account
       operations:
         send_code:
           buttons:

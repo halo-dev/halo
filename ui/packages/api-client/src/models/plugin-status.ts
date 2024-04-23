@@ -79,8 +79,7 @@ export const PluginStatusLastProbeStateEnum = {
     Resolved: 'RESOLVED',
     Started: 'STARTED',
     Stopped: 'STOPPED',
-    Failed: 'FAILED',
-    Unloaded: 'UNLOADED'
+    Failed: 'FAILED'
 } as const;
 
 export type PluginStatusLastProbeStateEnum = typeof PluginStatusLastProbeStateEnum[keyof typeof PluginStatusLastProbeStateEnum];

@@ -17,20 +17,14 @@
 /**
  * 
  * @export
- * @interface VerifyCodeRequest
+ * @interface ReplyStatus
  */
-export interface VerifyCodeRequest {
+export interface ReplyStatus {
     /**
      * 
-     * @type {string}
-     * @memberof VerifyCodeRequest
+     * @type {number}
+     * @memberof ReplyStatus
      */
-    'code': string;
-    /**
-     * 
-     * @type {string}
-     * @memberof VerifyCodeRequest
-     */
-    'password': string;
+    'observedVersion'?: number;
 }
 
