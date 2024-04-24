@@ -38,6 +38,7 @@ import org.springframework.web.reactive.result.view.ViewResolver;
 import reactor.core.publisher.Mono;
 import run.halo.app.console.ProxyFilter;
 import run.halo.app.console.WebSocketRequestPredicate;
+import run.halo.app.core.endpoint.WebSocketHandlerMapping;
 import run.halo.app.core.extension.endpoint.CustomEndpoint;
 import run.halo.app.core.extension.endpoint.CustomEndpointsBuilder;
 import run.halo.app.infra.properties.HaloProperties;
@@ -98,6 +99,13 @@ public class WebFluxConfig implements WebFluxConfigurer {
         var builder = new CustomEndpointsBuilder();
         context.getBeansOfType(CustomEndpoint.class).values().forEach(builder::add);
         return builder.build();
+    }
+
+    @Bean
+    public WebSocketHandlerMapping webSocketHandlerMapping() {
+        WebSocketHandlerMapping handlerMapping = new WebSocketHandlerMapping();
+        handlerMapping.setOrder(-2);
+        return handlerMapping;
     }
 
     @Bean

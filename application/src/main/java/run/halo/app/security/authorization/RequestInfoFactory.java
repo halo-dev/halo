@@ -6,6 +6,7 @@ import java.util.Set;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.http.server.PathContainer;
 import org.springframework.http.server.reactive.ServerHttpRequest;
+import run.halo.app.console.WebSocketUtils;
 
 /**
  * Creates {@link RequestInfo} from {@link ServerHttpRequest}.
@@ -214,6 +215,10 @@ public class RequestInfoFactory {
             if (Boolean.parseBoolean(deleteAll)) {
                 requestInfo.verb = "deletecollection";
             }
+        }
+        if ("list".equals(requestInfo.verb)
+            && WebSocketUtils.isWebSocketUpgrade(request.getHeaders())) {
+            requestInfo.verb = "watch";
         }
         return requestInfo;
     }
