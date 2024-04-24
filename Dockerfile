@@ -1,6 +1,6 @@
 FROM eclipse-temurin:21-jre as builder
 
-WORKDIR /application
+WORKDIR application
 ARG JAR_FILE=application/build/libs/*.jar
 COPY ${JAR_FILE} application.jar
 RUN java -Djarmode=layertools -jar application.jar extract
@@ -9,7 +9,7 @@ RUN java -Djarmode=layertools -jar application.jar extract
 
 FROM ibm-semeru-runtimes:open-21-jre
 LABEL maintainer="johnniang <johnniang@foxmail.com>"
-WORKDIR /application
+WORKDIR application
 COPY --from=builder application/dependencies/ ./
 COPY --from=builder application/spring-boot-loader/ ./
 COPY --from=builder application/snapshot-dependencies/ ./
