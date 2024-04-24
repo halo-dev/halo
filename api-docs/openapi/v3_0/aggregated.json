@@ -3585,6 +3585,88 @@
         ]
       }
     },
+    "/apis/api.console.halo.run/v1alpha1/tags": {
+      "get": {
+        "description": "List Post Tags.",
+        "operationId": "ListPostTags",
+        "parameters": [
+          {
+            "description": "Page number. Default is 0.",
+            "in": "query",
+            "name": "page",
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          },
+          {
+            "description": "Size number. Default is 0.",
+            "in": "query",
+            "name": "size",
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          },
+          {
+            "description": "Label selector. e.g.: hidden!\u003dtrue",
+            "in": "query",
+            "name": "labelSelector",
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            }
+          },
+          {
+            "description": "Field selector. e.g.: metadata.name\u003d\u003dhalo",
+            "in": "query",
+            "name": "fieldSelector",
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            }
+          },
+          {
+            "description": "Sorting criteria in the format: property,(asc|desc). Default sort order is ascending. Multiple sort criteria are supported.",
+            "in": "query",
+            "name": "sort",
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            }
+          },
+          {
+            "description": "Post tags filtered by keyword.",
+            "in": "query",
+            "name": "keyword",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "default": {
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/TagList"
+                }
+              }
+            },
+            "description": "default response"
+          }
+        },
+        "tags": [
+          "api.console.halo.run/v1alpha1/Tag"
+        ]
+      }
+    },
     "/apis/api.console.halo.run/v1alpha1/themes": {
       "get": {
         "description": "List themes.",
@@ -13467,6 +13549,10 @@
             "type": "string",
             "format": "date-time"
           },
+          "observedVersion": {
+            "type": "integer",
+            "format": "int64"
+          },
           "replyCount": {
             "type": "integer",
             "format": "int32"
@@ -16437,8 +16523,7 @@
               "RESOLVED",
               "STARTED",
               "STOPPED",
-              "FAILED",
-              "UNLOADED"
+              "FAILED"
             ]
           },
           "lastStartTime": {
@@ -17469,7 +17554,8 @@
           "apiVersion",
           "kind",
           "metadata",
-          "spec"
+          "spec",
+          "status"
         ],
         "type": "object",
         "properties": {
@@ -17484,6 +17570,9 @@
           },
           "spec": {
             "$ref": "#/components/schemas/ReplySpec"
+          },
+          "status": {
+            "$ref": "#/components/schemas/ReplyStatus"
           }
         }
       },
@@ -17639,6 +17728,15 @@
           },
           "userAgent": {
             "type": "string"
+          }
+        }
+      },
+      "ReplyStatus": {
+        "type": "object",
+        "properties": {
+          "observedVersion": {
+            "type": "integer",
+            "format": "int64"
           }
         }
       },

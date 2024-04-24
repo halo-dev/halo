@@ -421,6 +421,18 @@ watch(selectedPostNames, (newValue) => {
                     value: 'metadata.creationTimestamp,asc',
                   },
                   {
+                    label: t(
+                      'core.post.filters.sort.items.last_modify_time_desc'
+                    ),
+                    value: 'status.lastModifyTime,desc',
+                  },
+                  {
+                    label: t(
+                      'core.post.filters.sort.items.last_modify_time_asc'
+                    ),
+                    value: 'status.lastModifyTime,asc',
+                  },
+                  {
                     label: t('core.post.filters.sort.items.visit_desc'),
                     value: 'stats.visit,desc',
                   },

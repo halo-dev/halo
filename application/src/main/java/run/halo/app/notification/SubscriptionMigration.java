@@ -6,20 +6,19 @@ import static run.halo.app.extension.index.query.QueryFactory.isNull;
 import static run.halo.app.extension.index.query.QueryFactory.notEqual;
 import static run.halo.app.extension.index.query.QueryFactory.startsWith;
 
-import java.time.Duration;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.function.Consumer;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.context.event.ApplicationStartedEvent;
 import org.springframework.context.ApplicationListener;
-import org.springframework.dao.OptimisticLockingFailureException;
 import org.springframework.data.domain.Sort;
 import org.springframework.lang.NonNull;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Component;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
-import reactor.util.retry.Retry;
 import run.halo.app.content.NotificationReasonConst;
 import run.halo.app.core.extension.User;
 import run.halo.app.core.extension.content.Comment;
@@ -43,6 +42,7 @@ import run.halo.app.infra.ReactiveExtensionPaginatedIterator;
  * @author guqing
  * @since 2.15.0
  */
+@Slf4j
 @Component
 @RequiredArgsConstructor
 public class SubscriptionMigration implements ApplicationListener<ApplicationStartedEvent> {
@@ -51,6 +51,7 @@ public class SubscriptionMigration implements ApplicationListener<ApplicationSta
     private final SubscriptionService subscriptionService;
 
     @Override
+    @Async
     public void onApplicationEvent(@NonNull ApplicationStartedEvent event) {
         handleAnonymousSubscription();
         cleanupUserSubscription();
@@ -70,6 +71,7 @@ public class SubscriptionMigration implements ApplicationListener<ApplicationSta
     }
 
     private void handleAnonymousSubscription() {
+        log.debug("Start to collating anonymous subscription...");
         Set<String> anonymousSubscribers = new HashSet<>();
         deleteAnonymousSubscription(subscription -> {
             var name = subscription.getSpec().getSubscriber().getName();
@@ -84,6 +86,7 @@ public class SubscriptionMigration implements ApplicationListener<ApplicationSta
             createSubscription(anonymousSubscriber,
                 "props.repliedOwner == '%s'".formatted(anonymousSubscriber));
         }
+        log.debug("Collating anonymous subscription completed.");
     }
 
     private Mono<Void> deleteAnonymousSubscription(Consumer<Subscription> consumer) {
@@ -91,7 +94,11 @@ public class SubscriptionMigration implements ApplicationListener<ApplicationSta
             .flatMap(page -> Flux.fromIterable(page.getItems())
                 .flatMap(subscriptionService::remove)
                 .doOnNext(consumer)
-                .then(page.hasNext() ? deleteAnonymousSubscription(consumer) : Mono.empty())
+                .doOnNext(subscription -> log.debug("Deleted anonymous subscription: {}",
+                    subscription.getMetadata().getName())
+                )
+                .then(Mono.defer(
+                    () -> page.hasNext() ? deleteAnonymousSubscription(consumer) : Mono.empty()))
             );
     }
 
@@ -142,8 +149,10 @@ public class SubscriptionMigration implements ApplicationListener<ApplicationSta
         var unsubscribeReplyOnReply = notificationCenter.unsubscribe(subscriber, replyOnReply);
 
         return Mono.when(unsubscribeCommentOnPost, unsubscribeCommentOnPage,
-            unsubscribeReplyOnComment,
-            unsubscribeReplyOnReply);
+                unsubscribeReplyOnComment,
+                unsubscribeReplyOnReply)
+            .doOnSuccess(unused ->
+                log.debug("Collating internal subscription for user: {} completed", username));
     }
 
     <E extends Extension> Subscription.InterestReason createInterestReason(String type,

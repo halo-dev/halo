@@ -73,7 +73,7 @@ const handleChangePassword = async () => {
       changeOwnPasswordRequest,
     });
 
-    onVisibleChange(false);
+    window.location.reload();
   } catch (e) {
     console.error(e);
   } finally {

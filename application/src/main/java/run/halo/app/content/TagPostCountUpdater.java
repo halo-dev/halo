@@ -6,13 +6,10 @@ import static run.halo.app.extension.index.query.QueryFactory.equal;
 import static run.halo.app.extension.index.query.QueryFactory.isNull;
 
 import com.google.common.collect.Sets;
-import java.time.Duration;
-import java.time.Instant;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 import org.apache.commons.lang3.StringUtils;
-import org.springframework.context.SmartLifecycle;
 import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Component;
 import run.halo.app.core.extension.content.Post;
@@ -25,12 +22,6 @@ import run.halo.app.extension.ExtensionClient;
 import run.halo.app.extension.ListOptions;
 import run.halo.app.extension.MetadataUtil;
 import run.halo.app.extension.PageRequestImpl;
-import run.halo.app.extension.controller.Controller;
-import run.halo.app.extension.controller.ControllerBuilder;
-import run.halo.app.extension.controller.DefaultController;
-import run.halo.app.extension.controller.DefaultQueue;
-import run.halo.app.extension.controller.Reconciler;
-import run.halo.app.extension.controller.RequestQueue;
 import run.halo.app.extension.router.selector.FieldSelector;
 import run.halo.app.extension.router.selector.LabelSelector;
 import run.halo.app.infra.utils.JsonUtils;
@@ -43,24 +34,10 @@ import run.halo.app.infra.utils.JsonUtils;
  */
 @Component
 public class TagPostCountUpdater
-    implements Reconciler<TagPostCountUpdater.PostRelatedTags>, SmartLifecycle {
+    extends AbstractEventReconciler<TagPostCountUpdater.PostRelatedTags> {
 
-    private final RequestQueue<PostRelatedTags> tagQueue;
-
-    private final Controller postEventController;
-
-    private final ExtensionClient client;
-
-    private volatile boolean running = false;
-
-    /**
-     * Construct a {@link TagPostCountUpdater} with the given {@link ExtensionClient}.
-     */
     public TagPostCountUpdater(ExtensionClient client) {
-        this.client = client;
-
-        this.tagQueue = new DefaultQueue<>(Instant::now);
-        this.postEventController = this.setupWith(null);
+        super(TagPostCountUpdater.class.getName(), client);
     }
 
     @Override
@@ -84,36 +61,6 @@ public class TagPostCountUpdater
         return Result.doNotRetry();
     }
 
-
-    @Override
-    public Controller setupWith(ControllerBuilder builder) {
-        return new DefaultController<>(
-            this.getClass().getName(),
-            this,
-            tagQueue,
-            null,
-            Duration.ofMillis(100),
-            Duration.ofMinutes(10)
-        );
-    }
-
-    @Override
-    public void start() {
-        postEventController.start();
-        running = true;
-    }
-
-    @Override
-    public void stop() {
-        running = false;
-        postEventController.dispose();
-    }
-
-    @Override
-    public boolean isRunning() {
-        return running;
-    }
-
     /**
      * Listen to post event to calculate post related to tag for updating.
      */
@@ -122,14 +69,14 @@ public class TagPostCountUpdater
         var postName = postEvent.getName();
         if (postEvent instanceof PostUpdatedEvent) {
             var tagsToUpdate = calcTagsToUpdate(postEvent.getName());
-            tagQueue.addImmediately(new PostRelatedTags(postName, tagsToUpdate));
+            queue.addImmediately(new PostRelatedTags(postName, tagsToUpdate));
             return;
         }
 
         if (postEvent instanceof PostDeletedEvent deletedEvent) {
             var tags = defaultIfNull(deletedEvent.getPost().getSpec().getTags(),
                 List.<String>of());
-            tagQueue.addImmediately(new PostRelatedTags(postName, Sets.newHashSet(tags)));
+            queue.addImmediately(new PostRelatedTags(postName, Sets.newHashSet(tags)));
         }
     }
 
