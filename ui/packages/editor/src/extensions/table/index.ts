@@ -526,23 +526,23 @@ const Table = TiptapTable.extend<ExtensionOptions & TableOptions>({
         return true;
       },
       Tab: ({ editor }) => {
-        const { selection } = editor.state;
+        const { state } = editor;
         if (!isActive(editor.state, Table.name)) {
           return false;
         }
         let nextView = editor.view;
         let nextTr = editor.state.tr;
-        let nextCell = findNextCell(selection);
+
+        let nextCell = findNextCell(state);
         if (!nextCell) {
           // If it is the last cell, create a new line and jump to the first cell of the new line.
           editor
             .chain()
             .addRowAfter()
-            .command(({ tr, view }) => {
+            .command(({ tr, view, state }) => {
               nextView = view;
               nextTr = tr;
-              const { selection } = tr;
-              nextCell = findNextCell(selection);
+              nextCell = findNextCell(state);
               return true;
             });
         }
@@ -555,17 +555,18 @@ const Table = TiptapTable.extend<ExtensionOptions & TableOptions>({
               )
             )
           );
+          nextTr.scrollIntoView();
           nextView.dispatch(nextTr);
           return true;
         }
         return false;
       },
       "Shift-Tab": ({ editor }) => {
-        const { selection, tr } = editor.state;
+        const { tr } = editor.state;
         if (!isActive(editor.state, Table.name)) {
           return false;
         }
-        const previousCell = findPreviousCell(selection);
+        const previousCell = findPreviousCell(editor.state);
         if (previousCell) {
           tr.setSelection(
             new TextSelection(
@@ -575,6 +576,7 @@ const Table = TiptapTable.extend<ExtensionOptions & TableOptions>({
               )
             )
           );
+          tr.scrollIntoView();
           editor.view.dispatch(tr);
         }
         return true;
