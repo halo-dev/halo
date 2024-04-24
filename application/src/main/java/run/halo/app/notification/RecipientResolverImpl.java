@@ -38,7 +38,7 @@ public class RecipientResolverImpl implements RecipientResolver {
     @Override
     public Flux<Subscriber> resolve(Reason reason) {
         var reasonType = reason.getSpec().getReasonType();
-        return subscriptionService.list(reasonType)
+        return subscriptionService.listByPerPage(reasonType)
             .filter(this::isNotDisabled)
             .filter(subscription -> {
                 var interestReason = subscription.getSpec().getReason();

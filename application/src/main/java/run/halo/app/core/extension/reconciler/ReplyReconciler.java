@@ -46,6 +46,7 @@ public class ReplyReconciler implements Reconciler<Reconciler.Request> {
                     return;
                 }
                 if (addFinalizers(reply.getMetadata(), Set.of(FINALIZER_NAME))) {
+                    replyNotificationSubscriptionHelper.subscribeNewReplyReasonForReply(reply);
                     client.update(reply);
                     eventPublisher.publishEvent(new ReplyCreatedEvent(this, reply));
                 }
@@ -58,8 +59,6 @@ public class ReplyReconciler implements Reconciler<Reconciler.Request> {
                     );
                 }
                 client.update(reply);
-
-                replyNotificationSubscriptionHelper.subscribeNewReplyReasonForReply(reply);
 
                 eventPublisher.publishEvent(new ReplyChangedEvent(this, reply));
             });

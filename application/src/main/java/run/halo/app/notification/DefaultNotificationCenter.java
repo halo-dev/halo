@@ -73,17 +73,13 @@ public class DefaultNotificationCenter implements NotificationCenter {
 
     @Override
     public Mono<Void> unsubscribe(Subscription.Subscriber subscriber) {
-        return subscriptionService.list(subscriber)
-            .flatMap(subscriptionService::remove)
-            .then();
+        return subscriptionService.remove(subscriber).then();
     }
 
     @Override
     public Mono<Void> unsubscribe(Subscription.Subscriber subscriber,
         Subscription.InterestReason reason) {
-        return subscriptionService.list(subscriber, reason)
-            .flatMap(subscriptionService::remove)
-            .then();
+        return subscriptionService.remove(subscriber, reason).then();
     }
 
     Flux<String> getNotifiersBySubscriber(Subscriber subscriber, Reason reason) {

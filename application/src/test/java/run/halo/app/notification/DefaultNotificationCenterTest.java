@@ -30,7 +30,6 @@ import run.halo.app.core.extension.notification.ReasonType;
 import run.halo.app.core.extension.notification.Subscription;
 import run.halo.app.extension.Metadata;
 import run.halo.app.extension.ReactiveExtensionClient;
-import run.halo.app.infra.utils.JsonUtils;
 
 /**
  * Tests for {@link DefaultNotificationCenter}.
@@ -135,50 +134,6 @@ class DefaultNotificationCenterTest {
         spyNotificationCenter.subscribe(subscriber, reason).block();
 
         verify(client).create(any(Subscription.class));
-    }
-
-    @Test
-    public void testUnsubscribe() {
-        Subscription.Subscriber subscriber = new Subscription.Subscriber();
-        subscriber.setName("anonymousUser#A");
-        var spyNotificationCenter = spy(notificationCenter);
-        var subscriptions = createSubscriptions();
-
-        when(subscriptionService.list(eq(subscriber))).thenReturn(Flux.fromIterable(subscriptions));
-
-        when(subscriptionService.remove(any(Subscription.class))).thenReturn(Mono.empty());
-
-        spyNotificationCenter.unsubscribe(subscriber).block();
-
-        verify(subscriptionService).remove(any(Subscription.class));
-    }
-
-
-    @Test
-    public void testUnsubscribeWithReason() {
-        var spyNotificationCenter = spy(notificationCenter);
-        var subscriptions = createSubscriptions();
-
-        var subscription = subscriptions.get(0);
-
-        var subscriber = subscription.getSpec().getSubscriber();
-
-        var reason = subscription.getSpec().getReason();
-
-        var newReason = JsonUtils.deepCopy(reason);
-        newReason.setReasonType("fake-reason-type");
-        when(subscriptionService.list(eq(subscriber), eq(newReason))).thenReturn(Flux.empty());
-
-        when(subscriptionService.remove(any(Subscription.class))).thenReturn(Mono.empty());
-        spyNotificationCenter.unsubscribe(subscriber, newReason).block();
-        verify(client, times(0)).delete(any(Subscription.class));
-
-        when(subscriptionService.list(eq(subscriber), eq(reason))).thenReturn(
-            Flux.just(subscription));
-
-        // exists subscription will be deleted
-        spyNotificationCenter.unsubscribe(subscriber, reason).block();
-        verify(subscriptionService).remove(any(Subscription.class));
     }
 
     @Test

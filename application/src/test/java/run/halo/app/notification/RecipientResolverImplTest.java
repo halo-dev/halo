@@ -58,7 +58,7 @@ class RecipientResolverImplTest {
         reasonAttributes.put("owner", "guqing");
         reason.getSpec().setAttributes(reasonAttributes);
 
-        when(subscriptionService.list(anyString()))
+        when(subscriptionService.listByPerPage(anyString()))
             .thenReturn(Flux.just(subscription1, subscription2));
 
         recipientResolver.resolve(reason)
@@ -66,7 +66,7 @@ class RecipientResolverImplTest {
             .expectNext(new Subscriber(UserIdentity.of("guqing"), "guqing-subscription"))
             .verifyComplete();
 
-        verify(subscriptionService).list(anyString());
+        verify(subscriptionService).listByPerPage(anyString());
     }
 
     @Test
@@ -75,7 +75,7 @@ class RecipientResolverImplTest {
         subscriber.setName("test");
         Subscription subscription = createSubscription(subscriber);
 
-        when(subscriptionService.list(anyString()))
+        when(subscriptionService.listByPerPage(anyString()))
             .thenReturn(Flux.just(subscription));
 
         var reason = new Reason();
@@ -91,7 +91,7 @@ class RecipientResolverImplTest {
             .expectNext(new Subscriber(UserIdentity.of("test"), "fake-subscription"))
             .verifyComplete();
 
-        verify(subscriptionService).list(anyString());
+        verify(subscriptionService).listByPerPage(anyString());
     }
 
     @Test
@@ -108,7 +108,7 @@ class RecipientResolverImplTest {
         subscription2.getSpec().getReason().setSubject(null);
         subscription2.getSpec().getReason().setExpression("props.owner == 'guqing'");
 
-        when(subscriptionService.list(anyString()))
+        when(subscriptionService.listByPerPage(anyString()))
             .thenReturn(Flux.just(subscription1, subscription2));
 
         var reason = new Reason();
@@ -127,7 +127,7 @@ class RecipientResolverImplTest {
             .expectNextCount(1)
             .verifyComplete();
 
-        verify(subscriptionService).list(anyString());
+        verify(subscriptionService).listByPerPage(anyString());
     }
 
     @Test
