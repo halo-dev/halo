@@ -25,6 +25,11 @@ export const Upload = Extension.create({
               return false;
             }
 
+            const types = event.clipboardData.types;
+            if (types.includes("text/plain") || types.includes("text/html")) {
+              return false;
+            }
+
             const files = Array.from(event.clipboardData.files);
 
             if (files.length) {
