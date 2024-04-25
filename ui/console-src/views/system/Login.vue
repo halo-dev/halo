@@ -5,14 +5,11 @@ import { useRouteQuery } from "@vueuse/router";
 import SignupForm from "@/components/signup/SignupForm.vue";
 import SocialAuthProviders from "@/components/login/SocialAuthProviders.vue";
 import { useGlobalInfoFetch } from "@console/composables/use-global-info";
-import { useTitle } from "@vueuse/core";
-import { useI18n } from "vue-i18n";
-import { AppName } from "@/constants/app";
 import MdiKeyboardBackspace from "~icons/mdi/keyboard-backspace";
 import LocaleChange from "@/components/common/LocaleChange.vue";
+import { useAppTitle } from "@/composables/use-title";
 
 const { globalInfo } = useGlobalInfoFetch();
-const { t } = useI18n();
 
 const SIGNUP_TYPE = "signup";
 
@@ -32,14 +29,10 @@ function handleChangeType() {
 
 const isLoginType = computed(() => type.value !== SIGNUP_TYPE);
 
-useTitle(
-  computed(() => {
-    const siteTitle = globalInfo.value?.siteTitle || AppName;
-    const routeTitle = t(
-      `core.${type.value === SIGNUP_TYPE ? SIGNUP_TYPE : "login"}.title`
-    );
-    return [routeTitle, siteTitle].join(" - ");
-  })
+useAppTitle(
+  computed(
+    () => `core.${type.value === SIGNUP_TYPE ? SIGNUP_TYPE : "login"}.title`
+  )
 );
 </script>
 <template>
