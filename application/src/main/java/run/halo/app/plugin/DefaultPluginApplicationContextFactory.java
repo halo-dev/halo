@@ -29,6 +29,8 @@ import org.springframework.util.StopWatch;
 import org.springframework.web.reactive.function.server.RouterFunction;
 import org.springframework.web.reactive.function.server.ServerResponse;
 import reactor.core.Exceptions;
+import run.halo.app.core.endpoint.WebSocketEndpoint;
+import run.halo.app.core.endpoint.WebSocketEndpointManager;
 import run.halo.app.extension.ReactiveExtensionClient;
 import run.halo.app.infra.properties.HaloProperties;
 import run.halo.app.plugin.event.HaloPluginBeforeStopEvent;
@@ -125,6 +127,10 @@ public class DefaultPluginApplicationContextFactory implements PluginApplication
                 beanFactory.registerSingleton("finderManager", finderManager);
             });
 
+        rootContext.getBeanProvider(WebSocketEndpointManager.class)
+            .ifUnique(manager -> beanFactory.registerSingleton("pluginWebSocketEndpointManager",
+                new PluginWebSocketEndpointManager(manager)));
+
         rootContext.getBeanProvider(PluginRouterFunctionRegistry.class)
             .ifUnique(registry -> {
                 var pluginRouterFunctionManager = new PluginRouterFunctionManager(registry);
@@ -217,6 +223,31 @@ public class DefaultPluginApplicationContextFactory implements PluginApplication
             this.finderRegistry.register(this.pluginId, event.getApplicationContext());
         }
 
+    }
+
+    private static class PluginWebSocketEndpointManager {
+
+        private final WebSocketEndpointManager manager;
+
+        private List<WebSocketEndpoint> endpoints;
+
+        private PluginWebSocketEndpointManager(WebSocketEndpointManager manager) {
+            this.manager = manager;
+        }
+
+        @EventListener
+        public void onApplicationEvent(ContextRefreshedEvent event) {
+            var context = event.getApplicationContext();
+            this.endpoints = context.getBeanProvider(WebSocketEndpoint.class)
+                .orderedStream()
+                .toList();
+            manager.register(this.endpoints);
+        }
+
+        @EventListener
+        public void onApplicationEvent(ContextClosedEvent ignored) {
+            manager.unregister(this.endpoints);
+        }
     }
 
     private static class PluginRouterFunctionManager {
