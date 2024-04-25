@@ -8,8 +8,7 @@ import {
   VDescriptionItem,
   VTag,
 } from "@halo-dev/components";
-import type { Ref } from "vue";
-import { inject, computed } from "vue";
+import { computed, ref } from "vue";
 import type { DetailedUser, ListedAuthProvider } from "@halo-dev/api-client";
 import { rbacAnnotations } from "@/constants/annotations";
 import { formatDatetime } from "@/utils/date";
@@ -18,9 +17,8 @@ import { apiClient } from "@/utils/api-client";
 import axios from "axios";
 import { useI18n } from "vue-i18n";
 import EmailVerifyModal from "../components/EmailVerifyModal.vue";
-import { ref } from "vue";
 
-const user = inject<Ref<DetailedUser | undefined>>("user");
+withDefaults(defineProps<{ user?: DetailedUser }>(), { user: undefined });
 
 const { t } = useI18n();
 

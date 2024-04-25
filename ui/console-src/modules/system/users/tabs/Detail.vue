@@ -5,13 +5,13 @@ import {
   VDescriptionItem,
   VTag,
 } from "@halo-dev/components";
-import type { Ref } from "vue";
-import { inject } from "vue";
 import type { DetailedUser } from "@halo-dev/api-client";
 import { rbacAnnotations } from "@/constants/annotations";
 import { formatDatetime } from "@/utils/date";
 
-const user = inject<Ref<DetailedUser | undefined>>("user");
+withDefaults(defineProps<{ user?: DetailedUser }>(), {
+  user: undefined,
+});
 </script>
 <template>
   <div class="border-t border-gray-100">

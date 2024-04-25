@@ -57,6 +57,11 @@ public class ReplyReconciler implements Reconciler<Reconciler.Request> {
                         )
                     );
                 }
+
+                // version + 1 is required to truly equal version
+                // as a version will be incremented after the update
+                reply.getStatus().setObservedVersion(reply.getMetadata().getVersion() + 1);
+
                 client.update(reply);
 
                 replyNotificationSubscriptionHelper.subscribeNewReplyReasonForReply(reply);
