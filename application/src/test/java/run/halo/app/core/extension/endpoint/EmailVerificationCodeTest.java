@@ -24,6 +24,7 @@ import org.springframework.test.web.reactive.server.WebTestClient;
 import reactor.core.publisher.Mono;
 import run.halo.app.core.extension.User;
 import run.halo.app.core.extension.service.EmailVerificationService;
+import run.halo.app.core.extension.service.UserService;
 import run.halo.app.extension.Metadata;
 import run.halo.app.extension.ReactiveExtensionClient;
 
@@ -43,6 +44,10 @@ class EmailVerificationCodeTest {
     ReactiveExtensionClient client;
     @Mock
     EmailVerificationService emailVerificationService;
+
+    @Mock
+    UserService userService;
+
     @InjectMocks
     UserEndpoint endpoint;
 
@@ -97,9 +102,11 @@ class EmailVerificationCodeTest {
     void verifyEmail() {
         when(emailVerificationService.verify(anyString(), anyString()))
             .thenReturn(Mono.empty());
+        when(userService.confirmPassword(anyString(), anyString()))
+            .thenReturn(Mono.just(true));
         webClient.post()
             .uri("/users/-/verify-email")
-            .bodyValue(Map.of("code", "fake-code-1"))
+            .bodyValue(Map.of("code", "fake-code-1", "password", "123456"))
             .exchange()
             .expectStatus()
             .isOk();
@@ -107,7 +114,7 @@ class EmailVerificationCodeTest {
         // request again to trigger rate limit
         webClient.post()
             .uri("/users/-/verify-email")
-            .bodyValue(Map.of("code", "fake-code-2"))
+            .bodyValue(Map.of("code", "fake-code-2", "password", "123456"))
             .exchange()
             .expectStatus()
             .isEqualTo(HttpStatus.TOO_MANY_REQUESTS);
