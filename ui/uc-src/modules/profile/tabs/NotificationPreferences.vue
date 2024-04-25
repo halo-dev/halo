@@ -1,34 +1,36 @@
 <script lang="ts" setup>
 import { apiClient } from "@/utils/api-client";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/vue-query";
-import type { DetailedUser } from "@halo-dev/api-client";
+import type {
+  DetailedUser,
+  ReasonTypeNotifierRequest,
+} from "@halo-dev/api-client";
 import { VLoading, VSwitch } from "@halo-dev/components";
-import type { Ref } from "vue";
 import { computed } from "vue";
-import { inject } from "vue";
 import { cloneDeep } from "lodash-es";
-import type { ReasonTypeNotifierRequest } from "@halo-dev/api-client";
 import HasPermission from "@/components/permission/HasPermission.vue";
 
-const queryClient = useQueryClient();
+const props = withDefaults(defineProps<{ user?: DetailedUser }>(), {
+  user: undefined,
+});
 
-const user = inject<Ref<DetailedUser | undefined>>("user");
+const queryClient = useQueryClient();
 
 const { data, isLoading } = useQuery({
   queryKey: ["notification-preferences"],
   queryFn: async () => {
-    if (!user?.value) {
-      return;
+    if (!props.user) {
+      return null;
     }
 
     const { data } =
       await apiClient.notification.listUserNotificationPreferences({
-        username: user?.value?.user.metadata.name,
+        username: props.user?.user.metadata.name,
       });
 
     return data;
   },
-  enabled: computed(() => !!user?.value),
+  enabled: computed(() => !!props.user),
 });
 
 const {
@@ -48,7 +50,7 @@ const {
   }) => {
     const preferences = cloneDeep(data.value);
 
-    if (!user?.value || !preferences) {
+    if (!props.user || !preferences) {
       return;
     }
 
@@ -78,7 +80,7 @@ const {
       .filter(Boolean) as Array<ReasonTypeNotifierRequest>;
 
     return await apiClient.notification.saveUserNotificationPreferences({
-      username: user?.value?.user.metadata.name,
+      username: props.user.user.metadata.name,
       reasonTypeNotifierCollectionRequest: {
         reasonTypeNotifiers,
       },

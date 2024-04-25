@@ -11,3 +11,4 @@ export * from "./states/plugin-installation-tabs";
 export * from "./states/entity";
 export * from "./states/theme-list-tabs";
 export * from "./states/operation";
+export * from "./states/user-tab";
