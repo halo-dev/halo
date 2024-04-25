@@ -96,7 +96,6 @@ public class SubscriptionMigration implements ApplicationListener<ApplicationSta
             .doOnNext(subscription -> log.debug("Deleted anonymous subscription: {}",
                 subscription.getMetadata().getName())
             )
-            .collectList()
             .then();
     }
 

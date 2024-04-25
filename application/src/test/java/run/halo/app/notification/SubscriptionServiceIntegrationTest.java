@@ -63,6 +63,7 @@ class SubscriptionServiceIntegrationTest {
 
     @Nested
     class RemoveInitialBatchTest {
+        static int size = 310;
         private final List<Subscription> storedSubscriptions = subscriptionsForStore();
 
         @Autowired
@@ -87,7 +88,6 @@ class SubscriptionServiceIntegrationTest {
         }
 
         private List<Subscription> subscriptionsForStore() {
-            int size = 310;
             List<Subscription> subscriptions = new ArrayList<>(size);
             for (int i = 0; i < size; i++) {
                 var subscription = createSubscription();
@@ -110,7 +110,7 @@ class SubscriptionServiceIntegrationTest {
 
             subscriptionService.remove(subscriber, interestReason).block();
 
-            verify(client, times(storedSubscriptions.size())).delete(any(Subscription.class));
+            verify(client, times(size)).delete(any(Subscription.class));
         }
 
         @Test
@@ -120,7 +120,7 @@ class SubscriptionServiceIntegrationTest {
 
             subscriptionService.remove(subscriber).block();
 
-            verify(client, times(storedSubscriptions.size())).delete(any(Subscription.class));
+            verify(client, times(size)).delete(any(Subscription.class));
         }
     }
 
