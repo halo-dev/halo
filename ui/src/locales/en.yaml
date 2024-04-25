@@ -1607,6 +1607,7 @@ core:
       not_activated: Not activated
       installed: Installed
       not_installed: Not installed
+      starting_up: Starting
     text:
       none: None
       tip: Tip

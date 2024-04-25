@@ -20,7 +20,7 @@ import { computed, onMounted, provide, ref, watch } from "vue";
 import { apiClient } from "@/utils/api-client";
 import { usePermission } from "@/utils/permission";
 import { useQuery } from "@tanstack/vue-query";
-import type { Plugin } from "@halo-dev/api-client";
+import { PluginStatusPhaseEnum, type Plugin } from "@halo-dev/api-client";
 import { useI18n } from "vue-i18n";
 import { useRouteQuery } from "@vueuse/router";
 import { usePluginBatchOperations } from "./composables/use-plugin";
@@ -63,11 +63,26 @@ const { data, isLoading, isFetching, refetch } = useQuery<Plugin[]>({
   },
   keepPreviousData: true,
   refetchInterval: (data) => {
-    const deletingPlugins = data?.filter(
+    const hasDeletingData = data?.some(
       (plugin) => !!plugin.metadata.deletionTimestamp
     );
 
-    return deletingPlugins?.length ? 2000 : false;
+    if (hasDeletingData) {
+      return 1000;
+    }
+
+    const hasStartingData = data?.some(
+      (plugin) =>
+        plugin.spec.enabled &&
+        plugin.status?.phase !==
+          (PluginStatusPhaseEnum.Started || PluginStatusPhaseEnum.Failed)
+    );
+
+    if (hasStartingData) {
+      return 3000;
+    }
+
+    return false;
   },
 });
 
