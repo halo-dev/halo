@@ -80,6 +80,11 @@ public class CommentReconciler implements Reconciler<Reconciler.Request> {
                 updateUnReplyCountIfNecessary(comment);
                 updateSameSubjectRefCommentCounter(comment);
 
+                // version + 1 is required to truly equal version
+                // as a version will be incremented after the update
+                comment.getStatusOrDefault()
+                    .setObservedVersion(comment.getMetadata().getVersion() + 1);
+
                 client.update(comment);
             });
         return new Result(false, null);
