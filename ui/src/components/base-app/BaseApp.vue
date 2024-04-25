@@ -1,31 +1,20 @@
 <script lang="ts" setup>
-import { RouterView, useRoute } from "vue-router";
-import { computed, reactive, onMounted, inject } from "vue";
-import { useTitle } from "@vueuse/core";
+import { RouterView } from "vue-router";
+import { computed, inject, onMounted, reactive } from "vue";
 import { useFavicon } from "@vueuse/core";
-import { useI18n } from "vue-i18n";
 import {
   useOverlayScrollbars,
   type UseOverlayScrollbarsParams,
 } from "overlayscrollbars-vue";
 import type { FormKitConfig } from "@formkit/core";
 import { i18n } from "@/locales";
-import { AppName } from "@/constants/app";
 import { useGlobalInfoStore } from "@/stores/global-info";
 import { storeToRefs } from "pinia";
+import { useAppTitle } from "@/composables/use-title";
 
-const { t } = useI18n();
+useAppTitle();
 
 const { globalInfo } = storeToRefs(useGlobalInfoStore());
-
-const route = useRoute();
-useTitle(
-  computed(() => {
-    const { title: routeTitle } = route.meta;
-    const siteTitle = globalInfo.value?.siteTitle || AppName;
-    return [t(routeTitle || ""), siteTitle].filter(Boolean).join(" - ");
-  })
-);
 
 // Favicon
 const defaultFavicon = "/console/favicon.ico";
@@ -66,6 +55,7 @@ formkitConfig.locale = formkitLocales[i18n.global.locale.value] || "zh";
 function setViewportProperty(doc: HTMLElement) {
   let prevClientHeight: number;
   const customVar = "--vh";
+
   function handleResize() {
     const clientHeight = doc.clientHeight;
     if (clientHeight === prevClientHeight) return;
@@ -74,9 +64,11 @@ function setViewportProperty(doc: HTMLElement) {
       prevClientHeight = clientHeight;
     });
   }
+
   handleResize();
   return handleResize;
 }
+
 window.addEventListener(
   "resize",
   setViewportProperty(document.documentElement)
