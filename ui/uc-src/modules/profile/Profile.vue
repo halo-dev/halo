@@ -2,37 +2,34 @@
 import { apiClient } from "@/utils/api-client";
 import {
   VButton,
-  VTabbar,
   VDropdown,
   VDropdownItem,
+  VTabbar,
 } from "@halo-dev/components";
-import { computed, provide, ref, type Ref } from "vue";
+import {
+  computed,
+  markRaw,
+  onMounted,
+  provide,
+  type Ref,
+  ref,
+  toRaw,
+} from "vue";
 import type { DetailedUser } from "@halo-dev/api-client";
 import ProfileEditingModal from "./components/ProfileEditingModal.vue";
 import PasswordChangeModal from "./components/PasswordChangeModal.vue";
 import { useQuery } from "@tanstack/vue-query";
 import { useI18n } from "vue-i18n";
 import UserAvatar from "@/components/user-avatar/UserAvatar.vue";
-import type { Raw } from "vue";
-import type { Component } from "vue";
-import { markRaw } from "vue";
 import DetailTab from "./tabs/Detail.vue";
 import PersonalAccessTokensTab from "./tabs/PersonalAccessTokens.vue";
 import { useRouteQuery } from "@vueuse/router";
 import NotificationPreferences from "./tabs/NotificationPreferences.vue";
 import TwoFactor from "./tabs/TwoFactor.vue";
+import type { PluginModule, UserProfileTab } from "@halo-dev/console-shared";
+import { usePluginModuleStore } from "@/stores/plugin";
 
 const { t } = useI18n();
-
-interface UserTab {
-  id: string;
-  label: string;
-  component: Raw<Component>;
-  props?: Record<string, unknown>;
-  permissions?: string[];
-  priority: number;
-  hidden?: boolean;
-}
 
 const editingModal = ref(false);
 const passwordChangeModal = ref(false);
@@ -51,7 +48,7 @@ const {
 
 provide<Ref<DetailedUser | undefined>>("user", user);
 
-const tabs: UserTab[] = [
+const tabs = ref<UserProfileTab[]>([
   {
     id: "detail",
     label: t("core.uc_profile.tabs.detail"),
@@ -76,13 +73,36 @@ const tabs: UserTab[] = [
     component: markRaw(TwoFactor),
     priority: 40,
   },
-];
+]);
 
-const tabbarItems = computed(() => {
-  return tabs.map((tab) => ({ id: tab.id, label: tab.label }));
+// Collect uc:profile:tabs:create extension points
+onMounted(() => {
+  const { pluginModules } = usePluginModuleStore();
+
+  pluginModules.forEach((pluginModule: PluginModule) => {
+    const { extensionPoints } = pluginModule;
+    if (!extensionPoints?.["uc:user:profile:tabs:create"]) {
+      return;
+    }
+
+    const providers = extensionPoints[
+      "uc:user:profile:tabs:create"
+    ]() as UserProfileTab[];
+
+    tabs.value.push(...providers);
+  });
 });
 
-const activeTab = useRouteQuery<string>("tab", tabs[0].id, {
+const tabbarItems = computed(() => {
+  return toRaw(tabs)
+    .value.sort((a, b) => a.priority - b.priority)
+    .map((tab) => ({
+      id: tab.id,
+      label: tab.label,
+    }));
+});
+
+const activeTab = useRouteQuery<string>("tab", tabs.value[0].id, {
   mode: "push",
 });
 </script>
@@ -140,7 +160,8 @@ const activeTab = useRouteQuery<string>("tab", tabs[0].id, {
       <template v-for="tab in tabs" :key="tab.id">
         <component
           :is="tab.component"
-          v-if="activeTab === tab.id && !tab.hidden"
+          v-if="activeTab === tab.id"
+          :user="user"
         />
       </template>
     </div>
