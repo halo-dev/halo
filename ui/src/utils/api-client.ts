@@ -116,6 +116,13 @@ axiosInstance.interceptors.response.use(
       return Promise.reject(error);
     }
 
+    // Final fallback
+    if (errorResponse.status) {
+      const { status, statusText } = errorResponse;
+      Toast.error([status, statusText].filter(Boolean).join(": "));
+      return Promise.reject(error);
+    }
+
     Toast.error(i18n.global.t("core.common.toast.unknown_error"));
 
     return Promise.reject(error);
