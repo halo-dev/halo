@@ -26,7 +26,7 @@ export const Upload = Extension.create({
             }
 
             const types = event.clipboardData.types;
-            if (types.includes("text/plain") || types.includes("text/html")) {
+            if (!(types.length === 1 && types[0].toLowerCase() === "files")) {
               return false;
             }
 
