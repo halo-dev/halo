@@ -24,6 +24,12 @@ import { InterestReasonSubject } from './interest-reason-subject';
  */
 export interface InterestReason {
     /**
+     * The expression to be interested in
+     * @type {string}
+     * @memberof InterestReason
+     */
+    'expression'?: string;
+    /**
      * The name of the reason definition to be interested in
      * @type {string}
      * @memberof InterestReason

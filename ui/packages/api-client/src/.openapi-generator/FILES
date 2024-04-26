@@ -240,6 +240,7 @@ models/register-verify-email-request.ts
 models/reply-list.ts
 models/reply-request.ts
 models/reply-spec.ts
+models/reply-status.ts
 models/reply-vo-list.ts
 models/reply-vo.ts
 models/reply.ts

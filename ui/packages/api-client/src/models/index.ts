@@ -158,6 +158,7 @@ export * from './reply';
 export * from './reply-list';
 export * from './reply-request';
 export * from './reply-spec';
+export * from './reply-status';
 export * from './reply-vo';
 export * from './reply-vo-list';
 export * from './reset-password-request';
