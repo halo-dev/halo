@@ -3,7 +3,7 @@ package run.halo.app.infra;
 import static run.halo.app.extension.index.query.QueryFactory.isNull;
 
 import java.time.Duration;
-import java.util.concurrent.atomic.AtomicLong;
+import java.time.Instant;
 import lombok.RequiredArgsConstructor;
 import org.springframework.dao.OptimisticLockingFailureException;
 import org.springframework.data.domain.Sort;
@@ -50,18 +50,21 @@ public class ReactiveExtensionPaginatedOperatorImpl implements ReactiveExtension
         var newFieldQuery = listOptions.getFieldSelector()
             .andQuery(isNull("metadata.deletionTimestamp"));
         listOptions.setFieldSelector(newFieldQuery);
-
-        final AtomicLong totalRecords = new AtomicLong(0);
-        final AtomicLong consumedRecords = new AtomicLong(0);
+        final Instant now = Instant.now();
 
         return pageBy(type, listOptions, pageRequest)
-            .doOnNext(page -> totalRecords.compareAndSet(0, page.getTotal()))
             // forever loop first page until no more to delete
-            .expand(page -> hasMorePages(page, consumedRecords.get(), totalRecords.get())
+            .expand(result -> result.hasNext()
                 ? pageBy(type, listOptions, pageRequest) : Mono.empty())
-            .flatMap(page -> Flux.fromIterable(page.getItems()))
-            .takeWhile(item -> consumedRecords.incrementAndGet() <= totalRecords.get())
+            .flatMap(result -> Flux.fromIterable(result.getItems()))
+            .takeWhile(item -> shouldTakeNext(item, now))
             .flatMap(this::deleteWithRetry);
+    }
+
+    static <E extends Extension> boolean shouldTakeNext(E item, Instant now) {
+        var creationTimestamp = item.getMetadata().getCreationTimestamp();
+        return creationTimestamp.isBefore(now)
+            || creationTimestamp.equals(now);
     }
 
     @SuppressWarnings("unchecked")
@@ -77,11 +80,6 @@ public class ReactiveExtensionPaginatedOperatorImpl implements ReactiveExtension
             )
             .retryWhen(Retry.backoff(8, Duration.ofMillis(100))
                 .filter(OptimisticLockingFailureException.class::isInstance));
-    }
-
-    private <E extends Extension> boolean hasMorePages(ListResult<E> result, long consumedRecords,
-        long totalRecords) {
-        return result.hasNext() && consumedRecords < totalRecords;
     }
 
     @Override
@@ -103,22 +101,23 @@ public class ReactiveExtensionPaginatedOperatorImpl implements ReactiveExtension
      */
     private <E extends Extension> Flux<E> list(Class<E> type, ListOptions listOptions,
         PageRequest pageRequest) {
-        final AtomicLong totalRecords = new AtomicLong(0);
-        final AtomicLong consumedRecords = new AtomicLong(0);
+        final var now = Instant.now();
         return pageBy(type, listOptions, pageRequest)
-            // set total records in first page
-            .doOnNext(page -> totalRecords.compareAndSet(0, page.getTotal()))
-            .expandDeep(page -> {
-                if (hasMorePages(page, consumedRecords.get(), totalRecords.get())) {
+            .expand(result -> {
+                if (result.hasNext()) {
                     // fetch next page
-                    PageRequest nextPageRequest = pageRequest.next();
-                    return pageBy(type, listOptions, nextPageRequest);
+                    var nextPage = nextPage(result, pageRequest.getSort());
+                    return pageBy(type, listOptions, nextPage);
                 } else {
                     return Mono.empty();
                 }
             })
             .flatMap(page -> Flux.fromIterable(page.getItems()))
-            .takeWhile(item -> consumedRecords.incrementAndGet() <= totalRecords.get());
+            .takeWhile(item -> shouldTakeNext(item, now));
+    }
+
+    static <E extends Extension> PageRequest nextPage(ListResult<E> result, Sort sort) {
+        return PageRequestImpl.of(result.getPage() + 1, result.getSize(), sort);
     }
 
     private PageRequest createPageRequest() {

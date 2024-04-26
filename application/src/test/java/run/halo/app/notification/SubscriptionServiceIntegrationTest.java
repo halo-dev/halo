@@ -1,8 +1,10 @@
 package run.halo.app.notification;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.atLeast;
 import static org.mockito.Mockito.verify;
+import static run.halo.app.extension.index.query.QueryFactory.isNull;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -20,9 +22,12 @@ import reactor.test.StepVerifier;
 import run.halo.app.core.extension.notification.Subscription;
 import run.halo.app.extension.Extension;
 import run.halo.app.extension.ExtensionStoreUtil;
+import run.halo.app.extension.ListOptions;
+import run.halo.app.extension.PageRequestImpl;
 import run.halo.app.extension.ReactiveExtensionClient;
 import run.halo.app.extension.SchemeManager;
 import run.halo.app.extension.index.IndexerFactory;
+import run.halo.app.extension.router.selector.FieldSelector;
 import run.halo.app.extension.store.ReactiveExtensionStoreClient;
 import run.halo.app.infra.utils.JsonUtils;
 
@@ -110,7 +115,8 @@ class SubscriptionServiceIntegrationTest {
 
             subscriptionService.remove(subscriber, interestReason).block();
 
-            verify(client, times(size)).delete(any(Subscription.class));
+            verify(client, atLeast(size)).delete(any(Subscription.class));
+            assertCleanedUp();
         }
 
         @Test
@@ -119,8 +125,20 @@ class SubscriptionServiceIntegrationTest {
             subscriber.setName("admin");
 
             subscriptionService.remove(subscriber).block();
+            verify(client, atLeast(size)).delete(any(Subscription.class));
+            assertCleanedUp();
+        }
 
-            verify(client, times(size)).delete(any(Subscription.class));
+        private void assertCleanedUp() {
+            var listOptions = new ListOptions();
+            listOptions.setFieldSelector(FieldSelector.of(isNull("metadata.deletionTimestamp")));
+            client.listBy(Subscription.class, listOptions, PageRequestImpl.ofSize(1))
+                .as(StepVerifier::create)
+                .consumeNextWith(result -> {
+                    assertThat(result.getTotal()).isEqualTo(0);
+                    assertThat(result.getItems()).isEmpty();
+                })
+                .verifyComplete();
         }
     }
 

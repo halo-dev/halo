@@ -59,6 +59,7 @@ public class SubscriptionMigration implements ApplicationListener<ApplicationSta
             .map(user -> user.getMetadata().getName())
             .flatMap(this::removeInternalSubscriptionForUser)
             .then()
+            .doOnSuccess(unused -> log.info("Cleanup user subscription completed"))
             .block();
     }
 
@@ -78,7 +79,7 @@ public class SubscriptionMigration implements ApplicationListener<ApplicationSta
             createSubscription(anonymousSubscriber,
                 "props.repliedOwner == '%s'".formatted(anonymousSubscriber));
         }
-        log.debug("Collating anonymous subscription completed.");
+        log.info("Collating anonymous subscription completed.");
     }
 
     private Mono<Void> deleteAnonymousSubscription(Consumer<Subscription> consumer) {
