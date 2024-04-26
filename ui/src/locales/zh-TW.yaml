@@ -908,6 +908,10 @@ core:
         bio: 描述
         creation_time: 註冊時間
         identity_authentication: 登入方式
+        email_verified:
+          tooltip: 已驗證
+        email_not_verified:
+          tooltip: 未驗證
   role:
     title: 角色
     common:

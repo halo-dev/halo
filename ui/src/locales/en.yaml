@@ -975,6 +975,10 @@ core:
         bio: Bio
         creation_time: Creation time
         identity_authentication: Identity authentication
+        email_verified:
+          tooltip: Verified
+        email_not_verified:
+          tooltip: Not verified
   role:
     title: Roles
     common:
