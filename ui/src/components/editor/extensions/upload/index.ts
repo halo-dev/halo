@@ -25,6 +25,11 @@ export const Upload = Extension.create({
               return false;
             }
 
+            const types = event.clipboardData.types;
+            if (!(types.length === 1 && types[0].toLowerCase() === "files")) {
+              return false;
+            }
+
             const files = Array.from(event.clipboardData.files);
 
             if (files.length) {
