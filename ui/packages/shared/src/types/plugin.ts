@@ -1,5 +1,5 @@
 import type { Component, Ref } from "vue";
-import type { RouteRecordRaw, RouteRecordName } from "vue-router";
+import type { RouteRecordName, RouteRecordRaw } from "vue-router";
 import type { FunctionalPage } from "../states/pages";
 import type { AttachmentSelectProvider } from "../states/attachment-selector";
 import type { EditorProvider, PluginTab } from "..";
@@ -17,6 +17,7 @@ import type {
   Plugin,
   Theme,
 } from "@halo-dev/api-client";
+import type { UserProfileTab, UserTab } from "@/states/user-tab";
 
 export interface RouteRecordAppend {
   parentName: RouteRecordName;
@@ -76,6 +77,12 @@ export interface ExtensionPoint {
   "theme:list-item:operation:create"?: (
     theme: Ref<Theme>
   ) => OperationItem<Theme>[] | Promise<OperationItem<Theme>[]>;
+
+  "user:detail:tabs:create"?: () => UserTab[] | Promise<UserTab[]>;
+
+  "uc:user:profile:tabs:create"?: () =>
+    | UserProfileTab[]
+    | Promise<UserProfileTab[]>;
 }
 
 export interface PluginModule {

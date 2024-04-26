@@ -16464,6 +16464,9 @@
           "homepage": {
             "type": "string"
           },
+          "issues": {
+            "type": "string"
+          },
           "license": {
             "type": "array",
             "items": {
@@ -19469,6 +19472,9 @@
             "type": "string"
           },
           "homepage": {
+            "type": "string"
+          },
+          "issues": {
             "type": "string"
           },
           "license": {

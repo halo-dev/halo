@@ -61,6 +61,8 @@ public class Theme extends AbstractExtension {
 
         private String repo;
 
+        private String issues;
+
         private String version;
 
         @Deprecated(forRemoval = true, since = "2.2.0")

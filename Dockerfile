@@ -8,7 +8,7 @@ RUN java -Djarmode=layertools -jar application.jar extract
 ################################
 
 FROM ibm-semeru-runtimes:open-21-jre
-MAINTAINER johnniang <johnniang@fastmail.com>
+LABEL maintainer="johnniang <johnniang@foxmail.com>"
 WORKDIR application
 COPY --from=builder application/dependencies/ ./
 COPY --from=builder application/spring-boot-loader/ ./

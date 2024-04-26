@@ -680,6 +680,7 @@ core:
         plugin_requires: 插件依賴
         description: 描述
         license: 協議
+        issues: 問題回饋
     settings:
       title: 主題設置
     custom_templates:
@@ -820,6 +821,7 @@ core:
         homepage: 網站
         repo: 源碼倉庫
         load_location: 存儲位置
+        issues: 問題回饋
     loader:
       toast:
         entry_load_failed: 讀取插件入口文件失敗
@@ -908,6 +910,10 @@ core:
         bio: 描述
         creation_time: 註冊時間
         identity_authentication: 登入方式
+        email_verified:
+          tooltip: 已驗證
+        email_not_verified:
+          tooltip: 未驗證
   role:
     title: 角色
     common:
@@ -1004,6 +1010,8 @@ core:
       email_not_verified:
         description: 電子郵件地址尚未驗證，點擊下方按鈕進行驗證
         title: 驗證電子郵件信箱
+      email_verified:
+        tooltip: 已驗證
     pat:
       operations:
         delete:
@@ -1509,6 +1517,7 @@ core:
       not_activated: 未啟用
       installed: 已安裝
       not_installed: 未安裝
+      starting_up: 启动中
     text:
       none: 無
       tip: 提示

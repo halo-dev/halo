@@ -21,6 +21,27 @@ import org.springframework.http.HttpMethod;
 public class RequestInfoResolverTest {
 
     @Test
+    void shouldResolveAsWatchRequestWhenRequestIsWebSocket() {
+        var request = method(HttpMethod.GET, "/apis/fake.halo.run/v1alpha1/fakes")
+            .header("Upgrade", "websocket")
+            .header("Connection", "Upgrade")
+            .build();
+        RequestInfo requestInfo = RequestInfoFactory.INSTANCE.newRequestInfo(request);
+        assertThat(requestInfo).isNotNull();
+        assertThat(requestInfo.getVerb()).isEqualTo("watch");
+    }
+
+    @Test
+    void shouldNotResolveAsWatchRequestWhenRequestIsNotWebSocket() {
+        var request = method(HttpMethod.GET, "/apis/fake.halo.run/v1alpha1/fakes")
+            .header("Upgrade", "websocket")
+            .build();
+        RequestInfo requestInfo = RequestInfoFactory.INSTANCE.newRequestInfo(request);
+        assertThat(requestInfo).isNotNull();
+        assertThat(requestInfo.getVerb()).isEqualTo("list");
+    }
+
+    @Test
     public void requestInfoTest() {
         for (SuccessCase successCase : getTestRequestInfos()) {
             final var request = method(HttpMethod.valueOf(successCase.method), successCase.url)
@@ -176,7 +197,6 @@ public class RequestInfoResolverTest {
 
     public record ErrorCases(String desc, String url) {
     }
-
 
 
     public record SuccessCase(String method, String url, String expectedVerb,
