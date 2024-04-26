@@ -17,6 +17,7 @@ import { apiClient } from "@/utils/api-client";
 import axios from "axios";
 import { useI18n } from "vue-i18n";
 import EmailVerifyModal from "../components/EmailVerifyModal.vue";
+import RiVerifiedBadgeLine from "~icons/ri/verified-badge-line";
 
 withDefaults(defineProps<{ user?: DetailedUser }>(), { user: undefined });
 
@@ -103,7 +104,14 @@ const emailVerifyModal = ref(false);
           </VAlert>
 
           <div v-else>
-            <span>{{ user.user.spec.email }}</span>
+            <div class="flex items-center space-x-2">
+              <span>{{ user.user.spec.email }}</span>
+              <RiVerifiedBadgeLine
+                v-if="user.user.spec.emailVerified"
+                v-tooltip="$t('core.uc_profile.detail.email_verified.tooltip')"
+                class="text-xs text-blue-600"
+              />
+            </div>
             <div v-if="!user.user.spec.emailVerified" class="mt-3">
               <VAlert
                 :title="$t('core.uc_profile.detail.email_not_verified.title')"

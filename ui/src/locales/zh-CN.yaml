@@ -928,6 +928,10 @@ core:
         bio: 描述
         creation_time: 注册时间
         identity_authentication: 登录方式
+        email_verified:
+          tooltip: 已验证
+        email_not_verified:
+          tooltip: 未验证
   role:
     title: 角色
     common:
@@ -1024,6 +1028,8 @@ core:
       email_not_verified:
         title: 验证电子邮箱
         description: 电子邮箱地址还未验证，点击下方按钮进行验证
+      email_verified:
+        tooltip: 已验证
     pat:
       operations:
         delete:

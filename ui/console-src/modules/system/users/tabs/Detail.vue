@@ -1,5 +1,6 @@
 <script lang="ts" setup>
 import {
+  IconInformation,
   IconUserSettings,
   VDescription,
   VDescriptionItem,
@@ -8,6 +9,7 @@ import {
 import type { DetailedUser } from "@halo-dev/api-client";
 import { rbacAnnotations } from "@/constants/annotations";
 import { formatDatetime } from "@/utils/date";
+import RiVerifiedBadgeLine from "~icons/ri/verified-badge-line";
 
 withDefaults(defineProps<{ user?: DetailedUser }>(), {
   user: undefined,
@@ -28,9 +30,27 @@ withDefaults(defineProps<{ user?: DetailedUser }>(), {
       />
       <VDescriptionItem
         :label="$t('core.user.detail.fields.email')"
-        :content="user?.user.spec.email || $t('core.common.text.none')"
         class="!px-2"
-      />
+      >
+        <div v-if="user?.user.spec.email" class="flex items-center space-x-2">
+          <span>
+            {{ user?.user.spec.email }}
+          </span>
+          <RiVerifiedBadgeLine
+            v-if="user?.user.spec.emailVerified"
+            v-tooltip="$t('core.user.detail.fields.email_verified.tooltip')"
+            class="text-xs text-blue-600"
+          />
+          <IconInformation
+            v-else
+            v-tooltip="$t('core.user.detail.fields.email_not_verified.tooltip')"
+            class="text-xs text-red-500"
+          />
+        </div>
+        <span v-else>
+          {{ $t("core.common.text.none") }}
+        </span>
+      </VDescriptionItem>
       <VDescriptionItem
         :label="$t('core.user.detail.fields.roles')"
         class="!px-2"

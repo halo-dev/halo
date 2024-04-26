@@ -908,6 +908,10 @@ core:
         bio: 描述
         creation_time: 註冊時間
         identity_authentication: 登入方式
+        email_verified:
+          tooltip: 已驗證
+        email_not_verified:
+          tooltip: 未驗證
   role:
     title: 角色
     common:
@@ -1004,6 +1008,8 @@ core:
       email_not_verified:
         description: 電子郵件地址尚未驗證，點擊下方按鈕進行驗證
         title: 驗證電子郵件信箱
+      email_verified:
+        tooltip: 已驗證
     pat:
       operations:
         delete:
