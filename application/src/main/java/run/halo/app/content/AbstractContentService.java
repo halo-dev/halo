@@ -1,5 +1,9 @@
 package run.halo.app.content;
 
+import static run.halo.app.extension.index.query.QueryFactory.and;
+import static run.halo.app.extension.index.query.QueryFactory.equal;
+import static run.halo.app.extension.index.query.QueryFactory.isNull;
+
 import java.security.Principal;
 import java.time.Duration;
 import java.time.Instant;
@@ -8,15 +12,20 @@ import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.dao.OptimisticLockingFailureException;
+import org.springframework.data.domain.Sort;
 import org.springframework.lang.Nullable;
 import org.springframework.security.core.context.ReactiveSecurityContextHolder;
 import org.springframework.security.core.context.SecurityContext;
 import org.springframework.util.Assert;
+import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import reactor.util.retry.Retry;
 import run.halo.app.core.extension.content.Snapshot;
+import run.halo.app.extension.ListOptions;
 import run.halo.app.extension.MetadataUtil;
 import run.halo.app.extension.ReactiveExtensionClient;
+import run.halo.app.extension.Ref;
+import run.halo.app.extension.router.selector.FieldSelector;
 
 /**
  * Abstract Service for {@link Snapshot}.
@@ -64,12 +73,25 @@ public abstract class AbstractContentService {
     protected Mono<ContentWrapper> draftContent(@Nullable String baseSnapshotName,
         ContentRequest contentRequest,
         @Nullable String parentSnapshotName) {
+        return create(baseSnapshotName, contentRequest, parentSnapshotName)
+            .flatMap(head -> {
+                String baseSnapshotNameToUse =
+                    StringUtils.defaultIfBlank(baseSnapshotName, head.getMetadata().getName());
+                return restoredContent(baseSnapshotNameToUse, head);
+            });
+    }
+
+    protected Mono<ContentWrapper> draftContent(String baseSnapshotName, ContentRequest content) {
+        return this.draftContent(baseSnapshotName, content, content.headSnapshotName());
+    }
+
+    private Mono<Snapshot> create(@Nullable String baseSnapshotName,
+        ContentRequest contentRequest,
+        @Nullable String parentSnapshotName) {
         Snapshot snapshot = contentRequest.toSnapshot();
         snapshot.getMetadata().setName(UUID.randomUUID().toString());
         snapshot.getSpec().setParentSnapshotName(parentSnapshotName);
 
-        final String baseSnapshotNameToUse =
-            StringUtils.defaultIfBlank(baseSnapshotName, snapshot.getMetadata().getName());
         return client.fetch(Snapshot.class, baseSnapshotName)
             .doOnNext(this::checkBaseSnapshot)
             .defaultIfEmpty(snapshot)
@@ -77,19 +99,13 @@ public abstract class AbstractContentService {
                 contentRequest)
             )
             .flatMap(source -> getContextUsername()
-                .map(username -> {
+                .doOnNext(username -> {
                     Snapshot.addContributor(source, username);
                     source.getSpec().setOwner(username);
-                    return source;
                 })
-                .defaultIfEmpty(source)
+                .thenReturn(source)
             )
-            .flatMap(snapshotToCreate -> client.create(snapshotToCreate)
-                .flatMap(head -> restoredContent(baseSnapshotNameToUse, head)));
-    }
-
-    protected Mono<ContentWrapper> draftContent(String baseSnapshotName, ContentRequest content) {
-        return this.draftContent(baseSnapshotName, content, content.headSnapshotName());
+            .flatMap(client::create);
     }
 
     protected Mono<ContentWrapper> updateContent(String baseSnapshotName,
@@ -98,23 +114,42 @@ public abstract class AbstractContentService {
         Assert.notNull(baseSnapshotName, "The baseSnapshotName must not be null");
         Assert.notNull(contentRequest.headSnapshotName(), "The headSnapshotName must not be null");
         return Mono.defer(() -> client.fetch(Snapshot.class, contentRequest.headSnapshotName())
+                .flatMap(headSnapshot -> {
+                    var oldVersion = contentRequest.version();
+                    var version = headSnapshot.getMetadata().getVersion();
+                    if (hasConflict(oldVersion, version)) {
+                        // draft a new snapshot as the head snapshot
+                        return create(baseSnapshotName, contentRequest,
+                            contentRequest.headSnapshotName());
+                    }
+                    return Mono.just(headSnapshot);
+                })
                 .flatMap(headSnapshot -> client.fetch(Snapshot.class, baseSnapshotName)
-                    .map(baseSnapshot -> determineRawAndContentPatch(headSnapshot, baseSnapshot,
-                        contentRequest)
-                    )
+                    .map(baseSnapshot -> determineRawAndContentPatch(headSnapshot,
+                        baseSnapshot, contentRequest))
                 )
                 .flatMap(headSnapshot -> getContextUsername()
-                    .map(username -> {
-                        Snapshot.addContributor(headSnapshot, username);
-                        return headSnapshot;
-                    })
-                    .defaultIfEmpty(headSnapshot)
+                    .doOnNext(username -> Snapshot.addContributor(headSnapshot, username))
+                    .thenReturn(headSnapshot)
                 )
                 .flatMap(client::update)
             )
             .retryWhen(Retry.backoff(5, Duration.ofMillis(100))
                 .filter(throwable -> throwable instanceof OptimisticLockingFailureException))
             .flatMap(head -> restoredContent(baseSnapshotName, head));
+    }
+
+    protected Flux<Snapshot> listSnapshotsBy(Ref ref) {
+        var snapshotListOptions = new ListOptions();
+        var query = and(isNull("metadata.deletionTimestamp"),
+            equal("spec.subjectRef", Snapshot.toSubjectRefKey(ref)));
+        snapshotListOptions.setFieldSelector(FieldSelector.of(query));
+        var sort = Sort.by("metadata.creationTimestamp", "metadata.name").descending();
+        return client.listAll(Snapshot.class, snapshotListOptions, sort);
+    }
+
+    boolean hasConflict(Long oldVersion, Long newVersion) {
+        return oldVersion != null && !newVersion.equals(oldVersion);
     }
 
     protected Mono<ContentWrapper> restoredContent(String baseSnapshotName, Snapshot headSnapshot) {

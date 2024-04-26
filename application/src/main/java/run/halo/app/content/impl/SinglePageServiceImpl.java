@@ -10,6 +10,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.springframework.dao.OptimisticLockingFailureException;
 import org.springframework.stereotype.Service;
 import org.springframework.util.Assert;
+import org.springframework.web.server.ServerWebInputException;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import reactor.util.retry.Retry;
@@ -18,12 +19,14 @@ import run.halo.app.content.ContentRequest;
 import run.halo.app.content.ContentWrapper;
 import run.halo.app.content.Contributor;
 import run.halo.app.content.ListedSinglePage;
+import run.halo.app.content.ListedSnapshotDto;
 import run.halo.app.content.SinglePageQuery;
 import run.halo.app.content.SinglePageRequest;
 import run.halo.app.content.SinglePageService;
 import run.halo.app.content.Stats;
 import run.halo.app.core.extension.content.Post;
 import run.halo.app.core.extension.content.SinglePage;
+import run.halo.app.core.extension.content.Snapshot;
 import run.halo.app.core.extension.service.UserService;
 import run.halo.app.extension.ListResult;
 import run.halo.app.extension.ReactiveExtensionClient;
@@ -74,6 +77,13 @@ public class SinglePageServiceImpl extends AbstractContentService implements Sin
     }
 
     @Override
+    public Flux<ListedSnapshotDto> listSnapshots(String pageName) {
+        return client.fetch(SinglePage.class, pageName)
+            .flatMapMany(page -> listSnapshotsBy(Ref.of(page)))
+            .map(ListedSnapshotDto::from);
+    }
+
+    @Override
     public Mono<ListResult<ListedSinglePage>> list(SinglePageQuery query) {
         return client.list(SinglePage.class, query.toPredicate(),
                 query.toComparator(), query.getPage(), query.getSize())
@@ -103,6 +113,7 @@ public class SinglePageServiceImpl extends AbstractContentService implements Sin
             .flatMap(page -> {
                 var contentRequest =
                     new ContentRequest(Ref.of(page), page.getSpec().getHeadSnapshot(),
+                        null,
                         pageRequest.content().raw(), pageRequest.content().content(),
                         pageRequest.content().rawType());
                 return draftContent(page.getSpec().getBaseSnapshot(), contentRequest)
@@ -161,6 +172,93 @@ public class SinglePageServiceImpl extends AbstractContentService implements Sin
                 page.getSpec().setHeadSnapshot(contentWrapper.getSnapshotName());
                 return client.update(page);
             });
+    }
+
+    @Override
+    public Mono<SinglePage> revertToSpecifiedSnapshot(String pageName, String snapshotName) {
+        return client.get(SinglePage.class, pageName)
+            .filter(page -> {
+                var head = page.getSpec().getHeadSnapshot();
+                return !StringUtils.equals(head, snapshotName);
+            })
+            .flatMap(page -> {
+                var baseSnapshot = page.getSpec().getBaseSnapshot();
+                return getContent(snapshotName, baseSnapshot)
+                    .map(content -> ContentRequest.builder()
+                        .subjectRef(Ref.of(page))
+                        .headSnapshotName(page.getSpec().getHeadSnapshot())
+                        .content(content.getContent())
+                        .raw(content.getRaw())
+                        .rawType(content.getRawType())
+                        .build()
+                    )
+                    .flatMap(contentRequest -> draftContent(baseSnapshot, contentRequest))
+                    .flatMap(content -> {
+                        page.getSpec().setHeadSnapshot(content.getSnapshotName());
+                        return publishPageWithRetry(page);
+                    });
+            });
+    }
+
+    @Override
+    public Mono<ContentWrapper> deleteContent(String pageName, String snapshotName) {
+        return client.get(SinglePage.class, pageName)
+            .flatMap(page -> {
+                var headSnapshotName = page.getSpec().getHeadSnapshot();
+                if (StringUtils.equals(headSnapshotName, snapshotName)) {
+                    // update head to release
+                    page.getSpec().setHeadSnapshot(page.getSpec().getReleaseSnapshot());
+                    return updatePostWithRetry(page);
+                }
+                return Mono.just(page);
+            })
+            .flatMap(page -> {
+                var baseSnapshotName = page.getSpec().getBaseSnapshot();
+                var releaseSnapshotName = page.getSpec().getReleaseSnapshot();
+                if (StringUtils.equals(releaseSnapshotName, snapshotName)) {
+                    return Mono.error(new ServerWebInputException(
+                        "The snapshot to delete is the release snapshot, please"
+                            + " revert to another snapshot first."));
+                }
+                if (StringUtils.equals(baseSnapshotName, snapshotName)) {
+                    return Mono.error(
+                        new ServerWebInputException("The first snapshot cannot be deleted."));
+                }
+                return client.fetch(Snapshot.class, snapshotName)
+                    .flatMap(client::delete)
+                    .flatMap(deleted -> restoredContent(baseSnapshotName, deleted));
+            });
+    }
+
+    private Mono<SinglePage> updatePostWithRetry(SinglePage page) {
+        return client.update(page)
+            .onErrorResume(OptimisticLockingFailureException.class,
+                e -> Mono.defer(() -> client.get(SinglePage.class, page.getMetadata().getName())
+                        .flatMap(client::update))
+                    .retryWhen(Retry.backoff(8, Duration.ofMillis(100))
+                        .filter(OptimisticLockingFailureException.class::isInstance)
+                    )
+            );
+    }
+
+    private Mono<SinglePage> publish(SinglePage singlePage) {
+        var spec = singlePage.getSpec();
+        spec.setPublish(true);
+        if (spec.getHeadSnapshot() == null) {
+            spec.setHeadSnapshot(spec.getBaseSnapshot());
+        }
+        spec.setReleaseSnapshot(spec.getHeadSnapshot());
+        return client.update(singlePage);
+    }
+
+    Mono<SinglePage> publishPageWithRetry(SinglePage page) {
+        return publish(page)
+            .onErrorResume(OptimisticLockingFailureException.class,
+                e -> Mono.defer(() -> client.get(SinglePage.class, page.getMetadata().getName())
+                        .flatMap(this::publish))
+                    .retryWhen(Retry.backoff(8, Duration.ofMillis(100))
+                        .filter(OptimisticLockingFailureException.class::isInstance))
+            );
     }
 
     private Mono<ListedSinglePage> getListedSinglePage(SinglePage singlePage) {

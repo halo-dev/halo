@@ -6,6 +6,7 @@ import static org.springdoc.core.fn.builders.parameter.Builder.parameterBuilder;
 import static org.springdoc.core.fn.builders.requestbody.Builder.requestBodyBuilder;
 
 import io.swagger.v3.oas.annotations.enums.ParameterIn;
+import io.swagger.v3.oas.annotations.media.Schema;
 import java.time.Duration;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -18,12 +19,15 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.reactive.function.server.RouterFunction;
 import org.springframework.web.reactive.function.server.ServerRequest;
 import org.springframework.web.reactive.function.server.ServerResponse;
+import org.springframework.web.server.ServerWebInputException;
 import org.thymeleaf.util.StringUtils;
 import reactor.core.publisher.Mono;
 import reactor.util.retry.Retry;
 import run.halo.app.content.Content;
+import run.halo.app.content.ContentUpdateParam;
 import run.halo.app.content.ContentWrapper;
 import run.halo.app.content.ListedSinglePage;
+import run.halo.app.content.ListedSnapshotDto;
 import run.halo.app.content.SinglePageQuery;
 import run.halo.app.content.SinglePageRequest;
 import run.halo.app.content.SinglePageService;
@@ -85,6 +89,33 @@ public class SinglePageEndpoint implements CustomEndpoint {
                     .response(responseBuilder()
                         .implementation(ContentWrapper.class))
             )
+            .GET("singlepages/{name}/content", this::fetchContent,
+                builder -> builder.operationId("fetchSinglePageContent")
+                    .description("Fetch content of single page.")
+                    .tag(tag)
+                    .parameter(parameterBuilder().name("name")
+                        .in(ParameterIn.PATH)
+                        .required(true)
+                        .implementation(String.class)
+                    )
+                    .parameter(parameterBuilder().name("snapshotName")
+                        .in(ParameterIn.QUERY)
+                        .required(true)
+                        .implementation(String.class))
+                    .response(responseBuilder()
+                        .implementation(ContentWrapper.class))
+            )
+            .GET("singlepages/{name}/snapshot", this::listSnapshots,
+                builder -> builder.operationId("listSinglePageSnapshots")
+                    .description("List all snapshots for single page content.")
+                    .tag(tag)
+                    .parameter(parameterBuilder().name("name")
+                        .in(ParameterIn.PATH)
+                        .required(true)
+                        .implementation(String.class))
+                    .response(responseBuilder()
+                        .implementationArray(ListedSnapshotDto.class))
+            )
             .POST("singlepages", this::draftSinglePage,
                 builder -> builder.operationId("DraftSinglePage")
                     .description("Draft a single page.")
@@ -135,6 +166,24 @@ public class SinglePageEndpoint implements CustomEndpoint {
                     .response(responseBuilder()
                         .implementation(Post.class))
             )
+            .PUT("singlepages/{name}/revert-content", this::revertToSpecifiedSnapshot,
+                builder -> builder.operationId("revertToSpecifiedSnapshotForSinglePage")
+                    .description("Revert to specified snapshot for single page content.")
+                    .tag(tag)
+                    .parameter(parameterBuilder().name("name")
+                        .in(ParameterIn.PATH)
+                        .required(true)
+                        .implementation(String.class))
+                    .requestBody(requestBodyBuilder()
+                        .required(true)
+                        .content(contentBuilder()
+                            .mediaType(MediaType.APPLICATION_JSON_VALUE)
+                            .schema(Builder.schemaBuilder()
+                                .implementation(RevertSnapshotParam.class))
+                        ))
+                    .response(responseBuilder()
+                        .implementation(Post.class))
+            )
             .PUT("singlepages/{name}/publish", this::publishSinglePage,
                 builder -> builder.operationId("PublishSinglePage")
                     .description("Publish a single page.")
@@ -146,7 +195,62 @@ public class SinglePageEndpoint implements CustomEndpoint {
                     .response(responseBuilder()
                         .implementation(SinglePage.class))
             )
+            .DELETE("singlepages/{name}/content", this::deleteContent,
+                builder -> builder.operationId("deleteSinglePageContent")
+                    .description("Delete a content for post.")
+                    .tag(tag)
+                    .parameter(parameterBuilder().name("name")
+                        .in(ParameterIn.PATH)
+                        .required(true)
+                        .implementation(String.class)
+                    )
+                    .parameter(parameterBuilder()
+                        .name("snapshotName")
+                        .in(ParameterIn.QUERY)
+                        .required(true)
+                        .implementation(String.class))
+                    .response(responseBuilder()
+                        .implementation(ContentWrapper.class))
+            )
             .build();
+    }
+
+    private Mono<ServerResponse> deleteContent(ServerRequest request) {
+        final var postName = request.pathVariable("name");
+        final var snapshotName = request.queryParam("snapshotName").orElseThrow();
+        return singlePageService.deleteContent(postName, snapshotName)
+            .flatMap(content -> ServerResponse.ok().bodyValue(content));
+    }
+
+    private Mono<ServerResponse> revertToSpecifiedSnapshot(ServerRequest request) {
+        final var postName = request.pathVariable("name");
+        return request.bodyToMono(RevertSnapshotParam.class)
+            .switchIfEmpty(
+                Mono.error(new ServerWebInputException("Required request body is missing.")))
+            .flatMap(
+                param -> singlePageService.revertToSpecifiedSnapshot(postName, param.snapshotName))
+            .flatMap(page -> ServerResponse.ok().bodyValue(page));
+    }
+
+    @Schema(name = "RevertSnapshotForSingleParam")
+    record RevertSnapshotParam(
+        @Schema(requiredMode = Schema.RequiredMode.REQUIRED, minLength = 1) String snapshotName) {
+    }
+
+    private Mono<ServerResponse> fetchContent(ServerRequest request) {
+        final var snapshotName = request.queryParam("snapshotName").orElseThrow();
+        return client.fetch(SinglePage.class, request.pathVariable("name"))
+            .flatMap(page -> {
+                var baseSnapshot = page.getSpec().getBaseSnapshot();
+                return singlePageService.getContent(snapshotName, baseSnapshot);
+            })
+            .flatMap(content -> ServerResponse.ok().bodyValue(content));
+    }
+
+    private Mono<ServerResponse> listSnapshots(ServerRequest request) {
+        final var name = request.pathVariable("name");
+        var resultFlux = singlePageService.listSnapshots(name);
+        return ServerResponse.ok().body(resultFlux, ListedSnapshotDto.class);
     }
 
     private Mono<ServerResponse> fetchReleaseContent(ServerRequest request) {
@@ -169,7 +273,7 @@ public class SinglePageEndpoint implements CustomEndpoint {
 
     Mono<ServerResponse> updateContent(ServerRequest request) {
         String pageName = request.pathVariable("name");
-        return request.bodyToMono(Content.class)
+        return request.bodyToMono(ContentUpdateParam.class)
             .flatMap(content -> Mono.defer(() -> client.fetch(SinglePage.class, pageName)
                     .flatMap(page -> {
                         SinglePageRequest pageRequest = new SinglePageRequest(page, content);

@@ -1,6 +1,7 @@
 package run.halo.app.content;
 
 import org.springframework.lang.NonNull;
+import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import run.halo.app.core.extension.content.Post;
 import run.halo.app.extension.ListResult;
@@ -31,6 +32,8 @@ public interface PostService {
 
     Mono<ContentWrapper> getContent(String snapshotName, String baseSnapshotName);
 
+    Flux<ListedSnapshotDto> listSnapshots(String name);
+
     Mono<Post> publish(Post post);
 
     Mono<Post> unpublish(Post post);
@@ -43,4 +46,8 @@ public interface PostService {
      * @return full post data or empty.
      */
     Mono<Post> getByUsername(String postName, String username);
+
+    Mono<Post> revertToSpecifiedSnapshot(String postName, String snapshotName);
+
+    Mono<ContentWrapper> deleteContent(String postName, String snapshotName);
 }

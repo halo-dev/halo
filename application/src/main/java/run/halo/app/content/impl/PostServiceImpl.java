@@ -14,6 +14,7 @@ import org.springframework.data.domain.Sort;
 import org.springframework.lang.NonNull;
 import org.springframework.stereotype.Component;
 import org.springframework.util.Assert;
+import org.springframework.web.server.ServerWebInputException;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import reactor.util.retry.Retry;
@@ -22,12 +23,14 @@ import run.halo.app.content.ContentRequest;
 import run.halo.app.content.ContentWrapper;
 import run.halo.app.content.Contributor;
 import run.halo.app.content.ListedPost;
+import run.halo.app.content.ListedSnapshotDto;
 import run.halo.app.content.PostQuery;
 import run.halo.app.content.PostRequest;
 import run.halo.app.content.PostService;
 import run.halo.app.content.Stats;
 import run.halo.app.core.extension.content.Category;
 import run.halo.app.core.extension.content.Post;
+import run.halo.app.core.extension.content.Snapshot;
 import run.halo.app.core.extension.content.Tag;
 import run.halo.app.core.extension.service.UserService;
 import run.halo.app.extension.ListOptions;
@@ -173,6 +176,7 @@ public class PostServiceImpl extends AbstractContentService implements PostServi
                 }
                 var contentRequest =
                     new ContentRequest(Ref.of(post), post.getSpec().getHeadSnapshot(),
+                        null,
                         postRequest.content().raw(), postRequest.content().content(),
                         postRequest.content().rawType());
                 return draftContent(post.getSpec().getBaseSnapshot(), contentRequest)
@@ -262,6 +266,13 @@ public class PostServiceImpl extends AbstractContentService implements PostServi
     }
 
     @Override
+    public Flux<ListedSnapshotDto> listSnapshots(String name) {
+        return client.fetch(Post.class, name)
+            .flatMapMany(page -> listSnapshotsBy(Ref.of(page)))
+            .map(ListedSnapshotDto::from);
+    }
+
+    @Override
     public Mono<Post> publish(Post post) {
         var spec = post.getSpec();
         spec.setPublish(true);
@@ -283,5 +294,82 @@ public class PostServiceImpl extends AbstractContentService implements PostServi
         return client.get(Post.class, postName)
             .filter(post -> post.getSpec() != null)
             .filter(post -> Objects.equals(username, post.getSpec().getOwner()));
+    }
+
+    @Override
+    public Mono<Post> revertToSpecifiedSnapshot(String postName, String snapshotName) {
+        return client.get(Post.class, postName)
+            .filter(post -> {
+                var head = post.getSpec().getHeadSnapshot();
+                return !StringUtils.equals(head, snapshotName);
+            })
+            .flatMap(post -> {
+                var baseSnapshot = post.getSpec().getBaseSnapshot();
+                return getContent(snapshotName, baseSnapshot)
+                    .map(content -> ContentRequest.builder()
+                        .subjectRef(Ref.of(post))
+                        .headSnapshotName(post.getSpec().getHeadSnapshot())
+                        .content(content.getContent())
+                        .raw(content.getRaw())
+                        .rawType(content.getRawType())
+                        .build()
+                    )
+                    .flatMap(contentRequest -> draftContent(baseSnapshot, contentRequest))
+                    .flatMap(content -> {
+                        post.getSpec().setHeadSnapshot(content.getSnapshotName());
+                        return publishPostWithRetry(post);
+                    });
+            });
+    }
+
+    @Override
+    public Mono<ContentWrapper> deleteContent(String postName, String snapshotName) {
+        return client.get(Post.class, postName)
+            .flatMap(post -> {
+                var headSnapshotName = post.getSpec().getHeadSnapshot();
+                if (StringUtils.equals(headSnapshotName, snapshotName)) {
+                    // update head to release
+                    post.getSpec().setHeadSnapshot(post.getSpec().getReleaseSnapshot());
+                    return updatePostWithRetry(post);
+                }
+                return Mono.just(post);
+            })
+            .flatMap(post -> {
+                var baseSnapshotName = post.getSpec().getBaseSnapshot();
+                var releaseSnapshotName = post.getSpec().getReleaseSnapshot();
+                if (StringUtils.equals(releaseSnapshotName, snapshotName)) {
+                    return Mono.error(new ServerWebInputException(
+                        "The snapshot to delete is the release snapshot, please"
+                            + " revert to another snapshot first."));
+                }
+                if (StringUtils.equals(baseSnapshotName, snapshotName)) {
+                    return Mono.error(
+                        new ServerWebInputException("The first snapshot cannot be deleted."));
+                }
+                return client.fetch(Snapshot.class, snapshotName)
+                    .flatMap(client::delete)
+                    .flatMap(deleted -> restoredContent(baseSnapshotName, deleted));
+            });
+    }
+
+    private Mono<Post> updatePostWithRetry(Post post) {
+        return client.update(post)
+            .onErrorResume(OptimisticLockingFailureException.class,
+                e -> Mono.defer(() -> client.get(Post.class, post.getMetadata().getName())
+                        .flatMap(client::update))
+                    .retryWhen(Retry.backoff(8, Duration.ofMillis(100))
+                        .filter(OptimisticLockingFailureException.class::isInstance)
+                    )
+            );
+    }
+
+    Mono<Post> publishPostWithRetry(Post post) {
+        return publish(post)
+            .onErrorResume(OptimisticLockingFailureException.class,
+                e -> Mono.defer(() -> client.get(Post.class, post.getMetadata().getName())
+                        .flatMap(this::publish))
+                    .retryWhen(Retry.backoff(8, Duration.ofMillis(100))
+                        .filter(OptimisticLockingFailureException.class::isInstance))
+            );
     }
 }

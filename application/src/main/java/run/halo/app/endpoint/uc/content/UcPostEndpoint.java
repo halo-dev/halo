@@ -19,6 +19,7 @@ import org.springframework.web.reactive.function.server.ServerResponse;
 import org.springframework.web.server.ServerWebInputException;
 import reactor.core.publisher.Mono;
 import run.halo.app.content.Content;
+import run.halo.app.content.ContentUpdateParam;
 import run.halo.app.content.ListedPost;
 import run.halo.app.content.PostQuery;
 import run.halo.app.content.PostRequest;
@@ -280,7 +281,7 @@ public class UcPostEndpoint implements CustomEndpoint {
                     }
                     post.getSpec().setOwner(username);
                 }))
-            .map(post -> new PostRequest(post, getContent(post)))
+            .map(post -> new PostRequest(post, ContentUpdateParam.from(getContent(post))))
             .flatMap(postService::draftPost);
         return ServerResponse.ok().body(createdPost, Post.class);
     }

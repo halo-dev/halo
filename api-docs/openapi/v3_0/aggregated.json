@@ -2933,6 +2933,80 @@
       }
     },
     "/apis/api.console.halo.run/v1alpha1/posts/{name}/content": {
+      "delete": {
+        "description": "Delete a content for post.",
+        "operationId": "deletePostContent",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "name",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "in": "query",
+            "name": "snapshotName",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "default": {
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ContentWrapper"
+                }
+              }
+            },
+            "description": "default response"
+          }
+        },
+        "tags": [
+          "api.console.halo.run/v1alpha1/Post"
+        ]
+      },
+      "get": {
+        "description": "Fetch content of post.",
+        "operationId": "fetchPostContent",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "name",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "in": "query",
+            "name": "snapshotName",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "default": {
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ContentWrapper"
+                }
+              }
+            },
+            "description": "default response"
+          }
+        },
+        "tags": [
+          "api.console.halo.run/v1alpha1/Post"
+        ]
+      },
       "put": {
         "description": "Update a post\u0027s content.",
         "operationId": "UpdatePostContent",
@@ -3083,6 +3157,81 @@
               "*/*": {
                 "schema": {
                   "$ref": "#/components/schemas/ContentWrapper"
+                }
+              }
+            },
+            "description": "default response"
+          }
+        },
+        "tags": [
+          "api.console.halo.run/v1alpha1/Post"
+        ]
+      }
+    },
+    "/apis/api.console.halo.run/v1alpha1/posts/{name}/revert-content": {
+      "put": {
+        "description": "Revert to specified snapshot for post content.",
+        "operationId": "revertToSpecifiedSnapshotForPost",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "name",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RevertSnapshotForPostParam"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "default": {
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/Post"
+                }
+              }
+            },
+            "description": "default response"
+          }
+        },
+        "tags": [
+          "api.console.halo.run/v1alpha1/Post"
+        ]
+      }
+    },
+    "/apis/api.console.halo.run/v1alpha1/posts/{name}/snapshot": {
+      "get": {
+        "description": "List all snapshots for post content.",
+        "operationId": "listPostSnapshots",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "name",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "default": {
+            "content": {
+              "*/*": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/ListedSnapshotDto"
+                  }
                 }
               }
             },
@@ -3399,6 +3548,80 @@
       }
     },
     "/apis/api.console.halo.run/v1alpha1/singlepages/{name}/content": {
+      "delete": {
+        "description": "Delete a content for post.",
+        "operationId": "deleteSinglePageContent",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "name",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "in": "query",
+            "name": "snapshotName",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "default": {
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ContentWrapper"
+                }
+              }
+            },
+            "description": "default response"
+          }
+        },
+        "tags": [
+          "api.console.halo.run/v1alpha1/SinglePage"
+        ]
+      },
+      "get": {
+        "description": "Fetch content of single page.",
+        "operationId": "fetchSinglePageContent",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "name",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "in": "query",
+            "name": "snapshotName",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "default": {
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ContentWrapper"
+                }
+              }
+            },
+            "description": "default response"
+          }
+        },
+        "tags": [
+          "api.console.halo.run/v1alpha1/SinglePage"
+        ]
+      },
       "put": {
         "description": "Update a single page\u0027s content.",
         "operationId": "UpdateSinglePageContent",
@@ -3521,6 +3744,81 @@
               "*/*": {
                 "schema": {
                   "$ref": "#/components/schemas/ContentWrapper"
+                }
+              }
+            },
+            "description": "default response"
+          }
+        },
+        "tags": [
+          "api.console.halo.run/v1alpha1/SinglePage"
+        ]
+      }
+    },
+    "/apis/api.console.halo.run/v1alpha1/singlepages/{name}/revert-content": {
+      "put": {
+        "description": "Revert to specified snapshot for single page content.",
+        "operationId": "revertToSpecifiedSnapshotForSinglePage",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "name",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RevertSnapshotForSingleParam"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "default": {
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/Post"
+                }
+              }
+            },
+            "description": "default response"
+          }
+        },
+        "tags": [
+          "api.console.halo.run/v1alpha1/SinglePage"
+        ]
+      }
+    },
+    "/apis/api.console.halo.run/v1alpha1/singlepages/{name}/snapshot": {
+      "get": {
+        "description": "List all snapshots for single page content.",
+        "operationId": "listSinglePageSnapshots",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "name",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "default": {
+            "content": {
+              "*/*": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/ListedSnapshotDto"
+                  }
                 }
               }
             },
@@ -13890,6 +14188,24 @@
           }
         }
       },
+      "ContentUpdateParam": {
+        "type": "object",
+        "properties": {
+          "content": {
+            "type": "string"
+          },
+          "raw": {
+            "type": "string"
+          },
+          "rawType": {
+            "type": "string"
+          },
+          "version": {
+            "type": "integer",
+            "format": "int64"
+          }
+        }
+      },
       "ContentVo": {
         "type": "object",
         "properties": {
@@ -15370,6 +15686,36 @@
             "type": "integer",
             "description": "Indicates total pages.",
             "format": "int64"
+          }
+        }
+      },
+      "ListedSnapshotDto": {
+        "required": [
+          "metadata",
+          "spec"
+        ],
+        "type": "object",
+        "properties": {
+          "metadata": {
+            "$ref": "#/components/schemas/Metadata"
+          },
+          "spec": {
+            "$ref": "#/components/schemas/ListedSnapshotSpec"
+          }
+        }
+      },
+      "ListedSnapshotSpec": {
+        "required": [
+          "owner"
+        ],
+        "type": "object",
+        "properties": {
+          "modifyTime": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "owner": {
+            "type": "string"
           }
         }
       },
@@ -16952,7 +17298,7 @@
         "type": "object",
         "properties": {
           "content": {
-            "$ref": "#/components/schemas/Content"
+            "$ref": "#/components/schemas/ContentUpdateParam"
           },
           "post": {
             "$ref": "#/components/schemas/Post"
@@ -17954,6 +18300,30 @@
           }
         }
       },
+      "RevertSnapshotForPostParam": {
+        "required": [
+          "snapshotName"
+        ],
+        "type": "object",
+        "properties": {
+          "snapshotName": {
+            "minLength": 1,
+            "type": "string"
+          }
+        }
+      },
+      "RevertSnapshotForSingleParam": {
+        "required": [
+          "snapshotName"
+        ],
+        "type": "object",
+        "properties": {
+          "snapshotName": {
+            "minLength": 1,
+            "type": "string"
+          }
+        }
+      },
       "Role": {
         "required": [
           "apiVersion",
@@ -18595,7 +18965,7 @@
         "type": "object",
         "properties": {
           "content": {
-            "$ref": "#/components/schemas/Content"
+            "$ref": "#/components/schemas/ContentUpdateParam"
           },
           "page": {
             "$ref": "#/components/schemas/SinglePage"
