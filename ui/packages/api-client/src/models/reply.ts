@@ -19,6 +19,9 @@ import { Metadata } from './metadata';
 // May contain unused imports in some cases
 // @ts-ignore
 import { ReplySpec } from './reply-spec';
+// May contain unused imports in some cases
+// @ts-ignore
+import { ReplyStatus } from './reply-status';
 
 /**
  * 
@@ -50,5 +53,11 @@ export interface Reply {
      * @memberof Reply
      */
     'spec': ReplySpec;
+    /**
+     * 
+     * @type {ReplyStatus}
+     * @memberof Reply
+     */
+    'status': ReplyStatus;
 }
 

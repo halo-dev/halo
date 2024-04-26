@@ -28,15 +28,67 @@ import { ContentWrapper } from '../models';
 // @ts-ignore
 import { ListedPostList } from '../models';
 // @ts-ignore
+import { ListedSnapshotDto } from '../models';
+// @ts-ignore
 import { Post } from '../models';
 // @ts-ignore
 import { PostRequest } from '../models';
+// @ts-ignore
+import { RevertSnapshotForPostParam } from '../models';
 /**
  * ApiConsoleHaloRunV1alpha1PostApi - axios parameter creator
  * @export
  */
 export const ApiConsoleHaloRunV1alpha1PostApiAxiosParamCreator = function (configuration?: Configuration) {
     return {
+        /**
+         * Delete a content for post.
+         * @param {string} name 
+         * @param {string} snapshotName 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        deletePostContent: async (name: string, snapshotName: string, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+            // verify required parameter 'name' is not null or undefined
+            assertParamExists('deletePostContent', 'name', name)
+            // verify required parameter 'snapshotName' is not null or undefined
+            assertParamExists('deletePostContent', 'snapshotName', snapshotName)
+            const localVarPath = `/apis/api.console.halo.run/v1alpha1/posts/{name}/content`
+                .replace(`{${"name"}}`, encodeURIComponent(String(name)));
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'DELETE', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+            // authentication BasicAuth required
+            // http basic authentication required
+            setBasicAuthToObject(localVarRequestOptions, configuration)
+
+            // authentication BearerAuth required
+            // http bearer authentication required
+            await setBearerAuthToObject(localVarHeaderParameter, configuration)
+
+            if (snapshotName !== undefined) {
+                localVarQueryParameter['snapshotName'] = snapshotName;
+            }
+
+
+    
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
         /**
          * Draft a post.
          * @param {PostRequest} postRequest 
@@ -74,6 +126,54 @@ export const ApiConsoleHaloRunV1alpha1PostApiAxiosParamCreator = function (confi
             let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
             localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
             localVarRequestOptions.data = serializeDataIfNeeded(postRequest, localVarRequestOptions, configuration)
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+        /**
+         * Fetch content of post.
+         * @param {string} name 
+         * @param {string} snapshotName 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        fetchPostContent: async (name: string, snapshotName: string, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+            // verify required parameter 'name' is not null or undefined
+            assertParamExists('fetchPostContent', 'name', name)
+            // verify required parameter 'snapshotName' is not null or undefined
+            assertParamExists('fetchPostContent', 'snapshotName', snapshotName)
+            const localVarPath = `/apis/api.console.halo.run/v1alpha1/posts/{name}/content`
+                .replace(`{${"name"}}`, encodeURIComponent(String(name)));
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'GET', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+            // authentication BasicAuth required
+            // http basic authentication required
+            setBasicAuthToObject(localVarRequestOptions, configuration)
+
+            // authentication BearerAuth required
+            // http bearer authentication required
+            await setBearerAuthToObject(localVarHeaderParameter, configuration)
+
+            if (snapshotName !== undefined) {
+                localVarQueryParameter['snapshotName'] = snapshotName;
+            }
+
+
+    
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
 
             return {
                 url: toPathString(localVarUrlObj),
@@ -131,6 +231,47 @@ export const ApiConsoleHaloRunV1alpha1PostApiAxiosParamCreator = function (confi
             // verify required parameter 'name' is not null or undefined
             assertParamExists('fetchPostReleaseContent', 'name', name)
             const localVarPath = `/apis/api.console.halo.run/v1alpha1/posts/{name}/release-content`
+                .replace(`{${"name"}}`, encodeURIComponent(String(name)));
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'GET', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+            // authentication BasicAuth required
+            // http basic authentication required
+            setBasicAuthToObject(localVarRequestOptions, configuration)
+
+            // authentication BearerAuth required
+            // http bearer authentication required
+            await setBearerAuthToObject(localVarHeaderParameter, configuration)
+
+
+    
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+        /**
+         * List all snapshots for post content.
+         * @param {string} name 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        listPostSnapshots: async (name: string, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+            // verify required parameter 'name' is not null or undefined
+            assertParamExists('listPostSnapshots', 'name', name)
+            const localVarPath = `/apis/api.console.halo.run/v1alpha1/posts/{name}/snapshot`
                 .replace(`{${"name"}}`, encodeURIComponent(String(name)));
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
@@ -322,6 +463,53 @@ export const ApiConsoleHaloRunV1alpha1PostApiAxiosParamCreator = function (confi
             };
         },
         /**
+         * Revert to specified snapshot for post content.
+         * @param {string} name 
+         * @param {RevertSnapshotForPostParam} revertSnapshotForPostParam 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        revertToSpecifiedSnapshotForPost: async (name: string, revertSnapshotForPostParam: RevertSnapshotForPostParam, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+            // verify required parameter 'name' is not null or undefined
+            assertParamExists('revertToSpecifiedSnapshotForPost', 'name', name)
+            // verify required parameter 'revertSnapshotForPostParam' is not null or undefined
+            assertParamExists('revertToSpecifiedSnapshotForPost', 'revertSnapshotForPostParam', revertSnapshotForPostParam)
+            const localVarPath = `/apis/api.console.halo.run/v1alpha1/posts/{name}/revert-content`
+                .replace(`{${"name"}}`, encodeURIComponent(String(name)));
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'PUT', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+            // authentication BasicAuth required
+            // http basic authentication required
+            setBasicAuthToObject(localVarRequestOptions, configuration)
+
+            // authentication BearerAuth required
+            // http bearer authentication required
+            await setBearerAuthToObject(localVarHeaderParameter, configuration)
+
+
+    
+            localVarHeaderParameter['Content-Type'] = 'application/json';
+
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+            localVarRequestOptions.data = serializeDataIfNeeded(revertSnapshotForPostParam, localVarRequestOptions, configuration)
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+        /**
          * Publish a post.
          * @param {string} name 
          * @param {*} [options] Override http request option.
@@ -467,6 +655,19 @@ export const ApiConsoleHaloRunV1alpha1PostApiFp = function(configuration?: Confi
     const localVarAxiosParamCreator = ApiConsoleHaloRunV1alpha1PostApiAxiosParamCreator(configuration)
     return {
         /**
+         * Delete a content for post.
+         * @param {string} name 
+         * @param {string} snapshotName 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async deletePostContent(name: string, snapshotName: string, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<ContentWrapper>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.deletePostContent(name, snapshotName, options);
+            const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
+            const localVarOperationServerBasePath = operationServerMap['ApiConsoleHaloRunV1alpha1PostApi.deletePostContent']?.[localVarOperationServerIndex]?.url;
+            return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
+        },
+        /**
          * Draft a post.
          * @param {PostRequest} postRequest 
          * @param {*} [options] Override http request option.
@@ -476,6 +677,19 @@ export const ApiConsoleHaloRunV1alpha1PostApiFp = function(configuration?: Confi
             const localVarAxiosArgs = await localVarAxiosParamCreator.draftPost(postRequest, options);
             const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
             const localVarOperationServerBasePath = operationServerMap['ApiConsoleHaloRunV1alpha1PostApi.draftPost']?.[localVarOperationServerIndex]?.url;
+            return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
+        },
+        /**
+         * Fetch content of post.
+         * @param {string} name 
+         * @param {string} snapshotName 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async fetchPostContent(name: string, snapshotName: string, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<ContentWrapper>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.fetchPostContent(name, snapshotName, options);
+            const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
+            const localVarOperationServerBasePath = operationServerMap['ApiConsoleHaloRunV1alpha1PostApi.fetchPostContent']?.[localVarOperationServerIndex]?.url;
             return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
         },
         /**
@@ -500,6 +714,18 @@ export const ApiConsoleHaloRunV1alpha1PostApiFp = function(configuration?: Confi
             const localVarAxiosArgs = await localVarAxiosParamCreator.fetchPostReleaseContent(name, options);
             const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
             const localVarOperationServerBasePath = operationServerMap['ApiConsoleHaloRunV1alpha1PostApi.fetchPostReleaseContent']?.[localVarOperationServerIndex]?.url;
+            return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
+        },
+        /**
+         * List all snapshots for post content.
+         * @param {string} name 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async listPostSnapshots(name: string, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<Array<ListedSnapshotDto>>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.listPostSnapshots(name, options);
+            const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
+            const localVarOperationServerBasePath = operationServerMap['ApiConsoleHaloRunV1alpha1PostApi.listPostSnapshots']?.[localVarOperationServerIndex]?.url;
             return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
         },
         /**
@@ -543,6 +769,19 @@ export const ApiConsoleHaloRunV1alpha1PostApiFp = function(configuration?: Confi
             const localVarAxiosArgs = await localVarAxiosParamCreator.recyclePost(name, options);
             const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
             const localVarOperationServerBasePath = operationServerMap['ApiConsoleHaloRunV1alpha1PostApi.recyclePost']?.[localVarOperationServerIndex]?.url;
+            return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
+        },
+        /**
+         * Revert to specified snapshot for post content.
+         * @param {string} name 
+         * @param {RevertSnapshotForPostParam} revertSnapshotForPostParam 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async revertToSpecifiedSnapshotForPost(name: string, revertSnapshotForPostParam: RevertSnapshotForPostParam, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<Post>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.revertToSpecifiedSnapshotForPost(name, revertSnapshotForPostParam, options);
+            const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
+            const localVarOperationServerBasePath = operationServerMap['ApiConsoleHaloRunV1alpha1PostApi.revertToSpecifiedSnapshotForPost']?.[localVarOperationServerIndex]?.url;
             return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
         },
         /**
@@ -594,6 +833,15 @@ export const ApiConsoleHaloRunV1alpha1PostApiFactory = function (configuration?:
     const localVarFp = ApiConsoleHaloRunV1alpha1PostApiFp(configuration)
     return {
         /**
+         * Delete a content for post.
+         * @param {ApiConsoleHaloRunV1alpha1PostApiDeletePostContentRequest} requestParameters Request parameters.
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        deletePostContent(requestParameters: ApiConsoleHaloRunV1alpha1PostApiDeletePostContentRequest, options?: RawAxiosRequestConfig): AxiosPromise<ContentWrapper> {
+            return localVarFp.deletePostContent(requestParameters.name, requestParameters.snapshotName, options).then((request) => request(axios, basePath));
+        },
+        /**
          * Draft a post.
          * @param {ApiConsoleHaloRunV1alpha1PostApiDraftPostRequest} requestParameters Request parameters.
          * @param {*} [options] Override http request option.
@@ -601,6 +849,15 @@ export const ApiConsoleHaloRunV1alpha1PostApiFactory = function (configuration?:
          */
         draftPost(requestParameters: ApiConsoleHaloRunV1alpha1PostApiDraftPostRequest, options?: RawAxiosRequestConfig): AxiosPromise<Post> {
             return localVarFp.draftPost(requestParameters.postRequest, options).then((request) => request(axios, basePath));
+        },
+        /**
+         * Fetch content of post.
+         * @param {ApiConsoleHaloRunV1alpha1PostApiFetchPostContentRequest} requestParameters Request parameters.
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        fetchPostContent(requestParameters: ApiConsoleHaloRunV1alpha1PostApiFetchPostContentRequest, options?: RawAxiosRequestConfig): AxiosPromise<ContentWrapper> {
+            return localVarFp.fetchPostContent(requestParameters.name, requestParameters.snapshotName, options).then((request) => request(axios, basePath));
         },
         /**
          * Fetch head content of post.
@@ -619,6 +876,15 @@ export const ApiConsoleHaloRunV1alpha1PostApiFactory = function (configuration?:
          */
         fetchPostReleaseContent(requestParameters: ApiConsoleHaloRunV1alpha1PostApiFetchPostReleaseContentRequest, options?: RawAxiosRequestConfig): AxiosPromise<ContentWrapper> {
             return localVarFp.fetchPostReleaseContent(requestParameters.name, options).then((request) => request(axios, basePath));
+        },
+        /**
+         * List all snapshots for post content.
+         * @param {ApiConsoleHaloRunV1alpha1PostApiListPostSnapshotsRequest} requestParameters Request parameters.
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        listPostSnapshots(requestParameters: ApiConsoleHaloRunV1alpha1PostApiListPostSnapshotsRequest, options?: RawAxiosRequestConfig): AxiosPromise<Array<ListedSnapshotDto>> {
+            return localVarFp.listPostSnapshots(requestParameters.name, options).then((request) => request(axios, basePath));
         },
         /**
          * List posts.
@@ -646,6 +912,15 @@ export const ApiConsoleHaloRunV1alpha1PostApiFactory = function (configuration?:
          */
         recyclePost(requestParameters: ApiConsoleHaloRunV1alpha1PostApiRecyclePostRequest, options?: RawAxiosRequestConfig): AxiosPromise<void> {
             return localVarFp.recyclePost(requestParameters.name, options).then((request) => request(axios, basePath));
+        },
+        /**
+         * Revert to specified snapshot for post content.
+         * @param {ApiConsoleHaloRunV1alpha1PostApiRevertToSpecifiedSnapshotForPostRequest} requestParameters Request parameters.
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        revertToSpecifiedSnapshotForPost(requestParameters: ApiConsoleHaloRunV1alpha1PostApiRevertToSpecifiedSnapshotForPostRequest, options?: RawAxiosRequestConfig): AxiosPromise<Post> {
+            return localVarFp.revertToSpecifiedSnapshotForPost(requestParameters.name, requestParameters.revertSnapshotForPostParam, options).then((request) => request(axios, basePath));
         },
         /**
          * Publish a post.
@@ -678,6 +953,27 @@ export const ApiConsoleHaloRunV1alpha1PostApiFactory = function (configuration?:
 };
 
 /**
+ * Request parameters for deletePostContent operation in ApiConsoleHaloRunV1alpha1PostApi.
+ * @export
+ * @interface ApiConsoleHaloRunV1alpha1PostApiDeletePostContentRequest
+ */
+export interface ApiConsoleHaloRunV1alpha1PostApiDeletePostContentRequest {
+    /**
+     * 
+     * @type {string}
+     * @memberof ApiConsoleHaloRunV1alpha1PostApiDeletePostContent
+     */
+    readonly name: string
+
+    /**
+     * 
+     * @type {string}
+     * @memberof ApiConsoleHaloRunV1alpha1PostApiDeletePostContent
+     */
+    readonly snapshotName: string
+}
+
+/**
  * Request parameters for draftPost operation in ApiConsoleHaloRunV1alpha1PostApi.
  * @export
  * @interface ApiConsoleHaloRunV1alpha1PostApiDraftPostRequest
@@ -689,6 +985,27 @@ export interface ApiConsoleHaloRunV1alpha1PostApiDraftPostRequest {
      * @memberof ApiConsoleHaloRunV1alpha1PostApiDraftPost
      */
     readonly postRequest: PostRequest
+}
+
+/**
+ * Request parameters for fetchPostContent operation in ApiConsoleHaloRunV1alpha1PostApi.
+ * @export
+ * @interface ApiConsoleHaloRunV1alpha1PostApiFetchPostContentRequest
+ */
+export interface ApiConsoleHaloRunV1alpha1PostApiFetchPostContentRequest {
+    /**
+     * 
+     * @type {string}
+     * @memberof ApiConsoleHaloRunV1alpha1PostApiFetchPostContent
+     */
+    readonly name: string
+
+    /**
+     * 
+     * @type {string}
+     * @memberof ApiConsoleHaloRunV1alpha1PostApiFetchPostContent
+     */
+    readonly snapshotName: string
 }
 
 /**
@@ -715,6 +1032,20 @@ export interface ApiConsoleHaloRunV1alpha1PostApiFetchPostReleaseContentRequest 
      * 
      * @type {string}
      * @memberof ApiConsoleHaloRunV1alpha1PostApiFetchPostReleaseContent
+     */
+    readonly name: string
+}
+
+/**
+ * Request parameters for listPostSnapshots operation in ApiConsoleHaloRunV1alpha1PostApi.
+ * @export
+ * @interface ApiConsoleHaloRunV1alpha1PostApiListPostSnapshotsRequest
+ */
+export interface ApiConsoleHaloRunV1alpha1PostApiListPostSnapshotsRequest {
+    /**
+     * 
+     * @type {string}
+     * @memberof ApiConsoleHaloRunV1alpha1PostApiListPostSnapshots
      */
     readonly name: string
 }
@@ -811,6 +1142,27 @@ export interface ApiConsoleHaloRunV1alpha1PostApiRecyclePostRequest {
 }
 
 /**
+ * Request parameters for revertToSpecifiedSnapshotForPost operation in ApiConsoleHaloRunV1alpha1PostApi.
+ * @export
+ * @interface ApiConsoleHaloRunV1alpha1PostApiRevertToSpecifiedSnapshotForPostRequest
+ */
+export interface ApiConsoleHaloRunV1alpha1PostApiRevertToSpecifiedSnapshotForPostRequest {
+    /**
+     * 
+     * @type {string}
+     * @memberof ApiConsoleHaloRunV1alpha1PostApiRevertToSpecifiedSnapshotForPost
+     */
+    readonly name: string
+
+    /**
+     * 
+     * @type {RevertSnapshotForPostParam}
+     * @memberof ApiConsoleHaloRunV1alpha1PostApiRevertToSpecifiedSnapshotForPost
+     */
+    readonly revertSnapshotForPostParam: RevertSnapshotForPostParam
+}
+
+/**
  * Request parameters for unpublishPost operation in ApiConsoleHaloRunV1alpha1PostApi.
  * @export
  * @interface ApiConsoleHaloRunV1alpha1PostApiUnpublishPostRequest
@@ -874,6 +1226,17 @@ export interface ApiConsoleHaloRunV1alpha1PostApiUpdatePostContentRequest {
  */
 export class ApiConsoleHaloRunV1alpha1PostApi extends BaseAPI {
     /**
+     * Delete a content for post.
+     * @param {ApiConsoleHaloRunV1alpha1PostApiDeletePostContentRequest} requestParameters Request parameters.
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof ApiConsoleHaloRunV1alpha1PostApi
+     */
+    public deletePostContent(requestParameters: ApiConsoleHaloRunV1alpha1PostApiDeletePostContentRequest, options?: RawAxiosRequestConfig) {
+        return ApiConsoleHaloRunV1alpha1PostApiFp(this.configuration).deletePostContent(requestParameters.name, requestParameters.snapshotName, options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
      * Draft a post.
      * @param {ApiConsoleHaloRunV1alpha1PostApiDraftPostRequest} requestParameters Request parameters.
      * @param {*} [options] Override http request option.
@@ -882,6 +1245,17 @@ export class ApiConsoleHaloRunV1alpha1PostApi extends BaseAPI {
      */
     public draftPost(requestParameters: ApiConsoleHaloRunV1alpha1PostApiDraftPostRequest, options?: RawAxiosRequestConfig) {
         return ApiConsoleHaloRunV1alpha1PostApiFp(this.configuration).draftPost(requestParameters.postRequest, options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
+     * Fetch content of post.
+     * @param {ApiConsoleHaloRunV1alpha1PostApiFetchPostContentRequest} requestParameters Request parameters.
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof ApiConsoleHaloRunV1alpha1PostApi
+     */
+    public fetchPostContent(requestParameters: ApiConsoleHaloRunV1alpha1PostApiFetchPostContentRequest, options?: RawAxiosRequestConfig) {
+        return ApiConsoleHaloRunV1alpha1PostApiFp(this.configuration).fetchPostContent(requestParameters.name, requestParameters.snapshotName, options).then((request) => request(this.axios, this.basePath));
     }
 
     /**
@@ -904,6 +1278,17 @@ export class ApiConsoleHaloRunV1alpha1PostApi extends BaseAPI {
      */
     public fetchPostReleaseContent(requestParameters: ApiConsoleHaloRunV1alpha1PostApiFetchPostReleaseContentRequest, options?: RawAxiosRequestConfig) {
         return ApiConsoleHaloRunV1alpha1PostApiFp(this.configuration).fetchPostReleaseContent(requestParameters.name, options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
+     * List all snapshots for post content.
+     * @param {ApiConsoleHaloRunV1alpha1PostApiListPostSnapshotsRequest} requestParameters Request parameters.
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof ApiConsoleHaloRunV1alpha1PostApi
+     */
+    public listPostSnapshots(requestParameters: ApiConsoleHaloRunV1alpha1PostApiListPostSnapshotsRequest, options?: RawAxiosRequestConfig) {
+        return ApiConsoleHaloRunV1alpha1PostApiFp(this.configuration).listPostSnapshots(requestParameters.name, options).then((request) => request(this.axios, this.basePath));
     }
 
     /**
@@ -937,6 +1322,17 @@ export class ApiConsoleHaloRunV1alpha1PostApi extends BaseAPI {
      */
     public recyclePost(requestParameters: ApiConsoleHaloRunV1alpha1PostApiRecyclePostRequest, options?: RawAxiosRequestConfig) {
         return ApiConsoleHaloRunV1alpha1PostApiFp(this.configuration).recyclePost(requestParameters.name, options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
+     * Revert to specified snapshot for post content.
+     * @param {ApiConsoleHaloRunV1alpha1PostApiRevertToSpecifiedSnapshotForPostRequest} requestParameters Request parameters.
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof ApiConsoleHaloRunV1alpha1PostApi
+     */
+    public revertToSpecifiedSnapshotForPost(requestParameters: ApiConsoleHaloRunV1alpha1PostApiRevertToSpecifiedSnapshotForPostRequest, options?: RawAxiosRequestConfig) {
+        return ApiConsoleHaloRunV1alpha1PostApiFp(this.configuration).revertToSpecifiedSnapshotForPost(requestParameters.name, requestParameters.revertSnapshotForPostParam, options).then((request) => request(this.axios, this.basePath));
     }
 
     /**

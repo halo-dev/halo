@@ -15,28 +15,28 @@
 
 // May contain unused imports in some cases
 // @ts-ignore
-import { ContentUpdateParam } from './content-update-param';
+import { ListedSnapshotSpec } from './listed-snapshot-spec';
 // May contain unused imports in some cases
 // @ts-ignore
-import { SinglePage } from './single-page';
+import { Metadata } from './metadata';
 
 /**
  * 
  * @export
- * @interface SinglePageRequest
+ * @interface ListedSnapshotDto
  */
-export interface SinglePageRequest {
+export interface ListedSnapshotDto {
     /**
      * 
-     * @type {ContentUpdateParam}
-     * @memberof SinglePageRequest
+     * @type {Metadata}
+     * @memberof ListedSnapshotDto
      */
-    'content': ContentUpdateParam;
+    'metadata': Metadata;
     /**
      * 
-     * @type {SinglePage}
-     * @memberof SinglePageRequest
+     * @type {ListedSnapshotSpec}
+     * @memberof ListedSnapshotDto
      */
-    'page': SinglePage;
+    'spec': ListedSnapshotSpec;
 }
 

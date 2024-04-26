@@ -2,6 +2,7 @@
 import {
   Dialog,
   IconEye,
+  IconHistoryLine,
   IconPages,
   IconSave,
   IconSendPlaneFill,
@@ -452,6 +453,22 @@ async function handleUploadImage(file: File, options?: AxiosRequestConfig) {
           :allow-forced-select="!isUpdateMode"
           @select="handleChangeEditorProvider"
         />
+        <VButton
+          v-if="isUpdateMode"
+          size="sm"
+          type="default"
+          @click="
+            $router.push({
+              name: 'SinglePageSnapshots',
+              query: { name: routeQueryName },
+            })
+          "
+        >
+          <template #icon>
+            <IconHistoryLine class="h-full w-full" />
+          </template>
+          {{ $t("core.page_editor.actions.snapshots") }}
+        </VButton>
         <VButton
           size="sm"
           type="default"

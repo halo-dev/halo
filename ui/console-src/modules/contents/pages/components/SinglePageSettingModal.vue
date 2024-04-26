@@ -117,7 +117,7 @@ const handlePublishClick = () => {
 };
 
 // Fix me:
-// Force update post settings,
+// Force update singlePage settings,
 // because currently there may be errors caused by changes in version due to asynchronous processing.
 const { mutateAsync: singlePageUpdateMutate } = usePageUpdateMutate();
 

@@ -10,6 +10,7 @@ import TagList from "./tags/TagList.vue";
 import PostStatsWidget from "./widgets/PostStatsWidget.vue";
 import RecentPublishedWidget from "./widgets/RecentPublishedWidget.vue";
 import { markRaw } from "vue";
+import PostSnapshots from "./PostSnapshots.vue";
 
 export default definePlugin({
   components: {
@@ -56,6 +57,17 @@ export default definePlugin({
           meta: {
             title: "core.post_editor.title",
             searchable: true,
+            hideFooter: true,
+            permissions: ["system:posts:manage"],
+          },
+        },
+        {
+          path: "snapshots",
+          name: "PostSnapshots",
+          component: PostSnapshots,
+          meta: {
+            title: "core.post_snapshots.title",
+            searchable: false,
             hideFooter: true,
             permissions: ["system:posts:manage"],
           },
