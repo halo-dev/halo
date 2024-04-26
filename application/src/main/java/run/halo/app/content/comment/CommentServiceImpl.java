@@ -4,10 +4,12 @@ import static run.halo.app.extension.index.query.QueryFactory.and;
 import static run.halo.app.extension.index.query.QueryFactory.equal;
 import static run.halo.app.extension.index.query.QueryFactory.isNull;
 
+import java.time.Duration;
 import java.time.Instant;
 import java.util.Set;
 import java.util.function.Function;
 import org.apache.commons.lang3.BooleanUtils;
+import org.springframework.dao.OptimisticLockingFailureException;
 import org.springframework.data.domain.Sort;
 import org.springframework.lang.NonNull;
 import org.springframework.security.core.context.ReactiveSecurityContextHolder;
@@ -15,6 +17,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.util.Assert;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
+import reactor.util.retry.Retry;
 import run.halo.app.core.extension.User;
 import run.halo.app.core.extension.content.Comment;
 import run.halo.app.core.extension.service.RoleService;
@@ -147,17 +150,33 @@ public class CommentServiceImpl implements CommentService {
     @Override
     public Mono<Void> removeBySubject(@NonNull Ref subjectRef) {
         Assert.notNull(subjectRef, "The subjectRef must not be null.");
+        return cleanupComments(subjectRef, 200);
+    }
+
+    private Mono<Void> cleanupComments(Ref subjectRef, int batchSize) {
         // ascending order by creation time and name
-        var pageRequest = PageRequestImpl.of(1, 200,
+        final var pageRequest = PageRequestImpl.of(1, batchSize,
             Sort.by("metadata.creationTimestamp", "metadata.name"));
-        return Flux.defer(() -> listCommentsByRef(subjectRef, pageRequest))
-            .expand(page -> page.hasNext()
-                ? listCommentsByRef(subjectRef, pageRequest.next())
-                : Mono.empty()
+        // forever loop first page until no more to delete
+        return listCommentsByRef(subjectRef, pageRequest)
+            .flatMap(page -> Flux.fromIterable(page.getItems())
+                .flatMap(this::deleteWithRetry)
+                .then(page.hasNext() ? cleanupComments(subjectRef, batchSize) : Mono.empty())
+            );
+    }
+
+    private Mono<Comment> deleteWithRetry(Comment item) {
+        return client.delete(item)
+            .onErrorResume(OptimisticLockingFailureException.class,
+                e -> attemptToDelete(item.getMetadata().getName()));
+    }
+
+    private Mono<Comment> attemptToDelete(String name) {
+        return Mono.defer(() -> client.fetch(Comment.class, name)
+                .flatMap(client::delete)
             )
-            .flatMap(page -> Flux.fromIterable(page.getItems()))
-            .flatMap(client::delete)
-            .then();
+            .retryWhen(Retry.backoff(8, Duration.ofMillis(100))
+                .filter(OptimisticLockingFailureException.class::isInstance));
     }
 
     Mono<ListResult<Comment>> listCommentsByRef(Ref subjectRef, PageRequest pageRequest) {
