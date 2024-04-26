@@ -439,6 +439,11 @@ public class SchemeInitializer implements ApplicationListener<ApplicationContext
                     subscription -> subscription.getSpec().getReason().getSubject().toString()))
             );
             indexSpecs.add(new IndexSpec()
+                .setName("spec.reason.expression")
+                .setIndexFunc(simpleAttribute(Subscription.class,
+                    subscription -> subscription.getSpec().getReason().getExpression()))
+            );
+            indexSpecs.add(new IndexSpec()
                 .setName("spec.subscriber")
                 .setIndexFunc(simpleAttribute(Subscription.class,
                     subscription -> subscription.getSpec().getSubscriber().toString()))

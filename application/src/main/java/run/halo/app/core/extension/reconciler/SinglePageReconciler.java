@@ -107,11 +107,8 @@ public class SinglePageReconciler implements Reconciler<Reconciler.Request> {
 
         var interestReason = new Subscription.InterestReason();
         interestReason.setReasonType(NotificationReasonConst.NEW_COMMENT_ON_PAGE);
-        interestReason.setSubject(Subscription.ReasonSubject.builder()
-            .apiVersion(page.getApiVersion())
-            .kind(page.getKind())
-            .name(page.getMetadata().getName())
-            .build());
+        interestReason.setExpression(
+            "props.pageOwner == '%s'".formatted(page.getSpec().getOwner()));
         notificationCenter.subscribe(subscriber, interestReason).block();
     }
 

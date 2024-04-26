@@ -454,21 +454,6 @@ class CommentNotificationReasonPublisherTest {
         }
     }
 
-    @Test
-    void identityFromTest() {
-        var owner = new Comment.CommentOwner();
-        owner.setKind(User.KIND);
-        owner.setName("fake-user");
-
-        assertThat(CommentNotificationReasonPublisher.identityFrom(owner))
-            .isEqualTo(UserIdentity.of(owner.getName()));
-
-        owner.setKind(Comment.CommentOwner.KIND_EMAIL);
-        owner.setName("example@example.com");
-        assertThat(CommentNotificationReasonPublisher.identityFrom(owner))
-            .isEqualTo(UserIdentity.anonymousWithEmail(owner.getName()));
-    }
-
     static Comment createComment() {
         var comment = new Comment();
         comment.setMetadata(new Metadata());

@@ -21,13 +21,12 @@ import run.halo.app.extension.ReactiveExtensionClient;
 @Component
 @RequiredArgsConstructor
 public class DefaultSubscriberEmailResolver implements SubscriberEmailResolver {
-    private static final String SEPARATOR = "#";
-
     private final ReactiveExtensionClient client;
 
     @Override
     public Mono<String> resolve(Subscription.Subscriber subscriber) {
-        if (isEmailSubscriber(subscriber)) {
+        var identity = UserIdentity.of(subscriber.getName());
+        if (identity.isAnonymous()) {
             return Mono.fromSupplier(() -> getEmail(subscriber));
         }
         return client.fetch(User.class, subscriber.getName())
@@ -44,20 +43,14 @@ public class DefaultSubscriberEmailResolver implements SubscriberEmailResolver {
         return subscriber;
     }
 
-    static boolean isEmailSubscriber(Subscription.Subscriber subscriber) {
-        return UserIdentity.of(subscriber.getName()).isAnonymous();
-    }
-
     @NonNull
     String getEmail(Subscription.Subscriber subscriber) {
-        if (!isEmailSubscriber(subscriber)) {
-            throw new IllegalStateException("The subscriber is not an email subscriber");
+        var identity = UserIdentity.of(subscriber.getName());
+        if (!identity.isAnonymous()) {
+            throw new IllegalStateException("The subscriber is not an anonymous subscriber");
         }
-        var subscriberName = subscriber.getName();
-        String email = subscriberName.substring(subscriberName.indexOf(SEPARATOR) + 1);
-        if (StringUtils.isBlank(email)) {
-            throw new IllegalStateException("The subscriber does not have an email");
-        }
-        return email;
+        return identity.getEmail()
+            .filter(StringUtils::isNotBlank)
+            .orElseThrow(() -> new IllegalStateException("The subscriber does not have an email"));
     }
 }

@@ -1,6 +1,7 @@
 package run.halo.app.content.comment;
 
 import static org.apache.commons.lang3.StringUtils.defaultIfBlank;
+import static run.halo.app.content.comment.ReplyNotificationSubscriptionHelper.identityFrom;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import java.util.Map;
@@ -29,7 +30,6 @@ import run.halo.app.extension.Ref;
 import run.halo.app.infra.ExternalLinkProcessor;
 import run.halo.app.infra.utils.JsonUtils;
 import run.halo.app.notification.NotificationReasonEmitter;
-import run.halo.app.notification.UserIdentity;
 import run.halo.app.plugin.ExtensionComponentsFinder;
 import run.halo.app.plugin.extensionpoint.ExtensionGetter;
 
@@ -114,6 +114,7 @@ public class CommentNotificationReasonPublisher {
                 builder -> {
                     var attributes = CommentOnPostReasonData.builder()
                         .postName(subjectRef.getName())
+                        .postOwner(post.getSpec().getOwner())
                         .postTitle(post.getSpec().getTitle())
                         .postUrl(postUrl)
                         .commenter(owner.getDisplayName())
@@ -144,8 +145,9 @@ public class CommentNotificationReasonPublisher {
         }
 
         @Builder
-        record CommentOnPostReasonData(String postName, String postTitle, String postUrl,
-                                       String commenter, String content, String commentName) {
+        record CommentOnPostReasonData(String postName, String postOwner, String postTitle,
+                                       String postUrl, String commenter, String content,
+                                       String commentName) {
         }
     }
 
@@ -180,6 +182,7 @@ public class CommentNotificationReasonPublisher {
                 builder -> {
                     var attributes = CommentOnPageReasonData.builder()
                         .pageName(subjectRef.getName())
+                        .pageOwner(singlePage.getSpec().getOwner())
                         .pageTitle(singlePage.getSpec().getTitle())
                         .pageUrl(pageUrl)
                         .commenter(defaultIfBlank(owner.getDisplayName(), owner.getName()))
@@ -210,8 +213,9 @@ public class CommentNotificationReasonPublisher {
         }
 
         @Builder
-        record CommentOnPageReasonData(String pageName, String pageTitle, String pageUrl,
-                                       String commenter, String content, String commentName) {
+        record CommentOnPageReasonData(String pageName, String pageOwner, String pageTitle,
+                                       String pageUrl, String commenter, String content,
+                                       String commentName) {
         }
     }
 
@@ -222,13 +226,6 @@ public class CommentNotificationReasonPublisher {
             return JsonUtils.mapper().convertValue(data, new TypeReference<>() {
             });
         }
-    }
-
-    static UserIdentity identityFrom(Comment.CommentOwner owner) {
-        if (Comment.CommentOwner.KIND_EMAIL.equals(owner.getKind())) {
-            return UserIdentity.anonymousWithEmail(owner.getName());
-        }
-        return UserIdentity.of(owner.getName());
     }
 
     @Component
@@ -272,6 +269,10 @@ public class CommentNotificationReasonPublisher {
                 .orElse(null);
             var replyOwner = reply.getSpec().getOwner();
 
+            var repliedOwner = quoteReplyOptional
+                .map(quoteReply -> quoteReply.getSpec().getOwner())
+                .orElseGet(() -> comment.getSpec().getOwner());
+
             var reasonAttributesBuilder = NewReplyReasonData.builder()
                 .commentContent(comment.getSpec().getContent())
                 .isQuoteReply(isQuoteReply)
@@ -279,7 +280,9 @@ public class CommentNotificationReasonPublisher {
                 .commentName(comment.getMetadata().getName())
                 .replier(defaultIfBlank(replyOwner.getDisplayName(), replyOwner.getName()))
                 .content(reply.getSpec().getContent())
-                .replyName(reply.getMetadata().getName());
+                .replyName(reply.getMetadata().getName())
+                .replyOwner(identityFrom(replyOwner).name())
+                .repliedOwner(identityFrom(repliedOwner).name());
 
             getCommentSubjectDisplay(comment.getSpec().getSubjectRef())
                 .ifPresent(subject -> {
@@ -337,7 +340,7 @@ public class CommentNotificationReasonPublisher {
                                   String commentSubjectUrl, boolean isQuoteReply,
                                   String quoteContent,
                                   String commentName, String replier, String content,
-                                  String replyName) {
+                                  String replyName, String replyOwner, String repliedOwner) {
         }
     }
 }

@@ -15003,6 +15003,10 @@
         ],
         "type": "object",
         "properties": {
+          "expression": {
+            "type": "string",
+            "description": "The expression to be interested in"
+          },
           "reasonType": {
             "type": "string",
             "description": "The name of the reason definition to be interested in"

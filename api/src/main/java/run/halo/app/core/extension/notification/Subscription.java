@@ -11,7 +11,6 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
-import lombok.ToString;
 import run.halo.app.extension.AbstractExtension;
 import run.halo.app.extension.GVK;
 
@@ -59,6 +58,44 @@ public class Subscription extends AbstractExtension {
         @Schema(requiredMode = REQUIRED, description = "The subject name of reason type to be"
             + " interested in")
         private ReasonSubject subject;
+
+        @Schema(requiredMode = NOT_REQUIRED, description = "The expression to be interested in")
+        private String expression;
+
+        /**
+         * <p>Since 2.15.0, we have added a new field <code>expression</code> to the
+         * <code>InterestReason</code> object, so <code>subject</code> can be null.</p>
+         * <p>In this particular scenario, when the <code>subject</code> is null, we assign it a
+         * default <code>ReasonSubject</code> object. The properties of this object are set to
+         * specific values that do not occur in actual applications, thus we can consider this as
+         * <code>nonexistent data</code>.
+         * The purpose of this approach is to maintain backward compatibility, even if the
+         * <code>subject</code> can be null in the new version of the code.</p>
+         */
+        public static void ensureSubjectHasValue(InterestReason interestReason) {
+            if (interestReason.getSubject() == null) {
+                interestReason.setSubject(createFallbackSubject());
+            }
+        }
+
+        /**
+         * Check if the given reason subject is a fallback subject.
+         */
+        public static boolean isFallbackSubject(ReasonSubject reasonSubject) {
+            if (reasonSubject == null) {
+                return true;
+            }
+            var fallback = createFallbackSubject();
+            return fallback.getKind().equals(reasonSubject.getKind())
+                && fallback.getApiVersion().equals(reasonSubject.getApiVersion());
+        }
+
+        static ReasonSubject createFallbackSubject() {
+            return ReasonSubject.builder()
+                .apiVersion("notification.halo.run/v1alpha1")
+                .kind("NonexistentKind")
+                .build();
+        }
     }
 
     @Data
@@ -85,10 +122,14 @@ public class Subscription extends AbstractExtension {
     }
 
     @Data
-    @ToString
     @Schema(name = "SubscriptionSubscriber")
     public static class Subscriber {
         private String name;
+
+        @Override
+        public String toString() {
+            return name;
+        }
     }
 
     /**

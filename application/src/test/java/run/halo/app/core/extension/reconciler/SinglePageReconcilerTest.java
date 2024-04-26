@@ -232,11 +232,7 @@ class SinglePageReconcilerTest {
             assertArg(argReason -> {
                 var interestReason = new Subscription.InterestReason();
                 interestReason.setReasonType(NotificationReasonConst.NEW_COMMENT_ON_PAGE);
-                interestReason.setSubject(Subscription.ReasonSubject.builder()
-                    .apiVersion(page.getApiVersion())
-                    .kind(page.getKind())
-                    .name(page.getMetadata().getName())
-                    .build());
+                interestReason.setExpression("props.pageOwner == 'null'");
                 assertThat(argReason).isEqualTo(interestReason);
             }));
     }

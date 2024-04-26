@@ -79,6 +79,9 @@ spec:
     - name: postName
       type: string
       description: "The name of the post."
+    - name: postOwner
+      type: string
+      description: "The user name of the post owner."
     - name: postTitle
       type: string
     - name: postUrl
@@ -107,6 +110,9 @@ spec:
     - name: pageName
       type: string
       description: "The name of the single page."
+    - name: pageOwner
+      type: string
+      description: "The user name of the page owner."
     - name: pageTitle
       type: string
     - name: pageUrl
@@ -144,6 +150,12 @@ spec:
       type: boolean
     - name: commentContent
       type: string
+    - name: repliedOwner
+      type: string
+      description: "The owner of the comment or reply that has been replied to."
+    - name: replyOwner
+      type: string
+      description: "The user who created the current reply."
     - name: replier
       type: string
       description: "The display name of the replier."

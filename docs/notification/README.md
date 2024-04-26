@@ -19,7 +19,8 @@
 设计一个通知功能，可以根据以下目标，实现订阅和推送通知：
 
 - 支持扩展多种通知方式，例如邮件、短信、Slack 等。
-- 支持通知条件并可扩展，例如 Halo 有新文章发布事件如果用户订阅了新文章发布事件但付费订阅插件决定了此文章只有付费用户才可收到通知、按照付费等级不同决定是否发送新文章通知给对应用户等需要通过实现通知条件的扩展点来满足对应需求。
+- 支持通知条件并可扩展，例如 Halo
+  有新文章发布事件如果用户订阅了新文章发布事件但付费订阅插件决定了此文章只有付费用户才可收到通知、按照付费等级不同决定是否发送新文章通知给对应用户等需要通过实现通知条件的扩展点来满足对应需求。
 - 支持定制化选项，例如是否开启通知、通知时段等。
 - 支持通知流程，例如通知的发送、接收、查看、标记等。
 - 通知内容支持多语言。
@@ -97,7 +98,8 @@ spec:
 
 #### Subscription
 
-`Subscription` 自定义模型，定义了特定事件时与要被通知的订阅者之间的关系, 其中 `subscriber` 表示订阅者用户, `unsubscribeToken` 表示退订时的身份验证 token, `reason` 订阅者感兴趣的事件。
+`Subscription` 自定义模型，定义了特定事件时与要被通知的订阅者之间的关系, 其中 `subscriber`
+表示订阅者用户, `unsubscribeToken` 表示退订时的身份验证 token, `reason` 订阅者感兴趣的事件。
 
 用户可以通过 `Subscription` 来订阅自己感兴趣的事件，当事件触发时会收到通知：
 
@@ -116,13 +118,24 @@ spec:
       apiVersion: content.halo.run/v1alpha1
       kind: Post
       name: 'post-axgu'
+    # expression: 'props.owner == "guqing"'
 ```
 
-订阅退订链接 API 规则：`/apis/api.notification.halo.run/v1alpha1/subscriptions/{name}/unsubscribe?token={unsubscribeToken}`。
+- `spec.reason.subject`：用于根据事件的主体的匹配感兴趣的事件，如果不指定 name 则表示匹配主体与 kind 和 apiVersion
+  相同的一类事件。
+- `spec.expression`：根据表达式匹配感兴趣的事件，例如 `props.owner == "guqing"` 表示只有当事件的属性（reason attributes）的
+  owner 等于 guqing 时才会触发通知。表达式符合 SpEL
+  表达式语法，但结果只能是布尔值。参考：[增强 Subscription 模型以支持表达式匹配](https://github.com/halo-dev/halo/issues/5632)
+
+> 当 `spec.expression` 和 `spec.reason.subject` 同时存在时，以 `spec.reason.subject` 的结果为准，不建议同时使用。
+
+订阅退订链接 API
+规则：`/apis/api.notification.halo.run/v1alpha1/subscriptions/{name}/unsubscribe?token={unsubscribeToken}`。
 
 #### 用户通知偏好设置
 
-通过在用户偏好设置的 ConfigMap 中存储一个 `notification` key 用于保存事件类型与通知方式的关系设置，当用户订阅了如 'new-comment-on-post' 事件时会获取对应的通知方式来给用户发送通知。
+通过在用户偏好设置的 ConfigMap 中存储一个 `notification` key 用于保存事件类型与通知方式的关系设置，当用户订阅了如 '
+new-comment-on-post' 事件时会获取对应的通知方式来给用户发送通知。
 
 ```yaml
 apiVersion: v1alpha1
@@ -153,7 +166,8 @@ data:
 
 #### Notification 站内通知
 
-当用户订阅到事件后会创建 `Notification`, 它与通知方式（notifier）无关，`recipient` 为用户名，类似站内通知，如用户 `guqing` 订阅了评论事件那么当监听到评论事件时会创建一条记录可以在个人中心的通知列表看到一条通知消息。
+当用户订阅到事件后会创建 `Notification`, 它与通知方式（notifier）无关，`recipient` 为用户名，类似站内通知，如用户 `guqing`
+订阅了评论事件那么当监听到评论事件时会创建一条记录可以在个人中心的通知列表看到一条通知消息。
 
 ```yaml
 apiVersion: notification.halo.run/v1alpha1
@@ -177,6 +191,7 @@ spec:
    `GET /apis/api.notification.halo.run/v1alpha1/userspaces/{username}/notifications`
 2. 将通知标记为已读：`PUT /apis/api.notification.halo.run/v1alpha1/userspaces/{username}/notifications/mark-as-read`
 3.
+
 批量将通知标记为已读：`PUT /apis/api.notification.halo.run/v1alpha1/userspaces/{username}/notifications/mark-specified-as-read`
 
 #### 通知模板
@@ -185,14 +200,18 @@ spec:
 它通过定义 `reasonSelector` 来引用事件类别，当事件触发时会根据用户的语言偏好和触发事件的类别来选择一个最佳的通知模板。
 选择通知模板的规则为：
 
-1. 根据用户设置的语言，选择从通知模板中定义的 `spec.reasonSelector.language` 的值从更具体到不太具体的顺序（例如，gl_ES 的值将比 gl 的值具有更高的优先级）。
-2. 当通过语言成功匹配到模板时，匹配到的结果可能不止一个，如 `language` 为 `zh_CN` 的模板有三个那么会根据 `NotificationTemplate` 的 `metadata.creationTimestamp` 字段来选择一个最新的模板。
+1. 根据用户设置的语言，选择从通知模板中定义的 `spec.reasonSelector.language` 的值从更具体到不太具体的顺序（例如，gl_ES 的值将比
+   gl 的值具有更高的优先级）。
+2. 当通过语言成功匹配到模板时，匹配到的结果可能不止一个，如 `language` 为 `zh_CN`
+   的模板有三个那么会根据 `NotificationTemplate` 的 `metadata.creationTimestamp` 字段来选择一个最新的模板。
 
 这样的规则有助于用户可以个性化定制某些事件的模板内容。
 
-模板语法使用 ThymeleafEngine 渲染，纯文本模板使用 `textual` 模板模式，语法参考: [usingthymeleaf.html#textual-syntax](https://www.thymeleaf.org/doc/tutorials/3.1/usingthymeleaf.html#textual-syntax)
+模板语法使用 ThymeleafEngine 渲染，纯文本模板使用 `textual`
+模板模式，语法参考: [usingthymeleaf.html#textual-syntax](https://www.thymeleaf.org/doc/tutorials/3.1/usingthymeleaf.html#textual-syntax)
 
-`HTML` 则使用标准表达式语法在标签属性中取值，语法参考：[standard-expression-syntax](https://www.thymeleaf.org/doc/tutorials/3.1/usingthymeleaf.html#standard-expression-syntax)
+`HTML`
+则使用标准表达式语法在标签属性中取值，语法参考：[standard-expression-syntax](https://www.thymeleaf.org/doc/tutorials/3.1/usingthymeleaf.html#standard-expression-syntax)
 
 在通知中心渲染模板时会在 `ReasonAttributes` 中提供额外属性包括：
 
@@ -224,11 +243,12 @@ spec:
 
 #### 通知器声明及扩展
 
-`NotifierDescriptor` 自定义模型用于声明通知器，通过它来描述通知器的名称、描述和关联的 `ExtensionDefinition` 名称，让用户可以在用户界面知道通知器是什么以及它可以做什么,
+`NotifierDescriptor` 自定义模型用于声明通知器，通过它来描述通知器的名称、描述和关联的 `ExtensionDefinition`
+名称，让用户可以在用户界面知道通知器是什么以及它可以做什么,
 还让 NotificationCenter 知道如何加载通知器和准备通知器需要的设置以发送通知。
 
 ```yaml
-apiVersion: notification.halo.run/v1alpha1 
+apiVersion: notification.halo.run/v1alpha1
 kind: NotifierDescriptor
 metadata:
   name: email-notifier
@@ -261,52 +281,52 @@ spec:
 ```java
 public interface ReactiveNotifier extends ExtensionPoint {
 
-    /**
-     * Notify user.
-     *
-     * @param context notification context must not be null
-     */
-    Mono<Void> notify(NotificationContext context);
+  /**
+   * Notify user.
+   *
+   * @param context notification context must not be null
+   */
+  Mono<Void> notify(NotificationContext context);
 }
 
 @Data
 public class NotificationContext {
-    private Message message;
+  private Message message;
 
-    private ObjectNode receiverConfig;
+  private ObjectNode receiverConfig;
 
-    private ObjectNode senderConfig;
+  private ObjectNode senderConfig;
 
-    @Data
-    static class Message {
-      private MessagePayload payload;
+  @Data
+  static class Message {
+    private MessagePayload payload;
 
-      private Subject subject;
+    private Subject subject;
 
-      private String recipient;
+    private String recipient;
 
-      private Instant timestamp;
-    }
+    private Instant timestamp;
+  }
 
-    @Data
-    public static class Subject {
-      private String apiVersion;
-      private String kind;
-      private String name;
-      private String title;
-      private String url;
-    }
+  @Data
+  public static class Subject {
+    private String apiVersion;
+    private String kind;
+    private String name;
+    private String title;
+    private String url;
+  }
 
-    @Data
-    static class MessagePayload {
-      private String title;
+  @Data
+  static class MessagePayload {
+    private String title;
 
-      private String rawBody;
-      
-      private String htmlBody;
+    private String rawBody;
 
-      private ReasonAttributes attributes;
-    }
+    private String htmlBody;
+
+    private ReasonAttributes attributes;
+  }
 }
 ```
 
