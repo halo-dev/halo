@@ -31,16 +31,16 @@ export const ApiConsoleHaloRunV1alpha1TagApiAxiosParamCreator = function (config
     return {
         /**
          * List Post Tags.
-         * @param {Array<string>} [fieldSelector] Field selector for filtering.
-         * @param {string} [keyword] Keyword for searching.
-         * @param {Array<string>} [labelSelector] Label selector for filtering.
-         * @param {number} [page] The page number. Zero indicates no page.
-         * @param {number} [size] Size of one page. Zero indicates no limit.
-         * @param {Array<string>} [sort] Sort property and direction of the list result. Supported fields: creationTimestamp, name
+         * @param {number} [page] Page number. Default is 0.
+         * @param {number} [size] Size number. Default is 0.
+         * @param {Array<string>} [labelSelector] Label selector. e.g.: hidden!&#x3D;true
+         * @param {Array<string>} [fieldSelector] Field selector. e.g.: metadata.name&#x3D;&#x3D;halo
+         * @param {Array<string>} [sort] Sorting criteria in the format: property,(asc|desc). Default sort order is ascending. Multiple sort criteria are supported.
+         * @param {string} [keyword] Post tags filtered by keyword.
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        listPostTags: async (fieldSelector?: Array<string>, keyword?: string, labelSelector?: Array<string>, page?: number, size?: number, sort?: Array<string>, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+        listPostTags: async (page?: number, size?: number, labelSelector?: Array<string>, fieldSelector?: Array<string>, sort?: Array<string>, keyword?: string, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
             const localVarPath = `/apis/api.console.halo.run/v1alpha1/tags`;
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
@@ -61,18 +61,6 @@ export const ApiConsoleHaloRunV1alpha1TagApiAxiosParamCreator = function (config
             // http bearer authentication required
             await setBearerAuthToObject(localVarHeaderParameter, configuration)
 
-            if (fieldSelector) {
-                localVarQueryParameter['fieldSelector'] = fieldSelector;
-            }
-
-            if (keyword !== undefined) {
-                localVarQueryParameter['keyword'] = keyword;
-            }
-
-            if (labelSelector) {
-                localVarQueryParameter['labelSelector'] = labelSelector;
-            }
-
             if (page !== undefined) {
                 localVarQueryParameter['page'] = page;
             }
@@ -81,8 +69,20 @@ export const ApiConsoleHaloRunV1alpha1TagApiAxiosParamCreator = function (config
                 localVarQueryParameter['size'] = size;
             }
 
+            if (labelSelector) {
+                localVarQueryParameter['labelSelector'] = labelSelector;
+            }
+
+            if (fieldSelector) {
+                localVarQueryParameter['fieldSelector'] = fieldSelector;
+            }
+
             if (sort) {
-                localVarQueryParameter['sort'] = Array.from(sort);
+                localVarQueryParameter['sort'] = sort;
+            }
+
+            if (keyword !== undefined) {
+                localVarQueryParameter['keyword'] = keyword;
             }
 
 
@@ -108,17 +108,17 @@ export const ApiConsoleHaloRunV1alpha1TagApiFp = function(configuration?: Config
     return {
         /**
          * List Post Tags.
-         * @param {Array<string>} [fieldSelector] Field selector for filtering.
-         * @param {string} [keyword] Keyword for searching.
-         * @param {Array<string>} [labelSelector] Label selector for filtering.
-         * @param {number} [page] The page number. Zero indicates no page.
-         * @param {number} [size] Size of one page. Zero indicates no limit.
-         * @param {Array<string>} [sort] Sort property and direction of the list result. Supported fields: creationTimestamp, name
+         * @param {number} [page] Page number. Default is 0.
+         * @param {number} [size] Size number. Default is 0.
+         * @param {Array<string>} [labelSelector] Label selector. e.g.: hidden!&#x3D;true
+         * @param {Array<string>} [fieldSelector] Field selector. e.g.: metadata.name&#x3D;&#x3D;halo
+         * @param {Array<string>} [sort] Sorting criteria in the format: property,(asc|desc). Default sort order is ascending. Multiple sort criteria are supported.
+         * @param {string} [keyword] Post tags filtered by keyword.
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async listPostTags(fieldSelector?: Array<string>, keyword?: string, labelSelector?: Array<string>, page?: number, size?: number, sort?: Array<string>, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<TagList>> {
-            const localVarAxiosArgs = await localVarAxiosParamCreator.listPostTags(fieldSelector, keyword, labelSelector, page, size, sort, options);
+        async listPostTags(page?: number, size?: number, labelSelector?: Array<string>, fieldSelector?: Array<string>, sort?: Array<string>, keyword?: string, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<TagList>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.listPostTags(page, size, labelSelector, fieldSelector, sort, keyword, options);
             const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
             const localVarOperationServerBasePath = operationServerMap['ApiConsoleHaloRunV1alpha1TagApi.listPostTags']?.[localVarOperationServerIndex]?.url;
             return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
@@ -140,7 +140,7 @@ export const ApiConsoleHaloRunV1alpha1TagApiFactory = function (configuration?: 
          * @throws {RequiredError}
          */
         listPostTags(requestParameters: ApiConsoleHaloRunV1alpha1TagApiListPostTagsRequest = {}, options?: RawAxiosRequestConfig): AxiosPromise<TagList> {
-            return localVarFp.listPostTags(requestParameters.fieldSelector, requestParameters.keyword, requestParameters.labelSelector, requestParameters.page, requestParameters.size, requestParameters.sort, options).then((request) => request(axios, basePath));
+            return localVarFp.listPostTags(requestParameters.page, requestParameters.size, requestParameters.labelSelector, requestParameters.fieldSelector, requestParameters.sort, requestParameters.keyword, options).then((request) => request(axios, basePath));
         },
     };
 };
@@ -152,46 +152,46 @@ export const ApiConsoleHaloRunV1alpha1TagApiFactory = function (configuration?: 
  */
 export interface ApiConsoleHaloRunV1alpha1TagApiListPostTagsRequest {
     /**
-     * Field selector for filtering.
-     * @type {Array<string>}
-     * @memberof ApiConsoleHaloRunV1alpha1TagApiListPostTags
-     */
-    readonly fieldSelector?: Array<string>
-
-    /**
-     * Keyword for searching.
-     * @type {string}
-     * @memberof ApiConsoleHaloRunV1alpha1TagApiListPostTags
-     */
-    readonly keyword?: string
-
-    /**
-     * Label selector for filtering.
-     * @type {Array<string>}
-     * @memberof ApiConsoleHaloRunV1alpha1TagApiListPostTags
-     */
-    readonly labelSelector?: Array<string>
-
-    /**
-     * The page number. Zero indicates no page.
+     * Page number. Default is 0.
      * @type {number}
      * @memberof ApiConsoleHaloRunV1alpha1TagApiListPostTags
      */
     readonly page?: number
 
     /**
-     * Size of one page. Zero indicates no limit.
+     * Size number. Default is 0.
      * @type {number}
      * @memberof ApiConsoleHaloRunV1alpha1TagApiListPostTags
      */
     readonly size?: number
 
     /**
-     * Sort property and direction of the list result. Supported fields: creationTimestamp, name
+     * Label selector. e.g.: hidden!&#x3D;true
+     * @type {Array<string>}
+     * @memberof ApiConsoleHaloRunV1alpha1TagApiListPostTags
+     */
+    readonly labelSelector?: Array<string>
+
+    /**
+     * Field selector. e.g.: metadata.name&#x3D;&#x3D;halo
+     * @type {Array<string>}
+     * @memberof ApiConsoleHaloRunV1alpha1TagApiListPostTags
+     */
+    readonly fieldSelector?: Array<string>
+
+    /**
+     * Sorting criteria in the format: property,(asc|desc). Default sort order is ascending. Multiple sort criteria are supported.
      * @type {Array<string>}
      * @memberof ApiConsoleHaloRunV1alpha1TagApiListPostTags
      */
     readonly sort?: Array<string>
+
+    /**
+     * Post tags filtered by keyword.
+     * @type {string}
+     * @memberof ApiConsoleHaloRunV1alpha1TagApiListPostTags
+     */
+    readonly keyword?: string
 }
 
 /**
@@ -209,7 +209,7 @@ export class ApiConsoleHaloRunV1alpha1TagApi extends BaseAPI {
      * @memberof ApiConsoleHaloRunV1alpha1TagApi
      */
     public listPostTags(requestParameters: ApiConsoleHaloRunV1alpha1TagApiListPostTagsRequest = {}, options?: RawAxiosRequestConfig) {
-        return ApiConsoleHaloRunV1alpha1TagApiFp(this.configuration).listPostTags(requestParameters.fieldSelector, requestParameters.keyword, requestParameters.labelSelector, requestParameters.page, requestParameters.size, requestParameters.sort, options).then((request) => request(this.axios, this.basePath));
+        return ApiConsoleHaloRunV1alpha1TagApiFp(this.configuration).listPostTags(requestParameters.page, requestParameters.size, requestParameters.labelSelector, requestParameters.fieldSelector, requestParameters.sort, requestParameters.keyword, options).then((request) => request(this.axios, this.basePath));
     }
 }
 

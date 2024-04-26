@@ -19975,12 +19975,16 @@
       },
       "VerifyCodeRequest": {
         "required": [
-          "code"
+          "code",
+          "password"
         ],
         "type": "object",
         "properties": {
           "code": {
             "minLength": 1,
+            "type": "string"
+          },
+          "password": {
             "type": "string"
           }
         }
