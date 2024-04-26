@@ -28,7 +28,11 @@ import { ContentWrapper } from '../models';
 // @ts-ignore
 import { ListedSinglePageList } from '../models';
 // @ts-ignore
+import { ListedSnapshotDto } from '../models';
+// @ts-ignore
 import { Post } from '../models';
+// @ts-ignore
+import { RevertSnapshotForSingleParam } from '../models';
 // @ts-ignore
 import { SinglePage } from '../models';
 // @ts-ignore
@@ -39,6 +43,54 @@ import { SinglePageRequest } from '../models';
  */
 export const ApiConsoleHaloRunV1alpha1SinglePageApiAxiosParamCreator = function (configuration?: Configuration) {
     return {
+        /**
+         * Delete a content for post.
+         * @param {string} name 
+         * @param {string} snapshotName 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        deleteSinglePageContent: async (name: string, snapshotName: string, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+            // verify required parameter 'name' is not null or undefined
+            assertParamExists('deleteSinglePageContent', 'name', name)
+            // verify required parameter 'snapshotName' is not null or undefined
+            assertParamExists('deleteSinglePageContent', 'snapshotName', snapshotName)
+            const localVarPath = `/apis/api.console.halo.run/v1alpha1/singlepages/{name}/content`
+                .replace(`{${"name"}}`, encodeURIComponent(String(name)));
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'DELETE', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+            // authentication BasicAuth required
+            // http basic authentication required
+            setBasicAuthToObject(localVarRequestOptions, configuration)
+
+            // authentication BearerAuth required
+            // http bearer authentication required
+            await setBearerAuthToObject(localVarHeaderParameter, configuration)
+
+            if (snapshotName !== undefined) {
+                localVarQueryParameter['snapshotName'] = snapshotName;
+            }
+
+
+    
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
         /**
          * Draft a single page.
          * @param {SinglePageRequest} singlePageRequest 
@@ -76,6 +128,54 @@ export const ApiConsoleHaloRunV1alpha1SinglePageApiAxiosParamCreator = function 
             let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
             localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
             localVarRequestOptions.data = serializeDataIfNeeded(singlePageRequest, localVarRequestOptions, configuration)
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+        /**
+         * Fetch content of single page.
+         * @param {string} name 
+         * @param {string} snapshotName 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        fetchSinglePageContent: async (name: string, snapshotName: string, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+            // verify required parameter 'name' is not null or undefined
+            assertParamExists('fetchSinglePageContent', 'name', name)
+            // verify required parameter 'snapshotName' is not null or undefined
+            assertParamExists('fetchSinglePageContent', 'snapshotName', snapshotName)
+            const localVarPath = `/apis/api.console.halo.run/v1alpha1/singlepages/{name}/content`
+                .replace(`{${"name"}}`, encodeURIComponent(String(name)));
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'GET', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+            // authentication BasicAuth required
+            // http basic authentication required
+            setBasicAuthToObject(localVarRequestOptions, configuration)
+
+            // authentication BearerAuth required
+            // http bearer authentication required
+            await setBearerAuthToObject(localVarHeaderParameter, configuration)
+
+            if (snapshotName !== undefined) {
+                localVarQueryParameter['snapshotName'] = snapshotName;
+            }
+
+
+    
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
 
             return {
                 url: toPathString(localVarUrlObj),
@@ -133,6 +233,47 @@ export const ApiConsoleHaloRunV1alpha1SinglePageApiAxiosParamCreator = function 
             // verify required parameter 'name' is not null or undefined
             assertParamExists('fetchSinglePageReleaseContent', 'name', name)
             const localVarPath = `/apis/api.console.halo.run/v1alpha1/singlepages/{name}/release-content`
+                .replace(`{${"name"}}`, encodeURIComponent(String(name)));
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'GET', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+            // authentication BasicAuth required
+            // http basic authentication required
+            setBasicAuthToObject(localVarRequestOptions, configuration)
+
+            // authentication BearerAuth required
+            // http bearer authentication required
+            await setBearerAuthToObject(localVarHeaderParameter, configuration)
+
+
+    
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+        /**
+         * List all snapshots for single page content.
+         * @param {string} name 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        listSinglePageSnapshots: async (name: string, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+            // verify required parameter 'name' is not null or undefined
+            assertParamExists('listSinglePageSnapshots', 'name', name)
+            const localVarPath = `/apis/api.console.halo.run/v1alpha1/singlepages/{name}/snapshot`
                 .replace(`{${"name"}}`, encodeURIComponent(String(name)));
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
@@ -288,6 +429,53 @@ export const ApiConsoleHaloRunV1alpha1SinglePageApiAxiosParamCreator = function 
             };
         },
         /**
+         * Revert to specified snapshot for single page content.
+         * @param {string} name 
+         * @param {RevertSnapshotForSingleParam} revertSnapshotForSingleParam 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        revertToSpecifiedSnapshotForSinglePage: async (name: string, revertSnapshotForSingleParam: RevertSnapshotForSingleParam, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+            // verify required parameter 'name' is not null or undefined
+            assertParamExists('revertToSpecifiedSnapshotForSinglePage', 'name', name)
+            // verify required parameter 'revertSnapshotForSingleParam' is not null or undefined
+            assertParamExists('revertToSpecifiedSnapshotForSinglePage', 'revertSnapshotForSingleParam', revertSnapshotForSingleParam)
+            const localVarPath = `/apis/api.console.halo.run/v1alpha1/singlepages/{name}/revert-content`
+                .replace(`{${"name"}}`, encodeURIComponent(String(name)));
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'PUT', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+            // authentication BasicAuth required
+            // http basic authentication required
+            setBasicAuthToObject(localVarRequestOptions, configuration)
+
+            // authentication BearerAuth required
+            // http bearer authentication required
+            await setBearerAuthToObject(localVarHeaderParameter, configuration)
+
+
+    
+            localVarHeaderParameter['Content-Type'] = 'application/json';
+
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+            localVarRequestOptions.data = serializeDataIfNeeded(revertSnapshotForSingleParam, localVarRequestOptions, configuration)
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+        /**
          * Update a single page.
          * @param {string} name 
          * @param {SinglePageRequest} singlePageRequest 
@@ -392,6 +580,19 @@ export const ApiConsoleHaloRunV1alpha1SinglePageApiFp = function(configuration?:
     const localVarAxiosParamCreator = ApiConsoleHaloRunV1alpha1SinglePageApiAxiosParamCreator(configuration)
     return {
         /**
+         * Delete a content for post.
+         * @param {string} name 
+         * @param {string} snapshotName 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async deleteSinglePageContent(name: string, snapshotName: string, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<ContentWrapper>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.deleteSinglePageContent(name, snapshotName, options);
+            const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
+            const localVarOperationServerBasePath = operationServerMap['ApiConsoleHaloRunV1alpha1SinglePageApi.deleteSinglePageContent']?.[localVarOperationServerIndex]?.url;
+            return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
+        },
+        /**
          * Draft a single page.
          * @param {SinglePageRequest} singlePageRequest 
          * @param {*} [options] Override http request option.
@@ -401,6 +602,19 @@ export const ApiConsoleHaloRunV1alpha1SinglePageApiFp = function(configuration?:
             const localVarAxiosArgs = await localVarAxiosParamCreator.draftSinglePage(singlePageRequest, options);
             const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
             const localVarOperationServerBasePath = operationServerMap['ApiConsoleHaloRunV1alpha1SinglePageApi.draftSinglePage']?.[localVarOperationServerIndex]?.url;
+            return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
+        },
+        /**
+         * Fetch content of single page.
+         * @param {string} name 
+         * @param {string} snapshotName 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async fetchSinglePageContent(name: string, snapshotName: string, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<ContentWrapper>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.fetchSinglePageContent(name, snapshotName, options);
+            const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
+            const localVarOperationServerBasePath = operationServerMap['ApiConsoleHaloRunV1alpha1SinglePageApi.fetchSinglePageContent']?.[localVarOperationServerIndex]?.url;
             return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
         },
         /**
@@ -425,6 +639,18 @@ export const ApiConsoleHaloRunV1alpha1SinglePageApiFp = function(configuration?:
             const localVarAxiosArgs = await localVarAxiosParamCreator.fetchSinglePageReleaseContent(name, options);
             const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
             const localVarOperationServerBasePath = operationServerMap['ApiConsoleHaloRunV1alpha1SinglePageApi.fetchSinglePageReleaseContent']?.[localVarOperationServerIndex]?.url;
+            return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
+        },
+        /**
+         * List all snapshots for single page content.
+         * @param {string} name 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async listSinglePageSnapshots(name: string, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<Array<ListedSnapshotDto>>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.listSinglePageSnapshots(name, options);
+            const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
+            const localVarOperationServerBasePath = operationServerMap['ApiConsoleHaloRunV1alpha1SinglePageApi.listSinglePageSnapshots']?.[localVarOperationServerIndex]?.url;
             return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
         },
         /**
@@ -457,6 +683,19 @@ export const ApiConsoleHaloRunV1alpha1SinglePageApiFp = function(configuration?:
             const localVarAxiosArgs = await localVarAxiosParamCreator.publishSinglePage(name, options);
             const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
             const localVarOperationServerBasePath = operationServerMap['ApiConsoleHaloRunV1alpha1SinglePageApi.publishSinglePage']?.[localVarOperationServerIndex]?.url;
+            return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
+        },
+        /**
+         * Revert to specified snapshot for single page content.
+         * @param {string} name 
+         * @param {RevertSnapshotForSingleParam} revertSnapshotForSingleParam 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async revertToSpecifiedSnapshotForSinglePage(name: string, revertSnapshotForSingleParam: RevertSnapshotForSingleParam, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<Post>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.revertToSpecifiedSnapshotForSinglePage(name, revertSnapshotForSingleParam, options);
+            const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
+            const localVarOperationServerBasePath = operationServerMap['ApiConsoleHaloRunV1alpha1SinglePageApi.revertToSpecifiedSnapshotForSinglePage']?.[localVarOperationServerIndex]?.url;
             return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
         },
         /**
@@ -496,6 +735,15 @@ export const ApiConsoleHaloRunV1alpha1SinglePageApiFactory = function (configura
     const localVarFp = ApiConsoleHaloRunV1alpha1SinglePageApiFp(configuration)
     return {
         /**
+         * Delete a content for post.
+         * @param {ApiConsoleHaloRunV1alpha1SinglePageApiDeleteSinglePageContentRequest} requestParameters Request parameters.
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        deleteSinglePageContent(requestParameters: ApiConsoleHaloRunV1alpha1SinglePageApiDeleteSinglePageContentRequest, options?: RawAxiosRequestConfig): AxiosPromise<ContentWrapper> {
+            return localVarFp.deleteSinglePageContent(requestParameters.name, requestParameters.snapshotName, options).then((request) => request(axios, basePath));
+        },
+        /**
          * Draft a single page.
          * @param {ApiConsoleHaloRunV1alpha1SinglePageApiDraftSinglePageRequest} requestParameters Request parameters.
          * @param {*} [options] Override http request option.
@@ -503,6 +751,15 @@ export const ApiConsoleHaloRunV1alpha1SinglePageApiFactory = function (configura
          */
         draftSinglePage(requestParameters: ApiConsoleHaloRunV1alpha1SinglePageApiDraftSinglePageRequest, options?: RawAxiosRequestConfig): AxiosPromise<SinglePage> {
             return localVarFp.draftSinglePage(requestParameters.singlePageRequest, options).then((request) => request(axios, basePath));
+        },
+        /**
+         * Fetch content of single page.
+         * @param {ApiConsoleHaloRunV1alpha1SinglePageApiFetchSinglePageContentRequest} requestParameters Request parameters.
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        fetchSinglePageContent(requestParameters: ApiConsoleHaloRunV1alpha1SinglePageApiFetchSinglePageContentRequest, options?: RawAxiosRequestConfig): AxiosPromise<ContentWrapper> {
+            return localVarFp.fetchSinglePageContent(requestParameters.name, requestParameters.snapshotName, options).then((request) => request(axios, basePath));
         },
         /**
          * Fetch head content of single page.
@@ -523,6 +780,15 @@ export const ApiConsoleHaloRunV1alpha1SinglePageApiFactory = function (configura
             return localVarFp.fetchSinglePageReleaseContent(requestParameters.name, options).then((request) => request(axios, basePath));
         },
         /**
+         * List all snapshots for single page content.
+         * @param {ApiConsoleHaloRunV1alpha1SinglePageApiListSinglePageSnapshotsRequest} requestParameters Request parameters.
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        listSinglePageSnapshots(requestParameters: ApiConsoleHaloRunV1alpha1SinglePageApiListSinglePageSnapshotsRequest, options?: RawAxiosRequestConfig): AxiosPromise<Array<ListedSnapshotDto>> {
+            return localVarFp.listSinglePageSnapshots(requestParameters.name, options).then((request) => request(axios, basePath));
+        },
+        /**
          * List single pages.
          * @param {ApiConsoleHaloRunV1alpha1SinglePageApiListSinglePagesRequest} requestParameters Request parameters.
          * @param {*} [options] Override http request option.
@@ -539,6 +805,15 @@ export const ApiConsoleHaloRunV1alpha1SinglePageApiFactory = function (configura
          */
         publishSinglePage(requestParameters: ApiConsoleHaloRunV1alpha1SinglePageApiPublishSinglePageRequest, options?: RawAxiosRequestConfig): AxiosPromise<SinglePage> {
             return localVarFp.publishSinglePage(requestParameters.name, options).then((request) => request(axios, basePath));
+        },
+        /**
+         * Revert to specified snapshot for single page content.
+         * @param {ApiConsoleHaloRunV1alpha1SinglePageApiRevertToSpecifiedSnapshotForSinglePageRequest} requestParameters Request parameters.
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        revertToSpecifiedSnapshotForSinglePage(requestParameters: ApiConsoleHaloRunV1alpha1SinglePageApiRevertToSpecifiedSnapshotForSinglePageRequest, options?: RawAxiosRequestConfig): AxiosPromise<Post> {
+            return localVarFp.revertToSpecifiedSnapshotForSinglePage(requestParameters.name, requestParameters.revertSnapshotForSingleParam, options).then((request) => request(axios, basePath));
         },
         /**
          * Update a single page.
@@ -562,6 +837,27 @@ export const ApiConsoleHaloRunV1alpha1SinglePageApiFactory = function (configura
 };
 
 /**
+ * Request parameters for deleteSinglePageContent operation in ApiConsoleHaloRunV1alpha1SinglePageApi.
+ * @export
+ * @interface ApiConsoleHaloRunV1alpha1SinglePageApiDeleteSinglePageContentRequest
+ */
+export interface ApiConsoleHaloRunV1alpha1SinglePageApiDeleteSinglePageContentRequest {
+    /**
+     * 
+     * @type {string}
+     * @memberof ApiConsoleHaloRunV1alpha1SinglePageApiDeleteSinglePageContent
+     */
+    readonly name: string
+
+    /**
+     * 
+     * @type {string}
+     * @memberof ApiConsoleHaloRunV1alpha1SinglePageApiDeleteSinglePageContent
+     */
+    readonly snapshotName: string
+}
+
+/**
  * Request parameters for draftSinglePage operation in ApiConsoleHaloRunV1alpha1SinglePageApi.
  * @export
  * @interface ApiConsoleHaloRunV1alpha1SinglePageApiDraftSinglePageRequest
@@ -573,6 +869,27 @@ export interface ApiConsoleHaloRunV1alpha1SinglePageApiDraftSinglePageRequest {
      * @memberof ApiConsoleHaloRunV1alpha1SinglePageApiDraftSinglePage
      */
     readonly singlePageRequest: SinglePageRequest
+}
+
+/**
+ * Request parameters for fetchSinglePageContent operation in ApiConsoleHaloRunV1alpha1SinglePageApi.
+ * @export
+ * @interface ApiConsoleHaloRunV1alpha1SinglePageApiFetchSinglePageContentRequest
+ */
+export interface ApiConsoleHaloRunV1alpha1SinglePageApiFetchSinglePageContentRequest {
+    /**
+     * 
+     * @type {string}
+     * @memberof ApiConsoleHaloRunV1alpha1SinglePageApiFetchSinglePageContent
+     */
+    readonly name: string
+
+    /**
+     * 
+     * @type {string}
+     * @memberof ApiConsoleHaloRunV1alpha1SinglePageApiFetchSinglePageContent
+     */
+    readonly snapshotName: string
 }
 
 /**
@@ -599,6 +916,20 @@ export interface ApiConsoleHaloRunV1alpha1SinglePageApiFetchSinglePageReleaseCon
      * 
      * @type {string}
      * @memberof ApiConsoleHaloRunV1alpha1SinglePageApiFetchSinglePageReleaseContent
+     */
+    readonly name: string
+}
+
+/**
+ * Request parameters for listSinglePageSnapshots operation in ApiConsoleHaloRunV1alpha1SinglePageApi.
+ * @export
+ * @interface ApiConsoleHaloRunV1alpha1SinglePageApiListSinglePageSnapshotsRequest
+ */
+export interface ApiConsoleHaloRunV1alpha1SinglePageApiListSinglePageSnapshotsRequest {
+    /**
+     * 
+     * @type {string}
+     * @memberof ApiConsoleHaloRunV1alpha1SinglePageApiListSinglePageSnapshots
      */
     readonly name: string
 }
@@ -688,6 +1019,27 @@ export interface ApiConsoleHaloRunV1alpha1SinglePageApiPublishSinglePageRequest 
 }
 
 /**
+ * Request parameters for revertToSpecifiedSnapshotForSinglePage operation in ApiConsoleHaloRunV1alpha1SinglePageApi.
+ * @export
+ * @interface ApiConsoleHaloRunV1alpha1SinglePageApiRevertToSpecifiedSnapshotForSinglePageRequest
+ */
+export interface ApiConsoleHaloRunV1alpha1SinglePageApiRevertToSpecifiedSnapshotForSinglePageRequest {
+    /**
+     * 
+     * @type {string}
+     * @memberof ApiConsoleHaloRunV1alpha1SinglePageApiRevertToSpecifiedSnapshotForSinglePage
+     */
+    readonly name: string
+
+    /**
+     * 
+     * @type {RevertSnapshotForSingleParam}
+     * @memberof ApiConsoleHaloRunV1alpha1SinglePageApiRevertToSpecifiedSnapshotForSinglePage
+     */
+    readonly revertSnapshotForSingleParam: RevertSnapshotForSingleParam
+}
+
+/**
  * Request parameters for updateDraftSinglePage operation in ApiConsoleHaloRunV1alpha1SinglePageApi.
  * @export
  * @interface ApiConsoleHaloRunV1alpha1SinglePageApiUpdateDraftSinglePageRequest
@@ -737,6 +1089,17 @@ export interface ApiConsoleHaloRunV1alpha1SinglePageApiUpdateSinglePageContentRe
  */
 export class ApiConsoleHaloRunV1alpha1SinglePageApi extends BaseAPI {
     /**
+     * Delete a content for post.
+     * @param {ApiConsoleHaloRunV1alpha1SinglePageApiDeleteSinglePageContentRequest} requestParameters Request parameters.
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof ApiConsoleHaloRunV1alpha1SinglePageApi
+     */
+    public deleteSinglePageContent(requestParameters: ApiConsoleHaloRunV1alpha1SinglePageApiDeleteSinglePageContentRequest, options?: RawAxiosRequestConfig) {
+        return ApiConsoleHaloRunV1alpha1SinglePageApiFp(this.configuration).deleteSinglePageContent(requestParameters.name, requestParameters.snapshotName, options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
      * Draft a single page.
      * @param {ApiConsoleHaloRunV1alpha1SinglePageApiDraftSinglePageRequest} requestParameters Request parameters.
      * @param {*} [options] Override http request option.
@@ -745,6 +1108,17 @@ export class ApiConsoleHaloRunV1alpha1SinglePageApi extends BaseAPI {
      */
     public draftSinglePage(requestParameters: ApiConsoleHaloRunV1alpha1SinglePageApiDraftSinglePageRequest, options?: RawAxiosRequestConfig) {
         return ApiConsoleHaloRunV1alpha1SinglePageApiFp(this.configuration).draftSinglePage(requestParameters.singlePageRequest, options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
+     * Fetch content of single page.
+     * @param {ApiConsoleHaloRunV1alpha1SinglePageApiFetchSinglePageContentRequest} requestParameters Request parameters.
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof ApiConsoleHaloRunV1alpha1SinglePageApi
+     */
+    public fetchSinglePageContent(requestParameters: ApiConsoleHaloRunV1alpha1SinglePageApiFetchSinglePageContentRequest, options?: RawAxiosRequestConfig) {
+        return ApiConsoleHaloRunV1alpha1SinglePageApiFp(this.configuration).fetchSinglePageContent(requestParameters.name, requestParameters.snapshotName, options).then((request) => request(this.axios, this.basePath));
     }
 
     /**
@@ -770,6 +1144,17 @@ export class ApiConsoleHaloRunV1alpha1SinglePageApi extends BaseAPI {
     }
 
     /**
+     * List all snapshots for single page content.
+     * @param {ApiConsoleHaloRunV1alpha1SinglePageApiListSinglePageSnapshotsRequest} requestParameters Request parameters.
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof ApiConsoleHaloRunV1alpha1SinglePageApi
+     */
+    public listSinglePageSnapshots(requestParameters: ApiConsoleHaloRunV1alpha1SinglePageApiListSinglePageSnapshotsRequest, options?: RawAxiosRequestConfig) {
+        return ApiConsoleHaloRunV1alpha1SinglePageApiFp(this.configuration).listSinglePageSnapshots(requestParameters.name, options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
      * List single pages.
      * @param {ApiConsoleHaloRunV1alpha1SinglePageApiListSinglePagesRequest} requestParameters Request parameters.
      * @param {*} [options] Override http request option.
@@ -789,6 +1174,17 @@ export class ApiConsoleHaloRunV1alpha1SinglePageApi extends BaseAPI {
      */
     public publishSinglePage(requestParameters: ApiConsoleHaloRunV1alpha1SinglePageApiPublishSinglePageRequest, options?: RawAxiosRequestConfig) {
         return ApiConsoleHaloRunV1alpha1SinglePageApiFp(this.configuration).publishSinglePage(requestParameters.name, options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
+     * Revert to specified snapshot for single page content.
+     * @param {ApiConsoleHaloRunV1alpha1SinglePageApiRevertToSpecifiedSnapshotForSinglePageRequest} requestParameters Request parameters.
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof ApiConsoleHaloRunV1alpha1SinglePageApi
+     */
+    public revertToSpecifiedSnapshotForSinglePage(requestParameters: ApiConsoleHaloRunV1alpha1SinglePageApiRevertToSpecifiedSnapshotForSinglePageRequest, options?: RawAxiosRequestConfig) {
+        return ApiConsoleHaloRunV1alpha1SinglePageApiFp(this.configuration).revertToSpecifiedSnapshotForSinglePage(requestParameters.name, requestParameters.revertSnapshotForSingleParam, options).then((request) => request(this.axios, this.basePath));
     }
 
     /**

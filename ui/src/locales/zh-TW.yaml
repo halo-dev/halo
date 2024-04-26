@@ -273,6 +273,8 @@ core:
   post_editor:
     title: 文章編輯
     untitled: 未命名文章
+    actions:
+      snapshots: 版本歷史
   post_tag:
     title: 文章標籤
     header:
@@ -431,6 +433,8 @@ core:
   page_editor:
     title: 頁面編輯
     untitled: Untitled page
+    actions:
+      snapshots: 版本歷史
   comment:
     title: 留言
     empty:
@@ -1572,3 +1576,31 @@ core:
     empty:
       title: 沒有可用工具
       message: 目前沒有可用的工具，系統工具可能由外掛提供
+  post_snapshots:
+    operations:
+      revert:
+        button: 恢復
+        title: 恢復快照
+        description: 確定要恢復該快照嗎？此操作將根據這個快照創建一個新的快照並發佈。
+        toast_success: 恢復成功
+      delete:
+        title: 刪除快照
+        description: 確定要刪除該快照嗎？此操作無法恢復。
+    status:
+      released: 已發布
+      draft: 草稿
+    title: 文章版本歷史
+  page_snapshots:
+    operations:
+      revert:
+        button: 恢復
+        title: 恢復快照
+        description: 確定要恢復該快照嗎？此操作將根據這個快照創建一個新的快照並發佈。
+        toast_success: 恢復成功
+      delete:
+        title: 刪除快照
+        description: 確定要刪除該快照嗎？此操作無法恢復。
+    status:
+      released: 已發布
+      draft: 草稿
+    title: 頁面版本歷史

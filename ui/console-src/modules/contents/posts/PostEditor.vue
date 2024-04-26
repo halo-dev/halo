@@ -3,6 +3,7 @@ import {
   Dialog,
   IconBookRead,
   IconEye,
+  IconHistoryLine,
   IconSave,
   IconSendPlaneFill,
   IconSettings,
@@ -480,6 +481,19 @@ async function handleUploadImage(file: File, options?: AxiosRequestConfig) {
           :allow-forced-select="!isUpdateMode"
           @select="handleChangeEditorProvider"
         />
+        <VButton
+          v-if="isUpdateMode"
+          size="sm"
+          type="default"
+          @click="
+            $router.push({ name: 'PostSnapshots', query: { name: name } })
+          "
+        >
+          <template #icon>
+            <IconHistoryLine class="h-full w-full" />
+          </template>
+          {{ $t("core.post_editor.actions.snapshots") }}
+        </VButton>
         <VButton
           size="sm"
           type="default"

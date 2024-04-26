@@ -289,6 +289,8 @@ core:
   post_editor:
     title: Post edit
     untitled: Untitled post
+    actions:
+      snapshots: Snapshots
   post_tag:
     title: Post tags
     header:
@@ -455,6 +457,8 @@ core:
   page_editor:
     title: Page edit
     untitled: Untitled page
+    actions:
+      snapshots: Snapshots
   comment:
     title: Comments
     empty:
@@ -1674,3 +1678,39 @@ core:
       message: >-
         There are currently no tools available, and system tools may be provided
         by plugins
+  post_snapshots:
+    operations:
+      revert:
+        button: Revert
+        title: Revert snapshot
+        description: >-
+          Are you sure you want to restore this snapshot? This operation will
+          create a new snapshot based on this one and publish it.
+        toast_success: Reverted successfully
+      delete:
+        title: Delete snapshot
+        description: >-
+          Are you sure you want to delete this snapshot? This operation is
+          irreversible.
+    status:
+      released: Released
+      draft: Draft
+    title: Post snapshots
+  page_snapshots:
+    operations:
+      revert:
+        button: Revert
+        title: Revert snapshot
+        description: >-
+          Are you sure you want to restore this snapshot? This operation will
+          create a new snapshot based on this one and publish it.
+        toast_success: Reverted successfully
+      delete:
+        title: Delete snapshot
+        description: >-
+          Are you sure you want to delete this snapshot? This operation is
+          irreversible.
+    status:
+      released: Released
+      draft: Draft
+    title: Page snapshots

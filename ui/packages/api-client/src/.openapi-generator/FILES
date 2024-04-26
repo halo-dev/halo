@@ -120,6 +120,7 @@ models/condition.ts
 models/config-map-list.ts
 models/config-map-ref.ts
 models/config-map.ts
+models/content-update-param.ts
 models/content-vo.ts
 models/content-wrapper.ts
 models/content.ts
@@ -168,6 +169,8 @@ models/listed-single-page-list.ts
 models/listed-single-page-vo-list.ts
 models/listed-single-page-vo.ts
 models/listed-single-page.ts
+models/listed-snapshot-dto.ts
+models/listed-snapshot-spec.ts
 models/listed-user.ts
 models/login-history.ts
 models/mark-specified-request.ts
@@ -248,6 +251,8 @@ models/reset-password-request.ts
 models/reverse-proxy-list.ts
 models/reverse-proxy-rule.ts
 models/reverse-proxy.ts
+models/revert-snapshot-for-post-param.ts
+models/revert-snapshot-for-single-param.ts
 models/role-binding-list.ts
 models/role-binding.ts
 models/role-list.ts

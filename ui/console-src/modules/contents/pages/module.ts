@@ -6,6 +6,7 @@ import SinglePageEditor from "./SinglePageEditor.vue";
 import SinglePageStatsWidget from "./widgets/SinglePageStatsWidget.vue";
 import { IconPages } from "@halo-dev/components";
 import { markRaw } from "vue";
+import SinglePageSnapshots from "./SinglePageSnapshots.vue";
 
 export default definePlugin({
   components: {
@@ -50,6 +51,17 @@ export default definePlugin({
           meta: {
             title: "core.page_editor.title",
             searchable: true,
+            hideFooter: true,
+            permissions: ["system:singlepages:manage"],
+          },
+        },
+        {
+          path: "snapshots",
+          name: "SinglePageSnapshots",
+          component: SinglePageSnapshots,
+          meta: {
+            title: "core.page_snapshots.title",
+            searchable: false,
             hideFooter: true,
             permissions: ["system:singlepages:manage"],
           },

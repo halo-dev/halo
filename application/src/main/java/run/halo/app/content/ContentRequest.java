@@ -1,9 +1,11 @@
 package run.halo.app.content;
 
+import static io.swagger.v3.oas.annotations.media.Schema.RequiredMode.NOT_REQUIRED;
 import static io.swagger.v3.oas.annotations.media.Schema.RequiredMode.REQUIRED;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import java.util.HashMap;
+import lombok.Builder;
 import org.apache.commons.lang3.StringUtils;
 import run.halo.app.core.extension.content.Snapshot;
 import run.halo.app.extension.Metadata;
@@ -13,8 +15,10 @@ import run.halo.app.extension.Ref;
  * @author guqing
  * @since 2.0.0
  */
+@Builder
 public record ContentRequest(@Schema(requiredMode = REQUIRED) Ref subjectRef,
                              String headSnapshotName,
+                             @Schema(requiredMode = NOT_REQUIRED) Long version,
                              @Schema(requiredMode = REQUIRED) String raw,
                              @Schema(requiredMode = REQUIRED) String content,
                              @Schema(requiredMode = REQUIRED) String rawType) {

@@ -13,30 +13,24 @@
  */
 
 
-// May contain unused imports in some cases
-// @ts-ignore
-import { ContentUpdateParam } from './content-update-param';
-// May contain unused imports in some cases
-// @ts-ignore
-import { Post } from './post';
 
 /**
  * 
  * @export
- * @interface PostRequest
+ * @interface ListedSnapshotSpec
  */
-export interface PostRequest {
+export interface ListedSnapshotSpec {
     /**
      * 
-     * @type {ContentUpdateParam}
-     * @memberof PostRequest
+     * @type {string}
+     * @memberof ListedSnapshotSpec
      */
-    'content'?: ContentUpdateParam;
+    'modifyTime'?: string;
     /**
      * 
-     * @type {Post}
-     * @memberof PostRequest
+     * @type {string}
+     * @memberof ListedSnapshotSpec
      */
-    'post': Post;
+    'owner': string;
 }
 

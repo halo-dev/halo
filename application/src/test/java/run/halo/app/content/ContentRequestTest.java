@@ -24,7 +24,7 @@ class ContentRequestTest {
         ref.setKind(Post.KIND);
         ref.setGroup("content.halo.run");
         ref.setName("test-post");
-        contentRequest = new ContentRequest(ref, "snapshot-1", """
+        contentRequest = new ContentRequest(ref, "snapshot-1", null, """
             Four score and seven
             years ago our fathers
 

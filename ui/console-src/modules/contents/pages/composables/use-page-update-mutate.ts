@@ -35,7 +35,7 @@ export function usePageUpdateMutate() {
     },
     retry: 3,
     onError: (error) => {
-      console.error("Failed to update post", error);
+      console.error("Failed to update singlePage", error);
       Toast.error(t("core.common.toast.server_internal_error"));
     },
   });

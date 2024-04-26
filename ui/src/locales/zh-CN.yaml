@@ -293,6 +293,8 @@ core:
   post_editor:
     title: 文章编辑
     untitled: 未命名文章
+    actions:
+      snapshots: 版本历史
   post_tag:
     title: 文章标签
     header:
@@ -451,6 +453,8 @@ core:
   page_editor:
     title: 页面编辑
     untitled: 未命名页面
+    actions:
+      snapshots: 版本历史
   comment:
     title: 评论
     empty:
@@ -1578,3 +1582,31 @@ core:
     empty:
       title: 没有可用工具
       message: 当前没有可用的工具，系统工具可能由插件提供
+  post_snapshots:
+    operations:
+      revert:
+        button: 恢复
+        title: 恢复快照
+        description: 确定要恢复该快照吗？此操作将根据这个快照创建一个新的快照并发布。
+        toast_success: 恢复成功
+      delete:
+        title: 删除快照
+        description: 确定要删除该快照吗？此操作无法恢复。
+    status:
+      released: 已发布
+      draft: 草稿
+    title: 文章版本历史
+  page_snapshots:
+    operations:
+      revert:
+        button: 恢复
+        title: 恢复快照
+        description: 确定要恢复该快照吗？此操作将根据这个快照创建一个新的快照并发布。
+        toast_success: 恢复成功
+      delete:
+        title: 删除快照
+        description: 确定要删除该快照吗？此操作无法恢复。
+    status:
+      released: 已发布
+      draft: 草稿
+    title: 页面版本历史
