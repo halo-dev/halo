@@ -16,6 +16,7 @@ import {
   type NodeView,
   type EditorState,
   type DOMOutputSpec,
+  TextSelection,
 } from "@/tiptap/pm";
 import TableCell from "./table-cell";
 import TableRow from "./table-row";
@@ -38,6 +39,8 @@ import { i18n } from "@/locales";
 import type { ExtensionOptions, NodeBubbleMenu } from "@/types";
 import { BlockActionSeparator, ToolboxItem } from "@/components";
 import {
+  findNextCell,
+  findPreviousCell,
   hasTableBefore,
   isCellSelection,
   isTableSelected,
@@ -520,6 +523,62 @@ const Table = TiptapTable.extend<ExtensionOptions & TableOptions>({
           return false;
         }
         editor.commands.setNodeSelection(cellNodePos.pos);
+        return true;
+      },
+      Tab: ({ editor }) => {
+        const { state } = editor;
+        if (!isActive(editor.state, Table.name)) {
+          return false;
+        }
+        let nextView = editor.view;
+        let nextTr = editor.state.tr;
+
+        let nextCell = findNextCell(state);
+        if (!nextCell) {
+          // If it is the last cell, create a new line and jump to the first cell of the new line.
+          editor
+            .chain()
+            .addRowAfter()
+            .command(({ tr, view, state }) => {
+              nextView = view;
+              nextTr = tr;
+              nextCell = findNextCell(state);
+              return true;
+            });
+        }
+        if (nextCell) {
+          nextTr.setSelection(
+            new TextSelection(
+              nextTr.doc.resolve(nextCell.start),
+              nextTr.doc.resolve(
+                nextCell.start + (nextCell.node?.nodeSize || 0) - 4
+              )
+            )
+          );
+          nextTr.scrollIntoView();
+          nextView.dispatch(nextTr);
+          return true;
+        }
+        return false;
+      },
+      "Shift-Tab": ({ editor }) => {
+        const { tr } = editor.state;
+        if (!isActive(editor.state, Table.name)) {
+          return false;
+        }
+        const previousCell = findPreviousCell(editor.state);
+        if (previousCell) {
+          tr.setSelection(
+            new TextSelection(
+              tr.doc.resolve(previousCell.start),
+              tr.doc.resolve(
+                previousCell.start + (previousCell.node?.nodeSize || 0) - 4
+              )
+            )
+          );
+          tr.scrollIntoView();
+          editor.view.dispatch(tr);
+        }
         return true;
       },
     };

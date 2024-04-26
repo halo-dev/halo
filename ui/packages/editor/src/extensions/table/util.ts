@@ -1,6 +1,6 @@
 import { findParentNode } from "@/tiptap/vue-3";
-import { Node, CellSelection, TableMap } from "@/tiptap/pm";
-import type { EditorState, Selection, Transaction } from "@/tiptap/pm";
+import { Node, CellSelection, TableMap, selectedRect } from "@/tiptap/pm";
+import type { EditorState, Rect, Selection, Transaction } from "@/tiptap/pm";
 
 export const selectTable = (tr: Transaction) => {
   const table = findTable(tr.selection);
@@ -249,4 +249,131 @@ export const hasTableBefore = (editorState: EditorState) => {
   }
 
   return true;
+};
+
+export const findNextCell = (state: EditorState) => {
+  return findAdjacentCell(1)(state);
+};
+
+export const findPreviousCell = (state: EditorState) => {
+  return findAdjacentCell(-1)(state);
+};
+
+export const findAdjacentCell = (dir: number) => (state: EditorState) => {
+  const selectionPosRect = selectedRect(state);
+  if (selectionPosRect.table) {
+    const map = selectionPosRect.map;
+    // currentPos is the position of the current cell in the table map, which is between two cells.
+    const selectedCells = map.cellsInRect(selectionPosRect);
+    // Get the currently selected cell boundary
+    const rect = nextCell(map)(selectedCells[selectedCells.length - 1], dir);
+    if (rect) {
+      const { top, left } = rect;
+      // Get the pos of the current cell according to the boundary
+      const nextPos = map.map[top * map.width + left];
+      return {
+        start: nextPos + selectionPosRect.tableStart + 2,
+        node: selectionPosRect.table.nodeAt(nextPos),
+      };
+    }
+    return undefined;
+  }
+};
+
+export const nextCell = (map: TableMap) => (pos: number, dir: number) => {
+  function findNextCellPos({ top, left, right, bottom }: Rect) {
+    const nextCellRect = {
+      top,
+      left,
+      right,
+      bottom,
+    };
+    if (right + 1 > map.width) {
+      if (bottom === map.height) {
+        return undefined;
+      }
+      nextCellRect.top++;
+      nextCellRect.left = 0;
+      nextCellRect.right = 1;
+      nextCellRect.bottom++;
+    } else {
+      nextCellRect.left++;
+      nextCellRect.right++;
+    }
+    const temporaryPos =
+      map.map[nextCellRect.top * map.width + nextCellRect.left];
+    const temporaryRect = map.findCell(temporaryPos);
+    if (
+      temporaryRect.top != nextCellRect.top ||
+      temporaryRect.left < nextCellRect.left
+    ) {
+      return findNextCellPos({
+        ...nextCellRect,
+        right: temporaryRect.right,
+      });
+    }
+    return temporaryPos;
+  }
+
+  function findPreviousCellPos({ top, left, right, bottom }: Rect) {
+    const nextCellRect = {
+      top,
+      left,
+      right,
+      bottom,
+    };
+    if (left - 1 < 0) {
+      if (top === 0) {
+        return undefined;
+      }
+      nextCellRect.top--;
+      nextCellRect.left = map.width - 1;
+      nextCellRect.right = map.width;
+      nextCellRect.bottom--;
+    } else {
+      nextCellRect.left--;
+      nextCellRect.right--;
+    }
+    const temporaryPos =
+      map.map[nextCellRect.top * map.width + nextCellRect.left];
+    const temporaryRect = map.findCell(temporaryPos);
+    if (temporaryRect.top != nextCellRect.top) {
+      return findPreviousCellPos(nextCellRect);
+    }
+    return temporaryPos;
+  }
+
+  function nextCellRectByPos(innerPos: number, innerDir: number) {
+    // Get the current cell boundary
+    const { top, left, right, bottom } = map.findCell(innerPos);
+    if (innerDir == 0) {
+      return {
+        top,
+        left,
+        right,
+        bottom,
+      };
+    }
+
+    const nextCellRect = {
+      top,
+      left,
+      right,
+      bottom,
+    };
+    let nextPos;
+    if (innerDir > 0) {
+      nextPos = findNextCellPos(nextCellRect);
+      innerDir--;
+    } else {
+      nextPos = findPreviousCellPos(nextCellRect);
+      innerDir++;
+    }
+    if (!nextPos) {
+      return undefined;
+    }
+    return nextCellRectByPos(nextPos, innerDir);
+  }
+
+  return nextCellRectByPos(pos, dir);
 };
