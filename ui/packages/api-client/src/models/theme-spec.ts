@@ -67,6 +67,12 @@ export interface ThemeSpec {
     'homepage'?: string;
     /**
      * 
+     * @type {string}
+     * @memberof ThemeSpec
+     */
+    'issues'?: string;
+    /**
+     * 
      * @type {Array<License>}
      * @memberof ThemeSpec
      */

@@ -147,6 +147,19 @@ const pluginRoleTemplateGroups = computed<RoleTemplateGroup[]>(() => {
               {{ $t("core.common.text.none") }}
             </span>
           </VDescriptionItem>
+          <VDescriptionItem :label="$t('core.plugin.detail.fields.issues')">
+            <a
+              v-if="plugin?.spec.issues"
+              :href="plugin.spec.issues"
+              class="hover:text-gray-600"
+              target="_blank"
+            >
+              {{ plugin.spec.issues }}
+            </a>
+            <span v-else>
+              {{ $t("core.common.text.none") }}
+            </span>
+          </VDescriptionItem>
           <VDescriptionItem :label="$t('core.plugin.detail.fields.license')">
             <ul
               v-if="plugin?.spec.license && plugin?.spec.license.length"

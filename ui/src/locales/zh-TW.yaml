@@ -680,6 +680,7 @@ core:
         plugin_requires: 插件依賴
         description: 描述
         license: 協議
+        issues: 問題回饋
     settings:
       title: 主題設置
     custom_templates:
@@ -820,6 +821,7 @@ core:
         homepage: 網站
         repo: 源碼倉庫
         load_location: 存儲位置
+        issues: 問題回饋
     loader:
       toast:
         entry_load_failed: 讀取插件入口文件失敗

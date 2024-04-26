@@ -78,6 +78,8 @@ public class Plugin extends AbstractExtension {
 
         private String repo;
 
+        private String issues;
+
         private String description;
 
         private List<License> license;

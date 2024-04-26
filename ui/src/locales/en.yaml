@@ -730,6 +730,7 @@ core:
         plugin_requires: Plugin Requires
         description: Description
         license: License
+        issues: Issues feedback
     settings:
       title: Theme settings
     custom_templates:
@@ -882,6 +883,7 @@ core:
         homepage: Homepage
         repo: Source Repository
         load_location: Storage Location
+        issues: Issues feedback
     loader:
       toast:
         entry_load_failed: Failed to load plugins entry file
