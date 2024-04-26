@@ -69,8 +69,8 @@ public class SubscriptionServiceImpl implements SubscriptionService {
     }
 
     @Override
-    public Mono<Void> removeBy(ListOptions listOptions) {
-        return paginatedOperator.deleteInitialBatch(Subscription.class, listOptions).then();
+    public Flux<Subscription> removeBy(ListOptions listOptions) {
+        return paginatedOperator.deleteInitialBatch(Subscription.class, listOptions);
     }
 
     @Override

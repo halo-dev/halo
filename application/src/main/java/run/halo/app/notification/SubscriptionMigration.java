@@ -1,5 +1,8 @@
 package run.halo.app.notification;
 
+import static run.halo.app.content.NotificationReasonConst.NEW_COMMENT_ON_PAGE;
+import static run.halo.app.content.NotificationReasonConst.NEW_COMMENT_ON_POST;
+import static run.halo.app.content.NotificationReasonConst.SOMEONE_REPLIED_TO_YOU;
 import static run.halo.app.extension.index.query.QueryFactory.and;
 import static run.halo.app.extension.index.query.QueryFactory.equal;
 import static run.halo.app.extension.index.query.QueryFactory.in;
@@ -17,7 +20,6 @@ import org.springframework.lang.NonNull;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Component;
 import reactor.core.publisher.Mono;
-import run.halo.app.content.NotificationReasonConst;
 import run.halo.app.core.extension.User;
 import run.halo.app.core.extension.notification.Subscription;
 import run.halo.app.extension.ListOptions;
@@ -77,7 +79,8 @@ public class SubscriptionMigration implements ApplicationListener<ApplicationSta
         // anonymous only subscribe some-one-replied-to-you reason
         for (String anonymousSubscriber : anonymousSubscribers) {
             createSubscription(anonymousSubscriber,
-                "props.repliedOwner == '%s'".formatted(anonymousSubscriber));
+                SOMEONE_REPLIED_TO_YOU,
+                "props.repliedOwner == '%s'".formatted(anonymousSubscriber)).block();
         }
         log.info("Collating anonymous subscription completed.");
     }
@@ -87,9 +90,9 @@ public class SubscriptionMigration implements ApplicationListener<ApplicationSta
         var query = and(startsWith("spec.subscriber", AnonymousUserConst.PRINCIPAL),
             isNull("spec.reason.expression"),
             isNull("metadata.deletionTimestamp"),
-            in("spec.reason.reasonType", Set.of(NotificationReasonConst.NEW_COMMENT_ON_POST,
-                NotificationReasonConst.NEW_COMMENT_ON_PAGE,
-                NotificationReasonConst.SOMEONE_REPLIED_TO_YOU))
+            in("spec.reason.reasonType", Set.of(NEW_COMMENT_ON_POST,
+                NEW_COMMENT_ON_PAGE,
+                SOMEONE_REPLIED_TO_YOU))
         );
         listOptions.setFieldSelector(FieldSelector.of(query));
         return paginatedOperator.deleteInitialBatch(Subscription.class, listOptions)
@@ -98,16 +101,6 @@ public class SubscriptionMigration implements ApplicationListener<ApplicationSta
                 subscription.getMetadata().getName())
             )
             .then();
-    }
-
-    void createSubscription(String name, String expression) {
-        var interestReason = new Subscription.InterestReason();
-        interestReason.setReasonType(NotificationReasonConst.SOMEONE_REPLIED_TO_YOU);
-        interestReason.setExpression(expression);
-        var subscriber = new Subscription.Subscriber();
-        subscriber.setName(name);
-        log.debug("Create subscription for user: {} with expression: {}", name, expression);
-        notificationCenter.subscribe(subscriber, interestReason).block();
     }
 
     private Mono<Void> removeInternalSubscriptionForUser(String username) {
@@ -119,15 +112,44 @@ public class SubscriptionMigration implements ApplicationListener<ApplicationSta
         var fieldQuery = and(isNull("metadata.deletionTimestamp"),
             equal("spec.subscriber", subscriber.toString()),
             in("spec.reason.reasonType", Set.of(
-                NotificationReasonConst.NEW_COMMENT_ON_POST,
-                NotificationReasonConst.NEW_COMMENT_ON_PAGE,
-                NotificationReasonConst.SOMEONE_REPLIED_TO_YOU
+                NEW_COMMENT_ON_POST,
+                NEW_COMMENT_ON_PAGE,
+                SOMEONE_REPLIED_TO_YOU
             ))
         );
         listOptions.setFieldSelector(FieldSelector.of(fieldQuery));
 
         return subscriptionService.removeBy(listOptions)
+            .map(subscription -> {
+                var name = subscription.getSpec().getSubscriber().getName();
+                var reason = subscription.getSpec().getReason();
+                String expression = switch (reason.getReasonType()) {
+                    case NEW_COMMENT_ON_POST -> "props.postOwner == '%s'".formatted(name);
+                    case NEW_COMMENT_ON_PAGE -> "props.pageOwner == '%s'".formatted(name);
+                    case SOMEONE_REPLIED_TO_YOU -> "props.repliedOwner == '%s'".formatted(name);
+                    // never happen
+                    default -> null;
+                };
+                return new SubscriptionSummary(name, reason.getReasonType(), expression);
+            })
+            .distinct()
+            .flatMap(summary -> createSubscription(summary.subscriber(), summary.reasonType(),
+                summary.expression()))
+            .then()
             .doOnSuccess(unused ->
                 log.debug("Collating internal subscription for user: {} completed", username));
+    }
+
+    Mono<Void> createSubscription(String name, String reasonType, String expression) {
+        var interestReason = new Subscription.InterestReason();
+        interestReason.setReasonType(reasonType);
+        interestReason.setExpression(expression);
+        var subscriber = new Subscription.Subscriber();
+        subscriber.setName(name);
+        log.debug("Create subscription for user: {} with reasonType: {}", name, reasonType);
+        return notificationCenter.subscribe(subscriber, interestReason).then();
+    }
+
+    record SubscriptionSummary(String subscriber, String reasonType, String expression) {
     }
 }

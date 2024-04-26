@@ -22,5 +22,5 @@ public interface SubscriptionService {
 
     Mono<Subscription> remove(Subscription subscription);
 
-    Mono<Void> removeBy(ListOptions listOptions);
+    Flux<Subscription> removeBy(ListOptions listOptions);
 }
