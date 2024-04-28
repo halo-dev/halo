@@ -35,5 +35,5 @@ rules:
     resources: [ "singlepages" ]
     verbs: [ "get", "list" ]
   - apiGroups: [ "api.console.halo.run" ]
-    resources: [ "singlepages", "singlepages/head-content", "singlepages/release-content", "singlepages/snapshot" ]
+    resources: [ "singlepages", "singlepages/head-content", "singlepages/release-content", "singlepages/snapshot", "singlepages/content" ]
     verbs: [ "get", "list" ]
