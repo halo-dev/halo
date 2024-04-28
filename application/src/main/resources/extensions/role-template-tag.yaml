@@ -23,3 +23,6 @@ rules:
   - apiGroups: [ "content.halo.run" ]
     resources: [ "tags" ]
     verbs: [ "get", "list" ]
+  - apiGroups: [ "api.console.halo.run" ]
+    resources: [ "tags" ]
+    verbs: [ "get", "list" ]
