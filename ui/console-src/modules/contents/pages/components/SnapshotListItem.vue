@@ -109,6 +109,9 @@ const isBase = computed(() => {
         <VTag v-if="isHead">
           {{ $t("core.page_snapshots.status.draft") }}
         </VTag>
+        <VTag v-if="isBase">
+          {{ $t("core.page_snapshots.status.base") }}
+        </VTag>
         <VStatusDot
           v-if="snapshot.metadata.deletionTimestamp"
           v-tooltip="$t('core.common.status.deleting')"
