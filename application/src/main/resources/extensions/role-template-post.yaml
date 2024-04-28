@@ -37,5 +37,5 @@ rules:
     resources: [ "posts" ]
     verbs: [ "get", "list" ]
   - apiGroups: [ "api.console.halo.run" ]
-    resources: [ "posts", "posts/head-content", "posts/release-content", "posts/snapshot" ]
+    resources: [ "posts", "posts/head-content", "posts/release-content", "posts/snapshot", "posts/content" ]
     verbs: [ "get", "list" ]
