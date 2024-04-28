@@ -5,6 +5,7 @@ import java.time.Instant;
 import java.util.List;
 import java.util.Objects;
 import java.util.function.Function;
+import java.util.function.UnaryOperator;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.dao.OptimisticLockingFailureException;
@@ -206,9 +207,11 @@ public class SinglePageServiceImpl extends AbstractContentService implements Sin
             .flatMap(page -> {
                 var headSnapshotName = page.getSpec().getHeadSnapshot();
                 if (StringUtils.equals(headSnapshotName, snapshotName)) {
-                    // update head to release
-                    page.getSpec().setHeadSnapshot(page.getSpec().getReleaseSnapshot());
-                    return updatePostWithRetry(page);
+                    return updatePageWithRetry(page, record -> {
+                        // update head to release
+                        page.getSpec().setHeadSnapshot(page.getSpec().getReleaseSnapshot());
+                        return record;
+                    });
                 }
                 return Mono.just(page);
             })
@@ -230,14 +233,15 @@ public class SinglePageServiceImpl extends AbstractContentService implements Sin
             });
     }
 
-    private Mono<SinglePage> updatePostWithRetry(SinglePage page) {
-        return client.update(page)
+    private Mono<SinglePage> updatePageWithRetry(SinglePage page, UnaryOperator<SinglePage> func) {
+        return client.update(func.apply(page))
             .onErrorResume(OptimisticLockingFailureException.class,
                 e -> Mono.defer(() -> client.get(SinglePage.class, page.getMetadata().getName())
-                        .flatMap(client::update))
-                    .retryWhen(Retry.backoff(8, Duration.ofMillis(100))
-                        .filter(OptimisticLockingFailureException.class::isInstance)
+                        .map(func)
+                        .flatMap(client::update)
                     )
+                    .retryWhen(Retry.backoff(8, Duration.ofMillis(100))
+                        .filter(OptimisticLockingFailureException.class::isInstance))
             );
     }
 
