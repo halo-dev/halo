@@ -31,19 +31,19 @@ const action = () => {
       { 'cursor-not-allowed opacity-70 ': disabled },
       { 'hover:bg-gray-100': !disabled },
     ]"
-    class="flex flex-row items-center rounded gap-4 p-1 group cursor-pointer"
+    class="flex flex-row items-center rounded gap-3 py-1 px-1.5 group cursor-pointer"
     @click="action"
   >
     <component
       :is="icon"
-      class="bg-gray-100 p-1 rounded w-6 h-6"
+      class="bg-gray-100 p-1.5 rounded w-7 h-7"
       :class="[
         { '!bg-white': isActive },
         { 'group-hover:bg-white': !disabled },
       ]"
     />
     <span
-      class="text-xs text-gray-600"
+      class="text-sm text-gray-600"
       :class="[
         { '!text-gray-900 !font-medium': isActive },
         { 'group-hover:font-medium group-hover:text-gray-900': !disabled },

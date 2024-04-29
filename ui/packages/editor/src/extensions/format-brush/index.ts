@@ -2,7 +2,7 @@ import ToolbarItem from "@/components/toolbar/ToolbarItem.vue";
 import { i18n } from "@/locales";
 import { CoreEditor, Extension, Plugin, PluginKey } from "@/tiptap";
 import { markRaw } from "vue";
-import BxsBrushAlt from "~icons/bxs/brush-alt";
+import MdiBrushVariant from "~icons/mdi/brush-variant";
 import { getMarksByFirstTextNode, setMarks } from "./util";
 
 declare module "@/tiptap" {
@@ -32,7 +32,7 @@ const formatBrush = Extension.create<any, FormatBrushStore>({
           props: {
             editor,
             isActive: formatBrush,
-            icon: markRaw(BxsBrushAlt),
+            icon: markRaw(MdiBrushVariant),
             title: formatBrush
               ? i18n.global.t(
                   "editor.extensions.format_brush.toolbar_item.cancel"

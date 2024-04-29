@@ -78,7 +78,7 @@ function onColorChange(color: Payload) {
 </script>
 
 <template>
-  <VDropdown class="inline-flex">
+  <VDropdown class="inline-flex items-center">
     <slot />
     <template #popper>
       <slot name="prefix" />
