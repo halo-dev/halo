@@ -1,8 +1,8 @@
+import type { Editor } from "@/tiptap";
 import { Extension } from "@/tiptap";
 import type { ExtensionOptions } from "@/types";
-import type { Editor } from "@/tiptap";
 import { markRaw } from "vue";
-import IconParkSolidClearFormat from "~icons/icon-park-solid/clear-format";
+import MdiEraser from "~icons/mdi/eraser";
 import ToolbarItem from "@/components/toolbar/ToolbarItem.vue";
 import { i18n } from "@/locales";
 
@@ -16,7 +16,7 @@ const clearFormat = Extension.create<ExtensionOptions>({
           props: {
             editor,
             isActive: false,
-            icon: markRaw(IconParkSolidClearFormat),
+            icon: markRaw(MdiEraser),
             title: i18n.global.t("editor.common.clear_format"),
             action: () => editor.chain().focus().unsetAllMarks().run(),
           },

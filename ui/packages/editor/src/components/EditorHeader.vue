@@ -1,6 +1,6 @@
 <script lang="ts" setup>
-import { Menu as VMenu, Dropdown as VDropdown } from "floating-vue";
-import { Editor, type AnyExtension } from "@/tiptap/vue-3";
+import { Dropdown as VDropdown, Menu as VMenu } from "floating-vue";
+import { type AnyExtension, Editor } from "@/tiptap/vue-3";
 import MdiPlusCircle from "~icons/mdi/plus-circle";
 import type { ToolbarItem, ToolboxItem } from "@/types";
 
@@ -59,11 +59,11 @@ function getToolboxItemsFromExtensions() {
 </script>
 <template>
   <div
-    class="editor-header flex items-center py-1 space-x-0.5 justify-start px-1 overflow-auto sm:!justify-center border-b drop-shadow-sm bg-white"
+    class="editor-header flex items-center py-1 space-x-1 justify-start px-1 overflow-auto sm:!justify-center border-b drop-shadow-sm bg-white"
   >
     <div class="inline-flex items-center justify-center">
       <VMenu>
-        <button class="p-1 rounded-sm hover:bg-gray-100" tabindex="-1">
+        <button class="p-1.5 rounded-md hover:bg-gray-100" tabindex="-1">
           <MdiPlusCircle class="text-[#4CCBA0]" />
         </button>
         <template #popper>
@@ -108,7 +108,7 @@ function getToolboxItemsFromExtensions() {
           />
           <template #popper>
             <div
-              class="relative rounded-md bg-white overflow-hidden drop-shadow w-48 p-1 max-h-72 overflow-y-auto"
+              class="relative rounded-md bg-white overflow-hidden drop-shadow w-56 p-1 max-h-96 overflow-y-auto space-y-1.5"
             >
               <component
                 v-bind="child.props"

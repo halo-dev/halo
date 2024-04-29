@@ -1,10 +1,10 @@
 <script lang="ts" setup>
 import type { PropType } from "vue";
-import type { Editor, AnyExtension } from "@/tiptap/vue-3";
+import type { AnyExtension, Editor } from "@/tiptap/vue-3";
 import BubbleMenu from "@/components/bubble/BubbleMenu.vue";
 import type { NodeBubbleMenu } from "@/types";
 import BubbleItem from "@/components/bubble/BubbleItem.vue";
-import type { EditorView, EditorState } from "@/tiptap/pm";
+import type { EditorState, EditorView } from "@/tiptap/pm";
 
 const props = defineProps({
   editor: {
@@ -71,7 +71,7 @@ const shouldShow = (
     :default-animation="bubbleMenu.defaultAnimation"
   >
     <div
-      class="bubble-menu bg-white flex items-center rounded-md p-1 border drop-shadow space-x-0.5"
+      class="bubble-menu bg-white flex items-center rounded-md p-1 border drop-shadow space-x-1"
     >
       <template v-if="bubbleMenu.items">
         <template
