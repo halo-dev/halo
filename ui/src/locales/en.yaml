@@ -1692,9 +1692,18 @@ core:
         description: >-
           Are you sure you want to delete this snapshot? This operation is
           irreversible.
+      cleanup:
+        button: Cleanup
+        title: Cleanup snapshots
+        description: >-
+          Are you sure you want to delete all unused snapshots? Only published,
+          base version, and draft versions will be retained.
+        toast_empty: There are no snapshots to be cleaned up
+        toast_success: Cleanup completed
     status:
       released: Released
       draft: Draft
+      base: Base
     title: Post snapshots
   page_snapshots:
     operations:
@@ -1710,7 +1719,16 @@ core:
         description: >-
           Are you sure you want to delete this snapshot? This operation is
           irreversible.
+      cleanup:
+        button: Cleanup
+        title: Cleanup snapshots
+        description: >-
+          Are you sure you want to delete all unused snapshots? Only published,
+          base version, and draft versions will be retained.
+        toast_empty: There are no snapshots to be cleaned up
+        toast_success: Cleanup completed
     status:
       released: Released
       draft: Draft
+      base: Base
     title: Page snapshots

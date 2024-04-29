@@ -1592,9 +1592,16 @@ core:
       delete:
         title: 删除快照
         description: 确定要删除该快照吗？此操作无法恢复。
+      cleanup:
+        button: 清理
+        title: 清理快照
+        description: 确定要清理所有不再使用的快照吗？只会保留已发布、基础和草稿版本。
+        toast_empty: 没有需要清理的快照
+        toast_success: 清理完成
     status:
       released: 已发布
       draft: 草稿
+      base: 基础
     title: 文章版本历史
   page_snapshots:
     operations:
@@ -1606,7 +1613,14 @@ core:
       delete:
         title: 删除快照
         description: 确定要删除该快照吗？此操作无法恢复。
+      cleanup:
+        button: 清理
+        title: 清理快照
+        description: 确定要清理所有不再使用的快照吗？只会保留已发布、基础和草稿版本。
+        toast_empty: 没有需要清理的快照
+        toast_success: 清理完成
     status:
       released: 已发布
       draft: 草稿
+      base: 基础
     title: 页面版本历史
