@@ -23,4 +23,6 @@ ENV JVM_OPTS="-Xmx256m -Xms256m" \
 RUN ln -sf /usr/share/zoneinfo/$TZ /etc/localtime \
     && echo $TZ > /etc/timezone
 
+Expose 8090
+
 ENTRYPOINT ["sh", "-c", "java ${JVM_OPTS} org.springframework.boot.loader.launch.JarLauncher ${0} ${@}"]
