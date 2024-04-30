@@ -33,16 +33,8 @@ export function usePluginLifeCycle(
     const { enabled } = plugin.value.spec || {};
     const { phase } = plugin.value.status || {};
 
-    // Starting up
-    if (
-      enabled &&
-      phase !== (PluginStatusPhaseEnum.Started || PluginStatusPhaseEnum.Failed)
-    ) {
-      return t("core.common.status.starting_up");
-    }
-
     // Starting failed
-    if (!isStarted.value) {
+    if (enabled && phase === PluginStatusPhaseEnum.Failed) {
       const lastCondition = plugin.value.status?.conditions?.[0];
 
       return (
@@ -50,6 +42,14 @@ export function usePluginLifeCycle(
           .filter(Boolean)
           .join(":") || "Unknown"
       );
+    }
+
+    // Starting up
+    if (
+      enabled &&
+      phase !== (PluginStatusPhaseEnum.Started || PluginStatusPhaseEnum.Failed)
+    ) {
+      return t("core.common.status.starting_up");
     }
   };
 

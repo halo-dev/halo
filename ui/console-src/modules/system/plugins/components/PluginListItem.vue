@@ -154,14 +154,11 @@ const { startFields, endFields } = useEntityFieldItemExtensionPoint<Plugin>(
       !enabled || (enabled && phase === PluginStatusPhaseEnum.Started);
 
     const getStatusDotState = () => {
-      if (
-        enabled &&
-        phase !==
-          (PluginStatusPhaseEnum.Started || PluginStatusPhaseEnum.Failed)
-      ) {
-        return "default";
+      if (enabled && phase === PluginStatusPhaseEnum.Failed) {
+        return "error";
       }
-      return "error";
+
+      return "default";
     };
 
     return [
