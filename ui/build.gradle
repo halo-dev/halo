@@ -1,5 +1,18 @@
 plugins {
-  id "com.github.node-gradle.node"
+  id 'idea'
+  id 'com.github.node-gradle.node'
+}
+
+idea {
+  module {
+    excludeDirs += file('node_modules/')
+    excludeDirs += file('packages').listFiles().collect {
+      file(it.path + '/node_modules/')
+    }
+    excludeDirs += file('packages').listFiles().collect {
+      file(it.path + '/dist/')
+    }
+  }
 }
 
 tasks.register('clean', Delete) {
