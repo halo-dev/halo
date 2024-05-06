@@ -15,6 +15,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.util.CollectionUtils;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
+import run.halo.app.extension.ExtensionUtil;
 import run.halo.app.extension.ReactiveExtensionClient;
 import run.halo.app.extension.Unstructured;
 import run.halo.app.infra.properties.HaloProperties;
@@ -96,7 +97,13 @@ public class ExtensionResourceInitializer implements ApplicationListener<Applica
                 extension.getMetadata().setVersion(existingExt.getMetadata().getVersion());
                 return extensionClient.update(extension);
             })
-            .switchIfEmpty(Mono.defer(() -> extensionClient.create(extension)));
+            .switchIfEmpty(Mono.defer(() -> {
+                if (ExtensionUtil.isDeleted(extension)) {
+                    // skip deleted extension
+                    return Mono.empty();
+                }
+                return extensionClient.create(extension);
+            }));
     }
 
     private List<Resource> listResources(String location) {
