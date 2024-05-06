@@ -12,6 +12,7 @@ import static run.halo.app.plugin.PluginExtensionLoaderUtils.lookupExtensions;
 import static run.halo.app.plugin.PluginUtils.generateFileName;
 import static run.halo.app.plugin.PluginUtils.isDevelopmentMode;
 
+import com.fasterxml.jackson.core.type.TypeReference;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.net.MalformedURLException;
@@ -21,17 +22,24 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.time.Clock;
+import java.time.Duration;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Objects;
 import java.util.Set;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
-import org.pf4j.PluginManager;
+import org.pf4j.PluginRuntimeException;
 import org.pf4j.PluginState;
+import org.pf4j.PluginStateEvent;
+import org.pf4j.PluginStateListener;
+import org.pf4j.PluginWrapper;
 import org.pf4j.RuntimeMode;
 import org.springframework.core.io.DefaultResourceLoader;
 import org.springframework.stereotype.Component;
+import org.springframework.util.CollectionUtils;
 import org.springframework.util.ResourceUtils;
 import org.springframework.web.util.UriComponentsBuilder;
 import run.halo.app.core.extension.Plugin;
@@ -50,10 +58,13 @@ import run.halo.app.extension.controller.Reconciler.Request;
 import run.halo.app.extension.controller.RequeueException;
 import run.halo.app.infra.Condition;
 import run.halo.app.infra.ConditionStatus;
+import run.halo.app.infra.utils.JsonParseException;
+import run.halo.app.infra.utils.JsonUtils;
 import run.halo.app.infra.utils.PathUtils;
 import run.halo.app.infra.utils.YamlUnstructuredLoader;
 import run.halo.app.plugin.PluginConst;
 import run.halo.app.plugin.PluginProperties;
+import run.halo.app.plugin.SpringPluginManager;
 
 /**
  * Plugin reconciler.
@@ -66,19 +77,23 @@ import run.halo.app.plugin.PluginProperties;
 @Component
 public class PluginReconciler implements Reconciler<Request> {
     private static final String FINALIZER_NAME = "plugin-protection";
+    private static final String DEPENDENTS_ANNO_KEY = "plugin.halo.run/dependents-snapshot";
     private final ExtensionClient client;
-    private final PluginManager pluginManager;
+    private final SpringPluginManager pluginManager;
 
     private final PluginProperties pluginProperties;
 
     private Clock clock;
 
-    public PluginReconciler(ExtensionClient client, PluginManager pluginManager,
+    public PluginReconciler(ExtensionClient client, SpringPluginManager pluginManager,
         PluginProperties pluginProperties) {
         this.client = client;
         this.pluginManager = pluginManager;
         this.pluginProperties = pluginProperties;
         this.clock = Clock.systemUTC();
+
+        this.pluginManager.addPluginStateListener(new PluginStartedListener());
+        this.pluginManager.addPluginStateListener(new PluginStoppedListener());
     }
 
     /**
@@ -95,6 +110,11 @@ public class PluginReconciler implements Reconciler<Request> {
         return client.fetch(Plugin.class, request.name())
             .map(plugin -> {
                 if (ExtensionUtil.isDeleted(plugin)) {
+                    if (!checkDependents(plugin)) {
+                        client.update(plugin);
+                        // Check dependents every 10 seconds
+                        return Result.requeue(Duration.ofSeconds(10));
+                    }
                     // CleanUp resources and remove finalizer.
                     if (removeFinalizers(plugin.getMetadata(), Set.of(FINALIZER_NAME))) {
                         cleanupResources(plugin);
@@ -117,10 +137,10 @@ public class PluginReconciler implements Reconciler<Request> {
 
                     if (requestToEnable(plugin)) {
                         // Start
-                        startPlugin(plugin);
+                        enablePlugin(plugin);
                     } else {
                         // stop the plugin and disable it
-                        stopAndDisablePlugin(plugin);
+                        disablePlugin(plugin);
                     }
                 } catch (Throwable t) {
                     // populate condition
@@ -143,6 +163,28 @@ public class PluginReconciler implements Reconciler<Request> {
                 return Result.doNotRetry();
             })
             .orElseGet(Result::doNotRetry);
+    }
+
+    private boolean checkDependents(Plugin plugin) {
+        var pluginId = plugin.getMetadata().getName();
+        var dependents = pluginManager.getDependents(pluginId);
+        if (CollectionUtils.isEmpty(dependents)) {
+            return true;
+        }
+        var status = plugin.statusNonNull();
+        var condition = Condition.builder()
+            .type(PluginState.FAILED.toString())
+            .reason("DependentsExist")
+            .message(
+                "The plugin has dependents %s, please delete them first."
+                    .formatted(dependents.stream().map(PluginWrapper::getPluginId).toList())
+            )
+            .status(ConditionStatus.FALSE)
+            .lastTransitionTime(clock.instant())
+            .build();
+        nullSafeConditions(status).addAndEvictFIFO(condition);
+        status.setPhase(Plugin.Phase.FAILED);
+        return false;
     }
 
     private void syncPluginState(Plugin plugin) {
@@ -191,32 +233,87 @@ public class PluginReconciler implements Reconciler<Request> {
         }
     }
 
-    private void startPlugin(Plugin plugin) {
+    private void enablePlugin(Plugin plugin) {
         // start the plugin
         var pluginName = plugin.getMetadata().getName();
-        var wrapper = pluginManager.getPlugin(pluginName);
+        log.info("Starting plugin {}", pluginName);
         plugin.statusNonNull().setPhase(Plugin.Phase.STARTING);
-        if (!PluginState.STARTED.equals(wrapper.getPluginState())) {
-            var pluginState = pluginManager.startPlugin(pluginName);
-            if (!PluginState.STARTED.equals(pluginState)) {
-                throw new IllegalStateException("Failed to start plugin " + pluginName);
-            }
-            plugin.statusNonNull().setLastStartTime(clock.instant());
-            var condition = Condition.builder()
-                .type(PluginState.STARTED.toString())
-                .reason(PluginState.STARTED.toString())
-                .message("Started successfully")
-                .lastTransitionTime(clock.instant())
-                .status(ConditionStatus.TRUE)
-                .build();
-            nullSafeConditions(plugin.statusNonNull()).addAndEvictFIFO(condition);
+        var pluginState = pluginManager.startPlugin(pluginName);
+        if (!PluginState.STARTED.equals(pluginState)) {
+            throw new IllegalStateException("Failed to start plugin " + pluginName);
         }
+
+        var dependents = getAndRemoveDependents(plugin);
+        log.info("Starting dependents {} for plugin {}", dependents, pluginName);
+        dependents.stream()
+            .sorted(Comparator.reverseOrder())
+            .forEach(dependent -> {
+                if (pluginManager.getPlugin(dependent) != null) {
+                    pluginManager.startPlugin(dependent);
+                }
+            });
+        log.info("Started dependents {} for plugin {}", dependents, pluginName);
+
+        plugin.statusNonNull().setLastStartTime(clock.instant());
+        var condition = Condition.builder()
+            .type(PluginState.STARTED.toString())
+            .reason(PluginState.STARTED.toString())
+            .message("Started successfully")
+            .lastTransitionTime(clock.instant())
+            .status(ConditionStatus.TRUE)
+            .build();
+        nullSafeConditions(plugin.statusNonNull()).addAndEvictFIFO(condition);
         plugin.statusNonNull().setPhase(Plugin.Phase.STARTED);
+
+        log.info("Started plugin {}", pluginName);
     }
 
-    private void stopAndDisablePlugin(Plugin plugin) {
+    private List<String> getAndRemoveDependents(Plugin plugin) {
+        var pluginName = plugin.getMetadata().getName();
+        var annotations = plugin.getMetadata().getAnnotations();
+        if (annotations == null) {
+            return List.of();
+        }
+        var dependentsAnno = annotations.remove(DEPENDENTS_ANNO_KEY);
+        List<String> dependents = List.of();
+        if (StringUtils.isNotBlank(dependentsAnno)) {
+            try {
+                dependents = JsonUtils.jsonToObject(dependentsAnno, new TypeReference<>() {
+                });
+            } catch (JsonParseException ignored) {
+                log.error("Failed to parse dependents annotation {} for plugin {}",
+                    dependentsAnno, pluginName);
+                // Keep going to start the plugin.
+            }
+        }
+        return dependents;
+    }
+
+    private void setDependents(Plugin plugin) {
+        var pluginName = plugin.getMetadata().getName();
+        var annotations = plugin.getMetadata().getAnnotations();
+        if (annotations == null) {
+            annotations = new HashMap<>();
+            plugin.getMetadata().setAnnotations(annotations);
+        }
+        if (!annotations.containsKey(DEPENDENTS_ANNO_KEY)) {
+            // get dependents
+            var dependents = pluginManager.getDependents(pluginName)
+                .stream()
+                .filter(pluginWrapper ->
+                    Objects.equals(PluginState.STARTED, pluginWrapper.getPluginState())
+                )
+                .map(PluginWrapper::getPluginId)
+                .toList();
+
+            annotations.put(DEPENDENTS_ANNO_KEY, JsonUtils.objectToJson(dependents));
+        }
+    }
+
+    private void disablePlugin(Plugin plugin) {
         var pluginName = plugin.getMetadata().getName();
         if (pluginManager.getPlugin(pluginName) != null) {
+            setDependents(plugin);
             pluginManager.disablePlugin(pluginName);
         }
         plugin.statusNonNull().setPhase(Plugin.Phase.DISABLED);
@@ -284,29 +381,29 @@ public class PluginReconciler implements Reconciler<Request> {
     }
 
     private void loadOrReload(Plugin plugin) {
-        // TODO Try to check dependencies before.
         var pluginName = plugin.getMetadata().getName();
-        try {
-            var p = pluginManager.getPlugin(pluginName);
-            var requestToReload = requestToReload(plugin);
-            if (requestToReload) {
-                log.info("Unloading plugin {}", pluginName);
-                if (p != null) {
-                    pluginManager.unloadPlugin(pluginName);
-                }
-            }
-            if (p == null || requestToReload) {
-                log.info("Loading plugin {}", pluginName);
+        var p = pluginManager.getPlugin(pluginName);
+        var requestToReload = requestToReload(plugin);
+        if (requestToReload) {
+            if (p != null) {
                 var loadLocation = plugin.getStatus().getLoadLocation();
-                pluginManager.loadPlugin(Paths.get(loadLocation));
-                log.info("Loaded plugin {}", pluginName);
+                setDependents(plugin);
+                var unloaded = pluginManager.reloadPlugin(pluginName, Paths.get(loadLocation));
+                if (!unloaded) {
+                    throw new PluginRuntimeException("Failed to reload plugin " + pluginName);
+                }
+                p = pluginManager.getPlugin(pluginName);
             }
-        } catch (Throwable t) {
-            // unload the plugin
-            if (pluginManager.getPlugin(pluginName) != null) {
-                pluginManager.unloadPlugin(pluginName);
-            }
-            throw t;
+        }
+        if (p != null && pluginManager.getUnresolvedPlugins().contains(p)) {
+            pluginManager.unloadPlugin(pluginName);
+            p = null;
+        }
+        if (p == null) {
+            var loadLocation = plugin.getStatus().getLoadLocation();
+            log.info("Loading plugin {} from {}", pluginName, loadLocation);
+            pluginManager.loadPlugin(Paths.get(loadLocation));
+            log.info("Loaded plugin {} from {}", pluginName, loadLocation);
         }
     }
 
@@ -480,4 +577,38 @@ public class PluginReconciler implements Reconciler<Request> {
         return pluginName + "-system-generated-reverse-proxy";
     }
 
+    public class PluginStartedListener implements PluginStateListener {
+
+        @Override
+        public void pluginStateChanged(PluginStateEvent event) {
+            if (PluginState.STARTED.equals(event.getPluginState())) {
+                var pluginId = event.getPlugin().getPluginId();
+                client.fetch(Plugin.class, pluginId)
+                    .ifPresent(plugin -> {
+                        if (!Objects.equals(true, plugin.getSpec().getEnabled())) {
+                            plugin.getSpec().setEnabled(true);
+                            client.update(plugin);
+                        }
+                    });
+            }
+        }
+    }
+
+    public class PluginStoppedListener implements PluginStateListener {
+
+        @Override
+        public void pluginStateChanged(PluginStateEvent event) {
+            if (PluginState.STOPPED.equals(event.getPluginState())) {
+                var pluginId = event.getPlugin().getPluginId();
+                client.fetch(Plugin.class, pluginId)
+                    .ifPresent(plugin -> {
+                        if (!requestToReload(plugin)
+                            && Objects.equals(true, plugin.getSpec().getEnabled())) {
+                            plugin.getSpec().setEnabled(false);
+                            client.update(plugin);
+                        }
+                    });
+            }
+        }
+    }
 }
