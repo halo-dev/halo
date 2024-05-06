@@ -7,7 +7,7 @@ import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.doThrow;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
@@ -40,7 +40,6 @@ import org.junit.jupiter.api.io.TempDir;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.pf4j.PluginManager;
 import org.pf4j.PluginState;
 import org.pf4j.PluginWrapper;
 import org.pf4j.RuntimeMode;
@@ -56,6 +55,7 @@ import run.halo.app.extension.controller.Reconciler.Request;
 import run.halo.app.extension.controller.RequeueException;
 import run.halo.app.infra.ConditionStatus;
 import run.halo.app.plugin.PluginProperties;
+import run.halo.app.plugin.SpringPluginManager;
 
 /**
  * Tests for {@link PluginReconciler}.
@@ -67,7 +67,7 @@ import run.halo.app.plugin.PluginProperties;
 class PluginReconcilerTest {
 
     @Mock
-    PluginManager pluginManager;
+    SpringPluginManager pluginManager;
 
     @Mock
     ExtensionClient client;
@@ -186,41 +186,6 @@ class PluginReconcilerTest {
         }
 
         @Test
-        void shouldUnloadIfFailedToLoad() {
-            var fakePlugin = createPlugin(name, plugin -> {
-                var spec = plugin.getSpec();
-                spec.setVersion("1.2.3");
-                spec.setLogo("fake-logo.svg");
-                spec.setEnabled(true);
-            });
-
-            when(client.fetch(Plugin.class, name)).thenReturn(Optional.of(fakePlugin));
-            when(pluginManager.getPluginsRoots()).thenReturn(List.of(tempPath));
-            when(pluginManager.getPlugin(name))
-                // before loading
-                .thenReturn(null)
-                .thenReturn(mock(PluginWrapper.class))
-            ;
-            var expectException = mock(RuntimeException.class);
-            when(expectException.getMessage()).thenReturn("Something went wrong.");
-            doThrow(expectException).when(pluginManager).loadPlugin(any(Path.class));
-
-            var gotException = assertThrows(RuntimeException.class,
-                () -> reconciler.reconcile(new Request(name)));
-
-            assertEquals(expectException, gotException);
-            var condition = fakePlugin.getStatus().getConditions().peek();
-            assertEquals("FAILED", condition.getType());
-            assertEquals(ConditionStatus.FALSE, condition.getStatus());
-            assertEquals("UnexpectedState", condition.getReason());
-            assertEquals(expectException.getMessage(), condition.getMessage());
-            assertEquals(clock.instant(), condition.getLastTransitionTime());
-            verify(pluginManager, times(3)).getPlugin(name);
-            verify(pluginManager).loadPlugin(any(Path.class));
-            verify(pluginManager).unloadPlugin(name);
-        }
-
-        @Test
         void shouldReloadIfReloadAnnotationPresent() {
             var fakePlugin = createPlugin(name, plugin -> {
                 var spec = plugin.getSpec();
@@ -233,15 +198,14 @@ class PluginReconcilerTest {
             when(client.fetch(Plugin.class, name)).thenReturn(Optional.of(fakePlugin));
             when(pluginManager.getPluginsRoots()).thenReturn(List.of(tempPath));
             when(pluginManager.getPlugin(name)).thenReturn(mock(PluginWrapper.class));
-            when(pluginManager.unloadPlugin(name)).thenReturn(true);
+            when(pluginManager.reloadPlugin(eq(name), any(Path.class))).thenReturn(true);
             when(pluginManager.startPlugin(name)).thenReturn(PluginState.STARTED);
 
             var result = reconciler.reconcile(new Request(name));
             assertFalse(result.reEnqueue());
 
-            verify(pluginManager).unloadPlugin(name);
             var loadLocation = Paths.get(fakePlugin.getStatus().getLoadLocation());
-            verify(pluginManager).loadPlugin(loadLocation);
+            verify(pluginManager).reloadPlugin(name, loadLocation);
         }
 
         @Test
@@ -262,11 +226,7 @@ class PluginReconcilerTest {
                 .thenReturn(null)
                 // get setting extension
                 .thenReturn(mockPluginWrapperForSetting())
-                .thenReturn(mockPluginWrapperForStaticResources())
-                // before starting
-                .thenReturn(mockPluginWrapper(PluginState.RESOLVED))
-                // sync plugin state
-                .thenReturn(mockPluginWrapper(PluginState.STARTED));
+                .thenReturn(mockPluginWrapperForStaticResources());
             when(pluginManager.startPlugin(name)).thenReturn(PluginState.FAILED);
 
             var e = assertThrows(IllegalStateException.class,
@@ -293,8 +253,6 @@ class PluginReconcilerTest {
                 // get setting extension
                 .thenReturn(mockPluginWrapperForSetting())
                 .thenReturn(mockPluginWrapperForStaticResources())
-                // before starting
-                .thenReturn(mockPluginWrapper(PluginState.RESOLVED))
                 // sync plugin state
                 .thenReturn(mockPluginWrapper(PluginState.STARTED));
             when(pluginManager.startPlugin(name)).thenReturn(PluginState.STARTED);
@@ -325,7 +283,7 @@ class PluginReconcilerTest {
 
             verify(pluginManager).startPlugin(name);
             verify(pluginManager).loadPlugin(loadLocation);
-            verify(pluginManager, times(5)).getPlugin(name);
+            verify(pluginManager, times(4)).getPlugin(name);
             verify(client).update(fakePlugin);
             verify(client).fetch(Setting.class, settingName);
             verify(client).create(any(Setting.class));
