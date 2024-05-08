@@ -41,8 +41,9 @@ const TableHeader = Node.create<TableCellOptions>({
         default: [100],
         parseHTML: (element) => {
           const colwidth = element.getAttribute("colwidth");
-          const value = colwidth ? [parseInt(colwidth, 10)] : null;
-
+          const value = colwidth
+            ? colwidth.split(",").map((width) => parseInt(width, 10))
+            : null;
           return value;
         },
       },
