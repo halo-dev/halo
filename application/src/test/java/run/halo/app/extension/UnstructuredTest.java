@@ -2,6 +2,7 @@ package run.halo.app.extension;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static run.halo.app.extension.MetadataOperator.metadataDeepEquals;
 
@@ -98,10 +99,37 @@ class UnstructuredTest {
     }
 
     @Test
-    void shouldGetFinalizersCorrectly() throws JsonProcessingException, JSONException {
+    void shouldGetFinalizersCorrectly() throws JsonProcessingException {
         var extension = objectMapper.readValue(extensionJson, Unstructured.class);
 
         assertEquals(Set.of("finalizer.1", "finalizer.2"), extension.getMetadata().getFinalizers());
+
+        extension.getMetadata().setFinalizers(Set.of("finalizer.3", "finalizer.4"));
+        assertEquals(Set.of("finalizer.3", "finalizer.4"), extension.getMetadata().getFinalizers());
+    }
+
+    @Test
+    void shouldSetLabelsCorrectly() throws JsonProcessingException {
+        var extension = objectMapper.readValue(extensionJson, Unstructured.class);
+
+        assertEquals(Map.of("category", "fake", "default", "true"),
+            extension.getMetadata().getLabels());
+
+        extension.getMetadata().setLabels(Map.of("category", "fake", "default", "false"));
+        assertEquals(Map.of("category", "fake", "default", "false"),
+            extension.getMetadata().getLabels());
+    }
+
+    @Test
+    void shouldSetAnnotationsCorrectly() throws JsonProcessingException {
+        var extension = objectMapper.readValue(extensionJson, Unstructured.class);
+
+        assertNull(extension.getMetadata().getAnnotations());
+
+        extension.getMetadata()
+            .setAnnotations(Map.of("annotation1", "value1", "annotation2", "value2"));
+        assertEquals(Map.of("annotation1", "value1", "annotation2", "value2"),
+            extension.getMetadata().getAnnotations());
     }
 
     Unstructured createUnstructured() {

@@ -220,12 +220,7 @@ public class Unstructured implements Extension {
     public static Optional<Map<String, String>> getNestedStringStringMap(Map map,
         String... fields) {
         return getNestedValue(map, fields)
-            .map(labelsObj -> {
-                var labels = (Map) labelsObj;
-                var result = new HashMap<String, String>();
-                labels.forEach((key, value) -> result.put((String) key, (String) value));
-                return result;
-            });
+            .map(labelsObj -> (Map<String, String>) labelsObj);
     }
 
     public static Optional<Instant> getNestedInstant(Map map, String... fields) {
