@@ -283,43 +283,54 @@ public class PluginEndpoint implements CustomEndpoint {
         final var name = request.pathVariable("name");
         return request.bodyToMono(RunningStateRequest.class)
             .flatMap(runningState -> {
-                final var enable = runningState.isEnable();
-                return client.get(Plugin.class, name)
+                var enable = runningState.isEnable();
+                var updatedPlugin = Mono.defer(() -> client.get(Plugin.class, name))
                     .flatMap(plugin -> {
-                        plugin.getSpec().setEnabled(enable);
-                        return client.update(plugin);
-                    })
-                    .flatMap(plugin -> {
-                        if (runningState.isAsync()) {
-                            return Mono.just(plugin);
+                        if (!Objects.equals(enable, plugin.getSpec().getEnabled())) {
+                            plugin.getSpec().setEnabled(enable);
+                            log.debug("Updating plugin {} state to {}", name, enable);
+                            return client.update(plugin);
                         }
-                        return waitForPluginToMeetExpectedState(name, p -> {
-                            // when enabled = true,excepted phase = started || failed
-                            // when enabled = false,excepted phase = !started
-                            var phase = p.statusNonNull().getPhase();
-                            if (enable) {
-                                return Plugin.Phase.STARTED.equals(phase)
-                                    || Plugin.Phase.FAILED.equals(phase);
-                            }
-                            return !Plugin.Phase.STARTED.equals(phase);
-                        });
+                        log.debug("Checking plugin {} state, no need to update", name);
+                        return Mono.just(plugin);
                     });
+
+                var async = runningState.isAsync();
+                if (!async) {
+                    // if we want to wait the state of plugin to be updated
+                    updatedPlugin = updatedPlugin
+                        .flatMap(plugin -> {
+                            var phase = plugin.statusNonNull().getPhase();
+                            if (enable) {
+                                // if we request to enable the plugin
+                                if (!(Plugin.Phase.STARTED.equals(phase)
+                                    || Plugin.Phase.FAILED.equals(phase))) {
+                                    return Mono.error(UnexpectedPluginStateException::new);
+                                }
+                            } else {
+                                // if we request to disable the plugin
+                                if (Plugin.Phase.STARTED.equals(phase)) {
+                                    return Mono.error(UnexpectedPluginStateException::new);
+                                }
+                            }
+                            return Mono.just(plugin);
+                        })
+                        .retryWhen(
+                            Retry.backoff(10, Duration.ofMillis(100))
+                                .filter(UnexpectedPluginStateException.class::isInstance)
+                                .doBeforeRetry(signal ->
+                                    log.debug("Waiting for plugin {} to meet expected state", name)
+                                )
+                        )
+                        .doOnSuccess(plugin -> {
+                            log.info("Plugin {} met expected state {}",
+                                name, plugin.statusNonNull().getPhase());
+                        });
+                }
+
+                return updatedPlugin;
             })
             .flatMap(plugin -> ServerResponse.ok().bodyValue(plugin));
-    }
-
-    Mono<Plugin> waitForPluginToMeetExpectedState(String name, Predicate<Plugin> predicate) {
-        return Mono.defer(() -> client.get(Plugin.class, name)
-                .map(plugin -> {
-                    if (predicate.test(plugin)) {
-                        return plugin;
-                    }
-                    throw new IllegalStateException("Plugin " + name + " is not in expected state");
-                })
-            )
-            .retryWhen(Retry.backoff(10, Duration.ofMillis(100))
-                .filter(IllegalStateException.class::isInstance)
-            );
     }
 
     @Data
@@ -870,5 +881,9 @@ public class PluginEndpoint implements CustomEndpoint {
             this.jsBundle.set(null);
             this.cssBundle.set(null);
         }
+    }
+
+    private static class UnexpectedPluginStateException extends IllegalStateException {
+
     }
 }

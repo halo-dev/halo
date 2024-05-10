@@ -199,8 +199,16 @@ public class PluginReconciler implements Reconciler<Request> {
 
     private static boolean requestToReload(Plugin plugin) {
         var annotations = plugin.getMetadata().getAnnotations();
-        return annotations != null && annotations.remove(RELOAD_ANNO) != null;
+        return annotations != null && annotations.get(RELOAD_ANNO) != null;
     }
+
+    private static void removeRequestToReload(Plugin plugin) {
+        var annotations = plugin.getMetadata().getAnnotations();
+        if (annotations != null) {
+            annotations.remove(RELOAD_ANNO);
+        }
+    }
+
 
     private void cleanupResources(Plugin plugin) {
         var pluginName = plugin.getMetadata().getName();
@@ -394,6 +402,8 @@ public class PluginReconciler implements Reconciler<Request> {
                 }
                 p = pluginManager.getPlugin(pluginName);
             }
+            // ensure removing the reload annotation after the plugin is reloaded
+            removeRequestToReload(plugin);
         }
         if (p != null && pluginManager.getUnresolvedPlugins().contains(p)) {
             pluginManager.unloadPlugin(pluginName);
@@ -586,6 +596,7 @@ public class PluginReconciler implements Reconciler<Request> {
                 client.fetch(Plugin.class, pluginId)
                     .ifPresent(plugin -> {
                         if (!Objects.equals(true, plugin.getSpec().getEnabled())) {
+                            log.info("Observed plugin {} started, enabling it.", pluginId);
                             plugin.getSpec().setEnabled(true);
                             client.update(plugin);
                         }
@@ -604,6 +615,7 @@ public class PluginReconciler implements Reconciler<Request> {
                     .ifPresent(plugin -> {
                         if (!requestToReload(plugin)
                             && Objects.equals(true, plugin.getSpec().getEnabled())) {
+                            log.info("Observed plugin {} stopped, disabling it.", pluginId);
                             plugin.getSpec().setEnabled(false);
                             client.update(plugin);
                         }
