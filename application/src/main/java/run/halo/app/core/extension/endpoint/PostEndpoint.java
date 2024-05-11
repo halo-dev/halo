@@ -119,6 +119,28 @@ public class PostEndpoint implements CustomEndpoint {
                     .response(responseBuilder()
                         .implementationArray(ListedSnapshotDto.class))
             )
+            .GET("posts/{name}/diff-content", this::diffContent,
+                builder -> builder.operationId("diffPostContent")
+                    .description("Generate diff content between two snapshots.")
+                    .tag(tag)
+                    .parameter(parameterBuilder().name("name")
+                        .in(ParameterIn.PATH)
+                        .required(true)
+                        .implementation(String.class)
+                    )
+                    .parameter(parameterBuilder()
+                        .name("leftSnapshot")
+                        .in(ParameterIn.QUERY)
+                        .required(true)
+                        .implementation(String.class))
+                    .parameter(parameterBuilder()
+                        .name("rightSnapshot")
+                        .in(ParameterIn.QUERY)
+                        .required(true)
+                        .implementation(String.class))
+                    .response(responseBuilder()
+                        .implementation(String.class))
+            )
             .POST("posts", this::draftPost,
                 builder -> builder.operationId("DraftPost")
                     .description("Draft a post.")
@@ -236,6 +258,18 @@ public class PostEndpoint implements CustomEndpoint {
                         .implementation(ContentWrapper.class))
             )
             .build();
+    }
+
+    private Mono<ServerResponse> diffContent(ServerRequest request) {
+        final var postName = request.pathVariable("name");
+        var leftSnapshotName = request.queryParam("leftSnapshot")
+            .orElse(null);
+        var rightSnapshotName = request.queryParam("rightSnapshot")
+            .orElse(null);
+        return client.get(Post.class, postName)
+            .flatMap(post -> postService.generateContentDiff(postName, leftSnapshotName,
+                rightSnapshotName))
+            .flatMap(diff -> ServerResponse.ok().bodyValue(diff));
     }
 
     private Mono<ServerResponse> deleteContent(ServerRequest request) {

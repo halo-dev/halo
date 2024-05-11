@@ -11,8 +11,11 @@ import com.github.difflib.patch.InsertDelta;
 import com.github.difflib.patch.Patch;
 import com.github.difflib.patch.PatchFailedException;
 import com.google.common.base.Splitter;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import lombok.Data;
 import org.apache.commons.lang3.StringUtils;
 import run.halo.app.infra.utils.JsonUtils;
@@ -22,7 +25,8 @@ import run.halo.app.infra.utils.JsonUtils;
  * @since 2.0.0
  */
 public class PatchUtils {
-    private static final String DELIMITER = "\n";
+    public static final String DELIMITER = "\n";
+    static final Pattern HTML_OPEN_TAG_PATTERN = Pattern.compile("(<[^>]+>)|([^<]+)");
     private static final Splitter lineSplitter = Splitter.on(DELIMITER);
 
     public static Patch<String> create(String deltasJson) {
@@ -70,6 +74,49 @@ public class PatchUtils {
             return Collections.emptyList();
         }
         return lineSplitter.splitToList(content);
+    }
+
+    /**
+     * <p>It will generate a unified diff html for the given diff lines.</p>
+     * <p>It will wrap the following classes to the html elements:</p>
+     * <ul>
+     *     <li>diff-html-add: added elements</li>
+     *     <li>diff-html-remove: deleted elements</li>
+     * </ul>
+     */
+    public static String highlightDiffChanges(List<String> diffLines) {
+        final var sb = new StringBuilder();
+        for (String line : diffLines) {
+            if (line.startsWith("+")) {
+                sb.append(wrapLine(line.substring(1), "diff-html-add"));
+            } else if (line.startsWith("-")) {
+                sb.append(wrapLine(line.substring(1), "diff-html-remove"));
+            } else {
+                sb.append(line).append("\n");
+            }
+        }
+        return sb.toString();
+    }
+
+    private static String wrapLine(String line, String className) {
+        return "<div class=\"" + className + "\">" + line + "</div>\n";
+    }
+
+    /**
+     * Break line for html.
+     */
+    public static List<String> breakHtml(String compressedHtml) {
+        Matcher matcher = HTML_OPEN_TAG_PATTERN.matcher(compressedHtml);
+        List<String> elements = new ArrayList<>();
+        while (matcher.find()) {
+            if (matcher.group(1) != null) {
+                elements.add(matcher.group(1));
+            } else if (matcher.group(2) != null) {
+                List<String> lines = breakLine(matcher.group(2));
+                elements.addAll(lines);
+            }
+        }
+        return elements;
     }
 
     @Data

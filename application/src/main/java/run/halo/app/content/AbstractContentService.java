@@ -1,14 +1,21 @@
 package run.halo.app.content;
 
+import static com.github.difflib.UnifiedDiffUtils.generateUnifiedDiff;
+import static run.halo.app.content.PatchUtils.breakHtml;
 import static run.halo.app.extension.index.query.QueryFactory.and;
 import static run.halo.app.extension.index.query.QueryFactory.equal;
 import static run.halo.app.extension.index.query.QueryFactory.isNull;
 
+import com.github.difflib.DiffUtils;
+import com.github.difflib.patch.Patch;
 import java.security.Principal;
 import java.time.Duration;
 import java.time.Instant;
+import java.util.List;
 import java.util.UUID;
 import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.experimental.Accessors;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.dao.OptimisticLockingFailureException;
@@ -26,6 +33,7 @@ import run.halo.app.extension.MetadataUtil;
 import run.halo.app.extension.ReactiveExtensionClient;
 import run.halo.app.extension.Ref;
 import run.halo.app.extension.router.selector.FieldSelector;
+import run.halo.app.infra.exception.NotFoundException;
 
 /**
  * Abstract Service for {@link Snapshot}.
@@ -186,9 +194,58 @@ public abstract class AbstractContentService {
         return snapshotToUse;
     }
 
+    /**
+     * Returns the unified diff content of the right compared to the left.
+     */
+    protected Mono<String> generateContentDiffBy(String leftSnapshot, String rightSnapshot,
+        String baseSnapshot) {
+        if (StringUtils.isBlank(leftSnapshot) || StringUtils.isBlank(rightSnapshot)) {
+            return Mono.error(new IllegalArgumentException(
+                "The leftSnapshot and rightSnapshot must not be blank."));
+        }
+        if (StringUtils.isBlank(baseSnapshot)) {
+            return Mono.error(new IllegalArgumentException("The baseSnapshot must not be blank."));
+        }
+
+        var contentDiffDo = new ContentDiffDo();
+        var originalMono = getContent(leftSnapshot, baseSnapshot)
+            .switchIfEmpty(Mono.error(new NotFoundException("The leftSnapshot not found.")))
+            .doOnNext(contentWrapper -> contentDiffDo.setOriginal(contentWrapper.getContent()));
+        var revisedMono = getContent(rightSnapshot, baseSnapshot)
+            .switchIfEmpty(Mono.error(new NotFoundException("The rightSnapshot not found.")))
+            .doOnNext(contentWrapper -> contentDiffDo.setRevised(contentWrapper.getContent()));
+
+        return Mono.when(originalMono, revisedMono)
+            .then(Mono.fromSupplier(() -> {
+                var diffLines = generateContentUnifiedDiff(contentDiffDo.getOriginal(),
+                    contentDiffDo.getRevised());
+                return PatchUtils.highlightDiffChanges(diffLines);
+            }));
+    }
+
+    static List<String> generateContentUnifiedDiff(String original, String revised) {
+        Assert.notNull(original, "The original text must not be null.");
+        Assert.notNull(revised, "The revised text must not be null.");
+        var originalLines = breakHtml(original);
+        Patch<String> patch = DiffUtils.diff(originalLines, breakHtml(revised));
+        var unifiedDiff = generateUnifiedDiff("left", "right",
+            originalLines, patch, 10);
+        if (unifiedDiff.size() < 3) {
+            return List.of();
+        }
+        return unifiedDiff.subList(2, unifiedDiff.size());
+    }
+
     protected Mono<String> getContextUsername() {
         return ReactiveSecurityContextHolder.getContext()
             .map(SecurityContext::getAuthentication)
             .map(Principal::getName);
+    }
+
+    @Data
+    @Accessors(chain = true)
+    private static class ContentDiffDo {
+        private String original;
+        private String revised;
     }
 }

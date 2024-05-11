@@ -50,4 +50,12 @@ public interface PostService {
     Mono<Post> revertToSpecifiedSnapshot(String postName, String snapshotName);
 
     Mono<ContentWrapper> deleteContent(String postName, String snapshotName);
+
+    /**
+     * <p>Returns the unified diff content of the right compared to the left.</p>
+     * <p>If the left snapshot is blank, the releaseSnapshot will be used as the left snapshot.</p>
+     * <p>If the right snapshot is blank, the headSnapshot will be used as the right snapshot.</p>
+     */
+    Mono<String> generateContentDiff(String postName, String leftSnapshotName,
+        String rightSnapshotName);
 }

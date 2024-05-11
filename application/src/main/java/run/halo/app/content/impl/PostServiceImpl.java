@@ -6,6 +6,7 @@ import java.time.Duration;
 import java.time.Instant;
 import java.util.List;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.function.Function;
 import java.util.function.UnaryOperator;
 import lombok.extern.slf4j.Slf4j;
@@ -352,6 +353,23 @@ public class PostServiceImpl extends AbstractContentService implements PostServi
                 return client.fetch(Snapshot.class, snapshotName)
                     .flatMap(client::delete)
                     .flatMap(deleted -> restoredContent(baseSnapshotName, deleted));
+            });
+    }
+
+    @Override
+    public Mono<String> generateContentDiff(String postName, String leftSnapshotName,
+        String rightSnapshotName) {
+        return client.get(Post.class, postName)
+            .flatMap(post -> {
+                String ensuredLeftSnapshotName = Optional.ofNullable(leftSnapshotName)
+                    .filter(StringUtils::isNotBlank)
+                    .orElse(post.getSpec().getReleaseSnapshot());
+
+                String ensuredRightSnapshotName = Optional.ofNullable(rightSnapshotName)
+                    .filter(StringUtils::isNotBlank)
+                    .orElse(post.getSpec().getHeadSnapshot());
+                return generateContentDiffBy(ensuredLeftSnapshotName, ensuredRightSnapshotName,
+                    post.getSpec().getBaseSnapshot());
             });
     }
 
