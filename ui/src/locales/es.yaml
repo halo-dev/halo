@@ -9,7 +9,9 @@ core:
     operations:
       submit:
         toast_success: Inicio de sesión exitoso
-        toast_failed: Error en el inicio de sesión, nombre de usuario o contraseña incorrectos
+        toast_failed: >-
+          Error en el inicio de sesión, nombre de usuario o contraseña
+          incorrectos
         toast_csrf: Token CSRF no válido, por favor inténtalo de nuevo
       signup:
         label: No tienes una cuenta
@@ -40,7 +42,9 @@ core:
     title: Vinculación de cuentas
     common:
       toast:
-        mounted: El método de inicio de sesión actual no está vinculado a una cuenta. Por favor, vincula o registra una nueva cuenta primero.
+        mounted: >-
+          El método de inicio de sesión actual no está vinculado a una cuenta.
+          Por favor, vincula o registra una nueva cuenta primero.
     operations:
       login_and_bind:
         button: Iniciar sesión y vincular
@@ -48,7 +52,9 @@ core:
         button: Registrarse y vincular
       bind:
         toast_success: Vinculación exitosa
-        toast_failed: Vinculación fallida, no se encontró ningún método de inicio de sesión habilitado.
+        toast_failed: >-
+          Vinculación fallida, no se encontró ningún método de inicio de sesión
+          habilitado.
   sidebar:
     search:
       placeholder: Buscar
@@ -124,7 +130,9 @@ core:
             refresh_search_engine:
               title: Actualizar Motor de Búsqueda
               dialog_title: ¿Deseas actualizar el índice del motor de búsqueda?
-              dialog_content: Esta operación recreará los índices del motor de búsqueda para todas las publicaciones publicadas.
+              dialog_content: >-
+                Esta operación recreará los índices del motor de búsqueda para
+                todas las publicaciones publicadas.
               success_message: Índice del motor de búsqueda actualizado exitosamente.
             evict_page_cache:
               title: Actualizar Caché de Página
@@ -149,10 +157,14 @@ core:
     operations:
       delete:
         title: ¿Estás seguro de que deseas eliminar esta publicación?
-        description: Esta operación moverá la publicación a la papelera de reciclaje, y podrá ser restaurada desde la papelera de reciclaje posteriormente.
+        description: >-
+          Esta operación moverá la publicación a la papelera de reciclaje, y
+          podrá ser restaurada desde la papelera de reciclaje posteriormente.
       delete_in_batch:
         title: ¿Estás seguro de que deseas eliminar las publicaciones seleccionadas?
-        description: Esta operación moverá las publicaciones a la papelera de reciclaje, y podrán ser restauradas desde la papelera de reciclaje posteriormente.
+        description: >-
+          Esta operación moverá las publicaciones a la papelera de reciclaje, y
+          podrán ser restauradas desde la papelera de reciclaje posteriormente.
     filters:
       status:
         items:
@@ -198,7 +210,9 @@ core:
           label: Título
         slug:
           label: Slug
-          help: Usualmente usado para generar el enlace permanente a las publicaciones
+          help: >-
+            Usualmente usado para generar el enlace permanente a las
+            publicaciones
           refresh_message: Regenerar slug basado en el título.
         categories:
           label: Categorías
@@ -230,14 +244,20 @@ core:
         title: ¿Estás seguro de que deseas eliminar permanentemente esta publicación?
         description: Después de la eliminación, no será posible recuperarla.
       delete_in_batch:
-        title: ¿Estás seguro de que deseas eliminar permanentemente las publicaciones seleccionadas?
+        title: >-
+          ¿Estás seguro de que deseas eliminar permanentemente las publicaciones
+          seleccionadas?
         description: Después de la eliminación, no será posible recuperarlas.
       recovery:
         title: ¿Quieres restaurar esta publicación?
-        description: Esta operación restaurará la publicación a su estado antes de la eliminación.
+        description: >-
+          Esta operación restaurará la publicación a su estado antes de la
+          eliminación.
       recovery_in_batch:
         title: ¿Estás seguro de que deseas restaurar las publicaciones seleccionadas?
-        description: Esta operación restaurará las publicaciones a su estado antes de la eliminación.
+        description: >-
+          Esta operación restaurará las publicaciones a su estado antes de la
+          eliminación.
   post_editor:
     title: Edición de publicación
     untitled: Publicación sin título
@@ -251,7 +271,9 @@ core:
     operations:
       delete:
         title: ¿Estás seguro de que deseas eliminar esta etiqueta?
-        description: Después de eliminar esta etiqueta, se eliminará la asociación con el artículo correspondiente. Esta operación no se puede deshacer.
+        description: >-
+          Después de eliminar esta etiqueta, se eliminará la asociación con el
+          artículo correspondiente. Esta operación no se puede deshacer.
     editing_modal:
       titles:
         update: Actualizar etiqueta de publicación
@@ -264,7 +286,9 @@ core:
           label: Nombre para mostrar
         slug:
           label: Slug
-          help: Usualmente utilizado para generar el enlace permanente de las etiquetas
+          help: >-
+            Usualmente utilizado para generar el enlace permanente de las
+            etiquetas
           refresh_message: Regenerar slug basado en el nombre para mostrar.
         color:
           label: Color
@@ -282,7 +306,9 @@ core:
     operations:
       delete:
         title: ¿Estás seguro de que deseas eliminar esta categoría?
-        description: Después de eliminar esta categoría, se eliminará la asociación con los artículos correspondientes. Esta operación no se puede deshacer.
+        description: >-
+          Después de eliminar esta categoría, se eliminará la asociación con los
+          artículos correspondientes. Esta operación no se puede deshacer.
       add_sub_category:
         button: Agregar subcategoría
     editing_modal:
@@ -299,7 +325,9 @@ core:
           label: Nombre para mostrar
         slug:
           label: Slug
-          help: Usualmente utilizado para generar el enlace permanente de las categorías
+          help: >-
+            Usualmente utilizado para generar el enlace permanente de las
+            categorías
           refresh_message: Regenerar slug basado en el nombre para mostrar.
         template:
           label: Plantilla personalizada
@@ -319,10 +347,14 @@ core:
     operations:
       delete:
         title: ¿Estás seguro de que deseas eliminar esta página?
-        description: Esta operación moverá la página a la papelera de reciclaje, y podrá ser restaurada desde la papelera de reciclaje posteriormente.
+        description: >-
+          Esta operación moverá la página a la papelera de reciclaje, y podrá
+          ser restaurada desde la papelera de reciclaje posteriormente.
       delete_in_batch:
         title: ¿Estás seguro de que deseas eliminar las páginas seleccionadas?
-        description: Esta operación moverá las páginas a la papelera de reciclaje, y podrá ser restaurada desde la papelera de reciclaje posteriormente.
+        description: >-
+          Esta operación moverá las páginas a la papelera de reciclaje, y podrá
+          ser restaurada desde la papelera de reciclaje posteriormente.
     filters:
       status:
         items:
@@ -358,7 +390,9 @@ core:
           label: Título
         slug:
           label: Slug
-          help: Usualmente utilizado para generar el enlace permanente de las páginas
+          help: >-
+            Usualmente utilizado para generar el enlace permanente de las
+            páginas
           refresh_message: Regenerar slug basado en el título.
         auto_generate_excerpt:
           label: Generar Extracto Automáticamente
@@ -386,14 +420,20 @@ core:
         title: ¿Estás seguro de que deseas eliminar permanentemente esta página?
         description: Después de la eliminación, no será posible recuperarla.
       delete_in_batch:
-        title: ¿Estás seguro de que deseas eliminar permanentemente las páginas seleccionadas?
+        title: >-
+          ¿Estás seguro de que deseas eliminar permanentemente las páginas
+          seleccionadas?
         description: Después de la eliminación, no será posible recuperarlas.
       recovery:
         title: ¿Quieres restaurar esta página?
-        description: Esta operación restaurará la página a su estado antes de la eliminación.
+        description: >-
+          Esta operación restaurará la página a su estado antes de la
+          eliminación.
       recovery_in_batch:
         title: ¿Estás seguro de que deseas restaurar las páginas seleccionadas?
-        description: Esta operación restaurará las páginas a su estado antes de la eliminación.
+        description: >-
+          Esta operación restaurará las páginas a su estado antes de la
+          eliminación.
   page_editor:
     title: Edición de Página
     untitled: Página Sin Título
@@ -409,16 +449,24 @@ core:
     operations:
       delete_comment:
         title: ¿Estás seguro de que deseas eliminar este comentario?
-        description: Todas las respuestas bajo los comentarios se eliminarán al mismo tiempo, y esta operación no se puede deshacer.
+        description: >-
+          Todas las respuestas bajo los comentarios se eliminarán al mismo
+          tiempo, y esta operación no se puede deshacer.
       delete_comment_in_batch:
         title: ¿Estás seguro de que deseas eliminar los comentarios seleccionados?
-        description: Todas las respuestas bajo los comentarios se eliminarán al mismo tiempo, y esta operación no se puede deshacer.
+        description: >-
+          Todas las respuestas bajo los comentarios se eliminarán al mismo
+          tiempo, y esta operación no se puede deshacer.
       approve_comment_in_batch:
         button: Aprobar
-        title: ¿Estás seguro de que deseas aprobar los comentarios seleccionados para su revisión?
+        title: >-
+          ¿Estás seguro de que deseas aprobar los comentarios seleccionados para
+          su revisión?
       approve_applies_in_batch:
         button: Aprobar todas las respuestas
-        title: ¿Estás seguro de que deseas aprobar todas las respuestas a este comentario para su revisión?
+        title: >-
+          ¿Estás seguro de que deseas aprobar todas las respuestas a este
+          comentario para su revisión?
       delete_reply:
         title: ¿Estás seguro de que deseas eliminar esta respuesta?
       approve_reply:
@@ -467,7 +515,9 @@ core:
       storage_policies: Políticas de Almacenamiento
     empty:
       title: No hay adjuntos en el grupo actual.
-      message: El grupo actual no tiene adjuntos, puedes intentar actualizar o cargar adjuntos.
+      message: >-
+        El grupo actual no tiene adjuntos, puedes intentar actualizar o cargar
+        adjuntos.
       actions:
         upload: Cargar Adjunto
     operations:
@@ -497,6 +547,13 @@ core:
         items:
           grid: Modo Cuadrícula
           list: Modo Lista
+      accept:
+        label: Tipo
+        items:
+          image: Imagen
+          audio: Audio
+          video: Video
+          file: Archivo
     detail_modal:
       title: "Adjunto: {display_name}"
       fields:
@@ -530,18 +587,26 @@ core:
         delete:
           button: Y mover adjunto a sin grupo
           title: ¿Estás seguro de que deseas eliminar este grupo?
-          description: El grupo se eliminará, y los adjuntos bajo el grupo se moverán a sin grupo. Esta operación no se puede deshacer.
+          description: >-
+            El grupo se eliminará, y los adjuntos bajo el grupo se moverán a sin
+            grupo. Esta operación no se puede deshacer.
           toast_success: Eliminación exitosa, {total} adjuntos se han movido a sin grupo
         delete_with_attachments:
           button: También eliminar adjuntos
           title: ¿Estás seguro de que deseas eliminar este grupo?
-          description: Al eliminar el grupo y todos los adjuntos dentro de él, esta acción no se puede deshacer.
-          toast_success: Eliminación exitosa, {total} adjuntos se han eliminado simultáneamente
+          description: >-
+            Al eliminar el grupo y todos los adjuntos dentro de él, esta acción
+            no se puede deshacer.
+          toast_success: >-
+            Eliminación exitosa, {total} adjuntos se han eliminado
+            simultáneamente
     policies_modal:
       title: Políticas de Almacenamiento
       empty:
         title: Actualmente no hay estrategias de almacenamiento disponibles.
-        message: No hay políticas de almacenamiento disponibles en este momento. Puedes intentar actualizar o crear una nueva política.
+        message: >-
+          No hay políticas de almacenamiento disponibles en este momento. Puedes
+          intentar actualizar o crear una nueva política.
       operations:
         delete:
           title: ¿Estás seguro de que deseas eliminar esta política?
@@ -565,7 +630,9 @@ core:
           label: "Seleccionar política de almacenamiento:"
           empty:
             title: Sin política de almacenamiento
-            description: Antes de cargar, es necesario crear una nueva política de almacenamiento.
+            description: >-
+              Antes de cargar, es necesario crear una nueva política de
+              almacenamiento.
           not_select: Por favor, selecciona una política de almacenamiento primero
     select_modal:
       title: Seleccionar adjunto
@@ -574,7 +641,7 @@ core:
           label: Adjuntos
       operations:
         select:
-          result: "({count} elementos seleccionados)"
+          result: ({count} elementos seleccionados)
   theme:
     title: Temas
     common:
@@ -594,22 +661,35 @@ core:
         title: ¿Estás seguro de activar el tema actual?
         toast_success: Tema activado exitosamente
       reset:
-        title: ¿Estás seguro de que deseas restablecer todas las configuraciones del tema?
-        description: Esta operación eliminará la configuración guardada y la restablecerá a los ajustes predeterminados.
+        title: >-
+          ¿Estás seguro de que deseas restablecer todas las configuraciones del
+          tema?
+        description: >-
+          Esta operación eliminará la configuración guardada y la restablecerá a
+          los ajustes predeterminados.
         toast_success: Configuración restablecida exitosamente
       reload:
         button: Recargar
-        title: ¿Estás seguro de que deseas recargar todas las configuraciones del tema?
-        description: Esta operación solo recargará la configuración del tema y la definición del formulario de ajustes, y no eliminará ninguna configuración guardada.
+        title: >-
+          ¿Estás seguro de que deseas recargar todas las configuraciones del
+          tema?
+        description: >-
+          Esta operación solo recargará la configuración del tema y la
+          definición del formulario de ajustes, y no eliminará ninguna
+          configuración guardada.
         toast_success: Recarga de configuración exitosa
       uninstall:
         title: ¿Estás seguro de que deseas desinstalar este tema?
       uninstall_and_delete_config:
         button: Desinstalar y eliminar configuración
-        title: ¿Estás seguro de que deseas desinstalar este tema y su configuración correspondiente?
+        title: >-
+          ¿Estás seguro de que deseas desinstalar este tema y su configuración
+          correspondiente?
       remote_download:
         title: Se ha detectado una dirección de descarga remota, ¿deseas descargar?
-        description: "Por favor, verifica cuidadosamente si esta dirección es confiable: {url}"
+        description: >-
+          Por favor, verifica cuidadosamente si esta dirección es confiable:
+          {url}
     upload_modal:
       titles:
         install: Instalar tema
@@ -633,7 +713,9 @@ core:
         not_installed: No Instalados
       empty:
         title: No hay temas instalados actualmente.
-        message: No hay temas instalados actualmente, puedes intentar actualizar o instalar un nuevo tema.
+        message: >-
+          No hay temas instalados actualmente, puedes intentar actualizar o
+          instalar un nuevo tema.
       not_installed_empty:
         title: No hay temas actualmente no instalados.
     preview_model:
@@ -668,11 +750,15 @@ core:
         button: Establecer como menú principal
         toast_success: Configuración exitosa
       delete_menu:
-        title: "¿Estás seguro de que deseas eliminar este menú?"
-        description: Todos los elementos de menú de este menú se eliminarán al mismo tiempo y esta operación no se puede deshacer.
+        title: ¿Estás seguro de que deseas eliminar este menú?
+        description: >-
+          Todos los elementos de menú de este menú se eliminarán al mismo tiempo
+          y esta operación no se puede deshacer.
       delete_menu_item:
-        title: "¿Estás seguro de que deseas eliminar este elemento de menú?"
-        description: Todos los subelementos de menú se eliminarán al mismo tiempo y no se pueden restaurar después de la eliminación.
+        title: ¿Estás seguro de que deseas eliminar este elemento de menú?
+        description: >-
+          Todos los subelementos de menú se eliminarán al mismo tiempo y no se
+          pueden restaurar después de la eliminación.
       add_sub_menu_item:
         button: Agregar subelemento de menú
     list:
@@ -699,7 +785,7 @@ core:
           placeholder: Selecciona el elemento de menú padre
         ref_kind:
           label: Tipo
-          placeholder: "Por favor selecciona {label}"
+          placeholder: Por favor selecciona {label}
           options:
             custom: Personalizado
             post: Publicación
@@ -723,21 +809,29 @@ core:
       detail: Detail
     empty:
       title: There are no installed plugins currently.
-      message: There are no installed plugins currently, you can try refreshing or installing new plugins.
+      message: >-
+        There are no installed plugins currently, you can try refreshing or
+        installing new plugins.
       actions:
         install: Install Plugin
     operations:
       reset:
         title: Are you sure you want to reset all configurations of the plugin?
-        description: This operation will delete the saved configuration and reset it to default settings.
+        description: >-
+          This operation will delete the saved configuration and reset it to
+          default settings.
         toast_success: Reset configuration successfully
       uninstall:
         title: Are you sure you want to uninstall this plugin?
       uninstall_and_delete_config:
-        title: Are you sure you want to uninstall this plugin and its corresponding configuration?
+        title: >-
+          Are you sure you want to uninstall this plugin and its corresponding
+          configuration?
       uninstall_when_enabled:
         confirm_text: Stop running and uninstall
-        description: The current plugin is still in the enabled state and will be uninstalled after it stops running. This operation cannot be undone.
+        description: >-
+          The current plugin is still in the enabled state and will be
+          uninstalled after it stops running. This operation cannot be undone.
       change_status:
         active_title: Are you sure you want to active this plugin?
         inactive_title: Are you sure you want to inactive this plugin?
@@ -772,7 +866,9 @@ core:
           description: Would you like to activate the currently installed plugin?
         existed_during_installation:
           title: The plugin already exists.
-          description: The currently installed plugin already exists, do you want to upgrade?
+          description: >-
+            The currently installed plugin already exists, do you want to
+            upgrade?
     detail:
       title: Plugin detail
       header:
@@ -801,7 +897,9 @@ core:
       identity_authentication: Autenticación de Identidad
     empty:
       title: Actualmente no hay usuarios que cumplan con los criterios de filtrado.
-      message: No hay usuarios que coincidan con los criterios de filtrado en este momento. Puedes intentar actualizar o crear un nuevo usuario.
+      message: >-
+        No hay usuarios que coincidan con los criterios de filtrado en este
+        momento. Puedes intentar actualizar o crear un nuevo usuario.
     operations:
       delete:
         title: ¿Estás seguro de que deseas eliminar a este usuario?
@@ -869,7 +967,9 @@ core:
           button: Vincular
         unbind:
           button: Desvincular
-          title: ¿Estás seguro de que deseas desvincular el método de inicio de sesión para {display_name}?
+          title: >-
+            ¿Estás seguro de que deseas desvincular el método de inicio de
+            sesión para {display_name}?
       fields:
         display_name: Nombre para mostrar
         username: Nombre de usuario
@@ -906,7 +1006,9 @@ core:
     operations:
       delete:
         title: ¿Estás seguro de que deseas eliminar este rol?
-        description: Una vez eliminado el rol, se eliminarán las asignaciones de rol de los usuarios asociados y esta operación no se puede deshacer.
+        description: >-
+          Una vez eliminado el rol, se eliminarán las asignaciones de rol de los
+          usuarios asociados y esta operación no se puede deshacer.
       create_based_on_this_role:
         button: Crear basado en este rol
     detail:
@@ -923,7 +1025,9 @@ core:
         creation_time: Fecha de creación
     permissions_detail:
       system_reserved_alert:
-        description: El rol reservado del sistema no admite modificaciones. Se recomienda crear un nuevo rol basado en este.
+        description: >-
+          El rol reservado del sistema no admite modificaciones. Se recomienda
+          crear un nuevo rol basado en este.
     editing_modal:
       titles:
         create: Crear rol
@@ -940,11 +1044,17 @@ core:
       setting: Configuración
     operations:
       enable:
-        title: ¿Estás seguro de que deseas habilitar este método de autenticación de identidad?
+        title: >-
+          ¿Estás seguro de que deseas habilitar este método de autenticación de
+          identidad?
       disable:
-        title: ¿Estás seguro de que deseas deshabilitar este método de autenticación de identidad?
+        title: >-
+          ¿Estás seguro de que deseas deshabilitar este método de autenticación
+          de identidad?
       disable_privileged:
-        tooltip: El método de autenticación reservado por el sistema no se puede deshabilitar
+        tooltip: >-
+          El método de autenticación reservado por el sistema no se puede
+          deshabilitar
     detail:
       title: Detalle de la autenticación de identidad
       fields:
@@ -985,7 +1095,11 @@ core:
       database: "Base de datos: {database}"
       os: "Sistema operativo: {os}"
     alert:
-      external_url_invalid: La URL de acceso externo detectada no coincide con la URL de acceso actual, lo que podría causar que algunos enlaces no se redirijan correctamente. Por favor, verifica la configuración de la URL de acceso externo.
+      external_url_invalid: >-
+        La URL de acceso externo detectada no coincide con la URL de acceso
+        actual, lo que podría causar que algunos enlaces no se redirijan
+        correctamente. Por favor, verifica la configuración de la URL de acceso
+        externo.
   backup:
     title: Copia de Seguridad y Restauración
     tabs:
@@ -998,14 +1112,19 @@ core:
       create:
         button: Crear copia de seguridad
         title: Crear copia de seguridad
-        description: ¿Estás seguro de que deseas crear una copia de seguridad? Esta operación puede tomar un tiempo.
+        description: >-
+          ¿Estás seguro de que deseas crear una copia de seguridad? Esta
+          operación puede tomar un tiempo.
         toast_success: Solicitud de creación de copia de seguridad realizada
       delete:
         title: Eliminar copia de seguridad
         description: ¿Estás seguro de que deseas eliminar esta copia de seguridad?
       restore:
         title: Restauración exitosa
-        description: Después de una restauración exitosa, necesitas reiniciar Halo para cargar los recursos del sistema normalmente. Después de hacer clic en OK, reiniciaremos automáticamente Halo.
+        description: >-
+          Después de una restauración exitosa, necesitas reiniciar Halo para
+          cargar los recursos del sistema normalmente. Después de hacer clic en
+          OK, reiniciaremos automáticamente Halo.
       restart:
         toast_success: Solicitud de reinicio realizada
     list:
@@ -1018,9 +1137,15 @@ core:
         expiresAt: Expira el {expiresAt}
     restore:
       tips:
-        first: 1. El proceso de restauración puede tomar un tiempo, por favor no actualices la página durante este período.
-        second: 2. Durante el proceso de restauración, aunque los datos existentes no se eliminarán, si hay un conflicto, los datos se sobrescribirán.
-        third: 3. Después de completar la restauración, necesitas reiniciar Halo para cargar los recursos del sistema normalmente.
+        first: >-
+          1. El proceso de restauración puede tomar un tiempo, por favor no
+          actualices la página durante este período.
+        second: >-
+          2. Durante el proceso de restauración, aunque los datos existentes no
+          se eliminarán, si hay un conflicto, los datos se sobrescribirán.
+        third: >-
+          3. Después de completar la restauración, necesitas reiniciar Halo para
+          cargar los recursos del sistema normalmente.
         complete: Restauración completada, esperando reinicio...
       start: Iniciar Restauración
   exception:
@@ -1132,7 +1257,7 @@ core:
       extensions:
         placeholder:
           options:
-            placeholder: "Ingresa / para seleccionar el tipo de entrada."
+            placeholder: Ingresa / para seleccionar el tipo de entrada.
       toolbox:
         attachment: Adjunto
     global_search:
@@ -1158,7 +1283,9 @@ core:
     social_auth_providers:
       title: Inicio de sesión de terceros
     app_download_alert:
-      description: "Los temas y complementos para Halo se pueden descargar en las siguientes direcciones:"
+      description: >-
+        Los temas y complementos para Halo se pueden descargar en las siguientes
+        direcciones:
       sources:
         app_store: "Tienda de aplicaciones oficial: {url}"
         github: "GitHub: {url}"
@@ -1167,9 +1294,9 @@ core:
       toast_recovered: Contenido no guardado recuperado de la caché
   formkit:
     category_select:
-      creation_label: "Crear categoría {text}"
+      creation_label: Crear categoría {text}
     tag_select:
-      creation_label: "Crear etiqueta {text}"
+      creation_label: Crear etiqueta {text}
     validation:
       trim: Por favor, elimina los espacios al inicio y al final
   common:
@@ -1206,7 +1333,7 @@ core:
       detail: Detalle
     radio:
       "yes": Sí
-      "no": No
+      "no": "No"
     select:
       public: Público
       private: Privado
@@ -1228,10 +1355,10 @@ core:
       copy_success: Copiado exitosamente
       operation_failed: Fallo en la operación
       download_failed: Fallo en la descarga
-      save_failed_and_retry: "Fallo al guardar, por favor intenta nuevamente"
-      publish_failed_and_retry: "Fallo al publicar, por favor intenta nuevamente"
-      network_error: "Error de red, por favor verifica tu conexión"
-      login_expired: "Sesión expirada, por favor inicia sesión nuevamente"
+      save_failed_and_retry: Fallo al guardar, por favor intenta nuevamente
+      publish_failed_and_retry: Fallo al publicar, por favor intenta nuevamente
+      network_error: Error de red, por favor verifica tu conexión
+      login_expired: Sesión expirada, por favor inicia sesión nuevamente
       forbidden: Acceso denegado
       not_found: Recurso no encontrado
       server_internal_error: Error interno del servidor
@@ -1242,7 +1369,9 @@ core:
         warning: Advertencia
       descriptions:
         cannot_be_recovered: Esta operación es irreversible.
-        editor_not_found: No se encontró ningún editor que coincida con el formato {raw_type}. Por favor verifica si el complemento del editor ha sido instalado.
+        editor_not_found: >-
+          No se encontró ningún editor que coincida con el formato {raw_type}.
+          Por favor verifica si el complemento del editor ha sido instalado.
     filters:
       results:
         keyword: "Palabra clave: {keyword}"
