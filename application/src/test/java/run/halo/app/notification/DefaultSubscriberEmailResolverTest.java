@@ -50,6 +50,15 @@ class DefaultSubscriberEmailResolverTest {
         user.getMetadata().setName("fake-user");
         user.setSpec(new User.UserSpec());
         user.getSpec().setEmail("test@halo.run");
+        user.getSpec().setEmailVerified(false);
+        when(client.fetch(eq(User.class), eq("fake-user"))).thenReturn(Mono.just(user));
+
+        subscriber.setName("fake-user");
+        subscriberEmailResolver.resolve(subscriber)
+            .as(StepVerifier::create)
+            .verifyComplete();
+
+        user.getSpec().setEmailVerified(true);
         when(client.fetch(eq(User.class), eq("fake-user"))).thenReturn(Mono.just(user));
 
         subscriber.setName("fake-user");
