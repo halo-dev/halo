@@ -16,7 +16,7 @@ rules:
     verbs: [ "*" ]
   - apiGroups: [ "api.console.halo.run" ]
     resources: [ "themes", "themes/reload", "themes/resetconfig", "themes/config", "themes/activation",
-                 "themes/install-from-uri", "themes/upgrade-from-uri" ]
+                 "themes/install-from-uri", "themes/upgrade-from-uri", "themes/invalidate-cache" ]
     verbs: [ "*" ]
   - nonResourceURLs: [ "/apis/api.console.halo.run/themes/install" ]
     verbs: [ "create" ]

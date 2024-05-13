@@ -4220,6 +4220,30 @@
         ]
       }
     },
+    "/apis/api.console.halo.run/v1alpha1/themes/{name}/invalidate-cache": {
+      "put": {
+        "description": "Invalidate theme template cache.",
+        "operationId": "InvalidateCache",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "name",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "No Content"
+          }
+        },
+        "tags": [
+          "api.console.halo.run/v1alpha1/Theme"
+        ]
+      }
+    },
     "/apis/api.console.halo.run/v1alpha1/themes/{name}/reload": {
       "put": {
         "description": "Reload theme setting.",
