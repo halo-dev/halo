@@ -109,7 +109,7 @@ const handleClose = () => {
         <component
           :is="icons[type].icon"
           :class="`text-${icons[type].color}-500`"
-          class="w-6 h-6"
+          class="w-6 h-6 flex-none"
         ></component>
         <div class="text-base text-gray-900 font-bold">{{ title }}</div>
       </div>
