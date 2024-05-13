@@ -54,8 +54,10 @@ const handleClose = () => {
           <component :is="TypeIcons[type]" />
         </slot>
       </div>
-      <div class="alert-title">
-        {{ title }}
+      <div v-if="title || $slots.title" class="alert-title">
+        <slot name="title">
+          {{ title }}
+        </slot>
       </div>
       <div v-if="closable" class="alert-close" @click="handleClose">
         <IconClose />
