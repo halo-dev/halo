@@ -13186,6 +13186,10 @@
           "logo": {
             "type": "string"
           },
+          "priority": {
+            "type": "integer",
+            "format": "int32"
+          },
           "settingRef": {
             "$ref": "#/components/schemas/SettingRef"
           },
