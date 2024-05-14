@@ -178,6 +178,7 @@ const handleUpdateRole = async () => {
               )
             "
             class="w-full sm:w-1/4"
+            :closable="false"
           />
         </div>
 
