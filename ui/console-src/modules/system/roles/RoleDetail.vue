@@ -102,7 +102,6 @@ const handleUpdateRole = async () => {
   await handleCreateOrUpdate();
   await refetch();
 };
-const isShow = ref(true);
 </script>
 <template>
   <VPageHeader :title="$t('core.role.detail.title')">
@@ -170,7 +169,7 @@ const isShow = ref(true);
       </div>
 
       <div v-if="tabActiveId === 'permissions'">
-        <div v-if="isSystemReserved && isShow" class="px-4 py-5">
+        <div v-if="isSystemReserved" class="px-4 py-5">
           <VAlert
             :title="$t('core.common.text.tip')"
             :description="
@@ -179,7 +178,7 @@ const isShow = ref(true);
               )
             "
             class="w-full sm:w-1/4"
-            @close="isShow = false"
+            :closable="false"
           />
         </div>
 
