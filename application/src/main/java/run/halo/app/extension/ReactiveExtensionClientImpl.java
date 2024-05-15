@@ -215,6 +215,11 @@ public class ReactiveExtensionClientImpl implements ReactiveExtensionClient {
             newMetadata.setCreationTimestamp(oldMetadata.getCreationTimestamp());
             newMetadata.setGenerateName(oldMetadata.getGenerateName());
 
+            // If the extension is an unstructured, the version type may be integer instead of long.
+            // reset metadata.version for long type.
+            oldMetadata.setVersion(oldMetadata.getVersion());
+            newMetadata.setVersion(newMetadata.getVersion());
+
             if (Objects.equals(oldJsonExt, newJsonExt)) {
                 // skip updating if not data changed.
                 return Mono.just(extension);

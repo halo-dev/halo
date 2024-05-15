@@ -489,6 +489,32 @@ class ReactiveExtensionClientTest {
     }
 
     @Test
+    void shouldNotUpdateIfUnstructuredNotChange() throws JsonProcessingException {
+        var storeName = "/registry/fake.halo.run/fakes/fake";
+        var extensionStore = createExtensionStore(storeName, 2L);
+        when(storeClient.fetchByName(storeName)).thenReturn(
+            Mono.just(extensionStore));
+
+        var fakeJson = objectMapper.writeValueAsString(createFakeExtension("fake", 2L));
+        var oldFakeJson = objectMapper.writeValueAsString(createFakeExtension("fake", 2L));
+
+        var fake = objectMapper.readValue(fakeJson, Unstructured.class);
+        var oldFake = objectMapper.readValue(oldFakeJson, Unstructured.class);
+        oldFake.getMetadata().setVersion(2L);
+
+        when(converter.convertFrom(Unstructured.class, extensionStore)).thenReturn(oldFake);
+
+        StepVerifier.create(client.update(fake))
+            .expectNext(fake)
+            .verifyComplete();
+
+        verify(storeClient).fetchByName(storeName);
+        verify(converter).convertFrom(Unstructured.class, extensionStore);
+        verify(converter, never()).convertTo(any());
+        verify(storeClient, never()).update(any(), any(), any());
+    }
+
+    @Test
     void shouldUpdateIfExtensionStatusChangedOnly() {
         var fake = createFakeExtension("fake", 2L);
         fake.getStatus().setState("new-state");
