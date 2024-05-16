@@ -136,21 +136,12 @@ class TableView implements NodeView {
       return this.handleHorizontalWheel(this.containerDOM, e);
     });
 
-    let mouseX = 0;
-    let mouseY = 0;
-    document.addEventListener("mousemove", function (event) {
-      mouseX = event.clientX;
-      mouseY = event.clientY;
-    });
-
     this.containerDOM.addEventListener("scroll", () => {
       if (!editor) {
         return false;
       }
       const { view } = editor;
-      const coords = { left: mouseX, top: mouseY };
-      const pos = view.posAtCoords(coords);
-      editor.commands.setTextSelection(pos?.pos || 0);
+      view.dispatch(view.state.tr);
     });
 
     this.scrollDom = document.createElement("div");
