@@ -99,6 +99,12 @@ public class InMemoryReactiveIndexedSessionRepository extends ReactiveMapSession
     Mono<Void> updateIndex(MapSession session) {
         return removeIndex(session.getId())
             .then(Mono.defer(() -> {
+                if (!session.getId().equals(session.getOriginalId())) {
+                    return removeIndex(session.getOriginalId());
+                }
+                return Mono.empty();
+            }))
+            .then(Mono.defer(() -> {
                 indexResolver.resolveIndexesFor(session)
                     .forEach((name, value) -> {
                         IndexKey indexKey = new IndexKey(name, value);
