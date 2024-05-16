@@ -1,3 +1,3 @@
 module.exports = {
-  plugins: ["../../prettier.config.js"],
+  plugins: ["../../prettier.config.cjs"],
 };
