@@ -569,6 +569,13 @@ core:
         items:
           grid: Grid Mode
           list: List Mode
+      accept:
+        label: Type
+        items:
+          image: Image
+          audio: Audio
+          video: Video
+          file: File
     detail_modal:
       title: "Attachment: {display_name}"
       fields:

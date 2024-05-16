@@ -40,10 +40,11 @@ export const ApiConsoleHaloRunV1alpha1AttachmentApiAxiosParamCreator = function 
          * @param {Array<string>} [sort] Sorting criteria in the format: property,(asc|desc). Default sort order is ascending. Multiple sort criteria are supported.
          * @param {boolean} [ungrouped] Filter attachments without group. This parameter will ignore group parameter.
          * @param {string} [keyword] Keyword for searching.
+         * @param {Array<string>} [accepts] Acceptable media types.
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        searchAttachments: async (page?: number, size?: number, labelSelector?: Array<string>, fieldSelector?: Array<string>, sort?: Array<string>, ungrouped?: boolean, keyword?: string, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+        searchAttachments: async (page?: number, size?: number, labelSelector?: Array<string>, fieldSelector?: Array<string>, sort?: Array<string>, ungrouped?: boolean, keyword?: string, accepts?: Array<string>, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
             const localVarPath = `/apis/api.console.halo.run/v1alpha1/attachments`;
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
@@ -90,6 +91,10 @@ export const ApiConsoleHaloRunV1alpha1AttachmentApiAxiosParamCreator = function 
 
             if (keyword !== undefined) {
                 localVarQueryParameter['keyword'] = keyword;
+            }
+
+            if (accepts) {
+                localVarQueryParameter['accepts'] = accepts;
             }
 
 
@@ -182,11 +187,12 @@ export const ApiConsoleHaloRunV1alpha1AttachmentApiFp = function(configuration?:
          * @param {Array<string>} [sort] Sorting criteria in the format: property,(asc|desc). Default sort order is ascending. Multiple sort criteria are supported.
          * @param {boolean} [ungrouped] Filter attachments without group. This parameter will ignore group parameter.
          * @param {string} [keyword] Keyword for searching.
+         * @param {Array<string>} [accepts] Acceptable media types.
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async searchAttachments(page?: number, size?: number, labelSelector?: Array<string>, fieldSelector?: Array<string>, sort?: Array<string>, ungrouped?: boolean, keyword?: string, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<AttachmentList>> {
-            const localVarAxiosArgs = await localVarAxiosParamCreator.searchAttachments(page, size, labelSelector, fieldSelector, sort, ungrouped, keyword, options);
+        async searchAttachments(page?: number, size?: number, labelSelector?: Array<string>, fieldSelector?: Array<string>, sort?: Array<string>, ungrouped?: boolean, keyword?: string, accepts?: Array<string>, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<AttachmentList>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.searchAttachments(page, size, labelSelector, fieldSelector, sort, ungrouped, keyword, accepts, options);
             const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
             const localVarOperationServerBasePath = operationServerMap['ApiConsoleHaloRunV1alpha1AttachmentApi.searchAttachments']?.[localVarOperationServerIndex]?.url;
             return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
@@ -222,7 +228,7 @@ export const ApiConsoleHaloRunV1alpha1AttachmentApiFactory = function (configura
          * @throws {RequiredError}
          */
         searchAttachments(requestParameters: ApiConsoleHaloRunV1alpha1AttachmentApiSearchAttachmentsRequest = {}, options?: RawAxiosRequestConfig): AxiosPromise<AttachmentList> {
-            return localVarFp.searchAttachments(requestParameters.page, requestParameters.size, requestParameters.labelSelector, requestParameters.fieldSelector, requestParameters.sort, requestParameters.ungrouped, requestParameters.keyword, options).then((request) => request(axios, basePath));
+            return localVarFp.searchAttachments(requestParameters.page, requestParameters.size, requestParameters.labelSelector, requestParameters.fieldSelector, requestParameters.sort, requestParameters.ungrouped, requestParameters.keyword, requestParameters.accepts, options).then((request) => request(axios, basePath));
         },
         /**
          * 
@@ -290,6 +296,13 @@ export interface ApiConsoleHaloRunV1alpha1AttachmentApiSearchAttachmentsRequest 
      * @memberof ApiConsoleHaloRunV1alpha1AttachmentApiSearchAttachments
      */
     readonly keyword?: string
+
+    /**
+     * Acceptable media types.
+     * @type {Array<string>}
+     * @memberof ApiConsoleHaloRunV1alpha1AttachmentApiSearchAttachments
+     */
+    readonly accepts?: Array<string>
 }
 
 /**
@@ -335,7 +348,7 @@ export class ApiConsoleHaloRunV1alpha1AttachmentApi extends BaseAPI {
      * @memberof ApiConsoleHaloRunV1alpha1AttachmentApi
      */
     public searchAttachments(requestParameters: ApiConsoleHaloRunV1alpha1AttachmentApiSearchAttachmentsRequest = {}, options?: RawAxiosRequestConfig) {
-        return ApiConsoleHaloRunV1alpha1AttachmentApiFp(this.configuration).searchAttachments(requestParameters.page, requestParameters.size, requestParameters.labelSelector, requestParameters.fieldSelector, requestParameters.sort, requestParameters.ungrouped, requestParameters.keyword, options).then((request) => request(this.axios, this.basePath));
+        return ApiConsoleHaloRunV1alpha1AttachmentApiFp(this.configuration).searchAttachments(requestParameters.page, requestParameters.size, requestParameters.labelSelector, requestParameters.fieldSelector, requestParameters.sort, requestParameters.ungrouped, requestParameters.keyword, requestParameters.accepts, options).then((request) => request(this.axios, this.basePath));
     }
 
     /**

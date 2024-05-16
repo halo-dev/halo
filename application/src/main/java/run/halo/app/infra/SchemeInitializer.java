@@ -391,6 +391,13 @@ public class SchemeInitializer implements ApplicationListener<ApplicationContext
                 }))
             );
             indexSpecs.add(new IndexSpec()
+                .setName("spec.mediaType")
+                .setIndexFunc(simpleAttribute(Attachment.class, attachment -> {
+                    var mediaType = attachment.getSpec().getMediaType();
+                    return StringUtils.isBlank(mediaType) ? null : mediaType;
+                }))
+            );
+            indexSpecs.add(new IndexSpec()
                 .setName("spec.ownerName")
                 .setIndexFunc(simpleAttribute(Attachment.class,
                     attachment -> attachment.getSpec().getOwnerName()))

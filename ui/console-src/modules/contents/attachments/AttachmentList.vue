@@ -63,12 +63,14 @@ const size = useRouteQuery<number>("size", 60, {
 const selectedPolicy = useRouteQuery<string | undefined>("policy");
 const selectedUser = useRouteQuery<string | undefined>("user");
 const selectedSort = useRouteQuery<string | undefined>("sort");
+const selectedAccepts = useRouteQuery<string | undefined>("accepts");
 
 watch(
   () => [
     selectedPolicy.value,
     selectedUser.value,
     selectedSort.value,
+    selectedAccepts.value,
     keyword.value,
   ],
   () => {
@@ -77,13 +79,19 @@ watch(
 );
 
 const hasFilters = computed(() => {
-  return selectedPolicy.value || selectedUser.value || selectedSort.value;
+  return (
+    selectedPolicy.value ||
+    selectedUser.value ||
+    selectedSort.value ||
+    selectedAccepts.value
+  );
 });
 
 function handleClearFilters() {
   selectedPolicy.value = undefined;
   selectedUser.value = undefined;
   selectedSort.value = undefined;
+  selectedAccepts.value = undefined;
 }
 
 const {
@@ -110,6 +118,12 @@ const {
     );
   }),
   user: selectedUser,
+  accepts: computed(() => {
+    if (!selectedAccepts.value) {
+      return [];
+    }
+    return selectedAccepts.value.split(",");
+  }),
   keyword: keyword,
   sort: selectedSort,
   page: page,
@@ -346,6 +360,31 @@ onMounted(() => {
                           value: policy.metadata.name,
                         };
                       }) || []),
+                    ]"
+                  />
+                  <FilterDropdown
+                    v-model="selectedAccepts"
+                    :label="$t('core.attachment.filters.accept.label')"
+                    :items="[
+                      {
+                        label: t('core.common.filters.item_labels.all'),
+                      },
+                      {
+                        label: t('core.attachment.filters.accept.items.image'),
+                        value: 'image/*',
+                      },
+                      {
+                        label: t('core.attachment.filters.accept.items.audio'),
+                        value: 'audio/*',
+                      },
+                      {
+                        label: t('core.attachment.filters.accept.items.video'),
+                        value: 'video/*',
+                      },
+                      {
+                        label: t('core.attachment.filters.accept.items.file'),
+                        value: 'text/*,application/*',
+                      },
                     ]"
                   />
                   <HasPermission :permissions="['system:users:view']">

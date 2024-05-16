@@ -537,6 +537,13 @@ core:
         items:
           grid: 網格模式
           list: 列表模式
+      accept:
+        label: 類型
+        items:
+          image: 圖片
+          audio: 音頻
+          video: 視頻
+          file: 文件
     detail_modal:
       title: 附件：{display_name}
       fields:

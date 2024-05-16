@@ -1869,6 +1869,17 @@
             "schema": {
               "type": "string"
             }
+          },
+          {
+            "description": "Acceptable media types.",
+            "in": "query",
+            "name": "accepts",
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            }
           }
         ],
         "responses": {
