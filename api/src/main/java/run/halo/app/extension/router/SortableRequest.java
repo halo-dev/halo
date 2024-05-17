@@ -40,7 +40,8 @@ public class SortableRequest extends IListRequest.QueryListRequest {
             implementation = String.class,
             example = "metadata.creationTimestamp,desc"))
     public Sort getSort() {
-        return SortResolver.defaultInstance.resolve(exchange);
+        return SortResolver.defaultInstance.resolve(exchange)
+            .and(Sort.by("metadata.creationTimestamp", "metadata.name").descending());
     }
 
     /**
