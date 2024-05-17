@@ -5,6 +5,7 @@ import {
   isActive,
   findParentNode,
   VueNodeViewRenderer,
+  isNodeActive,
 } from "@/tiptap/vue-3";
 import {
   EditorState,
@@ -130,6 +131,32 @@ export default CodeBlockLowlight.extend<
   },
   addKeyboardShortcuts() {
     return {
+      Backspace: ({ editor }) => {
+        if (!isNodeActive(editor.state, this.name)) {
+          return false;
+        }
+
+        const { selection } = editor.state;
+        // Clear the selected content and adapt to the all-select shortcut key operation.
+        if (!selection.empty) {
+          editor
+            .chain()
+            .focus()
+            .deleteSelection()
+            .setTextSelection(selection.$from.pos)
+            .run();
+          return true;
+        }
+
+        const { $anchor } = selection;
+        const isAtStart = $anchor.parentOffset === 0;
+        // If the cursor is at the beginning of the code block or the code block is empty, it is not deleted.
+        if (isAtStart || !$anchor.parent.textContent.length) {
+          return true;
+        }
+
+        return false;
+      },
       Tab: () => {
         if (this.editor.isActive("codeBlock")) {
           return this.editor.chain().focus().codeIndent().run();
