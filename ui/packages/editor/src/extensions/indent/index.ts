@@ -4,8 +4,8 @@ import {
   type KeyboardShortcutCommand,
   Extension,
   isList,
-  Editor,
-} from "@/tiptap/vue-3";
+  CoreEditor,
+} from "@/tiptap";
 import { TextSelection, Transaction } from "@/tiptap/pm";
 
 declare module "@/tiptap" {
@@ -104,7 +104,6 @@ const Indent = Extension.create<IndentOptions, never>({
     return {
       Tab: getIndent(),
       "Shift-Tab": getOutdent(false),
-      Backspace: getOutdent(true),
       "Mod-]": getIndent(),
       "Mod-[": getOutdent(false),
     };
@@ -196,7 +195,7 @@ const isTextIndent = (tr: Transaction, currNodePos: number) => {
   return false;
 };
 
-const isListActive = (editor: Editor) => {
+const isListActive = (editor: CoreEditor) => {
   return (
     editor.isActive("bulletList") ||
     editor.isActive("orderedList") ||
@@ -204,7 +203,7 @@ const isListActive = (editor: Editor) => {
   );
 };
 
-const isFilterActive = (editor: Editor) => {
+const isFilterActive = (editor: CoreEditor) => {
   return editor.isActive("table") || editor.isActive("columns");
 };
 
@@ -232,11 +231,11 @@ export const getOutdent: (
     if (outdentOnlyAtHead && editor.state.selection.$head.parentOffset > 0) {
       return false;
     }
-    // @ts-ignore
+
     if (isFilterActive(editor)) {
       return false;
     }
-    // @ts-ignore
+
     if (isListActive(editor)) {
       const name = editor.can().liftListItem("listItem")
         ? "listItem"
