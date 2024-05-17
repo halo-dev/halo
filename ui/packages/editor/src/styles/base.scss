@@ -73,7 +73,7 @@
       }
 
       ul {
-        @apply list-disc;
+        list-style-type: revert-layer;
       }
 
       code br {
