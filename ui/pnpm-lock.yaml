@@ -185,6 +185,9 @@ importers:
       vue-demi:
         specifier: ^0.14.7
         version: 0.14.7(vue@3.4.19)
+      vue-draggable-plus:
+        specifier: ^0.4.1
+        version: 0.4.1(@types/sortablejs@1.15.8)
       vue-grid-layout:
         specifier: 3.0.0-beta1
         version: 3.0.0-beta1(@interactjs/core@1.10.17)(@interactjs/utils@1.10.17)
@@ -8100,6 +8103,10 @@ packages:
   /@types/sizzle@2.3.3:
     resolution: {integrity: sha512-JYM8x9EGF163bEyhdJBpR2QX1R5naCJHC8ucJylJ3w9/CVBaskdQ8WqBf8MmQrd1kRvp/a4TS8HJ+bxzR7ZJYQ==}
     dev: true
+
+  /@types/sortablejs@1.15.8:
+    resolution: {integrity: sha512-b79830lW+RZfwaztgs1aVPgbasJ8e7AXtZYHTELNXZPsERt4ymJdjV4OccDbHQAvHrCcFpbF78jkm0R6h/pZVg==}
+    dev: false
 
   /@types/tough-cookie@4.0.2:
     resolution: {integrity: sha512-Q5vtl1W5ue16D+nIaW8JWebSSraJVlK+EthKn7e7UcD4KWsaSJ8BqGPXNaPghgtcn/fhvrN17Tv8ksUsQpiplw==}
@@ -20088,6 +20095,18 @@ packages:
       vue: 3.4.19(typescript@5.3.3)
       vue-inbrowser-compiler-independent-utils: 4.71.1(vue@3.4.19)
     dev: true
+
+  /vue-draggable-plus@0.4.1(@types/sortablejs@1.15.8):
+    resolution: {integrity: sha512-KNi+c482OQUZTZ2kXIGc41fEwknkNF+LlngjBr5TVtBLNvpX2dmwRJJ3J7dy5dGcijXb7V1j+mhqce4iHOoi6Q==}
+    peerDependencies:
+      '@types/sortablejs': ^1.15.0
+      '@vue/composition-api': '*'
+    peerDependenciesMeta:
+      '@vue/composition-api':
+        optional: true
+    dependencies:
+      '@types/sortablejs': 1.15.8
+    dev: false
 
   /vue-eslint-parser@9.3.0(eslint@8.43.0):
     resolution: {integrity: sha512-48IxT9d0+wArT1+3wNIy0tascRoywqSUe2E1YalIC1L8jsUGe5aJQItWfRok7DVFGz3UYvzEI7n5wiTXsCMAcQ==}

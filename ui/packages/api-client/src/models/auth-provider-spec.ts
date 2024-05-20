@@ -70,6 +70,12 @@ export interface AuthProviderSpec {
     'logo'?: string;
     /**
      * 
+     * @type {number}
+     * @memberof AuthProviderSpec
+     */
+    'priority'?: number;
+    /**
+     * 
      * @type {SettingRef}
      * @memberof AuthProviderSpec
      */
