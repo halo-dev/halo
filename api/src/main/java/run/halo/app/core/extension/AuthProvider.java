@@ -24,7 +24,7 @@ import run.halo.app.extension.GVK;
 public class AuthProvider extends AbstractExtension {
 
     public static final String AUTH_BINDING_LABEL = "auth.halo.run/auth-binding";
-    
+
     public static final String PRIVILEGED_LABEL = "auth.halo.run/privileged";
 
     @Schema(requiredMode = REQUIRED)
@@ -51,6 +51,8 @@ public class AuthProvider extends AbstractExtension {
         private String bindingUrl;
 
         private String unbindUrl;
+
+        private int priority;
 
         @Schema(requiredMode = NOT_REQUIRED)
         private SettingRef settingRef;
