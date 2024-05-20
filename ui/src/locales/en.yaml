@@ -569,6 +569,13 @@ core:
         items:
           grid: Grid Mode
           list: List Mode
+      accept:
+        label: Type
+        items:
+          image: Image
+          audio: Audio
+          video: Video
+          file: File
     detail_modal:
       title: "Attachment: {display_name}"
       fields:
@@ -701,6 +708,12 @@ core:
       existed_during_installation:
         title: The theme already exists.
         description: The currently installed theme already exists, do you want to upgrade?
+      clear_templates_cache:
+        button: Clear templates cache
+        title: Clear templates cache
+        description: >-
+          This feature allows you to refresh the cache to view the latest web
+          results after modifying template files at runtime.
     list_modal:
       tabs:
         installed: Installed

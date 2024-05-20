@@ -280,6 +280,47 @@ export const ApiConsoleHaloRunV1alpha1ThemeApiAxiosParamCreator = function (conf
             };
         },
         /**
+         * Invalidate theme template cache.
+         * @param {string} name 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        invalidateCache: async (name: string, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+            // verify required parameter 'name' is not null or undefined
+            assertParamExists('invalidateCache', 'name', name)
+            const localVarPath = `/apis/api.console.halo.run/v1alpha1/themes/{name}/invalidate-cache`
+                .replace(`{${"name"}}`, encodeURIComponent(String(name)));
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'PUT', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+            // authentication BasicAuth required
+            // http basic authentication required
+            setBasicAuthToObject(localVarRequestOptions, configuration)
+
+            // authentication BearerAuth required
+            // http bearer authentication required
+            await setBearerAuthToObject(localVarHeaderParameter, configuration)
+
+
+    
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+        /**
          * List themes.
          * @param {number} [page] Page number. Default is 0.
          * @param {number} [size] Size number. Default is 0.
@@ -650,6 +691,18 @@ export const ApiConsoleHaloRunV1alpha1ThemeApiFp = function(configuration?: Conf
             return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
         },
         /**
+         * Invalidate theme template cache.
+         * @param {string} name 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async invalidateCache(name: string, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<void>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.invalidateCache(name, options);
+            const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
+            const localVarOperationServerBasePath = operationServerMap['ApiConsoleHaloRunV1alpha1ThemeApi.invalidateCache']?.[localVarOperationServerIndex]?.url;
+            return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
+        },
+        /**
          * List themes.
          * @param {number} [page] Page number. Default is 0.
          * @param {number} [size] Size number. Default is 0.
@@ -791,6 +844,15 @@ export const ApiConsoleHaloRunV1alpha1ThemeApiFactory = function (configuration?
             return localVarFp.installThemeFromUri(requestParameters.installFromUriRequest, options).then((request) => request(axios, basePath));
         },
         /**
+         * Invalidate theme template cache.
+         * @param {ApiConsoleHaloRunV1alpha1ThemeApiInvalidateCacheRequest} requestParameters Request parameters.
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        invalidateCache(requestParameters: ApiConsoleHaloRunV1alpha1ThemeApiInvalidateCacheRequest, options?: RawAxiosRequestConfig): AxiosPromise<void> {
+            return localVarFp.invalidateCache(requestParameters.name, options).then((request) => request(axios, basePath));
+        },
+        /**
          * List themes.
          * @param {ApiConsoleHaloRunV1alpha1ThemeApiListThemesRequest} requestParameters Request parameters.
          * @param {*} [options] Override http request option.
@@ -901,6 +963,20 @@ export interface ApiConsoleHaloRunV1alpha1ThemeApiInstallThemeFromUriRequest {
      * @memberof ApiConsoleHaloRunV1alpha1ThemeApiInstallThemeFromUri
      */
     readonly installFromUriRequest: InstallFromUriRequest
+}
+
+/**
+ * Request parameters for invalidateCache operation in ApiConsoleHaloRunV1alpha1ThemeApi.
+ * @export
+ * @interface ApiConsoleHaloRunV1alpha1ThemeApiInvalidateCacheRequest
+ */
+export interface ApiConsoleHaloRunV1alpha1ThemeApiInvalidateCacheRequest {
+    /**
+     * 
+     * @type {string}
+     * @memberof ApiConsoleHaloRunV1alpha1ThemeApiInvalidateCache
+     */
+    readonly name: string
 }
 
 /**
@@ -1105,6 +1181,17 @@ export class ApiConsoleHaloRunV1alpha1ThemeApi extends BaseAPI {
      */
     public installThemeFromUri(requestParameters: ApiConsoleHaloRunV1alpha1ThemeApiInstallThemeFromUriRequest, options?: RawAxiosRequestConfig) {
         return ApiConsoleHaloRunV1alpha1ThemeApiFp(this.configuration).installThemeFromUri(requestParameters.installFromUriRequest, options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
+     * Invalidate theme template cache.
+     * @param {ApiConsoleHaloRunV1alpha1ThemeApiInvalidateCacheRequest} requestParameters Request parameters.
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof ApiConsoleHaloRunV1alpha1ThemeApi
+     */
+    public invalidateCache(requestParameters: ApiConsoleHaloRunV1alpha1ThemeApiInvalidateCacheRequest, options?: RawAxiosRequestConfig) {
+        return ApiConsoleHaloRunV1alpha1ThemeApiFp(this.configuration).invalidateCache(requestParameters.name, options).then((request) => request(this.axios, this.basePath));
     }
 
     /**

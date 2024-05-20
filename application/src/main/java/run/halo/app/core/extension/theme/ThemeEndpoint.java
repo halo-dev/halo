@@ -6,6 +6,7 @@ import static org.springdoc.core.fn.builders.content.Builder.contentBuilder;
 import static org.springdoc.core.fn.builders.parameter.Builder.parameterBuilder;
 import static org.springdoc.core.fn.builders.requestbody.Builder.requestBodyBuilder;
 import static org.springdoc.core.fn.builders.schema.Builder.schemaBuilder;
+import static org.springframework.http.HttpStatus.NO_CONTENT;
 import static org.springframework.web.reactive.function.server.RequestPredicates.contentType;
 
 import io.swagger.v3.oas.annotations.enums.ParameterIn;
@@ -188,6 +189,20 @@ public class ThemeEndpoint implements CustomEndpoint {
                     .response(responseBuilder()
                         .implementation(Theme.class))
             )
+            .PUT("/themes/{name}/invalidate-cache", this::invalidateCache,
+                builder -> builder.operationId("InvalidateCache")
+                    .description("Invalidate theme template cache.")
+                    .tag(tag)
+                    .parameter(parameterBuilder()
+                        .name("name")
+                        .in(ParameterIn.PATH)
+                        .required(true)
+                        .implementation(String.class)
+                    )
+                    .response(responseBuilder()
+                        .responseCode(String.valueOf(NO_CONTENT.value()))
+                    )
+            )
             .GET("themes", this::listThemes,
                 builder -> {
                     builder.operationId("ListThemes")
@@ -232,6 +247,13 @@ public class ThemeEndpoint implements CustomEndpoint {
                         .implementation(ConfigMap.class))
             )
             .build();
+    }
+
+    private Mono<ServerResponse> invalidateCache(ServerRequest request) {
+        final var name = request.pathVariable("name");
+        return client.get(Theme.class, name)
+            .flatMap(theme -> templateEngineManager.clearCache(name))
+            .then(ServerResponse.noContent().build());
     }
 
     private Mono<ServerResponse> upgradeFromUri(ServerRequest request) {

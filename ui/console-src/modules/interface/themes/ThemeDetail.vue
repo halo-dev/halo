@@ -32,6 +32,27 @@ const themesModal = inject<Ref<boolean>>("themesModal");
 const { isActivated, getFailedMessage, handleResetSettingConfig } =
   useThemeLifeCycle(selectedTheme);
 
+async function handleClearCache() {
+  Dialog.warning({
+    title: t("core.theme.operations.clear_templates_cache.title"),
+    description: t("core.theme.operations.clear_templates_cache.description"),
+    confirmText: t("core.common.buttons.confirm"),
+    cancelText: t("core.common.buttons.cancel"),
+    async onConfirm() {
+      if (!selectedTheme.value) {
+        console.error("No selected or activated theme");
+        return;
+      }
+
+      await apiClient.theme.invalidateCache({
+        name: selectedTheme.value?.metadata.name,
+      });
+
+      Toast.success(t("core.common.toast.operation_success"));
+    },
+  });
+}
+
 const handleReloadTheme = async () => {
   Dialog.warning({
     title: t("core.theme.operations.reload.title"),
@@ -108,6 +129,9 @@ const handleReloadTheme = async () => {
               <VDropdownDivider />
               <VDropdownItem type="danger" @click="handleReloadTheme">
                 {{ $t("core.theme.operations.reload.button") }}
+              </VDropdownItem>
+              <VDropdownItem type="danger" @click="handleClearCache">
+                {{ $t("core.theme.operations.clear_templates_cache.button") }}
               </VDropdownItem>
               <VDropdownItem type="danger" @click="handleResetSettingConfig">
                 {{ $t("core.common.buttons.reset") }}

@@ -22,6 +22,7 @@ import AttachmentUploadModal from "../AttachmentUploadModal.vue";
 import AttachmentDetailModal from "../AttachmentDetailModal.vue";
 import AttachmentGroupList from "../AttachmentGroupList.vue";
 import { matchMediaTypes } from "@/utils/media-type";
+import { computed } from "vue";
 
 const props = withDefaults(
   defineProps<{
@@ -59,7 +60,14 @@ const {
   handleSelectNext,
   handleReset,
   isChecked,
-} = useAttachmentControl({ group: selectedGroup, page, size });
+} = useAttachmentControl({
+  group: selectedGroup,
+  accepts: computed(() => {
+    return props.accepts;
+  }),
+  page,
+  size,
+});
 
 const uploadVisible = ref(false);
 const detailVisible = ref(false);

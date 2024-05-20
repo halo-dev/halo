@@ -30,6 +30,7 @@ export function useAttachmentControl(filterOptions: {
   policy?: Ref<Policy | undefined>;
   group?: Ref<Group | undefined>;
   user?: Ref<string | undefined>;
+  accepts?: Ref<string[]>;
   keyword?: Ref<string | undefined>;
   sort?: Ref<string | undefined>;
   page: Ref<number>;
@@ -37,7 +38,8 @@ export function useAttachmentControl(filterOptions: {
 }): useAttachmentControlReturn {
   const { t } = useI18n();
 
-  const { user, policy, group, keyword, sort, page, size } = filterOptions;
+  const { user, policy, group, keyword, sort, page, size, accepts } =
+    filterOptions;
 
   const selectedAttachment = ref<Attachment>();
   const selectedAttachments = ref<Set<Attachment>>(new Set<Attachment>());
@@ -48,7 +50,17 @@ export function useAttachmentControl(filterOptions: {
   const hasNext = ref(false);
 
   const { data, isLoading, isFetching, refetch } = useQuery<Attachment[]>({
-    queryKey: ["attachments", policy, keyword, group, user, page, size, sort],
+    queryKey: [
+      "attachments",
+      policy,
+      keyword,
+      group,
+      user,
+      accepts,
+      page,
+      size,
+      sort,
+    ],
     queryFn: async () => {
       const isUnGrouped = group?.value?.metadata.name === "ungrouped";
 
@@ -71,6 +83,7 @@ export function useAttachmentControl(filterOptions: {
         page: page.value,
         size: size.value,
         ungrouped: isUnGrouped,
+        accepts: accepts?.value,
         keyword: keyword?.value,
         sort: [sort?.value as string].filter(Boolean),
       });

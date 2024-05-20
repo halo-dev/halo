@@ -557,6 +557,13 @@ core:
         items:
           grid: 网格模式
           list: 列表模式
+      accept:
+        label: 类型
+        items:
+          image: 图片
+          audio: 音频
+          video: 视频
+          file: 文件
     detail_modal:
       title: 附件：{display_name}
       fields:
@@ -673,6 +680,10 @@ core:
       existed_during_installation:
         title: 主题已存在
         description: 当前安装的主题已存在，是否升级？
+      clear_templates_cache:
+        button: 清理模板缓存
+        title: 清除模板缓存
+        description: 此功能适用于在运行时修改模板文件后，刷新缓存以查看最新网页结果。
     list_modal:
       tabs:
         installed: 已安装

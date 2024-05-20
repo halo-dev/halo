@@ -10,6 +10,7 @@ import io.swagger.v3.core.util.Json;
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.util.Optional;
 import lombok.extern.slf4j.Slf4j;
 import org.openapi4j.core.exception.ResolutionException;
 import org.openapi4j.core.model.v3.OAI3;
@@ -54,8 +55,14 @@ public class JSONExtensionConverter implements ExtensionConverter {
         var scheme = schemeManager.get(gvk);
 
         try {
+            var convertedExtension = Optional.of(extension)
+                .map(item -> scheme.type().isAssignableFrom(item.getClass()) ? item
+                    : objectMapper.convertValue(item, scheme.type())
+                )
+                .orElseThrow();
             var validation = new ValidationData<>(extension);
-            var extensionJsonNode = objectMapper.valueToTree(extension);
+
+            var extensionJsonNode = objectMapper.valueToTree(convertedExtension);
             var validator = getValidator(scheme);
             validator.validate(extensionJsonNode, validation);
             if (!validation.isValid()) {

@@ -537,6 +537,13 @@ core:
         items:
           grid: 網格模式
           list: 列表模式
+      accept:
+        label: 類型
+        items:
+          image: 圖片
+          audio: 音頻
+          video: 視頻
+          file: 文件
     detail_modal:
       title: 附件：{display_name}
       fields:
@@ -653,6 +660,10 @@ core:
       existed_during_installation:
         title: 主題已存在
         description: 當前安裝的主題已存在，是否升級？
+      clear_templates_cache:
+        button: 清除模板快取
+        title: 清除模板快取
+        description: 此功能適用於在運行時修改模板檔案後，刷新快取以查看最新網頁結果。
     list_modal:
       tabs:
         installed: 已安裝
