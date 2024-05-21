@@ -30,6 +30,7 @@ public class DefaultSubscriberEmailResolver implements SubscriberEmailResolver {
             return Mono.fromSupplier(() -> getEmail(subscriber));
         }
         return client.fetch(User.class, subscriber.getName())
+            .filter(user -> user.getSpec().isEmailVerified())
             .mapNotNull(user -> user.getSpec().getEmail());
     }
 

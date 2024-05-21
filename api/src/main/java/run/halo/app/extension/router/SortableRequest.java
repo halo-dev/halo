@@ -1,5 +1,7 @@
 package run.halo.app.extension.router;
 
+import static org.springframework.data.domain.Sort.Order.asc;
+import static org.springframework.data.domain.Sort.Order.desc;
 import static run.halo.app.extension.Comparators.compareCreationTimestamp;
 import static run.halo.app.extension.Comparators.compareName;
 import static run.halo.app.extension.Comparators.nullsComparator;
@@ -40,7 +42,10 @@ public class SortableRequest extends IListRequest.QueryListRequest {
             implementation = String.class,
             example = "metadata.creationTimestamp,desc"))
     public Sort getSort() {
-        return SortResolver.defaultInstance.resolve(exchange);
+        return SortResolver.defaultInstance.resolve(exchange)
+            .and(Sort.by(desc("metadata.creationTimestamp"),
+                asc("metadata.name"))
+            );
     }
 
     /**

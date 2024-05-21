@@ -59,9 +59,9 @@ function getToolboxItemsFromExtensions() {
 </script>
 <template>
   <div
-    class="editor-header flex items-center py-1 space-x-1 justify-start px-1 overflow-auto sm:!justify-center border-b drop-shadow-sm bg-white"
+    class="editor-header py-1 space-x-1 px-1 overflow-auto border-b drop-shadow-sm bg-white text-center"
   >
-    <div class="inline-flex items-center justify-center">
+    <div class="h-full inline-flex items-center">
       <VMenu>
         <button class="p-1.5 rounded-md hover:bg-gray-100" tabindex="-1">
           <MdiPlusCircle class="text-[#4CCBA0]" />
@@ -80,47 +80,46 @@ function getToolboxItemsFromExtensions() {
           </div>
         </template>
       </VMenu>
-    </div>
-    <div class="h-5 bg-gray-100 w-[1px] !mx-1"></div>
-    <div
-      v-for="(item, index) in getToolbarItemsFromExtensions()"
-      :key="index"
-      class="inline-flex items-center justify-center"
-    >
-      <component
-        :is="item.component"
-        v-if="!item.children?.length"
-        v-bind="item.props"
-        tabindex="-1"
-      />
-      <template v-else>
-        <VDropdown
-          class="inline-flex"
+      <div class="h-5 bg-gray-100 w-[1px] !mx-1"></div>
+      <div
+        v-for="(item, index) in getToolbarItemsFromExtensions()"
+        :key="index"
+      >
+        <component
+          :is="item.component"
+          v-if="!item.children?.length"
+          v-bind="item.props"
           tabindex="-1"
-          :triggers="['click']"
-          :popper-triggers="['click']"
-        >
-          <component
-            :is="item.component"
-            v-bind="item.props"
-            :children="item.children"
+        />
+        <template v-else>
+          <VDropdown
+            class="inline-flex"
             tabindex="-1"
-          />
-          <template #popper>
-            <div
-              class="relative rounded-md bg-white overflow-hidden drop-shadow w-56 p-1 max-h-96 overflow-y-auto space-y-1.5"
-            >
-              <component
-                v-bind="child.props"
-                :is="child.component"
-                v-for="(child, childIndex) in item.children"
-                :key="childIndex"
-                tabindex="-1"
-              />
-            </div>
-          </template>
-        </VDropdown>
-      </template>
+            :triggers="['click']"
+            :popper-triggers="['click']"
+          >
+            <component
+              :is="item.component"
+              v-bind="item.props"
+              :children="item.children"
+              tabindex="-1"
+            />
+            <template #popper>
+              <div
+                class="relative rounded-md bg-white overflow-hidden drop-shadow w-56 p-1 max-h-96 overflow-y-auto space-y-1.5"
+              >
+                <component
+                  v-bind="child.props"
+                  :is="child.component"
+                  v-for="(child, childIndex) in item.children"
+                  :key="childIndex"
+                  tabindex="-1"
+                />
+              </div>
+            </template>
+          </VDropdown>
+        </template>
+      </div>
     </div>
   </div>
 </template>

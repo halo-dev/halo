@@ -3,18 +3,23 @@ package run.halo.app.content.comment;
 import static run.halo.app.extension.index.query.QueryFactory.and;
 import static run.halo.app.extension.index.query.QueryFactory.equal;
 import static run.halo.app.extension.index.query.QueryFactory.isNull;
-import static run.halo.app.extension.router.selector.SelectorUtil.labelAndFieldSelectorToPredicate;
+import static run.halo.app.security.authorization.AuthorityUtils.COMMENT_MANAGEMENT_ROLE_NAME;
+import static run.halo.app.security.authorization.AuthorityUtils.authoritiesToRoles;
 
 import java.time.Duration;
 import java.time.Instant;
+import java.util.ArrayList;
 import java.util.Set;
 import java.util.function.Function;
-import java.util.function.Predicate;
+import java.util.function.UnaryOperator;
 import lombok.RequiredArgsConstructor;
 import org.apache.commons.lang3.BooleanUtils;
+import org.apache.commons.lang3.StringUtils;
+import org.reactivestreams.Publisher;
 import org.springframework.dao.OptimisticLockingFailureException;
 import org.springframework.data.domain.Sort;
 import org.springframework.security.core.context.ReactiveSecurityContextHolder;
+import org.springframework.security.core.context.SecurityContext;
 import org.springframework.stereotype.Service;
 import org.springframework.util.Assert;
 import reactor.core.publisher.Flux;
@@ -25,7 +30,6 @@ import run.halo.app.core.extension.content.Comment;
 import run.halo.app.core.extension.content.Reply;
 import run.halo.app.core.extension.service.RoleService;
 import run.halo.app.core.extension.service.UserService;
-import run.halo.app.extension.Extension;
 import run.halo.app.extension.ListOptions;
 import run.halo.app.extension.ListResult;
 import run.halo.app.extension.PageRequest;
@@ -34,7 +38,6 @@ import run.halo.app.extension.ReactiveExtensionClient;
 import run.halo.app.extension.router.selector.FieldSelector;
 import run.halo.app.metrics.CounterService;
 import run.halo.app.metrics.MeterUtils;
-import run.halo.app.security.authorization.AuthorityUtils;
 
 /**
  * A default implementation of {@link ReplyService}.
@@ -54,56 +57,100 @@ public class ReplyServiceImpl implements ReplyService {
     @Override
     public Mono<Reply> create(String commentName, Reply reply) {
         return client.get(Comment.class, commentName)
-            .map(comment -> {
-                // Boolean allowNotification = reply.getSpec().getAllowNotification();
-                // TODO send notification if allowNotification is true
-                reply.getSpec().setCommentName(commentName);
-                if (reply.getSpec().getTop() == null) {
-                    reply.getSpec().setTop(false);
-                }
-                if (reply.getSpec().getPriority() == null) {
-                    reply.getSpec().setPriority(0);
-                }
-                if (reply.getSpec().getCreationTime() == null) {
-                    reply.getSpec().setCreationTime(Instant.now());
-                }
-                if (reply.getSpec().getApproved() == null) {
-                    reply.getSpec().setApproved(false);
-                }
-                if (BooleanUtils.isTrue(reply.getSpec().getApproved())
-                    && reply.getSpec().getApprovedTime() == null) {
+            .flatMap(comment -> prepareReply(commentName, reply)
+                .flatMap(client::create)
+                .flatMap(createdReply -> {
+                    var quotedReply = createdReply.getSpec().getQuoteReply();
+                    if (StringUtils.isBlank(quotedReply)) {
+                        return Mono.just(createdReply);
+                    }
+                    return approveReply(quotedReply)
+                        .thenReturn(createdReply);
+                })
+                .flatMap(createdReply -> approveComment(comment)
+                    .thenReturn(createdReply)
+                )
+            );
+    }
+
+    private Mono<Comment> approveComment(Comment comment) {
+        UnaryOperator<Comment> updateFunc = commentToUpdate -> {
+            commentToUpdate.getSpec().setApproved(true);
+            commentToUpdate.getSpec().setApprovedTime(Instant.now());
+            return commentToUpdate;
+        };
+        return client.update(updateFunc.apply(comment))
+            .onErrorResume(OptimisticLockingFailureException.class,
+                e -> updateCommentWithRetry(comment.getMetadata().getName(), updateFunc));
+    }
+
+    private Mono<Void> approveReply(String replyName) {
+        return Mono.defer(() -> client.fetch(Reply.class, replyName)
+                .flatMap(reply -> {
+                    reply.getSpec().setApproved(true);
                     reply.getSpec().setApprovedTime(Instant.now());
-                }
-                return reply;
-            })
-            .flatMap(replyToUse -> {
-                if (replyToUse.getSpec().getOwner() != null) {
-                    return Mono.just(replyToUse);
-                }
-                // populate owner from current user
-                return fetchCurrentUser()
-                    .flatMap(user ->
-                        ReactiveSecurityContextHolder.getContext()
-                            .flatMap(securityContext -> {
-                                var authentication = securityContext.getAuthentication();
-                                var roles = AuthorityUtils.authoritiesToRoles(
-                                    authentication.getAuthorities());
-                                return roleService.contains(roles,
-                                        Set.of(AuthorityUtils.COMMENT_MANAGEMENT_ROLE_NAME))
-                                    .doOnNext(result -> {
-                                        if (result) {
-                                            reply.getSpec().setApproved(true);
-                                            reply.getSpec().setApprovedTime(Instant.now());
-                                        }
-                                        replyToUse.getSpec().setOwner(toCommentOwner(user));
-                                    })
-                                    .thenReturn(replyToUse);
-                            })
-                    )
-                    .switchIfEmpty(
-                        Mono.error(new IllegalArgumentException("Reply owner must not be null.")));
-            })
-            .flatMap(client::create);
+                    return client.update(reply);
+                })
+            )
+            .retryWhen(Retry.backoff(8, Duration.ofMillis(100))
+                .filter(OptimisticLockingFailureException.class::isInstance))
+            .then();
+    }
+
+    private Mono<Comment> updateCommentWithRetry(String name, UnaryOperator<Comment> updateFunc) {
+        return Mono.defer(() -> client.get(Comment.class, name)
+                .map(updateFunc)
+                .flatMap(client::update)
+            )
+            .retryWhen(Retry.backoff(8, Duration.ofMillis(100))
+                .filter(OptimisticLockingFailureException.class::isInstance));
+    }
+
+    private Mono<Reply> prepareReply(String commentName, Reply reply) {
+        reply.getSpec().setCommentName(commentName);
+        if (reply.getSpec().getTop() == null) {
+            reply.getSpec().setTop(false);
+        }
+        if (reply.getSpec().getPriority() == null) {
+            reply.getSpec().setPriority(0);
+        }
+        if (reply.getSpec().getCreationTime() == null) {
+            reply.getSpec().setCreationTime(Instant.now());
+        }
+        if (reply.getSpec().getApproved() == null) {
+            reply.getSpec().setApproved(false);
+        }
+        if (BooleanUtils.isTrue(reply.getSpec().getApproved())
+            && reply.getSpec().getApprovedTime() == null) {
+            reply.getSpec().setApprovedTime(Instant.now());
+        }
+
+        var steps = new ArrayList<Publisher<?>>();
+        var approveItMono = hasCommentManagePermission()
+            .filter(Boolean::booleanValue)
+            .doOnNext(hasPermission -> {
+                reply.getSpec().setApproved(true);
+                reply.getSpec().setApprovedTime(Instant.now());
+            });
+        steps.add(approveItMono);
+
+        var populateOwnerMono = fetchCurrentUser()
+            .switchIfEmpty(
+                Mono.error(new IllegalArgumentException("Reply owner must not be null.")))
+            .doOnNext(user -> reply.getSpec().setOwner(toCommentOwner(user)));
+        if (reply.getSpec().getOwner() == null) {
+            steps.add(populateOwnerMono);
+        }
+        return Mono.when(steps).thenReturn(reply);
+    }
+
+    Mono<Boolean> hasCommentManagePermission() {
+        return ReactiveSecurityContextHolder.getContext()
+            .map(SecurityContext::getAuthentication)
+            .flatMap(authentication -> {
+                var roles = authoritiesToRoles(authentication.getAuthorities());
+                return roleService.contains(roles, Set.of(COMMENT_MANAGEMENT_ROLE_NAME));
+            });
     }
 
     @Override
@@ -195,19 +242,6 @@ public class ReplyServiceImpl implements ReplyService {
         }
         throw new IllegalStateException(
             "Unsupported owner kind: " + owner.getKind());
-    }
-
-    Predicate<Reply> getReplyPredicate(ReplyQuery query) {
-        Predicate<Reply> predicate = reply -> true;
-        if (query.getCommentName() != null) {
-            predicate = predicate.and(
-                reply -> query.getCommentName().equals(reply.getSpec().getCommentName()));
-        }
-
-        Predicate<Extension> labelAndFieldSelectorPredicate =
-            labelAndFieldSelectorToPredicate(query.getLabelSelector(),
-                query.getFieldSelector());
-        return predicate.and(labelAndFieldSelectorPredicate);
     }
 
     private Comment.CommentOwner toCommentOwner(User user) {

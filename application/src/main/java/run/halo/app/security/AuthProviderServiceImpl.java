@@ -58,7 +58,7 @@ public class AuthProviderServiceImpl implements AuthProviderService {
     public Mono<List<ListedAuthProvider>> listAll() {
         return client.list(AuthProvider.class, provider ->
                     provider.getMetadata().getDeletionTimestamp() == null,
-                Comparator.comparing(item -> item.getMetadata().getCreationTimestamp())
+                defaultComparator()
             )
             .map(this::convertTo)
             .collectList()
@@ -103,6 +103,12 @@ public class AuthProviderServiceImpl implements AuthProviderService {
                         .getCreationTimestamp())
                 )
             );
+    }
+
+    private static Comparator<AuthProvider> defaultComparator() {
+        return Comparator.comparing((AuthProvider item) -> item.getSpec().getPriority())
+            .thenComparing(item -> item.getMetadata().getName())
+            .thenComparing(item -> item.getMetadata().getCreationTimestamp());
     }
 
     private Mono<ConfigMap> updateAuthProviderEnabled(Consumer<Set<String>> consumer) {
