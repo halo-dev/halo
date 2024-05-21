@@ -27,7 +27,7 @@ import { useI18n } from "vue-i18n";
 const { t } = useI18n();
 
 const editingModal = ref(false);
-const selectedTag = ref<Tag | null>(null);
+const selectedTag = ref<Tag>();
 
 const selectedTagNames = ref<string[]>([]);
 const checkedAll = ref(false);
@@ -66,7 +66,7 @@ const {
   sort: selectedSort,
 });
 
-const handleOpenEditingModal = (tag: Tag | null) => {
+const handleOpenEditingModal = (tag?: Tag) => {
   selectedTag.value = tag;
   editingModal.value = true;
 };
@@ -132,8 +132,9 @@ const handleSelectNext = async () => {
 };
 
 const onEditingModalClose = () => {
-  selectedTag.value = null;
+  selectedTag.value = undefined;
   queryName.value = null;
+  editingModal.value = false;
   handleFetchTags();
 };
 
@@ -157,7 +158,7 @@ watch(selectedTagNames, (newVal) => {
 </script>
 <template>
   <TagEditingModal
-    v-model:visible="editingModal"
+    v-if="editingModal"
     :tag="selectedTag"
     @close="onEditingModalClose"
     @next="handleSelectNext"
