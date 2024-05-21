@@ -2,7 +2,7 @@ import type { RouteRecordRaw } from "vue-router";
 import NotFound from "@/views/exceptions/NotFound.vue";
 import Forbidden from "@/views/exceptions/Forbidden.vue";
 import BasicLayout from "@console/layouts/BasicLayout.vue";
-import GatewayLayout from "@console/layouts/GatewayLayout.vue";
+import GatewayLayout from "@/layouts/GatewayLayout.vue";
 import Setup from "@console/views/system/Setup.vue";
 import Redirect from "@console/views/system/Redirect.vue";
 import SetupInitialData from "@console/views/system/SetupInitialData.vue";
