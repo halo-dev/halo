@@ -5,12 +5,12 @@ inputs:
   node-version:
     description: Node.js version.
     required: false
-    default: "18"
+    default: "20"
 
   pnpm-version:
     description: pnpm version.
     required: false
-    default: "8"
+    default: "9"
 
   java-version:
     description: Java version.
@@ -29,8 +29,8 @@ runs:
       uses: actions/setup-node@v4
       with:
         node-version: ${{ inputs.node-version }}
-        cache: 'pnpm'
-        cache-dependency-path: 'ui/pnpm-lock.yaml'
+        cache: "pnpm"
+        cache-dependency-path: "ui/pnpm-lock.yaml"
 
     - name: Setup JDK
       uses: actions/setup-java@v4
