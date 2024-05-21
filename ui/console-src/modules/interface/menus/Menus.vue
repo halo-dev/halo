@@ -1,15 +1,15 @@
 <script lang="ts" setup>
 import {
+  Dialog,
   IconAddCircle,
   IconListSettings,
-  Dialog,
+  Toast,
   VButton,
   VCard,
   VEmpty,
+  VLoading,
   VPageHeader,
   VSpace,
-  VLoading,
-  Toast,
 } from "@halo-dev/components";
 import MenuItemEditingModal from "./components/MenuItemEditingModal.vue";
 import MenuItemListItem from "./components/MenuItemListItem.vue";
@@ -90,6 +90,7 @@ const handleOpenCreateByParentModal = (menuItem: MenuTreeItem) => {
 const onMenuItemEditingModalClose = () => {
   selectedParentMenuItem.value = undefined;
   selectedMenuItem.value = undefined;
+  menuItemEditingModal.value = false;
 };
 
 const onMenuItemSaved = async (menuItem: MenuItem) => {
@@ -115,10 +116,13 @@ const onMenuItemSaved = async (menuItem: MenuItem) => {
   await refetch();
 };
 
+const batchUpdating = ref(false);
+
 const handleUpdateInBatch = useDebounceFn(async () => {
   const menuTreeItemsToUpdate = resetMenuItemsTreePriority(menuTreeItems.value);
   const menuItemsToUpdate = convertTreeToMenuItems(menuTreeItemsToUpdate);
   try {
+    batchUpdating.value = true;
     const promises = menuItemsToUpdate.map((menuItem) =>
       apiClient.extension.menuItem.updatev1alpha1MenuItem({
         name: menuItem.metadata.name,
@@ -131,6 +135,7 @@ const handleUpdateInBatch = useDebounceFn(async () => {
   } finally {
     await queryClient.invalidateQueries({ queryKey: ["menus"] });
     await refetch();
+    batchUpdating.value = false;
   }
 }, 300);
 
@@ -180,7 +185,7 @@ const handleDelete = async (menuItem: MenuTreeItem) => {
 </script>
 <template>
   <MenuItemEditingModal
-    v-model:visible="menuItemEditingModal"
+    v-if="menuItemEditingModal && selectedMenu"
     :menu-item="selectedMenuItem"
     :parent-menu-item="selectedParentMenuItem"
     :menu="selectedMenu"
@@ -194,7 +199,7 @@ const handleDelete = async (menuItem: MenuTreeItem) => {
   </VPageHeader>
   <div class="m-0 md:m-4">
     <div class="flex flex-col gap-4 sm:flex-row">
-      <div class="w-96">
+      <div class="w-96 flex-none">
         <MenuList v-model:selected-menu="selectedMenu" />
       </div>
       <div class="flex-1">
@@ -251,7 +256,10 @@ const handleDelete = async (menuItem: MenuTreeItem) => {
           </Transition>
           <Transition v-else appear name="fade">
             <MenuItemListItem
-              :menu-tree-items="menuTreeItems"
+              v-model="menuTreeItems"
+              :class="{
+                'cursor-progress opacity-60': batchUpdating,
+              }"
               @change="handleUpdateInBatch"
               @delete="handleDelete"
               @open-editing="handleOpenEditingModal"
