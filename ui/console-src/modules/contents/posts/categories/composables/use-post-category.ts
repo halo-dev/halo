@@ -30,8 +30,6 @@ export function usePostCategory(): usePostCategoryReturn {
           sort: ["metadata.creationTimestamp,desc"],
         });
 
-      console.trace("data.items", data);
-
       return data.items;
     },
     refetchInterval(data) {
