@@ -73,7 +73,8 @@ const {
       const { spec, metadata, status } = post.post;
       return (
         spec.deleted ||
-        metadata.labels?.[postLabels.PUBLISHED] !== spec.publish + "" ||
+        (metadata.labels?.[postLabels.PUBLISHED] !== spec.publish + "" &&
+          metadata.labels?.[postLabels.SCHEDULING_PUBLISH] !== "true") ||
         (spec.releaseSnapshot === spec.headSnapshot && status?.inProgress)
       );
     });

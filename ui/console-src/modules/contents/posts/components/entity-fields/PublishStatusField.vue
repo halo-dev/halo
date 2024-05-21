@@ -24,7 +24,9 @@ const publishStatus = computed(() => {
 const isPublishing = computed(() => {
   const { spec, status, metadata } = props.post.post;
   return (
-    (spec.publish && metadata.labels?.[postLabels.PUBLISHED] !== "true") ||
+    (spec.publish &&
+      metadata.labels?.[postLabels.PUBLISHED] !== "true" &&
+      metadata.labels?.[postLabels.SCHEDULING_PUBLISH] !== "true") ||
     (spec.releaseSnapshot === spec.headSnapshot && status?.inProgress)
   );
 });

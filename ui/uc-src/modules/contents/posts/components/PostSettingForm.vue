@@ -1,12 +1,15 @@
 <script lang="ts" setup>
 import { IconRefreshLine } from "@halo-dev/components";
 import type { PostFormState } from "../types";
-import { toISOString } from "@/utils/date";
+import { formatDatetime, toISOString } from "@/utils/date";
 import { computed } from "vue";
 import useSlugify from "@console/composables/use-slugify";
 import { FormType } from "@/types/slug";
 import { ref } from "vue";
 import HasPermission from "@/components/permission/HasPermission.vue";
+import { useI18n } from "vue-i18n";
+
+const { t } = useI18n();
 
 const props = withDefaults(
   defineProps<{
@@ -60,6 +63,19 @@ const { handleGenerateSlug } = useSlugify(
   computed(() => !props.updateMode),
   FormType.POST
 );
+
+const isScheduledPublish = computed(() => {
+  const { publishTime } = internalFormState.value;
+  return publishTime && new Date(publishTime) > new Date();
+});
+
+const publishTimeHelp = computed(() => {
+  return isScheduledPublish.value
+    ? t("core.post.settings.fields.publish_time.help.schedule_publish", {
+        datetime: formatDatetime(internalFormState.value.publishTime),
+      })
+    : "";
+});
 </script>
 
 <template>
@@ -189,6 +205,7 @@ const { handleGenerateSlug } = useSlugify(
             type="datetime-local"
             min="0000-01-01T00:00"
             max="9999-12-31T23:59"
+            :help="publishTimeHelp"
           ></FormKit>
           <HasPermission :permissions="['system:attachments:view']">
             <FormKit

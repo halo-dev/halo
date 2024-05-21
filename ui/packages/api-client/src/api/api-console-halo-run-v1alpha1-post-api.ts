@@ -379,10 +379,11 @@ export const ApiConsoleHaloRunV1alpha1PostApiAxiosParamCreator = function (confi
          * Publish a post.
          * @param {string} name 
          * @param {string} [headSnapshot] Head snapshot name of content.
+         * @param {boolean} [async] 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        publishPost: async (name: string, headSnapshot?: string, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+        publishPost: async (name: string, headSnapshot?: string, async?: boolean, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
             // verify required parameter 'name' is not null or undefined
             assertParamExists('publishPost', 'name', name)
             const localVarPath = `/apis/api.console.halo.run/v1alpha1/posts/{name}/publish`
@@ -408,6 +409,10 @@ export const ApiConsoleHaloRunV1alpha1PostApiAxiosParamCreator = function (confi
 
             if (headSnapshot !== undefined) {
                 localVarQueryParameter['headSnapshot'] = headSnapshot;
+            }
+
+            if (async !== undefined) {
+                localVarQueryParameter['async'] = async;
             }
 
 
@@ -750,11 +755,12 @@ export const ApiConsoleHaloRunV1alpha1PostApiFp = function(configuration?: Confi
          * Publish a post.
          * @param {string} name 
          * @param {string} [headSnapshot] Head snapshot name of content.
+         * @param {boolean} [async] 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async publishPost(name: string, headSnapshot?: string, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<Post>> {
-            const localVarAxiosArgs = await localVarAxiosParamCreator.publishPost(name, headSnapshot, options);
+        async publishPost(name: string, headSnapshot?: string, async?: boolean, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<Post>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.publishPost(name, headSnapshot, async, options);
             const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
             const localVarOperationServerBasePath = operationServerMap['ApiConsoleHaloRunV1alpha1PostApi.publishPost']?.[localVarOperationServerIndex]?.url;
             return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
@@ -902,7 +908,7 @@ export const ApiConsoleHaloRunV1alpha1PostApiFactory = function (configuration?:
          * @throws {RequiredError}
          */
         publishPost(requestParameters: ApiConsoleHaloRunV1alpha1PostApiPublishPostRequest, options?: RawAxiosRequestConfig): AxiosPromise<Post> {
-            return localVarFp.publishPost(requestParameters.name, requestParameters.headSnapshot, options).then((request) => request(axios, basePath));
+            return localVarFp.publishPost(requestParameters.name, requestParameters.headSnapshot, requestParameters.async, options).then((request) => request(axios, basePath));
         },
         /**
          * Recycle a post.
@@ -1125,6 +1131,13 @@ export interface ApiConsoleHaloRunV1alpha1PostApiPublishPostRequest {
      * @memberof ApiConsoleHaloRunV1alpha1PostApiPublishPost
      */
     readonly headSnapshot?: string
+
+    /**
+     * 
+     * @type {boolean}
+     * @memberof ApiConsoleHaloRunV1alpha1PostApiPublishPost
+     */
+    readonly async?: boolean
 }
 
 /**
@@ -1310,7 +1323,7 @@ export class ApiConsoleHaloRunV1alpha1PostApi extends BaseAPI {
      * @memberof ApiConsoleHaloRunV1alpha1PostApi
      */
     public publishPost(requestParameters: ApiConsoleHaloRunV1alpha1PostApiPublishPostRequest, options?: RawAxiosRequestConfig) {
-        return ApiConsoleHaloRunV1alpha1PostApiFp(this.configuration).publishPost(requestParameters.name, requestParameters.headSnapshot, options).then((request) => request(this.axios, this.basePath));
+        return ApiConsoleHaloRunV1alpha1PostApiFp(this.configuration).publishPost(requestParameters.name, requestParameters.headSnapshot, requestParameters.async, options).then((request) => request(this.axios, this.basePath));
     }
 
     /**

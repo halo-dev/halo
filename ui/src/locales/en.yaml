@@ -196,6 +196,7 @@ core:
         items:
           published: Published
           draft: Draft
+          scheduling: Scheduling publish
       visible:
         label: Visible
         result: "Visible: {visible}"
@@ -227,6 +228,8 @@ core:
         visits: "{visits} Visits"
         comments: "{comments} Comments"
         pinned: Pinned
+        schedule_publish:
+          tooltip: Schedule publish
     settings:
       title: Settings
       groups:
@@ -256,6 +259,8 @@ core:
           label: Visible
         publish_time:
           label: Publish Time
+          help:
+            schedule_publish: Schedule a timed task and publish it at {datetime}
         template:
           label: Template
         cover:
@@ -1575,6 +1580,7 @@ core:
       verify: Verify
       modify: Modify
       access: Access
+      schedule_publish: Schedule publish
     radio:
       "yes": "Yes"
       "no": "No"

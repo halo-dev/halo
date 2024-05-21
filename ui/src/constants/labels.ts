@@ -17,6 +17,7 @@ export enum postLabels {
   OWNER = "content.halo.run/owner",
   VISIBLE = "content.halo.run/visible",
   PHASE = "content.halo.run/phase",
+  SCHEDULING_PUBLISH = "content.halo.run/scheduling-publish",
 }
 
 // singlePage
