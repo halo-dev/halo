@@ -1,6 +1,6 @@
 <script lang="ts" setup>
 // core libs
-import { computed, nextTick, ref, watch } from "vue";
+import { computed, nextTick, onMounted, ref, toRaw } from "vue";
 import { apiClient } from "@/utils/api-client";
 
 // components
@@ -17,36 +17,33 @@ import SubmitButton from "@/components/button/SubmitButton.vue";
 import type { Category } from "@halo-dev/api-client";
 
 // libs
-import { cloneDeep } from "lodash-es";
-import { reset } from "@formkit/core";
 import { setFocus } from "@/formkit/utils/focus";
 import { useThemeCustomTemplates } from "@console/modules/interface/themes/composables/use-theme";
 import AnnotationsForm from "@/components/form/AnnotationsForm.vue";
 import useSlugify from "@console/composables/use-slugify";
 import { useI18n } from "vue-i18n";
 import { FormType } from "@/types/slug";
+import { useQueryClient } from "@tanstack/vue-query";
 
 const props = withDefaults(
   defineProps<{
-    visible: boolean;
     category?: Category;
     parentCategory?: Category;
   }>(),
   {
-    visible: false,
     category: undefined,
     parentCategory: undefined,
   }
 );
 
 const emit = defineEmits<{
-  (event: "update:visible", visible: boolean): void;
   (event: "close"): void;
 }>();
 
+const queryClient = useQueryClient();
 const { t } = useI18n();
 
-const initialFormState: Category = {
+const formState = ref<Category>({
   spec: {
     displayName: "",
     slug: "",
@@ -63,21 +60,16 @@ const initialFormState: Category = {
     name: "",
     generateName: "category-",
   },
-};
-
-const formState = ref<Category>(cloneDeep(initialFormState));
-const selectedParentCategory = ref("");
+});
+const selectedParentCategory = ref();
 const saving = ref(false);
+const modal = ref();
 
-const isUpdateMode = computed(() => {
-  return !!formState.value.metadata.creationTimestamp;
-});
+const isUpdateMode = !!props.category;
 
-const modalTitle = computed(() => {
-  return isUpdateMode.value
-    ? t("core.post_category.editing_modal.titles.update")
-    : t("core.post_category.editing_modal.titles.create");
-});
+const modalTitle = props.category
+  ? t("core.post_category.editing_modal.titles.update")
+  : t("core.post_category.editing_modal.titles.create");
 
 const annotationsFormRef = ref<InstanceType<typeof AnnotationsForm>>();
 
@@ -98,7 +90,7 @@ const handleSaveCategory = async () => {
 
   try {
     saving.value = true;
-    if (isUpdateMode.value) {
+    if (isUpdateMode) {
       await apiClient.extension.category.updatecontentHaloRunV1alpha1Category({
         name: formState.value.metadata.name,
         category: formState.value,
@@ -144,7 +136,10 @@ const handleSaveCategory = async () => {
         );
       }
     }
-    onVisibleChange(false);
+
+    modal.value.close();
+
+    queryClient.invalidateQueries({ queryKey: ["post-categories"] });
 
     Toast.success(t("core.common.toast.save_success"));
   } catch (e) {
@@ -154,37 +149,13 @@ const handleSaveCategory = async () => {
   }
 };
 
-const onVisibleChange = (visible: boolean) => {
-  emit("update:visible", visible);
-  if (!visible) {
-    emit("close");
+onMounted(() => {
+  if (props.category) {
+    formState.value = toRaw(props.category);
   }
-};
-
-const handleResetForm = () => {
-  selectedParentCategory.value = "";
-  formState.value = cloneDeep(initialFormState);
-  reset("category-form");
-};
-
-watch(
-  () => props.visible,
-  (visible) => {
-    if (visible) {
-      if (props.parentCategory) {
-        selectedParentCategory.value = props.parentCategory.metadata.name;
-      }
-
-      if (props.category) {
-        formState.value = cloneDeep(props.category);
-      }
-
-      setFocus("displayNameInput");
-    } else {
-      handleResetForm();
-    }
-  }
-);
+  selectedParentCategory.value = props.parentCategory?.metadata.name;
+  setFocus("displayNameInput");
+});
 
 // custom templates
 const { templates } = useThemeCustomTemplates("category");
@@ -200,17 +171,12 @@ const { handleGenerateSlug } = useSlugify(
       formState.value.spec.slug = value;
     },
   }),
-  computed(() => !isUpdateMode.value),
+  computed(() => !isUpdateMode),
   FormType.CATEGORY
 );
 </script>
 <template>
-  <VModal
-    :title="modalTitle"
-    :visible="visible"
-    :width="700"
-    @update:visible="onVisibleChange"
-  >
+  <VModal ref="modal" :title="modalTitle" :width="700" @close="emit('close')">
     <FormKit
       id="category-form"
       type="form"
@@ -331,14 +297,13 @@ const { handleGenerateSlug } = useSlugify(
     <template #footer>
       <VSpace>
         <SubmitButton
-          v-if="visible"
           :loading="saving"
           type="secondary"
           :text="$t('core.common.buttons.submit')"
           @submit="$formkit.submit('category-form')"
         >
         </SubmitButton>
-        <VButton @click="onVisibleChange(false)">
+        <VButton @click="modal.close()">
           {{ $t("core.common.buttons.cancel_and_shortcut") }}
         </VButton>
       </VSpace>

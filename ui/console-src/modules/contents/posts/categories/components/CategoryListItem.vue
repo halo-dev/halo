@@ -1,148 +1,182 @@
 <script lang="ts" setup>
 import {
+  Dialog,
   IconList,
-  VStatusDot,
+  Toast,
+  VDropdownItem,
   VEntity,
   VEntityField,
-  VDropdownItem,
+  VStatusDot,
 } from "@halo-dev/components";
-import Draggable from "vuedraggable";
-import type { CategoryTree } from "../utils";
-import { ref } from "vue";
+import { VueDraggable } from "vue-draggable-plus";
+import { type CategoryTree, convertCategoryTreeToCategory } from "../utils";
 import { formatDatetime } from "@/utils/date";
 import { usePermission } from "@/utils/permission";
+import type { PropType } from "vue";
+import { ref } from "vue";
+import CategoryEditingModal from "./CategoryEditingModal.vue";
+import type { Category } from "@halo-dev/api-client";
+import { useI18n } from "vue-i18n";
+import { apiClient } from "@/utils/api-client";
+import { useQueryClient } from "@tanstack/vue-query";
 
 const { currentUserHasPermission } = usePermission();
 
-withDefaults(
-  defineProps<{
-    categories: CategoryTree[];
-  }>(),
-  {
-    categories: () => [],
-  }
-);
+const categories = defineModel({
+  type: Array as PropType<CategoryTree[]>,
+  default: [],
+});
 
 const emit = defineEmits<{
   (event: "change"): void;
-  (event: "open-editing", category: CategoryTree): void;
-  (event: "open-create-by-parent", category: CategoryTree): void;
-  (event: "delete", category: CategoryTree): void;
 }>();
 
-const isDragging = ref(false);
+const queryClient = useQueryClient();
+const { t } = useI18n();
 
 function onChange() {
   emit("change");
 }
 
-function onOpenEditingModal(category: CategoryTree) {
-  emit("open-editing", category);
+// Editing category
+const editingModal = ref(false);
+const selectedCategory = ref<Category>();
+const selectedParentCategory = ref<Category>();
+
+function onEditingModalClose() {
+  selectedCategory.value = undefined;
+  selectedParentCategory.value = undefined;
+  editingModal.value = false;
 }
 
-function onOpenCreateByParentModal(category: CategoryTree) {
-  emit("open-create-by-parent", category);
-}
+const handleOpenEditingModal = (category: CategoryTree) => {
+  selectedCategory.value = convertCategoryTreeToCategory(category);
+  editingModal.value = true;
+};
 
-function onDelete(category: CategoryTree) {
-  emit("delete", category);
-}
+const handleOpenCreateByParentModal = (category: CategoryTree) => {
+  selectedParentCategory.value = convertCategoryTreeToCategory(category);
+  editingModal.value = true;
+};
+
+const handleDelete = async (category: CategoryTree) => {
+  Dialog.warning({
+    title: t("core.post_category.operations.delete.title"),
+    description: t("core.post_category.operations.delete.description"),
+    confirmType: "danger",
+    confirmText: t("core.common.buttons.confirm"),
+    cancelText: t("core.common.buttons.cancel"),
+    onConfirm: async () => {
+      try {
+        await apiClient.extension.category.deletecontentHaloRunV1alpha1Category(
+          {
+            name: category.metadata.name,
+          }
+        );
+
+        Toast.success(t("core.common.toast.delete_success"));
+
+        queryClient.invalidateQueries({ queryKey: ["post-categories"] });
+      } catch (e) {
+        console.error("Failed to delete tag", e);
+      }
+    },
+  });
+};
 </script>
 <template>
-  <draggable
-    :list="categories"
+  <VueDraggable
+    v-model="categories"
     class="box-border h-full w-full divide-y divide-gray-100"
     ghost-class="opacity-50"
     group="category-item"
     handle=".drag-element"
-    item-key="metadata.name"
     tag="ul"
-    @change="onChange"
-    @end="isDragging = false"
-    @start="isDragging = true"
+    @sort="onChange"
   >
-    <template #item="{ element: category }">
-      <li>
-        <VEntity>
-          <template #prepend>
-            <div
-              v-permission="['system:posts:manage']"
-              class="drag-element absolute inset-y-0 left-0 hidden w-3.5 cursor-move items-center bg-gray-100 transition-all hover:bg-gray-200 group-hover:flex"
-            >
-              <IconList class="h-3.5 w-3.5" />
-            </div>
-          </template>
-          <template #start>
-            <VEntityField :title="category.spec.displayName">
-              <template #description>
-                <a
-                  v-if="category.status.permalink"
-                  :href="category.status.permalink"
-                  :title="category.status.permalink"
-                  target="_blank"
-                  class="truncate text-xs text-gray-500 group-hover:text-gray-900"
-                >
-                  {{ category.status.permalink }}
-                </a>
-              </template>
-            </VEntityField>
-          </template>
-          <template #end>
-            <VEntityField v-if="category.metadata.deletionTimestamp">
-              <template #description>
-                <VStatusDot
-                  v-tooltip="$t('core.common.status.deleting')"
-                  state="warning"
-                  animate
-                />
-              </template>
-            </VEntityField>
-            <VEntityField
-              :description="
-                $t('core.common.fields.post_count', {
-                  count: category.status?.postCount || 0,
-                })
-              "
-            />
-            <VEntityField>
-              <template #description>
-                <span class="truncate text-xs tabular-nums text-gray-500">
-                  {{ formatDatetime(category.metadata.creationTimestamp) }}
-                </span>
-              </template>
-            </VEntityField>
-          </template>
-          <template
-            v-if="currentUserHasPermission(['system:posts:manage'])"
-            #dropdownItems
+    <CategoryEditingModal
+      v-if="editingModal"
+      :category="selectedCategory"
+      :parent-category="selectedParentCategory"
+      @close="onEditingModalClose"
+    />
+    <li v-for="category in categories" :key="category.metadata.name">
+      <VEntity>
+        <template #prepend>
+          <div
+            v-permission="['system:posts:manage']"
+            class="drag-element absolute inset-y-0 left-0 hidden w-3.5 cursor-move items-center bg-gray-100 transition-all hover:bg-gray-200 group-hover:flex"
           >
-            <VDropdownItem
-              v-permission="['system:posts:manage']"
-              @click="onOpenEditingModal(category)"
-            >
-              {{ $t("core.common.buttons.edit") }}
-            </VDropdownItem>
-            <VDropdownItem @click="onOpenCreateByParentModal(category)">
-              {{ $t("core.post_category.operations.add_sub_category.button") }}
-            </VDropdownItem>
-            <VDropdownItem
-              v-permission="['system:posts:manage']"
-              type="danger"
-              @click="onDelete(category)"
-            >
-              {{ $t("core.common.buttons.delete") }}
-            </VDropdownItem>
-          </template>
-        </VEntity>
-        <CategoryListItem
-          :categories="category.spec.children"
-          class="pl-10 transition-all duration-300"
-          @change="onChange"
-          @delete="onDelete"
-          @open-editing="onOpenEditingModal"
-          @open-create-by-parent="onOpenCreateByParentModal"
-        />
-      </li>
-    </template>
-  </draggable>
+            <IconList class="h-3.5 w-3.5" />
+          </div>
+        </template>
+        <template #start>
+          <VEntityField :title="category.spec.displayName">
+            <template #description>
+              <a
+                v-if="category.status?.permalink"
+                :href="category.status.permalink"
+                :title="category.status.permalink"
+                target="_blank"
+                class="truncate text-xs text-gray-500 group-hover:text-gray-900"
+              >
+                {{ category.status.permalink }}
+              </a>
+            </template>
+          </VEntityField>
+        </template>
+        <template #end>
+          <VEntityField v-if="category.metadata.deletionTimestamp">
+            <template #description>
+              <VStatusDot
+                v-tooltip="$t('core.common.status.deleting')"
+                state="warning"
+                animate
+              />
+            </template>
+          </VEntityField>
+          <VEntityField
+            :description="
+              $t('core.common.fields.post_count', {
+                count: category.status?.postCount || 0,
+              })
+            "
+          />
+          <VEntityField>
+            <template #description>
+              <span class="truncate text-xs tabular-nums text-gray-500">
+                {{ formatDatetime(category.metadata.creationTimestamp) }}
+              </span>
+            </template>
+          </VEntityField>
+        </template>
+        <template
+          v-if="currentUserHasPermission(['system:posts:manage'])"
+          #dropdownItems
+        >
+          <VDropdownItem
+            v-permission="['system:posts:manage']"
+            @click="handleOpenEditingModal(category)"
+          >
+            {{ $t("core.common.buttons.edit") }}
+          </VDropdownItem>
+          <VDropdownItem @click="handleOpenCreateByParentModal(category)">
+            {{ $t("core.post_category.operations.add_sub_category.button") }}
+          </VDropdownItem>
+          <VDropdownItem
+            v-permission="['system:posts:manage']"
+            type="danger"
+            @click="handleDelete(category)"
+          >
+            {{ $t("core.common.buttons.delete") }}
+          </VDropdownItem>
+        </template>
+      </VEntity>
+      <CategoryListItem
+        v-model="category.spec.children"
+        class="pl-10 transition-all duration-300"
+        @change="onChange"
+      />
+    </li>
+  </VueDraggable>
 </template>

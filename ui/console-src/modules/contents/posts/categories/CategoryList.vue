@@ -10,21 +10,14 @@ import {
   VButton,
   VCard,
   VEmpty,
+  VLoading,
   VPageHeader,
   VSpace,
-  VLoading,
 } from "@halo-dev/components";
 import CategoryEditingModal from "./components/CategoryEditingModal.vue";
 import CategoryListItem from "./components/CategoryListItem.vue";
 
-// types
-import type { Category } from "@halo-dev/api-client";
-import type { CategoryTree } from "./utils";
-import {
-  convertCategoryTreeToCategory,
-  convertTreeToCategories,
-  resetCategoriesTreePriority,
-} from "./utils";
+import { convertTreeToCategories, resetCategoriesTreePriority } from "./utils";
 
 // libs
 import { useDebounceFn } from "@vueuse/core";
@@ -32,17 +25,12 @@ import { useDebounceFn } from "@vueuse/core";
 // hooks
 import { usePostCategory } from "./composables/use-post-category";
 
-const editingModal = ref(false);
-const selectedCategory = ref<Category>();
-const selectedParentCategory = ref<Category>();
+const creationModal = ref(false);
 
-const {
-  categories,
-  categoriesTree,
-  isLoading,
-  handleFetchCategories,
-  handleDelete,
-} = usePostCategory();
+const { categories, categoriesTree, isLoading, handleFetchCategories } =
+  usePostCategory();
+
+const batchUpdating = ref(false);
 
 const handleUpdateInBatch = useDebounceFn(async () => {
   const categoriesTreeToUpdate = resetCategoriesTreePriority(
@@ -50,6 +38,7 @@ const handleUpdateInBatch = useDebounceFn(async () => {
   );
   const categoriesToUpdate = convertTreeToCategories(categoriesTreeToUpdate);
   try {
+    batchUpdating.value = true;
     const promises = categoriesToUpdate.map((category) =>
       apiClient.extension.category.updatecontentHaloRunV1alpha1Category({
         name: category.metadata.name,
@@ -61,32 +50,12 @@ const handleUpdateInBatch = useDebounceFn(async () => {
     console.error("Failed to update categories", e);
   } finally {
     await handleFetchCategories();
+    batchUpdating.value = false;
   }
-}, 500);
-
-const handleOpenEditingModal = (category: CategoryTree) => {
-  selectedCategory.value = convertCategoryTreeToCategory(category);
-  editingModal.value = true;
-};
-
-const handleOpenCreateByParentModal = (category: CategoryTree) => {
-  selectedParentCategory.value = convertCategoryTreeToCategory(category);
-  editingModal.value = true;
-};
-
-const onEditingModalClose = () => {
-  selectedCategory.value = undefined;
-  selectedParentCategory.value = undefined;
-  handleFetchCategories();
-};
+}, 300);
 </script>
 <template>
-  <CategoryEditingModal
-    v-model:visible="editingModal"
-    :category="selectedCategory"
-    :parent-category="selectedParentCategory"
-    @close="onEditingModalClose"
-  />
+  <CategoryEditingModal v-if="creationModal" @close="creationModal = false" />
   <VPageHeader :title="$t('core.post_category.title')">
     <template #icon>
       <IconBookRead class="mr-2 self-center" />
@@ -96,7 +65,7 @@ const onEditingModalClose = () => {
       <VButton
         v-permission="['system:posts:manage']"
         type="secondary"
-        @click="editingModal = true"
+        @click="creationModal = true"
       >
         <template #icon>
           <IconAddCircle class="h-full w-full" />
@@ -138,7 +107,7 @@ const onEditingModalClose = () => {
               <VButton
                 v-permission="['system:posts:manage']"
                 type="primary"
-                @click="editingModal = true"
+                @click="creationModal = true"
               >
                 <template #icon>
                   <IconAddCircle class="h-full w-full" />
@@ -151,11 +120,11 @@ const onEditingModalClose = () => {
       </Transition>
       <Transition v-else appear name="fade">
         <CategoryListItem
-          :categories="categoriesTree"
+          v-model="categoriesTree"
+          :class="{
+            'cursor-progress opacity-60': batchUpdating,
+          }"
           @change="handleUpdateInBatch"
-          @delete="handleDelete"
-          @open-editing="handleOpenEditingModal"
-          @open-create-by-parent="handleOpenCreateByParentModal"
         />
       </Transition>
     </VCard>
