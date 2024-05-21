@@ -1,17 +1,17 @@
 <script lang="ts" setup>
 import {
   Dialog,
+  Toast,
   VButton,
   VCard,
+  VDropdownItem,
   VEmpty,
-  VSpace,
-  VStatusDot,
   VEntity,
   VEntityField,
-  VTag,
   VLoading,
-  Toast,
-  VDropdownItem,
+  VSpace,
+  VStatusDot,
+  VTag,
 } from "@halo-dev/components";
 import MenuEditingModal from "./MenuEditingModal.vue";
 import { onMounted, ref } from "vue";
@@ -175,9 +175,9 @@ const handleSetPrimaryMenu = async (menu: Menu) => {
 </script>
 <template>
   <MenuEditingModal
-    v-model:visible="menuEditingModal"
+    v-if="menuEditingModal"
     :menu="selectedMenuToUpdate"
-    @close="refetch()"
+    @close="menuEditingModal = false"
     @created="handleSelect"
   />
   <VCard :body-class="['!p-0']" :title="$t('core.menu.title')">

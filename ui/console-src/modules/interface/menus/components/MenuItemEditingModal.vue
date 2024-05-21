@@ -1,39 +1,35 @@
 <script lang="ts" setup>
 import { Toast, VButton, VModal, VSpace } from "@halo-dev/components";
 import SubmitButton from "@/components/button/SubmitButton.vue";
-import { computed, nextTick, ref, watch } from "vue";
+import { computed, nextTick, onMounted, ref, toRaw } from "vue";
 import type { Menu, MenuItem, Ref } from "@halo-dev/api-client";
 import { apiClient } from "@/utils/api-client";
-import { reset } from "@formkit/core";
-import { cloneDeep } from "lodash-es";
 import { setFocus } from "@/formkit/utils/focus";
 import AnnotationsForm from "@/components/form/AnnotationsForm.vue";
 import { useI18n } from "vue-i18n";
 
 const props = withDefaults(
   defineProps<{
-    visible: boolean;
-    menu?: Menu;
+    menu: Menu;
     parentMenuItem: MenuItem;
     menuItem?: MenuItem;
   }>(),
   {
-    visible: false,
-    menu: undefined,
     parentMenuItem: undefined,
     menuItem: undefined,
   }
 );
 
 const emit = defineEmits<{
-  (event: "update:visible", visible: boolean): void;
   (event: "close"): void;
   (event: "saved", menuItem: MenuItem): void;
 }>();
 
 const { t } = useI18n();
 
-const initialFormState: MenuItem = {
+const modal = ref();
+const selectedParentMenuItem = ref<string>("");
+const formState = ref<MenuItem>({
   spec: {
     displayName: "",
     href: "",
@@ -47,21 +43,14 @@ const initialFormState: MenuItem = {
     name: "",
     generateName: "menu-item-",
   },
-};
-
-const selectedParentMenuItem = ref<string>("");
-const formState = ref<MenuItem>(cloneDeep(initialFormState));
+});
 const saving = ref(false);
 
-const isUpdateMode = computed(() => {
-  return !!formState.value.metadata.creationTimestamp;
-});
+const isUpdateMode = !!props.menuItem;
 
-const modalTitle = computed(() => {
-  return isUpdateMode.value
-    ? t("core.menu.menu_item_editing_modal.titles.update")
-    : t("core.menu.menu_item_editing_modal.titles.create");
-});
+const modalTitle = props.menuItem
+  ? t("core.menu.menu_item_editing_modal.titles.update")
+  : t("core.menu.menu_item_editing_modal.titles.create");
 
 const annotationsFormRef = ref<InstanceType<typeof AnnotationsForm>>();
 
@@ -96,14 +85,13 @@ const handleSaveMenuItem = async () => {
       formState.value.spec.href = undefined;
     }
 
-    if (isUpdateMode.value) {
+    if (isUpdateMode) {
       const { data } =
         await apiClient.extension.menuItem.updatev1alpha1MenuItem({
           name: formState.value.metadata.name,
           menuItem: formState.value,
         });
 
-      onVisibleChange(false);
       emit("saved", data);
     } else {
       const { data } =
@@ -129,9 +117,10 @@ const handleSaveMenuItem = async () => {
         });
       }
 
-      onVisibleChange(false);
       emit("saved", data);
     }
+
+    modal.value.close();
 
     Toast.success(t("core.common.toast.save_success"));
   } catch (e) {
@@ -140,58 +129,6 @@ const handleSaveMenuItem = async () => {
     saving.value = false;
   }
 };
-
-const onVisibleChange = (visible: boolean) => {
-  emit("update:visible", visible);
-  if (!visible) {
-    emit("close");
-  }
-};
-
-const handleResetForm = () => {
-  formState.value = cloneDeep(initialFormState);
-  selectedRefKind.value = "";
-  selectedRefName.value = "";
-  selectedParentMenuItem.value = "";
-  reset("menuitem-form");
-};
-
-watch(
-  () => props.visible,
-  (visible) => {
-    if (visible) {
-      selectedParentMenuItem.value = props.parentMenuItem?.metadata.name;
-      setFocus("displayNameInput");
-
-      if (!props.menuItem) {
-        selectedRefName.value = "";
-      }
-    } else {
-      handleResetForm();
-    }
-  }
-);
-
-watch(
-  () => props.menuItem,
-  (menuItem) => {
-    if (menuItem) {
-      formState.value = cloneDeep(menuItem);
-
-      // Set Ref related
-      const { targetRef } = formState.value.spec;
-
-      if (!targetRef) {
-        return;
-      }
-
-      selectedRefName.value = targetRef.name;
-      selectedRefKind.value = targetRef.kind as string;
-    } else {
-      handleResetForm();
-    }
-  }
-);
 
 interface MenuItemRef {
   label: string;
@@ -268,14 +205,27 @@ const selectedRefName = ref<string>("");
 const onMenuItemSourceChange = () => {
   selectedRefName.value = "";
 };
+
+onMounted(() => {
+  if (props.menuItem) {
+    formState.value = toRaw(props.menuItem);
+
+    // Set Ref related
+    const { targetRef } = formState.value.spec;
+
+    if (targetRef) {
+      selectedRefName.value = targetRef.name;
+      selectedRefKind.value = targetRef.kind as string;
+    }
+  }
+
+  selectedParentMenuItem.value = props.parentMenuItem?.metadata.name;
+
+  setFocus("displayNameInput");
+});
 </script>
 <template>
-  <VModal
-    :visible="visible"
-    :width="700"
-    :title="modalTitle"
-    @update:visible="onVisibleChange"
-  >
+  <VModal ref="modal" :width="700" :title="modalTitle" @close="emit('close')">
     <FormKit
       id="menuitem-form"
       name="menuitem-form"
@@ -295,7 +245,7 @@ const onMenuItemSourceChange = () => {
           </div>
           <div class="mt-5 divide-y divide-gray-100 md:col-span-3 md:mt-0">
             <FormKit
-              v-if="!isUpdateMode && menu && visible"
+              v-if="!isUpdateMode"
               v-model="selectedParentMenuItem"
               :label="
                 $t('core.menu.menu_item_editing_modal.fields.parent.label')
@@ -306,7 +256,7 @@ const onMenuItemSourceChange = () => {
                 )
               "
               type="menuItemSelect"
-              :menu-items="menu?.spec.menuItems || []"
+              :menu-items="menu.spec.menuItems || []"
             />
 
             <FormKit
@@ -424,14 +374,13 @@ const onMenuItemSourceChange = () => {
     <template #footer>
       <VSpace>
         <SubmitButton
-          v-if="visible"
           :loading="saving"
           type="secondary"
           :text="$t('core.common.buttons.submit')"
           @submit="$formkit.submit('menuitem-form')"
         >
         </SubmitButton>
-        <VButton @click="onVisibleChange(false)">
+        <VButton @click="modal.close()">
           {{ $t("core.common.buttons.cancel_and_shortcut") }}
         </VButton>
       </VSpace>
