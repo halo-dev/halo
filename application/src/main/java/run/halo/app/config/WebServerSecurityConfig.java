@@ -4,7 +4,6 @@ import static org.springframework.security.config.Customizer.withDefaults;
 import static org.springframework.security.web.server.authentication.ServerWebExchangeDelegatingReactiveAuthenticationManagerResolver.builder;
 import static org.springframework.security.web.server.util.matcher.ServerWebExchangeMatchers.pathMatchers;
 
-import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.ObjectProvider;
@@ -12,20 +11,13 @@ import org.springframework.boot.autoconfigure.session.SessionProperties;
 import org.springframework.boot.autoconfigure.web.ServerProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.core.Ordered;
-import org.springframework.core.annotation.Order;
-import org.springframework.http.HttpMethod;
-import org.springframework.http.MediaType;
 import org.springframework.security.config.annotation.web.reactive.EnableWebFluxSecurity;
 import org.springframework.security.config.web.server.ServerHttpSecurity;
-import org.springframework.security.core.authority.AuthorityUtils;
 import org.springframework.security.crypto.factory.PasswordEncoderFactories;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.server.SecurityWebFilterChain;
 import org.springframework.security.web.server.context.ServerSecurityContextRepository;
 import org.springframework.security.web.server.context.WebSessionServerSecurityContextRepository;
-import org.springframework.security.web.server.util.matcher.AndServerWebExchangeMatcher;
-import org.springframework.security.web.server.util.matcher.MediaTypeServerWebExchangeMatcher;
 import org.springframework.session.MapSession;
 import org.springframework.session.config.annotation.web.server.EnableSpringWebSession;
 import org.springframework.web.reactive.function.server.RouterFunction;
@@ -60,24 +52,30 @@ import run.halo.app.security.session.ReactiveIndexedSessionRepository;
 @RequiredArgsConstructor
 public class WebServerSecurityConfig {
 
-    @Bean(name = "apiSecurityFilterChain")
-    @Order(Ordered.HIGHEST_PRECEDENCE)
-    SecurityWebFilterChain apiFilterChain(ServerHttpSecurity http,
+    @Bean
+    SecurityWebFilterChain filterChain(ServerHttpSecurity http,
         RoleService roleService,
         ObjectProvider<SecurityConfigurer> securityConfigurers,
         ServerSecurityContextRepository securityContextRepository,
         ReactiveExtensionClient client,
-        PatJwkSupplier patJwkSupplier) {
+        PatJwkSupplier patJwkSupplier,
+        HaloProperties haloProperties) {
 
-        http.securityMatcher(pathMatchers("/api/**", "/apis/**", "/oauth2/**",
-                "/login/**", "/logout", "/actuator/**"))
-            .authorizeExchange(spec -> {
-                spec.anyExchange().access(
+        http.securityMatcher(pathMatchers("/**"))
+            .authorizeExchange(spec -> spec.pathMatchers(
+                    "/api/**",
+                    "/apis/**",
+                    "/oauth2/**",
+                    "/login/**",
+                    "/logout",
+                    "/actuator/**"
+                )
+                .access(
                     new TwoFactorAuthorizationManager(
                         new RequestInfoAuthorizationManager(roleService)
                     )
-                );
-            })
+                )
+                .anyExchange().permitAll())
             .anonymous(spec -> {
                 spec.authorities(AnonymousUserConst.Role);
                 spec.principal(AnonymousUserConst.PRINCIPAL);
@@ -87,32 +85,11 @@ public class WebServerSecurityConfig {
             .oauth2ResourceServer(oauth2 -> {
                 var authManagerResolver = builder().add(
                         new PatServerWebExchangeMatcher(),
-                        new PatAuthenticationManager(client, patJwkSupplier))
+                        new PatAuthenticationManager(client, patJwkSupplier)
+                    )
                     // TODO Add other authentication mangers here. e.g.: JwtAuthenticationManager.
                     .build();
                 oauth2.authenticationManagerResolver(authManagerResolver);
-            })
-            .headers(headerSpec -> headerSpec.hsts(hstsSpec -> hstsSpec.includeSubdomains(false)))
-        ;
-
-        // Integrate with other configurers separately
-        securityConfigurers.orderedStream()
-            .forEach(securityConfigurer -> securityConfigurer.configure(http));
-        return http.build();
-    }
-
-    @Bean
-    @Order(Ordered.HIGHEST_PRECEDENCE + 1)
-    SecurityWebFilterChain portalFilterChain(ServerHttpSecurity http,
-        ServerSecurityContextRepository securityContextRepository,
-        HaloProperties haloProperties) {
-        var pathMatcher = pathMatchers(HttpMethod.GET, "/**");
-        var mediaTypeMatcher = new MediaTypeServerWebExchangeMatcher(MediaType.TEXT_HTML);
-        mediaTypeMatcher.setIgnoredMediaTypes(Set.of(MediaType.ALL));
-        http.securityMatcher(new AndServerWebExchangeMatcher(pathMatcher, mediaTypeMatcher))
-            .securityContextRepository(securityContextRepository)
-            .authorizeExchange(spec -> {
-                spec.anyExchange().permitAll();
             })
             .headers(headerSpec -> headerSpec
                 .frameOptions(frameSpec -> {
@@ -122,17 +99,16 @@ public class WebServerSecurityConfig {
                         frameSpec.disable();
                     }
                 })
-                .referrerPolicy(referrerPolicySpec -> {
-                    referrerPolicySpec.policy(
-                        haloProperties.getSecurity().getReferrerOptions().getPolicy());
-                })
+                .referrerPolicy(referrerPolicySpec -> referrerPolicySpec.policy(
+                    haloProperties.getSecurity().getReferrerOptions().getPolicy())
+                )
                 .cache(ServerHttpSecurity.HeaderSpec.CacheSpec::disable)
                 .hsts(hstsSpec -> hstsSpec.includeSubdomains(false))
-            )
-            .anonymous(spec -> spec.authenticationFilter(
-                new HaloAnonymousAuthenticationWebFilter("portal", AnonymousUserConst.PRINCIPAL,
-                    AuthorityUtils.createAuthorityList(AnonymousUserConst.Role),
-                    securityContextRepository)));
+            );
+
+        // Integrate with other configurers separately
+        securityConfigurers.orderedStream()
+            .forEach(securityConfigurer -> securityConfigurer.configure(http));
         return http.build();
     }
 
