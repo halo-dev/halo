@@ -92,6 +92,7 @@ public class WebServerSecurityConfig {
                     .build();
                 oauth2.authenticationManagerResolver(authManagerResolver);
             })
+            .headers(headerSpec -> headerSpec.hsts(hstsSpec -> hstsSpec.includeSubdomains(false)))
         ;
 
         // Integrate with other configurers separately
@@ -126,6 +127,7 @@ public class WebServerSecurityConfig {
                         haloProperties.getSecurity().getReferrerOptions().getPolicy());
                 })
                 .cache(ServerHttpSecurity.HeaderSpec.CacheSpec::disable)
+                .hsts(hstsSpec -> hstsSpec.includeSubdomains(false))
             )
             .anonymous(spec -> spec.authenticationFilter(
                 new HaloAnonymousAuthenticationWebFilter("portal", AnonymousUserConst.PRINCIPAL,
