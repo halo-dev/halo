@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import { VTooltip } from "floating-vue";
+import { vTooltip } from "floating-vue";
 
 withDefaults(
   defineProps<{

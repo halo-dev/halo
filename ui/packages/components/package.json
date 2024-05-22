@@ -58,11 +58,11 @@
     "react-dom": "^18.2.0",
     "storybook": "^7.6.3",
     "unplugin-icons": "^0.14.15",
-    "vite-plugin-dts": "^2.3.0"
+    "vite-plugin-dts": "^3.9.1"
   },
   "peerDependencies": {
-    "vue": "^3.4.19",
-    "vue-router": "^4.2.5"
+    "vue": "^3.4.27",
+    "vue-router": "^4.3.2"
   },
   "exports": {
     ".": {
@@ -72,6 +72,6 @@
     "./dist/style.css": "./dist/style.css"
   },
   "dependencies": {
-    "floating-vue": "2.0.0-beta.24"
+    "floating-vue": "^5.2.2"
   }
 }

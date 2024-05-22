@@ -13,9 +13,9 @@ export default defineConfig({
     VueJsx(),
     Icons({ compiler: "vue3" }),
     Dts({
-      tsConfigFilePath: "./tsconfig.app.json",
+      tsconfigPath: "./tsconfig.app.json",
       entryRoot: "./src",
-      outputDir: "./dist",
+      outDir: "./dist",
       insertTypesEntry: true,
     }) as Plugin,
   ],

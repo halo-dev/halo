@@ -79,7 +79,7 @@
     "@tiptap/pm": "^2.4.0",
     "@tiptap/suggestion": "^2.4.0",
     "@tiptap/vue-3": "^2.4.0",
-    "floating-vue": "2.0.0-beta.24",
+    "floating-vue": "^5.2.2",
     "github-markdown-css": "^5.2.0",
     "highlight.js": "11.8.0",
     "linkifyjs": "^4.1.3",
@@ -91,9 +91,9 @@
     "@iconify/json": "^2.2.117",
     "@types/linkifyjs": "^2.1.7",
     "release-it": "^16.1.5",
-    "vite-plugin-dts": "^3.7.3"
+    "vite-plugin-dts": "^3.9.1"
   },
   "peerDependencies": {
-    "vue": "^3.4.19"
+    "vue": "^3.4.27"
   }
 }

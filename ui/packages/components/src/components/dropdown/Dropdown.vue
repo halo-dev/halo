@@ -1,5 +1,9 @@
 <script lang="ts" setup>
-import { Dropdown as FloatingDropdown, type Placement } from "floating-vue";
+import {
+  Dropdown as FloatingDropdown,
+  type Placement,
+  type TriggerEvent,
+} from "floating-vue";
 import "floating-vue/dist/style.css";
 import { provide, ref } from "vue";
 import { DropdownContextInjectionKey } from "./symbols";
@@ -7,7 +11,7 @@ import { DropdownContextInjectionKey } from "./symbols";
 withDefaults(
   defineProps<{
     placement?: Placement;
-    triggers?: string[];
+    triggers?: TriggerEvent[];
     classes?: string[];
   }>(),
   {
@@ -41,7 +45,7 @@ defineExpose({
     ref="dropdownRef"
     :placement="placement"
     :triggers="triggers"
-    :dispose-timeout="null"
+    :dispose-timeout="0"
     @show="emit('show')"
   >
     <slot />
