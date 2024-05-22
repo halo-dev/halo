@@ -100,8 +100,7 @@
     "vue-draggable-plus": "^0.4.1",
     "vue-grid-layout": "3.0.0-beta1",
     "vue-i18n": "^9.9.1",
-    "vue-router": "^4.2.5",
-    "vuedraggable": "^4.1.0"
+    "vue-router": "^4.2.5"
   },
   "devDependencies": {
     "@changesets/cli": "^2.25.2",

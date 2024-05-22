@@ -87,7 +87,7 @@ export function createViteConfig(options: Options) {
               "axios",
               "vue-grid-layout",
               "transliteration",
-              "vuedraggable",
+              "vue-draggable-plus",
               "emoji-mart",
               "colorjs.io",
               "jsencrypt",
