@@ -1,5 +1,5 @@
 import { defineAsyncComponent, type App } from "vue";
-import { VClosePopper, VLoading, VTooltip } from "@halo-dev/components";
+import { vClosePopper, VLoading, vTooltip } from "@halo-dev/components";
 import { Dropdown } from "floating-vue";
 import "floating-vue/dist/style.css";
 // @ts-ignore
@@ -22,8 +22,8 @@ export function setupComponents(app: App) {
     })
   );
 
-  app.directive("tooltip", VTooltip);
-  app.directive("close-popper", VClosePopper);
+  app.directive("tooltip", vTooltip);
+  app.directive("close-popper", vClosePopper);
   // @deprecated
   // Will be removed in the future, please use the VDropdown component from @halo-dev/components.
   app.component("FloatingDropdown", Dropdown);

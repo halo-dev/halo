@@ -93,6 +93,7 @@ export function createViteConfig(options: Options) {
               "jsencrypt",
               "overlayscrollbars",
               "overlayscrollbars-vue",
+              "floating-vue",
             ],
           },
         },

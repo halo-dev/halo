@@ -38,11 +38,11 @@
   "homepage": "https://github.com/halo-dev/halo/tree/main/ui/packages/shared#readme",
   "license": "MIT",
   "devDependencies": {
-    "vite-plugin-dts": "^2.3.0"
+    "vite-plugin-dts": "^3.9.1"
   },
   "peerDependencies": {
-    "vue": "^3.4.19",
-    "vue-router": "^4.2.5"
+    "vue": "^3.4.27",
+    "vue-router": "^4.3.2"
   },
   "dependencies": {
     "@halo-dev/api-client": "workspace:*"

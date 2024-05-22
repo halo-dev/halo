@@ -118,7 +118,7 @@ const { data: setting } = useQuery<Setting>({
 
 provide<Ref<Setting | undefined>>("setting", setting);
 
-const handleTabChange = (id: string) => {
+const handleTabChange = (id: string | number) => {
   const tab = tabs.value.find((item) => item.id === id);
   if (tab) {
     activeTab.value = tab.id;

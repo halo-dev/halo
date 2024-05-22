@@ -273,7 +273,7 @@ onMounted(() => {
       UiExtensionAudio.configure({
         uploadAudio: props.uploadImage,
       }),
-      ExtensionCharacterCount as AnyExtension,
+      ExtensionCharacterCount,
       ExtensionFontSize,
       ExtensionColor,
       ExtensionIndent,

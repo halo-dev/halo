@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import { VTooltip, Dropdown as VDropdown } from "floating-vue";
+import { vTooltip, Dropdown as VDropdown } from "floating-vue";
 import type { Editor } from "@/tiptap/vue-3";
 import { ref, type Component } from "vue";
 
@@ -44,7 +44,7 @@ const handleBubbleItemClick = (editor: Editor) => {
     class="inline-flex"
     :triggers="[]"
     :auto-hide="true"
-    :shown="componentRef"
+    :shown="!!componentRef"
     :distance="10"
   >
     <button
