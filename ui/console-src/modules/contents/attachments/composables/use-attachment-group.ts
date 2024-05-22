@@ -20,14 +20,15 @@ export function useFetchAttachmentGroup(): useFetchAttachmentGroupReturn {
             sort: ["metadata.creationTimestamp,asc"],
           }
         );
+
       return data.items;
     },
     refetchInterval(data) {
-      const deletingGroups = data?.filter(
+      const hasDeletingGroup = data?.some(
         (group) => !!group.metadata.deletionTimestamp
       );
 
-      return deletingGroups?.length ? 1000 : false;
+      return hasDeletingGroup ? 1000 : false;
     },
   });
 

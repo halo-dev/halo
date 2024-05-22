@@ -24,10 +24,10 @@ export function useFetchAttachmentPolicy(): useFetchAttachmentPolicyReturn {
       return data.items;
     },
     refetchInterval(data) {
-      const deletingPolicies = data?.filter(
+      const hasDeletingPolicy = data?.some(
         (policy) => !!policy.metadata.deletionTimestamp
       );
-      return deletingPolicies?.length ? 1000 : false;
+      return hasDeletingPolicy ? 1000 : false;
     },
   });
 

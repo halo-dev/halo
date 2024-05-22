@@ -1,6 +1,5 @@
-import type { Attachment, Group, Policy } from "@halo-dev/api-client";
-import { computed, nextTick, type Ref } from "vue";
-import { ref, watch } from "vue";
+import type { Attachment } from "@halo-dev/api-client";
+import { computed, nextTick, type Ref, ref, watch } from "vue";
 import { apiClient } from "@/utils/api-client";
 import { Dialog, Toast } from "@halo-dev/components";
 import { useQuery } from "@tanstack/vue-query";
@@ -27,8 +26,8 @@ interface useAttachmentControlReturn {
 }
 
 export function useAttachmentControl(filterOptions: {
-  policy?: Ref<Policy | undefined>;
-  group?: Ref<Group | undefined>;
+  policyName?: Ref<string | undefined>;
+  groupName?: Ref<string | undefined>;
   user?: Ref<string | undefined>;
   accepts?: Ref<string[]>;
   keyword?: Ref<string | undefined>;
@@ -38,7 +37,7 @@ export function useAttachmentControl(filterOptions: {
 }): useAttachmentControlReturn {
   const { t } = useI18n();
 
-  const { user, policy, group, keyword, sort, page, size, accepts } =
+  const { user, policyName, groupName, keyword, sort, page, size, accepts } =
     filterOptions;
 
   const selectedAttachment = ref<Attachment>();
@@ -52,9 +51,9 @@ export function useAttachmentControl(filterOptions: {
   const { data, isLoading, isFetching, refetch } = useQuery<Attachment[]>({
     queryKey: [
       "attachments",
-      policy,
+      policyName,
       keyword,
-      group,
+      groupName,
       user,
       accepts,
       page,
@@ -62,12 +61,12 @@ export function useAttachmentControl(filterOptions: {
       sort,
     ],
     queryFn: async () => {
-      const isUnGrouped = group?.value?.metadata.name === "ungrouped";
+      const isUnGrouped = groupName?.value === "ungrouped";
 
       const fieldSelectorMap: Record<string, string | undefined> = {
-        "spec.policyName": policy?.value?.metadata.name,
+        "spec.policyName": policyName?.value,
         "spec.ownerName": user?.value,
-        "spec.groupName": isUnGrouped ? undefined : group?.value?.metadata.name,
+        "spec.groupName": isUnGrouped ? undefined : groupName?.value,
       };
 
       const fieldSelector = Object.entries(fieldSelectorMap)
@@ -95,10 +94,10 @@ export function useAttachmentControl(filterOptions: {
       return data.items;
     },
     refetchInterval(data) {
-      const deletingAttachments = data?.filter(
+      const hasDeletingAttachment = data?.some(
         (attachment) => !!attachment.metadata.deletionTimestamp
       );
-      return deletingAttachments?.length ? 1000 : false;
+      return hasDeletingAttachment ? 1000 : false;
     },
   });
 
