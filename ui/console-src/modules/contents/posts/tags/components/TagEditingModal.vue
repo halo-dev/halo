@@ -19,27 +19,24 @@ import SubmitButton from "@/components/button/SubmitButton.vue";
 import type { Tag } from "@halo-dev/api-client";
 
 // libs
-import { cloneDeep } from "lodash-es";
-import { reset } from "@formkit/core";
 import { setFocus } from "@/formkit/utils/focus";
 import AnnotationsForm from "@/components/form/AnnotationsForm.vue";
 import useSlugify from "@console/composables/use-slugify";
 import { useI18n } from "vue-i18n";
 import { FormType } from "@/types/slug";
+import { onMounted } from "vue";
+import { toRaw } from "vue";
 
 const props = withDefaults(
   defineProps<{
-    visible: boolean;
-    tag: Tag | null;
+    tag?: Tag;
   }>(),
   {
-    visible: false,
-    tag: null,
+    tag: undefined,
   }
 );
 
 const emit = defineEmits<{
-  (event: "update:visible", visible: boolean): void;
   (event: "close"): void;
   (event: "previous"): void;
   (event: "next"): void;
@@ -47,7 +44,7 @@ const emit = defineEmits<{
 
 const { t } = useI18n();
 
-const initialFormState: Tag = {
+const formState = ref<Tag>({
   spec: {
     displayName: "",
     slug: "",
@@ -60,14 +57,13 @@ const initialFormState: Tag = {
     name: "",
     generateName: "tag-",
   },
-};
+});
 
-const formState = ref<Tag>(cloneDeep(initialFormState));
+const modal = ref();
+
 const saving = ref(false);
 
-const isUpdateMode = computed(() => {
-  return !!formState.value.metadata.creationTimestamp;
-});
+const isUpdateMode = computed(() => !!props.tag);
 
 const modalTitle = computed(() => {
   return isUpdateMode.value
@@ -104,7 +100,8 @@ const handleSaveTag = async () => {
         tag: formState.value,
       });
     }
-    onVisibleChange(false);
+
+    modal.value.close();
 
     Toast.success(t("core.common.toast.save_success"));
   } catch (e) {
@@ -114,37 +111,19 @@ const handleSaveTag = async () => {
   }
 };
 
-const onVisibleChange = (visible: boolean) => {
-  emit("update:visible", visible);
-  if (!visible) {
-    emit("close");
-  }
-};
-
-const handleResetForm = () => {
-  formState.value = cloneDeep(initialFormState);
-  reset("tag-form");
-};
-
-watch(
-  () => props.visible,
-  (visible) => {
-    if (visible) {
-      setFocus("displayNameInput");
-    } else {
-      handleResetForm();
-    }
-  }
-);
+onMounted(() => {
+  setFocus("displayNameInput");
+});
 
 watch(
   () => props.tag,
   (tag) => {
     if (tag) {
-      formState.value = cloneDeep(tag);
-    } else {
-      handleResetForm();
+      formState.value = toRaw(tag);
     }
+  },
+  {
+    immediate: true,
   }
 );
 
@@ -164,12 +143,7 @@ const { handleGenerateSlug } = useSlugify(
 );
 </script>
 <template>
-  <VModal
-    :title="modalTitle"
-    :visible="visible"
-    :width="700"
-    @update:visible="onVisibleChange"
-  >
+  <VModal ref="modal" :title="modalTitle" :width="700" @close="emit('close')">
     <template #actions>
       <span @click="emit('previous')">
         <IconArrowLeft />
@@ -278,14 +252,13 @@ const { handleGenerateSlug } = useSlugify(
     <template #footer>
       <VSpace>
         <SubmitButton
-          v-if="visible"
           :loading="saving"
           type="secondary"
           :text="$t('core.common.buttons.submit')"
           @submit="$formkit.submit('tag-form')"
         >
         </SubmitButton>
-        <VButton @click="onVisibleChange(false)">
+        <VButton @click="modal.close()">
           {{ $t("core.common.buttons.cancel_and_shortcut") }}
         </VButton>
       </VSpace>
