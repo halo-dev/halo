@@ -4,28 +4,32 @@ import LoginForm from "@/components/login/LoginForm.vue";
 import { useUserStore } from "@/stores/user";
 import { useI18n } from "vue-i18n";
 import SocialAuthProviders from "./SocialAuthProviders.vue";
+import { ref } from "vue";
 
 const userStore = useUserStore();
 const { t } = useI18n();
 
-const onVisibleChange = (visible: boolean) => {
-  userStore.loginModalVisible = visible;
-};
+const modal = ref<InstanceType<typeof VModal>>();
 
 const onLoginSucceed = () => {
-  onVisibleChange(false);
+  modal.value?.close();
   Toast.success(t("core.login.operations.submit.toast_success"));
 };
+
+function onClose() {
+  userStore.loginModalVisible = false;
+}
 </script>
 
 <template>
   <VModal
-    :visible="userStore.loginModalVisible"
+    v-if="userStore.loginModalVisible"
+    ref="modal"
     :mount-to-body="true"
     :width="400"
     :centered="true"
     :title="$t('core.login.modal.title')"
-    @update:visible="onVisibleChange"
+    @close="onClose"
   >
     <LoginForm v-if="userStore.loginModalVisible" @succeed="onLoginSucceed" />
     <SocialAuthProviders />

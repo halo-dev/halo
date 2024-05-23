@@ -105,14 +105,19 @@ const tabbarItems = computed(() => {
 const activeTab = useRouteQuery<string>("tab", tabs.value[0].id, {
   mode: "push",
 });
+
+function onPasswordChangeModalClose() {
+  passwordChangeModal.value = false;
+  refetch();
+}
 </script>
 <template>
-  <ProfileEditingModal v-model:visible="editingModal" />
+  <ProfileEditingModal v-if="editingModal" @close="editingModal = false" />
 
   <PasswordChangeModal
-    v-model:visible="passwordChangeModal"
+    v-if="passwordChangeModal"
     :user="user?.user"
-    @close="refetch"
+    @close="onPasswordChangeModalClose"
   />
 
   <header class="bg-white">

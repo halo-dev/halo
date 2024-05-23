@@ -95,14 +95,23 @@ const tabbarItems = computed(() => {
 function handleRouteToUC() {
   window.location.href = "/uc";
 }
+
+function onPasswordChangeModalClose() {
+  passwordChangeModal.value = false;
+  refetch();
+}
 </script>
 <template>
-  <UserEditingModal v-model:visible="editingModal" :user="user?.user" />
+  <UserEditingModal
+    v-if="editingModal && user?.user"
+    :user="user?.user"
+    @close="editingModal = false"
+  />
 
   <UserPasswordChangeModal
-    v-model:visible="passwordChangeModal"
+    v-if="passwordChangeModal"
     :user="user?.user"
-    @close="refetch"
+    @close="onPasswordChangeModalClose"
   />
 
   <header class="bg-white">

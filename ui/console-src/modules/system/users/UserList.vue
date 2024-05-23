@@ -1,32 +1,32 @@
 <script lang="ts" setup>
 import {
+  Dialog,
   IconAddCircle,
+  IconLockPasswordLine,
+  IconRefreshLine,
   IconUserFollow,
   IconUserSettings,
-  IconLockPasswordLine,
+  Toast,
+  VAvatar,
   VButton,
   VCard,
+  VDropdownItem,
+  VEmpty,
+  VEntity,
+  VEntityField,
+  VLoading,
   VPageHeader,
   VPagination,
   VSpace,
-  VTag,
-  VAvatar,
-  VEntity,
-  VEntityField,
-  Dialog,
   VStatusDot,
-  VLoading,
-  Toast,
-  IconRefreshLine,
-  VEmpty,
-  VDropdownItem,
+  VTag,
 } from "@halo-dev/components";
 import UserEditingModal from "./components/UserEditingModal.vue";
 import UserPasswordChangeModal from "./components/UserPasswordChangeModal.vue";
 import GrantPermissionModal from "./components/GrantPermissionModal.vue";
 import { computed, onMounted, ref, watch } from "vue";
 import { apiClient } from "@/utils/api-client";
-import type { User, ListedUser } from "@halo-dev/api-client";
+import type { ListedUser, User } from "@halo-dev/api-client";
 import { rbacAnnotations } from "@/constants/annotations";
 import { formatDatetime } from "@/utils/date";
 import { useRouteQuery } from "@vueuse/router";
@@ -232,19 +232,35 @@ onMounted(() => {
     creationModal.value = true;
   }
 });
+
+function onCreationModalClose() {
+  creationModal.value = false;
+  routeQueryAction.value = undefined;
+}
+
+function onEditingModalClose() {
+  editingModal.value = false;
+  selectedUser.value = undefined;
+}
+
+function onPasswordChangeModalClose() {
+  passwordChangeModal.value = false;
+  refetch();
+}
 </script>
 <template>
-  <UserEditingModal v-model:visible="editingModal" :user="selectedUser" />
-
-  <UserCreationModal
-    v-model:visible="creationModal"
-    @close="routeQueryAction = undefined"
+  <UserEditingModal
+    v-if="editingModal && selectedUser"
+    :user="selectedUser"
+    @close="onEditingModalClose"
   />
 
+  <UserCreationModal v-if="creationModal" @close="onCreationModalClose" />
+
   <UserPasswordChangeModal
-    v-model:visible="passwordChangeModal"
+    v-if="passwordChangeModal"
     :user="selectedUser"
-    @close="refetch"
+    @close="onPasswordChangeModalClose"
   />
 
   <GrantPermissionModal
