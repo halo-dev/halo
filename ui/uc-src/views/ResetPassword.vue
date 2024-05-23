@@ -4,7 +4,6 @@ import { Toast, VButton } from "@halo-dev/components";
 import { useRouteParams, useRouteQuery } from "@vueuse/router";
 import { ref } from "vue";
 import { useI18n } from "vue-i18n";
-import IconLogo from "~icons/core/logo?width=5rem&height=2rem";
 
 const { t } = useI18n();
 
@@ -46,69 +45,64 @@ const inputClasses = {
 </script>
 
 <template>
-  <div
-    class="flex h-screen flex-col items-center overflow-auto bg-white/90 pt-[30vh]"
-  >
-    <IconLogo class="mb-8 flex-none" />
-    <div class="flex w-72 flex-col">
+  <div class="flex w-72 flex-col">
+    <FormKit
+      id="reset-password-form"
+      name="reset-password-form"
+      type="form"
+      :classes="{
+        form: '!divide-none',
+      }"
+      :config="{ validationVisibility: 'submit' }"
+      @submit="onSubmit"
+      @keyup.enter="$formkit.submit('reset-password-form')"
+    >
       <FormKit
-        id="reset-password-form"
-        name="reset-password-form"
-        type="form"
-        :classes="{
-          form: '!divide-none',
+        :classes="inputClasses"
+        name="username"
+        :model-value="username"
+        :placeholder="$t('core.uc_reset_password.fields.username.label')"
+        :validation-label="$t('core.uc_reset_password.fields.username.label')"
+        :autofocus="true"
+        type="text"
+        disabled
+        validation="required"
+      ></FormKit>
+      <FormKit
+        :classes="inputClasses"
+        name="password"
+        type="password"
+        :placeholder="$t('core.uc_reset_password.fields.password.label')"
+        :validation-label="$t('core.uc_reset_password.fields.password.label')"
+        validation="required:trim|length:5,100|matches:/^\S.*\S$/"
+        :validation-messages="{
+          matches: $t('core.formkit.validation.trim'),
         }"
-        :config="{ validationVisibility: 'submit' }"
-        @submit="onSubmit"
-        @keyup.enter="$formkit.submit('reset-password-form')"
-      >
-        <FormKit
-          :classes="inputClasses"
-          name="username"
-          :model-value="username"
-          :placeholder="$t('core.uc_reset_password.fields.username.label')"
-          :validation-label="$t('core.uc_reset_password.fields.username.label')"
-          :autofocus="true"
-          type="text"
-          disabled
-          validation="required"
-        ></FormKit>
-        <FormKit
-          :classes="inputClasses"
-          name="password"
-          type="password"
-          :placeholder="$t('core.uc_reset_password.fields.password.label')"
-          :validation-label="$t('core.uc_reset_password.fields.password.label')"
-          validation="required:trim|length:5,100|matches:/^\S.*\S$/"
-          :validation-messages="{
-            matches: $t('core.formkit.validation.trim'),
-          }"
-        ></FormKit>
-        <FormKit
-          :classes="inputClasses"
-          name="password_confirm"
-          type="password"
-          :placeholder="
-            $t('core.uc_reset_password.fields.password_confirm.label')
-          "
-          :validation-label="
-            $t('core.uc_reset_password.fields.password_confirm.label')
-          "
-          validation="confirm|required:trim|length:5,100|matches:/^\S.*\S$/"
-          :validation-messages="{
-            matches: $t('core.formkit.validation.trim'),
-          }"
-        ></FormKit>
-      </FormKit>
-      <VButton
-        class="mt-8"
-        block
-        :loading="loading"
-        type="secondary"
-        @click="$formkit.submit('reset-password-form')"
-      >
-        {{ $t("core.uc_reset_password.operations.reset.button") }}
-      </VButton>
-    </div>
+      ></FormKit>
+      <FormKit
+        :classes="inputClasses"
+        name="password_confirm"
+        type="password"
+        :placeholder="
+          $t('core.uc_reset_password.fields.password_confirm.label')
+        "
+        :validation-label="
+          $t('core.uc_reset_password.fields.password_confirm.label')
+        "
+        validation="confirm|required:trim|length:5,100|matches:/^\S.*\S$/"
+        :validation-messages="{
+          matches: $t('core.formkit.validation.trim'),
+        }"
+      ></FormKit>
+    </FormKit>
+    <VButton
+      class="mt-8"
+      block
+      :loading="loading"
+      type="secondary"
+      @click="$formkit.submit('reset-password-form')"
+    >
+      {{ $t("core.uc_reset_password.operations.reset.button") }}
+    </VButton>
   </div>
 </template>
