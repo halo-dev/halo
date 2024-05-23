@@ -19,6 +19,7 @@ import org.springframework.web.server.ServerWebExchange;
 import reactor.core.publisher.Mono;
 import run.halo.app.security.authentication.login.HaloUser;
 import run.halo.app.security.authentication.login.UsernamePasswordHandler;
+import run.halo.app.security.authentication.rememberme.RememberMeServices;
 import run.halo.app.security.authentication.twofactor.TwoFactorAuthentication;
 
 @Slf4j
@@ -27,14 +28,15 @@ public class TotpAuthenticationFilter extends AuthenticationWebFilter {
     public TotpAuthenticationFilter(ServerSecurityContextRepository securityContextRepository,
         TotpAuthService totpAuthService,
         ServerResponse.Context context,
-        MessageSource messageSource) {
+        MessageSource messageSource,
+        RememberMeServices rememberMeServices) {
         super(new TwoFactorAuthManager(totpAuthService));
 
         setSecurityContextRepository(securityContextRepository);
         setRequiresAuthenticationMatcher(pathMatchers(HttpMethod.POST, "/login/2fa/totp"));
         setServerAuthenticationConverter(new TotpCodeAuthenticationConverter());
 
-        var handler = new UsernamePasswordHandler(context, messageSource);
+        var handler = new UsernamePasswordHandler(context, messageSource, rememberMeServices);
         setAuthenticationSuccessHandler(handler);
         setAuthenticationFailureHandler(handler);
     }

@@ -4,6 +4,7 @@ import static org.springframework.security.config.web.server.SecurityWebFiltersO
 import static run.halo.app.security.authentication.WebExchangeMatchers.ignoringMediaTypeAll;
 
 import java.net.URI;
+import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.security.config.web.server.ServerHttpSecurity;
@@ -15,9 +16,12 @@ import org.springframework.security.web.server.ui.LogoutPageGeneratingWebFilter;
 import org.springframework.stereotype.Component;
 import reactor.core.publisher.Mono;
 import run.halo.app.security.authentication.SecurityConfigurer;
+import run.halo.app.security.authentication.rememberme.RememberMeServices;
 
 @Component
+@RequiredArgsConstructor
 public class LogoutSecurityConfigurer implements SecurityConfigurer {
+    private final RememberMeServices rememberMeServices;
 
     @Override
     public void configure(ServerHttpSecurity http) {
@@ -25,7 +29,7 @@ public class LogoutSecurityConfigurer implements SecurityConfigurer {
         http.addFilterAt(new LogoutPageGeneratingWebFilter(), LOGOUT_PAGE_GENERATING);
     }
 
-    public static class LogoutSuccessHandler implements ServerLogoutSuccessHandler {
+    private class LogoutSuccessHandler implements ServerLogoutSuccessHandler {
 
         private final ServerLogoutSuccessHandler defaultHandler;
 
@@ -38,15 +42,18 @@ public class LogoutSecurityConfigurer implements SecurityConfigurer {
         @Override
         public Mono<Void> onLogoutSuccess(WebFilterExchange exchange,
             Authentication authentication) {
-            return ignoringMediaTypeAll(MediaType.APPLICATION_JSON).matches(exchange.getExchange())
-                .flatMap(matchResult -> {
-                    if (matchResult.isMatch()) {
-                        var response = exchange.getExchange().getResponse();
-                        response.setStatusCode(HttpStatus.NO_CONTENT);
-                        return response.setComplete();
-                    }
-                    return defaultHandler.onLogoutSuccess(exchange, authentication);
-                });
+            return rememberMeServices.loginFail(exchange.getExchange())
+                .then(ignoringMediaTypeAll(MediaType.APPLICATION_JSON)
+                    .matches(exchange.getExchange())
+                    .flatMap(matchResult -> {
+                        if (matchResult.isMatch()) {
+                            var response = exchange.getExchange().getResponse();
+                            response.setStatusCode(HttpStatus.NO_CONTENT);
+                            return response.setComplete();
+                        }
+                        return defaultHandler.onLogoutSuccess(exchange, authentication);
+                    })
+                );
         }
     }
 }

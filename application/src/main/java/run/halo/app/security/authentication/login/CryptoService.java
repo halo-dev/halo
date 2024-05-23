@@ -24,4 +24,6 @@ public interface CryptoService {
      */
     Mono<byte[]> readPublicKey();
 
+    Mono<byte[]> readPrivateKey();
+
 }

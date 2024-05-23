@@ -106,6 +106,11 @@ public class RsaKeyService implements CryptoService {
         return readKey(publicKeyPath);
     }
 
+    @Override
+    public Mono<byte[]> readPrivateKey() {
+        return readKey(privateKeyPath);
+    }
+
     private Mono<byte[]> readKey(Path keyPath) {
         var content =
             DataBufferUtils.read(keyPath, DefaultDataBufferFactory.sharedInstance, 4096);
