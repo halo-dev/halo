@@ -1,6 +1,6 @@
 <script lang="ts" setup>
 // core libs
-import { onMounted, ref, watch } from "vue";
+import { ref } from "vue";
 
 // components
 import {
@@ -26,17 +26,14 @@ const { t } = useI18n();
 
 const props = withDefaults(
   defineProps<{
-    selectedGroup: Group | undefined;
     readonly?: boolean;
   }>(),
   {
-    selectedGroup: undefined,
     readonly: false,
   }
 );
 
 const emit = defineEmits<{
-  (event: "update:selectedGroup", group: Group): void;
   (event: "select", group: Group): void;
   (event: "update"): void;
   (event: "reload-attachments"): void;
@@ -67,19 +64,17 @@ const defaultGroups: Group[] = [
 
 const { groups, handleFetchGroups } = useFetchAttachmentGroup();
 
-const groupToUpdate = ref<Group | null>(null);
+const groupToUpdate = ref<Group>();
 const loading = ref<boolean>(false);
 const editingModal = ref(false);
 
-const routeQuery = useRouteQuery<string>("group");
+const selectedGroup = props.readonly
+  ? ref("")
+  : useRouteQuery<string>("group", "");
 
 const handleSelectGroup = (group: Group) => {
-  emit("update:selectedGroup", group);
   emit("select", group);
-
-  if (!props.readonly) {
-    routeQuery.value = group.metadata.name;
-  }
+  selectedGroup.value = group.metadata.name;
 };
 
 const handleOpenEditingModal = (group: Group) => {
@@ -90,6 +85,7 @@ const handleOpenEditingModal = (group: Group) => {
 const onEditingModalClose = () => {
   emit("update");
   handleFetchGroups();
+  editingModal.value = false;
 };
 
 const handleDelete = (group: Group) => {
@@ -181,51 +177,20 @@ const handleDeleteWithAttachments = (group: Group) => {
     },
   });
 };
-
-watch(
-  () => groups.value?.length,
-  () => {
-    const allGroups = [...defaultGroups, ...(groups.value || [])];
-    const groupIndex = allGroups.findIndex(
-      (group) => group.metadata.name === routeQuery.value
-    );
-
-    if (groupIndex < 0) {
-      handleSelectGroup(defaultGroups[0]);
-    }
-  }
-);
-
-onMounted(async () => {
-  await handleFetchGroups();
-  if (routeQuery.value && !props.readonly) {
-    const allGroups = [...defaultGroups, ...(groups.value || [])];
-    const group = allGroups.find(
-      (group) => group.metadata.name === routeQuery.value
-    );
-    if (group) {
-      handleSelectGroup(group);
-      return;
-    }
-  }
-
-  handleSelectGroup(defaultGroups[0]);
-});
 </script>
 <template>
   <AttachmentGroupEditingModal
-    v-if="!readonly"
-    v-model:visible="editingModal"
+    v-if="!readonly && editingModal"
     :group="groupToUpdate"
     @close="onEditingModalClose"
   />
   <div class="mb-5 grid grid-cols-2 gap-x-2 gap-y-3 sm:grid-cols-6">
     <div
-      v-for="(defaultGroup, index) in defaultGroups"
-      :key="index"
+      v-for="defaultGroup in defaultGroups"
+      :key="defaultGroup.metadata.name"
       :class="{
         '!bg-gray-200 !text-gray-900':
-          defaultGroup.metadata.name === selectedGroup?.metadata.name,
+          defaultGroup.metadata.name === selectedGroup,
       }"
       class="flex cursor-pointer items-center rounded-base bg-gray-100 p-2 text-gray-500 transition-all hover:bg-gray-200 hover:text-gray-900 hover:shadow-sm"
       @click="handleSelectGroup(defaultGroup)"
@@ -235,11 +200,10 @@ onMounted(async () => {
       </div>
     </div>
     <div
-      v-for="(group, index) in groups"
-      :key="index"
+      v-for="group in groups"
+      :key="group.metadata.name"
       :class="{
-        '!bg-gray-200 !text-gray-900':
-          group.metadata.name === selectedGroup?.metadata.name,
+        '!bg-gray-200 !text-gray-900': group.metadata.name === selectedGroup,
       }"
       class="flex cursor-pointer items-center rounded-base bg-gray-100 p-2 text-gray-500 transition-all hover:bg-gray-200 hover:text-gray-900 hover:shadow-sm"
       @click="handleSelectGroup(group)"

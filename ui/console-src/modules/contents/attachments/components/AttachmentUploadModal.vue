@@ -7,7 +7,7 @@ import {
   VModal,
 } from "@halo-dev/components";
 import { ref, watch } from "vue";
-import type { Policy, PolicyTemplate } from "@halo-dev/api-client";
+import type { PolicyTemplate } from "@halo-dev/api-client";
 import {
   useFetchAttachmentPolicy,
   useFetchAttachmentPolicyTemplate,
@@ -16,17 +16,7 @@ import { useFetchAttachmentGroup } from "../composables/use-attachment-group";
 import AttachmentPolicyEditingModal from "./AttachmentPolicyEditingModal.vue";
 import { useLocalStorage } from "@vueuse/core";
 
-const props = withDefaults(
-  defineProps<{
-    visible: boolean;
-  }>(),
-  {
-    visible: false,
-  }
-);
-
 const emit = defineEmits<{
-  (event: "update:visible", visible: boolean): void;
   (event: "close"): void;
 }>();
 
@@ -34,11 +24,11 @@ const { groups } = useFetchAttachmentGroup();
 const { policies, handleFetchPolicies } = useFetchAttachmentPolicy();
 const { policyTemplates } = useFetchAttachmentPolicyTemplate();
 
+const modal = ref();
 const selectedGroupName = useLocalStorage("attachment-upload-group", "");
 const selectedPolicyName = useLocalStorage("attachment-upload-policy", "");
-const policyToCreate = ref<Policy>();
-const uploadVisible = ref(false);
 const policyEditingModal = ref(false);
+const policyTemplateNameToCreate = ref();
 
 watch(
   () => groups.value,
@@ -71,57 +61,24 @@ watch(
 );
 
 const handleOpenCreateNewPolicyModal = (policyTemplate: PolicyTemplate) => {
-  policyToCreate.value = {
-    spec: {
-      displayName: "",
-      templateName: policyTemplate.metadata.name,
-      configMapName: "",
-    },
-    apiVersion: "storage.halo.run/v1alpha1",
-    kind: "Policy",
-    metadata: {
-      name: "",
-      generateName: "attachment-policy-",
-    },
-  };
+  policyTemplateNameToCreate.value = policyTemplate.metadata.name;
   policyEditingModal.value = true;
 };
 
 const onEditingModalClose = async () => {
   await handleFetchPolicies();
-  policyToCreate.value = policies.value?.[0];
+  selectedPolicyName.value = policies.value?.[0].metadata.name;
+  policyEditingModal.value = false;
 };
-
-const onVisibleChange = (visible: boolean) => {
-  emit("update:visible", visible);
-  if (!visible) {
-    emit("close");
-    policyEditingModal.value = false;
-  }
-};
-
-watch(
-  () => props.visible,
-  (newValue) => {
-    if (newValue) {
-      uploadVisible.value = true;
-    } else {
-      const uploadVisibleTimer = setTimeout(() => {
-        uploadVisible.value = false;
-        clearTimeout(uploadVisibleTimer);
-      }, 200);
-    }
-  }
-);
 </script>
 <template>
   <VModal
+    ref="modal"
     :body-class="['!p-0']"
-    :visible="visible"
     :width="650"
     :centered="false"
     :title="$t('core.attachment.upload_modal.title')"
-    @update:visible="onVisibleChange"
+    @close="emit('close')"
   >
     <div class="w-full p-4">
       <div class="mb-2">
@@ -213,7 +170,6 @@ watch(
         />
       </div>
       <UppyUpload
-        v-if="uploadVisible"
         endpoint="/apis/api.console.halo.run/v1alpha1/attachments/upload"
         :disabled="!selectedPolicyName"
         :meta="{
@@ -226,15 +182,14 @@ watch(
             ? ''
             : $t('core.attachment.upload_modal.filters.policy.not_select')
         "
-        :done-button-handler="() => onVisibleChange(false)"
+        :done-button-handler="() => modal.close()"
       />
     </div>
   </VModal>
 
   <AttachmentPolicyEditingModal
-    v-if="visible"
-    v-model:visible="policyEditingModal"
-    :policy="policyToCreate"
+    v-if="policyEditingModal"
+    :template-name="policyTemplateNameToCreate"
     @close="onEditingModalClose"
   />
 </template>

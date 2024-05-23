@@ -4,28 +4,29 @@ import {
   IconArrowRight,
   IconCheckboxFill,
   IconDatabase2Line,
+  IconFolder,
   IconGrid,
   IconList,
-  IconUpload,
   IconRefreshLine,
+  IconUpload,
+  Toast,
   VButton,
   VCard,
+  VDropdown,
+  VDropdownItem,
+  VEmpty,
+  VLoading,
   VPageHeader,
   VPagination,
   VSpace,
-  VEmpty,
-  IconFolder,
-  VLoading,
-  Toast,
-  VDropdown,
-  VDropdownItem,
 } from "@halo-dev/components";
 import LazyImage from "@/components/image/LazyImage.vue";
 import AttachmentDetailModal from "./components/AttachmentDetailModal.vue";
 import AttachmentUploadModal from "./components/AttachmentUploadModal.vue";
 import AttachmentPoliciesModal from "./components/AttachmentPoliciesModal.vue";
 import AttachmentGroupList from "./components/AttachmentGroupList.vue";
-import { computed, onMounted, ref, watch } from "vue";
+import type { Ref } from "vue";
+import { computed, onMounted, provide, ref, watch } from "vue";
 import type { Attachment, Group } from "@halo-dev/api-client";
 import { useFetchAttachmentPolicy } from "./composables/use-attachment-policy";
 import { useAttachmentControl } from "./composables/use-attachment";
@@ -37,8 +38,6 @@ import { useFetchAttachmentGroup } from "./composables/use-attachment-group";
 import { useI18n } from "vue-i18n";
 import { useLocalStorage } from "@vueuse/core";
 import UserFilterDropdown from "@/components/filter/UserFilterDropdown.vue";
-import { provide } from "vue";
-import type { Ref } from "vue";
 import AttachmentListItem from "./components/AttachmentListItem.vue";
 
 const { t } = useI18n();
@@ -50,7 +49,7 @@ const detailVisible = ref(false);
 const { policies } = useFetchAttachmentPolicy();
 const { groups, handleFetchGroups } = useFetchAttachmentGroup();
 
-const selectedGroup = ref<Group>();
+const selectedGroup = useRouteQuery<string | undefined>("group");
 
 // Filter
 const keyword = useRouteQuery<string>("keyword", "");
@@ -111,12 +110,8 @@ const {
   isChecked,
   handleReset,
 } = useAttachmentControl({
-  group: selectedGroup,
-  policy: computed(() => {
-    return policies.value?.find(
-      (policy) => policy.metadata.name === selectedPolicy.value
-    );
-  }),
+  groupName: selectedGroup,
+  policyName: selectedPolicy,
   user: selectedUser,
   accepts: computed(() => {
     if (!selectedAccepts.value) {
@@ -187,6 +182,7 @@ const onDetailModalClose = () => {
 const onUploadModalClose = () => {
   routeQueryAction.value = undefined;
   handleFetchAttachments();
+  uploadVisible.value = false;
 };
 
 // View type
@@ -258,11 +254,11 @@ onMounted(() => {
       </span>
     </template>
   </AttachmentDetailModal>
-  <AttachmentUploadModal
-    v-model:visible="uploadVisible"
-    @close="onUploadModalClose"
+  <AttachmentUploadModal v-if="uploadVisible" @close="onUploadModalClose" />
+  <AttachmentPoliciesModal
+    v-if="policyVisible"
+    @close="policyVisible = false"
   />
-  <AttachmentPoliciesModal v-model:visible="policyVisible" />
   <VPageHeader :title="$t('core.attachment.title')">
     <template #icon>
       <IconFolder class="mr-2 self-center" />
@@ -470,7 +466,6 @@ onMounted(() => {
 
           <div :style="`${viewType === 'list' ? 'padding:12px 16px 0' : ''}`">
             <AttachmentGroupList
-              v-model:selected-group="selectedGroup"
               @select="handleReset"
               @update="handleFetchGroups"
               @reload-attachments="handleFetchAttachments"

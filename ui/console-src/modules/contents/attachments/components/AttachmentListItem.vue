@@ -1,15 +1,16 @@
 <script lang="ts" setup>
 import {
-  VSpace,
-  VStatusDot,
+  Dialog,
+  Toast,
+  VDropdownDivider,
+  VDropdownItem,
   VEntity,
   VEntityField,
-  Toast,
-  VDropdownItem,
-  Dialog,
-  VDropdownDivider,
+  VSpace,
+  VStatusDot,
 } from "@halo-dev/components";
-import { computed, ref } from "vue";
+import type { Ref } from "vue";
+import { computed, inject, markRaw, ref, toRefs } from "vue";
 import type { Attachment } from "@halo-dev/api-client";
 import { formatDatetime } from "@/utils/date";
 import prettyBytes from "pretty-bytes";
@@ -17,14 +18,10 @@ import { useFetchAttachmentPolicy } from "../composables/use-attachment-policy";
 import { apiClient } from "@/utils/api-client";
 import { usePermission } from "@/utils/permission";
 import { useI18n } from "vue-i18n";
-import { inject } from "vue";
-import type { Ref } from "vue";
 import { useQueryClient } from "@tanstack/vue-query";
 import { useOperationItemExtensionPoint } from "@console/composables/use-operation-extension-points";
-import { toRefs } from "vue";
 import type { OperationItem } from "@halo-dev/console-shared";
 import EntityDropdownItems from "@/components/entity/EntityDropdownItems.vue";
-import { markRaw } from "vue";
 
 const { currentUserHasPermission } = usePermission();
 const { t } = useI18n();
@@ -52,7 +49,7 @@ const selectedAttachments = inject<Ref<Set<Attachment>>>(
   ref<Set<Attachment>>(new Set())
 );
 
-const policyName = computed(() => {
+const policyDisplayName = computed(() => {
   const policy = policies.value?.find(
     (p) => p.metadata.name === props.attachment.spec.policyName
   );
@@ -180,7 +177,7 @@ const { operationItems } = useOperationItemExtensionPoint<Attachment>(
       </VEntityField>
     </template>
     <template #end>
-      <VEntityField :description="policyName" />
+      <VEntityField :description="policyDisplayName" />
       <VEntityField>
         <template #description>
           <RouterLink

@@ -1,38 +1,37 @@
 <script lang="ts" setup>
-import { Toast, VButton, VModal, VSpace } from "@halo-dev/components";
+import { Toast, VButton, VLoading, VModal, VSpace } from "@halo-dev/components";
 import SubmitButton from "@/components/button/SubmitButton.vue";
-import type { Policy, PolicyTemplate } from "@halo-dev/api-client";
+import type { Policy } from "@halo-dev/api-client";
 import { cloneDeep } from "lodash-es";
-import { computed, ref, toRaw, watch, watchEffect } from "vue";
-import { useSettingForm } from "@console/composables/use-setting-form";
+import { computed, onMounted, ref, toRaw, toRefs } from "vue";
+import { useSettingFormConvert } from "@console/composables/use-setting-form";
 import { apiClient } from "@/utils/api-client";
-import {
-  reset,
-  type FormKitSchemaCondition,
-  type FormKitSchemaNode,
-} from "@formkit/core";
 import { setFocus } from "@/formkit/utils/focus";
 import { useI18n } from "vue-i18n";
+import { useQuery } from "@tanstack/vue-query";
 
 const props = withDefaults(
   defineProps<{
-    visible: boolean;
     policy?: Policy;
+    templateName?: string;
   }>(),
   {
-    visible: false,
     policy: undefined,
+    templateName: undefined,
   }
 );
 
+const { policy } = toRefs(props);
+
 const emit = defineEmits<{
-  (event: "update:visible", visible: boolean): void;
   (event: "close"): void;
 }>();
 
 const { t } = useI18n();
 
-const initialFormState: Policy = {
+const modal = ref();
+
+const formState = ref<Policy>({
   spec: {
     displayName: "",
     templateName: "",
@@ -44,82 +43,106 @@ const initialFormState: Policy = {
     name: "",
     generateName: "attachment-policy-",
   },
-};
-
-const formState = ref<Policy>(cloneDeep(initialFormState));
-const policyTemplate = ref<PolicyTemplate | undefined>();
-
-const settingName = computed(() => policyTemplate.value?.spec?.settingName);
-
-const configMapName = computed({
-  get() {
-    return formState.value.spec.configMapName;
-  },
-  set(value) {
-    formState.value.spec.configMapName = value;
-  },
 });
 
-const {
+const isUpdateMode = !!props.policy;
+
+onMounted(async () => {
+  if (props.policy) {
+    formState.value = cloneDeep(props.policy);
+  }
+  if (props.templateName) {
+    formState.value.spec.templateName = props.templateName;
+  }
+
+  setFocus("displayNameInput");
+});
+
+const { data: policyTemplate } = useQuery({
+  queryKey: [
+    "core:attachment:policy-template",
+    formState.value.spec.templateName,
+  ],
+  queryFn: async () => {
+    const { data } =
+      await apiClient.extension.storage.policyTemplate.getstorageHaloRunV1alpha1PolicyTemplate(
+        {
+          name: formState.value.spec.templateName,
+        }
+      );
+    return data;
+  },
+  retry: 0,
+  enabled: computed(() => !!formState.value.spec.templateName),
+});
+
+const { data: setting, isLoading } = useQuery({
+  queryKey: [
+    "core:attachment:policy-template:setting",
+    policyTemplate.value?.spec?.settingName,
+  ],
+  queryFn: async () => {
+    if (!policyTemplate.value?.spec?.settingName) {
+      throw new Error("No setting found");
+    }
+
+    const { data } = await apiClient.extension.setting.getv1alpha1Setting({
+      name: policyTemplate.value.spec.settingName,
+    });
+
+    return data;
+  },
+  retry: 0,
+  enabled: computed(() => !!policyTemplate.value?.spec?.settingName),
+});
+
+const { data: configMap } = useQuery({
+  queryKey: [
+    "core:attachment:policy-template:configMap",
+    policy.value?.spec.configMapName,
+  ],
+  initialData: {
+    data: {},
+    apiVersion: "v1alpha1",
+    kind: "ConfigMap",
+    metadata: {
+      generateName: "configMap-",
+      name: "",
+    },
+  },
+  retry: 0,
+  queryFn: async () => {
+    if (!policy.value?.spec.configMapName) {
+      throw new Error("No configMap found");
+    }
+    const { data } = await apiClient.extension.configMap.getv1alpha1ConfigMap({
+      name: policy.value?.spec.configMapName,
+    });
+    return data;
+  },
+  enabled: computed(() => !!policy.value?.spec.configMapName),
+});
+
+const { configMapFormData, formSchema, convertToSave } = useSettingFormConvert(
   setting,
-  configMapFormData,
   configMap,
-  saving,
-  handleFetchConfigMap,
-  handleFetchSettings,
-  handleSaveConfigMap,
-  handleReset: handleResetSettingForm,
-} = useSettingForm(settingName, configMapName);
+  ref("default")
+);
 
-const formSchema = computed(() => {
-  if (!setting.value) {
-    return undefined;
-  }
-  const { forms } = setting.value.spec;
-  return forms.find((item) => item.group === "default")?.formSchema as (
-    | FormKitSchemaCondition
-    | FormKitSchemaNode
-  )[];
-});
-
-watchEffect(() => {
-  if (settingName.value) {
-    handleFetchSettings();
-  }
-});
-
-watchEffect(() => {
-  if (configMapName.value && setting.value) {
-    handleFetchConfigMap();
-  }
-});
-
-const isUpdateMode = computed(() => {
-  return !!formState.value.metadata.creationTimestamp;
-});
-
-const modalTitle = computed(() => {
-  return isUpdateMode.value
-    ? t("core.attachment.policy_editing_modal.titles.update", {
-        policy: props.policy?.spec.displayName,
-      })
-    : t("core.attachment.policy_editing_modal.titles.create", {
-        policy_template: policyTemplate.value?.spec?.displayName,
-      });
-});
+const submitting = ref(false);
 
 const handleSave = async () => {
   try {
-    saving.value = true;
+    submitting.value = true;
 
-    if (!isUpdateMode.value) {
-      configMap.value.metadata.name = "";
-      configMap.value.metadata.generateName = "configMap-";
-    }
+    const configMapToUpdate = convertToSave();
 
-    await handleSaveConfigMap();
+    if (isUpdateMode) {
+      await apiClient.extension.configMap.updatev1alpha1ConfigMap({
+        name: configMap.value.metadata.name,
+        configMap: configMapToUpdate,
+      });
 
-    if (isUpdateMode.value) {
       await apiClient.extension.storage.policy.updatestorageHaloRunV1alpha1Policy(
         {
           name: formState.value.metadata.name,
@@ -127,7 +150,12 @@ const handleSave = async () => {
         }
       );
     } else {
-      formState.value.spec.configMapName = configMap.value.metadata.name;
+      const { data: newConfigMap } =
+        await apiClient.extension.configMap.createv1alpha1ConfigMap({
+          configMap: configMapToUpdate,
+        });
+
+      formState.value.spec.configMapName = newConfigMap.metadata.name;
       await apiClient.extension.storage.policy.createstorageHaloRunV1alpha1Policy(
         {
           policy: formState.value,
@@ -136,117 +164,68 @@ const handleSave = async () => {
     }
 
     Toast.success(t("core.common.toast.save_success"));
-    onVisibleChange(false);
+    modal.value.close();
   } catch (e) {
     console.error("Failed to save attachment policy", e);
   } finally {
-    saving.value = false;
+    submitting.value = false;
   }
 };
 
-const handleResetForm = () => {
-  formState.value = cloneDeep(initialFormState);
-  reset("attachment-policy-form");
-};
-
-watch(
-  () => props.visible,
-  (visible) => {
-    if (visible) {
-      setFocus("displayNameInput");
-    } else {
-      const timer = setTimeout(() => {
-        policyTemplate.value = undefined;
-        handleResetForm();
-        handleResetSettingForm();
-        clearTimeout(timer);
-      }, 100);
-    }
-  }
-);
-
-watch(
-  () => props.policy,
-  async (policy) => {
-    if (policy) {
-      formState.value = cloneDeep(policy);
-
-      const { templateName } = formState.value.spec;
-
-      // Get policy template
-      if (templateName) {
-        const { data } =
-          await apiClient.extension.storage.policyTemplate.getstorageHaloRunV1alpha1PolicyTemplate(
-            {
-              name: templateName,
-            }
-          );
-        policyTemplate.value = data;
-      }
-    } else {
-      setTimeout(() => {
-        policyTemplate.value = undefined;
-        handleResetForm();
-        handleResetSettingForm();
-      }, 100);
-    }
-  }
-);
-
-const onVisibleChange = (visible: boolean) => {
-  emit("update:visible", visible);
-  if (!visible) {
-    emit("close");
-  }
-};
+const modalTitle = props.policy
+  ? t("core.attachment.policy_editing_modal.titles.update", {
+      policy: props.policy?.spec.displayName,
+    })
+  : t("core.attachment.policy_editing_modal.titles.create", {
+      policy_template: policyTemplate.value?.spec?.displayName,
+    });
 </script>
 <template>
-  <VModal
-    :title="modalTitle"
-    :visible="visible"
-    :width="600"
-    @update:visible="onVisibleChange"
-  >
+  <VModal ref="modal" :title="modalTitle" :width="600" @close="emit('close')">
     <div>
-      <FormKit
-        v-if="formSchema && configMapFormData"
-        id="attachment-policy-form"
-        v-model="configMapFormData['default']"
-        name="attachment-policy-form"
-        :actions="false"
-        :preserve="true"
-        type="form"
-        :config="{ validationVisibility: 'submit' }"
-        @submit="handleSave"
-      >
+      <VLoading v-if="isLoading" />
+      <template v-else>
         <FormKit
-          id="displayNameInput"
-          v-model="formState.spec.displayName"
-          :label="
-            $t('core.attachment.policy_editing_modal.fields.display_name.label')
-          "
-          type="text"
-          name="displayName"
-          validation="required|length:0,50"
-        ></FormKit>
-        <FormKitSchema
-          :schema="toRaw(formSchema)"
-          :data="configMapFormData['default']"
-        />
-      </FormKit>
+          v-if="formSchema && configMapFormData"
+          id="attachment-policy-form"
+          v-model="configMapFormData['default']"
+          name="attachment-policy-form"
+          :actions="false"
+          :preserve="true"
+          type="form"
+          :config="{ validationVisibility: 'submit' }"
+          @submit="handleSave"
+        >
+          <FormKit
+            id="displayNameInput"
+            v-model="formState.spec.displayName"
+            :label="
+              $t(
+                'core.attachment.policy_editing_modal.fields.display_name.label'
+              )
+            "
+            type="text"
+            name="displayName"
+            validation="required|length:0,50"
+          ></FormKit>
+          <FormKitSchema
+            :schema="toRaw(formSchema)"
+            :data="configMapFormData['default']"
+          />
+        </FormKit>
+      </template>
     </div>
 
     <template #footer>
       <VSpace>
         <SubmitButton
-          v-if="visible"
-          :loading="saving"
+          :loading="submitting"
           type="secondary"
           :text="$t('core.common.buttons.submit')"
           @submit="$formkit.submit('attachment-policy-form')"
         >
         </SubmitButton>
-        <VButton @click="onVisibleChange(false)">
+        <VButton @click="modal.close()">
           {{ $t("core.common.buttons.cancel_and_shortcut") }}
         </VButton>
       </VSpace>
