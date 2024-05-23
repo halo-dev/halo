@@ -6,6 +6,8 @@ core:
         placeholder: Username
       password:
         placeholder: Password
+      remember_me:
+        label: Remember Me
     operations:
       submit:
         toast_success: Login successful
