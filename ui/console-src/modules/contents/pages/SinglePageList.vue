@@ -1,22 +1,23 @@
 <script lang="ts" setup>
 import {
+  Dialog,
+  IconAddCircle,
   IconArrowLeft,
   IconArrowRight,
-  IconAddCircle,
-  IconRefreshLine,
   IconPages,
+  IconRefreshLine,
+  Toast,
   VButton,
   VCard,
-  VPagination,
-  VSpace,
-  Dialog,
   VEmpty,
   VLoading,
   VPageHeader,
-  Toast,
+  VPagination,
+  VSpace,
 } from "@halo-dev/components";
 import SinglePageSettingModal from "./components/SinglePageSettingModal.vue";
-import { computed, ref, watch } from "vue";
+import type { Ref } from "vue";
+import { computed, provide, ref, watch } from "vue";
 import type { ListedSinglePage, SinglePage } from "@halo-dev/api-client";
 import { apiClient } from "@/utils/api-client";
 import { singlePageLabels } from "@/constants/labels";
@@ -24,8 +25,6 @@ import { useQuery } from "@tanstack/vue-query";
 import { useI18n } from "vue-i18n";
 import UserFilterDropdown from "@/components/filter/UserFilterDropdown.vue";
 import SinglePageListItem from "./components/SinglePageListItem.vue";
-import { provide } from "vue";
-import type { Ref } from "vue";
 import { useRouteQuery } from "@vueuse/router";
 
 const { t } = useI18n();
@@ -156,6 +155,7 @@ const handleOpenSettingModal = async (singlePage: SinglePage) => {
 
 const onSettingModalClose = () => {
   selectedSinglePage.value = undefined;
+  settingModal.value = false;
   refetch();
 };
 
@@ -271,7 +271,7 @@ watch(selectedPageNames, (newValue) => {
 
 <template>
   <SinglePageSettingModal
-    v-model:visible="settingModal"
+    v-if="settingModal"
     :single-page="selectedSinglePage"
     @close="onSettingModalClose"
   >
