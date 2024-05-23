@@ -1,28 +1,30 @@
 <script lang="ts" setup>
 import {
-  VAvatar,
-  VTag,
-  VEntityField,
-  VEntity,
   Dialog,
-  VStatusDot,
-  VDropdownItem,
   IconReplyLine,
   Toast,
+  VAvatar,
+  VDropdownItem,
+  VEntity,
+  VEntityField,
+  VStatusDot,
+  VTag,
 } from "@halo-dev/components";
-import type { ListedReply } from "@halo-dev/api-client";
+import type { ListedComment, ListedReply } from "@halo-dev/api-client";
 import { formatDatetime } from "@/utils/date";
 import { apiClient } from "@/utils/api-client";
-import { computed, inject, type Ref } from "vue";
+import { computed, inject, ref, type Ref } from "vue";
 import { cloneDeep } from "lodash-es";
 import { useI18n } from "vue-i18n";
 import { useQueryClient } from "@tanstack/vue-query";
+import ReplyCreationModal from "./ReplyCreationModal.vue";
 
 const { t } = useI18n();
 const queryClient = useQueryClient();
 
 const props = withDefaults(
   defineProps<{
+    comment: ListedComment;
     reply: ListedReply;
     replies?: ListedReply[];
   }>(),
@@ -31,10 +33,6 @@ const props = withDefaults(
     replies: undefined,
   }
 );
-
-const emit = defineEmits<{
-  (event: "reply", reply: ListedReply): void;
-}>();
 
 const quoteReply = computed(() => {
   const { quoteReply: replyName } = props.reply.reply.spec;
@@ -90,10 +88,6 @@ const handleApprove = async () => {
   }
 };
 
-const handleTriggerReply = () => {
-  emit("reply", props.reply);
-};
-
 // Show hovered reply
 const hoveredReply = inject<Ref<ListedReply | undefined>>("hoveredReply");
 
@@ -108,9 +102,25 @@ const isHoveredReply = computed(() => {
     hoveredReply?.value?.reply.metadata.name === props.reply.reply.metadata.name
   );
 });
+
+// Create reply
+const replyModal = ref(false);
+
+function onReplyCreationModalClose() {
+  queryClient.invalidateQueries({
+    queryKey: ["comment-replies", props.comment.comment.metadata.name],
+  });
+  replyModal.value = false;
+}
 </script>
 
 <template>
+  <ReplyCreationModal
+    v-if="replyModal"
+    :comment="comment"
+    :reply="reply"
+    @close="onReplyCreationModalClose"
+  />
   <VEntity class="!px-0 !py-2" :class="{ 'animate-breath': isHoveredReply }">
     <template #start>
       <VEntityField>
@@ -150,7 +160,7 @@ const isHoveredReply = computed(() => {
             <div class="flex items-center gap-3 text-xs">
               <span
                 class="select-none text-gray-700 hover:text-gray-900"
-                @click="handleTriggerReply"
+                @click="replyModal = true"
               >
                 {{ $t("core.comment.operations.reply.button") }}
               </span>
