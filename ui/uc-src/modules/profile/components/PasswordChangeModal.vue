@@ -1,26 +1,12 @@
 <script lang="ts" setup>
 import { VButton, VModal, VSpace } from "@halo-dev/components";
 import SubmitButton from "@/components/button/SubmitButton.vue";
-import { ref, watch } from "vue";
-import type { User } from "@halo-dev/api-client";
+import { onMounted, ref } from "vue";
 import { apiClient } from "@/utils/api-client";
 import { cloneDeep } from "lodash-es";
-import { reset } from "@formkit/core";
 import { setFocus } from "@/formkit/utils/focus";
 
-const props = withDefaults(
-  defineProps<{
-    visible: boolean;
-    user?: User;
-  }>(),
-  {
-    visible: false,
-    user: undefined,
-  }
-);
-
 const emit = defineEmits<{
-  (event: "update:visible", visible: boolean): void;
   (event: "close"): void;
 }>();
 
@@ -30,41 +16,22 @@ interface PasswordChangeFormState {
   password_confirm?: string;
 }
 
-const initialFormState: PasswordChangeFormState = {
+const modal = ref<InstanceType<typeof VModal>>();
+
+const formState = ref<PasswordChangeFormState>({
   oldPassword: "",
   password: "",
   password_confirm: "",
-};
+});
+const isSubmitting = ref(false);
 
-const formState = ref<PasswordChangeFormState>(cloneDeep(initialFormState));
-const saving = ref(false);
-
-watch(
-  () => props.visible,
-  (visible) => {
-    if (visible) {
-      setFocus("passwordInput");
-    } else {
-      handleResetForm();
-    }
-  }
-);
-
-const onVisibleChange = (visible: boolean) => {
-  emit("update:visible", visible);
-  if (!visible) {
-    emit("close");
-  }
-};
-
-const handleResetForm = () => {
-  formState.value = cloneDeep(initialFormState);
-  reset("password-form");
-};
+onMounted(() => {
+  setFocus("passwordInput");
+});
 
 const handleChangePassword = async () => {
   try {
-    saving.value = true;
+    isSubmitting.value = true;
 
     const changeOwnPasswordRequest = cloneDeep(formState.value);
     delete changeOwnPasswordRequest.password_confirm;
@@ -77,17 +44,17 @@ const handleChangePassword = async () => {
   } catch (e) {
     console.error(e);
   } finally {
-    saving.value = false;
+    isSubmitting.value = false;
   }
 };
 </script>
 
 <template>
   <VModal
-    :visible="visible"
+    ref="modal"
     :width="500"
     :title="$t('core.uc_profile.change_password_modal.title')"
-    @update:visible="onVisibleChange"
+    @close="emit('close')"
   >
     <FormKit
       id="password-form"
@@ -135,14 +102,13 @@ const handleChangePassword = async () => {
     <template #footer>
       <VSpace>
         <SubmitButton
-          v-if="visible"
-          :loading="saving"
+          :loading="isSubmitting"
           type="secondary"
           :text="$t('core.common.buttons.submit')"
           @submit="$formkit.submit('password-form')"
         >
         </SubmitButton>
-        <VButton @click="onVisibleChange(false)">
+        <VButton @click="modal?.close()">
           {{ $t("core.common.buttons.cancel_and_shortcut") }}
         </VButton>
       </VSpace>
