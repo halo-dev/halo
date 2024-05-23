@@ -1,18 +1,18 @@
 <script lang="ts" setup>
 import {
   Dialog,
-  VAvatar,
-  VButton,
-  VEntity,
-  VEntityField,
-  VStatusDot,
-  VSpace,
-  VEmpty,
   IconAddCircle,
   IconExternalLinkLine,
-  VLoading,
   Toast,
+  VAvatar,
+  VButton,
   VDropdownItem,
+  VEmpty,
+  VEntity,
+  VEntityField,
+  VLoading,
+  VSpace,
+  VStatusDot,
   VTag,
 } from "@halo-dev/components";
 import ReplyCreationModal from "./ReplyCreationModal.vue";
@@ -24,7 +24,7 @@ import type {
   SinglePage,
 } from "@halo-dev/api-client";
 import { formatDatetime } from "@/utils/date";
-import { computed, provide, ref, onMounted, type Ref } from "vue";
+import { computed, onMounted, provide, ref, type Ref } from "vue";
 import ReplyListItem from "./ReplyListItem.vue";
 import { apiClient } from "@/utils/api-client";
 import { cloneDeep } from "lodash-es";
@@ -33,9 +33,9 @@ import { useQuery, useQueryClient } from "@tanstack/vue-query";
 import { useI18n } from "vue-i18n";
 import { usePluginModuleStore } from "@/stores/plugin";
 import type {
-  PluginModule,
   CommentSubjectRefProvider,
   CommentSubjectRefResult,
+  PluginModule,
 } from "@halo-dev/console-shared";
 
 const { currentUserHasPermission } = usePermission();
@@ -48,12 +48,10 @@ const props = withDefaults(
     isSelected?: boolean;
   }>(),
   {
-    comment: undefined,
     isSelected: false,
   }
 );
 
-const selectedReply = ref<ListedReply>();
 const hoveredReply = ref<ListedReply>();
 const showReplies = ref(false);
 const replyModal = ref(false);
@@ -182,23 +180,14 @@ const handleToggleShowReplies = async () => {
   }
 };
 
-const handleTriggerReply = () => {
-  replyModal.value = true;
-};
-
-const onTriggerReply = (reply: ListedReply) => {
-  selectedReply.value = reply;
-  replyModal.value = true;
-};
-
 const onReplyCreationModalClose = () => {
-  selectedReply.value = undefined;
-
   queryClient.invalidateQueries({ queryKey: ["comments"] });
 
   if (showReplies.value) {
     refetch();
   }
+
+  replyModal.value = false;
 };
 
 // Subject ref processing
@@ -287,10 +276,8 @@ const subjectRefResult = computed(() => {
 
 <template>
   <ReplyCreationModal
-    :key="comment?.comment.metadata.name"
-    v-model:visible="replyModal"
+    v-if="replyModal"
     :comment="comment"
-    :reply="selectedReply"
     @close="onReplyCreationModalClose"
   />
   <VEntity :is-selected="isSelected" :class="{ 'hover:bg-white': showReplies }">
@@ -364,7 +351,7 @@ const subjectRefResult = computed(() => {
               />
               <span
                 class="select-none text-gray-700 hover:text-gray-900"
-                @click="handleTriggerReply"
+                @click="replyModal = true"
               >
                 {{ $t("core.comment.operations.reply.button") }}
               </span>
@@ -458,8 +445,8 @@ const subjectRefResult = computed(() => {
               :key="reply.reply.metadata.name"
               :class="{ 'hover:bg-white': showReplies }"
               :reply="reply"
+              :comment="comment"
               :replies="replies"
-              @reply="onTriggerReply"
             ></ReplyListItem>
           </div>
         </Transition>

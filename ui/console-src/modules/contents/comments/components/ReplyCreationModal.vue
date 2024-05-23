@@ -1,11 +1,11 @@
 <script lang="ts" setup>
 import {
-  VModal,
-  VSpace,
-  VButton,
   IconMotionLine,
   Toast,
+  VButton,
   VDropdown,
+  VModal,
+  VSpace,
 } from "@halo-dev/components";
 import SubmitButton from "@/components/button/SubmitButton.vue";
 import type {
@@ -16,9 +16,7 @@ import type {
 // @ts-ignore
 import { Picker } from "emoji-mart";
 import i18n from "@emoji-mart/data/i18n/zh.json";
-import { computed, nextTick, ref, watch, watchEffect } from "vue";
-import { reset } from "@formkit/core";
-import { cloneDeep } from "lodash-es";
+import { onMounted, ref } from "vue";
 import { setFocus } from "@/formkit/utils/focus";
 import { apiClient } from "@/utils/api-client";
 import { useI18n } from "vue-i18n";
@@ -27,7 +25,6 @@ const { t } = useI18n();
 
 const props = withDefaults(
   defineProps<{
-    visible?: boolean;
     comment?: ListedComment;
     reply?: ListedReply;
   }>(),
@@ -39,76 +36,38 @@ const props = withDefaults(
 );
 
 const emit = defineEmits<{
-  (event: "update:visible", visible: boolean): void;
   (event: "close"): void;
 }>();
 
-const initialFormState: ReplyRequest = {
+const modal = ref();
+const formState = ref<ReplyRequest>({
   raw: "",
   content: "",
   allowNotification: true,
   quoteReply: undefined,
-};
-
-const formState = ref<ReplyRequest>(cloneDeep(initialFormState));
+});
 const saving = ref(false);
 
-watch(
-  () => formState.value.raw,
-  (newValue) => {
-    formState.value.content = newValue;
-  }
-);
-
-const formId = computed(() => {
-  return `comment-reply-form-${[
-    props.comment?.comment.metadata.name,
-    props.reply?.reply.metadata.name,
-  ].join("-")}`;
+onMounted(() => {
+  setFocus("content-input");
 });
-
-const contentInputId = computed(() => {
-  return `content-input-${[
-    props.comment?.comment.metadata.name,
-    props.reply?.reply.metadata.name,
-  ].join("-")}`;
-});
-
-const onVisibleChange = (visible: boolean) => {
-  emit("update:visible", visible);
-  if (!visible) {
-    emit("close");
-  }
-};
-
-const handleResetForm = () => {
-  formState.value = cloneDeep(initialFormState);
-  reset(formId.value);
-};
-
-watch(
-  () => props.visible,
-  async (visible) => {
-    if (visible) {
-      await nextTick();
-      setFocus(contentInputId.value);
-    } else {
-      handleResetForm();
-    }
-  }
-);
 
 const handleCreateReply = async () => {
   try {
     saving.value = true;
+
     if (props.reply) {
       formState.value.quoteReply = props.reply.reply.metadata.name;
     }
+
+    formState.value.content = formState.value.raw;
+
     await apiClient.comment.createReply({
       name: props.comment?.comment.metadata.name as string,
       replyRequest: formState.value,
     });
-    onVisibleChange(false);
+
+    modal.value.close();
 
     Toast.success(
       t("core.comment.reply_modal.operations.submit.toast_success")
@@ -123,57 +82,56 @@ const handleCreateReply = async () => {
 // Emoji picker
 const emojiPickerRef = ref<HTMLElement | null>(null);
 
-const handleCreateEmojiPicker = () => {
+const handleCreateEmojiPicker = async () => {
+  if (emojiPickerRef.value?.childElementCount) {
+    return;
+  }
+
+  const data = await import("@emoji-mart/data");
+
   const emojiPicker = new Picker({
-    data: async () => {
-      const data = await import("@emoji-mart/data");
-      return Object.assign({}, data);
-    },
+    data: Object.assign({}, data),
     theme: "light",
     autoFocus: true,
     i18n: i18n,
     onEmojiSelect: onEmojiSelect,
   });
+
   emojiPickerRef.value?.appendChild(emojiPicker as unknown as Node);
 };
 
 const onEmojiSelect = (emoji: { native: string }) => {
   formState.value.raw += emoji.native;
-  setFocus(contentInputId.value);
+  setFocus("content-input");
 };
-
-watchEffect(() => {
-  if (emojiPickerRef.value) {
-    handleCreateEmojiPicker();
-  }
-});
 </script>
 
 <template>
   <VModal
+    ref="modal"
     :title="$t('core.comment.reply_modal.title')"
-    :visible="visible"
     :width="500"
-    @update:visible="onVisibleChange"
+    @close="emit('close')"
   >
     <FormKit
-      :id="formId"
-      :name="formId"
+      id="create-reply-form"
+      name="create-reply-form"
       type="form"
       :config="{ validationVisibility: 'submit' }"
       @submit="handleCreateReply"
     >
       <FormKit
-        :id="contentInputId"
+        id="content-input"
         v-model="formState.raw"
         type="textarea"
         :validation-label="$t('core.comment.reply_modal.fields.content.label')"
         :rows="6"
+        value=""
         validation="required|length:0,1024"
       ></FormKit>
     </FormKit>
     <div class="mt-2 flex justify-end">
-      <VDropdown :classes="['!p-0']">
+      <VDropdown :classes="['!p-0']" @show="handleCreateEmojiPicker">
         <IconMotionLine
           class="h-5 w-5 cursor-pointer text-gray-500 transition-all hover:text-gray-900"
         />
@@ -185,14 +143,13 @@ watchEffect(() => {
     <template #footer>
       <VSpace>
         <SubmitButton
-          v-if="visible"
           :loading="saving"
           type="secondary"
           :text="$t('core.common.buttons.submit')"
-          @submit="$formkit.submit(formId)"
+          @submit="$formkit.submit('create-reply-form')"
         >
         </SubmitButton>
-        <VButton @click="onVisibleChange(false)">
+        <VButton @click="modal.close()">
           {{ $t("core.common.buttons.cancel_and_shortcut") }}
         </VButton>
       </VSpace>
