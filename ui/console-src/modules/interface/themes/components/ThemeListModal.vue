@@ -2,14 +2,14 @@
 import { VButton, VModal, VTabbar } from "@halo-dev/components";
 import {
   computed,
-  ref,
-  watch,
-  provide,
   inject,
   markRaw,
   nextTick,
   onMounted,
+  provide,
+  ref,
   type Ref,
+  watch,
 } from "vue";
 import type { Theme } from "@halo-dev/api-client";
 import { useI18n } from "vue-i18n";
@@ -25,32 +25,14 @@ import { usePermission } from "@/utils/permission";
 const { t } = useI18n();
 const { currentUserHasPermission } = usePermission();
 
-const props = withDefaults(
-  defineProps<{
-    visible: boolean;
-  }>(),
-  {
-    visible: false,
-  }
-);
-
 const selectedTheme = inject<Ref<Theme | undefined>>("selectedTheme", ref());
 
-watch(
-  () => selectedTheme.value,
-  (value, oldValue) => {
-    if (value && oldValue) {
-      emit("select", value);
-      onVisibleChange(false);
-    }
-  }
-);
-
 const emit = defineEmits<{
-  (event: "update:visible", visible: boolean): void;
   (event: "close"): void;
   (event: "select", theme: Theme | undefined): void;
 }>();
+
+const modal = ref();
 
 const tabs = ref<ThemeListTab[]>([
   {
@@ -79,6 +61,16 @@ const tabs = ref<ThemeListTab[]>([
   },
 ]);
 
+watch(
+  () => selectedTheme.value,
+  (value, oldValue) => {
+    if (value && oldValue) {
+      emit("select", value);
+      modal.value.close();
+    }
+  }
+);
+
 const activeTabId = ref();
 
 provide<Ref<string>>("activeTabId", activeTabId);
@@ -88,25 +80,16 @@ const modalTitle = computed(() => {
   return tab?.label;
 });
 
-const onVisibleChange = (visible: boolean) => {
-  emit("update:visible", visible);
-  if (!visible) {
-    emit("close");
-  }
-};
-
 // handle remote wordpress url from route
 const remoteDownloadUrl = useRouteQuery<string>("remote-download-url");
-watch(
-  () => props.visible,
-  (visible) => {
-    if (visible && remoteDownloadUrl.value) {
-      nextTick(() => {
-        activeTabId.value = "remote-download";
-      });
-    }
+
+onMounted(() => {
+  if (remoteDownloadUrl.value) {
+    nextTick(() => {
+      activeTabId.value = "remote-download";
+    });
   }
-);
+});
 
 const { pluginModules } = usePluginModuleStore();
 onMounted(() => {
@@ -135,11 +118,11 @@ onMounted(() => {
 </script>
 <template>
   <VModal
-    :visible="visible"
+    ref="modal"
     :width="920"
     height="calc(100vh - 20px)"
     :title="modalTitle"
-    @update:visible="onVisibleChange"
+    @close="emit('close')"
   >
     <VTabbar
       v-model:active-id="activeTabId"
@@ -162,7 +145,7 @@ onMounted(() => {
     </div>
 
     <template #footer>
-      <VButton @click="onVisibleChange(false)">
+      <VButton @click="modal.close()">
         {{ $t("core.common.buttons.close") }}
       </VButton>
     </template>

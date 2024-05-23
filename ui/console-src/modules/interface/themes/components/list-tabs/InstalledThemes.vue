@@ -3,12 +3,12 @@ import {
   IconAddCircle,
   VButton,
   VEmpty,
-  VSpace,
   VLoading,
+  VSpace,
 } from "@halo-dev/components";
 import ThemePreviewModal from "../preview/ThemePreviewModal.vue";
 import ThemeListItem from "../ThemeListItem.vue";
-import { ref, inject, type Ref } from "vue";
+import { inject, ref, type Ref } from "vue";
 import type { Theme } from "@halo-dev/api-client";
 import { apiClient } from "@/utils/api-client";
 import { useQuery } from "@tanstack/vue-query";
@@ -48,11 +48,11 @@ const {
     });
   },
   refetchInterval(data) {
-    const deletingThemes = data?.filter(
+    const hasDeletingTheme = data?.some(
       (theme) => !!theme.metadata.deletionTimestamp
     );
 
-    return deletingThemes?.length ? 1000 : false;
+    return hasDeletingTheme ? 1000 : false;
   },
 });
 
