@@ -6,7 +6,7 @@ import {
   VModal,
   VSpace,
 } from "@halo-dev/components";
-import { computed, nextTick, ref, toRaw, watch } from "vue";
+import { computed, nextTick, ref, watch } from "vue";
 import type { SinglePage } from "@halo-dev/api-client";
 import { cloneDeep } from "lodash-es";
 import { apiClient } from "@/utils/api-client";
@@ -21,7 +21,28 @@ import { useI18n } from "vue-i18n";
 import { usePageUpdateMutate } from "../composables/use-page-update-mutate";
 import { FormType } from "@/types/slug";
 
-const initialFormState: SinglePage = {
+const props = withDefaults(
+  defineProps<{
+    singlePage?: SinglePage;
+    publishSupport?: boolean;
+    onlyEmit?: boolean;
+  }>(),
+  {
+    singlePage: undefined,
+    publishSupport: true,
+    onlyEmit: false,
+  }
+);
+
+const emit = defineEmits<{
+  (event: "close"): void;
+  (event: "saved", singlePage: SinglePage): void;
+  (event: "published", singlePage: SinglePage): void;
+}>();
+
+const { t } = useI18n();
+
+const formState = ref<SinglePage>({
   spec: {
     title: "",
     slug: "",
@@ -45,49 +66,15 @@ const initialFormState: SinglePage = {
   metadata: {
     name: randomUUID(),
   },
-};
-
-const props = withDefaults(
-  defineProps<{
-    visible: boolean;
-    singlePage?: SinglePage;
-    publishSupport?: boolean;
-    onlyEmit?: boolean;
-  }>(),
-  {
-    visible: false,
-    singlePage: undefined,
-    publishSupport: true,
-    onlyEmit: false,
-  }
-);
-
-const emit = defineEmits<{
-  (event: "update:visible", visible: boolean): void;
-  (event: "close"): void;
-  (event: "saved", singlePage: SinglePage): void;
-  (event: "published", singlePage: SinglePage): void;
-}>();
-
-const { t } = useI18n();
-
-const formState = ref<SinglePage>(cloneDeep(initialFormState));
+});
+const modal = ref();
 const saving = ref(false);
 const publishing = ref(false);
 const publishCanceling = ref(false);
 const submitType = ref<"publish" | "save">();
 const publishTime = ref<string | undefined>(undefined);
 
-const isUpdateMode = computed(() => {
-  return !!formState.value.metadata.creationTimestamp;
-});
-
-const onVisibleChange = (visible: boolean) => {
-  emit("update:visible", visible);
-  if (!visible) {
-    emit("close");
-  }
-};
+const isUpdateMode = !!props.singlePage;
 
 const annotationsFormRef = ref<InstanceType<typeof AnnotationsForm>>();
 
@@ -138,13 +125,14 @@ const handleSave = async () => {
 
   if (props.onlyEmit) {
     emit("saved", formState.value);
+    modal.value.close();
     return;
   }
 
   try {
     saving.value = true;
 
-    const { data } = isUpdateMode.value
+    const { data } = isUpdateMode
       ? await singlePageUpdateMutate(formState.value)
       : await apiClient.extension.singlePage.createcontentHaloRunV1alpha1SinglePage(
           {
@@ -155,7 +143,7 @@ const handleSave = async () => {
     formState.value = data;
     emit("saved", data);
 
-    onVisibleChange(false);
+    modal.value.close();
 
     Toast.success(t("core.common.toast.save_success"));
   } catch (error) {
@@ -182,6 +170,7 @@ const handlePublish = async () => {
 
   if (props.onlyEmit) {
     emit("published", formState.value);
+    modal.value.close();
     return;
   }
 
@@ -206,7 +195,7 @@ const handlePublish = async () => {
 
     emit("published", data);
 
-    onVisibleChange(false);
+    modal.value.close();
 
     Toast.success(t("core.common.toast.publish_success"));
   } catch (error) {
@@ -238,7 +227,7 @@ const handleUnpublish = async () => {
 
     formState.value = data;
 
-    onVisibleChange(false);
+    modal.value.close();
 
     Toast.success(t("core.common.toast.cancel_publish_success"));
   } catch (error) {
@@ -252,7 +241,7 @@ watch(
   () => props.singlePage,
   (value) => {
     if (value) {
-      formState.value = toRaw(value);
+      formState.value = cloneDeep(value);
       publishTime.value = toDatetimeLocal(formState.value.spec.publishTime);
     }
   },
@@ -282,18 +271,18 @@ const { handleGenerateSlug } = useSlugify(
       formState.value.spec.slug = value;
     },
   }),
-  computed(() => !isUpdateMode.value),
+  computed(() => !isUpdateMode),
   FormType.SINGLE_PAGE
 );
 </script>
 
 <template>
   <VModal
-    :visible="visible"
+    ref="modal"
     :width="700"
     :title="$t('core.page.settings.title')"
     :centered="false"
-    @update:visible="onVisibleChange"
+    @close="emit('close')"
   >
     <template #actions>
       <slot name="actions"></slot>
@@ -492,7 +481,7 @@ const { handleGenerateSlug } = useSlugify(
         <VButton :loading="saving" type="secondary" @click="handleSaveClick">
           {{ $t("core.common.buttons.save") }}
         </VButton>
-        <VButton type="default" @click="onVisibleChange(false)">
+        <VButton type="default" @click="modal.close()">
           {{ $t("core.common.buttons.close") }}
         </VButton>
       </VSpace>

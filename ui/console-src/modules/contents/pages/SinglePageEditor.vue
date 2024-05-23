@@ -319,7 +319,6 @@ const onSettingSaved = (page: SinglePage) => {
   }
 
   formState.value.page = page;
-  settingModal.value = false;
 
   if (!isUpdateMode.value) {
     handleSave();
@@ -328,7 +327,6 @@ const onSettingSaved = (page: SinglePage) => {
 
 const onSettingPublished = (singlePage: SinglePage) => {
   formState.value.page = singlePage;
-  settingModal.value = false;
   handlePublish();
 };
 
@@ -426,10 +424,11 @@ async function handleUploadImage(file: File, options?: AxiosRequestConfig) {
 
 <template>
   <SinglePageSettingModal
-    v-model:visible="settingModal"
+    v-if="settingModal"
     :single-page="formState.page"
     :publish-support="!isUpdateMode"
     :only-emit="!isUpdateMode"
+    @close="settingModal = false"
     @saved="onSettingSaved"
     @published="onSettingPublished"
   />
