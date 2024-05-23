@@ -14,13 +14,11 @@ import com.google.common.base.Splitter;
 import java.util.Collections;
 import java.util.List;
 import lombok.Data;
+import lombok.experimental.UtilityClass;
 import org.apache.commons.lang3.StringUtils;
 import run.halo.app.infra.utils.JsonUtils;
 
-/**
- * @author guqing
- * @since 2.0.0
- */
+@UtilityClass
 public class PatchUtils {
     private static final String DELIMITER = "\n";
     private static final Splitter lineSplitter = Splitter.on(DELIMITER);
