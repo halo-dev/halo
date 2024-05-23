@@ -295,7 +295,10 @@ onMounted(() => {
       </Teleport>
     </div>
   </div>
-  <GlobalSearchModal v-model:visible="globalSearchVisible" />
+  <GlobalSearchModal
+    v-if="globalSearchVisible"
+    @close="globalSearchVisible = false"
+  />
   <LoginModal />
 </template>
 
