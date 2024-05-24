@@ -3,6 +3,7 @@ package run.halo.app.plugin;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.support.GenericApplicationContext;
 import org.springframework.security.web.server.context.ServerSecurityContextRepository;
+import run.halo.app.content.PostContentService;
 import run.halo.app.core.extension.service.AttachmentService;
 import run.halo.app.extension.DefaultSchemeManager;
 import run.halo.app.extension.ExtensionClient;
@@ -53,6 +54,8 @@ public enum SharedApplicationContextFactory {
             rootContext.getBean(NotificationCenter.class));
         beanFactory.registerSingleton("externalLinkProcessor",
             rootContext.getBean(ExternalLinkProcessor.class));
+        beanFactory.registerSingleton("postContentService",
+            rootContext.getBean(PostContentService.class));
         // TODO add more shared instance here
 
         sharedContext.refresh();
