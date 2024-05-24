@@ -29,7 +29,7 @@ import ReplyListItem from "./ReplyListItem.vue";
 import { apiClient } from "@/utils/api-client";
 import { cloneDeep } from "lodash-es";
 import { usePermission } from "@/utils/permission";
-import { useQuery, useQueryClient } from "@tanstack/vue-query";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/vue-query";
 import { useI18n } from "vue-i18n";
 import { usePluginModuleStore } from "@/stores/plugin";
 import type {
@@ -163,21 +163,41 @@ const {
   enabled: computed(() => showReplies.value),
 });
 
+const { mutateAsync: updateCommentLastReadTimeMutate } = useMutation({
+  mutationKey: ["update-comment-last-read-time"],
+  mutationFn: async () => {
+    const { data: latestComment } =
+      await apiClient.extension.comment.getContentHaloRunV1alpha1Comment({
+        name: props.comment.comment.metadata.name,
+      });
+
+    if (!latestComment.status?.unreadReplyCount) {
+      return latestComment;
+    }
+
+    latestComment.spec.lastReadTime = new Date().toISOString();
+
+    return apiClient.extension.comment.updateContentHaloRunV1alpha1Comment(
+      {
+        name: latestComment.metadata.name,
+        comment: latestComment,
+      },
+      {
+        mute: true,
+      }
+    );
+  },
+  retry: 3,
+});
+
 const handleToggleShowReplies = async () => {
   showReplies.value = !showReplies.value;
-  if (showReplies.value) {
-    // update last read time
-    if (props.comment.comment.status?.unreadReplyCount) {
-      const commentToUpdate = cloneDeep(props.comment.comment);
-      commentToUpdate.spec.lastReadTime = new Date().toISOString();
-      await apiClient.extension.comment.updateContentHaloRunV1alpha1Comment({
-        name: commentToUpdate.metadata.name,
-        comment: commentToUpdate,
-      });
-    }
-  } else {
-    queryClient.invalidateQueries({ queryKey: ["comments"] });
+
+  if (props.comment.comment.status?.unreadReplyCount) {
+    await updateCommentLastReadTimeMutate();
   }
+
+  queryClient.invalidateQueries({ queryKey: ["comments"] });
 };
 
 const onReplyCreationModalClose = () => {
