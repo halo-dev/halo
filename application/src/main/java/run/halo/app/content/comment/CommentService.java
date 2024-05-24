@@ -19,4 +19,6 @@ public interface CommentService {
     Mono<Comment> create(Comment comment);
 
     Mono<Void> removeBySubject(@NonNull Ref subjectRef);
+
+    Mono<Void> markRepliesAsRead(String commentName);
 }

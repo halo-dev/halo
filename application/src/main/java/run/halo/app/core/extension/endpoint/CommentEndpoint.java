@@ -125,9 +125,12 @@ public class CommentEndpoint implements CustomEndpoint {
                 if (reply.getSpec().getHidden() == null) {
                     reply.getSpec().setHidden(false);
                 }
-                return replyService.create(commentName, reply);
+                return replyService.create(commentName, reply)
+                    .flatMap(created -> commentService.markRepliesAsRead(commentName)
+                        .thenReturn(created)
+                    );
             })
-            .flatMap(comment -> ServerResponse.ok().bodyValue(comment));
+            .flatMap(reply -> ServerResponse.ok().bodyValue(reply));
     }
 
 }

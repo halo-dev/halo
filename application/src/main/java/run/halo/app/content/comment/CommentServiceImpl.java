@@ -153,6 +153,19 @@ public class CommentServiceImpl implements CommentService {
         return cleanupComments(subjectRef, 200);
     }
 
+    @Override
+    public Mono<Void> markRepliesAsRead(String commentName) {
+        return Mono.defer(() -> client.get(Comment.class, commentName)
+                .flatMap(comment -> {
+                    comment.getSpec().setLastReadTime(Instant.now());
+                    return client.update(comment);
+                })
+            )
+            .retryWhen(Retry.backoff(8, Duration.ofMillis(100))
+                .filter(OptimisticLockingFailureException.class::isInstance))
+            .then();
+    }
+
     private Mono<Void> cleanupComments(Ref subjectRef, int batchSize) {
         // ascending order by creation time and name
         final var pageRequest = PageRequestImpl.of(1, batchSize,
