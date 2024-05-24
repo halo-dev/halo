@@ -68,6 +68,7 @@ const { data: snapshot, isLoading } = useQuery({
     margin: 0;
 
     code {
+      color: #ccc;
       background: none;
       font-size: 0.8rem;
       padding: 0 !important;
