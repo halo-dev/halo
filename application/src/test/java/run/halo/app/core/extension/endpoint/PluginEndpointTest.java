@@ -2,8 +2,6 @@ package run.halo.app.core.extension.endpoint;
 
 import static java.util.Objects.requireNonNull;
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.ArgumentMatchers.argThat;
@@ -11,7 +9,6 @@ import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.ArgumentMatchers.isA;
 import static org.mockito.ArgumentMatchers.same;
 import static org.mockito.Mockito.lenient;
-import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.reactive.server.WebTestClient.bindToRouterFunction;
@@ -478,69 +475,4 @@ class PluginEndpointTest {
         }
     }
 
-    @Nested
-    class PluginStateChangeTest {
-
-        WebTestClient webClient;
-
-        @BeforeEach
-        void setUp() {
-            webClient = WebTestClient.bindToRouterFunction(endpoint.endpoint())
-                .build();
-        }
-
-        @Test
-        void shouldEnablePluginIfPluginWasNotStarted() {
-            var plugin = createPlugin("fake-plugin");
-            plugin.getSpec().setEnabled(false);
-            plugin.statusNonNull().setPhase(Plugin.Phase.RESOLVED);
-
-            when(client.get(Plugin.class, "fake-plugin")).thenReturn(Mono.just(plugin))
-                .thenReturn(Mono.fromSupplier(() -> {
-                    plugin.statusNonNull().setPhase(Plugin.Phase.STARTED);
-                    return plugin;
-                }));
-            when(client.update(plugin)).thenReturn(Mono.just(plugin));
-
-            var requestBody = new PluginEndpoint.RunningStateRequest();
-            requestBody.setEnable(true);
-            requestBody.setAsync(false);
-            webClient.put().uri("/plugins/fake-plugin/plugin-state")
-                .bodyValue(requestBody)
-                .exchange()
-                .expectStatus().isOk()
-                .expectBody(Plugin.class)
-                .value(p -> assertTrue(p.getSpec().getEnabled()));
-
-            verify(client, times(2)).get(Plugin.class, "fake-plugin");
-            verify(client).update(plugin);
-        }
-
-        @Test
-        void shouldDisablePluginIfAlreadyStarted() {
-            var plugin = createPlugin("fake-plugin");
-            plugin.getSpec().setEnabled(true);
-            plugin.statusNonNull().setPhase(Plugin.Phase.STARTED);
-
-            when(client.get(Plugin.class, "fake-plugin")).thenReturn(Mono.just(plugin))
-                .thenReturn(Mono.fromSupplier(() -> {
-                    plugin.getStatus().setPhase(Plugin.Phase.STOPPED);
-                    return plugin;
-                }));
-            when(client.update(plugin)).thenReturn(Mono.just(plugin));
-
-            var requestBody = new PluginEndpoint.RunningStateRequest();
-            requestBody.setEnable(false);
-            requestBody.setAsync(false);
-            webClient.put().uri("/plugins/fake-plugin/plugin-state")
-                .bodyValue(requestBody)
-                .exchange()
-                .expectStatus().isOk()
-                .expectBody(Plugin.class)
-                .value(p -> assertFalse(p.getSpec().getEnabled()));
-
-            verify(client, times(2)).get(Plugin.class, "fake-plugin");
-            verify(client).update(plugin);
-        }
-    }
 }

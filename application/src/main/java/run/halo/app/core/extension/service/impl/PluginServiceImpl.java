@@ -1,6 +1,7 @@
 package run.halo.app.core.extension.service.impl;
 
 import static java.nio.file.StandardCopyOption.REPLACE_EXISTING;
+import static org.pf4j.PluginState.STARTED;
 import static run.halo.app.plugin.PluginConst.RELOAD_ANNO;
 
 import com.github.zafarkhaja.semver.Version;
@@ -10,6 +11,7 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.time.Duration;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.HashMap;
@@ -20,7 +22,6 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.pf4j.DependencyResolver;
 import org.pf4j.PluginDescriptor;
-import org.pf4j.PluginManager;
 import org.pf4j.PluginWrapper;
 import org.pf4j.RuntimeMode;
 import org.springframework.core.io.Resource;
@@ -36,12 +37,15 @@ import reactor.core.Exceptions;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import reactor.core.scheduler.Schedulers;
+import reactor.util.retry.Retry;
 import run.halo.app.core.extension.Plugin;
 import run.halo.app.core.extension.service.PluginService;
 import run.halo.app.extension.ReactiveExtensionClient;
 import run.halo.app.infra.SystemVersionSupplier;
 import run.halo.app.infra.exception.PluginAlreadyExistsException;
+import run.halo.app.infra.exception.PluginDependenciesNotEnabledException;
 import run.halo.app.infra.exception.PluginDependencyException;
+import run.halo.app.infra.exception.PluginDependentsNotDisabledException;
 import run.halo.app.infra.exception.PluginInstallationException;
 import run.halo.app.infra.exception.UnsatisfiedAttributeValueException;
 import run.halo.app.infra.utils.FileUtils;
@@ -49,6 +53,7 @@ import run.halo.app.infra.utils.VersionUtils;
 import run.halo.app.plugin.PluginConst;
 import run.halo.app.plugin.PluginProperties;
 import run.halo.app.plugin.PluginUtils;
+import run.halo.app.plugin.SpringPluginManager;
 import run.halo.app.plugin.YamlPluginDescriptorFinder;
 import run.halo.app.plugin.YamlPluginFinder;
 import run.halo.app.plugin.resources.BundleResourceUtils;
@@ -67,7 +72,7 @@ public class PluginServiceImpl implements PluginService {
 
     private final PluginProperties pluginProperties;
 
-    private final PluginManager pluginManager;
+    private final SpringPluginManager pluginManager;
 
     @Override
     public Flux<Plugin> getPresets() {
@@ -252,6 +257,86 @@ public class PluginServiceImpl implements PluginService {
         });
     }
 
+    @Override
+    public Mono<Plugin> changeState(String pluginName, boolean requestToEnable, boolean wait) {
+        var updatedPlugin = Mono.defer(() -> client.get(Plugin.class, pluginName))
+            .flatMap(plugin -> {
+                if (!Objects.equals(requestToEnable, plugin.getSpec().getEnabled())) {
+                    // preflight check
+                    if (requestToEnable) {
+                        // make sure the dependencies are enabled
+                        var dependencies = plugin.getSpec().getPluginDependencies().keySet();
+                        var notStartedDependencies = dependencies.stream()
+                            .filter(dependency -> {
+                                var pluginWrapper = pluginManager.getPlugin(dependency);
+                                return pluginWrapper == null
+                                    || !Objects.equals(STARTED, pluginWrapper.getPluginState());
+                            })
+                            .toList();
+                        if (!CollectionUtils.isEmpty(notStartedDependencies)) {
+                            return Mono.error(
+                                new PluginDependenciesNotEnabledException(notStartedDependencies)
+                            );
+                        }
+                    } else {
+                        // make sure the dependents are disabled
+                        var dependents = pluginManager.getDependents(pluginName);
+                        var notDisabledDependents = dependents.stream()
+                            .filter(
+                                dependent -> Objects.equals(STARTED, dependent.getPluginState())
+                            )
+                            .map(PluginWrapper::getPluginId)
+                            .toList();
+                        if (!CollectionUtils.isEmpty(notDisabledDependents)) {
+                            return Mono.error(
+                                new PluginDependentsNotDisabledException(notDisabledDependents)
+                            );
+                        }
+                    }
+
+                    plugin.getSpec().setEnabled(requestToEnable);
+                    log.debug("Updating plugin {} state to {}", pluginName, requestToEnable);
+                    return client.update(plugin);
+                }
+                log.debug("Checking plugin {} state, no need to update", pluginName);
+                return Mono.just(plugin);
+            });
+
+        if (wait) {
+            // if we want to wait the state of plugin to be updated
+            updatedPlugin = updatedPlugin
+                .flatMap(plugin -> {
+                    var phase = plugin.statusNonNull().getPhase();
+                    if (requestToEnable) {
+                        // if we request to enable the plugin
+                        if (!(Plugin.Phase.STARTED.equals(phase)
+                            || Plugin.Phase.FAILED.equals(phase))) {
+                            return Mono.error(UnexpectedPluginStateException::new);
+                        }
+                    } else {
+                        // if we request to disable the plugin
+                        if (Plugin.Phase.STARTED.equals(phase)) {
+                            return Mono.error(UnexpectedPluginStateException::new);
+                        }
+                    }
+                    return Mono.just(plugin);
+                })
+                .retryWhen(
+                    Retry.backoff(10, Duration.ofMillis(100))
+                        .filter(UnexpectedPluginStateException.class::isInstance)
+                        .doBeforeRetry(signal ->
+                            log.debug("Waiting for plugin {} to meet expected state", pluginName)
+                        )
+                )
+                .doOnSuccess(plugin -> {
+                    log.info("Plugin {} met expected state {}",
+                        pluginName, plugin.statusNonNull().getPhase());
+                });
+        }
+
+        return updatedPlugin;
+    }
+
     Mono<Plugin> findPluginManifest(Path path) {
         return Mono.fromSupplier(
                 () -> {
@@ -368,4 +453,9 @@ public class PluginServiceImpl implements PluginService {
         oldPlugin.setSpec(newPlugin.getSpec());
         oldPlugin.getSpec().setEnabled(enabled);
     }
+
+    private static class UnexpectedPluginStateException extends RuntimeException {
+
+    }
+
 }
