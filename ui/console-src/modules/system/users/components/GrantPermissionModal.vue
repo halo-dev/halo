@@ -1,60 +1,51 @@
 <script lang="ts" setup>
 import { apiClient } from "@/utils/api-client";
 import type { User } from "@halo-dev/api-client";
-import { VModal, VSpace, VButton } from "@halo-dev/components";
+import { VButton, VModal, VSpace } from "@halo-dev/components";
 import SubmitButton from "@/components/button/SubmitButton.vue";
 import { ref } from "vue";
 
 const props = withDefaults(
   defineProps<{
-    visible: boolean;
     user?: User;
   }>(),
   {
-    visible: false,
     user: undefined,
   }
 );
 
 const emit = defineEmits<{
-  (event: "update:visible", visible: boolean): void;
   (event: "close"): void;
 }>();
 
+const modal = ref<InstanceType<typeof VModal>>();
 const selectedRole = ref("");
-const saving = ref(false);
+const isSubmitting = ref(false);
 
 const handleGrantPermission = async () => {
   try {
-    saving.value = true;
+    isSubmitting.value = true;
     await apiClient.user.grantPermission({
       name: props.user?.metadata.name as string,
       grantRequest: {
         roles: [selectedRole.value],
       },
     });
-    onVisibleChange(false);
+    modal.value?.close();
   } catch (error) {
     console.error("Failed to grant permission to user", error);
   } finally {
-    saving.value = false;
-  }
-};
-
-const onVisibleChange = (visible: boolean) => {
-  emit("update:visible", visible);
-  if (!visible) {
-    emit("close");
+    isSubmitting.value = false;
   }
 };
 </script>
 
 <template>
   <VModal
+    ref="modal"
     :title="$t('core.user.grant_permission_modal.title')"
-    :visible="visible"
     :width="500"
-    @update:visible="onVisibleChange"
+    @close="emit('close')"
   >
     <FormKit
       id="grant-permission-form"
@@ -72,14 +63,13 @@ const onVisibleChange = (visible: boolean) => {
     <template #footer>
       <VSpace>
         <SubmitButton
-          v-if="visible"
-          :loading="saving"
+          :loading="isSubmitting"
           type="secondary"
           :text="$t('core.common.buttons.submit')"
           @submit="$formkit.submit('grant-permission-form')"
         >
         </SubmitButton>
-        <VButton @click="onVisibleChange(false)">
+        <VButton @click="modal?.close()">
           {{ $t("core.common.buttons.cancel_and_shortcut") }}
         </VButton>
       </VSpace>

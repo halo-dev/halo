@@ -5,19 +5,19 @@ import type { Role, RoleList } from "@halo-dev/api-client";
 
 // components
 import {
+  Dialog,
   IconAddCircle,
   IconShieldUser,
-  Dialog,
+  Toast,
   VButton,
   VCard,
-  VPageHeader,
-  VTag,
-  VStatusDot,
+  VDropdownItem,
   VEntity,
   VEntityField,
   VLoading,
-  Toast,
-  VDropdownItem,
+  VPageHeader,
+  VStatusDot,
+  VTag,
 } from "@halo-dev/components";
 import RoleEditingModal from "./components/RoleEditingModal.vue";
 
@@ -130,6 +130,7 @@ const handleOpenEditingModal = (role: Role) => {
 
 const onEditingModalClose = () => {
   selectedRole.value = undefined;
+  editingModal.value = false;
   refetch();
 };
 
@@ -198,7 +199,7 @@ const handleDelete = async (role: Role) => {
 </script>
 <template>
   <RoleEditingModal
-    v-model:visible="editingModal"
+    v-if="editingModal"
     :role="selectedRole"
     @close="onEditingModalClose"
   />
