@@ -3109,6 +3109,13 @@
             "schema": {
               "type": "string"
             }
+          },
+          {
+            "in": "query",
+            "name": "async",
+            "schema": {
+              "type": "boolean"
+            }
           }
         ],
         "responses": {

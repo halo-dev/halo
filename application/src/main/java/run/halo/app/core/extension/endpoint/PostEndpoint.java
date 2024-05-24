@@ -4,13 +4,16 @@ import static org.springdoc.core.fn.builders.apiresponse.Builder.responseBuilder
 import static org.springdoc.core.fn.builders.content.Builder.contentBuilder;
 import static org.springdoc.core.fn.builders.parameter.Builder.parameterBuilder;
 import static org.springdoc.core.fn.builders.requestbody.Builder.requestBodyBuilder;
+import static run.halo.app.extension.MetadataUtil.nullSafeLabels;
 
 import io.swagger.v3.oas.annotations.enums.ParameterIn;
 import io.swagger.v3.oas.annotations.media.Schema;
 import java.time.Duration;
 import java.util.Objects;
+import java.util.function.Predicate;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.BooleanUtils;
 import org.springdoc.core.fn.builders.schema.Builder;
 import org.springdoc.webflux.core.fn.SpringdocRouteBuilder;
 import org.springframework.dao.OptimisticLockingFailureException;
@@ -199,6 +202,11 @@ public class PostEndpoint implements CustomEndpoint {
                         .description("Head snapshot name of content.")
                         .in(ParameterIn.QUERY)
                         .required(false))
+                    .parameter(parameterBuilder()
+                        .name("async")
+                        .in(ParameterIn.QUERY)
+                        .implementation(Boolean.class)
+                        .required(false))
                     .response(responseBuilder()
                         .implementation(Post.class))
             )
@@ -319,6 +327,7 @@ public class PostEndpoint implements CustomEndpoint {
         boolean asyncPublish = request.queryParam("async")
             .map(Boolean::parseBoolean)
             .orElse(false);
+
         return Mono.defer(() -> client.get(Post.class, name)
                 .doOnNext(post -> {
                     var spec = post.getSpec();
@@ -327,7 +336,6 @@ public class PostEndpoint implements CustomEndpoint {
                     if (spec.getHeadSnapshot() == null) {
                         spec.setHeadSnapshot(spec.getBaseSnapshot());
                     }
-                    // TODO Provide release snapshot query param to control
                     spec.setReleaseSnapshot(spec.getHeadSnapshot());
                 })
                 .flatMap(client::update)
@@ -342,12 +350,17 @@ public class PostEndpoint implements CustomEndpoint {
     }
 
     private Mono<Post> awaitPostPublished(String postName) {
+        Predicate<Post> schedulePublish = post -> {
+            var labels = nullSafeLabels(post);
+            return BooleanUtils.TRUE.equals(labels.get(Post.SCHEDULING_PUBLISH_LABEL));
+        };
         return Mono.defer(() -> client.get(Post.class, postName)
                 .filter(post -> {
                     var releasedSnapshot = MetadataUtil.nullSafeAnnotations(post)
                         .get(Post.LAST_RELEASED_SNAPSHOT_ANNO);
                     var expectReleaseSnapshot = post.getSpec().getReleaseSnapshot();
-                    return Objects.equals(releasedSnapshot, expectReleaseSnapshot);
+                    return Objects.equals(releasedSnapshot, expectReleaseSnapshot)
+                        || schedulePublish.test(post);
                 })
                 .switchIfEmpty(Mono.error(
                     () -> new RetryException("Retry to check post publish status"))))

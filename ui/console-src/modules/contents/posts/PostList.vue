@@ -133,9 +133,7 @@ const {
     }
 
     if (selectedPublishStatus.value !== undefined) {
-      labelSelector.push(
-        `${postLabels.PUBLISHED}=${selectedPublishStatus.value}`
-      );
+      labelSelector.push(selectedPublishStatus.value);
     }
 
     const { data } = await apiClient.post.listPosts({
@@ -158,7 +156,9 @@ const {
       const { spec, metadata, status } = post.post;
       return (
         spec.deleted ||
-        (spec.publish && metadata.labels?.[postLabels.PUBLISHED] !== "true") ||
+        (spec.publish &&
+          metadata.labels?.[postLabels.PUBLISHED] !== "true" &&
+          metadata.labels?.[postLabels.SCHEDULING_PUBLISH] !== "true") ||
         (spec.releaseSnapshot === spec.headSnapshot && status?.inProgress)
       );
     });
@@ -357,11 +357,15 @@ watch(selectedPostNames, (newValue) => {
                   },
                   {
                     label: t('core.post.filters.status.items.published'),
-                    value: 'true',
+                    value: `${postLabels.PUBLISHED}=true`,
                   },
                   {
                     label: t('core.post.filters.status.items.draft'),
-                    value: 'false',
+                    value: `${postLabels.PUBLISHED}=false`,
+                  },
+                  {
+                    label: t('core.post.filters.status.items.scheduling'),
+                    value: `${postLabels.SCHEDULING_PUBLISH}=true`,
                   },
                 ]"
               />

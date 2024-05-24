@@ -73,6 +73,7 @@ import IconSettings3Line from "~icons/ri/settings-3-line";
 import IconImageAddLine from "~icons/ri/image-add-line";
 import IconToolsFill from "~icons/ri/tools-fill";
 import IconHistoryLine from "~icons/ri/history-line";
+import IconTimerLine from "~icons/ri/timer-line";
 
 export {
   IconDashboard,
@@ -150,4 +151,5 @@ export {
   IconImageAddLine,
   IconToolsFill,
   IconHistoryLine,
+  IconTimerLine,
 };

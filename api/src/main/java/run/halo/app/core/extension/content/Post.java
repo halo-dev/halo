@@ -47,6 +47,12 @@ public class Post extends AbstractExtension {
 
     public static final String STATS_ANNO = "content.halo.run/stats";
 
+    /**
+     * <p>The key of the label that indicates that the post is scheduled to be published.</p>
+     * <p>Can be used to query posts that are scheduled to be published.</p>
+     */
+    public static final String SCHEDULING_PUBLISH_LABEL = "content.halo.run/scheduling-publish";
+
     public static final String DELETED_LABEL = "content.halo.run/deleted";
     public static final String PUBLISHED_LABEL = "content.halo.run/published";
     public static final String OWNER_LABEL = "content.halo.run/owner";

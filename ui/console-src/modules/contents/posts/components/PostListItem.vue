@@ -5,9 +5,7 @@ import {
   VDropdownDivider,
   VDropdownItem,
   VEntity,
-  VEntityField,
 } from "@halo-dev/components";
-import { formatDatetime } from "@/utils/date";
 import type { ListedPost, Post } from "@halo-dev/api-client";
 import { useI18n } from "vue-i18n";
 import { usePermission } from "@/utils/permission";
@@ -26,6 +24,7 @@ import ContributorsField from "./entity-fields/ContributorsField.vue";
 import PublishStatusField from "./entity-fields/PublishStatusField.vue";
 import VisibleField from "./entity-fields/VisibleField.vue";
 import StatusDotField from "@/components/entity-fields/StatusDotField.vue";
+import PublishTimeField from "./entity-fields/PublishTimeField.vue";
 
 const { currentUserHasPermission } = usePermission();
 const { t } = useI18n();
@@ -160,9 +159,9 @@ const { startFields, endFields } = useEntityFieldItemExtensionPoint<ListedPost>(
     {
       priority: 50,
       position: "end",
-      component: markRaw(VEntityField),
+      component: markRaw(PublishTimeField),
       props: {
-        description: formatDatetime(props.post.post.spec.publishTime),
+        post: props.post,
       },
     },
   ])

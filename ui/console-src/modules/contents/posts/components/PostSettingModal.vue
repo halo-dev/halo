@@ -13,7 +13,7 @@ import { apiClient } from "@/utils/api-client";
 import { useThemeCustomTemplates } from "@console/modules/interface/themes/composables/use-theme";
 import { postLabels } from "@/constants/labels";
 import { randomUUID } from "@/utils/id";
-import { toDatetimeLocal, toISOString } from "@/utils/date";
+import { formatDatetime, toDatetimeLocal, toISOString } from "@/utils/date";
 import AnnotationsForm from "@/components/form/AnnotationsForm.vue";
 import { submitForm } from "@formkit/core";
 import useSlugify from "@console/composables/use-slugify";
@@ -209,6 +209,7 @@ const handleUnpublish = async () => {
   }
 };
 
+// publish time
 watch(
   () => props.post,
   (value) => {
@@ -228,6 +229,21 @@ watch(
     formState.value.spec.publishTime = value ? toISOString(value) : undefined;
   }
 );
+
+const isScheduledPublish = computed(() => {
+  return (
+    formState.value.spec.publishTime &&
+    new Date(formState.value.spec.publishTime) > new Date()
+  );
+});
+
+const publishTimeHelp = computed(() => {
+  return isScheduledPublish.value
+    ? t("core.post.settings.fields.publish_time.help.schedule_publish", {
+        datetime: formatDatetime(publishTime.value),
+      })
+    : "";
+});
 
 // custom templates
 const { templates } = useThemeCustomTemplates("post");
@@ -397,6 +413,7 @@ const { handleGenerateSlug } = useSlugify(
               type="datetime-local"
               min="0000-01-01T00:00"
               max="9999-12-31T23:59"
+              :help="publishTimeHelp"
             ></FormKit>
             <FormKit
               v-model="formState.spec.template"
@@ -450,7 +467,11 @@ const { handleGenerateSlug } = useSlugify(
             type="secondary"
             @click="handlePublishClick()"
           >
-            {{ $t("core.common.buttons.publish") }}
+            {{
+              isScheduledPublish
+                ? $t("core.common.buttons.schedule_publish")
+                : $t("core.common.buttons.publish")
+            }}
           </VButton>
           <VButton
             v-else

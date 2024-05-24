@@ -188,6 +188,7 @@ core:
         items:
           published: 已发布
           draft: 未发布
+          scheduling: 定时发布
       visible:
         label: 可见性
         result: 可见性：{visible}
@@ -219,6 +220,8 @@ core:
         visits: 访问量 {visits}
         comments: 评论 {comments}
         pinned: 已置顶
+        schedule_publish:
+          tooltip: 定时发布
     settings:
       title: 文章设置
       groups:
@@ -248,6 +251,8 @@ core:
           label: 可见性
         publish_time:
           label: 发表时间
+          help:
+            schedule_publish: 将设置定时任务，并于 {datetime} 发布
         template:
           label: 自定义模板
         cover:
@@ -1519,6 +1524,7 @@ core:
       verify: 验证
       modify: 修改
       access: 访问
+      schedule_publish: 定时发布
     radio:
       "yes": 是
       "no": 否

@@ -4,6 +4,7 @@ import {
   IconExternalLinkLine,
   IconEye,
   IconEyeOff,
+  IconTimerLine,
   Toast,
   VAvatar,
   VDropdownItem,
@@ -51,7 +52,9 @@ const publishStatus = computed(() => {
 const isPublishing = computed(() => {
   const { spec, status, metadata } = props.post.post;
   return (
-    (spec.publish && metadata.labels?.[postLabels.PUBLISHED] !== "true") ||
+    (spec.publish &&
+      metadata.labels?.[postLabels.PUBLISHED] !== "true" &&
+      metadata.labels?.[postLabels.SCHEDULING_PUBLISH] !== "true") ||
     (spec.releaseSnapshot === spec.headSnapshot && status?.inProgress)
   );
 });
@@ -204,10 +207,23 @@ function handleUnpublish() {
         state="warning"
         animate
       />
-      <VEntityField
-        v-if="post.post.spec.publishTime"
-        :description="formatDatetime(post.post.spec.publishTime)"
-      ></VEntityField>
+      <VEntityField v-if="post.post.spec.publishTime">
+        <template #description>
+          <div class="inline-flex items-center space-x-2">
+            <span class="entity-field-description">
+              {{ formatDatetime(post.post.spec.publishTime) }}
+            </span>
+            <IconTimerLine
+              v-if="
+                post.post.metadata.labels?.[postLabels.SCHEDULING_PUBLISH] ===
+                'true'
+              "
+              v-tooltip="$t('core.post.list.fields.schedule_publish.tooltip')"
+              class="text-sm"
+            />
+          </div>
+        </template>
+      </VEntityField>
     </template>
     <template #dropdownItems>
       <VDropdownItem
