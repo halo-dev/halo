@@ -37,7 +37,7 @@ export const ContentHaloRunV1alpha1CommentApiAxiosParamCreator = function (confi
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        createcontentHaloRunV1alpha1Comment: async (comment?: Comment, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+        createContentHaloRunV1alpha1Comment: async (comment?: Comment, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
             const localVarPath = `/apis/content.halo.run/v1alpha1/comments`;
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
@@ -78,9 +78,9 @@ export const ContentHaloRunV1alpha1CommentApiAxiosParamCreator = function (confi
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        deletecontentHaloRunV1alpha1Comment: async (name: string, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+        deleteContentHaloRunV1alpha1Comment: async (name: string, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
             // verify required parameter 'name' is not null or undefined
-            assertParamExists('deletecontentHaloRunV1alpha1Comment', 'name', name)
+            assertParamExists('deleteContentHaloRunV1alpha1Comment', 'name', name)
             const localVarPath = `/apis/content.halo.run/v1alpha1/comments/{name}`
                 .replace(`{${"name"}}`, encodeURIComponent(String(name)));
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
@@ -119,9 +119,9 @@ export const ContentHaloRunV1alpha1CommentApiAxiosParamCreator = function (confi
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        getcontentHaloRunV1alpha1Comment: async (name: string, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+        getContentHaloRunV1alpha1Comment: async (name: string, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
             // verify required parameter 'name' is not null or undefined
-            assertParamExists('getcontentHaloRunV1alpha1Comment', 'name', name)
+            assertParamExists('getContentHaloRunV1alpha1Comment', 'name', name)
             const localVarPath = `/apis/content.halo.run/v1alpha1/comments/{name}`
                 .replace(`{${"name"}}`, encodeURIComponent(String(name)));
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
@@ -164,7 +164,7 @@ export const ContentHaloRunV1alpha1CommentApiAxiosParamCreator = function (confi
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        listcontentHaloRunV1alpha1Comment: async (page?: number, size?: number, labelSelector?: Array<string>, fieldSelector?: Array<string>, sort?: Array<string>, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+        listContentHaloRunV1alpha1Comment: async (page?: number, size?: number, labelSelector?: Array<string>, fieldSelector?: Array<string>, sort?: Array<string>, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
             const localVarPath = `/apis/content.halo.run/v1alpha1/comments`;
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
@@ -223,9 +223,9 @@ export const ContentHaloRunV1alpha1CommentApiAxiosParamCreator = function (confi
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        updatecontentHaloRunV1alpha1Comment: async (name: string, comment?: Comment, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+        updateContentHaloRunV1alpha1Comment: async (name: string, comment?: Comment, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
             // verify required parameter 'name' is not null or undefined
-            assertParamExists('updatecontentHaloRunV1alpha1Comment', 'name', name)
+            assertParamExists('updateContentHaloRunV1alpha1Comment', 'name', name)
             const localVarPath = `/apis/content.halo.run/v1alpha1/comments/{name}`
                 .replace(`{${"name"}}`, encodeURIComponent(String(name)));
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
@@ -277,10 +277,10 @@ export const ContentHaloRunV1alpha1CommentApiFp = function(configuration?: Confi
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async createcontentHaloRunV1alpha1Comment(comment?: Comment, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<Comment>> {
-            const localVarAxiosArgs = await localVarAxiosParamCreator.createcontentHaloRunV1alpha1Comment(comment, options);
+        async createContentHaloRunV1alpha1Comment(comment?: Comment, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<Comment>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.createContentHaloRunV1alpha1Comment(comment, options);
             const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
-            const localVarOperationServerBasePath = operationServerMap['ContentHaloRunV1alpha1CommentApi.createcontentHaloRunV1alpha1Comment']?.[localVarOperationServerIndex]?.url;
+            const localVarOperationServerBasePath = operationServerMap['ContentHaloRunV1alpha1CommentApi.createContentHaloRunV1alpha1Comment']?.[localVarOperationServerIndex]?.url;
             return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
         },
         /**
@@ -289,10 +289,10 @@ export const ContentHaloRunV1alpha1CommentApiFp = function(configuration?: Confi
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async deletecontentHaloRunV1alpha1Comment(name: string, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<void>> {
-            const localVarAxiosArgs = await localVarAxiosParamCreator.deletecontentHaloRunV1alpha1Comment(name, options);
+        async deleteContentHaloRunV1alpha1Comment(name: string, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<void>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.deleteContentHaloRunV1alpha1Comment(name, options);
             const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
-            const localVarOperationServerBasePath = operationServerMap['ContentHaloRunV1alpha1CommentApi.deletecontentHaloRunV1alpha1Comment']?.[localVarOperationServerIndex]?.url;
+            const localVarOperationServerBasePath = operationServerMap['ContentHaloRunV1alpha1CommentApi.deleteContentHaloRunV1alpha1Comment']?.[localVarOperationServerIndex]?.url;
             return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
         },
         /**
@@ -301,10 +301,10 @@ export const ContentHaloRunV1alpha1CommentApiFp = function(configuration?: Confi
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async getcontentHaloRunV1alpha1Comment(name: string, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<Comment>> {
-            const localVarAxiosArgs = await localVarAxiosParamCreator.getcontentHaloRunV1alpha1Comment(name, options);
+        async getContentHaloRunV1alpha1Comment(name: string, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<Comment>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.getContentHaloRunV1alpha1Comment(name, options);
             const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
-            const localVarOperationServerBasePath = operationServerMap['ContentHaloRunV1alpha1CommentApi.getcontentHaloRunV1alpha1Comment']?.[localVarOperationServerIndex]?.url;
+            const localVarOperationServerBasePath = operationServerMap['ContentHaloRunV1alpha1CommentApi.getContentHaloRunV1alpha1Comment']?.[localVarOperationServerIndex]?.url;
             return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
         },
         /**
@@ -317,10 +317,10 @@ export const ContentHaloRunV1alpha1CommentApiFp = function(configuration?: Confi
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async listcontentHaloRunV1alpha1Comment(page?: number, size?: number, labelSelector?: Array<string>, fieldSelector?: Array<string>, sort?: Array<string>, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<CommentList>> {
-            const localVarAxiosArgs = await localVarAxiosParamCreator.listcontentHaloRunV1alpha1Comment(page, size, labelSelector, fieldSelector, sort, options);
+        async listContentHaloRunV1alpha1Comment(page?: number, size?: number, labelSelector?: Array<string>, fieldSelector?: Array<string>, sort?: Array<string>, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<CommentList>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.listContentHaloRunV1alpha1Comment(page, size, labelSelector, fieldSelector, sort, options);
             const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
-            const localVarOperationServerBasePath = operationServerMap['ContentHaloRunV1alpha1CommentApi.listcontentHaloRunV1alpha1Comment']?.[localVarOperationServerIndex]?.url;
+            const localVarOperationServerBasePath = operationServerMap['ContentHaloRunV1alpha1CommentApi.listContentHaloRunV1alpha1Comment']?.[localVarOperationServerIndex]?.url;
             return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
         },
         /**
@@ -330,10 +330,10 @@ export const ContentHaloRunV1alpha1CommentApiFp = function(configuration?: Confi
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async updatecontentHaloRunV1alpha1Comment(name: string, comment?: Comment, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<Comment>> {
-            const localVarAxiosArgs = await localVarAxiosParamCreator.updatecontentHaloRunV1alpha1Comment(name, comment, options);
+        async updateContentHaloRunV1alpha1Comment(name: string, comment?: Comment, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<Comment>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.updateContentHaloRunV1alpha1Comment(name, comment, options);
             const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
-            const localVarOperationServerBasePath = operationServerMap['ContentHaloRunV1alpha1CommentApi.updatecontentHaloRunV1alpha1Comment']?.[localVarOperationServerIndex]?.url;
+            const localVarOperationServerBasePath = operationServerMap['ContentHaloRunV1alpha1CommentApi.updateContentHaloRunV1alpha1Comment']?.[localVarOperationServerIndex]?.url;
             return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
         },
     }
@@ -348,153 +348,153 @@ export const ContentHaloRunV1alpha1CommentApiFactory = function (configuration?:
     return {
         /**
          * Create content.halo.run/v1alpha1/Comment
-         * @param {ContentHaloRunV1alpha1CommentApiCreatecontentHaloRunV1alpha1CommentRequest} requestParameters Request parameters.
+         * @param {ContentHaloRunV1alpha1CommentApiCreateContentHaloRunV1alpha1CommentRequest} requestParameters Request parameters.
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        createcontentHaloRunV1alpha1Comment(requestParameters: ContentHaloRunV1alpha1CommentApiCreatecontentHaloRunV1alpha1CommentRequest = {}, options?: RawAxiosRequestConfig): AxiosPromise<Comment> {
-            return localVarFp.createcontentHaloRunV1alpha1Comment(requestParameters.comment, options).then((request) => request(axios, basePath));
+        createContentHaloRunV1alpha1Comment(requestParameters: ContentHaloRunV1alpha1CommentApiCreateContentHaloRunV1alpha1CommentRequest = {}, options?: RawAxiosRequestConfig): AxiosPromise<Comment> {
+            return localVarFp.createContentHaloRunV1alpha1Comment(requestParameters.comment, options).then((request) => request(axios, basePath));
         },
         /**
          * Delete content.halo.run/v1alpha1/Comment
-         * @param {ContentHaloRunV1alpha1CommentApiDeletecontentHaloRunV1alpha1CommentRequest} requestParameters Request parameters.
+         * @param {ContentHaloRunV1alpha1CommentApiDeleteContentHaloRunV1alpha1CommentRequest} requestParameters Request parameters.
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        deletecontentHaloRunV1alpha1Comment(requestParameters: ContentHaloRunV1alpha1CommentApiDeletecontentHaloRunV1alpha1CommentRequest, options?: RawAxiosRequestConfig): AxiosPromise<void> {
-            return localVarFp.deletecontentHaloRunV1alpha1Comment(requestParameters.name, options).then((request) => request(axios, basePath));
+        deleteContentHaloRunV1alpha1Comment(requestParameters: ContentHaloRunV1alpha1CommentApiDeleteContentHaloRunV1alpha1CommentRequest, options?: RawAxiosRequestConfig): AxiosPromise<void> {
+            return localVarFp.deleteContentHaloRunV1alpha1Comment(requestParameters.name, options).then((request) => request(axios, basePath));
         },
         /**
          * Get content.halo.run/v1alpha1/Comment
-         * @param {ContentHaloRunV1alpha1CommentApiGetcontentHaloRunV1alpha1CommentRequest} requestParameters Request parameters.
+         * @param {ContentHaloRunV1alpha1CommentApiGetContentHaloRunV1alpha1CommentRequest} requestParameters Request parameters.
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        getcontentHaloRunV1alpha1Comment(requestParameters: ContentHaloRunV1alpha1CommentApiGetcontentHaloRunV1alpha1CommentRequest, options?: RawAxiosRequestConfig): AxiosPromise<Comment> {
-            return localVarFp.getcontentHaloRunV1alpha1Comment(requestParameters.name, options).then((request) => request(axios, basePath));
+        getContentHaloRunV1alpha1Comment(requestParameters: ContentHaloRunV1alpha1CommentApiGetContentHaloRunV1alpha1CommentRequest, options?: RawAxiosRequestConfig): AxiosPromise<Comment> {
+            return localVarFp.getContentHaloRunV1alpha1Comment(requestParameters.name, options).then((request) => request(axios, basePath));
         },
         /**
          * List content.halo.run/v1alpha1/Comment
-         * @param {ContentHaloRunV1alpha1CommentApiListcontentHaloRunV1alpha1CommentRequest} requestParameters Request parameters.
+         * @param {ContentHaloRunV1alpha1CommentApiListContentHaloRunV1alpha1CommentRequest} requestParameters Request parameters.
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        listcontentHaloRunV1alpha1Comment(requestParameters: ContentHaloRunV1alpha1CommentApiListcontentHaloRunV1alpha1CommentRequest = {}, options?: RawAxiosRequestConfig): AxiosPromise<CommentList> {
-            return localVarFp.listcontentHaloRunV1alpha1Comment(requestParameters.page, requestParameters.size, requestParameters.labelSelector, requestParameters.fieldSelector, requestParameters.sort, options).then((request) => request(axios, basePath));
+        listContentHaloRunV1alpha1Comment(requestParameters: ContentHaloRunV1alpha1CommentApiListContentHaloRunV1alpha1CommentRequest = {}, options?: RawAxiosRequestConfig): AxiosPromise<CommentList> {
+            return localVarFp.listContentHaloRunV1alpha1Comment(requestParameters.page, requestParameters.size, requestParameters.labelSelector, requestParameters.fieldSelector, requestParameters.sort, options).then((request) => request(axios, basePath));
         },
         /**
          * Update content.halo.run/v1alpha1/Comment
-         * @param {ContentHaloRunV1alpha1CommentApiUpdatecontentHaloRunV1alpha1CommentRequest} requestParameters Request parameters.
+         * @param {ContentHaloRunV1alpha1CommentApiUpdateContentHaloRunV1alpha1CommentRequest} requestParameters Request parameters.
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        updatecontentHaloRunV1alpha1Comment(requestParameters: ContentHaloRunV1alpha1CommentApiUpdatecontentHaloRunV1alpha1CommentRequest, options?: RawAxiosRequestConfig): AxiosPromise<Comment> {
-            return localVarFp.updatecontentHaloRunV1alpha1Comment(requestParameters.name, requestParameters.comment, options).then((request) => request(axios, basePath));
+        updateContentHaloRunV1alpha1Comment(requestParameters: ContentHaloRunV1alpha1CommentApiUpdateContentHaloRunV1alpha1CommentRequest, options?: RawAxiosRequestConfig): AxiosPromise<Comment> {
+            return localVarFp.updateContentHaloRunV1alpha1Comment(requestParameters.name, requestParameters.comment, options).then((request) => request(axios, basePath));
         },
     };
 };
 
 /**
- * Request parameters for createcontentHaloRunV1alpha1Comment operation in ContentHaloRunV1alpha1CommentApi.
+ * Request parameters for createContentHaloRunV1alpha1Comment operation in ContentHaloRunV1alpha1CommentApi.
  * @export
- * @interface ContentHaloRunV1alpha1CommentApiCreatecontentHaloRunV1alpha1CommentRequest
+ * @interface ContentHaloRunV1alpha1CommentApiCreateContentHaloRunV1alpha1CommentRequest
  */
-export interface ContentHaloRunV1alpha1CommentApiCreatecontentHaloRunV1alpha1CommentRequest {
+export interface ContentHaloRunV1alpha1CommentApiCreateContentHaloRunV1alpha1CommentRequest {
     /**
      * Fresh comment
      * @type {Comment}
-     * @memberof ContentHaloRunV1alpha1CommentApiCreatecontentHaloRunV1alpha1Comment
+     * @memberof ContentHaloRunV1alpha1CommentApiCreateContentHaloRunV1alpha1Comment
      */
     readonly comment?: Comment
 }
 
 /**
- * Request parameters for deletecontentHaloRunV1alpha1Comment operation in ContentHaloRunV1alpha1CommentApi.
+ * Request parameters for deleteContentHaloRunV1alpha1Comment operation in ContentHaloRunV1alpha1CommentApi.
  * @export
- * @interface ContentHaloRunV1alpha1CommentApiDeletecontentHaloRunV1alpha1CommentRequest
+ * @interface ContentHaloRunV1alpha1CommentApiDeleteContentHaloRunV1alpha1CommentRequest
  */
-export interface ContentHaloRunV1alpha1CommentApiDeletecontentHaloRunV1alpha1CommentRequest {
+export interface ContentHaloRunV1alpha1CommentApiDeleteContentHaloRunV1alpha1CommentRequest {
     /**
      * Name of comment
      * @type {string}
-     * @memberof ContentHaloRunV1alpha1CommentApiDeletecontentHaloRunV1alpha1Comment
+     * @memberof ContentHaloRunV1alpha1CommentApiDeleteContentHaloRunV1alpha1Comment
      */
     readonly name: string
 }
 
 /**
- * Request parameters for getcontentHaloRunV1alpha1Comment operation in ContentHaloRunV1alpha1CommentApi.
+ * Request parameters for getContentHaloRunV1alpha1Comment operation in ContentHaloRunV1alpha1CommentApi.
  * @export
- * @interface ContentHaloRunV1alpha1CommentApiGetcontentHaloRunV1alpha1CommentRequest
+ * @interface ContentHaloRunV1alpha1CommentApiGetContentHaloRunV1alpha1CommentRequest
  */
-export interface ContentHaloRunV1alpha1CommentApiGetcontentHaloRunV1alpha1CommentRequest {
+export interface ContentHaloRunV1alpha1CommentApiGetContentHaloRunV1alpha1CommentRequest {
     /**
      * Name of comment
      * @type {string}
-     * @memberof ContentHaloRunV1alpha1CommentApiGetcontentHaloRunV1alpha1Comment
+     * @memberof ContentHaloRunV1alpha1CommentApiGetContentHaloRunV1alpha1Comment
      */
     readonly name: string
 }
 
 /**
- * Request parameters for listcontentHaloRunV1alpha1Comment operation in ContentHaloRunV1alpha1CommentApi.
+ * Request parameters for listContentHaloRunV1alpha1Comment operation in ContentHaloRunV1alpha1CommentApi.
  * @export
- * @interface ContentHaloRunV1alpha1CommentApiListcontentHaloRunV1alpha1CommentRequest
+ * @interface ContentHaloRunV1alpha1CommentApiListContentHaloRunV1alpha1CommentRequest
  */
-export interface ContentHaloRunV1alpha1CommentApiListcontentHaloRunV1alpha1CommentRequest {
+export interface ContentHaloRunV1alpha1CommentApiListContentHaloRunV1alpha1CommentRequest {
     /**
      * Page number. Default is 0.
      * @type {number}
-     * @memberof ContentHaloRunV1alpha1CommentApiListcontentHaloRunV1alpha1Comment
+     * @memberof ContentHaloRunV1alpha1CommentApiListContentHaloRunV1alpha1Comment
      */
     readonly page?: number
 
     /**
      * Size number. Default is 0.
      * @type {number}
-     * @memberof ContentHaloRunV1alpha1CommentApiListcontentHaloRunV1alpha1Comment
+     * @memberof ContentHaloRunV1alpha1CommentApiListContentHaloRunV1alpha1Comment
      */
     readonly size?: number
 
     /**
      * Label selector. e.g.: hidden!&#x3D;true
      * @type {Array<string>}
-     * @memberof ContentHaloRunV1alpha1CommentApiListcontentHaloRunV1alpha1Comment
+     * @memberof ContentHaloRunV1alpha1CommentApiListContentHaloRunV1alpha1Comment
      */
     readonly labelSelector?: Array<string>
 
     /**
      * Field selector. e.g.: metadata.name&#x3D;&#x3D;halo
      * @type {Array<string>}
-     * @memberof ContentHaloRunV1alpha1CommentApiListcontentHaloRunV1alpha1Comment
+     * @memberof ContentHaloRunV1alpha1CommentApiListContentHaloRunV1alpha1Comment
      */
     readonly fieldSelector?: Array<string>
 
     /**
      * Sorting criteria in the format: property,(asc|desc). Default sort order is ascending. Multiple sort criteria are supported.
      * @type {Array<string>}
-     * @memberof ContentHaloRunV1alpha1CommentApiListcontentHaloRunV1alpha1Comment
+     * @memberof ContentHaloRunV1alpha1CommentApiListContentHaloRunV1alpha1Comment
      */
     readonly sort?: Array<string>
 }
 
 /**
- * Request parameters for updatecontentHaloRunV1alpha1Comment operation in ContentHaloRunV1alpha1CommentApi.
+ * Request parameters for updateContentHaloRunV1alpha1Comment operation in ContentHaloRunV1alpha1CommentApi.
  * @export
- * @interface ContentHaloRunV1alpha1CommentApiUpdatecontentHaloRunV1alpha1CommentRequest
+ * @interface ContentHaloRunV1alpha1CommentApiUpdateContentHaloRunV1alpha1CommentRequest
  */
-export interface ContentHaloRunV1alpha1CommentApiUpdatecontentHaloRunV1alpha1CommentRequest {
+export interface ContentHaloRunV1alpha1CommentApiUpdateContentHaloRunV1alpha1CommentRequest {
     /**
      * Name of comment
      * @type {string}
-     * @memberof ContentHaloRunV1alpha1CommentApiUpdatecontentHaloRunV1alpha1Comment
+     * @memberof ContentHaloRunV1alpha1CommentApiUpdateContentHaloRunV1alpha1Comment
      */
     readonly name: string
 
     /**
      * Updated comment
      * @type {Comment}
-     * @memberof ContentHaloRunV1alpha1CommentApiUpdatecontentHaloRunV1alpha1Comment
+     * @memberof ContentHaloRunV1alpha1CommentApiUpdateContentHaloRunV1alpha1Comment
      */
     readonly comment?: Comment
 }
@@ -508,57 +508,57 @@ export interface ContentHaloRunV1alpha1CommentApiUpdatecontentHaloRunV1alpha1Com
 export class ContentHaloRunV1alpha1CommentApi extends BaseAPI {
     /**
      * Create content.halo.run/v1alpha1/Comment
-     * @param {ContentHaloRunV1alpha1CommentApiCreatecontentHaloRunV1alpha1CommentRequest} requestParameters Request parameters.
+     * @param {ContentHaloRunV1alpha1CommentApiCreateContentHaloRunV1alpha1CommentRequest} requestParameters Request parameters.
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      * @memberof ContentHaloRunV1alpha1CommentApi
      */
-    public createcontentHaloRunV1alpha1Comment(requestParameters: ContentHaloRunV1alpha1CommentApiCreatecontentHaloRunV1alpha1CommentRequest = {}, options?: RawAxiosRequestConfig) {
-        return ContentHaloRunV1alpha1CommentApiFp(this.configuration).createcontentHaloRunV1alpha1Comment(requestParameters.comment, options).then((request) => request(this.axios, this.basePath));
+    public createContentHaloRunV1alpha1Comment(requestParameters: ContentHaloRunV1alpha1CommentApiCreateContentHaloRunV1alpha1CommentRequest = {}, options?: RawAxiosRequestConfig) {
+        return ContentHaloRunV1alpha1CommentApiFp(this.configuration).createContentHaloRunV1alpha1Comment(requestParameters.comment, options).then((request) => request(this.axios, this.basePath));
     }
 
     /**
      * Delete content.halo.run/v1alpha1/Comment
-     * @param {ContentHaloRunV1alpha1CommentApiDeletecontentHaloRunV1alpha1CommentRequest} requestParameters Request parameters.
+     * @param {ContentHaloRunV1alpha1CommentApiDeleteContentHaloRunV1alpha1CommentRequest} requestParameters Request parameters.
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      * @memberof ContentHaloRunV1alpha1CommentApi
      */
-    public deletecontentHaloRunV1alpha1Comment(requestParameters: ContentHaloRunV1alpha1CommentApiDeletecontentHaloRunV1alpha1CommentRequest, options?: RawAxiosRequestConfig) {
-        return ContentHaloRunV1alpha1CommentApiFp(this.configuration).deletecontentHaloRunV1alpha1Comment(requestParameters.name, options).then((request) => request(this.axios, this.basePath));
+    public deleteContentHaloRunV1alpha1Comment(requestParameters: ContentHaloRunV1alpha1CommentApiDeleteContentHaloRunV1alpha1CommentRequest, options?: RawAxiosRequestConfig) {
+        return ContentHaloRunV1alpha1CommentApiFp(this.configuration).deleteContentHaloRunV1alpha1Comment(requestParameters.name, options).then((request) => request(this.axios, this.basePath));
     }
 
     /**
      * Get content.halo.run/v1alpha1/Comment
-     * @param {ContentHaloRunV1alpha1CommentApiGetcontentHaloRunV1alpha1CommentRequest} requestParameters Request parameters.
+     * @param {ContentHaloRunV1alpha1CommentApiGetContentHaloRunV1alpha1CommentRequest} requestParameters Request parameters.
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      * @memberof ContentHaloRunV1alpha1CommentApi
      */
-    public getcontentHaloRunV1alpha1Comment(requestParameters: ContentHaloRunV1alpha1CommentApiGetcontentHaloRunV1alpha1CommentRequest, options?: RawAxiosRequestConfig) {
-        return ContentHaloRunV1alpha1CommentApiFp(this.configuration).getcontentHaloRunV1alpha1Comment(requestParameters.name, options).then((request) => request(this.axios, this.basePath));
+    public getContentHaloRunV1alpha1Comment(requestParameters: ContentHaloRunV1alpha1CommentApiGetContentHaloRunV1alpha1CommentRequest, options?: RawAxiosRequestConfig) {
+        return ContentHaloRunV1alpha1CommentApiFp(this.configuration).getContentHaloRunV1alpha1Comment(requestParameters.name, options).then((request) => request(this.axios, this.basePath));
     }
 
     /**
      * List content.halo.run/v1alpha1/Comment
-     * @param {ContentHaloRunV1alpha1CommentApiListcontentHaloRunV1alpha1CommentRequest} requestParameters Request parameters.
+     * @param {ContentHaloRunV1alpha1CommentApiListContentHaloRunV1alpha1CommentRequest} requestParameters Request parameters.
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      * @memberof ContentHaloRunV1alpha1CommentApi
      */
-    public listcontentHaloRunV1alpha1Comment(requestParameters: ContentHaloRunV1alpha1CommentApiListcontentHaloRunV1alpha1CommentRequest = {}, options?: RawAxiosRequestConfig) {
-        return ContentHaloRunV1alpha1CommentApiFp(this.configuration).listcontentHaloRunV1alpha1Comment(requestParameters.page, requestParameters.size, requestParameters.labelSelector, requestParameters.fieldSelector, requestParameters.sort, options).then((request) => request(this.axios, this.basePath));
+    public listContentHaloRunV1alpha1Comment(requestParameters: ContentHaloRunV1alpha1CommentApiListContentHaloRunV1alpha1CommentRequest = {}, options?: RawAxiosRequestConfig) {
+        return ContentHaloRunV1alpha1CommentApiFp(this.configuration).listContentHaloRunV1alpha1Comment(requestParameters.page, requestParameters.size, requestParameters.labelSelector, requestParameters.fieldSelector, requestParameters.sort, options).then((request) => request(this.axios, this.basePath));
     }
 
     /**
      * Update content.halo.run/v1alpha1/Comment
-     * @param {ContentHaloRunV1alpha1CommentApiUpdatecontentHaloRunV1alpha1CommentRequest} requestParameters Request parameters.
+     * @param {ContentHaloRunV1alpha1CommentApiUpdateContentHaloRunV1alpha1CommentRequest} requestParameters Request parameters.
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      * @memberof ContentHaloRunV1alpha1CommentApi
      */
-    public updatecontentHaloRunV1alpha1Comment(requestParameters: ContentHaloRunV1alpha1CommentApiUpdatecontentHaloRunV1alpha1CommentRequest, options?: RawAxiosRequestConfig) {
-        return ContentHaloRunV1alpha1CommentApiFp(this.configuration).updatecontentHaloRunV1alpha1Comment(requestParameters.name, requestParameters.comment, options).then((request) => request(this.axios, this.basePath));
+    public updateContentHaloRunV1alpha1Comment(requestParameters: ContentHaloRunV1alpha1CommentApiUpdateContentHaloRunV1alpha1CommentRequest, options?: RawAxiosRequestConfig) {
+        return ContentHaloRunV1alpha1CommentApiFp(this.configuration).updateContentHaloRunV1alpha1Comment(requestParameters.name, requestParameters.comment, options).then((request) => request(this.axios, this.basePath));
     }
 }
 

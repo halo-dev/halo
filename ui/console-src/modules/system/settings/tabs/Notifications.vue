@@ -25,7 +25,7 @@ const { data: notifierDescriptors } = useQuery({
   queryKey: ["notifier-descriptors"],
   queryFn: async () => {
     const { data } =
-      await apiClient.extension.notifierDescriptors.listnotificationHaloRunV1alpha1NotifierDescriptor();
+      await apiClient.extension.notifierDescriptors.listNotificationHaloRunV1alpha1NotifierDescriptor();
     return data.items;
   },
   onSuccess(data) {

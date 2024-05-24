@@ -50,7 +50,7 @@ async function onSortUpdate() {
     updating.value = true;
 
     const { data: rawAuthProviders } =
-      await apiClient.extension.authProvider.listauthHaloRunV1alpha1AuthProvider();
+      await apiClient.extension.authProvider.listAuthHaloRunV1alpha1AuthProvider();
 
     const authProviderNames = authProviders.value.map((item) => item.name);
 
@@ -67,7 +67,7 @@ async function onSortUpdate() {
       .filter(Boolean) as AuthProvider[];
 
     for (const authProvider of sortedAuthProviders) {
-      await apiClient.extension.authProvider.updateauthHaloRunV1alpha1AuthProvider(
+      await apiClient.extension.authProvider.updateAuthHaloRunV1alpha1AuthProvider(
         {
           name: authProvider.metadata.name,
           authProvider: authProvider,

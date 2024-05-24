@@ -40,7 +40,7 @@ const handleUpdateInBatch = useDebounceFn(async () => {
   try {
     batchUpdating.value = true;
     const promises = categoriesToUpdate.map((category) =>
-      apiClient.extension.category.updatecontentHaloRunV1alpha1Category({
+      apiClient.extension.category.updateContentHaloRunV1alpha1Category({
         name: category.metadata.name,
         category: category,
       })

@@ -305,7 +305,7 @@ const handleFetchContent = async () => {
 // SinglePage settings
 const handleOpenSettingModal = async () => {
   const { data: latestSinglePage } =
-    await apiClient.extension.singlePage.getcontentHaloRunV1alpha1SinglePage({
+    await apiClient.extension.singlePage.getContentHaloRunV1alpha1SinglePage({
       name: formState.value.page.metadata.name,
     });
   formState.value.page = latestSinglePage;
@@ -333,7 +333,7 @@ const onSettingPublished = (singlePage: SinglePage) => {
 onMounted(async () => {
   if (routeQueryName.value) {
     const { data: singlePage } =
-      await apiClient.extension.singlePage.getcontentHaloRunV1alpha1SinglePage({
+      await apiClient.extension.singlePage.getContentHaloRunV1alpha1SinglePage({
         name: routeQueryName.value,
       });
     formState.value.page = singlePage;

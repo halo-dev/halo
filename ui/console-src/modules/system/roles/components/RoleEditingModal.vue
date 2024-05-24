@@ -34,7 +34,7 @@ const emit = defineEmits<{
 const { data: roleTemplates } = useQuery({
   queryKey: ["role-templates"],
   queryFn: async () => {
-    const { data } = await apiClient.extension.role.listv1alpha1Role({
+    const { data } = await apiClient.extension.role.listV1alpha1Role({
       page: 0,
       size: 0,
       labelSelector: [`${roleLabels.TEMPLATE}=true`, "!halo.run/hidden"],

@@ -45,7 +45,7 @@ const { data: plugin } = useQuery({
   queryKey: ["plugin", route.params.name],
   queryFn: async () => {
     const { data } =
-      await apiClient.extension.plugin.getpluginHaloRunV1alpha1Plugin({
+      await apiClient.extension.plugin.getPluginHaloRunV1alpha1Plugin({
         name: route.params.name as string,
       });
     return data;

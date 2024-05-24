@@ -37,7 +37,7 @@ export const StorageHaloRunV1alpha1PolicyApiAxiosParamCreator = function (config
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        createstorageHaloRunV1alpha1Policy: async (policy?: Policy, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+        createStorageHaloRunV1alpha1Policy: async (policy?: Policy, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
             const localVarPath = `/apis/storage.halo.run/v1alpha1/policies`;
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
@@ -78,9 +78,9 @@ export const StorageHaloRunV1alpha1PolicyApiAxiosParamCreator = function (config
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        deletestorageHaloRunV1alpha1Policy: async (name: string, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+        deleteStorageHaloRunV1alpha1Policy: async (name: string, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
             // verify required parameter 'name' is not null or undefined
-            assertParamExists('deletestorageHaloRunV1alpha1Policy', 'name', name)
+            assertParamExists('deleteStorageHaloRunV1alpha1Policy', 'name', name)
             const localVarPath = `/apis/storage.halo.run/v1alpha1/policies/{name}`
                 .replace(`{${"name"}}`, encodeURIComponent(String(name)));
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
@@ -119,9 +119,9 @@ export const StorageHaloRunV1alpha1PolicyApiAxiosParamCreator = function (config
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        getstorageHaloRunV1alpha1Policy: async (name: string, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+        getStorageHaloRunV1alpha1Policy: async (name: string, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
             // verify required parameter 'name' is not null or undefined
-            assertParamExists('getstorageHaloRunV1alpha1Policy', 'name', name)
+            assertParamExists('getStorageHaloRunV1alpha1Policy', 'name', name)
             const localVarPath = `/apis/storage.halo.run/v1alpha1/policies/{name}`
                 .replace(`{${"name"}}`, encodeURIComponent(String(name)));
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
@@ -164,7 +164,7 @@ export const StorageHaloRunV1alpha1PolicyApiAxiosParamCreator = function (config
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        liststorageHaloRunV1alpha1Policy: async (page?: number, size?: number, labelSelector?: Array<string>, fieldSelector?: Array<string>, sort?: Array<string>, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+        listStorageHaloRunV1alpha1Policy: async (page?: number, size?: number, labelSelector?: Array<string>, fieldSelector?: Array<string>, sort?: Array<string>, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
             const localVarPath = `/apis/storage.halo.run/v1alpha1/policies`;
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
@@ -223,9 +223,9 @@ export const StorageHaloRunV1alpha1PolicyApiAxiosParamCreator = function (config
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        updatestorageHaloRunV1alpha1Policy: async (name: string, policy?: Policy, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+        updateStorageHaloRunV1alpha1Policy: async (name: string, policy?: Policy, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
             // verify required parameter 'name' is not null or undefined
-            assertParamExists('updatestorageHaloRunV1alpha1Policy', 'name', name)
+            assertParamExists('updateStorageHaloRunV1alpha1Policy', 'name', name)
             const localVarPath = `/apis/storage.halo.run/v1alpha1/policies/{name}`
                 .replace(`{${"name"}}`, encodeURIComponent(String(name)));
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
@@ -277,10 +277,10 @@ export const StorageHaloRunV1alpha1PolicyApiFp = function(configuration?: Config
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async createstorageHaloRunV1alpha1Policy(policy?: Policy, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<Policy>> {
-            const localVarAxiosArgs = await localVarAxiosParamCreator.createstorageHaloRunV1alpha1Policy(policy, options);
+        async createStorageHaloRunV1alpha1Policy(policy?: Policy, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<Policy>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.createStorageHaloRunV1alpha1Policy(policy, options);
             const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
-            const localVarOperationServerBasePath = operationServerMap['StorageHaloRunV1alpha1PolicyApi.createstorageHaloRunV1alpha1Policy']?.[localVarOperationServerIndex]?.url;
+            const localVarOperationServerBasePath = operationServerMap['StorageHaloRunV1alpha1PolicyApi.createStorageHaloRunV1alpha1Policy']?.[localVarOperationServerIndex]?.url;
             return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
         },
         /**
@@ -289,10 +289,10 @@ export const StorageHaloRunV1alpha1PolicyApiFp = function(configuration?: Config
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async deletestorageHaloRunV1alpha1Policy(name: string, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<void>> {
-            const localVarAxiosArgs = await localVarAxiosParamCreator.deletestorageHaloRunV1alpha1Policy(name, options);
+        async deleteStorageHaloRunV1alpha1Policy(name: string, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<void>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.deleteStorageHaloRunV1alpha1Policy(name, options);
             const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
-            const localVarOperationServerBasePath = operationServerMap['StorageHaloRunV1alpha1PolicyApi.deletestorageHaloRunV1alpha1Policy']?.[localVarOperationServerIndex]?.url;
+            const localVarOperationServerBasePath = operationServerMap['StorageHaloRunV1alpha1PolicyApi.deleteStorageHaloRunV1alpha1Policy']?.[localVarOperationServerIndex]?.url;
             return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
         },
         /**
@@ -301,10 +301,10 @@ export const StorageHaloRunV1alpha1PolicyApiFp = function(configuration?: Config
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async getstorageHaloRunV1alpha1Policy(name: string, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<Policy>> {
-            const localVarAxiosArgs = await localVarAxiosParamCreator.getstorageHaloRunV1alpha1Policy(name, options);
+        async getStorageHaloRunV1alpha1Policy(name: string, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<Policy>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.getStorageHaloRunV1alpha1Policy(name, options);
             const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
-            const localVarOperationServerBasePath = operationServerMap['StorageHaloRunV1alpha1PolicyApi.getstorageHaloRunV1alpha1Policy']?.[localVarOperationServerIndex]?.url;
+            const localVarOperationServerBasePath = operationServerMap['StorageHaloRunV1alpha1PolicyApi.getStorageHaloRunV1alpha1Policy']?.[localVarOperationServerIndex]?.url;
             return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
         },
         /**
@@ -317,10 +317,10 @@ export const StorageHaloRunV1alpha1PolicyApiFp = function(configuration?: Config
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async liststorageHaloRunV1alpha1Policy(page?: number, size?: number, labelSelector?: Array<string>, fieldSelector?: Array<string>, sort?: Array<string>, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<PolicyList>> {
-            const localVarAxiosArgs = await localVarAxiosParamCreator.liststorageHaloRunV1alpha1Policy(page, size, labelSelector, fieldSelector, sort, options);
+        async listStorageHaloRunV1alpha1Policy(page?: number, size?: number, labelSelector?: Array<string>, fieldSelector?: Array<string>, sort?: Array<string>, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<PolicyList>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.listStorageHaloRunV1alpha1Policy(page, size, labelSelector, fieldSelector, sort, options);
             const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
-            const localVarOperationServerBasePath = operationServerMap['StorageHaloRunV1alpha1PolicyApi.liststorageHaloRunV1alpha1Policy']?.[localVarOperationServerIndex]?.url;
+            const localVarOperationServerBasePath = operationServerMap['StorageHaloRunV1alpha1PolicyApi.listStorageHaloRunV1alpha1Policy']?.[localVarOperationServerIndex]?.url;
             return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
         },
         /**
@@ -330,10 +330,10 @@ export const StorageHaloRunV1alpha1PolicyApiFp = function(configuration?: Config
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async updatestorageHaloRunV1alpha1Policy(name: string, policy?: Policy, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<Policy>> {
-            const localVarAxiosArgs = await localVarAxiosParamCreator.updatestorageHaloRunV1alpha1Policy(name, policy, options);
+        async updateStorageHaloRunV1alpha1Policy(name: string, policy?: Policy, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<Policy>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.updateStorageHaloRunV1alpha1Policy(name, policy, options);
             const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
-            const localVarOperationServerBasePath = operationServerMap['StorageHaloRunV1alpha1PolicyApi.updatestorageHaloRunV1alpha1Policy']?.[localVarOperationServerIndex]?.url;
+            const localVarOperationServerBasePath = operationServerMap['StorageHaloRunV1alpha1PolicyApi.updateStorageHaloRunV1alpha1Policy']?.[localVarOperationServerIndex]?.url;
             return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
         },
     }
@@ -348,153 +348,153 @@ export const StorageHaloRunV1alpha1PolicyApiFactory = function (configuration?: 
     return {
         /**
          * Create storage.halo.run/v1alpha1/Policy
-         * @param {StorageHaloRunV1alpha1PolicyApiCreatestorageHaloRunV1alpha1PolicyRequest} requestParameters Request parameters.
+         * @param {StorageHaloRunV1alpha1PolicyApiCreateStorageHaloRunV1alpha1PolicyRequest} requestParameters Request parameters.
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        createstorageHaloRunV1alpha1Policy(requestParameters: StorageHaloRunV1alpha1PolicyApiCreatestorageHaloRunV1alpha1PolicyRequest = {}, options?: RawAxiosRequestConfig): AxiosPromise<Policy> {
-            return localVarFp.createstorageHaloRunV1alpha1Policy(requestParameters.policy, options).then((request) => request(axios, basePath));
+        createStorageHaloRunV1alpha1Policy(requestParameters: StorageHaloRunV1alpha1PolicyApiCreateStorageHaloRunV1alpha1PolicyRequest = {}, options?: RawAxiosRequestConfig): AxiosPromise<Policy> {
+            return localVarFp.createStorageHaloRunV1alpha1Policy(requestParameters.policy, options).then((request) => request(axios, basePath));
         },
         /**
          * Delete storage.halo.run/v1alpha1/Policy
-         * @param {StorageHaloRunV1alpha1PolicyApiDeletestorageHaloRunV1alpha1PolicyRequest} requestParameters Request parameters.
+         * @param {StorageHaloRunV1alpha1PolicyApiDeleteStorageHaloRunV1alpha1PolicyRequest} requestParameters Request parameters.
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        deletestorageHaloRunV1alpha1Policy(requestParameters: StorageHaloRunV1alpha1PolicyApiDeletestorageHaloRunV1alpha1PolicyRequest, options?: RawAxiosRequestConfig): AxiosPromise<void> {
-            return localVarFp.deletestorageHaloRunV1alpha1Policy(requestParameters.name, options).then((request) => request(axios, basePath));
+        deleteStorageHaloRunV1alpha1Policy(requestParameters: StorageHaloRunV1alpha1PolicyApiDeleteStorageHaloRunV1alpha1PolicyRequest, options?: RawAxiosRequestConfig): AxiosPromise<void> {
+            return localVarFp.deleteStorageHaloRunV1alpha1Policy(requestParameters.name, options).then((request) => request(axios, basePath));
         },
         /**
          * Get storage.halo.run/v1alpha1/Policy
-         * @param {StorageHaloRunV1alpha1PolicyApiGetstorageHaloRunV1alpha1PolicyRequest} requestParameters Request parameters.
+         * @param {StorageHaloRunV1alpha1PolicyApiGetStorageHaloRunV1alpha1PolicyRequest} requestParameters Request parameters.
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        getstorageHaloRunV1alpha1Policy(requestParameters: StorageHaloRunV1alpha1PolicyApiGetstorageHaloRunV1alpha1PolicyRequest, options?: RawAxiosRequestConfig): AxiosPromise<Policy> {
-            return localVarFp.getstorageHaloRunV1alpha1Policy(requestParameters.name, options).then((request) => request(axios, basePath));
+        getStorageHaloRunV1alpha1Policy(requestParameters: StorageHaloRunV1alpha1PolicyApiGetStorageHaloRunV1alpha1PolicyRequest, options?: RawAxiosRequestConfig): AxiosPromise<Policy> {
+            return localVarFp.getStorageHaloRunV1alpha1Policy(requestParameters.name, options).then((request) => request(axios, basePath));
         },
         /**
          * List storage.halo.run/v1alpha1/Policy
-         * @param {StorageHaloRunV1alpha1PolicyApiListstorageHaloRunV1alpha1PolicyRequest} requestParameters Request parameters.
+         * @param {StorageHaloRunV1alpha1PolicyApiListStorageHaloRunV1alpha1PolicyRequest} requestParameters Request parameters.
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        liststorageHaloRunV1alpha1Policy(requestParameters: StorageHaloRunV1alpha1PolicyApiListstorageHaloRunV1alpha1PolicyRequest = {}, options?: RawAxiosRequestConfig): AxiosPromise<PolicyList> {
-            return localVarFp.liststorageHaloRunV1alpha1Policy(requestParameters.page, requestParameters.size, requestParameters.labelSelector, requestParameters.fieldSelector, requestParameters.sort, options).then((request) => request(axios, basePath));
+        listStorageHaloRunV1alpha1Policy(requestParameters: StorageHaloRunV1alpha1PolicyApiListStorageHaloRunV1alpha1PolicyRequest = {}, options?: RawAxiosRequestConfig): AxiosPromise<PolicyList> {
+            return localVarFp.listStorageHaloRunV1alpha1Policy(requestParameters.page, requestParameters.size, requestParameters.labelSelector, requestParameters.fieldSelector, requestParameters.sort, options).then((request) => request(axios, basePath));
         },
         /**
          * Update storage.halo.run/v1alpha1/Policy
-         * @param {StorageHaloRunV1alpha1PolicyApiUpdatestorageHaloRunV1alpha1PolicyRequest} requestParameters Request parameters.
+         * @param {StorageHaloRunV1alpha1PolicyApiUpdateStorageHaloRunV1alpha1PolicyRequest} requestParameters Request parameters.
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        updatestorageHaloRunV1alpha1Policy(requestParameters: StorageHaloRunV1alpha1PolicyApiUpdatestorageHaloRunV1alpha1PolicyRequest, options?: RawAxiosRequestConfig): AxiosPromise<Policy> {
-            return localVarFp.updatestorageHaloRunV1alpha1Policy(requestParameters.name, requestParameters.policy, options).then((request) => request(axios, basePath));
+        updateStorageHaloRunV1alpha1Policy(requestParameters: StorageHaloRunV1alpha1PolicyApiUpdateStorageHaloRunV1alpha1PolicyRequest, options?: RawAxiosRequestConfig): AxiosPromise<Policy> {
+            return localVarFp.updateStorageHaloRunV1alpha1Policy(requestParameters.name, requestParameters.policy, options).then((request) => request(axios, basePath));
         },
     };
 };
 
 /**
- * Request parameters for createstorageHaloRunV1alpha1Policy operation in StorageHaloRunV1alpha1PolicyApi.
+ * Request parameters for createStorageHaloRunV1alpha1Policy operation in StorageHaloRunV1alpha1PolicyApi.
  * @export
- * @interface StorageHaloRunV1alpha1PolicyApiCreatestorageHaloRunV1alpha1PolicyRequest
+ * @interface StorageHaloRunV1alpha1PolicyApiCreateStorageHaloRunV1alpha1PolicyRequest
  */
-export interface StorageHaloRunV1alpha1PolicyApiCreatestorageHaloRunV1alpha1PolicyRequest {
+export interface StorageHaloRunV1alpha1PolicyApiCreateStorageHaloRunV1alpha1PolicyRequest {
     /**
      * Fresh policy
      * @type {Policy}
-     * @memberof StorageHaloRunV1alpha1PolicyApiCreatestorageHaloRunV1alpha1Policy
+     * @memberof StorageHaloRunV1alpha1PolicyApiCreateStorageHaloRunV1alpha1Policy
      */
     readonly policy?: Policy
 }
 
 /**
- * Request parameters for deletestorageHaloRunV1alpha1Policy operation in StorageHaloRunV1alpha1PolicyApi.
+ * Request parameters for deleteStorageHaloRunV1alpha1Policy operation in StorageHaloRunV1alpha1PolicyApi.
  * @export
- * @interface StorageHaloRunV1alpha1PolicyApiDeletestorageHaloRunV1alpha1PolicyRequest
+ * @interface StorageHaloRunV1alpha1PolicyApiDeleteStorageHaloRunV1alpha1PolicyRequest
  */
-export interface StorageHaloRunV1alpha1PolicyApiDeletestorageHaloRunV1alpha1PolicyRequest {
+export interface StorageHaloRunV1alpha1PolicyApiDeleteStorageHaloRunV1alpha1PolicyRequest {
     /**
      * Name of policy
      * @type {string}
-     * @memberof StorageHaloRunV1alpha1PolicyApiDeletestorageHaloRunV1alpha1Policy
+     * @memberof StorageHaloRunV1alpha1PolicyApiDeleteStorageHaloRunV1alpha1Policy
      */
     readonly name: string
 }
 
 /**
- * Request parameters for getstorageHaloRunV1alpha1Policy operation in StorageHaloRunV1alpha1PolicyApi.
+ * Request parameters for getStorageHaloRunV1alpha1Policy operation in StorageHaloRunV1alpha1PolicyApi.
  * @export
- * @interface StorageHaloRunV1alpha1PolicyApiGetstorageHaloRunV1alpha1PolicyRequest
+ * @interface StorageHaloRunV1alpha1PolicyApiGetStorageHaloRunV1alpha1PolicyRequest
  */
-export interface StorageHaloRunV1alpha1PolicyApiGetstorageHaloRunV1alpha1PolicyRequest {
+export interface StorageHaloRunV1alpha1PolicyApiGetStorageHaloRunV1alpha1PolicyRequest {
     /**
      * Name of policy
      * @type {string}
-     * @memberof StorageHaloRunV1alpha1PolicyApiGetstorageHaloRunV1alpha1Policy
+     * @memberof StorageHaloRunV1alpha1PolicyApiGetStorageHaloRunV1alpha1Policy
      */
     readonly name: string
 }
 
 /**
- * Request parameters for liststorageHaloRunV1alpha1Policy operation in StorageHaloRunV1alpha1PolicyApi.
+ * Request parameters for listStorageHaloRunV1alpha1Policy operation in StorageHaloRunV1alpha1PolicyApi.
  * @export
- * @interface StorageHaloRunV1alpha1PolicyApiListstorageHaloRunV1alpha1PolicyRequest
+ * @interface StorageHaloRunV1alpha1PolicyApiListStorageHaloRunV1alpha1PolicyRequest
  */
-export interface StorageHaloRunV1alpha1PolicyApiListstorageHaloRunV1alpha1PolicyRequest {
+export interface StorageHaloRunV1alpha1PolicyApiListStorageHaloRunV1alpha1PolicyRequest {
     /**
      * Page number. Default is 0.
      * @type {number}
-     * @memberof StorageHaloRunV1alpha1PolicyApiListstorageHaloRunV1alpha1Policy
+     * @memberof StorageHaloRunV1alpha1PolicyApiListStorageHaloRunV1alpha1Policy
      */
     readonly page?: number
 
     /**
      * Size number. Default is 0.
      * @type {number}
-     * @memberof StorageHaloRunV1alpha1PolicyApiListstorageHaloRunV1alpha1Policy
+     * @memberof StorageHaloRunV1alpha1PolicyApiListStorageHaloRunV1alpha1Policy
      */
     readonly size?: number
 
     /**
      * Label selector. e.g.: hidden!&#x3D;true
      * @type {Array<string>}
-     * @memberof StorageHaloRunV1alpha1PolicyApiListstorageHaloRunV1alpha1Policy
+     * @memberof StorageHaloRunV1alpha1PolicyApiListStorageHaloRunV1alpha1Policy
      */
     readonly labelSelector?: Array<string>
 
     /**
      * Field selector. e.g.: metadata.name&#x3D;&#x3D;halo
      * @type {Array<string>}
-     * @memberof StorageHaloRunV1alpha1PolicyApiListstorageHaloRunV1alpha1Policy
+     * @memberof StorageHaloRunV1alpha1PolicyApiListStorageHaloRunV1alpha1Policy
      */
     readonly fieldSelector?: Array<string>
 
     /**
      * Sorting criteria in the format: property,(asc|desc). Default sort order is ascending. Multiple sort criteria are supported.
      * @type {Array<string>}
-     * @memberof StorageHaloRunV1alpha1PolicyApiListstorageHaloRunV1alpha1Policy
+     * @memberof StorageHaloRunV1alpha1PolicyApiListStorageHaloRunV1alpha1Policy
      */
     readonly sort?: Array<string>
 }
 
 /**
- * Request parameters for updatestorageHaloRunV1alpha1Policy operation in StorageHaloRunV1alpha1PolicyApi.
+ * Request parameters for updateStorageHaloRunV1alpha1Policy operation in StorageHaloRunV1alpha1PolicyApi.
  * @export
- * @interface StorageHaloRunV1alpha1PolicyApiUpdatestorageHaloRunV1alpha1PolicyRequest
+ * @interface StorageHaloRunV1alpha1PolicyApiUpdateStorageHaloRunV1alpha1PolicyRequest
  */
-export interface StorageHaloRunV1alpha1PolicyApiUpdatestorageHaloRunV1alpha1PolicyRequest {
+export interface StorageHaloRunV1alpha1PolicyApiUpdateStorageHaloRunV1alpha1PolicyRequest {
     /**
      * Name of policy
      * @type {string}
-     * @memberof StorageHaloRunV1alpha1PolicyApiUpdatestorageHaloRunV1alpha1Policy
+     * @memberof StorageHaloRunV1alpha1PolicyApiUpdateStorageHaloRunV1alpha1Policy
      */
     readonly name: string
 
     /**
      * Updated policy
      * @type {Policy}
-     * @memberof StorageHaloRunV1alpha1PolicyApiUpdatestorageHaloRunV1alpha1Policy
+     * @memberof StorageHaloRunV1alpha1PolicyApiUpdateStorageHaloRunV1alpha1Policy
      */
     readonly policy?: Policy
 }
@@ -508,57 +508,57 @@ export interface StorageHaloRunV1alpha1PolicyApiUpdatestorageHaloRunV1alpha1Poli
 export class StorageHaloRunV1alpha1PolicyApi extends BaseAPI {
     /**
      * Create storage.halo.run/v1alpha1/Policy
-     * @param {StorageHaloRunV1alpha1PolicyApiCreatestorageHaloRunV1alpha1PolicyRequest} requestParameters Request parameters.
+     * @param {StorageHaloRunV1alpha1PolicyApiCreateStorageHaloRunV1alpha1PolicyRequest} requestParameters Request parameters.
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      * @memberof StorageHaloRunV1alpha1PolicyApi
      */
-    public createstorageHaloRunV1alpha1Policy(requestParameters: StorageHaloRunV1alpha1PolicyApiCreatestorageHaloRunV1alpha1PolicyRequest = {}, options?: RawAxiosRequestConfig) {
-        return StorageHaloRunV1alpha1PolicyApiFp(this.configuration).createstorageHaloRunV1alpha1Policy(requestParameters.policy, options).then((request) => request(this.axios, this.basePath));
+    public createStorageHaloRunV1alpha1Policy(requestParameters: StorageHaloRunV1alpha1PolicyApiCreateStorageHaloRunV1alpha1PolicyRequest = {}, options?: RawAxiosRequestConfig) {
+        return StorageHaloRunV1alpha1PolicyApiFp(this.configuration).createStorageHaloRunV1alpha1Policy(requestParameters.policy, options).then((request) => request(this.axios, this.basePath));
     }
 
     /**
      * Delete storage.halo.run/v1alpha1/Policy
-     * @param {StorageHaloRunV1alpha1PolicyApiDeletestorageHaloRunV1alpha1PolicyRequest} requestParameters Request parameters.
+     * @param {StorageHaloRunV1alpha1PolicyApiDeleteStorageHaloRunV1alpha1PolicyRequest} requestParameters Request parameters.
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      * @memberof StorageHaloRunV1alpha1PolicyApi
      */
-    public deletestorageHaloRunV1alpha1Policy(requestParameters: StorageHaloRunV1alpha1PolicyApiDeletestorageHaloRunV1alpha1PolicyRequest, options?: RawAxiosRequestConfig) {
-        return StorageHaloRunV1alpha1PolicyApiFp(this.configuration).deletestorageHaloRunV1alpha1Policy(requestParameters.name, options).then((request) => request(this.axios, this.basePath));
+    public deleteStorageHaloRunV1alpha1Policy(requestParameters: StorageHaloRunV1alpha1PolicyApiDeleteStorageHaloRunV1alpha1PolicyRequest, options?: RawAxiosRequestConfig) {
+        return StorageHaloRunV1alpha1PolicyApiFp(this.configuration).deleteStorageHaloRunV1alpha1Policy(requestParameters.name, options).then((request) => request(this.axios, this.basePath));
     }
 
     /**
      * Get storage.halo.run/v1alpha1/Policy
-     * @param {StorageHaloRunV1alpha1PolicyApiGetstorageHaloRunV1alpha1PolicyRequest} requestParameters Request parameters.
+     * @param {StorageHaloRunV1alpha1PolicyApiGetStorageHaloRunV1alpha1PolicyRequest} requestParameters Request parameters.
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      * @memberof StorageHaloRunV1alpha1PolicyApi
      */
-    public getstorageHaloRunV1alpha1Policy(requestParameters: StorageHaloRunV1alpha1PolicyApiGetstorageHaloRunV1alpha1PolicyRequest, options?: RawAxiosRequestConfig) {
-        return StorageHaloRunV1alpha1PolicyApiFp(this.configuration).getstorageHaloRunV1alpha1Policy(requestParameters.name, options).then((request) => request(this.axios, this.basePath));
+    public getStorageHaloRunV1alpha1Policy(requestParameters: StorageHaloRunV1alpha1PolicyApiGetStorageHaloRunV1alpha1PolicyRequest, options?: RawAxiosRequestConfig) {
+        return StorageHaloRunV1alpha1PolicyApiFp(this.configuration).getStorageHaloRunV1alpha1Policy(requestParameters.name, options).then((request) => request(this.axios, this.basePath));
     }
 
     /**
      * List storage.halo.run/v1alpha1/Policy
-     * @param {StorageHaloRunV1alpha1PolicyApiListstorageHaloRunV1alpha1PolicyRequest} requestParameters Request parameters.
+     * @param {StorageHaloRunV1alpha1PolicyApiListStorageHaloRunV1alpha1PolicyRequest} requestParameters Request parameters.
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      * @memberof StorageHaloRunV1alpha1PolicyApi
      */
-    public liststorageHaloRunV1alpha1Policy(requestParameters: StorageHaloRunV1alpha1PolicyApiListstorageHaloRunV1alpha1PolicyRequest = {}, options?: RawAxiosRequestConfig) {
-        return StorageHaloRunV1alpha1PolicyApiFp(this.configuration).liststorageHaloRunV1alpha1Policy(requestParameters.page, requestParameters.size, requestParameters.labelSelector, requestParameters.fieldSelector, requestParameters.sort, options).then((request) => request(this.axios, this.basePath));
+    public listStorageHaloRunV1alpha1Policy(requestParameters: StorageHaloRunV1alpha1PolicyApiListStorageHaloRunV1alpha1PolicyRequest = {}, options?: RawAxiosRequestConfig) {
+        return StorageHaloRunV1alpha1PolicyApiFp(this.configuration).listStorageHaloRunV1alpha1Policy(requestParameters.page, requestParameters.size, requestParameters.labelSelector, requestParameters.fieldSelector, requestParameters.sort, options).then((request) => request(this.axios, this.basePath));
     }
 
     /**
      * Update storage.halo.run/v1alpha1/Policy
-     * @param {StorageHaloRunV1alpha1PolicyApiUpdatestorageHaloRunV1alpha1PolicyRequest} requestParameters Request parameters.
+     * @param {StorageHaloRunV1alpha1PolicyApiUpdateStorageHaloRunV1alpha1PolicyRequest} requestParameters Request parameters.
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      * @memberof StorageHaloRunV1alpha1PolicyApi
      */
-    public updatestorageHaloRunV1alpha1Policy(requestParameters: StorageHaloRunV1alpha1PolicyApiUpdatestorageHaloRunV1alpha1PolicyRequest, options?: RawAxiosRequestConfig) {
-        return StorageHaloRunV1alpha1PolicyApiFp(this.configuration).updatestorageHaloRunV1alpha1Policy(requestParameters.name, requestParameters.policy, options).then((request) => request(this.axios, this.basePath));
+    public updateStorageHaloRunV1alpha1Policy(requestParameters: StorageHaloRunV1alpha1PolicyApiUpdateStorageHaloRunV1alpha1PolicyRequest, options?: RawAxiosRequestConfig) {
+        return StorageHaloRunV1alpha1PolicyApiFp(this.configuration).updateStorageHaloRunV1alpha1Policy(requestParameters.name, requestParameters.policy, options).then((request) => request(this.axios, this.basePath));
     }
 }
 

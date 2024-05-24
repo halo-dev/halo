@@ -51,7 +51,7 @@ const {
     }
 
     const menuItemNames = selectedMenu.value.spec.menuItems.filter(Boolean);
-    const { data } = await apiClient.extension.menuItem.listv1alpha1MenuItem({
+    const { data } = await apiClient.extension.menuItem.listV1alpha1MenuItem({
       page: 0,
       size: 0,
       fieldSelector: [`name=(${menuItemNames.join(",")})`],
@@ -73,7 +73,7 @@ const {
 
 const handleOpenEditingModal = (menuItem: MenuTreeItem) => {
   apiClient.extension.menuItem
-    .getv1alpha1MenuItem({
+    .getV1alpha1MenuItem({
       name: menuItem.metadata.name,
     })
     .then((response) => {
@@ -106,7 +106,7 @@ const onMenuItemSaved = async (menuItem: MenuItem) => {
       menuItem.metadata.name,
     ];
 
-    await apiClient.extension.menu.updatev1alpha1Menu({
+    await apiClient.extension.menu.updateV1alpha1Menu({
       name: menuToUpdate.metadata.name,
       menu: menuToUpdate,
     });
@@ -124,7 +124,7 @@ const handleUpdateInBatch = useDebounceFn(async () => {
   try {
     batchUpdating.value = true;
     const promises = menuItemsToUpdate.map((menuItem) =>
-      apiClient.extension.menuItem.updatev1alpha1MenuItem({
+      apiClient.extension.menuItem.updateV1alpha1MenuItem({
         name: menuItem.metadata.name,
         menuItem,
       })
@@ -147,7 +147,7 @@ const handleDelete = async (menuItem: MenuTreeItem) => {
     confirmText: t("core.common.buttons.confirm"),
     cancelText: t("core.common.buttons.cancel"),
     onConfirm: async () => {
-      await apiClient.extension.menuItem.deletev1alpha1MenuItem({
+      await apiClient.extension.menuItem.deleteV1alpha1MenuItem({
         name: menuItem.metadata.name,
       });
 
@@ -155,7 +155,7 @@ const handleDelete = async (menuItem: MenuTreeItem) => {
 
       if (childrenNames.length) {
         const deleteChildrenRequests = childrenNames.map((name) =>
-          apiClient.extension.menuItem.deletev1alpha1MenuItem({
+          apiClient.extension.menuItem.deleteV1alpha1MenuItem({
             name,
           })
         );
@@ -170,7 +170,7 @@ const handleDelete = async (menuItem: MenuTreeItem) => {
         menuToUpdate.spec.menuItems = menuToUpdate.spec.menuItems?.filter(
           (name) => ![menuItem.metadata.name, ...childrenNames].includes(name)
         );
-        await apiClient.extension.menu.updatev1alpha1Menu({
+        await apiClient.extension.menu.updateV1alpha1Menu({
           name: menuToUpdate.metadata.name,
           menu: menuToUpdate,
         });

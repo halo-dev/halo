@@ -37,7 +37,7 @@ export const StorageHaloRunV1alpha1GroupApiAxiosParamCreator = function (configu
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        createstorageHaloRunV1alpha1Group: async (group?: Group, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+        createStorageHaloRunV1alpha1Group: async (group?: Group, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
             const localVarPath = `/apis/storage.halo.run/v1alpha1/groups`;
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
@@ -78,9 +78,9 @@ export const StorageHaloRunV1alpha1GroupApiAxiosParamCreator = function (configu
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        deletestorageHaloRunV1alpha1Group: async (name: string, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+        deleteStorageHaloRunV1alpha1Group: async (name: string, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
             // verify required parameter 'name' is not null or undefined
-            assertParamExists('deletestorageHaloRunV1alpha1Group', 'name', name)
+            assertParamExists('deleteStorageHaloRunV1alpha1Group', 'name', name)
             const localVarPath = `/apis/storage.halo.run/v1alpha1/groups/{name}`
                 .replace(`{${"name"}}`, encodeURIComponent(String(name)));
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
@@ -119,9 +119,9 @@ export const StorageHaloRunV1alpha1GroupApiAxiosParamCreator = function (configu
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        getstorageHaloRunV1alpha1Group: async (name: string, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+        getStorageHaloRunV1alpha1Group: async (name: string, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
             // verify required parameter 'name' is not null or undefined
-            assertParamExists('getstorageHaloRunV1alpha1Group', 'name', name)
+            assertParamExists('getStorageHaloRunV1alpha1Group', 'name', name)
             const localVarPath = `/apis/storage.halo.run/v1alpha1/groups/{name}`
                 .replace(`{${"name"}}`, encodeURIComponent(String(name)));
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
@@ -164,7 +164,7 @@ export const StorageHaloRunV1alpha1GroupApiAxiosParamCreator = function (configu
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        liststorageHaloRunV1alpha1Group: async (page?: number, size?: number, labelSelector?: Array<string>, fieldSelector?: Array<string>, sort?: Array<string>, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+        listStorageHaloRunV1alpha1Group: async (page?: number, size?: number, labelSelector?: Array<string>, fieldSelector?: Array<string>, sort?: Array<string>, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
             const localVarPath = `/apis/storage.halo.run/v1alpha1/groups`;
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
@@ -223,9 +223,9 @@ export const StorageHaloRunV1alpha1GroupApiAxiosParamCreator = function (configu
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        updatestorageHaloRunV1alpha1Group: async (name: string, group?: Group, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+        updateStorageHaloRunV1alpha1Group: async (name: string, group?: Group, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
             // verify required parameter 'name' is not null or undefined
-            assertParamExists('updatestorageHaloRunV1alpha1Group', 'name', name)
+            assertParamExists('updateStorageHaloRunV1alpha1Group', 'name', name)
             const localVarPath = `/apis/storage.halo.run/v1alpha1/groups/{name}`
                 .replace(`{${"name"}}`, encodeURIComponent(String(name)));
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
@@ -277,10 +277,10 @@ export const StorageHaloRunV1alpha1GroupApiFp = function(configuration?: Configu
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async createstorageHaloRunV1alpha1Group(group?: Group, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<Group>> {
-            const localVarAxiosArgs = await localVarAxiosParamCreator.createstorageHaloRunV1alpha1Group(group, options);
+        async createStorageHaloRunV1alpha1Group(group?: Group, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<Group>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.createStorageHaloRunV1alpha1Group(group, options);
             const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
-            const localVarOperationServerBasePath = operationServerMap['StorageHaloRunV1alpha1GroupApi.createstorageHaloRunV1alpha1Group']?.[localVarOperationServerIndex]?.url;
+            const localVarOperationServerBasePath = operationServerMap['StorageHaloRunV1alpha1GroupApi.createStorageHaloRunV1alpha1Group']?.[localVarOperationServerIndex]?.url;
             return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
         },
         /**
@@ -289,10 +289,10 @@ export const StorageHaloRunV1alpha1GroupApiFp = function(configuration?: Configu
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async deletestorageHaloRunV1alpha1Group(name: string, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<void>> {
-            const localVarAxiosArgs = await localVarAxiosParamCreator.deletestorageHaloRunV1alpha1Group(name, options);
+        async deleteStorageHaloRunV1alpha1Group(name: string, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<void>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.deleteStorageHaloRunV1alpha1Group(name, options);
             const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
-            const localVarOperationServerBasePath = operationServerMap['StorageHaloRunV1alpha1GroupApi.deletestorageHaloRunV1alpha1Group']?.[localVarOperationServerIndex]?.url;
+            const localVarOperationServerBasePath = operationServerMap['StorageHaloRunV1alpha1GroupApi.deleteStorageHaloRunV1alpha1Group']?.[localVarOperationServerIndex]?.url;
             return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
         },
         /**
@@ -301,10 +301,10 @@ export const StorageHaloRunV1alpha1GroupApiFp = function(configuration?: Configu
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async getstorageHaloRunV1alpha1Group(name: string, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<Group>> {
-            const localVarAxiosArgs = await localVarAxiosParamCreator.getstorageHaloRunV1alpha1Group(name, options);
+        async getStorageHaloRunV1alpha1Group(name: string, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<Group>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.getStorageHaloRunV1alpha1Group(name, options);
             const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
-            const localVarOperationServerBasePath = operationServerMap['StorageHaloRunV1alpha1GroupApi.getstorageHaloRunV1alpha1Group']?.[localVarOperationServerIndex]?.url;
+            const localVarOperationServerBasePath = operationServerMap['StorageHaloRunV1alpha1GroupApi.getStorageHaloRunV1alpha1Group']?.[localVarOperationServerIndex]?.url;
             return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
         },
         /**
@@ -317,10 +317,10 @@ export const StorageHaloRunV1alpha1GroupApiFp = function(configuration?: Configu
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async liststorageHaloRunV1alpha1Group(page?: number, size?: number, labelSelector?: Array<string>, fieldSelector?: Array<string>, sort?: Array<string>, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<GroupList>> {
-            const localVarAxiosArgs = await localVarAxiosParamCreator.liststorageHaloRunV1alpha1Group(page, size, labelSelector, fieldSelector, sort, options);
+        async listStorageHaloRunV1alpha1Group(page?: number, size?: number, labelSelector?: Array<string>, fieldSelector?: Array<string>, sort?: Array<string>, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<GroupList>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.listStorageHaloRunV1alpha1Group(page, size, labelSelector, fieldSelector, sort, options);
             const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
-            const localVarOperationServerBasePath = operationServerMap['StorageHaloRunV1alpha1GroupApi.liststorageHaloRunV1alpha1Group']?.[localVarOperationServerIndex]?.url;
+            const localVarOperationServerBasePath = operationServerMap['StorageHaloRunV1alpha1GroupApi.listStorageHaloRunV1alpha1Group']?.[localVarOperationServerIndex]?.url;
             return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
         },
         /**
@@ -330,10 +330,10 @@ export const StorageHaloRunV1alpha1GroupApiFp = function(configuration?: Configu
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async updatestorageHaloRunV1alpha1Group(name: string, group?: Group, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<Group>> {
-            const localVarAxiosArgs = await localVarAxiosParamCreator.updatestorageHaloRunV1alpha1Group(name, group, options);
+        async updateStorageHaloRunV1alpha1Group(name: string, group?: Group, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<Group>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.updateStorageHaloRunV1alpha1Group(name, group, options);
             const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
-            const localVarOperationServerBasePath = operationServerMap['StorageHaloRunV1alpha1GroupApi.updatestorageHaloRunV1alpha1Group']?.[localVarOperationServerIndex]?.url;
+            const localVarOperationServerBasePath = operationServerMap['StorageHaloRunV1alpha1GroupApi.updateStorageHaloRunV1alpha1Group']?.[localVarOperationServerIndex]?.url;
             return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
         },
     }
@@ -348,153 +348,153 @@ export const StorageHaloRunV1alpha1GroupApiFactory = function (configuration?: C
     return {
         /**
          * Create storage.halo.run/v1alpha1/Group
-         * @param {StorageHaloRunV1alpha1GroupApiCreatestorageHaloRunV1alpha1GroupRequest} requestParameters Request parameters.
+         * @param {StorageHaloRunV1alpha1GroupApiCreateStorageHaloRunV1alpha1GroupRequest} requestParameters Request parameters.
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        createstorageHaloRunV1alpha1Group(requestParameters: StorageHaloRunV1alpha1GroupApiCreatestorageHaloRunV1alpha1GroupRequest = {}, options?: RawAxiosRequestConfig): AxiosPromise<Group> {
-            return localVarFp.createstorageHaloRunV1alpha1Group(requestParameters.group, options).then((request) => request(axios, basePath));
+        createStorageHaloRunV1alpha1Group(requestParameters: StorageHaloRunV1alpha1GroupApiCreateStorageHaloRunV1alpha1GroupRequest = {}, options?: RawAxiosRequestConfig): AxiosPromise<Group> {
+            return localVarFp.createStorageHaloRunV1alpha1Group(requestParameters.group, options).then((request) => request(axios, basePath));
         },
         /**
          * Delete storage.halo.run/v1alpha1/Group
-         * @param {StorageHaloRunV1alpha1GroupApiDeletestorageHaloRunV1alpha1GroupRequest} requestParameters Request parameters.
+         * @param {StorageHaloRunV1alpha1GroupApiDeleteStorageHaloRunV1alpha1GroupRequest} requestParameters Request parameters.
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        deletestorageHaloRunV1alpha1Group(requestParameters: StorageHaloRunV1alpha1GroupApiDeletestorageHaloRunV1alpha1GroupRequest, options?: RawAxiosRequestConfig): AxiosPromise<void> {
-            return localVarFp.deletestorageHaloRunV1alpha1Group(requestParameters.name, options).then((request) => request(axios, basePath));
+        deleteStorageHaloRunV1alpha1Group(requestParameters: StorageHaloRunV1alpha1GroupApiDeleteStorageHaloRunV1alpha1GroupRequest, options?: RawAxiosRequestConfig): AxiosPromise<void> {
+            return localVarFp.deleteStorageHaloRunV1alpha1Group(requestParameters.name, options).then((request) => request(axios, basePath));
         },
         /**
          * Get storage.halo.run/v1alpha1/Group
-         * @param {StorageHaloRunV1alpha1GroupApiGetstorageHaloRunV1alpha1GroupRequest} requestParameters Request parameters.
+         * @param {StorageHaloRunV1alpha1GroupApiGetStorageHaloRunV1alpha1GroupRequest} requestParameters Request parameters.
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        getstorageHaloRunV1alpha1Group(requestParameters: StorageHaloRunV1alpha1GroupApiGetstorageHaloRunV1alpha1GroupRequest, options?: RawAxiosRequestConfig): AxiosPromise<Group> {
-            return localVarFp.getstorageHaloRunV1alpha1Group(requestParameters.name, options).then((request) => request(axios, basePath));
+        getStorageHaloRunV1alpha1Group(requestParameters: StorageHaloRunV1alpha1GroupApiGetStorageHaloRunV1alpha1GroupRequest, options?: RawAxiosRequestConfig): AxiosPromise<Group> {
+            return localVarFp.getStorageHaloRunV1alpha1Group(requestParameters.name, options).then((request) => request(axios, basePath));
         },
         /**
          * List storage.halo.run/v1alpha1/Group
-         * @param {StorageHaloRunV1alpha1GroupApiListstorageHaloRunV1alpha1GroupRequest} requestParameters Request parameters.
+         * @param {StorageHaloRunV1alpha1GroupApiListStorageHaloRunV1alpha1GroupRequest} requestParameters Request parameters.
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        liststorageHaloRunV1alpha1Group(requestParameters: StorageHaloRunV1alpha1GroupApiListstorageHaloRunV1alpha1GroupRequest = {}, options?: RawAxiosRequestConfig): AxiosPromise<GroupList> {
-            return localVarFp.liststorageHaloRunV1alpha1Group(requestParameters.page, requestParameters.size, requestParameters.labelSelector, requestParameters.fieldSelector, requestParameters.sort, options).then((request) => request(axios, basePath));
+        listStorageHaloRunV1alpha1Group(requestParameters: StorageHaloRunV1alpha1GroupApiListStorageHaloRunV1alpha1GroupRequest = {}, options?: RawAxiosRequestConfig): AxiosPromise<GroupList> {
+            return localVarFp.listStorageHaloRunV1alpha1Group(requestParameters.page, requestParameters.size, requestParameters.labelSelector, requestParameters.fieldSelector, requestParameters.sort, options).then((request) => request(axios, basePath));
         },
         /**
          * Update storage.halo.run/v1alpha1/Group
-         * @param {StorageHaloRunV1alpha1GroupApiUpdatestorageHaloRunV1alpha1GroupRequest} requestParameters Request parameters.
+         * @param {StorageHaloRunV1alpha1GroupApiUpdateStorageHaloRunV1alpha1GroupRequest} requestParameters Request parameters.
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        updatestorageHaloRunV1alpha1Group(requestParameters: StorageHaloRunV1alpha1GroupApiUpdatestorageHaloRunV1alpha1GroupRequest, options?: RawAxiosRequestConfig): AxiosPromise<Group> {
-            return localVarFp.updatestorageHaloRunV1alpha1Group(requestParameters.name, requestParameters.group, options).then((request) => request(axios, basePath));
+        updateStorageHaloRunV1alpha1Group(requestParameters: StorageHaloRunV1alpha1GroupApiUpdateStorageHaloRunV1alpha1GroupRequest, options?: RawAxiosRequestConfig): AxiosPromise<Group> {
+            return localVarFp.updateStorageHaloRunV1alpha1Group(requestParameters.name, requestParameters.group, options).then((request) => request(axios, basePath));
         },
     };
 };
 
 /**
- * Request parameters for createstorageHaloRunV1alpha1Group operation in StorageHaloRunV1alpha1GroupApi.
+ * Request parameters for createStorageHaloRunV1alpha1Group operation in StorageHaloRunV1alpha1GroupApi.
  * @export
- * @interface StorageHaloRunV1alpha1GroupApiCreatestorageHaloRunV1alpha1GroupRequest
+ * @interface StorageHaloRunV1alpha1GroupApiCreateStorageHaloRunV1alpha1GroupRequest
  */
-export interface StorageHaloRunV1alpha1GroupApiCreatestorageHaloRunV1alpha1GroupRequest {
+export interface StorageHaloRunV1alpha1GroupApiCreateStorageHaloRunV1alpha1GroupRequest {
     /**
      * Fresh group
      * @type {Group}
-     * @memberof StorageHaloRunV1alpha1GroupApiCreatestorageHaloRunV1alpha1Group
+     * @memberof StorageHaloRunV1alpha1GroupApiCreateStorageHaloRunV1alpha1Group
      */
     readonly group?: Group
 }
 
 /**
- * Request parameters for deletestorageHaloRunV1alpha1Group operation in StorageHaloRunV1alpha1GroupApi.
+ * Request parameters for deleteStorageHaloRunV1alpha1Group operation in StorageHaloRunV1alpha1GroupApi.
  * @export
- * @interface StorageHaloRunV1alpha1GroupApiDeletestorageHaloRunV1alpha1GroupRequest
+ * @interface StorageHaloRunV1alpha1GroupApiDeleteStorageHaloRunV1alpha1GroupRequest
  */
-export interface StorageHaloRunV1alpha1GroupApiDeletestorageHaloRunV1alpha1GroupRequest {
+export interface StorageHaloRunV1alpha1GroupApiDeleteStorageHaloRunV1alpha1GroupRequest {
     /**
      * Name of group
      * @type {string}
-     * @memberof StorageHaloRunV1alpha1GroupApiDeletestorageHaloRunV1alpha1Group
+     * @memberof StorageHaloRunV1alpha1GroupApiDeleteStorageHaloRunV1alpha1Group
      */
     readonly name: string
 }
 
 /**
- * Request parameters for getstorageHaloRunV1alpha1Group operation in StorageHaloRunV1alpha1GroupApi.
+ * Request parameters for getStorageHaloRunV1alpha1Group operation in StorageHaloRunV1alpha1GroupApi.
  * @export
- * @interface StorageHaloRunV1alpha1GroupApiGetstorageHaloRunV1alpha1GroupRequest
+ * @interface StorageHaloRunV1alpha1GroupApiGetStorageHaloRunV1alpha1GroupRequest
  */
-export interface StorageHaloRunV1alpha1GroupApiGetstorageHaloRunV1alpha1GroupRequest {
+export interface StorageHaloRunV1alpha1GroupApiGetStorageHaloRunV1alpha1GroupRequest {
     /**
      * Name of group
      * @type {string}
-     * @memberof StorageHaloRunV1alpha1GroupApiGetstorageHaloRunV1alpha1Group
+     * @memberof StorageHaloRunV1alpha1GroupApiGetStorageHaloRunV1alpha1Group
      */
     readonly name: string
 }
 
 /**
- * Request parameters for liststorageHaloRunV1alpha1Group operation in StorageHaloRunV1alpha1GroupApi.
+ * Request parameters for listStorageHaloRunV1alpha1Group operation in StorageHaloRunV1alpha1GroupApi.
  * @export
- * @interface StorageHaloRunV1alpha1GroupApiListstorageHaloRunV1alpha1GroupRequest
+ * @interface StorageHaloRunV1alpha1GroupApiListStorageHaloRunV1alpha1GroupRequest
  */
-export interface StorageHaloRunV1alpha1GroupApiListstorageHaloRunV1alpha1GroupRequest {
+export interface StorageHaloRunV1alpha1GroupApiListStorageHaloRunV1alpha1GroupRequest {
     /**
      * Page number. Default is 0.
      * @type {number}
-     * @memberof StorageHaloRunV1alpha1GroupApiListstorageHaloRunV1alpha1Group
+     * @memberof StorageHaloRunV1alpha1GroupApiListStorageHaloRunV1alpha1Group
      */
     readonly page?: number
 
     /**
      * Size number. Default is 0.
      * @type {number}
-     * @memberof StorageHaloRunV1alpha1GroupApiListstorageHaloRunV1alpha1Group
+     * @memberof StorageHaloRunV1alpha1GroupApiListStorageHaloRunV1alpha1Group
      */
     readonly size?: number
 
     /**
      * Label selector. e.g.: hidden!&#x3D;true
      * @type {Array<string>}
-     * @memberof StorageHaloRunV1alpha1GroupApiListstorageHaloRunV1alpha1Group
+     * @memberof StorageHaloRunV1alpha1GroupApiListStorageHaloRunV1alpha1Group
      */
     readonly labelSelector?: Array<string>
 
     /**
      * Field selector. e.g.: metadata.name&#x3D;&#x3D;halo
      * @type {Array<string>}
-     * @memberof StorageHaloRunV1alpha1GroupApiListstorageHaloRunV1alpha1Group
+     * @memberof StorageHaloRunV1alpha1GroupApiListStorageHaloRunV1alpha1Group
      */
     readonly fieldSelector?: Array<string>
 
     /**
      * Sorting criteria in the format: property,(asc|desc). Default sort order is ascending. Multiple sort criteria are supported.
      * @type {Array<string>}
-     * @memberof StorageHaloRunV1alpha1GroupApiListstorageHaloRunV1alpha1Group
+     * @memberof StorageHaloRunV1alpha1GroupApiListStorageHaloRunV1alpha1Group
      */
     readonly sort?: Array<string>
 }
 
 /**
- * Request parameters for updatestorageHaloRunV1alpha1Group operation in StorageHaloRunV1alpha1GroupApi.
+ * Request parameters for updateStorageHaloRunV1alpha1Group operation in StorageHaloRunV1alpha1GroupApi.
  * @export
- * @interface StorageHaloRunV1alpha1GroupApiUpdatestorageHaloRunV1alpha1GroupRequest
+ * @interface StorageHaloRunV1alpha1GroupApiUpdateStorageHaloRunV1alpha1GroupRequest
  */
-export interface StorageHaloRunV1alpha1GroupApiUpdatestorageHaloRunV1alpha1GroupRequest {
+export interface StorageHaloRunV1alpha1GroupApiUpdateStorageHaloRunV1alpha1GroupRequest {
     /**
      * Name of group
      * @type {string}
-     * @memberof StorageHaloRunV1alpha1GroupApiUpdatestorageHaloRunV1alpha1Group
+     * @memberof StorageHaloRunV1alpha1GroupApiUpdateStorageHaloRunV1alpha1Group
      */
     readonly name: string
 
     /**
      * Updated group
      * @type {Group}
-     * @memberof StorageHaloRunV1alpha1GroupApiUpdatestorageHaloRunV1alpha1Group
+     * @memberof StorageHaloRunV1alpha1GroupApiUpdateStorageHaloRunV1alpha1Group
      */
     readonly group?: Group
 }
@@ -508,57 +508,57 @@ export interface StorageHaloRunV1alpha1GroupApiUpdatestorageHaloRunV1alpha1Group
 export class StorageHaloRunV1alpha1GroupApi extends BaseAPI {
     /**
      * Create storage.halo.run/v1alpha1/Group
-     * @param {StorageHaloRunV1alpha1GroupApiCreatestorageHaloRunV1alpha1GroupRequest} requestParameters Request parameters.
+     * @param {StorageHaloRunV1alpha1GroupApiCreateStorageHaloRunV1alpha1GroupRequest} requestParameters Request parameters.
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      * @memberof StorageHaloRunV1alpha1GroupApi
      */
-    public createstorageHaloRunV1alpha1Group(requestParameters: StorageHaloRunV1alpha1GroupApiCreatestorageHaloRunV1alpha1GroupRequest = {}, options?: RawAxiosRequestConfig) {
-        return StorageHaloRunV1alpha1GroupApiFp(this.configuration).createstorageHaloRunV1alpha1Group(requestParameters.group, options).then((request) => request(this.axios, this.basePath));
+    public createStorageHaloRunV1alpha1Group(requestParameters: StorageHaloRunV1alpha1GroupApiCreateStorageHaloRunV1alpha1GroupRequest = {}, options?: RawAxiosRequestConfig) {
+        return StorageHaloRunV1alpha1GroupApiFp(this.configuration).createStorageHaloRunV1alpha1Group(requestParameters.group, options).then((request) => request(this.axios, this.basePath));
     }
 
     /**
      * Delete storage.halo.run/v1alpha1/Group
-     * @param {StorageHaloRunV1alpha1GroupApiDeletestorageHaloRunV1alpha1GroupRequest} requestParameters Request parameters.
+     * @param {StorageHaloRunV1alpha1GroupApiDeleteStorageHaloRunV1alpha1GroupRequest} requestParameters Request parameters.
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      * @memberof StorageHaloRunV1alpha1GroupApi
      */
-    public deletestorageHaloRunV1alpha1Group(requestParameters: StorageHaloRunV1alpha1GroupApiDeletestorageHaloRunV1alpha1GroupRequest, options?: RawAxiosRequestConfig) {
-        return StorageHaloRunV1alpha1GroupApiFp(this.configuration).deletestorageHaloRunV1alpha1Group(requestParameters.name, options).then((request) => request(this.axios, this.basePath));
+    public deleteStorageHaloRunV1alpha1Group(requestParameters: StorageHaloRunV1alpha1GroupApiDeleteStorageHaloRunV1alpha1GroupRequest, options?: RawAxiosRequestConfig) {
+        return StorageHaloRunV1alpha1GroupApiFp(this.configuration).deleteStorageHaloRunV1alpha1Group(requestParameters.name, options).then((request) => request(this.axios, this.basePath));
     }
 
     /**
      * Get storage.halo.run/v1alpha1/Group
-     * @param {StorageHaloRunV1alpha1GroupApiGetstorageHaloRunV1alpha1GroupRequest} requestParameters Request parameters.
+     * @param {StorageHaloRunV1alpha1GroupApiGetStorageHaloRunV1alpha1GroupRequest} requestParameters Request parameters.
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      * @memberof StorageHaloRunV1alpha1GroupApi
      */
-    public getstorageHaloRunV1alpha1Group(requestParameters: StorageHaloRunV1alpha1GroupApiGetstorageHaloRunV1alpha1GroupRequest, options?: RawAxiosRequestConfig) {
-        return StorageHaloRunV1alpha1GroupApiFp(this.configuration).getstorageHaloRunV1alpha1Group(requestParameters.name, options).then((request) => request(this.axios, this.basePath));
+    public getStorageHaloRunV1alpha1Group(requestParameters: StorageHaloRunV1alpha1GroupApiGetStorageHaloRunV1alpha1GroupRequest, options?: RawAxiosRequestConfig) {
+        return StorageHaloRunV1alpha1GroupApiFp(this.configuration).getStorageHaloRunV1alpha1Group(requestParameters.name, options).then((request) => request(this.axios, this.basePath));
     }
 
     /**
      * List storage.halo.run/v1alpha1/Group
-     * @param {StorageHaloRunV1alpha1GroupApiListstorageHaloRunV1alpha1GroupRequest} requestParameters Request parameters.
+     * @param {StorageHaloRunV1alpha1GroupApiListStorageHaloRunV1alpha1GroupRequest} requestParameters Request parameters.
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      * @memberof StorageHaloRunV1alpha1GroupApi
      */
-    public liststorageHaloRunV1alpha1Group(requestParameters: StorageHaloRunV1alpha1GroupApiListstorageHaloRunV1alpha1GroupRequest = {}, options?: RawAxiosRequestConfig) {
-        return StorageHaloRunV1alpha1GroupApiFp(this.configuration).liststorageHaloRunV1alpha1Group(requestParameters.page, requestParameters.size, requestParameters.labelSelector, requestParameters.fieldSelector, requestParameters.sort, options).then((request) => request(this.axios, this.basePath));
+    public listStorageHaloRunV1alpha1Group(requestParameters: StorageHaloRunV1alpha1GroupApiListStorageHaloRunV1alpha1GroupRequest = {}, options?: RawAxiosRequestConfig) {
+        return StorageHaloRunV1alpha1GroupApiFp(this.configuration).listStorageHaloRunV1alpha1Group(requestParameters.page, requestParameters.size, requestParameters.labelSelector, requestParameters.fieldSelector, requestParameters.sort, options).then((request) => request(this.axios, this.basePath));
     }
 
     /**
      * Update storage.halo.run/v1alpha1/Group
-     * @param {StorageHaloRunV1alpha1GroupApiUpdatestorageHaloRunV1alpha1GroupRequest} requestParameters Request parameters.
+     * @param {StorageHaloRunV1alpha1GroupApiUpdateStorageHaloRunV1alpha1GroupRequest} requestParameters Request parameters.
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      * @memberof StorageHaloRunV1alpha1GroupApi
      */
-    public updatestorageHaloRunV1alpha1Group(requestParameters: StorageHaloRunV1alpha1GroupApiUpdatestorageHaloRunV1alpha1GroupRequest, options?: RawAxiosRequestConfig) {
-        return StorageHaloRunV1alpha1GroupApiFp(this.configuration).updatestorageHaloRunV1alpha1Group(requestParameters.name, requestParameters.group, options).then((request) => request(this.axios, this.basePath));
+    public updateStorageHaloRunV1alpha1Group(requestParameters: StorageHaloRunV1alpha1GroupApiUpdateStorageHaloRunV1alpha1GroupRequest, options?: RawAxiosRequestConfig) {
+        return StorageHaloRunV1alpha1GroupApiFp(this.configuration).updateStorageHaloRunV1alpha1Group(requestParameters.name, requestParameters.group, options).then((request) => request(this.axios, this.basePath));
     }
 }
 

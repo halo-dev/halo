@@ -147,7 +147,7 @@ const handleSave = async () => {
 
     const { data } = isUpdateMode.value
       ? await postUpdateMutate(formState.value)
-      : await apiClient.extension.post.createcontentHaloRunV1alpha1Post({
+      : await apiClient.extension.post.createContentHaloRunV1alpha1Post({
           post: formState.value,
         });
 

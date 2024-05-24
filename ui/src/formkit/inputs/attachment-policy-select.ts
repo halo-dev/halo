@@ -5,7 +5,7 @@ import { select, selects, defaultIcon } from "@formkit/inputs";
 function optionsHandler(node: FormKitNode) {
   node.on("created", async () => {
     const { data } =
-      await apiClient.extension.storage.policy.liststorageHaloRunV1alpha1Policy();
+      await apiClient.extension.storage.policy.listStorageHaloRunV1alpha1Policy();
 
     node.props.options = data.items.map((policy) => {
       return {

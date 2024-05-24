@@ -21,7 +21,7 @@ export function useContentSnapshot(
       return;
     }
     const { data } =
-      await apiClient.extension.snapshot.getcontentHaloRunV1alpha1Snapshot({
+      await apiClient.extension.snapshot.getContentHaloRunV1alpha1Snapshot({
         name: snapshotName.value,
       });
     version.value = data.metadata.version || 0;

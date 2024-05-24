@@ -165,7 +165,7 @@ const handleDeleteInBatch = async () => {
     onConfirm: async () => {
       try {
         const promises = selectedCommentNames.value.map((name) => {
-          return apiClient.extension.comment.deletecontentHaloRunV1alpha1Comment(
+          return apiClient.extension.comment.deleteContentHaloRunV1alpha1Comment(
             {
               name,
             }
@@ -200,7 +200,7 @@ const handleApproveInBatch = async () => {
         });
 
         const promises = commentsToUpdate?.map((comment) => {
-          return apiClient.extension.comment.updatecontentHaloRunV1alpha1Comment(
+          return apiClient.extension.comment.updateContentHaloRunV1alpha1Comment(
             {
               name: comment.comment.metadata.name,
               comment: {

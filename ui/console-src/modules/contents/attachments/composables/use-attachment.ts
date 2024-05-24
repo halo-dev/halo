@@ -158,7 +158,7 @@ export function useAttachmentControl(filterOptions: {
         try {
           const promises = Array.from(selectedAttachments.value).map(
             (attachment) => {
-              return apiClient.extension.storage.attachment.deletestorageHaloRunV1alpha1Attachment(
+              return apiClient.extension.storage.attachment.deleteStorageHaloRunV1alpha1Attachment(
                 {
                   name: attachment.metadata.name,
                 }

@@ -44,7 +44,7 @@ provide<Ref<string>>("activeTab", activeTab);
 const { data: setting } = useQuery({
   queryKey: ["system-setting"],
   queryFn: async () => {
-    const { data } = await apiClient.extension.setting.getv1alpha1Setting({
+    const { data } = await apiClient.extension.setting.getV1alpha1Setting({
       name: "system",
     });
     return data;

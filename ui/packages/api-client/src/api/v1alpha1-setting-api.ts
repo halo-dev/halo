@@ -37,7 +37,7 @@ export const V1alpha1SettingApiAxiosParamCreator = function (configuration?: Con
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        createv1alpha1Setting: async (setting?: Setting, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+        createV1alpha1Setting: async (setting?: Setting, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
             const localVarPath = `/api/v1alpha1/settings`;
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
@@ -78,9 +78,9 @@ export const V1alpha1SettingApiAxiosParamCreator = function (configuration?: Con
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        deletev1alpha1Setting: async (name: string, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+        deleteV1alpha1Setting: async (name: string, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
             // verify required parameter 'name' is not null or undefined
-            assertParamExists('deletev1alpha1Setting', 'name', name)
+            assertParamExists('deleteV1alpha1Setting', 'name', name)
             const localVarPath = `/api/v1alpha1/settings/{name}`
                 .replace(`{${"name"}}`, encodeURIComponent(String(name)));
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
@@ -119,9 +119,9 @@ export const V1alpha1SettingApiAxiosParamCreator = function (configuration?: Con
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        getv1alpha1Setting: async (name: string, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+        getV1alpha1Setting: async (name: string, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
             // verify required parameter 'name' is not null or undefined
-            assertParamExists('getv1alpha1Setting', 'name', name)
+            assertParamExists('getV1alpha1Setting', 'name', name)
             const localVarPath = `/api/v1alpha1/settings/{name}`
                 .replace(`{${"name"}}`, encodeURIComponent(String(name)));
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
@@ -164,7 +164,7 @@ export const V1alpha1SettingApiAxiosParamCreator = function (configuration?: Con
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        listv1alpha1Setting: async (page?: number, size?: number, labelSelector?: Array<string>, fieldSelector?: Array<string>, sort?: Array<string>, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+        listV1alpha1Setting: async (page?: number, size?: number, labelSelector?: Array<string>, fieldSelector?: Array<string>, sort?: Array<string>, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
             const localVarPath = `/api/v1alpha1/settings`;
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
@@ -223,9 +223,9 @@ export const V1alpha1SettingApiAxiosParamCreator = function (configuration?: Con
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        updatev1alpha1Setting: async (name: string, setting?: Setting, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+        updateV1alpha1Setting: async (name: string, setting?: Setting, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
             // verify required parameter 'name' is not null or undefined
-            assertParamExists('updatev1alpha1Setting', 'name', name)
+            assertParamExists('updateV1alpha1Setting', 'name', name)
             const localVarPath = `/api/v1alpha1/settings/{name}`
                 .replace(`{${"name"}}`, encodeURIComponent(String(name)));
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
@@ -277,10 +277,10 @@ export const V1alpha1SettingApiFp = function(configuration?: Configuration) {
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async createv1alpha1Setting(setting?: Setting, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<Setting>> {
-            const localVarAxiosArgs = await localVarAxiosParamCreator.createv1alpha1Setting(setting, options);
+        async createV1alpha1Setting(setting?: Setting, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<Setting>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.createV1alpha1Setting(setting, options);
             const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
-            const localVarOperationServerBasePath = operationServerMap['V1alpha1SettingApi.createv1alpha1Setting']?.[localVarOperationServerIndex]?.url;
+            const localVarOperationServerBasePath = operationServerMap['V1alpha1SettingApi.createV1alpha1Setting']?.[localVarOperationServerIndex]?.url;
             return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
         },
         /**
@@ -289,10 +289,10 @@ export const V1alpha1SettingApiFp = function(configuration?: Configuration) {
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async deletev1alpha1Setting(name: string, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<void>> {
-            const localVarAxiosArgs = await localVarAxiosParamCreator.deletev1alpha1Setting(name, options);
+        async deleteV1alpha1Setting(name: string, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<void>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.deleteV1alpha1Setting(name, options);
             const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
-            const localVarOperationServerBasePath = operationServerMap['V1alpha1SettingApi.deletev1alpha1Setting']?.[localVarOperationServerIndex]?.url;
+            const localVarOperationServerBasePath = operationServerMap['V1alpha1SettingApi.deleteV1alpha1Setting']?.[localVarOperationServerIndex]?.url;
             return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
         },
         /**
@@ -301,10 +301,10 @@ export const V1alpha1SettingApiFp = function(configuration?: Configuration) {
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async getv1alpha1Setting(name: string, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<Setting>> {
-            const localVarAxiosArgs = await localVarAxiosParamCreator.getv1alpha1Setting(name, options);
+        async getV1alpha1Setting(name: string, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<Setting>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.getV1alpha1Setting(name, options);
             const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
-            const localVarOperationServerBasePath = operationServerMap['V1alpha1SettingApi.getv1alpha1Setting']?.[localVarOperationServerIndex]?.url;
+            const localVarOperationServerBasePath = operationServerMap['V1alpha1SettingApi.getV1alpha1Setting']?.[localVarOperationServerIndex]?.url;
             return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
         },
         /**
@@ -317,10 +317,10 @@ export const V1alpha1SettingApiFp = function(configuration?: Configuration) {
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async listv1alpha1Setting(page?: number, size?: number, labelSelector?: Array<string>, fieldSelector?: Array<string>, sort?: Array<string>, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<SettingList>> {
-            const localVarAxiosArgs = await localVarAxiosParamCreator.listv1alpha1Setting(page, size, labelSelector, fieldSelector, sort, options);
+        async listV1alpha1Setting(page?: number, size?: number, labelSelector?: Array<string>, fieldSelector?: Array<string>, sort?: Array<string>, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<SettingList>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.listV1alpha1Setting(page, size, labelSelector, fieldSelector, sort, options);
             const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
-            const localVarOperationServerBasePath = operationServerMap['V1alpha1SettingApi.listv1alpha1Setting']?.[localVarOperationServerIndex]?.url;
+            const localVarOperationServerBasePath = operationServerMap['V1alpha1SettingApi.listV1alpha1Setting']?.[localVarOperationServerIndex]?.url;
             return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
         },
         /**
@@ -330,10 +330,10 @@ export const V1alpha1SettingApiFp = function(configuration?: Configuration) {
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async updatev1alpha1Setting(name: string, setting?: Setting, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<Setting>> {
-            const localVarAxiosArgs = await localVarAxiosParamCreator.updatev1alpha1Setting(name, setting, options);
+        async updateV1alpha1Setting(name: string, setting?: Setting, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<Setting>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.updateV1alpha1Setting(name, setting, options);
             const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
-            const localVarOperationServerBasePath = operationServerMap['V1alpha1SettingApi.updatev1alpha1Setting']?.[localVarOperationServerIndex]?.url;
+            const localVarOperationServerBasePath = operationServerMap['V1alpha1SettingApi.updateV1alpha1Setting']?.[localVarOperationServerIndex]?.url;
             return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
         },
     }
@@ -348,153 +348,153 @@ export const V1alpha1SettingApiFactory = function (configuration?: Configuration
     return {
         /**
          * Create v1alpha1/Setting
-         * @param {V1alpha1SettingApiCreatev1alpha1SettingRequest} requestParameters Request parameters.
+         * @param {V1alpha1SettingApiCreateV1alpha1SettingRequest} requestParameters Request parameters.
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        createv1alpha1Setting(requestParameters: V1alpha1SettingApiCreatev1alpha1SettingRequest = {}, options?: RawAxiosRequestConfig): AxiosPromise<Setting> {
-            return localVarFp.createv1alpha1Setting(requestParameters.setting, options).then((request) => request(axios, basePath));
+        createV1alpha1Setting(requestParameters: V1alpha1SettingApiCreateV1alpha1SettingRequest = {}, options?: RawAxiosRequestConfig): AxiosPromise<Setting> {
+            return localVarFp.createV1alpha1Setting(requestParameters.setting, options).then((request) => request(axios, basePath));
         },
         /**
          * Delete v1alpha1/Setting
-         * @param {V1alpha1SettingApiDeletev1alpha1SettingRequest} requestParameters Request parameters.
+         * @param {V1alpha1SettingApiDeleteV1alpha1SettingRequest} requestParameters Request parameters.
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        deletev1alpha1Setting(requestParameters: V1alpha1SettingApiDeletev1alpha1SettingRequest, options?: RawAxiosRequestConfig): AxiosPromise<void> {
-            return localVarFp.deletev1alpha1Setting(requestParameters.name, options).then((request) => request(axios, basePath));
+        deleteV1alpha1Setting(requestParameters: V1alpha1SettingApiDeleteV1alpha1SettingRequest, options?: RawAxiosRequestConfig): AxiosPromise<void> {
+            return localVarFp.deleteV1alpha1Setting(requestParameters.name, options).then((request) => request(axios, basePath));
         },
         /**
          * Get v1alpha1/Setting
-         * @param {V1alpha1SettingApiGetv1alpha1SettingRequest} requestParameters Request parameters.
+         * @param {V1alpha1SettingApiGetV1alpha1SettingRequest} requestParameters Request parameters.
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        getv1alpha1Setting(requestParameters: V1alpha1SettingApiGetv1alpha1SettingRequest, options?: RawAxiosRequestConfig): AxiosPromise<Setting> {
-            return localVarFp.getv1alpha1Setting(requestParameters.name, options).then((request) => request(axios, basePath));
+        getV1alpha1Setting(requestParameters: V1alpha1SettingApiGetV1alpha1SettingRequest, options?: RawAxiosRequestConfig): AxiosPromise<Setting> {
+            return localVarFp.getV1alpha1Setting(requestParameters.name, options).then((request) => request(axios, basePath));
         },
         /**
          * List v1alpha1/Setting
-         * @param {V1alpha1SettingApiListv1alpha1SettingRequest} requestParameters Request parameters.
+         * @param {V1alpha1SettingApiListV1alpha1SettingRequest} requestParameters Request parameters.
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        listv1alpha1Setting(requestParameters: V1alpha1SettingApiListv1alpha1SettingRequest = {}, options?: RawAxiosRequestConfig): AxiosPromise<SettingList> {
-            return localVarFp.listv1alpha1Setting(requestParameters.page, requestParameters.size, requestParameters.labelSelector, requestParameters.fieldSelector, requestParameters.sort, options).then((request) => request(axios, basePath));
+        listV1alpha1Setting(requestParameters: V1alpha1SettingApiListV1alpha1SettingRequest = {}, options?: RawAxiosRequestConfig): AxiosPromise<SettingList> {
+            return localVarFp.listV1alpha1Setting(requestParameters.page, requestParameters.size, requestParameters.labelSelector, requestParameters.fieldSelector, requestParameters.sort, options).then((request) => request(axios, basePath));
         },
         /**
          * Update v1alpha1/Setting
-         * @param {V1alpha1SettingApiUpdatev1alpha1SettingRequest} requestParameters Request parameters.
+         * @param {V1alpha1SettingApiUpdateV1alpha1SettingRequest} requestParameters Request parameters.
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        updatev1alpha1Setting(requestParameters: V1alpha1SettingApiUpdatev1alpha1SettingRequest, options?: RawAxiosRequestConfig): AxiosPromise<Setting> {
-            return localVarFp.updatev1alpha1Setting(requestParameters.name, requestParameters.setting, options).then((request) => request(axios, basePath));
+        updateV1alpha1Setting(requestParameters: V1alpha1SettingApiUpdateV1alpha1SettingRequest, options?: RawAxiosRequestConfig): AxiosPromise<Setting> {
+            return localVarFp.updateV1alpha1Setting(requestParameters.name, requestParameters.setting, options).then((request) => request(axios, basePath));
         },
     };
 };
 
 /**
- * Request parameters for createv1alpha1Setting operation in V1alpha1SettingApi.
+ * Request parameters for createV1alpha1Setting operation in V1alpha1SettingApi.
  * @export
- * @interface V1alpha1SettingApiCreatev1alpha1SettingRequest
+ * @interface V1alpha1SettingApiCreateV1alpha1SettingRequest
  */
-export interface V1alpha1SettingApiCreatev1alpha1SettingRequest {
+export interface V1alpha1SettingApiCreateV1alpha1SettingRequest {
     /**
      * Fresh setting
      * @type {Setting}
-     * @memberof V1alpha1SettingApiCreatev1alpha1Setting
+     * @memberof V1alpha1SettingApiCreateV1alpha1Setting
      */
     readonly setting?: Setting
 }
 
 /**
- * Request parameters for deletev1alpha1Setting operation in V1alpha1SettingApi.
+ * Request parameters for deleteV1alpha1Setting operation in V1alpha1SettingApi.
  * @export
- * @interface V1alpha1SettingApiDeletev1alpha1SettingRequest
+ * @interface V1alpha1SettingApiDeleteV1alpha1SettingRequest
  */
-export interface V1alpha1SettingApiDeletev1alpha1SettingRequest {
+export interface V1alpha1SettingApiDeleteV1alpha1SettingRequest {
     /**
      * Name of setting
      * @type {string}
-     * @memberof V1alpha1SettingApiDeletev1alpha1Setting
+     * @memberof V1alpha1SettingApiDeleteV1alpha1Setting
      */
     readonly name: string
 }
 
 /**
- * Request parameters for getv1alpha1Setting operation in V1alpha1SettingApi.
+ * Request parameters for getV1alpha1Setting operation in V1alpha1SettingApi.
  * @export
- * @interface V1alpha1SettingApiGetv1alpha1SettingRequest
+ * @interface V1alpha1SettingApiGetV1alpha1SettingRequest
  */
-export interface V1alpha1SettingApiGetv1alpha1SettingRequest {
+export interface V1alpha1SettingApiGetV1alpha1SettingRequest {
     /**
      * Name of setting
      * @type {string}
-     * @memberof V1alpha1SettingApiGetv1alpha1Setting
+     * @memberof V1alpha1SettingApiGetV1alpha1Setting
      */
     readonly name: string
 }
 
 /**
- * Request parameters for listv1alpha1Setting operation in V1alpha1SettingApi.
+ * Request parameters for listV1alpha1Setting operation in V1alpha1SettingApi.
  * @export
- * @interface V1alpha1SettingApiListv1alpha1SettingRequest
+ * @interface V1alpha1SettingApiListV1alpha1SettingRequest
  */
-export interface V1alpha1SettingApiListv1alpha1SettingRequest {
+export interface V1alpha1SettingApiListV1alpha1SettingRequest {
     /**
      * Page number. Default is 0.
      * @type {number}
-     * @memberof V1alpha1SettingApiListv1alpha1Setting
+     * @memberof V1alpha1SettingApiListV1alpha1Setting
      */
     readonly page?: number
 
     /**
      * Size number. Default is 0.
      * @type {number}
-     * @memberof V1alpha1SettingApiListv1alpha1Setting
+     * @memberof V1alpha1SettingApiListV1alpha1Setting
      */
     readonly size?: number
 
     /**
      * Label selector. e.g.: hidden!&#x3D;true
      * @type {Array<string>}
-     * @memberof V1alpha1SettingApiListv1alpha1Setting
+     * @memberof V1alpha1SettingApiListV1alpha1Setting
      */
     readonly labelSelector?: Array<string>
 
     /**
      * Field selector. e.g.: metadata.name&#x3D;&#x3D;halo
      * @type {Array<string>}
-     * @memberof V1alpha1SettingApiListv1alpha1Setting
+     * @memberof V1alpha1SettingApiListV1alpha1Setting
      */
     readonly fieldSelector?: Array<string>
 
     /**
      * Sorting criteria in the format: property,(asc|desc). Default sort order is ascending. Multiple sort criteria are supported.
      * @type {Array<string>}
-     * @memberof V1alpha1SettingApiListv1alpha1Setting
+     * @memberof V1alpha1SettingApiListV1alpha1Setting
      */
     readonly sort?: Array<string>
 }
 
 /**
- * Request parameters for updatev1alpha1Setting operation in V1alpha1SettingApi.
+ * Request parameters for updateV1alpha1Setting operation in V1alpha1SettingApi.
  * @export
- * @interface V1alpha1SettingApiUpdatev1alpha1SettingRequest
+ * @interface V1alpha1SettingApiUpdateV1alpha1SettingRequest
  */
-export interface V1alpha1SettingApiUpdatev1alpha1SettingRequest {
+export interface V1alpha1SettingApiUpdateV1alpha1SettingRequest {
     /**
      * Name of setting
      * @type {string}
-     * @memberof V1alpha1SettingApiUpdatev1alpha1Setting
+     * @memberof V1alpha1SettingApiUpdateV1alpha1Setting
      */
     readonly name: string
 
     /**
      * Updated setting
      * @type {Setting}
-     * @memberof V1alpha1SettingApiUpdatev1alpha1Setting
+     * @memberof V1alpha1SettingApiUpdateV1alpha1Setting
      */
     readonly setting?: Setting
 }
@@ -508,57 +508,57 @@ export interface V1alpha1SettingApiUpdatev1alpha1SettingRequest {
 export class V1alpha1SettingApi extends BaseAPI {
     /**
      * Create v1alpha1/Setting
-     * @param {V1alpha1SettingApiCreatev1alpha1SettingRequest} requestParameters Request parameters.
+     * @param {V1alpha1SettingApiCreateV1alpha1SettingRequest} requestParameters Request parameters.
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      * @memberof V1alpha1SettingApi
      */
-    public createv1alpha1Setting(requestParameters: V1alpha1SettingApiCreatev1alpha1SettingRequest = {}, options?: RawAxiosRequestConfig) {
-        return V1alpha1SettingApiFp(this.configuration).createv1alpha1Setting(requestParameters.setting, options).then((request) => request(this.axios, this.basePath));
+    public createV1alpha1Setting(requestParameters: V1alpha1SettingApiCreateV1alpha1SettingRequest = {}, options?: RawAxiosRequestConfig) {
+        return V1alpha1SettingApiFp(this.configuration).createV1alpha1Setting(requestParameters.setting, options).then((request) => request(this.axios, this.basePath));
     }
 
     /**
      * Delete v1alpha1/Setting
-     * @param {V1alpha1SettingApiDeletev1alpha1SettingRequest} requestParameters Request parameters.
+     * @param {V1alpha1SettingApiDeleteV1alpha1SettingRequest} requestParameters Request parameters.
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      * @memberof V1alpha1SettingApi
      */
-    public deletev1alpha1Setting(requestParameters: V1alpha1SettingApiDeletev1alpha1SettingRequest, options?: RawAxiosRequestConfig) {
-        return V1alpha1SettingApiFp(this.configuration).deletev1alpha1Setting(requestParameters.name, options).then((request) => request(this.axios, this.basePath));
+    public deleteV1alpha1Setting(requestParameters: V1alpha1SettingApiDeleteV1alpha1SettingRequest, options?: RawAxiosRequestConfig) {
+        return V1alpha1SettingApiFp(this.configuration).deleteV1alpha1Setting(requestParameters.name, options).then((request) => request(this.axios, this.basePath));
     }
 
     /**
      * Get v1alpha1/Setting
-     * @param {V1alpha1SettingApiGetv1alpha1SettingRequest} requestParameters Request parameters.
+     * @param {V1alpha1SettingApiGetV1alpha1SettingRequest} requestParameters Request parameters.
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      * @memberof V1alpha1SettingApi
      */
-    public getv1alpha1Setting(requestParameters: V1alpha1SettingApiGetv1alpha1SettingRequest, options?: RawAxiosRequestConfig) {
-        return V1alpha1SettingApiFp(this.configuration).getv1alpha1Setting(requestParameters.name, options).then((request) => request(this.axios, this.basePath));
+    public getV1alpha1Setting(requestParameters: V1alpha1SettingApiGetV1alpha1SettingRequest, options?: RawAxiosRequestConfig) {
+        return V1alpha1SettingApiFp(this.configuration).getV1alpha1Setting(requestParameters.name, options).then((request) => request(this.axios, this.basePath));
     }
 
     /**
      * List v1alpha1/Setting
-     * @param {V1alpha1SettingApiListv1alpha1SettingRequest} requestParameters Request parameters.
+     * @param {V1alpha1SettingApiListV1alpha1SettingRequest} requestParameters Request parameters.
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      * @memberof V1alpha1SettingApi
      */
-    public listv1alpha1Setting(requestParameters: V1alpha1SettingApiListv1alpha1SettingRequest = {}, options?: RawAxiosRequestConfig) {
-        return V1alpha1SettingApiFp(this.configuration).listv1alpha1Setting(requestParameters.page, requestParameters.size, requestParameters.labelSelector, requestParameters.fieldSelector, requestParameters.sort, options).then((request) => request(this.axios, this.basePath));
+    public listV1alpha1Setting(requestParameters: V1alpha1SettingApiListV1alpha1SettingRequest = {}, options?: RawAxiosRequestConfig) {
+        return V1alpha1SettingApiFp(this.configuration).listV1alpha1Setting(requestParameters.page, requestParameters.size, requestParameters.labelSelector, requestParameters.fieldSelector, requestParameters.sort, options).then((request) => request(this.axios, this.basePath));
     }
 
     /**
      * Update v1alpha1/Setting
-     * @param {V1alpha1SettingApiUpdatev1alpha1SettingRequest} requestParameters Request parameters.
+     * @param {V1alpha1SettingApiUpdateV1alpha1SettingRequest} requestParameters Request parameters.
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      * @memberof V1alpha1SettingApi
      */
-    public updatev1alpha1Setting(requestParameters: V1alpha1SettingApiUpdatev1alpha1SettingRequest, options?: RawAxiosRequestConfig) {
-        return V1alpha1SettingApiFp(this.configuration).updatev1alpha1Setting(requestParameters.name, requestParameters.setting, options).then((request) => request(this.axios, this.basePath));
+    public updateV1alpha1Setting(requestParameters: V1alpha1SettingApiUpdateV1alpha1SettingRequest, options?: RawAxiosRequestConfig) {
+        return V1alpha1SettingApiFp(this.configuration).updateV1alpha1Setting(requestParameters.name, requestParameters.setting, options).then((request) => request(this.axios, this.basePath));
     }
 }
 

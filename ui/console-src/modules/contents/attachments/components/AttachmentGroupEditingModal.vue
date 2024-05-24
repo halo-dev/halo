@@ -45,14 +45,14 @@ const handleSave = async () => {
   try {
     saving.value = true;
     if (props.group) {
-      await apiClient.extension.storage.group.updatestorageHaloRunV1alpha1Group(
+      await apiClient.extension.storage.group.updateStorageHaloRunV1alpha1Group(
         {
           name: formState.value.metadata.name,
           group: formState.value,
         }
       );
     } else {
-      await apiClient.extension.storage.group.createstorageHaloRunV1alpha1Group(
+      await apiClient.extension.storage.group.createStorageHaloRunV1alpha1Group(
         {
           group: formState.value,
         }

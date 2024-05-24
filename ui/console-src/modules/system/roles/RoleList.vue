@@ -46,7 +46,7 @@ let fuse: Fuse<Role> | undefined = undefined;
 const { data: roleTemplates } = useQuery({
   queryKey: ["role-templates"],
   queryFn: async () => {
-    const { data } = await apiClient.extension.role.listv1alpha1Role({
+    const { data } = await apiClient.extension.role.listV1alpha1Role({
       page: 0,
       size: 0,
       labelSelector: [`${roleLabels.TEMPLATE}=true`, "!halo.run/hidden"],
@@ -62,7 +62,7 @@ const {
 } = useQuery<RoleList>({
   queryKey: ["roles"],
   queryFn: async () => {
-    const { data } = await apiClient.extension.role.listv1alpha1Role({
+    const { data } = await apiClient.extension.role.listV1alpha1Role({
       page: 0,
       size: 0,
       labelSelector: [`!${roleLabels.TEMPLATE}`],
@@ -153,7 +153,7 @@ const handleCloneRole = async (role: Role) => {
 
   // 如果是超级管理员角色，那么需要获取到所有角色模板并填充到表单
   if (role.metadata.name === SUPER_ROLE_NAME) {
-    const { data } = await apiClient.extension.role.listv1alpha1Role({
+    const { data } = await apiClient.extension.role.listV1alpha1Role({
       page: 0,
       size: 0,
       labelSelector: [`${roleLabels.TEMPLATE}=true`, "!halo.run/hidden"],
@@ -182,7 +182,7 @@ const handleDelete = async (role: Role) => {
     cancelText: t("core.common.buttons.cancel"),
     onConfirm: async () => {
       try {
-        await apiClient.extension.role.deletev1alpha1Role({
+        await apiClient.extension.role.deleteV1alpha1Role({
           name: role.metadata.name,
         });
 

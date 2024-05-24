@@ -48,7 +48,7 @@ const { data: policy } = useQuery({
     }
 
     const { data } =
-      await apiClient.extension.storage.policy.getstorageHaloRunV1alpha1Policy({
+      await apiClient.extension.storage.policy.getStorageHaloRunV1alpha1Policy({
         name: policyName.value,
       });
 

@@ -4,7 +4,7 @@ import { select, selects, defaultIcon } from "@formkit/inputs";
 
 function optionsHandler(node: FormKitNode) {
   node.on("created", async () => {
-    const { data } = await apiClient.extension.menuItem.listv1alpha1MenuItem({
+    const { data } = await apiClient.extension.menuItem.listV1alpha1MenuItem({
       fieldSelector: [`name=(${node.props.menuItems.join(",")})`],
     });
 

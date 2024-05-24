@@ -27,7 +27,7 @@ const name = computed(
 const { data: setting } = useQuery<Setting | undefined>({
   queryKey: ["notifier-setting", notifierDescriptor],
   queryFn: async () => {
-    const { data } = await apiClient.extension.setting.getv1alpha1Setting({
+    const { data } = await apiClient.extension.setting.getV1alpha1Setting({
       name: notifierDescriptor.value?.spec?.senderSettingRef?.name as string,
     });
     return data;

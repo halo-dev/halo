@@ -37,7 +37,7 @@ export const StorageHaloRunV1alpha1AttachmentApiAxiosParamCreator = function (co
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        createstorageHaloRunV1alpha1Attachment: async (attachment?: Attachment, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+        createStorageHaloRunV1alpha1Attachment: async (attachment?: Attachment, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
             const localVarPath = `/apis/storage.halo.run/v1alpha1/attachments`;
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
@@ -78,9 +78,9 @@ export const StorageHaloRunV1alpha1AttachmentApiAxiosParamCreator = function (co
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        deletestorageHaloRunV1alpha1Attachment: async (name: string, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+        deleteStorageHaloRunV1alpha1Attachment: async (name: string, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
             // verify required parameter 'name' is not null or undefined
-            assertParamExists('deletestorageHaloRunV1alpha1Attachment', 'name', name)
+            assertParamExists('deleteStorageHaloRunV1alpha1Attachment', 'name', name)
             const localVarPath = `/apis/storage.halo.run/v1alpha1/attachments/{name}`
                 .replace(`{${"name"}}`, encodeURIComponent(String(name)));
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
@@ -119,9 +119,9 @@ export const StorageHaloRunV1alpha1AttachmentApiAxiosParamCreator = function (co
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        getstorageHaloRunV1alpha1Attachment: async (name: string, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+        getStorageHaloRunV1alpha1Attachment: async (name: string, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
             // verify required parameter 'name' is not null or undefined
-            assertParamExists('getstorageHaloRunV1alpha1Attachment', 'name', name)
+            assertParamExists('getStorageHaloRunV1alpha1Attachment', 'name', name)
             const localVarPath = `/apis/storage.halo.run/v1alpha1/attachments/{name}`
                 .replace(`{${"name"}}`, encodeURIComponent(String(name)));
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
@@ -164,7 +164,7 @@ export const StorageHaloRunV1alpha1AttachmentApiAxiosParamCreator = function (co
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        liststorageHaloRunV1alpha1Attachment: async (page?: number, size?: number, labelSelector?: Array<string>, fieldSelector?: Array<string>, sort?: Array<string>, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+        listStorageHaloRunV1alpha1Attachment: async (page?: number, size?: number, labelSelector?: Array<string>, fieldSelector?: Array<string>, sort?: Array<string>, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
             const localVarPath = `/apis/storage.halo.run/v1alpha1/attachments`;
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
@@ -223,9 +223,9 @@ export const StorageHaloRunV1alpha1AttachmentApiAxiosParamCreator = function (co
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        updatestorageHaloRunV1alpha1Attachment: async (name: string, attachment?: Attachment, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+        updateStorageHaloRunV1alpha1Attachment: async (name: string, attachment?: Attachment, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
             // verify required parameter 'name' is not null or undefined
-            assertParamExists('updatestorageHaloRunV1alpha1Attachment', 'name', name)
+            assertParamExists('updateStorageHaloRunV1alpha1Attachment', 'name', name)
             const localVarPath = `/apis/storage.halo.run/v1alpha1/attachments/{name}`
                 .replace(`{${"name"}}`, encodeURIComponent(String(name)));
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
@@ -277,10 +277,10 @@ export const StorageHaloRunV1alpha1AttachmentApiFp = function(configuration?: Co
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async createstorageHaloRunV1alpha1Attachment(attachment?: Attachment, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<Attachment>> {
-            const localVarAxiosArgs = await localVarAxiosParamCreator.createstorageHaloRunV1alpha1Attachment(attachment, options);
+        async createStorageHaloRunV1alpha1Attachment(attachment?: Attachment, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<Attachment>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.createStorageHaloRunV1alpha1Attachment(attachment, options);
             const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
-            const localVarOperationServerBasePath = operationServerMap['StorageHaloRunV1alpha1AttachmentApi.createstorageHaloRunV1alpha1Attachment']?.[localVarOperationServerIndex]?.url;
+            const localVarOperationServerBasePath = operationServerMap['StorageHaloRunV1alpha1AttachmentApi.createStorageHaloRunV1alpha1Attachment']?.[localVarOperationServerIndex]?.url;
             return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
         },
         /**
@@ -289,10 +289,10 @@ export const StorageHaloRunV1alpha1AttachmentApiFp = function(configuration?: Co
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async deletestorageHaloRunV1alpha1Attachment(name: string, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<void>> {
-            const localVarAxiosArgs = await localVarAxiosParamCreator.deletestorageHaloRunV1alpha1Attachment(name, options);
+        async deleteStorageHaloRunV1alpha1Attachment(name: string, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<void>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.deleteStorageHaloRunV1alpha1Attachment(name, options);
             const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
-            const localVarOperationServerBasePath = operationServerMap['StorageHaloRunV1alpha1AttachmentApi.deletestorageHaloRunV1alpha1Attachment']?.[localVarOperationServerIndex]?.url;
+            const localVarOperationServerBasePath = operationServerMap['StorageHaloRunV1alpha1AttachmentApi.deleteStorageHaloRunV1alpha1Attachment']?.[localVarOperationServerIndex]?.url;
             return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
         },
         /**
@@ -301,10 +301,10 @@ export const StorageHaloRunV1alpha1AttachmentApiFp = function(configuration?: Co
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async getstorageHaloRunV1alpha1Attachment(name: string, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<Attachment>> {
-            const localVarAxiosArgs = await localVarAxiosParamCreator.getstorageHaloRunV1alpha1Attachment(name, options);
+        async getStorageHaloRunV1alpha1Attachment(name: string, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<Attachment>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.getStorageHaloRunV1alpha1Attachment(name, options);
             const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
-            const localVarOperationServerBasePath = operationServerMap['StorageHaloRunV1alpha1AttachmentApi.getstorageHaloRunV1alpha1Attachment']?.[localVarOperationServerIndex]?.url;
+            const localVarOperationServerBasePath = operationServerMap['StorageHaloRunV1alpha1AttachmentApi.getStorageHaloRunV1alpha1Attachment']?.[localVarOperationServerIndex]?.url;
             return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
         },
         /**
@@ -317,10 +317,10 @@ export const StorageHaloRunV1alpha1AttachmentApiFp = function(configuration?: Co
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async liststorageHaloRunV1alpha1Attachment(page?: number, size?: number, labelSelector?: Array<string>, fieldSelector?: Array<string>, sort?: Array<string>, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<AttachmentList>> {
-            const localVarAxiosArgs = await localVarAxiosParamCreator.liststorageHaloRunV1alpha1Attachment(page, size, labelSelector, fieldSelector, sort, options);
+        async listStorageHaloRunV1alpha1Attachment(page?: number, size?: number, labelSelector?: Array<string>, fieldSelector?: Array<string>, sort?: Array<string>, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<AttachmentList>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.listStorageHaloRunV1alpha1Attachment(page, size, labelSelector, fieldSelector, sort, options);
             const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
-            const localVarOperationServerBasePath = operationServerMap['StorageHaloRunV1alpha1AttachmentApi.liststorageHaloRunV1alpha1Attachment']?.[localVarOperationServerIndex]?.url;
+            const localVarOperationServerBasePath = operationServerMap['StorageHaloRunV1alpha1AttachmentApi.listStorageHaloRunV1alpha1Attachment']?.[localVarOperationServerIndex]?.url;
             return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
         },
         /**
@@ -330,10 +330,10 @@ export const StorageHaloRunV1alpha1AttachmentApiFp = function(configuration?: Co
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async updatestorageHaloRunV1alpha1Attachment(name: string, attachment?: Attachment, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<Attachment>> {
-            const localVarAxiosArgs = await localVarAxiosParamCreator.updatestorageHaloRunV1alpha1Attachment(name, attachment, options);
+        async updateStorageHaloRunV1alpha1Attachment(name: string, attachment?: Attachment, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<Attachment>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.updateStorageHaloRunV1alpha1Attachment(name, attachment, options);
             const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
-            const localVarOperationServerBasePath = operationServerMap['StorageHaloRunV1alpha1AttachmentApi.updatestorageHaloRunV1alpha1Attachment']?.[localVarOperationServerIndex]?.url;
+            const localVarOperationServerBasePath = operationServerMap['StorageHaloRunV1alpha1AttachmentApi.updateStorageHaloRunV1alpha1Attachment']?.[localVarOperationServerIndex]?.url;
             return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
         },
     }
@@ -348,153 +348,153 @@ export const StorageHaloRunV1alpha1AttachmentApiFactory = function (configuratio
     return {
         /**
          * Create storage.halo.run/v1alpha1/Attachment
-         * @param {StorageHaloRunV1alpha1AttachmentApiCreatestorageHaloRunV1alpha1AttachmentRequest} requestParameters Request parameters.
+         * @param {StorageHaloRunV1alpha1AttachmentApiCreateStorageHaloRunV1alpha1AttachmentRequest} requestParameters Request parameters.
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        createstorageHaloRunV1alpha1Attachment(requestParameters: StorageHaloRunV1alpha1AttachmentApiCreatestorageHaloRunV1alpha1AttachmentRequest = {}, options?: RawAxiosRequestConfig): AxiosPromise<Attachment> {
-            return localVarFp.createstorageHaloRunV1alpha1Attachment(requestParameters.attachment, options).then((request) => request(axios, basePath));
+        createStorageHaloRunV1alpha1Attachment(requestParameters: StorageHaloRunV1alpha1AttachmentApiCreateStorageHaloRunV1alpha1AttachmentRequest = {}, options?: RawAxiosRequestConfig): AxiosPromise<Attachment> {
+            return localVarFp.createStorageHaloRunV1alpha1Attachment(requestParameters.attachment, options).then((request) => request(axios, basePath));
         },
         /**
          * Delete storage.halo.run/v1alpha1/Attachment
-         * @param {StorageHaloRunV1alpha1AttachmentApiDeletestorageHaloRunV1alpha1AttachmentRequest} requestParameters Request parameters.
+         * @param {StorageHaloRunV1alpha1AttachmentApiDeleteStorageHaloRunV1alpha1AttachmentRequest} requestParameters Request parameters.
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        deletestorageHaloRunV1alpha1Attachment(requestParameters: StorageHaloRunV1alpha1AttachmentApiDeletestorageHaloRunV1alpha1AttachmentRequest, options?: RawAxiosRequestConfig): AxiosPromise<void> {
-            return localVarFp.deletestorageHaloRunV1alpha1Attachment(requestParameters.name, options).then((request) => request(axios, basePath));
+        deleteStorageHaloRunV1alpha1Attachment(requestParameters: StorageHaloRunV1alpha1AttachmentApiDeleteStorageHaloRunV1alpha1AttachmentRequest, options?: RawAxiosRequestConfig): AxiosPromise<void> {
+            return localVarFp.deleteStorageHaloRunV1alpha1Attachment(requestParameters.name, options).then((request) => request(axios, basePath));
         },
         /**
          * Get storage.halo.run/v1alpha1/Attachment
-         * @param {StorageHaloRunV1alpha1AttachmentApiGetstorageHaloRunV1alpha1AttachmentRequest} requestParameters Request parameters.
+         * @param {StorageHaloRunV1alpha1AttachmentApiGetStorageHaloRunV1alpha1AttachmentRequest} requestParameters Request parameters.
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        getstorageHaloRunV1alpha1Attachment(requestParameters: StorageHaloRunV1alpha1AttachmentApiGetstorageHaloRunV1alpha1AttachmentRequest, options?: RawAxiosRequestConfig): AxiosPromise<Attachment> {
-            return localVarFp.getstorageHaloRunV1alpha1Attachment(requestParameters.name, options).then((request) => request(axios, basePath));
+        getStorageHaloRunV1alpha1Attachment(requestParameters: StorageHaloRunV1alpha1AttachmentApiGetStorageHaloRunV1alpha1AttachmentRequest, options?: RawAxiosRequestConfig): AxiosPromise<Attachment> {
+            return localVarFp.getStorageHaloRunV1alpha1Attachment(requestParameters.name, options).then((request) => request(axios, basePath));
         },
         /**
          * List storage.halo.run/v1alpha1/Attachment
-         * @param {StorageHaloRunV1alpha1AttachmentApiListstorageHaloRunV1alpha1AttachmentRequest} requestParameters Request parameters.
+         * @param {StorageHaloRunV1alpha1AttachmentApiListStorageHaloRunV1alpha1AttachmentRequest} requestParameters Request parameters.
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        liststorageHaloRunV1alpha1Attachment(requestParameters: StorageHaloRunV1alpha1AttachmentApiListstorageHaloRunV1alpha1AttachmentRequest = {}, options?: RawAxiosRequestConfig): AxiosPromise<AttachmentList> {
-            return localVarFp.liststorageHaloRunV1alpha1Attachment(requestParameters.page, requestParameters.size, requestParameters.labelSelector, requestParameters.fieldSelector, requestParameters.sort, options).then((request) => request(axios, basePath));
+        listStorageHaloRunV1alpha1Attachment(requestParameters: StorageHaloRunV1alpha1AttachmentApiListStorageHaloRunV1alpha1AttachmentRequest = {}, options?: RawAxiosRequestConfig): AxiosPromise<AttachmentList> {
+            return localVarFp.listStorageHaloRunV1alpha1Attachment(requestParameters.page, requestParameters.size, requestParameters.labelSelector, requestParameters.fieldSelector, requestParameters.sort, options).then((request) => request(axios, basePath));
         },
         /**
          * Update storage.halo.run/v1alpha1/Attachment
-         * @param {StorageHaloRunV1alpha1AttachmentApiUpdatestorageHaloRunV1alpha1AttachmentRequest} requestParameters Request parameters.
+         * @param {StorageHaloRunV1alpha1AttachmentApiUpdateStorageHaloRunV1alpha1AttachmentRequest} requestParameters Request parameters.
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        updatestorageHaloRunV1alpha1Attachment(requestParameters: StorageHaloRunV1alpha1AttachmentApiUpdatestorageHaloRunV1alpha1AttachmentRequest, options?: RawAxiosRequestConfig): AxiosPromise<Attachment> {
-            return localVarFp.updatestorageHaloRunV1alpha1Attachment(requestParameters.name, requestParameters.attachment, options).then((request) => request(axios, basePath));
+        updateStorageHaloRunV1alpha1Attachment(requestParameters: StorageHaloRunV1alpha1AttachmentApiUpdateStorageHaloRunV1alpha1AttachmentRequest, options?: RawAxiosRequestConfig): AxiosPromise<Attachment> {
+            return localVarFp.updateStorageHaloRunV1alpha1Attachment(requestParameters.name, requestParameters.attachment, options).then((request) => request(axios, basePath));
         },
     };
 };
 
 /**
- * Request parameters for createstorageHaloRunV1alpha1Attachment operation in StorageHaloRunV1alpha1AttachmentApi.
+ * Request parameters for createStorageHaloRunV1alpha1Attachment operation in StorageHaloRunV1alpha1AttachmentApi.
  * @export
- * @interface StorageHaloRunV1alpha1AttachmentApiCreatestorageHaloRunV1alpha1AttachmentRequest
+ * @interface StorageHaloRunV1alpha1AttachmentApiCreateStorageHaloRunV1alpha1AttachmentRequest
  */
-export interface StorageHaloRunV1alpha1AttachmentApiCreatestorageHaloRunV1alpha1AttachmentRequest {
+export interface StorageHaloRunV1alpha1AttachmentApiCreateStorageHaloRunV1alpha1AttachmentRequest {
     /**
      * Fresh attachment
      * @type {Attachment}
-     * @memberof StorageHaloRunV1alpha1AttachmentApiCreatestorageHaloRunV1alpha1Attachment
+     * @memberof StorageHaloRunV1alpha1AttachmentApiCreateStorageHaloRunV1alpha1Attachment
      */
     readonly attachment?: Attachment
 }
 
 /**
- * Request parameters for deletestorageHaloRunV1alpha1Attachment operation in StorageHaloRunV1alpha1AttachmentApi.
+ * Request parameters for deleteStorageHaloRunV1alpha1Attachment operation in StorageHaloRunV1alpha1AttachmentApi.
  * @export
- * @interface StorageHaloRunV1alpha1AttachmentApiDeletestorageHaloRunV1alpha1AttachmentRequest
+ * @interface StorageHaloRunV1alpha1AttachmentApiDeleteStorageHaloRunV1alpha1AttachmentRequest
  */
-export interface StorageHaloRunV1alpha1AttachmentApiDeletestorageHaloRunV1alpha1AttachmentRequest {
+export interface StorageHaloRunV1alpha1AttachmentApiDeleteStorageHaloRunV1alpha1AttachmentRequest {
     /**
      * Name of attachment
      * @type {string}
-     * @memberof StorageHaloRunV1alpha1AttachmentApiDeletestorageHaloRunV1alpha1Attachment
+     * @memberof StorageHaloRunV1alpha1AttachmentApiDeleteStorageHaloRunV1alpha1Attachment
      */
     readonly name: string
 }
 
 /**
- * Request parameters for getstorageHaloRunV1alpha1Attachment operation in StorageHaloRunV1alpha1AttachmentApi.
+ * Request parameters for getStorageHaloRunV1alpha1Attachment operation in StorageHaloRunV1alpha1AttachmentApi.
  * @export
- * @interface StorageHaloRunV1alpha1AttachmentApiGetstorageHaloRunV1alpha1AttachmentRequest
+ * @interface StorageHaloRunV1alpha1AttachmentApiGetStorageHaloRunV1alpha1AttachmentRequest
  */
-export interface StorageHaloRunV1alpha1AttachmentApiGetstorageHaloRunV1alpha1AttachmentRequest {
+export interface StorageHaloRunV1alpha1AttachmentApiGetStorageHaloRunV1alpha1AttachmentRequest {
     /**
      * Name of attachment
      * @type {string}
-     * @memberof StorageHaloRunV1alpha1AttachmentApiGetstorageHaloRunV1alpha1Attachment
+     * @memberof StorageHaloRunV1alpha1AttachmentApiGetStorageHaloRunV1alpha1Attachment
      */
     readonly name: string
 }
 
 /**
- * Request parameters for liststorageHaloRunV1alpha1Attachment operation in StorageHaloRunV1alpha1AttachmentApi.
+ * Request parameters for listStorageHaloRunV1alpha1Attachment operation in StorageHaloRunV1alpha1AttachmentApi.
  * @export
- * @interface StorageHaloRunV1alpha1AttachmentApiListstorageHaloRunV1alpha1AttachmentRequest
+ * @interface StorageHaloRunV1alpha1AttachmentApiListStorageHaloRunV1alpha1AttachmentRequest
  */
-export interface StorageHaloRunV1alpha1AttachmentApiListstorageHaloRunV1alpha1AttachmentRequest {
+export interface StorageHaloRunV1alpha1AttachmentApiListStorageHaloRunV1alpha1AttachmentRequest {
     /**
      * Page number. Default is 0.
      * @type {number}
-     * @memberof StorageHaloRunV1alpha1AttachmentApiListstorageHaloRunV1alpha1Attachment
+     * @memberof StorageHaloRunV1alpha1AttachmentApiListStorageHaloRunV1alpha1Attachment
      */
     readonly page?: number
 
     /**
      * Size number. Default is 0.
      * @type {number}
-     * @memberof StorageHaloRunV1alpha1AttachmentApiListstorageHaloRunV1alpha1Attachment
+     * @memberof StorageHaloRunV1alpha1AttachmentApiListStorageHaloRunV1alpha1Attachment
      */
     readonly size?: number
 
     /**
      * Label selector. e.g.: hidden!&#x3D;true
      * @type {Array<string>}
-     * @memberof StorageHaloRunV1alpha1AttachmentApiListstorageHaloRunV1alpha1Attachment
+     * @memberof StorageHaloRunV1alpha1AttachmentApiListStorageHaloRunV1alpha1Attachment
      */
     readonly labelSelector?: Array<string>
 
     /**
      * Field selector. e.g.: metadata.name&#x3D;&#x3D;halo
      * @type {Array<string>}
-     * @memberof StorageHaloRunV1alpha1AttachmentApiListstorageHaloRunV1alpha1Attachment
+     * @memberof StorageHaloRunV1alpha1AttachmentApiListStorageHaloRunV1alpha1Attachment
      */
     readonly fieldSelector?: Array<string>
 
     /**
      * Sorting criteria in the format: property,(asc|desc). Default sort order is ascending. Multiple sort criteria are supported.
      * @type {Array<string>}
-     * @memberof StorageHaloRunV1alpha1AttachmentApiListstorageHaloRunV1alpha1Attachment
+     * @memberof StorageHaloRunV1alpha1AttachmentApiListStorageHaloRunV1alpha1Attachment
      */
     readonly sort?: Array<string>
 }
 
 /**
- * Request parameters for updatestorageHaloRunV1alpha1Attachment operation in StorageHaloRunV1alpha1AttachmentApi.
+ * Request parameters for updateStorageHaloRunV1alpha1Attachment operation in StorageHaloRunV1alpha1AttachmentApi.
  * @export
- * @interface StorageHaloRunV1alpha1AttachmentApiUpdatestorageHaloRunV1alpha1AttachmentRequest
+ * @interface StorageHaloRunV1alpha1AttachmentApiUpdateStorageHaloRunV1alpha1AttachmentRequest
  */
-export interface StorageHaloRunV1alpha1AttachmentApiUpdatestorageHaloRunV1alpha1AttachmentRequest {
+export interface StorageHaloRunV1alpha1AttachmentApiUpdateStorageHaloRunV1alpha1AttachmentRequest {
     /**
      * Name of attachment
      * @type {string}
-     * @memberof StorageHaloRunV1alpha1AttachmentApiUpdatestorageHaloRunV1alpha1Attachment
+     * @memberof StorageHaloRunV1alpha1AttachmentApiUpdateStorageHaloRunV1alpha1Attachment
      */
     readonly name: string
 
     /**
      * Updated attachment
      * @type {Attachment}
-     * @memberof StorageHaloRunV1alpha1AttachmentApiUpdatestorageHaloRunV1alpha1Attachment
+     * @memberof StorageHaloRunV1alpha1AttachmentApiUpdateStorageHaloRunV1alpha1Attachment
      */
     readonly attachment?: Attachment
 }
@@ -508,57 +508,57 @@ export interface StorageHaloRunV1alpha1AttachmentApiUpdatestorageHaloRunV1alpha1
 export class StorageHaloRunV1alpha1AttachmentApi extends BaseAPI {
     /**
      * Create storage.halo.run/v1alpha1/Attachment
-     * @param {StorageHaloRunV1alpha1AttachmentApiCreatestorageHaloRunV1alpha1AttachmentRequest} requestParameters Request parameters.
+     * @param {StorageHaloRunV1alpha1AttachmentApiCreateStorageHaloRunV1alpha1AttachmentRequest} requestParameters Request parameters.
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      * @memberof StorageHaloRunV1alpha1AttachmentApi
      */
-    public createstorageHaloRunV1alpha1Attachment(requestParameters: StorageHaloRunV1alpha1AttachmentApiCreatestorageHaloRunV1alpha1AttachmentRequest = {}, options?: RawAxiosRequestConfig) {
-        return StorageHaloRunV1alpha1AttachmentApiFp(this.configuration).createstorageHaloRunV1alpha1Attachment(requestParameters.attachment, options).then((request) => request(this.axios, this.basePath));
+    public createStorageHaloRunV1alpha1Attachment(requestParameters: StorageHaloRunV1alpha1AttachmentApiCreateStorageHaloRunV1alpha1AttachmentRequest = {}, options?: RawAxiosRequestConfig) {
+        return StorageHaloRunV1alpha1AttachmentApiFp(this.configuration).createStorageHaloRunV1alpha1Attachment(requestParameters.attachment, options).then((request) => request(this.axios, this.basePath));
     }
 
     /**
      * Delete storage.halo.run/v1alpha1/Attachment
-     * @param {StorageHaloRunV1alpha1AttachmentApiDeletestorageHaloRunV1alpha1AttachmentRequest} requestParameters Request parameters.
+     * @param {StorageHaloRunV1alpha1AttachmentApiDeleteStorageHaloRunV1alpha1AttachmentRequest} requestParameters Request parameters.
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      * @memberof StorageHaloRunV1alpha1AttachmentApi
      */
-    public deletestorageHaloRunV1alpha1Attachment(requestParameters: StorageHaloRunV1alpha1AttachmentApiDeletestorageHaloRunV1alpha1AttachmentRequest, options?: RawAxiosRequestConfig) {
-        return StorageHaloRunV1alpha1AttachmentApiFp(this.configuration).deletestorageHaloRunV1alpha1Attachment(requestParameters.name, options).then((request) => request(this.axios, this.basePath));
+    public deleteStorageHaloRunV1alpha1Attachment(requestParameters: StorageHaloRunV1alpha1AttachmentApiDeleteStorageHaloRunV1alpha1AttachmentRequest, options?: RawAxiosRequestConfig) {
+        return StorageHaloRunV1alpha1AttachmentApiFp(this.configuration).deleteStorageHaloRunV1alpha1Attachment(requestParameters.name, options).then((request) => request(this.axios, this.basePath));
     }
 
     /**
      * Get storage.halo.run/v1alpha1/Attachment
-     * @param {StorageHaloRunV1alpha1AttachmentApiGetstorageHaloRunV1alpha1AttachmentRequest} requestParameters Request parameters.
+     * @param {StorageHaloRunV1alpha1AttachmentApiGetStorageHaloRunV1alpha1AttachmentRequest} requestParameters Request parameters.
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      * @memberof StorageHaloRunV1alpha1AttachmentApi
      */
-    public getstorageHaloRunV1alpha1Attachment(requestParameters: StorageHaloRunV1alpha1AttachmentApiGetstorageHaloRunV1alpha1AttachmentRequest, options?: RawAxiosRequestConfig) {
-        return StorageHaloRunV1alpha1AttachmentApiFp(this.configuration).getstorageHaloRunV1alpha1Attachment(requestParameters.name, options).then((request) => request(this.axios, this.basePath));
+    public getStorageHaloRunV1alpha1Attachment(requestParameters: StorageHaloRunV1alpha1AttachmentApiGetStorageHaloRunV1alpha1AttachmentRequest, options?: RawAxiosRequestConfig) {
+        return StorageHaloRunV1alpha1AttachmentApiFp(this.configuration).getStorageHaloRunV1alpha1Attachment(requestParameters.name, options).then((request) => request(this.axios, this.basePath));
     }
 
     /**
      * List storage.halo.run/v1alpha1/Attachment
-     * @param {StorageHaloRunV1alpha1AttachmentApiListstorageHaloRunV1alpha1AttachmentRequest} requestParameters Request parameters.
+     * @param {StorageHaloRunV1alpha1AttachmentApiListStorageHaloRunV1alpha1AttachmentRequest} requestParameters Request parameters.
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      * @memberof StorageHaloRunV1alpha1AttachmentApi
      */
-    public liststorageHaloRunV1alpha1Attachment(requestParameters: StorageHaloRunV1alpha1AttachmentApiListstorageHaloRunV1alpha1AttachmentRequest = {}, options?: RawAxiosRequestConfig) {
-        return StorageHaloRunV1alpha1AttachmentApiFp(this.configuration).liststorageHaloRunV1alpha1Attachment(requestParameters.page, requestParameters.size, requestParameters.labelSelector, requestParameters.fieldSelector, requestParameters.sort, options).then((request) => request(this.axios, this.basePath));
+    public listStorageHaloRunV1alpha1Attachment(requestParameters: StorageHaloRunV1alpha1AttachmentApiListStorageHaloRunV1alpha1AttachmentRequest = {}, options?: RawAxiosRequestConfig) {
+        return StorageHaloRunV1alpha1AttachmentApiFp(this.configuration).listStorageHaloRunV1alpha1Attachment(requestParameters.page, requestParameters.size, requestParameters.labelSelector, requestParameters.fieldSelector, requestParameters.sort, options).then((request) => request(this.axios, this.basePath));
     }
 
     /**
      * Update storage.halo.run/v1alpha1/Attachment
-     * @param {StorageHaloRunV1alpha1AttachmentApiUpdatestorageHaloRunV1alpha1AttachmentRequest} requestParameters Request parameters.
+     * @param {StorageHaloRunV1alpha1AttachmentApiUpdateStorageHaloRunV1alpha1AttachmentRequest} requestParameters Request parameters.
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      * @memberof StorageHaloRunV1alpha1AttachmentApi
      */
-    public updatestorageHaloRunV1alpha1Attachment(requestParameters: StorageHaloRunV1alpha1AttachmentApiUpdatestorageHaloRunV1alpha1AttachmentRequest, options?: RawAxiosRequestConfig) {
-        return StorageHaloRunV1alpha1AttachmentApiFp(this.configuration).updatestorageHaloRunV1alpha1Attachment(requestParameters.name, requestParameters.attachment, options).then((request) => request(this.axios, this.basePath));
+    public updateStorageHaloRunV1alpha1Attachment(requestParameters: StorageHaloRunV1alpha1AttachmentApiUpdateStorageHaloRunV1alpha1AttachmentRequest, options?: RawAxiosRequestConfig) {
+        return StorageHaloRunV1alpha1AttachmentApiFp(this.configuration).updateStorageHaloRunV1alpha1Attachment(requestParameters.name, requestParameters.attachment, options).then((request) => request(this.axios, this.basePath));
     }
 }
 

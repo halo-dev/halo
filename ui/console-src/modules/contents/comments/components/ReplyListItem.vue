@@ -55,7 +55,7 @@ const handleDelete = async () => {
     cancelText: t("core.common.buttons.cancel"),
     onConfirm: async () => {
       try {
-        await apiClient.extension.reply.deletecontentHaloRunV1alpha1Reply({
+        await apiClient.extension.reply.deleteContentHaloRunV1alpha1Reply({
           name: props.reply?.reply.metadata.name as string,
         });
 
@@ -75,7 +75,7 @@ const handleApprove = async () => {
     replyToUpdate.spec.approved = true;
     // TODO: 暂时由前端设置发布时间。see https://github.com/halo-dev/halo/pull/2746
     replyToUpdate.spec.approvedTime = new Date().toISOString();
-    await apiClient.extension.reply.updatecontentHaloRunV1alpha1Reply({
+    await apiClient.extension.reply.updateContentHaloRunV1alpha1Reply({
       name: replyToUpdate.metadata.name,
       reply: replyToUpdate,
     });

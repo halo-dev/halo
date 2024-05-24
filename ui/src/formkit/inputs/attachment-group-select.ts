@@ -5,7 +5,7 @@ import { select, selects, defaultIcon } from "@formkit/inputs";
 function optionsHandler(node: FormKitNode) {
   node.on("created", async () => {
     const { data } =
-      await apiClient.extension.storage.group.liststorageHaloRunV1alpha1Group({
+      await apiClient.extension.storage.group.listStorageHaloRunV1alpha1Group({
         labelSelector: ["!halo.run/hidden"],
         sort: ["metadata.creationTimestamp,desc"],
       });
