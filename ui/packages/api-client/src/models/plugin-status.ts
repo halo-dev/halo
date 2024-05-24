@@ -88,6 +88,7 @@ export const PluginStatusPhaseEnum = {
     Pending: 'PENDING',
     Starting: 'STARTING',
     Created: 'CREATED',
+    Disabling: 'DISABLING',
     Disabled: 'DISABLED',
     Resolved: 'RESOLVED',
     Started: 'STARTED',

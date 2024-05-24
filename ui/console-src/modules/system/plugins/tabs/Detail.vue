@@ -1,6 +1,7 @@
 <script lang="ts" setup>
 import {
   VAlert,
+  VButton,
   VDescription,
   VDescriptionItem,
   VSwitch,
@@ -8,12 +9,18 @@ import {
 import type { Ref } from "vue";
 import { computed, inject } from "vue";
 import { apiClient } from "@/utils/api-client";
-import type { Plugin, Role } from "@halo-dev/api-client";
+import {
+  PluginStatusPhaseEnum,
+  type Plugin,
+  type Role,
+} from "@halo-dev/api-client";
 import { pluginLabels, roleLabels } from "@/constants/labels";
 import { rbacAnnotations } from "@/constants/annotations";
 import { usePluginLifeCycle } from "../composables/use-plugin";
 import { formatDatetime } from "@/utils/date";
 import { useQuery } from "@tanstack/vue-query";
+import { ref } from "vue";
+import PluginConditionsModal from "../components/PluginConditionsModal.vue";
 
 const plugin = inject<Ref<Plugin | undefined>>("plugin");
 const { changeStatus, changingStatus } = usePluginLifeCycle(plugin);
@@ -60,9 +67,30 @@ const pluginRoleTemplateGroups = computed<RoleTemplateGroup[]>(() => {
   });
   return groups;
 });
+
+// Error alert
+const conditionsModalVisible = ref(false);
+
+const errorAlertVisible = computed(() => {
+  const { phase } = plugin?.value?.status || {};
+
+  return (
+    phase !== PluginStatusPhaseEnum.Started &&
+    phase !== PluginStatusPhaseEnum.Disabled
+  );
+});
+
+const lastCondition = computed(() => {
+  return plugin?.value?.status?.conditions?.[0];
+});
 </script>
 
 <template>
+  <PluginConditionsModal
+    v-if="conditionsModalVisible && plugin"
+    :plugin="plugin"
+    @close="conditionsModalVisible = false"
+  />
   <Transition mode="out-in" name="fade">
     <div class="overflow-hidden rounded-b-base">
       <div class="flex items-center justify-between bg-white px-4 py-4 sm:px-6">
@@ -80,18 +108,21 @@ const pluginRoleTemplateGroups = computed<RoleTemplateGroup[]>(() => {
         </div>
       </div>
       <div
-        v-if="
-          plugin?.status?.phase === 'FAILED' &&
-          plugin?.status?.conditions?.length
-        "
+        v-if="errorAlertVisible && lastCondition"
         class="w-full px-4 pb-2 sm:px-6"
       >
         <VAlert
           type="error"
-          :title="plugin?.status?.conditions?.[0].reason"
-          :description="plugin?.status?.conditions?.[0].message"
+          :title="lastCondition.reason"
+          :description="lastCondition.message"
           :closable="false"
-        />
+        >
+          <template #actions>
+            <VButton size="sm" @click="conditionsModalVisible = true">
+              {{ $t("core.plugin.detail.operations.view_conditions.button") }}
+            </VButton>
+          </template>
+        </VAlert>
       </div>
       <div class="border-t border-gray-200">
         <VDescription>

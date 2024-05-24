@@ -844,6 +844,9 @@ core:
         repo: 源碼倉庫
         load_location: 存儲位置
         issues: 問題回饋
+      operations:
+        view_conditions:
+          button: 查看最近狀態
     loader:
       toast:
         entry_load_failed: 讀取插件入口文件失敗
@@ -852,6 +855,14 @@ core:
       editor:
         providers:
           default: 預設編輯器
+    conditions_modal:
+      title: 插件最近狀態
+      fields:
+        type: 類型
+        status: 狀態
+        reason: 原因
+        message: 訊息
+        last_transition_time: 時間
   user:
     title: 用戶
     actions:

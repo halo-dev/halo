@@ -43,7 +43,8 @@ const { plugin } = toRefs(props);
 
 const selectedNames = inject<Ref<string[]>>("selectedNames", ref([]));
 
-const { getStatusMessage, uninstall } = usePluginLifeCycle(plugin);
+const { getStatusDotState, getStatusMessage, uninstall } =
+  usePluginLifeCycle(plugin);
 
 const pluginUpgradeModalVisible = ref(false);
 
@@ -147,19 +148,11 @@ const { startFields, endFields } = useEntityFieldItemExtensionPoint<Plugin>(
   "plugin:list-item:field:create",
   plugin,
   computed((): EntityFieldItem[] => {
-    const { enabled } = props.plugin.spec || {};
     const { phase } = props.plugin.status || {};
 
     const shouldHideStatusDot =
-      !enabled || (enabled && phase === PluginStatusPhaseEnum.Started);
-
-    const getStatusDotState = () => {
-      if (enabled && phase === PluginStatusPhaseEnum.Failed) {
-        return "error";
-      }
-
-      return "default";
-    };
+      phase === PluginStatusPhaseEnum.Started ||
+      phase === PluginStatusPhaseEnum.Disabled;
 
     return [
       {
