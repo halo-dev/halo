@@ -1,12 +1,11 @@
 <script lang="ts" setup>
 import { VButton, VModal, VSpace } from "@halo-dev/components";
 import SubmitButton from "@/components/button/SubmitButton.vue";
-import { computed, watch } from "vue";
+import { onMounted, ref, watch } from "vue";
 import { rbacAnnotations } from "@/constants/annotations";
 import type { Role } from "@halo-dev/api-client";
 import { useRoleForm, useRoleTemplateSelection } from "@/composables/use-role";
 import { cloneDeep } from "lodash-es";
-import { reset } from "@formkit/core";
 import { setFocus } from "@/formkit/utils/focus";
 import { pluginLabels, roleLabels } from "@/constants/labels";
 import { useI18n } from "vue-i18n";
@@ -17,19 +16,18 @@ const { t } = useI18n();
 
 const props = withDefaults(
   defineProps<{
-    visible: boolean;
     role?: Role;
   }>(),
   {
-    visible: false,
     role: undefined,
   }
 );
 
 const emit = defineEmits<{
-  (event: "update:visible", visible: boolean): void;
   (event: "close"): void;
 }>();
+
+const modal = ref<InstanceType<typeof VModal>>();
 
 const { data: roleTemplates } = useQuery({
   queryKey: ["role-templates"],
@@ -46,13 +44,7 @@ const { data: roleTemplates } = useQuery({
 const { roleTemplateGroups, handleRoleTemplateSelect, selectedRoleTemplates } =
   useRoleTemplateSelection(roleTemplates);
 
-const {
-  formState,
-  isUpdateMode,
-  initialFormState,
-  saving,
-  handleCreateOrUpdate,
-} = useRoleForm();
+const { formState, isSubmitting, handleCreateOrUpdate } = useRoleForm();
 
 watch(
   () => selectedRoleTemplates.value,
@@ -64,67 +56,39 @@ watch(
   }
 );
 
-watch(
-  () => props.visible,
-  (visible) => {
-    if (visible) {
-      setFocus("displayNameInput");
-    } else {
-      handleResetForm();
+onMounted(() => {
+  setFocus("displayNameInput");
+
+  if (props.role) {
+    formState.value = cloneDeep(props.role);
+    const dependencies =
+      props.role.metadata.annotations?.[rbacAnnotations.DEPENDENCIES];
+    if (dependencies) {
+      selectedRoleTemplates.value = new Set(JSON.parse(dependencies));
     }
   }
-);
-
-watch(
-  () => props.role,
-  (role) => {
-    if (role) {
-      formState.value = cloneDeep(role);
-      const dependencies =
-        role.metadata.annotations?.[rbacAnnotations.DEPENDENCIES];
-      if (dependencies) {
-        selectedRoleTemplates.value = new Set(JSON.parse(dependencies));
-      }
-    } else {
-      handleResetForm();
-    }
-  }
-);
-
-const editingModalTitle = computed(() => {
-  return isUpdateMode.value
-    ? t("core.role.editing_modal.titles.update")
-    : t("core.role.editing_modal.titles.create");
 });
+
+const editingModalTitle = props.role
+  ? t("core.role.editing_modal.titles.update")
+  : t("core.role.editing_modal.titles.create");
 
 const handleCreateOrUpdateRole = async () => {
   try {
     await handleCreateOrUpdate();
-    onVisibleChange(false);
+
+    modal.value?.close();
   } catch (e) {
     console.error(e);
   }
 };
-
-const onVisibleChange = (visible: boolean) => {
-  emit("update:visible", visible);
-  if (!visible) {
-    emit("close");
-  }
-};
-
-const handleResetForm = () => {
-  formState.value = cloneDeep(initialFormState);
-  selectedRoleTemplates.value.clear();
-  reset("role-form");
-};
 </script>
 <template>
   <VModal
+    ref="modal"
     :title="editingModalTitle"
-    :visible="visible"
     :width="700"
-    @update:visible="onVisibleChange"
+    @close="emit('close')"
   >
     <div>
       <div class="md:grid md:grid-cols-4 md:gap-6">
@@ -301,14 +265,13 @@ const handleResetForm = () => {
     <template #footer>
       <VSpace>
         <SubmitButton
-          v-if="visible"
-          :loading="saving"
+          :loading="isSubmitting"
           type="secondary"
           :text="$t('core.common.buttons.submit')"
           @submit="$formkit.submit('role-form')"
         >
         </SubmitButton>
-        <VButton @click="onVisibleChange(false)">
+        <VButton @click="modal?.close()">
           {{ $t("core.common.buttons.cancel_and_shortcut") }}
         </VButton>
       </VSpace>

@@ -1,14 +1,14 @@
 <script lang="ts" setup>
 import {
   IconShieldUser,
+  VAlert,
   VButton,
   VCard,
+  VDescription,
+  VDescriptionItem,
   VPageHeader,
   VTabbar,
   VTag,
-  VAlert,
-  VDescription,
-  VDescriptionItem,
 } from "@halo-dev/components";
 import { useRoute } from "vue-router";
 import { computed, ref, watch } from "vue";
@@ -43,7 +43,7 @@ const { data: roleTemplates } = useQuery({
 const { roleTemplateGroups, handleRoleTemplateSelect, selectedRoleTemplates } =
   useRoleTemplateSelection(roleTemplates);
 
-const { formState, saving, handleCreateOrUpdate } = useRoleForm();
+const { formState, isSubmitting, handleCreateOrUpdate } = useRoleForm();
 
 const isSystemReserved = computed(() => {
   return (
@@ -285,7 +285,7 @@ const handleUpdateRole = async () => {
           </dl>
           <div v-permission="['system:roles:manage']" class="p-4">
             <VButton
-              :loading="saving"
+              :loading="isSubmitting"
               type="secondary"
               :disabled="isSystemReserved"
               @click="handleUpdateRole"
