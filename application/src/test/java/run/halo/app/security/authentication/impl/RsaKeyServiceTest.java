@@ -1,8 +1,14 @@
-package run.halo.app.security.authentication.login.impl;
+package run.halo.app.security.authentication.impl;
 
+import static com.nimbusds.jose.jwk.KeyOperation.SIGN;
+import static com.nimbusds.jose.jwk.KeyOperation.VERIFY;
 import static org.junit.jupiter.api.Assertions.assertArrayEquals;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
+import com.nimbusds.jose.JOSEException;
+import com.nimbusds.jose.JWSAlgorithm;
+import com.nimbusds.jose.jwk.KeyUse;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -14,6 +20,7 @@ import java.security.interfaces.RSAPublicKey;
 import java.security.spec.InvalidKeySpecException;
 import java.security.spec.PKCS8EncodedKeySpec;
 import java.security.spec.X509EncodedKeySpec;
+import java.util.Set;
 import javax.crypto.BadPaddingException;
 import javax.crypto.Cipher;
 import javax.crypto.IllegalBlockSizeException;
@@ -23,6 +30,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.api.io.TempDir;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.util.StringUtils;
 import reactor.core.Exceptions;
 import reactor.test.StepVerifier;
 import run.halo.app.security.authentication.login.InvalidEncryptedMessageException;
@@ -36,18 +44,16 @@ class RsaKeyServiceTest {
     Path tempDir;
 
     @BeforeEach
-    void setUp() {
+    void setUp() throws JOSEException {
         service = new RsaKeyService(tempDir);
+        service.afterPropertiesSet();
     }
 
     @Test
     void shouldGenerateKeyPair()
         throws IOException, NoSuchAlgorithmException, InvalidKeySpecException {
-        StepVerifier.create(service.generateKeys())
-            .verifyComplete();
-        // check the file
-        byte[] privKeyBytes = Files.readAllBytes(tempDir.resolve("id_rsa"));
-        byte[] pubKeyBytes = Files.readAllBytes(tempDir.resolve("id_rsa.pub"));
+        byte[] privKeyBytes = Files.readAllBytes(tempDir.resolve("pat_id_rsa"));
+        byte[] pubKeyBytes = Files.readAllBytes(tempDir.resolve("pat_id_rsa.pub"));
 
         var pubKeySpec = new X509EncodedKeySpec(pubKeyBytes);
         var privKeySpec = new PKCS8EncodedKeySpec(privKeyBytes);
@@ -60,10 +66,7 @@ class RsaKeyServiceTest {
 
     @Test
     void shouldReadPublicKey() throws IOException {
-        StepVerifier.create(service.generateKeys())
-            .verifyComplete();
-
-        var realPubKeyBytes = Files.readAllBytes(tempDir.resolve("id_rsa.pub"));
+        var realPubKeyBytes = Files.readAllBytes(tempDir.resolve("pat_id_rsa.pub"));
 
         StepVerifier.create(service.readPublicKey())
             .assertNext(bytes -> assertArrayEquals(realPubKeyBytes, bytes))
@@ -72,9 +75,6 @@ class RsaKeyServiceTest {
 
     @Test
     void shouldDecryptMessageCorrectly() {
-        StepVerifier.create(service.generateKeys())
-            .verifyComplete();
-
         final String message = "halo";
 
         var mono = service.readPublicKey()
@@ -83,7 +83,7 @@ class RsaKeyServiceTest {
                 try {
                     var keyFactory = KeyFactory.getInstance(RsaKeyService.ALGORITHM);
                     var pubKey = keyFactory.generatePublic(pubKeySpec);
-                    var cipher = Cipher.getInstance(RsaKeyService.ALGORITHM);
+                    var cipher = Cipher.getInstance(RsaKeyService.TRANSFORMATION);
                     cipher.init(Cipher.ENCRYPT_MODE, pubKey);
                     return cipher.doFinal(message.getBytes());
                 } catch (NoSuchAlgorithmException | InvalidKeySpecException
@@ -102,10 +102,21 @@ class RsaKeyServiceTest {
 
     @Test
     void shouldFailToDecryptMessage() {
-        StepVerifier.create(service.generateKeys())
-            .verifyComplete();
-
         StepVerifier.create(service.decrypt("invalid-bytes".getBytes()))
             .verifyError(InvalidEncryptedMessageException.class);
+    }
+
+    @Test
+    void shouldGetKeyIdFromJwk() {
+        assertTrue(StringUtils.hasText(service.getKeyId()));
+    }
+
+    @Test
+    void shouldGetJwk() {
+        var jwk = service.getJwk();
+        assertEquals("RSA", jwk.getKeyType().getValue());
+        assertEquals(JWSAlgorithm.RS256, jwk.getAlgorithm());
+        assertEquals(KeyUse.SIGNATURE, jwk.getKeyUse());
+        assertEquals(Set.of(SIGN, VERIFY), jwk.getKeyOperations());
     }
 }

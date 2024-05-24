@@ -6,6 +6,7 @@ import org.springdoc.core.fn.builders.apiresponse.Builder;
 import org.springdoc.webflux.core.fn.SpringdocRouteBuilder;
 import org.springframework.web.reactive.function.server.RouterFunction;
 import org.springframework.web.reactive.function.server.ServerResponse;
+import run.halo.app.security.authentication.CryptoService;
 
 public class PublicKeyRouteBuilder {
 

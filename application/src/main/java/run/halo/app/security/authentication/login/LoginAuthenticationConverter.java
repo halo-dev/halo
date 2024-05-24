@@ -15,6 +15,7 @@ import org.springframework.web.server.ServerWebExchange;
 import reactor.core.publisher.Mono;
 import run.halo.app.infra.exception.RateLimitExceededException;
 import run.halo.app.infra.utils.IpAddressUtils;
+import run.halo.app.security.authentication.CryptoService;
 
 @Slf4j
 public class LoginAuthenticationConverter extends ServerFormLoginAuthenticationConverter {

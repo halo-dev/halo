@@ -27,6 +27,7 @@ import reactor.util.retry.Retry;
 import run.halo.app.extension.ExtensionUtil;
 import run.halo.app.extension.ReactiveExtensionClient;
 import run.halo.app.security.PersonalAccessToken;
+import run.halo.app.security.authentication.CryptoService;
 import run.halo.app.security.authorization.AuthorityUtils;
 
 public class PatAuthenticationManager implements ReactiveAuthenticationManager {
@@ -40,16 +41,19 @@ public class PatAuthenticationManager implements ReactiveAuthenticationManager {
 
     private final ReactiveExtensionClient client;
 
+    private final CryptoService cryptoService;
+
     private Clock clock;
 
-    public PatAuthenticationManager(ReactiveExtensionClient client, PatJwkSupplier jwkSupplier) {
+    public PatAuthenticationManager(ReactiveExtensionClient client, CryptoService cryptoService) {
         this.client = client;
-        this.delegate = getDelegate(jwkSupplier);
+        this.cryptoService = cryptoService;
+        this.delegate = getDelegate();
         this.clock = Clock.systemDefaultZone();
     }
 
-    private static ReactiveAuthenticationManager getDelegate(PatJwkSupplier jwkSupplier) {
-        var jwtDecoder = withJwkSource(signedJWT -> Flux.just(jwkSupplier.getJwk()))
+    private ReactiveAuthenticationManager getDelegate() {
+        var jwtDecoder = withJwkSource(signedJWT -> Flux.just(cryptoService.getJwk()))
             .build();
         return new JwtReactiveAuthenticationManager(jwtDecoder);
     }

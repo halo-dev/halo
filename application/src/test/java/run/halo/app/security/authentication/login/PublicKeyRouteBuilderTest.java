@@ -13,6 +13,7 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.test.web.reactive.server.WebTestClient;
 import reactor.core.publisher.Mono;
+import run.halo.app.security.authentication.CryptoService;
 
 @ExtendWith(MockitoExtension.class)
 class PublicKeyRouteBuilderTest {
