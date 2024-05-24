@@ -6,6 +6,8 @@ core:
         placeholder: 用户名
       password:
         placeholder: 密码
+      remember_me:
+        label: 保持登录会话
     operations:
       submit:
         toast_success: 登录成功

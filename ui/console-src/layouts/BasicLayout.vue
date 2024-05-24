@@ -53,6 +53,10 @@ const handleLogout = () => {
 
         await userStore.fetchCurrentUser();
 
+        // Clear csrf token
+        document.cookie =
+          "XSRF-TOKEN=; Path=/; Expires=Thu, 01 Jan 1970 00:00:01 GMT;";
+
         router.replace({ name: "Login" });
       } catch (error) {
         console.error("Failed to logout", error);

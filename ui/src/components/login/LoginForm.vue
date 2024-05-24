@@ -7,7 +7,7 @@ import { AxiosError } from "axios";
 import { Toast, VButton } from "@halo-dev/components";
 import { onMounted, ref } from "vue";
 import qs from "qs";
-import { submitForm } from "@formkit/core";
+import { submitForm, reset } from "@formkit/core";
 import { JSEncrypt } from "jsencrypt";
 import { apiClient } from "@/utils/api-client";
 import { useI18n } from "vue-i18n";
@@ -29,29 +29,25 @@ const emit = defineEmits<{
   (event: "succeed"): void;
 }>();
 
-interface LoginForm {
-  _csrf: string;
-  username: string;
-  password: string;
-}
-
 const userStore = useUserStore();
 
-const loginForm = ref<LoginForm>({
-  _csrf: "",
-  username: "",
-  password: "",
-});
+const _csrf = ref("");
 
 const loading = ref(false);
 
 const handleGenerateToken = async () => {
   const token = randomUUID();
-  loginForm.value._csrf = token;
-  document.cookie = `XSRF-TOKEN=${token}; Path=/;`;
+  _csrf.value = token;
+  const expires = new Date();
+  expires.setFullYear(expires.getFullYear() + 1);
+  document.cookie = `XSRF-TOKEN=${token}; Path=/; SameSite=Lax; expires=${expires.toUTCString()}`;
 };
 
-const handleLogin = async () => {
+async function handleLogin(data: {
+  username: string;
+  password: string;
+  rememberMe: boolean;
+}) {
   try {
     loading.value = true;
 
@@ -61,10 +57,11 @@ const handleLogin = async () => {
     encrypt.setPublicKey(publicKey.base64Format as string);
 
     await axios.post(
-      `${import.meta.env.VITE_API_URL}/login`,
+      `${import.meta.env.VITE_API_URL}/login?remember-me=${data.rememberMe}`,
       qs.stringify({
-        ...loginForm.value,
-        password: encrypt.encrypt(loginForm.value.password),
+        _csrf: _csrf.value,
+        username: data.username,
+        password: encrypt.encrypt(data.password),
       }),
       {
         withCredentials: true,
@@ -115,12 +112,12 @@ const handleLogin = async () => {
       Toast.error(t("core.common.toast.unknown_error"));
     }
 
-    loginForm.value.password = "";
+    reset("passwordInput");
     setFocus("passwordInput");
   } finally {
     loading.value = false;
   }
-};
+}
 
 onMounted(() => {
   handleGenerateToken();
@@ -138,7 +135,6 @@ const mfaRequired = ref(false);
   <template v-if="!mfaRequired">
     <FormKit
       id="login-form"
-      v-model="loginForm"
       name="login-form"
       :actions="false"
       type="form"
@@ -170,9 +166,17 @@ const mfaRequired = ref(false);
         autocomplete="current-password"
       >
       </FormKit>
+
+      <FormKit
+        type="checkbox"
+        :label="$t('core.login.fields.remember_me.label')"
+        name="rememberMe"
+        :value="false"
+        :classes="inputClasses"
+      ></FormKit>
     </FormKit>
     <VButton
-      class="mt-8"
+      class="mt-6"
       block
       :loading="loading"
       type="secondary"
