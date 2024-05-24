@@ -24,7 +24,7 @@ export function usePostCategory(): usePostCategoryReturn {
     queryKey: ["post-categories"],
     queryFn: async () => {
       const { data } =
-        await apiClient.extension.category.listcontentHaloRunV1alpha1Category({
+        await apiClient.extension.category.listContentHaloRunV1alpha1Category({
           page: 0,
           size: 0,
           sort: ["metadata.creationTimestamp,desc"],

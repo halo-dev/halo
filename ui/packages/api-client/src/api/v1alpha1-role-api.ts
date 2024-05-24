@@ -37,7 +37,7 @@ export const V1alpha1RoleApiAxiosParamCreator = function (configuration?: Config
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        createv1alpha1Role: async (role?: Role, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+        createV1alpha1Role: async (role?: Role, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
             const localVarPath = `/api/v1alpha1/roles`;
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
@@ -78,9 +78,9 @@ export const V1alpha1RoleApiAxiosParamCreator = function (configuration?: Config
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        deletev1alpha1Role: async (name: string, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+        deleteV1alpha1Role: async (name: string, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
             // verify required parameter 'name' is not null or undefined
-            assertParamExists('deletev1alpha1Role', 'name', name)
+            assertParamExists('deleteV1alpha1Role', 'name', name)
             const localVarPath = `/api/v1alpha1/roles/{name}`
                 .replace(`{${"name"}}`, encodeURIComponent(String(name)));
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
@@ -119,9 +119,9 @@ export const V1alpha1RoleApiAxiosParamCreator = function (configuration?: Config
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        getv1alpha1Role: async (name: string, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+        getV1alpha1Role: async (name: string, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
             // verify required parameter 'name' is not null or undefined
-            assertParamExists('getv1alpha1Role', 'name', name)
+            assertParamExists('getV1alpha1Role', 'name', name)
             const localVarPath = `/api/v1alpha1/roles/{name}`
                 .replace(`{${"name"}}`, encodeURIComponent(String(name)));
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
@@ -164,7 +164,7 @@ export const V1alpha1RoleApiAxiosParamCreator = function (configuration?: Config
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        listv1alpha1Role: async (page?: number, size?: number, labelSelector?: Array<string>, fieldSelector?: Array<string>, sort?: Array<string>, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+        listV1alpha1Role: async (page?: number, size?: number, labelSelector?: Array<string>, fieldSelector?: Array<string>, sort?: Array<string>, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
             const localVarPath = `/api/v1alpha1/roles`;
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
@@ -223,9 +223,9 @@ export const V1alpha1RoleApiAxiosParamCreator = function (configuration?: Config
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        updatev1alpha1Role: async (name: string, role?: Role, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+        updateV1alpha1Role: async (name: string, role?: Role, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
             // verify required parameter 'name' is not null or undefined
-            assertParamExists('updatev1alpha1Role', 'name', name)
+            assertParamExists('updateV1alpha1Role', 'name', name)
             const localVarPath = `/api/v1alpha1/roles/{name}`
                 .replace(`{${"name"}}`, encodeURIComponent(String(name)));
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
@@ -277,10 +277,10 @@ export const V1alpha1RoleApiFp = function(configuration?: Configuration) {
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async createv1alpha1Role(role?: Role, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<Role>> {
-            const localVarAxiosArgs = await localVarAxiosParamCreator.createv1alpha1Role(role, options);
+        async createV1alpha1Role(role?: Role, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<Role>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.createV1alpha1Role(role, options);
             const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
-            const localVarOperationServerBasePath = operationServerMap['V1alpha1RoleApi.createv1alpha1Role']?.[localVarOperationServerIndex]?.url;
+            const localVarOperationServerBasePath = operationServerMap['V1alpha1RoleApi.createV1alpha1Role']?.[localVarOperationServerIndex]?.url;
             return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
         },
         /**
@@ -289,10 +289,10 @@ export const V1alpha1RoleApiFp = function(configuration?: Configuration) {
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async deletev1alpha1Role(name: string, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<void>> {
-            const localVarAxiosArgs = await localVarAxiosParamCreator.deletev1alpha1Role(name, options);
+        async deleteV1alpha1Role(name: string, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<void>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.deleteV1alpha1Role(name, options);
             const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
-            const localVarOperationServerBasePath = operationServerMap['V1alpha1RoleApi.deletev1alpha1Role']?.[localVarOperationServerIndex]?.url;
+            const localVarOperationServerBasePath = operationServerMap['V1alpha1RoleApi.deleteV1alpha1Role']?.[localVarOperationServerIndex]?.url;
             return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
         },
         /**
@@ -301,10 +301,10 @@ export const V1alpha1RoleApiFp = function(configuration?: Configuration) {
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async getv1alpha1Role(name: string, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<Role>> {
-            const localVarAxiosArgs = await localVarAxiosParamCreator.getv1alpha1Role(name, options);
+        async getV1alpha1Role(name: string, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<Role>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.getV1alpha1Role(name, options);
             const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
-            const localVarOperationServerBasePath = operationServerMap['V1alpha1RoleApi.getv1alpha1Role']?.[localVarOperationServerIndex]?.url;
+            const localVarOperationServerBasePath = operationServerMap['V1alpha1RoleApi.getV1alpha1Role']?.[localVarOperationServerIndex]?.url;
             return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
         },
         /**
@@ -317,10 +317,10 @@ export const V1alpha1RoleApiFp = function(configuration?: Configuration) {
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async listv1alpha1Role(page?: number, size?: number, labelSelector?: Array<string>, fieldSelector?: Array<string>, sort?: Array<string>, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<RoleList>> {
-            const localVarAxiosArgs = await localVarAxiosParamCreator.listv1alpha1Role(page, size, labelSelector, fieldSelector, sort, options);
+        async listV1alpha1Role(page?: number, size?: number, labelSelector?: Array<string>, fieldSelector?: Array<string>, sort?: Array<string>, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<RoleList>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.listV1alpha1Role(page, size, labelSelector, fieldSelector, sort, options);
             const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
-            const localVarOperationServerBasePath = operationServerMap['V1alpha1RoleApi.listv1alpha1Role']?.[localVarOperationServerIndex]?.url;
+            const localVarOperationServerBasePath = operationServerMap['V1alpha1RoleApi.listV1alpha1Role']?.[localVarOperationServerIndex]?.url;
             return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
         },
         /**
@@ -330,10 +330,10 @@ export const V1alpha1RoleApiFp = function(configuration?: Configuration) {
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async updatev1alpha1Role(name: string, role?: Role, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<Role>> {
-            const localVarAxiosArgs = await localVarAxiosParamCreator.updatev1alpha1Role(name, role, options);
+        async updateV1alpha1Role(name: string, role?: Role, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<Role>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.updateV1alpha1Role(name, role, options);
             const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
-            const localVarOperationServerBasePath = operationServerMap['V1alpha1RoleApi.updatev1alpha1Role']?.[localVarOperationServerIndex]?.url;
+            const localVarOperationServerBasePath = operationServerMap['V1alpha1RoleApi.updateV1alpha1Role']?.[localVarOperationServerIndex]?.url;
             return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
         },
     }
@@ -348,153 +348,153 @@ export const V1alpha1RoleApiFactory = function (configuration?: Configuration, b
     return {
         /**
          * Create v1alpha1/Role
-         * @param {V1alpha1RoleApiCreatev1alpha1RoleRequest} requestParameters Request parameters.
+         * @param {V1alpha1RoleApiCreateV1alpha1RoleRequest} requestParameters Request parameters.
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        createv1alpha1Role(requestParameters: V1alpha1RoleApiCreatev1alpha1RoleRequest = {}, options?: RawAxiosRequestConfig): AxiosPromise<Role> {
-            return localVarFp.createv1alpha1Role(requestParameters.role, options).then((request) => request(axios, basePath));
+        createV1alpha1Role(requestParameters: V1alpha1RoleApiCreateV1alpha1RoleRequest = {}, options?: RawAxiosRequestConfig): AxiosPromise<Role> {
+            return localVarFp.createV1alpha1Role(requestParameters.role, options).then((request) => request(axios, basePath));
         },
         /**
          * Delete v1alpha1/Role
-         * @param {V1alpha1RoleApiDeletev1alpha1RoleRequest} requestParameters Request parameters.
+         * @param {V1alpha1RoleApiDeleteV1alpha1RoleRequest} requestParameters Request parameters.
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        deletev1alpha1Role(requestParameters: V1alpha1RoleApiDeletev1alpha1RoleRequest, options?: RawAxiosRequestConfig): AxiosPromise<void> {
-            return localVarFp.deletev1alpha1Role(requestParameters.name, options).then((request) => request(axios, basePath));
+        deleteV1alpha1Role(requestParameters: V1alpha1RoleApiDeleteV1alpha1RoleRequest, options?: RawAxiosRequestConfig): AxiosPromise<void> {
+            return localVarFp.deleteV1alpha1Role(requestParameters.name, options).then((request) => request(axios, basePath));
         },
         /**
          * Get v1alpha1/Role
-         * @param {V1alpha1RoleApiGetv1alpha1RoleRequest} requestParameters Request parameters.
+         * @param {V1alpha1RoleApiGetV1alpha1RoleRequest} requestParameters Request parameters.
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        getv1alpha1Role(requestParameters: V1alpha1RoleApiGetv1alpha1RoleRequest, options?: RawAxiosRequestConfig): AxiosPromise<Role> {
-            return localVarFp.getv1alpha1Role(requestParameters.name, options).then((request) => request(axios, basePath));
+        getV1alpha1Role(requestParameters: V1alpha1RoleApiGetV1alpha1RoleRequest, options?: RawAxiosRequestConfig): AxiosPromise<Role> {
+            return localVarFp.getV1alpha1Role(requestParameters.name, options).then((request) => request(axios, basePath));
         },
         /**
          * List v1alpha1/Role
-         * @param {V1alpha1RoleApiListv1alpha1RoleRequest} requestParameters Request parameters.
+         * @param {V1alpha1RoleApiListV1alpha1RoleRequest} requestParameters Request parameters.
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        listv1alpha1Role(requestParameters: V1alpha1RoleApiListv1alpha1RoleRequest = {}, options?: RawAxiosRequestConfig): AxiosPromise<RoleList> {
-            return localVarFp.listv1alpha1Role(requestParameters.page, requestParameters.size, requestParameters.labelSelector, requestParameters.fieldSelector, requestParameters.sort, options).then((request) => request(axios, basePath));
+        listV1alpha1Role(requestParameters: V1alpha1RoleApiListV1alpha1RoleRequest = {}, options?: RawAxiosRequestConfig): AxiosPromise<RoleList> {
+            return localVarFp.listV1alpha1Role(requestParameters.page, requestParameters.size, requestParameters.labelSelector, requestParameters.fieldSelector, requestParameters.sort, options).then((request) => request(axios, basePath));
         },
         /**
          * Update v1alpha1/Role
-         * @param {V1alpha1RoleApiUpdatev1alpha1RoleRequest} requestParameters Request parameters.
+         * @param {V1alpha1RoleApiUpdateV1alpha1RoleRequest} requestParameters Request parameters.
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        updatev1alpha1Role(requestParameters: V1alpha1RoleApiUpdatev1alpha1RoleRequest, options?: RawAxiosRequestConfig): AxiosPromise<Role> {
-            return localVarFp.updatev1alpha1Role(requestParameters.name, requestParameters.role, options).then((request) => request(axios, basePath));
+        updateV1alpha1Role(requestParameters: V1alpha1RoleApiUpdateV1alpha1RoleRequest, options?: RawAxiosRequestConfig): AxiosPromise<Role> {
+            return localVarFp.updateV1alpha1Role(requestParameters.name, requestParameters.role, options).then((request) => request(axios, basePath));
         },
     };
 };
 
 /**
- * Request parameters for createv1alpha1Role operation in V1alpha1RoleApi.
+ * Request parameters for createV1alpha1Role operation in V1alpha1RoleApi.
  * @export
- * @interface V1alpha1RoleApiCreatev1alpha1RoleRequest
+ * @interface V1alpha1RoleApiCreateV1alpha1RoleRequest
  */
-export interface V1alpha1RoleApiCreatev1alpha1RoleRequest {
+export interface V1alpha1RoleApiCreateV1alpha1RoleRequest {
     /**
      * Fresh role
      * @type {Role}
-     * @memberof V1alpha1RoleApiCreatev1alpha1Role
+     * @memberof V1alpha1RoleApiCreateV1alpha1Role
      */
     readonly role?: Role
 }
 
 /**
- * Request parameters for deletev1alpha1Role operation in V1alpha1RoleApi.
+ * Request parameters for deleteV1alpha1Role operation in V1alpha1RoleApi.
  * @export
- * @interface V1alpha1RoleApiDeletev1alpha1RoleRequest
+ * @interface V1alpha1RoleApiDeleteV1alpha1RoleRequest
  */
-export interface V1alpha1RoleApiDeletev1alpha1RoleRequest {
+export interface V1alpha1RoleApiDeleteV1alpha1RoleRequest {
     /**
      * Name of role
      * @type {string}
-     * @memberof V1alpha1RoleApiDeletev1alpha1Role
+     * @memberof V1alpha1RoleApiDeleteV1alpha1Role
      */
     readonly name: string
 }
 
 /**
- * Request parameters for getv1alpha1Role operation in V1alpha1RoleApi.
+ * Request parameters for getV1alpha1Role operation in V1alpha1RoleApi.
  * @export
- * @interface V1alpha1RoleApiGetv1alpha1RoleRequest
+ * @interface V1alpha1RoleApiGetV1alpha1RoleRequest
  */
-export interface V1alpha1RoleApiGetv1alpha1RoleRequest {
+export interface V1alpha1RoleApiGetV1alpha1RoleRequest {
     /**
      * Name of role
      * @type {string}
-     * @memberof V1alpha1RoleApiGetv1alpha1Role
+     * @memberof V1alpha1RoleApiGetV1alpha1Role
      */
     readonly name: string
 }
 
 /**
- * Request parameters for listv1alpha1Role operation in V1alpha1RoleApi.
+ * Request parameters for listV1alpha1Role operation in V1alpha1RoleApi.
  * @export
- * @interface V1alpha1RoleApiListv1alpha1RoleRequest
+ * @interface V1alpha1RoleApiListV1alpha1RoleRequest
  */
-export interface V1alpha1RoleApiListv1alpha1RoleRequest {
+export interface V1alpha1RoleApiListV1alpha1RoleRequest {
     /**
      * Page number. Default is 0.
      * @type {number}
-     * @memberof V1alpha1RoleApiListv1alpha1Role
+     * @memberof V1alpha1RoleApiListV1alpha1Role
      */
     readonly page?: number
 
     /**
      * Size number. Default is 0.
      * @type {number}
-     * @memberof V1alpha1RoleApiListv1alpha1Role
+     * @memberof V1alpha1RoleApiListV1alpha1Role
      */
     readonly size?: number
 
     /**
      * Label selector. e.g.: hidden!&#x3D;true
      * @type {Array<string>}
-     * @memberof V1alpha1RoleApiListv1alpha1Role
+     * @memberof V1alpha1RoleApiListV1alpha1Role
      */
     readonly labelSelector?: Array<string>
 
     /**
      * Field selector. e.g.: metadata.name&#x3D;&#x3D;halo
      * @type {Array<string>}
-     * @memberof V1alpha1RoleApiListv1alpha1Role
+     * @memberof V1alpha1RoleApiListV1alpha1Role
      */
     readonly fieldSelector?: Array<string>
 
     /**
      * Sorting criteria in the format: property,(asc|desc). Default sort order is ascending. Multiple sort criteria are supported.
      * @type {Array<string>}
-     * @memberof V1alpha1RoleApiListv1alpha1Role
+     * @memberof V1alpha1RoleApiListV1alpha1Role
      */
     readonly sort?: Array<string>
 }
 
 /**
- * Request parameters for updatev1alpha1Role operation in V1alpha1RoleApi.
+ * Request parameters for updateV1alpha1Role operation in V1alpha1RoleApi.
  * @export
- * @interface V1alpha1RoleApiUpdatev1alpha1RoleRequest
+ * @interface V1alpha1RoleApiUpdateV1alpha1RoleRequest
  */
-export interface V1alpha1RoleApiUpdatev1alpha1RoleRequest {
+export interface V1alpha1RoleApiUpdateV1alpha1RoleRequest {
     /**
      * Name of role
      * @type {string}
-     * @memberof V1alpha1RoleApiUpdatev1alpha1Role
+     * @memberof V1alpha1RoleApiUpdateV1alpha1Role
      */
     readonly name: string
 
     /**
      * Updated role
      * @type {Role}
-     * @memberof V1alpha1RoleApiUpdatev1alpha1Role
+     * @memberof V1alpha1RoleApiUpdateV1alpha1Role
      */
     readonly role?: Role
 }
@@ -508,57 +508,57 @@ export interface V1alpha1RoleApiUpdatev1alpha1RoleRequest {
 export class V1alpha1RoleApi extends BaseAPI {
     /**
      * Create v1alpha1/Role
-     * @param {V1alpha1RoleApiCreatev1alpha1RoleRequest} requestParameters Request parameters.
+     * @param {V1alpha1RoleApiCreateV1alpha1RoleRequest} requestParameters Request parameters.
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      * @memberof V1alpha1RoleApi
      */
-    public createv1alpha1Role(requestParameters: V1alpha1RoleApiCreatev1alpha1RoleRequest = {}, options?: RawAxiosRequestConfig) {
-        return V1alpha1RoleApiFp(this.configuration).createv1alpha1Role(requestParameters.role, options).then((request) => request(this.axios, this.basePath));
+    public createV1alpha1Role(requestParameters: V1alpha1RoleApiCreateV1alpha1RoleRequest = {}, options?: RawAxiosRequestConfig) {
+        return V1alpha1RoleApiFp(this.configuration).createV1alpha1Role(requestParameters.role, options).then((request) => request(this.axios, this.basePath));
     }
 
     /**
      * Delete v1alpha1/Role
-     * @param {V1alpha1RoleApiDeletev1alpha1RoleRequest} requestParameters Request parameters.
+     * @param {V1alpha1RoleApiDeleteV1alpha1RoleRequest} requestParameters Request parameters.
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      * @memberof V1alpha1RoleApi
      */
-    public deletev1alpha1Role(requestParameters: V1alpha1RoleApiDeletev1alpha1RoleRequest, options?: RawAxiosRequestConfig) {
-        return V1alpha1RoleApiFp(this.configuration).deletev1alpha1Role(requestParameters.name, options).then((request) => request(this.axios, this.basePath));
+    public deleteV1alpha1Role(requestParameters: V1alpha1RoleApiDeleteV1alpha1RoleRequest, options?: RawAxiosRequestConfig) {
+        return V1alpha1RoleApiFp(this.configuration).deleteV1alpha1Role(requestParameters.name, options).then((request) => request(this.axios, this.basePath));
     }
 
     /**
      * Get v1alpha1/Role
-     * @param {V1alpha1RoleApiGetv1alpha1RoleRequest} requestParameters Request parameters.
+     * @param {V1alpha1RoleApiGetV1alpha1RoleRequest} requestParameters Request parameters.
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      * @memberof V1alpha1RoleApi
      */
-    public getv1alpha1Role(requestParameters: V1alpha1RoleApiGetv1alpha1RoleRequest, options?: RawAxiosRequestConfig) {
-        return V1alpha1RoleApiFp(this.configuration).getv1alpha1Role(requestParameters.name, options).then((request) => request(this.axios, this.basePath));
+    public getV1alpha1Role(requestParameters: V1alpha1RoleApiGetV1alpha1RoleRequest, options?: RawAxiosRequestConfig) {
+        return V1alpha1RoleApiFp(this.configuration).getV1alpha1Role(requestParameters.name, options).then((request) => request(this.axios, this.basePath));
     }
 
     /**
      * List v1alpha1/Role
-     * @param {V1alpha1RoleApiListv1alpha1RoleRequest} requestParameters Request parameters.
+     * @param {V1alpha1RoleApiListV1alpha1RoleRequest} requestParameters Request parameters.
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      * @memberof V1alpha1RoleApi
      */
-    public listv1alpha1Role(requestParameters: V1alpha1RoleApiListv1alpha1RoleRequest = {}, options?: RawAxiosRequestConfig) {
-        return V1alpha1RoleApiFp(this.configuration).listv1alpha1Role(requestParameters.page, requestParameters.size, requestParameters.labelSelector, requestParameters.fieldSelector, requestParameters.sort, options).then((request) => request(this.axios, this.basePath));
+    public listV1alpha1Role(requestParameters: V1alpha1RoleApiListV1alpha1RoleRequest = {}, options?: RawAxiosRequestConfig) {
+        return V1alpha1RoleApiFp(this.configuration).listV1alpha1Role(requestParameters.page, requestParameters.size, requestParameters.labelSelector, requestParameters.fieldSelector, requestParameters.sort, options).then((request) => request(this.axios, this.basePath));
     }
 
     /**
      * Update v1alpha1/Role
-     * @param {V1alpha1RoleApiUpdatev1alpha1RoleRequest} requestParameters Request parameters.
+     * @param {V1alpha1RoleApiUpdateV1alpha1RoleRequest} requestParameters Request parameters.
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      * @memberof V1alpha1RoleApi
      */
-    public updatev1alpha1Role(requestParameters: V1alpha1RoleApiUpdatev1alpha1RoleRequest, options?: RawAxiosRequestConfig) {
-        return V1alpha1RoleApiFp(this.configuration).updatev1alpha1Role(requestParameters.name, requestParameters.role, options).then((request) => request(this.axios, this.basePath));
+    public updateV1alpha1Role(requestParameters: V1alpha1RoleApiUpdateV1alpha1RoleRequest, options?: RawAxiosRequestConfig) {
+        return V1alpha1RoleApiFp(this.configuration).updateV1alpha1Role(requestParameters.name, requestParameters.role, options).then((request) => request(this.axios, this.basePath));
     }
 }
 

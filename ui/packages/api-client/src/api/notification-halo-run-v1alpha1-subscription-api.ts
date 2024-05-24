@@ -37,7 +37,7 @@ export const NotificationHaloRunV1alpha1SubscriptionApiAxiosParamCreator = funct
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        createnotificationHaloRunV1alpha1Subscription: async (subscription?: Subscription, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+        createNotificationHaloRunV1alpha1Subscription: async (subscription?: Subscription, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
             const localVarPath = `/apis/notification.halo.run/v1alpha1/subscriptions`;
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
@@ -78,9 +78,9 @@ export const NotificationHaloRunV1alpha1SubscriptionApiAxiosParamCreator = funct
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        deletenotificationHaloRunV1alpha1Subscription: async (name: string, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+        deleteNotificationHaloRunV1alpha1Subscription: async (name: string, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
             // verify required parameter 'name' is not null or undefined
-            assertParamExists('deletenotificationHaloRunV1alpha1Subscription', 'name', name)
+            assertParamExists('deleteNotificationHaloRunV1alpha1Subscription', 'name', name)
             const localVarPath = `/apis/notification.halo.run/v1alpha1/subscriptions/{name}`
                 .replace(`{${"name"}}`, encodeURIComponent(String(name)));
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
@@ -119,9 +119,9 @@ export const NotificationHaloRunV1alpha1SubscriptionApiAxiosParamCreator = funct
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        getnotificationHaloRunV1alpha1Subscription: async (name: string, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+        getNotificationHaloRunV1alpha1Subscription: async (name: string, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
             // verify required parameter 'name' is not null or undefined
-            assertParamExists('getnotificationHaloRunV1alpha1Subscription', 'name', name)
+            assertParamExists('getNotificationHaloRunV1alpha1Subscription', 'name', name)
             const localVarPath = `/apis/notification.halo.run/v1alpha1/subscriptions/{name}`
                 .replace(`{${"name"}}`, encodeURIComponent(String(name)));
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
@@ -164,7 +164,7 @@ export const NotificationHaloRunV1alpha1SubscriptionApiAxiosParamCreator = funct
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        listnotificationHaloRunV1alpha1Subscription: async (page?: number, size?: number, labelSelector?: Array<string>, fieldSelector?: Array<string>, sort?: Array<string>, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+        listNotificationHaloRunV1alpha1Subscription: async (page?: number, size?: number, labelSelector?: Array<string>, fieldSelector?: Array<string>, sort?: Array<string>, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
             const localVarPath = `/apis/notification.halo.run/v1alpha1/subscriptions`;
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
@@ -223,9 +223,9 @@ export const NotificationHaloRunV1alpha1SubscriptionApiAxiosParamCreator = funct
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        updatenotificationHaloRunV1alpha1Subscription: async (name: string, subscription?: Subscription, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+        updateNotificationHaloRunV1alpha1Subscription: async (name: string, subscription?: Subscription, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
             // verify required parameter 'name' is not null or undefined
-            assertParamExists('updatenotificationHaloRunV1alpha1Subscription', 'name', name)
+            assertParamExists('updateNotificationHaloRunV1alpha1Subscription', 'name', name)
             const localVarPath = `/apis/notification.halo.run/v1alpha1/subscriptions/{name}`
                 .replace(`{${"name"}}`, encodeURIComponent(String(name)));
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
@@ -277,10 +277,10 @@ export const NotificationHaloRunV1alpha1SubscriptionApiFp = function(configurati
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async createnotificationHaloRunV1alpha1Subscription(subscription?: Subscription, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<Subscription>> {
-            const localVarAxiosArgs = await localVarAxiosParamCreator.createnotificationHaloRunV1alpha1Subscription(subscription, options);
+        async createNotificationHaloRunV1alpha1Subscription(subscription?: Subscription, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<Subscription>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.createNotificationHaloRunV1alpha1Subscription(subscription, options);
             const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
-            const localVarOperationServerBasePath = operationServerMap['NotificationHaloRunV1alpha1SubscriptionApi.createnotificationHaloRunV1alpha1Subscription']?.[localVarOperationServerIndex]?.url;
+            const localVarOperationServerBasePath = operationServerMap['NotificationHaloRunV1alpha1SubscriptionApi.createNotificationHaloRunV1alpha1Subscription']?.[localVarOperationServerIndex]?.url;
             return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
         },
         /**
@@ -289,10 +289,10 @@ export const NotificationHaloRunV1alpha1SubscriptionApiFp = function(configurati
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async deletenotificationHaloRunV1alpha1Subscription(name: string, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<void>> {
-            const localVarAxiosArgs = await localVarAxiosParamCreator.deletenotificationHaloRunV1alpha1Subscription(name, options);
+        async deleteNotificationHaloRunV1alpha1Subscription(name: string, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<void>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.deleteNotificationHaloRunV1alpha1Subscription(name, options);
             const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
-            const localVarOperationServerBasePath = operationServerMap['NotificationHaloRunV1alpha1SubscriptionApi.deletenotificationHaloRunV1alpha1Subscription']?.[localVarOperationServerIndex]?.url;
+            const localVarOperationServerBasePath = operationServerMap['NotificationHaloRunV1alpha1SubscriptionApi.deleteNotificationHaloRunV1alpha1Subscription']?.[localVarOperationServerIndex]?.url;
             return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
         },
         /**
@@ -301,10 +301,10 @@ export const NotificationHaloRunV1alpha1SubscriptionApiFp = function(configurati
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async getnotificationHaloRunV1alpha1Subscription(name: string, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<Subscription>> {
-            const localVarAxiosArgs = await localVarAxiosParamCreator.getnotificationHaloRunV1alpha1Subscription(name, options);
+        async getNotificationHaloRunV1alpha1Subscription(name: string, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<Subscription>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.getNotificationHaloRunV1alpha1Subscription(name, options);
             const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
-            const localVarOperationServerBasePath = operationServerMap['NotificationHaloRunV1alpha1SubscriptionApi.getnotificationHaloRunV1alpha1Subscription']?.[localVarOperationServerIndex]?.url;
+            const localVarOperationServerBasePath = operationServerMap['NotificationHaloRunV1alpha1SubscriptionApi.getNotificationHaloRunV1alpha1Subscription']?.[localVarOperationServerIndex]?.url;
             return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
         },
         /**
@@ -317,10 +317,10 @@ export const NotificationHaloRunV1alpha1SubscriptionApiFp = function(configurati
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async listnotificationHaloRunV1alpha1Subscription(page?: number, size?: number, labelSelector?: Array<string>, fieldSelector?: Array<string>, sort?: Array<string>, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<SubscriptionList>> {
-            const localVarAxiosArgs = await localVarAxiosParamCreator.listnotificationHaloRunV1alpha1Subscription(page, size, labelSelector, fieldSelector, sort, options);
+        async listNotificationHaloRunV1alpha1Subscription(page?: number, size?: number, labelSelector?: Array<string>, fieldSelector?: Array<string>, sort?: Array<string>, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<SubscriptionList>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.listNotificationHaloRunV1alpha1Subscription(page, size, labelSelector, fieldSelector, sort, options);
             const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
-            const localVarOperationServerBasePath = operationServerMap['NotificationHaloRunV1alpha1SubscriptionApi.listnotificationHaloRunV1alpha1Subscription']?.[localVarOperationServerIndex]?.url;
+            const localVarOperationServerBasePath = operationServerMap['NotificationHaloRunV1alpha1SubscriptionApi.listNotificationHaloRunV1alpha1Subscription']?.[localVarOperationServerIndex]?.url;
             return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
         },
         /**
@@ -330,10 +330,10 @@ export const NotificationHaloRunV1alpha1SubscriptionApiFp = function(configurati
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async updatenotificationHaloRunV1alpha1Subscription(name: string, subscription?: Subscription, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<Subscription>> {
-            const localVarAxiosArgs = await localVarAxiosParamCreator.updatenotificationHaloRunV1alpha1Subscription(name, subscription, options);
+        async updateNotificationHaloRunV1alpha1Subscription(name: string, subscription?: Subscription, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<Subscription>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.updateNotificationHaloRunV1alpha1Subscription(name, subscription, options);
             const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
-            const localVarOperationServerBasePath = operationServerMap['NotificationHaloRunV1alpha1SubscriptionApi.updatenotificationHaloRunV1alpha1Subscription']?.[localVarOperationServerIndex]?.url;
+            const localVarOperationServerBasePath = operationServerMap['NotificationHaloRunV1alpha1SubscriptionApi.updateNotificationHaloRunV1alpha1Subscription']?.[localVarOperationServerIndex]?.url;
             return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
         },
     }
@@ -348,153 +348,153 @@ export const NotificationHaloRunV1alpha1SubscriptionApiFactory = function (confi
     return {
         /**
          * Create notification.halo.run/v1alpha1/Subscription
-         * @param {NotificationHaloRunV1alpha1SubscriptionApiCreatenotificationHaloRunV1alpha1SubscriptionRequest} requestParameters Request parameters.
+         * @param {NotificationHaloRunV1alpha1SubscriptionApiCreateNotificationHaloRunV1alpha1SubscriptionRequest} requestParameters Request parameters.
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        createnotificationHaloRunV1alpha1Subscription(requestParameters: NotificationHaloRunV1alpha1SubscriptionApiCreatenotificationHaloRunV1alpha1SubscriptionRequest = {}, options?: RawAxiosRequestConfig): AxiosPromise<Subscription> {
-            return localVarFp.createnotificationHaloRunV1alpha1Subscription(requestParameters.subscription, options).then((request) => request(axios, basePath));
+        createNotificationHaloRunV1alpha1Subscription(requestParameters: NotificationHaloRunV1alpha1SubscriptionApiCreateNotificationHaloRunV1alpha1SubscriptionRequest = {}, options?: RawAxiosRequestConfig): AxiosPromise<Subscription> {
+            return localVarFp.createNotificationHaloRunV1alpha1Subscription(requestParameters.subscription, options).then((request) => request(axios, basePath));
         },
         /**
          * Delete notification.halo.run/v1alpha1/Subscription
-         * @param {NotificationHaloRunV1alpha1SubscriptionApiDeletenotificationHaloRunV1alpha1SubscriptionRequest} requestParameters Request parameters.
+         * @param {NotificationHaloRunV1alpha1SubscriptionApiDeleteNotificationHaloRunV1alpha1SubscriptionRequest} requestParameters Request parameters.
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        deletenotificationHaloRunV1alpha1Subscription(requestParameters: NotificationHaloRunV1alpha1SubscriptionApiDeletenotificationHaloRunV1alpha1SubscriptionRequest, options?: RawAxiosRequestConfig): AxiosPromise<void> {
-            return localVarFp.deletenotificationHaloRunV1alpha1Subscription(requestParameters.name, options).then((request) => request(axios, basePath));
+        deleteNotificationHaloRunV1alpha1Subscription(requestParameters: NotificationHaloRunV1alpha1SubscriptionApiDeleteNotificationHaloRunV1alpha1SubscriptionRequest, options?: RawAxiosRequestConfig): AxiosPromise<void> {
+            return localVarFp.deleteNotificationHaloRunV1alpha1Subscription(requestParameters.name, options).then((request) => request(axios, basePath));
         },
         /**
          * Get notification.halo.run/v1alpha1/Subscription
-         * @param {NotificationHaloRunV1alpha1SubscriptionApiGetnotificationHaloRunV1alpha1SubscriptionRequest} requestParameters Request parameters.
+         * @param {NotificationHaloRunV1alpha1SubscriptionApiGetNotificationHaloRunV1alpha1SubscriptionRequest} requestParameters Request parameters.
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        getnotificationHaloRunV1alpha1Subscription(requestParameters: NotificationHaloRunV1alpha1SubscriptionApiGetnotificationHaloRunV1alpha1SubscriptionRequest, options?: RawAxiosRequestConfig): AxiosPromise<Subscription> {
-            return localVarFp.getnotificationHaloRunV1alpha1Subscription(requestParameters.name, options).then((request) => request(axios, basePath));
+        getNotificationHaloRunV1alpha1Subscription(requestParameters: NotificationHaloRunV1alpha1SubscriptionApiGetNotificationHaloRunV1alpha1SubscriptionRequest, options?: RawAxiosRequestConfig): AxiosPromise<Subscription> {
+            return localVarFp.getNotificationHaloRunV1alpha1Subscription(requestParameters.name, options).then((request) => request(axios, basePath));
         },
         /**
          * List notification.halo.run/v1alpha1/Subscription
-         * @param {NotificationHaloRunV1alpha1SubscriptionApiListnotificationHaloRunV1alpha1SubscriptionRequest} requestParameters Request parameters.
+         * @param {NotificationHaloRunV1alpha1SubscriptionApiListNotificationHaloRunV1alpha1SubscriptionRequest} requestParameters Request parameters.
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        listnotificationHaloRunV1alpha1Subscription(requestParameters: NotificationHaloRunV1alpha1SubscriptionApiListnotificationHaloRunV1alpha1SubscriptionRequest = {}, options?: RawAxiosRequestConfig): AxiosPromise<SubscriptionList> {
-            return localVarFp.listnotificationHaloRunV1alpha1Subscription(requestParameters.page, requestParameters.size, requestParameters.labelSelector, requestParameters.fieldSelector, requestParameters.sort, options).then((request) => request(axios, basePath));
+        listNotificationHaloRunV1alpha1Subscription(requestParameters: NotificationHaloRunV1alpha1SubscriptionApiListNotificationHaloRunV1alpha1SubscriptionRequest = {}, options?: RawAxiosRequestConfig): AxiosPromise<SubscriptionList> {
+            return localVarFp.listNotificationHaloRunV1alpha1Subscription(requestParameters.page, requestParameters.size, requestParameters.labelSelector, requestParameters.fieldSelector, requestParameters.sort, options).then((request) => request(axios, basePath));
         },
         /**
          * Update notification.halo.run/v1alpha1/Subscription
-         * @param {NotificationHaloRunV1alpha1SubscriptionApiUpdatenotificationHaloRunV1alpha1SubscriptionRequest} requestParameters Request parameters.
+         * @param {NotificationHaloRunV1alpha1SubscriptionApiUpdateNotificationHaloRunV1alpha1SubscriptionRequest} requestParameters Request parameters.
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        updatenotificationHaloRunV1alpha1Subscription(requestParameters: NotificationHaloRunV1alpha1SubscriptionApiUpdatenotificationHaloRunV1alpha1SubscriptionRequest, options?: RawAxiosRequestConfig): AxiosPromise<Subscription> {
-            return localVarFp.updatenotificationHaloRunV1alpha1Subscription(requestParameters.name, requestParameters.subscription, options).then((request) => request(axios, basePath));
+        updateNotificationHaloRunV1alpha1Subscription(requestParameters: NotificationHaloRunV1alpha1SubscriptionApiUpdateNotificationHaloRunV1alpha1SubscriptionRequest, options?: RawAxiosRequestConfig): AxiosPromise<Subscription> {
+            return localVarFp.updateNotificationHaloRunV1alpha1Subscription(requestParameters.name, requestParameters.subscription, options).then((request) => request(axios, basePath));
         },
     };
 };
 
 /**
- * Request parameters for createnotificationHaloRunV1alpha1Subscription operation in NotificationHaloRunV1alpha1SubscriptionApi.
+ * Request parameters for createNotificationHaloRunV1alpha1Subscription operation in NotificationHaloRunV1alpha1SubscriptionApi.
  * @export
- * @interface NotificationHaloRunV1alpha1SubscriptionApiCreatenotificationHaloRunV1alpha1SubscriptionRequest
+ * @interface NotificationHaloRunV1alpha1SubscriptionApiCreateNotificationHaloRunV1alpha1SubscriptionRequest
  */
-export interface NotificationHaloRunV1alpha1SubscriptionApiCreatenotificationHaloRunV1alpha1SubscriptionRequest {
+export interface NotificationHaloRunV1alpha1SubscriptionApiCreateNotificationHaloRunV1alpha1SubscriptionRequest {
     /**
      * Fresh subscription
      * @type {Subscription}
-     * @memberof NotificationHaloRunV1alpha1SubscriptionApiCreatenotificationHaloRunV1alpha1Subscription
+     * @memberof NotificationHaloRunV1alpha1SubscriptionApiCreateNotificationHaloRunV1alpha1Subscription
      */
     readonly subscription?: Subscription
 }
 
 /**
- * Request parameters for deletenotificationHaloRunV1alpha1Subscription operation in NotificationHaloRunV1alpha1SubscriptionApi.
+ * Request parameters for deleteNotificationHaloRunV1alpha1Subscription operation in NotificationHaloRunV1alpha1SubscriptionApi.
  * @export
- * @interface NotificationHaloRunV1alpha1SubscriptionApiDeletenotificationHaloRunV1alpha1SubscriptionRequest
+ * @interface NotificationHaloRunV1alpha1SubscriptionApiDeleteNotificationHaloRunV1alpha1SubscriptionRequest
  */
-export interface NotificationHaloRunV1alpha1SubscriptionApiDeletenotificationHaloRunV1alpha1SubscriptionRequest {
+export interface NotificationHaloRunV1alpha1SubscriptionApiDeleteNotificationHaloRunV1alpha1SubscriptionRequest {
     /**
      * Name of subscription
      * @type {string}
-     * @memberof NotificationHaloRunV1alpha1SubscriptionApiDeletenotificationHaloRunV1alpha1Subscription
+     * @memberof NotificationHaloRunV1alpha1SubscriptionApiDeleteNotificationHaloRunV1alpha1Subscription
      */
     readonly name: string
 }
 
 /**
- * Request parameters for getnotificationHaloRunV1alpha1Subscription operation in NotificationHaloRunV1alpha1SubscriptionApi.
+ * Request parameters for getNotificationHaloRunV1alpha1Subscription operation in NotificationHaloRunV1alpha1SubscriptionApi.
  * @export
- * @interface NotificationHaloRunV1alpha1SubscriptionApiGetnotificationHaloRunV1alpha1SubscriptionRequest
+ * @interface NotificationHaloRunV1alpha1SubscriptionApiGetNotificationHaloRunV1alpha1SubscriptionRequest
  */
-export interface NotificationHaloRunV1alpha1SubscriptionApiGetnotificationHaloRunV1alpha1SubscriptionRequest {
+export interface NotificationHaloRunV1alpha1SubscriptionApiGetNotificationHaloRunV1alpha1SubscriptionRequest {
     /**
      * Name of subscription
      * @type {string}
-     * @memberof NotificationHaloRunV1alpha1SubscriptionApiGetnotificationHaloRunV1alpha1Subscription
+     * @memberof NotificationHaloRunV1alpha1SubscriptionApiGetNotificationHaloRunV1alpha1Subscription
      */
     readonly name: string
 }
 
 /**
- * Request parameters for listnotificationHaloRunV1alpha1Subscription operation in NotificationHaloRunV1alpha1SubscriptionApi.
+ * Request parameters for listNotificationHaloRunV1alpha1Subscription operation in NotificationHaloRunV1alpha1SubscriptionApi.
  * @export
- * @interface NotificationHaloRunV1alpha1SubscriptionApiListnotificationHaloRunV1alpha1SubscriptionRequest
+ * @interface NotificationHaloRunV1alpha1SubscriptionApiListNotificationHaloRunV1alpha1SubscriptionRequest
  */
-export interface NotificationHaloRunV1alpha1SubscriptionApiListnotificationHaloRunV1alpha1SubscriptionRequest {
+export interface NotificationHaloRunV1alpha1SubscriptionApiListNotificationHaloRunV1alpha1SubscriptionRequest {
     /**
      * Page number. Default is 0.
      * @type {number}
-     * @memberof NotificationHaloRunV1alpha1SubscriptionApiListnotificationHaloRunV1alpha1Subscription
+     * @memberof NotificationHaloRunV1alpha1SubscriptionApiListNotificationHaloRunV1alpha1Subscription
      */
     readonly page?: number
 
     /**
      * Size number. Default is 0.
      * @type {number}
-     * @memberof NotificationHaloRunV1alpha1SubscriptionApiListnotificationHaloRunV1alpha1Subscription
+     * @memberof NotificationHaloRunV1alpha1SubscriptionApiListNotificationHaloRunV1alpha1Subscription
      */
     readonly size?: number
 
     /**
      * Label selector. e.g.: hidden!&#x3D;true
      * @type {Array<string>}
-     * @memberof NotificationHaloRunV1alpha1SubscriptionApiListnotificationHaloRunV1alpha1Subscription
+     * @memberof NotificationHaloRunV1alpha1SubscriptionApiListNotificationHaloRunV1alpha1Subscription
      */
     readonly labelSelector?: Array<string>
 
     /**
      * Field selector. e.g.: metadata.name&#x3D;&#x3D;halo
      * @type {Array<string>}
-     * @memberof NotificationHaloRunV1alpha1SubscriptionApiListnotificationHaloRunV1alpha1Subscription
+     * @memberof NotificationHaloRunV1alpha1SubscriptionApiListNotificationHaloRunV1alpha1Subscription
      */
     readonly fieldSelector?: Array<string>
 
     /**
      * Sorting criteria in the format: property,(asc|desc). Default sort order is ascending. Multiple sort criteria are supported.
      * @type {Array<string>}
-     * @memberof NotificationHaloRunV1alpha1SubscriptionApiListnotificationHaloRunV1alpha1Subscription
+     * @memberof NotificationHaloRunV1alpha1SubscriptionApiListNotificationHaloRunV1alpha1Subscription
      */
     readonly sort?: Array<string>
 }
 
 /**
- * Request parameters for updatenotificationHaloRunV1alpha1Subscription operation in NotificationHaloRunV1alpha1SubscriptionApi.
+ * Request parameters for updateNotificationHaloRunV1alpha1Subscription operation in NotificationHaloRunV1alpha1SubscriptionApi.
  * @export
- * @interface NotificationHaloRunV1alpha1SubscriptionApiUpdatenotificationHaloRunV1alpha1SubscriptionRequest
+ * @interface NotificationHaloRunV1alpha1SubscriptionApiUpdateNotificationHaloRunV1alpha1SubscriptionRequest
  */
-export interface NotificationHaloRunV1alpha1SubscriptionApiUpdatenotificationHaloRunV1alpha1SubscriptionRequest {
+export interface NotificationHaloRunV1alpha1SubscriptionApiUpdateNotificationHaloRunV1alpha1SubscriptionRequest {
     /**
      * Name of subscription
      * @type {string}
-     * @memberof NotificationHaloRunV1alpha1SubscriptionApiUpdatenotificationHaloRunV1alpha1Subscription
+     * @memberof NotificationHaloRunV1alpha1SubscriptionApiUpdateNotificationHaloRunV1alpha1Subscription
      */
     readonly name: string
 
     /**
      * Updated subscription
      * @type {Subscription}
-     * @memberof NotificationHaloRunV1alpha1SubscriptionApiUpdatenotificationHaloRunV1alpha1Subscription
+     * @memberof NotificationHaloRunV1alpha1SubscriptionApiUpdateNotificationHaloRunV1alpha1Subscription
      */
     readonly subscription?: Subscription
 }
@@ -508,57 +508,57 @@ export interface NotificationHaloRunV1alpha1SubscriptionApiUpdatenotificationHal
 export class NotificationHaloRunV1alpha1SubscriptionApi extends BaseAPI {
     /**
      * Create notification.halo.run/v1alpha1/Subscription
-     * @param {NotificationHaloRunV1alpha1SubscriptionApiCreatenotificationHaloRunV1alpha1SubscriptionRequest} requestParameters Request parameters.
+     * @param {NotificationHaloRunV1alpha1SubscriptionApiCreateNotificationHaloRunV1alpha1SubscriptionRequest} requestParameters Request parameters.
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      * @memberof NotificationHaloRunV1alpha1SubscriptionApi
      */
-    public createnotificationHaloRunV1alpha1Subscription(requestParameters: NotificationHaloRunV1alpha1SubscriptionApiCreatenotificationHaloRunV1alpha1SubscriptionRequest = {}, options?: RawAxiosRequestConfig) {
-        return NotificationHaloRunV1alpha1SubscriptionApiFp(this.configuration).createnotificationHaloRunV1alpha1Subscription(requestParameters.subscription, options).then((request) => request(this.axios, this.basePath));
+    public createNotificationHaloRunV1alpha1Subscription(requestParameters: NotificationHaloRunV1alpha1SubscriptionApiCreateNotificationHaloRunV1alpha1SubscriptionRequest = {}, options?: RawAxiosRequestConfig) {
+        return NotificationHaloRunV1alpha1SubscriptionApiFp(this.configuration).createNotificationHaloRunV1alpha1Subscription(requestParameters.subscription, options).then((request) => request(this.axios, this.basePath));
     }
 
     /**
      * Delete notification.halo.run/v1alpha1/Subscription
-     * @param {NotificationHaloRunV1alpha1SubscriptionApiDeletenotificationHaloRunV1alpha1SubscriptionRequest} requestParameters Request parameters.
+     * @param {NotificationHaloRunV1alpha1SubscriptionApiDeleteNotificationHaloRunV1alpha1SubscriptionRequest} requestParameters Request parameters.
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      * @memberof NotificationHaloRunV1alpha1SubscriptionApi
      */
-    public deletenotificationHaloRunV1alpha1Subscription(requestParameters: NotificationHaloRunV1alpha1SubscriptionApiDeletenotificationHaloRunV1alpha1SubscriptionRequest, options?: RawAxiosRequestConfig) {
-        return NotificationHaloRunV1alpha1SubscriptionApiFp(this.configuration).deletenotificationHaloRunV1alpha1Subscription(requestParameters.name, options).then((request) => request(this.axios, this.basePath));
+    public deleteNotificationHaloRunV1alpha1Subscription(requestParameters: NotificationHaloRunV1alpha1SubscriptionApiDeleteNotificationHaloRunV1alpha1SubscriptionRequest, options?: RawAxiosRequestConfig) {
+        return NotificationHaloRunV1alpha1SubscriptionApiFp(this.configuration).deleteNotificationHaloRunV1alpha1Subscription(requestParameters.name, options).then((request) => request(this.axios, this.basePath));
     }
 
     /**
      * Get notification.halo.run/v1alpha1/Subscription
-     * @param {NotificationHaloRunV1alpha1SubscriptionApiGetnotificationHaloRunV1alpha1SubscriptionRequest} requestParameters Request parameters.
+     * @param {NotificationHaloRunV1alpha1SubscriptionApiGetNotificationHaloRunV1alpha1SubscriptionRequest} requestParameters Request parameters.
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      * @memberof NotificationHaloRunV1alpha1SubscriptionApi
      */
-    public getnotificationHaloRunV1alpha1Subscription(requestParameters: NotificationHaloRunV1alpha1SubscriptionApiGetnotificationHaloRunV1alpha1SubscriptionRequest, options?: RawAxiosRequestConfig) {
-        return NotificationHaloRunV1alpha1SubscriptionApiFp(this.configuration).getnotificationHaloRunV1alpha1Subscription(requestParameters.name, options).then((request) => request(this.axios, this.basePath));
+    public getNotificationHaloRunV1alpha1Subscription(requestParameters: NotificationHaloRunV1alpha1SubscriptionApiGetNotificationHaloRunV1alpha1SubscriptionRequest, options?: RawAxiosRequestConfig) {
+        return NotificationHaloRunV1alpha1SubscriptionApiFp(this.configuration).getNotificationHaloRunV1alpha1Subscription(requestParameters.name, options).then((request) => request(this.axios, this.basePath));
     }
 
     /**
      * List notification.halo.run/v1alpha1/Subscription
-     * @param {NotificationHaloRunV1alpha1SubscriptionApiListnotificationHaloRunV1alpha1SubscriptionRequest} requestParameters Request parameters.
+     * @param {NotificationHaloRunV1alpha1SubscriptionApiListNotificationHaloRunV1alpha1SubscriptionRequest} requestParameters Request parameters.
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      * @memberof NotificationHaloRunV1alpha1SubscriptionApi
      */
-    public listnotificationHaloRunV1alpha1Subscription(requestParameters: NotificationHaloRunV1alpha1SubscriptionApiListnotificationHaloRunV1alpha1SubscriptionRequest = {}, options?: RawAxiosRequestConfig) {
-        return NotificationHaloRunV1alpha1SubscriptionApiFp(this.configuration).listnotificationHaloRunV1alpha1Subscription(requestParameters.page, requestParameters.size, requestParameters.labelSelector, requestParameters.fieldSelector, requestParameters.sort, options).then((request) => request(this.axios, this.basePath));
+    public listNotificationHaloRunV1alpha1Subscription(requestParameters: NotificationHaloRunV1alpha1SubscriptionApiListNotificationHaloRunV1alpha1SubscriptionRequest = {}, options?: RawAxiosRequestConfig) {
+        return NotificationHaloRunV1alpha1SubscriptionApiFp(this.configuration).listNotificationHaloRunV1alpha1Subscription(requestParameters.page, requestParameters.size, requestParameters.labelSelector, requestParameters.fieldSelector, requestParameters.sort, options).then((request) => request(this.axios, this.basePath));
     }
 
     /**
      * Update notification.halo.run/v1alpha1/Subscription
-     * @param {NotificationHaloRunV1alpha1SubscriptionApiUpdatenotificationHaloRunV1alpha1SubscriptionRequest} requestParameters Request parameters.
+     * @param {NotificationHaloRunV1alpha1SubscriptionApiUpdateNotificationHaloRunV1alpha1SubscriptionRequest} requestParameters Request parameters.
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      * @memberof NotificationHaloRunV1alpha1SubscriptionApi
      */
-    public updatenotificationHaloRunV1alpha1Subscription(requestParameters: NotificationHaloRunV1alpha1SubscriptionApiUpdatenotificationHaloRunV1alpha1SubscriptionRequest, options?: RawAxiosRequestConfig) {
-        return NotificationHaloRunV1alpha1SubscriptionApiFp(this.configuration).updatenotificationHaloRunV1alpha1Subscription(requestParameters.name, requestParameters.subscription, options).then((request) => request(this.axios, this.basePath));
+    public updateNotificationHaloRunV1alpha1Subscription(requestParameters: NotificationHaloRunV1alpha1SubscriptionApiUpdateNotificationHaloRunV1alpha1SubscriptionRequest, options?: RawAxiosRequestConfig) {
+        return NotificationHaloRunV1alpha1SubscriptionApiFp(this.configuration).updateNotificationHaloRunV1alpha1Subscription(requestParameters.name, requestParameters.subscription, options).then((request) => request(this.axios, this.basePath));
     }
 }
 

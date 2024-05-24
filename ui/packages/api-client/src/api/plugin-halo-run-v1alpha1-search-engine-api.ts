@@ -37,7 +37,7 @@ export const PluginHaloRunV1alpha1SearchEngineApiAxiosParamCreator = function (c
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        createpluginHaloRunV1alpha1SearchEngine: async (searchEngine?: SearchEngine, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+        createPluginHaloRunV1alpha1SearchEngine: async (searchEngine?: SearchEngine, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
             const localVarPath = `/apis/plugin.halo.run/v1alpha1/searchengines`;
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
@@ -78,9 +78,9 @@ export const PluginHaloRunV1alpha1SearchEngineApiAxiosParamCreator = function (c
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        deletepluginHaloRunV1alpha1SearchEngine: async (name: string, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+        deletePluginHaloRunV1alpha1SearchEngine: async (name: string, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
             // verify required parameter 'name' is not null or undefined
-            assertParamExists('deletepluginHaloRunV1alpha1SearchEngine', 'name', name)
+            assertParamExists('deletePluginHaloRunV1alpha1SearchEngine', 'name', name)
             const localVarPath = `/apis/plugin.halo.run/v1alpha1/searchengines/{name}`
                 .replace(`{${"name"}}`, encodeURIComponent(String(name)));
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
@@ -119,9 +119,9 @@ export const PluginHaloRunV1alpha1SearchEngineApiAxiosParamCreator = function (c
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        getpluginHaloRunV1alpha1SearchEngine: async (name: string, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+        getPluginHaloRunV1alpha1SearchEngine: async (name: string, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
             // verify required parameter 'name' is not null or undefined
-            assertParamExists('getpluginHaloRunV1alpha1SearchEngine', 'name', name)
+            assertParamExists('getPluginHaloRunV1alpha1SearchEngine', 'name', name)
             const localVarPath = `/apis/plugin.halo.run/v1alpha1/searchengines/{name}`
                 .replace(`{${"name"}}`, encodeURIComponent(String(name)));
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
@@ -164,7 +164,7 @@ export const PluginHaloRunV1alpha1SearchEngineApiAxiosParamCreator = function (c
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        listpluginHaloRunV1alpha1SearchEngine: async (page?: number, size?: number, labelSelector?: Array<string>, fieldSelector?: Array<string>, sort?: Array<string>, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+        listPluginHaloRunV1alpha1SearchEngine: async (page?: number, size?: number, labelSelector?: Array<string>, fieldSelector?: Array<string>, sort?: Array<string>, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
             const localVarPath = `/apis/plugin.halo.run/v1alpha1/searchengines`;
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
@@ -223,9 +223,9 @@ export const PluginHaloRunV1alpha1SearchEngineApiAxiosParamCreator = function (c
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        updatepluginHaloRunV1alpha1SearchEngine: async (name: string, searchEngine?: SearchEngine, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+        updatePluginHaloRunV1alpha1SearchEngine: async (name: string, searchEngine?: SearchEngine, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
             // verify required parameter 'name' is not null or undefined
-            assertParamExists('updatepluginHaloRunV1alpha1SearchEngine', 'name', name)
+            assertParamExists('updatePluginHaloRunV1alpha1SearchEngine', 'name', name)
             const localVarPath = `/apis/plugin.halo.run/v1alpha1/searchengines/{name}`
                 .replace(`{${"name"}}`, encodeURIComponent(String(name)));
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
@@ -277,10 +277,10 @@ export const PluginHaloRunV1alpha1SearchEngineApiFp = function(configuration?: C
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async createpluginHaloRunV1alpha1SearchEngine(searchEngine?: SearchEngine, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<SearchEngine>> {
-            const localVarAxiosArgs = await localVarAxiosParamCreator.createpluginHaloRunV1alpha1SearchEngine(searchEngine, options);
+        async createPluginHaloRunV1alpha1SearchEngine(searchEngine?: SearchEngine, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<SearchEngine>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.createPluginHaloRunV1alpha1SearchEngine(searchEngine, options);
             const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
-            const localVarOperationServerBasePath = operationServerMap['PluginHaloRunV1alpha1SearchEngineApi.createpluginHaloRunV1alpha1SearchEngine']?.[localVarOperationServerIndex]?.url;
+            const localVarOperationServerBasePath = operationServerMap['PluginHaloRunV1alpha1SearchEngineApi.createPluginHaloRunV1alpha1SearchEngine']?.[localVarOperationServerIndex]?.url;
             return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
         },
         /**
@@ -289,10 +289,10 @@ export const PluginHaloRunV1alpha1SearchEngineApiFp = function(configuration?: C
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async deletepluginHaloRunV1alpha1SearchEngine(name: string, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<void>> {
-            const localVarAxiosArgs = await localVarAxiosParamCreator.deletepluginHaloRunV1alpha1SearchEngine(name, options);
+        async deletePluginHaloRunV1alpha1SearchEngine(name: string, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<void>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.deletePluginHaloRunV1alpha1SearchEngine(name, options);
             const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
-            const localVarOperationServerBasePath = operationServerMap['PluginHaloRunV1alpha1SearchEngineApi.deletepluginHaloRunV1alpha1SearchEngine']?.[localVarOperationServerIndex]?.url;
+            const localVarOperationServerBasePath = operationServerMap['PluginHaloRunV1alpha1SearchEngineApi.deletePluginHaloRunV1alpha1SearchEngine']?.[localVarOperationServerIndex]?.url;
             return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
         },
         /**
@@ -301,10 +301,10 @@ export const PluginHaloRunV1alpha1SearchEngineApiFp = function(configuration?: C
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async getpluginHaloRunV1alpha1SearchEngine(name: string, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<SearchEngine>> {
-            const localVarAxiosArgs = await localVarAxiosParamCreator.getpluginHaloRunV1alpha1SearchEngine(name, options);
+        async getPluginHaloRunV1alpha1SearchEngine(name: string, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<SearchEngine>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.getPluginHaloRunV1alpha1SearchEngine(name, options);
             const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
-            const localVarOperationServerBasePath = operationServerMap['PluginHaloRunV1alpha1SearchEngineApi.getpluginHaloRunV1alpha1SearchEngine']?.[localVarOperationServerIndex]?.url;
+            const localVarOperationServerBasePath = operationServerMap['PluginHaloRunV1alpha1SearchEngineApi.getPluginHaloRunV1alpha1SearchEngine']?.[localVarOperationServerIndex]?.url;
             return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
         },
         /**
@@ -317,10 +317,10 @@ export const PluginHaloRunV1alpha1SearchEngineApiFp = function(configuration?: C
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async listpluginHaloRunV1alpha1SearchEngine(page?: number, size?: number, labelSelector?: Array<string>, fieldSelector?: Array<string>, sort?: Array<string>, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<SearchEngineList>> {
-            const localVarAxiosArgs = await localVarAxiosParamCreator.listpluginHaloRunV1alpha1SearchEngine(page, size, labelSelector, fieldSelector, sort, options);
+        async listPluginHaloRunV1alpha1SearchEngine(page?: number, size?: number, labelSelector?: Array<string>, fieldSelector?: Array<string>, sort?: Array<string>, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<SearchEngineList>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.listPluginHaloRunV1alpha1SearchEngine(page, size, labelSelector, fieldSelector, sort, options);
             const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
-            const localVarOperationServerBasePath = operationServerMap['PluginHaloRunV1alpha1SearchEngineApi.listpluginHaloRunV1alpha1SearchEngine']?.[localVarOperationServerIndex]?.url;
+            const localVarOperationServerBasePath = operationServerMap['PluginHaloRunV1alpha1SearchEngineApi.listPluginHaloRunV1alpha1SearchEngine']?.[localVarOperationServerIndex]?.url;
             return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
         },
         /**
@@ -330,10 +330,10 @@ export const PluginHaloRunV1alpha1SearchEngineApiFp = function(configuration?: C
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async updatepluginHaloRunV1alpha1SearchEngine(name: string, searchEngine?: SearchEngine, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<SearchEngine>> {
-            const localVarAxiosArgs = await localVarAxiosParamCreator.updatepluginHaloRunV1alpha1SearchEngine(name, searchEngine, options);
+        async updatePluginHaloRunV1alpha1SearchEngine(name: string, searchEngine?: SearchEngine, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<SearchEngine>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.updatePluginHaloRunV1alpha1SearchEngine(name, searchEngine, options);
             const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
-            const localVarOperationServerBasePath = operationServerMap['PluginHaloRunV1alpha1SearchEngineApi.updatepluginHaloRunV1alpha1SearchEngine']?.[localVarOperationServerIndex]?.url;
+            const localVarOperationServerBasePath = operationServerMap['PluginHaloRunV1alpha1SearchEngineApi.updatePluginHaloRunV1alpha1SearchEngine']?.[localVarOperationServerIndex]?.url;
             return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
         },
     }
@@ -348,153 +348,153 @@ export const PluginHaloRunV1alpha1SearchEngineApiFactory = function (configurati
     return {
         /**
          * Create plugin.halo.run/v1alpha1/SearchEngine
-         * @param {PluginHaloRunV1alpha1SearchEngineApiCreatepluginHaloRunV1alpha1SearchEngineRequest} requestParameters Request parameters.
+         * @param {PluginHaloRunV1alpha1SearchEngineApiCreatePluginHaloRunV1alpha1SearchEngineRequest} requestParameters Request parameters.
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        createpluginHaloRunV1alpha1SearchEngine(requestParameters: PluginHaloRunV1alpha1SearchEngineApiCreatepluginHaloRunV1alpha1SearchEngineRequest = {}, options?: RawAxiosRequestConfig): AxiosPromise<SearchEngine> {
-            return localVarFp.createpluginHaloRunV1alpha1SearchEngine(requestParameters.searchEngine, options).then((request) => request(axios, basePath));
+        createPluginHaloRunV1alpha1SearchEngine(requestParameters: PluginHaloRunV1alpha1SearchEngineApiCreatePluginHaloRunV1alpha1SearchEngineRequest = {}, options?: RawAxiosRequestConfig): AxiosPromise<SearchEngine> {
+            return localVarFp.createPluginHaloRunV1alpha1SearchEngine(requestParameters.searchEngine, options).then((request) => request(axios, basePath));
         },
         /**
          * Delete plugin.halo.run/v1alpha1/SearchEngine
-         * @param {PluginHaloRunV1alpha1SearchEngineApiDeletepluginHaloRunV1alpha1SearchEngineRequest} requestParameters Request parameters.
+         * @param {PluginHaloRunV1alpha1SearchEngineApiDeletePluginHaloRunV1alpha1SearchEngineRequest} requestParameters Request parameters.
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        deletepluginHaloRunV1alpha1SearchEngine(requestParameters: PluginHaloRunV1alpha1SearchEngineApiDeletepluginHaloRunV1alpha1SearchEngineRequest, options?: RawAxiosRequestConfig): AxiosPromise<void> {
-            return localVarFp.deletepluginHaloRunV1alpha1SearchEngine(requestParameters.name, options).then((request) => request(axios, basePath));
+        deletePluginHaloRunV1alpha1SearchEngine(requestParameters: PluginHaloRunV1alpha1SearchEngineApiDeletePluginHaloRunV1alpha1SearchEngineRequest, options?: RawAxiosRequestConfig): AxiosPromise<void> {
+            return localVarFp.deletePluginHaloRunV1alpha1SearchEngine(requestParameters.name, options).then((request) => request(axios, basePath));
         },
         /**
          * Get plugin.halo.run/v1alpha1/SearchEngine
-         * @param {PluginHaloRunV1alpha1SearchEngineApiGetpluginHaloRunV1alpha1SearchEngineRequest} requestParameters Request parameters.
+         * @param {PluginHaloRunV1alpha1SearchEngineApiGetPluginHaloRunV1alpha1SearchEngineRequest} requestParameters Request parameters.
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        getpluginHaloRunV1alpha1SearchEngine(requestParameters: PluginHaloRunV1alpha1SearchEngineApiGetpluginHaloRunV1alpha1SearchEngineRequest, options?: RawAxiosRequestConfig): AxiosPromise<SearchEngine> {
-            return localVarFp.getpluginHaloRunV1alpha1SearchEngine(requestParameters.name, options).then((request) => request(axios, basePath));
+        getPluginHaloRunV1alpha1SearchEngine(requestParameters: PluginHaloRunV1alpha1SearchEngineApiGetPluginHaloRunV1alpha1SearchEngineRequest, options?: RawAxiosRequestConfig): AxiosPromise<SearchEngine> {
+            return localVarFp.getPluginHaloRunV1alpha1SearchEngine(requestParameters.name, options).then((request) => request(axios, basePath));
         },
         /**
          * List plugin.halo.run/v1alpha1/SearchEngine
-         * @param {PluginHaloRunV1alpha1SearchEngineApiListpluginHaloRunV1alpha1SearchEngineRequest} requestParameters Request parameters.
+         * @param {PluginHaloRunV1alpha1SearchEngineApiListPluginHaloRunV1alpha1SearchEngineRequest} requestParameters Request parameters.
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        listpluginHaloRunV1alpha1SearchEngine(requestParameters: PluginHaloRunV1alpha1SearchEngineApiListpluginHaloRunV1alpha1SearchEngineRequest = {}, options?: RawAxiosRequestConfig): AxiosPromise<SearchEngineList> {
-            return localVarFp.listpluginHaloRunV1alpha1SearchEngine(requestParameters.page, requestParameters.size, requestParameters.labelSelector, requestParameters.fieldSelector, requestParameters.sort, options).then((request) => request(axios, basePath));
+        listPluginHaloRunV1alpha1SearchEngine(requestParameters: PluginHaloRunV1alpha1SearchEngineApiListPluginHaloRunV1alpha1SearchEngineRequest = {}, options?: RawAxiosRequestConfig): AxiosPromise<SearchEngineList> {
+            return localVarFp.listPluginHaloRunV1alpha1SearchEngine(requestParameters.page, requestParameters.size, requestParameters.labelSelector, requestParameters.fieldSelector, requestParameters.sort, options).then((request) => request(axios, basePath));
         },
         /**
          * Update plugin.halo.run/v1alpha1/SearchEngine
-         * @param {PluginHaloRunV1alpha1SearchEngineApiUpdatepluginHaloRunV1alpha1SearchEngineRequest} requestParameters Request parameters.
+         * @param {PluginHaloRunV1alpha1SearchEngineApiUpdatePluginHaloRunV1alpha1SearchEngineRequest} requestParameters Request parameters.
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        updatepluginHaloRunV1alpha1SearchEngine(requestParameters: PluginHaloRunV1alpha1SearchEngineApiUpdatepluginHaloRunV1alpha1SearchEngineRequest, options?: RawAxiosRequestConfig): AxiosPromise<SearchEngine> {
-            return localVarFp.updatepluginHaloRunV1alpha1SearchEngine(requestParameters.name, requestParameters.searchEngine, options).then((request) => request(axios, basePath));
+        updatePluginHaloRunV1alpha1SearchEngine(requestParameters: PluginHaloRunV1alpha1SearchEngineApiUpdatePluginHaloRunV1alpha1SearchEngineRequest, options?: RawAxiosRequestConfig): AxiosPromise<SearchEngine> {
+            return localVarFp.updatePluginHaloRunV1alpha1SearchEngine(requestParameters.name, requestParameters.searchEngine, options).then((request) => request(axios, basePath));
         },
     };
 };
 
 /**
- * Request parameters for createpluginHaloRunV1alpha1SearchEngine operation in PluginHaloRunV1alpha1SearchEngineApi.
+ * Request parameters for createPluginHaloRunV1alpha1SearchEngine operation in PluginHaloRunV1alpha1SearchEngineApi.
  * @export
- * @interface PluginHaloRunV1alpha1SearchEngineApiCreatepluginHaloRunV1alpha1SearchEngineRequest
+ * @interface PluginHaloRunV1alpha1SearchEngineApiCreatePluginHaloRunV1alpha1SearchEngineRequest
  */
-export interface PluginHaloRunV1alpha1SearchEngineApiCreatepluginHaloRunV1alpha1SearchEngineRequest {
+export interface PluginHaloRunV1alpha1SearchEngineApiCreatePluginHaloRunV1alpha1SearchEngineRequest {
     /**
      * Fresh searchengine
      * @type {SearchEngine}
-     * @memberof PluginHaloRunV1alpha1SearchEngineApiCreatepluginHaloRunV1alpha1SearchEngine
+     * @memberof PluginHaloRunV1alpha1SearchEngineApiCreatePluginHaloRunV1alpha1SearchEngine
      */
     readonly searchEngine?: SearchEngine
 }
 
 /**
- * Request parameters for deletepluginHaloRunV1alpha1SearchEngine operation in PluginHaloRunV1alpha1SearchEngineApi.
+ * Request parameters for deletePluginHaloRunV1alpha1SearchEngine operation in PluginHaloRunV1alpha1SearchEngineApi.
  * @export
- * @interface PluginHaloRunV1alpha1SearchEngineApiDeletepluginHaloRunV1alpha1SearchEngineRequest
+ * @interface PluginHaloRunV1alpha1SearchEngineApiDeletePluginHaloRunV1alpha1SearchEngineRequest
  */
-export interface PluginHaloRunV1alpha1SearchEngineApiDeletepluginHaloRunV1alpha1SearchEngineRequest {
+export interface PluginHaloRunV1alpha1SearchEngineApiDeletePluginHaloRunV1alpha1SearchEngineRequest {
     /**
      * Name of searchengine
      * @type {string}
-     * @memberof PluginHaloRunV1alpha1SearchEngineApiDeletepluginHaloRunV1alpha1SearchEngine
+     * @memberof PluginHaloRunV1alpha1SearchEngineApiDeletePluginHaloRunV1alpha1SearchEngine
      */
     readonly name: string
 }
 
 /**
- * Request parameters for getpluginHaloRunV1alpha1SearchEngine operation in PluginHaloRunV1alpha1SearchEngineApi.
+ * Request parameters for getPluginHaloRunV1alpha1SearchEngine operation in PluginHaloRunV1alpha1SearchEngineApi.
  * @export
- * @interface PluginHaloRunV1alpha1SearchEngineApiGetpluginHaloRunV1alpha1SearchEngineRequest
+ * @interface PluginHaloRunV1alpha1SearchEngineApiGetPluginHaloRunV1alpha1SearchEngineRequest
  */
-export interface PluginHaloRunV1alpha1SearchEngineApiGetpluginHaloRunV1alpha1SearchEngineRequest {
+export interface PluginHaloRunV1alpha1SearchEngineApiGetPluginHaloRunV1alpha1SearchEngineRequest {
     /**
      * Name of searchengine
      * @type {string}
-     * @memberof PluginHaloRunV1alpha1SearchEngineApiGetpluginHaloRunV1alpha1SearchEngine
+     * @memberof PluginHaloRunV1alpha1SearchEngineApiGetPluginHaloRunV1alpha1SearchEngine
      */
     readonly name: string
 }
 
 /**
- * Request parameters for listpluginHaloRunV1alpha1SearchEngine operation in PluginHaloRunV1alpha1SearchEngineApi.
+ * Request parameters for listPluginHaloRunV1alpha1SearchEngine operation in PluginHaloRunV1alpha1SearchEngineApi.
  * @export
- * @interface PluginHaloRunV1alpha1SearchEngineApiListpluginHaloRunV1alpha1SearchEngineRequest
+ * @interface PluginHaloRunV1alpha1SearchEngineApiListPluginHaloRunV1alpha1SearchEngineRequest
  */
-export interface PluginHaloRunV1alpha1SearchEngineApiListpluginHaloRunV1alpha1SearchEngineRequest {
+export interface PluginHaloRunV1alpha1SearchEngineApiListPluginHaloRunV1alpha1SearchEngineRequest {
     /**
      * Page number. Default is 0.
      * @type {number}
-     * @memberof PluginHaloRunV1alpha1SearchEngineApiListpluginHaloRunV1alpha1SearchEngine
+     * @memberof PluginHaloRunV1alpha1SearchEngineApiListPluginHaloRunV1alpha1SearchEngine
      */
     readonly page?: number
 
     /**
      * Size number. Default is 0.
      * @type {number}
-     * @memberof PluginHaloRunV1alpha1SearchEngineApiListpluginHaloRunV1alpha1SearchEngine
+     * @memberof PluginHaloRunV1alpha1SearchEngineApiListPluginHaloRunV1alpha1SearchEngine
      */
     readonly size?: number
 
     /**
      * Label selector. e.g.: hidden!&#x3D;true
      * @type {Array<string>}
-     * @memberof PluginHaloRunV1alpha1SearchEngineApiListpluginHaloRunV1alpha1SearchEngine
+     * @memberof PluginHaloRunV1alpha1SearchEngineApiListPluginHaloRunV1alpha1SearchEngine
      */
     readonly labelSelector?: Array<string>
 
     /**
      * Field selector. e.g.: metadata.name&#x3D;&#x3D;halo
      * @type {Array<string>}
-     * @memberof PluginHaloRunV1alpha1SearchEngineApiListpluginHaloRunV1alpha1SearchEngine
+     * @memberof PluginHaloRunV1alpha1SearchEngineApiListPluginHaloRunV1alpha1SearchEngine
      */
     readonly fieldSelector?: Array<string>
 
     /**
      * Sorting criteria in the format: property,(asc|desc). Default sort order is ascending. Multiple sort criteria are supported.
      * @type {Array<string>}
-     * @memberof PluginHaloRunV1alpha1SearchEngineApiListpluginHaloRunV1alpha1SearchEngine
+     * @memberof PluginHaloRunV1alpha1SearchEngineApiListPluginHaloRunV1alpha1SearchEngine
      */
     readonly sort?: Array<string>
 }
 
 /**
- * Request parameters for updatepluginHaloRunV1alpha1SearchEngine operation in PluginHaloRunV1alpha1SearchEngineApi.
+ * Request parameters for updatePluginHaloRunV1alpha1SearchEngine operation in PluginHaloRunV1alpha1SearchEngineApi.
  * @export
- * @interface PluginHaloRunV1alpha1SearchEngineApiUpdatepluginHaloRunV1alpha1SearchEngineRequest
+ * @interface PluginHaloRunV1alpha1SearchEngineApiUpdatePluginHaloRunV1alpha1SearchEngineRequest
  */
-export interface PluginHaloRunV1alpha1SearchEngineApiUpdatepluginHaloRunV1alpha1SearchEngineRequest {
+export interface PluginHaloRunV1alpha1SearchEngineApiUpdatePluginHaloRunV1alpha1SearchEngineRequest {
     /**
      * Name of searchengine
      * @type {string}
-     * @memberof PluginHaloRunV1alpha1SearchEngineApiUpdatepluginHaloRunV1alpha1SearchEngine
+     * @memberof PluginHaloRunV1alpha1SearchEngineApiUpdatePluginHaloRunV1alpha1SearchEngine
      */
     readonly name: string
 
     /**
      * Updated searchengine
      * @type {SearchEngine}
-     * @memberof PluginHaloRunV1alpha1SearchEngineApiUpdatepluginHaloRunV1alpha1SearchEngine
+     * @memberof PluginHaloRunV1alpha1SearchEngineApiUpdatePluginHaloRunV1alpha1SearchEngine
      */
     readonly searchEngine?: SearchEngine
 }
@@ -508,57 +508,57 @@ export interface PluginHaloRunV1alpha1SearchEngineApiUpdatepluginHaloRunV1alpha1
 export class PluginHaloRunV1alpha1SearchEngineApi extends BaseAPI {
     /**
      * Create plugin.halo.run/v1alpha1/SearchEngine
-     * @param {PluginHaloRunV1alpha1SearchEngineApiCreatepluginHaloRunV1alpha1SearchEngineRequest} requestParameters Request parameters.
+     * @param {PluginHaloRunV1alpha1SearchEngineApiCreatePluginHaloRunV1alpha1SearchEngineRequest} requestParameters Request parameters.
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      * @memberof PluginHaloRunV1alpha1SearchEngineApi
      */
-    public createpluginHaloRunV1alpha1SearchEngine(requestParameters: PluginHaloRunV1alpha1SearchEngineApiCreatepluginHaloRunV1alpha1SearchEngineRequest = {}, options?: RawAxiosRequestConfig) {
-        return PluginHaloRunV1alpha1SearchEngineApiFp(this.configuration).createpluginHaloRunV1alpha1SearchEngine(requestParameters.searchEngine, options).then((request) => request(this.axios, this.basePath));
+    public createPluginHaloRunV1alpha1SearchEngine(requestParameters: PluginHaloRunV1alpha1SearchEngineApiCreatePluginHaloRunV1alpha1SearchEngineRequest = {}, options?: RawAxiosRequestConfig) {
+        return PluginHaloRunV1alpha1SearchEngineApiFp(this.configuration).createPluginHaloRunV1alpha1SearchEngine(requestParameters.searchEngine, options).then((request) => request(this.axios, this.basePath));
     }
 
     /**
      * Delete plugin.halo.run/v1alpha1/SearchEngine
-     * @param {PluginHaloRunV1alpha1SearchEngineApiDeletepluginHaloRunV1alpha1SearchEngineRequest} requestParameters Request parameters.
+     * @param {PluginHaloRunV1alpha1SearchEngineApiDeletePluginHaloRunV1alpha1SearchEngineRequest} requestParameters Request parameters.
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      * @memberof PluginHaloRunV1alpha1SearchEngineApi
      */
-    public deletepluginHaloRunV1alpha1SearchEngine(requestParameters: PluginHaloRunV1alpha1SearchEngineApiDeletepluginHaloRunV1alpha1SearchEngineRequest, options?: RawAxiosRequestConfig) {
-        return PluginHaloRunV1alpha1SearchEngineApiFp(this.configuration).deletepluginHaloRunV1alpha1SearchEngine(requestParameters.name, options).then((request) => request(this.axios, this.basePath));
+    public deletePluginHaloRunV1alpha1SearchEngine(requestParameters: PluginHaloRunV1alpha1SearchEngineApiDeletePluginHaloRunV1alpha1SearchEngineRequest, options?: RawAxiosRequestConfig) {
+        return PluginHaloRunV1alpha1SearchEngineApiFp(this.configuration).deletePluginHaloRunV1alpha1SearchEngine(requestParameters.name, options).then((request) => request(this.axios, this.basePath));
     }
 
     /**
      * Get plugin.halo.run/v1alpha1/SearchEngine
-     * @param {PluginHaloRunV1alpha1SearchEngineApiGetpluginHaloRunV1alpha1SearchEngineRequest} requestParameters Request parameters.
+     * @param {PluginHaloRunV1alpha1SearchEngineApiGetPluginHaloRunV1alpha1SearchEngineRequest} requestParameters Request parameters.
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      * @memberof PluginHaloRunV1alpha1SearchEngineApi
      */
-    public getpluginHaloRunV1alpha1SearchEngine(requestParameters: PluginHaloRunV1alpha1SearchEngineApiGetpluginHaloRunV1alpha1SearchEngineRequest, options?: RawAxiosRequestConfig) {
-        return PluginHaloRunV1alpha1SearchEngineApiFp(this.configuration).getpluginHaloRunV1alpha1SearchEngine(requestParameters.name, options).then((request) => request(this.axios, this.basePath));
+    public getPluginHaloRunV1alpha1SearchEngine(requestParameters: PluginHaloRunV1alpha1SearchEngineApiGetPluginHaloRunV1alpha1SearchEngineRequest, options?: RawAxiosRequestConfig) {
+        return PluginHaloRunV1alpha1SearchEngineApiFp(this.configuration).getPluginHaloRunV1alpha1SearchEngine(requestParameters.name, options).then((request) => request(this.axios, this.basePath));
     }
 
     /**
      * List plugin.halo.run/v1alpha1/SearchEngine
-     * @param {PluginHaloRunV1alpha1SearchEngineApiListpluginHaloRunV1alpha1SearchEngineRequest} requestParameters Request parameters.
+     * @param {PluginHaloRunV1alpha1SearchEngineApiListPluginHaloRunV1alpha1SearchEngineRequest} requestParameters Request parameters.
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      * @memberof PluginHaloRunV1alpha1SearchEngineApi
      */
-    public listpluginHaloRunV1alpha1SearchEngine(requestParameters: PluginHaloRunV1alpha1SearchEngineApiListpluginHaloRunV1alpha1SearchEngineRequest = {}, options?: RawAxiosRequestConfig) {
-        return PluginHaloRunV1alpha1SearchEngineApiFp(this.configuration).listpluginHaloRunV1alpha1SearchEngine(requestParameters.page, requestParameters.size, requestParameters.labelSelector, requestParameters.fieldSelector, requestParameters.sort, options).then((request) => request(this.axios, this.basePath));
+    public listPluginHaloRunV1alpha1SearchEngine(requestParameters: PluginHaloRunV1alpha1SearchEngineApiListPluginHaloRunV1alpha1SearchEngineRequest = {}, options?: RawAxiosRequestConfig) {
+        return PluginHaloRunV1alpha1SearchEngineApiFp(this.configuration).listPluginHaloRunV1alpha1SearchEngine(requestParameters.page, requestParameters.size, requestParameters.labelSelector, requestParameters.fieldSelector, requestParameters.sort, options).then((request) => request(this.axios, this.basePath));
     }
 
     /**
      * Update plugin.halo.run/v1alpha1/SearchEngine
-     * @param {PluginHaloRunV1alpha1SearchEngineApiUpdatepluginHaloRunV1alpha1SearchEngineRequest} requestParameters Request parameters.
+     * @param {PluginHaloRunV1alpha1SearchEngineApiUpdatePluginHaloRunV1alpha1SearchEngineRequest} requestParameters Request parameters.
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      * @memberof PluginHaloRunV1alpha1SearchEngineApi
      */
-    public updatepluginHaloRunV1alpha1SearchEngine(requestParameters: PluginHaloRunV1alpha1SearchEngineApiUpdatepluginHaloRunV1alpha1SearchEngineRequest, options?: RawAxiosRequestConfig) {
-        return PluginHaloRunV1alpha1SearchEngineApiFp(this.configuration).updatepluginHaloRunV1alpha1SearchEngine(requestParameters.name, requestParameters.searchEngine, options).then((request) => request(this.axios, this.basePath));
+    public updatePluginHaloRunV1alpha1SearchEngine(requestParameters: PluginHaloRunV1alpha1SearchEngineApiUpdatePluginHaloRunV1alpha1SearchEngineRequest, options?: RawAxiosRequestConfig) {
+        return PluginHaloRunV1alpha1SearchEngineApiFp(this.configuration).updatePluginHaloRunV1alpha1SearchEngine(requestParameters.name, requestParameters.searchEngine, options).then((request) => request(this.axios, this.basePath));
     }
 }
 

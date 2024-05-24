@@ -37,7 +37,7 @@ export const PluginHaloRunV1alpha1ExtensionPointDefinitionApiAxiosParamCreator =
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        createpluginHaloRunV1alpha1ExtensionPointDefinition: async (extensionPointDefinition?: ExtensionPointDefinition, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+        createPluginHaloRunV1alpha1ExtensionPointDefinition: async (extensionPointDefinition?: ExtensionPointDefinition, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
             const localVarPath = `/apis/plugin.halo.run/v1alpha1/extensionpointdefinitions`;
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
@@ -78,9 +78,9 @@ export const PluginHaloRunV1alpha1ExtensionPointDefinitionApiAxiosParamCreator =
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        deletepluginHaloRunV1alpha1ExtensionPointDefinition: async (name: string, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+        deletePluginHaloRunV1alpha1ExtensionPointDefinition: async (name: string, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
             // verify required parameter 'name' is not null or undefined
-            assertParamExists('deletepluginHaloRunV1alpha1ExtensionPointDefinition', 'name', name)
+            assertParamExists('deletePluginHaloRunV1alpha1ExtensionPointDefinition', 'name', name)
             const localVarPath = `/apis/plugin.halo.run/v1alpha1/extensionpointdefinitions/{name}`
                 .replace(`{${"name"}}`, encodeURIComponent(String(name)));
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
@@ -119,9 +119,9 @@ export const PluginHaloRunV1alpha1ExtensionPointDefinitionApiAxiosParamCreator =
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        getpluginHaloRunV1alpha1ExtensionPointDefinition: async (name: string, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+        getPluginHaloRunV1alpha1ExtensionPointDefinition: async (name: string, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
             // verify required parameter 'name' is not null or undefined
-            assertParamExists('getpluginHaloRunV1alpha1ExtensionPointDefinition', 'name', name)
+            assertParamExists('getPluginHaloRunV1alpha1ExtensionPointDefinition', 'name', name)
             const localVarPath = `/apis/plugin.halo.run/v1alpha1/extensionpointdefinitions/{name}`
                 .replace(`{${"name"}}`, encodeURIComponent(String(name)));
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
@@ -164,7 +164,7 @@ export const PluginHaloRunV1alpha1ExtensionPointDefinitionApiAxiosParamCreator =
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        listpluginHaloRunV1alpha1ExtensionPointDefinition: async (page?: number, size?: number, labelSelector?: Array<string>, fieldSelector?: Array<string>, sort?: Array<string>, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+        listPluginHaloRunV1alpha1ExtensionPointDefinition: async (page?: number, size?: number, labelSelector?: Array<string>, fieldSelector?: Array<string>, sort?: Array<string>, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
             const localVarPath = `/apis/plugin.halo.run/v1alpha1/extensionpointdefinitions`;
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
@@ -223,9 +223,9 @@ export const PluginHaloRunV1alpha1ExtensionPointDefinitionApiAxiosParamCreator =
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        updatepluginHaloRunV1alpha1ExtensionPointDefinition: async (name: string, extensionPointDefinition?: ExtensionPointDefinition, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+        updatePluginHaloRunV1alpha1ExtensionPointDefinition: async (name: string, extensionPointDefinition?: ExtensionPointDefinition, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
             // verify required parameter 'name' is not null or undefined
-            assertParamExists('updatepluginHaloRunV1alpha1ExtensionPointDefinition', 'name', name)
+            assertParamExists('updatePluginHaloRunV1alpha1ExtensionPointDefinition', 'name', name)
             const localVarPath = `/apis/plugin.halo.run/v1alpha1/extensionpointdefinitions/{name}`
                 .replace(`{${"name"}}`, encodeURIComponent(String(name)));
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
@@ -277,10 +277,10 @@ export const PluginHaloRunV1alpha1ExtensionPointDefinitionApiFp = function(confi
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async createpluginHaloRunV1alpha1ExtensionPointDefinition(extensionPointDefinition?: ExtensionPointDefinition, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<ExtensionPointDefinition>> {
-            const localVarAxiosArgs = await localVarAxiosParamCreator.createpluginHaloRunV1alpha1ExtensionPointDefinition(extensionPointDefinition, options);
+        async createPluginHaloRunV1alpha1ExtensionPointDefinition(extensionPointDefinition?: ExtensionPointDefinition, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<ExtensionPointDefinition>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.createPluginHaloRunV1alpha1ExtensionPointDefinition(extensionPointDefinition, options);
             const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
-            const localVarOperationServerBasePath = operationServerMap['PluginHaloRunV1alpha1ExtensionPointDefinitionApi.createpluginHaloRunV1alpha1ExtensionPointDefinition']?.[localVarOperationServerIndex]?.url;
+            const localVarOperationServerBasePath = operationServerMap['PluginHaloRunV1alpha1ExtensionPointDefinitionApi.createPluginHaloRunV1alpha1ExtensionPointDefinition']?.[localVarOperationServerIndex]?.url;
             return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
         },
         /**
@@ -289,10 +289,10 @@ export const PluginHaloRunV1alpha1ExtensionPointDefinitionApiFp = function(confi
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async deletepluginHaloRunV1alpha1ExtensionPointDefinition(name: string, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<void>> {
-            const localVarAxiosArgs = await localVarAxiosParamCreator.deletepluginHaloRunV1alpha1ExtensionPointDefinition(name, options);
+        async deletePluginHaloRunV1alpha1ExtensionPointDefinition(name: string, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<void>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.deletePluginHaloRunV1alpha1ExtensionPointDefinition(name, options);
             const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
-            const localVarOperationServerBasePath = operationServerMap['PluginHaloRunV1alpha1ExtensionPointDefinitionApi.deletepluginHaloRunV1alpha1ExtensionPointDefinition']?.[localVarOperationServerIndex]?.url;
+            const localVarOperationServerBasePath = operationServerMap['PluginHaloRunV1alpha1ExtensionPointDefinitionApi.deletePluginHaloRunV1alpha1ExtensionPointDefinition']?.[localVarOperationServerIndex]?.url;
             return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
         },
         /**
@@ -301,10 +301,10 @@ export const PluginHaloRunV1alpha1ExtensionPointDefinitionApiFp = function(confi
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async getpluginHaloRunV1alpha1ExtensionPointDefinition(name: string, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<ExtensionPointDefinition>> {
-            const localVarAxiosArgs = await localVarAxiosParamCreator.getpluginHaloRunV1alpha1ExtensionPointDefinition(name, options);
+        async getPluginHaloRunV1alpha1ExtensionPointDefinition(name: string, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<ExtensionPointDefinition>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.getPluginHaloRunV1alpha1ExtensionPointDefinition(name, options);
             const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
-            const localVarOperationServerBasePath = operationServerMap['PluginHaloRunV1alpha1ExtensionPointDefinitionApi.getpluginHaloRunV1alpha1ExtensionPointDefinition']?.[localVarOperationServerIndex]?.url;
+            const localVarOperationServerBasePath = operationServerMap['PluginHaloRunV1alpha1ExtensionPointDefinitionApi.getPluginHaloRunV1alpha1ExtensionPointDefinition']?.[localVarOperationServerIndex]?.url;
             return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
         },
         /**
@@ -317,10 +317,10 @@ export const PluginHaloRunV1alpha1ExtensionPointDefinitionApiFp = function(confi
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async listpluginHaloRunV1alpha1ExtensionPointDefinition(page?: number, size?: number, labelSelector?: Array<string>, fieldSelector?: Array<string>, sort?: Array<string>, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<ExtensionPointDefinitionList>> {
-            const localVarAxiosArgs = await localVarAxiosParamCreator.listpluginHaloRunV1alpha1ExtensionPointDefinition(page, size, labelSelector, fieldSelector, sort, options);
+        async listPluginHaloRunV1alpha1ExtensionPointDefinition(page?: number, size?: number, labelSelector?: Array<string>, fieldSelector?: Array<string>, sort?: Array<string>, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<ExtensionPointDefinitionList>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.listPluginHaloRunV1alpha1ExtensionPointDefinition(page, size, labelSelector, fieldSelector, sort, options);
             const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
-            const localVarOperationServerBasePath = operationServerMap['PluginHaloRunV1alpha1ExtensionPointDefinitionApi.listpluginHaloRunV1alpha1ExtensionPointDefinition']?.[localVarOperationServerIndex]?.url;
+            const localVarOperationServerBasePath = operationServerMap['PluginHaloRunV1alpha1ExtensionPointDefinitionApi.listPluginHaloRunV1alpha1ExtensionPointDefinition']?.[localVarOperationServerIndex]?.url;
             return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
         },
         /**
@@ -330,10 +330,10 @@ export const PluginHaloRunV1alpha1ExtensionPointDefinitionApiFp = function(confi
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async updatepluginHaloRunV1alpha1ExtensionPointDefinition(name: string, extensionPointDefinition?: ExtensionPointDefinition, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<ExtensionPointDefinition>> {
-            const localVarAxiosArgs = await localVarAxiosParamCreator.updatepluginHaloRunV1alpha1ExtensionPointDefinition(name, extensionPointDefinition, options);
+        async updatePluginHaloRunV1alpha1ExtensionPointDefinition(name: string, extensionPointDefinition?: ExtensionPointDefinition, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<ExtensionPointDefinition>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.updatePluginHaloRunV1alpha1ExtensionPointDefinition(name, extensionPointDefinition, options);
             const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
-            const localVarOperationServerBasePath = operationServerMap['PluginHaloRunV1alpha1ExtensionPointDefinitionApi.updatepluginHaloRunV1alpha1ExtensionPointDefinition']?.[localVarOperationServerIndex]?.url;
+            const localVarOperationServerBasePath = operationServerMap['PluginHaloRunV1alpha1ExtensionPointDefinitionApi.updatePluginHaloRunV1alpha1ExtensionPointDefinition']?.[localVarOperationServerIndex]?.url;
             return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
         },
     }
@@ -348,153 +348,153 @@ export const PluginHaloRunV1alpha1ExtensionPointDefinitionApiFactory = function 
     return {
         /**
          * Create plugin.halo.run/v1alpha1/ExtensionPointDefinition
-         * @param {PluginHaloRunV1alpha1ExtensionPointDefinitionApiCreatepluginHaloRunV1alpha1ExtensionPointDefinitionRequest} requestParameters Request parameters.
+         * @param {PluginHaloRunV1alpha1ExtensionPointDefinitionApiCreatePluginHaloRunV1alpha1ExtensionPointDefinitionRequest} requestParameters Request parameters.
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        createpluginHaloRunV1alpha1ExtensionPointDefinition(requestParameters: PluginHaloRunV1alpha1ExtensionPointDefinitionApiCreatepluginHaloRunV1alpha1ExtensionPointDefinitionRequest = {}, options?: RawAxiosRequestConfig): AxiosPromise<ExtensionPointDefinition> {
-            return localVarFp.createpluginHaloRunV1alpha1ExtensionPointDefinition(requestParameters.extensionPointDefinition, options).then((request) => request(axios, basePath));
+        createPluginHaloRunV1alpha1ExtensionPointDefinition(requestParameters: PluginHaloRunV1alpha1ExtensionPointDefinitionApiCreatePluginHaloRunV1alpha1ExtensionPointDefinitionRequest = {}, options?: RawAxiosRequestConfig): AxiosPromise<ExtensionPointDefinition> {
+            return localVarFp.createPluginHaloRunV1alpha1ExtensionPointDefinition(requestParameters.extensionPointDefinition, options).then((request) => request(axios, basePath));
         },
         /**
          * Delete plugin.halo.run/v1alpha1/ExtensionPointDefinition
-         * @param {PluginHaloRunV1alpha1ExtensionPointDefinitionApiDeletepluginHaloRunV1alpha1ExtensionPointDefinitionRequest} requestParameters Request parameters.
+         * @param {PluginHaloRunV1alpha1ExtensionPointDefinitionApiDeletePluginHaloRunV1alpha1ExtensionPointDefinitionRequest} requestParameters Request parameters.
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        deletepluginHaloRunV1alpha1ExtensionPointDefinition(requestParameters: PluginHaloRunV1alpha1ExtensionPointDefinitionApiDeletepluginHaloRunV1alpha1ExtensionPointDefinitionRequest, options?: RawAxiosRequestConfig): AxiosPromise<void> {
-            return localVarFp.deletepluginHaloRunV1alpha1ExtensionPointDefinition(requestParameters.name, options).then((request) => request(axios, basePath));
+        deletePluginHaloRunV1alpha1ExtensionPointDefinition(requestParameters: PluginHaloRunV1alpha1ExtensionPointDefinitionApiDeletePluginHaloRunV1alpha1ExtensionPointDefinitionRequest, options?: RawAxiosRequestConfig): AxiosPromise<void> {
+            return localVarFp.deletePluginHaloRunV1alpha1ExtensionPointDefinition(requestParameters.name, options).then((request) => request(axios, basePath));
         },
         /**
          * Get plugin.halo.run/v1alpha1/ExtensionPointDefinition
-         * @param {PluginHaloRunV1alpha1ExtensionPointDefinitionApiGetpluginHaloRunV1alpha1ExtensionPointDefinitionRequest} requestParameters Request parameters.
+         * @param {PluginHaloRunV1alpha1ExtensionPointDefinitionApiGetPluginHaloRunV1alpha1ExtensionPointDefinitionRequest} requestParameters Request parameters.
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        getpluginHaloRunV1alpha1ExtensionPointDefinition(requestParameters: PluginHaloRunV1alpha1ExtensionPointDefinitionApiGetpluginHaloRunV1alpha1ExtensionPointDefinitionRequest, options?: RawAxiosRequestConfig): AxiosPromise<ExtensionPointDefinition> {
-            return localVarFp.getpluginHaloRunV1alpha1ExtensionPointDefinition(requestParameters.name, options).then((request) => request(axios, basePath));
+        getPluginHaloRunV1alpha1ExtensionPointDefinition(requestParameters: PluginHaloRunV1alpha1ExtensionPointDefinitionApiGetPluginHaloRunV1alpha1ExtensionPointDefinitionRequest, options?: RawAxiosRequestConfig): AxiosPromise<ExtensionPointDefinition> {
+            return localVarFp.getPluginHaloRunV1alpha1ExtensionPointDefinition(requestParameters.name, options).then((request) => request(axios, basePath));
         },
         /**
          * List plugin.halo.run/v1alpha1/ExtensionPointDefinition
-         * @param {PluginHaloRunV1alpha1ExtensionPointDefinitionApiListpluginHaloRunV1alpha1ExtensionPointDefinitionRequest} requestParameters Request parameters.
+         * @param {PluginHaloRunV1alpha1ExtensionPointDefinitionApiListPluginHaloRunV1alpha1ExtensionPointDefinitionRequest} requestParameters Request parameters.
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        listpluginHaloRunV1alpha1ExtensionPointDefinition(requestParameters: PluginHaloRunV1alpha1ExtensionPointDefinitionApiListpluginHaloRunV1alpha1ExtensionPointDefinitionRequest = {}, options?: RawAxiosRequestConfig): AxiosPromise<ExtensionPointDefinitionList> {
-            return localVarFp.listpluginHaloRunV1alpha1ExtensionPointDefinition(requestParameters.page, requestParameters.size, requestParameters.labelSelector, requestParameters.fieldSelector, requestParameters.sort, options).then((request) => request(axios, basePath));
+        listPluginHaloRunV1alpha1ExtensionPointDefinition(requestParameters: PluginHaloRunV1alpha1ExtensionPointDefinitionApiListPluginHaloRunV1alpha1ExtensionPointDefinitionRequest = {}, options?: RawAxiosRequestConfig): AxiosPromise<ExtensionPointDefinitionList> {
+            return localVarFp.listPluginHaloRunV1alpha1ExtensionPointDefinition(requestParameters.page, requestParameters.size, requestParameters.labelSelector, requestParameters.fieldSelector, requestParameters.sort, options).then((request) => request(axios, basePath));
         },
         /**
          * Update plugin.halo.run/v1alpha1/ExtensionPointDefinition
-         * @param {PluginHaloRunV1alpha1ExtensionPointDefinitionApiUpdatepluginHaloRunV1alpha1ExtensionPointDefinitionRequest} requestParameters Request parameters.
+         * @param {PluginHaloRunV1alpha1ExtensionPointDefinitionApiUpdatePluginHaloRunV1alpha1ExtensionPointDefinitionRequest} requestParameters Request parameters.
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        updatepluginHaloRunV1alpha1ExtensionPointDefinition(requestParameters: PluginHaloRunV1alpha1ExtensionPointDefinitionApiUpdatepluginHaloRunV1alpha1ExtensionPointDefinitionRequest, options?: RawAxiosRequestConfig): AxiosPromise<ExtensionPointDefinition> {
-            return localVarFp.updatepluginHaloRunV1alpha1ExtensionPointDefinition(requestParameters.name, requestParameters.extensionPointDefinition, options).then((request) => request(axios, basePath));
+        updatePluginHaloRunV1alpha1ExtensionPointDefinition(requestParameters: PluginHaloRunV1alpha1ExtensionPointDefinitionApiUpdatePluginHaloRunV1alpha1ExtensionPointDefinitionRequest, options?: RawAxiosRequestConfig): AxiosPromise<ExtensionPointDefinition> {
+            return localVarFp.updatePluginHaloRunV1alpha1ExtensionPointDefinition(requestParameters.name, requestParameters.extensionPointDefinition, options).then((request) => request(axios, basePath));
         },
     };
 };
 
 /**
- * Request parameters for createpluginHaloRunV1alpha1ExtensionPointDefinition operation in PluginHaloRunV1alpha1ExtensionPointDefinitionApi.
+ * Request parameters for createPluginHaloRunV1alpha1ExtensionPointDefinition operation in PluginHaloRunV1alpha1ExtensionPointDefinitionApi.
  * @export
- * @interface PluginHaloRunV1alpha1ExtensionPointDefinitionApiCreatepluginHaloRunV1alpha1ExtensionPointDefinitionRequest
+ * @interface PluginHaloRunV1alpha1ExtensionPointDefinitionApiCreatePluginHaloRunV1alpha1ExtensionPointDefinitionRequest
  */
-export interface PluginHaloRunV1alpha1ExtensionPointDefinitionApiCreatepluginHaloRunV1alpha1ExtensionPointDefinitionRequest {
+export interface PluginHaloRunV1alpha1ExtensionPointDefinitionApiCreatePluginHaloRunV1alpha1ExtensionPointDefinitionRequest {
     /**
      * Fresh extensionpointdefinition
      * @type {ExtensionPointDefinition}
-     * @memberof PluginHaloRunV1alpha1ExtensionPointDefinitionApiCreatepluginHaloRunV1alpha1ExtensionPointDefinition
+     * @memberof PluginHaloRunV1alpha1ExtensionPointDefinitionApiCreatePluginHaloRunV1alpha1ExtensionPointDefinition
      */
     readonly extensionPointDefinition?: ExtensionPointDefinition
 }
 
 /**
- * Request parameters for deletepluginHaloRunV1alpha1ExtensionPointDefinition operation in PluginHaloRunV1alpha1ExtensionPointDefinitionApi.
+ * Request parameters for deletePluginHaloRunV1alpha1ExtensionPointDefinition operation in PluginHaloRunV1alpha1ExtensionPointDefinitionApi.
  * @export
- * @interface PluginHaloRunV1alpha1ExtensionPointDefinitionApiDeletepluginHaloRunV1alpha1ExtensionPointDefinitionRequest
+ * @interface PluginHaloRunV1alpha1ExtensionPointDefinitionApiDeletePluginHaloRunV1alpha1ExtensionPointDefinitionRequest
  */
-export interface PluginHaloRunV1alpha1ExtensionPointDefinitionApiDeletepluginHaloRunV1alpha1ExtensionPointDefinitionRequest {
+export interface PluginHaloRunV1alpha1ExtensionPointDefinitionApiDeletePluginHaloRunV1alpha1ExtensionPointDefinitionRequest {
     /**
      * Name of extensionpointdefinition
      * @type {string}
-     * @memberof PluginHaloRunV1alpha1ExtensionPointDefinitionApiDeletepluginHaloRunV1alpha1ExtensionPointDefinition
+     * @memberof PluginHaloRunV1alpha1ExtensionPointDefinitionApiDeletePluginHaloRunV1alpha1ExtensionPointDefinition
      */
     readonly name: string
 }
 
 /**
- * Request parameters for getpluginHaloRunV1alpha1ExtensionPointDefinition operation in PluginHaloRunV1alpha1ExtensionPointDefinitionApi.
+ * Request parameters for getPluginHaloRunV1alpha1ExtensionPointDefinition operation in PluginHaloRunV1alpha1ExtensionPointDefinitionApi.
  * @export
- * @interface PluginHaloRunV1alpha1ExtensionPointDefinitionApiGetpluginHaloRunV1alpha1ExtensionPointDefinitionRequest
+ * @interface PluginHaloRunV1alpha1ExtensionPointDefinitionApiGetPluginHaloRunV1alpha1ExtensionPointDefinitionRequest
  */
-export interface PluginHaloRunV1alpha1ExtensionPointDefinitionApiGetpluginHaloRunV1alpha1ExtensionPointDefinitionRequest {
+export interface PluginHaloRunV1alpha1ExtensionPointDefinitionApiGetPluginHaloRunV1alpha1ExtensionPointDefinitionRequest {
     /**
      * Name of extensionpointdefinition
      * @type {string}
-     * @memberof PluginHaloRunV1alpha1ExtensionPointDefinitionApiGetpluginHaloRunV1alpha1ExtensionPointDefinition
+     * @memberof PluginHaloRunV1alpha1ExtensionPointDefinitionApiGetPluginHaloRunV1alpha1ExtensionPointDefinition
      */
     readonly name: string
 }
 
 /**
- * Request parameters for listpluginHaloRunV1alpha1ExtensionPointDefinition operation in PluginHaloRunV1alpha1ExtensionPointDefinitionApi.
+ * Request parameters for listPluginHaloRunV1alpha1ExtensionPointDefinition operation in PluginHaloRunV1alpha1ExtensionPointDefinitionApi.
  * @export
- * @interface PluginHaloRunV1alpha1ExtensionPointDefinitionApiListpluginHaloRunV1alpha1ExtensionPointDefinitionRequest
+ * @interface PluginHaloRunV1alpha1ExtensionPointDefinitionApiListPluginHaloRunV1alpha1ExtensionPointDefinitionRequest
  */
-export interface PluginHaloRunV1alpha1ExtensionPointDefinitionApiListpluginHaloRunV1alpha1ExtensionPointDefinitionRequest {
+export interface PluginHaloRunV1alpha1ExtensionPointDefinitionApiListPluginHaloRunV1alpha1ExtensionPointDefinitionRequest {
     /**
      * Page number. Default is 0.
      * @type {number}
-     * @memberof PluginHaloRunV1alpha1ExtensionPointDefinitionApiListpluginHaloRunV1alpha1ExtensionPointDefinition
+     * @memberof PluginHaloRunV1alpha1ExtensionPointDefinitionApiListPluginHaloRunV1alpha1ExtensionPointDefinition
      */
     readonly page?: number
 
     /**
      * Size number. Default is 0.
      * @type {number}
-     * @memberof PluginHaloRunV1alpha1ExtensionPointDefinitionApiListpluginHaloRunV1alpha1ExtensionPointDefinition
+     * @memberof PluginHaloRunV1alpha1ExtensionPointDefinitionApiListPluginHaloRunV1alpha1ExtensionPointDefinition
      */
     readonly size?: number
 
     /**
      * Label selector. e.g.: hidden!&#x3D;true
      * @type {Array<string>}
-     * @memberof PluginHaloRunV1alpha1ExtensionPointDefinitionApiListpluginHaloRunV1alpha1ExtensionPointDefinition
+     * @memberof PluginHaloRunV1alpha1ExtensionPointDefinitionApiListPluginHaloRunV1alpha1ExtensionPointDefinition
      */
     readonly labelSelector?: Array<string>
 
     /**
      * Field selector. e.g.: metadata.name&#x3D;&#x3D;halo
      * @type {Array<string>}
-     * @memberof PluginHaloRunV1alpha1ExtensionPointDefinitionApiListpluginHaloRunV1alpha1ExtensionPointDefinition
+     * @memberof PluginHaloRunV1alpha1ExtensionPointDefinitionApiListPluginHaloRunV1alpha1ExtensionPointDefinition
      */
     readonly fieldSelector?: Array<string>
 
     /**
      * Sorting criteria in the format: property,(asc|desc). Default sort order is ascending. Multiple sort criteria are supported.
      * @type {Array<string>}
-     * @memberof PluginHaloRunV1alpha1ExtensionPointDefinitionApiListpluginHaloRunV1alpha1ExtensionPointDefinition
+     * @memberof PluginHaloRunV1alpha1ExtensionPointDefinitionApiListPluginHaloRunV1alpha1ExtensionPointDefinition
      */
     readonly sort?: Array<string>
 }
 
 /**
- * Request parameters for updatepluginHaloRunV1alpha1ExtensionPointDefinition operation in PluginHaloRunV1alpha1ExtensionPointDefinitionApi.
+ * Request parameters for updatePluginHaloRunV1alpha1ExtensionPointDefinition operation in PluginHaloRunV1alpha1ExtensionPointDefinitionApi.
  * @export
- * @interface PluginHaloRunV1alpha1ExtensionPointDefinitionApiUpdatepluginHaloRunV1alpha1ExtensionPointDefinitionRequest
+ * @interface PluginHaloRunV1alpha1ExtensionPointDefinitionApiUpdatePluginHaloRunV1alpha1ExtensionPointDefinitionRequest
  */
-export interface PluginHaloRunV1alpha1ExtensionPointDefinitionApiUpdatepluginHaloRunV1alpha1ExtensionPointDefinitionRequest {
+export interface PluginHaloRunV1alpha1ExtensionPointDefinitionApiUpdatePluginHaloRunV1alpha1ExtensionPointDefinitionRequest {
     /**
      * Name of extensionpointdefinition
      * @type {string}
-     * @memberof PluginHaloRunV1alpha1ExtensionPointDefinitionApiUpdatepluginHaloRunV1alpha1ExtensionPointDefinition
+     * @memberof PluginHaloRunV1alpha1ExtensionPointDefinitionApiUpdatePluginHaloRunV1alpha1ExtensionPointDefinition
      */
     readonly name: string
 
     /**
      * Updated extensionpointdefinition
      * @type {ExtensionPointDefinition}
-     * @memberof PluginHaloRunV1alpha1ExtensionPointDefinitionApiUpdatepluginHaloRunV1alpha1ExtensionPointDefinition
+     * @memberof PluginHaloRunV1alpha1ExtensionPointDefinitionApiUpdatePluginHaloRunV1alpha1ExtensionPointDefinition
      */
     readonly extensionPointDefinition?: ExtensionPointDefinition
 }
@@ -508,57 +508,57 @@ export interface PluginHaloRunV1alpha1ExtensionPointDefinitionApiUpdatepluginHal
 export class PluginHaloRunV1alpha1ExtensionPointDefinitionApi extends BaseAPI {
     /**
      * Create plugin.halo.run/v1alpha1/ExtensionPointDefinition
-     * @param {PluginHaloRunV1alpha1ExtensionPointDefinitionApiCreatepluginHaloRunV1alpha1ExtensionPointDefinitionRequest} requestParameters Request parameters.
+     * @param {PluginHaloRunV1alpha1ExtensionPointDefinitionApiCreatePluginHaloRunV1alpha1ExtensionPointDefinitionRequest} requestParameters Request parameters.
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      * @memberof PluginHaloRunV1alpha1ExtensionPointDefinitionApi
      */
-    public createpluginHaloRunV1alpha1ExtensionPointDefinition(requestParameters: PluginHaloRunV1alpha1ExtensionPointDefinitionApiCreatepluginHaloRunV1alpha1ExtensionPointDefinitionRequest = {}, options?: RawAxiosRequestConfig) {
-        return PluginHaloRunV1alpha1ExtensionPointDefinitionApiFp(this.configuration).createpluginHaloRunV1alpha1ExtensionPointDefinition(requestParameters.extensionPointDefinition, options).then((request) => request(this.axios, this.basePath));
+    public createPluginHaloRunV1alpha1ExtensionPointDefinition(requestParameters: PluginHaloRunV1alpha1ExtensionPointDefinitionApiCreatePluginHaloRunV1alpha1ExtensionPointDefinitionRequest = {}, options?: RawAxiosRequestConfig) {
+        return PluginHaloRunV1alpha1ExtensionPointDefinitionApiFp(this.configuration).createPluginHaloRunV1alpha1ExtensionPointDefinition(requestParameters.extensionPointDefinition, options).then((request) => request(this.axios, this.basePath));
     }
 
     /**
      * Delete plugin.halo.run/v1alpha1/ExtensionPointDefinition
-     * @param {PluginHaloRunV1alpha1ExtensionPointDefinitionApiDeletepluginHaloRunV1alpha1ExtensionPointDefinitionRequest} requestParameters Request parameters.
+     * @param {PluginHaloRunV1alpha1ExtensionPointDefinitionApiDeletePluginHaloRunV1alpha1ExtensionPointDefinitionRequest} requestParameters Request parameters.
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      * @memberof PluginHaloRunV1alpha1ExtensionPointDefinitionApi
      */
-    public deletepluginHaloRunV1alpha1ExtensionPointDefinition(requestParameters: PluginHaloRunV1alpha1ExtensionPointDefinitionApiDeletepluginHaloRunV1alpha1ExtensionPointDefinitionRequest, options?: RawAxiosRequestConfig) {
-        return PluginHaloRunV1alpha1ExtensionPointDefinitionApiFp(this.configuration).deletepluginHaloRunV1alpha1ExtensionPointDefinition(requestParameters.name, options).then((request) => request(this.axios, this.basePath));
+    public deletePluginHaloRunV1alpha1ExtensionPointDefinition(requestParameters: PluginHaloRunV1alpha1ExtensionPointDefinitionApiDeletePluginHaloRunV1alpha1ExtensionPointDefinitionRequest, options?: RawAxiosRequestConfig) {
+        return PluginHaloRunV1alpha1ExtensionPointDefinitionApiFp(this.configuration).deletePluginHaloRunV1alpha1ExtensionPointDefinition(requestParameters.name, options).then((request) => request(this.axios, this.basePath));
     }
 
     /**
      * Get plugin.halo.run/v1alpha1/ExtensionPointDefinition
-     * @param {PluginHaloRunV1alpha1ExtensionPointDefinitionApiGetpluginHaloRunV1alpha1ExtensionPointDefinitionRequest} requestParameters Request parameters.
+     * @param {PluginHaloRunV1alpha1ExtensionPointDefinitionApiGetPluginHaloRunV1alpha1ExtensionPointDefinitionRequest} requestParameters Request parameters.
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      * @memberof PluginHaloRunV1alpha1ExtensionPointDefinitionApi
      */
-    public getpluginHaloRunV1alpha1ExtensionPointDefinition(requestParameters: PluginHaloRunV1alpha1ExtensionPointDefinitionApiGetpluginHaloRunV1alpha1ExtensionPointDefinitionRequest, options?: RawAxiosRequestConfig) {
-        return PluginHaloRunV1alpha1ExtensionPointDefinitionApiFp(this.configuration).getpluginHaloRunV1alpha1ExtensionPointDefinition(requestParameters.name, options).then((request) => request(this.axios, this.basePath));
+    public getPluginHaloRunV1alpha1ExtensionPointDefinition(requestParameters: PluginHaloRunV1alpha1ExtensionPointDefinitionApiGetPluginHaloRunV1alpha1ExtensionPointDefinitionRequest, options?: RawAxiosRequestConfig) {
+        return PluginHaloRunV1alpha1ExtensionPointDefinitionApiFp(this.configuration).getPluginHaloRunV1alpha1ExtensionPointDefinition(requestParameters.name, options).then((request) => request(this.axios, this.basePath));
     }
 
     /**
      * List plugin.halo.run/v1alpha1/ExtensionPointDefinition
-     * @param {PluginHaloRunV1alpha1ExtensionPointDefinitionApiListpluginHaloRunV1alpha1ExtensionPointDefinitionRequest} requestParameters Request parameters.
+     * @param {PluginHaloRunV1alpha1ExtensionPointDefinitionApiListPluginHaloRunV1alpha1ExtensionPointDefinitionRequest} requestParameters Request parameters.
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      * @memberof PluginHaloRunV1alpha1ExtensionPointDefinitionApi
      */
-    public listpluginHaloRunV1alpha1ExtensionPointDefinition(requestParameters: PluginHaloRunV1alpha1ExtensionPointDefinitionApiListpluginHaloRunV1alpha1ExtensionPointDefinitionRequest = {}, options?: RawAxiosRequestConfig) {
-        return PluginHaloRunV1alpha1ExtensionPointDefinitionApiFp(this.configuration).listpluginHaloRunV1alpha1ExtensionPointDefinition(requestParameters.page, requestParameters.size, requestParameters.labelSelector, requestParameters.fieldSelector, requestParameters.sort, options).then((request) => request(this.axios, this.basePath));
+    public listPluginHaloRunV1alpha1ExtensionPointDefinition(requestParameters: PluginHaloRunV1alpha1ExtensionPointDefinitionApiListPluginHaloRunV1alpha1ExtensionPointDefinitionRequest = {}, options?: RawAxiosRequestConfig) {
+        return PluginHaloRunV1alpha1ExtensionPointDefinitionApiFp(this.configuration).listPluginHaloRunV1alpha1ExtensionPointDefinition(requestParameters.page, requestParameters.size, requestParameters.labelSelector, requestParameters.fieldSelector, requestParameters.sort, options).then((request) => request(this.axios, this.basePath));
     }
 
     /**
      * Update plugin.halo.run/v1alpha1/ExtensionPointDefinition
-     * @param {PluginHaloRunV1alpha1ExtensionPointDefinitionApiUpdatepluginHaloRunV1alpha1ExtensionPointDefinitionRequest} requestParameters Request parameters.
+     * @param {PluginHaloRunV1alpha1ExtensionPointDefinitionApiUpdatePluginHaloRunV1alpha1ExtensionPointDefinitionRequest} requestParameters Request parameters.
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      * @memberof PluginHaloRunV1alpha1ExtensionPointDefinitionApi
      */
-    public updatepluginHaloRunV1alpha1ExtensionPointDefinition(requestParameters: PluginHaloRunV1alpha1ExtensionPointDefinitionApiUpdatepluginHaloRunV1alpha1ExtensionPointDefinitionRequest, options?: RawAxiosRequestConfig) {
-        return PluginHaloRunV1alpha1ExtensionPointDefinitionApiFp(this.configuration).updatepluginHaloRunV1alpha1ExtensionPointDefinition(requestParameters.name, requestParameters.extensionPointDefinition, options).then((request) => request(this.axios, this.basePath));
+    public updatePluginHaloRunV1alpha1ExtensionPointDefinition(requestParameters: PluginHaloRunV1alpha1ExtensionPointDefinitionApiUpdatePluginHaloRunV1alpha1ExtensionPointDefinitionRequest, options?: RawAxiosRequestConfig) {
+        return PluginHaloRunV1alpha1ExtensionPointDefinitionApiFp(this.configuration).updatePluginHaloRunV1alpha1ExtensionPointDefinition(requestParameters.name, requestParameters.extensionPointDefinition, options).then((request) => request(this.axios, this.basePath));
     }
 }
 

@@ -18,11 +18,11 @@ withDefaults(
 const { mutate: changeVisibleMutation } = useMutation({
   mutationFn: async (post: Post) => {
     const { data } =
-      await apiClient.extension.post.getcontentHaloRunV1alpha1Post({
+      await apiClient.extension.post.getContentHaloRunV1alpha1Post({
         name: post.metadata.name,
       });
     data.spec.visible = data.spec.visible === "PRIVATE" ? "PUBLIC" : "PRIVATE";
-    await apiClient.extension.post.updatecontentHaloRunV1alpha1Post(
+    await apiClient.extension.post.updateContentHaloRunV1alpha1Post(
       {
         name: post.metadata.name,
         post: data,

@@ -103,14 +103,14 @@ const handleDelete = (group: Group) => {
         size: 0,
       });
 
-      await apiClient.extension.storage.group.deletestorageHaloRunV1alpha1Group(
+      await apiClient.extension.storage.group.deleteStorageHaloRunV1alpha1Group(
         { name: group.metadata.name }
       );
 
       // move attachments to none group
       const moveToUnGroupRequests = data.items.map((attachment) => {
         attachment.spec.groupName = undefined;
-        return apiClient.extension.storage.attachment.updatestorageHaloRunV1alpha1Attachment(
+        return apiClient.extension.storage.attachment.updateStorageHaloRunV1alpha1Attachment(
           {
             name: attachment.metadata.name,
             attachment: attachment,
@@ -152,12 +152,12 @@ const handleDeleteWithAttachments = (group: Group) => {
         size: 0,
       });
 
-      await apiClient.extension.storage.group.deletestorageHaloRunV1alpha1Group(
+      await apiClient.extension.storage.group.deleteStorageHaloRunV1alpha1Group(
         { name: group.metadata.name }
       );
 
       const deleteAttachmentRequests = data.items.map((attachment) => {
-        return apiClient.extension.storage.attachment.deletestorageHaloRunV1alpha1Attachment(
+        return apiClient.extension.storage.attachment.deleteStorageHaloRunV1alpha1Attachment(
           { name: attachment.metadata.name }
         );
       });

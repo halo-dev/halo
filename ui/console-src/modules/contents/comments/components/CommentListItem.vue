@@ -67,7 +67,7 @@ const handleDelete = async () => {
     cancelText: t("core.common.buttons.cancel"),
     onConfirm: async () => {
       try {
-        await apiClient.extension.comment.deletecontentHaloRunV1alpha1Comment({
+        await apiClient.extension.comment.deleteContentHaloRunV1alpha1Comment({
           name: props.comment?.comment?.metadata.name as string,
         });
 
@@ -92,7 +92,7 @@ const handleApproveReplyInBatch = async () => {
           return !reply.reply.spec.approved;
         });
         const promises = repliesToUpdate?.map((reply) => {
-          return apiClient.extension.reply.updatecontentHaloRunV1alpha1Reply({
+          return apiClient.extension.reply.updateContentHaloRunV1alpha1Reply({
             name: reply.reply.metadata.name,
             reply: {
               ...reply.reply,
@@ -123,7 +123,7 @@ const handleApprove = async () => {
     commentToUpdate.spec.approved = true;
     // TODO: 暂时由前端设置发布时间。see https://github.com/halo-dev/halo/pull/2746
     commentToUpdate.spec.approvedTime = new Date().toISOString();
-    await apiClient.extension.comment.updatecontentHaloRunV1alpha1Comment({
+    await apiClient.extension.comment.updateContentHaloRunV1alpha1Comment({
       name: commentToUpdate.metadata.name,
       comment: commentToUpdate,
     });
@@ -170,7 +170,7 @@ const handleToggleShowReplies = async () => {
     if (props.comment.comment.status?.unreadReplyCount) {
       const commentToUpdate = cloneDeep(props.comment.comment);
       commentToUpdate.spec.lastReadTime = new Date().toISOString();
-      await apiClient.extension.comment.updatecontentHaloRunV1alpha1Comment({
+      await apiClient.extension.comment.updateContentHaloRunV1alpha1Comment({
         name: commentToUpdate.metadata.name,
         comment: commentToUpdate,
       });

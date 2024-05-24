@@ -142,7 +142,7 @@ const queryName = useRouteQuery("name");
 
 onMounted(async () => {
   if (queryName.value) {
-    const { data } = await apiClient.extension.tag.getcontentHaloRunV1alpha1Tag(
+    const { data } = await apiClient.extension.tag.getContentHaloRunV1alpha1Tag(
       {
         name: queryName.value as string,
       }

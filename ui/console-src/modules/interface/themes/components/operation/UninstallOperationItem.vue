@@ -27,7 +27,7 @@ const handleUninstall = async (deleteExtensions?: boolean) => {
     cancelText: t("core.common.buttons.cancel"),
     onConfirm: async () => {
       try {
-        await apiClient.extension.theme.deletethemeHaloRunV1alpha1Theme({
+        await apiClient.extension.theme.deleteThemeHaloRunV1alpha1Theme({
           name: props.theme.metadata.name,
         });
 
@@ -36,7 +36,7 @@ const handleUninstall = async (deleteExtensions?: boolean) => {
           const { settingName, configMapName } = props.theme.spec;
 
           if (settingName) {
-            await apiClient.extension.setting.deletev1alpha1Setting(
+            await apiClient.extension.setting.deleteV1alpha1Setting(
               {
                 name: settingName,
               },
@@ -47,7 +47,7 @@ const handleUninstall = async (deleteExtensions?: boolean) => {
           }
 
           if (configMapName) {
-            await apiClient.extension.configMap.deletev1alpha1ConfigMap(
+            await apiClient.extension.configMap.deleteV1alpha1ConfigMap(
               {
                 name: configMapName,
               },

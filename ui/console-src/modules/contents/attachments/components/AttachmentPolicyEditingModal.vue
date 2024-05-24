@@ -65,7 +65,7 @@ const { data: policyTemplate } = useQuery({
   ],
   queryFn: async () => {
     const { data } =
-      await apiClient.extension.storage.policyTemplate.getstorageHaloRunV1alpha1PolicyTemplate(
+      await apiClient.extension.storage.policyTemplate.getStorageHaloRunV1alpha1PolicyTemplate(
         {
           name: formState.value.spec.templateName,
         }
@@ -86,7 +86,7 @@ const { data: setting, isLoading } = useQuery({
       throw new Error("No setting found");
     }
 
-    const { data } = await apiClient.extension.setting.getv1alpha1Setting({
+    const { data } = await apiClient.extension.setting.getV1alpha1Setting({
       name: policyTemplate.value.spec.settingName,
     });
 
@@ -115,7 +115,7 @@ const { data: configMap } = useQuery({
     if (!policy.value?.spec.configMapName) {
       throw new Error("No configMap found");
     }
-    const { data } = await apiClient.extension.configMap.getv1alpha1ConfigMap({
+    const { data } = await apiClient.extension.configMap.getV1alpha1ConfigMap({
       name: policy.value?.spec.configMapName,
     });
     return data;
@@ -138,12 +138,12 @@ const handleSave = async () => {
     const configMapToUpdate = convertToSave();
 
     if (isUpdateMode) {
-      await apiClient.extension.configMap.updatev1alpha1ConfigMap({
+      await apiClient.extension.configMap.updateV1alpha1ConfigMap({
         name: configMap.value.metadata.name,
         configMap: configMapToUpdate,
       });
 
-      await apiClient.extension.storage.policy.updatestorageHaloRunV1alpha1Policy(
+      await apiClient.extension.storage.policy.updateStorageHaloRunV1alpha1Policy(
         {
           name: formState.value.metadata.name,
           policy: formState.value,
@@ -151,12 +151,12 @@ const handleSave = async () => {
       );
     } else {
       const { data: newConfigMap } =
-        await apiClient.extension.configMap.createv1alpha1ConfigMap({
+        await apiClient.extension.configMap.createV1alpha1ConfigMap({
           configMap: configMapToUpdate,
         });
 
       formState.value.spec.configMapName = newConfigMap.metadata.name;
-      await apiClient.extension.storage.policy.createstorageHaloRunV1alpha1Policy(
+      await apiClient.extension.storage.policy.createStorageHaloRunV1alpha1Policy(
         {
           policy: formState.value,
         }

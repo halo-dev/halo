@@ -48,7 +48,7 @@ const {
 } = useQuery<Menu[]>({
   queryKey: ["menus"],
   queryFn: async () => {
-    const { data } = await apiClient.extension.menu.listv1alpha1Menu({
+    const { data } = await apiClient.extension.menu.listV1alpha1Menu({
       page: 0,
       size: 0,
     });
@@ -87,12 +87,12 @@ const handleDeleteMenu = async (menu: Menu) => {
     cancelText: t("core.common.buttons.cancel"),
     onConfirm: async () => {
       try {
-        await apiClient.extension.menu.deletev1alpha1Menu({
+        await apiClient.extension.menu.deleteV1alpha1Menu({
           name: menu.metadata.name,
         });
 
         const deleteItemsPromises = menu.spec.menuItems?.map((item) =>
-          apiClient.extension.menuItem.deletev1alpha1MenuItem({
+          apiClient.extension.menuItem.deleteV1alpha1MenuItem({
             name: item,
           })
         );
@@ -138,7 +138,7 @@ onMounted(async () => {
 const { data: primaryMenuName, refetch: refetchPrimaryMenuName } = useQuery({
   queryKey: ["primary-menu-name"],
   queryFn: async () => {
-    const { data } = await apiClient.extension.configMap.getv1alpha1ConfigMap({
+    const { data } = await apiClient.extension.configMap.getV1alpha1ConfigMap({
       name: "system",
     });
 
@@ -154,7 +154,7 @@ const { data: primaryMenuName, refetch: refetchPrimaryMenuName } = useQuery({
 
 const handleSetPrimaryMenu = async (menu: Menu) => {
   const { data: systemConfigMap } =
-    await apiClient.extension.configMap.getv1alpha1ConfigMap({
+    await apiClient.extension.configMap.getV1alpha1ConfigMap({
       name: "system",
     });
 
@@ -163,7 +163,7 @@ const handleSetPrimaryMenu = async (menu: Menu) => {
     menuConfigToUpdate.primary = menu.metadata.name;
     systemConfigMap.data["menu"] = JSON.stringify(menuConfigToUpdate);
 
-    await apiClient.extension.configMap.updatev1alpha1ConfigMap({
+    await apiClient.extension.configMap.updateV1alpha1ConfigMap({
       name: "system",
       configMap: systemConfigMap,
     });

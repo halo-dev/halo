@@ -87,7 +87,7 @@ const handleSaveMenuItem = async () => {
 
     if (isUpdateMode) {
       const { data } =
-        await apiClient.extension.menuItem.updatev1alpha1MenuItem({
+        await apiClient.extension.menuItem.updateV1alpha1MenuItem({
           name: formState.value.metadata.name,
           menuItem: formState.value,
         });
@@ -95,14 +95,14 @@ const handleSaveMenuItem = async () => {
       emit("saved", data);
     } else {
       const { data } =
-        await apiClient.extension.menuItem.createv1alpha1MenuItem({
+        await apiClient.extension.menuItem.createV1alpha1MenuItem({
           menuItem: formState.value,
         });
 
       // if parent menu item is selected, add the new menu item to the parent menu item
       if (selectedParentMenuItem.value) {
         const { data: menuItemToUpdate } =
-          await apiClient.extension.menuItem.getv1alpha1MenuItem({
+          await apiClient.extension.menuItem.getV1alpha1MenuItem({
             name: selectedParentMenuItem.value,
           });
 
@@ -111,7 +111,7 @@ const handleSaveMenuItem = async () => {
           data.metadata.name,
         ];
 
-        await apiClient.extension.menuItem.updatev1alpha1MenuItem({
+        await apiClient.extension.menuItem.updateV1alpha1MenuItem({
           name: menuItemToUpdate.metadata.name,
           menuItem: menuItemToUpdate,
         });

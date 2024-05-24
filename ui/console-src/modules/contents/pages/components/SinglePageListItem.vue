@@ -73,11 +73,11 @@ const isPublishing = computed(() => {
 const { mutate: changeVisibleMutation } = useMutation({
   mutationFn: async (singlePage: SinglePage) => {
     const { data } =
-      await apiClient.extension.singlePage.getcontentHaloRunV1alpha1SinglePage({
+      await apiClient.extension.singlePage.getContentHaloRunV1alpha1SinglePage({
         name: singlePage.metadata.name,
       });
     data.spec.visible = data.spec.visible === "PRIVATE" ? "PUBLIC" : "PRIVATE";
-    await apiClient.extension.singlePage.updatecontentHaloRunV1alpha1SinglePage(
+    await apiClient.extension.singlePage.updateContentHaloRunV1alpha1SinglePage(
       {
         name: singlePage.metadata.name,
         singlePage: data,
@@ -107,7 +107,7 @@ const handleDelete = async () => {
     onConfirm: async () => {
       const singlePageToUpdate = cloneDeep(props.singlePage.page);
       singlePageToUpdate.spec.deleted = true;
-      await apiClient.extension.singlePage.updatecontentHaloRunV1alpha1SinglePage(
+      await apiClient.extension.singlePage.updateContentHaloRunV1alpha1SinglePage(
         {
           name: props.singlePage.page.metadata.name,
           singlePage: singlePageToUpdate,

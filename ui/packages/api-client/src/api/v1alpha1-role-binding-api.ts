@@ -37,7 +37,7 @@ export const V1alpha1RoleBindingApiAxiosParamCreator = function (configuration?:
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        createv1alpha1RoleBinding: async (roleBinding?: RoleBinding, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+        createV1alpha1RoleBinding: async (roleBinding?: RoleBinding, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
             const localVarPath = `/api/v1alpha1/rolebindings`;
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
@@ -78,9 +78,9 @@ export const V1alpha1RoleBindingApiAxiosParamCreator = function (configuration?:
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        deletev1alpha1RoleBinding: async (name: string, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+        deleteV1alpha1RoleBinding: async (name: string, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
             // verify required parameter 'name' is not null or undefined
-            assertParamExists('deletev1alpha1RoleBinding', 'name', name)
+            assertParamExists('deleteV1alpha1RoleBinding', 'name', name)
             const localVarPath = `/api/v1alpha1/rolebindings/{name}`
                 .replace(`{${"name"}}`, encodeURIComponent(String(name)));
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
@@ -119,9 +119,9 @@ export const V1alpha1RoleBindingApiAxiosParamCreator = function (configuration?:
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        getv1alpha1RoleBinding: async (name: string, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+        getV1alpha1RoleBinding: async (name: string, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
             // verify required parameter 'name' is not null or undefined
-            assertParamExists('getv1alpha1RoleBinding', 'name', name)
+            assertParamExists('getV1alpha1RoleBinding', 'name', name)
             const localVarPath = `/api/v1alpha1/rolebindings/{name}`
                 .replace(`{${"name"}}`, encodeURIComponent(String(name)));
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
@@ -164,7 +164,7 @@ export const V1alpha1RoleBindingApiAxiosParamCreator = function (configuration?:
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        listv1alpha1RoleBinding: async (page?: number, size?: number, labelSelector?: Array<string>, fieldSelector?: Array<string>, sort?: Array<string>, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+        listV1alpha1RoleBinding: async (page?: number, size?: number, labelSelector?: Array<string>, fieldSelector?: Array<string>, sort?: Array<string>, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
             const localVarPath = `/api/v1alpha1/rolebindings`;
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
@@ -223,9 +223,9 @@ export const V1alpha1RoleBindingApiAxiosParamCreator = function (configuration?:
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        updatev1alpha1RoleBinding: async (name: string, roleBinding?: RoleBinding, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+        updateV1alpha1RoleBinding: async (name: string, roleBinding?: RoleBinding, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
             // verify required parameter 'name' is not null or undefined
-            assertParamExists('updatev1alpha1RoleBinding', 'name', name)
+            assertParamExists('updateV1alpha1RoleBinding', 'name', name)
             const localVarPath = `/api/v1alpha1/rolebindings/{name}`
                 .replace(`{${"name"}}`, encodeURIComponent(String(name)));
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
@@ -277,10 +277,10 @@ export const V1alpha1RoleBindingApiFp = function(configuration?: Configuration) 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async createv1alpha1RoleBinding(roleBinding?: RoleBinding, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<RoleBinding>> {
-            const localVarAxiosArgs = await localVarAxiosParamCreator.createv1alpha1RoleBinding(roleBinding, options);
+        async createV1alpha1RoleBinding(roleBinding?: RoleBinding, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<RoleBinding>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.createV1alpha1RoleBinding(roleBinding, options);
             const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
-            const localVarOperationServerBasePath = operationServerMap['V1alpha1RoleBindingApi.createv1alpha1RoleBinding']?.[localVarOperationServerIndex]?.url;
+            const localVarOperationServerBasePath = operationServerMap['V1alpha1RoleBindingApi.createV1alpha1RoleBinding']?.[localVarOperationServerIndex]?.url;
             return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
         },
         /**
@@ -289,10 +289,10 @@ export const V1alpha1RoleBindingApiFp = function(configuration?: Configuration) 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async deletev1alpha1RoleBinding(name: string, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<void>> {
-            const localVarAxiosArgs = await localVarAxiosParamCreator.deletev1alpha1RoleBinding(name, options);
+        async deleteV1alpha1RoleBinding(name: string, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<void>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.deleteV1alpha1RoleBinding(name, options);
             const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
-            const localVarOperationServerBasePath = operationServerMap['V1alpha1RoleBindingApi.deletev1alpha1RoleBinding']?.[localVarOperationServerIndex]?.url;
+            const localVarOperationServerBasePath = operationServerMap['V1alpha1RoleBindingApi.deleteV1alpha1RoleBinding']?.[localVarOperationServerIndex]?.url;
             return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
         },
         /**
@@ -301,10 +301,10 @@ export const V1alpha1RoleBindingApiFp = function(configuration?: Configuration) 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async getv1alpha1RoleBinding(name: string, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<RoleBinding>> {
-            const localVarAxiosArgs = await localVarAxiosParamCreator.getv1alpha1RoleBinding(name, options);
+        async getV1alpha1RoleBinding(name: string, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<RoleBinding>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.getV1alpha1RoleBinding(name, options);
             const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
-            const localVarOperationServerBasePath = operationServerMap['V1alpha1RoleBindingApi.getv1alpha1RoleBinding']?.[localVarOperationServerIndex]?.url;
+            const localVarOperationServerBasePath = operationServerMap['V1alpha1RoleBindingApi.getV1alpha1RoleBinding']?.[localVarOperationServerIndex]?.url;
             return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
         },
         /**
@@ -317,10 +317,10 @@ export const V1alpha1RoleBindingApiFp = function(configuration?: Configuration) 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async listv1alpha1RoleBinding(page?: number, size?: number, labelSelector?: Array<string>, fieldSelector?: Array<string>, sort?: Array<string>, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<RoleBindingList>> {
-            const localVarAxiosArgs = await localVarAxiosParamCreator.listv1alpha1RoleBinding(page, size, labelSelector, fieldSelector, sort, options);
+        async listV1alpha1RoleBinding(page?: number, size?: number, labelSelector?: Array<string>, fieldSelector?: Array<string>, sort?: Array<string>, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<RoleBindingList>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.listV1alpha1RoleBinding(page, size, labelSelector, fieldSelector, sort, options);
             const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
-            const localVarOperationServerBasePath = operationServerMap['V1alpha1RoleBindingApi.listv1alpha1RoleBinding']?.[localVarOperationServerIndex]?.url;
+            const localVarOperationServerBasePath = operationServerMap['V1alpha1RoleBindingApi.listV1alpha1RoleBinding']?.[localVarOperationServerIndex]?.url;
             return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
         },
         /**
@@ -330,10 +330,10 @@ export const V1alpha1RoleBindingApiFp = function(configuration?: Configuration) 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async updatev1alpha1RoleBinding(name: string, roleBinding?: RoleBinding, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<RoleBinding>> {
-            const localVarAxiosArgs = await localVarAxiosParamCreator.updatev1alpha1RoleBinding(name, roleBinding, options);
+        async updateV1alpha1RoleBinding(name: string, roleBinding?: RoleBinding, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<RoleBinding>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.updateV1alpha1RoleBinding(name, roleBinding, options);
             const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
-            const localVarOperationServerBasePath = operationServerMap['V1alpha1RoleBindingApi.updatev1alpha1RoleBinding']?.[localVarOperationServerIndex]?.url;
+            const localVarOperationServerBasePath = operationServerMap['V1alpha1RoleBindingApi.updateV1alpha1RoleBinding']?.[localVarOperationServerIndex]?.url;
             return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
         },
     }
@@ -348,153 +348,153 @@ export const V1alpha1RoleBindingApiFactory = function (configuration?: Configura
     return {
         /**
          * Create v1alpha1/RoleBinding
-         * @param {V1alpha1RoleBindingApiCreatev1alpha1RoleBindingRequest} requestParameters Request parameters.
+         * @param {V1alpha1RoleBindingApiCreateV1alpha1RoleBindingRequest} requestParameters Request parameters.
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        createv1alpha1RoleBinding(requestParameters: V1alpha1RoleBindingApiCreatev1alpha1RoleBindingRequest = {}, options?: RawAxiosRequestConfig): AxiosPromise<RoleBinding> {
-            return localVarFp.createv1alpha1RoleBinding(requestParameters.roleBinding, options).then((request) => request(axios, basePath));
+        createV1alpha1RoleBinding(requestParameters: V1alpha1RoleBindingApiCreateV1alpha1RoleBindingRequest = {}, options?: RawAxiosRequestConfig): AxiosPromise<RoleBinding> {
+            return localVarFp.createV1alpha1RoleBinding(requestParameters.roleBinding, options).then((request) => request(axios, basePath));
         },
         /**
          * Delete v1alpha1/RoleBinding
-         * @param {V1alpha1RoleBindingApiDeletev1alpha1RoleBindingRequest} requestParameters Request parameters.
+         * @param {V1alpha1RoleBindingApiDeleteV1alpha1RoleBindingRequest} requestParameters Request parameters.
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        deletev1alpha1RoleBinding(requestParameters: V1alpha1RoleBindingApiDeletev1alpha1RoleBindingRequest, options?: RawAxiosRequestConfig): AxiosPromise<void> {
-            return localVarFp.deletev1alpha1RoleBinding(requestParameters.name, options).then((request) => request(axios, basePath));
+        deleteV1alpha1RoleBinding(requestParameters: V1alpha1RoleBindingApiDeleteV1alpha1RoleBindingRequest, options?: RawAxiosRequestConfig): AxiosPromise<void> {
+            return localVarFp.deleteV1alpha1RoleBinding(requestParameters.name, options).then((request) => request(axios, basePath));
         },
         /**
          * Get v1alpha1/RoleBinding
-         * @param {V1alpha1RoleBindingApiGetv1alpha1RoleBindingRequest} requestParameters Request parameters.
+         * @param {V1alpha1RoleBindingApiGetV1alpha1RoleBindingRequest} requestParameters Request parameters.
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        getv1alpha1RoleBinding(requestParameters: V1alpha1RoleBindingApiGetv1alpha1RoleBindingRequest, options?: RawAxiosRequestConfig): AxiosPromise<RoleBinding> {
-            return localVarFp.getv1alpha1RoleBinding(requestParameters.name, options).then((request) => request(axios, basePath));
+        getV1alpha1RoleBinding(requestParameters: V1alpha1RoleBindingApiGetV1alpha1RoleBindingRequest, options?: RawAxiosRequestConfig): AxiosPromise<RoleBinding> {
+            return localVarFp.getV1alpha1RoleBinding(requestParameters.name, options).then((request) => request(axios, basePath));
         },
         /**
          * List v1alpha1/RoleBinding
-         * @param {V1alpha1RoleBindingApiListv1alpha1RoleBindingRequest} requestParameters Request parameters.
+         * @param {V1alpha1RoleBindingApiListV1alpha1RoleBindingRequest} requestParameters Request parameters.
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        listv1alpha1RoleBinding(requestParameters: V1alpha1RoleBindingApiListv1alpha1RoleBindingRequest = {}, options?: RawAxiosRequestConfig): AxiosPromise<RoleBindingList> {
-            return localVarFp.listv1alpha1RoleBinding(requestParameters.page, requestParameters.size, requestParameters.labelSelector, requestParameters.fieldSelector, requestParameters.sort, options).then((request) => request(axios, basePath));
+        listV1alpha1RoleBinding(requestParameters: V1alpha1RoleBindingApiListV1alpha1RoleBindingRequest = {}, options?: RawAxiosRequestConfig): AxiosPromise<RoleBindingList> {
+            return localVarFp.listV1alpha1RoleBinding(requestParameters.page, requestParameters.size, requestParameters.labelSelector, requestParameters.fieldSelector, requestParameters.sort, options).then((request) => request(axios, basePath));
         },
         /**
          * Update v1alpha1/RoleBinding
-         * @param {V1alpha1RoleBindingApiUpdatev1alpha1RoleBindingRequest} requestParameters Request parameters.
+         * @param {V1alpha1RoleBindingApiUpdateV1alpha1RoleBindingRequest} requestParameters Request parameters.
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        updatev1alpha1RoleBinding(requestParameters: V1alpha1RoleBindingApiUpdatev1alpha1RoleBindingRequest, options?: RawAxiosRequestConfig): AxiosPromise<RoleBinding> {
-            return localVarFp.updatev1alpha1RoleBinding(requestParameters.name, requestParameters.roleBinding, options).then((request) => request(axios, basePath));
+        updateV1alpha1RoleBinding(requestParameters: V1alpha1RoleBindingApiUpdateV1alpha1RoleBindingRequest, options?: RawAxiosRequestConfig): AxiosPromise<RoleBinding> {
+            return localVarFp.updateV1alpha1RoleBinding(requestParameters.name, requestParameters.roleBinding, options).then((request) => request(axios, basePath));
         },
     };
 };
 
 /**
- * Request parameters for createv1alpha1RoleBinding operation in V1alpha1RoleBindingApi.
+ * Request parameters for createV1alpha1RoleBinding operation in V1alpha1RoleBindingApi.
  * @export
- * @interface V1alpha1RoleBindingApiCreatev1alpha1RoleBindingRequest
+ * @interface V1alpha1RoleBindingApiCreateV1alpha1RoleBindingRequest
  */
-export interface V1alpha1RoleBindingApiCreatev1alpha1RoleBindingRequest {
+export interface V1alpha1RoleBindingApiCreateV1alpha1RoleBindingRequest {
     /**
      * Fresh rolebinding
      * @type {RoleBinding}
-     * @memberof V1alpha1RoleBindingApiCreatev1alpha1RoleBinding
+     * @memberof V1alpha1RoleBindingApiCreateV1alpha1RoleBinding
      */
     readonly roleBinding?: RoleBinding
 }
 
 /**
- * Request parameters for deletev1alpha1RoleBinding operation in V1alpha1RoleBindingApi.
+ * Request parameters for deleteV1alpha1RoleBinding operation in V1alpha1RoleBindingApi.
  * @export
- * @interface V1alpha1RoleBindingApiDeletev1alpha1RoleBindingRequest
+ * @interface V1alpha1RoleBindingApiDeleteV1alpha1RoleBindingRequest
  */
-export interface V1alpha1RoleBindingApiDeletev1alpha1RoleBindingRequest {
+export interface V1alpha1RoleBindingApiDeleteV1alpha1RoleBindingRequest {
     /**
      * Name of rolebinding
      * @type {string}
-     * @memberof V1alpha1RoleBindingApiDeletev1alpha1RoleBinding
+     * @memberof V1alpha1RoleBindingApiDeleteV1alpha1RoleBinding
      */
     readonly name: string
 }
 
 /**
- * Request parameters for getv1alpha1RoleBinding operation in V1alpha1RoleBindingApi.
+ * Request parameters for getV1alpha1RoleBinding operation in V1alpha1RoleBindingApi.
  * @export
- * @interface V1alpha1RoleBindingApiGetv1alpha1RoleBindingRequest
+ * @interface V1alpha1RoleBindingApiGetV1alpha1RoleBindingRequest
  */
-export interface V1alpha1RoleBindingApiGetv1alpha1RoleBindingRequest {
+export interface V1alpha1RoleBindingApiGetV1alpha1RoleBindingRequest {
     /**
      * Name of rolebinding
      * @type {string}
-     * @memberof V1alpha1RoleBindingApiGetv1alpha1RoleBinding
+     * @memberof V1alpha1RoleBindingApiGetV1alpha1RoleBinding
      */
     readonly name: string
 }
 
 /**
- * Request parameters for listv1alpha1RoleBinding operation in V1alpha1RoleBindingApi.
+ * Request parameters for listV1alpha1RoleBinding operation in V1alpha1RoleBindingApi.
  * @export
- * @interface V1alpha1RoleBindingApiListv1alpha1RoleBindingRequest
+ * @interface V1alpha1RoleBindingApiListV1alpha1RoleBindingRequest
  */
-export interface V1alpha1RoleBindingApiListv1alpha1RoleBindingRequest {
+export interface V1alpha1RoleBindingApiListV1alpha1RoleBindingRequest {
     /**
      * Page number. Default is 0.
      * @type {number}
-     * @memberof V1alpha1RoleBindingApiListv1alpha1RoleBinding
+     * @memberof V1alpha1RoleBindingApiListV1alpha1RoleBinding
      */
     readonly page?: number
 
     /**
      * Size number. Default is 0.
      * @type {number}
-     * @memberof V1alpha1RoleBindingApiListv1alpha1RoleBinding
+     * @memberof V1alpha1RoleBindingApiListV1alpha1RoleBinding
      */
     readonly size?: number
 
     /**
      * Label selector. e.g.: hidden!&#x3D;true
      * @type {Array<string>}
-     * @memberof V1alpha1RoleBindingApiListv1alpha1RoleBinding
+     * @memberof V1alpha1RoleBindingApiListV1alpha1RoleBinding
      */
     readonly labelSelector?: Array<string>
 
     /**
      * Field selector. e.g.: metadata.name&#x3D;&#x3D;halo
      * @type {Array<string>}
-     * @memberof V1alpha1RoleBindingApiListv1alpha1RoleBinding
+     * @memberof V1alpha1RoleBindingApiListV1alpha1RoleBinding
      */
     readonly fieldSelector?: Array<string>
 
     /**
      * Sorting criteria in the format: property,(asc|desc). Default sort order is ascending. Multiple sort criteria are supported.
      * @type {Array<string>}
-     * @memberof V1alpha1RoleBindingApiListv1alpha1RoleBinding
+     * @memberof V1alpha1RoleBindingApiListV1alpha1RoleBinding
      */
     readonly sort?: Array<string>
 }
 
 /**
- * Request parameters for updatev1alpha1RoleBinding operation in V1alpha1RoleBindingApi.
+ * Request parameters for updateV1alpha1RoleBinding operation in V1alpha1RoleBindingApi.
  * @export
- * @interface V1alpha1RoleBindingApiUpdatev1alpha1RoleBindingRequest
+ * @interface V1alpha1RoleBindingApiUpdateV1alpha1RoleBindingRequest
  */
-export interface V1alpha1RoleBindingApiUpdatev1alpha1RoleBindingRequest {
+export interface V1alpha1RoleBindingApiUpdateV1alpha1RoleBindingRequest {
     /**
      * Name of rolebinding
      * @type {string}
-     * @memberof V1alpha1RoleBindingApiUpdatev1alpha1RoleBinding
+     * @memberof V1alpha1RoleBindingApiUpdateV1alpha1RoleBinding
      */
     readonly name: string
 
     /**
      * Updated rolebinding
      * @type {RoleBinding}
-     * @memberof V1alpha1RoleBindingApiUpdatev1alpha1RoleBinding
+     * @memberof V1alpha1RoleBindingApiUpdateV1alpha1RoleBinding
      */
     readonly roleBinding?: RoleBinding
 }
@@ -508,57 +508,57 @@ export interface V1alpha1RoleBindingApiUpdatev1alpha1RoleBindingRequest {
 export class V1alpha1RoleBindingApi extends BaseAPI {
     /**
      * Create v1alpha1/RoleBinding
-     * @param {V1alpha1RoleBindingApiCreatev1alpha1RoleBindingRequest} requestParameters Request parameters.
+     * @param {V1alpha1RoleBindingApiCreateV1alpha1RoleBindingRequest} requestParameters Request parameters.
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      * @memberof V1alpha1RoleBindingApi
      */
-    public createv1alpha1RoleBinding(requestParameters: V1alpha1RoleBindingApiCreatev1alpha1RoleBindingRequest = {}, options?: RawAxiosRequestConfig) {
-        return V1alpha1RoleBindingApiFp(this.configuration).createv1alpha1RoleBinding(requestParameters.roleBinding, options).then((request) => request(this.axios, this.basePath));
+    public createV1alpha1RoleBinding(requestParameters: V1alpha1RoleBindingApiCreateV1alpha1RoleBindingRequest = {}, options?: RawAxiosRequestConfig) {
+        return V1alpha1RoleBindingApiFp(this.configuration).createV1alpha1RoleBinding(requestParameters.roleBinding, options).then((request) => request(this.axios, this.basePath));
     }
 
     /**
      * Delete v1alpha1/RoleBinding
-     * @param {V1alpha1RoleBindingApiDeletev1alpha1RoleBindingRequest} requestParameters Request parameters.
+     * @param {V1alpha1RoleBindingApiDeleteV1alpha1RoleBindingRequest} requestParameters Request parameters.
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      * @memberof V1alpha1RoleBindingApi
      */
-    public deletev1alpha1RoleBinding(requestParameters: V1alpha1RoleBindingApiDeletev1alpha1RoleBindingRequest, options?: RawAxiosRequestConfig) {
-        return V1alpha1RoleBindingApiFp(this.configuration).deletev1alpha1RoleBinding(requestParameters.name, options).then((request) => request(this.axios, this.basePath));
+    public deleteV1alpha1RoleBinding(requestParameters: V1alpha1RoleBindingApiDeleteV1alpha1RoleBindingRequest, options?: RawAxiosRequestConfig) {
+        return V1alpha1RoleBindingApiFp(this.configuration).deleteV1alpha1RoleBinding(requestParameters.name, options).then((request) => request(this.axios, this.basePath));
     }
 
     /**
      * Get v1alpha1/RoleBinding
-     * @param {V1alpha1RoleBindingApiGetv1alpha1RoleBindingRequest} requestParameters Request parameters.
+     * @param {V1alpha1RoleBindingApiGetV1alpha1RoleBindingRequest} requestParameters Request parameters.
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      * @memberof V1alpha1RoleBindingApi
      */
-    public getv1alpha1RoleBinding(requestParameters: V1alpha1RoleBindingApiGetv1alpha1RoleBindingRequest, options?: RawAxiosRequestConfig) {
-        return V1alpha1RoleBindingApiFp(this.configuration).getv1alpha1RoleBinding(requestParameters.name, options).then((request) => request(this.axios, this.basePath));
+    public getV1alpha1RoleBinding(requestParameters: V1alpha1RoleBindingApiGetV1alpha1RoleBindingRequest, options?: RawAxiosRequestConfig) {
+        return V1alpha1RoleBindingApiFp(this.configuration).getV1alpha1RoleBinding(requestParameters.name, options).then((request) => request(this.axios, this.basePath));
     }
 
     /**
      * List v1alpha1/RoleBinding
-     * @param {V1alpha1RoleBindingApiListv1alpha1RoleBindingRequest} requestParameters Request parameters.
+     * @param {V1alpha1RoleBindingApiListV1alpha1RoleBindingRequest} requestParameters Request parameters.
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      * @memberof V1alpha1RoleBindingApi
      */
-    public listv1alpha1RoleBinding(requestParameters: V1alpha1RoleBindingApiListv1alpha1RoleBindingRequest = {}, options?: RawAxiosRequestConfig) {
-        return V1alpha1RoleBindingApiFp(this.configuration).listv1alpha1RoleBinding(requestParameters.page, requestParameters.size, requestParameters.labelSelector, requestParameters.fieldSelector, requestParameters.sort, options).then((request) => request(this.axios, this.basePath));
+    public listV1alpha1RoleBinding(requestParameters: V1alpha1RoleBindingApiListV1alpha1RoleBindingRequest = {}, options?: RawAxiosRequestConfig) {
+        return V1alpha1RoleBindingApiFp(this.configuration).listV1alpha1RoleBinding(requestParameters.page, requestParameters.size, requestParameters.labelSelector, requestParameters.fieldSelector, requestParameters.sort, options).then((request) => request(this.axios, this.basePath));
     }
 
     /**
      * Update v1alpha1/RoleBinding
-     * @param {V1alpha1RoleBindingApiUpdatev1alpha1RoleBindingRequest} requestParameters Request parameters.
+     * @param {V1alpha1RoleBindingApiUpdateV1alpha1RoleBindingRequest} requestParameters Request parameters.
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      * @memberof V1alpha1RoleBindingApi
      */
-    public updatev1alpha1RoleBinding(requestParameters: V1alpha1RoleBindingApiUpdatev1alpha1RoleBindingRequest, options?: RawAxiosRequestConfig) {
-        return V1alpha1RoleBindingApiFp(this.configuration).updatev1alpha1RoleBinding(requestParameters.name, requestParameters.roleBinding, options).then((request) => request(this.axios, this.basePath));
+    public updateV1alpha1RoleBinding(requestParameters: V1alpha1RoleBindingApiUpdateV1alpha1RoleBindingRequest, options?: RawAxiosRequestConfig) {
+        return V1alpha1RoleBindingApiFp(this.configuration).updateV1alpha1RoleBinding(requestParameters.name, requestParameters.roleBinding, options).then((request) => request(this.axios, this.basePath));
     }
 }
 

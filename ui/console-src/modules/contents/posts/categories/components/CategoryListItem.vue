@@ -68,7 +68,7 @@ const handleDelete = async (category: CategoryTree) => {
     cancelText: t("core.common.buttons.cancel"),
     onConfirm: async () => {
       try {
-        await apiClient.extension.category.deletecontentHaloRunV1alpha1Category(
+        await apiClient.extension.category.deleteContentHaloRunV1alpha1Category(
           {
             name: category.metadata.name,
           }

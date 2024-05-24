@@ -136,7 +136,7 @@ const handleDelete = async (user: User) => {
     cancelText: t("core.common.buttons.cancel"),
     onConfirm: async () => {
       try {
-        await apiClient.extension.user.deletev1alpha1User({
+        await apiClient.extension.user.deleteV1alpha1User({
           name: user.metadata.name,
         });
 
@@ -163,7 +163,7 @@ const handleDeleteInBatch = async () => {
       );
       await Promise.all(
         userNamesToDelete.map((name) => {
-          return apiClient.extension.user.deletev1alpha1User({
+          return apiClient.extension.user.deleteV1alpha1User({
             name,
           });
         })

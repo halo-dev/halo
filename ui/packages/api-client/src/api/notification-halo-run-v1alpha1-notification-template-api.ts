@@ -37,7 +37,7 @@ export const NotificationHaloRunV1alpha1NotificationTemplateApiAxiosParamCreator
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        createnotificationHaloRunV1alpha1NotificationTemplate: async (notificationTemplate?: NotificationTemplate, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+        createNotificationHaloRunV1alpha1NotificationTemplate: async (notificationTemplate?: NotificationTemplate, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
             const localVarPath = `/apis/notification.halo.run/v1alpha1/notificationtemplates`;
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
@@ -78,9 +78,9 @@ export const NotificationHaloRunV1alpha1NotificationTemplateApiAxiosParamCreator
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        deletenotificationHaloRunV1alpha1NotificationTemplate: async (name: string, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+        deleteNotificationHaloRunV1alpha1NotificationTemplate: async (name: string, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
             // verify required parameter 'name' is not null or undefined
-            assertParamExists('deletenotificationHaloRunV1alpha1NotificationTemplate', 'name', name)
+            assertParamExists('deleteNotificationHaloRunV1alpha1NotificationTemplate', 'name', name)
             const localVarPath = `/apis/notification.halo.run/v1alpha1/notificationtemplates/{name}`
                 .replace(`{${"name"}}`, encodeURIComponent(String(name)));
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
@@ -119,9 +119,9 @@ export const NotificationHaloRunV1alpha1NotificationTemplateApiAxiosParamCreator
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        getnotificationHaloRunV1alpha1NotificationTemplate: async (name: string, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+        getNotificationHaloRunV1alpha1NotificationTemplate: async (name: string, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
             // verify required parameter 'name' is not null or undefined
-            assertParamExists('getnotificationHaloRunV1alpha1NotificationTemplate', 'name', name)
+            assertParamExists('getNotificationHaloRunV1alpha1NotificationTemplate', 'name', name)
             const localVarPath = `/apis/notification.halo.run/v1alpha1/notificationtemplates/{name}`
                 .replace(`{${"name"}}`, encodeURIComponent(String(name)));
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
@@ -164,7 +164,7 @@ export const NotificationHaloRunV1alpha1NotificationTemplateApiAxiosParamCreator
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        listnotificationHaloRunV1alpha1NotificationTemplate: async (page?: number, size?: number, labelSelector?: Array<string>, fieldSelector?: Array<string>, sort?: Array<string>, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+        listNotificationHaloRunV1alpha1NotificationTemplate: async (page?: number, size?: number, labelSelector?: Array<string>, fieldSelector?: Array<string>, sort?: Array<string>, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
             const localVarPath = `/apis/notification.halo.run/v1alpha1/notificationtemplates`;
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
@@ -223,9 +223,9 @@ export const NotificationHaloRunV1alpha1NotificationTemplateApiAxiosParamCreator
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        updatenotificationHaloRunV1alpha1NotificationTemplate: async (name: string, notificationTemplate?: NotificationTemplate, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+        updateNotificationHaloRunV1alpha1NotificationTemplate: async (name: string, notificationTemplate?: NotificationTemplate, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
             // verify required parameter 'name' is not null or undefined
-            assertParamExists('updatenotificationHaloRunV1alpha1NotificationTemplate', 'name', name)
+            assertParamExists('updateNotificationHaloRunV1alpha1NotificationTemplate', 'name', name)
             const localVarPath = `/apis/notification.halo.run/v1alpha1/notificationtemplates/{name}`
                 .replace(`{${"name"}}`, encodeURIComponent(String(name)));
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
@@ -277,10 +277,10 @@ export const NotificationHaloRunV1alpha1NotificationTemplateApiFp = function(con
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async createnotificationHaloRunV1alpha1NotificationTemplate(notificationTemplate?: NotificationTemplate, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<NotificationTemplate>> {
-            const localVarAxiosArgs = await localVarAxiosParamCreator.createnotificationHaloRunV1alpha1NotificationTemplate(notificationTemplate, options);
+        async createNotificationHaloRunV1alpha1NotificationTemplate(notificationTemplate?: NotificationTemplate, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<NotificationTemplate>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.createNotificationHaloRunV1alpha1NotificationTemplate(notificationTemplate, options);
             const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
-            const localVarOperationServerBasePath = operationServerMap['NotificationHaloRunV1alpha1NotificationTemplateApi.createnotificationHaloRunV1alpha1NotificationTemplate']?.[localVarOperationServerIndex]?.url;
+            const localVarOperationServerBasePath = operationServerMap['NotificationHaloRunV1alpha1NotificationTemplateApi.createNotificationHaloRunV1alpha1NotificationTemplate']?.[localVarOperationServerIndex]?.url;
             return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
         },
         /**
@@ -289,10 +289,10 @@ export const NotificationHaloRunV1alpha1NotificationTemplateApiFp = function(con
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async deletenotificationHaloRunV1alpha1NotificationTemplate(name: string, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<void>> {
-            const localVarAxiosArgs = await localVarAxiosParamCreator.deletenotificationHaloRunV1alpha1NotificationTemplate(name, options);
+        async deleteNotificationHaloRunV1alpha1NotificationTemplate(name: string, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<void>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.deleteNotificationHaloRunV1alpha1NotificationTemplate(name, options);
             const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
-            const localVarOperationServerBasePath = operationServerMap['NotificationHaloRunV1alpha1NotificationTemplateApi.deletenotificationHaloRunV1alpha1NotificationTemplate']?.[localVarOperationServerIndex]?.url;
+            const localVarOperationServerBasePath = operationServerMap['NotificationHaloRunV1alpha1NotificationTemplateApi.deleteNotificationHaloRunV1alpha1NotificationTemplate']?.[localVarOperationServerIndex]?.url;
             return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
         },
         /**
@@ -301,10 +301,10 @@ export const NotificationHaloRunV1alpha1NotificationTemplateApiFp = function(con
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async getnotificationHaloRunV1alpha1NotificationTemplate(name: string, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<NotificationTemplate>> {
-            const localVarAxiosArgs = await localVarAxiosParamCreator.getnotificationHaloRunV1alpha1NotificationTemplate(name, options);
+        async getNotificationHaloRunV1alpha1NotificationTemplate(name: string, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<NotificationTemplate>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.getNotificationHaloRunV1alpha1NotificationTemplate(name, options);
             const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
-            const localVarOperationServerBasePath = operationServerMap['NotificationHaloRunV1alpha1NotificationTemplateApi.getnotificationHaloRunV1alpha1NotificationTemplate']?.[localVarOperationServerIndex]?.url;
+            const localVarOperationServerBasePath = operationServerMap['NotificationHaloRunV1alpha1NotificationTemplateApi.getNotificationHaloRunV1alpha1NotificationTemplate']?.[localVarOperationServerIndex]?.url;
             return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
         },
         /**
@@ -317,10 +317,10 @@ export const NotificationHaloRunV1alpha1NotificationTemplateApiFp = function(con
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async listnotificationHaloRunV1alpha1NotificationTemplate(page?: number, size?: number, labelSelector?: Array<string>, fieldSelector?: Array<string>, sort?: Array<string>, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<NotificationTemplateList>> {
-            const localVarAxiosArgs = await localVarAxiosParamCreator.listnotificationHaloRunV1alpha1NotificationTemplate(page, size, labelSelector, fieldSelector, sort, options);
+        async listNotificationHaloRunV1alpha1NotificationTemplate(page?: number, size?: number, labelSelector?: Array<string>, fieldSelector?: Array<string>, sort?: Array<string>, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<NotificationTemplateList>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.listNotificationHaloRunV1alpha1NotificationTemplate(page, size, labelSelector, fieldSelector, sort, options);
             const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
-            const localVarOperationServerBasePath = operationServerMap['NotificationHaloRunV1alpha1NotificationTemplateApi.listnotificationHaloRunV1alpha1NotificationTemplate']?.[localVarOperationServerIndex]?.url;
+            const localVarOperationServerBasePath = operationServerMap['NotificationHaloRunV1alpha1NotificationTemplateApi.listNotificationHaloRunV1alpha1NotificationTemplate']?.[localVarOperationServerIndex]?.url;
             return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
         },
         /**
@@ -330,10 +330,10 @@ export const NotificationHaloRunV1alpha1NotificationTemplateApiFp = function(con
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async updatenotificationHaloRunV1alpha1NotificationTemplate(name: string, notificationTemplate?: NotificationTemplate, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<NotificationTemplate>> {
-            const localVarAxiosArgs = await localVarAxiosParamCreator.updatenotificationHaloRunV1alpha1NotificationTemplate(name, notificationTemplate, options);
+        async updateNotificationHaloRunV1alpha1NotificationTemplate(name: string, notificationTemplate?: NotificationTemplate, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<NotificationTemplate>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.updateNotificationHaloRunV1alpha1NotificationTemplate(name, notificationTemplate, options);
             const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
-            const localVarOperationServerBasePath = operationServerMap['NotificationHaloRunV1alpha1NotificationTemplateApi.updatenotificationHaloRunV1alpha1NotificationTemplate']?.[localVarOperationServerIndex]?.url;
+            const localVarOperationServerBasePath = operationServerMap['NotificationHaloRunV1alpha1NotificationTemplateApi.updateNotificationHaloRunV1alpha1NotificationTemplate']?.[localVarOperationServerIndex]?.url;
             return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
         },
     }
@@ -348,153 +348,153 @@ export const NotificationHaloRunV1alpha1NotificationTemplateApiFactory = functio
     return {
         /**
          * Create notification.halo.run/v1alpha1/NotificationTemplate
-         * @param {NotificationHaloRunV1alpha1NotificationTemplateApiCreatenotificationHaloRunV1alpha1NotificationTemplateRequest} requestParameters Request parameters.
+         * @param {NotificationHaloRunV1alpha1NotificationTemplateApiCreateNotificationHaloRunV1alpha1NotificationTemplateRequest} requestParameters Request parameters.
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        createnotificationHaloRunV1alpha1NotificationTemplate(requestParameters: NotificationHaloRunV1alpha1NotificationTemplateApiCreatenotificationHaloRunV1alpha1NotificationTemplateRequest = {}, options?: RawAxiosRequestConfig): AxiosPromise<NotificationTemplate> {
-            return localVarFp.createnotificationHaloRunV1alpha1NotificationTemplate(requestParameters.notificationTemplate, options).then((request) => request(axios, basePath));
+        createNotificationHaloRunV1alpha1NotificationTemplate(requestParameters: NotificationHaloRunV1alpha1NotificationTemplateApiCreateNotificationHaloRunV1alpha1NotificationTemplateRequest = {}, options?: RawAxiosRequestConfig): AxiosPromise<NotificationTemplate> {
+            return localVarFp.createNotificationHaloRunV1alpha1NotificationTemplate(requestParameters.notificationTemplate, options).then((request) => request(axios, basePath));
         },
         /**
          * Delete notification.halo.run/v1alpha1/NotificationTemplate
-         * @param {NotificationHaloRunV1alpha1NotificationTemplateApiDeletenotificationHaloRunV1alpha1NotificationTemplateRequest} requestParameters Request parameters.
+         * @param {NotificationHaloRunV1alpha1NotificationTemplateApiDeleteNotificationHaloRunV1alpha1NotificationTemplateRequest} requestParameters Request parameters.
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        deletenotificationHaloRunV1alpha1NotificationTemplate(requestParameters: NotificationHaloRunV1alpha1NotificationTemplateApiDeletenotificationHaloRunV1alpha1NotificationTemplateRequest, options?: RawAxiosRequestConfig): AxiosPromise<void> {
-            return localVarFp.deletenotificationHaloRunV1alpha1NotificationTemplate(requestParameters.name, options).then((request) => request(axios, basePath));
+        deleteNotificationHaloRunV1alpha1NotificationTemplate(requestParameters: NotificationHaloRunV1alpha1NotificationTemplateApiDeleteNotificationHaloRunV1alpha1NotificationTemplateRequest, options?: RawAxiosRequestConfig): AxiosPromise<void> {
+            return localVarFp.deleteNotificationHaloRunV1alpha1NotificationTemplate(requestParameters.name, options).then((request) => request(axios, basePath));
         },
         /**
          * Get notification.halo.run/v1alpha1/NotificationTemplate
-         * @param {NotificationHaloRunV1alpha1NotificationTemplateApiGetnotificationHaloRunV1alpha1NotificationTemplateRequest} requestParameters Request parameters.
+         * @param {NotificationHaloRunV1alpha1NotificationTemplateApiGetNotificationHaloRunV1alpha1NotificationTemplateRequest} requestParameters Request parameters.
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        getnotificationHaloRunV1alpha1NotificationTemplate(requestParameters: NotificationHaloRunV1alpha1NotificationTemplateApiGetnotificationHaloRunV1alpha1NotificationTemplateRequest, options?: RawAxiosRequestConfig): AxiosPromise<NotificationTemplate> {
-            return localVarFp.getnotificationHaloRunV1alpha1NotificationTemplate(requestParameters.name, options).then((request) => request(axios, basePath));
+        getNotificationHaloRunV1alpha1NotificationTemplate(requestParameters: NotificationHaloRunV1alpha1NotificationTemplateApiGetNotificationHaloRunV1alpha1NotificationTemplateRequest, options?: RawAxiosRequestConfig): AxiosPromise<NotificationTemplate> {
+            return localVarFp.getNotificationHaloRunV1alpha1NotificationTemplate(requestParameters.name, options).then((request) => request(axios, basePath));
         },
         /**
          * List notification.halo.run/v1alpha1/NotificationTemplate
-         * @param {NotificationHaloRunV1alpha1NotificationTemplateApiListnotificationHaloRunV1alpha1NotificationTemplateRequest} requestParameters Request parameters.
+         * @param {NotificationHaloRunV1alpha1NotificationTemplateApiListNotificationHaloRunV1alpha1NotificationTemplateRequest} requestParameters Request parameters.
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        listnotificationHaloRunV1alpha1NotificationTemplate(requestParameters: NotificationHaloRunV1alpha1NotificationTemplateApiListnotificationHaloRunV1alpha1NotificationTemplateRequest = {}, options?: RawAxiosRequestConfig): AxiosPromise<NotificationTemplateList> {
-            return localVarFp.listnotificationHaloRunV1alpha1NotificationTemplate(requestParameters.page, requestParameters.size, requestParameters.labelSelector, requestParameters.fieldSelector, requestParameters.sort, options).then((request) => request(axios, basePath));
+        listNotificationHaloRunV1alpha1NotificationTemplate(requestParameters: NotificationHaloRunV1alpha1NotificationTemplateApiListNotificationHaloRunV1alpha1NotificationTemplateRequest = {}, options?: RawAxiosRequestConfig): AxiosPromise<NotificationTemplateList> {
+            return localVarFp.listNotificationHaloRunV1alpha1NotificationTemplate(requestParameters.page, requestParameters.size, requestParameters.labelSelector, requestParameters.fieldSelector, requestParameters.sort, options).then((request) => request(axios, basePath));
         },
         /**
          * Update notification.halo.run/v1alpha1/NotificationTemplate
-         * @param {NotificationHaloRunV1alpha1NotificationTemplateApiUpdatenotificationHaloRunV1alpha1NotificationTemplateRequest} requestParameters Request parameters.
+         * @param {NotificationHaloRunV1alpha1NotificationTemplateApiUpdateNotificationHaloRunV1alpha1NotificationTemplateRequest} requestParameters Request parameters.
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        updatenotificationHaloRunV1alpha1NotificationTemplate(requestParameters: NotificationHaloRunV1alpha1NotificationTemplateApiUpdatenotificationHaloRunV1alpha1NotificationTemplateRequest, options?: RawAxiosRequestConfig): AxiosPromise<NotificationTemplate> {
-            return localVarFp.updatenotificationHaloRunV1alpha1NotificationTemplate(requestParameters.name, requestParameters.notificationTemplate, options).then((request) => request(axios, basePath));
+        updateNotificationHaloRunV1alpha1NotificationTemplate(requestParameters: NotificationHaloRunV1alpha1NotificationTemplateApiUpdateNotificationHaloRunV1alpha1NotificationTemplateRequest, options?: RawAxiosRequestConfig): AxiosPromise<NotificationTemplate> {
+            return localVarFp.updateNotificationHaloRunV1alpha1NotificationTemplate(requestParameters.name, requestParameters.notificationTemplate, options).then((request) => request(axios, basePath));
         },
     };
 };
 
 /**
- * Request parameters for createnotificationHaloRunV1alpha1NotificationTemplate operation in NotificationHaloRunV1alpha1NotificationTemplateApi.
+ * Request parameters for createNotificationHaloRunV1alpha1NotificationTemplate operation in NotificationHaloRunV1alpha1NotificationTemplateApi.
  * @export
- * @interface NotificationHaloRunV1alpha1NotificationTemplateApiCreatenotificationHaloRunV1alpha1NotificationTemplateRequest
+ * @interface NotificationHaloRunV1alpha1NotificationTemplateApiCreateNotificationHaloRunV1alpha1NotificationTemplateRequest
  */
-export interface NotificationHaloRunV1alpha1NotificationTemplateApiCreatenotificationHaloRunV1alpha1NotificationTemplateRequest {
+export interface NotificationHaloRunV1alpha1NotificationTemplateApiCreateNotificationHaloRunV1alpha1NotificationTemplateRequest {
     /**
      * Fresh notificationtemplate
      * @type {NotificationTemplate}
-     * @memberof NotificationHaloRunV1alpha1NotificationTemplateApiCreatenotificationHaloRunV1alpha1NotificationTemplate
+     * @memberof NotificationHaloRunV1alpha1NotificationTemplateApiCreateNotificationHaloRunV1alpha1NotificationTemplate
      */
     readonly notificationTemplate?: NotificationTemplate
 }
 
 /**
- * Request parameters for deletenotificationHaloRunV1alpha1NotificationTemplate operation in NotificationHaloRunV1alpha1NotificationTemplateApi.
+ * Request parameters for deleteNotificationHaloRunV1alpha1NotificationTemplate operation in NotificationHaloRunV1alpha1NotificationTemplateApi.
  * @export
- * @interface NotificationHaloRunV1alpha1NotificationTemplateApiDeletenotificationHaloRunV1alpha1NotificationTemplateRequest
+ * @interface NotificationHaloRunV1alpha1NotificationTemplateApiDeleteNotificationHaloRunV1alpha1NotificationTemplateRequest
  */
-export interface NotificationHaloRunV1alpha1NotificationTemplateApiDeletenotificationHaloRunV1alpha1NotificationTemplateRequest {
+export interface NotificationHaloRunV1alpha1NotificationTemplateApiDeleteNotificationHaloRunV1alpha1NotificationTemplateRequest {
     /**
      * Name of notificationtemplate
      * @type {string}
-     * @memberof NotificationHaloRunV1alpha1NotificationTemplateApiDeletenotificationHaloRunV1alpha1NotificationTemplate
+     * @memberof NotificationHaloRunV1alpha1NotificationTemplateApiDeleteNotificationHaloRunV1alpha1NotificationTemplate
      */
     readonly name: string
 }
 
 /**
- * Request parameters for getnotificationHaloRunV1alpha1NotificationTemplate operation in NotificationHaloRunV1alpha1NotificationTemplateApi.
+ * Request parameters for getNotificationHaloRunV1alpha1NotificationTemplate operation in NotificationHaloRunV1alpha1NotificationTemplateApi.
  * @export
- * @interface NotificationHaloRunV1alpha1NotificationTemplateApiGetnotificationHaloRunV1alpha1NotificationTemplateRequest
+ * @interface NotificationHaloRunV1alpha1NotificationTemplateApiGetNotificationHaloRunV1alpha1NotificationTemplateRequest
  */
-export interface NotificationHaloRunV1alpha1NotificationTemplateApiGetnotificationHaloRunV1alpha1NotificationTemplateRequest {
+export interface NotificationHaloRunV1alpha1NotificationTemplateApiGetNotificationHaloRunV1alpha1NotificationTemplateRequest {
     /**
      * Name of notificationtemplate
      * @type {string}
-     * @memberof NotificationHaloRunV1alpha1NotificationTemplateApiGetnotificationHaloRunV1alpha1NotificationTemplate
+     * @memberof NotificationHaloRunV1alpha1NotificationTemplateApiGetNotificationHaloRunV1alpha1NotificationTemplate
      */
     readonly name: string
 }
 
 /**
- * Request parameters for listnotificationHaloRunV1alpha1NotificationTemplate operation in NotificationHaloRunV1alpha1NotificationTemplateApi.
+ * Request parameters for listNotificationHaloRunV1alpha1NotificationTemplate operation in NotificationHaloRunV1alpha1NotificationTemplateApi.
  * @export
- * @interface NotificationHaloRunV1alpha1NotificationTemplateApiListnotificationHaloRunV1alpha1NotificationTemplateRequest
+ * @interface NotificationHaloRunV1alpha1NotificationTemplateApiListNotificationHaloRunV1alpha1NotificationTemplateRequest
  */
-export interface NotificationHaloRunV1alpha1NotificationTemplateApiListnotificationHaloRunV1alpha1NotificationTemplateRequest {
+export interface NotificationHaloRunV1alpha1NotificationTemplateApiListNotificationHaloRunV1alpha1NotificationTemplateRequest {
     /**
      * Page number. Default is 0.
      * @type {number}
-     * @memberof NotificationHaloRunV1alpha1NotificationTemplateApiListnotificationHaloRunV1alpha1NotificationTemplate
+     * @memberof NotificationHaloRunV1alpha1NotificationTemplateApiListNotificationHaloRunV1alpha1NotificationTemplate
      */
     readonly page?: number
 
     /**
      * Size number. Default is 0.
      * @type {number}
-     * @memberof NotificationHaloRunV1alpha1NotificationTemplateApiListnotificationHaloRunV1alpha1NotificationTemplate
+     * @memberof NotificationHaloRunV1alpha1NotificationTemplateApiListNotificationHaloRunV1alpha1NotificationTemplate
      */
     readonly size?: number
 
     /**
      * Label selector. e.g.: hidden!&#x3D;true
      * @type {Array<string>}
-     * @memberof NotificationHaloRunV1alpha1NotificationTemplateApiListnotificationHaloRunV1alpha1NotificationTemplate
+     * @memberof NotificationHaloRunV1alpha1NotificationTemplateApiListNotificationHaloRunV1alpha1NotificationTemplate
      */
     readonly labelSelector?: Array<string>
 
     /**
      * Field selector. e.g.: metadata.name&#x3D;&#x3D;halo
      * @type {Array<string>}
-     * @memberof NotificationHaloRunV1alpha1NotificationTemplateApiListnotificationHaloRunV1alpha1NotificationTemplate
+     * @memberof NotificationHaloRunV1alpha1NotificationTemplateApiListNotificationHaloRunV1alpha1NotificationTemplate
      */
     readonly fieldSelector?: Array<string>
 
     /**
      * Sorting criteria in the format: property,(asc|desc). Default sort order is ascending. Multiple sort criteria are supported.
      * @type {Array<string>}
-     * @memberof NotificationHaloRunV1alpha1NotificationTemplateApiListnotificationHaloRunV1alpha1NotificationTemplate
+     * @memberof NotificationHaloRunV1alpha1NotificationTemplateApiListNotificationHaloRunV1alpha1NotificationTemplate
      */
     readonly sort?: Array<string>
 }
 
 /**
- * Request parameters for updatenotificationHaloRunV1alpha1NotificationTemplate operation in NotificationHaloRunV1alpha1NotificationTemplateApi.
+ * Request parameters for updateNotificationHaloRunV1alpha1NotificationTemplate operation in NotificationHaloRunV1alpha1NotificationTemplateApi.
  * @export
- * @interface NotificationHaloRunV1alpha1NotificationTemplateApiUpdatenotificationHaloRunV1alpha1NotificationTemplateRequest
+ * @interface NotificationHaloRunV1alpha1NotificationTemplateApiUpdateNotificationHaloRunV1alpha1NotificationTemplateRequest
  */
-export interface NotificationHaloRunV1alpha1NotificationTemplateApiUpdatenotificationHaloRunV1alpha1NotificationTemplateRequest {
+export interface NotificationHaloRunV1alpha1NotificationTemplateApiUpdateNotificationHaloRunV1alpha1NotificationTemplateRequest {
     /**
      * Name of notificationtemplate
      * @type {string}
-     * @memberof NotificationHaloRunV1alpha1NotificationTemplateApiUpdatenotificationHaloRunV1alpha1NotificationTemplate
+     * @memberof NotificationHaloRunV1alpha1NotificationTemplateApiUpdateNotificationHaloRunV1alpha1NotificationTemplate
      */
     readonly name: string
 
     /**
      * Updated notificationtemplate
      * @type {NotificationTemplate}
-     * @memberof NotificationHaloRunV1alpha1NotificationTemplateApiUpdatenotificationHaloRunV1alpha1NotificationTemplate
+     * @memberof NotificationHaloRunV1alpha1NotificationTemplateApiUpdateNotificationHaloRunV1alpha1NotificationTemplate
      */
     readonly notificationTemplate?: NotificationTemplate
 }
@@ -508,57 +508,57 @@ export interface NotificationHaloRunV1alpha1NotificationTemplateApiUpdatenotific
 export class NotificationHaloRunV1alpha1NotificationTemplateApi extends BaseAPI {
     /**
      * Create notification.halo.run/v1alpha1/NotificationTemplate
-     * @param {NotificationHaloRunV1alpha1NotificationTemplateApiCreatenotificationHaloRunV1alpha1NotificationTemplateRequest} requestParameters Request parameters.
+     * @param {NotificationHaloRunV1alpha1NotificationTemplateApiCreateNotificationHaloRunV1alpha1NotificationTemplateRequest} requestParameters Request parameters.
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      * @memberof NotificationHaloRunV1alpha1NotificationTemplateApi
      */
-    public createnotificationHaloRunV1alpha1NotificationTemplate(requestParameters: NotificationHaloRunV1alpha1NotificationTemplateApiCreatenotificationHaloRunV1alpha1NotificationTemplateRequest = {}, options?: RawAxiosRequestConfig) {
-        return NotificationHaloRunV1alpha1NotificationTemplateApiFp(this.configuration).createnotificationHaloRunV1alpha1NotificationTemplate(requestParameters.notificationTemplate, options).then((request) => request(this.axios, this.basePath));
+    public createNotificationHaloRunV1alpha1NotificationTemplate(requestParameters: NotificationHaloRunV1alpha1NotificationTemplateApiCreateNotificationHaloRunV1alpha1NotificationTemplateRequest = {}, options?: RawAxiosRequestConfig) {
+        return NotificationHaloRunV1alpha1NotificationTemplateApiFp(this.configuration).createNotificationHaloRunV1alpha1NotificationTemplate(requestParameters.notificationTemplate, options).then((request) => request(this.axios, this.basePath));
     }
 
     /**
      * Delete notification.halo.run/v1alpha1/NotificationTemplate
-     * @param {NotificationHaloRunV1alpha1NotificationTemplateApiDeletenotificationHaloRunV1alpha1NotificationTemplateRequest} requestParameters Request parameters.
+     * @param {NotificationHaloRunV1alpha1NotificationTemplateApiDeleteNotificationHaloRunV1alpha1NotificationTemplateRequest} requestParameters Request parameters.
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      * @memberof NotificationHaloRunV1alpha1NotificationTemplateApi
      */
-    public deletenotificationHaloRunV1alpha1NotificationTemplate(requestParameters: NotificationHaloRunV1alpha1NotificationTemplateApiDeletenotificationHaloRunV1alpha1NotificationTemplateRequest, options?: RawAxiosRequestConfig) {
-        return NotificationHaloRunV1alpha1NotificationTemplateApiFp(this.configuration).deletenotificationHaloRunV1alpha1NotificationTemplate(requestParameters.name, options).then((request) => request(this.axios, this.basePath));
+    public deleteNotificationHaloRunV1alpha1NotificationTemplate(requestParameters: NotificationHaloRunV1alpha1NotificationTemplateApiDeleteNotificationHaloRunV1alpha1NotificationTemplateRequest, options?: RawAxiosRequestConfig) {
+        return NotificationHaloRunV1alpha1NotificationTemplateApiFp(this.configuration).deleteNotificationHaloRunV1alpha1NotificationTemplate(requestParameters.name, options).then((request) => request(this.axios, this.basePath));
     }
 
     /**
      * Get notification.halo.run/v1alpha1/NotificationTemplate
-     * @param {NotificationHaloRunV1alpha1NotificationTemplateApiGetnotificationHaloRunV1alpha1NotificationTemplateRequest} requestParameters Request parameters.
+     * @param {NotificationHaloRunV1alpha1NotificationTemplateApiGetNotificationHaloRunV1alpha1NotificationTemplateRequest} requestParameters Request parameters.
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      * @memberof NotificationHaloRunV1alpha1NotificationTemplateApi
      */
-    public getnotificationHaloRunV1alpha1NotificationTemplate(requestParameters: NotificationHaloRunV1alpha1NotificationTemplateApiGetnotificationHaloRunV1alpha1NotificationTemplateRequest, options?: RawAxiosRequestConfig) {
-        return NotificationHaloRunV1alpha1NotificationTemplateApiFp(this.configuration).getnotificationHaloRunV1alpha1NotificationTemplate(requestParameters.name, options).then((request) => request(this.axios, this.basePath));
+    public getNotificationHaloRunV1alpha1NotificationTemplate(requestParameters: NotificationHaloRunV1alpha1NotificationTemplateApiGetNotificationHaloRunV1alpha1NotificationTemplateRequest, options?: RawAxiosRequestConfig) {
+        return NotificationHaloRunV1alpha1NotificationTemplateApiFp(this.configuration).getNotificationHaloRunV1alpha1NotificationTemplate(requestParameters.name, options).then((request) => request(this.axios, this.basePath));
     }
 
     /**
      * List notification.halo.run/v1alpha1/NotificationTemplate
-     * @param {NotificationHaloRunV1alpha1NotificationTemplateApiListnotificationHaloRunV1alpha1NotificationTemplateRequest} requestParameters Request parameters.
+     * @param {NotificationHaloRunV1alpha1NotificationTemplateApiListNotificationHaloRunV1alpha1NotificationTemplateRequest} requestParameters Request parameters.
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      * @memberof NotificationHaloRunV1alpha1NotificationTemplateApi
      */
-    public listnotificationHaloRunV1alpha1NotificationTemplate(requestParameters: NotificationHaloRunV1alpha1NotificationTemplateApiListnotificationHaloRunV1alpha1NotificationTemplateRequest = {}, options?: RawAxiosRequestConfig) {
-        return NotificationHaloRunV1alpha1NotificationTemplateApiFp(this.configuration).listnotificationHaloRunV1alpha1NotificationTemplate(requestParameters.page, requestParameters.size, requestParameters.labelSelector, requestParameters.fieldSelector, requestParameters.sort, options).then((request) => request(this.axios, this.basePath));
+    public listNotificationHaloRunV1alpha1NotificationTemplate(requestParameters: NotificationHaloRunV1alpha1NotificationTemplateApiListNotificationHaloRunV1alpha1NotificationTemplateRequest = {}, options?: RawAxiosRequestConfig) {
+        return NotificationHaloRunV1alpha1NotificationTemplateApiFp(this.configuration).listNotificationHaloRunV1alpha1NotificationTemplate(requestParameters.page, requestParameters.size, requestParameters.labelSelector, requestParameters.fieldSelector, requestParameters.sort, options).then((request) => request(this.axios, this.basePath));
     }
 
     /**
      * Update notification.halo.run/v1alpha1/NotificationTemplate
-     * @param {NotificationHaloRunV1alpha1NotificationTemplateApiUpdatenotificationHaloRunV1alpha1NotificationTemplateRequest} requestParameters Request parameters.
+     * @param {NotificationHaloRunV1alpha1NotificationTemplateApiUpdateNotificationHaloRunV1alpha1NotificationTemplateRequest} requestParameters Request parameters.
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      * @memberof NotificationHaloRunV1alpha1NotificationTemplateApi
      */
-    public updatenotificationHaloRunV1alpha1NotificationTemplate(requestParameters: NotificationHaloRunV1alpha1NotificationTemplateApiUpdatenotificationHaloRunV1alpha1NotificationTemplateRequest, options?: RawAxiosRequestConfig) {
-        return NotificationHaloRunV1alpha1NotificationTemplateApiFp(this.configuration).updatenotificationHaloRunV1alpha1NotificationTemplate(requestParameters.name, requestParameters.notificationTemplate, options).then((request) => request(this.axios, this.basePath));
+    public updateNotificationHaloRunV1alpha1NotificationTemplate(requestParameters: NotificationHaloRunV1alpha1NotificationTemplateApiUpdateNotificationHaloRunV1alpha1NotificationTemplateRequest, options?: RawAxiosRequestConfig) {
+        return NotificationHaloRunV1alpha1NotificationTemplateApiFp(this.configuration).updateNotificationHaloRunV1alpha1NotificationTemplate(requestParameters.name, requestParameters.notificationTemplate, options).then((request) => request(this.axios, this.basePath));
     }
 }
 

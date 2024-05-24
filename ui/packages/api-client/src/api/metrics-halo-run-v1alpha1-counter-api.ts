@@ -37,7 +37,7 @@ export const MetricsHaloRunV1alpha1CounterApiAxiosParamCreator = function (confi
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        createmetricsHaloRunV1alpha1Counter: async (counter?: Counter, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+        createMetricsHaloRunV1alpha1Counter: async (counter?: Counter, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
             const localVarPath = `/apis/metrics.halo.run/v1alpha1/counters`;
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
@@ -78,9 +78,9 @@ export const MetricsHaloRunV1alpha1CounterApiAxiosParamCreator = function (confi
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        deletemetricsHaloRunV1alpha1Counter: async (name: string, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+        deleteMetricsHaloRunV1alpha1Counter: async (name: string, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
             // verify required parameter 'name' is not null or undefined
-            assertParamExists('deletemetricsHaloRunV1alpha1Counter', 'name', name)
+            assertParamExists('deleteMetricsHaloRunV1alpha1Counter', 'name', name)
             const localVarPath = `/apis/metrics.halo.run/v1alpha1/counters/{name}`
                 .replace(`{${"name"}}`, encodeURIComponent(String(name)));
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
@@ -119,9 +119,9 @@ export const MetricsHaloRunV1alpha1CounterApiAxiosParamCreator = function (confi
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        getmetricsHaloRunV1alpha1Counter: async (name: string, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+        getMetricsHaloRunV1alpha1Counter: async (name: string, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
             // verify required parameter 'name' is not null or undefined
-            assertParamExists('getmetricsHaloRunV1alpha1Counter', 'name', name)
+            assertParamExists('getMetricsHaloRunV1alpha1Counter', 'name', name)
             const localVarPath = `/apis/metrics.halo.run/v1alpha1/counters/{name}`
                 .replace(`{${"name"}}`, encodeURIComponent(String(name)));
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
@@ -164,7 +164,7 @@ export const MetricsHaloRunV1alpha1CounterApiAxiosParamCreator = function (confi
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        listmetricsHaloRunV1alpha1Counter: async (page?: number, size?: number, labelSelector?: Array<string>, fieldSelector?: Array<string>, sort?: Array<string>, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+        listMetricsHaloRunV1alpha1Counter: async (page?: number, size?: number, labelSelector?: Array<string>, fieldSelector?: Array<string>, sort?: Array<string>, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
             const localVarPath = `/apis/metrics.halo.run/v1alpha1/counters`;
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
@@ -223,9 +223,9 @@ export const MetricsHaloRunV1alpha1CounterApiAxiosParamCreator = function (confi
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        updatemetricsHaloRunV1alpha1Counter: async (name: string, counter?: Counter, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+        updateMetricsHaloRunV1alpha1Counter: async (name: string, counter?: Counter, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
             // verify required parameter 'name' is not null or undefined
-            assertParamExists('updatemetricsHaloRunV1alpha1Counter', 'name', name)
+            assertParamExists('updateMetricsHaloRunV1alpha1Counter', 'name', name)
             const localVarPath = `/apis/metrics.halo.run/v1alpha1/counters/{name}`
                 .replace(`{${"name"}}`, encodeURIComponent(String(name)));
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
@@ -277,10 +277,10 @@ export const MetricsHaloRunV1alpha1CounterApiFp = function(configuration?: Confi
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async createmetricsHaloRunV1alpha1Counter(counter?: Counter, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<Counter>> {
-            const localVarAxiosArgs = await localVarAxiosParamCreator.createmetricsHaloRunV1alpha1Counter(counter, options);
+        async createMetricsHaloRunV1alpha1Counter(counter?: Counter, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<Counter>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.createMetricsHaloRunV1alpha1Counter(counter, options);
             const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
-            const localVarOperationServerBasePath = operationServerMap['MetricsHaloRunV1alpha1CounterApi.createmetricsHaloRunV1alpha1Counter']?.[localVarOperationServerIndex]?.url;
+            const localVarOperationServerBasePath = operationServerMap['MetricsHaloRunV1alpha1CounterApi.createMetricsHaloRunV1alpha1Counter']?.[localVarOperationServerIndex]?.url;
             return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
         },
         /**
@@ -289,10 +289,10 @@ export const MetricsHaloRunV1alpha1CounterApiFp = function(configuration?: Confi
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async deletemetricsHaloRunV1alpha1Counter(name: string, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<void>> {
-            const localVarAxiosArgs = await localVarAxiosParamCreator.deletemetricsHaloRunV1alpha1Counter(name, options);
+        async deleteMetricsHaloRunV1alpha1Counter(name: string, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<void>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.deleteMetricsHaloRunV1alpha1Counter(name, options);
             const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
-            const localVarOperationServerBasePath = operationServerMap['MetricsHaloRunV1alpha1CounterApi.deletemetricsHaloRunV1alpha1Counter']?.[localVarOperationServerIndex]?.url;
+            const localVarOperationServerBasePath = operationServerMap['MetricsHaloRunV1alpha1CounterApi.deleteMetricsHaloRunV1alpha1Counter']?.[localVarOperationServerIndex]?.url;
             return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
         },
         /**
@@ -301,10 +301,10 @@ export const MetricsHaloRunV1alpha1CounterApiFp = function(configuration?: Confi
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async getmetricsHaloRunV1alpha1Counter(name: string, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<Counter>> {
-            const localVarAxiosArgs = await localVarAxiosParamCreator.getmetricsHaloRunV1alpha1Counter(name, options);
+        async getMetricsHaloRunV1alpha1Counter(name: string, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<Counter>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.getMetricsHaloRunV1alpha1Counter(name, options);
             const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
-            const localVarOperationServerBasePath = operationServerMap['MetricsHaloRunV1alpha1CounterApi.getmetricsHaloRunV1alpha1Counter']?.[localVarOperationServerIndex]?.url;
+            const localVarOperationServerBasePath = operationServerMap['MetricsHaloRunV1alpha1CounterApi.getMetricsHaloRunV1alpha1Counter']?.[localVarOperationServerIndex]?.url;
             return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
         },
         /**
@@ -317,10 +317,10 @@ export const MetricsHaloRunV1alpha1CounterApiFp = function(configuration?: Confi
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async listmetricsHaloRunV1alpha1Counter(page?: number, size?: number, labelSelector?: Array<string>, fieldSelector?: Array<string>, sort?: Array<string>, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<CounterList>> {
-            const localVarAxiosArgs = await localVarAxiosParamCreator.listmetricsHaloRunV1alpha1Counter(page, size, labelSelector, fieldSelector, sort, options);
+        async listMetricsHaloRunV1alpha1Counter(page?: number, size?: number, labelSelector?: Array<string>, fieldSelector?: Array<string>, sort?: Array<string>, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<CounterList>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.listMetricsHaloRunV1alpha1Counter(page, size, labelSelector, fieldSelector, sort, options);
             const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
-            const localVarOperationServerBasePath = operationServerMap['MetricsHaloRunV1alpha1CounterApi.listmetricsHaloRunV1alpha1Counter']?.[localVarOperationServerIndex]?.url;
+            const localVarOperationServerBasePath = operationServerMap['MetricsHaloRunV1alpha1CounterApi.listMetricsHaloRunV1alpha1Counter']?.[localVarOperationServerIndex]?.url;
             return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
         },
         /**
@@ -330,10 +330,10 @@ export const MetricsHaloRunV1alpha1CounterApiFp = function(configuration?: Confi
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async updatemetricsHaloRunV1alpha1Counter(name: string, counter?: Counter, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<Counter>> {
-            const localVarAxiosArgs = await localVarAxiosParamCreator.updatemetricsHaloRunV1alpha1Counter(name, counter, options);
+        async updateMetricsHaloRunV1alpha1Counter(name: string, counter?: Counter, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<Counter>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.updateMetricsHaloRunV1alpha1Counter(name, counter, options);
             const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
-            const localVarOperationServerBasePath = operationServerMap['MetricsHaloRunV1alpha1CounterApi.updatemetricsHaloRunV1alpha1Counter']?.[localVarOperationServerIndex]?.url;
+            const localVarOperationServerBasePath = operationServerMap['MetricsHaloRunV1alpha1CounterApi.updateMetricsHaloRunV1alpha1Counter']?.[localVarOperationServerIndex]?.url;
             return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
         },
     }
@@ -348,153 +348,153 @@ export const MetricsHaloRunV1alpha1CounterApiFactory = function (configuration?:
     return {
         /**
          * Create metrics.halo.run/v1alpha1/Counter
-         * @param {MetricsHaloRunV1alpha1CounterApiCreatemetricsHaloRunV1alpha1CounterRequest} requestParameters Request parameters.
+         * @param {MetricsHaloRunV1alpha1CounterApiCreateMetricsHaloRunV1alpha1CounterRequest} requestParameters Request parameters.
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        createmetricsHaloRunV1alpha1Counter(requestParameters: MetricsHaloRunV1alpha1CounterApiCreatemetricsHaloRunV1alpha1CounterRequest = {}, options?: RawAxiosRequestConfig): AxiosPromise<Counter> {
-            return localVarFp.createmetricsHaloRunV1alpha1Counter(requestParameters.counter, options).then((request) => request(axios, basePath));
+        createMetricsHaloRunV1alpha1Counter(requestParameters: MetricsHaloRunV1alpha1CounterApiCreateMetricsHaloRunV1alpha1CounterRequest = {}, options?: RawAxiosRequestConfig): AxiosPromise<Counter> {
+            return localVarFp.createMetricsHaloRunV1alpha1Counter(requestParameters.counter, options).then((request) => request(axios, basePath));
         },
         /**
          * Delete metrics.halo.run/v1alpha1/Counter
-         * @param {MetricsHaloRunV1alpha1CounterApiDeletemetricsHaloRunV1alpha1CounterRequest} requestParameters Request parameters.
+         * @param {MetricsHaloRunV1alpha1CounterApiDeleteMetricsHaloRunV1alpha1CounterRequest} requestParameters Request parameters.
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        deletemetricsHaloRunV1alpha1Counter(requestParameters: MetricsHaloRunV1alpha1CounterApiDeletemetricsHaloRunV1alpha1CounterRequest, options?: RawAxiosRequestConfig): AxiosPromise<void> {
-            return localVarFp.deletemetricsHaloRunV1alpha1Counter(requestParameters.name, options).then((request) => request(axios, basePath));
+        deleteMetricsHaloRunV1alpha1Counter(requestParameters: MetricsHaloRunV1alpha1CounterApiDeleteMetricsHaloRunV1alpha1CounterRequest, options?: RawAxiosRequestConfig): AxiosPromise<void> {
+            return localVarFp.deleteMetricsHaloRunV1alpha1Counter(requestParameters.name, options).then((request) => request(axios, basePath));
         },
         /**
          * Get metrics.halo.run/v1alpha1/Counter
-         * @param {MetricsHaloRunV1alpha1CounterApiGetmetricsHaloRunV1alpha1CounterRequest} requestParameters Request parameters.
+         * @param {MetricsHaloRunV1alpha1CounterApiGetMetricsHaloRunV1alpha1CounterRequest} requestParameters Request parameters.
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        getmetricsHaloRunV1alpha1Counter(requestParameters: MetricsHaloRunV1alpha1CounterApiGetmetricsHaloRunV1alpha1CounterRequest, options?: RawAxiosRequestConfig): AxiosPromise<Counter> {
-            return localVarFp.getmetricsHaloRunV1alpha1Counter(requestParameters.name, options).then((request) => request(axios, basePath));
+        getMetricsHaloRunV1alpha1Counter(requestParameters: MetricsHaloRunV1alpha1CounterApiGetMetricsHaloRunV1alpha1CounterRequest, options?: RawAxiosRequestConfig): AxiosPromise<Counter> {
+            return localVarFp.getMetricsHaloRunV1alpha1Counter(requestParameters.name, options).then((request) => request(axios, basePath));
         },
         /**
          * List metrics.halo.run/v1alpha1/Counter
-         * @param {MetricsHaloRunV1alpha1CounterApiListmetricsHaloRunV1alpha1CounterRequest} requestParameters Request parameters.
+         * @param {MetricsHaloRunV1alpha1CounterApiListMetricsHaloRunV1alpha1CounterRequest} requestParameters Request parameters.
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        listmetricsHaloRunV1alpha1Counter(requestParameters: MetricsHaloRunV1alpha1CounterApiListmetricsHaloRunV1alpha1CounterRequest = {}, options?: RawAxiosRequestConfig): AxiosPromise<CounterList> {
-            return localVarFp.listmetricsHaloRunV1alpha1Counter(requestParameters.page, requestParameters.size, requestParameters.labelSelector, requestParameters.fieldSelector, requestParameters.sort, options).then((request) => request(axios, basePath));
+        listMetricsHaloRunV1alpha1Counter(requestParameters: MetricsHaloRunV1alpha1CounterApiListMetricsHaloRunV1alpha1CounterRequest = {}, options?: RawAxiosRequestConfig): AxiosPromise<CounterList> {
+            return localVarFp.listMetricsHaloRunV1alpha1Counter(requestParameters.page, requestParameters.size, requestParameters.labelSelector, requestParameters.fieldSelector, requestParameters.sort, options).then((request) => request(axios, basePath));
         },
         /**
          * Update metrics.halo.run/v1alpha1/Counter
-         * @param {MetricsHaloRunV1alpha1CounterApiUpdatemetricsHaloRunV1alpha1CounterRequest} requestParameters Request parameters.
+         * @param {MetricsHaloRunV1alpha1CounterApiUpdateMetricsHaloRunV1alpha1CounterRequest} requestParameters Request parameters.
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        updatemetricsHaloRunV1alpha1Counter(requestParameters: MetricsHaloRunV1alpha1CounterApiUpdatemetricsHaloRunV1alpha1CounterRequest, options?: RawAxiosRequestConfig): AxiosPromise<Counter> {
-            return localVarFp.updatemetricsHaloRunV1alpha1Counter(requestParameters.name, requestParameters.counter, options).then((request) => request(axios, basePath));
+        updateMetricsHaloRunV1alpha1Counter(requestParameters: MetricsHaloRunV1alpha1CounterApiUpdateMetricsHaloRunV1alpha1CounterRequest, options?: RawAxiosRequestConfig): AxiosPromise<Counter> {
+            return localVarFp.updateMetricsHaloRunV1alpha1Counter(requestParameters.name, requestParameters.counter, options).then((request) => request(axios, basePath));
         },
     };
 };
 
 /**
- * Request parameters for createmetricsHaloRunV1alpha1Counter operation in MetricsHaloRunV1alpha1CounterApi.
+ * Request parameters for createMetricsHaloRunV1alpha1Counter operation in MetricsHaloRunV1alpha1CounterApi.
  * @export
- * @interface MetricsHaloRunV1alpha1CounterApiCreatemetricsHaloRunV1alpha1CounterRequest
+ * @interface MetricsHaloRunV1alpha1CounterApiCreateMetricsHaloRunV1alpha1CounterRequest
  */
-export interface MetricsHaloRunV1alpha1CounterApiCreatemetricsHaloRunV1alpha1CounterRequest {
+export interface MetricsHaloRunV1alpha1CounterApiCreateMetricsHaloRunV1alpha1CounterRequest {
     /**
      * Fresh counter
      * @type {Counter}
-     * @memberof MetricsHaloRunV1alpha1CounterApiCreatemetricsHaloRunV1alpha1Counter
+     * @memberof MetricsHaloRunV1alpha1CounterApiCreateMetricsHaloRunV1alpha1Counter
      */
     readonly counter?: Counter
 }
 
 /**
- * Request parameters for deletemetricsHaloRunV1alpha1Counter operation in MetricsHaloRunV1alpha1CounterApi.
+ * Request parameters for deleteMetricsHaloRunV1alpha1Counter operation in MetricsHaloRunV1alpha1CounterApi.
  * @export
- * @interface MetricsHaloRunV1alpha1CounterApiDeletemetricsHaloRunV1alpha1CounterRequest
+ * @interface MetricsHaloRunV1alpha1CounterApiDeleteMetricsHaloRunV1alpha1CounterRequest
  */
-export interface MetricsHaloRunV1alpha1CounterApiDeletemetricsHaloRunV1alpha1CounterRequest {
+export interface MetricsHaloRunV1alpha1CounterApiDeleteMetricsHaloRunV1alpha1CounterRequest {
     /**
      * Name of counter
      * @type {string}
-     * @memberof MetricsHaloRunV1alpha1CounterApiDeletemetricsHaloRunV1alpha1Counter
+     * @memberof MetricsHaloRunV1alpha1CounterApiDeleteMetricsHaloRunV1alpha1Counter
      */
     readonly name: string
 }
 
 /**
- * Request parameters for getmetricsHaloRunV1alpha1Counter operation in MetricsHaloRunV1alpha1CounterApi.
+ * Request parameters for getMetricsHaloRunV1alpha1Counter operation in MetricsHaloRunV1alpha1CounterApi.
  * @export
- * @interface MetricsHaloRunV1alpha1CounterApiGetmetricsHaloRunV1alpha1CounterRequest
+ * @interface MetricsHaloRunV1alpha1CounterApiGetMetricsHaloRunV1alpha1CounterRequest
  */
-export interface MetricsHaloRunV1alpha1CounterApiGetmetricsHaloRunV1alpha1CounterRequest {
+export interface MetricsHaloRunV1alpha1CounterApiGetMetricsHaloRunV1alpha1CounterRequest {
     /**
      * Name of counter
      * @type {string}
-     * @memberof MetricsHaloRunV1alpha1CounterApiGetmetricsHaloRunV1alpha1Counter
+     * @memberof MetricsHaloRunV1alpha1CounterApiGetMetricsHaloRunV1alpha1Counter
      */
     readonly name: string
 }
 
 /**
- * Request parameters for listmetricsHaloRunV1alpha1Counter operation in MetricsHaloRunV1alpha1CounterApi.
+ * Request parameters for listMetricsHaloRunV1alpha1Counter operation in MetricsHaloRunV1alpha1CounterApi.
  * @export
- * @interface MetricsHaloRunV1alpha1CounterApiListmetricsHaloRunV1alpha1CounterRequest
+ * @interface MetricsHaloRunV1alpha1CounterApiListMetricsHaloRunV1alpha1CounterRequest
  */
-export interface MetricsHaloRunV1alpha1CounterApiListmetricsHaloRunV1alpha1CounterRequest {
+export interface MetricsHaloRunV1alpha1CounterApiListMetricsHaloRunV1alpha1CounterRequest {
     /**
      * Page number. Default is 0.
      * @type {number}
-     * @memberof MetricsHaloRunV1alpha1CounterApiListmetricsHaloRunV1alpha1Counter
+     * @memberof MetricsHaloRunV1alpha1CounterApiListMetricsHaloRunV1alpha1Counter
      */
     readonly page?: number
 
     /**
      * Size number. Default is 0.
      * @type {number}
-     * @memberof MetricsHaloRunV1alpha1CounterApiListmetricsHaloRunV1alpha1Counter
+     * @memberof MetricsHaloRunV1alpha1CounterApiListMetricsHaloRunV1alpha1Counter
      */
     readonly size?: number
 
     /**
      * Label selector. e.g.: hidden!&#x3D;true
      * @type {Array<string>}
-     * @memberof MetricsHaloRunV1alpha1CounterApiListmetricsHaloRunV1alpha1Counter
+     * @memberof MetricsHaloRunV1alpha1CounterApiListMetricsHaloRunV1alpha1Counter
      */
     readonly labelSelector?: Array<string>
 
     /**
      * Field selector. e.g.: metadata.name&#x3D;&#x3D;halo
      * @type {Array<string>}
-     * @memberof MetricsHaloRunV1alpha1CounterApiListmetricsHaloRunV1alpha1Counter
+     * @memberof MetricsHaloRunV1alpha1CounterApiListMetricsHaloRunV1alpha1Counter
      */
     readonly fieldSelector?: Array<string>
 
     /**
      * Sorting criteria in the format: property,(asc|desc). Default sort order is ascending. Multiple sort criteria are supported.
      * @type {Array<string>}
-     * @memberof MetricsHaloRunV1alpha1CounterApiListmetricsHaloRunV1alpha1Counter
+     * @memberof MetricsHaloRunV1alpha1CounterApiListMetricsHaloRunV1alpha1Counter
      */
     readonly sort?: Array<string>
 }
 
 /**
- * Request parameters for updatemetricsHaloRunV1alpha1Counter operation in MetricsHaloRunV1alpha1CounterApi.
+ * Request parameters for updateMetricsHaloRunV1alpha1Counter operation in MetricsHaloRunV1alpha1CounterApi.
  * @export
- * @interface MetricsHaloRunV1alpha1CounterApiUpdatemetricsHaloRunV1alpha1CounterRequest
+ * @interface MetricsHaloRunV1alpha1CounterApiUpdateMetricsHaloRunV1alpha1CounterRequest
  */
-export interface MetricsHaloRunV1alpha1CounterApiUpdatemetricsHaloRunV1alpha1CounterRequest {
+export interface MetricsHaloRunV1alpha1CounterApiUpdateMetricsHaloRunV1alpha1CounterRequest {
     /**
      * Name of counter
      * @type {string}
-     * @memberof MetricsHaloRunV1alpha1CounterApiUpdatemetricsHaloRunV1alpha1Counter
+     * @memberof MetricsHaloRunV1alpha1CounterApiUpdateMetricsHaloRunV1alpha1Counter
      */
     readonly name: string
 
     /**
      * Updated counter
      * @type {Counter}
-     * @memberof MetricsHaloRunV1alpha1CounterApiUpdatemetricsHaloRunV1alpha1Counter
+     * @memberof MetricsHaloRunV1alpha1CounterApiUpdateMetricsHaloRunV1alpha1Counter
      */
     readonly counter?: Counter
 }
@@ -508,57 +508,57 @@ export interface MetricsHaloRunV1alpha1CounterApiUpdatemetricsHaloRunV1alpha1Cou
 export class MetricsHaloRunV1alpha1CounterApi extends BaseAPI {
     /**
      * Create metrics.halo.run/v1alpha1/Counter
-     * @param {MetricsHaloRunV1alpha1CounterApiCreatemetricsHaloRunV1alpha1CounterRequest} requestParameters Request parameters.
+     * @param {MetricsHaloRunV1alpha1CounterApiCreateMetricsHaloRunV1alpha1CounterRequest} requestParameters Request parameters.
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      * @memberof MetricsHaloRunV1alpha1CounterApi
      */
-    public createmetricsHaloRunV1alpha1Counter(requestParameters: MetricsHaloRunV1alpha1CounterApiCreatemetricsHaloRunV1alpha1CounterRequest = {}, options?: RawAxiosRequestConfig) {
-        return MetricsHaloRunV1alpha1CounterApiFp(this.configuration).createmetricsHaloRunV1alpha1Counter(requestParameters.counter, options).then((request) => request(this.axios, this.basePath));
+    public createMetricsHaloRunV1alpha1Counter(requestParameters: MetricsHaloRunV1alpha1CounterApiCreateMetricsHaloRunV1alpha1CounterRequest = {}, options?: RawAxiosRequestConfig) {
+        return MetricsHaloRunV1alpha1CounterApiFp(this.configuration).createMetricsHaloRunV1alpha1Counter(requestParameters.counter, options).then((request) => request(this.axios, this.basePath));
     }
 
     /**
      * Delete metrics.halo.run/v1alpha1/Counter
-     * @param {MetricsHaloRunV1alpha1CounterApiDeletemetricsHaloRunV1alpha1CounterRequest} requestParameters Request parameters.
+     * @param {MetricsHaloRunV1alpha1CounterApiDeleteMetricsHaloRunV1alpha1CounterRequest} requestParameters Request parameters.
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      * @memberof MetricsHaloRunV1alpha1CounterApi
      */
-    public deletemetricsHaloRunV1alpha1Counter(requestParameters: MetricsHaloRunV1alpha1CounterApiDeletemetricsHaloRunV1alpha1CounterRequest, options?: RawAxiosRequestConfig) {
-        return MetricsHaloRunV1alpha1CounterApiFp(this.configuration).deletemetricsHaloRunV1alpha1Counter(requestParameters.name, options).then((request) => request(this.axios, this.basePath));
+    public deleteMetricsHaloRunV1alpha1Counter(requestParameters: MetricsHaloRunV1alpha1CounterApiDeleteMetricsHaloRunV1alpha1CounterRequest, options?: RawAxiosRequestConfig) {
+        return MetricsHaloRunV1alpha1CounterApiFp(this.configuration).deleteMetricsHaloRunV1alpha1Counter(requestParameters.name, options).then((request) => request(this.axios, this.basePath));
     }
 
     /**
      * Get metrics.halo.run/v1alpha1/Counter
-     * @param {MetricsHaloRunV1alpha1CounterApiGetmetricsHaloRunV1alpha1CounterRequest} requestParameters Request parameters.
+     * @param {MetricsHaloRunV1alpha1CounterApiGetMetricsHaloRunV1alpha1CounterRequest} requestParameters Request parameters.
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      * @memberof MetricsHaloRunV1alpha1CounterApi
      */
-    public getmetricsHaloRunV1alpha1Counter(requestParameters: MetricsHaloRunV1alpha1CounterApiGetmetricsHaloRunV1alpha1CounterRequest, options?: RawAxiosRequestConfig) {
-        return MetricsHaloRunV1alpha1CounterApiFp(this.configuration).getmetricsHaloRunV1alpha1Counter(requestParameters.name, options).then((request) => request(this.axios, this.basePath));
+    public getMetricsHaloRunV1alpha1Counter(requestParameters: MetricsHaloRunV1alpha1CounterApiGetMetricsHaloRunV1alpha1CounterRequest, options?: RawAxiosRequestConfig) {
+        return MetricsHaloRunV1alpha1CounterApiFp(this.configuration).getMetricsHaloRunV1alpha1Counter(requestParameters.name, options).then((request) => request(this.axios, this.basePath));
     }
 
     /**
      * List metrics.halo.run/v1alpha1/Counter
-     * @param {MetricsHaloRunV1alpha1CounterApiListmetricsHaloRunV1alpha1CounterRequest} requestParameters Request parameters.
+     * @param {MetricsHaloRunV1alpha1CounterApiListMetricsHaloRunV1alpha1CounterRequest} requestParameters Request parameters.
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      * @memberof MetricsHaloRunV1alpha1CounterApi
      */
-    public listmetricsHaloRunV1alpha1Counter(requestParameters: MetricsHaloRunV1alpha1CounterApiListmetricsHaloRunV1alpha1CounterRequest = {}, options?: RawAxiosRequestConfig) {
-        return MetricsHaloRunV1alpha1CounterApiFp(this.configuration).listmetricsHaloRunV1alpha1Counter(requestParameters.page, requestParameters.size, requestParameters.labelSelector, requestParameters.fieldSelector, requestParameters.sort, options).then((request) => request(this.axios, this.basePath));
+    public listMetricsHaloRunV1alpha1Counter(requestParameters: MetricsHaloRunV1alpha1CounterApiListMetricsHaloRunV1alpha1CounterRequest = {}, options?: RawAxiosRequestConfig) {
+        return MetricsHaloRunV1alpha1CounterApiFp(this.configuration).listMetricsHaloRunV1alpha1Counter(requestParameters.page, requestParameters.size, requestParameters.labelSelector, requestParameters.fieldSelector, requestParameters.sort, options).then((request) => request(this.axios, this.basePath));
     }
 
     /**
      * Update metrics.halo.run/v1alpha1/Counter
-     * @param {MetricsHaloRunV1alpha1CounterApiUpdatemetricsHaloRunV1alpha1CounterRequest} requestParameters Request parameters.
+     * @param {MetricsHaloRunV1alpha1CounterApiUpdateMetricsHaloRunV1alpha1CounterRequest} requestParameters Request parameters.
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      * @memberof MetricsHaloRunV1alpha1CounterApi
      */
-    public updatemetricsHaloRunV1alpha1Counter(requestParameters: MetricsHaloRunV1alpha1CounterApiUpdatemetricsHaloRunV1alpha1CounterRequest, options?: RawAxiosRequestConfig) {
-        return MetricsHaloRunV1alpha1CounterApiFp(this.configuration).updatemetricsHaloRunV1alpha1Counter(requestParameters.name, requestParameters.counter, options).then((request) => request(this.axios, this.basePath));
+    public updateMetricsHaloRunV1alpha1Counter(requestParameters: MetricsHaloRunV1alpha1CounterApiUpdateMetricsHaloRunV1alpha1CounterRequest, options?: RawAxiosRequestConfig) {
+        return MetricsHaloRunV1alpha1CounterApiFp(this.configuration).updateMetricsHaloRunV1alpha1Counter(requestParameters.name, requestParameters.counter, options).then((request) => request(this.axios, this.basePath));
     }
 }
 

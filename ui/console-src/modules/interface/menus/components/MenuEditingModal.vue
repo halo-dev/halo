@@ -50,12 +50,12 @@ const handleSaveMenu = async () => {
   try {
     saving.value = true;
     if (props.menu) {
-      await apiClient.extension.menu.updatev1alpha1Menu({
+      await apiClient.extension.menu.updateV1alpha1Menu({
         name: formState.value.metadata.name,
         menu: formState.value,
       });
     } else {
-      const { data } = await apiClient.extension.menu.createv1alpha1Menu({
+      const { data } = await apiClient.extension.menu.createV1alpha1Menu({
         menu: formState.value,
       });
       emit("created", data);

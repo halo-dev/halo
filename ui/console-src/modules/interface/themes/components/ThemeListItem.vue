@@ -64,7 +64,7 @@ const handleCreateTheme = async () => {
     creating.value = true;
 
     const { data } =
-      await apiClient.extension.theme.createthemeHaloRunV1alpha1Theme({
+      await apiClient.extension.theme.createThemeHaloRunV1alpha1Theme({
         theme: props.theme,
       });
 

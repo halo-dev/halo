@@ -37,7 +37,7 @@ export const MigrationHaloRunV1alpha1BackupApiAxiosParamCreator = function (conf
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        createmigrationHaloRunV1alpha1Backup: async (backup?: Backup, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+        createMigrationHaloRunV1alpha1Backup: async (backup?: Backup, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
             const localVarPath = `/apis/migration.halo.run/v1alpha1/backups`;
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
@@ -78,9 +78,9 @@ export const MigrationHaloRunV1alpha1BackupApiAxiosParamCreator = function (conf
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        deletemigrationHaloRunV1alpha1Backup: async (name: string, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+        deleteMigrationHaloRunV1alpha1Backup: async (name: string, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
             // verify required parameter 'name' is not null or undefined
-            assertParamExists('deletemigrationHaloRunV1alpha1Backup', 'name', name)
+            assertParamExists('deleteMigrationHaloRunV1alpha1Backup', 'name', name)
             const localVarPath = `/apis/migration.halo.run/v1alpha1/backups/{name}`
                 .replace(`{${"name"}}`, encodeURIComponent(String(name)));
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
@@ -119,9 +119,9 @@ export const MigrationHaloRunV1alpha1BackupApiAxiosParamCreator = function (conf
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        getmigrationHaloRunV1alpha1Backup: async (name: string, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+        getMigrationHaloRunV1alpha1Backup: async (name: string, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
             // verify required parameter 'name' is not null or undefined
-            assertParamExists('getmigrationHaloRunV1alpha1Backup', 'name', name)
+            assertParamExists('getMigrationHaloRunV1alpha1Backup', 'name', name)
             const localVarPath = `/apis/migration.halo.run/v1alpha1/backups/{name}`
                 .replace(`{${"name"}}`, encodeURIComponent(String(name)));
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
@@ -164,7 +164,7 @@ export const MigrationHaloRunV1alpha1BackupApiAxiosParamCreator = function (conf
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        listmigrationHaloRunV1alpha1Backup: async (page?: number, size?: number, labelSelector?: Array<string>, fieldSelector?: Array<string>, sort?: Array<string>, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+        listMigrationHaloRunV1alpha1Backup: async (page?: number, size?: number, labelSelector?: Array<string>, fieldSelector?: Array<string>, sort?: Array<string>, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
             const localVarPath = `/apis/migration.halo.run/v1alpha1/backups`;
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
@@ -223,9 +223,9 @@ export const MigrationHaloRunV1alpha1BackupApiAxiosParamCreator = function (conf
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        updatemigrationHaloRunV1alpha1Backup: async (name: string, backup?: Backup, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+        updateMigrationHaloRunV1alpha1Backup: async (name: string, backup?: Backup, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
             // verify required parameter 'name' is not null or undefined
-            assertParamExists('updatemigrationHaloRunV1alpha1Backup', 'name', name)
+            assertParamExists('updateMigrationHaloRunV1alpha1Backup', 'name', name)
             const localVarPath = `/apis/migration.halo.run/v1alpha1/backups/{name}`
                 .replace(`{${"name"}}`, encodeURIComponent(String(name)));
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
@@ -277,10 +277,10 @@ export const MigrationHaloRunV1alpha1BackupApiFp = function(configuration?: Conf
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async createmigrationHaloRunV1alpha1Backup(backup?: Backup, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<Backup>> {
-            const localVarAxiosArgs = await localVarAxiosParamCreator.createmigrationHaloRunV1alpha1Backup(backup, options);
+        async createMigrationHaloRunV1alpha1Backup(backup?: Backup, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<Backup>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.createMigrationHaloRunV1alpha1Backup(backup, options);
             const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
-            const localVarOperationServerBasePath = operationServerMap['MigrationHaloRunV1alpha1BackupApi.createmigrationHaloRunV1alpha1Backup']?.[localVarOperationServerIndex]?.url;
+            const localVarOperationServerBasePath = operationServerMap['MigrationHaloRunV1alpha1BackupApi.createMigrationHaloRunV1alpha1Backup']?.[localVarOperationServerIndex]?.url;
             return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
         },
         /**
@@ -289,10 +289,10 @@ export const MigrationHaloRunV1alpha1BackupApiFp = function(configuration?: Conf
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async deletemigrationHaloRunV1alpha1Backup(name: string, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<void>> {
-            const localVarAxiosArgs = await localVarAxiosParamCreator.deletemigrationHaloRunV1alpha1Backup(name, options);
+        async deleteMigrationHaloRunV1alpha1Backup(name: string, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<void>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.deleteMigrationHaloRunV1alpha1Backup(name, options);
             const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
-            const localVarOperationServerBasePath = operationServerMap['MigrationHaloRunV1alpha1BackupApi.deletemigrationHaloRunV1alpha1Backup']?.[localVarOperationServerIndex]?.url;
+            const localVarOperationServerBasePath = operationServerMap['MigrationHaloRunV1alpha1BackupApi.deleteMigrationHaloRunV1alpha1Backup']?.[localVarOperationServerIndex]?.url;
             return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
         },
         /**
@@ -301,10 +301,10 @@ export const MigrationHaloRunV1alpha1BackupApiFp = function(configuration?: Conf
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async getmigrationHaloRunV1alpha1Backup(name: string, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<Backup>> {
-            const localVarAxiosArgs = await localVarAxiosParamCreator.getmigrationHaloRunV1alpha1Backup(name, options);
+        async getMigrationHaloRunV1alpha1Backup(name: string, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<Backup>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.getMigrationHaloRunV1alpha1Backup(name, options);
             const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
-            const localVarOperationServerBasePath = operationServerMap['MigrationHaloRunV1alpha1BackupApi.getmigrationHaloRunV1alpha1Backup']?.[localVarOperationServerIndex]?.url;
+            const localVarOperationServerBasePath = operationServerMap['MigrationHaloRunV1alpha1BackupApi.getMigrationHaloRunV1alpha1Backup']?.[localVarOperationServerIndex]?.url;
             return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
         },
         /**
@@ -317,10 +317,10 @@ export const MigrationHaloRunV1alpha1BackupApiFp = function(configuration?: Conf
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async listmigrationHaloRunV1alpha1Backup(page?: number, size?: number, labelSelector?: Array<string>, fieldSelector?: Array<string>, sort?: Array<string>, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<BackupList>> {
-            const localVarAxiosArgs = await localVarAxiosParamCreator.listmigrationHaloRunV1alpha1Backup(page, size, labelSelector, fieldSelector, sort, options);
+        async listMigrationHaloRunV1alpha1Backup(page?: number, size?: number, labelSelector?: Array<string>, fieldSelector?: Array<string>, sort?: Array<string>, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<BackupList>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.listMigrationHaloRunV1alpha1Backup(page, size, labelSelector, fieldSelector, sort, options);
             const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
-            const localVarOperationServerBasePath = operationServerMap['MigrationHaloRunV1alpha1BackupApi.listmigrationHaloRunV1alpha1Backup']?.[localVarOperationServerIndex]?.url;
+            const localVarOperationServerBasePath = operationServerMap['MigrationHaloRunV1alpha1BackupApi.listMigrationHaloRunV1alpha1Backup']?.[localVarOperationServerIndex]?.url;
             return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
         },
         /**
@@ -330,10 +330,10 @@ export const MigrationHaloRunV1alpha1BackupApiFp = function(configuration?: Conf
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async updatemigrationHaloRunV1alpha1Backup(name: string, backup?: Backup, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<Backup>> {
-            const localVarAxiosArgs = await localVarAxiosParamCreator.updatemigrationHaloRunV1alpha1Backup(name, backup, options);
+        async updateMigrationHaloRunV1alpha1Backup(name: string, backup?: Backup, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<Backup>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.updateMigrationHaloRunV1alpha1Backup(name, backup, options);
             const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
-            const localVarOperationServerBasePath = operationServerMap['MigrationHaloRunV1alpha1BackupApi.updatemigrationHaloRunV1alpha1Backup']?.[localVarOperationServerIndex]?.url;
+            const localVarOperationServerBasePath = operationServerMap['MigrationHaloRunV1alpha1BackupApi.updateMigrationHaloRunV1alpha1Backup']?.[localVarOperationServerIndex]?.url;
             return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
         },
     }
@@ -348,153 +348,153 @@ export const MigrationHaloRunV1alpha1BackupApiFactory = function (configuration?
     return {
         /**
          * Create migration.halo.run/v1alpha1/Backup
-         * @param {MigrationHaloRunV1alpha1BackupApiCreatemigrationHaloRunV1alpha1BackupRequest} requestParameters Request parameters.
+         * @param {MigrationHaloRunV1alpha1BackupApiCreateMigrationHaloRunV1alpha1BackupRequest} requestParameters Request parameters.
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        createmigrationHaloRunV1alpha1Backup(requestParameters: MigrationHaloRunV1alpha1BackupApiCreatemigrationHaloRunV1alpha1BackupRequest = {}, options?: RawAxiosRequestConfig): AxiosPromise<Backup> {
-            return localVarFp.createmigrationHaloRunV1alpha1Backup(requestParameters.backup, options).then((request) => request(axios, basePath));
+        createMigrationHaloRunV1alpha1Backup(requestParameters: MigrationHaloRunV1alpha1BackupApiCreateMigrationHaloRunV1alpha1BackupRequest = {}, options?: RawAxiosRequestConfig): AxiosPromise<Backup> {
+            return localVarFp.createMigrationHaloRunV1alpha1Backup(requestParameters.backup, options).then((request) => request(axios, basePath));
         },
         /**
          * Delete migration.halo.run/v1alpha1/Backup
-         * @param {MigrationHaloRunV1alpha1BackupApiDeletemigrationHaloRunV1alpha1BackupRequest} requestParameters Request parameters.
+         * @param {MigrationHaloRunV1alpha1BackupApiDeleteMigrationHaloRunV1alpha1BackupRequest} requestParameters Request parameters.
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        deletemigrationHaloRunV1alpha1Backup(requestParameters: MigrationHaloRunV1alpha1BackupApiDeletemigrationHaloRunV1alpha1BackupRequest, options?: RawAxiosRequestConfig): AxiosPromise<void> {
-            return localVarFp.deletemigrationHaloRunV1alpha1Backup(requestParameters.name, options).then((request) => request(axios, basePath));
+        deleteMigrationHaloRunV1alpha1Backup(requestParameters: MigrationHaloRunV1alpha1BackupApiDeleteMigrationHaloRunV1alpha1BackupRequest, options?: RawAxiosRequestConfig): AxiosPromise<void> {
+            return localVarFp.deleteMigrationHaloRunV1alpha1Backup(requestParameters.name, options).then((request) => request(axios, basePath));
         },
         /**
          * Get migration.halo.run/v1alpha1/Backup
-         * @param {MigrationHaloRunV1alpha1BackupApiGetmigrationHaloRunV1alpha1BackupRequest} requestParameters Request parameters.
+         * @param {MigrationHaloRunV1alpha1BackupApiGetMigrationHaloRunV1alpha1BackupRequest} requestParameters Request parameters.
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        getmigrationHaloRunV1alpha1Backup(requestParameters: MigrationHaloRunV1alpha1BackupApiGetmigrationHaloRunV1alpha1BackupRequest, options?: RawAxiosRequestConfig): AxiosPromise<Backup> {
-            return localVarFp.getmigrationHaloRunV1alpha1Backup(requestParameters.name, options).then((request) => request(axios, basePath));
+        getMigrationHaloRunV1alpha1Backup(requestParameters: MigrationHaloRunV1alpha1BackupApiGetMigrationHaloRunV1alpha1BackupRequest, options?: RawAxiosRequestConfig): AxiosPromise<Backup> {
+            return localVarFp.getMigrationHaloRunV1alpha1Backup(requestParameters.name, options).then((request) => request(axios, basePath));
         },
         /**
          * List migration.halo.run/v1alpha1/Backup
-         * @param {MigrationHaloRunV1alpha1BackupApiListmigrationHaloRunV1alpha1BackupRequest} requestParameters Request parameters.
+         * @param {MigrationHaloRunV1alpha1BackupApiListMigrationHaloRunV1alpha1BackupRequest} requestParameters Request parameters.
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        listmigrationHaloRunV1alpha1Backup(requestParameters: MigrationHaloRunV1alpha1BackupApiListmigrationHaloRunV1alpha1BackupRequest = {}, options?: RawAxiosRequestConfig): AxiosPromise<BackupList> {
-            return localVarFp.listmigrationHaloRunV1alpha1Backup(requestParameters.page, requestParameters.size, requestParameters.labelSelector, requestParameters.fieldSelector, requestParameters.sort, options).then((request) => request(axios, basePath));
+        listMigrationHaloRunV1alpha1Backup(requestParameters: MigrationHaloRunV1alpha1BackupApiListMigrationHaloRunV1alpha1BackupRequest = {}, options?: RawAxiosRequestConfig): AxiosPromise<BackupList> {
+            return localVarFp.listMigrationHaloRunV1alpha1Backup(requestParameters.page, requestParameters.size, requestParameters.labelSelector, requestParameters.fieldSelector, requestParameters.sort, options).then((request) => request(axios, basePath));
         },
         /**
          * Update migration.halo.run/v1alpha1/Backup
-         * @param {MigrationHaloRunV1alpha1BackupApiUpdatemigrationHaloRunV1alpha1BackupRequest} requestParameters Request parameters.
+         * @param {MigrationHaloRunV1alpha1BackupApiUpdateMigrationHaloRunV1alpha1BackupRequest} requestParameters Request parameters.
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        updatemigrationHaloRunV1alpha1Backup(requestParameters: MigrationHaloRunV1alpha1BackupApiUpdatemigrationHaloRunV1alpha1BackupRequest, options?: RawAxiosRequestConfig): AxiosPromise<Backup> {
-            return localVarFp.updatemigrationHaloRunV1alpha1Backup(requestParameters.name, requestParameters.backup, options).then((request) => request(axios, basePath));
+        updateMigrationHaloRunV1alpha1Backup(requestParameters: MigrationHaloRunV1alpha1BackupApiUpdateMigrationHaloRunV1alpha1BackupRequest, options?: RawAxiosRequestConfig): AxiosPromise<Backup> {
+            return localVarFp.updateMigrationHaloRunV1alpha1Backup(requestParameters.name, requestParameters.backup, options).then((request) => request(axios, basePath));
         },
     };
 };
 
 /**
- * Request parameters for createmigrationHaloRunV1alpha1Backup operation in MigrationHaloRunV1alpha1BackupApi.
+ * Request parameters for createMigrationHaloRunV1alpha1Backup operation in MigrationHaloRunV1alpha1BackupApi.
  * @export
- * @interface MigrationHaloRunV1alpha1BackupApiCreatemigrationHaloRunV1alpha1BackupRequest
+ * @interface MigrationHaloRunV1alpha1BackupApiCreateMigrationHaloRunV1alpha1BackupRequest
  */
-export interface MigrationHaloRunV1alpha1BackupApiCreatemigrationHaloRunV1alpha1BackupRequest {
+export interface MigrationHaloRunV1alpha1BackupApiCreateMigrationHaloRunV1alpha1BackupRequest {
     /**
      * Fresh backup
      * @type {Backup}
-     * @memberof MigrationHaloRunV1alpha1BackupApiCreatemigrationHaloRunV1alpha1Backup
+     * @memberof MigrationHaloRunV1alpha1BackupApiCreateMigrationHaloRunV1alpha1Backup
      */
     readonly backup?: Backup
 }
 
 /**
- * Request parameters for deletemigrationHaloRunV1alpha1Backup operation in MigrationHaloRunV1alpha1BackupApi.
+ * Request parameters for deleteMigrationHaloRunV1alpha1Backup operation in MigrationHaloRunV1alpha1BackupApi.
  * @export
- * @interface MigrationHaloRunV1alpha1BackupApiDeletemigrationHaloRunV1alpha1BackupRequest
+ * @interface MigrationHaloRunV1alpha1BackupApiDeleteMigrationHaloRunV1alpha1BackupRequest
  */
-export interface MigrationHaloRunV1alpha1BackupApiDeletemigrationHaloRunV1alpha1BackupRequest {
+export interface MigrationHaloRunV1alpha1BackupApiDeleteMigrationHaloRunV1alpha1BackupRequest {
     /**
      * Name of backup
      * @type {string}
-     * @memberof MigrationHaloRunV1alpha1BackupApiDeletemigrationHaloRunV1alpha1Backup
+     * @memberof MigrationHaloRunV1alpha1BackupApiDeleteMigrationHaloRunV1alpha1Backup
      */
     readonly name: string
 }
 
 /**
- * Request parameters for getmigrationHaloRunV1alpha1Backup operation in MigrationHaloRunV1alpha1BackupApi.
+ * Request parameters for getMigrationHaloRunV1alpha1Backup operation in MigrationHaloRunV1alpha1BackupApi.
  * @export
- * @interface MigrationHaloRunV1alpha1BackupApiGetmigrationHaloRunV1alpha1BackupRequest
+ * @interface MigrationHaloRunV1alpha1BackupApiGetMigrationHaloRunV1alpha1BackupRequest
  */
-export interface MigrationHaloRunV1alpha1BackupApiGetmigrationHaloRunV1alpha1BackupRequest {
+export interface MigrationHaloRunV1alpha1BackupApiGetMigrationHaloRunV1alpha1BackupRequest {
     /**
      * Name of backup
      * @type {string}
-     * @memberof MigrationHaloRunV1alpha1BackupApiGetmigrationHaloRunV1alpha1Backup
+     * @memberof MigrationHaloRunV1alpha1BackupApiGetMigrationHaloRunV1alpha1Backup
      */
     readonly name: string
 }
 
 /**
- * Request parameters for listmigrationHaloRunV1alpha1Backup operation in MigrationHaloRunV1alpha1BackupApi.
+ * Request parameters for listMigrationHaloRunV1alpha1Backup operation in MigrationHaloRunV1alpha1BackupApi.
  * @export
- * @interface MigrationHaloRunV1alpha1BackupApiListmigrationHaloRunV1alpha1BackupRequest
+ * @interface MigrationHaloRunV1alpha1BackupApiListMigrationHaloRunV1alpha1BackupRequest
  */
-export interface MigrationHaloRunV1alpha1BackupApiListmigrationHaloRunV1alpha1BackupRequest {
+export interface MigrationHaloRunV1alpha1BackupApiListMigrationHaloRunV1alpha1BackupRequest {
     /**
      * Page number. Default is 0.
      * @type {number}
-     * @memberof MigrationHaloRunV1alpha1BackupApiListmigrationHaloRunV1alpha1Backup
+     * @memberof MigrationHaloRunV1alpha1BackupApiListMigrationHaloRunV1alpha1Backup
      */
     readonly page?: number
 
     /**
      * Size number. Default is 0.
      * @type {number}
-     * @memberof MigrationHaloRunV1alpha1BackupApiListmigrationHaloRunV1alpha1Backup
+     * @memberof MigrationHaloRunV1alpha1BackupApiListMigrationHaloRunV1alpha1Backup
      */
     readonly size?: number
 
     /**
      * Label selector. e.g.: hidden!&#x3D;true
      * @type {Array<string>}
-     * @memberof MigrationHaloRunV1alpha1BackupApiListmigrationHaloRunV1alpha1Backup
+     * @memberof MigrationHaloRunV1alpha1BackupApiListMigrationHaloRunV1alpha1Backup
      */
     readonly labelSelector?: Array<string>
 
     /**
      * Field selector. e.g.: metadata.name&#x3D;&#x3D;halo
      * @type {Array<string>}
-     * @memberof MigrationHaloRunV1alpha1BackupApiListmigrationHaloRunV1alpha1Backup
+     * @memberof MigrationHaloRunV1alpha1BackupApiListMigrationHaloRunV1alpha1Backup
      */
     readonly fieldSelector?: Array<string>
 
     /**
      * Sorting criteria in the format: property,(asc|desc). Default sort order is ascending. Multiple sort criteria are supported.
      * @type {Array<string>}
-     * @memberof MigrationHaloRunV1alpha1BackupApiListmigrationHaloRunV1alpha1Backup
+     * @memberof MigrationHaloRunV1alpha1BackupApiListMigrationHaloRunV1alpha1Backup
      */
     readonly sort?: Array<string>
 }
 
 /**
- * Request parameters for updatemigrationHaloRunV1alpha1Backup operation in MigrationHaloRunV1alpha1BackupApi.
+ * Request parameters for updateMigrationHaloRunV1alpha1Backup operation in MigrationHaloRunV1alpha1BackupApi.
  * @export
- * @interface MigrationHaloRunV1alpha1BackupApiUpdatemigrationHaloRunV1alpha1BackupRequest
+ * @interface MigrationHaloRunV1alpha1BackupApiUpdateMigrationHaloRunV1alpha1BackupRequest
  */
-export interface MigrationHaloRunV1alpha1BackupApiUpdatemigrationHaloRunV1alpha1BackupRequest {
+export interface MigrationHaloRunV1alpha1BackupApiUpdateMigrationHaloRunV1alpha1BackupRequest {
     /**
      * Name of backup
      * @type {string}
-     * @memberof MigrationHaloRunV1alpha1BackupApiUpdatemigrationHaloRunV1alpha1Backup
+     * @memberof MigrationHaloRunV1alpha1BackupApiUpdateMigrationHaloRunV1alpha1Backup
      */
     readonly name: string
 
     /**
      * Updated backup
      * @type {Backup}
-     * @memberof MigrationHaloRunV1alpha1BackupApiUpdatemigrationHaloRunV1alpha1Backup
+     * @memberof MigrationHaloRunV1alpha1BackupApiUpdateMigrationHaloRunV1alpha1Backup
      */
     readonly backup?: Backup
 }
@@ -508,57 +508,57 @@ export interface MigrationHaloRunV1alpha1BackupApiUpdatemigrationHaloRunV1alpha1
 export class MigrationHaloRunV1alpha1BackupApi extends BaseAPI {
     /**
      * Create migration.halo.run/v1alpha1/Backup
-     * @param {MigrationHaloRunV1alpha1BackupApiCreatemigrationHaloRunV1alpha1BackupRequest} requestParameters Request parameters.
+     * @param {MigrationHaloRunV1alpha1BackupApiCreateMigrationHaloRunV1alpha1BackupRequest} requestParameters Request parameters.
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      * @memberof MigrationHaloRunV1alpha1BackupApi
      */
-    public createmigrationHaloRunV1alpha1Backup(requestParameters: MigrationHaloRunV1alpha1BackupApiCreatemigrationHaloRunV1alpha1BackupRequest = {}, options?: RawAxiosRequestConfig) {
-        return MigrationHaloRunV1alpha1BackupApiFp(this.configuration).createmigrationHaloRunV1alpha1Backup(requestParameters.backup, options).then((request) => request(this.axios, this.basePath));
+    public createMigrationHaloRunV1alpha1Backup(requestParameters: MigrationHaloRunV1alpha1BackupApiCreateMigrationHaloRunV1alpha1BackupRequest = {}, options?: RawAxiosRequestConfig) {
+        return MigrationHaloRunV1alpha1BackupApiFp(this.configuration).createMigrationHaloRunV1alpha1Backup(requestParameters.backup, options).then((request) => request(this.axios, this.basePath));
     }
 
     /**
      * Delete migration.halo.run/v1alpha1/Backup
-     * @param {MigrationHaloRunV1alpha1BackupApiDeletemigrationHaloRunV1alpha1BackupRequest} requestParameters Request parameters.
+     * @param {MigrationHaloRunV1alpha1BackupApiDeleteMigrationHaloRunV1alpha1BackupRequest} requestParameters Request parameters.
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      * @memberof MigrationHaloRunV1alpha1BackupApi
      */
-    public deletemigrationHaloRunV1alpha1Backup(requestParameters: MigrationHaloRunV1alpha1BackupApiDeletemigrationHaloRunV1alpha1BackupRequest, options?: RawAxiosRequestConfig) {
-        return MigrationHaloRunV1alpha1BackupApiFp(this.configuration).deletemigrationHaloRunV1alpha1Backup(requestParameters.name, options).then((request) => request(this.axios, this.basePath));
+    public deleteMigrationHaloRunV1alpha1Backup(requestParameters: MigrationHaloRunV1alpha1BackupApiDeleteMigrationHaloRunV1alpha1BackupRequest, options?: RawAxiosRequestConfig) {
+        return MigrationHaloRunV1alpha1BackupApiFp(this.configuration).deleteMigrationHaloRunV1alpha1Backup(requestParameters.name, options).then((request) => request(this.axios, this.basePath));
     }
 
     /**
      * Get migration.halo.run/v1alpha1/Backup
-     * @param {MigrationHaloRunV1alpha1BackupApiGetmigrationHaloRunV1alpha1BackupRequest} requestParameters Request parameters.
+     * @param {MigrationHaloRunV1alpha1BackupApiGetMigrationHaloRunV1alpha1BackupRequest} requestParameters Request parameters.
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      * @memberof MigrationHaloRunV1alpha1BackupApi
      */
-    public getmigrationHaloRunV1alpha1Backup(requestParameters: MigrationHaloRunV1alpha1BackupApiGetmigrationHaloRunV1alpha1BackupRequest, options?: RawAxiosRequestConfig) {
-        return MigrationHaloRunV1alpha1BackupApiFp(this.configuration).getmigrationHaloRunV1alpha1Backup(requestParameters.name, options).then((request) => request(this.axios, this.basePath));
+    public getMigrationHaloRunV1alpha1Backup(requestParameters: MigrationHaloRunV1alpha1BackupApiGetMigrationHaloRunV1alpha1BackupRequest, options?: RawAxiosRequestConfig) {
+        return MigrationHaloRunV1alpha1BackupApiFp(this.configuration).getMigrationHaloRunV1alpha1Backup(requestParameters.name, options).then((request) => request(this.axios, this.basePath));
     }
 
     /**
      * List migration.halo.run/v1alpha1/Backup
-     * @param {MigrationHaloRunV1alpha1BackupApiListmigrationHaloRunV1alpha1BackupRequest} requestParameters Request parameters.
+     * @param {MigrationHaloRunV1alpha1BackupApiListMigrationHaloRunV1alpha1BackupRequest} requestParameters Request parameters.
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      * @memberof MigrationHaloRunV1alpha1BackupApi
      */
-    public listmigrationHaloRunV1alpha1Backup(requestParameters: MigrationHaloRunV1alpha1BackupApiListmigrationHaloRunV1alpha1BackupRequest = {}, options?: RawAxiosRequestConfig) {
-        return MigrationHaloRunV1alpha1BackupApiFp(this.configuration).listmigrationHaloRunV1alpha1Backup(requestParameters.page, requestParameters.size, requestParameters.labelSelector, requestParameters.fieldSelector, requestParameters.sort, options).then((request) => request(this.axios, this.basePath));
+    public listMigrationHaloRunV1alpha1Backup(requestParameters: MigrationHaloRunV1alpha1BackupApiListMigrationHaloRunV1alpha1BackupRequest = {}, options?: RawAxiosRequestConfig) {
+        return MigrationHaloRunV1alpha1BackupApiFp(this.configuration).listMigrationHaloRunV1alpha1Backup(requestParameters.page, requestParameters.size, requestParameters.labelSelector, requestParameters.fieldSelector, requestParameters.sort, options).then((request) => request(this.axios, this.basePath));
     }
 
     /**
      * Update migration.halo.run/v1alpha1/Backup
-     * @param {MigrationHaloRunV1alpha1BackupApiUpdatemigrationHaloRunV1alpha1BackupRequest} requestParameters Request parameters.
+     * @param {MigrationHaloRunV1alpha1BackupApiUpdateMigrationHaloRunV1alpha1BackupRequest} requestParameters Request parameters.
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      * @memberof MigrationHaloRunV1alpha1BackupApi
      */
-    public updatemigrationHaloRunV1alpha1Backup(requestParameters: MigrationHaloRunV1alpha1BackupApiUpdatemigrationHaloRunV1alpha1BackupRequest, options?: RawAxiosRequestConfig) {
-        return MigrationHaloRunV1alpha1BackupApiFp(this.configuration).updatemigrationHaloRunV1alpha1Backup(requestParameters.name, requestParameters.backup, options).then((request) => request(this.axios, this.basePath));
+    public updateMigrationHaloRunV1alpha1Backup(requestParameters: MigrationHaloRunV1alpha1BackupApiUpdateMigrationHaloRunV1alpha1BackupRequest, options?: RawAxiosRequestConfig) {
+        return MigrationHaloRunV1alpha1BackupApiFp(this.configuration).updateMigrationHaloRunV1alpha1Backup(requestParameters.name, requestParameters.backup, options).then((request) => request(this.axios, this.basePath));
     }
 }
 

@@ -28,13 +28,11 @@ import run.halo.app.extension.ReactiveExtensionClient;
 import run.halo.app.infra.AnonymousUserConst;
 import run.halo.app.infra.properties.HaloProperties;
 import run.halo.app.security.DefaultUserDetailService;
+import run.halo.app.security.authentication.CryptoService;
 import run.halo.app.security.authentication.SecurityConfigurer;
-import run.halo.app.security.authentication.login.CryptoService;
+import run.halo.app.security.authentication.impl.RsaKeyService;
 import run.halo.app.security.authentication.login.PublicKeyRouteBuilder;
-import run.halo.app.security.authentication.login.RsaKeyScheduledGenerator;
-import run.halo.app.security.authentication.login.impl.RsaKeyService;
 import run.halo.app.security.authentication.pat.PatAuthenticationManager;
-import run.halo.app.security.authentication.pat.PatJwkSupplier;
 import run.halo.app.security.authentication.pat.PatServerWebExchangeMatcher;
 import run.halo.app.security.authentication.twofactor.TwoFactorAuthorizationManager;
 import run.halo.app.security.authorization.RequestInfoAuthorizationManager;
@@ -58,7 +56,7 @@ public class WebServerSecurityConfig {
         ObjectProvider<SecurityConfigurer> securityConfigurers,
         ServerSecurityContextRepository securityContextRepository,
         ReactiveExtensionClient client,
-        PatJwkSupplier patJwkSupplier,
+        CryptoService cryptoService,
         HaloProperties haloProperties) {
 
         http.securityMatcher(pathMatchers("/**"))
@@ -85,7 +83,7 @@ public class WebServerSecurityConfig {
             .oauth2ResourceServer(oauth2 -> {
                 var authManagerResolver = builder().add(
                         new PatServerWebExchangeMatcher(),
-                        new PatAuthenticationManager(client, patJwkSupplier)
+                        new PatAuthenticationManager(client, cryptoService)
                     )
                     // TODO Add other authentication mangers here. e.g.: JwtAuthenticationManager.
                     .build();
@@ -149,8 +147,4 @@ public class WebServerSecurityConfig {
         return new RsaKeyService(haloProperties.getWorkDir().resolve("keys"));
     }
 
-    @Bean
-    RsaKeyScheduledGenerator rsaKeyScheduledGenerator(CryptoService cryptoService) {
-        return new RsaKeyScheduledGenerator(cryptoService);
-    }
 }

@@ -76,7 +76,7 @@ const handleDelete = async (policy: Policy) => {
     confirmText: t("core.common.buttons.confirm"),
     cancelText: t("core.common.buttons.cancel"),
     onConfirm: async () => {
-      await apiClient.extension.storage.policy.deletestorageHaloRunV1alpha1Policy(
+      await apiClient.extension.storage.policy.deleteStorageHaloRunV1alpha1Policy(
         { name: policy.metadata.name }
       );
 

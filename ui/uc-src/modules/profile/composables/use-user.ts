@@ -22,7 +22,7 @@ export function useUserFetch(options?: {
   const handleFetchUsers = async () => {
     try {
       loading.value = true;
-      const { data } = await apiClient.extension.user.listv1alpha1User({
+      const { data } = await apiClient.extension.user.listV1alpha1User({
         fieldSelector: [`name!=${ANONYMOUSUSER_NAME}`],
       });
       users.value = data.items;

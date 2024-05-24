@@ -1,13 +1,9 @@
-package run.halo.app.security.authentication.login;
+package run.halo.app.security.authentication;
 
+import com.nimbusds.jose.jwk.JWK;
 import reactor.core.publisher.Mono;
 
 public interface CryptoService {
-
-    /**
-     * Generates key pair.
-     */
-    Mono<Void> generateKeys();
 
     /**
      * Decrypts message with Base64 format.
@@ -24,6 +20,18 @@ public interface CryptoService {
      */
     Mono<byte[]> readPublicKey();
 
-    Mono<byte[]> readPrivateKey();
+    /**
+     * Gets key ID of private key.
+     *
+     * @return key ID of private key.
+     */
+    String getKeyId();
+
+    /**
+     * Gets JSON Web Keys.
+     *
+     * @return JSON Web Keys
+     */
+    JWK getJwk();
 
 }

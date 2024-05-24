@@ -66,7 +66,7 @@ export function useFetchRole(): useFetchRoleReturn {
         loading.value = true;
       }
 
-      const { data } = await apiClient.extension.role.listv1alpha1Role({
+      const { data } = await apiClient.extension.role.listV1alpha1Role({
         page: 0,
         size: 0,
         labelSelector: [`!${roleLabels.TEMPLATE}`],
@@ -121,14 +121,14 @@ export function useRoleForm(): useRoleFormReturn {
     try {
       saving.value = true;
       if (isUpdateMode.value) {
-        const { data } = await apiClient.extension.role.updatev1alpha1Role({
+        const { data } = await apiClient.extension.role.updateV1alpha1Role({
           name: formState.value.metadata.name,
           role: formState.value,
         });
 
         formState.value = data;
       } else {
-        const { data } = await apiClient.extension.role.createv1alpha1Role({
+        const { data } = await apiClient.extension.role.createV1alpha1Role({
           role: formState.value,
         });
 

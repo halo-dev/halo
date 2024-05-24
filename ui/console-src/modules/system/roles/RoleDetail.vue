@@ -31,7 +31,7 @@ const tabActiveId = ref("detail");
 const { data: roleTemplates } = useQuery({
   queryKey: ["role-templates"],
   queryFn: async () => {
-    const { data } = await apiClient.extension.role.listv1alpha1Role({
+    const { data } = await apiClient.extension.role.listV1alpha1Role({
       page: 0,
       size: 0,
       labelSelector: [`${roleLabels.TEMPLATE}=true`, "!halo.run/hidden"],
@@ -84,7 +84,7 @@ watch(
 const { refetch } = useQuery<Role>({
   queryKey: ["role", route.params.name],
   queryFn: async () => {
-    const { data } = await apiClient.extension.role.getv1alpha1Role({
+    const { data } = await apiClient.extension.role.getV1alpha1Role({
       name: route.params.name as string,
     });
     return data;

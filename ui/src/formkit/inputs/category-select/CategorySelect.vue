@@ -216,7 +216,7 @@ const handleCreateCategory = async () => {
   }
 
   const { data } =
-    await apiClient.extension.category.createcontentHaloRunV1alpha1Category({
+    await apiClient.extension.category.createContentHaloRunV1alpha1Category({
       category: {
         spec: {
           displayName: text.value,

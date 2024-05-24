@@ -37,7 +37,7 @@ export const ContentHaloRunV1alpha1PostApiAxiosParamCreator = function (configur
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        createcontentHaloRunV1alpha1Post: async (post?: Post, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+        createContentHaloRunV1alpha1Post: async (post?: Post, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
             const localVarPath = `/apis/content.halo.run/v1alpha1/posts`;
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
@@ -78,9 +78,9 @@ export const ContentHaloRunV1alpha1PostApiAxiosParamCreator = function (configur
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        deletecontentHaloRunV1alpha1Post: async (name: string, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+        deleteContentHaloRunV1alpha1Post: async (name: string, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
             // verify required parameter 'name' is not null or undefined
-            assertParamExists('deletecontentHaloRunV1alpha1Post', 'name', name)
+            assertParamExists('deleteContentHaloRunV1alpha1Post', 'name', name)
             const localVarPath = `/apis/content.halo.run/v1alpha1/posts/{name}`
                 .replace(`{${"name"}}`, encodeURIComponent(String(name)));
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
@@ -119,9 +119,9 @@ export const ContentHaloRunV1alpha1PostApiAxiosParamCreator = function (configur
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        getcontentHaloRunV1alpha1Post: async (name: string, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+        getContentHaloRunV1alpha1Post: async (name: string, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
             // verify required parameter 'name' is not null or undefined
-            assertParamExists('getcontentHaloRunV1alpha1Post', 'name', name)
+            assertParamExists('getContentHaloRunV1alpha1Post', 'name', name)
             const localVarPath = `/apis/content.halo.run/v1alpha1/posts/{name}`
                 .replace(`{${"name"}}`, encodeURIComponent(String(name)));
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
@@ -164,7 +164,7 @@ export const ContentHaloRunV1alpha1PostApiAxiosParamCreator = function (configur
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        listcontentHaloRunV1alpha1Post: async (page?: number, size?: number, labelSelector?: Array<string>, fieldSelector?: Array<string>, sort?: Array<string>, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+        listContentHaloRunV1alpha1Post: async (page?: number, size?: number, labelSelector?: Array<string>, fieldSelector?: Array<string>, sort?: Array<string>, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
             const localVarPath = `/apis/content.halo.run/v1alpha1/posts`;
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
@@ -223,9 +223,9 @@ export const ContentHaloRunV1alpha1PostApiAxiosParamCreator = function (configur
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        updatecontentHaloRunV1alpha1Post: async (name: string, post?: Post, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+        updateContentHaloRunV1alpha1Post: async (name: string, post?: Post, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
             // verify required parameter 'name' is not null or undefined
-            assertParamExists('updatecontentHaloRunV1alpha1Post', 'name', name)
+            assertParamExists('updateContentHaloRunV1alpha1Post', 'name', name)
             const localVarPath = `/apis/content.halo.run/v1alpha1/posts/{name}`
                 .replace(`{${"name"}}`, encodeURIComponent(String(name)));
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
@@ -277,10 +277,10 @@ export const ContentHaloRunV1alpha1PostApiFp = function(configuration?: Configur
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async createcontentHaloRunV1alpha1Post(post?: Post, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<Post>> {
-            const localVarAxiosArgs = await localVarAxiosParamCreator.createcontentHaloRunV1alpha1Post(post, options);
+        async createContentHaloRunV1alpha1Post(post?: Post, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<Post>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.createContentHaloRunV1alpha1Post(post, options);
             const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
-            const localVarOperationServerBasePath = operationServerMap['ContentHaloRunV1alpha1PostApi.createcontentHaloRunV1alpha1Post']?.[localVarOperationServerIndex]?.url;
+            const localVarOperationServerBasePath = operationServerMap['ContentHaloRunV1alpha1PostApi.createContentHaloRunV1alpha1Post']?.[localVarOperationServerIndex]?.url;
             return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
         },
         /**
@@ -289,10 +289,10 @@ export const ContentHaloRunV1alpha1PostApiFp = function(configuration?: Configur
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async deletecontentHaloRunV1alpha1Post(name: string, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<void>> {
-            const localVarAxiosArgs = await localVarAxiosParamCreator.deletecontentHaloRunV1alpha1Post(name, options);
+        async deleteContentHaloRunV1alpha1Post(name: string, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<void>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.deleteContentHaloRunV1alpha1Post(name, options);
             const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
-            const localVarOperationServerBasePath = operationServerMap['ContentHaloRunV1alpha1PostApi.deletecontentHaloRunV1alpha1Post']?.[localVarOperationServerIndex]?.url;
+            const localVarOperationServerBasePath = operationServerMap['ContentHaloRunV1alpha1PostApi.deleteContentHaloRunV1alpha1Post']?.[localVarOperationServerIndex]?.url;
             return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
         },
         /**
@@ -301,10 +301,10 @@ export const ContentHaloRunV1alpha1PostApiFp = function(configuration?: Configur
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async getcontentHaloRunV1alpha1Post(name: string, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<Post>> {
-            const localVarAxiosArgs = await localVarAxiosParamCreator.getcontentHaloRunV1alpha1Post(name, options);
+        async getContentHaloRunV1alpha1Post(name: string, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<Post>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.getContentHaloRunV1alpha1Post(name, options);
             const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
-            const localVarOperationServerBasePath = operationServerMap['ContentHaloRunV1alpha1PostApi.getcontentHaloRunV1alpha1Post']?.[localVarOperationServerIndex]?.url;
+            const localVarOperationServerBasePath = operationServerMap['ContentHaloRunV1alpha1PostApi.getContentHaloRunV1alpha1Post']?.[localVarOperationServerIndex]?.url;
             return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
         },
         /**
@@ -317,10 +317,10 @@ export const ContentHaloRunV1alpha1PostApiFp = function(configuration?: Configur
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async listcontentHaloRunV1alpha1Post(page?: number, size?: number, labelSelector?: Array<string>, fieldSelector?: Array<string>, sort?: Array<string>, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<PostList>> {
-            const localVarAxiosArgs = await localVarAxiosParamCreator.listcontentHaloRunV1alpha1Post(page, size, labelSelector, fieldSelector, sort, options);
+        async listContentHaloRunV1alpha1Post(page?: number, size?: number, labelSelector?: Array<string>, fieldSelector?: Array<string>, sort?: Array<string>, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<PostList>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.listContentHaloRunV1alpha1Post(page, size, labelSelector, fieldSelector, sort, options);
             const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
-            const localVarOperationServerBasePath = operationServerMap['ContentHaloRunV1alpha1PostApi.listcontentHaloRunV1alpha1Post']?.[localVarOperationServerIndex]?.url;
+            const localVarOperationServerBasePath = operationServerMap['ContentHaloRunV1alpha1PostApi.listContentHaloRunV1alpha1Post']?.[localVarOperationServerIndex]?.url;
             return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
         },
         /**
@@ -330,10 +330,10 @@ export const ContentHaloRunV1alpha1PostApiFp = function(configuration?: Configur
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async updatecontentHaloRunV1alpha1Post(name: string, post?: Post, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<Post>> {
-            const localVarAxiosArgs = await localVarAxiosParamCreator.updatecontentHaloRunV1alpha1Post(name, post, options);
+        async updateContentHaloRunV1alpha1Post(name: string, post?: Post, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<Post>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.updateContentHaloRunV1alpha1Post(name, post, options);
             const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
-            const localVarOperationServerBasePath = operationServerMap['ContentHaloRunV1alpha1PostApi.updatecontentHaloRunV1alpha1Post']?.[localVarOperationServerIndex]?.url;
+            const localVarOperationServerBasePath = operationServerMap['ContentHaloRunV1alpha1PostApi.updateContentHaloRunV1alpha1Post']?.[localVarOperationServerIndex]?.url;
             return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
         },
     }
@@ -348,153 +348,153 @@ export const ContentHaloRunV1alpha1PostApiFactory = function (configuration?: Co
     return {
         /**
          * Create content.halo.run/v1alpha1/Post
-         * @param {ContentHaloRunV1alpha1PostApiCreatecontentHaloRunV1alpha1PostRequest} requestParameters Request parameters.
+         * @param {ContentHaloRunV1alpha1PostApiCreateContentHaloRunV1alpha1PostRequest} requestParameters Request parameters.
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        createcontentHaloRunV1alpha1Post(requestParameters: ContentHaloRunV1alpha1PostApiCreatecontentHaloRunV1alpha1PostRequest = {}, options?: RawAxiosRequestConfig): AxiosPromise<Post> {
-            return localVarFp.createcontentHaloRunV1alpha1Post(requestParameters.post, options).then((request) => request(axios, basePath));
+        createContentHaloRunV1alpha1Post(requestParameters: ContentHaloRunV1alpha1PostApiCreateContentHaloRunV1alpha1PostRequest = {}, options?: RawAxiosRequestConfig): AxiosPromise<Post> {
+            return localVarFp.createContentHaloRunV1alpha1Post(requestParameters.post, options).then((request) => request(axios, basePath));
         },
         /**
          * Delete content.halo.run/v1alpha1/Post
-         * @param {ContentHaloRunV1alpha1PostApiDeletecontentHaloRunV1alpha1PostRequest} requestParameters Request parameters.
+         * @param {ContentHaloRunV1alpha1PostApiDeleteContentHaloRunV1alpha1PostRequest} requestParameters Request parameters.
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        deletecontentHaloRunV1alpha1Post(requestParameters: ContentHaloRunV1alpha1PostApiDeletecontentHaloRunV1alpha1PostRequest, options?: RawAxiosRequestConfig): AxiosPromise<void> {
-            return localVarFp.deletecontentHaloRunV1alpha1Post(requestParameters.name, options).then((request) => request(axios, basePath));
+        deleteContentHaloRunV1alpha1Post(requestParameters: ContentHaloRunV1alpha1PostApiDeleteContentHaloRunV1alpha1PostRequest, options?: RawAxiosRequestConfig): AxiosPromise<void> {
+            return localVarFp.deleteContentHaloRunV1alpha1Post(requestParameters.name, options).then((request) => request(axios, basePath));
         },
         /**
          * Get content.halo.run/v1alpha1/Post
-         * @param {ContentHaloRunV1alpha1PostApiGetcontentHaloRunV1alpha1PostRequest} requestParameters Request parameters.
+         * @param {ContentHaloRunV1alpha1PostApiGetContentHaloRunV1alpha1PostRequest} requestParameters Request parameters.
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        getcontentHaloRunV1alpha1Post(requestParameters: ContentHaloRunV1alpha1PostApiGetcontentHaloRunV1alpha1PostRequest, options?: RawAxiosRequestConfig): AxiosPromise<Post> {
-            return localVarFp.getcontentHaloRunV1alpha1Post(requestParameters.name, options).then((request) => request(axios, basePath));
+        getContentHaloRunV1alpha1Post(requestParameters: ContentHaloRunV1alpha1PostApiGetContentHaloRunV1alpha1PostRequest, options?: RawAxiosRequestConfig): AxiosPromise<Post> {
+            return localVarFp.getContentHaloRunV1alpha1Post(requestParameters.name, options).then((request) => request(axios, basePath));
         },
         /**
          * List content.halo.run/v1alpha1/Post
-         * @param {ContentHaloRunV1alpha1PostApiListcontentHaloRunV1alpha1PostRequest} requestParameters Request parameters.
+         * @param {ContentHaloRunV1alpha1PostApiListContentHaloRunV1alpha1PostRequest} requestParameters Request parameters.
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        listcontentHaloRunV1alpha1Post(requestParameters: ContentHaloRunV1alpha1PostApiListcontentHaloRunV1alpha1PostRequest = {}, options?: RawAxiosRequestConfig): AxiosPromise<PostList> {
-            return localVarFp.listcontentHaloRunV1alpha1Post(requestParameters.page, requestParameters.size, requestParameters.labelSelector, requestParameters.fieldSelector, requestParameters.sort, options).then((request) => request(axios, basePath));
+        listContentHaloRunV1alpha1Post(requestParameters: ContentHaloRunV1alpha1PostApiListContentHaloRunV1alpha1PostRequest = {}, options?: RawAxiosRequestConfig): AxiosPromise<PostList> {
+            return localVarFp.listContentHaloRunV1alpha1Post(requestParameters.page, requestParameters.size, requestParameters.labelSelector, requestParameters.fieldSelector, requestParameters.sort, options).then((request) => request(axios, basePath));
         },
         /**
          * Update content.halo.run/v1alpha1/Post
-         * @param {ContentHaloRunV1alpha1PostApiUpdatecontentHaloRunV1alpha1PostRequest} requestParameters Request parameters.
+         * @param {ContentHaloRunV1alpha1PostApiUpdateContentHaloRunV1alpha1PostRequest} requestParameters Request parameters.
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        updatecontentHaloRunV1alpha1Post(requestParameters: ContentHaloRunV1alpha1PostApiUpdatecontentHaloRunV1alpha1PostRequest, options?: RawAxiosRequestConfig): AxiosPromise<Post> {
-            return localVarFp.updatecontentHaloRunV1alpha1Post(requestParameters.name, requestParameters.post, options).then((request) => request(axios, basePath));
+        updateContentHaloRunV1alpha1Post(requestParameters: ContentHaloRunV1alpha1PostApiUpdateContentHaloRunV1alpha1PostRequest, options?: RawAxiosRequestConfig): AxiosPromise<Post> {
+            return localVarFp.updateContentHaloRunV1alpha1Post(requestParameters.name, requestParameters.post, options).then((request) => request(axios, basePath));
         },
     };
 };
 
 /**
- * Request parameters for createcontentHaloRunV1alpha1Post operation in ContentHaloRunV1alpha1PostApi.
+ * Request parameters for createContentHaloRunV1alpha1Post operation in ContentHaloRunV1alpha1PostApi.
  * @export
- * @interface ContentHaloRunV1alpha1PostApiCreatecontentHaloRunV1alpha1PostRequest
+ * @interface ContentHaloRunV1alpha1PostApiCreateContentHaloRunV1alpha1PostRequest
  */
-export interface ContentHaloRunV1alpha1PostApiCreatecontentHaloRunV1alpha1PostRequest {
+export interface ContentHaloRunV1alpha1PostApiCreateContentHaloRunV1alpha1PostRequest {
     /**
      * Fresh post
      * @type {Post}
-     * @memberof ContentHaloRunV1alpha1PostApiCreatecontentHaloRunV1alpha1Post
+     * @memberof ContentHaloRunV1alpha1PostApiCreateContentHaloRunV1alpha1Post
      */
     readonly post?: Post
 }
 
 /**
- * Request parameters for deletecontentHaloRunV1alpha1Post operation in ContentHaloRunV1alpha1PostApi.
+ * Request parameters for deleteContentHaloRunV1alpha1Post operation in ContentHaloRunV1alpha1PostApi.
  * @export
- * @interface ContentHaloRunV1alpha1PostApiDeletecontentHaloRunV1alpha1PostRequest
+ * @interface ContentHaloRunV1alpha1PostApiDeleteContentHaloRunV1alpha1PostRequest
  */
-export interface ContentHaloRunV1alpha1PostApiDeletecontentHaloRunV1alpha1PostRequest {
+export interface ContentHaloRunV1alpha1PostApiDeleteContentHaloRunV1alpha1PostRequest {
     /**
      * Name of post
      * @type {string}
-     * @memberof ContentHaloRunV1alpha1PostApiDeletecontentHaloRunV1alpha1Post
+     * @memberof ContentHaloRunV1alpha1PostApiDeleteContentHaloRunV1alpha1Post
      */
     readonly name: string
 }
 
 /**
- * Request parameters for getcontentHaloRunV1alpha1Post operation in ContentHaloRunV1alpha1PostApi.
+ * Request parameters for getContentHaloRunV1alpha1Post operation in ContentHaloRunV1alpha1PostApi.
  * @export
- * @interface ContentHaloRunV1alpha1PostApiGetcontentHaloRunV1alpha1PostRequest
+ * @interface ContentHaloRunV1alpha1PostApiGetContentHaloRunV1alpha1PostRequest
  */
-export interface ContentHaloRunV1alpha1PostApiGetcontentHaloRunV1alpha1PostRequest {
+export interface ContentHaloRunV1alpha1PostApiGetContentHaloRunV1alpha1PostRequest {
     /**
      * Name of post
      * @type {string}
-     * @memberof ContentHaloRunV1alpha1PostApiGetcontentHaloRunV1alpha1Post
+     * @memberof ContentHaloRunV1alpha1PostApiGetContentHaloRunV1alpha1Post
      */
     readonly name: string
 }
 
 /**
- * Request parameters for listcontentHaloRunV1alpha1Post operation in ContentHaloRunV1alpha1PostApi.
+ * Request parameters for listContentHaloRunV1alpha1Post operation in ContentHaloRunV1alpha1PostApi.
  * @export
- * @interface ContentHaloRunV1alpha1PostApiListcontentHaloRunV1alpha1PostRequest
+ * @interface ContentHaloRunV1alpha1PostApiListContentHaloRunV1alpha1PostRequest
  */
-export interface ContentHaloRunV1alpha1PostApiListcontentHaloRunV1alpha1PostRequest {
+export interface ContentHaloRunV1alpha1PostApiListContentHaloRunV1alpha1PostRequest {
     /**
      * Page number. Default is 0.
      * @type {number}
-     * @memberof ContentHaloRunV1alpha1PostApiListcontentHaloRunV1alpha1Post
+     * @memberof ContentHaloRunV1alpha1PostApiListContentHaloRunV1alpha1Post
      */
     readonly page?: number
 
     /**
      * Size number. Default is 0.
      * @type {number}
-     * @memberof ContentHaloRunV1alpha1PostApiListcontentHaloRunV1alpha1Post
+     * @memberof ContentHaloRunV1alpha1PostApiListContentHaloRunV1alpha1Post
      */
     readonly size?: number
 
     /**
      * Label selector. e.g.: hidden!&#x3D;true
      * @type {Array<string>}
-     * @memberof ContentHaloRunV1alpha1PostApiListcontentHaloRunV1alpha1Post
+     * @memberof ContentHaloRunV1alpha1PostApiListContentHaloRunV1alpha1Post
      */
     readonly labelSelector?: Array<string>
 
     /**
      * Field selector. e.g.: metadata.name&#x3D;&#x3D;halo
      * @type {Array<string>}
-     * @memberof ContentHaloRunV1alpha1PostApiListcontentHaloRunV1alpha1Post
+     * @memberof ContentHaloRunV1alpha1PostApiListContentHaloRunV1alpha1Post
      */
     readonly fieldSelector?: Array<string>
 
     /**
      * Sorting criteria in the format: property,(asc|desc). Default sort order is ascending. Multiple sort criteria are supported.
      * @type {Array<string>}
-     * @memberof ContentHaloRunV1alpha1PostApiListcontentHaloRunV1alpha1Post
+     * @memberof ContentHaloRunV1alpha1PostApiListContentHaloRunV1alpha1Post
      */
     readonly sort?: Array<string>
 }
 
 /**
- * Request parameters for updatecontentHaloRunV1alpha1Post operation in ContentHaloRunV1alpha1PostApi.
+ * Request parameters for updateContentHaloRunV1alpha1Post operation in ContentHaloRunV1alpha1PostApi.
  * @export
- * @interface ContentHaloRunV1alpha1PostApiUpdatecontentHaloRunV1alpha1PostRequest
+ * @interface ContentHaloRunV1alpha1PostApiUpdateContentHaloRunV1alpha1PostRequest
  */
-export interface ContentHaloRunV1alpha1PostApiUpdatecontentHaloRunV1alpha1PostRequest {
+export interface ContentHaloRunV1alpha1PostApiUpdateContentHaloRunV1alpha1PostRequest {
     /**
      * Name of post
      * @type {string}
-     * @memberof ContentHaloRunV1alpha1PostApiUpdatecontentHaloRunV1alpha1Post
+     * @memberof ContentHaloRunV1alpha1PostApiUpdateContentHaloRunV1alpha1Post
      */
     readonly name: string
 
     /**
      * Updated post
      * @type {Post}
-     * @memberof ContentHaloRunV1alpha1PostApiUpdatecontentHaloRunV1alpha1Post
+     * @memberof ContentHaloRunV1alpha1PostApiUpdateContentHaloRunV1alpha1Post
      */
     readonly post?: Post
 }
@@ -508,57 +508,57 @@ export interface ContentHaloRunV1alpha1PostApiUpdatecontentHaloRunV1alpha1PostRe
 export class ContentHaloRunV1alpha1PostApi extends BaseAPI {
     /**
      * Create content.halo.run/v1alpha1/Post
-     * @param {ContentHaloRunV1alpha1PostApiCreatecontentHaloRunV1alpha1PostRequest} requestParameters Request parameters.
+     * @param {ContentHaloRunV1alpha1PostApiCreateContentHaloRunV1alpha1PostRequest} requestParameters Request parameters.
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      * @memberof ContentHaloRunV1alpha1PostApi
      */
-    public createcontentHaloRunV1alpha1Post(requestParameters: ContentHaloRunV1alpha1PostApiCreatecontentHaloRunV1alpha1PostRequest = {}, options?: RawAxiosRequestConfig) {
-        return ContentHaloRunV1alpha1PostApiFp(this.configuration).createcontentHaloRunV1alpha1Post(requestParameters.post, options).then((request) => request(this.axios, this.basePath));
+    public createContentHaloRunV1alpha1Post(requestParameters: ContentHaloRunV1alpha1PostApiCreateContentHaloRunV1alpha1PostRequest = {}, options?: RawAxiosRequestConfig) {
+        return ContentHaloRunV1alpha1PostApiFp(this.configuration).createContentHaloRunV1alpha1Post(requestParameters.post, options).then((request) => request(this.axios, this.basePath));
     }
 
     /**
      * Delete content.halo.run/v1alpha1/Post
-     * @param {ContentHaloRunV1alpha1PostApiDeletecontentHaloRunV1alpha1PostRequest} requestParameters Request parameters.
+     * @param {ContentHaloRunV1alpha1PostApiDeleteContentHaloRunV1alpha1PostRequest} requestParameters Request parameters.
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      * @memberof ContentHaloRunV1alpha1PostApi
      */
-    public deletecontentHaloRunV1alpha1Post(requestParameters: ContentHaloRunV1alpha1PostApiDeletecontentHaloRunV1alpha1PostRequest, options?: RawAxiosRequestConfig) {
-        return ContentHaloRunV1alpha1PostApiFp(this.configuration).deletecontentHaloRunV1alpha1Post(requestParameters.name, options).then((request) => request(this.axios, this.basePath));
+    public deleteContentHaloRunV1alpha1Post(requestParameters: ContentHaloRunV1alpha1PostApiDeleteContentHaloRunV1alpha1PostRequest, options?: RawAxiosRequestConfig) {
+        return ContentHaloRunV1alpha1PostApiFp(this.configuration).deleteContentHaloRunV1alpha1Post(requestParameters.name, options).then((request) => request(this.axios, this.basePath));
     }
 
     /**
      * Get content.halo.run/v1alpha1/Post
-     * @param {ContentHaloRunV1alpha1PostApiGetcontentHaloRunV1alpha1PostRequest} requestParameters Request parameters.
+     * @param {ContentHaloRunV1alpha1PostApiGetContentHaloRunV1alpha1PostRequest} requestParameters Request parameters.
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      * @memberof ContentHaloRunV1alpha1PostApi
      */
-    public getcontentHaloRunV1alpha1Post(requestParameters: ContentHaloRunV1alpha1PostApiGetcontentHaloRunV1alpha1PostRequest, options?: RawAxiosRequestConfig) {
-        return ContentHaloRunV1alpha1PostApiFp(this.configuration).getcontentHaloRunV1alpha1Post(requestParameters.name, options).then((request) => request(this.axios, this.basePath));
+    public getContentHaloRunV1alpha1Post(requestParameters: ContentHaloRunV1alpha1PostApiGetContentHaloRunV1alpha1PostRequest, options?: RawAxiosRequestConfig) {
+        return ContentHaloRunV1alpha1PostApiFp(this.configuration).getContentHaloRunV1alpha1Post(requestParameters.name, options).then((request) => request(this.axios, this.basePath));
     }
 
     /**
      * List content.halo.run/v1alpha1/Post
-     * @param {ContentHaloRunV1alpha1PostApiListcontentHaloRunV1alpha1PostRequest} requestParameters Request parameters.
+     * @param {ContentHaloRunV1alpha1PostApiListContentHaloRunV1alpha1PostRequest} requestParameters Request parameters.
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      * @memberof ContentHaloRunV1alpha1PostApi
      */
-    public listcontentHaloRunV1alpha1Post(requestParameters: ContentHaloRunV1alpha1PostApiListcontentHaloRunV1alpha1PostRequest = {}, options?: RawAxiosRequestConfig) {
-        return ContentHaloRunV1alpha1PostApiFp(this.configuration).listcontentHaloRunV1alpha1Post(requestParameters.page, requestParameters.size, requestParameters.labelSelector, requestParameters.fieldSelector, requestParameters.sort, options).then((request) => request(this.axios, this.basePath));
+    public listContentHaloRunV1alpha1Post(requestParameters: ContentHaloRunV1alpha1PostApiListContentHaloRunV1alpha1PostRequest = {}, options?: RawAxiosRequestConfig) {
+        return ContentHaloRunV1alpha1PostApiFp(this.configuration).listContentHaloRunV1alpha1Post(requestParameters.page, requestParameters.size, requestParameters.labelSelector, requestParameters.fieldSelector, requestParameters.sort, options).then((request) => request(this.axios, this.basePath));
     }
 
     /**
      * Update content.halo.run/v1alpha1/Post
-     * @param {ContentHaloRunV1alpha1PostApiUpdatecontentHaloRunV1alpha1PostRequest} requestParameters Request parameters.
+     * @param {ContentHaloRunV1alpha1PostApiUpdateContentHaloRunV1alpha1PostRequest} requestParameters Request parameters.
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      * @memberof ContentHaloRunV1alpha1PostApi
      */
-    public updatecontentHaloRunV1alpha1Post(requestParameters: ContentHaloRunV1alpha1PostApiUpdatecontentHaloRunV1alpha1PostRequest, options?: RawAxiosRequestConfig) {
-        return ContentHaloRunV1alpha1PostApiFp(this.configuration).updatecontentHaloRunV1alpha1Post(requestParameters.name, requestParameters.post, options).then((request) => request(this.axios, this.basePath));
+    public updateContentHaloRunV1alpha1Post(requestParameters: ContentHaloRunV1alpha1PostApiUpdateContentHaloRunV1alpha1PostRequest, options?: RawAxiosRequestConfig) {
+        return ContentHaloRunV1alpha1PostApiFp(this.configuration).updateContentHaloRunV1alpha1Post(requestParameters.name, requestParameters.post, options).then((request) => request(this.axios, this.basePath));
     }
 }
 

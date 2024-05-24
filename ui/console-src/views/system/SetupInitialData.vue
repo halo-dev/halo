@@ -69,10 +69,10 @@ async function setupInitialData() {
     processing.value = true;
 
     // Create category / tag / post
-    await apiClient.extension.category.createcontentHaloRunV1alpha1Category({
+    await apiClient.extension.category.createContentHaloRunV1alpha1Category({
       category: category as Category,
     });
-    await apiClient.extension.tag.createcontentHaloRunV1alpha1Tag({
+    await apiClient.extension.tag.createContentHaloRunV1alpha1Tag({
       tag: tag as Tag,
     });
     const { data: postData } = await apiClient.post.draftPost({
@@ -93,12 +93,12 @@ async function setupInitialData() {
 
     // Create menu and menu items
     const menuItemPromises = menuItems.map((item) => {
-      return apiClient.extension.menuItem.createv1alpha1MenuItem({
+      return apiClient.extension.menuItem.createV1alpha1MenuItem({
         menuItem: item,
       });
     });
     await Promise.all(menuItemPromises);
-    await apiClient.extension.menu.createv1alpha1Menu({ menu: menu });
+    await apiClient.extension.menu.createV1alpha1Menu({ menu: menu });
 
     // Install preset plugins
     const { data: presetPlugins } = await apiClient.plugin.listPluginPresets();
@@ -114,7 +114,7 @@ async function setupInitialData() {
   } catch (error) {
     console.error(error);
   } finally {
-    await apiClient.extension.configMap.createv1alpha1ConfigMap({
+    await apiClient.extension.configMap.createV1alpha1ConfigMap({
       configMap: {
         metadata: {
           name: "system-states",

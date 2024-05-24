@@ -91,7 +91,7 @@ const handleSaveCategory = async () => {
   try {
     saving.value = true;
     if (isUpdateMode) {
-      await apiClient.extension.category.updatecontentHaloRunV1alpha1Category({
+      await apiClient.extension.category.updateContentHaloRunV1alpha1Category({
         name: formState.value.metadata.name,
         category: formState.value,
       });
@@ -101,7 +101,7 @@ const handleSaveCategory = async () => {
 
       if (selectedParentCategory.value) {
         const { data } =
-          await apiClient.extension.category.getcontentHaloRunV1alpha1Category({
+          await apiClient.extension.category.getContentHaloRunV1alpha1Category({
             name: selectedParentCategory.value,
           });
         parentCategory = data;
@@ -114,7 +114,7 @@ const handleSaveCategory = async () => {
       formState.value.spec.priority = priority;
 
       const { data: createdCategory } =
-        await apiClient.extension.category.createcontentHaloRunV1alpha1Category(
+        await apiClient.extension.category.createContentHaloRunV1alpha1Category(
           {
             category: formState.value,
           }
@@ -128,7 +128,7 @@ const handleSaveCategory = async () => {
           ])
         );
 
-        await apiClient.extension.category.updatecontentHaloRunV1alpha1Category(
+        await apiClient.extension.category.updateContentHaloRunV1alpha1Category(
           {
             name: selectedParentCategory.value,
             category: parentCategory,

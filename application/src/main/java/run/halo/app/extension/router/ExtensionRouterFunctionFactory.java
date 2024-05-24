@@ -37,7 +37,7 @@ public class ExtensionRouterFunctionFactory {
         var tagName = gvk.toString();
         return SpringdocRouteBuilder.route()
             .GET(getHandler.pathPattern(), getHandler,
-                builder -> builder.operationId("Get" + gvk)
+                builder -> builder.operationId("Get/" + gvk)
                     .description("Get " + gvk)
                     .tag(tagName)
                     .parameter(parameterBuilder().in(ParameterIn.PATH)
@@ -48,7 +48,7 @@ public class ExtensionRouterFunctionFactory {
                         .implementation(scheme.type())))
             .GET(listHandler.pathPattern(), listHandler,
                 builder -> {
-                    builder.operationId("List" + gvk)
+                    builder.operationId("List/" + gvk)
                         .description("List " + gvk)
                         .tag(tagName)
                         .response(responseBuilder().responseCode("200")
@@ -57,7 +57,7 @@ public class ExtensionRouterFunctionFactory {
                     SortableRequest.buildParameters(builder);
                 })
             .POST(createHandler.pathPattern(), createHandler,
-                builder -> builder.operationId("Create" + gvk)
+                builder -> builder.operationId("Create/" + gvk)
                     .description("Create " + gvk)
                     .tag(tagName)
                     .requestBody(requestBodyBuilder()
@@ -67,7 +67,7 @@ public class ExtensionRouterFunctionFactory {
                         .description("Response " + scheme.plural() + " created just now")
                         .implementation(scheme.type())))
             .PUT(updateHandler.pathPattern(), updateHandler,
-                builder -> builder.operationId("Update" + gvk)
+                builder -> builder.operationId("Update/" + gvk)
                     .description("Update " + gvk)
                     .tag(tagName)
                     .parameter(parameterBuilder().in(ParameterIn.PATH)
@@ -80,7 +80,7 @@ public class ExtensionRouterFunctionFactory {
                         .description("Response " + scheme.plural() + " updated just now")
                         .implementation(scheme.type())))
             .DELETE(deleteHandler.pathPattern(), deleteHandler,
-                builder -> builder.operationId("Delete" + gvk)
+                builder -> builder.operationId("Delete/" + gvk)
                     .description("Delete " + gvk)
                     .tag(tagName)
                     .parameter(parameterBuilder().in(ParameterIn.PATH)

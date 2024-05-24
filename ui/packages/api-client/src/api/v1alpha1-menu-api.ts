@@ -37,7 +37,7 @@ export const V1alpha1MenuApiAxiosParamCreator = function (configuration?: Config
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        createv1alpha1Menu: async (menu?: Menu, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+        createV1alpha1Menu: async (menu?: Menu, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
             const localVarPath = `/api/v1alpha1/menus`;
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
@@ -78,9 +78,9 @@ export const V1alpha1MenuApiAxiosParamCreator = function (configuration?: Config
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        deletev1alpha1Menu: async (name: string, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+        deleteV1alpha1Menu: async (name: string, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
             // verify required parameter 'name' is not null or undefined
-            assertParamExists('deletev1alpha1Menu', 'name', name)
+            assertParamExists('deleteV1alpha1Menu', 'name', name)
             const localVarPath = `/api/v1alpha1/menus/{name}`
                 .replace(`{${"name"}}`, encodeURIComponent(String(name)));
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
@@ -119,9 +119,9 @@ export const V1alpha1MenuApiAxiosParamCreator = function (configuration?: Config
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        getv1alpha1Menu: async (name: string, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+        getV1alpha1Menu: async (name: string, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
             // verify required parameter 'name' is not null or undefined
-            assertParamExists('getv1alpha1Menu', 'name', name)
+            assertParamExists('getV1alpha1Menu', 'name', name)
             const localVarPath = `/api/v1alpha1/menus/{name}`
                 .replace(`{${"name"}}`, encodeURIComponent(String(name)));
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
@@ -164,7 +164,7 @@ export const V1alpha1MenuApiAxiosParamCreator = function (configuration?: Config
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        listv1alpha1Menu: async (page?: number, size?: number, labelSelector?: Array<string>, fieldSelector?: Array<string>, sort?: Array<string>, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+        listV1alpha1Menu: async (page?: number, size?: number, labelSelector?: Array<string>, fieldSelector?: Array<string>, sort?: Array<string>, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
             const localVarPath = `/api/v1alpha1/menus`;
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
@@ -223,9 +223,9 @@ export const V1alpha1MenuApiAxiosParamCreator = function (configuration?: Config
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        updatev1alpha1Menu: async (name: string, menu?: Menu, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+        updateV1alpha1Menu: async (name: string, menu?: Menu, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
             // verify required parameter 'name' is not null or undefined
-            assertParamExists('updatev1alpha1Menu', 'name', name)
+            assertParamExists('updateV1alpha1Menu', 'name', name)
             const localVarPath = `/api/v1alpha1/menus/{name}`
                 .replace(`{${"name"}}`, encodeURIComponent(String(name)));
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
@@ -277,10 +277,10 @@ export const V1alpha1MenuApiFp = function(configuration?: Configuration) {
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async createv1alpha1Menu(menu?: Menu, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<Menu>> {
-            const localVarAxiosArgs = await localVarAxiosParamCreator.createv1alpha1Menu(menu, options);
+        async createV1alpha1Menu(menu?: Menu, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<Menu>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.createV1alpha1Menu(menu, options);
             const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
-            const localVarOperationServerBasePath = operationServerMap['V1alpha1MenuApi.createv1alpha1Menu']?.[localVarOperationServerIndex]?.url;
+            const localVarOperationServerBasePath = operationServerMap['V1alpha1MenuApi.createV1alpha1Menu']?.[localVarOperationServerIndex]?.url;
             return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
         },
         /**
@@ -289,10 +289,10 @@ export const V1alpha1MenuApiFp = function(configuration?: Configuration) {
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async deletev1alpha1Menu(name: string, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<void>> {
-            const localVarAxiosArgs = await localVarAxiosParamCreator.deletev1alpha1Menu(name, options);
+        async deleteV1alpha1Menu(name: string, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<void>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.deleteV1alpha1Menu(name, options);
             const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
-            const localVarOperationServerBasePath = operationServerMap['V1alpha1MenuApi.deletev1alpha1Menu']?.[localVarOperationServerIndex]?.url;
+            const localVarOperationServerBasePath = operationServerMap['V1alpha1MenuApi.deleteV1alpha1Menu']?.[localVarOperationServerIndex]?.url;
             return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
         },
         /**
@@ -301,10 +301,10 @@ export const V1alpha1MenuApiFp = function(configuration?: Configuration) {
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async getv1alpha1Menu(name: string, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<Menu>> {
-            const localVarAxiosArgs = await localVarAxiosParamCreator.getv1alpha1Menu(name, options);
+        async getV1alpha1Menu(name: string, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<Menu>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.getV1alpha1Menu(name, options);
             const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
-            const localVarOperationServerBasePath = operationServerMap['V1alpha1MenuApi.getv1alpha1Menu']?.[localVarOperationServerIndex]?.url;
+            const localVarOperationServerBasePath = operationServerMap['V1alpha1MenuApi.getV1alpha1Menu']?.[localVarOperationServerIndex]?.url;
             return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
         },
         /**
@@ -317,10 +317,10 @@ export const V1alpha1MenuApiFp = function(configuration?: Configuration) {
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async listv1alpha1Menu(page?: number, size?: number, labelSelector?: Array<string>, fieldSelector?: Array<string>, sort?: Array<string>, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<MenuList>> {
-            const localVarAxiosArgs = await localVarAxiosParamCreator.listv1alpha1Menu(page, size, labelSelector, fieldSelector, sort, options);
+        async listV1alpha1Menu(page?: number, size?: number, labelSelector?: Array<string>, fieldSelector?: Array<string>, sort?: Array<string>, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<MenuList>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.listV1alpha1Menu(page, size, labelSelector, fieldSelector, sort, options);
             const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
-            const localVarOperationServerBasePath = operationServerMap['V1alpha1MenuApi.listv1alpha1Menu']?.[localVarOperationServerIndex]?.url;
+            const localVarOperationServerBasePath = operationServerMap['V1alpha1MenuApi.listV1alpha1Menu']?.[localVarOperationServerIndex]?.url;
             return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
         },
         /**
@@ -330,10 +330,10 @@ export const V1alpha1MenuApiFp = function(configuration?: Configuration) {
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async updatev1alpha1Menu(name: string, menu?: Menu, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<Menu>> {
-            const localVarAxiosArgs = await localVarAxiosParamCreator.updatev1alpha1Menu(name, menu, options);
+        async updateV1alpha1Menu(name: string, menu?: Menu, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<Menu>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.updateV1alpha1Menu(name, menu, options);
             const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
-            const localVarOperationServerBasePath = operationServerMap['V1alpha1MenuApi.updatev1alpha1Menu']?.[localVarOperationServerIndex]?.url;
+            const localVarOperationServerBasePath = operationServerMap['V1alpha1MenuApi.updateV1alpha1Menu']?.[localVarOperationServerIndex]?.url;
             return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
         },
     }
@@ -348,153 +348,153 @@ export const V1alpha1MenuApiFactory = function (configuration?: Configuration, b
     return {
         /**
          * Create v1alpha1/Menu
-         * @param {V1alpha1MenuApiCreatev1alpha1MenuRequest} requestParameters Request parameters.
+         * @param {V1alpha1MenuApiCreateV1alpha1MenuRequest} requestParameters Request parameters.
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        createv1alpha1Menu(requestParameters: V1alpha1MenuApiCreatev1alpha1MenuRequest = {}, options?: RawAxiosRequestConfig): AxiosPromise<Menu> {
-            return localVarFp.createv1alpha1Menu(requestParameters.menu, options).then((request) => request(axios, basePath));
+        createV1alpha1Menu(requestParameters: V1alpha1MenuApiCreateV1alpha1MenuRequest = {}, options?: RawAxiosRequestConfig): AxiosPromise<Menu> {
+            return localVarFp.createV1alpha1Menu(requestParameters.menu, options).then((request) => request(axios, basePath));
         },
         /**
          * Delete v1alpha1/Menu
-         * @param {V1alpha1MenuApiDeletev1alpha1MenuRequest} requestParameters Request parameters.
+         * @param {V1alpha1MenuApiDeleteV1alpha1MenuRequest} requestParameters Request parameters.
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        deletev1alpha1Menu(requestParameters: V1alpha1MenuApiDeletev1alpha1MenuRequest, options?: RawAxiosRequestConfig): AxiosPromise<void> {
-            return localVarFp.deletev1alpha1Menu(requestParameters.name, options).then((request) => request(axios, basePath));
+        deleteV1alpha1Menu(requestParameters: V1alpha1MenuApiDeleteV1alpha1MenuRequest, options?: RawAxiosRequestConfig): AxiosPromise<void> {
+            return localVarFp.deleteV1alpha1Menu(requestParameters.name, options).then((request) => request(axios, basePath));
         },
         /**
          * Get v1alpha1/Menu
-         * @param {V1alpha1MenuApiGetv1alpha1MenuRequest} requestParameters Request parameters.
+         * @param {V1alpha1MenuApiGetV1alpha1MenuRequest} requestParameters Request parameters.
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        getv1alpha1Menu(requestParameters: V1alpha1MenuApiGetv1alpha1MenuRequest, options?: RawAxiosRequestConfig): AxiosPromise<Menu> {
-            return localVarFp.getv1alpha1Menu(requestParameters.name, options).then((request) => request(axios, basePath));
+        getV1alpha1Menu(requestParameters: V1alpha1MenuApiGetV1alpha1MenuRequest, options?: RawAxiosRequestConfig): AxiosPromise<Menu> {
+            return localVarFp.getV1alpha1Menu(requestParameters.name, options).then((request) => request(axios, basePath));
         },
         /**
          * List v1alpha1/Menu
-         * @param {V1alpha1MenuApiListv1alpha1MenuRequest} requestParameters Request parameters.
+         * @param {V1alpha1MenuApiListV1alpha1MenuRequest} requestParameters Request parameters.
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        listv1alpha1Menu(requestParameters: V1alpha1MenuApiListv1alpha1MenuRequest = {}, options?: RawAxiosRequestConfig): AxiosPromise<MenuList> {
-            return localVarFp.listv1alpha1Menu(requestParameters.page, requestParameters.size, requestParameters.labelSelector, requestParameters.fieldSelector, requestParameters.sort, options).then((request) => request(axios, basePath));
+        listV1alpha1Menu(requestParameters: V1alpha1MenuApiListV1alpha1MenuRequest = {}, options?: RawAxiosRequestConfig): AxiosPromise<MenuList> {
+            return localVarFp.listV1alpha1Menu(requestParameters.page, requestParameters.size, requestParameters.labelSelector, requestParameters.fieldSelector, requestParameters.sort, options).then((request) => request(axios, basePath));
         },
         /**
          * Update v1alpha1/Menu
-         * @param {V1alpha1MenuApiUpdatev1alpha1MenuRequest} requestParameters Request parameters.
+         * @param {V1alpha1MenuApiUpdateV1alpha1MenuRequest} requestParameters Request parameters.
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        updatev1alpha1Menu(requestParameters: V1alpha1MenuApiUpdatev1alpha1MenuRequest, options?: RawAxiosRequestConfig): AxiosPromise<Menu> {
-            return localVarFp.updatev1alpha1Menu(requestParameters.name, requestParameters.menu, options).then((request) => request(axios, basePath));
+        updateV1alpha1Menu(requestParameters: V1alpha1MenuApiUpdateV1alpha1MenuRequest, options?: RawAxiosRequestConfig): AxiosPromise<Menu> {
+            return localVarFp.updateV1alpha1Menu(requestParameters.name, requestParameters.menu, options).then((request) => request(axios, basePath));
         },
     };
 };
 
 /**
- * Request parameters for createv1alpha1Menu operation in V1alpha1MenuApi.
+ * Request parameters for createV1alpha1Menu operation in V1alpha1MenuApi.
  * @export
- * @interface V1alpha1MenuApiCreatev1alpha1MenuRequest
+ * @interface V1alpha1MenuApiCreateV1alpha1MenuRequest
  */
-export interface V1alpha1MenuApiCreatev1alpha1MenuRequest {
+export interface V1alpha1MenuApiCreateV1alpha1MenuRequest {
     /**
      * Fresh menu
      * @type {Menu}
-     * @memberof V1alpha1MenuApiCreatev1alpha1Menu
+     * @memberof V1alpha1MenuApiCreateV1alpha1Menu
      */
     readonly menu?: Menu
 }
 
 /**
- * Request parameters for deletev1alpha1Menu operation in V1alpha1MenuApi.
+ * Request parameters for deleteV1alpha1Menu operation in V1alpha1MenuApi.
  * @export
- * @interface V1alpha1MenuApiDeletev1alpha1MenuRequest
+ * @interface V1alpha1MenuApiDeleteV1alpha1MenuRequest
  */
-export interface V1alpha1MenuApiDeletev1alpha1MenuRequest {
+export interface V1alpha1MenuApiDeleteV1alpha1MenuRequest {
     /**
      * Name of menu
      * @type {string}
-     * @memberof V1alpha1MenuApiDeletev1alpha1Menu
+     * @memberof V1alpha1MenuApiDeleteV1alpha1Menu
      */
     readonly name: string
 }
 
 /**
- * Request parameters for getv1alpha1Menu operation in V1alpha1MenuApi.
+ * Request parameters for getV1alpha1Menu operation in V1alpha1MenuApi.
  * @export
- * @interface V1alpha1MenuApiGetv1alpha1MenuRequest
+ * @interface V1alpha1MenuApiGetV1alpha1MenuRequest
  */
-export interface V1alpha1MenuApiGetv1alpha1MenuRequest {
+export interface V1alpha1MenuApiGetV1alpha1MenuRequest {
     /**
      * Name of menu
      * @type {string}
-     * @memberof V1alpha1MenuApiGetv1alpha1Menu
+     * @memberof V1alpha1MenuApiGetV1alpha1Menu
      */
     readonly name: string
 }
 
 /**
- * Request parameters for listv1alpha1Menu operation in V1alpha1MenuApi.
+ * Request parameters for listV1alpha1Menu operation in V1alpha1MenuApi.
  * @export
- * @interface V1alpha1MenuApiListv1alpha1MenuRequest
+ * @interface V1alpha1MenuApiListV1alpha1MenuRequest
  */
-export interface V1alpha1MenuApiListv1alpha1MenuRequest {
+export interface V1alpha1MenuApiListV1alpha1MenuRequest {
     /**
      * Page number. Default is 0.
      * @type {number}
-     * @memberof V1alpha1MenuApiListv1alpha1Menu
+     * @memberof V1alpha1MenuApiListV1alpha1Menu
      */
     readonly page?: number
 
     /**
      * Size number. Default is 0.
      * @type {number}
-     * @memberof V1alpha1MenuApiListv1alpha1Menu
+     * @memberof V1alpha1MenuApiListV1alpha1Menu
      */
     readonly size?: number
 
     /**
      * Label selector. e.g.: hidden!&#x3D;true
      * @type {Array<string>}
-     * @memberof V1alpha1MenuApiListv1alpha1Menu
+     * @memberof V1alpha1MenuApiListV1alpha1Menu
      */
     readonly labelSelector?: Array<string>
 
     /**
      * Field selector. e.g.: metadata.name&#x3D;&#x3D;halo
      * @type {Array<string>}
-     * @memberof V1alpha1MenuApiListv1alpha1Menu
+     * @memberof V1alpha1MenuApiListV1alpha1Menu
      */
     readonly fieldSelector?: Array<string>
 
     /**
      * Sorting criteria in the format: property,(asc|desc). Default sort order is ascending. Multiple sort criteria are supported.
      * @type {Array<string>}
-     * @memberof V1alpha1MenuApiListv1alpha1Menu
+     * @memberof V1alpha1MenuApiListV1alpha1Menu
      */
     readonly sort?: Array<string>
 }
 
 /**
- * Request parameters for updatev1alpha1Menu operation in V1alpha1MenuApi.
+ * Request parameters for updateV1alpha1Menu operation in V1alpha1MenuApi.
  * @export
- * @interface V1alpha1MenuApiUpdatev1alpha1MenuRequest
+ * @interface V1alpha1MenuApiUpdateV1alpha1MenuRequest
  */
-export interface V1alpha1MenuApiUpdatev1alpha1MenuRequest {
+export interface V1alpha1MenuApiUpdateV1alpha1MenuRequest {
     /**
      * Name of menu
      * @type {string}
-     * @memberof V1alpha1MenuApiUpdatev1alpha1Menu
+     * @memberof V1alpha1MenuApiUpdateV1alpha1Menu
      */
     readonly name: string
 
     /**
      * Updated menu
      * @type {Menu}
-     * @memberof V1alpha1MenuApiUpdatev1alpha1Menu
+     * @memberof V1alpha1MenuApiUpdateV1alpha1Menu
      */
     readonly menu?: Menu
 }
@@ -508,57 +508,57 @@ export interface V1alpha1MenuApiUpdatev1alpha1MenuRequest {
 export class V1alpha1MenuApi extends BaseAPI {
     /**
      * Create v1alpha1/Menu
-     * @param {V1alpha1MenuApiCreatev1alpha1MenuRequest} requestParameters Request parameters.
+     * @param {V1alpha1MenuApiCreateV1alpha1MenuRequest} requestParameters Request parameters.
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      * @memberof V1alpha1MenuApi
      */
-    public createv1alpha1Menu(requestParameters: V1alpha1MenuApiCreatev1alpha1MenuRequest = {}, options?: RawAxiosRequestConfig) {
-        return V1alpha1MenuApiFp(this.configuration).createv1alpha1Menu(requestParameters.menu, options).then((request) => request(this.axios, this.basePath));
+    public createV1alpha1Menu(requestParameters: V1alpha1MenuApiCreateV1alpha1MenuRequest = {}, options?: RawAxiosRequestConfig) {
+        return V1alpha1MenuApiFp(this.configuration).createV1alpha1Menu(requestParameters.menu, options).then((request) => request(this.axios, this.basePath));
     }
 
     /**
      * Delete v1alpha1/Menu
-     * @param {V1alpha1MenuApiDeletev1alpha1MenuRequest} requestParameters Request parameters.
+     * @param {V1alpha1MenuApiDeleteV1alpha1MenuRequest} requestParameters Request parameters.
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      * @memberof V1alpha1MenuApi
      */
-    public deletev1alpha1Menu(requestParameters: V1alpha1MenuApiDeletev1alpha1MenuRequest, options?: RawAxiosRequestConfig) {
-        return V1alpha1MenuApiFp(this.configuration).deletev1alpha1Menu(requestParameters.name, options).then((request) => request(this.axios, this.basePath));
+    public deleteV1alpha1Menu(requestParameters: V1alpha1MenuApiDeleteV1alpha1MenuRequest, options?: RawAxiosRequestConfig) {
+        return V1alpha1MenuApiFp(this.configuration).deleteV1alpha1Menu(requestParameters.name, options).then((request) => request(this.axios, this.basePath));
     }
 
     /**
      * Get v1alpha1/Menu
-     * @param {V1alpha1MenuApiGetv1alpha1MenuRequest} requestParameters Request parameters.
+     * @param {V1alpha1MenuApiGetV1alpha1MenuRequest} requestParameters Request parameters.
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      * @memberof V1alpha1MenuApi
      */
-    public getv1alpha1Menu(requestParameters: V1alpha1MenuApiGetv1alpha1MenuRequest, options?: RawAxiosRequestConfig) {
-        return V1alpha1MenuApiFp(this.configuration).getv1alpha1Menu(requestParameters.name, options).then((request) => request(this.axios, this.basePath));
+    public getV1alpha1Menu(requestParameters: V1alpha1MenuApiGetV1alpha1MenuRequest, options?: RawAxiosRequestConfig) {
+        return V1alpha1MenuApiFp(this.configuration).getV1alpha1Menu(requestParameters.name, options).then((request) => request(this.axios, this.basePath));
     }
 
     /**
      * List v1alpha1/Menu
-     * @param {V1alpha1MenuApiListv1alpha1MenuRequest} requestParameters Request parameters.
+     * @param {V1alpha1MenuApiListV1alpha1MenuRequest} requestParameters Request parameters.
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      * @memberof V1alpha1MenuApi
      */
-    public listv1alpha1Menu(requestParameters: V1alpha1MenuApiListv1alpha1MenuRequest = {}, options?: RawAxiosRequestConfig) {
-        return V1alpha1MenuApiFp(this.configuration).listv1alpha1Menu(requestParameters.page, requestParameters.size, requestParameters.labelSelector, requestParameters.fieldSelector, requestParameters.sort, options).then((request) => request(this.axios, this.basePath));
+    public listV1alpha1Menu(requestParameters: V1alpha1MenuApiListV1alpha1MenuRequest = {}, options?: RawAxiosRequestConfig) {
+        return V1alpha1MenuApiFp(this.configuration).listV1alpha1Menu(requestParameters.page, requestParameters.size, requestParameters.labelSelector, requestParameters.fieldSelector, requestParameters.sort, options).then((request) => request(this.axios, this.basePath));
     }
 
     /**
      * Update v1alpha1/Menu
-     * @param {V1alpha1MenuApiUpdatev1alpha1MenuRequest} requestParameters Request parameters.
+     * @param {V1alpha1MenuApiUpdateV1alpha1MenuRequest} requestParameters Request parameters.
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      * @memberof V1alpha1MenuApi
      */
-    public updatev1alpha1Menu(requestParameters: V1alpha1MenuApiUpdatev1alpha1MenuRequest, options?: RawAxiosRequestConfig) {
-        return V1alpha1MenuApiFp(this.configuration).updatev1alpha1Menu(requestParameters.name, requestParameters.menu, options).then((request) => request(this.axios, this.basePath));
+    public updateV1alpha1Menu(requestParameters: V1alpha1MenuApiUpdateV1alpha1MenuRequest, options?: RawAxiosRequestConfig) {
+        return V1alpha1MenuApiFp(this.configuration).updateV1alpha1Menu(requestParameters.name, requestParameters.menu, options).then((request) => request(this.axios, this.basePath));
     }
 }
 

@@ -96,7 +96,7 @@ function handleDelete() {
     confirmText: t("core.common.buttons.confirm"),
     cancelText: t("core.common.buttons.cancel"),
     async onConfirm() {
-      await apiClient.extension.backup.deletemigrationHaloRunV1alpha1Backup({
+      await apiClient.extension.backup.deleteMigrationHaloRunV1alpha1Backup({
         name: props.backup.metadata.name,
       });
 

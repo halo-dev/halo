@@ -37,7 +37,7 @@ export const ContentHaloRunV1alpha1CategoryApiAxiosParamCreator = function (conf
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        createcontentHaloRunV1alpha1Category: async (category?: Category, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+        createContentHaloRunV1alpha1Category: async (category?: Category, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
             const localVarPath = `/apis/content.halo.run/v1alpha1/categories`;
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
@@ -78,9 +78,9 @@ export const ContentHaloRunV1alpha1CategoryApiAxiosParamCreator = function (conf
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        deletecontentHaloRunV1alpha1Category: async (name: string, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+        deleteContentHaloRunV1alpha1Category: async (name: string, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
             // verify required parameter 'name' is not null or undefined
-            assertParamExists('deletecontentHaloRunV1alpha1Category', 'name', name)
+            assertParamExists('deleteContentHaloRunV1alpha1Category', 'name', name)
             const localVarPath = `/apis/content.halo.run/v1alpha1/categories/{name}`
                 .replace(`{${"name"}}`, encodeURIComponent(String(name)));
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
@@ -119,9 +119,9 @@ export const ContentHaloRunV1alpha1CategoryApiAxiosParamCreator = function (conf
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        getcontentHaloRunV1alpha1Category: async (name: string, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+        getContentHaloRunV1alpha1Category: async (name: string, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
             // verify required parameter 'name' is not null or undefined
-            assertParamExists('getcontentHaloRunV1alpha1Category', 'name', name)
+            assertParamExists('getContentHaloRunV1alpha1Category', 'name', name)
             const localVarPath = `/apis/content.halo.run/v1alpha1/categories/{name}`
                 .replace(`{${"name"}}`, encodeURIComponent(String(name)));
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
@@ -164,7 +164,7 @@ export const ContentHaloRunV1alpha1CategoryApiAxiosParamCreator = function (conf
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        listcontentHaloRunV1alpha1Category: async (page?: number, size?: number, labelSelector?: Array<string>, fieldSelector?: Array<string>, sort?: Array<string>, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+        listContentHaloRunV1alpha1Category: async (page?: number, size?: number, labelSelector?: Array<string>, fieldSelector?: Array<string>, sort?: Array<string>, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
             const localVarPath = `/apis/content.halo.run/v1alpha1/categories`;
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
@@ -223,9 +223,9 @@ export const ContentHaloRunV1alpha1CategoryApiAxiosParamCreator = function (conf
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        updatecontentHaloRunV1alpha1Category: async (name: string, category?: Category, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+        updateContentHaloRunV1alpha1Category: async (name: string, category?: Category, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
             // verify required parameter 'name' is not null or undefined
-            assertParamExists('updatecontentHaloRunV1alpha1Category', 'name', name)
+            assertParamExists('updateContentHaloRunV1alpha1Category', 'name', name)
             const localVarPath = `/apis/content.halo.run/v1alpha1/categories/{name}`
                 .replace(`{${"name"}}`, encodeURIComponent(String(name)));
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
@@ -277,10 +277,10 @@ export const ContentHaloRunV1alpha1CategoryApiFp = function(configuration?: Conf
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async createcontentHaloRunV1alpha1Category(category?: Category, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<Category>> {
-            const localVarAxiosArgs = await localVarAxiosParamCreator.createcontentHaloRunV1alpha1Category(category, options);
+        async createContentHaloRunV1alpha1Category(category?: Category, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<Category>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.createContentHaloRunV1alpha1Category(category, options);
             const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
-            const localVarOperationServerBasePath = operationServerMap['ContentHaloRunV1alpha1CategoryApi.createcontentHaloRunV1alpha1Category']?.[localVarOperationServerIndex]?.url;
+            const localVarOperationServerBasePath = operationServerMap['ContentHaloRunV1alpha1CategoryApi.createContentHaloRunV1alpha1Category']?.[localVarOperationServerIndex]?.url;
             return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
         },
         /**
@@ -289,10 +289,10 @@ export const ContentHaloRunV1alpha1CategoryApiFp = function(configuration?: Conf
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async deletecontentHaloRunV1alpha1Category(name: string, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<void>> {
-            const localVarAxiosArgs = await localVarAxiosParamCreator.deletecontentHaloRunV1alpha1Category(name, options);
+        async deleteContentHaloRunV1alpha1Category(name: string, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<void>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.deleteContentHaloRunV1alpha1Category(name, options);
             const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
-            const localVarOperationServerBasePath = operationServerMap['ContentHaloRunV1alpha1CategoryApi.deletecontentHaloRunV1alpha1Category']?.[localVarOperationServerIndex]?.url;
+            const localVarOperationServerBasePath = operationServerMap['ContentHaloRunV1alpha1CategoryApi.deleteContentHaloRunV1alpha1Category']?.[localVarOperationServerIndex]?.url;
             return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
         },
         /**
@@ -301,10 +301,10 @@ export const ContentHaloRunV1alpha1CategoryApiFp = function(configuration?: Conf
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async getcontentHaloRunV1alpha1Category(name: string, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<Category>> {
-            const localVarAxiosArgs = await localVarAxiosParamCreator.getcontentHaloRunV1alpha1Category(name, options);
+        async getContentHaloRunV1alpha1Category(name: string, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<Category>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.getContentHaloRunV1alpha1Category(name, options);
             const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
-            const localVarOperationServerBasePath = operationServerMap['ContentHaloRunV1alpha1CategoryApi.getcontentHaloRunV1alpha1Category']?.[localVarOperationServerIndex]?.url;
+            const localVarOperationServerBasePath = operationServerMap['ContentHaloRunV1alpha1CategoryApi.getContentHaloRunV1alpha1Category']?.[localVarOperationServerIndex]?.url;
             return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
         },
         /**
@@ -317,10 +317,10 @@ export const ContentHaloRunV1alpha1CategoryApiFp = function(configuration?: Conf
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async listcontentHaloRunV1alpha1Category(page?: number, size?: number, labelSelector?: Array<string>, fieldSelector?: Array<string>, sort?: Array<string>, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<CategoryList>> {
-            const localVarAxiosArgs = await localVarAxiosParamCreator.listcontentHaloRunV1alpha1Category(page, size, labelSelector, fieldSelector, sort, options);
+        async listContentHaloRunV1alpha1Category(page?: number, size?: number, labelSelector?: Array<string>, fieldSelector?: Array<string>, sort?: Array<string>, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<CategoryList>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.listContentHaloRunV1alpha1Category(page, size, labelSelector, fieldSelector, sort, options);
             const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
-            const localVarOperationServerBasePath = operationServerMap['ContentHaloRunV1alpha1CategoryApi.listcontentHaloRunV1alpha1Category']?.[localVarOperationServerIndex]?.url;
+            const localVarOperationServerBasePath = operationServerMap['ContentHaloRunV1alpha1CategoryApi.listContentHaloRunV1alpha1Category']?.[localVarOperationServerIndex]?.url;
             return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
         },
         /**
@@ -330,10 +330,10 @@ export const ContentHaloRunV1alpha1CategoryApiFp = function(configuration?: Conf
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async updatecontentHaloRunV1alpha1Category(name: string, category?: Category, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<Category>> {
-            const localVarAxiosArgs = await localVarAxiosParamCreator.updatecontentHaloRunV1alpha1Category(name, category, options);
+        async updateContentHaloRunV1alpha1Category(name: string, category?: Category, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<Category>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.updateContentHaloRunV1alpha1Category(name, category, options);
             const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
-            const localVarOperationServerBasePath = operationServerMap['ContentHaloRunV1alpha1CategoryApi.updatecontentHaloRunV1alpha1Category']?.[localVarOperationServerIndex]?.url;
+            const localVarOperationServerBasePath = operationServerMap['ContentHaloRunV1alpha1CategoryApi.updateContentHaloRunV1alpha1Category']?.[localVarOperationServerIndex]?.url;
             return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
         },
     }
@@ -348,153 +348,153 @@ export const ContentHaloRunV1alpha1CategoryApiFactory = function (configuration?
     return {
         /**
          * Create content.halo.run/v1alpha1/Category
-         * @param {ContentHaloRunV1alpha1CategoryApiCreatecontentHaloRunV1alpha1CategoryRequest} requestParameters Request parameters.
+         * @param {ContentHaloRunV1alpha1CategoryApiCreateContentHaloRunV1alpha1CategoryRequest} requestParameters Request parameters.
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        createcontentHaloRunV1alpha1Category(requestParameters: ContentHaloRunV1alpha1CategoryApiCreatecontentHaloRunV1alpha1CategoryRequest = {}, options?: RawAxiosRequestConfig): AxiosPromise<Category> {
-            return localVarFp.createcontentHaloRunV1alpha1Category(requestParameters.category, options).then((request) => request(axios, basePath));
+        createContentHaloRunV1alpha1Category(requestParameters: ContentHaloRunV1alpha1CategoryApiCreateContentHaloRunV1alpha1CategoryRequest = {}, options?: RawAxiosRequestConfig): AxiosPromise<Category> {
+            return localVarFp.createContentHaloRunV1alpha1Category(requestParameters.category, options).then((request) => request(axios, basePath));
         },
         /**
          * Delete content.halo.run/v1alpha1/Category
-         * @param {ContentHaloRunV1alpha1CategoryApiDeletecontentHaloRunV1alpha1CategoryRequest} requestParameters Request parameters.
+         * @param {ContentHaloRunV1alpha1CategoryApiDeleteContentHaloRunV1alpha1CategoryRequest} requestParameters Request parameters.
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        deletecontentHaloRunV1alpha1Category(requestParameters: ContentHaloRunV1alpha1CategoryApiDeletecontentHaloRunV1alpha1CategoryRequest, options?: RawAxiosRequestConfig): AxiosPromise<void> {
-            return localVarFp.deletecontentHaloRunV1alpha1Category(requestParameters.name, options).then((request) => request(axios, basePath));
+        deleteContentHaloRunV1alpha1Category(requestParameters: ContentHaloRunV1alpha1CategoryApiDeleteContentHaloRunV1alpha1CategoryRequest, options?: RawAxiosRequestConfig): AxiosPromise<void> {
+            return localVarFp.deleteContentHaloRunV1alpha1Category(requestParameters.name, options).then((request) => request(axios, basePath));
         },
         /**
          * Get content.halo.run/v1alpha1/Category
-         * @param {ContentHaloRunV1alpha1CategoryApiGetcontentHaloRunV1alpha1CategoryRequest} requestParameters Request parameters.
+         * @param {ContentHaloRunV1alpha1CategoryApiGetContentHaloRunV1alpha1CategoryRequest} requestParameters Request parameters.
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        getcontentHaloRunV1alpha1Category(requestParameters: ContentHaloRunV1alpha1CategoryApiGetcontentHaloRunV1alpha1CategoryRequest, options?: RawAxiosRequestConfig): AxiosPromise<Category> {
-            return localVarFp.getcontentHaloRunV1alpha1Category(requestParameters.name, options).then((request) => request(axios, basePath));
+        getContentHaloRunV1alpha1Category(requestParameters: ContentHaloRunV1alpha1CategoryApiGetContentHaloRunV1alpha1CategoryRequest, options?: RawAxiosRequestConfig): AxiosPromise<Category> {
+            return localVarFp.getContentHaloRunV1alpha1Category(requestParameters.name, options).then((request) => request(axios, basePath));
         },
         /**
          * List content.halo.run/v1alpha1/Category
-         * @param {ContentHaloRunV1alpha1CategoryApiListcontentHaloRunV1alpha1CategoryRequest} requestParameters Request parameters.
+         * @param {ContentHaloRunV1alpha1CategoryApiListContentHaloRunV1alpha1CategoryRequest} requestParameters Request parameters.
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        listcontentHaloRunV1alpha1Category(requestParameters: ContentHaloRunV1alpha1CategoryApiListcontentHaloRunV1alpha1CategoryRequest = {}, options?: RawAxiosRequestConfig): AxiosPromise<CategoryList> {
-            return localVarFp.listcontentHaloRunV1alpha1Category(requestParameters.page, requestParameters.size, requestParameters.labelSelector, requestParameters.fieldSelector, requestParameters.sort, options).then((request) => request(axios, basePath));
+        listContentHaloRunV1alpha1Category(requestParameters: ContentHaloRunV1alpha1CategoryApiListContentHaloRunV1alpha1CategoryRequest = {}, options?: RawAxiosRequestConfig): AxiosPromise<CategoryList> {
+            return localVarFp.listContentHaloRunV1alpha1Category(requestParameters.page, requestParameters.size, requestParameters.labelSelector, requestParameters.fieldSelector, requestParameters.sort, options).then((request) => request(axios, basePath));
         },
         /**
          * Update content.halo.run/v1alpha1/Category
-         * @param {ContentHaloRunV1alpha1CategoryApiUpdatecontentHaloRunV1alpha1CategoryRequest} requestParameters Request parameters.
+         * @param {ContentHaloRunV1alpha1CategoryApiUpdateContentHaloRunV1alpha1CategoryRequest} requestParameters Request parameters.
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        updatecontentHaloRunV1alpha1Category(requestParameters: ContentHaloRunV1alpha1CategoryApiUpdatecontentHaloRunV1alpha1CategoryRequest, options?: RawAxiosRequestConfig): AxiosPromise<Category> {
-            return localVarFp.updatecontentHaloRunV1alpha1Category(requestParameters.name, requestParameters.category, options).then((request) => request(axios, basePath));
+        updateContentHaloRunV1alpha1Category(requestParameters: ContentHaloRunV1alpha1CategoryApiUpdateContentHaloRunV1alpha1CategoryRequest, options?: RawAxiosRequestConfig): AxiosPromise<Category> {
+            return localVarFp.updateContentHaloRunV1alpha1Category(requestParameters.name, requestParameters.category, options).then((request) => request(axios, basePath));
         },
     };
 };
 
 /**
- * Request parameters for createcontentHaloRunV1alpha1Category operation in ContentHaloRunV1alpha1CategoryApi.
+ * Request parameters for createContentHaloRunV1alpha1Category operation in ContentHaloRunV1alpha1CategoryApi.
  * @export
- * @interface ContentHaloRunV1alpha1CategoryApiCreatecontentHaloRunV1alpha1CategoryRequest
+ * @interface ContentHaloRunV1alpha1CategoryApiCreateContentHaloRunV1alpha1CategoryRequest
  */
-export interface ContentHaloRunV1alpha1CategoryApiCreatecontentHaloRunV1alpha1CategoryRequest {
+export interface ContentHaloRunV1alpha1CategoryApiCreateContentHaloRunV1alpha1CategoryRequest {
     /**
      * Fresh category
      * @type {Category}
-     * @memberof ContentHaloRunV1alpha1CategoryApiCreatecontentHaloRunV1alpha1Category
+     * @memberof ContentHaloRunV1alpha1CategoryApiCreateContentHaloRunV1alpha1Category
      */
     readonly category?: Category
 }
 
 /**
- * Request parameters for deletecontentHaloRunV1alpha1Category operation in ContentHaloRunV1alpha1CategoryApi.
+ * Request parameters for deleteContentHaloRunV1alpha1Category operation in ContentHaloRunV1alpha1CategoryApi.
  * @export
- * @interface ContentHaloRunV1alpha1CategoryApiDeletecontentHaloRunV1alpha1CategoryRequest
+ * @interface ContentHaloRunV1alpha1CategoryApiDeleteContentHaloRunV1alpha1CategoryRequest
  */
-export interface ContentHaloRunV1alpha1CategoryApiDeletecontentHaloRunV1alpha1CategoryRequest {
+export interface ContentHaloRunV1alpha1CategoryApiDeleteContentHaloRunV1alpha1CategoryRequest {
     /**
      * Name of category
      * @type {string}
-     * @memberof ContentHaloRunV1alpha1CategoryApiDeletecontentHaloRunV1alpha1Category
+     * @memberof ContentHaloRunV1alpha1CategoryApiDeleteContentHaloRunV1alpha1Category
      */
     readonly name: string
 }
 
 /**
- * Request parameters for getcontentHaloRunV1alpha1Category operation in ContentHaloRunV1alpha1CategoryApi.
+ * Request parameters for getContentHaloRunV1alpha1Category operation in ContentHaloRunV1alpha1CategoryApi.
  * @export
- * @interface ContentHaloRunV1alpha1CategoryApiGetcontentHaloRunV1alpha1CategoryRequest
+ * @interface ContentHaloRunV1alpha1CategoryApiGetContentHaloRunV1alpha1CategoryRequest
  */
-export interface ContentHaloRunV1alpha1CategoryApiGetcontentHaloRunV1alpha1CategoryRequest {
+export interface ContentHaloRunV1alpha1CategoryApiGetContentHaloRunV1alpha1CategoryRequest {
     /**
      * Name of category
      * @type {string}
-     * @memberof ContentHaloRunV1alpha1CategoryApiGetcontentHaloRunV1alpha1Category
+     * @memberof ContentHaloRunV1alpha1CategoryApiGetContentHaloRunV1alpha1Category
      */
     readonly name: string
 }
 
 /**
- * Request parameters for listcontentHaloRunV1alpha1Category operation in ContentHaloRunV1alpha1CategoryApi.
+ * Request parameters for listContentHaloRunV1alpha1Category operation in ContentHaloRunV1alpha1CategoryApi.
  * @export
- * @interface ContentHaloRunV1alpha1CategoryApiListcontentHaloRunV1alpha1CategoryRequest
+ * @interface ContentHaloRunV1alpha1CategoryApiListContentHaloRunV1alpha1CategoryRequest
  */
-export interface ContentHaloRunV1alpha1CategoryApiListcontentHaloRunV1alpha1CategoryRequest {
+export interface ContentHaloRunV1alpha1CategoryApiListContentHaloRunV1alpha1CategoryRequest {
     /**
      * Page number. Default is 0.
      * @type {number}
-     * @memberof ContentHaloRunV1alpha1CategoryApiListcontentHaloRunV1alpha1Category
+     * @memberof ContentHaloRunV1alpha1CategoryApiListContentHaloRunV1alpha1Category
      */
     readonly page?: number
 
     /**
      * Size number. Default is 0.
      * @type {number}
-     * @memberof ContentHaloRunV1alpha1CategoryApiListcontentHaloRunV1alpha1Category
+     * @memberof ContentHaloRunV1alpha1CategoryApiListContentHaloRunV1alpha1Category
      */
     readonly size?: number
 
     /**
      * Label selector. e.g.: hidden!&#x3D;true
      * @type {Array<string>}
-     * @memberof ContentHaloRunV1alpha1CategoryApiListcontentHaloRunV1alpha1Category
+     * @memberof ContentHaloRunV1alpha1CategoryApiListContentHaloRunV1alpha1Category
      */
     readonly labelSelector?: Array<string>
 
     /**
      * Field selector. e.g.: metadata.name&#x3D;&#x3D;halo
      * @type {Array<string>}
-     * @memberof ContentHaloRunV1alpha1CategoryApiListcontentHaloRunV1alpha1Category
+     * @memberof ContentHaloRunV1alpha1CategoryApiListContentHaloRunV1alpha1Category
      */
     readonly fieldSelector?: Array<string>
 
     /**
      * Sorting criteria in the format: property,(asc|desc). Default sort order is ascending. Multiple sort criteria are supported.
      * @type {Array<string>}
-     * @memberof ContentHaloRunV1alpha1CategoryApiListcontentHaloRunV1alpha1Category
+     * @memberof ContentHaloRunV1alpha1CategoryApiListContentHaloRunV1alpha1Category
      */
     readonly sort?: Array<string>
 }
 
 /**
- * Request parameters for updatecontentHaloRunV1alpha1Category operation in ContentHaloRunV1alpha1CategoryApi.
+ * Request parameters for updateContentHaloRunV1alpha1Category operation in ContentHaloRunV1alpha1CategoryApi.
  * @export
- * @interface ContentHaloRunV1alpha1CategoryApiUpdatecontentHaloRunV1alpha1CategoryRequest
+ * @interface ContentHaloRunV1alpha1CategoryApiUpdateContentHaloRunV1alpha1CategoryRequest
  */
-export interface ContentHaloRunV1alpha1CategoryApiUpdatecontentHaloRunV1alpha1CategoryRequest {
+export interface ContentHaloRunV1alpha1CategoryApiUpdateContentHaloRunV1alpha1CategoryRequest {
     /**
      * Name of category
      * @type {string}
-     * @memberof ContentHaloRunV1alpha1CategoryApiUpdatecontentHaloRunV1alpha1Category
+     * @memberof ContentHaloRunV1alpha1CategoryApiUpdateContentHaloRunV1alpha1Category
      */
     readonly name: string
 
     /**
      * Updated category
      * @type {Category}
-     * @memberof ContentHaloRunV1alpha1CategoryApiUpdatecontentHaloRunV1alpha1Category
+     * @memberof ContentHaloRunV1alpha1CategoryApiUpdateContentHaloRunV1alpha1Category
      */
     readonly category?: Category
 }
@@ -508,57 +508,57 @@ export interface ContentHaloRunV1alpha1CategoryApiUpdatecontentHaloRunV1alpha1Ca
 export class ContentHaloRunV1alpha1CategoryApi extends BaseAPI {
     /**
      * Create content.halo.run/v1alpha1/Category
-     * @param {ContentHaloRunV1alpha1CategoryApiCreatecontentHaloRunV1alpha1CategoryRequest} requestParameters Request parameters.
+     * @param {ContentHaloRunV1alpha1CategoryApiCreateContentHaloRunV1alpha1CategoryRequest} requestParameters Request parameters.
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      * @memberof ContentHaloRunV1alpha1CategoryApi
      */
-    public createcontentHaloRunV1alpha1Category(requestParameters: ContentHaloRunV1alpha1CategoryApiCreatecontentHaloRunV1alpha1CategoryRequest = {}, options?: RawAxiosRequestConfig) {
-        return ContentHaloRunV1alpha1CategoryApiFp(this.configuration).createcontentHaloRunV1alpha1Category(requestParameters.category, options).then((request) => request(this.axios, this.basePath));
+    public createContentHaloRunV1alpha1Category(requestParameters: ContentHaloRunV1alpha1CategoryApiCreateContentHaloRunV1alpha1CategoryRequest = {}, options?: RawAxiosRequestConfig) {
+        return ContentHaloRunV1alpha1CategoryApiFp(this.configuration).createContentHaloRunV1alpha1Category(requestParameters.category, options).then((request) => request(this.axios, this.basePath));
     }
 
     /**
      * Delete content.halo.run/v1alpha1/Category
-     * @param {ContentHaloRunV1alpha1CategoryApiDeletecontentHaloRunV1alpha1CategoryRequest} requestParameters Request parameters.
+     * @param {ContentHaloRunV1alpha1CategoryApiDeleteContentHaloRunV1alpha1CategoryRequest} requestParameters Request parameters.
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      * @memberof ContentHaloRunV1alpha1CategoryApi
      */
-    public deletecontentHaloRunV1alpha1Category(requestParameters: ContentHaloRunV1alpha1CategoryApiDeletecontentHaloRunV1alpha1CategoryRequest, options?: RawAxiosRequestConfig) {
-        return ContentHaloRunV1alpha1CategoryApiFp(this.configuration).deletecontentHaloRunV1alpha1Category(requestParameters.name, options).then((request) => request(this.axios, this.basePath));
+    public deleteContentHaloRunV1alpha1Category(requestParameters: ContentHaloRunV1alpha1CategoryApiDeleteContentHaloRunV1alpha1CategoryRequest, options?: RawAxiosRequestConfig) {
+        return ContentHaloRunV1alpha1CategoryApiFp(this.configuration).deleteContentHaloRunV1alpha1Category(requestParameters.name, options).then((request) => request(this.axios, this.basePath));
     }
 
     /**
      * Get content.halo.run/v1alpha1/Category
-     * @param {ContentHaloRunV1alpha1CategoryApiGetcontentHaloRunV1alpha1CategoryRequest} requestParameters Request parameters.
+     * @param {ContentHaloRunV1alpha1CategoryApiGetContentHaloRunV1alpha1CategoryRequest} requestParameters Request parameters.
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      * @memberof ContentHaloRunV1alpha1CategoryApi
      */
-    public getcontentHaloRunV1alpha1Category(requestParameters: ContentHaloRunV1alpha1CategoryApiGetcontentHaloRunV1alpha1CategoryRequest, options?: RawAxiosRequestConfig) {
-        return ContentHaloRunV1alpha1CategoryApiFp(this.configuration).getcontentHaloRunV1alpha1Category(requestParameters.name, options).then((request) => request(this.axios, this.basePath));
+    public getContentHaloRunV1alpha1Category(requestParameters: ContentHaloRunV1alpha1CategoryApiGetContentHaloRunV1alpha1CategoryRequest, options?: RawAxiosRequestConfig) {
+        return ContentHaloRunV1alpha1CategoryApiFp(this.configuration).getContentHaloRunV1alpha1Category(requestParameters.name, options).then((request) => request(this.axios, this.basePath));
     }
 
     /**
      * List content.halo.run/v1alpha1/Category
-     * @param {ContentHaloRunV1alpha1CategoryApiListcontentHaloRunV1alpha1CategoryRequest} requestParameters Request parameters.
+     * @param {ContentHaloRunV1alpha1CategoryApiListContentHaloRunV1alpha1CategoryRequest} requestParameters Request parameters.
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      * @memberof ContentHaloRunV1alpha1CategoryApi
      */
-    public listcontentHaloRunV1alpha1Category(requestParameters: ContentHaloRunV1alpha1CategoryApiListcontentHaloRunV1alpha1CategoryRequest = {}, options?: RawAxiosRequestConfig) {
-        return ContentHaloRunV1alpha1CategoryApiFp(this.configuration).listcontentHaloRunV1alpha1Category(requestParameters.page, requestParameters.size, requestParameters.labelSelector, requestParameters.fieldSelector, requestParameters.sort, options).then((request) => request(this.axios, this.basePath));
+    public listContentHaloRunV1alpha1Category(requestParameters: ContentHaloRunV1alpha1CategoryApiListContentHaloRunV1alpha1CategoryRequest = {}, options?: RawAxiosRequestConfig) {
+        return ContentHaloRunV1alpha1CategoryApiFp(this.configuration).listContentHaloRunV1alpha1Category(requestParameters.page, requestParameters.size, requestParameters.labelSelector, requestParameters.fieldSelector, requestParameters.sort, options).then((request) => request(this.axios, this.basePath));
     }
 
     /**
      * Update content.halo.run/v1alpha1/Category
-     * @param {ContentHaloRunV1alpha1CategoryApiUpdatecontentHaloRunV1alpha1CategoryRequest} requestParameters Request parameters.
+     * @param {ContentHaloRunV1alpha1CategoryApiUpdateContentHaloRunV1alpha1CategoryRequest} requestParameters Request parameters.
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      * @memberof ContentHaloRunV1alpha1CategoryApi
      */
-    public updatecontentHaloRunV1alpha1Category(requestParameters: ContentHaloRunV1alpha1CategoryApiUpdatecontentHaloRunV1alpha1CategoryRequest, options?: RawAxiosRequestConfig) {
-        return ContentHaloRunV1alpha1CategoryApiFp(this.configuration).updatecontentHaloRunV1alpha1Category(requestParameters.name, requestParameters.category, options).then((request) => request(this.axios, this.basePath));
+    public updateContentHaloRunV1alpha1Category(requestParameters: ContentHaloRunV1alpha1CategoryApiUpdateContentHaloRunV1alpha1CategoryRequest, options?: RawAxiosRequestConfig) {
+        return ContentHaloRunV1alpha1CategoryApiFp(this.configuration).updateContentHaloRunV1alpha1Category(requestParameters.name, requestParameters.category, options).then((request) => request(this.axios, this.basePath));
     }
 }
 

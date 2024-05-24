@@ -168,7 +168,7 @@ const {
 });
 
 const handleOpenSettingModal = async (post: Post) => {
-  const { data } = await apiClient.extension.post.getcontentHaloRunV1alpha1Post(
+  const { data } = await apiClient.extension.post.getContentHaloRunV1alpha1Post(
     {
       name: post.metadata.name,
     }
@@ -191,7 +191,7 @@ const handleSelectPrevious = async () => {
 
   if (index > 0) {
     const { data: previousPost } =
-      await apiClient.extension.post.getcontentHaloRunV1alpha1Post({
+      await apiClient.extension.post.getContentHaloRunV1alpha1Post({
         name: posts.value[index - 1].post.metadata.name,
       });
     selectedPost.value = previousPost;
@@ -212,7 +212,7 @@ const handleSelectNext = async () => {
   );
   if (index < posts.value.length - 1) {
     const { data: nextPost } =
-      await apiClient.extension.post.getcontentHaloRunV1alpha1Post({
+      await apiClient.extension.post.getContentHaloRunV1alpha1Post({
         name: posts.value[index + 1].post.metadata.name,
       });
     selectedPost.value = nextPost;

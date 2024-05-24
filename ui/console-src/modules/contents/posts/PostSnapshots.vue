@@ -29,7 +29,7 @@ const { data: post } = useQuery({
   queryKey: ["post-by-name", postName],
   queryFn: async () => {
     const { data } =
-      await apiClient.extension.post.getcontentHaloRunV1alpha1Post({
+      await apiClient.extension.post.getContentHaloRunV1alpha1Post({
         name: postName.value,
       });
     return data;

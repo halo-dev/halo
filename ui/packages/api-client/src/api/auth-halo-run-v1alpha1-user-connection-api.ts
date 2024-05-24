@@ -37,7 +37,7 @@ export const AuthHaloRunV1alpha1UserConnectionApiAxiosParamCreator = function (c
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        createauthHaloRunV1alpha1UserConnection: async (userConnection?: UserConnection, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+        createAuthHaloRunV1alpha1UserConnection: async (userConnection?: UserConnection, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
             const localVarPath = `/apis/auth.halo.run/v1alpha1/userconnections`;
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
@@ -78,9 +78,9 @@ export const AuthHaloRunV1alpha1UserConnectionApiAxiosParamCreator = function (c
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        deleteauthHaloRunV1alpha1UserConnection: async (name: string, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+        deleteAuthHaloRunV1alpha1UserConnection: async (name: string, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
             // verify required parameter 'name' is not null or undefined
-            assertParamExists('deleteauthHaloRunV1alpha1UserConnection', 'name', name)
+            assertParamExists('deleteAuthHaloRunV1alpha1UserConnection', 'name', name)
             const localVarPath = `/apis/auth.halo.run/v1alpha1/userconnections/{name}`
                 .replace(`{${"name"}}`, encodeURIComponent(String(name)));
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
@@ -119,9 +119,9 @@ export const AuthHaloRunV1alpha1UserConnectionApiAxiosParamCreator = function (c
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        getauthHaloRunV1alpha1UserConnection: async (name: string, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+        getAuthHaloRunV1alpha1UserConnection: async (name: string, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
             // verify required parameter 'name' is not null or undefined
-            assertParamExists('getauthHaloRunV1alpha1UserConnection', 'name', name)
+            assertParamExists('getAuthHaloRunV1alpha1UserConnection', 'name', name)
             const localVarPath = `/apis/auth.halo.run/v1alpha1/userconnections/{name}`
                 .replace(`{${"name"}}`, encodeURIComponent(String(name)));
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
@@ -164,7 +164,7 @@ export const AuthHaloRunV1alpha1UserConnectionApiAxiosParamCreator = function (c
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        listauthHaloRunV1alpha1UserConnection: async (page?: number, size?: number, labelSelector?: Array<string>, fieldSelector?: Array<string>, sort?: Array<string>, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+        listAuthHaloRunV1alpha1UserConnection: async (page?: number, size?: number, labelSelector?: Array<string>, fieldSelector?: Array<string>, sort?: Array<string>, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
             const localVarPath = `/apis/auth.halo.run/v1alpha1/userconnections`;
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
@@ -223,9 +223,9 @@ export const AuthHaloRunV1alpha1UserConnectionApiAxiosParamCreator = function (c
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        updateauthHaloRunV1alpha1UserConnection: async (name: string, userConnection?: UserConnection, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+        updateAuthHaloRunV1alpha1UserConnection: async (name: string, userConnection?: UserConnection, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
             // verify required parameter 'name' is not null or undefined
-            assertParamExists('updateauthHaloRunV1alpha1UserConnection', 'name', name)
+            assertParamExists('updateAuthHaloRunV1alpha1UserConnection', 'name', name)
             const localVarPath = `/apis/auth.halo.run/v1alpha1/userconnections/{name}`
                 .replace(`{${"name"}}`, encodeURIComponent(String(name)));
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
@@ -277,10 +277,10 @@ export const AuthHaloRunV1alpha1UserConnectionApiFp = function(configuration?: C
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async createauthHaloRunV1alpha1UserConnection(userConnection?: UserConnection, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<UserConnection>> {
-            const localVarAxiosArgs = await localVarAxiosParamCreator.createauthHaloRunV1alpha1UserConnection(userConnection, options);
+        async createAuthHaloRunV1alpha1UserConnection(userConnection?: UserConnection, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<UserConnection>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.createAuthHaloRunV1alpha1UserConnection(userConnection, options);
             const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
-            const localVarOperationServerBasePath = operationServerMap['AuthHaloRunV1alpha1UserConnectionApi.createauthHaloRunV1alpha1UserConnection']?.[localVarOperationServerIndex]?.url;
+            const localVarOperationServerBasePath = operationServerMap['AuthHaloRunV1alpha1UserConnectionApi.createAuthHaloRunV1alpha1UserConnection']?.[localVarOperationServerIndex]?.url;
             return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
         },
         /**
@@ -289,10 +289,10 @@ export const AuthHaloRunV1alpha1UserConnectionApiFp = function(configuration?: C
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async deleteauthHaloRunV1alpha1UserConnection(name: string, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<void>> {
-            const localVarAxiosArgs = await localVarAxiosParamCreator.deleteauthHaloRunV1alpha1UserConnection(name, options);
+        async deleteAuthHaloRunV1alpha1UserConnection(name: string, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<void>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.deleteAuthHaloRunV1alpha1UserConnection(name, options);
             const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
-            const localVarOperationServerBasePath = operationServerMap['AuthHaloRunV1alpha1UserConnectionApi.deleteauthHaloRunV1alpha1UserConnection']?.[localVarOperationServerIndex]?.url;
+            const localVarOperationServerBasePath = operationServerMap['AuthHaloRunV1alpha1UserConnectionApi.deleteAuthHaloRunV1alpha1UserConnection']?.[localVarOperationServerIndex]?.url;
             return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
         },
         /**
@@ -301,10 +301,10 @@ export const AuthHaloRunV1alpha1UserConnectionApiFp = function(configuration?: C
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async getauthHaloRunV1alpha1UserConnection(name: string, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<UserConnection>> {
-            const localVarAxiosArgs = await localVarAxiosParamCreator.getauthHaloRunV1alpha1UserConnection(name, options);
+        async getAuthHaloRunV1alpha1UserConnection(name: string, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<UserConnection>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.getAuthHaloRunV1alpha1UserConnection(name, options);
             const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
-            const localVarOperationServerBasePath = operationServerMap['AuthHaloRunV1alpha1UserConnectionApi.getauthHaloRunV1alpha1UserConnection']?.[localVarOperationServerIndex]?.url;
+            const localVarOperationServerBasePath = operationServerMap['AuthHaloRunV1alpha1UserConnectionApi.getAuthHaloRunV1alpha1UserConnection']?.[localVarOperationServerIndex]?.url;
             return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
         },
         /**
@@ -317,10 +317,10 @@ export const AuthHaloRunV1alpha1UserConnectionApiFp = function(configuration?: C
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async listauthHaloRunV1alpha1UserConnection(page?: number, size?: number, labelSelector?: Array<string>, fieldSelector?: Array<string>, sort?: Array<string>, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<UserConnectionList>> {
-            const localVarAxiosArgs = await localVarAxiosParamCreator.listauthHaloRunV1alpha1UserConnection(page, size, labelSelector, fieldSelector, sort, options);
+        async listAuthHaloRunV1alpha1UserConnection(page?: number, size?: number, labelSelector?: Array<string>, fieldSelector?: Array<string>, sort?: Array<string>, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<UserConnectionList>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.listAuthHaloRunV1alpha1UserConnection(page, size, labelSelector, fieldSelector, sort, options);
             const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
-            const localVarOperationServerBasePath = operationServerMap['AuthHaloRunV1alpha1UserConnectionApi.listauthHaloRunV1alpha1UserConnection']?.[localVarOperationServerIndex]?.url;
+            const localVarOperationServerBasePath = operationServerMap['AuthHaloRunV1alpha1UserConnectionApi.listAuthHaloRunV1alpha1UserConnection']?.[localVarOperationServerIndex]?.url;
             return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
         },
         /**
@@ -330,10 +330,10 @@ export const AuthHaloRunV1alpha1UserConnectionApiFp = function(configuration?: C
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async updateauthHaloRunV1alpha1UserConnection(name: string, userConnection?: UserConnection, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<UserConnection>> {
-            const localVarAxiosArgs = await localVarAxiosParamCreator.updateauthHaloRunV1alpha1UserConnection(name, userConnection, options);
+        async updateAuthHaloRunV1alpha1UserConnection(name: string, userConnection?: UserConnection, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<UserConnection>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.updateAuthHaloRunV1alpha1UserConnection(name, userConnection, options);
             const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
-            const localVarOperationServerBasePath = operationServerMap['AuthHaloRunV1alpha1UserConnectionApi.updateauthHaloRunV1alpha1UserConnection']?.[localVarOperationServerIndex]?.url;
+            const localVarOperationServerBasePath = operationServerMap['AuthHaloRunV1alpha1UserConnectionApi.updateAuthHaloRunV1alpha1UserConnection']?.[localVarOperationServerIndex]?.url;
             return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
         },
     }
@@ -348,153 +348,153 @@ export const AuthHaloRunV1alpha1UserConnectionApiFactory = function (configurati
     return {
         /**
          * Create auth.halo.run/v1alpha1/UserConnection
-         * @param {AuthHaloRunV1alpha1UserConnectionApiCreateauthHaloRunV1alpha1UserConnectionRequest} requestParameters Request parameters.
+         * @param {AuthHaloRunV1alpha1UserConnectionApiCreateAuthHaloRunV1alpha1UserConnectionRequest} requestParameters Request parameters.
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        createauthHaloRunV1alpha1UserConnection(requestParameters: AuthHaloRunV1alpha1UserConnectionApiCreateauthHaloRunV1alpha1UserConnectionRequest = {}, options?: RawAxiosRequestConfig): AxiosPromise<UserConnection> {
-            return localVarFp.createauthHaloRunV1alpha1UserConnection(requestParameters.userConnection, options).then((request) => request(axios, basePath));
+        createAuthHaloRunV1alpha1UserConnection(requestParameters: AuthHaloRunV1alpha1UserConnectionApiCreateAuthHaloRunV1alpha1UserConnectionRequest = {}, options?: RawAxiosRequestConfig): AxiosPromise<UserConnection> {
+            return localVarFp.createAuthHaloRunV1alpha1UserConnection(requestParameters.userConnection, options).then((request) => request(axios, basePath));
         },
         /**
          * Delete auth.halo.run/v1alpha1/UserConnection
-         * @param {AuthHaloRunV1alpha1UserConnectionApiDeleteauthHaloRunV1alpha1UserConnectionRequest} requestParameters Request parameters.
+         * @param {AuthHaloRunV1alpha1UserConnectionApiDeleteAuthHaloRunV1alpha1UserConnectionRequest} requestParameters Request parameters.
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        deleteauthHaloRunV1alpha1UserConnection(requestParameters: AuthHaloRunV1alpha1UserConnectionApiDeleteauthHaloRunV1alpha1UserConnectionRequest, options?: RawAxiosRequestConfig): AxiosPromise<void> {
-            return localVarFp.deleteauthHaloRunV1alpha1UserConnection(requestParameters.name, options).then((request) => request(axios, basePath));
+        deleteAuthHaloRunV1alpha1UserConnection(requestParameters: AuthHaloRunV1alpha1UserConnectionApiDeleteAuthHaloRunV1alpha1UserConnectionRequest, options?: RawAxiosRequestConfig): AxiosPromise<void> {
+            return localVarFp.deleteAuthHaloRunV1alpha1UserConnection(requestParameters.name, options).then((request) => request(axios, basePath));
         },
         /**
          * Get auth.halo.run/v1alpha1/UserConnection
-         * @param {AuthHaloRunV1alpha1UserConnectionApiGetauthHaloRunV1alpha1UserConnectionRequest} requestParameters Request parameters.
+         * @param {AuthHaloRunV1alpha1UserConnectionApiGetAuthHaloRunV1alpha1UserConnectionRequest} requestParameters Request parameters.
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        getauthHaloRunV1alpha1UserConnection(requestParameters: AuthHaloRunV1alpha1UserConnectionApiGetauthHaloRunV1alpha1UserConnectionRequest, options?: RawAxiosRequestConfig): AxiosPromise<UserConnection> {
-            return localVarFp.getauthHaloRunV1alpha1UserConnection(requestParameters.name, options).then((request) => request(axios, basePath));
+        getAuthHaloRunV1alpha1UserConnection(requestParameters: AuthHaloRunV1alpha1UserConnectionApiGetAuthHaloRunV1alpha1UserConnectionRequest, options?: RawAxiosRequestConfig): AxiosPromise<UserConnection> {
+            return localVarFp.getAuthHaloRunV1alpha1UserConnection(requestParameters.name, options).then((request) => request(axios, basePath));
         },
         /**
          * List auth.halo.run/v1alpha1/UserConnection
-         * @param {AuthHaloRunV1alpha1UserConnectionApiListauthHaloRunV1alpha1UserConnectionRequest} requestParameters Request parameters.
+         * @param {AuthHaloRunV1alpha1UserConnectionApiListAuthHaloRunV1alpha1UserConnectionRequest} requestParameters Request parameters.
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        listauthHaloRunV1alpha1UserConnection(requestParameters: AuthHaloRunV1alpha1UserConnectionApiListauthHaloRunV1alpha1UserConnectionRequest = {}, options?: RawAxiosRequestConfig): AxiosPromise<UserConnectionList> {
-            return localVarFp.listauthHaloRunV1alpha1UserConnection(requestParameters.page, requestParameters.size, requestParameters.labelSelector, requestParameters.fieldSelector, requestParameters.sort, options).then((request) => request(axios, basePath));
+        listAuthHaloRunV1alpha1UserConnection(requestParameters: AuthHaloRunV1alpha1UserConnectionApiListAuthHaloRunV1alpha1UserConnectionRequest = {}, options?: RawAxiosRequestConfig): AxiosPromise<UserConnectionList> {
+            return localVarFp.listAuthHaloRunV1alpha1UserConnection(requestParameters.page, requestParameters.size, requestParameters.labelSelector, requestParameters.fieldSelector, requestParameters.sort, options).then((request) => request(axios, basePath));
         },
         /**
          * Update auth.halo.run/v1alpha1/UserConnection
-         * @param {AuthHaloRunV1alpha1UserConnectionApiUpdateauthHaloRunV1alpha1UserConnectionRequest} requestParameters Request parameters.
+         * @param {AuthHaloRunV1alpha1UserConnectionApiUpdateAuthHaloRunV1alpha1UserConnectionRequest} requestParameters Request parameters.
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        updateauthHaloRunV1alpha1UserConnection(requestParameters: AuthHaloRunV1alpha1UserConnectionApiUpdateauthHaloRunV1alpha1UserConnectionRequest, options?: RawAxiosRequestConfig): AxiosPromise<UserConnection> {
-            return localVarFp.updateauthHaloRunV1alpha1UserConnection(requestParameters.name, requestParameters.userConnection, options).then((request) => request(axios, basePath));
+        updateAuthHaloRunV1alpha1UserConnection(requestParameters: AuthHaloRunV1alpha1UserConnectionApiUpdateAuthHaloRunV1alpha1UserConnectionRequest, options?: RawAxiosRequestConfig): AxiosPromise<UserConnection> {
+            return localVarFp.updateAuthHaloRunV1alpha1UserConnection(requestParameters.name, requestParameters.userConnection, options).then((request) => request(axios, basePath));
         },
     };
 };
 
 /**
- * Request parameters for createauthHaloRunV1alpha1UserConnection operation in AuthHaloRunV1alpha1UserConnectionApi.
+ * Request parameters for createAuthHaloRunV1alpha1UserConnection operation in AuthHaloRunV1alpha1UserConnectionApi.
  * @export
- * @interface AuthHaloRunV1alpha1UserConnectionApiCreateauthHaloRunV1alpha1UserConnectionRequest
+ * @interface AuthHaloRunV1alpha1UserConnectionApiCreateAuthHaloRunV1alpha1UserConnectionRequest
  */
-export interface AuthHaloRunV1alpha1UserConnectionApiCreateauthHaloRunV1alpha1UserConnectionRequest {
+export interface AuthHaloRunV1alpha1UserConnectionApiCreateAuthHaloRunV1alpha1UserConnectionRequest {
     /**
      * Fresh userconnection
      * @type {UserConnection}
-     * @memberof AuthHaloRunV1alpha1UserConnectionApiCreateauthHaloRunV1alpha1UserConnection
+     * @memberof AuthHaloRunV1alpha1UserConnectionApiCreateAuthHaloRunV1alpha1UserConnection
      */
     readonly userConnection?: UserConnection
 }
 
 /**
- * Request parameters for deleteauthHaloRunV1alpha1UserConnection operation in AuthHaloRunV1alpha1UserConnectionApi.
+ * Request parameters for deleteAuthHaloRunV1alpha1UserConnection operation in AuthHaloRunV1alpha1UserConnectionApi.
  * @export
- * @interface AuthHaloRunV1alpha1UserConnectionApiDeleteauthHaloRunV1alpha1UserConnectionRequest
+ * @interface AuthHaloRunV1alpha1UserConnectionApiDeleteAuthHaloRunV1alpha1UserConnectionRequest
  */
-export interface AuthHaloRunV1alpha1UserConnectionApiDeleteauthHaloRunV1alpha1UserConnectionRequest {
+export interface AuthHaloRunV1alpha1UserConnectionApiDeleteAuthHaloRunV1alpha1UserConnectionRequest {
     /**
      * Name of userconnection
      * @type {string}
-     * @memberof AuthHaloRunV1alpha1UserConnectionApiDeleteauthHaloRunV1alpha1UserConnection
+     * @memberof AuthHaloRunV1alpha1UserConnectionApiDeleteAuthHaloRunV1alpha1UserConnection
      */
     readonly name: string
 }
 
 /**
- * Request parameters for getauthHaloRunV1alpha1UserConnection operation in AuthHaloRunV1alpha1UserConnectionApi.
+ * Request parameters for getAuthHaloRunV1alpha1UserConnection operation in AuthHaloRunV1alpha1UserConnectionApi.
  * @export
- * @interface AuthHaloRunV1alpha1UserConnectionApiGetauthHaloRunV1alpha1UserConnectionRequest
+ * @interface AuthHaloRunV1alpha1UserConnectionApiGetAuthHaloRunV1alpha1UserConnectionRequest
  */
-export interface AuthHaloRunV1alpha1UserConnectionApiGetauthHaloRunV1alpha1UserConnectionRequest {
+export interface AuthHaloRunV1alpha1UserConnectionApiGetAuthHaloRunV1alpha1UserConnectionRequest {
     /**
      * Name of userconnection
      * @type {string}
-     * @memberof AuthHaloRunV1alpha1UserConnectionApiGetauthHaloRunV1alpha1UserConnection
+     * @memberof AuthHaloRunV1alpha1UserConnectionApiGetAuthHaloRunV1alpha1UserConnection
      */
     readonly name: string
 }
 
 /**
- * Request parameters for listauthHaloRunV1alpha1UserConnection operation in AuthHaloRunV1alpha1UserConnectionApi.
+ * Request parameters for listAuthHaloRunV1alpha1UserConnection operation in AuthHaloRunV1alpha1UserConnectionApi.
  * @export
- * @interface AuthHaloRunV1alpha1UserConnectionApiListauthHaloRunV1alpha1UserConnectionRequest
+ * @interface AuthHaloRunV1alpha1UserConnectionApiListAuthHaloRunV1alpha1UserConnectionRequest
  */
-export interface AuthHaloRunV1alpha1UserConnectionApiListauthHaloRunV1alpha1UserConnectionRequest {
+export interface AuthHaloRunV1alpha1UserConnectionApiListAuthHaloRunV1alpha1UserConnectionRequest {
     /**
      * Page number. Default is 0.
      * @type {number}
-     * @memberof AuthHaloRunV1alpha1UserConnectionApiListauthHaloRunV1alpha1UserConnection
+     * @memberof AuthHaloRunV1alpha1UserConnectionApiListAuthHaloRunV1alpha1UserConnection
      */
     readonly page?: number
 
     /**
      * Size number. Default is 0.
      * @type {number}
-     * @memberof AuthHaloRunV1alpha1UserConnectionApiListauthHaloRunV1alpha1UserConnection
+     * @memberof AuthHaloRunV1alpha1UserConnectionApiListAuthHaloRunV1alpha1UserConnection
      */
     readonly size?: number
 
     /**
      * Label selector. e.g.: hidden!&#x3D;true
      * @type {Array<string>}
-     * @memberof AuthHaloRunV1alpha1UserConnectionApiListauthHaloRunV1alpha1UserConnection
+     * @memberof AuthHaloRunV1alpha1UserConnectionApiListAuthHaloRunV1alpha1UserConnection
      */
     readonly labelSelector?: Array<string>
 
     /**
      * Field selector. e.g.: metadata.name&#x3D;&#x3D;halo
      * @type {Array<string>}
-     * @memberof AuthHaloRunV1alpha1UserConnectionApiListauthHaloRunV1alpha1UserConnection
+     * @memberof AuthHaloRunV1alpha1UserConnectionApiListAuthHaloRunV1alpha1UserConnection
      */
     readonly fieldSelector?: Array<string>
 
     /**
      * Sorting criteria in the format: property,(asc|desc). Default sort order is ascending. Multiple sort criteria are supported.
      * @type {Array<string>}
-     * @memberof AuthHaloRunV1alpha1UserConnectionApiListauthHaloRunV1alpha1UserConnection
+     * @memberof AuthHaloRunV1alpha1UserConnectionApiListAuthHaloRunV1alpha1UserConnection
      */
     readonly sort?: Array<string>
 }
 
 /**
- * Request parameters for updateauthHaloRunV1alpha1UserConnection operation in AuthHaloRunV1alpha1UserConnectionApi.
+ * Request parameters for updateAuthHaloRunV1alpha1UserConnection operation in AuthHaloRunV1alpha1UserConnectionApi.
  * @export
- * @interface AuthHaloRunV1alpha1UserConnectionApiUpdateauthHaloRunV1alpha1UserConnectionRequest
+ * @interface AuthHaloRunV1alpha1UserConnectionApiUpdateAuthHaloRunV1alpha1UserConnectionRequest
  */
-export interface AuthHaloRunV1alpha1UserConnectionApiUpdateauthHaloRunV1alpha1UserConnectionRequest {
+export interface AuthHaloRunV1alpha1UserConnectionApiUpdateAuthHaloRunV1alpha1UserConnectionRequest {
     /**
      * Name of userconnection
      * @type {string}
-     * @memberof AuthHaloRunV1alpha1UserConnectionApiUpdateauthHaloRunV1alpha1UserConnection
+     * @memberof AuthHaloRunV1alpha1UserConnectionApiUpdateAuthHaloRunV1alpha1UserConnection
      */
     readonly name: string
 
     /**
      * Updated userconnection
      * @type {UserConnection}
-     * @memberof AuthHaloRunV1alpha1UserConnectionApiUpdateauthHaloRunV1alpha1UserConnection
+     * @memberof AuthHaloRunV1alpha1UserConnectionApiUpdateAuthHaloRunV1alpha1UserConnection
      */
     readonly userConnection?: UserConnection
 }
@@ -508,57 +508,57 @@ export interface AuthHaloRunV1alpha1UserConnectionApiUpdateauthHaloRunV1alpha1Us
 export class AuthHaloRunV1alpha1UserConnectionApi extends BaseAPI {
     /**
      * Create auth.halo.run/v1alpha1/UserConnection
-     * @param {AuthHaloRunV1alpha1UserConnectionApiCreateauthHaloRunV1alpha1UserConnectionRequest} requestParameters Request parameters.
+     * @param {AuthHaloRunV1alpha1UserConnectionApiCreateAuthHaloRunV1alpha1UserConnectionRequest} requestParameters Request parameters.
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      * @memberof AuthHaloRunV1alpha1UserConnectionApi
      */
-    public createauthHaloRunV1alpha1UserConnection(requestParameters: AuthHaloRunV1alpha1UserConnectionApiCreateauthHaloRunV1alpha1UserConnectionRequest = {}, options?: RawAxiosRequestConfig) {
-        return AuthHaloRunV1alpha1UserConnectionApiFp(this.configuration).createauthHaloRunV1alpha1UserConnection(requestParameters.userConnection, options).then((request) => request(this.axios, this.basePath));
+    public createAuthHaloRunV1alpha1UserConnection(requestParameters: AuthHaloRunV1alpha1UserConnectionApiCreateAuthHaloRunV1alpha1UserConnectionRequest = {}, options?: RawAxiosRequestConfig) {
+        return AuthHaloRunV1alpha1UserConnectionApiFp(this.configuration).createAuthHaloRunV1alpha1UserConnection(requestParameters.userConnection, options).then((request) => request(this.axios, this.basePath));
     }
 
     /**
      * Delete auth.halo.run/v1alpha1/UserConnection
-     * @param {AuthHaloRunV1alpha1UserConnectionApiDeleteauthHaloRunV1alpha1UserConnectionRequest} requestParameters Request parameters.
+     * @param {AuthHaloRunV1alpha1UserConnectionApiDeleteAuthHaloRunV1alpha1UserConnectionRequest} requestParameters Request parameters.
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      * @memberof AuthHaloRunV1alpha1UserConnectionApi
      */
-    public deleteauthHaloRunV1alpha1UserConnection(requestParameters: AuthHaloRunV1alpha1UserConnectionApiDeleteauthHaloRunV1alpha1UserConnectionRequest, options?: RawAxiosRequestConfig) {
-        return AuthHaloRunV1alpha1UserConnectionApiFp(this.configuration).deleteauthHaloRunV1alpha1UserConnection(requestParameters.name, options).then((request) => request(this.axios, this.basePath));
+    public deleteAuthHaloRunV1alpha1UserConnection(requestParameters: AuthHaloRunV1alpha1UserConnectionApiDeleteAuthHaloRunV1alpha1UserConnectionRequest, options?: RawAxiosRequestConfig) {
+        return AuthHaloRunV1alpha1UserConnectionApiFp(this.configuration).deleteAuthHaloRunV1alpha1UserConnection(requestParameters.name, options).then((request) => request(this.axios, this.basePath));
     }
 
     /**
      * Get auth.halo.run/v1alpha1/UserConnection
-     * @param {AuthHaloRunV1alpha1UserConnectionApiGetauthHaloRunV1alpha1UserConnectionRequest} requestParameters Request parameters.
+     * @param {AuthHaloRunV1alpha1UserConnectionApiGetAuthHaloRunV1alpha1UserConnectionRequest} requestParameters Request parameters.
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      * @memberof AuthHaloRunV1alpha1UserConnectionApi
      */
-    public getauthHaloRunV1alpha1UserConnection(requestParameters: AuthHaloRunV1alpha1UserConnectionApiGetauthHaloRunV1alpha1UserConnectionRequest, options?: RawAxiosRequestConfig) {
-        return AuthHaloRunV1alpha1UserConnectionApiFp(this.configuration).getauthHaloRunV1alpha1UserConnection(requestParameters.name, options).then((request) => request(this.axios, this.basePath));
+    public getAuthHaloRunV1alpha1UserConnection(requestParameters: AuthHaloRunV1alpha1UserConnectionApiGetAuthHaloRunV1alpha1UserConnectionRequest, options?: RawAxiosRequestConfig) {
+        return AuthHaloRunV1alpha1UserConnectionApiFp(this.configuration).getAuthHaloRunV1alpha1UserConnection(requestParameters.name, options).then((request) => request(this.axios, this.basePath));
     }
 
     /**
      * List auth.halo.run/v1alpha1/UserConnection
-     * @param {AuthHaloRunV1alpha1UserConnectionApiListauthHaloRunV1alpha1UserConnectionRequest} requestParameters Request parameters.
+     * @param {AuthHaloRunV1alpha1UserConnectionApiListAuthHaloRunV1alpha1UserConnectionRequest} requestParameters Request parameters.
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      * @memberof AuthHaloRunV1alpha1UserConnectionApi
      */
-    public listauthHaloRunV1alpha1UserConnection(requestParameters: AuthHaloRunV1alpha1UserConnectionApiListauthHaloRunV1alpha1UserConnectionRequest = {}, options?: RawAxiosRequestConfig) {
-        return AuthHaloRunV1alpha1UserConnectionApiFp(this.configuration).listauthHaloRunV1alpha1UserConnection(requestParameters.page, requestParameters.size, requestParameters.labelSelector, requestParameters.fieldSelector, requestParameters.sort, options).then((request) => request(this.axios, this.basePath));
+    public listAuthHaloRunV1alpha1UserConnection(requestParameters: AuthHaloRunV1alpha1UserConnectionApiListAuthHaloRunV1alpha1UserConnectionRequest = {}, options?: RawAxiosRequestConfig) {
+        return AuthHaloRunV1alpha1UserConnectionApiFp(this.configuration).listAuthHaloRunV1alpha1UserConnection(requestParameters.page, requestParameters.size, requestParameters.labelSelector, requestParameters.fieldSelector, requestParameters.sort, options).then((request) => request(this.axios, this.basePath));
     }
 
     /**
      * Update auth.halo.run/v1alpha1/UserConnection
-     * @param {AuthHaloRunV1alpha1UserConnectionApiUpdateauthHaloRunV1alpha1UserConnectionRequest} requestParameters Request parameters.
+     * @param {AuthHaloRunV1alpha1UserConnectionApiUpdateAuthHaloRunV1alpha1UserConnectionRequest} requestParameters Request parameters.
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      * @memberof AuthHaloRunV1alpha1UserConnectionApi
      */
-    public updateauthHaloRunV1alpha1UserConnection(requestParameters: AuthHaloRunV1alpha1UserConnectionApiUpdateauthHaloRunV1alpha1UserConnectionRequest, options?: RawAxiosRequestConfig) {
-        return AuthHaloRunV1alpha1UserConnectionApiFp(this.configuration).updateauthHaloRunV1alpha1UserConnection(requestParameters.name, requestParameters.userConnection, options).then((request) => request(this.axios, this.basePath));
+    public updateAuthHaloRunV1alpha1UserConnection(requestParameters: AuthHaloRunV1alpha1UserConnectionApiUpdateAuthHaloRunV1alpha1UserConnectionRequest, options?: RawAxiosRequestConfig) {
+        return AuthHaloRunV1alpha1UserConnectionApiFp(this.configuration).updateAuthHaloRunV1alpha1UserConnection(requestParameters.name, requestParameters.userConnection, options).then((request) => request(this.axios, this.basePath));
     }
 }
 
