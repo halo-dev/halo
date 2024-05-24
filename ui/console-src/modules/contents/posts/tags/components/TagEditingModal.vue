@@ -91,12 +91,12 @@ const handleSaveTag = async () => {
   try {
     saving.value = true;
     if (isUpdateMode.value) {
-      await apiClient.extension.tag.updatecontentHaloRunV1alpha1Tag({
+      await apiClient.extension.tag.updateContentHaloRunV1alpha1Tag({
         name: formState.value.metadata.name,
         tag: formState.value,
       });
     } else {
-      await apiClient.extension.tag.createcontentHaloRunV1alpha1Tag({
+      await apiClient.extension.tag.createContentHaloRunV1alpha1Tag({
         tag: formState.value,
       });
     }

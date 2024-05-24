@@ -71,7 +71,7 @@ export function usePostTag(filterOptions?: {
       cancelText: t("core.common.buttons.cancel"),
       onConfirm: async () => {
         try {
-          await apiClient.extension.tag.deletecontentHaloRunV1alpha1Tag({
+          await apiClient.extension.tag.deleteContentHaloRunV1alpha1Tag({
             name: tag.metadata.name,
           });
 
@@ -97,7 +97,7 @@ export function usePostTag(filterOptions?: {
           try {
             await Promise.all(
               tagNames.map((tagName) => {
-                apiClient.extension.tag.deletecontentHaloRunV1alpha1Tag({
+                apiClient.extension.tag.deleteContentHaloRunV1alpha1Tag({
                   name: tagName,
                 });
               })

@@ -134,7 +134,7 @@ const handleSave = async () => {
 
     const { data } = isUpdateMode
       ? await singlePageUpdateMutate(formState.value)
-      : await apiClient.extension.singlePage.createcontentHaloRunV1alpha1SinglePage(
+      : await apiClient.extension.singlePage.createContentHaloRunV1alpha1SinglePage(
           {
             singlePage: formState.value,
           }
@@ -184,7 +184,7 @@ const handlePublish = async () => {
     singlePageToUpdate.spec.publish = true;
 
     const { data } =
-      await apiClient.extension.singlePage.updatecontentHaloRunV1alpha1SinglePage(
+      await apiClient.extension.singlePage.updateContentHaloRunV1alpha1SinglePage(
         {
           name: formState.value.metadata.name,
           singlePage: singlePageToUpdate,
@@ -210,7 +210,7 @@ const handleUnpublish = async () => {
     publishCanceling.value = true;
 
     const { data: singlePage } =
-      await apiClient.extension.singlePage.getcontentHaloRunV1alpha1SinglePage({
+      await apiClient.extension.singlePage.getContentHaloRunV1alpha1SinglePage({
         name: formState.value.metadata.name,
       });
 
@@ -218,7 +218,7 @@ const handleUnpublish = async () => {
     singlePageToUpdate.spec.publish = false;
 
     const { data } =
-      await apiClient.extension.singlePage.updatecontentHaloRunV1alpha1SinglePage(
+      await apiClient.extension.singlePage.updateContentHaloRunV1alpha1SinglePage(
         {
           name: formState.value.metadata.name,
           singlePage: singlePageToUpdate,

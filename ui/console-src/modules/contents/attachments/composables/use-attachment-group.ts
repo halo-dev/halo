@@ -14,7 +14,7 @@ export function useFetchAttachmentGroup(): useFetchAttachmentGroupReturn {
     queryKey: ["attachment-groups"],
     queryFn: async () => {
       const { data } =
-        await apiClient.extension.storage.group.liststorageHaloRunV1alpha1Group(
+        await apiClient.extension.storage.group.listStorageHaloRunV1alpha1Group(
           {
             labelSelector: ["!halo.run/hidden"],
             sort: ["metadata.creationTimestamp,asc"],

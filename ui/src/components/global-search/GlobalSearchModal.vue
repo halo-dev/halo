@@ -79,7 +79,7 @@ const handleBuildSearchIndex = () => {
   });
 
   if (currentUserHasPermission(["system:users:view"])) {
-    apiClient.extension.user.listv1alpha1User().then((response) => {
+    apiClient.extension.user.listV1alpha1User().then((response) => {
       response.data.items.forEach((user) => {
         fuse.add({
           title: user.spec.displayName,
@@ -100,7 +100,7 @@ const handleBuildSearchIndex = () => {
 
   if (currentUserHasPermission(["system:plugins:view"])) {
     apiClient.extension.plugin
-      .listpluginHaloRunV1alpha1Plugin()
+      .listPluginHaloRunV1alpha1Plugin()
       .then((response) => {
         response.data.items.forEach((plugin) => {
           fuse.add({
@@ -122,7 +122,7 @@ const handleBuildSearchIndex = () => {
 
   if (currentUserHasPermission(["system:posts:view"])) {
     apiClient.extension.post
-      .listcontentHaloRunV1alpha1Post()
+      .listContentHaloRunV1alpha1Post()
       .then((response) => {
         response.data.items.forEach((post) => {
           fuse.add({
@@ -142,7 +142,7 @@ const handleBuildSearchIndex = () => {
       });
 
     apiClient.extension.category
-      .listcontentHaloRunV1alpha1Category({
+      .listContentHaloRunV1alpha1Category({
         sort: ["metadata.creationTimestamp,desc"],
       })
       .then((response) => {
@@ -164,7 +164,7 @@ const handleBuildSearchIndex = () => {
       });
 
     apiClient.extension.tag
-      .listcontentHaloRunV1alpha1Tag({
+      .listContentHaloRunV1alpha1Tag({
         sort: ["metadata.creationTimestamp,desc"],
       })
       .then((response) => {
@@ -188,7 +188,7 @@ const handleBuildSearchIndex = () => {
 
   if (currentUserHasPermission(["system:singlepages:view"])) {
     apiClient.extension.singlePage
-      .listcontentHaloRunV1alpha1SinglePage()
+      .listContentHaloRunV1alpha1SinglePage()
       .then((response) => {
         response.data.items.forEach((singlePage) => {
           fuse.add({
@@ -210,7 +210,7 @@ const handleBuildSearchIndex = () => {
 
   if (currentUserHasPermission(["system:attachments:view"])) {
     apiClient.extension.storage.attachment
-      .liststorageHaloRunV1alpha1Attachment()
+      .listStorageHaloRunV1alpha1Attachment()
       .then((response) => {
         response.data.items.forEach((attachment) => {
           fuse.add({
@@ -235,7 +235,7 @@ const handleBuildSearchIndex = () => {
     currentUserHasPermission(["system:configmaps:view"])
   ) {
     apiClient.extension.setting
-      .getv1alpha1Setting({ name: "system" })
+      .getV1alpha1Setting({ name: "system" })
       .then((response) => {
         response.data.spec.forms.forEach((form) => {
           fuse.add({

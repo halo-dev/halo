@@ -132,7 +132,7 @@ const handleMove = async (group: Group) => {
     const promises = Array.from(selectedAttachments.value).map((attachment) => {
       const attachmentToUpdate = cloneDeep(attachment);
       attachmentToUpdate.spec.groupName = group.metadata.name;
-      return apiClient.extension.storage.attachment.updatestorageHaloRunV1alpha1Attachment(
+      return apiClient.extension.storage.attachment.updateStorageHaloRunV1alpha1Attachment(
         {
           name: attachment.metadata.name,
           attachment: attachmentToUpdate,
@@ -230,7 +230,7 @@ onMounted(() => {
     return;
   }
   apiClient.extension.storage.attachment
-    .getstorageHaloRunV1alpha1Attachment({
+    .getStorageHaloRunV1alpha1Attachment({
       name: nameQuery.value,
     })
     .then((response) => {

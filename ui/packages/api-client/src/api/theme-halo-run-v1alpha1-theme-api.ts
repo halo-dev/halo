@@ -37,7 +37,7 @@ export const ThemeHaloRunV1alpha1ThemeApiAxiosParamCreator = function (configura
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        createthemeHaloRunV1alpha1Theme: async (theme?: Theme, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+        createThemeHaloRunV1alpha1Theme: async (theme?: Theme, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
             const localVarPath = `/apis/theme.halo.run/v1alpha1/themes`;
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
@@ -78,9 +78,9 @@ export const ThemeHaloRunV1alpha1ThemeApiAxiosParamCreator = function (configura
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        deletethemeHaloRunV1alpha1Theme: async (name: string, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+        deleteThemeHaloRunV1alpha1Theme: async (name: string, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
             // verify required parameter 'name' is not null or undefined
-            assertParamExists('deletethemeHaloRunV1alpha1Theme', 'name', name)
+            assertParamExists('deleteThemeHaloRunV1alpha1Theme', 'name', name)
             const localVarPath = `/apis/theme.halo.run/v1alpha1/themes/{name}`
                 .replace(`{${"name"}}`, encodeURIComponent(String(name)));
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
@@ -119,9 +119,9 @@ export const ThemeHaloRunV1alpha1ThemeApiAxiosParamCreator = function (configura
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        getthemeHaloRunV1alpha1Theme: async (name: string, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+        getThemeHaloRunV1alpha1Theme: async (name: string, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
             // verify required parameter 'name' is not null or undefined
-            assertParamExists('getthemeHaloRunV1alpha1Theme', 'name', name)
+            assertParamExists('getThemeHaloRunV1alpha1Theme', 'name', name)
             const localVarPath = `/apis/theme.halo.run/v1alpha1/themes/{name}`
                 .replace(`{${"name"}}`, encodeURIComponent(String(name)));
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
@@ -164,7 +164,7 @@ export const ThemeHaloRunV1alpha1ThemeApiAxiosParamCreator = function (configura
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        listthemeHaloRunV1alpha1Theme: async (page?: number, size?: number, labelSelector?: Array<string>, fieldSelector?: Array<string>, sort?: Array<string>, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+        listThemeHaloRunV1alpha1Theme: async (page?: number, size?: number, labelSelector?: Array<string>, fieldSelector?: Array<string>, sort?: Array<string>, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
             const localVarPath = `/apis/theme.halo.run/v1alpha1/themes`;
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
@@ -223,9 +223,9 @@ export const ThemeHaloRunV1alpha1ThemeApiAxiosParamCreator = function (configura
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        updatethemeHaloRunV1alpha1Theme: async (name: string, theme?: Theme, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+        updateThemeHaloRunV1alpha1Theme: async (name: string, theme?: Theme, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
             // verify required parameter 'name' is not null or undefined
-            assertParamExists('updatethemeHaloRunV1alpha1Theme', 'name', name)
+            assertParamExists('updateThemeHaloRunV1alpha1Theme', 'name', name)
             const localVarPath = `/apis/theme.halo.run/v1alpha1/themes/{name}`
                 .replace(`{${"name"}}`, encodeURIComponent(String(name)));
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
@@ -277,10 +277,10 @@ export const ThemeHaloRunV1alpha1ThemeApiFp = function(configuration?: Configura
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async createthemeHaloRunV1alpha1Theme(theme?: Theme, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<Theme>> {
-            const localVarAxiosArgs = await localVarAxiosParamCreator.createthemeHaloRunV1alpha1Theme(theme, options);
+        async createThemeHaloRunV1alpha1Theme(theme?: Theme, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<Theme>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.createThemeHaloRunV1alpha1Theme(theme, options);
             const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
-            const localVarOperationServerBasePath = operationServerMap['ThemeHaloRunV1alpha1ThemeApi.createthemeHaloRunV1alpha1Theme']?.[localVarOperationServerIndex]?.url;
+            const localVarOperationServerBasePath = operationServerMap['ThemeHaloRunV1alpha1ThemeApi.createThemeHaloRunV1alpha1Theme']?.[localVarOperationServerIndex]?.url;
             return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
         },
         /**
@@ -289,10 +289,10 @@ export const ThemeHaloRunV1alpha1ThemeApiFp = function(configuration?: Configura
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async deletethemeHaloRunV1alpha1Theme(name: string, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<void>> {
-            const localVarAxiosArgs = await localVarAxiosParamCreator.deletethemeHaloRunV1alpha1Theme(name, options);
+        async deleteThemeHaloRunV1alpha1Theme(name: string, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<void>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.deleteThemeHaloRunV1alpha1Theme(name, options);
             const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
-            const localVarOperationServerBasePath = operationServerMap['ThemeHaloRunV1alpha1ThemeApi.deletethemeHaloRunV1alpha1Theme']?.[localVarOperationServerIndex]?.url;
+            const localVarOperationServerBasePath = operationServerMap['ThemeHaloRunV1alpha1ThemeApi.deleteThemeHaloRunV1alpha1Theme']?.[localVarOperationServerIndex]?.url;
             return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
         },
         /**
@@ -301,10 +301,10 @@ export const ThemeHaloRunV1alpha1ThemeApiFp = function(configuration?: Configura
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async getthemeHaloRunV1alpha1Theme(name: string, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<Theme>> {
-            const localVarAxiosArgs = await localVarAxiosParamCreator.getthemeHaloRunV1alpha1Theme(name, options);
+        async getThemeHaloRunV1alpha1Theme(name: string, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<Theme>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.getThemeHaloRunV1alpha1Theme(name, options);
             const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
-            const localVarOperationServerBasePath = operationServerMap['ThemeHaloRunV1alpha1ThemeApi.getthemeHaloRunV1alpha1Theme']?.[localVarOperationServerIndex]?.url;
+            const localVarOperationServerBasePath = operationServerMap['ThemeHaloRunV1alpha1ThemeApi.getThemeHaloRunV1alpha1Theme']?.[localVarOperationServerIndex]?.url;
             return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
         },
         /**
@@ -317,10 +317,10 @@ export const ThemeHaloRunV1alpha1ThemeApiFp = function(configuration?: Configura
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async listthemeHaloRunV1alpha1Theme(page?: number, size?: number, labelSelector?: Array<string>, fieldSelector?: Array<string>, sort?: Array<string>, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<ThemeList>> {
-            const localVarAxiosArgs = await localVarAxiosParamCreator.listthemeHaloRunV1alpha1Theme(page, size, labelSelector, fieldSelector, sort, options);
+        async listThemeHaloRunV1alpha1Theme(page?: number, size?: number, labelSelector?: Array<string>, fieldSelector?: Array<string>, sort?: Array<string>, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<ThemeList>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.listThemeHaloRunV1alpha1Theme(page, size, labelSelector, fieldSelector, sort, options);
             const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
-            const localVarOperationServerBasePath = operationServerMap['ThemeHaloRunV1alpha1ThemeApi.listthemeHaloRunV1alpha1Theme']?.[localVarOperationServerIndex]?.url;
+            const localVarOperationServerBasePath = operationServerMap['ThemeHaloRunV1alpha1ThemeApi.listThemeHaloRunV1alpha1Theme']?.[localVarOperationServerIndex]?.url;
             return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
         },
         /**
@@ -330,10 +330,10 @@ export const ThemeHaloRunV1alpha1ThemeApiFp = function(configuration?: Configura
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async updatethemeHaloRunV1alpha1Theme(name: string, theme?: Theme, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<Theme>> {
-            const localVarAxiosArgs = await localVarAxiosParamCreator.updatethemeHaloRunV1alpha1Theme(name, theme, options);
+        async updateThemeHaloRunV1alpha1Theme(name: string, theme?: Theme, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<Theme>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.updateThemeHaloRunV1alpha1Theme(name, theme, options);
             const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
-            const localVarOperationServerBasePath = operationServerMap['ThemeHaloRunV1alpha1ThemeApi.updatethemeHaloRunV1alpha1Theme']?.[localVarOperationServerIndex]?.url;
+            const localVarOperationServerBasePath = operationServerMap['ThemeHaloRunV1alpha1ThemeApi.updateThemeHaloRunV1alpha1Theme']?.[localVarOperationServerIndex]?.url;
             return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
         },
     }
@@ -348,153 +348,153 @@ export const ThemeHaloRunV1alpha1ThemeApiFactory = function (configuration?: Con
     return {
         /**
          * Create theme.halo.run/v1alpha1/Theme
-         * @param {ThemeHaloRunV1alpha1ThemeApiCreatethemeHaloRunV1alpha1ThemeRequest} requestParameters Request parameters.
+         * @param {ThemeHaloRunV1alpha1ThemeApiCreateThemeHaloRunV1alpha1ThemeRequest} requestParameters Request parameters.
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        createthemeHaloRunV1alpha1Theme(requestParameters: ThemeHaloRunV1alpha1ThemeApiCreatethemeHaloRunV1alpha1ThemeRequest = {}, options?: RawAxiosRequestConfig): AxiosPromise<Theme> {
-            return localVarFp.createthemeHaloRunV1alpha1Theme(requestParameters.theme, options).then((request) => request(axios, basePath));
+        createThemeHaloRunV1alpha1Theme(requestParameters: ThemeHaloRunV1alpha1ThemeApiCreateThemeHaloRunV1alpha1ThemeRequest = {}, options?: RawAxiosRequestConfig): AxiosPromise<Theme> {
+            return localVarFp.createThemeHaloRunV1alpha1Theme(requestParameters.theme, options).then((request) => request(axios, basePath));
         },
         /**
          * Delete theme.halo.run/v1alpha1/Theme
-         * @param {ThemeHaloRunV1alpha1ThemeApiDeletethemeHaloRunV1alpha1ThemeRequest} requestParameters Request parameters.
+         * @param {ThemeHaloRunV1alpha1ThemeApiDeleteThemeHaloRunV1alpha1ThemeRequest} requestParameters Request parameters.
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        deletethemeHaloRunV1alpha1Theme(requestParameters: ThemeHaloRunV1alpha1ThemeApiDeletethemeHaloRunV1alpha1ThemeRequest, options?: RawAxiosRequestConfig): AxiosPromise<void> {
-            return localVarFp.deletethemeHaloRunV1alpha1Theme(requestParameters.name, options).then((request) => request(axios, basePath));
+        deleteThemeHaloRunV1alpha1Theme(requestParameters: ThemeHaloRunV1alpha1ThemeApiDeleteThemeHaloRunV1alpha1ThemeRequest, options?: RawAxiosRequestConfig): AxiosPromise<void> {
+            return localVarFp.deleteThemeHaloRunV1alpha1Theme(requestParameters.name, options).then((request) => request(axios, basePath));
         },
         /**
          * Get theme.halo.run/v1alpha1/Theme
-         * @param {ThemeHaloRunV1alpha1ThemeApiGetthemeHaloRunV1alpha1ThemeRequest} requestParameters Request parameters.
+         * @param {ThemeHaloRunV1alpha1ThemeApiGetThemeHaloRunV1alpha1ThemeRequest} requestParameters Request parameters.
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        getthemeHaloRunV1alpha1Theme(requestParameters: ThemeHaloRunV1alpha1ThemeApiGetthemeHaloRunV1alpha1ThemeRequest, options?: RawAxiosRequestConfig): AxiosPromise<Theme> {
-            return localVarFp.getthemeHaloRunV1alpha1Theme(requestParameters.name, options).then((request) => request(axios, basePath));
+        getThemeHaloRunV1alpha1Theme(requestParameters: ThemeHaloRunV1alpha1ThemeApiGetThemeHaloRunV1alpha1ThemeRequest, options?: RawAxiosRequestConfig): AxiosPromise<Theme> {
+            return localVarFp.getThemeHaloRunV1alpha1Theme(requestParameters.name, options).then((request) => request(axios, basePath));
         },
         /**
          * List theme.halo.run/v1alpha1/Theme
-         * @param {ThemeHaloRunV1alpha1ThemeApiListthemeHaloRunV1alpha1ThemeRequest} requestParameters Request parameters.
+         * @param {ThemeHaloRunV1alpha1ThemeApiListThemeHaloRunV1alpha1ThemeRequest} requestParameters Request parameters.
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        listthemeHaloRunV1alpha1Theme(requestParameters: ThemeHaloRunV1alpha1ThemeApiListthemeHaloRunV1alpha1ThemeRequest = {}, options?: RawAxiosRequestConfig): AxiosPromise<ThemeList> {
-            return localVarFp.listthemeHaloRunV1alpha1Theme(requestParameters.page, requestParameters.size, requestParameters.labelSelector, requestParameters.fieldSelector, requestParameters.sort, options).then((request) => request(axios, basePath));
+        listThemeHaloRunV1alpha1Theme(requestParameters: ThemeHaloRunV1alpha1ThemeApiListThemeHaloRunV1alpha1ThemeRequest = {}, options?: RawAxiosRequestConfig): AxiosPromise<ThemeList> {
+            return localVarFp.listThemeHaloRunV1alpha1Theme(requestParameters.page, requestParameters.size, requestParameters.labelSelector, requestParameters.fieldSelector, requestParameters.sort, options).then((request) => request(axios, basePath));
         },
         /**
          * Update theme.halo.run/v1alpha1/Theme
-         * @param {ThemeHaloRunV1alpha1ThemeApiUpdatethemeHaloRunV1alpha1ThemeRequest} requestParameters Request parameters.
+         * @param {ThemeHaloRunV1alpha1ThemeApiUpdateThemeHaloRunV1alpha1ThemeRequest} requestParameters Request parameters.
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        updatethemeHaloRunV1alpha1Theme(requestParameters: ThemeHaloRunV1alpha1ThemeApiUpdatethemeHaloRunV1alpha1ThemeRequest, options?: RawAxiosRequestConfig): AxiosPromise<Theme> {
-            return localVarFp.updatethemeHaloRunV1alpha1Theme(requestParameters.name, requestParameters.theme, options).then((request) => request(axios, basePath));
+        updateThemeHaloRunV1alpha1Theme(requestParameters: ThemeHaloRunV1alpha1ThemeApiUpdateThemeHaloRunV1alpha1ThemeRequest, options?: RawAxiosRequestConfig): AxiosPromise<Theme> {
+            return localVarFp.updateThemeHaloRunV1alpha1Theme(requestParameters.name, requestParameters.theme, options).then((request) => request(axios, basePath));
         },
     };
 };
 
 /**
- * Request parameters for createthemeHaloRunV1alpha1Theme operation in ThemeHaloRunV1alpha1ThemeApi.
+ * Request parameters for createThemeHaloRunV1alpha1Theme operation in ThemeHaloRunV1alpha1ThemeApi.
  * @export
- * @interface ThemeHaloRunV1alpha1ThemeApiCreatethemeHaloRunV1alpha1ThemeRequest
+ * @interface ThemeHaloRunV1alpha1ThemeApiCreateThemeHaloRunV1alpha1ThemeRequest
  */
-export interface ThemeHaloRunV1alpha1ThemeApiCreatethemeHaloRunV1alpha1ThemeRequest {
+export interface ThemeHaloRunV1alpha1ThemeApiCreateThemeHaloRunV1alpha1ThemeRequest {
     /**
      * Fresh theme
      * @type {Theme}
-     * @memberof ThemeHaloRunV1alpha1ThemeApiCreatethemeHaloRunV1alpha1Theme
+     * @memberof ThemeHaloRunV1alpha1ThemeApiCreateThemeHaloRunV1alpha1Theme
      */
     readonly theme?: Theme
 }
 
 /**
- * Request parameters for deletethemeHaloRunV1alpha1Theme operation in ThemeHaloRunV1alpha1ThemeApi.
+ * Request parameters for deleteThemeHaloRunV1alpha1Theme operation in ThemeHaloRunV1alpha1ThemeApi.
  * @export
- * @interface ThemeHaloRunV1alpha1ThemeApiDeletethemeHaloRunV1alpha1ThemeRequest
+ * @interface ThemeHaloRunV1alpha1ThemeApiDeleteThemeHaloRunV1alpha1ThemeRequest
  */
-export interface ThemeHaloRunV1alpha1ThemeApiDeletethemeHaloRunV1alpha1ThemeRequest {
+export interface ThemeHaloRunV1alpha1ThemeApiDeleteThemeHaloRunV1alpha1ThemeRequest {
     /**
      * Name of theme
      * @type {string}
-     * @memberof ThemeHaloRunV1alpha1ThemeApiDeletethemeHaloRunV1alpha1Theme
+     * @memberof ThemeHaloRunV1alpha1ThemeApiDeleteThemeHaloRunV1alpha1Theme
      */
     readonly name: string
 }
 
 /**
- * Request parameters for getthemeHaloRunV1alpha1Theme operation in ThemeHaloRunV1alpha1ThemeApi.
+ * Request parameters for getThemeHaloRunV1alpha1Theme operation in ThemeHaloRunV1alpha1ThemeApi.
  * @export
- * @interface ThemeHaloRunV1alpha1ThemeApiGetthemeHaloRunV1alpha1ThemeRequest
+ * @interface ThemeHaloRunV1alpha1ThemeApiGetThemeHaloRunV1alpha1ThemeRequest
  */
-export interface ThemeHaloRunV1alpha1ThemeApiGetthemeHaloRunV1alpha1ThemeRequest {
+export interface ThemeHaloRunV1alpha1ThemeApiGetThemeHaloRunV1alpha1ThemeRequest {
     /**
      * Name of theme
      * @type {string}
-     * @memberof ThemeHaloRunV1alpha1ThemeApiGetthemeHaloRunV1alpha1Theme
+     * @memberof ThemeHaloRunV1alpha1ThemeApiGetThemeHaloRunV1alpha1Theme
      */
     readonly name: string
 }
 
 /**
- * Request parameters for listthemeHaloRunV1alpha1Theme operation in ThemeHaloRunV1alpha1ThemeApi.
+ * Request parameters for listThemeHaloRunV1alpha1Theme operation in ThemeHaloRunV1alpha1ThemeApi.
  * @export
- * @interface ThemeHaloRunV1alpha1ThemeApiListthemeHaloRunV1alpha1ThemeRequest
+ * @interface ThemeHaloRunV1alpha1ThemeApiListThemeHaloRunV1alpha1ThemeRequest
  */
-export interface ThemeHaloRunV1alpha1ThemeApiListthemeHaloRunV1alpha1ThemeRequest {
+export interface ThemeHaloRunV1alpha1ThemeApiListThemeHaloRunV1alpha1ThemeRequest {
     /**
      * Page number. Default is 0.
      * @type {number}
-     * @memberof ThemeHaloRunV1alpha1ThemeApiListthemeHaloRunV1alpha1Theme
+     * @memberof ThemeHaloRunV1alpha1ThemeApiListThemeHaloRunV1alpha1Theme
      */
     readonly page?: number
 
     /**
      * Size number. Default is 0.
      * @type {number}
-     * @memberof ThemeHaloRunV1alpha1ThemeApiListthemeHaloRunV1alpha1Theme
+     * @memberof ThemeHaloRunV1alpha1ThemeApiListThemeHaloRunV1alpha1Theme
      */
     readonly size?: number
 
     /**
      * Label selector. e.g.: hidden!&#x3D;true
      * @type {Array<string>}
-     * @memberof ThemeHaloRunV1alpha1ThemeApiListthemeHaloRunV1alpha1Theme
+     * @memberof ThemeHaloRunV1alpha1ThemeApiListThemeHaloRunV1alpha1Theme
      */
     readonly labelSelector?: Array<string>
 
     /**
      * Field selector. e.g.: metadata.name&#x3D;&#x3D;halo
      * @type {Array<string>}
-     * @memberof ThemeHaloRunV1alpha1ThemeApiListthemeHaloRunV1alpha1Theme
+     * @memberof ThemeHaloRunV1alpha1ThemeApiListThemeHaloRunV1alpha1Theme
      */
     readonly fieldSelector?: Array<string>
 
     /**
      * Sorting criteria in the format: property,(asc|desc). Default sort order is ascending. Multiple sort criteria are supported.
      * @type {Array<string>}
-     * @memberof ThemeHaloRunV1alpha1ThemeApiListthemeHaloRunV1alpha1Theme
+     * @memberof ThemeHaloRunV1alpha1ThemeApiListThemeHaloRunV1alpha1Theme
      */
     readonly sort?: Array<string>
 }
 
 /**
- * Request parameters for updatethemeHaloRunV1alpha1Theme operation in ThemeHaloRunV1alpha1ThemeApi.
+ * Request parameters for updateThemeHaloRunV1alpha1Theme operation in ThemeHaloRunV1alpha1ThemeApi.
  * @export
- * @interface ThemeHaloRunV1alpha1ThemeApiUpdatethemeHaloRunV1alpha1ThemeRequest
+ * @interface ThemeHaloRunV1alpha1ThemeApiUpdateThemeHaloRunV1alpha1ThemeRequest
  */
-export interface ThemeHaloRunV1alpha1ThemeApiUpdatethemeHaloRunV1alpha1ThemeRequest {
+export interface ThemeHaloRunV1alpha1ThemeApiUpdateThemeHaloRunV1alpha1ThemeRequest {
     /**
      * Name of theme
      * @type {string}
-     * @memberof ThemeHaloRunV1alpha1ThemeApiUpdatethemeHaloRunV1alpha1Theme
+     * @memberof ThemeHaloRunV1alpha1ThemeApiUpdateThemeHaloRunV1alpha1Theme
      */
     readonly name: string
 
     /**
      * Updated theme
      * @type {Theme}
-     * @memberof ThemeHaloRunV1alpha1ThemeApiUpdatethemeHaloRunV1alpha1Theme
+     * @memberof ThemeHaloRunV1alpha1ThemeApiUpdateThemeHaloRunV1alpha1Theme
      */
     readonly theme?: Theme
 }
@@ -508,57 +508,57 @@ export interface ThemeHaloRunV1alpha1ThemeApiUpdatethemeHaloRunV1alpha1ThemeRequ
 export class ThemeHaloRunV1alpha1ThemeApi extends BaseAPI {
     /**
      * Create theme.halo.run/v1alpha1/Theme
-     * @param {ThemeHaloRunV1alpha1ThemeApiCreatethemeHaloRunV1alpha1ThemeRequest} requestParameters Request parameters.
+     * @param {ThemeHaloRunV1alpha1ThemeApiCreateThemeHaloRunV1alpha1ThemeRequest} requestParameters Request parameters.
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      * @memberof ThemeHaloRunV1alpha1ThemeApi
      */
-    public createthemeHaloRunV1alpha1Theme(requestParameters: ThemeHaloRunV1alpha1ThemeApiCreatethemeHaloRunV1alpha1ThemeRequest = {}, options?: RawAxiosRequestConfig) {
-        return ThemeHaloRunV1alpha1ThemeApiFp(this.configuration).createthemeHaloRunV1alpha1Theme(requestParameters.theme, options).then((request) => request(this.axios, this.basePath));
+    public createThemeHaloRunV1alpha1Theme(requestParameters: ThemeHaloRunV1alpha1ThemeApiCreateThemeHaloRunV1alpha1ThemeRequest = {}, options?: RawAxiosRequestConfig) {
+        return ThemeHaloRunV1alpha1ThemeApiFp(this.configuration).createThemeHaloRunV1alpha1Theme(requestParameters.theme, options).then((request) => request(this.axios, this.basePath));
     }
 
     /**
      * Delete theme.halo.run/v1alpha1/Theme
-     * @param {ThemeHaloRunV1alpha1ThemeApiDeletethemeHaloRunV1alpha1ThemeRequest} requestParameters Request parameters.
+     * @param {ThemeHaloRunV1alpha1ThemeApiDeleteThemeHaloRunV1alpha1ThemeRequest} requestParameters Request parameters.
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      * @memberof ThemeHaloRunV1alpha1ThemeApi
      */
-    public deletethemeHaloRunV1alpha1Theme(requestParameters: ThemeHaloRunV1alpha1ThemeApiDeletethemeHaloRunV1alpha1ThemeRequest, options?: RawAxiosRequestConfig) {
-        return ThemeHaloRunV1alpha1ThemeApiFp(this.configuration).deletethemeHaloRunV1alpha1Theme(requestParameters.name, options).then((request) => request(this.axios, this.basePath));
+    public deleteThemeHaloRunV1alpha1Theme(requestParameters: ThemeHaloRunV1alpha1ThemeApiDeleteThemeHaloRunV1alpha1ThemeRequest, options?: RawAxiosRequestConfig) {
+        return ThemeHaloRunV1alpha1ThemeApiFp(this.configuration).deleteThemeHaloRunV1alpha1Theme(requestParameters.name, options).then((request) => request(this.axios, this.basePath));
     }
 
     /**
      * Get theme.halo.run/v1alpha1/Theme
-     * @param {ThemeHaloRunV1alpha1ThemeApiGetthemeHaloRunV1alpha1ThemeRequest} requestParameters Request parameters.
+     * @param {ThemeHaloRunV1alpha1ThemeApiGetThemeHaloRunV1alpha1ThemeRequest} requestParameters Request parameters.
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      * @memberof ThemeHaloRunV1alpha1ThemeApi
      */
-    public getthemeHaloRunV1alpha1Theme(requestParameters: ThemeHaloRunV1alpha1ThemeApiGetthemeHaloRunV1alpha1ThemeRequest, options?: RawAxiosRequestConfig) {
-        return ThemeHaloRunV1alpha1ThemeApiFp(this.configuration).getthemeHaloRunV1alpha1Theme(requestParameters.name, options).then((request) => request(this.axios, this.basePath));
+    public getThemeHaloRunV1alpha1Theme(requestParameters: ThemeHaloRunV1alpha1ThemeApiGetThemeHaloRunV1alpha1ThemeRequest, options?: RawAxiosRequestConfig) {
+        return ThemeHaloRunV1alpha1ThemeApiFp(this.configuration).getThemeHaloRunV1alpha1Theme(requestParameters.name, options).then((request) => request(this.axios, this.basePath));
     }
 
     /**
      * List theme.halo.run/v1alpha1/Theme
-     * @param {ThemeHaloRunV1alpha1ThemeApiListthemeHaloRunV1alpha1ThemeRequest} requestParameters Request parameters.
+     * @param {ThemeHaloRunV1alpha1ThemeApiListThemeHaloRunV1alpha1ThemeRequest} requestParameters Request parameters.
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      * @memberof ThemeHaloRunV1alpha1ThemeApi
      */
-    public listthemeHaloRunV1alpha1Theme(requestParameters: ThemeHaloRunV1alpha1ThemeApiListthemeHaloRunV1alpha1ThemeRequest = {}, options?: RawAxiosRequestConfig) {
-        return ThemeHaloRunV1alpha1ThemeApiFp(this.configuration).listthemeHaloRunV1alpha1Theme(requestParameters.page, requestParameters.size, requestParameters.labelSelector, requestParameters.fieldSelector, requestParameters.sort, options).then((request) => request(this.axios, this.basePath));
+    public listThemeHaloRunV1alpha1Theme(requestParameters: ThemeHaloRunV1alpha1ThemeApiListThemeHaloRunV1alpha1ThemeRequest = {}, options?: RawAxiosRequestConfig) {
+        return ThemeHaloRunV1alpha1ThemeApiFp(this.configuration).listThemeHaloRunV1alpha1Theme(requestParameters.page, requestParameters.size, requestParameters.labelSelector, requestParameters.fieldSelector, requestParameters.sort, options).then((request) => request(this.axios, this.basePath));
     }
 
     /**
      * Update theme.halo.run/v1alpha1/Theme
-     * @param {ThemeHaloRunV1alpha1ThemeApiUpdatethemeHaloRunV1alpha1ThemeRequest} requestParameters Request parameters.
+     * @param {ThemeHaloRunV1alpha1ThemeApiUpdateThemeHaloRunV1alpha1ThemeRequest} requestParameters Request parameters.
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      * @memberof ThemeHaloRunV1alpha1ThemeApi
      */
-    public updatethemeHaloRunV1alpha1Theme(requestParameters: ThemeHaloRunV1alpha1ThemeApiUpdatethemeHaloRunV1alpha1ThemeRequest, options?: RawAxiosRequestConfig) {
-        return ThemeHaloRunV1alpha1ThemeApiFp(this.configuration).updatethemeHaloRunV1alpha1Theme(requestParameters.name, requestParameters.theme, options).then((request) => request(this.axios, this.basePath));
+    public updateThemeHaloRunV1alpha1Theme(requestParameters: ThemeHaloRunV1alpha1ThemeApiUpdateThemeHaloRunV1alpha1ThemeRequest, options?: RawAxiosRequestConfig) {
+        return ThemeHaloRunV1alpha1ThemeApiFp(this.configuration).updateThemeHaloRunV1alpha1Theme(requestParameters.name, requestParameters.theme, options).then((request) => request(this.axios, this.basePath));
     }
 }
 

@@ -146,7 +146,7 @@ const {
 
 const handleOpenSettingModal = async (singlePage: SinglePage) => {
   const { data } =
-    await apiClient.extension.singlePage.getcontentHaloRunV1alpha1SinglePage({
+    await apiClient.extension.singlePage.getContentHaloRunV1alpha1SinglePage({
       name: singlePage.metadata.name,
     });
   selectedSinglePage.value = data;
@@ -168,7 +168,7 @@ const handleSelectPrevious = async () => {
   );
   if (index > 0) {
     const { data } =
-      await apiClient.extension.singlePage.getcontentHaloRunV1alpha1SinglePage({
+      await apiClient.extension.singlePage.getContentHaloRunV1alpha1SinglePage({
         name: singlePages.value[index - 1].page.metadata.name,
       });
     selectedSinglePage.value = data;
@@ -191,7 +191,7 @@ const handleSelectNext = async () => {
   );
   if (index < singlePages.value.length - 1) {
     const { data } =
-      await apiClient.extension.singlePage.getcontentHaloRunV1alpha1SinglePage({
+      await apiClient.extension.singlePage.getContentHaloRunV1alpha1SinglePage({
         name: singlePages.value[index + 1].page.metadata.name,
       });
     selectedSinglePage.value = data;
@@ -242,7 +242,7 @@ const handleDeleteInBatch = async () => {
             return Promise.resolve();
           }
 
-          return apiClient.extension.singlePage.updatecontentHaloRunV1alpha1SinglePage(
+          return apiClient.extension.singlePage.updateContentHaloRunV1alpha1SinglePage(
             {
               name: page.metadata.name,
               singlePage: {

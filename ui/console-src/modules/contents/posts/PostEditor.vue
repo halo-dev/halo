@@ -327,7 +327,7 @@ const handleFetchContent = async () => {
 
 const handleOpenSettingModal = async () => {
   const { data: latestPost } =
-    await apiClient.extension.post.getcontentHaloRunV1alpha1Post({
+    await apiClient.extension.post.getContentHaloRunV1alpha1Post({
       name: formState.value.post.metadata.name,
     });
   formState.value.post = latestPost;
@@ -361,7 +361,7 @@ onMounted(async () => {
   if (name.value) {
     // fetch post
     const { data: post } =
-      await apiClient.extension.post.getcontentHaloRunV1alpha1Post({
+      await apiClient.extension.post.getContentHaloRunV1alpha1Post({
         name: name.value as string,
       });
     formState.value.post = post;

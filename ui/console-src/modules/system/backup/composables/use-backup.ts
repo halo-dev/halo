@@ -10,7 +10,7 @@ export function useBackupFetch() {
     queryKey: ["backups"],
     queryFn: async () => {
       const { data } =
-        await apiClient.extension.backup.listmigrationHaloRunV1alpha1Backup({
+        await apiClient.extension.backup.listMigrationHaloRunV1alpha1Backup({
           sort: ["metadata.creationTimestamp,desc"],
         });
       return data;
@@ -51,7 +51,7 @@ export function useBackup() {
       confirmText: t("core.common.buttons.confirm"),
       cancelText: t("core.common.buttons.cancel"),
       async onConfirm() {
-        await apiClient.extension.backup.createmigrationHaloRunV1alpha1Backup({
+        await apiClient.extension.backup.createMigrationHaloRunV1alpha1Backup({
           backup: {
             apiVersion: "migration.halo.run/v1alpha1",
             kind: "Backup",

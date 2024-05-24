@@ -92,7 +92,7 @@ const handleDeletePermanently = async (post: Post) => {
     confirmText: t("core.common.buttons.confirm"),
     cancelText: t("core.common.buttons.cancel"),
     onConfirm: async () => {
-      await apiClient.extension.post.deletecontentHaloRunV1alpha1Post({
+      await apiClient.extension.post.deleteContentHaloRunV1alpha1Post({
         name: post.metadata.name,
       });
       await refetch();
@@ -112,7 +112,7 @@ const handleDeletePermanentlyInBatch = async () => {
     onConfirm: async () => {
       await Promise.all(
         selectedPostNames.value.map((name) => {
-          return apiClient.extension.post.deletecontentHaloRunV1alpha1Post({
+          return apiClient.extension.post.deleteContentHaloRunV1alpha1Post({
             name,
           });
         })
@@ -134,7 +134,7 @@ const handleRecovery = async (post: Post) => {
     onConfirm: async () => {
       const postToUpdate = cloneDeep(post);
       postToUpdate.spec.deleted = false;
-      await apiClient.extension.post.updatecontentHaloRunV1alpha1Post({
+      await apiClient.extension.post.updateContentHaloRunV1alpha1Post({
         name: postToUpdate.metadata.name,
         post: postToUpdate,
       });
@@ -165,7 +165,7 @@ const handleRecoveryInBatch = async () => {
             return Promise.resolve();
           }
 
-          return apiClient.extension.post.updatecontentHaloRunV1alpha1Post({
+          return apiClient.extension.post.updateContentHaloRunV1alpha1Post({
             name: post.metadata.name,
             post: {
               ...post,

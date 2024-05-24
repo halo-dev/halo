@@ -92,7 +92,7 @@ const handleDeletePermanently = async (singlePage: SinglePage) => {
     confirmText: t("core.common.buttons.confirm"),
     cancelText: t("core.common.buttons.cancel"),
     onConfirm: async () => {
-      await apiClient.extension.singlePage.deletecontentHaloRunV1alpha1SinglePage(
+      await apiClient.extension.singlePage.deleteContentHaloRunV1alpha1SinglePage(
         {
           name: singlePage.metadata.name,
         }
@@ -114,7 +114,7 @@ const handleDeletePermanentlyInBatch = async () => {
     onConfirm: async () => {
       await Promise.all(
         selectedPageNames.value.map((name) => {
-          return apiClient.extension.singlePage.deletecontentHaloRunV1alpha1SinglePage(
+          return apiClient.extension.singlePage.deleteContentHaloRunV1alpha1SinglePage(
             {
               name,
             }
@@ -138,7 +138,7 @@ const handleRecovery = async (singlePage: SinglePage) => {
     onConfirm: async () => {
       const singlePageToUpdate = cloneDeep(singlePage);
       singlePageToUpdate.spec.deleted = false;
-      await apiClient.extension.singlePage.updatecontentHaloRunV1alpha1SinglePage(
+      await apiClient.extension.singlePage.updateContentHaloRunV1alpha1SinglePage(
         {
           name: singlePageToUpdate.metadata.name,
           singlePage: singlePageToUpdate,
@@ -170,7 +170,7 @@ const handleRecoveryInBatch = async () => {
             return Promise.resolve();
           }
 
-          return apiClient.extension.singlePage.updatecontentHaloRunV1alpha1SinglePage(
+          return apiClient.extension.singlePage.updateContentHaloRunV1alpha1SinglePage(
             {
               name: singlePage.metadata.name,
               singlePage: {

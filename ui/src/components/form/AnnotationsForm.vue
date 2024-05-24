@@ -58,7 +58,7 @@ const avaliableAnnotationSettings = computed(() => {
 const handleFetchAnnotationSettings = async () => {
   try {
     const { data } =
-      await apiClient.extension.annotationSetting.listv1alpha1AnnotationSetting(
+      await apiClient.extension.annotationSetting.listV1alpha1AnnotationSetting(
         {
           labelSelector: [
             `halo.run/target-ref=${[props.group, props.kind].join("/")}`,

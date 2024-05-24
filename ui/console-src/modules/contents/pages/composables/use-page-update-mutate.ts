@@ -10,13 +10,13 @@ export function usePageUpdateMutate() {
     mutationKey: ["singlePage-update"],
     mutationFn: async (page: SinglePage) => {
       const { data: latestSinglePage } =
-        await apiClient.extension.singlePage.getcontentHaloRunV1alpha1SinglePage(
+        await apiClient.extension.singlePage.getContentHaloRunV1alpha1SinglePage(
           {
             name: page.metadata.name,
           }
         );
 
-      return apiClient.extension.singlePage.updatecontentHaloRunV1alpha1SinglePage(
+      return apiClient.extension.singlePage.updateContentHaloRunV1alpha1SinglePage(
         {
           name: page.metadata.name,
           singlePage: {

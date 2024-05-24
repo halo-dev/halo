@@ -81,12 +81,12 @@ const handleShowActiveModalAfterInstall = (plugin: Plugin) => {
     onConfirm: async () => {
       try {
         const { data: pluginToUpdate } =
-          await apiClient.extension.plugin.getpluginHaloRunV1alpha1Plugin({
+          await apiClient.extension.plugin.getPluginHaloRunV1alpha1Plugin({
             name: plugin.metadata.name,
           });
         pluginToUpdate.spec.enabled = true;
 
-        await apiClient.extension.plugin.updatepluginHaloRunV1alpha1Plugin({
+        await apiClient.extension.plugin.updatePluginHaloRunV1alpha1Plugin({
           name: pluginToUpdate.metadata.name,
           plugin: pluginToUpdate,
         });

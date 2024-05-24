@@ -29,7 +29,7 @@ const { data: singlePage } = useQuery({
   queryKey: ["singlePage-by-name", singlePageName],
   queryFn: async () => {
     const { data } =
-      await apiClient.extension.singlePage.getcontentHaloRunV1alpha1SinglePage({
+      await apiClient.extension.singlePage.getContentHaloRunV1alpha1SinglePage({
         name: singlePageName.value,
       });
     return data;

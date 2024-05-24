@@ -37,7 +37,7 @@ export const V1alpha1SecretApiAxiosParamCreator = function (configuration?: Conf
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        createv1alpha1Secret: async (secret?: Secret, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+        createV1alpha1Secret: async (secret?: Secret, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
             const localVarPath = `/api/v1alpha1/secrets`;
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
@@ -78,9 +78,9 @@ export const V1alpha1SecretApiAxiosParamCreator = function (configuration?: Conf
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        deletev1alpha1Secret: async (name: string, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+        deleteV1alpha1Secret: async (name: string, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
             // verify required parameter 'name' is not null or undefined
-            assertParamExists('deletev1alpha1Secret', 'name', name)
+            assertParamExists('deleteV1alpha1Secret', 'name', name)
             const localVarPath = `/api/v1alpha1/secrets/{name}`
                 .replace(`{${"name"}}`, encodeURIComponent(String(name)));
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
@@ -119,9 +119,9 @@ export const V1alpha1SecretApiAxiosParamCreator = function (configuration?: Conf
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        getv1alpha1Secret: async (name: string, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+        getV1alpha1Secret: async (name: string, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
             // verify required parameter 'name' is not null or undefined
-            assertParamExists('getv1alpha1Secret', 'name', name)
+            assertParamExists('getV1alpha1Secret', 'name', name)
             const localVarPath = `/api/v1alpha1/secrets/{name}`
                 .replace(`{${"name"}}`, encodeURIComponent(String(name)));
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
@@ -164,7 +164,7 @@ export const V1alpha1SecretApiAxiosParamCreator = function (configuration?: Conf
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        listv1alpha1Secret: async (page?: number, size?: number, labelSelector?: Array<string>, fieldSelector?: Array<string>, sort?: Array<string>, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+        listV1alpha1Secret: async (page?: number, size?: number, labelSelector?: Array<string>, fieldSelector?: Array<string>, sort?: Array<string>, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
             const localVarPath = `/api/v1alpha1/secrets`;
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
@@ -223,9 +223,9 @@ export const V1alpha1SecretApiAxiosParamCreator = function (configuration?: Conf
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        updatev1alpha1Secret: async (name: string, secret?: Secret, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+        updateV1alpha1Secret: async (name: string, secret?: Secret, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
             // verify required parameter 'name' is not null or undefined
-            assertParamExists('updatev1alpha1Secret', 'name', name)
+            assertParamExists('updateV1alpha1Secret', 'name', name)
             const localVarPath = `/api/v1alpha1/secrets/{name}`
                 .replace(`{${"name"}}`, encodeURIComponent(String(name)));
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
@@ -277,10 +277,10 @@ export const V1alpha1SecretApiFp = function(configuration?: Configuration) {
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async createv1alpha1Secret(secret?: Secret, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<Secret>> {
-            const localVarAxiosArgs = await localVarAxiosParamCreator.createv1alpha1Secret(secret, options);
+        async createV1alpha1Secret(secret?: Secret, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<Secret>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.createV1alpha1Secret(secret, options);
             const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
-            const localVarOperationServerBasePath = operationServerMap['V1alpha1SecretApi.createv1alpha1Secret']?.[localVarOperationServerIndex]?.url;
+            const localVarOperationServerBasePath = operationServerMap['V1alpha1SecretApi.createV1alpha1Secret']?.[localVarOperationServerIndex]?.url;
             return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
         },
         /**
@@ -289,10 +289,10 @@ export const V1alpha1SecretApiFp = function(configuration?: Configuration) {
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async deletev1alpha1Secret(name: string, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<void>> {
-            const localVarAxiosArgs = await localVarAxiosParamCreator.deletev1alpha1Secret(name, options);
+        async deleteV1alpha1Secret(name: string, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<void>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.deleteV1alpha1Secret(name, options);
             const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
-            const localVarOperationServerBasePath = operationServerMap['V1alpha1SecretApi.deletev1alpha1Secret']?.[localVarOperationServerIndex]?.url;
+            const localVarOperationServerBasePath = operationServerMap['V1alpha1SecretApi.deleteV1alpha1Secret']?.[localVarOperationServerIndex]?.url;
             return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
         },
         /**
@@ -301,10 +301,10 @@ export const V1alpha1SecretApiFp = function(configuration?: Configuration) {
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async getv1alpha1Secret(name: string, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<Secret>> {
-            const localVarAxiosArgs = await localVarAxiosParamCreator.getv1alpha1Secret(name, options);
+        async getV1alpha1Secret(name: string, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<Secret>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.getV1alpha1Secret(name, options);
             const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
-            const localVarOperationServerBasePath = operationServerMap['V1alpha1SecretApi.getv1alpha1Secret']?.[localVarOperationServerIndex]?.url;
+            const localVarOperationServerBasePath = operationServerMap['V1alpha1SecretApi.getV1alpha1Secret']?.[localVarOperationServerIndex]?.url;
             return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
         },
         /**
@@ -317,10 +317,10 @@ export const V1alpha1SecretApiFp = function(configuration?: Configuration) {
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async listv1alpha1Secret(page?: number, size?: number, labelSelector?: Array<string>, fieldSelector?: Array<string>, sort?: Array<string>, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<SecretList>> {
-            const localVarAxiosArgs = await localVarAxiosParamCreator.listv1alpha1Secret(page, size, labelSelector, fieldSelector, sort, options);
+        async listV1alpha1Secret(page?: number, size?: number, labelSelector?: Array<string>, fieldSelector?: Array<string>, sort?: Array<string>, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<SecretList>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.listV1alpha1Secret(page, size, labelSelector, fieldSelector, sort, options);
             const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
-            const localVarOperationServerBasePath = operationServerMap['V1alpha1SecretApi.listv1alpha1Secret']?.[localVarOperationServerIndex]?.url;
+            const localVarOperationServerBasePath = operationServerMap['V1alpha1SecretApi.listV1alpha1Secret']?.[localVarOperationServerIndex]?.url;
             return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
         },
         /**
@@ -330,10 +330,10 @@ export const V1alpha1SecretApiFp = function(configuration?: Configuration) {
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async updatev1alpha1Secret(name: string, secret?: Secret, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<Secret>> {
-            const localVarAxiosArgs = await localVarAxiosParamCreator.updatev1alpha1Secret(name, secret, options);
+        async updateV1alpha1Secret(name: string, secret?: Secret, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<Secret>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.updateV1alpha1Secret(name, secret, options);
             const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
-            const localVarOperationServerBasePath = operationServerMap['V1alpha1SecretApi.updatev1alpha1Secret']?.[localVarOperationServerIndex]?.url;
+            const localVarOperationServerBasePath = operationServerMap['V1alpha1SecretApi.updateV1alpha1Secret']?.[localVarOperationServerIndex]?.url;
             return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
         },
     }
@@ -348,153 +348,153 @@ export const V1alpha1SecretApiFactory = function (configuration?: Configuration,
     return {
         /**
          * Create v1alpha1/Secret
-         * @param {V1alpha1SecretApiCreatev1alpha1SecretRequest} requestParameters Request parameters.
+         * @param {V1alpha1SecretApiCreateV1alpha1SecretRequest} requestParameters Request parameters.
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        createv1alpha1Secret(requestParameters: V1alpha1SecretApiCreatev1alpha1SecretRequest = {}, options?: RawAxiosRequestConfig): AxiosPromise<Secret> {
-            return localVarFp.createv1alpha1Secret(requestParameters.secret, options).then((request) => request(axios, basePath));
+        createV1alpha1Secret(requestParameters: V1alpha1SecretApiCreateV1alpha1SecretRequest = {}, options?: RawAxiosRequestConfig): AxiosPromise<Secret> {
+            return localVarFp.createV1alpha1Secret(requestParameters.secret, options).then((request) => request(axios, basePath));
         },
         /**
          * Delete v1alpha1/Secret
-         * @param {V1alpha1SecretApiDeletev1alpha1SecretRequest} requestParameters Request parameters.
+         * @param {V1alpha1SecretApiDeleteV1alpha1SecretRequest} requestParameters Request parameters.
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        deletev1alpha1Secret(requestParameters: V1alpha1SecretApiDeletev1alpha1SecretRequest, options?: RawAxiosRequestConfig): AxiosPromise<void> {
-            return localVarFp.deletev1alpha1Secret(requestParameters.name, options).then((request) => request(axios, basePath));
+        deleteV1alpha1Secret(requestParameters: V1alpha1SecretApiDeleteV1alpha1SecretRequest, options?: RawAxiosRequestConfig): AxiosPromise<void> {
+            return localVarFp.deleteV1alpha1Secret(requestParameters.name, options).then((request) => request(axios, basePath));
         },
         /**
          * Get v1alpha1/Secret
-         * @param {V1alpha1SecretApiGetv1alpha1SecretRequest} requestParameters Request parameters.
+         * @param {V1alpha1SecretApiGetV1alpha1SecretRequest} requestParameters Request parameters.
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        getv1alpha1Secret(requestParameters: V1alpha1SecretApiGetv1alpha1SecretRequest, options?: RawAxiosRequestConfig): AxiosPromise<Secret> {
-            return localVarFp.getv1alpha1Secret(requestParameters.name, options).then((request) => request(axios, basePath));
+        getV1alpha1Secret(requestParameters: V1alpha1SecretApiGetV1alpha1SecretRequest, options?: RawAxiosRequestConfig): AxiosPromise<Secret> {
+            return localVarFp.getV1alpha1Secret(requestParameters.name, options).then((request) => request(axios, basePath));
         },
         /**
          * List v1alpha1/Secret
-         * @param {V1alpha1SecretApiListv1alpha1SecretRequest} requestParameters Request parameters.
+         * @param {V1alpha1SecretApiListV1alpha1SecretRequest} requestParameters Request parameters.
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        listv1alpha1Secret(requestParameters: V1alpha1SecretApiListv1alpha1SecretRequest = {}, options?: RawAxiosRequestConfig): AxiosPromise<SecretList> {
-            return localVarFp.listv1alpha1Secret(requestParameters.page, requestParameters.size, requestParameters.labelSelector, requestParameters.fieldSelector, requestParameters.sort, options).then((request) => request(axios, basePath));
+        listV1alpha1Secret(requestParameters: V1alpha1SecretApiListV1alpha1SecretRequest = {}, options?: RawAxiosRequestConfig): AxiosPromise<SecretList> {
+            return localVarFp.listV1alpha1Secret(requestParameters.page, requestParameters.size, requestParameters.labelSelector, requestParameters.fieldSelector, requestParameters.sort, options).then((request) => request(axios, basePath));
         },
         /**
          * Update v1alpha1/Secret
-         * @param {V1alpha1SecretApiUpdatev1alpha1SecretRequest} requestParameters Request parameters.
+         * @param {V1alpha1SecretApiUpdateV1alpha1SecretRequest} requestParameters Request parameters.
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        updatev1alpha1Secret(requestParameters: V1alpha1SecretApiUpdatev1alpha1SecretRequest, options?: RawAxiosRequestConfig): AxiosPromise<Secret> {
-            return localVarFp.updatev1alpha1Secret(requestParameters.name, requestParameters.secret, options).then((request) => request(axios, basePath));
+        updateV1alpha1Secret(requestParameters: V1alpha1SecretApiUpdateV1alpha1SecretRequest, options?: RawAxiosRequestConfig): AxiosPromise<Secret> {
+            return localVarFp.updateV1alpha1Secret(requestParameters.name, requestParameters.secret, options).then((request) => request(axios, basePath));
         },
     };
 };
 
 /**
- * Request parameters for createv1alpha1Secret operation in V1alpha1SecretApi.
+ * Request parameters for createV1alpha1Secret operation in V1alpha1SecretApi.
  * @export
- * @interface V1alpha1SecretApiCreatev1alpha1SecretRequest
+ * @interface V1alpha1SecretApiCreateV1alpha1SecretRequest
  */
-export interface V1alpha1SecretApiCreatev1alpha1SecretRequest {
+export interface V1alpha1SecretApiCreateV1alpha1SecretRequest {
     /**
      * Fresh secret
      * @type {Secret}
-     * @memberof V1alpha1SecretApiCreatev1alpha1Secret
+     * @memberof V1alpha1SecretApiCreateV1alpha1Secret
      */
     readonly secret?: Secret
 }
 
 /**
- * Request parameters for deletev1alpha1Secret operation in V1alpha1SecretApi.
+ * Request parameters for deleteV1alpha1Secret operation in V1alpha1SecretApi.
  * @export
- * @interface V1alpha1SecretApiDeletev1alpha1SecretRequest
+ * @interface V1alpha1SecretApiDeleteV1alpha1SecretRequest
  */
-export interface V1alpha1SecretApiDeletev1alpha1SecretRequest {
+export interface V1alpha1SecretApiDeleteV1alpha1SecretRequest {
     /**
      * Name of secret
      * @type {string}
-     * @memberof V1alpha1SecretApiDeletev1alpha1Secret
+     * @memberof V1alpha1SecretApiDeleteV1alpha1Secret
      */
     readonly name: string
 }
 
 /**
- * Request parameters for getv1alpha1Secret operation in V1alpha1SecretApi.
+ * Request parameters for getV1alpha1Secret operation in V1alpha1SecretApi.
  * @export
- * @interface V1alpha1SecretApiGetv1alpha1SecretRequest
+ * @interface V1alpha1SecretApiGetV1alpha1SecretRequest
  */
-export interface V1alpha1SecretApiGetv1alpha1SecretRequest {
+export interface V1alpha1SecretApiGetV1alpha1SecretRequest {
     /**
      * Name of secret
      * @type {string}
-     * @memberof V1alpha1SecretApiGetv1alpha1Secret
+     * @memberof V1alpha1SecretApiGetV1alpha1Secret
      */
     readonly name: string
 }
 
 /**
- * Request parameters for listv1alpha1Secret operation in V1alpha1SecretApi.
+ * Request parameters for listV1alpha1Secret operation in V1alpha1SecretApi.
  * @export
- * @interface V1alpha1SecretApiListv1alpha1SecretRequest
+ * @interface V1alpha1SecretApiListV1alpha1SecretRequest
  */
-export interface V1alpha1SecretApiListv1alpha1SecretRequest {
+export interface V1alpha1SecretApiListV1alpha1SecretRequest {
     /**
      * Page number. Default is 0.
      * @type {number}
-     * @memberof V1alpha1SecretApiListv1alpha1Secret
+     * @memberof V1alpha1SecretApiListV1alpha1Secret
      */
     readonly page?: number
 
     /**
      * Size number. Default is 0.
      * @type {number}
-     * @memberof V1alpha1SecretApiListv1alpha1Secret
+     * @memberof V1alpha1SecretApiListV1alpha1Secret
      */
     readonly size?: number
 
     /**
      * Label selector. e.g.: hidden!&#x3D;true
      * @type {Array<string>}
-     * @memberof V1alpha1SecretApiListv1alpha1Secret
+     * @memberof V1alpha1SecretApiListV1alpha1Secret
      */
     readonly labelSelector?: Array<string>
 
     /**
      * Field selector. e.g.: metadata.name&#x3D;&#x3D;halo
      * @type {Array<string>}
-     * @memberof V1alpha1SecretApiListv1alpha1Secret
+     * @memberof V1alpha1SecretApiListV1alpha1Secret
      */
     readonly fieldSelector?: Array<string>
 
     /**
      * Sorting criteria in the format: property,(asc|desc). Default sort order is ascending. Multiple sort criteria are supported.
      * @type {Array<string>}
-     * @memberof V1alpha1SecretApiListv1alpha1Secret
+     * @memberof V1alpha1SecretApiListV1alpha1Secret
      */
     readonly sort?: Array<string>
 }
 
 /**
- * Request parameters for updatev1alpha1Secret operation in V1alpha1SecretApi.
+ * Request parameters for updateV1alpha1Secret operation in V1alpha1SecretApi.
  * @export
- * @interface V1alpha1SecretApiUpdatev1alpha1SecretRequest
+ * @interface V1alpha1SecretApiUpdateV1alpha1SecretRequest
  */
-export interface V1alpha1SecretApiUpdatev1alpha1SecretRequest {
+export interface V1alpha1SecretApiUpdateV1alpha1SecretRequest {
     /**
      * Name of secret
      * @type {string}
-     * @memberof V1alpha1SecretApiUpdatev1alpha1Secret
+     * @memberof V1alpha1SecretApiUpdateV1alpha1Secret
      */
     readonly name: string
 
     /**
      * Updated secret
      * @type {Secret}
-     * @memberof V1alpha1SecretApiUpdatev1alpha1Secret
+     * @memberof V1alpha1SecretApiUpdateV1alpha1Secret
      */
     readonly secret?: Secret
 }
@@ -508,57 +508,57 @@ export interface V1alpha1SecretApiUpdatev1alpha1SecretRequest {
 export class V1alpha1SecretApi extends BaseAPI {
     /**
      * Create v1alpha1/Secret
-     * @param {V1alpha1SecretApiCreatev1alpha1SecretRequest} requestParameters Request parameters.
+     * @param {V1alpha1SecretApiCreateV1alpha1SecretRequest} requestParameters Request parameters.
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      * @memberof V1alpha1SecretApi
      */
-    public createv1alpha1Secret(requestParameters: V1alpha1SecretApiCreatev1alpha1SecretRequest = {}, options?: RawAxiosRequestConfig) {
-        return V1alpha1SecretApiFp(this.configuration).createv1alpha1Secret(requestParameters.secret, options).then((request) => request(this.axios, this.basePath));
+    public createV1alpha1Secret(requestParameters: V1alpha1SecretApiCreateV1alpha1SecretRequest = {}, options?: RawAxiosRequestConfig) {
+        return V1alpha1SecretApiFp(this.configuration).createV1alpha1Secret(requestParameters.secret, options).then((request) => request(this.axios, this.basePath));
     }
 
     /**
      * Delete v1alpha1/Secret
-     * @param {V1alpha1SecretApiDeletev1alpha1SecretRequest} requestParameters Request parameters.
+     * @param {V1alpha1SecretApiDeleteV1alpha1SecretRequest} requestParameters Request parameters.
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      * @memberof V1alpha1SecretApi
      */
-    public deletev1alpha1Secret(requestParameters: V1alpha1SecretApiDeletev1alpha1SecretRequest, options?: RawAxiosRequestConfig) {
-        return V1alpha1SecretApiFp(this.configuration).deletev1alpha1Secret(requestParameters.name, options).then((request) => request(this.axios, this.basePath));
+    public deleteV1alpha1Secret(requestParameters: V1alpha1SecretApiDeleteV1alpha1SecretRequest, options?: RawAxiosRequestConfig) {
+        return V1alpha1SecretApiFp(this.configuration).deleteV1alpha1Secret(requestParameters.name, options).then((request) => request(this.axios, this.basePath));
     }
 
     /**
      * Get v1alpha1/Secret
-     * @param {V1alpha1SecretApiGetv1alpha1SecretRequest} requestParameters Request parameters.
+     * @param {V1alpha1SecretApiGetV1alpha1SecretRequest} requestParameters Request parameters.
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      * @memberof V1alpha1SecretApi
      */
-    public getv1alpha1Secret(requestParameters: V1alpha1SecretApiGetv1alpha1SecretRequest, options?: RawAxiosRequestConfig) {
-        return V1alpha1SecretApiFp(this.configuration).getv1alpha1Secret(requestParameters.name, options).then((request) => request(this.axios, this.basePath));
+    public getV1alpha1Secret(requestParameters: V1alpha1SecretApiGetV1alpha1SecretRequest, options?: RawAxiosRequestConfig) {
+        return V1alpha1SecretApiFp(this.configuration).getV1alpha1Secret(requestParameters.name, options).then((request) => request(this.axios, this.basePath));
     }
 
     /**
      * List v1alpha1/Secret
-     * @param {V1alpha1SecretApiListv1alpha1SecretRequest} requestParameters Request parameters.
+     * @param {V1alpha1SecretApiListV1alpha1SecretRequest} requestParameters Request parameters.
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      * @memberof V1alpha1SecretApi
      */
-    public listv1alpha1Secret(requestParameters: V1alpha1SecretApiListv1alpha1SecretRequest = {}, options?: RawAxiosRequestConfig) {
-        return V1alpha1SecretApiFp(this.configuration).listv1alpha1Secret(requestParameters.page, requestParameters.size, requestParameters.labelSelector, requestParameters.fieldSelector, requestParameters.sort, options).then((request) => request(this.axios, this.basePath));
+    public listV1alpha1Secret(requestParameters: V1alpha1SecretApiListV1alpha1SecretRequest = {}, options?: RawAxiosRequestConfig) {
+        return V1alpha1SecretApiFp(this.configuration).listV1alpha1Secret(requestParameters.page, requestParameters.size, requestParameters.labelSelector, requestParameters.fieldSelector, requestParameters.sort, options).then((request) => request(this.axios, this.basePath));
     }
 
     /**
      * Update v1alpha1/Secret
-     * @param {V1alpha1SecretApiUpdatev1alpha1SecretRequest} requestParameters Request parameters.
+     * @param {V1alpha1SecretApiUpdateV1alpha1SecretRequest} requestParameters Request parameters.
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      * @memberof V1alpha1SecretApi
      */
-    public updatev1alpha1Secret(requestParameters: V1alpha1SecretApiUpdatev1alpha1SecretRequest, options?: RawAxiosRequestConfig) {
-        return V1alpha1SecretApiFp(this.configuration).updatev1alpha1Secret(requestParameters.name, requestParameters.secret, options).then((request) => request(this.axios, this.basePath));
+    public updateV1alpha1Secret(requestParameters: V1alpha1SecretApiUpdateV1alpha1SecretRequest, options?: RawAxiosRequestConfig) {
+        return V1alpha1SecretApiFp(this.configuration).updateV1alpha1Secret(requestParameters.name, requestParameters.secret, options).then((request) => request(this.axios, this.basePath));
     }
 }
 

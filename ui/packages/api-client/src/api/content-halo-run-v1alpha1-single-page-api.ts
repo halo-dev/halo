@@ -37,7 +37,7 @@ export const ContentHaloRunV1alpha1SinglePageApiAxiosParamCreator = function (co
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        createcontentHaloRunV1alpha1SinglePage: async (singlePage?: SinglePage, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+        createContentHaloRunV1alpha1SinglePage: async (singlePage?: SinglePage, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
             const localVarPath = `/apis/content.halo.run/v1alpha1/singlepages`;
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
@@ -78,9 +78,9 @@ export const ContentHaloRunV1alpha1SinglePageApiAxiosParamCreator = function (co
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        deletecontentHaloRunV1alpha1SinglePage: async (name: string, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+        deleteContentHaloRunV1alpha1SinglePage: async (name: string, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
             // verify required parameter 'name' is not null or undefined
-            assertParamExists('deletecontentHaloRunV1alpha1SinglePage', 'name', name)
+            assertParamExists('deleteContentHaloRunV1alpha1SinglePage', 'name', name)
             const localVarPath = `/apis/content.halo.run/v1alpha1/singlepages/{name}`
                 .replace(`{${"name"}}`, encodeURIComponent(String(name)));
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
@@ -119,9 +119,9 @@ export const ContentHaloRunV1alpha1SinglePageApiAxiosParamCreator = function (co
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        getcontentHaloRunV1alpha1SinglePage: async (name: string, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+        getContentHaloRunV1alpha1SinglePage: async (name: string, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
             // verify required parameter 'name' is not null or undefined
-            assertParamExists('getcontentHaloRunV1alpha1SinglePage', 'name', name)
+            assertParamExists('getContentHaloRunV1alpha1SinglePage', 'name', name)
             const localVarPath = `/apis/content.halo.run/v1alpha1/singlepages/{name}`
                 .replace(`{${"name"}}`, encodeURIComponent(String(name)));
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
@@ -164,7 +164,7 @@ export const ContentHaloRunV1alpha1SinglePageApiAxiosParamCreator = function (co
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        listcontentHaloRunV1alpha1SinglePage: async (page?: number, size?: number, labelSelector?: Array<string>, fieldSelector?: Array<string>, sort?: Array<string>, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+        listContentHaloRunV1alpha1SinglePage: async (page?: number, size?: number, labelSelector?: Array<string>, fieldSelector?: Array<string>, sort?: Array<string>, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
             const localVarPath = `/apis/content.halo.run/v1alpha1/singlepages`;
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
@@ -223,9 +223,9 @@ export const ContentHaloRunV1alpha1SinglePageApiAxiosParamCreator = function (co
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        updatecontentHaloRunV1alpha1SinglePage: async (name: string, singlePage?: SinglePage, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+        updateContentHaloRunV1alpha1SinglePage: async (name: string, singlePage?: SinglePage, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
             // verify required parameter 'name' is not null or undefined
-            assertParamExists('updatecontentHaloRunV1alpha1SinglePage', 'name', name)
+            assertParamExists('updateContentHaloRunV1alpha1SinglePage', 'name', name)
             const localVarPath = `/apis/content.halo.run/v1alpha1/singlepages/{name}`
                 .replace(`{${"name"}}`, encodeURIComponent(String(name)));
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
@@ -277,10 +277,10 @@ export const ContentHaloRunV1alpha1SinglePageApiFp = function(configuration?: Co
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async createcontentHaloRunV1alpha1SinglePage(singlePage?: SinglePage, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<SinglePage>> {
-            const localVarAxiosArgs = await localVarAxiosParamCreator.createcontentHaloRunV1alpha1SinglePage(singlePage, options);
+        async createContentHaloRunV1alpha1SinglePage(singlePage?: SinglePage, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<SinglePage>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.createContentHaloRunV1alpha1SinglePage(singlePage, options);
             const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
-            const localVarOperationServerBasePath = operationServerMap['ContentHaloRunV1alpha1SinglePageApi.createcontentHaloRunV1alpha1SinglePage']?.[localVarOperationServerIndex]?.url;
+            const localVarOperationServerBasePath = operationServerMap['ContentHaloRunV1alpha1SinglePageApi.createContentHaloRunV1alpha1SinglePage']?.[localVarOperationServerIndex]?.url;
             return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
         },
         /**
@@ -289,10 +289,10 @@ export const ContentHaloRunV1alpha1SinglePageApiFp = function(configuration?: Co
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async deletecontentHaloRunV1alpha1SinglePage(name: string, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<void>> {
-            const localVarAxiosArgs = await localVarAxiosParamCreator.deletecontentHaloRunV1alpha1SinglePage(name, options);
+        async deleteContentHaloRunV1alpha1SinglePage(name: string, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<void>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.deleteContentHaloRunV1alpha1SinglePage(name, options);
             const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
-            const localVarOperationServerBasePath = operationServerMap['ContentHaloRunV1alpha1SinglePageApi.deletecontentHaloRunV1alpha1SinglePage']?.[localVarOperationServerIndex]?.url;
+            const localVarOperationServerBasePath = operationServerMap['ContentHaloRunV1alpha1SinglePageApi.deleteContentHaloRunV1alpha1SinglePage']?.[localVarOperationServerIndex]?.url;
             return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
         },
         /**
@@ -301,10 +301,10 @@ export const ContentHaloRunV1alpha1SinglePageApiFp = function(configuration?: Co
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async getcontentHaloRunV1alpha1SinglePage(name: string, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<SinglePage>> {
-            const localVarAxiosArgs = await localVarAxiosParamCreator.getcontentHaloRunV1alpha1SinglePage(name, options);
+        async getContentHaloRunV1alpha1SinglePage(name: string, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<SinglePage>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.getContentHaloRunV1alpha1SinglePage(name, options);
             const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
-            const localVarOperationServerBasePath = operationServerMap['ContentHaloRunV1alpha1SinglePageApi.getcontentHaloRunV1alpha1SinglePage']?.[localVarOperationServerIndex]?.url;
+            const localVarOperationServerBasePath = operationServerMap['ContentHaloRunV1alpha1SinglePageApi.getContentHaloRunV1alpha1SinglePage']?.[localVarOperationServerIndex]?.url;
             return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
         },
         /**
@@ -317,10 +317,10 @@ export const ContentHaloRunV1alpha1SinglePageApiFp = function(configuration?: Co
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async listcontentHaloRunV1alpha1SinglePage(page?: number, size?: number, labelSelector?: Array<string>, fieldSelector?: Array<string>, sort?: Array<string>, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<SinglePageList>> {
-            const localVarAxiosArgs = await localVarAxiosParamCreator.listcontentHaloRunV1alpha1SinglePage(page, size, labelSelector, fieldSelector, sort, options);
+        async listContentHaloRunV1alpha1SinglePage(page?: number, size?: number, labelSelector?: Array<string>, fieldSelector?: Array<string>, sort?: Array<string>, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<SinglePageList>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.listContentHaloRunV1alpha1SinglePage(page, size, labelSelector, fieldSelector, sort, options);
             const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
-            const localVarOperationServerBasePath = operationServerMap['ContentHaloRunV1alpha1SinglePageApi.listcontentHaloRunV1alpha1SinglePage']?.[localVarOperationServerIndex]?.url;
+            const localVarOperationServerBasePath = operationServerMap['ContentHaloRunV1alpha1SinglePageApi.listContentHaloRunV1alpha1SinglePage']?.[localVarOperationServerIndex]?.url;
             return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
         },
         /**
@@ -330,10 +330,10 @@ export const ContentHaloRunV1alpha1SinglePageApiFp = function(configuration?: Co
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async updatecontentHaloRunV1alpha1SinglePage(name: string, singlePage?: SinglePage, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<SinglePage>> {
-            const localVarAxiosArgs = await localVarAxiosParamCreator.updatecontentHaloRunV1alpha1SinglePage(name, singlePage, options);
+        async updateContentHaloRunV1alpha1SinglePage(name: string, singlePage?: SinglePage, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<SinglePage>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.updateContentHaloRunV1alpha1SinglePage(name, singlePage, options);
             const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
-            const localVarOperationServerBasePath = operationServerMap['ContentHaloRunV1alpha1SinglePageApi.updatecontentHaloRunV1alpha1SinglePage']?.[localVarOperationServerIndex]?.url;
+            const localVarOperationServerBasePath = operationServerMap['ContentHaloRunV1alpha1SinglePageApi.updateContentHaloRunV1alpha1SinglePage']?.[localVarOperationServerIndex]?.url;
             return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
         },
     }
@@ -348,153 +348,153 @@ export const ContentHaloRunV1alpha1SinglePageApiFactory = function (configuratio
     return {
         /**
          * Create content.halo.run/v1alpha1/SinglePage
-         * @param {ContentHaloRunV1alpha1SinglePageApiCreatecontentHaloRunV1alpha1SinglePageRequest} requestParameters Request parameters.
+         * @param {ContentHaloRunV1alpha1SinglePageApiCreateContentHaloRunV1alpha1SinglePageRequest} requestParameters Request parameters.
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        createcontentHaloRunV1alpha1SinglePage(requestParameters: ContentHaloRunV1alpha1SinglePageApiCreatecontentHaloRunV1alpha1SinglePageRequest = {}, options?: RawAxiosRequestConfig): AxiosPromise<SinglePage> {
-            return localVarFp.createcontentHaloRunV1alpha1SinglePage(requestParameters.singlePage, options).then((request) => request(axios, basePath));
+        createContentHaloRunV1alpha1SinglePage(requestParameters: ContentHaloRunV1alpha1SinglePageApiCreateContentHaloRunV1alpha1SinglePageRequest = {}, options?: RawAxiosRequestConfig): AxiosPromise<SinglePage> {
+            return localVarFp.createContentHaloRunV1alpha1SinglePage(requestParameters.singlePage, options).then((request) => request(axios, basePath));
         },
         /**
          * Delete content.halo.run/v1alpha1/SinglePage
-         * @param {ContentHaloRunV1alpha1SinglePageApiDeletecontentHaloRunV1alpha1SinglePageRequest} requestParameters Request parameters.
+         * @param {ContentHaloRunV1alpha1SinglePageApiDeleteContentHaloRunV1alpha1SinglePageRequest} requestParameters Request parameters.
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        deletecontentHaloRunV1alpha1SinglePage(requestParameters: ContentHaloRunV1alpha1SinglePageApiDeletecontentHaloRunV1alpha1SinglePageRequest, options?: RawAxiosRequestConfig): AxiosPromise<void> {
-            return localVarFp.deletecontentHaloRunV1alpha1SinglePage(requestParameters.name, options).then((request) => request(axios, basePath));
+        deleteContentHaloRunV1alpha1SinglePage(requestParameters: ContentHaloRunV1alpha1SinglePageApiDeleteContentHaloRunV1alpha1SinglePageRequest, options?: RawAxiosRequestConfig): AxiosPromise<void> {
+            return localVarFp.deleteContentHaloRunV1alpha1SinglePage(requestParameters.name, options).then((request) => request(axios, basePath));
         },
         /**
          * Get content.halo.run/v1alpha1/SinglePage
-         * @param {ContentHaloRunV1alpha1SinglePageApiGetcontentHaloRunV1alpha1SinglePageRequest} requestParameters Request parameters.
+         * @param {ContentHaloRunV1alpha1SinglePageApiGetContentHaloRunV1alpha1SinglePageRequest} requestParameters Request parameters.
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        getcontentHaloRunV1alpha1SinglePage(requestParameters: ContentHaloRunV1alpha1SinglePageApiGetcontentHaloRunV1alpha1SinglePageRequest, options?: RawAxiosRequestConfig): AxiosPromise<SinglePage> {
-            return localVarFp.getcontentHaloRunV1alpha1SinglePage(requestParameters.name, options).then((request) => request(axios, basePath));
+        getContentHaloRunV1alpha1SinglePage(requestParameters: ContentHaloRunV1alpha1SinglePageApiGetContentHaloRunV1alpha1SinglePageRequest, options?: RawAxiosRequestConfig): AxiosPromise<SinglePage> {
+            return localVarFp.getContentHaloRunV1alpha1SinglePage(requestParameters.name, options).then((request) => request(axios, basePath));
         },
         /**
          * List content.halo.run/v1alpha1/SinglePage
-         * @param {ContentHaloRunV1alpha1SinglePageApiListcontentHaloRunV1alpha1SinglePageRequest} requestParameters Request parameters.
+         * @param {ContentHaloRunV1alpha1SinglePageApiListContentHaloRunV1alpha1SinglePageRequest} requestParameters Request parameters.
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        listcontentHaloRunV1alpha1SinglePage(requestParameters: ContentHaloRunV1alpha1SinglePageApiListcontentHaloRunV1alpha1SinglePageRequest = {}, options?: RawAxiosRequestConfig): AxiosPromise<SinglePageList> {
-            return localVarFp.listcontentHaloRunV1alpha1SinglePage(requestParameters.page, requestParameters.size, requestParameters.labelSelector, requestParameters.fieldSelector, requestParameters.sort, options).then((request) => request(axios, basePath));
+        listContentHaloRunV1alpha1SinglePage(requestParameters: ContentHaloRunV1alpha1SinglePageApiListContentHaloRunV1alpha1SinglePageRequest = {}, options?: RawAxiosRequestConfig): AxiosPromise<SinglePageList> {
+            return localVarFp.listContentHaloRunV1alpha1SinglePage(requestParameters.page, requestParameters.size, requestParameters.labelSelector, requestParameters.fieldSelector, requestParameters.sort, options).then((request) => request(axios, basePath));
         },
         /**
          * Update content.halo.run/v1alpha1/SinglePage
-         * @param {ContentHaloRunV1alpha1SinglePageApiUpdatecontentHaloRunV1alpha1SinglePageRequest} requestParameters Request parameters.
+         * @param {ContentHaloRunV1alpha1SinglePageApiUpdateContentHaloRunV1alpha1SinglePageRequest} requestParameters Request parameters.
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        updatecontentHaloRunV1alpha1SinglePage(requestParameters: ContentHaloRunV1alpha1SinglePageApiUpdatecontentHaloRunV1alpha1SinglePageRequest, options?: RawAxiosRequestConfig): AxiosPromise<SinglePage> {
-            return localVarFp.updatecontentHaloRunV1alpha1SinglePage(requestParameters.name, requestParameters.singlePage, options).then((request) => request(axios, basePath));
+        updateContentHaloRunV1alpha1SinglePage(requestParameters: ContentHaloRunV1alpha1SinglePageApiUpdateContentHaloRunV1alpha1SinglePageRequest, options?: RawAxiosRequestConfig): AxiosPromise<SinglePage> {
+            return localVarFp.updateContentHaloRunV1alpha1SinglePage(requestParameters.name, requestParameters.singlePage, options).then((request) => request(axios, basePath));
         },
     };
 };
 
 /**
- * Request parameters for createcontentHaloRunV1alpha1SinglePage operation in ContentHaloRunV1alpha1SinglePageApi.
+ * Request parameters for createContentHaloRunV1alpha1SinglePage operation in ContentHaloRunV1alpha1SinglePageApi.
  * @export
- * @interface ContentHaloRunV1alpha1SinglePageApiCreatecontentHaloRunV1alpha1SinglePageRequest
+ * @interface ContentHaloRunV1alpha1SinglePageApiCreateContentHaloRunV1alpha1SinglePageRequest
  */
-export interface ContentHaloRunV1alpha1SinglePageApiCreatecontentHaloRunV1alpha1SinglePageRequest {
+export interface ContentHaloRunV1alpha1SinglePageApiCreateContentHaloRunV1alpha1SinglePageRequest {
     /**
      * Fresh singlepage
      * @type {SinglePage}
-     * @memberof ContentHaloRunV1alpha1SinglePageApiCreatecontentHaloRunV1alpha1SinglePage
+     * @memberof ContentHaloRunV1alpha1SinglePageApiCreateContentHaloRunV1alpha1SinglePage
      */
     readonly singlePage?: SinglePage
 }
 
 /**
- * Request parameters for deletecontentHaloRunV1alpha1SinglePage operation in ContentHaloRunV1alpha1SinglePageApi.
+ * Request parameters for deleteContentHaloRunV1alpha1SinglePage operation in ContentHaloRunV1alpha1SinglePageApi.
  * @export
- * @interface ContentHaloRunV1alpha1SinglePageApiDeletecontentHaloRunV1alpha1SinglePageRequest
+ * @interface ContentHaloRunV1alpha1SinglePageApiDeleteContentHaloRunV1alpha1SinglePageRequest
  */
-export interface ContentHaloRunV1alpha1SinglePageApiDeletecontentHaloRunV1alpha1SinglePageRequest {
+export interface ContentHaloRunV1alpha1SinglePageApiDeleteContentHaloRunV1alpha1SinglePageRequest {
     /**
      * Name of singlepage
      * @type {string}
-     * @memberof ContentHaloRunV1alpha1SinglePageApiDeletecontentHaloRunV1alpha1SinglePage
+     * @memberof ContentHaloRunV1alpha1SinglePageApiDeleteContentHaloRunV1alpha1SinglePage
      */
     readonly name: string
 }
 
 /**
- * Request parameters for getcontentHaloRunV1alpha1SinglePage operation in ContentHaloRunV1alpha1SinglePageApi.
+ * Request parameters for getContentHaloRunV1alpha1SinglePage operation in ContentHaloRunV1alpha1SinglePageApi.
  * @export
- * @interface ContentHaloRunV1alpha1SinglePageApiGetcontentHaloRunV1alpha1SinglePageRequest
+ * @interface ContentHaloRunV1alpha1SinglePageApiGetContentHaloRunV1alpha1SinglePageRequest
  */
-export interface ContentHaloRunV1alpha1SinglePageApiGetcontentHaloRunV1alpha1SinglePageRequest {
+export interface ContentHaloRunV1alpha1SinglePageApiGetContentHaloRunV1alpha1SinglePageRequest {
     /**
      * Name of singlepage
      * @type {string}
-     * @memberof ContentHaloRunV1alpha1SinglePageApiGetcontentHaloRunV1alpha1SinglePage
+     * @memberof ContentHaloRunV1alpha1SinglePageApiGetContentHaloRunV1alpha1SinglePage
      */
     readonly name: string
 }
 
 /**
- * Request parameters for listcontentHaloRunV1alpha1SinglePage operation in ContentHaloRunV1alpha1SinglePageApi.
+ * Request parameters for listContentHaloRunV1alpha1SinglePage operation in ContentHaloRunV1alpha1SinglePageApi.
  * @export
- * @interface ContentHaloRunV1alpha1SinglePageApiListcontentHaloRunV1alpha1SinglePageRequest
+ * @interface ContentHaloRunV1alpha1SinglePageApiListContentHaloRunV1alpha1SinglePageRequest
  */
-export interface ContentHaloRunV1alpha1SinglePageApiListcontentHaloRunV1alpha1SinglePageRequest {
+export interface ContentHaloRunV1alpha1SinglePageApiListContentHaloRunV1alpha1SinglePageRequest {
     /**
      * Page number. Default is 0.
      * @type {number}
-     * @memberof ContentHaloRunV1alpha1SinglePageApiListcontentHaloRunV1alpha1SinglePage
+     * @memberof ContentHaloRunV1alpha1SinglePageApiListContentHaloRunV1alpha1SinglePage
      */
     readonly page?: number
 
     /**
      * Size number. Default is 0.
      * @type {number}
-     * @memberof ContentHaloRunV1alpha1SinglePageApiListcontentHaloRunV1alpha1SinglePage
+     * @memberof ContentHaloRunV1alpha1SinglePageApiListContentHaloRunV1alpha1SinglePage
      */
     readonly size?: number
 
     /**
      * Label selector. e.g.: hidden!&#x3D;true
      * @type {Array<string>}
-     * @memberof ContentHaloRunV1alpha1SinglePageApiListcontentHaloRunV1alpha1SinglePage
+     * @memberof ContentHaloRunV1alpha1SinglePageApiListContentHaloRunV1alpha1SinglePage
      */
     readonly labelSelector?: Array<string>
 
     /**
      * Field selector. e.g.: metadata.name&#x3D;&#x3D;halo
      * @type {Array<string>}
-     * @memberof ContentHaloRunV1alpha1SinglePageApiListcontentHaloRunV1alpha1SinglePage
+     * @memberof ContentHaloRunV1alpha1SinglePageApiListContentHaloRunV1alpha1SinglePage
      */
     readonly fieldSelector?: Array<string>
 
     /**
      * Sorting criteria in the format: property,(asc|desc). Default sort order is ascending. Multiple sort criteria are supported.
      * @type {Array<string>}
-     * @memberof ContentHaloRunV1alpha1SinglePageApiListcontentHaloRunV1alpha1SinglePage
+     * @memberof ContentHaloRunV1alpha1SinglePageApiListContentHaloRunV1alpha1SinglePage
      */
     readonly sort?: Array<string>
 }
 
 /**
- * Request parameters for updatecontentHaloRunV1alpha1SinglePage operation in ContentHaloRunV1alpha1SinglePageApi.
+ * Request parameters for updateContentHaloRunV1alpha1SinglePage operation in ContentHaloRunV1alpha1SinglePageApi.
  * @export
- * @interface ContentHaloRunV1alpha1SinglePageApiUpdatecontentHaloRunV1alpha1SinglePageRequest
+ * @interface ContentHaloRunV1alpha1SinglePageApiUpdateContentHaloRunV1alpha1SinglePageRequest
  */
-export interface ContentHaloRunV1alpha1SinglePageApiUpdatecontentHaloRunV1alpha1SinglePageRequest {
+export interface ContentHaloRunV1alpha1SinglePageApiUpdateContentHaloRunV1alpha1SinglePageRequest {
     /**
      * Name of singlepage
      * @type {string}
-     * @memberof ContentHaloRunV1alpha1SinglePageApiUpdatecontentHaloRunV1alpha1SinglePage
+     * @memberof ContentHaloRunV1alpha1SinglePageApiUpdateContentHaloRunV1alpha1SinglePage
      */
     readonly name: string
 
     /**
      * Updated singlepage
      * @type {SinglePage}
-     * @memberof ContentHaloRunV1alpha1SinglePageApiUpdatecontentHaloRunV1alpha1SinglePage
+     * @memberof ContentHaloRunV1alpha1SinglePageApiUpdateContentHaloRunV1alpha1SinglePage
      */
     readonly singlePage?: SinglePage
 }
@@ -508,57 +508,57 @@ export interface ContentHaloRunV1alpha1SinglePageApiUpdatecontentHaloRunV1alpha1
 export class ContentHaloRunV1alpha1SinglePageApi extends BaseAPI {
     /**
      * Create content.halo.run/v1alpha1/SinglePage
-     * @param {ContentHaloRunV1alpha1SinglePageApiCreatecontentHaloRunV1alpha1SinglePageRequest} requestParameters Request parameters.
+     * @param {ContentHaloRunV1alpha1SinglePageApiCreateContentHaloRunV1alpha1SinglePageRequest} requestParameters Request parameters.
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      * @memberof ContentHaloRunV1alpha1SinglePageApi
      */
-    public createcontentHaloRunV1alpha1SinglePage(requestParameters: ContentHaloRunV1alpha1SinglePageApiCreatecontentHaloRunV1alpha1SinglePageRequest = {}, options?: RawAxiosRequestConfig) {
-        return ContentHaloRunV1alpha1SinglePageApiFp(this.configuration).createcontentHaloRunV1alpha1SinglePage(requestParameters.singlePage, options).then((request) => request(this.axios, this.basePath));
+    public createContentHaloRunV1alpha1SinglePage(requestParameters: ContentHaloRunV1alpha1SinglePageApiCreateContentHaloRunV1alpha1SinglePageRequest = {}, options?: RawAxiosRequestConfig) {
+        return ContentHaloRunV1alpha1SinglePageApiFp(this.configuration).createContentHaloRunV1alpha1SinglePage(requestParameters.singlePage, options).then((request) => request(this.axios, this.basePath));
     }
 
     /**
      * Delete content.halo.run/v1alpha1/SinglePage
-     * @param {ContentHaloRunV1alpha1SinglePageApiDeletecontentHaloRunV1alpha1SinglePageRequest} requestParameters Request parameters.
+     * @param {ContentHaloRunV1alpha1SinglePageApiDeleteContentHaloRunV1alpha1SinglePageRequest} requestParameters Request parameters.
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      * @memberof ContentHaloRunV1alpha1SinglePageApi
      */
-    public deletecontentHaloRunV1alpha1SinglePage(requestParameters: ContentHaloRunV1alpha1SinglePageApiDeletecontentHaloRunV1alpha1SinglePageRequest, options?: RawAxiosRequestConfig) {
-        return ContentHaloRunV1alpha1SinglePageApiFp(this.configuration).deletecontentHaloRunV1alpha1SinglePage(requestParameters.name, options).then((request) => request(this.axios, this.basePath));
+    public deleteContentHaloRunV1alpha1SinglePage(requestParameters: ContentHaloRunV1alpha1SinglePageApiDeleteContentHaloRunV1alpha1SinglePageRequest, options?: RawAxiosRequestConfig) {
+        return ContentHaloRunV1alpha1SinglePageApiFp(this.configuration).deleteContentHaloRunV1alpha1SinglePage(requestParameters.name, options).then((request) => request(this.axios, this.basePath));
     }
 
     /**
      * Get content.halo.run/v1alpha1/SinglePage
-     * @param {ContentHaloRunV1alpha1SinglePageApiGetcontentHaloRunV1alpha1SinglePageRequest} requestParameters Request parameters.
+     * @param {ContentHaloRunV1alpha1SinglePageApiGetContentHaloRunV1alpha1SinglePageRequest} requestParameters Request parameters.
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      * @memberof ContentHaloRunV1alpha1SinglePageApi
      */
-    public getcontentHaloRunV1alpha1SinglePage(requestParameters: ContentHaloRunV1alpha1SinglePageApiGetcontentHaloRunV1alpha1SinglePageRequest, options?: RawAxiosRequestConfig) {
-        return ContentHaloRunV1alpha1SinglePageApiFp(this.configuration).getcontentHaloRunV1alpha1SinglePage(requestParameters.name, options).then((request) => request(this.axios, this.basePath));
+    public getContentHaloRunV1alpha1SinglePage(requestParameters: ContentHaloRunV1alpha1SinglePageApiGetContentHaloRunV1alpha1SinglePageRequest, options?: RawAxiosRequestConfig) {
+        return ContentHaloRunV1alpha1SinglePageApiFp(this.configuration).getContentHaloRunV1alpha1SinglePage(requestParameters.name, options).then((request) => request(this.axios, this.basePath));
     }
 
     /**
      * List content.halo.run/v1alpha1/SinglePage
-     * @param {ContentHaloRunV1alpha1SinglePageApiListcontentHaloRunV1alpha1SinglePageRequest} requestParameters Request parameters.
+     * @param {ContentHaloRunV1alpha1SinglePageApiListContentHaloRunV1alpha1SinglePageRequest} requestParameters Request parameters.
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      * @memberof ContentHaloRunV1alpha1SinglePageApi
      */
-    public listcontentHaloRunV1alpha1SinglePage(requestParameters: ContentHaloRunV1alpha1SinglePageApiListcontentHaloRunV1alpha1SinglePageRequest = {}, options?: RawAxiosRequestConfig) {
-        return ContentHaloRunV1alpha1SinglePageApiFp(this.configuration).listcontentHaloRunV1alpha1SinglePage(requestParameters.page, requestParameters.size, requestParameters.labelSelector, requestParameters.fieldSelector, requestParameters.sort, options).then((request) => request(this.axios, this.basePath));
+    public listContentHaloRunV1alpha1SinglePage(requestParameters: ContentHaloRunV1alpha1SinglePageApiListContentHaloRunV1alpha1SinglePageRequest = {}, options?: RawAxiosRequestConfig) {
+        return ContentHaloRunV1alpha1SinglePageApiFp(this.configuration).listContentHaloRunV1alpha1SinglePage(requestParameters.page, requestParameters.size, requestParameters.labelSelector, requestParameters.fieldSelector, requestParameters.sort, options).then((request) => request(this.axios, this.basePath));
     }
 
     /**
      * Update content.halo.run/v1alpha1/SinglePage
-     * @param {ContentHaloRunV1alpha1SinglePageApiUpdatecontentHaloRunV1alpha1SinglePageRequest} requestParameters Request parameters.
+     * @param {ContentHaloRunV1alpha1SinglePageApiUpdateContentHaloRunV1alpha1SinglePageRequest} requestParameters Request parameters.
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      * @memberof ContentHaloRunV1alpha1SinglePageApi
      */
-    public updatecontentHaloRunV1alpha1SinglePage(requestParameters: ContentHaloRunV1alpha1SinglePageApiUpdatecontentHaloRunV1alpha1SinglePageRequest, options?: RawAxiosRequestConfig) {
-        return ContentHaloRunV1alpha1SinglePageApiFp(this.configuration).updatecontentHaloRunV1alpha1SinglePage(requestParameters.name, requestParameters.singlePage, options).then((request) => request(this.axios, this.basePath));
+    public updateContentHaloRunV1alpha1SinglePage(requestParameters: ContentHaloRunV1alpha1SinglePageApiUpdateContentHaloRunV1alpha1SinglePageRequest, options?: RawAxiosRequestConfig) {
+        return ContentHaloRunV1alpha1SinglePageApiFp(this.configuration).updateContentHaloRunV1alpha1SinglePage(requestParameters.name, requestParameters.singlePage, options).then((request) => request(this.axios, this.basePath));
     }
 }
 

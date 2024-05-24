@@ -33,7 +33,7 @@ const { data: authProvider } = useQuery<AuthProvider>({
   queryKey: ["auth-provider", route.params.name],
   queryFn: async () => {
     const { data } =
-      await apiClient.extension.authProvider.getauthHaloRunV1alpha1AuthProvider(
+      await apiClient.extension.authProvider.getAuthHaloRunV1alpha1AuthProvider(
         {
           name: route.params.name as string,
         }
@@ -63,7 +63,7 @@ const { data: setting, refetch: handleFetchSettings } = useQuery<Setting>({
     authProvider.value?.spec.settingRef?.name,
   ],
   queryFn: async () => {
-    const { data } = await apiClient.extension.setting.getv1alpha1Setting(
+    const { data } = await apiClient.extension.setting.getV1alpha1Setting(
       {
         name: authProvider.value?.spec.settingRef?.name as string,
       },
@@ -82,7 +82,7 @@ const { data: configMap, refetch: handleFetchConfigMap } = useQuery({
     authProvider.value?.spec.configMapRef?.name,
   ],
   queryFn: async () => {
-    const { data } = await apiClient.extension.configMap.getv1alpha1ConfigMap(
+    const { data } = await apiClient.extension.configMap.getV1alpha1ConfigMap(
       {
         name: authProvider.value?.spec.configMapRef?.name as string,
       },
@@ -96,7 +96,7 @@ const { data: configMap, refetch: handleFetchConfigMap } = useQuery({
   onError: async () => {
     const data = {};
     data[group.value] = "";
-    await apiClient.extension.configMap.createv1alpha1ConfigMap({
+    await apiClient.extension.configMap.createV1alpha1ConfigMap({
       configMap: {
         apiVersion: "v1alpha1",
         data: data,
@@ -128,7 +128,7 @@ const handleSaveConfigMap = async () => {
     return;
   }
 
-  await apiClient.extension.configMap.updatev1alpha1ConfigMap({
+  await apiClient.extension.configMap.updateV1alpha1ConfigMap({
     name: authProvider.value.spec.configMapRef?.name as string,
     configMap: configMapToUpdate,
   });

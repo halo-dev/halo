@@ -54,7 +54,7 @@ const handleUpdateUser = async () => {
   try {
     isSubmitting.value = true;
 
-    await apiClient.extension.user.updatev1alpha1User({
+    await apiClient.extension.user.updateV1alpha1User({
       name: formState.value.metadata.name,
       user: formState.value,
     });

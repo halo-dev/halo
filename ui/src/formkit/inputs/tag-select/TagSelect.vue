@@ -197,7 +197,7 @@ const handleCreateTag = async () => {
   }
 
   const { data } =
-    await apiClient.extension.tag.createcontentHaloRunV1alpha1Tag({
+    await apiClient.extension.tag.createContentHaloRunV1alpha1Tag({
       tag: {
         spec: {
           displayName: text.value,

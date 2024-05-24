@@ -65,7 +65,7 @@ const handleDelete = () => {
     cancelText: t("core.common.buttons.cancel"),
     onConfirm: async () => {
       try {
-        await apiClient.extension.storage.attachment.deletestorageHaloRunV1alpha1Attachment(
+        await apiClient.extension.storage.attachment.deleteStorageHaloRunV1alpha1Attachment(
           {
             name: props.attachment.metadata.name,
           }

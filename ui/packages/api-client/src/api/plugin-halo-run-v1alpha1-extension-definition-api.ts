@@ -37,7 +37,7 @@ export const PluginHaloRunV1alpha1ExtensionDefinitionApiAxiosParamCreator = func
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        createpluginHaloRunV1alpha1ExtensionDefinition: async (extensionDefinition?: ExtensionDefinition, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+        createPluginHaloRunV1alpha1ExtensionDefinition: async (extensionDefinition?: ExtensionDefinition, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
             const localVarPath = `/apis/plugin.halo.run/v1alpha1/extensiondefinitions`;
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
@@ -78,9 +78,9 @@ export const PluginHaloRunV1alpha1ExtensionDefinitionApiAxiosParamCreator = func
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        deletepluginHaloRunV1alpha1ExtensionDefinition: async (name: string, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+        deletePluginHaloRunV1alpha1ExtensionDefinition: async (name: string, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
             // verify required parameter 'name' is not null or undefined
-            assertParamExists('deletepluginHaloRunV1alpha1ExtensionDefinition', 'name', name)
+            assertParamExists('deletePluginHaloRunV1alpha1ExtensionDefinition', 'name', name)
             const localVarPath = `/apis/plugin.halo.run/v1alpha1/extensiondefinitions/{name}`
                 .replace(`{${"name"}}`, encodeURIComponent(String(name)));
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
@@ -119,9 +119,9 @@ export const PluginHaloRunV1alpha1ExtensionDefinitionApiAxiosParamCreator = func
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        getpluginHaloRunV1alpha1ExtensionDefinition: async (name: string, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+        getPluginHaloRunV1alpha1ExtensionDefinition: async (name: string, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
             // verify required parameter 'name' is not null or undefined
-            assertParamExists('getpluginHaloRunV1alpha1ExtensionDefinition', 'name', name)
+            assertParamExists('getPluginHaloRunV1alpha1ExtensionDefinition', 'name', name)
             const localVarPath = `/apis/plugin.halo.run/v1alpha1/extensiondefinitions/{name}`
                 .replace(`{${"name"}}`, encodeURIComponent(String(name)));
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
@@ -164,7 +164,7 @@ export const PluginHaloRunV1alpha1ExtensionDefinitionApiAxiosParamCreator = func
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        listpluginHaloRunV1alpha1ExtensionDefinition: async (page?: number, size?: number, labelSelector?: Array<string>, fieldSelector?: Array<string>, sort?: Array<string>, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+        listPluginHaloRunV1alpha1ExtensionDefinition: async (page?: number, size?: number, labelSelector?: Array<string>, fieldSelector?: Array<string>, sort?: Array<string>, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
             const localVarPath = `/apis/plugin.halo.run/v1alpha1/extensiondefinitions`;
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
@@ -223,9 +223,9 @@ export const PluginHaloRunV1alpha1ExtensionDefinitionApiAxiosParamCreator = func
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        updatepluginHaloRunV1alpha1ExtensionDefinition: async (name: string, extensionDefinition?: ExtensionDefinition, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+        updatePluginHaloRunV1alpha1ExtensionDefinition: async (name: string, extensionDefinition?: ExtensionDefinition, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
             // verify required parameter 'name' is not null or undefined
-            assertParamExists('updatepluginHaloRunV1alpha1ExtensionDefinition', 'name', name)
+            assertParamExists('updatePluginHaloRunV1alpha1ExtensionDefinition', 'name', name)
             const localVarPath = `/apis/plugin.halo.run/v1alpha1/extensiondefinitions/{name}`
                 .replace(`{${"name"}}`, encodeURIComponent(String(name)));
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
@@ -277,10 +277,10 @@ export const PluginHaloRunV1alpha1ExtensionDefinitionApiFp = function(configurat
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async createpluginHaloRunV1alpha1ExtensionDefinition(extensionDefinition?: ExtensionDefinition, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<ExtensionDefinition>> {
-            const localVarAxiosArgs = await localVarAxiosParamCreator.createpluginHaloRunV1alpha1ExtensionDefinition(extensionDefinition, options);
+        async createPluginHaloRunV1alpha1ExtensionDefinition(extensionDefinition?: ExtensionDefinition, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<ExtensionDefinition>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.createPluginHaloRunV1alpha1ExtensionDefinition(extensionDefinition, options);
             const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
-            const localVarOperationServerBasePath = operationServerMap['PluginHaloRunV1alpha1ExtensionDefinitionApi.createpluginHaloRunV1alpha1ExtensionDefinition']?.[localVarOperationServerIndex]?.url;
+            const localVarOperationServerBasePath = operationServerMap['PluginHaloRunV1alpha1ExtensionDefinitionApi.createPluginHaloRunV1alpha1ExtensionDefinition']?.[localVarOperationServerIndex]?.url;
             return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
         },
         /**
@@ -289,10 +289,10 @@ export const PluginHaloRunV1alpha1ExtensionDefinitionApiFp = function(configurat
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async deletepluginHaloRunV1alpha1ExtensionDefinition(name: string, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<void>> {
-            const localVarAxiosArgs = await localVarAxiosParamCreator.deletepluginHaloRunV1alpha1ExtensionDefinition(name, options);
+        async deletePluginHaloRunV1alpha1ExtensionDefinition(name: string, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<void>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.deletePluginHaloRunV1alpha1ExtensionDefinition(name, options);
             const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
-            const localVarOperationServerBasePath = operationServerMap['PluginHaloRunV1alpha1ExtensionDefinitionApi.deletepluginHaloRunV1alpha1ExtensionDefinition']?.[localVarOperationServerIndex]?.url;
+            const localVarOperationServerBasePath = operationServerMap['PluginHaloRunV1alpha1ExtensionDefinitionApi.deletePluginHaloRunV1alpha1ExtensionDefinition']?.[localVarOperationServerIndex]?.url;
             return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
         },
         /**
@@ -301,10 +301,10 @@ export const PluginHaloRunV1alpha1ExtensionDefinitionApiFp = function(configurat
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async getpluginHaloRunV1alpha1ExtensionDefinition(name: string, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<ExtensionDefinition>> {
-            const localVarAxiosArgs = await localVarAxiosParamCreator.getpluginHaloRunV1alpha1ExtensionDefinition(name, options);
+        async getPluginHaloRunV1alpha1ExtensionDefinition(name: string, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<ExtensionDefinition>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.getPluginHaloRunV1alpha1ExtensionDefinition(name, options);
             const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
-            const localVarOperationServerBasePath = operationServerMap['PluginHaloRunV1alpha1ExtensionDefinitionApi.getpluginHaloRunV1alpha1ExtensionDefinition']?.[localVarOperationServerIndex]?.url;
+            const localVarOperationServerBasePath = operationServerMap['PluginHaloRunV1alpha1ExtensionDefinitionApi.getPluginHaloRunV1alpha1ExtensionDefinition']?.[localVarOperationServerIndex]?.url;
             return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
         },
         /**
@@ -317,10 +317,10 @@ export const PluginHaloRunV1alpha1ExtensionDefinitionApiFp = function(configurat
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async listpluginHaloRunV1alpha1ExtensionDefinition(page?: number, size?: number, labelSelector?: Array<string>, fieldSelector?: Array<string>, sort?: Array<string>, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<ExtensionDefinitionList>> {
-            const localVarAxiosArgs = await localVarAxiosParamCreator.listpluginHaloRunV1alpha1ExtensionDefinition(page, size, labelSelector, fieldSelector, sort, options);
+        async listPluginHaloRunV1alpha1ExtensionDefinition(page?: number, size?: number, labelSelector?: Array<string>, fieldSelector?: Array<string>, sort?: Array<string>, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<ExtensionDefinitionList>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.listPluginHaloRunV1alpha1ExtensionDefinition(page, size, labelSelector, fieldSelector, sort, options);
             const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
-            const localVarOperationServerBasePath = operationServerMap['PluginHaloRunV1alpha1ExtensionDefinitionApi.listpluginHaloRunV1alpha1ExtensionDefinition']?.[localVarOperationServerIndex]?.url;
+            const localVarOperationServerBasePath = operationServerMap['PluginHaloRunV1alpha1ExtensionDefinitionApi.listPluginHaloRunV1alpha1ExtensionDefinition']?.[localVarOperationServerIndex]?.url;
             return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
         },
         /**
@@ -330,10 +330,10 @@ export const PluginHaloRunV1alpha1ExtensionDefinitionApiFp = function(configurat
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async updatepluginHaloRunV1alpha1ExtensionDefinition(name: string, extensionDefinition?: ExtensionDefinition, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<ExtensionDefinition>> {
-            const localVarAxiosArgs = await localVarAxiosParamCreator.updatepluginHaloRunV1alpha1ExtensionDefinition(name, extensionDefinition, options);
+        async updatePluginHaloRunV1alpha1ExtensionDefinition(name: string, extensionDefinition?: ExtensionDefinition, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<ExtensionDefinition>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.updatePluginHaloRunV1alpha1ExtensionDefinition(name, extensionDefinition, options);
             const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
-            const localVarOperationServerBasePath = operationServerMap['PluginHaloRunV1alpha1ExtensionDefinitionApi.updatepluginHaloRunV1alpha1ExtensionDefinition']?.[localVarOperationServerIndex]?.url;
+            const localVarOperationServerBasePath = operationServerMap['PluginHaloRunV1alpha1ExtensionDefinitionApi.updatePluginHaloRunV1alpha1ExtensionDefinition']?.[localVarOperationServerIndex]?.url;
             return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
         },
     }
@@ -348,153 +348,153 @@ export const PluginHaloRunV1alpha1ExtensionDefinitionApiFactory = function (conf
     return {
         /**
          * Create plugin.halo.run/v1alpha1/ExtensionDefinition
-         * @param {PluginHaloRunV1alpha1ExtensionDefinitionApiCreatepluginHaloRunV1alpha1ExtensionDefinitionRequest} requestParameters Request parameters.
+         * @param {PluginHaloRunV1alpha1ExtensionDefinitionApiCreatePluginHaloRunV1alpha1ExtensionDefinitionRequest} requestParameters Request parameters.
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        createpluginHaloRunV1alpha1ExtensionDefinition(requestParameters: PluginHaloRunV1alpha1ExtensionDefinitionApiCreatepluginHaloRunV1alpha1ExtensionDefinitionRequest = {}, options?: RawAxiosRequestConfig): AxiosPromise<ExtensionDefinition> {
-            return localVarFp.createpluginHaloRunV1alpha1ExtensionDefinition(requestParameters.extensionDefinition, options).then((request) => request(axios, basePath));
+        createPluginHaloRunV1alpha1ExtensionDefinition(requestParameters: PluginHaloRunV1alpha1ExtensionDefinitionApiCreatePluginHaloRunV1alpha1ExtensionDefinitionRequest = {}, options?: RawAxiosRequestConfig): AxiosPromise<ExtensionDefinition> {
+            return localVarFp.createPluginHaloRunV1alpha1ExtensionDefinition(requestParameters.extensionDefinition, options).then((request) => request(axios, basePath));
         },
         /**
          * Delete plugin.halo.run/v1alpha1/ExtensionDefinition
-         * @param {PluginHaloRunV1alpha1ExtensionDefinitionApiDeletepluginHaloRunV1alpha1ExtensionDefinitionRequest} requestParameters Request parameters.
+         * @param {PluginHaloRunV1alpha1ExtensionDefinitionApiDeletePluginHaloRunV1alpha1ExtensionDefinitionRequest} requestParameters Request parameters.
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        deletepluginHaloRunV1alpha1ExtensionDefinition(requestParameters: PluginHaloRunV1alpha1ExtensionDefinitionApiDeletepluginHaloRunV1alpha1ExtensionDefinitionRequest, options?: RawAxiosRequestConfig): AxiosPromise<void> {
-            return localVarFp.deletepluginHaloRunV1alpha1ExtensionDefinition(requestParameters.name, options).then((request) => request(axios, basePath));
+        deletePluginHaloRunV1alpha1ExtensionDefinition(requestParameters: PluginHaloRunV1alpha1ExtensionDefinitionApiDeletePluginHaloRunV1alpha1ExtensionDefinitionRequest, options?: RawAxiosRequestConfig): AxiosPromise<void> {
+            return localVarFp.deletePluginHaloRunV1alpha1ExtensionDefinition(requestParameters.name, options).then((request) => request(axios, basePath));
         },
         /**
          * Get plugin.halo.run/v1alpha1/ExtensionDefinition
-         * @param {PluginHaloRunV1alpha1ExtensionDefinitionApiGetpluginHaloRunV1alpha1ExtensionDefinitionRequest} requestParameters Request parameters.
+         * @param {PluginHaloRunV1alpha1ExtensionDefinitionApiGetPluginHaloRunV1alpha1ExtensionDefinitionRequest} requestParameters Request parameters.
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        getpluginHaloRunV1alpha1ExtensionDefinition(requestParameters: PluginHaloRunV1alpha1ExtensionDefinitionApiGetpluginHaloRunV1alpha1ExtensionDefinitionRequest, options?: RawAxiosRequestConfig): AxiosPromise<ExtensionDefinition> {
-            return localVarFp.getpluginHaloRunV1alpha1ExtensionDefinition(requestParameters.name, options).then((request) => request(axios, basePath));
+        getPluginHaloRunV1alpha1ExtensionDefinition(requestParameters: PluginHaloRunV1alpha1ExtensionDefinitionApiGetPluginHaloRunV1alpha1ExtensionDefinitionRequest, options?: RawAxiosRequestConfig): AxiosPromise<ExtensionDefinition> {
+            return localVarFp.getPluginHaloRunV1alpha1ExtensionDefinition(requestParameters.name, options).then((request) => request(axios, basePath));
         },
         /**
          * List plugin.halo.run/v1alpha1/ExtensionDefinition
-         * @param {PluginHaloRunV1alpha1ExtensionDefinitionApiListpluginHaloRunV1alpha1ExtensionDefinitionRequest} requestParameters Request parameters.
+         * @param {PluginHaloRunV1alpha1ExtensionDefinitionApiListPluginHaloRunV1alpha1ExtensionDefinitionRequest} requestParameters Request parameters.
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        listpluginHaloRunV1alpha1ExtensionDefinition(requestParameters: PluginHaloRunV1alpha1ExtensionDefinitionApiListpluginHaloRunV1alpha1ExtensionDefinitionRequest = {}, options?: RawAxiosRequestConfig): AxiosPromise<ExtensionDefinitionList> {
-            return localVarFp.listpluginHaloRunV1alpha1ExtensionDefinition(requestParameters.page, requestParameters.size, requestParameters.labelSelector, requestParameters.fieldSelector, requestParameters.sort, options).then((request) => request(axios, basePath));
+        listPluginHaloRunV1alpha1ExtensionDefinition(requestParameters: PluginHaloRunV1alpha1ExtensionDefinitionApiListPluginHaloRunV1alpha1ExtensionDefinitionRequest = {}, options?: RawAxiosRequestConfig): AxiosPromise<ExtensionDefinitionList> {
+            return localVarFp.listPluginHaloRunV1alpha1ExtensionDefinition(requestParameters.page, requestParameters.size, requestParameters.labelSelector, requestParameters.fieldSelector, requestParameters.sort, options).then((request) => request(axios, basePath));
         },
         /**
          * Update plugin.halo.run/v1alpha1/ExtensionDefinition
-         * @param {PluginHaloRunV1alpha1ExtensionDefinitionApiUpdatepluginHaloRunV1alpha1ExtensionDefinitionRequest} requestParameters Request parameters.
+         * @param {PluginHaloRunV1alpha1ExtensionDefinitionApiUpdatePluginHaloRunV1alpha1ExtensionDefinitionRequest} requestParameters Request parameters.
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        updatepluginHaloRunV1alpha1ExtensionDefinition(requestParameters: PluginHaloRunV1alpha1ExtensionDefinitionApiUpdatepluginHaloRunV1alpha1ExtensionDefinitionRequest, options?: RawAxiosRequestConfig): AxiosPromise<ExtensionDefinition> {
-            return localVarFp.updatepluginHaloRunV1alpha1ExtensionDefinition(requestParameters.name, requestParameters.extensionDefinition, options).then((request) => request(axios, basePath));
+        updatePluginHaloRunV1alpha1ExtensionDefinition(requestParameters: PluginHaloRunV1alpha1ExtensionDefinitionApiUpdatePluginHaloRunV1alpha1ExtensionDefinitionRequest, options?: RawAxiosRequestConfig): AxiosPromise<ExtensionDefinition> {
+            return localVarFp.updatePluginHaloRunV1alpha1ExtensionDefinition(requestParameters.name, requestParameters.extensionDefinition, options).then((request) => request(axios, basePath));
         },
     };
 };
 
 /**
- * Request parameters for createpluginHaloRunV1alpha1ExtensionDefinition operation in PluginHaloRunV1alpha1ExtensionDefinitionApi.
+ * Request parameters for createPluginHaloRunV1alpha1ExtensionDefinition operation in PluginHaloRunV1alpha1ExtensionDefinitionApi.
  * @export
- * @interface PluginHaloRunV1alpha1ExtensionDefinitionApiCreatepluginHaloRunV1alpha1ExtensionDefinitionRequest
+ * @interface PluginHaloRunV1alpha1ExtensionDefinitionApiCreatePluginHaloRunV1alpha1ExtensionDefinitionRequest
  */
-export interface PluginHaloRunV1alpha1ExtensionDefinitionApiCreatepluginHaloRunV1alpha1ExtensionDefinitionRequest {
+export interface PluginHaloRunV1alpha1ExtensionDefinitionApiCreatePluginHaloRunV1alpha1ExtensionDefinitionRequest {
     /**
      * Fresh extensiondefinition
      * @type {ExtensionDefinition}
-     * @memberof PluginHaloRunV1alpha1ExtensionDefinitionApiCreatepluginHaloRunV1alpha1ExtensionDefinition
+     * @memberof PluginHaloRunV1alpha1ExtensionDefinitionApiCreatePluginHaloRunV1alpha1ExtensionDefinition
      */
     readonly extensionDefinition?: ExtensionDefinition
 }
 
 /**
- * Request parameters for deletepluginHaloRunV1alpha1ExtensionDefinition operation in PluginHaloRunV1alpha1ExtensionDefinitionApi.
+ * Request parameters for deletePluginHaloRunV1alpha1ExtensionDefinition operation in PluginHaloRunV1alpha1ExtensionDefinitionApi.
  * @export
- * @interface PluginHaloRunV1alpha1ExtensionDefinitionApiDeletepluginHaloRunV1alpha1ExtensionDefinitionRequest
+ * @interface PluginHaloRunV1alpha1ExtensionDefinitionApiDeletePluginHaloRunV1alpha1ExtensionDefinitionRequest
  */
-export interface PluginHaloRunV1alpha1ExtensionDefinitionApiDeletepluginHaloRunV1alpha1ExtensionDefinitionRequest {
+export interface PluginHaloRunV1alpha1ExtensionDefinitionApiDeletePluginHaloRunV1alpha1ExtensionDefinitionRequest {
     /**
      * Name of extensiondefinition
      * @type {string}
-     * @memberof PluginHaloRunV1alpha1ExtensionDefinitionApiDeletepluginHaloRunV1alpha1ExtensionDefinition
+     * @memberof PluginHaloRunV1alpha1ExtensionDefinitionApiDeletePluginHaloRunV1alpha1ExtensionDefinition
      */
     readonly name: string
 }
 
 /**
- * Request parameters for getpluginHaloRunV1alpha1ExtensionDefinition operation in PluginHaloRunV1alpha1ExtensionDefinitionApi.
+ * Request parameters for getPluginHaloRunV1alpha1ExtensionDefinition operation in PluginHaloRunV1alpha1ExtensionDefinitionApi.
  * @export
- * @interface PluginHaloRunV1alpha1ExtensionDefinitionApiGetpluginHaloRunV1alpha1ExtensionDefinitionRequest
+ * @interface PluginHaloRunV1alpha1ExtensionDefinitionApiGetPluginHaloRunV1alpha1ExtensionDefinitionRequest
  */
-export interface PluginHaloRunV1alpha1ExtensionDefinitionApiGetpluginHaloRunV1alpha1ExtensionDefinitionRequest {
+export interface PluginHaloRunV1alpha1ExtensionDefinitionApiGetPluginHaloRunV1alpha1ExtensionDefinitionRequest {
     /**
      * Name of extensiondefinition
      * @type {string}
-     * @memberof PluginHaloRunV1alpha1ExtensionDefinitionApiGetpluginHaloRunV1alpha1ExtensionDefinition
+     * @memberof PluginHaloRunV1alpha1ExtensionDefinitionApiGetPluginHaloRunV1alpha1ExtensionDefinition
      */
     readonly name: string
 }
 
 /**
- * Request parameters for listpluginHaloRunV1alpha1ExtensionDefinition operation in PluginHaloRunV1alpha1ExtensionDefinitionApi.
+ * Request parameters for listPluginHaloRunV1alpha1ExtensionDefinition operation in PluginHaloRunV1alpha1ExtensionDefinitionApi.
  * @export
- * @interface PluginHaloRunV1alpha1ExtensionDefinitionApiListpluginHaloRunV1alpha1ExtensionDefinitionRequest
+ * @interface PluginHaloRunV1alpha1ExtensionDefinitionApiListPluginHaloRunV1alpha1ExtensionDefinitionRequest
  */
-export interface PluginHaloRunV1alpha1ExtensionDefinitionApiListpluginHaloRunV1alpha1ExtensionDefinitionRequest {
+export interface PluginHaloRunV1alpha1ExtensionDefinitionApiListPluginHaloRunV1alpha1ExtensionDefinitionRequest {
     /**
      * Page number. Default is 0.
      * @type {number}
-     * @memberof PluginHaloRunV1alpha1ExtensionDefinitionApiListpluginHaloRunV1alpha1ExtensionDefinition
+     * @memberof PluginHaloRunV1alpha1ExtensionDefinitionApiListPluginHaloRunV1alpha1ExtensionDefinition
      */
     readonly page?: number
 
     /**
      * Size number. Default is 0.
      * @type {number}
-     * @memberof PluginHaloRunV1alpha1ExtensionDefinitionApiListpluginHaloRunV1alpha1ExtensionDefinition
+     * @memberof PluginHaloRunV1alpha1ExtensionDefinitionApiListPluginHaloRunV1alpha1ExtensionDefinition
      */
     readonly size?: number
 
     /**
      * Label selector. e.g.: hidden!&#x3D;true
      * @type {Array<string>}
-     * @memberof PluginHaloRunV1alpha1ExtensionDefinitionApiListpluginHaloRunV1alpha1ExtensionDefinition
+     * @memberof PluginHaloRunV1alpha1ExtensionDefinitionApiListPluginHaloRunV1alpha1ExtensionDefinition
      */
     readonly labelSelector?: Array<string>
 
     /**
      * Field selector. e.g.: metadata.name&#x3D;&#x3D;halo
      * @type {Array<string>}
-     * @memberof PluginHaloRunV1alpha1ExtensionDefinitionApiListpluginHaloRunV1alpha1ExtensionDefinition
+     * @memberof PluginHaloRunV1alpha1ExtensionDefinitionApiListPluginHaloRunV1alpha1ExtensionDefinition
      */
     readonly fieldSelector?: Array<string>
 
     /**
      * Sorting criteria in the format: property,(asc|desc). Default sort order is ascending. Multiple sort criteria are supported.
      * @type {Array<string>}
-     * @memberof PluginHaloRunV1alpha1ExtensionDefinitionApiListpluginHaloRunV1alpha1ExtensionDefinition
+     * @memberof PluginHaloRunV1alpha1ExtensionDefinitionApiListPluginHaloRunV1alpha1ExtensionDefinition
      */
     readonly sort?: Array<string>
 }
 
 /**
- * Request parameters for updatepluginHaloRunV1alpha1ExtensionDefinition operation in PluginHaloRunV1alpha1ExtensionDefinitionApi.
+ * Request parameters for updatePluginHaloRunV1alpha1ExtensionDefinition operation in PluginHaloRunV1alpha1ExtensionDefinitionApi.
  * @export
- * @interface PluginHaloRunV1alpha1ExtensionDefinitionApiUpdatepluginHaloRunV1alpha1ExtensionDefinitionRequest
+ * @interface PluginHaloRunV1alpha1ExtensionDefinitionApiUpdatePluginHaloRunV1alpha1ExtensionDefinitionRequest
  */
-export interface PluginHaloRunV1alpha1ExtensionDefinitionApiUpdatepluginHaloRunV1alpha1ExtensionDefinitionRequest {
+export interface PluginHaloRunV1alpha1ExtensionDefinitionApiUpdatePluginHaloRunV1alpha1ExtensionDefinitionRequest {
     /**
      * Name of extensiondefinition
      * @type {string}
-     * @memberof PluginHaloRunV1alpha1ExtensionDefinitionApiUpdatepluginHaloRunV1alpha1ExtensionDefinition
+     * @memberof PluginHaloRunV1alpha1ExtensionDefinitionApiUpdatePluginHaloRunV1alpha1ExtensionDefinition
      */
     readonly name: string
 
     /**
      * Updated extensiondefinition
      * @type {ExtensionDefinition}
-     * @memberof PluginHaloRunV1alpha1ExtensionDefinitionApiUpdatepluginHaloRunV1alpha1ExtensionDefinition
+     * @memberof PluginHaloRunV1alpha1ExtensionDefinitionApiUpdatePluginHaloRunV1alpha1ExtensionDefinition
      */
     readonly extensionDefinition?: ExtensionDefinition
 }
@@ -508,57 +508,57 @@ export interface PluginHaloRunV1alpha1ExtensionDefinitionApiUpdatepluginHaloRunV
 export class PluginHaloRunV1alpha1ExtensionDefinitionApi extends BaseAPI {
     /**
      * Create plugin.halo.run/v1alpha1/ExtensionDefinition
-     * @param {PluginHaloRunV1alpha1ExtensionDefinitionApiCreatepluginHaloRunV1alpha1ExtensionDefinitionRequest} requestParameters Request parameters.
+     * @param {PluginHaloRunV1alpha1ExtensionDefinitionApiCreatePluginHaloRunV1alpha1ExtensionDefinitionRequest} requestParameters Request parameters.
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      * @memberof PluginHaloRunV1alpha1ExtensionDefinitionApi
      */
-    public createpluginHaloRunV1alpha1ExtensionDefinition(requestParameters: PluginHaloRunV1alpha1ExtensionDefinitionApiCreatepluginHaloRunV1alpha1ExtensionDefinitionRequest = {}, options?: RawAxiosRequestConfig) {
-        return PluginHaloRunV1alpha1ExtensionDefinitionApiFp(this.configuration).createpluginHaloRunV1alpha1ExtensionDefinition(requestParameters.extensionDefinition, options).then((request) => request(this.axios, this.basePath));
+    public createPluginHaloRunV1alpha1ExtensionDefinition(requestParameters: PluginHaloRunV1alpha1ExtensionDefinitionApiCreatePluginHaloRunV1alpha1ExtensionDefinitionRequest = {}, options?: RawAxiosRequestConfig) {
+        return PluginHaloRunV1alpha1ExtensionDefinitionApiFp(this.configuration).createPluginHaloRunV1alpha1ExtensionDefinition(requestParameters.extensionDefinition, options).then((request) => request(this.axios, this.basePath));
     }
 
     /**
      * Delete plugin.halo.run/v1alpha1/ExtensionDefinition
-     * @param {PluginHaloRunV1alpha1ExtensionDefinitionApiDeletepluginHaloRunV1alpha1ExtensionDefinitionRequest} requestParameters Request parameters.
+     * @param {PluginHaloRunV1alpha1ExtensionDefinitionApiDeletePluginHaloRunV1alpha1ExtensionDefinitionRequest} requestParameters Request parameters.
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      * @memberof PluginHaloRunV1alpha1ExtensionDefinitionApi
      */
-    public deletepluginHaloRunV1alpha1ExtensionDefinition(requestParameters: PluginHaloRunV1alpha1ExtensionDefinitionApiDeletepluginHaloRunV1alpha1ExtensionDefinitionRequest, options?: RawAxiosRequestConfig) {
-        return PluginHaloRunV1alpha1ExtensionDefinitionApiFp(this.configuration).deletepluginHaloRunV1alpha1ExtensionDefinition(requestParameters.name, options).then((request) => request(this.axios, this.basePath));
+    public deletePluginHaloRunV1alpha1ExtensionDefinition(requestParameters: PluginHaloRunV1alpha1ExtensionDefinitionApiDeletePluginHaloRunV1alpha1ExtensionDefinitionRequest, options?: RawAxiosRequestConfig) {
+        return PluginHaloRunV1alpha1ExtensionDefinitionApiFp(this.configuration).deletePluginHaloRunV1alpha1ExtensionDefinition(requestParameters.name, options).then((request) => request(this.axios, this.basePath));
     }
 
     /**
      * Get plugin.halo.run/v1alpha1/ExtensionDefinition
-     * @param {PluginHaloRunV1alpha1ExtensionDefinitionApiGetpluginHaloRunV1alpha1ExtensionDefinitionRequest} requestParameters Request parameters.
+     * @param {PluginHaloRunV1alpha1ExtensionDefinitionApiGetPluginHaloRunV1alpha1ExtensionDefinitionRequest} requestParameters Request parameters.
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      * @memberof PluginHaloRunV1alpha1ExtensionDefinitionApi
      */
-    public getpluginHaloRunV1alpha1ExtensionDefinition(requestParameters: PluginHaloRunV1alpha1ExtensionDefinitionApiGetpluginHaloRunV1alpha1ExtensionDefinitionRequest, options?: RawAxiosRequestConfig) {
-        return PluginHaloRunV1alpha1ExtensionDefinitionApiFp(this.configuration).getpluginHaloRunV1alpha1ExtensionDefinition(requestParameters.name, options).then((request) => request(this.axios, this.basePath));
+    public getPluginHaloRunV1alpha1ExtensionDefinition(requestParameters: PluginHaloRunV1alpha1ExtensionDefinitionApiGetPluginHaloRunV1alpha1ExtensionDefinitionRequest, options?: RawAxiosRequestConfig) {
+        return PluginHaloRunV1alpha1ExtensionDefinitionApiFp(this.configuration).getPluginHaloRunV1alpha1ExtensionDefinition(requestParameters.name, options).then((request) => request(this.axios, this.basePath));
     }
 
     /**
      * List plugin.halo.run/v1alpha1/ExtensionDefinition
-     * @param {PluginHaloRunV1alpha1ExtensionDefinitionApiListpluginHaloRunV1alpha1ExtensionDefinitionRequest} requestParameters Request parameters.
+     * @param {PluginHaloRunV1alpha1ExtensionDefinitionApiListPluginHaloRunV1alpha1ExtensionDefinitionRequest} requestParameters Request parameters.
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      * @memberof PluginHaloRunV1alpha1ExtensionDefinitionApi
      */
-    public listpluginHaloRunV1alpha1ExtensionDefinition(requestParameters: PluginHaloRunV1alpha1ExtensionDefinitionApiListpluginHaloRunV1alpha1ExtensionDefinitionRequest = {}, options?: RawAxiosRequestConfig) {
-        return PluginHaloRunV1alpha1ExtensionDefinitionApiFp(this.configuration).listpluginHaloRunV1alpha1ExtensionDefinition(requestParameters.page, requestParameters.size, requestParameters.labelSelector, requestParameters.fieldSelector, requestParameters.sort, options).then((request) => request(this.axios, this.basePath));
+    public listPluginHaloRunV1alpha1ExtensionDefinition(requestParameters: PluginHaloRunV1alpha1ExtensionDefinitionApiListPluginHaloRunV1alpha1ExtensionDefinitionRequest = {}, options?: RawAxiosRequestConfig) {
+        return PluginHaloRunV1alpha1ExtensionDefinitionApiFp(this.configuration).listPluginHaloRunV1alpha1ExtensionDefinition(requestParameters.page, requestParameters.size, requestParameters.labelSelector, requestParameters.fieldSelector, requestParameters.sort, options).then((request) => request(this.axios, this.basePath));
     }
 
     /**
      * Update plugin.halo.run/v1alpha1/ExtensionDefinition
-     * @param {PluginHaloRunV1alpha1ExtensionDefinitionApiUpdatepluginHaloRunV1alpha1ExtensionDefinitionRequest} requestParameters Request parameters.
+     * @param {PluginHaloRunV1alpha1ExtensionDefinitionApiUpdatePluginHaloRunV1alpha1ExtensionDefinitionRequest} requestParameters Request parameters.
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      * @memberof PluginHaloRunV1alpha1ExtensionDefinitionApi
      */
-    public updatepluginHaloRunV1alpha1ExtensionDefinition(requestParameters: PluginHaloRunV1alpha1ExtensionDefinitionApiUpdatepluginHaloRunV1alpha1ExtensionDefinitionRequest, options?: RawAxiosRequestConfig) {
-        return PluginHaloRunV1alpha1ExtensionDefinitionApiFp(this.configuration).updatepluginHaloRunV1alpha1ExtensionDefinition(requestParameters.name, requestParameters.extensionDefinition, options).then((request) => request(this.axios, this.basePath));
+    public updatePluginHaloRunV1alpha1ExtensionDefinition(requestParameters: PluginHaloRunV1alpha1ExtensionDefinitionApiUpdatePluginHaloRunV1alpha1ExtensionDefinitionRequest, options?: RawAxiosRequestConfig) {
+        return PluginHaloRunV1alpha1ExtensionDefinitionApiFp(this.configuration).updatePluginHaloRunV1alpha1ExtensionDefinition(requestParameters.name, requestParameters.extensionDefinition, options).then((request) => request(this.axios, this.basePath));
     }
 }
 

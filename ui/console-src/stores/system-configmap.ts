@@ -15,7 +15,7 @@ export const useSystemConfigMapStore = defineStore({
     async fetchSystemConfigMap() {
       try {
         const { data } =
-          await apiClient.extension.configMap.getv1alpha1ConfigMap(
+          await apiClient.extension.configMap.getV1alpha1ConfigMap(
             {
               name: "system",
             },

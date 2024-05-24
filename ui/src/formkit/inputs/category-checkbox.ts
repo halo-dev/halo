@@ -5,7 +5,7 @@ import { checkbox, checkboxes, defaultIcon } from "@formkit/inputs";
 function optionsHandler(node: FormKitNode) {
   node.on("created", async () => {
     const { data } =
-      await apiClient.extension.category.listcontentHaloRunV1alpha1Category({
+      await apiClient.extension.category.listContentHaloRunV1alpha1Category({
         sort: ["metadata.creationTimestamp,desc"],
       });
 
