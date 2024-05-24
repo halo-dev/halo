@@ -1,7 +1,10 @@
 package run.halo.app.infra;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
+import java.time.Duration;
+import java.time.Instant;
 import java.util.Iterator;
 import org.json.JSONException;
 import org.junit.jupiter.api.Test;
@@ -140,6 +143,86 @@ class ConditionListTest {
             """;
         ConditionList conditions = JsonUtils.jsonToObject(s, ConditionList.class);
         assertThat(conditions.peek().getType()).isEqualTo("type3");
+    }
+
+    @Test
+    void shouldNotAddIfTypeIsSame() {
+        var conditions = new ConditionList();
+        var condition = Condition.builder()
+            .type("type")
+            .status(ConditionStatus.TRUE)
+            .reason("reason")
+            .message("message")
+            .build();
+
+        var anotherCondition = Condition.builder()
+            .type("type")
+            .status(ConditionStatus.FALSE)
+            .reason("another reason")
+            .message("another message")
+            .build();
+
+        conditions.addAndEvictFIFO(condition);
+        conditions.addAndEvictFIFO(anotherCondition);
+
+        assertEquals(1, conditions.size());
+    }
+
+    @Test
+    void shouldNotUpdateLastTransitionTimeIfStatusNotChanged() {
+        var now = Instant.now();
+        var conditions = new ConditionList();
+        conditions.addAndEvictFIFO(
+            Condition.builder()
+                .type("type")
+                .status(ConditionStatus.TRUE)
+                .reason("reason")
+                .message("message")
+                .lastTransitionTime(now)
+                .build()
+        );
+
+        conditions.addAndEvictFIFO(
+            Condition.builder()
+                .type("type")
+                .status(ConditionStatus.TRUE)
+                .reason("reason")
+                .message("message")
+                .lastTransitionTime(now.plus(Duration.ofSeconds(1)))
+                .build()
+        );
+
+        assertEquals(1, conditions.size());
+        // make sure the last transition time was not modified.
+        assertEquals(now, conditions.peek().getLastTransitionTime());
+    }
+
+    @Test
+    void shouldUpdateLastTransitionTimeIfStatusChanged() {
+        var now = Instant.now();
+        var conditions = new ConditionList();
+        conditions.addAndEvictFIFO(
+            Condition.builder()
+                .type("type")
+                .status(ConditionStatus.TRUE)
+                .reason("reason")
+                .message("message")
+                .lastTransitionTime(now)
+                .build()
+        );
+
+        conditions.addAndEvictFIFO(
+            Condition.builder()
+                .type("type")
+                .status(ConditionStatus.FALSE)
+                .reason("reason")
+                .message("message")
+                .lastTransitionTime(now.plus(Duration.ofSeconds(1)))
+                .build()
+        );
+
+        assertEquals(1, conditions.size());
+        assertEquals(now.plus(Duration.ofSeconds(1)), conditions.peek().getLastTransitionTime());
     }
 
     private Condition condition(String type, String message, String reason,

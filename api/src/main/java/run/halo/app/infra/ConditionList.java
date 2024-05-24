@@ -55,12 +55,32 @@ public class ConditionList extends AbstractCollection<Condition> {
      * @param condition item to add
      */
     public boolean addAndEvictFIFO(@NonNull Condition condition, int evictThreshold) {
-        boolean result = this.addFirst(condition);
+        var current = getCondition(condition.getType());
+        if (current != null) {
+            // do not update last transition time if status is not changed
+            if (Objects.equals(condition.getStatus(), current.getStatus())) {
+                condition.setLastTransitionTime(current.getLastTransitionTime());
+            }
+        }
+
+        conditions.remove(current);
+        conditions.addFirst(condition);
+
         while (conditions.size() > evictThreshold) {
             removeLast();
         }
-        return result;
+        return true;
     }
+
+    private Condition getCondition(String type) {
+        for (Condition condition : conditions) {
+            if (condition.getType().equals(type)) {
+                return condition;
+            }
+        }
+        return null;
+    }
+
 
     public void remove(Condition condition) {
         conditions.remove(condition);

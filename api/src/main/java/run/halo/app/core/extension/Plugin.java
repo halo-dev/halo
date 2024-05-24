@@ -142,6 +142,7 @@ public class Plugin extends AbstractExtension {
         PENDING,
         STARTING,
         CREATED,
+        DISABLING,
         DISABLED,
         RESOLVED,
         STARTED,
