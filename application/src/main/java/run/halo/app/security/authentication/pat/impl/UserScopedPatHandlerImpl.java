@@ -39,7 +39,7 @@ import run.halo.app.infra.ExternalUrlSupplier;
 import run.halo.app.infra.exception.AccessDeniedException;
 import run.halo.app.infra.exception.NotFoundException;
 import run.halo.app.security.PersonalAccessToken;
-import run.halo.app.security.authentication.pat.PatJwkSupplier;
+import run.halo.app.security.authentication.CryptoService;
 import run.halo.app.security.authentication.pat.UserScopedPatHandler;
 import run.halo.app.security.authorization.AuthorityUtils;
 
@@ -66,14 +66,14 @@ public class UserScopedPatHandlerImpl implements UserScopedPatHandler {
     private Clock clock;
 
     public UserScopedPatHandlerImpl(ReactiveExtensionClient client,
-        PatJwkSupplier jwkSupplier,
+        CryptoService cryptoService,
         ExternalUrlSupplier externalUrl,
         RoleService roleService) {
         this.client = client;
         this.externalUrl = externalUrl;
         this.roleService = roleService;
 
-        var patJwk = jwkSupplier.getJwk();
+        var patJwk = cryptoService.getJwk();
         var jwkSet = new ImmutableJWKSet<>(new JWKSet(patJwk));
         this.patEncoder = new NimbusJwtEncoder(jwkSet);
         this.keyId = patJwk.getKeyID();
