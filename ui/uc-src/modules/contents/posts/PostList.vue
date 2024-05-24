@@ -15,8 +15,7 @@ import {
 } from "@halo-dev/components";
 import PostListItem from "./components/PostListItem.vue";
 import { useRouteQuery } from "@vueuse/router";
-import { computed } from "vue";
-import { watch } from "vue";
+import { computed, watch } from "vue";
 import { postLabels } from "@/constants/labels";
 
 const page = useRouteQuery<number>("page", 1, {
@@ -69,17 +68,34 @@ const {
     size.value = data.size;
   },
   refetchInterval: (data) => {
-    const hasAbnormalPost = data?.items.some((post) => {
-      const { spec, metadata, status } = post.post;
+    const hasDeletingPosts = data?.items.some((post) => post.post.spec.deleted);
+
+    if (hasDeletingPosts) {
+      return 1000;
+    }
+
+    const hasPublishingPost = data?.items.some((post) => {
+      const { spec, metadata } = post.post;
       return (
-        spec.deleted ||
-        (metadata.labels?.[postLabels.PUBLISHED] !== spec.publish + "" &&
-          metadata.labels?.[postLabels.SCHEDULING_PUBLISH] !== "true") ||
-        (spec.releaseSnapshot === spec.headSnapshot && status?.inProgress)
+        metadata.labels?.[postLabels.PUBLISHED] !== spec.publish + "" &&
+        metadata.labels?.[postLabels.SCHEDULING_PUBLISH] !== "true"
       );
     });
 
-    return hasAbnormalPost ? 1000 : false;
+    if (hasPublishingPost) {
+      return 1000;
+    }
+
+    const hasCancelingPublishPost = data?.items.some((post) => {
+      const { spec, metadata } = post.post;
+      return (
+        !spec.publish &&
+        (metadata.labels?.[postLabels.PUBLISHED] === "true" ||
+          metadata.labels?.[postLabels.SCHEDULING_PUBLISH] === "true")
+      );
+    });
+
+    return hasCancelingPublishPost ? 1000 : false;
   },
 });
 </script>

@@ -6,9 +6,8 @@ import {
   VModal,
   VSpace,
 } from "@halo-dev/components";
-import { computed, nextTick, ref, toRaw, watch } from "vue";
+import { computed, nextTick, ref, watch } from "vue";
 import type { Post } from "@halo-dev/api-client";
-import { cloneDeep } from "lodash-es";
 import { apiClient } from "@/utils/api-client";
 import { useThemeCustomTemplates } from "@console/modules/interface/themes/composables/use-theme";
 import { postLabels } from "@/constants/labels";
@@ -20,8 +19,31 @@ import useSlugify from "@console/composables/use-slugify";
 import { useI18n } from "vue-i18n";
 import { usePostUpdateMutate } from "../composables/use-post-update-mutate";
 import { FormType } from "@/types/slug";
+import { cloneDeep } from "lodash-es";
 
-const initialFormState: Post = {
+const props = withDefaults(
+  defineProps<{
+    post?: Post;
+    publishSupport?: boolean;
+    onlyEmit?: boolean;
+  }>(),
+  {
+    post: undefined,
+    publishSupport: true,
+    onlyEmit: false,
+  }
+);
+
+const emit = defineEmits<{
+  (event: "close"): void;
+  (event: "saved", post: Post): void;
+  (event: "published", post: Post): void;
+}>();
+
+const { t } = useI18n();
+
+const modal = ref<InstanceType<typeof VModal>>();
+const formState = ref<Post>({
   spec: {
     title: "",
     slug: "",
@@ -47,34 +69,8 @@ const initialFormState: Post = {
   metadata: {
     name: randomUUID(),
   },
-};
-
-const props = withDefaults(
-  defineProps<{
-    visible: boolean;
-    post?: Post;
-    publishSupport?: boolean;
-    onlyEmit?: boolean;
-  }>(),
-  {
-    visible: false,
-    post: undefined,
-    publishSupport: true,
-    onlyEmit: false,
-  }
-);
-
-const emit = defineEmits<{
-  (event: "update:visible", visible: boolean): void;
-  (event: "close"): void;
-  (event: "saved", post: Post): void;
-  (event: "published", post: Post): void;
-}>();
-
-const { t } = useI18n();
-
-const formState = ref<Post>(cloneDeep(initialFormState));
-const saving = ref(false);
+});
+const isSubmitting = ref(false);
 const publishing = ref(false);
 const publishCanceling = ref(false);
 const submitType = ref<"publish" | "save">();
@@ -83,13 +79,6 @@ const publishTime = ref<string | undefined>(undefined);
 const isUpdateMode = computed(() => {
   return !!formState.value.metadata.creationTimestamp;
 });
-
-const handleVisibleChange = (visible: boolean) => {
-  emit("update:visible", visible);
-  if (!visible) {
-    emit("close");
-  }
-};
 
 const handleSubmit = () => {
   if (submitType.value === "publish") {
@@ -139,11 +128,12 @@ const handleSave = async () => {
 
   if (props.onlyEmit) {
     emit("saved", formState.value);
+    modal.value?.close();
     return;
   }
 
   try {
-    saving.value = true;
+    isSubmitting.value = true;
 
     const { data } = isUpdateMode.value
       ? await postUpdateMutate(formState.value)
@@ -154,24 +144,27 @@ const handleSave = async () => {
     formState.value = data;
     emit("saved", data);
 
-    handleVisibleChange(false);
+    modal.value?.close();
 
     Toast.success(t("core.common.toast.save_success"));
   } catch (e) {
     console.error("Failed to save post", e);
   } finally {
-    saving.value = false;
+    isSubmitting.value = false;
   }
 };
 
 const handlePublish = async () => {
   if (props.onlyEmit) {
     emit("published", formState.value);
+    modal.value?.close();
     return;
   }
 
   try {
     publishing.value = true;
+
+    await postUpdateMutate(formState.value);
 
     const { data } = await apiClient.post.publishPost({
       name: formState.value.metadata.name,
@@ -181,7 +174,7 @@ const handlePublish = async () => {
 
     emit("published", data);
 
-    handleVisibleChange(false);
+    modal.value?.close();
 
     Toast.success(t("core.common.toast.publish_success"));
   } catch (e) {
@@ -199,7 +192,7 @@ const handleUnpublish = async () => {
       name: formState.value.metadata.name,
     });
 
-    handleVisibleChange(false);
+    modal.value?.close();
 
     Toast.success(t("core.common.toast.cancel_publish_success"));
   } catch (e) {
@@ -214,7 +207,7 @@ watch(
   () => props.post,
   (value) => {
     if (value) {
-      formState.value = toRaw(value);
+      formState.value = cloneDeep(value);
       publishTime.value = toDatetimeLocal(formState.value.spec.publishTime);
     }
   },
@@ -264,14 +257,37 @@ const { handleGenerateSlug } = useSlugify(
   computed(() => !isUpdateMode.value),
   FormType.POST
 );
+
+// Buttons condition
+const showPublishButton = computed(() => {
+  if (!props.publishSupport) {
+    return false;
+  }
+
+  const {
+    [postLabels.PUBLISHED]: published,
+    [postLabels.SCHEDULING_PUBLISH]: schedulingPublish,
+  } = formState.value.metadata.labels || {};
+
+  return published !== "true" && schedulingPublish !== "true";
+});
+
+const showCancelPublishButton = computed(() => {
+  const {
+    [postLabels.PUBLISHED]: published,
+    [postLabels.SCHEDULING_PUBLISH]: schedulingPublish,
+  } = formState.value.metadata.labels || {};
+
+  return published === "true" || schedulingPublish === "true";
+});
 </script>
 <template>
   <VModal
-    :visible="visible"
+    ref="modal"
     :width="700"
     :title="$t('core.post.settings.title')"
     :centered="false"
-    @update:visible="handleVisibleChange"
+    @close="emit('close')"
   >
     <template #actions>
       <slot name="actions"></slot>
@@ -459,10 +475,10 @@ const { handleGenerateSlug } = useSlugify(
     </div>
 
     <template #footer>
-      <VSpace>
-        <template v-if="publishSupport">
+      <div class="flex items-center justify-between">
+        <VSpace>
           <VButton
-            v-if="formState.metadata.labels?.[postLabels.PUBLISHED] !== 'true'"
+            v-if="showPublishButton"
             :loading="publishing"
             type="secondary"
             @click="handlePublishClick()"
@@ -474,21 +490,26 @@ const { handleGenerateSlug } = useSlugify(
             }}
           </VButton>
           <VButton
-            v-else
-            :loading="publishCanceling"
-            type="danger"
-            @click="handleUnpublish()"
+            :loading="isSubmitting"
+            type="secondary"
+            @click="handleSaveClick()"
           >
-            {{ $t("core.common.buttons.cancel_publish") }}
+            {{ $t("core.common.buttons.save") }}
           </VButton>
-        </template>
-        <VButton :loading="saving" type="secondary" @click="handleSaveClick()">
-          {{ $t("core.common.buttons.save") }}
+          <VButton type="default" @click="modal?.close()">
+            {{ $t("core.common.buttons.close") }}
+          </VButton>
+        </VSpace>
+
+        <VButton
+          v-if="showCancelPublishButton"
+          :loading="publishCanceling"
+          type="danger"
+          @click="handleUnpublish()"
+        >
+          {{ $t("core.common.buttons.cancel_publish") }}
         </VButton>
-        <VButton type="default" @click="handleVisibleChange(false)">
-          {{ $t("core.common.buttons.close") }}
-        </VButton>
-      </VSpace>
+      </div>
     </template>
   </VModal>
 </template>

@@ -342,7 +342,6 @@ const onSettingSaved = (post: Post) => {
   }
 
   formState.value.post = post;
-  settingModal.value = false;
 
   if (!isUpdateMode.value) {
     handleSave();
@@ -351,7 +350,6 @@ const onSettingSaved = (post: Post) => {
 
 const onSettingPublished = (post: Post) => {
   formState.value.post = post;
-  settingModal.value = false;
   handlePublish();
 };
 
@@ -454,10 +452,11 @@ async function handleUploadImage(file: File, options?: AxiosRequestConfig) {
 
 <template>
   <PostSettingModal
-    v-model:visible="settingModal"
+    v-if="settingModal"
     :post="formState.post"
     :publish-support="!isUpdateMode"
     :only-emit="!isUpdateMode"
+    @close="settingModal = false"
     @saved="onSettingSaved"
     @published="onSettingPublished"
   />

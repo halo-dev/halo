@@ -67,8 +67,8 @@ const formState = ref<SinglePage>({
     name: randomUUID(),
   },
 });
-const modal = ref();
-const saving = ref(false);
+const modal = ref<InstanceType<typeof VModal>>();
+const isSubmitting = ref(false);
 const publishing = ref(false);
 const publishCanceling = ref(false);
 const submitType = ref<"publish" | "save">();
@@ -125,12 +125,12 @@ const handleSave = async () => {
 
   if (props.onlyEmit) {
     emit("saved", formState.value);
-    modal.value.close();
+    modal.value?.close();
     return;
   }
 
   try {
-    saving.value = true;
+    isSubmitting.value = true;
 
     const { data } = isUpdateMode
       ? await singlePageUpdateMutate(formState.value)
@@ -143,13 +143,13 @@ const handleSave = async () => {
     formState.value = data;
     emit("saved", data);
 
-    modal.value.close();
+    modal.value?.close();
 
     Toast.success(t("core.common.toast.save_success"));
   } catch (error) {
     console.error("Failed to save single page", error);
   } finally {
-    saving.value = false;
+    isSubmitting.value = false;
   }
 };
 
@@ -170,7 +170,7 @@ const handlePublish = async () => {
 
   if (props.onlyEmit) {
     emit("published", formState.value);
-    modal.value.close();
+    modal.value?.close();
     return;
   }
 
@@ -195,7 +195,7 @@ const handlePublish = async () => {
 
     emit("published", data);
 
-    modal.value.close();
+    modal.value?.close();
 
     Toast.success(t("core.common.toast.publish_success"));
   } catch (error) {
@@ -227,7 +227,7 @@ const handleUnpublish = async () => {
 
     formState.value = data;
 
-    modal.value.close();
+    modal.value?.close();
 
     Toast.success(t("core.common.toast.cancel_publish_success"));
   } catch (error) {
@@ -457,10 +457,11 @@ const { handleGenerateSlug } = useSlugify(
     </div>
 
     <template #footer>
-      <VSpace>
-        <template v-if="publishSupport">
+      <div class="flex items-center justify-between">
+        <VSpace>
           <VButton
             v-if="
+              publishSupport &&
               formState.metadata.labels?.[singlePageLabels.PUBLISHED] !== 'true'
             "
             :loading="publishing"
@@ -470,21 +471,28 @@ const { handleGenerateSlug } = useSlugify(
             {{ $t("core.common.buttons.publish") }}
           </VButton>
           <VButton
-            v-else
-            :loading="publishCanceling"
-            type="danger"
-            @click="handleUnpublish()"
+            :loading="isSubmitting"
+            type="secondary"
+            @click="handleSaveClick"
           >
-            {{ $t("core.common.buttons.cancel_publish") }}
+            {{ $t("core.common.buttons.save") }}
           </VButton>
-        </template>
-        <VButton :loading="saving" type="secondary" @click="handleSaveClick">
-          {{ $t("core.common.buttons.save") }}
+          <VButton type="default" @click="modal?.close()">
+            {{ $t("core.common.buttons.close") }}
+          </VButton>
+        </VSpace>
+
+        <VButton
+          v-if="
+            formState.metadata.labels?.[singlePageLabels.PUBLISHED] === 'true'
+          "
+          :loading="publishCanceling"
+          type="danger"
+          @click="handleUnpublish()"
+        >
+          {{ $t("core.common.buttons.cancel_publish") }}
         </VButton>
-        <VButton type="default" @click="modal.close()">
-          {{ $t("core.common.buttons.close") }}
-        </VButton>
-      </VSpace>
+      </div>
     </template>
   </VModal>
 </template>
