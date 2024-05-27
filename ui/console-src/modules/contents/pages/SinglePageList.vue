@@ -131,16 +131,14 @@ const {
     return data.items;
   },
   refetchInterval(data) {
-    const abnormalSinglePages = data?.filter((singlePage) => {
-      const { spec, metadata, status } = singlePage.page;
+    const hasAbnormalSinglePage = data?.some((singlePage) => {
+      const { spec, metadata } = singlePage.page;
       return (
         spec.deleted ||
-        (spec.publish &&
-          metadata.labels?.[singlePageLabels.PUBLISHED] !== "true") ||
-        (spec.releaseSnapshot === spec.headSnapshot && status?.inProgress)
+        metadata.labels?.[singlePageLabels.PUBLISHED] !== spec.publish + ""
       );
     });
-    return abnormalSinglePages?.length ? 1000 : false;
+    return hasAbnormalSinglePage ? 1000 : false;
   },
 });
 
