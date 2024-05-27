@@ -1,6 +1,6 @@
 <script lang="ts" setup>
 // core libs
-import { computed, nextTick, onMounted, ref, toRaw } from "vue";
+import { computed, nextTick, onMounted, ref } from "vue";
 import { apiClient } from "@/utils/api-client";
 
 // components
@@ -24,6 +24,7 @@ import useSlugify from "@console/composables/use-slugify";
 import { useI18n } from "vue-i18n";
 import { FormType } from "@/types/slug";
 import { useQueryClient } from "@tanstack/vue-query";
+import { cloneDeep } from "lodash-es";
 
 const props = withDefaults(
   defineProps<{
@@ -151,7 +152,7 @@ const handleSaveCategory = async () => {
 
 onMounted(() => {
   if (props.category) {
-    formState.value = toRaw(props.category);
+    formState.value = cloneDeep(props.category);
   }
   selectedParentCategory.value = props.parentCategory?.metadata.name;
   setFocus("displayNameInput");

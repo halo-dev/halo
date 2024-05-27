@@ -12,7 +12,7 @@ import { usePermission } from "@/utils/permission";
 import { apiClient } from "@/utils/api-client";
 import { useQueryClient } from "@tanstack/vue-query";
 import type { Ref } from "vue";
-import { computed, toRefs, markRaw, ref, inject } from "vue";
+import { computed, inject, markRaw, ref, toRefs } from "vue";
 import { useRouter } from "vue-router";
 import { useEntityFieldItemExtensionPoint } from "@console/composables/use-entity-extension-points";
 import { useOperationItemExtensionPoint } from "@console/composables/use-operation-extension-points";
@@ -25,6 +25,7 @@ import PublishStatusField from "./entity-fields/PublishStatusField.vue";
 import VisibleField from "./entity-fields/VisibleField.vue";
 import StatusDotField from "@/components/entity-fields/StatusDotField.vue";
 import PublishTimeField from "./entity-fields/PublishTimeField.vue";
+import { postLabels } from "@/constants/labels";
 
 const { currentUserHasPermission } = usePermission();
 const { t } = useI18n();
@@ -72,6 +73,26 @@ const { operationItems } = useOperationItemExtensionPoint<ListedPost>(
   post,
   computed((): OperationItem<ListedPost>[] => [
     {
+      priority: 0,
+      component: markRaw(VDropdownItem),
+      label: t("core.common.buttons.publish"),
+      action: async () => {
+        await apiClient.post.publishPost({
+          name: props.post.post.metadata.name,
+        });
+
+        Toast.success(t("core.common.toast.publish_success"));
+
+        queryClient.invalidateQueries({
+          queryKey: ["posts"],
+        });
+      },
+      hidden:
+        props.post.post.metadata.labels?.[postLabels.PUBLISHED] == "true" ||
+        props.post.post.metadata.labels?.[postLabels.SCHEDULING_PUBLISH] ==
+          "true",
+    },
+    {
       priority: 10,
       component: markRaw(VDropdownItem),
       label: t("core.common.buttons.edit"),
@@ -98,6 +119,29 @@ const { operationItems } = useOperationItemExtensionPoint<ListedPost>(
     },
     {
       priority: 40,
+      component: markRaw(VDropdownItem),
+      props: {
+        type: "danger",
+      },
+      label: t("core.common.buttons.cancel_publish"),
+      action: async () => {
+        await apiClient.post.unpublishPost({
+          name: props.post.post.metadata.name,
+        });
+
+        Toast.success(t("core.common.toast.cancel_publish_success"));
+
+        queryClient.invalidateQueries({
+          queryKey: ["posts"],
+        });
+      },
+      hidden:
+        props.post.post.metadata.labels?.[postLabels.PUBLISHED] !== "true" &&
+        props.post.post.metadata.labels?.[postLabels.SCHEDULING_PUBLISH] !==
+          "true",
+    },
+    {
+      priority: 50,
       component: markRaw(VDropdownItem),
       props: {
         type: "danger",

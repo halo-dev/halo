@@ -1,4 +1,7 @@
 <script lang="ts" setup>
+import { apiClient } from "@/utils/api-client";
+import { formatDatetime } from "@/utils/date";
+import type { Policy, PolicyTemplate } from "@halo-dev/api-client";
 import {
   Dialog,
   IconAddCircle,
@@ -13,16 +16,13 @@ import {
   VSpace,
   VStatusDot,
 } from "@halo-dev/components";
-import AttachmentPolicyEditingModal from "./AttachmentPolicyEditingModal.vue";
 import { ref } from "vue";
-import type { Policy, PolicyTemplate } from "@halo-dev/api-client";
-import { formatDatetime } from "@/utils/date";
+import { useI18n } from "vue-i18n";
 import {
   useFetchAttachmentPolicy,
   useFetchAttachmentPolicyTemplate,
 } from "../composables/use-attachment-policy";
-import { apiClient } from "@/utils/api-client";
-import { useI18n } from "vue-i18n";
+import AttachmentPolicyEditingModal from "./AttachmentPolicyEditingModal.vue";
 
 const emit = defineEmits<{
   (event: "close"): void;
@@ -63,7 +63,7 @@ const handleDelete = async (policy: Policy) => {
         "core.attachment.policies_modal.operations.can_not_delete.description"
       ),
       confirmText: t("core.common.buttons.confirm"),
-      cancelText: t("core.common.buttons.cancel"),
+      showCancel: false,
     });
     return;
   }
@@ -88,9 +88,17 @@ const handleDelete = async (policy: Policy) => {
 
 const onEditingModalClose = () => {
   selectedPolicy.value = undefined;
+  selectedTemplateName.value = undefined;
   handleFetchPolicies();
   policyEditingModal.value = false;
 };
+
+function getPolicyTemplateDisplayName(templateName: string) {
+  const policyTemplate = policyTemplates.value?.find(
+    (template) => template.metadata.name === templateName
+  );
+  return policyTemplate?.spec?.displayName || "--";
+}
 </script>
 <template>
   <VModal
@@ -108,8 +116,8 @@ const onEditingModalClose = () => {
         </span>
         <template #popper>
           <VDropdownItem
-            v-for="(policyTemplate, index) in policyTemplates"
-            :key="index"
+            v-for="policyTemplate in policyTemplates"
+            :key="policyTemplate.metadata.name"
             @click="handleOpenCreateNewPolicyModal(policyTemplate)"
           >
             {{ policyTemplate.spec?.displayName }}
@@ -157,7 +165,9 @@ const onEditingModalClose = () => {
           <template #start>
             <VEntityField
               :title="policy.spec.displayName"
-              :description="policy.spec.templateName"
+              :description="
+                getPolicyTemplateDisplayName(policy.spec.templateName)
+              "
             ></VEntityField>
           </template>
           <template #end>

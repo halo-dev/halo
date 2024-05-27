@@ -25,7 +25,7 @@ import useSlugify from "@console/composables/use-slugify";
 import { useI18n } from "vue-i18n";
 import { FormType } from "@/types/slug";
 import { onMounted } from "vue";
-import { toRaw } from "vue";
+import { cloneDeep } from "lodash-es";
 
 const props = withDefaults(
   defineProps<{
@@ -119,7 +119,7 @@ watch(
   () => props.tag,
   (tag) => {
     if (tag) {
-      formState.value = toRaw(tag);
+      formState.value = cloneDeep(tag);
     }
   },
   {

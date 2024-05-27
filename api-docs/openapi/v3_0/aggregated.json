@@ -14089,8 +14089,6 @@
       "Condition": {
         "required": [
           "lastTransitionTime",
-          "message",
-          "reason",
           "status",
           "type"
         ],
@@ -16944,6 +16942,7 @@
               "PENDING",
               "STARTING",
               "CREATED",
+              "DISABLING",
               "DISABLED",
               "RESOLVED",
               "STARTED",

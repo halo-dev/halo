@@ -1,4 +1,14 @@
 <script lang="ts" setup>
+import AnnotationsForm from "@/components/form/AnnotationsForm.vue";
+import { singlePageLabels } from "@/constants/labels";
+import { FormType } from "@/types/slug";
+import { apiClient } from "@/utils/api-client";
+import { toDatetimeLocal, toISOString } from "@/utils/date";
+import { randomUUID } from "@/utils/id";
+import useSlugify from "@console/composables/use-slugify";
+import { useThemeCustomTemplates } from "@console/modules/interface/themes/composables/use-theme";
+import { submitForm } from "@formkit/core";
+import type { SinglePage } from "@halo-dev/api-client";
 import {
   IconRefreshLine,
   Toast,
@@ -6,20 +16,10 @@ import {
   VModal,
   VSpace,
 } from "@halo-dev/components";
-import { computed, nextTick, ref, watch } from "vue";
-import type { SinglePage } from "@halo-dev/api-client";
 import { cloneDeep } from "lodash-es";
-import { apiClient } from "@/utils/api-client";
-import { useThemeCustomTemplates } from "@console/modules/interface/themes/composables/use-theme";
-import { singlePageLabels } from "@/constants/labels";
-import { randomUUID } from "@/utils/id";
-import { toDatetimeLocal, toISOString } from "@/utils/date";
-import { submitForm } from "@formkit/core";
-import AnnotationsForm from "@/components/form/AnnotationsForm.vue";
-import useSlugify from "@console/composables/use-slugify";
+import { computed, nextTick, ref, watch } from "vue";
 import { useI18n } from "vue-i18n";
 import { usePageUpdateMutate } from "../composables/use-page-update-mutate";
-import { FormType } from "@/types/slug";
 
 const props = withDefaults(
   defineProps<{
@@ -68,7 +68,7 @@ const formState = ref<SinglePage>({
   },
 });
 const modal = ref<InstanceType<typeof VModal> | null>(null);
-const saving = ref(false);
+const isSubmitting = ref(false);
 const publishing = ref(false);
 const publishCanceling = ref(false);
 const submitType = ref<"publish" | "save">();
@@ -130,7 +130,7 @@ const handleSave = async () => {
   }
 
   try {
-    saving.value = true;
+    isSubmitting.value = true;
 
     const { data } = isUpdateMode
       ? await singlePageUpdateMutate(formState.value)
@@ -149,7 +149,7 @@ const handleSave = async () => {
   } catch (error) {
     console.error("Failed to save single page", error);
   } finally {
-    saving.value = false;
+    isSubmitting.value = false;
   }
 };
 
@@ -457,10 +457,11 @@ const { handleGenerateSlug } = useSlugify(
     </div>
 
     <template #footer>
-      <VSpace>
-        <template v-if="publishSupport">
+      <div class="flex items-center justify-between">
+        <VSpace>
           <VButton
             v-if="
+              publishSupport &&
               formState.metadata.labels?.[singlePageLabels.PUBLISHED] !== 'true'
             "
             :loading="publishing"
@@ -470,21 +471,28 @@ const { handleGenerateSlug } = useSlugify(
             {{ $t("core.common.buttons.publish") }}
           </VButton>
           <VButton
-            v-else
-            :loading="publishCanceling"
-            type="danger"
-            @click="handleUnpublish()"
+            :loading="isSubmitting"
+            type="secondary"
+            @click="handleSaveClick"
           >
-            {{ $t("core.common.buttons.cancel_publish") }}
+            {{ $t("core.common.buttons.save") }}
           </VButton>
-        </template>
-        <VButton :loading="saving" type="secondary" @click="handleSaveClick">
-          {{ $t("core.common.buttons.save") }}
+          <VButton type="default" @click="modal?.close()">
+            {{ $t("core.common.buttons.close") }}
+          </VButton>
+        </VSpace>
+
+        <VButton
+          v-if="
+            formState.metadata.labels?.[singlePageLabels.PUBLISHED] === 'true'
+          "
+          :loading="publishCanceling"
+          type="danger"
+          @click="handleUnpublish()"
+        >
+          {{ $t("core.common.buttons.cancel_publish") }}
         </VButton>
-        <VButton type="default" @click="modal?.close()">
-          {{ $t("core.common.buttons.close") }}
-        </VButton>
-      </VSpace>
+      </div>
     </template>
   </VModal>
 </template>

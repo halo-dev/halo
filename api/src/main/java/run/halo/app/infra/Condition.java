@@ -51,13 +51,15 @@ public class Condition {
      * Human-readable message indicating details about last transition.
      * This may be an empty string.
      */
-    @Schema(requiredMode = REQUIRED, maxLength = 32768)
-    private String message;
+    @Schema(maxLength = 32768)
+    @Builder.Default
+    private String message = "";
 
     /**
      * Unique, one-word, CamelCase reason for the condition's last transition.
      */
-    @Schema(requiredMode = REQUIRED, maxLength = 1024,
+    @Schema(maxLength = 1024,
         pattern = "^[A-Za-z]([A-Za-z0-9_,:]*[A-Za-z0-9_])?$")
-    private String reason;
+    @Builder.Default
+    private String reason = "";
 }

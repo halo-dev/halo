@@ -3,9 +3,7 @@ package run.halo.app.plugin;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
-import java.util.Comparator;
 import java.util.List;
-import java.util.Objects;
 import java.util.Stack;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
@@ -22,7 +20,6 @@ import org.pf4j.PluginDescriptorFinder;
 import org.pf4j.PluginFactory;
 import org.pf4j.PluginLoader;
 import org.pf4j.PluginRepository;
-import org.pf4j.PluginRuntimeException;
 import org.pf4j.PluginStatusProvider;
 import org.pf4j.PluginWrapper;
 import org.springframework.context.ApplicationContext;
@@ -160,37 +157,6 @@ public class HaloPluginManager extends DefaultPluginManager implements SpringPlu
     @Override
     public ApplicationContext getSharedContext() {
         return sharedContext.get();
-    }
-
-    public boolean reloadPlugin(String pluginId, Path loadLocation) {
-        log.info("Reloading plugin {} from {}", pluginId, loadLocation);
-
-        var dependents = getDependents(pluginId);
-        dependents.forEach(plugin -> unloadPlugin(plugin.getPluginId(), false));
-
-        var unloaded = unloadPlugin(pluginId, false);
-        if (!unloaded) {
-            return false;
-        }
-
-        // load the root plugin
-        var loadedPluginId = loadPlugin(loadLocation);
-
-        if (!Objects.equals(pluginId, loadedPluginId)) {
-            throw new PluginRuntimeException("""
-                The plugin {} is reloaded successfully, \
-                but the plugin id is different from the original one.
-                """);
-        }
-
-        // load all dependents with reverse order
-        dependents.stream()
-            .map(PluginWrapper::getPluginPath)
-            .sorted(Comparator.reverseOrder())
-            .forEach(this::loadPlugin);
-
-        log.info("Reloaded plugin {} from {}", loadedPluginId, loadLocation);
-        return true;
     }
 
     @Override

@@ -78,35 +78,35 @@ importers:
         specifier: ^2.4.0
         version: 2.4.0(@tiptap/core@2.4.0(@tiptap/pm@2.4.0))(@tiptap/pm@2.4.0)
       '@uppy/core':
-        specifier: ^3.8.0
-        version: 3.8.0
+        specifier: ^3.11.3
+        version: 3.11.3
       '@uppy/dashboard':
-        specifier: ^3.7.1
-        version: 3.7.1(@uppy/core@3.8.0)
+        specifier: ^3.8.3
+        version: 3.8.3(@uppy/core@3.11.3)
       '@uppy/drag-drop':
-        specifier: ^3.0.3
-        version: 3.0.3(@uppy/core@3.8.0)
+        specifier: ^3.1.0
+        version: 3.1.0(@uppy/core@3.11.3)
       '@uppy/file-input':
-        specifier: ^3.0.4
-        version: 3.0.4(@uppy/core@3.8.0)
+        specifier: ^3.1.2
+        version: 3.1.2(@uppy/core@3.11.3)
       '@uppy/image-editor':
-        specifier: ^2.4.4
-        version: 2.4.4(@uppy/core@3.8.0)
+        specifier: ^2.4.6
+        version: 2.4.6(@uppy/core@3.11.3)
       '@uppy/locales':
-        specifier: ^3.5.0
-        version: 3.5.0
+        specifier: ^3.5.3
+        version: 3.5.3
       '@uppy/progress-bar':
-        specifier: ^3.0.4
-        version: 3.0.4(@uppy/core@3.8.0)
+        specifier: ^3.1.1
+        version: 3.1.1(@uppy/core@3.11.3)
       '@uppy/status-bar':
-        specifier: ^3.2.5
-        version: 3.2.5(@uppy/core@3.8.0)
+        specifier: ^3.3.3
+        version: 3.3.3(@uppy/core@3.11.3)
       '@uppy/vue':
-        specifier: ^1.1.0
-        version: 1.1.0(@uppy/core@3.8.0)(@uppy/dashboard@3.7.1(@uppy/core@3.8.0))(@uppy/drag-drop@3.0.3(@uppy/core@3.8.0))(@uppy/file-input@3.0.4(@uppy/core@3.8.0))(@uppy/progress-bar@3.0.4(@uppy/core@3.8.0))(@uppy/status-bar@3.2.5(@uppy/core@3.8.0))(vue@3.4.27(typescript@5.3.3))
+        specifier: ^1.1.2
+        version: 1.1.2(@uppy/core@3.11.3)(@uppy/dashboard@3.8.3(@uppy/core@3.11.3))(@uppy/drag-drop@3.1.0(@uppy/core@3.11.3))(@uppy/file-input@3.1.2(@uppy/core@3.11.3))(@uppy/progress-bar@3.1.1(@uppy/core@3.11.3))(@uppy/status-bar@3.3.3(@uppy/core@3.11.3))(vue@3.4.27(typescript@5.3.3))
       '@uppy/xhr-upload':
-        specifier: ^3.6.0
-        version: 3.6.0(@uppy/core@3.8.0)
+        specifier: ^3.6.7
+        version: 3.6.7(@uppy/core@3.11.3)
       '@vueuse/components':
         specifier: ^10.9.0
         version: 10.9.0(vue@3.4.27(typescript@5.3.3))
@@ -3855,11 +3855,8 @@ packages:
   '@tootallnate/quickjs-emscripten@0.23.0':
     resolution: {integrity: sha512-C5Mc6rdnsaJDjO3UpGW/CQTHtCKaYlScZTly4JIu97Jxo/odCiH0ITnDXSJPTOrEKk/ycSZ0AOgTmkDtkOsvIA==}
 
-  '@transloadit/prettier-bytes@0.0.7':
-    resolution: {integrity: sha512-VeJbUb0wEKbcwaSlj5n+LscBl9IPgLPkHVGBkh00cztv6X4L/TJXK58LzFuBKX7/GAfiGhIwH67YTLTlzvIzBA==}
-
-  '@transloadit/prettier-bytes@0.0.9':
-    resolution: {integrity: sha512-pCvdmea/F3Tn4hAtHqNXmjcixSaroJJ+L3STXlYJdir1g1m2mRQpWbN8a4SvgQtaw2930Ckhdx8qXdXBFMKbAA==}
+  '@transloadit/prettier-bytes@0.3.4':
+    resolution: {integrity: sha512-8/SnIF9Q2k52mbjRVAYLranwkaDTLb+O9r4Z/uo8uNw//SjygKvvbF4BHSOuReufaAyum1q13602VcNud25Dfg==}
 
   '@tsconfig/node18@2.0.1':
     resolution: {integrity: sha512-UqdfvuJK0SArA2CxhKWwwAWfnVSXiYe63bVpMutc27vpngCntGUZQETO24pEJ46zU6XM+7SpqYoMgcO3bM11Ew==}
@@ -4162,81 +4159,77 @@ packages:
     resolution: {integrity: sha512-zEfbFLzB9ETcEJ4HZEEsCR9HHeNku5/Qw1jSS5McYJv5BR+ftYXwFFAH5Al+xkGaZEqowMwl7uoJjQb1YSPF8Q==}
     engines: {node: ^12.22.0 || ^14.17.0 || >=16.0.0}
 
-  '@uppy/companion-client@3.7.0':
-    resolution: {integrity: sha512-37qJNMkqo01SM9h2gkFbV6e+aXM02s2zAda2dGsRLRsjvl/Tx69NlmxJ3xqG/7HWRnYcbBWtspb7y0tt1i/afg==}
-
-  '@uppy/core@3.8.0':
-    resolution: {integrity: sha512-C93vVhid929+VLGjaD9CZOLJDg8GkEGMUGveFp3Tyo/wujiG+sB3fOF+c6TzKpzPLfNtVpskU1BnI7tZrq1LWw==}
-
-  '@uppy/dashboard@3.7.1':
-    resolution: {integrity: sha512-qtCMXd2Ymrw0qNGSTlEEMyyDkGUCm+wX5/VrmV9lnfT7JtlSfotUK0K6KvkBeu2v1Chsu27C6Xlq6RddZMR2xQ==}
+  '@uppy/companion-client@3.8.1':
+    resolution: {integrity: sha512-A1k9cOgGMsJNx1lI0Lj2ZaLAH3WIL3xImi2EPXuAHgL1uBZqjuffP2P9XK4nr+KVc+PBivOxH7MoiYpJm97/xw==}
     peerDependencies:
-      '@uppy/core': ^3.7.1
+      '@uppy/core': ^3.11.0
 
-  '@uppy/drag-drop@3.0.3':
-    resolution: {integrity: sha512-0bCgQKxg+9vkxQipTgrX9yQIuK9a0hZrkipm1+Ynq6jTeig49b7II1bWYnoKdiYhi6nRE4UnDJf4z09yCAU7rA==}
+  '@uppy/core@3.11.3':
+    resolution: {integrity: sha512-Wmy6+VUR8xeWJcjrKHxvDHY4ZI4hoxOiL7k8XCnS119Fl0aNNT4sbmDlcHtl5NmR8MR8p1l5M/QaUBZV0SpEKg==}
+
+  '@uppy/dashboard@3.8.3':
+    resolution: {integrity: sha512-R55GliI6I/8G1o0s834+XDFeGTKRFgPQr2KVkHNA0bzU/eYPE+jPW+UtZchaZDUfMMjIjwDEiYtobhcPsukGxg==}
     peerDependencies:
-      '@uppy/core': ^3.4.0
+      '@uppy/core': ^3.11.2
 
-  '@uppy/file-input@3.0.4':
-    resolution: {integrity: sha512-D7Nw9GgpABYTcC8SZluDyxd+ppe7+gJejNbPZqMpQyW1S/ME3me55dkDQaVWn8yrgv7347zO2ciue9Rfmko+rQ==}
+  '@uppy/drag-drop@3.1.0':
+    resolution: {integrity: sha512-9TINGQ9R5xmu7rvd3MpxNv/E6W28VkmSDhl91l8IOcxCU44psctuvgt57TB5ArLKfICljDBJzs/6dCU38U1CuA==}
     peerDependencies:
-      '@uppy/core': ^3.6.0
+      '@uppy/core': ^3.10.0
 
-  '@uppy/image-editor@2.4.4':
-    resolution: {integrity: sha512-ASjv2Mh4mhlhkh1isDvIj3tlbERG77jo/ETwtajRSERGV6Ga9w1QGG7vL19bmNW9McHPFMZvOKNojAgv4SAtPg==}
+  '@uppy/file-input@3.1.2':
+    resolution: {integrity: sha512-IgZhK3EfO2bEqmEwpqfo3N9k8OxV2pmuGdKU4IuwJFv3Q1s1F6ceSDhWX8ivtVXlDvnbJIkqZbZjnvWwJxfjng==}
+    peerDependencies:
+      '@uppy/core': ^3.11.0
+
+  '@uppy/image-editor@2.4.6':
+    resolution: {integrity: sha512-uQ8k4pUSsYBv6ZBoICwKq3M1DqiKg6AFM/nbvxL/q5KpRkRTszzPvP4hyvjY2zDLLf/NlK3E45N2IcWraV87dQ==}
+    peerDependencies:
+      '@uppy/core': ^3.11.3
+
+  '@uppy/informer@3.1.0':
+    resolution: {integrity: sha512-vmpTLqzSLmZSuIVDZV0o19yXVqyTh5/uCbKUEiyfBhR726kQiuYQLP/ZHaKcvW3c1ESQGbNg53iNHbFBqF681w==}
     peerDependencies:
       '@uppy/core': ^3.9.3
 
-  '@uppy/informer@3.0.4':
-    resolution: {integrity: sha512-gzocdxn8qAFsW2EryehwjghladaBgv6Isjte53FTBV7o/vjaHPP6huKGbYpljyuQi8i9V+KrmvNGslofssgJ4g==}
+  '@uppy/locales@3.5.3':
+    resolution: {integrity: sha512-fA7MIvsHoIoQpVSjvJW2i14smPxEdFKfcmWuNxDVOjMQXHxxwRSSUD+O+n/cUK8wdyT4lKbRitU/HUC/c1xG0A==}
+
+  '@uppy/progress-bar@3.1.1':
+    resolution: {integrity: sha512-c7Wcv6/gvrdxICnZUaU/cZG6wUtS0V/GYGssGFQ6OW84h0smuzGGA+KOh9zKqr6HBHxgKRxmCDtrlTlSSvAuQQ==}
     peerDependencies:
-      '@uppy/core': ^3.6.0
+      '@uppy/core': ^3.10.0
 
-  '@uppy/locales@3.5.0':
-    resolution: {integrity: sha512-sWW9GVJSbuA2Ehr5RNcuzIuHkJBcqv+ihm8IonIvwHsAn6hfkp/YYDTb0CdXGmbxfkQxVNdUlK7RZfhPNbms/A==}
-
-  '@uppy/progress-bar@3.0.4':
-    resolution: {integrity: sha512-sxv/mG7Uc9uyTnRvfcXBhO+TWd+UqjuW5aHXCKWwTkMgDShHR0T46sEk12q+jwgbFwyeFg3p0GU3hgUxqxiEUQ==}
+  '@uppy/provider-views@3.12.0':
+    resolution: {integrity: sha512-ctDfuEhBqUJRk3P6C9UfQI07OcV++TJPUrzf5TRgdueFa/vkKb/IVTWpNy2J0fV0POw51pUI2jf9CLUpSnXFng==}
     peerDependencies:
-      '@uppy/core': ^3.6.0
+      '@uppy/core': ^3.11.0
 
-  '@uppy/provider-views@3.8.0':
-    resolution: {integrity: sha512-sTtx5bgsg2WVR+MyF0gnnM3Z7g3CyFx+Stlz//AvB6g27EMqtqO4zwDR3mestMrETkWYov5bhhqUbt2BaeANpA==}
+  '@uppy/status-bar@3.3.3':
+    resolution: {integrity: sha512-TCcnBjTDbq/AmnGOcWbCpQNsv05Z6Y36zdmTCt/xNe2/gTVAYAzGRoGOrkeb6jf/E4AAi25VyOolSqL2ibB8Kw==}
     peerDependencies:
-      '@uppy/core': ^3.8.0
+      '@uppy/core': ^3.11.2
 
-  '@uppy/status-bar@3.2.5':
-    resolution: {integrity: sha512-bRSxBPio5B+Kuf6w8ll+/i9VUwG8f0FnbZ1yQvCr8J9vxhd0Z5hvwhX4NP8uzHC6ZPJHlEQOTsxzGQ6y+Mdm0A==}
+  '@uppy/store-default@3.2.2':
+    resolution: {integrity: sha512-OiSgT++Jj4nLK0N9WTeod3UNjCH81OXE5BcMJCd9oWzl2d0xPNq2T/E9Y6O72XVd+6Y7+tf5vZlPElutfMB3KQ==}
+
+  '@uppy/thumbnail-generator@3.1.0':
+    resolution: {integrity: sha512-tDKK/cukC0CrM0F/OlHFmvpGGUq+Db4YfakhIGPKtT7ZO8aWOiIu5JIvaYUnKRxGq3RGsk4zhkxYXuoxVzzsGA==}
     peerDependencies:
-      '@uppy/core': ^3.6.0
+      '@uppy/core': ^3.10.0
 
-  '@uppy/store-default@3.2.0':
-    resolution: {integrity: sha512-Y7t0peUG89ZKa30vM4qlRIC6uKxIfOANeMT9Nzjwcxvzz8l7es22jG3eAj9WF2F7YSu7xdsH8ODs6SIrJJ8gow==}
+  '@uppy/utils@5.9.0':
+    resolution: {integrity: sha512-9Ubddd3orCOLYjf0KobwgJ+aTrABSxk9t4X/QdM4qJHVZuMIftkaMplrViRUO+kvIBCXEZDIP2AmS060siDNGw==}
 
-  '@uppy/thumbnail-generator@3.0.6':
-    resolution: {integrity: sha512-gsi/BQBiunHneXCbo8VglFbhEb0CoQXQjCyGNKoEq/deEcbXhBBDxkiGcgv83l5GZJl2jLiKWqXnXAXREkldrQ==}
+  '@uppy/vue@1.1.2':
+    resolution: {integrity: sha512-Qx2vgqBQunGPwT84e2le+DpaJccxFvvwgYz1hvS6SrO9PK74IEYpPm6dSXc3x37HgilZkcDz4X3BlEU2nRIB4Q==}
     peerDependencies:
-      '@uppy/core': ^3.6.0
-
-  '@uppy/utils@5.4.3':
-    resolution: {integrity: sha512-ewQTWQ5Wu1/ocz/lLCkhoXQwHLRktFK4CxrOsZmeCLK9LxjD1GOwSFjOuL199WDQKXiCle6SVlAJGQ3SDlXVkg==}
-
-  '@uppy/utils@5.7.0':
-    resolution: {integrity: sha512-AJj7gAx5YfMgyevwOxVdIP2h4Nw/O6h57wKA6gj+Lce6tMORcqzGt4yQiKBsrBI0bPyFWCbzA3vX5t0//1JCBA==}
-
-  '@uppy/utils@5.7.4':
-    resolution: {integrity: sha512-0Xsr7Xqdrb9mgfY3hi0YdhIaAxUw6qJasAflNMwNsyLGt3kH4pLfQHucolBKfWglVGtk1vfb49hZYvJGpcpzYA==}
-
-  '@uppy/vue@1.1.0':
-    resolution: {integrity: sha512-xUKjLq8R0VBQHPDBb/f/bCL8+f51qSrTqYS6JXA4oFQ3QXICQN72E3rAPOyEwkiy+45JJMHA6uKeC+v6H9dcVg==}
-    peerDependencies:
-      '@uppy/core': ^3.6.0
-      '@uppy/dashboard': ^3.6.0
+      '@uppy/core': ^3.9.1
+      '@uppy/dashboard': ^3.7.3
       '@uppy/drag-drop': ^3.0.3
       '@uppy/file-input': ^3.0.4
       '@uppy/progress-bar': ^3.0.4
-      '@uppy/status-bar': ^3.2.5
+      '@uppy/status-bar': ^3.2.7
       vue: '>=2.6.11'
     peerDependenciesMeta:
       '@uppy/dashboard':
@@ -4250,10 +4243,10 @@ packages:
       '@uppy/status-bar':
         optional: true
 
-  '@uppy/xhr-upload@3.6.0':
-    resolution: {integrity: sha512-HgWr+CvJzJXAp639AiZatdEWmRdhhN5LrjTZurAkvm9nPQarpi1bo0DChO+1bpkXWOR/1VarBbZOr8lNecEn7Q==}
+  '@uppy/xhr-upload@3.6.7':
+    resolution: {integrity: sha512-xd8PA6gz8/usm7wpI6w8zOjnw5KnE/Yt7fWknFubMFCbP0yutWbStgeFAj5AMdLjLQpGveGb/OVWHhBfy2LwlA==}
     peerDependencies:
-      '@uppy/core': ^3.8.0
+      '@uppy/core': ^3.11.3
 
   '@vitejs/plugin-vue-jsx@3.1.0':
     resolution: {integrity: sha512-w9M6F3LSEU5kszVb9An2/MmXNxocAnUb3WhRr8bHlimhDrXNt6n6D2nJQR3UXpGlZHh/EsgouOHCsM8V3Ln+WA==}
@@ -14986,9 +14979,7 @@ snapshots:
 
   '@tootallnate/quickjs-emscripten@0.23.0': {}
 
-  '@transloadit/prettier-bytes@0.0.7': {}
-
-  '@transloadit/prettier-bytes@0.0.9': {}
+  '@transloadit/prettier-bytes@0.3.4': {}
 
   '@tsconfig/node18@2.0.1': {}
 
@@ -15349,32 +15340,33 @@ snapshots:
       '@typescript-eslint/types': 5.59.6
       eslint-visitor-keys: 3.4.1
 
-  '@uppy/companion-client@3.7.0':
+  '@uppy/companion-client@3.8.1(@uppy/core@3.11.3)':
     dependencies:
-      '@uppy/utils': 5.7.0
+      '@uppy/core': 3.11.3
+      '@uppy/utils': 5.9.0
       namespace-emitter: 2.0.1
       p-retry: 6.2.0
 
-  '@uppy/core@3.8.0':
+  '@uppy/core@3.11.3':
     dependencies:
-      '@transloadit/prettier-bytes': 0.0.9
-      '@uppy/store-default': 3.2.0
-      '@uppy/utils': 5.7.0
+      '@transloadit/prettier-bytes': 0.3.4
+      '@uppy/store-default': 3.2.2
+      '@uppy/utils': 5.9.0
       lodash: 4.17.21
       mime-match: 1.0.2
       namespace-emitter: 2.0.1
       nanoid: 4.0.0
       preact: 10.11.2
 
-  '@uppy/dashboard@3.7.1(@uppy/core@3.8.0)':
+  '@uppy/dashboard@3.8.3(@uppy/core@3.11.3)':
     dependencies:
-      '@transloadit/prettier-bytes': 0.0.7
-      '@uppy/core': 3.8.0
-      '@uppy/informer': 3.0.4(@uppy/core@3.8.0)
-      '@uppy/provider-views': 3.8.0(@uppy/core@3.8.0)
-      '@uppy/status-bar': 3.2.5(@uppy/core@3.8.0)
-      '@uppy/thumbnail-generator': 3.0.6(@uppy/core@3.8.0)
-      '@uppy/utils': 5.7.0
+      '@transloadit/prettier-bytes': 0.3.4
+      '@uppy/core': 3.11.3
+      '@uppy/informer': 3.1.0(@uppy/core@3.11.3)
+      '@uppy/provider-views': 3.12.0(@uppy/core@3.11.3)
+      '@uppy/status-bar': 3.3.3(@uppy/core@3.11.3)
+      '@uppy/thumbnail-generator': 3.1.0(@uppy/core@3.11.3)
+      '@uppy/utils': 5.9.0
       classnames: 2.3.2
       is-shallow-equal: 1.0.1
       lodash: 4.17.21
@@ -15382,99 +15374,88 @@ snapshots:
       nanoid: 4.0.0
       preact: 10.11.2
 
-  '@uppy/drag-drop@3.0.3(@uppy/core@3.8.0)':
+  '@uppy/drag-drop@3.1.0(@uppy/core@3.11.3)':
     dependencies:
-      '@uppy/core': 3.8.0
-      '@uppy/utils': 5.4.3
+      '@uppy/core': 3.11.3
+      '@uppy/utils': 5.9.0
       preact: 10.11.2
 
-  '@uppy/file-input@3.0.4(@uppy/core@3.8.0)':
+  '@uppy/file-input@3.1.2(@uppy/core@3.11.3)':
     dependencies:
-      '@uppy/core': 3.8.0
-      '@uppy/utils': 5.7.0
+      '@uppy/core': 3.11.3
+      '@uppy/utils': 5.9.0
       preact: 10.11.2
 
-  '@uppy/image-editor@2.4.4(@uppy/core@3.8.0)':
+  '@uppy/image-editor@2.4.6(@uppy/core@3.11.3)':
     dependencies:
-      '@uppy/core': 3.8.0
-      '@uppy/utils': 5.7.4
+      '@uppy/core': 3.11.3
+      '@uppy/utils': 5.9.0
       cropperjs: 1.5.7
       preact: 10.11.2
 
-  '@uppy/informer@3.0.4(@uppy/core@3.8.0)':
+  '@uppy/informer@3.1.0(@uppy/core@3.11.3)':
     dependencies:
-      '@uppy/core': 3.8.0
-      '@uppy/utils': 5.7.0
+      '@uppy/core': 3.11.3
+      '@uppy/utils': 5.9.0
       preact: 10.11.2
 
-  '@uppy/locales@3.5.0':
+  '@uppy/locales@3.5.3':
     dependencies:
-      '@uppy/utils': 5.7.0
+      '@uppy/utils': 5.9.0
 
-  '@uppy/progress-bar@3.0.4(@uppy/core@3.8.0)':
+  '@uppy/progress-bar@3.1.1(@uppy/core@3.11.3)':
     dependencies:
-      '@uppy/core': 3.8.0
-      '@uppy/utils': 5.7.0
+      '@uppy/core': 3.11.3
+      '@uppy/utils': 5.9.0
       preact: 10.11.2
 
-  '@uppy/provider-views@3.8.0(@uppy/core@3.8.0)':
+  '@uppy/provider-views@3.12.0(@uppy/core@3.11.3)':
     dependencies:
-      '@uppy/core': 3.8.0
-      '@uppy/utils': 5.7.0
+      '@uppy/core': 3.11.3
+      '@uppy/utils': 5.9.0
       classnames: 2.3.2
       nanoid: 4.0.0
       p-queue: 7.3.4
       preact: 10.11.2
 
-  '@uppy/status-bar@3.2.5(@uppy/core@3.8.0)':
+  '@uppy/status-bar@3.3.3(@uppy/core@3.11.3)':
     dependencies:
-      '@transloadit/prettier-bytes': 0.0.9
-      '@uppy/core': 3.8.0
-      '@uppy/utils': 5.7.0
+      '@transloadit/prettier-bytes': 0.3.4
+      '@uppy/core': 3.11.3
+      '@uppy/utils': 5.9.0
       classnames: 2.3.2
       preact: 10.11.2
 
-  '@uppy/store-default@3.2.0': {}
+  '@uppy/store-default@3.2.2': {}
 
-  '@uppy/thumbnail-generator@3.0.6(@uppy/core@3.8.0)':
+  '@uppy/thumbnail-generator@3.1.0(@uppy/core@3.11.3)':
     dependencies:
-      '@uppy/core': 3.8.0
-      '@uppy/utils': 5.7.0
+      '@uppy/core': 3.11.3
+      '@uppy/utils': 5.9.0
       exifr: 7.1.3
 
-  '@uppy/utils@5.4.3':
+  '@uppy/utils@5.9.0':
     dependencies:
       lodash: 4.17.21
       preact: 10.11.2
 
-  '@uppy/utils@5.7.0':
+  '@uppy/vue@1.1.2(@uppy/core@3.11.3)(@uppy/dashboard@3.8.3(@uppy/core@3.11.3))(@uppy/drag-drop@3.1.0(@uppy/core@3.11.3))(@uppy/file-input@3.1.2(@uppy/core@3.11.3))(@uppy/progress-bar@3.1.1(@uppy/core@3.11.3))(@uppy/status-bar@3.3.3(@uppy/core@3.11.3))(vue@3.4.27(typescript@5.3.3))':
     dependencies:
-      lodash: 4.17.21
-      preact: 10.11.2
-
-  '@uppy/utils@5.7.4':
-    dependencies:
-      lodash: 4.17.21
-      preact: 10.11.2
-
-  '@uppy/vue@1.1.0(@uppy/core@3.8.0)(@uppy/dashboard@3.7.1(@uppy/core@3.8.0))(@uppy/drag-drop@3.0.3(@uppy/core@3.8.0))(@uppy/file-input@3.0.4(@uppy/core@3.8.0))(@uppy/progress-bar@3.0.4(@uppy/core@3.8.0))(@uppy/status-bar@3.2.5(@uppy/core@3.8.0))(vue@3.4.27(typescript@5.3.3))':
-    dependencies:
-      '@uppy/core': 3.8.0
+      '@uppy/core': 3.11.3
       shallow-equal: 1.2.1
       vue: 3.4.27(typescript@5.3.3)
     optionalDependencies:
-      '@uppy/dashboard': 3.7.1(@uppy/core@3.8.0)
-      '@uppy/drag-drop': 3.0.3(@uppy/core@3.8.0)
-      '@uppy/file-input': 3.0.4(@uppy/core@3.8.0)
-      '@uppy/progress-bar': 3.0.4(@uppy/core@3.8.0)
-      '@uppy/status-bar': 3.2.5(@uppy/core@3.8.0)
+      '@uppy/dashboard': 3.8.3(@uppy/core@3.11.3)
+      '@uppy/drag-drop': 3.1.0(@uppy/core@3.11.3)
+      '@uppy/file-input': 3.1.2(@uppy/core@3.11.3)
+      '@uppy/progress-bar': 3.1.1(@uppy/core@3.11.3)
+      '@uppy/status-bar': 3.3.3(@uppy/core@3.11.3)
 
-  '@uppy/xhr-upload@3.6.0(@uppy/core@3.8.0)':
+  '@uppy/xhr-upload@3.6.7(@uppy/core@3.11.3)':
     dependencies:
-      '@uppy/companion-client': 3.7.0
-      '@uppy/core': 3.8.0
-      '@uppy/utils': 5.7.0
-      nanoid: 4.0.0
+      '@uppy/companion-client': 3.8.1(@uppy/core@3.11.3)
+      '@uppy/core': 3.11.3
+      '@uppy/utils': 5.9.0
 
   '@vitejs/plugin-vue-jsx@3.1.0(vite@5.2.11(@types/node@18.13.0)(less@4.2.0)(sass@1.60.0)(terser@5.31.0))(vue@3.4.27(typescript@5.3.3))':
     dependencies:

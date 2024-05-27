@@ -7,7 +7,7 @@ import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.lenient;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
@@ -40,6 +40,7 @@ import org.junit.jupiter.api.io.TempDir;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.pf4j.DefaultPluginDescriptor;
 import org.pf4j.PluginState;
 import org.pf4j.PluginWrapper;
 import org.pf4j.RuntimeMode;
@@ -53,6 +54,7 @@ import run.halo.app.extension.Metadata;
 import run.halo.app.extension.controller.Reconciler;
 import run.halo.app.extension.controller.Reconciler.Request;
 import run.halo.app.extension.controller.RequeueException;
+import run.halo.app.infra.Condition;
 import run.halo.app.infra.ConditionStatus;
 import run.halo.app.plugin.PluginProperties;
 import run.halo.app.plugin.SpringPluginManager;
@@ -122,11 +124,22 @@ class PluginReconcilerTest {
 
             when(client.fetch(Plugin.class, name)).thenReturn(Optional.of(fakePlugin));
 
-            var t = assertThrows(IllegalStateException.class,
-                () -> reconciler.reconcile(new Request(name)));
-            assertEquals(
-                "Cannot run the plugin fake-plugin with dev mode in non-development environment.",
-                t.getMessage());
+            var result = reconciler.reconcile(new Request(name));
+            assertFalse(result.reEnqueue());
+
+            var status = fakePlugin.getStatus();
+            assertEquals(Plugin.Phase.UNKNOWN, status.getPhase());
+            var condition = status.getConditions().peekFirst();
+            assertEquals(Condition.builder()
+                .type(PluginReconciler.ConditionType.INITIALIZED)
+                .status(ConditionStatus.FALSE)
+                .reason(PluginReconciler.ConditionReason.INVALID_RUNTIME_MODE)
+                .message("""
+                    Cannot run the plugin with development mode in non-development environment.\
+                    """)
+                .build(), condition);
+
+            verify(client).update(fakePlugin);
             verify(client).fetch(Plugin.class, name);
             verify(pluginProperties).getRuntimeMode();
             verify(pluginManager, never()).loadPlugin(any(Path.class));
@@ -177,12 +190,8 @@ class PluginReconcilerTest {
                 .thenReturn(null);
             when(pluginProperties.getRuntimeMode()).thenReturn(RuntimeMode.DEVELOPMENT);
 
-            var gotException = assertThrows(IllegalArgumentException.class,
-                () -> reconciler.reconcile(new Request(name)));
-
-            assertEquals("""
-                Please set plugin path annotation "plugin.halo.run/runtime-mode" in development \
-                mode for plugin fake-plugin.""", gotException.getMessage());
+            var result = reconciler.reconcile(new Request(name));
+            assertFalse(result.reEnqueue());
         }
 
         @Test
@@ -197,15 +206,18 @@ class PluginReconcilerTest {
 
             when(client.fetch(Plugin.class, name)).thenReturn(Optional.of(fakePlugin));
             when(pluginManager.getPluginsRoots()).thenReturn(List.of(tempPath));
-            when(pluginManager.getPlugin(name)).thenReturn(mock(PluginWrapper.class));
-            when(pluginManager.reloadPlugin(eq(name), any(Path.class))).thenReturn(true);
+            var pluginWrapper = mockPluginWrapper(PluginState.RESOLVED);
+            when(pluginManager.getPlugin(name)).thenReturn(pluginWrapper);
             when(pluginManager.startPlugin(name)).thenReturn(PluginState.STARTED);
+            when(pluginManager.getUnresolvedPlugins()).thenReturn(List.of(pluginWrapper));
+            when(pluginManager.getResolvedPlugins()).thenReturn(List.of());
 
             var result = reconciler.reconcile(new Request(name));
             assertFalse(result.reEnqueue());
 
+            verify(pluginManager).unloadPlugin(name);
             var loadLocation = Paths.get(fakePlugin.getStatus().getLoadLocation());
-            verify(pluginManager).reloadPlugin(name, loadLocation);
+            verify(pluginManager).loadPlugin(loadLocation);
         }
 
         @Test
@@ -229,9 +241,19 @@ class PluginReconcilerTest {
                 .thenReturn(mockPluginWrapperForStaticResources());
             when(pluginManager.startPlugin(name)).thenReturn(PluginState.FAILED);
 
-            var e = assertThrows(IllegalStateException.class,
-                () -> reconciler.reconcile(new Request(name)));
-            assertEquals("Failed to start plugin fake-plugin", e.getMessage());
+            var result = reconciler.reconcile(new Request(name));
+            assertFalse(result.reEnqueue());
+
+            verify(client).update(fakePlugin);
+            var status = fakePlugin.getStatus();
+            assertEquals(Plugin.Phase.FAILED, status.getPhase());
+            var condition = status.getConditions().peekFirst();
+            assertEquals(Condition.builder()
+                .type(PluginReconciler.ConditionType.READY)
+                .status(ConditionStatus.FALSE)
+                .reason(PluginReconciler.ConditionReason.START_ERROR)
+                .message("Failed to start plugin fake-plugin(FAILED).")
+                .build(), condition);
         }
 
         @Test
@@ -253,6 +275,8 @@ class PluginReconcilerTest {
                 // get setting extension
                 .thenReturn(mockPluginWrapperForSetting())
                 .thenReturn(mockPluginWrapperForStaticResources())
+                // before starting
+                .thenReturn(mockPluginWrapper(PluginState.STOPPED))
                 // sync plugin state
                 .thenReturn(mockPluginWrapper(PluginState.STARTED));
             when(pluginManager.startPlugin(name)).thenReturn(PluginState.STARTED);
@@ -277,13 +301,13 @@ class PluginReconcilerTest {
             assertNotNull(fakePlugin.getStatus().getLastStartTime());
 
             var condition = fakePlugin.getStatus().getConditions().peek();
-            assertEquals("STARTED", condition.getType());
+            assertEquals(PluginReconciler.ConditionType.READY, condition.getType());
             assertEquals(ConditionStatus.TRUE, condition.getStatus());
             assertEquals(clock.instant(), condition.getLastTransitionTime());
 
             verify(pluginManager).startPlugin(name);
             verify(pluginManager).loadPlugin(loadLocation);
-            verify(pluginManager, times(4)).getPlugin(name);
+            verify(pluginManager, times(5)).getPlugin(name);
             verify(client).update(fakePlugin);
             verify(client).fetch(Setting.class, settingName);
             verify(client).create(any(Setting.class));
@@ -354,8 +378,9 @@ class PluginReconcilerTest {
 
             var pluginRootResource =
                 new DefaultResourceLoader().getResource("classpath:plugin/plugin-0.0.1/");
-            var classLoader = new URLClassLoader(new URL[]{pluginRootResource.getURL()}, null);
+            var classLoader = new URLClassLoader(new URL[] {pluginRootResource.getURL()}, null);
             when(pluginWrapper.getPluginClassLoader()).thenReturn(classLoader);
+            lenient().when(pluginWrapper.getDescriptor()).thenReturn(new DefaultPluginDescriptor());
             return pluginWrapper;
         }
 
@@ -368,12 +393,14 @@ class PluginReconcilerTest {
             when(pluginClassLoader.getResource("console/style.css")).thenReturn(
                 mock(URL.class));
             when(pluginWrapper.getPluginClassLoader()).thenReturn(pluginClassLoader);
+            lenient().when(pluginWrapper.getDescriptor()).thenReturn(new DefaultPluginDescriptor());
             return pluginWrapper;
         }
 
         PluginWrapper mockPluginWrapper(PluginState state) {
             var pluginWrapper = mock(PluginWrapper.class);
-            when(pluginWrapper.getPluginState()).thenReturn(state);
+            lenient().when(pluginWrapper.getPluginState()).thenReturn(state);
+            lenient().when(pluginWrapper.getDescriptor()).thenReturn(new DefaultPluginDescriptor());
             return pluginWrapper;
         }
 

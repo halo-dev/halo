@@ -9,6 +9,7 @@ import { useMutation } from "@tanstack/vue-query";
 
 interface usePluginLifeCycleReturn {
   isStarted: ComputedRef<boolean | undefined>;
+  getStatusDotState: () => string;
   getStatusMessage: () => string | undefined;
   changeStatus: () => void;
   changingStatus: Ref<boolean>;
@@ -27,26 +28,41 @@ export function usePluginLifeCycle(
     );
   });
 
+  const getStatusDotState = () => {
+    const { phase } = plugin?.value?.status || {};
+    const { enabled } = plugin?.value?.spec || {};
+
+    if (enabled && phase === PluginStatusPhaseEnum.Failed) {
+      return "error";
+    }
+
+    if (phase === PluginStatusPhaseEnum.Disabling) {
+      return "warning";
+    }
+
+    return "default";
+  };
+
   const getStatusMessage = () => {
     if (!plugin?.value) return;
 
-    const { enabled } = plugin.value.spec || {};
     const { phase } = plugin.value.status || {};
 
-    // Starting failed
-    if (enabled && phase === PluginStatusPhaseEnum.Failed) {
+    if (
+      phase === PluginStatusPhaseEnum.Failed ||
+      phase === PluginStatusPhaseEnum.Disabling
+    ) {
       const lastCondition = plugin.value.status?.conditions?.[0];
 
       return (
         [lastCondition?.reason, lastCondition?.message]
           .filter(Boolean)
-          .join(":") || "Unknown"
+          .join(": ") || "Unknown"
       );
     }
 
     // Starting up
     if (
-      enabled &&
       phase !== (PluginStatusPhaseEnum.Started || PluginStatusPhaseEnum.Failed)
     ) {
       return t("core.common.status.starting_up");
@@ -153,6 +169,7 @@ export function usePluginLifeCycle(
 
   return {
     isStarted,
+    getStatusDotState,
     getStatusMessage,
     changeStatus,
     changingStatus,

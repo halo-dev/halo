@@ -31,13 +31,13 @@ export interface Condition {
      * @type {string}
      * @memberof Condition
      */
-    'message': string;
+    'message'?: string;
     /**
      * 
      * @type {string}
      * @memberof Condition
      */
-    'reason': string;
+    'reason'?: string;
     /**
      * 
      * @type {string}

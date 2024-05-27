@@ -62,4 +62,15 @@ public interface PluginService {
      * @return signed js bundle version by all enabled plugins version.
      */
     Mono<String> generateJsBundleVersion();
+
+    /**
+     * Enables or disables a plugin by name.
+     *
+     * @param pluginName plugin name
+     * @param requestToEnable request to enable or disable
+     * @param wait wait for plugin to be enabled or disabled
+     * @return updated plugin
+     */
+    Mono<Plugin> changeState(String pluginName, boolean requestToEnable, boolean wait);
+
 }
