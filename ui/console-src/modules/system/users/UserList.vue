@@ -247,6 +247,12 @@ function onPasswordChangeModalClose() {
   passwordChangeModal.value = false;
   refetch();
 }
+
+function onGrantPermissionModalClose() {
+  grantPermissionModal.value = false;
+  selectedUser.value = undefined;
+  refetch();
+}
 </script>
 <template>
   <UserEditingModal
@@ -264,9 +270,9 @@ function onPasswordChangeModalClose() {
   />
 
   <GrantPermissionModal
-    v-model:visible="grantPermissionModal"
+    v-if="grantPermissionModal"
     :user="selectedUser"
-    @close="refetch"
+    @close="onGrantPermissionModalClose"
   />
 
   <VPageHeader :title="$t('core.user.title')">
