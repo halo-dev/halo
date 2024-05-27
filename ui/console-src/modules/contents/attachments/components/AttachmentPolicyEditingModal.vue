@@ -1,14 +1,14 @@
 <script lang="ts" setup>
-import { Toast, VButton, VLoading, VModal, VSpace } from "@halo-dev/components";
 import SubmitButton from "@/components/button/SubmitButton.vue";
+import { setFocus } from "@/formkit/utils/focus";
+import { apiClient } from "@/utils/api-client";
+import { useSettingFormConvert } from "@console/composables/use-setting-form";
 import type { Policy } from "@halo-dev/api-client";
+import { Toast, VButton, VLoading, VModal, VSpace } from "@halo-dev/components";
+import { useQuery } from "@tanstack/vue-query";
 import { cloneDeep } from "lodash-es";
 import { computed, onMounted, ref, toRaw, toRefs } from "vue";
-import { useSettingFormConvert } from "@console/composables/use-setting-form";
-import { apiClient } from "@/utils/api-client";
-import { setFocus } from "@/formkit/utils/focus";
 import { useI18n } from "vue-i18n";
-import { useQuery } from "@tanstack/vue-query";
 
 const props = withDefaults(
   defineProps<{
@@ -63,6 +63,7 @@ const { data: policyTemplate } = useQuery({
     "core:attachment:policy-template",
     formState.value.spec.templateName,
   ],
+  cacheTime: 0,
   queryFn: async () => {
     const { data } =
       await apiClient.extension.storage.policyTemplate.getStorageHaloRunV1alpha1PolicyTemplate(
@@ -81,6 +82,7 @@ const { data: setting, isLoading } = useQuery({
     "core:attachment:policy-template:setting",
     policyTemplate.value?.spec?.settingName,
   ],
+  cacheTime: 0,
   queryFn: async () => {
     if (!policyTemplate.value?.spec?.settingName) {
       throw new Error("No setting found");
@@ -101,6 +103,7 @@ const { data: configMap } = useQuery({
     "core:attachment:policy-template:configMap",
     policy.value?.spec.configMapName,
   ],
+  cacheTime: 0,
   initialData: {
     data: {},
     apiVersion: "v1alpha1",
@@ -181,7 +184,13 @@ const modalTitle = props.policy
     });
 </script>
 <template>
-  <VModal ref="modal" :title="modalTitle" :width="600" @close="emit('close')">
+  <VModal
+    ref="modal"
+    mount-to-body
+    :title="modalTitle"
+    :width="600"
+    @close="emit('close')"
+  >
     <div>
       <VLoading v-if="isLoading" />
       <template v-else>
