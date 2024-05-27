@@ -1,12 +1,12 @@
 <script lang="ts" setup>
-import { Toast, VButton, VModal, VSpace } from "@halo-dev/components";
 import SubmitButton from "@/components/button/SubmitButton.vue";
-import type { Group } from "@halo-dev/api-client";
-import { onMounted, ref } from "vue";
-import { apiClient } from "@/utils/api-client";
 import { setFocus } from "@/formkit/utils/focus";
-import { useI18n } from "vue-i18n";
+import { apiClient } from "@/utils/api-client";
+import type { Group } from "@halo-dev/api-client";
+import { Toast, VButton, VModal, VSpace } from "@halo-dev/components";
 import { cloneDeep } from "lodash-es";
+import { onMounted, ref } from "vue";
+import { useI18n } from "vue-i18n";
 
 const props = withDefaults(
   defineProps<{
@@ -35,7 +35,7 @@ const formState = ref<Group>({
     generateName: "attachment-group-",
   },
 });
-const saving = ref(false);
+const isSubmitting = ref(false);
 
 const modalTitle = props.group
   ? t("core.attachment.group_editing_modal.titles.update")
@@ -43,7 +43,7 @@ const modalTitle = props.group
 
 const handleSave = async () => {
   try {
-    saving.value = true;
+    isSubmitting.value = true;
     if (props.group) {
       await apiClient.extension.storage.group.updateStorageHaloRunV1alpha1Group(
         {
@@ -64,7 +64,7 @@ const handleSave = async () => {
   } catch (e) {
     console.error("Failed to save attachment group", e);
   } finally {
-    saving.value = false;
+    isSubmitting.value = false;
   }
 };
 
@@ -77,7 +77,13 @@ onMounted(() => {
 });
 </script>
 <template>
-  <VModal ref="modal" :title="modalTitle" :width="500" @close="emit('close')">
+  <VModal
+    ref="modal"
+    mount-to-body
+    :title="modalTitle"
+    :width="500"
+    @close="emit('close')"
+  >
     <FormKit
       id="attachment-group-form"
       name="attachment-group-form"
@@ -100,7 +106,7 @@ onMounted(() => {
     <template #footer>
       <VSpace>
         <SubmitButton
-          :loading="saving"
+          :loading="isSubmitting"
           type="secondary"
           :text="$t('core.common.buttons.submit')"
           @submit="$formkit.submit('attachment-group-form')"

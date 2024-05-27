@@ -1,4 +1,9 @@
 <script lang="ts" setup>
+import UserFilterDropdown from "@/components/filter/UserFilterDropdown.vue";
+import LazyImage from "@/components/image/LazyImage.vue";
+import { apiClient } from "@/utils/api-client";
+import { isImage } from "@/utils/image";
+import type { Attachment, Group } from "@halo-dev/api-client";
 import {
   IconArrowLeft,
   IconArrowRight,
@@ -20,25 +25,20 @@ import {
   VPagination,
   VSpace,
 } from "@halo-dev/components";
-import LazyImage from "@/components/image/LazyImage.vue";
-import AttachmentDetailModal from "./components/AttachmentDetailModal.vue";
-import AttachmentUploadModal from "./components/AttachmentUploadModal.vue";
-import AttachmentPoliciesModal from "./components/AttachmentPoliciesModal.vue";
-import AttachmentGroupList from "./components/AttachmentGroupList.vue";
+import { useLocalStorage } from "@vueuse/core";
+import { useRouteQuery } from "@vueuse/router";
+import { cloneDeep } from "lodash-es";
 import type { Ref } from "vue";
 import { computed, onMounted, provide, ref, watch } from "vue";
-import type { Attachment, Group } from "@halo-dev/api-client";
-import { useFetchAttachmentPolicy } from "./composables/use-attachment-policy";
-import { useAttachmentControl } from "./composables/use-attachment";
-import { apiClient } from "@/utils/api-client";
-import { cloneDeep } from "lodash-es";
-import { isImage } from "@/utils/image";
-import { useRouteQuery } from "@vueuse/router";
-import { useFetchAttachmentGroup } from "./composables/use-attachment-group";
 import { useI18n } from "vue-i18n";
-import { useLocalStorage } from "@vueuse/core";
-import UserFilterDropdown from "@/components/filter/UserFilterDropdown.vue";
+import AttachmentDetailModal from "./components/AttachmentDetailModal.vue";
+import AttachmentGroupList from "./components/AttachmentGroupList.vue";
 import AttachmentListItem from "./components/AttachmentListItem.vue";
+import AttachmentPoliciesModal from "./components/AttachmentPoliciesModal.vue";
+import AttachmentUploadModal from "./components/AttachmentUploadModal.vue";
+import { useAttachmentControl } from "./composables/use-attachment";
+import { useFetchAttachmentGroup } from "./composables/use-attachment-group";
+import { useFetchAttachmentPolicy } from "./composables/use-attachment-policy";
 
 const { t } = useI18n();
 
@@ -47,7 +47,7 @@ const uploadVisible = ref(false);
 const detailVisible = ref(false);
 
 const { policies } = useFetchAttachmentPolicy();
-const { groups, handleFetchGroups } = useFetchAttachmentGroup();
+const { groups } = useFetchAttachmentGroup();
 
 const selectedGroup = useRouteQuery<string | undefined>("group");
 
@@ -465,11 +465,7 @@ onMounted(() => {
           </template>
 
           <div :style="`${viewType === 'list' ? 'padding:12px 16px 0' : ''}`">
-            <AttachmentGroupList
-              @select="handleReset"
-              @update="handleFetchGroups"
-              @reload-attachments="handleFetchAttachments"
-            />
+            <AttachmentGroupList @select="handleReset" />
           </div>
 
           <VLoading v-if="isLoading" />

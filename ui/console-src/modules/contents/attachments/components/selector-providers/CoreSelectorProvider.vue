@@ -1,4 +1,8 @@
 <script lang="ts" setup>
+import LazyImage from "@/components/image/LazyImage.vue";
+import { isImage } from "@/utils/image";
+import { matchMediaTypes } from "@/utils/media-type";
+import type { Attachment, Group } from "@halo-dev/api-client";
 import {
   IconArrowLeft,
   IconArrowRight,
@@ -12,16 +16,12 @@ import {
   VPagination,
   VSpace,
 } from "@halo-dev/components";
-import { computed, ref, watchEffect } from "vue";
-import { isImage } from "@/utils/image";
-import { useAttachmentControl } from "../../composables/use-attachment";
-import LazyImage from "@/components/image/LazyImage.vue";
 import type { AttachmentLike } from "@halo-dev/console-shared";
-import type { Attachment, Group } from "@halo-dev/api-client";
-import AttachmentUploadModal from "../AttachmentUploadModal.vue";
+import { computed, ref, watchEffect } from "vue";
+import { useAttachmentControl } from "../../composables/use-attachment";
 import AttachmentDetailModal from "../AttachmentDetailModal.vue";
 import AttachmentGroupList from "../AttachmentGroupList.vue";
-import { matchMediaTypes } from "@/utils/media-type";
+import AttachmentUploadModal from "../AttachmentUploadModal.vue";
 
 const props = withDefaults(
   defineProps<{
