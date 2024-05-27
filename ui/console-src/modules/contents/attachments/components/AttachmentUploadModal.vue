@@ -24,7 +24,7 @@ const { groups } = useFetchAttachmentGroup();
 const { policies, handleFetchPolicies } = useFetchAttachmentPolicy();
 const { policyTemplates } = useFetchAttachmentPolicyTemplate();
 
-const modal = ref();
+const modal = ref<InstanceType<typeof VModal> | null>(null);
 const selectedGroupName = useLocalStorage("attachment-upload-group", "");
 const selectedPolicyName = useLocalStorage("attachment-upload-policy", "");
 const policyEditingModal = ref(false);
@@ -182,7 +182,7 @@ const onEditingModalClose = async () => {
             ? ''
             : $t('core.attachment.upload_modal.filters.policy.not_select')
         "
-        :done-button-handler="() => modal.close()"
+        :done-button-handler="() => modal?.close()"
       />
     </div>
   </VModal>

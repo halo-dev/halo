@@ -23,7 +23,7 @@ const emit = defineEmits<{
 
 const { t } = useI18n();
 
-const modal = ref();
+const modal = ref<InstanceType<typeof VModal> | null>(null);
 const formState = ref<Group>({
   spec: {
     displayName: "",
@@ -60,7 +60,7 @@ const handleSave = async () => {
     }
 
     Toast.success(t("core.common.toast.save_success"));
-    modal.value.close();
+    modal.value?.close();
   } catch (e) {
     console.error("Failed to save attachment group", e);
   } finally {
@@ -106,7 +106,7 @@ onMounted(() => {
           @submit="$formkit.submit('attachment-group-form')"
         >
         </SubmitButton>
-        <VButton @click="modal.close()">
+        <VButton @click="modal?.close()">
           {{ $t("core.common.buttons.cancel_and_shortcut") }}
         </VButton>
       </VSpace>

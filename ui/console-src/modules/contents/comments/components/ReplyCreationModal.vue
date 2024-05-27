@@ -39,7 +39,7 @@ const emit = defineEmits<{
   (event: "close"): void;
 }>();
 
-const modal = ref();
+const modal = ref<InstanceType<typeof VModal> | null>(null);
 const formState = ref<ReplyRequest>({
   raw: "",
   content: "",
@@ -67,7 +67,7 @@ const handleCreateReply = async () => {
       replyRequest: formState.value,
     });
 
-    modal.value.close();
+    modal.value?.close();
 
     Toast.success(
       t("core.comment.reply_modal.operations.submit.toast_success")
@@ -149,7 +149,7 @@ const onEmojiSelect = (emoji: { native: string }) => {
           @submit="$formkit.submit('create-reply-form')"
         >
         </SubmitButton>
-        <VButton @click="modal.close()">
+        <VButton @click="modal?.close()">
           {{ $t("core.common.buttons.cancel_and_shortcut") }}
         </VButton>
       </VSpace>

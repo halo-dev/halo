@@ -33,7 +33,7 @@ const { t } = useI18n();
 const { policies, isLoading, handleFetchPolicies } = useFetchAttachmentPolicy();
 const { policyTemplates } = useFetchAttachmentPolicyTemplate();
 
-const modal = ref();
+const modal = ref<InstanceType<typeof VModal> | null>(null);
 const selectedPolicy = ref<Policy>();
 const selectedTemplateName = ref();
 
@@ -190,7 +190,7 @@ const onEditingModalClose = () => {
       </li>
     </ul>
     <template #footer>
-      <VButton @click="modal.close()">
+      <VButton @click="modal?.close()">
         {{ $t("core.common.buttons.close_and_shortcut") }}
       </VButton>
     </template>

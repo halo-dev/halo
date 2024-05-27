@@ -16,7 +16,7 @@ interface PasswordChangeFormState {
   password_confirm?: string;
 }
 
-const modal = ref<InstanceType<typeof VModal>>();
+const modal = ref<InstanceType<typeof VModal> | null>(null);
 
 const formState = ref<PasswordChangeFormState>({
   oldPassword: "",

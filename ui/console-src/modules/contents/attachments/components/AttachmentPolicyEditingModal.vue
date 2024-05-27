@@ -29,7 +29,7 @@ const emit = defineEmits<{
 
 const { t } = useI18n();
 
-const modal = ref();
+const modal = ref<InstanceType<typeof VModal> | null>(null);
 
 const formState = ref<Policy>({
   spec: {
@@ -164,7 +164,7 @@ const handleSave = async () => {
     }
 
     Toast.success(t("core.common.toast.save_success"));
-    modal.value.close();
+    modal.value?.close();
   } catch (e) {
     console.error("Failed to save attachment policy", e);
   } finally {
@@ -225,7 +225,7 @@ const modalTitle = props.policy
           @submit="$formkit.submit('attachment-policy-form')"
         >
         </SubmitButton>
-        <VButton @click="modal.close()">
+        <VButton @click="modal?.close()">
           {{ $t("core.common.buttons.cancel_and_shortcut") }}
         </VButton>
       </VSpace>

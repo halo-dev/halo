@@ -25,7 +25,7 @@ const emit = defineEmits<{
 const queryClient = useQueryClient();
 const { t } = useI18n();
 
-const modal = ref();
+const modal = ref<InstanceType<typeof VModal> | null>(null);
 
 const formState = ref<Menu>({
   spec: {
@@ -63,7 +63,7 @@ const handleSaveMenu = async () => {
 
     queryClient.invalidateQueries({ queryKey: ["menus"] });
 
-    modal.value.close();
+    modal.value?.close();
 
     Toast.success(t("core.common.toast.save_success"));
   } catch (e) {
@@ -107,7 +107,7 @@ onMounted(() => {
           @submit="$formkit.submit('menu-form')"
         >
         </SubmitButton>
-        <VButton @click="modal.close()">
+        <VButton @click="modal?.close()">
           {{ $t("core.common.buttons.cancel_and_shortcut") }}
         </VButton>
       </VSpace>

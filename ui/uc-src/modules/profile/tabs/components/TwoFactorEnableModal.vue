@@ -11,7 +11,7 @@ const emit = defineEmits<{
   (event: "close"): void;
 }>();
 
-const modal = ref();
+const modal = ref<InstanceType<typeof VModal> | null>(null);
 
 const { mutate, isLoading } = useMutation({
   mutationKey: ["enable-two-factor"],
@@ -25,7 +25,7 @@ const { mutate, isLoading } = useMutation({
   onSuccess() {
     Toast.success("启用成功");
     queryClient.invalidateQueries({ queryKey: ["two-factor-settings"] });
-    modal.value.close();
+    modal.value?.close();
   },
 });
 
@@ -52,7 +52,7 @@ function onSubmit(password: string) {
         >
           启用
         </VButton>
-        <VButton @click="modal.close()">关闭</VButton>
+        <VButton @click="modal?.close()">关闭</VButton>
       </VSpace>
     </template>
   </VModal>

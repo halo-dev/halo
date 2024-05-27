@@ -27,7 +27,7 @@ const emit = defineEmits<{
 
 const { t } = useI18n();
 
-const modal = ref();
+const modal = ref<InstanceType<typeof VModal> | null>(null);
 const selectedParentMenuItem = ref<string>("");
 const formState = ref<MenuItem>({
   spec: {
@@ -120,7 +120,7 @@ const handleSaveMenuItem = async () => {
       emit("saved", data);
     }
 
-    modal.value.close();
+    modal.value?.close();
 
     Toast.success(t("core.common.toast.save_success"));
   } catch (e) {
@@ -380,7 +380,7 @@ onMounted(() => {
           @submit="$formkit.submit('menuitem-form')"
         >
         </SubmitButton>
-        <VButton @click="modal.close()">
+        <VButton @click="modal?.close()">
           {{ $t("core.common.buttons.cancel_and_shortcut") }}
         </VButton>
       </VSpace>

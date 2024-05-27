@@ -41,7 +41,7 @@ const emit = defineEmits<{
 const { pluginToUpgrade } = toRefs(props);
 provide<Ref<Plugin | undefined>>("pluginToUpgrade", pluginToUpgrade);
 
-const modal = ref();
+const modal = ref<InstanceType<typeof VModal> | null>(null);
 
 const tabs = ref<PluginInstallationTab[]>([
   {
@@ -131,12 +131,12 @@ onMounted(() => {
           :is="tab.component"
           v-bind="tab.props"
           v-if="tab.id === activeTabId"
-          @close-modal="modal.close()"
+          @close-modal="modal?.close()"
         />
       </template>
     </div>
     <template #footer>
-      <VButton @click="modal.close()">
+      <VButton @click="modal?.close()">
         {{ $t("core.common.buttons.close") }}
       </VButton>
     </template>

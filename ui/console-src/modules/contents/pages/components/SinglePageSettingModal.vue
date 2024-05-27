@@ -67,7 +67,7 @@ const formState = ref<SinglePage>({
     name: randomUUID(),
   },
 });
-const modal = ref();
+const modal = ref<InstanceType<typeof VModal> | null>(null);
 const saving = ref(false);
 const publishing = ref(false);
 const publishCanceling = ref(false);
@@ -125,7 +125,7 @@ const handleSave = async () => {
 
   if (props.onlyEmit) {
     emit("saved", formState.value);
-    modal.value.close();
+    modal.value?.close();
     return;
   }
 
@@ -143,7 +143,7 @@ const handleSave = async () => {
     formState.value = data;
     emit("saved", data);
 
-    modal.value.close();
+    modal.value?.close();
 
     Toast.success(t("core.common.toast.save_success"));
   } catch (error) {
@@ -170,7 +170,7 @@ const handlePublish = async () => {
 
   if (props.onlyEmit) {
     emit("published", formState.value);
-    modal.value.close();
+    modal.value?.close();
     return;
   }
 
@@ -195,7 +195,7 @@ const handlePublish = async () => {
 
     emit("published", data);
 
-    modal.value.close();
+    modal.value?.close();
 
     Toast.success(t("core.common.toast.publish_success"));
   } catch (error) {
@@ -227,7 +227,7 @@ const handleUnpublish = async () => {
 
     formState.value = data;
 
-    modal.value.close();
+    modal.value?.close();
 
     Toast.success(t("core.common.toast.cancel_publish_success"));
   } catch (error) {
@@ -481,7 +481,7 @@ const { handleGenerateSlug } = useSlugify(
         <VButton :loading="saving" type="secondary" @click="handleSaveClick">
           {{ $t("core.common.buttons.save") }}
         </VButton>
-        <VButton type="default" @click="modal.close()">
+        <VButton type="default" @click="modal?.close()">
           {{ $t("core.common.buttons.close") }}
         </VButton>
       </VSpace>
