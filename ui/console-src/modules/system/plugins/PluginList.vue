@@ -1,4 +1,7 @@
 <script lang="ts" setup>
+import { apiClient } from "@/utils/api-client";
+import { usePermission } from "@/utils/permission";
+import { PluginStatusPhaseEnum, type Plugin } from "@halo-dev/api-client";
 import {
   Dialog,
   IconAddCircle,
@@ -13,16 +16,13 @@ import {
   VPageHeader,
   VSpace,
 } from "@halo-dev/components";
-import PluginListItem from "./components/PluginListItem.vue";
-import PluginInstallationModal from "./components/PluginInstallationModal.vue";
+import { useQuery } from "@tanstack/vue-query";
+import { useRouteQuery } from "@vueuse/router";
 import type { Ref } from "vue";
 import { computed, onMounted, provide, ref, watch } from "vue";
-import { apiClient } from "@/utils/api-client";
-import { usePermission } from "@/utils/permission";
-import { useQuery } from "@tanstack/vue-query";
-import { PluginStatusPhaseEnum, type Plugin } from "@halo-dev/api-client";
 import { useI18n } from "vue-i18n";
-import { useRouteQuery } from "@vueuse/router";
+import PluginInstallationModal from "./components/PluginInstallationModal.vue";
+import PluginListItem from "./components/PluginListItem.vue";
 import { usePluginBatchOperations } from "./composables/use-plugin";
 
 const { t } = useI18n();
@@ -30,10 +30,17 @@ const { currentUserHasPermission } = usePermission();
 
 const pluginInstallationModalVisible = ref(false);
 
-const keyword = ref("");
+const keyword = useRouteQuery<string>("keyword", "");
 
-const selectedEnabledValue = ref();
-const selectedSortValue = ref();
+const selectedEnabledValue = useRouteQuery<
+  string | undefined,
+  boolean | undefined
+>("enabled", undefined, {
+  transform: (value) => {
+    return value ? value === "true" : undefined;
+  },
+});
+const selectedSortValue = useRouteQuery<string | undefined>("sort");
 
 const hasFilters = computed(() => {
   return selectedEnabledValue.value !== undefined || selectedSortValue.value;
