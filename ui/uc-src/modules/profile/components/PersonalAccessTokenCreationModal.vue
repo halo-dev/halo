@@ -20,7 +20,7 @@ const emit = defineEmits<{
   (event: "close"): void;
 }>();
 
-const modal = ref();
+const modal = ref<InstanceType<typeof VModal> | null>(null);
 
 const formState = ref<
   Omit<PersonalAccessToken, "spec"> & {
@@ -249,7 +249,7 @@ const { mutate, isLoading } = useMutation({
           :text="$t('core.common.buttons.submit')"
           @submit="$formkit.submit('pat-creation-form')"
         />
-        <VButton @click="modal.close()">
+        <VButton @click="modal?.close()">
           {{ $t("core.common.buttons.cancel_and_shortcut") }}
         </VButton>
       </VSpace>

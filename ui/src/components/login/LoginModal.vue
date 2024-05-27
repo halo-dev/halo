@@ -9,7 +9,7 @@ import { ref } from "vue";
 const userStore = useUserStore();
 const { t } = useI18n();
 
-const modal = ref<InstanceType<typeof VModal>>();
+const modal = ref<InstanceType<typeof VModal> | null>(null);
 
 const onLoginSucceed = () => {
   modal.value?.close();

@@ -29,7 +29,7 @@ const emit = defineEmits<{
   (event: "success", post: Post): void;
 }>();
 
-const modal = ref();
+const modal = ref<InstanceType<typeof VModal> | null>(null);
 
 const { mutate, isLoading } = useMutation({
   mutationKey: ["uc:create-post"],
@@ -84,7 +84,7 @@ const { mutate, isLoading } = useMutation({
     }
 
     emit("success", data);
-    modal.value.close();
+    modal.value?.close();
   },
   onError() {
     if (props.publish) {
@@ -133,7 +133,7 @@ function onSubmit(data: PostFormState) {
               : $t("core.common.buttons.save")
           }}
         </VButton>
-        <VButton type="default" @click="modal.close()">
+        <VButton type="default" @click="modal?.close()">
           {{ $t("core.common.buttons.close") }}
         </VButton>
       </VSpace>

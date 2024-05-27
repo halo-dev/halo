@@ -32,7 +32,7 @@ const emit = defineEmits<{
   (event: "select", theme: Theme | undefined): void;
 }>();
 
-const modal = ref();
+const modal = ref<InstanceType<typeof VModal> | null>(null);
 
 const tabs = ref<ThemeListTab[]>([
   {
@@ -66,7 +66,7 @@ watch(
   (value, oldValue) => {
     if (value && oldValue) {
       emit("select", value);
-      modal.value.close();
+      modal.value?.close();
     }
   }
 );
@@ -145,7 +145,7 @@ onMounted(() => {
     </div>
 
     <template #footer>
-      <VButton @click="modal.close()">
+      <VButton @click="modal?.close()">
         {{ $t("core.common.buttons.close") }}
       </VButton>
     </template>

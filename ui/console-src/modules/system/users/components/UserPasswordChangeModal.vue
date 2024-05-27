@@ -30,7 +30,7 @@ const initialFormState: PasswordChangeFormState = {
   password_confirm: "",
 };
 
-const modal = ref<InstanceType<typeof VModal>>();
+const modal = ref<InstanceType<typeof VModal> | null>(null);
 const formState = ref<PasswordChangeFormState>(cloneDeep(initialFormState));
 const isSubmitting = ref(false);
 

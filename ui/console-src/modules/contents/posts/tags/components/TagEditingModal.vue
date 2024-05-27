@@ -59,7 +59,7 @@ const formState = ref<Tag>({
   },
 });
 
-const modal = ref();
+const modal = ref<InstanceType<typeof VModal> | null>(null);
 
 const saving = ref(false);
 
@@ -101,7 +101,7 @@ const handleSaveTag = async () => {
       });
     }
 
-    modal.value.close();
+    modal.value?.close();
 
     Toast.success(t("core.common.toast.save_success"));
   } catch (e) {
@@ -258,7 +258,7 @@ const { handleGenerateSlug } = useSlugify(
           @submit="$formkit.submit('tag-form')"
         >
         </SubmitButton>
-        <VButton @click="modal.close()">
+        <VButton @click="modal?.close()">
           {{ $t("core.common.buttons.cancel_and_shortcut") }}
         </VButton>
       </VSpace>

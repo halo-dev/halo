@@ -18,7 +18,7 @@ const emit = defineEmits<{
   (event: "close"): void;
 }>();
 
-const modal = ref<InstanceType<typeof VModal>>();
+const modal = ref<InstanceType<typeof VModal> | null>(null);
 const selectedRole = ref("");
 const isSubmitting = ref(false);
 

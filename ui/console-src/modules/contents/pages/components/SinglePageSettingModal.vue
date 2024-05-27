@@ -1,4 +1,14 @@
 <script lang="ts" setup>
+import AnnotationsForm from "@/components/form/AnnotationsForm.vue";
+import { singlePageLabels } from "@/constants/labels";
+import { FormType } from "@/types/slug";
+import { apiClient } from "@/utils/api-client";
+import { toDatetimeLocal, toISOString } from "@/utils/date";
+import { randomUUID } from "@/utils/id";
+import useSlugify from "@console/composables/use-slugify";
+import { useThemeCustomTemplates } from "@console/modules/interface/themes/composables/use-theme";
+import { submitForm } from "@formkit/core";
+import type { SinglePage } from "@halo-dev/api-client";
 import {
   IconRefreshLine,
   Toast,
@@ -6,20 +16,10 @@ import {
   VModal,
   VSpace,
 } from "@halo-dev/components";
-import { computed, nextTick, ref, watch } from "vue";
-import type { SinglePage } from "@halo-dev/api-client";
 import { cloneDeep } from "lodash-es";
-import { apiClient } from "@/utils/api-client";
-import { useThemeCustomTemplates } from "@console/modules/interface/themes/composables/use-theme";
-import { singlePageLabels } from "@/constants/labels";
-import { randomUUID } from "@/utils/id";
-import { toDatetimeLocal, toISOString } from "@/utils/date";
-import { submitForm } from "@formkit/core";
-import AnnotationsForm from "@/components/form/AnnotationsForm.vue";
-import useSlugify from "@console/composables/use-slugify";
+import { computed, nextTick, ref, watch } from "vue";
 import { useI18n } from "vue-i18n";
 import { usePageUpdateMutate } from "../composables/use-page-update-mutate";
-import { FormType } from "@/types/slug";
 
 const props = withDefaults(
   defineProps<{
@@ -67,7 +67,7 @@ const formState = ref<SinglePage>({
     name: randomUUID(),
   },
 });
-const modal = ref<InstanceType<typeof VModal>>();
+const modal = ref<InstanceType<typeof VModal> | null>(null);
 const isSubmitting = ref(false);
 const publishing = ref(false);
 const publishCanceling = ref(false);

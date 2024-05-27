@@ -64,7 +64,7 @@ const formState = ref<Category>({
 });
 const selectedParentCategory = ref();
 const saving = ref(false);
-const modal = ref();
+const modal = ref<InstanceType<typeof VModal> | null>(null);
 
 const isUpdateMode = !!props.category;
 
@@ -138,7 +138,7 @@ const handleSaveCategory = async () => {
       }
     }
 
-    modal.value.close();
+    modal.value?.close();
 
     queryClient.invalidateQueries({ queryKey: ["post-categories"] });
 
@@ -304,7 +304,7 @@ const { handleGenerateSlug } = useSlugify(
           @submit="$formkit.submit('category-form')"
         >
         </SubmitButton>
-        <VButton @click="modal.close()">
+        <VButton @click="modal?.close()">
           {{ $t("core.common.buttons.cancel_and_shortcut") }}
         </VButton>
       </VSpace>

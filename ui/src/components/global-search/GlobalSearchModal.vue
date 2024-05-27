@@ -32,7 +32,7 @@ const emit = defineEmits<{
   (e: "close"): void;
 }>();
 
-const modal = ref<InstanceType<typeof VModal>>();
+const modal = ref<InstanceType<typeof VModal> | null>(null);
 const globalSearchInput = ref<HTMLInputElement | null>(null);
 const keyword = ref("");
 

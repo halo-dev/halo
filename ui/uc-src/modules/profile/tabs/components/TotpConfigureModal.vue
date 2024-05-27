@@ -13,7 +13,7 @@ const emit = defineEmits<{
   (event: "close"): void;
 }>();
 
-const modal = ref();
+const modal = ref<InstanceType<typeof VModal> | null>(null);
 
 const { data } = useQuery({
   queryKey: ["totp-auth-link"],
@@ -35,7 +35,7 @@ const { mutate, isLoading } = useMutation({
   onSuccess() {
     Toast.success("配置成功");
     queryClient.invalidateQueries({ queryKey: ["two-factor-settings"] });
-    modal.value.close();
+    modal.value?.close();
   },
 });
 
@@ -106,7 +106,7 @@ function onSubmit(data: TotpRequest) {
         >
           完成
         </VButton>
-        <VButton @click="modal.close()">关闭</VButton>
+        <VButton @click="modal?.close()">关闭</VButton>
       </VSpace>
     </template>
   </VModal>
