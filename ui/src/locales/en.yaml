@@ -908,6 +908,9 @@ core:
         repo: Source Repository
         load_location: Storage Location
         issues: Issues feedback
+      operations:
+        view_conditions:
+          button: View recent conditions
     loader:
       toast:
         entry_load_failed: Failed to load plugins entry file
@@ -916,6 +919,14 @@ core:
       editor:
         providers:
           default: Default Editor
+    conditions_modal:
+      title: Recent conditions
+      fields:
+        type: Type
+        status: Status
+        reason: Reason
+        message: Message
+        last_transition_time: Last transition time
   user:
     title: Users
     actions:

@@ -3,6 +3,7 @@ package run.halo.app.core.extension.service.impl;
 import static java.util.Objects.requireNonNull;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertInstanceOf;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.isA;
@@ -40,9 +41,9 @@ import run.halo.app.extension.ReactiveExtensionClient;
 import run.halo.app.infra.SystemVersionSupplier;
 import run.halo.app.infra.exception.PluginAlreadyExistsException;
 import run.halo.app.infra.utils.FileUtils;
-import run.halo.app.plugin.HaloPluginManager;
 import run.halo.app.plugin.PluginConst;
 import run.halo.app.plugin.PluginProperties;
+import run.halo.app.plugin.SpringPluginManager;
 import run.halo.app.plugin.YamlPluginFinder;
 
 @ExtendWith(MockitoExtension.class)
@@ -58,7 +59,7 @@ class PluginServiceImplTest {
     PluginProperties pluginProperties;
 
     @Mock
-    HaloPluginManager pluginManager;
+    SpringPluginManager pluginManager;
 
     @InjectMocks
     PluginServiceImpl pluginService;
@@ -233,15 +234,6 @@ class PluginServiceImplTest {
             verify(client).update(testPlugin);
         }
 
-        Plugin createPlugin(String name, Consumer<Plugin> pluginConsumer) {
-            var plugin = new Plugin();
-            plugin.setMetadata(new Metadata());
-            plugin.getMetadata().setName(name);
-            plugin.setSpec(new Plugin.PluginSpec());
-            plugin.setStatus(new Plugin.PluginStatus());
-            pluginConsumer.accept(plugin);
-            return plugin;
-        }
     }
 
 
@@ -298,5 +290,62 @@ class PluginServiceImplTest {
             .verifyComplete();
 
         assertThat(result).isNotEqualTo(result2);
+    }
+
+    @Nested
+    class PluginStateChangeTest {
+
+        @Test
+        void shouldEnablePluginIfPluginWasNotStarted() {
+            var plugin = createPlugin("fake-plugin", p -> {
+                p.getSpec().setEnabled(false);
+                p.statusNonNull().setPhase(Plugin.Phase.RESOLVED);
+            });
+
+            when(client.get(Plugin.class, "fake-plugin")).thenReturn(Mono.just(plugin))
+                .thenReturn(Mono.fromSupplier(() -> {
+                    plugin.statusNonNull().setPhase(Plugin.Phase.STARTED);
+                    return plugin;
+                }));
+            when(client.update(plugin)).thenReturn(Mono.just(plugin));
+
+            pluginService.changeState("fake-plugin", true, false)
+                .as(StepVerifier::create)
+                .expectNext(plugin)
+                .verifyComplete();
+
+            assertTrue(plugin.getSpec().getEnabled());
+        }
+
+        @Test
+        void shouldDisablePluginIfAlreadyStarted() {
+            var plugin = createPlugin("fake-plugin", p -> {
+                p.getSpec().setEnabled(true);
+                p.statusNonNull().setPhase(Plugin.Phase.STARTED);
+            });
+
+            when(client.get(Plugin.class, "fake-plugin")).thenReturn(Mono.just(plugin))
+                .thenReturn(Mono.fromSupplier(() -> {
+                    plugin.getStatus().setPhase(Plugin.Phase.STOPPED);
+                    return plugin;
+                }));
+            when(client.update(plugin)).thenReturn(Mono.just(plugin));
+
+            pluginService.changeState("fake-plugin", false, false)
+                .as(StepVerifier::create)
+                .expectNext(plugin)
+                .verifyComplete();
+            assertFalse(plugin.getSpec().getEnabled());
+        }
+    }
+
+    Plugin createPlugin(String name, Consumer<Plugin> pluginConsumer) {
+        var plugin = new Plugin();
+        plugin.setMetadata(new Metadata());
+        plugin.getMetadata().setName(name);
+        plugin.setSpec(new Plugin.PluginSpec());
+        plugin.setStatus(new Plugin.PluginStatus());
+        pluginConsumer.accept(plugin);
+        return plugin;
     }
 }

@@ -864,6 +864,9 @@ core:
         repo: 源码仓库
         load_location: 存储位置
         issues: 问题反馈
+      operations:
+        view_conditions:
+          button: 查看最近状态
     loader:
       toast:
         entry_load_failed: 加载插件入口文件失败
@@ -872,6 +875,14 @@ core:
       editor:
         providers:
           default: 默认编辑器
+    conditions_modal:
+      title: 插件最近状态
+      fields:
+        type: 类型
+        status: 状态
+        reason: 原因
+        message: 信息
+        last_transition_time: 时间
   user:
     title: 用户
     actions:

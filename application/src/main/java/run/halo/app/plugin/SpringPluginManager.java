@@ -1,6 +1,5 @@
 package run.halo.app.plugin;
 
-import java.nio.file.Path;
 import java.util.List;
 import org.pf4j.PluginManager;
 import org.pf4j.PluginWrapper;
@@ -11,15 +10,6 @@ public interface SpringPluginManager extends PluginManager {
     ApplicationContext getRootContext();
 
     ApplicationContext getSharedContext();
-
-    /**
-     * Reload the plugin and the plugins that depend on it.
-     *
-     * @param pluginId plugin id
-     * @param loadLocation new load location
-     * @return true if reload successfully, otherwise false
-     */
-    boolean reloadPlugin(String pluginId, Path loadLocation);
 
     /**
      * Get all dependents recursively.
