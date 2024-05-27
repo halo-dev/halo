@@ -2,11 +2,12 @@
 import { Toast, VButton, VModal, VSpace } from "@halo-dev/components";
 import SubmitButton from "@/components/button/SubmitButton.vue";
 import type { Menu } from "@halo-dev/api-client";
-import { onMounted, ref, toRaw } from "vue";
+import { onMounted, ref } from "vue";
 import { apiClient } from "@/utils/api-client";
 import { setFocus } from "@/formkit/utils/focus";
 import { useI18n } from "vue-i18n";
 import { useQueryClient } from "@tanstack/vue-query";
+import { cloneDeep } from "lodash-es";
 
 const props = withDefaults(
   defineProps<{
@@ -75,7 +76,7 @@ const handleSaveMenu = async () => {
 
 onMounted(() => {
   if (props.menu) {
-    formState.value = toRaw(props.menu);
+    formState.value = cloneDeep(props.menu);
   }
   setFocus("menuDisplayNameInput");
 });

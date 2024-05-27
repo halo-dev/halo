@@ -1,12 +1,13 @@
 <script lang="ts" setup>
 import { Toast, VButton, VModal, VSpace } from "@halo-dev/components";
 import SubmitButton from "@/components/button/SubmitButton.vue";
-import { computed, nextTick, onMounted, ref, toRaw } from "vue";
+import { computed, nextTick, onMounted, ref } from "vue";
 import type { Menu, MenuItem, Ref } from "@halo-dev/api-client";
 import { apiClient } from "@/utils/api-client";
 import { setFocus } from "@/formkit/utils/focus";
 import AnnotationsForm from "@/components/form/AnnotationsForm.vue";
 import { useI18n } from "vue-i18n";
+import { cloneDeep } from "lodash-es";
 
 const props = withDefaults(
   defineProps<{
@@ -208,7 +209,7 @@ const onMenuItemSourceChange = () => {
 
 onMounted(() => {
   if (props.menuItem) {
-    formState.value = toRaw(props.menuItem);
+    formState.value = cloneDeep(props.menuItem);
 
     // Set Ref related
     const { targetRef } = formState.value.spec;
