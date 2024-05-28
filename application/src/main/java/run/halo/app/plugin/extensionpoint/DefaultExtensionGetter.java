@@ -8,12 +8,14 @@ import java.util.stream.Stream;
 import lombok.RequiredArgsConstructor;
 import org.pf4j.ExtensionPoint;
 import org.pf4j.PluginManager;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.context.ApplicationContext;
 import org.springframework.core.annotation.AnnotationAwareOrderComparator;
 import org.springframework.lang.NonNull;
 import org.springframework.stereotype.Component;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
+import run.halo.app.cache.CacheNames;
 import run.halo.app.extension.ReactiveExtensionClient;
 import run.halo.app.infra.SystemConfigurableEnvironmentFetcher;
 import run.halo.app.infra.SystemSetting.ExtensionPointEnabled;
@@ -72,6 +74,10 @@ public class DefaultExtensionGetter implements ExtensionGetter {
     }
 
     @Override
+    @Cacheable(
+        value = CacheNames.EXTENSION_POINT_DEFINITIONS,
+        condition = "@cacheConditionProvider.isExtensionPointDefinitionCacheEnabled()"
+    )
     public <T extends ExtensionPoint> Flux<T> getEnabledExtensionByDefinition(
         Class<T> extensionPoint) {
         return fetchExtensionPointDefinition(extensionPoint)
@@ -88,6 +94,10 @@ public class DefaultExtensionGetter implements ExtensionGetter {
     }
 
     @Override
+    @Cacheable(
+        value = CacheNames.PLUGIN_EXTENSIONS,
+        condition = "@cacheConditionProvider.isPluginExtensionCacheEnabled()"
+    )
     public <T extends ExtensionPoint> Flux<T> getExtensions(Class<T> extensionPointClass) {
         var extensions = new ArrayList<>(pluginManager.getExtensions(extensionPointClass));
         applicationContext.getBeanProvider(extensionPointClass)

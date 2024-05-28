@@ -37,6 +37,13 @@ halo:
     page:
       # Disable page cache by default due to experimental feature
       disabled: true
+    role-dependencies:
+      disabled: ${ROLE_DEPENDENCIES_CACHE_DISABLED:true}
+    plugin-extension:
+      disabled: ${PLUGIN_EXTENSION_CACHE_DISABLED:true}
+    extension-point-definition:
+      disabled: ${EXTENSION_POINT_DEFINITION_CACHE_DISABLED:true}
+
   work-dir: ${user.home}/.halo2
   plugin:
     plugins-root: ${halo.work-dir}/plugins

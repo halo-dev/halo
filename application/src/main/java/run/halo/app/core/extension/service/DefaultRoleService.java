@@ -13,11 +13,13 @@ import java.util.function.Predicate;
 import java.util.stream.Collectors;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.lang.NonNull;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
+import run.halo.app.cache.CacheNames;
 import run.halo.app.core.extension.Role;
 import run.halo.app.core.extension.RoleBinding;
 import run.halo.app.core.extension.RoleBinding.RoleRef;
@@ -72,6 +74,10 @@ public class DefaultRoleService implements RoleService {
     }
 
     @Override
+    @Cacheable(
+        value = CacheNames.ROLE_DEPENDENCIES,
+        condition = "@cacheConditionProvider.isRoleCacheEnabled()"
+    )
     public Flux<Role> listDependenciesFlux(Set<String> names) {
         return listDependencies(names, shouldFilterHidden(false));
     }

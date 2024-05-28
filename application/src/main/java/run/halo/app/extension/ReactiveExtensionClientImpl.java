@@ -18,6 +18,8 @@ import java.util.function.Predicate;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Caching;
 import org.springframework.context.event.ContextRefreshedEvent;
 import org.springframework.context.event.EventListener;
 import org.springframework.dao.DataIntegrityViolationException;
@@ -29,6 +31,7 @@ import org.springframework.transaction.reactive.TransactionalOperator;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import reactor.util.retry.Retry;
+import run.halo.app.cache.CacheNames;
 import run.halo.app.extension.exception.ExtensionNotFoundException;
 import run.halo.app.extension.index.DefaultExtensionIterator;
 import run.halo.app.extension.index.ExtensionIterator;
@@ -170,6 +173,24 @@ public class ReactiveExtensionClientImpl implements ReactiveExtensionClient {
     }
 
     @Override
+    @Caching(evict = {
+        @CacheEvict(
+            value = CacheNames.ROLE_DEPENDENCIES,
+            condition = "@cacheConditionProvider.isRoleDependenciesCacheEvictableByKind"
+                + "(#extension.kind)",
+            allEntries = true),
+        @CacheEvict(
+            value = CacheNames.PLUGIN_EXTENSIONS,
+            condition =
+                "@cacheConditionProvider.isPluginExtensionCacheEvictableByKind"
+                    + "(#extension.kind)",
+            allEntries = true),
+        @CacheEvict(
+            value = CacheNames.EXTENSION_POINT_DEFINITIONS,
+            condition = "@cacheConditionProvider.isExtensionPointDefinitionCacheEvictableByKind"
+                + "(#extension.kind)",
+            allEntries = true)
+    })
     public <E extends Extension> Mono<E> create(E extension) {
         checkClientWritable(extension);
         return Mono.just(extension)
@@ -203,6 +224,24 @@ public class ReactiveExtensionClientImpl implements ReactiveExtensionClient {
     }
 
     @Override
+    @Caching(evict = {
+        @CacheEvict(
+            value = CacheNames.ROLE_DEPENDENCIES,
+            condition = "@cacheConditionProvider.isRoleDependenciesCacheEvictableByKind"
+                + "(#extension.kind)",
+            allEntries = true),
+        @CacheEvict(
+            value = CacheNames.PLUGIN_EXTENSIONS,
+            condition =
+                "@cacheConditionProvider.isPluginExtensionCacheEvictableByKind"
+                    + "(#extension.kind)",
+            allEntries = true),
+        @CacheEvict(
+            value = CacheNames.EXTENSION_POINT_DEFINITIONS,
+            condition = "@cacheConditionProvider.isExtensionPointDefinitionCacheEvictableByKind"
+                + "(#extension.kind)",
+            allEntries = true)
+    })
     public <E extends Extension> Mono<E> update(E extension) {
         checkClientWritable(extension);
         // Refactor the atomic reference if we have a better solution.
@@ -245,6 +284,24 @@ public class ReactiveExtensionClientImpl implements ReactiveExtensionClient {
     }
 
     @Override
+    @Caching(evict = {
+        @CacheEvict(
+            value = CacheNames.ROLE_DEPENDENCIES,
+            condition = "@cacheConditionProvider.isRoleDependenciesCacheEvictableByKind"
+                + "(#extension.kind)",
+            allEntries = true),
+        @CacheEvict(
+            value = CacheNames.PLUGIN_EXTENSIONS,
+            condition =
+                "@cacheConditionProvider.isPluginExtensionCacheEvictableByKind"
+                    + "(#extension.kind)",
+            allEntries = true),
+        @CacheEvict(
+            value = CacheNames.EXTENSION_POINT_DEFINITIONS,
+            condition = "@cacheConditionProvider.isExtensionPointDefinitionCacheEvictableByKind"
+                + "(#extension.kind)",
+            allEntries = true)
+    })
     public <E extends Extension> Mono<E> delete(E extension) {
         checkClientWritable(extension);
         // set deletionTimestamp
