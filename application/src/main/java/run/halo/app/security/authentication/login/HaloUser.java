@@ -1,113 +1,120 @@
 package run.halo.app.security.authentication.login;
 
 import java.util.Collection;
-import java.util.Comparator;
-import java.util.List;
 import java.util.Objects;
 import org.springframework.security.core.CredentialsContainer;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.util.Assert;
-import run.halo.app.core.extension.User;
+import run.halo.app.security.HaloUserDetails;
 
-public class HaloUser implements UserDetails, CredentialsContainer {
+public class HaloUser implements HaloUserDetails, CredentialsContainer {
 
-    private final User delegate;
+    private final UserDetails delegate;
 
-    private final Collection<? extends GrantedAuthority> authorities;
+    private final boolean twoFactorAuthEnabled;
 
-    public HaloUser(User delegate, Collection<? extends GrantedAuthority> authorities) {
+    private String totpEncryptedSecret;
+
+    public HaloUser(UserDetails delegate,
+        boolean twoFactorAuthEnabled,
+        String totpEncryptedSecret) {
         Assert.notNull(delegate, "Delegate user must not be null");
-        Assert.notNull(authorities, "Authorities must not be null");
         this.delegate = delegate;
-
-        this.authorities = authorities.stream()
-            .filter(Objects::nonNull)
-            .sorted(Comparator.comparing(GrantedAuthority::getAuthority))
-            .toList();
-    }
-
-    public HaloUser(User delegate) {
-        this(delegate, List.of());
+        this.twoFactorAuthEnabled = twoFactorAuthEnabled;
+        this.totpEncryptedSecret = totpEncryptedSecret;
     }
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
-        return authorities;
+        return delegate.getAuthorities();
     }
 
     @Override
     public String getPassword() {
-        return delegate.getSpec().getPassword();
+        return delegate.getPassword();
     }
 
     @Override
     public String getUsername() {
-        return delegate.getMetadata().getName();
+        return delegate.getUsername();
     }
 
     @Override
     public boolean isAccountNonExpired() {
-        return true;
+        return delegate.isAccountNonExpired();
     }
 
     @Override
     public boolean isAccountNonLocked() {
-        return true;
+        return delegate.isAccountNonLocked();
     }
 
     @Override
     public boolean isCredentialsNonExpired() {
-        return true;
+        return delegate.isCredentialsNonExpired();
     }
 
     @Override
     public boolean isEnabled() {
-        var disabled = delegate.getSpec().getDisabled();
-        return disabled == null || !disabled;
-    }
-
-    public User getDelegate() {
-        return delegate;
+        return delegate.isEnabled();
     }
 
     @Override
     public void eraseCredentials() {
-        delegate.getSpec().setPassword(null);
+        if (delegate instanceof CredentialsContainer container) {
+            container.eraseCredentials();
+        }
+        this.totpEncryptedSecret = null;
     }
 
     @Override
     public boolean equals(Object obj) {
         if (obj instanceof HaloUser user) {
-            var username = this.delegate.getMetadata().getName();
-            var otherUsername = user.delegate.getMetadata().getName();
-            return username.equals(otherUsername);
+            return Objects.equals(this.delegate, user.delegate);
         }
         return false;
     }
 
     @Override
     public int hashCode() {
-        return this.delegate.getMetadata().getName().hashCode();
+        return this.delegate.hashCode();
+    }
+
+    @Override
+    public boolean isTwoFactorAuthEnabled() {
+        return this.twoFactorAuthEnabled;
+    }
+
+    @Override
+    public String getTotpEncryptedSecret() {
+        return this.totpEncryptedSecret;
     }
 
     public static class Builder {
 
-        private final User user;
+        private final UserDetails user;
 
-        private Collection<? extends GrantedAuthority> authorities;
+        private boolean twoFactorAuthEnabled;
 
-        public Builder(User user) {
+        private String totpEncryptedSecret;
+
+        public Builder(UserDetails user) {
             this.user = user;
         }
 
-        public Builder authorities(Collection<? extends GrantedAuthority> authorities) {
-            this.authorities = authorities;
+        public Builder twoFactorAuthEnabled(boolean twoFactorAuthEnabled) {
+            this.twoFactorAuthEnabled = twoFactorAuthEnabled;
             return this;
         }
 
-        public HaloUser build() {
-            return new HaloUser(user, authorities);
+        public Builder totpEncryptedSecret(String totpEncryptedSecret) {
+            this.totpEncryptedSecret = totpEncryptedSecret;
+            return this;
+        }
+
+        public HaloUserDetails build() {
+            return new HaloUser(user, twoFactorAuthEnabled, totpEncryptedSecret);
         }
     }
 }

@@ -1,5 +1,6 @@
 package run.halo.app.security;
 
+import static java.util.Objects.requireNonNullElse;
 import static run.halo.app.core.extension.User.GROUP;
 import static run.halo.app.core.extension.User.KIND;
 import static run.halo.app.security.authorization.AuthorityUtils.ANONYMOUS_ROLE_NAME;
@@ -48,19 +49,27 @@ public class DefaultUserDetailService
             .flatMap(user -> {
                 var name = user.getMetadata().getName();
                 var subject = new Subject(KIND, name, GROUP);
-
-                var builder = new HaloUser.Builder(user);
-
+                var userBuilder = User.withUsername(name)
+                    .password(user.getSpec().getPassword())
+                    .disabled(requireNonNullElse(user.getSpec().getDisabled(), false));
                 var setAuthorities = roleService.listRoleRefs(subject)
                     .filter(this::isRoleRef)
                     .map(RoleRef::getName)
                     // every authenticated user should have authenticated and anonymous roles.
                     .concatWithValues(AUTHENTICATED_ROLE_NAME, ANONYMOUS_ROLE_NAME)
                     .map(roleName -> new SimpleGrantedAuthority(ROLE_PREFIX + roleName))
+                    .distinct()
                     .collectList()
-                    .doOnNext(builder::authorities);
+                    .doOnNext(userBuilder::authorities);
 
-                return setAuthorities.then(Mono.fromSupplier(builder::build));
+                return setAuthorities.then(Mono.fromSupplier(() -> {
+                    var twoFactorAuthEnabled =
+                        requireNonNullElse(user.getSpec().getTwoFactorAuthEnabled(), false);
+                    return new HaloUser.Builder(userBuilder.build())
+                        .twoFactorAuthEnabled(twoFactorAuthEnabled)
+                        .totpEncryptedSecret(user.getSpec().getTotpEncryptedSecret())
+                        .build();
+                }));
             });
     }
 

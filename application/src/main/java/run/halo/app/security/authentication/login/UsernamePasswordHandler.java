@@ -71,6 +71,10 @@ public class UsernamePasswordHandler implements ServerAuthenticationSuccessHandl
                 .then(webFilterExchange.getChain().filter(webFilterExchange.getExchange()));
         }
 
+        if (authentication instanceof CredentialsContainer container) {
+            container.eraseCredentials();
+        }
+
         ServerWebExchangeMatcher xhrMatcher = exchange -> {
             if (exchange.getRequest().getHeaders().getOrEmpty("X-Requested-With")
                 .contains("XMLHttpRequest")) {
@@ -87,14 +91,9 @@ public class UsernamePasswordHandler implements ServerAuthenticationSuccessHandl
                     () -> defaultSuccessHandler.onAuthenticationSuccess(webFilterExchange,
                             authentication)
                         .then(Mono.empty())))
-                .flatMap(isXhr -> {
-                    if (authentication instanceof CredentialsContainer container) {
-                        container.eraseCredentials();
-                    }
-                    return ServerResponse.ok()
-                        .bodyValue(authentication.getPrincipal())
-                        .flatMap(response -> response.writeTo(exchange, context));
-                }));
+                .flatMap(isXhr -> ServerResponse.ok()
+                    .bodyValue(authentication.getPrincipal())
+                    .flatMap(response -> response.writeTo(exchange, context))));
     }
 
     private Mono<Void> handleAuthenticationException(Throwable exception,

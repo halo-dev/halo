@@ -15,6 +15,7 @@ import run.halo.app.security.authentication.twofactor.totp.TotpAuthenticationFil
 public class TwoFactorAuthSecurityConfigurer implements SecurityConfigurer {
 
     private final ServerSecurityContextRepository securityContextRepository;
+
     private final TotpAuthService totpAuthService;
 
     private final ServerResponse.Context context;
@@ -25,8 +26,11 @@ public class TwoFactorAuthSecurityConfigurer implements SecurityConfigurer {
 
     public TwoFactorAuthSecurityConfigurer(
         ServerSecurityContextRepository securityContextRepository,
-        TotpAuthService totpAuthService, ServerResponse.Context context,
-        MessageSource messageSource, RememberMeServices rememberMeServices) {
+        TotpAuthService totpAuthService,
+        ServerResponse.Context context,
+        MessageSource messageSource,
+        RememberMeServices rememberMeServices
+    ) {
         this.securityContextRepository = securityContextRepository;
         this.totpAuthService = totpAuthService;
         this.context = context;

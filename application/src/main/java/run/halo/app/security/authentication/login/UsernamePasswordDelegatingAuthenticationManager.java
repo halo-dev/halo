@@ -6,8 +6,8 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
 import reactor.core.publisher.Mono;
 import run.halo.app.plugin.extensionpoint.ExtensionGetter;
+import run.halo.app.security.HaloUserDetails;
 import run.halo.app.security.authentication.twofactor.TwoFactorAuthentication;
-import run.halo.app.security.authentication.twofactor.TwoFactorUtils;
 
 @Slf4j
 public class UsernamePasswordDelegatingAuthenticationManager
@@ -43,12 +43,9 @@ public class UsernamePasswordDelegatingAuthenticationManager
             )
             // check if MFA is enabled after authenticated
             .map(a -> {
-                if (a.getPrincipal() instanceof HaloUser user) {
-                    var twoFactorAuthSettings =
-                        TwoFactorUtils.getTwoFactorAuthSettings(user.getDelegate());
-                    if (twoFactorAuthSettings.isAvailable()) {
-                        a = new TwoFactorAuthentication(a);
-                    }
+                if (a.getPrincipal() instanceof HaloUserDetails user
+                    && user.isTwoFactorAuthEnabled()) {
+                    a = new TwoFactorAuthentication(a);
                 }
                 return a;
             });
