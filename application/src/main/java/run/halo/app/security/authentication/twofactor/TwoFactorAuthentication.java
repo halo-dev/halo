@@ -7,6 +7,11 @@ import org.springframework.security.authentication.AbstractAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 
+/**
+ * Authentication token for two-factor authentication.
+ *
+ * @author johnniang
+ */
 public class TwoFactorAuthentication extends AbstractAuthenticationToken {
 
     private final Authentication previous;
@@ -33,10 +38,12 @@ public class TwoFactorAuthentication extends AbstractAuthenticationToken {
 
     @Override
     public boolean isAuthenticated() {
+        // return true for accessing anonymous resources
         return true;
     }
 
     public Authentication getPrevious() {
         return previous;
     }
+
 }
