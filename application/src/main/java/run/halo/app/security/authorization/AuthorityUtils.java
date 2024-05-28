@@ -4,6 +4,9 @@ import java.util.Collection;
 import java.util.Set;
 import java.util.stream.Collectors;
 import org.apache.commons.lang3.StringUtils;
+import org.springframework.security.authentication.RememberMeAuthenticationToken;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
 
 /**
@@ -43,5 +46,16 @@ public enum AuthorityUtils {
 
     public static boolean containsSuperRole(Collection<String> roles) {
         return roles.contains(SUPER_ROLE_NAME);
+    }
+
+    /**
+     * Check if the authentication is a real user.
+     *
+     * @param authentication current authentication
+     * @return true if the authentication is a real user; false otherwise
+     */
+    public static boolean isRealUser(Authentication authentication) {
+        return authentication instanceof UsernamePasswordAuthenticationToken
+            || authentication instanceof RememberMeAuthenticationToken;
     }
 }
