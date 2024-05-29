@@ -1,28 +1,28 @@
 <script lang="ts" setup>
-import {
-  IconTerminalBoxLine,
-  IconClipboardLine,
-  VAlert,
-  VPageHeader,
-  VCard,
-  VButton,
-  Toast,
-  VDescription,
-  VDescriptionItem,
-  VTag,
-  VLoading,
-} from "@halo-dev/components";
-import { computed } from "vue";
-import type { Info, GlobalInfo, Startup } from "@/types";
-import axios from "axios";
+import type { GlobalInfo, Info, Startup } from "@/types";
+import { apiClient } from "@/utils/api-client";
 import { formatDatetime } from "@/utils/date";
-import { useClipboard } from "@vueuse/core";
-import { useI18n } from "vue-i18n";
+import { usePermission } from "@/utils/permission";
 import { useThemeStore } from "@console/stores/theme";
 import type { Plugin } from "@halo-dev/api-client";
-import { apiClient } from "@/utils/api-client";
+import {
+  IconClipboardLine,
+  IconTerminalBoxLine,
+  Toast,
+  VAlert,
+  VButton,
+  VCard,
+  VDescription,
+  VDescriptionItem,
+  VLoading,
+  VPageHeader,
+  VTag,
+} from "@halo-dev/components";
 import { useQuery } from "@tanstack/vue-query";
-import { usePermission } from "@/utils/permission";
+import { useClipboard } from "@vueuse/core";
+import axios from "axios";
+import { computed } from "vue";
+import { useI18n } from "vue-i18n";
 
 const { t } = useI18n();
 const themeStore = useThemeStore();
@@ -159,7 +159,7 @@ const handleCopy = () => {
     },
     {
       label: t("core.overview.fields.activated_theme"),
-      value: themeStore.activatedTheme?.spec.displayName || "",
+      value: `${themeStore.activatedTheme?.spec.displayName} ${themeStore.activatedTheme?.spec.version}`,
       href:
         themeStore.activatedTheme?.spec.repo ||
         themeStore.activatedTheme?.spec.homepage,
@@ -167,7 +167,7 @@ const handleCopy = () => {
     {
       label: t("core.overview.fields.enabled_plugins"),
       children: plugins.value?.map((plugin) => ({
-        value: plugin.spec.displayName,
+        value: `${plugin.spec.displayName} ${plugin.spec.version}`,
         href: plugin.spec.repo || plugin.spec.homepage,
       })) as CopyItem[],
     },
