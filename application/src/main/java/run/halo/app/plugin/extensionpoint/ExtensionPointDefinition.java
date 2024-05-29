@@ -1,6 +1,7 @@
 package run.halo.app.plugin.extensionpoint;
 
 import static io.swagger.v3.oas.annotations.media.Schema.RequiredMode.REQUIRED;
+import static run.halo.app.plugin.extensionpoint.ExtensionPointDefinition.KIND;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
@@ -22,9 +23,10 @@ import run.halo.app.extension.GVK;
 @ToString(callSuper = true)
 @EqualsAndHashCode(callSuper = true)
 @GVK(group = "plugin.halo.run", version = "v1alpha1",
-    kind = "ExtensionPointDefinition", singular = "extensionpointdefinition",
+    kind = KIND, singular = "extensionpointdefinition",
     plural = "extensionpointdefinitions")
 public class ExtensionPointDefinition extends AbstractExtension {
+    public static final String KIND = "ExtensionPointDefinition";
 
     @Schema(requiredMode = REQUIRED)
     private ExtensionPointSpec spec;

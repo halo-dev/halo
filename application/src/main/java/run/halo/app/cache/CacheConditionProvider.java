@@ -5,8 +5,11 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Component;
+import run.halo.app.core.extension.Plugin;
+import run.halo.app.core.extension.Role;
 import run.halo.app.extension.ReactiveExtensionClientImpl;
 import run.halo.app.infra.properties.HaloProperties;
+import run.halo.app.plugin.extensionpoint.ExtensionPointDefinition;
 
 /**
  * Provides methods to determine if specific types of caches are evictable or enabled.
@@ -22,10 +25,6 @@ import run.halo.app.infra.properties.HaloProperties;
 @Component
 @RequiredArgsConstructor
 public class CacheConditionProvider {
-    private static final String ROLE_KIND = "Role";
-    private static final String PLUGIN_KIND = "Plugin";
-    private static final String EXTENSION_POINT_DEFINITION_KIND = "ExtensionPointDefinition";
-
     private final HaloProperties properties;
 
     /**
@@ -35,7 +34,7 @@ public class CacheConditionProvider {
      * @return {@code true} if the role dependencies cache is evictable, {@code false} otherwise.
      */
     public boolean isRoleDependenciesCacheEvictableByKind(String kind) {
-        return isRoleCacheEnabled() && Objects.equals(kind, ROLE_KIND);
+        return isRoleDependenciesCacheEnabled() && Objects.equals(kind, Role.KIND);
     }
 
     /**
@@ -45,7 +44,7 @@ public class CacheConditionProvider {
      * @return {@code true} if the plugin extension cache is evictable, {@code false} otherwise.
      */
     public boolean isPluginExtensionCacheEvictableByKind(String kind) {
-        return isPluginExtensionCacheEnabled() && Objects.equals(kind, PLUGIN_KIND);
+        return isPluginExtensionCacheEnabled() && Objects.equals(kind, Plugin.KIND);
     }
 
     /**
@@ -56,8 +55,8 @@ public class CacheConditionProvider {
      * otherwise.
      */
     public boolean isExtensionPointDefinitionCacheEvictableByKind(String kind) {
-        return isExtensionPointDefinitionCacheEnabled() && Objects.equals(kind,
-            EXTENSION_POINT_DEFINITION_KIND);
+        return isExtensionPointDefinitionCacheEnabled()
+            && Objects.equals(kind, ExtensionPointDefinition.KIND);
     }
 
     /**
@@ -65,7 +64,7 @@ public class CacheConditionProvider {
      *
      * @return {@code true} if the role dependencies cache is enabled, {@code false} otherwise
      */
-    public boolean isRoleCacheEnabled() {
+    public boolean isRoleDependenciesCacheEnabled() {
         return isCacheEnabled("role-dependencies");
     }
 

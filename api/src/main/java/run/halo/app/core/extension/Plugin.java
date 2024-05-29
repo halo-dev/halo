@@ -1,6 +1,7 @@
 package run.halo.app.core.extension;
 
 import static io.swagger.v3.oas.annotations.media.Schema.RequiredMode.REQUIRED;
+import static run.halo.app.core.extension.Plugin.KIND;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -27,10 +28,11 @@ import run.halo.app.infra.ConditionList;
  */
 @Data
 @ToString(callSuper = true)
-@GVK(group = "plugin.halo.run", version = "v1alpha1", kind = "Plugin", plural = "plugins",
+@GVK(group = "plugin.halo.run", version = "v1alpha1", kind = KIND, plural = "plugins",
     singular = "plugin")
 @EqualsAndHashCode(callSuper = true)
 public class Plugin extends AbstractExtension {
+    public static final String KIND = "Plugin";
 
     @Schema(requiredMode = REQUIRED)
     private PluginSpec spec;

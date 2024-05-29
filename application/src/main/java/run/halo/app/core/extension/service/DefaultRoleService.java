@@ -76,7 +76,7 @@ public class DefaultRoleService implements RoleService {
     @Override
     @Cacheable(
         value = CacheNames.ROLE_DEPENDENCIES,
-        condition = "@cacheConditionProvider.isRoleCacheEnabled()"
+        condition = "@cacheConditionProvider.isRoleDependenciesCacheEnabled()"
     )
     public Flux<Role> listDependenciesFlux(Set<String> names) {
         return listDependencies(names, shouldFilterHidden(false));
