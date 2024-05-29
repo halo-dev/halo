@@ -5,19 +5,17 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.Reader;
 import java.nio.charset.StandardCharsets;
-import java.util.Collections;
 import java.util.HashSet;
-import java.util.LinkedHashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.concurrent.locks.StampedLock;
+import java.util.concurrent.ConcurrentHashMap;
 import lombok.extern.slf4j.Slf4j;
 import org.pf4j.AbstractExtensionFinder;
 import org.pf4j.PluginManager;
+import org.pf4j.PluginState;
+import org.pf4j.PluginStateEvent;
 import org.pf4j.PluginWrapper;
 import org.pf4j.processor.ExtensionStorage;
-import org.springframework.util.Assert;
 
 /**
  * <p>The spring component finder. it will read {@code META-INF/plugin-components.idx} file in
@@ -31,53 +29,41 @@ import org.springframework.util.Assert;
 @Slf4j
 public class SpringComponentsFinder extends AbstractExtensionFinder {
     public static final String EXTENSIONS_RESOURCE = "META-INF/plugin-components.idx";
-    private final StampedLock entryStampedLock = new StampedLock();
 
     public SpringComponentsFinder(PluginManager pluginManager) {
         super(pluginManager);
+        entries = new ConcurrentHashMap<>();
     }
 
     @Override
     public Map<String, Set<String>> readClasspathStorages() {
-        log.debug("Reading components storages from classpath");
-        return Collections.emptyMap();
+        throw new UnsupportedOperationException();
     }
 
     @Override
     public Map<String, Set<String>> readPluginsStorages() {
-        // We have to copy the source code from `org.pf4j.LegacyExtensionFinder.readPluginsStorages`
-        // because we have to adapt to the new extensions resource location
-        // `META-INF/plugin-components.idx`.
-        log.debug("Reading components storages from plugins");
-        Map<String, Set<String>> result = new LinkedHashMap<>();
+        throw new UnsupportedOperationException();
+    }
 
-        List<PluginWrapper> plugins = pluginManager.getPlugins();
-        for (PluginWrapper plugin : plugins) {
-            String pluginId = plugin.getDescriptor().getPluginId();
-            log.debug("Reading extensions storage from plugin '{}'", pluginId);
-            Set<String> bucket = new HashSet<>();
-
-            try {
-                log.debug("Read '{}'", EXTENSIONS_RESOURCE);
-                ClassLoader pluginClassLoader = plugin.getPluginClassLoader();
-                try (var resourceStream =
-                         pluginClassLoader.getResourceAsStream(EXTENSIONS_RESOURCE)) {
-                    if (resourceStream == null) {
-                        log.debug("Cannot find '{}'", EXTENSIONS_RESOURCE);
-                    } else {
-                        collectExtensions(resourceStream, bucket);
-                    }
+    private Set<String> readPluginStorage(PluginWrapper pluginWrapper) {
+        var pluginId = pluginWrapper.getPluginId();
+        log.debug("Reading extensions storage from plugin '{}'", pluginId);
+        var bucket = new HashSet<String>();
+        try {
+            log.debug("Read '{}'", EXTENSIONS_RESOURCE);
+            var classLoader = pluginWrapper.getPluginClassLoader();
+            try (var resourceStream = classLoader.getResourceAsStream(EXTENSIONS_RESOURCE)) {
+                if (resourceStream == null) {
+                    log.debug("Cannot find '{}'", EXTENSIONS_RESOURCE);
+                } else {
+                    collectExtensions(resourceStream, bucket);
                 }
-
-                debugExtensions(bucket);
-
-                result.put(pluginId, bucket);
-            } catch (IOException e) {
-                log.error("Failed to read components from " + EXTENSIONS_RESOURCE, e);
             }
+            debugExtensions(bucket);
+        } catch (IOException e) {
+            log.error("Failed to read components from " + EXTENSIONS_RESOURCE, e);
         }
-
-        return result;
+        return bucket;
     }
 
     private void collectExtensions(InputStream inputStream, Set<String> bucket) throws IOException {
@@ -86,20 +72,15 @@ public class SpringComponentsFinder extends AbstractExtensionFinder {
         }
     }
 
-    protected boolean containsComponentsStorage(String pluginId) {
-        Assert.notNull(pluginId, "The pluginId cannot be null");
-        long stamp = entryStampedLock.tryOptimisticRead();
-        boolean contains = super.entries != null && super.entries.containsKey(pluginId);
-        if (!entryStampedLock.validate(stamp)) {
-            stamp = entryStampedLock.readLock();
-            try {
-                return super.entries != null && entries.containsKey(pluginId);
-            } finally {
-                entryStampedLock.unlockRead(stamp);
-            }
+    @Override
+    public void pluginStateChanged(PluginStateEvent event) {
+        var pluginState = event.getPluginState();
+        String pluginId = event.getPlugin().getPluginId();
+        if (pluginState == PluginState.UNLOADED) {
+            entries.remove(pluginId);
+        } else if (pluginState == PluginState.CREATED || pluginState == PluginState.RESOLVED) {
+            entries.computeIfAbsent(pluginId, id -> readPluginStorage(event.getPlugin()));
         }
-        return contains;
     }
 
 }
-
