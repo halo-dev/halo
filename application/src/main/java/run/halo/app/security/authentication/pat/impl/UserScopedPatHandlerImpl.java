@@ -11,7 +11,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Objects;
 import java.util.function.Predicate;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.context.ReactiveSecurityContextHolder;
@@ -86,7 +85,7 @@ public class UserScopedPatHandlerImpl implements UserScopedPatHandler {
     }
 
     private static Mono<Authentication> mustBeRealUser(Mono<Authentication> authentication) {
-        return authentication.filter(UsernamePasswordAuthenticationToken.class::isInstance)
+        return authentication.filter(AuthorityUtils::isRealUser)
             // Non-username-password authentication could not access the API at any time.
             .switchIfEmpty(Mono.error(AccessDeniedException::new));
     }
