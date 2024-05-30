@@ -100,7 +100,6 @@ public class WebServerSecurityConfig {
                 .referrerPolicy(referrerPolicySpec -> referrerPolicySpec.policy(
                     haloProperties.getSecurity().getReferrerOptions().getPolicy())
                 )
-                .cache(ServerHttpSecurity.HeaderSpec.CacheSpec::disable)
                 .hsts(hstsSpec -> hstsSpec.includeSubdomains(false))
             );
 
