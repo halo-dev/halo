@@ -4,8 +4,11 @@ import java.time.Duration;
 import java.time.Instant;
 import java.util.function.Predicate;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Caching;
 import org.springframework.stereotype.Component;
 import org.springframework.util.CollectionUtils;
+import run.halo.app.cache.CacheNames;
 import run.halo.app.extension.Extension;
 import run.halo.app.extension.ExtensionClient;
 import run.halo.app.extension.ExtensionConverter;
@@ -49,6 +52,24 @@ class GcReconciler implements Reconciler<GcRequest> {
     }
 
     @Override
+    @Caching(evict = {
+        @CacheEvict(
+            value = CacheNames.ROLE_DEPENDENCIES,
+            condition = "@cacheConditionProvider.isRoleDependenciesCacheEvictableByKind"
+                + "(#request.gvk().kind())",
+            allEntries = true),
+        @CacheEvict(
+            value = CacheNames.PLUGIN_EXTENSIONS,
+            condition =
+                "@cacheConditionProvider.isPluginExtensionCacheEvictableByKind"
+                    + "(#request.gvk().kind())",
+            allEntries = true),
+        @CacheEvict(
+            value = CacheNames.EXTENSION_POINT_DEFINITIONS,
+            condition = "@cacheConditionProvider.isExtensionPointDefinitionCacheEvictableByKind"
+                + "(#request.gvk().kind())",
+            allEntries = true)
+    })
     public Result reconcile(GcRequest request) {
         log.debug("Extension {} is being deleted", request);
 

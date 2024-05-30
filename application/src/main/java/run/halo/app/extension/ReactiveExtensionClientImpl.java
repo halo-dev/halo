@@ -284,24 +284,6 @@ public class ReactiveExtensionClientImpl implements ReactiveExtensionClient {
     }
 
     @Override
-    @Caching(evict = {
-        @CacheEvict(
-            value = CacheNames.ROLE_DEPENDENCIES,
-            condition = "@cacheConditionProvider.isRoleDependenciesCacheEvictableByKind"
-                + "(#extension.kind)",
-            allEntries = true),
-        @CacheEvict(
-            value = CacheNames.PLUGIN_EXTENSIONS,
-            condition =
-                "@cacheConditionProvider.isPluginExtensionCacheEvictableByKind"
-                    + "(#extension.kind)",
-            allEntries = true),
-        @CacheEvict(
-            value = CacheNames.EXTENSION_POINT_DEFINITIONS,
-            condition = "@cacheConditionProvider.isExtensionPointDefinitionCacheEvictableByKind"
-                + "(#extension.kind)",
-            allEntries = true)
-    })
     public <E extends Extension> Mono<E> delete(E extension) {
         checkClientWritable(extension);
         // set deletionTimestamp
