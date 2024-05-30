@@ -31,7 +31,6 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.pf4j.PluginDescriptor;
 import org.pf4j.PluginWrapper;
-import org.pf4j.RuntimeMode;
 import org.springframework.web.server.ServerWebInputException;
 import reactor.core.publisher.Mono;
 import reactor.test.StepVerifier;
@@ -239,14 +238,6 @@ class PluginServiceImplTest {
 
     @Test
     void generateJsBundleVersionTest() {
-        when(pluginManager.getRuntimeMode()).thenReturn(RuntimeMode.DEVELOPMENT);
-
-        pluginService.generateJsBundleVersion()
-            .as(StepVerifier::create)
-            .consumeNextWith(version -> assertThat(version).isNotNull())
-            .verifyComplete();
-
-        when(pluginManager.getRuntimeMode()).thenReturn(RuntimeMode.DEPLOYMENT);
         var plugin1 = mock(PluginWrapper.class);
         var plugin2 = mock(PluginWrapper.class);
         var plugin3 = mock(PluginWrapper.class);

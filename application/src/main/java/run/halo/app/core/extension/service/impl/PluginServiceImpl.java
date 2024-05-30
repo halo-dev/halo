@@ -23,7 +23,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.pf4j.DependencyResolver;
 import org.pf4j.PluginDescriptor;
 import org.pf4j.PluginWrapper;
-import org.pf4j.RuntimeMode;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.buffer.DataBuffer;
 import org.springframework.core.io.buffer.DataBufferUtils;
@@ -243,9 +242,6 @@ public class PluginServiceImpl implements PluginService {
     @Override
     public Mono<String> generateJsBundleVersion() {
         return Mono.fromSupplier(() -> {
-            if (RuntimeMode.DEVELOPMENT.equals(pluginManager.getRuntimeMode())) {
-                return String.valueOf(System.currentTimeMillis());
-            }
             var compactVersion = pluginManager.getStartedPlugins()
                 .stream()
                 .sorted(Comparator.comparing(PluginWrapper::getPluginId))

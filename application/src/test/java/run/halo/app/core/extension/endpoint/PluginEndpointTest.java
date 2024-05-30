@@ -8,7 +8,9 @@ import static org.mockito.ArgumentMatchers.argThat;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.ArgumentMatchers.isA;
 import static org.mockito.ArgumentMatchers.same;
+import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.lenient;
+import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.reactive.server.WebTestClient.bindToRouterFunction;
@@ -33,10 +35,15 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.boot.autoconfigure.web.WebProperties;
+import org.springframework.core.io.ByteArrayResource;
 import org.springframework.core.io.FileSystemResource;
+import org.springframework.core.io.Resource;
 import org.springframework.core.io.buffer.DataBuffer;
 import org.springframework.core.io.buffer.DefaultDataBufferFactory;
+import org.springframework.http.CacheControl;
 import org.springframework.http.MediaType;
 import org.springframework.http.client.MultipartBodyBuilder;
 import org.springframework.test.web.reactive.server.WebTestClient;
@@ -46,6 +53,7 @@ import reactor.core.publisher.Mono;
 import reactor.test.StepVerifier;
 import run.halo.app.core.extension.Plugin;
 import run.halo.app.core.extension.Setting;
+import run.halo.app.core.extension.endpoint.PluginEndpoint.BufferedPluginBundleResource;
 import run.halo.app.core.extension.service.PluginService;
 import run.halo.app.extension.ConfigMap;
 import run.halo.app.extension.ListResult;
@@ -70,6 +78,12 @@ class PluginEndpointTest {
 
     @Mock
     PluginService pluginService;
+
+    @Spy
+    WebProperties webProperties = new WebProperties();
+
+    @Mock
+    BufferedPluginBundleResource bufferedPluginBundleResource;
 
     @InjectMocks
     PluginEndpoint endpoint;
@@ -391,8 +405,8 @@ class PluginEndpointTest {
 
     @Nested
     class BufferedPluginBundleResourceTest {
-        private final PluginEndpoint.BufferedPluginBundleResource bufferedPluginBundleResource =
-            new PluginEndpoint.BufferedPluginBundleResource();
+        private final BufferedPluginBundleResource bufferedPluginBundleResource =
+            new BufferedPluginBundleResource();
 
         private static Flux<DataBuffer> getDataBufferFlux(String x) {
             var buffer = DefaultDataBufferFactory.sharedInstance
@@ -472,6 +486,121 @@ class PluginEndpointTest {
                     }
                 })
                 .verifyComplete();
+        }
+    }
+
+    @Nested
+    class BundleResourceEndpointTest {
+
+        private long lastModified;
+
+        WebTestClient webClient;
+
+        @BeforeEach
+        void setUp() {
+            webClient = WebTestClient.bindToRouterFunction(endpoint.endpoint()).build();
+            long currentTimeMillis = System.currentTimeMillis();
+            // We should ignore milliseconds here
+            // See https://datatracker.ietf.org/doc/html/rfc7231#section-7.1.1.1 for more.
+            this.lastModified = currentTimeMillis - currentTimeMillis % 1_000;
+        }
+
+        @Test
+        void shouldBeRedirectedWhileFetchingBundleJsWithoutVersion() {
+            when(pluginService.generateJsBundleVersion()).thenReturn(Mono.just("fake-version"));
+            webClient.get().uri("/plugins/-/bundle.js")
+                .exchange()
+                .expectStatus().is3xxRedirection()
+                .expectHeader().cacheControl(CacheControl.noStore())
+                .expectHeader().location(
+                    "/apis/api.console.halo.run/v1alpha1/plugins/-/bundle.js?v=fake-version");
+        }
+
+        @Test
+        void shouldBeRedirectedWhileFetchingBundleCssWithoutVersion() {
+            when(pluginService.generateJsBundleVersion()).thenReturn(Mono.just("fake-version"));
+            webClient.get().uri("/plugins/-/bundle.css")
+                .exchange()
+                .expectStatus().is3xxRedirection()
+                .expectHeader().cacheControl(CacheControl.noStore())
+                .expectHeader().location(
+                    "/apis/api.console.halo.run/v1alpha1/plugins/-/bundle.css?v=fake-version");
+        }
+
+        @Test
+        void shouldFetchBundleCssWithCacheControl() {
+            var cache = webProperties.getResources().getCache();
+            cache.setUseLastModified(true);
+            var cachecontrol = cache.getCachecontrol();
+            cachecontrol.setNoCache(true);
+            endpoint.afterPropertiesSet();
+
+            when(bufferedPluginBundleResource.getCssBundle(eq("fake-version"), any()))
+                .thenReturn(Mono.fromSupplier(() -> mockResource("fake-css")));
+            webClient.get().uri("/plugins/-/bundle.css?v=fake-version")
+                .exchange()
+                .expectStatus().isOk()
+                .expectHeader().cacheControl(CacheControl.noCache())
+                .expectHeader().contentType("text/css")
+                .expectHeader().lastModified(lastModified)
+                .expectBody(String.class).isEqualTo("fake-css");
+        }
+
+        @Test
+        void shouldFetchBundleJsWithCacheControl() {
+            var cache = webProperties.getResources().getCache();
+            cache.setUseLastModified(true);
+            var cachecontrol = cache.getCachecontrol();
+            cachecontrol.setNoStore(true);
+            endpoint.afterPropertiesSet();
+
+            when(bufferedPluginBundleResource.getJsBundle(eq("fake-version"), any()))
+                .thenReturn(Mono.fromSupplier(() -> mockResource("fake-js")));
+            webClient.get().uri("/plugins/-/bundle.js?v=fake-version")
+                .exchange()
+                .expectStatus().isOk()
+                .expectHeader().cacheControl(CacheControl.noStore())
+                .expectHeader().contentType("text/javascript")
+                .expectHeader().lastModified(lastModified)
+                .expectBody(String.class).isEqualTo("fake-js");
+        }
+
+        @Test
+        void shouldFetchBundleCss() {
+            when(bufferedPluginBundleResource.getCssBundle(eq("fake-version"), any()))
+                .thenReturn(Mono.fromSupplier(() -> mockResource("fake-css")));
+            webClient.get().uri("/plugins/-/bundle.css?v=fake-version")
+                .exchange()
+                .expectStatus().isOk()
+                .expectHeader().cacheControl(CacheControl.empty())
+                .expectHeader().contentType("text/css")
+                .expectHeader().lastModified(-1)
+                .expectBody(String.class).isEqualTo("fake-css");
+        }
+
+        @Test
+        void shouldFetchBundleJs() {
+            when(bufferedPluginBundleResource.getJsBundle(eq("fake-version"), any()))
+                .thenReturn(Mono.fromSupplier(() -> mockResource("fake-js")));
+            webClient.get().uri("/plugins/-/bundle.js?v=fake-version")
+                .exchange()
+                .expectStatus().isOk()
+                .expectHeader().cacheControl(CacheControl.empty())
+                .expectHeader().contentType("text/javascript")
+                .expectHeader().lastModified(-1)
+                .expectBody(String.class).isEqualTo("fake-js");
+        }
+
+        Resource mockResource(String content) {
+            var resource = new ByteArrayResource(content.getBytes(StandardCharsets.UTF_8));
+            resource = spy(resource);
+            try {
+                doReturn(lastModified).when(resource).lastModified();
+            } catch (IOException e) {
+                // should never happen
+                throw new RuntimeException(e);
+            }
+            return resource;
         }
     }
 
