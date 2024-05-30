@@ -1,26 +1,23 @@
 <script lang="ts" setup>
-import { VButton, VModal, VTabbar } from "@halo-dev/components";
+import { usePluginModuleStore } from "@/stores/plugin";
+import { usePermission } from "@/utils/permission";
 import type { Plugin } from "@halo-dev/api-client";
+import { VButton, VModal, VTabbar } from "@halo-dev/components";
+import type { PluginInstallationTab } from "@halo-dev/console-shared";
+import { useRouteQuery } from "@vueuse/router";
 import {
   computed,
   markRaw,
   nextTick,
   onMounted,
   provide,
-  type Ref,
   ref,
   toRefs,
+  type Ref,
 } from "vue";
 import { useI18n } from "vue-i18n";
-import { useRouteQuery } from "@vueuse/router";
 import LocalUpload from "./installation-tabs/LocalUpload.vue";
 import RemoteDownload from "./installation-tabs/RemoteDownload.vue";
-import type {
-  PluginInstallationTab,
-  PluginModule,
-} from "@halo-dev/console-shared";
-import { usePluginModuleStore } from "@/stores/plugin";
-import { usePermission } from "@/utils/permission";
 
 const { t } = useI18n();
 const { currentUserHasPermission } = usePermission();
@@ -82,23 +79,28 @@ onMounted(() => {
 });
 
 const { pluginModules } = usePluginModuleStore();
-onMounted(() => {
-  pluginModules.forEach((pluginModule: PluginModule) => {
-    const { extensionPoints } = pluginModule;
-    if (!extensionPoints?.["plugin:installation:tabs:create"]) {
-      return;
+
+onMounted(async () => {
+  for (const pluginModule of pluginModules) {
+    try {
+      const callbackFunction =
+        pluginModule?.extensionPoints?.["plugin:installation:tabs:create"];
+
+      if (typeof callbackFunction !== "function") {
+        continue;
+      }
+
+      const items = await callbackFunction();
+
+      tabs.value.push(
+        ...items.filter((item) => {
+          return currentUserHasPermission(item.permissions);
+        })
+      );
+    } catch (error) {
+      console.error(`Error processing plugin module:`, pluginModule, error);
     }
-
-    let items = extensionPoints[
-      "plugin:installation:tabs:create"
-    ]() as PluginInstallationTab[];
-
-    items = items.filter((item) => {
-      return currentUserHasPermission(item.permissions);
-    });
-
-    tabs.value.push(...items);
-  });
+  }
 
   tabs.value.sort((a, b) => {
     return a.priority - b.priority;
