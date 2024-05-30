@@ -88,9 +88,7 @@ const previewUrl = computed(() => {
   if (!selectedTheme.value) {
     return "#";
   }
-  return `${import.meta.env.VITE_API_URL}/?preview-theme=${
-    selectedTheme.value.metadata.name
-  }`;
+  return `/?preview-theme=${selectedTheme.value.metadata.name}`;
 });
 
 const modalTitle = computed(() => {

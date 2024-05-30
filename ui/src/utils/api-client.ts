@@ -57,7 +57,7 @@ import { useUserStore } from "@/stores/user";
 import { Toast } from "@halo-dev/components";
 import { i18n } from "@/locales";
 
-const baseURL = import.meta.env.VITE_API_URL;
+const baseURL = "/";
 
 const axiosInstance = axios.create({
   baseURL,
