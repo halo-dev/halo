@@ -1,27 +1,27 @@
 <script lang="ts" setup>
 // core libs
-import { provide, ref, computed } from "vue";
-import { useRoute } from "vue-router";
 import { apiClient } from "@/utils/api-client";
+import { computed, provide, ref } from "vue";
+import { useRoute } from "vue-router";
 
 // libs
 import { cloneDeep } from "lodash-es";
 
 // components
-import { VCard, VPageHeader, VTabbar, VAvatar } from "@halo-dev/components";
+import { VAvatar, VCard, VPageHeader, VTabbar } from "@halo-dev/components";
 
 // types
-import type { Ref } from "vue";
-import type { Plugin, Setting, SettingForm } from "@halo-dev/api-client";
+import { usePluginModuleStore } from "@/stores/plugin";
 import { usePermission } from "@/utils/permission";
-import { useI18n } from "vue-i18n";
-import { useQuery } from "@tanstack/vue-query";
+import type { Plugin, Setting, SettingForm } from "@halo-dev/api-client";
 import type { PluginTab } from "@halo-dev/console-shared";
+import { useQuery } from "@tanstack/vue-query";
+import { useRouteQuery } from "@vueuse/router";
+import type { Ref } from "vue";
 import { markRaw } from "vue";
+import { useI18n } from "vue-i18n";
 import DetailTab from "./tabs/Detail.vue";
 import SettingTab from "./tabs/Setting.vue";
-import { useRouteQuery } from "@vueuse/router";
-import { usePluginModuleStore } from "@/stores/plugin";
 
 const { currentUserHasPermission } = usePermission();
 const { t } = useI18n();
@@ -50,12 +50,12 @@ const { data: plugin } = useQuery({
       });
     return data;
   },
-  onSuccess(data) {
+  async onSuccess(data) {
     if (
       !data.spec.settingName ||
       !currentUserHasPermission(["system:plugins:manage"])
     ) {
-      tabs.value = [...initialTabs.value, ...getTabsFromExtensions()];
+      tabs.value = [...initialTabs.value, ...(await getTabsFromExtensions())];
     }
   },
 });
@@ -82,7 +82,7 @@ const { data: setting } = useQuery({
       const { forms } = data.spec;
       tabs.value = [
         ...initialTabs.value,
-        ...getTabsFromExtensions(),
+        ...(await getTabsFromExtensions()),
         ...forms.map((item: SettingForm) => {
           return {
             id: item.group,
@@ -97,7 +97,7 @@ const { data: setting } = useQuery({
 
 provide<Ref<Setting | undefined>>("setting", setting);
 
-function getTabsFromExtensions(): PluginTab[] {
+async function getTabsFromExtensions() {
   const { pluginModuleMap } = usePluginModuleStore();
 
   const currentPluginModule = pluginModuleMap[route.params.name as string];
@@ -106,15 +106,14 @@ function getTabsFromExtensions(): PluginTab[] {
     return [];
   }
 
-  const { extensionPoints } = currentPluginModule;
+  const callbackFunction =
+    currentPluginModule?.extensionPoints?.["plugin:self:tabs:create"];
 
-  if (!extensionPoints?.["plugin:self:tabs:create"]) {
+  if (typeof callbackFunction !== "function") {
     return [];
   }
 
-  const pluginTabs = extensionPoints[
-    "plugin:self:tabs:create"
-  ]() as PluginTab[];
+  const pluginTabs = await callbackFunction();
 
   return pluginTabs.filter((tab) => {
     return currentUserHasPermission(tab.permissions);

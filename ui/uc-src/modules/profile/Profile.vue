@@ -1,33 +1,33 @@
 <script lang="ts" setup>
+import UserAvatar from "@/components/user-avatar/UserAvatar.vue";
+import { usePluginModuleStore } from "@/stores/plugin";
 import { apiClient } from "@/utils/api-client";
+import type { DetailedUser } from "@halo-dev/api-client";
 import {
   VButton,
   VDropdown,
   VDropdownItem,
   VTabbar,
 } from "@halo-dev/components";
+import type { UserProfileTab } from "@halo-dev/console-shared";
+import { useQuery } from "@tanstack/vue-query";
+import { useRouteQuery } from "@vueuse/router";
 import {
   computed,
   markRaw,
   onMounted,
   provide,
-  type Ref,
   ref,
   toRaw,
+  type Ref,
 } from "vue";
-import type { DetailedUser } from "@halo-dev/api-client";
-import ProfileEditingModal from "./components/ProfileEditingModal.vue";
-import PasswordChangeModal from "./components/PasswordChangeModal.vue";
-import { useQuery } from "@tanstack/vue-query";
 import { useI18n } from "vue-i18n";
-import UserAvatar from "@/components/user-avatar/UserAvatar.vue";
+import PasswordChangeModal from "./components/PasswordChangeModal.vue";
+import ProfileEditingModal from "./components/ProfileEditingModal.vue";
 import DetailTab from "./tabs/Detail.vue";
-import PersonalAccessTokensTab from "./tabs/PersonalAccessTokens.vue";
-import { useRouteQuery } from "@vueuse/router";
 import NotificationPreferences from "./tabs/NotificationPreferences.vue";
+import PersonalAccessTokensTab from "./tabs/PersonalAccessTokens.vue";
 import TwoFactor from "./tabs/TwoFactor.vue";
-import type { PluginModule, UserProfileTab } from "@halo-dev/console-shared";
-import { usePluginModuleStore } from "@/stores/plugin";
 
 const { t } = useI18n();
 
@@ -76,21 +76,24 @@ const tabs = ref<UserProfileTab[]>([
 ]);
 
 // Collect uc:profile:tabs:create extension points
-onMounted(() => {
-  const { pluginModules } = usePluginModuleStore();
+const { pluginModules } = usePluginModuleStore();
 
-  pluginModules.forEach((pluginModule: PluginModule) => {
-    const { extensionPoints } = pluginModule;
-    if (!extensionPoints?.["uc:user:profile:tabs:create"]) {
-      return;
+onMounted(async () => {
+  for (const pluginModule of pluginModules) {
+    try {
+      const callbackFunction =
+        pluginModule?.extensionPoints?.["uc:user:profile:tabs:create"];
+      if (typeof callbackFunction !== "function") {
+        continue;
+      }
+
+      const providers = await callbackFunction();
+
+      tabs.value.push(...providers);
+    } catch (error) {
+      console.error(`Error processing plugin module:`, pluginModule, error);
     }
-
-    const providers = extensionPoints[
-      "uc:user:profile:tabs:create"
-    ]() as UserProfileTab[];
-
-    tabs.value.push(...providers);
-  });
+  }
 });
 
 const tabbarItems = computed(() => {

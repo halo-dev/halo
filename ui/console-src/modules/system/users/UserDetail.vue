@@ -1,32 +1,32 @@
 <script lang="ts" setup>
+import UserAvatar from "@/components/user-avatar/UserAvatar.vue";
+import { usePluginModuleStore } from "@/stores/plugin";
+import { useUserStore } from "@/stores/user";
 import { apiClient } from "@/utils/api-client";
+import { usePermission } from "@/utils/permission";
 import {
   VButton,
   VDropdown,
   VDropdownItem,
   VTabbar,
 } from "@halo-dev/components";
+import type { UserTab } from "@halo-dev/console-shared";
+import { useQuery } from "@tanstack/vue-query";
+import { useRouteQuery } from "@vueuse/router";
 import {
   computed,
   markRaw,
   onMounted,
   provide,
-  type Ref,
   ref,
   toRaw,
+  type Ref,
 } from "vue";
+import { useI18n } from "vue-i18n";
 import { useRoute } from "vue-router";
 import UserEditingModal from "./components/UserEditingModal.vue";
 import UserPasswordChangeModal from "./components/UserPasswordChangeModal.vue";
-import { usePermission } from "@/utils/permission";
-import { useQuery } from "@tanstack/vue-query";
-import { useI18n } from "vue-i18n";
-import UserAvatar from "@/components/user-avatar/UserAvatar.vue";
 import DetailTab from "./tabs/Detail.vue";
-import { useRouteQuery } from "@vueuse/router";
-import { useUserStore } from "@/stores/user";
-import { usePluginModuleStore } from "@/stores/plugin";
-import type { PluginModule, UserTab } from "@halo-dev/console-shared";
 
 const { currentUserHasPermission } = usePermission();
 const { t } = useI18n();
@@ -62,19 +62,24 @@ const tabs = ref<UserTab[]>([
 ]);
 
 // Collect user:detail:tabs:create extension points
-onMounted(() => {
-  const { pluginModules } = usePluginModuleStore();
+const { pluginModules } = usePluginModuleStore();
 
-  pluginModules.forEach((pluginModule: PluginModule) => {
-    const { extensionPoints } = pluginModule;
-    if (!extensionPoints?.["user:detail:tabs:create"]) {
-      return;
+onMounted(async () => {
+  for (const pluginModule of pluginModules) {
+    try {
+      const callbackFunction =
+        pluginModule?.extensionPoints?.["user:detail:tabs:create"];
+      if (typeof callbackFunction !== "function") {
+        continue;
+      }
+
+      const providers = await callbackFunction();
+
+      tabs.value.push(...providers);
+    } catch (error) {
+      console.error(`Error processing plugin module:`, pluginModule, error);
     }
-
-    const providers = extensionPoints["user:detail:tabs:create"]() as UserTab[];
-
-    tabs.value.push(...providers);
-  });
+  }
 });
 
 const activeTab = useRouteQuery<string>("tab", tabs.value[0].id, {
