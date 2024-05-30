@@ -43,7 +43,7 @@ const handleLogout = () => {
     cancelText: t("core.common.buttons.cancel"),
     onConfirm: async () => {
       try {
-        await axios.post(`${import.meta.env.VITE_API_URL}/logout`, undefined, {
+        await axios.post(`/logout`, undefined, {
           withCredentials: true,
         });
 
