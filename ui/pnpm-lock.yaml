@@ -105,8 +105,8 @@ importers:
         specifier: ^1.1.2
         version: 1.1.2(@uppy/core@3.11.3)(@uppy/dashboard@3.8.3(@uppy/core@3.11.3))(@uppy/drag-drop@3.1.0(@uppy/core@3.11.3))(@uppy/file-input@3.1.2(@uppy/core@3.11.3))(@uppy/progress-bar@3.1.1(@uppy/core@3.11.3))(@uppy/status-bar@3.3.3(@uppy/core@3.11.3))(vue@3.4.27(typescript@5.3.3))
       '@uppy/xhr-upload':
-        specifier: ^3.6.7
-        version: 3.6.7(@uppy/core@3.11.3)
+        specifier: 3.6.0
+        version: 3.6.0(@uppy/core@3.11.3)
       '@vueuse/components':
         specifier: ^10.9.0
         version: 10.9.0(vue@3.4.27(typescript@5.3.3))
@@ -4243,10 +4243,10 @@ packages:
       '@uppy/status-bar':
         optional: true
 
-  '@uppy/xhr-upload@3.6.7':
-    resolution: {integrity: sha512-xd8PA6gz8/usm7wpI6w8zOjnw5KnE/Yt7fWknFubMFCbP0yutWbStgeFAj5AMdLjLQpGveGb/OVWHhBfy2LwlA==}
+  '@uppy/xhr-upload@3.6.0':
+    resolution: {integrity: sha512-HgWr+CvJzJXAp639AiZatdEWmRdhhN5LrjTZurAkvm9nPQarpi1bo0DChO+1bpkXWOR/1VarBbZOr8lNecEn7Q==}
     peerDependencies:
-      '@uppy/core': ^3.11.3
+      '@uppy/core': ^3.8.0
 
   '@vitejs/plugin-vue-jsx@3.1.0':
     resolution: {integrity: sha512-w9M6F3LSEU5kszVb9An2/MmXNxocAnUb3WhRr8bHlimhDrXNt6n6D2nJQR3UXpGlZHh/EsgouOHCsM8V3Ln+WA==}
@@ -15451,11 +15451,12 @@ snapshots:
       '@uppy/progress-bar': 3.1.1(@uppy/core@3.11.3)
       '@uppy/status-bar': 3.3.3(@uppy/core@3.11.3)
 
-  '@uppy/xhr-upload@3.6.7(@uppy/core@3.11.3)':
+  '@uppy/xhr-upload@3.6.0(@uppy/core@3.11.3)':
     dependencies:
       '@uppy/companion-client': 3.8.1(@uppy/core@3.11.3)
       '@uppy/core': 3.11.3
       '@uppy/utils': 5.9.0
+      nanoid: 4.0.0
 
   '@vitejs/plugin-vue-jsx@3.1.0(vite@5.2.11(@types/node@18.13.0)(less@4.2.0)(sass@1.60.0)(terser@5.31.0))(vue@3.4.27(typescript@5.3.3))':
     dependencies:
