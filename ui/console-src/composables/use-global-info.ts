@@ -6,12 +6,9 @@ export function useGlobalInfoFetch() {
   const { data } = useQuery<GlobalInfo>({
     queryKey: ["globalinfo"],
     queryFn: async () => {
-      const { data } = await axios.get<GlobalInfo>(
-        `${import.meta.env.VITE_API_URL}/actuator/globalinfo`,
-        {
-          withCredentials: true,
-        }
-      );
+      const { data } = await axios.get<GlobalInfo>(`/actuator/globalinfo`, {
+        withCredentials: true,
+      });
 
       return data;
     },

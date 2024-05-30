@@ -45,12 +45,9 @@ const handleUnbindAuth = (authProvider: ListedAuthProvider) => {
     confirmText: t("core.common.buttons.confirm"),
     cancelText: t("core.common.buttons.cancel"),
     onConfirm: async () => {
-      await axios.put(
-        `${import.meta.env.VITE_API_URL}${authProvider.unbindingUrl}`,
-        {
-          withCredentials: true,
-        }
-      );
+      await axios.put(`${authProvider.unbindingUrl}`, {
+        withCredentials: true,
+      });
 
       window.location.reload();
     },

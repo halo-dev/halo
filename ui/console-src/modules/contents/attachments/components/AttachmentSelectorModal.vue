@@ -1,14 +1,13 @@
 <script lang="ts" setup>
+import { usePluginModuleStore } from "@/stores/plugin";
 import { VButton, VModal, VSpace, VTabbar } from "@halo-dev/components";
-import { ref, markRaw, onMounted, computed } from "vue";
-import CoreSelectorProvider from "./selector-providers/CoreSelectorProvider.vue";
 import type {
   AttachmentLike,
   AttachmentSelectProvider,
-  PluginModule,
 } from "@halo-dev/console-shared";
-import { usePluginModuleStore } from "@/stores/plugin";
+import { computed, markRaw, onMounted, ref } from "vue";
 import { useI18n } from "vue-i18n";
+import CoreSelectorProvider from "./selector-providers/CoreSelectorProvider.vue";
 
 const { t } = useI18n();
 
@@ -46,23 +45,22 @@ const attachmentSelectProviders = ref<AttachmentSelectProvider[]>([
 // resolve plugin extension points
 const { pluginModules } = usePluginModuleStore();
 
-onMounted(() => {
-  pluginModules.forEach((pluginModule: PluginModule) => {
-    const { extensionPoints } = pluginModule;
-    if (!extensionPoints?.["attachment:selector:create"]) {
-      return;
-    }
+onMounted(async () => {
+  for (const pluginModule of pluginModules) {
+    try {
+      const callbackFunction =
+        pluginModule?.extensionPoints?.["attachment:selector:create"];
 
-    const providers = extensionPoints[
-      "attachment:selector:create"
-    ]() as AttachmentSelectProvider[];
+      if (typeof callbackFunction !== "function") {
+        continue;
+      }
 
-    if (providers) {
-      providers.forEach((provider) => {
-        attachmentSelectProviders.value.push(provider);
-      });
+      const providers = await callbackFunction();
+      attachmentSelectProviders.value.push(...providers);
+    } catch (error) {
+      console.error(`Error processing plugin module:`, pluginModule, error);
     }
-  });
+  }
 });
 
 const activeId = ref(attachmentSelectProviders.value[0].id);

@@ -1,8 +1,8 @@
-import { usePluginModuleStore } from "@/stores/plugin";
-import type { EditorProvider, PluginModule } from "@halo-dev/console-shared";
-import { onMounted, ref, type Ref, defineAsyncComponent, markRaw } from "vue";
-import { VLoading } from "@halo-dev/components";
 import Logo from "@/assets/logo.png";
+import { usePluginModuleStore } from "@/stores/plugin";
+import { VLoading } from "@halo-dev/components";
+import type { EditorProvider } from "@halo-dev/console-shared";
+import { defineAsyncComponent, markRaw, onMounted, ref, type Ref } from "vue";
 import { useI18n } from "vue-i18n";
 
 interface useEditorExtensionPointsReturn {
@@ -30,17 +30,23 @@ export function useEditorExtensionPoints(): useEditorExtensionPointsReturn {
     },
   ]);
 
-  onMounted(() => {
-    pluginModules.forEach((pluginModule: PluginModule) => {
-      const { extensionPoints } = pluginModule;
-      if (!extensionPoints?.["editor:create"]) {
-        return;
+  onMounted(async () => {
+    for (const pluginModule of pluginModules) {
+      try {
+        const callbackFunction =
+          pluginModule?.extensionPoints?.["editor:create"];
+
+        if (typeof callbackFunction !== "function") {
+          continue;
+        }
+
+        const providers = await callbackFunction();
+
+        editorProviders.value.push(...providers);
+      } catch (error) {
+        console.error(`Error processing plugin module:`, pluginModule, error);
       }
-
-      const providers = extensionPoints["editor:create"]() as EditorProvider[];
-
-      editorProviders.value.push(...providers);
-    });
+    }
   });
 
   return {

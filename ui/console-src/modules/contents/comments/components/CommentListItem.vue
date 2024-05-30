@@ -1,4 +1,15 @@
 <script lang="ts" setup>
+import { usePluginModuleStore } from "@/stores/plugin";
+import { apiClient } from "@/utils/api-client";
+import { formatDatetime } from "@/utils/date";
+import { usePermission } from "@/utils/permission";
+import type {
+  Extension,
+  ListedComment,
+  ListedReply,
+  Post,
+  SinglePage,
+} from "@halo-dev/api-client";
 import {
   Dialog,
   IconAddCircle,
@@ -15,28 +26,16 @@ import {
   VStatusDot,
   VTag,
 } from "@halo-dev/components";
-import ReplyCreationModal from "./ReplyCreationModal.vue";
-import type {
-  Extension,
-  ListedComment,
-  ListedReply,
-  Post,
-  SinglePage,
-} from "@halo-dev/api-client";
-import { formatDatetime } from "@/utils/date";
-import { computed, onMounted, provide, ref, type Ref } from "vue";
-import ReplyListItem from "./ReplyListItem.vue";
-import { apiClient } from "@/utils/api-client";
-import { cloneDeep } from "lodash-es";
-import { usePermission } from "@/utils/permission";
-import { useMutation, useQuery, useQueryClient } from "@tanstack/vue-query";
-import { useI18n } from "vue-i18n";
-import { usePluginModuleStore } from "@/stores/plugin";
 import type {
   CommentSubjectRefProvider,
   CommentSubjectRefResult,
-  PluginModule,
 } from "@halo-dev/console-shared";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/vue-query";
+import { cloneDeep } from "lodash-es";
+import { computed, onMounted, provide, ref, type Ref } from "vue";
+import { useI18n } from "vue-i18n";
+import ReplyCreationModal from "./ReplyCreationModal.vue";
+import ReplyListItem from "./ReplyListItem.vue";
 
 const { currentUserHasPermission } = usePermission();
 const { t } = useI18n();
@@ -250,25 +249,21 @@ const SubjectRefProviders = ref<CommentSubjectRefProvider[]>([
   },
 ]);
 
+const { pluginModules } = usePluginModuleStore();
+
 onMounted(() => {
-  const { pluginModules } = usePluginModuleStore();
+  for (const pluginModule of pluginModules) {
+    const callbackFunction =
+      pluginModule?.extensionPoints?.["comment:subject-ref:create"];
 
-  pluginModules.forEach((pluginModule: PluginModule) => {
-    const { extensionPoints } = pluginModule;
-    if (!extensionPoints?.["comment:subject-ref:create"]) {
-      return;
+    if (typeof callbackFunction !== "function") {
+      continue;
     }
 
-    const providers = extensionPoints[
-      "comment:subject-ref:create"
-    ]() as CommentSubjectRefProvider[];
+    const providers = callbackFunction();
 
-    if (providers) {
-      providers.forEach((provider) => {
-        SubjectRefProviders.value.push(provider);
-      });
-    }
-  });
+    SubjectRefProviders.value.push(...providers);
+  }
 });
 
 const subjectRefResult = computed(() => {

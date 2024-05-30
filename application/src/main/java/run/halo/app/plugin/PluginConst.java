@@ -22,7 +22,7 @@ public interface PluginConst {
 
     String RUNTIME_MODE_ANNO = "plugin.halo.run/runtime-mode";
 
-    static String assertsRoutePrefix(String pluginName) {
+    static String assetsRoutePrefix(String pluginName) {
         return "/plugins/" + pluginName + "/assets/";
     }
 

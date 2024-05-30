@@ -1,28 +1,28 @@
 <script lang="ts" setup>
-import {
-  IconTerminalBoxLine,
-  IconClipboardLine,
-  VAlert,
-  VPageHeader,
-  VCard,
-  VButton,
-  Toast,
-  VDescription,
-  VDescriptionItem,
-  VTag,
-  VLoading,
-} from "@halo-dev/components";
-import { computed } from "vue";
-import type { Info, GlobalInfo, Startup } from "@/types";
-import axios from "axios";
+import type { GlobalInfo, Info, Startup } from "@/types";
+import { apiClient } from "@/utils/api-client";
 import { formatDatetime } from "@/utils/date";
-import { useClipboard } from "@vueuse/core";
-import { useI18n } from "vue-i18n";
+import { usePermission } from "@/utils/permission";
 import { useThemeStore } from "@console/stores/theme";
 import type { Plugin } from "@halo-dev/api-client";
-import { apiClient } from "@/utils/api-client";
+import {
+  IconClipboardLine,
+  IconTerminalBoxLine,
+  Toast,
+  VAlert,
+  VButton,
+  VCard,
+  VDescription,
+  VDescriptionItem,
+  VLoading,
+  VPageHeader,
+  VTag,
+} from "@halo-dev/components";
 import { useQuery } from "@tanstack/vue-query";
-import { usePermission } from "@/utils/permission";
+import { useClipboard } from "@vueuse/core";
+import axios from "axios";
+import { computed } from "vue";
+import { useI18n } from "vue-i18n";
 
 const { t } = useI18n();
 const themeStore = useThemeStore();
@@ -31,12 +31,9 @@ const { currentUserHasPermission } = usePermission();
 const { data: info } = useQuery<Info>({
   queryKey: ["system-info"],
   queryFn: async () => {
-    const { data } = await axios.get<Info>(
-      `${import.meta.env.VITE_API_URL}/actuator/info`,
-      {
-        withCredentials: true,
-      }
-    );
+    const { data } = await axios.get<Info>(`/actuator/info`, {
+      withCredentials: true,
+    });
     return data;
   },
   retry: 0,
@@ -45,12 +42,9 @@ const { data: info } = useQuery<Info>({
 const { data: globalInfo } = useQuery<GlobalInfo>({
   queryKey: ["system-global-info"],
   queryFn: async () => {
-    const { data } = await axios.get<GlobalInfo>(
-      `${import.meta.env.VITE_API_URL}/actuator/globalinfo`,
-      {
-        withCredentials: true,
-      }
-    );
+    const { data } = await axios.get<GlobalInfo>(`/actuator/globalinfo`, {
+      withCredentials: true,
+    });
     return data;
   },
   retry: 0,
@@ -59,12 +53,9 @@ const { data: globalInfo } = useQuery<GlobalInfo>({
 const { data: startup } = useQuery<Startup>({
   queryKey: ["system-startup-info"],
   queryFn: async () => {
-    const { data } = await axios.get<Startup>(
-      `${import.meta.env.VITE_API_URL}/actuator/startup`,
-      {
-        withCredentials: true,
-      }
-    );
+    const { data } = await axios.get<Startup>(`/actuator/startup`, {
+      withCredentials: true,
+    });
     return data;
   },
   retry: 0,
@@ -159,7 +150,7 @@ const handleCopy = () => {
     },
     {
       label: t("core.overview.fields.activated_theme"),
-      value: themeStore.activatedTheme?.spec.displayName || "",
+      value: `${themeStore.activatedTheme?.spec.displayName} ${themeStore.activatedTheme?.spec.version}`,
       href:
         themeStore.activatedTheme?.spec.repo ||
         themeStore.activatedTheme?.spec.homepage,
@@ -167,7 +158,7 @@ const handleCopy = () => {
     {
       label: t("core.overview.fields.enabled_plugins"),
       children: plugins.value?.map((plugin) => ({
-        value: plugin.spec.displayName,
+        value: `${plugin.spec.displayName} ${plugin.spec.version}`,
         href: plugin.spec.repo || plugin.spec.homepage,
       })) as CopyItem[],
     },
@@ -201,7 +192,7 @@ const handleCopy = () => {
 
 const handleDownloadLogfile = () => {
   axios
-    .get(`${import.meta.env.VITE_API_URL}/actuator/logfile`)
+    .get(`/actuator/logfile`)
     .then((response) => {
       const blob = new Blob([response.data]);
       const downloadElement = document.createElement("a");

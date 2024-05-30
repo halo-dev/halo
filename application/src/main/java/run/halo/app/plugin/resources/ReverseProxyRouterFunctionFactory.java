@@ -4,6 +4,7 @@ import static org.springframework.http.MediaType.ALL;
 import static org.springframework.web.reactive.function.server.RequestPredicates.GET;
 import static org.springframework.web.reactive.function.server.RequestPredicates.accept;
 
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.time.Instant;
 import java.util.List;
@@ -16,6 +17,7 @@ import org.springframework.context.ApplicationContext;
 import org.springframework.core.io.DefaultResourceLoader;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.ResourceLoader;
+import org.springframework.http.CacheControl;
 import org.springframework.http.server.PathContainer;
 import org.springframework.lang.NonNull;
 import org.springframework.lang.Nullable;
@@ -26,6 +28,7 @@ import org.springframework.web.reactive.function.server.RouterFunction;
 import org.springframework.web.reactive.function.server.RouterFunctions;
 import org.springframework.web.reactive.function.server.ServerRequest;
 import org.springframework.web.reactive.function.server.ServerResponse;
+import org.springframework.web.reactive.resource.NoResourceFoundException;
 import org.springframework.web.util.pattern.PathPatternParser;
 import reactor.core.publisher.Mono;
 import run.halo.app.core.extension.ReverseProxy;
@@ -71,34 +74,44 @@ public class ReverseProxyRouterFunctionFactory {
         ReverseProxy reverseProxy, @NonNull String pluginName) {
         Assert.notNull(reverseProxy, "The reverseProxy must not be null.");
         var rules = getReverseProxyRules(reverseProxy);
+        var cacheProperties = webProperties.getResources().getCache();
+        var useLastModified = cacheProperties.isUseLastModified();
+        var cacheControl = cacheProperties.getCachecontrol().toHttpCacheControl();
+        if (cacheControl == null) {
+            cacheControl = CacheControl.empty();
+        }
+        var finalCacheControl = cacheControl;
         return rules.stream().map(rule -> {
             String routePath = buildRoutePath(pluginName, rule);
             log.debug("Plugin [{}] registered reverse proxy route path [{}]", pluginName,
                 routePath);
             return RouterFunctions.route(GET(routePath).and(accept(ALL)),
                 request -> {
-                    Resource resource =
-                        loadResourceByFileRule(pluginName, rule, request);
+                    var resource = loadResourceByFileRule(pluginName, rule, request);
                     if (!resource.exists()) {
-                        return ServerResponse.notFound().build();
+                        return Mono.error(new NoResourceFoundException(routePath));
                     }
-                    var cacheProperties = webProperties.getResources().getCache();
-                    var useLastModified = cacheProperties.isUseLastModified();
-                    var bodyBuilder = ServerResponse.ok()
-                        .cacheControl(cacheProperties.getCachecontrol().toHttpCacheControl());
+                    if (!useLastModified) {
+                        return ServerResponse.ok()
+                            .cacheControl(finalCacheControl)
+                            .body(BodyInserters.fromResource(resource));
+                    }
+                    Instant lastModified;
                     try {
-                        if (useLastModified) {
-                            var lastModified = Instant.ofEpochMilli(resource.lastModified());
-                            return request.checkNotModified(lastModified)
-                                .switchIfEmpty(Mono.defer(
-                                    () -> bodyBuilder.lastModified(lastModified)
-                                        .body(BodyInserters.fromResource(resource)))
-                                );
-                        }
-                        return bodyBuilder.body(BodyInserters.fromResource(resource));
+                        lastModified = Instant.ofEpochMilli(resource.lastModified());
                     } catch (IOException e) {
-                        throw new RuntimeException(e);
+                        if (e instanceof FileNotFoundException) {
+                            return Mono.error(new NoResourceFoundException(routePath));
+                        }
+                        return Mono.error(e);
                     }
+                    return request.checkNotModified(lastModified)
+                        .switchIfEmpty(Mono.defer(
+                            () -> ServerResponse.ok()
+                                .cacheControl(finalCacheControl)
+                                .lastModified(lastModified)
+                                .body(BodyInserters.fromResource(resource)))
+                        );
                 });
         }).reduce(RouterFunction::and).orElse(null);
     }
@@ -112,7 +125,7 @@ public class ReverseProxyRouterFunctionFactory {
     }
 
     public static String buildRoutePath(String pluginId, ReverseProxyRule reverseProxyRule) {
-        return PathUtils.combinePath(PluginConst.assertsRoutePrefix(pluginId),
+        return PathUtils.combinePath(PluginConst.assetsRoutePrefix(pluginId),
             reverseProxyRule.path());
     }
 

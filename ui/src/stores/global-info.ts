@@ -7,12 +7,9 @@ export const useGlobalInfoStore = defineStore("global-info", () => {
   const globalInfo = ref<GlobalInfo>();
 
   async function fetchGlobalInfo() {
-    const { data } = await axios.get<GlobalInfo>(
-      `${import.meta.env.VITE_API_URL}/actuator/globalinfo`,
-      {
-        withCredentials: true,
-      }
-    );
+    const { data } = await axios.get<GlobalInfo>(`/actuator/globalinfo`, {
+      withCredentials: true,
+    });
     globalInfo.value = data;
   }
 

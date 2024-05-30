@@ -1,5 +1,10 @@
 <script lang="ts" setup>
+import { usePluginModuleStore } from "@/stores/plugin";
+import { usePermission } from "@/utils/permission";
+import type { Theme } from "@halo-dev/api-client";
 import { VButton, VModal, VTabbar } from "@halo-dev/components";
+import type { ThemeListTab } from "@halo-dev/console-shared";
+import { useRouteQuery } from "@vueuse/router";
 import {
   computed,
   inject,
@@ -8,19 +13,14 @@ import {
   onMounted,
   provide,
   ref,
-  type Ref,
   watch,
+  type Ref,
 } from "vue";
-import type { Theme } from "@halo-dev/api-client";
 import { useI18n } from "vue-i18n";
-import { useRouteQuery } from "@vueuse/router";
 import InstalledThemes from "./list-tabs/InstalledThemes.vue";
-import NotInstalledThemes from "./list-tabs/NotInstalledThemes.vue";
 import LocalUpload from "./list-tabs/LocalUpload.vue";
+import NotInstalledThemes from "./list-tabs/NotInstalledThemes.vue";
 import RemoteDownload from "./list-tabs/RemoteDownload.vue";
-import { usePluginModuleStore } from "@/stores/plugin";
-import type { PluginModule, ThemeListTab } from "@halo-dev/console-shared";
-import { usePermission } from "@/utils/permission";
 
 const { t } = useI18n();
 const { currentUserHasPermission } = usePermission();
@@ -92,22 +92,30 @@ onMounted(() => {
 });
 
 const { pluginModules } = usePluginModuleStore();
-onMounted(() => {
+
+onMounted(async () => {
   const tabsFromPlugins: ThemeListTab[] = [];
-  pluginModules.forEach((pluginModule: PluginModule) => {
-    const { extensionPoints } = pluginModule;
-    if (!extensionPoints?.["theme:list:tabs:create"]) {
-      return;
+
+  for (const pluginModule of pluginModules) {
+    try {
+      const callbackFunction =
+        pluginModule?.extensionPoints?.["theme:list:tabs:create"];
+
+      if (typeof callbackFunction !== "function") {
+        continue;
+      }
+
+      const items = await callbackFunction();
+
+      tabsFromPlugins.push(
+        ...items.filter((item) => {
+          return currentUserHasPermission(item.permissions);
+        })
+      );
+    } catch (error) {
+      console.error(`Error processing plugin module:`, pluginModule, error);
     }
-
-    let items = extensionPoints["theme:list:tabs:create"]() as ThemeListTab[];
-
-    items = items.filter((item) => {
-      return currentUserHasPermission(item.permissions);
-    });
-
-    tabsFromPlugins.push(...items);
-  });
+  }
 
   tabs.value = tabs.value.concat(tabsFromPlugins).sort((a, b) => {
     return a.priority - b.priority;

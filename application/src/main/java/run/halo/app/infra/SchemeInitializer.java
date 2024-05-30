@@ -72,7 +72,13 @@ public class SchemeInitializer implements ApplicationListener<ApplicationContext
         // plugin.halo.run
         schemeManager.register(Plugin.class);
         schemeManager.register(SearchEngine.class);
-        schemeManager.register(ExtensionPointDefinition.class);
+        schemeManager.register(ExtensionPointDefinition.class, indexSpecs -> {
+            indexSpecs.add(new IndexSpec()
+                .setName("spec.className")
+                .setIndexFunc(simpleAttribute(ExtensionPointDefinition.class,
+                    definition -> definition.getSpec().getClassName())
+                ));
+        });
         schemeManager.register(ExtensionDefinition.class);
 
         schemeManager.register(RoleBinding.class);

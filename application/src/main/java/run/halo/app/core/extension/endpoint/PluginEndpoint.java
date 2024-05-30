@@ -19,6 +19,7 @@ import static run.halo.app.infra.utils.FileUtils.deleteFileSilently;
 import io.swagger.v3.oas.annotations.enums.ParameterIn;
 import io.swagger.v3.oas.annotations.media.ArraySchema;
 import io.swagger.v3.oas.annotations.media.Schema;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.net.URI;
 import java.nio.file.Files;
@@ -32,20 +33,20 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
-import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.concurrent.locks.ReadWriteLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.function.Supplier;
-import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
 import org.reactivestreams.Publisher;
 import org.springdoc.core.fn.builders.operation.Builder;
 import org.springdoc.webflux.core.fn.SpringdocRouteBuilder;
 import org.springframework.beans.factory.DisposableBean;
+import org.springframework.beans.factory.InitializingBean;
+import org.springframework.boot.autoconfigure.web.WebProperties;
 import org.springframework.core.io.FileSystemResource;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.buffer.DataBuffer;
@@ -67,6 +68,7 @@ import org.springframework.web.reactive.function.BodyInserters;
 import org.springframework.web.reactive.function.server.RouterFunction;
 import org.springframework.web.reactive.function.server.ServerRequest;
 import org.springframework.web.reactive.function.server.ServerResponse;
+import org.springframework.web.reactive.resource.NoResourceFoundException;
 import org.springframework.web.server.ServerWebExchange;
 import org.springframework.web.server.ServerWebInputException;
 import reactor.core.publisher.Flux;
@@ -88,9 +90,7 @@ import run.halo.app.plugin.PluginNotFoundException;
 
 @Slf4j
 @Component
-@AllArgsConstructor
-public class PluginEndpoint implements CustomEndpoint {
-    private static final CacheControl MAX_CACHE_CONTROL = CacheControl.maxAge(365, TimeUnit.DAYS);
+public class PluginEndpoint implements CustomEndpoint, InitializingBean {
 
     private final ReactiveExtensionClient client;
 
@@ -98,9 +98,27 @@ public class PluginEndpoint implements CustomEndpoint {
 
     private final ReactiveUrlDataBufferFetcher reactiveUrlDataBufferFetcher;
 
+    private final BufferedPluginBundleResource bufferedPluginBundleResource;
+
+    private final WebProperties webProperties;
+
     private final Scheduler scheduler = Schedulers.boundedElastic();
 
-    private final BufferedPluginBundleResource bufferedPluginBundleResource;
+    private boolean useLastModified;
+
+    private CacheControl bundleCacheControl = CacheControl.empty();
+
+    public PluginEndpoint(ReactiveExtensionClient client,
+        PluginService pluginService,
+        ReactiveUrlDataBufferFetcher reactiveUrlDataBufferFetcher,
+        BufferedPluginBundleResource bufferedPluginBundleResource,
+        WebProperties webProperties) {
+        this.client = client;
+        this.pluginService = pluginService;
+        this.reactiveUrlDataBufferFetcher = reactiveUrlDataBufferFetcher;
+        this.bufferedPluginBundleResource = bufferedPluginBundleResource;
+        this.webProperties = webProperties;
+    }
 
     @Override
     public RouterFunction<ServerResponse> endpoint() {
@@ -290,6 +308,16 @@ public class PluginEndpoint implements CustomEndpoint {
             .flatMap(plugin -> ServerResponse.ok().bodyValue(plugin));
     }
 
+    @Override
+    public void afterPropertiesSet() {
+        var cache = this.webProperties.getResources().getCache();
+        this.useLastModified = cache.isUseLastModified();
+        var cacheControl = cache.getCachecontrol().toHttpCacheControl();
+        if (cacheControl != null) {
+            this.bundleCacheControl = cacheControl;
+        }
+    }
+
     @Data
     @Schema(name = "PluginRunningStateRequest")
     static class RunningStateRequest {
@@ -299,60 +327,65 @@ public class PluginEndpoint implements CustomEndpoint {
 
     private Mono<ServerResponse> fetchJsBundle(ServerRequest request) {
         Optional<String> versionOption = request.queryParam("v");
-        return versionOption.map(s ->
-                Mono.defer(() -> bufferedPluginBundleResource
-                    .getJsBundle(s, pluginService::uglifyJsBundle)
-                ).flatMap(fsRes -> {
-                    var bodyBuilder = ServerResponse.ok()
-                        .cacheControl(MAX_CACHE_CONTROL)
-                        .contentType(MediaType.valueOf("text/javascript"));
+        if (versionOption.isEmpty()) {
+            return pluginService.generateJsBundleVersion()
+                .flatMap(version -> ServerResponse
+                    .temporaryRedirect(buildJsBundleUri("js", version))
+                    .cacheControl(CacheControl.noStore())
+                    .build());
+        }
+        var version = versionOption.get();
+        return bufferedPluginBundleResource.getJsBundle(version, pluginService::uglifyJsBundle)
+            .flatMap(jsRes -> {
+                var bodyBuilder = ServerResponse.ok()
+                    .cacheControl(bundleCacheControl)
+                    .contentType(MediaType.valueOf("text/javascript"));
+                if (useLastModified) {
                     try {
-                        Instant lastModified = Instant.ofEpochMilli(fsRes.lastModified());
-                        return request.checkNotModified(lastModified)
-                            .switchIfEmpty(Mono.defer(() ->
-                                bodyBuilder.lastModified(lastModified)
-                                    .body(BodyInserters.fromResource(fsRes)))
-                            );
+                        var lastModified = Instant.ofEpochMilli(jsRes.lastModified());
+                        bodyBuilder = bodyBuilder.lastModified(lastModified);
                     } catch (IOException e) {
+                        if (e instanceof FileNotFoundException) {
+                            return Mono.error(new NoResourceFoundException("bundle.js"));
+                        }
                         return Mono.error(e);
                     }
-                })
-            )
-            .orElseGet(() -> pluginService.generateJsBundleVersion()
-                .flatMap(v -> ServerResponse
-                    .temporaryRedirect(buildJsBundleUri("js", v))
-                    .build()
-                )
-            );
+                }
+                return bodyBuilder.body(BodyInserters.fromResource(jsRes));
+            });
     }
 
     private Mono<ServerResponse> fetchCssBundle(ServerRequest request) {
         Optional<String> versionOption = request.queryParam("v");
-        return versionOption.map(s ->
-                Mono.defer(() -> bufferedPluginBundleResource.getCssBundle(s,
-                    pluginService::uglifyCssBundle)
-                ).flatMap(fsRes -> {
-                    var bodyBuilder = ServerResponse.ok()
-                        .cacheControl(MAX_CACHE_CONTROL)
-                        .contentType(MediaType.valueOf("text/css"));
+        if (versionOption.isEmpty()) {
+            return pluginService.generateJsBundleVersion()
+                .flatMap(version -> ServerResponse
+                    .temporaryRedirect(buildJsBundleUri("css", version))
+                    .cacheControl(CacheControl.noStore())
+                    .build());
+        }
+
+        var version = versionOption.get();
+        return bufferedPluginBundleResource.getCssBundle(version, pluginService::uglifyCssBundle)
+            .flatMap(cssRes -> {
+                var bodyBuilder = ServerResponse.ok()
+                    .cacheControl(bundleCacheControl)
+                    .contentType(MediaType.valueOf("text/css"));
+
+                if (useLastModified) {
                     try {
-                        Instant lastModified = Instant.ofEpochMilli(fsRes.lastModified());
-                        return request.checkNotModified(lastModified)
-                            .switchIfEmpty(Mono.defer(() ->
-                                bodyBuilder.lastModified(lastModified)
-                                    .body(BodyInserters.fromResource(fsRes)))
-                            );
+                        var lastModified = Instant.ofEpochMilli(cssRes.lastModified());
+                        bodyBuilder = bodyBuilder.lastModified(lastModified);
                     } catch (IOException e) {
+                        if (e instanceof FileNotFoundException) {
+                            return Mono.error(new NoResourceFoundException("bundle.css"));
+                        }
                         return Mono.error(e);
                     }
-                })
-            )
-            .orElseGet(() -> pluginService.generateJsBundleVersion()
-                .flatMap(v -> ServerResponse
-                    .temporaryRedirect(buildJsBundleUri("css", v))
-                    .build()
-                )
-            );
+                }
+
+                return bodyBuilder.body(BodyInserters.fromResource(cssRes));
+            });
     }
 
     URI buildJsBundleUri(String type, String version) {
@@ -743,10 +776,10 @@ public class PluginEndpoint implements CustomEndpoint {
 
         private Path tempDir;
 
-        public Mono<FileSystemResource> getJsBundle(String version,
+        public Mono<Resource> getJsBundle(String version,
             Supplier<Flux<DataBuffer>> jsSupplier) {
             var fileName = tempFileName(version, ".js");
-            return Mono.defer(() -> {
+            return Mono.<Resource>defer(() -> {
                 jsLock.readLock().lock();
                 try {
                     var jsBundleResource = jsBundle.get();
@@ -768,12 +801,12 @@ public class PluginEndpoint implements CustomEndpoint {
             }).subscribeOn(Schedulers.boundedElastic());
         }
 
-        public Mono<FileSystemResource> getCssBundle(String version,
+        public Mono<Resource> getCssBundle(String version,
             Supplier<Flux<DataBuffer>> cssSupplier) {
             var fileName = tempFileName(version, ".css");
-            return Mono.defer(() -> {
+            return Mono.<Resource>defer(() -> {
+                cssLock.readLock().lock();
                 try {
-                    cssLock.readLock().lock();
                     var cssBundleResource = cssBundle.get();
                     if (getResourceIfNotChange(fileName, cssBundleResource) != null) {
                         return Mono.just(cssBundleResource);

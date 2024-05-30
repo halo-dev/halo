@@ -41,11 +41,12 @@ defineExpose({
 </script>
 
 <template>
+  <!-- @vue-ignore -->
   <FloatingDropdown
     ref="dropdownRef"
     :placement="placement"
     :triggers="triggers"
-    :dispose-timeout="0"
+    :dispose-timeout="null"
     @show="emit('show')"
   >
     <slot />
