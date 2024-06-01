@@ -1,5 +1,6 @@
 package run.halo.app.core.extension.service.impl;
 
+import static java.nio.charset.StandardCharsets.UTF_8;
 import static java.util.Objects.requireNonNull;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -7,33 +8,45 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertInstanceOf;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.isA;
+import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.lenient;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+import static org.springframework.core.io.buffer.DefaultDataBufferFactory.sharedInstance;
 
 import com.github.zafarkhaja.semver.Version;
 import com.google.common.hash.Hashing;
 import java.io.IOException;
 import java.net.URISyntaxException;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
 import java.util.function.Consumer;
+import java.util.stream.IntStream;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
+import org.junit.jupiter.api.RepeatedTest;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.api.io.TempDir;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.pf4j.PluginDescriptor;
 import org.pf4j.PluginWrapper;
+import org.springframework.core.io.buffer.DataBuffer;
 import org.springframework.web.server.ServerWebInputException;
 import reactor.core.publisher.Mono;
 import reactor.test.StepVerifier;
+import reactor.test.publisher.PublisherProbe;
 import run.halo.app.core.extension.Plugin;
 import run.halo.app.extension.Metadata;
 import run.halo.app.extension.ReactiveExtensionClient;
@@ -60,6 +73,7 @@ class PluginServiceImplTest {
     @Mock
     SpringPluginManager pluginManager;
 
+    @Spy
     @InjectMocks
     PluginServiceImpl pluginService;
 
@@ -237,7 +251,7 @@ class PluginServiceImplTest {
 
 
     @Test
-    void generateJsBundleVersionTest() {
+    void generateBundleVersionTest() {
         var plugin1 = mock(PluginWrapper.class);
         var plugin2 = mock(PluginWrapper.class);
         var plugin3 = mock(PluginWrapper.class);
@@ -262,7 +276,7 @@ class PluginServiceImplTest {
         var result = Hashing.sha256().hashUnencodedChars(str).toString();
         assertThat(result.length()).isEqualTo(64);
 
-        pluginService.generateJsBundleVersion()
+        pluginService.generateBundleVersion()
             .as(StepVerifier::create)
             .consumeNextWith(version -> assertThat(version).isEqualTo(result))
             .verifyComplete();
@@ -275,7 +289,7 @@ class PluginServiceImplTest {
         var str2 = "fake-1:1.0.0fake-2:2.0.0fake-4:3.0.0";
         var result2 = Hashing.sha256().hashUnencodedChars(str2).toString();
         when(pluginManager.getStartedPlugins()).thenReturn(List.of(plugin1, plugin2, plugin4));
-        pluginService.generateJsBundleVersion()
+        pluginService.generateBundleVersion()
             .as(StepVerifier::create)
             .consumeNextWith(version -> assertThat(version).isEqualTo(result2))
             .verifyComplete();
@@ -327,6 +341,123 @@ class PluginServiceImplTest {
                 .expectNext(plugin)
                 .verifyComplete();
             assertFalse(plugin.getSpec().getEnabled());
+        }
+    }
+
+    @Nested
+    class BundleCacheTest {
+
+        PluginServiceImpl.BundleCache cache;
+
+        @TempDir
+        Path tempDir;
+
+        @BeforeEach
+        void setUp() {
+            pluginService.setTempDir(tempDir);
+            cache = pluginService.new BundleCache(".js");
+        }
+
+        @Test
+        void shouldComputeBundleFileIfAbsent() {
+            doReturn(Mono.just("different-version")).when(pluginService).generateBundleVersion();
+            var fakeContent = Mono.<DataBuffer>just(sharedInstance.wrap("fake-content".getBytes(
+                UTF_8)));
+            cache.computeIfAbsent("fake-version", fakeContent)
+                .as(StepVerifier::create)
+                .assertNext(resource -> {
+                    try {
+                        assertEquals(tempDir.resolve("different-version.js"),
+                            resource.getFile().toPath());
+                        assertEquals("different-version.js", resource.getFilename());
+                        assertEquals("fake-content", resource.getContentAsString(UTF_8));
+                    } catch (IOException e) {
+                        throw new RuntimeException(e);
+                    }
+                })
+                .verifyComplete();
+        }
+
+        @Test
+        void shouldNotComputeBundleFileIfPresentAndVersionIsMatch() {
+            shouldComputeBundleFileIfAbsent();
+
+            var fakeContent = Mono.<DataBuffer>just(
+                sharedInstance.wrap("another-fake-content".getBytes(UTF_8)));
+
+            cache.computeIfAbsent("different-version", fakeContent)
+                .as(StepVerifier::create)
+                .assertNext(resource -> {
+                    try {
+                        assertEquals("different-version.js", resource.getFilename());
+                        // The content won't be changed if the version is matched.
+                        assertEquals("fake-content", resource.getContentAsString(UTF_8));
+                    } catch (IOException e) {
+                        throw new RuntimeException(e);
+                    }
+                })
+                .verifyComplete();
+        }
+
+        @Test
+        void shouldComputeBundleFileIfPresentButVersionMismatch() {
+            shouldComputeBundleFileIfAbsent();
+
+            var fakeContent = Mono.<DataBuffer>just(
+                sharedInstance.wrap("another-fake-content".getBytes(UTF_8)));
+
+            doReturn(Mono.just("updated-version")).when(pluginService).generateBundleVersion();
+
+            cache.computeIfAbsent("mismatch-version", fakeContent)
+                .as(StepVerifier::create)
+                .assertNext(resource -> {
+                    try {
+                        assertTrue(Files.notExists(tempDir.resolve("different-version.js")));
+                        assertEquals("updated-version.js", resource.getFilename());
+                        assertEquals("another-fake-content", resource.getContentAsString(UTF_8));
+                    } catch (IOException e) {
+                        throw new RuntimeException(e);
+                    }
+                })
+                .verifyComplete();
+        }
+
+        @RepeatedTest(10)
+        void concurrentComputeBundleFileIfAbsent() {
+            lenient().doReturn(Mono.just("different-version"))
+                .when(pluginService)
+                .generateBundleVersion();
+
+            var executorService = Executors.newCachedThreadPool();
+
+            var probes = new ArrayList<PublisherProbe<DataBuffer>>();
+            List<? extends Future<?>> futures = IntStream.range(0, 10)
+                .mapToObj(i -> executorService.submit(() -> {
+                    var fakeContent = Mono.<DataBuffer>just(sharedInstance.wrap(
+                        ("fake-content-" + i).getBytes(UTF_8)
+                    ));
+                    var probe = PublisherProbe.of(fakeContent);
+                    probes.add(probe);
+                    cache.computeIfAbsent("fake-version", probe.mono())
+                        .as(StepVerifier::create)
+                        .expectNextCount(1)
+                        .verifyComplete();
+                }))
+                .toList();
+            executorService.shutdown();
+            futures.forEach(future -> {
+                try {
+                    future.get();
+                } catch (InterruptedException | ExecutionException e) {
+                    throw new RuntimeException(e);
+                }
+            });
+
+            // ensure only one probe was subscribed
+            var subscribedCount = probes.stream()
+                .filter(PublisherProbe::wasSubscribed)
+                .count();
+            assertEquals(1, subscribedCount);
         }
     }
 

@@ -32,25 +32,16 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
-import java.util.Optional;
-import java.util.concurrent.atomic.AtomicReference;
-import java.util.concurrent.locks.ReadWriteLock;
-import java.util.concurrent.locks.ReentrantReadWriteLock;
 import java.util.function.Function;
 import java.util.function.Predicate;
-import java.util.function.Supplier;
 import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
 import org.reactivestreams.Publisher;
 import org.springdoc.core.fn.builders.operation.Builder;
 import org.springdoc.webflux.core.fn.SpringdocRouteBuilder;
-import org.springframework.beans.factory.DisposableBean;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.boot.autoconfigure.web.WebProperties;
-import org.springframework.core.io.FileSystemResource;
-import org.springframework.core.io.Resource;
 import org.springframework.core.io.buffer.DataBuffer;
-import org.springframework.core.io.buffer.DataBufferUtils;
 import org.springframework.dao.OptimisticLockingFailureException;
 import org.springframework.data.domain.Sort;
 import org.springframework.http.CacheControl;
@@ -58,10 +49,7 @@ import org.springframework.http.MediaType;
 import org.springframework.http.codec.multipart.FilePart;
 import org.springframework.http.codec.multipart.FormFieldPart;
 import org.springframework.http.codec.multipart.Part;
-import org.springframework.lang.Nullable;
 import org.springframework.stereotype.Component;
-import org.springframework.util.Assert;
-import org.springframework.util.FileSystemUtils;
 import org.springframework.util.MultiValueMap;
 import org.springframework.util.StringUtils;
 import org.springframework.web.reactive.function.BodyInserters;
@@ -71,7 +59,6 @@ import org.springframework.web.reactive.function.server.ServerResponse;
 import org.springframework.web.reactive.resource.NoResourceFoundException;
 import org.springframework.web.server.ServerWebExchange;
 import org.springframework.web.server.ServerWebInputException;
-import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import reactor.core.scheduler.Scheduler;
 import reactor.core.scheduler.Schedulers;
@@ -98,8 +85,6 @@ public class PluginEndpoint implements CustomEndpoint, InitializingBean {
 
     private final ReactiveUrlDataBufferFetcher reactiveUrlDataBufferFetcher;
 
-    private final BufferedPluginBundleResource bufferedPluginBundleResource;
-
     private final WebProperties webProperties;
 
     private final Scheduler scheduler = Schedulers.boundedElastic();
@@ -111,12 +96,10 @@ public class PluginEndpoint implements CustomEndpoint, InitializingBean {
     public PluginEndpoint(ReactiveExtensionClient client,
         PluginService pluginService,
         ReactiveUrlDataBufferFetcher reactiveUrlDataBufferFetcher,
-        BufferedPluginBundleResource bufferedPluginBundleResource,
         WebProperties webProperties) {
         this.client = client;
         this.pluginService = pluginService;
         this.reactiveUrlDataBufferFetcher = reactiveUrlDataBufferFetcher;
-        this.bufferedPluginBundleResource = bufferedPluginBundleResource;
         this.webProperties = webProperties;
     }
 
@@ -326,52 +309,38 @@ public class PluginEndpoint implements CustomEndpoint, InitializingBean {
     }
 
     private Mono<ServerResponse> fetchJsBundle(ServerRequest request) {
-        Optional<String> versionOption = request.queryParam("v");
-        if (versionOption.isEmpty()) {
-            return pluginService.generateJsBundleVersion()
+        var versionOption = request.queryParam("v");
+        return versionOption.map(s -> pluginService.getJsBundle(s).flatMap(
+                jsRes -> {
+                    var bodyBuilder = ServerResponse.ok()
+                        .cacheControl(bundleCacheControl)
+                        .contentType(MediaType.valueOf("text/javascript"));
+                    if (useLastModified) {
+                        try {
+                            var lastModified = Instant.ofEpochMilli(jsRes.lastModified());
+                            bodyBuilder = bodyBuilder.lastModified(lastModified);
+                        } catch (IOException e) {
+                            if (e instanceof FileNotFoundException) {
+                                return Mono.error(new NoResourceFoundException("bundle.js"));
+                            }
+                            return Mono.error(e);
+                        }
+                    }
+                    return bodyBuilder.body(BodyInserters.fromResource(jsRes));
+                }))
+            .orElseGet(() -> pluginService.generateBundleVersion()
                 .flatMap(version -> ServerResponse
                     .temporaryRedirect(buildJsBundleUri("js", version))
                     .cacheControl(CacheControl.noStore())
-                    .build());
-        }
-        var version = versionOption.get();
-        return bufferedPluginBundleResource.getJsBundle(version, pluginService::uglifyJsBundle)
-            .flatMap(jsRes -> {
-                var bodyBuilder = ServerResponse.ok()
-                    .cacheControl(bundleCacheControl)
-                    .contentType(MediaType.valueOf("text/javascript"));
-                if (useLastModified) {
-                    try {
-                        var lastModified = Instant.ofEpochMilli(jsRes.lastModified());
-                        bodyBuilder = bodyBuilder.lastModified(lastModified);
-                    } catch (IOException e) {
-                        if (e instanceof FileNotFoundException) {
-                            return Mono.error(new NoResourceFoundException("bundle.js"));
-                        }
-                        return Mono.error(e);
-                    }
-                }
-                return bodyBuilder.body(BodyInserters.fromResource(jsRes));
-            });
+                    .build()));
     }
 
     private Mono<ServerResponse> fetchCssBundle(ServerRequest request) {
-        Optional<String> versionOption = request.queryParam("v");
-        if (versionOption.isEmpty()) {
-            return pluginService.generateJsBundleVersion()
-                .flatMap(version -> ServerResponse
-                    .temporaryRedirect(buildJsBundleUri("css", version))
-                    .cacheControl(CacheControl.noStore())
-                    .build());
-        }
-
-        var version = versionOption.get();
-        return bufferedPluginBundleResource.getCssBundle(version, pluginService::uglifyCssBundle)
-            .flatMap(cssRes -> {
+        return request.queryParam("v")
+            .map(s -> pluginService.getCssBundle(s).flatMap(cssRes -> {
                 var bodyBuilder = ServerResponse.ok()
                     .cacheControl(bundleCacheControl)
                     .contentType(MediaType.valueOf("text/css"));
-
                 if (useLastModified) {
                     try {
                         var lastModified = Instant.ofEpochMilli(cssRes.lastModified());
@@ -383,9 +352,14 @@ public class PluginEndpoint implements CustomEndpoint, InitializingBean {
                         return Mono.error(e);
                     }
                 }
-
                 return bodyBuilder.body(BodyInserters.fromResource(cssRes));
-            });
+            }))
+            .orElseGet(() -> pluginService.generateBundleVersion()
+                .flatMap(version -> ServerResponse
+                    .temporaryRedirect(buildJsBundleUri("css", version))
+                    .cacheControl(CacheControl.noStore())
+                    .build()));
+
     }
 
     URI buildJsBundleUri(String type, String version) {
@@ -763,114 +737,6 @@ public class PluginEndpoint implements CustomEndpoint, InitializingBean {
         return Mono.fromCallable(() -> Files.createTempFile("halo-plugin-", ".jar"))
             .flatMap(path -> write(content, path).thenReturn(path))
             .subscribeOn(this.scheduler);
-    }
-
-    @Component
-    static class BufferedPluginBundleResource implements DisposableBean {
-
-        private final AtomicReference<FileSystemResource> jsBundle = new AtomicReference<>();
-        private final AtomicReference<FileSystemResource> cssBundle = new AtomicReference<>();
-
-        private final ReadWriteLock jsLock = new ReentrantReadWriteLock();
-        private final ReadWriteLock cssLock = new ReentrantReadWriteLock();
-
-        private Path tempDir;
-
-        public Mono<Resource> getJsBundle(String version,
-            Supplier<Flux<DataBuffer>> jsSupplier) {
-            var fileName = tempFileName(version, ".js");
-            return Mono.<Resource>defer(() -> {
-                jsLock.readLock().lock();
-                try {
-                    var jsBundleResource = jsBundle.get();
-                    if (getResourceIfNotChange(fileName, jsBundleResource) != null) {
-                        return Mono.just(jsBundleResource);
-                    }
-                } finally {
-                    jsLock.readLock().unlock();
-                }
-
-                jsLock.writeLock().lock();
-                try {
-                    var oldJsBundle = jsBundle.get();
-                    return writeBundle(fileName, jsSupplier)
-                        .doOnNext(newRes -> jsBundle.compareAndSet(oldJsBundle, newRes));
-                } finally {
-                    jsLock.writeLock().unlock();
-                }
-            }).subscribeOn(Schedulers.boundedElastic());
-        }
-
-        public Mono<Resource> getCssBundle(String version,
-            Supplier<Flux<DataBuffer>> cssSupplier) {
-            var fileName = tempFileName(version, ".css");
-            return Mono.<Resource>defer(() -> {
-                cssLock.readLock().lock();
-                try {
-                    var cssBundleResource = cssBundle.get();
-                    if (getResourceIfNotChange(fileName, cssBundleResource) != null) {
-                        return Mono.just(cssBundleResource);
-                    }
-                } finally {
-                    cssLock.readLock().unlock();
-                }
-
-                cssLock.writeLock().lock();
-                try {
-                    var oldCssBundle = cssBundle.get();
-                    return writeBundle(fileName, cssSupplier)
-                        .doOnNext(newRes -> cssBundle.compareAndSet(oldCssBundle, newRes));
-                } finally {
-                    cssLock.writeLock().unlock();
-                }
-            }).subscribeOn(Schedulers.boundedElastic());
-        }
-
-        @Nullable
-        private Resource getResourceIfNotChange(String fileName, Resource resource) {
-            if (resource != null && resource.exists() && fileName.equals(resource.getFilename())) {
-                return resource;
-            }
-            return null;
-        }
-
-        private Mono<FileSystemResource> writeBundle(String fileName,
-            Supplier<Flux<DataBuffer>> dataSupplier) {
-            return Mono.defer(
-                () -> {
-                    var filePath = createTempFileToStore(fileName);
-                    return DataBufferUtils.write(dataSupplier.get(), filePath)
-                        .then(Mono.fromSupplier(() -> new FileSystemResource(filePath)));
-                });
-        }
-
-        private Path createTempFileToStore(String fileName) {
-            try {
-                if (tempDir == null || !Files.exists(tempDir)) {
-                    this.tempDir = Files.createTempDirectory("halo-plugin-bundle");
-                }
-                var path = tempDir.resolve(fileName);
-                Files.deleteIfExists(path);
-                return Files.createFile(path);
-            } catch (IOException e) {
-                throw new ServerWebInputException("Failed to create temp file.", null, e);
-            }
-        }
-
-        private String tempFileName(String v, String suffix) {
-            Assert.notNull(v, "Version must not be null");
-            Assert.notNull(suffix, "Suffix must not be null");
-            return v + suffix;
-        }
-
-        @Override
-        public void destroy() throws Exception {
-            if (tempDir != null && Files.exists(tempDir)) {
-                FileSystemUtils.deleteRecursively(tempDir);
-            }
-            this.jsBundle.set(null);
-            this.cssBundle.set(null);
-        }
     }
 
 }

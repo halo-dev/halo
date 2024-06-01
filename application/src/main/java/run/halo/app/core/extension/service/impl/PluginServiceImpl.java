@@ -1,10 +1,13 @@
 package run.halo.app.core.extension.service.impl;
 
 import static java.nio.file.StandardCopyOption.REPLACE_EXISTING;
+import static java.nio.file.StandardOpenOption.CREATE;
+import static java.nio.file.StandardOpenOption.TRUNCATE_EXISTING;
 import static org.pf4j.PluginState.STARTED;
 import static run.halo.app.plugin.PluginConst.RELOAD_ANNO;
 
 import com.github.zafarkhaja.semver.Version;
+import com.google.common.hash.HashCode;
 import com.google.common.hash.Hashing;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
@@ -17,13 +20,18 @@ import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Objects;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.stream.Collectors;
-import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.pf4j.DependencyResolver;
 import org.pf4j.PluginDescriptor;
 import org.pf4j.PluginWrapper;
+import org.reactivestreams.Publisher;
+import org.springframework.beans.factory.DisposableBean;
+import org.springframework.beans.factory.InitializingBean;
+import org.springframework.core.io.FileSystemResource;
 import org.springframework.core.io.Resource;
+import org.springframework.core.io.WritableResource;
 import org.springframework.core.io.buffer.DataBuffer;
 import org.springframework.core.io.buffer.DataBufferUtils;
 import org.springframework.core.io.buffer.DefaultDataBufferFactory;
@@ -31,10 +39,12 @@ import org.springframework.core.io.support.PathMatchingResourcePatternResolver;
 import org.springframework.stereotype.Component;
 import org.springframework.util.Assert;
 import org.springframework.util.CollectionUtils;
+import org.springframework.util.FileSystemUtils;
 import org.springframework.web.server.ServerWebInputException;
 import reactor.core.Exceptions;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
+import reactor.core.scheduler.Scheduler;
 import reactor.core.scheduler.Schedulers;
 import reactor.util.retry.Retry;
 import run.halo.app.core.extension.Plugin;
@@ -59,8 +69,7 @@ import run.halo.app.plugin.resources.BundleResourceUtils;
 
 @Slf4j
 @Component
-@RequiredArgsConstructor
-public class PluginServiceImpl implements PluginService {
+public class PluginServiceImpl implements PluginService, InitializingBean, DisposableBean {
 
     private static final String PRESET_LOCATION_PREFIX = "classpath:/presets/plugins/";
     private static final String PRESETS_LOCATION_PATTERN = PRESET_LOCATION_PREFIX + "*.jar";
@@ -72,6 +81,25 @@ public class PluginServiceImpl implements PluginService {
     private final PluginProperties pluginProperties;
 
     private final SpringPluginManager pluginManager;
+
+    private final BundleCache jsBundleCache;
+
+    private final BundleCache cssBundleCache;
+
+    private Path tempDir;
+
+    private final Scheduler scheduler = Schedulers.boundedElastic();
+
+    public PluginServiceImpl(ReactiveExtensionClient client, SystemVersionSupplier systemVersion,
+        PluginProperties pluginProperties, SpringPluginManager pluginManager) {
+        this.client = client;
+        this.systemVersion = systemVersion;
+        this.pluginProperties = pluginProperties;
+        this.pluginManager = pluginManager;
+
+        this.jsBundleCache = new BundleCache(".js");
+        this.cssBundleCache = new BundleCache(".css");
+    }
 
     @Override
     public Flux<Plugin> getPresets() {
@@ -240,17 +268,23 @@ public class PluginServiceImpl implements PluginService {
     }
 
     @Override
-    public Mono<String> generateJsBundleVersion() {
-        return Mono.fromSupplier(() -> {
-            var compactVersion = pluginManager.getStartedPlugins()
-                .stream()
-                .sorted(Comparator.comparing(PluginWrapper::getPluginId))
-                .map(pluginWrapper -> pluginWrapper.getPluginId() + ":"
-                    + pluginWrapper.getDescriptor().getVersion()
-                )
-                .collect(Collectors.joining());
-            return Hashing.sha256().hashUnencodedChars(compactVersion).toString();
-        });
+    public Mono<String> generateBundleVersion() {
+        return Flux.fromIterable(new ArrayList<>(pluginManager.getStartedPlugins()))
+            .sort(Comparator.comparing(PluginWrapper::getPluginId))
+            .map(pw -> pw.getPluginId() + ':' + pw.getDescriptor().getVersion())
+            .collect(Collectors.joining())
+            .map(Hashing.sha256()::hashUnencodedChars)
+            .map(HashCode::toString);
+    }
+
+    @Override
+    public Mono<Resource> getJsBundle(String version) {
+        return jsBundleCache.computeIfAbsent(version, this.uglifyJsBundle());
+    }
+
+    @Override
+    public Mono<Resource> getCssBundle(String version) {
+        return cssBundleCache.computeIfAbsent(version, this.uglifyCssBundle());
     }
 
     @Override
@@ -342,6 +376,26 @@ public class PluginServiceImpl implements PluginService {
             .onErrorMap(e -> new PluginInstallationException("Failed to parse the plugin manifest",
                 "problemDetail.plugin.missingManifest", null)
             );
+    }
+
+
+    @Override
+    public void afterPropertiesSet() throws Exception {
+        this.tempDir = Files.createTempDirectory("halo-plugin-bundle");
+    }
+
+    @Override
+    public void destroy() throws Exception {
+        FileSystemUtils.deleteRecursively(this.tempDir);
+    }
+
+    /**
+     * Set temporary directory for plugin bundle.
+     *
+     * @param tempDir temporary directory.
+     */
+    void setTempDir(Path tempDir) {
+        this.tempDir = tempDir;
     }
 
     /**
@@ -450,8 +504,93 @@ public class PluginServiceImpl implements PluginService {
         oldPlugin.getSpec().setEnabled(enabled);
     }
 
-    private static class UnexpectedPluginStateException extends RuntimeException {
+    class BundleCache {
 
+        private final String suffix;
+
+        private final AtomicBoolean writing = new AtomicBoolean();
+
+        private volatile Resource resource;
+
+        BundleCache(String suffix) {
+            this.suffix = suffix;
+        }
+
+        Mono<Resource> computeIfAbsent(String version, Publisher<DataBuffer> content) {
+            var filename = buildBundleFilename(version, suffix);
+            if (isResourceMatch(resource, filename)) {
+                return Mono.just(resource);
+            }
+            return generateBundleVersion()
+                .flatMap(newVersion -> {
+                    var newFilename = buildBundleFilename(newVersion, suffix);
+                    if (isResourceMatch(this.resource, newFilename)) {
+                        // if the resource was not changed, just return it
+                        return Mono.just(resource);
+                    }
+                    if (writing.compareAndSet(false, true)) {
+                        return Mono.justOrEmpty(this.resource)
+                            // double check of the resource
+                            .filter(res -> isResourceMatch(res, newFilename))
+                            .switchIfEmpty(Mono.using(
+                                    () -> tempDir.resolve(newFilename),
+                                    path -> DataBufferUtils.write(content, path,
+                                            CREATE, TRUNCATE_EXISTING)
+                                        .then(Mono.<Resource>fromSupplier(
+                                            () -> new FileSystemResource(path)
+                                        )),
+                                    path -> {
+                                        // clean up old resource
+                                        cleanUp(this.resource);
+                                    })
+                                .subscribeOn(scheduler)
+                                .doOnNext(newResource -> this.resource = newResource)
+                            )
+                            .doFinally(signalType -> writing.set(false));
+                    } else {
+                        return Mono.defer(() -> {
+                            if (this.writing.get()) {
+                                log.debug("Waiting for the bundle file {} to be written", filename);
+                                return Mono.empty();
+                            }
+                            log.debug("Waited the bundle file {} to be written", filename);
+                            return Mono.just(this.resource);
+                        }).repeatWhenEmpty(100, count -> {
+                            // retry after 100ms
+                            return count.delayElements(Duration.ofMillis(100));
+                        });
+                    }
+                });
+        }
+
+        private static void cleanUp(Resource resource) {
+            if (resource instanceof WritableResource wr
+                && wr.isWritable()
+                && wr.isFile()) {
+                try {
+                    Files.deleteIfExists(wr.getFile().toPath());
+                } catch (IOException e) {
+                    log.warn("Failed to delete old bundle file {}",
+                        wr.getFilename(), e);
+                }
+            }
+        }
+
+        private static boolean isResourceMatch(Resource resource, String filename) {
+            return resource != null
+                && resource.exists()
+                && resource.isFile()
+                && Objects.equals(filename, resource.getFilename());
+        }
+    }
+
+    private static String buildBundleFilename(String v, String suffix) {
+        Assert.notNull(v, "Version must not be null");
+        Assert.notNull(suffix, "Suffix must not be null");
+        return v + suffix;
+    }
+
+    private static class UnexpectedPluginStateException extends RuntimeException {
     }
 
 }
