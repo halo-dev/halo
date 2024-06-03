@@ -1,6 +1,7 @@
 package run.halo.app.core.extension.service;
 
 import java.nio.file.Path;
+import org.springframework.core.io.Resource;
 import org.springframework.core.io.buffer.DataBuffer;
 import org.springframework.web.server.ServerWebInputException;
 import reactor.core.publisher.Flux;
@@ -56,12 +57,48 @@ public interface PluginService {
     Flux<DataBuffer> uglifyCssBundle();
 
     /**
-     * <p>Generate js bundle version for cache control.</p>
+     * <p>Generate js/css bundle version for cache control.</p>
      * This method will list all enabled plugins version and sign it to a string.
      *
-     * @return signed js bundle version by all enabled plugins version.
+     * @return signed js/css bundle version by all enabled plugins version.
      */
-    Mono<String> generateJsBundleVersion();
+    Mono<String> generateBundleVersion();
+
+    /**
+     * Retrieves the JavaScript bundle for all enabled plugins.
+     *
+     * <p>This method combines the JavaScript bundles of all enabled plugins into a single bundle
+     * and returns a representation of this bundle as a resource.
+     * If the JavaScript bundle already exists and is up-to-date, the existing resource is
+     * returned; otherwise, a new JavaScript bundle is generated.
+     *
+     * <p>Note: This method may perform IO operations and could potentially block, so it should be
+     * used in a non-blocking environment.
+     *
+     * @param version The version of the CSS bundle to retrieve.
+     * @return A {@code Mono<Resource>} object representing the JavaScript bundle. When this
+     * {@code Mono} is subscribed to, it emits the JavaScript bundle resource if successful, or
+     * an error signal if an error occurs.
+     */
+    Mono<Resource> getJsBundle(String version);
+
+    /**
+     * Retrieves the CSS bundle for all enabled plugins.
+     *
+     * <p>This method combines the CSS bundles of all enabled plugins into a single bundle and
+     * returns a representation of this bundle as a resource.
+     * If the CSS bundle already exists and is up-to-date, the existing resource is returned;
+     * otherwise, a new CSS bundle is generated.
+     *
+     * <p>Note: This method may perform IO operations and could potentially block, so it should be
+     * used in a non-blocking environment.
+     *
+     * @param version The version of the CSS bundle to retrieve.
+     * @return A {@code Mono<Resource>} object representing the CSS bundle. When this {@code Mono
+     * } is subscribed to, it emits the CSS bundle resource if successful, or an error signal if
+     * an error occurs.
+     */
+    Mono<Resource> getCssBundle(String version);
 
     /**
      * Enables or disables a plugin by name.
