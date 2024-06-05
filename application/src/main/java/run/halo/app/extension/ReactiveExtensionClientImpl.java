@@ -112,8 +112,30 @@ public class ReactiveExtensionClientImpl implements ReactiveExtensionClient {
 
     @Override
     public <E extends Extension> Flux<E> listAll(Class<E> type, ListOptions options, Sort sort) {
-        return listBy(type, options, PageRequestImpl.ofSize(0).withSort(sort))
-            .flatMapIterable(ListResult::getItems);
+        var scheme = schemeManager.get(type);
+        return Mono.fromSupplier(
+                () -> indexedQueryEngine.retrieveAll(scheme.groupVersionKind(), options, sort))
+            .doOnSuccess(objectKeys -> {
+                if (log.isDebugEnabled()) {
+                    if (objectKeys.size() > 500) {
+                        log.warn("The number of objects retrieved by listAll is too large ({}) "
+                                + "and it is recommended to use paging query.",
+                            objectKeys.size());
+                    }
+                }
+            })
+            .flatMapMany(objectKeys -> {
+                var storeNames = objectKeys.stream()
+                    .map(objectKey -> ExtensionStoreUtil.buildStoreName(scheme, objectKey))
+                    .toList();
+                final long startTimeMs = System.currentTimeMillis();
+                return client.listByNames(storeNames)
+                    .map(extensionStore -> converter.convertFrom(type, extensionStore))
+                    .doOnNext(s -> {
+                        log.debug("Successfully retrieved all by names from db for {} in {}ms",
+                            scheme.groupVersionKind(), System.currentTimeMillis() - startTimeMs);
+                    });
+            });
     }
 
     @Override
@@ -130,7 +152,7 @@ public class ReactiveExtensionClientImpl implements ReactiveExtensionClient {
                 final long startTimeMs = System.currentTimeMillis();
                 return client.listByNames(storeNames)
                     .map(extensionStore -> converter.convertFrom(type, extensionStore))
-                    .doFinally(s -> {
+                    .doOnNext(s -> {
                         log.debug("Successfully retrieved by names from db for {} in {}ms",
                             scheme.groupVersionKind(), System.currentTimeMillis() - startTimeMs);
                     })

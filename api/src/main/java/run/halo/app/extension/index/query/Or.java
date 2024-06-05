@@ -3,6 +3,7 @@ package run.halo.app.extension.index.query;
 import com.google.common.collect.Sets;
 import java.util.Collection;
 import java.util.NavigableSet;
+import java.util.stream.Collectors;
 
 public class Or extends LogicalQuery {
 
@@ -17,5 +18,11 @@ public class Or extends LogicalQuery {
             resultSet.addAll(query.matches(indexView));
         }
         return resultSet;
+    }
+
+    @Override
+    public String toString() {
+        return "(" + childQueries.stream().map(Query::toString)
+            .collect(Collectors.joining(" OR ")) + ")";
     }
 }
