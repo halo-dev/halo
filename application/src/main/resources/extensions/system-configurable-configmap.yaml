@@ -6,7 +6,8 @@ data:
   user: |
     {
       "allowRegistration": false,
-      "defaultRole": "",
+      "mustVerifyEmailOnRegistration": false,
+      "defaultRole": "guest",
       "avatarPolicy": "default-policy"
     }
   theme: |
