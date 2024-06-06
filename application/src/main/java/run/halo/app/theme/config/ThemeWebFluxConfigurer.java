@@ -1,13 +1,11 @@
 package run.halo.app.theme.config;
 
-import java.io.IOException;
-import java.net.MalformedURLException;
 import java.nio.file.Path;
 import java.util.List;
 import java.util.Map;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.boot.autoconfigure.web.WebProperties;
-import org.springframework.core.io.FileUrlResource;
+import org.springframework.core.io.FileSystemResource;
 import org.springframework.core.io.Resource;
 import org.springframework.http.CacheControl;
 import org.springframework.stereotype.Component;
@@ -16,11 +14,11 @@ import org.springframework.web.reactive.config.ResourceHandlerRegistry;
 import org.springframework.web.reactive.config.WebFluxConfigurer;
 import org.springframework.web.reactive.resource.AbstractResourceResolver;
 import org.springframework.web.reactive.resource.EncodedResourceResolver;
-import org.springframework.web.reactive.resource.PathResourceResolver;
 import org.springframework.web.reactive.resource.ResourceResolverChain;
 import org.springframework.web.server.ServerWebExchange;
 import reactor.core.publisher.Mono;
 import run.halo.app.infra.ThemeRootGetter;
+import run.halo.app.infra.utils.FileUtils;
 
 @Component
 public class ThemeWebFluxConfigurer implements WebFluxConfigurer {
@@ -47,8 +45,7 @@ public class ThemeWebFluxConfigurer implements WebFluxConfigurer {
             .setUseLastModified(useLastModified)
             .resourceChain(true)
             .addResolver(new EncodedResourceResolver())
-            .addResolver(new ThemePathResourceResolver(themeRootGetter.get()))
-            .addResolver(new PathResourceResolver());
+            .addResolver(new ThemePathResourceResolver(themeRootGetter.get()));
     }
 
     /**
@@ -59,14 +56,10 @@ public class ThemeWebFluxConfigurer implements WebFluxConfigurer {
      */
     private static class ThemePathResourceResolver extends AbstractResourceResolver {
 
-        private final Resource themeRootResource;
+        private final Path themeRoot;
 
         private ThemePathResourceResolver(Path themeRoot) {
-            try {
-                this.themeRootResource = new FileUrlResource(themeRoot.toUri().toURL());
-            } catch (MalformedURLException e) {
-                throw new RuntimeException("Failed to resolve " + themeRoot + " to URL.", e);
-            }
+            this.themeRoot = themeRoot;
         }
 
         @Override
@@ -84,19 +77,17 @@ public class ThemeWebFluxConfigurer implements WebFluxConfigurer {
                 return Mono.empty();
             }
 
-            try {
-                var location = themeRootResource.createRelative(themeName + "/templates/assets/");
-                return chain.resolveResource(exchange, resourcePaths, List.of(location));
-            } catch (IOException e) {
-                return Mono.empty();
-            }
+            var assetsPath = themeRoot.resolve(themeName + "/templates/assets/" + resourcePaths);
+            FileUtils.checkDirectoryTraversal(themeRoot, assetsPath);
+            var location = new FileSystemResource(assetsPath);
+            return Mono.just(location);
         }
 
         @Override
         protected Mono<String> resolveUrlPathInternal(String resourceUrlPath,
-            List<? extends Resource> locations,
-            ResourceResolverChain chain) {
-            return chain.resolveUrlPath(resourceUrlPath, locations);
+            List<? extends Resource> locations, ResourceResolverChain chain) {
+            throw new UnsupportedOperationException();
         }
+
     }
 }
