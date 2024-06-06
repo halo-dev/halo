@@ -432,17 +432,20 @@ class PluginServiceImplTest {
 
             var probes = new ArrayList<PublisherProbe<DataBuffer>>();
             List<? extends Future<?>> futures = IntStream.range(0, 10)
-                .mapToObj(i -> executorService.submit(() -> {
+                .mapToObj(i -> {
                     var fakeContent = Mono.<DataBuffer>just(sharedInstance.wrap(
                         ("fake-content-" + i).getBytes(UTF_8)
                     ));
                     var probe = PublisherProbe.of(fakeContent);
                     probes.add(probe);
-                    cache.computeIfAbsent("fake-version", probe.mono())
-                        .as(StepVerifier::create)
-                        .expectNextCount(1)
-                        .verifyComplete();
-                }))
+                    return executorService.submit(
+                        () -> {
+                            cache.computeIfAbsent("fake-version", probe.mono())
+                                .as(StepVerifier::create)
+                                .expectNextCount(1)
+                                .verifyComplete();
+                        });
+                })
                 .toList();
             executorService.shutdown();
             futures.forEach(future -> {
