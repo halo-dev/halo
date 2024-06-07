@@ -9,8 +9,7 @@ import java.lang.annotation.Target;
 /**
  * <p>It is a symbolic annotation.</p>
  * <p>When the event marked with {@link SharedEvent} annotation is published, it will be
- * broadcast to the application context of the plugin by
- * {@link PluginApplicationEventBridgeDispatcher}.</p>
+ * broadcast to the application context of the plugin.
  *
  * @author guqing
  * @since 2.0.0
