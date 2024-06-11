@@ -23,6 +23,7 @@ import type { Theme } from "@halo-dev/api-client";
 
 import { apiClient } from "@/utils/api-client";
 import { useI18n } from "vue-i18n";
+import { useFileDialog } from "@vueuse/core";
 
 const { t } = useI18n();
 
@@ -78,6 +79,158 @@ const handleReloadTheme = async () => {
     },
   });
 };
+
+interface ExportData {
+  themeName: string;
+  version: string;
+  settingName: string;
+  configMapName: string;
+  configs: { [key: string]: string };
+}
+
+const handleExportThemeConfiguration = async () => {
+  if (!selectedTheme.value) {
+    console.error("No selected or activated theme");
+    return;
+  }
+
+  const { data } = await apiClient.theme.fetchThemeConfig({
+    name: selectedTheme?.value?.metadata.name as string,
+  });
+  if (!data) {
+    console.error("Failed to fetch theme config");
+    return;
+  }
+
+  const themeName = selectedTheme.value.metadata.name;
+  const exportData = {
+    themeName: themeName,
+    version: selectedTheme.value.spec.version,
+    settingName: selectedTheme.value.spec.settingName,
+    configMapName: selectedTheme.value.spec.configMapName,
+    configs: data.data,
+  } as ExportData;
+  const exportStr = JSON.stringify(exportData);
+  const blob = new Blob([exportStr], { type: "application/json" });
+  const temporaryExportUrl = URL.createObjectURL(blob);
+  const temporaryLinkTag = document.createElement("a");
+
+  temporaryLinkTag.href = temporaryExportUrl;
+  temporaryLinkTag.download = `export-${themeName}-config-${Date.now().toString()}.json`;
+
+  document.body.appendChild(temporaryLinkTag);
+  temporaryLinkTag.click();
+
+  document.body.removeChild(temporaryLinkTag);
+  URL.revokeObjectURL(temporaryExportUrl);
+};
+
+const {
+  open: openSelectImportFileDialog,
+  onChange: handleImportThemeConfiguration,
+} = useFileDialog({
+  accept: "application/json",
+  multiple: false,
+  directory: false,
+  reset: true,
+});
+
+handleImportThemeConfiguration(async (files) => {
+  if (files === null || files.length === 0) {
+    return;
+  }
+  const configText = await files[0].text();
+  const configJson = JSON.parse(configText || "{}");
+  if (!configJson.configs) {
+    return;
+  }
+  if (!configJson.themeName || !configJson.version) {
+    Toast.error(t("core.theme.operations.import_configuration.invalid_format"));
+    return;
+  }
+  if (!selectedTheme.value) {
+    console.error("No selected or activated theme");
+    return;
+  }
+  if (configJson.themeName !== selectedTheme.value.metadata.name) {
+    Toast.error(
+      t("core.theme.operations.import_configuration.mismatched_theme")
+    );
+    return;
+  }
+
+  if (configJson.version !== selectedTheme.value.spec.version) {
+    Dialog.warning({
+      title: t(
+        "core.theme.operations.import_configuration.version_mismatch.title"
+      ),
+      description: t(
+        "core.theme.operations.import_configuration.version_mismatch.description"
+      ),
+      confirmText: t("core.common.buttons.confirm"),
+      cancelText: t("core.common.buttons.cancel"),
+      onConfirm: () => {
+        handleSaveConfigMap(configJson.configs);
+      },
+      onCancel() {
+        return;
+      },
+    });
+    return;
+  }
+  handleSaveConfigMap(configJson.configs);
+});
+
+const handleSaveConfigMap = async (importData: Record<string, string>) => {
+  if (!selectedTheme.value) {
+    return;
+  }
+  const { data } = await apiClient.theme.fetchThemeConfig({
+    name: selectedTheme.value.metadata.name as string,
+  });
+  if (!data || !data.data) {
+    return;
+  }
+  const combinedConfigData = combinedConfigMap(data.data, importData);
+  await apiClient.theme.updateThemeConfig({
+    name: selectedTheme.value.metadata.name,
+    configMap: {
+      ...data,
+      data: combinedConfigData,
+    },
+  });
+  Toast.success(t("core.common.toast.save_success"));
+};
+
+/**
+ * combined benchmark configuration and import configuration
+ *
+ * benchmark: { a: "{\"a\": 1}", b: "{\"b\": 2}" }
+ * expand: { a: "{\"c\": 3}", b: "{\"d\": 4}" }
+ * => { a: "{\"a\": 1, \"c\": 3}", b: "{\"b\": 2, \"d\": 4}" }
+ *
+ * benchmark: { a: "{\"a\": 1}", b: "{\"b\": 2}", d: "{\"d\": 4}"
+ * expand: { a: "{\"a\": 2}", b: "{\"b\": 3, \"d\": 4}", c: "{\"c\": 5}" }
+ * => { a: "{\"a\": 2}", b: "{\"b\": 3, \"d\": 4}", d: "{\"d\": 4}" }
+ *
+ */
+const combinedConfigMap = (
+  benchmarkConfigMap: { [key: string]: string },
+  importConfigMap: { [key: string]: string }
+): { [key: string]: string } => {
+  const result = benchmarkConfigMap;
+
+  for (const key in result) {
+    const benchmarkValueJson = JSON.parse(benchmarkConfigMap[key] || "{}");
+    const expandValueJson = JSON.parse(importConfigMap[key] || "{}");
+    const combinedValue = {
+      ...benchmarkValueJson,
+      ...expandValueJson,
+    };
+    result[key] = JSON.stringify(combinedValue);
+  }
+  return result;
+};
 </script>
 
 <template>
@@ -125,6 +278,12 @@ const handleReloadTheme = async () => {
             <template #popper>
               <VDropdownItem @click="themesModal = true">
                 {{ $t("core.common.buttons.upgrade") }}
+              </VDropdownItem>
+              <VDropdownItem @click="handleExportThemeConfiguration">
+                {{ $t("core.theme.operations.export_configuration.button") }}
+              </VDropdownItem>
+              <VDropdownItem @click="openSelectImportFileDialog">
+                {{ $t("core.theme.operations.import_configuration.button") }}
               </VDropdownItem>
               <VDropdownDivider />
               <VDropdownItem type="danger" @click="handleReloadTheme">
