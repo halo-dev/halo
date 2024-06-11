@@ -168,7 +168,6 @@ const attachmentSelectorModal = ref(false);
 const { onAttachmentSelect, attachmentResult } = useAttachmentSelect();
 
 const editor = shallowRef<Editor>();
-// Set focus
 const editorTitleRef = ref();
 
 const { pluginModules } = usePluginModuleStore();
