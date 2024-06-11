@@ -450,7 +450,7 @@ onMounted(() => {
   const urlParams = new URLSearchParams(window.location.search);
   const name = urlParams.get("name");
 
-  if (!name) {
+  if (!name && editorTitleRef.value) {
     nextTick(() => {
       editorTitleRef.value.focus();
     });
