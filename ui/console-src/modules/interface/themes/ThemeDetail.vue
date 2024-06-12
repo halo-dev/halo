@@ -282,7 +282,7 @@ const combinedConfigMap = (
               <VDropdownItem @click="handleExportThemeConfiguration">
                 {{ $t("core.theme.operations.export_configuration.button") }}
               </VDropdownItem>
-              <VDropdownItem @click="openSelectImportFileDialog">
+              <VDropdownItem @click="openSelectImportFileDialog()">
                 {{ $t("core.theme.operations.import_configuration.button") }}
               </VDropdownItem>
               <VDropdownDivider />
