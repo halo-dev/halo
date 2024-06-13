@@ -23,6 +23,9 @@ import java.net.URISyntaxException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.time.Clock;
+import java.time.Instant;
+import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
@@ -249,7 +252,6 @@ class PluginServiceImplTest {
 
     }
 
-
     @Test
     void generateBundleVersionTest() {
         var plugin1 = mock(PluginWrapper.class);
@@ -295,6 +297,19 @@ class PluginServiceImplTest {
             .verifyComplete();
 
         assertThat(result).isNotEqualTo(result2);
+    }
+
+    @Test
+    void shouldGenerateRandomBundleVersionInDevelopment() {
+        var clock = Clock.fixed(Instant.now(), ZoneId.systemDefault());
+        pluginService.setClock(clock);
+        when(pluginManager.isDevelopment()).thenReturn(true);
+        pluginService.generateBundleVersion()
+            .as(StepVerifier::create)
+            .expectNext(String.valueOf(clock.instant().toEpochMilli()))
+            .verifyComplete();
+
+        verify(pluginManager, never()).getStartedPlugins();
     }
 
     @Nested
