@@ -38,6 +38,10 @@ docker run -d --name halo -p 8090:8090 -v ~/.halo2:/root/.halo2 halohub/halo:2.1
 - 用户名：`demo`
 - 密码：`P@ssw0rd123..`
 
+## 演示视频
+
+[![Watch the video](https://www.halo.run/upload/dashboard-2023-12-03.png)](https://www.bilibili.com/video/BV15x4y1U7RU/?share_source=copy_web&vd_source=0ab6cf86ca512a363f04f18b86f55b86)
+
 ## 生态
 
 可访问 [官方应用市场](https://www.halo.run/store/apps) 或 [awesome-halo 仓库](https://github.com/halo-sigs/awesome-halo) 查看适用于 Halo 2.x 的主题和插件。
