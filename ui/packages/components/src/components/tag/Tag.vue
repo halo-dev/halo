@@ -51,7 +51,8 @@ const classes = computed(() => {
   h-5
   text-xs
   border
-  border-solid;
+  border-solid
+  px-1;
 
   &.tag-default {
     border: 1px solid #d9d9d9;
@@ -81,14 +82,6 @@ const classes = computed(() => {
 
   .tag-content {
     @apply px-1;
-  }
-
-  .tag-left-icon {
-    @apply pl-1;
-  }
-
-  .tag-right-icon {
-    @apply pr-1;
   }
 }
 </style>

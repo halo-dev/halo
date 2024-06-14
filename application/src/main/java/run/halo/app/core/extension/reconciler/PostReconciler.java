@@ -15,6 +15,7 @@ import com.google.common.hash.Hashing;
 import java.time.Duration;
 import java.time.Instant;
 import java.util.HashSet;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
@@ -88,7 +89,7 @@ public class PostReconciler implements Reconciler<Reconciler.Request> {
 
     @Override
     public Result reconcile(Request request) {
-        var events = new HashSet<ApplicationEvent>();
+        var events = new LinkedHashSet<ApplicationEvent>();
         client.fetch(Post.class, request.name())
             .ifPresent(post -> {
                 if (ExtensionOperator.isDeleted(post)) {
@@ -104,7 +105,7 @@ public class PostReconciler implements Reconciler<Reconciler.Request> {
                 }
                 addFinalizers(post.getMetadata(), Set.of(FINALIZER_NAME));
 
-                populateLabels(post);
+                populateLabels(post, events);
 
                 schedulePublishIfNecessary(post);
 
@@ -195,7 +196,7 @@ public class PostReconciler implements Reconciler<Reconciler.Request> {
         return Result.doNotRetry();
     }
 
-    private void populateLabels(Post post) {
+    private void populateLabels(Post post, Set<ApplicationEvent> events) {
         var labels = nullSafeLabels(post);
         labels.put(Post.DELETED_LABEL, String.valueOf(isTrue(post.getSpec().getDeleted())));
 
@@ -203,8 +204,7 @@ public class PostReconciler implements Reconciler<Reconciler.Request> {
         var oldVisible = VisibleEnum.from(labels.get(Post.VISIBLE_LABEL));
         if (!Objects.equals(oldVisible, expectVisible)) {
             var postName = post.getMetadata().getName();
-            eventPublisher.publishEvent(
-                new PostVisibleChangedEvent(postName, oldVisible, expectVisible));
+            events.add(new PostVisibleChangedEvent(this, postName, oldVisible, expectVisible));
         }
         labels.put(Post.VISIBLE_LABEL, expectVisible.toString());
 
