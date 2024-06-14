@@ -14,6 +14,7 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.time.Clock;
 import java.time.Duration;
 import java.util.ArrayList;
 import java.util.Comparator;
@@ -90,6 +91,8 @@ public class PluginServiceImpl implements PluginService, InitializingBean, Dispo
 
     private final Scheduler scheduler = Schedulers.boundedElastic();
 
+    private Clock clock = Clock.systemUTC();
+
     public PluginServiceImpl(ReactiveExtensionClient client, SystemVersionSupplier systemVersion,
         PluginProperties pluginProperties, SpringPluginManager pluginManager) {
         this.client = client;
@@ -99,6 +102,16 @@ public class PluginServiceImpl implements PluginService, InitializingBean, Dispo
 
         this.jsBundleCache = new BundleCache(".js");
         this.cssBundleCache = new BundleCache(".css");
+    }
+
+    /**
+     * The method is only for testing.
+     *
+     * @param clock new clock
+     */
+    void setClock(Clock clock) {
+        Assert.notNull(clock, "Clock must not be null");
+        this.clock = clock;
     }
 
     @Override
@@ -269,6 +282,9 @@ public class PluginServiceImpl implements PluginService, InitializingBean, Dispo
 
     @Override
     public Mono<String> generateBundleVersion() {
+        if (pluginManager.isDevelopment()) {
+            return Mono.just(String.valueOf(clock.instant().toEpochMilli()));
+        }
         return Flux.fromIterable(new ArrayList<>(pluginManager.getStartedPlugins()))
             .sort(Comparator.comparing(PluginWrapper::getPluginId))
             .map(pw -> pw.getPluginId() + ':' + pw.getDescriptor().getVersion())

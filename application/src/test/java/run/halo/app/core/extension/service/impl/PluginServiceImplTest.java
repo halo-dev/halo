@@ -23,6 +23,9 @@ import java.net.URISyntaxException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.time.Clock;
+import java.time.Instant;
+import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
@@ -249,7 +252,6 @@ class PluginServiceImplTest {
 
     }
 
-
     @Test
     void generateBundleVersionTest() {
         var plugin1 = mock(PluginWrapper.class);
@@ -295,6 +297,19 @@ class PluginServiceImplTest {
             .verifyComplete();
 
         assertThat(result).isNotEqualTo(result2);
+    }
+
+    @Test
+    void shouldGenerateRandomBundleVersionInDevelopment() {
+        var clock = Clock.fixed(Instant.now(), ZoneId.systemDefault());
+        pluginService.setClock(clock);
+        when(pluginManager.isDevelopment()).thenReturn(true);
+        pluginService.generateBundleVersion()
+            .as(StepVerifier::create)
+            .expectNext(String.valueOf(clock.instant().toEpochMilli()))
+            .verifyComplete();
+
+        verify(pluginManager, never()).getStartedPlugins();
     }
 
     @Nested
@@ -432,17 +447,20 @@ class PluginServiceImplTest {
 
             var probes = new ArrayList<PublisherProbe<DataBuffer>>();
             List<? extends Future<?>> futures = IntStream.range(0, 10)
-                .mapToObj(i -> executorService.submit(() -> {
+                .mapToObj(i -> {
                     var fakeContent = Mono.<DataBuffer>just(sharedInstance.wrap(
                         ("fake-content-" + i).getBytes(UTF_8)
                     ));
                     var probe = PublisherProbe.of(fakeContent);
                     probes.add(probe);
-                    cache.computeIfAbsent("fake-version", probe.mono())
-                        .as(StepVerifier::create)
-                        .expectNextCount(1)
-                        .verifyComplete();
-                }))
+                    return executorService.submit(
+                        () -> {
+                            cache.computeIfAbsent("fake-version", probe.mono())
+                                .as(StepVerifier::create)
+                                .expectNextCount(1)
+                                .verifyComplete();
+                        });
+                })
                 .toList();
             executorService.shutdown();
             futures.forEach(future -> {
