@@ -12,7 +12,7 @@ import {
 } from "@halo-dev/components";
 import { useRoute } from "vue-router";
 import { computed, ref, watch } from "vue";
-import { apiClient } from "@/utils/api-client";
+import { apiClient } from "@halo-dev/api-client";
 import { pluginLabels, roleLabels } from "@/constants/labels";
 import { rbacAnnotations } from "@/constants/annotations";
 import { useRoleForm, useRoleTemplateSelection } from "@/composables/use-role";

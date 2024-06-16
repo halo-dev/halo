@@ -24,7 +24,7 @@ import {
   toRef,
   watch,
 } from "vue";
-import { apiClient } from "@/utils/api-client";
+import { apiClient } from "@halo-dev/api-client";
 import { useRouteQuery } from "@vueuse/router";
 import { useRouter } from "vue-router";
 import { randomUUID } from "@/utils/id";

@@ -10,7 +10,7 @@ import {
   VSpace,
 } from "@halo-dev/components";
 import type { Theme } from "@halo-dev/api-client";
-import { apiClient } from "@/utils/api-client";
+import { apiClient } from "@halo-dev/api-client";
 import { toRefs, ref, inject, type Ref } from "vue";
 import { useThemeLifeCycle } from "../composables/use-theme";
 import { usePermission } from "@/utils/permission";

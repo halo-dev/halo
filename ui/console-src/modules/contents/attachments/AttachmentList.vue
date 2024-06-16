@@ -1,7 +1,7 @@
 <script lang="ts" setup>
 import UserFilterDropdown from "@/components/filter/UserFilterDropdown.vue";
 import LazyImage from "@/components/image/LazyImage.vue";
-import { apiClient } from "@/utils/api-client";
+import { apiClient } from "@halo-dev/api-client";
 import { isImage } from "@/utils/image";
 import type { Attachment, Group } from "@halo-dev/api-client";
 import {

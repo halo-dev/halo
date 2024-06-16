@@ -11,7 +11,7 @@ import { useSettingFormConvert } from "@console/composables/use-setting-form";
 import { useSystemConfigMapStore } from "@console/stores/system-configmap";
 import type { ConfigMap, Setting } from "@halo-dev/api-client";
 import { useQuery, useQueryClient } from "@tanstack/vue-query";
-import { apiClient } from "@/utils/api-client";
+import { apiClient } from "@halo-dev/api-client";
 import { useI18n } from "vue-i18n";
 import { useGlobalInfoStore } from "@/stores/global-info";
 

@@ -1,4 +1,4 @@
-import { apiClient } from "@/utils/api-client";
+import { apiClient } from "@halo-dev/api-client";
 import { watch, type Ref, ref, nextTick } from "vue";
 
 interface SnapshotContent {

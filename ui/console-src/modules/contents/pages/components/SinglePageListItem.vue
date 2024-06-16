@@ -14,7 +14,7 @@ import {
 } from "@halo-dev/components";
 import { computed, ref } from "vue";
 import type { ListedSinglePage, SinglePage } from "@halo-dev/api-client";
-import { apiClient } from "@/utils/api-client";
+import { apiClient } from "@halo-dev/api-client";
 import { formatDatetime } from "@/utils/date";
 import { RouterLink } from "vue-router";
 import { cloneDeep } from "lodash-es";

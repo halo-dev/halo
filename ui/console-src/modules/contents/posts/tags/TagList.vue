@@ -16,7 +16,7 @@ import {
 import HasPermission from "@/components/permission/HasPermission.vue";
 import TagEditingModal from "./components/TagEditingModal.vue";
 import { useRouteQuery } from "@vueuse/router";
-import { apiClient } from "@/utils/api-client";
+import { apiClient } from "@halo-dev/api-client";
 import { usePostTag } from "./composables/use-post-tag";
 import TagListItem from "./components/TagListItem.vue";
 import SearchInput from "@/components/input/SearchInput.vue";

@@ -1,6 +1,6 @@
 import { rbacAnnotations } from "@/constants/annotations";
 import { roleLabels } from "@/constants/labels";
-import { apiClient } from "@/utils/api-client";
+import { apiClient } from "@halo-dev/api-client";
 import type { FormKitNode, FormKitTypeDefinition } from "@formkit/core";
 import { select, selects, defaultIcon } from "@formkit/inputs";
 import { i18n } from "@/locales";

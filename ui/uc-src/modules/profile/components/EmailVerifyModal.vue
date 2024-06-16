@@ -1,6 +1,6 @@
 <script lang="ts" setup>
 import { useUserStore } from "@/stores/user";
-import { apiClient } from "@/utils/api-client";
+import { apiClient } from "@halo-dev/api-client";
 import type { VerifyCodeRequest } from "@halo-dev/api-client";
 import { Toast, VButton, VModal, VSpace } from "@halo-dev/components";
 import { useMutation, useQueryClient } from "@tanstack/vue-query";

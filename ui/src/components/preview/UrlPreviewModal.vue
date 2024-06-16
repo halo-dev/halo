@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import { axiosInstance } from "@/utils/api-client";
+import { axiosInstance } from "@halo-dev/api-client";
 import {
   VModal,
   IconLink,

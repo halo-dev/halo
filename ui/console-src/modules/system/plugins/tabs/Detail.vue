@@ -8,7 +8,7 @@ import {
 } from "@halo-dev/components";
 import type { Ref } from "vue";
 import { computed, inject } from "vue";
-import { apiClient } from "@/utils/api-client";
+import { apiClient } from "@halo-dev/api-client";
 import {
   PluginStatusPhaseEnum,
   type Plugin,

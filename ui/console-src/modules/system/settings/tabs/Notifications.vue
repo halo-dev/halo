@@ -1,7 +1,7 @@
 <script lang="ts" setup>
 import { useQuery } from "@tanstack/vue-query";
 import NotificationSetting from "./NotificationSetting.vue";
-import { apiClient } from "@/utils/api-client";
+import { apiClient } from "@halo-dev/api-client";
 import { markRaw, ref } from "vue";
 import type { Raw } from "vue";
 import type { Component } from "vue";

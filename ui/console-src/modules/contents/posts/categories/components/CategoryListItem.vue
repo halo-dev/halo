@@ -17,7 +17,7 @@ import { ref } from "vue";
 import CategoryEditingModal from "./CategoryEditingModal.vue";
 import type { Category } from "@halo-dev/api-client";
 import { useI18n } from "vue-i18n";
-import { apiClient } from "@/utils/api-client";
+import { apiClient } from "@halo-dev/api-client";
 import { useQueryClient } from "@tanstack/vue-query";
 
 const { currentUserHasPermission } = usePermission();

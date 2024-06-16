@@ -12,7 +12,7 @@ import {
 } from "@halo-dev/components";
 import type { ListedComment, ListedReply } from "@halo-dev/api-client";
 import { formatDatetime } from "@/utils/date";
-import { apiClient } from "@/utils/api-client";
+import { apiClient } from "@halo-dev/api-client";
 import { computed, inject, ref, type Ref } from "vue";
 import { cloneDeep } from "lodash-es";
 import { useI18n } from "vue-i18n";

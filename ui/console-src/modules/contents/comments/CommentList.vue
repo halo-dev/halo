@@ -15,7 +15,7 @@ import {
 import CommentListItem from "./components/CommentListItem.vue";
 import type { ListedComment } from "@halo-dev/api-client";
 import { computed, ref, watch } from "vue";
-import { apiClient } from "@/utils/api-client";
+import { apiClient } from "@halo-dev/api-client";
 import { useQuery } from "@tanstack/vue-query";
 import { useI18n } from "vue-i18n";
 import UserFilterDropdown from "@/components/filter/UserFilterDropdown.vue";

@@ -19,7 +19,7 @@ import PostSettingModal from "./components/PostSettingModal.vue";
 import type { Ref } from "vue";
 import { computed, provide, ref, watch } from "vue";
 import type { ListedPost, Post } from "@halo-dev/api-client";
-import { apiClient } from "@/utils/api-client";
+import { apiClient } from "@halo-dev/api-client";
 import { postLabels } from "@/constants/labels";
 import { useQuery } from "@tanstack/vue-query";
 import { useI18n } from "vue-i18n";

@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import { apiClient } from "@/utils/api-client";
+import { apiClient } from "@halo-dev/api-client";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/vue-query";
 import { useQRCode } from "@vueuse/integrations/useQRCode";
 import { Toast, VButton, VModal, VSpace } from "@halo-dev/components";

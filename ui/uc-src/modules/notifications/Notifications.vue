@@ -1,6 +1,6 @@
 <script lang="ts" setup>
 import { useUserStore } from "@/stores/user";
-import { apiClient } from "@/utils/api-client";
+import { apiClient } from "@halo-dev/api-client";
 import {
   IconNotificationBadgeLine,
   VButton,

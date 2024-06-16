@@ -7,7 +7,7 @@ import {
   IconExternalLinkLine,
 } from "@halo-dev/components";
 import type { ListedPost } from "@halo-dev/api-client";
-import { apiClient } from "@/utils/api-client";
+import { apiClient } from "@halo-dev/api-client";
 import { formatDatetime } from "@/utils/date";
 import { postLabels } from "@/constants/labels";
 import { useQuery } from "@tanstack/vue-query";

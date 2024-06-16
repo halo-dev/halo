@@ -1,6 +1,6 @@
 <script lang="ts" setup>
 // core libs
-import { apiClient } from "@/utils/api-client";
+import { apiClient } from "@halo-dev/api-client";
 import { computed, provide, ref } from "vue";
 import { useRoute } from "vue-router";
 

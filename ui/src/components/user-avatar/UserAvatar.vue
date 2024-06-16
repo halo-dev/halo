@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import { apiClient } from "@/utils/api-client";
+import { apiClient } from "@halo-dev/api-client";
 import {
   IconRiPencilFill,
   IconAddCircle,

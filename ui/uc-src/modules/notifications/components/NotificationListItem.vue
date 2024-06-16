@@ -1,6 +1,6 @@
 <script lang="ts" setup>
 import { useUserStore } from "@/stores/user";
-import { apiClient } from "@/utils/api-client";
+import { apiClient } from "@halo-dev/api-client";
 import { relativeTimeTo } from "@/utils/date";
 import type { Notification } from "@halo-dev/api-client";
 import { useMutation, useQueryClient } from "@tanstack/vue-query";

@@ -8,7 +8,7 @@ import {
 } from "@halo-dev/components";
 import { computed, nextTick, ref, watch } from "vue";
 import type { Post } from "@halo-dev/api-client";
-import { apiClient } from "@/utils/api-client";
+import { apiClient } from "@halo-dev/api-client";
 import { useThemeCustomTemplates } from "@console/modules/interface/themes/composables/use-theme";
 import { postLabels } from "@/constants/labels";
 import { randomUUID } from "@/utils/id";

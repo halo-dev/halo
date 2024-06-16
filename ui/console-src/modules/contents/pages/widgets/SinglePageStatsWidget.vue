@@ -1,6 +1,6 @@
 <script lang="ts" setup>
 import { VCard, IconPages } from "@halo-dev/components";
-import { apiClient } from "@/utils/api-client";
+import { apiClient } from "@halo-dev/api-client";
 import { singlePageLabels } from "@/constants/labels";
 import { useQuery } from "@tanstack/vue-query";
 

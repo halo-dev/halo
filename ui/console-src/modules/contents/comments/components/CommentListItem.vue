@@ -1,6 +1,6 @@
 <script lang="ts" setup>
 import { usePluginModuleStore } from "@/stores/plugin";
-import { apiClient } from "@/utils/api-client";
+import { apiClient } from "@halo-dev/api-client";
 import { formatDatetime } from "@/utils/date";
 import { usePermission } from "@/utils/permission";
 import type {

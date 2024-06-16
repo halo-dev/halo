@@ -10,7 +10,7 @@ import type { UppyFile } from "@uppy/core";
 import type { ErrorResponse } from "@uppy/core";
 import type { PluginInstallationErrorResponse } from "../../types";
 import { PLUGIN_ALREADY_EXISTS_TYPE } from "../../constants";
-import { apiClient } from "@/utils/api-client";
+import { apiClient } from "@halo-dev/api-client";
 import AppDownloadAlert from "@/components/common/AppDownloadAlert.vue";
 
 const emit = defineEmits<{

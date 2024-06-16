@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import { apiClient } from "@/utils/api-client";
+import { apiClient } from "@halo-dev/api-client";
 import { Dialog, Toast, VButton } from "@halo-dev/components";
 import { useQueryClient } from "@tanstack/vue-query";
 import type { Ref } from "vue";

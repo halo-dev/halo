@@ -1,4 +1,4 @@
-import { apiClient } from "@/utils/api-client";
+import { apiClient } from "@halo-dev/api-client";
 import type { Theme } from "@halo-dev/api-client";
 import { defineStore } from "pinia";
 import { ref } from "vue";

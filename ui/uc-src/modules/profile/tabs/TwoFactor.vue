@@ -10,7 +10,7 @@ import {
   VSpace,
 } from "@halo-dev/components";
 import { useQuery } from "@tanstack/vue-query";
-import { apiClient } from "@/utils/api-client";
+import { apiClient } from "@halo-dev/api-client";
 import StatusDotField from "@/components/entity-fields/StatusDotField.vue";
 import RiShieldKeyholeLine from "~icons/ri/shield-keyhole-line";
 import TwoFactorEnableModal from "./components/TwoFactorEnableModal.vue";

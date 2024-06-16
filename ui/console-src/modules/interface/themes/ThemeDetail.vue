@@ -21,7 +21,7 @@ import {
 } from "@halo-dev/components";
 import type { Theme } from "@halo-dev/api-client";
 
-import { apiClient } from "@/utils/api-client";
+import { apiClient } from "@halo-dev/api-client";
 import { useI18n } from "vue-i18n";
 
 const { t } = useI18n();
