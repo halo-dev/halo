@@ -4,7 +4,7 @@ import "./styles/index.scss";
 import "./styles/tailwind.css";
 import "floating-vue/dist/style.css";
 import "github-markdown-css/github-markdown-light.css";
-import "highlight.js/styles/github-dark.css";
+import "highlight.js/styles/github.css";
 
 const plugin: Plugin = {
   install(app: App) {

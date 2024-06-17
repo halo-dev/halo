@@ -1,0 +1,9 @@
+.halo-rich-text-editor {
+  $editorNodeCardBorderSelected: rgba(47, 142, 244);
+
+  .has-node-selected {
+    &.code-node {
+      border-color: $editorNodeCardBorderSelected;
+    }
+  }
+}
