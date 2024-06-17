@@ -53,6 +53,7 @@ const formState = ref<Category>({
     template: "",
     priority: 0,
     children: [],
+    independent: false,
   },
   status: {},
   apiVersion: "content.halo.run/v1alpha1",
@@ -254,6 +255,17 @@ const { handleGenerateSlug } = useSlugify(
               type="attachment"
               :accepts="['image/*']"
               validation="length:0,1024"
+            ></FormKit>
+            <FormKit
+              v-model="formState.spec.independent"
+              :label="
+                $t('core.post_category.editing_modal.fields.independent.label')
+              "
+              :help="
+                $t('core.post_category.editing_modal.fields.independent.help')
+              "
+              type="checkbox"
+              name="independent"
             ></FormKit>
             <FormKit
               v-model="formState.spec.description"

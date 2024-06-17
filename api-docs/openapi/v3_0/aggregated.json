@@ -13499,6 +13499,9 @@
             "minLength": 1,
             "type": "string"
           },
+          "independent": {
+            "type": "boolean"
+          },
           "priority": {
             "type": "integer",
             "format": "int32",
@@ -17446,12 +17449,12 @@
           },
           "visible": {
             "type": "string",
+            "default": "PUBLIC",
             "enum": [
               "PUBLIC",
               "INTERNAL",
               "PRIVATE"
-            ],
-            "default": "PUBLIC"
+            ]
           }
         }
       },
@@ -19101,12 +19104,12 @@
           },
           "visible": {
             "type": "string",
+            "default": "PUBLIC",
             "enum": [
               "PUBLIC",
               "INTERNAL",
               "PRIVATE"
-            ],
-            "default": "PUBLIC"
+            ]
           }
         }
       },

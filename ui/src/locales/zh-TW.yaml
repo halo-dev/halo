@@ -352,6 +352,9 @@ core:
         description:
           label: 描述
           help: 需要主題適配以支持
+        independent:
+          label: 獨立分類
+          help: 如果選取，子分類下的文章將不會彙總到父分類中顯示
   page:
     title: 頁面
     actions:

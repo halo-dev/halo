@@ -372,6 +372,11 @@ core:
         description:
           label: Description
           help: Theme adaptation is required to support
+        independent:
+          label: Independent Category
+          help: >-
+            If selected, posts in child categories will not be aggregated into
+            the parent category
   page:
     title: Pages
     actions:

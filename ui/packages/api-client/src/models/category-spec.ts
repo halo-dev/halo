@@ -46,6 +46,12 @@ export interface CategorySpec {
     'displayName': string;
     /**
      * 
+     * @type {boolean}
+     * @memberof CategorySpec
+     */
+    'independent'?: boolean;
+    /**
+     * 
      * @type {number}
      * @memberof CategorySpec
      */

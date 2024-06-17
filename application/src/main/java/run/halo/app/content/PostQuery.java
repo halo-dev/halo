@@ -58,6 +58,12 @@ public class PostQuery extends IListRequest.QueryListRequest {
     }
 
     @Nullable
+    public String getCategoryWithChildren() {
+        var value = queryParams.getFirst("categoryWithChildren");
+        return StringUtils.defaultIfBlank(value, null);
+    }
+
+    @Nullable
     @Schema(description = "Posts filtered by keyword.")
     public String getKeyword() {
         return StringUtils.defaultIfBlank(queryParams.getFirst("keyword"), null);
@@ -139,6 +145,12 @@ public class PostQuery extends IListRequest.QueryListRequest {
                 .in(ParameterIn.QUERY)
                 .name("keyword")
                 .description("Posts filtered by keyword.")
+                .implementation(String.class)
+                .required(false))
+            .parameter(parameterBuilder()
+                .in(ParameterIn.QUERY)
+                .name("categoryWithChildren")
+                .description("Posts filtered by category including sub-categories.")
                 .implementation(String.class)
                 .required(false));
     }
