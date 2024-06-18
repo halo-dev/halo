@@ -21,7 +21,6 @@ import ExtensionLink from "./link";
 import ExtensionColor from "./color";
 import ExtensionFontSize from "./font-size";
 import ExtensionDropcursor from "@tiptap/extension-dropcursor";
-import ExtensionGapcursor from "@tiptap/extension-gapcursor";
 import ExtensionHardBreak from "@tiptap/extension-hard-break";
 import ExtensionHorizontalRule from "@tiptap/extension-horizontal-rule";
 import ExtensionDocument from "@tiptap/extension-document";
@@ -45,6 +44,7 @@ import ExtensionTrailingNode from "./trailing-node";
 import ExtensionSearchAndReplace from "./search-and-replace";
 import ExtensionClearFormat from "./clear-format";
 import ExtensionFormatBrush from "./format-brush";
+import ExtensionGapcursor from "./gap-cursor";
 
 const allExtensions = [
   ExtensionBlockquote,

@@ -100,6 +100,7 @@ const getRenderContainer = (node: HTMLElement) => {
 export default CodeBlockLowlight.extend<
   CustomCodeBlockLowlightOptions & CodeBlockLowlightOptions
 >({
+  allowGapCursor: true,
   addCommands() {
     return {
       ...this.parent?.(),

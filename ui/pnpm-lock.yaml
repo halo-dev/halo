@@ -475,9 +475,6 @@ importers:
       '@tiptap/extension-dropcursor':
         specifier: ^2.4.0
         version: 2.4.0(@tiptap/core@2.4.0(@tiptap/pm@2.4.0))(@tiptap/pm@2.4.0)
-      '@tiptap/extension-gapcursor':
-        specifier: ^2.4.0
-        version: 2.4.0(@tiptap/core@2.4.0(@tiptap/pm@2.4.0))(@tiptap/pm@2.4.0)
       '@tiptap/extension-hard-break':
         specifier: ^2.4.0
         version: 2.4.0(@tiptap/core@2.4.0(@tiptap/pm@2.4.0))
@@ -3696,12 +3693,6 @@ packages:
 
   '@tiptap/extension-floating-menu@2.4.0':
     resolution: {integrity: sha512-vLb9v+htbHhXyty0oaXjT3VC8St4xuGSHWUB9GuAJAQ+NajIO6rBPbLUmm9qM0Eh2zico5mpSD1Qtn5FM6xYzg==}
-    peerDependencies:
-      '@tiptap/core': ^2.0.0
-      '@tiptap/pm': ^2.0.0
-
-  '@tiptap/extension-gapcursor@2.4.0':
-    resolution: {integrity: sha512-F4y/0J2lseohkFUw9P2OpKhrJ6dHz69ZScABUvcHxjznJLd6+0Zt7014Lw5PA8/m2d/w0fX8LZQ88pZr4quZPQ==}
     peerDependencies:
       '@tiptap/core': ^2.0.0
       '@tiptap/pm': ^2.0.0
@@ -10367,6 +10358,9 @@ packages:
   vue-component-type-helpers@2.0.19:
     resolution: {integrity: sha512-cN3f1aTxxKo4lzNeQAkVopswuImUrb5Iurll9Gaw5cqpnbTAxtEMM1mgi6ou4X79OCyqYv1U1mzBHJkzmiK82w==}
 
+  vue-component-type-helpers@2.0.21:
+    resolution: {integrity: sha512-3NaicyZ7N4B6cft4bfb7dOnPbE9CjLcx+6wZWAg5zwszfO4qXRh+U52dN5r5ZZfc6iMaxKCEcoH9CmxxoFZHLg==}
+
   vue-demi@0.13.11:
     resolution: {integrity: sha512-IR8HoEEGM65YY3ZJYAjMlKygDQn25D5ajNFNoKh9RSDMQtlzCxtfQjdQgv9jjK+m3377SsJXY8ysq8kLCZL25A==}
     engines: {node: '>=12'}
@@ -14712,7 +14706,7 @@ snapshots:
       ts-dedent: 2.2.0
       type-fest: 2.19.0
       vue: 3.4.27(typescript@5.4.2)
-      vue-component-type-helpers: 2.0.19
+      vue-component-type-helpers: 2.0.21
     transitivePeerDependencies:
       - encoding
       - supports-color
@@ -14832,11 +14826,6 @@ snapshots:
       '@tiptap/core': 2.4.0(@tiptap/pm@2.4.0)
       '@tiptap/pm': 2.4.0
       tippy.js: 6.3.7
-
-  '@tiptap/extension-gapcursor@2.4.0(@tiptap/core@2.4.0(@tiptap/pm@2.4.0))(@tiptap/pm@2.4.0)':
-    dependencies:
-      '@tiptap/core': 2.4.0(@tiptap/pm@2.4.0)
-      '@tiptap/pm': 2.4.0
 
   '@tiptap/extension-hard-break@2.4.0(@tiptap/core@2.4.0(@tiptap/pm@2.4.0))':
     dependencies:
@@ -22388,6 +22377,8 @@ snapshots:
   void-elements@3.1.0: {}
 
   vue-component-type-helpers@2.0.19: {}
+
+  vue-component-type-helpers@2.0.21: {}
 
   vue-demi@0.13.11(vue@3.4.27(typescript@5.3.3)):
     dependencies:
