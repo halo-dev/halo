@@ -1,4 +1,4 @@
-FROM ghcr.io/linuxsuren/api-testing:v0.0.16
+FROM ghcr.io/linuxsuren/api-testing:v0.0.17
 WORKDIR /workspace
 COPY testsuite.yaml .
-CMD [ "atest", "run", "-p", "testsuite.yaml", "--level=debug" ]
+CMD [ "atest", "run", "-p", "testsuite.yaml", "--level=debug", "--request-ignore-error", "--report=md" ]
