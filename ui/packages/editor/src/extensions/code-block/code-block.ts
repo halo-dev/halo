@@ -205,7 +205,7 @@ export default CodeBlockLowlight.extend<
             editor,
             isActive: editor.isActive("codeBlock"),
             icon: markRaw(MdiCodeBracesBox),
-            title: i18n.global.t("editor.common.codeblock"),
+            title: i18n.global.t("editor.common.codeblock.title"),
             action: () => editor.chain().focus().toggleCodeBlock().run(),
           },
         };
@@ -214,7 +214,7 @@ export default CodeBlockLowlight.extend<
         return {
           priority: 80,
           icon: markRaw(MdiCodeBracesBox),
-          title: "editor.common.codeblock",
+          title: "editor.common.codeblock.title",
           keywords: ["codeblock", "daimakuai"],
           command: ({ editor, range }: { editor: Editor; range: Range }) => {
             editor.chain().focus().deleteRange(range).setCodeBlock().run();
@@ -229,7 +229,7 @@ export default CodeBlockLowlight.extend<
             props: {
               editor,
               icon: markRaw(MdiCodeBracesBox),
-              title: i18n.global.t("editor.common.codeblock"),
+              title: i18n.global.t("editor.common.codeblock.title"),
               action: () => {
                 editor.chain().focus().setCodeBlock().run();
               },

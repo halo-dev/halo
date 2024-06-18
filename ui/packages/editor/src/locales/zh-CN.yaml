@@ -104,7 +104,10 @@ editor:
     code: 行内代码
     superscript: 上角标
     subscript: 下角标
-    codeblock: 代码块
+    codeblock:
+      title: 代码块
+      copy_code: 复制代码
+      copy_code_success: 复制成功
     image: 图片
     heading:
       title: 文本类型
