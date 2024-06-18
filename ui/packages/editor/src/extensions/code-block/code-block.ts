@@ -50,7 +50,7 @@ const updateIndent = (tr: Transaction, type: IndentType): Transaction => {
   const { from, to } = selection;
   doc.nodesBetween(from, to, (node, pos) => {
     if (from - to == 0 && type === "indent") {
-      tr.insertText("\t", from, to);
+      tr.insertText("  ", from, to);
       return false;
     }
 
@@ -60,17 +60,17 @@ const updateIndent = (tr: Transaction, type: IndentType): Transaction => {
       precedeLineBreakPos === -1 ? pos + 1 : pos + precedeLineBreakPos + 1;
     const text = doc.textBetween(startBetWeenIndex, to, "\n");
     if (type === "indent") {
-      let replacedStr = text.replace(/\n/g, "\n\t");
+      let replacedStr = text.replace(/\n/g, "\n  ");
       if (startBetWeenIndex === pos + 1) {
-        replacedStr = "\t" + replacedStr;
+        replacedStr = "  " + replacedStr;
       }
       tr.insertText(replacedStr, startBetWeenIndex, to);
     } else {
-      let replacedStr = text.replace(/\n\t/g, "\n");
+      let replacedStr = text.replace(/\n {2}/g, "\n");
       if (startBetWeenIndex === pos + 1) {
-        const firstNewLineIndex = replacedStr.indexOf("\t");
+        const firstNewLineIndex = replacedStr.indexOf("  ");
         if (firstNewLineIndex == 0) {
-          replacedStr = replacedStr.replace("\t", "");
+          replacedStr = replacedStr.replace("  ", "");
         }
       }
       tr.insertText(replacedStr, startBetWeenIndex, to);
