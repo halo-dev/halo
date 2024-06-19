@@ -2854,6 +2854,14 @@
             "schema": {
               "type": "string"
             }
+          },
+          {
+            "description": "Posts filtered by category including sub-categories.",
+            "in": "query",
+            "name": "categoryWithChildren",
+            "schema": {
+              "type": "string"
+            }
           }
         ],
         "responses": {
@@ -12546,6 +12554,14 @@
             "schema": {
               "type": "string"
             }
+          },
+          {
+            "description": "Posts filtered by category including sub-categories.",
+            "in": "query",
+            "name": "categoryWithChildren",
+            "schema": {
+              "type": "string"
+            }
           }
         ],
         "responses": {
@@ -17449,12 +17465,12 @@
           },
           "visible": {
             "type": "string",
-            "default": "PUBLIC",
             "enum": [
               "PUBLIC",
               "INTERNAL",
               "PRIVATE"
-            ]
+            ],
+            "default": "PUBLIC"
           }
         }
       },
@@ -19104,12 +19120,12 @@
           },
           "visible": {
             "type": "string",
-            "default": "PUBLIC",
             "enum": [
               "PUBLIC",
               "INTERNAL",
               "PRIVATE"
-            ]
+            ],
+            "default": "PUBLIC"
           }
         }
       },

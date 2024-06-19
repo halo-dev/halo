@@ -374,7 +374,10 @@ core:
           help: 需要主题适配以支持
         independent:
           label: 独立分类
-          help: 如果选中，子分类下的文章将不会汇总到父分类中显示
+          help: 如果选中，此分类下的文章将不会汇总到父分类中显示
+    list:
+      fields:
+        independent: 此分类下的文章将不会汇总到父分类中显示
   page:
     title: 页面
     actions:

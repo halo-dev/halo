@@ -375,8 +375,13 @@ core:
         independent:
           label: Independent Category
           help: >-
-            If selected, posts in child categories will not be aggregated into
-            the parent category
+            If selected, the posts in this category will not be aggregated and
+            displayed in the parent category
+    list:
+      fields:
+        independent: >-
+          The posts in this category will not be aggregated and displayed in the
+          parent category
   page:
     title: Pages
     actions:
