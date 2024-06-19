@@ -1,11 +1,6 @@
 <script lang="ts" setup>
-// types
-import type { Ref } from "vue";
-// core libs
-import { inject, ref } from "vue";
-import { useThemeLifeCycle } from "./composables/use-theme";
-
-// components
+import { apiClient } from "@/utils/api-client";
+import type { Theme } from "@halo-dev/api-client";
 import {
   Dialog,
   IconMore,
@@ -19,10 +14,10 @@ import {
   VStatusDot,
   VTag,
 } from "@halo-dev/components";
-import type { Theme } from "@halo-dev/api-client";
-
-import { apiClient } from "@/utils/api-client";
+import type { Ref } from "vue";
+import { inject, ref } from "vue";
 import { useI18n } from "vue-i18n";
+import { useThemeConfigFile, useThemeLifeCycle } from "./composables/use-theme";
 
 const { t } = useI18n();
 
@@ -78,6 +73,9 @@ const handleReloadTheme = async () => {
     },
   });
 };
+
+const { handleExportThemeConfiguration, openSelectImportFileDialog } =
+  useThemeConfigFile(selectedTheme);
 </script>
 
 <template>
@@ -125,6 +123,12 @@ const handleReloadTheme = async () => {
             <template #popper>
               <VDropdownItem @click="themesModal = true">
                 {{ $t("core.common.buttons.upgrade") }}
+              </VDropdownItem>
+              <VDropdownItem @click="handleExportThemeConfiguration">
+                {{ $t("core.theme.operations.export_configuration.button") }}
+              </VDropdownItem>
+              <VDropdownItem @click="openSelectImportFileDialog()">
+                {{ $t("core.theme.operations.import_configuration.button") }}
               </VDropdownItem>
               <VDropdownDivider />
               <VDropdownItem type="danger" @click="handleReloadTheme">

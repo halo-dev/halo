@@ -671,6 +671,15 @@ core:
         button: 清除模板快取
         title: 清除模板快取
         description: 此功能適用於在運行時修改模板檔案後，刷新快取以查看最新網頁結果。
+      export_configuration:
+        button: 匯出主題配置
+      import_configuration:
+        button: 匯入主題配置
+        version_mismatch:
+          title: 版本不匹配
+          description: 匯入的配置檔版本與目前主題版本不匹配，這可能會導致相容性問題。是否繼續匯入？
+        invalid_format: 無效的主題配置文件
+        mismatched_theme: 配置文件與所選主題不匹配
     list_modal:
       tabs:
         installed: 已安裝
