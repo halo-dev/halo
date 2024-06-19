@@ -104,7 +104,10 @@ editor:
     code: Code
     superscript: Super Script
     subscript: Sub Script
-    codeblock: Code block
+    codeblock:
+      title: Code block
+      copy_code: Copy code
+      copy_code_success: Copy success
     image: Image
     heading:
       title: Text type
