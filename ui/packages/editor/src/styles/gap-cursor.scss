@@ -2,7 +2,9 @@
   .ProseMirror {
     &.ProseMirror-focused {
       .card-gap-cursor {
-        display: block;
+        &::before {
+          display: block;
+        }
       }
     }
     .card-gap-cursor {
@@ -12,7 +14,7 @@
     .card-gap-cursor {
       &::before {
         content: "";
-        display: block;
+        display: none;
         position: absolute;
         min-width: 1px;
         height: 1em;
