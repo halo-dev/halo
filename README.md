@@ -21,6 +21,8 @@
 <a href="https://t.me/halo_dev">Telegram 频道</a>
 </p>
 
+[![Watch the video](https://www.halo.run/upload/halo-github-screenshot.png)](https://www.bilibili.com/video/BV15x4y1U7RU/?share_source=copy_web&vd_source=0ab6cf86ca512a363f04f18b86f55b86)
+
 ------------------------------
 
 ## 快速开始
@@ -37,10 +39,6 @@ docker run -d --name halo -p 8090:8090 -v ~/.halo2:/root/.halo2 halohub/halo:2.1
 - 后台地址：<https://demo.halo.run/console>
 - 用户名：`demo`
 - 密码：`P@ssw0rd123..`
-
-## 演示视频
-
-[![Watch the video](https://www.halo.run/upload/dashboard-2023-12-03.png)](https://www.bilibili.com/video/BV15x4y1U7RU/?share_source=copy_web&vd_source=0ab6cf86ca512a363f04f18b86f55b86)
 
 ## 生态
 
