@@ -21,6 +21,8 @@
 <a href="https://t.me/halo_dev">Telegram 频道</a>
 </p>
 
+[![Watch the video](https://www.halo.run/upload/halo-github-screenshot.png)](https://www.bilibili.com/video/BV15x4y1U7RU/?share_source=copy_web&vd_source=0ab6cf86ca512a363f04f18b86f55b86)
+
 ------------------------------
 
 ## 快速开始

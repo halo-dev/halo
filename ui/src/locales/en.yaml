@@ -721,6 +721,18 @@ core:
         description: >-
           This feature allows you to refresh the cache to view the latest web
           results after modifying template files at runtime.
+      export_configuration:
+        button: Export theme configuration
+      import_configuration:
+        button: Import theme configuration
+        version_mismatch:
+          title: Version mismatch
+          description: >-
+            The imported configuration file version does not match the 
+            current theme version, which may lead to compatibility issues.
+            Do you want to continue importing?
+        invalid_format: Invalid theme configuration file
+        mismatched_theme: Configuration file does not match the selected theme
     list_modal:
       tabs:
         installed: Installed
