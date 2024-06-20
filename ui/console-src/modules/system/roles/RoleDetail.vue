@@ -20,7 +20,7 @@ import { SUPER_ROLE_NAME } from "@/constants/constants";
 import { useI18n } from "vue-i18n";
 import { formatDatetime } from "@/utils/date";
 import { useQuery } from "@tanstack/vue-query";
-import type { Role } from "packages/api-client/dist";
+import type { Role } from "@halo-dev/api-client";
 import { resolveDeepDependencies } from "@/utils/role";
 
 const route = useRoute();

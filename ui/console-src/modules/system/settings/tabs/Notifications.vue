@@ -1,15 +1,11 @@
 <script lang="ts" setup>
-import { useQuery } from "@tanstack/vue-query";
-import NotificationSetting from "./NotificationSetting.vue";
+import type { NotifierDescriptor } from "@halo-dev/api-client";
 import { apiClient } from "@halo-dev/api-client";
-import { markRaw, ref } from "vue";
-import type { Raw } from "vue";
-import type { Component } from "vue";
-import { provide } from "vue";
 import { VTabbar } from "@halo-dev/components";
-import { computed } from "vue";
-import type { ComputedRef } from "vue";
-import type { NotifierDescriptor } from "packages/api-client/dist";
+import { useQuery } from "@tanstack/vue-query";
+import type { Component, ComputedRef, Raw } from "vue";
+import { computed, markRaw, provide, ref } from "vue";
+import NotificationSetting from "./NotificationSetting.vue";
 
 interface Tab {
   id: string;

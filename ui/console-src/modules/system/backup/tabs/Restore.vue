@@ -17,7 +17,7 @@ import { ref } from "vue";
 import { useI18n } from "vue-i18n";
 import { useBackupFetch } from "../composables/use-backup";
 import BackupListItem from "../components/BackupListItem.vue";
-import type { Backup } from "packages/api-client/dist";
+import type { Backup } from "@halo-dev/api-client";
 
 const { t } = useI18n();
 const { data: backups } = useBackupFetch();
