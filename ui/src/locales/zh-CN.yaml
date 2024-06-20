@@ -366,12 +366,16 @@ core:
           refresh_message: 根据名称重新生成别名
         template:
           label: 自定义模板
+          help: 自定义分类归档页面的渲染模版，需要主题提供支持
         cover:
           label: 封面图
           help: 需要主题适配以支持
         description:
           label: 描述
           help: 需要主题适配以支持
+        post_template:
+          label: 自定义文章模板
+          help: 自定义当前分类下文章的渲染模版，需要主题提供支持
   page:
     title: 页面
     actions:

@@ -346,12 +346,16 @@ core:
           refresh_message: 根據名稱重新生成別名
         template:
           label: 自定義模板
+          help: 自定義分類歸檔頁面的渲染模板，需要主題提供支持
         cover:
           label: 封面圖
           help: 需要主題適配以支持
         description:
           label: 描述
           help: 需要主題適配以支持
+        post_template:
+          label: 自定義文章模板
+          help: 自定義當前分類下文章的渲染模板，需要主題提供支持
   page:
     title: 頁面
     actions:

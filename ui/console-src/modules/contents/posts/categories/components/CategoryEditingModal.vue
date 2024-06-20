@@ -51,6 +51,7 @@ const formState = ref<Category>({
     description: "",
     cover: "",
     template: "",
+    postTemplate: "",
     priority: 0,
     children: [],
   },
@@ -160,6 +161,7 @@ onMounted(() => {
 
 // custom templates
 const { templates } = useThemeCustomTemplates("category");
+const { templates: postTemplates } = useThemeCustomTemplates("post");
 
 // slug
 const { handleGenerateSlug } = useSlugify(
@@ -243,8 +245,25 @@ const { handleGenerateSlug } = useSlugify(
               :label="
                 $t('core.post_category.editing_modal.fields.template.label')
               "
+              :help="
+                $t('core.post_category.editing_modal.fields.template.help')
+              "
               type="select"
               name="template"
+            ></FormKit>
+            <FormKit
+              v-model="formState.spec.postTemplate"
+              :options="postTemplates"
+              :label="
+                $t(
+                  'core.post_category.editing_modal.fields.post_template.label'
+                )
+              "
+              :help="
+                $t('core.post_category.editing_modal.fields.post_template.help')
+              "
+              type="select"
+              name="postTemplate"
             ></FormKit>
             <FormKit
               v-model="formState.spec.cover"
