@@ -123,11 +123,6 @@ items:
           "guest"
         ]
       }
-- name: deleteUser
-  request:
-    api: |
-      {{default "http://halo:8090" (env "SERVER")}}/api/v1alpha1/users/{{.param.userName}}
-    method: DELETE
 - name: sendPasswordResetEmail
   request:
     api: |
@@ -286,4 +281,10 @@ items:
   request:
     api: |
       /api.notification.halo.run/v1alpha1/userspaces/admin/notifications/{{.param.notificationName}}
+    method: DELETE
+
+- name: deleteUser
+  request:
+    api: |
+      {{default "http://halo:8090" (env "SERVER")}}/api/v1alpha1/users/{{.param.userName}}
     method: DELETE
