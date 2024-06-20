@@ -46,7 +46,7 @@ const formState = ref<Category>({
     template: "",
     priority: 0,
     children: [],
-    independent: false,
+    preventParentPostCascadeQuery: false,
   },
   status: {},
   apiVersion: "content.halo.run/v1alpha1",
@@ -250,7 +250,7 @@ const { handleGenerateSlug } = useSlugify(
               validation="length:0,1024"
             ></FormKit>
             <FormKit
-              v-model="formState.spec.independent"
+              v-model="formState.spec.preventParentPostCascadeQuery"
               :label="
                 $t('core.post_category.editing_modal.fields.independent.label')
               "
@@ -258,7 +258,7 @@ const { handleGenerateSlug } = useSlugify(
                 $t('core.post_category.editing_modal.fields.independent.help')
               "
               type="checkbox"
-              name="independent"
+              name="preventParentPostCascadeQuery"
             ></FormKit>
             <FormKit
               v-model="formState.spec.description"

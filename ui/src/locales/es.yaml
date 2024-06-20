@@ -336,9 +336,11 @@ core:
           help: Se requiere adaptación del tema para ser compatible
         description:
           label: Descripción
-          help: Se requiere adaptación del tema para ser compatible
+          help: >-
+            Evitar que la categoría principal incluya esta categoría y sus
+            subcategorías en consultas de publicaciones en cascada
         independent:
-          label: Categoría independiente
+          label: Evitar consulta en cascada de publicación principal
           help: >-
             Si se selecciona, las publicaciones de las subcategorías no se
             agregarán a la categoría principal

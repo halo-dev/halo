@@ -29,6 +29,6 @@ public class CategoryServiceImpl implements CategoryService {
     }
 
     private boolean isNotIndependent(Category category) {
-        return !category.getSpec().isIndependent();
+        return !category.getSpec().isPreventParentPostCascadeQuery();
     }
 }

@@ -371,9 +371,11 @@ core:
           help: Theme adaptation is required to support
         description:
           label: Description
-          help: Theme adaptation is required to support
+          help: >-
+            Prevent parent category from including this category and its
+            subcategories in cascade post queries
         independent:
-          label: Independent Category
+          label: Prevent Parent Post Cascade Query
           help: >-
             If selected, the posts in this category will not be aggregated and
             displayed in the parent category

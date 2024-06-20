@@ -60,7 +60,15 @@ public class Category extends AbstractExtension {
 
         private List<String> children;
 
-        private boolean independent;
+        /**
+         * <p>if a category is queried for related posts, the default behavior is to
+         * query all posts under the category including its subcategories, but if this field is
+         * set to true, cascade query behavior will be terminated here.</p>
+         * <p>For example, if a category has subcategories A and B, and A has subcategories C and
+         * D and C marked this field as true, when querying posts under A category,all posts under A
+         * and B will be queried, but C and D will not be queried.</p>
+         */
+        private boolean preventParentPostCascadeQuery;
     }
 
     @JsonIgnore

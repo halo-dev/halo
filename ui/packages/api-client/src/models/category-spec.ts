@@ -49,7 +49,7 @@ export interface CategorySpec {
      * @type {boolean}
      * @memberof CategorySpec
      */
-    'independent'?: boolean;
+    'preventParentPostCascadeQuery'?: boolean;
     /**
      * 
      * @type {number}

@@ -371,9 +371,9 @@ core:
           help: 需要主题适配以支持
         description:
           label: 描述
-          help: 需要主题适配以支持
+          help: 阻止父级分类在级联文章查询中包含此分类及其子分类
         independent:
-          label: 独立分类
+          label: 阻止文章级联查询
           help: 如果选中，此分类下的文章将不会汇总到父分类中显示
     list:
       fields:

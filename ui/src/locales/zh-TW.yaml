@@ -351,9 +351,9 @@ core:
           help: 需要主題適配以支持
         description:
           label: 描述
-          help: 需要主題適配以支持
+          help: 阻止父級分類在級聯文章查詢中包含此分類及其子分類
         independent:
-          label: 獨立分類
+          label: 防止父級聯查詢
           help: 如果選取，此分類下的文章將不會彙總到父分類中顯示
     list:
       fields:

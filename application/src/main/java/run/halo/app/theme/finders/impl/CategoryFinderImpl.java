@@ -167,12 +167,13 @@ public class CategoryFinderImpl implements CategoryFinder {
 
         for (var child : rootNode.getChildren()) {
             int childSum = recomputePostCount(child);
-            if (!child.getSpec().isIndependent()) {
+            if (!child.getSpec().isPreventParentPostCascadeQuery()) {
                 rootNode.setPostCount(rootNode.getPostCount() + childSum);
             }
         }
 
-        return rootNode.getSpec().isIndependent() ? originalPostCount : rootNode.getPostCount();
+        return rootNode.getSpec().isPreventParentPostCascadeQuery() ? originalPostCount
+            : rootNode.getPostCount();
     }
 
     static Comparator<CategoryTreeVo> defaultTreeNodeComparator() {
