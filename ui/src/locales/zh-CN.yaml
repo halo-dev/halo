@@ -691,6 +691,15 @@ core:
         button: 清理模板缓存
         title: 清除模板缓存
         description: 此功能适用于在运行时修改模板文件后，刷新缓存以查看最新网页结果。
+      export_configuration:
+        button: 导出主题配置
+      import_configuration:
+        button: 导入主题配置
+        version_mismatch:
+          title: 版本不匹配
+          description: 导入的配置文件版本与当前主题版本不匹配，这可能会导致兼容性问题。是否继续导入？
+        invalid_format: 无效的主题配置文件
+        mismatched_theme: 配置文件与所选主题不匹配
     list_modal:
       tabs:
         installed: 已安装

@@ -290,6 +290,9 @@ const Blockquote = TiptapHeading.extend<ExtensionOptions & HeadingOptions>({
               return true;
             }
             if (transaction.docChanged) {
+              if (transaction.getMeta("paste")) {
+                return true;
+              }
               beforeComposition = composition;
               const selection = transaction.selection;
               const { $from } = selection;
