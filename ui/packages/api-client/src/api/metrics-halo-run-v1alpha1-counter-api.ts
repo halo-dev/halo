@@ -25,6 +25,8 @@ import { BASE_PATH, COLLECTION_FORMATS, RequestArgs, BaseAPI, RequiredError, ope
 import { Counter } from '../models';
 // @ts-ignore
 import { CounterList } from '../models';
+// @ts-ignore
+import { JsonPatchInner } from '../models';
 /**
  * MetricsHaloRunV1alpha1CounterApi - axios parameter creator
  * @export
@@ -217,6 +219,51 @@ export const MetricsHaloRunV1alpha1CounterApiAxiosParamCreator = function (confi
             };
         },
         /**
+         * Patch metrics.halo.run/v1alpha1/Counter
+         * @param {string} name Name of counter
+         * @param {Array<JsonPatchInner>} [jsonPatchInner] 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        patchMetricsHaloRunV1alpha1Counter: async (name: string, jsonPatchInner?: Array<JsonPatchInner>, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+            // verify required parameter 'name' is not null or undefined
+            assertParamExists('patchMetricsHaloRunV1alpha1Counter', 'name', name)
+            const localVarPath = `/apis/metrics.halo.run/v1alpha1/counters/{name}`
+                .replace(`{${"name"}}`, encodeURIComponent(String(name)));
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'PATCH', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+            // authentication BasicAuth required
+            // http basic authentication required
+            setBasicAuthToObject(localVarRequestOptions, configuration)
+
+            // authentication BearerAuth required
+            // http bearer authentication required
+            await setBearerAuthToObject(localVarHeaderParameter, configuration)
+
+
+    
+            localVarHeaderParameter['Content-Type'] = 'application/json-patch+json';
+
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+            localVarRequestOptions.data = serializeDataIfNeeded(jsonPatchInner, localVarRequestOptions, configuration)
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+        /**
          * Update metrics.halo.run/v1alpha1/Counter
          * @param {string} name Name of counter
          * @param {Counter} [counter] Updated counter
@@ -324,6 +371,19 @@ export const MetricsHaloRunV1alpha1CounterApiFp = function(configuration?: Confi
             return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
         },
         /**
+         * Patch metrics.halo.run/v1alpha1/Counter
+         * @param {string} name Name of counter
+         * @param {Array<JsonPatchInner>} [jsonPatchInner] 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async patchMetricsHaloRunV1alpha1Counter(name: string, jsonPatchInner?: Array<JsonPatchInner>, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<Counter>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.patchMetricsHaloRunV1alpha1Counter(name, jsonPatchInner, options);
+            const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
+            const localVarOperationServerBasePath = operationServerMap['MetricsHaloRunV1alpha1CounterApi.patchMetricsHaloRunV1alpha1Counter']?.[localVarOperationServerIndex]?.url;
+            return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
+        },
+        /**
          * Update metrics.halo.run/v1alpha1/Counter
          * @param {string} name Name of counter
          * @param {Counter} [counter] Updated counter
@@ -381,6 +441,15 @@ export const MetricsHaloRunV1alpha1CounterApiFactory = function (configuration?:
          */
         listMetricsHaloRunV1alpha1Counter(requestParameters: MetricsHaloRunV1alpha1CounterApiListMetricsHaloRunV1alpha1CounterRequest = {}, options?: RawAxiosRequestConfig): AxiosPromise<CounterList> {
             return localVarFp.listMetricsHaloRunV1alpha1Counter(requestParameters.page, requestParameters.size, requestParameters.labelSelector, requestParameters.fieldSelector, requestParameters.sort, options).then((request) => request(axios, basePath));
+        },
+        /**
+         * Patch metrics.halo.run/v1alpha1/Counter
+         * @param {MetricsHaloRunV1alpha1CounterApiPatchMetricsHaloRunV1alpha1CounterRequest} requestParameters Request parameters.
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        patchMetricsHaloRunV1alpha1Counter(requestParameters: MetricsHaloRunV1alpha1CounterApiPatchMetricsHaloRunV1alpha1CounterRequest, options?: RawAxiosRequestConfig): AxiosPromise<Counter> {
+            return localVarFp.patchMetricsHaloRunV1alpha1Counter(requestParameters.name, requestParameters.jsonPatchInner, options).then((request) => request(axios, basePath));
         },
         /**
          * Update metrics.halo.run/v1alpha1/Counter
@@ -479,6 +548,27 @@ export interface MetricsHaloRunV1alpha1CounterApiListMetricsHaloRunV1alpha1Count
 }
 
 /**
+ * Request parameters for patchMetricsHaloRunV1alpha1Counter operation in MetricsHaloRunV1alpha1CounterApi.
+ * @export
+ * @interface MetricsHaloRunV1alpha1CounterApiPatchMetricsHaloRunV1alpha1CounterRequest
+ */
+export interface MetricsHaloRunV1alpha1CounterApiPatchMetricsHaloRunV1alpha1CounterRequest {
+    /**
+     * Name of counter
+     * @type {string}
+     * @memberof MetricsHaloRunV1alpha1CounterApiPatchMetricsHaloRunV1alpha1Counter
+     */
+    readonly name: string
+
+    /**
+     * 
+     * @type {Array<JsonPatchInner>}
+     * @memberof MetricsHaloRunV1alpha1CounterApiPatchMetricsHaloRunV1alpha1Counter
+     */
+    readonly jsonPatchInner?: Array<JsonPatchInner>
+}
+
+/**
  * Request parameters for updateMetricsHaloRunV1alpha1Counter operation in MetricsHaloRunV1alpha1CounterApi.
  * @export
  * @interface MetricsHaloRunV1alpha1CounterApiUpdateMetricsHaloRunV1alpha1CounterRequest
@@ -548,6 +638,17 @@ export class MetricsHaloRunV1alpha1CounterApi extends BaseAPI {
      */
     public listMetricsHaloRunV1alpha1Counter(requestParameters: MetricsHaloRunV1alpha1CounterApiListMetricsHaloRunV1alpha1CounterRequest = {}, options?: RawAxiosRequestConfig) {
         return MetricsHaloRunV1alpha1CounterApiFp(this.configuration).listMetricsHaloRunV1alpha1Counter(requestParameters.page, requestParameters.size, requestParameters.labelSelector, requestParameters.fieldSelector, requestParameters.sort, options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
+     * Patch metrics.halo.run/v1alpha1/Counter
+     * @param {MetricsHaloRunV1alpha1CounterApiPatchMetricsHaloRunV1alpha1CounterRequest} requestParameters Request parameters.
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof MetricsHaloRunV1alpha1CounterApi
+     */
+    public patchMetricsHaloRunV1alpha1Counter(requestParameters: MetricsHaloRunV1alpha1CounterApiPatchMetricsHaloRunV1alpha1CounterRequest, options?: RawAxiosRequestConfig) {
+        return MetricsHaloRunV1alpha1CounterApiFp(this.configuration).patchMetricsHaloRunV1alpha1Counter(requestParameters.name, requestParameters.jsonPatchInner, options).then((request) => request(this.axios, this.basePath));
     }
 
     /**

@@ -5,7 +5,6 @@ import java.util.function.Function;
 import lombok.EqualsAndHashCode;
 import org.springframework.util.Assert;
 import run.halo.app.extension.Extension;
-import run.halo.app.extension.Unstructured;
 
 @EqualsAndHashCode(callSuper = true)
 public class FunctionalMultiValueIndexAttribute<E extends Extension>
@@ -29,10 +28,6 @@ public class FunctionalMultiValueIndexAttribute<E extends Extension>
 
     @Override
     public Set<String> getValues(Extension object) {
-        if (object instanceof Unstructured unstructured) {
-            var ext = Unstructured.OBJECT_MAPPER.convertValue(unstructured, getObjectType());
-            return getNonNullValues(ext);
-        }
         if (getObjectType().isInstance(object)) {
             return getNonNullValues(getObjectType().cast(object));
         }

@@ -25,6 +25,8 @@ import { BASE_PATH, COLLECTION_FORMATS, RequestArgs, BaseAPI, RequiredError, ope
 import { AnnotationSetting } from '../models';
 // @ts-ignore
 import { AnnotationSettingList } from '../models';
+// @ts-ignore
+import { JsonPatchInner } from '../models';
 /**
  * V1alpha1AnnotationSettingApi - axios parameter creator
  * @export
@@ -217,6 +219,51 @@ export const V1alpha1AnnotationSettingApiAxiosParamCreator = function (configura
             };
         },
         /**
+         * Patch v1alpha1/AnnotationSetting
+         * @param {string} name Name of annotationsetting
+         * @param {Array<JsonPatchInner>} [jsonPatchInner] 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        patchV1alpha1AnnotationSetting: async (name: string, jsonPatchInner?: Array<JsonPatchInner>, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+            // verify required parameter 'name' is not null or undefined
+            assertParamExists('patchV1alpha1AnnotationSetting', 'name', name)
+            const localVarPath = `/api/v1alpha1/annotationsettings/{name}`
+                .replace(`{${"name"}}`, encodeURIComponent(String(name)));
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'PATCH', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+            // authentication BasicAuth required
+            // http basic authentication required
+            setBasicAuthToObject(localVarRequestOptions, configuration)
+
+            // authentication BearerAuth required
+            // http bearer authentication required
+            await setBearerAuthToObject(localVarHeaderParameter, configuration)
+
+
+    
+            localVarHeaderParameter['Content-Type'] = 'application/json-patch+json';
+
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+            localVarRequestOptions.data = serializeDataIfNeeded(jsonPatchInner, localVarRequestOptions, configuration)
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+        /**
          * Update v1alpha1/AnnotationSetting
          * @param {string} name Name of annotationsetting
          * @param {AnnotationSetting} [annotationSetting] Updated annotationsetting
@@ -324,6 +371,19 @@ export const V1alpha1AnnotationSettingApiFp = function(configuration?: Configura
             return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
         },
         /**
+         * Patch v1alpha1/AnnotationSetting
+         * @param {string} name Name of annotationsetting
+         * @param {Array<JsonPatchInner>} [jsonPatchInner] 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async patchV1alpha1AnnotationSetting(name: string, jsonPatchInner?: Array<JsonPatchInner>, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<AnnotationSetting>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.patchV1alpha1AnnotationSetting(name, jsonPatchInner, options);
+            const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
+            const localVarOperationServerBasePath = operationServerMap['V1alpha1AnnotationSettingApi.patchV1alpha1AnnotationSetting']?.[localVarOperationServerIndex]?.url;
+            return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
+        },
+        /**
          * Update v1alpha1/AnnotationSetting
          * @param {string} name Name of annotationsetting
          * @param {AnnotationSetting} [annotationSetting] Updated annotationsetting
@@ -381,6 +441,15 @@ export const V1alpha1AnnotationSettingApiFactory = function (configuration?: Con
          */
         listV1alpha1AnnotationSetting(requestParameters: V1alpha1AnnotationSettingApiListV1alpha1AnnotationSettingRequest = {}, options?: RawAxiosRequestConfig): AxiosPromise<AnnotationSettingList> {
             return localVarFp.listV1alpha1AnnotationSetting(requestParameters.page, requestParameters.size, requestParameters.labelSelector, requestParameters.fieldSelector, requestParameters.sort, options).then((request) => request(axios, basePath));
+        },
+        /**
+         * Patch v1alpha1/AnnotationSetting
+         * @param {V1alpha1AnnotationSettingApiPatchV1alpha1AnnotationSettingRequest} requestParameters Request parameters.
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        patchV1alpha1AnnotationSetting(requestParameters: V1alpha1AnnotationSettingApiPatchV1alpha1AnnotationSettingRequest, options?: RawAxiosRequestConfig): AxiosPromise<AnnotationSetting> {
+            return localVarFp.patchV1alpha1AnnotationSetting(requestParameters.name, requestParameters.jsonPatchInner, options).then((request) => request(axios, basePath));
         },
         /**
          * Update v1alpha1/AnnotationSetting
@@ -479,6 +548,27 @@ export interface V1alpha1AnnotationSettingApiListV1alpha1AnnotationSettingReques
 }
 
 /**
+ * Request parameters for patchV1alpha1AnnotationSetting operation in V1alpha1AnnotationSettingApi.
+ * @export
+ * @interface V1alpha1AnnotationSettingApiPatchV1alpha1AnnotationSettingRequest
+ */
+export interface V1alpha1AnnotationSettingApiPatchV1alpha1AnnotationSettingRequest {
+    /**
+     * Name of annotationsetting
+     * @type {string}
+     * @memberof V1alpha1AnnotationSettingApiPatchV1alpha1AnnotationSetting
+     */
+    readonly name: string
+
+    /**
+     * 
+     * @type {Array<JsonPatchInner>}
+     * @memberof V1alpha1AnnotationSettingApiPatchV1alpha1AnnotationSetting
+     */
+    readonly jsonPatchInner?: Array<JsonPatchInner>
+}
+
+/**
  * Request parameters for updateV1alpha1AnnotationSetting operation in V1alpha1AnnotationSettingApi.
  * @export
  * @interface V1alpha1AnnotationSettingApiUpdateV1alpha1AnnotationSettingRequest
@@ -548,6 +638,17 @@ export class V1alpha1AnnotationSettingApi extends BaseAPI {
      */
     public listV1alpha1AnnotationSetting(requestParameters: V1alpha1AnnotationSettingApiListV1alpha1AnnotationSettingRequest = {}, options?: RawAxiosRequestConfig) {
         return V1alpha1AnnotationSettingApiFp(this.configuration).listV1alpha1AnnotationSetting(requestParameters.page, requestParameters.size, requestParameters.labelSelector, requestParameters.fieldSelector, requestParameters.sort, options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
+     * Patch v1alpha1/AnnotationSetting
+     * @param {V1alpha1AnnotationSettingApiPatchV1alpha1AnnotationSettingRequest} requestParameters Request parameters.
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof V1alpha1AnnotationSettingApi
+     */
+    public patchV1alpha1AnnotationSetting(requestParameters: V1alpha1AnnotationSettingApiPatchV1alpha1AnnotationSettingRequest, options?: RawAxiosRequestConfig) {
+        return V1alpha1AnnotationSettingApiFp(this.configuration).patchV1alpha1AnnotationSetting(requestParameters.name, requestParameters.jsonPatchInner, options).then((request) => request(this.axios, this.basePath));
     }
 
     /**

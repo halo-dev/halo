@@ -22,6 +22,8 @@ import { DUMMY_BASE_URL, assertParamExists, setApiKeyToObject, setBasicAuthToObj
 // @ts-ignore
 import { BASE_PATH, COLLECTION_FORMATS, RequestArgs, BaseAPI, RequiredError, operationServerMap } from '../base';
 // @ts-ignore
+import { JsonPatchInner } from '../models';
+// @ts-ignore
 import { Theme } from '../models';
 // @ts-ignore
 import { ThemeList } from '../models';
@@ -217,6 +219,51 @@ export const ThemeHaloRunV1alpha1ThemeApiAxiosParamCreator = function (configura
             };
         },
         /**
+         * Patch theme.halo.run/v1alpha1/Theme
+         * @param {string} name Name of theme
+         * @param {Array<JsonPatchInner>} [jsonPatchInner] 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        patchThemeHaloRunV1alpha1Theme: async (name: string, jsonPatchInner?: Array<JsonPatchInner>, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+            // verify required parameter 'name' is not null or undefined
+            assertParamExists('patchThemeHaloRunV1alpha1Theme', 'name', name)
+            const localVarPath = `/apis/theme.halo.run/v1alpha1/themes/{name}`
+                .replace(`{${"name"}}`, encodeURIComponent(String(name)));
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'PATCH', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+            // authentication BasicAuth required
+            // http basic authentication required
+            setBasicAuthToObject(localVarRequestOptions, configuration)
+
+            // authentication BearerAuth required
+            // http bearer authentication required
+            await setBearerAuthToObject(localVarHeaderParameter, configuration)
+
+
+    
+            localVarHeaderParameter['Content-Type'] = 'application/json-patch+json';
+
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+            localVarRequestOptions.data = serializeDataIfNeeded(jsonPatchInner, localVarRequestOptions, configuration)
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+        /**
          * Update theme.halo.run/v1alpha1/Theme
          * @param {string} name Name of theme
          * @param {Theme} [theme] Updated theme
@@ -324,6 +371,19 @@ export const ThemeHaloRunV1alpha1ThemeApiFp = function(configuration?: Configura
             return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
         },
         /**
+         * Patch theme.halo.run/v1alpha1/Theme
+         * @param {string} name Name of theme
+         * @param {Array<JsonPatchInner>} [jsonPatchInner] 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async patchThemeHaloRunV1alpha1Theme(name: string, jsonPatchInner?: Array<JsonPatchInner>, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<Theme>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.patchThemeHaloRunV1alpha1Theme(name, jsonPatchInner, options);
+            const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
+            const localVarOperationServerBasePath = operationServerMap['ThemeHaloRunV1alpha1ThemeApi.patchThemeHaloRunV1alpha1Theme']?.[localVarOperationServerIndex]?.url;
+            return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
+        },
+        /**
          * Update theme.halo.run/v1alpha1/Theme
          * @param {string} name Name of theme
          * @param {Theme} [theme] Updated theme
@@ -381,6 +441,15 @@ export const ThemeHaloRunV1alpha1ThemeApiFactory = function (configuration?: Con
          */
         listThemeHaloRunV1alpha1Theme(requestParameters: ThemeHaloRunV1alpha1ThemeApiListThemeHaloRunV1alpha1ThemeRequest = {}, options?: RawAxiosRequestConfig): AxiosPromise<ThemeList> {
             return localVarFp.listThemeHaloRunV1alpha1Theme(requestParameters.page, requestParameters.size, requestParameters.labelSelector, requestParameters.fieldSelector, requestParameters.sort, options).then((request) => request(axios, basePath));
+        },
+        /**
+         * Patch theme.halo.run/v1alpha1/Theme
+         * @param {ThemeHaloRunV1alpha1ThemeApiPatchThemeHaloRunV1alpha1ThemeRequest} requestParameters Request parameters.
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        patchThemeHaloRunV1alpha1Theme(requestParameters: ThemeHaloRunV1alpha1ThemeApiPatchThemeHaloRunV1alpha1ThemeRequest, options?: RawAxiosRequestConfig): AxiosPromise<Theme> {
+            return localVarFp.patchThemeHaloRunV1alpha1Theme(requestParameters.name, requestParameters.jsonPatchInner, options).then((request) => request(axios, basePath));
         },
         /**
          * Update theme.halo.run/v1alpha1/Theme
@@ -479,6 +548,27 @@ export interface ThemeHaloRunV1alpha1ThemeApiListThemeHaloRunV1alpha1ThemeReques
 }
 
 /**
+ * Request parameters for patchThemeHaloRunV1alpha1Theme operation in ThemeHaloRunV1alpha1ThemeApi.
+ * @export
+ * @interface ThemeHaloRunV1alpha1ThemeApiPatchThemeHaloRunV1alpha1ThemeRequest
+ */
+export interface ThemeHaloRunV1alpha1ThemeApiPatchThemeHaloRunV1alpha1ThemeRequest {
+    /**
+     * Name of theme
+     * @type {string}
+     * @memberof ThemeHaloRunV1alpha1ThemeApiPatchThemeHaloRunV1alpha1Theme
+     */
+    readonly name: string
+
+    /**
+     * 
+     * @type {Array<JsonPatchInner>}
+     * @memberof ThemeHaloRunV1alpha1ThemeApiPatchThemeHaloRunV1alpha1Theme
+     */
+    readonly jsonPatchInner?: Array<JsonPatchInner>
+}
+
+/**
  * Request parameters for updateThemeHaloRunV1alpha1Theme operation in ThemeHaloRunV1alpha1ThemeApi.
  * @export
  * @interface ThemeHaloRunV1alpha1ThemeApiUpdateThemeHaloRunV1alpha1ThemeRequest
@@ -548,6 +638,17 @@ export class ThemeHaloRunV1alpha1ThemeApi extends BaseAPI {
      */
     public listThemeHaloRunV1alpha1Theme(requestParameters: ThemeHaloRunV1alpha1ThemeApiListThemeHaloRunV1alpha1ThemeRequest = {}, options?: RawAxiosRequestConfig) {
         return ThemeHaloRunV1alpha1ThemeApiFp(this.configuration).listThemeHaloRunV1alpha1Theme(requestParameters.page, requestParameters.size, requestParameters.labelSelector, requestParameters.fieldSelector, requestParameters.sort, options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
+     * Patch theme.halo.run/v1alpha1/Theme
+     * @param {ThemeHaloRunV1alpha1ThemeApiPatchThemeHaloRunV1alpha1ThemeRequest} requestParameters Request parameters.
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof ThemeHaloRunV1alpha1ThemeApi
+     */
+    public patchThemeHaloRunV1alpha1Theme(requestParameters: ThemeHaloRunV1alpha1ThemeApiPatchThemeHaloRunV1alpha1ThemeRequest, options?: RawAxiosRequestConfig) {
+        return ThemeHaloRunV1alpha1ThemeApiFp(this.configuration).patchThemeHaloRunV1alpha1Theme(requestParameters.name, requestParameters.jsonPatchInner, options).then((request) => request(this.axios, this.basePath));
     }
 
     /**

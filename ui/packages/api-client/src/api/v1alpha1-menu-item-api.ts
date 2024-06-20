@@ -22,6 +22,8 @@ import { DUMMY_BASE_URL, assertParamExists, setApiKeyToObject, setBasicAuthToObj
 // @ts-ignore
 import { BASE_PATH, COLLECTION_FORMATS, RequestArgs, BaseAPI, RequiredError, operationServerMap } from '../base';
 // @ts-ignore
+import { JsonPatchInner } from '../models';
+// @ts-ignore
 import { MenuItem } from '../models';
 // @ts-ignore
 import { MenuItemList } from '../models';
@@ -217,6 +219,51 @@ export const V1alpha1MenuItemApiAxiosParamCreator = function (configuration?: Co
             };
         },
         /**
+         * Patch v1alpha1/MenuItem
+         * @param {string} name Name of menuitem
+         * @param {Array<JsonPatchInner>} [jsonPatchInner] 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        patchV1alpha1MenuItem: async (name: string, jsonPatchInner?: Array<JsonPatchInner>, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+            // verify required parameter 'name' is not null or undefined
+            assertParamExists('patchV1alpha1MenuItem', 'name', name)
+            const localVarPath = `/api/v1alpha1/menuitems/{name}`
+                .replace(`{${"name"}}`, encodeURIComponent(String(name)));
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'PATCH', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+            // authentication BasicAuth required
+            // http basic authentication required
+            setBasicAuthToObject(localVarRequestOptions, configuration)
+
+            // authentication BearerAuth required
+            // http bearer authentication required
+            await setBearerAuthToObject(localVarHeaderParameter, configuration)
+
+
+    
+            localVarHeaderParameter['Content-Type'] = 'application/json-patch+json';
+
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+            localVarRequestOptions.data = serializeDataIfNeeded(jsonPatchInner, localVarRequestOptions, configuration)
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+        /**
          * Update v1alpha1/MenuItem
          * @param {string} name Name of menuitem
          * @param {MenuItem} [menuItem] Updated menuitem
@@ -324,6 +371,19 @@ export const V1alpha1MenuItemApiFp = function(configuration?: Configuration) {
             return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
         },
         /**
+         * Patch v1alpha1/MenuItem
+         * @param {string} name Name of menuitem
+         * @param {Array<JsonPatchInner>} [jsonPatchInner] 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async patchV1alpha1MenuItem(name: string, jsonPatchInner?: Array<JsonPatchInner>, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<MenuItem>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.patchV1alpha1MenuItem(name, jsonPatchInner, options);
+            const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
+            const localVarOperationServerBasePath = operationServerMap['V1alpha1MenuItemApi.patchV1alpha1MenuItem']?.[localVarOperationServerIndex]?.url;
+            return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
+        },
+        /**
          * Update v1alpha1/MenuItem
          * @param {string} name Name of menuitem
          * @param {MenuItem} [menuItem] Updated menuitem
@@ -381,6 +441,15 @@ export const V1alpha1MenuItemApiFactory = function (configuration?: Configuratio
          */
         listV1alpha1MenuItem(requestParameters: V1alpha1MenuItemApiListV1alpha1MenuItemRequest = {}, options?: RawAxiosRequestConfig): AxiosPromise<MenuItemList> {
             return localVarFp.listV1alpha1MenuItem(requestParameters.page, requestParameters.size, requestParameters.labelSelector, requestParameters.fieldSelector, requestParameters.sort, options).then((request) => request(axios, basePath));
+        },
+        /**
+         * Patch v1alpha1/MenuItem
+         * @param {V1alpha1MenuItemApiPatchV1alpha1MenuItemRequest} requestParameters Request parameters.
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        patchV1alpha1MenuItem(requestParameters: V1alpha1MenuItemApiPatchV1alpha1MenuItemRequest, options?: RawAxiosRequestConfig): AxiosPromise<MenuItem> {
+            return localVarFp.patchV1alpha1MenuItem(requestParameters.name, requestParameters.jsonPatchInner, options).then((request) => request(axios, basePath));
         },
         /**
          * Update v1alpha1/MenuItem
@@ -479,6 +548,27 @@ export interface V1alpha1MenuItemApiListV1alpha1MenuItemRequest {
 }
 
 /**
+ * Request parameters for patchV1alpha1MenuItem operation in V1alpha1MenuItemApi.
+ * @export
+ * @interface V1alpha1MenuItemApiPatchV1alpha1MenuItemRequest
+ */
+export interface V1alpha1MenuItemApiPatchV1alpha1MenuItemRequest {
+    /**
+     * Name of menuitem
+     * @type {string}
+     * @memberof V1alpha1MenuItemApiPatchV1alpha1MenuItem
+     */
+    readonly name: string
+
+    /**
+     * 
+     * @type {Array<JsonPatchInner>}
+     * @memberof V1alpha1MenuItemApiPatchV1alpha1MenuItem
+     */
+    readonly jsonPatchInner?: Array<JsonPatchInner>
+}
+
+/**
  * Request parameters for updateV1alpha1MenuItem operation in V1alpha1MenuItemApi.
  * @export
  * @interface V1alpha1MenuItemApiUpdateV1alpha1MenuItemRequest
@@ -548,6 +638,17 @@ export class V1alpha1MenuItemApi extends BaseAPI {
      */
     public listV1alpha1MenuItem(requestParameters: V1alpha1MenuItemApiListV1alpha1MenuItemRequest = {}, options?: RawAxiosRequestConfig) {
         return V1alpha1MenuItemApiFp(this.configuration).listV1alpha1MenuItem(requestParameters.page, requestParameters.size, requestParameters.labelSelector, requestParameters.fieldSelector, requestParameters.sort, options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
+     * Patch v1alpha1/MenuItem
+     * @param {V1alpha1MenuItemApiPatchV1alpha1MenuItemRequest} requestParameters Request parameters.
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof V1alpha1MenuItemApi
+     */
+    public patchV1alpha1MenuItem(requestParameters: V1alpha1MenuItemApiPatchV1alpha1MenuItemRequest, options?: RawAxiosRequestConfig) {
+        return V1alpha1MenuItemApiFp(this.configuration).patchV1alpha1MenuItem(requestParameters.name, requestParameters.jsonPatchInner, options).then((request) => request(this.axios, this.basePath));
     }
 
     /**

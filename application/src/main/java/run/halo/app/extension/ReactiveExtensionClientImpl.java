@@ -155,6 +155,12 @@ public class ReactiveExtensionClientImpl implements ReactiveExtensionClient {
             .map(extensionStore -> converter.convertFrom(Unstructured.class, extensionStore));
     }
 
+    private Mono<JsonExtension> fetchJsonExtension(GroupVersionKind gvk, String name) {
+        var storeName = ExtensionStoreUtil.buildStoreName(schemeManager.get(gvk), name);
+        return client.fetchByName(storeName)
+            .map(extensionStore -> converter.convertFrom(JsonExtension.class, extensionStore));
+    }
+
     @Override
     public <E extends Extension> Mono<E> get(Class<E> type, String name) {
         return fetch(type, name)
@@ -168,6 +174,13 @@ public class ReactiveExtensionClientImpl implements ReactiveExtensionClient {
         return fetch(gvk, name)
             .switchIfEmpty(Mono.error(() -> new ExtensionNotFoundException(gvk, name)));
     }
+
+    @Override
+    public Mono<JsonExtension> getJsonExtension(GroupVersionKind gvk, String name) {
+        return fetchJsonExtension(gvk, name)
+            .switchIfEmpty(Mono.error(() -> new ExtensionNotFoundException(gvk, name)));
+    }
+
 
     @Override
     public <E extends Extension> Mono<E> create(E extension) {
@@ -238,8 +251,14 @@ public class ReactiveExtensionClientImpl implements ReactiveExtensionClient {
     }
 
     private Mono<? extends Extension> getLatest(Extension extension) {
-        if (extension instanceof Unstructured unstructured) {
-            return get(unstructured.groupVersionKind(), unstructured.getMetadata().getName());
+        if (extension instanceof Unstructured) {
+            return get(extension.groupVersionKind(), extension.getMetadata().getName());
+        }
+        if (extension instanceof JsonExtension) {
+            return getJsonExtension(
+                extension.groupVersionKind(),
+                extension.getMetadata().getName()
+            );
         }
         return get(extension.getClass(), extension.getMetadata().getName());
     }
@@ -268,7 +287,7 @@ public class ReactiveExtensionClientImpl implements ReactiveExtensionClient {
             var indexer = indexerFactory.getIndexer(gvk);
             return client.create(name, data)
                 .map(created -> converter.convertFrom(type, created))
-                .doOnNext(indexer::indexRecord)
+                .doOnNext(extension -> indexer.indexRecord(convertToRealExtension(extension)))
                 .as(transactionalOperator::transactional);
         });
     }
@@ -280,9 +299,21 @@ public class ReactiveExtensionClientImpl implements ReactiveExtensionClient {
             var indexer = indexerFactory.getIndexer(oldExtension.groupVersionKind());
             return client.update(name, version, data)
                 .map(updated -> converter.convertFrom(type, updated))
-                .doOnNext(indexer::updateRecord)
+                .doOnNext(extension -> indexer.updateRecord(convertToRealExtension(extension)))
                 .as(transactionalOperator::transactional);
         });
+    }
+
+    private Extension convertToRealExtension(Extension extension) {
+        var gvk = extension.groupVersionKind();
+        var realType = schemeManager.get(gvk).type();
+        Extension realExtension = extension;
+        if (extension instanceof Unstructured) {
+            realExtension = Unstructured.OBJECT_MAPPER.convertValue(extension, realType);
+        } else if (extension instanceof JsonExtension jsonExtension) {
+            realExtension = jsonExtension.getObjectMapper().convertValue(jsonExtension, realType);
+        }
+        return realExtension;
     }
 
     /**
