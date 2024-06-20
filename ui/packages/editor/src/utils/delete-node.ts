@@ -6,7 +6,7 @@ export const deleteNodeByPos = (
   state: EditorState,
   dispatch: Dispatch
 ) => {
-  let done = false;
+  const done = false;
 
   if ($pos.depth) {
     for (let d = $pos.depth; d > 0; d--) {
@@ -15,7 +15,7 @@ export const deleteNodeByPos = (
           state.tr.delete($pos.before(d), $pos.after(d)).scrollIntoView()
         );
       }
-      done = true;
+      return true;
     }
   } else {
     const node = $pos.parent;
@@ -25,7 +25,7 @@ export const deleteNodeByPos = (
           .setSelection(NodeSelection.create(state.doc, $pos.pos))
           .deleteSelection()
       );
-      done = true;
+      return true;
     }
   }
 
@@ -35,7 +35,7 @@ export const deleteNodeByPos = (
     if (pos) {
       if (dispatch) {
         dispatch(state.tr.delete(pos, pos + $pos.node().nodeSize));
-        done = true;
+        return true;
       }
     }
   }
@@ -45,7 +45,7 @@ export const deleteNodeByPos = (
 export const deleteNode = (nodeType: string, editor: Editor) => {
   const { state } = editor;
   const $pos = state.selection.$anchor;
-  let done = false;
+  const done = false;
 
   if ($pos.depth) {
     for (let d = $pos.depth; d > 0; d--) {
@@ -57,7 +57,7 @@ export const deleteNode = (nodeType: string, editor: Editor) => {
           editor.dispatchTransaction(
             state.tr.delete($pos.before(d), $pos.after(d)).scrollIntoView()
           );
-        done = true;
+        return true;
       }
     }
   } else {
@@ -65,7 +65,7 @@ export const deleteNode = (nodeType: string, editor: Editor) => {
     const node = state.selection.node;
     if (node && node.type.name === nodeType) {
       editor.chain().deleteSelection().run();
-      done = true;
+      return true;
     }
   }
 
@@ -80,7 +80,7 @@ export const deleteNode = (nodeType: string, editor: Editor) => {
         if (editor.dispatchTransaction)
           // @ts-ignore
           editor.dispatchTransaction(state.tr.delete(pos, pos + node.nodeSize));
-        done = true;
+        return true;
       }
     }
   }

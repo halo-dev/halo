@@ -1,12 +1,14 @@
 import TiptapParagraph from "@tiptap/extension-paragraph";
 import type { ParagraphOptions } from "@tiptap/extension-paragraph";
 import type { ExtensionOptions, ToolbarItem as TypeToolbarItem } from "@/types";
-import type { Editor } from "@/tiptap";
+import { isActive, type Editor } from "@/tiptap";
 import { markRaw } from "vue";
 import ToolbarItem from "@/components/toolbar/ToolbarItem.vue";
 import TablerLineHeight from "~icons/tabler/line-height";
 import { i18n } from "@/locales";
 import ToolbarSubItem from "@/components/toolbar/ToolbarSubItem.vue";
+import { deleteNodeByPos } from "@/utils";
+import { isEmpty } from "@/utils/isNodeEmpty";
 
 const Paragraph = TiptapParagraph.extend<ExtensionOptions & ParagraphOptions>({
   addAttributes() {
@@ -82,6 +84,45 @@ const Paragraph = TiptapParagraph.extend<ExtensionOptions & ParagraphOptions>({
             };
           }),
         };
+      },
+    };
+  },
+
+  addKeyboardShortcuts() {
+    return {
+      Backspace: ({ editor }) => {
+        const { state, view } = editor;
+        if (!isActive(state, Paragraph.name)) {
+          return false;
+        }
+
+        const { selection } = state;
+        const { $from } = selection;
+        if ($from.parentOffset == 0) {
+          const beforePos = $from.before($from.depth);
+          if (beforePos != 0) {
+            const $beforePos = $from.doc.resolve(beforePos);
+            const nodeBefore = $beforePos.nodeBefore;
+
+            if (!nodeBefore) {
+              return false;
+            }
+
+            if (!nodeBefore.type.isBlock || nodeBefore.type.isText) {
+              return false;
+            }
+
+            return deleteNodeByPos(
+              $from.doc.resolve(beforePos - 1),
+              state,
+              view.dispatch
+            );
+          } else if (isEmpty($from.parent)) {
+            return deleteNodeByPos($from, state, view.dispatch);
+          }
+        }
+
+        return false;
       },
     };
   },
