@@ -1,7 +1,14 @@
 import TiptapParagraph from "@tiptap/extension-paragraph";
 import type { ParagraphOptions } from "@tiptap/extension-paragraph";
 import type { ExtensionOptions, ToolbarItem as TypeToolbarItem } from "@/types";
-import { isActive, type Editor } from "@/tiptap";
+import {
+  EditorState,
+  ResolvedPos,
+  TextSelection,
+  isActive,
+  type Dispatch,
+  type Editor,
+} from "@/tiptap";
 import { markRaw } from "vue";
 import ToolbarItem from "@/components/toolbar/ToolbarItem.vue";
 import TablerLineHeight from "~icons/tabler/line-height";
@@ -92,40 +99,88 @@ const Paragraph = TiptapParagraph.extend<ExtensionOptions & ParagraphOptions>({
     return {
       Backspace: ({ editor }) => {
         const { state, view } = editor;
-        if (!isActive(state, Paragraph.name)) {
+        const { selection } = state;
+
+        if (
+          !isActive(state, Paragraph.name) ||
+          !(selection instanceof TextSelection) ||
+          !selection.empty
+        ) {
           return false;
         }
 
-        const { selection } = state;
         const { $from } = selection;
-        if ($from.parentOffset == 0) {
-          const beforePos = $from.before($from.depth);
-          if (beforePos != 0) {
-            const $beforePos = $from.doc.resolve(beforePos);
-            const nodeBefore = $beforePos.nodeBefore;
 
-            if (!nodeBefore) {
-              return false;
-            }
-
-            if (!nodeBefore.type.isBlock || nodeBefore.type.isText) {
-              return false;
-            }
-
-            return deleteNodeByPos(
-              $from.doc.resolve(beforePos - 1),
-              state,
-              view.dispatch
-            );
-          } else if (isEmpty($from.parent)) {
-            return deleteNodeByPos($from, state, view.dispatch);
-          }
+        if ($from.parentOffset !== 0) {
+          return false;
         }
 
-        return false;
+        const beforePos = $from.before($from.depth);
+
+        if (isEmpty($from.parent)) {
+          return deleteCurrentNodeAndSetSelection(
+            $from,
+            beforePos,
+            state,
+            view.dispatch
+          );
+        }
+
+        if (beforePos === 0) {
+          return false;
+        }
+
+        return handleDeletePreviousNode($from, beforePos, state, view.dispatch);
       },
     };
   },
 });
+
+export function deleteCurrentNodeAndSetSelection(
+  $from: ResolvedPos,
+  beforePos: number,
+  state: EditorState,
+  dispatch: Dispatch
+) {
+  const tr = deleteNodeByPos($from, state);
+  if (tr && dispatch) {
+    if (beforePos !== 0) {
+      tr.setSelection(TextSelection.create(tr.doc, beforePos - 1));
+    }
+    dispatch(tr);
+    return true;
+  }
+  return false;
+}
+
+export function handleDeletePreviousNode(
+  $from: ResolvedPos,
+  beforePos: number,
+  state: EditorState,
+  dispatch: Dispatch
+) {
+  if (!dispatch) {
+    return false;
+  }
+
+  const $beforePos = $from.doc.resolve(beforePos);
+  const nodeBefore = $beforePos.nodeBefore;
+
+  if (
+    !nodeBefore ||
+    !nodeBefore.type.isBlock ||
+    nodeBefore.type.isText ||
+    nodeBefore.type.name === Paragraph.name
+  ) {
+    return false;
+  }
+
+  const tr = deleteNodeByPos($from.doc.resolve(beforePos - 1), state);
+  if (tr) {
+    dispatch(tr);
+    return true;
+  }
+  return false;
+}
 
 export default Paragraph;

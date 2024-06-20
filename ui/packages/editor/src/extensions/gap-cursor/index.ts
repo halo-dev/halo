@@ -117,8 +117,11 @@ const GapCursor = Extension.create({
 
               if (isStart) {
                 return handleBackspaceAtStart(pos, state, dispatch);
-              } else if (nodeOffset.node) {
-                return deleteNodeByPos(state.doc.resolve(pos), state, dispatch);
+              } else if (
+                nodeOffset.node &&
+                deleteNodeByPos(state.doc.resolve(pos), state, dispatch)
+              ) {
+                return true;
               }
 
               return false;
@@ -204,7 +207,10 @@ export function handleBackspaceAtStart(
     return true;
   }
 
-  return deleteNodeByPos($beforePos, state, dispatch);
+  if (deleteNodeByPos($beforePos, state, dispatch)) {
+    return true;
+  }
+  return false;
 }
 
 export function handleInlineContent(

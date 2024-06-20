@@ -4,42 +4,41 @@ import { type ResolvedPos, type EditorState, NodeSelection } from "@/tiptap/pm";
 export const deleteNodeByPos = (
   $pos: ResolvedPos,
   state: EditorState,
-  dispatch: Dispatch
+  dispatch?: Dispatch
 ) => {
-  const done = false;
-
   if ($pos.depth) {
     for (let d = $pos.depth; d > 0; d--) {
+      const tr = state.tr
+        .delete($pos.before(d), $pos.after(d))
+        .scrollIntoView();
       if (dispatch) {
-        dispatch(
-          state.tr.delete($pos.before(d), $pos.after(d)).scrollIntoView()
-        );
+        dispatch(tr);
       }
-      return true;
+      return tr;
     }
   } else {
     const node = $pos.parent;
-    if (!node.isTextblock && node.nodeSize && dispatch) {
-      dispatch(
-        state.tr
-          .setSelection(NodeSelection.create(state.doc, $pos.pos))
-          .deleteSelection()
-      );
-      return true;
-    }
-  }
-
-  if (!done) {
-    const pos = $pos.pos;
-
-    if (pos) {
+    if (!node.isTextblock && node.nodeSize) {
+      const tr = state.tr
+        .setSelection(NodeSelection.create(state.doc, $pos.pos))
+        .deleteSelection();
       if (dispatch) {
-        dispatch(state.tr.delete(pos, pos + $pos.node().nodeSize));
-        return true;
+        dispatch(tr);
       }
+      return tr;
     }
   }
-  return done;
+
+  const pos = $pos.pos;
+
+  if (pos) {
+    const tr = state.tr.delete(pos, pos + $pos.node().nodeSize);
+    if (dispatch) {
+      dispatch(tr);
+      return tr;
+    }
+  }
+  return null;
 };
 
 export const deleteNode = (nodeType: string, editor: Editor) => {
