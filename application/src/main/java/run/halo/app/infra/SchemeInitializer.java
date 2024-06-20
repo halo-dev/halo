@@ -88,6 +88,12 @@ public class SchemeInitializer implements ApplicationListener<ApplicationContext
                 .setIndexFunc(
                     simpleAttribute(User.class, user -> user.getSpec().getDisplayName())));
             indexSpecs.add(new IndexSpec()
+                .setName("spec.email")
+                .setIndexFunc(simpleAttribute(User.class, user -> {
+                    var email = user.getSpec().getEmail();
+                    return StringUtils.isBlank(email) ? null : email;
+                })));
+            indexSpecs.add(new IndexSpec()
                 .setName(User.USER_RELATED_ROLES_INDEX)
                 .setIndexFunc(multiValueAttribute(User.class, user -> {
                     var roleNamesAnno = MetadataUtil.nullSafeAnnotations(user)

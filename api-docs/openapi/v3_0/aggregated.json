@@ -13515,6 +13515,10 @@
             "minLength": 1,
             "type": "string"
           },
+          "postTemplate": {
+            "maxLength": 255,
+            "type": "string"
+          },
           "preventParentPostCascadeQuery": {
             "type": "boolean"
           },
@@ -13528,6 +13532,7 @@
             "type": "string"
           },
           "template": {
+            "maxLength": 255,
             "type": "string"
           }
         }
@@ -17465,12 +17470,12 @@
           },
           "visible": {
             "type": "string",
-            "default": "PUBLIC",
             "enum": [
               "PUBLIC",
               "INTERNAL",
               "PRIVATE"
-            ]
+            ],
+            "default": "PUBLIC"
           }
         }
       },
@@ -19120,12 +19125,12 @@
           },
           "visible": {
             "type": "string",
-            "default": "PUBLIC",
             "enum": [
               "PUBLIC",
               "INTERNAL",
               "PRIVATE"
-            ]
+            ],
+            "default": "PUBLIC"
           }
         }
       },

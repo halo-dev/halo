@@ -346,18 +346,22 @@ core:
           refresh_message: 根據名稱重新生成別名
         template:
           label: 自定義模板
+          help: 自定義分類歸檔頁面的渲染模板，需要主題提供支持
         cover:
           label: 封面圖
           help: 需要主題適配以支持
         description:
           label: 描述
-          help: 阻止父級分類在級聯文章查詢中包含此分類及其子分類
+          help: 需要主題適配以支持
         independent:
           label: 防止父級聯查詢
-          help: 如果選取，此分類下的文章將不會彙總到父分類中顯示
+          help: 阻止父級分類在級聯文章查詢中包含此分類及其子分類
+        post_template:
+          label: 自定義文章模板
+          help: 自定義當前分類下文章的渲染模板，需要主題提供支持
     list:
       fields:
-        independent: 此分類下的文章將不會彙總到父分類中顯示
+        independent: 阻止父級分類在級聯文章查詢中包含此分類及其子分類
   page:
     title: 頁面
     actions:
@@ -677,6 +681,15 @@ core:
         button: 清除模板快取
         title: 清除模板快取
         description: 此功能適用於在運行時修改模板檔案後，刷新快取以查看最新網頁結果。
+      export_configuration:
+        button: 匯出主題配置
+      import_configuration:
+        button: 匯入主題配置
+        version_mismatch:
+          title: 版本不匹配
+          description: 匯入的配置檔版本與目前主題版本不匹配，這可能會導致相容性問題。是否繼續匯入？
+        invalid_format: 無效的主題配置文件
+        mismatched_theme: 配置文件與所選主題不匹配
     list_modal:
       tabs:
         installed: 已安裝
