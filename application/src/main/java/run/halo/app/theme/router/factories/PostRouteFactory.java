@@ -1,11 +1,14 @@
 package run.halo.app.theme.router.factories;
 
+import static org.apache.commons.lang3.ObjectUtils.defaultIfNull;
+import static org.apache.commons.lang3.StringUtils.isNotBlank;
 import static org.springframework.web.reactive.function.server.RequestPredicates.GET;
 import static org.springframework.web.reactive.function.server.RequestPredicates.accept;
 
 import com.google.common.cache.Cache;
 import com.google.common.cache.CacheBuilder;
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.ExecutionException;
@@ -120,11 +123,22 @@ public class PostRouteFactory implements RouteFactory {
             })
             .flatMap(postVo -> {
                 Map<String, Object> model = ModelMapUtils.postModel(postVo);
-                String template = postVo.getSpec().getTemplate();
-                return viewNameResolver.resolveViewNameOrDefault(request, template,
-                        DefaultTemplateEnum.POST.getValue())
+                return determineTemplate(request, postVo)
                     .flatMap(templateName -> ServerResponse.ok().render(templateName, model));
             });
+    }
+
+    Mono<String> determineTemplate(ServerRequest request, PostVo postVo) {
+        return Flux.fromIterable(defaultIfNull(postVo.getCategories(), List.of()))
+            .filter(category -> isNotBlank(category.getSpec().getPostTemplate()))
+            .concatMap(category -> viewNameResolver.resolveViewNameOrDefault(request,
+                category.getSpec().getPostTemplate(), null)
+            )
+            .next()
+            .switchIfEmpty(Mono.defer(() -> viewNameResolver.resolveViewNameOrDefault(request,
+                postVo.getSpec().getTemplate(),
+                DefaultTemplateEnum.POST.getValue())
+            ));
     }
 
     Mono<PostVo> bestMatchPost(PostPatternVariable variable) {
@@ -143,10 +157,10 @@ public class PostRouteFactory implements RouteFactory {
     }
 
     Flux<Post> postsByPredicates(PostPatternVariable patternVariable) {
-        if (StringUtils.isNotBlank(patternVariable.getName())) {
+        if (isNotBlank(patternVariable.getName())) {
             return fetchPostsByName(patternVariable.getName());
         }
-        if (StringUtils.isNotBlank(patternVariable.getSlug())) {
+        if (isNotBlank(patternVariable.getSlug())) {
             return fetchPostsBySlug(patternVariable.getSlug());
         }
         return Flux.empty();
@@ -163,7 +177,7 @@ public class PostRouteFactory implements RouteFactory {
     private Flux<Post> fetchPostsBySlug(String slug) {
         return queryPostPredicateResolver.getListOptions()
             .flatMapMany(listOptions -> {
-                if (StringUtils.isNotBlank(slug)) {
+                if (isNotBlank(slug)) {
                     var other = QueryFactory.equal("spec.slug", slug);
                     listOptions.setFieldSelector(listOptions.getFieldSelector().andQuery(other));
                 }
