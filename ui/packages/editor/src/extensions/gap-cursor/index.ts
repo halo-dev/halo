@@ -2,6 +2,7 @@ import {
   callOrReturn,
   Extension,
   getExtensionField,
+  isActive,
   type ParentConfig,
 } from "@/tiptap/core";
 import {
@@ -15,8 +16,9 @@ import {
   type Command,
 } from "@/tiptap/pm";
 import GapCursorSelection from "./gap-cursor-selection";
-import type { Dispatch, EditorState, ResolvedPos } from "@/tiptap";
+import type { Dispatch, EditorState, EditorView, ResolvedPos } from "@/tiptap";
 import { deleteNodeByPos } from "@/utils";
+import { isEmpty } from "@/utils/isNodeEmpty";
 
 declare module "@tiptap/core" {
   interface NodeConfig<Options, Storage> {
@@ -103,14 +105,27 @@ const GapCursor = Extension.create({
               return false;
             },
             Backspace: (state, dispatch) => {
+              const { selection } = state;
               if (
-                !(state.selection instanceof GapCursorSelection) ||
-                !dispatch
+                isActive(state, "paragraph") &&
+                isEmpty(state.selection.$from.parent) &&
+                selection instanceof TextSelection &&
+                selection.empty
               ) {
+                const { $from } = selection;
+                const tr = deleteNodeByPos($from, state);
+                if (tr && dispatch) {
+                  dispatch(arrowGapCursor(-1, "left", state) || tr);
+                  return true;
+                }
                 return false;
               }
 
-              const { isStart, $from } = state.selection;
+              if (!(selection instanceof GapCursorSelection) || !dispatch) {
+                return false;
+              }
+
+              const { isStart, $from } = selection;
               const nodeOffset = state.doc.childBefore($from.pos);
               const index = nodeOffset.index;
               const pos = state.doc.resolve(0).posAtIndex(index);
@@ -244,41 +259,55 @@ export function arrow(axis: "vert" | "horiz", dir: number): Command {
   const dirStr =
     axis == "vert" ? (dir > 0 ? "down" : "up") : dir > 0 ? "right" : "left";
   return (state, dispatch, view) => {
-    const sel = state.selection;
-    let $start = dir > 0 ? sel.$to : sel.$from;
-    let mustMove = sel.empty;
-    if (sel instanceof TextSelection) {
-      // Do nothing if the next node is not at the end of the document or is at the root node.
-      if (!view?.endOfTextblock(dirStr) || $start.depth == 0) {
-        return false;
-      }
-      mustMove = false;
-      $start = state.doc.resolve(dir > 0 ? $start.after() : $start.before());
-      // If inside a node, check if it has reached the boundary of the node
-      if ($start.depth > 0) {
-        const pos = $start.pos;
-        const start = $start.start(1) + 1;
-        const end = $start.end(1) - 1;
-        if (pos != start && pos != end) {
-          return false;
-        }
-      }
+    const tr = arrowGapCursor(dir, dirStr, state, view);
+    if (tr && dispatch) {
+      dispatch(tr);
+      return true;
     }
-
-    if (sel instanceof GapCursorSelection) {
-      return false;
-    }
-
-    const $found = GapCursorSelection.findGapCursorFrom($start, dir, mustMove);
-    if (!$found) {
-      return false;
-    }
-    if (dispatch) {
-      dispatch(state.tr.setSelection(new GapCursorSelection($found)));
-    }
-    return true;
+    return false;
   };
 }
+
+export const arrowGapCursor = (
+  dir: number,
+  dirStr: any,
+  state: EditorState,
+  view?: EditorView
+) => {
+  const sel = state.selection;
+  let $start = dir > 0 ? sel.$to : sel.$from;
+  let mustMove = sel.empty;
+  if (sel instanceof TextSelection) {
+    // Do nothing if the next node is not at the end of the document or is at the root node.
+    if ($start.depth == 0) {
+      return;
+    }
+    if (view && !view.endOfTextblock(dirStr)) {
+      return;
+    }
+    mustMove = false;
+    $start = state.doc.resolve(dir > 0 ? $start.after() : $start.before());
+    // If inside a node, check if it has reached the boundary of the node
+    if ($start.depth > 0) {
+      const pos = $start.pos;
+      const start = $start.start(1) + 1;
+      const end = $start.end(1) - 1;
+      if (pos != start && pos != end) {
+        return;
+      }
+    }
+  }
+
+  if (sel instanceof GapCursorSelection) {
+    return;
+  }
+
+  const $found = GapCursorSelection.findGapCursorFrom($start, dir, mustMove);
+  if (!$found) {
+    return;
+  }
+  return state.tr.setSelection(new GapCursorSelection($found));
+};
 
 /**
  * Creates a new paragraph near the current GapCursor
