@@ -366,12 +366,20 @@ core:
           refresh_message: Regenerate slug based on display name.
         template:
           label: Custom template
+          help: >-
+            Customize the rendering template of the category archive page, which
+            requires support from the theme
         cover:
           label: Cover
           help: Theme adaptation is required to support
         description:
           label: Description
           help: Theme adaptation is required to support
+        post_template:
+          label: Custom post template
+          help: >-
+            Customize the rendering template of posts in the current category,
+            which requires support from the theme
   page:
     title: Pages
     actions:
@@ -728,9 +736,9 @@ core:
         version_mismatch:
           title: Version mismatch
           description: >-
-            The imported configuration file version does not match the 
-            current theme version, which may lead to compatibility issues.
-            Do you want to continue importing?
+            The imported configuration file version does not match the  current
+            theme version, which may lead to compatibility issues. Do you want
+            to continue importing?
         invalid_format: Invalid theme configuration file
         mismatched_theme: Configuration file does not match the selected theme
     list_modal:
