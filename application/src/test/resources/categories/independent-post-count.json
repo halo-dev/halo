@@ -98,7 +98,7 @@
     {
         "spec": {
             "displayName": "SubNode2",
-            "independent": true,
+            "preventParentPostCascadeQuery": true,
             "children": ["IndependentChild1", "IndependentChild2"]
         },
         "status": {
@@ -147,7 +147,7 @@
     {
         "spec": {
             "displayName": "IndependentNode",
-            "independent": true,
+            "preventParentPostCascadeQuery": true,
             "children": ["IndependentChild3", "IndependentChild4"]
         },
         "status": {
@@ -308,7 +308,7 @@
     {
         "spec": {
             "displayName": "DeepNode3",
-            "independent": true,
+            "preventParentPostCascadeQuery": true,
             "children": ["DeepNode4", "DeepNode5"]
         },
         "status": {
@@ -373,7 +373,7 @@
     {
         "spec": {
             "displayName": "IndependentSubNode",
-            "independent": true,
+            "preventParentPostCascadeQuery": true,
             "children": ["SubNode3", "SubNode4"]
         },
         "status": {

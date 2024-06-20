@@ -78,7 +78,7 @@ class CategoryFinderImplTest {
                              "C1",
                              "C2"
                          ],
-                         "independent": false
+                         "preventParentPostCascadeQuery": false
                      }
                 }
                 """,
