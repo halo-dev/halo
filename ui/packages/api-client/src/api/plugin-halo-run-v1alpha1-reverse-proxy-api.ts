@@ -22,6 +22,8 @@ import { DUMMY_BASE_URL, assertParamExists, setApiKeyToObject, setBasicAuthToObj
 // @ts-ignore
 import { BASE_PATH, COLLECTION_FORMATS, RequestArgs, BaseAPI, RequiredError, operationServerMap } from '../base';
 // @ts-ignore
+import { JsonPatchInner } from '../models';
+// @ts-ignore
 import { ReverseProxy } from '../models';
 // @ts-ignore
 import { ReverseProxyList } from '../models';
@@ -217,6 +219,51 @@ export const PluginHaloRunV1alpha1ReverseProxyApiAxiosParamCreator = function (c
             };
         },
         /**
+         * Patch plugin.halo.run/v1alpha1/ReverseProxy
+         * @param {string} name Name of reverseproxy
+         * @param {Array<JsonPatchInner>} [jsonPatchInner] 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        patchPluginHaloRunV1alpha1ReverseProxy: async (name: string, jsonPatchInner?: Array<JsonPatchInner>, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+            // verify required parameter 'name' is not null or undefined
+            assertParamExists('patchPluginHaloRunV1alpha1ReverseProxy', 'name', name)
+            const localVarPath = `/apis/plugin.halo.run/v1alpha1/reverseproxies/{name}`
+                .replace(`{${"name"}}`, encodeURIComponent(String(name)));
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'PATCH', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+            // authentication BasicAuth required
+            // http basic authentication required
+            setBasicAuthToObject(localVarRequestOptions, configuration)
+
+            // authentication BearerAuth required
+            // http bearer authentication required
+            await setBearerAuthToObject(localVarHeaderParameter, configuration)
+
+
+    
+            localVarHeaderParameter['Content-Type'] = 'application/json-patch+json';
+
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+            localVarRequestOptions.data = serializeDataIfNeeded(jsonPatchInner, localVarRequestOptions, configuration)
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+        /**
          * Update plugin.halo.run/v1alpha1/ReverseProxy
          * @param {string} name Name of reverseproxy
          * @param {ReverseProxy} [reverseProxy] Updated reverseproxy
@@ -324,6 +371,19 @@ export const PluginHaloRunV1alpha1ReverseProxyApiFp = function(configuration?: C
             return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
         },
         /**
+         * Patch plugin.halo.run/v1alpha1/ReverseProxy
+         * @param {string} name Name of reverseproxy
+         * @param {Array<JsonPatchInner>} [jsonPatchInner] 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async patchPluginHaloRunV1alpha1ReverseProxy(name: string, jsonPatchInner?: Array<JsonPatchInner>, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<ReverseProxy>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.patchPluginHaloRunV1alpha1ReverseProxy(name, jsonPatchInner, options);
+            const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
+            const localVarOperationServerBasePath = operationServerMap['PluginHaloRunV1alpha1ReverseProxyApi.patchPluginHaloRunV1alpha1ReverseProxy']?.[localVarOperationServerIndex]?.url;
+            return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
+        },
+        /**
          * Update plugin.halo.run/v1alpha1/ReverseProxy
          * @param {string} name Name of reverseproxy
          * @param {ReverseProxy} [reverseProxy] Updated reverseproxy
@@ -381,6 +441,15 @@ export const PluginHaloRunV1alpha1ReverseProxyApiFactory = function (configurati
          */
         listPluginHaloRunV1alpha1ReverseProxy(requestParameters: PluginHaloRunV1alpha1ReverseProxyApiListPluginHaloRunV1alpha1ReverseProxyRequest = {}, options?: RawAxiosRequestConfig): AxiosPromise<ReverseProxyList> {
             return localVarFp.listPluginHaloRunV1alpha1ReverseProxy(requestParameters.page, requestParameters.size, requestParameters.labelSelector, requestParameters.fieldSelector, requestParameters.sort, options).then((request) => request(axios, basePath));
+        },
+        /**
+         * Patch plugin.halo.run/v1alpha1/ReverseProxy
+         * @param {PluginHaloRunV1alpha1ReverseProxyApiPatchPluginHaloRunV1alpha1ReverseProxyRequest} requestParameters Request parameters.
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        patchPluginHaloRunV1alpha1ReverseProxy(requestParameters: PluginHaloRunV1alpha1ReverseProxyApiPatchPluginHaloRunV1alpha1ReverseProxyRequest, options?: RawAxiosRequestConfig): AxiosPromise<ReverseProxy> {
+            return localVarFp.patchPluginHaloRunV1alpha1ReverseProxy(requestParameters.name, requestParameters.jsonPatchInner, options).then((request) => request(axios, basePath));
         },
         /**
          * Update plugin.halo.run/v1alpha1/ReverseProxy
@@ -479,6 +548,27 @@ export interface PluginHaloRunV1alpha1ReverseProxyApiListPluginHaloRunV1alpha1Re
 }
 
 /**
+ * Request parameters for patchPluginHaloRunV1alpha1ReverseProxy operation in PluginHaloRunV1alpha1ReverseProxyApi.
+ * @export
+ * @interface PluginHaloRunV1alpha1ReverseProxyApiPatchPluginHaloRunV1alpha1ReverseProxyRequest
+ */
+export interface PluginHaloRunV1alpha1ReverseProxyApiPatchPluginHaloRunV1alpha1ReverseProxyRequest {
+    /**
+     * Name of reverseproxy
+     * @type {string}
+     * @memberof PluginHaloRunV1alpha1ReverseProxyApiPatchPluginHaloRunV1alpha1ReverseProxy
+     */
+    readonly name: string
+
+    /**
+     * 
+     * @type {Array<JsonPatchInner>}
+     * @memberof PluginHaloRunV1alpha1ReverseProxyApiPatchPluginHaloRunV1alpha1ReverseProxy
+     */
+    readonly jsonPatchInner?: Array<JsonPatchInner>
+}
+
+/**
  * Request parameters for updatePluginHaloRunV1alpha1ReverseProxy operation in PluginHaloRunV1alpha1ReverseProxyApi.
  * @export
  * @interface PluginHaloRunV1alpha1ReverseProxyApiUpdatePluginHaloRunV1alpha1ReverseProxyRequest
@@ -548,6 +638,17 @@ export class PluginHaloRunV1alpha1ReverseProxyApi extends BaseAPI {
      */
     public listPluginHaloRunV1alpha1ReverseProxy(requestParameters: PluginHaloRunV1alpha1ReverseProxyApiListPluginHaloRunV1alpha1ReverseProxyRequest = {}, options?: RawAxiosRequestConfig) {
         return PluginHaloRunV1alpha1ReverseProxyApiFp(this.configuration).listPluginHaloRunV1alpha1ReverseProxy(requestParameters.page, requestParameters.size, requestParameters.labelSelector, requestParameters.fieldSelector, requestParameters.sort, options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
+     * Patch plugin.halo.run/v1alpha1/ReverseProxy
+     * @param {PluginHaloRunV1alpha1ReverseProxyApiPatchPluginHaloRunV1alpha1ReverseProxyRequest} requestParameters Request parameters.
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof PluginHaloRunV1alpha1ReverseProxyApi
+     */
+    public patchPluginHaloRunV1alpha1ReverseProxy(requestParameters: PluginHaloRunV1alpha1ReverseProxyApiPatchPluginHaloRunV1alpha1ReverseProxyRequest, options?: RawAxiosRequestConfig) {
+        return PluginHaloRunV1alpha1ReverseProxyApiFp(this.configuration).patchPluginHaloRunV1alpha1ReverseProxy(requestParameters.name, requestParameters.jsonPatchInner, options).then((request) => request(this.axios, this.basePath));
     }
 
     /**

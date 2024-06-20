@@ -22,6 +22,8 @@ import { DUMMY_BASE_URL, assertParamExists, setApiKeyToObject, setBasicAuthToObj
 // @ts-ignore
 import { BASE_PATH, COLLECTION_FORMATS, RequestArgs, BaseAPI, RequiredError, operationServerMap } from '../base';
 // @ts-ignore
+import { JsonPatchInner } from '../models';
+// @ts-ignore
 import { User } from '../models';
 // @ts-ignore
 import { UserList } from '../models';
@@ -217,6 +219,51 @@ export const V1alpha1UserApiAxiosParamCreator = function (configuration?: Config
             };
         },
         /**
+         * Patch v1alpha1/User
+         * @param {string} name Name of user
+         * @param {Array<JsonPatchInner>} [jsonPatchInner] 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        patchV1alpha1User: async (name: string, jsonPatchInner?: Array<JsonPatchInner>, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+            // verify required parameter 'name' is not null or undefined
+            assertParamExists('patchV1alpha1User', 'name', name)
+            const localVarPath = `/api/v1alpha1/users/{name}`
+                .replace(`{${"name"}}`, encodeURIComponent(String(name)));
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'PATCH', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+            // authentication BasicAuth required
+            // http basic authentication required
+            setBasicAuthToObject(localVarRequestOptions, configuration)
+
+            // authentication BearerAuth required
+            // http bearer authentication required
+            await setBearerAuthToObject(localVarHeaderParameter, configuration)
+
+
+    
+            localVarHeaderParameter['Content-Type'] = 'application/json-patch+json';
+
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+            localVarRequestOptions.data = serializeDataIfNeeded(jsonPatchInner, localVarRequestOptions, configuration)
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+        /**
          * Update v1alpha1/User
          * @param {string} name Name of user
          * @param {User} [user] Updated user
@@ -324,6 +371,19 @@ export const V1alpha1UserApiFp = function(configuration?: Configuration) {
             return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
         },
         /**
+         * Patch v1alpha1/User
+         * @param {string} name Name of user
+         * @param {Array<JsonPatchInner>} [jsonPatchInner] 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async patchV1alpha1User(name: string, jsonPatchInner?: Array<JsonPatchInner>, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<User>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.patchV1alpha1User(name, jsonPatchInner, options);
+            const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
+            const localVarOperationServerBasePath = operationServerMap['V1alpha1UserApi.patchV1alpha1User']?.[localVarOperationServerIndex]?.url;
+            return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
+        },
+        /**
          * Update v1alpha1/User
          * @param {string} name Name of user
          * @param {User} [user] Updated user
@@ -381,6 +441,15 @@ export const V1alpha1UserApiFactory = function (configuration?: Configuration, b
          */
         listV1alpha1User(requestParameters: V1alpha1UserApiListV1alpha1UserRequest = {}, options?: RawAxiosRequestConfig): AxiosPromise<UserList> {
             return localVarFp.listV1alpha1User(requestParameters.page, requestParameters.size, requestParameters.labelSelector, requestParameters.fieldSelector, requestParameters.sort, options).then((request) => request(axios, basePath));
+        },
+        /**
+         * Patch v1alpha1/User
+         * @param {V1alpha1UserApiPatchV1alpha1UserRequest} requestParameters Request parameters.
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        patchV1alpha1User(requestParameters: V1alpha1UserApiPatchV1alpha1UserRequest, options?: RawAxiosRequestConfig): AxiosPromise<User> {
+            return localVarFp.patchV1alpha1User(requestParameters.name, requestParameters.jsonPatchInner, options).then((request) => request(axios, basePath));
         },
         /**
          * Update v1alpha1/User
@@ -479,6 +548,27 @@ export interface V1alpha1UserApiListV1alpha1UserRequest {
 }
 
 /**
+ * Request parameters for patchV1alpha1User operation in V1alpha1UserApi.
+ * @export
+ * @interface V1alpha1UserApiPatchV1alpha1UserRequest
+ */
+export interface V1alpha1UserApiPatchV1alpha1UserRequest {
+    /**
+     * Name of user
+     * @type {string}
+     * @memberof V1alpha1UserApiPatchV1alpha1User
+     */
+    readonly name: string
+
+    /**
+     * 
+     * @type {Array<JsonPatchInner>}
+     * @memberof V1alpha1UserApiPatchV1alpha1User
+     */
+    readonly jsonPatchInner?: Array<JsonPatchInner>
+}
+
+/**
  * Request parameters for updateV1alpha1User operation in V1alpha1UserApi.
  * @export
  * @interface V1alpha1UserApiUpdateV1alpha1UserRequest
@@ -548,6 +638,17 @@ export class V1alpha1UserApi extends BaseAPI {
      */
     public listV1alpha1User(requestParameters: V1alpha1UserApiListV1alpha1UserRequest = {}, options?: RawAxiosRequestConfig) {
         return V1alpha1UserApiFp(this.configuration).listV1alpha1User(requestParameters.page, requestParameters.size, requestParameters.labelSelector, requestParameters.fieldSelector, requestParameters.sort, options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
+     * Patch v1alpha1/User
+     * @param {V1alpha1UserApiPatchV1alpha1UserRequest} requestParameters Request parameters.
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof V1alpha1UserApi
+     */
+    public patchV1alpha1User(requestParameters: V1alpha1UserApiPatchV1alpha1UserRequest, options?: RawAxiosRequestConfig) {
+        return V1alpha1UserApiFp(this.configuration).patchV1alpha1User(requestParameters.name, requestParameters.jsonPatchInner, options).then((request) => request(this.axios, this.basePath));
     }
 
     /**

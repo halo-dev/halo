@@ -70,10 +70,10 @@ class UserReconcilerTest {
         when(client.fetch(eq(User.class), eq("fake-user")))
             .thenReturn(Optional.of(user("fake-user")));
         userReconciler.reconcile(new Reconciler.Request("fake-user"));
-        verify(client, times(3)).update(any(User.class));
+        verify(client, times(4)).update(any(User.class));
 
         ArgumentCaptor<User> captor = ArgumentCaptor.forClass(User.class);
-        verify(client, times(3)).update(captor.capture());
+        verify(client, times(4)).update(captor.capture());
         assertThat(captor.getValue().getStatus().getPermalink())
             .isEqualTo("http://localhost:8090/authors/fake-user");
     }
@@ -83,7 +83,7 @@ class UserReconcilerTest {
         when(client.fetch(eq(User.class), eq(AnonymousUserConst.PRINCIPAL)))
             .thenReturn(Optional.of(user(AnonymousUserConst.PRINCIPAL)));
         userReconciler.reconcile(new Reconciler.Request(AnonymousUserConst.PRINCIPAL));
-        verify(client, times(2)).update(any(User.class));
+        verify(client, times(3)).update(any(User.class));
     }
 
     @Test
@@ -108,7 +108,7 @@ class UserReconcilerTest {
 
         userReconciler.reconcile(new Reconciler.Request("fake-user"));
         ArgumentCaptor<User> captor = ArgumentCaptor.forClass(User.class);
-        verify(client, times(3)).update(captor.capture());
+        verify(client, times(4)).update(captor.capture());
         User user = captor.getAllValues().get(1);
         assertThat(user.getMetadata().getAnnotations().get(User.ROLE_NAMES_ANNO))
             .isEqualTo("[\"fake-role\"]");

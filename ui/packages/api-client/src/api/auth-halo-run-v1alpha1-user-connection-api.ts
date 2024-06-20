@@ -22,6 +22,8 @@ import { DUMMY_BASE_URL, assertParamExists, setApiKeyToObject, setBasicAuthToObj
 // @ts-ignore
 import { BASE_PATH, COLLECTION_FORMATS, RequestArgs, BaseAPI, RequiredError, operationServerMap } from '../base';
 // @ts-ignore
+import { JsonPatchInner } from '../models';
+// @ts-ignore
 import { UserConnection } from '../models';
 // @ts-ignore
 import { UserConnectionList } from '../models';
@@ -217,6 +219,51 @@ export const AuthHaloRunV1alpha1UserConnectionApiAxiosParamCreator = function (c
             };
         },
         /**
+         * Patch auth.halo.run/v1alpha1/UserConnection
+         * @param {string} name Name of userconnection
+         * @param {Array<JsonPatchInner>} [jsonPatchInner] 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        patchAuthHaloRunV1alpha1UserConnection: async (name: string, jsonPatchInner?: Array<JsonPatchInner>, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+            // verify required parameter 'name' is not null or undefined
+            assertParamExists('patchAuthHaloRunV1alpha1UserConnection', 'name', name)
+            const localVarPath = `/apis/auth.halo.run/v1alpha1/userconnections/{name}`
+                .replace(`{${"name"}}`, encodeURIComponent(String(name)));
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'PATCH', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+            // authentication BasicAuth required
+            // http basic authentication required
+            setBasicAuthToObject(localVarRequestOptions, configuration)
+
+            // authentication BearerAuth required
+            // http bearer authentication required
+            await setBearerAuthToObject(localVarHeaderParameter, configuration)
+
+
+    
+            localVarHeaderParameter['Content-Type'] = 'application/json-patch+json';
+
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+            localVarRequestOptions.data = serializeDataIfNeeded(jsonPatchInner, localVarRequestOptions, configuration)
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+        /**
          * Update auth.halo.run/v1alpha1/UserConnection
          * @param {string} name Name of userconnection
          * @param {UserConnection} [userConnection] Updated userconnection
@@ -324,6 +371,19 @@ export const AuthHaloRunV1alpha1UserConnectionApiFp = function(configuration?: C
             return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
         },
         /**
+         * Patch auth.halo.run/v1alpha1/UserConnection
+         * @param {string} name Name of userconnection
+         * @param {Array<JsonPatchInner>} [jsonPatchInner] 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async patchAuthHaloRunV1alpha1UserConnection(name: string, jsonPatchInner?: Array<JsonPatchInner>, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<UserConnection>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.patchAuthHaloRunV1alpha1UserConnection(name, jsonPatchInner, options);
+            const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
+            const localVarOperationServerBasePath = operationServerMap['AuthHaloRunV1alpha1UserConnectionApi.patchAuthHaloRunV1alpha1UserConnection']?.[localVarOperationServerIndex]?.url;
+            return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
+        },
+        /**
          * Update auth.halo.run/v1alpha1/UserConnection
          * @param {string} name Name of userconnection
          * @param {UserConnection} [userConnection] Updated userconnection
@@ -381,6 +441,15 @@ export const AuthHaloRunV1alpha1UserConnectionApiFactory = function (configurati
          */
         listAuthHaloRunV1alpha1UserConnection(requestParameters: AuthHaloRunV1alpha1UserConnectionApiListAuthHaloRunV1alpha1UserConnectionRequest = {}, options?: RawAxiosRequestConfig): AxiosPromise<UserConnectionList> {
             return localVarFp.listAuthHaloRunV1alpha1UserConnection(requestParameters.page, requestParameters.size, requestParameters.labelSelector, requestParameters.fieldSelector, requestParameters.sort, options).then((request) => request(axios, basePath));
+        },
+        /**
+         * Patch auth.halo.run/v1alpha1/UserConnection
+         * @param {AuthHaloRunV1alpha1UserConnectionApiPatchAuthHaloRunV1alpha1UserConnectionRequest} requestParameters Request parameters.
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        patchAuthHaloRunV1alpha1UserConnection(requestParameters: AuthHaloRunV1alpha1UserConnectionApiPatchAuthHaloRunV1alpha1UserConnectionRequest, options?: RawAxiosRequestConfig): AxiosPromise<UserConnection> {
+            return localVarFp.patchAuthHaloRunV1alpha1UserConnection(requestParameters.name, requestParameters.jsonPatchInner, options).then((request) => request(axios, basePath));
         },
         /**
          * Update auth.halo.run/v1alpha1/UserConnection
@@ -479,6 +548,27 @@ export interface AuthHaloRunV1alpha1UserConnectionApiListAuthHaloRunV1alpha1User
 }
 
 /**
+ * Request parameters for patchAuthHaloRunV1alpha1UserConnection operation in AuthHaloRunV1alpha1UserConnectionApi.
+ * @export
+ * @interface AuthHaloRunV1alpha1UserConnectionApiPatchAuthHaloRunV1alpha1UserConnectionRequest
+ */
+export interface AuthHaloRunV1alpha1UserConnectionApiPatchAuthHaloRunV1alpha1UserConnectionRequest {
+    /**
+     * Name of userconnection
+     * @type {string}
+     * @memberof AuthHaloRunV1alpha1UserConnectionApiPatchAuthHaloRunV1alpha1UserConnection
+     */
+    readonly name: string
+
+    /**
+     * 
+     * @type {Array<JsonPatchInner>}
+     * @memberof AuthHaloRunV1alpha1UserConnectionApiPatchAuthHaloRunV1alpha1UserConnection
+     */
+    readonly jsonPatchInner?: Array<JsonPatchInner>
+}
+
+/**
  * Request parameters for updateAuthHaloRunV1alpha1UserConnection operation in AuthHaloRunV1alpha1UserConnectionApi.
  * @export
  * @interface AuthHaloRunV1alpha1UserConnectionApiUpdateAuthHaloRunV1alpha1UserConnectionRequest
@@ -548,6 +638,17 @@ export class AuthHaloRunV1alpha1UserConnectionApi extends BaseAPI {
      */
     public listAuthHaloRunV1alpha1UserConnection(requestParameters: AuthHaloRunV1alpha1UserConnectionApiListAuthHaloRunV1alpha1UserConnectionRequest = {}, options?: RawAxiosRequestConfig) {
         return AuthHaloRunV1alpha1UserConnectionApiFp(this.configuration).listAuthHaloRunV1alpha1UserConnection(requestParameters.page, requestParameters.size, requestParameters.labelSelector, requestParameters.fieldSelector, requestParameters.sort, options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
+     * Patch auth.halo.run/v1alpha1/UserConnection
+     * @param {AuthHaloRunV1alpha1UserConnectionApiPatchAuthHaloRunV1alpha1UserConnectionRequest} requestParameters Request parameters.
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof AuthHaloRunV1alpha1UserConnectionApi
+     */
+    public patchAuthHaloRunV1alpha1UserConnection(requestParameters: AuthHaloRunV1alpha1UserConnectionApiPatchAuthHaloRunV1alpha1UserConnectionRequest, options?: RawAxiosRequestConfig) {
+        return AuthHaloRunV1alpha1UserConnectionApiFp(this.configuration).patchAuthHaloRunV1alpha1UserConnection(requestParameters.name, requestParameters.jsonPatchInner, options).then((request) => request(this.axios, this.basePath));
     }
 
     /**

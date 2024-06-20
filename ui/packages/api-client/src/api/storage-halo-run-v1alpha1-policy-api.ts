@@ -22,6 +22,8 @@ import { DUMMY_BASE_URL, assertParamExists, setApiKeyToObject, setBasicAuthToObj
 // @ts-ignore
 import { BASE_PATH, COLLECTION_FORMATS, RequestArgs, BaseAPI, RequiredError, operationServerMap } from '../base';
 // @ts-ignore
+import { JsonPatchInner } from '../models';
+// @ts-ignore
 import { Policy } from '../models';
 // @ts-ignore
 import { PolicyList } from '../models';
@@ -217,6 +219,51 @@ export const StorageHaloRunV1alpha1PolicyApiAxiosParamCreator = function (config
             };
         },
         /**
+         * Patch storage.halo.run/v1alpha1/Policy
+         * @param {string} name Name of policy
+         * @param {Array<JsonPatchInner>} [jsonPatchInner] 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        patchStorageHaloRunV1alpha1Policy: async (name: string, jsonPatchInner?: Array<JsonPatchInner>, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+            // verify required parameter 'name' is not null or undefined
+            assertParamExists('patchStorageHaloRunV1alpha1Policy', 'name', name)
+            const localVarPath = `/apis/storage.halo.run/v1alpha1/policies/{name}`
+                .replace(`{${"name"}}`, encodeURIComponent(String(name)));
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'PATCH', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+            // authentication BasicAuth required
+            // http basic authentication required
+            setBasicAuthToObject(localVarRequestOptions, configuration)
+
+            // authentication BearerAuth required
+            // http bearer authentication required
+            await setBearerAuthToObject(localVarHeaderParameter, configuration)
+
+
+    
+            localVarHeaderParameter['Content-Type'] = 'application/json-patch+json';
+
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+            localVarRequestOptions.data = serializeDataIfNeeded(jsonPatchInner, localVarRequestOptions, configuration)
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+        /**
          * Update storage.halo.run/v1alpha1/Policy
          * @param {string} name Name of policy
          * @param {Policy} [policy] Updated policy
@@ -324,6 +371,19 @@ export const StorageHaloRunV1alpha1PolicyApiFp = function(configuration?: Config
             return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
         },
         /**
+         * Patch storage.halo.run/v1alpha1/Policy
+         * @param {string} name Name of policy
+         * @param {Array<JsonPatchInner>} [jsonPatchInner] 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async patchStorageHaloRunV1alpha1Policy(name: string, jsonPatchInner?: Array<JsonPatchInner>, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<Policy>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.patchStorageHaloRunV1alpha1Policy(name, jsonPatchInner, options);
+            const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
+            const localVarOperationServerBasePath = operationServerMap['StorageHaloRunV1alpha1PolicyApi.patchStorageHaloRunV1alpha1Policy']?.[localVarOperationServerIndex]?.url;
+            return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
+        },
+        /**
          * Update storage.halo.run/v1alpha1/Policy
          * @param {string} name Name of policy
          * @param {Policy} [policy] Updated policy
@@ -381,6 +441,15 @@ export const StorageHaloRunV1alpha1PolicyApiFactory = function (configuration?: 
          */
         listStorageHaloRunV1alpha1Policy(requestParameters: StorageHaloRunV1alpha1PolicyApiListStorageHaloRunV1alpha1PolicyRequest = {}, options?: RawAxiosRequestConfig): AxiosPromise<PolicyList> {
             return localVarFp.listStorageHaloRunV1alpha1Policy(requestParameters.page, requestParameters.size, requestParameters.labelSelector, requestParameters.fieldSelector, requestParameters.sort, options).then((request) => request(axios, basePath));
+        },
+        /**
+         * Patch storage.halo.run/v1alpha1/Policy
+         * @param {StorageHaloRunV1alpha1PolicyApiPatchStorageHaloRunV1alpha1PolicyRequest} requestParameters Request parameters.
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        patchStorageHaloRunV1alpha1Policy(requestParameters: StorageHaloRunV1alpha1PolicyApiPatchStorageHaloRunV1alpha1PolicyRequest, options?: RawAxiosRequestConfig): AxiosPromise<Policy> {
+            return localVarFp.patchStorageHaloRunV1alpha1Policy(requestParameters.name, requestParameters.jsonPatchInner, options).then((request) => request(axios, basePath));
         },
         /**
          * Update storage.halo.run/v1alpha1/Policy
@@ -479,6 +548,27 @@ export interface StorageHaloRunV1alpha1PolicyApiListStorageHaloRunV1alpha1Policy
 }
 
 /**
+ * Request parameters for patchStorageHaloRunV1alpha1Policy operation in StorageHaloRunV1alpha1PolicyApi.
+ * @export
+ * @interface StorageHaloRunV1alpha1PolicyApiPatchStorageHaloRunV1alpha1PolicyRequest
+ */
+export interface StorageHaloRunV1alpha1PolicyApiPatchStorageHaloRunV1alpha1PolicyRequest {
+    /**
+     * Name of policy
+     * @type {string}
+     * @memberof StorageHaloRunV1alpha1PolicyApiPatchStorageHaloRunV1alpha1Policy
+     */
+    readonly name: string
+
+    /**
+     * 
+     * @type {Array<JsonPatchInner>}
+     * @memberof StorageHaloRunV1alpha1PolicyApiPatchStorageHaloRunV1alpha1Policy
+     */
+    readonly jsonPatchInner?: Array<JsonPatchInner>
+}
+
+/**
  * Request parameters for updateStorageHaloRunV1alpha1Policy operation in StorageHaloRunV1alpha1PolicyApi.
  * @export
  * @interface StorageHaloRunV1alpha1PolicyApiUpdateStorageHaloRunV1alpha1PolicyRequest
@@ -548,6 +638,17 @@ export class StorageHaloRunV1alpha1PolicyApi extends BaseAPI {
      */
     public listStorageHaloRunV1alpha1Policy(requestParameters: StorageHaloRunV1alpha1PolicyApiListStorageHaloRunV1alpha1PolicyRequest = {}, options?: RawAxiosRequestConfig) {
         return StorageHaloRunV1alpha1PolicyApiFp(this.configuration).listStorageHaloRunV1alpha1Policy(requestParameters.page, requestParameters.size, requestParameters.labelSelector, requestParameters.fieldSelector, requestParameters.sort, options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
+     * Patch storage.halo.run/v1alpha1/Policy
+     * @param {StorageHaloRunV1alpha1PolicyApiPatchStorageHaloRunV1alpha1PolicyRequest} requestParameters Request parameters.
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof StorageHaloRunV1alpha1PolicyApi
+     */
+    public patchStorageHaloRunV1alpha1Policy(requestParameters: StorageHaloRunV1alpha1PolicyApiPatchStorageHaloRunV1alpha1PolicyRequest, options?: RawAxiosRequestConfig) {
+        return StorageHaloRunV1alpha1PolicyApiFp(this.configuration).patchStorageHaloRunV1alpha1Policy(requestParameters.name, requestParameters.jsonPatchInner, options).then((request) => request(this.axios, this.basePath));
     }
 
     /**

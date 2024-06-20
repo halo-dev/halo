@@ -60,6 +60,8 @@ public interface ReactiveExtensionClient {
 
     <E extends Extension> Mono<E> get(Class<E> type, String name);
 
+    Mono<JsonExtension> getJsonExtension(GroupVersionKind gvk, String name);
+
     /**
      * Creates an Extension.
      *

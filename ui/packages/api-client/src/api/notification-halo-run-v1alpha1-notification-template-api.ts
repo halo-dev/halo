@@ -22,6 +22,8 @@ import { DUMMY_BASE_URL, assertParamExists, setApiKeyToObject, setBasicAuthToObj
 // @ts-ignore
 import { BASE_PATH, COLLECTION_FORMATS, RequestArgs, BaseAPI, RequiredError, operationServerMap } from '../base';
 // @ts-ignore
+import { JsonPatchInner } from '../models';
+// @ts-ignore
 import { NotificationTemplate } from '../models';
 // @ts-ignore
 import { NotificationTemplateList } from '../models';
@@ -217,6 +219,51 @@ export const NotificationHaloRunV1alpha1NotificationTemplateApiAxiosParamCreator
             };
         },
         /**
+         * Patch notification.halo.run/v1alpha1/NotificationTemplate
+         * @param {string} name Name of notificationtemplate
+         * @param {Array<JsonPatchInner>} [jsonPatchInner] 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        patchNotificationHaloRunV1alpha1NotificationTemplate: async (name: string, jsonPatchInner?: Array<JsonPatchInner>, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+            // verify required parameter 'name' is not null or undefined
+            assertParamExists('patchNotificationHaloRunV1alpha1NotificationTemplate', 'name', name)
+            const localVarPath = `/apis/notification.halo.run/v1alpha1/notificationtemplates/{name}`
+                .replace(`{${"name"}}`, encodeURIComponent(String(name)));
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'PATCH', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+            // authentication BasicAuth required
+            // http basic authentication required
+            setBasicAuthToObject(localVarRequestOptions, configuration)
+
+            // authentication BearerAuth required
+            // http bearer authentication required
+            await setBearerAuthToObject(localVarHeaderParameter, configuration)
+
+
+    
+            localVarHeaderParameter['Content-Type'] = 'application/json-patch+json';
+
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+            localVarRequestOptions.data = serializeDataIfNeeded(jsonPatchInner, localVarRequestOptions, configuration)
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+        /**
          * Update notification.halo.run/v1alpha1/NotificationTemplate
          * @param {string} name Name of notificationtemplate
          * @param {NotificationTemplate} [notificationTemplate] Updated notificationtemplate
@@ -324,6 +371,19 @@ export const NotificationHaloRunV1alpha1NotificationTemplateApiFp = function(con
             return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
         },
         /**
+         * Patch notification.halo.run/v1alpha1/NotificationTemplate
+         * @param {string} name Name of notificationtemplate
+         * @param {Array<JsonPatchInner>} [jsonPatchInner] 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async patchNotificationHaloRunV1alpha1NotificationTemplate(name: string, jsonPatchInner?: Array<JsonPatchInner>, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<NotificationTemplate>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.patchNotificationHaloRunV1alpha1NotificationTemplate(name, jsonPatchInner, options);
+            const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
+            const localVarOperationServerBasePath = operationServerMap['NotificationHaloRunV1alpha1NotificationTemplateApi.patchNotificationHaloRunV1alpha1NotificationTemplate']?.[localVarOperationServerIndex]?.url;
+            return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
+        },
+        /**
          * Update notification.halo.run/v1alpha1/NotificationTemplate
          * @param {string} name Name of notificationtemplate
          * @param {NotificationTemplate} [notificationTemplate] Updated notificationtemplate
@@ -381,6 +441,15 @@ export const NotificationHaloRunV1alpha1NotificationTemplateApiFactory = functio
          */
         listNotificationHaloRunV1alpha1NotificationTemplate(requestParameters: NotificationHaloRunV1alpha1NotificationTemplateApiListNotificationHaloRunV1alpha1NotificationTemplateRequest = {}, options?: RawAxiosRequestConfig): AxiosPromise<NotificationTemplateList> {
             return localVarFp.listNotificationHaloRunV1alpha1NotificationTemplate(requestParameters.page, requestParameters.size, requestParameters.labelSelector, requestParameters.fieldSelector, requestParameters.sort, options).then((request) => request(axios, basePath));
+        },
+        /**
+         * Patch notification.halo.run/v1alpha1/NotificationTemplate
+         * @param {NotificationHaloRunV1alpha1NotificationTemplateApiPatchNotificationHaloRunV1alpha1NotificationTemplateRequest} requestParameters Request parameters.
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        patchNotificationHaloRunV1alpha1NotificationTemplate(requestParameters: NotificationHaloRunV1alpha1NotificationTemplateApiPatchNotificationHaloRunV1alpha1NotificationTemplateRequest, options?: RawAxiosRequestConfig): AxiosPromise<NotificationTemplate> {
+            return localVarFp.patchNotificationHaloRunV1alpha1NotificationTemplate(requestParameters.name, requestParameters.jsonPatchInner, options).then((request) => request(axios, basePath));
         },
         /**
          * Update notification.halo.run/v1alpha1/NotificationTemplate
@@ -479,6 +548,27 @@ export interface NotificationHaloRunV1alpha1NotificationTemplateApiListNotificat
 }
 
 /**
+ * Request parameters for patchNotificationHaloRunV1alpha1NotificationTemplate operation in NotificationHaloRunV1alpha1NotificationTemplateApi.
+ * @export
+ * @interface NotificationHaloRunV1alpha1NotificationTemplateApiPatchNotificationHaloRunV1alpha1NotificationTemplateRequest
+ */
+export interface NotificationHaloRunV1alpha1NotificationTemplateApiPatchNotificationHaloRunV1alpha1NotificationTemplateRequest {
+    /**
+     * Name of notificationtemplate
+     * @type {string}
+     * @memberof NotificationHaloRunV1alpha1NotificationTemplateApiPatchNotificationHaloRunV1alpha1NotificationTemplate
+     */
+    readonly name: string
+
+    /**
+     * 
+     * @type {Array<JsonPatchInner>}
+     * @memberof NotificationHaloRunV1alpha1NotificationTemplateApiPatchNotificationHaloRunV1alpha1NotificationTemplate
+     */
+    readonly jsonPatchInner?: Array<JsonPatchInner>
+}
+
+/**
  * Request parameters for updateNotificationHaloRunV1alpha1NotificationTemplate operation in NotificationHaloRunV1alpha1NotificationTemplateApi.
  * @export
  * @interface NotificationHaloRunV1alpha1NotificationTemplateApiUpdateNotificationHaloRunV1alpha1NotificationTemplateRequest
@@ -548,6 +638,17 @@ export class NotificationHaloRunV1alpha1NotificationTemplateApi extends BaseAPI 
      */
     public listNotificationHaloRunV1alpha1NotificationTemplate(requestParameters: NotificationHaloRunV1alpha1NotificationTemplateApiListNotificationHaloRunV1alpha1NotificationTemplateRequest = {}, options?: RawAxiosRequestConfig) {
         return NotificationHaloRunV1alpha1NotificationTemplateApiFp(this.configuration).listNotificationHaloRunV1alpha1NotificationTemplate(requestParameters.page, requestParameters.size, requestParameters.labelSelector, requestParameters.fieldSelector, requestParameters.sort, options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
+     * Patch notification.halo.run/v1alpha1/NotificationTemplate
+     * @param {NotificationHaloRunV1alpha1NotificationTemplateApiPatchNotificationHaloRunV1alpha1NotificationTemplateRequest} requestParameters Request parameters.
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof NotificationHaloRunV1alpha1NotificationTemplateApi
+     */
+    public patchNotificationHaloRunV1alpha1NotificationTemplate(requestParameters: NotificationHaloRunV1alpha1NotificationTemplateApiPatchNotificationHaloRunV1alpha1NotificationTemplateRequest, options?: RawAxiosRequestConfig) {
+        return NotificationHaloRunV1alpha1NotificationTemplateApiFp(this.configuration).patchNotificationHaloRunV1alpha1NotificationTemplate(requestParameters.name, requestParameters.jsonPatchInner, options).then((request) => request(this.axios, this.basePath));
     }
 
     /**

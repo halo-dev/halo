@@ -25,6 +25,8 @@ import { BASE_PATH, COLLECTION_FORMATS, RequestArgs, BaseAPI, RequiredError, ope
 import { ConfigMap } from '../models';
 // @ts-ignore
 import { ConfigMapList } from '../models';
+// @ts-ignore
+import { JsonPatchInner } from '../models';
 /**
  * V1alpha1ConfigMapApi - axios parameter creator
  * @export
@@ -217,6 +219,51 @@ export const V1alpha1ConfigMapApiAxiosParamCreator = function (configuration?: C
             };
         },
         /**
+         * Patch v1alpha1/ConfigMap
+         * @param {string} name Name of configmap
+         * @param {Array<JsonPatchInner>} [jsonPatchInner] 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        patchV1alpha1ConfigMap: async (name: string, jsonPatchInner?: Array<JsonPatchInner>, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+            // verify required parameter 'name' is not null or undefined
+            assertParamExists('patchV1alpha1ConfigMap', 'name', name)
+            const localVarPath = `/api/v1alpha1/configmaps/{name}`
+                .replace(`{${"name"}}`, encodeURIComponent(String(name)));
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'PATCH', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+            // authentication BasicAuth required
+            // http basic authentication required
+            setBasicAuthToObject(localVarRequestOptions, configuration)
+
+            // authentication BearerAuth required
+            // http bearer authentication required
+            await setBearerAuthToObject(localVarHeaderParameter, configuration)
+
+
+    
+            localVarHeaderParameter['Content-Type'] = 'application/json-patch+json';
+
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+            localVarRequestOptions.data = serializeDataIfNeeded(jsonPatchInner, localVarRequestOptions, configuration)
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+        /**
          * Update v1alpha1/ConfigMap
          * @param {string} name Name of configmap
          * @param {ConfigMap} [configMap] Updated configmap
@@ -324,6 +371,19 @@ export const V1alpha1ConfigMapApiFp = function(configuration?: Configuration) {
             return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
         },
         /**
+         * Patch v1alpha1/ConfigMap
+         * @param {string} name Name of configmap
+         * @param {Array<JsonPatchInner>} [jsonPatchInner] 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async patchV1alpha1ConfigMap(name: string, jsonPatchInner?: Array<JsonPatchInner>, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<ConfigMap>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.patchV1alpha1ConfigMap(name, jsonPatchInner, options);
+            const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
+            const localVarOperationServerBasePath = operationServerMap['V1alpha1ConfigMapApi.patchV1alpha1ConfigMap']?.[localVarOperationServerIndex]?.url;
+            return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
+        },
+        /**
          * Update v1alpha1/ConfigMap
          * @param {string} name Name of configmap
          * @param {ConfigMap} [configMap] Updated configmap
@@ -381,6 +441,15 @@ export const V1alpha1ConfigMapApiFactory = function (configuration?: Configurati
          */
         listV1alpha1ConfigMap(requestParameters: V1alpha1ConfigMapApiListV1alpha1ConfigMapRequest = {}, options?: RawAxiosRequestConfig): AxiosPromise<ConfigMapList> {
             return localVarFp.listV1alpha1ConfigMap(requestParameters.page, requestParameters.size, requestParameters.labelSelector, requestParameters.fieldSelector, requestParameters.sort, options).then((request) => request(axios, basePath));
+        },
+        /**
+         * Patch v1alpha1/ConfigMap
+         * @param {V1alpha1ConfigMapApiPatchV1alpha1ConfigMapRequest} requestParameters Request parameters.
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        patchV1alpha1ConfigMap(requestParameters: V1alpha1ConfigMapApiPatchV1alpha1ConfigMapRequest, options?: RawAxiosRequestConfig): AxiosPromise<ConfigMap> {
+            return localVarFp.patchV1alpha1ConfigMap(requestParameters.name, requestParameters.jsonPatchInner, options).then((request) => request(axios, basePath));
         },
         /**
          * Update v1alpha1/ConfigMap
@@ -479,6 +548,27 @@ export interface V1alpha1ConfigMapApiListV1alpha1ConfigMapRequest {
 }
 
 /**
+ * Request parameters for patchV1alpha1ConfigMap operation in V1alpha1ConfigMapApi.
+ * @export
+ * @interface V1alpha1ConfigMapApiPatchV1alpha1ConfigMapRequest
+ */
+export interface V1alpha1ConfigMapApiPatchV1alpha1ConfigMapRequest {
+    /**
+     * Name of configmap
+     * @type {string}
+     * @memberof V1alpha1ConfigMapApiPatchV1alpha1ConfigMap
+     */
+    readonly name: string
+
+    /**
+     * 
+     * @type {Array<JsonPatchInner>}
+     * @memberof V1alpha1ConfigMapApiPatchV1alpha1ConfigMap
+     */
+    readonly jsonPatchInner?: Array<JsonPatchInner>
+}
+
+/**
  * Request parameters for updateV1alpha1ConfigMap operation in V1alpha1ConfigMapApi.
  * @export
  * @interface V1alpha1ConfigMapApiUpdateV1alpha1ConfigMapRequest
@@ -548,6 +638,17 @@ export class V1alpha1ConfigMapApi extends BaseAPI {
      */
     public listV1alpha1ConfigMap(requestParameters: V1alpha1ConfigMapApiListV1alpha1ConfigMapRequest = {}, options?: RawAxiosRequestConfig) {
         return V1alpha1ConfigMapApiFp(this.configuration).listV1alpha1ConfigMap(requestParameters.page, requestParameters.size, requestParameters.labelSelector, requestParameters.fieldSelector, requestParameters.sort, options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
+     * Patch v1alpha1/ConfigMap
+     * @param {V1alpha1ConfigMapApiPatchV1alpha1ConfigMapRequest} requestParameters Request parameters.
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof V1alpha1ConfigMapApi
+     */
+    public patchV1alpha1ConfigMap(requestParameters: V1alpha1ConfigMapApiPatchV1alpha1ConfigMapRequest, options?: RawAxiosRequestConfig) {
+        return V1alpha1ConfigMapApiFp(this.configuration).patchV1alpha1ConfigMap(requestParameters.name, requestParameters.jsonPatchInner, options).then((request) => request(this.axios, this.basePath));
     }
 
     /**
