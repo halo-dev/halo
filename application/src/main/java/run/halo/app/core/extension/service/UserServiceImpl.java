@@ -1,6 +1,9 @@
 package run.halo.app.core.extension.service;
 
+import static org.springframework.data.domain.Sort.Order.asc;
+import static org.springframework.data.domain.Sort.Order.desc;
 import static run.halo.app.core.extension.RoleBinding.containsUser;
+import static run.halo.app.extension.index.query.QueryFactory.equal;
 
 import java.util.HashSet;
 import java.util.Objects;
@@ -8,6 +11,7 @@ import java.util.Set;
 import lombok.RequiredArgsConstructor;
 import org.apache.commons.lang3.BooleanUtils;
 import org.springframework.context.ApplicationEventPublisher;
+import org.springframework.data.domain.Sort;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -21,8 +25,10 @@ import run.halo.app.core.extension.Role;
 import run.halo.app.core.extension.RoleBinding;
 import run.halo.app.core.extension.User;
 import run.halo.app.event.user.PasswordChangedEvent;
+import run.halo.app.extension.ListOptions;
 import run.halo.app.extension.ReactiveExtensionClient;
 import run.halo.app.extension.exception.ExtensionNotFoundException;
+import run.halo.app.extension.router.selector.FieldSelector;
 import run.halo.app.infra.SystemConfigurableEnvironmentFetcher;
 import run.halo.app.infra.SystemSetting;
 import run.halo.app.infra.exception.AccessDeniedException;
@@ -196,6 +202,15 @@ public class UserServiceImpl implements UserService {
                 return passwordEncoder.matches(rawPassword, user.getSpec().getPassword());
             })
             .hasElement();
+    }
+
+    @Override
+    public Flux<User> listByEmail(String email) {
+        var listOptions = new ListOptions();
+        listOptions.setFieldSelector(FieldSelector.of(equal("spec.email", email)));
+        return client.listAll(User.class, listOptions, Sort.by(desc("metadata.creationTimestamp"),
+            asc("metadata.name"))
+        );
     }
 
     void publishPasswordChangedEvent(String username) {
