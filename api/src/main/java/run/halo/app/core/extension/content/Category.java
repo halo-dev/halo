@@ -1,5 +1,6 @@
 package run.halo.app.core.extension.content;
 
+import static io.swagger.v3.oas.annotations.media.Schema.RequiredMode.NOT_REQUIRED;
 import static io.swagger.v3.oas.annotations.media.Schema.RequiredMode.REQUIRED;
 import static run.halo.app.core.extension.content.Category.KIND;
 
@@ -53,7 +54,16 @@ public class Category extends AbstractExtension {
 
         private String cover;
 
+        @Schema(requiredMode = NOT_REQUIRED, maxLength = 255)
         private String template;
+
+        /**
+         * <p>Used to specify the template for the posts associated with the category.</p>
+         * <p>The priority is not as high as that of the post.</p>
+         * <p>If the post also specifies a template, the post's template will prevail.</p>
+         */
+        @Schema(requiredMode = NOT_REQUIRED, maxLength = 255)
+        private String postTemplate;
 
         @Schema(requiredMode = REQUIRED, defaultValue = "0")
         private Integer priority;

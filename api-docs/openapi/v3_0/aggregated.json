@@ -14967,6 +14967,10 @@
             "minLength": 1,
             "type": "string"
           },
+          "postTemplate": {
+            "maxLength": 255,
+            "type": "string"
+          },
           "priority": {
             "type": "integer",
             "format": "int32",
@@ -14977,6 +14981,7 @@
             "type": "string"
           },
           "template": {
+            "maxLength": 255,
             "type": "string"
           }
         }
