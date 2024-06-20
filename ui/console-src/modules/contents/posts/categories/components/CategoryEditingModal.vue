@@ -271,10 +271,14 @@ const { handleGenerateSlug } = useSlugify(
             <FormKit
               v-model="formState.spec.preventParentPostCascadeQuery"
               :label="
-                $t('core.post_category.editing_modal.fields.independent.label')
+                $t(
+                  'core.post_category.editing_modal.fields.prevent_parent_post_cascade_query.label'
+                )
               "
               :help="
-                $t('core.post_category.editing_modal.fields.independent.help')
+                $t(
+                  'core.post_category.editing_modal.fields.prevent_parent_post_cascade_query.help'
+                )
               "
               type="checkbox"
               name="preventParentPostCascadeQuery"

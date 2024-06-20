@@ -336,10 +336,8 @@ core:
           help: Se requiere adaptación del tema para ser compatible
         description:
           label: Descripción
-          help: >-
-            Evitar que la categoría principal incluya esta categoría y sus
-            subcategorías en consultas de publicaciones en cascada
-        independent:
+          help: Se requiere adaptación del tema para ser compatible
+        prevent_parent_post_cascade_query:
           label: Evitar consulta en cascada de publicación principal
           help: >-
             Si se selecciona, las publicaciones de las subcategorías no se

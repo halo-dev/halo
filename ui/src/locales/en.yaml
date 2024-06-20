@@ -375,7 +375,7 @@ core:
         description:
           label: Description
           help: Theme adaptation is required to support
-        independent:
+        prevent_parent_post_cascade_query:
           label: Prevent Parent Post Cascade Query
           help: >-
             Prevent parent category from including this category and its
@@ -387,7 +387,7 @@ core:
             which requires support from the theme
     list:
       fields:
-        independent: >-
+        prevent_parent_post_cascade_query: >-
           Prevent parent category from including this category and its
           subcategories in cascade post queries
   page:

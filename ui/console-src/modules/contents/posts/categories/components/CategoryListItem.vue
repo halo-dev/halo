@@ -136,10 +136,14 @@ const handleDelete = async (category: CategoryTree) => {
               />
             </template>
           </VEntityField>
-          <VEntityField v-if="category.spec.independent">
+          <VEntityField v-if="category.spec.preventParentPostCascadeQuery">
             <template #description>
               <GridiconsLinkBreak
-                v-tooltip="$t('core.post_category.list.fields.independent')"
+                v-tooltip="
+                  $t(
+                    'core.post_category.list.fields.prevent_parent_post_cascade_query'
+                  )
+                "
                 class="cursor-pointer text-sm transition-all hover:text-blue-600"
               />
             </template>
