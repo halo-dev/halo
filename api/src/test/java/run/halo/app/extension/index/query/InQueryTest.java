@@ -2,7 +2,7 @@ package run.halo.app.extension.index.query;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-import java.util.Set;
+import java.util.LinkedHashSet;
 import org.junit.jupiter.api.Test;
 
 /**
@@ -15,7 +15,10 @@ class InQueryTest {
 
     @Test
     void testToString() {
-        var inQuery = new InQuery("name", Set.of("Alice", "Bob"));
-        assertThat(inQuery.toString()).isEqualTo("name IN ('Bob', 'Alice')");
+        var values = new LinkedHashSet<String>();
+        values.add("Alice");
+        values.add("Bob");
+        var inQuery = new InQuery("name", values);
+        assertThat(inQuery.toString()).isEqualTo("name IN ('Alice', 'Bob')");
     }
 }
