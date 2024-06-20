@@ -46,6 +46,12 @@ export interface CategorySpec {
     'displayName': string;
     /**
      * 
+     * @type {string}
+     * @memberof CategorySpec
+     */
+    'postTemplate'?: string;
+    /**
+     * 
      * @type {number}
      * @memberof CategorySpec
      */
