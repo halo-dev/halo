@@ -25,6 +25,8 @@ import { BASE_PATH, COLLECTION_FORMATS, RequestArgs, BaseAPI, RequiredError, ope
 import { Attachment } from '../models';
 // @ts-ignore
 import { AttachmentList } from '../models';
+// @ts-ignore
+import { JsonPatchInner } from '../models';
 /**
  * StorageHaloRunV1alpha1AttachmentApi - axios parameter creator
  * @export
@@ -217,6 +219,51 @@ export const StorageHaloRunV1alpha1AttachmentApiAxiosParamCreator = function (co
             };
         },
         /**
+         * Patch storage.halo.run/v1alpha1/Attachment
+         * @param {string} name Name of attachment
+         * @param {Array<JsonPatchInner>} [jsonPatchInner] 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        patchStorageHaloRunV1alpha1Attachment: async (name: string, jsonPatchInner?: Array<JsonPatchInner>, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+            // verify required parameter 'name' is not null or undefined
+            assertParamExists('patchStorageHaloRunV1alpha1Attachment', 'name', name)
+            const localVarPath = `/apis/storage.halo.run/v1alpha1/attachments/{name}`
+                .replace(`{${"name"}}`, encodeURIComponent(String(name)));
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'PATCH', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+            // authentication BasicAuth required
+            // http basic authentication required
+            setBasicAuthToObject(localVarRequestOptions, configuration)
+
+            // authentication BearerAuth required
+            // http bearer authentication required
+            await setBearerAuthToObject(localVarHeaderParameter, configuration)
+
+
+    
+            localVarHeaderParameter['Content-Type'] = 'application/json-patch+json';
+
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+            localVarRequestOptions.data = serializeDataIfNeeded(jsonPatchInner, localVarRequestOptions, configuration)
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+        /**
          * Update storage.halo.run/v1alpha1/Attachment
          * @param {string} name Name of attachment
          * @param {Attachment} [attachment] Updated attachment
@@ -324,6 +371,19 @@ export const StorageHaloRunV1alpha1AttachmentApiFp = function(configuration?: Co
             return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
         },
         /**
+         * Patch storage.halo.run/v1alpha1/Attachment
+         * @param {string} name Name of attachment
+         * @param {Array<JsonPatchInner>} [jsonPatchInner] 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async patchStorageHaloRunV1alpha1Attachment(name: string, jsonPatchInner?: Array<JsonPatchInner>, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<Attachment>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.patchStorageHaloRunV1alpha1Attachment(name, jsonPatchInner, options);
+            const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
+            const localVarOperationServerBasePath = operationServerMap['StorageHaloRunV1alpha1AttachmentApi.patchStorageHaloRunV1alpha1Attachment']?.[localVarOperationServerIndex]?.url;
+            return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
+        },
+        /**
          * Update storage.halo.run/v1alpha1/Attachment
          * @param {string} name Name of attachment
          * @param {Attachment} [attachment] Updated attachment
@@ -381,6 +441,15 @@ export const StorageHaloRunV1alpha1AttachmentApiFactory = function (configuratio
          */
         listStorageHaloRunV1alpha1Attachment(requestParameters: StorageHaloRunV1alpha1AttachmentApiListStorageHaloRunV1alpha1AttachmentRequest = {}, options?: RawAxiosRequestConfig): AxiosPromise<AttachmentList> {
             return localVarFp.listStorageHaloRunV1alpha1Attachment(requestParameters.page, requestParameters.size, requestParameters.labelSelector, requestParameters.fieldSelector, requestParameters.sort, options).then((request) => request(axios, basePath));
+        },
+        /**
+         * Patch storage.halo.run/v1alpha1/Attachment
+         * @param {StorageHaloRunV1alpha1AttachmentApiPatchStorageHaloRunV1alpha1AttachmentRequest} requestParameters Request parameters.
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        patchStorageHaloRunV1alpha1Attachment(requestParameters: StorageHaloRunV1alpha1AttachmentApiPatchStorageHaloRunV1alpha1AttachmentRequest, options?: RawAxiosRequestConfig): AxiosPromise<Attachment> {
+            return localVarFp.patchStorageHaloRunV1alpha1Attachment(requestParameters.name, requestParameters.jsonPatchInner, options).then((request) => request(axios, basePath));
         },
         /**
          * Update storage.halo.run/v1alpha1/Attachment
@@ -479,6 +548,27 @@ export interface StorageHaloRunV1alpha1AttachmentApiListStorageHaloRunV1alpha1At
 }
 
 /**
+ * Request parameters for patchStorageHaloRunV1alpha1Attachment operation in StorageHaloRunV1alpha1AttachmentApi.
+ * @export
+ * @interface StorageHaloRunV1alpha1AttachmentApiPatchStorageHaloRunV1alpha1AttachmentRequest
+ */
+export interface StorageHaloRunV1alpha1AttachmentApiPatchStorageHaloRunV1alpha1AttachmentRequest {
+    /**
+     * Name of attachment
+     * @type {string}
+     * @memberof StorageHaloRunV1alpha1AttachmentApiPatchStorageHaloRunV1alpha1Attachment
+     */
+    readonly name: string
+
+    /**
+     * 
+     * @type {Array<JsonPatchInner>}
+     * @memberof StorageHaloRunV1alpha1AttachmentApiPatchStorageHaloRunV1alpha1Attachment
+     */
+    readonly jsonPatchInner?: Array<JsonPatchInner>
+}
+
+/**
  * Request parameters for updateStorageHaloRunV1alpha1Attachment operation in StorageHaloRunV1alpha1AttachmentApi.
  * @export
  * @interface StorageHaloRunV1alpha1AttachmentApiUpdateStorageHaloRunV1alpha1AttachmentRequest
@@ -548,6 +638,17 @@ export class StorageHaloRunV1alpha1AttachmentApi extends BaseAPI {
      */
     public listStorageHaloRunV1alpha1Attachment(requestParameters: StorageHaloRunV1alpha1AttachmentApiListStorageHaloRunV1alpha1AttachmentRequest = {}, options?: RawAxiosRequestConfig) {
         return StorageHaloRunV1alpha1AttachmentApiFp(this.configuration).listStorageHaloRunV1alpha1Attachment(requestParameters.page, requestParameters.size, requestParameters.labelSelector, requestParameters.fieldSelector, requestParameters.sort, options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
+     * Patch storage.halo.run/v1alpha1/Attachment
+     * @param {StorageHaloRunV1alpha1AttachmentApiPatchStorageHaloRunV1alpha1AttachmentRequest} requestParameters Request parameters.
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof StorageHaloRunV1alpha1AttachmentApi
+     */
+    public patchStorageHaloRunV1alpha1Attachment(requestParameters: StorageHaloRunV1alpha1AttachmentApiPatchStorageHaloRunV1alpha1AttachmentRequest, options?: RawAxiosRequestConfig) {
+        return StorageHaloRunV1alpha1AttachmentApiFp(this.configuration).patchStorageHaloRunV1alpha1Attachment(requestParameters.name, requestParameters.jsonPatchInner, options).then((request) => request(this.axios, this.basePath));
     }
 
     /**

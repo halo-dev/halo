@@ -1,9 +1,12 @@
 package run.halo.app.extension.router;
 
 import static org.springdoc.core.fn.builders.apiresponse.Builder.responseBuilder;
+import static org.springdoc.core.fn.builders.content.Builder.contentBuilder;
 import static org.springdoc.core.fn.builders.parameter.Builder.parameterBuilder;
 import static org.springdoc.core.fn.builders.requestbody.Builder.requestBodyBuilder;
+import static org.springdoc.core.fn.builders.schema.Builder.schemaBuilder;
 
+import io.swagger.v3.core.util.RefUtils;
 import io.swagger.v3.oas.annotations.enums.ParameterIn;
 import org.springdoc.webflux.core.fn.SpringdocRouteBuilder;
 import org.springframework.lang.NonNull;
@@ -32,6 +35,7 @@ public class ExtensionRouterFunctionFactory {
         var createHandler = new ExtensionCreateHandler(scheme, client);
         var updateHandler = new ExtensionUpdateHandler(scheme, client);
         var deleteHandler = new ExtensionDeleteHandler(scheme, client);
+        var patchHandler = new ExtensionPatchHandler(scheme, client);
         // TODO More handlers here
         var gvk = scheme.groupVersionKind();
         var tagName = gvk.toString();
@@ -79,6 +83,26 @@ public class ExtensionRouterFunctionFactory {
                     .response(responseBuilder().responseCode("200")
                         .description("Response " + scheme.plural() + " updated just now")
                         .implementation(scheme.type())))
+            .PATCH(patchHandler.pathPattern(), patchHandler,
+                builder -> builder.operationId("Patch/" + gvk)
+                    .description("Patch " + gvk)
+                    .tag(tagName)
+                    .parameter(parameterBuilder().in(ParameterIn.PATH)
+                        .name("name")
+                        .description("Name of " + scheme.singular()))
+                    .requestBody(requestBodyBuilder()
+                        .content(contentBuilder()
+                            .mediaType("application/json-patch+json")
+                            .schema(
+                                schemaBuilder().ref(RefUtils.constructRef(JsonPatch.SCHEMA_NAME))
+                            )
+                        )
+                    )
+                    .response(responseBuilder().responseCode("200")
+                        .description("Response " + scheme.singular() + " patched just now")
+                        .implementation(scheme.type())
+                    )
+            )
             .DELETE(deleteHandler.pathPattern(), deleteHandler,
                 builder -> builder.operationId("Delete/" + gvk)
                     .description("Delete " + gvk)
@@ -125,6 +149,10 @@ public class ExtensionRouterFunctionFactory {
     }
 
     interface DeleteHandler extends HandlerFunction<ServerResponse>, PathPatternGenerator {
+
+    }
+
+    interface PatchHandler extends HandlerFunction<ServerResponse>, PathPatternGenerator {
 
     }
 

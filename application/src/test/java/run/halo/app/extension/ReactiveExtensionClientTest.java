@@ -3,11 +3,14 @@ package run.halo.app.extension;
 import static java.util.Collections.emptyList;
 import static java.util.Collections.reverseOrder;
 import static java.util.Comparator.comparing;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertInstanceOf;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.argThat;
+import static org.mockito.ArgumentMatchers.assertArg;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.ArgumentMatchers.isA;
 import static org.mockito.ArgumentMatchers.same;
@@ -428,7 +431,11 @@ class ReactiveExtensionClientTest {
         verify(converter, times(1)).convertTo(eq(fake));
         verify(storeClient, times(1)).create(eq("/registry/fake.halo.run/fakes/fake"), any());
         assertNotNull(fake.getMetadata().getCreationTimestamp());
-        verify(indexer).indexRecord(eq(fake));
+
+        verify(indexer).indexRecord(assertArg(ext -> {
+            assertInstanceOf(FakeExtension.class, ext);
+            assertEquals("fake", ext.getMetadata().getName());
+        }));
     }
 
     @Test
@@ -581,7 +588,10 @@ class ReactiveExtensionClientTest {
         verify(converter, times(2)).convertFrom(same(Unstructured.class), any());
         verify(storeClient)
             .update(eq("/registry/fake.halo.run/fakes/fake"), eq(12345L), any());
-        verify(indexer).updateRecord(eq(updatedFake));
+        verify(indexer).updateRecord(assertArg(ext -> {
+            assertInstanceOf(FakeExtension.class, ext);
+            assertEquals("fake", ext.getMetadata().getName());
+        }));
     }
 
     @Test
@@ -605,6 +615,29 @@ class ReactiveExtensionClientTest {
         verify(storeClient, never()).delete(any(), any());
         verify(indexer).updateRecord(eq(fake));
     }
+
+    @Test
+    void shouldGetJsonExtension() {
+        var storeName = "/registry/fake.halo.run/fakes/fake";
+        when(storeClient.fetchByName(storeName)).thenReturn(
+            Mono.just(createExtensionStore(storeName)));
+
+        var fake = createFakeExtension("fake", 1L);
+        var expectedJsonExt = objectMapper.convertValue(fake, JsonExtension.class);
+
+        when(converter.convertFrom(JsonExtension.class, createExtensionStore(storeName)))
+            .thenReturn(expectedJsonExt);
+
+        var gvk = Scheme.buildFromType(FakeExtension.class).groupVersionKind();
+        StepVerifier.create(client.getJsonExtension(gvk, "fake"))
+            .expectNext(expectedJsonExt)
+            .verifyComplete();
+
+        verify(storeClient, times(1)).fetchByName(eq(storeName));
+        verify(converter, times(1)).convertFrom(eq(JsonExtension.class),
+            eq(createExtensionStore(storeName)));
+    }
+
 
     @Nested
     @DisplayName("Extension watcher test")

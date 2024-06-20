@@ -22,6 +22,8 @@ import { DUMMY_BASE_URL, assertParamExists, setApiKeyToObject, setBasicAuthToObj
 // @ts-ignore
 import { BASE_PATH, COLLECTION_FORMATS, RequestArgs, BaseAPI, RequiredError, operationServerMap } from '../base';
 // @ts-ignore
+import { JsonPatchInner } from '../models';
+// @ts-ignore
 import { PersonalAccessToken } from '../models';
 // @ts-ignore
 import { PersonalAccessTokenList } from '../models';
@@ -217,6 +219,51 @@ export const SecurityHaloRunV1alpha1PersonalAccessTokenApiAxiosParamCreator = fu
             };
         },
         /**
+         * Patch security.halo.run/v1alpha1/PersonalAccessToken
+         * @param {string} name Name of personalaccesstoken
+         * @param {Array<JsonPatchInner>} [jsonPatchInner] 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        patchSecurityHaloRunV1alpha1PersonalAccessToken: async (name: string, jsonPatchInner?: Array<JsonPatchInner>, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+            // verify required parameter 'name' is not null or undefined
+            assertParamExists('patchSecurityHaloRunV1alpha1PersonalAccessToken', 'name', name)
+            const localVarPath = `/apis/security.halo.run/v1alpha1/personalaccesstokens/{name}`
+                .replace(`{${"name"}}`, encodeURIComponent(String(name)));
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'PATCH', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+            // authentication BasicAuth required
+            // http basic authentication required
+            setBasicAuthToObject(localVarRequestOptions, configuration)
+
+            // authentication BearerAuth required
+            // http bearer authentication required
+            await setBearerAuthToObject(localVarHeaderParameter, configuration)
+
+
+    
+            localVarHeaderParameter['Content-Type'] = 'application/json-patch+json';
+
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+            localVarRequestOptions.data = serializeDataIfNeeded(jsonPatchInner, localVarRequestOptions, configuration)
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+        /**
          * Update security.halo.run/v1alpha1/PersonalAccessToken
          * @param {string} name Name of personalaccesstoken
          * @param {PersonalAccessToken} [personalAccessToken] Updated personalaccesstoken
@@ -324,6 +371,19 @@ export const SecurityHaloRunV1alpha1PersonalAccessTokenApiFp = function(configur
             return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
         },
         /**
+         * Patch security.halo.run/v1alpha1/PersonalAccessToken
+         * @param {string} name Name of personalaccesstoken
+         * @param {Array<JsonPatchInner>} [jsonPatchInner] 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async patchSecurityHaloRunV1alpha1PersonalAccessToken(name: string, jsonPatchInner?: Array<JsonPatchInner>, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<PersonalAccessToken>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.patchSecurityHaloRunV1alpha1PersonalAccessToken(name, jsonPatchInner, options);
+            const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
+            const localVarOperationServerBasePath = operationServerMap['SecurityHaloRunV1alpha1PersonalAccessTokenApi.patchSecurityHaloRunV1alpha1PersonalAccessToken']?.[localVarOperationServerIndex]?.url;
+            return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
+        },
+        /**
          * Update security.halo.run/v1alpha1/PersonalAccessToken
          * @param {string} name Name of personalaccesstoken
          * @param {PersonalAccessToken} [personalAccessToken] Updated personalaccesstoken
@@ -381,6 +441,15 @@ export const SecurityHaloRunV1alpha1PersonalAccessTokenApiFactory = function (co
          */
         listSecurityHaloRunV1alpha1PersonalAccessToken(requestParameters: SecurityHaloRunV1alpha1PersonalAccessTokenApiListSecurityHaloRunV1alpha1PersonalAccessTokenRequest = {}, options?: RawAxiosRequestConfig): AxiosPromise<PersonalAccessTokenList> {
             return localVarFp.listSecurityHaloRunV1alpha1PersonalAccessToken(requestParameters.page, requestParameters.size, requestParameters.labelSelector, requestParameters.fieldSelector, requestParameters.sort, options).then((request) => request(axios, basePath));
+        },
+        /**
+         * Patch security.halo.run/v1alpha1/PersonalAccessToken
+         * @param {SecurityHaloRunV1alpha1PersonalAccessTokenApiPatchSecurityHaloRunV1alpha1PersonalAccessTokenRequest} requestParameters Request parameters.
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        patchSecurityHaloRunV1alpha1PersonalAccessToken(requestParameters: SecurityHaloRunV1alpha1PersonalAccessTokenApiPatchSecurityHaloRunV1alpha1PersonalAccessTokenRequest, options?: RawAxiosRequestConfig): AxiosPromise<PersonalAccessToken> {
+            return localVarFp.patchSecurityHaloRunV1alpha1PersonalAccessToken(requestParameters.name, requestParameters.jsonPatchInner, options).then((request) => request(axios, basePath));
         },
         /**
          * Update security.halo.run/v1alpha1/PersonalAccessToken
@@ -479,6 +548,27 @@ export interface SecurityHaloRunV1alpha1PersonalAccessTokenApiListSecurityHaloRu
 }
 
 /**
+ * Request parameters for patchSecurityHaloRunV1alpha1PersonalAccessToken operation in SecurityHaloRunV1alpha1PersonalAccessTokenApi.
+ * @export
+ * @interface SecurityHaloRunV1alpha1PersonalAccessTokenApiPatchSecurityHaloRunV1alpha1PersonalAccessTokenRequest
+ */
+export interface SecurityHaloRunV1alpha1PersonalAccessTokenApiPatchSecurityHaloRunV1alpha1PersonalAccessTokenRequest {
+    /**
+     * Name of personalaccesstoken
+     * @type {string}
+     * @memberof SecurityHaloRunV1alpha1PersonalAccessTokenApiPatchSecurityHaloRunV1alpha1PersonalAccessToken
+     */
+    readonly name: string
+
+    /**
+     * 
+     * @type {Array<JsonPatchInner>}
+     * @memberof SecurityHaloRunV1alpha1PersonalAccessTokenApiPatchSecurityHaloRunV1alpha1PersonalAccessToken
+     */
+    readonly jsonPatchInner?: Array<JsonPatchInner>
+}
+
+/**
  * Request parameters for updateSecurityHaloRunV1alpha1PersonalAccessToken operation in SecurityHaloRunV1alpha1PersonalAccessTokenApi.
  * @export
  * @interface SecurityHaloRunV1alpha1PersonalAccessTokenApiUpdateSecurityHaloRunV1alpha1PersonalAccessTokenRequest
@@ -548,6 +638,17 @@ export class SecurityHaloRunV1alpha1PersonalAccessTokenApi extends BaseAPI {
      */
     public listSecurityHaloRunV1alpha1PersonalAccessToken(requestParameters: SecurityHaloRunV1alpha1PersonalAccessTokenApiListSecurityHaloRunV1alpha1PersonalAccessTokenRequest = {}, options?: RawAxiosRequestConfig) {
         return SecurityHaloRunV1alpha1PersonalAccessTokenApiFp(this.configuration).listSecurityHaloRunV1alpha1PersonalAccessToken(requestParameters.page, requestParameters.size, requestParameters.labelSelector, requestParameters.fieldSelector, requestParameters.sort, options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
+     * Patch security.halo.run/v1alpha1/PersonalAccessToken
+     * @param {SecurityHaloRunV1alpha1PersonalAccessTokenApiPatchSecurityHaloRunV1alpha1PersonalAccessTokenRequest} requestParameters Request parameters.
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof SecurityHaloRunV1alpha1PersonalAccessTokenApi
+     */
+    public patchSecurityHaloRunV1alpha1PersonalAccessToken(requestParameters: SecurityHaloRunV1alpha1PersonalAccessTokenApiPatchSecurityHaloRunV1alpha1PersonalAccessTokenRequest, options?: RawAxiosRequestConfig) {
+        return SecurityHaloRunV1alpha1PersonalAccessTokenApiFp(this.configuration).patchSecurityHaloRunV1alpha1PersonalAccessToken(requestParameters.name, requestParameters.jsonPatchInner, options).then((request) => request(this.axios, this.basePath));
     }
 
     /**

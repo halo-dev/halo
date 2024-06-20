@@ -22,6 +22,8 @@ import { DUMMY_BASE_URL, assertParamExists, setApiKeyToObject, setBasicAuthToObj
 // @ts-ignore
 import { BASE_PATH, COLLECTION_FORMATS, RequestArgs, BaseAPI, RequiredError, operationServerMap } from '../base';
 // @ts-ignore
+import { JsonPatchInner } from '../models';
+// @ts-ignore
 import { Secret } from '../models';
 // @ts-ignore
 import { SecretList } from '../models';
@@ -217,6 +219,51 @@ export const V1alpha1SecretApiAxiosParamCreator = function (configuration?: Conf
             };
         },
         /**
+         * Patch v1alpha1/Secret
+         * @param {string} name Name of secret
+         * @param {Array<JsonPatchInner>} [jsonPatchInner] 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        patchV1alpha1Secret: async (name: string, jsonPatchInner?: Array<JsonPatchInner>, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+            // verify required parameter 'name' is not null or undefined
+            assertParamExists('patchV1alpha1Secret', 'name', name)
+            const localVarPath = `/api/v1alpha1/secrets/{name}`
+                .replace(`{${"name"}}`, encodeURIComponent(String(name)));
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'PATCH', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+            // authentication BasicAuth required
+            // http basic authentication required
+            setBasicAuthToObject(localVarRequestOptions, configuration)
+
+            // authentication BearerAuth required
+            // http bearer authentication required
+            await setBearerAuthToObject(localVarHeaderParameter, configuration)
+
+
+    
+            localVarHeaderParameter['Content-Type'] = 'application/json-patch+json';
+
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+            localVarRequestOptions.data = serializeDataIfNeeded(jsonPatchInner, localVarRequestOptions, configuration)
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+        /**
          * Update v1alpha1/Secret
          * @param {string} name Name of secret
          * @param {Secret} [secret] Updated secret
@@ -324,6 +371,19 @@ export const V1alpha1SecretApiFp = function(configuration?: Configuration) {
             return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
         },
         /**
+         * Patch v1alpha1/Secret
+         * @param {string} name Name of secret
+         * @param {Array<JsonPatchInner>} [jsonPatchInner] 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async patchV1alpha1Secret(name: string, jsonPatchInner?: Array<JsonPatchInner>, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<Secret>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.patchV1alpha1Secret(name, jsonPatchInner, options);
+            const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
+            const localVarOperationServerBasePath = operationServerMap['V1alpha1SecretApi.patchV1alpha1Secret']?.[localVarOperationServerIndex]?.url;
+            return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
+        },
+        /**
          * Update v1alpha1/Secret
          * @param {string} name Name of secret
          * @param {Secret} [secret] Updated secret
@@ -381,6 +441,15 @@ export const V1alpha1SecretApiFactory = function (configuration?: Configuration,
          */
         listV1alpha1Secret(requestParameters: V1alpha1SecretApiListV1alpha1SecretRequest = {}, options?: RawAxiosRequestConfig): AxiosPromise<SecretList> {
             return localVarFp.listV1alpha1Secret(requestParameters.page, requestParameters.size, requestParameters.labelSelector, requestParameters.fieldSelector, requestParameters.sort, options).then((request) => request(axios, basePath));
+        },
+        /**
+         * Patch v1alpha1/Secret
+         * @param {V1alpha1SecretApiPatchV1alpha1SecretRequest} requestParameters Request parameters.
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        patchV1alpha1Secret(requestParameters: V1alpha1SecretApiPatchV1alpha1SecretRequest, options?: RawAxiosRequestConfig): AxiosPromise<Secret> {
+            return localVarFp.patchV1alpha1Secret(requestParameters.name, requestParameters.jsonPatchInner, options).then((request) => request(axios, basePath));
         },
         /**
          * Update v1alpha1/Secret
@@ -479,6 +548,27 @@ export interface V1alpha1SecretApiListV1alpha1SecretRequest {
 }
 
 /**
+ * Request parameters for patchV1alpha1Secret operation in V1alpha1SecretApi.
+ * @export
+ * @interface V1alpha1SecretApiPatchV1alpha1SecretRequest
+ */
+export interface V1alpha1SecretApiPatchV1alpha1SecretRequest {
+    /**
+     * Name of secret
+     * @type {string}
+     * @memberof V1alpha1SecretApiPatchV1alpha1Secret
+     */
+    readonly name: string
+
+    /**
+     * 
+     * @type {Array<JsonPatchInner>}
+     * @memberof V1alpha1SecretApiPatchV1alpha1Secret
+     */
+    readonly jsonPatchInner?: Array<JsonPatchInner>
+}
+
+/**
  * Request parameters for updateV1alpha1Secret operation in V1alpha1SecretApi.
  * @export
  * @interface V1alpha1SecretApiUpdateV1alpha1SecretRequest
@@ -548,6 +638,17 @@ export class V1alpha1SecretApi extends BaseAPI {
      */
     public listV1alpha1Secret(requestParameters: V1alpha1SecretApiListV1alpha1SecretRequest = {}, options?: RawAxiosRequestConfig) {
         return V1alpha1SecretApiFp(this.configuration).listV1alpha1Secret(requestParameters.page, requestParameters.size, requestParameters.labelSelector, requestParameters.fieldSelector, requestParameters.sort, options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
+     * Patch v1alpha1/Secret
+     * @param {V1alpha1SecretApiPatchV1alpha1SecretRequest} requestParameters Request parameters.
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof V1alpha1SecretApi
+     */
+    public patchV1alpha1Secret(requestParameters: V1alpha1SecretApiPatchV1alpha1SecretRequest, options?: RawAxiosRequestConfig) {
+        return V1alpha1SecretApiFp(this.configuration).patchV1alpha1Secret(requestParameters.name, requestParameters.jsonPatchInner, options).then((request) => request(this.axios, this.basePath));
     }
 
     /**

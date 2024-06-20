@@ -25,6 +25,8 @@ import { BASE_PATH, COLLECTION_FORMATS, RequestArgs, BaseAPI, RequiredError, ope
 import { Group } from '../models';
 // @ts-ignore
 import { GroupList } from '../models';
+// @ts-ignore
+import { JsonPatchInner } from '../models';
 /**
  * StorageHaloRunV1alpha1GroupApi - axios parameter creator
  * @export
@@ -217,6 +219,51 @@ export const StorageHaloRunV1alpha1GroupApiAxiosParamCreator = function (configu
             };
         },
         /**
+         * Patch storage.halo.run/v1alpha1/Group
+         * @param {string} name Name of group
+         * @param {Array<JsonPatchInner>} [jsonPatchInner] 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        patchStorageHaloRunV1alpha1Group: async (name: string, jsonPatchInner?: Array<JsonPatchInner>, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+            // verify required parameter 'name' is not null or undefined
+            assertParamExists('patchStorageHaloRunV1alpha1Group', 'name', name)
+            const localVarPath = `/apis/storage.halo.run/v1alpha1/groups/{name}`
+                .replace(`{${"name"}}`, encodeURIComponent(String(name)));
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'PATCH', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+            // authentication BasicAuth required
+            // http basic authentication required
+            setBasicAuthToObject(localVarRequestOptions, configuration)
+
+            // authentication BearerAuth required
+            // http bearer authentication required
+            await setBearerAuthToObject(localVarHeaderParameter, configuration)
+
+
+    
+            localVarHeaderParameter['Content-Type'] = 'application/json-patch+json';
+
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+            localVarRequestOptions.data = serializeDataIfNeeded(jsonPatchInner, localVarRequestOptions, configuration)
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+        /**
          * Update storage.halo.run/v1alpha1/Group
          * @param {string} name Name of group
          * @param {Group} [group] Updated group
@@ -324,6 +371,19 @@ export const StorageHaloRunV1alpha1GroupApiFp = function(configuration?: Configu
             return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
         },
         /**
+         * Patch storage.halo.run/v1alpha1/Group
+         * @param {string} name Name of group
+         * @param {Array<JsonPatchInner>} [jsonPatchInner] 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async patchStorageHaloRunV1alpha1Group(name: string, jsonPatchInner?: Array<JsonPatchInner>, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<Group>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.patchStorageHaloRunV1alpha1Group(name, jsonPatchInner, options);
+            const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
+            const localVarOperationServerBasePath = operationServerMap['StorageHaloRunV1alpha1GroupApi.patchStorageHaloRunV1alpha1Group']?.[localVarOperationServerIndex]?.url;
+            return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
+        },
+        /**
          * Update storage.halo.run/v1alpha1/Group
          * @param {string} name Name of group
          * @param {Group} [group] Updated group
@@ -381,6 +441,15 @@ export const StorageHaloRunV1alpha1GroupApiFactory = function (configuration?: C
          */
         listStorageHaloRunV1alpha1Group(requestParameters: StorageHaloRunV1alpha1GroupApiListStorageHaloRunV1alpha1GroupRequest = {}, options?: RawAxiosRequestConfig): AxiosPromise<GroupList> {
             return localVarFp.listStorageHaloRunV1alpha1Group(requestParameters.page, requestParameters.size, requestParameters.labelSelector, requestParameters.fieldSelector, requestParameters.sort, options).then((request) => request(axios, basePath));
+        },
+        /**
+         * Patch storage.halo.run/v1alpha1/Group
+         * @param {StorageHaloRunV1alpha1GroupApiPatchStorageHaloRunV1alpha1GroupRequest} requestParameters Request parameters.
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        patchStorageHaloRunV1alpha1Group(requestParameters: StorageHaloRunV1alpha1GroupApiPatchStorageHaloRunV1alpha1GroupRequest, options?: RawAxiosRequestConfig): AxiosPromise<Group> {
+            return localVarFp.patchStorageHaloRunV1alpha1Group(requestParameters.name, requestParameters.jsonPatchInner, options).then((request) => request(axios, basePath));
         },
         /**
          * Update storage.halo.run/v1alpha1/Group
@@ -479,6 +548,27 @@ export interface StorageHaloRunV1alpha1GroupApiListStorageHaloRunV1alpha1GroupRe
 }
 
 /**
+ * Request parameters for patchStorageHaloRunV1alpha1Group operation in StorageHaloRunV1alpha1GroupApi.
+ * @export
+ * @interface StorageHaloRunV1alpha1GroupApiPatchStorageHaloRunV1alpha1GroupRequest
+ */
+export interface StorageHaloRunV1alpha1GroupApiPatchStorageHaloRunV1alpha1GroupRequest {
+    /**
+     * Name of group
+     * @type {string}
+     * @memberof StorageHaloRunV1alpha1GroupApiPatchStorageHaloRunV1alpha1Group
+     */
+    readonly name: string
+
+    /**
+     * 
+     * @type {Array<JsonPatchInner>}
+     * @memberof StorageHaloRunV1alpha1GroupApiPatchStorageHaloRunV1alpha1Group
+     */
+    readonly jsonPatchInner?: Array<JsonPatchInner>
+}
+
+/**
  * Request parameters for updateStorageHaloRunV1alpha1Group operation in StorageHaloRunV1alpha1GroupApi.
  * @export
  * @interface StorageHaloRunV1alpha1GroupApiUpdateStorageHaloRunV1alpha1GroupRequest
@@ -548,6 +638,17 @@ export class StorageHaloRunV1alpha1GroupApi extends BaseAPI {
      */
     public listStorageHaloRunV1alpha1Group(requestParameters: StorageHaloRunV1alpha1GroupApiListStorageHaloRunV1alpha1GroupRequest = {}, options?: RawAxiosRequestConfig) {
         return StorageHaloRunV1alpha1GroupApiFp(this.configuration).listStorageHaloRunV1alpha1Group(requestParameters.page, requestParameters.size, requestParameters.labelSelector, requestParameters.fieldSelector, requestParameters.sort, options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
+     * Patch storage.halo.run/v1alpha1/Group
+     * @param {StorageHaloRunV1alpha1GroupApiPatchStorageHaloRunV1alpha1GroupRequest} requestParameters Request parameters.
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof StorageHaloRunV1alpha1GroupApi
+     */
+    public patchStorageHaloRunV1alpha1Group(requestParameters: StorageHaloRunV1alpha1GroupApiPatchStorageHaloRunV1alpha1GroupRequest, options?: RawAxiosRequestConfig) {
+        return StorageHaloRunV1alpha1GroupApiFp(this.configuration).patchStorageHaloRunV1alpha1Group(requestParameters.name, requestParameters.jsonPatchInner, options).then((request) => request(this.axios, this.basePath));
     }
 
     /**

@@ -25,6 +25,8 @@ import { BASE_PATH, COLLECTION_FORMATS, RequestArgs, BaseAPI, RequiredError, ope
 import { Category } from '../models';
 // @ts-ignore
 import { CategoryList } from '../models';
+// @ts-ignore
+import { JsonPatchInner } from '../models';
 /**
  * ContentHaloRunV1alpha1CategoryApi - axios parameter creator
  * @export
@@ -217,6 +219,51 @@ export const ContentHaloRunV1alpha1CategoryApiAxiosParamCreator = function (conf
             };
         },
         /**
+         * Patch content.halo.run/v1alpha1/Category
+         * @param {string} name Name of category
+         * @param {Array<JsonPatchInner>} [jsonPatchInner] 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        patchContentHaloRunV1alpha1Category: async (name: string, jsonPatchInner?: Array<JsonPatchInner>, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+            // verify required parameter 'name' is not null or undefined
+            assertParamExists('patchContentHaloRunV1alpha1Category', 'name', name)
+            const localVarPath = `/apis/content.halo.run/v1alpha1/categories/{name}`
+                .replace(`{${"name"}}`, encodeURIComponent(String(name)));
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'PATCH', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+            // authentication BasicAuth required
+            // http basic authentication required
+            setBasicAuthToObject(localVarRequestOptions, configuration)
+
+            // authentication BearerAuth required
+            // http bearer authentication required
+            await setBearerAuthToObject(localVarHeaderParameter, configuration)
+
+
+    
+            localVarHeaderParameter['Content-Type'] = 'application/json-patch+json';
+
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+            localVarRequestOptions.data = serializeDataIfNeeded(jsonPatchInner, localVarRequestOptions, configuration)
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+        /**
          * Update content.halo.run/v1alpha1/Category
          * @param {string} name Name of category
          * @param {Category} [category] Updated category
@@ -324,6 +371,19 @@ export const ContentHaloRunV1alpha1CategoryApiFp = function(configuration?: Conf
             return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
         },
         /**
+         * Patch content.halo.run/v1alpha1/Category
+         * @param {string} name Name of category
+         * @param {Array<JsonPatchInner>} [jsonPatchInner] 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async patchContentHaloRunV1alpha1Category(name: string, jsonPatchInner?: Array<JsonPatchInner>, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<Category>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.patchContentHaloRunV1alpha1Category(name, jsonPatchInner, options);
+            const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
+            const localVarOperationServerBasePath = operationServerMap['ContentHaloRunV1alpha1CategoryApi.patchContentHaloRunV1alpha1Category']?.[localVarOperationServerIndex]?.url;
+            return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
+        },
+        /**
          * Update content.halo.run/v1alpha1/Category
          * @param {string} name Name of category
          * @param {Category} [category] Updated category
@@ -381,6 +441,15 @@ export const ContentHaloRunV1alpha1CategoryApiFactory = function (configuration?
          */
         listContentHaloRunV1alpha1Category(requestParameters: ContentHaloRunV1alpha1CategoryApiListContentHaloRunV1alpha1CategoryRequest = {}, options?: RawAxiosRequestConfig): AxiosPromise<CategoryList> {
             return localVarFp.listContentHaloRunV1alpha1Category(requestParameters.page, requestParameters.size, requestParameters.labelSelector, requestParameters.fieldSelector, requestParameters.sort, options).then((request) => request(axios, basePath));
+        },
+        /**
+         * Patch content.halo.run/v1alpha1/Category
+         * @param {ContentHaloRunV1alpha1CategoryApiPatchContentHaloRunV1alpha1CategoryRequest} requestParameters Request parameters.
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        patchContentHaloRunV1alpha1Category(requestParameters: ContentHaloRunV1alpha1CategoryApiPatchContentHaloRunV1alpha1CategoryRequest, options?: RawAxiosRequestConfig): AxiosPromise<Category> {
+            return localVarFp.patchContentHaloRunV1alpha1Category(requestParameters.name, requestParameters.jsonPatchInner, options).then((request) => request(axios, basePath));
         },
         /**
          * Update content.halo.run/v1alpha1/Category
@@ -479,6 +548,27 @@ export interface ContentHaloRunV1alpha1CategoryApiListContentHaloRunV1alpha1Cate
 }
 
 /**
+ * Request parameters for patchContentHaloRunV1alpha1Category operation in ContentHaloRunV1alpha1CategoryApi.
+ * @export
+ * @interface ContentHaloRunV1alpha1CategoryApiPatchContentHaloRunV1alpha1CategoryRequest
+ */
+export interface ContentHaloRunV1alpha1CategoryApiPatchContentHaloRunV1alpha1CategoryRequest {
+    /**
+     * Name of category
+     * @type {string}
+     * @memberof ContentHaloRunV1alpha1CategoryApiPatchContentHaloRunV1alpha1Category
+     */
+    readonly name: string
+
+    /**
+     * 
+     * @type {Array<JsonPatchInner>}
+     * @memberof ContentHaloRunV1alpha1CategoryApiPatchContentHaloRunV1alpha1Category
+     */
+    readonly jsonPatchInner?: Array<JsonPatchInner>
+}
+
+/**
  * Request parameters for updateContentHaloRunV1alpha1Category operation in ContentHaloRunV1alpha1CategoryApi.
  * @export
  * @interface ContentHaloRunV1alpha1CategoryApiUpdateContentHaloRunV1alpha1CategoryRequest
@@ -548,6 +638,17 @@ export class ContentHaloRunV1alpha1CategoryApi extends BaseAPI {
      */
     public listContentHaloRunV1alpha1Category(requestParameters: ContentHaloRunV1alpha1CategoryApiListContentHaloRunV1alpha1CategoryRequest = {}, options?: RawAxiosRequestConfig) {
         return ContentHaloRunV1alpha1CategoryApiFp(this.configuration).listContentHaloRunV1alpha1Category(requestParameters.page, requestParameters.size, requestParameters.labelSelector, requestParameters.fieldSelector, requestParameters.sort, options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
+     * Patch content.halo.run/v1alpha1/Category
+     * @param {ContentHaloRunV1alpha1CategoryApiPatchContentHaloRunV1alpha1CategoryRequest} requestParameters Request parameters.
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof ContentHaloRunV1alpha1CategoryApi
+     */
+    public patchContentHaloRunV1alpha1Category(requestParameters: ContentHaloRunV1alpha1CategoryApiPatchContentHaloRunV1alpha1CategoryRequest, options?: RawAxiosRequestConfig) {
+        return ContentHaloRunV1alpha1CategoryApiFp(this.configuration).patchContentHaloRunV1alpha1Category(requestParameters.name, requestParameters.jsonPatchInner, options).then((request) => request(this.axios, this.basePath));
     }
 
     /**

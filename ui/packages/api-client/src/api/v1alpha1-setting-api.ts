@@ -22,6 +22,8 @@ import { DUMMY_BASE_URL, assertParamExists, setApiKeyToObject, setBasicAuthToObj
 // @ts-ignore
 import { BASE_PATH, COLLECTION_FORMATS, RequestArgs, BaseAPI, RequiredError, operationServerMap } from '../base';
 // @ts-ignore
+import { JsonPatchInner } from '../models';
+// @ts-ignore
 import { Setting } from '../models';
 // @ts-ignore
 import { SettingList } from '../models';
@@ -217,6 +219,51 @@ export const V1alpha1SettingApiAxiosParamCreator = function (configuration?: Con
             };
         },
         /**
+         * Patch v1alpha1/Setting
+         * @param {string} name Name of setting
+         * @param {Array<JsonPatchInner>} [jsonPatchInner] 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        patchV1alpha1Setting: async (name: string, jsonPatchInner?: Array<JsonPatchInner>, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+            // verify required parameter 'name' is not null or undefined
+            assertParamExists('patchV1alpha1Setting', 'name', name)
+            const localVarPath = `/api/v1alpha1/settings/{name}`
+                .replace(`{${"name"}}`, encodeURIComponent(String(name)));
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'PATCH', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+            // authentication BasicAuth required
+            // http basic authentication required
+            setBasicAuthToObject(localVarRequestOptions, configuration)
+
+            // authentication BearerAuth required
+            // http bearer authentication required
+            await setBearerAuthToObject(localVarHeaderParameter, configuration)
+
+
+    
+            localVarHeaderParameter['Content-Type'] = 'application/json-patch+json';
+
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+            localVarRequestOptions.data = serializeDataIfNeeded(jsonPatchInner, localVarRequestOptions, configuration)
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+        /**
          * Update v1alpha1/Setting
          * @param {string} name Name of setting
          * @param {Setting} [setting] Updated setting
@@ -324,6 +371,19 @@ export const V1alpha1SettingApiFp = function(configuration?: Configuration) {
             return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
         },
         /**
+         * Patch v1alpha1/Setting
+         * @param {string} name Name of setting
+         * @param {Array<JsonPatchInner>} [jsonPatchInner] 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async patchV1alpha1Setting(name: string, jsonPatchInner?: Array<JsonPatchInner>, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<Setting>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.patchV1alpha1Setting(name, jsonPatchInner, options);
+            const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
+            const localVarOperationServerBasePath = operationServerMap['V1alpha1SettingApi.patchV1alpha1Setting']?.[localVarOperationServerIndex]?.url;
+            return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
+        },
+        /**
          * Update v1alpha1/Setting
          * @param {string} name Name of setting
          * @param {Setting} [setting] Updated setting
@@ -381,6 +441,15 @@ export const V1alpha1SettingApiFactory = function (configuration?: Configuration
          */
         listV1alpha1Setting(requestParameters: V1alpha1SettingApiListV1alpha1SettingRequest = {}, options?: RawAxiosRequestConfig): AxiosPromise<SettingList> {
             return localVarFp.listV1alpha1Setting(requestParameters.page, requestParameters.size, requestParameters.labelSelector, requestParameters.fieldSelector, requestParameters.sort, options).then((request) => request(axios, basePath));
+        },
+        /**
+         * Patch v1alpha1/Setting
+         * @param {V1alpha1SettingApiPatchV1alpha1SettingRequest} requestParameters Request parameters.
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        patchV1alpha1Setting(requestParameters: V1alpha1SettingApiPatchV1alpha1SettingRequest, options?: RawAxiosRequestConfig): AxiosPromise<Setting> {
+            return localVarFp.patchV1alpha1Setting(requestParameters.name, requestParameters.jsonPatchInner, options).then((request) => request(axios, basePath));
         },
         /**
          * Update v1alpha1/Setting
@@ -479,6 +548,27 @@ export interface V1alpha1SettingApiListV1alpha1SettingRequest {
 }
 
 /**
+ * Request parameters for patchV1alpha1Setting operation in V1alpha1SettingApi.
+ * @export
+ * @interface V1alpha1SettingApiPatchV1alpha1SettingRequest
+ */
+export interface V1alpha1SettingApiPatchV1alpha1SettingRequest {
+    /**
+     * Name of setting
+     * @type {string}
+     * @memberof V1alpha1SettingApiPatchV1alpha1Setting
+     */
+    readonly name: string
+
+    /**
+     * 
+     * @type {Array<JsonPatchInner>}
+     * @memberof V1alpha1SettingApiPatchV1alpha1Setting
+     */
+    readonly jsonPatchInner?: Array<JsonPatchInner>
+}
+
+/**
  * Request parameters for updateV1alpha1Setting operation in V1alpha1SettingApi.
  * @export
  * @interface V1alpha1SettingApiUpdateV1alpha1SettingRequest
@@ -548,6 +638,17 @@ export class V1alpha1SettingApi extends BaseAPI {
      */
     public listV1alpha1Setting(requestParameters: V1alpha1SettingApiListV1alpha1SettingRequest = {}, options?: RawAxiosRequestConfig) {
         return V1alpha1SettingApiFp(this.configuration).listV1alpha1Setting(requestParameters.page, requestParameters.size, requestParameters.labelSelector, requestParameters.fieldSelector, requestParameters.sort, options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
+     * Patch v1alpha1/Setting
+     * @param {V1alpha1SettingApiPatchV1alpha1SettingRequest} requestParameters Request parameters.
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof V1alpha1SettingApi
+     */
+    public patchV1alpha1Setting(requestParameters: V1alpha1SettingApiPatchV1alpha1SettingRequest, options?: RawAxiosRequestConfig) {
+        return V1alpha1SettingApiFp(this.configuration).patchV1alpha1Setting(requestParameters.name, requestParameters.jsonPatchInner, options).then((request) => request(this.axios, this.basePath));
     }
 
     /**

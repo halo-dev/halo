@@ -22,6 +22,8 @@ import { DUMMY_BASE_URL, assertParamExists, setApiKeyToObject, setBasicAuthToObj
 // @ts-ignore
 import { BASE_PATH, COLLECTION_FORMATS, RequestArgs, BaseAPI, RequiredError, operationServerMap } from '../base';
 // @ts-ignore
+import { JsonPatchInner } from '../models';
+// @ts-ignore
 import { NotifierDescriptor } from '../models';
 // @ts-ignore
 import { NotifierDescriptorList } from '../models';
@@ -217,6 +219,51 @@ export const NotificationHaloRunV1alpha1NotifierDescriptorApiAxiosParamCreator =
             };
         },
         /**
+         * Patch notification.halo.run/v1alpha1/NotifierDescriptor
+         * @param {string} name Name of notifierDescriptor
+         * @param {Array<JsonPatchInner>} [jsonPatchInner] 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        patchNotificationHaloRunV1alpha1NotifierDescriptor: async (name: string, jsonPatchInner?: Array<JsonPatchInner>, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+            // verify required parameter 'name' is not null or undefined
+            assertParamExists('patchNotificationHaloRunV1alpha1NotifierDescriptor', 'name', name)
+            const localVarPath = `/apis/notification.halo.run/v1alpha1/notifierDescriptors/{name}`
+                .replace(`{${"name"}}`, encodeURIComponent(String(name)));
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'PATCH', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+            // authentication BasicAuth required
+            // http basic authentication required
+            setBasicAuthToObject(localVarRequestOptions, configuration)
+
+            // authentication BearerAuth required
+            // http bearer authentication required
+            await setBearerAuthToObject(localVarHeaderParameter, configuration)
+
+
+    
+            localVarHeaderParameter['Content-Type'] = 'application/json-patch+json';
+
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+            localVarRequestOptions.data = serializeDataIfNeeded(jsonPatchInner, localVarRequestOptions, configuration)
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+        /**
          * Update notification.halo.run/v1alpha1/NotifierDescriptor
          * @param {string} name Name of notifierDescriptor
          * @param {NotifierDescriptor} [notifierDescriptor] Updated notifierDescriptor
@@ -324,6 +371,19 @@ export const NotificationHaloRunV1alpha1NotifierDescriptorApiFp = function(confi
             return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
         },
         /**
+         * Patch notification.halo.run/v1alpha1/NotifierDescriptor
+         * @param {string} name Name of notifierDescriptor
+         * @param {Array<JsonPatchInner>} [jsonPatchInner] 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async patchNotificationHaloRunV1alpha1NotifierDescriptor(name: string, jsonPatchInner?: Array<JsonPatchInner>, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<NotifierDescriptor>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.patchNotificationHaloRunV1alpha1NotifierDescriptor(name, jsonPatchInner, options);
+            const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
+            const localVarOperationServerBasePath = operationServerMap['NotificationHaloRunV1alpha1NotifierDescriptorApi.patchNotificationHaloRunV1alpha1NotifierDescriptor']?.[localVarOperationServerIndex]?.url;
+            return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
+        },
+        /**
          * Update notification.halo.run/v1alpha1/NotifierDescriptor
          * @param {string} name Name of notifierDescriptor
          * @param {NotifierDescriptor} [notifierDescriptor] Updated notifierDescriptor
@@ -381,6 +441,15 @@ export const NotificationHaloRunV1alpha1NotifierDescriptorApiFactory = function 
          */
         listNotificationHaloRunV1alpha1NotifierDescriptor(requestParameters: NotificationHaloRunV1alpha1NotifierDescriptorApiListNotificationHaloRunV1alpha1NotifierDescriptorRequest = {}, options?: RawAxiosRequestConfig): AxiosPromise<NotifierDescriptorList> {
             return localVarFp.listNotificationHaloRunV1alpha1NotifierDescriptor(requestParameters.page, requestParameters.size, requestParameters.labelSelector, requestParameters.fieldSelector, requestParameters.sort, options).then((request) => request(axios, basePath));
+        },
+        /**
+         * Patch notification.halo.run/v1alpha1/NotifierDescriptor
+         * @param {NotificationHaloRunV1alpha1NotifierDescriptorApiPatchNotificationHaloRunV1alpha1NotifierDescriptorRequest} requestParameters Request parameters.
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        patchNotificationHaloRunV1alpha1NotifierDescriptor(requestParameters: NotificationHaloRunV1alpha1NotifierDescriptorApiPatchNotificationHaloRunV1alpha1NotifierDescriptorRequest, options?: RawAxiosRequestConfig): AxiosPromise<NotifierDescriptor> {
+            return localVarFp.patchNotificationHaloRunV1alpha1NotifierDescriptor(requestParameters.name, requestParameters.jsonPatchInner, options).then((request) => request(axios, basePath));
         },
         /**
          * Update notification.halo.run/v1alpha1/NotifierDescriptor
@@ -479,6 +548,27 @@ export interface NotificationHaloRunV1alpha1NotifierDescriptorApiListNotificatio
 }
 
 /**
+ * Request parameters for patchNotificationHaloRunV1alpha1NotifierDescriptor operation in NotificationHaloRunV1alpha1NotifierDescriptorApi.
+ * @export
+ * @interface NotificationHaloRunV1alpha1NotifierDescriptorApiPatchNotificationHaloRunV1alpha1NotifierDescriptorRequest
+ */
+export interface NotificationHaloRunV1alpha1NotifierDescriptorApiPatchNotificationHaloRunV1alpha1NotifierDescriptorRequest {
+    /**
+     * Name of notifierDescriptor
+     * @type {string}
+     * @memberof NotificationHaloRunV1alpha1NotifierDescriptorApiPatchNotificationHaloRunV1alpha1NotifierDescriptor
+     */
+    readonly name: string
+
+    /**
+     * 
+     * @type {Array<JsonPatchInner>}
+     * @memberof NotificationHaloRunV1alpha1NotifierDescriptorApiPatchNotificationHaloRunV1alpha1NotifierDescriptor
+     */
+    readonly jsonPatchInner?: Array<JsonPatchInner>
+}
+
+/**
  * Request parameters for updateNotificationHaloRunV1alpha1NotifierDescriptor operation in NotificationHaloRunV1alpha1NotifierDescriptorApi.
  * @export
  * @interface NotificationHaloRunV1alpha1NotifierDescriptorApiUpdateNotificationHaloRunV1alpha1NotifierDescriptorRequest
@@ -548,6 +638,17 @@ export class NotificationHaloRunV1alpha1NotifierDescriptorApi extends BaseAPI {
      */
     public listNotificationHaloRunV1alpha1NotifierDescriptor(requestParameters: NotificationHaloRunV1alpha1NotifierDescriptorApiListNotificationHaloRunV1alpha1NotifierDescriptorRequest = {}, options?: RawAxiosRequestConfig) {
         return NotificationHaloRunV1alpha1NotifierDescriptorApiFp(this.configuration).listNotificationHaloRunV1alpha1NotifierDescriptor(requestParameters.page, requestParameters.size, requestParameters.labelSelector, requestParameters.fieldSelector, requestParameters.sort, options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
+     * Patch notification.halo.run/v1alpha1/NotifierDescriptor
+     * @param {NotificationHaloRunV1alpha1NotifierDescriptorApiPatchNotificationHaloRunV1alpha1NotifierDescriptorRequest} requestParameters Request parameters.
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof NotificationHaloRunV1alpha1NotifierDescriptorApi
+     */
+    public patchNotificationHaloRunV1alpha1NotifierDescriptor(requestParameters: NotificationHaloRunV1alpha1NotifierDescriptorApiPatchNotificationHaloRunV1alpha1NotifierDescriptorRequest, options?: RawAxiosRequestConfig) {
+        return NotificationHaloRunV1alpha1NotifierDescriptorApiFp(this.configuration).patchNotificationHaloRunV1alpha1NotifierDescriptor(requestParameters.name, requestParameters.jsonPatchInner, options).then((request) => request(this.axios, this.basePath));
     }
 
     /**

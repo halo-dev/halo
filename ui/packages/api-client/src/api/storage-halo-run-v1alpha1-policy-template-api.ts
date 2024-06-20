@@ -22,6 +22,8 @@ import { DUMMY_BASE_URL, assertParamExists, setApiKeyToObject, setBasicAuthToObj
 // @ts-ignore
 import { BASE_PATH, COLLECTION_FORMATS, RequestArgs, BaseAPI, RequiredError, operationServerMap } from '../base';
 // @ts-ignore
+import { JsonPatchInner } from '../models';
+// @ts-ignore
 import { PolicyTemplate } from '../models';
 // @ts-ignore
 import { PolicyTemplateList } from '../models';
@@ -217,6 +219,51 @@ export const StorageHaloRunV1alpha1PolicyTemplateApiAxiosParamCreator = function
             };
         },
         /**
+         * Patch storage.halo.run/v1alpha1/PolicyTemplate
+         * @param {string} name Name of policytemplate
+         * @param {Array<JsonPatchInner>} [jsonPatchInner] 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        patchStorageHaloRunV1alpha1PolicyTemplate: async (name: string, jsonPatchInner?: Array<JsonPatchInner>, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+            // verify required parameter 'name' is not null or undefined
+            assertParamExists('patchStorageHaloRunV1alpha1PolicyTemplate', 'name', name)
+            const localVarPath = `/apis/storage.halo.run/v1alpha1/policytemplates/{name}`
+                .replace(`{${"name"}}`, encodeURIComponent(String(name)));
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'PATCH', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+            // authentication BasicAuth required
+            // http basic authentication required
+            setBasicAuthToObject(localVarRequestOptions, configuration)
+
+            // authentication BearerAuth required
+            // http bearer authentication required
+            await setBearerAuthToObject(localVarHeaderParameter, configuration)
+
+
+    
+            localVarHeaderParameter['Content-Type'] = 'application/json-patch+json';
+
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+            localVarRequestOptions.data = serializeDataIfNeeded(jsonPatchInner, localVarRequestOptions, configuration)
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+        /**
          * Update storage.halo.run/v1alpha1/PolicyTemplate
          * @param {string} name Name of policytemplate
          * @param {PolicyTemplate} [policyTemplate] Updated policytemplate
@@ -324,6 +371,19 @@ export const StorageHaloRunV1alpha1PolicyTemplateApiFp = function(configuration?
             return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
         },
         /**
+         * Patch storage.halo.run/v1alpha1/PolicyTemplate
+         * @param {string} name Name of policytemplate
+         * @param {Array<JsonPatchInner>} [jsonPatchInner] 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async patchStorageHaloRunV1alpha1PolicyTemplate(name: string, jsonPatchInner?: Array<JsonPatchInner>, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<PolicyTemplate>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.patchStorageHaloRunV1alpha1PolicyTemplate(name, jsonPatchInner, options);
+            const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
+            const localVarOperationServerBasePath = operationServerMap['StorageHaloRunV1alpha1PolicyTemplateApi.patchStorageHaloRunV1alpha1PolicyTemplate']?.[localVarOperationServerIndex]?.url;
+            return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
+        },
+        /**
          * Update storage.halo.run/v1alpha1/PolicyTemplate
          * @param {string} name Name of policytemplate
          * @param {PolicyTemplate} [policyTemplate] Updated policytemplate
@@ -381,6 +441,15 @@ export const StorageHaloRunV1alpha1PolicyTemplateApiFactory = function (configur
          */
         listStorageHaloRunV1alpha1PolicyTemplate(requestParameters: StorageHaloRunV1alpha1PolicyTemplateApiListStorageHaloRunV1alpha1PolicyTemplateRequest = {}, options?: RawAxiosRequestConfig): AxiosPromise<PolicyTemplateList> {
             return localVarFp.listStorageHaloRunV1alpha1PolicyTemplate(requestParameters.page, requestParameters.size, requestParameters.labelSelector, requestParameters.fieldSelector, requestParameters.sort, options).then((request) => request(axios, basePath));
+        },
+        /**
+         * Patch storage.halo.run/v1alpha1/PolicyTemplate
+         * @param {StorageHaloRunV1alpha1PolicyTemplateApiPatchStorageHaloRunV1alpha1PolicyTemplateRequest} requestParameters Request parameters.
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        patchStorageHaloRunV1alpha1PolicyTemplate(requestParameters: StorageHaloRunV1alpha1PolicyTemplateApiPatchStorageHaloRunV1alpha1PolicyTemplateRequest, options?: RawAxiosRequestConfig): AxiosPromise<PolicyTemplate> {
+            return localVarFp.patchStorageHaloRunV1alpha1PolicyTemplate(requestParameters.name, requestParameters.jsonPatchInner, options).then((request) => request(axios, basePath));
         },
         /**
          * Update storage.halo.run/v1alpha1/PolicyTemplate
@@ -479,6 +548,27 @@ export interface StorageHaloRunV1alpha1PolicyTemplateApiListStorageHaloRunV1alph
 }
 
 /**
+ * Request parameters for patchStorageHaloRunV1alpha1PolicyTemplate operation in StorageHaloRunV1alpha1PolicyTemplateApi.
+ * @export
+ * @interface StorageHaloRunV1alpha1PolicyTemplateApiPatchStorageHaloRunV1alpha1PolicyTemplateRequest
+ */
+export interface StorageHaloRunV1alpha1PolicyTemplateApiPatchStorageHaloRunV1alpha1PolicyTemplateRequest {
+    /**
+     * Name of policytemplate
+     * @type {string}
+     * @memberof StorageHaloRunV1alpha1PolicyTemplateApiPatchStorageHaloRunV1alpha1PolicyTemplate
+     */
+    readonly name: string
+
+    /**
+     * 
+     * @type {Array<JsonPatchInner>}
+     * @memberof StorageHaloRunV1alpha1PolicyTemplateApiPatchStorageHaloRunV1alpha1PolicyTemplate
+     */
+    readonly jsonPatchInner?: Array<JsonPatchInner>
+}
+
+/**
  * Request parameters for updateStorageHaloRunV1alpha1PolicyTemplate operation in StorageHaloRunV1alpha1PolicyTemplateApi.
  * @export
  * @interface StorageHaloRunV1alpha1PolicyTemplateApiUpdateStorageHaloRunV1alpha1PolicyTemplateRequest
@@ -548,6 +638,17 @@ export class StorageHaloRunV1alpha1PolicyTemplateApi extends BaseAPI {
      */
     public listStorageHaloRunV1alpha1PolicyTemplate(requestParameters: StorageHaloRunV1alpha1PolicyTemplateApiListStorageHaloRunV1alpha1PolicyTemplateRequest = {}, options?: RawAxiosRequestConfig) {
         return StorageHaloRunV1alpha1PolicyTemplateApiFp(this.configuration).listStorageHaloRunV1alpha1PolicyTemplate(requestParameters.page, requestParameters.size, requestParameters.labelSelector, requestParameters.fieldSelector, requestParameters.sort, options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
+     * Patch storage.halo.run/v1alpha1/PolicyTemplate
+     * @param {StorageHaloRunV1alpha1PolicyTemplateApiPatchStorageHaloRunV1alpha1PolicyTemplateRequest} requestParameters Request parameters.
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof StorageHaloRunV1alpha1PolicyTemplateApi
+     */
+    public patchStorageHaloRunV1alpha1PolicyTemplate(requestParameters: StorageHaloRunV1alpha1PolicyTemplateApiPatchStorageHaloRunV1alpha1PolicyTemplateRequest, options?: RawAxiosRequestConfig) {
+        return StorageHaloRunV1alpha1PolicyTemplateApiFp(this.configuration).patchStorageHaloRunV1alpha1PolicyTemplate(requestParameters.name, requestParameters.jsonPatchInner, options).then((request) => request(this.axios, this.basePath));
     }
 
     /**
