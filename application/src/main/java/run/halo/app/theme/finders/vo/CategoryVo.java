@@ -36,7 +36,7 @@ public class CategoryVo implements ExtensionVoOperator {
             .metadata(category.getMetadata())
             .spec(category.getSpec())
             .status(category.getStatus())
-            .postCount(category.getStatusOrDefault().visiblePostCount)
+            .postCount(category.getStatusOrDefault().getVisiblePostCount())
             .build();
     }
 }

@@ -2,6 +2,7 @@ package run.halo.app.extension.controller;
 
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Sort;
 import run.halo.app.extension.Extension;
 import run.halo.app.extension.ExtensionClient;
 import run.halo.app.extension.ExtensionMatcher;
@@ -58,7 +59,7 @@ public class RequestSynchronizer implements Synchronizer<Request> {
                 listOptions.setFieldSelector(listMatcher.getFieldSelector());
                 listOptions.setLabelSelector(listMatcher.getLabelSelector());
             }
-            indexedQueryEngine.retrieveAll(type, listOptions)
+            indexedQueryEngine.retrieveAll(type, listOptions, Sort.by("metadata.creationTimestamp"))
                 .forEach(name -> watcher.onAdd(new Request(name)));
         }
         client.watch(this.watcher);

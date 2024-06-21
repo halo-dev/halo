@@ -2,6 +2,7 @@ package run.halo.app.extension.index;
 
 import java.util.Iterator;
 import java.util.function.Function;
+import org.springframework.lang.NonNull;
 import run.halo.app.extension.Extension;
 
 /**
@@ -20,7 +21,7 @@ public interface Indexer {
     /**
      * <p>Index the specified {@link Extension} by {@link IndexDescriptor}s.</p>
      * <p>First, the {@link Indexer} will index the {@link Extension} by the
-     * {@link IndexDescriptor}s and record the index entries to {@link IndexerTransaction} and
+     * {@link IndexDescriptor}s and record the index entries to {@code IndexerTransaction} and
      * commit the transaction, if any error occurs, the transaction will be rollback to keep the
      * {@link Indexer} consistent.</p>
      *
@@ -33,7 +34,7 @@ public interface Indexer {
      * <p>Update indexes for the specified {@link Extension} by {@link IndexDescriptor}s.</p>
      * <p>First, the {@link Indexer} will remove the index entries of the {@link Extension} by
      * the old {@link IndexDescriptor}s and reindex the {@link Extension} to generate change logs
-     * to {@link IndexerTransaction} and commit the transaction, if any error occurs, the
+     * to {@code IndexerTransaction} and commit the transaction, if any error occurs, the
      * transaction will be rollback to keep the {@link Indexer} consistent.</p>
      *
      * @param extension the {@link Extension} to be updated
@@ -74,10 +75,20 @@ public interface Indexer {
     void removeIndexRecords(Function<IndexDescriptor, Boolean> matchFn);
 
     /**
+     * <p>Get the {@link IndexEntry} by index name if found and ready.</p>
+     *
+     * @param name an index name
+     * @return the {@link IndexEntry} if found
+     * @throws IllegalArgumentException if the index name is not found or the index is not ready
+     */
+    @NonNull
+    IndexEntry getIndexEntry(String name);
+
+    /**
      * <p>Gets an iterator over all the ready {@link IndexEntry}s, in no particular order.</p>
      *
      * @return an iterator over all the ready {@link IndexEntry}s
-     * @link {@link IndexDescriptor#isReady()}
+     * @see IndexDescriptor#isReady()
      */
     Iterator<IndexEntry> readyIndexesIterator();
 
@@ -85,7 +96,11 @@ public interface Indexer {
      * <p>Gets an iterator over all the {@link IndexEntry}s, in no particular order.</p>
      *
      * @return an iterator over all the {@link IndexEntry}s
-     * @link {@link IndexDescriptor#isReady()}
+     * @see IndexDescriptor#isReady()
      */
     Iterator<IndexEntry> allIndexesIterator();
+
+    void acquireReadLock();
+
+    void releaseReadLock();
 }

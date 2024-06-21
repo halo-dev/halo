@@ -53,6 +53,7 @@ public class CategoryTreeVo implements VisualizableTreeNode<CategoryTreeVo>, Ext
 
     @Override
     public String nodeText() {
-        return String.format("%s (%s)", getSpec().getDisplayName(), getPostCount());
+        return String.format("%s (%s)%s", getSpec().getDisplayName(), getPostCount(),
+            spec.isPreventParentPostCascadeQuery() ? " (Independent)" : "");
     }
 }

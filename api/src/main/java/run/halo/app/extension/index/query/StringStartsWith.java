@@ -1,7 +1,9 @@
 package run.halo.app.extension.index.query;
 
 import com.google.common.collect.Sets;
+import java.util.Map;
 import java.util.NavigableSet;
+import org.apache.commons.lang3.StringUtils;
 
 public class StringStartsWith extends SimpleQuery {
     public StringStartsWith(String fieldName, String value) {
@@ -11,13 +13,24 @@ public class StringStartsWith extends SimpleQuery {
     @Override
     public NavigableSet<String> matches(QueryIndexView indexView) {
         var resultSet = Sets.<String>newTreeSet();
-        var allValues = indexView.getAllValuesForField(fieldName);
+        var indexEntry = indexView.getIndexEntry(fieldName);
 
-        for (String val : allValues) {
-            if (val.startsWith(value)) {
-                resultSet.addAll(indexView.getIdsForFieldValue(fieldName, val));
+        indexEntry.acquireReadLock();
+        try {
+            for (Map.Entry<String, String> entry : indexEntry.entries()) {
+                var fieldValue = entry.getKey();
+                if (StringUtils.startsWith(fieldValue, value)) {
+                    resultSet.add(entry.getValue());
+                }
             }
+            return resultSet;
+        } finally {
+            indexEntry.releaseReadLock();
         }
-        return resultSet;
+    }
+
+    @Override
+    public String toString() {
+        return "startsWith(" + fieldName + ", '" + value + "')";
     }
 }

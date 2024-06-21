@@ -10,7 +10,7 @@ public class IndexDescriptor {
     private final IndexSpec spec;
 
     /**
-     * Record whether the index is ready, managed by {@link IndexBuilder}.
+     * Record whether the index is ready, managed by {@code IndexBuilder}.
      */
     private boolean ready;
 

@@ -3,7 +3,7 @@ package run.halo.app.extension.index;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
+import java.util.NavigableSet;
 import run.halo.app.extension.Metadata;
 
 /**
@@ -34,7 +34,7 @@ import run.halo.app.extension.Metadata;
 public interface IndexEntry {
 
     /**
-     * Acquires the read lock for reading such as {@link #getByIndexKey(String)},
+     * Acquires the read lock for reading such as {@link #getObjectNamesBy(String)},
      * {@link #entries()}, {@link #indexedKeys()}, because the returned result set of these
      * methods is not immutable.
      */
@@ -87,7 +87,7 @@ public interface IndexEntry {
      *
      * @return distinct indexed keys of this entry.
      */
-    Set<String> indexedKeys();
+    NavigableSet<String> indexedKeys();
 
     /**
      * <p>Returns the entries of this entry in order.</p>
@@ -99,19 +99,34 @@ public interface IndexEntry {
     Collection<Map.Entry<String, String>> entries();
 
     /**
-     * Returns the immutable entries of this entry in order, it is safe to modify the returned
-     * result, but extra cost is made.
-     *
-     * @return immutable entries of this entry.
+     * <p>Returns the position of the object name in the indexed attribute value mapping for
+     * sorting.</p>
+     * For example:
+     * <pre>
+     * metadata.name | field1
+     * ------------- | ------
+     * foo           | 1
+     * bar           | 2
+     * baz           | 2
+     * </pre>
+     * "field1" is the indexed attribute, and the position of the object name in the indexed
+     * attribute
+     * value mapping for sorting is:
+     * <pre>
+     * foo -> 0
+     * bar -> 1
+     * baz -> 1
+     * </pre>
+     * "bar" and "baz" have the same value, so they have the same position.
      */
-    Collection<Map.Entry<String, String>> immutableEntries();
+    Map<String, Integer> getIdPositionMap();
 
     /**
      * Returns the object names of this entry in order.
      *
      * @return object names of this entry.
      */
-    List<String> getByIndexKey(String indexKey);
+    List<String> getObjectNamesBy(String indexKey);
 
     void clear();
 }

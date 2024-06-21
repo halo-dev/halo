@@ -3,6 +3,7 @@ package run.halo.app.extension.index.query;
 import com.google.common.collect.Sets;
 import java.util.Collection;
 import java.util.NavigableSet;
+import java.util.stream.Collectors;
 
 public class And extends LogicalQuery {
 
@@ -32,5 +33,11 @@ public class And extends LogicalQuery {
             }
         }
         return resultSet == null ? Sets.newTreeSet() : resultSet;
+    }
+
+    @Override
+    public String toString() {
+        return "(" + childQueries.stream().map(Query::toString)
+            .collect(Collectors.joining(" AND ")) + ")";
     }
 }
