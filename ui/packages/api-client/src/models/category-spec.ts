@@ -52,6 +52,12 @@ export interface CategorySpec {
     'postTemplate'?: string;
     /**
      * 
+     * @type {boolean}
+     * @memberof CategorySpec
+     */
+    'preventParentPostCascadeQuery'?: boolean;
+    /**
+     * 
      * @type {number}
      * @memberof CategorySpec
      */

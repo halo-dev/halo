@@ -3205,6 +3205,14 @@
             "schema": {
               "type": "string"
             }
+          },
+          {
+            "description": "Posts filtered by category including sub-categories.",
+            "in": "query",
+            "name": "categoryWithChildren",
+            "schema": {
+              "type": "string"
+            }
           }
         ],
         "responses": {
@@ -13989,6 +13997,14 @@
             "schema": {
               "type": "string"
             }
+          },
+          {
+            "description": "Posts filtered by category including sub-categories.",
+            "in": "query",
+            "name": "categoryWithChildren",
+            "schema": {
+              "type": "string"
+            }
           }
         ],
         "responses": {
@@ -14970,6 +14986,9 @@
           "postTemplate": {
             "maxLength": 255,
             "type": "string"
+          },
+          "preventParentPostCascadeQuery": {
+            "type": "boolean"
           },
           "priority": {
             "type": "integer",
@@ -19001,12 +19020,12 @@
           },
           "visible": {
             "type": "string",
-            "default": "PUBLIC",
             "enum": [
               "PUBLIC",
               "INTERNAL",
               "PRIVATE"
-            ]
+            ],
+            "default": "PUBLIC"
           }
         }
       },
@@ -20702,12 +20721,12 @@
           },
           "visible": {
             "type": "string",
-            "default": "PUBLIC",
             "enum": [
               "PUBLIC",
               "INTERNAL",
               "PRIVATE"
-            ]
+            ],
+            "default": "PUBLIC"
           }
         }
       },
