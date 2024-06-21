@@ -1,6 +1,5 @@
 package run.halo.app.extension.index.query;
 
-import com.google.common.collect.Sets;
 import java.util.NavigableSet;
 
 public class Between extends SimpleQuery {
@@ -19,17 +18,14 @@ public class Between extends SimpleQuery {
         this.upperInclusive = upperInclusive;
     }
 
-
     @Override
     public NavigableSet<String> matches(QueryIndexView indexView) {
-        NavigableSet<String> allValues = indexView.getAllValuesForField(fieldName);
-        // get all values in the specified range
-        var subSet = allValues.subSet(lowerValue, lowerInclusive, upperValue, upperInclusive);
+        return indexView.between(fieldName, lowerValue, lowerInclusive, upperValue, upperInclusive);
+    }
 
-        var resultSet = Sets.<String>newTreeSet();
-        for (String val : subSet) {
-            resultSet.addAll(indexView.getIdsForFieldValue(fieldName, val));
-        }
-        return resultSet;
+    @Override
+    public String toString() {
+        return fieldName + " BETWEEN " + (lowerInclusive ? "[" : "(") + lowerValue + ", "
+            + upperValue + (upperInclusive ? "]" : ")");
     }
 }
