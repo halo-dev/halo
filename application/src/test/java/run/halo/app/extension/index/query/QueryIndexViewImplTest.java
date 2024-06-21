@@ -25,7 +25,7 @@ import run.halo.app.extension.index.Indexer;
  * Tests for {@link QueryIndexViewImpl}.
  *
  * @author guqing
- * @since 2.12.0
+ * @since 2.17.0
  */
 class QueryIndexViewImplTest {
     final String id = PRIMARY_INDEX_NAME;

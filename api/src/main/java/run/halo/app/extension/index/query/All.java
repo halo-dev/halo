@@ -15,6 +15,6 @@ public class All extends SimpleQuery {
 
     @Override
     public String toString() {
-        return fieldName + "!= null";
+        return fieldName + " != null";
     }
 }
