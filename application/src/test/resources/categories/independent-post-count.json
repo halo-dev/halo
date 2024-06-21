@@ -1,0 +1,422 @@
+[
+    {
+        "spec": {
+            "displayName": "全部",
+            "children": ["FIT2CLOUD", "AnotherRootChild"]
+        },
+        "status": {
+            "visiblePostCount": 35
+        },
+        "apiVersion": "content.halo.run/v1alpha1",
+        "kind": "Category",
+        "metadata": {
+            "name": "全部",
+            "version": 0,
+            "creationTimestamp": "2024-06-14T06:17:47.589181Z"
+        }
+    },
+    {
+        "spec": {
+            "displayName": "FIT2CLOUD",
+            "children": ["DataEase", "IndependentNode"]
+        },
+        "status": {
+            "visiblePostCount": 15
+        },
+        "apiVersion": "content.halo.run/v1alpha1",
+        "kind": "Category",
+        "metadata": {
+            "name": "FIT2CLOUD",
+            "version": 0,
+            "creationTimestamp": "2024-06-14T06:17:47.589181Z"
+        }
+    },
+    {
+        "spec": {
+            "displayName": "DataEase",
+            "children": ["SubNode1", "SubNode2"]
+        },
+        "status": {
+            "visiblePostCount": 10
+        },
+        "apiVersion": "content.halo.run/v1alpha1",
+        "kind": "Category",
+        "metadata": {
+            "name": "DataEase",
+            "version": 0,
+            "creationTimestamp": "2024-06-14T06:17:47.589181Z"
+        }
+    },
+    {
+        "spec": {
+            "displayName": "SubNode1",
+            "children": ["Leaf1", "Leaf2"]
+        },
+        "status": {
+            "visiblePostCount": 4
+        },
+        "apiVersion": "content.halo.run/v1alpha1",
+        "kind": "Category",
+        "metadata": {
+            "name": "SubNode1",
+            "version": 0,
+            "creationTimestamp": "2024-06-14T06:17:47.589181Z"
+        }
+    },
+    {
+        "spec": {
+            "displayName": "Leaf1",
+            "children": []
+        },
+        "status": {
+            "visiblePostCount": 2
+        },
+        "apiVersion": "content.halo.run/v1alpha1",
+        "kind": "Category",
+        "metadata": {
+            "name": "Leaf1",
+            "version": 0,
+            "creationTimestamp": "2024-06-14T06:17:47.589181Z"
+        }
+    },
+    {
+        "spec": {
+            "displayName": "Leaf2",
+            "children": []
+        },
+        "status": {
+            "visiblePostCount": 2
+        },
+        "apiVersion": "content.halo.run/v1alpha1",
+        "kind": "Category",
+        "metadata": {
+            "name": "Leaf2",
+            "version": 0,
+            "creationTimestamp": "2024-06-14T06:17:47.589181Z"
+        }
+    },
+    {
+        "spec": {
+            "displayName": "SubNode2",
+            "preventParentPostCascadeQuery": true,
+            "children": ["IndependentChild1", "IndependentChild2"]
+        },
+        "status": {
+            "visiblePostCount": 6
+        },
+        "apiVersion": "content.halo.run/v1alpha1",
+        "kind": "Category",
+        "metadata": {
+            "name": "SubNode2",
+            "version": 0,
+            "creationTimestamp": "2024-06-14T06:17:47.589181Z"
+        }
+    },
+    {
+        "spec": {
+            "displayName": "IndependentChild1",
+            "children": []
+        },
+        "status": {
+            "visiblePostCount": 3
+        },
+        "apiVersion": "content.halo.run/v1alpha1",
+        "kind": "Category",
+        "metadata": {
+            "name": "IndependentChild1",
+            "version": 0,
+            "creationTimestamp": "2024-06-14T06:17:47.589181Z"
+        }
+    },
+    {
+        "spec": {
+            "displayName": "IndependentChild2",
+            "children": []
+        },
+        "status": {
+            "visiblePostCount": 3
+        },
+        "apiVersion": "content.halo.run/v1alpha1",
+        "kind": "Category",
+        "metadata": {
+            "name": "IndependentChild2",
+            "version": 0,
+            "creationTimestamp": "2024-06-14T06:17:47.589181Z"
+        }
+    },
+    {
+        "spec": {
+            "displayName": "IndependentNode",
+            "preventParentPostCascadeQuery": true,
+            "children": ["IndependentChild3", "IndependentChild4"]
+        },
+        "status": {
+            "visiblePostCount": 5
+        },
+        "apiVersion": "content.halo.run/v1alpha1",
+        "kind": "Category",
+        "metadata": {
+            "name": "IndependentNode",
+            "version": 0,
+            "creationTimestamp": "2024-06-14T06:17:47.589181Z"
+        }
+    },
+    {
+        "spec": {
+            "displayName": "IndependentChild3",
+            "children": []
+        },
+        "status": {
+            "visiblePostCount": 2
+        },
+        "apiVersion": "content.halo.run/v1alpha1",
+        "kind": "Category",
+        "metadata": {
+            "name": "IndependentChild3",
+            "version": 0,
+            "creationTimestamp": "2024-06-14T06:17:47.589181Z"
+        }
+    },
+    {
+        "spec": {
+            "displayName": "IndependentChild4",
+            "children": []
+        },
+        "status": {
+            "visiblePostCount": 3
+        },
+        "apiVersion": "content.halo.run/v1alpha1",
+        "kind": "Category",
+        "metadata": {
+            "name": "IndependentChild4",
+            "version": 0,
+            "creationTimestamp": "2024-06-14T06:17:47.589181Z"
+        }
+    },
+    {
+        "spec": {
+            "displayName": "AnotherRootChild",
+            "children": ["Child1", "Child2"]
+        },
+        "status": {
+            "visiblePostCount": 20
+        },
+        "apiVersion": "content.halo.run/v1alpha1",
+        "kind": "Category",
+        "metadata": {
+            "name": "AnotherRootChild",
+            "version": 0,
+            "creationTimestamp": "2024-06-14T06:17:47.589181Z"
+        }
+    },
+    {
+        "spec": {
+            "displayName": "Child1",
+            "children": ["SubChild1", "SubChild2"]
+        },
+        "status": {
+            "visiblePostCount": 8
+        },
+        "apiVersion": "content.halo.run/v1alpha1",
+        "kind": "Category",
+        "metadata": {
+            "name": "Child1",
+            "version": 0,
+            "creationTimestamp": "2024-06-14T06:17:47.589181Z"
+        }
+    },
+    {
+        "spec": {
+            "displayName": "SubChild1",
+            "children": ["DeepNode1", "DeepNode2"]
+        },
+        "status": {
+            "visiblePostCount": 3
+        },
+        "apiVersion": "content.halo.run/v1alpha1",
+        "kind": "Category",
+        "metadata": {
+            "name": "SubChild1",
+            "version": 0,
+            "creationTimestamp": "2024-06-14T06:17:47.589181Z"
+        }
+    },
+    {
+        "spec": {
+            "displayName": "DeepNode1",
+            "children": []
+        },
+        "status": {
+            "visiblePostCount": 1
+        },
+        "apiVersion": "content.halo.run/v1alpha1",
+        "kind": "Category",
+        "metadata": {
+            "name": "DeepNode1",
+            "version": 0,
+            "creationTimestamp": "2024-06-14T06:17:47.589181Z"
+        }
+    },
+    {
+        "spec": {
+            "displayName": "DeepNode2",
+            "children": ["DeeperNode"]
+        },
+        "status": {
+            "visiblePostCount": 1
+        },
+        "apiVersion": "content.halo.run/v1alpha1",
+        "kind": "Category",
+        "metadata": {
+            "name": "DeepNode2",
+            "version": 0,
+            "creationTimestamp": "2024-06-14T06:17:47.589181Z"
+        }
+    },
+    {
+        "spec": {
+            "displayName": "DeeperNode",
+            "children": []
+        },
+        "status": {
+            "visiblePostCount": 1
+        },
+        "apiVersion": "content.halo.run/v1alpha1",
+        "kind": "Category",
+        "metadata": {
+            "name": "DeeperNode",
+            "version": 0,
+            "creationTimestamp": "2024-06-14T06:17:47.589181Z"
+        }
+    },
+    {
+        "spec": {
+            "displayName": "SubChild2",
+            "children": ["DeepNode3"]
+        },
+        "status": {
+            "visiblePostCount": 5
+        },
+        "apiVersion": "content.halo.run/v1alpha1",
+        "kind": "Category",
+        "metadata": {
+            "name": "SubChild2",
+            "version": 0,
+            "creationTimestamp": "2024-06-14T06:17:47.589181Z"
+        }
+    },
+    {
+        "spec": {
+            "displayName": "DeepNode3",
+            "preventParentPostCascadeQuery": true,
+            "children": ["DeepNode4", "DeepNode5"]
+        },
+        "status": {
+            "visiblePostCount": 2
+        },
+        "apiVersion": "content.halo.run/v1alpha1",
+        "kind": "Category",
+        "metadata": {
+            "name": "DeepNode3",
+            "version": 0,
+            "creationTimestamp": "2024-06-14T06:17:47.589181Z"
+        }
+    },
+    {
+        "spec": {
+            "displayName": "DeepNode4",
+            "children": []
+        },
+        "status": {
+            "visiblePostCount": 1
+        },
+        "apiVersion": "content.halo.run/v1alpha1",
+        "kind": "Category",
+        "metadata": {
+            "name": "DeepNode4",
+            "version": 0,
+            "creationTimestamp": "2024-06-14T06:17:47.589181Z"
+        }
+    },
+    {
+        "spec": {
+            "displayName": "DeepNode5",
+            "children": []
+        },
+        "status": {
+            "visiblePostCount": 1
+        },
+        "apiVersion": "content.halo.run/v1alpha1",
+        "kind": "Category",
+        "metadata": {
+            "name": "DeepNode5",
+            "version": 0,
+            "creationTimestamp": "2024-06-14T06:17:47.589181Z"
+        }
+    },
+    {
+        "spec": {
+            "displayName": "Child2",
+            "children": ["IndependentSubNode"]
+        },
+        "status": {
+            "visiblePostCount": 12
+        },
+        "apiVersion": "content.halo.run/v1alpha1",
+        "kind": "Category",
+        "metadata": {
+            "name": "Child2",
+            "version": 0,
+            "creationTimestamp": "2024-06-14T06:17:47.589181Z"
+        }
+    },
+    {
+        "spec": {
+            "displayName": "IndependentSubNode",
+            "preventParentPostCascadeQuery": true,
+            "children": ["SubNode3", "SubNode4"]
+        },
+        "status": {
+            "visiblePostCount": 12
+        },
+        "apiVersion": "content.halo.run/v1alpha1",
+        "kind": "Category",
+        "metadata": {
+            "name": "IndependentSubNode",
+            "version": 0,
+            "creationTimestamp": "2024-06-14T06:17:47.589181Z"
+        }
+    },
+    {
+        "spec": {
+            "displayName": "SubNode3",
+            "children": []
+        },
+        "status": {
+            "visiblePostCount": 6
+        },
+        "apiVersion": "content.halo.run/v1alpha1",
+        "kind": "Category",
+        "metadata": {
+            "name": "SubNode3",
+            "version": 0,
+            "creationTimestamp": "2024-06-14T06:17:47.589181Z"
+        }
+    },
+    {
+        "spec": {
+            "displayName": "SubNode4",
+            "children": []
+        },
+        "status": {
+            "visiblePostCount": 6
+        },
+        "apiVersion": "content.halo.run/v1alpha1",
+        "kind": "Category",
+        "metadata": {
+            "name": "SubNode4",
+            "version": 0,
+            "creationTimestamp": "2024-06-14T06:17:47.589181Z"
+        }
+    }
+]
