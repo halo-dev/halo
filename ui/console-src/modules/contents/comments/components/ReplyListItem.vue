@@ -14,7 +14,6 @@ import type { ListedComment, ListedReply } from "@halo-dev/api-client";
 import { formatDatetime } from "@/utils/date";
 import { apiClient } from "@/utils/api-client";
 import { computed, inject, ref, type Ref } from "vue";
-import { cloneDeep } from "lodash-es";
 import { useI18n } from "vue-i18n";
 import { useQueryClient } from "@tanstack/vue-query";
 import ReplyCreationModal from "./ReplyCreationModal.vue";
@@ -71,13 +70,21 @@ const handleDelete = async () => {
 
 const handleApprove = async () => {
   try {
-    const replyToUpdate = cloneDeep(props.reply.reply);
-    replyToUpdate.spec.approved = true;
-    // TODO: 暂时由前端设置发布时间。see https://github.com/halo-dev/halo/pull/2746
-    replyToUpdate.spec.approvedTime = new Date().toISOString();
-    await apiClient.extension.reply.updateContentHaloRunV1alpha1Reply({
-      name: replyToUpdate.metadata.name,
-      reply: replyToUpdate,
+    await apiClient.extension.reply.patchContentHaloRunV1alpha1Reply({
+      name: props.reply.reply.metadata.name,
+      jsonPatchInner: [
+        {
+          op: "add",
+          path: "/spec/approved",
+          value: true,
+        },
+        {
+          op: "add",
+          path: "/spec/approvedTime",
+          // TODO: 暂时由前端设置发布时间。see https://github.com/halo-dev/halo/pull/2746
+          value: new Date().toISOString(),
+        },
+      ],
     });
 
     Toast.success(t("core.common.toast.operation_success"));
