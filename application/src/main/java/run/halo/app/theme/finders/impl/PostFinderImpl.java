@@ -2,6 +2,7 @@ package run.halo.app.theme.finders.impl;
 
 import static run.halo.app.extension.index.query.QueryFactory.and;
 import static run.halo.app.extension.index.query.QueryFactory.equal;
+import static run.halo.app.extension.index.query.QueryFactory.in;
 
 import java.util.Comparator;
 import java.util.List;
@@ -15,6 +16,8 @@ import org.springframework.lang.NonNull;
 import org.springframework.util.Assert;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
+import run.halo.app.content.CategoryService;
+import run.halo.app.core.extension.content.Category;
 import run.halo.app.core.extension.content.Post;
 import run.halo.app.extension.ListOptions;
 import run.halo.app.extension.ListResult;
@@ -51,6 +54,8 @@ public class PostFinderImpl implements PostFinder {
     private final PostPublicQueryService postPublicQueryService;
 
     private final ReactiveQueryPostPredicateResolver postPredicateResolver;
+
+    private final CategoryService categoryService;
 
     @Override
     public Mono<PostVo> getByName(String postName) {
@@ -141,13 +146,24 @@ public class PostFinderImpl implements PostFinder {
     @Override
     public Mono<ListResult<ListedPostVo>> listByCategory(Integer page, Integer size,
         String categoryName) {
-        var fieldQuery = QueryFactory.all();
-        if (StringUtils.isNotBlank(categoryName)) {
-            fieldQuery = and(fieldQuery, equal("spec.categories", categoryName));
+        return listChildrenCategories(categoryName)
+            .map(category -> category.getMetadata().getName())
+            .collectList()
+            .flatMap(categoryNames -> {
+                var listOptions = new ListOptions();
+                var fieldQuery = in("spec.categories", categoryNames);
+                listOptions.setFieldSelector(FieldSelector.of(fieldQuery));
+                return postPublicQueryService.list(listOptions, getPageRequest(page, size));
+            });
+    }
+
+    private Flux<Category> listChildrenCategories(String categoryName) {
+        if (StringUtils.isBlank(categoryName)) {
+            return client.listAll(Category.class, new ListOptions(),
+                Sort.by(Sort.Order.asc("metadata.creationTimeStamp"),
+                    Sort.Order.desc("metadata.name")));
         }
-        var listOptions = new ListOptions();
-        listOptions.setFieldSelector(FieldSelector.of(fieldQuery));
-        return postPublicQueryService.list(listOptions, getPageRequest(page, size));
+        return categoryService.listChildren(categoryName);
     }
 
     @Override

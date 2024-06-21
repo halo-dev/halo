@@ -24,4 +24,9 @@ public class Not extends LogicalQuery {
         allIds.removeAll(negatedResult);
         return allIds;
     }
+
+    @Override
+    public String toString() {
+        return "NOT (" + negatedQuery + ")";
+    }
 }

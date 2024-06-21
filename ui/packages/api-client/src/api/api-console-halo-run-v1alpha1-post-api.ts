@@ -312,10 +312,11 @@ export const ApiConsoleHaloRunV1alpha1PostApiAxiosParamCreator = function (confi
          * @param {Array<string>} [sort] Sorting criteria in the format: property,(asc|desc). Default sort order is ascending. Multiple sort criteria are supported.
          * @param {ListPostsPublishPhaseEnum} [publishPhase] Posts filtered by publish phase.
          * @param {string} [keyword] Posts filtered by keyword.
+         * @param {string} [categoryWithChildren] Posts filtered by category including sub-categories.
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        listPosts: async (page?: number, size?: number, labelSelector?: Array<string>, fieldSelector?: Array<string>, sort?: Array<string>, publishPhase?: ListPostsPublishPhaseEnum, keyword?: string, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+        listPosts: async (page?: number, size?: number, labelSelector?: Array<string>, fieldSelector?: Array<string>, sort?: Array<string>, publishPhase?: ListPostsPublishPhaseEnum, keyword?: string, categoryWithChildren?: string, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
             const localVarPath = `/apis/api.console.halo.run/v1alpha1/posts`;
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
@@ -362,6 +363,10 @@ export const ApiConsoleHaloRunV1alpha1PostApiAxiosParamCreator = function (confi
 
             if (keyword !== undefined) {
                 localVarQueryParameter['keyword'] = keyword;
+            }
+
+            if (categoryWithChildren !== undefined) {
+                localVarQueryParameter['categoryWithChildren'] = categoryWithChildren;
             }
 
 
@@ -742,11 +747,12 @@ export const ApiConsoleHaloRunV1alpha1PostApiFp = function(configuration?: Confi
          * @param {Array<string>} [sort] Sorting criteria in the format: property,(asc|desc). Default sort order is ascending. Multiple sort criteria are supported.
          * @param {ListPostsPublishPhaseEnum} [publishPhase] Posts filtered by publish phase.
          * @param {string} [keyword] Posts filtered by keyword.
+         * @param {string} [categoryWithChildren] Posts filtered by category including sub-categories.
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async listPosts(page?: number, size?: number, labelSelector?: Array<string>, fieldSelector?: Array<string>, sort?: Array<string>, publishPhase?: ListPostsPublishPhaseEnum, keyword?: string, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<ListedPostList>> {
-            const localVarAxiosArgs = await localVarAxiosParamCreator.listPosts(page, size, labelSelector, fieldSelector, sort, publishPhase, keyword, options);
+        async listPosts(page?: number, size?: number, labelSelector?: Array<string>, fieldSelector?: Array<string>, sort?: Array<string>, publishPhase?: ListPostsPublishPhaseEnum, keyword?: string, categoryWithChildren?: string, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<ListedPostList>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.listPosts(page, size, labelSelector, fieldSelector, sort, publishPhase, keyword, categoryWithChildren, options);
             const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
             const localVarOperationServerBasePath = operationServerMap['ApiConsoleHaloRunV1alpha1PostApi.listPosts']?.[localVarOperationServerIndex]?.url;
             return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
@@ -899,7 +905,7 @@ export const ApiConsoleHaloRunV1alpha1PostApiFactory = function (configuration?:
          * @throws {RequiredError}
          */
         listPosts(requestParameters: ApiConsoleHaloRunV1alpha1PostApiListPostsRequest = {}, options?: RawAxiosRequestConfig): AxiosPromise<ListedPostList> {
-            return localVarFp.listPosts(requestParameters.page, requestParameters.size, requestParameters.labelSelector, requestParameters.fieldSelector, requestParameters.sort, requestParameters.publishPhase, requestParameters.keyword, options).then((request) => request(axios, basePath));
+            return localVarFp.listPosts(requestParameters.page, requestParameters.size, requestParameters.labelSelector, requestParameters.fieldSelector, requestParameters.sort, requestParameters.publishPhase, requestParameters.keyword, requestParameters.categoryWithChildren, options).then((request) => request(axios, basePath));
         },
         /**
          * Publish a post.
@@ -1110,6 +1116,13 @@ export interface ApiConsoleHaloRunV1alpha1PostApiListPostsRequest {
      * @memberof ApiConsoleHaloRunV1alpha1PostApiListPosts
      */
     readonly keyword?: string
+
+    /**
+     * Posts filtered by category including sub-categories.
+     * @type {string}
+     * @memberof ApiConsoleHaloRunV1alpha1PostApiListPosts
+     */
+    readonly categoryWithChildren?: string
 }
 
 /**
@@ -1312,7 +1325,7 @@ export class ApiConsoleHaloRunV1alpha1PostApi extends BaseAPI {
      * @memberof ApiConsoleHaloRunV1alpha1PostApi
      */
     public listPosts(requestParameters: ApiConsoleHaloRunV1alpha1PostApiListPostsRequest = {}, options?: RawAxiosRequestConfig) {
-        return ApiConsoleHaloRunV1alpha1PostApiFp(this.configuration).listPosts(requestParameters.page, requestParameters.size, requestParameters.labelSelector, requestParameters.fieldSelector, requestParameters.sort, requestParameters.publishPhase, requestParameters.keyword, options).then((request) => request(this.axios, this.basePath));
+        return ApiConsoleHaloRunV1alpha1PostApiFp(this.configuration).listPosts(requestParameters.page, requestParameters.size, requestParameters.labelSelector, requestParameters.fieldSelector, requestParameters.sort, requestParameters.publishPhase, requestParameters.keyword, requestParameters.categoryWithChildren, options).then((request) => request(this.axios, this.basePath));
     }
 
     /**

@@ -6,18 +6,22 @@ import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.when;
 
 import com.fasterxml.jackson.core.type.TypeReference;
+import java.io.IOException;
+import java.nio.file.Files;
 import java.time.Instant;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import org.json.JSONException;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.skyscreamer.jsonassert.JSONAssert;
 import org.springframework.data.domain.Sort;
+import org.springframework.util.ResourceUtils;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import run.halo.app.core.extension.content.Category;
@@ -73,7 +77,8 @@ class CategoryFinderImplTest {
                          "children": [
                              "C1",
                              "C2"
-                         ]
+                         ],
+                         "preventParentPostCascadeQuery": false
                      }
                 }
                 """,
@@ -126,14 +131,97 @@ class CategoryFinderImplTest {
         List<CategoryTreeVo> treeVos = categoryFinder.listAsTree().collectList().block();
         String s = visualizeTree(treeVos);
         assertThat(s).isEqualTo("""
-            全部 (5)
-            ├── FIT2CLOUD (2)
+            全部 (7)
+            ├── FIT2CLOUD (4)
             │   ├── DataEase (0)
             │   ├── Halo (2)
             │   ├── MeterSphere (0)
             │   └── JumpServer (0)
             └── 默认分类 (3)
-              """);
+            """);
+    }
+
+    @Nested
+    class CategoryPostCountTest {
+
+        /**
+         * <p>Structure below.</p>
+         * <pre>
+         * 全部 (35)
+         * ├── FIT2CLOUD (15)
+         * │   ├── DataEase (10)
+         * │   │   ├── SubNode1 (4)
+         * │   │   │   ├── Leaf1 (2)
+         * │   │   │   ├── Leaf2 (2)
+         * │   │   ├── SubNode2 (6)  (independent)
+         * │   │       ├── IndependentChild1 (3)
+         * │   │       ├── IndependentChild2 (3)
+         * │   ├── IndependentNode (5)  (independent)
+         * │       ├── IndependentChild3 (2)
+         * │       ├── IndependentChild4 (3)
+         * ├── AnotherRootChild (20)
+         * │   ├── Child1 (8)
+         * │   │   ├── SubChild1 (3)
+         * │   │   │   ├── DeepNode1 (1)
+         * │   │   │   ├── DeepNode2 (1)
+         * │   │   │   │   ├── DeeperNode (1)
+         * │   │   ├── SubChild2 (5)
+         * │   │       ├── DeepNode3 (2)  (independent)
+         * │   │           ├── DeepNode4 (1)
+         * │   │           ├── DeepNode5 (1)
+         * │   ├── Child2 (12)
+         * │       ├── IndependentSubNode (12)  (independent)
+         * │           ├── SubNode3 (6)
+         * │           ├── SubNode4 (6)
+         * </pre>
+         */
+        private List<Category> categories;
+
+        @BeforeEach
+        void setUp() throws IOException {
+            var file = ResourceUtils.getFile("classpath:categories/independent-post-count.json");
+            var json = Files.readString(file.toPath());
+            categories = JsonUtils.jsonToObject(json, new TypeReference<>() {
+            });
+            when(client.listAll(eq(Category.class), any(ListOptions.class), any(Sort.class)))
+                .thenReturn(Flux.fromIterable(categories));
+        }
+
+        @Test
+        void computePostCountFromTree() {
+            var treeVos = categoryFinder.toCategoryTreeVoFlux("全部")
+                .collectList().block();
+            assertThat(treeVos).hasSize(1);
+            String s = visualizeTree(treeVos.get(0).getChildren());
+            assertThat(s).isEqualTo("""
+                全部 (84)
+                ├── AnotherRootChild (51)
+                │   ├── Child1 (19)
+                │   │   ├── SubChild1 (6)
+                │   │   │   ├── DeepNode1 (1)
+                │   │   │   └── DeepNode2 (2)
+                │   │   │       └── DeeperNode (1)
+                │   │   └── SubChild2 (5)
+                │   │       └── DeepNode3 (4) (Independent)
+                │   │           ├── DeepNode4 (1)
+                │   │           └── DeepNode5 (1)
+                │   └── Child2 (12)
+                │       └── IndependentSubNode (24) (Independent)
+                │           ├── SubNode3 (6)
+                │           └── SubNode4 (6)
+                └── FIT2CLOUD (33)
+                    ├── DataEase (18)
+                    │   ├── SubNode1 (8)
+                    │   │   ├── Leaf1 (2)
+                    │   │   └── Leaf2 (2)
+                    │   └── SubNode2 (12) (Independent)
+                    │       ├── IndependentChild1 (3)
+                    │       └── IndependentChild2 (3)
+                    └── IndependentNode (10) (Independent)
+                        ├── IndependentChild3 (2)
+                        └── IndependentChild4 (3)
+                """);
+        }
     }
 
     private List<Category> categoriesForTree() {
@@ -203,7 +291,6 @@ class CategoryFinderImplTest {
         root.print(stringBuilder, "", "");
         return stringBuilder.toString();
     }
-
 
     private List<Category> categories() {
         Category category2 = JsonUtils.deepCopy(category());

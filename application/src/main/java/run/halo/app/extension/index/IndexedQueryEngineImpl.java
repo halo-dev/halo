@@ -1,15 +1,14 @@
 package run.halo.app.extension.index;
 
-import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.NavigableSet;
 import java.util.Set;
 import java.util.TreeSet;
+import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
@@ -23,6 +22,7 @@ import run.halo.app.extension.ListOptions;
 import run.halo.app.extension.ListResult;
 import run.halo.app.extension.PageRequest;
 import run.halo.app.extension.index.query.QueryFactory;
+import run.halo.app.extension.index.query.QueryIndexView;
 import run.halo.app.extension.index.query.QueryIndexViewImpl;
 import run.halo.app.extension.router.selector.FieldSelector;
 import run.halo.app.extension.router.selector.LabelSelector;
@@ -41,153 +41,106 @@ public class IndexedQueryEngineImpl implements IndexedQueryEngine {
 
     private final IndexerFactory indexerFactory;
 
-    private static Map<String, IndexEntry> fieldPathIndexEntryMap(Indexer indexer) {
-        // O(n) time complexity
-        Map<String, IndexEntry> indexEntryMap = new HashMap<>();
-        var iterator = indexer.readyIndexesIterator();
-        while (iterator.hasNext()) {
-            var indexEntry = iterator.next();
-            var descriptor = indexEntry.getIndexDescriptor();
-            var indexedFieldPath = descriptor.getSpec().getName();
-            indexEntryMap.put(indexedFieldPath, indexEntry);
-        }
-        return indexEntryMap;
-    }
-
-    static IndexEntry getIndexEntry(String fieldPath, Map<String, IndexEntry> fieldPathEntryMap) {
-        if (!fieldPathEntryMap.containsKey(fieldPath)) {
-            throwNotIndexedException(fieldPath);
-        }
-        return fieldPathEntryMap.get(fieldPath);
-    }
-
     @Override
     public ListResult<String> retrieve(GroupVersionKind type, ListOptions options,
         PageRequest page) {
-        var indexer = indexerFactory.getIndexer(type);
-        var allMatchedResult = doRetrieve(indexer, options, page.getSort());
+        var allMatchedResult = doRetrieve(type, options, page.getSort());
         var list = ListResult.subList(allMatchedResult, page.getPageNumber(), page.getPageSize());
         return new ListResult<>(page.getPageNumber(), page.getPageSize(),
             allMatchedResult.size(), list);
     }
 
     @Override
-    public List<String> retrieveAll(GroupVersionKind type, ListOptions options) {
-        var indexer = indexerFactory.getIndexer(type);
-        return doRetrieve(indexer, options, Sort.unsorted());
+    public List<String> retrieveAll(GroupVersionKind type, ListOptions options, Sort sort) {
+        return doRetrieve(type, options, sort);
     }
 
-    static <T> List<T> intersection(List<T> list1, List<T> list2) {
-        Set<T> set = new LinkedHashSet<>(list1);
-        List<T> intersection = new ArrayList<>();
-        for (T item : list2) {
-            if (set.contains(item) && !intersection.contains(item)) {
-                intersection.add(item);
-            }
-        }
-        return intersection;
-    }
-
-    static void throwNotIndexedException(String fieldPath) {
-        throw new IllegalArgumentException(
-            "No index found for fieldPath: " + fieldPath
-                + ", make sure you have created an index for this field.");
-    }
-
-    List<String> retrieveForLabelMatchers(List<SelectorMatcher> labelMatchers,
-        Map<String, IndexEntry> fieldPathEntryMap, List<String> allMetadataNames) {
-        var indexEntry = getIndexEntry(LabelIndexSpecUtils.LABEL_PATH, fieldPathEntryMap);
-        // O(m) time complexity, m is the number of labelMatchers
-        var labelKeysToQuery = labelMatchers.stream()
-            .sorted(Comparator.comparing(SelectorMatcher::getKey))
-            .map(SelectorMatcher::getKey)
-            .collect(Collectors.toSet());
-
-        Map<String, Map<String, String>> objectNameLabelsMap = new HashMap<>();
-        indexEntry.acquireReadLock();
-        try {
-            indexEntry.entries().forEach(entry -> {
-                // key is labelKey=labelValue, value is objectName
-                var labelPair = LabelIndexSpecUtils.labelKeyValuePair(entry.getKey());
-                if (!labelKeysToQuery.contains(labelPair.getFirst())) {
-                    return;
-                }
-                objectNameLabelsMap.computeIfAbsent(entry.getValue(), k -> new HashMap<>())
-                    .put(labelPair.getFirst(), labelPair.getSecond());
-            });
-        } finally {
-            indexEntry.releaseReadLock();
-        }
-        // O(p * m) time complexity, p is the number of allMetadataNames
-        return allMetadataNames.stream()
-            .filter(objectName -> {
-                var labels = objectNameLabelsMap.getOrDefault(objectName, Map.of());
+    NavigableSet<String> retrieveForLabelMatchers(Indexer indexer,
+        List<SelectorMatcher> labelMatchers) {
+        var objectLabelMap = ObjectLabelMap.buildFrom(indexer, labelMatchers);
+        // O(k×m) time complexity, k is the number of keys, m is the number of labelMatchers
+        return objectLabelMap.objectIdLabelsMap()
+            .entrySet()
+            .stream()
+            .filter(entry -> {
+                var labels = entry.getValue();
                 // object match all labels will be returned
                 return labelMatchers.stream()
                     .allMatch(matcher -> matcher.test(labels.get(matcher.getKey())));
             })
-            .toList();
+            .map(Map.Entry::getKey)
+            .collect(Collectors.toCollection(TreeSet::new));
     }
 
-    List<String> doRetrieve(Indexer indexer, ListOptions options, Sort sort) {
-        StopWatch stopWatch = new StopWatch();
-        stopWatch.start("build index entry map");
-        var fieldPathEntryMap = fieldPathIndexEntryMap(indexer);
-        var primaryEntry = getIndexEntry(PrimaryKeySpecUtils.PRIMARY_INDEX_NAME, fieldPathEntryMap);
-        stopWatch.stop();
-
-        // O(n) time complexity
-        stopWatch.start("retrieve all metadata names");
-        var allMetadataNames = new ArrayList<String>();
-        primaryEntry.acquireReadLock();
-        try {
-            allMetadataNames.addAll(primaryEntry.indexedKeys());
-        } finally {
-            primaryEntry.releaseReadLock();
-        }
-        stopWatch.stop();
-
-        stopWatch.start("build index view");
-        var fieldNamesUsedInQuery = getFieldNamesUsedInListOptions(options, sort);
-        var indexViewMap = new HashMap<String, Collection<Map.Entry<String, String>>>();
-        for (Map.Entry<String, IndexEntry> entry : fieldPathEntryMap.entrySet()) {
-            if (!fieldNamesUsedInQuery.contains(entry.getKey())) {
-                continue;
-            }
-            indexViewMap.put(entry.getKey(), entry.getValue().immutableEntries());
-        }
-        // TODO optimize build indexView time
-        var indexView = new QueryIndexViewImpl(indexViewMap);
-        stopWatch.stop();
-
-        stopWatch.start("retrieve matched metadata names");
-        if (hasLabelSelector(options.getLabelSelector())) {
-            var matchedByLabels = retrieveForLabelMatchers(options.getLabelSelector().getMatchers(),
-                fieldPathEntryMap, allMetadataNames);
-            if (allMetadataNames.size() != matchedByLabels.size()) {
-                indexView.removeByIdNotIn(new TreeSet<>(matchedByLabels));
-            }
-        }
-        stopWatch.stop();
-
-        stopWatch.start("retrieve matched metadata names by fields");
+    NavigableSet<String> evaluateSelectorsForIndex(Indexer indexer, QueryIndexView indexView,
+        ListOptions options) {
+        final var hasLabelSelector = hasLabelSelector(options.getLabelSelector());
         final var hasFieldSelector = hasFieldSelector(options.getFieldSelector());
-        if (hasFieldSelector) {
-            var fieldSelector = options.getFieldSelector();
-            var query = fieldSelector.query();
-            var resultSet = query.matches(indexView);
-            indexView.removeByIdNotIn(resultSet);
+
+        if (!hasLabelSelector && !hasFieldSelector) {
+            return QueryFactory.all().matches(indexView);
         }
+
+        // only label selector
+        if (hasLabelSelector && !hasFieldSelector) {
+            return retrieveForLabelMatchers(indexer, options.getLabelSelector().getMatchers());
+        }
+
+        // only field selector
+        if (!hasLabelSelector) {
+            var fieldSelector = options.getFieldSelector();
+            return fieldSelector.query().matches(indexView);
+        }
+
+        // both label and field selector
+        var fieldSelector = options.getFieldSelector();
+        var forField = fieldSelector.query().matches(indexView);
+        var forLabel =
+            retrieveForLabelMatchers(indexer, options.getLabelSelector().getMatchers());
+
+        // determine the optimal retainAll direction based on the size of the collection
+        var resultSet = (forField.size() <= forLabel.size()) ? forField : forLabel;
+        resultSet.retainAll((resultSet == forField) ? forLabel : forField);
+        return resultSet;
+    }
+
+    List<String> doRetrieve(GroupVersionKind type, ListOptions options, Sort sort) {
+        var indexer = indexerFactory.getIndexer(type);
+
+        StopWatch stopWatch = new StopWatch(type.toString());
+
+        stopWatch.start("Check index status to ensure all indexes are ready");
+        var fieldNamesUsedInQuery = getFieldNamesUsedInListOptions(options, sort);
+        checkIndexForNames(indexer, fieldNamesUsedInQuery);
         stopWatch.stop();
 
-        stopWatch.start("sort result");
-        var result = indexView.sortBy(sort);
+        var indexView = new QueryIndexViewImpl(indexer);
+
+        stopWatch.start("Evaluate selectors for index");
+        var resultSet = evaluateSelectorsForIndex(indexer, indexView, options);
+        stopWatch.stop();
+
+        stopWatch.start("Sort result set by sort order");
+        var result = indexView.sortBy(resultSet, sort);
         stopWatch.stop();
 
         if (log.isTraceEnabled()) {
-            log.trace("Retrieve result from indexer, {}", stopWatch.prettyPrint());
+            log.trace("Retrieve result from indexer by query [{}],\n {}", options,
+                stopWatch.prettyPrint(TimeUnit.MILLISECONDS));
         }
         return result;
+    }
+
+    void checkIndexForNames(Indexer indexer, Set<String> indexNames) {
+        indexer.acquireReadLock();
+        try {
+            for (String indexName : indexNames) {
+                // get index entry will throw exception if index not found
+                indexer.getIndexEntry(indexName);
+            }
+        } finally {
+            indexer.releaseReadLock();
+        }
     }
 
     @NonNull
@@ -212,5 +165,47 @@ public class IndexedQueryEngineImpl implements IndexedQueryEngine {
 
     boolean hasFieldSelector(FieldSelector fieldSelector) {
         return fieldSelector != null;
+    }
+
+    record ObjectLabelMap(Map<String, Map<String, String>> objectIdLabelsMap) {
+
+        public static ObjectLabelMap buildFrom(Indexer indexer,
+            List<SelectorMatcher> labelMatchers) {
+            indexer.acquireReadLock();
+            try {
+                final var objectNameLabelsMap = new HashMap<String, Map<String, String>>();
+                final var labelIndexEntry = indexer.getIndexEntry(LabelIndexSpecUtils.LABEL_PATH);
+                // O(m) time complexity, m is the number of labelMatchers
+                final var labelKeysToQuery = labelMatchers.stream()
+                    .sorted(Comparator.comparing(SelectorMatcher::getKey))
+                    .map(SelectorMatcher::getKey)
+                    .collect(Collectors.toSet());
+
+                labelIndexEntry.entries().forEach(entry -> {
+                    // key is labelKey=labelValue, value is objectName
+                    var labelPair = LabelIndexSpecUtils.labelKeyValuePair(entry.getKey());
+                    if (!labelKeysToQuery.contains(labelPair.getFirst())) {
+                        return;
+                    }
+                    objectNameLabelsMap.computeIfAbsent(entry.getValue(), k -> new HashMap<>())
+                        .put(labelPair.getFirst(), labelPair.getSecond());
+                });
+
+                var nameIndexOperator = new IndexEntryOperatorImpl(
+                    indexer.getIndexEntry(PrimaryKeySpecUtils.PRIMARY_INDEX_NAME)
+                );
+                var allIndexedObjectNames = nameIndexOperator.getValues();
+
+                // remove all object names that exist labels,O(n) time complexity
+                allIndexedObjectNames.removeAll(objectNameLabelsMap.keySet());
+                // add absent object names to object labels map
+                for (String name : allIndexedObjectNames) {
+                    objectNameLabelsMap.put(name, new HashMap<>());
+                }
+                return new ObjectLabelMap(objectNameLabelsMap);
+            } finally {
+                indexer.releaseReadLock();
+            }
+        }
     }
 }

@@ -1,6 +1,5 @@
 package run.halo.app.extension.index.query;
 
-import com.google.common.collect.Sets;
 import java.util.NavigableSet;
 
 public class LessThanQuery extends SimpleQuery {
@@ -18,24 +17,15 @@ public class LessThanQuery extends SimpleQuery {
     @Override
     public NavigableSet<String> matches(QueryIndexView indexView) {
         if (isFieldRef) {
-            return resultSetForRefValue(indexView);
+            return indexView.findMatchingIdsWithSmallerValues(fieldName, value, orEqual);
         }
-        return resultSetForExactValue(indexView);
+        return indexView.findIdsLessThan(fieldName, value, orEqual);
     }
 
-    private NavigableSet<String> resultSetForRefValue(QueryIndexView indexView) {
-        return indexView.findIdsForFieldValueLessThan(fieldName, value, orEqual);
-    }
-
-    private NavigableSet<String> resultSetForExactValue(QueryIndexView indexView) {
-        var resultSet = Sets.<String>newTreeSet();
-        var allValues = indexView.getAllValuesForField(fieldName);
-        var headSet = orEqual ? allValues.headSet(value, true)
-            : allValues.headSet(value, false);
-
-        for (String val : headSet) {
-            resultSet.addAll(indexView.getIdsForFieldValue(fieldName, val));
-        }
-        return resultSet;
+    @Override
+    public String toString() {
+        return fieldName
+            + (orEqual ? " <= " : " < ")
+            + (isFieldRef ? value : "'" + value + "'");
     }
 }

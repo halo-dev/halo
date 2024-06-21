@@ -4,6 +4,13 @@ import { computed, nextTick, onMounted, ref } from "vue";
 import { apiClient } from "@halo-dev/api-client";
 
 // components
+import SubmitButton from "@/components/button/SubmitButton.vue";
+import AnnotationsForm from "@/components/form/AnnotationsForm.vue";
+import { setFocus } from "@/formkit/utils/focus";
+import { FormType } from "@/types/slug";
+import useSlugify from "@console/composables/use-slugify";
+import { useThemeCustomTemplates } from "@console/modules/interface/themes/composables/use-theme";
+import type { Category } from "@halo-dev/api-client";
 import {
   IconRefreshLine,
   Toast,
@@ -11,20 +18,9 @@ import {
   VModal,
   VSpace,
 } from "@halo-dev/components";
-import SubmitButton from "@/components/button/SubmitButton.vue";
-
-// types
-import type { Category } from "@halo-dev/api-client";
-
-// libs
-import { setFocus } from "@/formkit/utils/focus";
-import { useThemeCustomTemplates } from "@console/modules/interface/themes/composables/use-theme";
-import AnnotationsForm from "@/components/form/AnnotationsForm.vue";
-import useSlugify from "@console/composables/use-slugify";
-import { useI18n } from "vue-i18n";
-import { FormType } from "@/types/slug";
 import { useQueryClient } from "@tanstack/vue-query";
 import { cloneDeep } from "lodash-es";
+import { useI18n } from "vue-i18n";
 
 const props = withDefaults(
   defineProps<{
@@ -54,6 +50,7 @@ const formState = ref<Category>({
     postTemplate: "",
     priority: 0,
     children: [],
+    preventParentPostCascadeQuery: false,
   },
   status: {},
   apiVersion: "content.halo.run/v1alpha1",
@@ -273,6 +270,21 @@ const { handleGenerateSlug } = useSlugify(
               type="attachment"
               :accepts="['image/*']"
               validation="length:0,1024"
+            ></FormKit>
+            <FormKit
+              v-model="formState.spec.preventParentPostCascadeQuery"
+              :label="
+                $t(
+                  'core.post_category.editing_modal.fields.prevent_parent_post_cascade_query.label'
+                )
+              "
+              :help="
+                $t(
+                  'core.post_category.editing_modal.fields.prevent_parent_post_cascade_query.help'
+                )
+              "
+              type="checkbox"
+              name="preventParentPostCascadeQuery"
             ></FormKit>
             <FormKit
               v-model="formState.spec.description"

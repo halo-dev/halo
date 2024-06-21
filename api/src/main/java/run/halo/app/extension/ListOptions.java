@@ -10,4 +10,19 @@ import run.halo.app.extension.router.selector.LabelSelector;
 public class ListOptions {
     private LabelSelector labelSelector;
     private FieldSelector fieldSelector;
+
+    @Override
+    public String toString() {
+        var sb = new StringBuilder();
+        if (fieldSelector != null) {
+            sb.append("fieldSelector: ").append(fieldSelector.query());
+        }
+        if (labelSelector != null) {
+            if (!sb.isEmpty()) {
+                sb.append(", ");
+            }
+            sb.append("labelSelector: ").append(labelSelector);
+        }
+        return sb.toString();
+    }
 }
