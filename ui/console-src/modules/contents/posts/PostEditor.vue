@@ -50,7 +50,7 @@ const { mutateAsync: postUpdateMutate } = usePostUpdateMutate();
 const { currentUserHasPermission } = usePermission();
 
 // Editor providers
-const { editorProviders } = useEditorExtensionPoints();
+const { editorProviders, fetchEditorProviders } = useEditorExtensionPoints();
 const currentEditorProvider = ref<EditorProvider>();
 const storedEditorProviderName = useLocalStorage("editor-provider-name", "");
 
@@ -356,6 +356,8 @@ const onSettingPublished = (post: Post) => {
 // Get post data when the route contains the name parameter
 const name = useRouteQuery<string>("name");
 onMounted(async () => {
+  await fetchEditorProviders();
+
   if (name.value) {
     // fetch post
     const { data: post } =

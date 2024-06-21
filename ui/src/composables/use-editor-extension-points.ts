@@ -2,11 +2,12 @@ import Logo from "@/assets/logo.png";
 import { usePluginModuleStore } from "@/stores/plugin";
 import { VLoading } from "@halo-dev/components";
 import type { EditorProvider } from "@halo-dev/console-shared";
-import { defineAsyncComponent, markRaw, onMounted, ref, type Ref } from "vue";
+import { defineAsyncComponent, markRaw, ref, type Ref } from "vue";
 import { useI18n } from "vue-i18n";
 
 interface useEditorExtensionPointsReturn {
   editorProviders: Ref<EditorProvider[]>;
+  fetchEditorProviders: () => Promise<void>;
 }
 
 export function useEditorExtensionPoints(): useEditorExtensionPointsReturn {
@@ -30,7 +31,7 @@ export function useEditorExtensionPoints(): useEditorExtensionPointsReturn {
     },
   ]);
 
-  onMounted(async () => {
+  async function fetchEditorProviders() {
     for (const pluginModule of pluginModules) {
       try {
         const callbackFunction =
@@ -40,16 +41,17 @@ export function useEditorExtensionPoints(): useEditorExtensionPointsReturn {
           continue;
         }
 
-        const providers = await callbackFunction();
+        const pluginProviders = await callbackFunction();
 
-        editorProviders.value.push(...providers);
+        editorProviders.value.push(...pluginProviders);
       } catch (error) {
         console.error(`Error processing plugin module:`, pluginModule, error);
       }
     }
-  });
+  }
 
   return {
     editorProviders,
+    fetchEditorProviders,
   };
 }
