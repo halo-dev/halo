@@ -201,12 +201,9 @@ importers:
       '@changesets/cli':
         specifier: ^2.25.2
         version: 2.25.2
-      '@iconify-json/mdi':
-        specifier: ^1.1.50
-        version: 1.1.50
-      '@iconify-json/vscode-icons':
-        specifier: ^1.1.22
-        version: 1.1.22
+      '@iconify/json':
+        specifier: ^2.2.117
+        version: 2.2.147
       '@intlify/unplugin-vue-i18n':
         specifier: ^4.0.0
         version: 4.0.0(rollup@4.17.2)(vue-i18n@9.13.1(vue@3.4.27(typescript@5.3.3)))
@@ -2451,14 +2448,8 @@ packages:
   '@iarna/toml@2.2.5':
     resolution: {integrity: sha512-trnsAYxU3xnS1gPHPyU961coFyLkh4gAD/0zQ5mymY4yOZ+CYvsPqUbOFSw0aDM4y0tV7tiFxL/1XfXPNC6IPg==}
 
-  '@iconify-json/mdi@1.1.50':
-    resolution: {integrity: sha512-SgbT5w5eHCdOG74ZWPz7HlTGk6VsifIJhNi6lAsxj/5Nlqt6Cz4LlQmSa9eecU9p075Jub2aAx/o7YI+GCahRQ==}
-
   '@iconify-json/ri@1.1.15':
     resolution: {integrity: sha512-A1g6jPANPRC1aKthtBpWGn53NI/bf7HsjNr/Zi2n3fIlWLHp4SI8MGXw7POUKAefzipb7HSqlBNpQxGLJ5qe2g==}
-
-  '@iconify-json/vscode-icons@1.1.22':
-    resolution: {integrity: sha512-lO0Sl2xApg/R7PlZJOiRbwuOQFXPRVbM8c+RHOMxWEUF0Hd/UiHBemYjdUDW5pr9QNmvv183rwJiBFHBvIeZ5A==}
 
   '@iconify/json@2.2.147':
     resolution: {integrity: sha512-VTW1vVivOq5RVcZu7xqCXWptGH7fo6VPsUxT5QBlbBS042859YZnK1JTXHJu4InMuTwQC/3KLP+InJJ5kawOGg==}
@@ -10367,6 +10358,9 @@ packages:
   vue-component-type-helpers@2.0.19:
     resolution: {integrity: sha512-cN3f1aTxxKo4lzNeQAkVopswuImUrb5Iurll9Gaw5cqpnbTAxtEMM1mgi6ou4X79OCyqYv1U1mzBHJkzmiK82w==}
 
+  vue-component-type-helpers@2.0.21:
+    resolution: {integrity: sha512-3NaicyZ7N4B6cft4bfb7dOnPbE9CjLcx+6wZWAg5zwszfO4qXRh+U52dN5r5ZZfc6iMaxKCEcoH9CmxxoFZHLg==}
+
   vue-demi@0.13.11:
     resolution: {integrity: sha512-IR8HoEEGM65YY3ZJYAjMlKygDQn25D5ajNFNoKh9RSDMQtlzCxtfQjdQgv9jjK+m3377SsJXY8ysq8kLCZL25A==}
     engines: {node: '>=12'}
@@ -13028,15 +13022,7 @@ snapshots:
 
   '@iarna/toml@2.2.5': {}
 
-  '@iconify-json/mdi@1.1.50':
-    dependencies:
-      '@iconify/types': 2.0.0
-
   '@iconify-json/ri@1.1.15':
-    dependencies:
-      '@iconify/types': 2.0.0
-
-  '@iconify-json/vscode-icons@1.1.22':
     dependencies:
       '@iconify/types': 2.0.0
 
@@ -14712,7 +14698,7 @@ snapshots:
       ts-dedent: 2.2.0
       type-fest: 2.19.0
       vue: 3.4.27(typescript@5.4.2)
-      vue-component-type-helpers: 2.0.19
+      vue-component-type-helpers: 2.0.21
     transitivePeerDependencies:
       - encoding
       - supports-color
@@ -15488,12 +15474,12 @@ snapshots:
     dependencies:
       '@vitest/utils': 0.34.1
       p-limit: 4.0.0
-      pathe: 1.1.1
+      pathe: 1.1.2
 
   '@vitest/snapshot@0.34.1':
     dependencies:
       magic-string: 0.30.7
-      pathe: 1.1.1
+      pathe: 1.1.2
       pretty-format: 29.6.2
 
   '@vitest/spy@0.34.1':
@@ -18271,7 +18257,7 @@ snapshots:
       https-proxy-agent: 7.0.2
       mri: 1.2.0
       node-fetch-native: 1.4.1
-      pathe: 1.1.1
+      pathe: 1.1.2
       tar: 6.2.0
     transitivePeerDependencies:
       - supports-color
@@ -22143,7 +22129,7 @@ snapshots:
       cac: 6.7.14
       debug: 4.3.4(supports-color@8.1.1)
       mlly: 1.4.0
-      pathe: 1.1.1
+      pathe: 1.1.2
       picocolors: 1.0.0
       vite: 4.2.3(@types/node@18.13.0)(less@4.2.0)(sass@1.60.0)(terser@5.31.0)
     transitivePeerDependencies:
@@ -22388,6 +22374,8 @@ snapshots:
   void-elements@3.1.0: {}
 
   vue-component-type-helpers@2.0.19: {}
+
+  vue-component-type-helpers@2.0.21: {}
 
   vue-demi@0.13.11(vue@3.4.27(typescript@5.3.3)):
     dependencies:
