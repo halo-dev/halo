@@ -50,7 +50,7 @@ const { mutateAsync: singlePageUpdateMutate } = usePageUpdateMutate();
 const { currentUserHasPermission } = usePermission();
 
 // Editor providers
-const { editorProviders } = useEditorExtensionPoints();
+const { editorProviders, fetchEditorProviders } = useEditorExtensionPoints();
 const currentEditorProvider = ref<EditorProvider>();
 const storedEditorProviderName = useLocalStorage("editor-provider-name", "");
 
@@ -331,6 +331,8 @@ const onSettingPublished = (singlePage: SinglePage) => {
 };
 
 onMounted(async () => {
+  await fetchEditorProviders();
+
   if (routeQueryName.value) {
     const { data: singlePage } =
       await apiClient.extension.singlePage.getContentHaloRunV1alpha1SinglePage({
