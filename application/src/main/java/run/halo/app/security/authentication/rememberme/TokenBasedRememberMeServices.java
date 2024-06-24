@@ -31,7 +31,6 @@ import org.springframework.security.crypto.codec.Utf8;
 import org.springframework.security.web.authentication.rememberme.CookieTheftException;
 import org.springframework.security.web.authentication.rememberme.InvalidCookieException;
 import org.springframework.security.web.authentication.rememberme.RememberMeAuthenticationException;
-import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
 import org.springframework.web.server.ServerWebExchange;
 import reactor.core.publisher.Mono;
@@ -54,7 +53,6 @@ import reactor.core.publisher.Mono;
 @Slf4j
 @Setter
 @Getter
-@Component
 @RequiredArgsConstructor
 public class TokenBasedRememberMeServices implements RememberMeServices {
 
@@ -66,11 +64,11 @@ public class TokenBasedRememberMeServices implements RememberMeServices {
 
     private static final String DELIMITER = ":";
 
-    private final CookieSignatureKeyResolver cookieSignatureKeyResolver;
+    protected final CookieSignatureKeyResolver cookieSignatureKeyResolver;
 
-    private final ReactiveUserDetailsService userDetailsService;
+    protected final ReactiveUserDetailsService userDetailsService;
 
-    private final RememberMeCookieResolver rememberMeCookieResolver;
+    protected final RememberMeCookieResolver rememberMeCookieResolver;
 
     private UserDetailsChecker userDetailsChecker = new AccountStatusUserDetailsChecker();
 
@@ -218,6 +216,11 @@ public class TokenBasedRememberMeServices implements RememberMeServices {
             log.debug("Remember-me login not requested.");
             return Mono.empty();
         }
+        return onLoginSuccess(exchange, successfulAuthentication);
+    }
+
+    protected Mono<Void> onLoginSuccess(ServerWebExchange exchange,
+        Authentication successfulAuthentication) {
         return Mono.defer(() -> retrieveUsernamePassword(successfulAuthentication))
             .flatMap(pair -> {
                 var username = pair.username();
