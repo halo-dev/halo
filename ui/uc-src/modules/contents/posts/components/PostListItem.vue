@@ -7,6 +7,7 @@ import {
   IconTimerLine,
   Toast,
   VAvatar,
+  VAvatarGroup,
   VDropdownDivider,
   VDropdownItem,
   VEntity,
@@ -179,15 +180,15 @@ function handleUnpublish() {
     <template #end>
       <VEntityField>
         <template #description>
-          <VAvatar
-            v-for="{ name, avatar, displayName } in post.contributors"
-            :key="name"
-            v-tooltip="displayName"
-            size="xs"
-            :src="avatar"
-            :alt="displayName"
-            circle
-          ></VAvatar>
+          <VAvatarGroup size="xs" circle>
+            <VAvatar
+              v-for="{ name, avatar, displayName } in post.contributors"
+              :key="name"
+              v-tooltip="displayName"
+              :src="avatar"
+              :alt="displayName"
+            ></VAvatar>
+          </VAvatarGroup>
         </template>
       </VEntityField>
       <VEntityField :description="publishStatus">

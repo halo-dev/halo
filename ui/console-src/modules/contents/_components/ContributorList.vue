@@ -1,7 +1,7 @@
 <script lang="ts" setup>
 import { usePermission } from "@/utils/permission";
 import type { Contributor } from "@halo-dev/api-client";
-import { VAvatar } from "@halo-dev/components";
+import { VAvatar, VAvatarGroup } from "@halo-dev/components";
 import { useRouter } from "vue-router";
 
 withDefaults(
@@ -26,14 +26,14 @@ function handleRouteToUserDetail(contributor: Contributor) {
 </script>
 
 <template>
-  <VAvatar
-    v-for="(contributor, contributorIndex) in contributors"
-    :key="contributorIndex"
-    v-tooltip="contributor.displayName"
-    size="xs"
-    :src="contributor.avatar"
-    :alt="contributor.displayName"
-    circle
-    @click="handleRouteToUserDetail(contributor)"
-  ></VAvatar>
+  <VAvatarGroup size="xs" circle>
+    <VAvatar
+      v-for="contributor in contributors"
+      :key="contributor.name"
+      v-tooltip="contributor.displayName"
+      :src="contributor.avatar"
+      :alt="contributor.displayName"
+      @click="handleRouteToUserDetail(contributor)"
+    ></VAvatar>
+  </VAvatarGroup>
 </template>
