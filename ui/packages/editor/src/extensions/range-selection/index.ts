@@ -39,6 +39,7 @@ const range = {
   enable: false,
 };
 const ExtensionRangeSelection = Extension.create({
+  priority: 100,
   name: "rangeSelectionExtension",
 
   addProseMirrorPlugins() {
@@ -57,12 +58,7 @@ const ExtensionRangeSelection = Extension.create({
             const { $from, $to } = selection;
             const decorations: Decoration[] = [];
             doc.nodesBetween($from.pos, $to.pos, (node, pos) => {
-              if (
-                node.isText ||
-                node.type.name === "paragraph" ||
-                pos + 1 < $from.pos ||
-                pos + 1 > $to.pos
-              ) {
+              if (node.isText || node.type.name === "paragraph") {
                 return;
               }
               let className = "no-selection";
@@ -112,20 +108,12 @@ const ExtensionRangeSelection = Extension.create({
                 return;
               }
               range.head = $pos.pos;
-              if (range.anchor && range.enable && range.anchor !== range.head) {
-                if (
-                  RangeSelection.valid(view.state, range.anchor, range.head)
-                ) {
-                  view.dispatch(
-                    view.state.tr.setSelection(
-                      RangeSelection.create(
-                        view.state.doc,
-                        range.anchor,
-                        range.head
-                      )
-                    )
-                  );
-                }
+              const selection = RangeSelection.between(
+                view.state.doc.resolve(range.anchor),
+                view.state.doc.resolve(range.head)
+              );
+              if (selection) {
+                view.dispatch(view.state.tr.setSelection(selection));
               }
             },
             mouseup: () => {
