@@ -1,7 +1,6 @@
 import type { ComputedRef, Ref } from "vue";
 import { computed } from "vue";
 import { type Plugin, PluginStatusPhaseEnum } from "@halo-dev/api-client";
-import { cloneDeep } from "lodash-es";
 import { apiClient } from "@/utils/api-client";
 import { Dialog, Toast } from "@halo-dev/components";
 import { useI18n } from "vue-i18n";
@@ -117,14 +116,12 @@ export function usePluginLifeCycle(
         if (!plugin.value) return;
 
         try {
-          if (enabled) {
-            const pluginToUpdate = cloneDeep(plugin.value);
-            pluginToUpdate.spec.enabled = false;
-            await apiClient.extension.plugin.updatePluginHaloRunV1alpha1Plugin({
-              name: pluginToUpdate.metadata.name,
-              plugin: pluginToUpdate,
-            });
-          }
+          await apiClient.plugin.changePluginRunningState({
+            name: plugin.value.metadata.name,
+            pluginRunningStateRequest: {
+              enable: false,
+            },
+          });
 
           await apiClient.extension.plugin.deletePluginHaloRunV1alpha1Plugin({
             name: plugin.value.metadata.name,
