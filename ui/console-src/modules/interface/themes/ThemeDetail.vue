@@ -1,6 +1,4 @@
 <script lang="ts" setup>
-import { apiClient } from "@/utils/api-client";
-import type { Theme } from "@halo-dev/api-client";
 import {
   Dialog,
   IconMore,
@@ -14,6 +12,9 @@ import {
   VStatusDot,
   VTag,
 } from "@halo-dev/components";
+import type { Theme } from "@halo-dev/api-client";
+
+import { apiClient } from "@halo-dev/api-client";
 import type { Ref } from "vue";
 import { inject, ref } from "vue";
 import { useI18n } from "vue-i18n";

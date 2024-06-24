@@ -6,7 +6,7 @@ import {
   VLoading,
 } from "@halo-dev/components";
 import { useQuery } from "@tanstack/vue-query";
-import { apiClient } from "@/utils/api-client";
+import { apiClient } from "@halo-dev/api-client";
 import type { AuthProvider, ListedAuthProvider } from "@halo-dev/api-client";
 import AuthProviderListItem from "./components/AuthProviderListItem.vue";
 import { computed, ref } from "vue";

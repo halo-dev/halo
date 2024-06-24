@@ -11,7 +11,7 @@ import {
 } from "@halo-dev/components";
 import { useQuery, useQueryClient } from "@tanstack/vue-query";
 import { useRoute } from "vue-router";
-import { apiClient } from "@/utils/api-client";
+import { apiClient } from "@halo-dev/api-client";
 import { computed, watch } from "vue";
 import { OverlayScrollbarsComponent } from "overlayscrollbars-vue";
 import { useRouteQuery } from "@vueuse/router";

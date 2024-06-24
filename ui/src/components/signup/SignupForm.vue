@@ -2,7 +2,7 @@
 import { computed, type ComputedRef, onMounted, reactive, ref } from "vue";
 import { submitForm } from "@formkit/core";
 import { Toast, VButton } from "@halo-dev/components";
-import { apiClient } from "@/utils/api-client";
+import { apiClient } from "@halo-dev/api-client";
 import { useRouteQuery } from "@vueuse/router";
 import { useI18n } from "vue-i18n";
 import { useMutation } from "@tanstack/vue-query";

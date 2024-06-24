@@ -18,7 +18,7 @@ import { Picker } from "emoji-mart";
 import i18n from "@emoji-mart/data/i18n/zh.json";
 import { onMounted, ref } from "vue";
 import { setFocus } from "@/formkit/utils/focus";
-import { apiClient } from "@/utils/api-client";
+import { apiClient } from "@halo-dev/api-client";
 import { useI18n } from "vue-i18n";
 
 const { t } = useI18n();

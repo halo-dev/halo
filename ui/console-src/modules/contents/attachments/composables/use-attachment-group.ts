@@ -1,6 +1,6 @@
 import type { Ref } from "vue";
 import type { Group } from "@halo-dev/api-client";
-import { apiClient } from "@/utils/api-client";
+import { apiClient } from "@halo-dev/api-client";
 import { useQuery } from "@tanstack/vue-query";
 
 interface useFetchAttachmentGroupReturn {

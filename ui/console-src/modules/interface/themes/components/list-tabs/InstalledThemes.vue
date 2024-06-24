@@ -10,7 +10,7 @@ import ThemePreviewModal from "../preview/ThemePreviewModal.vue";
 import ThemeListItem from "../ThemeListItem.vue";
 import { inject, ref, type Ref } from "vue";
 import type { Theme } from "@halo-dev/api-client";
-import { apiClient } from "@/utils/api-client";
+import { apiClient } from "@halo-dev/api-client";
 import { useQuery } from "@tanstack/vue-query";
 import { useThemeStore } from "@console/stores/theme";
 

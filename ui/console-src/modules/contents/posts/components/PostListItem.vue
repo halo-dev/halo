@@ -9,7 +9,7 @@ import {
 import type { ListedPost, Post } from "@halo-dev/api-client";
 import { useI18n } from "vue-i18n";
 import { usePermission } from "@/utils/permission";
-import { apiClient } from "@/utils/api-client";
+import { apiClient } from "@halo-dev/api-client";
 import { useQueryClient } from "@tanstack/vue-query";
 import type { Ref } from "vue";
 import { computed, inject, markRaw, ref, toRefs } from "vue";

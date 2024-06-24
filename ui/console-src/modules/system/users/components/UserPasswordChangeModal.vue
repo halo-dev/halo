@@ -3,7 +3,7 @@ import { VButton, VModal, VSpace } from "@halo-dev/components";
 import SubmitButton from "@/components/button/SubmitButton.vue";
 import { onMounted, ref } from "vue";
 import type { User } from "@halo-dev/api-client";
-import { apiClient } from "@/utils/api-client";
+import { apiClient } from "@halo-dev/api-client";
 import { cloneDeep } from "lodash-es";
 import { setFocus } from "@/formkit/utils/focus";
 

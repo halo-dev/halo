@@ -1,9 +1,13 @@
 <script lang="ts" setup>
+// core libs
+import { computed, nextTick, onMounted, ref } from "vue";
+import { apiClient } from "@halo-dev/api-client";
+
+// components
 import SubmitButton from "@/components/button/SubmitButton.vue";
 import AnnotationsForm from "@/components/form/AnnotationsForm.vue";
 import { setFocus } from "@/formkit/utils/focus";
 import { FormType } from "@/types/slug";
-import { apiClient } from "@/utils/api-client";
 import useSlugify from "@console/composables/use-slugify";
 import { useThemeCustomTemplates } from "@console/modules/interface/themes/composables/use-theme";
 import type { Category } from "@halo-dev/api-client";
@@ -16,7 +20,6 @@ import {
 } from "@halo-dev/components";
 import { useQueryClient } from "@tanstack/vue-query";
 import { cloneDeep } from "lodash-es";
-import { computed, nextTick, onMounted, ref } from "vue";
 import { useI18n } from "vue-i18n";
 
 const props = withDefaults(

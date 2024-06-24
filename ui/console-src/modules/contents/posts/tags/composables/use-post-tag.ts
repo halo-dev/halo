@@ -1,4 +1,4 @@
-import { apiClient } from "@/utils/api-client";
+import { apiClient } from "@halo-dev/api-client";
 import type { Tag } from "@halo-dev/api-client";
 import { ref, watch, type Ref } from "vue";
 import { Dialog, Toast } from "@halo-dev/components";

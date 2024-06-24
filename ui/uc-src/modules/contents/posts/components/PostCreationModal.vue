@@ -8,7 +8,7 @@ import { useMutation } from "@tanstack/vue-query";
 import { useI18n } from "vue-i18n";
 import { randomUUID } from "@/utils/id";
 import { contentAnnotations } from "@/constants/annotations";
-import { apiClient } from "@/utils/api-client";
+import { apiClient } from "@halo-dev/api-client";
 
 const { t } = useI18n();
 

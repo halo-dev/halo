@@ -40,7 +40,7 @@ import type { Setting, SettingForm, Theme } from "@halo-dev/api-client";
 import { usePermission } from "@/utils/permission";
 import { useThemeStore } from "@console/stores/theme";
 import { storeToRefs } from "pinia";
-import { apiClient } from "@/utils/api-client";
+import { apiClient } from "@halo-dev/api-client";
 import { useI18n } from "vue-i18n";
 import { useQuery } from "@tanstack/vue-query";
 import { useRouteQuery } from "@vueuse/router";

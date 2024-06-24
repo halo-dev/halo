@@ -9,7 +9,7 @@ import {
 } from "vue";
 import { roleLabels } from "@/constants/labels";
 import { rbacAnnotations } from "@/constants/annotations";
-import { apiClient } from "@/utils/api-client";
+import { apiClient } from "@halo-dev/api-client";
 import { Toast } from "@halo-dev/components";
 import { useI18n } from "vue-i18n";
 import { resolveDeepDependencies } from "@/utils/role";

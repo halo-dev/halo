@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { useQuery } from "@tanstack/vue-query";
-import { apiClient } from "@/utils/api-client";
+import { apiClient } from "@halo-dev/api-client";
 import { computed, toRefs } from "vue";
 import { Toast, VLoading } from "@halo-dev/components";
 import { OverlayScrollbarsComponent } from "overlayscrollbars-vue";

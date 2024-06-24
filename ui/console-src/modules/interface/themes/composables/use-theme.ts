@@ -1,6 +1,6 @@
-import { apiClient } from "@/utils/api-client";
 import { useThemeStore } from "@console/stores/theme";
 import type { Theme } from "@halo-dev/api-client";
+import { apiClient } from "@halo-dev/api-client";
 import { Dialog, Toast } from "@halo-dev/components";
 import { useFileDialog } from "@vueuse/core";
 import { storeToRefs } from "pinia";

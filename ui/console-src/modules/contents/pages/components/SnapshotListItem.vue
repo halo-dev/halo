@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import type { ListedSnapshotDto, SinglePage } from "@halo-dev/api-client";
-import { apiClient } from "@/utils/api-client";
+import { apiClient } from "@halo-dev/api-client";
 import { Dialog, Toast, VButton, VStatusDot, VTag } from "@halo-dev/components";
 import { useQueryClient } from "@tanstack/vue-query";
 import { computed } from "vue";

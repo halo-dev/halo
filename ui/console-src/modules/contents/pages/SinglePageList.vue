@@ -19,7 +19,7 @@ import SinglePageSettingModal from "./components/SinglePageSettingModal.vue";
 import type { Ref } from "vue";
 import { computed, provide, ref, watch } from "vue";
 import type { ListedSinglePage, SinglePage } from "@halo-dev/api-client";
-import { apiClient } from "@/utils/api-client";
+import { apiClient } from "@halo-dev/api-client";
 import { singlePageLabels } from "@/constants/labels";
 import { useQuery } from "@tanstack/vue-query";
 import { useI18n } from "vue-i18n";

@@ -9,7 +9,7 @@ import { cloneDeep } from "lodash-es";
 import { setFocus } from "@/formkit/utils/focus";
 import { pluginLabels, roleLabels } from "@/constants/labels";
 import { useI18n } from "vue-i18n";
-import { apiClient } from "@/utils/api-client";
+import { apiClient } from "@halo-dev/api-client";
 import { useQuery } from "@tanstack/vue-query";
 
 const { t } = useI18n();

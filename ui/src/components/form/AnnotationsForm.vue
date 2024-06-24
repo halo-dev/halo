@@ -10,7 +10,7 @@ import {
 import { IconArrowRight } from "@halo-dev/components";
 
 import { computed, nextTick, onMounted, ref, watch } from "vue";
-import { apiClient } from "@/utils/api-client";
+import { apiClient } from "@halo-dev/api-client";
 import type { AnnotationSetting } from "@halo-dev/api-client";
 import { cloneDeep } from "lodash-es";
 import { getValidationMessages } from "@formkit/validation";

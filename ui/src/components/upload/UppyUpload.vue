@@ -12,7 +12,7 @@ import zh_TW from "@uppy/locales/lib/zh_TW";
 import en_US from "@uppy/locales/lib/en_US";
 import { computed, onUnmounted } from "vue";
 import { Toast } from "@halo-dev/components";
-import type { ProblemDetail } from "@/utils/api-client";
+import type { ProblemDetail } from "@/setup/setupApiClient";
 import { i18n } from "@/locales";
 
 const props = withDefaults(

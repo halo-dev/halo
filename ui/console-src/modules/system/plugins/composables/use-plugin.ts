@@ -1,7 +1,7 @@
 import type { ComputedRef, Ref } from "vue";
 import { computed } from "vue";
 import { type Plugin, PluginStatusPhaseEnum } from "@halo-dev/api-client";
-import { apiClient } from "@/utils/api-client";
+import { apiClient } from "@halo-dev/api-client";
 import { Dialog, Toast } from "@halo-dev/components";
 import { useI18n } from "vue-i18n";
 import { useMutation } from "@tanstack/vue-query";

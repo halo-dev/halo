@@ -1,6 +1,6 @@
 import type { Attachment } from "@halo-dev/api-client";
 import { computed, nextTick, type Ref, ref, watch } from "vue";
-import { apiClient } from "@/utils/api-client";
+import { apiClient } from "@halo-dev/api-client";
 import { Dialog, Toast } from "@halo-dev/components";
 import { useQuery } from "@tanstack/vue-query";
 import { useI18n } from "vue-i18n";

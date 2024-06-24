@@ -9,7 +9,7 @@ import { onMounted, ref } from "vue";
 import qs from "qs";
 import { submitForm, reset } from "@formkit/core";
 import { JSEncrypt } from "jsencrypt";
-import { apiClient } from "@/utils/api-client";
+import { apiClient } from "@halo-dev/api-client";
 import { useI18n } from "vue-i18n";
 import { ERROR_MFA_REQUIRED_TYPE } from "@/constants/error-types";
 import MfaForm from "./MfaForm.vue";
