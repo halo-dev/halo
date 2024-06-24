@@ -27,7 +27,6 @@ import {
 } from "@halo-dev/components";
 import { useLocalStorage } from "@vueuse/core";
 import { useRouteQuery } from "@vueuse/router";
-import { cloneDeep } from "lodash-es";
 import type { Ref } from "vue";
 import { computed, onMounted, provide, ref, watch } from "vue";
 import { useI18n } from "vue-i18n";
@@ -130,12 +129,16 @@ provide<Ref<Set<Attachment>>>("selectedAttachments", selectedAttachments);
 const handleMove = async (group: Group) => {
   try {
     const promises = Array.from(selectedAttachments.value).map((attachment) => {
-      const attachmentToUpdate = cloneDeep(attachment);
-      attachmentToUpdate.spec.groupName = group.metadata.name;
-      return apiClient.extension.storage.attachment.updateStorageHaloRunV1alpha1Attachment(
+      return apiClient.extension.storage.attachment.patchStorageHaloRunV1alpha1Attachment(
         {
           name: attachment.metadata.name,
-          attachment: attachmentToUpdate,
+          jsonPatchInner: [
+            {
+              op: "add",
+              path: "/spec/groupName",
+              value: group.metadata.name,
+            },
+          ],
         }
       );
     });
