@@ -15,6 +15,7 @@ import org.springframework.security.web.authentication.rememberme.InvalidCookieE
 import org.springframework.security.web.authentication.rememberme.PersistentRememberMeToken;
 import org.springframework.security.web.authentication.rememberme.PersistentTokenRepository;
 import org.springframework.security.web.authentication.rememberme.RememberMeAuthenticationException;
+import org.springframework.security.web.server.WebFilterExchange;
 import org.springframework.stereotype.Component;
 import org.springframework.web.server.ServerWebExchange;
 import reactor.core.publisher.Mono;
@@ -152,6 +153,14 @@ public class PersistentTokenBasedRememberMeServices extends TokenBasedRememberMe
                 log.error("Failed to save persistent token ", ex);
                 return Mono.empty();
             });
+    }
+
+    @Override
+    protected Mono<Void> onLogout(WebFilterExchange exchange, Authentication authentication) {
+        if (authentication != null) {
+            return this.tokenRepository.removeUserTokens(authentication.getName());
+        }
+        return Mono.empty();
     }
 
     private void addCookie(PersistentRememberMeToken token, ServerWebExchange exchange) {

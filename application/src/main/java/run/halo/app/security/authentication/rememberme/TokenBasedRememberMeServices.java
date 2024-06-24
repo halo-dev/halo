@@ -31,6 +31,8 @@ import org.springframework.security.crypto.codec.Utf8;
 import org.springframework.security.web.authentication.rememberme.CookieTheftException;
 import org.springframework.security.web.authentication.rememberme.InvalidCookieException;
 import org.springframework.security.web.authentication.rememberme.RememberMeAuthenticationException;
+import org.springframework.security.web.server.WebFilterExchange;
+import org.springframework.security.web.server.authentication.logout.ServerLogoutHandler;
 import org.springframework.util.StringUtils;
 import org.springframework.web.server.ServerWebExchange;
 import reactor.core.publisher.Mono;
@@ -54,7 +56,7 @@ import reactor.core.publisher.Mono;
 @Setter
 @Getter
 @RequiredArgsConstructor
-public class TokenBasedRememberMeServices implements RememberMeServices {
+public class TokenBasedRememberMeServices implements ServerLogoutHandler, RememberMeServices {
 
     public static final int TWO_WEEKS_S = 1209600;
 
@@ -373,6 +375,19 @@ public class TokenBasedRememberMeServices implements RememberMeServices {
 
     protected Mono<String> getKey() {
         return cookieSignatureKeyResolver.resolveSigningKey();
+    }
+
+    @Override
+    public Mono<Void> logout(WebFilterExchange exchange, Authentication authentication) {
+        if (log.isDebugEnabled()) {
+            log.debug("Logout of user {}", (authentication != null) ? authentication.getName()
+                : "Unknown");
+        }
+        return onLogout(exchange, authentication);
+    }
+
+    protected Mono<Void> onLogout(WebFilterExchange exchange, Authentication authentication) {
+        return Mono.empty();
     }
 
     record UsernamePassword(String username, String password) {
