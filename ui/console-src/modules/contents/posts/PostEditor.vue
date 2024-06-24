@@ -326,11 +326,27 @@ const handleFetchContent = async () => {
 };
 
 const handleOpenSettingModal = async () => {
+  if (isTitleChanged.value) {
+    await apiClient.extension.post.patchContentHaloRunV1alpha1Post({
+      name: formState.value.post.metadata.name,
+      jsonPatchInner: [
+        {
+          op: "add",
+          path: "/spec/title",
+          value:
+            formState.value.post.spec.title || t("core.post_editor.untitled"),
+        },
+      ],
+    });
+    isTitleChanged.value = false;
+  }
+
   const { data: latestPost } =
     await apiClient.extension.post.getContentHaloRunV1alpha1Post({
       name: formState.value.post.metadata.name,
     });
   formState.value.post = latestPost;
+
   settingModal.value = true;
 };
 
