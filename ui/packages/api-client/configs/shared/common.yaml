@@ -1,0 +1,9 @@
+generatorName: typescript-axios
+outputDir: src
+#typeMappings: "set=Array"
+additionalProperties:
+  supportsES6: true
+  useSingleRequestParameter: true
+  withSeparateModelsAndApi: true
+  apiPackage: api
+  modelPackage: models

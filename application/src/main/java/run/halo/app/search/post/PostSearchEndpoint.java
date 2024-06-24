@@ -29,7 +29,7 @@ public class PostSearchEndpoint implements CustomEndpoint {
 
     @Override
     public RouterFunction<ServerResponse> endpoint() {
-        final var tag = API_VERSION + "/Post";
+        var tag = "PostV1alpha1";
         return SpringdocRouteBuilder.route()
             .GET("indices/post", this::search,
                 builder -> {

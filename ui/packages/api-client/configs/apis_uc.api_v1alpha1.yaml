@@ -1,0 +1,3 @@
+'!include': "shared/common.yaml"
+inputSpec: ../../../api-docs/openapi/v3_0/apis_uc.api_v1alpha1.json
+apiPackage: uc-api

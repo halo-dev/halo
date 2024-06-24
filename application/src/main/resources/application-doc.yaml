@@ -4,6 +4,32 @@ springdoc:
   api-docs:
     enabled: true
     version: OPENAPI_3_0
+  group-configs:
+    - group: apis_public.api_v1alpha1
+      displayName: Public-related API
+      paths-to-match:
+        - /apis/api.halo.run/v1alpha1/**
+    - group: apis_console.api_v1alpha1
+      displayName: Console-related API
+      paths-to-match:
+        - /apis/console.api.*/v1alpha1/**
+        - /apis/api.console.halo.run/v1alpha1/**
+    - group: apis_uc.api_v1alpha1
+      displayName: User Center-related API
+      paths-to-match:
+        - /apis/uc.api.*/v1alpha1/**
+    - group: apis_extension.api_v1alpha1
+      displayName: Extension API
+      paths-to-match:
+        - /api/v1alpha1/**
+        - /apis/content.halo.run/v1alpha1/**
+        - /apis/theme.halo.run/v1alpha1/**
+        - /apis/security.halo.run/v1alpha1/**
+        - /apis/migration.halo.run/v1alpha1/**
+        - /apis/auth.halo.run/v1alpha1/**
+        - /apis/metrics.halo.run/v1alpha1/**
+        - /apis/storage.halo.run/v1alpha1/**
+        - /apis/plugin.halo.run/v1alpha1/**
 
 spring:
   main:

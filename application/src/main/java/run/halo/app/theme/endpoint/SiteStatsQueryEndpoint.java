@@ -29,7 +29,7 @@ public class SiteStatsQueryEndpoint implements CustomEndpoint {
 
     @Override
     public RouterFunction<ServerResponse> endpoint() {
-        final var tag = groupVersion().toString() + "/Stats";
+        var tag = "StatsV1alpha1";
         return SpringdocRouteBuilder.route()
             .GET("stats/-", this::getStats,
                 builder -> builder.operationId("queryStats")
