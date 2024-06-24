@@ -363,6 +363,9 @@ function createConsoleApiClient(baseURL: string,axiosInstance: AxiosInstance) {
     user: new ApiConsoleHaloRunV1alpha1UserApi(undefined, baseURL, axiosInstance),
     stats: new ApiConsoleHaloRunV1alpha1StatsApi(undefined, baseURL, axiosInstance),
     system: new ApiConsoleHaloRunV1alpha1SystemApi(undefined, baseURL, axiosInstance),
+    migration: new ApiConsoleMigrationHaloRunV1alpha1MigrationApi(undefined, baseURL, axiosInstance),
+    cache: new V1alpha1CacheApi(undefined, baseURL, axiosInstance),
+    login: new LoginApi(undefined, baseURL, axiosInstance),
     storage: {
       attachment: new ApiConsoleHaloRunV1alpha1AttachmentApi(undefined, baseURL, axiosInstance),
     },
@@ -379,6 +382,7 @@ function createConsoleApiClient(baseURL: string,axiosInstance: AxiosInstance) {
     },
     notification: {
       notifier: new ApiConsoleHaloRunV1alpha1NotifierApi(undefined, baseURL, axiosInstance),
+      notification: new ApiNotificationHaloRunV1alpha1NotificationApi(undefined, baseURL, axiosInstance),
     },
     plugin: {
       plugin: new ApiConsoleHaloRunV1alpha1PluginApi(undefined, baseURL, axiosInstance),
@@ -424,6 +428,10 @@ function createUcApiClient(baseURL: string,axiosInstance: AxiosInstance) {
     content: {
       post: new UcApiContentHaloRunV1alpha1PostApi(undefined, baseURL, axiosInstance),
       snapshot: new UcApiContentHaloRunV1alpha1SnapshotApi(undefined, baseURL, axiosInstance),
+    },
+    security: {
+      twoFactor: new ApiSecurityHaloRunV1alpha1AuthenticationTwoFactorApi(undefined, baseURL, axiosInstance),
+      personalAccessToken: new ApiSecurityHaloRunV1alpha1PersonalAccessTokenApi(undefined, baseURL, axiosInstance),
     }
   }
 }
