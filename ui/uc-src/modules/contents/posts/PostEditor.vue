@@ -102,7 +102,7 @@ provide<ComputedRef<string | undefined>>(
 );
 
 // Editor providers
-const { editorProviders } = useEditorExtensionPoints();
+const { editorProviders, fetchEditorProviders } = useEditorExtensionPoints();
 const currentEditorProvider = ref<EditorProvider>();
 const storedEditorProviderName = useLocalStorage("editor-provider-name", "");
 
@@ -125,6 +125,8 @@ const handleChangeEditorProvider = async (provider: EditorProvider) => {
 const name = useRouteQuery<string | undefined>("name");
 
 onMounted(async () => {
+  await fetchEditorProviders();
+
   if (name.value) {
     await getLatestPost();
     await handleFetchContent();

@@ -200,18 +200,22 @@ const handleApproveInBatch = async () => {
         });
 
         const promises = commentsToUpdate?.map((comment) => {
-          return apiClient.extension.comment.updateContentHaloRunV1alpha1Comment(
+          return apiClient.extension.comment.patchContentHaloRunV1alpha1Comment(
             {
               name: comment.comment.metadata.name,
-              comment: {
-                ...comment.comment,
-                spec: {
-                  ...comment.comment.spec,
-                  approved: true,
-                  // TODO: 暂时由前端设置发布时间。see https://github.com/halo-dev/halo/pull/2746
-                  approvedTime: new Date().toISOString(),
+              jsonPatchInner: [
+                {
+                  op: "add",
+                  path: "/spec/approved",
+                  value: true,
                 },
-              },
+                {
+                  op: "add",
+                  path: "/spec/approvedTime",
+                  // TODO: 暂时由前端设置发布时间。see https://github.com/halo-dev/halo/pull/2746
+                  value: new Date().toISOString(),
+                },
+              ],
             }
           );
         });

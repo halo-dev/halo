@@ -64,15 +64,11 @@ const handleShowActiveModalAfterInstall = (plugin: Plugin) => {
     cancelText: t("core.common.buttons.cancel"),
     onConfirm: async () => {
       try {
-        const { data: pluginToUpdate } =
-          await apiClient.extension.plugin.getPluginHaloRunV1alpha1Plugin({
-            name: plugin.metadata.name,
-          });
-        pluginToUpdate.spec.enabled = true;
-
-        await apiClient.extension.plugin.updatePluginHaloRunV1alpha1Plugin({
-          name: pluginToUpdate.metadata.name,
-          plugin: pluginToUpdate,
+        await apiClient.plugin.changePluginRunningState({
+          name: plugin.metadata.name,
+          pluginRunningStateRequest: {
+            enable: true,
+          },
         });
 
         window.location.reload();

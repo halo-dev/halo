@@ -31,7 +31,6 @@ import type {
   CommentSubjectRefResult,
 } from "@halo-dev/console-shared";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/vue-query";
-import { cloneDeep } from "lodash-es";
 import { computed, onMounted, provide, ref, type Ref } from "vue";
 import { useI18n } from "vue-i18n";
 import ReplyCreationModal from "./ReplyCreationModal.vue";
@@ -91,17 +90,21 @@ const handleApproveReplyInBatch = async () => {
           return !reply.reply.spec.approved;
         });
         const promises = repliesToUpdate?.map((reply) => {
-          return apiClient.extension.reply.updateContentHaloRunV1alpha1Reply({
+          return apiClient.extension.reply.patchContentHaloRunV1alpha1Reply({
             name: reply.reply.metadata.name,
-            reply: {
-              ...reply.reply,
-              spec: {
-                ...reply.reply.spec,
-                approved: true,
-                // TODO: 暂时由前端设置发布时间。see https://github.com/halo-dev/halo/pull/2746
-                approvedTime: new Date().toISOString(),
+            jsonPatchInner: [
+              {
+                op: "add",
+                path: "/spec/approved",
+                value: true,
               },
-            },
+              {
+                op: "add",
+                path: "/spec/approvedTime",
+                // TODO: 暂时由前端设置发布时间。see https://github.com/halo-dev/halo/pull/2746
+                value: new Date().toISOString(),
+              },
+            ],
           });
         });
         await Promise.all(promises || []);
@@ -118,13 +121,21 @@ const handleApproveReplyInBatch = async () => {
 
 const handleApprove = async () => {
   try {
-    const commentToUpdate = cloneDeep(props.comment.comment);
-    commentToUpdate.spec.approved = true;
-    // TODO: 暂时由前端设置发布时间。see https://github.com/halo-dev/halo/pull/2746
-    commentToUpdate.spec.approvedTime = new Date().toISOString();
-    await apiClient.extension.comment.updateContentHaloRunV1alpha1Comment({
-      name: commentToUpdate.metadata.name,
-      comment: commentToUpdate,
+    await apiClient.extension.comment.patchContentHaloRunV1alpha1Comment({
+      name: props.comment.comment.metadata.name,
+      jsonPatchInner: [
+        {
+          op: "add",
+          path: "/spec/approved",
+          value: true,
+        },
+        {
+          op: "add",
+          path: "/spec/approvedTime",
+          // TODO: 暂时由前端设置发布时间。see https://github.com/halo-dev/halo/pull/2746
+          value: new Date().toISOString(),
+        },
+      ],
     });
 
     Toast.success(t("core.common.toast.operation_success"));
@@ -165,21 +176,16 @@ const {
 const { mutateAsync: updateCommentLastReadTimeMutate } = useMutation({
   mutationKey: ["update-comment-last-read-time"],
   mutationFn: async () => {
-    const { data: latestComment } =
-      await apiClient.extension.comment.getContentHaloRunV1alpha1Comment({
-        name: props.comment.comment.metadata.name,
-      });
-
-    if (!latestComment.status?.unreadReplyCount) {
-      return latestComment;
-    }
-
-    latestComment.spec.lastReadTime = new Date().toISOString();
-
-    return apiClient.extension.comment.updateContentHaloRunV1alpha1Comment(
+    return apiClient.extension.comment.patchContentHaloRunV1alpha1Comment(
       {
-        name: latestComment.metadata.name,
-        comment: latestComment,
+        name: props.comment.comment.metadata.name,
+        jsonPatchInner: [
+          {
+            op: "add",
+            path: "/spec/lastReadTime",
+            value: new Date().toISOString(),
+          },
+        ],
       },
       {
         mute: true,
