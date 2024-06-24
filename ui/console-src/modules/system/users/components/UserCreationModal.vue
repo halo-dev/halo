@@ -1,7 +1,7 @@
 <script lang="ts" setup>
 // core libs
 import { onMounted, ref } from "vue";
-import { apiClient } from "@/utils/api-client";
+import { apiClient } from "@halo-dev/api-client";
 import type { CreateUserRequest } from "@halo-dev/api-client";
 
 // components

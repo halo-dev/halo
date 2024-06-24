@@ -18,7 +18,7 @@ import {
 import { markRaw, ref, type Component } from "vue";
 import { useRouter } from "vue-router";
 import ThemePreviewModal from "@console/modules/interface/themes/components/preview/ThemePreviewModal.vue";
-import { apiClient } from "@/utils/api-client";
+import { apiClient } from "@halo-dev/api-client";
 import { useI18n } from "vue-i18n";
 import { OverlayScrollbarsComponent } from "overlayscrollbars-vue";
 

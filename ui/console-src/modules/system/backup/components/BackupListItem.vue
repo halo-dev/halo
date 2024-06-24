@@ -11,7 +11,7 @@ import {
 import type { Backup } from "@halo-dev/api-client";
 import { relativeTimeTo, formatDatetime } from "@/utils/date";
 import { computed, markRaw } from "vue";
-import { apiClient } from "@/utils/api-client";
+import { apiClient } from "@halo-dev/api-client";
 import { useQueryClient } from "@tanstack/vue-query";
 import prettyBytes from "pretty-bytes";
 import { useI18n } from "vue-i18n";

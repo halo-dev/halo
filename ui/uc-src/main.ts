@@ -8,16 +8,18 @@ import { createPinia } from "pinia";
 import { setupCoreModules, setupPluginModules } from "@uc/setup/setupModules";
 import router from "@uc/router";
 import { useUserStore } from "@/stores/user";
-import { apiClient } from "@/utils/api-client";
+import { apiClient } from "@halo-dev/api-client";
 import { useRoleStore } from "@/stores/role";
 import { hasPermission } from "@/utils/permission";
 import { useGlobalInfoStore } from "@/stores/global-info";
+import { setupApiClient } from "@/setup/setupApiClient";
 
 const app = createApp(App);
 
 setupComponents(app);
 setupI18n(app);
 setupVueQuery(app);
+setupApiClient();
 
 app.use(createPinia());
 

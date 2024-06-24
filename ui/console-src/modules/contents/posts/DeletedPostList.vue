@@ -20,7 +20,7 @@ import {
 import PostTag from "./tags/components/PostTag.vue";
 import { ref, watch } from "vue";
 import type { ListedPost, Post } from "@halo-dev/api-client";
-import { apiClient } from "@/utils/api-client";
+import { apiClient } from "@halo-dev/api-client";
 import { formatDatetime } from "@/utils/date";
 import { usePermission } from "@/utils/permission";
 import { cloneDeep } from "lodash-es";

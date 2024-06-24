@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import { apiClient } from "@/utils/api-client";
+import { apiClient } from "@halo-dev/api-client";
 import { Toast, VButton } from "@halo-dev/components";
 import { ref } from "vue";
 import { useI18n } from "vue-i18n";

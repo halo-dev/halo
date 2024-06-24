@@ -16,7 +16,7 @@ import {
 import MenuEditingModal from "./MenuEditingModal.vue";
 import { onMounted, ref } from "vue";
 import type { Menu } from "@halo-dev/api-client";
-import { apiClient } from "@/utils/api-client";
+import { apiClient } from "@halo-dev/api-client";
 import { useRouteQuery } from "@vueuse/router";
 import { usePermission } from "@/utils/permission";
 import { useI18n } from "vue-i18n";

@@ -20,7 +20,7 @@ import type { Content, Post, Snapshot } from "@halo-dev/api-client";
 import { randomUUID } from "@/utils/id";
 import { contentAnnotations } from "@/constants/annotations";
 import { useRouteQuery } from "@vueuse/router";
-import { apiClient } from "@/utils/api-client";
+import { apiClient } from "@halo-dev/api-client";
 import { useRouter } from "vue-router";
 import { useI18n } from "vue-i18n";
 import { useMutation } from "@tanstack/vue-query";

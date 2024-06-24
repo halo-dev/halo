@@ -2,7 +2,7 @@
 import { VButton, VEmpty, VSpace, VLoading } from "@halo-dev/components";
 import ThemeListItem from "../ThemeListItem.vue";
 import type { Theme } from "@halo-dev/api-client";
-import { apiClient } from "@/utils/api-client";
+import { apiClient } from "@halo-dev/api-client";
 import { useQuery } from "@tanstack/vue-query";
 
 const {

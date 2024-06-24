@@ -2,7 +2,7 @@
 import UserAvatar from "@/components/user-avatar/UserAvatar.vue";
 import { usePluginModuleStore } from "@/stores/plugin";
 import { useUserStore } from "@/stores/user";
-import { apiClient } from "@/utils/api-client";
+import { apiClient } from "@halo-dev/api-client";
 import { usePermission } from "@/utils/permission";
 import {
   VButton,

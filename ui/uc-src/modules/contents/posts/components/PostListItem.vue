@@ -22,7 +22,7 @@ import { formatDatetime } from "@/utils/date";
 import StatusDotField from "@/components/entity-fields/StatusDotField.vue";
 import { useI18n } from "vue-i18n";
 import HasPermission from "@/components/permission/HasPermission.vue";
-import { apiClient } from "@/utils/api-client";
+import { apiClient } from "@halo-dev/api-client";
 import { useQueryClient } from "@tanstack/vue-query";
 
 const { t } = useI18n();

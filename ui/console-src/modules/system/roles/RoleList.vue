@@ -26,7 +26,7 @@ import { rbacAnnotations } from "@/constants/annotations";
 import { formatDatetime } from "@/utils/date";
 
 // libs
-import { apiClient } from "@/utils/api-client";
+import { apiClient } from "@halo-dev/api-client";
 import Fuse from "fuse.js";
 import { usePermission } from "@/utils/permission";
 import { roleLabels } from "@/constants/labels";

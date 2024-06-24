@@ -2,7 +2,7 @@
 import AnnotationsForm from "@/components/form/AnnotationsForm.vue";
 import { singlePageLabels } from "@/constants/labels";
 import { FormType } from "@/types/slug";
-import { apiClient } from "@/utils/api-client";
+import { apiClient } from "@halo-dev/api-client";
 import { toDatetimeLocal, toISOString } from "@/utils/date";
 import { randomUUID } from "@/utils/id";
 import useSlugify from "@console/composables/use-slugify";

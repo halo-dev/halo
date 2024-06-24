@@ -11,7 +11,7 @@ import { inject } from "vue";
 import type { Ref } from "vue";
 import { ref } from "vue";
 import { useThemeStore } from "@console/stores/theme";
-import { apiClient } from "@/utils/api-client";
+import { apiClient } from "@halo-dev/api-client";
 
 const { t } = useI18n();
 const queryClient = useQueryClient();
