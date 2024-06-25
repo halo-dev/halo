@@ -289,7 +289,7 @@ const handlePublishInBatch = async () => {
     onConfirm: async () => {
       for (const i in selectedPostNames.value) {
         const name = selectedPostNames.value[i];
-        await apiClient.post.publishPost({ name });
+        await consoleApiClient.content.post.publishPost({ name });
       }
 
       await refetch();
@@ -309,7 +309,7 @@ const handleCancelPublishInBatch = async () => {
     onConfirm: async () => {
       for (const i in selectedPostNames.value) {
         const name = selectedPostNames.value[i];
-        await apiClient.post.unpublishPost({ name });
+        await consoleApiClient.content.post.unpublishPost({ name });
       }
 
       await refetch();
