@@ -142,8 +142,8 @@ export function deleteCurrentNodeAndSetSelection(
   state: EditorState,
   dispatch: Dispatch
 ) {
-  const tr = deleteNodeByPos($from, state);
-  if (tr && dispatch) {
+  const { tr } = state;
+  if (deleteNodeByPos($from)(tr) && dispatch) {
     if (beforePos !== 0) {
       tr.setSelection(TextSelection.create(tr.doc, beforePos - 1));
     }
@@ -159,6 +159,7 @@ export function handleDeletePreviousNode(
   state: EditorState,
   dispatch: Dispatch
 ) {
+  const { tr } = state;
   if (!dispatch) {
     return false;
   }
@@ -175,8 +176,7 @@ export function handleDeletePreviousNode(
     return false;
   }
 
-  const tr = deleteNodeByPos($from.doc.resolve(beforePos - 1), state);
-  if (tr) {
+  if (deleteNodeByPos($from.doc.resolve(beforePos - 1))(tr)) {
     dispatch(tr);
     return true;
   }

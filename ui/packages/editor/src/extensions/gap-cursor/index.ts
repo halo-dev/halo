@@ -16,7 +16,13 @@ import {
   type Command,
 } from "@/tiptap/pm";
 import GapCursorSelection from "./gap-cursor-selection";
-import type { Dispatch, EditorState, EditorView, ResolvedPos } from "@/tiptap";
+import type {
+  Dispatch,
+  EditorState,
+  EditorView,
+  ResolvedPos,
+  Transaction,
+} from "@/tiptap";
 import { deleteNodeByPos } from "@/utils";
 import { isEmpty } from "@/utils/isNodeEmpty";
 
@@ -105,7 +111,7 @@ const GapCursor = Extension.create({
               return false;
             },
             Backspace: (state, dispatch) => {
-              const { selection } = state;
+              const { selection, tr } = state;
               if (
                 isActive(state, "paragraph") &&
                 isEmpty(state.selection.$from.parent) &&
@@ -113,10 +119,13 @@ const GapCursor = Extension.create({
                 selection.empty
               ) {
                 const { $from } = selection;
-                const tr = deleteNodeByPos($from, state);
-                if (tr && dispatch) {
-                  dispatch(arrowGapCursor(-1, "left", state) || tr);
-                  return true;
+                deleteNodeByPos($from)(tr);
+                if (dispatch) {
+                  const $found = arrowGapCursor(-1, "left", state)(tr);
+                  if ($found) {
+                    dispatch(tr);
+                    return true;
+                  }
                 }
                 return false;
               }
@@ -134,8 +143,9 @@ const GapCursor = Extension.create({
                 return handleBackspaceAtStart(pos, state, dispatch);
               } else if (
                 nodeOffset.node &&
-                deleteNodeByPos(state.doc.resolve(pos), state, dispatch)
+                deleteNodeByPos(state.doc.resolve(pos))(tr)
               ) {
+                dispatch(tr);
                 return true;
               }
 
@@ -206,6 +216,7 @@ export function handleBackspaceAtStart(
   state: EditorState,
   dispatch: Dispatch
 ) {
+  const { tr } = state;
   if (pos == 0) {
     return false;
   }
@@ -218,11 +229,12 @@ export function handleBackspaceAtStart(
   }
 
   if (GapCursorSelection.valid($beforePos) && dispatch) {
-    dispatch(state.tr.setSelection(new GapCursorSelection($beforePos)));
+    dispatch(tr.setSelection(new GapCursorSelection($beforePos)));
     return true;
   }
 
-  if (deleteNodeByPos($beforePos, state, dispatch)) {
+  if (deleteNodeByPos($beforePos)(tr) && dispatch) {
+    dispatch(tr);
     return true;
   }
   return false;
@@ -259,8 +271,8 @@ export function arrow(axis: "vert" | "horiz", dir: number): Command {
   const dirStr =
     axis == "vert" ? (dir > 0 ? "down" : "up") : dir > 0 ? "right" : "left";
   return (state, dispatch, view) => {
-    const tr = arrowGapCursor(dir, dirStr, state, view);
-    if (tr && dispatch) {
+    const { tr } = state;
+    if (arrowGapCursor(dir, dirStr, state, view)(tr) && dispatch) {
       dispatch(tr);
       return true;
     }
@@ -274,39 +286,42 @@ export const arrowGapCursor = (
   state: EditorState,
   view?: EditorView
 ) => {
-  const sel = state.selection;
-  let $start = dir > 0 ? sel.$to : sel.$from;
-  let mustMove = sel.empty;
-  if (sel instanceof TextSelection) {
-    // Do nothing if the next node is not at the end of the document or is at the root node.
-    if ($start.depth == 0) {
-      return;
-    }
-    if (view && !view.endOfTextblock(dirStr)) {
-      return;
-    }
-    mustMove = false;
-    $start = state.doc.resolve(dir > 0 ? $start.after() : $start.before());
-    // If inside a node, check if it has reached the boundary of the node
-    if ($start.depth > 0) {
-      const pos = $start.pos;
-      const start = $start.start(1) + 1;
-      const end = $start.end(1) - 1;
-      if (pos != start && pos != end) {
+  return (tr: Transaction) => {
+    const sel = state.selection;
+    let $start = dir > 0 ? sel.$to : sel.$from;
+    let mustMove = sel.empty;
+    if (sel instanceof TextSelection) {
+      // Do nothing if the next node is not at the end of the document or is at the root node.
+      if ($start.depth == 0) {
         return;
       }
+      if (view && !view.endOfTextblock(dirStr)) {
+        return;
+      }
+      mustMove = false;
+      $start = state.doc.resolve(dir > 0 ? $start.after() : $start.before());
+      // If inside a node, check if it has reached the boundary of the node
+      if ($start.depth > 0) {
+        const pos = $start.pos;
+        const start = $start.start(1) + 1;
+        const end = $start.end(1) - 1;
+        if (pos != start && pos != end) {
+          return;
+        }
+      }
     }
-  }
 
-  if (sel instanceof GapCursorSelection) {
-    return;
-  }
+    if (sel instanceof GapCursorSelection) {
+      return;
+    }
 
-  const $found = GapCursorSelection.findGapCursorFrom($start, dir, mustMove);
-  if (!$found) {
-    return;
-  }
-  return state.tr.setSelection(new GapCursorSelection($found));
+    const $found = GapCursorSelection.findGapCursorFrom($start, dir, mustMove);
+    if (!$found) {
+      return;
+    }
+    tr.setSelection(new GapCursorSelection($found));
+    return $found;
+  };
 };
 
 /**

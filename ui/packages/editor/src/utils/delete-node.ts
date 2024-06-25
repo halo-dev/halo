@@ -1,44 +1,31 @@
-import type { Dispatch, Editor } from "@/tiptap/vue-3";
-import { type ResolvedPos, type EditorState, NodeSelection } from "@/tiptap/pm";
+import type { Editor } from "@/tiptap/vue-3";
+import { type ResolvedPos, NodeSelection, Transaction } from "@/tiptap/pm";
 
-export const deleteNodeByPos = (
-  $pos: ResolvedPos,
-  state: EditorState,
-  dispatch?: Dispatch
-) => {
-  if ($pos.depth) {
-    for (let d = $pos.depth; d > 0; d--) {
-      const tr = state.tr
-        .delete($pos.before(d), $pos.after(d))
-        .scrollIntoView();
-      if (dispatch) {
-        dispatch(tr);
+export const deleteNodeByPos = ($pos: ResolvedPos) => {
+  return (tr: Transaction) => {
+    if ($pos.depth) {
+      for (let d = $pos.depth; d > 0; d--) {
+        tr.delete($pos.before(d), $pos.after(d)).scrollIntoView();
+        return true;
       }
-      return tr;
-    }
-  } else {
-    const node = $pos.parent;
-    if (!node.isTextblock && node.nodeSize) {
-      const tr = state.tr
-        .setSelection(NodeSelection.create(state.doc, $pos.pos))
-        .deleteSelection();
-      if (dispatch) {
-        dispatch(tr);
+    } else {
+      const node = $pos.parent;
+      if (!node.isTextblock && node.nodeSize) {
+        tr.setSelection(
+          NodeSelection.create($pos.doc, $pos.pos)
+        ).deleteSelection();
+        return true;
       }
-      return tr;
     }
-  }
 
-  const pos = $pos.pos;
+    const pos = $pos.pos;
 
-  if (pos) {
-    const tr = state.tr.delete(pos, pos + $pos.node().nodeSize);
-    if (dispatch) {
-      dispatch(tr);
-      return tr;
+    if (pos) {
+      tr.delete(pos, pos + $pos.node().nodeSize);
+      return true;
     }
-  }
-  return null;
+    return false;
+  };
 };
 
 export const deleteNode = (nodeType: string, editor: Editor) => {
