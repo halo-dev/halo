@@ -120,13 +120,6 @@ const handleUpdateUser = async () => {
               validation="required|email|length:0,100"
             ></FormKit>
             <FormKit
-              v-model="formState.spec.phone"
-              :label="$t('core.user.editing_modal.fields.phone.label')"
-              type="text"
-              name="phone"
-              validation="length:0,20"
-            ></FormKit>
-            <FormKit
               v-model="formState.spec.bio"
               :label="$t('core.user.editing_modal.fields.bio.label')"
               type="textarea"
