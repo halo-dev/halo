@@ -10,6 +10,7 @@ import io.swagger.v3.core.util.RefUtils;
 import io.swagger.v3.oas.annotations.enums.ParameterIn;
 import org.springdoc.webflux.core.fn.SpringdocRouteBuilder;
 import org.springframework.lang.NonNull;
+import org.springframework.util.StringUtils;
 import org.springframework.web.reactive.function.server.HandlerFunction;
 import org.springframework.web.reactive.function.server.RouterFunction;
 import org.springframework.web.reactive.function.server.ServerResponse;
@@ -38,11 +39,12 @@ public class ExtensionRouterFunctionFactory {
         var patchHandler = new ExtensionPatchHandler(scheme, client);
         // TODO More handlers here
         var gvk = scheme.groupVersionKind();
-        var tagName = gvk.toString();
+        var kind = gvk.kind();
+        var tagName = gvk.kind() + StringUtils.capitalize(gvk.version());
         return SpringdocRouteBuilder.route()
             .GET(getHandler.pathPattern(), getHandler,
-                builder -> builder.operationId("Get/" + gvk)
-                    .description("Get " + gvk)
+                builder -> builder.operationId("get" + kind)
+                    .description("Get " + kind)
                     .tag(tagName)
                     .parameter(parameterBuilder().in(ParameterIn.PATH)
                         .name("name")
@@ -52,8 +54,8 @@ public class ExtensionRouterFunctionFactory {
                         .implementation(scheme.type())))
             .GET(listHandler.pathPattern(), listHandler,
                 builder -> {
-                    builder.operationId("List/" + gvk)
-                        .description("List " + gvk)
+                    builder.operationId("list" + kind)
+                        .description("List " + kind)
                         .tag(tagName)
                         .response(responseBuilder().responseCode("200")
                             .description("Response " + scheme.plural())
@@ -61,8 +63,8 @@ public class ExtensionRouterFunctionFactory {
                     SortableRequest.buildParameters(builder);
                 })
             .POST(createHandler.pathPattern(), createHandler,
-                builder -> builder.operationId("Create/" + gvk)
-                    .description("Create " + gvk)
+                builder -> builder.operationId("create" + kind)
+                    .description("Create " + kind)
                     .tag(tagName)
                     .requestBody(requestBodyBuilder()
                         .description("Fresh " + scheme.singular())
@@ -71,8 +73,8 @@ public class ExtensionRouterFunctionFactory {
                         .description("Response " + scheme.plural() + " created just now")
                         .implementation(scheme.type())))
             .PUT(updateHandler.pathPattern(), updateHandler,
-                builder -> builder.operationId("Update/" + gvk)
-                    .description("Update " + gvk)
+                builder -> builder.operationId("update" + kind)
+                    .description("Update " + kind)
                     .tag(tagName)
                     .parameter(parameterBuilder().in(ParameterIn.PATH)
                         .name("name")
@@ -84,8 +86,8 @@ public class ExtensionRouterFunctionFactory {
                         .description("Response " + scheme.plural() + " updated just now")
                         .implementation(scheme.type())))
             .PATCH(patchHandler.pathPattern(), patchHandler,
-                builder -> builder.operationId("Patch/" + gvk)
-                    .description("Patch " + gvk)
+                builder -> builder.operationId("patch" + kind)
+                    .description("Patch " + kind)
                     .tag(tagName)
                     .parameter(parameterBuilder().in(ParameterIn.PATH)
                         .name("name")
@@ -104,8 +106,8 @@ public class ExtensionRouterFunctionFactory {
                     )
             )
             .DELETE(deleteHandler.pathPattern(), deleteHandler,
-                builder -> builder.operationId("Delete/" + gvk)
-                    .description("Delete " + gvk)
+                builder -> builder.operationId("delete" + kind)
+                    .description("Delete " + kind)
                     .tag(tagName)
                     .parameter(parameterBuilder().in(ParameterIn.PATH)
                         .name("name")

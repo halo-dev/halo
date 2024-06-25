@@ -37,7 +37,7 @@ public class SinglePageQueryEndpoint implements CustomEndpoint {
 
     @Override
     public RouterFunction<ServerResponse> endpoint() {
-        final var tag = groupVersion().toString() + "/SinglePage";
+        var tag = "SinglePageV1alpha1Public";
         return SpringdocRouteBuilder.route()
             .GET("singlepages", this::listSinglePages,
                 builder -> {

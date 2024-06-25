@@ -111,7 +111,7 @@ public class UserEndpoint implements CustomEndpoint {
 
     @Override
     public RouterFunction<ServerResponse> endpoint() {
-        var tag = "api.console.halo.run/v1alpha1/User";
+        var tag = "UserV1alpha1Console";
         return SpringdocRouteBuilder.route()
             .GET("/users/-", this::me, builder -> builder.operationId("GetCurrentUserDetail")
                 .description("Get current user detail")

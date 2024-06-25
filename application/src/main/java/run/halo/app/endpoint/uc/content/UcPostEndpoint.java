@@ -51,7 +51,7 @@ public class UcPostEndpoint implements CustomEndpoint {
 
     @Override
     public RouterFunction<ServerResponse> endpoint() {
-        var tag = groupVersion() + "/Post";
+        var tag = "PostV1alpha1Uc";
         var namePathParam = parameterBuilder().name("name")
             .description("Post name")
             .in(ParameterIn.PATH)
