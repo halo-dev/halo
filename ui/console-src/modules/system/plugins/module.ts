@@ -2,6 +2,7 @@ import BasicLayout from "@console/layouts/BasicLayout.vue";
 import { IconPlug, IconSettings } from "@halo-dev/components";
 import { definePlugin } from "@halo-dev/console-shared";
 import { markRaw } from "vue";
+import type { RouteRecordRaw } from "vue-router";
 import PluginDetail from "./PluginDetail.vue";
 import PluginExtensionPointSettings from "./PluginExtensionPointSettings.vue";
 import PluginList from "./PluginList.vue";
@@ -53,6 +54,6 @@ export default definePlugin({
           },
         },
       ],
-    },
+    } as RouteRecordRaw,
   ],
 });
