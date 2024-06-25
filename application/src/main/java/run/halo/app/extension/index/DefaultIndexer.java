@@ -11,6 +11,7 @@ import java.util.concurrent.locks.ReadWriteLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 import java.util.function.Function;
 import org.apache.commons.lang3.BooleanUtils;
+import org.springframework.lang.NonNull;
 import run.halo.app.extension.Extension;
 
 /**
@@ -173,6 +174,28 @@ public class DefaultIndexer implements Indexer {
     }
 
     @Override
+    @NonNull
+    public IndexEntry getIndexEntry(String name) {
+        readLock.lock();
+        try {
+            var indexDescriptor = findIndexByName(name);
+            if (indexDescriptor == null) {
+                throw new IllegalArgumentException(
+                    "No index found for fieldPath [" + name + "], "
+                        + "make sure you have created an index for this field.");
+            }
+            if (!indexDescriptor.isReady()) {
+                throw new IllegalStateException(
+                    "Index [" + name + "] is not ready, "
+                        + "Please wait for more time or check the index status.");
+            }
+            return indexEntries.get(indexDescriptor);
+        } finally {
+            readLock.unlock();
+        }
+    }
+
+    @Override
     public Iterator<IndexEntry> readyIndexesIterator() {
         readLock.lock();
         try {
@@ -196,5 +219,15 @@ public class DefaultIndexer implements Indexer {
         } finally {
             readLock.unlock();
         }
+    }
+
+    @Override
+    public void acquireReadLock() {
+        readLock.lock();
+    }
+
+    @Override
+    public void releaseReadLock() {
+        readLock.unlock();
     }
 }

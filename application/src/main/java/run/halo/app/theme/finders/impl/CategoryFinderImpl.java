@@ -17,6 +17,7 @@ import reactor.core.publisher.Mono;
 import run.halo.app.core.extension.content.Category;
 import run.halo.app.extension.ListOptions;
 import run.halo.app.extension.ListResult;
+import run.halo.app.extension.Metadata;
 import run.halo.app.extension.PageRequestImpl;
 import run.halo.app.extension.ReactiveExtensionClient;
 import run.halo.app.extension.index.query.QueryFactory;
@@ -114,7 +115,9 @@ public class CategoryFinderImpl implements CategoryFinder {
                         }
                     }
                 });
-                return listToTree(nameIdentityMap.values(), name);
+                var tree = listToTree(nameIdentityMap.values(), name);
+                recomputePostCount(tree);
+                return tree;
             });
     }
 
@@ -137,6 +140,40 @@ public class CategoryFinderImpl implements CategoryFinder {
                 : StringUtils.equals(v.getMetadata().getName(), name))
             .sorted(defaultTreeNodeComparator())
             .collect(Collectors.toList());
+    }
+
+    private CategoryTreeVo dummyVirtualRoot(List<CategoryTreeVo> treeNodes) {
+        Category.CategorySpec categorySpec = new Category.CategorySpec();
+        categorySpec.setSlug("/");
+        return CategoryTreeVo.builder()
+            .spec(categorySpec)
+            .postCount(0)
+            .children(treeNodes)
+            .metadata(new Metadata())
+            .build();
+    }
+
+    void recomputePostCount(List<CategoryTreeVo> treeNodes) {
+        var rootNode = dummyVirtualRoot(treeNodes);
+        recomputePostCount(rootNode);
+    }
+
+    private int recomputePostCount(CategoryTreeVo rootNode) {
+        if (rootNode == null) {
+            return 0;
+        }
+
+        int originalPostCount = rootNode.getPostCount();
+
+        for (var child : rootNode.getChildren()) {
+            int childSum = recomputePostCount(child);
+            if (!child.getSpec().isPreventParentPostCascadeQuery()) {
+                rootNode.setPostCount(rootNode.getPostCount() + childSum);
+            }
+        }
+
+        return rootNode.getSpec().isPreventParentPostCascadeQuery() ? originalPostCount
+            : rootNode.getPostCount();
     }
 
     static Comparator<CategoryTreeVo> defaultTreeNodeComparator() {

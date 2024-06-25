@@ -20,6 +20,7 @@ import run.halo.app.core.extension.User;
 import run.halo.app.core.extension.notification.Reason;
 import run.halo.app.core.extension.notification.Subscription;
 import run.halo.app.core.extension.service.EmailVerificationService;
+import run.halo.app.core.extension.service.UserService;
 import run.halo.app.extension.GroupVersion;
 import run.halo.app.extension.MetadataUtil;
 import run.halo.app.extension.ReactiveExtensionClient;
@@ -46,6 +47,7 @@ public class EmailVerificationServiceImpl implements EmailVerificationService {
     private final ReactiveExtensionClient client;
     private final NotificationReasonEmitter reasonEmitter;
     private final NotificationCenter notificationCenter;
+    private final UserService userService;
 
     @Override
     public Mono<Void> sendVerificationCode(String username, String email) {
@@ -80,26 +82,49 @@ public class EmailVerificationServiceImpl implements EmailVerificationService {
         Assert.state(StringUtils.isNotBlank(username), "Username must not be blank");
         Assert.state(StringUtils.isNotBlank(code), "Code must not be blank");
         return Mono.defer(() -> client.get(User.class, username)
-                .flatMap(user -> {
-                    var annotations = MetadataUtil.nullSafeAnnotations(user);
-                    var emailToVerify = annotations.get(User.EMAIL_TO_VERIFY);
-                    if (StringUtils.isBlank(emailToVerify)) {
-                        return Mono.error(EmailVerificationFailed::new);
-                    }
-                    var verified =
-                        emailVerificationManager.verifyCode(username, emailToVerify, code);
-                    if (!verified) {
-                        return Mono.error(EmailVerificationFailed::new);
-                    }
-                    user.getSpec().setEmailVerified(true);
-                    user.getSpec().setEmail(emailToVerify);
-                    emailVerificationManager.removeCode(username, emailToVerify);
-                    return client.update(user);
-                })
+                .flatMap(user -> verifyUserEmail(user, code))
             )
             .retryWhen(Retry.backoff(8, Duration.ofMillis(100))
-                .filter(OptimisticLockingFailureException.class::isInstance))
+                .filter(OptimisticLockingFailureException.class::isInstance));
+    }
+
+    private Mono<Void> verifyUserEmail(User user, String code) {
+        var username = user.getMetadata().getName();
+        var annotations = MetadataUtil.nullSafeAnnotations(user);
+        var emailToVerify = annotations.get(User.EMAIL_TO_VERIFY);
+
+        if (StringUtils.isBlank(emailToVerify)) {
+            return Mono.error(EmailVerificationFailed::new);
+        }
+
+        var verified = emailVerificationManager.verifyCode(username, emailToVerify, code);
+        if (!verified) {
+            return Mono.error(EmailVerificationFailed::new);
+        }
+
+        return isEmailInUse(username, emailToVerify)
+            .flatMap(inUse -> {
+                if (inUse) {
+                    return Mono.error(new EmailVerificationFailed("Email already in use.",
+                        null,
+                        "problemDetail.user.email.verify.emailInUse",
+                        null)
+                    );
+                }
+                // remove code when verified
+                emailVerificationManager.removeCode(username, emailToVerify);
+                user.getSpec().setEmailVerified(true);
+                user.getSpec().setEmail(emailToVerify);
+                return client.update(user);
+            })
             .then();
+    }
+
+    Mono<Boolean> isEmailInUse(String username, String emailToVerify) {
+        return userService.listByEmail(emailToVerify)
+            .filter(user -> user.getSpec().isEmailVerified())
+            .filter(user -> !user.getMetadata().getName().equals(username))
+            .hasElements();
     }
 
     @Override

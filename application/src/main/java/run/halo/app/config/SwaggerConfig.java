@@ -12,6 +12,7 @@ import io.swagger.v3.oas.models.info.Info;
 import io.swagger.v3.oas.models.security.SecurityRequirement;
 import io.swagger.v3.oas.models.security.SecurityScheme;
 import java.util.Set;
+import org.springdoc.core.customizers.OpenApiCustomizer;
 import org.springdoc.core.models.GroupedOpenApi;
 import org.springdoc.core.providers.ObjectMapperProvider;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
@@ -20,6 +21,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.Ordered;
 import org.springframework.core.annotation.Order;
+import run.halo.app.extension.router.JsonPatch;
 
 @Configuration
 @ConditionalOnProperty(name = SPRINGDOC_ENABLED, matchIfMissing = true)
@@ -37,8 +39,11 @@ public class SwaggerConfig {
                     .type(SecurityScheme.Type.HTTP).scheme("bearer").bearerFormat("JWT"))
             )
             .addSecurityItem(new SecurityRequirement().addList("BasicAuth").addList("BearerAuth"))
-            .info(new Info().title("Halo Next API")
-                .version("2.0.0"));
+            .info(new Info().title("Halo Next API").version("2.0.0"));
+    }
+
+    OpenApiCustomizer openApiCustomizer() {
+        return openApi -> JsonPatch.addSchema(openApi.getComponents());
     }
 
     @Bean
@@ -47,6 +52,7 @@ public class SwaggerConfig {
             .group("core-api")
             .displayName("Core APIs")
             .pathsToMatch("/api/**")
+            .addOpenApiCustomizer(openApiCustomizer())
             .build();
     }
 
@@ -58,6 +64,7 @@ public class SwaggerConfig {
             .pathsToMatch("/apis/**")
             .pathsToExclude("/apis/api.console.halo.run/**", "/apis/api.halo.run/**",
                 "/apis/api.plugin.halo.run/**")
+            .addOpenApiCustomizer(openApiCustomizer())
             .build();
     }
 
@@ -67,6 +74,7 @@ public class SwaggerConfig {
             .group("core-custom-api")
             .displayName("Custom APIs in Core")
             .pathsToMatch("/apis/api.console.halo.run/**")
+            .addOpenApiCustomizer(openApiCustomizer())
             .build();
     }
 
@@ -76,6 +84,7 @@ public class SwaggerConfig {
             .group("api.halo.run")
             .displayName("api.halo.run")
             .pathsToMatch("/apis/api.halo.run/**")
+            .addOpenApiCustomizer(openApiCustomizer())
             .build();
     }
 
@@ -85,6 +94,7 @@ public class SwaggerConfig {
             .group("plugin-custom-api")
             .displayName("Custom APIs in Plugin")
             .pathsToMatch("/apis/api.plugin.halo.run/**")
+            .addOpenApiCustomizer(openApiCustomizer())
             .build();
     }
 
@@ -94,6 +104,7 @@ public class SwaggerConfig {
             .group("uc.api")
             .displayName("User center APIs.")
             .pathsToMatch("/apis/uc.api.*/**")
+            .addOpenApiCustomizer(openApiCustomizer())
             .build();
     }
 
@@ -103,6 +114,7 @@ public class SwaggerConfig {
             .group("all-api")
             .displayName("All APIs")
             .pathsToMatch("/api/**", "/apis/**", "/login/**")
+            .addOpenApiCustomizer(openApiCustomizer())
             .build();
     }
 

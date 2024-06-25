@@ -8,7 +8,7 @@ import {
   VModal,
 } from "@halo-dev/components";
 import { useLocalStorage } from "@vueuse/core";
-import { ref, watch } from "vue";
+import { onMounted, ref } from "vue";
 import { useFetchAttachmentGroup } from "../composables/use-attachment-group";
 import {
   useFetchAttachmentPolicy,
@@ -32,35 +32,11 @@ const selectedPolicyName = useLocalStorage("attachment-upload-policy", "");
 const policyEditingModal = ref(false);
 const policyTemplateNameToCreate = ref();
 
-watch(
-  () => groups.value,
-  () => {
-    if (selectedGroupName.value === "") return;
-
-    const group = groups.value?.find(
-      (group) => group.metadata.name === selectedGroupName.value
-    );
-    if (!group) {
-      selectedGroupName.value = groups.value?.length
-        ? groups.value[0].metadata.name
-        : "";
-    }
+onMounted(() => {
+  if (!selectedPolicyName.value) {
+    selectedPolicyName.value = policies.value?.[0].metadata.name;
   }
-);
-
-watch(
-  () => policies.value,
-  () => {
-    const policy = policies.value?.find(
-      (policy) => policy.metadata.name === selectedPolicyName.value
-    );
-    if (!policy) {
-      selectedPolicyName.value = policies.value?.length
-        ? policies.value[0].metadata.name
-        : "";
-    }
-  }
-);
+});
 
 const handleOpenCreateNewPolicyModal = (policyTemplate: PolicyTemplate) => {
   policyTemplateNameToCreate.value = policyTemplate.metadata.name;

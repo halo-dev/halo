@@ -10,9 +10,19 @@ public class IsNull extends SimpleQuery {
 
     @Override
     public NavigableSet<String> matches(QueryIndexView indexView) {
-        var allIds = indexView.getAllIds();
-        var idsForField = indexView.getAllIdsForField(fieldName);
-        allIds.removeAll(idsForField);
-        return allIds;
+        indexView.acquireReadLock();
+        try {
+            var allIds = indexView.getAllIds();
+            var idsForNonNullValue = indexView.getIdsForField(fieldName);
+            allIds.removeAll(idsForNonNullValue);
+            return allIds;
+        } finally {
+            indexView.releaseReadLock();
+        }
+    }
+
+    @Override
+    public String toString() {
+        return fieldName + " IS NULL";
     }
 }

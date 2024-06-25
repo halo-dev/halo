@@ -1,5 +1,6 @@
 package run.halo.app.core.extension.content;
 
+import static io.swagger.v3.oas.annotations.media.Schema.RequiredMode.NOT_REQUIRED;
 import static io.swagger.v3.oas.annotations.media.Schema.RequiredMode.REQUIRED;
 import static run.halo.app.core.extension.content.Category.KIND;
 
@@ -53,12 +54,31 @@ public class Category extends AbstractExtension {
 
         private String cover;
 
+        @Schema(requiredMode = NOT_REQUIRED, maxLength = 255)
         private String template;
+
+        /**
+         * <p>Used to specify the template for the posts associated with the category.</p>
+         * <p>The priority is not as high as that of the post.</p>
+         * <p>If the post also specifies a template, the post's template will prevail.</p>
+         */
+        @Schema(requiredMode = NOT_REQUIRED, maxLength = 255)
+        private String postTemplate;
 
         @Schema(requiredMode = REQUIRED, defaultValue = "0")
         private Integer priority;
 
         private List<String> children;
+
+        /**
+         * <p>if a category is queried for related posts, the default behavior is to
+         * query all posts under the category including its subcategories, but if this field is
+         * set to true, cascade query behavior will be terminated here.</p>
+         * <p>For example, if a category has subcategories A and B, and A has subcategories C and
+         * D and C marked this field as true, when querying posts under A category,all posts under A
+         * and B will be queried, but C and D will not be queried.</p>
+         */
+        private boolean preventParentPostCascadeQuery;
     }
 
     @JsonIgnore

@@ -61,11 +61,15 @@ const handleDelete = () => {
 
       // move attachments to none group
       const moveToUnGroupRequests = data.items.map((attachment) => {
-        attachment.spec.groupName = undefined;
-        return apiClient.extension.storage.attachment.updateStorageHaloRunV1alpha1Attachment(
+        return apiClient.extension.storage.attachment.patchStorageHaloRunV1alpha1Attachment(
           {
             name: attachment.metadata.name,
-            attachment: attachment,
+            jsonPatchInner: [
+              {
+                op: "remove",
+                path: "/spec/groupName",
+              },
+            ],
           }
         );
       });

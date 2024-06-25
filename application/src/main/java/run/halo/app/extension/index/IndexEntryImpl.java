@@ -4,9 +4,11 @@ import com.google.common.collect.ListMultimap;
 import com.google.common.collect.MultimapBuilder;
 import java.util.Collection;
 import java.util.Comparator;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
+import java.util.NavigableSet;
+import java.util.TreeSet;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReadWriteLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
@@ -94,10 +96,13 @@ public class IndexEntryImpl implements IndexEntry {
     }
 
     @Override
-    public Set<String> indexedKeys() {
+    public NavigableSet<String> indexedKeys() {
         readLock.lock();
         try {
-            return indexKeyObjectNamesMap.keySet();
+            var keys = indexKeyObjectNamesMap.keySet();
+            var resultSet = new TreeSet<>(keyComparator());
+            resultSet.addAll(keys);
+            return resultSet;
         } finally {
             readLock.unlock();
         }
@@ -114,20 +119,32 @@ public class IndexEntryImpl implements IndexEntry {
     }
 
     @Override
-    public Collection<Map.Entry<String, String>> immutableEntries() {
+    public Map<String, Integer> getIdPositionMap() {
         readLock.lock();
         try {
-            // Copy to a new list to avoid ConcurrentModificationException
-            return indexKeyObjectNamesMap.entries().stream()
-                .map(entry -> Map.entry(entry.getKey(), entry.getValue()))
-                .toList();
+            // asMap is sorted by key
+            var keyObjectMap = getKeyObjectMap();
+            int i = 0;
+            var idPositionMap = new HashMap<String, Integer>();
+            for (var valueIdsEntry : keyObjectMap.entrySet()) {
+                var ids = valueIdsEntry.getValue();
+                for (String id : ids) {
+                    idPositionMap.put(id, i);
+                }
+                i++;
+            }
+            return idPositionMap;
         } finally {
             readLock.unlock();
         }
     }
 
+    protected Map<String, Collection<String>> getKeyObjectMap() {
+        return indexKeyObjectNamesMap.asMap();
+    }
+
     @Override
-    public List<String> getByIndexKey(String indexKey) {
+    public List<String> getObjectNamesBy(String indexKey) {
         readLock.lock();
         try {
             return indexKeyObjectNamesMap.get(indexKey);

@@ -346,12 +346,22 @@ core:
           refresh_message: 根據名稱重新生成別名
         template:
           label: 自定義模板
+          help: 自定義分類歸檔頁面的渲染模板，需要主題提供支持
         cover:
           label: 封面圖
           help: 需要主題適配以支持
         description:
           label: 描述
           help: 需要主題適配以支持
+        prevent_parent_post_cascade_query:
+          label: 防止父級聯查詢
+          help: 阻止父級分類在級聯文章查詢中包含此分類及其子分類
+        post_template:
+          label: 自定義文章模板
+          help: 自定義當前分類下文章的渲染模板，需要主題提供支持
+    list:
+      fields:
+        prevent_parent_post_cascade_query: 阻止父級分類在級聯文章查詢中包含此分類及其子分類
   page:
     title: 頁面
     actions:

@@ -1,5 +1,6 @@
 .gitignore
 .npmignore
+.openapi-generator-ignore
 api.ts
 api/api-console-halo-run-v1alpha1-attachment-api.ts
 api/api-console-halo-run-v1alpha1-auth-provider-api.ts
@@ -80,6 +81,7 @@ common.ts
 configuration.ts
 git_push.sh
 index.ts
+models/add-operation.ts
 models/annotation-setting-list.ts
 models/annotation-setting-spec.ts
 models/annotation-setting.ts
@@ -126,6 +128,7 @@ models/content-wrapper.ts
 models/content.ts
 models/contributor-vo.ts
 models/contributor.ts
+models/copy-operation.ts
 models/counter-list.ts
 models/counter-request.ts
 models/counter.ts
@@ -154,6 +157,7 @@ models/index.ts
 models/install-from-uri-request.ts
 models/interest-reason-subject.ts
 models/interest-reason.ts
+models/json-patch-inner.ts
 models/license.ts
 models/list-result-reply-vo.ts
 models/listed-auth-provider.ts
@@ -184,6 +188,7 @@ models/menu-spec.ts
 models/menu-vo.ts
 models/menu.ts
 models/metadata.ts
+models/move-operation.ts
 models/navigation-post-vo.ts
 models/notification-list.ts
 models/notification-spec.ts
@@ -240,6 +245,8 @@ models/reason-type.ts
 models/reason.ts
 models/ref.ts
 models/register-verify-email-request.ts
+models/remove-operation.ts
+models/replace-operation.ts
 models/reply-list.ts
 models/reply-request.ts
 models/reply-spec.ts
@@ -295,6 +302,7 @@ models/tag-vo.ts
 models/tag.ts
 models/template-content.ts
 models/template-descriptor.ts
+models/test-operation.ts
 models/theme-list.ts
 models/theme-spec.ts
 models/theme-status.ts

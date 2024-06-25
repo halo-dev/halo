@@ -22,6 +22,8 @@ import { DUMMY_BASE_URL, assertParamExists, setApiKeyToObject, setBasicAuthToObj
 // @ts-ignore
 import { BASE_PATH, COLLECTION_FORMATS, RequestArgs, BaseAPI, RequiredError, operationServerMap } from '../base';
 // @ts-ignore
+import { JsonPatchInner } from '../models';
+// @ts-ignore
 import { SinglePage } from '../models';
 // @ts-ignore
 import { SinglePageList } from '../models';
@@ -217,6 +219,51 @@ export const ContentHaloRunV1alpha1SinglePageApiAxiosParamCreator = function (co
             };
         },
         /**
+         * Patch content.halo.run/v1alpha1/SinglePage
+         * @param {string} name Name of singlepage
+         * @param {Array<JsonPatchInner>} [jsonPatchInner] 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        patchContentHaloRunV1alpha1SinglePage: async (name: string, jsonPatchInner?: Array<JsonPatchInner>, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+            // verify required parameter 'name' is not null or undefined
+            assertParamExists('patchContentHaloRunV1alpha1SinglePage', 'name', name)
+            const localVarPath = `/apis/content.halo.run/v1alpha1/singlepages/{name}`
+                .replace(`{${"name"}}`, encodeURIComponent(String(name)));
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'PATCH', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+            // authentication BasicAuth required
+            // http basic authentication required
+            setBasicAuthToObject(localVarRequestOptions, configuration)
+
+            // authentication BearerAuth required
+            // http bearer authentication required
+            await setBearerAuthToObject(localVarHeaderParameter, configuration)
+
+
+    
+            localVarHeaderParameter['Content-Type'] = 'application/json-patch+json';
+
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+            localVarRequestOptions.data = serializeDataIfNeeded(jsonPatchInner, localVarRequestOptions, configuration)
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+        /**
          * Update content.halo.run/v1alpha1/SinglePage
          * @param {string} name Name of singlepage
          * @param {SinglePage} [singlePage] Updated singlepage
@@ -324,6 +371,19 @@ export const ContentHaloRunV1alpha1SinglePageApiFp = function(configuration?: Co
             return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
         },
         /**
+         * Patch content.halo.run/v1alpha1/SinglePage
+         * @param {string} name Name of singlepage
+         * @param {Array<JsonPatchInner>} [jsonPatchInner] 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async patchContentHaloRunV1alpha1SinglePage(name: string, jsonPatchInner?: Array<JsonPatchInner>, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<SinglePage>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.patchContentHaloRunV1alpha1SinglePage(name, jsonPatchInner, options);
+            const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
+            const localVarOperationServerBasePath = operationServerMap['ContentHaloRunV1alpha1SinglePageApi.patchContentHaloRunV1alpha1SinglePage']?.[localVarOperationServerIndex]?.url;
+            return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
+        },
+        /**
          * Update content.halo.run/v1alpha1/SinglePage
          * @param {string} name Name of singlepage
          * @param {SinglePage} [singlePage] Updated singlepage
@@ -381,6 +441,15 @@ export const ContentHaloRunV1alpha1SinglePageApiFactory = function (configuratio
          */
         listContentHaloRunV1alpha1SinglePage(requestParameters: ContentHaloRunV1alpha1SinglePageApiListContentHaloRunV1alpha1SinglePageRequest = {}, options?: RawAxiosRequestConfig): AxiosPromise<SinglePageList> {
             return localVarFp.listContentHaloRunV1alpha1SinglePage(requestParameters.page, requestParameters.size, requestParameters.labelSelector, requestParameters.fieldSelector, requestParameters.sort, options).then((request) => request(axios, basePath));
+        },
+        /**
+         * Patch content.halo.run/v1alpha1/SinglePage
+         * @param {ContentHaloRunV1alpha1SinglePageApiPatchContentHaloRunV1alpha1SinglePageRequest} requestParameters Request parameters.
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        patchContentHaloRunV1alpha1SinglePage(requestParameters: ContentHaloRunV1alpha1SinglePageApiPatchContentHaloRunV1alpha1SinglePageRequest, options?: RawAxiosRequestConfig): AxiosPromise<SinglePage> {
+            return localVarFp.patchContentHaloRunV1alpha1SinglePage(requestParameters.name, requestParameters.jsonPatchInner, options).then((request) => request(axios, basePath));
         },
         /**
          * Update content.halo.run/v1alpha1/SinglePage
@@ -479,6 +548,27 @@ export interface ContentHaloRunV1alpha1SinglePageApiListContentHaloRunV1alpha1Si
 }
 
 /**
+ * Request parameters for patchContentHaloRunV1alpha1SinglePage operation in ContentHaloRunV1alpha1SinglePageApi.
+ * @export
+ * @interface ContentHaloRunV1alpha1SinglePageApiPatchContentHaloRunV1alpha1SinglePageRequest
+ */
+export interface ContentHaloRunV1alpha1SinglePageApiPatchContentHaloRunV1alpha1SinglePageRequest {
+    /**
+     * Name of singlepage
+     * @type {string}
+     * @memberof ContentHaloRunV1alpha1SinglePageApiPatchContentHaloRunV1alpha1SinglePage
+     */
+    readonly name: string
+
+    /**
+     * 
+     * @type {Array<JsonPatchInner>}
+     * @memberof ContentHaloRunV1alpha1SinglePageApiPatchContentHaloRunV1alpha1SinglePage
+     */
+    readonly jsonPatchInner?: Array<JsonPatchInner>
+}
+
+/**
  * Request parameters for updateContentHaloRunV1alpha1SinglePage operation in ContentHaloRunV1alpha1SinglePageApi.
  * @export
  * @interface ContentHaloRunV1alpha1SinglePageApiUpdateContentHaloRunV1alpha1SinglePageRequest
@@ -548,6 +638,17 @@ export class ContentHaloRunV1alpha1SinglePageApi extends BaseAPI {
      */
     public listContentHaloRunV1alpha1SinglePage(requestParameters: ContentHaloRunV1alpha1SinglePageApiListContentHaloRunV1alpha1SinglePageRequest = {}, options?: RawAxiosRequestConfig) {
         return ContentHaloRunV1alpha1SinglePageApiFp(this.configuration).listContentHaloRunV1alpha1SinglePage(requestParameters.page, requestParameters.size, requestParameters.labelSelector, requestParameters.fieldSelector, requestParameters.sort, options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
+     * Patch content.halo.run/v1alpha1/SinglePage
+     * @param {ContentHaloRunV1alpha1SinglePageApiPatchContentHaloRunV1alpha1SinglePageRequest} requestParameters Request parameters.
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof ContentHaloRunV1alpha1SinglePageApi
+     */
+    public patchContentHaloRunV1alpha1SinglePage(requestParameters: ContentHaloRunV1alpha1SinglePageApiPatchContentHaloRunV1alpha1SinglePageRequest, options?: RawAxiosRequestConfig) {
+        return ContentHaloRunV1alpha1SinglePageApiFp(this.configuration).patchContentHaloRunV1alpha1SinglePage(requestParameters.name, requestParameters.jsonPatchInner, options).then((request) => request(this.axios, this.basePath));
     }
 
     /**

@@ -174,6 +174,45 @@
           "v1alpha1/AnnotationSetting"
         ]
       },
+      "patch": {
+        "description": "Patch v1alpha1/AnnotationSetting",
+        "operationId": "Patch/v1alpha1/AnnotationSetting",
+        "parameters": [
+          {
+            "description": "Name of annotationsetting",
+            "in": "path",
+            "name": "name",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json-patch+json": {
+              "schema": {
+                "$ref": "#/components/schemas/JsonPatch"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/AnnotationSetting"
+                }
+              }
+            },
+            "description": "Response annotationsetting patched just now"
+          }
+        },
+        "tags": [
+          "v1alpha1/AnnotationSetting"
+        ]
+      },
       "put": {
         "description": "Update v1alpha1/AnnotationSetting",
         "operationId": "Update/v1alpha1/AnnotationSetting",
@@ -366,6 +405,45 @@
               }
             },
             "description": "Response single configmap"
+          }
+        },
+        "tags": [
+          "v1alpha1/ConfigMap"
+        ]
+      },
+      "patch": {
+        "description": "Patch v1alpha1/ConfigMap",
+        "operationId": "Patch/v1alpha1/ConfigMap",
+        "parameters": [
+          {
+            "description": "Name of configmap",
+            "in": "path",
+            "name": "name",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json-patch+json": {
+              "schema": {
+                "$ref": "#/components/schemas/JsonPatch"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ConfigMap"
+                }
+              }
+            },
+            "description": "Response configmap patched just now"
           }
         },
         "tags": [
@@ -570,6 +648,45 @@
           "v1alpha1/MenuItem"
         ]
       },
+      "patch": {
+        "description": "Patch v1alpha1/MenuItem",
+        "operationId": "Patch/v1alpha1/MenuItem",
+        "parameters": [
+          {
+            "description": "Name of menuitem",
+            "in": "path",
+            "name": "name",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json-patch+json": {
+              "schema": {
+                "$ref": "#/components/schemas/JsonPatch"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/MenuItem"
+                }
+              }
+            },
+            "description": "Response menuitem patched just now"
+          }
+        },
+        "tags": [
+          "v1alpha1/MenuItem"
+        ]
+      },
       "put": {
         "description": "Update v1alpha1/MenuItem",
         "operationId": "Update/v1alpha1/MenuItem",
@@ -762,6 +879,45 @@
               }
             },
             "description": "Response single menu"
+          }
+        },
+        "tags": [
+          "v1alpha1/Menu"
+        ]
+      },
+      "patch": {
+        "description": "Patch v1alpha1/Menu",
+        "operationId": "Patch/v1alpha1/Menu",
+        "parameters": [
+          {
+            "description": "Name of menu",
+            "in": "path",
+            "name": "name",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json-patch+json": {
+              "schema": {
+                "$ref": "#/components/schemas/JsonPatch"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/Menu"
+                }
+              }
+            },
+            "description": "Response menu patched just now"
           }
         },
         "tags": [
@@ -966,6 +1122,45 @@
           "v1alpha1/RoleBinding"
         ]
       },
+      "patch": {
+        "description": "Patch v1alpha1/RoleBinding",
+        "operationId": "Patch/v1alpha1/RoleBinding",
+        "parameters": [
+          {
+            "description": "Name of rolebinding",
+            "in": "path",
+            "name": "name",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json-patch+json": {
+              "schema": {
+                "$ref": "#/components/schemas/JsonPatch"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/RoleBinding"
+                }
+              }
+            },
+            "description": "Response rolebinding patched just now"
+          }
+        },
+        "tags": [
+          "v1alpha1/RoleBinding"
+        ]
+      },
       "put": {
         "description": "Update v1alpha1/RoleBinding",
         "operationId": "Update/v1alpha1/RoleBinding",
@@ -1158,6 +1353,45 @@
               }
             },
             "description": "Response single role"
+          }
+        },
+        "tags": [
+          "v1alpha1/Role"
+        ]
+      },
+      "patch": {
+        "description": "Patch v1alpha1/Role",
+        "operationId": "Patch/v1alpha1/Role",
+        "parameters": [
+          {
+            "description": "Name of role",
+            "in": "path",
+            "name": "name",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json-patch+json": {
+              "schema": {
+                "$ref": "#/components/schemas/JsonPatch"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/Role"
+                }
+              }
+            },
+            "description": "Response role patched just now"
           }
         },
         "tags": [
@@ -1362,6 +1596,45 @@
           "v1alpha1/Secret"
         ]
       },
+      "patch": {
+        "description": "Patch v1alpha1/Secret",
+        "operationId": "Patch/v1alpha1/Secret",
+        "parameters": [
+          {
+            "description": "Name of secret",
+            "in": "path",
+            "name": "name",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json-patch+json": {
+              "schema": {
+                "$ref": "#/components/schemas/JsonPatch"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/Secret"
+                }
+              }
+            },
+            "description": "Response secret patched just now"
+          }
+        },
+        "tags": [
+          "v1alpha1/Secret"
+        ]
+      },
       "put": {
         "description": "Update v1alpha1/Secret",
         "operationId": "Update/v1alpha1/Secret",
@@ -1560,6 +1833,45 @@
           "v1alpha1/Setting"
         ]
       },
+      "patch": {
+        "description": "Patch v1alpha1/Setting",
+        "operationId": "Patch/v1alpha1/Setting",
+        "parameters": [
+          {
+            "description": "Name of setting",
+            "in": "path",
+            "name": "name",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json-patch+json": {
+              "schema": {
+                "$ref": "#/components/schemas/JsonPatch"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/Setting"
+                }
+              }
+            },
+            "description": "Response setting patched just now"
+          }
+        },
+        "tags": [
+          "v1alpha1/Setting"
+        ]
+      },
       "put": {
         "description": "Update v1alpha1/Setting",
         "operationId": "Update/v1alpha1/Setting",
@@ -1752,6 +2064,45 @@
               }
             },
             "description": "Response single user"
+          }
+        },
+        "tags": [
+          "v1alpha1/User"
+        ]
+      },
+      "patch": {
+        "description": "Patch v1alpha1/User",
+        "operationId": "Patch/v1alpha1/User",
+        "parameters": [
+          {
+            "description": "Name of user",
+            "in": "path",
+            "name": "name",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json-patch+json": {
+              "schema": {
+                "$ref": "#/components/schemas/JsonPatch"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/User"
+                }
+              }
+            },
+            "description": "Response user patched just now"
           }
         },
         "tags": [
@@ -2851,6 +3202,14 @@
             "description": "Posts filtered by keyword.",
             "in": "query",
             "name": "keyword",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "description": "Posts filtered by category including sub-categories.",
+            "in": "query",
+            "name": "categoryWithChildren",
             "schema": {
               "type": "string"
             }
@@ -7017,6 +7376,45 @@
           "auth.halo.run/v1alpha1/AuthProvider"
         ]
       },
+      "patch": {
+        "description": "Patch auth.halo.run/v1alpha1/AuthProvider",
+        "operationId": "Patch/auth.halo.run/v1alpha1/AuthProvider",
+        "parameters": [
+          {
+            "description": "Name of authprovider",
+            "in": "path",
+            "name": "name",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json-patch+json": {
+              "schema": {
+                "$ref": "#/components/schemas/JsonPatch"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/AuthProvider"
+                }
+              }
+            },
+            "description": "Response authprovider patched just now"
+          }
+        },
+        "tags": [
+          "auth.halo.run/v1alpha1/AuthProvider"
+        ]
+      },
       "put": {
         "description": "Update auth.halo.run/v1alpha1/AuthProvider",
         "operationId": "Update/auth.halo.run/v1alpha1/AuthProvider",
@@ -7209,6 +7607,45 @@
               }
             },
             "description": "Response single userconnection"
+          }
+        },
+        "tags": [
+          "auth.halo.run/v1alpha1/UserConnection"
+        ]
+      },
+      "patch": {
+        "description": "Patch auth.halo.run/v1alpha1/UserConnection",
+        "operationId": "Patch/auth.halo.run/v1alpha1/UserConnection",
+        "parameters": [
+          {
+            "description": "Name of userconnection",
+            "in": "path",
+            "name": "name",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json-patch+json": {
+              "schema": {
+                "$ref": "#/components/schemas/JsonPatch"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/UserConnection"
+                }
+              }
+            },
+            "description": "Response userconnection patched just now"
           }
         },
         "tags": [
@@ -7438,6 +7875,45 @@
           "content.halo.run/v1alpha1/Category"
         ]
       },
+      "patch": {
+        "description": "Patch content.halo.run/v1alpha1/Category",
+        "operationId": "Patch/content.halo.run/v1alpha1/Category",
+        "parameters": [
+          {
+            "description": "Name of category",
+            "in": "path",
+            "name": "name",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json-patch+json": {
+              "schema": {
+                "$ref": "#/components/schemas/JsonPatch"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/Category"
+                }
+              }
+            },
+            "description": "Response category patched just now"
+          }
+        },
+        "tags": [
+          "content.halo.run/v1alpha1/Category"
+        ]
+      },
       "put": {
         "description": "Update content.halo.run/v1alpha1/Category",
         "operationId": "Update/content.halo.run/v1alpha1/Category",
@@ -7630,6 +8106,45 @@
               }
             },
             "description": "Response single comment"
+          }
+        },
+        "tags": [
+          "content.halo.run/v1alpha1/Comment"
+        ]
+      },
+      "patch": {
+        "description": "Patch content.halo.run/v1alpha1/Comment",
+        "operationId": "Patch/content.halo.run/v1alpha1/Comment",
+        "parameters": [
+          {
+            "description": "Name of comment",
+            "in": "path",
+            "name": "name",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json-patch+json": {
+              "schema": {
+                "$ref": "#/components/schemas/JsonPatch"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/Comment"
+                }
+              }
+            },
+            "description": "Response comment patched just now"
           }
         },
         "tags": [
@@ -7834,6 +8349,45 @@
           "content.halo.run/v1alpha1/Post"
         ]
       },
+      "patch": {
+        "description": "Patch content.halo.run/v1alpha1/Post",
+        "operationId": "Patch/content.halo.run/v1alpha1/Post",
+        "parameters": [
+          {
+            "description": "Name of post",
+            "in": "path",
+            "name": "name",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json-patch+json": {
+              "schema": {
+                "$ref": "#/components/schemas/JsonPatch"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/Post"
+                }
+              }
+            },
+            "description": "Response post patched just now"
+          }
+        },
+        "tags": [
+          "content.halo.run/v1alpha1/Post"
+        ]
+      },
       "put": {
         "description": "Update content.halo.run/v1alpha1/Post",
         "operationId": "Update/content.halo.run/v1alpha1/Post",
@@ -8026,6 +8580,45 @@
               }
             },
             "description": "Response single reply"
+          }
+        },
+        "tags": [
+          "content.halo.run/v1alpha1/Reply"
+        ]
+      },
+      "patch": {
+        "description": "Patch content.halo.run/v1alpha1/Reply",
+        "operationId": "Patch/content.halo.run/v1alpha1/Reply",
+        "parameters": [
+          {
+            "description": "Name of reply",
+            "in": "path",
+            "name": "name",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json-patch+json": {
+              "schema": {
+                "$ref": "#/components/schemas/JsonPatch"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/Reply"
+                }
+              }
+            },
+            "description": "Response reply patched just now"
           }
         },
         "tags": [
@@ -8230,6 +8823,45 @@
           "content.halo.run/v1alpha1/SinglePage"
         ]
       },
+      "patch": {
+        "description": "Patch content.halo.run/v1alpha1/SinglePage",
+        "operationId": "Patch/content.halo.run/v1alpha1/SinglePage",
+        "parameters": [
+          {
+            "description": "Name of singlepage",
+            "in": "path",
+            "name": "name",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json-patch+json": {
+              "schema": {
+                "$ref": "#/components/schemas/JsonPatch"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/SinglePage"
+                }
+              }
+            },
+            "description": "Response singlepage patched just now"
+          }
+        },
+        "tags": [
+          "content.halo.run/v1alpha1/SinglePage"
+        ]
+      },
       "put": {
         "description": "Update content.halo.run/v1alpha1/SinglePage",
         "operationId": "Update/content.halo.run/v1alpha1/SinglePage",
@@ -8422,6 +9054,45 @@
               }
             },
             "description": "Response single snapshot"
+          }
+        },
+        "tags": [
+          "content.halo.run/v1alpha1/Snapshot"
+        ]
+      },
+      "patch": {
+        "description": "Patch content.halo.run/v1alpha1/Snapshot",
+        "operationId": "Patch/content.halo.run/v1alpha1/Snapshot",
+        "parameters": [
+          {
+            "description": "Name of snapshot",
+            "in": "path",
+            "name": "name",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json-patch+json": {
+              "schema": {
+                "$ref": "#/components/schemas/JsonPatch"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/Snapshot"
+                }
+              }
+            },
+            "description": "Response snapshot patched just now"
           }
         },
         "tags": [
@@ -8626,6 +9297,45 @@
           "content.halo.run/v1alpha1/Tag"
         ]
       },
+      "patch": {
+        "description": "Patch content.halo.run/v1alpha1/Tag",
+        "operationId": "Patch/content.halo.run/v1alpha1/Tag",
+        "parameters": [
+          {
+            "description": "Name of tag",
+            "in": "path",
+            "name": "name",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json-patch+json": {
+              "schema": {
+                "$ref": "#/components/schemas/JsonPatch"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/Tag"
+                }
+              }
+            },
+            "description": "Response tag patched just now"
+          }
+        },
+        "tags": [
+          "content.halo.run/v1alpha1/Tag"
+        ]
+      },
       "put": {
         "description": "Update content.halo.run/v1alpha1/Tag",
         "operationId": "Update/content.halo.run/v1alpha1/Tag",
@@ -8818,6 +9528,45 @@
               }
             },
             "description": "Response single counter"
+          }
+        },
+        "tags": [
+          "metrics.halo.run/v1alpha1/Counter"
+        ]
+      },
+      "patch": {
+        "description": "Patch metrics.halo.run/v1alpha1/Counter",
+        "operationId": "Patch/metrics.halo.run/v1alpha1/Counter",
+        "parameters": [
+          {
+            "description": "Name of counter",
+            "in": "path",
+            "name": "name",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json-patch+json": {
+              "schema": {
+                "$ref": "#/components/schemas/JsonPatch"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/Counter"
+                }
+              }
+            },
+            "description": "Response counter patched just now"
           }
         },
         "tags": [
@@ -9022,6 +9771,45 @@
           "migration.halo.run/v1alpha1/Backup"
         ]
       },
+      "patch": {
+        "description": "Patch migration.halo.run/v1alpha1/Backup",
+        "operationId": "Patch/migration.halo.run/v1alpha1/Backup",
+        "parameters": [
+          {
+            "description": "Name of backup",
+            "in": "path",
+            "name": "name",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json-patch+json": {
+              "schema": {
+                "$ref": "#/components/schemas/JsonPatch"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/Backup"
+                }
+              }
+            },
+            "description": "Response backup patched just now"
+          }
+        },
+        "tags": [
+          "migration.halo.run/v1alpha1/Backup"
+        ]
+      },
       "put": {
         "description": "Update migration.halo.run/v1alpha1/Backup",
         "operationId": "Update/migration.halo.run/v1alpha1/Backup",
@@ -9214,6 +10002,45 @@
               }
             },
             "description": "Response single notification"
+          }
+        },
+        "tags": [
+          "notification.halo.run/v1alpha1/Notification"
+        ]
+      },
+      "patch": {
+        "description": "Patch notification.halo.run/v1alpha1/Notification",
+        "operationId": "Patch/notification.halo.run/v1alpha1/Notification",
+        "parameters": [
+          {
+            "description": "Name of notification",
+            "in": "path",
+            "name": "name",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json-patch+json": {
+              "schema": {
+                "$ref": "#/components/schemas/JsonPatch"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/Notification"
+                }
+              }
+            },
+            "description": "Response notification patched just now"
           }
         },
         "tags": [
@@ -9418,6 +10245,45 @@
           "notification.halo.run/v1alpha1/NotificationTemplate"
         ]
       },
+      "patch": {
+        "description": "Patch notification.halo.run/v1alpha1/NotificationTemplate",
+        "operationId": "Patch/notification.halo.run/v1alpha1/NotificationTemplate",
+        "parameters": [
+          {
+            "description": "Name of notificationtemplate",
+            "in": "path",
+            "name": "name",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json-patch+json": {
+              "schema": {
+                "$ref": "#/components/schemas/JsonPatch"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/NotificationTemplate"
+                }
+              }
+            },
+            "description": "Response notificationtemplate patched just now"
+          }
+        },
+        "tags": [
+          "notification.halo.run/v1alpha1/NotificationTemplate"
+        ]
+      },
       "put": {
         "description": "Update notification.halo.run/v1alpha1/NotificationTemplate",
         "operationId": "Update/notification.halo.run/v1alpha1/NotificationTemplate",
@@ -9610,6 +10476,45 @@
               }
             },
             "description": "Response single notifierDescriptor"
+          }
+        },
+        "tags": [
+          "notification.halo.run/v1alpha1/NotifierDescriptor"
+        ]
+      },
+      "patch": {
+        "description": "Patch notification.halo.run/v1alpha1/NotifierDescriptor",
+        "operationId": "Patch/notification.halo.run/v1alpha1/NotifierDescriptor",
+        "parameters": [
+          {
+            "description": "Name of notifierDescriptor",
+            "in": "path",
+            "name": "name",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json-patch+json": {
+              "schema": {
+                "$ref": "#/components/schemas/JsonPatch"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/NotifierDescriptor"
+                }
+              }
+            },
+            "description": "Response notifierDescriptor patched just now"
           }
         },
         "tags": [
@@ -9814,6 +10719,45 @@
           "notification.halo.run/v1alpha1/Reason"
         ]
       },
+      "patch": {
+        "description": "Patch notification.halo.run/v1alpha1/Reason",
+        "operationId": "Patch/notification.halo.run/v1alpha1/Reason",
+        "parameters": [
+          {
+            "description": "Name of reason",
+            "in": "path",
+            "name": "name",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json-patch+json": {
+              "schema": {
+                "$ref": "#/components/schemas/JsonPatch"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/Reason"
+                }
+              }
+            },
+            "description": "Response reason patched just now"
+          }
+        },
+        "tags": [
+          "notification.halo.run/v1alpha1/Reason"
+        ]
+      },
       "put": {
         "description": "Update notification.halo.run/v1alpha1/Reason",
         "operationId": "Update/notification.halo.run/v1alpha1/Reason",
@@ -10006,6 +10950,45 @@
               }
             },
             "description": "Response single reasontype"
+          }
+        },
+        "tags": [
+          "notification.halo.run/v1alpha1/ReasonType"
+        ]
+      },
+      "patch": {
+        "description": "Patch notification.halo.run/v1alpha1/ReasonType",
+        "operationId": "Patch/notification.halo.run/v1alpha1/ReasonType",
+        "parameters": [
+          {
+            "description": "Name of reasontype",
+            "in": "path",
+            "name": "name",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json-patch+json": {
+              "schema": {
+                "$ref": "#/components/schemas/JsonPatch"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ReasonType"
+                }
+              }
+            },
+            "description": "Response reasontype patched just now"
           }
         },
         "tags": [
@@ -10210,6 +11193,45 @@
           "notification.halo.run/v1alpha1/Subscription"
         ]
       },
+      "patch": {
+        "description": "Patch notification.halo.run/v1alpha1/Subscription",
+        "operationId": "Patch/notification.halo.run/v1alpha1/Subscription",
+        "parameters": [
+          {
+            "description": "Name of subscription",
+            "in": "path",
+            "name": "name",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json-patch+json": {
+              "schema": {
+                "$ref": "#/components/schemas/JsonPatch"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/Subscription"
+                }
+              }
+            },
+            "description": "Response subscription patched just now"
+          }
+        },
+        "tags": [
+          "notification.halo.run/v1alpha1/Subscription"
+        ]
+      },
       "put": {
         "description": "Update notification.halo.run/v1alpha1/Subscription",
         "operationId": "Update/notification.halo.run/v1alpha1/Subscription",
@@ -10402,6 +11424,45 @@
               }
             },
             "description": "Response single extensiondefinition"
+          }
+        },
+        "tags": [
+          "plugin.halo.run/v1alpha1/ExtensionDefinition"
+        ]
+      },
+      "patch": {
+        "description": "Patch plugin.halo.run/v1alpha1/ExtensionDefinition",
+        "operationId": "Patch/plugin.halo.run/v1alpha1/ExtensionDefinition",
+        "parameters": [
+          {
+            "description": "Name of extensiondefinition",
+            "in": "path",
+            "name": "name",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json-patch+json": {
+              "schema": {
+                "$ref": "#/components/schemas/JsonPatch"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ExtensionDefinition"
+                }
+              }
+            },
+            "description": "Response extensiondefinition patched just now"
           }
         },
         "tags": [
@@ -10606,6 +11667,45 @@
           "plugin.halo.run/v1alpha1/ExtensionPointDefinition"
         ]
       },
+      "patch": {
+        "description": "Patch plugin.halo.run/v1alpha1/ExtensionPointDefinition",
+        "operationId": "Patch/plugin.halo.run/v1alpha1/ExtensionPointDefinition",
+        "parameters": [
+          {
+            "description": "Name of extensionpointdefinition",
+            "in": "path",
+            "name": "name",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json-patch+json": {
+              "schema": {
+                "$ref": "#/components/schemas/JsonPatch"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ExtensionPointDefinition"
+                }
+              }
+            },
+            "description": "Response extensionpointdefinition patched just now"
+          }
+        },
+        "tags": [
+          "plugin.halo.run/v1alpha1/ExtensionPointDefinition"
+        ]
+      },
       "put": {
         "description": "Update plugin.halo.run/v1alpha1/ExtensionPointDefinition",
         "operationId": "Update/plugin.halo.run/v1alpha1/ExtensionPointDefinition",
@@ -10798,6 +11898,45 @@
               }
             },
             "description": "Response single plugin"
+          }
+        },
+        "tags": [
+          "plugin.halo.run/v1alpha1/Plugin"
+        ]
+      },
+      "patch": {
+        "description": "Patch plugin.halo.run/v1alpha1/Plugin",
+        "operationId": "Patch/plugin.halo.run/v1alpha1/Plugin",
+        "parameters": [
+          {
+            "description": "Name of plugin",
+            "in": "path",
+            "name": "name",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json-patch+json": {
+              "schema": {
+                "$ref": "#/components/schemas/JsonPatch"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/Plugin"
+                }
+              }
+            },
+            "description": "Response plugin patched just now"
           }
         },
         "tags": [
@@ -11002,6 +12141,45 @@
           "plugin.halo.run/v1alpha1/ReverseProxy"
         ]
       },
+      "patch": {
+        "description": "Patch plugin.halo.run/v1alpha1/ReverseProxy",
+        "operationId": "Patch/plugin.halo.run/v1alpha1/ReverseProxy",
+        "parameters": [
+          {
+            "description": "Name of reverseproxy",
+            "in": "path",
+            "name": "name",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json-patch+json": {
+              "schema": {
+                "$ref": "#/components/schemas/JsonPatch"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ReverseProxy"
+                }
+              }
+            },
+            "description": "Response reverseproxy patched just now"
+          }
+        },
+        "tags": [
+          "plugin.halo.run/v1alpha1/ReverseProxy"
+        ]
+      },
       "put": {
         "description": "Update plugin.halo.run/v1alpha1/ReverseProxy",
         "operationId": "Update/plugin.halo.run/v1alpha1/ReverseProxy",
@@ -11194,6 +12372,45 @@
               }
             },
             "description": "Response single searchengine"
+          }
+        },
+        "tags": [
+          "plugin.halo.run/v1alpha1/SearchEngine"
+        ]
+      },
+      "patch": {
+        "description": "Patch plugin.halo.run/v1alpha1/SearchEngine",
+        "operationId": "Patch/plugin.halo.run/v1alpha1/SearchEngine",
+        "parameters": [
+          {
+            "description": "Name of searchengine",
+            "in": "path",
+            "name": "name",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json-patch+json": {
+              "schema": {
+                "$ref": "#/components/schemas/JsonPatch"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/SearchEngine"
+                }
+              }
+            },
+            "description": "Response searchengine patched just now"
           }
         },
         "tags": [
@@ -11398,6 +12615,45 @@
           "security.halo.run/v1alpha1/PersonalAccessToken"
         ]
       },
+      "patch": {
+        "description": "Patch security.halo.run/v1alpha1/PersonalAccessToken",
+        "operationId": "Patch/security.halo.run/v1alpha1/PersonalAccessToken",
+        "parameters": [
+          {
+            "description": "Name of personalaccesstoken",
+            "in": "path",
+            "name": "name",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json-patch+json": {
+              "schema": {
+                "$ref": "#/components/schemas/JsonPatch"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/PersonalAccessToken"
+                }
+              }
+            },
+            "description": "Response personalaccesstoken patched just now"
+          }
+        },
+        "tags": [
+          "security.halo.run/v1alpha1/PersonalAccessToken"
+        ]
+      },
       "put": {
         "description": "Update security.halo.run/v1alpha1/PersonalAccessToken",
         "operationId": "Update/security.halo.run/v1alpha1/PersonalAccessToken",
@@ -11590,6 +12846,45 @@
               }
             },
             "description": "Response single attachment"
+          }
+        },
+        "tags": [
+          "storage.halo.run/v1alpha1/Attachment"
+        ]
+      },
+      "patch": {
+        "description": "Patch storage.halo.run/v1alpha1/Attachment",
+        "operationId": "Patch/storage.halo.run/v1alpha1/Attachment",
+        "parameters": [
+          {
+            "description": "Name of attachment",
+            "in": "path",
+            "name": "name",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json-patch+json": {
+              "schema": {
+                "$ref": "#/components/schemas/JsonPatch"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/Attachment"
+                }
+              }
+            },
+            "description": "Response attachment patched just now"
           }
         },
         "tags": [
@@ -11794,6 +13089,45 @@
           "storage.halo.run/v1alpha1/Group"
         ]
       },
+      "patch": {
+        "description": "Patch storage.halo.run/v1alpha1/Group",
+        "operationId": "Patch/storage.halo.run/v1alpha1/Group",
+        "parameters": [
+          {
+            "description": "Name of group",
+            "in": "path",
+            "name": "name",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json-patch+json": {
+              "schema": {
+                "$ref": "#/components/schemas/JsonPatch"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/Group"
+                }
+              }
+            },
+            "description": "Response group patched just now"
+          }
+        },
+        "tags": [
+          "storage.halo.run/v1alpha1/Group"
+        ]
+      },
       "put": {
         "description": "Update storage.halo.run/v1alpha1/Group",
         "operationId": "Update/storage.halo.run/v1alpha1/Group",
@@ -11986,6 +13320,45 @@
               }
             },
             "description": "Response single policy"
+          }
+        },
+        "tags": [
+          "storage.halo.run/v1alpha1/Policy"
+        ]
+      },
+      "patch": {
+        "description": "Patch storage.halo.run/v1alpha1/Policy",
+        "operationId": "Patch/storage.halo.run/v1alpha1/Policy",
+        "parameters": [
+          {
+            "description": "Name of policy",
+            "in": "path",
+            "name": "name",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json-patch+json": {
+              "schema": {
+                "$ref": "#/components/schemas/JsonPatch"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/Policy"
+                }
+              }
+            },
+            "description": "Response policy patched just now"
           }
         },
         "tags": [
@@ -12190,6 +13563,45 @@
           "storage.halo.run/v1alpha1/PolicyTemplate"
         ]
       },
+      "patch": {
+        "description": "Patch storage.halo.run/v1alpha1/PolicyTemplate",
+        "operationId": "Patch/storage.halo.run/v1alpha1/PolicyTemplate",
+        "parameters": [
+          {
+            "description": "Name of policytemplate",
+            "in": "path",
+            "name": "name",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json-patch+json": {
+              "schema": {
+                "$ref": "#/components/schemas/JsonPatch"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/PolicyTemplate"
+                }
+              }
+            },
+            "description": "Response policytemplate patched just now"
+          }
+        },
+        "tags": [
+          "storage.halo.run/v1alpha1/PolicyTemplate"
+        ]
+      },
       "put": {
         "description": "Update storage.halo.run/v1alpha1/PolicyTemplate",
         "operationId": "Update/storage.halo.run/v1alpha1/PolicyTemplate",
@@ -12388,6 +13800,45 @@
           "theme.halo.run/v1alpha1/Theme"
         ]
       },
+      "patch": {
+        "description": "Patch theme.halo.run/v1alpha1/Theme",
+        "operationId": "Patch/theme.halo.run/v1alpha1/Theme",
+        "parameters": [
+          {
+            "description": "Name of theme",
+            "in": "path",
+            "name": "name",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json-patch+json": {
+              "schema": {
+                "$ref": "#/components/schemas/JsonPatch"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/Theme"
+                }
+              }
+            },
+            "description": "Response theme patched just now"
+          }
+        },
+        "tags": [
+          "theme.halo.run/v1alpha1/Theme"
+        ]
+      },
       "put": {
         "description": "Update theme.halo.run/v1alpha1/Theme",
         "operationId": "Update/theme.halo.run/v1alpha1/Theme",
@@ -12543,6 +13994,14 @@
             "description": "Posts filtered by keyword.",
             "in": "query",
             "name": "keyword",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "description": "Posts filtered by category including sub-categories.",
+            "in": "query",
+            "name": "categoryWithChildren",
             "schema": {
               "type": "string"
             }
@@ -12880,6 +14339,31 @@
   },
   "components": {
     "schemas": {
+      "AddOperation": {
+        "required": [
+          "op",
+          "path",
+          "value"
+        ],
+        "type": "object",
+        "properties": {
+          "op": {
+            "type": "string",
+            "enum": [
+              "add"
+            ]
+          },
+          "path": {
+            "pattern": "^(/[^/~]*(~[01][^/~]*)*)*$",
+            "type": "string",
+            "description": "A JSON Pointer path pointing to the location to move/copy from.",
+            "example": "/a/b/c"
+          },
+          "value": {
+            "description": "Value can be any JSON value"
+          }
+        }
+      },
       "AnnotationSetting": {
         "required": [
           "apiVersion",
@@ -13499,6 +14983,13 @@
             "minLength": 1,
             "type": "string"
           },
+          "postTemplate": {
+            "maxLength": 255,
+            "type": "string"
+          },
+          "preventParentPostCascadeQuery": {
+            "type": "boolean"
+          },
           "priority": {
             "type": "integer",
             "format": "int32",
@@ -13509,6 +15000,7 @@
             "type": "string"
           },
           "template": {
+            "maxLength": 255,
             "type": "string"
           }
         }
@@ -14318,6 +15810,34 @@
           }
         }
       },
+      "CopyOperation": {
+        "required": [
+          "op",
+          "from",
+          "path"
+        ],
+        "type": "object",
+        "properties": {
+          "from": {
+            "pattern": "^(/[^/~]*(~[01][^/~]*)*)*$",
+            "type": "string",
+            "description": "A JSON Pointer path pointing to the location to move/copy from.",
+            "example": "/a/b/c"
+          },
+          "op": {
+            "type": "string",
+            "enum": [
+              "copy"
+            ]
+          },
+          "path": {
+            "pattern": "^(/[^/~]*(~[01][^/~]*)*)*$",
+            "type": "string",
+            "description": "A JSON Pointer path pointing to the location to move/copy from.",
+            "example": "/a/b/c"
+          }
+        }
+      },
       "Counter": {
         "required": [
           "apiVersion",
@@ -15082,6 +16602,34 @@
           }
         },
         "description": "The subject name of reason type to be interested in"
+      },
+      "JsonPatch": {
+        "minItems": 1,
+        "uniqueItems": true,
+        "type": "array",
+        "description": "JSON schema for JSONPatch operations",
+        "items": {
+          "oneOf": [
+            {
+              "$ref": "#/components/schemas/AddOperation"
+            },
+            {
+              "$ref": "#/components/schemas/ReplaceOperation"
+            },
+            {
+              "$ref": "#/components/schemas/TestOperation"
+            },
+            {
+              "$ref": "#/components/schemas/RemoveOperation"
+            },
+            {
+              "$ref": "#/components/schemas/MoveOperation"
+            },
+            {
+              "$ref": "#/components/schemas/CopyOperation"
+            }
+          ]
+        }
       },
       "License": {
         "type": "object",
@@ -15936,7 +17484,6 @@
         "type": "object",
         "properties": {
           "children": {
-            "uniqueItems": true,
             "type": "array",
             "description": "Children of this menu item",
             "items": {
@@ -16080,7 +17627,6 @@
             "description": "The display name of the menu."
           },
           "menuItems": {
-            "uniqueItems": true,
             "type": "array",
             "description": "Names of menu children below this menu.",
             "items": {
@@ -16160,6 +17706,34 @@
             "type": "integer",
             "format": "int64",
             "nullable": true
+          }
+        }
+      },
+      "MoveOperation": {
+        "required": [
+          "op",
+          "from",
+          "path"
+        ],
+        "type": "object",
+        "properties": {
+          "from": {
+            "pattern": "^(/[^/~]*(~[01][^/~]*)*)*$",
+            "type": "string",
+            "description": "A JSON Pointer path pointing to the location to move/copy from.",
+            "example": "/a/b/c"
+          },
+          "op": {
+            "type": "string",
+            "enum": [
+              "move"
+            ]
+          },
+          "path": {
+            "pattern": "^(/[^/~]*(~[01][^/~]*)*)*$",
+            "type": "string",
+            "description": "A JSON Pointer path pointing to the location to move/copy from.",
+            "example": "/a/b/c"
           }
         }
       },
@@ -17945,6 +19519,52 @@
         "properties": {
           "email": {
             "type": "string"
+          }
+        }
+      },
+      "RemoveOperation": {
+        "required": [
+          "op",
+          "path"
+        ],
+        "type": "object",
+        "properties": {
+          "op": {
+            "type": "string",
+            "enum": [
+              "remove"
+            ]
+          },
+          "path": {
+            "pattern": "^(/[^/~]*(~[01][^/~]*)*)*$",
+            "type": "string",
+            "description": "A JSON Pointer path pointing to the location to move/copy from.",
+            "example": "/a/b/c"
+          }
+        }
+      },
+      "ReplaceOperation": {
+        "required": [
+          "op",
+          "path",
+          "value"
+        ],
+        "type": "object",
+        "properties": {
+          "op": {
+            "type": "string",
+            "enum": [
+              "replace"
+            ]
+          },
+          "path": {
+            "pattern": "^(/[^/~]*(~[01][^/~]*)*)*$",
+            "type": "string",
+            "description": "A JSON Pointer path pointing to the location to move/copy from.",
+            "example": "/a/b/c"
+          },
+          "value": {
+            "description": "Value can be any JSON value"
           }
         }
       },
@@ -19776,6 +21396,31 @@
           },
           "screenshot": {
             "type": "string"
+          }
+        }
+      },
+      "TestOperation": {
+        "required": [
+          "op",
+          "path",
+          "value"
+        ],
+        "type": "object",
+        "properties": {
+          "op": {
+            "type": "string",
+            "enum": [
+              "test"
+            ]
+          },
+          "path": {
+            "pattern": "^(/[^/~]*(~[01][^/~]*)*)*$",
+            "type": "string",
+            "description": "A JSON Pointer path pointing to the location to move/copy from.",
+            "example": "/a/b/c"
+          },
+          "value": {
+            "description": "Value can be any JSON value"
           }
         }
       },

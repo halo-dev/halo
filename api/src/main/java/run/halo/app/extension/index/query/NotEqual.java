@@ -1,6 +1,5 @@
 package run.halo.app.extension.index.query;
 
-import com.google.common.collect.Sets;
 import java.util.NavigableSet;
 import org.springframework.util.Assert;
 
@@ -19,15 +18,19 @@ public class NotEqual extends SimpleQuery {
 
     @Override
     public NavigableSet<String> matches(QueryIndexView indexView) {
-        var names = equalQuery.matches(indexView);
-        var allNames = indexView.getAllIdsForField(fieldName);
-
-        var resultSet = Sets.<String>newTreeSet();
-        for (String name : allNames) {
-            if (!names.contains(name)) {
-                resultSet.add(name);
-            }
+        indexView.acquireReadLock();
+        try {
+            NavigableSet<String> equalNames = equalQuery.matches(indexView);
+            NavigableSet<String> allNames = indexView.getIdsForField(fieldName);
+            allNames.removeAll(equalNames);
+            return allNames;
+        } finally {
+            indexView.releaseReadLock();
         }
-        return resultSet;
+    }
+
+    @Override
+    public String toString() {
+        return fieldName + " != " + (isFieldRef ? value : "'" + value + "'");
     }
 }

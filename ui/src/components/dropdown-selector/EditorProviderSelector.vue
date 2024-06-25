@@ -1,12 +1,12 @@
 <script lang="ts" setup>
 import { useEditorExtensionPoints } from "@/composables/use-editor-extension-points";
-import type { EditorProvider } from "@halo-dev/console-shared";
 import {
-  VAvatar,
   IconExchange,
+  VAvatar,
   VDropdown,
   VDropdownItem,
 } from "@halo-dev/components";
+import type { EditorProvider } from "@halo-dev/console-shared";
 
 withDefaults(
   defineProps<{
@@ -23,7 +23,9 @@ const emit = defineEmits<{
   (event: "select", provider: EditorProvider): void;
 }>();
 
-const { editorProviders } = useEditorExtensionPoints();
+const { editorProviders, fetchEditorProviders } = useEditorExtensionPoints();
+
+fetchEditorProviders();
 </script>
 
 <template>

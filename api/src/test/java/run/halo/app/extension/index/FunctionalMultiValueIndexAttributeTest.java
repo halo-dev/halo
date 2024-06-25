@@ -35,7 +35,9 @@ class FunctionalMultiValueIndexAttributeTest {
         assertThat(attribute.getValues(fake)).isEqualTo(fake.getCategories());
 
         var unstructured = Unstructured.OBJECT_MAPPER.convertValue(fake, Unstructured.class);
-        assertThat(attribute.getValues(unstructured)).isEqualTo(fake.getCategories());
+        assertThatThrownBy(() -> attribute.getValues(unstructured))
+            .isInstanceOf(IllegalArgumentException.class)
+            .hasMessageContaining("Object type does not match");
 
         var demoExt = new DemoExtension();
         assertThatThrownBy(() -> attribute.getValues(demoExt))

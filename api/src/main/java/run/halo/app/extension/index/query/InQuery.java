@@ -1,8 +1,9 @@
 package run.halo.app.extension.index.query;
 
-import com.google.common.collect.Sets;
 import java.util.NavigableSet;
 import java.util.Set;
+import java.util.stream.Collectors;
+import run.halo.app.extension.index.IndexEntryOperatorImpl;
 
 public class InQuery extends SimpleQuery {
     private final Set<String> values;
@@ -14,10 +15,15 @@ public class InQuery extends SimpleQuery {
 
     @Override
     public NavigableSet<String> matches(QueryIndexView indexView) {
-        NavigableSet<String> resultSet = Sets.newTreeSet();
-        for (String val : values) {
-            resultSet.addAll(indexView.getIdsForFieldValue(fieldName, val));
-        }
-        return resultSet;
+        var indexEntry = indexView.getIndexEntry(fieldName);
+        var operator = new IndexEntryOperatorImpl(indexEntry);
+        return operator.findIn(values);
+    }
+
+    @Override
+    public String toString() {
+        return fieldName + " IN (" + values.stream()
+            .map(value -> "'" + value + "'")
+            .collect(Collectors.joining(", ")) + ")";
     }
 }

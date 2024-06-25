@@ -1,6 +1,7 @@
 package run.halo.app.extension.index.query;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static run.halo.app.extension.index.query.IndexViewDataSet.createEmployeeIndexView;
 import static run.halo.app.extension.index.query.QueryFactory.all;
 import static run.halo.app.extension.index.query.QueryFactory.and;
 import static run.halo.app.extension.index.query.QueryFactory.between;
@@ -35,9 +36,11 @@ import org.junit.jupiter.api.Test;
  */
 class QueryFactoryTest {
 
+    private final String id = QueryIndexViewImpl.PRIMARY_INDEX_NAME;
+
     @Test
     void allTest() {
-        var indexView = IndexViewDataSet.createEmployeeIndexView();
+        var indexView = createEmployeeIndexView();
         var resultSet = all("firstName").matches(indexView);
         assertThat(resultSet).containsExactlyInAnyOrder(
             "100", "101", "102", "103", "104", "105"
@@ -64,7 +67,7 @@ class QueryFactoryTest {
 
     @Test
     void equalTest() {
-        var indexView = IndexViewDataSet.createEmployeeIndexView();
+        var indexView = createEmployeeIndexView();
         var resultSet = equal("lastName", "Fay").matches(indexView);
         assertThat(resultSet).containsExactlyInAnyOrder(
             "100", "104", "105"
@@ -73,8 +76,8 @@ class QueryFactoryTest {
 
     @Test
     void equalOtherFieldTest() {
-        var indexView = IndexViewDataSet.createEmployeeIndexView();
-        var resultSet = equalOtherField("managerId", "id").matches(indexView);
+        var indexView = createEmployeeIndexView();
+        var resultSet = equalOtherField("managerId", id).matches(indexView);
         assertThat(resultSet).containsExactlyInAnyOrder(
             "102", "103"
         );
@@ -82,7 +85,7 @@ class QueryFactoryTest {
 
     @Test
     void notEqualTest() {
-        var indexView = IndexViewDataSet.createEmployeeIndexView();
+        var indexView = createEmployeeIndexView();
         var resultSet = notEqual("lastName", "Fay").matches(indexView);
         assertThat(resultSet).containsExactlyInAnyOrder(
             "101", "102", "103"
@@ -91,8 +94,8 @@ class QueryFactoryTest {
 
     @Test
     void notEqualOtherFieldTest() {
-        var indexView = IndexViewDataSet.createEmployeeIndexView();
-        var resultSet = notEqualOtherField("managerId", "id").matches(indexView);
+        var indexView = createEmployeeIndexView();
+        var resultSet = notEqualOtherField("managerId", id).matches(indexView);
         // 103 102 is equal
         assertThat(resultSet).containsExactlyInAnyOrder(
             "100", "101", "104", "105"
@@ -101,8 +104,8 @@ class QueryFactoryTest {
 
     @Test
     void lessThanTest() {
-        var indexView = IndexViewDataSet.createEmployeeIndexView();
-        var resultSet = lessThan("id", "103").matches(indexView);
+        var indexView = createEmployeeIndexView();
+        var resultSet = lessThan(id, "103").matches(indexView);
         assertThat(resultSet).containsExactlyInAnyOrder(
             "100", "101", "102"
         );
@@ -110,8 +113,8 @@ class QueryFactoryTest {
 
     @Test
     void lessThanOtherFieldTest() {
-        var indexView = IndexViewDataSet.createEmployeeIndexView();
-        var resultSet = lessThanOtherField("id", "managerId").matches(indexView);
+        var indexView = createEmployeeIndexView();
+        var resultSet = lessThanOtherField(id, "managerId").matches(indexView);
         assertThat(resultSet).containsExactlyInAnyOrder(
             "100", "101"
         );
@@ -119,8 +122,8 @@ class QueryFactoryTest {
 
     @Test
     void lessThanOrEqualTest() {
-        var indexView = IndexViewDataSet.createEmployeeIndexView();
-        var resultSet = lessThanOrEqual("id", "103").matches(indexView);
+        var indexView = createEmployeeIndexView();
+        var resultSet = lessThanOrEqual(id, "103").matches(indexView);
         assertThat(resultSet).containsExactlyInAnyOrder(
             "100", "101", "102", "103"
         );
@@ -128,9 +131,9 @@ class QueryFactoryTest {
 
     @Test
     void lessThanOrEqualOtherFieldTest() {
-        var indexView = IndexViewDataSet.createEmployeeIndexView();
+        var indexView = createEmployeeIndexView();
         var resultSet =
-            lessThanOrEqualOtherField("id", "managerId").matches(indexView);
+            lessThanOrEqualOtherField(id, "managerId").matches(indexView);
         assertThat(resultSet).containsExactlyInAnyOrder(
             "100", "101", "102", "103"
         );
@@ -138,8 +141,8 @@ class QueryFactoryTest {
 
     @Test
     void greaterThanTest() {
-        var indexView = IndexViewDataSet.createEmployeeIndexView();
-        var resultSet = greaterThan("id", "103").matches(indexView);
+        var indexView = createEmployeeIndexView();
+        var resultSet = greaterThan(id, "103").matches(indexView);
         assertThat(resultSet).containsExactlyInAnyOrder(
             "104", "105"
         );
@@ -147,8 +150,8 @@ class QueryFactoryTest {
 
     @Test
     void greaterThanOtherFieldTest() {
-        var indexView = IndexViewDataSet.createEmployeeIndexView();
-        var resultSet = greaterThanOtherField("id", "managerId").matches(indexView);
+        var indexView = createEmployeeIndexView();
+        var resultSet = greaterThanOtherField(id, "managerId").matches(indexView);
         assertThat(resultSet).containsExactlyInAnyOrder(
             "104", "105"
         );
@@ -156,8 +159,8 @@ class QueryFactoryTest {
 
     @Test
     void greaterThanOrEqualTest() {
-        var indexView = IndexViewDataSet.createEmployeeIndexView();
-        var resultSet = greaterThanOrEqual("id", "103").matches(indexView);
+        var indexView = createEmployeeIndexView();
+        var resultSet = greaterThanOrEqual(id, "103").matches(indexView);
         assertThat(resultSet).containsExactlyInAnyOrder(
             "103", "104", "105"
         );
@@ -165,9 +168,9 @@ class QueryFactoryTest {
 
     @Test
     void greaterThanOrEqualOtherFieldTest() {
-        var indexView = IndexViewDataSet.createEmployeeIndexView();
+        var indexView = createEmployeeIndexView();
         var resultSet =
-            greaterThanOrEqualOtherField("id", "managerId").matches(indexView);
+            greaterThanOrEqualOtherField(id, "managerId").matches(indexView);
         assertThat(resultSet).containsExactlyInAnyOrder(
             "102", "103", "104", "105"
         );
@@ -175,8 +178,8 @@ class QueryFactoryTest {
 
     @Test
     void inTest() {
-        var indexView = IndexViewDataSet.createEmployeeIndexView();
-        var resultSet = in("id", "103", "104").matches(indexView);
+        var indexView = createEmployeeIndexView();
+        var resultSet = in(id, "103", "104").matches(indexView);
         assertThat(resultSet).containsExactlyInAnyOrder(
             "103", "104"
         );
@@ -184,7 +187,7 @@ class QueryFactoryTest {
 
     @Test
     void inTest2() {
-        var indexView = IndexViewDataSet.createEmployeeIndexView();
+        var indexView = createEmployeeIndexView();
         var resultSet = in("lastName", "Fay").matches(indexView);
         assertThat(resultSet).containsExactlyInAnyOrder(
             "100", "104", "105"
@@ -193,13 +196,13 @@ class QueryFactoryTest {
 
     @Test
     void betweenTest() {
-        var indexView = IndexViewDataSet.createEmployeeIndexView();
-        var resultSet = between("id", "103", "105").matches(indexView);
+        var indexView = createEmployeeIndexView();
+        var resultSet = between(id, "103", "105").matches(indexView);
         assertThat(resultSet).containsExactlyInAnyOrder(
             "103", "104", "105"
         );
 
-        indexView = IndexViewDataSet.createEmployeeIndexView();
+        indexView = createEmployeeIndexView();
         resultSet = between("salary", "2000", "2400").matches(indexView);
         assertThat(resultSet).containsExactlyInAnyOrder(
             "101", "102", "103"
@@ -208,7 +211,7 @@ class QueryFactoryTest {
 
     @Test
     void betweenLowerExclusive() {
-        var indexView = IndexViewDataSet.createEmployeeIndexView();
+        var indexView = createEmployeeIndexView();
         var resultSet =
             QueryFactory.betweenLowerExclusive("salary", "2000", "2400").matches(indexView);
         assertThat(resultSet).containsExactlyInAnyOrder(
@@ -218,7 +221,7 @@ class QueryFactoryTest {
 
     @Test
     void betweenUpperExclusive() {
-        var indexView = IndexViewDataSet.createEmployeeIndexView();
+        var indexView = createEmployeeIndexView();
         var resultSet =
             QueryFactory.betweenUpperExclusive("salary", "2000", "2400").matches(indexView);
         assertThat(resultSet).containsExactlyInAnyOrder(
@@ -228,7 +231,7 @@ class QueryFactoryTest {
 
     @Test
     void betweenExclusive() {
-        var indexView = IndexViewDataSet.createEmployeeIndexView();
+        var indexView = createEmployeeIndexView();
         var resultSet = QueryFactory.betweenExclusive("salary", "2000", "2400").matches(indexView);
         assertThat(resultSet).containsExactlyInAnyOrder(
             "102"
@@ -237,7 +240,7 @@ class QueryFactoryTest {
 
     @Test
     void startsWithTest() {
-        var indexView = IndexViewDataSet.createEmployeeIndexView();
+        var indexView = createEmployeeIndexView();
         var resultSet = startsWith("firstName", "W").matches(indexView);
         assertThat(resultSet).containsExactlyInAnyOrder(
             "102"
@@ -246,7 +249,7 @@ class QueryFactoryTest {
 
     @Test
     void endsWithTest() {
-        var indexView = IndexViewDataSet.createEmployeeIndexView();
+        var indexView = createEmployeeIndexView();
         var resultSet = endsWith("firstName", "y").matches(indexView);
         assertThat(resultSet).containsExactlyInAnyOrder(
             "103"
@@ -255,7 +258,7 @@ class QueryFactoryTest {
 
     @Test
     void containsTest() {
-        var indexView = IndexViewDataSet.createEmployeeIndexView();
+        var indexView = createEmployeeIndexView();
         var resultSet = contains("firstName", "i").matches(indexView);
         assertThat(resultSet).containsExactlyInAnyOrder(
             "102"
@@ -268,7 +271,7 @@ class QueryFactoryTest {
 
     @Test
     void notTest() {
-        var indexView = IndexViewDataSet.createEmployeeIndexView();
+        var indexView = createEmployeeIndexView();
         var resultSet =
             QueryFactory.not(QueryFactory.contains("firstName", "i")).matches(indexView);
         assertThat(resultSet).containsExactlyInAnyOrder(
@@ -286,10 +289,10 @@ class QueryFactoryTest {
         // and composite query
         query = and(
             and(equal("firstName", "W"), equal("lastName", "Fay")),
-            or(equalOtherField("id", "userId"), lessThan("age", "123"))
+            or(equalOtherField(id, "userId"), lessThan("age", "123"))
         );
         fieldNames = getFieldNamesUsedInQuery(query);
-        assertThat(fieldNames).containsExactlyInAnyOrder("firstName", "lastName", "id", "userId",
+        assertThat(fieldNames).containsExactlyInAnyOrder("firstName", "lastName", id, "userId",
             "age");
 
         // or composite query
