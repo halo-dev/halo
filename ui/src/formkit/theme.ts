@@ -130,6 +130,11 @@ const theme: Record<string, Record<string, string>> = {
     "dropdown-wrapper":
       "absolute ring-1 ring-gray-100 top-full bottom-auto right-0 z-10 mt-1 max-h-96 w-full overflow-auto rounded bg-white shadow-lg",
   },
+  secretSelect: {
+    ...textClassification,
+    inner: `${textClassification.inner} !overflow-visible !h-auto min-h-[2.25rem]`,
+    input: `w-0 flex-grow bg-transparent py-1 px-3 block transition-all text-sm`,
+  },
 };
 
 export default theme;
