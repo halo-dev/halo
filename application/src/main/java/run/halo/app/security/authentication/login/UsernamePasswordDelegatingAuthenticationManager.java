@@ -26,7 +26,7 @@ public class UsernamePasswordDelegatingAuthenticationManager
     @Override
     public Mono<Authentication> authenticate(Authentication authentication) {
         return extensionGetter
-            .getEnabledExtensionByDefinition(UsernamePasswordAuthenticationManager.class)
+            .getEnabledExtensions(UsernamePasswordAuthenticationManager.class)
             .next()
             .flatMap(authenticationManager -> authenticationManager.authenticate(authentication)
                 .doOnError(t -> log.error(
