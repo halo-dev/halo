@@ -68,6 +68,7 @@ import {
 } from "../src";
 
 const defaultAxiosInstance = axios.create({
+  baseURL: "/",
   withCredentials: true,
 });
 
@@ -443,5 +444,6 @@ export {
   createPublicApiClient,
   createUcApiClient,
   defaultPublicApiClient as publicApiClient,
-  defaultUcApiClient as ucApiClient,
+  defaultUcApiClient as ucApiClient
 };
+

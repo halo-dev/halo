@@ -1,9 +1,10 @@
-import { definePlugin } from "@halo-dev/console-shared";
 import BasicLayout from "@console/layouts/BasicLayout.vue";
-import PluginList from "./PluginList.vue";
-import PluginDetail from "./PluginDetail.vue";
-import { IconPlug } from "@halo-dev/components";
+import { IconPlug, IconSettings } from "@halo-dev/components";
+import { definePlugin } from "@halo-dev/console-shared";
 import { markRaw } from "vue";
+import PluginDetail from "./PluginDetail.vue";
+import PluginExtensionPointSettings from "./PluginExtensionPointSettings.vue";
+import PluginList from "./PluginList.vue";
 
 export default definePlugin({
   components: {},
@@ -28,6 +29,19 @@ export default definePlugin({
           path: "",
           name: "Plugins",
           component: PluginList,
+        },
+        {
+          path: "extension-point-settings",
+          name: "PluginExtensionPointSettings",
+          component: PluginExtensionPointSettings,
+          meta: {
+            title: "扩展点设置",
+            hideFooter: true,
+            menu: {
+              name: "扩展点设置",
+              icon: markRaw(IconSettings),
+            },
+          },
         },
         {
           path: ":name",
