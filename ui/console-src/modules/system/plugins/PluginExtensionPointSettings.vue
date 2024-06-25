@@ -101,7 +101,7 @@ watch(
             <h2 class="font-semibold text-green-900">
               {{ selectedExtensionPointDefinition?.spec.displayName }}
             </h2>
-            <small class="text-gray-600">
+            <small class="line-clamp-1 text-gray-600">
               {{ selectedExtensionPointDefinition?.spec.description }}
             </small>
           </div>
