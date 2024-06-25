@@ -40,7 +40,7 @@ import type { Setting, SettingForm, Theme } from "@halo-dev/api-client";
 import { usePermission } from "@/utils/permission";
 import { useThemeStore } from "@console/stores/theme";
 import { storeToRefs } from "pinia";
-import { apiClient } from "@/utils/api-client";
+import { consoleApiClient } from "@halo-dev/api-client";
 import { useI18n } from "vue-i18n";
 import { useQuery } from "@tanstack/vue-query";
 import { useRouteQuery } from "@vueuse/router";
@@ -85,7 +85,7 @@ provide<Ref<Theme | undefined>>("selectedTheme", selectedTheme);
 const { data: setting } = useQuery<Setting>({
   queryKey: ["theme-setting", selectedTheme],
   queryFn: async () => {
-    const { data } = await apiClient.theme.fetchThemeSetting({
+    const { data } = await consoleApiClient.theme.theme.fetchThemeSetting({
       name: selectedTheme.value?.metadata.name as string,
     });
     return data;

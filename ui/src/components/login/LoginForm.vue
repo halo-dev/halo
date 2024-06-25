@@ -9,7 +9,7 @@ import { onMounted, ref } from "vue";
 import qs from "qs";
 import { submitForm, reset } from "@formkit/core";
 import { JSEncrypt } from "jsencrypt";
-import { apiClient } from "@/utils/api-client";
+import { consoleApiClient } from "@halo-dev/api-client";
 import { useI18n } from "vue-i18n";
 import { ERROR_MFA_REQUIRED_TYPE } from "@/constants/error-types";
 import MfaForm from "./MfaForm.vue";
@@ -51,7 +51,7 @@ async function handleLogin(data: {
   try {
     loading.value = true;
 
-    const { data: publicKey } = await apiClient.login.getPublicKey();
+    const { data: publicKey } = await consoleApiClient.login.getPublicKey();
 
     const encrypt = new JSEncrypt();
     encrypt.setPublicKey(publicKey.base64Format as string);

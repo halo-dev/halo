@@ -75,7 +75,7 @@ public class ThemeEndpoint implements CustomEndpoint {
 
     @Override
     public RouterFunction<ServerResponse> endpoint() {
-        final var tag = "api.console.halo.run/v1alpha1/Theme";
+        var tag = "ThemeV1alpha1Console";
         return SpringdocRouteBuilder.route()
             .POST("themes/install", contentType(MediaType.MULTIPART_FORM_DATA),
                 this::install, builder -> builder.operationId("InstallTheme")

@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import { apiClient } from "@/utils/api-client";
+import { ucApiClient } from "@halo-dev/api-client";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/vue-query";
 import type {
   DetailedUser,
@@ -24,9 +24,11 @@ const { data, isLoading } = useQuery({
     }
 
     const { data } =
-      await apiClient.notification.listUserNotificationPreferences({
-        username: props.user?.user.metadata.name,
-      });
+      await ucApiClient.notification.notification.listUserNotificationPreferences(
+        {
+          username: props.user?.user.metadata.name,
+        }
+      );
 
     return data;
   },
@@ -79,12 +81,14 @@ const {
       })
       .filter(Boolean) as Array<ReasonTypeNotifierRequest>;
 
-    return await apiClient.notification.saveUserNotificationPreferences({
-      username: props.user.user.metadata.name,
-      reasonTypeNotifierCollectionRequest: {
-        reasonTypeNotifiers,
-      },
-    });
+    return await ucApiClient.notification.notification.saveUserNotificationPreferences(
+      {
+        username: props.user.user.metadata.name,
+        reasonTypeNotifierCollectionRequest: {
+          reasonTypeNotifiers,
+        },
+      }
+    );
   },
   onSuccess() {
     queryClient.invalidateQueries({ queryKey: ["notification-preferences"] });

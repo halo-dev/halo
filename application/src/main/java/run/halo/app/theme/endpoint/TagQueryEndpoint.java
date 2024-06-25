@@ -42,7 +42,7 @@ public class TagQueryEndpoint implements CustomEndpoint {
 
     @Override
     public RouterFunction<ServerResponse> endpoint() {
-        final var tag = groupVersion().toString() + "/Tag";
+        var tag = "TagV1alpha1Public";
         return SpringdocRouteBuilder.route()
             .GET("tags", this::listTags,
                 builder -> {

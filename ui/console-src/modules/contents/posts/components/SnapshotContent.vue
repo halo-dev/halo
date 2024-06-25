@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { useQuery } from "@tanstack/vue-query";
-import { apiClient } from "@/utils/api-client";
+import { consoleApiClient } from "@halo-dev/api-client";
 import { computed, toRefs } from "vue";
 import { Toast, VLoading } from "@halo-dev/components";
 import { OverlayScrollbarsComponent } from "overlayscrollbars-vue";
@@ -25,7 +25,7 @@ const { data: snapshot, isLoading } = useQuery({
       throw new Error("postName and snapshotName are required");
     }
 
-    const { data } = await apiClient.post.fetchPostContent({
+    const { data } = await consoleApiClient.content.post.fetchPostContent({
       name: postName.value,
       snapshotName: snapshotName.value,
     });

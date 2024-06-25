@@ -47,7 +47,7 @@ public class UserNotificationEndpoint implements CustomEndpoint {
     }
 
     Supplier<RouterFunction<ServerResponse>> userspaceScopedApis() {
-        var tag = "api.notification.halo.run/v1alpha1/Notification";
+        var tag = "NotificationV1alpha1Uc";
         return () -> SpringdocRouteBuilder.route()
             .GET("/notifications", this::listNotification,
                 builder -> {

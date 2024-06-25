@@ -8,7 +8,7 @@ import { useMutation } from "@tanstack/vue-query";
 import { useI18n } from "vue-i18n";
 import { randomUUID } from "@/utils/id";
 import { contentAnnotations } from "@/constants/annotations";
-import { apiClient } from "@/utils/api-client";
+import { ucApiClient } from "@halo-dev/api-client";
 
 const { t } = useI18n();
 
@@ -64,12 +64,12 @@ const { mutate, isLoading } = useMutation({
       },
     };
 
-    const { data: createdPost } = await apiClient.uc.post.createMyPost({
+    const { data: createdPost } = await ucApiClient.content.post.createMyPost({
       post,
     });
 
     if (props.publish) {
-      await apiClient.uc.post.publishMyPost({
+      await ucApiClient.content.post.publishMyPost({
         name: post.metadata.name,
       });
     }

@@ -36,7 +36,7 @@ public class MenuQueryEndpoint implements CustomEndpoint {
 
     @Override
     public RouterFunction<ServerResponse> endpoint() {
-        final var tag = groupVersion().toString() + "/Menu";
+        final var tag = "MenuV1alpha1Public";
         return SpringdocRouteBuilder.route()
             .GET("menus/-", this::getByName,
                 builder -> builder.operationId("queryPrimaryMenu")

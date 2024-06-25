@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import { apiClient } from "@/utils/api-client";
+import { ucApiClient } from "@halo-dev/api-client";
 import { Toast, VButton, VModal, VSpace } from "@halo-dev/components";
 import { useMutation, useQueryClient } from "@tanstack/vue-query";
 import { ref } from "vue";
@@ -16,7 +16,7 @@ const modal = ref<InstanceType<typeof VModal> | null>(null);
 const { mutate, isLoading } = useMutation({
   mutationKey: ["disable-two-factor"],
   mutationFn: async ({ password }: { password: string }) => {
-    return await apiClient.twoFactor.disableTwoFactor({
+    return await ucApiClient.security.twoFactor.disableTwoFactor({
       passwordRequest: {
         password: password,
       },

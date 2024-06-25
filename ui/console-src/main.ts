@@ -3,7 +3,7 @@ import type { DirectiveBinding } from "vue";
 import { createPinia } from "pinia";
 import App from "./App.vue";
 import router from "./router";
-import { apiClient } from "@/utils/api-client";
+import { consoleApiClient } from "@halo-dev/api-client";
 // setup
 import "@/setup/setupStyles";
 import { setupComponents } from "@/setup/setupComponents";
@@ -20,19 +20,22 @@ import {
   setupCoreModules,
   setupPluginModules,
 } from "@console/setup/setupModules";
+import { setupApiClient } from "@/setup/setupApiClient";
 
 const app = createApp(App);
 
 setupComponents(app);
 setupI18n(app);
 setupVueQuery(app);
+setupApiClient();
 
 app.use(createPinia());
 
 async function loadUserPermissions() {
-  const { data: currentPermissions } = await apiClient.user.getPermissions({
-    name: "-",
-  });
+  const { data: currentPermissions } =
+    await consoleApiClient.user.getPermissions({
+      name: "-",
+    });
   const roleStore = useRoleStore();
   roleStore.$patch({
     permissions: currentPermissions,

@@ -75,7 +75,7 @@ public class AttachmentEndpoint implements CustomEndpoint {
 
     @Override
     public RouterFunction<ServerResponse> endpoint() {
-        var tag = "api.console.halo.run/v1alpha1/Attachment";
+        var tag = "AttachmentV1alpha1Console";
         return SpringdocRouteBuilder.route()
             .POST("/attachments/upload", contentType(MediaType.MULTIPART_FORM_DATA),
                 request -> request.body(BodyExtractors.toMultipartData())

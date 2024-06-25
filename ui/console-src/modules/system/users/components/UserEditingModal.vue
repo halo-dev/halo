@@ -1,7 +1,7 @@
 <script lang="ts" setup>
 // core libs
 import { nextTick, ref } from "vue";
-import { apiClient } from "@/utils/api-client";
+import { coreApiClient } from "@halo-dev/api-client";
 import type { User } from "@halo-dev/api-client";
 
 // components
@@ -54,7 +54,7 @@ const handleUpdateUser = async () => {
   try {
     isSubmitting.value = true;
 
-    await apiClient.extension.user.updateV1alpha1User({
+    await coreApiClient.user.updateUser({
       name: formState.value.metadata.name,
       user: formState.value,
     });

@@ -7,7 +7,7 @@ import {
   VSpace,
 } from "@halo-dev/components";
 import { ref } from "vue";
-import { apiClient } from "@/utils/api-client";
+import { ucApiClient } from "@halo-dev/api-client";
 import type { PersonalAccessToken } from "@halo-dev/api-client";
 import { useQuery } from "@tanstack/vue-query";
 import PersonalAccessTokenCreationModal from "../components/PersonalAccessTokenCreationModal.vue";
@@ -20,7 +20,8 @@ const {
 } = useQuery<PersonalAccessToken[]>({
   queryKey: ["personal-access-tokens"],
   queryFn: async () => {
-    const { data } = await apiClient.pat.obtainPats();
+    const { data } =
+      await ucApiClient.security.personalAccessToken.obtainPats();
     return data;
   },
   refetchInterval(data) {

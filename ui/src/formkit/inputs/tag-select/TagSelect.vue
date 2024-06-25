@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import { apiClient } from "@/utils/api-client";
+import { coreApiClient } from "@halo-dev/api-client";
 import type { FormKitFrameworkContext } from "@formkit/core";
 import type { Tag } from "@halo-dev/api-client";
 import { computed, ref, watch, type PropType } from "vue";
@@ -196,23 +196,22 @@ const handleCreateTag = async () => {
     return;
   }
 
-  const { data } =
-    await apiClient.extension.tag.createContentHaloRunV1alpha1Tag({
-      tag: {
-        spec: {
-          displayName: text.value,
-          slug: slugify(text.value, { trim: true }),
-          color: "#ffffff",
-          cover: "",
-        },
-        apiVersion: "content.halo.run/v1alpha1",
-        kind: "Tag",
-        metadata: {
-          name: "",
-          generateName: "tag-",
-        },
+  const { data } = await coreApiClient.content.tag.createTag({
+    tag: {
+      spec: {
+        displayName: text.value,
+        slug: slugify(text.value, { trim: true }),
+        color: "#ffffff",
+        cover: "",
       },
-    });
+      apiVersion: "content.halo.run/v1alpha1",
+      kind: "Tag",
+      metadata: {
+        name: "",
+        generateName: "tag-",
+      },
+    },
+  });
 
   handleFetchTags();
 

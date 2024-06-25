@@ -49,7 +49,7 @@ public class EmailConfigValidationEndpoint implements CustomEndpoint {
 
     @Override
     public RouterFunction<ServerResponse> endpoint() {
-        var tag = "console.api.notification.halo.run/v1alpha1/Notifier";
+        var tag = "NotifierV1alpha1Console";
         return SpringdocRouteBuilder.route()
             .POST("/notifiers/default-email-notifier/verify-connection",
                 this::verifyEmailSenderConfig,

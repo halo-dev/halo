@@ -35,7 +35,7 @@ public class TrackerEndpoint implements CustomEndpoint {
 
     @Override
     public RouterFunction<ServerResponse> endpoint() {
-        final var tag = "api.halo.run/v1alpha1/Tracker";
+        var tag = "MetricsV1alpha1Public";
         return SpringdocRouteBuilder.route()
             .POST("trackers/counter", this::increaseVisit,
                 builder -> builder.operationId("count")

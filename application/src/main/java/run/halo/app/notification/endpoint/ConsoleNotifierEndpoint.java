@@ -34,7 +34,7 @@ public class ConsoleNotifierEndpoint implements CustomEndpoint {
 
     @Override
     public RouterFunction<ServerResponse> endpoint() {
-        var tag = "api.console.halo.run/v1alpha1/Notifier";
+        var tag = "NotifierV1alpha1Console";
         return SpringdocRouteBuilder.route()
             .GET("/notifiers/{name}/sender-config", this::fetchSenderConfig,
                 builder -> builder.operationId("FetchSenderConfig")

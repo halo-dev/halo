@@ -1,5 +1,4 @@
 <script lang="ts" setup>
-import { apiClient } from "@/utils/api-client";
 import { formatDatetime } from "@/utils/date";
 import { usePermission } from "@/utils/permission";
 import type { Category } from "@halo-dev/api-client";
@@ -17,6 +16,7 @@ import type { PropType } from "vue";
 import { ref } from "vue";
 import { VueDraggable } from "vue-draggable-plus";
 import { useI18n } from "vue-i18n";
+import { coreApiClient } from "@halo-dev/api-client";
 import GridiconsLinkBreak from "~icons/gridicons/link-break";
 import { convertCategoryTreeToCategory, type CategoryTree } from "../utils";
 import CategoryEditingModal from "./CategoryEditingModal.vue";
@@ -69,11 +69,9 @@ const handleDelete = async (category: CategoryTree) => {
     cancelText: t("core.common.buttons.cancel"),
     onConfirm: async () => {
       try {
-        await apiClient.extension.category.deleteContentHaloRunV1alpha1Category(
-          {
-            name: category.metadata.name,
-          }
-        );
+        await coreApiClient.content.category.deleteCategory({
+          name: category.metadata.name,
+        });
 
         Toast.success(t("core.common.toast.delete_success"));
 
