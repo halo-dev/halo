@@ -1,7 +1,7 @@
 <script lang="ts" setup>
 import UserFilterDropdown from "@/components/filter/UserFilterDropdown.vue";
 import LazyImage from "@/components/image/LazyImage.vue";
-import { apiClient } from "@/utils/api-client";
+import { coreApiClient } from "@halo-dev/api-client";
 import { isImage } from "@/utils/image";
 import type { Attachment, Group } from "@halo-dev/api-client";
 import {
@@ -129,18 +129,16 @@ provide<Ref<Set<Attachment>>>("selectedAttachments", selectedAttachments);
 const handleMove = async (group: Group) => {
   try {
     const promises = Array.from(selectedAttachments.value).map((attachment) => {
-      return apiClient.extension.storage.attachment.patchStorageHaloRunV1alpha1Attachment(
-        {
-          name: attachment.metadata.name,
-          jsonPatchInner: [
-            {
-              op: "add",
-              path: "/spec/groupName",
-              value: group.metadata.name,
-            },
-          ],
-        }
-      );
+      return coreApiClient.storage.attachment.patchAttachment({
+        name: attachment.metadata.name,
+        jsonPatchInner: [
+          {
+            op: "add",
+            path: "/spec/groupName",
+            value: group.metadata.name,
+          },
+        ],
+      });
     });
 
     await Promise.all(promises);
@@ -232,8 +230,8 @@ onMounted(() => {
   if (!nameQuery.value) {
     return;
   }
-  apiClient.extension.storage.attachment
-    .getStorageHaloRunV1alpha1Attachment({
+  coreApiClient.storage.attachment
+    .getAttachment({
       name: nameQuery.value,
     })
     .then((response) => {

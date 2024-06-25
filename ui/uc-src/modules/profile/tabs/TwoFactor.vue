@@ -10,7 +10,7 @@ import {
   VSpace,
 } from "@halo-dev/components";
 import { useQuery } from "@tanstack/vue-query";
-import { apiClient } from "@/utils/api-client";
+import { ucApiClient } from "@halo-dev/api-client";
 import StatusDotField from "@/components/entity-fields/StatusDotField.vue";
 import RiShieldKeyholeLine from "~icons/ri/shield-keyhole-line";
 import TwoFactorEnableModal from "./components/TwoFactorEnableModal.vue";
@@ -20,7 +20,7 @@ const { data: settings, isLoading } = useQuery({
   queryKey: ["two-factor-settings"],
   queryFn: async () => {
     const { data } =
-      await apiClient.twoFactor.getTwoFactorAuthenticationSettings();
+      await ucApiClient.security.twoFactor.getTwoFactorAuthenticationSettings();
     return data;
   },
 });

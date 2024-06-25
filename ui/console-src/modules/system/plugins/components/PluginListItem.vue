@@ -10,10 +10,14 @@ import {
 import type { Ref } from "vue";
 import { computed, inject, markRaw, ref, toRefs } from "vue";
 import { usePluginLifeCycle } from "../composables/use-plugin";
-import { type Plugin, PluginStatusPhaseEnum } from "@halo-dev/api-client";
+import {
+  type Plugin,
+  PluginStatusPhaseEnum,
+  consoleApiClient,
+} from "@halo-dev/api-client";
 import { formatDatetime } from "@/utils/date";
 import { usePermission } from "@/utils/permission";
-import { apiClient } from "@/utils/api-client";
+
 import { useI18n } from "vue-i18n";
 import { useEntityFieldItemExtensionPoint } from "@console/composables/use-entity-extension-points";
 import { useOperationItemExtensionPoint } from "@console/composables/use-operation-extension-points";
@@ -61,7 +65,7 @@ const handleResetSettingConfig = async () => {
           return;
         }
 
-        await apiClient.plugin.resetPluginConfig({
+        await consoleApiClient.plugin.plugin.resetPluginConfig({
           name: plugin.value.metadata.name as string,
         });
 

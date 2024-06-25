@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { useQuery } from "@tanstack/vue-query";
-import { apiClient } from "@/utils/api-client";
+import { consoleApiClient } from "@halo-dev/api-client";
 import { computed, toRefs } from "vue";
 import { Toast, VLoading } from "@halo-dev/components";
 import { OverlayScrollbarsComponent } from "overlayscrollbars-vue";
@@ -25,10 +25,11 @@ const { data: snapshot, isLoading } = useQuery({
       throw new Error("singlePageName and snapshotName are required");
     }
 
-    const { data } = await apiClient.singlePage.fetchSinglePageContent({
-      name: singlePageName.value,
-      snapshotName: snapshotName.value,
-    });
+    const { data } =
+      await consoleApiClient.content.singlePage.fetchSinglePageContent({
+        name: singlePageName.value,
+        snapshotName: snapshotName.value,
+      });
     return data;
   },
   onError(err) {

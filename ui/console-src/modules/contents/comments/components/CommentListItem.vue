@@ -1,6 +1,6 @@
 <script lang="ts" setup>
 import { usePluginModuleStore } from "@/stores/plugin";
-import { apiClient } from "@/utils/api-client";
+import { consoleApiClient, coreApiClient } from "@halo-dev/api-client";
 import { formatDatetime } from "@/utils/date";
 import { usePermission } from "@/utils/permission";
 import type {
@@ -65,7 +65,7 @@ const handleDelete = async () => {
     cancelText: t("core.common.buttons.cancel"),
     onConfirm: async () => {
       try {
-        await apiClient.extension.comment.deleteContentHaloRunV1alpha1Comment({
+        await coreApiClient.content.comment.deleteComment({
           name: props.comment?.comment?.metadata.name as string,
         });
 
@@ -90,7 +90,7 @@ const handleApproveReplyInBatch = async () => {
           return !reply.reply.spec.approved;
         });
         const promises = repliesToUpdate?.map((reply) => {
-          return apiClient.extension.reply.patchContentHaloRunV1alpha1Reply({
+          return coreApiClient.content.reply.patchReply({
             name: reply.reply.metadata.name,
             jsonPatchInner: [
               {
@@ -121,7 +121,7 @@ const handleApproveReplyInBatch = async () => {
 
 const handleApprove = async () => {
   try {
-    await apiClient.extension.comment.patchContentHaloRunV1alpha1Comment({
+    await coreApiClient.content.comment.patchComment({
       name: props.comment.comment.metadata.name,
       jsonPatchInner: [
         {
@@ -157,7 +157,7 @@ const {
     showReplies,
   ],
   queryFn: async () => {
-    const { data } = await apiClient.reply.listReplies({
+    const { data } = await consoleApiClient.content.reply.listReplies({
       commentName: props.comment.comment.metadata.name,
       page: 0,
       size: 0,
@@ -176,7 +176,7 @@ const {
 const { mutateAsync: updateCommentLastReadTimeMutate } = useMutation({
   mutationKey: ["update-comment-last-read-time"],
   mutationFn: async () => {
-    return apiClient.extension.comment.patchContentHaloRunV1alpha1Comment(
+    return coreApiClient.content.comment.patchComment(
       {
         name: props.comment.comment.metadata.name,
         jsonPatchInner: [

@@ -10,7 +10,7 @@ import type { UppyFile } from "@uppy/core";
 import type { ErrorResponse } from "@uppy/core";
 import type { PluginInstallationErrorResponse } from "../../types";
 import { PLUGIN_ALREADY_EXISTS_TYPE } from "../../constants";
-import { apiClient } from "@/utils/api-client";
+import { consoleApiClient } from "@halo-dev/api-client";
 import AppDownloadAlert from "@/components/common/AppDownloadAlert.vue";
 
 const emit = defineEmits<{
@@ -64,7 +64,7 @@ const handleShowActiveModalAfterInstall = (plugin: Plugin) => {
     cancelText: t("core.common.buttons.cancel"),
     onConfirm: async () => {
       try {
-        await apiClient.plugin.changePluginRunningState({
+        await consoleApiClient.plugin.plugin.changePluginRunningState({
           name: plugin.metadata.name,
           pluginRunningStateRequest: {
             enable: true,
@@ -93,7 +93,7 @@ const handleCatchExistsException = async (
     confirmText: t("core.common.buttons.confirm"),
     cancelText: t("core.common.buttons.cancel"),
     onConfirm: async () => {
-      await apiClient.plugin.upgradePlugin({
+      await consoleApiClient.plugin.plugin.upgradePlugin({
         name: error.pluginName,
         file: file,
       });

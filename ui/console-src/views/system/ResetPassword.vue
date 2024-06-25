@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import { apiClient } from "@/utils/api-client";
+import { publicApiClient } from "@halo-dev/api-client";
 import { Toast, VButton } from "@halo-dev/components";
 import { ref } from "vue";
 import { useI18n } from "vue-i18n";
@@ -16,7 +16,7 @@ const loading = ref(false);
 async function onSubmit(data: ResetPasswordForm) {
   try {
     loading.value = true;
-    await apiClient.common.user.sendPasswordResetEmail({
+    await publicApiClient.user.sendPasswordResetEmail({
       passwordResetEmailRequest: {
         email: data.email,
         username: data.username,

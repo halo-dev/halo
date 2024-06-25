@@ -2,7 +2,7 @@
 import UserAvatar from "@/components/user-avatar/UserAvatar.vue";
 import { usePluginModuleStore } from "@/stores/plugin";
 import { useUserStore } from "@/stores/user";
-import { apiClient } from "@/utils/api-client";
+import { consoleApiClient } from "@halo-dev/api-client";
 import { usePermission } from "@/utils/permission";
 import {
   VButton,
@@ -44,7 +44,7 @@ const {
 } = useQuery({
   queryKey: ["user-detail", params.name],
   queryFn: async () => {
-    const { data } = await apiClient.user.getUserDetail({
+    const { data } = await consoleApiClient.user.getUserDetail({
       name: params.name as string,
     });
     return data;

@@ -2,7 +2,7 @@
 import { postLabels } from "@/constants/labels";
 import { formatDatetime } from "@/utils/date";
 import { IconTimerLine, VEntityField } from "@halo-dev/components";
-import type { ListedPost } from "packages/api-client/dist";
+import type { ListedPost } from "@halo-dev/api-client";
 
 withDefaults(
   defineProps<{

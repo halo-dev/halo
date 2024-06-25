@@ -1,9 +1,13 @@
 <script lang="ts" setup>
+// core libs
+import { computed, nextTick, onMounted, ref } from "vue";
+import { coreApiClient } from "@halo-dev/api-client";
+
+// components
 import SubmitButton from "@/components/button/SubmitButton.vue";
 import AnnotationsForm from "@/components/form/AnnotationsForm.vue";
 import { setFocus } from "@/formkit/utils/focus";
 import { FormType } from "@/types/slug";
-import { apiClient } from "@/utils/api-client";
 import useSlugify from "@console/composables/use-slugify";
 import { useThemeCustomTemplates } from "@console/modules/interface/themes/composables/use-theme";
 import type { Category } from "@halo-dev/api-client";
@@ -16,7 +20,6 @@ import {
 } from "@halo-dev/components";
 import { useQueryClient } from "@tanstack/vue-query";
 import { cloneDeep } from "lodash-es";
-import { computed, nextTick, onMounted, ref } from "vue";
 import { useI18n } from "vue-i18n";
 
 const props = withDefaults(
@@ -87,7 +90,7 @@ const handleSaveCategory = async () => {
   try {
     saving.value = true;
     if (isUpdateMode) {
-      await apiClient.extension.category.updateContentHaloRunV1alpha1Category({
+      await coreApiClient.content.category.updateCategory({
         name: formState.value.metadata.name,
         category: formState.value,
       });
@@ -96,10 +99,9 @@ const handleSaveCategory = async () => {
       let parentCategory: Category | undefined = undefined;
 
       if (selectedParentCategory.value) {
-        const { data } =
-          await apiClient.extension.category.getContentHaloRunV1alpha1Category({
-            name: selectedParentCategory.value,
-          });
+        const { data } = await coreApiClient.content.category.getCategory({
+          name: selectedParentCategory.value,
+        });
         parentCategory = data;
       }
 
@@ -110,11 +112,9 @@ const handleSaveCategory = async () => {
       formState.value.spec.priority = priority;
 
       const { data: createdCategory } =
-        await apiClient.extension.category.createContentHaloRunV1alpha1Category(
-          {
-            category: formState.value,
-          }
-        );
+        await coreApiClient.content.category.createCategory({
+          category: formState.value,
+        });
 
       if (parentCategory) {
         parentCategory.spec.children = Array.from(
@@ -124,12 +124,10 @@ const handleSaveCategory = async () => {
           ])
         );
 
-        await apiClient.extension.category.updateContentHaloRunV1alpha1Category(
-          {
-            name: selectedParentCategory.value,
-            category: parentCategory,
-          }
-        );
+        await coreApiClient.content.category.updateCategory({
+          name: selectedParentCategory.value,
+          category: parentCategory,
+        });
       }
     }
 

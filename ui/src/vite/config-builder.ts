@@ -1,14 +1,14 @@
-import { fileURLToPath } from "url";
-import fs from "fs";
-import { defineConfig, type Plugin } from "vite";
 import Vue from "@vitejs/plugin-vue";
 import VueJsx from "@vitejs/plugin-vue-jsx";
-import { VitePWA } from "vite-plugin-pwa";
-import Icons from "unplugin-icons/vite";
-import { setupLibraryExternal } from "./library-external";
-import GzipPlugin from "rollup-plugin-gzip";
+import fs from "fs";
 import path from "path";
+import GzipPlugin from "rollup-plugin-gzip";
+import Icons from "unplugin-icons/vite";
+import { fileURLToPath } from "url";
+import { defineConfig, type Plugin } from "vite";
+import { VitePWA } from "vite-plugin-pwa";
 import VueDevTools from "vite-plugin-vue-devtools";
+import { setupLibraryExternal } from "./library-external";
 
 interface Options {
   base: string;
@@ -84,7 +84,6 @@ export function createViteConfig(options: Options) {
           manualChunks: {
             vendor: [
               "lodash-es",
-              "axios",
               "vue-grid-layout",
               "transliteration",
               "vue-draggable-plus",

@@ -1,11 +1,11 @@
+import randomstring from "randomstring";
+import type { HtmlTagDescriptor } from "vite";
 import { viteExternalsPlugin as ViteExternals } from "vite-plugin-externals";
+import { createHtmlPlugin as VitePluginHtml } from "vite-plugin-html";
 import {
   viteStaticCopy as ViteStaticCopy,
   type Target,
 } from "vite-plugin-static-copy";
-import { createHtmlPlugin as VitePluginHtml } from "vite-plugin-html";
-import randomstring from "randomstring";
-import type { HtmlTagDescriptor } from "vite";
 
 /**
  * It copies the external libraries to the `assets` folder, and injects the script tags into the HTML
@@ -38,6 +38,11 @@ export const setupLibraryExternal = (
       }.js`,
       dest: "assets/vue-router",
       rename: `vue-router.global.${staticSuffix}.js`,
+    },
+    {
+      src: "./node_modules/axios/dist/axios.min.js",
+      dest: "assets/axios",
+      rename: `axios.${staticSuffix}.js`,
     },
     {
       src: `./node_modules/vue-demi/lib/index.iife.js`,
@@ -79,6 +84,11 @@ export const setupLibraryExternal = (
       dest: "assets/richtext-editor",
       rename: `halo-rich-text-editor.iife.${staticSuffix}.js`,
     },
+    {
+      src: "./node_modules/@halo-dev/api-client/dist/halo-api-client.iife.js",
+      dest: "assets/api-client",
+      rename: `halo-api-client.iife.${staticSuffix}.js`,
+    },
   ];
 
   const injectTags = staticTargets
@@ -98,6 +108,7 @@ export const setupLibraryExternal = (
     ViteExternals({
       vue: "Vue",
       "vue-router": "VueRouter",
+      axios: "axios",
       "@halo-dev/shared": "HaloConsoleShared",
       "@halo-dev/components": "HaloComponents",
       "@vueuse/core": "VueUse",
@@ -105,6 +116,7 @@ export const setupLibraryExternal = (
       "@vueuse/router": "VueUse",
       "vue-demi": "VueDemi",
       "@halo-dev/richtext-editor": "RichTextEditor",
+      "@halo-dev/api-client": "HaloApiClient",
     }),
     ViteStaticCopy({
       targets: staticTargets,

@@ -7,7 +7,7 @@ import {
   IconExternalLinkLine,
 } from "@halo-dev/components";
 import type { ListedPost } from "@halo-dev/api-client";
-import { apiClient } from "@/utils/api-client";
+import { consoleApiClient } from "@halo-dev/api-client";
 import { formatDatetime } from "@/utils/date";
 import { postLabels } from "@/constants/labels";
 import { useQuery } from "@tanstack/vue-query";
@@ -16,7 +16,7 @@ import { OverlayScrollbarsComponent } from "overlayscrollbars-vue";
 const { data } = useQuery<ListedPost[]>({
   queryKey: ["widget-recent-posts"],
   queryFn: async () => {
-    const { data } = await apiClient.post.listPosts({
+    const { data } = await consoleApiClient.content.post.listPosts({
       labelSelector: [
         `${postLabels.DELETED}=false`,
         `${postLabels.PUBLISHED}=true`,

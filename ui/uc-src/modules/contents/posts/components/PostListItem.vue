@@ -22,7 +22,7 @@ import { formatDatetime } from "@/utils/date";
 import StatusDotField from "@/components/entity-fields/StatusDotField.vue";
 import { useI18n } from "vue-i18n";
 import HasPermission from "@/components/permission/HasPermission.vue";
-import { apiClient } from "@/utils/api-client";
+import { ucApiClient } from "@halo-dev/api-client";
 import { useQueryClient } from "@tanstack/vue-query";
 
 const { t } = useI18n();
@@ -68,7 +68,7 @@ const isPublishing = computed(() => {
 });
 
 async function handlePublish() {
-  await apiClient.uc.post.publishMyPost({
+  await ucApiClient.content.post.publishMyPost({
     name: props.post.post.metadata.name,
   });
 
@@ -83,7 +83,7 @@ function handleUnpublish() {
     confirmText: t("core.common.buttons.confirm"),
     cancelText: t("core.common.buttons.cancel"),
     async onConfirm() {
-      await apiClient.uc.post.unpublishMyPost({
+      await ucApiClient.content.post.unpublishMyPost({
         name: props.post.post.metadata.name,
       });
 
