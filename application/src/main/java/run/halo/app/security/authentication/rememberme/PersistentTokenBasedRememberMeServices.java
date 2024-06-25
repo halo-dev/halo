@@ -41,6 +41,8 @@ import reactor.core.publisher.Mono;
  * </p>
  *
  * @author guqing
+ * @see
+ * <a href="https://github.com/spring-projects/spring-security/blob/902aff451f2f4d3f2ce44659bbef3645bf320ece/web/src/main/java/org/springframework/security/web/authentication/rememberme/PersistentTokenBasedRememberMeServices.java#L61">PersistentTokenBasedRememberMeServices</a>
  * @since 2.17.0
  */
 @Slf4j
