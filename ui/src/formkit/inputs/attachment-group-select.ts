@@ -1,14 +1,13 @@
-import { apiClient } from "@/utils/api-client";
+import { coreApiClient } from "@halo-dev/api-client";
 import type { FormKitNode, FormKitTypeDefinition } from "@formkit/core";
 import { select, selects, defaultIcon } from "@formkit/inputs";
 
 function optionsHandler(node: FormKitNode) {
   node.on("created", async () => {
-    const { data } =
-      await apiClient.extension.storage.group.listStorageHaloRunV1alpha1Group({
-        labelSelector: ["!halo.run/hidden"],
-        sort: ["metadata.creationTimestamp,desc"],
-      });
+    const { data } = await coreApiClient.storage.group.listGroup({
+      labelSelector: ["!halo.run/hidden"],
+      sort: ["metadata.creationTimestamp,desc"],
+    });
 
     node.props.options = data.items.map((group) => {
       return {

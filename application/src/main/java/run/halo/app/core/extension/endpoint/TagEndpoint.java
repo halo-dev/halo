@@ -44,7 +44,7 @@ public class TagEndpoint implements CustomEndpoint {
 
     @Override
     public RouterFunction<ServerResponse> endpoint() {
-        final var tag = "api.console.halo.run/v1alpha1/Tag";
+        var tag = "TagV1alpha1Console";
         return SpringdocRouteBuilder.route()
             .GET("tags", this::listTag, builder -> {
                     builder.operationId("ListPostTags")

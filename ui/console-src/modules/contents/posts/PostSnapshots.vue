@@ -11,7 +11,7 @@ import {
 } from "@halo-dev/components";
 import { useQuery, useQueryClient } from "@tanstack/vue-query";
 import { useRoute } from "vue-router";
-import { apiClient } from "@/utils/api-client";
+import { consoleApiClient, coreApiClient } from "@halo-dev/api-client";
 import { computed, watch } from "vue";
 import { OverlayScrollbarsComponent } from "overlayscrollbars-vue";
 import { useRouteQuery } from "@vueuse/router";
@@ -28,10 +28,9 @@ const postName = computed(() => route.query.name as string);
 const { data: post } = useQuery({
   queryKey: ["post-by-name", postName],
   queryFn: async () => {
-    const { data } =
-      await apiClient.extension.post.getContentHaloRunV1alpha1Post({
-        name: postName.value,
-      });
+    const { data } = await coreApiClient.content.post.getPost({
+      name: postName.value,
+    });
     return data;
   },
   enabled: computed(() => !!postName.value),
@@ -40,7 +39,7 @@ const { data: post } = useQuery({
 const { data: snapshots, isLoading } = useQuery({
   queryKey: ["post-snapshots-by-post-name", postName],
   queryFn: async () => {
-    const { data } = await apiClient.post.listPostSnapshots({
+    const { data } = await consoleApiClient.content.post.listPostSnapshots({
       name: postName.value,
     });
     return data;
@@ -99,7 +98,7 @@ function handleCleanup() {
       }
 
       for (let i = 0; i < snapshotsToDelete?.length; i++) {
-        await apiClient.post.deletePostContent({
+        await consoleApiClient.content.post.deletePostContent({
           name: postName.value,
           snapshotName: snapshotsToDelete[i].metadata.name,
         });

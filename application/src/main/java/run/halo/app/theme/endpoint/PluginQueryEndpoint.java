@@ -30,7 +30,7 @@ public class PluginQueryEndpoint implements CustomEndpoint {
 
     @Override
     public RouterFunction<ServerResponse> endpoint() {
-        final var tag = groupVersion().toString() + "/Plugin";
+        final var tag = "PluginV1alpha1Public";
         return SpringdocRouteBuilder.route()
             .GET("plugins/{name}/available", this::availableByName,
                 builder -> builder.operationId("queryPluginAvailableByName")

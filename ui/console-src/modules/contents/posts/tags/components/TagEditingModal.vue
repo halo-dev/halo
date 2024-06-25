@@ -1,7 +1,7 @@
 <script lang="ts" setup>
 // core libs
 import { computed, nextTick, ref, watch } from "vue";
-import { apiClient } from "@/utils/api-client";
+import { coreApiClient } from "@halo-dev/api-client";
 
 // components
 import {
@@ -91,12 +91,12 @@ const handleSaveTag = async () => {
   try {
     saving.value = true;
     if (isUpdateMode.value) {
-      await apiClient.extension.tag.updateContentHaloRunV1alpha1Tag({
+      await coreApiClient.content.tag.updateTag({
         name: formState.value.metadata.name,
         tag: formState.value,
       });
     } else {
-      await apiClient.extension.tag.createContentHaloRunV1alpha1Tag({
+      await coreApiClient.content.tag.createTag({
         tag: formState.value,
       });
     }

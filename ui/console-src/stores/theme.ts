@@ -1,4 +1,4 @@
-import { apiClient } from "@/utils/api-client";
+import { consoleApiClient } from "@halo-dev/api-client";
 import type { Theme } from "@halo-dev/api-client";
 import { defineStore } from "pinia";
 import { ref } from "vue";
@@ -15,7 +15,7 @@ export const useThemeStore = defineStore("theme", () => {
     }
 
     try {
-      const { data } = await apiClient.theme.fetchActivatedTheme({
+      const { data } = await consoleApiClient.theme.theme.fetchActivatedTheme({
         mute: true,
       });
 

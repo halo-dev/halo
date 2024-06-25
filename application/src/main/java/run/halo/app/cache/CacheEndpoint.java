@@ -25,9 +25,10 @@ public class CacheEndpoint implements CustomEndpoint {
 
     @Override
     public RouterFunction<ServerResponse> endpoint() {
+        var tag = "CacheV1alpha1Console";
         return route()
             .DELETE("/caches/{name}", this::evictCache, builder -> builder
-                .tag("v1alpha1/Cache")
+                .tag(tag)
                 .operationId("EvictCache")
                 .description("Evict a cache.")
                 .parameter(parameterBuilder()

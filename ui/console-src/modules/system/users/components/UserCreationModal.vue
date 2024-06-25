@@ -1,7 +1,7 @@
 <script lang="ts" setup>
 // core libs
 import { onMounted, ref } from "vue";
-import { apiClient } from "@/utils/api-client";
+import { consoleApiClient } from "@halo-dev/api-client";
 import type { CreateUserRequest } from "@halo-dev/api-client";
 
 // components
@@ -46,7 +46,7 @@ const handleCreateUser = async () => {
       formState.value.roles = [selectedRole.value];
     }
 
-    await apiClient.user.createUser({
+    await consoleApiClient.user.createUser({
       createUserRequest: formState.value,
     });
 

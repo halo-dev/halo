@@ -29,7 +29,7 @@ public class AuthProviderEndpoint implements CustomEndpoint {
 
     @Override
     public RouterFunction<ServerResponse> endpoint() {
-        final var tag = "api.console.halo.run/v1alpha1/AuthProvider";
+        final var tag = "AuthProviderV1alpha1Console";
         return SpringdocRouteBuilder.route()
             .GET("auth-providers", this::listAuthProviders,
                 builder -> builder.operationId("listAuthProviders")

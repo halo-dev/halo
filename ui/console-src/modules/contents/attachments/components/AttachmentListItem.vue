@@ -15,7 +15,7 @@ import type { Attachment } from "@halo-dev/api-client";
 import { formatDatetime } from "@/utils/date";
 import prettyBytes from "pretty-bytes";
 import { useFetchAttachmentPolicy } from "../composables/use-attachment-policy";
-import { apiClient } from "@/utils/api-client";
+import { coreApiClient } from "@halo-dev/api-client";
 import { usePermission } from "@/utils/permission";
 import { useI18n } from "vue-i18n";
 import { useQueryClient } from "@tanstack/vue-query";
@@ -65,11 +65,9 @@ const handleDelete = () => {
     cancelText: t("core.common.buttons.cancel"),
     onConfirm: async () => {
       try {
-        await apiClient.extension.storage.attachment.deleteStorageHaloRunV1alpha1Attachment(
-          {
-            name: props.attachment.metadata.name,
-          }
-        );
+        await coreApiClient.storage.attachment.deleteAttachment({
+          name: props.attachment.metadata.name,
+        });
 
         selectedAttachments.value.delete(props.attachment);
 

@@ -10,7 +10,7 @@ import type { Ref } from "vue";
 import type { ConfigMap, Setting, Theme } from "@halo-dev/api-client";
 
 // hooks
-import { apiClient } from "@/utils/api-client";
+import { consoleApiClient } from "@halo-dev/api-client";
 import { useSettingFormConvert } from "@console/composables/use-setting-form";
 import { useI18n } from "vue-i18n";
 import { useQuery, useQueryClient } from "@tanstack/vue-query";
@@ -29,7 +29,7 @@ const saving = ref(false);
 const { data: configMap, suspense } = useQuery<ConfigMap>({
   queryKey: ["theme-configMap", selectedTheme],
   queryFn: async () => {
-    const { data } = await apiClient.theme.fetchThemeConfig({
+    const { data } = await consoleApiClient.theme.theme.fetchThemeConfig({
       name: selectedTheme?.value?.metadata.name as string,
     });
     return data;
@@ -55,7 +55,7 @@ const handleSaveConfigMap = async () => {
     return;
   }
 
-  await apiClient.theme.updateThemeConfig({
+  await consoleApiClient.theme.theme.updateThemeConfig({
     name: selectedTheme?.value?.metadata.name,
     configMap: configMapToUpdate,
   });

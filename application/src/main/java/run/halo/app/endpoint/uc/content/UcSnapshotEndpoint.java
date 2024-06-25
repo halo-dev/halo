@@ -38,8 +38,7 @@ public class UcSnapshotEndpoint implements CustomEndpoint {
 
     @Override
     public RouterFunction<ServerResponse> endpoint() {
-        var tag = groupVersion() + "/Snapshot";
-
+        var tag = "SnapshotV1alpha1Uc";
         return route().nest(path("/snapshots"),
                 () -> route()
                     .GET("/{name}",

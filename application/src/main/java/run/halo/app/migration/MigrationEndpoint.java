@@ -53,7 +53,7 @@ public class MigrationEndpoint implements CustomEndpoint {
 
     @Override
     public RouterFunction<ServerResponse> endpoint() {
-        var tag = groupVersion().toString() + "/Migration";
+        var tag = "MigrationV1alpha1Console";
         return SpringdocRouteBuilder.route()
             .GET("/backups/{name}/files/{filename}",
                 request -> {

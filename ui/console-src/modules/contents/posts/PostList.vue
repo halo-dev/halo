@@ -19,7 +19,7 @@ import PostSettingModal from "./components/PostSettingModal.vue";
 import type { Ref } from "vue";
 import { computed, provide, ref, watch } from "vue";
 import type { ListedPost, Post } from "@halo-dev/api-client";
-import { apiClient } from "@/utils/api-client";
+import { consoleApiClient, coreApiClient } from "@halo-dev/api-client";
 import { postLabels } from "@/constants/labels";
 import { useQuery } from "@tanstack/vue-query";
 import { useI18n } from "vue-i18n";
@@ -135,7 +135,7 @@ const {
       labelSelector.push(selectedPublishStatus.value);
     }
 
-    const { data } = await apiClient.post.listPosts({
+    const { data } = await consoleApiClient.content.post.listPosts({
       labelSelector,
       fieldSelector,
       page: page.value,
@@ -183,11 +183,9 @@ const {
 });
 
 const handleOpenSettingModal = async (post: Post) => {
-  const { data } = await apiClient.extension.post.getContentHaloRunV1alpha1Post(
-    {
-      name: post.metadata.name,
-    }
-  );
+  const { data } = await coreApiClient.content.post.getPost({
+    name: post.metadata.name,
+  });
   selectedPost.value = data;
   settingModal.value = true;
 };
@@ -206,10 +204,9 @@ const handleSelectPrevious = async () => {
   );
 
   if (index > 0) {
-    const { data: previousPost } =
-      await apiClient.extension.post.getContentHaloRunV1alpha1Post({
-        name: posts.value[index - 1].post.metadata.name,
-      });
+    const { data: previousPost } = await coreApiClient.content.post.getPost({
+      name: posts.value[index - 1].post.metadata.name,
+    });
     selectedPost.value = previousPost;
     return;
   }
@@ -227,10 +224,9 @@ const handleSelectNext = async () => {
     (post) => post.post.metadata.name === selectedPost.value?.metadata.name
   );
   if (index < posts.value.length - 1) {
-    const { data: nextPost } =
-      await apiClient.extension.post.getContentHaloRunV1alpha1Post({
-        name: posts.value[index + 1].post.metadata.name,
-      });
+    const { data: nextPost } = await coreApiClient.content.post.getPost({
+      name: posts.value[index + 1].post.metadata.name,
+    });
     selectedPost.value = nextPost;
     return;
   }
@@ -271,7 +267,7 @@ const handleDeleteInBatch = async () => {
     onConfirm: async () => {
       await Promise.all(
         selectedPostNames.value.map((name) => {
-          return apiClient.post.recyclePost({
+          return consoleApiClient.content.post.recyclePost({
             name,
           });
         })
