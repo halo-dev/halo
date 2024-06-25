@@ -1,7 +1,7 @@
-import { Plugin } from "vite";
-import yaml from "js-yaml";
 import type { Plugin as HaloPlugin } from "@halo-dev/api-client";
 import fs from "fs";
+import yaml from "js-yaml";
+import { Plugin } from "vite";
 
 export function HaloUIPluginBundlerKit(): Plugin {
   return {
@@ -42,7 +42,9 @@ export function HaloUIPluginBundlerKit(): Plugin {
               "@vueuse/router",
               "@halo-dev/shared",
               "@halo-dev/components",
+              "@halo-dev/api-client",
               "@halo-dev/richtext-editor",
+              "axios",
             ],
             output: {
               globals: {
@@ -53,7 +55,9 @@ export function HaloUIPluginBundlerKit(): Plugin {
                 "@vueuse/router": "VueUse",
                 "@halo-dev/console-shared": "HaloConsoleShared",
                 "@halo-dev/components": "HaloComponents",
+                "@halo-dev/api-client": "HaloApiClient",
                 "@halo-dev/richtext-editor": "RichTextEditor",
+                axios: "axios",
               },
               extend: true,
             },

@@ -1,10 +1,10 @@
-import { apiClient } from "@/utils/api-client";
+import { coreApiClient } from "@halo-dev/api-client";
 import type { FormKitNode, FormKitTypeDefinition } from "@formkit/core";
 import { select, selects, defaultIcon } from "@formkit/inputs";
 
 function optionsHandler(node: FormKitNode) {
   node.on("created", async () => {
-    const { data } = await apiClient.extension.menuItem.listV1alpha1MenuItem({
+    const { data } = await coreApiClient.menuItem.listMenuItem({
       fieldSelector: [`name=(${node.props.menuItems.join(",")})`],
     });
 

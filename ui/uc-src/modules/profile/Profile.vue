@@ -1,7 +1,7 @@
 <script lang="ts" setup>
 import UserAvatar from "@/components/user-avatar/UserAvatar.vue";
 import { usePluginModuleStore } from "@/stores/plugin";
-import { apiClient } from "@/utils/api-client";
+import { consoleApiClient } from "@halo-dev/api-client";
 import type { DetailedUser } from "@halo-dev/api-client";
 import {
   VButton,
@@ -41,7 +41,7 @@ const {
 } = useQuery({
   queryKey: ["user-detail"],
   queryFn: async () => {
-    const { data } = await apiClient.user.getCurrentUserDetail();
+    const { data } = await consoleApiClient.user.getCurrentUserDetail();
     return data;
   },
 });

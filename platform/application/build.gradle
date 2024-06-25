@@ -54,8 +54,6 @@ dependencies {
         api "io.github.resilience4j:resilience4j-spring-boot3:$resilience4jVersion"
         api "io.github.resilience4j:resilience4j-reactor:$resilience4jVersion"
         api "com.j256.two-factor-auth:two-factor-auth:$twoFactorAuth"
-
-        runtime 'org.mariadb:r2dbc-mariadb:1.1.4'
     }
 
 }

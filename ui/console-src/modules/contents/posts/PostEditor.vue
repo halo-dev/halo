@@ -24,7 +24,11 @@ import {
   toRef,
   watch,
 } from "vue";
-import { apiClient } from "@/utils/api-client";
+import {
+  consoleApiClient,
+  coreApiClient,
+  ucApiClient,
+} from "@halo-dev/api-client";
 import { useRouteQuery } from "@vueuse/router";
 import { useRouter } from "vue-router";
 import { randomUUID } from "@/utils/id";
@@ -169,7 +173,7 @@ const handleSave = async (options?: { mute?: boolean }) => {
         ).data;
       }
 
-      const { data } = await apiClient.post.updatePostContent({
+      const { data } = await consoleApiClient.content.post.updatePostContent({
         name: formState.value.post.metadata.name,
         content: formState.value.content,
       });
@@ -181,7 +185,7 @@ const handleSave = async (options?: { mute?: boolean }) => {
       // Clear new post content cache
       handleClearCache();
 
-      const { data } = await apiClient.post.draftPost({
+      const { data } = await consoleApiClient.content.post.draftPost({
         postRequest: formState.value,
       });
       formState.value.post = data;
@@ -218,12 +222,12 @@ const handlePublish = async () => {
         ).data;
       }
 
-      await apiClient.post.updatePostContent({
+      await consoleApiClient.content.post.updatePostContent({
         name: postName,
         content: formState.value.content,
       });
 
-      await apiClient.post.publishPost({
+      await consoleApiClient.content.post.publishPost({
         name: postName,
       });
 
@@ -233,11 +237,11 @@ const handlePublish = async () => {
         router.back();
       }
     } else {
-      const { data } = await apiClient.post.draftPost({
+      const { data } = await consoleApiClient.content.post.draftPost({
         postRequest: formState.value,
       });
 
-      await apiClient.post.publishPost({
+      await consoleApiClient.content.post.publishPost({
         name: data.metadata.name,
       });
 
@@ -273,7 +277,7 @@ const handleFetchContent = async () => {
     return;
   }
 
-  const { data } = await apiClient.post.fetchPostHeadContent({
+  const { data } = await consoleApiClient.content.post.fetchPostHeadContent({
     name: formState.value.post.metadata.name,
   });
 
@@ -327,7 +331,7 @@ const handleFetchContent = async () => {
 
 const handleOpenSettingModal = async () => {
   if (isTitleChanged.value) {
-    await apiClient.extension.post.patchContentHaloRunV1alpha1Post({
+    await coreApiClient.content.post.patchPost({
       name: formState.value.post.metadata.name,
       jsonPatchInner: [
         {
@@ -341,10 +345,9 @@ const handleOpenSettingModal = async () => {
     isTitleChanged.value = false;
   }
 
-  const { data: latestPost } =
-    await apiClient.extension.post.getContentHaloRunV1alpha1Post({
-      name: formState.value.post.metadata.name,
-    });
+  const { data: latestPost } = await coreApiClient.content.post.getPost({
+    name: formState.value.post.metadata.name,
+  });
   formState.value.post = latestPost;
 
   settingModal.value = true;
@@ -376,10 +379,9 @@ onMounted(async () => {
 
   if (name.value) {
     // fetch post
-    const { data: post } =
-      await apiClient.extension.post.getContentHaloRunV1alpha1Post({
-        name: name.value as string,
-      });
+    const { data: post } = await coreApiClient.content.post.getPost({
+      name: name.value as string,
+    });
     formState.value.post = post;
 
     // fetch post content
@@ -456,7 +458,7 @@ async function handleUploadImage(file: File, options?: AxiosRequestConfig) {
     await handleSave();
   }
 
-  const { data } = await apiClient.uc.attachment.createAttachmentForPost(
+  const { data } = await ucApiClient.storage.attachment.createAttachmentForPost(
     {
       file,
       postName: formState.value.post.metadata.name,

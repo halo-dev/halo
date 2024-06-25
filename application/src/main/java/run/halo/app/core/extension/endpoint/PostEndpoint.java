@@ -58,7 +58,7 @@ public class PostEndpoint implements CustomEndpoint {
 
     @Override
     public RouterFunction<ServerResponse> endpoint() {
-        final var tag = "api.console.halo.run/v1alpha1/Post";
+        final var tag = "PostV1alpha1Console";
         return SpringdocRouteBuilder.route()
             .GET("posts", this::listPost, builder -> {
                     builder.operationId("ListPosts")

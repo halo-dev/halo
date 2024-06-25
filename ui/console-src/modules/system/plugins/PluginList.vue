@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import { apiClient } from "@/utils/api-client";
+import { consoleApiClient } from "@halo-dev/api-client";
 import { usePermission } from "@/utils/permission";
 import { PluginStatusPhaseEnum, type Plugin } from "@halo-dev/api-client";
 import {
@@ -56,7 +56,7 @@ const total = ref(0);
 const { data, isLoading, isFetching, refetch } = useQuery<Plugin[]>({
   queryKey: ["plugins", keyword, selectedEnabledValue, selectedSortValue],
   queryFn: async () => {
-    const { data } = await apiClient.plugin.listPlugins({
+    const { data } = await consoleApiClient.plugin.plugin.listPlugins({
       page: 0,
       size: 0,
       keyword: keyword.value,

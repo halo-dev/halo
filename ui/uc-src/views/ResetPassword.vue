@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import { apiClient } from "@/utils/api-client";
+import { publicApiClient } from "@halo-dev/api-client";
 import { Toast, VButton } from "@halo-dev/components";
 import { useRouteParams, useRouteQuery } from "@vueuse/router";
 import { ref } from "vue";
@@ -21,7 +21,7 @@ async function onSubmit(data: ResetPasswordForm) {
   try {
     loading.value = true;
 
-    await apiClient.common.user.resetPasswordByToken({
+    await publicApiClient.user.resetPasswordByToken({
       name: data.username,
       resetPasswordRequest: {
         newPassword: data.password,

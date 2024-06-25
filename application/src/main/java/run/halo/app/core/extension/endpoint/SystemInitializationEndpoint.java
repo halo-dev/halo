@@ -50,7 +50,7 @@ public class SystemInitializationEndpoint implements CustomEndpoint {
 
     @Override
     public RouterFunction<ServerResponse> endpoint() {
-        var tag = "api.console.halo.run/v1alpha1/System";
+        var tag = "SystemV1alpha1Console";
         // define a non-resource api
         return SpringdocRouteBuilder.route()
             .POST("/system/initialize", this::initialize,

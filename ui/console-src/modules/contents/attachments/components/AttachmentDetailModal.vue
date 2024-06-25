@@ -10,7 +10,7 @@ import LazyImage from "@/components/image/LazyImage.vue";
 import type { Attachment } from "@halo-dev/api-client";
 import prettyBytes from "pretty-bytes";
 import { computed, ref } from "vue";
-import { apiClient } from "@/utils/api-client";
+import { coreApiClient } from "@halo-dev/api-client";
 import { isImage } from "@/utils/image";
 import { formatDatetime } from "@/utils/date";
 import { useFetchAttachmentGroup } from "../composables/use-attachment-group";
@@ -47,10 +47,9 @@ const { data: policy } = useQuery({
       return;
     }
 
-    const { data } =
-      await apiClient.extension.storage.policy.getStorageHaloRunV1alpha1Policy({
-        name: policyName.value,
-      });
+    const { data } = await coreApiClient.storage.policy.getPolicy({
+      name: policyName.value,
+    });
 
     return data;
   },

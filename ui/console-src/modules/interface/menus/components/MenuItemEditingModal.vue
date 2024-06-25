@@ -3,7 +3,7 @@ import { Toast, VButton, VModal, VSpace } from "@halo-dev/components";
 import SubmitButton from "@/components/button/SubmitButton.vue";
 import { computed, nextTick, onMounted, ref } from "vue";
 import type { Menu, MenuItem, Ref } from "@halo-dev/api-client";
-import { apiClient } from "@/utils/api-client";
+import { coreApiClient } from "@halo-dev/api-client";
 import { setFocus } from "@/formkit/utils/focus";
 import AnnotationsForm from "@/components/form/AnnotationsForm.vue";
 import { useI18n } from "vue-i18n";
@@ -87,23 +87,21 @@ const handleSaveMenuItem = async () => {
     }
 
     if (isUpdateMode) {
-      const { data } =
-        await apiClient.extension.menuItem.updateV1alpha1MenuItem({
-          name: formState.value.metadata.name,
-          menuItem: formState.value,
-        });
+      const { data } = await coreApiClient.menuItem.updateMenuItem({
+        name: formState.value.metadata.name,
+        menuItem: formState.value,
+      });
 
       emit("saved", data);
     } else {
-      const { data } =
-        await apiClient.extension.menuItem.createV1alpha1MenuItem({
-          menuItem: formState.value,
-        });
+      const { data } = await coreApiClient.menuItem.createMenuItem({
+        menuItem: formState.value,
+      });
 
       // if parent menu item is selected, add the new menu item to the parent menu item
       if (selectedParentMenuItem.value) {
         const { data: menuItemToUpdate } =
-          await apiClient.extension.menuItem.getV1alpha1MenuItem({
+          await coreApiClient.menuItem.getMenuItem({
             name: selectedParentMenuItem.value,
           });
 
@@ -112,7 +110,7 @@ const handleSaveMenuItem = async () => {
           data.metadata.name,
         ];
 
-        await apiClient.extension.menuItem.updateV1alpha1MenuItem({
+        await coreApiClient.menuItem.updateMenuItem({
           name: menuItemToUpdate.metadata.name,
           menuItem: menuItemToUpdate,
         });

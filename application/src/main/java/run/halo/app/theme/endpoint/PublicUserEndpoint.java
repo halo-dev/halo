@@ -61,7 +61,7 @@ public class PublicUserEndpoint implements CustomEndpoint {
 
     @Override
     public RouterFunction<ServerResponse> endpoint() {
-        var tag = "api.halo.run/v1alpha1/User";
+        var tag = "UserV1alpha1Public";
         return SpringdocRouteBuilder.route()
             .POST("/users/-/signup", this::signUp,
                 builder -> builder.operationId("SignUp")

@@ -1,11 +1,11 @@
 import { postLabels } from "@/constants/labels";
-import { apiClient } from "@/utils/api-client";
+import { consoleApiClient } from "@halo-dev/api-client";
 import type { FormKitNode, FormKitTypeDefinition } from "@formkit/core";
 import { select, selects, defaultIcon } from "@formkit/inputs";
 
 function optionsHandler(node: FormKitNode) {
   node.on("created", async () => {
-    const { data } = await apiClient.post.listPosts({
+    const { data } = await consoleApiClient.content.post.listPosts({
       labelSelector: [
         `${postLabels.DELETED}=false`,
         `${postLabels.PUBLISHED}=true`,

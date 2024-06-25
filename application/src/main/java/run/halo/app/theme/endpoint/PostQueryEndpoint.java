@@ -38,7 +38,7 @@ public class PostQueryEndpoint implements CustomEndpoint {
 
     @Override
     public RouterFunction<ServerResponse> endpoint() {
-        final var tag = groupVersion().toString() + "/Post";
+        var tag = "PostV1alpha1Public";
         return SpringdocRouteBuilder.route()
             .GET("posts", this::listPosts,
                 builder -> {

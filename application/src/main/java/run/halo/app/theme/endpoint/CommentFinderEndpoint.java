@@ -73,7 +73,7 @@ public class CommentFinderEndpoint implements CustomEndpoint {
 
     @Override
     public RouterFunction<ServerResponse> endpoint() {
-        final var tag = "api.halo.run/v1alpha1/Comment";
+        final var tag = "CommentV1alpha1Public";
         return SpringdocRouteBuilder.route()
             .POST("comments", this::createComment,
                 builder -> builder.operationId("CreateComment")

@@ -16,7 +16,7 @@ import {
 import HasPermission from "@/components/permission/HasPermission.vue";
 import TagEditingModal from "./components/TagEditingModal.vue";
 import { useRouteQuery } from "@vueuse/router";
-import { apiClient } from "@/utils/api-client";
+import { coreApiClient } from "@halo-dev/api-client";
 import { usePostTag } from "./composables/use-post-tag";
 import TagListItem from "./components/TagListItem.vue";
 import SearchInput from "@/components/input/SearchInput.vue";
@@ -142,11 +142,9 @@ const queryName = useRouteQuery("name");
 
 onMounted(async () => {
   if (queryName.value) {
-    const { data } = await apiClient.extension.tag.getContentHaloRunV1alpha1Tag(
-      {
-        name: queryName.value as string,
-      }
-    );
+    const { data } = await coreApiClient.content.tag.getTag({
+      name: queryName.value as string,
+    });
     selectedTag.value = data;
     editingModal.value = true;
   }
