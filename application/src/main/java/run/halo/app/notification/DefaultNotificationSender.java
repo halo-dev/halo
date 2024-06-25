@@ -66,7 +66,7 @@ public class DefaultNotificationSender
 
     Mono<ReactiveNotifier> selectNotifier(String notifierExtensionName) {
         return client.fetch(ExtensionDefinition.class, notifierExtensionName)
-            .flatMap(extDefinition -> extensionGetter.getEnabledExtensionByDefinition(
+            .flatMap(extDefinition -> extensionGetter.getEnabledExtensions(
                     ReactiveNotifier.class)
                 .filter(notifier -> notifier.getClass().getName()
                     .equals(extDefinition.getSpec().getClassName())
