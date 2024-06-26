@@ -426,9 +426,20 @@
         ]
       }
     },
+    "/apis/api.console.halo.run/v1alpha1/indices/-/rebuild": {
+      "post": {
+        "description": "Rebuild all indices",
+        "operationId": "RebuildAllIndices",
+        "responses": {},
+        "tags": [
+          "IndicesV1alpha1Console"
+        ]
+      }
+    },
     "/apis/api.console.halo.run/v1alpha1/indices/post": {
       "post": {
-        "description": "Build or rebuild post indices for full text search",
+        "deprecated": true,
+        "description": "Build or rebuild post indices for full text search. This method is deprecated, please use POST /indices/-/rebuild instead.",
         "operationId": "BuildPostIndices",
         "responses": {},
         "tags": [
@@ -3440,6 +3451,9 @@
             "minLength": 1,
             "type": "string"
           },
+          "hideFromList": {
+            "type": "boolean"
+          },
           "postTemplate": {
             "maxLength": 255,
             "type": "string"
@@ -5191,6 +5205,9 @@
           "excerpt": {
             "type": "string"
           },
+          "hideFromList": {
+            "type": "boolean"
+          },
           "inProgress": {
             "type": "boolean"
           },
@@ -5698,6 +5715,9 @@
           },
           "excerpt": {
             "type": "string"
+          },
+          "hideFromList": {
+            "type": "boolean"
           },
           "inProgress": {
             "type": "boolean"

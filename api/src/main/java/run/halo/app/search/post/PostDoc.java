@@ -3,6 +3,7 @@ package run.halo.app.search.post;
 import java.time.Instant;
 import org.springframework.util.Assert;
 
+@Deprecated(forRemoval = true, since = "2.17")
 public record PostDoc(String name,
                       String title,
                       String excerpt,

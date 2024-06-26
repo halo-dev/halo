@@ -11,6 +11,7 @@ import org.springframework.util.MultiValueMap;
 import org.springframework.util.StringUtils;
 import org.springframework.web.server.ServerWebInputException;
 
+@Deprecated(forRemoval = true, since = "2.17")
 public class SearchParam {
 
     private static final int DEFAULT_LIMIT = 10;

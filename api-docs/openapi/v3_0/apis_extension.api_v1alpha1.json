@@ -8485,6 +8485,9 @@
             "minLength": 1,
             "type": "string"
           },
+          "hideFromList": {
+            "type": "boolean"
+          },
           "postTemplate": {
             "maxLength": 255,
             "type": "string"
@@ -10645,6 +10648,9 @@
           "excerpt": {
             "type": "string"
           },
+          "hideFromList": {
+            "type": "boolean"
+          },
           "inProgress": {
             "type": "boolean"
           },
@@ -11831,6 +11837,9 @@
           },
           "excerpt": {
             "type": "string"
+          },
+          "hideFromList": {
+            "type": "boolean"
           },
           "inProgress": {
             "type": "boolean"
