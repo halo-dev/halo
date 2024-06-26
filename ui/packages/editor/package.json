@@ -51,7 +51,6 @@
     "@tiptap/extension-color": "^2.4.0",
     "@tiptap/extension-document": "^2.4.0",
     "@tiptap/extension-dropcursor": "^2.4.0",
-    "@tiptap/extension-gapcursor": "^2.4.0",
     "@tiptap/extension-hard-break": "^2.4.0",
     "@tiptap/extension-heading": "^2.4.0",
     "@tiptap/extension-highlight": "^2.4.0",

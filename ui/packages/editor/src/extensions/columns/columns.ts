@@ -173,7 +173,7 @@ const Columns = Node.create({
   priority: 10,
   defining: true,
   isolating: true,
-  allowGapCursor: false,
+  allowGapCursor: true,
   content: "column{1,}",
   fakeSelection: false,
 

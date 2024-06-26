@@ -2,7 +2,6 @@
 import { i18n } from "@/locales";
 import ExtensionDocument from "@tiptap/extension-document";
 import ExtensionDropcursor from "@tiptap/extension-dropcursor";
-import ExtensionGapcursor from "@tiptap/extension-gapcursor";
 import ExtensionHardBreak from "@tiptap/extension-hard-break";
 import ExtensionHorizontalRule from "@tiptap/extension-horizontal-rule";
 import ExtensionPlaceholder from "@tiptap/extension-placeholder";
@@ -37,6 +36,7 @@ import ExtensionClearFormat from "./clear-format";
 import { ExtensionColumn, ExtensionColumns } from "./columns";
 import ExtensionDraggable from "./draggable";
 import ExtensionFormatBrush from "./format-brush";
+import ExtensionGapcursor from "./gap-cursor";
 import ExtensionIframe from "./iframe";
 import ExtensionImage from "./image";
 import ExtensionIndent from "./indent";
