@@ -59,6 +59,7 @@ export * from './api/post-v1alpha1-public-api';
 export * from './api/post-v1alpha1-uc-api';
 export * from './api/reason-type-v1alpha1-api';
 export * from './api/reason-v1alpha1-api';
+export * from './api/remember-me-token-v1alpha1-api';
 export * from './api/reply-v1alpha1-api';
 export * from './api/reply-v1alpha1-console-api';
 export * from './api/reverse-proxy-v1alpha1-api';
