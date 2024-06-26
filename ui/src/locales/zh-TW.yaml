@@ -191,6 +191,8 @@ core:
       cancel_publish_in_batch:
         title: 取消發佈文章
         description: 批量取消發佈文章，所選文章會被設置為未發布狀態
+      batch_setting:
+        button: 批量設置
     filters:
       status:
         items:
@@ -265,6 +267,25 @@ core:
           label: 自定義模板
         cover:
           label: 封面圖
+    batch_setting_modal:
+      title: 文章批量設置
+      fields:
+        common:
+          enabled: 啟用
+          op:
+            label: 設置方式
+            options:
+              add: 追加
+              replace: 替换
+              remove_all: 移除全部
+        category_group: 分类
+        category_names: 選擇分類
+        tag_group: 標籤
+        tag_names: 選擇標籤
+        visible_group: 可見性
+        visible_value: 選擇可見性
+        allow_comment_group: 允許評論
+        allow_comment_value: 選擇是否允許評論
   deleted_post:
     title: 文章回收站
     empty:
