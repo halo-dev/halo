@@ -280,9 +280,52 @@ const handleDeleteInBatch = async () => {
   });
 };
 
-watch(selectedPostNames, (newValue) => {
-  checkedAll.value = newValue.length === posts.value?.length;
-});
+const handlePublishInBatch = async () => {
+  Dialog.info({
+    title: t("core.post.operations.publish_in_batch.title"),
+    description: t("core.post.operations.publish_in_batch.description"),
+    confirmText: t("core.common.buttons.confirm"),
+    cancelText: t("core.common.buttons.cancel"),
+    onConfirm: async () => {
+      for (const i in selectedPostNames.value) {
+        const name = selectedPostNames.value[i];
+        await consoleApiClient.content.post.publishPost({ name });
+      }
+
+      await refetch();
+      selectedPostNames.value = [];
+
+      Toast.success(t("core.common.toast.publish_success"));
+    },
+  });
+};
+
+const handleCancelPublishInBatch = async () => {
+  Dialog.warning({
+    title: t("core.post.operations.cancel_publish_in_batch.title"),
+    description: t("core.post.operations.cancel_publish_in_batch.description"),
+    confirmText: t("core.common.buttons.confirm"),
+    cancelText: t("core.common.buttons.cancel"),
+    onConfirm: async () => {
+      for (const i in selectedPostNames.value) {
+        const name = selectedPostNames.value[i];
+        await consoleApiClient.content.post.unpublishPost({ name });
+      }
+
+      await refetch();
+      selectedPostNames.value = [];
+
+      Toast.success(t("core.common.toast.cancel_publish_success"));
+    },
+  });
+};
+
+watch(
+  () => selectedPostNames.value,
+  (newValue) => {
+    checkedAll.value = newValue.length === posts.value?.length;
+  }
+);
 </script>
 <template>
   <PostSettingModal
@@ -349,6 +392,12 @@ watch(selectedPostNames, (newValue) => {
             <div class="flex w-full flex-1 items-center sm:w-auto">
               <SearchInput v-if="!selectedPostNames.length" v-model="keyword" />
               <VSpace v-else>
+                <VButton @click="handlePublishInBatch">
+                  {{ $t("core.common.buttons.publish") }}
+                </VButton>
+                <VButton @click="handleCancelPublishInBatch">
+                  {{ $t("core.common.buttons.cancel_publish") }}
+                </VButton>
                 <VButton type="danger" @click="handleDeleteInBatch">
                   {{ $t("core.common.buttons.delete") }}
                 </VButton>

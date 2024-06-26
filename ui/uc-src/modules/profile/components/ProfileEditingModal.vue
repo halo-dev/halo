@@ -32,7 +32,6 @@ const formState = ref<User>(
     spec: {
       displayName: "",
       email: "",
-      phone: "",
       password: "",
       bio: "",
       disabled: false,
@@ -140,13 +139,6 @@ async function onEmailVerifyModalClose() {
                 </VButton>
               </template>
             </FormKit>
-            <FormKit
-              v-model="formState.spec.phone"
-              :label="$t('core.uc_profile.editing_modal.fields.phone.label')"
-              type="text"
-              name="phone"
-              validation="length:0,20"
-            ></FormKit>
             <FormKit
               v-model="formState.spec.bio"
               :label="$t('core.uc_profile.editing_modal.fields.bio.label')"
