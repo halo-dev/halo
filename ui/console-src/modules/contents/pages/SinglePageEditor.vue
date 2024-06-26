@@ -311,11 +311,27 @@ const handleFetchContent = async () => {
 
 // SinglePage settings
 const handleOpenSettingModal = async () => {
+  if (isTitleChanged.value) {
+    await coreApiClient.content.singlePage.patchSinglePage({
+      name: formState.value.page.metadata.name,
+      jsonPatchInner: [
+        {
+          op: "add",
+          path: "/spec/title",
+          value:
+            formState.value.page.spec.title || t("core.page_editor.untitled"),
+        },
+      ],
+    });
+    isTitleChanged.value = false;
+  }
+
   const { data: latestSinglePage } =
     await coreApiClient.content.singlePage.getSinglePage({
       name: formState.value.page.metadata.name,
     });
   formState.value.page = latestSinglePage;
+
   settingModal.value = true;
 };
 
