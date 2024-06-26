@@ -1,6 +1,7 @@
 package run.halo.app.infra;
 
 import java.util.LinkedHashMap;
+import java.util.LinkedHashSet;
 import java.util.Set;
 import lombok.Data;
 import org.springframework.boot.convert.ApplicationConversionService;
@@ -115,12 +116,10 @@ public class SystemSetting {
     }
 
     /**
-     * ExtensionPointEnabled key is full qualified name of extension point and value is a list of
-     * full qualified name of implementation.
+     * ExtensionPointEnabled key is metadata name of extension point and value is a list of
+     * extension definition names.
      */
-    public static class ExtensionPointEnabled extends LinkedHashMap<String, Set<String>> {
-
-        public static final ExtensionPointEnabled EMPTY = new ExtensionPointEnabled();
+    public static class ExtensionPointEnabled extends LinkedHashMap<String, LinkedHashSet<String>> {
 
         public static final String GROUP = "extensionPointEnabled";
 

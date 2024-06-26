@@ -84,7 +84,7 @@ public class CommentEnabledVariableProcessor extends AbstractTemplateBoundariesP
         }
 
         ExtensionGetter extensionGetter = appCtx.getBean(ExtensionGetter.class);
-        return extensionGetter.getEnabledExtensionByDefinition(CommentWidget.class)
+        return extensionGetter.getEnabledExtensions(CommentWidget.class)
             .next()
             .blockOptional();
     }

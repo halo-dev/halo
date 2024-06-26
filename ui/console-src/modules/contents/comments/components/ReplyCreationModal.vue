@@ -18,7 +18,7 @@ import { Picker } from "emoji-mart";
 import i18n from "@emoji-mart/data/i18n/zh.json";
 import { onMounted, ref } from "vue";
 import { setFocus } from "@/formkit/utils/focus";
-import { apiClient } from "@/utils/api-client";
+import { consoleApiClient } from "@halo-dev/api-client";
 import { useI18n } from "vue-i18n";
 
 const { t } = useI18n();
@@ -62,7 +62,7 @@ const handleCreateReply = async () => {
 
     formState.value.content = formState.value.raw;
 
-    await apiClient.comment.createReply({
+    await consoleApiClient.content.comment.createReply({
       name: props.comment?.comment.metadata.name as string,
       replyRequest: formState.value,
     });

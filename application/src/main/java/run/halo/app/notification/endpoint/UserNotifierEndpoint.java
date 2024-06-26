@@ -35,7 +35,7 @@ public class UserNotifierEndpoint implements CustomEndpoint {
 
     @Override
     public RouterFunction<ServerResponse> endpoint() {
-        var tag = "api.notification.halo.run/v1alpha1/Notifier";
+        var tag = "NotifierV1alpha1Uc";
         return SpringdocRouteBuilder.route()
             .GET("/notifiers/{name}/receiver-config", this::fetchReceiverConfig,
                 builder -> builder.operationId("FetchReceiverConfig")

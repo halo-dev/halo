@@ -24,7 +24,11 @@ import {
   toRef,
   watch,
 } from "vue";
-import { apiClient } from "@/utils/api-client";
+import {
+  consoleApiClient,
+  coreApiClient,
+  ucApiClient,
+} from "@halo-dev/api-client";
 import { useRouteQuery } from "@vueuse/router";
 import { useRouter } from "vue-router";
 import { randomUUID } from "@/utils/id";
@@ -156,10 +160,11 @@ const handleSave = async (options?: { mute?: boolean }) => {
         ).data;
       }
 
-      const { data } = await apiClient.singlePage.updateSinglePageContent({
-        name: formState.value.page.metadata.name,
-        content: formState.value.content,
-      });
+      const { data } =
+        await consoleApiClient.content.singlePage.updateSinglePageContent({
+          name: formState.value.page.metadata.name,
+          content: formState.value.content,
+        });
 
       formState.value.page = data;
       isTitleChanged.value = false;
@@ -167,9 +172,10 @@ const handleSave = async (options?: { mute?: boolean }) => {
       // Clear new page content cache
       handleClearCache();
 
-      const { data } = await apiClient.singlePage.draftSinglePage({
-        singlePageRequest: formState.value,
-      });
+      const { data } =
+        await consoleApiClient.content.singlePage.draftSinglePage({
+          singlePageRequest: formState.value,
+        });
       formState.value.page = data;
       routeQueryName.value = data.metadata.name;
     }
@@ -205,12 +211,12 @@ const handlePublish = async () => {
         ).data;
       }
 
-      await apiClient.singlePage.updateSinglePageContent({
+      await consoleApiClient.content.singlePage.updateSinglePageContent({
         name: singlePageName,
         content: formState.value.content,
       });
 
-      await apiClient.singlePage.publishSinglePage({
+      await consoleApiClient.content.singlePage.publishSinglePage({
         name: singlePageName,
       });
 
@@ -221,7 +227,7 @@ const handlePublish = async () => {
       }
     } else {
       formState.value.page.spec.publish = true;
-      await apiClient.singlePage.draftSinglePage({
+      await consoleApiClient.content.singlePage.draftSinglePage({
         singlePageRequest: formState.value,
       });
 
@@ -254,9 +260,10 @@ const handleFetchContent = async () => {
   if (!formState.value.page.spec.headSnapshot) {
     return;
   }
-  const { data } = await apiClient.singlePage.fetchSinglePageHeadContent({
-    name: formState.value.page.metadata.name,
-  });
+  const { data } =
+    await consoleApiClient.content.singlePage.fetchSinglePageHeadContent({
+      name: formState.value.page.metadata.name,
+    });
 
   formState.value.content = Object.assign(formState.value.content, data);
 
@@ -304,11 +311,27 @@ const handleFetchContent = async () => {
 
 // SinglePage settings
 const handleOpenSettingModal = async () => {
+  if (isTitleChanged.value) {
+    await coreApiClient.content.singlePage.patchSinglePage({
+      name: formState.value.page.metadata.name,
+      jsonPatchInner: [
+        {
+          op: "add",
+          path: "/spec/title",
+          value:
+            formState.value.page.spec.title || t("core.page_editor.untitled"),
+        },
+      ],
+    });
+    isTitleChanged.value = false;
+  }
+
   const { data: latestSinglePage } =
-    await apiClient.extension.singlePage.getContentHaloRunV1alpha1SinglePage({
+    await coreApiClient.content.singlePage.getSinglePage({
       name: formState.value.page.metadata.name,
     });
   formState.value.page = latestSinglePage;
+
   settingModal.value = true;
 };
 
@@ -335,7 +358,7 @@ onMounted(async () => {
 
   if (routeQueryName.value) {
     const { data: singlePage } =
-      await apiClient.extension.singlePage.getContentHaloRunV1alpha1SinglePage({
+      await coreApiClient.content.singlePage.getSinglePage({
         name: routeQueryName.value,
       });
     formState.value.page = singlePage;
@@ -412,7 +435,7 @@ async function handleUploadImage(file: File, options?: AxiosRequestConfig) {
     await handleSave();
   }
 
-  const { data } = await apiClient.uc.attachment.createAttachmentForPost(
+  const { data } = await ucApiClient.storage.attachment.createAttachmentForPost(
     {
       file,
       singlePageName: formState.value.page.metadata.name,

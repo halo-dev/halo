@@ -1,14 +1,17 @@
 {
   "name": "@halo-dev/api-client",
   "version": "2.17.0",
-  "description": "",
-  "scripts": {
-    "build": "unbuild",
-    "dev": "unbuild --stub",
-    "release": "bumpp",
-    "gen": "openapi-generator-cli generate -i ../../../api-docs/openapi/v3_0/aggregated.json -g typescript-axios -c ./.openapi_config.yaml -o ./src --type-mappings='set=Array'"
+  "description": "API Client for Halo 2",
+  "homepage": "https://github.com/halo-dev/halo/tree/main/ui/packages/api-client#readme",
+  "bugs": {
+    "url": "https://github.com/halo-dev/halo/issues"
   },
-  "keywords": [],
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/halo-dev/halo.git",
+    "directory": "ui/packages/api-client"
+  },
+  "license": "GPL-3.0",
   "author": "@halo-dev",
   "contributors": [
     {
@@ -16,44 +19,38 @@
       "url": "https://github.com/ruibaby"
     }
   ],
-  "repository": {
-    "type": "git",
-    "url": "https://github.com/halo-dev/halo.git",
-    "directory": "ui/packages/api-client"
-  },
-  "bugs": {
-    "url": "https://github.com/halo-dev/halo/issues"
-  },
-  "homepage": "https://github.com/halo-dev/halo/tree/main/ui/packages/api-client#readme",
-  "license": "GPL-3.0",
   "exports": {
     ".": {
-      "types": "./dist/index.d.ts",
-      "require": "./dist/index.cjs",
-      "import": "./dist/index.mjs"
+      "types": "./dist/entry/index.d.ts",
+      "import": "./dist/halo-api-client.es.js"
     }
   },
-  "main": "./dist/index.mjs",
-  "module": "./dist/index.mjs",
-  "types": "./dist/index.d.ts",
+  "main": "./dist/halo-api-client.iife.js",
+  "module": "./dist/halo-api-client.es.js",
+  "types": "./dist/entry/index.d.ts",
   "typesVersions": {
     "*": {
       "*": [
         "./dist/*",
-        "./dist/index.d.ts"
+        "./dist/entry/index.d.ts"
       ]
     }
   },
   "files": [
     "dist"
   ],
+  "scripts": {
+    "build": "vite build",
+    "gen": "openapi-generator-cli generate -i ../../../api-docs/openapi/v3_0/aggregated.json -g typescript-axios -c ./.openapi_config.yaml -o ./src --type-mappings='set=Array'"
+  },
   "devDependencies": {
-    "@openapitools/openapi-generator-cli": "^2.5.2",
-    "@types/node": "^18.13.0",
-    "axios": "^1.6.7",
-    "bumpp": "^8.2.1",
-    "typescript": "^4.9.5",
+    "@openapitools/openapi-generator-cli": "^2.13.4",
+    "@types/node": "^20.14.2",
+    "typescript": "^5.4.5",
     "unbuild": "^0.7.6",
-    "vitest": "^0.18.1"
+    "vite-plugin-dts": "^3.9.1"
+  },
+  "peerDependencies": {
+    "axios": "^1.7.x"
   }
 }

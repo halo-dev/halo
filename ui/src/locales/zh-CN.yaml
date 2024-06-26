@@ -185,6 +185,12 @@ core:
       delete_in_batch:
         title: 删除所选文章
         description: 该操作会将文章放入回收站，后续可以从回收站恢复。
+      publish_in_batch:
+        title: 发布文章
+        description: 批量发布文章，所选文章会被设置为发布状态
+      cancel_publish_in_batch:
+        title: 取消发布文章
+        description: 批量取消发布文章，所选文章会被设置为未发布状态
     filters:
       status:
         items:

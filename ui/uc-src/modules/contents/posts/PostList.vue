@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import { apiClient } from "@/utils/api-client";
+import { ucApiClient } from "@halo-dev/api-client";
 import { useQuery } from "@tanstack/vue-query";
 import {
   IconAddCircle,
@@ -54,7 +54,7 @@ const {
   queryKey: ["my-posts", page, size, keyword, selectedPublishPhase],
   queryFn: async () => {
     const labelSelector: string[] = ["content.halo.run/deleted=false"];
-    const { data } = await apiClient.uc.post.listMyPosts({
+    const { data } = await ucApiClient.content.post.listMyPosts({
       labelSelector,
       page: page.value,
       size: size.value,

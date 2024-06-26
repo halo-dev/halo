@@ -1,7 +1,7 @@
 <script lang="ts" setup>
 import SubmitButton from "@/components/button/SubmitButton.vue";
 import { patAnnotations, rbacAnnotations } from "@/constants/annotations";
-import { apiClient } from "@/utils/api-client";
+import { ucApiClient } from "@halo-dev/api-client";
 import { toISOString } from "@/utils/date";
 import { Dialog, Toast, VButton, VModal, VSpace } from "@halo-dev/components";
 import { useMutation, useQueryClient } from "@tanstack/vue-query";
@@ -73,9 +73,11 @@ const { mutate, isLoading } = useMutation({
       ...formState.value.spec,
       roles: Array.from(selectedRoleTemplates.value),
     };
-    const { data } = await apiClient.pat.generatePat({
-      personalAccessToken: formState.value,
-    });
+    const { data } = await ucApiClient.security.personalAccessToken.generatePat(
+      {
+        personalAccessToken: formState.value,
+      }
+    );
     return data;
   },
   onSuccess(data) {

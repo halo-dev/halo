@@ -24,7 +24,7 @@ public class AdditionalWebFilterChainProxy implements WebFilter {
 
     @Override
     public Mono<Void> filter(ServerWebExchange exchange, WebFilterChain chain) {
-        return extensionGetter.getEnabledExtensionByDefinition(AdditionalWebFilter.class)
+        return extensionGetter.getEnabledExtensions(AdditionalWebFilter.class)
             .sort(AnnotationAwareOrderComparator.INSTANCE)
             .cast(WebFilter.class)
             .collectList()

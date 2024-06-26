@@ -4,7 +4,7 @@ import { inject, ref, type Ref, computed } from "vue";
 
 // hooks
 import { useSettingFormConvert } from "@console/composables/use-setting-form";
-import { apiClient } from "@/utils/api-client";
+import { consoleApiClient } from "@halo-dev/api-client";
 
 // components
 import { Toast, VButton } from "@halo-dev/components";
@@ -27,7 +27,7 @@ const saving = ref(false);
 const { data: configMap } = useQuery<ConfigMap>({
   queryKey: ["plugin-configMap", plugin],
   queryFn: async () => {
-    const { data } = await apiClient.plugin.fetchPluginConfig({
+    const { data } = await consoleApiClient.plugin.plugin.fetchPluginConfig({
       name: plugin?.value?.metadata.name as string,
     });
     return data;
@@ -51,7 +51,7 @@ const handleSaveConfigMap = async () => {
     return;
   }
 
-  await apiClient.plugin.updatePluginConfig({
+  await consoleApiClient.plugin.plugin.updatePluginConfig({
     name: plugin.value.metadata.name,
     configMap: configMapToUpdate,
   });

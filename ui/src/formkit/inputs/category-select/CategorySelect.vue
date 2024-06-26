@@ -11,7 +11,7 @@ import { onClickOutside } from "@vueuse/core";
 import Fuse from "fuse.js";
 import CategoryTag from "./components/CategoryTag.vue";
 import SearchResultListItem from "./components/SearchResultListItem.vue";
-import { apiClient } from "@/utils/api-client";
+import { coreApiClient } from "@halo-dev/api-client";
 import { usePermission } from "@/utils/permission";
 import { slugify } from "transliteration";
 import HasPermission from "@/components/permission/HasPermission.vue";
@@ -215,26 +215,25 @@ const handleCreateCategory = async () => {
     return;
   }
 
-  const { data } =
-    await apiClient.extension.category.createContentHaloRunV1alpha1Category({
-      category: {
-        spec: {
-          displayName: text.value,
-          slug: slugify(text.value, { trim: true }),
-          description: "",
-          cover: "",
-          template: "",
-          priority: categories.value?.length || 0 + 1,
-          children: [],
-        },
-        apiVersion: "content.halo.run/v1alpha1",
-        kind: "Category",
-        metadata: {
-          name: "",
-          generateName: "category-",
-        },
+  const { data } = await coreApiClient.content.category.createCategory({
+    category: {
+      spec: {
+        displayName: text.value,
+        slug: slugify(text.value, { trim: true }),
+        description: "",
+        cover: "",
+        template: "",
+        priority: categories.value?.length || 0 + 1,
+        children: [],
       },
-    });
+      apiVersion: "content.halo.run/v1alpha1",
+      kind: "Category",
+      metadata: {
+        name: "",
+        generateName: "category-",
+      },
+    },
+  });
 
   handleFetchCategories();
   handleSelect(data);

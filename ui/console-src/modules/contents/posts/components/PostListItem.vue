@@ -9,7 +9,7 @@ import {
 import type { ListedPost, Post } from "@halo-dev/api-client";
 import { useI18n } from "vue-i18n";
 import { usePermission } from "@/utils/permission";
-import { apiClient } from "@/utils/api-client";
+import { consoleApiClient } from "@halo-dev/api-client";
 import { useQueryClient } from "@tanstack/vue-query";
 import type { Ref } from "vue";
 import { computed, inject, markRaw, ref, toRefs } from "vue";
@@ -58,7 +58,7 @@ const handleDelete = async () => {
     confirmText: t("core.common.buttons.confirm"),
     cancelText: t("core.common.buttons.cancel"),
     onConfirm: async () => {
-      await apiClient.post.recyclePost({
+      await consoleApiClient.content.post.recyclePost({
         name: props.post.post.metadata.name,
       });
       await queryClient.invalidateQueries({ queryKey: ["posts"] });
@@ -77,7 +77,7 @@ const { operationItems } = useOperationItemExtensionPoint<ListedPost>(
       component: markRaw(VDropdownItem),
       label: t("core.common.buttons.publish"),
       action: async () => {
-        await apiClient.post.publishPost({
+        await consoleApiClient.content.post.publishPost({
           name: props.post.post.metadata.name,
         });
 
@@ -125,7 +125,7 @@ const { operationItems } = useOperationItemExtensionPoint<ListedPost>(
       },
       label: t("core.common.buttons.cancel_publish"),
       action: async () => {
-        await apiClient.post.unpublishPost({
+        await consoleApiClient.content.post.unpublishPost({
           name: props.post.post.metadata.name,
         });
 

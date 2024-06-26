@@ -1,4 +1,4 @@
-import { apiClient } from "@/utils/api-client";
+import { coreApiClient } from "@halo-dev/api-client";
 import type { ConfigMap } from "@halo-dev/api-client";
 import { defineStore } from "pinia";
 
@@ -14,13 +14,12 @@ export const useSystemConfigMapStore = defineStore({
   actions: {
     async fetchSystemConfigMap() {
       try {
-        const { data } =
-          await apiClient.extension.configMap.getV1alpha1ConfigMap(
-            {
-              name: "system",
-            },
-            { mute: true }
-          );
+        const { data } = await coreApiClient.configMap.getConfigMap(
+          {
+            name: "system",
+          },
+          { mute: true }
+        );
         this.configMap = data;
       } catch (error) {
         console.error("Failed to fetch system configMap", error);
