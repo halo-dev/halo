@@ -1,5 +1,4 @@
 <script lang="ts" setup>
-import { watchEffect } from "vue";
 import { useLocalStorage } from "@vueuse/core";
 import {
   ExtensionBlockquote,
@@ -47,6 +46,7 @@ import {
   ExtensionSearchAndReplace,
   ExtensionClearFormat,
   ExtensionFormatBrush,
+  ExtensionRangeSelection,
 } from "../index";
 
 const content = useLocalStorage("content", "");
@@ -115,6 +115,7 @@ const editor = useEditor({
     ExtensionSearchAndReplace,
     ExtensionClearFormat,
     ExtensionFormatBrush,
+    ExtensionRangeSelection,
   ],
   parseOptions: {
     preserveWhitespace: true,
@@ -122,10 +123,6 @@ const editor = useEditor({
   onUpdate: () => {
     content.value = editor.value?.getHTML() + "";
   },
-});
-
-watchEffect(() => {
-  // console.log(editor.value?.getHTML());
 });
 </script>
 

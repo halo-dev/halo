@@ -4,6 +4,8 @@ import java.util.Objects;
 import lombok.Builder;
 import lombok.Getter;
 import org.springframework.util.Assert;
+import run.halo.app.extension.router.selector.FieldSelector;
+import run.halo.app.extension.router.selector.LabelSelector;
 
 public class WatcherExtensionMatchers {
     @Getter
@@ -38,15 +40,15 @@ public class WatcherExtensionMatchers {
     }
 
     public ExtensionMatcher onAddMatcher() {
-        return this.onAddMatcher;
+        return delegateExtensionMatcher(this.onAddMatcher);
     }
 
     public ExtensionMatcher onUpdateMatcher() {
-        return this.onUpdateMatcher;
+        return delegateExtensionMatcher(this.onUpdateMatcher);
     }
 
     public ExtensionMatcher onDeleteMatcher() {
-        return this.onDeleteMatcher;
+        return delegateExtensionMatcher(this.onDeleteMatcher);
     }
 
     public static WatcherExtensionMatchersBuilder builder(ExtensionClient client,
@@ -57,5 +59,33 @@ public class WatcherExtensionMatchers {
     static ExtensionMatcher emptyMatcher(ExtensionClient client,
         GroupVersionKind gvk) {
         return DefaultExtensionMatcher.builder(client, gvk).build();
+    }
+
+    /**
+     * Remove this method when the deprecated methods are removed.
+     */
+    ExtensionMatcher delegateExtensionMatcher(ExtensionMatcher matcher) {
+        return new ExtensionMatcher() {
+
+            @Override
+            public GroupVersionKind getGvk() {
+                return matcher.getGvk();
+            }
+
+            @Override
+            public LabelSelector getLabelSelector() {
+                return matcher.getLabelSelector();
+            }
+
+            @Override
+            public FieldSelector getFieldSelector() {
+                return matcher.getFieldSelector();
+            }
+
+            @Override
+            public boolean match(Extension extension) {
+                return extension.groupVersionKind().equals(gvk) && matcher.match(extension);
+            }
+        };
     }
 }

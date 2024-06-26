@@ -46,6 +46,7 @@ api/post-v1alpha1-public-api.ts
 api/post-v1alpha1-uc-api.ts
 api/reason-type-v1alpha1-api.ts
 api/reason-v1alpha1-api.ts
+api/remember-me-token-v1alpha1-api.ts
 api/reply-v1alpha1-api.ts
 api/reply-v1alpha1-console-api.ts
 api/reverse-proxy-v1alpha1-api.ts
@@ -241,6 +242,9 @@ models/reason-type.ts
 models/reason.ts
 models/ref.ts
 models/register-verify-email-request.ts
+models/remember-me-token-list.ts
+models/remember-me-token-spec.ts
+models/remember-me-token.ts
 models/remove-operation.ts
 models/replace-operation.ts
 models/reply-list.ts

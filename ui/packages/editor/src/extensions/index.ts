@@ -45,6 +45,7 @@ import ExtensionSearchAndReplace from "./search-and-replace";
 import ExtensionClearFormat from "./clear-format";
 import ExtensionFormatBrush from "./format-brush";
 import ExtensionGapcursor from "./gap-cursor";
+import { ExtensionRangeSelection, RangeSelection } from "./range-selection";
 
 const allExtensions = [
   ExtensionBlockquote,
@@ -104,6 +105,7 @@ const allExtensions = [
   ExtensionSearchAndReplace,
   ExtensionClearFormat,
   ExtensionFormatBrush,
+  ExtensionRangeSelection,
 ];
 
 export {
@@ -153,4 +155,6 @@ export {
   ExtensionSearchAndReplace,
   ExtensionClearFormat,
   ExtensionFormatBrush,
+  ExtensionRangeSelection,
+  RangeSelection,
 };

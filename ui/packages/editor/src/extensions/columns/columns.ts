@@ -175,6 +175,7 @@ const Columns = Node.create({
   isolating: true,
   allowGapCursor: true,
   content: "column{1,}",
+  fakeSelection: false,
 
   addOptions() {
     return {

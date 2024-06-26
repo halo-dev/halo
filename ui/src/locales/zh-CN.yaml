@@ -191,6 +191,8 @@ core:
       cancel_publish_in_batch:
         title: 取消发布文章
         description: 批量取消发布文章，所选文章会被设置为未发布状态
+      batch_setting:
+        button: 批量设置
     filters:
       status:
         items:
@@ -273,6 +275,25 @@ core:
             create_time_asc: 较早创建
             display_name_desc: 标签名降序
             display_name_asc: 标签名升序
+    batch_setting_modal:
+      title: 文章批量设置
+      fields:
+        common:
+          enabled: 启用
+          op:
+            label: 设置方式
+            options:
+              add: 追加
+              replace: 替换
+              remove_all: 移除全部
+        category_group: 分类
+        category_names: 选择分类
+        tag_group: 标签
+        tag_names: 选择标签
+        visible_group: 可见性
+        visible_value: 选择可见性
+        allow_comment_group: 允许评论
+        allow_comment_value: 选择是否允许评论
   deleted_post:
     title: 文章回收站
     empty:

@@ -64,8 +64,6 @@ const getRoleCountText = computed(() => {
     resolveDeepDependencies(formState.value, roleTemplates.value || [])
   );
 
-  console.log(dependencies);
-
   return t("core.role.common.text.contains_n_permissions", {
     count: dependencies.size || 0,
   });

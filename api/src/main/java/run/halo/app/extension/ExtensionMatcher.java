@@ -4,11 +4,20 @@ import run.halo.app.extension.router.selector.FieldSelector;
 import run.halo.app.extension.router.selector.LabelSelector;
 
 public interface ExtensionMatcher {
-    GroupVersionKind getGvk();
+    @Deprecated(since = "2.17.0", forRemoval = true)
+    default GroupVersionKind getGvk() {
+        return null;
+    }
 
-    LabelSelector getLabelSelector();
+    @Deprecated(since = "2.17.0", forRemoval = true)
+    default LabelSelector getLabelSelector() {
+        return null;
+    }
 
-    FieldSelector getFieldSelector();
+    @Deprecated(since = "2.17.0", forRemoval = true)
+    default FieldSelector getFieldSelector() {
+        return null;
+    }
 
     boolean match(Extension extension);
 }
