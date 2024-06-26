@@ -22,7 +22,7 @@ import { attachmentPolicySelect } from "./inputs/attachment-policy-select";
 import { attachmentGroupSelect } from "./inputs/attachment-group-select";
 import { password } from "./inputs/password";
 import { verificationForm } from "./inputs/verify-form";
-import { dynamicList } from "./inputs/dynamic-list";
+import { list } from "./inputs/list";
 
 import radioAlt from "./plugins/radio-alt";
 import stopImplicitSubmission from "./plugins/stop-implicit-submission";
@@ -42,7 +42,7 @@ const config: DefaultConfigOptions = {
     autoScrollToErrors,
   ],
   inputs: {
-    dynamicList,
+    list,
     form,
     password,
     group,

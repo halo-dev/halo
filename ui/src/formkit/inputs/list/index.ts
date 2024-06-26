@@ -42,13 +42,13 @@ import {
   IconCloseCircle,
 } from "@halo-dev/components";
 import AddButton from "./AddButton.vue";
-import { dynamicLists } from "./features/dynamicLists";
+import { lists } from "./features/lists";
 
 /**
  * Input definition for a dynamic list input.
  * @public
  */
-export const dynamicList: FormKitTypeDefinition = {
+export const list: FormKitTypeDefinition = {
   /**
    * The actual schema of the input, or a function that returns the schema.
    */
@@ -104,7 +104,7 @@ export const dynamicList: FormKitTypeDefinition = {
   /**
    * Additional features that should be added to your input
    */
-  features: [dynamicLists, disablesChildren, renamesRadios],
+  features: [lists, disablesChildren, renamesRadios],
 
   library: {
     IconAddCircle,

@@ -12,7 +12,7 @@ import {
   type FormKitSection,
 } from "@formkit/inputs";
 
-export function createDynamicListSection() {
+export function createListSection() {
   return (
     section: string,
     el: string | null | (() => FormKitSchemaNode),

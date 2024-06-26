@@ -98,7 +98,7 @@ const theme: Record<string, Record<string, string>> = {
     control:
       "cursor-pointer text-gray-500 transition-all hover:text-primary disabled:!cursor-not-allowed disabled:opacity-50 disabled:hover:!text-gray-500",
   },
-  dynamicList: {
+  list: {
     label: textClassification.label,
     legend: `${textClassification.label} px-2`,
     fieldset: boxClassification.fieldset,

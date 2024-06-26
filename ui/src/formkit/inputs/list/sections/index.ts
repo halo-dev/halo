@@ -1,8 +1,8 @@
-import { createDynamicListSection } from "../dynamicListSection";
+import { createListSection } from "../listSection";
 
-const dynamicListSection = createDynamicListSection();
+const listSection = createListSection();
 
-export const addButton = dynamicListSection("addButton", () => ({
+export const addButton = listSection("addButton", () => ({
   $cmp: "AddButton",
   props: {
     onClick: "$fns.createAppend()",
@@ -14,7 +14,7 @@ export const addButton = dynamicListSection("addButton", () => ({
   type: "button",
 }));
 
-export const content = dynamicListSection("content", () => ({
+export const content = listSection("content", () => ({
   $el: "div",
   attrs: {
     key: "$item",
@@ -23,19 +23,19 @@ export const content = dynamicListSection("content", () => ({
   },
 }));
 
-export const controlLabel = dynamicListSection("controlLabel", "span");
+export const controlLabel = listSection("controlLabel", "span");
 
-export const controls = dynamicListSection("controls", () => ({
+export const controls = listSection("controls", () => ({
   $el: "ul",
   if: "$removeControl || $insertControl || $upControl || $downControl",
 }));
 
-export const down = dynamicListSection("down", () => ({
+export const down = listSection("down", () => ({
   $el: "li",
   if: "$downControl",
 }));
 
-export const downControl = dynamicListSection("downControl", () => ({
+export const downControl = listSection("downControl", () => ({
   $el: "button",
   attrs: {
     disabled: "$index >= $value.length - 1",
@@ -45,15 +45,15 @@ export const downControl = dynamicListSection("downControl", () => ({
   },
 }));
 
-export const downIcon = dynamicListSection("downIcon", () => ({
+export const downIcon = listSection("downIcon", () => ({
   $cmp: "IconArrowDownCircleLine",
 }));
 
-export const empty = dynamicListSection("empty", () => ({
+export const empty = listSection("empty", () => ({
   $el: "div",
 }));
 
-export const fieldset = dynamicListSection("fieldset", () => ({
+export const fieldset = listSection("fieldset", () => ({
   $el: "fieldset",
   attrs: {
     id: "$id",
@@ -61,12 +61,12 @@ export const fieldset = dynamicListSection("fieldset", () => ({
   },
 }));
 
-export const insert = dynamicListSection("insert", () => ({
+export const insert = listSection("insert", () => ({
   $el: "li",
   if: "$insertControl",
 }));
 
-export const insertControl = dynamicListSection("insertControl", () => ({
+export const insertControl = listSection("insertControl", () => ({
   $el: "button",
   attrs: {
     disabled: "$value.length >= $max",
@@ -76,11 +76,11 @@ export const insertControl = dynamicListSection("insertControl", () => ({
   },
 }));
 
-export const insertIcon = dynamicListSection("insertIcon", () => ({
+export const insertIcon = listSection("insertIcon", () => ({
   $cmp: "IconAddCircle",
 }));
 
-export const item = dynamicListSection("item", () => ({
+export const item = listSection("item", () => ({
   $el: "li",
   for: ["item", "index", "$items"],
   attrs: {
@@ -91,19 +91,19 @@ export const item = dynamicListSection("item", () => ({
   },
 }));
 
-export const items = dynamicListSection("items", () => ({
+export const items = listSection("items", () => ({
   $el: "ul",
   attrs: {
     role: "list",
   },
 }));
 
-export const remove = dynamicListSection("remove", () => ({
+export const remove = listSection("remove", () => ({
   $el: "li",
   if: "$removeControl",
 }));
 
-export const removeControl = dynamicListSection("removeControl", () => ({
+export const removeControl = listSection("removeControl", () => ({
   $el: "button",
   attrs: {
     disabled: "$value.length <= $min",
@@ -113,16 +113,16 @@ export const removeControl = dynamicListSection("removeControl", () => ({
   },
 }));
 
-export const removeIcon = dynamicListSection("removeIcon", () => ({
+export const removeIcon = listSection("removeIcon", () => ({
   $cmp: "IconCloseCircle",
 }));
 
-export const up = dynamicListSection("up", () => ({
+export const up = listSection("up", () => ({
   $el: "li",
   if: "$upControl",
 }));
 
-export const upControl = dynamicListSection("upControl", () => ({
+export const upControl = listSection("upControl", () => ({
   $el: "button",
   attrs: {
     disabled: "$index <= 0",
@@ -132,6 +132,6 @@ export const upControl = dynamicListSection("upControl", () => ({
   },
 }));
 
-export const upIcon = dynamicListSection("upIcon", () => ({
+export const upIcon = listSection("upIcon", () => ({
   $cmp: "IconArrowUpCircleLine",
 }));

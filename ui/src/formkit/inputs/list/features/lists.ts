@@ -1,9 +1,9 @@
 import type { FormKitNode } from "@formkit/core";
 import { undefine } from "@formkit/utils";
 
-export const dynamicLists = function (node: FormKitNode) {
+export const lists = function (node: FormKitNode) {
   node._c.sync = true;
-  node.on("created", dynamicListFeature.bind(null, node));
+  node.on("created", listFeature.bind(null, node));
 };
 
 const fn = (node: FormKitNode): object | string | boolean | number => {
@@ -23,7 +23,7 @@ function createValue(num: number, node: FormKitNode) {
   return new Array(num).fill("").map(() => fn(node));
 }
 
-function dynamicListFeature(node: FormKitNode) {
+function listFeature(node: FormKitNode) {
   node.props.removeControl = node.props.removeControl ?? true;
   node.props.upControl = node.props.upControl ?? true;
   node.props.downControl = node.props.downControl ?? true;
@@ -35,7 +35,7 @@ function dynamicListFeature(node: FormKitNode) {
   node.props.max = node.props.max ? Number(node.props.max) : Infinity;
   node.props.itemType = node.props.itemType ?? "string";
   if (node.props.min > node.props.max) {
-    throw Error("DynamicList: min must be less than max");
+    throw Error("list: min must be less than max");
   }
 
   if ("disabled" in node.props) {

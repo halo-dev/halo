@@ -25,7 +25,7 @@
     6. downControl: 是否显示下移按钮，默认为 `true`
     7. insertControl: 是否显示插入按钮，默认为 `true`
     8. removeControl: 是否显示删除按钮，默认为 `true`
-- `dynamicList`: 动态列表，定义一个数组列表。
+- `list`: 动态列表，定义一个数组列表。
   - 参数
     1. itemType: 列表项的数据类型，用于初始化数据类型，可选参数 `string`, `number`, `boolean`, `object`，默认为 `string`
     1. min: 最小数量，默认为 `0`
@@ -81,9 +81,9 @@ const postName = ref("");
   label: 底部菜单组
 ```
 
-### dynamicList
+### list
 
-DynamicList 是一个数组类型的输入组件，可以让使用者可视化的操作数组。它支持动态添加、删除、上移、下移、插入数组项等操作。
+list 是一个数组类型的输入组件，可以让使用者可视化的操作数组。它支持动态添加、删除、上移、下移、插入数组项等操作。
 
 在 Vue SFC 中以组件形式使用：
 
@@ -96,7 +96,7 @@ const users = ref([]);
   <FormKit
     :min="1"
     :max="3"
-    type="dynamicList"
+    type="list"
     label="Users"
     add-label="Add User"
     item-type="string"
@@ -115,7 +115,7 @@ const users = ref([]);
 在 FormKit Schema 中使用：
 
 ```yaml
-- $formkit: dynamicList
+- $formkit: list
   name: users
   label: Users
   addLabel: Add User
@@ -129,22 +129,18 @@ const users = ref([]);
 ```
 
 > [!NOTE]
-> `dynamicList` 组件有且只有一个子节点，并且必须为子节点传递 `index` 属性。若想提供多个字段，则建议使用 `group` 组件包裹。
+> `list` 组件有且只有一个子节点，并且必须为子节点传递 `index` 属性。若想提供多个字段，则建议使用 `group` 组件包裹。
 
 
 最终得到的数据类似于：
 
 ```json
-[
-  {
-    "full_name": "Jack",
-    "email": "jack@example.com"
-  },
-  {
-    "full_name": "John",
-    "email": "john@example.com"
-  }
-]
+{
+  "users": [
+    "Jack",
+    "John"
+  ]
+}
 ```
 
 
