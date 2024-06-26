@@ -24,7 +24,7 @@ export const secretSelect: FormKitTypeDefinition = {
     messages(message("$message.value"))
   ),
   type: "input",
-  props: ["key"],
+  props: ["requiredKey"],
   library: {
     SecretSelect: SecretSelect,
   },

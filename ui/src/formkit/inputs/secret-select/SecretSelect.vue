@@ -1,8 +1,7 @@
 <script lang="ts" setup>
-import { useQuery, useQueryClient } from "@tanstack/vue-query";
-import { coreApiClient, type Secret } from "@halo-dev/api-client";
-import { computed, ref, type PropType } from "vue";
+import { secretAnnotations } from "@/constants/annotations";
 import type { FormKitFrameworkContext } from "@formkit/core";
+import { coreApiClient, type Secret } from "@halo-dev/api-client";
 import {
   IconArrowRight,
   IconCheckboxCircle,
@@ -10,12 +9,12 @@ import {
   IconSettings,
   VTag,
 } from "@halo-dev/components";
+import { useQueryClient } from "@tanstack/vue-query";
 import { onClickOutside } from "@vueuse/core";
-import SecretListModal from "./components/SecretListModal.vue";
 import Fuse from "fuse.js";
-import { watch } from "vue";
-
-const Q_KEY = () => ["secrets"];
+import { computed, ref, watch, type PropType } from "vue";
+import SecretListModal from "./components/SecretListModal.vue";
+import { Q_KEY, useSecretsFetch } from "./composables/use-secrets-fetch";
 
 const queryClient = useQueryClient();
 
@@ -31,13 +30,7 @@ const dropdownVisible = ref(false);
 const text = ref("");
 const wrapperRef = ref<HTMLElement>();
 
-const { data } = useQuery({
-  queryKey: Q_KEY(),
-  queryFn: async () => {
-    const { data } = await coreApiClient.secret.listSecret();
-    return data;
-  },
-});
+const { data } = useSecretsFetch();
 
 onClickOutside(wrapperRef, () => {
   dropdownVisible.value = false;
@@ -112,6 +105,7 @@ const handleKeydown = (e: KeyboardEvent) => {
 
   if (e.key === "Enter") {
     if (!selectedSecret.value && text.value) {
+      e.preventDefault();
       handleCreateSecret();
       return;
     }
@@ -174,7 +168,7 @@ async function handleCreateSecret() {
       apiVersion: "v1alpha1",
       type: "Opaque",
       stringData: {
-        [props.context.key as string]: text.value,
+        [props.context.requiredKey as string]: text.value,
       },
     },
   });
@@ -196,7 +190,8 @@ async function handleCreateSecret() {
   />
   <div
     ref="wrapperRef"
-    class="flex w-full items-center"
+    class="flex h-full w-full items-center"
+    style="border-radius: inherit"
     @keydown="handleKeydown"
   >
     <div class="flex w-full min-w-0 flex-1 shrink flex-wrap items-center">
@@ -223,14 +218,12 @@ async function handleCreateSecret() {
       />
     </div>
 
-    <div
-      class="inline-flex h-full flex-none cursor-pointer items-center gap-2 px-1"
-    >
+    <div class="inline-flex h-full flex-none cursor-pointer items-center gap-2">
       <div @click="dropdownVisible = !dropdownVisible">
         <IconArrowRight class="rotate-90 text-gray-500 hover:text-gray-700" />
       </div>
       <div
-        class="group flex h-full cursor-pointer items-center border-l px-3 transition-all hover:bg-gray-100"
+        class="group flex h-full cursor-pointer items-center rounded-r-base border-l px-3 transition-all hover:bg-gray-100"
         @click="secretListModalVisible = true"
       >
         <IconSettings class="h-4 w-4 text-gray-500 hover:text-gray-700" />
@@ -259,19 +252,26 @@ async function handleCreateSecret() {
           v-for="secret in searchResults"
           :id="secret.metadata.name"
           :key="secret.metadata.name"
-          class="group flex cursor-pointer items-center justify-between rounded p-2 hover:bg-gray-100"
+          class="group flex cursor-pointer items-center rounded p-2 hover:bg-gray-100"
           :class="{
             'bg-gray-100':
               selectedSecret?.metadata.name === secret.metadata.name,
           }"
           @click="handleSelect(secret)"
         >
-          <div class="inline-flex items-center overflow-hidden text-sm">
-            {{ secret.metadata.name }}
+          <div
+            class="inline-flex min-w-0 flex-1 shrink items-center space-x-2 overflow-hidden text-sm"
+          >
+            <span class="flex-none"> {{ secret.metadata.name }}</span>
+            <span
+              class="line-clamp-1 min-w-0 flex-1 shrink break-words text-xs text-gray-500"
+            >
+              {{ secret.metadata.annotations?.[secretAnnotations.DESCRIPTION] }}
+            </span>
           </div>
           <IconCheckboxCircle
             v-if="context._value === secret.metadata.name"
-            class="text-primary"
+            class="flex-none text-primary"
           />
         </li>
       </ul>
