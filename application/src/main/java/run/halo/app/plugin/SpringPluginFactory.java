@@ -16,24 +16,27 @@ import org.pf4j.PluginWrapper;
 @Slf4j
 public class SpringPluginFactory implements PluginFactory {
 
-
     private final PluginApplicationContextFactory contextFactory;
+    private final PluginGetter pluginGetter;
 
-    public SpringPluginFactory(PluginApplicationContextFactory contextFactory) {
+    public SpringPluginFactory(PluginApplicationContextFactory contextFactory,
+        PluginGetter pluginGetter) {
         this.contextFactory = contextFactory;
+        this.pluginGetter = pluginGetter;
     }
 
     @Override
     public Plugin create(PluginWrapper pluginWrapper) {
-        var pluginContext = new PluginContext(
-            pluginWrapper.getPluginId(),
-            pluginWrapper.getDescriptor().getVersion(),
-            pluginWrapper.getRuntimeMode()
-        );
+        var plugin = pluginGetter.getPlugin(pluginWrapper.getPluginId());
+        var pluginContext = PluginContext.builder()
+            .name(pluginWrapper.getPluginId())
+            .configMapName(plugin.getSpec().getConfigMapName())
+            .version(pluginWrapper.getDescriptor().getVersion())
+            .runtimeMode(pluginWrapper.getRuntimeMode())
+            .build();
         return new SpringPlugin(
             contextFactory,
             pluginContext
         );
     }
-
 }
