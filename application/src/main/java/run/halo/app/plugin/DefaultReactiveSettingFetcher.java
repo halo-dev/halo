@@ -57,13 +57,12 @@ public class DefaultReactiveSettingFetcher
 
     public DefaultReactiveSettingFetcher(PluginContext pluginContext,
         ReactiveExtensionClient client, ExtensionClient blockingClient,
-        CacheManager cacheManager, ApplicationContext applicationContext) {
+        CacheManager cacheManager) {
         this.client = client;
         this.pluginName = pluginContext.getName();
         this.configMapName = pluginContext.getConfigMapName();
         this.blockingClient = blockingClient;
         this.cacheManager = cacheManager;
-        this.applicationContext = applicationContext;
         this.cacheName = buildCacheKey(pluginName);
     }
 

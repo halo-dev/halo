@@ -25,8 +25,6 @@ public class PluginContext {
 
     private final String configMapName;
 
-    private final String settingName;
-
     private final String version;
 
     private final RuntimeMode runtimeMode;

@@ -71,7 +71,7 @@ class DefaultSettingFetcherTest {
         cache.invalidate();
 
         this.reactiveSettingFetcher = new DefaultReactiveSettingFetcher(pluginContext, client,
-            blockingClient, cacheManager, applicationContext);
+            blockingClient, cacheManager);
         reactiveSettingFetcher.setApplicationContext(applicationContext);
 
         settingFetcher = new DefaultSettingFetcher(reactiveSettingFetcher);

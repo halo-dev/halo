@@ -16,7 +16,6 @@ import org.pf4j.PluginWrapper;
 @Slf4j
 public class SpringPluginFactory implements PluginFactory {
 
-
     private final PluginApplicationContextFactory contextFactory;
     private final PluginGetter pluginGetter;
 
@@ -32,7 +31,6 @@ public class SpringPluginFactory implements PluginFactory {
         var pluginContext = PluginContext.builder()
             .name(pluginWrapper.getPluginId())
             .configMapName(plugin.getSpec().getConfigMapName())
-            .settingName(plugin.getSpec().getSettingName())
             .version(pluginWrapper.getDescriptor().getVersion())
             .runtimeMode(pluginWrapper.getRuntimeMode())
             .build();
