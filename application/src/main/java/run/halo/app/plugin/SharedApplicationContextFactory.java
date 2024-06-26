@@ -2,6 +2,7 @@ package run.halo.app.plugin;
 
 import org.springframework.cache.CacheManager;
 import org.springframework.context.ApplicationContext;
+import org.springframework.context.support.GenericApplicationContext;
 import org.springframework.security.web.server.context.ServerSecurityContextRepository;
 import run.halo.app.content.PostContentService;
 import run.halo.app.core.extension.service.AttachmentService;
@@ -26,7 +27,7 @@ public enum SharedApplicationContextFactory {
 
     public static ApplicationContext create(ApplicationContext rootContext) {
         // TODO Optimize creation timing
-        var sharedContext = new SharedApplicationContext();
+        var sharedContext = new GenericApplicationContext();
         sharedContext.registerShutdownHook();
 
         var beanFactory = sharedContext.getBeanFactory();
