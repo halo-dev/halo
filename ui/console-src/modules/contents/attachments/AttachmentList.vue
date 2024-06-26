@@ -1,9 +1,9 @@
 <script lang="ts" setup>
 import UserFilterDropdown from "@/components/filter/UserFilterDropdown.vue";
 import LazyImage from "@/components/image/LazyImage.vue";
-import { coreApiClient } from "@halo-dev/api-client";
 import { isImage } from "@/utils/image";
 import type { Attachment, Group } from "@halo-dev/api-client";
+import { coreApiClient } from "@halo-dev/api-client";
 import {
   IconArrowLeft,
   IconArrowRight,
@@ -323,7 +323,7 @@ onMounted(() => {
                         $t("core.attachment.operations.deselect_items.button")
                       }}
                     </VButton>
-                    <VDropdown>
+                    <VDropdown v-if="groups?.length">
                       <VButton>
                         {{ $t("core.attachment.operations.move.button") }}
                       </VButton>

@@ -330,10 +330,26 @@ const handleFetchContent = async () => {
 };
 
 const handleOpenSettingModal = async () => {
+  if (isTitleChanged.value) {
+    await coreApiClient.content.post.patchPost({
+      name: formState.value.post.metadata.name,
+      jsonPatchInner: [
+        {
+          op: "add",
+          path: "/spec/title",
+          value:
+            formState.value.post.spec.title || t("core.post_editor.untitled"),
+        },
+      ],
+    });
+    isTitleChanged.value = false;
+  }
+
   const { data: latestPost } = await coreApiClient.content.post.getPost({
     name: formState.value.post.metadata.name,
   });
   formState.value.post = latestPost;
+
   settingModal.value = true;
 };
 

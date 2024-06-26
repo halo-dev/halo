@@ -28,7 +28,6 @@ const formState = ref<CreateUserRequest>({
   email: "",
   name: "",
   password: "",
-  phone: "",
   roles: [],
 });
 const selectedRole = ref("");
@@ -107,13 +106,6 @@ const handleCreateUser = async () => {
         type="email"
         name="email"
         validation="required|email|length:0,100"
-      ></FormKit>
-      <FormKit
-        v-model="formState.phone"
-        :label="$t('core.user.editing_modal.fields.phone.label')"
-        type="text"
-        name="phone"
-        validation="length:0,20"
       ></FormKit>
       <FormKit
         v-model="formState.password"
