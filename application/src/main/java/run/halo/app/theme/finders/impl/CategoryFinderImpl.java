@@ -1,5 +1,7 @@
 package run.halo.app.theme.finders.impl;
 
+import static run.halo.app.extension.index.query.QueryFactory.notEqual;
+
 import java.time.Instant;
 import java.util.Collection;
 import java.util.Comparator;
@@ -8,19 +10,21 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.function.Function;
 import java.util.stream.Collectors;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.BooleanUtils;
 import org.apache.commons.lang3.ObjectUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.data.domain.Sort;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
+import run.halo.app.content.CategoryService;
 import run.halo.app.core.extension.content.Category;
 import run.halo.app.extension.ListOptions;
 import run.halo.app.extension.ListResult;
 import run.halo.app.extension.Metadata;
 import run.halo.app.extension.PageRequestImpl;
 import run.halo.app.extension.ReactiveExtensionClient;
-import run.halo.app.extension.index.query.QueryFactory;
 import run.halo.app.extension.router.selector.FieldSelector;
 import run.halo.app.theme.finders.CategoryFinder;
 import run.halo.app.theme.finders.Finder;
@@ -35,12 +39,10 @@ import run.halo.app.theme.finders.vo.CategoryVo;
  */
 @Slf4j
 @Finder("categoryFinder")
+@RequiredArgsConstructor
 public class CategoryFinderImpl implements CategoryFinder {
     private final ReactiveExtensionClient client;
-
-    public CategoryFinderImpl(ReactiveExtensionClient client) {
-        this.client = client;
-    }
+    private final CategoryService categoryService;
 
     @Override
     public Mono<CategoryVo> getByName(String name) {
@@ -65,7 +67,11 @@ public class CategoryFinderImpl implements CategoryFinder {
 
     @Override
     public Mono<ListResult<CategoryVo>> list(Integer page, Integer size) {
-        return client.listBy(Category.class, new ListOptions(),
+        var listOptions = new ListOptions();
+        listOptions.setFieldSelector(FieldSelector.of(
+            notEqual("spec.hideFromList", BooleanUtils.TRUE)
+        ));
+        return client.listBy(Category.class, listOptions,
                 PageRequestImpl.of(pageNullSafe(page), sizeNullSafe(size), defaultSort())
             )
             .map(list -> {
@@ -91,6 +97,7 @@ public class CategoryFinderImpl implements CategoryFinder {
     @Override
     public Flux<CategoryVo> listAll() {
         return client.listAll(Category.class, new ListOptions(), defaultSort())
+            .filter(category -> !category.getSpec().isHideFromList())
             .map(CategoryVo::from);
     }
 
@@ -203,18 +210,8 @@ public class CategoryFinderImpl implements CategoryFinder {
 
     @Override
     public Mono<CategoryVo> getParentByName(String name) {
-        if (StringUtils.isBlank(name)) {
-            return Mono.empty();
-        }
-        var listOptions = new ListOptions();
-        listOptions.setFieldSelector(FieldSelector.of(
-            QueryFactory.equal("spec.children", name)
-        ));
-        return client.listBy(Category.class, listOptions,
-                PageRequestImpl.of(1, 1, defaultSort())
-            )
-            .map(ListResult::first)
-            .mapNotNull(item -> item.map(CategoryVo::from).orElse(null));
+        return categoryService.getParentByName(name)
+            .map(CategoryVo::from);
     }
 
     int pageNullSafe(Integer page) {

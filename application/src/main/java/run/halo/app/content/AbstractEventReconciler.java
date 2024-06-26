@@ -3,7 +3,6 @@ package run.halo.app.content;
 import java.time.Duration;
 import java.time.Instant;
 import org.springframework.context.SmartLifecycle;
-import run.halo.app.extension.ExtensionClient;
 import run.halo.app.extension.controller.Controller;
 import run.halo.app.extension.controller.ControllerBuilder;
 import run.halo.app.extension.controller.DefaultController;
@@ -24,12 +23,9 @@ public abstract class AbstractEventReconciler<E> implements Reconciler<E>, Smart
 
     protected volatile boolean running = false;
 
-    protected final ExtensionClient client;
-
     private final String controllerName;
 
-    protected AbstractEventReconciler(String controllerName, ExtensionClient client) {
-        this.client = client;
+    protected AbstractEventReconciler(String controllerName) {
         this.controllerName = controllerName;
         this.queue = new DefaultQueue<>(Instant::now);
         this.controller = this.setupWith(null);
