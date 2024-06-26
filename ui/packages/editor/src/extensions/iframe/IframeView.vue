@@ -3,6 +3,7 @@ import { i18n } from "@/locales";
 import type { Decoration, Node as ProseMirrorNode } from "@/tiptap/pm";
 import type { Editor, Node } from "@/tiptap/vue-3";
 import { NodeViewWrapper } from "@/tiptap/vue-3";
+import { isAllowedUri } from "@/utils/is-allowed-uri";
 import { computed, onMounted, ref } from "vue";
 
 const props = defineProps<{
@@ -21,6 +22,9 @@ const src = computed({
     return props.node?.attrs.src;
   },
   set: (src: string) => {
+    if (!src || !isAllowedUri(src)) {
+      return;
+    }
     props.updateAttributes({ src: src });
   },
 });

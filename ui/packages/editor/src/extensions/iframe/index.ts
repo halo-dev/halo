@@ -15,6 +15,7 @@ import {
 } from "@/tiptap/vue-3";
 import type { ExtensionOptions, NodeBubbleMenu } from "@/types";
 import { deleteNode } from "@/utils";
+import { isAllowedUri } from "@/utils/is-allowed-uri";
 import { markRaw } from "vue";
 import MdiBorderAllVariant from "~icons/mdi/border-all-variant";
 import MdiBorderNoneVariant from "~icons/mdi/border-none-variant";
@@ -144,11 +145,24 @@ const Iframe = Node.create<ExtensionOptions>({
     return [
       {
         tag: "iframe",
+        getAttrs: (dom) => {
+          const src = (dom as HTMLElement).getAttribute("src");
+
+          // prevent XSS attacks
+          if (!src || !isAllowedUri(src)) {
+            return false;
+          }
+          return { src };
+        },
       },
     ];
   },
 
   renderHTML({ HTMLAttributes }) {
+    // prevent XSS attacks
+    if (!isAllowedUri(HTMLAttributes.src)) {
+      return ["iframe", mergeAttributes({ ...HTMLAttributes, src: "" })];
+    }
     return ["iframe", mergeAttributes(HTMLAttributes)];
   },
 
