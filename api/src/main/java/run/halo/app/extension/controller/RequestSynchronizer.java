@@ -5,7 +5,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Sort;
 import run.halo.app.extension.Extension;
 import run.halo.app.extension.ExtensionClient;
-import run.halo.app.extension.ExtensionMatcher;
 import run.halo.app.extension.GroupVersionKind;
 import run.halo.app.extension.ListOptions;
 import run.halo.app.extension.Watcher;
@@ -27,7 +26,7 @@ public class RequestSynchronizer implements Synchronizer<Request> {
 
     private final Watcher watcher;
 
-    private final ExtensionMatcher listMatcher;
+    private final ListOptions listOptions;
 
     @Getter
     private volatile boolean started = false;
@@ -36,13 +35,13 @@ public class RequestSynchronizer implements Synchronizer<Request> {
         ExtensionClient client,
         Extension extension,
         Watcher watcher,
-        ExtensionMatcher listMatcher) {
+        ListOptions listOptions) {
         this.syncAllOnStart = syncAllOnStart;
         this.client = client;
         this.type = extension.groupVersionKind();
         this.watcher = watcher;
         this.indexedQueryEngine = client.indexedQueryEngine();
-        this.listMatcher = listMatcher;
+        this.listOptions = listOptions;
     }
 
     @Override
@@ -54,11 +53,6 @@ public class RequestSynchronizer implements Synchronizer<Request> {
         started = true;
 
         if (syncAllOnStart) {
-            var listOptions = new ListOptions();
-            if (listMatcher != null) {
-                listOptions.setFieldSelector(listMatcher.getFieldSelector());
-                listOptions.setLabelSelector(listMatcher.getLabelSelector());
-            }
             indexedQueryEngine.retrieveAll(type, listOptions, Sort.by("metadata.creationTimestamp"))
                 .forEach(name -> watcher.onAdd(new Request(name)));
         }
