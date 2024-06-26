@@ -1,5 +1,4 @@
 <script lang="ts" setup>
-import { watchEffect } from "vue";
 import { useLocalStorage } from "@vueuse/core";
 import {
   ExtensionBlockquote,
@@ -122,10 +121,6 @@ const editor = useEditor({
   onUpdate: () => {
     content.value = editor.value?.getHTML() + "";
   },
-});
-
-watchEffect(() => {
-  // console.log(editor.value?.getHTML());
 });
 </script>
 
