@@ -32,6 +32,7 @@ import {
   ExtensionNodeSelected,
   ExtensionOrderedList,
   ExtensionPlaceholder,
+  ExtensionRangeSelection,
   ExtensionSearchAndReplace,
   ExtensionStrike,
   ExtensionSubscript,
@@ -49,7 +50,6 @@ import {
   ToolboxItem,
   lowlight,
   type AnyExtension,
-  ExtensionRangeSelection,
 } from "@halo-dev/richtext-editor";
 // ui custom extension
 import { i18n } from "@/locales";

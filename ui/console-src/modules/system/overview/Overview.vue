@@ -1,10 +1,10 @@
 <script lang="ts" setup>
 import type { GlobalInfo, Info, Startup } from "@/types";
-import { consoleApiClient } from "@halo-dev/api-client";
 import { formatDatetime } from "@/utils/date";
 import { usePermission } from "@/utils/permission";
 import { useThemeStore } from "@console/stores/theme";
 import type { Plugin } from "@halo-dev/api-client";
+import { consoleApiClient } from "@halo-dev/api-client";
 import {
   IconClipboardLine,
   IconTerminalBoxLine,

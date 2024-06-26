@@ -1,7 +1,7 @@
 <script lang="ts" setup>
 import { useUserStore } from "@/stores/user";
-import { consoleApiClient } from "@halo-dev/api-client";
 import type { VerifyCodeRequest } from "@halo-dev/api-client";
+import { consoleApiClient } from "@halo-dev/api-client";
 import { Toast, VButton, VModal, VSpace } from "@halo-dev/components";
 import { useMutation, useQueryClient } from "@tanstack/vue-query";
 import { useIntervalFn } from "@vueuse/shared";

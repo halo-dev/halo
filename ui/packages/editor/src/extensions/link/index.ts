@@ -1,7 +1,7 @@
-import TiptapLink from "@tiptap/extension-link";
-import type { LinkOptions } from "@tiptap/extension-link";
-import type { ExtensionOptions } from "@/types";
 import { mergeAttributes } from "@/tiptap/vue-3";
+import type { ExtensionOptions } from "@/types";
+import type { LinkOptions } from "@tiptap/extension-link";
+import TiptapLink from "@tiptap/extension-link";
 
 const Link = TiptapLink.extend<ExtensionOptions & LinkOptions>({
   addOptions() {

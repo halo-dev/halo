@@ -1,10 +1,10 @@
+import ToolbarItem from "@/components/toolbar/ToolbarItem.vue";
+import { i18n } from "@/locales";
 import type { Editor } from "@/tiptap";
 import { Extension } from "@/tiptap";
 import type { ExtensionOptions } from "@/types";
 import { markRaw } from "vue";
 import MdiEraser from "~icons/mdi/eraser";
-import ToolbarItem from "@/components/toolbar/ToolbarItem.vue";
-import { i18n } from "@/locales";
 
 const clearFormat = Extension.create<ExtensionOptions>({
   addOptions() {

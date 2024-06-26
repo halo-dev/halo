@@ -1,12 +1,12 @@
 <script lang="ts" setup>
-import { Toast, VButton, VModal, VSpace } from "@halo-dev/components";
 import {
   coreApiClient,
   type JsonPatchInner,
   type ListedPost,
 } from "@halo-dev/api-client";
-import { ref } from "vue";
+import { Toast, VButton, VModal, VSpace } from "@halo-dev/components";
 import { useMutation, useQueryClient } from "@tanstack/vue-query";
+import { ref } from "vue";
 import { useI18n } from "vue-i18n";
 
 type ArrayPatchOp = "add" | "replace" | "removeAll";

@@ -1,6 +1,16 @@
 <script lang="ts" setup>
+import EditorProviderSelector from "@/components/dropdown-selector/EditorProviderSelector.vue";
+import HasPermission from "@/components/permission/HasPermission.vue";
+import { useAutoSaveContent } from "@/composables/use-auto-save-content";
+import { useContentCache } from "@/composables/use-content-cache";
 import { useEditorExtensionPoints } from "@/composables/use-editor-extension-points";
-import type { EditorProvider } from "@halo-dev/console-shared";
+import { useSessionKeepAlive } from "@/composables/use-session-keep-alive";
+import { contentAnnotations } from "@/constants/annotations";
+import { randomUUID } from "@/utils/id";
+import { usePermission } from "@/utils/permission";
+import { useSaveKeybinding } from "@console/composables/use-save-keybinding";
+import type { Content, Post, Snapshot } from "@halo-dev/api-client";
+import { ucApiClient } from "@halo-dev/api-client";
 import {
   Dialog,
   IconBookRead,
@@ -12,28 +22,18 @@ import {
   VPageHeader,
   VSpace,
 } from "@halo-dev/components";
-import EditorProviderSelector from "@/components/dropdown-selector/EditorProviderSelector.vue";
+import type { EditorProvider } from "@halo-dev/console-shared";
+import { useMutation } from "@tanstack/vue-query";
+import { usePostUpdateMutate } from "@uc/modules/contents/posts/composables/use-post-update-mutate";
+import { useLocalStorage } from "@vueuse/core";
+import { useRouteQuery } from "@vueuse/router";
+import type { AxiosRequestConfig } from "axios";
 import type { ComputedRef } from "vue";
 import { computed, nextTick, onMounted, provide, ref, toRef, watch } from "vue";
-import { useLocalStorage } from "@vueuse/core";
-import type { Content, Post, Snapshot } from "@halo-dev/api-client";
-import { randomUUID } from "@/utils/id";
-import { contentAnnotations } from "@/constants/annotations";
-import { useRouteQuery } from "@vueuse/router";
-import { ucApiClient } from "@halo-dev/api-client";
-import { useRouter } from "vue-router";
 import { useI18n } from "vue-i18n";
-import { useMutation } from "@tanstack/vue-query";
-import { useSaveKeybinding } from "@console/composables/use-save-keybinding";
+import { useRouter } from "vue-router";
 import PostCreationModal from "./components/PostCreationModal.vue";
 import PostSettingEditModal from "./components/PostSettingEditModal.vue";
-import HasPermission from "@/components/permission/HasPermission.vue";
-import { useSessionKeepAlive } from "@/composables/use-session-keep-alive";
-import { usePermission } from "@/utils/permission";
-import type { AxiosRequestConfig } from "axios";
-import { useContentCache } from "@/composables/use-content-cache";
-import { useAutoSaveContent } from "@/composables/use-auto-save-content";
-import { usePostUpdateMutate } from "@uc/modules/contents/posts/composables/use-post-update-mutate";
 
 const router = useRouter();
 const { t } = useI18n();

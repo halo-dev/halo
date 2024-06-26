@@ -1,16 +1,16 @@
 import type { FormKitTypeDefinition } from "@formkit/core";
 import {
-  outer,
-  inner,
-  wrapper,
-  label,
   help,
-  messages,
-  message,
   icon,
+  inner,
+  label,
+  message,
+  messages,
+  outer,
   prefix,
   suffix,
   textInput,
+  wrapper,
 } from "@formkit/inputs";
 import RevealButton from "./RevealButton.vue";
 

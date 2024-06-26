@@ -1,7 +1,7 @@
 <script lang="ts" setup>
 // core libs
-import { computed, nextTick, onMounted, ref } from "vue";
 import { coreApiClient } from "@halo-dev/api-client";
+import { computed, nextTick, onMounted, ref } from "vue";
 
 // components
 import SubmitButton from "@/components/button/SubmitButton.vue";

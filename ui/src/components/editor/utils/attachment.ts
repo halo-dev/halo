@@ -1,5 +1,5 @@
-import type { Content } from "@halo-dev/richtext-editor";
 import type { AttachmentLike } from "@halo-dev/console-shared";
+import type { Content } from "@halo-dev/richtext-editor";
 
 export function getContents(attachments: AttachmentLike[]): Content[] {
   return attachments

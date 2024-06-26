@@ -1,33 +1,33 @@
-import TiptapImage from "@tiptap/extension-image";
+import { BlockActionSeparator } from "@/components";
+import MdiDeleteForeverOutline from "@/components/icon/MdiDeleteForeverOutline.vue";
+import ToolboxItem from "@/components/toolbox/ToolboxItem.vue";
+import { i18n } from "@/locales";
+import type { EditorState } from "@/tiptap/pm";
 import {
   isActive,
   mergeAttributes,
   VueNodeViewRenderer,
   type Editor,
 } from "@/tiptap/vue-3";
-import type { EditorState } from "@/tiptap/pm";
-import ImageView from "./ImageView.vue";
-import type { ImageOptions } from "@tiptap/extension-image";
 import type { ExtensionOptions, NodeBubbleMenu } from "@/types";
-import ToolboxItem from "@/components/toolbox/ToolboxItem.vue";
-import MdiFileImageBox from "~icons/mdi/file-image-box";
+import { deleteNode } from "@/utils";
+import type { ImageOptions } from "@tiptap/extension-image";
+import TiptapImage from "@tiptap/extension-image";
 import { markRaw } from "vue";
-import { i18n } from "@/locales";
-import BubbleItemImageSize from "./BubbleItemImageSize.vue";
-import BubbleItemImageAlt from "./BubbleItemImageAlt.vue";
-import BubbleItemVideoLink from "./BubbleItemImageLink.vue";
-import BubbleItemImageHref from "./BubbleItemImageHref.vue";
-import { BlockActionSeparator } from "@/components";
-import MdiFormatAlignLeft from "~icons/mdi/format-align-left";
+import MdiFileImageBox from "~icons/mdi/file-image-box";
 import MdiFormatAlignCenter from "~icons/mdi/format-align-center";
-import MdiFormatAlignRight from "~icons/mdi/format-align-right";
 import MdiFormatAlignJustify from "~icons/mdi/format-align-justify";
+import MdiFormatAlignLeft from "~icons/mdi/format-align-left";
+import MdiFormatAlignRight from "~icons/mdi/format-align-right";
+import MdiLink from "~icons/mdi/link";
 import MdiLinkVariant from "~icons/mdi/link-variant";
 import MdiShare from "~icons/mdi/share";
 import MdiTextBoxEditOutline from "~icons/mdi/text-box-edit-outline";
-import MdiDeleteForeverOutline from "@/components/icon/MdiDeleteForeverOutline.vue";
-import { deleteNode } from "@/utils";
-import MdiLink from "~icons/mdi/link";
+import BubbleItemImageAlt from "./BubbleItemImageAlt.vue";
+import BubbleItemImageHref from "./BubbleItemImageHref.vue";
+import BubbleItemVideoLink from "./BubbleItemImageLink.vue";
+import BubbleItemImageSize from "./BubbleItemImageSize.vue";
+import ImageView from "./ImageView.vue";
 
 const Image = TiptapImage.extend<ExtensionOptions & ImageOptions>({
   inline() {

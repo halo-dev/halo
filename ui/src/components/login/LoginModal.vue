@@ -1,10 +1,10 @@
 <script lang="ts" setup>
-import { Toast, VModal } from "@halo-dev/components";
 import LoginForm from "@/components/login/LoginForm.vue";
 import { useUserStore } from "@/stores/user";
+import { Toast, VModal } from "@halo-dev/components";
+import { ref } from "vue";
 import { useI18n } from "vue-i18n";
 import SocialAuthProviders from "./SocialAuthProviders.vue";
-import { ref } from "vue";
 
 const userStore = useUserStore();
 const { t } = useI18n();

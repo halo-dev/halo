@@ -1,15 +1,15 @@
 <script lang="ts" setup>
+import { setFocus } from "@/formkit/utils/focus";
+import { usePostCategory } from "@console/modules/contents/posts/categories/composables/use-post-category";
 import type { Category } from "@halo-dev/api-client";
 import {
+  IconArrowDown,
+  VDropdown,
   VEntity,
   VEntityField,
-  VDropdown,
-  IconArrowDown,
 } from "@halo-dev/components";
-import { setFocus } from "@/formkit/utils/focus";
-import { computed, ref, watch } from "vue";
 import Fuse from "fuse.js";
-import { usePostCategory } from "@console/modules/contents/posts/categories/composables/use-post-category";
+import { computed, ref, watch } from "vue";
 
 const props = withDefaults(
   defineProps<{

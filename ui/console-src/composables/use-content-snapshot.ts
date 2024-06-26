@@ -1,5 +1,5 @@
 import { coreApiClient } from "@halo-dev/api-client";
-import { watch, type Ref, ref, nextTick } from "vue";
+import { nextTick, ref, watch, type Ref } from "vue";
 
 interface SnapshotContent {
   version: Ref<number>;

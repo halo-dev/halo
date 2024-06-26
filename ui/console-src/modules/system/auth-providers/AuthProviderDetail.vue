@@ -1,9 +1,7 @@
 <script lang="ts" setup>
-import { computed, ref, toRaw } from "vue";
-import { coreApiClient } from "@halo-dev/api-client";
-import { useQuery } from "@tanstack/vue-query";
+import { useSettingFormConvert } from "@console/composables/use-setting-form";
 import type { AuthProvider, Setting } from "@halo-dev/api-client";
-import { useRoute } from "vue-router";
+import { coreApiClient } from "@halo-dev/api-client";
 import {
   Toast,
   VAvatar,
@@ -14,8 +12,10 @@ import {
   VPageHeader,
   VTabbar,
 } from "@halo-dev/components";
-import { useSettingFormConvert } from "@console/composables/use-setting-form";
+import { useQuery } from "@tanstack/vue-query";
+import { computed, ref, toRaw } from "vue";
 import { useI18n } from "vue-i18n";
+import { useRoute } from "vue-router";
 
 const route = useRoute();
 const { t } = useI18n();

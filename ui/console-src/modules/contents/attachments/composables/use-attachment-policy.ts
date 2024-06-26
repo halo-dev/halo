@@ -1,7 +1,7 @@
-import type { Ref } from "vue";
 import type { Policy, PolicyTemplate } from "@halo-dev/api-client";
 import { coreApiClient } from "@halo-dev/api-client";
 import { useQuery } from "@tanstack/vue-query";
+import type { Ref } from "vue";
 
 interface useFetchAttachmentPolicyReturn {
   policies: Ref<Policy[] | undefined>;

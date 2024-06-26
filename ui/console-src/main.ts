@@ -1,26 +1,26 @@
-import { createApp } from "vue";
-import type { DirectiveBinding } from "vue";
+import { consoleApiClient } from "@halo-dev/api-client";
 import { createPinia } from "pinia";
+import type { DirectiveBinding } from "vue";
+import { createApp } from "vue";
 import App from "./App.vue";
 import router from "./router";
-import { consoleApiClient } from "@halo-dev/api-client";
 // setup
-import "@/setup/setupStyles";
+import { getBrowserLanguage, i18n, setupI18n } from "@/locales";
 import { setupComponents } from "@/setup/setupComponents";
-import { setupI18n, i18n, getBrowserLanguage } from "@/locales";
+import "@/setup/setupStyles";
 // core modules
-import { hasPermission } from "@/utils/permission";
-import { useRoleStore } from "@/stores/role";
-import { useThemeStore } from "@console/stores/theme";
-import { useUserStore } from "@/stores/user";
-import { useSystemConfigMapStore } from "@console/stores/system-configmap";
+import { setupApiClient } from "@/setup/setupApiClient";
 import { setupVueQuery } from "@/setup/setupVueQuery";
 import { useGlobalInfoStore } from "@/stores/global-info";
+import { useRoleStore } from "@/stores/role";
+import { useUserStore } from "@/stores/user";
+import { hasPermission } from "@/utils/permission";
 import {
   setupCoreModules,
   setupPluginModules,
 } from "@console/setup/setupModules";
-import { setupApiClient } from "@/setup/setupApiClient";
+import { useSystemConfigMapStore } from "@console/stores/system-configmap";
+import { useThemeStore } from "@console/stores/theme";
 
 const app = createApp(App);
 

@@ -1,9 +1,9 @@
+import { Editor } from "@tiptap/core";
 import {
   listHelpers,
   ListKeymap,
   type ListKeymapOptions,
 } from "@tiptap/extension-list-keymap";
-import { Editor } from "@tiptap/core";
 
 /**
  *  Optimize the listKeymap extension until the issue with @tiptap/extension-list-keymap is resolved.

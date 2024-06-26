@@ -1,7 +1,10 @@
 <script lang="ts" setup>
-import { consoleApiClient } from "@halo-dev/api-client";
 import { usePermission } from "@/utils/permission";
-import { PluginStatusPhaseEnum, type Plugin } from "@halo-dev/api-client";
+import {
+  PluginStatusPhaseEnum,
+  consoleApiClient,
+  type Plugin,
+} from "@halo-dev/api-client";
 import {
   Dialog,
   IconAddCircle,

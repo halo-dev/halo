@@ -1,9 +1,9 @@
 import { rbacAnnotations } from "@/constants/annotations";
 import { roleLabels } from "@/constants/labels";
-import { coreApiClient } from "@halo-dev/api-client";
-import type { FormKitNode, FormKitTypeDefinition } from "@formkit/core";
-import { select, selects, defaultIcon } from "@formkit/inputs";
 import { i18n } from "@/locales";
+import type { FormKitNode, FormKitTypeDefinition } from "@formkit/core";
+import { defaultIcon, select, selects } from "@formkit/inputs";
+import { coreApiClient } from "@halo-dev/api-client";
 
 function optionsHandler(node: FormKitNode) {
   node.on("created", async () => {

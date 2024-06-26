@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { i18n } from "@/locales";
 import type { Editor } from "@/tiptap/vue-3";
+import { isAllowedUri } from "@/utils/is-allowed-uri";
 import { computed, type Component } from "vue";
 import Iframe from "./index";
 
@@ -18,6 +19,9 @@ const src = computed({
     return props.editor.getAttributes(Iframe.name).src;
   },
   set: (src: string) => {
+    if (!src || !isAllowedUri(src)) {
+      return;
+    }
     props.editor.chain().updateAttributes(Iframe.name, { src: src }).run();
   },
 });

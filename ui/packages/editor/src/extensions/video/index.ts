@@ -1,39 +1,39 @@
-import type { ExtensionOptions, NodeBubbleMenu } from "@/types";
-import {
-  Editor,
-  isActive,
-  mergeAttributes,
-  Node,
-  nodeInputRule,
-  type Range,
-  VueNodeViewRenderer,
-} from "@/tiptap/vue-3";
-import type { EditorState } from "@/tiptap/pm";
-import { markRaw } from "vue";
-import VideoView from "./VideoView.vue";
-import MdiVideo from "~icons/mdi/video";
+import { BlockActionSeparator } from "@/components";
+import MdiDeleteForeverOutline from "@/components/icon/MdiDeleteForeverOutline.vue";
 import ToolboxItem from "@/components/toolbox/ToolboxItem.vue";
 import { i18n } from "@/locales";
-import { BlockActionSeparator } from "@/components";
-import BubbleItemVideoSize from "./BubbleItemVideoSize.vue";
-import BubbleItemVideoLink from "./BubbleItemVideoLink.vue";
-import MdiImageSizeSelectActual from "~icons/mdi/image-size-select-actual";
-import MdiImageSizeSelectSmall from "~icons/mdi/image-size-select-small";
-import MdiImageSizeSelectLarge from "~icons/mdi/image-size-select-large";
-import MdiFormatAlignLeft from "~icons/mdi/format-align-left";
-import MdiFormatAlignCenter from "~icons/mdi/format-align-center";
-import MdiFormatAlignRight from "~icons/mdi/format-align-right";
-import MdiFormatAlignJustify from "~icons/mdi/format-align-justify";
+import type { EditorState } from "@/tiptap/pm";
+import {
+  Editor,
+  Node,
+  VueNodeViewRenderer,
+  isActive,
+  mergeAttributes,
+  nodeInputRule,
+  type Range,
+} from "@/tiptap/vue-3";
+import type { ExtensionOptions, NodeBubbleMenu } from "@/types";
+import { deleteNode } from "@/utils";
+import { markRaw } from "vue";
 import MdiCogPlay from "~icons/mdi/cog-play";
 import MdiCogPlayOutline from "~icons/mdi/cog-play-outline";
+import MdiFormatAlignCenter from "~icons/mdi/format-align-center";
+import MdiFormatAlignJustify from "~icons/mdi/format-align-justify";
+import MdiFormatAlignLeft from "~icons/mdi/format-align-left";
+import MdiFormatAlignRight from "~icons/mdi/format-align-right";
+import MdiImageSizeSelectActual from "~icons/mdi/image-size-select-actual";
+import MdiImageSizeSelectLarge from "~icons/mdi/image-size-select-large";
+import MdiImageSizeSelectSmall from "~icons/mdi/image-size-select-small";
+import MdiLinkVariant from "~icons/mdi/link-variant";
+import MdiMotionPlay from "~icons/mdi/motion-play";
+import MdiMotionPlayOutline from "~icons/mdi/motion-play-outline";
 import MdiPlayCircle from "~icons/mdi/play-circle";
 import MdiPlayCircleOutline from "~icons/mdi/play-circle-outline";
-import MdiMotionPlayOutline from "~icons/mdi/motion-play-outline";
-import MdiMotionPlay from "~icons/mdi/motion-play";
-import MdiLinkVariant from "~icons/mdi/link-variant";
 import MdiShare from "~icons/mdi/share";
-import { deleteNode } from "@/utils";
-import MdiDeleteForeverOutline from "@/components/icon/MdiDeleteForeverOutline.vue";
+import MdiVideo from "~icons/mdi/video";
+import BubbleItemVideoLink from "./BubbleItemVideoLink.vue";
+import BubbleItemVideoSize from "./BubbleItemVideoSize.vue";
+import VideoView from "./VideoView.vue";
 declare module "@/tiptap" {
   interface Commands<ReturnType> {
     video: {

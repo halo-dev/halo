@@ -2,10 +2,10 @@
 import LazyImage from "@/components/image/LazyImage.vue";
 import type { Theme } from "@halo-dev/api-client";
 import {
+  VDropdownItem,
   VEntity,
   VEntityField,
   VTag,
-  VDropdownItem,
 } from "@halo-dev/components";
 import { toRefs } from "vue";
 import { useThemeLifeCycle } from "../../composables/use-theme";

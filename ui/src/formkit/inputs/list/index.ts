@@ -1,19 +1,28 @@
 import type { FormKitTypeDefinition } from "@formkit/core";
 
+import { i18n } from "@/locales";
 import {
+  $if,
   disablesChildren,
-  renamesRadios,
   fieldset,
-  messages,
-  message,
-  outer,
-  legend,
   help,
   inner,
+  legend,
+  message,
+  messages,
+  outer,
   prefix,
-  $if,
+  renamesRadios,
   suffix,
 } from "@formkit/inputs";
+import {
+  IconAddCircle,
+  IconArrowDownCircleLine,
+  IconArrowUpCircleLine,
+  IconCloseCircle,
+} from "@halo-dev/components";
+import AddButton from "./AddButton.vue";
+import { lists } from "./features/lists";
 import {
   addButton,
   content,
@@ -34,15 +43,6 @@ import {
   upControl,
   upIcon,
 } from "./sections";
-import { i18n } from "@/locales";
-import {
-  IconAddCircle,
-  IconArrowDownCircleLine,
-  IconArrowUpCircleLine,
-  IconCloseCircle,
-} from "@halo-dev/components";
-import AddButton from "./AddButton.vue";
-import { lists } from "./features/lists";
 
 /**
  * Input definition for a dynamic list input.

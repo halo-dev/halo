@@ -1,5 +1,7 @@
 <script lang="ts" setup>
-import { type RouteLocationRaw, useRoute, useRouter } from "vue-router";
+import { usePermission } from "@/utils/permission";
+import { useThemeStore } from "@console/stores/theme";
+import { consoleApiClient, coreApiClient } from "@halo-dev/api-client";
 import {
   IconBookRead,
   IconFolder,
@@ -12,14 +14,12 @@ import {
   VEntityField,
   VModal,
 } from "@halo-dev/components";
-import { type Component, computed, markRaw, onMounted, ref, watch } from "vue";
-import Fuse from "fuse.js";
-import { consoleApiClient, coreApiClient } from "@halo-dev/api-client";
-import { usePermission } from "@/utils/permission";
-import { useThemeStore } from "@console/stores/theme";
-import { storeToRefs } from "pinia";
-import { useI18n } from "vue-i18n";
 import { useEventListener } from "@vueuse/core";
+import Fuse from "fuse.js";
+import { storeToRefs } from "pinia";
+import { computed, markRaw, onMounted, ref, watch, type Component } from "vue";
+import { useI18n } from "vue-i18n";
+import { useRoute, useRouter, type RouteLocationRaw } from "vue-router";
 
 const router = useRouter();
 const route = useRoute();

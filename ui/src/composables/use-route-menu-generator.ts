@@ -1,12 +1,12 @@
 import { useRoleStore } from "@/stores/role";
-import type { MenuGroupType, MenuItemType } from "@halo-dev/console-shared";
-import { onMounted, ref, type Ref } from "vue";
-import { sortBy } from "lodash-es";
 import { hasPermission } from "@/utils/permission";
+import type { MenuGroupType, MenuItemType } from "@halo-dev/console-shared";
+import { sortBy } from "lodash-es";
+import { onMounted, ref, type Ref } from "vue";
 import {
   useRouter,
-  type RouteRecordRaw,
   type RouteRecordNormalized,
+  type RouteRecordRaw,
 } from "vue-router";
 
 interface useRouteMenuGeneratorReturn {

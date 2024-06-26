@@ -1,7 +1,8 @@
 <script lang="ts" setup>
 import { useUserStore } from "@/stores/user";
-import { ucApiClient } from "@halo-dev/api-client";
 import { relativeTimeTo } from "@/utils/date";
+import type { Notification } from "@halo-dev/api-client";
+import { ucApiClient } from "@halo-dev/api-client";
 import {
   VButton,
   VCard,
@@ -12,7 +13,6 @@ import {
 } from "@halo-dev/components";
 import { useQuery } from "@tanstack/vue-query";
 import { OverlayScrollbarsComponent } from "overlayscrollbars-vue";
-import type { Notification } from "@halo-dev/api-client";
 
 const { currentUser } = useUserStore();
 

@@ -1,10 +1,10 @@
 <script setup lang="ts">
+import { relativeTimeTo } from "@/utils/date";
 import type { ListedSnapshotDto, SinglePage } from "@halo-dev/api-client";
 import { consoleApiClient } from "@halo-dev/api-client";
 import { Dialog, Toast, VButton, VStatusDot, VTag } from "@halo-dev/components";
 import { useQueryClient } from "@tanstack/vue-query";
 import { computed } from "vue";
-import { relativeTimeTo } from "@/utils/date";
 import { useI18n } from "vue-i18n";
 
 const { t } = useI18n();

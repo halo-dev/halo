@@ -1,8 +1,8 @@
 <script lang="ts" setup>
-import { VButton } from "@halo-dev/components";
 import type { Attachment } from "@halo-dev/api-client";
-import { useAttachmentPermalinkCopy } from "../composables/use-attachment";
+import { VButton } from "@halo-dev/components";
 import { computed, toRefs } from "vue";
+import { useAttachmentPermalinkCopy } from "../composables/use-attachment";
 
 const props = withDefaults(
   defineProps<{

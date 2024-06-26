@@ -1,5 +1,5 @@
-import { consoleApiClient } from "@halo-dev/api-client";
 import type { Role, User } from "@halo-dev/api-client";
+import { consoleApiClient } from "@halo-dev/api-client";
 import { defineStore } from "pinia";
 
 interface UserStoreState {

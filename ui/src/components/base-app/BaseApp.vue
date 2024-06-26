@@ -1,16 +1,16 @@
 <script lang="ts" setup>
-import { RouterView } from "vue-router";
-import { computed, inject, onMounted, reactive } from "vue";
+import { useAppTitle } from "@/composables/use-title";
+import { i18n } from "@/locales";
+import { useGlobalInfoStore } from "@/stores/global-info";
+import type { FormKitConfig } from "@formkit/core";
 import { useFavicon } from "@vueuse/core";
 import {
   useOverlayScrollbars,
   type UseOverlayScrollbarsParams,
 } from "overlayscrollbars-vue";
-import type { FormKitConfig } from "@formkit/core";
-import { i18n } from "@/locales";
-import { useGlobalInfoStore } from "@/stores/global-info";
 import { storeToRefs } from "pinia";
-import { useAppTitle } from "@/composables/use-title";
+import { computed, inject, onMounted, reactive } from "vue";
+import { RouterView } from "vue-router";
 
 useAppTitle();
 

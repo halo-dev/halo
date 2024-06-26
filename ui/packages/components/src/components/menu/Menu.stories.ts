@@ -1,13 +1,13 @@
-import type { Meta, StoryObj } from "@storybook/vue3";
-import { VMenu, VMenuItem, VMenuLabel } from "./index";
 import {
+  IconAddCircle,
   IconBookRead,
   IconDashboard,
   IconFolder,
   IconMessage,
   IconPages,
-  IconAddCircle,
 } from "@/icons/icons";
+import type { Meta, StoryObj } from "@storybook/vue3";
+import { VMenu, VMenuItem, VMenuLabel } from "./index";
 
 const meta: Meta<typeof VMenu> = {
   title: "Menu",

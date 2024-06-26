@@ -1,7 +1,7 @@
 import type { Meta, StoryObj } from "@storybook/vue3";
 import { VEmpty } from ".";
-import { VSpace } from "../space";
 import { VButton } from "../button";
+import { VSpace } from "../space";
 
 const meta: Meta<typeof VEmpty> = {
   title: "Empty",
