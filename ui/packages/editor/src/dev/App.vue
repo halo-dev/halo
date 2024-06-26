@@ -46,6 +46,7 @@ import {
   ExtensionSearchAndReplace,
   ExtensionClearFormat,
   ExtensionFormatBrush,
+  ExtensionRangeSelection,
 } from "../index";
 
 const content = useLocalStorage("content", "");
@@ -114,6 +115,7 @@ const editor = useEditor({
     ExtensionSearchAndReplace,
     ExtensionClearFormat,
     ExtensionFormatBrush,
+    ExtensionRangeSelection,
   ],
   parseOptions: {
     preserveWhitespace: true,

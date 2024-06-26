@@ -49,6 +49,7 @@ import {
   ToolboxItem,
   lowlight,
   type AnyExtension,
+  ExtensionRangeSelection,
 } from "@halo-dev/richtext-editor";
 // ui custom extension
 import { i18n } from "@/locales";
@@ -401,6 +402,7 @@ onMounted(async () => {
       ExtensionSearchAndReplace,
       ExtensionClearFormat,
       ExtensionFormatBrush,
+      ExtensionRangeSelection,
     ],
     parseOptions: {
       preserveWhitespace: true,
