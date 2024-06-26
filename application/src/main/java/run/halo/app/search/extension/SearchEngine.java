@@ -10,11 +10,17 @@ import run.halo.app.extension.AbstractExtension;
 import run.halo.app.extension.GVK;
 import run.halo.app.extension.Ref;
 
+/**
+ * Search engine extension.
+ *
+ * @deprecated This class is deprecated and will be removed in Halo 2.18.
+ */
 @Data
 @ToString(callSuper = true)
 @EqualsAndHashCode(callSuper = true)
 @GVK(group = "plugin.halo.run", version = "v1alpha1", kind = "SearchEngine",
     plural = "searchengines", singular = "searchengine")
+@Deprecated(forRemoval = true)
 public class SearchEngine extends AbstractExtension {
 
     @Schema(requiredMode = REQUIRED)

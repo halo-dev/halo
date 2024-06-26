@@ -2,6 +2,7 @@ apiVersion: plugin.halo.run/v1alpha1
 kind: SearchEngine
 metadata:
   name: lucene
+  deletionTimestamp: 2024-06-25T00:00:00Z
 spec:
   logo: https://lucene.apache.org/theme/images/lucene/lucene_logo_green_300.png
   website: https://lucene.apache.org/

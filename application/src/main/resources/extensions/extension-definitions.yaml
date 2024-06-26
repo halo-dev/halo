@@ -46,3 +46,16 @@ spec:
   extensionPointName: reactive-notifier
   displayName: "EmailNotifier"
   description: "Support sending notifications to users via email"
+
+---
+apiVersion: plugin.halo.run/v1alpha1
+kind: ExtensionDefinition
+metadata:
+  name: search-engine-lucene
+spec:
+  className: run.halo.app.search.lucene.LuceneSearchEngine
+  extensionPointName: search-engine
+  displayName: Lucene Search Engine
+  description: |
+    Lucene is a high-performance, full-featured text search engine library written entirely in Java. 
+    It is a technology suitable for nearly any application that requires full-text search, especially cross-platform.

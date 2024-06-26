@@ -63,3 +63,14 @@ spec:
   displayName: Notifier
   type: MULTI_INSTANCE
   description: "Provides a way to extend the notifier to send notifications to users."
+
+---
+apiVersion: plugin.halo.run/v1alpha1
+kind: ExtensionPointDefinition
+metadata:
+  name: search-engine
+spec:
+  className: run.halo.app.search.SearchEngine
+  displayName: SearchEngine
+  type: SINGLETON
+  description: "Provides a way to extend the search engine."

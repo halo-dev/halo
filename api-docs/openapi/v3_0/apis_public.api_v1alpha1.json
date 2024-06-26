@@ -269,9 +269,41 @@
         ]
       }
     },
+    "/apis/api.halo.run/v1alpha1/indices/-/search": {
+      "post": {
+        "description": "Search indices.",
+        "operationId": "IndicesSearch",
+        "requestBody": {
+          "content": {
+            "*/*": {
+              "schema": {
+                "$ref": "#/components/schemas/SearchOption"
+              }
+            }
+          },
+          "description": "Please note that the \"filterPublished\", \"filterExposed\" and \"filterRecycled\" fields are ignored in this endpoint."
+        },
+        "responses": {
+          "default": {
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/SearchResult"
+                }
+              }
+            },
+            "description": "default response"
+          }
+        },
+        "tags": [
+          "IndexV1alpha1Public"
+        ]
+      }
+    },
     "/apis/api.halo.run/v1alpha1/indices/post": {
       "get": {
-        "description": "Search posts with fuzzy query",
+        "deprecated": true,
+        "description": "Search posts with fuzzy query. This method is deprecated, please use POST /indices/-/search instead.",
         "operationId": "SearchPost",
         "parameters": [
           {
@@ -314,7 +346,7 @@
             "content": {
               "*/*": {
                 "schema": {
-                  "$ref": "#/components/schemas/PostHits"
+                  "$ref": "#/components/schemas/SearchResult"
                 }
               }
             },
@@ -322,7 +354,7 @@
           }
         },
         "tags": [
-          "PostV1alpha1Public"
+          "IndexV1alpha1Public"
         ]
       }
     },
@@ -1052,6 +1084,79 @@
           }
         }
       },
+      "HaloDocument": {
+        "required": [
+          "content",
+          "id",
+          "metadataName",
+          "ownerName",
+          "permalink",
+          "title",
+          "type"
+        ],
+        "type": "object",
+        "properties": {
+          "annotations": {
+            "type": "object",
+            "additionalProperties": {
+              "type": "string"
+            }
+          },
+          "categories": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "content": {
+            "type": "string"
+          },
+          "creationTimestamp": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "description": {
+            "type": "string"
+          },
+          "exposed": {
+            "type": "boolean"
+          },
+          "id": {
+            "type": "string"
+          },
+          "metadataName": {
+            "type": "string"
+          },
+          "ownerName": {
+            "type": "string"
+          },
+          "permalink": {
+            "type": "string"
+          },
+          "published": {
+            "type": "boolean"
+          },
+          "recycled": {
+            "type": "boolean"
+          },
+          "tags": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "title": {
+            "type": "string"
+          },
+          "type": {
+            "type": "string"
+          },
+          "updateTimestamp": {
+            "type": "string",
+            "format": "date-time"
+          }
+        }
+      },
       "JsonPatch": {
         "minItems": 1,
         "uniqueItems": true,
@@ -1398,53 +1503,6 @@
           }
         }
       },
-      "PostHit": {
-        "type": "object",
-        "properties": {
-          "content": {
-            "type": "string"
-          },
-          "name": {
-            "type": "string"
-          },
-          "permalink": {
-            "type": "string"
-          },
-          "publishTimestamp": {
-            "type": "string",
-            "format": "date-time"
-          },
-          "title": {
-            "type": "string"
-          }
-        }
-      },
-      "PostHits": {
-        "type": "object",
-        "properties": {
-          "hits": {
-            "type": "array",
-            "items": {
-              "$ref": "#/components/schemas/PostHit"
-            }
-          },
-          "keyword": {
-            "type": "string"
-          },
-          "limit": {
-            "type": "integer",
-            "format": "int32"
-          },
-          "processingTimeMillis": {
-            "type": "integer",
-            "format": "int64"
-          },
-          "total": {
-            "type": "integer",
-            "format": "int64"
-          }
-        }
-      },
       "Ref": {
         "required": [
           "name"
@@ -1755,6 +1813,94 @@
           },
           "token": {
             "type": "string"
+          }
+        }
+      },
+      "SearchOption": {
+        "required": [
+          "keyword"
+        ],
+        "type": "object",
+        "properties": {
+          "annotations": {
+            "type": "object",
+            "additionalProperties": {
+              "type": "string"
+            }
+          },
+          "filterExposed": {
+            "type": "boolean"
+          },
+          "filterPublished": {
+            "type": "boolean"
+          },
+          "filterRecycled": {
+            "type": "boolean"
+          },
+          "highlightPostTag": {
+            "type": "string"
+          },
+          "highlightPreTag": {
+            "type": "string"
+          },
+          "includeCategoryNames": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "includeOwnerNames": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "includeTagNames": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "includeTypes": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "keyword": {
+            "type": "string"
+          },
+          "limit": {
+            "maximum": 1000,
+            "minimum": 1,
+            "type": "integer",
+            "format": "int32"
+          }
+        }
+      },
+      "SearchResult": {
+        "type": "object",
+        "properties": {
+          "hits": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/HaloDocument"
+            }
+          },
+          "keyword": {
+            "type": "string"
+          },
+          "limit": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "processingTimeMillis": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "total": {
+            "type": "integer",
+            "format": "int64"
           }
         }
       },

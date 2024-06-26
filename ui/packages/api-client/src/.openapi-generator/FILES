@@ -21,6 +21,7 @@ api/device-v1alpha1-uc-api.ts
 api/extension-definition-v1alpha1-api.ts
 api/extension-point-definition-v1alpha1-api.ts
 api/group-v1alpha1-api.ts
+api/index-v1alpha1-public-api.ts
 api/indices-v1alpha1-console-api.ts
 api/login-api.ts
 api/menu-item-v1alpha1-api.ts
@@ -155,6 +156,7 @@ models/group-list.ts
 models/group-spec.ts
 models/group-status.ts
 models/group.ts
+models/halo-document.ts
 models/index.ts
 models/install-from-uri-request.ts
 models/interest-reason-subject.ts
@@ -222,8 +224,6 @@ models/policy-template-list.ts
 models/policy-template-spec.ts
 models/policy-template.ts
 models/policy.ts
-models/post-hit.ts
-models/post-hits.ts
 models/post-list.ts
 models/post-request.ts
 models/post-spec.ts
@@ -273,6 +273,8 @@ models/role.ts
 models/search-engine-list.ts
 models/search-engine-spec.ts
 models/search-engine.ts
+models/search-option.ts
+models/search-result.ts
 models/secret-list.ts
 models/secret.ts
 models/setting-form.ts
