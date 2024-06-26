@@ -386,9 +386,13 @@ core:
         post_template:
           label: 自定義文章模板
           help: 自定義當前分類下文章的渲染模板，需要主題提供支持
+        hide_from_list:
+          label: 在列表中隱藏
+          help: 開啟此選項後，此分類和其下子分類，以及其下文章將不會顯示在前臺的列表中，需要主動訪問分類歸檔頁面，此功能僅對第一級目錄生效
     list:
       fields:
         prevent_parent_post_cascade_query: 阻止父級分類在級聯文章查詢中包含此分類及其子分類
+        hide_from_list: 已隱藏，此分類和其下子分類，以及其下文章將不會顯示在前臺的列表中，需要主動訪問分類歸檔頁面
   page:
     title: 頁面
     actions:

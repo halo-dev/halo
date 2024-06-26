@@ -52,6 +52,12 @@ export interface SinglePageStatus {
      * @type {boolean}
      * @memberof SinglePageStatus
      */
+    'hideFromList'?: boolean;
+    /**
+     * 
+     * @type {boolean}
+     * @memberof SinglePageStatus
+     */
     'inProgress'?: boolean;
     /**
      * 

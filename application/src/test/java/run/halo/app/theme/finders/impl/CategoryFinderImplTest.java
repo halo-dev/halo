@@ -24,6 +24,7 @@ import org.springframework.data.domain.Sort;
 import org.springframework.util.ResourceUtils;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
+import run.halo.app.content.CategoryService;
 import run.halo.app.core.extension.content.Category;
 import run.halo.app.extension.ListOptions;
 import run.halo.app.extension.ListResult;
@@ -46,11 +47,14 @@ class CategoryFinderImplTest {
     @Mock
     private ReactiveExtensionClient client;
 
+    @Mock
+    private CategoryService categoryService;
+
     private CategoryFinderImpl categoryFinder;
 
     @BeforeEach
     void setUp() {
-        categoryFinder = new CategoryFinderImpl(client);
+        categoryFinder = new CategoryFinderImpl(client, categoryService);
     }
 
     @Test
@@ -78,7 +82,8 @@ class CategoryFinderImplTest {
                              "C1",
                              "C2"
                          ],
-                         "preventParentPostCascadeQuery": false
+                         "preventParentPostCascadeQuery": false,
+                         "hideFromList": false
                      }
                 }
                 """,

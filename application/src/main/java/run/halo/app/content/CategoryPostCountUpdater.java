@@ -37,10 +37,12 @@ import run.halo.app.infra.utils.JsonUtils;
 public class CategoryPostCountUpdater
     extends AbstractEventReconciler<CategoryPostCountUpdater.PostRelatedCategories> {
 
+    protected final ExtensionClient client;
     private final CategoryPostCountService categoryPostCountService;
 
     public CategoryPostCountUpdater(ExtensionClient client) {
-        super(CategoryPostCountUpdater.class.getName(), client);
+        super(CategoryPostCountUpdater.class.getName());
+        this.client = client;
         this.categoryPostCountService = new CategoryPostCountService(client);
     }
 

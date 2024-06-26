@@ -21,7 +21,7 @@ public class NotEqual extends SimpleQuery {
         indexView.acquireReadLock();
         try {
             NavigableSet<String> equalNames = equalQuery.matches(indexView);
-            NavigableSet<String> allNames = indexView.getIdsForField(fieldName);
+            NavigableSet<String> allNames = indexView.getAllIds();
             allNames.removeAll(equalNames);
             return allNames;
         } finally {

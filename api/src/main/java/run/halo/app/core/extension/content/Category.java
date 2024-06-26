@@ -27,6 +27,7 @@ import run.halo.app.extension.GroupVersionKind;
 public class Category extends AbstractExtension {
 
     public static final String KIND = "Category";
+    public static final String LAST_HIDDEN_STATE_ANNO = "content.halo.run/last-hidden-state";
 
     public static final GroupVersionKind GVK = GroupVersionKind.fromExtension(Category.class);
 
@@ -79,6 +80,15 @@ public class Category extends AbstractExtension {
          * and B will be queried, but C and D will not be queried.</p>
          */
         private boolean preventParentPostCascadeQuery;
+
+        /**
+         * <p>Whether to hide the category from the category list.</p>
+         * <p>When set to true, the category including its subcategories and related posts will
+         * not be displayed in the category list, but it can still be accessed by permalink.</p>
+         * <p>Limitation: It only takes effect on the theme-side categorized list and it only
+         * allows to be set to true on the first level(root node) of categories.</p>
+         */
+        private boolean hideFromList;
     }
 
     @JsonIgnore

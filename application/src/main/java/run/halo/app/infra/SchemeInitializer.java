@@ -193,6 +193,14 @@ public class SchemeInitializer implements ApplicationListener<ApplicationContext
                     return lastModifyTime == null ? null : lastModifyTime.toString();
                 })));
             indexSpecs.add(new IndexSpec()
+                .setName("status.hideFromList")
+                .setIndexFunc(simpleAttribute(Post.class, post -> {
+                    var hidden = post.getStatus().getHideFromList();
+                    // only index when hidden is true
+                    return (hidden == null || !hidden) ? null : BooleanUtils.TRUE;
+                }))
+            );
+            indexSpecs.add(new IndexSpec()
                 .setName(Post.REQUIRE_SYNC_ON_STARTUP_INDEX_NAME)
                 .setIndexFunc(simpleAttribute(Post.class, post -> {
                     var version = post.getMetadata().getVersion();
@@ -238,6 +246,19 @@ public class SchemeInitializer implements ApplicationListener<ApplicationContext
                 .setName("spec.priority")
                 .setIndexFunc(simpleAttribute(Category.class,
                     category -> defaultIfNull(category.getSpec().getPriority(), 0).toString())));
+            indexSpecs.add(new IndexSpec()
+                .setName("spec.children")
+                .setIndexFunc(multiValueAttribute(Category.class, category -> {
+                    var children = category.getSpec().getChildren();
+                    return children == null ? Set.of() : Set.copyOf(children);
+                }))
+            );
+            indexSpecs.add(new IndexSpec()
+                .setName("spec.hideFromList")
+                .setIndexFunc(simpleAttribute(Category.class,
+                    category -> toStringTrueFalse(isTrue(category.getSpec().isHideFromList()))
+                ))
+            );
         });
         schemeManager.register(Tag.class, indexSpecs -> {
             indexSpecs.add(new IndexSpec()
