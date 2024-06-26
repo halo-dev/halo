@@ -1,23 +1,23 @@
-import type { ExtensionOptions, NodeBubbleMenu } from "@/types";
-import { Text as TiptapText } from "@tiptap/extension-text";
-import { markRaw } from "vue";
 import ColorBubbleItem from "@/extensions/color/ColorBubbleItem.vue";
 import HighlightBubbleItem from "@/extensions/highlight/HighlightBubbleItem.vue";
 import LinkBubbleButton from "@/extensions/link/LinkBubbleButton.vue";
+import { i18n } from "@/locales";
+import type { EditorState } from "@/tiptap/pm";
+import { isActive, isTextSelection } from "@/tiptap/vue-3";
+import type { ExtensionOptions, NodeBubbleMenu } from "@/types";
+import { Text as TiptapText } from "@tiptap/extension-text";
+import { markRaw } from "vue";
 import MdiCodeTags from "~icons/mdi/code-tags";
+import MdiFormatBold from "~icons/mdi/format-bold";
 import MdiFormatColor from "~icons/mdi/format-color";
 import MdiFormatColorHighlight from "~icons/mdi/format-color-highlight";
 import MdiFormatItalic from "~icons/mdi/format-italic";
-import MdiLinkVariantOff from "~icons/mdi/link-variant-off";
-import MdiShare from "~icons/mdi/share";
 import MdiFormatStrikethrough from "~icons/mdi/format-strikethrough";
 import MdiFormatSubscript from "~icons/mdi/format-subscript";
 import MdiFormatSuperscript from "~icons/mdi/format-superscript";
 import MdiFormatUnderline from "~icons/mdi/format-underline";
-import { isActive, isTextSelection } from "@/tiptap/vue-3";
-import type { EditorState } from "@/tiptap/pm";
-import MdiFormatBold from "~icons/mdi/format-bold";
-import { i18n } from "@/locales";
+import MdiLinkVariantOff from "~icons/mdi/link-variant-off";
+import MdiShare from "~icons/mdi/share";
 
 const OTHER_BUBBLE_MENU_TYPES = [
   "audio",

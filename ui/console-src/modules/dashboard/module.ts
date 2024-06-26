@@ -1,11 +1,11 @@
-import { definePlugin } from "@halo-dev/console-shared";
 import BasicLayout from "@console/layouts/BasicLayout.vue";
-import Dashboard from "./Dashboard.vue";
 import { IconDashboard } from "@halo-dev/components";
+import { definePlugin } from "@halo-dev/console-shared";
+import Dashboard from "./Dashboard.vue";
 
+import { markRaw } from "vue";
 import QuickLinkWidget from "./widgets/QuickLinkWidget.vue";
 import ViewsStatsWidget from "./widgets/ViewsStatsWidget.vue";
-import { markRaw } from "vue";
 
 export default definePlugin({
   components: {

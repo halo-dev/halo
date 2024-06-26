@@ -1,13 +1,13 @@
 <script lang="ts" setup>
-import { Toast, VButton, VModal, VSpace } from "@halo-dev/components";
 import SubmitButton from "@/components/button/SubmitButton.vue";
-import { computed, nextTick, onMounted, ref } from "vue";
+import AnnotationsForm from "@/components/form/AnnotationsForm.vue";
+import { setFocus } from "@/formkit/utils/focus";
 import type { Menu, MenuItem, Ref } from "@halo-dev/api-client";
 import { coreApiClient } from "@halo-dev/api-client";
-import { setFocus } from "@/formkit/utils/focus";
-import AnnotationsForm from "@/components/form/AnnotationsForm.vue";
-import { useI18n } from "vue-i18n";
+import { Toast, VButton, VModal, VSpace } from "@halo-dev/components";
 import { cloneDeep } from "lodash-es";
+import { computed, nextTick, onMounted, ref } from "vue";
+import { useI18n } from "vue-i18n";
 
 const props = withDefaults(
   defineProps<{

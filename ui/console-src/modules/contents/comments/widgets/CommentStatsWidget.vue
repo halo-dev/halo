@@ -1,6 +1,6 @@
 <script lang="ts" setup>
 import { useDashboardStats } from "@console/composables/use-dashboard-stats";
-import { VCard, IconMessage } from "@halo-dev/components";
+import { IconMessage, VCard } from "@halo-dev/components";
 
 const { data: stats } = useDashboardStats();
 </script>

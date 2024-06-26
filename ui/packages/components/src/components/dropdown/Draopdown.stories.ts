@@ -1,6 +1,6 @@
 import type { Meta, StoryObj } from "@storybook/vue3";
 
-import { VDropdown, VDropdownItem, VDropdownDivider } from ".";
+import { VDropdown, VDropdownDivider, VDropdownItem } from ".";
 import { VButton } from "../button";
 
 const meta: Meta<typeof VDropdown> = {

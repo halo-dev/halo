@@ -1,16 +1,16 @@
 <script setup lang="ts" name="BubbleMenu">
-import { ref, type PropType, watch, computed, nextTick } from "vue";
-import type { PluginKey, Editor } from "@/tiptap";
-import type { SearchAndReplacePluginState } from "./SearchAndReplacePlugin";
+import { i18n } from "@/locales";
+import type { Editor, PluginKey } from "@/tiptap";
+import { computed, nextTick, ref, watch, type PropType } from "vue";
+import LucideReplace from "~icons/lucide/replace";
+import LucideReplaceAll from "~icons/lucide/replace-all";
+import MdiArrowDown from "~icons/mdi/arrow-down";
+import MdiArrowUp from "~icons/mdi/arrow-up";
+import MdiClose from "~icons/mdi/close";
 import MdiFormatLetterCase from "~icons/mdi/format-letter-case";
 import MdiFormatLetterMatches from "~icons/mdi/format-letter-matches";
 import MdiRegex from "~icons/mdi/regex";
-import MdiArrowUp from "~icons/mdi/arrow-up";
-import MdiArrowDown from "~icons/mdi/arrow-down";
-import MdiClose from "~icons/mdi/close";
-import LucideReplace from "~icons/lucide/replace";
-import LucideReplaceAll from "~icons/lucide/replace-all";
-import { i18n } from "@/locales";
+import type { SearchAndReplacePluginState } from "./SearchAndReplacePlugin";
 
 const props = defineProps({
   editor: {

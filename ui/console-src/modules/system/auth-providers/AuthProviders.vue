@@ -1,17 +1,17 @@
 <script lang="ts" setup>
+import type { AuthProvider, ListedAuthProvider } from "@halo-dev/api-client";
+import { consoleApiClient, coreApiClient } from "@halo-dev/api-client";
 import {
-  VPageHeader,
   IconLockPasswordLine,
   VCard,
   VLoading,
+  VPageHeader,
 } from "@halo-dev/components";
 import { useQuery } from "@tanstack/vue-query";
-import { consoleApiClient, coreApiClient } from "@halo-dev/api-client";
-import type { AuthProvider, ListedAuthProvider } from "@halo-dev/api-client";
-import AuthProviderListItem from "./components/AuthProviderListItem.vue";
-import { computed, ref } from "vue";
 import Fuse from "fuse.js";
+import { computed, ref } from "vue";
 import { VueDraggable } from "vue-draggable-plus";
+import AuthProviderListItem from "./components/AuthProviderListItem.vue";
 
 const authProviders = ref<ListedAuthProvider[]>([]);
 

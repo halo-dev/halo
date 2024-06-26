@@ -1,14 +1,14 @@
-import type { RouteRecordRaw } from "vue-router";
-import NotFound from "@/views/exceptions/NotFound.vue";
-import Forbidden from "@/views/exceptions/Forbidden.vue";
-import BasicLayout from "@console/layouts/BasicLayout.vue";
 import GatewayLayout from "@/layouts/GatewayLayout.vue";
-import Setup from "@console/views/system/Setup.vue";
-import Redirect from "@console/views/system/Redirect.vue";
-import SetupInitialData from "@console/views/system/SetupInitialData.vue";
-import ResetPassword from "@console/views/system/ResetPassword.vue";
-import Login from "@console/views/system/Login.vue";
+import Forbidden from "@/views/exceptions/Forbidden.vue";
+import NotFound from "@/views/exceptions/NotFound.vue";
+import BasicLayout from "@console/layouts/BasicLayout.vue";
 import Binding from "@console/views/system/Binding.vue";
+import Login from "@console/views/system/Login.vue";
+import Redirect from "@console/views/system/Redirect.vue";
+import ResetPassword from "@console/views/system/ResetPassword.vue";
+import Setup from "@console/views/system/Setup.vue";
+import SetupInitialData from "@console/views/system/SetupInitialData.vue";
+import type { RouteRecordRaw } from "vue-router";
 
 export const routes: Array<RouteRecordRaw> = [
   {

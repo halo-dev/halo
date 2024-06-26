@@ -1,9 +1,10 @@
 <script lang="ts" setup>
 // core libs
-import { computed, nextTick, ref, watch } from "vue";
 import { coreApiClient } from "@halo-dev/api-client";
+import { computed, nextTick, ref, watch } from "vue";
 
 // components
+import SubmitButton from "@/components/button/SubmitButton.vue";
 import {
   IconArrowLeft,
   IconArrowRight,
@@ -13,19 +14,18 @@ import {
   VModal,
   VSpace,
 } from "@halo-dev/components";
-import SubmitButton from "@/components/button/SubmitButton.vue";
 
 // types
 import type { Tag } from "@halo-dev/api-client";
 
 // libs
-import { setFocus } from "@/formkit/utils/focus";
 import AnnotationsForm from "@/components/form/AnnotationsForm.vue";
-import useSlugify from "@console/composables/use-slugify";
-import { useI18n } from "vue-i18n";
+import { setFocus } from "@/formkit/utils/focus";
 import { FormType } from "@/types/slug";
-import { onMounted } from "vue";
+import useSlugify from "@console/composables/use-slugify";
 import { cloneDeep } from "lodash-es";
+import { onMounted } from "vue";
+import { useI18n } from "vue-i18n";
 
 const props = withDefaults(
   defineProps<{

@@ -1,12 +1,11 @@
 <script lang="ts" setup>
 import { useUserStore } from "@/stores/user";
-import { ucApiClient } from "@halo-dev/api-client";
 import { relativeTimeTo } from "@/utils/date";
 import type { Notification } from "@halo-dev/api-client";
-import { useMutation, useQueryClient } from "@tanstack/vue-query";
+import { ucApiClient } from "@halo-dev/api-client";
 import { Dialog, Toast, VStatusDot } from "@halo-dev/components";
-import { watch } from "vue";
-import { ref } from "vue";
+import { useMutation, useQueryClient } from "@tanstack/vue-query";
+import { ref, watch } from "vue";
 import { useI18n } from "vue-i18n";
 
 const queryClient = useQueryClient();

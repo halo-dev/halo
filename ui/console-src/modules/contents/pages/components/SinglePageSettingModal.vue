@@ -2,13 +2,13 @@
 import AnnotationsForm from "@/components/form/AnnotationsForm.vue";
 import { singlePageLabels } from "@/constants/labels";
 import { FormType } from "@/types/slug";
-import { coreApiClient } from "@halo-dev/api-client";
 import { toDatetimeLocal, toISOString } from "@/utils/date";
 import { randomUUID } from "@/utils/id";
 import useSlugify from "@console/composables/use-slugify";
 import { useThemeCustomTemplates } from "@console/modules/interface/themes/composables/use-theme";
 import { submitForm } from "@formkit/core";
 import type { SinglePage } from "@halo-dev/api-client";
+import { coreApiClient } from "@halo-dev/api-client";
 import {
   IconRefreshLine,
   Toast,

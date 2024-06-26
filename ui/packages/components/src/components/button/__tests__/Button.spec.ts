@@ -1,7 +1,7 @@
-import { describe, expect, it, vi } from "vitest";
-import { VButton } from "../index";
 import { mount } from "@vue/test-utils";
+import { describe, expect, it, vi } from "vitest";
 import { IconSettings } from "../../../icons/icons";
+import { VButton } from "../index";
 
 describe("Button", () => {
   it("should render", () => {

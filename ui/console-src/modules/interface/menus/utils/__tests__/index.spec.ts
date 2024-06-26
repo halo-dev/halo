@@ -1,3 +1,4 @@
+import type { MenuItem } from "@halo-dev/api-client";
 import { describe, expect, it } from "vitest";
 import type { MenuTreeItem } from "../index";
 import {
@@ -8,7 +9,6 @@ import {
   resetMenuItemsTreePriority,
   sortMenuItemsTree,
 } from "../index";
-import type { MenuItem } from "@halo-dev/api-client";
 
 const rawMenuItems: MenuItem[] = [
   {

@@ -1,12 +1,11 @@
 // core libs
 // types
-import { computed, watch, type ComputedRef, type Ref } from "vue";
-import { ref } from "vue";
+import { computed, ref, watch, type ComputedRef, type Ref } from "vue";
 
 // libs
-import { cloneDeep } from "lodash-es";
-import type { ConfigMap, Setting, SettingForm } from "@halo-dev/api-client";
 import type { FormKitSchemaCondition, FormKitSchemaNode } from "@formkit/core";
+import type { ConfigMap, Setting, SettingForm } from "@halo-dev/api-client";
+import { cloneDeep } from "lodash-es";
 
 interface useSettingFormConvertReturn {
   formSchema: ComputedRef<

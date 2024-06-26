@@ -1,8 +1,8 @@
 <script lang="ts" setup>
 import { submitForm } from "@formkit/core";
 import { Toast, VButton } from "@halo-dev/components";
-import qs from "qs";
 import axios from "axios";
+import qs from "qs";
 
 const emit = defineEmits<{
   (event: "succeed"): void;

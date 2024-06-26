@@ -1,8 +1,8 @@
 <script lang="ts" setup>
-import { VEntityField, VSwitch } from "@halo-dev/components";
 import type { Plugin } from "@halo-dev/api-client";
-import { usePluginLifeCycle } from "../../composables/use-plugin";
+import { VEntityField, VSwitch } from "@halo-dev/components";
 import { toRefs } from "vue";
+import { usePluginLifeCycle } from "../../composables/use-plugin";
 const props = withDefaults(
   defineProps<{
     plugin: Plugin;

@@ -1,15 +1,15 @@
+import {
+  PluginStatusPhaseEnum,
+  consoleApiClient,
+  coreApiClient,
+  type Plugin,
+} from "@halo-dev/api-client";
 import type { ComputedRef, Ref } from "vue";
 import { computed } from "vue";
-import {
-  type Plugin,
-  PluginStatusPhaseEnum,
-  coreApiClient,
-  consoleApiClient,
-} from "@halo-dev/api-client";
 
 import { Dialog, Toast } from "@halo-dev/components";
-import { useI18n } from "vue-i18n";
 import { useMutation } from "@tanstack/vue-query";
+import { useI18n } from "vue-i18n";
 
 interface usePluginLifeCycleReturn {
   isStarted: ComputedRef<boolean | undefined>;

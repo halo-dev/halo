@@ -1,10 +1,10 @@
-import { coreApiClient } from "@halo-dev/api-client";
 import type { Category } from "@halo-dev/api-client";
+import { coreApiClient } from "@halo-dev/api-client";
+import { useQuery } from "@tanstack/vue-query";
 import type { Ref } from "vue";
 import { ref } from "vue";
 import type { CategoryTree } from "../utils";
 import { buildCategoriesTree } from "../utils";
-import { useQuery } from "@tanstack/vue-query";
 
 interface usePostCategoryReturn {
   categories: Ref<Category[] | undefined>;

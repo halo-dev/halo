@@ -1,8 +1,8 @@
 <script lang="ts" setup>
-import { type PropType, ref, watch } from "vue";
-import type { CommandMenuItem } from "@/types";
 import { i18n } from "@/locales";
+import type { CommandMenuItem } from "@/types";
 import scrollIntoView from "scroll-into-view-if-needed";
+import { ref, watch, type PropType } from "vue";
 
 const props = defineProps({
   items: {

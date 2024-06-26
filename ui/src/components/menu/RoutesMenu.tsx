@@ -1,10 +1,10 @@
+import { VMenu, VMenuItem, VMenuLabel } from "@halo-dev/components";
+import type { MenuGroupType, MenuItemType } from "@halo-dev/console-shared";
 import type { Component, PropType } from "vue";
 import { computed, defineComponent } from "vue";
-import type { MenuGroupType, MenuItemType } from "@halo-dev/console-shared";
-import { VMenu, VMenuItem, VMenuLabel } from "@halo-dev/components";
+import { useI18n } from "vue-i18n";
 import type { RouteLocationMatched } from "vue-router";
 import { useRoute, useRouter } from "vue-router";
-import { useI18n } from "vue-i18n";
 
 const RoutesMenu = defineComponent({
   name: "RoutesMenu",

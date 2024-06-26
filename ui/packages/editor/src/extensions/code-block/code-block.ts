@@ -1,12 +1,7 @@
-import {
-  Editor,
-  type Range,
-  type CommandProps,
-  isActive,
-  findParentNode,
-  VueNodeViewRenderer,
-  isNodeActive,
-} from "@/tiptap/vue-3";
+import MdiDeleteForeverOutline from "@/components/icon/MdiDeleteForeverOutline.vue";
+import ToolbarItem from "@/components/toolbar/ToolbarItem.vue";
+import ToolboxItem from "@/components/toolbox/ToolboxItem.vue";
+import { i18n } from "@/locales";
 import {
   EditorState,
   Plugin,
@@ -14,16 +9,21 @@ import {
   TextSelection,
   type Transaction,
 } from "@/tiptap/pm";
-import CodeBlockLowlight from "@tiptap/extension-code-block-lowlight";
-import type { CodeBlockLowlightOptions } from "@tiptap/extension-code-block-lowlight";
-import CodeBlockViewRenderer from "./CodeBlockViewRenderer.vue";
-import ToolbarItem from "@/components/toolbar/ToolbarItem.vue";
-import MdiCodeBracesBox from "~icons/mdi/code-braces-box";
-import { markRaw } from "vue";
-import { i18n } from "@/locales";
-import ToolboxItem from "@/components/toolbox/ToolboxItem.vue";
-import MdiDeleteForeverOutline from "@/components/icon/MdiDeleteForeverOutline.vue";
+import {
+  Editor,
+  VueNodeViewRenderer,
+  findParentNode,
+  isActive,
+  isNodeActive,
+  type CommandProps,
+  type Range,
+} from "@/tiptap/vue-3";
 import { deleteNode } from "@/utils";
+import type { CodeBlockLowlightOptions } from "@tiptap/extension-code-block-lowlight";
+import CodeBlockLowlight from "@tiptap/extension-code-block-lowlight";
+import { markRaw } from "vue";
+import MdiCodeBracesBox from "~icons/mdi/code-braces-box";
+import CodeBlockViewRenderer from "./CodeBlockViewRenderer.vue";
 
 export interface CustomCodeBlockLowlightOptions
   extends CodeBlockLowlightOptions {

@@ -1,21 +1,21 @@
 <script lang="ts" setup>
 // core libs
-import { onMounted, ref } from "vue";
-import { consoleApiClient } from "@halo-dev/api-client";
 import type { User } from "@halo-dev/api-client";
+import { consoleApiClient } from "@halo-dev/api-client";
+import { onMounted, ref } from "vue";
 
 // components
-import { Toast, VButton, VModal, VSpace } from "@halo-dev/components";
 import SubmitButton from "@/components/button/SubmitButton.vue";
+import { Toast, VButton, VModal, VSpace } from "@halo-dev/components";
 
 // libs
 import { cloneDeep } from "lodash-es";
 
 // hooks
 import { setFocus } from "@/formkit/utils/focus";
-import { useI18n } from "vue-i18n";
-import { useQueryClient } from "@tanstack/vue-query";
 import { useUserStore } from "@/stores/user";
+import { useQueryClient } from "@tanstack/vue-query";
+import { useI18n } from "vue-i18n";
 import EmailVerifyModal from "./EmailVerifyModal.vue";
 
 const { t } = useI18n();

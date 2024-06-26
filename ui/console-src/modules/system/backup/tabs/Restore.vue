@@ -1,4 +1,5 @@
 <script lang="ts" setup>
+import type { Backup } from "@halo-dev/api-client";
 import { consoleApiClient } from "@halo-dev/api-client";
 import {
   Dialog,
@@ -12,12 +13,10 @@ import {
 } from "@halo-dev/components";
 import { useMutation, useQuery } from "@tanstack/vue-query";
 import axios from "axios";
-import { computed } from "vue";
-import { ref } from "vue";
+import { computed, ref } from "vue";
 import { useI18n } from "vue-i18n";
-import { useBackupFetch } from "../composables/use-backup";
 import BackupListItem from "../components/BackupListItem.vue";
-import type { Backup } from "@halo-dev/api-client";
+import { useBackupFetch } from "../composables/use-backup";
 
 const { t } = useI18n();
 const { data: backups } = useBackupFetch();

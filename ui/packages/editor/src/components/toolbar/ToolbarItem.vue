@@ -1,8 +1,8 @@
 <script lang="ts" setup>
-import type { Component } from "vue";
-import { vTooltip } from "floating-vue";
-import MdiMenuDown from "~icons/mdi/menu-down";
 import type { ToolbarItem } from "@/types";
+import { vTooltip } from "floating-vue";
+import type { Component } from "vue";
+import MdiMenuDown from "~icons/mdi/menu-down";
 
 withDefaults(
   defineProps<{

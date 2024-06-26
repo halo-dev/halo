@@ -1,20 +1,20 @@
 <script lang="ts" setup>
 // core libs
-import { nextTick, ref } from "vue";
-import { coreApiClient } from "@halo-dev/api-client";
 import type { User } from "@halo-dev/api-client";
+import { coreApiClient } from "@halo-dev/api-client";
+import { nextTick, ref } from "vue";
 
 // components
-import { Toast, VButton, VModal, VSpace } from "@halo-dev/components";
 import SubmitButton from "@/components/button/SubmitButton.vue";
+import { Toast, VButton, VModal, VSpace } from "@halo-dev/components";
 
 // libs
 import { cloneDeep } from "lodash-es";
 
 // hooks
 import AnnotationsForm from "@/components/form/AnnotationsForm.vue";
-import { useI18n } from "vue-i18n";
 import { useQueryClient } from "@tanstack/vue-query";
+import { useI18n } from "vue-i18n";
 
 const { t } = useI18n();
 const queryClient = useQueryClient();

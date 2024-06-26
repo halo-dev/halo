@@ -1,13 +1,13 @@
 <script lang="ts" setup>
-import type { Node as ProseMirrorNode, Decoration } from "@/tiptap/pm";
+import { i18n } from "@/locales";
+import type { Decoration, Node as ProseMirrorNode } from "@/tiptap/pm";
 import type { Editor, Node } from "@/tiptap/vue-3";
 import { NodeViewContent, NodeViewWrapper } from "@/tiptap/vue-3";
-import lowlight from "./lowlight";
+import { useTimeout } from "@vueuse/core";
 import { computed } from "vue";
 import BxBxsCopy from "~icons/bx/bxs-copy";
 import IconCheckboxCircle from "~icons/ri/checkbox-circle-line";
-import { useTimeout } from "@vueuse/core";
-import { i18n } from "@/locales";
+import lowlight from "./lowlight";
 
 const props = defineProps<{
   editor: Editor;

@@ -2,6 +2,7 @@
 import { formatDatetime } from "@/utils/date";
 import { usePermission } from "@/utils/permission";
 import type { Category } from "@halo-dev/api-client";
+import { coreApiClient } from "@halo-dev/api-client";
 import {
   Dialog,
   IconList,
@@ -16,7 +17,6 @@ import type { PropType } from "vue";
 import { ref } from "vue";
 import { VueDraggable } from "vue-draggable-plus";
 import { useI18n } from "vue-i18n";
-import { coreApiClient } from "@halo-dev/api-client";
 import GridiconsLinkBreak from "~icons/gridicons/link-break";
 import { convertCategoryTreeToCategory, type CategoryTree } from "../utils";
 import CategoryEditingModal from "./CategoryEditingModal.vue";

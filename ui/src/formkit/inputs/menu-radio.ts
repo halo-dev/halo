@@ -1,6 +1,6 @@
-import { coreApiClient } from "@halo-dev/api-client";
 import type { FormKitNode, FormKitTypeDefinition } from "@formkit/core";
-import { radio, radios, defaultIcon } from "@formkit/inputs";
+import { defaultIcon, radio, radios } from "@formkit/inputs";
+import { coreApiClient } from "@halo-dev/api-client";
 
 function optionsHandler(node: FormKitNode) {
   node.on("created", async () => {

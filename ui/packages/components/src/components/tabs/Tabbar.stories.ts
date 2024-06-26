@@ -1,6 +1,6 @@
 import type { Meta, StoryObj } from "@storybook/vue3";
-import { VTabbar } from ".";
 import { ref } from "vue";
+import { VTabbar } from ".";
 
 const meta: Meta<typeof VTabbar> = {
   title: "Tabbar",

@@ -1,4 +1,8 @@
 <script lang="ts" setup>
+import UserFilterDropdown from "@/components/filter/UserFilterDropdown.vue";
+import { singlePageLabels } from "@/constants/labels";
+import type { ListedSinglePage, SinglePage } from "@halo-dev/api-client";
+import { consoleApiClient, coreApiClient } from "@halo-dev/api-client";
 import {
   Dialog,
   IconAddCircle,
@@ -15,17 +19,13 @@ import {
   VPagination,
   VSpace,
 } from "@halo-dev/components";
-import SinglePageSettingModal from "./components/SinglePageSettingModal.vue";
+import { useQuery } from "@tanstack/vue-query";
+import { useRouteQuery } from "@vueuse/router";
 import type { Ref } from "vue";
 import { computed, provide, ref, watch } from "vue";
-import type { ListedSinglePage, SinglePage } from "@halo-dev/api-client";
-import { consoleApiClient, coreApiClient } from "@halo-dev/api-client";
-import { singlePageLabels } from "@/constants/labels";
-import { useQuery } from "@tanstack/vue-query";
 import { useI18n } from "vue-i18n";
-import UserFilterDropdown from "@/components/filter/UserFilterDropdown.vue";
 import SinglePageListItem from "./components/SinglePageListItem.vue";
-import { useRouteQuery } from "@vueuse/router";
+import SinglePageSettingModal from "./components/SinglePageSettingModal.vue";
 
 const { t } = useI18n();
 

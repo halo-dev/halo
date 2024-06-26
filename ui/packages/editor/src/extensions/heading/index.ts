@@ -1,22 +1,22 @@
-import { mergeAttributes, type Editor, type Range } from "@/tiptap/vue-3";
-import TiptapParagraph from "@/extensions/paragraph";
-import TiptapHeading from "@tiptap/extension-heading";
-import type { HeadingOptions } from "@tiptap/extension-heading";
 import ToolbarItem from "@/components/toolbar/ToolbarItem.vue";
 import ToolbarSubItem from "@/components/toolbar/ToolbarSubItem.vue";
-import MdiFormatParagraph from "~icons/mdi/format-paragraph";
-import MdiFormatHeaderPound from "~icons/mdi/format-header-pound";
+import TiptapParagraph from "@/extensions/paragraph";
+import { i18n } from "@/locales";
+import { AttrStep, Plugin, PluginKey } from "@/tiptap";
+import { mergeAttributes, type Editor, type Range } from "@/tiptap/vue-3";
+import type { ExtensionOptions } from "@/types";
+import { generateAnchorId } from "@/utils";
+import type { HeadingOptions } from "@tiptap/extension-heading";
+import TiptapHeading from "@tiptap/extension-heading";
+import { markRaw } from "vue";
 import MdiFormatHeader1 from "~icons/mdi/format-header-1";
 import MdiFormatHeader2 from "~icons/mdi/format-header-2";
 import MdiFormatHeader3 from "~icons/mdi/format-header-3";
 import MdiFormatHeader4 from "~icons/mdi/format-header-4";
 import MdiFormatHeader5 from "~icons/mdi/format-header-5";
 import MdiFormatHeader6 from "~icons/mdi/format-header-6";
-import { markRaw } from "vue";
-import { i18n } from "@/locales";
-import type { ExtensionOptions } from "@/types";
-import { AttrStep, Plugin, PluginKey } from "@/tiptap";
-import { generateAnchorId } from "@/utils";
+import MdiFormatHeaderPound from "~icons/mdi/format-header-pound";
+import MdiFormatParagraph from "~icons/mdi/format-paragraph";
 
 const Blockquote = TiptapHeading.extend<ExtensionOptions & HeadingOptions>({
   renderHTML({ node, HTMLAttributes }) {

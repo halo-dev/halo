@@ -1,8 +1,8 @@
 <script lang="ts" setup>
 import type { SocialAuthProvider } from "@/types";
 import { useRouteQuery } from "@vueuse/router";
-import { inject, ref } from "vue";
 import type { Ref } from "vue";
+import { inject, ref } from "vue";
 
 const props = withDefaults(
   defineProps<{

@@ -1,25 +1,25 @@
 <script lang="ts" setup>
-import { consoleApiClient, coreApiClient } from "@halo-dev/api-client";
-import { VLoading } from "@halo-dev/components";
-import { useMutation } from "@tanstack/vue-query";
+import { useGlobalInfoStore } from "@/stores/global-info";
+import { useUserStore } from "@/stores/user";
 import {
+  consoleApiClient,
+  coreApiClient,
   type Category,
   type Plugin,
   type PostRequest,
   type SinglePageRequest,
   type Tag,
 } from "@halo-dev/api-client";
-import { onMounted } from "vue";
+import { VLoading } from "@halo-dev/components";
+import { useMutation } from "@tanstack/vue-query";
+import { onMounted, ref } from "vue";
+import { useRouter } from "vue-router";
 import category from "./setup-data/category.json";
-import tag from "./setup-data/tag.json";
+import menuItems from "./setup-data/menu-items.json";
+import menu from "./setup-data/menu.json";
 import post from "./setup-data/post.json";
 import singlePage from "./setup-data/singlePage.json";
-import menu from "./setup-data/menu.json";
-import menuItems from "./setup-data/menu-items.json";
-import { useRouter } from "vue-router";
-import { useGlobalInfoStore } from "@/stores/global-info";
-import { ref } from "vue";
-import { useUserStore } from "@/stores/user";
+import tag from "./setup-data/tag.json";
 
 const router = useRouter();
 const globalInfoStore = useGlobalInfoStore();

@@ -444,5 +444,5 @@ export {
   createPublicApiClient,
   createUcApiClient,
   defaultPublicApiClient as publicApiClient,
-  defaultUcApiClient as ucApiClient,
+  defaultUcApiClient as ucApiClient
 };

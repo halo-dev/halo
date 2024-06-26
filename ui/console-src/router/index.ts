@@ -1,13 +1,13 @@
+import routesConfig from "@console/router/routes.config";
 import {
   createRouter,
   createWebHistory,
   type RouteLocationNormalized,
   type RouteLocationNormalizedLoaded,
 } from "vue-router";
-import routesConfig from "@console/router/routes.config";
-import { setupPermissionGuard } from "./guards/permission";
-import { setupCheckStatesGuard } from "./guards/check-states";
 import { setupAuthCheckGuard } from "./guards/auth-check";
+import { setupCheckStatesGuard } from "./guards/check-states";
+import { setupPermissionGuard } from "./guards/permission";
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),

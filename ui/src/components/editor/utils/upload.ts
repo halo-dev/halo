@@ -1,11 +1,11 @@
 // image drag and paste upload
-import { CoreEditor } from "@halo-dev/richtext-editor";
+import { usePermission } from "@/utils/permission";
 import type { Attachment } from "@halo-dev/api-client";
+import { CoreEditor } from "@halo-dev/richtext-editor";
+import type { AxiosRequestConfig } from "axios";
+import ExtensionAudio from "../extensions/audio";
 import Image from "../extensions/image";
 import ExtensionVideo from "../extensions/video";
-import ExtensionAudio from "../extensions/audio";
-import type { AxiosRequestConfig } from "axios";
-import { usePermission } from "@/utils/permission";
 
 export interface FileProps {
   file: File;

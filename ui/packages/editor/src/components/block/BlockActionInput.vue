@@ -1,6 +1,6 @@
 <script lang="ts" setup>
-import { computed } from "vue";
 import { vTooltip } from "floating-vue";
+import { computed } from "vue";
 
 const props = withDefaults(
   defineProps<{

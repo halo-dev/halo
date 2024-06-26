@@ -1,7 +1,7 @@
 <script lang="ts" setup>
 // core libs
-import { ref } from "vue";
 import { coreApiClient } from "@halo-dev/api-client";
+import { ref } from "vue";
 
 // components
 import {

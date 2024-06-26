@@ -1,29 +1,28 @@
 <script lang="ts" setup>
-import {
-  IconEye,
-  IconEyeOff,
-  IconExternalLinkLine,
-  VSpace,
-  Dialog,
-  VStatusDot,
-  VEntity,
-  VEntityField,
-  Toast,
-  VDropdownItem,
-  VDropdownDivider,
-} from "@halo-dev/components";
-import { computed, ref } from "vue";
+import { singlePageLabels } from "@/constants/labels";
+import { formatDatetime } from "@/utils/date";
+import { usePermission } from "@/utils/permission";
 import type { ListedSinglePage, SinglePage } from "@halo-dev/api-client";
 import { coreApiClient } from "@halo-dev/api-client";
-import { formatDatetime } from "@/utils/date";
-import { RouterLink } from "vue-router";
-import { cloneDeep } from "lodash-es";
-import { usePermission } from "@/utils/permission";
-import { singlePageLabels } from "@/constants/labels";
+import {
+  Dialog,
+  IconExternalLinkLine,
+  IconEye,
+  IconEyeOff,
+  Toast,
+  VDropdownDivider,
+  VDropdownItem,
+  VEntity,
+  VEntityField,
+  VSpace,
+  VStatusDot,
+} from "@halo-dev/components";
 import { useMutation, useQueryClient } from "@tanstack/vue-query";
-import { useI18n } from "vue-i18n";
-import { inject } from "vue";
+import { cloneDeep } from "lodash-es";
 import type { Ref } from "vue";
+import { computed, inject, ref } from "vue";
+import { useI18n } from "vue-i18n";
+import { RouterLink } from "vue-router";
 import ContributorList from "../../_components/ContributorList.vue";
 
 const { currentUserHasPermission } = usePermission();

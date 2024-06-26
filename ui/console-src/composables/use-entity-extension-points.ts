@@ -1,6 +1,6 @@
 import { usePluginModuleStore } from "@/stores/plugin";
 import type { EntityFieldItem, PluginModule } from "@halo-dev/console-shared";
-import { onMounted, ref, type ComputedRef, type Ref, computed } from "vue";
+import { computed, onMounted, ref, type ComputedRef, type Ref } from "vue";
 
 export function useEntityFieldItemExtensionPoint<T>(
   extensionPointName: string,

@@ -1,17 +1,14 @@
 <script lang="ts" setup>
-import { type Ref, inject, ref } from "vue";
-import type { Plugin } from "@halo-dev/api-client";
-import { Dialog, Toast } from "@halo-dev/components";
-import type { SuccessResponse } from "@uppy/core";
-import { useI18n } from "vue-i18n";
-import { useQueryClient } from "@tanstack/vue-query";
-import { computed } from "vue";
-import type { UppyFile } from "@uppy/core";
-import type { ErrorResponse } from "@uppy/core";
-import type { PluginInstallationErrorResponse } from "../../types";
-import { PLUGIN_ALREADY_EXISTS_TYPE } from "../../constants";
-import { consoleApiClient } from "@halo-dev/api-client";
 import AppDownloadAlert from "@/components/common/AppDownloadAlert.vue";
+import type { Plugin } from "@halo-dev/api-client";
+import { consoleApiClient } from "@halo-dev/api-client";
+import { Dialog, Toast } from "@halo-dev/components";
+import { useQueryClient } from "@tanstack/vue-query";
+import type { ErrorResponse, SuccessResponse, UppyFile } from "@uppy/core";
+import { computed, inject, ref, type Ref } from "vue";
+import { useI18n } from "vue-i18n";
+import { PLUGIN_ALREADY_EXISTS_TYPE } from "../../constants";
+import type { PluginInstallationErrorResponse } from "../../types";
 
 const emit = defineEmits<{
   (event: "close-modal"): void;

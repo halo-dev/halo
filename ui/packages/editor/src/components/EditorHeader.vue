@@ -1,8 +1,8 @@
 <script lang="ts" setup>
-import { Dropdown as VDropdown, Menu as VMenu } from "floating-vue";
-import { type AnyExtension, Editor } from "@/tiptap/vue-3";
-import MdiPlusCircle from "~icons/mdi/plus-circle";
+import { Editor, type AnyExtension } from "@/tiptap/vue-3";
 import type { ToolbarItem, ToolboxItem } from "@/types";
+import { Dropdown as VDropdown, Menu as VMenu } from "floating-vue";
+import MdiPlusCircle from "~icons/mdi/plus-circle";
 
 const props = defineProps({
   editor: {

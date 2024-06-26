@@ -1,11 +1,11 @@
+import { matchMediaType } from "@/utils/media-type";
 import type { Attachment } from "@halo-dev/api-client";
-import { computed, nextTick, type Ref, ref, watch } from "vue";
 import { consoleApiClient, coreApiClient } from "@halo-dev/api-client";
 import { Dialog, Toast } from "@halo-dev/components";
 import { useQuery } from "@tanstack/vue-query";
-import { useI18n } from "vue-i18n";
 import { useClipboard } from "@vueuse/core";
-import { matchMediaType } from "@/utils/media-type";
+import { computed, nextTick, ref, watch, type Ref } from "vue";
+import { useI18n } from "vue-i18n";
 
 interface useAttachmentControlReturn {
   attachments: Ref<Attachment[] | undefined>;

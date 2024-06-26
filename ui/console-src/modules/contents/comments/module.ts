@@ -1,9 +1,9 @@
-import { definePlugin } from "@halo-dev/console-shared";
 import BasicLayout from "@console/layouts/BasicLayout.vue";
 import { IconMessage } from "@halo-dev/components";
+import { definePlugin } from "@halo-dev/console-shared";
+import { markRaw } from "vue";
 import CommentList from "./CommentList.vue";
 import CommentStatsWidget from "./widgets/CommentStatsWidget.vue";
-import { markRaw } from "vue";
 
 export default definePlugin({
   components: {

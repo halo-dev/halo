@@ -1,6 +1,7 @@
 <script lang="ts" setup>
-import type { User } from "@halo-dev/api-client";
+import { setFocus } from "@/formkit/utils/focus";
 import { useUserFetch } from "@console/modules/system/users/composables/use-user";
+import type { User } from "@halo-dev/api-client";
 import {
   IconArrowDown,
   VAvatar,
@@ -8,9 +9,8 @@ import {
   VEntity,
   VEntityField,
 } from "@halo-dev/components";
-import { setFocus } from "@/formkit/utils/focus";
-import { computed, ref, watch } from "vue";
 import Fuse from "fuse.js";
+import { computed, ref, watch } from "vue";
 
 const props = withDefaults(
   defineProps<{

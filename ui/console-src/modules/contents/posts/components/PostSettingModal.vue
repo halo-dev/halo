@@ -1,4 +1,14 @@
 <script lang="ts" setup>
+import AnnotationsForm from "@/components/form/AnnotationsForm.vue";
+import { postLabels } from "@/constants/labels";
+import { FormType } from "@/types/slug";
+import { formatDatetime, toDatetimeLocal, toISOString } from "@/utils/date";
+import { randomUUID } from "@/utils/id";
+import useSlugify from "@console/composables/use-slugify";
+import { useThemeCustomTemplates } from "@console/modules/interface/themes/composables/use-theme";
+import { submitForm } from "@formkit/core";
+import type { Post } from "@halo-dev/api-client";
+import { consoleApiClient, coreApiClient } from "@halo-dev/api-client";
 import {
   IconRefreshLine,
   Toast,
@@ -6,20 +16,10 @@ import {
   VModal,
   VSpace,
 } from "@halo-dev/components";
+import { cloneDeep } from "lodash-es";
 import { computed, nextTick, ref, watch } from "vue";
-import type { Post } from "@halo-dev/api-client";
-import { consoleApiClient, coreApiClient } from "@halo-dev/api-client";
-import { useThemeCustomTemplates } from "@console/modules/interface/themes/composables/use-theme";
-import { postLabels } from "@/constants/labels";
-import { randomUUID } from "@/utils/id";
-import { formatDatetime, toDatetimeLocal, toISOString } from "@/utils/date";
-import AnnotationsForm from "@/components/form/AnnotationsForm.vue";
-import { submitForm } from "@formkit/core";
-import useSlugify from "@console/composables/use-slugify";
 import { useI18n } from "vue-i18n";
 import { usePostUpdateMutate } from "../composables/use-post-update-mutate";
-import { FormType } from "@/types/slug";
-import { cloneDeep } from "lodash-es";
 
 const props = withDefaults(
   defineProps<{

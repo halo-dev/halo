@@ -160,4 +160,4 @@ const ExtensionRangeSelection = Extension.create({
   },
 });
 
-export { RangeSelection, ExtensionRangeSelection };
+export { ExtensionRangeSelection, RangeSelection };
