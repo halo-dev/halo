@@ -26,10 +26,12 @@ const props = withDefaults(
   defineProps<{
     category?: Category;
     parentCategory?: Category;
+    isChildLevelCategory: boolean;
   }>(),
   {
     category: undefined,
     parentCategory: undefined,
+    isChildLevelCategory: false,
   }
 );
 
@@ -265,6 +267,22 @@ const { handleGenerateSlug } = useSlugify(
               type="attachment"
               :accepts="['image/*']"
               validation="length:0,1024"
+            ></FormKit>
+            <FormKit
+              v-model="formState.spec.hideFromList"
+              :disabled="isChildLevelCategory"
+              :label="
+                $t(
+                  'core.post_category.editing_modal.fields.hide_from_list.label'
+                )
+              "
+              :help="
+                $t(
+                  'core.post_category.editing_modal.fields.hide_from_list.help'
+                )
+              "
+              type="checkbox"
+              name="hideFromList"
             ></FormKit>
             <FormKit
               v-model="formState.spec.preventParentPostCascadeQuery"

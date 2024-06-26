@@ -52,6 +52,12 @@ export interface PostStatus {
      * @type {boolean}
      * @memberof PostStatus
      */
+    'hideFromList'?: boolean;
+    /**
+     * 
+     * @type {boolean}
+     * @memberof PostStatus
+     */
     'inProgress'?: boolean;
     /**
      * 

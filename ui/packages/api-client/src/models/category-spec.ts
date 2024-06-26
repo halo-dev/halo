@@ -46,6 +46,12 @@ export interface CategorySpec {
     'displayName': string;
     /**
      * 
+     * @type {boolean}
+     * @memberof CategorySpec
+     */
+    'hideFromList'?: boolean;
+    /**
+     * 
      * @type {string}
      * @memberof CategorySpec
      */

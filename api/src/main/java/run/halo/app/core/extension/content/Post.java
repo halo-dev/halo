@@ -168,6 +168,11 @@ public class Post extends AbstractExtension {
 
         private List<String> contributors;
 
+        /**
+         * see {@link Category.CategorySpec#isHideFromList()}.
+         */
+        private Boolean hideFromList;
+
         private Instant lastModifyTime;
 
         private Long observedVersion;

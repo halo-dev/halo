@@ -406,9 +406,13 @@ core:
         post_template:
           label: 自定义文章模板
           help: 自定义当前分类下文章的渲染模版，需要主题提供支持
+        hide_from_list:
+          label: 在列表中隐藏
+          help: 开启此选项后，此分类和其下子分类，以及其下文章将不会显示在前台的列表中，需要主动访问分类归档页面，此功能仅对第一级目录生效
     list:
       fields:
         prevent_parent_post_cascade_query: 阻止父级分类在级联文章查询中包含此分类及其子分类
+        hide_from_list: 已隐藏，此分类和其下子分类，以及其下文章将不会显示在前台的列表中
   page:
     title: 页面
     actions:
