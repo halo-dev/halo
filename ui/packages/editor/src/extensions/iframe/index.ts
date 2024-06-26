@@ -32,6 +32,7 @@ import MdiDeleteForeverOutline from "@/components/icon/MdiDeleteForeverOutline.v
 import MdiShare from "~icons/mdi/share";
 import MdiLinkVariant from "~icons/mdi/link-variant";
 import MdiWebSync from "~icons/mdi/web-sync";
+import { isAllowedUri } from "@/utils/is-allowed-uri";
 
 declare module "@/tiptap" {
   interface Commands<ReturnType> {
@@ -144,11 +145,24 @@ const Iframe = Node.create<ExtensionOptions>({
     return [
       {
         tag: "iframe",
+        getAttrs: (dom) => {
+          const src = (dom as HTMLElement).getAttribute("src");
+
+          // prevent XSS attacks
+          if (!src || !isAllowedUri(src)) {
+            return false;
+          }
+          return { src };
+        },
       },
     ];
   },
 
   renderHTML({ HTMLAttributes }) {
+    // prevent XSS attacks
+    if (!isAllowedUri(HTMLAttributes.src)) {
+      return ["iframe", mergeAttributes({ ...HTMLAttributes, src: "" })];
+    }
     return ["iframe", mergeAttributes(HTMLAttributes)];
   },
 
