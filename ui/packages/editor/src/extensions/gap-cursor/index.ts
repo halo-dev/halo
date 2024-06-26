@@ -1,6 +1,13 @@
+import type {
+  Dispatch,
+  EditorState,
+  EditorView,
+  ResolvedPos,
+  Transaction,
+} from "@/tiptap";
 import {
-  callOrReturn,
   Extension,
+  callOrReturn,
   getExtensionField,
   isActive,
   type ParentConfig,
@@ -9,22 +16,15 @@ import {
   AllSelection,
   Decoration,
   DecorationSet,
-  keydownHandler,
   Plugin,
   PluginKey,
   TextSelection,
+  keydownHandler,
   type Command,
 } from "@/tiptap/pm";
-import GapCursorSelection from "./gap-cursor-selection";
-import type {
-  Dispatch,
-  EditorState,
-  EditorView,
-  ResolvedPos,
-  Transaction,
-} from "@/tiptap";
 import { deleteNodeByPos } from "@/utils";
 import { isEmpty } from "@/utils/isNodeEmpty";
+import GapCursorSelection from "./gap-cursor-selection";
 
 declare module "@tiptap/core" {
   interface NodeConfig<Options, Storage> {
