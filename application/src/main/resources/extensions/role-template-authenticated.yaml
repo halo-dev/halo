@@ -129,6 +129,9 @@ rules:
   - apiGroups: [ "api.security.halo.run" ]
     resources: [ "authentications", "authentications/totp", "authentications/settings" ]
     verbs: [ "*" ]
+  - apiGroups: [ "uc.api.security.halo.run" ]
+    resources: [ "devices" ]
+    verbs: [ "get", "list", "delete" ]
 ---
 apiVersion: v1alpha1
 kind: Role

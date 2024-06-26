@@ -51,6 +51,8 @@ import reactor.core.publisher.Mono;
 public class PersistentTokenBasedRememberMeServices extends TokenBasedRememberMeServices
     implements RememberMeServices {
 
+    public static final String REMEMBER_ME_SERIES_REQUEST_NAME = "remember-me-series";
+
     public static final int DEFAULT_SERIES_LENGTH = 16;
 
     public static final int DEFAULT_TOKEN_LENGTH = 16;
@@ -167,6 +169,7 @@ public class PersistentTokenBasedRememberMeServices extends TokenBasedRememberMe
 
     private void addCookie(PersistentRememberMeToken token, ServerWebExchange exchange) {
         setCookie(new String[] {token.getSeries(), token.getTokenValue()}, exchange);
+        exchange.getAttributes().put(REMEMBER_ME_SERIES_REQUEST_NAME, token.getSeries());
     }
 
     protected String generateSeriesData() {

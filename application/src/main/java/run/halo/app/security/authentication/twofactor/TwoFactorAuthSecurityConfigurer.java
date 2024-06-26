@@ -10,6 +10,7 @@ import run.halo.app.security.authentication.SecurityConfigurer;
 import run.halo.app.security.authentication.rememberme.RememberMeServices;
 import run.halo.app.security.authentication.twofactor.totp.TotpAuthService;
 import run.halo.app.security.authentication.twofactor.totp.TotpAuthenticationFilter;
+import run.halo.app.security.device.DeviceService;
 
 @Component
 public class TwoFactorAuthSecurityConfigurer implements SecurityConfigurer {
@@ -24,25 +25,28 @@ public class TwoFactorAuthSecurityConfigurer implements SecurityConfigurer {
 
     private final RememberMeServices rememberMeServices;
 
+    private final DeviceService deviceService;
+
     public TwoFactorAuthSecurityConfigurer(
         ServerSecurityContextRepository securityContextRepository,
         TotpAuthService totpAuthService,
         ServerResponse.Context context,
         MessageSource messageSource,
-        RememberMeServices rememberMeServices
+        RememberMeServices rememberMeServices,
+        DeviceService deviceService
     ) {
         this.securityContextRepository = securityContextRepository;
         this.totpAuthService = totpAuthService;
         this.context = context;
         this.messageSource = messageSource;
         this.rememberMeServices = rememberMeServices;
+        this.deviceService = deviceService;
     }
 
     @Override
     public void configure(ServerHttpSecurity http) {
         var filter = new TotpAuthenticationFilter(securityContextRepository, totpAuthService,
-            context, messageSource, rememberMeServices);
+            context, messageSource, rememberMeServices, deviceService);
         http.addFilterAfter(filter, SecurityWebFiltersOrder.AUTHENTICATION);
     }
-
 }

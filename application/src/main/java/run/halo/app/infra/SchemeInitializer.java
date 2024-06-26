@@ -19,6 +19,7 @@ import run.halo.app.content.Stats;
 import run.halo.app.core.extension.AnnotationSetting;
 import run.halo.app.core.extension.AuthProvider;
 import run.halo.app.core.extension.Counter;
+import run.halo.app.core.extension.Device;
 import run.halo.app.core.extension.Menu;
 import run.halo.app.core.extension.MenuItem;
 import run.halo.app.core.extension.Plugin;
@@ -445,6 +446,14 @@ public class SchemeInitializer implements ApplicationListener<ApplicationContext
                 .setName("spec.username")
                 .setIndexFunc(simpleAttribute(RememberMeToken.class,
                     token -> token.getSpec().getUsername())
+                )
+            );
+        });
+        schemeManager.register(Device.class, indexSpecs -> {
+            indexSpecs.add(new IndexSpec()
+                .setName("spec.principalName")
+                .setIndexFunc(simpleAttribute(Device.class,
+                    device -> device.getSpec().getPrincipalName())
                 )
             );
         });
