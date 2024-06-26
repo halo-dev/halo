@@ -1,9 +1,9 @@
 <script setup lang="ts">
 import { i18n } from "@/locales";
 import type { Editor } from "@/tiptap/vue-3";
+import { isAllowedUri } from "@/utils/is-allowed-uri";
 import { computed, type Component } from "vue";
 import Iframe from "./index";
-import { isAllowedUri } from "@/utils/is-allowed-uri";
 
 const props = defineProps<{
   editor: Editor;
