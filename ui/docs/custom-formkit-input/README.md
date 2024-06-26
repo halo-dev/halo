@@ -25,6 +25,17 @@
     6. downControl: 是否显示下移按钮，默认为 `true`
     7. insertControl: 是否显示插入按钮，默认为 `true`
     8. removeControl: 是否显示删除按钮，默认为 `true`
+- `list`: 动态列表，定义一个数组列表。
+  - 参数
+    1. itemType: 列表项的数据类型，用于初始化数据类型，可选参数 `string`, `number`, `boolean`, `object`，默认为 `string`
+    1. min: 最小数量，默认为 `0`
+    2. max: 最大数量，默认为 `Infinity`，即无限制。
+    3. addLabel: 添加按钮的文本，默认为 `添加`
+    4. addButton: 是否显示添加按钮，默认为 `true`
+    5. upControl: 是否显示上移按钮，默认为 `true`
+    6. downControl: 是否显示下移按钮，默认为 `true`
+    7. insertControl: 是否显示插入按钮，默认为 `true`
+    8. removeControl: 是否显示删除按钮，默认为 `true`
 - `menuCheckbox`：选择一组菜单
 - `menuRadio`：选择一个菜单
 - `menuItemSelect`：选择菜单项
@@ -69,6 +80,69 @@ const postName = ref("");
   name: menus
   label: 底部菜单组
 ```
+
+### list
+
+list 是一个数组类型的输入组件，可以让使用者可视化的操作数组。它支持动态添加、删除、上移、下移、插入数组项等操作。
+
+在 Vue SFC 中以组件形式使用：
+
+```vue
+<script lang="ts" setup>
+const users = ref([]);
+</script>
+
+<template>
+  <FormKit
+    :min="1"
+    :max="3"
+    type="list"
+    label="Users"
+    add-label="Add User"
+    item-type="string"
+  >
+    <template #default="{ index }">
+      <FormKit
+        type="text"
+        :index="index"
+        validation="required"
+      />
+    </template>
+  </FormKit>
+</template>
+```
+
+在 FormKit Schema 中使用：
+
+```yaml
+- $formkit: list
+  name: users
+  label: Users
+  addLabel: Add User
+  min: 1
+  max: 3
+  itemType: string
+  children:
+    - $formkit: text
+      index: "$index"
+      validation: required
+```
+
+> [!NOTE]
+> `list` 组件有且只有一个子节点，并且必须为子节点传递 `index` 属性。若想提供多个字段，则建议使用 `group` 组件包裹。
+
+
+最终得到的数据类似于：
+
+```json
+{
+  "users": [
+    "Jack",
+    "John"
+  ]
+}
+```
+
 
 ### Repeater
 
