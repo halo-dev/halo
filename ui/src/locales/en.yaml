@@ -193,6 +193,16 @@ core:
         description: >-
           This operation will move the posts to the recycle bin, and it can be
           restored from the recycle bin later.
+      publish_in_batch:
+        title: Publish posts
+        description: >-
+          Batch publish posts, the selected posts will be set to published
+          status
+      cancel_publish_in_batch:
+        title: Cancel publish posts
+        description: >-
+          Batch cancel publish posts, the selected posts will be set to
+          unpublished status
     filters:
       status:
         items:

@@ -1,6 +1,6 @@
 <script lang="ts" setup>
 import { useUserStore } from "@/stores/user";
-import { apiClient } from "@/utils/api-client";
+import { ucApiClient } from "@halo-dev/api-client";
 import {
   IconNotificationBadgeLine,
   VButton,
@@ -29,10 +29,11 @@ const {
 } = useQuery({
   queryKey: ["user-notifications", activeTab],
   queryFn: async () => {
-    const { data } = await apiClient.notification.listUserNotifications({
-      username: currentUser?.metadata.name as string,
-      fieldSelector: [`spec.unread=${activeTab.value === "unread"}`],
-    });
+    const { data } =
+      await ucApiClient.notification.notification.listUserNotifications({
+        username: currentUser?.metadata.name as string,
+        fieldSelector: [`spec.unread=${activeTab.value === "unread"}`],
+      });
 
     return data;
   },

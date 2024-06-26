@@ -12,7 +12,7 @@ import {
 } from "@halo-dev/components";
 import { useRoute } from "vue-router";
 import { computed, ref, watch } from "vue";
-import { apiClient } from "@/utils/api-client";
+import { coreApiClient } from "@halo-dev/api-client";
 import { pluginLabels, roleLabels } from "@/constants/labels";
 import { rbacAnnotations } from "@/constants/annotations";
 import { useRoleForm, useRoleTemplateSelection } from "@/composables/use-role";
@@ -20,7 +20,7 @@ import { SUPER_ROLE_NAME } from "@/constants/constants";
 import { useI18n } from "vue-i18n";
 import { formatDatetime } from "@/utils/date";
 import { useQuery } from "@tanstack/vue-query";
-import type { Role } from "packages/api-client/dist";
+import type { Role } from "@halo-dev/api-client";
 import { resolveDeepDependencies } from "@/utils/role";
 
 const route = useRoute();
@@ -31,7 +31,7 @@ const tabActiveId = ref("detail");
 const { data: roleTemplates } = useQuery({
   queryKey: ["role-templates"],
   queryFn: async () => {
-    const { data } = await apiClient.extension.role.listV1alpha1Role({
+    const { data } = await coreApiClient.role.listRole({
       page: 0,
       size: 0,
       labelSelector: [`${roleLabels.TEMPLATE}=true`, "!halo.run/hidden"],
@@ -64,8 +64,6 @@ const getRoleCountText = computed(() => {
     resolveDeepDependencies(formState.value, roleTemplates.value || [])
   );
 
-  console.log(dependencies);
-
   return t("core.role.common.text.contains_n_permissions", {
     count: dependencies.size || 0,
   });
@@ -84,7 +82,7 @@ watch(
 const { refetch } = useQuery<Role>({
   queryKey: ["role", route.params.name],
   queryFn: async () => {
-    const { data } = await apiClient.extension.role.getV1alpha1Role({
+    const { data } = await coreApiClient.role.getRole({
       name: route.params.name as string,
     });
     return data;

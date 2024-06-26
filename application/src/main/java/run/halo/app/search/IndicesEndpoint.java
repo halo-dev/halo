@@ -24,7 +24,7 @@ public class IndicesEndpoint implements CustomEndpoint {
 
     @Override
     public RouterFunction<ServerResponse> endpoint() {
-        final var tag = API_VERSION + "/Indices";
+        final var tag = "IndicesV1alpha1Console";
         return SpringdocRouteBuilder.route()
             .POST("indices/post", this::rebuildPostIndices,
                 builder -> builder.operationId("BuildPostIndices")

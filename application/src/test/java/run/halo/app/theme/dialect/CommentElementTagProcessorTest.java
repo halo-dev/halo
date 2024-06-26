@@ -75,7 +75,7 @@ class CommentElementTagProcessorTest {
             .thenReturn(Mono.just(commentSetting));
         when(commentSetting.getEnable()).thenReturn(true);
 
-        when(extensionGetter.getEnabledExtensionByDefinition(eq(CommentWidget.class)))
+        when(extensionGetter.getEnabledExtensions(eq(CommentWidget.class)))
             .thenReturn(Flux.empty());
         String result = templateEngine.process("commentWidget", context);
         assertThat(result).isEqualTo("""
@@ -88,7 +88,7 @@ class CommentElementTagProcessorTest {
             </html>
             """);
 
-        when(extensionGetter.getEnabledExtensionByDefinition(eq(CommentWidget.class)))
+        when(extensionGetter.getEnabledExtensions(eq(CommentWidget.class)))
             .thenReturn(Flux.just(new DefaultCommentWidget()));
         result = templateEngine.process("commentWidget", context);
         assertThat(result).isEqualTo("""

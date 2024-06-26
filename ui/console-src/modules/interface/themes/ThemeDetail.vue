@@ -1,6 +1,4 @@
 <script lang="ts" setup>
-import { apiClient } from "@/utils/api-client";
-import type { Theme } from "@halo-dev/api-client";
 import {
   Dialog,
   IconMore,
@@ -14,6 +12,9 @@ import {
   VStatusDot,
   VTag,
 } from "@halo-dev/components";
+import type { Theme } from "@halo-dev/api-client";
+
+import { consoleApiClient } from "@halo-dev/api-client";
 import type { Ref } from "vue";
 import { inject, ref } from "vue";
 import { useI18n } from "vue-i18n";
@@ -39,7 +40,7 @@ async function handleClearCache() {
         return;
       }
 
-      await apiClient.theme.invalidateCache({
+      await consoleApiClient.theme.theme.invalidateCache({
         name: selectedTheme.value?.metadata.name,
       });
 
@@ -60,7 +61,7 @@ const handleReloadTheme = async () => {
           return;
         }
 
-        await apiClient.theme.reload({
+        await consoleApiClient.theme.theme.reload({
           name: selectedTheme.value.metadata.name as string,
         });
 

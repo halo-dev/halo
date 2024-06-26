@@ -135,7 +135,11 @@ tasks.register('downloadPluginPresets', Download) {
 openApi {
     outputDir = file("$rootDir/api-docs/openapi/v3_0")
     groupedApiMappings = [
-            'http://localhost:8091/v3/api-docs/all-api': 'aggregated.json',
+            'http://localhost:8091/v3/api-docs/apis_aggregated.api_v1alpha1': 'aggregated.json',
+            'http://localhost:8091/v3/api-docs/apis_public.api_v1alpha1'    : 'apis_public.api_v1alpha1.json',
+            'http://localhost:8091/v3/api-docs/apis_console.api_v1alpha1'   : 'apis_console.api_v1alpha1.json',
+            'http://localhost:8091/v3/api-docs/apis_uc.api_v1alpha1'        : 'apis_uc.api_v1alpha1.json',
+            'http://localhost:8091/v3/api-docs/apis_extension.api_v1alpha1' : 'apis_extension.api_v1alpha1.json',
     ]
     customBootRun {
         args = ['--server.port=8091',

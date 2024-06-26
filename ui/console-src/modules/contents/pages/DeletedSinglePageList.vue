@@ -19,7 +19,7 @@ import {
 } from "@halo-dev/components";
 import { ref, watch } from "vue";
 import type { ListedSinglePage, SinglePage } from "@halo-dev/api-client";
-import { apiClient } from "@/utils/api-client";
+import { consoleApiClient, coreApiClient } from "@halo-dev/api-client";
 import { formatDatetime } from "@/utils/date";
 import { cloneDeep } from "lodash-es";
 import { usePermission } from "@/utils/permission";
@@ -46,7 +46,7 @@ const {
 } = useQuery<ListedSinglePage[]>({
   queryKey: ["deleted-singlePages", page, size, keyword],
   queryFn: async () => {
-    const { data } = await apiClient.singlePage.listSinglePages({
+    const { data } = await consoleApiClient.content.singlePage.listSinglePages({
       labelSelector: [`content.halo.run/deleted=true`],
       page: page.value,
       size: size.value,
@@ -92,11 +92,9 @@ const handleDeletePermanently = async (singlePage: SinglePage) => {
     confirmText: t("core.common.buttons.confirm"),
     cancelText: t("core.common.buttons.cancel"),
     onConfirm: async () => {
-      await apiClient.extension.singlePage.deleteContentHaloRunV1alpha1SinglePage(
-        {
-          name: singlePage.metadata.name,
-        }
-      );
+      await coreApiClient.content.singlePage.deleteSinglePage({
+        name: singlePage.metadata.name,
+      });
       await refetch();
 
       Toast.success(t("core.common.toast.delete_success"));
@@ -114,11 +112,9 @@ const handleDeletePermanentlyInBatch = async () => {
     onConfirm: async () => {
       await Promise.all(
         selectedPageNames.value.map((name) => {
-          return apiClient.extension.singlePage.deleteContentHaloRunV1alpha1SinglePage(
-            {
-              name,
-            }
-          );
+          return coreApiClient.content.singlePage.deleteSinglePage({
+            name,
+          });
         })
       );
       await refetch();
@@ -138,12 +134,10 @@ const handleRecovery = async (singlePage: SinglePage) => {
     onConfirm: async () => {
       const singlePageToUpdate = cloneDeep(singlePage);
       singlePageToUpdate.spec.deleted = false;
-      await apiClient.extension.singlePage.updateContentHaloRunV1alpha1SinglePage(
-        {
-          name: singlePageToUpdate.metadata.name,
-          singlePage: singlePageToUpdate,
-        }
-      );
+      await coreApiClient.content.singlePage.updateSinglePage({
+        name: singlePageToUpdate.metadata.name,
+        singlePage: singlePageToUpdate,
+      });
       await refetch();
 
       Toast.success(t("core.common.toast.recovery_success"));
@@ -170,18 +164,16 @@ const handleRecoveryInBatch = async () => {
             return Promise.resolve();
           }
 
-          return apiClient.extension.singlePage.updateContentHaloRunV1alpha1SinglePage(
-            {
-              name: singlePage.metadata.name,
-              singlePage: {
-                ...singlePage,
-                spec: {
-                  ...singlePage.spec,
-                  deleted: false,
-                },
+          return coreApiClient.content.singlePage.updateSinglePage({
+            name: singlePage.metadata.name,
+            singlePage: {
+              ...singlePage,
+              spec: {
+                ...singlePage.spec,
+                deleted: false,
               },
-            }
-          );
+            },
+          });
         })
       );
       await refetch();

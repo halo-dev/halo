@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import { apiClient } from "@/utils/api-client";
+import { consoleApiClient } from "@halo-dev/api-client";
 import { Dialog, Toast, VButton } from "@halo-dev/components";
 import { useQueryClient } from "@tanstack/vue-query";
 import type { Ref } from "vue";
@@ -26,7 +26,7 @@ const handleDownloadTheme = async () => {
   try {
     downloading.value = true;
 
-    await apiClient.theme.installThemeFromUri({
+    await consoleApiClient.theme.theme.installThemeFromUri({
       installFromUriRequest: {
         uri: remoteDownloadUrl.value,
       },
@@ -64,7 +64,7 @@ const handleCatchExistsException = async (
     confirmText: t("core.common.buttons.confirm"),
     cancelText: t("core.common.buttons.cancel"),
     onConfirm: async () => {
-      await apiClient.theme.upgradeThemeFromUri({
+      await consoleApiClient.theme.theme.upgradeThemeFromUri({
         name: error.themeName,
         upgradeFromUriRequest: {
           uri: remoteDownloadUrl.value,

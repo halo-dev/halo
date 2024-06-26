@@ -7,6 +7,7 @@ import static run.halo.app.extension.index.query.QueryFactory.lessThan;
 import java.time.Duration;
 import java.time.Instant;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 import run.halo.app.core.extension.RememberMeToken;
@@ -20,6 +21,7 @@ import run.halo.app.infra.ReactiveExtensionPaginatedOperator;
  * @author guqing
  * @since 2.17.0
  */
+@Slf4j
 @Component
 @RequiredArgsConstructor
 public class RememberTokenCleaner {
@@ -27,12 +29,13 @@ public class RememberTokenCleaner {
     private final RememberMeCookieResolver rememberMeCookieResolver;
 
     /**
-     * Clean up expired tokens every day at 4:00 AM.
+     * Clean up expired tokens every day at 3:00 AM.
      */
     @Scheduled(cron = "0 0 3 * * ?")
     public void cleanUpExpiredTokens() {
         paginatedOperator.deleteInitialBatch(RememberMeToken.class, getExpiredTokensListOptions())
             .then().block();
+        log.info("Expired remember me tokens have been cleaned up.");
     }
 
     ListOptions getExpiredTokensListOptions() {

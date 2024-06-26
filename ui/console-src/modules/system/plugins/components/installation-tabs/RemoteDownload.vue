@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import { apiClient } from "@/utils/api-client";
+import { consoleApiClient } from "@halo-dev/api-client";
 import { Dialog, Toast, VButton } from "@halo-dev/components";
 import type { Plugin } from "@halo-dev/api-client";
 import type { Ref } from "vue";
@@ -33,7 +33,7 @@ const handleDownloadPlugin = async () => {
   try {
     downloading.value = true;
     if (pluginToUpgrade.value) {
-      await apiClient.plugin.upgradePluginFromUri({
+      await consoleApiClient.plugin.plugin.upgradePluginFromUri({
         name: pluginToUpgrade.value.metadata.name,
         upgradeFromUriRequest: {
           uri: remoteDownloadUrl.value,
@@ -45,11 +45,12 @@ const handleDownloadPlugin = async () => {
       return;
     }
 
-    const { data: plugin } = await apiClient.plugin.installPluginFromUri({
-      installFromUriRequest: {
-        uri: remoteDownloadUrl.value,
-      },
-    });
+    const { data: plugin } =
+      await consoleApiClient.plugin.plugin.installPluginFromUri({
+        installFromUriRequest: {
+          uri: remoteDownloadUrl.value,
+        },
+      });
 
     emit("close-modal");
     queryClient.invalidateQueries({ queryKey: ["plugins"] });
@@ -80,7 +81,7 @@ const handleShowActiveModalAfterInstall = (plugin: Plugin) => {
     cancelText: t("core.common.buttons.cancel"),
     onConfirm: async () => {
       try {
-        await apiClient.plugin.changePluginRunningState({
+        await consoleApiClient.plugin.plugin.changePluginRunningState({
           name: plugin.metadata.name,
           pluginRunningStateRequest: {
             enable: true,
@@ -108,7 +109,7 @@ const handleCatchExistsException = async (
     confirmText: t("core.common.buttons.confirm"),
     cancelText: t("core.common.buttons.cancel"),
     onConfirm: async () => {
-      await apiClient.plugin.upgradePluginFromUri({
+      await consoleApiClient.plugin.plugin.upgradePluginFromUri({
         name: error.pluginName,
         upgradeFromUriRequest: {
           uri: remoteDownloadUrl.value,

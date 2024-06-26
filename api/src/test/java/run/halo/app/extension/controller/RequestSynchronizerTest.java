@@ -18,7 +18,6 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.data.domain.Sort;
 import run.halo.app.extension.ExtensionClient;
-import run.halo.app.extension.ExtensionMatcher;
 import run.halo.app.extension.FakeExtension;
 import run.halo.app.extension.GroupVersionKind;
 import run.halo.app.extension.ListOptions;
@@ -37,16 +36,13 @@ class RequestSynchronizerTest {
     @Mock
     Watcher watcher;
 
-    @Mock
-    ExtensionMatcher listMatcher;
-
     RequestSynchronizer synchronizer;
 
     @BeforeEach
     void setUp() {
         when(client.indexedQueryEngine()).thenReturn(indexedQueryEngine);
         synchronizer =
-            new RequestSynchronizer(true, client, new FakeExtension(), watcher, listMatcher);
+            new RequestSynchronizer(true, client, new FakeExtension(), watcher, new ListOptions());
         assertFalse(synchronizer.isDisposed());
         assertFalse(synchronizer.isStarted());
     }
@@ -71,7 +67,7 @@ class RequestSynchronizerTest {
     @Test
     void shouldStartCorrectlyWhenNotSyncingAllOnStart() {
         synchronizer =
-            new RequestSynchronizer(false, client, new FakeExtension(), watcher, listMatcher);
+            new RequestSynchronizer(false, client, new FakeExtension(), watcher, new ListOptions());
         assertFalse(synchronizer.isDisposed());
         assertFalse(synchronizer.isStarted());
 

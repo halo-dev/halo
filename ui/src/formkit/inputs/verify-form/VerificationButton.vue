@@ -8,7 +8,7 @@ import {
 import { createMessage, type FormKitFrameworkContext } from "@formkit/core";
 import type { PropType } from "vue";
 import { i18n } from "@/locales";
-import { axiosInstance } from "@/utils/api-client";
+import { axiosInstance } from "@halo-dev/api-client";
 import { nextTick, onMounted, ref } from "vue";
 
 const props = defineProps({

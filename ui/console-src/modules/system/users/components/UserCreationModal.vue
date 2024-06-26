@@ -1,7 +1,7 @@
 <script lang="ts" setup>
 // core libs
 import { onMounted, ref } from "vue";
-import { apiClient } from "@/utils/api-client";
+import { consoleApiClient } from "@halo-dev/api-client";
 import type { CreateUserRequest } from "@halo-dev/api-client";
 
 // components
@@ -28,7 +28,6 @@ const formState = ref<CreateUserRequest>({
   email: "",
   name: "",
   password: "",
-  phone: "",
   roles: [],
 });
 const selectedRole = ref("");
@@ -46,7 +45,7 @@ const handleCreateUser = async () => {
       formState.value.roles = [selectedRole.value];
     }
 
-    await apiClient.user.createUser({
+    await consoleApiClient.user.createUser({
       createUserRequest: formState.value,
     });
 
@@ -107,13 +106,6 @@ const handleCreateUser = async () => {
         type="email"
         name="email"
         validation="required|email|length:0,100"
-      ></FormKit>
-      <FormKit
-        v-model="formState.phone"
-        :label="$t('core.user.editing_modal.fields.phone.label')"
-        type="text"
-        name="phone"
-        validation="length:0,20"
       ></FormKit>
       <FormKit
         v-model="formState.password"

@@ -1,7 +1,7 @@
 <script lang="ts" setup>
 // core libs
 import { onMounted, ref } from "vue";
-import { apiClient } from "@/utils/api-client";
+import { consoleApiClient } from "@halo-dev/api-client";
 import type { User } from "@halo-dev/api-client";
 
 // components
@@ -32,7 +32,6 @@ const formState = ref<User>(
     spec: {
       displayName: "",
       email: "",
-      phone: "",
       password: "",
       bio: "",
       disabled: false,
@@ -55,7 +54,7 @@ const handleUpdateUser = async () => {
   try {
     isSubmitting.value = true;
 
-    await apiClient.user.updateCurrentUser({
+    await consoleApiClient.user.updateCurrentUser({
       user: formState.value,
     });
 
@@ -140,13 +139,6 @@ async function onEmailVerifyModalClose() {
                 </VButton>
               </template>
             </FormKit>
-            <FormKit
-              v-model="formState.spec.phone"
-              :label="$t('core.uc_profile.editing_modal.fields.phone.label')"
-              type="text"
-              name="phone"
-              validation="length:0,20"
-            ></FormKit>
             <FormKit
               v-model="formState.spec.bio"
               :label="$t('core.uc_profile.editing_modal.fields.bio.label')"

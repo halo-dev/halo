@@ -9,7 +9,7 @@ import { cloneDeep } from "lodash-es";
 import { setFocus } from "@/formkit/utils/focus";
 import { pluginLabels, roleLabels } from "@/constants/labels";
 import { useI18n } from "vue-i18n";
-import { apiClient } from "@/utils/api-client";
+import { coreApiClient } from "@halo-dev/api-client";
 import { useQuery } from "@tanstack/vue-query";
 
 const { t } = useI18n();
@@ -32,7 +32,7 @@ const modal = ref<InstanceType<typeof VModal> | null>(null);
 const { data: roleTemplates } = useQuery({
   queryKey: ["role-templates"],
   queryFn: async () => {
-    const { data } = await apiClient.extension.role.listV1alpha1Role({
+    const { data } = await coreApiClient.role.listRole({
       page: 0,
       size: 0,
       labelSelector: [`${roleLabels.TEMPLATE}=true`, "!halo.run/hidden"],

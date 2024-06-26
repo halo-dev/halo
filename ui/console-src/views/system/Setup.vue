@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import { apiClient } from "@/utils/api-client";
+import { consoleApiClient } from "@halo-dev/api-client";
 import { Toast, VButton } from "@halo-dev/components";
 import { ref } from "vue";
 import { useRouter } from "vue-router";
@@ -23,7 +23,7 @@ const formState = ref<SystemInitializationRequest>({
 const handleSubmit = async () => {
   loading.value = true;
 
-  await apiClient.system.initialize({
+  await consoleApiClient.system.initialize({
     systemInitializationRequest: formState.value,
   });
 

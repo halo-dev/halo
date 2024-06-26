@@ -100,6 +100,9 @@ const getRenderContainer = (node: HTMLElement) => {
 export default CodeBlockLowlight.extend<
   CustomCodeBlockLowlightOptions & CodeBlockLowlightOptions
 >({
+  // It needs to have a higher priority than range-selection,
+  // otherwise the Mod-a shortcut key will be overridden.
+  priority: 110,
   addCommands() {
     return {
       ...this.parent?.(),

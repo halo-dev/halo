@@ -1,7 +1,7 @@
 <script lang="ts" setup>
 // core libs
 import { nextTick, ref } from "vue";
-import { apiClient } from "@/utils/api-client";
+import { coreApiClient } from "@halo-dev/api-client";
 import type { User } from "@halo-dev/api-client";
 
 // components
@@ -54,7 +54,7 @@ const handleUpdateUser = async () => {
   try {
     isSubmitting.value = true;
 
-    await apiClient.extension.user.updateV1alpha1User({
+    await coreApiClient.user.updateUser({
       name: formState.value.metadata.name,
       user: formState.value,
     });
@@ -118,13 +118,6 @@ const handleUpdateUser = async () => {
               type="email"
               name="email"
               validation="required|email|length:0,100"
-            ></FormKit>
-            <FormKit
-              v-model="formState.spec.phone"
-              :label="$t('core.user.editing_modal.fields.phone.label')"
-              type="text"
-              name="phone"
-              validation="length:0,20"
             ></FormKit>
             <FormKit
               v-model="formState.spec.bio"

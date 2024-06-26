@@ -8,7 +8,7 @@ import {
 } from "@halo-dev/components";
 import type { Ref } from "vue";
 import { computed, inject } from "vue";
-import { apiClient } from "@/utils/api-client";
+import { coreApiClient } from "@halo-dev/api-client";
 import {
   PluginStatusPhaseEnum,
   type Plugin,
@@ -33,7 +33,7 @@ interface RoleTemplateGroup {
 const { data: pluginRoleTemplates } = useQuery({
   queryKey: ["plugin-roles", plugin?.value?.metadata.name],
   queryFn: async () => {
-    const { data } = await apiClient.extension.role.listV1alpha1Role({
+    const { data } = await coreApiClient.role.listRole({
       page: 0,
       size: 0,
       labelSelector: [

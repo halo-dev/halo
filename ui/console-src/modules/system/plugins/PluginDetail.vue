@@ -1,6 +1,6 @@
 <script lang="ts" setup>
 // core libs
-import { apiClient } from "@/utils/api-client";
+import { consoleApiClient, coreApiClient } from "@halo-dev/api-client";
 import { computed, provide, ref } from "vue";
 import { useRoute } from "vue-router";
 
@@ -44,10 +44,9 @@ provide<Ref<string>>("activeTab", activeTab);
 const { data: plugin } = useQuery({
   queryKey: ["plugin", route.params.name],
   queryFn: async () => {
-    const { data } =
-      await apiClient.extension.plugin.getPluginHaloRunV1alpha1Plugin({
-        name: route.params.name as string,
-      });
+    const { data } = await coreApiClient.plugin.plugin.getPlugin({
+      name: route.params.name as string,
+    });
     return data;
   },
   async onSuccess(data) {
@@ -65,7 +64,7 @@ provide<Ref<Plugin | undefined>>("plugin", plugin);
 const { data: setting } = useQuery({
   queryKey: ["plugin-setting", plugin],
   queryFn: async () => {
-    const { data } = await apiClient.plugin.fetchPluginSetting({
+    const { data } = await consoleApiClient.plugin.plugin.fetchPluginSetting({
       name: plugin.value?.metadata.name as string,
     });
     return data;

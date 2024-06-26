@@ -31,7 +31,7 @@ public class ReplyEndpoint implements CustomEndpoint {
 
     @Override
     public RouterFunction<ServerResponse> endpoint() {
-        final var tag = "api.console.halo.run/v1alpha1/Reply";
+        var tag = "ReplyV1alpha1Console";
         return SpringdocRouteBuilder.route()
             .GET("replies", this::listReplies, builder -> {
                     builder.operationId("ListReplies")
