@@ -203,6 +203,8 @@ core:
         description: >-
           Batch cancel publish posts, the selected posts will be set to
           unpublished status
+      batch_setting:
+        button: Batch settings
     filters:
       status:
         items:
@@ -285,6 +287,25 @@ core:
             create_time_asc: Earliest Created
             display_name_desc: Descending order by tag name
             display_name_asc: Ascending order by tag name
+    batch_setting_modal:
+      title: Post batch settings
+      fields:
+        common:
+          enabled: Enabled
+          op:
+            label: Operate
+            options:
+              add: Add
+              replace: Replace
+              remove_all: Remove all
+        category_group: Category
+        category_names: Select categories
+        tag_group: Tag
+        tag_names: Select tags
+        visible_group: Visible
+        visible_value: "Select visible option "
+        allow_comment_group: " Allow comment"
+        allow_comment_value: Choose whether to allow comments
   deleted_post:
     title: Deleted Posts
     empty:

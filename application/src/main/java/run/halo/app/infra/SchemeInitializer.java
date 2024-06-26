@@ -22,6 +22,7 @@ import run.halo.app.core.extension.Counter;
 import run.halo.app.core.extension.Menu;
 import run.halo.app.core.extension.MenuItem;
 import run.halo.app.core.extension.Plugin;
+import run.halo.app.core.extension.RememberMeToken;
 import run.halo.app.core.extension.ReverseProxy;
 import run.halo.app.core.extension.Role;
 import run.halo.app.core.extension.RoleBinding;
@@ -438,6 +439,21 @@ public class SchemeInitializer implements ApplicationListener<ApplicationContext
 
         // security.halo.run
         schemeManager.register(PersonalAccessToken.class);
+        schemeManager.register(RememberMeToken.class, indexSpecs -> {
+            indexSpecs.add(new IndexSpec()
+                .setName("spec.series")
+                .setUnique(true)
+                .setIndexFunc(simpleAttribute(RememberMeToken.class,
+                    token -> token.getSpec().getSeries())
+                )
+            );
+            indexSpecs.add(new IndexSpec()
+                .setName("spec.username")
+                .setIndexFunc(simpleAttribute(RememberMeToken.class,
+                    token -> token.getSpec().getUsername())
+                )
+            );
+        });
 
         // migration.halo.run
         schemeManager.register(Backup.class);

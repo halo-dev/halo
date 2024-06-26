@@ -28,6 +28,7 @@ import UserFilterDropdown from "@/components/filter/UserFilterDropdown.vue";
 import CategoryFilterDropdown from "@/components/filter/CategoryFilterDropdown.vue";
 import TagFilterDropdown from "@/components/filter/TagFilterDropdown.vue";
 import PostListItem from "./components/PostListItem.vue";
+import PostBatchSettingModal from "./components/PostBatchSettingModal.vue";
 
 const { t } = useI18n();
 
@@ -320,6 +321,23 @@ const handleCancelPublishInBatch = async () => {
   });
 };
 
+// Batch settings
+const batchSettingModalVisible = ref(false);
+const batchSettingPosts = ref<ListedPost[]>([]);
+
+function handleOpenBatchSettingModal() {
+  batchSettingPosts.value = selectedPostNames.value.map((name) => {
+    return posts.value?.find((post) => post.post.metadata.name === name);
+  }) as ListedPost[];
+
+  batchSettingModalVisible.value = true;
+}
+
+function onBatchSettingModalClose() {
+  batchSettingModalVisible.value = false;
+  batchSettingPosts.value = [];
+}
+
 watch(
   () => selectedPostNames.value,
   (newValue) => {
@@ -342,6 +360,11 @@ watch(
       </span>
     </template>
   </PostSettingModal>
+  <PostBatchSettingModal
+    v-if="batchSettingModalVisible"
+    :posts="batchSettingPosts"
+    @close="onBatchSettingModalClose"
+  />
   <VPageHeader :title="$t('core.post.title')">
     <template #icon>
       <IconBookRead class="mr-2 self-center" />
@@ -397,6 +420,9 @@ watch(
                 </VButton>
                 <VButton @click="handleCancelPublishInBatch">
                   {{ $t("core.common.buttons.cancel_publish") }}
+                </VButton>
+                <VButton @click="handleOpenBatchSettingModal">
+                  {{ $t("core.post.operations.batch_setting.button") }}
                 </VButton>
                 <VButton type="danger" @click="handleDeleteInBatch">
                   {{ $t("core.common.buttons.delete") }}
