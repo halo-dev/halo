@@ -1,7 +1,7 @@
 <script lang="ts" setup>
 import type { Notification } from "@halo-dev/api-client";
-import { computed } from "vue";
 import { OverlayScrollbarsComponent } from "overlayscrollbars-vue";
+import { computed } from "vue";
 
 const props = withDefaults(
   defineProps<{

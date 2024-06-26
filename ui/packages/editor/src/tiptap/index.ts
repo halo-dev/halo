@@ -1,25 +1,25 @@
-export * from "./vue-3";
 export * from "./core";
+export { Editor as CoreEditor } from "./core";
 export * from "./pm";
 export {
+  InputRule as PMInputRule,
+  Mark as PMMark,
+  Node as PMNode,
+  textblockTypeInputRule as pmTextblockTypeInputRule,
+  wrappingInputRule as pmWrappingInputRule,
+  type Command as PMCommand,
+  type NodeRange as PMNodeRange,
+  type NodeView as PMNodeView,
+} from "./pm";
+export * from "./vue-3";
+export {
   Editor,
-  type Command,
   InputRule,
   Mark,
-  type NodeRange,
   Node,
   NodeView,
   textblockTypeInputRule,
   wrappingInputRule,
+  type Command,
+  type NodeRange,
 } from "./vue-3";
-export { Editor as CoreEditor } from "./core";
-export {
-  type Command as PMCommand,
-  InputRule as PMInputRule,
-  Mark as PMMark,
-  type NodeRange as PMNodeRange,
-  Node as PMNode,
-  type NodeView as PMNodeView,
-  textblockTypeInputRule as pmTextblockTypeInputRule,
-  wrappingInputRule as pmWrappingInputRule,
-} from "./pm";

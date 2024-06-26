@@ -1,9 +1,9 @@
 <script lang="ts" setup>
-import { computed, onMounted, onUnmounted, ref, watch } from "vue";
-import type { ArrowShow, Direction, Type } from "./interface";
-import type { ComputedRef } from "vue";
 import { useElementSize, useThrottleFn } from "@vueuse/core";
+import type { ComputedRef } from "vue";
+import { computed, onMounted, onUnmounted, ref, watch } from "vue";
 import { IconArrowLeft, IconArrowRight } from "../../icons/icons";
+import type { ArrowShow, Direction, Type } from "./interface";
 
 const props = withDefaults(
   defineProps<{

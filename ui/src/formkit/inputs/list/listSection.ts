@@ -1,9 +1,9 @@
 import {
   isComponent,
   isDOM,
-  type FormKitSchemaNode,
   type FormKitExtendableSchemaRoot,
   type FormKitSchemaCondition,
+  type FormKitSchemaNode,
   type FormKitSectionsSchema,
 } from "@formkit/core";
 import {

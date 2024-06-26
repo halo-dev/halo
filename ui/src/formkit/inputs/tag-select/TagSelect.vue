@@ -1,20 +1,20 @@
 <script lang="ts" setup>
-import { coreApiClient } from "@halo-dev/api-client";
+import HasPermission from "@/components/permission/HasPermission.vue";
+import { usePermission } from "@/utils/permission";
+import PostTag from "@console/modules/contents/posts/tags/components/PostTag.vue";
+import { usePostTag } from "@console/modules/contents/posts/tags/composables/use-post-tag";
 import type { FormKitFrameworkContext } from "@formkit/core";
 import type { Tag } from "@halo-dev/api-client";
-import { computed, ref, watch, type PropType } from "vue";
-import PostTag from "@console/modules/contents/posts/tags/components/PostTag.vue";
+import { coreApiClient } from "@halo-dev/api-client";
 import {
-  IconCheckboxCircle,
   IconArrowRight,
+  IconCheckboxCircle,
   IconClose,
 } from "@halo-dev/components";
 import { onClickOutside } from "@vueuse/core";
 import Fuse from "fuse.js";
-import { usePermission } from "@/utils/permission";
 import { slugify } from "transliteration";
-import { usePostTag } from "@console/modules/contents/posts/tags/composables/use-post-tag";
-import HasPermission from "@/components/permission/HasPermission.vue";
+import { computed, ref, watch, type PropType } from "vue";
 
 const { currentUserHasPermission } = usePermission();
 

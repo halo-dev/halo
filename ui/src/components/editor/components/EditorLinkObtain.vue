@@ -1,16 +1,15 @@
 <script setup lang="ts">
-import { VButton, VSpace, VDropdown } from "@halo-dev/components";
+import HasPermission from "@/components/permission/HasPermission.vue";
+import { i18n } from "@/locales";
+import type { Attachment } from "@halo-dev/api-client";
+import { VButton, VDropdown, VSpace } from "@halo-dev/components";
+import type { AttachmentLike } from "@halo-dev/console-shared";
 import type { CoreEditor } from "@halo-dev/richtext-editor";
 import { useFileDialog } from "@vueuse/core";
-import type { AttachmentLike } from "@halo-dev/console-shared";
-import { getAttachmentUrl, type AttachmentAttr } from "../utils/attachment";
-import { i18n } from "@/locales";
-import { onUnmounted, ref } from "vue";
-import { watch } from "vue";
-import { uploadFile } from "../utils/upload";
-import type { Attachment } from "@halo-dev/api-client";
 import type { AxiosRequestConfig } from "axios";
-import HasPermission from "@/components/permission/HasPermission.vue";
+import { onUnmounted, ref, watch } from "vue";
+import { getAttachmentUrl, type AttachmentAttr } from "../utils/attachment";
+import { uploadFile } from "../utils/upload";
 
 const props = withDefaults(
   defineProps<{

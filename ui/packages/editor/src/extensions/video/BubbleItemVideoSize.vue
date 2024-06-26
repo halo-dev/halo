@@ -1,9 +1,9 @@
 <script lang="ts" setup>
 import { BlockActionInput } from "@/components";
+import { i18n } from "@/locales";
 import type { Editor } from "@/tiptap/vue-3";
 import { computed, type Component } from "vue";
 import Video from "./index";
-import { i18n } from "@/locales";
 const props = defineProps<{
   editor: Editor;
   isActive?: ({ editor }: { editor: Editor }) => boolean;

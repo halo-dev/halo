@@ -2,8 +2,8 @@
 import UserAvatar from "@/components/user-avatar/UserAvatar.vue";
 import { usePluginModuleStore } from "@/stores/plugin";
 import { useUserStore } from "@/stores/user";
-import { consoleApiClient } from "@halo-dev/api-client";
 import { usePermission } from "@/utils/permission";
+import { consoleApiClient } from "@halo-dev/api-client";
 import {
   VButton,
   VDropdown,

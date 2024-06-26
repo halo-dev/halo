@@ -43,7 +43,7 @@
   </Story>
 </template>
 <script lang="ts" setup>
-import { VTag } from "../../components/tag";
 import { VSpace } from "../../components/space";
+import { VTag } from "../../components/tag";
 import { IconSettings } from "../../icons/icons";
 </script>

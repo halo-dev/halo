@@ -1,4 +1,21 @@
 <script lang="ts" setup>
+import EditorProviderSelector from "@/components/dropdown-selector/EditorProviderSelector.vue";
+import UrlPreviewModal from "@/components/preview/UrlPreviewModal.vue";
+import { useAutoSaveContent } from "@/composables/use-auto-save-content";
+import { useContentCache } from "@/composables/use-content-cache";
+import { useEditorExtensionPoints } from "@/composables/use-editor-extension-points";
+import { useSessionKeepAlive } from "@/composables/use-session-keep-alive";
+import { contentAnnotations } from "@/constants/annotations";
+import { randomUUID } from "@/utils/id";
+import { usePermission } from "@/utils/permission";
+import { useContentSnapshot } from "@console/composables/use-content-snapshot";
+import { useSaveKeybinding } from "@console/composables/use-save-keybinding";
+import type { SinglePage, SinglePageRequest } from "@halo-dev/api-client";
+import {
+  consoleApiClient,
+  coreApiClient,
+  ucApiClient,
+} from "@halo-dev/api-client";
 import {
   Dialog,
   IconEye,
@@ -12,41 +29,24 @@ import {
   VPageHeader,
   VSpace,
 } from "@halo-dev/components";
-import SinglePageSettingModal from "./components/SinglePageSettingModal.vue";
-import type { SinglePage, SinglePageRequest } from "@halo-dev/api-client";
+import type { EditorProvider } from "@halo-dev/console-shared";
+import { useLocalStorage } from "@vueuse/core";
+import { useRouteQuery } from "@vueuse/router";
+import type { AxiosRequestConfig } from "axios";
 import {
   computed,
-  type ComputedRef,
   nextTick,
   onMounted,
   provide,
   ref,
   toRef,
   watch,
+  type ComputedRef,
 } from "vue";
-import {
-  consoleApiClient,
-  coreApiClient,
-  ucApiClient,
-} from "@halo-dev/api-client";
-import { useRouteQuery } from "@vueuse/router";
-import { useRouter } from "vue-router";
-import { randomUUID } from "@/utils/id";
-import { useContentCache } from "@/composables/use-content-cache";
-import { useEditorExtensionPoints } from "@/composables/use-editor-extension-points";
-import type { EditorProvider } from "@halo-dev/console-shared";
-import { useLocalStorage } from "@vueuse/core";
-import EditorProviderSelector from "@/components/dropdown-selector/EditorProviderSelector.vue";
 import { useI18n } from "vue-i18n";
-import UrlPreviewModal from "@/components/preview/UrlPreviewModal.vue";
-import { contentAnnotations } from "@/constants/annotations";
+import { useRouter } from "vue-router";
+import SinglePageSettingModal from "./components/SinglePageSettingModal.vue";
 import { usePageUpdateMutate } from "./composables/use-page-update-mutate";
-import { useAutoSaveContent } from "@/composables/use-auto-save-content";
-import { useContentSnapshot } from "@console/composables/use-content-snapshot";
-import { useSaveKeybinding } from "@console/composables/use-save-keybinding";
-import { useSessionKeepAlive } from "@/composables/use-session-keep-alive";
-import { usePermission } from "@/utils/permission";
-import type { AxiosRequestConfig } from "axios";
 
 const router = useRouter();
 const { t } = useI18n();

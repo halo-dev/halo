@@ -1,6 +1,6 @@
 <script lang="ts" setup>
-import { IconMore } from "../../icons/icons";
 import { computed } from "vue";
+import { IconMore } from "../../icons/icons";
 import { VDropdown } from "../dropdown";
 
 const props = withDefaults(

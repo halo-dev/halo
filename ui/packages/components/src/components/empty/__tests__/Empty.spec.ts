@@ -1,8 +1,8 @@
-import { describe, expect, it } from "vitest";
 import { mount } from "@vue/test-utils";
-import { VEmpty } from "../index";
-import { VButton } from "../../button";
+import { describe, expect, it } from "vitest";
 import { h } from "vue";
+import { VButton } from "../../button";
+import { VEmpty } from "../index";
 
 describe("Empty", () => {
   it("should render", () => {

@@ -1,7 +1,6 @@
-import { useWindowFocus } from "@vueuse/core";
+import { useTimeoutFn, useWindowFocus } from "@vueuse/core";
 import { watch, type Ref } from "vue";
 import { onBeforeRouteLeave } from "vue-router";
-import { useTimeoutFn } from "@vueuse/core";
 import type { ContentCache } from "./use-content-cache";
 
 export function useAutoSaveContent(

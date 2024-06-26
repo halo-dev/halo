@@ -1,7 +1,7 @@
 <script lang="ts" setup>
-import { consoleApiClient, coreApiClient } from "@halo-dev/api-client";
 import { formatDatetime } from "@/utils/date";
 import type { Policy, PolicyTemplate } from "@halo-dev/api-client";
+import { consoleApiClient, coreApiClient } from "@halo-dev/api-client";
 import {
   Dialog,
   IconAddCircle,

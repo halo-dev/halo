@@ -1,14 +1,14 @@
 <script lang="ts" setup>
-import { computed, onBeforeMount, onMounted } from "vue";
-import router from "@console/router";
-import { useUserStore } from "@/stores/user";
 import LoginForm from "@/components/login/LoginForm.vue";
-import { useRoute } from "vue-router";
+import SignupForm from "@/components/signup/SignupForm.vue";
+import { useUserStore } from "@/stores/user";
+import { useGlobalInfoFetch } from "@console/composables/use-global-info";
+import router from "@console/router";
 import { Toast } from "@halo-dev/components";
 import { useRouteQuery } from "@vueuse/router";
-import SignupForm from "@/components/signup/SignupForm.vue";
-import { useGlobalInfoFetch } from "@console/composables/use-global-info";
+import { computed, onBeforeMount, onMounted } from "vue";
 import { useI18n } from "vue-i18n";
+import { useRoute } from "vue-router";
 
 const userStore = useUserStore();
 const route = useRoute();

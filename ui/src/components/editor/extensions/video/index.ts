@@ -1,6 +1,6 @@
+import type { Attachment } from "@halo-dev/api-client";
 import { ExtensionVideo, VueNodeViewRenderer } from "@halo-dev/richtext-editor";
 import type { AxiosRequestConfig } from "axios";
-import type { Attachment } from "@halo-dev/api-client";
 import VideoView from "./VideoView.vue";
 
 interface UiVideoOptions {

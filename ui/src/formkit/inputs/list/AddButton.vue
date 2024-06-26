@@ -1,6 +1,6 @@
 <script lang="ts" setup>
-import { VButton, IconAddCircle } from "@halo-dev/components";
 import type { FormKitFrameworkContext } from "@formkit/core";
+import { IconAddCircle, VButton } from "@halo-dev/components";
 import type { PropType } from "vue";
 
 const props = defineProps({

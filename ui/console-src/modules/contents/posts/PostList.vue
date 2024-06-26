@@ -1,4 +1,10 @@
 <script lang="ts" setup>
+import CategoryFilterDropdown from "@/components/filter/CategoryFilterDropdown.vue";
+import TagFilterDropdown from "@/components/filter/TagFilterDropdown.vue";
+import UserFilterDropdown from "@/components/filter/UserFilterDropdown.vue";
+import { postLabels } from "@/constants/labels";
+import type { ListedPost, Post } from "@halo-dev/api-client";
+import { consoleApiClient, coreApiClient } from "@halo-dev/api-client";
 import {
   Dialog,
   IconAddCircle,
@@ -15,20 +21,14 @@ import {
   VPagination,
   VSpace,
 } from "@halo-dev/components";
-import PostSettingModal from "./components/PostSettingModal.vue";
+import { useQuery } from "@tanstack/vue-query";
+import { useRouteQuery } from "@vueuse/router";
 import type { Ref } from "vue";
 import { computed, provide, ref, watch } from "vue";
-import type { ListedPost, Post } from "@halo-dev/api-client";
-import { consoleApiClient, coreApiClient } from "@halo-dev/api-client";
-import { postLabels } from "@/constants/labels";
-import { useQuery } from "@tanstack/vue-query";
 import { useI18n } from "vue-i18n";
-import { useRouteQuery } from "@vueuse/router";
-import UserFilterDropdown from "@/components/filter/UserFilterDropdown.vue";
-import CategoryFilterDropdown from "@/components/filter/CategoryFilterDropdown.vue";
-import TagFilterDropdown from "@/components/filter/TagFilterDropdown.vue";
-import PostListItem from "./components/PostListItem.vue";
 import PostBatchSettingModal from "./components/PostBatchSettingModal.vue";
+import PostListItem from "./components/PostListItem.vue";
+import PostSettingModal from "./components/PostSettingModal.vue";
 
 const { t } = useI18n();
 

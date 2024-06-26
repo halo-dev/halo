@@ -1,11 +1,11 @@
-import type { Editor } from "@/tiptap/vue-3";
-import TiptapSuperscript from "@tiptap/extension-superscript";
-import type { SuperscriptExtensionOptions } from "@tiptap/extension-superscript";
 import ToolbarItem from "@/components/toolbar/ToolbarItem.vue";
-import MdiFormatSuperscript from "~icons/mdi/format-superscript";
-import { markRaw } from "vue";
 import { i18n } from "@/locales";
+import type { Editor } from "@/tiptap/vue-3";
 import type { ExtensionOptions } from "@/types";
+import type { SuperscriptExtensionOptions } from "@tiptap/extension-superscript";
+import TiptapSuperscript from "@tiptap/extension-superscript";
+import { markRaw } from "vue";
+import MdiFormatSuperscript from "~icons/mdi/format-superscript";
 
 const Superscript = TiptapSuperscript.extend<
   ExtensionOptions & SuperscriptExtensionOptions

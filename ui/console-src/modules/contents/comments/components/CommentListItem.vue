@@ -1,6 +1,5 @@
 <script lang="ts" setup>
 import { usePluginModuleStore } from "@/stores/plugin";
-import { consoleApiClient, coreApiClient } from "@halo-dev/api-client";
 import { formatDatetime } from "@/utils/date";
 import { usePermission } from "@/utils/permission";
 import type {
@@ -10,6 +9,7 @@ import type {
   Post,
   SinglePage,
 } from "@halo-dev/api-client";
+import { consoleApiClient, coreApiClient } from "@halo-dev/api-client";
 import {
   Dialog,
   IconAddCircle,

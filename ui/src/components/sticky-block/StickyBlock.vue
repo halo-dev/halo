@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { useEventListener } from "@vueuse/core";
-import { ref, onMounted } from "vue";
+import { onMounted, ref } from "vue";
 
 const props = withDefaults(
   defineProps<{

@@ -1,4 +1,7 @@
 <script setup lang="ts">
+import SnapshotContent from "@console/modules/contents/posts/components/SnapshotContent.vue";
+import SnapshotListItem from "@console/modules/contents/posts/components/SnapshotListItem.vue";
+import { consoleApiClient, coreApiClient } from "@halo-dev/api-client";
 import {
   Dialog,
   IconHistoryLine,
@@ -10,14 +13,11 @@ import {
   VSpace,
 } from "@halo-dev/components";
 import { useQuery, useQueryClient } from "@tanstack/vue-query";
-import { useRoute } from "vue-router";
-import { consoleApiClient, coreApiClient } from "@halo-dev/api-client";
-import { computed, watch } from "vue";
-import { OverlayScrollbarsComponent } from "overlayscrollbars-vue";
 import { useRouteQuery } from "@vueuse/router";
-import SnapshotContent from "@console/modules/contents/posts/components/SnapshotContent.vue";
-import SnapshotListItem from "@console/modules/contents/posts/components/SnapshotListItem.vue";
+import { OverlayScrollbarsComponent } from "overlayscrollbars-vue";
+import { computed, watch } from "vue";
 import { useI18n } from "vue-i18n";
+import { useRoute } from "vue-router";
 
 const { t } = useI18n();
 const route = useRoute();

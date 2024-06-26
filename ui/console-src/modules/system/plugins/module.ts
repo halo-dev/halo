@@ -1,9 +1,9 @@
-import { definePlugin } from "@halo-dev/console-shared";
 import BasicLayout from "@console/layouts/BasicLayout.vue";
-import PluginList from "./PluginList.vue";
-import PluginDetail from "./PluginDetail.vue";
 import { IconPlug } from "@halo-dev/components";
+import { definePlugin } from "@halo-dev/console-shared";
 import { markRaw } from "vue";
+import PluginDetail from "./PluginDetail.vue";
+import PluginList from "./PluginList.vue";
 
 export default definePlugin({
   components: {},
