@@ -13,18 +13,33 @@
  */
 
 
+// May contain unused imports in some cases
+// @ts-ignore
+import { Device } from './device';
 
 /**
- * The subscriber to be notified
+ * 
  * @export
- * @interface SubscriptionSubscriber
+ * @interface UserDevice
  */
-export interface SubscriptionSubscriber {
+export interface UserDevice {
     /**
      * 
-     * @type {string}
-     * @memberof SubscriptionSubscriber
+     * @type {boolean}
+     * @memberof UserDevice
      */
-    'name': string;
+    'active': boolean;
+    /**
+     * 
+     * @type {boolean}
+     * @memberof UserDevice
+     */
+    'currentDevice': boolean;
+    /**
+     * 
+     * @type {Device}
+     * @memberof UserDevice
+     */
+    'device': Device;
 }
 

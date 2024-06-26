@@ -25,6 +25,7 @@ import { useI18n } from "vue-i18n";
 import PasswordChangeModal from "./components/PasswordChangeModal.vue";
 import ProfileEditingModal from "./components/ProfileEditingModal.vue";
 import DetailTab from "./tabs/Detail.vue";
+import Devices from "./tabs/Devices.vue";
 import NotificationPreferences from "./tabs/NotificationPreferences.vue";
 import PersonalAccessTokensTab from "./tabs/PersonalAccessTokens.vue";
 import TwoFactor from "./tabs/TwoFactor.vue";
@@ -72,6 +73,12 @@ const tabs = ref<UserProfileTab[]>([
     label: "两步验证",
     component: markRaw(TwoFactor),
     priority: 40,
+  },
+  {
+    id: "devices",
+    label: t("core.uc_profile.tabs.devices"),
+    component: markRaw(Devices),
+    priority: 50,
   },
 ]);
 

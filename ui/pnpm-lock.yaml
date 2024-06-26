@@ -179,6 +179,9 @@ importers:
       transliteration:
         specifier: ^2.3.5
         version: 2.3.5
+      ua-parser-js:
+        specifier: ^1.0.38
+        version: 1.0.38
       vue:
         specifier: ^3.4.27
         version: 3.4.27(typescript@5.3.3)
@@ -237,6 +240,9 @@ importers:
       '@types/randomstring':
         specifier: ^1.1.8
         version: 1.1.8
+      '@types/ua-parser-js':
+        specifier: ^0.7.39
+        version: 0.7.39
       '@vitejs/plugin-vue':
         specifier: ^5.0.4
         version: 5.0.4(vite@5.2.11(@types/node@18.13.0)(less@4.2.0)(sass@1.60.0)(terser@5.31.0))(vue@3.4.27(typescript@5.3.3))
@@ -4054,6 +4060,9 @@ packages:
 
   '@types/trusted-types@2.0.7':
     resolution: {integrity: sha512-ScaPdn1dQczgbl0QFTeTOmVHFULt394XJgOQNoyVhZ6r2vLnMLJfBPd53SB52T/3G36VI1/g2MZaX0cwDuXsfw==}
+
+  '@types/ua-parser-js@0.7.39':
+    resolution: {integrity: sha512-P/oDfpofrdtF5xw433SPALpdSchtJmY7nsJItf8h3KXqOslkbySh8zq4dSWXH2oTjRvJ5PczVEoCZPow6GicLg==}
 
   '@types/unist@2.0.10':
     resolution: {integrity: sha512-IfYcSBWE3hLpBg8+X2SEa8LVkJdJEkT2Ese2aaLs3ptGdVtABxndrMaxuFlQ1qdFf9Q5rDvDpxI3WwgvKFAsQA==}
@@ -9767,6 +9776,9 @@ packages:
     engines: {node: '>=14.17'}
     hasBin: true
 
+  ua-parser-js@1.0.38:
+    resolution: {integrity: sha512-Aq5ppTOfvrCMgAPneW1HfWj66Xi7XL+/mIy996R1/CLS/rcyJQm6QZdsKrUeivDFQ+Oc9Wyuwor8Ze8peEoUoQ==}
+
   typescript@5.4.5:
     resolution: {integrity: sha512-vcI4UpRgg81oIRUFwR0WSIHKt11nJ7SAVlYNIu+QpqeyXP+gpQJy/Z4+F0aGxSE4MqwjyXvW/TzgkLAx2AGHwQ==}
     engines: {node: '>=14.17'}
@@ -14972,6 +14984,8 @@ snapshots:
   '@types/tough-cookie@4.0.2': {}
 
   '@types/trusted-types@2.0.7': {}
+
+  '@types/ua-parser-js@0.7.39': {}
 
   '@types/unist@2.0.10': {}
 
@@ -21531,6 +21545,8 @@ snapshots:
   typescript@5.3.3: {}
 
   typescript@5.4.2: {}
+
+  ua-parser-js@1.0.38: {}
 
   typescript@5.4.5: {}
 
