@@ -1,6 +1,6 @@
-import TiptapParagraph from "@tiptap/extension-paragraph";
-import type { ParagraphOptions } from "@tiptap/extension-paragraph";
-import type { ExtensionOptions, ToolbarItem as TypeToolbarItem } from "@/types";
+import ToolbarItem from "@/components/toolbar/ToolbarItem.vue";
+import ToolbarSubItem from "@/components/toolbar/ToolbarSubItem.vue";
+import { i18n } from "@/locales";
 import {
   EditorState,
   ResolvedPos,
@@ -9,13 +9,13 @@ import {
   type Dispatch,
   type Editor,
 } from "@/tiptap";
-import { markRaw } from "vue";
-import ToolbarItem from "@/components/toolbar/ToolbarItem.vue";
-import TablerLineHeight from "~icons/tabler/line-height";
-import { i18n } from "@/locales";
-import ToolbarSubItem from "@/components/toolbar/ToolbarSubItem.vue";
+import type { ExtensionOptions, ToolbarItem as TypeToolbarItem } from "@/types";
 import { deleteNodeByPos } from "@/utils";
 import { isEmpty } from "@/utils/isNodeEmpty";
+import type { ParagraphOptions } from "@tiptap/extension-paragraph";
+import TiptapParagraph from "@tiptap/extension-paragraph";
+import { markRaw } from "vue";
+import TablerLineHeight from "~icons/tabler/line-height";
 
 const Paragraph = TiptapParagraph.extend<ExtensionOptions & ParagraphOptions>({
   addAttributes() {

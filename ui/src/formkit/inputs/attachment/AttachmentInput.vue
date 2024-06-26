@@ -1,9 +1,9 @@
 <script lang="ts" setup>
+import AttachmentSelectorModal from "@console/modules/contents/attachments/components/AttachmentSelectorModal.vue";
 import type { FormKitFrameworkContext } from "@formkit/core";
 import { IconFolder } from "@halo-dev/components";
-import AttachmentSelectorModal from "@console/modules/contents/attachments/components/AttachmentSelectorModal.vue";
-import { ref, type PropType } from "vue";
 import type { AttachmentLike } from "@halo-dev/console-shared";
+import { ref, type PropType } from "vue";
 
 const props = defineProps({
   context: {

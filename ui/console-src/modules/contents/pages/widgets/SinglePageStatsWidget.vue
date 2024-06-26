@@ -1,7 +1,7 @@
 <script lang="ts" setup>
-import { VCard, IconPages } from "@halo-dev/components";
-import { consoleApiClient } from "@halo-dev/api-client";
 import { singlePageLabels } from "@/constants/labels";
+import { consoleApiClient } from "@halo-dev/api-client";
+import { IconPages, VCard } from "@halo-dev/components";
 import { useQuery } from "@tanstack/vue-query";
 
 const { data: total } = useQuery({

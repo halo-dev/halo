@@ -1,9 +1,9 @@
 import {
+  EditorState,
+  Node,
   ResolvedPos,
   Selection,
-  Node,
   type Mappable,
-  EditorState,
 } from "@/tiptap/pm";
 
 /**

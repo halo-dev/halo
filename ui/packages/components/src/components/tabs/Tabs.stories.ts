@@ -1,5 +1,5 @@
 import type { Meta, StoryObj } from "@storybook/vue3";
-import { VTabs, VTabItem } from ".";
+import { VTabItem, VTabs } from ".";
 
 const meta: Meta<typeof VTabs> = {
   title: "Tabs",

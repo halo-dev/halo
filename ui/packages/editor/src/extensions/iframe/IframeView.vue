@@ -1,9 +1,10 @@
 <script lang="ts" setup>
-import type { Node as ProseMirrorNode, Decoration } from "@/tiptap/pm";
+import { i18n } from "@/locales";
+import type { Decoration, Node as ProseMirrorNode } from "@/tiptap/pm";
 import type { Editor, Node } from "@/tiptap/vue-3";
 import { NodeViewWrapper } from "@/tiptap/vue-3";
+import { isAllowedUri } from "@/utils/is-allowed-uri";
 import { computed, onMounted, ref } from "vue";
-import { i18n } from "@/locales";
 
 const props = defineProps<{
   editor: Editor;
@@ -21,6 +22,9 @@ const src = computed({
     return props.node?.attrs.src;
   },
   set: (src: string) => {
+    if (!src || !isAllowedUri(src)) {
+      return;
+    }
     props.updateAttributes({ src: src });
   },
 });

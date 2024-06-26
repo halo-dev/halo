@@ -1,10 +1,10 @@
 <script lang="ts" setup>
-import type { Editor } from "@/tiptap/vue-3";
 import MdiDeleteForeverOutline from "@/components/icon/MdiDeleteForeverOutline.vue";
-import MdiArrowULeftBottom from "~icons/mdi/arrow-u-left-bottom";
-import BlockActionSeparator from "./BlockActionSeparator.vue";
-import BlockActionButton from "./BlockActionButton.vue";
 import { i18n } from "@/locales";
+import type { Editor } from "@/tiptap/vue-3";
+import MdiArrowULeftBottom from "~icons/mdi/arrow-u-left-bottom";
+import BlockActionButton from "./BlockActionButton.vue";
+import BlockActionSeparator from "./BlockActionSeparator.vue";
 
 const props = withDefaults(
   defineProps<{

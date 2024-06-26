@@ -1,7 +1,7 @@
-import { coreApiClient } from "@halo-dev/api-client";
-import { useMutation } from "@tanstack/vue-query";
 import type { SinglePage } from "@halo-dev/api-client";
+import { coreApiClient } from "@halo-dev/api-client";
 import { Toast } from "@halo-dev/components";
+import { useMutation } from "@tanstack/vue-query";
 import { useI18n } from "vue-i18n";
 
 export function usePageUpdateMutate() {

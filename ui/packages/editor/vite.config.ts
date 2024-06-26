@@ -1,10 +1,10 @@
 import { fileURLToPath, URL } from "node:url";
 
-import { defineConfig } from "vite";
-import Vue from "@vitejs/plugin-vue";
-import Icons from "unplugin-icons/vite";
-import path from "node:path";
 import VueI18nPlugin from "@intlify/unplugin-vue-i18n/vite";
+import Vue from "@vitejs/plugin-vue";
+import path from "node:path";
+import Icons from "unplugin-icons/vite";
+import { defineConfig } from "vite";
 
 export default defineConfig({
   plugins: [

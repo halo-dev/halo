@@ -1,6 +1,6 @@
 import { Extension } from "@/tiptap/vue-3";
 
-import { Plugin, PluginKey, Decoration, DecorationSet } from "@/tiptap/pm";
+import { Decoration, DecorationSet, Plugin, PluginKey } from "@/tiptap/pm";
 
 export interface NodeSelectedOptions {
   className: string;

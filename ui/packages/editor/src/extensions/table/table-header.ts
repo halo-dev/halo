@@ -1,17 +1,16 @@
-import { mergeAttributes, Node } from "@/tiptap/vue-3";
+import { i18n } from "@/locales";
 import {
-  Plugin,
-  PluginKey,
+  addColumnAfter,
   Decoration,
   DecorationSet,
-  addColumnAfter,
+  Plugin,
+  PluginKey,
 } from "@/tiptap/pm";
-import { getCellsInRow, isColumnSelected, selectColumn } from "./util";
-import { render } from "vue";
+import { mergeAttributes, Node } from "@/tiptap/vue-3";
 import { Tooltip } from "floating-vue";
-import { h } from "vue";
+import { h, render } from "vue";
 import MdiPlus from "~icons/mdi/plus";
-import { i18n } from "@/locales";
+import { getCellsInRow, isColumnSelected, selectColumn } from "./util";
 
 export interface TableCellOptions {
   HTMLAttributes: Record<string, any>;

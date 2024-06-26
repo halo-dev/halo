@@ -1,6 +1,6 @@
 <script lang="ts" setup>
-import { VCard, VAvatar } from "@halo-dev/components";
 import { useUserFetch } from "@console/modules/system/users/composables/use-user";
+import { VAvatar, VCard } from "@halo-dev/components";
 
 const { users } = useUserFetch({ fetchOnMounted: true });
 </script>

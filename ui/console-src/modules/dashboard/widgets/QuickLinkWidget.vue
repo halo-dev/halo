@@ -1,26 +1,26 @@
 <script lang="ts" setup>
-import {
-  IconArrowRight,
-  IconBookRead,
-  IconFolder,
-  IconPages,
-  IconPlug,
-  IconUserSettings,
-  IconPalette,
-  IconWindowLine,
-  IconSearch,
-  IconDatabase2Line,
-  VCard,
-  IconAccountCircleLine,
-  Dialog,
-  Toast,
-} from "@halo-dev/components";
-import { markRaw, ref, type Component } from "vue";
-import { useRouter } from "vue-router";
 import ThemePreviewModal from "@console/modules/interface/themes/components/preview/ThemePreviewModal.vue";
 import { consoleApiClient } from "@halo-dev/api-client";
-import { useI18n } from "vue-i18n";
+import {
+  Dialog,
+  IconAccountCircleLine,
+  IconArrowRight,
+  IconBookRead,
+  IconDatabase2Line,
+  IconFolder,
+  IconPages,
+  IconPalette,
+  IconPlug,
+  IconSearch,
+  IconUserSettings,
+  IconWindowLine,
+  Toast,
+  VCard,
+} from "@halo-dev/components";
 import { OverlayScrollbarsComponent } from "overlayscrollbars-vue";
+import { markRaw, ref, type Component } from "vue";
+import { useI18n } from "vue-i18n";
+import { useRouter } from "vue-router";
 
 interface Action {
   icon: Component;

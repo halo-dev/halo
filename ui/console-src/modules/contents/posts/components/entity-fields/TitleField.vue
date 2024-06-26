@@ -1,14 +1,14 @@
 <script lang="ts" setup>
+import { postLabels } from "@/constants/labels";
+import type { ListedPost } from "@halo-dev/api-client";
 import {
   IconExternalLinkLine,
   VEntityField,
   VSpace,
   VStatusDot,
 } from "@halo-dev/components";
-import PostTag from "../../tags/components/PostTag.vue";
-import type { ListedPost } from "@halo-dev/api-client";
-import { postLabels } from "@/constants/labels";
 import { computed } from "vue";
+import PostTag from "../../tags/components/PostTag.vue";
 
 const props = withDefaults(
   defineProps<{

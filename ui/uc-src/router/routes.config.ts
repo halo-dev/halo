@@ -1,9 +1,9 @@
-import type { RouteRecordRaw } from "vue-router";
-import NotFound from "@/views/exceptions/NotFound.vue";
+import GatewayLayout from "@/layouts/GatewayLayout.vue";
 import Forbidden from "@/views/exceptions/Forbidden.vue";
+import NotFound from "@/views/exceptions/NotFound.vue";
 import BasicLayout from "@uc/layouts/BasicLayout.vue";
 import ResetPassword from "@uc/views/ResetPassword.vue";
-import GatewayLayout from "@/layouts/GatewayLayout.vue";
+import type { RouteRecordRaw } from "vue-router";
 
 export const routes: Array<RouteRecordRaw> = [
   {

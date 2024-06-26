@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import { VButton, IconMore } from "@halo-dev/components";
+import { IconMore, VButton } from "@halo-dev/components";
 </script>
 
 <template>

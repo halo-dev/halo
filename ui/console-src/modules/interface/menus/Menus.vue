@@ -1,4 +1,6 @@
 <script lang="ts" setup>
+import type { Menu, MenuItem } from "@halo-dev/api-client";
+import { coreApiClient } from "@halo-dev/api-client";
 import {
   Dialog,
   IconAddCircle,
@@ -11,13 +13,14 @@ import {
   VPageHeader,
   VSpace,
 } from "@halo-dev/components";
+import { useQuery, useQueryClient } from "@tanstack/vue-query";
+import { useDebounceFn } from "@vueuse/core";
+import { cloneDeep } from "lodash-es";
+import { computed, ref } from "vue";
+import { useI18n } from "vue-i18n";
 import MenuItemEditingModal from "./components/MenuItemEditingModal.vue";
 import MenuItemListItem from "./components/MenuItemListItem.vue";
 import MenuList from "./components/MenuList.vue";
-import { computed, ref } from "vue";
-import { coreApiClient } from "@halo-dev/api-client";
-import type { Menu, MenuItem } from "@halo-dev/api-client";
-import { cloneDeep } from "lodash-es";
 import type { MenuTreeItem } from "./utils";
 import {
   buildMenuItemsTree,
@@ -26,9 +29,6 @@ import {
   getChildrenNames,
   resetMenuItemsTreePriority,
 } from "./utils";
-import { useDebounceFn } from "@vueuse/core";
-import { useI18n } from "vue-i18n";
-import { useQuery, useQueryClient } from "@tanstack/vue-query";
 
 const { t } = useI18n();
 const queryClient = useQueryClient();

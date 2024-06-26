@@ -1,6 +1,6 @@
 <script lang="ts" setup>
-import type { Component } from "vue";
 import type { Editor } from "@/tiptap/vue-3";
+import type { Component } from "vue";
 
 const props = withDefaults(
   defineProps<{

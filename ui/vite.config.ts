@@ -1,6 +1,6 @@
+import VueI18nPlugin from "@intlify/unplugin-vue-i18n/vite";
 import path from "path";
 import { Plugin } from "vite";
-import VueI18nPlugin from "@intlify/unplugin-vue-i18n/vite";
 import { createViteConfig } from "./src/vite/config-builder";
 
 export default ({ mode }: { mode: string }) => {

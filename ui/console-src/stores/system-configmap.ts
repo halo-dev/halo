@@ -1,5 +1,5 @@
-import { coreApiClient } from "@halo-dev/api-client";
 import type { ConfigMap } from "@halo-dev/api-client";
+import { coreApiClient } from "@halo-dev/api-client";
 import { defineStore } from "pinia";
 
 interface SystemConfigMapState {

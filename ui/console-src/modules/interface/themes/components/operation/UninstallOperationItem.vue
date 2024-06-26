@@ -1,9 +1,9 @@
 <script lang="ts" setup>
-import { Dialog, Toast, VDropdown, VDropdownItem } from "@halo-dev/components";
 import type { Theme } from "@halo-dev/api-client";
-import { useI18n } from "vue-i18n";
 import { coreApiClient } from "@halo-dev/api-client";
+import { Dialog, Toast, VDropdown, VDropdownItem } from "@halo-dev/components";
 import { useQueryClient } from "@tanstack/vue-query";
+import { useI18n } from "vue-i18n";
 
 const { t } = useI18n();
 const queryClient = useQueryClient();

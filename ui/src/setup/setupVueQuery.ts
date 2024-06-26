@@ -1,8 +1,8 @@
-import type { App } from "vue";
 import {
   VueQueryPlugin,
   type VueQueryPluginOptions,
 } from "@tanstack/vue-query";
+import type { App } from "vue";
 
 const networkMode = import.meta.env.PROD ? "online" : "always";
 

@@ -1,18 +1,15 @@
 <script lang="ts" setup>
+import { submitForm } from "@formkit/core";
+import type { Plugin } from "@halo-dev/api-client";
 import { consoleApiClient } from "@halo-dev/api-client";
 import { Dialog, Toast, VButton } from "@halo-dev/components";
-import type { Plugin } from "@halo-dev/api-client";
-import type { Ref } from "vue";
-import { inject } from "vue";
-import { ref } from "vue";
-import { useI18n } from "vue-i18n";
 import { useQueryClient } from "@tanstack/vue-query";
-import type { PluginInstallationErrorResponse } from "../../types";
-import { PLUGIN_ALREADY_EXISTS_TYPE } from "../../constants";
 import { useRouteQuery } from "@vueuse/router";
-import { onMounted } from "vue";
-import { nextTick } from "vue";
-import { submitForm } from "@formkit/core";
+import type { Ref } from "vue";
+import { inject, nextTick, onMounted, ref } from "vue";
+import { useI18n } from "vue-i18n";
+import { PLUGIN_ALREADY_EXISTS_TYPE } from "../../constants";
+import type { PluginInstallationErrorResponse } from "../../types";
 
 const emit = defineEmits<{
   (event: "close-modal"): void;

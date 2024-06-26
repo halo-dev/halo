@@ -1,9 +1,9 @@
-import { defineConfig } from "vitest/config";
-import { fileURLToPath, URL } from "url";
 import VueI18nPlugin from "@intlify/unplugin-vue-i18n/vite";
-import { sharedPlugins } from "./src/vite/config-builder";
 import path from "path";
+import { fileURLToPath, URL } from "url";
 import type { Plugin } from "vite";
+import { defineConfig } from "vitest/config";
+import { sharedPlugins } from "./src/vite/config-builder";
 
 export default defineConfig({
   plugins: [

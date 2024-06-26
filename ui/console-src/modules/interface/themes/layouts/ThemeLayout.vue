@@ -5,9 +5,9 @@ import {
   nextTick,
   onMounted,
   provide,
-  type Ref,
   ref,
   watch,
+  type Ref,
 } from "vue";
 import { useRoute, useRouter } from "vue-router";
 
@@ -20,6 +20,10 @@ import { useThemeLifeCycle } from "../composables/use-theme";
 import BasicLayout from "@console/layouts/BasicLayout.vue";
 
 // components
+import { usePermission } from "@/utils/permission";
+import { useThemeStore } from "@console/stores/theme";
+import type { Setting, SettingForm, Theme } from "@halo-dev/api-client";
+import { consoleApiClient } from "@halo-dev/api-client";
 import {
   Dialog,
   IconExchange,
@@ -34,16 +38,12 @@ import {
   VSpace,
   VTabbar,
 } from "@halo-dev/components";
-import ThemeListModal from "../components/ThemeListModal.vue";
-import ThemePreviewModal from "../components/preview/ThemePreviewModal.vue";
-import type { Setting, SettingForm, Theme } from "@halo-dev/api-client";
-import { usePermission } from "@/utils/permission";
-import { useThemeStore } from "@console/stores/theme";
-import { storeToRefs } from "pinia";
-import { consoleApiClient } from "@halo-dev/api-client";
-import { useI18n } from "vue-i18n";
 import { useQuery } from "@tanstack/vue-query";
 import { useRouteQuery } from "@vueuse/router";
+import { storeToRefs } from "pinia";
+import { useI18n } from "vue-i18n";
+import ThemeListModal from "../components/ThemeListModal.vue";
+import ThemePreviewModal from "../components/preview/ThemePreviewModal.vue";
 
 const { currentUserHasPermission } = usePermission();
 const { t } = useI18n();

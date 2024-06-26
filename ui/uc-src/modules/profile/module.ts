@@ -1,6 +1,6 @@
+import { IconAccountCircleLine } from "@halo-dev/components";
 import { definePlugin } from "@halo-dev/console-shared";
 import BasicLayout from "@uc/layouts/BasicLayout.vue";
-import { IconAccountCircleLine } from "@halo-dev/components";
 import { markRaw } from "vue";
 import Profile from "./Profile.vue";
 

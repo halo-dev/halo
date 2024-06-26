@@ -1,10 +1,10 @@
 <script lang="ts" setup>
-import type { PropType } from "vue";
-import type { AnyExtension, Editor } from "@/tiptap/vue-3";
-import BubbleMenu from "@/components/bubble/BubbleMenu.vue";
-import type { NodeBubbleMenu } from "@/types";
 import BubbleItem from "@/components/bubble/BubbleItem.vue";
+import BubbleMenu from "@/components/bubble/BubbleMenu.vue";
 import type { EditorState, EditorView } from "@/tiptap/pm";
+import type { AnyExtension, Editor } from "@/tiptap/vue-3";
+import type { NodeBubbleMenu } from "@/types";
+import type { PropType } from "vue";
 
 const props = defineProps({
   editor: {

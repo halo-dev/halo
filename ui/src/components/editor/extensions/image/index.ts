@@ -1,7 +1,7 @@
-import { ExtensionImage, VueNodeViewRenderer } from "@halo-dev/richtext-editor";
-import ImageView from "./ImageView.vue";
-import type { AxiosRequestConfig } from "axios";
 import type { Attachment } from "@halo-dev/api-client";
+import { ExtensionImage, VueNodeViewRenderer } from "@halo-dev/richtext-editor";
+import type { AxiosRequestConfig } from "axios";
+import ImageView from "./ImageView.vue";
 
 export interface ImageOptions {
   inline: boolean;

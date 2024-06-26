@@ -1,9 +1,9 @@
+import { IconBookRead } from "@halo-dev/components";
 import { definePlugin } from "@halo-dev/console-shared";
 import BasicLayout from "@uc/layouts/BasicLayout.vue";
-import { IconBookRead } from "@halo-dev/components";
-import PostList from "./PostList.vue";
 import { markRaw } from "vue";
 import PostEditor from "./PostEditor.vue";
+import PostList from "./PostList.vue";
 
 export default definePlugin({
   ucRoutes: [

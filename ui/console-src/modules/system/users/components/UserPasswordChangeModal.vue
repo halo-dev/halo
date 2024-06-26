@@ -1,11 +1,11 @@
 <script lang="ts" setup>
-import { VButton, VModal, VSpace } from "@halo-dev/components";
 import SubmitButton from "@/components/button/SubmitButton.vue";
-import { onMounted, ref } from "vue";
+import { setFocus } from "@/formkit/utils/focus";
 import type { User } from "@halo-dev/api-client";
 import { consoleApiClient } from "@halo-dev/api-client";
+import { VButton, VModal, VSpace } from "@halo-dev/components";
 import { cloneDeep } from "lodash-es";
-import { setFocus } from "@/formkit/utils/focus";
+import { onMounted, ref } from "vue";
 
 const props = withDefaults(
   defineProps<{

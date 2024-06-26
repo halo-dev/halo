@@ -1,29 +1,29 @@
-import type { ExtensionOptions, NodeBubbleMenu } from "@/types";
-import {
-  Editor,
-  isActive,
-  mergeAttributes,
-  Node,
-  nodeInputRule,
-  type Range,
-  VueNodeViewRenderer,
-} from "@/tiptap/vue-3";
-import type { EditorState } from "@/tiptap/pm";
-import { markRaw } from "vue";
-import AudioView from "./AudioView.vue";
-import MdiMusicCircleOutline from "~icons/mdi/music-circle-outline";
+import { BlockActionSeparator } from "@/components";
+import MdiDeleteForeverOutline from "@/components/icon/MdiDeleteForeverOutline.vue";
 import ToolboxItemVue from "@/components/toolbox/ToolboxItem.vue";
 import { i18n } from "@/locales";
+import type { EditorState } from "@/tiptap/pm";
+import {
+  Editor,
+  Node,
+  VueNodeViewRenderer,
+  isActive,
+  mergeAttributes,
+  nodeInputRule,
+  type Range,
+} from "@/tiptap/vue-3";
+import type { ExtensionOptions, NodeBubbleMenu } from "@/types";
+import { deleteNode } from "@/utils";
+import { markRaw } from "vue";
+import MdiLinkVariant from "~icons/mdi/link-variant";
+import MdiMotionPlay from "~icons/mdi/motion-play";
+import MdiMotionPlayOutline from "~icons/mdi/motion-play-outline";
+import MdiMusicCircleOutline from "~icons/mdi/music-circle-outline";
 import MdiPlayCircle from "~icons/mdi/play-circle";
 import MdiPlayCircleOutline from "~icons/mdi/play-circle-outline";
-import MdiMotionPlayOutline from "~icons/mdi/motion-play-outline";
-import MdiMotionPlay from "~icons/mdi/motion-play";
-import { BlockActionSeparator } from "@/components";
-import BubbleItemAudioLink from "./BubbleItemAudioLink.vue";
-import MdiLinkVariant from "~icons/mdi/link-variant";
 import MdiShare from "~icons/mdi/share";
-import { deleteNode } from "@/utils";
-import MdiDeleteForeverOutline from "@/components/icon/MdiDeleteForeverOutline.vue";
+import AudioView from "./AudioView.vue";
+import BubbleItemAudioLink from "./BubbleItemAudioLink.vue";
 
 declare module "@/tiptap" {
   interface Commands<ReturnType> {

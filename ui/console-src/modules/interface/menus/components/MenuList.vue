@@ -1,4 +1,7 @@
 <script lang="ts" setup>
+import { usePermission } from "@/utils/permission";
+import type { Menu } from "@halo-dev/api-client";
+import { coreApiClient } from "@halo-dev/api-client";
 import {
   Dialog,
   Toast,
@@ -13,14 +16,11 @@ import {
   VStatusDot,
   VTag,
 } from "@halo-dev/components";
-import MenuEditingModal from "./MenuEditingModal.vue";
-import { onMounted, ref } from "vue";
-import type { Menu } from "@halo-dev/api-client";
-import { coreApiClient } from "@halo-dev/api-client";
-import { useRouteQuery } from "@vueuse/router";
-import { usePermission } from "@/utils/permission";
-import { useI18n } from "vue-i18n";
 import { useQuery } from "@tanstack/vue-query";
+import { useRouteQuery } from "@vueuse/router";
+import { onMounted, ref } from "vue";
+import { useI18n } from "vue-i18n";
+import MenuEditingModal from "./MenuEditingModal.vue";
 
 const { currentUserHasPermission } = usePermission();
 const { t } = useI18n();

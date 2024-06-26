@@ -1,20 +1,16 @@
 <script setup lang="ts">
 import {
-  IconZoomInLine,
-  IconZoomOutLine,
   IconArrowLeftRightLine,
   IconArrowUpDownLine,
   IconRefreshLine,
   IconRiUpload2Fill,
+  IconZoomInLine,
+  IconZoomOutLine,
 } from "@halo-dev/components";
-import { type Ref } from "vue";
-import { ref, watch } from "vue";
-import "cropperjs/dist/cropper.css";
 import Cropper from "cropperjs";
-import { onMounted } from "vue";
-import { computed } from "vue";
+import "cropperjs/dist/cropper.css";
 import type { Component } from "vue";
-import { markRaw } from "vue";
+import { computed, markRaw, onMounted, ref, watch, type Ref } from "vue";
 import { useI18n } from "vue-i18n";
 
 const { t } = useI18n();
