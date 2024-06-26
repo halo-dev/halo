@@ -1,4 +1,4 @@
-import { apiClient } from "@/utils/api-client";
+import { coreApiClient } from "@halo-dev/api-client";
 import type { Category } from "@halo-dev/api-client";
 import type { Ref } from "vue";
 import { ref } from "vue";
@@ -23,12 +23,11 @@ export function usePostCategory(): usePostCategoryReturn {
   } = useQuery({
     queryKey: ["post-categories"],
     queryFn: async () => {
-      const { data } =
-        await apiClient.extension.category.listContentHaloRunV1alpha1Category({
-          page: 0,
-          size: 0,
-          sort: ["metadata.creationTimestamp,desc"],
-        });
+      const { data } = await coreApiClient.content.category.listCategory({
+        page: 0,
+        size: 0,
+        sort: ["metadata.creationTimestamp,desc"],
+      });
 
       return data.items;
     },

@@ -60,7 +60,7 @@ public class UcPostAttachmentEndpoint implements CustomEndpoint {
 
     @Override
     public RouterFunction<ServerResponse> endpoint() {
-        var tag = groupVersion() + "/Attachment";
+        var tag = "AttachmentV1alpha1Uc";
         return route()
             .POST("/attachments",
                 this::createAttachmentForPost,

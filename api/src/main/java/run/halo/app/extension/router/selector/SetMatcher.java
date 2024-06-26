@@ -46,6 +46,14 @@ public class SetMatcher implements SelectorMatcher {
         return operator.with(values).test(s);
     }
 
+    @Override
+    public String toString() {
+        if (Operator.EXISTS.equals(operator) || Operator.NOT_EXISTS.equals(operator)) {
+            return key + " " + operator;
+        }
+        return key + " " + operator + " (" + String.join(", ", values) + ")";
+    }
+
     private enum Operator {
         IN(values -> v -> contains(values, v)),
         NOT_IN(values -> v -> !contains(values, v)),

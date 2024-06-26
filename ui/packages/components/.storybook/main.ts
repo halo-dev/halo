@@ -1,3 +1,4 @@
+/* eslint-disable storybook/no-uninstalled-addons */
 import type { StorybookConfig } from "@storybook/vue3-vite";
 
 const config: StorybookConfig = {
@@ -14,6 +15,13 @@ const config: StorybookConfig = {
   },
   docs: {
     autodocs: "tag",
+  },
+  async viteFinal(config) {
+    const { mergeConfig } = await import("vite");
+
+    return mergeConfig(config, {
+      assetsInclude: ["/sb-preview/runtime.js"],
+    });
   },
 };
 export default config;

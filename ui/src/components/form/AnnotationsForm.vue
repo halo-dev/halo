@@ -10,7 +10,7 @@ import {
 import { IconArrowRight } from "@halo-dev/components";
 
 import { computed, nextTick, onMounted, ref, watch } from "vue";
-import { apiClient } from "@/utils/api-client";
+import { coreApiClient } from "@halo-dev/api-client";
 import type { AnnotationSetting } from "@halo-dev/api-client";
 import { cloneDeep } from "lodash-es";
 import { getValidationMessages } from "@formkit/validation";
@@ -58,13 +58,11 @@ const avaliableAnnotationSettings = computed(() => {
 const handleFetchAnnotationSettings = async () => {
   try {
     const { data } =
-      await apiClient.extension.annotationSetting.listV1alpha1AnnotationSetting(
-        {
-          labelSelector: [
-            `halo.run/target-ref=${[props.group, props.kind].join("/")}`,
-          ],
-        }
-      );
+      await coreApiClient.annotationSetting.listAnnotationSetting({
+        labelSelector: [
+          `halo.run/target-ref=${[props.group, props.kind].join("/")}`,
+        ],
+      });
     annotationSettings.value = data.items;
   } catch (error) {
     console.error("Failed to fetch annotation settings", error);

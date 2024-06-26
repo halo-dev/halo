@@ -1,15 +1,11 @@
 <script lang="ts" setup>
-import { useQuery } from "@tanstack/vue-query";
-import NotificationSetting from "./NotificationSetting.vue";
-import { apiClient } from "@/utils/api-client";
-import { markRaw, ref } from "vue";
-import type { Raw } from "vue";
-import type { Component } from "vue";
-import { provide } from "vue";
+import type { NotifierDescriptor } from "@halo-dev/api-client";
+import { coreApiClient } from "@halo-dev/api-client";
 import { VTabbar } from "@halo-dev/components";
-import { computed } from "vue";
-import type { ComputedRef } from "vue";
-import type { NotifierDescriptor } from "packages/api-client/dist";
+import { useQuery } from "@tanstack/vue-query";
+import type { Component, ComputedRef, Raw } from "vue";
+import { computed, markRaw, provide, ref } from "vue";
+import NotificationSetting from "./NotificationSetting.vue";
 
 interface Tab {
   id: string;
@@ -25,7 +21,7 @@ const { data: notifierDescriptors } = useQuery({
   queryKey: ["notifier-descriptors"],
   queryFn: async () => {
     const { data } =
-      await apiClient.extension.notifierDescriptors.listNotificationHaloRunV1alpha1NotifierDescriptor();
+      await coreApiClient.notification.notifierDescriptor.listNotifierDescriptor();
     return data.items;
   },
   onSuccess(data) {

@@ -1,4 +1,4 @@
-import { apiClient } from "@/utils/api-client";
+import { consoleApiClient } from "@halo-dev/api-client";
 import type { Role, User } from "@halo-dev/api-client";
 import { defineStore } from "pinia";
 
@@ -19,7 +19,7 @@ export const useUserStore = defineStore("user", {
   actions: {
     async fetchCurrentUser() {
       try {
-        const { data } = await apiClient.user.getCurrentUserDetail();
+        const { data } = await consoleApiClient.user.getCurrentUserDetail();
         this.currentUser = data.user;
         this.currentRoles = data.roles;
         this.isAnonymous = data.user.metadata.name === "anonymousUser";

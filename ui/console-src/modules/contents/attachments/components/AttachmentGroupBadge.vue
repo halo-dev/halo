@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import { apiClient } from "@/utils/api-client";
+import { consoleApiClient, coreApiClient } from "@halo-dev/api-client";
 import type { Group } from "@halo-dev/api-client";
 import {
   Dialog,
@@ -49,29 +49,28 @@ const handleDelete = () => {
       }
 
       // TODO: 后续将修改为在后端进行批量操作处理
-      const { data } = await apiClient.attachment.searchAttachments({
-        fieldSelector: [`spec.groupName=${props.group.metadata.name}`],
-        page: 0,
-        size: 0,
-      });
+      const { data } =
+        await consoleApiClient.storage.attachment.searchAttachments({
+          fieldSelector: [`spec.groupName=${props.group.metadata.name}`],
+          page: 0,
+          size: 0,
+        });
 
-      await apiClient.extension.storage.group.deleteStorageHaloRunV1alpha1Group(
-        { name: props.group.metadata.name }
-      );
+      await coreApiClient.storage.group.deleteGroup({
+        name: props.group.metadata.name,
+      });
 
       // move attachments to none group
       const moveToUnGroupRequests = data.items.map((attachment) => {
-        return apiClient.extension.storage.attachment.patchStorageHaloRunV1alpha1Attachment(
-          {
-            name: attachment.metadata.name,
-            jsonPatchInner: [
-              {
-                op: "remove",
-                path: "/spec/groupName",
-              },
-            ],
-          }
-        );
+        return coreApiClient.storage.attachment.patchAttachment({
+          name: attachment.metadata.name,
+          jsonPatchInner: [
+            {
+              op: "remove",
+              path: "/spec/groupName",
+            },
+          ],
+        });
       });
 
       await Promise.all(moveToUnGroupRequests);
@@ -105,20 +104,21 @@ const handleDeleteWithAttachments = () => {
       }
 
       // TODO: 后续将修改为在后端进行批量操作处理
-      const { data } = await apiClient.attachment.searchAttachments({
-        fieldSelector: [`spec.groupName=${props.group.metadata.name}`],
-        page: 0,
-        size: 0,
+      const { data } =
+        await consoleApiClient.storage.attachment.searchAttachments({
+          fieldSelector: [`spec.groupName=${props.group.metadata.name}`],
+          page: 0,
+          size: 0,
+        });
+
+      await coreApiClient.storage.group.deleteGroup({
+        name: props.group.metadata.name,
       });
 
-      await apiClient.extension.storage.group.deleteStorageHaloRunV1alpha1Group(
-        { name: props.group.metadata.name }
-      );
-
       const deleteAttachmentRequests = data.items.map((attachment) => {
-        return apiClient.extension.storage.attachment.deleteStorageHaloRunV1alpha1Attachment(
-          { name: attachment.metadata.name }
-        );
+        return coreApiClient.storage.attachment.deleteAttachment({
+          name: attachment.metadata.name,
+        });
       });
 
       await Promise.all(deleteAttachmentRequests);

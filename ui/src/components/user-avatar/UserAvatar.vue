@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import { apiClient } from "@/utils/api-client";
+import { consoleApiClient } from "@halo-dev/api-client";
 import {
   IconRiPencilFill,
   IconAddCircle,
@@ -42,8 +42,8 @@ const { data: avatar, isFetching } = useQuery({
   queryKey: ["user-avatar", name, isCurrentUser],
   queryFn: async () => {
     const { data } = props.isCurrentUser
-      ? await apiClient.user.getCurrentUserDetail()
-      : await apiClient.user.getUserDetail({
+      ? await consoleApiClient.user.getCurrentUserDetail()
+      : await consoleApiClient.user.getUserDetail({
           name: props.name,
         });
 
@@ -96,7 +96,7 @@ const handleUploadAvatar = () => {
   userAvatarCropper.value?.getCropperFile().then((file) => {
     uploadSaving.value = true;
 
-    apiClient.user
+    consoleApiClient.user
       .uploadUserAvatar({
         name: props.isCurrentUser ? "-" : props.name,
         file: file,
@@ -123,7 +123,7 @@ const handleRemoveCurrentAvatar = () => {
     confirmText: t("core.common.buttons.confirm"),
     cancelText: t("core.common.buttons.cancel"),
     onConfirm: async () => {
-      apiClient.user
+      consoleApiClient.user
         .deleteUserAvatar({
           name: props.isCurrentUser ? "-" : props.name,
         })

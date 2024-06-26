@@ -5,7 +5,7 @@ import type { NotifierDescriptor, Setting } from "@halo-dev/api-client";
 import type { Ref } from "vue";
 import { inject } from "vue";
 import { ref } from "vue";
-import { apiClient } from "@/utils/api-client";
+import { consoleApiClient, coreApiClient } from "@halo-dev/api-client";
 import { computed } from "vue";
 import { toRaw } from "vue";
 import type { FormKitSchemaCondition, FormKitSchemaNode } from "@formkit/core";
@@ -27,7 +27,7 @@ const name = computed(
 const { data: setting } = useQuery<Setting | undefined>({
   queryKey: ["notifier-setting", notifierDescriptor],
   queryFn: async () => {
-    const { data } = await apiClient.extension.setting.getV1alpha1Setting({
+    const { data } = await coreApiClient.setting.getSetting({
       name: notifierDescriptor.value?.spec?.senderSettingRef?.name as string,
     });
     return data;
@@ -40,9 +40,10 @@ const configMapData = ref<Record<string, unknown>>({});
 useQuery<Record<string, unknown>>({
   queryKey: ["notifier-configMap", notifierDescriptor],
   queryFn: async () => {
-    const { data } = await apiClient.notifier.fetchSenderConfig({
-      name: name.value,
-    });
+    const { data } =
+      await consoleApiClient.notification.notifier.fetchSenderConfig({
+        name: name.value,
+      });
     return data as Record<string, unknown>;
   },
   onSuccess(data) {
@@ -61,10 +62,11 @@ const formSchema = computed(() => {
 const { isLoading: isMutating, mutate } = useMutation({
   mutationKey: ["save-notifier-configMap", notifierDescriptor],
   mutationFn: async () => {
-    const { data } = await apiClient.notifier.saveSenderConfig({
-      name: name.value,
-      body: configMapData.value,
-    });
+    const { data } =
+      await consoleApiClient.notification.notifier.saveSenderConfig({
+        name: name.value,
+        body: configMapData.value,
+      });
     return data;
   },
   onSuccess() {

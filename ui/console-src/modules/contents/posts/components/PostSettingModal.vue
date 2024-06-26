@@ -8,7 +8,7 @@ import {
 } from "@halo-dev/components";
 import { computed, nextTick, ref, watch } from "vue";
 import type { Post } from "@halo-dev/api-client";
-import { apiClient } from "@/utils/api-client";
+import { consoleApiClient, coreApiClient } from "@halo-dev/api-client";
 import { useThemeCustomTemplates } from "@console/modules/interface/themes/composables/use-theme";
 import { postLabels } from "@/constants/labels";
 import { randomUUID } from "@/utils/id";
@@ -137,7 +137,7 @@ const handleSave = async () => {
 
     const { data } = isUpdateMode.value
       ? await postUpdateMutate(formState.value)
-      : await apiClient.extension.post.createContentHaloRunV1alpha1Post({
+      : await coreApiClient.content.post.createPost({
           post: formState.value,
         });
 
@@ -166,7 +166,7 @@ const handlePublish = async () => {
 
     await postUpdateMutate(formState.value);
 
-    const { data } = await apiClient.post.publishPost({
+    const { data } = await consoleApiClient.content.post.publishPost({
       name: formState.value.metadata.name,
     });
 
@@ -188,7 +188,7 @@ const handleUnpublish = async () => {
   try {
     publishCanceling.value = true;
 
-    await apiClient.post.unpublishPost({
+    await consoleApiClient.content.post.unpublishPost({
       name: formState.value.metadata.name,
     });
 

@@ -1,26 +1,19 @@
 <script lang="ts" setup>
-import { computed, onMounted, ref, watch } from "vue";
+import { computed, inject, onMounted, ref, watch } from "vue";
 import { IconErrorWarning } from "../../icons/icons";
-import type { Size } from "./interface";
+import { AvatarGroupContextInjectionKey, type AvatarProps } from "./interface";
 
-const props = withDefaults(
-  defineProps<{
-    src?: string;
-    alt?: string;
-    size?: Size;
-    width?: string;
-    height?: string;
-    circle?: boolean;
-  }>(),
-  {
-    src: undefined,
-    alt: undefined,
-    size: "md",
-    width: undefined,
-    height: undefined,
-    circle: false,
-  }
-);
+const props = withDefaults(defineProps<AvatarProps>(), {
+  size: "md",
+  circle: false,
+});
+
+const groupProps = inject(AvatarGroupContextInjectionKey);
+
+const size = computed(() => groupProps?.size || props.size);
+const circle = computed(() => groupProps?.circle || props.circle);
+const width = computed(() => groupProps?.width || props.width);
+const height = computed(() => groupProps?.height || props.height);
 
 const isLoading = ref(false);
 const error = ref(false);
@@ -65,20 +58,20 @@ onMounted(async () => {
 });
 
 const classes = computed(() => {
-  const result = [`avatar-${props.circle ? "circle" : "square"}`];
-  if (props.size) {
-    result.push(`avatar-${props.size}`);
+  const result = [`avatar-${circle.value ? "circle" : "square"}`];
+  if (size.value) {
+    result.push(`avatar-${size.value}`);
   }
   return result;
 });
 
 const styles = computed(() => {
   const result: Record<string, string> = {};
-  if (props.width) {
-    result.width = props.width;
+  if (width.value) {
+    result.width = width.value;
   }
-  if (props.height) {
-    result.height = props.height;
+  if (height.value) {
+    result.height = height.value;
   }
   return result;
 });

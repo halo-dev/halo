@@ -1,6 +1,6 @@
 <script lang="ts" setup>
 import { useUserStore } from "@/stores/user";
-import { apiClient } from "@/utils/api-client";
+import { ucApiClient } from "@halo-dev/api-client";
 import { relativeTimeTo } from "@/utils/date";
 import type { Notification } from "@halo-dev/api-client";
 import { useMutation, useQueryClient } from "@tanstack/vue-query";
@@ -27,10 +27,11 @@ const isRead = ref();
 const { mutate: handleMarkAsRead } = useMutation({
   mutationKey: ["notification-mark-as-read"],
   mutationFn: async ({ refetch }: { refetch: boolean }) => {
-    const { data } = await apiClient.notification.markNotificationAsRead({
-      name: props.notification.metadata.name,
-      username: currentUser?.metadata.name as string,
-    });
+    const { data } =
+      await ucApiClient.notification.notification.markNotificationAsRead({
+        name: props.notification.metadata.name,
+        username: currentUser?.metadata.name as string,
+      });
 
     if (refetch) {
       await queryClient.invalidateQueries({ queryKey: ["user-notifications"] });
@@ -48,7 +49,7 @@ function handleDelete() {
     title: t("core.uc_notification.operations.delete.title"),
     description: t("core.uc_notification.operations.delete.description"),
     async onConfirm() {
-      await apiClient.notification.deleteSpecifiedNotification({
+      await ucApiClient.notification.notification.deleteSpecifiedNotification({
         name: props.notification.metadata.name,
         username: currentUser?.metadata.name as string,
       });

@@ -7,6 +7,7 @@ import org.springframework.util.Assert;
 import run.halo.app.extension.Extension;
 import run.halo.app.extension.ExtensionClient;
 import run.halo.app.extension.ExtensionMatcher;
+import run.halo.app.extension.ListOptions;
 import run.halo.app.extension.WatcherExtensionMatchers;
 import run.halo.app.extension.controller.Reconciler.Request;
 
@@ -29,6 +30,8 @@ public class ControllerBuilder {
     private ExtensionMatcher onDeleteMatcher;
 
     private ExtensionMatcher onUpdateMatcher;
+
+    private ListOptions syncAllListOptions;
 
     private final ExtensionClient client;
 
@@ -84,6 +87,11 @@ public class ControllerBuilder {
         return this;
     }
 
+    public ControllerBuilder syncAllListOptions(ListOptions syncAllListOptions) {
+        this.syncAllListOptions = syncAllListOptions;
+        return this;
+    }
+
     public ControllerBuilder workerCount(int workerCount) {
         this.workerCount = workerCount;
         return this;
@@ -116,8 +124,23 @@ public class ControllerBuilder {
             client,
             extension,
             watcher,
-            extensionMatchers.onAddMatcher());
+            determineSyncAllListOptions());
         return new DefaultController<>(name, reconciler, queue, synchronizer, minDelay, maxDelay,
             workerCount);
+    }
+
+    ListOptions determineSyncAllListOptions() {
+        if (syncAllListOptions != null) {
+            return syncAllListOptions;
+        }
+        // In order to be compatible with the previous version of the code
+        // The previous version of the code determined syncAllListOptions through onAddMatcher
+        // TODO Will be removed later
+        if (onAddMatcher != null) {
+            return new ListOptions()
+                .setLabelSelector(onAddMatcher.getLabelSelector())
+                .setFieldSelector(onAddMatcher.getFieldSelector());
+        }
+        return new ListOptions();
     }
 }

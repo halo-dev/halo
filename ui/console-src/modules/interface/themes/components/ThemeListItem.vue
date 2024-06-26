@@ -10,7 +10,7 @@ import {
   VSpace,
 } from "@halo-dev/components";
 import type { Theme } from "@halo-dev/api-client";
-import { apiClient } from "@/utils/api-client";
+import { consoleApiClient, coreApiClient } from "@halo-dev/api-client";
 import { toRefs, ref, inject, type Ref } from "vue";
 import { useThemeLifeCycle } from "../composables/use-theme";
 import { usePermission } from "@/utils/permission";
@@ -63,13 +63,12 @@ const handleCreateTheme = async () => {
   try {
     creating.value = true;
 
-    const { data } =
-      await apiClient.extension.theme.createThemeHaloRunV1alpha1Theme({
-        theme: props.theme,
-      });
+    const { data } = await coreApiClient.theme.theme.createTheme({
+      theme: props.theme,
+    });
 
     // create theme settings
-    apiClient.theme.reload({ name: data.metadata.name });
+    consoleApiClient.theme.theme.reload({ name: data.metadata.name });
 
     activeTabId.value = "installed";
 

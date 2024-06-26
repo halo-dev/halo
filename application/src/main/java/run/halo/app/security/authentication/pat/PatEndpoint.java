@@ -25,7 +25,7 @@ public class PatEndpoint implements CustomEndpoint {
 
     @Override
     public RouterFunction<ServerResponse> endpoint() {
-        var tag = groupVersion().toString() + "/" + PersonalAccessToken.KIND;
+        var tag = PersonalAccessToken.KIND + "V1alpha1Uc";
         return route().nest(path("/personalaccesstokens"),
                 () -> route()
                     .POST(patHandler::create,
@@ -94,7 +94,7 @@ public class PatEndpoint implements CustomEndpoint {
 
     @Override
     public GroupVersion groupVersion() {
-        return GroupVersion.parseAPIVersion("api.security.halo.run/v1alpha1");
+        return GroupVersion.parseAPIVersion("uc.api.security.halo.run/v1alpha1");
     }
 
 }

@@ -1,13 +1,13 @@
 import { rbacAnnotations } from "@/constants/annotations";
 import { roleLabels } from "@/constants/labels";
-import { apiClient } from "@/utils/api-client";
+import { coreApiClient } from "@halo-dev/api-client";
 import type { FormKitNode, FormKitTypeDefinition } from "@formkit/core";
 import { select, selects, defaultIcon } from "@formkit/inputs";
 import { i18n } from "@/locales";
 
 function optionsHandler(node: FormKitNode) {
   node.on("created", async () => {
-    const { data } = await apiClient.extension.role.listV1alpha1Role({
+    const { data } = await coreApiClient.role.listRole({
       page: 0,
       size: 0,
       labelSelector: [`!${roleLabels.TEMPLATE}`],

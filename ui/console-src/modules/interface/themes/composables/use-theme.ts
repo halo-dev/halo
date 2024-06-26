@@ -1,6 +1,6 @@
-import { apiClient } from "@/utils/api-client";
 import { useThemeStore } from "@console/stores/theme";
 import type { Theme } from "@halo-dev/api-client";
+import { consoleApiClient } from "@halo-dev/api-client";
 import { Dialog, Toast } from "@halo-dev/components";
 import { useFileDialog } from "@vueuse/core";
 import { storeToRefs } from "pinia";
@@ -53,7 +53,7 @@ export function useThemeLifeCycle(
         try {
           if (!theme.value) return;
 
-          await apiClient.theme.activateTheme({
+          await consoleApiClient.theme.theme.activateTheme({
             name: theme.value?.metadata.name,
           });
 
@@ -84,7 +84,7 @@ export function useThemeLifeCycle(
             return;
           }
 
-          await apiClient.theme.resetThemeConfig({
+          await consoleApiClient.theme.theme.resetThemeConfig({
             name: theme.value.metadata.name as string,
           });
 
@@ -157,7 +157,7 @@ export function useThemeConfigFile(theme: Ref<Theme | undefined>) {
       return;
     }
 
-    const { data } = await apiClient.theme.fetchThemeConfig({
+    const { data } = await consoleApiClient.theme.theme.fetchThemeConfig({
       name: theme?.value?.metadata.name as string,
     });
     if (!data) {
@@ -250,14 +250,14 @@ export function useThemeConfigFile(theme: Ref<Theme | undefined>) {
     if (!theme.value) {
       return;
     }
-    const { data } = await apiClient.theme.fetchThemeConfig({
+    const { data } = await consoleApiClient.theme.theme.fetchThemeConfig({
       name: theme.value.metadata.name as string,
     });
     if (!data || !data.data) {
       return;
     }
     const combinedConfigData = combinedConfigMap(data.data, importData);
-    await apiClient.theme.updateThemeConfig({
+    await consoleApiClient.theme.theme.updateThemeConfig({
       name: theme.value.metadata.name,
       configMap: {
         ...data,

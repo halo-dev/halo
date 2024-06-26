@@ -1,8 +1,8 @@
 {
   "openapi": "3.0.1",
   "info": {
-    "title": "Halo Next API",
-    "version": "2.0.0"
+    "title": "Halo",
+    "version": "2.17.0-SNAPSHOT"
   },
   "servers": [
     {
@@ -12,15 +12,15 @@
   ],
   "security": [
     {
-      "BasicAuth": [],
-      "BearerAuth": []
+      "basicAuth": [],
+      "bearerAuth": []
     }
   ],
   "paths": {
     "/api/v1alpha1/annotationsettings": {
       "get": {
-        "description": "List v1alpha1/AnnotationSetting",
-        "operationId": "List/v1alpha1/AnnotationSetting",
+        "description": "List AnnotationSetting",
+        "operationId": "listAnnotationSetting",
         "parameters": [
           {
             "description": "Page number. Default is 0.",
@@ -87,12 +87,12 @@
           }
         },
         "tags": [
-          "v1alpha1/AnnotationSetting"
+          "AnnotationSettingV1alpha1"
         ]
       },
       "post": {
-        "description": "Create v1alpha1/AnnotationSetting",
-        "operationId": "Create/v1alpha1/AnnotationSetting",
+        "description": "Create AnnotationSetting",
+        "operationId": "createAnnotationSetting",
         "requestBody": {
           "content": {
             "*/*": {
@@ -116,14 +116,14 @@
           }
         },
         "tags": [
-          "v1alpha1/AnnotationSetting"
+          "AnnotationSettingV1alpha1"
         ]
       }
     },
     "/api/v1alpha1/annotationsettings/{name}": {
       "delete": {
-        "description": "Delete v1alpha1/AnnotationSetting",
-        "operationId": "Delete/v1alpha1/AnnotationSetting",
+        "description": "Delete AnnotationSetting",
+        "operationId": "deleteAnnotationSetting",
         "parameters": [
           {
             "description": "Name of annotationsetting",
@@ -141,12 +141,12 @@
           }
         },
         "tags": [
-          "v1alpha1/AnnotationSetting"
+          "AnnotationSettingV1alpha1"
         ]
       },
       "get": {
-        "description": "Get v1alpha1/AnnotationSetting",
-        "operationId": "Get/v1alpha1/AnnotationSetting",
+        "description": "Get AnnotationSetting",
+        "operationId": "getAnnotationSetting",
         "parameters": [
           {
             "description": "Name of annotationsetting",
@@ -171,12 +171,12 @@
           }
         },
         "tags": [
-          "v1alpha1/AnnotationSetting"
+          "AnnotationSettingV1alpha1"
         ]
       },
       "patch": {
-        "description": "Patch v1alpha1/AnnotationSetting",
-        "operationId": "Patch/v1alpha1/AnnotationSetting",
+        "description": "Patch AnnotationSetting",
+        "operationId": "patchAnnotationSetting",
         "parameters": [
           {
             "description": "Name of annotationsetting",
@@ -210,12 +210,12 @@
           }
         },
         "tags": [
-          "v1alpha1/AnnotationSetting"
+          "AnnotationSettingV1alpha1"
         ]
       },
       "put": {
-        "description": "Update v1alpha1/AnnotationSetting",
-        "operationId": "Update/v1alpha1/AnnotationSetting",
+        "description": "Update AnnotationSetting",
+        "operationId": "updateAnnotationSetting",
         "parameters": [
           {
             "description": "Name of annotationsetting",
@@ -250,14 +250,14 @@
           }
         },
         "tags": [
-          "v1alpha1/AnnotationSetting"
+          "AnnotationSettingV1alpha1"
         ]
       }
     },
     "/api/v1alpha1/configmaps": {
       "get": {
-        "description": "List v1alpha1/ConfigMap",
-        "operationId": "List/v1alpha1/ConfigMap",
+        "description": "List ConfigMap",
+        "operationId": "listConfigMap",
         "parameters": [
           {
             "description": "Page number. Default is 0.",
@@ -324,12 +324,12 @@
           }
         },
         "tags": [
-          "v1alpha1/ConfigMap"
+          "ConfigMapV1alpha1"
         ]
       },
       "post": {
-        "description": "Create v1alpha1/ConfigMap",
-        "operationId": "Create/v1alpha1/ConfigMap",
+        "description": "Create ConfigMap",
+        "operationId": "createConfigMap",
         "requestBody": {
           "content": {
             "*/*": {
@@ -353,14 +353,14 @@
           }
         },
         "tags": [
-          "v1alpha1/ConfigMap"
+          "ConfigMapV1alpha1"
         ]
       }
     },
     "/api/v1alpha1/configmaps/{name}": {
       "delete": {
-        "description": "Delete v1alpha1/ConfigMap",
-        "operationId": "Delete/v1alpha1/ConfigMap",
+        "description": "Delete ConfigMap",
+        "operationId": "deleteConfigMap",
         "parameters": [
           {
             "description": "Name of configmap",
@@ -378,12 +378,12 @@
           }
         },
         "tags": [
-          "v1alpha1/ConfigMap"
+          "ConfigMapV1alpha1"
         ]
       },
       "get": {
-        "description": "Get v1alpha1/ConfigMap",
-        "operationId": "Get/v1alpha1/ConfigMap",
+        "description": "Get ConfigMap",
+        "operationId": "getConfigMap",
         "parameters": [
           {
             "description": "Name of configmap",
@@ -408,12 +408,12 @@
           }
         },
         "tags": [
-          "v1alpha1/ConfigMap"
+          "ConfigMapV1alpha1"
         ]
       },
       "patch": {
-        "description": "Patch v1alpha1/ConfigMap",
-        "operationId": "Patch/v1alpha1/ConfigMap",
+        "description": "Patch ConfigMap",
+        "operationId": "patchConfigMap",
         "parameters": [
           {
             "description": "Name of configmap",
@@ -447,12 +447,12 @@
           }
         },
         "tags": [
-          "v1alpha1/ConfigMap"
+          "ConfigMapV1alpha1"
         ]
       },
       "put": {
-        "description": "Update v1alpha1/ConfigMap",
-        "operationId": "Update/v1alpha1/ConfigMap",
+        "description": "Update ConfigMap",
+        "operationId": "updateConfigMap",
         "parameters": [
           {
             "description": "Name of configmap",
@@ -487,14 +487,14 @@
           }
         },
         "tags": [
-          "v1alpha1/ConfigMap"
+          "ConfigMapV1alpha1"
         ]
       }
     },
     "/api/v1alpha1/menuitems": {
       "get": {
-        "description": "List v1alpha1/MenuItem",
-        "operationId": "List/v1alpha1/MenuItem",
+        "description": "List MenuItem",
+        "operationId": "listMenuItem",
         "parameters": [
           {
             "description": "Page number. Default is 0.",
@@ -561,12 +561,12 @@
           }
         },
         "tags": [
-          "v1alpha1/MenuItem"
+          "MenuItemV1alpha1"
         ]
       },
       "post": {
-        "description": "Create v1alpha1/MenuItem",
-        "operationId": "Create/v1alpha1/MenuItem",
+        "description": "Create MenuItem",
+        "operationId": "createMenuItem",
         "requestBody": {
           "content": {
             "*/*": {
@@ -590,14 +590,14 @@
           }
         },
         "tags": [
-          "v1alpha1/MenuItem"
+          "MenuItemV1alpha1"
         ]
       }
     },
     "/api/v1alpha1/menuitems/{name}": {
       "delete": {
-        "description": "Delete v1alpha1/MenuItem",
-        "operationId": "Delete/v1alpha1/MenuItem",
+        "description": "Delete MenuItem",
+        "operationId": "deleteMenuItem",
         "parameters": [
           {
             "description": "Name of menuitem",
@@ -615,12 +615,12 @@
           }
         },
         "tags": [
-          "v1alpha1/MenuItem"
+          "MenuItemV1alpha1"
         ]
       },
       "get": {
-        "description": "Get v1alpha1/MenuItem",
-        "operationId": "Get/v1alpha1/MenuItem",
+        "description": "Get MenuItem",
+        "operationId": "getMenuItem",
         "parameters": [
           {
             "description": "Name of menuitem",
@@ -645,12 +645,12 @@
           }
         },
         "tags": [
-          "v1alpha1/MenuItem"
+          "MenuItemV1alpha1"
         ]
       },
       "patch": {
-        "description": "Patch v1alpha1/MenuItem",
-        "operationId": "Patch/v1alpha1/MenuItem",
+        "description": "Patch MenuItem",
+        "operationId": "patchMenuItem",
         "parameters": [
           {
             "description": "Name of menuitem",
@@ -684,12 +684,12 @@
           }
         },
         "tags": [
-          "v1alpha1/MenuItem"
+          "MenuItemV1alpha1"
         ]
       },
       "put": {
-        "description": "Update v1alpha1/MenuItem",
-        "operationId": "Update/v1alpha1/MenuItem",
+        "description": "Update MenuItem",
+        "operationId": "updateMenuItem",
         "parameters": [
           {
             "description": "Name of menuitem",
@@ -724,14 +724,14 @@
           }
         },
         "tags": [
-          "v1alpha1/MenuItem"
+          "MenuItemV1alpha1"
         ]
       }
     },
     "/api/v1alpha1/menus": {
       "get": {
-        "description": "List v1alpha1/Menu",
-        "operationId": "List/v1alpha1/Menu",
+        "description": "List Menu",
+        "operationId": "listMenu",
         "parameters": [
           {
             "description": "Page number. Default is 0.",
@@ -798,12 +798,12 @@
           }
         },
         "tags": [
-          "v1alpha1/Menu"
+          "MenuV1alpha1"
         ]
       },
       "post": {
-        "description": "Create v1alpha1/Menu",
-        "operationId": "Create/v1alpha1/Menu",
+        "description": "Create Menu",
+        "operationId": "createMenu",
         "requestBody": {
           "content": {
             "*/*": {
@@ -827,14 +827,14 @@
           }
         },
         "tags": [
-          "v1alpha1/Menu"
+          "MenuV1alpha1"
         ]
       }
     },
     "/api/v1alpha1/menus/{name}": {
       "delete": {
-        "description": "Delete v1alpha1/Menu",
-        "operationId": "Delete/v1alpha1/Menu",
+        "description": "Delete Menu",
+        "operationId": "deleteMenu",
         "parameters": [
           {
             "description": "Name of menu",
@@ -852,12 +852,12 @@
           }
         },
         "tags": [
-          "v1alpha1/Menu"
+          "MenuV1alpha1"
         ]
       },
       "get": {
-        "description": "Get v1alpha1/Menu",
-        "operationId": "Get/v1alpha1/Menu",
+        "description": "Get Menu",
+        "operationId": "getMenu",
         "parameters": [
           {
             "description": "Name of menu",
@@ -882,12 +882,12 @@
           }
         },
         "tags": [
-          "v1alpha1/Menu"
+          "MenuV1alpha1"
         ]
       },
       "patch": {
-        "description": "Patch v1alpha1/Menu",
-        "operationId": "Patch/v1alpha1/Menu",
+        "description": "Patch Menu",
+        "operationId": "patchMenu",
         "parameters": [
           {
             "description": "Name of menu",
@@ -921,12 +921,12 @@
           }
         },
         "tags": [
-          "v1alpha1/Menu"
+          "MenuV1alpha1"
         ]
       },
       "put": {
-        "description": "Update v1alpha1/Menu",
-        "operationId": "Update/v1alpha1/Menu",
+        "description": "Update Menu",
+        "operationId": "updateMenu",
         "parameters": [
           {
             "description": "Name of menu",
@@ -961,14 +961,14 @@
           }
         },
         "tags": [
-          "v1alpha1/Menu"
+          "MenuV1alpha1"
         ]
       }
     },
     "/api/v1alpha1/rolebindings": {
       "get": {
-        "description": "List v1alpha1/RoleBinding",
-        "operationId": "List/v1alpha1/RoleBinding",
+        "description": "List RoleBinding",
+        "operationId": "listRoleBinding",
         "parameters": [
           {
             "description": "Page number. Default is 0.",
@@ -1035,12 +1035,12 @@
           }
         },
         "tags": [
-          "v1alpha1/RoleBinding"
+          "RoleBindingV1alpha1"
         ]
       },
       "post": {
-        "description": "Create v1alpha1/RoleBinding",
-        "operationId": "Create/v1alpha1/RoleBinding",
+        "description": "Create RoleBinding",
+        "operationId": "createRoleBinding",
         "requestBody": {
           "content": {
             "*/*": {
@@ -1064,14 +1064,14 @@
           }
         },
         "tags": [
-          "v1alpha1/RoleBinding"
+          "RoleBindingV1alpha1"
         ]
       }
     },
     "/api/v1alpha1/rolebindings/{name}": {
       "delete": {
-        "description": "Delete v1alpha1/RoleBinding",
-        "operationId": "Delete/v1alpha1/RoleBinding",
+        "description": "Delete RoleBinding",
+        "operationId": "deleteRoleBinding",
         "parameters": [
           {
             "description": "Name of rolebinding",
@@ -1089,12 +1089,12 @@
           }
         },
         "tags": [
-          "v1alpha1/RoleBinding"
+          "RoleBindingV1alpha1"
         ]
       },
       "get": {
-        "description": "Get v1alpha1/RoleBinding",
-        "operationId": "Get/v1alpha1/RoleBinding",
+        "description": "Get RoleBinding",
+        "operationId": "getRoleBinding",
         "parameters": [
           {
             "description": "Name of rolebinding",
@@ -1119,12 +1119,12 @@
           }
         },
         "tags": [
-          "v1alpha1/RoleBinding"
+          "RoleBindingV1alpha1"
         ]
       },
       "patch": {
-        "description": "Patch v1alpha1/RoleBinding",
-        "operationId": "Patch/v1alpha1/RoleBinding",
+        "description": "Patch RoleBinding",
+        "operationId": "patchRoleBinding",
         "parameters": [
           {
             "description": "Name of rolebinding",
@@ -1158,12 +1158,12 @@
           }
         },
         "tags": [
-          "v1alpha1/RoleBinding"
+          "RoleBindingV1alpha1"
         ]
       },
       "put": {
-        "description": "Update v1alpha1/RoleBinding",
-        "operationId": "Update/v1alpha1/RoleBinding",
+        "description": "Update RoleBinding",
+        "operationId": "updateRoleBinding",
         "parameters": [
           {
             "description": "Name of rolebinding",
@@ -1198,14 +1198,14 @@
           }
         },
         "tags": [
-          "v1alpha1/RoleBinding"
+          "RoleBindingV1alpha1"
         ]
       }
     },
     "/api/v1alpha1/roles": {
       "get": {
-        "description": "List v1alpha1/Role",
-        "operationId": "List/v1alpha1/Role",
+        "description": "List Role",
+        "operationId": "listRole",
         "parameters": [
           {
             "description": "Page number. Default is 0.",
@@ -1272,12 +1272,12 @@
           }
         },
         "tags": [
-          "v1alpha1/Role"
+          "RoleV1alpha1"
         ]
       },
       "post": {
-        "description": "Create v1alpha1/Role",
-        "operationId": "Create/v1alpha1/Role",
+        "description": "Create Role",
+        "operationId": "createRole",
         "requestBody": {
           "content": {
             "*/*": {
@@ -1301,14 +1301,14 @@
           }
         },
         "tags": [
-          "v1alpha1/Role"
+          "RoleV1alpha1"
         ]
       }
     },
     "/api/v1alpha1/roles/{name}": {
       "delete": {
-        "description": "Delete v1alpha1/Role",
-        "operationId": "Delete/v1alpha1/Role",
+        "description": "Delete Role",
+        "operationId": "deleteRole",
         "parameters": [
           {
             "description": "Name of role",
@@ -1326,12 +1326,12 @@
           }
         },
         "tags": [
-          "v1alpha1/Role"
+          "RoleV1alpha1"
         ]
       },
       "get": {
-        "description": "Get v1alpha1/Role",
-        "operationId": "Get/v1alpha1/Role",
+        "description": "Get Role",
+        "operationId": "getRole",
         "parameters": [
           {
             "description": "Name of role",
@@ -1356,12 +1356,12 @@
           }
         },
         "tags": [
-          "v1alpha1/Role"
+          "RoleV1alpha1"
         ]
       },
       "patch": {
-        "description": "Patch v1alpha1/Role",
-        "operationId": "Patch/v1alpha1/Role",
+        "description": "Patch Role",
+        "operationId": "patchRole",
         "parameters": [
           {
             "description": "Name of role",
@@ -1395,12 +1395,12 @@
           }
         },
         "tags": [
-          "v1alpha1/Role"
+          "RoleV1alpha1"
         ]
       },
       "put": {
-        "description": "Update v1alpha1/Role",
-        "operationId": "Update/v1alpha1/Role",
+        "description": "Update Role",
+        "operationId": "updateRole",
         "parameters": [
           {
             "description": "Name of role",
@@ -1435,14 +1435,14 @@
           }
         },
         "tags": [
-          "v1alpha1/Role"
+          "RoleV1alpha1"
         ]
       }
     },
     "/api/v1alpha1/secrets": {
       "get": {
-        "description": "List v1alpha1/Secret",
-        "operationId": "List/v1alpha1/Secret",
+        "description": "List Secret",
+        "operationId": "listSecret",
         "parameters": [
           {
             "description": "Page number. Default is 0.",
@@ -1509,12 +1509,12 @@
           }
         },
         "tags": [
-          "v1alpha1/Secret"
+          "SecretV1alpha1"
         ]
       },
       "post": {
-        "description": "Create v1alpha1/Secret",
-        "operationId": "Create/v1alpha1/Secret",
+        "description": "Create Secret",
+        "operationId": "createSecret",
         "requestBody": {
           "content": {
             "*/*": {
@@ -1538,14 +1538,14 @@
           }
         },
         "tags": [
-          "v1alpha1/Secret"
+          "SecretV1alpha1"
         ]
       }
     },
     "/api/v1alpha1/secrets/{name}": {
       "delete": {
-        "description": "Delete v1alpha1/Secret",
-        "operationId": "Delete/v1alpha1/Secret",
+        "description": "Delete Secret",
+        "operationId": "deleteSecret",
         "parameters": [
           {
             "description": "Name of secret",
@@ -1563,12 +1563,12 @@
           }
         },
         "tags": [
-          "v1alpha1/Secret"
+          "SecretV1alpha1"
         ]
       },
       "get": {
-        "description": "Get v1alpha1/Secret",
-        "operationId": "Get/v1alpha1/Secret",
+        "description": "Get Secret",
+        "operationId": "getSecret",
         "parameters": [
           {
             "description": "Name of secret",
@@ -1593,12 +1593,12 @@
           }
         },
         "tags": [
-          "v1alpha1/Secret"
+          "SecretV1alpha1"
         ]
       },
       "patch": {
-        "description": "Patch v1alpha1/Secret",
-        "operationId": "Patch/v1alpha1/Secret",
+        "description": "Patch Secret",
+        "operationId": "patchSecret",
         "parameters": [
           {
             "description": "Name of secret",
@@ -1632,12 +1632,12 @@
           }
         },
         "tags": [
-          "v1alpha1/Secret"
+          "SecretV1alpha1"
         ]
       },
       "put": {
-        "description": "Update v1alpha1/Secret",
-        "operationId": "Update/v1alpha1/Secret",
+        "description": "Update Secret",
+        "operationId": "updateSecret",
         "parameters": [
           {
             "description": "Name of secret",
@@ -1672,14 +1672,14 @@
           }
         },
         "tags": [
-          "v1alpha1/Secret"
+          "SecretV1alpha1"
         ]
       }
     },
     "/api/v1alpha1/settings": {
       "get": {
-        "description": "List v1alpha1/Setting",
-        "operationId": "List/v1alpha1/Setting",
+        "description": "List Setting",
+        "operationId": "listSetting",
         "parameters": [
           {
             "description": "Page number. Default is 0.",
@@ -1746,12 +1746,12 @@
           }
         },
         "tags": [
-          "v1alpha1/Setting"
+          "SettingV1alpha1"
         ]
       },
       "post": {
-        "description": "Create v1alpha1/Setting",
-        "operationId": "Create/v1alpha1/Setting",
+        "description": "Create Setting",
+        "operationId": "createSetting",
         "requestBody": {
           "content": {
             "*/*": {
@@ -1775,14 +1775,14 @@
           }
         },
         "tags": [
-          "v1alpha1/Setting"
+          "SettingV1alpha1"
         ]
       }
     },
     "/api/v1alpha1/settings/{name}": {
       "delete": {
-        "description": "Delete v1alpha1/Setting",
-        "operationId": "Delete/v1alpha1/Setting",
+        "description": "Delete Setting",
+        "operationId": "deleteSetting",
         "parameters": [
           {
             "description": "Name of setting",
@@ -1800,12 +1800,12 @@
           }
         },
         "tags": [
-          "v1alpha1/Setting"
+          "SettingV1alpha1"
         ]
       },
       "get": {
-        "description": "Get v1alpha1/Setting",
-        "operationId": "Get/v1alpha1/Setting",
+        "description": "Get Setting",
+        "operationId": "getSetting",
         "parameters": [
           {
             "description": "Name of setting",
@@ -1830,12 +1830,12 @@
           }
         },
         "tags": [
-          "v1alpha1/Setting"
+          "SettingV1alpha1"
         ]
       },
       "patch": {
-        "description": "Patch v1alpha1/Setting",
-        "operationId": "Patch/v1alpha1/Setting",
+        "description": "Patch Setting",
+        "operationId": "patchSetting",
         "parameters": [
           {
             "description": "Name of setting",
@@ -1869,12 +1869,12 @@
           }
         },
         "tags": [
-          "v1alpha1/Setting"
+          "SettingV1alpha1"
         ]
       },
       "put": {
-        "description": "Update v1alpha1/Setting",
-        "operationId": "Update/v1alpha1/Setting",
+        "description": "Update Setting",
+        "operationId": "updateSetting",
         "parameters": [
           {
             "description": "Name of setting",
@@ -1909,14 +1909,14 @@
           }
         },
         "tags": [
-          "v1alpha1/Setting"
+          "SettingV1alpha1"
         ]
       }
     },
     "/api/v1alpha1/users": {
       "get": {
-        "description": "List v1alpha1/User",
-        "operationId": "List/v1alpha1/User",
+        "description": "List User",
+        "operationId": "listUser",
         "parameters": [
           {
             "description": "Page number. Default is 0.",
@@ -1983,12 +1983,12 @@
           }
         },
         "tags": [
-          "v1alpha1/User"
+          "UserV1alpha1"
         ]
       },
       "post": {
-        "description": "Create v1alpha1/User",
-        "operationId": "Create/v1alpha1/User",
+        "description": "Create User",
+        "operationId": "createUser",
         "requestBody": {
           "content": {
             "*/*": {
@@ -2012,14 +2012,14 @@
           }
         },
         "tags": [
-          "v1alpha1/User"
+          "UserV1alpha1"
         ]
       }
     },
     "/api/v1alpha1/users/{name}": {
       "delete": {
-        "description": "Delete v1alpha1/User",
-        "operationId": "Delete/v1alpha1/User",
+        "description": "Delete User",
+        "operationId": "deleteUser",
         "parameters": [
           {
             "description": "Name of user",
@@ -2037,12 +2037,12 @@
           }
         },
         "tags": [
-          "v1alpha1/User"
+          "UserV1alpha1"
         ]
       },
       "get": {
-        "description": "Get v1alpha1/User",
-        "operationId": "Get/v1alpha1/User",
+        "description": "Get User",
+        "operationId": "getUser",
         "parameters": [
           {
             "description": "Name of user",
@@ -2067,12 +2067,12 @@
           }
         },
         "tags": [
-          "v1alpha1/User"
+          "UserV1alpha1"
         ]
       },
       "patch": {
-        "description": "Patch v1alpha1/User",
-        "operationId": "Patch/v1alpha1/User",
+        "description": "Patch User",
+        "operationId": "patchUser",
         "parameters": [
           {
             "description": "Name of user",
@@ -2106,12 +2106,12 @@
           }
         },
         "tags": [
-          "v1alpha1/User"
+          "UserV1alpha1"
         ]
       },
       "put": {
-        "description": "Update v1alpha1/User",
-        "operationId": "Update/v1alpha1/User",
+        "description": "Update User",
+        "operationId": "updateUser",
         "parameters": [
           {
             "description": "Name of user",
@@ -2146,7 +2146,7 @@
           }
         },
         "tags": [
-          "v1alpha1/User"
+          "UserV1alpha1"
         ]
       }
     },
@@ -2246,7 +2246,7 @@
           }
         },
         "tags": [
-          "api.console.halo.run/v1alpha1/Attachment"
+          "AttachmentV1alpha1Console"
         ]
       }
     },
@@ -2276,7 +2276,7 @@
           }
         },
         "tags": [
-          "api.console.halo.run/v1alpha1/Attachment"
+          "AttachmentV1alpha1Console"
         ]
       }
     },
@@ -2300,7 +2300,7 @@
           }
         },
         "tags": [
-          "api.console.halo.run/v1alpha1/AuthProvider"
+          "AuthProviderV1alpha1Console"
         ]
       }
     },
@@ -2331,7 +2331,7 @@
           }
         },
         "tags": [
-          "api.console.halo.run/v1alpha1/AuthProvider"
+          "AuthProviderV1alpha1Console"
         ]
       }
     },
@@ -2362,7 +2362,7 @@
           }
         },
         "tags": [
-          "api.console.halo.run/v1alpha1/AuthProvider"
+          "AuthProviderV1alpha1Console"
         ]
       }
     },
@@ -2387,7 +2387,7 @@
           }
         },
         "tags": [
-          "v1alpha1/Cache"
+          "CacheV1alpha1Console"
         ]
       }
     },
@@ -2485,7 +2485,7 @@
           }
         },
         "tags": [
-          "api.console.halo.run/v1alpha1/Comment"
+          "CommentV1alpha1Console"
         ]
       },
       "post": {
@@ -2514,7 +2514,7 @@
           }
         },
         "tags": [
-          "api.console.halo.run/v1alpha1/Comment"
+          "CommentV1alpha1Console"
         ]
       }
     },
@@ -2555,7 +2555,7 @@
           }
         },
         "tags": [
-          "api.console.halo.run/v1alpha1/Comment"
+          "CommentV1alpha1Console"
         ]
       }
     },
@@ -2565,7 +2565,7 @@
         "operationId": "BuildPostIndices",
         "responses": {},
         "tags": [
-          "api.console.halo.run/v1alpha1/Indices"
+          "IndicesV1alpha1Console"
         ]
       }
     },
@@ -2597,7 +2597,7 @@
           }
         },
         "tags": [
-          "api.console.halo.run/v1alpha1/Notifier"
+          "NotifierV1alpha1Console"
         ]
       },
       "post": {
@@ -2631,7 +2631,7 @@
           }
         },
         "tags": [
-          "api.console.halo.run/v1alpha1/Notifier"
+          "NotifierV1alpha1Console"
         ]
       }
     },
@@ -2655,7 +2655,7 @@
           }
         },
         "tags": [
-          "api.console.halo.run/v1alpha1/Plugin"
+          "PluginV1alpha1Console"
         ]
       }
     },
@@ -2745,7 +2745,7 @@
           }
         },
         "tags": [
-          "api.console.halo.run/v1alpha1/Plugin"
+          "PluginV1alpha1Console"
         ]
       }
     },
@@ -2766,7 +2766,7 @@
           }
         },
         "tags": [
-          "api.console.halo.run/v1alpha1/Plugin"
+          "PluginV1alpha1Console"
         ]
       }
     },
@@ -2787,7 +2787,7 @@
           }
         },
         "tags": [
-          "api.console.halo.run/v1alpha1/Plugin"
+          "PluginV1alpha1Console"
         ]
       }
     },
@@ -2818,7 +2818,7 @@
           }
         },
         "tags": [
-          "api.console.halo.run/v1alpha1/Plugin"
+          "PluginV1alpha1Console"
         ]
       }
     },
@@ -2849,7 +2849,7 @@
           }
         },
         "tags": [
-          "api.console.halo.run/v1alpha1/Plugin"
+          "PluginV1alpha1Console"
         ]
       }
     },
@@ -2880,7 +2880,7 @@
           }
         },
         "tags": [
-          "api.console.halo.run/v1alpha1/Plugin"
+          "PluginV1alpha1Console"
         ]
       },
       "put": {
@@ -2919,7 +2919,7 @@
           }
         },
         "tags": [
-          "api.console.halo.run/v1alpha1/Plugin"
+          "PluginV1alpha1Console"
         ]
       }
     },
@@ -2960,7 +2960,7 @@
           }
         },
         "tags": [
-          "api.console.halo.run/v1alpha1/Plugin"
+          "PluginV1alpha1Console"
         ]
       }
     },
@@ -2991,7 +2991,7 @@
           }
         },
         "tags": [
-          "api.console.halo.run/v1alpha1/Plugin"
+          "PluginV1alpha1Console"
         ]
       }
     },
@@ -3022,7 +3022,7 @@
           }
         },
         "tags": [
-          "api.console.halo.run/v1alpha1/Plugin"
+          "PluginV1alpha1Console"
         ]
       }
     },
@@ -3053,7 +3053,7 @@
           }
         },
         "tags": [
-          "api.console.halo.run/v1alpha1/Plugin"
+          "PluginV1alpha1Console"
         ]
       }
     },
@@ -3083,7 +3083,7 @@
         },
         "responses": {},
         "tags": [
-          "api.console.halo.run/v1alpha1/Plugin"
+          "PluginV1alpha1Console"
         ]
       }
     },
@@ -3124,7 +3124,7 @@
           }
         },
         "tags": [
-          "api.console.halo.run/v1alpha1/Plugin"
+          "PluginV1alpha1Console"
         ]
       }
     },
@@ -3228,7 +3228,7 @@
           }
         },
         "tags": [
-          "api.console.halo.run/v1alpha1/Post"
+          "PostV1alpha1Console"
         ]
       },
       "post": {
@@ -3257,7 +3257,7 @@
           }
         },
         "tags": [
-          "api.console.halo.run/v1alpha1/Post"
+          "PostV1alpha1Console"
         ]
       }
     },
@@ -3298,7 +3298,7 @@
           }
         },
         "tags": [
-          "api.console.halo.run/v1alpha1/Post"
+          "PostV1alpha1Console"
         ]
       }
     },
@@ -3337,7 +3337,7 @@
           }
         },
         "tags": [
-          "api.console.halo.run/v1alpha1/Post"
+          "PostV1alpha1Console"
         ]
       },
       "get": {
@@ -3374,7 +3374,7 @@
           }
         },
         "tags": [
-          "api.console.halo.run/v1alpha1/Post"
+          "PostV1alpha1Console"
         ]
       },
       "put": {
@@ -3413,7 +3413,7 @@
           }
         },
         "tags": [
-          "api.console.halo.run/v1alpha1/Post"
+          "PostV1alpha1Console"
         ]
       }
     },
@@ -3444,7 +3444,7 @@
           }
         },
         "tags": [
-          "api.console.halo.run/v1alpha1/Post"
+          "PostV1alpha1Console"
         ]
       }
     },
@@ -3490,7 +3490,7 @@
           }
         },
         "tags": [
-          "api.console.halo.run/v1alpha1/Post"
+          "PostV1alpha1Console"
         ]
       }
     },
@@ -3510,7 +3510,7 @@
         ],
         "responses": {},
         "tags": [
-          "api.console.halo.run/v1alpha1/Post"
+          "PostV1alpha1Console"
         ]
       }
     },
@@ -3541,7 +3541,7 @@
           }
         },
         "tags": [
-          "api.console.halo.run/v1alpha1/Post"
+          "PostV1alpha1Console"
         ]
       }
     },
@@ -3582,7 +3582,7 @@
           }
         },
         "tags": [
-          "api.console.halo.run/v1alpha1/Post"
+          "PostV1alpha1Console"
         ]
       }
     },
@@ -3616,7 +3616,7 @@
           }
         },
         "tags": [
-          "api.console.halo.run/v1alpha1/Post"
+          "PostV1alpha1Console"
         ]
       }
     },
@@ -3647,7 +3647,7 @@
           }
         },
         "tags": [
-          "api.console.halo.run/v1alpha1/Post"
+          "PostV1alpha1Console"
         ]
       }
     },
@@ -3730,7 +3730,7 @@
           }
         },
         "tags": [
-          "api.console.halo.run/v1alpha1/Reply"
+          "ReplyV1alpha1Console"
         ]
       }
     },
@@ -3850,7 +3850,7 @@
           }
         },
         "tags": [
-          "api.console.halo.run/v1alpha1/SinglePage"
+          "SinglePageV1alpha1Console"
         ]
       },
       "post": {
@@ -3879,7 +3879,7 @@
           }
         },
         "tags": [
-          "api.console.halo.run/v1alpha1/SinglePage"
+          "SinglePageV1alpha1Console"
         ]
       }
     },
@@ -3920,7 +3920,7 @@
           }
         },
         "tags": [
-          "api.console.halo.run/v1alpha1/SinglePage"
+          "SinglePageV1alpha1Console"
         ]
       }
     },
@@ -3959,7 +3959,7 @@
           }
         },
         "tags": [
-          "api.console.halo.run/v1alpha1/SinglePage"
+          "SinglePageV1alpha1Console"
         ]
       },
       "get": {
@@ -3996,7 +3996,7 @@
           }
         },
         "tags": [
-          "api.console.halo.run/v1alpha1/SinglePage"
+          "SinglePageV1alpha1Console"
         ]
       },
       "put": {
@@ -4035,7 +4035,7 @@
           }
         },
         "tags": [
-          "api.console.halo.run/v1alpha1/SinglePage"
+          "SinglePageV1alpha1Console"
         ]
       }
     },
@@ -4066,7 +4066,7 @@
           }
         },
         "tags": [
-          "api.console.halo.run/v1alpha1/SinglePage"
+          "SinglePageV1alpha1Console"
         ]
       }
     },
@@ -4097,7 +4097,7 @@
           }
         },
         "tags": [
-          "api.console.halo.run/v1alpha1/SinglePage"
+          "SinglePageV1alpha1Console"
         ]
       }
     },
@@ -4128,7 +4128,7 @@
           }
         },
         "tags": [
-          "api.console.halo.run/v1alpha1/SinglePage"
+          "SinglePageV1alpha1Console"
         ]
       }
     },
@@ -4169,7 +4169,7 @@
           }
         },
         "tags": [
-          "api.console.halo.run/v1alpha1/SinglePage"
+          "SinglePageV1alpha1Console"
         ]
       }
     },
@@ -4203,7 +4203,7 @@
           }
         },
         "tags": [
-          "api.console.halo.run/v1alpha1/SinglePage"
+          "SinglePageV1alpha1Console"
         ]
       }
     },
@@ -4224,7 +4224,7 @@
           }
         },
         "tags": [
-          "api.console.halo.run/v1alpha1/Stats"
+          "SystemV1alpha1Console"
         ]
       }
     },
@@ -4256,7 +4256,7 @@
           }
         },
         "tags": [
-          "api.console.halo.run/v1alpha1/System"
+          "SystemV1alpha1Console"
         ]
       }
     },
@@ -4338,7 +4338,7 @@
           }
         },
         "tags": [
-          "api.console.halo.run/v1alpha1/Tag"
+          "TagV1alpha1Console"
         ]
       }
     },
@@ -4409,7 +4409,7 @@
           }
         },
         "tags": [
-          "api.console.halo.run/v1alpha1/Theme"
+          "ThemeV1alpha1Console"
         ]
       }
     },
@@ -4430,7 +4430,7 @@
           }
         },
         "tags": [
-          "api.console.halo.run/v1alpha1/Theme"
+          "ThemeV1alpha1Console"
         ]
       }
     },
@@ -4461,7 +4461,7 @@
           }
         },
         "tags": [
-          "api.console.halo.run/v1alpha1/Theme"
+          "ThemeV1alpha1Console"
         ]
       }
     },
@@ -4492,7 +4492,7 @@
           }
         },
         "tags": [
-          "api.console.halo.run/v1alpha1/Theme"
+          "ThemeV1alpha1Console"
         ]
       }
     },
@@ -4523,7 +4523,7 @@
           }
         },
         "tags": [
-          "api.console.halo.run/v1alpha1/Theme"
+          "ThemeV1alpha1Console"
         ]
       }
     },
@@ -4554,7 +4554,7 @@
           }
         },
         "tags": [
-          "api.console.halo.run/v1alpha1/Theme"
+          "ThemeV1alpha1Console"
         ]
       },
       "put": {
@@ -4593,7 +4593,7 @@
           }
         },
         "tags": [
-          "api.console.halo.run/v1alpha1/Theme"
+          "ThemeV1alpha1Console"
         ]
       }
     },
@@ -4617,7 +4617,7 @@
           }
         },
         "tags": [
-          "api.console.halo.run/v1alpha1/Theme"
+          "ThemeV1alpha1Console"
         ]
       }
     },
@@ -4648,7 +4648,7 @@
           }
         },
         "tags": [
-          "api.console.halo.run/v1alpha1/Theme"
+          "ThemeV1alpha1Console"
         ]
       }
     },
@@ -4679,7 +4679,7 @@
           }
         },
         "tags": [
-          "api.console.halo.run/v1alpha1/Theme"
+          "ThemeV1alpha1Console"
         ]
       }
     },
@@ -4710,7 +4710,7 @@
           }
         },
         "tags": [
-          "api.console.halo.run/v1alpha1/Theme"
+          "ThemeV1alpha1Console"
         ]
       }
     },
@@ -4740,7 +4740,7 @@
         },
         "responses": {},
         "tags": [
-          "api.console.halo.run/v1alpha1/Theme"
+          "ThemeV1alpha1Console"
         ]
       }
     },
@@ -4781,7 +4781,7 @@
           }
         },
         "tags": [
-          "api.console.halo.run/v1alpha1/Theme"
+          "ThemeV1alpha1Console"
         ]
       }
     },
@@ -4871,7 +4871,7 @@
           }
         },
         "tags": [
-          "api.console.halo.run/v1alpha1/User"
+          "UserV1alpha1Console"
         ]
       },
       "post": {
@@ -4900,7 +4900,7 @@
           }
         },
         "tags": [
-          "api.console.halo.run/v1alpha1/User"
+          "UserV1alpha1Console"
         ]
       }
     },
@@ -4921,7 +4921,7 @@
           }
         },
         "tags": [
-          "api.console.halo.run/v1alpha1/User"
+          "UserV1alpha1Console"
         ]
       },
       "put": {
@@ -4950,7 +4950,7 @@
           }
         },
         "tags": [
-          "api.console.halo.run/v1alpha1/User"
+          "UserV1alpha1Console"
         ]
       }
     },
@@ -4981,7 +4981,7 @@
           }
         },
         "tags": [
-          "api.console.halo.run/v1alpha1/User"
+          "UserV1alpha1Console"
         ]
       }
     },
@@ -5006,7 +5006,7 @@
           }
         },
         "tags": [
-          "api.console.halo.run/v1alpha1/User"
+          "UserV1alpha1Console"
         ]
       }
     },
@@ -5031,7 +5031,7 @@
           }
         },
         "tags": [
-          "api.console.halo.run/v1alpha1/User"
+          "UserV1alpha1Console"
         ]
       }
     },
@@ -5063,7 +5063,7 @@
           }
         },
         "tags": [
-          "api.console.halo.run/v1alpha1/User"
+          "UserV1alpha1Console"
         ]
       }
     },
@@ -5095,7 +5095,7 @@
           }
         },
         "tags": [
-          "api.console.halo.run/v1alpha1/User"
+          "UserV1alpha1Console"
         ]
       },
       "post": {
@@ -5135,7 +5135,7 @@
           }
         },
         "tags": [
-          "api.console.halo.run/v1alpha1/User"
+          "UserV1alpha1Console"
         ]
       }
     },
@@ -5177,7 +5177,7 @@
           }
         },
         "tags": [
-          "api.console.halo.run/v1alpha1/User"
+          "UserV1alpha1Console"
         ]
       }
     },
@@ -5209,7 +5209,7 @@
           }
         },
         "tags": [
-          "api.console.halo.run/v1alpha1/User"
+          "UserV1alpha1Console"
         ]
       },
       "post": {
@@ -5249,7 +5249,7 @@
           }
         },
         "tags": [
-          "api.console.halo.run/v1alpha1/User"
+          "UserV1alpha1Console"
         ]
       }
     },
@@ -5278,7 +5278,7 @@
         ],
         "responses": {},
         "tags": [
-          "api.console.migration.halo.run/v1alpha1/Migration"
+          "MigrationV1alpha1Console"
         ]
       }
     },
@@ -5298,7 +5298,7 @@
         },
         "responses": {},
         "tags": [
-          "api.console.migration.halo.run/v1alpha1/Migration"
+          "MigrationV1alpha1Console"
         ]
       }
     },
@@ -5372,7 +5372,7 @@
           }
         },
         "tags": [
-          "api.content.halo.run/v1alpha1/Category"
+          "CategoryV1alpha1Public"
         ]
       }
     },
@@ -5404,7 +5404,7 @@
           }
         },
         "tags": [
-          "api.content.halo.run/v1alpha1/Category"
+          "CategoryV1alpha1Public"
         ]
       }
     },
@@ -5487,7 +5487,7 @@
           }
         },
         "tags": [
-          "api.content.halo.run/v1alpha1/Category"
+          "CategoryV1alpha1Public"
         ]
       }
     },
@@ -5561,7 +5561,7 @@
           }
         },
         "tags": [
-          "api.content.halo.run/v1alpha1/Post"
+          "PostV1alpha1Public"
         ]
       }
     },
@@ -5593,7 +5593,7 @@
           }
         },
         "tags": [
-          "api.content.halo.run/v1alpha1/Post"
+          "PostV1alpha1Public"
         ]
       }
     },
@@ -5625,7 +5625,7 @@
           }
         },
         "tags": [
-          "api.content.halo.run/v1alpha1/Post"
+          "PostV1alpha1Public"
         ]
       }
     },
@@ -5699,7 +5699,7 @@
           }
         },
         "tags": [
-          "api.content.halo.run/v1alpha1/SinglePage"
+          "SinglePageV1alpha1Public"
         ]
       }
     },
@@ -5731,7 +5731,7 @@
           }
         },
         "tags": [
-          "api.content.halo.run/v1alpha1/SinglePage"
+          "SinglePageV1alpha1Public"
         ]
       }
     },
@@ -5805,7 +5805,7 @@
           }
         },
         "tags": [
-          "api.content.halo.run/v1alpha1/Tag"
+          "TagV1alpha1Public"
         ]
       }
     },
@@ -5837,7 +5837,7 @@
           }
         },
         "tags": [
-          "api.content.halo.run/v1alpha1/Tag"
+          "TagV1alpha1Public"
         ]
       }
     },
@@ -5920,7 +5920,7 @@
           }
         },
         "tags": [
-          "api.content.halo.run/v1alpha1/Tag"
+          "TagV1alpha1Public"
         ]
       }
     },
@@ -6024,7 +6024,7 @@
           }
         },
         "tags": [
-          "api.halo.run/v1alpha1/Comment"
+          "CommentV1alpha1Public"
         ]
       },
       "post": {
@@ -6053,7 +6053,7 @@
           }
         },
         "tags": [
-          "api.halo.run/v1alpha1/Comment"
+          "CommentV1alpha1Public"
         ]
       }
     },
@@ -6084,7 +6084,7 @@
           }
         },
         "tags": [
-          "api.halo.run/v1alpha1/Comment"
+          "CommentV1alpha1Public"
         ]
       }
     },
@@ -6133,7 +6133,7 @@
           }
         },
         "tags": [
-          "api.halo.run/v1alpha1/Comment"
+          "CommentV1alpha1Public"
         ]
       },
       "post": {
@@ -6172,7 +6172,7 @@
           }
         },
         "tags": [
-          "api.halo.run/v1alpha1/Comment"
+          "CommentV1alpha1Public"
         ]
       }
     },
@@ -6229,7 +6229,7 @@
           }
         },
         "tags": [
-          "api.halo.run/v1alpha1/Post"
+          "PostV1alpha1Public"
         ]
       }
     },
@@ -6250,7 +6250,7 @@
           }
         },
         "tags": [
-          "api.halo.run/v1alpha1/Menu"
+          "MenuV1alpha1Public"
         ]
       }
     },
@@ -6282,7 +6282,7 @@
           }
         },
         "tags": [
-          "api.halo.run/v1alpha1/Menu"
+          "MenuV1alpha1Public"
         ]
       }
     },
@@ -6303,7 +6303,7 @@
           }
         },
         "tags": [
-          "api.halo.run/v1alpha1/Stats"
+          "SystemV1alpha1Public"
         ]
       }
     },
@@ -6328,7 +6328,7 @@
           }
         },
         "tags": [
-          "api.halo.run/v1alpha1/Tracker"
+          "MetricsV1alpha1Public"
         ]
       }
     },
@@ -6353,7 +6353,7 @@
           }
         },
         "tags": [
-          "api.halo.run/v1alpha1/Tracker"
+          "MetricsV1alpha1Public"
         ]
       }
     },
@@ -6378,7 +6378,7 @@
           }
         },
         "tags": [
-          "api.halo.run/v1alpha1/Tracker"
+          "MetricsV1alpha1Public"
         ]
       }
     },
@@ -6403,7 +6403,7 @@
           }
         },
         "tags": [
-          "api.halo.run/v1alpha1/User"
+          "UserV1alpha1Public"
         ]
       }
     },
@@ -6428,7 +6428,7 @@
           }
         },
         "tags": [
-          "api.halo.run/v1alpha1/User"
+          "UserV1alpha1Public"
         ]
       }
     },
@@ -6459,7 +6459,7 @@
           }
         },
         "tags": [
-          "api.halo.run/v1alpha1/User"
+          "UserV1alpha1Public"
         ]
       }
     },
@@ -6495,7 +6495,7 @@
           }
         },
         "tags": [
-          "api.halo.run/v1alpha1/User"
+          "UserV1alpha1Public"
         ]
       }
     },
@@ -6527,7 +6527,7 @@
           }
         },
         "tags": [
-          "api.notification.halo.run/v1alpha1/Notifier"
+          "NotifierV1alpha1Uc"
         ]
       },
       "post": {
@@ -6561,7 +6561,7 @@
           }
         },
         "tags": [
-          "api.notification.halo.run/v1alpha1/Notifier"
+          "NotifierV1alpha1Uc"
         ]
       }
     },
@@ -6634,7 +6634,7 @@
           }
         },
         "tags": [
-          "api.notification.halo.run/v1alpha1/Notification"
+          "NotificationV1alpha1Uc"
         ]
       },
       "post": {
@@ -6673,7 +6673,7 @@
           }
         },
         "tags": [
-          "api.notification.halo.run/v1alpha1/Notification"
+          "NotificationV1alpha1Uc"
         ]
       }
     },
@@ -6764,7 +6764,7 @@
           }
         },
         "tags": [
-          "api.notification.halo.run/v1alpha1/Notification"
+          "NotificationV1alpha1Uc"
         ]
       }
     },
@@ -6809,7 +6809,7 @@
           }
         },
         "tags": [
-          "api.notification.halo.run/v1alpha1/Notification"
+          "NotificationV1alpha1Uc"
         ]
       }
     },
@@ -6850,7 +6850,7 @@
           }
         },
         "tags": [
-          "api.notification.halo.run/v1alpha1/Notification"
+          "NotificationV1alpha1Uc"
         ]
       }
     },
@@ -6891,7 +6891,7 @@
           }
         },
         "tags": [
-          "api.notification.halo.run/v1alpha1/Notification"
+          "NotificationV1alpha1Uc"
         ]
       }
     },
@@ -6923,306 +6923,14 @@
           }
         },
         "tags": [
-          "api.plugin.halo.run/v1alpha1/Plugin"
-        ]
-      }
-    },
-    "/apis/api.security.halo.run/v1alpha1/authentications/two-factor/settings": {
-      "get": {
-        "description": "Get Two-factor authentication settings.",
-        "operationId": "GetTwoFactorAuthenticationSettings",
-        "responses": {
-          "default": {
-            "content": {
-              "*/*": {
-                "schema": {
-                  "$ref": "#/components/schemas/TwoFactorAuthSettings"
-                }
-              }
-            },
-            "description": "default response"
-          }
-        },
-        "tags": [
-          "api.security.halo.run/v1alpha1/Authentication/TwoFactor"
-        ]
-      }
-    },
-    "/apis/api.security.halo.run/v1alpha1/authentications/two-factor/settings/disabled": {
-      "put": {
-        "description": "Disable Two-factor authentication",
-        "operationId": "DisableTwoFactor",
-        "requestBody": {
-          "content": {
-            "*/*": {
-              "schema": {
-                "$ref": "#/components/schemas/PasswordRequest"
-              }
-            }
-          }
-        },
-        "responses": {
-          "default": {
-            "content": {
-              "*/*": {
-                "schema": {
-                  "$ref": "#/components/schemas/TwoFactorAuthSettings"
-                }
-              }
-            },
-            "description": "default response"
-          }
-        },
-        "tags": [
-          "api.security.halo.run/v1alpha1/Authentication/TwoFactor"
-        ]
-      }
-    },
-    "/apis/api.security.halo.run/v1alpha1/authentications/two-factor/settings/enabled": {
-      "put": {
-        "description": "Enable Two-factor authentication",
-        "operationId": "EnableTwoFactor",
-        "requestBody": {
-          "content": {
-            "*/*": {
-              "schema": {
-                "$ref": "#/components/schemas/PasswordRequest"
-              }
-            }
-          }
-        },
-        "responses": {
-          "default": {
-            "content": {
-              "*/*": {
-                "schema": {
-                  "$ref": "#/components/schemas/TwoFactorAuthSettings"
-                }
-              }
-            },
-            "description": "default response"
-          }
-        },
-        "tags": [
-          "api.security.halo.run/v1alpha1/Authentication/TwoFactor"
-        ]
-      }
-    },
-    "/apis/api.security.halo.run/v1alpha1/authentications/two-factor/totp": {
-      "post": {
-        "description": "Configure a TOTP",
-        "operationId": "ConfigurerTotp",
-        "requestBody": {
-          "content": {
-            "*/*": {
-              "schema": {
-                "$ref": "#/components/schemas/TotpRequest"
-              }
-            }
-          }
-        },
-        "responses": {
-          "default": {
-            "content": {
-              "*/*": {
-                "schema": {
-                  "$ref": "#/components/schemas/TwoFactorAuthSettings"
-                }
-              }
-            },
-            "description": "default response"
-          }
-        },
-        "tags": [
-          "api.security.halo.run/v1alpha1/Authentication/TwoFactor"
-        ]
-      }
-    },
-    "/apis/api.security.halo.run/v1alpha1/authentications/two-factor/totp/-": {
-      "delete": {
-        "operationId": "DeleteTotp",
-        "requestBody": {
-          "content": {
-            "*/*": {
-              "schema": {
-                "$ref": "#/components/schemas/PasswordRequest"
-              }
-            }
-          }
-        },
-        "responses": {
-          "default": {
-            "content": {
-              "*/*": {
-                "schema": {
-                  "$ref": "#/components/schemas/TwoFactorAuthSettings"
-                }
-              }
-            },
-            "description": "default response"
-          }
-        },
-        "tags": [
-          "api.security.halo.run/v1alpha1/Authentication/TwoFactor"
-        ]
-      }
-    },
-    "/apis/api.security.halo.run/v1alpha1/authentications/two-factor/totp/auth-link": {
-      "get": {
-        "description": "Get TOTP auth link, including secret",
-        "operationId": "GetTotpAuthLink",
-        "responses": {
-          "default": {
-            "content": {
-              "*/*": {
-                "schema": {
-                  "$ref": "#/components/schemas/TotpAuthLinkResponse"
-                }
-              }
-            },
-            "description": "default response"
-          }
-        },
-        "tags": [
-          "api.security.halo.run/v1alpha1/Authentication/TwoFactor"
-        ]
-      }
-    },
-    "/apis/api.security.halo.run/v1alpha1/personalaccesstokens": {
-      "get": {
-        "description": "Obtain PAT list.",
-        "operationId": "ObtainPats",
-        "responses": {
-          "default": {
-            "content": {
-              "*/*": {
-                "schema": {
-                  "type": "array",
-                  "items": {
-                    "$ref": "#/components/schemas/PersonalAccessToken"
-                  }
-                }
-              }
-            },
-            "description": "default response"
-          }
-        },
-        "tags": [
-          "api.security.halo.run/v1alpha1/PersonalAccessToken"
-        ]
-      },
-      "post": {
-        "description": "Generate a PAT.",
-        "operationId": "GeneratePat",
-        "requestBody": {
-          "content": {
-            "*/*": {
-              "schema": {
-                "$ref": "#/components/schemas/PersonalAccessToken"
-              }
-            }
-          },
-          "required": true
-        },
-        "responses": {
-          "default": {
-            "content": {
-              "*/*": {
-                "schema": {
-                  "$ref": "#/components/schemas/PersonalAccessToken"
-                }
-              }
-            },
-            "description": "default response"
-          }
-        },
-        "tags": [
-          "api.security.halo.run/v1alpha1/PersonalAccessToken"
-        ]
-      }
-    },
-    "/apis/api.security.halo.run/v1alpha1/personalaccesstokens/{name}": {
-      "delete": {
-        "description": "Delete a PAT",
-        "operationId": "DeletePat",
-        "parameters": [
-          {
-            "in": "path",
-            "name": "name",
-            "required": true,
-            "schema": {
-              "type": "string"
-            }
-          }
-        ],
-        "responses": {},
-        "tags": [
-          "api.security.halo.run/v1alpha1/PersonalAccessToken"
-        ]
-      },
-      "get": {
-        "description": "Obtain a PAT.",
-        "operationId": "ObtainPat",
-        "parameters": [
-          {
-            "in": "path",
-            "name": "name",
-            "required": true,
-            "schema": {
-              "type": "string"
-            }
-          }
-        ],
-        "responses": {},
-        "tags": [
-          "api.security.halo.run/v1alpha1/PersonalAccessToken"
-        ]
-      }
-    },
-    "/apis/api.security.halo.run/v1alpha1/personalaccesstokens/{name}/actions/restoration": {
-      "put": {
-        "description": "Restore a PAT.",
-        "operationId": "RestorePat",
-        "parameters": [
-          {
-            "in": "path",
-            "name": "name",
-            "required": true,
-            "schema": {
-              "type": "string"
-            }
-          }
-        ],
-        "responses": {},
-        "tags": [
-          "api.security.halo.run/v1alpha1/PersonalAccessToken"
-        ]
-      }
-    },
-    "/apis/api.security.halo.run/v1alpha1/personalaccesstokens/{name}/actions/revocation": {
-      "put": {
-        "description": "Revoke a PAT",
-        "operationId": "RevokePat",
-        "parameters": [
-          {
-            "in": "path",
-            "name": "name",
-            "required": true,
-            "schema": {
-              "type": "string"
-            }
-          }
-        ],
-        "responses": {},
-        "tags": [
-          "api.security.halo.run/v1alpha1/PersonalAccessToken"
+          "PluginV1alpha1Public"
         ]
       }
     },
     "/apis/auth.halo.run/v1alpha1/authproviders": {
       "get": {
-        "description": "List auth.halo.run/v1alpha1/AuthProvider",
-        "operationId": "List/auth.halo.run/v1alpha1/AuthProvider",
+        "description": "List AuthProvider",
+        "operationId": "listAuthProvider",
         "parameters": [
           {
             "description": "Page number. Default is 0.",
@@ -7289,12 +6997,12 @@
           }
         },
         "tags": [
-          "auth.halo.run/v1alpha1/AuthProvider"
+          "AuthProviderV1alpha1"
         ]
       },
       "post": {
-        "description": "Create auth.halo.run/v1alpha1/AuthProvider",
-        "operationId": "Create/auth.halo.run/v1alpha1/AuthProvider",
+        "description": "Create AuthProvider",
+        "operationId": "createAuthProvider",
         "requestBody": {
           "content": {
             "*/*": {
@@ -7318,14 +7026,14 @@
           }
         },
         "tags": [
-          "auth.halo.run/v1alpha1/AuthProvider"
+          "AuthProviderV1alpha1"
         ]
       }
     },
     "/apis/auth.halo.run/v1alpha1/authproviders/{name}": {
       "delete": {
-        "description": "Delete auth.halo.run/v1alpha1/AuthProvider",
-        "operationId": "Delete/auth.halo.run/v1alpha1/AuthProvider",
+        "description": "Delete AuthProvider",
+        "operationId": "deleteAuthProvider",
         "parameters": [
           {
             "description": "Name of authprovider",
@@ -7343,12 +7051,12 @@
           }
         },
         "tags": [
-          "auth.halo.run/v1alpha1/AuthProvider"
+          "AuthProviderV1alpha1"
         ]
       },
       "get": {
-        "description": "Get auth.halo.run/v1alpha1/AuthProvider",
-        "operationId": "Get/auth.halo.run/v1alpha1/AuthProvider",
+        "description": "Get AuthProvider",
+        "operationId": "getAuthProvider",
         "parameters": [
           {
             "description": "Name of authprovider",
@@ -7373,12 +7081,12 @@
           }
         },
         "tags": [
-          "auth.halo.run/v1alpha1/AuthProvider"
+          "AuthProviderV1alpha1"
         ]
       },
       "patch": {
-        "description": "Patch auth.halo.run/v1alpha1/AuthProvider",
-        "operationId": "Patch/auth.halo.run/v1alpha1/AuthProvider",
+        "description": "Patch AuthProvider",
+        "operationId": "patchAuthProvider",
         "parameters": [
           {
             "description": "Name of authprovider",
@@ -7412,12 +7120,12 @@
           }
         },
         "tags": [
-          "auth.halo.run/v1alpha1/AuthProvider"
+          "AuthProviderV1alpha1"
         ]
       },
       "put": {
-        "description": "Update auth.halo.run/v1alpha1/AuthProvider",
-        "operationId": "Update/auth.halo.run/v1alpha1/AuthProvider",
+        "description": "Update AuthProvider",
+        "operationId": "updateAuthProvider",
         "parameters": [
           {
             "description": "Name of authprovider",
@@ -7452,14 +7160,14 @@
           }
         },
         "tags": [
-          "auth.halo.run/v1alpha1/AuthProvider"
+          "AuthProviderV1alpha1"
         ]
       }
     },
     "/apis/auth.halo.run/v1alpha1/userconnections": {
       "get": {
-        "description": "List auth.halo.run/v1alpha1/UserConnection",
-        "operationId": "List/auth.halo.run/v1alpha1/UserConnection",
+        "description": "List UserConnection",
+        "operationId": "listUserConnection",
         "parameters": [
           {
             "description": "Page number. Default is 0.",
@@ -7526,12 +7234,12 @@
           }
         },
         "tags": [
-          "auth.halo.run/v1alpha1/UserConnection"
+          "UserConnectionV1alpha1"
         ]
       },
       "post": {
-        "description": "Create auth.halo.run/v1alpha1/UserConnection",
-        "operationId": "Create/auth.halo.run/v1alpha1/UserConnection",
+        "description": "Create UserConnection",
+        "operationId": "createUserConnection",
         "requestBody": {
           "content": {
             "*/*": {
@@ -7555,14 +7263,14 @@
           }
         },
         "tags": [
-          "auth.halo.run/v1alpha1/UserConnection"
+          "UserConnectionV1alpha1"
         ]
       }
     },
     "/apis/auth.halo.run/v1alpha1/userconnections/{name}": {
       "delete": {
-        "description": "Delete auth.halo.run/v1alpha1/UserConnection",
-        "operationId": "Delete/auth.halo.run/v1alpha1/UserConnection",
+        "description": "Delete UserConnection",
+        "operationId": "deleteUserConnection",
         "parameters": [
           {
             "description": "Name of userconnection",
@@ -7580,12 +7288,12 @@
           }
         },
         "tags": [
-          "auth.halo.run/v1alpha1/UserConnection"
+          "UserConnectionV1alpha1"
         ]
       },
       "get": {
-        "description": "Get auth.halo.run/v1alpha1/UserConnection",
-        "operationId": "Get/auth.halo.run/v1alpha1/UserConnection",
+        "description": "Get UserConnection",
+        "operationId": "getUserConnection",
         "parameters": [
           {
             "description": "Name of userconnection",
@@ -7610,12 +7318,12 @@
           }
         },
         "tags": [
-          "auth.halo.run/v1alpha1/UserConnection"
+          "UserConnectionV1alpha1"
         ]
       },
       "patch": {
-        "description": "Patch auth.halo.run/v1alpha1/UserConnection",
-        "operationId": "Patch/auth.halo.run/v1alpha1/UserConnection",
+        "description": "Patch UserConnection",
+        "operationId": "patchUserConnection",
         "parameters": [
           {
             "description": "Name of userconnection",
@@ -7649,12 +7357,12 @@
           }
         },
         "tags": [
-          "auth.halo.run/v1alpha1/UserConnection"
+          "UserConnectionV1alpha1"
         ]
       },
       "put": {
-        "description": "Update auth.halo.run/v1alpha1/UserConnection",
-        "operationId": "Update/auth.halo.run/v1alpha1/UserConnection",
+        "description": "Update UserConnection",
+        "operationId": "updateUserConnection",
         "parameters": [
           {
             "description": "Name of userconnection",
@@ -7689,7 +7397,7 @@
           }
         },
         "tags": [
-          "auth.halo.run/v1alpha1/UserConnection"
+          "UserConnectionV1alpha1"
         ]
       }
     },
@@ -7714,14 +7422,14 @@
           }
         },
         "tags": [
-          "console.api.notification.halo.run/v1alpha1/Notifier"
+          "NotifierV1alpha1Console"
         ]
       }
     },
     "/apis/content.halo.run/v1alpha1/categories": {
       "get": {
-        "description": "List content.halo.run/v1alpha1/Category",
-        "operationId": "List/content.halo.run/v1alpha1/Category",
+        "description": "List Category",
+        "operationId": "listCategory",
         "parameters": [
           {
             "description": "Page number. Default is 0.",
@@ -7788,12 +7496,12 @@
           }
         },
         "tags": [
-          "content.halo.run/v1alpha1/Category"
+          "CategoryV1alpha1"
         ]
       },
       "post": {
-        "description": "Create content.halo.run/v1alpha1/Category",
-        "operationId": "Create/content.halo.run/v1alpha1/Category",
+        "description": "Create Category",
+        "operationId": "createCategory",
         "requestBody": {
           "content": {
             "*/*": {
@@ -7817,14 +7525,14 @@
           }
         },
         "tags": [
-          "content.halo.run/v1alpha1/Category"
+          "CategoryV1alpha1"
         ]
       }
     },
     "/apis/content.halo.run/v1alpha1/categories/{name}": {
       "delete": {
-        "description": "Delete content.halo.run/v1alpha1/Category",
-        "operationId": "Delete/content.halo.run/v1alpha1/Category",
+        "description": "Delete Category",
+        "operationId": "deleteCategory",
         "parameters": [
           {
             "description": "Name of category",
@@ -7842,12 +7550,12 @@
           }
         },
         "tags": [
-          "content.halo.run/v1alpha1/Category"
+          "CategoryV1alpha1"
         ]
       },
       "get": {
-        "description": "Get content.halo.run/v1alpha1/Category",
-        "operationId": "Get/content.halo.run/v1alpha1/Category",
+        "description": "Get Category",
+        "operationId": "getCategory",
         "parameters": [
           {
             "description": "Name of category",
@@ -7872,12 +7580,12 @@
           }
         },
         "tags": [
-          "content.halo.run/v1alpha1/Category"
+          "CategoryV1alpha1"
         ]
       },
       "patch": {
-        "description": "Patch content.halo.run/v1alpha1/Category",
-        "operationId": "Patch/content.halo.run/v1alpha1/Category",
+        "description": "Patch Category",
+        "operationId": "patchCategory",
         "parameters": [
           {
             "description": "Name of category",
@@ -7911,12 +7619,12 @@
           }
         },
         "tags": [
-          "content.halo.run/v1alpha1/Category"
+          "CategoryV1alpha1"
         ]
       },
       "put": {
-        "description": "Update content.halo.run/v1alpha1/Category",
-        "operationId": "Update/content.halo.run/v1alpha1/Category",
+        "description": "Update Category",
+        "operationId": "updateCategory",
         "parameters": [
           {
             "description": "Name of category",
@@ -7951,14 +7659,14 @@
           }
         },
         "tags": [
-          "content.halo.run/v1alpha1/Category"
+          "CategoryV1alpha1"
         ]
       }
     },
     "/apis/content.halo.run/v1alpha1/comments": {
       "get": {
-        "description": "List content.halo.run/v1alpha1/Comment",
-        "operationId": "List/content.halo.run/v1alpha1/Comment",
+        "description": "List Comment",
+        "operationId": "listComment",
         "parameters": [
           {
             "description": "Page number. Default is 0.",
@@ -8025,12 +7733,12 @@
           }
         },
         "tags": [
-          "content.halo.run/v1alpha1/Comment"
+          "CommentV1alpha1"
         ]
       },
       "post": {
-        "description": "Create content.halo.run/v1alpha1/Comment",
-        "operationId": "Create/content.halo.run/v1alpha1/Comment",
+        "description": "Create Comment",
+        "operationId": "createComment",
         "requestBody": {
           "content": {
             "*/*": {
@@ -8054,14 +7762,14 @@
           }
         },
         "tags": [
-          "content.halo.run/v1alpha1/Comment"
+          "CommentV1alpha1"
         ]
       }
     },
     "/apis/content.halo.run/v1alpha1/comments/{name}": {
       "delete": {
-        "description": "Delete content.halo.run/v1alpha1/Comment",
-        "operationId": "Delete/content.halo.run/v1alpha1/Comment",
+        "description": "Delete Comment",
+        "operationId": "deleteComment",
         "parameters": [
           {
             "description": "Name of comment",
@@ -8079,12 +7787,12 @@
           }
         },
         "tags": [
-          "content.halo.run/v1alpha1/Comment"
+          "CommentV1alpha1"
         ]
       },
       "get": {
-        "description": "Get content.halo.run/v1alpha1/Comment",
-        "operationId": "Get/content.halo.run/v1alpha1/Comment",
+        "description": "Get Comment",
+        "operationId": "getComment",
         "parameters": [
           {
             "description": "Name of comment",
@@ -8109,12 +7817,12 @@
           }
         },
         "tags": [
-          "content.halo.run/v1alpha1/Comment"
+          "CommentV1alpha1"
         ]
       },
       "patch": {
-        "description": "Patch content.halo.run/v1alpha1/Comment",
-        "operationId": "Patch/content.halo.run/v1alpha1/Comment",
+        "description": "Patch Comment",
+        "operationId": "patchComment",
         "parameters": [
           {
             "description": "Name of comment",
@@ -8148,12 +7856,12 @@
           }
         },
         "tags": [
-          "content.halo.run/v1alpha1/Comment"
+          "CommentV1alpha1"
         ]
       },
       "put": {
-        "description": "Update content.halo.run/v1alpha1/Comment",
-        "operationId": "Update/content.halo.run/v1alpha1/Comment",
+        "description": "Update Comment",
+        "operationId": "updateComment",
         "parameters": [
           {
             "description": "Name of comment",
@@ -8188,14 +7896,14 @@
           }
         },
         "tags": [
-          "content.halo.run/v1alpha1/Comment"
+          "CommentV1alpha1"
         ]
       }
     },
     "/apis/content.halo.run/v1alpha1/posts": {
       "get": {
-        "description": "List content.halo.run/v1alpha1/Post",
-        "operationId": "List/content.halo.run/v1alpha1/Post",
+        "description": "List Post",
+        "operationId": "listPost",
         "parameters": [
           {
             "description": "Page number. Default is 0.",
@@ -8262,12 +7970,12 @@
           }
         },
         "tags": [
-          "content.halo.run/v1alpha1/Post"
+          "PostV1alpha1"
         ]
       },
       "post": {
-        "description": "Create content.halo.run/v1alpha1/Post",
-        "operationId": "Create/content.halo.run/v1alpha1/Post",
+        "description": "Create Post",
+        "operationId": "createPost",
         "requestBody": {
           "content": {
             "*/*": {
@@ -8291,14 +7999,14 @@
           }
         },
         "tags": [
-          "content.halo.run/v1alpha1/Post"
+          "PostV1alpha1"
         ]
       }
     },
     "/apis/content.halo.run/v1alpha1/posts/{name}": {
       "delete": {
-        "description": "Delete content.halo.run/v1alpha1/Post",
-        "operationId": "Delete/content.halo.run/v1alpha1/Post",
+        "description": "Delete Post",
+        "operationId": "deletePost",
         "parameters": [
           {
             "description": "Name of post",
@@ -8316,12 +8024,12 @@
           }
         },
         "tags": [
-          "content.halo.run/v1alpha1/Post"
+          "PostV1alpha1"
         ]
       },
       "get": {
-        "description": "Get content.halo.run/v1alpha1/Post",
-        "operationId": "Get/content.halo.run/v1alpha1/Post",
+        "description": "Get Post",
+        "operationId": "getPost",
         "parameters": [
           {
             "description": "Name of post",
@@ -8346,12 +8054,12 @@
           }
         },
         "tags": [
-          "content.halo.run/v1alpha1/Post"
+          "PostV1alpha1"
         ]
       },
       "patch": {
-        "description": "Patch content.halo.run/v1alpha1/Post",
-        "operationId": "Patch/content.halo.run/v1alpha1/Post",
+        "description": "Patch Post",
+        "operationId": "patchPost",
         "parameters": [
           {
             "description": "Name of post",
@@ -8385,12 +8093,12 @@
           }
         },
         "tags": [
-          "content.halo.run/v1alpha1/Post"
+          "PostV1alpha1"
         ]
       },
       "put": {
-        "description": "Update content.halo.run/v1alpha1/Post",
-        "operationId": "Update/content.halo.run/v1alpha1/Post",
+        "description": "Update Post",
+        "operationId": "updatePost",
         "parameters": [
           {
             "description": "Name of post",
@@ -8425,14 +8133,14 @@
           }
         },
         "tags": [
-          "content.halo.run/v1alpha1/Post"
+          "PostV1alpha1"
         ]
       }
     },
     "/apis/content.halo.run/v1alpha1/replies": {
       "get": {
-        "description": "List content.halo.run/v1alpha1/Reply",
-        "operationId": "List/content.halo.run/v1alpha1/Reply",
+        "description": "List Reply",
+        "operationId": "listReply",
         "parameters": [
           {
             "description": "Page number. Default is 0.",
@@ -8499,12 +8207,12 @@
           }
         },
         "tags": [
-          "content.halo.run/v1alpha1/Reply"
+          "ReplyV1alpha1"
         ]
       },
       "post": {
-        "description": "Create content.halo.run/v1alpha1/Reply",
-        "operationId": "Create/content.halo.run/v1alpha1/Reply",
+        "description": "Create Reply",
+        "operationId": "createReply",
         "requestBody": {
           "content": {
             "*/*": {
@@ -8528,14 +8236,14 @@
           }
         },
         "tags": [
-          "content.halo.run/v1alpha1/Reply"
+          "ReplyV1alpha1"
         ]
       }
     },
     "/apis/content.halo.run/v1alpha1/replies/{name}": {
       "delete": {
-        "description": "Delete content.halo.run/v1alpha1/Reply",
-        "operationId": "Delete/content.halo.run/v1alpha1/Reply",
+        "description": "Delete Reply",
+        "operationId": "deleteReply",
         "parameters": [
           {
             "description": "Name of reply",
@@ -8553,12 +8261,12 @@
           }
         },
         "tags": [
-          "content.halo.run/v1alpha1/Reply"
+          "ReplyV1alpha1"
         ]
       },
       "get": {
-        "description": "Get content.halo.run/v1alpha1/Reply",
-        "operationId": "Get/content.halo.run/v1alpha1/Reply",
+        "description": "Get Reply",
+        "operationId": "getReply",
         "parameters": [
           {
             "description": "Name of reply",
@@ -8583,12 +8291,12 @@
           }
         },
         "tags": [
-          "content.halo.run/v1alpha1/Reply"
+          "ReplyV1alpha1"
         ]
       },
       "patch": {
-        "description": "Patch content.halo.run/v1alpha1/Reply",
-        "operationId": "Patch/content.halo.run/v1alpha1/Reply",
+        "description": "Patch Reply",
+        "operationId": "patchReply",
         "parameters": [
           {
             "description": "Name of reply",
@@ -8622,12 +8330,12 @@
           }
         },
         "tags": [
-          "content.halo.run/v1alpha1/Reply"
+          "ReplyV1alpha1"
         ]
       },
       "put": {
-        "description": "Update content.halo.run/v1alpha1/Reply",
-        "operationId": "Update/content.halo.run/v1alpha1/Reply",
+        "description": "Update Reply",
+        "operationId": "updateReply",
         "parameters": [
           {
             "description": "Name of reply",
@@ -8662,14 +8370,14 @@
           }
         },
         "tags": [
-          "content.halo.run/v1alpha1/Reply"
+          "ReplyV1alpha1"
         ]
       }
     },
     "/apis/content.halo.run/v1alpha1/singlepages": {
       "get": {
-        "description": "List content.halo.run/v1alpha1/SinglePage",
-        "operationId": "List/content.halo.run/v1alpha1/SinglePage",
+        "description": "List SinglePage",
+        "operationId": "listSinglePage",
         "parameters": [
           {
             "description": "Page number. Default is 0.",
@@ -8736,12 +8444,12 @@
           }
         },
         "tags": [
-          "content.halo.run/v1alpha1/SinglePage"
+          "SinglePageV1alpha1"
         ]
       },
       "post": {
-        "description": "Create content.halo.run/v1alpha1/SinglePage",
-        "operationId": "Create/content.halo.run/v1alpha1/SinglePage",
+        "description": "Create SinglePage",
+        "operationId": "createSinglePage",
         "requestBody": {
           "content": {
             "*/*": {
@@ -8765,14 +8473,14 @@
           }
         },
         "tags": [
-          "content.halo.run/v1alpha1/SinglePage"
+          "SinglePageV1alpha1"
         ]
       }
     },
     "/apis/content.halo.run/v1alpha1/singlepages/{name}": {
       "delete": {
-        "description": "Delete content.halo.run/v1alpha1/SinglePage",
-        "operationId": "Delete/content.halo.run/v1alpha1/SinglePage",
+        "description": "Delete SinglePage",
+        "operationId": "deleteSinglePage",
         "parameters": [
           {
             "description": "Name of singlepage",
@@ -8790,12 +8498,12 @@
           }
         },
         "tags": [
-          "content.halo.run/v1alpha1/SinglePage"
+          "SinglePageV1alpha1"
         ]
       },
       "get": {
-        "description": "Get content.halo.run/v1alpha1/SinglePage",
-        "operationId": "Get/content.halo.run/v1alpha1/SinglePage",
+        "description": "Get SinglePage",
+        "operationId": "getSinglePage",
         "parameters": [
           {
             "description": "Name of singlepage",
@@ -8820,12 +8528,12 @@
           }
         },
         "tags": [
-          "content.halo.run/v1alpha1/SinglePage"
+          "SinglePageV1alpha1"
         ]
       },
       "patch": {
-        "description": "Patch content.halo.run/v1alpha1/SinglePage",
-        "operationId": "Patch/content.halo.run/v1alpha1/SinglePage",
+        "description": "Patch SinglePage",
+        "operationId": "patchSinglePage",
         "parameters": [
           {
             "description": "Name of singlepage",
@@ -8859,12 +8567,12 @@
           }
         },
         "tags": [
-          "content.halo.run/v1alpha1/SinglePage"
+          "SinglePageV1alpha1"
         ]
       },
       "put": {
-        "description": "Update content.halo.run/v1alpha1/SinglePage",
-        "operationId": "Update/content.halo.run/v1alpha1/SinglePage",
+        "description": "Update SinglePage",
+        "operationId": "updateSinglePage",
         "parameters": [
           {
             "description": "Name of singlepage",
@@ -8899,14 +8607,14 @@
           }
         },
         "tags": [
-          "content.halo.run/v1alpha1/SinglePage"
+          "SinglePageV1alpha1"
         ]
       }
     },
     "/apis/content.halo.run/v1alpha1/snapshots": {
       "get": {
-        "description": "List content.halo.run/v1alpha1/Snapshot",
-        "operationId": "List/content.halo.run/v1alpha1/Snapshot",
+        "description": "List Snapshot",
+        "operationId": "listSnapshot",
         "parameters": [
           {
             "description": "Page number. Default is 0.",
@@ -8973,12 +8681,12 @@
           }
         },
         "tags": [
-          "content.halo.run/v1alpha1/Snapshot"
+          "SnapshotV1alpha1"
         ]
       },
       "post": {
-        "description": "Create content.halo.run/v1alpha1/Snapshot",
-        "operationId": "Create/content.halo.run/v1alpha1/Snapshot",
+        "description": "Create Snapshot",
+        "operationId": "createSnapshot",
         "requestBody": {
           "content": {
             "*/*": {
@@ -9002,14 +8710,14 @@
           }
         },
         "tags": [
-          "content.halo.run/v1alpha1/Snapshot"
+          "SnapshotV1alpha1"
         ]
       }
     },
     "/apis/content.halo.run/v1alpha1/snapshots/{name}": {
       "delete": {
-        "description": "Delete content.halo.run/v1alpha1/Snapshot",
-        "operationId": "Delete/content.halo.run/v1alpha1/Snapshot",
+        "description": "Delete Snapshot",
+        "operationId": "deleteSnapshot",
         "parameters": [
           {
             "description": "Name of snapshot",
@@ -9027,12 +8735,12 @@
           }
         },
         "tags": [
-          "content.halo.run/v1alpha1/Snapshot"
+          "SnapshotV1alpha1"
         ]
       },
       "get": {
-        "description": "Get content.halo.run/v1alpha1/Snapshot",
-        "operationId": "Get/content.halo.run/v1alpha1/Snapshot",
+        "description": "Get Snapshot",
+        "operationId": "getSnapshot",
         "parameters": [
           {
             "description": "Name of snapshot",
@@ -9057,12 +8765,12 @@
           }
         },
         "tags": [
-          "content.halo.run/v1alpha1/Snapshot"
+          "SnapshotV1alpha1"
         ]
       },
       "patch": {
-        "description": "Patch content.halo.run/v1alpha1/Snapshot",
-        "operationId": "Patch/content.halo.run/v1alpha1/Snapshot",
+        "description": "Patch Snapshot",
+        "operationId": "patchSnapshot",
         "parameters": [
           {
             "description": "Name of snapshot",
@@ -9096,12 +8804,12 @@
           }
         },
         "tags": [
-          "content.halo.run/v1alpha1/Snapshot"
+          "SnapshotV1alpha1"
         ]
       },
       "put": {
-        "description": "Update content.halo.run/v1alpha1/Snapshot",
-        "operationId": "Update/content.halo.run/v1alpha1/Snapshot",
+        "description": "Update Snapshot",
+        "operationId": "updateSnapshot",
         "parameters": [
           {
             "description": "Name of snapshot",
@@ -9136,14 +8844,14 @@
           }
         },
         "tags": [
-          "content.halo.run/v1alpha1/Snapshot"
+          "SnapshotV1alpha1"
         ]
       }
     },
     "/apis/content.halo.run/v1alpha1/tags": {
       "get": {
-        "description": "List content.halo.run/v1alpha1/Tag",
-        "operationId": "List/content.halo.run/v1alpha1/Tag",
+        "description": "List Tag",
+        "operationId": "listTag",
         "parameters": [
           {
             "description": "Page number. Default is 0.",
@@ -9210,12 +8918,12 @@
           }
         },
         "tags": [
-          "content.halo.run/v1alpha1/Tag"
+          "TagV1alpha1"
         ]
       },
       "post": {
-        "description": "Create content.halo.run/v1alpha1/Tag",
-        "operationId": "Create/content.halo.run/v1alpha1/Tag",
+        "description": "Create Tag",
+        "operationId": "createTag",
         "requestBody": {
           "content": {
             "*/*": {
@@ -9239,14 +8947,14 @@
           }
         },
         "tags": [
-          "content.halo.run/v1alpha1/Tag"
+          "TagV1alpha1"
         ]
       }
     },
     "/apis/content.halo.run/v1alpha1/tags/{name}": {
       "delete": {
-        "description": "Delete content.halo.run/v1alpha1/Tag",
-        "operationId": "Delete/content.halo.run/v1alpha1/Tag",
+        "description": "Delete Tag",
+        "operationId": "deleteTag",
         "parameters": [
           {
             "description": "Name of tag",
@@ -9264,12 +8972,12 @@
           }
         },
         "tags": [
-          "content.halo.run/v1alpha1/Tag"
+          "TagV1alpha1"
         ]
       },
       "get": {
-        "description": "Get content.halo.run/v1alpha1/Tag",
-        "operationId": "Get/content.halo.run/v1alpha1/Tag",
+        "description": "Get Tag",
+        "operationId": "getTag",
         "parameters": [
           {
             "description": "Name of tag",
@@ -9294,12 +9002,12 @@
           }
         },
         "tags": [
-          "content.halo.run/v1alpha1/Tag"
+          "TagV1alpha1"
         ]
       },
       "patch": {
-        "description": "Patch content.halo.run/v1alpha1/Tag",
-        "operationId": "Patch/content.halo.run/v1alpha1/Tag",
+        "description": "Patch Tag",
+        "operationId": "patchTag",
         "parameters": [
           {
             "description": "Name of tag",
@@ -9333,12 +9041,12 @@
           }
         },
         "tags": [
-          "content.halo.run/v1alpha1/Tag"
+          "TagV1alpha1"
         ]
       },
       "put": {
-        "description": "Update content.halo.run/v1alpha1/Tag",
-        "operationId": "Update/content.halo.run/v1alpha1/Tag",
+        "description": "Update Tag",
+        "operationId": "updateTag",
         "parameters": [
           {
             "description": "Name of tag",
@@ -9373,14 +9081,14 @@
           }
         },
         "tags": [
-          "content.halo.run/v1alpha1/Tag"
+          "TagV1alpha1"
         ]
       }
     },
     "/apis/metrics.halo.run/v1alpha1/counters": {
       "get": {
-        "description": "List metrics.halo.run/v1alpha1/Counter",
-        "operationId": "List/metrics.halo.run/v1alpha1/Counter",
+        "description": "List Counter",
+        "operationId": "listCounter",
         "parameters": [
           {
             "description": "Page number. Default is 0.",
@@ -9447,12 +9155,12 @@
           }
         },
         "tags": [
-          "metrics.halo.run/v1alpha1/Counter"
+          "CounterV1alpha1"
         ]
       },
       "post": {
-        "description": "Create metrics.halo.run/v1alpha1/Counter",
-        "operationId": "Create/metrics.halo.run/v1alpha1/Counter",
+        "description": "Create Counter",
+        "operationId": "createCounter",
         "requestBody": {
           "content": {
             "*/*": {
@@ -9476,14 +9184,14 @@
           }
         },
         "tags": [
-          "metrics.halo.run/v1alpha1/Counter"
+          "CounterV1alpha1"
         ]
       }
     },
     "/apis/metrics.halo.run/v1alpha1/counters/{name}": {
       "delete": {
-        "description": "Delete metrics.halo.run/v1alpha1/Counter",
-        "operationId": "Delete/metrics.halo.run/v1alpha1/Counter",
+        "description": "Delete Counter",
+        "operationId": "deleteCounter",
         "parameters": [
           {
             "description": "Name of counter",
@@ -9501,12 +9209,12 @@
           }
         },
         "tags": [
-          "metrics.halo.run/v1alpha1/Counter"
+          "CounterV1alpha1"
         ]
       },
       "get": {
-        "description": "Get metrics.halo.run/v1alpha1/Counter",
-        "operationId": "Get/metrics.halo.run/v1alpha1/Counter",
+        "description": "Get Counter",
+        "operationId": "getCounter",
         "parameters": [
           {
             "description": "Name of counter",
@@ -9531,12 +9239,12 @@
           }
         },
         "tags": [
-          "metrics.halo.run/v1alpha1/Counter"
+          "CounterV1alpha1"
         ]
       },
       "patch": {
-        "description": "Patch metrics.halo.run/v1alpha1/Counter",
-        "operationId": "Patch/metrics.halo.run/v1alpha1/Counter",
+        "description": "Patch Counter",
+        "operationId": "patchCounter",
         "parameters": [
           {
             "description": "Name of counter",
@@ -9570,12 +9278,12 @@
           }
         },
         "tags": [
-          "metrics.halo.run/v1alpha1/Counter"
+          "CounterV1alpha1"
         ]
       },
       "put": {
-        "description": "Update metrics.halo.run/v1alpha1/Counter",
-        "operationId": "Update/metrics.halo.run/v1alpha1/Counter",
+        "description": "Update Counter",
+        "operationId": "updateCounter",
         "parameters": [
           {
             "description": "Name of counter",
@@ -9610,14 +9318,14 @@
           }
         },
         "tags": [
-          "metrics.halo.run/v1alpha1/Counter"
+          "CounterV1alpha1"
         ]
       }
     },
     "/apis/migration.halo.run/v1alpha1/backups": {
       "get": {
-        "description": "List migration.halo.run/v1alpha1/Backup",
-        "operationId": "List/migration.halo.run/v1alpha1/Backup",
+        "description": "List Backup",
+        "operationId": "listBackup",
         "parameters": [
           {
             "description": "Page number. Default is 0.",
@@ -9684,12 +9392,12 @@
           }
         },
         "tags": [
-          "migration.halo.run/v1alpha1/Backup"
+          "BackupV1alpha1"
         ]
       },
       "post": {
-        "description": "Create migration.halo.run/v1alpha1/Backup",
-        "operationId": "Create/migration.halo.run/v1alpha1/Backup",
+        "description": "Create Backup",
+        "operationId": "createBackup",
         "requestBody": {
           "content": {
             "*/*": {
@@ -9713,14 +9421,14 @@
           }
         },
         "tags": [
-          "migration.halo.run/v1alpha1/Backup"
+          "BackupV1alpha1"
         ]
       }
     },
     "/apis/migration.halo.run/v1alpha1/backups/{name}": {
       "delete": {
-        "description": "Delete migration.halo.run/v1alpha1/Backup",
-        "operationId": "Delete/migration.halo.run/v1alpha1/Backup",
+        "description": "Delete Backup",
+        "operationId": "deleteBackup",
         "parameters": [
           {
             "description": "Name of backup",
@@ -9738,12 +9446,12 @@
           }
         },
         "tags": [
-          "migration.halo.run/v1alpha1/Backup"
+          "BackupV1alpha1"
         ]
       },
       "get": {
-        "description": "Get migration.halo.run/v1alpha1/Backup",
-        "operationId": "Get/migration.halo.run/v1alpha1/Backup",
+        "description": "Get Backup",
+        "operationId": "getBackup",
         "parameters": [
           {
             "description": "Name of backup",
@@ -9768,12 +9476,12 @@
           }
         },
         "tags": [
-          "migration.halo.run/v1alpha1/Backup"
+          "BackupV1alpha1"
         ]
       },
       "patch": {
-        "description": "Patch migration.halo.run/v1alpha1/Backup",
-        "operationId": "Patch/migration.halo.run/v1alpha1/Backup",
+        "description": "Patch Backup",
+        "operationId": "patchBackup",
         "parameters": [
           {
             "description": "Name of backup",
@@ -9807,12 +9515,12 @@
           }
         },
         "tags": [
-          "migration.halo.run/v1alpha1/Backup"
+          "BackupV1alpha1"
         ]
       },
       "put": {
-        "description": "Update migration.halo.run/v1alpha1/Backup",
-        "operationId": "Update/migration.halo.run/v1alpha1/Backup",
+        "description": "Update Backup",
+        "operationId": "updateBackup",
         "parameters": [
           {
             "description": "Name of backup",
@@ -9847,14 +9555,14 @@
           }
         },
         "tags": [
-          "migration.halo.run/v1alpha1/Backup"
+          "BackupV1alpha1"
         ]
       }
     },
     "/apis/notification.halo.run/v1alpha1/notifications": {
       "get": {
-        "description": "List notification.halo.run/v1alpha1/Notification",
-        "operationId": "List/notification.halo.run/v1alpha1/Notification",
+        "description": "List Notification",
+        "operationId": "listNotification",
         "parameters": [
           {
             "description": "Page number. Default is 0.",
@@ -9921,12 +9629,12 @@
           }
         },
         "tags": [
-          "notification.halo.run/v1alpha1/Notification"
+          "NotificationV1alpha1"
         ]
       },
       "post": {
-        "description": "Create notification.halo.run/v1alpha1/Notification",
-        "operationId": "Create/notification.halo.run/v1alpha1/Notification",
+        "description": "Create Notification",
+        "operationId": "createNotification",
         "requestBody": {
           "content": {
             "*/*": {
@@ -9950,14 +9658,14 @@
           }
         },
         "tags": [
-          "notification.halo.run/v1alpha1/Notification"
+          "NotificationV1alpha1"
         ]
       }
     },
     "/apis/notification.halo.run/v1alpha1/notifications/{name}": {
       "delete": {
-        "description": "Delete notification.halo.run/v1alpha1/Notification",
-        "operationId": "Delete/notification.halo.run/v1alpha1/Notification",
+        "description": "Delete Notification",
+        "operationId": "deleteNotification",
         "parameters": [
           {
             "description": "Name of notification",
@@ -9975,12 +9683,12 @@
           }
         },
         "tags": [
-          "notification.halo.run/v1alpha1/Notification"
+          "NotificationV1alpha1"
         ]
       },
       "get": {
-        "description": "Get notification.halo.run/v1alpha1/Notification",
-        "operationId": "Get/notification.halo.run/v1alpha1/Notification",
+        "description": "Get Notification",
+        "operationId": "getNotification",
         "parameters": [
           {
             "description": "Name of notification",
@@ -10005,12 +9713,12 @@
           }
         },
         "tags": [
-          "notification.halo.run/v1alpha1/Notification"
+          "NotificationV1alpha1"
         ]
       },
       "patch": {
-        "description": "Patch notification.halo.run/v1alpha1/Notification",
-        "operationId": "Patch/notification.halo.run/v1alpha1/Notification",
+        "description": "Patch Notification",
+        "operationId": "patchNotification",
         "parameters": [
           {
             "description": "Name of notification",
@@ -10044,12 +9752,12 @@
           }
         },
         "tags": [
-          "notification.halo.run/v1alpha1/Notification"
+          "NotificationV1alpha1"
         ]
       },
       "put": {
-        "description": "Update notification.halo.run/v1alpha1/Notification",
-        "operationId": "Update/notification.halo.run/v1alpha1/Notification",
+        "description": "Update Notification",
+        "operationId": "updateNotification",
         "parameters": [
           {
             "description": "Name of notification",
@@ -10084,14 +9792,14 @@
           }
         },
         "tags": [
-          "notification.halo.run/v1alpha1/Notification"
+          "NotificationV1alpha1"
         ]
       }
     },
     "/apis/notification.halo.run/v1alpha1/notificationtemplates": {
       "get": {
-        "description": "List notification.halo.run/v1alpha1/NotificationTemplate",
-        "operationId": "List/notification.halo.run/v1alpha1/NotificationTemplate",
+        "description": "List NotificationTemplate",
+        "operationId": "listNotificationTemplate",
         "parameters": [
           {
             "description": "Page number. Default is 0.",
@@ -10158,12 +9866,12 @@
           }
         },
         "tags": [
-          "notification.halo.run/v1alpha1/NotificationTemplate"
+          "NotificationTemplateV1alpha1"
         ]
       },
       "post": {
-        "description": "Create notification.halo.run/v1alpha1/NotificationTemplate",
-        "operationId": "Create/notification.halo.run/v1alpha1/NotificationTemplate",
+        "description": "Create NotificationTemplate",
+        "operationId": "createNotificationTemplate",
         "requestBody": {
           "content": {
             "*/*": {
@@ -10187,14 +9895,14 @@
           }
         },
         "tags": [
-          "notification.halo.run/v1alpha1/NotificationTemplate"
+          "NotificationTemplateV1alpha1"
         ]
       }
     },
     "/apis/notification.halo.run/v1alpha1/notificationtemplates/{name}": {
       "delete": {
-        "description": "Delete notification.halo.run/v1alpha1/NotificationTemplate",
-        "operationId": "Delete/notification.halo.run/v1alpha1/NotificationTemplate",
+        "description": "Delete NotificationTemplate",
+        "operationId": "deleteNotificationTemplate",
         "parameters": [
           {
             "description": "Name of notificationtemplate",
@@ -10212,12 +9920,12 @@
           }
         },
         "tags": [
-          "notification.halo.run/v1alpha1/NotificationTemplate"
+          "NotificationTemplateV1alpha1"
         ]
       },
       "get": {
-        "description": "Get notification.halo.run/v1alpha1/NotificationTemplate",
-        "operationId": "Get/notification.halo.run/v1alpha1/NotificationTemplate",
+        "description": "Get NotificationTemplate",
+        "operationId": "getNotificationTemplate",
         "parameters": [
           {
             "description": "Name of notificationtemplate",
@@ -10242,12 +9950,12 @@
           }
         },
         "tags": [
-          "notification.halo.run/v1alpha1/NotificationTemplate"
+          "NotificationTemplateV1alpha1"
         ]
       },
       "patch": {
-        "description": "Patch notification.halo.run/v1alpha1/NotificationTemplate",
-        "operationId": "Patch/notification.halo.run/v1alpha1/NotificationTemplate",
+        "description": "Patch NotificationTemplate",
+        "operationId": "patchNotificationTemplate",
         "parameters": [
           {
             "description": "Name of notificationtemplate",
@@ -10281,12 +9989,12 @@
           }
         },
         "tags": [
-          "notification.halo.run/v1alpha1/NotificationTemplate"
+          "NotificationTemplateV1alpha1"
         ]
       },
       "put": {
-        "description": "Update notification.halo.run/v1alpha1/NotificationTemplate",
-        "operationId": "Update/notification.halo.run/v1alpha1/NotificationTemplate",
+        "description": "Update NotificationTemplate",
+        "operationId": "updateNotificationTemplate",
         "parameters": [
           {
             "description": "Name of notificationtemplate",
@@ -10321,14 +10029,14 @@
           }
         },
         "tags": [
-          "notification.halo.run/v1alpha1/NotificationTemplate"
+          "NotificationTemplateV1alpha1"
         ]
       }
     },
     "/apis/notification.halo.run/v1alpha1/notifierDescriptors": {
       "get": {
-        "description": "List notification.halo.run/v1alpha1/NotifierDescriptor",
-        "operationId": "List/notification.halo.run/v1alpha1/NotifierDescriptor",
+        "description": "List NotifierDescriptor",
+        "operationId": "listNotifierDescriptor",
         "parameters": [
           {
             "description": "Page number. Default is 0.",
@@ -10395,12 +10103,12 @@
           }
         },
         "tags": [
-          "notification.halo.run/v1alpha1/NotifierDescriptor"
+          "NotifierDescriptorV1alpha1"
         ]
       },
       "post": {
-        "description": "Create notification.halo.run/v1alpha1/NotifierDescriptor",
-        "operationId": "Create/notification.halo.run/v1alpha1/NotifierDescriptor",
+        "description": "Create NotifierDescriptor",
+        "operationId": "createNotifierDescriptor",
         "requestBody": {
           "content": {
             "*/*": {
@@ -10424,14 +10132,14 @@
           }
         },
         "tags": [
-          "notification.halo.run/v1alpha1/NotifierDescriptor"
+          "NotifierDescriptorV1alpha1"
         ]
       }
     },
     "/apis/notification.halo.run/v1alpha1/notifierDescriptors/{name}": {
       "delete": {
-        "description": "Delete notification.halo.run/v1alpha1/NotifierDescriptor",
-        "operationId": "Delete/notification.halo.run/v1alpha1/NotifierDescriptor",
+        "description": "Delete NotifierDescriptor",
+        "operationId": "deleteNotifierDescriptor",
         "parameters": [
           {
             "description": "Name of notifierDescriptor",
@@ -10449,12 +10157,12 @@
           }
         },
         "tags": [
-          "notification.halo.run/v1alpha1/NotifierDescriptor"
+          "NotifierDescriptorV1alpha1"
         ]
       },
       "get": {
-        "description": "Get notification.halo.run/v1alpha1/NotifierDescriptor",
-        "operationId": "Get/notification.halo.run/v1alpha1/NotifierDescriptor",
+        "description": "Get NotifierDescriptor",
+        "operationId": "getNotifierDescriptor",
         "parameters": [
           {
             "description": "Name of notifierDescriptor",
@@ -10479,12 +10187,12 @@
           }
         },
         "tags": [
-          "notification.halo.run/v1alpha1/NotifierDescriptor"
+          "NotifierDescriptorV1alpha1"
         ]
       },
       "patch": {
-        "description": "Patch notification.halo.run/v1alpha1/NotifierDescriptor",
-        "operationId": "Patch/notification.halo.run/v1alpha1/NotifierDescriptor",
+        "description": "Patch NotifierDescriptor",
+        "operationId": "patchNotifierDescriptor",
         "parameters": [
           {
             "description": "Name of notifierDescriptor",
@@ -10518,12 +10226,12 @@
           }
         },
         "tags": [
-          "notification.halo.run/v1alpha1/NotifierDescriptor"
+          "NotifierDescriptorV1alpha1"
         ]
       },
       "put": {
-        "description": "Update notification.halo.run/v1alpha1/NotifierDescriptor",
-        "operationId": "Update/notification.halo.run/v1alpha1/NotifierDescriptor",
+        "description": "Update NotifierDescriptor",
+        "operationId": "updateNotifierDescriptor",
         "parameters": [
           {
             "description": "Name of notifierDescriptor",
@@ -10558,14 +10266,14 @@
           }
         },
         "tags": [
-          "notification.halo.run/v1alpha1/NotifierDescriptor"
+          "NotifierDescriptorV1alpha1"
         ]
       }
     },
     "/apis/notification.halo.run/v1alpha1/reasons": {
       "get": {
-        "description": "List notification.halo.run/v1alpha1/Reason",
-        "operationId": "List/notification.halo.run/v1alpha1/Reason",
+        "description": "List Reason",
+        "operationId": "listReason",
         "parameters": [
           {
             "description": "Page number. Default is 0.",
@@ -10632,12 +10340,12 @@
           }
         },
         "tags": [
-          "notification.halo.run/v1alpha1/Reason"
+          "ReasonV1alpha1"
         ]
       },
       "post": {
-        "description": "Create notification.halo.run/v1alpha1/Reason",
-        "operationId": "Create/notification.halo.run/v1alpha1/Reason",
+        "description": "Create Reason",
+        "operationId": "createReason",
         "requestBody": {
           "content": {
             "*/*": {
@@ -10661,14 +10369,14 @@
           }
         },
         "tags": [
-          "notification.halo.run/v1alpha1/Reason"
+          "ReasonV1alpha1"
         ]
       }
     },
     "/apis/notification.halo.run/v1alpha1/reasons/{name}": {
       "delete": {
-        "description": "Delete notification.halo.run/v1alpha1/Reason",
-        "operationId": "Delete/notification.halo.run/v1alpha1/Reason",
+        "description": "Delete Reason",
+        "operationId": "deleteReason",
         "parameters": [
           {
             "description": "Name of reason",
@@ -10686,12 +10394,12 @@
           }
         },
         "tags": [
-          "notification.halo.run/v1alpha1/Reason"
+          "ReasonV1alpha1"
         ]
       },
       "get": {
-        "description": "Get notification.halo.run/v1alpha1/Reason",
-        "operationId": "Get/notification.halo.run/v1alpha1/Reason",
+        "description": "Get Reason",
+        "operationId": "getReason",
         "parameters": [
           {
             "description": "Name of reason",
@@ -10716,12 +10424,12 @@
           }
         },
         "tags": [
-          "notification.halo.run/v1alpha1/Reason"
+          "ReasonV1alpha1"
         ]
       },
       "patch": {
-        "description": "Patch notification.halo.run/v1alpha1/Reason",
-        "operationId": "Patch/notification.halo.run/v1alpha1/Reason",
+        "description": "Patch Reason",
+        "operationId": "patchReason",
         "parameters": [
           {
             "description": "Name of reason",
@@ -10755,12 +10463,12 @@
           }
         },
         "tags": [
-          "notification.halo.run/v1alpha1/Reason"
+          "ReasonV1alpha1"
         ]
       },
       "put": {
-        "description": "Update notification.halo.run/v1alpha1/Reason",
-        "operationId": "Update/notification.halo.run/v1alpha1/Reason",
+        "description": "Update Reason",
+        "operationId": "updateReason",
         "parameters": [
           {
             "description": "Name of reason",
@@ -10795,14 +10503,14 @@
           }
         },
         "tags": [
-          "notification.halo.run/v1alpha1/Reason"
+          "ReasonV1alpha1"
         ]
       }
     },
     "/apis/notification.halo.run/v1alpha1/reasontypes": {
       "get": {
-        "description": "List notification.halo.run/v1alpha1/ReasonType",
-        "operationId": "List/notification.halo.run/v1alpha1/ReasonType",
+        "description": "List ReasonType",
+        "operationId": "listReasonType",
         "parameters": [
           {
             "description": "Page number. Default is 0.",
@@ -10869,12 +10577,12 @@
           }
         },
         "tags": [
-          "notification.halo.run/v1alpha1/ReasonType"
+          "ReasonTypeV1alpha1"
         ]
       },
       "post": {
-        "description": "Create notification.halo.run/v1alpha1/ReasonType",
-        "operationId": "Create/notification.halo.run/v1alpha1/ReasonType",
+        "description": "Create ReasonType",
+        "operationId": "createReasonType",
         "requestBody": {
           "content": {
             "*/*": {
@@ -10898,14 +10606,14 @@
           }
         },
         "tags": [
-          "notification.halo.run/v1alpha1/ReasonType"
+          "ReasonTypeV1alpha1"
         ]
       }
     },
     "/apis/notification.halo.run/v1alpha1/reasontypes/{name}": {
       "delete": {
-        "description": "Delete notification.halo.run/v1alpha1/ReasonType",
-        "operationId": "Delete/notification.halo.run/v1alpha1/ReasonType",
+        "description": "Delete ReasonType",
+        "operationId": "deleteReasonType",
         "parameters": [
           {
             "description": "Name of reasontype",
@@ -10923,12 +10631,12 @@
           }
         },
         "tags": [
-          "notification.halo.run/v1alpha1/ReasonType"
+          "ReasonTypeV1alpha1"
         ]
       },
       "get": {
-        "description": "Get notification.halo.run/v1alpha1/ReasonType",
-        "operationId": "Get/notification.halo.run/v1alpha1/ReasonType",
+        "description": "Get ReasonType",
+        "operationId": "getReasonType",
         "parameters": [
           {
             "description": "Name of reasontype",
@@ -10953,12 +10661,12 @@
           }
         },
         "tags": [
-          "notification.halo.run/v1alpha1/ReasonType"
+          "ReasonTypeV1alpha1"
         ]
       },
       "patch": {
-        "description": "Patch notification.halo.run/v1alpha1/ReasonType",
-        "operationId": "Patch/notification.halo.run/v1alpha1/ReasonType",
+        "description": "Patch ReasonType",
+        "operationId": "patchReasonType",
         "parameters": [
           {
             "description": "Name of reasontype",
@@ -10992,12 +10700,12 @@
           }
         },
         "tags": [
-          "notification.halo.run/v1alpha1/ReasonType"
+          "ReasonTypeV1alpha1"
         ]
       },
       "put": {
-        "description": "Update notification.halo.run/v1alpha1/ReasonType",
-        "operationId": "Update/notification.halo.run/v1alpha1/ReasonType",
+        "description": "Update ReasonType",
+        "operationId": "updateReasonType",
         "parameters": [
           {
             "description": "Name of reasontype",
@@ -11032,14 +10740,14 @@
           }
         },
         "tags": [
-          "notification.halo.run/v1alpha1/ReasonType"
+          "ReasonTypeV1alpha1"
         ]
       }
     },
     "/apis/notification.halo.run/v1alpha1/subscriptions": {
       "get": {
-        "description": "List notification.halo.run/v1alpha1/Subscription",
-        "operationId": "List/notification.halo.run/v1alpha1/Subscription",
+        "description": "List Subscription",
+        "operationId": "listSubscription",
         "parameters": [
           {
             "description": "Page number. Default is 0.",
@@ -11106,12 +10814,12 @@
           }
         },
         "tags": [
-          "notification.halo.run/v1alpha1/Subscription"
+          "SubscriptionV1alpha1"
         ]
       },
       "post": {
-        "description": "Create notification.halo.run/v1alpha1/Subscription",
-        "operationId": "Create/notification.halo.run/v1alpha1/Subscription",
+        "description": "Create Subscription",
+        "operationId": "createSubscription",
         "requestBody": {
           "content": {
             "*/*": {
@@ -11135,14 +10843,14 @@
           }
         },
         "tags": [
-          "notification.halo.run/v1alpha1/Subscription"
+          "SubscriptionV1alpha1"
         ]
       }
     },
     "/apis/notification.halo.run/v1alpha1/subscriptions/{name}": {
       "delete": {
-        "description": "Delete notification.halo.run/v1alpha1/Subscription",
-        "operationId": "Delete/notification.halo.run/v1alpha1/Subscription",
+        "description": "Delete Subscription",
+        "operationId": "deleteSubscription",
         "parameters": [
           {
             "description": "Name of subscription",
@@ -11160,12 +10868,12 @@
           }
         },
         "tags": [
-          "notification.halo.run/v1alpha1/Subscription"
+          "SubscriptionV1alpha1"
         ]
       },
       "get": {
-        "description": "Get notification.halo.run/v1alpha1/Subscription",
-        "operationId": "Get/notification.halo.run/v1alpha1/Subscription",
+        "description": "Get Subscription",
+        "operationId": "getSubscription",
         "parameters": [
           {
             "description": "Name of subscription",
@@ -11190,12 +10898,12 @@
           }
         },
         "tags": [
-          "notification.halo.run/v1alpha1/Subscription"
+          "SubscriptionV1alpha1"
         ]
       },
       "patch": {
-        "description": "Patch notification.halo.run/v1alpha1/Subscription",
-        "operationId": "Patch/notification.halo.run/v1alpha1/Subscription",
+        "description": "Patch Subscription",
+        "operationId": "patchSubscription",
         "parameters": [
           {
             "description": "Name of subscription",
@@ -11229,12 +10937,12 @@
           }
         },
         "tags": [
-          "notification.halo.run/v1alpha1/Subscription"
+          "SubscriptionV1alpha1"
         ]
       },
       "put": {
-        "description": "Update notification.halo.run/v1alpha1/Subscription",
-        "operationId": "Update/notification.halo.run/v1alpha1/Subscription",
+        "description": "Update Subscription",
+        "operationId": "updateSubscription",
         "parameters": [
           {
             "description": "Name of subscription",
@@ -11269,14 +10977,14 @@
           }
         },
         "tags": [
-          "notification.halo.run/v1alpha1/Subscription"
+          "SubscriptionV1alpha1"
         ]
       }
     },
     "/apis/plugin.halo.run/v1alpha1/extensiondefinitions": {
       "get": {
-        "description": "List plugin.halo.run/v1alpha1/ExtensionDefinition",
-        "operationId": "List/plugin.halo.run/v1alpha1/ExtensionDefinition",
+        "description": "List ExtensionDefinition",
+        "operationId": "listExtensionDefinition",
         "parameters": [
           {
             "description": "Page number. Default is 0.",
@@ -11343,12 +11051,12 @@
           }
         },
         "tags": [
-          "plugin.halo.run/v1alpha1/ExtensionDefinition"
+          "ExtensionDefinitionV1alpha1"
         ]
       },
       "post": {
-        "description": "Create plugin.halo.run/v1alpha1/ExtensionDefinition",
-        "operationId": "Create/plugin.halo.run/v1alpha1/ExtensionDefinition",
+        "description": "Create ExtensionDefinition",
+        "operationId": "createExtensionDefinition",
         "requestBody": {
           "content": {
             "*/*": {
@@ -11372,14 +11080,14 @@
           }
         },
         "tags": [
-          "plugin.halo.run/v1alpha1/ExtensionDefinition"
+          "ExtensionDefinitionV1alpha1"
         ]
       }
     },
     "/apis/plugin.halo.run/v1alpha1/extensiondefinitions/{name}": {
       "delete": {
-        "description": "Delete plugin.halo.run/v1alpha1/ExtensionDefinition",
-        "operationId": "Delete/plugin.halo.run/v1alpha1/ExtensionDefinition",
+        "description": "Delete ExtensionDefinition",
+        "operationId": "deleteExtensionDefinition",
         "parameters": [
           {
             "description": "Name of extensiondefinition",
@@ -11397,12 +11105,12 @@
           }
         },
         "tags": [
-          "plugin.halo.run/v1alpha1/ExtensionDefinition"
+          "ExtensionDefinitionV1alpha1"
         ]
       },
       "get": {
-        "description": "Get plugin.halo.run/v1alpha1/ExtensionDefinition",
-        "operationId": "Get/plugin.halo.run/v1alpha1/ExtensionDefinition",
+        "description": "Get ExtensionDefinition",
+        "operationId": "getExtensionDefinition",
         "parameters": [
           {
             "description": "Name of extensiondefinition",
@@ -11427,12 +11135,12 @@
           }
         },
         "tags": [
-          "plugin.halo.run/v1alpha1/ExtensionDefinition"
+          "ExtensionDefinitionV1alpha1"
         ]
       },
       "patch": {
-        "description": "Patch plugin.halo.run/v1alpha1/ExtensionDefinition",
-        "operationId": "Patch/plugin.halo.run/v1alpha1/ExtensionDefinition",
+        "description": "Patch ExtensionDefinition",
+        "operationId": "patchExtensionDefinition",
         "parameters": [
           {
             "description": "Name of extensiondefinition",
@@ -11466,12 +11174,12 @@
           }
         },
         "tags": [
-          "plugin.halo.run/v1alpha1/ExtensionDefinition"
+          "ExtensionDefinitionV1alpha1"
         ]
       },
       "put": {
-        "description": "Update plugin.halo.run/v1alpha1/ExtensionDefinition",
-        "operationId": "Update/plugin.halo.run/v1alpha1/ExtensionDefinition",
+        "description": "Update ExtensionDefinition",
+        "operationId": "updateExtensionDefinition",
         "parameters": [
           {
             "description": "Name of extensiondefinition",
@@ -11506,14 +11214,14 @@
           }
         },
         "tags": [
-          "plugin.halo.run/v1alpha1/ExtensionDefinition"
+          "ExtensionDefinitionV1alpha1"
         ]
       }
     },
     "/apis/plugin.halo.run/v1alpha1/extensionpointdefinitions": {
       "get": {
-        "description": "List plugin.halo.run/v1alpha1/ExtensionPointDefinition",
-        "operationId": "List/plugin.halo.run/v1alpha1/ExtensionPointDefinition",
+        "description": "List ExtensionPointDefinition",
+        "operationId": "listExtensionPointDefinition",
         "parameters": [
           {
             "description": "Page number. Default is 0.",
@@ -11580,12 +11288,12 @@
           }
         },
         "tags": [
-          "plugin.halo.run/v1alpha1/ExtensionPointDefinition"
+          "ExtensionPointDefinitionV1alpha1"
         ]
       },
       "post": {
-        "description": "Create plugin.halo.run/v1alpha1/ExtensionPointDefinition",
-        "operationId": "Create/plugin.halo.run/v1alpha1/ExtensionPointDefinition",
+        "description": "Create ExtensionPointDefinition",
+        "operationId": "createExtensionPointDefinition",
         "requestBody": {
           "content": {
             "*/*": {
@@ -11609,14 +11317,14 @@
           }
         },
         "tags": [
-          "plugin.halo.run/v1alpha1/ExtensionPointDefinition"
+          "ExtensionPointDefinitionV1alpha1"
         ]
       }
     },
     "/apis/plugin.halo.run/v1alpha1/extensionpointdefinitions/{name}": {
       "delete": {
-        "description": "Delete plugin.halo.run/v1alpha1/ExtensionPointDefinition",
-        "operationId": "Delete/plugin.halo.run/v1alpha1/ExtensionPointDefinition",
+        "description": "Delete ExtensionPointDefinition",
+        "operationId": "deleteExtensionPointDefinition",
         "parameters": [
           {
             "description": "Name of extensionpointdefinition",
@@ -11634,12 +11342,12 @@
           }
         },
         "tags": [
-          "plugin.halo.run/v1alpha1/ExtensionPointDefinition"
+          "ExtensionPointDefinitionV1alpha1"
         ]
       },
       "get": {
-        "description": "Get plugin.halo.run/v1alpha1/ExtensionPointDefinition",
-        "operationId": "Get/plugin.halo.run/v1alpha1/ExtensionPointDefinition",
+        "description": "Get ExtensionPointDefinition",
+        "operationId": "getExtensionPointDefinition",
         "parameters": [
           {
             "description": "Name of extensionpointdefinition",
@@ -11664,12 +11372,12 @@
           }
         },
         "tags": [
-          "plugin.halo.run/v1alpha1/ExtensionPointDefinition"
+          "ExtensionPointDefinitionV1alpha1"
         ]
       },
       "patch": {
-        "description": "Patch plugin.halo.run/v1alpha1/ExtensionPointDefinition",
-        "operationId": "Patch/plugin.halo.run/v1alpha1/ExtensionPointDefinition",
+        "description": "Patch ExtensionPointDefinition",
+        "operationId": "patchExtensionPointDefinition",
         "parameters": [
           {
             "description": "Name of extensionpointdefinition",
@@ -11703,12 +11411,12 @@
           }
         },
         "tags": [
-          "plugin.halo.run/v1alpha1/ExtensionPointDefinition"
+          "ExtensionPointDefinitionV1alpha1"
         ]
       },
       "put": {
-        "description": "Update plugin.halo.run/v1alpha1/ExtensionPointDefinition",
-        "operationId": "Update/plugin.halo.run/v1alpha1/ExtensionPointDefinition",
+        "description": "Update ExtensionPointDefinition",
+        "operationId": "updateExtensionPointDefinition",
         "parameters": [
           {
             "description": "Name of extensionpointdefinition",
@@ -11743,14 +11451,14 @@
           }
         },
         "tags": [
-          "plugin.halo.run/v1alpha1/ExtensionPointDefinition"
+          "ExtensionPointDefinitionV1alpha1"
         ]
       }
     },
     "/apis/plugin.halo.run/v1alpha1/plugins": {
       "get": {
-        "description": "List plugin.halo.run/v1alpha1/Plugin",
-        "operationId": "List/plugin.halo.run/v1alpha1/Plugin",
+        "description": "List Plugin",
+        "operationId": "listPlugin",
         "parameters": [
           {
             "description": "Page number. Default is 0.",
@@ -11817,12 +11525,12 @@
           }
         },
         "tags": [
-          "plugin.halo.run/v1alpha1/Plugin"
+          "PluginV1alpha1"
         ]
       },
       "post": {
-        "description": "Create plugin.halo.run/v1alpha1/Plugin",
-        "operationId": "Create/plugin.halo.run/v1alpha1/Plugin",
+        "description": "Create Plugin",
+        "operationId": "createPlugin",
         "requestBody": {
           "content": {
             "*/*": {
@@ -11846,14 +11554,14 @@
           }
         },
         "tags": [
-          "plugin.halo.run/v1alpha1/Plugin"
+          "PluginV1alpha1"
         ]
       }
     },
     "/apis/plugin.halo.run/v1alpha1/plugins/{name}": {
       "delete": {
-        "description": "Delete plugin.halo.run/v1alpha1/Plugin",
-        "operationId": "Delete/plugin.halo.run/v1alpha1/Plugin",
+        "description": "Delete Plugin",
+        "operationId": "deletePlugin",
         "parameters": [
           {
             "description": "Name of plugin",
@@ -11871,12 +11579,12 @@
           }
         },
         "tags": [
-          "plugin.halo.run/v1alpha1/Plugin"
+          "PluginV1alpha1"
         ]
       },
       "get": {
-        "description": "Get plugin.halo.run/v1alpha1/Plugin",
-        "operationId": "Get/plugin.halo.run/v1alpha1/Plugin",
+        "description": "Get Plugin",
+        "operationId": "getPlugin",
         "parameters": [
           {
             "description": "Name of plugin",
@@ -11901,12 +11609,12 @@
           }
         },
         "tags": [
-          "plugin.halo.run/v1alpha1/Plugin"
+          "PluginV1alpha1"
         ]
       },
       "patch": {
-        "description": "Patch plugin.halo.run/v1alpha1/Plugin",
-        "operationId": "Patch/plugin.halo.run/v1alpha1/Plugin",
+        "description": "Patch Plugin",
+        "operationId": "patchPlugin",
         "parameters": [
           {
             "description": "Name of plugin",
@@ -11940,12 +11648,12 @@
           }
         },
         "tags": [
-          "plugin.halo.run/v1alpha1/Plugin"
+          "PluginV1alpha1"
         ]
       },
       "put": {
-        "description": "Update plugin.halo.run/v1alpha1/Plugin",
-        "operationId": "Update/plugin.halo.run/v1alpha1/Plugin",
+        "description": "Update Plugin",
+        "operationId": "updatePlugin",
         "parameters": [
           {
             "description": "Name of plugin",
@@ -11980,14 +11688,14 @@
           }
         },
         "tags": [
-          "plugin.halo.run/v1alpha1/Plugin"
+          "PluginV1alpha1"
         ]
       }
     },
     "/apis/plugin.halo.run/v1alpha1/reverseproxies": {
       "get": {
-        "description": "List plugin.halo.run/v1alpha1/ReverseProxy",
-        "operationId": "List/plugin.halo.run/v1alpha1/ReverseProxy",
+        "description": "List ReverseProxy",
+        "operationId": "listReverseProxy",
         "parameters": [
           {
             "description": "Page number. Default is 0.",
@@ -12054,12 +11762,12 @@
           }
         },
         "tags": [
-          "plugin.halo.run/v1alpha1/ReverseProxy"
+          "ReverseProxyV1alpha1"
         ]
       },
       "post": {
-        "description": "Create plugin.halo.run/v1alpha1/ReverseProxy",
-        "operationId": "Create/plugin.halo.run/v1alpha1/ReverseProxy",
+        "description": "Create ReverseProxy",
+        "operationId": "createReverseProxy",
         "requestBody": {
           "content": {
             "*/*": {
@@ -12083,14 +11791,14 @@
           }
         },
         "tags": [
-          "plugin.halo.run/v1alpha1/ReverseProxy"
+          "ReverseProxyV1alpha1"
         ]
       }
     },
     "/apis/plugin.halo.run/v1alpha1/reverseproxies/{name}": {
       "delete": {
-        "description": "Delete plugin.halo.run/v1alpha1/ReverseProxy",
-        "operationId": "Delete/plugin.halo.run/v1alpha1/ReverseProxy",
+        "description": "Delete ReverseProxy",
+        "operationId": "deleteReverseProxy",
         "parameters": [
           {
             "description": "Name of reverseproxy",
@@ -12108,12 +11816,12 @@
           }
         },
         "tags": [
-          "plugin.halo.run/v1alpha1/ReverseProxy"
+          "ReverseProxyV1alpha1"
         ]
       },
       "get": {
-        "description": "Get plugin.halo.run/v1alpha1/ReverseProxy",
-        "operationId": "Get/plugin.halo.run/v1alpha1/ReverseProxy",
+        "description": "Get ReverseProxy",
+        "operationId": "getReverseProxy",
         "parameters": [
           {
             "description": "Name of reverseproxy",
@@ -12138,12 +11846,12 @@
           }
         },
         "tags": [
-          "plugin.halo.run/v1alpha1/ReverseProxy"
+          "ReverseProxyV1alpha1"
         ]
       },
       "patch": {
-        "description": "Patch plugin.halo.run/v1alpha1/ReverseProxy",
-        "operationId": "Patch/plugin.halo.run/v1alpha1/ReverseProxy",
+        "description": "Patch ReverseProxy",
+        "operationId": "patchReverseProxy",
         "parameters": [
           {
             "description": "Name of reverseproxy",
@@ -12177,12 +11885,12 @@
           }
         },
         "tags": [
-          "plugin.halo.run/v1alpha1/ReverseProxy"
+          "ReverseProxyV1alpha1"
         ]
       },
       "put": {
-        "description": "Update plugin.halo.run/v1alpha1/ReverseProxy",
-        "operationId": "Update/plugin.halo.run/v1alpha1/ReverseProxy",
+        "description": "Update ReverseProxy",
+        "operationId": "updateReverseProxy",
         "parameters": [
           {
             "description": "Name of reverseproxy",
@@ -12217,14 +11925,14 @@
           }
         },
         "tags": [
-          "plugin.halo.run/v1alpha1/ReverseProxy"
+          "ReverseProxyV1alpha1"
         ]
       }
     },
     "/apis/plugin.halo.run/v1alpha1/searchengines": {
       "get": {
-        "description": "List plugin.halo.run/v1alpha1/SearchEngine",
-        "operationId": "List/plugin.halo.run/v1alpha1/SearchEngine",
+        "description": "List SearchEngine",
+        "operationId": "listSearchEngine",
         "parameters": [
           {
             "description": "Page number. Default is 0.",
@@ -12291,12 +11999,12 @@
           }
         },
         "tags": [
-          "plugin.halo.run/v1alpha1/SearchEngine"
+          "SearchEngineV1alpha1"
         ]
       },
       "post": {
-        "description": "Create plugin.halo.run/v1alpha1/SearchEngine",
-        "operationId": "Create/plugin.halo.run/v1alpha1/SearchEngine",
+        "description": "Create SearchEngine",
+        "operationId": "createSearchEngine",
         "requestBody": {
           "content": {
             "*/*": {
@@ -12320,14 +12028,14 @@
           }
         },
         "tags": [
-          "plugin.halo.run/v1alpha1/SearchEngine"
+          "SearchEngineV1alpha1"
         ]
       }
     },
     "/apis/plugin.halo.run/v1alpha1/searchengines/{name}": {
       "delete": {
-        "description": "Delete plugin.halo.run/v1alpha1/SearchEngine",
-        "operationId": "Delete/plugin.halo.run/v1alpha1/SearchEngine",
+        "description": "Delete SearchEngine",
+        "operationId": "deleteSearchEngine",
         "parameters": [
           {
             "description": "Name of searchengine",
@@ -12345,12 +12053,12 @@
           }
         },
         "tags": [
-          "plugin.halo.run/v1alpha1/SearchEngine"
+          "SearchEngineV1alpha1"
         ]
       },
       "get": {
-        "description": "Get plugin.halo.run/v1alpha1/SearchEngine",
-        "operationId": "Get/plugin.halo.run/v1alpha1/SearchEngine",
+        "description": "Get SearchEngine",
+        "operationId": "getSearchEngine",
         "parameters": [
           {
             "description": "Name of searchengine",
@@ -12375,12 +12083,12 @@
           }
         },
         "tags": [
-          "plugin.halo.run/v1alpha1/SearchEngine"
+          "SearchEngineV1alpha1"
         ]
       },
       "patch": {
-        "description": "Patch plugin.halo.run/v1alpha1/SearchEngine",
-        "operationId": "Patch/plugin.halo.run/v1alpha1/SearchEngine",
+        "description": "Patch SearchEngine",
+        "operationId": "patchSearchEngine",
         "parameters": [
           {
             "description": "Name of searchengine",
@@ -12414,12 +12122,12 @@
           }
         },
         "tags": [
-          "plugin.halo.run/v1alpha1/SearchEngine"
+          "SearchEngineV1alpha1"
         ]
       },
       "put": {
-        "description": "Update plugin.halo.run/v1alpha1/SearchEngine",
-        "operationId": "Update/plugin.halo.run/v1alpha1/SearchEngine",
+        "description": "Update SearchEngine",
+        "operationId": "updateSearchEngine",
         "parameters": [
           {
             "description": "Name of searchengine",
@@ -12454,14 +12162,14 @@
           }
         },
         "tags": [
-          "plugin.halo.run/v1alpha1/SearchEngine"
+          "SearchEngineV1alpha1"
         ]
       }
     },
     "/apis/security.halo.run/v1alpha1/personalaccesstokens": {
       "get": {
-        "description": "List security.halo.run/v1alpha1/PersonalAccessToken",
-        "operationId": "List/security.halo.run/v1alpha1/PersonalAccessToken",
+        "description": "List PersonalAccessToken",
+        "operationId": "listPersonalAccessToken",
         "parameters": [
           {
             "description": "Page number. Default is 0.",
@@ -12528,12 +12236,12 @@
           }
         },
         "tags": [
-          "security.halo.run/v1alpha1/PersonalAccessToken"
+          "PersonalAccessTokenV1alpha1"
         ]
       },
       "post": {
-        "description": "Create security.halo.run/v1alpha1/PersonalAccessToken",
-        "operationId": "Create/security.halo.run/v1alpha1/PersonalAccessToken",
+        "description": "Create PersonalAccessToken",
+        "operationId": "createPersonalAccessToken",
         "requestBody": {
           "content": {
             "*/*": {
@@ -12557,14 +12265,14 @@
           }
         },
         "tags": [
-          "security.halo.run/v1alpha1/PersonalAccessToken"
+          "PersonalAccessTokenV1alpha1"
         ]
       }
     },
     "/apis/security.halo.run/v1alpha1/personalaccesstokens/{name}": {
       "delete": {
-        "description": "Delete security.halo.run/v1alpha1/PersonalAccessToken",
-        "operationId": "Delete/security.halo.run/v1alpha1/PersonalAccessToken",
+        "description": "Delete PersonalAccessToken",
+        "operationId": "deletePersonalAccessToken",
         "parameters": [
           {
             "description": "Name of personalaccesstoken",
@@ -12582,12 +12290,12 @@
           }
         },
         "tags": [
-          "security.halo.run/v1alpha1/PersonalAccessToken"
+          "PersonalAccessTokenV1alpha1"
         ]
       },
       "get": {
-        "description": "Get security.halo.run/v1alpha1/PersonalAccessToken",
-        "operationId": "Get/security.halo.run/v1alpha1/PersonalAccessToken",
+        "description": "Get PersonalAccessToken",
+        "operationId": "getPersonalAccessToken",
         "parameters": [
           {
             "description": "Name of personalaccesstoken",
@@ -12612,12 +12320,12 @@
           }
         },
         "tags": [
-          "security.halo.run/v1alpha1/PersonalAccessToken"
+          "PersonalAccessTokenV1alpha1"
         ]
       },
       "patch": {
-        "description": "Patch security.halo.run/v1alpha1/PersonalAccessToken",
-        "operationId": "Patch/security.halo.run/v1alpha1/PersonalAccessToken",
+        "description": "Patch PersonalAccessToken",
+        "operationId": "patchPersonalAccessToken",
         "parameters": [
           {
             "description": "Name of personalaccesstoken",
@@ -12651,12 +12359,12 @@
           }
         },
         "tags": [
-          "security.halo.run/v1alpha1/PersonalAccessToken"
+          "PersonalAccessTokenV1alpha1"
         ]
       },
       "put": {
-        "description": "Update security.halo.run/v1alpha1/PersonalAccessToken",
-        "operationId": "Update/security.halo.run/v1alpha1/PersonalAccessToken",
+        "description": "Update PersonalAccessToken",
+        "operationId": "updatePersonalAccessToken",
         "parameters": [
           {
             "description": "Name of personalaccesstoken",
@@ -12691,14 +12399,251 @@
           }
         },
         "tags": [
-          "security.halo.run/v1alpha1/PersonalAccessToken"
+          "PersonalAccessTokenV1alpha1"
+        ]
+      }
+    },
+    "/apis/security.halo.run/v1alpha1/remembermetokens": {
+      "get": {
+        "description": "List RememberMeToken",
+        "operationId": "listRememberMeToken",
+        "parameters": [
+          {
+            "description": "Page number. Default is 0.",
+            "in": "query",
+            "name": "page",
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          },
+          {
+            "description": "Size number. Default is 0.",
+            "in": "query",
+            "name": "size",
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          },
+          {
+            "description": "Label selector. e.g.: hidden!\u003dtrue",
+            "in": "query",
+            "name": "labelSelector",
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            }
+          },
+          {
+            "description": "Field selector. e.g.: metadata.name\u003d\u003dhalo",
+            "in": "query",
+            "name": "fieldSelector",
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            }
+          },
+          {
+            "description": "Sorting criteria in the format: property,(asc|desc). Default sort order is ascending. Multiple sort criteria are supported.",
+            "in": "query",
+            "name": "sort",
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/RememberMeTokenList"
+                }
+              }
+            },
+            "description": "Response remembermetokens"
+          }
+        },
+        "tags": [
+          "RememberMeTokenV1alpha1"
+        ]
+      },
+      "post": {
+        "description": "Create RememberMeToken",
+        "operationId": "createRememberMeToken",
+        "requestBody": {
+          "content": {
+            "*/*": {
+              "schema": {
+                "$ref": "#/components/schemas/RememberMeToken"
+              }
+            }
+          },
+          "description": "Fresh remembermetoken"
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/RememberMeToken"
+                }
+              }
+            },
+            "description": "Response remembermetokens created just now"
+          }
+        },
+        "tags": [
+          "RememberMeTokenV1alpha1"
+        ]
+      }
+    },
+    "/apis/security.halo.run/v1alpha1/remembermetokens/{name}": {
+      "delete": {
+        "description": "Delete RememberMeToken",
+        "operationId": "deleteRememberMeToken",
+        "parameters": [
+          {
+            "description": "Name of remembermetoken",
+            "in": "path",
+            "name": "name",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Response remembermetoken deleted just now"
+          }
+        },
+        "tags": [
+          "RememberMeTokenV1alpha1"
+        ]
+      },
+      "get": {
+        "description": "Get RememberMeToken",
+        "operationId": "getRememberMeToken",
+        "parameters": [
+          {
+            "description": "Name of remembermetoken",
+            "in": "path",
+            "name": "name",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/RememberMeToken"
+                }
+              }
+            },
+            "description": "Response single remembermetoken"
+          }
+        },
+        "tags": [
+          "RememberMeTokenV1alpha1"
+        ]
+      },
+      "patch": {
+        "description": "Patch RememberMeToken",
+        "operationId": "patchRememberMeToken",
+        "parameters": [
+          {
+            "description": "Name of remembermetoken",
+            "in": "path",
+            "name": "name",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json-patch+json": {
+              "schema": {
+                "$ref": "#/components/schemas/JsonPatch"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/RememberMeToken"
+                }
+              }
+            },
+            "description": "Response remembermetoken patched just now"
+          }
+        },
+        "tags": [
+          "RememberMeTokenV1alpha1"
+        ]
+      },
+      "put": {
+        "description": "Update RememberMeToken",
+        "operationId": "updateRememberMeToken",
+        "parameters": [
+          {
+            "description": "Name of remembermetoken",
+            "in": "path",
+            "name": "name",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "*/*": {
+              "schema": {
+                "$ref": "#/components/schemas/RememberMeToken"
+              }
+            }
+          },
+          "description": "Updated remembermetoken"
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/RememberMeToken"
+                }
+              }
+            },
+            "description": "Response remembermetokens updated just now"
+          }
+        },
+        "tags": [
+          "RememberMeTokenV1alpha1"
         ]
       }
     },
     "/apis/storage.halo.run/v1alpha1/attachments": {
       "get": {
-        "description": "List storage.halo.run/v1alpha1/Attachment",
-        "operationId": "List/storage.halo.run/v1alpha1/Attachment",
+        "description": "List Attachment",
+        "operationId": "listAttachment",
         "parameters": [
           {
             "description": "Page number. Default is 0.",
@@ -12765,12 +12710,12 @@
           }
         },
         "tags": [
-          "storage.halo.run/v1alpha1/Attachment"
+          "AttachmentV1alpha1"
         ]
       },
       "post": {
-        "description": "Create storage.halo.run/v1alpha1/Attachment",
-        "operationId": "Create/storage.halo.run/v1alpha1/Attachment",
+        "description": "Create Attachment",
+        "operationId": "createAttachment",
         "requestBody": {
           "content": {
             "*/*": {
@@ -12794,14 +12739,14 @@
           }
         },
         "tags": [
-          "storage.halo.run/v1alpha1/Attachment"
+          "AttachmentV1alpha1"
         ]
       }
     },
     "/apis/storage.halo.run/v1alpha1/attachments/{name}": {
       "delete": {
-        "description": "Delete storage.halo.run/v1alpha1/Attachment",
-        "operationId": "Delete/storage.halo.run/v1alpha1/Attachment",
+        "description": "Delete Attachment",
+        "operationId": "deleteAttachment",
         "parameters": [
           {
             "description": "Name of attachment",
@@ -12819,12 +12764,12 @@
           }
         },
         "tags": [
-          "storage.halo.run/v1alpha1/Attachment"
+          "AttachmentV1alpha1"
         ]
       },
       "get": {
-        "description": "Get storage.halo.run/v1alpha1/Attachment",
-        "operationId": "Get/storage.halo.run/v1alpha1/Attachment",
+        "description": "Get Attachment",
+        "operationId": "getAttachment",
         "parameters": [
           {
             "description": "Name of attachment",
@@ -12849,12 +12794,12 @@
           }
         },
         "tags": [
-          "storage.halo.run/v1alpha1/Attachment"
+          "AttachmentV1alpha1"
         ]
       },
       "patch": {
-        "description": "Patch storage.halo.run/v1alpha1/Attachment",
-        "operationId": "Patch/storage.halo.run/v1alpha1/Attachment",
+        "description": "Patch Attachment",
+        "operationId": "patchAttachment",
         "parameters": [
           {
             "description": "Name of attachment",
@@ -12888,12 +12833,12 @@
           }
         },
         "tags": [
-          "storage.halo.run/v1alpha1/Attachment"
+          "AttachmentV1alpha1"
         ]
       },
       "put": {
-        "description": "Update storage.halo.run/v1alpha1/Attachment",
-        "operationId": "Update/storage.halo.run/v1alpha1/Attachment",
+        "description": "Update Attachment",
+        "operationId": "updateAttachment",
         "parameters": [
           {
             "description": "Name of attachment",
@@ -12928,14 +12873,14 @@
           }
         },
         "tags": [
-          "storage.halo.run/v1alpha1/Attachment"
+          "AttachmentV1alpha1"
         ]
       }
     },
     "/apis/storage.halo.run/v1alpha1/groups": {
       "get": {
-        "description": "List storage.halo.run/v1alpha1/Group",
-        "operationId": "List/storage.halo.run/v1alpha1/Group",
+        "description": "List Group",
+        "operationId": "listGroup",
         "parameters": [
           {
             "description": "Page number. Default is 0.",
@@ -13002,12 +12947,12 @@
           }
         },
         "tags": [
-          "storage.halo.run/v1alpha1/Group"
+          "GroupV1alpha1"
         ]
       },
       "post": {
-        "description": "Create storage.halo.run/v1alpha1/Group",
-        "operationId": "Create/storage.halo.run/v1alpha1/Group",
+        "description": "Create Group",
+        "operationId": "createGroup",
         "requestBody": {
           "content": {
             "*/*": {
@@ -13031,14 +12976,14 @@
           }
         },
         "tags": [
-          "storage.halo.run/v1alpha1/Group"
+          "GroupV1alpha1"
         ]
       }
     },
     "/apis/storage.halo.run/v1alpha1/groups/{name}": {
       "delete": {
-        "description": "Delete storage.halo.run/v1alpha1/Group",
-        "operationId": "Delete/storage.halo.run/v1alpha1/Group",
+        "description": "Delete Group",
+        "operationId": "deleteGroup",
         "parameters": [
           {
             "description": "Name of group",
@@ -13056,12 +13001,12 @@
           }
         },
         "tags": [
-          "storage.halo.run/v1alpha1/Group"
+          "GroupV1alpha1"
         ]
       },
       "get": {
-        "description": "Get storage.halo.run/v1alpha1/Group",
-        "operationId": "Get/storage.halo.run/v1alpha1/Group",
+        "description": "Get Group",
+        "operationId": "getGroup",
         "parameters": [
           {
             "description": "Name of group",
@@ -13086,12 +13031,12 @@
           }
         },
         "tags": [
-          "storage.halo.run/v1alpha1/Group"
+          "GroupV1alpha1"
         ]
       },
       "patch": {
-        "description": "Patch storage.halo.run/v1alpha1/Group",
-        "operationId": "Patch/storage.halo.run/v1alpha1/Group",
+        "description": "Patch Group",
+        "operationId": "patchGroup",
         "parameters": [
           {
             "description": "Name of group",
@@ -13125,12 +13070,12 @@
           }
         },
         "tags": [
-          "storage.halo.run/v1alpha1/Group"
+          "GroupV1alpha1"
         ]
       },
       "put": {
-        "description": "Update storage.halo.run/v1alpha1/Group",
-        "operationId": "Update/storage.halo.run/v1alpha1/Group",
+        "description": "Update Group",
+        "operationId": "updateGroup",
         "parameters": [
           {
             "description": "Name of group",
@@ -13165,14 +13110,14 @@
           }
         },
         "tags": [
-          "storage.halo.run/v1alpha1/Group"
+          "GroupV1alpha1"
         ]
       }
     },
     "/apis/storage.halo.run/v1alpha1/policies": {
       "get": {
-        "description": "List storage.halo.run/v1alpha1/Policy",
-        "operationId": "List/storage.halo.run/v1alpha1/Policy",
+        "description": "List Policy",
+        "operationId": "listPolicy",
         "parameters": [
           {
             "description": "Page number. Default is 0.",
@@ -13239,12 +13184,12 @@
           }
         },
         "tags": [
-          "storage.halo.run/v1alpha1/Policy"
+          "PolicyV1alpha1"
         ]
       },
       "post": {
-        "description": "Create storage.halo.run/v1alpha1/Policy",
-        "operationId": "Create/storage.halo.run/v1alpha1/Policy",
+        "description": "Create Policy",
+        "operationId": "createPolicy",
         "requestBody": {
           "content": {
             "*/*": {
@@ -13268,14 +13213,14 @@
           }
         },
         "tags": [
-          "storage.halo.run/v1alpha1/Policy"
+          "PolicyV1alpha1"
         ]
       }
     },
     "/apis/storage.halo.run/v1alpha1/policies/{name}": {
       "delete": {
-        "description": "Delete storage.halo.run/v1alpha1/Policy",
-        "operationId": "Delete/storage.halo.run/v1alpha1/Policy",
+        "description": "Delete Policy",
+        "operationId": "deletePolicy",
         "parameters": [
           {
             "description": "Name of policy",
@@ -13293,12 +13238,12 @@
           }
         },
         "tags": [
-          "storage.halo.run/v1alpha1/Policy"
+          "PolicyV1alpha1"
         ]
       },
       "get": {
-        "description": "Get storage.halo.run/v1alpha1/Policy",
-        "operationId": "Get/storage.halo.run/v1alpha1/Policy",
+        "description": "Get Policy",
+        "operationId": "getPolicy",
         "parameters": [
           {
             "description": "Name of policy",
@@ -13323,12 +13268,12 @@
           }
         },
         "tags": [
-          "storage.halo.run/v1alpha1/Policy"
+          "PolicyV1alpha1"
         ]
       },
       "patch": {
-        "description": "Patch storage.halo.run/v1alpha1/Policy",
-        "operationId": "Patch/storage.halo.run/v1alpha1/Policy",
+        "description": "Patch Policy",
+        "operationId": "patchPolicy",
         "parameters": [
           {
             "description": "Name of policy",
@@ -13362,12 +13307,12 @@
           }
         },
         "tags": [
-          "storage.halo.run/v1alpha1/Policy"
+          "PolicyV1alpha1"
         ]
       },
       "put": {
-        "description": "Update storage.halo.run/v1alpha1/Policy",
-        "operationId": "Update/storage.halo.run/v1alpha1/Policy",
+        "description": "Update Policy",
+        "operationId": "updatePolicy",
         "parameters": [
           {
             "description": "Name of policy",
@@ -13402,14 +13347,14 @@
           }
         },
         "tags": [
-          "storage.halo.run/v1alpha1/Policy"
+          "PolicyV1alpha1"
         ]
       }
     },
     "/apis/storage.halo.run/v1alpha1/policytemplates": {
       "get": {
-        "description": "List storage.halo.run/v1alpha1/PolicyTemplate",
-        "operationId": "List/storage.halo.run/v1alpha1/PolicyTemplate",
+        "description": "List PolicyTemplate",
+        "operationId": "listPolicyTemplate",
         "parameters": [
           {
             "description": "Page number. Default is 0.",
@@ -13476,12 +13421,12 @@
           }
         },
         "tags": [
-          "storage.halo.run/v1alpha1/PolicyTemplate"
+          "PolicyTemplateV1alpha1"
         ]
       },
       "post": {
-        "description": "Create storage.halo.run/v1alpha1/PolicyTemplate",
-        "operationId": "Create/storage.halo.run/v1alpha1/PolicyTemplate",
+        "description": "Create PolicyTemplate",
+        "operationId": "createPolicyTemplate",
         "requestBody": {
           "content": {
             "*/*": {
@@ -13505,14 +13450,14 @@
           }
         },
         "tags": [
-          "storage.halo.run/v1alpha1/PolicyTemplate"
+          "PolicyTemplateV1alpha1"
         ]
       }
     },
     "/apis/storage.halo.run/v1alpha1/policytemplates/{name}": {
       "delete": {
-        "description": "Delete storage.halo.run/v1alpha1/PolicyTemplate",
-        "operationId": "Delete/storage.halo.run/v1alpha1/PolicyTemplate",
+        "description": "Delete PolicyTemplate",
+        "operationId": "deletePolicyTemplate",
         "parameters": [
           {
             "description": "Name of policytemplate",
@@ -13530,12 +13475,12 @@
           }
         },
         "tags": [
-          "storage.halo.run/v1alpha1/PolicyTemplate"
+          "PolicyTemplateV1alpha1"
         ]
       },
       "get": {
-        "description": "Get storage.halo.run/v1alpha1/PolicyTemplate",
-        "operationId": "Get/storage.halo.run/v1alpha1/PolicyTemplate",
+        "description": "Get PolicyTemplate",
+        "operationId": "getPolicyTemplate",
         "parameters": [
           {
             "description": "Name of policytemplate",
@@ -13560,12 +13505,12 @@
           }
         },
         "tags": [
-          "storage.halo.run/v1alpha1/PolicyTemplate"
+          "PolicyTemplateV1alpha1"
         ]
       },
       "patch": {
-        "description": "Patch storage.halo.run/v1alpha1/PolicyTemplate",
-        "operationId": "Patch/storage.halo.run/v1alpha1/PolicyTemplate",
+        "description": "Patch PolicyTemplate",
+        "operationId": "patchPolicyTemplate",
         "parameters": [
           {
             "description": "Name of policytemplate",
@@ -13599,12 +13544,12 @@
           }
         },
         "tags": [
-          "storage.halo.run/v1alpha1/PolicyTemplate"
+          "PolicyTemplateV1alpha1"
         ]
       },
       "put": {
-        "description": "Update storage.halo.run/v1alpha1/PolicyTemplate",
-        "operationId": "Update/storage.halo.run/v1alpha1/PolicyTemplate",
+        "description": "Update PolicyTemplate",
+        "operationId": "updatePolicyTemplate",
         "parameters": [
           {
             "description": "Name of policytemplate",
@@ -13639,14 +13584,14 @@
           }
         },
         "tags": [
-          "storage.halo.run/v1alpha1/PolicyTemplate"
+          "PolicyTemplateV1alpha1"
         ]
       }
     },
     "/apis/theme.halo.run/v1alpha1/themes": {
       "get": {
-        "description": "List theme.halo.run/v1alpha1/Theme",
-        "operationId": "List/theme.halo.run/v1alpha1/Theme",
+        "description": "List Theme",
+        "operationId": "listTheme",
         "parameters": [
           {
             "description": "Page number. Default is 0.",
@@ -13713,12 +13658,12 @@
           }
         },
         "tags": [
-          "theme.halo.run/v1alpha1/Theme"
+          "ThemeV1alpha1"
         ]
       },
       "post": {
-        "description": "Create theme.halo.run/v1alpha1/Theme",
-        "operationId": "Create/theme.halo.run/v1alpha1/Theme",
+        "description": "Create Theme",
+        "operationId": "createTheme",
         "requestBody": {
           "content": {
             "*/*": {
@@ -13742,14 +13687,14 @@
           }
         },
         "tags": [
-          "theme.halo.run/v1alpha1/Theme"
+          "ThemeV1alpha1"
         ]
       }
     },
     "/apis/theme.halo.run/v1alpha1/themes/{name}": {
       "delete": {
-        "description": "Delete theme.halo.run/v1alpha1/Theme",
-        "operationId": "Delete/theme.halo.run/v1alpha1/Theme",
+        "description": "Delete Theme",
+        "operationId": "deleteTheme",
         "parameters": [
           {
             "description": "Name of theme",
@@ -13767,12 +13712,12 @@
           }
         },
         "tags": [
-          "theme.halo.run/v1alpha1/Theme"
+          "ThemeV1alpha1"
         ]
       },
       "get": {
-        "description": "Get theme.halo.run/v1alpha1/Theme",
-        "operationId": "Get/theme.halo.run/v1alpha1/Theme",
+        "description": "Get Theme",
+        "operationId": "getTheme",
         "parameters": [
           {
             "description": "Name of theme",
@@ -13797,12 +13742,12 @@
           }
         },
         "tags": [
-          "theme.halo.run/v1alpha1/Theme"
+          "ThemeV1alpha1"
         ]
       },
       "patch": {
-        "description": "Patch theme.halo.run/v1alpha1/Theme",
-        "operationId": "Patch/theme.halo.run/v1alpha1/Theme",
+        "description": "Patch Theme",
+        "operationId": "patchTheme",
         "parameters": [
           {
             "description": "Name of theme",
@@ -13836,12 +13781,12 @@
           }
         },
         "tags": [
-          "theme.halo.run/v1alpha1/Theme"
+          "ThemeV1alpha1"
         ]
       },
       "put": {
-        "description": "Update theme.halo.run/v1alpha1/Theme",
-        "operationId": "Update/theme.halo.run/v1alpha1/Theme",
+        "description": "Update Theme",
+        "operationId": "updateTheme",
         "parameters": [
           {
             "description": "Name of theme",
@@ -13876,7 +13821,7 @@
           }
         },
         "tags": [
-          "theme.halo.run/v1alpha1/Theme"
+          "ThemeV1alpha1"
         ]
       }
     },
@@ -13916,7 +13861,7 @@
           }
         },
         "tags": [
-          "uc.api.content.halo.run/v1alpha1/Attachment"
+          "AttachmentV1alpha1Uc"
         ]
       }
     },
@@ -14020,7 +13965,7 @@
           }
         },
         "tags": [
-          "uc.api.content.halo.run/v1alpha1/Post"
+          "PostV1alpha1Uc"
         ]
       },
       "post": {
@@ -14048,7 +13993,7 @@
           }
         },
         "tags": [
-          "uc.api.content.halo.run/v1alpha1/Post"
+          "PostV1alpha1Uc"
         ]
       }
     },
@@ -14080,7 +14025,7 @@
           }
         },
         "tags": [
-          "uc.api.content.halo.run/v1alpha1/Post"
+          "PostV1alpha1Uc"
         ]
       },
       "put": {
@@ -14119,7 +14064,7 @@
           }
         },
         "tags": [
-          "uc.api.content.halo.run/v1alpha1/Post"
+          "PostV1alpha1Uc"
         ]
       }
     },
@@ -14159,7 +14104,7 @@
           }
         },
         "tags": [
-          "uc.api.content.halo.run/v1alpha1/Post"
+          "PostV1alpha1Uc"
         ]
       },
       "put": {
@@ -14198,7 +14143,7 @@
           }
         },
         "tags": [
-          "uc.api.content.halo.run/v1alpha1/Post"
+          "PostV1alpha1Uc"
         ]
       }
     },
@@ -14230,7 +14175,7 @@
           }
         },
         "tags": [
-          "uc.api.content.halo.run/v1alpha1/Post"
+          "PostV1alpha1Uc"
         ]
       }
     },
@@ -14262,7 +14207,7 @@
           }
         },
         "tags": [
-          "uc.api.content.halo.run/v1alpha1/Post"
+          "PostV1alpha1Uc"
         ]
       }
     },
@@ -14311,7 +14256,299 @@
           }
         },
         "tags": [
-          "uc.api.content.halo.run/v1alpha1/Snapshot"
+          "SnapshotV1alpha1Uc"
+        ]
+      }
+    },
+    "/apis/uc.api.security.halo.run/v1alpha1/authentications/two-factor/settings": {
+      "get": {
+        "description": "Get Two-factor authentication settings.",
+        "operationId": "GetTwoFactorAuthenticationSettings",
+        "responses": {
+          "default": {
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/TwoFactorAuthSettings"
+                }
+              }
+            },
+            "description": "default response"
+          }
+        },
+        "tags": [
+          "TwoFactorAuthV1alpha1Uc"
+        ]
+      }
+    },
+    "/apis/uc.api.security.halo.run/v1alpha1/authentications/two-factor/settings/disabled": {
+      "put": {
+        "description": "Disable Two-factor authentication",
+        "operationId": "DisableTwoFactor",
+        "requestBody": {
+          "content": {
+            "*/*": {
+              "schema": {
+                "$ref": "#/components/schemas/PasswordRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "default": {
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/TwoFactorAuthSettings"
+                }
+              }
+            },
+            "description": "default response"
+          }
+        },
+        "tags": [
+          "TwoFactorAuthV1alpha1Uc"
+        ]
+      }
+    },
+    "/apis/uc.api.security.halo.run/v1alpha1/authentications/two-factor/settings/enabled": {
+      "put": {
+        "description": "Enable Two-factor authentication",
+        "operationId": "EnableTwoFactor",
+        "requestBody": {
+          "content": {
+            "*/*": {
+              "schema": {
+                "$ref": "#/components/schemas/PasswordRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "default": {
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/TwoFactorAuthSettings"
+                }
+              }
+            },
+            "description": "default response"
+          }
+        },
+        "tags": [
+          "TwoFactorAuthV1alpha1Uc"
+        ]
+      }
+    },
+    "/apis/uc.api.security.halo.run/v1alpha1/authentications/two-factor/totp": {
+      "post": {
+        "description": "Configure a TOTP",
+        "operationId": "ConfigurerTotp",
+        "requestBody": {
+          "content": {
+            "*/*": {
+              "schema": {
+                "$ref": "#/components/schemas/TotpRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "default": {
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/TwoFactorAuthSettings"
+                }
+              }
+            },
+            "description": "default response"
+          }
+        },
+        "tags": [
+          "TwoFactorAuthV1alpha1Uc"
+        ]
+      }
+    },
+    "/apis/uc.api.security.halo.run/v1alpha1/authentications/two-factor/totp/-": {
+      "delete": {
+        "operationId": "DeleteTotp",
+        "requestBody": {
+          "content": {
+            "*/*": {
+              "schema": {
+                "$ref": "#/components/schemas/PasswordRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "default": {
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/TwoFactorAuthSettings"
+                }
+              }
+            },
+            "description": "default response"
+          }
+        },
+        "tags": [
+          "TwoFactorAuthV1alpha1Uc"
+        ]
+      }
+    },
+    "/apis/uc.api.security.halo.run/v1alpha1/authentications/two-factor/totp/auth-link": {
+      "get": {
+        "description": "Get TOTP auth link, including secret",
+        "operationId": "GetTotpAuthLink",
+        "responses": {
+          "default": {
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/TotpAuthLinkResponse"
+                }
+              }
+            },
+            "description": "default response"
+          }
+        },
+        "tags": [
+          "TwoFactorAuthV1alpha1Uc"
+        ]
+      }
+    },
+    "/apis/uc.api.security.halo.run/v1alpha1/personalaccesstokens": {
+      "get": {
+        "description": "Obtain PAT list.",
+        "operationId": "ObtainPats",
+        "responses": {
+          "default": {
+            "content": {
+              "*/*": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/PersonalAccessToken"
+                  }
+                }
+              }
+            },
+            "description": "default response"
+          }
+        },
+        "tags": [
+          "PersonalAccessTokenV1alpha1Uc"
+        ]
+      },
+      "post": {
+        "description": "Generate a PAT.",
+        "operationId": "GeneratePat",
+        "requestBody": {
+          "content": {
+            "*/*": {
+              "schema": {
+                "$ref": "#/components/schemas/PersonalAccessToken"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "default": {
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/PersonalAccessToken"
+                }
+              }
+            },
+            "description": "default response"
+          }
+        },
+        "tags": [
+          "PersonalAccessTokenV1alpha1Uc"
+        ]
+      }
+    },
+    "/apis/uc.api.security.halo.run/v1alpha1/personalaccesstokens/{name}": {
+      "delete": {
+        "description": "Delete a PAT",
+        "operationId": "DeletePat",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "name",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {},
+        "tags": [
+          "PersonalAccessTokenV1alpha1Uc"
+        ]
+      },
+      "get": {
+        "description": "Obtain a PAT.",
+        "operationId": "ObtainPat",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "name",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {},
+        "tags": [
+          "PersonalAccessTokenV1alpha1Uc"
+        ]
+      }
+    },
+    "/apis/uc.api.security.halo.run/v1alpha1/personalaccesstokens/{name}/actions/restoration": {
+      "put": {
+        "description": "Restore a PAT.",
+        "operationId": "RestorePat",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "name",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {},
+        "tags": [
+          "PersonalAccessTokenV1alpha1Uc"
+        ]
+      }
+    },
+    "/apis/uc.api.security.halo.run/v1alpha1/personalaccesstokens/{name}/actions/revocation": {
+      "put": {
+        "description": "Revoke a PAT",
+        "operationId": "RevokePat",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "name",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {},
+        "tags": [
+          "PersonalAccessTokenV1alpha1Uc"
         ]
       }
     },
@@ -17484,6 +17721,7 @@
         "type": "object",
         "properties": {
           "children": {
+            "uniqueItems": true,
             "type": "array",
             "description": "Children of this menu item",
             "items": {
@@ -17627,6 +17865,7 @@
             "description": "The display name of the menu."
           },
           "menuItems": {
+            "uniqueItems": true,
             "type": "array",
             "description": "Names of menu children below this menu.",
             "items": {
@@ -19020,12 +19259,12 @@
           },
           "visible": {
             "type": "string",
+            "default": "PUBLIC",
             "enum": [
               "PUBLIC",
               "INTERNAL",
               "PRIVATE"
-            ],
-            "default": "PUBLIC"
+            ]
           }
         }
       },
@@ -19518,6 +19757,114 @@
         "type": "object",
         "properties": {
           "email": {
+            "type": "string"
+          }
+        }
+      },
+      "RememberMeToken": {
+        "required": [
+          "apiVersion",
+          "kind",
+          "metadata",
+          "spec"
+        ],
+        "type": "object",
+        "properties": {
+          "apiVersion": {
+            "type": "string"
+          },
+          "kind": {
+            "type": "string"
+          },
+          "metadata": {
+            "$ref": "#/components/schemas/Metadata"
+          },
+          "spec": {
+            "$ref": "#/components/schemas/RememberMeTokenSpec"
+          }
+        }
+      },
+      "RememberMeTokenList": {
+        "required": [
+          "first",
+          "hasNext",
+          "hasPrevious",
+          "items",
+          "last",
+          "page",
+          "size",
+          "total",
+          "totalPages"
+        ],
+        "type": "object",
+        "properties": {
+          "first": {
+            "type": "boolean",
+            "description": "Indicates whether current page is the first page."
+          },
+          "hasNext": {
+            "type": "boolean",
+            "description": "Indicates whether current page has previous page."
+          },
+          "hasPrevious": {
+            "type": "boolean",
+            "description": "Indicates whether current page has previous page."
+          },
+          "items": {
+            "type": "array",
+            "description": "A chunk of items.",
+            "items": {
+              "$ref": "#/components/schemas/RememberMeToken"
+            }
+          },
+          "last": {
+            "type": "boolean",
+            "description": "Indicates whether current page is the last page."
+          },
+          "page": {
+            "type": "integer",
+            "description": "Page number, starts from 1. If not set or equal to 0, it means no pagination.",
+            "format": "int32"
+          },
+          "size": {
+            "type": "integer",
+            "description": "Size of each page. If not set or equal to 0, it means no pagination.",
+            "format": "int32"
+          },
+          "total": {
+            "type": "integer",
+            "description": "Total elements.",
+            "format": "int64"
+          },
+          "totalPages": {
+            "type": "integer",
+            "description": "Indicates total pages.",
+            "format": "int64"
+          }
+        }
+      },
+      "RememberMeTokenSpec": {
+        "required": [
+          "series",
+          "tokenValue",
+          "username"
+        ],
+        "type": "object",
+        "properties": {
+          "lastUsed": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "series": {
+            "minLength": 1,
+            "type": "string"
+          },
+          "tokenValue": {
+            "minLength": 1,
+            "type": "string"
+          },
+          "username": {
+            "minLength": 1,
             "type": "string"
           }
         }
@@ -20721,12 +21068,12 @@
           },
           "visible": {
             "type": "string",
+            "default": "PUBLIC",
             "enum": [
               "PUBLIC",
               "INTERNAL",
               "PRIVATE"
-            ],
-            "default": "PUBLIC"
+            ]
           }
         }
       },
@@ -22070,11 +22417,11 @@
       }
     },
     "securitySchemes": {
-      "BasicAuth": {
+      "basicAuth": {
         "scheme": "basic",
         "type": "http"
       },
-      "BearerAuth": {
+      "bearerAuth": {
         "bearerFormat": "JWT",
         "scheme": "bearer",
         "type": "http"

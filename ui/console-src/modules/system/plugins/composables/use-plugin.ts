@@ -1,7 +1,12 @@
 import type { ComputedRef, Ref } from "vue";
 import { computed } from "vue";
-import { type Plugin, PluginStatusPhaseEnum } from "@halo-dev/api-client";
-import { apiClient } from "@/utils/api-client";
+import {
+  type Plugin,
+  PluginStatusPhaseEnum,
+  coreApiClient,
+  consoleApiClient,
+} from "@halo-dev/api-client";
+
 import { Dialog, Toast } from "@halo-dev/components";
 import { useI18n } from "vue-i18n";
 import { useMutation } from "@tanstack/vue-query";
@@ -75,7 +80,7 @@ export function usePluginLifeCycle(
 
       const { enabled } = plugin.value.spec;
 
-      return await apiClient.plugin.changePluginRunningState({
+      return await consoleApiClient.plugin.plugin.changePluginRunningState({
         name: plugin.value.metadata.name,
         pluginRunningStateRequest: {
           enable: !enabled,
@@ -116,14 +121,14 @@ export function usePluginLifeCycle(
         if (!plugin.value) return;
 
         try {
-          await apiClient.plugin.changePluginRunningState({
+          await consoleApiClient.plugin.plugin.changePluginRunningState({
             name: plugin.value.metadata.name,
             pluginRunningStateRequest: {
               enable: false,
             },
           });
 
-          await apiClient.extension.plugin.deletePluginHaloRunV1alpha1Plugin({
+          await coreApiClient.plugin.plugin.deletePlugin({
             name: plugin.value.metadata.name,
           });
 
@@ -132,7 +137,7 @@ export function usePluginLifeCycle(
             const { settingName, configMapName } = plugin.value.spec;
 
             if (settingName) {
-              await apiClient.extension.setting.deleteV1alpha1Setting(
+              await coreApiClient.setting.deleteSetting(
                 {
                   name: settingName,
                 },
@@ -143,7 +148,7 @@ export function usePluginLifeCycle(
             }
 
             if (configMapName) {
-              await apiClient.extension.configMap.deleteV1alpha1ConfigMap(
+              await coreApiClient.configMap.deleteConfigMap(
                 {
                   name: configMapName,
                 },
@@ -193,22 +198,20 @@ export function usePluginBatchOperations(names: Ref<string[]>) {
       onConfirm: async () => {
         try {
           for (let i = 0; i < names.value.length; i++) {
-            await apiClient.extension.plugin.deletePluginHaloRunV1alpha1Plugin({
+            await coreApiClient.plugin.plugin.deletePlugin({
               name: names.value[i],
             });
 
             if (deleteExtensions) {
               const { data: plugin } =
-                await apiClient.extension.plugin.getPluginHaloRunV1alpha1Plugin(
-                  {
-                    name: names.value[i],
-                  }
-                );
+                await coreApiClient.plugin.plugin.getPlugin({
+                  name: names.value[i],
+                });
 
               const { settingName, configMapName } = plugin.spec;
 
               if (settingName) {
-                await apiClient.extension.setting.deleteV1alpha1Setting(
+                await coreApiClient.setting.deleteSetting(
                   {
                     name: settingName,
                   },
@@ -219,7 +222,7 @@ export function usePluginBatchOperations(names: Ref<string[]>) {
               }
 
               if (configMapName) {
-                await apiClient.extension.configMap.deleteV1alpha1ConfigMap(
+                await coreApiClient.configMap.deleteConfigMap(
                   {
                     name: configMapName,
                   },
@@ -249,7 +252,7 @@ export function usePluginBatchOperations(names: Ref<string[]>) {
       onConfirm: async () => {
         try {
           for (let i = 0; i < names.value.length; i++) {
-            await apiClient.plugin.changePluginRunningState({
+            await consoleApiClient.plugin.plugin.changePluginRunningState({
               name: names.value[i],
               pluginRunningStateRequest: {
                 enable: enabled,
