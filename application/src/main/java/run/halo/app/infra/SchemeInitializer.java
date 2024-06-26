@@ -81,7 +81,13 @@ public class SchemeInitializer implements ApplicationListener<ApplicationContext
                     definition -> definition.getSpec().getClassName())
                 ));
         });
-        schemeManager.register(ExtensionDefinition.class);
+        schemeManager.register(ExtensionDefinition.class, indexSpecs -> {
+            indexSpecs.add(new IndexSpec()
+                .setName("spec.extensionPointName")
+                .setIndexFunc(simpleAttribute(ExtensionDefinition.class,
+                    definition -> definition.getSpec().getExtensionPointName())
+                ));
+        });
 
         schemeManager.register(RoleBinding.class);
         schemeManager.register(User.class, indexSpecs -> {
