@@ -1083,6 +1083,7 @@ core:
       detail: 详情
       notification-preferences: 通知配置
       pat: 个人令牌
+      devices: 登录设备
     actions:
       update_profile:
         title: 修改资料
@@ -1206,6 +1207,23 @@ core:
           toast_email_empty: 请输入电子邮箱
         verify:
           toast_success: 验证成功
+    device:
+      list:
+        fields:
+          current: 当前设备
+          last_accessed_time: 上次访问：{time}
+      detail_modal:
+        title: 登录设备详情
+        fields:
+          os: 操作系统
+          browser: 浏览器
+          creation_timestamp: 创建时间
+          last_accessed_times: 上次访问时间
+          last_authenticated_time: 上次登录时间
+      operations:
+        revoke:
+          title: 撤销设备
+          description: 确定要撤销该设备吗？撤销之后，此设备会退出登录
   uc_notification:
     title: 消息
     tabs:
@@ -1584,6 +1602,7 @@ core:
       modify: 修改
       access: 访问
       schedule_publish: 定时发布
+      revoke: 撤销
     radio:
       "yes": 是
       "no": 否

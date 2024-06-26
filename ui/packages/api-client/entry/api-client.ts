@@ -14,6 +14,7 @@ import {
   CommentV1alpha1PublicApi,
   ConfigMapV1alpha1Api,
   CounterV1alpha1Api,
+  DeviceV1alpha1UcApi,
   ExtensionDefinitionV1alpha1Api,
   ExtensionPointDefinitionV1alpha1Api,
   GroupV1alpha1Api,
@@ -64,7 +65,7 @@ import {
   UserConnectionV1alpha1Api,
   UserV1alpha1Api,
   UserV1alpha1ConsoleApi,
-  UserV1alpha1PublicApi,
+  UserV1alpha1PublicApi
 } from "../src";
 
 const defaultAxiosInstance = axios.create({
@@ -370,6 +371,11 @@ function createUcApiClient(axiosInstance: AxiosInstance) {
         axiosInstance
       ),
       personalAccessToken: new PersonalAccessTokenV1alpha1UcApi(
+        undefined,
+        baseURL,
+        axiosInstance
+      ),
+      device: new DeviceV1alpha1UcApi(
         undefined,
         baseURL,
         axiosInstance

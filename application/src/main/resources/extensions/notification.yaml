@@ -205,3 +205,27 @@ spec:
     - name: expirationAtMinutes
       type: string
       description: "The expiration minutes of the reset link, such as 30 minutes."
+---
+apiVersion: notification.halo.run/v1alpha1
+kind: ReasonType
+metadata:
+  name: new-device-login
+spec:
+  displayName: "新设备登录"
+  description: "当你的账户在新设备上登录时，你会收到一条通知，告诉你有新设备登录了你的账户。"
+  properties:
+    - name: os
+      type: string
+      description: "The operating system of the device."
+    - name: browser
+      type: string
+      description: "The browser of the device."
+    - name: ipAddress
+      type: string
+      description: "The IP address of the device."
+    - name: loginTime
+      type: string
+      description: "The login time of the device."
+    - name: principalName
+      type: string
+      description: "The principal name of the device."

@@ -15,16 +15,22 @@
 
 
 /**
- * The subscriber to be notified
+ * 
  * @export
- * @interface SubscriptionSubscriber
+ * @interface DeviceStatus
  */
-export interface SubscriptionSubscriber {
+export interface DeviceStatus {
     /**
      * 
      * @type {string}
-     * @memberof SubscriptionSubscriber
+     * @memberof DeviceStatus
      */
-    'name': string;
+    'browser'?: string;
+    /**
+     * 
+     * @type {string}
+     * @memberof DeviceStatus
+     */
+    'os'?: string;
 }
 

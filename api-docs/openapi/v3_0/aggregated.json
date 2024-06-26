@@ -12166,6 +12166,243 @@
         ]
       }
     },
+    "/apis/security.halo.run/v1alpha1/devices": {
+      "get": {
+        "description": "List v1alpha1",
+        "operationId": "listv1alpha1",
+        "parameters": [
+          {
+            "description": "Page number. Default is 0.",
+            "in": "query",
+            "name": "page",
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          },
+          {
+            "description": "Size number. Default is 0.",
+            "in": "query",
+            "name": "size",
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          },
+          {
+            "description": "Label selector. e.g.: hidden!\u003dtrue",
+            "in": "query",
+            "name": "labelSelector",
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            }
+          },
+          {
+            "description": "Field selector. e.g.: metadata.name\u003d\u003dhalo",
+            "in": "query",
+            "name": "fieldSelector",
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            }
+          },
+          {
+            "description": "Sorting criteria in the format: property,(asc|desc). Default sort order is ascending. Multiple sort criteria are supported.",
+            "in": "query",
+            "name": "sort",
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/v1alpha1List"
+                }
+              }
+            },
+            "description": "Response devices"
+          }
+        },
+        "tags": [
+          "v1alpha1V1alpha1"
+        ]
+      },
+      "post": {
+        "description": "Create v1alpha1",
+        "operationId": "createv1alpha1",
+        "requestBody": {
+          "content": {
+            "*/*": {
+              "schema": {
+                "$ref": "#/components/schemas/Device"
+              }
+            }
+          },
+          "description": "Fresh device"
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/Device"
+                }
+              }
+            },
+            "description": "Response devices created just now"
+          }
+        },
+        "tags": [
+          "v1alpha1V1alpha1"
+        ]
+      }
+    },
+    "/apis/security.halo.run/v1alpha1/devices/{name}": {
+      "delete": {
+        "description": "Delete v1alpha1",
+        "operationId": "deletev1alpha1",
+        "parameters": [
+          {
+            "description": "Name of device",
+            "in": "path",
+            "name": "name",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Response device deleted just now"
+          }
+        },
+        "tags": [
+          "v1alpha1V1alpha1"
+        ]
+      },
+      "get": {
+        "description": "Get v1alpha1",
+        "operationId": "getv1alpha1",
+        "parameters": [
+          {
+            "description": "Name of device",
+            "in": "path",
+            "name": "name",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/Device"
+                }
+              }
+            },
+            "description": "Response single device"
+          }
+        },
+        "tags": [
+          "v1alpha1V1alpha1"
+        ]
+      },
+      "patch": {
+        "description": "Patch v1alpha1",
+        "operationId": "patchv1alpha1",
+        "parameters": [
+          {
+            "description": "Name of device",
+            "in": "path",
+            "name": "name",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json-patch+json": {
+              "schema": {
+                "$ref": "#/components/schemas/JsonPatch"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/Device"
+                }
+              }
+            },
+            "description": "Response device patched just now"
+          }
+        },
+        "tags": [
+          "v1alpha1V1alpha1"
+        ]
+      },
+      "put": {
+        "description": "Update v1alpha1",
+        "operationId": "updatev1alpha1",
+        "parameters": [
+          {
+            "description": "Name of device",
+            "in": "path",
+            "name": "name",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "*/*": {
+              "schema": {
+                "$ref": "#/components/schemas/Device"
+              }
+            }
+          },
+          "description": "Updated device"
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/Device"
+                }
+              }
+            },
+            "description": "Response devices updated just now"
+          }
+        },
+        "tags": [
+          "v1alpha1V1alpha1"
+        ]
+      }
+    },
     "/apis/security.halo.run/v1alpha1/personalaccesstokens": {
       "get": {
         "description": "List PersonalAccessToken",
@@ -14421,6 +14658,55 @@
         ]
       }
     },
+    "/apis/uc.api.security.halo.run/v1alpha1/devices": {
+      "get": {
+        "description": "List all user devices",
+        "operationId": "ListDevices",
+        "responses": {
+          "default": {
+            "content": {
+              "*/*": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/UserDevice"
+                  }
+                }
+              }
+            },
+            "description": "default response"
+          }
+        },
+        "tags": [
+          "DeviceV1alpha1Uc"
+        ]
+      }
+    },
+    "/apis/uc.api.security.halo.run/v1alpha1/devices/{deviceId}": {
+      "delete": {
+        "description": "Revoke a own device",
+        "operationId": "RevokeDevice",
+        "parameters": [
+          {
+            "description": "Device ID",
+            "in": "path",
+            "name": "deviceId",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "204 NO_CONTENT": {
+            "description": "default response"
+          }
+        },
+        "tags": [
+          "DeviceV1alpha1Uc"
+        ]
+      }
+    },
     "/apis/uc.api.security.halo.run/v1alpha1/personalaccesstokens": {
       "get": {
         "description": "Obtain PAT list.",
@@ -16309,6 +16595,81 @@
           },
           "user": {
             "$ref": "#/components/schemas/User"
+          }
+        }
+      },
+      "Device": {
+        "required": [
+          "apiVersion",
+          "kind",
+          "metadata",
+          "spec",
+          "status"
+        ],
+        "type": "object",
+        "properties": {
+          "apiVersion": {
+            "type": "string"
+          },
+          "kind": {
+            "type": "string"
+          },
+          "metadata": {
+            "$ref": "#/components/schemas/Metadata"
+          },
+          "spec": {
+            "$ref": "#/components/schemas/DeviceSpec"
+          },
+          "status": {
+            "$ref": "#/components/schemas/DeviceStatus"
+          }
+        }
+      },
+      "DeviceSpec": {
+        "required": [
+          "ipAddress",
+          "principalName",
+          "sessionId"
+        ],
+        "type": "object",
+        "properties": {
+          "ipAddress": {
+            "maxLength": 129,
+            "type": "string"
+          },
+          "lastAccessedTime": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "lastAuthenticatedTime": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "principalName": {
+            "minLength": 1,
+            "type": "string"
+          },
+          "rememberMeSeriesId": {
+            "type": "string"
+          },
+          "sessionId": {
+            "minLength": 1,
+            "type": "string"
+          },
+          "userAgent": {
+            "maxLength": 500,
+            "type": "string"
+          }
+        }
+      },
+      "DeviceStatus": {
+        "type": "object",
+        "properties": {
+          "browser": {
+            "type": "string"
+          },
+          "os": {
+            "type": "string"
           }
         }
       },
@@ -21465,9 +21826,13 @@
         }
       },
       "SubscriptionSubscriber": {
+        "required": [
+          "name"
+        ],
         "type": "object",
         "properties": {
           "name": {
+            "minLength": 1,
             "type": "string"
           }
         },
@@ -22172,6 +22537,25 @@
           }
         }
       },
+      "UserDevice": {
+        "required": [
+          "active",
+          "currentDevice",
+          "device"
+        ],
+        "type": "object",
+        "properties": {
+          "active": {
+            "type": "boolean"
+          },
+          "currentDevice": {
+            "type": "boolean"
+          },
+          "device": {
+            "$ref": "#/components/schemas/Device"
+          }
+        }
+      },
       "UserEndpoint.ListedUserList": {
         "required": [
           "first",
@@ -22412,6 +22796,65 @@
           },
           "plural": {
             "type": "string"
+          }
+        }
+      },
+      "v1alpha1List": {
+        "required": [
+          "first",
+          "hasNext",
+          "hasPrevious",
+          "items",
+          "last",
+          "page",
+          "size",
+          "total",
+          "totalPages"
+        ],
+        "type": "object",
+        "properties": {
+          "first": {
+            "type": "boolean",
+            "description": "Indicates whether current page is the first page."
+          },
+          "hasNext": {
+            "type": "boolean",
+            "description": "Indicates whether current page has previous page."
+          },
+          "hasPrevious": {
+            "type": "boolean",
+            "description": "Indicates whether current page has previous page."
+          },
+          "items": {
+            "type": "array",
+            "description": "A chunk of items.",
+            "items": {
+              "$ref": "#/components/schemas/Device"
+            }
+          },
+          "last": {
+            "type": "boolean",
+            "description": "Indicates whether current page is the last page."
+          },
+          "page": {
+            "type": "integer",
+            "description": "Page number, starts from 1. If not set or equal to 0, it means no pagination.",
+            "format": "int32"
+          },
+          "size": {
+            "type": "integer",
+            "description": "Size of each page. If not set or equal to 0, it means no pagination.",
+            "format": "int32"
+          },
+          "total": {
+            "type": "integer",
+            "description": "Total elements.",
+            "format": "int64"
+          },
+          "totalPages": {
+            "type": "integer",
+            "description": "Indicates total pages.",
+            "format": "int64"
           }
         }
       }

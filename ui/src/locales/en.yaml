@@ -1151,6 +1151,7 @@ core:
       detail: Detail
       notification-preferences: Notification Preferences
       pat: Personal Access Tokens
+      devices: Devices
     actions:
       update_profile:
         title: Update profile
@@ -1281,6 +1282,25 @@ core:
       titles:
         modify: Modify email address
         verify: Verify email
+    device:
+      list:
+        fields:
+          current: Current
+          last_accessed_time: "Last accessed time: {time}"
+      detail_modal:
+        title: Login device details
+        fields:
+          os: OS
+          browser: Browser
+          creation_timestamp: Creation time
+          last_accessed_times: Last accessed time
+          last_authenticated_time: Last authenticated time
+      operations:
+        revoke:
+          title: Revoke device
+          description: >-
+            Are you sure you want to revoke this device? After revoking, this
+            device will be logged out
   uc_notification:
     title: Notifications
     tabs:
@@ -1655,6 +1675,7 @@ core:
       modify: Modify
       access: Access
       schedule_publish: Schedule publish
+      revoke: Revoke
     radio:
       "yes": "Yes"
       "no": "No"

@@ -1063,6 +1063,7 @@ core:
       detail: 詳情
       notification-preferences: 通知配置
       pat: 個人令牌
+      devices: 登錄設備
     actions:
       update_profile:
         title: 修改資料
@@ -1186,6 +1187,22 @@ core:
       titles:
         modify: 修改電子郵件信箱
         verify: 驗證電子郵件信箱
+    device:
+      list:
+        fields:
+          last_accessed_time: 上次訪問：{time}
+      detail_modal:
+        title: 登入設備詳情
+        fields:
+          os: 操作系統
+          browser: 瀏覽器
+          creation_timestamp: 創建時間
+          last_accessed_times: 上次訪問時間
+          last_authenticated_time: 上次登錄時間
+      operations:
+        revoke:
+          title: 撤銷設備
+          description: 確定要撤銷該設備嗎？撤銷之後，此裝置會退出登錄
   uc_notification:
     title: 訊息
     tabs:
@@ -1542,6 +1559,7 @@ core:
       verify: 驗證
       access: 訪問
       schedule_publish: 定時發佈
+      revoke: 撤銷
     radio:
       "yes": 是
       "no": 否

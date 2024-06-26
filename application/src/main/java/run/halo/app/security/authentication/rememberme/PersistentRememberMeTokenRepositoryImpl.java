@@ -1,12 +1,15 @@
 package run.halo.app.security.authentication.rememberme;
 
+import static run.halo.app.extension.index.query.QueryFactory.and;
 import static run.halo.app.extension.index.query.QueryFactory.equal;
+import static run.halo.app.extension.index.query.QueryFactory.isNull;
 
 import java.time.Duration;
 import java.time.Instant;
 import java.util.Date;
 import lombok.RequiredArgsConstructor;
 import org.springframework.dao.OptimisticLockingFailureException;
+import org.springframework.lang.NonNull;
 import org.springframework.security.web.authentication.rememberme.PersistentRememberMeToken;
 import org.springframework.stereotype.Component;
 import reactor.core.publisher.Mono;
@@ -81,9 +84,19 @@ public class PersistentRememberMeTokenRepositoryImpl
         return paginatedOperator.deleteInitialBatch(RememberMeToken.class, listOptions).then();
     }
 
+    @Override
+    public Mono<Void> removeToken(@NonNull String series) {
+        return getTokenExtensionForSeries(series)
+            .flatMap(client::delete)
+            .then();
+    }
+
     private Mono<RememberMeToken> getTokenExtensionForSeries(String seriesId) {
-        var listOptions = new ListOptions();
-        listOptions.setFieldSelector(FieldSelector.of(equal("spec.series", seriesId)));
+        var listOptions = ListOptions.builder()
+            .fieldQuery(and(equal("spec.series", seriesId),
+                isNull("metadata.deletionTimestamp")
+            ))
+            .build();
         return client.listBy(RememberMeToken.class, listOptions, PageRequestImpl.ofSize(1))
             .flatMap(result -> Mono.justOrEmpty(ListResult.first(result)));
     }
