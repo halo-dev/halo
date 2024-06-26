@@ -15,8 +15,6 @@ const circle = computed(() => groupProps?.circle || props.circle);
 const width = computed(() => groupProps?.width || props.width);
 const height = computed(() => groupProps?.height || props.height);
 
-console.log(groupProps);
-
 const isLoading = ref(false);
 const error = ref(false);
 let init = true;
