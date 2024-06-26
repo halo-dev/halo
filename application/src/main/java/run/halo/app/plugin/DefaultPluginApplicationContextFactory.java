@@ -1,6 +1,5 @@
 package run.halo.app.plugin;
 
-import static org.springframework.beans.factory.config.BeanDefinition.SCOPE_SINGLETON;
 import static org.springframework.util.ResourceUtils.CLASSPATH_URL_PREFIX;
 
 import java.io.IOException;
@@ -102,9 +101,8 @@ public class DefaultPluginApplicationContextFactory implements PluginApplication
 
         rootContext.getBeanProvider(ReactiveExtensionClient.class)
             .ifUnique(client -> {
-                context.registerBean("reactiveSettingFetcher",
-                    DefaultReactiveSettingFetcher.class, bhd -> bhd.setScope(SCOPE_SINGLETON));
-                beanFactory.registerSingleton("settingFetcher", DefaultSettingFetcher.class);
+                context.registerBean("reactiveSettingFetcher", DefaultReactiveSettingFetcher.class);
+                context.registerBean("settingFetcher", DefaultSettingFetcher.class);
             });
 
         rootContext.getBeanProvider(PluginRequestMappingHandlerMapping.class)
