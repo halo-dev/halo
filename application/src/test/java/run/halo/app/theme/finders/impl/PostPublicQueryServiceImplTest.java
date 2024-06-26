@@ -35,7 +35,7 @@ class PostPublicQueryServiceImplTest {
 
     @Test
     void extendPostContent() {
-        when(extensionGetter.getEnabledExtensionByDefinition(
+        when(extensionGetter.getEnabledExtensions(
             eq(ReactivePostContentHandler.class))).thenReturn(
             Flux.just(new PostContentHandlerB(), new PostContentHandlerA(),
                 new PostContentHandlerC()));

@@ -68,6 +68,7 @@ import {
 } from "../src";
 
 const defaultAxiosInstance = axios.create({
+  baseURL: "/",
   withCredentials: true,
 });
 
