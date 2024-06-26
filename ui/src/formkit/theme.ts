@@ -106,9 +106,9 @@ const theme: Record<string, Record<string, string>> = {
     help: `${boxClassification.wrapper} mb-2`,
     inner: "flex flex-col gap-4",
     items: "flex flex-col w-full gap-2 rounded-base",
-    item: "grid grid-cols-12 focus-within:border-primary transition-all overflow-visible focus-within:shadow-sm",
+    item: "grid grid-cols-12 focus-within:border-primary transition-all gap-1.5 overflow-visible",
     content: "flex-1 col-span-9 divide-y divide-gray-100",
-    controls: "flex items-center justify-center gap-1.5 col-span-3",
+    controls: "flex items-center justify-center gap-1 col-span-3",
     control:
       "cursor-pointer text-gray-500 transition-all hover:text-primary disabled:!cursor-not-allowed disabled:opacity-50 disabled:hover:!text-gray-500",
     up: "flex",
