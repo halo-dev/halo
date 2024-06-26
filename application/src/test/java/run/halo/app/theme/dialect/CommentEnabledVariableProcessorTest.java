@@ -54,7 +54,7 @@ class CommentEnabledVariableProcessorTest {
             .thenReturn(Mono.just(commentSetting));
 
         CommentWidget commentWidget = mock(CommentWidget.class);
-        when(extensionGetter.getEnabledExtensionByDefinition(CommentWidget.class))
+        when(extensionGetter.getEnabledExtensions(CommentWidget.class))
             .thenReturn(Flux.just(commentWidget));
         WebEngineContext webContext = mock(WebEngineContext.class);
         var evaluationContext = mock(ThymeleafEvaluationContext.class);
