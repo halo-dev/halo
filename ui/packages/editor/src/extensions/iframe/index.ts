@@ -44,6 +44,7 @@ declare module "@/tiptap" {
 
 const Iframe = Node.create<ExtensionOptions>({
   name: "iframe",
+  fakeSelection: true,
 
   inline() {
     return true;

@@ -5,7 +5,7 @@ import {
 } from "@halo-dev/api-client";
 import { Toast, VEmpty, VLoading } from "@halo-dev/components";
 import { useQuery, useQueryClient } from "@tanstack/vue-query";
-import { computed, ref, toRefs } from "vue";
+import { computed, ref, toRefs, type Ref } from "vue";
 import { useI18n } from "vue-i18n";
 import { useExtensionDefinitionFetch } from "../../composables/use-extension-definition-fetch";
 import ExtensionDefinitionListItem from "./ExtensionDefinitionListItem.vue";
@@ -13,12 +13,19 @@ import ExtensionDefinitionListItem from "./ExtensionDefinitionListItem.vue";
 const { t } = useI18n();
 const queryClient = useQueryClient();
 
-const Q_KEY = (name?: string) => ["extension-point-value", name];
+const Q_KEY = (name?: Ref<string | undefined>) => [
+  "extension-point-value",
+  name,
+];
 
 const props = withDefaults(
   defineProps<{ extensionPointDefinition?: ExtensionPointDefinition }>(),
   { extensionPointDefinition: undefined }
 );
+
+const extensionPointDefinitionName = computed(() => {
+  return extensionPointDefinition.value?.metadata.name;
+});
 
 const { extensionPointDefinition } = toRefs(props);
 
@@ -27,7 +34,7 @@ const { data: extensionDefinitions, isLoading } = useExtensionDefinitionFetch(
 );
 
 const { data: value } = useQuery({
-  queryKey: Q_KEY(extensionPointDefinition.value?.metadata.name),
+  queryKey: Q_KEY(extensionPointDefinitionName),
   queryFn: async () => {
     if (!extensionPointDefinition.value) return null;
 
@@ -88,7 +95,7 @@ async function onExtensionChange(e: Event) {
     Toast.success(t("core.common.toast.save_success"));
 
     queryClient.invalidateQueries({
-      queryKey: Q_KEY(extensionPointDefinition.value?.metadata.name),
+      queryKey: Q_KEY(extensionPointDefinitionName),
     });
   } catch (error) {
     Toast.error(t("core.common.toast.save_failed_and_retry"));

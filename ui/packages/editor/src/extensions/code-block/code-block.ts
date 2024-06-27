@@ -104,6 +104,7 @@ export default CodeBlockLowlight.extend<
   // It needs to have a higher priority than range-selection,
   // otherwise the Mod-a shortcut key will be overridden.
   priority: 110,
+  fakeSelection: true,
   addCommands() {
     return {
       ...this.parent?.(),

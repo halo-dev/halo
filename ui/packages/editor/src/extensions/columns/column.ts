@@ -4,6 +4,7 @@ const Column = Node.create({
   name: "column",
   content: "block+",
   isolating: true,
+  fakeSelection: true,
 
   addOptions() {
     return {

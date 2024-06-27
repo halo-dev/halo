@@ -27,6 +27,7 @@ const TableCell = Node.create<TableCellOptions>({
   content: "block+",
   tableRole: "cell",
   isolating: true,
+  fakeSelection: true,
 
   addOptions() {
     return {

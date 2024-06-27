@@ -18,15 +18,15 @@ import {
 } from "@halo-dev/api-client"
 ```
 
-- coreApiClient: 为 Halo 所有自定义模型的 CRUD 接口封装的 api client。
-- consoleApiClient: 为 Halo 针对 Console 提供的接口封装的 api client。
-- ucApiClient: 为 Halo 针对 UC 提供的接口封装的 api client。
-- publicApiClient: 为 Halo 所有公开访问的接口封装的 api client。
-- createCoreApiClient: 用于创建自定义模型的 CRUD 接口封装的 api client，需要传入 baseURL 和 axios 实例。
-- createConsoleApiClient: 用于创建 Console 接口封装的 api client，需要传入 baseURL 和 axios 实例。
-- createUcApiClient: 用于创建 UC 接口封装的 api client，需要传入 baseURL 和 axios 实例。
-- createPublicApiClient: 用于创建公开访问接口封装的 api client，需要传入 baseURL 和 axios 实例。
-- axiosInstance: 内部默认创建的 axios 实例。
+- **coreApiClient**: 为 Halo 所有自定义模型的 CRUD 接口封装的 api client。
+- **consoleApiClient**: 为 Halo 针对 Console 提供的接口封装的 api client。
+- **ucApiClient**: 为 Halo 针对 UC 提供的接口封装的 api client。
+- **publicApiClient**: 为 Halo 所有公开访问的接口封装的 api client。
+- **createCoreApiClient**: 用于创建自定义模型的 CRUD 接口封装的 api client，需要传入 axios 实例。
+- **createConsoleApiClient**: 用于创建 Console 接口封装的 api client，需要传入 axios 实例。
+- **createUcApiClient**: 用于创建 UC 接口封装的 api client，需要传入 axios 实例。
+- **createPublicApiClient**: 用于创建公开访问接口封装的 api client，需要传入 axios 实例。
+- **axiosInstance**: 内部默认创建的 axios 实例。
 
 ### 在插件中使用
 
@@ -39,12 +39,14 @@ pnpm install @halo-dev/api-client axios
 ```javascript
 import { coreApiClient } from "@halo-dev/api-client"
 
-coreApiClient.content.post.listContentHaloRunV1alpha1Post().then(response => {
+coreApiClient.content.post.listPost().then(response => {
   // handle response
 })
 ```
 
 此外，在最新的 `@halo-dev/ui-plugin-bundler-kit@2.17.0` 中，已经排除了 `@halo-dev/api-client`、`axios` 依赖，所以最终产物中的相关依赖会自动使用 Halo 本身提供的依赖，无需关心最终产物大小。
+
+详细文档可查阅：[插件开发 / API 请求](https://docs.halo.run/developer-guide/plugin/api-reference/ui/api-request)
 
 ### 在外部项目中使用
 
@@ -61,7 +63,7 @@ const axiosInstance = axios.create({
 
 const coreApiClient = createCoreApiClient(axiosInstance)
 
-coreApiClient.content.post.listContentHaloRunV1alpha1Post().then(response => {
+coreApiClient.content.post.listPost().then(response => {
   // handle response
 })
 ```

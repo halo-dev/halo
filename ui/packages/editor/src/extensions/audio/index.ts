@@ -35,6 +35,7 @@ declare module "@/tiptap" {
 
 const Audio = Node.create<ExtensionOptions>({
   name: "audio",
+  fakeSelection: true,
 
   inline() {
     return true;

@@ -21,6 +21,7 @@ const TableHeader = Node.create<TableCellOptions>({
   content: "block+",
   tableRole: "header_cell",
   isolating: true,
+  fakeSelection: true,
 
   addOptions() {
     return {
