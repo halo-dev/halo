@@ -3,6 +3,7 @@ package run.halo.app.theme.finders.impl;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.lenient;
 import static org.mockito.Mockito.when;
 
 import com.fasterxml.jackson.core.type.TypeReference;
@@ -55,6 +56,7 @@ class CategoryFinderImplTest {
     @BeforeEach
     void setUp() {
         categoryFinder = new CategoryFinderImpl(client, categoryService);
+        lenient().when(categoryService.isCategoryHidden(any())).thenReturn(Mono.just(false));
     }
 
     @Test
@@ -226,6 +228,44 @@ class CategoryFinderImplTest {
                         ├── IndependentChild3 (2)
                         └── IndependentChild4 (3)
                 """);
+        }
+
+        @Test
+        void getBreadcrumbsTest() {
+            // first level
+            var breadcrumbs = categoryFinder.getBreadcrumbs("全部").collectList().block();
+            assertThat(toNames(breadcrumbs)).containsSequence("全部");
+
+            // second level
+            breadcrumbs = categoryFinder.getBreadcrumbs("AnotherRootChild").collectList().block();
+            assertThat(toNames(breadcrumbs)).containsSequence("全部", "AnotherRootChild");
+
+            // more levels
+            breadcrumbs = categoryFinder.getBreadcrumbs("DeepNode5").collectList().block();
+            assertThat(toNames(breadcrumbs)).containsSequence("全部", "AnotherRootChild", "Child1",
+                "SubChild2", "DeepNode3", "DeepNode5");
+
+            breadcrumbs = categoryFinder.getBreadcrumbs("IndependentChild4").collectList().block();
+            assertThat(toNames(breadcrumbs)).containsSequence("全部", "FIT2CLOUD",
+                "IndependentNode",
+                "IndependentChild4");
+
+            breadcrumbs = categoryFinder.getBreadcrumbs("SubNode4").collectList().block();
+            assertThat(toNames(breadcrumbs)).containsSequence("全部", "AnotherRootChild", "Child2",
+                "IndependentSubNode", "SubNode4");
+
+            // not exist
+            breadcrumbs = categoryFinder.getBreadcrumbs("not-exist").collectList().block();
+            assertThat(toNames(breadcrumbs)).isEmpty();
+        }
+
+        static List<String> toNames(List<CategoryVo> categories) {
+            if (categories == null) {
+                return List.of();
+            }
+            return categories.stream()
+                .map(category -> category.getMetadata().getName())
+                .toList();
         }
     }
 
