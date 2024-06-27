@@ -150,7 +150,7 @@ const theme: Record<string, Record<string, string>> = {
   },
   secretSelect: {
     ...textClassification,
-    inner: `${textClassification.inner} !overflow-visible min-h-[2.25rem]`,
+    inner: `${textClassification.inner} !overflow-visible min-h-[2.25rem] !border-none`,
     input: `w-0 flex-grow bg-transparent py-1 px-3 block transition-all text-sm`,
   },
 };

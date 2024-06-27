@@ -7,12 +7,12 @@ import {
   IconCheckboxCircle,
   IconClose,
   IconSettings,
-  VTag,
 } from "@halo-dev/components";
 import { useQueryClient } from "@tanstack/vue-query";
 import { onClickOutside } from "@vueuse/core";
 import Fuse from "fuse.js";
 import { computed, ref, watch, type PropType } from "vue";
+import SecretEditModal from "./components/SecretEditModal.vue";
 import SecretListModal from "./components/SecretListModal.vue";
 import { Q_KEY, useSecretsFetch } from "./composables/use-secrets-fetch";
 
@@ -135,19 +135,38 @@ const scrollToSelected = () => {
   }
 };
 
+// Check required key and edit secret
+function hasRequiredKey(secret: Secret) {
+  return !!secret.stringData?.[props.context.requiredKey as string];
+}
+const secretToUpdate = ref<Secret>();
+const secretEditModalVisible = ref(false);
+
 const handleSelect = (secret?: Secret) => {
-  if (!secret) {
+  if (!secret || secret.metadata.name === props.context._value) {
     props.context.node.input("");
+    dropdownVisible.value = false;
     return;
   }
 
-  props.context.node.input(
-    secret.metadata.name === props.context._value ? "" : secret.metadata.name
-  );
+  props.context.node.input(secret.metadata.name);
 
   text.value = "";
 
   dropdownVisible.value = false;
+
+  // Check required key and open edit modal
+  if (!hasRequiredKey(secret)) {
+    const stringDataToUpdate = {
+      ...secret.stringData,
+      [props.context.requiredKey as string]: "",
+    };
+    secretToUpdate.value = {
+      ...secret,
+      stringData: stringDataToUpdate,
+    };
+    secretEditModalVisible.value = true;
+  }
 };
 
 const onTextInput = (e: Event) => {
@@ -188,25 +207,30 @@ async function handleCreateSecret() {
     v-if="secretListModalVisible"
     @close="secretListModalVisible = false"
   />
+  <SecretEditModal
+    v-if="secretEditModalVisible"
+    :secret="secretToUpdate"
+    @close="secretEditModalVisible = false"
+  />
   <div
     ref="wrapperRef"
-    class="flex h-full w-full items-center"
+    class="flex h-full w-full items-center border border-gray-300 transition-all"
+    :class="[
+      { 'pointer-events-none': context.disabled },
+      { 'border-primary shadow-sm': dropdownVisible },
+    ]"
     style="border-radius: inherit"
     @keydown="handleKeydown"
   >
-    <div class="flex w-full min-w-0 flex-1 shrink flex-wrap items-center">
-      <div v-if="context._value" class="flex px-2">
-        <VTag class="!h-6" rounded>
-          {{ context._value }}
-          <template #rightIcon>
-            <IconClose
-              class="h-4 w-4 cursor-pointer text-gray-600 hover:text-gray-900"
-              @click="handleSelect()"
-            />
-          </template>
-        </VTag>
+    <div
+      class="flex w-full min-w-0 flex-1 shrink flex-wrap items-center"
+      @click="dropdownVisible = true"
+    >
+      <div v-if="context._value" class="flex px-3 text-sm text-black">
+        {{ context._value }}
       </div>
       <input
+        v-else
         :value="text"
         :class="context.classes.input"
         type="text"
@@ -218,15 +242,25 @@ async function handleCreateSecret() {
       />
     </div>
 
-    <div class="inline-flex h-full flex-none cursor-pointer items-center gap-2">
-      <div @click="dropdownVisible = !dropdownVisible">
-        <IconArrowRight class="rotate-90 text-gray-500 hover:text-gray-700" />
+    <div class="inline-flex h-full flex-none items-center gap-2">
+      <div v-if="context._value" class="cursor-pointer" @click="handleSelect()">
+        <IconClose
+          class="rotate-90 text-sm text-gray-500 hover:text-gray-700"
+        />
       </div>
-      <div
-        class="group flex h-full cursor-pointer items-center rounded-r-base border-l px-3 transition-all hover:bg-gray-100"
-        @click="secretListModalVisible = true"
-      >
-        <IconSettings class="h-4 w-4 text-gray-500 hover:text-gray-700" />
+      <div class="inline-flex h-full items-center">
+        <div
+          class="group flex h-full cursor-pointer items-center border-l px-3 transition-all hover:bg-gray-100"
+          @click="dropdownVisible = !dropdownVisible"
+        >
+          <IconArrowRight class="rotate-90 text-gray-500 hover:text-gray-700" />
+        </div>
+        <div
+          class="group flex h-full cursor-pointer items-center rounded-r-base border-l px-3 transition-all hover:bg-gray-100"
+          @click="secretListModalVisible = true"
+        >
+          <IconSettings class="h-4 w-4 text-gray-500 hover:text-gray-700" />
+        </div>
       </div>
     </div>
 
@@ -266,7 +300,11 @@ async function handleCreateSecret() {
             <span
               class="line-clamp-1 min-w-0 flex-1 shrink break-words text-xs text-gray-500"
             >
-              {{ secret.metadata.annotations?.[secretAnnotations.DESCRIPTION] }}
+              {{
+                hasRequiredKey(secret)
+                  ? secret.metadata.annotations?.[secretAnnotations.DESCRIPTION]
+                  : "缺少当前选项所需的字段，请选择之后补充完整"
+              }}
             </span>
           </div>
           <IconCheckboxCircle
