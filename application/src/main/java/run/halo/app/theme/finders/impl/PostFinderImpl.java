@@ -165,7 +165,7 @@ public class PostFinderImpl implements PostFinder {
     private Flux<Category> listChildrenCategories(String categoryName) {
         if (StringUtils.isBlank(categoryName)) {
             return client.listAll(Category.class, new ListOptions(),
-                Sort.by(Sort.Order.asc("metadata.creationTimeStamp"),
+                Sort.by(Sort.Order.asc("metadata.creationTimestamp"),
                     Sort.Order.desc("metadata.name")));
         }
         return categoryService.listChildren(categoryName);
