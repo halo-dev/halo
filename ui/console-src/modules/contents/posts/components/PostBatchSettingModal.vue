@@ -22,6 +22,10 @@ interface FormData {
     names?: string[];
     op: ArrayPatchOp;
   };
+  owner: {
+    enabled: boolean;
+    value: string;
+  };
   visible: {
     enabled: boolean;
     value: "PUBLIC" | "PRIVATE";
@@ -70,6 +74,14 @@ const { mutate, isLoading } = useMutation({
             post.post.spec.tags || [],
             data.tag.names || []
           ),
+        });
+      }
+
+      if (data.owner.enabled) {
+        jsonPatchInner.push({
+          op: "add",
+          path: "/spec/owner",
+          value: data.owner.value,
         });
       }
 
@@ -233,6 +245,25 @@ function onSubmit(data: FormData) {
           :multiple="true"
           name="names"
           validation="required"
+        ></FormKit>
+      </FormKit>
+      <FormKit
+        v-slot="{ value }"
+        type="group"
+        name="owner"
+        :label="$t('core.post.batch_setting_modal.fields.owner_group')"
+      >
+        <FormKit
+          :value="false"
+          :label="$t('core.post.batch_setting_modal.fields.common.enabled')"
+          type="checkbox"
+          name="enabled"
+        ></FormKit>
+        <FormKit
+          v-if="value?.enabled"
+          :label="$t('core.post.batch_setting_modal.fields.owner_value')"
+          name="value"
+          type="userSelect"
         ></FormKit>
       </FormKit>
       <FormKit

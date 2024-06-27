@@ -1,4 +1,5 @@
 <script lang="ts" setup>
+import PostContributorList from "@/components/user/PostContributorList.vue";
 import { formatDatetime } from "@/utils/date";
 import { usePermission } from "@/utils/permission";
 import type { ListedPost, Post } from "@halo-dev/api-client";
@@ -25,7 +26,6 @@ import { useQuery } from "@tanstack/vue-query";
 import { cloneDeep } from "lodash-es";
 import { ref, watch } from "vue";
 import { useI18n } from "vue-i18n";
-import ContributorList from "../_components/ContributorList.vue";
 import PostTag from "./tags/components/PostTag.vue";
 
 const { currentUserHasPermission } = usePermission();
@@ -351,7 +351,10 @@ watch(
               <template #end>
                 <VEntityField>
                   <template #description>
-                    <ContributorList :contributors="post.contributors" />
+                    <PostContributorList
+                      :owner="post.owner"
+                      :contributors="post.contributors"
+                    />
                   </template>
                 </VEntityField>
                 <VEntityField v-if="!post?.post?.spec.deleted">

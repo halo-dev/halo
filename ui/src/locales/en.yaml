@@ -279,6 +279,8 @@ core:
           label: Template
         cover:
           label: Cover
+        owner:
+          label: Owner
     tag:
       filters:
         sort:
@@ -306,6 +308,8 @@ core:
         visible_value: "Select visible option "
         allow_comment_group: " Allow comment"
         allow_comment_value: Choose whether to allow comments
+        owner_group: Owner
+        owner_value: Select owner
   deleted_post:
     title: Deleted Posts
     empty:
@@ -428,7 +432,10 @@ core:
         prevent_parent_post_cascade_query: >-
           Prevent parent category from including this category and its
           subcategories in cascade post queries
-        hide_from_list: This category is hidden, This category and its subcategories, as well as its posts, will not be displayed in the front-end list. You need to actively visit the category archive page
+        hide_from_list: >-
+          This category is hidden, This category and its subcategories, as well
+          as its posts, will not be displayed in the front-end list. You need to
+          actively visit the category archive page
   page:
     title: Pages
     actions:

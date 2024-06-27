@@ -267,6 +267,8 @@ core:
           label: 自定义模板
         cover:
           label: 封面图
+        owner:
+          label: 作者
     tag:
       filters:
         sort:
@@ -294,6 +296,8 @@ core:
         visible_value: 选择可见性
         allow_comment_group: 允许评论
         allow_comment_value: 选择是否允许评论
+        owner_group: 作者
+        owner_value: 设置作者
   deleted_post:
     title: 文章回收站
     empty:
