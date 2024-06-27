@@ -22,6 +22,7 @@ import run.halo.app.core.extension.service.UserService;
 import run.halo.app.extension.GroupKind;
 import run.halo.app.infra.exception.UserNotFoundException;
 import run.halo.app.security.authentication.login.HaloUser;
+import run.halo.app.security.authentication.twofactor.TwoFactorUtils;
 
 public class DefaultUserDetailService
     implements ReactiveUserDetailsService, ReactiveUserDetailsPasswordService {
@@ -63,10 +64,9 @@ public class DefaultUserDetailService
                     .doOnNext(userBuilder::authorities);
 
                 return setAuthorities.then(Mono.fromSupplier(() -> {
-                    var twoFactorAuthEnabled =
-                        requireNonNullElse(user.getSpec().getTwoFactorAuthEnabled(), false);
+                    var twoFactorAuthSettings = TwoFactorUtils.getTwoFactorAuthSettings(user);
                     return new HaloUser.Builder(userBuilder.build())
-                        .twoFactorAuthEnabled(twoFactorAuthEnabled)
+                        .twoFactorAuthEnabled(twoFactorAuthSettings.isAvailable())
                         .totpEncryptedSecret(user.getSpec().getTotpEncryptedSecret())
                         .build();
                 }));
