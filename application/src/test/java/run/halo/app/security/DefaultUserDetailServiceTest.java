@@ -1,6 +1,10 @@
 package run.halo.app.security;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertInstanceOf;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
@@ -103,6 +107,51 @@ class DefaultUserDetailServiceTest {
                 assertEquals(
                     Set.of("ROLE_fake-role", "ROLE_authenticated", "ROLE_anonymous"),
                     authorityListToSet(gotUser.getAuthorities()));
+            })
+            .verifyComplete();
+    }
+
+    @Test
+    void shouldFindHaloUserDetailsWith2faDisabledWhen2faNotEnabled() {
+        var fakeUser = createFakeUser();
+        when(userService.getUser("faker")).thenReturn(Mono.just(fakeUser));
+        when(roleService.listRoleRefs(any())).thenReturn(Flux.empty());
+        userDetailService.findByUsername("faker")
+            .as(StepVerifier::create)
+            .assertNext(userDetails -> {
+                assertInstanceOf(HaloUserDetails.class, userDetails);
+                assertFalse(((HaloUserDetails) userDetails).isTwoFactorAuthEnabled());
+            })
+            .verifyComplete();
+    }
+
+    @Test
+    void shouldFindHaloUserDetailsWith2faDisabledWhen2faEnabledButNoTotpConfigured() {
+        var fakeUser = createFakeUser();
+        fakeUser.getSpec().setTwoFactorAuthEnabled(true);
+        when(userService.getUser("faker")).thenReturn(Mono.just(fakeUser));
+        when(roleService.listRoleRefs(any())).thenReturn(Flux.empty());
+        userDetailService.findByUsername("faker")
+            .as(StepVerifier::create)
+            .assertNext(userDetails -> {
+                assertInstanceOf(HaloUserDetails.class, userDetails);
+                assertFalse(((HaloUserDetails) userDetails).isTwoFactorAuthEnabled());
+            })
+            .verifyComplete();
+    }
+
+    @Test
+    void shouldFindHaloUserDetailsWith2faEnabledWhen2faEnabledAndTotpConfigured() {
+        var fakeUser = createFakeUser();
+        fakeUser.getSpec().setTwoFactorAuthEnabled(true);
+        fakeUser.getSpec().setTotpEncryptedSecret("fake-totp-encrypted-secret");
+        when(userService.getUser("faker")).thenReturn(Mono.just(fakeUser));
+        when(roleService.listRoleRefs(any())).thenReturn(Flux.empty());
+        userDetailService.findByUsername("faker")
+            .as(StepVerifier::create)
+            .assertNext(userDetails -> {
+                assertInstanceOf(HaloUserDetails.class, userDetails);
+                assertTrue(((HaloUserDetails) userDetails).isTwoFactorAuthEnabled());
             })
             .verifyComplete();
     }
