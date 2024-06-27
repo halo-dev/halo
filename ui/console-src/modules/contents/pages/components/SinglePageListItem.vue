@@ -1,4 +1,5 @@
 <script lang="ts" setup>
+import PostContributorList from "@/components/user/PostContributorList.vue";
 import { singlePageLabels } from "@/constants/labels";
 import { formatDatetime } from "@/utils/date";
 import { usePermission } from "@/utils/permission";
@@ -23,7 +24,6 @@ import type { Ref } from "vue";
 import { computed, inject, ref } from "vue";
 import { useI18n } from "vue-i18n";
 import { RouterLink } from "vue-router";
-import ContributorList from "../../_components/ContributorList.vue";
 
 const { currentUserHasPermission } = usePermission();
 const { t } = useI18n();
@@ -184,7 +184,10 @@ const handleDelete = async () => {
     <template #end>
       <VEntityField>
         <template #description>
-          <ContributorList :contributors="singlePage.contributors" />
+          <PostContributorList
+            :owner="singlePage.owner"
+            :contributors="singlePage.contributors"
+          />
         </template>
       </VEntityField>
       <VEntityField :description="publishStatus">

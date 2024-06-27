@@ -279,6 +279,8 @@ core:
           label: Template
         cover:
           label: Cover
+        owner:
+          label: Owner
     tag:
       filters:
         sort:
@@ -306,6 +308,8 @@ core:
         visible_value: "Select visible option "
         allow_comment_group: " Allow comment"
         allow_comment_value: Choose whether to allow comments
+        owner_group: Owner
+        owner_value: Select owner
   deleted_post:
     title: Deleted Posts
     empty:

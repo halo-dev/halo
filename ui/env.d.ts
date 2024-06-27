@@ -3,8 +3,8 @@
 
 export {};
 
-import type { CoreMenuGroupId } from "@halo-dev/console-shared";
 import type { FormKitInputs } from "@formkit/inputs";
+import type { CoreMenuGroupId } from "@halo-dev/console-shared";
 
 import "vue-router";
 
@@ -122,6 +122,11 @@ declare module "@formkit/inputs" {
 
     code: {
       type: "code";
+      value?: string;
+    };
+
+    userSelect: {
+      type: "userSelect";
       value?: string;
     };
   }

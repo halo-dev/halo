@@ -1,4 +1,5 @@
 <script lang="ts" setup>
+import PostContributorList from "@/components/user/PostContributorList.vue";
 import { formatDatetime } from "@/utils/date";
 import { usePermission } from "@/utils/permission";
 import type { ListedSinglePage, SinglePage } from "@halo-dev/api-client";
@@ -25,7 +26,6 @@ import { useQuery } from "@tanstack/vue-query";
 import { cloneDeep } from "lodash-es";
 import { ref, watch } from "vue";
 import { useI18n } from "vue-i18n";
-import ContributorList from "../_components/ContributorList.vue";
 
 const { currentUserHasPermission } = usePermission();
 const { t } = useI18n();
@@ -327,7 +327,10 @@ watch(
               <template #end>
                 <VEntityField>
                   <template #description>
-                    <ContributorList :contributors="singlePage.contributors" />
+                    <PostContributorList
+                      :owner="singlePage.owner"
+                      :contributors="singlePage.contributors"
+                    />
                   </template>
                 </VEntityField>
                 <VEntityField v-if="!singlePage?.page?.spec.deleted">

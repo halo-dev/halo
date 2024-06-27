@@ -25,6 +25,7 @@ import { tagSelect } from "./inputs/tag-select";
 import { verificationForm } from "./inputs/verify-form";
 import theme from "./theme";
 
+import { userSelect } from "./inputs/user-select";
 import autoScrollToErrors from "./plugins/auto-scroll-to-errors";
 import passwordPreventAutocomplete from "./plugins/password-prevent-autocomplete";
 import radioAlt from "./plugins/radio-alt";
@@ -65,6 +66,7 @@ const config: DefaultConfigOptions = {
     tagCheckbox,
     tagSelect,
     verificationForm,
+    userSelect,
   },
   locales: { zh, en },
   locale: "zh",

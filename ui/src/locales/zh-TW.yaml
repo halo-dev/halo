@@ -267,6 +267,8 @@ core:
           label: 自定義模板
         cover:
           label: 封面圖
+        owner:
+          label: 作者
     batch_setting_modal:
       title: 文章批量設置
       fields:
@@ -286,6 +288,8 @@ core:
         visible_value: 選擇可見性
         allow_comment_group: 允許評論
         allow_comment_value: 選擇是否允許評論
+        owner_group: 作者
+        owner_value: 設置作者
   deleted_post:
     title: 文章回收站
     empty:

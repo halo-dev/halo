@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import ContributorList from "@console/modules/contents/_components/ContributorList.vue";
+import PostContributorList from "@/components/user/PostContributorList.vue";
 import type { ListedPost } from "@halo-dev/api-client";
 import { VEntityField } from "@halo-dev/components";
 
@@ -14,7 +14,10 @@ withDefaults(
 <template>
   <VEntityField>
     <template #description>
-      <ContributorList :contributors="post.contributors" />
+      <PostContributorList
+        :owner="post.owner"
+        :contributors="post.contributors"
+      />
     </template>
   </VEntityField>
 </template>

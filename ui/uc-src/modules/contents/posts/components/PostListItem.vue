@@ -1,6 +1,7 @@
 <script lang="ts" setup>
 import StatusDotField from "@/components/entity-fields/StatusDotField.vue";
 import HasPermission from "@/components/permission/HasPermission.vue";
+import PostContributorList from "@/components/user/PostContributorList.vue";
 import { postLabels } from "@/constants/labels";
 import { formatDatetime } from "@/utils/date";
 import PostTag from "@console/modules/contents/posts/tags/components/PostTag.vue";
@@ -13,8 +14,6 @@ import {
   IconEyeOff,
   IconTimerLine,
   Toast,
-  VAvatar,
-  VAvatarGroup,
   VDropdownDivider,
   VDropdownItem,
   VEntity,
@@ -180,15 +179,11 @@ function handleUnpublish() {
     <template #end>
       <VEntityField>
         <template #description>
-          <VAvatarGroup size="xs" circle>
-            <VAvatar
-              v-for="{ name, avatar, displayName } in post.contributors"
-              :key="name"
-              v-tooltip="displayName"
-              :src="avatar"
-              :alt="displayName"
-            ></VAvatar>
-          </VAvatarGroup>
+          <PostContributorList
+            :owner="post.owner"
+            :contributors="post.contributors"
+            :allow-view-user-detail="false"
+          />
         </template>
       </VEntityField>
       <VEntityField :description="publishStatus">

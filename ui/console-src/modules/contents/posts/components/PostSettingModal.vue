@@ -392,6 +392,11 @@ const showCancelPublishButton = computed(() => {
           </div>
           <div class="mt-5 divide-y divide-gray-100 md:col-span-3 md:mt-0">
             <FormKit
+              v-model="formState.spec.owner"
+              :label="$t('core.post.settings.fields.owner.label')"
+              type="userSelect"
+            ></FormKit>
+            <FormKit
               v-model="formState.spec.allowComment"
               :options="[
                 { label: $t('core.common.radio.yes'), value: true },
