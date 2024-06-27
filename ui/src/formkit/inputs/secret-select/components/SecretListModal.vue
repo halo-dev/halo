@@ -20,7 +20,7 @@ const creationModalVisible = ref(false);
   <VModal
     ref="modal"
     :body-class="['!p-0']"
-    title="管理 Secret"
+    :title="$t('core.formkit.secret.list_modal.title')"
     :width="650"
     @close="emit('close')"
   >
@@ -38,7 +38,9 @@ const creationModalVisible = ref(false);
       </li>
     </ul>
     <template #footer>
-      <VButton @click="modal?.close()">关闭</VButton>
+      <VButton @click="modal?.close()">
+        {{ $t("core.common.buttons.close") }}
+      </VButton>
     </template>
   </VModal>
 

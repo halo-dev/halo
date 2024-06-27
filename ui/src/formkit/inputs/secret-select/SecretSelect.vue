@@ -208,7 +208,7 @@ async function handleCreateSecret() {
     @close="secretListModalVisible = false"
   />
   <SecretEditModal
-    v-if="secretEditModalVisible"
+    v-if="secretEditModalVisible && secretToUpdate"
     :secret="secretToUpdate"
     @close="secretEditModalVisible = false"
   />
@@ -234,9 +234,7 @@ async function handleCreateSecret() {
         :value="text"
         :class="context.classes.input"
         type="text"
-        :placeholder="
-          context._value ? '' : '搜索已存在的密钥或者输入内容以创建新的密钥'
-        "
+        :placeholder="$t('core.formkit.secret.placeholder')"
         @input="onTextInput"
         @focus="dropdownVisible = true"
       />
@@ -279,7 +277,7 @@ async function handleCreateSecret() {
           @click="handleCreateSecret"
         >
           <span class="text-xs text-gray-700 group-hover:text-gray-900">
-            根据输入的文本创建新密钥
+            {{ $t("core.formkit.secret.creation_label") }}
           </span>
         </li>
         <li
@@ -303,7 +301,7 @@ async function handleCreateSecret() {
               {{
                 hasRequiredKey(secret)
                   ? secret.metadata.annotations?.[secretAnnotations.DESCRIPTION]
-                  : "缺少当前选项所需的字段，请选择之后补充完整"
+                  : $t("core.formkit.secret.required_key_missing_label")
               }}
             </span>
           </div>

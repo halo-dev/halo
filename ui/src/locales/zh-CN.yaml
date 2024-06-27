@@ -1567,6 +1567,24 @@ core:
       no_action_defined: 未定义{label}接口
       verify_success: "{label}成功"
       verify_failed: "{label}失败"
+    secret:
+      creation_label: 根据输入的文本创建新密钥
+      placeholder: 搜索已存在的密钥或者输入内容以创建新的密钥
+      required_key_missing_label: 缺少当前选项所需的字段，请选择之后补充完整
+      creation_modal:
+        title: 创建密钥
+      edit_modal:
+        title: 编辑密钥
+      list_modal:
+        title: 管理密钥
+      operations:
+        delete:
+          title: 删除密钥
+          description: 确定删除此密钥吗？请确保没有地方正在使用此密钥，否则需要在具体的地方重新设置
+      form:
+        fields:
+          description: 备注
+          string_data: 字符串数据
   common:
     buttons:
       save: 保存

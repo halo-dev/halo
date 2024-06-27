@@ -28,9 +28,8 @@ const props = withDefaults(
 
 function handleDelete() {
   Dialog.warning({
-    title: "删除密钥",
-    description:
-      "确定删除密钥吗？请确保没有地方正在使用此密钥，否则需要在具体的地方重新设置",
+    title: t("core.formkit.secret.operations.delete.title"),
+    description: t("core.formkit.secret.operations.delete.description"),
     confirmType: "danger",
     async onConfirm() {
       await coreApiClient.secret.deleteSecret({

@@ -428,7 +428,10 @@ core:
         prevent_parent_post_cascade_query: >-
           Prevent parent category from including this category and its
           subcategories in cascade post queries
-        hide_from_list: This category is hidden, This category and its subcategories, as well as its posts, will not be displayed in the front-end list. You need to actively visit the category archive page
+        hide_from_list: >-
+          This category is hidden, This category and its subcategories, as well
+          as its posts, will not be displayed in the front-end list. You need to
+          actively visit the category archive page
   page:
     title: Pages
     actions:
@@ -1644,6 +1647,27 @@ core:
       no_action_defined: "{label} interface not defined"
       verify_success: "{label} successful"
       verify_failed: "{label} failed"
+    secret:
+      creation_label: Create a new secret based on the text entered
+      placeholder: Search for an existing secret or enter new content to create one
+      required_key_missing_label: The needed fields are missing, Please select and complete them
+      creation_modal:
+        title: Create secret
+      edit_modal:
+        title: Edit secret
+      list_modal:
+        title: Secrets
+      operations:
+        delete:
+          title: Delete secret
+          description: >-
+            Are you sure you want to delete this secret? Please make sure that
+            this secret is not being used anywhere, otherwise you need to reset
+            it in a specific place
+      form:
+        fields:
+          description: Description
+          string_data: String Data
   common:
     buttons:
       save: Save

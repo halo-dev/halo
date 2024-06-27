@@ -76,7 +76,12 @@ const formState: SecretFormState = {
 </script>
 
 <template>
-  <VModal ref="modal" title="编辑密钥" :width="600" @close="emit('close')">
+  <VModal
+    ref="modal"
+    :title="$t('core.formkit.secret.edit_modal.title')"
+    :width="600"
+    @close="emit('close')"
+  >
     <SecretForm :form-state="formState" @submit="onSubmit" />
 
     <template #footer>
@@ -86,9 +91,11 @@ const formState: SecretFormState = {
           type="secondary"
           @click="$formkit.submit('secret-form')"
         >
-          保存
+          {{ $t("core.common.buttons.save") }}
         </VButton>
-        <VButton @click="modal?.close()">关闭</VButton>
+        <VButton @click="modal?.close()">
+          {{ $t("core.common.buttons.close") }}
+        </VButton>
       </VSpace>
     </template>
   </VModal>

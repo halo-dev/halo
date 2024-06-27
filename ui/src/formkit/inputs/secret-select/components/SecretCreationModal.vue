@@ -55,7 +55,12 @@ function onSubmit(data: SecretFormState) {
 </script>
 
 <template>
-  <VModal ref="modal" title="创建密钥" :width="600" @close="emit('close')">
+  <VModal
+    ref="modal"
+    :title="$t('core.formkit.secret.creation_modal.title')"
+    :width="600"
+    @close="emit('close')"
+  >
     <SecretForm @submit="onSubmit" />
 
     <template #footer>
@@ -65,9 +70,11 @@ function onSubmit(data: SecretFormState) {
           type="secondary"
           @click="$formkit.submit('secret-form')"
         >
-          保存
+          {{ $t("core.common.buttons.save") }}
         </VButton>
-        <VButton @click="modal?.close()">关闭</VButton>
+        <VButton @click="modal?.close()">
+          {{ $t("core.common.buttons.close") }}
+        </VButton>
       </VSpace>
     </template>
   </VModal>

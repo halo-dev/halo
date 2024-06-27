@@ -37,8 +37,15 @@ function onSubmit(data: SecretFormState) {
     :config="{ validationVisibility: 'submit' }"
     @submit="onSubmit"
   >
-    <FormKit label="备注" name="description"></FormKit>
-    <FormKit type="repeater" name="stringDataArray" label="字符串数据">
+    <FormKit
+      :label="$t('core.formkit.secret.form.fields.description')"
+      name="description"
+    ></FormKit>
+    <FormKit
+      type="repeater"
+      name="stringDataArray"
+      :label="$t('core.formkit.secret.form.fields.string_data')"
+    >
       <FormKit validation="required" name="key" label="Key"></FormKit>
       <FormKit
         type="code"
