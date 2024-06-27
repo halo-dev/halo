@@ -1524,6 +1524,24 @@ core:
       no_action_defined: 未定義{label}介面
       verify_success: "{label}成功"
       verify_failed: "{label}失敗"
+    secret:
+      creation_label: 根據輸入的文本創建新密鈅
+      placeholder: 搜索已存在的密鈅或者輸入內容以創建新的密鈅
+      required_key_missing_label: 缺少當前選項所需的字段，請選擇之後補充完整
+      creation_modal:
+        title: 創建密鈅
+      edit_modal:
+        title: 編輯密鈅
+      list_modal:
+        title: 管理密鈅
+      operations:
+        delete:
+          title: 刪除密鈅
+          description: 確定刪除此密鈅嗎？請確保沒有地方正在使用此密鈅，否則需要在具體的地方重新設置
+      form:
+        fields:
+          description: 備註
+          string_data: 字符串數據
   common:
     buttons:
       save: 保存
