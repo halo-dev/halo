@@ -28,12 +28,50 @@ import { BASE_PATH, COLLECTION_FORMATS, RequestArgs, BaseAPI, RequiredError, ope
 export const IndicesV1alpha1ConsoleApiAxiosParamCreator = function (configuration?: Configuration) {
     return {
         /**
-         * Build or rebuild post indices for full text search
+         * Build or rebuild post indices for full text search. This method is deprecated, please use POST /indices/-/rebuild instead.
          * @param {*} [options] Override http request option.
+         * @deprecated
          * @throws {RequiredError}
          */
         buildPostIndices: async (options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
             const localVarPath = `/apis/api.console.halo.run/v1alpha1/indices/post`;
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'POST', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+            // authentication basicAuth required
+            // http basic authentication required
+            setBasicAuthToObject(localVarRequestOptions, configuration)
+
+            // authentication bearerAuth required
+            // http bearer authentication required
+            await setBearerAuthToObject(localVarHeaderParameter, configuration)
+
+
+    
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+        /**
+         * Rebuild all indices
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        rebuildAllIndices: async (options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+            const localVarPath = `/apis/api.console.halo.run/v1alpha1/indices/-/rebuild`;
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
             let baseOptions;
@@ -75,14 +113,26 @@ export const IndicesV1alpha1ConsoleApiFp = function(configuration?: Configuratio
     const localVarAxiosParamCreator = IndicesV1alpha1ConsoleApiAxiosParamCreator(configuration)
     return {
         /**
-         * Build or rebuild post indices for full text search
+         * Build or rebuild post indices for full text search. This method is deprecated, please use POST /indices/-/rebuild instead.
          * @param {*} [options] Override http request option.
+         * @deprecated
          * @throws {RequiredError}
          */
         async buildPostIndices(options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<void>> {
             const localVarAxiosArgs = await localVarAxiosParamCreator.buildPostIndices(options);
             const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
             const localVarOperationServerBasePath = operationServerMap['IndicesV1alpha1ConsoleApi.buildPostIndices']?.[localVarOperationServerIndex]?.url;
+            return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
+        },
+        /**
+         * Rebuild all indices
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async rebuildAllIndices(options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<void>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.rebuildAllIndices(options);
+            const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
+            const localVarOperationServerBasePath = operationServerMap['IndicesV1alpha1ConsoleApi.rebuildAllIndices']?.[localVarOperationServerIndex]?.url;
             return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
         },
     }
@@ -96,12 +146,21 @@ export const IndicesV1alpha1ConsoleApiFactory = function (configuration?: Config
     const localVarFp = IndicesV1alpha1ConsoleApiFp(configuration)
     return {
         /**
-         * Build or rebuild post indices for full text search
+         * Build or rebuild post indices for full text search. This method is deprecated, please use POST /indices/-/rebuild instead.
          * @param {*} [options] Override http request option.
+         * @deprecated
          * @throws {RequiredError}
          */
         buildPostIndices(options?: RawAxiosRequestConfig): AxiosPromise<void> {
             return localVarFp.buildPostIndices(options).then((request) => request(axios, basePath));
+        },
+        /**
+         * Rebuild all indices
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        rebuildAllIndices(options?: RawAxiosRequestConfig): AxiosPromise<void> {
+            return localVarFp.rebuildAllIndices(options).then((request) => request(axios, basePath));
         },
     };
 };
@@ -114,13 +173,24 @@ export const IndicesV1alpha1ConsoleApiFactory = function (configuration?: Config
  */
 export class IndicesV1alpha1ConsoleApi extends BaseAPI {
     /**
-     * Build or rebuild post indices for full text search
+     * Build or rebuild post indices for full text search. This method is deprecated, please use POST /indices/-/rebuild instead.
      * @param {*} [options] Override http request option.
+     * @deprecated
      * @throws {RequiredError}
      * @memberof IndicesV1alpha1ConsoleApi
      */
     public buildPostIndices(options?: RawAxiosRequestConfig) {
         return IndicesV1alpha1ConsoleApiFp(this.configuration).buildPostIndices(options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
+     * Rebuild all indices
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof IndicesV1alpha1ConsoleApi
+     */
+    public rebuildAllIndices(options?: RawAxiosRequestConfig) {
+        return IndicesV1alpha1ConsoleApiFp(this.configuration).rebuildAllIndices(options).then((request) => request(this.axios, this.basePath));
     }
 }
 

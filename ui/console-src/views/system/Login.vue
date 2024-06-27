@@ -1,13 +1,13 @@
 <script lang="ts" setup>
-import { computed } from "vue";
-import LoginForm from "@/components/login/LoginForm.vue";
-import { useRouteQuery } from "@vueuse/router";
-import SignupForm from "@/components/signup/SignupForm.vue";
-import SocialAuthProviders from "@/components/login/SocialAuthProviders.vue";
-import { useGlobalInfoFetch } from "@console/composables/use-global-info";
-import MdiKeyboardBackspace from "~icons/mdi/keyboard-backspace";
 import LocaleChange from "@/components/common/LocaleChange.vue";
+import LoginForm from "@/components/login/LoginForm.vue";
+import SocialAuthProviders from "@/components/login/SocialAuthProviders.vue";
+import SignupForm from "@/components/signup/SignupForm.vue";
 import { useAppTitle } from "@/composables/use-title";
+import { useGlobalInfoFetch } from "@console/composables/use-global-info";
+import { useRouteQuery } from "@vueuse/router";
+import { computed } from "vue";
+import MdiKeyboardBackspace from "~icons/mdi/keyboard-backspace";
 
 const { globalInfo } = useGlobalInfoFetch();
 

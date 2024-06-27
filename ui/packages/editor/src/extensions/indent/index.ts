@@ -1,10 +1,10 @@
 import {
+  CoreEditor,
+  Extension,
+  isList,
   type CommandProps,
   type Extensions,
   type KeyboardShortcutCommand,
-  Extension,
-  isList,
-  CoreEditor,
 } from "@/tiptap";
 import { TextSelection, Transaction } from "@/tiptap/pm";
 

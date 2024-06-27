@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.function.Predicate;
+import java.util.stream.Collectors;
 import lombok.Data;
 import lombok.experimental.Accessors;
 import org.springframework.lang.NonNull;
@@ -24,6 +25,16 @@ public class LabelSelector implements Predicate<Map<String, String>> {
             .allMatch(matcher -> matcher.test(labels.get(matcher.getKey())));
     }
 
+    @Override
+    public String toString() {
+        if (matchers == null || matchers.isEmpty()) {
+            return "";
+        }
+        return matchers.stream()
+            .map(SelectorMatcher::toString)
+            .collect(Collectors.joining(", "));
+    }
+
     /**
      * Returns a new label selector that is the result of ANDing the current selector with the
      * given selector.
@@ -40,41 +51,58 @@ public class LabelSelector implements Predicate<Map<String, String>> {
         return labelSelector;
     }
 
-    public static LabelSelectorBuilder builder() {
-        return new LabelSelectorBuilder();
+    public static LabelSelectorBuilder<?> builder() {
+        return new LabelSelectorBuilder<>();
     }
 
-    public static class LabelSelectorBuilder {
+    public static class LabelSelectorBuilder<T extends LabelSelectorBuilder<T>> {
         private final List<SelectorMatcher> matchers = new ArrayList<>();
 
-        public LabelSelectorBuilder eq(String key, String value) {
+        public LabelSelectorBuilder() {
+        }
+
+        /**
+         * Create a new label selector builder with the given matchers.
+         */
+        public LabelSelectorBuilder(List<SelectorMatcher> givenMatchers) {
+            if (givenMatchers != null) {
+                matchers.addAll(givenMatchers);
+            }
+        }
+
+        @SuppressWarnings("unchecked")
+        private T self() {
+            return (T) this;
+        }
+
+        public T eq(String key, String value) {
             matchers.add(EqualityMatcher.equal(key, value));
-            return this;
+            return self();
         }
 
-        public LabelSelectorBuilder notEq(String key, String value) {
+        public T notEq(String key, String value) {
             matchers.add(EqualityMatcher.notEqual(key, value));
-            return this;
+            return self();
         }
 
-        public LabelSelectorBuilder in(String key, String... values) {
+        public T in(String key, String... values) {
             matchers.add(SetMatcher.in(key, values));
-            return this;
+            return self();
         }
 
-        public LabelSelectorBuilder notIn(String key, String... values) {
+        public T notIn(String key, String... values) {
             matchers.add(SetMatcher.notIn(key, values));
-            return this;
+            return self();
         }
 
-        public LabelSelectorBuilder exists(String key) {
+        public T exists(String key) {
             matchers.add(SetMatcher.exists(key));
-            return this;
+            return self();
         }
 
-        public LabelSelectorBuilder notExists(String key) {
+        public T notExists(String key) {
             matchers.add(SetMatcher.notExists(key));
-            return this;
+            return self();
         }
 
         /**

@@ -1,9 +1,9 @@
 <script lang="ts" setup>
 import { ToolbarItem } from "@/components";
-import type { Component } from "vue";
-import type { Editor } from "@/tiptap/vue-3";
 import ColorPickerDropdown from "@/components/common/ColorPickerDropdown.vue";
 import { i18n } from "@/locales";
+import type { Editor } from "@/tiptap/vue-3";
+import type { Component } from "vue";
 
 const props = withDefaults(
   defineProps<{

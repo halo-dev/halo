@@ -1,12 +1,12 @@
-import { definePlugin } from "@halo-dev/console-shared";
 import BasicLayout from "@console/layouts/BasicLayout.vue";
-import SinglePageList from "./SinglePageList.vue";
+import { IconPages } from "@halo-dev/components";
+import { definePlugin } from "@halo-dev/console-shared";
+import { markRaw } from "vue";
 import DeletedSinglePageList from "./DeletedSinglePageList.vue";
 import SinglePageEditor from "./SinglePageEditor.vue";
-import SinglePageStatsWidget from "./widgets/SinglePageStatsWidget.vue";
-import { IconPages } from "@halo-dev/components";
-import { markRaw } from "vue";
+import SinglePageList from "./SinglePageList.vue";
 import SinglePageSnapshots from "./SinglePageSnapshots.vue";
+import SinglePageStatsWidget from "./widgets/SinglePageStatsWidget.vue";
 
 export default definePlugin({
   components: {

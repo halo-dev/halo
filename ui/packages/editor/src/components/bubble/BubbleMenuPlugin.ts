@@ -1,12 +1,12 @@
+import type { EditorView } from "@/tiptap/pm";
+import { EditorState, Plugin, PluginKey } from "@/tiptap/pm";
 import {
   Editor,
   isNodeSelection,
   isTextSelection,
   posToDOMRect,
 } from "@/tiptap/vue-3";
-import { EditorState, Plugin, PluginKey } from "@/tiptap/pm";
-import type { EditorView } from "@/tiptap/pm";
-import tippy, { type Instance, type Props, sticky } from "tippy.js";
+import tippy, { sticky, type Instance, type Props } from "tippy.js";
 
 export interface TippyOptionProps extends Props {
   fixed?: boolean;

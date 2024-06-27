@@ -25,6 +25,6 @@ export interface SubscriptionSubscriber {
      * @type {string}
      * @memberof SubscriptionSubscriber
      */
-    'name'?: string;
+    'name': string;
 }
 

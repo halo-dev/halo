@@ -1,13 +1,13 @@
-import { useLocalStorage } from "@vueuse/core";
 import { Toast } from "@halo-dev/components";
-import { ref, watch, type Ref } from "vue";
+import { useLocalStorage } from "@vueuse/core";
+import { debounce } from "lodash-es";
+import { computed, type Ref } from "vue";
+import { useI18n } from "vue-i18n";
 export interface ContentCache {
   name: string;
   content?: string;
   version: number;
 }
-import { debounce } from "lodash-es";
-import { useI18n } from "vue-i18n";
 
 interface useContentCacheReturn {
   handleResetCache: () => void;
@@ -23,7 +23,19 @@ export function useContentCache(
   contentVersion: Ref<number>
 ): useContentCacheReturn {
   const content_caches = useLocalStorage<ContentCache[]>(key, []);
-  const currentCache = ref<ContentCache | undefined>(undefined);
+  const currentCache = computed<ContentCache | undefined>(() => {
+    if (content_caches.value.length > 0) {
+      if (name.value) {
+        return content_caches.value.find(
+          (c: ContentCache) => c.name === name.value
+        );
+      } else {
+        return content_caches.value.find((c: ContentCache) => c.name === "");
+      }
+    }
+    return undefined;
+  });
+
   const { t } = useI18n();
 
   const handleResetCache = () => {
@@ -83,20 +95,6 @@ export function useContentCache(
     }
     index > -1 && content_caches.value.splice(index, 1);
   };
-
-  watch(content_caches, (newCaches) => {
-    if (newCaches.length > 0) {
-      if (name.value) {
-        currentCache.value = newCaches.find(
-          (c: ContentCache) => c.name === name.value
-        );
-      } else {
-        currentCache.value = newCaches.find((c: ContentCache) => c.name === "");
-      }
-    } else {
-      currentCache.value = undefined;
-    }
-  });
 
   return {
     handleClearCache,

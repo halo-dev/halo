@@ -1,4 +1,12 @@
 <script lang="ts" setup>
+import { useRoleForm, useRoleTemplateSelection } from "@/composables/use-role";
+import { rbacAnnotations } from "@/constants/annotations";
+import { SUPER_ROLE_NAME } from "@/constants/constants";
+import { pluginLabels, roleLabels } from "@/constants/labels";
+import { formatDatetime } from "@/utils/date";
+import { resolveDeepDependencies } from "@/utils/role";
+import type { Role } from "@halo-dev/api-client";
+import { coreApiClient } from "@halo-dev/api-client";
 import {
   IconShieldUser,
   VAlert,
@@ -10,18 +18,10 @@ import {
   VTabbar,
   VTag,
 } from "@halo-dev/components";
-import { useRoute } from "vue-router";
-import { computed, ref, watch } from "vue";
-import { coreApiClient } from "@halo-dev/api-client";
-import { pluginLabels, roleLabels } from "@/constants/labels";
-import { rbacAnnotations } from "@/constants/annotations";
-import { useRoleForm, useRoleTemplateSelection } from "@/composables/use-role";
-import { SUPER_ROLE_NAME } from "@/constants/constants";
-import { useI18n } from "vue-i18n";
-import { formatDatetime } from "@/utils/date";
 import { useQuery } from "@tanstack/vue-query";
-import type { Role } from "@halo-dev/api-client";
-import { resolveDeepDependencies } from "@/utils/role";
+import { computed, ref, watch } from "vue";
+import { useI18n } from "vue-i18n";
+import { useRoute } from "vue-router";
 
 const route = useRoute();
 const { t } = useI18n();
@@ -63,8 +63,6 @@ const getRoleCountText = computed(() => {
   const dependencies = new Set<string>(
     resolveDeepDependencies(formState.value, roleTemplates.value || [])
   );
-
-  console.log(dependencies);
 
   return t("core.role.common.text.contains_n_permissions", {
     count: dependencies.size || 0,

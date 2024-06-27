@@ -1,23 +1,23 @@
-import {
-  Editor,
-  findParentNode,
-  isActive,
-  mergeAttributes,
-  Node,
-  type Range,
-} from "@/tiptap/vue-3";
-import { Node as PMNode, EditorState, TextSelection } from "@/tiptap/pm";
-import type { NodeType, Schema } from "@/tiptap/pm";
-import { markRaw } from "vue";
-import Column from "./column";
-import RiInsertColumnLeft from "~icons/ri/insert-column-left";
-import RiInsertColumnRight from "~icons/ri/insert-column-right";
-import RiDeleteColumn from "~icons/ri/delete-column";
 import { BlockActionSeparator, ToolboxItem } from "@/components";
 import MdiDeleteForeverOutline from "@/components/icon/MdiDeleteForeverOutline.vue";
 import { i18n } from "@/locales";
+import type { NodeType, Schema } from "@/tiptap/pm";
+import { EditorState, Node as PMNode, TextSelection } from "@/tiptap/pm";
+import {
+  Editor,
+  Node,
+  findParentNode,
+  isActive,
+  mergeAttributes,
+  type Range,
+} from "@/tiptap/vue-3";
 import { deleteNode } from "@/utils";
+import { markRaw } from "vue";
 import MdiCollage from "~icons/mdi/collage";
+import RiDeleteColumn from "~icons/ri/delete-column";
+import RiInsertColumnLeft from "~icons/ri/insert-column-left";
+import RiInsertColumnRight from "~icons/ri/insert-column-right";
+import Column from "./column";
 
 declare module "@/tiptap" {
   interface Commands<ReturnType> {
@@ -173,8 +173,9 @@ const Columns = Node.create({
   priority: 10,
   defining: true,
   isolating: true,
-  allowGapCursor: false,
+  allowGapCursor: true,
   content: "column{1,}",
+  fakeSelection: false,
 
   addOptions() {
     return {

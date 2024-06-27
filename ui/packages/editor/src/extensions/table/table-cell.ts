@@ -1,11 +1,15 @@
-import { mergeAttributes, Node } from "@/tiptap/vue-3";
+import { i18n } from "@/locales";
 import {
-  Plugin,
-  PluginKey,
+  addRowAfter,
   Decoration,
   DecorationSet,
-  addRowAfter,
+  Plugin,
+  PluginKey,
 } from "@/tiptap/pm";
+import { mergeAttributes, Node } from "@/tiptap/vue-3";
+import { Tooltip } from "floating-vue";
+import { h, render } from "vue";
+import MdiPlus from "~icons/mdi/plus";
 import {
   getCellsInColumn,
   isRowSelected,
@@ -13,11 +17,6 @@ import {
   selectRow,
   selectTable,
 } from "./util";
-import { Tooltip } from "floating-vue";
-import { h } from "vue";
-import MdiPlus from "~icons/mdi/plus";
-import { render } from "vue";
-import { i18n } from "@/locales";
 
 export interface TableCellOptions {
   HTMLAttributes: Record<string, any>;

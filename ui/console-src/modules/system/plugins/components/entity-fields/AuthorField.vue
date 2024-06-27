@@ -1,6 +1,6 @@
 <script lang="ts" setup>
-import { VEntityField } from "@halo-dev/components";
 import type { Plugin } from "@halo-dev/api-client";
+import { VEntityField } from "@halo-dev/components";
 withDefaults(
   defineProps<{
     plugin: Plugin;

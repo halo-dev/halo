@@ -101,10 +101,8 @@ public class DefaultPluginApplicationContextFactory implements PluginApplication
 
         rootContext.getBeanProvider(ReactiveExtensionClient.class)
             .ifUnique(client -> {
-                var reactiveSettingFetcher = new DefaultReactiveSettingFetcher(client, pluginId);
-                var settingFetcher = new DefaultSettingFetcher(reactiveSettingFetcher);
-                beanFactory.registerSingleton("reactiveSettingFetcher", reactiveSettingFetcher);
-                beanFactory.registerSingleton("settingFetcher", settingFetcher);
+                context.registerBean("reactiveSettingFetcher", DefaultReactiveSettingFetcher.class);
+                context.registerBean("settingFetcher", DefaultSettingFetcher.class);
             });
 
         rootContext.getBeanProvider(PluginRequestMappingHandlerMapping.class)

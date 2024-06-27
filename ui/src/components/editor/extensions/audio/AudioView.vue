@@ -1,11 +1,11 @@
 <script lang="ts" setup>
+import { VButton } from "@halo-dev/components";
 import type { NodeViewProps } from "@halo-dev/richtext-editor";
 import { computed, ref } from "vue";
-import type { AttachmentAttr } from "../../utils/attachment";
 import RiFileMusicLine from "~icons/ri/file-music-line";
 import { EditorLinkObtain } from "../../components";
-import { VButton } from "@halo-dev/components";
 import InlineBlockBox from "../../components/InlineBlockBox.vue";
+import type { AttachmentAttr } from "../../utils/attachment";
 
 const props = defineProps<NodeViewProps>();
 

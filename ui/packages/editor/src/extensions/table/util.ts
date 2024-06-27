@@ -1,6 +1,6 @@
-import { findParentNode } from "@/tiptap/vue-3";
-import { Node, CellSelection, TableMap, selectedRect } from "@/tiptap/pm";
 import type { EditorState, Rect, Selection, Transaction } from "@/tiptap/pm";
+import { CellSelection, Node, TableMap, selectedRect } from "@/tiptap/pm";
+import { findParentNode } from "@/tiptap/vue-3";
 
 export const selectTable = (tr: Transaction) => {
   const table = findTable(tr.selection);

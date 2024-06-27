@@ -1,11 +1,11 @@
-import type { Editor } from "@/tiptap/vue-3";
-import TiptapUnderline from "@tiptap/extension-underline";
-import type { UnderlineOptions } from "@tiptap/extension-underline";
 import ToolbarItem from "@/components/toolbar/ToolbarItem.vue";
-import MdiFormatUnderline from "~icons/mdi/format-underline";
-import { markRaw } from "vue";
 import { i18n } from "@/locales";
+import type { Editor } from "@/tiptap/vue-3";
 import type { ExtensionOptions } from "@/types";
+import type { UnderlineOptions } from "@tiptap/extension-underline";
+import TiptapUnderline from "@tiptap/extension-underline";
+import { markRaw } from "vue";
+import MdiFormatUnderline from "~icons/mdi/format-underline";
 
 const Underline = TiptapUnderline.extend<ExtensionOptions & UnderlineOptions>({
   addOptions() {

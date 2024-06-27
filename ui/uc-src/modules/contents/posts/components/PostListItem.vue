@@ -1,4 +1,11 @@
 <script lang="ts" setup>
+import StatusDotField from "@/components/entity-fields/StatusDotField.vue";
+import HasPermission from "@/components/permission/HasPermission.vue";
+import { postLabels } from "@/constants/labels";
+import { formatDatetime } from "@/utils/date";
+import PostTag from "@console/modules/contents/posts/tags/components/PostTag.vue";
+import type { ListedPost } from "@halo-dev/api-client";
+import { ucApiClient } from "@halo-dev/api-client";
 import {
   Dialog,
   IconExternalLinkLine,
@@ -15,16 +22,9 @@ import {
   VSpace,
   VStatusDot,
 } from "@halo-dev/components";
-import type { ListedPost } from "@halo-dev/api-client";
-import { computed } from "vue";
-import { postLabels } from "@/constants/labels";
-import PostTag from "@console/modules/contents/posts/tags/components/PostTag.vue";
-import { formatDatetime } from "@/utils/date";
-import StatusDotField from "@/components/entity-fields/StatusDotField.vue";
-import { useI18n } from "vue-i18n";
-import HasPermission from "@/components/permission/HasPermission.vue";
-import { ucApiClient } from "@halo-dev/api-client";
 import { useQueryClient } from "@tanstack/vue-query";
+import { computed } from "vue";
+import { useI18n } from "vue-i18n";
 
 const { t } = useI18n();
 const queryClient = useQueryClient();

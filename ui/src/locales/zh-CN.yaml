@@ -191,6 +191,8 @@ core:
       cancel_publish_in_batch:
         title: 取消发布文章
         description: 批量取消发布文章，所选文章会被设置为未发布状态
+      batch_setting:
+        button: 批量设置
     filters:
       status:
         items:
@@ -273,6 +275,25 @@ core:
             create_time_asc: 较早创建
             display_name_desc: 标签名降序
             display_name_asc: 标签名升序
+    batch_setting_modal:
+      title: 文章批量设置
+      fields:
+        common:
+          enabled: 启用
+          op:
+            label: 设置方式
+            options:
+              add: 追加
+              replace: 替换
+              remove_all: 移除全部
+        category_group: 分类
+        category_names: 选择分类
+        tag_group: 标签
+        tag_names: 选择标签
+        visible_group: 可见性
+        visible_value: 选择可见性
+        allow_comment_group: 允许评论
+        allow_comment_value: 选择是否允许评论
   deleted_post:
     title: 文章回收站
     empty:
@@ -385,9 +406,13 @@ core:
         post_template:
           label: 自定义文章模板
           help: 自定义当前分类下文章的渲染模版，需要主题提供支持
+        hide_from_list:
+          label: 在列表中隐藏
+          help: 开启此选项后，此分类和其下子分类，以及其下文章将不会显示在前台的列表中，需要主动访问分类归档页面，此功能仅对第一级目录生效
     list:
       fields:
         prevent_parent_post_cascade_query: 阻止父级分类在级联文章查询中包含此分类及其子分类
+        hide_from_list: 已隐藏，此分类和其下子分类，以及其下文章将不会显示在前台的列表中
   page:
     title: 页面
     actions:
@@ -1062,6 +1087,7 @@ core:
       detail: 详情
       notification-preferences: 通知配置
       pat: 个人令牌
+      devices: 登录设备
     actions:
       update_profile:
         title: 修改资料
@@ -1185,6 +1211,23 @@ core:
           toast_email_empty: 请输入电子邮箱
         verify:
           toast_success: 验证成功
+    device:
+      list:
+        fields:
+          current: 当前设备
+          last_accessed_time: 上次访问：{time}
+      detail_modal:
+        title: 登录设备详情
+        fields:
+          os: 操作系统
+          browser: 浏览器
+          creation_timestamp: 创建时间
+          last_accessed_times: 上次访问时间
+          last_authenticated_time: 上次登录时间
+      operations:
+        revoke:
+          title: 撤销设备
+          description: 确定要撤销该设备吗？撤销之后，此设备会退出登录
   uc_notification:
     title: 消息
     tabs:
@@ -1563,6 +1606,7 @@ core:
       modify: 修改
       access: 访问
       schedule_publish: 定时发布
+      revoke: 撤销
     radio:
       "yes": 是
       "no": 否

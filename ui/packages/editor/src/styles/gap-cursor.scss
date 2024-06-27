@@ -1,0 +1,43 @@
+.halo-rich-text-editor {
+  .ProseMirror {
+    &.ProseMirror-focused {
+      .card-gap-cursor {
+        &::before {
+          display: block;
+        }
+      }
+    }
+    .card-gap-cursor {
+      position: relative;
+    }
+
+    .card-gap-cursor {
+      &::before {
+        content: "";
+        display: none;
+        position: absolute;
+        min-width: 1px;
+        height: 1em;
+        font-size: 1em;
+        border-left: 1px solid black;
+        animation: ProseMirror-cursor-blink 1.1s steps(2, start) infinite;
+      }
+    }
+
+    .start-card-gap-cursor::before {
+      top: -2px;
+      left: -1px;
+    }
+
+    .end-card-gap-cursor::before {
+      bottom: -2px;
+      right: -1px;
+    }
+  }
+}
+
+@keyframes ProseMirror-cursor-blink {
+  to {
+    visibility: hidden;
+  }
+}

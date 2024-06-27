@@ -1,19 +1,19 @@
 <script lang="ts" setup>
 // core libs
-import { computed, ref, type Ref, inject, toRaw } from "vue";
+import { computed, inject, ref, toRaw, type Ref } from "vue";
 
 // components
-import { Toast, VButton } from "@halo-dev/components";
 import StickyBlock from "@/components/sticky-block/StickyBlock.vue";
+import { Toast, VButton } from "@halo-dev/components";
 
 // hooks
+import { useGlobalInfoStore } from "@/stores/global-info";
 import { useSettingFormConvert } from "@console/composables/use-setting-form";
 import { useSystemConfigMapStore } from "@console/stores/system-configmap";
 import type { ConfigMap, Setting } from "@halo-dev/api-client";
-import { useQuery, useQueryClient } from "@tanstack/vue-query";
 import { coreApiClient } from "@halo-dev/api-client";
+import { useQuery, useQueryClient } from "@tanstack/vue-query";
 import { useI18n } from "vue-i18n";
-import { useGlobalInfoStore } from "@/stores/global-info";
 
 const SYSTEM_CONFIGMAP_NAME = "system";
 

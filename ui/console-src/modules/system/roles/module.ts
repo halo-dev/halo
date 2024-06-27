@@ -1,7 +1,7 @@
-import { definePlugin } from "@halo-dev/console-shared";
 import BasicLayout from "@console/layouts/BasicLayout.vue";
-import RoleList from "./RoleList.vue";
+import { definePlugin } from "@halo-dev/console-shared";
 import RoleDetail from "./RoleDetail.vue";
+import RoleList from "./RoleList.vue";
 
 export default definePlugin({
   components: {},

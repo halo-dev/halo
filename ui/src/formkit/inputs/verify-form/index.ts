@@ -5,8 +5,8 @@ import {
   message,
   messages,
 } from "@formkit/inputs";
-import { default as verifyFeature } from "./features";
 import VerificationButton from "./VerificationButton.vue";
+import { default as verifyFeature } from "./features";
 
 export const verifyInput = createSection("verificationForm", () => ({
   $el: "div",

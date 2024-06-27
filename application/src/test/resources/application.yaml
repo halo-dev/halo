@@ -27,6 +27,9 @@ halo:
   extension:
     controller:
       disabled: true
+  search-engine:
+    lucene:
+      enabled: false
 
 springdoc:
   api-docs:

@@ -613,6 +613,55 @@
         ]
       }
     },
+    "/apis/uc.api.security.halo.run/v1alpha1/devices": {
+      "get": {
+        "description": "List all user devices",
+        "operationId": "ListDevices",
+        "responses": {
+          "default": {
+            "content": {
+              "*/*": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/UserDevice"
+                  }
+                }
+              }
+            },
+            "description": "default response"
+          }
+        },
+        "tags": [
+          "DeviceV1alpha1Uc"
+        ]
+      }
+    },
+    "/apis/uc.api.security.halo.run/v1alpha1/devices/{deviceId}": {
+      "delete": {
+        "description": "Revoke a own device",
+        "operationId": "RevokeDevice",
+        "parameters": [
+          {
+            "description": "Device ID",
+            "in": "path",
+            "name": "deviceId",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "204 NO_CONTENT": {
+            "description": "default response"
+          }
+        },
+        "tags": [
+          "DeviceV1alpha1Uc"
+        ]
+      }
+    },
     "/apis/uc.api.security.halo.run/v1alpha1/personalaccesstokens": {
       "get": {
         "description": "Obtain PAT list.",
@@ -897,6 +946,9 @@
             "minLength": 1,
             "type": "string"
           },
+          "hideFromList": {
+            "type": "boolean"
+          },
           "postTemplate": {
             "maxLength": 255,
             "type": "string"
@@ -1010,6 +1062,81 @@
             "type": "string",
             "description": "A JSON Pointer path pointing to the location to move/copy from.",
             "example": "/a/b/c"
+          }
+        }
+      },
+      "Device": {
+        "required": [
+          "apiVersion",
+          "kind",
+          "metadata",
+          "spec",
+          "status"
+        ],
+        "type": "object",
+        "properties": {
+          "apiVersion": {
+            "type": "string"
+          },
+          "kind": {
+            "type": "string"
+          },
+          "metadata": {
+            "$ref": "#/components/schemas/Metadata"
+          },
+          "spec": {
+            "$ref": "#/components/schemas/DeviceSpec"
+          },
+          "status": {
+            "$ref": "#/components/schemas/DeviceStatus"
+          }
+        }
+      },
+      "DeviceSpec": {
+        "required": [
+          "ipAddress",
+          "principalName",
+          "sessionId"
+        ],
+        "type": "object",
+        "properties": {
+          "ipAddress": {
+            "maxLength": 129,
+            "type": "string"
+          },
+          "lastAccessedTime": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "lastAuthenticatedTime": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "principalName": {
+            "minLength": 1,
+            "type": "string"
+          },
+          "rememberMeSeriesId": {
+            "type": "string"
+          },
+          "sessionId": {
+            "minLength": 1,
+            "type": "string"
+          },
+          "userAgent": {
+            "maxLength": 500,
+            "type": "string"
+          }
+        }
+      },
+      "DeviceStatus": {
+        "type": "object",
+        "properties": {
+          "browser": {
+            "type": "string"
+          },
+          "os": {
+            "type": "string"
           }
         }
       },
@@ -1455,12 +1582,12 @@
           },
           "visible": {
             "type": "string",
+            "default": "PUBLIC",
             "enum": [
               "PUBLIC",
               "INTERNAL",
               "PRIVATE"
-            ],
-            "default": "PUBLIC"
+            ]
           }
         }
       },
@@ -1493,6 +1620,9 @@
           },
           "excerpt": {
             "type": "string"
+          },
+          "hideFromList": {
+            "type": "boolean"
           },
           "inProgress": {
             "type": "boolean"
@@ -1810,6 +1940,25 @@
           },
           "totpConfigured": {
             "type": "boolean"
+          }
+        }
+      },
+      "UserDevice": {
+        "required": [
+          "active",
+          "currentDevice",
+          "device"
+        ],
+        "type": "object",
+        "properties": {
+          "active": {
+            "type": "boolean"
+          },
+          "currentDevice": {
+            "type": "boolean"
+          },
+          "device": {
+            "$ref": "#/components/schemas/Device"
           }
         }
       }

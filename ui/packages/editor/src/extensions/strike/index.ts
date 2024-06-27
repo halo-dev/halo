@@ -1,11 +1,11 @@
-import type { Editor } from "@/tiptap/vue-3";
-import TiptapStrike from "@tiptap/extension-strike";
-import type { StrikeOptions } from "@tiptap/extension-strike";
 import ToolbarItem from "@/components/toolbar/ToolbarItem.vue";
-import MdiFormatStrikethrough from "~icons/mdi/format-strikethrough";
-import { markRaw } from "vue";
 import { i18n } from "@/locales";
+import type { Editor } from "@/tiptap/vue-3";
 import type { ExtensionOptions } from "@/types";
+import type { StrikeOptions } from "@tiptap/extension-strike";
+import TiptapStrike from "@tiptap/extension-strike";
+import { markRaw } from "vue";
+import MdiFormatStrikethrough from "~icons/mdi/format-strikethrough";
 
 const Strike = TiptapStrike.extend<ExtensionOptions & StrikeOptions>({
   addOptions() {

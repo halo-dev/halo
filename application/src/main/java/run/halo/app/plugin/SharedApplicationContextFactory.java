@@ -1,5 +1,6 @@
 package run.halo.app.plugin;
 
+import org.springframework.cache.CacheManager;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.support.GenericApplicationContext;
 import org.springframework.security.web.server.context.ServerSecurityContextRepository;
@@ -56,6 +57,8 @@ public enum SharedApplicationContextFactory {
             rootContext.getBean(ExternalLinkProcessor.class));
         beanFactory.registerSingleton("postContentService",
             rootContext.getBean(PostContentService.class));
+        beanFactory.registerSingleton("cacheManager",
+            rootContext.getBean(CacheManager.class));
         // TODO add more shared instance here
 
         sharedContext.refresh();

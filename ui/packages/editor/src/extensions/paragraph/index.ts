@@ -1,12 +1,21 @@
-import TiptapParagraph from "@tiptap/extension-paragraph";
-import type { ParagraphOptions } from "@tiptap/extension-paragraph";
-import type { ExtensionOptions, ToolbarItem as TypeToolbarItem } from "@/types";
-import type { Editor } from "@/tiptap";
-import { markRaw } from "vue";
 import ToolbarItem from "@/components/toolbar/ToolbarItem.vue";
-import TablerLineHeight from "~icons/tabler/line-height";
-import { i18n } from "@/locales";
 import ToolbarSubItem from "@/components/toolbar/ToolbarSubItem.vue";
+import { i18n } from "@/locales";
+import {
+  EditorState,
+  ResolvedPos,
+  TextSelection,
+  isActive,
+  type Dispatch,
+  type Editor,
+} from "@/tiptap";
+import type { ExtensionOptions, ToolbarItem as TypeToolbarItem } from "@/types";
+import { deleteNodeByPos } from "@/utils";
+import { isEmpty } from "@/utils/isNodeEmpty";
+import type { ParagraphOptions } from "@tiptap/extension-paragraph";
+import TiptapParagraph from "@tiptap/extension-paragraph";
+import { markRaw } from "vue";
+import TablerLineHeight from "~icons/tabler/line-height";
 
 const Paragraph = TiptapParagraph.extend<ExtensionOptions & ParagraphOptions>({
   addAttributes() {
@@ -85,6 +94,93 @@ const Paragraph = TiptapParagraph.extend<ExtensionOptions & ParagraphOptions>({
       },
     };
   },
+
+  addKeyboardShortcuts() {
+    return {
+      Backspace: ({ editor }) => {
+        const { state, view } = editor;
+        const { selection } = state;
+
+        if (
+          !isActive(state, Paragraph.name) ||
+          !(selection instanceof TextSelection) ||
+          !selection.empty
+        ) {
+          return false;
+        }
+
+        const { $from } = selection;
+
+        if ($from.parentOffset !== 0) {
+          return false;
+        }
+
+        const beforePos = $from.before($from.depth);
+
+        if (isEmpty($from.parent)) {
+          return deleteCurrentNodeAndSetSelection(
+            $from,
+            beforePos,
+            state,
+            view.dispatch
+          );
+        }
+
+        if (beforePos === 0) {
+          return false;
+        }
+
+        return handleDeletePreviousNode($from, beforePos, state, view.dispatch);
+      },
+    };
+  },
 });
+
+export function deleteCurrentNodeAndSetSelection(
+  $from: ResolvedPos,
+  beforePos: number,
+  state: EditorState,
+  dispatch: Dispatch
+) {
+  const { tr } = state;
+  if (deleteNodeByPos($from)(tr) && dispatch) {
+    if (beforePos !== 0) {
+      tr.setSelection(TextSelection.create(tr.doc, beforePos - 1));
+    }
+    dispatch(tr);
+    return true;
+  }
+  return false;
+}
+
+export function handleDeletePreviousNode(
+  $from: ResolvedPos,
+  beforePos: number,
+  state: EditorState,
+  dispatch: Dispatch
+) {
+  const { tr } = state;
+  if (!dispatch) {
+    return false;
+  }
+
+  const $beforePos = $from.doc.resolve(beforePos);
+  const nodeBefore = $beforePos.nodeBefore;
+
+  if (
+    !nodeBefore ||
+    !nodeBefore.type.isBlock ||
+    nodeBefore.type.isText ||
+    nodeBefore.type.name === Paragraph.name
+  ) {
+    return false;
+  }
+
+  if (deleteNodeByPos($from.doc.resolve(beforePos - 1))(tr)) {
+    dispatch(tr);
+    return true;
+  }
+  return false;
+}
 
 export default Paragraph;

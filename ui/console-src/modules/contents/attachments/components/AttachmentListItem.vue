@@ -1,4 +1,10 @@
 <script lang="ts" setup>
+import EntityDropdownItems from "@/components/entity/EntityDropdownItems.vue";
+import { formatDatetime } from "@/utils/date";
+import { usePermission } from "@/utils/permission";
+import { useOperationItemExtensionPoint } from "@console/composables/use-operation-extension-points";
+import type { Attachment } from "@halo-dev/api-client";
+import { coreApiClient } from "@halo-dev/api-client";
 import {
   Dialog,
   Toast,
@@ -9,19 +15,13 @@ import {
   VSpace,
   VStatusDot,
 } from "@halo-dev/components";
+import type { OperationItem } from "@halo-dev/console-shared";
+import { useQueryClient } from "@tanstack/vue-query";
+import prettyBytes from "pretty-bytes";
 import type { Ref } from "vue";
 import { computed, inject, markRaw, ref, toRefs } from "vue";
-import type { Attachment } from "@halo-dev/api-client";
-import { formatDatetime } from "@/utils/date";
-import prettyBytes from "pretty-bytes";
-import { useFetchAttachmentPolicy } from "../composables/use-attachment-policy";
-import { coreApiClient } from "@halo-dev/api-client";
-import { usePermission } from "@/utils/permission";
 import { useI18n } from "vue-i18n";
-import { useQueryClient } from "@tanstack/vue-query";
-import { useOperationItemExtensionPoint } from "@console/composables/use-operation-extension-points";
-import type { OperationItem } from "@halo-dev/console-shared";
-import EntityDropdownItems from "@/components/entity/EntityDropdownItems.vue";
+import { useFetchAttachmentPolicy } from "../composables/use-attachment-policy";
 
 const { currentUserHasPermission } = usePermission();
 const { t } = useI18n();

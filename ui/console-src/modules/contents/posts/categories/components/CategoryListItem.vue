@@ -2,8 +2,10 @@
 import { formatDatetime } from "@/utils/date";
 import { usePermission } from "@/utils/permission";
 import type { Category } from "@halo-dev/api-client";
+import { coreApiClient } from "@halo-dev/api-client";
 import {
   Dialog,
+  IconEyeOff,
   IconList,
   Toast,
   VDropdownItem,
@@ -16,12 +18,13 @@ import type { PropType } from "vue";
 import { ref } from "vue";
 import { VueDraggable } from "vue-draggable-plus";
 import { useI18n } from "vue-i18n";
-import { coreApiClient } from "@halo-dev/api-client";
 import GridiconsLinkBreak from "~icons/gridicons/link-break";
 import { convertCategoryTreeToCategory, type CategoryTree } from "../utils";
 import CategoryEditingModal from "./CategoryEditingModal.vue";
 
 const { currentUserHasPermission } = usePermission();
+
+withDefaults(defineProps<{ isChildLevel?: boolean }>(), {});
 
 const categories = defineModel({
   type: Array as PropType<CategoryTree[]>,
@@ -95,6 +98,7 @@ const handleDelete = async (category: CategoryTree) => {
   >
     <CategoryEditingModal
       v-if="editingModal"
+      :is-child-level-category="isChildLevel"
       :category="selectedCategory"
       :parent-category="selectedParentCategory"
       @close="onEditingModalClose"
@@ -131,6 +135,14 @@ const handleDelete = async (category: CategoryTree) => {
                 v-tooltip="$t('core.common.status.deleting')"
                 state="warning"
                 animate
+              />
+            </template>
+          </VEntityField>
+          <VEntityField v-if="category.spec.hideFromList">
+            <template #description>
+              <IconEyeOff
+                v-tooltip="$t('core.post_category.list.fields.hide_from_list')"
+                class="cursor-pointer text-sm transition-all hover:text-blue-600"
               />
             </template>
           </VEntityField>
@@ -185,6 +197,7 @@ const handleDelete = async (category: CategoryTree) => {
       </VEntity>
       <CategoryListItem
         v-model="category.spec.children"
+        is-child-level
         class="pl-10 transition-all duration-300"
         @change="onChange"
       />

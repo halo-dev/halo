@@ -110,6 +110,7 @@
   </VModal>
 </template>
 <script lang="ts" setup>
+import { usePermission } from "@/utils/permission";
 import {
   IconAddCircle,
   IconCloseCircle,
@@ -122,11 +123,10 @@ import {
   VSpace,
   VTabbar,
 } from "@halo-dev/components";
-import { ref } from "vue";
 import { useStorage } from "@vueuse/core";
 import { cloneDeep } from "lodash-es";
+import { ref } from "vue";
 import { useI18n } from "vue-i18n";
-import { usePermission } from "@/utils/permission";
 
 const { t } = useI18n();
 const { currentUserHasPermission } = usePermission();

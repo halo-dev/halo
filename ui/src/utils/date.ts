@@ -1,11 +1,11 @@
 import { i18n } from "@/locales";
 import dayjs from "dayjs";
-import "dayjs/locale/zh-cn";
 import "dayjs/locale/en";
+import "dayjs/locale/zh-cn";
 import "dayjs/locale/zh-tw";
+import relativeTime from "dayjs/plugin/relativeTime";
 import timezone from "dayjs/plugin/timezone";
 import utc from "dayjs/plugin/utc";
-import relativeTime from "dayjs/plugin/relativeTime";
 dayjs.extend(timezone);
 dayjs.extend(utc);
 dayjs.extend(relativeTime);

@@ -1,11 +1,11 @@
 <script lang="ts" setup>
-import { computed, type Component } from "vue";
-import { vTooltip, Dropdown as VDropdown } from "floating-vue";
-import MdiLinkVariant from "~icons/mdi/link-variant";
 import { i18n } from "@/locales";
 import { type Editor } from "@/tiptap/vue-3";
-import { test } from "linkifyjs";
 import { TextSelection } from "@tiptap/pm/state";
+import { Dropdown as VDropdown, vTooltip } from "floating-vue";
+import { test } from "linkifyjs";
+import { computed, type Component } from "vue";
+import MdiLinkVariant from "~icons/mdi/link-variant";
 
 const props = defineProps<{
   editor: Editor;

@@ -3,12 +3,14 @@ package run.halo.app.theme.finders.impl;
 import static run.halo.app.extension.index.query.QueryFactory.and;
 import static run.halo.app.extension.index.query.QueryFactory.equal;
 import static run.halo.app.extension.index.query.QueryFactory.in;
+import static run.halo.app.extension.index.query.QueryFactory.notEqual;
 
 import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 import lombok.AllArgsConstructor;
+import org.apache.commons.lang3.BooleanUtils;
 import org.apache.commons.lang3.ObjectUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.data.domain.Sort;
@@ -136,7 +138,10 @@ public class PostFinderImpl implements PostFinder {
 
     @Override
     public Mono<ListResult<ListedPostVo>> list(Integer page, Integer size) {
-        return postPublicQueryService.list(new ListOptions(), getPageRequest(page, size));
+        var listOptions = ListOptions.builder()
+            .fieldQuery(notEqual("status.hideFromList", BooleanUtils.TRUE))
+            .build();
+        return postPublicQueryService.list(listOptions, getPageRequest(page, size));
     }
 
     private PageRequestImpl getPageRequest(Integer page, Integer size) {
@@ -202,6 +207,9 @@ public class PostFinderImpl implements PostFinder {
     public Mono<ListResult<PostArchiveVo>> archives(Integer page, Integer size, String year,
         String month) {
         var listOptions = new ListOptions();
+        listOptions.setFieldSelector(FieldSelector.of(
+            notEqual("status.hideFromList", BooleanUtils.TRUE))
+        );
         var labelSelectorBuilder = LabelSelector.builder();
         if (StringUtils.isNotBlank(year)) {
             labelSelectorBuilder.eq(Post.ARCHIVE_YEAR_LABEL, year);

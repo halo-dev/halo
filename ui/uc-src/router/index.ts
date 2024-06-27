@@ -1,10 +1,10 @@
+import routesConfig from "@uc/router/routes.config";
 import {
   createRouter,
   createWebHistory,
   type RouteLocationNormalized,
   type RouteLocationNormalizedLoaded,
 } from "vue-router";
-import routesConfig from "@uc/router/routes.config";
 import { setupAuthCheckGuard } from "./guards/auth-check";
 import { setupPermissionGuard } from "./guards/permission";
 

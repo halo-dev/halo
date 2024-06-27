@@ -1,5 +1,6 @@
 package run.halo.app.plugin;
 
+import lombok.Builder;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import org.pf4j.RuntimeMode;
@@ -17,9 +18,12 @@ import org.pf4j.RuntimeMode;
  * @since 2.10.0
  */
 @Getter
+@Builder
 @RequiredArgsConstructor
 public class PluginContext {
     private final String name;
+
+    private final String configMapName;
 
     private final String version;
 

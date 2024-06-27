@@ -1,21 +1,21 @@
 <script lang="ts" setup>
 import {
+  reset,
+  submitForm,
   type FormKitNode,
   type FormKitSchemaCondition,
   type FormKitSchemaNode,
-  reset,
-  submitForm,
 } from "@formkit/core";
 
 import { IconArrowRight } from "@halo-dev/components";
 
-import { computed, nextTick, onMounted, ref, watch } from "vue";
-import { coreApiClient } from "@halo-dev/api-client";
-import type { AnnotationSetting } from "@halo-dev/api-client";
-import { cloneDeep } from "lodash-es";
-import { getValidationMessages } from "@formkit/validation";
-import { useThemeStore } from "@console/stores/theme";
 import { randomUUID } from "@/utils/id";
+import { useThemeStore } from "@console/stores/theme";
+import { getValidationMessages } from "@formkit/validation";
+import type { AnnotationSetting } from "@halo-dev/api-client";
+import { coreApiClient } from "@halo-dev/api-client";
+import { cloneDeep } from "lodash-es";
+import { computed, nextTick, onMounted, ref, watch } from "vue";
 
 const themeStore = useThemeStore();
 

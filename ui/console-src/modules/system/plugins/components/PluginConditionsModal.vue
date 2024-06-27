@@ -1,7 +1,7 @@
 <script lang="ts" setup>
-import { VButton, VModal } from "@halo-dev/components";
-import type { Plugin } from "@halo-dev/api-client";
 import { formatDatetime, relativeTimeTo } from "@/utils/date";
+import type { Plugin } from "@halo-dev/api-client";
+import { VButton, VModal } from "@halo-dev/components";
 import { ref } from "vue";
 
 withDefaults(defineProps<{ plugin: Plugin }>(), {});

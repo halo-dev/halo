@@ -1,14 +1,14 @@
 <script lang="ts" setup>
-import { ucApiClient } from "@halo-dev/api-client";
-import { useMutation, useQuery, useQueryClient } from "@tanstack/vue-query";
+import HasPermission from "@/components/permission/HasPermission.vue";
 import type {
   DetailedUser,
   ReasonTypeNotifierRequest,
 } from "@halo-dev/api-client";
+import { ucApiClient } from "@halo-dev/api-client";
 import { VLoading, VSwitch } from "@halo-dev/components";
-import { computed } from "vue";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/vue-query";
 import { cloneDeep } from "lodash-es";
-import HasPermission from "@/components/permission/HasPermission.vue";
+import { computed } from "vue";
 
 const props = withDefaults(defineProps<{ user?: DetailedUser }>(), {
   user: undefined,

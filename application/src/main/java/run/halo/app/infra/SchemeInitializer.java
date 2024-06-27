@@ -19,9 +19,11 @@ import run.halo.app.content.Stats;
 import run.halo.app.core.extension.AnnotationSetting;
 import run.halo.app.core.extension.AuthProvider;
 import run.halo.app.core.extension.Counter;
+import run.halo.app.core.extension.Device;
 import run.halo.app.core.extension.Menu;
 import run.halo.app.core.extension.MenuItem;
 import run.halo.app.core.extension.Plugin;
+import run.halo.app.core.extension.RememberMeToken;
 import run.halo.app.core.extension.ReverseProxy;
 import run.halo.app.core.extension.Role;
 import run.halo.app.core.extension.RoleBinding;
@@ -79,7 +81,13 @@ public class SchemeInitializer implements ApplicationListener<ApplicationContext
                     definition -> definition.getSpec().getClassName())
                 ));
         });
-        schemeManager.register(ExtensionDefinition.class);
+        schemeManager.register(ExtensionDefinition.class, indexSpecs -> {
+            indexSpecs.add(new IndexSpec()
+                .setName("spec.extensionPointName")
+                .setIndexFunc(simpleAttribute(ExtensionDefinition.class,
+                    definition -> definition.getSpec().getExtensionPointName())
+                ));
+        });
 
         schemeManager.register(RoleBinding.class);
         schemeManager.register(User.class, indexSpecs -> {
@@ -191,6 +199,14 @@ public class SchemeInitializer implements ApplicationListener<ApplicationContext
                     return lastModifyTime == null ? null : lastModifyTime.toString();
                 })));
             indexSpecs.add(new IndexSpec()
+                .setName("status.hideFromList")
+                .setIndexFunc(simpleAttribute(Post.class, post -> {
+                    var hidden = post.getStatus().getHideFromList();
+                    // only index when hidden is true
+                    return (hidden == null || !hidden) ? null : BooleanUtils.TRUE;
+                }))
+            );
+            indexSpecs.add(new IndexSpec()
                 .setName(Post.REQUIRE_SYNC_ON_STARTUP_INDEX_NAME)
                 .setIndexFunc(simpleAttribute(Post.class, post -> {
                     var version = post.getMetadata().getVersion();
@@ -236,6 +252,19 @@ public class SchemeInitializer implements ApplicationListener<ApplicationContext
                 .setName("spec.priority")
                 .setIndexFunc(simpleAttribute(Category.class,
                     category -> defaultIfNull(category.getSpec().getPriority(), 0).toString())));
+            indexSpecs.add(new IndexSpec()
+                .setName("spec.children")
+                .setIndexFunc(multiValueAttribute(Category.class, category -> {
+                    var children = category.getSpec().getChildren();
+                    return children == null ? Set.of() : Set.copyOf(children);
+                }))
+            );
+            indexSpecs.add(new IndexSpec()
+                .setName("spec.hideFromList")
+                .setIndexFunc(simpleAttribute(Category.class,
+                    category -> toStringTrueFalse(isTrue(category.getSpec().isHideFromList()))
+                ))
+            );
         });
         schemeManager.register(Tag.class, indexSpecs -> {
             indexSpecs.add(new IndexSpec()
@@ -432,6 +461,29 @@ public class SchemeInitializer implements ApplicationListener<ApplicationContext
 
         // security.halo.run
         schemeManager.register(PersonalAccessToken.class);
+        schemeManager.register(RememberMeToken.class, indexSpecs -> {
+            indexSpecs.add(new IndexSpec()
+                .setName("spec.series")
+                .setUnique(true)
+                .setIndexFunc(simpleAttribute(RememberMeToken.class,
+                    token -> token.getSpec().getSeries())
+                )
+            );
+            indexSpecs.add(new IndexSpec()
+                .setName("spec.username")
+                .setIndexFunc(simpleAttribute(RememberMeToken.class,
+                    token -> token.getSpec().getUsername())
+                )
+            );
+        });
+        schemeManager.register(Device.class, indexSpecs -> {
+            indexSpecs.add(new IndexSpec()
+                .setName("spec.principalName")
+                .setIndexFunc(simpleAttribute(Device.class,
+                    device -> device.getSpec().getPrincipalName())
+                )
+            );
+        });
 
         // migration.halo.run
         schemeManager.register(Backup.class);

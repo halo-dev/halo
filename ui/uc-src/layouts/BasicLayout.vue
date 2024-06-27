@@ -1,29 +1,29 @@
 <script lang="ts" setup>
+import LoginModal from "@/components/login/LoginModal.vue";
+import { RoutesMenu } from "@/components/menu/RoutesMenu";
+import { useRouteMenuGenerator } from "@/composables/use-route-menu-generator";
+import { rbacAnnotations } from "@/constants/annotations";
+import { useUserStore } from "@/stores/user";
+import { coreMenuGroups } from "@console/router/constant";
 import {
-  IconMore,
-  IconUserSettings,
-  VTag,
-  VAvatar,
   Dialog,
   IconLogoutCircleRLine,
+  IconMore,
   IconSettings3Line,
+  IconUserSettings,
+  VAvatar,
+  VTag,
 } from "@halo-dev/components";
-import { RoutesMenu } from "@/components/menu/RoutesMenu";
-import IconLogo from "~icons/core/logo?width=5rem&height=2rem";
-import { RouterView, useRoute, useRouter } from "vue-router";
-import { computed, onMounted, reactive, ref } from "vue";
 import axios from "axios";
-import LoginModal from "@/components/login/LoginModal.vue";
-import { coreMenuGroups } from "@console/router/constant";
-import { useUserStore } from "@/stores/user";
-import { rbacAnnotations } from "@/constants/annotations";
-import { defineStore, storeToRefs } from "pinia";
-import { useI18n } from "vue-i18n";
 import {
   useOverlayScrollbars,
   type UseOverlayScrollbarsParams,
 } from "overlayscrollbars-vue";
-import { useRouteMenuGenerator } from "@/composables/use-route-menu-generator";
+import { defineStore, storeToRefs } from "pinia";
+import { computed, onMounted, reactive, ref } from "vue";
+import { useI18n } from "vue-i18n";
+import { RouterView, useRoute, useRouter } from "vue-router";
+import IconLogo from "~icons/core/logo?width=5rem&height=2rem";
 
 const route = useRoute();
 const router = useRouter();

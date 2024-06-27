@@ -21,6 +21,7 @@ import run.halo.app.plugin.extensionpoint.ExtensionGetter;
 import run.halo.app.security.authentication.CryptoService;
 import run.halo.app.security.authentication.SecurityConfigurer;
 import run.halo.app.security.authentication.rememberme.RememberMeServices;
+import run.halo.app.security.device.DeviceService;
 
 @Component
 public class LoginSecurityConfigurer implements SecurityConfigurer {
@@ -43,6 +44,7 @@ public class LoginSecurityConfigurer implements SecurityConfigurer {
     private final RateLimiterRegistry rateLimiterRegistry;
 
     private final RememberMeServices rememberMeServices;
+    private final DeviceService deviceService;
 
     public LoginSecurityConfigurer(ObservationRegistry observationRegistry,
         ReactiveUserDetailsService userDetailsService,
@@ -50,7 +52,8 @@ public class LoginSecurityConfigurer implements SecurityConfigurer {
         ServerSecurityContextRepository securityContextRepository, CryptoService cryptoService,
         ExtensionGetter extensionGetter, ServerResponse.Context context,
         MessageSource messageSource, RateLimiterRegistry rateLimiterRegistry,
-        RememberMeServices rememberMeServices) {
+        RememberMeServices rememberMeServices,
+        DeviceService deviceService) {
         this.observationRegistry = observationRegistry;
         this.userDetailsService = userDetailsService;
         this.passwordService = passwordService;
@@ -62,13 +65,15 @@ public class LoginSecurityConfigurer implements SecurityConfigurer {
         this.messageSource = messageSource;
         this.rateLimiterRegistry = rateLimiterRegistry;
         this.rememberMeServices = rememberMeServices;
+        this.deviceService = deviceService;
     }
 
     @Override
     public void configure(ServerHttpSecurity http) {
         var filter = new AuthenticationWebFilter(authenticationManager());
         var requiresMatcher = ServerWebExchangeMatchers.pathMatchers(HttpMethod.POST, "/login");
-        var handler = new UsernamePasswordHandler(context, messageSource, rememberMeServices);
+        var handler =
+            new UsernamePasswordHandler(context, messageSource, rememberMeServices, deviceService);
         var authConverter = new LoginAuthenticationConverter(cryptoService, rateLimiterRegistry);
         filter.setRequiresAuthenticationMatcher(requiresMatcher);
         filter.setAuthenticationFailureHandler(handler);

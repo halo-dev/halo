@@ -4,6 +4,7 @@ import java.time.Instant;
 import lombok.Data;
 
 @Data
+@Deprecated(forRemoval = true, since = "2.17")
 public class PostHit {
 
     private String name;

@@ -1,35 +1,34 @@
 <script lang="ts" setup>
-import ThemePreviewListItem from "./ThemePreviewListItem.vue";
 import { useSettingFormConvert } from "@console/composables/use-setting-form";
 import { useThemeStore } from "@console/stores/theme";
-import { axiosInstance, consoleApiClient } from "@halo-dev/api-client";
 import type {
   ConfigMap,
   Setting,
   SettingForm,
   Theme,
 } from "@halo-dev/api-client";
+import { axiosInstance, consoleApiClient } from "@halo-dev/api-client";
 import {
-  VModal,
+  IconArrowLeft,
+  IconComputer,
   IconLink,
   IconPalette,
-  IconSettings,
-  IconArrowLeft,
-  VTabbar,
-  VButton,
-  IconComputer,
   IconPhone,
-  IconTablet,
   IconRefreshLine,
+  IconSettings,
+  IconTablet,
   Toast,
+  VButton,
   VLoading,
+  VModal,
+  VTabbar,
 } from "@halo-dev/components";
-import { storeToRefs } from "pinia";
-import { computed, markRaw, ref, toRaw } from "vue";
-import { useI18n } from "vue-i18n";
-import { OverlayScrollbarsComponent } from "overlayscrollbars-vue";
 import { useQuery } from "@tanstack/vue-query";
-import { onMounted } from "vue";
+import { OverlayScrollbarsComponent } from "overlayscrollbars-vue";
+import { storeToRefs } from "pinia";
+import { computed, markRaw, onMounted, ref, toRaw } from "vue";
+import { useI18n } from "vue-i18n";
+import ThemePreviewListItem from "./ThemePreviewListItem.vue";
 
 const props = withDefaults(
   defineProps<{

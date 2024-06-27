@@ -1,6 +1,6 @@
 <script lang="ts" setup>
-import { consoleApiClient, coreApiClient } from "@halo-dev/api-client";
 import type { Group } from "@halo-dev/api-client";
+import { consoleApiClient, coreApiClient } from "@halo-dev/api-client";
 import {
   Dialog,
   IconCheckboxCircle,

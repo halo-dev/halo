@@ -191,6 +191,8 @@ core:
       cancel_publish_in_batch:
         title: 取消發佈文章
         description: 批量取消發佈文章，所選文章會被設置為未發布狀態
+      batch_setting:
+        button: 批量設置
     filters:
       status:
         items:
@@ -265,6 +267,25 @@ core:
           label: 自定義模板
         cover:
           label: 封面圖
+    batch_setting_modal:
+      title: 文章批量設置
+      fields:
+        common:
+          enabled: 啟用
+          op:
+            label: 設置方式
+            options:
+              add: 追加
+              replace: 替换
+              remove_all: 移除全部
+        category_group: 分类
+        category_names: 選擇分類
+        tag_group: 標籤
+        tag_names: 選擇標籤
+        visible_group: 可見性
+        visible_value: 選擇可見性
+        allow_comment_group: 允許評論
+        allow_comment_value: 選擇是否允許評論
   deleted_post:
     title: 文章回收站
     empty:
@@ -365,9 +386,13 @@ core:
         post_template:
           label: 自定義文章模板
           help: 自定義當前分類下文章的渲染模板，需要主題提供支持
+        hide_from_list:
+          label: 在列表中隱藏
+          help: 開啟此選項後，此分類和其下子分類，以及其下文章將不會顯示在前臺的列表中，需要主動訪問分類歸檔頁面，此功能僅對第一級目錄生效
     list:
       fields:
         prevent_parent_post_cascade_query: 阻止父級分類在級聯文章查詢中包含此分類及其子分類
+        hide_from_list: 已隱藏，此分類和其下子分類，以及其下文章將不會顯示在前臺的列表中，需要主動訪問分類歸檔頁面
   page:
     title: 頁面
     actions:
@@ -1042,6 +1067,7 @@ core:
       detail: 詳情
       notification-preferences: 通知配置
       pat: 個人令牌
+      devices: 登錄設備
     actions:
       update_profile:
         title: 修改資料
@@ -1165,6 +1191,22 @@ core:
       titles:
         modify: 修改電子郵件信箱
         verify: 驗證電子郵件信箱
+    device:
+      list:
+        fields:
+          last_accessed_time: 上次訪問：{time}
+      detail_modal:
+        title: 登入設備詳情
+        fields:
+          os: 操作系統
+          browser: 瀏覽器
+          creation_timestamp: 創建時間
+          last_accessed_times: 上次訪問時間
+          last_authenticated_time: 上次登錄時間
+      operations:
+        revoke:
+          title: 撤銷設備
+          description: 確定要撤銷該設備嗎？撤銷之後，此裝置會退出登錄
   uc_notification:
     title: 訊息
     tabs:
@@ -1521,6 +1563,7 @@ core:
       verify: 驗證
       access: 訪問
       schedule_publish: 定時發佈
+      revoke: 撤銷
     radio:
       "yes": 是
       "no": 否

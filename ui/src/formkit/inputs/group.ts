@@ -2,13 +2,13 @@ import type { FormKitTypeDefinition } from "@formkit/core";
 
 import {
   disablesChildren,
-  outer,
   fieldset,
-  legend,
   help,
   inner,
+  legend,
   message,
   messages,
+  outer,
 } from "@formkit/inputs";
 
 export const group: FormKitTypeDefinition = {

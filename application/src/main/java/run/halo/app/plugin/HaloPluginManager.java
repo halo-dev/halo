@@ -79,7 +79,8 @@ public class HaloPluginManager extends DefaultPluginManager implements SpringPlu
     @Override
     protected PluginFactory createPluginFactory() {
         var contextFactory = new DefaultPluginApplicationContextFactory(this);
-        return new SpringPluginFactory(contextFactory);
+        var pluginGetter = rootContext.getBean(PluginGetter.class);
+        return new SpringPluginFactory(contextFactory, pluginGetter);
     }
 
     @Override

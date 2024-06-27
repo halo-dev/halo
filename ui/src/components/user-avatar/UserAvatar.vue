@@ -1,25 +1,24 @@
 <script lang="ts" setup>
+import { rbacAnnotations } from "@/constants/annotations";
+import { usePermission } from "@/utils/permission";
 import { consoleApiClient } from "@halo-dev/api-client";
 import {
-  IconRiPencilFill,
+  Dialog,
   IconAddCircle,
-  VButton,
+  IconRiPencilFill,
+  Toast,
   VAvatar,
+  VButton,
   VDropdown,
   VDropdownItem,
+  VLoading,
   VModal,
   VSpace,
-  Toast,
-  Dialog,
-  VLoading,
 } from "@halo-dev/components";
-import { ref, defineAsyncComponent, type Ref, toRefs } from "vue";
-import { usePermission } from "@/utils/permission";
 import { useQuery, useQueryClient } from "@tanstack/vue-query";
-import { useI18n } from "vue-i18n";
 import { useFileDialog } from "@vueuse/core";
-import { computed } from "vue";
-import { rbacAnnotations } from "@/constants/annotations";
+import { computed, defineAsyncComponent, ref, toRefs, type Ref } from "vue";
+import { useI18n } from "vue-i18n";
 
 const props = withDefaults(
   defineProps<{

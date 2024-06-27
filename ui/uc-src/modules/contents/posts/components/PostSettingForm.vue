@@ -1,13 +1,12 @@
 <script lang="ts" setup>
-import { IconRefreshLine } from "@halo-dev/components";
-import type { PostFormState } from "../types";
-import { formatDatetime, toISOString } from "@/utils/date";
-import { computed } from "vue";
-import useSlugify from "@console/composables/use-slugify";
-import { FormType } from "@/types/slug";
-import { ref } from "vue";
 import HasPermission from "@/components/permission/HasPermission.vue";
+import { FormType } from "@/types/slug";
+import { formatDatetime, toISOString } from "@/utils/date";
+import useSlugify from "@console/composables/use-slugify";
+import { IconRefreshLine } from "@halo-dev/components";
+import { computed, ref } from "vue";
 import { useI18n } from "vue-i18n";
+import type { PostFormState } from "../types";
 
 const { t } = useI18n();
 

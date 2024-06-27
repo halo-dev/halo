@@ -1,17 +1,17 @@
-import { defineAsyncComponent, type App } from "vue";
 import { vClosePopper, VLoading, vTooltip } from "@halo-dev/components";
 import { Dropdown } from "floating-vue";
 import "floating-vue/dist/style.css";
+import { defineAsyncComponent, type App } from "vue";
 // @ts-ignore
-import VueGridLayout from "vue-grid-layout";
-import { defaultConfig, plugin as FormKit } from "@formkit/vue";
-import FormKitConfig from "@/formkit/formkit.config";
-import FilterDropdown from "@/components/filter/FilterDropdown.vue";
 import FilterCleanButton from "@/components/filter/FilterCleanButton.vue";
-import SearchInput from "@/components/input/SearchInput.vue";
+import FilterDropdown from "@/components/filter/FilterDropdown.vue";
 import AnnotationsForm from "@/components/form/AnnotationsForm.vue";
 import AttachmentFileTypeIcon from "@/components/icon/AttachmentFileTypeIcon.vue";
+import SearchInput from "@/components/input/SearchInput.vue";
 import HasPermission from "@/components/permission/HasPermission.vue";
+import FormKitConfig from "@/formkit/formkit.config";
+import { defaultConfig, plugin as FormKit } from "@formkit/vue";
+import VueGridLayout from "vue-grid-layout";
 
 export function setupComponents(app: App) {
   app.use(VueGridLayout);

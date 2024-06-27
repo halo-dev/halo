@@ -1,7 +1,7 @@
 <script lang="ts" setup>
 // core libs
-import { computed, ref } from "vue";
 import type { Role, RoleList } from "@halo-dev/api-client";
+import { computed, ref } from "vue";
 
 // components
 import {
@@ -26,14 +26,14 @@ import { rbacAnnotations } from "@/constants/annotations";
 import { formatDatetime } from "@/utils/date";
 
 // libs
-import { coreApiClient } from "@halo-dev/api-client";
-import Fuse from "fuse.js";
-import { usePermission } from "@/utils/permission";
-import { roleLabels } from "@/constants/labels";
 import { SUPER_ROLE_NAME } from "@/constants/constants";
-import { useI18n } from "vue-i18n";
-import { useQuery } from "@tanstack/vue-query";
+import { roleLabels } from "@/constants/labels";
+import { usePermission } from "@/utils/permission";
 import { resolveDeepDependencies } from "@/utils/role";
+import { coreApiClient } from "@halo-dev/api-client";
+import { useQuery } from "@tanstack/vue-query";
+import Fuse from "fuse.js";
+import { useI18n } from "vue-i18n";
 
 const { currentUserHasPermission } = usePermission();
 const { t } = useI18n();

@@ -11,11 +11,11 @@ import {
   VTabbar,
 } from "@halo-dev/components";
 import { useQuery } from "@tanstack/vue-query";
-import { computed } from "vue";
 import { useRouteQuery } from "@vueuse/router";
-import NotificationListItem from "./components/NotificationListItem.vue";
 import { OverlayScrollbarsComponent } from "overlayscrollbars-vue";
+import { computed } from "vue";
 import NotificationContent from "./components/NotificationContent.vue";
+import NotificationListItem from "./components/NotificationListItem.vue";
 
 const { currentUser } = useUserStore();
 

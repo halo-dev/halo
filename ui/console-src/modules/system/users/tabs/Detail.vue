@@ -1,4 +1,7 @@
 <script lang="ts" setup>
+import { rbacAnnotations } from "@/constants/annotations";
+import { formatDatetime } from "@/utils/date";
+import type { DetailedUser } from "@halo-dev/api-client";
 import {
   IconInformation,
   IconUserSettings,
@@ -6,9 +9,6 @@ import {
   VDescriptionItem,
   VTag,
 } from "@halo-dev/components";
-import type { DetailedUser } from "@halo-dev/api-client";
-import { rbacAnnotations } from "@/constants/annotations";
-import { formatDatetime } from "@/utils/date";
 import RiVerifiedBadgeLine from "~icons/ri/verified-badge-line";
 
 withDefaults(defineProps<{ user?: DetailedUser }>(), {

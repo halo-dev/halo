@@ -1,27 +1,25 @@
 <script lang="ts" setup>
-import {
-  VTag,
-  VStatusDot,
-  Toast,
-  VDropdownItem,
-  VDropdown,
-  VDropdownDivider,
-  VButton,
-  VSpace,
-} from "@halo-dev/components";
+import { usePermission } from "@/utils/permission";
+import { useOperationItemExtensionPoint } from "@console/composables/use-operation-extension-points";
 import type { Theme } from "@halo-dev/api-client";
 import { consoleApiClient, coreApiClient } from "@halo-dev/api-client";
-import { toRefs, ref, inject, type Ref } from "vue";
-import { useThemeLifeCycle } from "../composables/use-theme";
-import { usePermission } from "@/utils/permission";
-import { useI18n } from "vue-i18n";
-import { useQueryClient } from "@tanstack/vue-query";
-import { useOperationItemExtensionPoint } from "@console/composables/use-operation-extension-points";
-import { markRaw } from "vue";
-import UninstallOperationItem from "./operation/UninstallOperationItem.vue";
-import { computed } from "vue";
+import {
+  Toast,
+  VButton,
+  VDropdown,
+  VDropdownDivider,
+  VDropdownItem,
+  VSpace,
+  VStatusDot,
+  VTag,
+} from "@halo-dev/components";
 import type { OperationItem } from "@halo-dev/console-shared";
+import { useQueryClient } from "@tanstack/vue-query";
+import { computed, inject, markRaw, ref, toRefs, type Ref } from "vue";
+import { useI18n } from "vue-i18n";
+import { useThemeLifeCycle } from "../composables/use-theme";
 import MoreOperationItem from "./operation/MoreOperationItem.vue";
+import UninstallOperationItem from "./operation/UninstallOperationItem.vue";
 
 const { currentUserHasPermission } = usePermission();
 const { t } = useI18n();

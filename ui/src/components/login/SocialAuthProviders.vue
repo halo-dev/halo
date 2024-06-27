@@ -1,6 +1,6 @@
 <script lang="ts" setup>
-import { ref, provide } from "vue";
 import type { Ref } from "vue";
+import { provide, ref } from "vue";
 
 // auth providers
 import { useGlobalInfoFetch } from "@console/composables/use-global-info";

@@ -46,3 +46,7 @@ data:
     {
       "primary": "primary"
     }
+  extensionPointEnabled: |
+    {
+      "search-engine": ["search-engine-lucene"]
+    }

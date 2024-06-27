@@ -1,7 +1,7 @@
 <script lang="ts" setup>
+import { computed } from "vue";
 import type { Align, Direction, Spacing } from "./interface";
 import { SpacingSize } from "./interface";
-import { computed } from "vue";
 
 const props = withDefaults(
   defineProps<{

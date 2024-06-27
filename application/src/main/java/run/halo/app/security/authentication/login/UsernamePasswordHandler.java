@@ -22,6 +22,7 @@ import org.springframework.web.server.ServerWebExchange;
 import reactor.core.publisher.Mono;
 import run.halo.app.security.authentication.rememberme.RememberMeServices;
 import run.halo.app.security.authentication.twofactor.TwoFactorAuthentication;
+import run.halo.app.security.device.DeviceService;
 
 @Slf4j
 public class UsernamePasswordHandler implements ServerAuthenticationSuccessHandler,
@@ -33,6 +34,8 @@ public class UsernamePasswordHandler implements ServerAuthenticationSuccessHandl
 
     private final RememberMeServices rememberMeServices;
 
+    private final DeviceService deviceService;
+
     private final ServerAuthenticationFailureHandler defaultFailureHandler =
         new RedirectServerAuthenticationFailureHandler("/console?error#/login");
 
@@ -40,10 +43,11 @@ public class UsernamePasswordHandler implements ServerAuthenticationSuccessHandl
         new RedirectServerAuthenticationSuccessHandler("/console/");
 
     public UsernamePasswordHandler(ServerResponse.Context context, MessageSource messageSource,
-        RememberMeServices rememberMeServices) {
+        RememberMeServices rememberMeServices, DeviceService deviceService) {
         this.context = context;
         this.messageSource = messageSource;
         this.rememberMeServices = rememberMeServices;
+        this.deviceService = deviceService;
     }
 
     @Override
@@ -68,6 +72,7 @@ public class UsernamePasswordHandler implements ServerAuthenticationSuccessHandl
         if (authentication instanceof TwoFactorAuthentication) {
             // continue filtering for authorization
             return rememberMeServices.loginSuccess(webFilterExchange.getExchange(), authentication)
+                .then(deviceService.loginSuccess(webFilterExchange.getExchange(), authentication))
                 .then(webFilterExchange.getChain().filter(webFilterExchange.getExchange()));
         }
 
@@ -85,6 +90,7 @@ public class UsernamePasswordHandler implements ServerAuthenticationSuccessHandl
 
         var exchange = webFilterExchange.getExchange();
         return rememberMeServices.loginSuccess(exchange, authentication)
+            .then(deviceService.loginSuccess(exchange, authentication))
             .then(xhrMatcher.matches(exchange)
                 .filter(ServerWebExchangeMatcher.MatchResult::isMatch)
                 .switchIfEmpty(Mono.defer(

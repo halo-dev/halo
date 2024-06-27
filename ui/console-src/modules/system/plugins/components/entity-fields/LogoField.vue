@@ -1,6 +1,6 @@
 <script lang="ts" setup>
-import { VAvatar, VEntityField } from "@halo-dev/components";
 import type { Plugin } from "@halo-dev/api-client";
+import { VAvatar, VEntityField } from "@halo-dev/components";
 withDefaults(
   defineProps<{
     plugin: Plugin;

@@ -203,6 +203,8 @@ core:
         description: >-
           Batch cancel publish posts, the selected posts will be set to
           unpublished status
+      batch_setting:
+        button: Batch settings
     filters:
       status:
         items:
@@ -285,6 +287,25 @@ core:
             create_time_asc: Earliest Created
             display_name_desc: Descending order by tag name
             display_name_asc: Ascending order by tag name
+    batch_setting_modal:
+      title: Post batch settings
+      fields:
+        common:
+          enabled: Enabled
+          op:
+            label: Operate
+            options:
+              add: Add
+              replace: Replace
+              remove_all: Remove all
+        category_group: Category
+        category_names: Select categories
+        tag_group: Tag
+        tag_names: Select tags
+        visible_group: Visible
+        visible_value: "Select visible option "
+        allow_comment_group: " Allow comment"
+        allow_comment_value: Choose whether to allow comments
   deleted_post:
     title: Deleted Posts
     empty:
@@ -395,11 +416,19 @@ core:
           help: >-
             Customize the rendering template of posts in the current category,
             which requires support from the theme
+        hide_from_list:
+          label: Hide from list
+          help: >-
+            After turning on this option, this category and its subcategories,
+            as well as its posts, will not be displayed in the front-end list.
+            You need to actively visit the category archive page. This feature
+            is only effective for the first-level directory.
     list:
       fields:
         prevent_parent_post_cascade_query: >-
           Prevent parent category from including this category and its
           subcategories in cascade post queries
+        hide_from_list: This category is hidden, This category and its subcategories, as well as its posts, will not be displayed in the front-end list. You need to actively visit the category archive page
   page:
     title: Pages
     actions:
@@ -1130,6 +1159,7 @@ core:
       detail: Detail
       notification-preferences: Notification Preferences
       pat: Personal Access Tokens
+      devices: Devices
     actions:
       update_profile:
         title: Update profile
@@ -1260,6 +1290,25 @@ core:
       titles:
         modify: Modify email address
         verify: Verify email
+    device:
+      list:
+        fields:
+          current: Current
+          last_accessed_time: "Last accessed time: {time}"
+      detail_modal:
+        title: Login device details
+        fields:
+          os: OS
+          browser: Browser
+          creation_timestamp: Creation time
+          last_accessed_times: Last accessed time
+          last_authenticated_time: Last authenticated time
+      operations:
+        revoke:
+          title: Revoke device
+          description: >-
+            Are you sure you want to revoke this device? After revoking, this
+            device will be logged out
   uc_notification:
     title: Notifications
     tabs:
@@ -1634,6 +1683,7 @@ core:
       modify: Modify
       access: Access
       schedule_publish: Schedule publish
+      revoke: Revoke
     radio:
       "yes": "Yes"
       "no": "No"

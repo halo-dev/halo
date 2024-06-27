@@ -1,43 +1,43 @@
-import TiptapTable, {
-  type TableOptions,
-  createColGroup,
-} from "@tiptap/extension-table";
+import { BlockActionSeparator, ToolboxItem } from "@/components";
+import { i18n } from "@/locales";
 import {
-  isActive,
-  type Editor,
-  type Range,
-  mergeAttributes,
-  isNodeActive,
   CoreEditor,
   findParentNode,
+  isActive,
+  isNodeActive,
+  mergeAttributes,
+  type Editor,
+  type Range,
 } from "@/tiptap";
 import {
-  type Node as ProseMirrorNode,
-  type NodeView,
-  type EditorState,
-  type DOMOutputSpec,
   TextSelection,
+  type DOMOutputSpec,
+  type EditorState,
+  type NodeView,
+  type Node as ProseMirrorNode,
 } from "@/tiptap/pm";
-import TableCell from "./table-cell";
-import TableRow from "./table-row";
-import TableHeader from "./table-header";
+import type { ExtensionOptions, NodeBubbleMenu } from "@/types";
+import TiptapTable, {
+  createColGroup,
+  type TableOptions,
+} from "@tiptap/extension-table";
+import { markRaw } from "vue";
+import FluentTableColumnTopBottom24Regular from "~icons/fluent/table-column-top-bottom-24-regular";
 import MdiTable from "~icons/mdi/table";
-import MdiTablePlus from "~icons/mdi/table-plus";
-import MdiTableColumnPlusBefore from "~icons/mdi/table-column-plus-before";
 import MdiTableColumnPlusAfter from "~icons/mdi/table-column-plus-after";
-import MdiTableRowPlusAfter from "~icons/mdi/table-row-plus-after";
-import MdiTableRowPlusBefore from "~icons/mdi/table-row-plus-before";
+import MdiTableColumnPlusBefore from "~icons/mdi/table-column-plus-before";
 import MdiTableColumnRemove from "~icons/mdi/table-column-remove";
-import MdiTableRowRemove from "~icons/mdi/table-row-remove";
-import MdiTableRemove from "~icons/mdi/table-remove";
 import MdiTableHeadersEye from "~icons/mdi/table-headers-eye";
 import MdiTableMergeCells from "~icons/mdi/table-merge-cells";
+import MdiTablePlus from "~icons/mdi/table-plus";
+import MdiTableRemove from "~icons/mdi/table-remove";
+import MdiTableRowPlusAfter from "~icons/mdi/table-row-plus-after";
+import MdiTableRowPlusBefore from "~icons/mdi/table-row-plus-before";
+import MdiTableRowRemove from "~icons/mdi/table-row-remove";
 import MdiTableSplitCell from "~icons/mdi/table-split-cell";
-import FluentTableColumnTopBottom24Regular from "~icons/fluent/table-column-top-bottom-24-regular";
-import { markRaw } from "vue";
-import { i18n } from "@/locales";
-import type { ExtensionOptions, NodeBubbleMenu } from "@/types";
-import { BlockActionSeparator, ToolboxItem } from "@/components";
+import TableCell from "./table-cell";
+import TableHeader from "./table-header";
+import TableRow from "./table-row";
 import {
   findNextCell,
   findPreviousCell,
@@ -208,6 +208,9 @@ class TableView implements NodeView {
 }
 
 const Table = TiptapTable.extend<ExtensionOptions & TableOptions>({
+  allowGapCursor: true,
+  fakeSelection: false,
+
   addExtensions() {
     return [TableCell, TableRow, TableHeader];
   },

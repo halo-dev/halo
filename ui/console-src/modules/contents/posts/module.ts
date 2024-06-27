@@ -1,16 +1,16 @@
-import { definePlugin } from "@halo-dev/console-shared";
 import BasicLayout from "@console/layouts/BasicLayout.vue";
 import BlankLayout from "@console/layouts/BlankLayout.vue";
 import { IconBookRead } from "@halo-dev/components";
-import PostList from "./PostList.vue";
+import { definePlugin } from "@halo-dev/console-shared";
+import { markRaw } from "vue";
 import DeletedPostList from "./DeletedPostList.vue";
 import PostEditor from "./PostEditor.vue";
+import PostList from "./PostList.vue";
+import PostSnapshots from "./PostSnapshots.vue";
 import CategoryList from "./categories/CategoryList.vue";
 import TagList from "./tags/TagList.vue";
 import PostStatsWidget from "./widgets/PostStatsWidget.vue";
 import RecentPublishedWidget from "./widgets/RecentPublishedWidget.vue";
-import { markRaw } from "vue";
-import PostSnapshots from "./PostSnapshots.vue";
 
 export default definePlugin({
   components: {

@@ -2559,9 +2559,20 @@
         ]
       }
     },
+    "/apis/api.console.halo.run/v1alpha1/indices/-/rebuild": {
+      "post": {
+        "description": "Rebuild all indices",
+        "operationId": "RebuildAllIndices",
+        "responses": {},
+        "tags": [
+          "IndicesV1alpha1Console"
+        ]
+      }
+    },
     "/apis/api.console.halo.run/v1alpha1/indices/post": {
       "post": {
-        "description": "Build or rebuild post indices for full text search",
+        "deprecated": true,
+        "description": "Build or rebuild post indices for full text search. This method is deprecated, please use POST /indices/-/rebuild instead.",
         "operationId": "BuildPostIndices",
         "responses": {},
         "tags": [
@@ -6176,9 +6187,41 @@
         ]
       }
     },
+    "/apis/api.halo.run/v1alpha1/indices/-/search": {
+      "post": {
+        "description": "Search indices.",
+        "operationId": "IndicesSearch",
+        "requestBody": {
+          "content": {
+            "*/*": {
+              "schema": {
+                "$ref": "#/components/schemas/SearchOption"
+              }
+            }
+          },
+          "description": "Please note that the \"filterPublished\", \"filterExposed\" and \"filterRecycled\" fields are ignored in this endpoint."
+        },
+        "responses": {
+          "default": {
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/SearchResult"
+                }
+              }
+            },
+            "description": "default response"
+          }
+        },
+        "tags": [
+          "IndexV1alpha1Public"
+        ]
+      }
+    },
     "/apis/api.halo.run/v1alpha1/indices/post": {
       "get": {
-        "description": "Search posts with fuzzy query",
+        "deprecated": true,
+        "description": "Search posts with fuzzy query. This method is deprecated, please use POST /indices/-/search instead.",
         "operationId": "SearchPost",
         "parameters": [
           {
@@ -6221,7 +6264,7 @@
             "content": {
               "*/*": {
                 "schema": {
-                  "$ref": "#/components/schemas/PostHits"
+                  "$ref": "#/components/schemas/SearchResult"
                 }
               }
             },
@@ -6229,7 +6272,7 @@
           }
         },
         "tags": [
-          "PostV1alpha1Public"
+          "IndexV1alpha1Public"
         ]
       }
     },
@@ -12166,6 +12209,243 @@
         ]
       }
     },
+    "/apis/security.halo.run/v1alpha1/devices": {
+      "get": {
+        "description": "List v1alpha1",
+        "operationId": "listv1alpha1",
+        "parameters": [
+          {
+            "description": "Page number. Default is 0.",
+            "in": "query",
+            "name": "page",
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          },
+          {
+            "description": "Size number. Default is 0.",
+            "in": "query",
+            "name": "size",
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          },
+          {
+            "description": "Label selector. e.g.: hidden!\u003dtrue",
+            "in": "query",
+            "name": "labelSelector",
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            }
+          },
+          {
+            "description": "Field selector. e.g.: metadata.name\u003d\u003dhalo",
+            "in": "query",
+            "name": "fieldSelector",
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            }
+          },
+          {
+            "description": "Sorting criteria in the format: property,(asc|desc). Default sort order is ascending. Multiple sort criteria are supported.",
+            "in": "query",
+            "name": "sort",
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/v1alpha1List"
+                }
+              }
+            },
+            "description": "Response devices"
+          }
+        },
+        "tags": [
+          "v1alpha1V1alpha1"
+        ]
+      },
+      "post": {
+        "description": "Create v1alpha1",
+        "operationId": "createv1alpha1",
+        "requestBody": {
+          "content": {
+            "*/*": {
+              "schema": {
+                "$ref": "#/components/schemas/Device"
+              }
+            }
+          },
+          "description": "Fresh device"
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/Device"
+                }
+              }
+            },
+            "description": "Response devices created just now"
+          }
+        },
+        "tags": [
+          "v1alpha1V1alpha1"
+        ]
+      }
+    },
+    "/apis/security.halo.run/v1alpha1/devices/{name}": {
+      "delete": {
+        "description": "Delete v1alpha1",
+        "operationId": "deletev1alpha1",
+        "parameters": [
+          {
+            "description": "Name of device",
+            "in": "path",
+            "name": "name",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Response device deleted just now"
+          }
+        },
+        "tags": [
+          "v1alpha1V1alpha1"
+        ]
+      },
+      "get": {
+        "description": "Get v1alpha1",
+        "operationId": "getv1alpha1",
+        "parameters": [
+          {
+            "description": "Name of device",
+            "in": "path",
+            "name": "name",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/Device"
+                }
+              }
+            },
+            "description": "Response single device"
+          }
+        },
+        "tags": [
+          "v1alpha1V1alpha1"
+        ]
+      },
+      "patch": {
+        "description": "Patch v1alpha1",
+        "operationId": "patchv1alpha1",
+        "parameters": [
+          {
+            "description": "Name of device",
+            "in": "path",
+            "name": "name",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json-patch+json": {
+              "schema": {
+                "$ref": "#/components/schemas/JsonPatch"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/Device"
+                }
+              }
+            },
+            "description": "Response device patched just now"
+          }
+        },
+        "tags": [
+          "v1alpha1V1alpha1"
+        ]
+      },
+      "put": {
+        "description": "Update v1alpha1",
+        "operationId": "updatev1alpha1",
+        "parameters": [
+          {
+            "description": "Name of device",
+            "in": "path",
+            "name": "name",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "*/*": {
+              "schema": {
+                "$ref": "#/components/schemas/Device"
+              }
+            }
+          },
+          "description": "Updated device"
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/Device"
+                }
+              }
+            },
+            "description": "Response devices updated just now"
+          }
+        },
+        "tags": [
+          "v1alpha1V1alpha1"
+        ]
+      }
+    },
     "/apis/security.halo.run/v1alpha1/personalaccesstokens": {
       "get": {
         "description": "List PersonalAccessToken",
@@ -12400,6 +12680,243 @@
         },
         "tags": [
           "PersonalAccessTokenV1alpha1"
+        ]
+      }
+    },
+    "/apis/security.halo.run/v1alpha1/remembermetokens": {
+      "get": {
+        "description": "List RememberMeToken",
+        "operationId": "listRememberMeToken",
+        "parameters": [
+          {
+            "description": "Page number. Default is 0.",
+            "in": "query",
+            "name": "page",
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          },
+          {
+            "description": "Size number. Default is 0.",
+            "in": "query",
+            "name": "size",
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          },
+          {
+            "description": "Label selector. e.g.: hidden!\u003dtrue",
+            "in": "query",
+            "name": "labelSelector",
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            }
+          },
+          {
+            "description": "Field selector. e.g.: metadata.name\u003d\u003dhalo",
+            "in": "query",
+            "name": "fieldSelector",
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            }
+          },
+          {
+            "description": "Sorting criteria in the format: property,(asc|desc). Default sort order is ascending. Multiple sort criteria are supported.",
+            "in": "query",
+            "name": "sort",
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/RememberMeTokenList"
+                }
+              }
+            },
+            "description": "Response remembermetokens"
+          }
+        },
+        "tags": [
+          "RememberMeTokenV1alpha1"
+        ]
+      },
+      "post": {
+        "description": "Create RememberMeToken",
+        "operationId": "createRememberMeToken",
+        "requestBody": {
+          "content": {
+            "*/*": {
+              "schema": {
+                "$ref": "#/components/schemas/RememberMeToken"
+              }
+            }
+          },
+          "description": "Fresh remembermetoken"
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/RememberMeToken"
+                }
+              }
+            },
+            "description": "Response remembermetokens created just now"
+          }
+        },
+        "tags": [
+          "RememberMeTokenV1alpha1"
+        ]
+      }
+    },
+    "/apis/security.halo.run/v1alpha1/remembermetokens/{name}": {
+      "delete": {
+        "description": "Delete RememberMeToken",
+        "operationId": "deleteRememberMeToken",
+        "parameters": [
+          {
+            "description": "Name of remembermetoken",
+            "in": "path",
+            "name": "name",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Response remembermetoken deleted just now"
+          }
+        },
+        "tags": [
+          "RememberMeTokenV1alpha1"
+        ]
+      },
+      "get": {
+        "description": "Get RememberMeToken",
+        "operationId": "getRememberMeToken",
+        "parameters": [
+          {
+            "description": "Name of remembermetoken",
+            "in": "path",
+            "name": "name",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/RememberMeToken"
+                }
+              }
+            },
+            "description": "Response single remembermetoken"
+          }
+        },
+        "tags": [
+          "RememberMeTokenV1alpha1"
+        ]
+      },
+      "patch": {
+        "description": "Patch RememberMeToken",
+        "operationId": "patchRememberMeToken",
+        "parameters": [
+          {
+            "description": "Name of remembermetoken",
+            "in": "path",
+            "name": "name",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json-patch+json": {
+              "schema": {
+                "$ref": "#/components/schemas/JsonPatch"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/RememberMeToken"
+                }
+              }
+            },
+            "description": "Response remembermetoken patched just now"
+          }
+        },
+        "tags": [
+          "RememberMeTokenV1alpha1"
+        ]
+      },
+      "put": {
+        "description": "Update RememberMeToken",
+        "operationId": "updateRememberMeToken",
+        "parameters": [
+          {
+            "description": "Name of remembermetoken",
+            "in": "path",
+            "name": "name",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "*/*": {
+              "schema": {
+                "$ref": "#/components/schemas/RememberMeToken"
+              }
+            }
+          },
+          "description": "Updated remembermetoken"
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/RememberMeToken"
+                }
+              }
+            },
+            "description": "Response remembermetokens updated just now"
+          }
+        },
+        "tags": [
+          "RememberMeTokenV1alpha1"
         ]
       }
     },
@@ -14184,6 +14701,55 @@
         ]
       }
     },
+    "/apis/uc.api.security.halo.run/v1alpha1/devices": {
+      "get": {
+        "description": "List all user devices",
+        "operationId": "ListDevices",
+        "responses": {
+          "default": {
+            "content": {
+              "*/*": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/UserDevice"
+                  }
+                }
+              }
+            },
+            "description": "default response"
+          }
+        },
+        "tags": [
+          "DeviceV1alpha1Uc"
+        ]
+      }
+    },
+    "/apis/uc.api.security.halo.run/v1alpha1/devices/{deviceId}": {
+      "delete": {
+        "description": "Revoke a own device",
+        "operationId": "RevokeDevice",
+        "parameters": [
+          {
+            "description": "Device ID",
+            "in": "path",
+            "name": "deviceId",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "204 NO_CONTENT": {
+            "description": "default response"
+          }
+        },
+        "tags": [
+          "DeviceV1alpha1Uc"
+        ]
+      }
+    },
     "/apis/uc.api.security.halo.run/v1alpha1/personalaccesstokens": {
       "get": {
         "description": "Obtain PAT list.",
@@ -14982,6 +15548,9 @@
           "displayName": {
             "minLength": 1,
             "type": "string"
+          },
+          "hideFromList": {
+            "type": "boolean"
           },
           "postTemplate": {
             "maxLength": 255,
@@ -16075,6 +16644,81 @@
           }
         }
       },
+      "Device": {
+        "required": [
+          "apiVersion",
+          "kind",
+          "metadata",
+          "spec",
+          "status"
+        ],
+        "type": "object",
+        "properties": {
+          "apiVersion": {
+            "type": "string"
+          },
+          "kind": {
+            "type": "string"
+          },
+          "metadata": {
+            "$ref": "#/components/schemas/Metadata"
+          },
+          "spec": {
+            "$ref": "#/components/schemas/DeviceSpec"
+          },
+          "status": {
+            "$ref": "#/components/schemas/DeviceStatus"
+          }
+        }
+      },
+      "DeviceSpec": {
+        "required": [
+          "ipAddress",
+          "principalName",
+          "sessionId"
+        ],
+        "type": "object",
+        "properties": {
+          "ipAddress": {
+            "maxLength": 129,
+            "type": "string"
+          },
+          "lastAccessedTime": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "lastAuthenticatedTime": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "principalName": {
+            "minLength": 1,
+            "type": "string"
+          },
+          "rememberMeSeriesId": {
+            "type": "string"
+          },
+          "sessionId": {
+            "minLength": 1,
+            "type": "string"
+          },
+          "userAgent": {
+            "maxLength": 500,
+            "type": "string"
+          }
+        }
+      },
+      "DeviceStatus": {
+        "type": "object",
+        "properties": {
+          "browser": {
+            "type": "string"
+          },
+          "os": {
+            "type": "string"
+          }
+        }
+      },
       "EmailConfigValidationRequest": {
         "type": "object",
         "properties": {
@@ -16511,6 +17155,79 @@
           "updateTimestamp": {
             "type": "string",
             "description": "Update timestamp of the group",
+            "format": "date-time"
+          }
+        }
+      },
+      "HaloDocument": {
+        "required": [
+          "content",
+          "id",
+          "metadataName",
+          "ownerName",
+          "permalink",
+          "title",
+          "type"
+        ],
+        "type": "object",
+        "properties": {
+          "annotations": {
+            "type": "object",
+            "additionalProperties": {
+              "type": "string"
+            }
+          },
+          "categories": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "content": {
+            "type": "string"
+          },
+          "creationTimestamp": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "description": {
+            "type": "string"
+          },
+          "exposed": {
+            "type": "boolean"
+          },
+          "id": {
+            "type": "string"
+          },
+          "metadataName": {
+            "type": "string"
+          },
+          "ownerName": {
+            "type": "string"
+          },
+          "permalink": {
+            "type": "string"
+          },
+          "published": {
+            "type": "boolean"
+          },
+          "recycled": {
+            "type": "boolean"
+          },
+          "tags": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "title": {
+            "type": "string"
+          },
+          "type": {
+            "type": "string"
+          },
+          "updateTimestamp": {
+            "type": "string",
             "format": "date-time"
           }
         }
@@ -18811,53 +19528,6 @@
           }
         }
       },
-      "PostHit": {
-        "type": "object",
-        "properties": {
-          "content": {
-            "type": "string"
-          },
-          "name": {
-            "type": "string"
-          },
-          "permalink": {
-            "type": "string"
-          },
-          "publishTimestamp": {
-            "type": "string",
-            "format": "date-time"
-          },
-          "title": {
-            "type": "string"
-          }
-        }
-      },
-      "PostHits": {
-        "type": "object",
-        "properties": {
-          "hits": {
-            "type": "array",
-            "items": {
-              "$ref": "#/components/schemas/PostHit"
-            }
-          },
-          "keyword": {
-            "type": "string"
-          },
-          "limit": {
-            "type": "integer",
-            "format": "int32"
-          },
-          "processingTimeMillis": {
-            "type": "integer",
-            "format": "int64"
-          },
-          "total": {
-            "type": "integer",
-            "format": "int64"
-          }
-        }
-      },
       "PostList": {
         "required": [
           "first",
@@ -19022,12 +19692,12 @@
           },
           "visible": {
             "type": "string",
+            "default": "PUBLIC",
             "enum": [
               "PUBLIC",
               "INTERNAL",
               "PRIVATE"
-            ],
-            "default": "PUBLIC"
+            ]
           }
         }
       },
@@ -19060,6 +19730,9 @@
           },
           "excerpt": {
             "type": "string"
+          },
+          "hideFromList": {
+            "type": "boolean"
           },
           "inProgress": {
             "type": "boolean"
@@ -19520,6 +20193,114 @@
         "type": "object",
         "properties": {
           "email": {
+            "type": "string"
+          }
+        }
+      },
+      "RememberMeToken": {
+        "required": [
+          "apiVersion",
+          "kind",
+          "metadata",
+          "spec"
+        ],
+        "type": "object",
+        "properties": {
+          "apiVersion": {
+            "type": "string"
+          },
+          "kind": {
+            "type": "string"
+          },
+          "metadata": {
+            "$ref": "#/components/schemas/Metadata"
+          },
+          "spec": {
+            "$ref": "#/components/schemas/RememberMeTokenSpec"
+          }
+        }
+      },
+      "RememberMeTokenList": {
+        "required": [
+          "first",
+          "hasNext",
+          "hasPrevious",
+          "items",
+          "last",
+          "page",
+          "size",
+          "total",
+          "totalPages"
+        ],
+        "type": "object",
+        "properties": {
+          "first": {
+            "type": "boolean",
+            "description": "Indicates whether current page is the first page."
+          },
+          "hasNext": {
+            "type": "boolean",
+            "description": "Indicates whether current page has previous page."
+          },
+          "hasPrevious": {
+            "type": "boolean",
+            "description": "Indicates whether current page has previous page."
+          },
+          "items": {
+            "type": "array",
+            "description": "A chunk of items.",
+            "items": {
+              "$ref": "#/components/schemas/RememberMeToken"
+            }
+          },
+          "last": {
+            "type": "boolean",
+            "description": "Indicates whether current page is the last page."
+          },
+          "page": {
+            "type": "integer",
+            "description": "Page number, starts from 1. If not set or equal to 0, it means no pagination.",
+            "format": "int32"
+          },
+          "size": {
+            "type": "integer",
+            "description": "Size of each page. If not set or equal to 0, it means no pagination.",
+            "format": "int32"
+          },
+          "total": {
+            "type": "integer",
+            "description": "Total elements.",
+            "format": "int64"
+          },
+          "totalPages": {
+            "type": "integer",
+            "description": "Indicates total pages.",
+            "format": "int64"
+          }
+        }
+      },
+      "RememberMeTokenSpec": {
+        "required": [
+          "series",
+          "tokenValue",
+          "username"
+        ],
+        "type": "object",
+        "properties": {
+          "lastUsed": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "series": {
+            "minLength": 1,
+            "type": "string"
+          },
+          "tokenValue": {
+            "minLength": 1,
+            "type": "string"
+          },
+          "username": {
+            "minLength": 1,
             "type": "string"
           }
         }
@@ -20290,6 +21071,94 @@
           }
         }
       },
+      "SearchOption": {
+        "required": [
+          "keyword"
+        ],
+        "type": "object",
+        "properties": {
+          "annotations": {
+            "type": "object",
+            "additionalProperties": {
+              "type": "string"
+            }
+          },
+          "filterExposed": {
+            "type": "boolean"
+          },
+          "filterPublished": {
+            "type": "boolean"
+          },
+          "filterRecycled": {
+            "type": "boolean"
+          },
+          "highlightPostTag": {
+            "type": "string"
+          },
+          "highlightPreTag": {
+            "type": "string"
+          },
+          "includeCategoryNames": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "includeOwnerNames": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "includeTagNames": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "includeTypes": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "keyword": {
+            "type": "string"
+          },
+          "limit": {
+            "maximum": 1000,
+            "minimum": 1,
+            "type": "integer",
+            "format": "int32"
+          }
+        }
+      },
+      "SearchResult": {
+        "type": "object",
+        "properties": {
+          "hits": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/HaloDocument"
+            }
+          },
+          "keyword": {
+            "type": "string"
+          },
+          "limit": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "processingTimeMillis": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "total": {
+            "type": "integer",
+            "format": "int64"
+          }
+        }
+      },
       "Secret": {
         "required": [
           "apiVersion",
@@ -20723,12 +21592,12 @@
           },
           "visible": {
             "type": "string",
+            "default": "PUBLIC",
             "enum": [
               "PUBLIC",
               "INTERNAL",
               "PRIVATE"
-            ],
-            "default": "PUBLIC"
+            ]
           }
         }
       },
@@ -20761,6 +21630,9 @@
           },
           "excerpt": {
             "type": "string"
+          },
+          "hideFromList": {
+            "type": "boolean"
           },
           "inProgress": {
             "type": "boolean"
@@ -21120,9 +21992,13 @@
         }
       },
       "SubscriptionSubscriber": {
+        "required": [
+          "name"
+        ],
         "type": "object",
         "properties": {
           "name": {
+            "minLength": 1,
             "type": "string"
           }
         },
@@ -21827,6 +22703,25 @@
           }
         }
       },
+      "UserDevice": {
+        "required": [
+          "active",
+          "currentDevice",
+          "device"
+        ],
+        "type": "object",
+        "properties": {
+          "active": {
+            "type": "boolean"
+          },
+          "currentDevice": {
+            "type": "boolean"
+          },
+          "device": {
+            "$ref": "#/components/schemas/Device"
+          }
+        }
+      },
       "UserEndpoint.ListedUserList": {
         "required": [
           "first",
@@ -22067,6 +22962,65 @@
           },
           "plural": {
             "type": "string"
+          }
+        }
+      },
+      "v1alpha1List": {
+        "required": [
+          "first",
+          "hasNext",
+          "hasPrevious",
+          "items",
+          "last",
+          "page",
+          "size",
+          "total",
+          "totalPages"
+        ],
+        "type": "object",
+        "properties": {
+          "first": {
+            "type": "boolean",
+            "description": "Indicates whether current page is the first page."
+          },
+          "hasNext": {
+            "type": "boolean",
+            "description": "Indicates whether current page has previous page."
+          },
+          "hasPrevious": {
+            "type": "boolean",
+            "description": "Indicates whether current page has previous page."
+          },
+          "items": {
+            "type": "array",
+            "description": "A chunk of items.",
+            "items": {
+              "$ref": "#/components/schemas/Device"
+            }
+          },
+          "last": {
+            "type": "boolean",
+            "description": "Indicates whether current page is the last page."
+          },
+          "page": {
+            "type": "integer",
+            "description": "Page number, starts from 1. If not set or equal to 0, it means no pagination.",
+            "format": "int32"
+          },
+          "size": {
+            "type": "integer",
+            "description": "Size of each page. If not set or equal to 0, it means no pagination.",
+            "format": "int32"
+          },
+          "total": {
+            "type": "integer",
+            "description": "Total elements.",
+            "format": "int64"
+          },
+          "totalPages": {
+            "type": "integer",
+            "description": "Indicates total pages.",
+            "format": "int64"
           }
         }
       }

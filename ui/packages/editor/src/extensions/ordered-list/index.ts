@@ -1,12 +1,12 @@
-import type { Editor, Range } from "@/tiptap/vue-3";
-import TiptapOrderedList from "@tiptap/extension-ordered-list";
-import type { OrderedListOptions } from "@tiptap/extension-ordered-list";
-import ExtensionListItem from "@tiptap/extension-list-item";
 import ToolbarItem from "@/components/toolbar/ToolbarItem.vue";
-import MdiFormatListNumbered from "~icons/mdi/format-list-numbered";
-import { markRaw } from "vue";
 import { i18n } from "@/locales";
+import type { Editor, Range } from "@/tiptap/vue-3";
 import type { ExtensionOptions } from "@/types";
+import ExtensionListItem from "@tiptap/extension-list-item";
+import type { OrderedListOptions } from "@tiptap/extension-ordered-list";
+import TiptapOrderedList from "@tiptap/extension-ordered-list";
+import { markRaw } from "vue";
+import MdiFormatListNumbered from "~icons/mdi/format-list-numbered";
 
 const OrderedList = TiptapOrderedList.extend<
   ExtensionOptions & OrderedListOptions

@@ -17,9 +17,11 @@ api/comment-v1alpha1-console-api.ts
 api/comment-v1alpha1-public-api.ts
 api/config-map-v1alpha1-api.ts
 api/counter-v1alpha1-api.ts
+api/device-v1alpha1-uc-api.ts
 api/extension-definition-v1alpha1-api.ts
 api/extension-point-definition-v1alpha1-api.ts
 api/group-v1alpha1-api.ts
+api/index-v1alpha1-public-api.ts
 api/indices-v1alpha1-console-api.ts
 api/login-api.ts
 api/menu-item-v1alpha1-api.ts
@@ -46,6 +48,7 @@ api/post-v1alpha1-public-api.ts
 api/post-v1alpha1-uc-api.ts
 api/reason-type-v1alpha1-api.ts
 api/reason-v1alpha1-api.ts
+api/remember-me-token-v1alpha1-api.ts
 api/reply-v1alpha1-api.ts
 api/reply-v1alpha1-console-api.ts
 api/reverse-proxy-v1alpha1-api.ts
@@ -72,6 +75,7 @@ api/user-connection-v1alpha1-api.ts
 api/user-v1alpha1-api.ts
 api/user-v1alpha1-console-api.ts
 api/user-v1alpha1-public-api.ts
+api/v1alpha1-v1alpha1-api.ts
 base.ts
 common.ts
 configuration.ts
@@ -132,6 +136,9 @@ models/create-user-request.ts
 models/custom-templates.ts
 models/dashboard-stats.ts
 models/detailed-user.ts
+models/device-spec.ts
+models/device-status.ts
+models/device.ts
 models/email-config-validation-request.ts
 models/email-verify-request.ts
 models/excerpt.ts
@@ -149,6 +156,7 @@ models/group-list.ts
 models/group-spec.ts
 models/group-status.ts
 models/group.ts
+models/halo-document.ts
 models/index.ts
 models/install-from-uri-request.ts
 models/interest-reason-subject.ts
@@ -216,8 +224,6 @@ models/policy-template-list.ts
 models/policy-template-spec.ts
 models/policy-template.ts
 models/policy.ts
-models/post-hit.ts
-models/post-hits.ts
 models/post-list.ts
 models/post-request.ts
 models/post-spec.ts
@@ -241,6 +247,9 @@ models/reason-type.ts
 models/reason.ts
 models/ref.ts
 models/register-verify-email-request.ts
+models/remember-me-token-list.ts
+models/remember-me-token-spec.ts
+models/remember-me-token.ts
 models/remove-operation.ts
 models/replace-operation.ts
 models/reply-list.ts
@@ -264,6 +273,8 @@ models/role.ts
 models/search-engine-list.ts
 models/search-engine-spec.ts
 models/search-engine.ts
+models/search-option.ts
+models/search-result.ts
 models/secret-list.ts
 models/secret.ts
 models/setting-form.ts
@@ -310,11 +321,13 @@ models/upgrade-from-uri-request.ts
 models/user-connection-list.ts
 models/user-connection-spec.ts
 models/user-connection.ts
+models/user-device.ts
 models/user-endpoint-listed-user-list.ts
 models/user-list.ts
 models/user-permission.ts
 models/user-spec.ts
 models/user-status.ts
 models/user.ts
+models/v1alpha1-list.ts
 models/verify-code-request.ts
 models/vote-request.ts

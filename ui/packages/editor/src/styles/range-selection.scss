@@ -1,0 +1,33 @@
+.halo-rich-text-editor {
+  $editorRangeFakeSelection: rgba(27, 162, 227, 0.2);
+
+  .no-selection {
+    *::selection {
+      background-color: transparent;
+      color: inherit;
+    }
+  }
+
+  .range-fake-selection {
+    position: relative;
+
+    &::after {
+      content: " ";
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background-color: $editorRangeFakeSelection;
+      pointer-events: none;
+      z-index: 99;
+      caret-color: transparent;
+    }
+
+    &.column {
+      &::after {
+        border-radius: 5px;
+      }
+    }
+  }
+}
