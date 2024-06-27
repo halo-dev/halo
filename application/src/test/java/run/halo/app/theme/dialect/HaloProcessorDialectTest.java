@@ -3,6 +3,7 @@ package run.halo.app.theme.dialect;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.lenient;
+import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 import com.google.common.collect.ImmutableSortedMap;
@@ -17,7 +18,9 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.context.ApplicationContext;
+import org.springframework.core.annotation.AnnotationAwareOrderComparator;
 import org.thymeleaf.IEngineConfiguration;
 import org.thymeleaf.TemplateEngine;
 import org.thymeleaf.context.Context;
@@ -26,13 +29,16 @@ import org.thymeleaf.spring6.expression.ThymeleafEvaluationContext;
 import org.thymeleaf.templateresolver.StringTemplateResolver;
 import org.thymeleaf.templateresource.ITemplateResource;
 import org.thymeleaf.templateresource.StringTemplateResource;
+import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import run.halo.app.core.extension.User;
 import run.halo.app.core.extension.content.Post;
 import run.halo.app.extension.Metadata;
 import run.halo.app.infra.SystemConfigurableEnvironmentFetcher;
 import run.halo.app.infra.SystemSetting;
-import run.halo.app.plugin.ExtensionComponentsFinder;
+import run.halo.app.infra.SystemSetting.CodeInjection;
+import run.halo.app.infra.SystemSetting.Seo;
+import run.halo.app.plugin.extensionpoint.ExtensionGetter;
 import run.halo.app.theme.DefaultTemplateEnum;
 import run.halo.app.theme.finders.PostFinder;
 import run.halo.app.theme.finders.SinglePageFinder;
@@ -67,7 +73,7 @@ class HaloProcessorDialectTest {
     private SystemConfigurableEnvironmentFetcher fetcher;
 
     @Mock
-    private ExtensionComponentsFinder extensionComponentsFinder;
+    ExtensionGetter extensionGetter;
 
     private TemplateEngine templateEngine;
 
@@ -84,29 +90,30 @@ class HaloProcessorDialectTest {
         map.put("templateGlobalHeadProcessor", new TemplateGlobalHeadProcessor(fetcher));
         map.put("faviconHeadProcessor", new DefaultFaviconHeadProcessor(fetcher));
         map.put("globalSeoProcessor", new GlobalSeoProcessor(fetcher));
-        lenient().when(applicationContext.getBeansOfType(eq(TemplateHeadProcessor.class)))
-            .thenReturn(map);
 
-        SystemSetting.CodeInjection codeInjection = new SystemSetting.CodeInjection();
+        CodeInjection codeInjection = new CodeInjection();
         codeInjection.setContentHead("<meta name=\"content-head-test\" content=\"test\" />");
         codeInjection.setGlobalHead("<meta name=\"global-head-test\" content=\"test\" />");
         codeInjection.setFooter("<footer>hello this is global footer.</footer>");
-        lenient().when(fetcher.fetch(eq(SystemSetting.CodeInjection.GROUP),
-            eq(SystemSetting.CodeInjection.class))).thenReturn(Mono.just(codeInjection));
+        lenient().when(fetcher.fetch(eq(CodeInjection.GROUP), eq(CodeInjection.class)))
+            .thenReturn(Mono.just(codeInjection));
 
         lenient().when(applicationContext.getBean(eq(SystemConfigurableEnvironmentFetcher.class)))
             .thenReturn(fetcher);
-        lenient().when(fetcher.fetch(eq(SystemSetting.Seo.GROUP),
-            eq(SystemSetting.Seo.class))).thenReturn(Mono.empty());
+        lenient().when(fetcher.fetch(eq(Seo.GROUP), eq(Seo.class)))
+            .thenReturn(Mono.empty());
 
-        lenient().when(applicationContext.getBean(eq(ExtensionComponentsFinder.class)))
-            .thenReturn(extensionComponentsFinder);
+        lenient().when(applicationContext.getBeanProvider(ExtensionGetter.class))
+            .then(invocation -> {
+                @SuppressWarnings("unchecked")
+                ObjectProvider<ExtensionGetter> objectProvider = mock(ObjectProvider.class);
+                when(objectProvider.getIfUnique()).thenReturn(extensionGetter);
+                return objectProvider;
+            });
+        lenient().when(extensionGetter.getExtensions(TemplateHeadProcessor.class)).thenReturn(
+            Flux.fromIterable(map.values()).sort(AnnotationAwareOrderComparator.INSTANCE)
+        );
 
-        lenient().when(extensionComponentsFinder.getExtensions(eq(TemplateHeadProcessor.class)))
-            .thenReturn(new ArrayList<>(map.values()));
-
-        lenient().when(applicationContext.getBean(eq(SystemConfigurableEnvironmentFetcher.class)))
-            .thenReturn(fetcher);
         lenient().when(fetcher.fetchComment())
             .thenReturn(Mono.just(new SystemSetting.Comment()));
     }
@@ -192,10 +199,10 @@ class HaloProcessorDialectTest {
     @Test
     void blockSeo() {
         final Context context = getContext();
-        SystemSetting.Seo seo = new SystemSetting.Seo();
+        Seo seo = new Seo();
         seo.setBlockSpiders(true);
-        when(fetcher.fetch(eq(SystemSetting.Seo.GROUP),
-            eq(SystemSetting.Seo.class))).thenReturn(Mono.just(seo));
+        when(fetcher.fetch(eq(Seo.GROUP),
+            eq(Seo.class))).thenReturn(Mono.just(seo));
         SystemSetting.Basic basic = new SystemSetting.Basic();
         basic.setFavicon("favicon.ico");
         when(fetcher.fetch(eq(SystemSetting.Basic.GROUP),
@@ -222,11 +229,11 @@ class HaloProcessorDialectTest {
     @Test
     void seoWithKeywordsAndDescription() {
         final Context context = getContext();
-        SystemSetting.Seo seo = new SystemSetting.Seo();
+        Seo seo = new Seo();
         seo.setKeywords("K1, K2, K3");
         seo.setDescription("This is a description.");
-        when(fetcher.fetch(eq(SystemSetting.Seo.GROUP),
-            eq(SystemSetting.Seo.class))).thenReturn(Mono.just(seo));
+        when(fetcher.fetch(eq(Seo.GROUP),
+            eq(Seo.class))).thenReturn(Mono.just(seo));
         SystemSetting.Basic basic = new SystemSetting.Basic();
         basic.setFavicon("favicon.ico");
         when(fetcher.fetch(eq(SystemSetting.Basic.GROUP),

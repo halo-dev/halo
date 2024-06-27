@@ -34,7 +34,7 @@ import run.halo.app.infra.SystemConfigurableEnvironmentFetcher;
 import run.halo.app.infra.exception.AccessDeniedException;
 import run.halo.app.metrics.CounterService;
 import run.halo.app.metrics.MeterUtils;
-import run.halo.app.plugin.ExtensionComponentsFinder;
+import run.halo.app.plugin.extensionpoint.ExtensionGetter;
 import run.halo.app.security.authorization.AuthorityUtils;
 
 /**
@@ -49,22 +49,23 @@ public class CommentServiceImpl implements CommentService {
     private final ReactiveExtensionClient client;
     private final UserService userService;
     private final RoleService roleService;
-    private final ExtensionComponentsFinder extensionComponentsFinder;
+    private final ExtensionGetter extensionGetter;
 
     private final SystemConfigurableEnvironmentFetcher environmentFetcher;
     private final CounterService counterService;
 
     public CommentServiceImpl(ReactiveExtensionClient client,
-        UserService userService, ExtensionComponentsFinder extensionComponentsFinder,
+        UserService userService,
         SystemConfigurableEnvironmentFetcher environmentFetcher,
-        CounterService counterService, RoleService roleService
+        CounterService counterService, RoleService roleService,
+        ExtensionGetter extensionGetter
     ) {
         this.client = client;
         this.userService = userService;
-        this.extensionComponentsFinder = extensionComponentsFinder;
         this.environmentFetcher = environmentFetcher;
         this.counterService = counterService;
         this.roleService = roleService;
+        this.extensionGetter = extensionGetter;
     }
 
     @Override
@@ -247,11 +248,9 @@ public class CommentServiceImpl implements CommentService {
 
     @SuppressWarnings("unchecked")
     Mono<Extension> getCommentSubject(Ref ref) {
-        return extensionComponentsFinder.getExtensions(CommentSubject.class)
-            .stream()
-            .filter(commentSubject -> commentSubject.supports(ref))
-            .findFirst()
-            .map(commentSubject -> commentSubject.get(ref.getName()))
-            .orElseGet(Mono::empty);
+        return extensionGetter.getExtensions(CommentSubject.class)
+            .filter(subject -> subject.supports(ref))
+            .next()
+            .flatMap(subject -> subject.get(ref.getName()));
     }
 }

@@ -30,7 +30,6 @@ import run.halo.app.extension.Ref;
 import run.halo.app.infra.ExternalLinkProcessor;
 import run.halo.app.infra.utils.JsonUtils;
 import run.halo.app.notification.NotificationReasonEmitter;
-import run.halo.app.plugin.ExtensionComponentsFinder;
 import run.halo.app.plugin.extensionpoint.ExtensionGetter;
 
 /**
@@ -233,7 +232,7 @@ public class CommentNotificationReasonPublisher {
     static class NewReplyReasonPublisher {
         private final ExtensionClient client;
         private final NotificationReasonEmitter notificationReasonEmitter;
-        private final ExtensionComponentsFinder extensionComponentsFinder;
+        private final ExtensionGetter extensionGetter;
 
         public void publishReasonBy(Reply reply, Comment comment) {
             boolean isQuoteReply = StringUtils.isNotBlank(reply.getSpec().getQuoteReply());
@@ -306,16 +305,14 @@ public class CommentNotificationReasonPublisher {
 
         /**
          * To be compatible with older versions, it may be empty, so use optional.
-         * TODO use {@link ExtensionGetter} instead of {@code extensionComponentsFinder}
          */
         @SuppressWarnings("unchecked")
         Optional<CommentSubject.SubjectDisplay> getCommentSubjectDisplay(Ref ref) {
-            return extensionComponentsFinder.getExtensions(CommentSubject.class)
-                .stream()
+            return extensionGetter.getExtensions(CommentSubject.class)
                 .filter(commentSubject -> commentSubject.supports(ref))
-                .findFirst()
-                .flatMap(commentSubject
-                    -> commentSubject.getSubjectDisplay(ref.getName()).blockOptional());
+                .next()
+                .flatMap(subject -> subject.getSubjectDisplay(ref.getName()))
+                .blockOptional();
         }
 
         boolean doNotEmitReason(Reply currentReply, Reply quoteReply, Comment comment) {
