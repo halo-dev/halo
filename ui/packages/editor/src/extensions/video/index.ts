@@ -44,6 +44,7 @@ declare module "@/tiptap" {
 
 const Video = Node.create<ExtensionOptions>({
   name: "video",
+  fakeSelection: true,
 
   inline() {
     return true;

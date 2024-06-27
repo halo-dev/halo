@@ -209,7 +209,6 @@ class TableView implements NodeView {
 
 const Table = TiptapTable.extend<ExtensionOptions & TableOptions>({
   allowGapCursor: true,
-  fakeSelection: false,
 
   addExtensions() {
     return [TableCell, TableRow, TableHeader];

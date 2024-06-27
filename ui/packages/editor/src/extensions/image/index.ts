@@ -30,6 +30,8 @@ import BubbleItemImageSize from "./BubbleItemImageSize.vue";
 import ImageView from "./ImageView.vue";
 
 const Image = TiptapImage.extend<ExtensionOptions & ImageOptions>({
+  fakeSelection: true,
+
   inline() {
     return true;
   },
