@@ -105,6 +105,25 @@ export default CodeBlockLowlight.extend<
   // otherwise the Mod-a shortcut key will be overridden.
   priority: 110,
   fakeSelection: true,
+
+  addAttributes() {
+    return {
+      ...this.parent?.(),
+      collapsed: {
+        default: false,
+        parseHTML: (element) => !!element.getAttribute("collapsed"),
+        renderHTML: (attributes) => {
+          if (attributes.collapsed) {
+            return {
+              collapsed: attributes.collapsed,
+            };
+          }
+          return {};
+        },
+      },
+    };
+  },
+
   addCommands() {
     return {
       ...this.parent?.(),
