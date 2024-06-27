@@ -61,16 +61,13 @@ const ExtensionRangeSelection = Extension.create({
               if (node.isText || node.type.name === "paragraph") {
                 return;
               }
-              let className = "no-selection";
               if (node.type.spec.fakeSelection) {
-                className = className + " range-fake-selection";
+                decorations.push(
+                  Decoration.node(pos, pos + node.nodeSize, {
+                    class: "no-selection range-fake-selection",
+                  })
+                );
               }
-
-              decorations.push(
-                Decoration.node(pos, pos + node.nodeSize, {
-                  class: className,
-                })
-              );
             });
             return DecorationSet.create(doc, decorations);
           },
@@ -155,7 +152,7 @@ const ExtensionRangeSelection = Extension.create({
     return {
       fakeSelection:
         callOrReturn(getExtensionField(extension, "fakeSelection", context)) ??
-        true,
+        false,
     };
   },
 });
