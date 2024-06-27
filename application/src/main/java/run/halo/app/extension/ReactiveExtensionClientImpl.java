@@ -228,7 +228,7 @@ public class ReactiveExtensionClientImpl implements ReactiveExtensionClient {
             })
             .map(converter::convertTo)
             .flatMap(extStore -> doCreate(extension, extStore.getName(), extStore.getData())
-                .doOnNext(watchers::onAdd)
+                .doOnNext(created -> watchers.onAdd(convertToRealExtension(created)))
             )
             .retryWhen(Retry.backoff(3, Duration.ofMillis(100))
                 // retry when generateName is set
@@ -266,7 +266,9 @@ public class ReactiveExtensionClientImpl implements ReactiveExtensionClient {
             var store = this.converter.convertTo(newJsonExt);
             var updated = doUpdate(extension, store.getName(), store.getVersion(), store.getData());
             if (!onlyStatusChanged) {
-                updated = updated.doOnNext(ext -> watchers.onUpdate(old, ext));
+                updated = updated.doOnNext(ext -> watchers.onUpdate(convertToRealExtension(old),
+                    convertToRealExtension(ext))
+                );
             }
             return updated;
         });
@@ -293,7 +295,7 @@ public class ReactiveExtensionClientImpl implements ReactiveExtensionClient {
         var extensionStore = converter.convertTo(extension);
         return doUpdate(extension, extensionStore.getName(),
             extensionStore.getVersion(), extensionStore.getData()
-        ).doOnNext(watchers::onDelete);
+        ).doOnNext(updated -> watchers.onDelete(convertToRealExtension(extension)));
     }
 
     @Override

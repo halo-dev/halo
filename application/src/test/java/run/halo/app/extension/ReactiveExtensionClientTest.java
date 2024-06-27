@@ -688,6 +688,47 @@ class ReactiveExtensionClientTest {
 
             verify(watcher, times(1)).onDelete(any());
         }
+
+        @Test
+        void shouldWatchRealType() {
+            var extensionStore = createExtensionStore("/registry/fake.halo.run/fakes/fake");
+            var fake = createFakeExtension("fake", 1L);
+            var unstructured = Unstructured.OBJECT_MAPPER.convertValue(fake, Unstructured.class);
+
+            when(storeClient.fetchByName(extensionStore.getName()))
+                .thenReturn(Mono.just(extensionStore));
+            when(converter.convertTo(any())).thenReturn(extensionStore);
+            when(converter.convertFrom(same(Unstructured.class), any())).thenReturn(unstructured);
+
+            var indexer = mock(Indexer.class);
+            when(indexerFactory.getIndexer(eq(fake.groupVersionKind()))).thenReturn(indexer);
+
+            // on add
+            when(storeClient.create(any(), any())).thenReturn(Mono.just(extensionStore));
+            doNothing().when(watcher).onAdd(any(Extension.class));
+            StepVerifier.create(client.create(unstructured))
+                .expectNext(unstructured)
+                .verifyComplete();
+            verify(watcher, times(1)).onAdd(isA(FakeExtension.class));
+
+            // on update
+            when(storeClient.update(any(), any(), any())).thenReturn(Mono.just(extensionStore));
+
+            doNothing().when(watcher).onUpdate(any(), any());
+            StepVerifier.create(client.update(unstructured))
+                .expectNext(unstructured)
+                .verifyComplete();
+            verify(watcher, times(1))
+                .onUpdate(isA(FakeExtension.class), isA(FakeExtension.class));
+
+            // on delete
+            doNothing().when(watcher).onDelete(any());
+            StepVerifier.create(client.delete(unstructured))
+                .expectNext(unstructured)
+                .verifyComplete();
+            verify(watcher, times(1)).onDelete(isA(FakeExtension.class));
+
+        }
     }
 
 }
