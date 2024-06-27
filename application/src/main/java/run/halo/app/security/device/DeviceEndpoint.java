@@ -19,6 +19,7 @@ import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.core.context.ReactiveSecurityContextHolder;
 import org.springframework.security.core.context.SecurityContext;
+import org.springframework.session.ReactiveFindByIndexNameSessionRepository;
 import org.springframework.session.Session;
 import org.springframework.stereotype.Component;
 import org.springframework.web.reactive.function.server.RouterFunction;
@@ -31,7 +32,6 @@ import run.halo.app.extension.GroupVersion;
 import run.halo.app.extension.ListOptions;
 import run.halo.app.extension.ReactiveExtensionClient;
 import run.halo.app.extension.router.selector.FieldSelector;
-import run.halo.app.security.session.ReactiveIndexedSessionRepository;
 
 /**
  * Device endpoint for user profile,every user can only manage their own devices.
@@ -43,7 +43,7 @@ import run.halo.app.security.session.ReactiveIndexedSessionRepository;
 @RequiredArgsConstructor
 public class DeviceEndpoint implements CustomEndpoint {
     private final ReactiveExtensionClient client;
-    private final ReactiveIndexedSessionRepository<?> sessionRepository;
+    private final ReactiveFindByIndexNameSessionRepository<?> sessionRepository;
     private final DeviceService deviceService;
 
     @Override
