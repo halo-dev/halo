@@ -8,7 +8,7 @@ const props = withDefaults(defineProps<AvatarProps>(), {
   circle: false,
 });
 
-const groupProps = inject(AvatarGroupContextInjectionKey);
+const groupProps = inject(AvatarGroupContextInjectionKey, undefined);
 
 const size = computed(() => groupProps?.size || props.size);
 const circle = computed(() => groupProps?.circle || props.circle);
