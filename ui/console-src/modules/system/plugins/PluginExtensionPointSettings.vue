@@ -57,7 +57,7 @@ watch(
           <div
             class="sticky top-0 z-10 flex h-12 items-center border-b bg-white px-4"
           >
-            <h2 class="font-semibold text-green-900">扩展点定义</h2>
+            <h2 class="font-semibold text-gray-900">扩展点定义</h2>
           </div>
           <ul
             class="box-border h-full w-full divide-y divide-gray-100 overflow-auto"
@@ -98,7 +98,7 @@ watch(
           <div
             class="sticky top-0 z-10 flex h-12 items-center space-x-3 border-b bg-white px-4"
           >
-            <h2 class="font-semibold text-green-900">
+            <h2 class="font-semibold text-gray-900">
               {{ selectedExtensionPointDefinition?.spec.displayName }}
             </h2>
             <small class="line-clamp-1 text-gray-600">
