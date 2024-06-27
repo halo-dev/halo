@@ -14,7 +14,7 @@ import {
 import SecretSelect from "./SecretSelect.vue";
 import { SecretSection } from "./sections";
 
-export const secretSelect: FormKitTypeDefinition = {
+export const secret: FormKitTypeDefinition = {
   schema: outer(
     wrapper(
       label("$label"),

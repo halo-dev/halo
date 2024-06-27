@@ -18,7 +18,7 @@ import { password } from "./inputs/password";
 import { postSelect } from "./inputs/post-select";
 import { repeater } from "./inputs/repeater";
 import { roleSelect } from "./inputs/role-select";
-import { secretSelect } from "./inputs/secret-select";
+import { secret } from "./inputs/secret";
 import { singlePageSelect } from "./inputs/singlePage-select";
 import { tagCheckbox } from "./inputs/tag-checkbox";
 import { tagSelect } from "./inputs/tag-select";
@@ -43,28 +43,28 @@ const config: DefaultConfigOptions = {
     autoScrollToErrors,
   ],
   inputs: {
-    list,
-    form,
-    password,
-    group,
-    nativeGroup,
     attachment,
-    code,
-    repeater,
-    menuCheckbox,
-    menuRadio,
-    menuItemSelect,
-    postSelect,
-    categorySelect,
-    tagSelect,
-    singlePageSelect,
-    categoryCheckbox,
-    tagCheckbox,
-    roleSelect,
-    attachmentPolicySelect,
     attachmentGroupSelect,
+    attachmentPolicySelect,
+    categoryCheckbox,
+    categorySelect,
+    code,
+    form,
+    group,
+    list,
+    menuCheckbox,
+    menuItemSelect,
+    menuRadio,
+    nativeGroup,
+    password,
+    postSelect,
+    repeater,
+    roleSelect,
+    secret,
+    singlePageSelect,
+    tagCheckbox,
+    tagSelect,
     verificationForm,
-    secretSelect,
   },
   locales: { zh, en },
   locale: "zh",
