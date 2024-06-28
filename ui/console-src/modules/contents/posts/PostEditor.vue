@@ -6,10 +6,12 @@ import { useContentCache } from "@/composables/use-content-cache";
 import { useEditorExtensionPoints } from "@/composables/use-editor-extension-points";
 import { useSessionKeepAlive } from "@/composables/use-session-keep-alive";
 import { contentAnnotations } from "@/constants/annotations";
+import { FormType } from "@/types/slug";
 import { randomUUID } from "@/utils/id";
 import { usePermission } from "@/utils/permission";
 import { useContentSnapshot } from "@console/composables/use-content-snapshot";
 import { useSaveKeybinding } from "@console/composables/use-save-keybinding";
+import useSlugify from "@console/composables/use-slugify";
 import type { Post, PostRequest } from "@halo-dev/api-client";
 import {
   consoleApiClient,
@@ -468,6 +470,21 @@ async function handleUploadImage(file: File, options?: AxiosRequestConfig) {
   );
   return data;
 }
+
+// Slug generation
+useSlugify(
+  computed(() => formState.value.post.spec.title),
+  computed({
+    get() {
+      return formState.value.post.spec.slug;
+    },
+    set(value) {
+      formState.value.post.spec.slug = value;
+    },
+  }),
+  computed(() => !isUpdateMode.value),
+  FormType.POST
+);
 </script>
 
 <template>
