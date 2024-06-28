@@ -13,11 +13,13 @@ import org.opentest4j.AssertionFailedError;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.reactive.AutoConfigureWebTestClient;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.dao.OptimisticLockingFailureException;
 import org.springframework.retry.support.RetryTemplateBuilder;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.web.reactive.server.WebTestClient;
 import reactor.test.StepVerifier;
+import reactor.util.retry.Retry;
 import run.halo.app.content.Content;
 import run.halo.app.content.ContentUpdateParam;
 import run.halo.app.content.PostRequest;
@@ -135,6 +137,7 @@ public class LuceneSearchEngineIntegrationTest {
     void deletePostPermanently(String postName) {
         client.get(Post.class, postName)
             .flatMap(client::delete)
+            .retryWhen(optimisticLockRetry())
             .as(StepVerifier::create)
             .expectNextCount(1)
             .verifyComplete();
@@ -144,6 +147,7 @@ public class LuceneSearchEngineIntegrationTest {
         client.get(Post.class, postName)
             .doOnNext(post -> post.getSpec().setDeleted(false))
             .flatMap(client::update)
+            .retryWhen(optimisticLockRetry())
             .as(StepVerifier::create)
             .expectNextCount(1)
             .verifyComplete();
@@ -153,6 +157,7 @@ public class LuceneSearchEngineIntegrationTest {
         client.get(Post.class, postName)
             .doOnNext(post -> post.getSpec().setDeleted(true))
             .flatMap(client::update)
+            .retryWhen(optimisticLockRetry())
             .as(StepVerifier::create)
             .expectNextCount(1)
             .verifyComplete();
@@ -162,6 +167,7 @@ public class LuceneSearchEngineIntegrationTest {
         client.get(Post.class, postName)
             .doOnNext(post -> post.getSpec().setVisible(PUBLIC))
             .flatMap(client::update)
+            .retryWhen(optimisticLockRetry())
             .as(StepVerifier::create)
             .expectNextCount(1)
             .verifyComplete();
@@ -171,6 +177,7 @@ public class LuceneSearchEngineIntegrationTest {
         client.get(Post.class, postName)
             .doOnNext(post -> post.getSpec().setVisible(PRIVATE))
             .flatMap(client::update)
+            .retryWhen(optimisticLockRetry())
             .as(StepVerifier::create)
             .expectNextCount(1)
             .verifyComplete();
@@ -179,6 +186,7 @@ public class LuceneSearchEngineIntegrationTest {
     void publishPost(String postName) {
         client.get(Post.class, postName)
             .flatMap(postService::publish)
+            .retryWhen(optimisticLockRetry())
             .as(StepVerifier::create)
             .expectNextCount(1)
             .verifyComplete();
@@ -187,6 +195,7 @@ public class LuceneSearchEngineIntegrationTest {
     void unpublishPost(String postName) {
         client.get(Post.class, postName)
             .flatMap(postService::unpublish)
+            .retryWhen(optimisticLockRetry())
             .as(StepVerifier::create)
             .expectNextCount(1)
             .verifyComplete();
@@ -220,4 +229,10 @@ public class LuceneSearchEngineIntegrationTest {
             .expectNextCount(1)
             .verifyComplete();
     }
+
+    Retry optimisticLockRetry() {
+        return Retry.backoff(5, Duration.ofMillis(100))
+            .filter(OptimisticLockingFailureException.class::isInstance);
+    }
+
 }
