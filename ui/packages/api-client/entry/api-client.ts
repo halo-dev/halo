@@ -7,7 +7,6 @@ import {
   AuthProviderV1alpha1Api,
   AuthProviderV1alpha1ConsoleApi,
   BackupV1alpha1Api,
-  CacheV1alpha1ConsoleApi,
   CategoryV1alpha1Api,
   CommentV1alpha1Api,
   CommentV1alpha1ConsoleApi,
@@ -277,7 +276,6 @@ function createConsoleApiClient(axiosInstance: AxiosInstance) {
       baseURL,
       axiosInstance
     ),
-    cache: new CacheV1alpha1ConsoleApi(undefined, baseURL, axiosInstance),
     login: new LoginApi(undefined, baseURL, axiosInstance),
     storage: {
       attachment: new AttachmentV1alpha1ConsoleApi(

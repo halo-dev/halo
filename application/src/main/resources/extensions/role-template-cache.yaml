@@ -2,6 +2,7 @@ apiVersion: v1alpha1
 kind: "Role"
 metadata:
   name: role-template-manage-cache
+  deletionTimestamp: 2024-06-01T00:00:00Z
   labels:
     halo.run/role-template: "true"
   annotations:

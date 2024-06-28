@@ -162,11 +162,6 @@ core:
                 This operation will recreate search engine indexes for all
                 published posts.
               success_message: Refresh search engine index successfully.
-            evict_page_cache:
-              title: Refresh Page Cache
-              dialog_title: Refresh the page cache
-              dialog_content: This operation will clear the cache for all pages.
-              success_message: Refresh page cache successfully.
         user_stats:
           title: Users
         comment_stats:

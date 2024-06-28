@@ -2366,31 +2366,6 @@
         ]
       }
     },
-    "/apis/api.console.halo.run/v1alpha1/caches/{name}": {
-      "delete": {
-        "description": "Evict a cache.",
-        "operationId": "EvictCache",
-        "parameters": [
-          {
-            "description": "Cache name",
-            "in": "path",
-            "name": "name",
-            "required": true,
-            "schema": {
-              "type": "string"
-            }
-          }
-        ],
-        "responses": {
-          "204": {
-            "description": "No Content"
-          }
-        },
-        "tags": [
-          "CacheV1alpha1Console"
-        ]
-      }
-    },
     "/apis/api.console.halo.run/v1alpha1/comments": {
       "get": {
         "description": "List comments.",
@@ -19692,12 +19667,12 @@
           },
           "visible": {
             "type": "string",
-            "default": "PUBLIC",
             "enum": [
               "PUBLIC",
               "INTERNAL",
               "PRIVATE"
-            ]
+            ],
+            "default": "PUBLIC"
           }
         }
       },
@@ -21592,12 +21567,12 @@
           },
           "visible": {
             "type": "string",
-            "default": "PUBLIC",
             "enum": [
               "PUBLIC",
               "INTERNAL",
               "PRIVATE"
-            ]
+            ],
+            "default": "PUBLIC"
           }
         }
       },

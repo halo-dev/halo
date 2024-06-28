@@ -158,11 +158,6 @@ core:
               dialog_title: 刷新搜索引擎索引
               dialog_content: 此操作会对所有已发布的文章重新创建本地搜索引擎的索引。
               success_message: 刷新成功
-            evict_page_cache:
-              title: 刷新页面缓存
-              dialog_title: 刷新页面缓存
-              dialog_content: 此操作会清空所有页面的缓存。
-              success_message: 刷新成功
         user_stats:
           title: 用户
         comment_stats:

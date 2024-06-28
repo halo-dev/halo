@@ -22,7 +22,6 @@ export * from './api/attachment-v1alpha1-uc-api';
 export * from './api/auth-provider-v1alpha1-api';
 export * from './api/auth-provider-v1alpha1-console-api';
 export * from './api/backup-v1alpha1-api';
-export * from './api/cache-v1alpha1-console-api';
 export * from './api/category-v1alpha1-api';
 export * from './api/category-v1alpha1-public-api';
 export * from './api/comment-v1alpha1-api';
