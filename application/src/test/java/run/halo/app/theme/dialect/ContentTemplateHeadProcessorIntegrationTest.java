@@ -3,6 +3,7 @@ package run.halo.app.theme.dialect;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.lenient;
+import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 import java.util.ArrayList;
@@ -16,7 +17,9 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.context.ApplicationContext;
+import org.springframework.core.annotation.AnnotationAwareOrderComparator;
 import org.thymeleaf.IEngineConfiguration;
 import org.thymeleaf.TemplateEngine;
 import org.thymeleaf.context.Context;
@@ -25,12 +28,13 @@ import org.thymeleaf.spring6.expression.ThymeleafEvaluationContext;
 import org.thymeleaf.templateresolver.StringTemplateResolver;
 import org.thymeleaf.templateresource.ITemplateResource;
 import org.thymeleaf.templateresource.StringTemplateResource;
+import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import run.halo.app.core.extension.content.Post;
 import run.halo.app.extension.Metadata;
 import run.halo.app.infra.SystemConfigurableEnvironmentFetcher;
 import run.halo.app.infra.SystemSetting;
-import run.halo.app.plugin.ExtensionComponentsFinder;
+import run.halo.app.plugin.extensionpoint.ExtensionGetter;
 import run.halo.app.theme.DefaultTemplateEnum;
 import run.halo.app.theme.finders.PostFinder;
 import run.halo.app.theme.finders.SinglePageFinder;
@@ -64,7 +68,7 @@ class ContentTemplateHeadProcessorIntegrationTest {
     private SystemConfigurableEnvironmentFetcher fetcher;
 
     @Mock
-    private ExtensionComponentsFinder extensionComponentsFinder;
+    ExtensionGetter extensionGetter;
 
     private TemplateEngine templateEngine;
 
@@ -98,17 +102,18 @@ class ContentTemplateHeadProcessorIntegrationTest {
         lenient().when(fetcher.fetch(eq(SystemSetting.CodeInjection.GROUP),
             eq(SystemSetting.CodeInjection.class))).thenReturn(Mono.just(codeInjection));
 
-        lenient().when(applicationContext.getBean(eq(SystemConfigurableEnvironmentFetcher.class)))
-            .thenReturn(fetcher);
         lenient().when(fetcher.fetch(eq(SystemSetting.Seo.GROUP), eq(SystemSetting.Seo.class)))
             .thenReturn(Mono.empty());
 
-        lenient().when(applicationContext.getBean(eq(ExtensionComponentsFinder.class)))
-            .thenReturn(extensionComponentsFinder);
-
-        lenient().when(extensionComponentsFinder.getExtensions(eq(TemplateHeadProcessor.class)))
-            .thenReturn(new ArrayList<>(map.values()));
-
+        lenient().when(applicationContext.getBeanProvider(ExtensionGetter.class))
+                .thenAnswer(invocation -> {
+                    var objectProvider = mock(ObjectProvider.class);
+                    when(objectProvider.getIfUnique()).thenReturn(extensionGetter);
+                    return objectProvider;
+                });
+        lenient().when(extensionGetter.getExtensions(TemplateHeadProcessor.class)).thenReturn(
+            Flux.fromIterable(map.values()).sort(AnnotationAwareOrderComparator.INSTANCE)
+        );
         lenient().when(applicationContext.getBean(eq(SystemConfigurableEnvironmentFetcher.class)))
             .thenReturn(fetcher);
         lenient().when(fetcher.fetchComment()).thenReturn(Mono.just(new SystemSetting.Comment()));

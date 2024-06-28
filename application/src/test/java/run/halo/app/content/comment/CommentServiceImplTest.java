@@ -27,6 +27,7 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.server.ServerWebExchange;
+import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import reactor.test.StepVerifier;
 import run.halo.app.content.TestPost;
@@ -47,7 +48,7 @@ import run.halo.app.infra.SystemSetting;
 import run.halo.app.infra.utils.JsonUtils;
 import run.halo.app.metrics.CounterService;
 import run.halo.app.metrics.MeterUtils;
-import run.halo.app.plugin.ExtensionComponentsFinder;
+import run.halo.app.plugin.extensionpoint.ExtensionGetter;
 import run.halo.app.security.authorization.AuthorityUtils;
 
 /**
@@ -72,7 +73,7 @@ class CommentServiceImplTest {
     private RoleService roleService;
 
     @Mock
-    private ExtensionComponentsFinder extensionComponentsFinder;
+    private ExtensionGetter extensionGetter;
 
     @InjectMocks
     private CommentServiceImpl commentService;
@@ -101,8 +102,8 @@ class CommentServiceImplTest {
             .thenReturn(Mono.just(false));
 
         PostCommentSubject postCommentSubject = Mockito.mock(PostCommentSubject.class);
-        when(extensionComponentsFinder.getExtensions(eq(CommentSubject.class)))
-            .thenReturn(List.of(postCommentSubject));
+        when(extensionGetter.getExtensions(CommentSubject.class))
+            .thenReturn(Flux.just(postCommentSubject));
 
         when(postCommentSubject.supports(any())).thenReturn(true);
         when(postCommentSubject.get(eq("fake-post"))).thenReturn(Mono.just(post()));
