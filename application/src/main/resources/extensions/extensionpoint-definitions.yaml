@@ -1,13 +1,15 @@
+## TODO: Currently, Halo does not support i18n for configuration file descriptions
+## So Simplified Chinese is temporarily used as the default description language.
+
 apiVersion: plugin.halo.run/v1alpha1
 kind: ExtensionPointDefinition
 metadata:
   name: additional-webfilter
 spec:
   className: run.halo.app.security.AdditionalWebFilter
-  displayName: AdditionalWebFilter
+  displayName: "附加 Web 过滤器"
   type: MULTI_INSTANCE
-  description: "Contract for interception-style, chained processing of Web requests that may be used to 
-    implement cross-cutting, application-agnostic requirements such as security, timeouts, and others."
+  description: "用于 Web 请求的链式处理，可以用来实现跨领域、与应用无关的需求，如安全性、超时等"
 
 ---
 apiVersion: plugin.halo.run/v1alpha1
@@ -16,9 +18,9 @@ metadata:
   name: reactive-post-content-handler
 spec:
   className: run.halo.app.theme.ReactivePostContentHandler
-  displayName: ReactivePostContentHandler
+  displayName: "文章内容处理器"
   type: MULTI_INSTANCE
-  description: "Provides a way to extend the post content to be displayed on the theme-side."
+  description: "扩展在主题侧显示的文章内容"
 
 ---
 apiVersion: plugin.halo.run/v1alpha1
@@ -27,9 +29,9 @@ metadata:
   name: reactive-singlepage-content-handler
 spec:
   className: run.halo.app.theme.ReactiveSinglePageContentHandler
-  displayName: ReactiveSinglePageContentHandler
+  displayName: "页面内容处理器"
   type: MULTI_INSTANCE
-  description: "Provides a way to extend the single page content to be displayed on the theme-side."
+  description: "扩展在主题侧显示的页面内容"
 
 ---
 apiVersion: plugin.halo.run/v1alpha1
@@ -38,9 +40,9 @@ metadata:
   name: comment-widget
 spec:
   className: run.halo.app.theme.dialect.CommentWidget
-  displayName: CommentWidget
+  displayName: "评论组件"
   type: SINGLETON
-  description: "Provides an extension point for the comment widget on the theme-side."
+  description: "扩展在文章页面中显示的评论组件"
 
 ---
 apiVersion: plugin.halo.run/v1alpha1
@@ -49,9 +51,9 @@ metadata:
   name: username-password-authentication-manager
 spec:
   className: run.halo.app.security.authentication.login.UsernamePasswordAuthenticationManager
-  displayName: Username password authentication manager
+  displayName: "用户名密码认证管理器"
   type: SINGLETON
-  description: "Provides a way to extend the username password authentication."
+  description: "扩展用户名密码认证"
 
 ---
 apiVersion: plugin.halo.run/v1alpha1
@@ -60,9 +62,9 @@ metadata:
   name: reactive-notifier
 spec:
   className: run.halo.app.notification.ReactiveNotifier
-  displayName: Notifier
+  displayName: "消息通知器"
   type: MULTI_INSTANCE
-  description: "Provides a way to extend the notifier to send notifications to users."
+  description: "扩展消息通知器，以向用户发送通知"
 
 ---
 apiVersion: plugin.halo.run/v1alpha1
@@ -71,6 +73,6 @@ metadata:
   name: search-engine
 spec:
   className: run.halo.app.search.SearchEngine
-  displayName: SearchEngine
+  displayName: "搜索引擎"
   type: SINGLETON
-  description: "Provides a way to extend the search engine."
+  description: "扩展内容搜索引擎"
