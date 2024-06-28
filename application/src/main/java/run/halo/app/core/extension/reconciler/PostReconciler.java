@@ -28,6 +28,7 @@ import org.springframework.context.ApplicationEvent;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Component;
+import run.halo.app.content.CategoryService;
 import run.halo.app.content.ContentWrapper;
 import run.halo.app.content.NotificationReasonConst;
 import run.halo.app.content.PostService;
@@ -83,6 +84,7 @@ public class PostReconciler implements Reconciler<Reconciler.Request> {
     private final PostPermalinkPolicy postPermalinkPolicy;
     private final CounterService counterService;
     private final CommentService commentService;
+    private final CategoryService categoryService;
 
     private final ApplicationEventPublisher eventPublisher;
     private final NotificationCenter notificationCenter;
@@ -185,6 +187,8 @@ public class PostReconciler implements Reconciler<Reconciler.Request> {
                 status.setInProgress(
                     !StringUtils.equals(headSnapshot, post.getSpec().getReleaseSnapshot()));
 
+                computeHiddenState(post);
+
                 // version + 1 is required to truly equal version
                 // as a version will be incremented after the update
                 status.setObservedVersion(post.getMetadata().getVersion() + 1);
@@ -194,6 +198,19 @@ public class PostReconciler implements Reconciler<Reconciler.Request> {
                 events.forEach(eventPublisher::publishEvent);
             });
         return Result.doNotRetry();
+    }
+
+    private void computeHiddenState(Post post) {
+        var categories = post.getSpec().getCategories();
+        if (categories == null) {
+            post.getStatusOrDefault().setHideFromList(false);
+            return;
+        }
+        var hidden = categories.stream()
+            .anyMatch(categoryName -> categoryService.isCategoryHidden(categoryName)
+                .blockOptional().orElse(false)
+            );
+        post.getStatusOrDefault().setHideFromList(hidden);
     }
 
     private void populateLabels(Post post, Set<ApplicationEvent> events) {
