@@ -17,6 +17,7 @@ import org.apache.commons.lang3.BooleanUtils;
 import org.apache.commons.lang3.ObjectUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.data.domain.Sort;
+import org.springframework.lang.Nullable;
 import org.springframework.util.Assert;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
@@ -88,12 +89,16 @@ public class CategoryFinderImpl implements CategoryFinder {
 
     @Override
     public Flux<CategoryTreeVo> listAsTree() {
-        return this.toCategoryTreeVoFlux(null);
+        return listAll()
+            .collectList()
+            .flatMapMany(list -> Flux.fromIterable(listToTree(list, null)));
     }
 
     @Override
     public Flux<CategoryTreeVo> listAsTree(String name) {
-        return this.toCategoryTreeVoFlux(name);
+        return listAllFor(name)
+            .collectList()
+            .flatMapMany(list -> Flux.fromIterable(listToTree(list, name)));
     }
 
     @Override
@@ -103,43 +108,50 @@ public class CategoryFinderImpl implements CategoryFinder {
             .map(CategoryVo::from);
     }
 
-    Flux<CategoryVo> listAllFor(String parentName) {
-        return categoryService.isCategoryHidden(parentName)
+    private Flux<CategoryVo> listAllFor(String parentName) {
+        return Mono.defer(
+                () -> {
+                    if (StringUtils.isBlank(parentName)) {
+                        return Mono.just(false);
+                    }
+                    return categoryService.isCategoryHidden(parentName);
+                })
             .flatMapMany(
                 isHidden -> client.listAll(Category.class, new ListOptions(), defaultSort())
-                    .filter(category -> isHidden || !category.getSpec().isHideFromList())
+                    .filter(category -> {
+                        if (isHidden) {
+                            return true;
+                        }
+                        return !category.getSpec().isHideFromList();
+                    })
                     .map(CategoryVo::from)
             );
     }
 
-    Flux<CategoryTreeVo> toCategoryTreeVoFlux(String name) {
-        return listAllFor(name)
-            .collectList()
-            .flatMapIterable(categoryVos -> {
-                Map<String, CategoryTreeVo> nameIdentityMap = categoryVos.stream()
-                    .map(CategoryTreeVo::from)
-                    .collect(Collectors.toMap(categoryVo -> categoryVo.getMetadata().getName(),
-                        Function.identity()));
+    private List<CategoryTreeVo> listToTree(List<CategoryVo> categoryVos, @Nullable String name) {
+        Map<String, CategoryTreeVo> nameIdentityMap = categoryVos.stream()
+            .map(CategoryTreeVo::from)
+            .collect(Collectors.toMap(categoryVo -> categoryVo.getMetadata().getName(),
+                Function.identity()));
 
-                nameIdentityMap.forEach((nameKey, value) -> {
-                    List<String> children = value.getSpec().getChildren();
-                    if (children == null) {
-                        return;
-                    }
-                    for (String child : children) {
-                        CategoryTreeVo childNode = nameIdentityMap.get(child);
-                        if (childNode != null) {
-                            childNode.setParentName(nameKey);
-                        }
-                    }
-                });
-                var tree = listToTree(nameIdentityMap.values(), name);
-                recomputePostCount(tree);
-                return tree;
-            });
+        nameIdentityMap.forEach((nameKey, value) -> {
+            List<String> children = value.getSpec().getChildren();
+            if (children == null) {
+                return;
+            }
+            for (String child : children) {
+                CategoryTreeVo childNode = nameIdentityMap.get(child);
+                if (childNode != null) {
+                    childNode.setParentName(nameKey);
+                }
+            }
+        });
+        var tree = listToTree(nameIdentityMap.values(), name);
+        recomputePostCount(tree);
+        return tree;
     }
 
-    static List<CategoryTreeVo> listToTree(Collection<CategoryTreeVo> list, String name) {
+    private static List<CategoryTreeVo> listToTree(Collection<CategoryTreeVo> list, String name) {
         Map<String, List<CategoryTreeVo>> parentNameIdentityMap = list.stream()
             .filter(categoryTreeVo -> categoryTreeVo.getParentName() != null)
             .collect(Collectors.groupingBy(CategoryTreeVo::getParentName));
@@ -228,8 +240,9 @@ public class CategoryFinderImpl implements CategoryFinder {
 
     @Override
     public Flux<CategoryVo> getBreadcrumbs(String name) {
-        return listAsTree()
+        return listAllFor(name)
             .collectList()
+            .map(list -> listToTree(list, null))
             .flatMapMany(treeNodes -> {
                 var rootNode = dummyVirtualRoot(treeNodes);
                 var paths = new ArrayList<CategoryVo>();
