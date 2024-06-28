@@ -42,6 +42,7 @@ public class CategoryReconciler implements Reconciler<Reconciler.Request> {
             .ifPresent(category -> {
                 if (ExtensionUtil.isDeleted(category)) {
                     if (removeFinalizers(category.getMetadata(), Set.of(FINALIZER_NAME))) {
+                        refreshHiddenState(category, false);
                         client.update(category);
                     }
                     return;
@@ -50,20 +51,24 @@ public class CategoryReconciler implements Reconciler<Reconciler.Request> {
 
                 populatePermalinkPattern(category);
                 populatePermalink(category);
-                checkHideFromListState(category);
+                checkHiddenState(category);
 
                 client.update(category);
             });
         return Result.doNotRetry();
     }
 
-    /**
-     * TODO move this logic to before-create/update hook in the future see {@code gh-4343}.
-     */
-    private void checkHideFromListState(Category category) {
+    private void checkHiddenState(Category category) {
         final boolean hidden = categoryService.isCategoryHidden(category.getMetadata().getName())
             .blockOptional()
             .orElse(false);
+        refreshHiddenState(category, hidden);
+    }
+
+    /**
+     * TODO move this logic to before-create/update hook in the future see {@code gh-4343}.
+     */
+    private void refreshHiddenState(Category category, boolean hidden) {
         category.getSpec().setHideFromList(hidden);
         if (isHiddenStateChanged(category)) {
             publishHiddenStateChangeEvent(category);
