@@ -236,13 +236,20 @@ const handleSetPrimaryMenu = async (menu: Menu) => {
               v-if="currentUserHasPermission(['system:menus:manage'])"
               #dropdownItems
             >
-              <VDropdownItem @click="handleSetPrimaryMenu(menu)">
+              <VDropdownItem
+                v-if="primaryMenuName !== menu.metadata.name"
+                @click="handleSetPrimaryMenu(menu)"
+              >
                 {{ $t("core.menu.operations.set_primary.button") }}
               </VDropdownItem>
               <VDropdownItem @click="handleOpenEditingModal(menu)">
                 {{ $t("core.common.buttons.edit") }}
               </VDropdownItem>
-              <VDropdownItem type="danger" @click="handleDeleteMenu(menu)">
+              <VDropdownItem
+                :disabled="primaryMenuName === menu.metadata.name"
+                type="danger"
+                @click="handleDeleteMenu(menu)"
+              >
                 {{ $t("core.common.buttons.delete") }}
               </VDropdownItem>
             </template>
