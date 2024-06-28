@@ -110,10 +110,10 @@ metadata:
     halo.run/role-template: "true"
     halo.run/hidden: "true"
 rules:
-  - apiGroups: [ "api.security.halo.run" ]
+  - apiGroups: [ "uc.api.security.halo.run" ]
     resources: [ "personalaccesstokens" ]
     verbs: [ "*" ]
-  - apiGroups: [ "api.security.halo.run" ]
+  - apiGroups: [ "uc.api.security.halo.run" ]
     resources: [ "personalaccesstokens/actions" ]
     verbs: [ "update" ]
 
@@ -126,7 +126,7 @@ metadata:
     halo.run/role-template: "true"
     halo.run/hidden: "true"
 rules:
-  - apiGroups: [ "api.security.halo.run" ]
+  - apiGroups: [ "uc.api.security.halo.run" ]
     resources: [ "authentications", "authentications/totp", "authentications/settings" ]
     verbs: [ "*" ]
   - apiGroups: [ "uc.api.security.halo.run" ]
