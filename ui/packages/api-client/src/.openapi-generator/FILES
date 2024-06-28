@@ -9,7 +9,6 @@ api/attachment-v1alpha1-uc-api.ts
 api/auth-provider-v1alpha1-api.ts
 api/auth-provider-v1alpha1-console-api.ts
 api/backup-v1alpha1-api.ts
-api/cache-v1alpha1-console-api.ts
 api/category-v1alpha1-api.ts
 api/category-v1alpha1-public-api.ts
 api/comment-v1alpha1-api.ts
