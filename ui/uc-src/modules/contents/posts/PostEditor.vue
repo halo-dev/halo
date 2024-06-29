@@ -6,9 +6,11 @@ import { useContentCache } from "@/composables/use-content-cache";
 import { useEditorExtensionPoints } from "@/composables/use-editor-extension-points";
 import { useSessionKeepAlive } from "@/composables/use-session-keep-alive";
 import { contentAnnotations } from "@/constants/annotations";
+import { FormType } from "@/types/slug";
 import { randomUUID } from "@/utils/id";
 import { usePermission } from "@/utils/permission";
 import { useSaveKeybinding } from "@console/composables/use-save-keybinding";
+import useSlugify from "@console/composables/use-slugify";
 import type { Content, Post, Snapshot } from "@halo-dev/api-client";
 import { ucApiClient } from "@halo-dev/api-client";
 import {
@@ -437,6 +439,21 @@ async function handleUploadImage(file: File, options?: AxiosRequestConfig) {
 
 // Keep session alive
 useSessionKeepAlive();
+
+// Slug generation
+useSlugify(
+  computed(() => formState.value.spec.title),
+  computed({
+    get() {
+      return formState.value.spec.slug;
+    },
+    set(value) {
+      formState.value.spec.slug = value;
+    },
+  }),
+  computed(() => !isUpdateMode.value),
+  FormType.POST
+);
 </script>
 
 <template>
