@@ -162,13 +162,13 @@ public class DefaultReactiveSettingFetcher
                 if (configMapData != null) {
                     configMapData.forEach((key, value) -> result.put(key, readTree(value)));
                 }
+                // update cache
+                cache.put(pluginName, result);
                 applicationContext.publishEvent(PluginConfigUpdatedEvent.builder()
                     .source(this)
                     .oldConfig(existData)
                     .newConfig(result)
                     .build());
-                // update cache
-                cache.put(pluginName, result);
             });
         return Result.doNotRetry();
     }
