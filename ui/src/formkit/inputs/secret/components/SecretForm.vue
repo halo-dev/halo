@@ -34,6 +34,7 @@ function onSubmit(data: SecretFormState) {
     type="form"
     :model-value="defaultValue"
     name="secret-form"
+    ignore
     :config="{ validationVisibility: 'submit' }"
     @submit="onSubmit"
   >
