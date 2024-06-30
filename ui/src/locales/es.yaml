@@ -1308,6 +1308,7 @@ core:
     buttons:
       save: Guardar
       close: Cerrar
+      save_and_continue: Guardar y seguir añadiendo
       close_and_shortcut: Cerrar (Esc)
       delete: Borrar
       setting: Configuración

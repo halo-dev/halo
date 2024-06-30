@@ -26,6 +26,7 @@ import useSlugify from "@console/composables/use-slugify";
 import { cloneDeep } from "lodash-es";
 import { onMounted } from "vue";
 import { useI18n } from "vue-i18n";
+import { submitForm, reset } from "@formkit/core";
 
 const props = withDefaults(
   defineProps<{
@@ -62,6 +63,8 @@ const formState = ref<Tag>({
 const modal = ref<InstanceType<typeof VModal> | null>(null);
 
 const saving = ref(false);
+
+const keepAddingSubmit = ref(false);
 
 const isUpdateMode = computed(() => !!props.tag);
 
@@ -101,7 +104,11 @@ const handleSaveTag = async () => {
       });
     }
 
-    modal.value?.close();
+    if (keepAddingSubmit.value) {
+      reset("tag-form");
+    } else {
+      modal.value?.close();
+    }
 
     Toast.success(t("core.common.toast.save_success"));
   } catch (e) {
@@ -109,6 +116,11 @@ const handleSaveTag = async () => {
   } finally {
     saving.value = false;
   }
+};
+
+const handleSubmit = (keepAdding = false) => {
+  keepAddingSubmit.value = keepAdding;
+  submitForm("tag-form");
 };
 
 onMounted(() => {
@@ -255,11 +267,19 @@ const { handleGenerateSlug } = useSlugify(
           :loading="saving"
           type="secondary"
           :text="$t('core.common.buttons.submit')"
-          @submit="$formkit.submit('tag-form')"
+          @submit="handleSubmit"
         >
         </SubmitButton>
         <VButton @click="modal?.close()">
           {{ $t("core.common.buttons.cancel_and_shortcut") }}
+        </VButton>
+        <VButton
+          v-if="!isUpdateMode"
+          :loading="saving"
+          :keep="true"
+          @click="handleSubmit(true)"
+        >
+          {{ $t("core.common.buttons.save_and_continue") }}
         </VButton>
       </VSpace>
     </template>

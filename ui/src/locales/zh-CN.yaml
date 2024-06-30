@@ -1588,6 +1588,7 @@ core:
     buttons:
       save: 保存
       close: 关闭
+      save_and_continue: 保存并继续添加
       close_and_shortcut: 关闭（Esc）
       delete: 删除
       setting: 设置

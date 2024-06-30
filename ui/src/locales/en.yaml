@@ -1671,6 +1671,7 @@ core:
     buttons:
       save: Save
       close: Close
+      save_and_continue: Save and keep adding
       close_and_shortcut: Close (Esc)
       delete: Delete
       setting: Setting
