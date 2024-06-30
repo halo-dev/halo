@@ -3,6 +3,8 @@ package run.halo.app.plugin;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.ArgumentMatchers.isA;
+import static org.mockito.Mockito.inOrder;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -18,6 +20,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
+import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.skyscreamer.jsonassert.JSONAssert;
 import org.springframework.boot.test.mock.mockito.MockBean;
@@ -64,7 +67,8 @@ class DefaultSettingFetcherTest {
     private DefaultReactiveSettingFetcher reactiveSettingFetcher;
     private DefaultSettingFetcher settingFetcher;
 
-    private final Cache cache = new ConcurrentMapCache(buildCacheKey(pluginContext.getName()));
+    @Spy
+    Cache cache = new ConcurrentMapCache(buildCacheKey(pluginContext.getName()));
 
     @BeforeEach
     void setUp() {
@@ -115,7 +119,12 @@ class DefaultSettingFetcherTest {
         when(blockingClient.fetch(eq(ConfigMap.class), eq(pluginContext.getConfigMapName())))
             .thenReturn(Optional.of(configMap));
         reactiveSettingFetcher.reconcile(new Reconciler.Request(pluginContext.getConfigMapName()));
-        verify(applicationContext).publishEvent(any());
+
+        // Make sure the method cache#put is called before the event is published
+        // to avoid the event listener to fetch the old value from the cache
+        var inOrder = inOrder(cache, applicationContext);
+        inOrder.verify(cache).put(eq("fake"), any());
+        inOrder.verify(applicationContext).publishEvent(isA(PluginConfigUpdatedEvent.class));
 
         Map<String, JsonNode> updatedValues = settingFetcher.getValues();
         verify(client, times(1)).fetch(eq(ConfigMap.class), any());
