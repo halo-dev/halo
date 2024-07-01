@@ -127,8 +127,12 @@ public class WebServerSecurityConfig {
 
     @Bean
     DefaultUserDetailService userDetailsService(UserService userService,
-        RoleService roleService) {
-        return new DefaultUserDetailService(userService, roleService);
+        RoleService roleService,
+        HaloProperties haloProperties) {
+        var userDetailService = new DefaultUserDetailService(userService, roleService);
+        var twoFactorAuthDisabled = haloProperties.getSecurity().getTwoFactorAuth().isDisabled();
+        userDetailService.setTwoFactorAuthDisabled(twoFactorAuthDisabled);
+        return userDetailService;
     }
 
     @Bean

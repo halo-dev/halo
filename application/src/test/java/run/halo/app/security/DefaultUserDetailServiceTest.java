@@ -157,10 +157,26 @@ class DefaultUserDetailServiceTest {
     }
 
     @Test
+    void shouldFindHaloUserDetailsWith2faDisabledWhen2faDisabledGlobally() {
+        userDetailService.setTwoFactorAuthDisabled(true);
+        var fakeUser = createFakeUser();
+        fakeUser.getSpec().setTwoFactorAuthEnabled(true);
+        fakeUser.getSpec().setTotpEncryptedSecret("fake-totp-encrypted-secret");
+        when(userService.getUser("faker")).thenReturn(Mono.just(fakeUser));
+        when(roleService.listRoleRefs(any())).thenReturn(Flux.empty());
+        userDetailService.findByUsername("faker")
+            .as(StepVerifier::create)
+            .assertNext(userDetails -> {
+                assertInstanceOf(HaloUserDetails.class, userDetails);
+                assertFalse(((HaloUserDetails) userDetails).isTwoFactorAuthEnabled());
+            })
+            .verifyComplete();
+    }
+
+    @Test
     void shouldFindUserDetailsByExistingUsernameButKindOfRoleRefIsNotRole() {
         var foundUser = createFakeUser();
 
-        var roleGvk = new Role().groupVersionKind();
         var roleRef = new RoleRef();
         roleRef.setKind("FakeRole");
         roleRef.setApiGroup("fake.halo.run");
