@@ -14,6 +14,7 @@ import run.halo.app.infra.ExternalLinkProcessor;
 import run.halo.app.infra.ExternalUrlSupplier;
 import run.halo.app.notification.NotificationCenter;
 import run.halo.app.notification.NotificationReasonEmitter;
+import run.halo.app.security.LoginHandlerEnhancer;
 
 /**
  * Utility for creating shared application context.
@@ -59,6 +60,8 @@ public enum SharedApplicationContextFactory {
             rootContext.getBean(PostContentService.class));
         beanFactory.registerSingleton("cacheManager",
             rootContext.getBean(CacheManager.class));
+        beanFactory.registerSingleton("loginHandlerEnhancer",
+            rootContext.getBean(LoginHandlerEnhancer.class));
         // TODO add more shared instance here
 
         sharedContext.refresh();
