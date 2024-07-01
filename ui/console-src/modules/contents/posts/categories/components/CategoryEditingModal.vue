@@ -21,6 +21,7 @@ import {
 import { useQueryClient } from "@tanstack/vue-query";
 import { cloneDeep } from "lodash-es";
 import { useI18n } from "vue-i18n";
+import { submitForm, reset } from "@formkit/core";
 
 const props = withDefaults(
   defineProps<{
@@ -65,6 +66,7 @@ const formState = ref<Category>({
 const selectedParentCategory = ref();
 const saving = ref(false);
 const modal = ref<InstanceType<typeof VModal> | null>(null);
+const keepAddingSubmit = ref(false);
 
 const isUpdateMode = !!props.category;
 
@@ -133,7 +135,11 @@ const handleSaveCategory = async () => {
       }
     }
 
-    modal.value?.close();
+    if (keepAddingSubmit.value) {
+      reset("category-form");
+    } else {
+      modal.value?.close();
+    }
 
     queryClient.invalidateQueries({ queryKey: ["post-categories"] });
 
@@ -143,6 +149,11 @@ const handleSaveCategory = async () => {
   } finally {
     saving.value = false;
   }
+};
+
+const handleSubmit = (keepAdding = false) => {
+  keepAddingSubmit.value = keepAdding;
+  submitForm("category-form");
 };
 
 onMounted(() => {
@@ -340,18 +351,29 @@ const { handleGenerateSlug } = useSlugify(
     </div>
 
     <template #footer>
-      <VSpace>
-        <SubmitButton
-          :loading="saving"
-          type="secondary"
-          :text="$t('core.common.buttons.submit')"
-          @submit="$formkit.submit('category-form')"
-        >
-        </SubmitButton>
+      <div class="flex justify-between">
+        <VSpace>
+          <SubmitButton
+            :loading="saving && !keepAddingSubmit"
+            :disabled="saving && keepAddingSubmit"
+            type="secondary"
+            :text="$t('core.common.buttons.submit')"
+            @submit="handleSubmit"
+          >
+          </SubmitButton>
+          <VButton
+            v-if="!isUpdateMode"
+            :loading="saving && keepAddingSubmit"
+            :disabled="saving && !keepAddingSubmit"
+            @click="handleSubmit(true)"
+          >
+            {{ $t("core.common.buttons.save_and_continue") }}
+          </VButton>
+        </VSpace>
         <VButton @click="modal?.close()">
           {{ $t("core.common.buttons.cancel_and_shortcut") }}
         </VButton>
-      </VSpace>
+      </div>
     </template>
   </VModal>
 </template>
