@@ -15,23 +15,6 @@ rules: [ ]
 apiVersion: v1alpha1
 kind: "Role"
 metadata:
-  name: role-template-post-editor
-  # Deprecated, will be removed in the future
-  deletionTimestamp: 2023-12-01T03:36:25.875373Z
-  labels:
-    halo.run/role-template: "true"
-  annotations:
-    rbac.authorization.halo.run/module: "Posts Management"
-    # Currently, yaml definition does not support i18n, please see https://github.com/halo-dev/halo/issues/3573
-    rbac.authorization.halo.run/display-name: "Post Editor"
-    rbac.authorization.halo.run/dependencies: |
-      ["role-template-manage-posts", "role-template-post-author"]
-rules: [ ]
-
----
-apiVersion: v1alpha1
-kind: "Role"
-metadata:
   name: post-author
   labels:
     rbac.authorization.halo.run/system-reserved: "true"
