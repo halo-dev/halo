@@ -70,7 +70,7 @@ const tabs = ref<UserProfileTab[]>([
   },
   {
     id: "2fa",
-    label: "两步验证",
+    label: t("core.uc_profile.tabs.2fa"),
     component: markRaw(TwoFactor),
     priority: 40,
   },

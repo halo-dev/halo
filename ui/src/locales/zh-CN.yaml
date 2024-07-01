@@ -25,6 +25,11 @@ core:
     button: 登录
     modal:
       title: 重新登录
+    2fa:
+      fields:
+        code:
+          placeholder: 请输入两步验证码
+          label: 两步验证码
   signup:
     title: 注册
     fields:
@@ -1086,6 +1091,7 @@ core:
       detail: 详情
       notification-preferences: 通知配置
       pat: 个人令牌
+      2fa: 两步验证
       devices: 登录设备
     actions:
       update_profile:
@@ -1115,6 +1121,47 @@ core:
         description: 电子邮箱地址还未验证，点击下方按钮进行验证
       email_verified:
         tooltip: 已验证
+    2fa:
+      operations:
+        enable:
+          button: 启用两步验证
+          title: 启用两步验证
+        disable:
+          title: 禁用两步验证
+        disable_totp:
+          title: 停用 TOTP
+      password_validation_form:
+        fields:
+          password:
+            label: 验证密码
+            help: 当前账号的登录密码
+      methods:
+        title: 验证方式
+        totp:
+          title: TOTP
+          description: 使用 TOTP 应用程序配置两步验证
+          fields:
+            status:
+              configured: 已配置
+              not_configured: 未配置
+          operations:
+            reconfigure:
+              button: 重新配置
+            configure:
+              button: 配置
+              title: TOTP 配置
+              fields:
+                code:
+                  label: 验证码
+                  help: 从验证器应用获得的 6 位验证码
+                password:
+                  label: 验证密码
+                  help: 当前账号的登录密码
+                qrcode:
+                  label: 使用验证器应用扫描下方二维码：
+                manual:
+                  label: 如果无法扫描二维码，点击查看代替步骤
+                  help: 使用以下代码手动配置验证器应用：
     pat:
       operations:
         delete:
@@ -1624,6 +1671,8 @@ core:
       access: 访问
       schedule_publish: 定时发布
       revoke: 撤销
+      disable: 禁用
+      enable: 启用
     radio:
       "yes": 是
       "no": 否
@@ -1656,6 +1705,8 @@ core:
       not_found: 资源不存在
       server_internal_error: 服务器内部错误
       unknown_error: 未知错误
+      disable_success: 禁用成功
+      enable_success: 啟用成功
     dialog:
       titles:
         tip: 提示
