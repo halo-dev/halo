@@ -12186,8 +12186,8 @@
     },
     "/apis/security.halo.run/v1alpha1/devices": {
       "get": {
-        "description": "List v1alpha1",
-        "operationId": "listv1alpha1",
+        "description": "List Device",
+        "operationId": "listDevice",
         "parameters": [
           {
             "description": "Page number. Default is 0.",
@@ -12246,7 +12246,7 @@
             "content": {
               "*/*": {
                 "schema": {
-                  "$ref": "#/components/schemas/v1alpha1List"
+                  "$ref": "#/components/schemas/DeviceList"
                 }
               }
             },
@@ -12254,12 +12254,12 @@
           }
         },
         "tags": [
-          "v1alpha1V1alpha1"
+          "DeviceV1alpha1"
         ]
       },
       "post": {
-        "description": "Create v1alpha1",
-        "operationId": "createv1alpha1",
+        "description": "Create Device",
+        "operationId": "createDevice",
         "requestBody": {
           "content": {
             "*/*": {
@@ -12283,14 +12283,14 @@
           }
         },
         "tags": [
-          "v1alpha1V1alpha1"
+          "DeviceV1alpha1"
         ]
       }
     },
     "/apis/security.halo.run/v1alpha1/devices/{name}": {
       "delete": {
-        "description": "Delete v1alpha1",
-        "operationId": "deletev1alpha1",
+        "description": "Delete Device",
+        "operationId": "deleteDevice",
         "parameters": [
           {
             "description": "Name of device",
@@ -12308,12 +12308,12 @@
           }
         },
         "tags": [
-          "v1alpha1V1alpha1"
+          "DeviceV1alpha1"
         ]
       },
       "get": {
-        "description": "Get v1alpha1",
-        "operationId": "getv1alpha1",
+        "description": "Get Device",
+        "operationId": "getDevice",
         "parameters": [
           {
             "description": "Name of device",
@@ -12338,12 +12338,12 @@
           }
         },
         "tags": [
-          "v1alpha1V1alpha1"
+          "DeviceV1alpha1"
         ]
       },
       "patch": {
-        "description": "Patch v1alpha1",
-        "operationId": "patchv1alpha1",
+        "description": "Patch Device",
+        "operationId": "patchDevice",
         "parameters": [
           {
             "description": "Name of device",
@@ -12377,12 +12377,12 @@
           }
         },
         "tags": [
-          "v1alpha1V1alpha1"
+          "DeviceV1alpha1"
         ]
       },
       "put": {
-        "description": "Update v1alpha1",
-        "operationId": "updatev1alpha1",
+        "description": "Update Device",
+        "operationId": "updateDevice",
         "parameters": [
           {
             "description": "Name of device",
@@ -12417,7 +12417,7 @@
           }
         },
         "tags": [
-          "v1alpha1V1alpha1"
+          "DeviceV1alpha1"
         ]
       }
     },
@@ -16643,6 +16643,65 @@
           },
           "status": {
             "$ref": "#/components/schemas/DeviceStatus"
+          }
+        }
+      },
+      "DeviceList": {
+        "required": [
+          "first",
+          "hasNext",
+          "hasPrevious",
+          "items",
+          "last",
+          "page",
+          "size",
+          "total",
+          "totalPages"
+        ],
+        "type": "object",
+        "properties": {
+          "first": {
+            "type": "boolean",
+            "description": "Indicates whether current page is the first page."
+          },
+          "hasNext": {
+            "type": "boolean",
+            "description": "Indicates whether current page has previous page."
+          },
+          "hasPrevious": {
+            "type": "boolean",
+            "description": "Indicates whether current page has previous page."
+          },
+          "items": {
+            "type": "array",
+            "description": "A chunk of items.",
+            "items": {
+              "$ref": "#/components/schemas/Device"
+            }
+          },
+          "last": {
+            "type": "boolean",
+            "description": "Indicates whether current page is the last page."
+          },
+          "page": {
+            "type": "integer",
+            "description": "Page number, starts from 1. If not set or equal to 0, it means no pagination.",
+            "format": "int32"
+          },
+          "size": {
+            "type": "integer",
+            "description": "Size of each page. If not set or equal to 0, it means no pagination.",
+            "format": "int32"
+          },
+          "total": {
+            "type": "integer",
+            "description": "Total elements.",
+            "format": "int64"
+          },
+          "totalPages": {
+            "type": "integer",
+            "description": "Indicates total pages.",
+            "format": "int64"
           }
         }
       },
@@ -22937,65 +22996,6 @@
           },
           "plural": {
             "type": "string"
-          }
-        }
-      },
-      "v1alpha1List": {
-        "required": [
-          "first",
-          "hasNext",
-          "hasPrevious",
-          "items",
-          "last",
-          "page",
-          "size",
-          "total",
-          "totalPages"
-        ],
-        "type": "object",
-        "properties": {
-          "first": {
-            "type": "boolean",
-            "description": "Indicates whether current page is the first page."
-          },
-          "hasNext": {
-            "type": "boolean",
-            "description": "Indicates whether current page has previous page."
-          },
-          "hasPrevious": {
-            "type": "boolean",
-            "description": "Indicates whether current page has previous page."
-          },
-          "items": {
-            "type": "array",
-            "description": "A chunk of items.",
-            "items": {
-              "$ref": "#/components/schemas/Device"
-            }
-          },
-          "last": {
-            "type": "boolean",
-            "description": "Indicates whether current page is the last page."
-          },
-          "page": {
-            "type": "integer",
-            "description": "Page number, starts from 1. If not set or equal to 0, it means no pagination.",
-            "format": "int32"
-          },
-          "size": {
-            "type": "integer",
-            "description": "Size of each page. If not set or equal to 0, it means no pagination.",
-            "format": "int32"
-          },
-          "total": {
-            "type": "integer",
-            "description": "Total elements.",
-            "format": "int64"
-          },
-          "totalPages": {
-            "type": "integer",
-            "description": "Indicates total pages.",
-            "format": "int64"
           }
         }
       }
