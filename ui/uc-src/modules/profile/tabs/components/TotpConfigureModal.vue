@@ -5,8 +5,10 @@ import { Toast, VButton, VModal, VSpace } from "@halo-dev/components";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/vue-query";
 import { useQRCode } from "@vueuse/integrations/useQRCode";
 import { computed, ref } from "vue";
+import { useI18n } from "vue-i18n";
 
 const queryClient = useQueryClient();
+const { t } = useI18n();
 
 const emit = defineEmits<{
   (event: "close"): void;
@@ -32,7 +34,7 @@ const { mutate, isLoading } = useMutation({
     });
   },
   onSuccess() {
-    Toast.success("配置成功");
+    Toast.success(t("core.common.toast.save_success"));
     queryClient.invalidateQueries({ queryKey: ["two-factor-settings"] });
     modal.value?.close();
   },
@@ -48,20 +50,34 @@ function onSubmit(data: TotpRequest) {
     ref="modal"
     :width="500"
     :centered="false"
-    title="TOTP 配置"
+    :title="$t('core.uc_profile.2fa.methods.totp.operations.configure.title')"
     @close="emit('close')"
   >
     <div>
       <div class="mb-4 space-y-3 border-b border-gray-100 pb-4 text-gray-900">
-        <div class="text-sm font-semibold">使用验证器应用扫描下方二维码：</div>
+        <div class="text-sm font-semibold">
+          {{
+            $t(
+              "core.uc_profile.2fa.methods.totp.operations.configure.fields.qrcode.label"
+            )
+          }}
+        </div>
         <img :src="qrcode" class="rounded-base border border-gray-100" />
         <details>
           <summary class="cursor-pointer select-none text-sm text-gray-800">
-            如果无法扫描二维码，点击查看代替步骤
+            {{
+              $t(
+                "core.uc_profile.2fa.methods.totp.operations.configure.fields.manual.label"
+              )
+            }}
           </summary>
           <div class="mt-3 rounded-base border border-gray-100 p-2">
             <span class="text-sm text-gray-600">
-              使用以下代码手动配置验证器应用：
+              {{
+                $t(
+                  "core.uc_profile.2fa.methods.totp.operations.configure.fields.manual.help"
+                )
+              }}
             </span>
             <div class="mt-2">
               <code
@@ -77,16 +93,32 @@ function onSubmit(data: TotpRequest) {
         <FormKit
           type="number"
           name="code"
-          label="验证码"
+          :label="
+            $t(
+              'core.uc_profile.2fa.methods.totp.operations.configure.fields.code.label'
+            )
+          "
           validation="required"
-          help="从验证器应用获得的 6 位验证码"
+          :help="
+            $t(
+              'core.uc_profile.2fa.methods.totp.operations.configure.fields.code.help'
+            )
+          "
         ></FormKit>
         <FormKit
           type="password"
-          label="验证密码"
+          :label="
+            $t(
+              'core.uc_profile.2fa.methods.totp.operations.configure.fields.password.label'
+            )
+          "
           validation="required"
           name="password"
-          help="当前账号的登录密码"
+          :help="
+            $t(
+              'core.uc_profile.2fa.methods.totp.operations.configure.fields.password.help'
+            )
+          "
           autocomplete="current-password"
         ></FormKit>
         <FormKit
@@ -103,9 +135,11 @@ function onSubmit(data: TotpRequest) {
           type="secondary"
           @click="$formkit.submit('totp-form')"
         >
-          完成
+          {{ $t("core.common.buttons.save") }}
         </VButton>
-        <VButton @click="modal?.close()">关闭</VButton>
+        <VButton @click="modal?.close()">
+          {{ $t("core.common.buttons.close") }}
+        </VButton>
       </VSpace>
     </template>
   </VModal>

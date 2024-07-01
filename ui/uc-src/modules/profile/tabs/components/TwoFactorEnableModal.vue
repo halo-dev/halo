@@ -3,9 +3,11 @@ import { ucApiClient } from "@halo-dev/api-client";
 import { Toast, VButton, VModal, VSpace } from "@halo-dev/components";
 import { useMutation, useQueryClient } from "@tanstack/vue-query";
 import { ref } from "vue";
+import { useI18n } from "vue-i18n";
 import PasswordValidationForm from "./PasswordValidationForm.vue";
 
 const queryClient = useQueryClient();
+const { t } = useI18n();
 
 const emit = defineEmits<{
   (event: "close"): void;
@@ -23,7 +25,7 @@ const { mutate, isLoading } = useMutation({
     });
   },
   onSuccess() {
-    Toast.success("启用成功");
+    Toast.success(t("core.common.toast.enable_success"));
     queryClient.invalidateQueries({ queryKey: ["two-factor-settings"] });
     modal.value?.close();
   },
@@ -39,7 +41,7 @@ function onSubmit(password: string) {
     ref="modal"
     :width="500"
     :centered="false"
-    title="启用两步验证"
+    :title="$t('core.uc_profile.2fa.operations.enable.title')"
     @close="emit('close')"
   >
     <PasswordValidationForm @submit="onSubmit" />
@@ -50,9 +52,11 @@ function onSubmit(password: string) {
           type="secondary"
           @click="$formkit.submit('password-validation-form')"
         >
-          启用
+          {{ $t("core.common.buttons.enable") }}
         </VButton>
-        <VButton @click="modal?.close()">关闭</VButton>
+        <VButton @click="modal?.close()">
+          {{ $t("core.common.buttons.close") }}
+        </VButton>
       </VSpace>
     </template>
   </VModal>
