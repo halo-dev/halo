@@ -917,6 +917,15 @@ core:
         reason: 原因
         message: 訊息
         last_transition_time: 時間
+    extension-settings:
+      title: 擴展配置
+      extension-point-definition:
+        title: 擴展點定義
+      extension-definition:
+        empty:
+          title: 當前沒有擴展點實現
+    actions:
+      extension-point-settings: 擴展配置
   user:
     title: 用戶
     actions:

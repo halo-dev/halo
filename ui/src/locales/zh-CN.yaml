@@ -937,6 +937,15 @@ core:
         reason: 原因
         message: 信息
         last_transition_time: 时间
+    extension-settings:
+      title: 扩展配置
+      extension-point-definition:
+        title: 扩展点定义
+      extension-definition:
+        empty:
+          title: 当前没有扩展点实现
+    actions:
+      extension-point-settings: 扩展配置
   user:
     title: 用户
     actions:
