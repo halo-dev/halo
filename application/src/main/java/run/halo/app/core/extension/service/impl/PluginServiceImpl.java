@@ -549,15 +549,22 @@ public class PluginServiceImpl implements PluginService, InitializingBean, Dispo
                             // double check of the resource
                             .filter(res -> isResourceMatch(res, newFilename))
                             .switchIfEmpty(Mono.using(
-                                    () -> tempDir.resolve(newFilename),
+                                    () -> {
+                                        if (!Files.exists(tempDir)) {
+                                            Files.createDirectories(tempDir);
+                                        }
+                                        return tempDir.resolve(newFilename);
+                                    },
                                     path -> DataBufferUtils.write(content, path,
                                             CREATE, TRUNCATE_EXISTING)
                                         .then(Mono.<Resource>fromSupplier(
                                             () -> new FileSystemResource(path)
                                         )),
                                     path -> {
-                                        // clean up old resource
-                                        cleanUp(this.resource);
+                                        if (shouldCleanUp(path)) {
+                                            // clean up old resource
+                                            cleanUp(this.resource);
+                                        }
                                     })
                                 .subscribeOn(scheduler)
                                 .doOnNext(newResource -> this.resource = newResource)
@@ -577,6 +584,18 @@ public class PluginServiceImpl implements PluginService, InitializingBean, Dispo
                         });
                     }
                 });
+        }
+
+        private boolean shouldCleanUp(Path newPath) {
+            if (this.resource == null || !this.resource.exists()) {
+                return false;
+            }
+            try {
+                var oldPath = this.resource.getFile().toPath();
+                return !oldPath.equals(newPath);
+            } catch (IOException e) {
+                return false;
+            }
         }
 
         private static void cleanUp(Resource resource) {

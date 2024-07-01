@@ -46,6 +46,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.pf4j.PluginDescriptor;
 import org.pf4j.PluginWrapper;
 import org.springframework.core.io.buffer.DataBuffer;
+import org.springframework.util.FileSystemUtils;
 import org.springframework.web.server.ServerWebInputException;
 import reactor.core.publisher.Mono;
 import reactor.test.StepVerifier;
@@ -386,6 +387,24 @@ class PluginServiceImplTest {
                             resource.getFile().toPath());
                         assertEquals("different-version.js", resource.getFilename());
                         assertEquals("fake-content", resource.getContentAsString(UTF_8));
+                    } catch (IOException e) {
+                        throw new RuntimeException(e);
+                    }
+                })
+                .verifyComplete();
+
+            try {
+                FileSystemUtils.deleteRecursively(tempDir);
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
+            cache.computeIfAbsent("fake-version", fakeContent)
+                .as(StepVerifier::create)
+                .assertNext(resource -> {
+                    try {
+                        assertThat(Files.exists(tempDir)).isTrue();
+                        assertEquals(tempDir.resolve("different-version.js"),
+                            resource.getFile().toPath());
                     } catch (IOException e) {
                         throw new RuntimeException(e);
                     }
