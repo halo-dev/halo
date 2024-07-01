@@ -1,5 +1,6 @@
 .gitignore
 .npmignore
+.openapi-generator-ignore
 api.ts
 api/annotation-setting-v1alpha1-api.ts
 api/api-notification-halo-run-v1alpha1-subscription-api.ts
