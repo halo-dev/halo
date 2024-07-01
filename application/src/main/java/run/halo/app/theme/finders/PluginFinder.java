@@ -9,4 +9,6 @@ package run.halo.app.theme.finders;
 public interface PluginFinder {
 
     boolean available(String pluginName);
+
+    boolean available(String pluginName, String requiresVersion);
 }
