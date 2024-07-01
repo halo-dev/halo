@@ -998,6 +998,15 @@ core:
         reason: Reason
         message: Message
         last_transition_time: Last transition time
+    extension-settings:
+      title: Extension settings
+      extension-point-definition:
+        title: Extension point definitions
+      extension-definition:
+        empty:
+          title: There is currently no extension point implemented
+    actions:
+      extension-point-settings: Extension settings
   user:
     title: Users
     actions:
