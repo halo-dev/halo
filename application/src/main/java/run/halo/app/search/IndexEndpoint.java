@@ -4,10 +4,15 @@ import static org.springdoc.core.fn.builders.apiresponse.Builder.responseBuilder
 import static org.springdoc.core.fn.builders.requestbody.Builder.requestBodyBuilder;
 
 import java.util.List;
+import java.util.Map;
 import org.springdoc.webflux.core.fn.SpringdocRouteBuilder;
+import org.springframework.context.annotation.Bean;
+import org.springframework.http.MediaType;
 import org.springframework.stereotype.Component;
 import org.springframework.validation.Validator;
+import org.springframework.web.reactive.function.server.RequestPredicates;
 import org.springframework.web.reactive.function.server.RouterFunction;
+import org.springframework.web.reactive.function.server.RouterFunctions;
 import org.springframework.web.reactive.function.server.ServerRequest;
 import org.springframework.web.reactive.function.server.ServerResponse;
 import org.springframework.web.server.ServerWebInputException;
@@ -18,6 +23,8 @@ import run.halo.app.extension.GroupVersion;
 import run.halo.app.infra.exception.RequestBodyValidationException;
 import run.halo.app.plugin.extensionpoint.ExtensionGetter;
 import run.halo.app.search.post.PostHaloDocumentsProvider;
+import run.halo.app.theme.DefaultTemplateEnum;
+import run.halo.app.theme.router.ModelConst;
 
 @Component
 public class IndexEndpoint implements CustomEndpoint {
@@ -31,6 +38,24 @@ public class IndexEndpoint implements CustomEndpoint {
     public IndexEndpoint(ExtensionGetter extensionGetter, Validator validator) {
         this.extensionGetter = extensionGetter;
         this.validator = validator;
+    }
+
+    @Bean
+    RouterFunction<ServerResponse> searchView() {
+        return RouterFunctions.route()
+            .GET("/search", RequestPredicates.accept(MediaType.TEXT_HTML), request -> {
+                var keyword = request.queryParam("keyword").orElse("").trim();
+                var option = new SearchOption();
+                option.setKeyword(keyword);
+                var searchResult = this.performSearch(option);
+                // get search option
+                var templateId = DefaultTemplateEnum.SEARCH.getValue();
+                return ServerResponse.ok().render(templateId, Map.of(
+                    "searchResult", searchResult,
+                    ModelConst.TEMPLATE_ID, templateId)
+                );
+            })
+            .build();
     }
 
     @Override

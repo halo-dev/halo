@@ -21,7 +21,11 @@ public enum DefaultTemplateEnum {
 
     SINGLE_PAGE("page"),
 
-    AUTHOR("author");
+    AUTHOR("author"),
+
+    SEARCH("search"),
+
+    ;
 
     private final String value;
 

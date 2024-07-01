@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="zh" xmlns:th="https://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <title>搜索结果</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            padding: 20px;
+            background-color: #f0f0f0;
+        }
+        .container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            background-color: #fff;
+            padding: 20px;
+            border-radius: 5px;
+            box-shadow: 0px 0px 10px 0px rgba(0,0,0,0.1);
+        }
+        .result {
+            display: flex;
+            flex-direction: column;
+            align-items: flex-start;
+            width: 80%;
+            padding: 20px;
+            margin-bottom: 20px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+        }
+        h1 {
+            color: #333;
+        }
+        h2 {
+            color: #666;
+            font-size: 1.5em;
+        }
+        p.description {
+            color: #999;
+            font-style: italic;
+        }
+        p.content {
+            color: #777;
+            font-size: 0.9em;
+        }
+        a {
+            color: #007BFF;
+            text-decoration: none;
+        }
+        a:hover {
+            color: #0056b3;
+        }
+
+        .search-box {
+            display: flex;
+            flex-direction: column;
+            align-items: flex-start;
+            width: 80%;
+            padding: 20px;
+            margin-bottom: 20px;
+        }
+        .search-box input {
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+        }
+        .search-box button {
+            padding: 10px;
+            border: none;
+            background-color: #007BFF;
+            color: #fff;
+            cursor: pointer;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+        }
+        .search-box button:hover {
+            background-color: #0056b3;
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <h1>搜索结果</h1>
+    <div class="search-box">
+        <form th:action="@{/search}" method="get">
+            <input type="text" name="keyword" th:value="${searchResult.keyword}" placeholder="输入关键词">
+            <button type="submit">搜索</button>
+        </form>
+    </div>
+    <div th:each="document : ${searchResult.hits}" class="result">
+        <h2 th:utext="${document.title}"></h2>
+        <p class="description" th:utext="${document.description}"></p>
+        <p class="content" th:utext="${document.content}"></p>
+        <a th:href="${document.permalink}">查看详情</a>
+    </div>
+</div>
+</body>
+</html>
