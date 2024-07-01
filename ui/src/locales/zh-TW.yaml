@@ -25,6 +25,11 @@ core:
     button: 登入
     modal:
       title: 重新登入
+    2fa:
+      fields:
+        code:
+          placeholder: 請輸入兩步驟驗證碼
+          label: 兩步驟驗證碼
   signup:
     title: 註冊
     fields:
@@ -912,6 +917,15 @@ core:
         reason: 原因
         message: 訊息
         last_transition_time: 時間
+    extension-settings:
+      title: 擴展配置
+      extension-point-definition:
+        title: 擴展點定義
+      extension-definition:
+        empty:
+          title: 當前沒有擴展點實現
+    actions:
+      extension-point-settings: 擴展配置
   user:
     title: 用戶
     actions:
@@ -1066,6 +1080,7 @@ core:
       detail: 詳情
       notification-preferences: 通知配置
       pat: 個人令牌
+      2fa: 两步验证
       devices: 登錄設備
     actions:
       update_profile:
@@ -1095,6 +1110,47 @@ core:
         title: 驗證電子郵件信箱
       email_verified:
         tooltip: 已驗證
+    2fa:
+      operations:
+        enable:
+          button: 启用两步验证
+          title: 启用两步验证
+        disable:
+          title: 禁用两步验证
+        disable_totp:
+          title: 停用 TOTP
+      password_validation_form:
+        fields:
+          password:
+            label: 验证密碼
+            help: 目前帳號的登入密碼
+      methods:
+        title: 驗證方法
+        totp:
+          title: TOTP
+          description: 使用 TOTP 應用程式設定兩步驟驗證
+          fields:
+            status:
+              configured: 已配置
+              not_configured: 未配置
+          operations:
+            reconfigure:
+              button: 重新配置
+            configure:
+              button: 配置
+              title: TOTP 配置
+              fields:
+                code:
+                  label: 驗證碼
+                  help: 從驗證器應用程式取得的 6 位驗證碼
+                password:
+                  label: 验证密碼
+                  help: 目前帳號的登入密碼
+                qrcode:
+                  label: 使用驗證器應用程式掃描下面的二維碼：
+                manual:
+                  label: 如果您無法掃描二維碼，請按一下查看替代步驟。
+                  help: 使用以下程式碼手動配置驗證器應用程式：
     pat:
       operations:
         delete:
@@ -1581,6 +1637,8 @@ core:
       access: 訪問
       schedule_publish: 定時發佈
       revoke: 撤銷
+      disable: 禁用
+      enable: 启用
     radio:
       "yes": 是
       "no": 否
@@ -1613,6 +1671,8 @@ core:
       not_found: 資源不存在
       server_internal_error: 伺服器內部錯誤
       unknown_error: 未知錯誤
+      disable_success: 禁用成功
+      enable_success: 啟用成功
     dialog:
       titles:
         tip: 提示

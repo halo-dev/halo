@@ -1,15 +1,24 @@
 <script lang="ts" setup>
+import { setFocus } from "@/formkit/utils/focus";
 import { submitForm } from "@formkit/core";
 import { Toast, VButton } from "@halo-dev/components";
 import axios from "axios";
 import qs from "qs";
+import { onMounted, ref } from "vue";
+import { useI18n } from "vue-i18n";
+
+const { t } = useI18n();
 
 const emit = defineEmits<{
   (event: "succeed"): void;
 }>();
 
+const loading = ref(false);
+
 async function onSubmit({ code }: { code: string }) {
   try {
+    loading.value = true;
+
     const _csrf = document.cookie
       .split("; ")
       .find((row) => row.startsWith("XSRF-TOKEN"))
@@ -36,9 +45,15 @@ async function onSubmit({ code }: { code: string }) {
 
     emit("succeed");
   } catch (error) {
-    Toast.error("验证失败");
+    Toast.error(t("core.common.toast.validation_failed"));
+  } finally {
+    loading.value = false;
   }
 }
+
+onMounted(() => {
+  setFocus("code");
+});
 </script>
 
 <template>
@@ -54,19 +69,25 @@ async function onSubmit({ code }: { code: string }) {
     @keyup.enter="submitForm('mfa-form')"
   >
     <FormKit
+      id="code"
       :classes="{
         outer: '!py-0',
       }"
       name="code"
-      placeholder="请输入两步验证码"
-      validation-label="两步验证码"
-      :autofocus="true"
+      :placeholder="$t('core.login.2fa.fields.code.placeholder')"
+      :validation-label="$t('core.login.2fa.fields.code.label')"
       type="text"
       validation="required"
     >
     </FormKit>
   </FormKit>
-  <VButton class="mt-8" block type="secondary" @click="submitForm('mfa-form')">
-    验证
+  <VButton
+    :loading="loading"
+    class="mt-8"
+    block
+    type="secondary"
+    @click="submitForm('mfa-form')"
+  >
+    {{ $t("core.common.buttons.verify") }}
   </VButton>
 </template>

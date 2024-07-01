@@ -37,6 +37,9 @@
       "eslint --fix --max-warnings=0"
     ]
   },
+  "resolutions": {
+    "axios": "^1.7.x"
+  },
   "dependencies": {
     "@codemirror/commands": "^6.1.2",
     "@codemirror/lang-css": "^6.0.1",
