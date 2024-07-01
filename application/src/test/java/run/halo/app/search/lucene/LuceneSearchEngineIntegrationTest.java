@@ -102,6 +102,7 @@ public class LuceneSearchEngineIntegrationTest {
                     assertEquals(1, hits.size());
                     var doc = hits.get(0);
                     assertEquals("post.content.halo.run-first-post", doc.getId());
+                    assertEquals("post.content.halo.run", doc.getType());
                     assertEquals("first <my-tag>halo</my-tag> post", doc.getTitle());
                     assertNull(doc.getDescription());
                     assertEquals("<my-tag>halo</my-tag>", doc.getContent());

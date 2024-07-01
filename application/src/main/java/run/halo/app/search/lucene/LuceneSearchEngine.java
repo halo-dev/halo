@@ -348,6 +348,7 @@ public class LuceneSearchEngine implements SearchEngine, InitializingBean, Dispo
         public HaloDocument convert(Document doc) {
             var haloDoc = new HaloDocument();
             haloDoc.setId(doc.get("id"));
+            haloDoc.setType(doc.get("type"));
             haloDoc.setMetadataName(doc.get("name"));
             haloDoc.setTitle(doc.get("title"));
             haloDoc.setDescription(doc.get("description"));
