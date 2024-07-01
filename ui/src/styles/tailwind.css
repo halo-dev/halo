@@ -22,5 +22,5 @@ textarea {
 }
 
 input[type="checkbox"] {
-  @apply rounded-sm border-gray-500;
+  @apply rounded-sm border-gray-500 disabled:bg-gray-200 disabled:opacity-50;
 }
