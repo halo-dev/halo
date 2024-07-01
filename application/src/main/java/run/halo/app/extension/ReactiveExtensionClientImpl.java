@@ -11,6 +11,7 @@ import java.util.Comparator;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -112,9 +113,17 @@ public class ReactiveExtensionClientImpl implements ReactiveExtensionClient {
 
     @Override
     public <E extends Extension> Flux<E> listAll(Class<E> type, ListOptions options, Sort sort) {
+        var nullSafeSort = Optional.ofNullable(sort)
+            .orElseGet(() -> {
+                log.warn("The sort parameter is null, it is recommended to use Sort.unsorted() "
+                    + "instead and the compatibility support for null will be removed in the "
+                    + "subsequent version.");
+                return Sort.unsorted();
+            });
         var scheme = schemeManager.get(type);
         return Mono.fromSupplier(
-                () -> indexedQueryEngine.retrieveAll(scheme.groupVersionKind(), options, sort))
+                () -> indexedQueryEngine.retrieveAll(scheme.groupVersionKind(), options,
+                    nullSafeSort))
             .doOnSuccess(objectKeys -> {
                 if (log.isDebugEnabled()) {
                     if (objectKeys.size() > 500) {
