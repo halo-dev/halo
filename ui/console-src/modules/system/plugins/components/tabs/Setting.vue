@@ -1,19 +1,11 @@
 <script lang="ts" setup>
-// core libs
-import { computed, inject, ref, type Ref } from "vue";
-
-// hooks
-import { useSettingFormConvert } from "@console/composables/use-setting-form";
-import { consoleApiClient } from "@halo-dev/api-client";
-
-// components
-import { Toast, VButton } from "@halo-dev/components";
-
-// types
 import StickyBlock from "@/components/sticky-block/StickyBlock.vue";
+import { useSettingFormConvert } from "@console/composables/use-setting-form";
 import type { ConfigMap, Plugin, Setting } from "@halo-dev/api-client";
+import { consoleApiClient } from "@halo-dev/api-client";
+import { Toast, VButton } from "@halo-dev/components";
 import { useQuery, useQueryClient } from "@tanstack/vue-query";
-import { toRaw } from "vue";
+import { computed, inject, ref, toRaw, type Ref } from "vue";
 import { useI18n } from "vue-i18n";
 
 const { t } = useI18n();

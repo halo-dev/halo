@@ -18,8 +18,8 @@ import {
 import { useQuery } from "@tanstack/vue-query";
 import type { Ref } from "vue";
 import { computed, inject, ref } from "vue";
-import PluginConditionsModal from "../components/PluginConditionsModal.vue";
-import { usePluginLifeCycle } from "../composables/use-plugin";
+import { usePluginLifeCycle } from "../../composables/use-plugin";
+import PluginConditionsModal from "../PluginConditionsModal.vue";
 
 const plugin = inject<Ref<Plugin | undefined>>("plugin");
 const { changeStatus, changingStatus } = usePluginLifeCycle(plugin);
