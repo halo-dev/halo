@@ -1,6 +1,11 @@
 <script lang="ts" setup>
 import { coreApiClient } from "@halo-dev/api-client";
-import { IconSettings, VCard, VPageHeader } from "@halo-dev/components";
+import {
+  IconSettings,
+  VButton,
+  VCard,
+  VPageHeader,
+} from "@halo-dev/components";
 import { useQuery } from "@tanstack/vue-query";
 import { useRouteQuery } from "@vueuse/router";
 import { computed, watch } from "vue";
@@ -41,9 +46,14 @@ watch(
 </script>
 
 <template>
-  <VPageHeader title="扩展点设置">
+  <VPageHeader :title="$t('core.plugin.extension-settings.title')">
     <template #icon>
       <IconSettings class="mr-2 self-center" />
+    </template>
+    <template #actions>
+      <VButton size="sm" @click="$router.back()">
+        {{ $t("core.common.buttons.back") }}
+      </VButton>
     </template>
   </VPageHeader>
 
@@ -57,7 +67,13 @@ watch(
           <div
             class="sticky top-0 z-10 flex h-12 items-center border-b bg-white px-4"
           >
-            <h2 class="font-semibold text-gray-900">扩展点定义</h2>
+            <h2 class="font-semibold text-gray-900">
+              {{
+                $t(
+                  "core.plugin.extension-settings.extension-point-definition.title"
+                )
+              }}
+            </h2>
           </div>
           <ul
             class="box-border h-full w-full divide-y divide-gray-100 overflow-auto"

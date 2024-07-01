@@ -1,3 +1,6 @@
+## TODO: Currently, Halo does not support i18n for configuration file descriptions
+## So Simplified Chinese is temporarily used as the default description language.
+
 # TODO Remove the username-password-authenticator in the future.
 apiVersion: plugin.halo.run/v1alpha1
 kind: ExtensionDefinition
@@ -21,8 +24,8 @@ metadata:
 spec:
   className: run.halo.app.security.authentication.login.UsernamePasswordLogoutHandler
   extensionPointName: additional-webfilter
-  displayName: "UsernamePasswordLogoutHandler"
-  description: "Logout handler for username and password authentication."
+  displayName: "用户名密码注销处理器"
+  description: "用于用户名和密码认证的注销处理器"
 ---
 apiVersion: plugin.halo.run/v1alpha1
 kind: ExtensionDefinition
@@ -33,8 +36,8 @@ metadata:
 spec:
   className: run.halo.app.security.authentication.login.DelegatingLogoutPageGeneratingWebFilter
   extensionPointName: additional-webfilter
-  displayName: "DelegatingLogoutPageGeneratingWebFilter"
-  description: "Generates a default log out page."
+  displayName: "注销页面生成过滤器"
+  description: "用于生成默认的注销页面"
 
 ---
 apiVersion: plugin.halo.run/v1alpha1
@@ -44,8 +47,8 @@ metadata:
 spec:
   className: run.halo.app.notification.EmailNotifier
   extensionPointName: reactive-notifier
-  displayName: "EmailNotifier"
-  description: "Support sending notifications to users via email"
+  displayName: "邮件通知器"
+  description: "支持通过电子邮件向用户发送通知"
 
 ---
 apiVersion: plugin.halo.run/v1alpha1
@@ -55,7 +58,6 @@ metadata:
 spec:
   className: run.halo.app.search.lucene.LuceneSearchEngine
   extensionPointName: search-engine
-  displayName: Lucene Search Engine
-  description: |
-    Lucene is a high-performance, full-featured text search engine library written entirely in Java. 
-    It is a technology suitable for nearly any application that requires full-text search, especially cross-platform.
+  displayName: "Lucene 搜索引擎"
+  description: "Halo 自带的本地搜索引擎"
+  icon: /images/extension-points/lucene.png

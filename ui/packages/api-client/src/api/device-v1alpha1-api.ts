@@ -24,22 +24,22 @@ import { BASE_PATH, COLLECTION_FORMATS, RequestArgs, BaseAPI, RequiredError, ope
 // @ts-ignore
 import { Device } from '../models';
 // @ts-ignore
-import { JsonPatchInner } from '../models';
+import { DeviceList } from '../models';
 // @ts-ignore
-import { V1alpha1List } from '../models';
+import { JsonPatchInner } from '../models';
 /**
- * V1alpha1V1alpha1Api - axios parameter creator
+ * DeviceV1alpha1Api - axios parameter creator
  * @export
  */
-export const V1alpha1V1alpha1ApiAxiosParamCreator = function (configuration?: Configuration) {
+export const DeviceV1alpha1ApiAxiosParamCreator = function (configuration?: Configuration) {
     return {
         /**
-         * Create v1alpha1
+         * Create Device
          * @param {Device} [device] Fresh device
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        createv1alpha1: async (device?: Device, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+        createDevice: async (device?: Device, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
             const localVarPath = `/apis/security.halo.run/v1alpha1/devices`;
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
@@ -75,14 +75,14 @@ export const V1alpha1V1alpha1ApiAxiosParamCreator = function (configuration?: Co
             };
         },
         /**
-         * Delete v1alpha1
+         * Delete Device
          * @param {string} name Name of device
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        deletev1alpha1: async (name: string, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+        deleteDevice: async (name: string, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
             // verify required parameter 'name' is not null or undefined
-            assertParamExists('deletev1alpha1', 'name', name)
+            assertParamExists('deleteDevice', 'name', name)
             const localVarPath = `/apis/security.halo.run/v1alpha1/devices/{name}`
                 .replace(`{${"name"}}`, encodeURIComponent(String(name)));
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
@@ -116,14 +116,14 @@ export const V1alpha1V1alpha1ApiAxiosParamCreator = function (configuration?: Co
             };
         },
         /**
-         * Get v1alpha1
+         * Get Device
          * @param {string} name Name of device
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        getv1alpha1: async (name: string, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+        getDevice: async (name: string, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
             // verify required parameter 'name' is not null or undefined
-            assertParamExists('getv1alpha1', 'name', name)
+            assertParamExists('getDevice', 'name', name)
             const localVarPath = `/apis/security.halo.run/v1alpha1/devices/{name}`
                 .replace(`{${"name"}}`, encodeURIComponent(String(name)));
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
@@ -157,7 +157,7 @@ export const V1alpha1V1alpha1ApiAxiosParamCreator = function (configuration?: Co
             };
         },
         /**
-         * List v1alpha1
+         * List Device
          * @param {number} [page] Page number. Default is 0.
          * @param {number} [size] Size number. Default is 0.
          * @param {Array<string>} [labelSelector] Label selector. e.g.: hidden!&#x3D;true
@@ -166,7 +166,7 @@ export const V1alpha1V1alpha1ApiAxiosParamCreator = function (configuration?: Co
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        listv1alpha1: async (page?: number, size?: number, labelSelector?: Array<string>, fieldSelector?: Array<string>, sort?: Array<string>, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+        listDevice: async (page?: number, size?: number, labelSelector?: Array<string>, fieldSelector?: Array<string>, sort?: Array<string>, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
             const localVarPath = `/apis/security.halo.run/v1alpha1/devices`;
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
@@ -219,15 +219,15 @@ export const V1alpha1V1alpha1ApiAxiosParamCreator = function (configuration?: Co
             };
         },
         /**
-         * Patch v1alpha1
+         * Patch Device
          * @param {string} name Name of device
          * @param {Array<JsonPatchInner>} [jsonPatchInner] 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        patchv1alpha1: async (name: string, jsonPatchInner?: Array<JsonPatchInner>, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+        patchDevice: async (name: string, jsonPatchInner?: Array<JsonPatchInner>, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
             // verify required parameter 'name' is not null or undefined
-            assertParamExists('patchv1alpha1', 'name', name)
+            assertParamExists('patchDevice', 'name', name)
             const localVarPath = `/apis/security.halo.run/v1alpha1/devices/{name}`
                 .replace(`{${"name"}}`, encodeURIComponent(String(name)));
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
@@ -264,15 +264,15 @@ export const V1alpha1V1alpha1ApiAxiosParamCreator = function (configuration?: Co
             };
         },
         /**
-         * Update v1alpha1
+         * Update Device
          * @param {string} name Name of device
          * @param {Device} [device] Updated device
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        updatev1alpha1: async (name: string, device?: Device, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+        updateDevice: async (name: string, device?: Device, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
             // verify required parameter 'name' is not null or undefined
-            assertParamExists('updatev1alpha1', 'name', name)
+            assertParamExists('updateDevice', 'name', name)
             const localVarPath = `/apis/security.halo.run/v1alpha1/devices/{name}`
                 .replace(`{${"name"}}`, encodeURIComponent(String(name)));
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
@@ -312,50 +312,50 @@ export const V1alpha1V1alpha1ApiAxiosParamCreator = function (configuration?: Co
 };
 
 /**
- * V1alpha1V1alpha1Api - functional programming interface
+ * DeviceV1alpha1Api - functional programming interface
  * @export
  */
-export const V1alpha1V1alpha1ApiFp = function(configuration?: Configuration) {
-    const localVarAxiosParamCreator = V1alpha1V1alpha1ApiAxiosParamCreator(configuration)
+export const DeviceV1alpha1ApiFp = function(configuration?: Configuration) {
+    const localVarAxiosParamCreator = DeviceV1alpha1ApiAxiosParamCreator(configuration)
     return {
         /**
-         * Create v1alpha1
+         * Create Device
          * @param {Device} [device] Fresh device
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async createv1alpha1(device?: Device, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<Device>> {
-            const localVarAxiosArgs = await localVarAxiosParamCreator.createv1alpha1(device, options);
+        async createDevice(device?: Device, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<Device>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.createDevice(device, options);
             const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
-            const localVarOperationServerBasePath = operationServerMap['V1alpha1V1alpha1Api.createv1alpha1']?.[localVarOperationServerIndex]?.url;
+            const localVarOperationServerBasePath = operationServerMap['DeviceV1alpha1Api.createDevice']?.[localVarOperationServerIndex]?.url;
             return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
         },
         /**
-         * Delete v1alpha1
+         * Delete Device
          * @param {string} name Name of device
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async deletev1alpha1(name: string, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<void>> {
-            const localVarAxiosArgs = await localVarAxiosParamCreator.deletev1alpha1(name, options);
+        async deleteDevice(name: string, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<void>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.deleteDevice(name, options);
             const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
-            const localVarOperationServerBasePath = operationServerMap['V1alpha1V1alpha1Api.deletev1alpha1']?.[localVarOperationServerIndex]?.url;
+            const localVarOperationServerBasePath = operationServerMap['DeviceV1alpha1Api.deleteDevice']?.[localVarOperationServerIndex]?.url;
             return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
         },
         /**
-         * Get v1alpha1
+         * Get Device
          * @param {string} name Name of device
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async getv1alpha1(name: string, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<Device>> {
-            const localVarAxiosArgs = await localVarAxiosParamCreator.getv1alpha1(name, options);
+        async getDevice(name: string, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<Device>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.getDevice(name, options);
             const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
-            const localVarOperationServerBasePath = operationServerMap['V1alpha1V1alpha1Api.getv1alpha1']?.[localVarOperationServerIndex]?.url;
+            const localVarOperationServerBasePath = operationServerMap['DeviceV1alpha1Api.getDevice']?.[localVarOperationServerIndex]?.url;
             return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
         },
         /**
-         * List v1alpha1
+         * List Device
          * @param {number} [page] Page number. Default is 0.
          * @param {number} [size] Size number. Default is 0.
          * @param {Array<string>} [labelSelector] Label selector. e.g.: hidden!&#x3D;true
@@ -364,302 +364,302 @@ export const V1alpha1V1alpha1ApiFp = function(configuration?: Configuration) {
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async listv1alpha1(page?: number, size?: number, labelSelector?: Array<string>, fieldSelector?: Array<string>, sort?: Array<string>, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<V1alpha1List>> {
-            const localVarAxiosArgs = await localVarAxiosParamCreator.listv1alpha1(page, size, labelSelector, fieldSelector, sort, options);
+        async listDevice(page?: number, size?: number, labelSelector?: Array<string>, fieldSelector?: Array<string>, sort?: Array<string>, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<DeviceList>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.listDevice(page, size, labelSelector, fieldSelector, sort, options);
             const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
-            const localVarOperationServerBasePath = operationServerMap['V1alpha1V1alpha1Api.listv1alpha1']?.[localVarOperationServerIndex]?.url;
+            const localVarOperationServerBasePath = operationServerMap['DeviceV1alpha1Api.listDevice']?.[localVarOperationServerIndex]?.url;
             return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
         },
         /**
-         * Patch v1alpha1
+         * Patch Device
          * @param {string} name Name of device
          * @param {Array<JsonPatchInner>} [jsonPatchInner] 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async patchv1alpha1(name: string, jsonPatchInner?: Array<JsonPatchInner>, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<Device>> {
-            const localVarAxiosArgs = await localVarAxiosParamCreator.patchv1alpha1(name, jsonPatchInner, options);
+        async patchDevice(name: string, jsonPatchInner?: Array<JsonPatchInner>, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<Device>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.patchDevice(name, jsonPatchInner, options);
             const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
-            const localVarOperationServerBasePath = operationServerMap['V1alpha1V1alpha1Api.patchv1alpha1']?.[localVarOperationServerIndex]?.url;
+            const localVarOperationServerBasePath = operationServerMap['DeviceV1alpha1Api.patchDevice']?.[localVarOperationServerIndex]?.url;
             return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
         },
         /**
-         * Update v1alpha1
+         * Update Device
          * @param {string} name Name of device
          * @param {Device} [device] Updated device
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async updatev1alpha1(name: string, device?: Device, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<Device>> {
-            const localVarAxiosArgs = await localVarAxiosParamCreator.updatev1alpha1(name, device, options);
+        async updateDevice(name: string, device?: Device, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<Device>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.updateDevice(name, device, options);
             const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
-            const localVarOperationServerBasePath = operationServerMap['V1alpha1V1alpha1Api.updatev1alpha1']?.[localVarOperationServerIndex]?.url;
+            const localVarOperationServerBasePath = operationServerMap['DeviceV1alpha1Api.updateDevice']?.[localVarOperationServerIndex]?.url;
             return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
         },
     }
 };
 
 /**
- * V1alpha1V1alpha1Api - factory interface
+ * DeviceV1alpha1Api - factory interface
  * @export
  */
-export const V1alpha1V1alpha1ApiFactory = function (configuration?: Configuration, basePath?: string, axios?: AxiosInstance) {
-    const localVarFp = V1alpha1V1alpha1ApiFp(configuration)
+export const DeviceV1alpha1ApiFactory = function (configuration?: Configuration, basePath?: string, axios?: AxiosInstance) {
+    const localVarFp = DeviceV1alpha1ApiFp(configuration)
     return {
         /**
-         * Create v1alpha1
-         * @param {V1alpha1V1alpha1ApiCreatev1alpha1Request} requestParameters Request parameters.
+         * Create Device
+         * @param {DeviceV1alpha1ApiCreateDeviceRequest} requestParameters Request parameters.
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        createv1alpha1(requestParameters: V1alpha1V1alpha1ApiCreatev1alpha1Request = {}, options?: RawAxiosRequestConfig): AxiosPromise<Device> {
-            return localVarFp.createv1alpha1(requestParameters.device, options).then((request) => request(axios, basePath));
+        createDevice(requestParameters: DeviceV1alpha1ApiCreateDeviceRequest = {}, options?: RawAxiosRequestConfig): AxiosPromise<Device> {
+            return localVarFp.createDevice(requestParameters.device, options).then((request) => request(axios, basePath));
         },
         /**
-         * Delete v1alpha1
-         * @param {V1alpha1V1alpha1ApiDeletev1alpha1Request} requestParameters Request parameters.
+         * Delete Device
+         * @param {DeviceV1alpha1ApiDeleteDeviceRequest} requestParameters Request parameters.
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        deletev1alpha1(requestParameters: V1alpha1V1alpha1ApiDeletev1alpha1Request, options?: RawAxiosRequestConfig): AxiosPromise<void> {
-            return localVarFp.deletev1alpha1(requestParameters.name, options).then((request) => request(axios, basePath));
+        deleteDevice(requestParameters: DeviceV1alpha1ApiDeleteDeviceRequest, options?: RawAxiosRequestConfig): AxiosPromise<void> {
+            return localVarFp.deleteDevice(requestParameters.name, options).then((request) => request(axios, basePath));
         },
         /**
-         * Get v1alpha1
-         * @param {V1alpha1V1alpha1ApiGetv1alpha1Request} requestParameters Request parameters.
+         * Get Device
+         * @param {DeviceV1alpha1ApiGetDeviceRequest} requestParameters Request parameters.
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        getv1alpha1(requestParameters: V1alpha1V1alpha1ApiGetv1alpha1Request, options?: RawAxiosRequestConfig): AxiosPromise<Device> {
-            return localVarFp.getv1alpha1(requestParameters.name, options).then((request) => request(axios, basePath));
+        getDevice(requestParameters: DeviceV1alpha1ApiGetDeviceRequest, options?: RawAxiosRequestConfig): AxiosPromise<Device> {
+            return localVarFp.getDevice(requestParameters.name, options).then((request) => request(axios, basePath));
         },
         /**
-         * List v1alpha1
-         * @param {V1alpha1V1alpha1ApiListv1alpha1Request} requestParameters Request parameters.
+         * List Device
+         * @param {DeviceV1alpha1ApiListDeviceRequest} requestParameters Request parameters.
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        listv1alpha1(requestParameters: V1alpha1V1alpha1ApiListv1alpha1Request = {}, options?: RawAxiosRequestConfig): AxiosPromise<V1alpha1List> {
-            return localVarFp.listv1alpha1(requestParameters.page, requestParameters.size, requestParameters.labelSelector, requestParameters.fieldSelector, requestParameters.sort, options).then((request) => request(axios, basePath));
+        listDevice(requestParameters: DeviceV1alpha1ApiListDeviceRequest = {}, options?: RawAxiosRequestConfig): AxiosPromise<DeviceList> {
+            return localVarFp.listDevice(requestParameters.page, requestParameters.size, requestParameters.labelSelector, requestParameters.fieldSelector, requestParameters.sort, options).then((request) => request(axios, basePath));
         },
         /**
-         * Patch v1alpha1
-         * @param {V1alpha1V1alpha1ApiPatchv1alpha1Request} requestParameters Request parameters.
+         * Patch Device
+         * @param {DeviceV1alpha1ApiPatchDeviceRequest} requestParameters Request parameters.
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        patchv1alpha1(requestParameters: V1alpha1V1alpha1ApiPatchv1alpha1Request, options?: RawAxiosRequestConfig): AxiosPromise<Device> {
-            return localVarFp.patchv1alpha1(requestParameters.name, requestParameters.jsonPatchInner, options).then((request) => request(axios, basePath));
+        patchDevice(requestParameters: DeviceV1alpha1ApiPatchDeviceRequest, options?: RawAxiosRequestConfig): AxiosPromise<Device> {
+            return localVarFp.patchDevice(requestParameters.name, requestParameters.jsonPatchInner, options).then((request) => request(axios, basePath));
         },
         /**
-         * Update v1alpha1
-         * @param {V1alpha1V1alpha1ApiUpdatev1alpha1Request} requestParameters Request parameters.
+         * Update Device
+         * @param {DeviceV1alpha1ApiUpdateDeviceRequest} requestParameters Request parameters.
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        updatev1alpha1(requestParameters: V1alpha1V1alpha1ApiUpdatev1alpha1Request, options?: RawAxiosRequestConfig): AxiosPromise<Device> {
-            return localVarFp.updatev1alpha1(requestParameters.name, requestParameters.device, options).then((request) => request(axios, basePath));
+        updateDevice(requestParameters: DeviceV1alpha1ApiUpdateDeviceRequest, options?: RawAxiosRequestConfig): AxiosPromise<Device> {
+            return localVarFp.updateDevice(requestParameters.name, requestParameters.device, options).then((request) => request(axios, basePath));
         },
     };
 };
 
 /**
- * Request parameters for createv1alpha1 operation in V1alpha1V1alpha1Api.
+ * Request parameters for createDevice operation in DeviceV1alpha1Api.
  * @export
- * @interface V1alpha1V1alpha1ApiCreatev1alpha1Request
+ * @interface DeviceV1alpha1ApiCreateDeviceRequest
  */
-export interface V1alpha1V1alpha1ApiCreatev1alpha1Request {
+export interface DeviceV1alpha1ApiCreateDeviceRequest {
     /**
      * Fresh device
      * @type {Device}
-     * @memberof V1alpha1V1alpha1ApiCreatev1alpha1
+     * @memberof DeviceV1alpha1ApiCreateDevice
      */
     readonly device?: Device
 }
 
 /**
- * Request parameters for deletev1alpha1 operation in V1alpha1V1alpha1Api.
+ * Request parameters for deleteDevice operation in DeviceV1alpha1Api.
  * @export
- * @interface V1alpha1V1alpha1ApiDeletev1alpha1Request
+ * @interface DeviceV1alpha1ApiDeleteDeviceRequest
  */
-export interface V1alpha1V1alpha1ApiDeletev1alpha1Request {
+export interface DeviceV1alpha1ApiDeleteDeviceRequest {
     /**
      * Name of device
      * @type {string}
-     * @memberof V1alpha1V1alpha1ApiDeletev1alpha1
+     * @memberof DeviceV1alpha1ApiDeleteDevice
      */
     readonly name: string
 }
 
 /**
- * Request parameters for getv1alpha1 operation in V1alpha1V1alpha1Api.
+ * Request parameters for getDevice operation in DeviceV1alpha1Api.
  * @export
- * @interface V1alpha1V1alpha1ApiGetv1alpha1Request
+ * @interface DeviceV1alpha1ApiGetDeviceRequest
  */
-export interface V1alpha1V1alpha1ApiGetv1alpha1Request {
+export interface DeviceV1alpha1ApiGetDeviceRequest {
     /**
      * Name of device
      * @type {string}
-     * @memberof V1alpha1V1alpha1ApiGetv1alpha1
+     * @memberof DeviceV1alpha1ApiGetDevice
      */
     readonly name: string
 }
 
 /**
- * Request parameters for listv1alpha1 operation in V1alpha1V1alpha1Api.
+ * Request parameters for listDevice operation in DeviceV1alpha1Api.
  * @export
- * @interface V1alpha1V1alpha1ApiListv1alpha1Request
+ * @interface DeviceV1alpha1ApiListDeviceRequest
  */
-export interface V1alpha1V1alpha1ApiListv1alpha1Request {
+export interface DeviceV1alpha1ApiListDeviceRequest {
     /**
      * Page number. Default is 0.
      * @type {number}
-     * @memberof V1alpha1V1alpha1ApiListv1alpha1
+     * @memberof DeviceV1alpha1ApiListDevice
      */
     readonly page?: number
 
     /**
      * Size number. Default is 0.
      * @type {number}
-     * @memberof V1alpha1V1alpha1ApiListv1alpha1
+     * @memberof DeviceV1alpha1ApiListDevice
      */
     readonly size?: number
 
     /**
      * Label selector. e.g.: hidden!&#x3D;true
      * @type {Array<string>}
-     * @memberof V1alpha1V1alpha1ApiListv1alpha1
+     * @memberof DeviceV1alpha1ApiListDevice
      */
     readonly labelSelector?: Array<string>
 
     /**
      * Field selector. e.g.: metadata.name&#x3D;&#x3D;halo
      * @type {Array<string>}
-     * @memberof V1alpha1V1alpha1ApiListv1alpha1
+     * @memberof DeviceV1alpha1ApiListDevice
      */
     readonly fieldSelector?: Array<string>
 
     /**
      * Sorting criteria in the format: property,(asc|desc). Default sort order is ascending. Multiple sort criteria are supported.
      * @type {Array<string>}
-     * @memberof V1alpha1V1alpha1ApiListv1alpha1
+     * @memberof DeviceV1alpha1ApiListDevice
      */
     readonly sort?: Array<string>
 }
 
 /**
- * Request parameters for patchv1alpha1 operation in V1alpha1V1alpha1Api.
+ * Request parameters for patchDevice operation in DeviceV1alpha1Api.
  * @export
- * @interface V1alpha1V1alpha1ApiPatchv1alpha1Request
+ * @interface DeviceV1alpha1ApiPatchDeviceRequest
  */
-export interface V1alpha1V1alpha1ApiPatchv1alpha1Request {
+export interface DeviceV1alpha1ApiPatchDeviceRequest {
     /**
      * Name of device
      * @type {string}
-     * @memberof V1alpha1V1alpha1ApiPatchv1alpha1
+     * @memberof DeviceV1alpha1ApiPatchDevice
      */
     readonly name: string
 
     /**
      * 
      * @type {Array<JsonPatchInner>}
-     * @memberof V1alpha1V1alpha1ApiPatchv1alpha1
+     * @memberof DeviceV1alpha1ApiPatchDevice
      */
     readonly jsonPatchInner?: Array<JsonPatchInner>
 }
 
 /**
- * Request parameters for updatev1alpha1 operation in V1alpha1V1alpha1Api.
+ * Request parameters for updateDevice operation in DeviceV1alpha1Api.
  * @export
- * @interface V1alpha1V1alpha1ApiUpdatev1alpha1Request
+ * @interface DeviceV1alpha1ApiUpdateDeviceRequest
  */
-export interface V1alpha1V1alpha1ApiUpdatev1alpha1Request {
+export interface DeviceV1alpha1ApiUpdateDeviceRequest {
     /**
      * Name of device
      * @type {string}
-     * @memberof V1alpha1V1alpha1ApiUpdatev1alpha1
+     * @memberof DeviceV1alpha1ApiUpdateDevice
      */
     readonly name: string
 
     /**
      * Updated device
      * @type {Device}
-     * @memberof V1alpha1V1alpha1ApiUpdatev1alpha1
+     * @memberof DeviceV1alpha1ApiUpdateDevice
      */
     readonly device?: Device
 }
 
 /**
- * V1alpha1V1alpha1Api - object-oriented interface
+ * DeviceV1alpha1Api - object-oriented interface
  * @export
- * @class V1alpha1V1alpha1Api
+ * @class DeviceV1alpha1Api
  * @extends {BaseAPI}
  */
-export class V1alpha1V1alpha1Api extends BaseAPI {
+export class DeviceV1alpha1Api extends BaseAPI {
     /**
-     * Create v1alpha1
-     * @param {V1alpha1V1alpha1ApiCreatev1alpha1Request} requestParameters Request parameters.
+     * Create Device
+     * @param {DeviceV1alpha1ApiCreateDeviceRequest} requestParameters Request parameters.
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
-     * @memberof V1alpha1V1alpha1Api
+     * @memberof DeviceV1alpha1Api
      */
-    public createv1alpha1(requestParameters: V1alpha1V1alpha1ApiCreatev1alpha1Request = {}, options?: RawAxiosRequestConfig) {
-        return V1alpha1V1alpha1ApiFp(this.configuration).createv1alpha1(requestParameters.device, options).then((request) => request(this.axios, this.basePath));
+    public createDevice(requestParameters: DeviceV1alpha1ApiCreateDeviceRequest = {}, options?: RawAxiosRequestConfig) {
+        return DeviceV1alpha1ApiFp(this.configuration).createDevice(requestParameters.device, options).then((request) => request(this.axios, this.basePath));
     }
 
     /**
-     * Delete v1alpha1
-     * @param {V1alpha1V1alpha1ApiDeletev1alpha1Request} requestParameters Request parameters.
+     * Delete Device
+     * @param {DeviceV1alpha1ApiDeleteDeviceRequest} requestParameters Request parameters.
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
-     * @memberof V1alpha1V1alpha1Api
+     * @memberof DeviceV1alpha1Api
      */
-    public deletev1alpha1(requestParameters: V1alpha1V1alpha1ApiDeletev1alpha1Request, options?: RawAxiosRequestConfig) {
-        return V1alpha1V1alpha1ApiFp(this.configuration).deletev1alpha1(requestParameters.name, options).then((request) => request(this.axios, this.basePath));
+    public deleteDevice(requestParameters: DeviceV1alpha1ApiDeleteDeviceRequest, options?: RawAxiosRequestConfig) {
+        return DeviceV1alpha1ApiFp(this.configuration).deleteDevice(requestParameters.name, options).then((request) => request(this.axios, this.basePath));
     }
 
     /**
-     * Get v1alpha1
-     * @param {V1alpha1V1alpha1ApiGetv1alpha1Request} requestParameters Request parameters.
+     * Get Device
+     * @param {DeviceV1alpha1ApiGetDeviceRequest} requestParameters Request parameters.
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
-     * @memberof V1alpha1V1alpha1Api
+     * @memberof DeviceV1alpha1Api
      */
-    public getv1alpha1(requestParameters: V1alpha1V1alpha1ApiGetv1alpha1Request, options?: RawAxiosRequestConfig) {
-        return V1alpha1V1alpha1ApiFp(this.configuration).getv1alpha1(requestParameters.name, options).then((request) => request(this.axios, this.basePath));
+    public getDevice(requestParameters: DeviceV1alpha1ApiGetDeviceRequest, options?: RawAxiosRequestConfig) {
+        return DeviceV1alpha1ApiFp(this.configuration).getDevice(requestParameters.name, options).then((request) => request(this.axios, this.basePath));
     }
 
     /**
-     * List v1alpha1
-     * @param {V1alpha1V1alpha1ApiListv1alpha1Request} requestParameters Request parameters.
+     * List Device
+     * @param {DeviceV1alpha1ApiListDeviceRequest} requestParameters Request parameters.
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
-     * @memberof V1alpha1V1alpha1Api
+     * @memberof DeviceV1alpha1Api
      */
-    public listv1alpha1(requestParameters: V1alpha1V1alpha1ApiListv1alpha1Request = {}, options?: RawAxiosRequestConfig) {
-        return V1alpha1V1alpha1ApiFp(this.configuration).listv1alpha1(requestParameters.page, requestParameters.size, requestParameters.labelSelector, requestParameters.fieldSelector, requestParameters.sort, options).then((request) => request(this.axios, this.basePath));
+    public listDevice(requestParameters: DeviceV1alpha1ApiListDeviceRequest = {}, options?: RawAxiosRequestConfig) {
+        return DeviceV1alpha1ApiFp(this.configuration).listDevice(requestParameters.page, requestParameters.size, requestParameters.labelSelector, requestParameters.fieldSelector, requestParameters.sort, options).then((request) => request(this.axios, this.basePath));
     }
 
     /**
-     * Patch v1alpha1
-     * @param {V1alpha1V1alpha1ApiPatchv1alpha1Request} requestParameters Request parameters.
+     * Patch Device
+     * @param {DeviceV1alpha1ApiPatchDeviceRequest} requestParameters Request parameters.
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
-     * @memberof V1alpha1V1alpha1Api
+     * @memberof DeviceV1alpha1Api
      */
-    public patchv1alpha1(requestParameters: V1alpha1V1alpha1ApiPatchv1alpha1Request, options?: RawAxiosRequestConfig) {
-        return V1alpha1V1alpha1ApiFp(this.configuration).patchv1alpha1(requestParameters.name, requestParameters.jsonPatchInner, options).then((request) => request(this.axios, this.basePath));
+    public patchDevice(requestParameters: DeviceV1alpha1ApiPatchDeviceRequest, options?: RawAxiosRequestConfig) {
+        return DeviceV1alpha1ApiFp(this.configuration).patchDevice(requestParameters.name, requestParameters.jsonPatchInner, options).then((request) => request(this.axios, this.basePath));
     }
 
     /**
-     * Update v1alpha1
-     * @param {V1alpha1V1alpha1ApiUpdatev1alpha1Request} requestParameters Request parameters.
+     * Update Device
+     * @param {DeviceV1alpha1ApiUpdateDeviceRequest} requestParameters Request parameters.
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
-     * @memberof V1alpha1V1alpha1Api
+     * @memberof DeviceV1alpha1Api
      */
-    public updatev1alpha1(requestParameters: V1alpha1V1alpha1ApiUpdatev1alpha1Request, options?: RawAxiosRequestConfig) {
-        return V1alpha1V1alpha1ApiFp(this.configuration).updatev1alpha1(requestParameters.name, requestParameters.device, options).then((request) => request(this.axios, this.basePath));
+    public updateDevice(requestParameters: DeviceV1alpha1ApiUpdateDeviceRequest, options?: RawAxiosRequestConfig) {
+        return DeviceV1alpha1ApiFp(this.configuration).updateDevice(requestParameters.name, requestParameters.device, options).then((request) => request(this.axios, this.basePath));
     }
 }
 

@@ -25,6 +25,11 @@ core:
     button: Login
     modal:
       title: Re-login
+    2fa:
+      fields:
+        code:
+          placeholder: Two-step verification code
+          label: Two-step verification code
   signup:
     title: Sign up
     fields:
@@ -162,11 +167,6 @@ core:
                 This operation will recreate search engine indexes for all
                 published posts.
               success_message: Refresh search engine index successfully.
-            evict_page_cache:
-              title: Refresh Page Cache
-              dialog_title: Refresh the page cache
-              dialog_content: This operation will clear the cache for all pages.
-              success_message: Refresh page cache successfully.
         user_stats:
           title: Users
         comment_stats:
@@ -1003,6 +1003,15 @@ core:
         reason: Reason
         message: Message
         last_transition_time: Last transition time
+    extension-settings:
+      title: Extension settings
+      extension-point-definition:
+        title: Extension point definitions
+      extension-definition:
+        empty:
+          title: There is currently no extension point implemented
+    actions:
+      extension-point-settings: Extension settings
   user:
     title: Users
     actions:
@@ -1166,6 +1175,7 @@ core:
       detail: Detail
       notification-preferences: Notification Preferences
       pat: Personal Access Tokens
+      2fa: 2FA
       devices: Devices
     actions:
       update_profile:
@@ -1199,6 +1209,49 @@ core:
         title: Verify email
       email_verified:
         tooltip: Verified
+    2fa:
+      operations:
+        enable:
+          button: Enable 2FA
+          title: Enable 2FA
+        disable:
+          title: Disable 2FA
+        disable_totp:
+          title: Disable TOTP
+      password_validation_form:
+        fields:
+          password:
+            label: Password
+            help: Login password of the current account
+      methods:
+        title: Two-factor methods
+        totp:
+          title: TOTP
+          description: Configure two-step verification with TOTP application
+          fields:
+            status:
+              configured: Configured
+              not_configured: Not configured
+          operations:
+            reconfigure:
+              button: Reconfigure
+            configure:
+              button: Configure
+              title: TOTP configuration
+              fields:
+                code:
+                  label: Verification code
+                  help: >-
+                    6-digit verification code obtained from the validator
+                    application
+                password:
+                  label: Password
+                  help: Login password of the current account
+                qrcode:
+                  label: "Use the validator application to scan the QR code below:"
+                manual:
+                  label: "If you can't scan the QR code, click to view the alternative steps."
+                  help: "Manually configure the validator application with the following code:"
     pat:
       operations:
         delete:
@@ -1712,6 +1765,8 @@ core:
       access: Access
       schedule_publish: Schedule publish
       revoke: Revoke
+      disable: Disable
+      enable: Enable
     radio:
       "yes": "Yes"
       "no": "No"
@@ -1744,6 +1799,8 @@ core:
       not_found: Resource not found
       server_internal_error: Internal server error
       unknown_error: Unknown error
+      disable_success: Disabled successfully
+      enable_success: Enabled successfully
     dialog:
       titles:
         tip: Tip

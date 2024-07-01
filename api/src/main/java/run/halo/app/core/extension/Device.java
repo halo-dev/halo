@@ -19,7 +19,7 @@ import run.halo.app.extension.GVK;
 public class Device extends AbstractExtension {
     public static final String GROUP = "security.halo.run";
     public static final String VERSION = "v1alpha1";
-    public static final String KIND = "v1alpha1";
+    public static final String KIND = "Device";
 
     @Schema(requiredMode = REQUIRED)
     private Spec spec;

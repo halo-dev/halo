@@ -10,6 +10,7 @@ import {
   IconAddCircle,
   IconPlug,
   IconRefreshLine,
+  IconSettings,
   VButton,
   VCard,
   VDropdown,
@@ -160,16 +161,30 @@ onMounted(() => {
       <IconPlug class="mr-2 self-center" />
     </template>
     <template #actions>
-      <VButton
-        v-permission="['system:plugins:manage']"
-        type="secondary"
-        @click="pluginInstallationModalVisible = true"
-      >
-        <template #icon>
-          <IconAddCircle class="h-full w-full" />
-        </template>
-        {{ $t("core.common.buttons.install") }}
-      </VButton>
+      <VSpace>
+        <HasPermission :permissions="['*']">
+          <VButton
+            size="sm"
+            @click="$router.push({ name: 'PluginExtensionPointSettings' })"
+          >
+            <template #icon>
+              <IconSettings class="h-full w-full" />
+            </template>
+            {{ $t("core.plugin.actions.extension-point-settings") }}
+          </VButton>
+        </HasPermission>
+
+        <VButton
+          v-permission="['system:plugins:manage']"
+          type="secondary"
+          @click="pluginInstallationModalVisible = true"
+        >
+          <template #icon>
+            <IconAddCircle class="h-full w-full" />
+          </template>
+          {{ $t("core.common.buttons.install") }}
+        </VButton>
+      </VSpace>
     </template>
   </VPageHeader>
 

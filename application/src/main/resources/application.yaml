@@ -33,10 +33,6 @@ spring:
       spec: expireAfterAccess=1h, maximumSize=10000
 
 halo:
-  caches:
-    page:
-      # Disable page cache by default due to experimental feature
-      disabled: true
   work-dir: ${user.home}/.halo2
   plugin:
     plugins-root: ${halo.work-dir}/plugins

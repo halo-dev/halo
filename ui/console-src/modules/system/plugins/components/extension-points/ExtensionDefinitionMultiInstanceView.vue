@@ -25,7 +25,11 @@ const { data: extensionDefinitions, isLoading } = useExtensionDefinitionFetch(
       appear
       name="fade"
     >
-      <VEmpty title="当前没有扩展点实现"></VEmpty>
+      <VEmpty
+        :title="
+          $t('core.plugin.extension-settings.extension-definition.empty.title')
+        "
+      ></VEmpty>
     </Transition>
     <Transition v-else name="fade" appear>
       <ul

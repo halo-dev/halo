@@ -2,6 +2,7 @@
 import { rbacAnnotations } from "@/constants/annotations";
 import { pluginLabels, roleLabels } from "@/constants/labels";
 import { formatDatetime } from "@/utils/date";
+import { usePermission } from "@/utils/permission";
 import {
   PluginStatusPhaseEnum,
   coreApiClient,
@@ -18,8 +19,10 @@ import {
 import { useQuery } from "@tanstack/vue-query";
 import type { Ref } from "vue";
 import { computed, inject, ref } from "vue";
-import PluginConditionsModal from "../components/PluginConditionsModal.vue";
-import { usePluginLifeCycle } from "../composables/use-plugin";
+import { usePluginLifeCycle } from "../../composables/use-plugin";
+import PluginConditionsModal from "../PluginConditionsModal.vue";
+
+const { currentUserHasPermission } = usePermission();
 
 const plugin = inject<Ref<Plugin | undefined>>("plugin");
 const { changeStatus, changingStatus } = usePluginLifeCycle(plugin);
@@ -45,7 +48,11 @@ const { data: pluginRoleTemplates } = useQuery({
     return data.items;
   },
   cacheTime: 0,
-  enabled: computed(() => !!plugin?.value?.metadata.name),
+  enabled: computed(
+    () =>
+      !!plugin?.value?.metadata.name &&
+      currentUserHasPermission(["system:roles:view"])
+  ),
 });
 
 const pluginRoleTemplateGroups = computed<RoleTemplateGroup[]>(() => {

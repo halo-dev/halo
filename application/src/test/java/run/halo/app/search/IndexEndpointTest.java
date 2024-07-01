@@ -17,20 +17,16 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.test.web.reactive.server.WebTestClient;
 import org.springframework.validation.Errors;
-import org.springframework.validation.Validator;
 import org.springframework.web.reactive.function.server.HandlerStrategies;
 import org.springframework.web.server.handler.ResponseStatusExceptionHandler;
 import reactor.core.publisher.Mono;
-import run.halo.app.plugin.extensionpoint.ExtensionGetter;
+import run.halo.app.infra.exception.RequestBodyValidationException;
 
 @ExtendWith(MockitoExtension.class)
 class IndexEndpointTest {
 
     @Mock
-    ExtensionGetter extensionGetter;
-
-    @Mock
-    Validator validator;
+    SearchService searchService;
 
     @InjectMocks
     IndexEndpoint endpoint;
@@ -57,8 +53,8 @@ class IndexEndpointTest {
     void shouldResponseBadRequestIfRequestBodyValidationFailed() {
         var option = new SearchOption();
         var errors = mock(Errors.class);
-        when(errors.hasErrors()).thenReturn(true);
-        when(validator.validateObject(any(SearchOption.class))).thenReturn(errors);
+        when(searchService.search(any(SearchOption.class)))
+            .thenReturn(Mono.error(new RequestBodyValidationException(errors)));
 
         client.post().uri("/indices/-/search")
             .bodyValue(option)
@@ -70,17 +66,8 @@ class IndexEndpointTest {
     void shouldSearchCorrectly() {
         var option = new SearchOption();
         option.setKeyword("halo");
-
-        var errors = mock(Errors.class);
-        when(errors.hasErrors()).thenReturn(false);
-        when(validator.validateObject(any(SearchOption.class))).thenReturn(errors);
-
-        var searchEngine = mock(SearchEngine.class);
-        when(searchEngine.available()).thenReturn(true);
         var searchResult = new SearchResult();
-        when(searchEngine.search(any(SearchOption.class))).thenReturn(searchResult);
-        when(extensionGetter.getEnabledExtension(SearchEngine.class))
-            .thenReturn(Mono.just(searchEngine));
+        when(searchService.search(any(SearchOption.class))).thenReturn(Mono.just(searchResult));
 
         client.post().uri("/indices/-/search")
             .bodyValue(option)
@@ -89,7 +76,7 @@ class IndexEndpointTest {
             .expectBody(SearchResult.class)
             .isEqualTo(searchResult);
 
-        verify(searchEngine).search(assertArg(o -> {
+        verify(searchService).search(assertArg(o -> {
             assertEquals("halo", o.getKeyword());
             // make sure the filters are overwritten
             assertTrue(o.getFilterExposed());
@@ -101,15 +88,8 @@ class IndexEndpointTest {
     @Test
     void shouldBeCompatibleWithOldSearchApi() {
         var searchResult = new SearchResult();
-        var searchEngine = mock(SearchEngine.class);
-        when(searchEngine.available()).thenReturn(true);
-        when(searchEngine.search(any(SearchOption.class))).thenReturn(searchResult);
-        when(extensionGetter.getEnabledExtension(SearchEngine.class))
-            .thenReturn(Mono.just(searchEngine));
-
-        var errors = mock(Errors.class);
-        when(errors.hasErrors()).thenReturn(false);
-        when(validator.validateObject(any(SearchOption.class))).thenReturn(errors);
+        when(searchService.search(any(SearchOption.class)))
+            .thenReturn(Mono.just(searchResult));
 
         client.get().uri(uriBuilder -> uriBuilder.path("/indices/post")
                 .queryParam("keyword", "halo")
@@ -119,7 +99,7 @@ class IndexEndpointTest {
             .expectBody(SearchResult.class)
             .isEqualTo(searchResult);
 
-        verify(searchEngine).search(assertArg(o -> {
+        verify(searchService).search(assertArg(o -> {
             assertEquals("halo", o.getKeyword());
             // make sure the filters are overwritten
             assertTrue(o.getFilterExposed());
@@ -130,14 +110,8 @@ class IndexEndpointTest {
 
     @Test
     void shouldFailWhenSearchEngineIsUnavailable() {
-        var searchEngine = mock(SearchEngine.class);
-        when(searchEngine.available()).thenReturn(false);
-        when(extensionGetter.getEnabledExtension(SearchEngine.class))
-            .thenReturn(Mono.just(searchEngine));
-
-        var errors = mock(Errors.class);
-        when(errors.hasErrors()).thenReturn(false);
-        when(validator.validateObject(any(SearchOption.class))).thenReturn(errors);
+        when(searchService.search(any(SearchOption.class)))
+            .thenReturn(Mono.error(new SearchEngineUnavailableException()));
 
         client.post().uri("/indices/-/search")
             .bodyValue(new SearchOption())

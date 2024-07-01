@@ -6,17 +6,13 @@ import static org.springdoc.core.fn.builders.requestbody.Builder.requestBodyBuil
 import java.util.List;
 import org.springdoc.webflux.core.fn.SpringdocRouteBuilder;
 import org.springframework.stereotype.Component;
-import org.springframework.validation.Validator;
 import org.springframework.web.reactive.function.server.RouterFunction;
 import org.springframework.web.reactive.function.server.ServerRequest;
 import org.springframework.web.reactive.function.server.ServerResponse;
 import org.springframework.web.server.ServerWebInputException;
 import reactor.core.publisher.Mono;
-import reactor.core.scheduler.Schedulers;
 import run.halo.app.core.extension.endpoint.CustomEndpoint;
 import run.halo.app.extension.GroupVersion;
-import run.halo.app.infra.exception.RequestBodyValidationException;
-import run.halo.app.plugin.extensionpoint.ExtensionGetter;
 import run.halo.app.search.post.PostHaloDocumentsProvider;
 
 @Component
@@ -24,13 +20,10 @@ public class IndexEndpoint implements CustomEndpoint {
 
     private static final String API_VERSION = "api.halo.run/v1alpha1";
 
-    private final ExtensionGetter extensionGetter;
+    private final SearchService searchService;
 
-    private final Validator validator;
-
-    public IndexEndpoint(ExtensionGetter extensionGetter, Validator validator) {
-        this.extensionGetter = extensionGetter;
-        this.validator = validator;
+    public IndexEndpoint(SearchService searchService) {
+        this.searchService = searchService;
     }
 
     @Override
@@ -92,17 +85,7 @@ public class IndexEndpoint implements CustomEndpoint {
         option.setFilterExposed(true);
         option.setFilterPublished(true);
         option.setFilterRecycled(false);
-        // validate the option
-        var errors = validator.validateObject(option);
-        if (errors.hasErrors()) {
-            return Mono.error(new RequestBodyValidationException(errors));
-        }
-        return extensionGetter.getEnabledExtension(SearchEngine.class)
-            .filter(SearchEngine::available)
-            .switchIfEmpty(Mono.error(SearchEngineUnavailableException::new))
-            .flatMap(searchEngine -> Mono.fromSupplier(() ->
-                searchEngine.search(option)
-            ).subscribeOn(Schedulers.boundedElastic()));
+        return searchService.search(option);
     }
 
     @Override

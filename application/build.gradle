@@ -107,7 +107,7 @@ tasks.named('jacocoTestReport', JacocoReport) {
 }
 
 ext.presetPluginUrls = [
-        'https://github.com/halo-dev/plugin-comment-widget/releases/download/v2.1.0/plugin-comment-widget-2.1.0.jar'  : 'plugin-comment-widget.jar',
+        'https://github.com/halo-dev/plugin-comment-widget/releases/download/v2.3.1/plugin-comment-widget-2.3.1.jar'  : 'plugin-comment-widget.jar',
         'https://github.com/halo-dev/plugin-search-widget/releases/download/v1.4.0/plugin-search-widget-1.4.0.jar'    : 'plugin-search-widget.jar',
         'https://github.com/halo-dev/plugin-sitemap/releases/download/v1.1.1/plugin-sitemap-1.1.1.jar'                : 'plugin-sitemap.jar',
         'https://github.com/halo-dev/plugin-feed/releases/download/v1.2.2/plugin-feed-1.2.2.jar'                      : 'plugin-feed.jar',
@@ -115,7 +115,7 @@ ext.presetPluginUrls = [
         // Currently, plugin-app-store is not open source, so we need to download it from the official website.
         // Please see https://github.com/halo-dev/plugin-app-store/issues/55
         // https://www.halo.run/store/apps/app-VYJbF
-        'https://www.halo.run/store/apps/app-VYJbF/releases/download/app-release-yfjXe/assets/app-release-yfjXe-kOzZZ': 'appstore.jar',
+        'https://www.halo.run/store/apps/app-VYJbF/releases/download/app-release-SRWfv/assets/app-release-SRWfv-VLtMA': 'appstore.jar',
 ]
 
 tasks.register('downloadPluginPresets', Download) {

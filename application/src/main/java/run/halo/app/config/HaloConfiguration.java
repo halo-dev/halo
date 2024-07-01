@@ -5,12 +5,14 @@ import com.fasterxml.jackson.databind.MapperFeature;
 import java.io.IOException;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.boot.autoconfigure.jackson.Jackson2ObjectMapperBuilderCustomizer;
+import org.springframework.cache.annotation.EnableCaching;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.scheduling.annotation.EnableAsync;
 import run.halo.app.infra.properties.HaloProperties;
 import run.halo.app.search.lucene.LuceneSearchEngine;
 
+@EnableCaching
 @Configuration(proxyBeanMethods = false)
 @EnableAsync
 public class HaloConfiguration {

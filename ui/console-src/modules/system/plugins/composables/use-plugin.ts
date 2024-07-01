@@ -1,15 +1,21 @@
+import { usePluginModuleStore } from "@/stores/plugin";
+import { usePermission } from "@/utils/permission";
 import {
   PluginStatusPhaseEnum,
   consoleApiClient,
   coreApiClient,
   type Plugin,
+  type SettingForm,
 } from "@halo-dev/api-client";
-import type { ComputedRef, Ref } from "vue";
-import { computed } from "vue";
-
 import { Dialog, Toast } from "@halo-dev/components";
-import { useMutation } from "@tanstack/vue-query";
+import type { PluginTab } from "@halo-dev/console-shared";
+import { useMutation, useQuery } from "@tanstack/vue-query";
+import { useRouteQuery } from "@vueuse/router";
+import type { ComputedRef, Ref } from "vue";
+import { computed, markRaw, ref } from "vue";
 import { useI18n } from "vue-i18n";
+import DetailTab from "../components/tabs/Detail.vue";
+import SettingTab from "../components/tabs/Setting.vue";
 
 interface usePluginLifeCycleReturn {
   isStarted: ComputedRef<boolean | undefined>;
@@ -269,4 +275,106 @@ export function usePluginBatchOperations(names: Ref<string[]>) {
   }
 
   return { handleUninstallInBatch, handleChangeStatusInBatch };
+}
+
+export function usePluginDetailTabs(
+  pluginName: Ref<string | undefined>,
+  recordsActiveTab: boolean
+) {
+  const { currentUserHasPermission } = usePermission();
+  const { t } = useI18n();
+
+  const initialTabs = [
+    {
+      id: "detail",
+      label: t("core.plugin.tabs.detail"),
+      component: markRaw(DetailTab),
+    },
+  ];
+
+  const tabs = ref<PluginTab[]>(initialTabs);
+  const activeTab = recordsActiveTab
+    ? useRouteQuery<string>("tab", tabs.value[0].id)
+    : ref(tabs.value[0].id);
+
+  const { data: plugin } = useQuery({
+    queryKey: ["plugin", pluginName],
+    queryFn: async () => {
+      const { data } = await coreApiClient.plugin.plugin.getPlugin({
+        name: pluginName.value as string,
+      });
+      return data;
+    },
+    async onSuccess(data) {
+      if (
+        !data.spec.settingName ||
+        !currentUserHasPermission(["system:plugins:manage"])
+      ) {
+        tabs.value = [...initialTabs, ...(await getTabsFromExtensions())];
+      }
+    },
+  });
+
+  const { data: setting } = useQuery({
+    queryKey: ["plugin-setting", plugin],
+    queryFn: async () => {
+      const { data } = await consoleApiClient.plugin.plugin.fetchPluginSetting({
+        name: plugin.value?.metadata.name as string,
+      });
+      return data;
+    },
+    enabled: computed(() => {
+      return (
+        !!plugin.value &&
+        !!plugin.value.spec.settingName &&
+        currentUserHasPermission(["system:plugins:manage"])
+      );
+    }),
+    async onSuccess(data) {
+      if (data) {
+        const { forms } = data.spec;
+        tabs.value = [
+          ...initialTabs,
+          ...(await getTabsFromExtensions()),
+          ...forms.map((item: SettingForm) => {
+            return {
+              id: item.group,
+              label: item.label || "",
+              component: markRaw(SettingTab),
+            };
+          }),
+        ] as PluginTab[];
+      }
+    },
+  });
+
+  async function getTabsFromExtensions() {
+    const { pluginModuleMap } = usePluginModuleStore();
+
+    const currentPluginModule = pluginModuleMap[pluginName.value as string];
+
+    if (!currentPluginModule) {
+      return [];
+    }
+
+    const callbackFunction =
+      currentPluginModule?.extensionPoints?.["plugin:self:tabs:create"];
+
+    if (typeof callbackFunction !== "function") {
+      return [];
+    }
+
+    const pluginTabs = await callbackFunction();
+
+    return pluginTabs.filter((tab) => {
+      return currentUserHasPermission(tab.permissions);
+    });
+  }
+
+  return {
+    plugin,
+    setting,
+    tabs,
+    activeTab,
+  };
 }

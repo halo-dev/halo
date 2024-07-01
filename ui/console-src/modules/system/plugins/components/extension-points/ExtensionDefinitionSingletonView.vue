@@ -113,7 +113,11 @@ async function onExtensionChange(e: Event) {
       appear
       name="fade"
     >
-      <VEmpty title="当前没有扩展点实现"></VEmpty>
+      <VEmpty
+        :title="
+          $t('core.plugin.extension-settings.extension-definition.empty.title')
+        "
+      ></VEmpty>
     </Transition>
     <Transition v-else name="fade" appear>
       <ul
@@ -127,6 +131,7 @@ async function onExtensionChange(e: Event) {
           <label
             class="cursor-pointer transition-all"
             :class="{ 'pointer-events-none opacity-50': isSubmitting }"
+            @click.stop
           >
             <ExtensionDefinitionListItem :extension-definition="item">
               <template #selection-indicator>
