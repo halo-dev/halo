@@ -6,5 +6,5 @@ plugins {
     id "io.freefair.lombok" version "8.6" apply false
     id 'org.gradle.crypto.checksum' version '1.4.0' apply false
     id "com.github.node-gradle.node" version "7.0.2" apply false
-    id "org.springdoc.openapi-gradle-plugin" version "1.8.0" apply false
+    id "org.springdoc.openapi-gradle-plugin" version "1.9.0" apply false
 }
