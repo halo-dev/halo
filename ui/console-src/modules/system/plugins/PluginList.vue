@@ -162,15 +162,18 @@ onMounted(() => {
     </template>
     <template #actions>
       <VSpace>
-        <VButton
-          size="sm"
-          @click="$router.push({ name: 'PluginExtensionPointSettings' })"
-        >
-          <template #icon>
-            <IconSettings class="h-full w-full" />
-          </template>
-          {{ $t("core.plugin.actions.extension-point-settings") }}
-        </VButton>
+        <HasPermission :permissions="['*']">
+          <VButton
+            size="sm"
+            @click="$router.push({ name: 'PluginExtensionPointSettings' })"
+          >
+            <template #icon>
+              <IconSettings class="h-full w-full" />
+            </template>
+            {{ $t("core.plugin.actions.extension-point-settings") }}
+          </VButton>
+        </HasPermission>
+
         <VButton
           v-permission="['system:plugins:manage']"
           type="secondary"

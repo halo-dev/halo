@@ -38,6 +38,7 @@ export default definePlugin({
           meta: {
             title: "core.plugin.extension-settings.title",
             hideFooter: true,
+            permissions: ["*"],
           },
         },
         {
