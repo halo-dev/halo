@@ -11,7 +11,8 @@ import {
   VEntityField,
 } from "@halo-dev/components";
 import { useQuery } from "@tanstack/vue-query";
-import { computed } from "vue";
+import { computed, ref } from "vue";
+import PluginDetailModal from "../PluginDetailModal.vue";
 
 const props = withDefaults(
   defineProps<{ extensionDefinition: ExtensionDefinition }>(),
@@ -36,9 +37,16 @@ const matchedPlugin = computed(() => {
       props.extensionDefinition.metadata.labels?.["plugin.halo.run/plugin-name"]
   );
 });
+
+const pluginDetailModalVisible = ref(false);
 </script>
 
 <template>
+  <PluginDetailModal
+    v-if="pluginDetailModalVisible && matchedPlugin"
+    :name="matchedPlugin.metadata.name"
+    @close="pluginDetailModalVisible = false"
+  />
   <VEntity>
     <template v-if="$slots['selection-indicator']" #checkbox>
       <slot name="selection-indicator" />
@@ -61,15 +69,12 @@ const matchedPlugin = computed(() => {
     <template v-if="matchedPlugin" #end>
       <VEntityField>
         <template #description>
-          <RouterLink
+          <div
             class="cursor-pointer rounded p-1 text-gray-600 transition-all hover:text-blue-600 group-hover:bg-gray-200/60"
-            :to="{
-              name: 'PluginDetail',
-              params: { name: matchedPlugin?.metadata.name },
-            }"
+            @click.prevent="pluginDetailModalVisible = true"
           >
             <IconSettings />
-          </RouterLink>
+          </div>
         </template>
       </VEntityField>
     </template>

@@ -1,123 +1,23 @@
 <script lang="ts" setup>
-// core libs
-import { consoleApiClient, coreApiClient } from "@halo-dev/api-client";
-import { computed, provide, ref } from "vue";
-import { useRoute } from "vue-router";
-
-// libs
-import { cloneDeep } from "lodash-es";
-
-// components
+import type { Plugin, Setting } from "@halo-dev/api-client";
 import { VAvatar, VCard, VPageHeader, VTabbar } from "@halo-dev/components";
-
-// types
-import { usePluginModuleStore } from "@/stores/plugin";
-import { usePermission } from "@/utils/permission";
-import type { Plugin, Setting, SettingForm } from "@halo-dev/api-client";
-import type { PluginTab } from "@halo-dev/console-shared";
-import { useQuery } from "@tanstack/vue-query";
-import { useRouteQuery } from "@vueuse/router";
 import type { Ref } from "vue";
-import { markRaw } from "vue";
-import { useI18n } from "vue-i18n";
-import DetailTab from "./tabs/Detail.vue";
-import SettingTab from "./tabs/Setting.vue";
-
-const { currentUserHasPermission } = usePermission();
-const { t } = useI18n();
-
-const initialTabs = ref<PluginTab[]>([
-  {
-    id: "detail",
-    label: t("core.plugin.tabs.detail"),
-    component: markRaw(DetailTab),
-  },
-]);
+import { provide, toRefs } from "vue";
+import { useRoute } from "vue-router";
+import { usePluginDetailTabs } from "./composables/use-plugin";
 
 const route = useRoute();
 
-const tabs = ref<PluginTab[]>(cloneDeep(initialTabs.value));
-const activeTab = useRouteQuery<string>("tab", tabs.value[0].id);
+const { name } = toRefs(route.params);
+
+const { plugin, setting, activeTab, tabs } = usePluginDetailTabs(
+  name as Ref<string | undefined>,
+  true
+);
 
 provide<Ref<string>>("activeTab", activeTab);
-
-const { data: plugin } = useQuery({
-  queryKey: ["plugin", route.params.name],
-  queryFn: async () => {
-    const { data } = await coreApiClient.plugin.plugin.getPlugin({
-      name: route.params.name as string,
-    });
-    return data;
-  },
-  async onSuccess(data) {
-    if (
-      !data.spec.settingName ||
-      !currentUserHasPermission(["system:plugins:manage"])
-    ) {
-      tabs.value = [...initialTabs.value, ...(await getTabsFromExtensions())];
-    }
-  },
-});
-
 provide<Ref<Plugin | undefined>>("plugin", plugin);
-
-const { data: setting } = useQuery({
-  queryKey: ["plugin-setting", plugin],
-  queryFn: async () => {
-    const { data } = await consoleApiClient.plugin.plugin.fetchPluginSetting({
-      name: plugin.value?.metadata.name as string,
-    });
-    return data;
-  },
-  enabled: computed(() => {
-    return (
-      !!plugin.value &&
-      !!plugin.value.spec.settingName &&
-      currentUserHasPermission(["system:plugins:manage"])
-    );
-  }),
-  async onSuccess(data) {
-    if (data) {
-      const { forms } = data.spec;
-      tabs.value = [
-        ...initialTabs.value,
-        ...(await getTabsFromExtensions()),
-        ...forms.map((item: SettingForm) => {
-          return {
-            id: item.group,
-            label: item.label || "",
-            component: markRaw(SettingTab),
-          };
-        }),
-      ] as PluginTab[];
-    }
-  },
-});
-
 provide<Ref<Setting | undefined>>("setting", setting);
-
-async function getTabsFromExtensions() {
-  const { pluginModuleMap } = usePluginModuleStore();
-
-  const currentPluginModule = pluginModuleMap[route.params.name as string];
-
-  if (!currentPluginModule) {
-    return [];
-  }
-
-  const callbackFunction =
-    currentPluginModule?.extensionPoints?.["plugin:self:tabs:create"];
-
-  if (typeof callbackFunction !== "function") {
-    return [];
-  }
-
-  const pluginTabs = await callbackFunction();
-
-  return pluginTabs.filter((tab) => {
-    return currentUserHasPermission(tab.permissions);
-  });
-}
 </script>
 <template>
   <VPageHeader :title="plugin?.spec?.displayName">

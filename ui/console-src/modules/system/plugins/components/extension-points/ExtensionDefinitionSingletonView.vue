@@ -131,6 +131,7 @@ async function onExtensionChange(e: Event) {
           <label
             class="cursor-pointer transition-all"
             :class="{ 'pointer-events-none opacity-50': isSubmitting }"
+            @click.stop
           >
             <ExtensionDefinitionListItem :extension-definition="item">
               <template #selection-indicator>
