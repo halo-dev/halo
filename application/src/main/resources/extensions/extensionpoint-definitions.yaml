@@ -76,3 +76,15 @@ spec:
   displayName: "搜索引擎"
   type: SINGLETON
   description: "扩展内容搜索引擎"
+
+---
+apiVersion: plugin.halo.run/v1alpha1
+kind: ExtensionPointDefinition
+metadata:
+  name: template-footer-processor
+spec:
+  className: run.halo.app.theme.dialect.TemplateFooterProcessor
+  displayName: 页脚标签内容处理器
+  type: MULTI_INSTANCE
+  description: "提供用于扩展 <halo:footer/> 标签内容的扩展方式。"
+  

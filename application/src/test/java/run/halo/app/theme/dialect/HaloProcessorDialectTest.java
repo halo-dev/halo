@@ -125,6 +125,9 @@ class HaloProcessorDialectTest {
         when(fetcher.fetch(eq(SystemSetting.Basic.GROUP),
             eq(SystemSetting.Basic.class))).thenReturn(Mono.just(basic));
 
+        when(extensionGetter.getExtensions(TemplateFooterProcessor.class))
+            .thenReturn(Flux.empty());
+
         Context context = getContext();
 
         String result = templateEngine.process("index", context);
@@ -171,6 +174,9 @@ class HaloProcessorDialectTest {
         basic.setFavicon(null);
         when(fetcher.fetch(eq(SystemSetting.Basic.GROUP),
             eq(SystemSetting.Basic.class))).thenReturn(Mono.just(basic));
+
+        when(extensionGetter.getExtensions(TemplateFooterProcessor.class))
+            .thenReturn(Flux.empty());
 
         String result = templateEngine.process("post", context);
         assertThat(result).isEqualTo("""
