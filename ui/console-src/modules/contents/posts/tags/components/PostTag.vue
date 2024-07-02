@@ -1,9 +1,9 @@
 <script lang="ts" setup>
-import { VTag } from "@halo-dev/components";
 import type { Tag } from "@halo-dev/api-client";
+import { VTag } from "@halo-dev/components";
+import Color from "colorjs.io";
 import { computed } from "vue";
 import { useRouter } from "vue-router";
-import Color from "colorjs.io";
 
 const props = withDefaults(
   defineProps<{

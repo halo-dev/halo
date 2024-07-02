@@ -16,6 +16,18 @@ public class SecurityProperties {
 
     private final RememberMeOptions rememberMe = new RememberMeOptions();
 
+    private final TwoFactorAuthOptions twoFactorAuth = new TwoFactorAuthOptions();
+
+    @Data
+    public static class TwoFactorAuthOptions {
+
+        /**
+         * Whether two-factor authentication is disabled.
+         */
+        private boolean disabled;
+
+    }
+
     @Data
     public static class FrameOptions {
 

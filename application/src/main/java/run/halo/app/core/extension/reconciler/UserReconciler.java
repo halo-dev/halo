@@ -20,6 +20,7 @@ import run.halo.app.core.extension.UserConnection;
 import run.halo.app.core.extension.attachment.Attachment;
 import run.halo.app.core.extension.service.AttachmentService;
 import run.halo.app.core.extension.service.RoleService;
+import run.halo.app.core.extension.service.UserService;
 import run.halo.app.extension.ExtensionClient;
 import run.halo.app.extension.GroupKind;
 import run.halo.app.extension.MetadataUtil;
@@ -47,6 +48,7 @@ public class UserReconciler implements Reconciler<Request> {
         .fixedBackoff(300)
         .retryOn(IllegalStateException.class)
         .build();
+    private final UserService userService;
 
     @Override
     public Result reconcile(Request request) {
@@ -60,8 +62,34 @@ public class UserReconciler implements Reconciler<Request> {
             ensureRoleNamesAnno(request.name());
             updatePermalink(request.name());
             handleAvatar(request.name());
+
+            checkVerifiedEmail(user);
+            client.update(user);
         });
         return new Result(false, null);
+    }
+
+    private void checkVerifiedEmail(User user) {
+        var username = user.getMetadata().getName();
+        if (!user.getSpec().isEmailVerified()) {
+            return;
+        }
+        var email = user.getSpec().getEmail();
+        if (StringUtils.isBlank(email)) {
+            return;
+        }
+        if (checkEmailInUse(username, email)) {
+            user.getSpec().setEmailVerified(false);
+        }
+    }
+
+    private Boolean checkEmailInUse(String username, String email) {
+        return userService.listByEmail(email)
+            .filter(existUser -> existUser.getSpec().isEmailVerified())
+            .filter(existUser -> !existUser.getMetadata().getName().equals(username))
+            .hasElements()
+            .blockOptional()
+            .orElse(false);
     }
 
     private void handleAvatar(String name) {

@@ -20,7 +20,7 @@ import org.springframework.web.ErrorResponse;
 import org.springframework.web.reactive.function.server.ServerResponse;
 import org.springframework.web.server.ServerWebExchange;
 import reactor.core.publisher.Mono;
-import run.halo.app.security.authentication.rememberme.RememberMeServices;
+import run.halo.app.security.LoginHandlerEnhancer;
 import run.halo.app.security.authentication.twofactor.TwoFactorAuthentication;
 
 @Slf4j
@@ -31,7 +31,7 @@ public class UsernamePasswordHandler implements ServerAuthenticationSuccessHandl
 
     private final MessageSource messageSource;
 
-    private final RememberMeServices rememberMeServices;
+    private final LoginHandlerEnhancer loginHandlerEnhancer;
 
     private final ServerAuthenticationFailureHandler defaultFailureHandler =
         new RedirectServerAuthenticationFailureHandler("/console?error#/login");
@@ -40,17 +40,17 @@ public class UsernamePasswordHandler implements ServerAuthenticationSuccessHandl
         new RedirectServerAuthenticationSuccessHandler("/console/");
 
     public UsernamePasswordHandler(ServerResponse.Context context, MessageSource messageSource,
-        RememberMeServices rememberMeServices) {
+        LoginHandlerEnhancer loginHandlerEnhancer) {
         this.context = context;
         this.messageSource = messageSource;
-        this.rememberMeServices = rememberMeServices;
+        this.loginHandlerEnhancer = loginHandlerEnhancer;
     }
 
     @Override
     public Mono<Void> onAuthenticationFailure(WebFilterExchange webFilterExchange,
         AuthenticationException exception) {
         var exchange = webFilterExchange.getExchange();
-        return rememberMeServices.loginFail(exchange)
+        return loginHandlerEnhancer.onLoginFailure(exchange, exception)
             .then(ignoringMediaTypeAll(APPLICATION_JSON)
                 .matches(exchange)
                 .filter(ServerWebExchangeMatcher.MatchResult::isMatch)
@@ -67,7 +67,8 @@ public class UsernamePasswordHandler implements ServerAuthenticationSuccessHandl
         Authentication authentication) {
         if (authentication instanceof TwoFactorAuthentication) {
             // continue filtering for authorization
-            return rememberMeServices.loginSuccess(webFilterExchange.getExchange(), authentication)
+            return loginHandlerEnhancer.onLoginSuccess(webFilterExchange.getExchange(),
+                    authentication)
                 .then(webFilterExchange.getChain().filter(webFilterExchange.getExchange()));
         }
 
@@ -84,7 +85,7 @@ public class UsernamePasswordHandler implements ServerAuthenticationSuccessHandl
         };
 
         var exchange = webFilterExchange.getExchange();
-        return rememberMeServices.loginSuccess(exchange, authentication)
+        return loginHandlerEnhancer.onLoginSuccess(webFilterExchange.getExchange(), authentication)
             .then(xhrMatcher.matches(exchange)
                 .filter(ServerWebExchangeMatcher.MatchResult::isMatch)
                 .switchIfEmpty(Mono.defer(

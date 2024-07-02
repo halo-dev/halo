@@ -17,10 +17,14 @@ function onSubmit({ password }: { password: string }) {
   >
     <FormKit
       type="password"
-      label="验证密码"
+      :label="
+        $t('core.uc_profile.2fa.password_validation_form.fields.password.label')
+      "
       validation="required"
       name="password"
-      help="当前账号的登录密码"
+      :help="
+        $t('core.uc_profile.2fa.password_validation_form.fields.password.help')
+      "
       autocomplete="current-password"
     ></FormKit>
   </FormKit>

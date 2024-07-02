@@ -51,8 +51,22 @@ public class CategoryTreeVo implements VisualizableTreeNode<CategoryTreeVo>, Ext
             .build();
     }
 
+    /**
+     * Convert {@link CategoryTreeVo} to {@link CategoryVo}.
+     */
+    public static CategoryVo toCategoryVo(CategoryTreeVo categoryTreeVo) {
+        Assert.notNull(categoryTreeVo, "The category tree vo must not be null");
+        return CategoryVo.builder()
+            .metadata(categoryTreeVo.getMetadata())
+            .spec(categoryTreeVo.getSpec())
+            .status(categoryTreeVo.getStatus())
+            .postCount(categoryTreeVo.getPostCount())
+            .build();
+    }
+
     @Override
     public String nodeText() {
-        return String.format("%s (%s)", getSpec().getDisplayName(), getPostCount());
+        return String.format("%s (%s)%s", getSpec().getDisplayName(), getPostCount(),
+            spec.isPreventParentPostCascadeQuery() ? " (Independent)" : "");
     }
 }

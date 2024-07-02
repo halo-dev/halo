@@ -1,9 +1,9 @@
 <script lang="ts" setup>
-import { VButton, VEmpty, VSpace, VLoading } from "@halo-dev/components";
-import ThemeListItem from "../ThemeListItem.vue";
 import type { Theme } from "@halo-dev/api-client";
-import { apiClient } from "@/utils/api-client";
+import { consoleApiClient } from "@halo-dev/api-client";
+import { VButton, VEmpty, VLoading, VSpace } from "@halo-dev/components";
 import { useQuery } from "@tanstack/vue-query";
+import ThemeListItem from "../ThemeListItem.vue";
 
 const {
   data: themes,
@@ -13,7 +13,7 @@ const {
 } = useQuery<Theme[]>({
   queryKey: ["not-installed-themes"],
   queryFn: async () => {
-    const { data } = await apiClient.theme.listThemes({
+    const { data } = await consoleApiClient.theme.theme.listThemes({
       page: 0,
       size: 0,
       uninstalled: true,

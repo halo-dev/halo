@@ -1,20 +1,20 @@
 <script lang="ts" setup>
-import type { Type } from "./interface";
-import {
-  onMounted,
-  ref,
-  watchEffect,
-  type Raw,
-  type Component,
-  markRaw,
-} from "vue";
 import {
   IconCheckboxCircle,
+  IconClose,
   IconErrorWarning,
   IconForbidLine,
   IconInformation,
-  IconClose,
 } from "@/icons/icons";
+import {
+  markRaw,
+  onMounted,
+  ref,
+  watchEffect,
+  type Component,
+  type Raw,
+} from "vue";
+import type { Type } from "./interface";
 
 const props = withDefaults(
   defineProps<{

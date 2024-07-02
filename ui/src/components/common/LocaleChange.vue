@@ -1,6 +1,6 @@
 <script lang="ts" setup>
+import { getBrowserLanguage, i18n, locales } from "@/locales";
 import { useLocalStorage } from "@vueuse/core";
-import { locales, getBrowserLanguage, i18n } from "@/locales";
 import { watch } from "vue";
 import MdiTranslate from "~icons/mdi/translate";
 

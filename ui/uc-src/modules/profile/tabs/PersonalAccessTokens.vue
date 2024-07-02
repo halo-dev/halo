@@ -1,4 +1,6 @@
 <script lang="ts" setup>
+import type { PersonalAccessToken } from "@halo-dev/api-client";
+import { ucApiClient } from "@halo-dev/api-client";
 import {
   IconAddCircle,
   VButton,
@@ -6,10 +8,8 @@ import {
   VLoading,
   VSpace,
 } from "@halo-dev/components";
-import { ref } from "vue";
-import { apiClient } from "@/utils/api-client";
-import type { PersonalAccessToken } from "@halo-dev/api-client";
 import { useQuery } from "@tanstack/vue-query";
+import { ref } from "vue";
 import PersonalAccessTokenCreationModal from "../components/PersonalAccessTokenCreationModal.vue";
 import PersonalAccessTokenListItem from "../components/PersonalAccessTokenListItem.vue";
 
@@ -20,7 +20,8 @@ const {
 } = useQuery<PersonalAccessToken[]>({
   queryKey: ["personal-access-tokens"],
   queryFn: async () => {
-    const { data } = await apiClient.pat.obtainPats();
+    const { data } =
+      await ucApiClient.security.personalAccessToken.obtainPats();
     return data;
   },
   refetchInterval(data) {

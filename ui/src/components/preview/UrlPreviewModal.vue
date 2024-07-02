@@ -1,17 +1,16 @@
 <script lang="ts" setup>
-import { axiosInstance } from "@/utils/api-client";
+import { axiosInstance } from "@halo-dev/api-client";
 import {
-  VModal,
-  IconLink,
-  VTabbar,
   IconComputer,
-  IconTablet,
+  IconLink,
   IconPhone,
+  IconTablet,
   VLoading,
+  VModal,
+  VTabbar,
 } from "@halo-dev/components";
 import { useQuery } from "@tanstack/vue-query";
-import { toRefs } from "vue";
-import { computed, markRaw, ref } from "vue";
+import { computed, markRaw, ref, toRefs } from "vue";
 
 const props = withDefaults(
   defineProps<{

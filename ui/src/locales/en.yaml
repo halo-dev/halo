@@ -25,6 +25,11 @@ core:
     button: Login
     modal:
       title: Re-login
+    2fa:
+      fields:
+        code:
+          placeholder: Two-step verification code
+          label: Two-step verification code
   signup:
     title: Sign up
     fields:
@@ -162,11 +167,6 @@ core:
                 This operation will recreate search engine indexes for all
                 published posts.
               success_message: Refresh search engine index successfully.
-            evict_page_cache:
-              title: Refresh Page Cache
-              dialog_title: Refresh the page cache
-              dialog_content: This operation will clear the cache for all pages.
-              success_message: Refresh page cache successfully.
         user_stats:
           title: Users
         comment_stats:
@@ -193,6 +193,18 @@ core:
         description: >-
           This operation will move the posts to the recycle bin, and it can be
           restored from the recycle bin later.
+      publish_in_batch:
+        title: Publish posts
+        description: >-
+          Batch publish posts, the selected posts will be set to published
+          status
+      cancel_publish_in_batch:
+        title: Cancel publish posts
+        description: >-
+          Batch cancel publish posts, the selected posts will be set to
+          unpublished status
+      batch_setting:
+        button: Batch settings
     filters:
       status:
         items:
@@ -267,6 +279,8 @@ core:
           label: Template
         cover:
           label: Cover
+        owner:
+          label: Owner
     tag:
       filters:
         sort:
@@ -275,6 +289,27 @@ core:
             create_time_asc: Earliest Created
             display_name_desc: Descending order by tag name
             display_name_asc: Ascending order by tag name
+    batch_setting_modal:
+      title: Post batch settings
+      fields:
+        common:
+          enabled: Enabled
+          op:
+            label: Operate
+            options:
+              add: Add
+              replace: Replace
+              remove_all: Remove all
+        category_group: Category
+        category_names: Select categories
+        tag_group: Tag
+        tag_names: Select tags
+        visible_group: Visible
+        visible_value: "Select visible option "
+        allow_comment_group: " Allow comment"
+        allow_comment_value: Choose whether to allow comments
+        owner_group: Owner
+        owner_value: Select owner
   deleted_post:
     title: Deleted Posts
     empty:
@@ -366,12 +401,41 @@ core:
           refresh_message: Regenerate slug based on display name.
         template:
           label: Custom template
+          help: >-
+            Customize the rendering template of the category archive page, which
+            requires support from the theme
         cover:
           label: Cover
           help: Theme adaptation is required to support
         description:
           label: Description
           help: Theme adaptation is required to support
+        prevent_parent_post_cascade_query:
+          label: Prevent Parent Post Cascade Query
+          help: >-
+            Prevent parent category from including this category and its
+            subcategories in cascade post queries
+        post_template:
+          label: Custom post template
+          help: >-
+            Customize the rendering template of posts in the current category,
+            which requires support from the theme
+        hide_from_list:
+          label: Hide from list
+          help: >-
+            After turning on this option, this category and its subcategories,
+            as well as its posts, will not be displayed in the front-end list.
+            You need to actively visit the category archive page. This feature
+            is only effective for the first-level directory.
+    list:
+      fields:
+        prevent_parent_post_cascade_query: >-
+          Prevent parent category from including this category and its
+          subcategories in cascade post queries
+        hide_from_list: >-
+          This category is hidden, This category and its subcategories, as well
+          as its posts, will not be displayed in the front-end list. You need to
+          actively visit the category archive page
   page:
     title: Pages
     actions:
@@ -721,6 +785,18 @@ core:
         description: >-
           This feature allows you to refresh the cache to view the latest web
           results after modifying template files at runtime.
+      export_configuration:
+        button: Export theme configuration
+      import_configuration:
+        button: Import theme configuration
+        version_mismatch:
+          title: Version mismatch
+          description: >-
+            The imported configuration file version does not match the  current
+            theme version, which may lead to compatibility issues. Do you want
+            to continue importing?
+        invalid_format: Invalid theme configuration file
+        mismatched_theme: Configuration file does not match the selected theme
     list_modal:
       tabs:
         installed: Installed
@@ -927,6 +1003,15 @@ core:
         reason: Reason
         message: Message
         last_transition_time: Last transition time
+    extension-settings:
+      title: Extension settings
+      extension-point-definition:
+        title: Extension point definitions
+      extension-definition:
+        empty:
+          title: There is currently no extension point implemented
+    actions:
+      extension-point-settings: Extension settings
   user:
     title: Users
     actions:
@@ -1090,6 +1175,8 @@ core:
       detail: Detail
       notification-preferences: Notification Preferences
       pat: Personal Access Tokens
+      2fa: 2FA
+      devices: Devices
     actions:
       update_profile:
         title: Update profile
@@ -1122,6 +1209,49 @@ core:
         title: Verify email
       email_verified:
         tooltip: Verified
+    2fa:
+      operations:
+        enable:
+          button: Enable 2FA
+          title: Enable 2FA
+        disable:
+          title: Disable 2FA
+        disable_totp:
+          title: Disable TOTP
+      password_validation_form:
+        fields:
+          password:
+            label: Password
+            help: Login password of the current account
+      methods:
+        title: Two-factor methods
+        totp:
+          title: TOTP
+          description: Configure two-step verification with TOTP application
+          fields:
+            status:
+              configured: Configured
+              not_configured: Not configured
+          operations:
+            reconfigure:
+              button: Reconfigure
+            configure:
+              button: Configure
+              title: TOTP configuration
+              fields:
+                code:
+                  label: Verification code
+                  help: >-
+                    6-digit verification code obtained from the validator
+                    application
+                password:
+                  label: Password
+                  help: Login password of the current account
+                qrcode:
+                  label: "Use the validator application to scan the QR code below:"
+                manual:
+                  label: "If you can't scan the QR code, click to view the alternative steps."
+                  help: "Manually configure the validator application with the following code:"
     pat:
       operations:
         delete:
@@ -1220,6 +1350,25 @@ core:
       titles:
         modify: Modify email address
         verify: Verify email
+    device:
+      list:
+        fields:
+          current: Current
+          last_accessed_time: "Last accessed time: {time}"
+      detail_modal:
+        title: Login device details
+        fields:
+          os: OS
+          browser: Browser
+          creation_timestamp: Creation time
+          last_accessed_times: Last accessed time
+          last_authenticated_time: Last authenticated time
+      operations:
+        revoke:
+          title: Revoke device
+          description: >-
+            Are you sure you want to revoke this device? After revoking, this
+            device will be logged out
   uc_notification:
     title: Notifications
     tabs:
@@ -1555,10 +1704,32 @@ core:
       no_action_defined: "{label} interface not defined"
       verify_success: "{label} successful"
       verify_failed: "{label} failed"
+    secret:
+      creation_label: Create a new secret based on the text entered
+      placeholder: Search for an existing secret or enter new content to create one
+      required_key_missing_label: The needed fields are missing, Please select and complete them
+      creation_modal:
+        title: Create secret
+      edit_modal:
+        title: Edit secret
+      list_modal:
+        title: Secrets
+      operations:
+        delete:
+          title: Delete secret
+          description: >-
+            Are you sure you want to delete this secret? Please make sure that
+            this secret is not being used anywhere, otherwise you need to reset
+            it in a specific place
+      form:
+        fields:
+          description: Description
+          string_data: String Data
   common:
     buttons:
       save: Save
       close: Close
+      save_and_continue: Save and keep adding
       close_and_shortcut: Close (Esc)
       delete: Delete
       setting: Setting
@@ -1594,6 +1765,9 @@ core:
       modify: Modify
       access: Access
       schedule_publish: Schedule publish
+      revoke: Revoke
+      disable: Disable
+      enable: Enable
     radio:
       "yes": "Yes"
       "no": "No"
@@ -1626,6 +1800,8 @@ core:
       not_found: Resource not found
       server_internal_error: Internal server error
       unknown_error: Unknown error
+      disable_success: Disabled successfully
+      enable_success: Enabled successfully
     dialog:
       titles:
         tip: Tip

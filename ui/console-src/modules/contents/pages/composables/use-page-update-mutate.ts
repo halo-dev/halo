@@ -1,7 +1,7 @@
-import { apiClient } from "@/utils/api-client";
-import { useMutation } from "@tanstack/vue-query";
 import type { SinglePage } from "@halo-dev/api-client";
+import { coreApiClient } from "@halo-dev/api-client";
 import { Toast } from "@halo-dev/components";
+import { useMutation } from "@tanstack/vue-query";
 import { useI18n } from "vue-i18n";
 
 export function usePageUpdateMutate() {
@@ -10,13 +10,11 @@ export function usePageUpdateMutate() {
     mutationKey: ["singlePage-update"],
     mutationFn: async (page: SinglePage) => {
       const { data: latestSinglePage } =
-        await apiClient.extension.singlePage.getContentHaloRunV1alpha1SinglePage(
-          {
-            name: page.metadata.name,
-          }
-        );
+        await coreApiClient.content.singlePage.getSinglePage({
+          name: page.metadata.name,
+        });
 
-      return apiClient.extension.singlePage.updateContentHaloRunV1alpha1SinglePage(
+      return coreApiClient.content.singlePage.updateSinglePage(
         {
           name: page.metadata.name,
           singlePage: {

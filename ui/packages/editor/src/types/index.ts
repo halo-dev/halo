@@ -1,12 +1,12 @@
-import type { Editor, Range } from "@/tiptap/vue-3";
 import type {
-  Node,
-  ResolvedPos,
-  Slice,
   EditorState,
   EditorView,
+  Node,
+  ResolvedPos,
   Selection,
+  Slice,
 } from "@/tiptap/pm";
+import type { Editor, Range } from "@/tiptap/vue-3";
 import type { Component } from "vue";
 export interface ToolbarItem {
   priority: number;

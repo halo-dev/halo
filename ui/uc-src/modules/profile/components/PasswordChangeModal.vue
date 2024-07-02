@@ -1,10 +1,10 @@
 <script lang="ts" setup>
-import { VButton, VModal, VSpace } from "@halo-dev/components";
 import SubmitButton from "@/components/button/SubmitButton.vue";
-import { onMounted, ref } from "vue";
-import { apiClient } from "@/utils/api-client";
-import { cloneDeep } from "lodash-es";
 import { setFocus } from "@/formkit/utils/focus";
+import { consoleApiClient } from "@halo-dev/api-client";
+import { VButton, VModal, VSpace } from "@halo-dev/components";
+import { cloneDeep } from "lodash-es";
+import { onMounted, ref } from "vue";
 
 const emit = defineEmits<{
   (event: "close"): void;
@@ -36,7 +36,7 @@ const handleChangePassword = async () => {
     const changeOwnPasswordRequest = cloneDeep(formState.value);
     delete changeOwnPasswordRequest.password_confirm;
 
-    await apiClient.user.changeOwnPassword({
+    await consoleApiClient.user.changeOwnPassword({
       changeOwnPasswordRequest,
     });
 

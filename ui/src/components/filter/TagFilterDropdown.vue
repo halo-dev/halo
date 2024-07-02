@@ -1,16 +1,16 @@
 <script lang="ts" setup>
+import { setFocus } from "@/formkit/utils/focus";
+import PostTag from "@console/modules/contents/posts/tags/components/PostTag.vue";
+import { usePostTag } from "@console/modules/contents/posts/tags/composables/use-post-tag";
 import type { Tag } from "@halo-dev/api-client";
 import {
+  IconArrowDown,
+  VDropdown,
   VEntity,
   VEntityField,
-  VDropdown,
-  IconArrowDown,
 } from "@halo-dev/components";
-import { setFocus } from "@/formkit/utils/focus";
-import { computed, ref, watch } from "vue";
 import Fuse from "fuse.js";
-import { usePostTag } from "@console/modules/contents/posts/tags/composables/use-post-tag";
-import PostTag from "@console/modules/contents/posts/tags/components/PostTag.vue";
+import { computed, ref, watch } from "vue";
 
 const props = withDefaults(
   defineProps<{

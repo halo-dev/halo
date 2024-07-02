@@ -1,18 +1,15 @@
 <script lang="ts" setup>
-import { apiClient } from "@/utils/api-client";
+import { useThemeStore } from "@console/stores/theme";
+import { submitForm } from "@formkit/core";
+import { consoleApiClient } from "@halo-dev/api-client";
 import { Dialog, Toast, VButton } from "@halo-dev/components";
 import { useQueryClient } from "@tanstack/vue-query";
-import type { Ref } from "vue";
-import { inject } from "vue";
-import { ref } from "vue";
-import { useI18n } from "vue-i18n";
-import type { ThemeInstallationErrorResponse } from "../../types";
-import { useThemeStore } from "@console/stores/theme";
-import { THEME_ALREADY_EXISTS_TYPE } from "../../constants";
 import { useRouteQuery } from "@vueuse/router";
-import { onMounted } from "vue";
-import { nextTick } from "vue";
-import { submitForm } from "@formkit/core";
+import type { Ref } from "vue";
+import { inject, nextTick, onMounted, ref } from "vue";
+import { useI18n } from "vue-i18n";
+import { THEME_ALREADY_EXISTS_TYPE } from "../../constants";
+import type { ThemeInstallationErrorResponse } from "../../types";
 
 const { t } = useI18n();
 const queryClient = useQueryClient();
@@ -26,7 +23,7 @@ const handleDownloadTheme = async () => {
   try {
     downloading.value = true;
 
-    await apiClient.theme.installThemeFromUri({
+    await consoleApiClient.theme.theme.installThemeFromUri({
       installFromUriRequest: {
         uri: remoteDownloadUrl.value,
       },
@@ -64,7 +61,7 @@ const handleCatchExistsException = async (
     confirmText: t("core.common.buttons.confirm"),
     cancelText: t("core.common.buttons.cancel"),
     onConfirm: async () => {
-      await apiClient.theme.upgradeThemeFromUri({
+      await consoleApiClient.theme.theme.upgradeThemeFromUri({
         name: error.themeName,
         upgradeFromUriRequest: {
           uri: remoteDownloadUrl.value,

@@ -1,30 +1,33 @@
+import { getBrowserLanguage, i18n, setupI18n } from "@/locales";
+import { setupApiClient } from "@/setup/setupApiClient";
+import { setupComponents } from "@/setup/setupComponents";
 import "@/setup/setupStyles";
+import { setupVueQuery } from "@/setup/setupVueQuery";
+import { useGlobalInfoStore } from "@/stores/global-info";
+import { useRoleStore } from "@/stores/role";
+import { useUserStore } from "@/stores/user";
+import { hasPermission } from "@/utils/permission";
+import { consoleApiClient } from "@halo-dev/api-client";
+import router from "@uc/router";
+import { setupCoreModules, setupPluginModules } from "@uc/setup/setupModules";
+import { createPinia } from "pinia";
 import { createApp, type DirectiveBinding } from "vue";
 import App from "./App.vue";
-import { setupVueQuery } from "@/setup/setupVueQuery";
-import { setupComponents } from "@/setup/setupComponents";
-import { getBrowserLanguage, i18n, setupI18n } from "@/locales";
-import { createPinia } from "pinia";
-import { setupCoreModules, setupPluginModules } from "@uc/setup/setupModules";
-import router from "@uc/router";
-import { useUserStore } from "@/stores/user";
-import { apiClient } from "@/utils/api-client";
-import { useRoleStore } from "@/stores/role";
-import { hasPermission } from "@/utils/permission";
-import { useGlobalInfoStore } from "@/stores/global-info";
 
 const app = createApp(App);
 
 setupComponents(app);
 setupI18n(app);
 setupVueQuery(app);
+setupApiClient();
 
 app.use(createPinia());
 
 async function loadUserPermissions() {
-  const { data: currentPermissions } = await apiClient.user.getPermissions({
-    name: "-",
-  });
+  const { data: currentPermissions } =
+    await consoleApiClient.user.getPermissions({
+      name: "-",
+    });
   const roleStore = useRoleStore();
   roleStore.$patch({
     permissions: currentPermissions,

@@ -1,6 +1,6 @@
+import { mount } from "@vue/test-utils";
 import { describe, expect, it } from "vitest";
 import { VSpace } from "../index";
-import { mount } from "@vue/test-utils";
 import { SpacingSize } from "../interface";
 
 describe("Space", () => {

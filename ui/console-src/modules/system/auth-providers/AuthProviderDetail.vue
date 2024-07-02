@@ -1,9 +1,7 @@
 <script lang="ts" setup>
-import { computed, ref, toRaw } from "vue";
-import { apiClient } from "@/utils/api-client";
-import { useQuery } from "@tanstack/vue-query";
+import { useSettingFormConvert } from "@console/composables/use-setting-form";
 import type { AuthProvider, Setting } from "@halo-dev/api-client";
-import { useRoute } from "vue-router";
+import { coreApiClient } from "@halo-dev/api-client";
 import {
   Toast,
   VAvatar,
@@ -14,8 +12,10 @@ import {
   VPageHeader,
   VTabbar,
 } from "@halo-dev/components";
-import { useSettingFormConvert } from "@console/composables/use-setting-form";
+import { useQuery } from "@tanstack/vue-query";
+import { computed, ref, toRaw } from "vue";
 import { useI18n } from "vue-i18n";
+import { useRoute } from "vue-router";
 
 const route = useRoute();
 const { t } = useI18n();
@@ -32,12 +32,9 @@ const activeTab = ref<string>("detail");
 const { data: authProvider } = useQuery<AuthProvider>({
   queryKey: ["auth-provider", route.params.name],
   queryFn: async () => {
-    const { data } =
-      await apiClient.extension.authProvider.getAuthHaloRunV1alpha1AuthProvider(
-        {
-          name: route.params.name as string,
-        }
-      );
+    const { data } = await coreApiClient.auth.authProvider.getAuthProvider({
+      name: route.params.name as string,
+    });
     return data;
   },
   onSuccess(data) {
@@ -63,7 +60,7 @@ const { data: setting, refetch: handleFetchSettings } = useQuery<Setting>({
     authProvider.value?.spec.settingRef?.name,
   ],
   queryFn: async () => {
-    const { data } = await apiClient.extension.setting.getV1alpha1Setting(
+    const { data } = await coreApiClient.setting.getSetting(
       {
         name: authProvider.value?.spec.settingRef?.name as string,
       },
@@ -82,7 +79,7 @@ const { data: configMap, refetch: handleFetchConfigMap } = useQuery({
     authProvider.value?.spec.configMapRef?.name,
   ],
   queryFn: async () => {
-    const { data } = await apiClient.extension.configMap.getV1alpha1ConfigMap(
+    const { data } = await coreApiClient.configMap.getConfigMap(
       {
         name: authProvider.value?.spec.configMapRef?.name as string,
       },
@@ -96,7 +93,7 @@ const { data: configMap, refetch: handleFetchConfigMap } = useQuery({
   onError: async () => {
     const data = {};
     data[group.value] = "";
-    await apiClient.extension.configMap.createV1alpha1ConfigMap({
+    await coreApiClient.configMap.createConfigMap({
       configMap: {
         apiVersion: "v1alpha1",
         data: data,
@@ -128,7 +125,7 @@ const handleSaveConfigMap = async () => {
     return;
   }
 
-  await apiClient.extension.configMap.updateV1alpha1ConfigMap({
+  await coreApiClient.configMap.updateConfigMap({
     name: authProvider.value.spec.configMapRef?.name as string,
     configMap: configMapToUpdate,
   });

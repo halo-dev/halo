@@ -1,5 +1,6 @@
 <script lang="ts" setup>
-import { apiClient } from "@/utils/api-client";
+import type { Backup } from "@halo-dev/api-client";
+import { consoleApiClient } from "@halo-dev/api-client";
 import {
   Dialog,
   Toast,
@@ -12,12 +13,10 @@ import {
 } from "@halo-dev/components";
 import { useMutation, useQuery } from "@tanstack/vue-query";
 import axios from "axios";
-import { computed } from "vue";
-import { ref } from "vue";
+import { computed, ref } from "vue";
 import { useI18n } from "vue-i18n";
-import { useBackupFetch } from "../composables/use-backup";
 import BackupListItem from "../components/BackupListItem.vue";
-import type { Backup } from "packages/api-client/dist";
+import { useBackupFetch } from "../composables/use-backup";
 
 const { t } = useI18n();
 const { data: backups } = useBackupFetch();
@@ -58,7 +57,7 @@ const remoteDownloadUrl = ref("");
 const { isLoading: downloading, mutate: handleRemoteDownload } = useMutation({
   mutationKey: ["remote-download-restore"],
   mutationFn: async () => {
-    return await apiClient.migration.restoreBackup({
+    return await consoleApiClient.migration.restoreBackup({
       downloadUrl: remoteDownloadUrl.value,
     });
   },
@@ -74,7 +73,7 @@ function handleRestoreFromBackup(backup: Backup) {
     confirmText: t("core.common.buttons.confirm"),
     showCancel: false,
     async onConfirm() {
-      await apiClient.migration.restoreBackup({
+      await consoleApiClient.migration.restoreBackup({
         backupName: backup.metadata.name,
       });
       setTimeout(() => {

@@ -1,6 +1,6 @@
 <script lang="ts" setup>
-import { DropdownContextInjectionKey } from "./symbols";
 import { inject } from "vue";
+import { DropdownContextInjectionKey } from "./symbols";
 
 const props = withDefaults(
   defineProps<{

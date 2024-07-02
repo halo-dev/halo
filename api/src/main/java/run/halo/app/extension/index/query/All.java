@@ -10,6 +10,11 @@ public class All extends SimpleQuery {
 
     @Override
     public NavigableSet<String> matches(QueryIndexView indexView) {
-        return indexView.getAllIdsForField(fieldName);
+        return indexView.getIdsForField(fieldName);
+    }
+
+    @Override
+    public String toString() {
+        return fieldName + " != null";
     }
 }

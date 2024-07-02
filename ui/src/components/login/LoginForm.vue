@@ -1,17 +1,16 @@
 <script lang="ts" setup>
+import { ERROR_MFA_REQUIRED_TYPE } from "@/constants/error-types";
 import { setFocus } from "@/formkit/utils/focus";
 import { useUserStore } from "@/stores/user";
 import { randomUUID } from "@/utils/id";
-import axios from "axios";
-import { AxiosError } from "axios";
+import { reset, submitForm } from "@formkit/core";
+import { consoleApiClient } from "@halo-dev/api-client";
 import { Toast, VButton } from "@halo-dev/components";
-import { onMounted, ref } from "vue";
-import qs from "qs";
-import { submitForm, reset } from "@formkit/core";
+import axios, { AxiosError } from "axios";
 import { JSEncrypt } from "jsencrypt";
-import { apiClient } from "@/utils/api-client";
+import qs from "qs";
+import { onMounted, ref } from "vue";
 import { useI18n } from "vue-i18n";
-import { ERROR_MFA_REQUIRED_TYPE } from "@/constants/error-types";
 import MfaForm from "./MfaForm.vue";
 
 const { t } = useI18n();
@@ -51,7 +50,7 @@ async function handleLogin(data: {
   try {
     loading.value = true;
 
-    const { data: publicKey } = await apiClient.login.getPublicKey();
+    const { data: publicKey } = await consoleApiClient.login.getPublicKey();
 
     const encrypt = new JSEncrypt();
     encrypt.setPublicKey(publicKey.base64Format as string);

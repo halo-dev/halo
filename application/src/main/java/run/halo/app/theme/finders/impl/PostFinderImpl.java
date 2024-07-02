@@ -2,12 +2,15 @@ package run.halo.app.theme.finders.impl;
 
 import static run.halo.app.extension.index.query.QueryFactory.and;
 import static run.halo.app.extension.index.query.QueryFactory.equal;
+import static run.halo.app.extension.index.query.QueryFactory.in;
+import static run.halo.app.extension.index.query.QueryFactory.notEqual;
 
 import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 import lombok.AllArgsConstructor;
+import org.apache.commons.lang3.BooleanUtils;
 import org.apache.commons.lang3.ObjectUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.data.domain.Sort;
@@ -15,6 +18,8 @@ import org.springframework.lang.NonNull;
 import org.springframework.util.Assert;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
+import run.halo.app.content.CategoryService;
+import run.halo.app.core.extension.content.Category;
 import run.halo.app.core.extension.content.Post;
 import run.halo.app.extension.ListOptions;
 import run.halo.app.extension.ListResult;
@@ -51,6 +56,8 @@ public class PostFinderImpl implements PostFinder {
     private final PostPublicQueryService postPublicQueryService;
 
     private final ReactiveQueryPostPredicateResolver postPredicateResolver;
+
+    private final CategoryService categoryService;
 
     @Override
     public Mono<PostVo> getByName(String postName) {
@@ -131,7 +138,10 @@ public class PostFinderImpl implements PostFinder {
 
     @Override
     public Mono<ListResult<ListedPostVo>> list(Integer page, Integer size) {
-        return postPublicQueryService.list(new ListOptions(), getPageRequest(page, size));
+        var listOptions = ListOptions.builder()
+            .fieldQuery(notEqual("status.hideFromList", BooleanUtils.TRUE))
+            .build();
+        return postPublicQueryService.list(listOptions, getPageRequest(page, size));
     }
 
     private PageRequestImpl getPageRequest(Integer page, Integer size) {
@@ -141,13 +151,24 @@ public class PostFinderImpl implements PostFinder {
     @Override
     public Mono<ListResult<ListedPostVo>> listByCategory(Integer page, Integer size,
         String categoryName) {
-        var fieldQuery = QueryFactory.all();
-        if (StringUtils.isNotBlank(categoryName)) {
-            fieldQuery = and(fieldQuery, equal("spec.categories", categoryName));
+        return listChildrenCategories(categoryName)
+            .map(category -> category.getMetadata().getName())
+            .collectList()
+            .flatMap(categoryNames -> {
+                var listOptions = new ListOptions();
+                var fieldQuery = in("spec.categories", categoryNames);
+                listOptions.setFieldSelector(FieldSelector.of(fieldQuery));
+                return postPublicQueryService.list(listOptions, getPageRequest(page, size));
+            });
+    }
+
+    private Flux<Category> listChildrenCategories(String categoryName) {
+        if (StringUtils.isBlank(categoryName)) {
+            return client.listAll(Category.class, new ListOptions(),
+                Sort.by(Sort.Order.asc("metadata.creationTimestamp"),
+                    Sort.Order.desc("metadata.name")));
         }
-        var listOptions = new ListOptions();
-        listOptions.setFieldSelector(FieldSelector.of(fieldQuery));
-        return postPublicQueryService.list(listOptions, getPageRequest(page, size));
+        return categoryService.listChildren(categoryName);
     }
 
     @Override
@@ -186,6 +207,9 @@ public class PostFinderImpl implements PostFinder {
     public Mono<ListResult<PostArchiveVo>> archives(Integer page, Integer size, String year,
         String month) {
         var listOptions = new ListOptions();
+        listOptions.setFieldSelector(FieldSelector.of(
+            notEqual("status.hideFromList", BooleanUtils.TRUE))
+        );
         var labelSelectorBuilder = LabelSelector.builder();
         if (StringUtils.isNotBlank(year)) {
             labelSelectorBuilder.eq(Post.ARCHIVE_YEAR_LABEL, year);

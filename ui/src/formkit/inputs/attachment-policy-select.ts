@@ -1,11 +1,10 @@
-import { apiClient } from "@/utils/api-client";
 import type { FormKitNode, FormKitTypeDefinition } from "@formkit/core";
-import { select, selects, defaultIcon } from "@formkit/inputs";
+import { defaultIcon, select, selects } from "@formkit/inputs";
+import { coreApiClient } from "@halo-dev/api-client";
 
 function optionsHandler(node: FormKitNode) {
   node.on("created", async () => {
-    const { data } =
-      await apiClient.extension.storage.policy.listStorageHaloRunV1alpha1Policy();
+    const { data } = await coreApiClient.storage.policy.listPolicy();
 
     node.props.options = data.items.map((policy) => {
       return {

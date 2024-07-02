@@ -16,8 +16,8 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.data.domain.Sort;
 import run.halo.app.extension.ExtensionClient;
-import run.halo.app.extension.ExtensionMatcher;
 import run.halo.app.extension.FakeExtension;
 import run.halo.app.extension.GroupVersionKind;
 import run.halo.app.extension.ListOptions;
@@ -36,16 +36,13 @@ class RequestSynchronizerTest {
     @Mock
     Watcher watcher;
 
-    @Mock
-    ExtensionMatcher listMatcher;
-
     RequestSynchronizer synchronizer;
 
     @BeforeEach
     void setUp() {
         when(client.indexedQueryEngine()).thenReturn(indexedQueryEngine);
         synchronizer =
-            new RequestSynchronizer(true, client, new FakeExtension(), watcher, listMatcher);
+            new RequestSynchronizer(true, client, new FakeExtension(), watcher, new ListOptions());
         assertFalse(synchronizer.isDisposed());
         assertFalse(synchronizer.isStarted());
     }
@@ -53,7 +50,7 @@ class RequestSynchronizerTest {
     @Test
     void shouldStartCorrectlyWhenSyncingAllOnStart() {
         var type = GroupVersionKind.fromExtension(FakeExtension.class);
-        when(indexedQueryEngine.retrieveAll(eq(type), isA(ListOptions.class)))
+        when(indexedQueryEngine.retrieveAll(eq(type), isA(ListOptions.class), any(Sort.class)))
             .thenReturn(List.of("fake-01", "fake-02"));
 
         synchronizer.start();
@@ -62,7 +59,7 @@ class RequestSynchronizerTest {
         assertFalse(synchronizer.isDisposed());
 
         verify(indexedQueryEngine, times(1)).retrieveAll(eq(type),
-            isA(ListOptions.class));
+            isA(ListOptions.class), isA(Sort.class));
         verify(watcher, times(2)).onAdd(isA(Reconciler.Request.class));
         verify(client, times(1)).watch(same(watcher));
     }
@@ -70,7 +67,7 @@ class RequestSynchronizerTest {
     @Test
     void shouldStartCorrectlyWhenNotSyncingAllOnStart() {
         synchronizer =
-            new RequestSynchronizer(false, client, new FakeExtension(), watcher, listMatcher);
+            new RequestSynchronizer(false, client, new FakeExtension(), watcher, new ListOptions());
         assertFalse(synchronizer.isDisposed());
         assertFalse(synchronizer.isStarted());
 

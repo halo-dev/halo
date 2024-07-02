@@ -1,4 +1,8 @@
 <script lang="ts" setup>
+import UserFilterDropdown from "@/components/filter/UserFilterDropdown.vue";
+import { singlePageLabels } from "@/constants/labels";
+import type { ListedSinglePage, SinglePage } from "@halo-dev/api-client";
+import { consoleApiClient, coreApiClient } from "@halo-dev/api-client";
 import {
   Dialog,
   IconAddCircle,
@@ -15,17 +19,13 @@ import {
   VPagination,
   VSpace,
 } from "@halo-dev/components";
-import SinglePageSettingModal from "./components/SinglePageSettingModal.vue";
+import { useQuery } from "@tanstack/vue-query";
+import { useRouteQuery } from "@vueuse/router";
 import type { Ref } from "vue";
 import { computed, provide, ref, watch } from "vue";
-import type { ListedSinglePage, SinglePage } from "@halo-dev/api-client";
-import { apiClient } from "@/utils/api-client";
-import { singlePageLabels } from "@/constants/labels";
-import { useQuery } from "@tanstack/vue-query";
 import { useI18n } from "vue-i18n";
-import UserFilterDropdown from "@/components/filter/UserFilterDropdown.vue";
 import SinglePageListItem from "./components/SinglePageListItem.vue";
-import { useRouteQuery } from "@vueuse/router";
+import SinglePageSettingModal from "./components/SinglePageSettingModal.vue";
 
 const { t } = useI18n();
 
@@ -114,7 +114,7 @@ const {
       );
     }
 
-    const { data } = await apiClient.singlePage.listSinglePages({
+    const { data } = await consoleApiClient.content.singlePage.listSinglePages({
       labelSelector,
       page: page.value,
       size: size.value,
@@ -143,10 +143,9 @@ const {
 });
 
 const handleOpenSettingModal = async (singlePage: SinglePage) => {
-  const { data } =
-    await apiClient.extension.singlePage.getContentHaloRunV1alpha1SinglePage({
-      name: singlePage.metadata.name,
-    });
+  const { data } = await coreApiClient.content.singlePage.getSinglePage({
+    name: singlePage.metadata.name,
+  });
   selectedSinglePage.value = data;
   settingModal.value = true;
 };
@@ -165,10 +164,9 @@ const handleSelectPrevious = async () => {
       singlePage.page.metadata.name === selectedSinglePage.value?.metadata.name
   );
   if (index > 0) {
-    const { data } =
-      await apiClient.extension.singlePage.getContentHaloRunV1alpha1SinglePage({
-        name: singlePages.value[index - 1].page.metadata.name,
-      });
+    const { data } = await coreApiClient.content.singlePage.getSinglePage({
+      name: singlePages.value[index - 1].page.metadata.name,
+    });
     selectedSinglePage.value = data;
     return;
   }
@@ -188,10 +186,9 @@ const handleSelectNext = async () => {
       singlePage.page.metadata.name === selectedSinglePage.value?.metadata.name
   );
   if (index < singlePages.value.length - 1) {
-    const { data } =
-      await apiClient.extension.singlePage.getContentHaloRunV1alpha1SinglePage({
-        name: singlePages.value[index + 1].page.metadata.name,
-      });
+    const { data } = await coreApiClient.content.singlePage.getSinglePage({
+      name: singlePages.value[index + 1].page.metadata.name,
+    });
     selectedSinglePage.value = data;
     return;
   }
@@ -240,18 +237,16 @@ const handleDeleteInBatch = async () => {
             return Promise.resolve();
           }
 
-          return apiClient.extension.singlePage.updateContentHaloRunV1alpha1SinglePage(
-            {
-              name: page.metadata.name,
-              singlePage: {
-                ...page,
-                spec: {
-                  ...page.spec,
-                  deleted: true,
-                },
+          return coreApiClient.content.singlePage.updateSinglePage({
+            name: page.metadata.name,
+            singlePage: {
+              ...page,
+              spec: {
+                ...page.spec,
+                deleted: true,
               },
-            }
-          );
+            },
+          });
         })
       );
       await refetch();

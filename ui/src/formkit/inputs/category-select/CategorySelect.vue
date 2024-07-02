@@ -1,20 +1,20 @@
 <script lang="ts" setup>
-import type { FormKitFrameworkContext } from "@formkit/core";
-import type { Category } from "@halo-dev/api-client";
-import { computed, provide, ref, watch, type PropType, type Ref } from "vue";
-import { IconArrowRight } from "@halo-dev/components";
+import HasPermission from "@/components/permission/HasPermission.vue";
+import { usePermission } from "@/utils/permission";
 import { usePostCategory } from "@console/modules/contents/posts/categories/composables/use-post-category";
 import type { CategoryTree } from "@console/modules/contents/posts/categories/utils";
 import { convertTreeToCategories } from "@console/modules/contents/posts/categories/utils";
-import CategoryListItem from "./components/CategoryListItem.vue";
+import type { FormKitFrameworkContext } from "@formkit/core";
+import type { Category } from "@halo-dev/api-client";
+import { coreApiClient } from "@halo-dev/api-client";
+import { IconArrowRight } from "@halo-dev/components";
 import { onClickOutside } from "@vueuse/core";
 import Fuse from "fuse.js";
+import { slugify } from "transliteration";
+import { computed, provide, ref, watch, type PropType, type Ref } from "vue";
+import CategoryListItem from "./components/CategoryListItem.vue";
 import CategoryTag from "./components/CategoryTag.vue";
 import SearchResultListItem from "./components/SearchResultListItem.vue";
-import { apiClient } from "@/utils/api-client";
-import { usePermission } from "@/utils/permission";
-import { slugify } from "transliteration";
-import HasPermission from "@/components/permission/HasPermission.vue";
 
 const { currentUserHasPermission } = usePermission();
 
@@ -215,26 +215,25 @@ const handleCreateCategory = async () => {
     return;
   }
 
-  const { data } =
-    await apiClient.extension.category.createContentHaloRunV1alpha1Category({
-      category: {
-        spec: {
-          displayName: text.value,
-          slug: slugify(text.value, { trim: true }),
-          description: "",
-          cover: "",
-          template: "",
-          priority: categories.value?.length || 0 + 1,
-          children: [],
-        },
-        apiVersion: "content.halo.run/v1alpha1",
-        kind: "Category",
-        metadata: {
-          name: "",
-          generateName: "category-",
-        },
+  const { data } = await coreApiClient.content.category.createCategory({
+    category: {
+      spec: {
+        displayName: text.value,
+        slug: slugify(text.value, { trim: true }),
+        description: "",
+        cover: "",
+        template: "",
+        priority: categories.value?.length || 0 + 1,
+        children: [],
       },
-    });
+      apiVersion: "content.halo.run/v1alpha1",
+      kind: "Category",
+      metadata: {
+        name: "",
+        generateName: "category-",
+      },
+    },
+  });
 
   handleFetchCategories();
   handleSelect(data);

@@ -1,14 +1,19 @@
 package run.halo.app.theme.dialect;
 
+import static org.thymeleaf.spring6.context.SpringContextUtils.getApplicationContext;
+
 import org.springframework.context.ApplicationContext;
 import org.thymeleaf.context.ITemplateContext;
+import org.thymeleaf.model.IModel;
 import org.thymeleaf.model.IProcessableElementTag;
 import org.thymeleaf.processor.element.AbstractElementTagProcessor;
 import org.thymeleaf.processor.element.IElementTagStructureHandler;
 import org.thymeleaf.spring6.context.SpringContextUtils;
 import org.thymeleaf.templatemode.TemplateMode;
+import reactor.core.publisher.Flux;
 import run.halo.app.infra.SystemConfigurableEnvironmentFetcher;
 import run.halo.app.infra.SystemSetting;
+import run.halo.app.plugin.extensionpoint.ExtensionGetter;
 
 /**
  * <p>Footer element tag processor.</p>
@@ -42,12 +47,23 @@ public class TemplateFooterElementTagProcessor extends AbstractElementTagProcess
     @Override
     protected void doProcess(ITemplateContext context, IProcessableElementTag tag,
         IElementTagStructureHandler structureHandler) {
+
+        IModel modelToInsert = context.getModelFactory().createModel();
         /*
          * Obtain the Spring application context.
          */
         final ApplicationContext appCtx = SpringContextUtils.getApplicationContext(context);
+
         String globalFooterText = getGlobalFooterText(appCtx);
-        structureHandler.replaceWith(globalFooterText, false);
+        modelToInsert.add(context.getModelFactory().createText(globalFooterText));
+
+        getTemplateFooterProcessors(context)
+            .concatMap(processor -> processor.process(context, tag,
+                structureHandler, modelToInsert)
+            )
+            .then()
+            .block();
+        structureHandler.replaceWith(modelToInsert, false);
     }
 
     private String getGlobalFooterText(ApplicationContext appCtx) {
@@ -56,5 +72,14 @@ public class TemplateFooterElementTagProcessor extends AbstractElementTagProcess
         return fetcher.fetch(SystemSetting.CodeInjection.GROUP, SystemSetting.CodeInjection.class)
             .map(SystemSetting.CodeInjection::getFooter)
             .block();
+    }
+
+    private Flux<TemplateFooterProcessor> getTemplateFooterProcessors(ITemplateContext context) {
+        var extensionGetter = getApplicationContext(context).getBeanProvider(ExtensionGetter.class)
+            .getIfUnique();
+        if (extensionGetter == null) {
+            return Flux.empty();
+        }
+        return extensionGetter.getExtensions(TemplateFooterProcessor.class);
     }
 }

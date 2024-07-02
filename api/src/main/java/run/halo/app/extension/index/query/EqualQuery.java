@@ -17,16 +17,16 @@ public class EqualQuery extends SimpleQuery {
     @Override
     public NavigableSet<String> matches(QueryIndexView indexView) {
         if (isFieldRef) {
-            return resultSetForRefValue(indexView);
+            return indexView.findMatchingIdsWithEqualValues(fieldName, value);
         }
-        return resultSetForExactValue(indexView);
+        return indexView.findIds(fieldName, value);
     }
 
-    private NavigableSet<String> resultSetForRefValue(QueryIndexView indexView) {
-        return indexView.findIdsForFieldValueEqual(fieldName, value);
-    }
-
-    private NavigableSet<String> resultSetForExactValue(QueryIndexView indexView) {
-        return indexView.getIdsForFieldValue(fieldName, value);
+    @Override
+    public String toString() {
+        if (isFieldRef) {
+            return fieldName + " = " + value;
+        }
+        return fieldName + " = '" + value + "'";
     }
 }

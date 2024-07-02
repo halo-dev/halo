@@ -1,7 +1,7 @@
 <script lang="ts" setup>
-import { apiClient } from "@/utils/api-client";
 import { formatDatetime, relativeTimeTo } from "@/utils/date";
 import type { PersonalAccessToken } from "@halo-dev/api-client";
+import { ucApiClient } from "@halo-dev/api-client";
 import {
   Dialog,
   Toast,
@@ -30,7 +30,7 @@ function handleDelete() {
     title: t("core.uc_profile.pat.operations.delete.title"),
     description: t("core.uc_profile.pat.operations.delete.description"),
     async onConfirm() {
-      await apiClient.pat.deletePat({
+      await ucApiClient.security.personalAccessToken.deletePat({
         name: props.token.metadata.name,
       });
 
@@ -45,7 +45,7 @@ function handleRevoke() {
     title: t("core.uc_profile.pat.operations.revoke.title"),
     description: t("core.uc_profile.pat.operations.revoke.description"),
     async onConfirm() {
-      await apiClient.pat.revokePat({
+      await ucApiClient.security.personalAccessToken.revokePat({
         name: props.token.metadata.name,
       });
 
@@ -56,7 +56,9 @@ function handleRevoke() {
 }
 
 async function handleRestore() {
-  await apiClient.pat.restorePat({ name: props.token.metadata.name });
+  await ucApiClient.security.personalAccessToken.restorePat({
+    name: props.token.metadata.name,
+  });
 
   Toast.success(t("core.uc_profile.pat.operations.restore.toast_success"));
   queryClient.invalidateQueries({ queryKey: ["personal-access-tokens"] });

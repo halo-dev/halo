@@ -1,6 +1,6 @@
 <script lang="ts" setup>
-import { apiClient } from "@/utils/api-client";
 import type { ListedAuthProvider } from "@halo-dev/api-client";
+import { consoleApiClient } from "@halo-dev/api-client";
 import {
   Dialog,
   IconList,
@@ -33,13 +33,13 @@ const handleChangeStatus = async () => {
     onConfirm: async () => {
       try {
         if (props.authProvider.enabled) {
-          await apiClient.authProvider.disableAuthProvider({
+          await consoleApiClient.auth.authProvider.disableAuthProvider({
             name: props.authProvider.name,
           });
 
           Toast.success(t("core.common.toast.inactive_success"));
         } else {
-          await apiClient.authProvider.enableAuthProvider({
+          await consoleApiClient.auth.authProvider.enableAuthProvider({
             name: props.authProvider.name,
           });
           Toast.success(t("core.common.toast.active_success"));

@@ -1,10 +1,10 @@
+import "floating-vue/dist/style.css";
+import "github-markdown-css/github-markdown-light.css";
+import "highlight.js/styles/github.css";
 import type { App, Plugin } from "vue";
 import { RichTextEditor } from "./components";
 import "./styles/index.scss";
 import "./styles/tailwind.css";
-import "floating-vue/dist/style.css";
-import "github-markdown-css/github-markdown-light.css";
-import "highlight.js/styles/github.css";
 
 const plugin: Plugin = {
   install(app: App) {
@@ -14,8 +14,8 @@ const plugin: Plugin = {
 
 export default plugin;
 
-export * from "./tiptap";
-export * from "./extensions";
 export * from "./components";
+export * from "./extensions";
+export * from "./tiptap";
 export * from "./utils";
 // TODO: export * from "./types";

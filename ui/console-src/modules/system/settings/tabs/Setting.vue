@@ -1,19 +1,19 @@
 <script lang="ts" setup>
 // core libs
-import { computed, ref, type Ref, inject, toRaw } from "vue";
+import { computed, inject, ref, toRaw, type Ref } from "vue";
 
 // components
-import { Toast, VButton } from "@halo-dev/components";
 import StickyBlock from "@/components/sticky-block/StickyBlock.vue";
+import { Toast, VButton } from "@halo-dev/components";
 
 // hooks
+import { useGlobalInfoStore } from "@/stores/global-info";
 import { useSettingFormConvert } from "@console/composables/use-setting-form";
 import { useSystemConfigMapStore } from "@console/stores/system-configmap";
 import type { ConfigMap, Setting } from "@halo-dev/api-client";
+import { coreApiClient } from "@halo-dev/api-client";
 import { useQuery, useQueryClient } from "@tanstack/vue-query";
-import { apiClient } from "@/utils/api-client";
 import { useI18n } from "vue-i18n";
-import { useGlobalInfoStore } from "@/stores/global-info";
 
 const SYSTEM_CONFIGMAP_NAME = "system";
 
@@ -28,7 +28,7 @@ const saving = ref(false);
 const { data: configMap } = useQuery<ConfigMap>({
   queryKey: ["system-configMap"],
   queryFn: async () => {
-    const { data } = await apiClient.extension.configMap.getV1alpha1ConfigMap({
+    const { data } = await coreApiClient.configMap.getConfigMap({
       name: SYSTEM_CONFIGMAP_NAME,
     });
     return data;
@@ -52,7 +52,7 @@ const handleSaveConfigMap = async () => {
     return;
   }
 
-  const { data } = await apiClient.extension.configMap.updateV1alpha1ConfigMap({
+  const { data } = await coreApiClient.configMap.updateConfigMap({
     name: SYSTEM_CONFIGMAP_NAME,
     configMap: configMapToUpdate,
   });

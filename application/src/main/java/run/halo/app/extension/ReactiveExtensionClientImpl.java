@@ -11,6 +11,7 @@ import java.util.Comparator;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -112,8 +113,38 @@ public class ReactiveExtensionClientImpl implements ReactiveExtensionClient {
 
     @Override
     public <E extends Extension> Flux<E> listAll(Class<E> type, ListOptions options, Sort sort) {
-        return listBy(type, options, PageRequestImpl.ofSize(0).withSort(sort))
-            .flatMapIterable(ListResult::getItems);
+        var nullSafeSort = Optional.ofNullable(sort)
+            .orElseGet(() -> {
+                log.warn("The sort parameter is null, it is recommended to use Sort.unsorted() "
+                    + "instead and the compatibility support for null will be removed in the "
+                    + "subsequent version.");
+                return Sort.unsorted();
+            });
+        var scheme = schemeManager.get(type);
+        return Mono.fromSupplier(
+                () -> indexedQueryEngine.retrieveAll(scheme.groupVersionKind(), options,
+                    nullSafeSort))
+            .doOnSuccess(objectKeys -> {
+                if (log.isDebugEnabled()) {
+                    if (objectKeys.size() > 500) {
+                        log.warn("The number of objects retrieved by listAll is too large ({}) "
+                                + "and it is recommended to use paging query.",
+                            objectKeys.size());
+                    }
+                }
+            })
+            .flatMapMany(objectKeys -> {
+                var storeNames = objectKeys.stream()
+                    .map(objectKey -> ExtensionStoreUtil.buildStoreName(scheme, objectKey))
+                    .toList();
+                final long startTimeMs = System.currentTimeMillis();
+                return client.listByNames(storeNames)
+                    .map(extensionStore -> converter.convertFrom(type, extensionStore))
+                    .doOnNext(s -> {
+                        log.debug("Successfully retrieved all by names from db for {} in {}ms",
+                            scheme.groupVersionKind(), System.currentTimeMillis() - startTimeMs);
+                    });
+            });
     }
 
     @Override
@@ -130,7 +161,7 @@ public class ReactiveExtensionClientImpl implements ReactiveExtensionClient {
                 final long startTimeMs = System.currentTimeMillis();
                 return client.listByNames(storeNames)
                     .map(extensionStore -> converter.convertFrom(type, extensionStore))
-                    .doFinally(s -> {
+                    .doOnNext(s -> {
                         log.debug("Successfully retrieved by names from db for {} in {}ms",
                             scheme.groupVersionKind(), System.currentTimeMillis() - startTimeMs);
                     })
@@ -155,6 +186,12 @@ public class ReactiveExtensionClientImpl implements ReactiveExtensionClient {
             .map(extensionStore -> converter.convertFrom(Unstructured.class, extensionStore));
     }
 
+    private Mono<JsonExtension> fetchJsonExtension(GroupVersionKind gvk, String name) {
+        var storeName = ExtensionStoreUtil.buildStoreName(schemeManager.get(gvk), name);
+        return client.fetchByName(storeName)
+            .map(extensionStore -> converter.convertFrom(JsonExtension.class, extensionStore));
+    }
+
     @Override
     public <E extends Extension> Mono<E> get(Class<E> type, String name) {
         return fetch(type, name)
@@ -168,6 +205,13 @@ public class ReactiveExtensionClientImpl implements ReactiveExtensionClient {
         return fetch(gvk, name)
             .switchIfEmpty(Mono.error(() -> new ExtensionNotFoundException(gvk, name)));
     }
+
+    @Override
+    public Mono<JsonExtension> getJsonExtension(GroupVersionKind gvk, String name) {
+        return fetchJsonExtension(gvk, name)
+            .switchIfEmpty(Mono.error(() -> new ExtensionNotFoundException(gvk, name)));
+    }
+
 
     @Override
     public <E extends Extension> Mono<E> create(E extension) {
@@ -193,7 +237,7 @@ public class ReactiveExtensionClientImpl implements ReactiveExtensionClient {
             })
             .map(converter::convertTo)
             .flatMap(extStore -> doCreate(extension, extStore.getName(), extStore.getData())
-                .doOnNext(watchers::onAdd)
+                .doOnNext(created -> watchers.onAdd(convertToRealExtension(created)))
             )
             .retryWhen(Retry.backoff(3, Duration.ofMillis(100))
                 // retry when generateName is set
@@ -231,15 +275,23 @@ public class ReactiveExtensionClientImpl implements ReactiveExtensionClient {
             var store = this.converter.convertTo(newJsonExt);
             var updated = doUpdate(extension, store.getName(), store.getVersion(), store.getData());
             if (!onlyStatusChanged) {
-                updated = updated.doOnNext(ext -> watchers.onUpdate(old, ext));
+                updated = updated.doOnNext(ext -> watchers.onUpdate(convertToRealExtension(old),
+                    convertToRealExtension(ext))
+                );
             }
             return updated;
         });
     }
 
     private Mono<? extends Extension> getLatest(Extension extension) {
-        if (extension instanceof Unstructured unstructured) {
-            return get(unstructured.groupVersionKind(), unstructured.getMetadata().getName());
+        if (extension instanceof Unstructured) {
+            return get(extension.groupVersionKind(), extension.getMetadata().getName());
+        }
+        if (extension instanceof JsonExtension) {
+            return getJsonExtension(
+                extension.groupVersionKind(),
+                extension.getMetadata().getName()
+            );
         }
         return get(extension.getClass(), extension.getMetadata().getName());
     }
@@ -252,7 +304,7 @@ public class ReactiveExtensionClientImpl implements ReactiveExtensionClient {
         var extensionStore = converter.convertTo(extension);
         return doUpdate(extension, extensionStore.getName(),
             extensionStore.getVersion(), extensionStore.getData()
-        ).doOnNext(watchers::onDelete);
+        ).doOnNext(updated -> watchers.onDelete(convertToRealExtension(extension)));
     }
 
     @Override
@@ -268,7 +320,7 @@ public class ReactiveExtensionClientImpl implements ReactiveExtensionClient {
             var indexer = indexerFactory.getIndexer(gvk);
             return client.create(name, data)
                 .map(created -> converter.convertFrom(type, created))
-                .doOnNext(indexer::indexRecord)
+                .doOnNext(extension -> indexer.indexRecord(convertToRealExtension(extension)))
                 .as(transactionalOperator::transactional);
         });
     }
@@ -280,9 +332,21 @@ public class ReactiveExtensionClientImpl implements ReactiveExtensionClient {
             var indexer = indexerFactory.getIndexer(oldExtension.groupVersionKind());
             return client.update(name, version, data)
                 .map(updated -> converter.convertFrom(type, updated))
-                .doOnNext(indexer::updateRecord)
+                .doOnNext(extension -> indexer.updateRecord(convertToRealExtension(extension)))
                 .as(transactionalOperator::transactional);
         });
+    }
+
+    private Extension convertToRealExtension(Extension extension) {
+        var gvk = extension.groupVersionKind();
+        var realType = schemeManager.get(gvk).type();
+        Extension realExtension = extension;
+        if (extension instanceof Unstructured) {
+            realExtension = Unstructured.OBJECT_MAPPER.convertValue(extension, realType);
+        } else if (extension instanceof JsonExtension jsonExtension) {
+            realExtension = jsonExtension.getObjectMapper().convertValue(jsonExtension, realType);
+        }
+        return realExtension;
     }
 
     /**

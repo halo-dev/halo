@@ -1,4 +1,10 @@
 <script lang="ts" setup>
+import SubmitButton from "@/components/button/SubmitButton.vue";
+import type {
+  ListedComment,
+  ListedReply,
+  ReplyRequest,
+} from "@halo-dev/api-client";
 import {
   IconMotionLine,
   Toast,
@@ -7,18 +13,12 @@ import {
   VModal,
   VSpace,
 } from "@halo-dev/components";
-import SubmitButton from "@/components/button/SubmitButton.vue";
-import type {
-  ListedComment,
-  ListedReply,
-  ReplyRequest,
-} from "@halo-dev/api-client";
 // @ts-ignore
-import { Picker } from "emoji-mart";
-import i18n from "@emoji-mart/data/i18n/zh.json";
-import { onMounted, ref } from "vue";
 import { setFocus } from "@/formkit/utils/focus";
-import { apiClient } from "@/utils/api-client";
+import i18n from "@emoji-mart/data/i18n/zh.json";
+import { consoleApiClient } from "@halo-dev/api-client";
+import { Picker } from "emoji-mart";
+import { onMounted, ref } from "vue";
 import { useI18n } from "vue-i18n";
 
 const { t } = useI18n();
@@ -62,7 +62,7 @@ const handleCreateReply = async () => {
 
     formState.value.content = formState.value.raw;
 
-    await apiClient.comment.createReply({
+    await consoleApiClient.content.comment.createReply({
       name: props.comment?.comment.metadata.name as string,
       replyRequest: formState.value,
     });

@@ -1,9 +1,9 @@
 <script lang="ts" setup>
-import { Dialog, Toast, VDropdown, VDropdownItem } from "@halo-dev/components";
 import type { Theme } from "@halo-dev/api-client";
-import { useI18n } from "vue-i18n";
-import { apiClient } from "@/utils/api-client";
+import { coreApiClient } from "@halo-dev/api-client";
+import { Dialog, Toast, VDropdown, VDropdownItem } from "@halo-dev/components";
 import { useQueryClient } from "@tanstack/vue-query";
+import { useI18n } from "vue-i18n";
 
 const { t } = useI18n();
 const queryClient = useQueryClient();
@@ -27,7 +27,7 @@ const handleUninstall = async (deleteExtensions?: boolean) => {
     cancelText: t("core.common.buttons.cancel"),
     onConfirm: async () => {
       try {
-        await apiClient.extension.theme.deleteThemeHaloRunV1alpha1Theme({
+        await coreApiClient.theme.theme.deleteTheme({
           name: props.theme.metadata.name,
         });
 
@@ -36,7 +36,7 @@ const handleUninstall = async (deleteExtensions?: boolean) => {
           const { settingName, configMapName } = props.theme.spec;
 
           if (settingName) {
-            await apiClient.extension.setting.deleteV1alpha1Setting(
+            await coreApiClient.setting.deleteSetting(
               {
                 name: settingName,
               },
@@ -47,7 +47,7 @@ const handleUninstall = async (deleteExtensions?: boolean) => {
           }
 
           if (configMapName) {
-            await apiClient.extension.configMap.deleteV1alpha1ConfigMap(
+            await coreApiClient.configMap.deleteConfigMap(
               {
                 name: configMapName,
               },

@@ -3,12 +3,12 @@ import HasPermission from "@/components/permission/HasPermission.vue";
 import { formatDatetime } from "@/utils/date";
 import type { Tag } from "@halo-dev/api-client";
 import {
-  VStatusDot,
+  IconExternalLinkLine,
+  VDropdownItem,
   VEntity,
   VEntityField,
-  VDropdownItem,
-  IconExternalLinkLine,
   VSpace,
+  VStatusDot,
 } from "@halo-dev/components";
 import PostTag from "./PostTag.vue";
 

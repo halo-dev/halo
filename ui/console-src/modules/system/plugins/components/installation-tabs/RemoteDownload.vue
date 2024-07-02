@@ -1,18 +1,15 @@
 <script lang="ts" setup>
-import { apiClient } from "@/utils/api-client";
-import { Dialog, Toast, VButton } from "@halo-dev/components";
-import type { Plugin } from "@halo-dev/api-client";
-import type { Ref } from "vue";
-import { inject } from "vue";
-import { ref } from "vue";
-import { useI18n } from "vue-i18n";
-import { useQueryClient } from "@tanstack/vue-query";
-import type { PluginInstallationErrorResponse } from "../../types";
-import { PLUGIN_ALREADY_EXISTS_TYPE } from "../../constants";
-import { useRouteQuery } from "@vueuse/router";
-import { onMounted } from "vue";
-import { nextTick } from "vue";
 import { submitForm } from "@formkit/core";
+import type { Plugin } from "@halo-dev/api-client";
+import { consoleApiClient } from "@halo-dev/api-client";
+import { Dialog, Toast, VButton } from "@halo-dev/components";
+import { useQueryClient } from "@tanstack/vue-query";
+import { useRouteQuery } from "@vueuse/router";
+import type { Ref } from "vue";
+import { inject, nextTick, onMounted, ref } from "vue";
+import { useI18n } from "vue-i18n";
+import { PLUGIN_ALREADY_EXISTS_TYPE } from "../../constants";
+import type { PluginInstallationErrorResponse } from "../../types";
 
 const emit = defineEmits<{
   (event: "close-modal"): void;
@@ -33,7 +30,7 @@ const handleDownloadPlugin = async () => {
   try {
     downloading.value = true;
     if (pluginToUpgrade.value) {
-      await apiClient.plugin.upgradePluginFromUri({
+      await consoleApiClient.plugin.plugin.upgradePluginFromUri({
         name: pluginToUpgrade.value.metadata.name,
         upgradeFromUriRequest: {
           uri: remoteDownloadUrl.value,
@@ -45,11 +42,12 @@ const handleDownloadPlugin = async () => {
       return;
     }
 
-    const { data: plugin } = await apiClient.plugin.installPluginFromUri({
-      installFromUriRequest: {
-        uri: remoteDownloadUrl.value,
-      },
-    });
+    const { data: plugin } =
+      await consoleApiClient.plugin.plugin.installPluginFromUri({
+        installFromUriRequest: {
+          uri: remoteDownloadUrl.value,
+        },
+      });
 
     emit("close-modal");
     queryClient.invalidateQueries({ queryKey: ["plugins"] });
@@ -80,15 +78,11 @@ const handleShowActiveModalAfterInstall = (plugin: Plugin) => {
     cancelText: t("core.common.buttons.cancel"),
     onConfirm: async () => {
       try {
-        const { data: pluginToUpdate } =
-          await apiClient.extension.plugin.getPluginHaloRunV1alpha1Plugin({
-            name: plugin.metadata.name,
-          });
-        pluginToUpdate.spec.enabled = true;
-
-        await apiClient.extension.plugin.updatePluginHaloRunV1alpha1Plugin({
-          name: pluginToUpdate.metadata.name,
-          plugin: pluginToUpdate,
+        await consoleApiClient.plugin.plugin.changePluginRunningState({
+          name: plugin.metadata.name,
+          pluginRunningStateRequest: {
+            enable: true,
+          },
         });
 
         window.location.reload();
@@ -112,7 +106,7 @@ const handleCatchExistsException = async (
     confirmText: t("core.common.buttons.confirm"),
     cancelText: t("core.common.buttons.cancel"),
     onConfirm: async () => {
-      await apiClient.plugin.upgradePluginFromUri({
+      await consoleApiClient.plugin.plugin.upgradePluginFromUri({
         name: error.pluginName,
         upgradeFromUriRequest: {
           uri: remoteDownloadUrl.value,

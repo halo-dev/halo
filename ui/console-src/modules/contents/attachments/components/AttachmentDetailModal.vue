@@ -1,4 +1,9 @@
 <script lang="ts" setup>
+import LazyImage from "@/components/image/LazyImage.vue";
+import { formatDatetime } from "@/utils/date";
+import { isImage } from "@/utils/image";
+import type { Attachment } from "@halo-dev/api-client";
+import { coreApiClient } from "@halo-dev/api-client";
 import {
   VButton,
   VDescription,
@@ -6,15 +11,10 @@ import {
   VModal,
   VSpace,
 } from "@halo-dev/components";
-import LazyImage from "@/components/image/LazyImage.vue";
-import type { Attachment } from "@halo-dev/api-client";
+import { useQuery } from "@tanstack/vue-query";
 import prettyBytes from "pretty-bytes";
 import { computed, ref } from "vue";
-import { apiClient } from "@/utils/api-client";
-import { isImage } from "@/utils/image";
-import { formatDatetime } from "@/utils/date";
 import { useFetchAttachmentGroup } from "../composables/use-attachment-group";
-import { useQuery } from "@tanstack/vue-query";
 import AttachmentPermalinkList from "./AttachmentPermalinkList.vue";
 
 const props = withDefaults(
@@ -47,10 +47,9 @@ const { data: policy } = useQuery({
       return;
     }
 
-    const { data } =
-      await apiClient.extension.storage.policy.getStorageHaloRunV1alpha1Policy({
-        name: policyName.value,
-      });
+    const { data } = await coreApiClient.storage.policy.getPolicy({
+      name: policyName.value,
+    });
 
     return data;
   },

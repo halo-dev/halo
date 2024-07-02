@@ -1,4 +1,6 @@
 <script lang="ts" setup>
+import { usePermission } from "@/utils/permission";
+import type { MenuTreeItem } from "@console/modules/interface/menus/utils";
 import {
   IconList,
   VDropdownItem,
@@ -7,11 +9,9 @@ import {
   VStatusDot,
   VTag,
 } from "@halo-dev/components";
-import { VueDraggable } from "vue-draggable-plus";
-import type { MenuTreeItem } from "@console/modules/interface/menus/utils";
-import { usePermission } from "@/utils/permission";
-import { useI18n } from "vue-i18n";
 import type { PropType } from "vue";
+import { VueDraggable } from "vue-draggable-plus";
+import { useI18n } from "vue-i18n";
 
 const { currentUserHasPermission } = usePermission();
 const { t } = useI18n();

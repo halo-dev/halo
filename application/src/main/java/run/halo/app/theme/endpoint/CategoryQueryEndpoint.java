@@ -41,7 +41,7 @@ public class CategoryQueryEndpoint implements CustomEndpoint {
 
     @Override
     public RouterFunction<ServerResponse> endpoint() {
-        final var tag = groupVersion().toString() + "/Category";
+        final var tag = "CategoryV1alpha1Public";
         return SpringdocRouteBuilder.route()
             .GET("categories", this::listCategories,
                 builder -> {

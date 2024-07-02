@@ -1,10 +1,10 @@
 <script lang="ts" setup>
 import { ToolbarItem } from "@/components";
-import type { Component } from "vue";
-import type { Editor } from "@/tiptap/vue-3";
 import ColorPickerDropdown from "@/components/common/ColorPickerDropdown.vue";
-import MdiFormatColorMarkerCancel from "~icons/mdi/format-color-marker-cancel";
 import { i18n } from "@/locales";
+import type { Editor } from "@/tiptap/vue-3";
+import type { Component } from "vue";
+import MdiFormatColorMarkerCancel from "~icons/mdi/format-color-marker-cancel";
 
 const props = withDefaults(
   defineProps<{

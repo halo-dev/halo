@@ -10,7 +10,6 @@ import static org.mockito.Mockito.when;
 import static org.springframework.security.test.web.reactive.server.SecurityMockServerConfigurers.mockUser;
 import static org.springframework.security.test.web.reactive.server.SecurityMockServerConfigurers.springSecurity;
 
-import java.util.List;
 import java.util.Map;
 import java.util.function.Consumer;
 import org.junit.jupiter.api.BeforeEach;
@@ -36,7 +35,7 @@ import run.halo.app.extension.ListResult;
 import run.halo.app.extension.Metadata;
 import run.halo.app.extension.PageRequest;
 import run.halo.app.extension.ReactiveExtensionClient;
-import run.halo.app.plugin.ExtensionComponentsFinder;
+import run.halo.app.plugin.extensionpoint.ExtensionGetter;
 
 @ExtendWith(MockitoExtension.class)
 class AttachmentEndpointTest {
@@ -45,7 +44,7 @@ class AttachmentEndpointTest {
     ReactiveExtensionClient client;
 
     @Mock
-    ExtensionComponentsFinder extensionComponentsFinder;
+    ExtensionGetter extensionGetter;
 
     AttachmentEndpoint endpoint;
 
@@ -53,7 +52,7 @@ class AttachmentEndpointTest {
 
     @BeforeEach
     void setUp() {
-        var attachmentService = new DefaultAttachmentService(client, extensionComponentsFinder);
+        var attachmentService = new DefaultAttachmentService(client, extensionGetter);
         endpoint = new AttachmentEndpoint(attachmentService, client);
         webClient = WebTestClient.bindToRouterFunction(endpoint.endpoint())
             .apply(springSecurity())
@@ -101,7 +100,7 @@ class AttachmentEndpointTest {
             verify(client, never()).get(Policy.class, "fake-policy");
             verify(client, never()).get(ConfigMap.class, "fake-configmap");
             verify(client, never()).create(attachment);
-            verify(extensionComponentsFinder, never()).getExtensions(AttachmentHandler.class);
+            verify(extensionGetter, never()).getExtensions(AttachmentHandler.class);
             verify(handler, never()).upload(any());
         }
 
@@ -156,8 +155,8 @@ class AttachmentEndpointTest {
             attachment.setMetadata(metadata);
 
             when(handler.upload(any())).thenReturn(Mono.just(attachment));
-            when(extensionComponentsFinder.getExtensions(AttachmentHandler.class)).thenReturn(
-                List.of(handler));
+            when(extensionGetter.getExtensions(AttachmentHandler.class))
+                .thenReturn(Flux.just(handler));
             when(client.create(attachment)).thenReturn(Mono.just(attachment));
 
             var builder = new MultipartBodyBuilder();
@@ -195,8 +194,8 @@ class AttachmentEndpointTest {
             attachment.setMetadata(metadata);
 
             when(handler.upload(any())).thenReturn(Mono.just(attachment));
-            when(extensionComponentsFinder.getExtensions(AttachmentHandler.class)).thenReturn(
-                List.of(handler));
+            when(extensionGetter.getExtensions(AttachmentHandler.class))
+                .thenReturn(Flux.just(handler));
             when(client.create(attachment)).thenReturn(Mono.just(attachment));
 
             var builder = new MultipartBodyBuilder();
@@ -223,7 +222,6 @@ class AttachmentEndpointTest {
             verify(client).get(Policy.class, "fake-policy");
             verify(client).get(ConfigMap.class, "fake-configmap");
             verify(client).create(attachment);
-            verify(extensionComponentsFinder).getExtensions(AttachmentHandler.class);
             verify(handler).upload(any());
         }
     }

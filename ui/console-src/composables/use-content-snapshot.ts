@@ -1,5 +1,5 @@
-import { apiClient } from "@/utils/api-client";
-import { watch, type Ref, ref, nextTick } from "vue";
+import { coreApiClient } from "@halo-dev/api-client";
+import { nextTick, ref, watch, type Ref } from "vue";
 
 interface SnapshotContent {
   version: Ref<number>;
@@ -20,10 +20,9 @@ export function useContentSnapshot(
     if (!snapshotName.value) {
       return;
     }
-    const { data } =
-      await apiClient.extension.snapshot.getContentHaloRunV1alpha1Snapshot({
-        name: snapshotName.value,
-      });
+    const { data } = await coreApiClient.content.snapshot.getSnapshot({
+      name: snapshotName.value,
+    });
     version.value = data.metadata.version || 0;
   };
 

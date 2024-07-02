@@ -24,6 +24,28 @@ import run.halo.app.infra.exception.DuplicateNameException;
 @ExtendWith(MockitoExtension.class)
 class DefaultIndexerTest {
 
+    private static FakeExtension createFakeExtension() {
+        var fake = new FakeExtension();
+        fake.setMetadata(new Metadata());
+        fake.getMetadata().setName("fake-extension");
+        fake.setEmail("fake-email");
+        return fake;
+    }
+
+    private static IndexSpec getNameIndexSpec() {
+        return getIndexSpec("metadata.name", true,
+            IndexAttributeFactory.simpleAttribute(FakeExtension.class,
+                e -> e.getMetadata().getName()));
+    }
+
+    private static IndexSpec getIndexSpec(String name, boolean unique, IndexAttribute attribute) {
+        return new IndexSpec()
+            .setName(name)
+            .setOrder(IndexSpec.OrderType.ASC)
+            .setUnique(unique)
+            .setIndexFunc(attribute);
+    }
+
     @Test
     void constructor() {
         var spec = getNameIndexSpec();
@@ -49,17 +71,26 @@ class DefaultIndexerTest {
     }
 
     @Test
+    void getIndexEntryTest() {
+        var spec = getNameIndexSpec();
+        var descriptor = new IndexDescriptor(spec);
+        descriptor.setReady(true);
+        var indexContainer = new IndexEntryContainer();
+        indexContainer.add(new IndexEntryImpl(descriptor));
+
+        var defaultIndexer = new DefaultIndexer(List.of(descriptor), indexContainer);
+        assertThatThrownBy(() -> defaultIndexer.getIndexEntry("not-exist"))
+            .isInstanceOf(IllegalArgumentException.class)
+            .hasMessage("No index found for fieldPath [not-exist], "
+                + "make sure you have created an index for this field.");
+
+        assertThat(defaultIndexer.getIndexEntry("metadata.name")).isNotNull();
+    }
+
+    @Test
     void getObjectKey() {
         var fake = createFakeExtension();
         assertThat(DefaultIndexer.getObjectKey(fake)).isEqualTo("fake-extension");
-    }
-
-    private static FakeExtension createFakeExtension() {
-        var fake = new FakeExtension();
-        fake.setMetadata(new Metadata());
-        fake.getMetadata().setName("fake-extension");
-        fake.setEmail("fake-email");
-        return fake;
     }
 
     @Test
@@ -79,12 +110,6 @@ class DefaultIndexerTest {
         var entries = indexEntry.entries();
         assertThat(entries).hasSize(1);
         assertThat(entries).contains(Map.entry("fake-extension", "fake-extension"));
-    }
-
-    private static IndexSpec getNameIndexSpec() {
-        return getIndexSpec("metadata.name", true,
-            IndexAttributeFactory.simpleAttribute(FakeExtension.class,
-                e -> e.getMetadata().getName()));
     }
 
     @Test
@@ -240,14 +265,6 @@ class DefaultIndexerTest {
         descriptor.setReady(false);
         iterator = indexer.readyIndexesIterator();
         assertThat(iterator.hasNext()).isFalse();
-    }
-
-    private static IndexSpec getIndexSpec(String name, boolean unique, IndexAttribute attribute) {
-        return new IndexSpec()
-            .setName(name)
-            .setOrder(IndexSpec.OrderType.ASC)
-            .setUnique(unique)
-            .setIndexFunc(attribute);
     }
 
     @Data

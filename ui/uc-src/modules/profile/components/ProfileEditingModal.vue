@@ -1,21 +1,21 @@
 <script lang="ts" setup>
 // core libs
-import { onMounted, ref } from "vue";
-import { apiClient } from "@/utils/api-client";
 import type { User } from "@halo-dev/api-client";
+import { consoleApiClient } from "@halo-dev/api-client";
+import { onMounted, ref } from "vue";
 
 // components
-import { Toast, VButton, VModal, VSpace } from "@halo-dev/components";
 import SubmitButton from "@/components/button/SubmitButton.vue";
+import { Toast, VButton, VModal, VSpace } from "@halo-dev/components";
 
 // libs
 import { cloneDeep } from "lodash-es";
 
 // hooks
 import { setFocus } from "@/formkit/utils/focus";
-import { useI18n } from "vue-i18n";
-import { useQueryClient } from "@tanstack/vue-query";
 import { useUserStore } from "@/stores/user";
+import { useQueryClient } from "@tanstack/vue-query";
+import { useI18n } from "vue-i18n";
 import EmailVerifyModal from "./EmailVerifyModal.vue";
 
 const { t } = useI18n();
@@ -32,7 +32,6 @@ const formState = ref<User>(
     spec: {
       displayName: "",
       email: "",
-      phone: "",
       password: "",
       bio: "",
       disabled: false,
@@ -55,7 +54,7 @@ const handleUpdateUser = async () => {
   try {
     isSubmitting.value = true;
 
-    await apiClient.user.updateCurrentUser({
+    await consoleApiClient.user.updateCurrentUser({
       user: formState.value,
     });
 
@@ -140,13 +139,6 @@ async function onEmailVerifyModalClose() {
                 </VButton>
               </template>
             </FormKit>
-            <FormKit
-              v-model="formState.spec.phone"
-              :label="$t('core.uc_profile.editing_modal.fields.phone.label')"
-              type="text"
-              name="phone"
-              validation="length:0,20"
-            ></FormKit>
             <FormKit
               v-model="formState.spec.bio"
               :label="$t('core.uc_profile.editing_modal.fields.bio.label')"

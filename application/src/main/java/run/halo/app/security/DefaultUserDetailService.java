@@ -7,6 +7,7 @@ import static run.halo.app.security.authorization.AuthorityUtils.ANONYMOUS_ROLE_
 import static run.halo.app.security.authorization.AuthorityUtils.AUTHENTICATED_ROLE_NAME;
 import static run.halo.app.security.authorization.AuthorityUtils.ROLE_PREFIX;
 
+import lombok.Setter;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.ReactiveUserDetailsPasswordService;
@@ -22,6 +23,7 @@ import run.halo.app.core.extension.service.UserService;
 import run.halo.app.extension.GroupKind;
 import run.halo.app.infra.exception.UserNotFoundException;
 import run.halo.app.security.authentication.login.HaloUser;
+import run.halo.app.security.authentication.twofactor.TwoFactorUtils;
 
 public class DefaultUserDetailService
     implements ReactiveUserDetailsService, ReactiveUserDetailsPasswordService {
@@ -29,6 +31,12 @@ public class DefaultUserDetailService
     private final UserService userService;
 
     private final RoleService roleService;
+
+    /**
+     * Indicates whether two-factor authentication is disabled.
+     */
+    @Setter
+    private boolean twoFactorAuthDisabled;
 
     public DefaultUserDetailService(UserService userService, RoleService roleService) {
         this.userService = userService;
@@ -63,10 +71,11 @@ public class DefaultUserDetailService
                     .doOnNext(userBuilder::authorities);
 
                 return setAuthorities.then(Mono.fromSupplier(() -> {
-                    var twoFactorAuthEnabled =
-                        requireNonNullElse(user.getSpec().getTwoFactorAuthEnabled(), false);
+                    var twoFactorAuthSettings = TwoFactorUtils.getTwoFactorAuthSettings(user);
                     return new HaloUser.Builder(userBuilder.build())
-                        .twoFactorAuthEnabled(twoFactorAuthEnabled)
+                        .twoFactorAuthEnabled(
+                            (!twoFactorAuthDisabled) && twoFactorAuthSettings.isAvailable()
+                        )
                         .totpEncryptedSecret(user.getSpec().getTotpEncryptedSecret())
                         .build();
                 }));

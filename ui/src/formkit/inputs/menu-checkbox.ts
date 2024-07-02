@@ -1,10 +1,10 @@
-import { apiClient } from "@/utils/api-client";
 import type { FormKitNode, FormKitTypeDefinition } from "@formkit/core";
 import { checkbox, checkboxes, defaultIcon } from "@formkit/inputs";
+import { coreApiClient } from "@halo-dev/api-client";
 
 function optionsHandler(node: FormKitNode) {
   node.on("created", async () => {
-    const { data } = await apiClient.extension.menu.listV1alpha1Menu();
+    const { data } = await coreApiClient.menu.listMenu();
 
     node.props.options = data.items.map((menu) => {
       return {

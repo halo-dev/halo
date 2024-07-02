@@ -1,12 +1,12 @@
 <script lang="ts" setup>
-import { apiClient } from "@/utils/api-client";
+import LocaleChange from "@/components/common/LocaleChange.vue";
+import { useGlobalInfoStore } from "@/stores/global-info";
+import type { SystemInitializationRequest } from "@halo-dev/api-client";
+import { consoleApiClient } from "@halo-dev/api-client";
 import { Toast, VButton } from "@halo-dev/components";
 import { ref } from "vue";
-import { useRouter } from "vue-router";
-import type { SystemInitializationRequest } from "@halo-dev/api-client";
 import { useI18n } from "vue-i18n";
-import { useGlobalInfoStore } from "@/stores/global-info";
-import LocaleChange from "@/components/common/LocaleChange.vue";
+import { useRouter } from "vue-router";
 
 const router = useRouter();
 const { t } = useI18n();
@@ -23,7 +23,7 @@ const formState = ref<SystemInitializationRequest>({
 const handleSubmit = async () => {
   loading.value = true;
 
-  await apiClient.system.initialize({
+  await consoleApiClient.system.initialize({
     systemInitializationRequest: formState.value,
   });
 

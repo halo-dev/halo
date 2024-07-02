@@ -1,10 +1,10 @@
 <script lang="ts" setup>
 import type { GlobalInfo, Info, Startup } from "@/types";
-import { apiClient } from "@/utils/api-client";
 import { formatDatetime } from "@/utils/date";
 import { usePermission } from "@/utils/permission";
 import { useThemeStore } from "@console/stores/theme";
 import type { Plugin } from "@halo-dev/api-client";
+import { consoleApiClient } from "@halo-dev/api-client";
 import {
   IconClipboardLine,
   IconTerminalBoxLine,
@@ -64,7 +64,7 @@ const { data: startup } = useQuery<Startup>({
 const { data: plugins, isLoading: isPluginsLoading } = useQuery<Plugin[]>({
   queryKey: ["enabled-plugins"],
   queryFn: async () => {
-    const { data } = await apiClient.plugin.listPlugins({
+    const { data } = await consoleApiClient.plugin.plugin.listPlugins({
       page: 0,
       size: 0,
       enabled: true,

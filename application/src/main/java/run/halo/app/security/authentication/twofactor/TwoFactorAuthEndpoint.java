@@ -64,7 +64,7 @@ public class TwoFactorAuthEndpoint implements CustomEndpoint {
 
     @Override
     public RouterFunction<ServerResponse> endpoint() {
-        var tag = groupVersion() + "/Authentication/TwoFactor";
+        var tag = "TwoFactorAuthV1alpha1Uc";
         return route().nest(path("/authentications/two-factor"),
             () -> route()
                 .GET("/settings", this::getTwoFactorSettings,
@@ -278,6 +278,6 @@ public class TwoFactorAuthEndpoint implements CustomEndpoint {
 
     @Override
     public GroupVersion groupVersion() {
-        return GroupVersion.parseAPIVersion("api.security.halo.run/v1alpha1");
+        return GroupVersion.parseAPIVersion("uc.api.security.halo.run/v1alpha1");
     }
 }

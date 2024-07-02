@@ -1,25 +1,24 @@
 <script lang="ts" setup>
 // core libs
-import { ref, type Ref, provide } from "vue";
+import { provide, ref, type Ref } from "vue";
 
 // components
+import { usePermission } from "@/utils/permission";
+import type { Setting, SettingForm } from "@halo-dev/api-client";
+import { coreApiClient } from "@halo-dev/api-client";
 import {
+  IconSettings,
   VCard,
   VPageHeader,
   VTabbar,
-  IconSettings,
 } from "@halo-dev/components";
-import type { Setting, SettingForm } from "@halo-dev/api-client";
 import { useQuery } from "@tanstack/vue-query";
-import { apiClient } from "@/utils/api-client";
-import { useI18n } from "vue-i18n";
-import type { Raw } from "vue";
-import type { Component } from "vue";
-import { markRaw } from "vue";
-import SettingTab from "./tabs/Setting.vue";
 import { useRouteQuery } from "@vueuse/router";
+import type { Component, Raw } from "vue";
+import { markRaw } from "vue";
+import { useI18n } from "vue-i18n";
 import NotificationsTab from "./tabs/Notifications.vue";
-import { usePermission } from "@/utils/permission";
+import SettingTab from "./tabs/Setting.vue";
 
 const { t } = useI18n();
 const { currentUserHasPermission } = usePermission();
@@ -44,7 +43,7 @@ provide<Ref<string>>("activeTab", activeTab);
 const { data: setting } = useQuery({
   queryKey: ["system-setting"],
   queryFn: async () => {
-    const { data } = await apiClient.extension.setting.getV1alpha1Setting({
+    const { data } = await coreApiClient.setting.getSetting({
       name: "system",
     });
     return data;

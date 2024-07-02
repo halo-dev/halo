@@ -1,7 +1,7 @@
 <script lang="ts" setup>
-import { apiClient } from "@/utils/api-client";
 import { formatDatetime } from "@/utils/date";
 import type { Policy, PolicyTemplate } from "@halo-dev/api-client";
+import { consoleApiClient, coreApiClient } from "@halo-dev/api-client";
 import {
   Dialog,
   IconAddCircle,
@@ -50,7 +50,7 @@ const handleOpenCreateNewPolicyModal = (policyTemplate: PolicyTemplate) => {
 };
 
 const handleDelete = async (policy: Policy) => {
-  const { data } = await apiClient.attachment.searchAttachments({
+  const { data } = await consoleApiClient.storage.attachment.searchAttachments({
     fieldSelector: [`spec.policyName=${policy.metadata.name}`],
   });
 
@@ -76,9 +76,9 @@ const handleDelete = async (policy: Policy) => {
     confirmText: t("core.common.buttons.confirm"),
     cancelText: t("core.common.buttons.cancel"),
     onConfirm: async () => {
-      await apiClient.extension.storage.policy.deleteStorageHaloRunV1alpha1Policy(
-        { name: policy.metadata.name }
-      );
+      await coreApiClient.storage.policy.deletePolicy({
+        name: policy.metadata.name,
+      });
 
       Toast.success(t("core.common.toast.delete_success"));
       handleFetchPolicies();

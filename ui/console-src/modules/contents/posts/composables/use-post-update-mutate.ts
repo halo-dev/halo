@@ -1,7 +1,7 @@
-import { useMutation } from "@tanstack/vue-query";
 import type { Post } from "@halo-dev/api-client";
-import { apiClient } from "@/utils/api-client";
+import { coreApiClient } from "@halo-dev/api-client";
 import { Toast } from "@halo-dev/components";
+import { useMutation } from "@tanstack/vue-query";
 import { useI18n } from "vue-i18n";
 
 export function usePostUpdateMutate() {
@@ -10,12 +10,11 @@ export function usePostUpdateMutate() {
   return useMutation({
     mutationKey: ["post-update"],
     mutationFn: async (post: Post) => {
-      const { data: latestPost } =
-        await apiClient.extension.post.getContentHaloRunV1alpha1Post({
-          name: post.metadata.name,
-        });
+      const { data: latestPost } = await coreApiClient.content.post.getPost({
+        name: post.metadata.name,
+      });
 
-      return await apiClient.extension.post.updateContentHaloRunV1alpha1Post(
+      return await coreApiClient.content.post.updatePost(
         {
           name: post.metadata.name,
           post: {

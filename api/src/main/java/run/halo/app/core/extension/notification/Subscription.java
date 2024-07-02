@@ -124,6 +124,7 @@ public class Subscription extends AbstractExtension {
     @Data
     @Schema(name = "SubscriptionSubscriber")
     public static class Subscriber {
+        @Schema(requiredMode = REQUIRED, minLength = 1)
         private String name;
 
         @Override

@@ -1,8 +1,8 @@
 <script lang="ts" setup>
 import SubmitButton from "@/components/button/SubmitButton.vue";
 import { setFocus } from "@/formkit/utils/focus";
-import { apiClient } from "@/utils/api-client";
 import type { Group } from "@halo-dev/api-client";
+import { coreApiClient } from "@halo-dev/api-client";
 import { Toast, VButton, VModal, VSpace } from "@halo-dev/components";
 import { cloneDeep } from "lodash-es";
 import { onMounted, ref } from "vue";
@@ -45,18 +45,14 @@ const handleSave = async () => {
   try {
     isSubmitting.value = true;
     if (props.group) {
-      await apiClient.extension.storage.group.updateStorageHaloRunV1alpha1Group(
-        {
-          name: formState.value.metadata.name,
-          group: formState.value,
-        }
-      );
+      await coreApiClient.storage.group.updateGroup({
+        name: formState.value.metadata.name,
+        group: formState.value,
+      });
     } else {
-      await apiClient.extension.storage.group.createStorageHaloRunV1alpha1Group(
-        {
-          group: formState.value,
-        }
-      );
+      await coreApiClient.storage.group.createGroup({
+        group: formState.value,
+      });
     }
 
     Toast.success(t("core.common.toast.save_success"));

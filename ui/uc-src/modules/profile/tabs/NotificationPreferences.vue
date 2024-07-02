@@ -1,14 +1,14 @@
 <script lang="ts" setup>
-import { apiClient } from "@/utils/api-client";
-import { useMutation, useQuery, useQueryClient } from "@tanstack/vue-query";
+import HasPermission from "@/components/permission/HasPermission.vue";
 import type {
   DetailedUser,
   ReasonTypeNotifierRequest,
 } from "@halo-dev/api-client";
+import { ucApiClient } from "@halo-dev/api-client";
 import { VLoading, VSwitch } from "@halo-dev/components";
-import { computed } from "vue";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/vue-query";
 import { cloneDeep } from "lodash-es";
-import HasPermission from "@/components/permission/HasPermission.vue";
+import { computed } from "vue";
 
 const props = withDefaults(defineProps<{ user?: DetailedUser }>(), {
   user: undefined,
@@ -24,9 +24,11 @@ const { data, isLoading } = useQuery({
     }
 
     const { data } =
-      await apiClient.notification.listUserNotificationPreferences({
-        username: props.user?.user.metadata.name,
-      });
+      await ucApiClient.notification.notification.listUserNotificationPreferences(
+        {
+          username: props.user?.user.metadata.name,
+        }
+      );
 
     return data;
   },
@@ -79,12 +81,14 @@ const {
       })
       .filter(Boolean) as Array<ReasonTypeNotifierRequest>;
 
-    return await apiClient.notification.saveUserNotificationPreferences({
-      username: props.user.user.metadata.name,
-      reasonTypeNotifierCollectionRequest: {
-        reasonTypeNotifiers,
-      },
-    });
+    return await ucApiClient.notification.notification.saveUserNotificationPreferences(
+      {
+        username: props.user.user.metadata.name,
+        reasonTypeNotifierCollectionRequest: {
+          reasonTypeNotifiers,
+        },
+      }
+    );
   },
   onSuccess() {
     queryClient.invalidateQueries({ queryKey: ["notification-preferences"] });

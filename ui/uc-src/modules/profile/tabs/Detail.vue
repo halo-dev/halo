@@ -1,4 +1,8 @@
 <script lang="ts" setup>
+import { rbacAnnotations } from "@/constants/annotations";
+import { formatDatetime } from "@/utils/date";
+import type { DetailedUser, ListedAuthProvider } from "@halo-dev/api-client";
+import { consoleApiClient } from "@halo-dev/api-client";
 import {
   Dialog,
   IconUserSettings,
@@ -8,16 +12,12 @@ import {
   VDescriptionItem,
   VTag,
 } from "@halo-dev/components";
-import { computed, ref } from "vue";
-import type { DetailedUser, ListedAuthProvider } from "@halo-dev/api-client";
-import { rbacAnnotations } from "@/constants/annotations";
-import { formatDatetime } from "@/utils/date";
 import { useQuery } from "@tanstack/vue-query";
-import { apiClient } from "@/utils/api-client";
 import axios from "axios";
+import { computed, ref } from "vue";
 import { useI18n } from "vue-i18n";
-import EmailVerifyModal from "../components/EmailVerifyModal.vue";
 import RiVerifiedBadgeLine from "~icons/ri/verified-badge-line";
+import EmailVerifyModal from "../components/EmailVerifyModal.vue";
 
 withDefaults(defineProps<{ user?: DetailedUser }>(), { user: undefined });
 
@@ -26,7 +26,8 @@ const { t } = useI18n();
 const { data: authProviders, isFetching } = useQuery<ListedAuthProvider[]>({
   queryKey: ["user-auth-providers"],
   queryFn: async () => {
-    const { data } = await apiClient.authProvider.listAuthProviders();
+    const { data } =
+      await consoleApiClient.auth.authProvider.listAuthProviders();
     return data;
   },
 });

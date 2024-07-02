@@ -36,7 +36,7 @@ class SinglePageConversionServiceImplTest {
 
     @Test
     void extendPageContent() {
-        when(extensionGetter.getEnabledExtensionByDefinition(
+        when(extensionGetter.getEnabledExtensions(
             eq(ReactiveSinglePageContentHandler.class)))
             .thenReturn(
                 Flux.just(new PageContentHandlerB(),

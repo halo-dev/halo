@@ -1,13 +1,13 @@
 <script lang="ts" setup>
-import { computed, type ComputedRef, onMounted, reactive, ref } from "vue";
-import { submitForm } from "@formkit/core";
-import { Toast, VButton } from "@halo-dev/components";
-import { apiClient } from "@/utils/api-client";
-import { useRouteQuery } from "@vueuse/router";
-import { useI18n } from "vue-i18n";
-import { useMutation } from "@tanstack/vue-query";
-import { useIntervalFn } from "@vueuse/shared";
 import { useGlobalInfoStore } from "@/stores/global-info";
+import { submitForm } from "@formkit/core";
+import { publicApiClient } from "@halo-dev/api-client";
+import { Toast, VButton } from "@halo-dev/components";
+import { useMutation } from "@tanstack/vue-query";
+import { useRouteQuery } from "@vueuse/router";
+import { useIntervalFn } from "@vueuse/shared";
+import { computed, onMounted, reactive, ref, type ComputedRef } from "vue";
+import { useI18n } from "vue-i18n";
 
 const { t } = useI18n();
 
@@ -74,7 +74,7 @@ const handleSignup = async () => {
   try {
     loading.value = true;
 
-    await apiClient.common.user.signUp({
+    await publicApiClient.user.signUp({
       signUpRequest: formState.value,
     });
 
@@ -115,7 +115,7 @@ const { mutate: sendVerifyCode, isLoading: isSending } = useMutation({
       Toast.error(t("core.signup.fields.email.matchFailed"));
       throw new Error("email is illegal");
     }
-    return await apiClient.common.user.sendRegisterVerifyEmail({
+    return await publicApiClient.user.sendRegisterVerifyEmail({
       registerVerifyEmailRequest: {
         email: formState.value.user.spec.email,
       },

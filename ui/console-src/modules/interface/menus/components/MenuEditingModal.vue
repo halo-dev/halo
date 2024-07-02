@@ -1,13 +1,13 @@
 <script lang="ts" setup>
-import { Toast, VButton, VModal, VSpace } from "@halo-dev/components";
 import SubmitButton from "@/components/button/SubmitButton.vue";
-import type { Menu } from "@halo-dev/api-client";
-import { onMounted, ref } from "vue";
-import { apiClient } from "@/utils/api-client";
 import { setFocus } from "@/formkit/utils/focus";
-import { useI18n } from "vue-i18n";
+import type { Menu } from "@halo-dev/api-client";
+import { coreApiClient } from "@halo-dev/api-client";
+import { Toast, VButton, VModal, VSpace } from "@halo-dev/components";
 import { useQueryClient } from "@tanstack/vue-query";
 import { cloneDeep } from "lodash-es";
+import { onMounted, ref } from "vue";
+import { useI18n } from "vue-i18n";
 
 const props = withDefaults(
   defineProps<{
@@ -51,12 +51,12 @@ const handleSaveMenu = async () => {
   try {
     saving.value = true;
     if (props.menu) {
-      await apiClient.extension.menu.updateV1alpha1Menu({
+      await coreApiClient.menu.updateMenu({
         name: formState.value.metadata.name,
         menu: formState.value,
       });
     } else {
-      const { data } = await apiClient.extension.menu.createV1alpha1Menu({
+      const { data } = await coreApiClient.menu.createMenu({
         menu: formState.value,
       });
       emit("created", data);

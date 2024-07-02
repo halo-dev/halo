@@ -1,6 +1,6 @@
 <script lang="ts" setup>
+import type { FunctionalComponent, Raw, SVGAttributes } from "vue";
 import { computed, markRaw } from "vue";
-import type { Type } from "./interface";
 import {
   IconCheckboxCircle,
   IconClose,
@@ -8,8 +8,7 @@ import {
   IconErrorWarning,
   IconInformation,
 } from "../../icons/icons";
-import type { FunctionalComponent, Raw } from "vue";
-import type { SVGAttributes } from "vue";
+import type { Type } from "./interface";
 
 const TypeIcons: Record<Type, Raw<FunctionalComponent<SVGAttributes>>> = {
   success: markRaw(IconCheckboxCircle),

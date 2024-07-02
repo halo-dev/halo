@@ -1,13 +1,12 @@
-import { apiClient } from "@/utils/api-client";
 import type { FormKitNode, FormKitTypeDefinition } from "@formkit/core";
 import { checkbox, checkboxes, defaultIcon } from "@formkit/inputs";
+import { coreApiClient } from "@halo-dev/api-client";
 
 function optionsHandler(node: FormKitNode) {
   node.on("created", async () => {
-    const { data } =
-      await apiClient.extension.tag.listContentHaloRunV1alpha1Tag({
-        sort: ["metadata.creationTimestamp,desc"],
-      });
+    const { data } = await coreApiClient.content.tag.listTag({
+      sort: ["metadata.creationTimestamp,desc"],
+    });
 
     node.props.options = data.items.map((tag) => {
       return {

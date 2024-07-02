@@ -25,6 +25,11 @@ core:
     button: 登录
     modal:
       title: 重新登录
+    2fa:
+      fields:
+        code:
+          placeholder: 请输入两步验证码
+          label: 两步验证码
   signup:
     title: 注册
     fields:
@@ -158,11 +163,6 @@ core:
               dialog_title: 刷新搜索引擎索引
               dialog_content: 此操作会对所有已发布的文章重新创建本地搜索引擎的索引。
               success_message: 刷新成功
-            evict_page_cache:
-              title: 刷新页面缓存
-              dialog_title: 刷新页面缓存
-              dialog_content: 此操作会清空所有页面的缓存。
-              success_message: 刷新成功
         user_stats:
           title: 用户
         comment_stats:
@@ -185,6 +185,14 @@ core:
       delete_in_batch:
         title: 删除所选文章
         description: 该操作会将文章放入回收站，后续可以从回收站恢复。
+      publish_in_batch:
+        title: 发布文章
+        description: 批量发布文章，所选文章会被设置为发布状态
+      cancel_publish_in_batch:
+        title: 取消发布文章
+        description: 批量取消发布文章，所选文章会被设置为未发布状态
+      batch_setting:
+        button: 批量设置
     filters:
       status:
         items:
@@ -259,6 +267,8 @@ core:
           label: 自定义模板
         cover:
           label: 封面图
+        owner:
+          label: 作者
     tag:
       filters:
         sort:
@@ -267,6 +277,27 @@ core:
             create_time_asc: 较早创建
             display_name_desc: 标签名降序
             display_name_asc: 标签名升序
+    batch_setting_modal:
+      title: 文章批量设置
+      fields:
+        common:
+          enabled: 启用
+          op:
+            label: 设置方式
+            options:
+              add: 追加
+              replace: 替换
+              remove_all: 移除全部
+        category_group: 分类
+        category_names: 选择分类
+        tag_group: 标签
+        tag_names: 选择标签
+        visible_group: 可见性
+        visible_value: 选择可见性
+        allow_comment_group: 允许评论
+        allow_comment_value: 选择是否允许评论
+        owner_group: 作者
+        owner_value: 设置作者
   deleted_post:
     title: 文章回收站
     empty:
@@ -366,12 +397,26 @@ core:
           refresh_message: 根据名称重新生成别名
         template:
           label: 自定义模板
+          help: 自定义分类归档页面的渲染模版，需要主题提供支持
         cover:
           label: 封面图
           help: 需要主题适配以支持
         description:
           label: 描述
           help: 需要主题适配以支持
+        prevent_parent_post_cascade_query:
+          label: 阻止文章级联查询
+          help: 阻止父级分类在级联文章查询中包含此分类及其子分类
+        post_template:
+          label: 自定义文章模板
+          help: 自定义当前分类下文章的渲染模版，需要主题提供支持
+        hide_from_list:
+          label: 在列表中隐藏
+          help: 开启此选项后，此分类和其下子分类，以及其下文章将不会显示在前台的列表中，需要主动访问分类归档页面，此功能仅对第一级目录生效
+    list:
+      fields:
+        prevent_parent_post_cascade_query: 阻止父级分类在级联文章查询中包含此分类及其子分类
+        hide_from_list: 已隐藏，此分类和其下子分类，以及其下文章将不会显示在前台的列表中
   page:
     title: 页面
     actions:
@@ -691,6 +736,15 @@ core:
         button: 清理模板缓存
         title: 清除模板缓存
         description: 此功能适用于在运行时修改模板文件后，刷新缓存以查看最新网页结果。
+      export_configuration:
+        button: 导出主题配置
+      import_configuration:
+        button: 导入主题配置
+        version_mismatch:
+          title: 版本不匹配
+          description: 导入的配置文件版本与当前主题版本不匹配，这可能会导致兼容性问题。是否继续导入？
+        invalid_format: 无效的主题配置文件
+        mismatched_theme: 配置文件与所选主题不匹配
     list_modal:
       tabs:
         installed: 已安装
@@ -883,6 +937,15 @@ core:
         reason: 原因
         message: 信息
         last_transition_time: 时间
+    extension-settings:
+      title: 扩展配置
+      extension-point-definition:
+        title: 扩展点定义
+      extension-definition:
+        empty:
+          title: 当前没有扩展点实现
+    actions:
+      extension-point-settings: 扩展配置
   user:
     title: 用户
     actions:
@@ -1037,6 +1100,8 @@ core:
       detail: 详情
       notification-preferences: 通知配置
       pat: 个人令牌
+      2fa: 两步验证
+      devices: 登录设备
     actions:
       update_profile:
         title: 修改资料
@@ -1065,6 +1130,47 @@ core:
         description: 电子邮箱地址还未验证，点击下方按钮进行验证
       email_verified:
         tooltip: 已验证
+    2fa:
+      operations:
+        enable:
+          button: 启用两步验证
+          title: 启用两步验证
+        disable:
+          title: 禁用两步验证
+        disable_totp:
+          title: 停用 TOTP
+      password_validation_form:
+        fields:
+          password:
+            label: 验证密码
+            help: 当前账号的登录密码
+      methods:
+        title: 验证方式
+        totp:
+          title: TOTP
+          description: 使用 TOTP 应用程序配置两步验证
+          fields:
+            status:
+              configured: 已配置
+              not_configured: 未配置
+          operations:
+            reconfigure:
+              button: 重新配置
+            configure:
+              button: 配置
+              title: TOTP 配置
+              fields:
+                code:
+                  label: 验证码
+                  help: 从验证器应用获得的 6 位验证码
+                password:
+                  label: 验证密码
+                  help: 当前账号的登录密码
+                qrcode:
+                  label: 使用验证器应用扫描下方二维码：
+                manual:
+                  label: 如果无法扫描二维码，点击查看代替步骤
+                  help: 使用以下代码手动配置验证器应用：
     pat:
       operations:
         delete:
@@ -1160,6 +1266,23 @@ core:
           toast_email_empty: 请输入电子邮箱
         verify:
           toast_success: 验证成功
+    device:
+      list:
+        fields:
+          current: 当前设备
+          last_accessed_time: 上次访问：{time}
+      detail_modal:
+        title: 登录设备详情
+        fields:
+          os: 操作系统
+          browser: 浏览器
+          creation_timestamp: 创建时间
+          last_accessed_times: 上次访问时间
+          last_authenticated_time: 上次登录时间
+      operations:
+        revoke:
+          title: 撤销设备
+          description: 确定要撤销该设备吗？撤销之后，此设备会退出登录
   uc_notification:
     title: 消息
     tabs:
@@ -1499,10 +1622,29 @@ core:
       no_action_defined: 未定义{label}接口
       verify_success: "{label}成功"
       verify_failed: "{label}失败"
+    secret:
+      creation_label: 根据输入的文本创建新密钥
+      placeholder: 搜索已存在的密钥或者输入内容以创建新的密钥
+      required_key_missing_label: 缺少当前选项所需的字段，请选择之后补充完整
+      creation_modal:
+        title: 创建密钥
+      edit_modal:
+        title: 编辑密钥
+      list_modal:
+        title: 管理密钥
+      operations:
+        delete:
+          title: 删除密钥
+          description: 确定删除此密钥吗？请确保没有地方正在使用此密钥，否则需要在具体的地方重新设置
+      form:
+        fields:
+          description: 备注
+          string_data: 字符串数据
   common:
     buttons:
       save: 保存
       close: 关闭
+      save_and_continue: 保存并继续添加
       close_and_shortcut: 关闭（Esc）
       delete: 删除
       setting: 设置
@@ -1538,6 +1680,9 @@ core:
       modify: 修改
       access: 访问
       schedule_publish: 定时发布
+      revoke: 撤销
+      disable: 禁用
+      enable: 启用
     radio:
       "yes": 是
       "no": 否
@@ -1570,6 +1715,8 @@ core:
       not_found: 资源不存在
       server_internal_error: 服务器内部错误
       unknown_error: 未知错误
+      disable_success: 禁用成功
+      enable_success: 啟用成功
     dialog:
       titles:
         tip: 提示

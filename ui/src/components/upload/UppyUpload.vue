@@ -1,19 +1,19 @@
 <script lang="ts" setup>
-import { Dashboard } from "@uppy/vue";
-import "@uppy/core/dist/style.css";
-import "@uppy/dashboard/dist/style.css";
+import { i18n } from "@/locales";
+import type { ProblemDetail } from "@/setup/setupApiClient";
+import { Toast } from "@halo-dev/components";
 import type { Restrictions } from "@uppy/core";
 import Uppy, { type SuccessResponse } from "@uppy/core";
-import XHRUpload from "@uppy/xhr-upload";
+import "@uppy/core/dist/style.css";
+import "@uppy/dashboard/dist/style.css";
 import ImageEditor from "@uppy/image-editor";
 import "@uppy/image-editor/dist/style.min.css";
+import en_US from "@uppy/locales/lib/en_US";
 import zh_CN from "@uppy/locales/lib/zh_CN";
 import zh_TW from "@uppy/locales/lib/zh_TW";
-import en_US from "@uppy/locales/lib/en_US";
+import { Dashboard } from "@uppy/vue";
+import XHRUpload from "@uppy/xhr-upload";
 import { computed, onUnmounted } from "vue";
-import { Toast } from "@halo-dev/components";
-import type { ProblemDetail } from "@/utils/api-client";
-import { i18n } from "@/locales";
 
 const props = withDefaults(
   defineProps<{

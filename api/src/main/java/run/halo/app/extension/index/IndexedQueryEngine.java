@@ -1,6 +1,7 @@
 package run.halo.app.extension.index;
 
 import java.util.List;
+import org.springframework.data.domain.Sort;
 import run.halo.app.extension.GroupVersionKind;
 import run.halo.app.extension.ListOptions;
 import run.halo.app.extension.ListResult;
@@ -36,7 +37,8 @@ public interface IndexedQueryEngine {
      *
      * @param type the type of the object must exist in {@link run.halo.app.extension.SchemeManager}
      * @param options the list options to use for retrieving the object records
+     * @param sort the sort to use for retrieving the object records
      * @return a collection of {@link Metadata#getName()}
      */
-    List<String> retrieveAll(GroupVersionKind type, ListOptions options);
+    List<String> retrieveAll(GroupVersionKind type, ListOptions options, Sort sort);
 }

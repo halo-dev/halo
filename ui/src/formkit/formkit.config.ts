@@ -1,33 +1,36 @@
+import { en, zh } from "@formkit/i18n";
+import { group as nativeGroup } from "@formkit/inputs";
 import { generateClasses } from "@formkit/themes";
-import theme from "./theme";
-import { zh, en } from "@formkit/i18n";
 import type { DefaultConfigOptions } from "@formkit/vue";
+import { attachment } from "./inputs/attachment";
+import { attachmentGroupSelect } from "./inputs/attachment-group-select";
+import { attachmentPolicySelect } from "./inputs/attachment-policy-select";
+import { categoryCheckbox } from "./inputs/category-checkbox";
+import { categorySelect } from "./inputs/category-select";
+import { code } from "./inputs/code";
 import { form } from "./inputs/form";
 import { group } from "./inputs/group";
-import { group as nativeGroup } from "@formkit/inputs";
-import { attachment } from "./inputs/attachment";
-import { code } from "./inputs/code";
-import { repeater } from "./inputs/repeater";
+import { list } from "./inputs/list";
 import { menuCheckbox } from "./inputs/menu-checkbox";
-import { menuRadio } from "./inputs/menu-radio";
 import { menuItemSelect } from "./inputs/menu-item-select";
-import { postSelect } from "./inputs/post-select";
-import { singlePageSelect } from "./inputs/singlePage-select";
-import { tagSelect } from "./inputs/tag-select";
-import { categorySelect } from "./inputs/category-select";
-import { categoryCheckbox } from "./inputs/category-checkbox";
-import { tagCheckbox } from "./inputs/tag-checkbox";
-import { roleSelect } from "./inputs/role-select";
-import { attachmentPolicySelect } from "./inputs/attachment-policy-select";
-import { attachmentGroupSelect } from "./inputs/attachment-group-select";
+import { menuRadio } from "./inputs/menu-radio";
 import { password } from "./inputs/password";
+import { postSelect } from "./inputs/post-select";
+import { repeater } from "./inputs/repeater";
+import { roleSelect } from "./inputs/role-select";
+import { secret } from "./inputs/secret";
+import { singlePageSelect } from "./inputs/singlePage-select";
+import { tagCheckbox } from "./inputs/tag-checkbox";
+import { tagSelect } from "./inputs/tag-select";
 import { verificationForm } from "./inputs/verify-form";
+import theme from "./theme";
 
-import radioAlt from "./plugins/radio-alt";
-import stopImplicitSubmission from "./plugins/stop-implicit-submission";
-import passwordPreventAutocomplete from "./plugins/password-prevent-autocomplete";
-import requiredAsterisk from "./plugins/required-asterisk";
+import { userSelect } from "./inputs/user-select";
 import autoScrollToErrors from "./plugins/auto-scroll-to-errors";
+import passwordPreventAutocomplete from "./plugins/password-prevent-autocomplete";
+import radioAlt from "./plugins/radio-alt";
+import requiredAsterisk from "./plugins/required-asterisk";
+import stopImplicitSubmission from "./plugins/stop-implicit-submission";
 
 const config: DefaultConfigOptions = {
   config: {
@@ -41,26 +44,29 @@ const config: DefaultConfigOptions = {
     autoScrollToErrors,
   ],
   inputs: {
-    form,
-    password,
-    group,
-    nativeGroup,
     attachment,
-    code,
-    repeater,
-    menuCheckbox,
-    menuRadio,
-    menuItemSelect,
-    postSelect,
-    categorySelect,
-    tagSelect,
-    singlePageSelect,
-    categoryCheckbox,
-    tagCheckbox,
-    roleSelect,
-    attachmentPolicySelect,
     attachmentGroupSelect,
+    attachmentPolicySelect,
+    categoryCheckbox,
+    categorySelect,
+    code,
+    form,
+    group,
+    list,
+    menuCheckbox,
+    menuItemSelect,
+    menuRadio,
+    nativeGroup,
+    password,
+    postSelect,
+    repeater,
+    roleSelect,
+    secret,
+    singlePageSelect,
+    tagCheckbox,
+    tagSelect,
     verificationForm,
+    userSelect,
   },
   locales: { zh, en },
   locale: "zh",

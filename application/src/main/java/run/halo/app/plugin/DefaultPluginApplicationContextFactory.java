@@ -14,7 +14,6 @@ import org.springframework.beans.factory.support.DefaultBeanNameGenerator;
 import org.springframework.boot.env.PropertySourceLoader;
 import org.springframework.boot.env.YamlPropertySourceLoader;
 import org.springframework.context.ApplicationContext;
-import org.springframework.context.ApplicationEvent;
 import org.springframework.context.ApplicationListener;
 import org.springframework.context.event.ContextClosedEvent;
 import org.springframework.context.event.ContextRefreshedEvent;
@@ -39,6 +38,7 @@ import run.halo.app.plugin.event.HaloPluginStoppedEvent;
 import run.halo.app.plugin.event.SpringPluginStartedEvent;
 import run.halo.app.plugin.event.SpringPluginStoppedEvent;
 import run.halo.app.plugin.event.SpringPluginStoppingEvent;
+import run.halo.app.search.SearchService;
 import run.halo.app.theme.DefaultTemplateNameResolver;
 import run.halo.app.theme.ViewNameResolver;
 import run.halo.app.theme.finders.FinderRegistry;
@@ -62,16 +62,15 @@ public class DefaultPluginApplicationContextFactory implements PluginApplication
     @Override
     public ApplicationContext create(String pluginId) {
         log.debug("Preparing to create application context for plugin {}", pluginId);
-        var pluginWrapper = pluginManager.getPlugin(pluginId);
 
         var sw = new StopWatch("CreateApplicationContextFor" + pluginId);
-
         sw.start("Create");
-        var context = new PluginApplicationContext(pluginId);
+        var context = new PluginApplicationContext(pluginId, pluginManager);
         context.setBeanNameGenerator(DefaultBeanNameGenerator.INSTANCE);
         context.registerShutdownHook();
         context.setParent(pluginManager.getSharedContext());
 
+        var pluginWrapper = pluginManager.getPlugin(pluginId);
         var classLoader = pluginWrapper.getPluginClassLoader();
         var resourceLoader = new DefaultResourceLoader(classLoader);
         context.setResourceLoader(resourceLoader);
@@ -103,10 +102,8 @@ public class DefaultPluginApplicationContextFactory implements PluginApplication
 
         rootContext.getBeanProvider(ReactiveExtensionClient.class)
             .ifUnique(client -> {
-                var reactiveSettingFetcher = new DefaultReactiveSettingFetcher(client, pluginId);
-                var settingFetcher = new DefaultSettingFetcher(reactiveSettingFetcher);
-                beanFactory.registerSingleton("reactiveSettingFetcher", reactiveSettingFetcher);
-                beanFactory.registerSingleton("settingFetcher", settingFetcher);
+                context.registerBean("reactiveSettingFetcher", DefaultReactiveSettingFetcher.class);
+                context.registerBean("settingFetcher", DefaultSettingFetcher.class);
             });
 
         rootContext.getBeanProvider(PluginRequestMappingHandlerMapping.class)
@@ -140,14 +137,11 @@ public class DefaultPluginApplicationContextFactory implements PluginApplication
                 );
             });
 
-        rootContext.getBeanProvider(SharedEventListenerRegistry.class)
-            .ifUnique(listenerRegistry -> {
-                var shareEventListenerAdapter = new ShareEventListenerAdapter(listenerRegistry);
-                beanFactory.registerSingleton(
-                    "shareEventListenerAdapter",
-                    shareEventListenerAdapter
-                );
-            });
+        rootContext.getBeanProvider(SearchService.class)
+            .ifUnique(searchService ->
+                beanFactory.registerSingleton("searchService", searchService)
+            );
+
         sw.stop();
 
         sw.start("LoadComponents");
@@ -175,31 +169,6 @@ public class DefaultPluginApplicationContextFactory implements PluginApplication
             log.debug("\n{}", sw.prettyPrint(TimeUnit.MILLISECONDS));
         }
         return context;
-    }
-
-    private static class ShareEventListenerAdapter {
-
-        private final SharedEventListenerRegistry listenerRegistry;
-
-        private ApplicationListener<ApplicationEvent> listener;
-
-        private ShareEventListenerAdapter(SharedEventListenerRegistry listenerRegistry) {
-            this.listenerRegistry = listenerRegistry;
-        }
-
-        @EventListener
-        public void onApplicationEvent(ContextRefreshedEvent event) {
-            this.listener = sharedEvent -> event.getApplicationContext().publishEvent(sharedEvent);
-            listenerRegistry.register(this.listener);
-        }
-
-        @EventListener(ContextClosedEvent.class)
-        public void onApplicationEvent() {
-            if (this.listener != null) {
-                this.listenerRegistry.unregister(this.listener);
-            }
-        }
-
     }
 
     private static class FinderManager {

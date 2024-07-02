@@ -158,7 +158,7 @@ public class PluginReconciler implements Reconciler<Request> {
                         }
                     }
                     return result;
-                } catch (Exception e) {
+                } catch (Throwable e) {
                     status.getConditions().addAndEvictFIFO(Condition.builder()
                         .type(ConditionType.READY)
                         .status(ConditionStatus.FALSE)
@@ -313,7 +313,7 @@ public class PluginReconciler implements Reconciler<Request> {
                     Failed to start plugin %s(%s).\
                     """.formatted(pluginName, pluginState));
             }
-        } catch (Exception e) {
+        } catch (Throwable e) {
             conditions.addAndEvictFIFO(Condition.builder()
                 .type(ConditionType.READY)
                 .status(ConditionStatus.FALSE)
@@ -365,7 +365,7 @@ public class PluginReconciler implements Reconciler<Request> {
             }
             try {
                 pluginManager.disablePlugin(pluginName);
-            } catch (Exception e) {
+            } catch (Throwable e) {
                 conditions.addAndEvictFIFO(Condition.builder()
                     .type(ConditionType.READY)
                     .status(ConditionStatus.FALSE)

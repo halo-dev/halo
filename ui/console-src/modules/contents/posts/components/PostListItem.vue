@@ -1,4 +1,13 @@
 <script lang="ts" setup>
+import EntityFieldItems from "@/components/entity-fields/EntityFieldItems.vue";
+import StatusDotField from "@/components/entity-fields/StatusDotField.vue";
+import EntityDropdownItems from "@/components/entity/EntityDropdownItems.vue";
+import { postLabels } from "@/constants/labels";
+import { usePermission } from "@/utils/permission";
+import { useEntityFieldItemExtensionPoint } from "@console/composables/use-entity-extension-points";
+import { useOperationItemExtensionPoint } from "@console/composables/use-operation-extension-points";
+import type { ListedPost, Post } from "@halo-dev/api-client";
+import { consoleApiClient } from "@halo-dev/api-client";
 import {
   Dialog,
   Toast,
@@ -6,26 +15,17 @@ import {
   VDropdownItem,
   VEntity,
 } from "@halo-dev/components";
-import type { ListedPost, Post } from "@halo-dev/api-client";
-import { useI18n } from "vue-i18n";
-import { usePermission } from "@/utils/permission";
-import { apiClient } from "@/utils/api-client";
+import type { EntityFieldItem, OperationItem } from "@halo-dev/console-shared";
 import { useQueryClient } from "@tanstack/vue-query";
 import type { Ref } from "vue";
 import { computed, inject, markRaw, ref, toRefs } from "vue";
+import { useI18n } from "vue-i18n";
 import { useRouter } from "vue-router";
-import { useEntityFieldItemExtensionPoint } from "@console/composables/use-entity-extension-points";
-import { useOperationItemExtensionPoint } from "@console/composables/use-operation-extension-points";
-import EntityDropdownItems from "@/components/entity/EntityDropdownItems.vue";
-import type { EntityFieldItem, OperationItem } from "@halo-dev/console-shared";
-import TitleField from "./entity-fields/TitleField.vue";
-import EntityFieldItems from "@/components/entity-fields/EntityFieldItems.vue";
 import ContributorsField from "./entity-fields/ContributorsField.vue";
 import PublishStatusField from "./entity-fields/PublishStatusField.vue";
-import VisibleField from "./entity-fields/VisibleField.vue";
-import StatusDotField from "@/components/entity-fields/StatusDotField.vue";
 import PublishTimeField from "./entity-fields/PublishTimeField.vue";
-import { postLabels } from "@/constants/labels";
+import TitleField from "./entity-fields/TitleField.vue";
+import VisibleField from "./entity-fields/VisibleField.vue";
 
 const { currentUserHasPermission } = usePermission();
 const { t } = useI18n();
@@ -58,7 +58,7 @@ const handleDelete = async () => {
     confirmText: t("core.common.buttons.confirm"),
     cancelText: t("core.common.buttons.cancel"),
     onConfirm: async () => {
-      await apiClient.post.recyclePost({
+      await consoleApiClient.content.post.recyclePost({
         name: props.post.post.metadata.name,
       });
       await queryClient.invalidateQueries({ queryKey: ["posts"] });
@@ -77,7 +77,7 @@ const { operationItems } = useOperationItemExtensionPoint<ListedPost>(
       component: markRaw(VDropdownItem),
       label: t("core.common.buttons.publish"),
       action: async () => {
-        await apiClient.post.publishPost({
+        await consoleApiClient.content.post.publishPost({
           name: props.post.post.metadata.name,
         });
 
@@ -125,7 +125,7 @@ const { operationItems } = useOperationItemExtensionPoint<ListedPost>(
       },
       label: t("core.common.buttons.cancel_publish"),
       action: async () => {
-        await apiClient.post.unpublishPost({
+        await consoleApiClient.content.post.unpublishPost({
           name: props.post.post.metadata.name,
         });
 

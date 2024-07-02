@@ -6,7 +6,6 @@ import lombok.EqualsAndHashCode;
 import org.springframework.lang.Nullable;
 import org.springframework.util.Assert;
 import run.halo.app.extension.Extension;
-import run.halo.app.extension.Unstructured;
 
 @EqualsAndHashCode(callSuper = true)
 public class FunctionalIndexAttribute<E extends Extension>
@@ -42,10 +41,6 @@ public class FunctionalIndexAttribute<E extends Extension>
      */
     @Nullable
     public String getValue(Extension object) {
-        if (object instanceof Unstructured unstructured) {
-            var ext = Unstructured.OBJECT_MAPPER.convertValue(unstructured, getObjectType());
-            return valueFunc.apply(ext);
-        }
         if (getObjectType().isInstance(object)) {
             return valueFunc.apply(getObjectType().cast(object));
         }

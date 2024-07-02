@@ -1,9 +1,9 @@
 <script lang="ts" setup>
 import SubmitButton from "@/components/button/SubmitButton.vue";
 import { setFocus } from "@/formkit/utils/focus";
-import { apiClient } from "@/utils/api-client";
 import { useSettingFormConvert } from "@console/composables/use-setting-form";
 import type { Policy } from "@halo-dev/api-client";
+import { coreApiClient } from "@halo-dev/api-client";
 import { Toast, VButton, VLoading, VModal, VSpace } from "@halo-dev/components";
 import { useQuery } from "@tanstack/vue-query";
 import { cloneDeep } from "lodash-es";
@@ -66,11 +66,9 @@ const { data: policyTemplate } = useQuery({
   cacheTime: 0,
   queryFn: async () => {
     const { data } =
-      await apiClient.extension.storage.policyTemplate.getStorageHaloRunV1alpha1PolicyTemplate(
-        {
-          name: formState.value.spec.templateName,
-        }
-      );
+      await coreApiClient.storage.policyTemplate.getPolicyTemplate({
+        name: formState.value.spec.templateName,
+      });
     return data;
   },
   retry: 0,
@@ -88,7 +86,7 @@ const { data: setting, isLoading } = useQuery({
       throw new Error("No setting found");
     }
 
-    const { data } = await apiClient.extension.setting.getV1alpha1Setting({
+    const { data } = await coreApiClient.setting.getSetting({
       name: policyTemplate.value.spec.settingName,
     });
 
@@ -118,7 +116,7 @@ const { data: configMap } = useQuery({
     if (!policy.value?.spec.configMapName) {
       throw new Error("No configMap found");
     }
-    const { data } = await apiClient.extension.configMap.getV1alpha1ConfigMap({
+    const { data } = await coreApiClient.configMap.getConfigMap({
       name: policy.value?.spec.configMapName,
     });
     return data;
@@ -141,29 +139,26 @@ const handleSave = async () => {
     const configMapToUpdate = convertToSave();
 
     if (isUpdateMode) {
-      await apiClient.extension.configMap.updateV1alpha1ConfigMap({
+      await coreApiClient.configMap.updateConfigMap({
         name: configMap.value.metadata.name,
         configMap: configMapToUpdate,
       });
 
-      await apiClient.extension.storage.policy.updateStorageHaloRunV1alpha1Policy(
-        {
-          name: formState.value.metadata.name,
-          policy: formState.value,
-        }
-      );
+      await coreApiClient.storage.policy.updatePolicy({
+        name: formState.value.metadata.name,
+        policy: formState.value,
+      });
     } else {
       const { data: newConfigMap } =
-        await apiClient.extension.configMap.createV1alpha1ConfigMap({
+        await coreApiClient.configMap.createConfigMap({
           configMap: configMapToUpdate,
         });
 
       formState.value.spec.configMapName = newConfigMap.metadata.name;
-      await apiClient.extension.storage.policy.createStorageHaloRunV1alpha1Policy(
-        {
-          policy: formState.value,
-        }
-      );
+
+      await coreApiClient.storage.policy.createPolicy({
+        policy: formState.value,
+      });
     }
 
     Toast.success(t("core.common.toast.save_success"));

@@ -1,50 +1,51 @@
 // Tiptap official extensions
-import ExtensionHistory from "./history";
-import ExtensionHeading from "./heading";
-import ExtensionBold from "./bold";
-import ExtensionItalic from "./italic";
-import ExtensionStrike from "./strike";
-import ExtensionUnderline from "./underline";
-import ExtensionHighlight from "./highlight";
-import ExtensionBlockquote from "./blockquote";
-import ExtensionCode from "./code";
-import ExtensionSuperscript from "./superscript";
-import ExtensionSubscript from "./subscript";
-import ExtensionBulletList from "./bullet-list";
-import ExtensionOrderedList from "./ordered-list";
-import ExtensionTaskList from "./task-list";
-import ExtensionListKeymap from "./list-keymap";
-import ExtensionTable from "./table";
-import ExtensionTextAlign from "./text-align";
-import ExtensionTextStyle from "@tiptap/extension-text-style";
-import ExtensionLink from "./link";
-import ExtensionColor from "./color";
-import ExtensionFontSize from "./font-size";
+import { i18n } from "@/locales";
+import ExtensionDocument from "@tiptap/extension-document";
 import ExtensionDropcursor from "@tiptap/extension-dropcursor";
-import ExtensionGapcursor from "@tiptap/extension-gapcursor";
 import ExtensionHardBreak from "@tiptap/extension-hard-break";
 import ExtensionHorizontalRule from "@tiptap/extension-horizontal-rule";
-import ExtensionDocument from "@tiptap/extension-document";
-import ExtensionParagraph from "./paragraph";
 import ExtensionPlaceholder from "@tiptap/extension-placeholder";
-import { i18n } from "@/locales";
+import ExtensionTextStyle from "@tiptap/extension-text-style";
+import ExtensionBlockquote from "./blockquote";
+import ExtensionBold from "./bold";
+import ExtensionBulletList from "./bullet-list";
+import ExtensionCode from "./code";
+import ExtensionColor from "./color";
+import ExtensionFontSize from "./font-size";
+import ExtensionHeading from "./heading";
+import ExtensionHighlight from "./highlight";
+import ExtensionHistory from "./history";
+import ExtensionItalic from "./italic";
+import ExtensionLink from "./link";
+import ExtensionListKeymap from "./list-keymap";
+import ExtensionOrderedList from "./ordered-list";
+import ExtensionParagraph from "./paragraph";
+import ExtensionStrike from "./strike";
+import ExtensionSubscript from "./subscript";
+import ExtensionSuperscript from "./superscript";
+import ExtensionTable from "./table";
+import ExtensionTaskList from "./task-list";
+import ExtensionTextAlign from "./text-align";
+import ExtensionUnderline from "./underline";
 
 // Custom extensions
-import { ExtensionCommands } from "../extensions/commands-menu";
 import { ExtensionCodeBlock, lowlight } from "@/extensions/code-block";
-import ExtensionIframe from "./iframe";
-import ExtensionVideo from "./video";
+import { ExtensionCommands } from "../extensions/commands-menu";
 import ExtensionAudio from "./audio";
+import ExtensionClearFormat from "./clear-format";
+import { ExtensionColumn, ExtensionColumns } from "./columns";
+import ExtensionDraggable from "./draggable";
+import ExtensionFormatBrush from "./format-brush";
+import ExtensionGapcursor from "./gap-cursor";
+import ExtensionIframe from "./iframe";
 import ExtensionImage from "./image";
 import ExtensionIndent from "./indent";
-import { ExtensionColumns, ExtensionColumn } from "./columns";
-import ExtensionText from "./text";
-import ExtensionDraggable from "./draggable";
 import ExtensionNodeSelected from "./node-selected";
-import ExtensionTrailingNode from "./trailing-node";
+import { ExtensionRangeSelection, RangeSelection } from "./range-selection";
 import ExtensionSearchAndReplace from "./search-and-replace";
-import ExtensionClearFormat from "./clear-format";
-import ExtensionFormatBrush from "./format-brush";
+import ExtensionText from "./text";
+import ExtensionTrailingNode from "./trailing-node";
+import ExtensionVideo from "./video";
 
 const allExtensions = [
   ExtensionBlockquote,
@@ -104,53 +105,56 @@ const allExtensions = [
   ExtensionSearchAndReplace,
   ExtensionClearFormat,
   ExtensionFormatBrush,
+  ExtensionRangeSelection,
 ];
 
 export {
-  allExtensions,
+  ExtensionAudio,
   ExtensionBlockquote,
   ExtensionBold,
   ExtensionBulletList,
+  ExtensionClearFormat,
   ExtensionCode,
+  ExtensionCodeBlock,
+  ExtensionColor,
+  ExtensionColumn,
+  ExtensionColumns,
+  ExtensionCommands,
   ExtensionDocument,
+  ExtensionDraggable,
   ExtensionDropcursor,
+  ExtensionFontSize,
+  ExtensionFormatBrush,
   ExtensionGapcursor,
   ExtensionHardBreak,
   ExtensionHeading,
+  ExtensionHighlight,
   ExtensionHistory,
   ExtensionHorizontalRule,
-  ExtensionItalic,
-  ExtensionOrderedList,
-  ExtensionStrike,
-  ExtensionText,
+  ExtensionIframe,
   ExtensionImage,
-  ExtensionTaskList,
+  ExtensionIndent,
+  ExtensionItalic,
   ExtensionLink,
-  ExtensionTextAlign,
-  ExtensionTextStyle,
-  ExtensionUnderline,
-  ExtensionTable,
-  ExtensionSubscript,
-  ExtensionSuperscript,
+  ExtensionListKeymap,
+  ExtensionNodeSelected,
+  ExtensionOrderedList,
   ExtensionParagraph,
   ExtensionPlaceholder,
-  ExtensionHighlight,
-  ExtensionCommands,
-  ExtensionCodeBlock,
-  lowlight,
-  ExtensionIframe,
-  ExtensionVideo,
-  ExtensionAudio,
-  ExtensionColor,
-  ExtensionFontSize,
-  ExtensionIndent,
-  ExtensionDraggable,
-  ExtensionColumns,
-  ExtensionColumn,
-  ExtensionNodeSelected,
-  ExtensionTrailingNode,
-  ExtensionListKeymap,
+  ExtensionRangeSelection,
   ExtensionSearchAndReplace,
-  ExtensionClearFormat,
-  ExtensionFormatBrush,
+  ExtensionStrike,
+  ExtensionSubscript,
+  ExtensionSuperscript,
+  ExtensionTable,
+  ExtensionTaskList,
+  ExtensionText,
+  ExtensionTextAlign,
+  ExtensionTextStyle,
+  ExtensionTrailingNode,
+  ExtensionUnderline,
+  ExtensionVideo,
+  RangeSelection,
+  allExtensions,
+  lowlight,
 };

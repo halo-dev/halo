@@ -1,5 +1,5 @@
 <script setup lang="ts" name="BubbleMenu">
-import { ref, type PropType, onMounted, onBeforeUnmount } from "vue";
+import { onBeforeUnmount, onMounted, ref, type PropType } from "vue";
 import {
   BubbleMenuPlugin,
   type BubbleMenuPluginProps,

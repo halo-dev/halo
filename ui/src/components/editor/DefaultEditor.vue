@@ -32,6 +32,7 @@ import {
   ExtensionNodeSelected,
   ExtensionOrderedList,
   ExtensionPlaceholder,
+  ExtensionRangeSelection,
   ExtensionSearchAndReplace,
   ExtensionStrike,
   ExtensionSubscript,
@@ -401,6 +402,7 @@ onMounted(async () => {
       ExtensionSearchAndReplace,
       ExtensionClearFormat,
       ExtensionFormatBrush,
+      ExtensionRangeSelection,
     ],
     parseOptions: {
       preserveWhitespace: true,

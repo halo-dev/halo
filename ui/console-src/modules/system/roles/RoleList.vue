@@ -1,7 +1,7 @@
 <script lang="ts" setup>
 // core libs
-import { computed, ref } from "vue";
 import type { Role, RoleList } from "@halo-dev/api-client";
+import { computed, ref } from "vue";
 
 // components
 import {
@@ -26,14 +26,14 @@ import { rbacAnnotations } from "@/constants/annotations";
 import { formatDatetime } from "@/utils/date";
 
 // libs
-import { apiClient } from "@/utils/api-client";
-import Fuse from "fuse.js";
-import { usePermission } from "@/utils/permission";
-import { roleLabels } from "@/constants/labels";
 import { SUPER_ROLE_NAME } from "@/constants/constants";
-import { useI18n } from "vue-i18n";
-import { useQuery } from "@tanstack/vue-query";
+import { roleLabels } from "@/constants/labels";
+import { usePermission } from "@/utils/permission";
 import { resolveDeepDependencies } from "@/utils/role";
+import { coreApiClient } from "@halo-dev/api-client";
+import { useQuery } from "@tanstack/vue-query";
+import Fuse from "fuse.js";
+import { useI18n } from "vue-i18n";
 
 const { currentUserHasPermission } = usePermission();
 const { t } = useI18n();
@@ -46,7 +46,7 @@ let fuse: Fuse<Role> | undefined = undefined;
 const { data: roleTemplates } = useQuery({
   queryKey: ["role-templates"],
   queryFn: async () => {
-    const { data } = await apiClient.extension.role.listV1alpha1Role({
+    const { data } = await coreApiClient.role.listRole({
       page: 0,
       size: 0,
       labelSelector: [`${roleLabels.TEMPLATE}=true`, "!halo.run/hidden"],
@@ -62,7 +62,7 @@ const {
 } = useQuery<RoleList>({
   queryKey: ["roles"],
   queryFn: async () => {
-    const { data } = await apiClient.extension.role.listV1alpha1Role({
+    const { data } = await coreApiClient.role.listRole({
       page: 0,
       size: 0,
       labelSelector: [`!${roleLabels.TEMPLATE}`],
@@ -154,7 +154,7 @@ const handleCloneRole = async (role: Role) => {
 
   // 如果是超级管理员角色，那么需要获取到所有角色模板并填充到表单
   if (role.metadata.name === SUPER_ROLE_NAME) {
-    const { data } = await apiClient.extension.role.listV1alpha1Role({
+    const { data } = await coreApiClient.role.listRole({
       page: 0,
       size: 0,
       labelSelector: [`${roleLabels.TEMPLATE}=true`, "!halo.run/hidden"],
@@ -183,7 +183,7 @@ const handleDelete = async (role: Role) => {
     cancelText: t("core.common.buttons.cancel"),
     onConfirm: async () => {
       try {
-        await apiClient.extension.role.deleteV1alpha1Role({
+        await coreApiClient.role.deleteRole({
           name: role.metadata.name,
         });
 

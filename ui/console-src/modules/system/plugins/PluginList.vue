@@ -1,12 +1,16 @@
 <script lang="ts" setup>
-import { apiClient } from "@/utils/api-client";
 import { usePermission } from "@/utils/permission";
-import { PluginStatusPhaseEnum, type Plugin } from "@halo-dev/api-client";
+import {
+  PluginStatusPhaseEnum,
+  consoleApiClient,
+  type Plugin,
+} from "@halo-dev/api-client";
 import {
   Dialog,
   IconAddCircle,
   IconPlug,
   IconRefreshLine,
+  IconSettings,
   VButton,
   VCard,
   VDropdown,
@@ -56,7 +60,7 @@ const total = ref(0);
 const { data, isLoading, isFetching, refetch } = useQuery<Plugin[]>({
   queryKey: ["plugins", keyword, selectedEnabledValue, selectedSortValue],
   queryFn: async () => {
-    const { data } = await apiClient.plugin.listPlugins({
+    const { data } = await consoleApiClient.plugin.plugin.listPlugins({
       page: 0,
       size: 0,
       keyword: keyword.value,
@@ -157,16 +161,30 @@ onMounted(() => {
       <IconPlug class="mr-2 self-center" />
     </template>
     <template #actions>
-      <VButton
-        v-permission="['system:plugins:manage']"
-        type="secondary"
-        @click="pluginInstallationModalVisible = true"
-      >
-        <template #icon>
-          <IconAddCircle class="h-full w-full" />
-        </template>
-        {{ $t("core.common.buttons.install") }}
-      </VButton>
+      <VSpace>
+        <HasPermission :permissions="['*']">
+          <VButton
+            size="sm"
+            @click="$router.push({ name: 'PluginExtensionPointSettings' })"
+          >
+            <template #icon>
+              <IconSettings class="h-full w-full" />
+            </template>
+            {{ $t("core.plugin.actions.extension-point-settings") }}
+          </VButton>
+        </HasPermission>
+
+        <VButton
+          v-permission="['system:plugins:manage']"
+          type="secondary"
+          @click="pluginInstallationModalVisible = true"
+        >
+          <template #icon>
+            <IconAddCircle class="h-full w-full" />
+          </template>
+          {{ $t("core.common.buttons.install") }}
+        </VButton>
+      </VSpace>
     </template>
   </VPageHeader>
 

@@ -1,5 +1,5 @@
-import { defineStore } from "pinia";
 import type { PluginModule } from "@halo-dev/console-shared";
+import { defineStore } from "pinia";
 import { computed, ref } from "vue";
 
 export const usePluginModuleStore = defineStore("plugin", () => {

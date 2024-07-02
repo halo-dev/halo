@@ -1,17 +1,14 @@
 <script lang="ts" setup>
-import { type Ref, inject, ref } from "vue";
-import type { Plugin } from "@halo-dev/api-client";
-import { Dialog, Toast } from "@halo-dev/components";
-import type { SuccessResponse } from "@uppy/core";
-import { useI18n } from "vue-i18n";
-import { useQueryClient } from "@tanstack/vue-query";
-import { computed } from "vue";
-import type { UppyFile } from "@uppy/core";
-import type { ErrorResponse } from "@uppy/core";
-import type { PluginInstallationErrorResponse } from "../../types";
-import { PLUGIN_ALREADY_EXISTS_TYPE } from "../../constants";
-import { apiClient } from "@/utils/api-client";
 import AppDownloadAlert from "@/components/common/AppDownloadAlert.vue";
+import type { Plugin } from "@halo-dev/api-client";
+import { consoleApiClient } from "@halo-dev/api-client";
+import { Dialog, Toast } from "@halo-dev/components";
+import { useQueryClient } from "@tanstack/vue-query";
+import type { ErrorResponse, SuccessResponse, UppyFile } from "@uppy/core";
+import { computed, inject, ref, type Ref } from "vue";
+import { useI18n } from "vue-i18n";
+import { PLUGIN_ALREADY_EXISTS_TYPE } from "../../constants";
+import type { PluginInstallationErrorResponse } from "../../types";
 
 const emit = defineEmits<{
   (event: "close-modal"): void;
@@ -64,15 +61,11 @@ const handleShowActiveModalAfterInstall = (plugin: Plugin) => {
     cancelText: t("core.common.buttons.cancel"),
     onConfirm: async () => {
       try {
-        const { data: pluginToUpdate } =
-          await apiClient.extension.plugin.getPluginHaloRunV1alpha1Plugin({
-            name: plugin.metadata.name,
-          });
-        pluginToUpdate.spec.enabled = true;
-
-        await apiClient.extension.plugin.updatePluginHaloRunV1alpha1Plugin({
-          name: pluginToUpdate.metadata.name,
-          plugin: pluginToUpdate,
+        await consoleApiClient.plugin.plugin.changePluginRunningState({
+          name: plugin.metadata.name,
+          pluginRunningStateRequest: {
+            enable: true,
+          },
         });
 
         window.location.reload();
@@ -97,7 +90,7 @@ const handleCatchExistsException = async (
     confirmText: t("core.common.buttons.confirm"),
     cancelText: t("core.common.buttons.cancel"),
     onConfirm: async () => {
-      await apiClient.plugin.upgradePlugin({
+      await consoleApiClient.plugin.plugin.upgradePlugin({
         name: error.pluginName,
         file: file,
       });

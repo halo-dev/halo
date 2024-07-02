@@ -1,10 +1,10 @@
 <script setup lang="ts">
+import { relativeTimeTo } from "@/utils/date";
 import type { ListedSnapshotDto, SinglePage } from "@halo-dev/api-client";
-import { apiClient } from "@/utils/api-client";
+import { consoleApiClient } from "@halo-dev/api-client";
 import { Dialog, Toast, VButton, VStatusDot, VTag } from "@halo-dev/components";
 import { useQueryClient } from "@tanstack/vue-query";
 import { computed } from "vue";
-import { relativeTimeTo } from "@/utils/date";
 import { useI18n } from "vue-i18n";
 
 const { t } = useI18n();
@@ -29,12 +29,14 @@ async function handleRestore() {
     confirmText: t("core.common.buttons.confirm"),
     cancelText: t("core.common.buttons.cancel"),
     async onConfirm() {
-      await apiClient.singlePage.revertToSpecifiedSnapshotForSinglePage({
-        name: props.singlePage?.metadata.name as string,
-        revertSnapshotForSingleParam: {
-          snapshotName: props.snapshot.metadata.name,
-        },
-      });
+      await consoleApiClient.content.singlePage.revertToSpecifiedSnapshotForSinglePage(
+        {
+          name: props.singlePage?.metadata.name as string,
+          revertSnapshotForSingleParam: {
+            snapshotName: props.snapshot.metadata.name,
+          },
+        }
+      );
       await queryClient.invalidateQueries({
         queryKey: ["singlePage-snapshots-by-singlePage-name"],
       });
@@ -50,7 +52,7 @@ function handleDelete() {
     confirmText: t("core.common.buttons.confirm"),
     cancelText: t("core.common.buttons.cancel"),
     async onConfirm() {
-      await apiClient.singlePage.deleteSinglePageContent({
+      await consoleApiClient.content.singlePage.deleteSinglePageContent({
         name: props.singlePage?.metadata.name as string,
         snapshotName: props.snapshot.metadata.name,
       });

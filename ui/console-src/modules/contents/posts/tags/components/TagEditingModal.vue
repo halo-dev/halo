@@ -1,9 +1,10 @@
 <script lang="ts" setup>
 // core libs
+import { coreApiClient } from "@halo-dev/api-client";
 import { computed, nextTick, ref, watch } from "vue";
-import { apiClient } from "@/utils/api-client";
 
 // components
+import SubmitButton from "@/components/button/SubmitButton.vue";
 import {
   IconArrowLeft,
   IconArrowRight,
@@ -13,19 +14,19 @@ import {
   VModal,
   VSpace,
 } from "@halo-dev/components";
-import SubmitButton from "@/components/button/SubmitButton.vue";
 
 // types
 import type { Tag } from "@halo-dev/api-client";
 
 // libs
-import { setFocus } from "@/formkit/utils/focus";
 import AnnotationsForm from "@/components/form/AnnotationsForm.vue";
-import useSlugify from "@console/composables/use-slugify";
-import { useI18n } from "vue-i18n";
+import { setFocus } from "@/formkit/utils/focus";
 import { FormType } from "@/types/slug";
-import { onMounted } from "vue";
+import useSlugify from "@console/composables/use-slugify";
 import { cloneDeep } from "lodash-es";
+import { onMounted } from "vue";
+import { useI18n } from "vue-i18n";
+import { submitForm, reset } from "@formkit/core";
 
 const props = withDefaults(
   defineProps<{
@@ -63,6 +64,8 @@ const modal = ref<InstanceType<typeof VModal> | null>(null);
 
 const saving = ref(false);
 
+const keepAddingSubmit = ref(false);
+
 const isUpdateMode = computed(() => !!props.tag);
 
 const modalTitle = computed(() => {
@@ -91,17 +94,21 @@ const handleSaveTag = async () => {
   try {
     saving.value = true;
     if (isUpdateMode.value) {
-      await apiClient.extension.tag.updateContentHaloRunV1alpha1Tag({
+      await coreApiClient.content.tag.updateTag({
         name: formState.value.metadata.name,
         tag: formState.value,
       });
     } else {
-      await apiClient.extension.tag.createContentHaloRunV1alpha1Tag({
+      await coreApiClient.content.tag.createTag({
         tag: formState.value,
       });
     }
 
-    modal.value?.close();
+    if (keepAddingSubmit.value) {
+      reset("tag-form");
+    } else {
+      modal.value?.close();
+    }
 
     Toast.success(t("core.common.toast.save_success"));
   } catch (e) {
@@ -109,6 +116,11 @@ const handleSaveTag = async () => {
   } finally {
     saving.value = false;
   }
+};
+
+const handleSubmit = (keepAdding = false) => {
+  keepAddingSubmit.value = keepAdding;
+  submitForm("tag-form");
 };
 
 onMounted(() => {
@@ -250,18 +262,29 @@ const { handleGenerateSlug } = useSlugify(
     </div>
 
     <template #footer>
-      <VSpace>
-        <SubmitButton
-          :loading="saving"
-          type="secondary"
-          :text="$t('core.common.buttons.submit')"
-          @submit="$formkit.submit('tag-form')"
-        >
-        </SubmitButton>
+      <div class="flex justify-between">
+        <VSpace>
+          <SubmitButton
+            :loading="saving && !keepAddingSubmit"
+            :disabled="saving && keepAddingSubmit"
+            type="secondary"
+            :text="$t('core.common.buttons.submit')"
+            @submit="handleSubmit"
+          >
+          </SubmitButton>
+          <VButton
+            v-if="!isUpdateMode"
+            :loading="saving && keepAddingSubmit"
+            :disabled="saving && !keepAddingSubmit"
+            @click="handleSubmit(true)"
+          >
+            {{ $t("core.common.buttons.save_and_continue") }}
+          </VButton>
+        </VSpace>
         <VButton @click="modal?.close()">
           {{ $t("core.common.buttons.cancel_and_shortcut") }}
         </VButton>
-      </VSpace>
+      </div>
     </template>
   </VModal>
 </template>

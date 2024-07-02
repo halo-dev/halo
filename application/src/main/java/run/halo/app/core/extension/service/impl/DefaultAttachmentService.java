@@ -29,19 +29,19 @@ import run.halo.app.core.extension.attachment.endpoint.UploadOption;
 import run.halo.app.core.extension.service.AttachmentService;
 import run.halo.app.extension.ConfigMap;
 import run.halo.app.extension.ReactiveExtensionClient;
-import run.halo.app.plugin.ExtensionComponentsFinder;
+import run.halo.app.plugin.extensionpoint.ExtensionGetter;
 
 @Component
 public class DefaultAttachmentService implements AttachmentService {
 
     private final ReactiveExtensionClient client;
 
-    private final ExtensionComponentsFinder extensionComponentsFinder;
+    private final ExtensionGetter extensionGetter;
 
     public DefaultAttachmentService(ReactiveExtensionClient client,
-        ExtensionComponentsFinder extensionComponentsFinder) {
+        ExtensionGetter extensionGetter) {
         this.client = client;
-        this.extensionComponentsFinder = extensionComponentsFinder;
+        this.extensionGetter = extensionGetter;
     }
 
     @Override
@@ -61,12 +61,9 @@ public class DefaultAttachmentService implements AttachmentService {
                 return client.get(ConfigMap.class, configMapName)
                     .map(configMap -> new UploadOption(filePart, policy, configMap));
             })
-            .flatMap(uploadContext -> {
-                var handlers = extensionComponentsFinder.getExtensions(AttachmentHandler.class);
-                return Flux.fromIterable(handlers)
-                    .concatMap(handler -> handler.upload(uploadContext))
-                    .next();
-            })
+            .flatMap(uploadContext -> extensionGetter.getExtensions(AttachmentHandler.class)
+                .concatMap(handler -> handler.upload(uploadContext))
+                .next())
             .switchIfEmpty(Mono.error(() -> new ServerErrorException(
                 "No suitable handler found for uploading the attachment.", null)))
             .doOnNext(attachment -> {
@@ -106,32 +103,31 @@ public class DefaultAttachmentService implements AttachmentService {
         return client.get(Policy.class, spec.getPolicyName())
             .flatMap(policy -> client.get(ConfigMap.class, policy.getSpec().getConfigMapName())
                 .map(configMap -> new DeleteOption(attachment, policy, configMap)))
-            .flatMap(deleteOption -> {
-                var handlers = extensionComponentsFinder.getExtensions(AttachmentHandler.class);
-                return Flux.fromIterable(handlers)
-                    .concatMap(handler -> handler.delete(deleteOption))
-                    .next();
-            });
+            .flatMap(deleteOption -> extensionGetter.getExtensions(AttachmentHandler.class)
+                .concatMap(handler -> handler.delete(deleteOption))
+                .next());
     }
 
     @Override
     public Mono<URI> getPermalink(Attachment attachment) {
-        var handlers = extensionComponentsFinder.getExtensions(AttachmentHandler.class);
         return client.get(Policy.class, attachment.getSpec().getPolicyName())
             .flatMap(policy -> client.get(ConfigMap.class, policy.getSpec().getConfigMapName())
-                .flatMap(configMap -> Flux.fromIterable(handlers)
+                .flatMap(configMap -> extensionGetter.getExtensions(AttachmentHandler.class)
                     .concatMap(handler -> handler.getPermalink(attachment, policy, configMap))
-                    .next()));
+                    .next()
+                )
+            );
     }
 
     @Override
     public Mono<URI> getSharedURL(Attachment attachment, Duration ttl) {
-        var handlers = extensionComponentsFinder.getExtensions(AttachmentHandler.class);
         return client.get(Policy.class, attachment.getSpec().getPolicyName())
             .flatMap(policy -> client.get(ConfigMap.class, policy.getSpec().getConfigMapName())
-                .flatMap(configMap -> Flux.fromIterable(handlers)
+                .flatMap(configMap -> extensionGetter.getExtensions(AttachmentHandler.class)
                     .concatMap(handler -> handler.getSharedURL(attachment, policy, configMap, ttl))
-                    .next()));
+                    .next()
+                )
+            );
     }
 
     private <T> Mono<T> authenticationConsumer(Function<Authentication, Mono<T>> func) {

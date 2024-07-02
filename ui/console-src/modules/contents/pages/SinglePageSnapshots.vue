@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { consoleApiClient, coreApiClient } from "@halo-dev/api-client";
 import {
   Dialog,
   IconHistoryLine,
@@ -10,14 +11,13 @@ import {
   VSpace,
 } from "@halo-dev/components";
 import { useQuery, useQueryClient } from "@tanstack/vue-query";
-import { useRoute } from "vue-router";
-import { apiClient } from "@/utils/api-client";
-import { computed, watch } from "vue";
-import { OverlayScrollbarsComponent } from "overlayscrollbars-vue";
 import { useRouteQuery } from "@vueuse/router";
+import { OverlayScrollbarsComponent } from "overlayscrollbars-vue";
+import { computed, watch } from "vue";
+import { useI18n } from "vue-i18n";
+import { useRoute } from "vue-router";
 import SnapshotContent from "./components/SnapshotContent.vue";
 import SnapshotListItem from "./components/SnapshotListItem.vue";
-import { useI18n } from "vue-i18n";
 
 const queryClient = useQueryClient();
 const route = useRoute();
@@ -28,10 +28,9 @@ const singlePageName = computed(() => route.query.name as string);
 const { data: singlePage } = useQuery({
   queryKey: ["singlePage-by-name", singlePageName],
   queryFn: async () => {
-    const { data } =
-      await apiClient.extension.singlePage.getContentHaloRunV1alpha1SinglePage({
-        name: singlePageName.value,
-      });
+    const { data } = await coreApiClient.content.singlePage.getSinglePage({
+      name: singlePageName.value,
+    });
     return data;
   },
   enabled: computed(() => !!singlePageName.value),
@@ -40,9 +39,10 @@ const { data: singlePage } = useQuery({
 const { data: snapshots, isLoading } = useQuery({
   queryKey: ["singlePage-snapshots-by-singlePage-name", singlePageName],
   queryFn: async () => {
-    const { data } = await apiClient.singlePage.listSinglePageSnapshots({
-      name: singlePageName.value,
-    });
+    const { data } =
+      await consoleApiClient.content.singlePage.listSinglePageSnapshots({
+        name: singlePageName.value,
+      });
     return data;
   },
   refetchInterval(data) {
@@ -99,7 +99,7 @@ function handleCleanup() {
       }
 
       for (let i = 0; i < snapshotsToDelete?.length; i++) {
-        await apiClient.singlePage.deleteSinglePageContent({
+        await consoleApiClient.content.singlePage.deleteSinglePageContent({
           name: singlePageName.value,
           snapshotName: snapshotsToDelete[i].metadata.name,
         });

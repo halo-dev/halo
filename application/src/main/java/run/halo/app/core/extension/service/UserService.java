@@ -25,4 +25,6 @@ public interface UserService {
     Mono<User> createUser(User user, Set<String> roles);
 
     Mono<Boolean> confirmPassword(String username, String rawPassword);
+
+    Flux<User> listByEmail(String email);
 }

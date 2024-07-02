@@ -1,8 +1,8 @@
 <script lang="ts" setup>
-import { apiClient } from "@/utils/api-client";
-import type { User } from "@halo-dev/api-client";
-import { VButton, VModal, VSpace } from "@halo-dev/components";
 import SubmitButton from "@/components/button/SubmitButton.vue";
+import type { User } from "@halo-dev/api-client";
+import { consoleApiClient } from "@halo-dev/api-client";
+import { VButton, VModal, VSpace } from "@halo-dev/components";
 import { ref } from "vue";
 
 const props = withDefaults(
@@ -25,7 +25,7 @@ const isSubmitting = ref(false);
 const handleGrantPermission = async () => {
   try {
     isSubmitting.value = true;
-    await apiClient.user.grantPermission({
+    await consoleApiClient.user.grantPermission({
       name: props.user?.metadata.name as string,
       grantRequest: {
         roles: [selectedRole.value],

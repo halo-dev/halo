@@ -1,8 +1,8 @@
 <script lang="ts" setup>
 import UserAvatar from "@/components/user-avatar/UserAvatar.vue";
 import { usePluginModuleStore } from "@/stores/plugin";
-import { apiClient } from "@/utils/api-client";
 import type { DetailedUser } from "@halo-dev/api-client";
+import { consoleApiClient } from "@halo-dev/api-client";
 import {
   VButton,
   VDropdown,
@@ -25,6 +25,7 @@ import { useI18n } from "vue-i18n";
 import PasswordChangeModal from "./components/PasswordChangeModal.vue";
 import ProfileEditingModal from "./components/ProfileEditingModal.vue";
 import DetailTab from "./tabs/Detail.vue";
+import Devices from "./tabs/Devices.vue";
 import NotificationPreferences from "./tabs/NotificationPreferences.vue";
 import PersonalAccessTokensTab from "./tabs/PersonalAccessTokens.vue";
 import TwoFactor from "./tabs/TwoFactor.vue";
@@ -41,7 +42,7 @@ const {
 } = useQuery({
   queryKey: ["user-detail"],
   queryFn: async () => {
-    const { data } = await apiClient.user.getCurrentUserDetail();
+    const { data } = await consoleApiClient.user.getCurrentUserDetail();
     return data;
   },
 });
@@ -69,9 +70,15 @@ const tabs = ref<UserProfileTab[]>([
   },
   {
     id: "2fa",
-    label: "两步验证",
+    label: t("core.uc_profile.tabs.2fa"),
     component: markRaw(TwoFactor),
     priority: 40,
+  },
+  {
+    id: "devices",
+    label: t("core.uc_profile.tabs.devices"),
+    component: markRaw(Devices),
+    priority: 50,
   },
 ]);
 

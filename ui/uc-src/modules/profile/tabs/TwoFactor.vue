@@ -1,7 +1,6 @@
 <script lang="ts" setup>
-import TotpConfigureModal from "./components/TotpConfigureModal.vue";
-import TotpDeletionModal from "./components/TotpDeletionModal.vue";
-import { ref } from "vue";
+import StatusDotField from "@/components/entity-fields/StatusDotField.vue";
+import { ucApiClient } from "@halo-dev/api-client";
 import {
   VButton,
   VEntity,
@@ -10,17 +9,18 @@ import {
   VSpace,
 } from "@halo-dev/components";
 import { useQuery } from "@tanstack/vue-query";
-import { apiClient } from "@/utils/api-client";
-import StatusDotField from "@/components/entity-fields/StatusDotField.vue";
+import { ref } from "vue";
 import RiShieldKeyholeLine from "~icons/ri/shield-keyhole-line";
-import TwoFactorEnableModal from "./components/TwoFactorEnableModal.vue";
+import TotpConfigureModal from "./components/TotpConfigureModal.vue";
+import TotpDeletionModal from "./components/TotpDeletionModal.vue";
 import TwoFactorDisableModal from "./components/TwoFactorDisableModal.vue";
+import TwoFactorEnableModal from "./components/TwoFactorEnableModal.vue";
 
 const { data: settings, isLoading } = useQuery({
   queryKey: ["two-factor-settings"],
   queryFn: async () => {
     const { data } =
-      await apiClient.twoFactor.getTwoFactorAuthenticationSettings();
+      await ucApiClient.security.twoFactor.getTwoFactorAuthenticationSettings();
     return data;
   },
 });
@@ -51,7 +51,9 @@ const totpDeletionModalVisible = ref(false);
         :checked="settings?.enabled"
         @change="onEnabledChange"
       />
-      <span class="text-sm font-medium text-gray-700">启用两步验证</span>
+      <span class="text-sm font-medium text-gray-700">
+        {{ $t("core.uc_profile.2fa.operations.enable.button") }}
+      </span>
     </label>
   </div>
 
@@ -63,7 +65,9 @@ const totpDeletionModalVisible = ref(false);
       role="list"
     >
       <li class="bg-gray-50 px-4 py-3">
-        <span class="text-sm font-semibold text-gray-900">验证方式</span>
+        <span class="text-sm font-semibold text-gray-900">
+          {{ $t("core.uc_profile.2fa.methods.title") }}
+        </span>
       </li>
       <li>
         <VEntity>
@@ -74,20 +78,36 @@ const totpDeletionModalVisible = ref(false);
               </template>
             </VEntityField>
             <VEntityField
-              title="TOTP"
-              description="使用 TOTP 应用程序配置两步验证"
+              :title="$t('core.uc_profile.2fa.methods.totp.title')"
+              :description="$t('core.uc_profile.2fa.methods.totp.description')"
             />
           </template>
           <template #end>
             <StatusDotField
               :state="settings?.totpConfigured ? 'success' : 'default'"
-              :text="settings?.totpConfigured ? '已配置' : '未配置'"
+              :text="
+                settings?.totpConfigured
+                  ? $t(
+                      'core.uc_profile.2fa.methods.totp.fields.status.configured'
+                    )
+                  : $t(
+                      'core.uc_profile.2fa.methods.totp.fields.status.not_configured'
+                    )
+              "
             ></StatusDotField>
             <VEntityField>
               <template #description>
                 <VSpace>
                   <VButton size="sm" @click="totpConfigureModalVisible = true">
-                    {{ settings?.totpConfigured ? "重新配置" : "配置" }}
+                    {{
+                      settings?.totpConfigured
+                        ? $t(
+                            "core.uc_profile.2fa.methods.totp.operations.reconfigure.button"
+                          )
+                        : $t(
+                            "core.uc_profile.2fa.methods.totp.operations.configure.button"
+                          )
+                    }}
                   </VButton>
                   <VButton
                     v-if="settings?.totpConfigured"
@@ -95,7 +115,7 @@ const totpDeletionModalVisible = ref(false);
                     type="danger"
                     @click="totpDeletionModalVisible = true"
                   >
-                    停用
+                    {{ $t("core.common.buttons.disable") }}
                   </VButton>
                 </VSpace>
               </template>

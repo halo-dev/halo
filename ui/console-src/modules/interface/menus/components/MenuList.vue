@@ -1,4 +1,7 @@
 <script lang="ts" setup>
+import { usePermission } from "@/utils/permission";
+import type { Menu } from "@halo-dev/api-client";
+import { coreApiClient } from "@halo-dev/api-client";
 import {
   Dialog,
   Toast,
@@ -13,14 +16,11 @@ import {
   VStatusDot,
   VTag,
 } from "@halo-dev/components";
-import MenuEditingModal from "./MenuEditingModal.vue";
-import { onMounted, ref } from "vue";
-import type { Menu } from "@halo-dev/api-client";
-import { apiClient } from "@/utils/api-client";
-import { useRouteQuery } from "@vueuse/router";
-import { usePermission } from "@/utils/permission";
-import { useI18n } from "vue-i18n";
 import { useQuery } from "@tanstack/vue-query";
+import { useRouteQuery } from "@vueuse/router";
+import { onMounted, ref } from "vue";
+import { useI18n } from "vue-i18n";
+import MenuEditingModal from "./MenuEditingModal.vue";
 
 const { currentUserHasPermission } = usePermission();
 const { t } = useI18n();
@@ -48,7 +48,7 @@ const {
 } = useQuery<Menu[]>({
   queryKey: ["menus"],
   queryFn: async () => {
-    const { data } = await apiClient.extension.menu.listV1alpha1Menu({
+    const { data } = await coreApiClient.menu.listMenu({
       page: 0,
       size: 0,
     });
@@ -87,12 +87,12 @@ const handleDeleteMenu = async (menu: Menu) => {
     cancelText: t("core.common.buttons.cancel"),
     onConfirm: async () => {
       try {
-        await apiClient.extension.menu.deleteV1alpha1Menu({
+        await coreApiClient.menu.deleteMenu({
           name: menu.metadata.name,
         });
 
         const deleteItemsPromises = menu.spec.menuItems?.map((item) =>
-          apiClient.extension.menuItem.deleteV1alpha1MenuItem({
+          coreApiClient.menuItem.deleteMenuItem({
             name: item,
           })
         );
@@ -138,7 +138,7 @@ onMounted(async () => {
 const { data: primaryMenuName, refetch: refetchPrimaryMenuName } = useQuery({
   queryKey: ["primary-menu-name"],
   queryFn: async () => {
-    const { data } = await apiClient.extension.configMap.getV1alpha1ConfigMap({
+    const { data } = await coreApiClient.configMap.getConfigMap({
       name: "system",
     });
 
@@ -153,17 +153,16 @@ const { data: primaryMenuName, refetch: refetchPrimaryMenuName } = useQuery({
 });
 
 const handleSetPrimaryMenu = async (menu: Menu) => {
-  const { data: systemConfigMap } =
-    await apiClient.extension.configMap.getV1alpha1ConfigMap({
-      name: "system",
-    });
+  const { data: systemConfigMap } = await coreApiClient.configMap.getConfigMap({
+    name: "system",
+  });
 
   if (systemConfigMap.data) {
     const menuConfigToUpdate = JSON.parse(systemConfigMap.data?.menu || "{}");
     menuConfigToUpdate.primary = menu.metadata.name;
     systemConfigMap.data["menu"] = JSON.stringify(menuConfigToUpdate);
 
-    await apiClient.extension.configMap.updateV1alpha1ConfigMap({
+    await coreApiClient.configMap.updateConfigMap({
       name: "system",
       configMap: systemConfigMap,
     });
@@ -237,13 +236,20 @@ const handleSetPrimaryMenu = async (menu: Menu) => {
               v-if="currentUserHasPermission(['system:menus:manage'])"
               #dropdownItems
             >
-              <VDropdownItem @click="handleSetPrimaryMenu(menu)">
+              <VDropdownItem
+                v-if="primaryMenuName !== menu.metadata.name"
+                @click="handleSetPrimaryMenu(menu)"
+              >
                 {{ $t("core.menu.operations.set_primary.button") }}
               </VDropdownItem>
               <VDropdownItem @click="handleOpenEditingModal(menu)">
                 {{ $t("core.common.buttons.edit") }}
               </VDropdownItem>
-              <VDropdownItem type="danger" @click="handleDeleteMenu(menu)">
+              <VDropdownItem
+                :disabled="primaryMenuName === menu.metadata.name"
+                type="danger"
+                @click="handleDeleteMenu(menu)"
+              >
                 {{ $t("core.common.buttons.delete") }}
               </VDropdownItem>
             </template>

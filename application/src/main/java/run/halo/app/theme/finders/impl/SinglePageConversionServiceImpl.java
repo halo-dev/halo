@@ -58,7 +58,7 @@ public class SinglePageConversionServiceImpl implements SinglePageConversionServ
         ContentWrapper wrapper) {
         Assert.notNull(singlePage, "SinglePage must not be null");
         Assert.notNull(wrapper, "SinglePage content must not be null");
-        return extensionGetter.getEnabledExtensionByDefinition(
+        return extensionGetter.getEnabledExtensions(
                 ReactiveSinglePageContentHandler.class)
             .reduce(Mono.fromSupplier(() -> SinglePageContentContext.builder()
                     .singlePage(singlePage)

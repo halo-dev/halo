@@ -38,7 +38,7 @@ public class StatsEndpoint implements CustomEndpoint {
 
     @Override
     public RouterFunction<ServerResponse> endpoint() {
-        final var tag = "api.console.halo.run/v1alpha1/Stats";
+        var tag = "SystemV1alpha1Console";
         return SpringdocRouteBuilder.route()
             .GET("stats", this::getStats, builder -> builder.operationId("getStats")
                 .description("Get stats.")

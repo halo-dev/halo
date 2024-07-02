@@ -1,4 +1,12 @@
 <script lang="ts" setup>
+import StatusDotField from "@/components/entity-fields/StatusDotField.vue";
+import HasPermission from "@/components/permission/HasPermission.vue";
+import PostContributorList from "@/components/user/PostContributorList.vue";
+import { postLabels } from "@/constants/labels";
+import { formatDatetime } from "@/utils/date";
+import PostTag from "@console/modules/contents/posts/tags/components/PostTag.vue";
+import type { ListedPost } from "@halo-dev/api-client";
+import { ucApiClient } from "@halo-dev/api-client";
 import {
   Dialog,
   IconExternalLinkLine,
@@ -6,7 +14,6 @@ import {
   IconEyeOff,
   IconTimerLine,
   Toast,
-  VAvatar,
   VDropdownDivider,
   VDropdownItem,
   VEntity,
@@ -14,16 +21,9 @@ import {
   VSpace,
   VStatusDot,
 } from "@halo-dev/components";
-import type { ListedPost } from "@halo-dev/api-client";
-import { computed } from "vue";
-import { postLabels } from "@/constants/labels";
-import PostTag from "@console/modules/contents/posts/tags/components/PostTag.vue";
-import { formatDatetime } from "@/utils/date";
-import StatusDotField from "@/components/entity-fields/StatusDotField.vue";
-import { useI18n } from "vue-i18n";
-import HasPermission from "@/components/permission/HasPermission.vue";
-import { apiClient } from "@/utils/api-client";
 import { useQueryClient } from "@tanstack/vue-query";
+import { computed } from "vue";
+import { useI18n } from "vue-i18n";
 
 const { t } = useI18n();
 const queryClient = useQueryClient();
@@ -68,7 +68,7 @@ const isPublishing = computed(() => {
 });
 
 async function handlePublish() {
-  await apiClient.uc.post.publishMyPost({
+  await ucApiClient.content.post.publishMyPost({
     name: props.post.post.metadata.name,
   });
 
@@ -83,7 +83,7 @@ function handleUnpublish() {
     confirmText: t("core.common.buttons.confirm"),
     cancelText: t("core.common.buttons.cancel"),
     async onConfirm() {
-      await apiClient.uc.post.unpublishMyPost({
+      await ucApiClient.content.post.unpublishMyPost({
         name: props.post.post.metadata.name,
       });
 
@@ -179,15 +179,11 @@ function handleUnpublish() {
     <template #end>
       <VEntityField>
         <template #description>
-          <VAvatar
-            v-for="{ name, avatar, displayName } in post.contributors"
-            :key="name"
-            v-tooltip="displayName"
-            size="xs"
-            :src="avatar"
-            :alt="displayName"
-            circle
-          ></VAvatar>
+          <PostContributorList
+            :owner="post.owner"
+            :contributors="post.contributors"
+            :allow-view-user-detail="false"
+          />
         </template>
       </VEntityField>
       <VEntityField :description="publishStatus">

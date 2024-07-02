@@ -1,52 +1,52 @@
 <script lang="ts" setup>
-import { watchEffect } from "vue";
 import { useLocalStorage } from "@vueuse/core";
 import {
+  ExtensionAudio,
   ExtensionBlockquote,
   ExtensionBold,
   ExtensionBulletList,
+  ExtensionClearFormat,
   ExtensionCode,
+  ExtensionCodeBlock,
+  ExtensionColor,
+  ExtensionColumn,
+  ExtensionColumns,
+  ExtensionCommands,
   ExtensionDocument,
+  ExtensionDraggable,
   ExtensionDropcursor,
+  ExtensionFontSize,
+  ExtensionFormatBrush,
   ExtensionGapcursor,
   ExtensionHardBreak,
   ExtensionHeading,
+  ExtensionHighlight,
   ExtensionHistory,
   ExtensionHorizontalRule,
-  ExtensionItalic,
-  ExtensionOrderedList,
-  ExtensionStrike,
-  ExtensionText,
+  ExtensionIframe,
   ExtensionImage,
-  ExtensionTaskList,
+  ExtensionIndent,
+  ExtensionItalic,
   ExtensionLink,
-  ExtensionTextAlign,
-  ExtensionUnderline,
-  ExtensionTable,
+  ExtensionListKeymap,
+  ExtensionNodeSelected,
+  ExtensionOrderedList,
+  ExtensionPlaceholder,
+  ExtensionRangeSelection,
+  ExtensionSearchAndReplace,
+  ExtensionStrike,
   ExtensionSubscript,
   ExtensionSuperscript,
-  ExtensionPlaceholder,
-  ExtensionHighlight,
-  ExtensionCommands,
-  ExtensionIframe,
-  ExtensionVideo,
-  ExtensionAudio,
-  ExtensionCodeBlock,
-  ExtensionColor,
-  ExtensionFontSize,
-  lowlight,
-  RichTextEditor,
-  useEditor,
-  ExtensionIndent,
-  ExtensionDraggable,
-  ExtensionColumns,
-  ExtensionColumn,
-  ExtensionNodeSelected,
+  ExtensionTable,
+  ExtensionTaskList,
+  ExtensionText,
+  ExtensionTextAlign,
   ExtensionTrailingNode,
-  ExtensionListKeymap,
-  ExtensionSearchAndReplace,
-  ExtensionClearFormat,
-  ExtensionFormatBrush,
+  ExtensionUnderline,
+  ExtensionVideo,
+  RichTextEditor,
+  lowlight,
+  useEditor,
 } from "../index";
 
 const content = useLocalStorage("content", "");
@@ -115,6 +115,7 @@ const editor = useEditor({
     ExtensionSearchAndReplace,
     ExtensionClearFormat,
     ExtensionFormatBrush,
+    ExtensionRangeSelection,
   ],
   parseOptions: {
     preserveWhitespace: true,
@@ -122,10 +123,6 @@ const editor = useEditor({
   onUpdate: () => {
     content.value = editor.value?.getHTML() + "";
   },
-});
-
-watchEffect(() => {
-  // console.log(editor.value?.getHTML());
 });
 </script>
 

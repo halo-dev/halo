@@ -1,6 +1,6 @@
 <script lang="ts" setup>
-import { vTooltip, Dropdown as VDropdown } from "floating-vue";
 import type { Editor } from "@/tiptap/vue-3";
+import { Dropdown as VDropdown, vTooltip } from "floating-vue";
 import { ref, type Component } from "vue";
 
 const props = withDefaults(

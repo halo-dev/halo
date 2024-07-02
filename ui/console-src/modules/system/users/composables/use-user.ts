@@ -1,7 +1,7 @@
+import type { User } from "@halo-dev/api-client";
+import { coreApiClient } from "@halo-dev/api-client";
 import type { Ref } from "vue";
 import { onMounted, ref } from "vue";
-import type { User } from "@halo-dev/api-client";
-import { apiClient } from "@/utils/api-client";
 
 interface useUserFetchReturn {
   users: Ref<User[]>;
@@ -22,7 +22,7 @@ export function useUserFetch(options?: {
   const handleFetchUsers = async () => {
     try {
       loading.value = true;
-      const { data } = await apiClient.extension.user.listV1alpha1User({
+      const { data } = await coreApiClient.user.listUser({
         fieldSelector: [`name!=${ANONYMOUSUSER_NAME}`],
       });
       users.value = data.items;

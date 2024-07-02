@@ -1,12 +1,16 @@
 <script lang="ts" setup>
-import type { PMNode, Decoration } from "@halo-dev/richtext-editor";
-import type { Editor, Node } from "@halo-dev/richtext-editor";
+import { VButton } from "@halo-dev/components";
+import type {
+  Decoration,
+  Editor,
+  Node,
+  PMNode,
+} from "@halo-dev/richtext-editor";
 import { computed, ref } from "vue";
-import type { AttachmentAttr } from "../../utils/attachment";
 import RiVideoAddLine from "~icons/ri/video-add-line";
 import { EditorLinkObtain } from "../../components";
-import { VButton } from "@halo-dev/components";
 import InlineBlockBox from "../../components/InlineBlockBox.vue";
+import type { AttachmentAttr } from "../../utils/attachment";
 
 const props = defineProps<{
   editor: Editor;

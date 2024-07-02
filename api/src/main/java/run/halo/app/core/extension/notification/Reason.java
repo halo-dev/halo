@@ -9,6 +9,7 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
+import lombok.experimental.Accessors;
 import run.halo.app.extension.AbstractExtension;
 import run.halo.app.extension.GVK;
 import run.halo.app.notification.ReasonAttributes;
@@ -31,6 +32,7 @@ public class Reason extends AbstractExtension {
     private Spec spec;
 
     @Data
+    @Accessors(chain = true)
     @Schema(name = "ReasonSpec")
     public static class Spec {
         @Schema(requiredMode = REQUIRED)

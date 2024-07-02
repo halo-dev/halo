@@ -1,6 +1,6 @@
 .halo-rich-text-editor {
   $editorVerticalPadding: 15px;
-  $editorHorizontalPadding: 20%;
+  $editorContentMaxWidth: 64rem;
 
   box-sizing: border-box;
   height: calc(100% - 48px);
@@ -11,8 +11,9 @@
   }
 
   .editor-header-extra {
-    width: 100%;
-    padding: $editorVerticalPadding 20px;
+    padding: $editorVerticalPadding 1rem;
+    max-width: $editorContentMaxWidth;
+    margin: 0 auto;
   }
 
   .editor-content {
@@ -21,7 +22,9 @@
 
     .ProseMirror {
       outline: none !important;
-      padding: $editorVerticalPadding 20px;
+      padding: $editorVerticalPadding 1rem;
+      max-width: $editorContentMaxWidth;
+      margin: 0 auto;
 
       p {
         margin-top: 0.75em;
@@ -78,19 +81,6 @@
 
       code br {
         display: initial;
-      }
-    }
-  }
-
-  @media screen {
-    .ProseMirror,
-    .editor-header-extra {
-      @media (min-width: 640px) {
-        padding: $editorVerticalPadding min($editorHorizontalPadding, 10%) !important;
-      }
-
-      @media (min-width: 1024px) {
-        padding: $editorVerticalPadding $editorHorizontalPadding !important;
       }
     }
   }

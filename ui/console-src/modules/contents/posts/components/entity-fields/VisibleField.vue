@@ -1,6 +1,6 @@
 <script lang="ts" setup>
-import { apiClient } from "@/utils/api-client";
 import type { ListedPost, Post } from "@halo-dev/api-client";
+import { coreApiClient } from "@halo-dev/api-client";
 import { IconEye, IconEyeOff, Toast, VEntityField } from "@halo-dev/components";
 import { useMutation, useQueryClient } from "@tanstack/vue-query";
 import { useI18n } from "vue-i18n";
@@ -17,12 +17,11 @@ withDefaults(
 
 const { mutate: changeVisibleMutation } = useMutation({
   mutationFn: async (post: Post) => {
-    const { data } =
-      await apiClient.extension.post.getContentHaloRunV1alpha1Post({
-        name: post.metadata.name,
-      });
+    const { data } = await coreApiClient.content.post.getPost({
+      name: post.metadata.name,
+    });
     data.spec.visible = data.spec.visible === "PRIVATE" ? "PUBLIC" : "PRIVATE";
-    await apiClient.extension.post.updateContentHaloRunV1alpha1Post(
+    await coreApiClient.content.post.updatePost(
       {
         name: post.metadata.name,
         post: data,

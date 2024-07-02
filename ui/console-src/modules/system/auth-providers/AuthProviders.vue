@@ -1,24 +1,25 @@
 <script lang="ts" setup>
+import type { AuthProvider, ListedAuthProvider } from "@halo-dev/api-client";
+import { consoleApiClient, coreApiClient } from "@halo-dev/api-client";
 import {
-  VPageHeader,
   IconLockPasswordLine,
   VCard,
   VLoading,
+  VPageHeader,
 } from "@halo-dev/components";
 import { useQuery } from "@tanstack/vue-query";
-import { apiClient } from "@/utils/api-client";
-import type { AuthProvider, ListedAuthProvider } from "@halo-dev/api-client";
-import AuthProviderListItem from "./components/AuthProviderListItem.vue";
-import { computed, ref } from "vue";
 import Fuse from "fuse.js";
+import { computed, ref } from "vue";
 import { VueDraggable } from "vue-draggable-plus";
+import AuthProviderListItem from "./components/AuthProviderListItem.vue";
 
 const authProviders = ref<ListedAuthProvider[]>([]);
 
 const { isLoading, refetch } = useQuery<ListedAuthProvider[]>({
   queryKey: ["auth-providers"],
   queryFn: async () => {
-    const { data } = await apiClient.authProvider.listAuthProviders();
+    const { data } =
+      await consoleApiClient.auth.authProvider.listAuthProviders();
     return data;
   },
   onSuccess(data) {
@@ -50,7 +51,7 @@ async function onSortUpdate() {
     updating.value = true;
 
     const { data: rawAuthProviders } =
-      await apiClient.extension.authProvider.listAuthHaloRunV1alpha1AuthProvider();
+      await coreApiClient.auth.authProvider.listAuthProvider();
 
     const authProviderNames = authProviders.value.map((item) => item.name);
 
@@ -67,12 +68,10 @@ async function onSortUpdate() {
       .filter(Boolean) as AuthProvider[];
 
     for (const authProvider of sortedAuthProviders) {
-      await apiClient.extension.authProvider.updateAuthHaloRunV1alpha1AuthProvider(
-        {
-          name: authProvider.metadata.name,
-          authProvider: authProvider,
-        }
-      );
+      await coreApiClient.auth.authProvider.updateAuthProvider({
+        name: authProvider.metadata.name,
+        authProvider: authProvider,
+      });
     }
   } finally {
     await refetch();

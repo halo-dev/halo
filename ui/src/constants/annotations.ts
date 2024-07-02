@@ -29,3 +29,8 @@ export enum contentAnnotations {
 export enum patAnnotations {
   ACCESS_TOKEN = "security.halo.run/access-token",
 }
+
+// Secret
+export enum secretAnnotations {
+  DESCRIPTION = "secret.halo.run/description",
+}

@@ -1,25 +1,25 @@
 <script lang="ts" setup>
+import UserFilterDropdown from "@/components/filter/UserFilterDropdown.vue";
+import type { ListedComment } from "@halo-dev/api-client";
+import { consoleApiClient, coreApiClient } from "@halo-dev/api-client";
 import {
+  Dialog,
   IconMessage,
+  IconRefreshLine,
+  Toast,
   VButton,
   VCard,
+  VEmpty,
+  VLoading,
   VPageHeader,
   VPagination,
   VSpace,
-  IconRefreshLine,
-  VEmpty,
-  Dialog,
-  VLoading,
-  Toast,
 } from "@halo-dev/components";
-import CommentListItem from "./components/CommentListItem.vue";
-import type { ListedComment } from "@halo-dev/api-client";
-import { computed, ref, watch } from "vue";
-import { apiClient } from "@/utils/api-client";
 import { useQuery } from "@tanstack/vue-query";
-import { useI18n } from "vue-i18n";
-import UserFilterDropdown from "@/components/filter/UserFilterDropdown.vue";
 import { useRouteQuery } from "@vueuse/router";
+import { computed, ref, watch } from "vue";
+import { useI18n } from "vue-i18n";
+import CommentListItem from "./components/CommentListItem.vue";
 
 const { t } = useI18n();
 
@@ -101,7 +101,7 @@ const {
       })
       .filter(Boolean) as string[];
 
-    const { data } = await apiClient.comment.listComments({
+    const { data } = await consoleApiClient.content.comment.listComments({
       fieldSelector,
       page: page.value,
       size: size.value,
@@ -165,11 +165,9 @@ const handleDeleteInBatch = async () => {
     onConfirm: async () => {
       try {
         const promises = selectedCommentNames.value.map((name) => {
-          return apiClient.extension.comment.deleteContentHaloRunV1alpha1Comment(
-            {
-              name,
-            }
-          );
+          return coreApiClient.content.comment.deleteComment({
+            name,
+          });
         });
         await Promise.all(promises);
         selectedCommentNames.value = [];
@@ -200,20 +198,22 @@ const handleApproveInBatch = async () => {
         });
 
         const promises = commentsToUpdate?.map((comment) => {
-          return apiClient.extension.comment.updateContentHaloRunV1alpha1Comment(
-            {
-              name: comment.comment.metadata.name,
-              comment: {
-                ...comment.comment,
-                spec: {
-                  ...comment.comment.spec,
-                  approved: true,
-                  // TODO: 暂时由前端设置发布时间。see https://github.com/halo-dev/halo/pull/2746
-                  approvedTime: new Date().toISOString(),
-                },
+          return coreApiClient.content.comment.patchComment({
+            name: comment.comment.metadata.name,
+            jsonPatchInner: [
+              {
+                op: "add",
+                path: "/spec/approved",
+                value: true,
               },
-            }
-          );
+              {
+                op: "add",
+                path: "/spec/approvedTime",
+                // TODO: 暂时由前端设置发布时间。see https://github.com/halo-dev/halo/pull/2746
+                value: new Date().toISOString(),
+              },
+            ],
+          });
         });
         await Promise.all(promises || []);
         selectedCommentNames.value = [];

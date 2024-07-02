@@ -1,35 +1,34 @@
 <script lang="ts" setup>
-import ThemePreviewListItem from "./ThemePreviewListItem.vue";
 import { useSettingFormConvert } from "@console/composables/use-setting-form";
 import { useThemeStore } from "@console/stores/theme";
-import { apiClient, axiosInstance } from "@/utils/api-client";
 import type {
   ConfigMap,
   Setting,
   SettingForm,
   Theme,
 } from "@halo-dev/api-client";
+import { axiosInstance, consoleApiClient } from "@halo-dev/api-client";
 import {
-  VModal,
+  IconArrowLeft,
+  IconComputer,
   IconLink,
   IconPalette,
-  IconSettings,
-  IconArrowLeft,
-  VTabbar,
-  VButton,
-  IconComputer,
   IconPhone,
-  IconTablet,
   IconRefreshLine,
+  IconSettings,
+  IconTablet,
   Toast,
+  VButton,
   VLoading,
+  VModal,
+  VTabbar,
 } from "@halo-dev/components";
-import { storeToRefs } from "pinia";
-import { computed, markRaw, ref, toRaw } from "vue";
-import { useI18n } from "vue-i18n";
-import { OverlayScrollbarsComponent } from "overlayscrollbars-vue";
 import { useQuery } from "@tanstack/vue-query";
-import { onMounted } from "vue";
+import { OverlayScrollbarsComponent } from "overlayscrollbars-vue";
+import { storeToRefs } from "pinia";
+import { computed, markRaw, onMounted, ref, toRaw } from "vue";
+import { useI18n } from "vue-i18n";
+import ThemePreviewListItem from "./ThemePreviewListItem.vue";
 
 const props = withDefaults(
   defineProps<{
@@ -62,7 +61,7 @@ const selectedTheme = ref<Theme>();
 const { data: themes } = useQuery<Theme[]>({
   queryKey: ["themes"],
   queryFn: async () => {
-    const { data } = await apiClient.theme.listThemes({
+    const { data } = await consoleApiClient.theme.theme.listThemes({
       page: 0,
       size: 0,
       uninstalled: false,
@@ -129,7 +128,7 @@ const settingsVisible = ref(false);
 const { data: setting } = useQuery<Setting>({
   queryKey: ["theme-setting", selectedTheme],
   queryFn: async () => {
-    const { data } = await apiClient.theme.fetchThemeSetting({
+    const { data } = await consoleApiClient.theme.theme.fetchThemeSetting({
       name: selectedTheme?.value?.metadata.name as string,
     });
 
@@ -154,7 +153,7 @@ const { data: setting } = useQuery<Setting>({
 const { data: configMap, refetch: handleFetchConfigMap } = useQuery<ConfigMap>({
   queryKey: ["theme-configMap", selectedTheme],
   queryFn: async () => {
-    const { data } = await apiClient.theme.fetchThemeConfig({
+    const { data } = await consoleApiClient.theme.theme.fetchThemeConfig({
       name: selectedTheme?.value?.metadata.name as string,
     });
     return data;
@@ -180,7 +179,7 @@ const handleSaveConfigMap = async () => {
     return;
   }
 
-  await apiClient.theme.updateThemeConfig({
+  await consoleApiClient.theme.theme.updateThemeConfig({
     name: selectedTheme?.value?.metadata.name,
     configMap: configMapToUpdate,
   });

@@ -29,7 +29,7 @@ const theme: Record<string, Record<string, string>> = {
   global: {
     form: "divide-y divide-gray-100",
     outer:
-      "formkit-disabled:opacity-50 py-4 first:pt-0 last:pb-0 transition-all",
+      "formkit-disabled:opacity-70 formkit-disabled:cursor-not-allowed formkit-disabled:pointer-events-none py-4 first:pt-0 last:pb-0 transition-all",
     help: "text-xs mt-2 text-gray-500",
     messages: "list-none p-0 mt-1.5 mb-0 transition-all",
     message: "text-red-500 mt-2 text-xs",
@@ -98,6 +98,24 @@ const theme: Record<string, Record<string, string>> = {
     control:
       "cursor-pointer text-gray-500 transition-all hover:text-primary disabled:!cursor-not-allowed disabled:opacity-50 disabled:hover:!text-gray-500",
   },
+  list: {
+    label: textClassification.label,
+    legend: `${textClassification.label} px-2`,
+    fieldset: boxClassification.fieldset,
+    wrapper: boxClassification.wrapper,
+    help: `${boxClassification.wrapper} mb-2`,
+    inner: "flex flex-col gap-4",
+    items: "flex flex-col w-full gap-2 rounded-base",
+    item: "grid grid-cols-12 focus-within:border-primary transition-all gap-1.5 overflow-visible",
+    content: "flex-1 col-span-9 divide-y divide-gray-100",
+    controls: "flex items-center justify-center gap-1 col-span-3",
+    control:
+      "cursor-pointer text-gray-500 transition-all hover:text-primary disabled:!cursor-not-allowed disabled:opacity-50 disabled:hover:!text-gray-500",
+    up: "flex",
+    remove: "flex",
+    insert: "flex",
+    down: "flex",
+  },
   group: {
     label: textClassification.label,
     legend: `${textClassification.label} px-2`,
@@ -129,6 +147,11 @@ const theme: Record<string, Record<string, string>> = {
       "inline-flex h-full cursor-pointer items-center px-1",
     "dropdown-wrapper":
       "absolute ring-1 ring-gray-100 top-full bottom-auto right-0 z-10 mt-1 max-h-96 w-full overflow-auto rounded bg-white shadow-lg",
+  },
+  secret: {
+    ...textClassification,
+    inner: `${textClassification.inner} !overflow-visible min-h-[2.25rem] !border-none`,
+    input: `w-0 flex-grow bg-transparent py-1 px-3 block transition-all text-sm`,
   },
 };
 

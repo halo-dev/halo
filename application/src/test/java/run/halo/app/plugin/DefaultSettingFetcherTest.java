@@ -3,11 +3,15 @@ package run.halo.app.plugin;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.ArgumentMatchers.isA;
+import static org.mockito.Mockito.inOrder;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+import static run.halo.app.plugin.DefaultReactiveSettingFetcher.buildCacheKey;
 
 import com.fasterxml.jackson.databind.JsonNode;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -16,13 +20,21 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
+import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.skyscreamer.jsonassert.JSONAssert;
+import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.cache.Cache;
+import org.springframework.cache.CacheManager;
+import org.springframework.cache.concurrent.ConcurrentMapCache;
+import org.springframework.context.ApplicationContext;
 import reactor.core.publisher.Mono;
 import run.halo.app.core.extension.Plugin;
 import run.halo.app.extension.ConfigMap;
+import run.halo.app.extension.ExtensionClient;
 import run.halo.app.extension.Metadata;
 import run.halo.app.extension.ReactiveExtensionClient;
+import run.halo.app.extension.controller.Reconciler;
 import run.halo.app.infra.utils.JsonUtils;
 
 /**
@@ -35,31 +47,51 @@ import run.halo.app.infra.utils.JsonUtils;
 class DefaultSettingFetcherTest {
 
     @Mock
-    private ReactiveExtensionClient extensionClient;
+    private ReactiveExtensionClient client;
 
+    @Mock
+    private ExtensionClient blockingClient;
+
+    @Mock
+    private CacheManager cacheManager;
+
+    @MockBean
+    private final PluginContext pluginContext = PluginContext.builder()
+        .name("fake")
+        .configMapName("fake-config")
+        .build();
+
+    @Mock
+    private ApplicationContext applicationContext;
+
+    private DefaultReactiveSettingFetcher reactiveSettingFetcher;
     private DefaultSettingFetcher settingFetcher;
+
+    @Spy
+    Cache cache = new ConcurrentMapCache(buildCacheKey(pluginContext.getName()));
 
     @BeforeEach
     void setUp() {
-        DefaultReactiveSettingFetcher reactiveSettingFetcher =
-            new DefaultReactiveSettingFetcher(extensionClient, "fake");
-        settingFetcher = new DefaultSettingFetcher(reactiveSettingFetcher);
-        // do not call extensionClient when the settingFetcher first time created
-        verify(extensionClient, times(0)).fetch(eq(ConfigMap.class), any());
-        verify(extensionClient, times(0)).fetch(eq(Plugin.class), any());
+        cache.invalidate();
 
-        Plugin plugin = buildPlugin();
-        when(extensionClient.fetch(eq(Plugin.class), any())).thenReturn(Mono.just(plugin));
+        this.reactiveSettingFetcher = new DefaultReactiveSettingFetcher(pluginContext, client,
+            blockingClient, cacheManager);
+        reactiveSettingFetcher.setApplicationContext(applicationContext);
+
+        settingFetcher = new DefaultSettingFetcher(reactiveSettingFetcher);
+
+        when(cacheManager.getCache(eq(cache.getName()))).thenReturn(cache);
 
         ConfigMap configMap = buildConfigMap();
-        when(extensionClient.fetch(eq(ConfigMap.class), any())).thenReturn(Mono.just(configMap));
+        when(client.fetch(eq(ConfigMap.class), eq(pluginContext.getConfigMapName())))
+            .thenReturn(Mono.just(configMap));
     }
 
     @Test
     void getValues() throws JSONException {
         Map<String, JsonNode> values = settingFetcher.getValues();
 
-        verify(extensionClient, times(1)).fetch(eq(ConfigMap.class), any());
+        verify(client, times(1)).fetch(eq(ConfigMap.class), any());
 
         assertThat(values).hasSize(2);
         JSONAssert.assertEquals(getSns(), JsonUtils.objectToJson(values.get("sns")), true);
@@ -67,6 +99,45 @@ class DefaultSettingFetcherTest {
         // The extensionClient will only be called once
         Map<String, JsonNode> callAgain = settingFetcher.getValues();
         assertThat(callAgain).isNotNull();
+        verify(client, times(1)).fetch(eq(ConfigMap.class), any());
+    }
+
+    @Test
+    void getValuesWithUpdateCache() throws JSONException {
+        Map<String, JsonNode> values = settingFetcher.getValues();
+
+        verify(client, times(1)).fetch(eq(ConfigMap.class), any());
+        JSONAssert.assertEquals(getSns(), JsonUtils.objectToJson(values.get("sns")), true);
+
+        ConfigMap configMap = buildConfigMap();
+        configMap.getData().put("sns", """
+            {
+                "email": "abc@example.com",
+                "github": "abc"
+            }
+            """);
+        when(blockingClient.fetch(eq(ConfigMap.class), eq(pluginContext.getConfigMapName())))
+            .thenReturn(Optional.of(configMap));
+        reactiveSettingFetcher.reconcile(new Reconciler.Request(pluginContext.getConfigMapName()));
+
+        // Make sure the method cache#put is called before the event is published
+        // to avoid the event listener to fetch the old value from the cache
+        var inOrder = inOrder(cache, applicationContext);
+        inOrder.verify(cache).put(eq("fake"), any());
+        inOrder.verify(applicationContext).publishEvent(isA(PluginConfigUpdatedEvent.class));
+
+        Map<String, JsonNode> updatedValues = settingFetcher.getValues();
+        verify(client, times(1)).fetch(eq(ConfigMap.class), any());
+        assertThat(updatedValues).hasSize(2);
+        JSONAssert.assertEquals(configMap.getData().get("sns"),
+            JsonUtils.objectToJson(updatedValues.get("sns")), true);
+
+        // cleanup cache
+        reactiveSettingFetcher.destroy();
+
+        updatedValues = settingFetcher.getValues();
+        assertThat(updatedValues).hasSize(2);
+        verify(client, times(2)).fetch(eq(ConfigMap.class), any());
     }
 
     @Test
@@ -74,10 +145,6 @@ class DefaultSettingFetcherTest {
         Optional<Sns> sns = settingFetcher.fetch("sns", Sns.class);
         assertThat(sns.isEmpty()).isFalse();
         JSONAssert.assertEquals(getSns(), JsonUtils.objectToJson(sns.get()), true);
-
-        when(extensionClient.fetch(eq(ConfigMap.class), any())).thenReturn(Mono.empty());
-        Optional<Sns> missing = settingFetcher.fetch("sns1", Sns.class);
-        assertThat(missing.isEmpty()).isTrue();
     }
 
     @Test
@@ -101,14 +168,15 @@ class DefaultSettingFetcherTest {
         configMap.setMetadata(metadata);
         configMap.setKind("ConfigMap");
         configMap.setApiVersion("v1alpha1");
-        configMap.setData(Map.of("sns", getSns(),
-            "basic", """
-                {
-                     "color": "red",
-                     "width": "100"
-                 }
-                """)
-        );
+        var map = new HashMap<String, String>();
+        map.put("sns", getSns());
+        map.put("basic", """
+            {
+                "color": "red",
+                "width": "100"
+            }
+            """);
+        configMap.setData(map);
         return configMap;
     }
 

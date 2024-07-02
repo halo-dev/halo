@@ -1,8 +1,8 @@
-import { apiClient } from "@/utils/api-client";
 import type { Tag } from "@halo-dev/api-client";
-import { ref, watch, type Ref } from "vue";
+import { consoleApiClient, coreApiClient } from "@halo-dev/api-client";
 import { Dialog, Toast } from "@halo-dev/components";
 import { useQuery, type QueryObserverResult } from "@tanstack/vue-query";
+import { ref, watch, type Ref } from "vue";
 import { useI18n } from "vue-i18n";
 
 interface usePostTagReturn {
@@ -39,7 +39,7 @@ export function usePostTag(filterOptions?: {
   } = useQuery({
     queryKey: ["post-tags", sort, page, size, keyword],
     queryFn: async () => {
-      const { data } = await apiClient.tag.listPostTags({
+      const { data } = await consoleApiClient.content.tag.listPostTags({
         page: page?.value || 0,
         size: size?.value || 0,
         sort: [sort?.value as string].filter(Boolean) || [
@@ -71,7 +71,7 @@ export function usePostTag(filterOptions?: {
       cancelText: t("core.common.buttons.cancel"),
       onConfirm: async () => {
         try {
-          await apiClient.extension.tag.deleteContentHaloRunV1alpha1Tag({
+          await coreApiClient.content.tag.deleteTag({
             name: tag.metadata.name,
           });
 
@@ -97,7 +97,7 @@ export function usePostTag(filterOptions?: {
           try {
             await Promise.all(
               tagNames.map((tagName) => {
-                apiClient.extension.tag.deleteContentHaloRunV1alpha1Tag({
+                coreApiClient.content.tag.deleteTag({
                   name: tagName,
                 });
               })

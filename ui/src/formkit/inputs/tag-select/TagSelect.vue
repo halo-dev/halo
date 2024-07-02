@@ -1,20 +1,20 @@
 <script lang="ts" setup>
-import { apiClient } from "@/utils/api-client";
+import HasPermission from "@/components/permission/HasPermission.vue";
+import { usePermission } from "@/utils/permission";
+import PostTag from "@console/modules/contents/posts/tags/components/PostTag.vue";
+import { usePostTag } from "@console/modules/contents/posts/tags/composables/use-post-tag";
 import type { FormKitFrameworkContext } from "@formkit/core";
 import type { Tag } from "@halo-dev/api-client";
-import { computed, ref, watch, type PropType } from "vue";
-import PostTag from "@console/modules/contents/posts/tags/components/PostTag.vue";
+import { coreApiClient } from "@halo-dev/api-client";
 import {
-  IconCheckboxCircle,
   IconArrowRight,
+  IconCheckboxCircle,
   IconClose,
 } from "@halo-dev/components";
 import { onClickOutside } from "@vueuse/core";
 import Fuse from "fuse.js";
-import { usePermission } from "@/utils/permission";
 import { slugify } from "transliteration";
-import { usePostTag } from "@console/modules/contents/posts/tags/composables/use-post-tag";
-import HasPermission from "@/components/permission/HasPermission.vue";
+import { computed, ref, watch, type PropType } from "vue";
 
 const { currentUserHasPermission } = usePermission();
 
@@ -196,23 +196,22 @@ const handleCreateTag = async () => {
     return;
   }
 
-  const { data } =
-    await apiClient.extension.tag.createContentHaloRunV1alpha1Tag({
-      tag: {
-        spec: {
-          displayName: text.value,
-          slug: slugify(text.value, { trim: true }),
-          color: "#ffffff",
-          cover: "",
-        },
-        apiVersion: "content.halo.run/v1alpha1",
-        kind: "Tag",
-        metadata: {
-          name: "",
-          generateName: "tag-",
-        },
+  const { data } = await coreApiClient.content.tag.createTag({
+    tag: {
+      spec: {
+        displayName: text.value,
+        slug: slugify(text.value, { trim: true }),
+        color: "#ffffff",
+        cover: "",
       },
-    });
+      apiVersion: "content.halo.run/v1alpha1",
+      kind: "Tag",
+      metadata: {
+        name: "",
+        generateName: "tag-",
+      },
+    },
+  });
 
   handleFetchTags();
 

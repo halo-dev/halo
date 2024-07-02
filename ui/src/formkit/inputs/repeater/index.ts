@@ -1,17 +1,25 @@
 import type { FormKitTypeDefinition } from "@formkit/core";
 
+import { i18n } from "@/locales";
 import {
-  outer,
+  $if,
   fieldset,
-  legend,
   help,
   inner,
-  prefix,
-  $if,
-  suffix,
-  messages,
+  legend,
   message,
+  messages,
+  outer,
+  prefix,
+  suffix,
 } from "@formkit/inputs";
+import {
+  IconAddCircle,
+  IconArrowDownCircleLine,
+  IconArrowUpCircleLine,
+  IconCloseCircle,
+} from "@halo-dev/components";
+import AddButton from "./AddButton.vue";
 import { repeats } from "./features/repeats";
 import {
   addButton,
@@ -34,14 +42,6 @@ import {
   upControl,
   upIcon,
 } from "./sections";
-import {
-  IconAddCircle,
-  IconCloseCircle,
-  IconArrowUpCircleLine,
-  IconArrowDownCircleLine,
-} from "@halo-dev/components";
-import AddButton from "./AddButton.vue";
-import { i18n } from "@/locales";
 
 /**
  * Input definition for a repeater input.

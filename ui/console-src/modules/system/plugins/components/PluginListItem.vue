@@ -1,4 +1,11 @@
 <script lang="ts" setup>
+import { formatDatetime } from "@/utils/date";
+import { usePermission } from "@/utils/permission";
+import {
+  PluginStatusPhaseEnum,
+  consoleApiClient,
+  type Plugin,
+} from "@halo-dev/api-client";
 import {
   Dialog,
   Toast,
@@ -10,22 +17,19 @@ import {
 import type { Ref } from "vue";
 import { computed, inject, markRaw, ref, toRefs } from "vue";
 import { usePluginLifeCycle } from "../composables/use-plugin";
-import { type Plugin, PluginStatusPhaseEnum } from "@halo-dev/api-client";
-import { formatDatetime } from "@/utils/date";
-import { usePermission } from "@/utils/permission";
-import { apiClient } from "@/utils/api-client";
-import { useI18n } from "vue-i18n";
+
+import EntityFieldItems from "@/components/entity-fields/EntityFieldItems.vue";
+import StatusDotField from "@/components/entity-fields/StatusDotField.vue";
+import EntityDropdownItems from "@/components/entity/EntityDropdownItems.vue";
 import { useEntityFieldItemExtensionPoint } from "@console/composables/use-entity-extension-points";
 import { useOperationItemExtensionPoint } from "@console/composables/use-operation-extension-points";
-import { useRouter } from "vue-router";
-import EntityDropdownItems from "@/components/entity/EntityDropdownItems.vue";
-import EntityFieldItems from "@/components/entity-fields/EntityFieldItems.vue";
-import LogoField from "./entity-fields/LogoField.vue";
-import StatusDotField from "@/components/entity-fields/StatusDotField.vue";
-import AuthorField from "./entity-fields/AuthorField.vue";
-import SwitchField from "./entity-fields/SwitchField.vue";
-import type { EntityFieldItem, OperationItem } from "@halo-dev/console-shared";
 import PluginInstallationModal from "@console/modules/system/plugins/components/PluginInstallationModal.vue";
+import type { EntityFieldItem, OperationItem } from "@halo-dev/console-shared";
+import { useI18n } from "vue-i18n";
+import { useRouter } from "vue-router";
+import AuthorField from "./entity-fields/AuthorField.vue";
+import LogoField from "./entity-fields/LogoField.vue";
+import SwitchField from "./entity-fields/SwitchField.vue";
 
 const { currentUserHasPermission } = usePermission();
 const { t } = useI18n();
@@ -61,7 +65,7 @@ const handleResetSettingConfig = async () => {
           return;
         }
 
-        await apiClient.plugin.resetPluginConfig({
+        await consoleApiClient.plugin.plugin.resetPluginConfig({
           name: plugin.value.metadata.name as string,
         });
 

@@ -1,27 +1,25 @@
 <script lang="ts" setup>
+import { usePermission } from "@/utils/permission";
+import { useOperationItemExtensionPoint } from "@console/composables/use-operation-extension-points";
+import type { Theme } from "@halo-dev/api-client";
+import { consoleApiClient, coreApiClient } from "@halo-dev/api-client";
 import {
-  VTag,
-  VStatusDot,
   Toast,
-  VDropdownItem,
+  VButton,
   VDropdown,
   VDropdownDivider,
-  VButton,
+  VDropdownItem,
   VSpace,
+  VStatusDot,
+  VTag,
 } from "@halo-dev/components";
-import type { Theme } from "@halo-dev/api-client";
-import { apiClient } from "@/utils/api-client";
-import { toRefs, ref, inject, type Ref } from "vue";
-import { useThemeLifeCycle } from "../composables/use-theme";
-import { usePermission } from "@/utils/permission";
-import { useI18n } from "vue-i18n";
-import { useQueryClient } from "@tanstack/vue-query";
-import { useOperationItemExtensionPoint } from "@console/composables/use-operation-extension-points";
-import { markRaw } from "vue";
-import UninstallOperationItem from "./operation/UninstallOperationItem.vue";
-import { computed } from "vue";
 import type { OperationItem } from "@halo-dev/console-shared";
+import { useQueryClient } from "@tanstack/vue-query";
+import { computed, inject, markRaw, ref, toRefs, type Ref } from "vue";
+import { useI18n } from "vue-i18n";
+import { useThemeLifeCycle } from "../composables/use-theme";
 import MoreOperationItem from "./operation/MoreOperationItem.vue";
+import UninstallOperationItem from "./operation/UninstallOperationItem.vue";
 
 const { currentUserHasPermission } = usePermission();
 const { t } = useI18n();
@@ -63,13 +61,12 @@ const handleCreateTheme = async () => {
   try {
     creating.value = true;
 
-    const { data } =
-      await apiClient.extension.theme.createThemeHaloRunV1alpha1Theme({
-        theme: props.theme,
-      });
+    const { data } = await coreApiClient.theme.theme.createTheme({
+      theme: props.theme,
+    });
 
     // create theme settings
-    apiClient.theme.reload({ name: data.metadata.name });
+    consoleApiClient.theme.theme.reload({ name: data.metadata.name });
 
     activeTabId.value = "installed";
 

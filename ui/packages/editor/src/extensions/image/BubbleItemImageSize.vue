@@ -1,17 +1,17 @@
 <script setup lang="ts">
-import { i18n } from "@/locales";
-import type { Editor } from "@/tiptap/vue-3";
-import { computed, type Component } from "vue";
-import Image from "./index";
 import {
   BlockActionButton,
   BlockActionInput,
   BlockActionSeparator,
 } from "@/components";
+import { i18n } from "@/locales";
+import type { Editor } from "@/tiptap/vue-3";
+import { computed, type Component } from "vue";
 import MdiBackupRestore from "~icons/mdi/backup-restore";
 import MdiImageSizeSelectActual from "~icons/mdi/image-size-select-actual";
 import MdiImageSizeSelectLarge from "~icons/mdi/image-size-select-large";
 import MdiImageSizeSelectSmall from "~icons/mdi/image-size-select-small";
+import Image from "./index";
 
 const props = defineProps<{
   editor: Editor;

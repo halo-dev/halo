@@ -1,5 +1,7 @@
 <script lang="ts" setup>
-import { type RouteLocationRaw, useRoute, useRouter } from "vue-router";
+import { usePermission } from "@/utils/permission";
+import { useThemeStore } from "@console/stores/theme";
+import { consoleApiClient, coreApiClient } from "@halo-dev/api-client";
 import {
   IconBookRead,
   IconFolder,
@@ -12,14 +14,12 @@ import {
   VEntityField,
   VModal,
 } from "@halo-dev/components";
-import { type Component, computed, markRaw, onMounted, ref, watch } from "vue";
-import Fuse from "fuse.js";
-import { apiClient } from "@/utils/api-client";
-import { usePermission } from "@/utils/permission";
-import { useThemeStore } from "@console/stores/theme";
-import { storeToRefs } from "pinia";
-import { useI18n } from "vue-i18n";
 import { useEventListener } from "@vueuse/core";
+import Fuse from "fuse.js";
+import { storeToRefs } from "pinia";
+import { computed, markRaw, onMounted, ref, watch, type Component } from "vue";
+import { useI18n } from "vue-i18n";
+import { useRoute, useRouter, type RouteLocationRaw } from "vue-router";
 
 const router = useRouter();
 const route = useRoute();
@@ -79,7 +79,7 @@ const handleBuildSearchIndex = () => {
   });
 
   if (currentUserHasPermission(["system:users:view"])) {
-    apiClient.extension.user.listV1alpha1User().then((response) => {
+    coreApiClient.user.listUser().then((response) => {
       response.data.items.forEach((user) => {
         fuse.add({
           title: user.spec.displayName,
@@ -99,50 +99,46 @@ const handleBuildSearchIndex = () => {
   }
 
   if (currentUserHasPermission(["system:plugins:view"])) {
-    apiClient.extension.plugin
-      .listPluginHaloRunV1alpha1Plugin()
-      .then((response) => {
-        response.data.items.forEach((plugin) => {
-          fuse.add({
-            title: plugin.spec.displayName as string,
-            icon: {
-              src: plugin.status?.logo as string,
+    coreApiClient.plugin.plugin.listPlugin().then((response) => {
+      response.data.items.forEach((plugin) => {
+        fuse.add({
+          title: plugin.spec.displayName as string,
+          icon: {
+            src: plugin.status?.logo as string,
+          },
+          group: t("core.components.global_search.groups.plugin"),
+          route: {
+            name: "PluginDetail",
+            params: {
+              name: plugin.metadata.name,
             },
-            group: t("core.components.global_search.groups.plugin"),
-            route: {
-              name: "PluginDetail",
-              params: {
-                name: plugin.metadata.name,
-              },
-            },
-          });
+          },
         });
       });
+    });
   }
 
   if (currentUserHasPermission(["system:posts:view"])) {
-    apiClient.extension.post
-      .listContentHaloRunV1alpha1Post()
-      .then((response) => {
-        response.data.items.forEach((post) => {
-          fuse.add({
-            title: post.spec.title,
-            icon: {
-              component: markRaw(IconBookRead),
+    coreApiClient.content.post.listPost().then((response) => {
+      response.data.items.forEach((post) => {
+        fuse.add({
+          title: post.spec.title,
+          icon: {
+            component: markRaw(IconBookRead),
+          },
+          group: t("core.components.global_search.groups.post"),
+          route: {
+            name: "PostEditor",
+            query: {
+              name: post.metadata.name,
             },
-            group: t("core.components.global_search.groups.post"),
-            route: {
-              name: "PostEditor",
-              query: {
-                name: post.metadata.name,
-              },
-            },
-          });
+          },
         });
       });
+    });
 
-    apiClient.extension.category
-      .listContentHaloRunV1alpha1Category({
+    coreApiClient.content.category
+      .listCategory({
         sort: ["metadata.creationTimestamp,desc"],
       })
       .then((response) => {
@@ -163,8 +159,8 @@ const handleBuildSearchIndex = () => {
         });
       });
 
-    apiClient.extension.tag
-      .listContentHaloRunV1alpha1Tag({
+    coreApiClient.content.tag
+      .listTag({
         sort: ["metadata.creationTimestamp,desc"],
       })
       .then((response) => {
@@ -187,76 +183,70 @@ const handleBuildSearchIndex = () => {
   }
 
   if (currentUserHasPermission(["system:singlepages:view"])) {
-    apiClient.extension.singlePage
-      .listContentHaloRunV1alpha1SinglePage()
-      .then((response) => {
-        response.data.items.forEach((singlePage) => {
-          fuse.add({
-            title: singlePage.spec.title,
-            icon: {
-              component: markRaw(IconPages),
+    coreApiClient.content.singlePage.listSinglePage().then((response) => {
+      response.data.items.forEach((singlePage) => {
+        fuse.add({
+          title: singlePage.spec.title,
+          icon: {
+            component: markRaw(IconPages),
+          },
+          group: t("core.components.global_search.groups.page"),
+          route: {
+            name: "SinglePageEditor",
+            query: {
+              name: singlePage.metadata.name,
             },
-            group: t("core.components.global_search.groups.page"),
-            route: {
-              name: "SinglePageEditor",
-              query: {
-                name: singlePage.metadata.name,
-              },
-            },
-          });
+          },
         });
       });
+    });
   }
 
   if (currentUserHasPermission(["system:attachments:view"])) {
-    apiClient.extension.storage.attachment
-      .listStorageHaloRunV1alpha1Attachment()
-      .then((response) => {
-        response.data.items.forEach((attachment) => {
-          fuse.add({
-            title: attachment.spec.displayName as string,
-            icon: {
-              component: markRaw(IconFolder),
+    coreApiClient.storage.attachment.listAttachment().then((response) => {
+      response.data.items.forEach((attachment) => {
+        fuse.add({
+          title: attachment.spec.displayName as string,
+          icon: {
+            component: markRaw(IconFolder),
+          },
+          group: t("core.components.global_search.groups.attachment"),
+          route: {
+            name: "Attachments",
+            query: {
+              name: attachment.metadata.name,
             },
-            group: t("core.components.global_search.groups.attachment"),
-            route: {
-              name: "Attachments",
-              query: {
-                name: attachment.metadata.name,
-              },
-            },
-          });
+          },
         });
       });
+    });
   }
 
   if (
     currentUserHasPermission(["system:settings:view"]) &&
     currentUserHasPermission(["system:configmaps:view"])
   ) {
-    apiClient.extension.setting
-      .getV1alpha1Setting({ name: "system" })
-      .then((response) => {
-        response.data.spec.forms.forEach((form) => {
-          fuse.add({
-            title: form.label as string,
-            icon: {
-              component: markRaw(IconSettings),
+    coreApiClient.setting.getSetting({ name: "system" }).then((response) => {
+      response.data.spec.forms.forEach((form) => {
+        fuse.add({
+          title: form.label as string,
+          icon: {
+            component: markRaw(IconSettings),
+          },
+          group: t("core.components.global_search.groups.setting"),
+          route: {
+            name: "SystemSetting",
+            params: {
+              group: form.group,
             },
-            group: t("core.components.global_search.groups.setting"),
-            route: {
-              name: "SystemSetting",
-              params: {
-                group: form.group,
-              },
-            },
-          });
+          },
         });
       });
+    });
   }
 
   if (currentUserHasPermission(["system:themes:view"])) {
-    apiClient.theme
+    consoleApiClient.theme.theme
       .fetchThemeSetting({ name: "-" })
       .then(({ data: themeSettings }) => {
         themeSettings.spec.forms.forEach((form) => {

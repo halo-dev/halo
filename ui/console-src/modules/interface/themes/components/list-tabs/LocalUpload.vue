@@ -1,17 +1,15 @@
 <script lang="ts" setup>
 import AppDownloadAlert from "@/components/common/AppDownloadAlert.vue";
+import { useThemeStore } from "@console/stores/theme";
+import { consoleApiClient } from "@halo-dev/api-client";
 import { Dialog, Toast } from "@halo-dev/components";
-import type { ErrorResponse } from "@uppy/core";
-import type { UppyFile } from "@uppy/core";
+import { useQueryClient } from "@tanstack/vue-query";
+import type { ErrorResponse, UppyFile } from "@uppy/core";
+import type { Ref } from "vue";
+import { inject, ref } from "vue";
+import { useI18n } from "vue-i18n";
 import { THEME_ALREADY_EXISTS_TYPE } from "../../constants";
 import type { ThemeInstallationErrorResponse } from "../../types";
-import { useQueryClient } from "@tanstack/vue-query";
-import { useI18n } from "vue-i18n";
-import { inject } from "vue";
-import type { Ref } from "vue";
-import { ref } from "vue";
-import { useThemeStore } from "@console/stores/theme";
-import { apiClient } from "@/utils/api-client";
 
 const { t } = useI18n();
 const queryClient = useQueryClient();
@@ -54,7 +52,7 @@ const handleCatchExistsException = async (
         throw new Error("File is required");
       }
 
-      await apiClient.theme.upgradeTheme({
+      await consoleApiClient.theme.theme.upgradeTheme({
         name: error.themeName,
         file: file,
       });

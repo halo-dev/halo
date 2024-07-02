@@ -1,6 +1,6 @@
 <script lang="ts" setup>
-import { apiClient } from "@/utils/api-client";
-import { useQuery } from "@tanstack/vue-query";
+import { postLabels } from "@/constants/labels";
+import { ucApiClient } from "@halo-dev/api-client";
 import {
   IconAddCircle,
   IconBookRead,
@@ -13,10 +13,10 @@ import {
   VPagination,
   VSpace,
 } from "@halo-dev/components";
-import PostListItem from "./components/PostListItem.vue";
+import { useQuery } from "@tanstack/vue-query";
 import { useRouteQuery } from "@vueuse/router";
 import { computed, watch } from "vue";
-import { postLabels } from "@/constants/labels";
+import PostListItem from "./components/PostListItem.vue";
 
 const page = useRouteQuery<number>("page", 1, {
   transform: Number,
@@ -54,7 +54,7 @@ const {
   queryKey: ["my-posts", page, size, keyword, selectedPublishPhase],
   queryFn: async () => {
     const labelSelector: string[] = ["content.halo.run/deleted=false"];
-    const { data } = await apiClient.uc.post.listMyPosts({
+    const { data } = await ucApiClient.content.post.listMyPosts({
       labelSelector,
       page: page.value,
       size: size.value,

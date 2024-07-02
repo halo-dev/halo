@@ -1,4 +1,11 @@
 <script lang="ts" setup>
+import { useFetchRole } from "@/composables/use-role";
+import { rbacAnnotations } from "@/constants/annotations";
+import { useUserStore } from "@/stores/user";
+import { formatDatetime } from "@/utils/date";
+import { usePermission } from "@/utils/permission";
+import type { ListedUser, User } from "@halo-dev/api-client";
+import { consoleApiClient, coreApiClient } from "@halo-dev/api-client";
 import {
   Dialog,
   IconAddCircle,
@@ -21,21 +28,14 @@ import {
   VStatusDot,
   VTag,
 } from "@halo-dev/components";
+import { useQuery } from "@tanstack/vue-query";
+import { useRouteQuery } from "@vueuse/router";
+import { computed, onMounted, ref, watch } from "vue";
+import { useI18n } from "vue-i18n";
+import GrantPermissionModal from "./components/GrantPermissionModal.vue";
+import UserCreationModal from "./components/UserCreationModal.vue";
 import UserEditingModal from "./components/UserEditingModal.vue";
 import UserPasswordChangeModal from "./components/UserPasswordChangeModal.vue";
-import GrantPermissionModal from "./components/GrantPermissionModal.vue";
-import { computed, onMounted, ref, watch } from "vue";
-import { apiClient } from "@/utils/api-client";
-import type { ListedUser, User } from "@halo-dev/api-client";
-import { rbacAnnotations } from "@/constants/annotations";
-import { formatDatetime } from "@/utils/date";
-import { useRouteQuery } from "@vueuse/router";
-import { usePermission } from "@/utils/permission";
-import { useUserStore } from "@/stores/user";
-import { useFetchRole } from "@/composables/use-role";
-import { useQuery } from "@tanstack/vue-query";
-import { useI18n } from "vue-i18n";
-import UserCreationModal from "./components/UserCreationModal.vue";
 
 const { currentUserHasPermission } = usePermission();
 const { t } = useI18n();
@@ -99,7 +99,7 @@ const {
     selectedRoleValue,
   ],
   queryFn: async () => {
-    const { data } = await apiClient.user.listUsers({
+    const { data } = await consoleApiClient.user.listUsers({
       page: page.value,
       size: size.value,
       keyword: keyword.value,
@@ -136,7 +136,7 @@ const handleDelete = async (user: User) => {
     cancelText: t("core.common.buttons.cancel"),
     onConfirm: async () => {
       try {
-        await apiClient.extension.user.deleteV1alpha1User({
+        await coreApiClient.user.deleteUser({
           name: user.metadata.name,
         });
 
@@ -163,7 +163,7 @@ const handleDeleteInBatch = async () => {
       );
       await Promise.all(
         userNamesToDelete.map((name) => {
-          return apiClient.extension.user.deleteV1alpha1User({
+          return coreApiClient.user.deleteUser({
             name,
           });
         })

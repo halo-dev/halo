@@ -7,17 +7,17 @@ import org.springframework.context.MessageSource;
 import org.springframework.context.MessageSourceResolvable;
 import org.springframework.http.ProblemDetail;
 import org.springframework.lang.Nullable;
-import org.springframework.validation.BindingResult;
+import org.springframework.validation.Errors;
 import org.springframework.web.server.ServerWebInputException;
 import org.springframework.web.util.BindErrorUtils;
 
 public class RequestBodyValidationException extends ServerWebInputException {
 
-    private final BindingResult bindingResult;
+    private final Errors errors;
 
-    public RequestBodyValidationException(BindingResult bindingResult) {
+    public RequestBodyValidationException(Errors errors) {
         super("Validation failure", null, null, null, null);
-        this.bindingResult = bindingResult;
+        this.errors = errors;
     }
 
     @Override
@@ -28,8 +28,8 @@ public class RequestBodyValidationException extends ServerWebInputException {
     }
 
     private List<String> collectAllErrors(MessageSource messageSource, Locale locale) {
-        var globalErrors = resolveErrors(bindingResult.getGlobalErrors(), messageSource, locale);
-        var fieldErrors = resolveErrors(bindingResult.getFieldErrors(), messageSource, locale);
+        var globalErrors = resolveErrors(errors.getGlobalErrors(), messageSource, locale);
+        var fieldErrors = resolveErrors(errors.getFieldErrors(), messageSource, locale);
         var errors = new ArrayList<String>(globalErrors.size() + fieldErrors.size());
         errors.addAll(globalErrors);
         errors.addAll(fieldErrors);
@@ -39,16 +39,16 @@ public class RequestBodyValidationException extends ServerWebInputException {
     @Override
     public Object[] getDetailMessageArguments(MessageSource messageSource, Locale locale) {
         return new Object[] {
-            resolveErrors(bindingResult.getGlobalErrors(), messageSource, locale),
-            resolveErrors(bindingResult.getFieldErrors(), messageSource, locale)
+            resolveErrors(errors.getGlobalErrors(), messageSource, locale),
+            resolveErrors(errors.getFieldErrors(), messageSource, locale)
         };
     }
 
     @Override
     public Object[] getDetailMessageArguments() {
         return new Object[] {
-            resolveErrors(bindingResult.getGlobalErrors(), null, Locale.getDefault()),
-            resolveErrors(bindingResult.getFieldErrors(), null, Locale.getDefault())
+            resolveErrors(errors.getGlobalErrors(), null, Locale.getDefault()),
+            resolveErrors(errors.getFieldErrors(), null, Locale.getDefault())
         };
     }
 

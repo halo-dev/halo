@@ -19,8 +19,8 @@ import org.springframework.web.reactive.function.server.ServerResponse;
 import org.springframework.web.server.ServerWebExchange;
 import reactor.core.publisher.Mono;
 import run.halo.app.security.HaloUserDetails;
+import run.halo.app.security.LoginHandlerEnhancer;
 import run.halo.app.security.authentication.login.UsernamePasswordHandler;
-import run.halo.app.security.authentication.rememberme.RememberMeServices;
 import run.halo.app.security.authentication.twofactor.TwoFactorAuthentication;
 
 @Slf4j
@@ -31,7 +31,7 @@ public class TotpAuthenticationFilter extends AuthenticationWebFilter {
         TotpAuthService totpAuthService,
         ServerResponse.Context context,
         MessageSource messageSource,
-        RememberMeServices rememberMeServices
+        LoginHandlerEnhancer loginHandlerEnhancer
     ) {
         super(new TwoFactorAuthManager(totpAuthService));
 
@@ -39,7 +39,7 @@ public class TotpAuthenticationFilter extends AuthenticationWebFilter {
         setRequiresAuthenticationMatcher(pathMatchers(HttpMethod.POST, "/login/2fa/totp"));
         setServerAuthenticationConverter(new TotpCodeAuthenticationConverter());
 
-        var handler = new UsernamePasswordHandler(context, messageSource, rememberMeServices);
+        var handler = new UsernamePasswordHandler(context, messageSource, loginHandlerEnhancer);
         setAuthenticationSuccessHandler(handler);
         setAuthenticationFailureHandler(handler);
     }

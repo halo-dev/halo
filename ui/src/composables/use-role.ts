@@ -1,18 +1,18 @@
+import { rbacAnnotations } from "@/constants/annotations";
+import { roleLabels } from "@/constants/labels";
+import { resolveDeepDependencies } from "@/utils/role";
 import type { Role } from "@halo-dev/api-client";
+import { coreApiClient } from "@halo-dev/api-client";
+import { Toast } from "@halo-dev/components";
 import {
   computed,
-  type ComputedRef,
   onMounted,
   onUnmounted,
-  type Ref,
   ref,
+  type ComputedRef,
+  type Ref,
 } from "vue";
-import { roleLabels } from "@/constants/labels";
-import { rbacAnnotations } from "@/constants/annotations";
-import { apiClient } from "@/utils/api-client";
-import { Toast } from "@halo-dev/components";
 import { useI18n } from "vue-i18n";
-import { resolveDeepDependencies } from "@/utils/role";
 
 interface RoleTemplateGroup {
   module: string | null | undefined;
@@ -56,7 +56,7 @@ export function useFetchRole(): useFetchRoleReturn {
         loading.value = true;
       }
 
-      const { data } = await apiClient.extension.role.listV1alpha1Role({
+      const { data } = await coreApiClient.role.listRole({
         page: 0,
         size: 0,
         labelSelector: [`!${roleLabels.TEMPLATE}`],
@@ -124,14 +124,14 @@ export function useRoleForm(): useRoleFormReturn {
     try {
       isSubmitting.value = true;
       if (isUpdateMode.value) {
-        const { data } = await apiClient.extension.role.updateV1alpha1Role({
+        const { data } = await coreApiClient.role.updateRole({
           name: formState.value.metadata.name,
           role: formState.value,
         });
 
         formState.value = data;
       } else {
-        const { data } = await apiClient.extension.role.createV1alpha1Role({
+        const { data } = await coreApiClient.role.createRole({
           role: formState.value,
         });
 

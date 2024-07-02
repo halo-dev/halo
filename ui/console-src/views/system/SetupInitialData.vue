@@ -1,25 +1,25 @@
 <script lang="ts" setup>
-import { apiClient } from "@/utils/api-client";
-import { VLoading } from "@halo-dev/components";
-import { useMutation } from "@tanstack/vue-query";
+import { useGlobalInfoStore } from "@/stores/global-info";
+import { useUserStore } from "@/stores/user";
 import {
+  consoleApiClient,
+  coreApiClient,
   type Category,
   type Plugin,
   type PostRequest,
   type SinglePageRequest,
   type Tag,
 } from "@halo-dev/api-client";
-import { onMounted } from "vue";
+import { VLoading } from "@halo-dev/components";
+import { useMutation } from "@tanstack/vue-query";
+import { onMounted, ref } from "vue";
+import { useRouter } from "vue-router";
 import category from "./setup-data/category.json";
-import tag from "./setup-data/tag.json";
+import menuItems from "./setup-data/menu-items.json";
+import menu from "./setup-data/menu.json";
 import post from "./setup-data/post.json";
 import singlePage from "./setup-data/singlePage.json";
-import menu from "./setup-data/menu.json";
-import menuItems from "./setup-data/menu-items.json";
-import { useRouter } from "vue-router";
-import { useGlobalInfoStore } from "@/stores/global-info";
-import { ref } from "vue";
-import { useUserStore } from "@/stores/user";
+import tag from "./setup-data/tag.json";
 
 const router = useRouter();
 const globalInfoStore = useGlobalInfoStore();
@@ -27,7 +27,7 @@ const globalInfoStore = useGlobalInfoStore();
 const { mutateAsync: pluginInstallMutate } = useMutation({
   mutationKey: ["plugin-install"],
   mutationFn: async (plugin: Plugin) => {
-    const { data } = await apiClient.plugin.installPlugin(
+    const { data } = await consoleApiClient.plugin.plugin.installPlugin(
       {
         source: "PRESET",
         presetName: plugin.metadata.name as string,
@@ -48,7 +48,7 @@ const { mutateAsync: pluginInstallMutate } = useMutation({
 const { mutateAsync: pluginStartMutate } = useMutation({
   mutationKey: ["plugin-start"],
   mutationFn: async (plugin: Plugin) => {
-    return await apiClient.plugin.changePluginRunningState(
+    return await consoleApiClient.plugin.plugin.changePluginRunningState(
       {
         name: plugin.metadata.name,
         pluginRunningStateRequest: {
@@ -69,39 +69,41 @@ async function setupInitialData() {
     processing.value = true;
 
     // Create category / tag / post
-    await apiClient.extension.category.createContentHaloRunV1alpha1Category({
+    await coreApiClient.content.category.createCategory({
       category: category as Category,
     });
-    await apiClient.extension.tag.createContentHaloRunV1alpha1Tag({
+    await coreApiClient.content.tag.createTag({
       tag: tag as Tag,
     });
-    const { data: postData } = await apiClient.post.draftPost({
+    const { data: postData } = await consoleApiClient.content.post.draftPost({
       postRequest: post as PostRequest,
     });
-    await apiClient.post.publishPost({ name: postData.metadata.name });
+    await consoleApiClient.content.post.publishPost({
+      name: postData.metadata.name,
+    });
 
     // Create singlePage
-    const { data: singlePageData } = await apiClient.singlePage.draftSinglePage(
-      {
+    const { data: singlePageData } =
+      await consoleApiClient.content.singlePage.draftSinglePage({
         singlePageRequest: singlePage as SinglePageRequest,
-      }
-    );
+      });
 
-    await apiClient.singlePage.publishSinglePage({
+    await consoleApiClient.content.singlePage.publishSinglePage({
       name: singlePageData.metadata.name,
     });
 
     // Create menu and menu items
     const menuItemPromises = menuItems.map((item) => {
-      return apiClient.extension.menuItem.createV1alpha1MenuItem({
+      return coreApiClient.menuItem.createMenuItem({
         menuItem: item,
       });
     });
     await Promise.all(menuItemPromises);
-    await apiClient.extension.menu.createV1alpha1Menu({ menu: menu });
+    await coreApiClient.menu.createMenu({ menu: menu });
 
     // Install preset plugins
-    const { data: presetPlugins } = await apiClient.plugin.listPluginPresets();
+    const { data: presetPlugins } =
+      await consoleApiClient.plugin.plugin.listPluginPresets();
 
     for (let i = 0; i < presetPlugins.length; i++) {
       const presetPlugin = presetPlugins[i];
@@ -114,7 +116,7 @@ async function setupInitialData() {
   } catch (error) {
     console.error(error);
   } finally {
-    await apiClient.extension.configMap.createV1alpha1ConfigMap({
+    await coreApiClient.configMap.createConfigMap({
       configMap: {
         metadata: {
           name: "system-states",

@@ -18,6 +18,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import run.halo.app.content.NotificationReasonConst;
 import run.halo.app.core.extension.User;
@@ -36,7 +37,7 @@ import run.halo.app.infra.ExternalLinkProcessor;
 import run.halo.app.notification.NotificationReasonEmitter;
 import run.halo.app.notification.ReasonPayload;
 import run.halo.app.notification.UserIdentity;
-import run.halo.app.plugin.ExtensionComponentsFinder;
+import run.halo.app.plugin.extensionpoint.ExtensionGetter;
 
 /**
  * Tests for {@link CommentNotificationReasonPublisher}.
@@ -143,7 +144,7 @@ class CommentNotificationReasonPublisherTest {
         NotificationReasonEmitter emitter;
 
         @Mock
-        ExtensionComponentsFinder extensionComponentsFinder;
+        ExtensionGetter extensionGetter;
 
         @Mock
         ExternalLinkProcessor externalLinkProcessor;
@@ -247,9 +248,6 @@ class CommentNotificationReasonPublisherTest {
 
         @Mock
         NotificationReasonEmitter emitter;
-
-        @Mock
-        ExtensionComponentsFinder extensionComponentsFinder;
 
         @Mock
         ExternalLinkProcessor externalLinkProcessor;
@@ -358,13 +356,15 @@ class CommentNotificationReasonPublisherTest {
         NotificationReasonEmitter notificationReasonEmitter;
 
         @Mock
-        ExtensionComponentsFinder extensionComponentsFinder;
+        ExtensionGetter extensionGetter;
 
         @InjectMocks
         CommentNotificationReasonPublisher.NewReplyReasonPublisher newReplyReasonPublisher;
 
         @Test
         void publishReasonByTest() {
+            when(extensionGetter.getExtensions(CommentSubject.class))
+                .thenReturn(Flux.empty());
             var reply = createReply("fake-reply");
 
             reply.getSpec().setQuoteReply("fake-quote-reply");

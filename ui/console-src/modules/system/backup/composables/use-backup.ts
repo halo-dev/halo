@@ -1,18 +1,16 @@
-import { apiClient } from "@/utils/api-client";
+import { BackupStatusPhaseEnum, coreApiClient } from "@halo-dev/api-client";
 import { Dialog, Toast } from "@halo-dev/components";
 import { useQuery, useQueryClient } from "@tanstack/vue-query";
 import dayjs from "dayjs";
-import { BackupStatusPhaseEnum } from "@halo-dev/api-client";
 import { useI18n } from "vue-i18n";
 
 export function useBackupFetch() {
   return useQuery({
     queryKey: ["backups"],
     queryFn: async () => {
-      const { data } =
-        await apiClient.extension.backup.listMigrationHaloRunV1alpha1Backup({
-          sort: ["metadata.creationTimestamp,desc"],
-        });
+      const { data } = await coreApiClient.migration.backup.listBackup({
+        sort: ["metadata.creationTimestamp,desc"],
+      });
       return data;
     },
     refetchInterval(data) {
@@ -51,7 +49,7 @@ export function useBackup() {
       confirmText: t("core.common.buttons.confirm"),
       cancelText: t("core.common.buttons.cancel"),
       async onConfirm() {
-        await apiClient.extension.backup.createMigrationHaloRunV1alpha1Backup({
+        await coreApiClient.migration.backup.createBackup({
           backup: {
             apiVersion: "migration.halo.run/v1alpha1",
             kind: "Backup",

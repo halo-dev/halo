@@ -35,9 +35,11 @@ import run.halo.app.infra.utils.JsonUtils;
 @Component
 public class TagPostCountUpdater
     extends AbstractEventReconciler<TagPostCountUpdater.PostRelatedTags> {
+    private final ExtensionClient client;
 
     public TagPostCountUpdater(ExtensionClient client) {
-        super(TagPostCountUpdater.class.getName(), client);
+        super(TagPostCountUpdater.class.getName());
+        this.client = client;
     }
 
     @Override

@@ -1,6 +1,6 @@
 <script lang="ts" setup>
-import { IconArrowRight } from "../../icons/icons";
 import { computed, inject, ref, useSlots } from "vue";
+import { IconArrowRight } from "../../icons/icons";
 
 const props = withDefaults(
   defineProps<{
