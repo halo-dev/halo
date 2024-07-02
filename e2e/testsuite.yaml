@@ -71,8 +71,6 @@ items:
 - name: listPosts
   request:
     api: /api.console.halo.run/v1alpha1/posts?keyword={{.param.postName}}
-    header:
-      Authorization: "{{.param.auth}}"
   expect:
     verify:
       - data.total == 1
@@ -80,14 +78,10 @@ items:
   request:
     api: /api.console.halo.run/v1alpha1/posts/{{(index .listPosts.items 0).post.metadata.name}}/recycle
     method: PUT
-    header:
-      Authorization: "{{.param.auth}}"
 - name: recover
   request:
     api: /content.halo.run/v1alpha1/posts/{{(index .listPosts.items 0).post.metadata.name}}
     method: DELETE
-    header:
-      Authorization: "{{.param.auth}}"
 
 ## Users
 - name: createUser
@@ -95,7 +89,6 @@ items:
     api: /api.console.halo.run/v1alpha1/users
     method: POST
     header:
-      Authorization: "{{.param.auth}}"
       Content-Type: application/json
     body: |
       {
@@ -113,7 +106,6 @@ items:
     api: /api.console.halo.run/v1alpha1/users/{{.param.userName}}/password
     method: PUT
     header:
-      Authorization: "{{.param.auth}}"
       Content-Type: application/json
     body: |
       {
@@ -124,7 +116,6 @@ items:
     api: /api.console.halo.run/v1alpha1/users/{{.param.userName}}/permissions
     method: POST
     header:
-      Authorization: "{{.param.auth}}"
       Content-Type: application/json
     body: |
       {
@@ -132,13 +123,6 @@ items:
           "guest"
         ]
       }
-- name: deleteUser
-  request:
-    api: |
-      {{default "http://halo:8090" (env "SERVER")}}/api/v1alpha1/users/{{.param.userName}}
-    method: DELETE
-    header:
-      Authorization: "{{.param.auth}}"
 - name: sendPasswordResetEmail
   request:
     api: |
@@ -174,7 +158,6 @@ items:
       {{default "http://halo:8090" (env "SERVER")}}/api/v1alpha1/roles
     method: POST
     header:
-      Authorization: "{{.param.auth}}"
       Content-Type: application/json
     body: |
       {
@@ -197,8 +180,6 @@ items:
   request:
     api: |
       {{default "http://halo:8090" (env "SERVER")}}/api/v1alpha1/roles
-    header:
-      Authorization: "{{.param.auth}}"
   expect:
     verify:
       - data.total >= 3
@@ -207,8 +188,6 @@ items:
     api: |
       {{default "http://halo:8090" (env "SERVER")}}/api/v1alpha1/roles/{{(index .listRoles.items 0).metadata.name}}
     method: DELETE
-    header:
-      Authorization: "{{.param.auth}}"
 
 ## Plugins
 - name: installPlugin
@@ -216,7 +195,6 @@ items:
     api: /api.console.halo.run/v1alpha1/plugins/-/install-from-uri
     method: POST
     header:
-      Authorization: "{{.param.auth}}"
       Content-Type: application/json
     body: |
       {
@@ -225,16 +203,12 @@ items:
 - name: pluginList
   request:
     api: /api.console.halo.run/v1alpha1/plugins
-    header:
-      Authorization: "{{.param.auth}}"
   expect:
     verify:
       - data.total >= 1
 - name: inActivePlugins
   request:
     api: /api.console.halo.run/v1alpha1/plugins?enabled=false&keyword=&page=0&size=0
-    header:
-      Authorization: "{{.param.auth}}"
   expect:
     verify:
       - data.total == 1
@@ -243,7 +217,6 @@ items:
     api: /api.console.halo.run/v1alpha1/plugins/PluginSitePush/plugin-state
     method: PUT
     header:
-      Authorization: "{{.param.auth}}"
       Content-Type: application/json
     body: |
       {
@@ -254,7 +227,6 @@ items:
     api: /api.console.halo.run/v1alpha1/plugins/PluginSitePush/plugin-state
     method: PUT
     header:
-      Authorization: "{{.param.auth}}"
       Content-Type: application/json
     body: |
       {
@@ -265,14 +237,11 @@ items:
     api: /api.console.halo.run/v1alpha1/plugins/PluginSitePush/reset-config
     method: PUT
     header:
-      Authorization: "{{.param.auth}}"
       Content-Type: application/json
 - name: uninstallPlugin
   request:
     api: /plugin.halo.run/v1alpha1/plugins/PluginSitePush
     method: DELETE
-    header:
-      Authorization: "{{.param.auth}}"
 
   # Notifications
 - name: createNotification
@@ -297,15 +266,12 @@ items:
       }
     header:
       Content-Type: application/json
-      Authorization: "{{.param.auth}}"
   expect:
     statusCode: 201
 - name: getNotificationByName
   request:
     api: /notification.halo.run/v1alpha1/notifications/{{.param.notificationName}}
     method: GET
-    header:
-      Authorization: "{{.param.auth}}"
   expect:
     statusCode: 200
     verify:
@@ -316,5 +282,9 @@ items:
     api: |
       /api.notification.halo.run/v1alpha1/userspaces/admin/notifications/{{.param.notificationName}}
     method: DELETE
-    header:
-      Authorization: "{{.param.auth}}"
+
+- name: deleteUser
+  request:
+    api: |
+      {{default "http://halo:8090" (env "SERVER")}}/api/v1alpha1/users/{{.param.userName}}
+    method: DELETE
