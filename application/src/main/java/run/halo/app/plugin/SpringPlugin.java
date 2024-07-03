@@ -40,9 +40,6 @@ public class SpringPlugin extends Plugin {
             log.info("After publishing plugin starting event for plugin {}", pluginId);
             if (pluginOpt.isPresent()) {
                 this.delegate = pluginOpt.get();
-                if (this.delegate instanceof BasePlugin basePlugin) {
-                    basePlugin.setContext(pluginContext);
-                }
                 log.info("Starting {} for plugin {}", this.delegate, pluginId);
                 this.delegate.start();
                 log.info("Started {} for plugin {}", this.delegate, pluginId);

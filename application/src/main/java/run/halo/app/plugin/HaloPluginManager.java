@@ -15,7 +15,6 @@ import org.pf4j.ExtensionFactory;
 import org.pf4j.ExtensionFinder;
 import org.pf4j.JarPluginLoader;
 import org.pf4j.JarPluginRepository;
-import org.pf4j.PluginDescriptor;
 import org.pf4j.PluginDescriptorFinder;
 import org.pf4j.PluginFactory;
 import org.pf4j.PluginLoader;
@@ -93,17 +92,6 @@ public class HaloPluginManager extends DefaultPluginManager implements SpringPlu
     @Override
     protected PluginDescriptorFinder createPluginDescriptorFinder() {
         return new YamlPluginDescriptorFinder();
-    }
-
-    @Override
-    protected PluginWrapper createPluginWrapper(PluginDescriptor pluginDescriptor, Path pluginPath,
-        ClassLoader pluginClassLoader) {
-        // create the plugin wrapper
-        log.debug("Creating wrapper for plugin '{}'", pluginPath);
-        var pluginWrapper =
-            new HaloPluginWrapper(this, pluginDescriptor, pluginPath, pluginClassLoader);
-        pluginWrapper.setPluginFactory(getPluginFactory());
-        return pluginWrapper;
     }
 
     @Override
