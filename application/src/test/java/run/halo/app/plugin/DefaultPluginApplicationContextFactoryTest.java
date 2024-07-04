@@ -22,7 +22,7 @@ class DefaultPluginApplicationContextFactoryTest {
 
     @BeforeEach
     void setUp() {
-        factory = new DefaultPluginApplicationContextFactory((SpringPluginManager) pluginManager);
+        factory = new DefaultPluginApplicationContextFactory(pluginManager);
     }
 
     @Test
@@ -41,6 +41,7 @@ class DefaultPluginApplicationContextFactoryTest {
 
         assertInstanceOf(PluginApplicationContext.class, context);
         assertNotNull(context.getBeanProvider(SearchService.class).getIfUnique());
+        assertNotNull(context.getBeanProvider(PluginsRootGetter.class).getIfUnique());
         // TODO Add more assertions here.
     }
 

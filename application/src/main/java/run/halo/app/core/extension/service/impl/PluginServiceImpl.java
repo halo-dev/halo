@@ -13,7 +13,6 @@ import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.time.Clock;
 import java.time.Duration;
 import java.util.ArrayList;
@@ -61,8 +60,8 @@ import run.halo.app.infra.exception.UnsatisfiedAttributeValueException;
 import run.halo.app.infra.utils.FileUtils;
 import run.halo.app.infra.utils.VersionUtils;
 import run.halo.app.plugin.PluginConst;
-import run.halo.app.plugin.PluginProperties;
 import run.halo.app.plugin.PluginUtils;
+import run.halo.app.plugin.PluginsRootGetter;
 import run.halo.app.plugin.SpringPluginManager;
 import run.halo.app.plugin.YamlPluginDescriptorFinder;
 import run.halo.app.plugin.YamlPluginFinder;
@@ -79,7 +78,7 @@ public class PluginServiceImpl implements PluginService, InitializingBean, Dispo
 
     private final SystemVersionSupplier systemVersion;
 
-    private final PluginProperties pluginProperties;
+    private final PluginsRootGetter pluginsRootGetter;
 
     private final SpringPluginManager pluginManager;
 
@@ -93,11 +92,13 @@ public class PluginServiceImpl implements PluginService, InitializingBean, Dispo
 
     private Clock clock = Clock.systemUTC();
 
-    public PluginServiceImpl(ReactiveExtensionClient client, SystemVersionSupplier systemVersion,
-        PluginProperties pluginProperties, SpringPluginManager pluginManager) {
+    public PluginServiceImpl(ReactiveExtensionClient client,
+        SystemVersionSupplier systemVersion,
+        PluginsRootGetter pluginsRootGetter,
+        SpringPluginManager pluginManager) {
         this.client = client;
         this.systemVersion = systemVersion;
-        this.pluginProperties = pluginProperties;
+        this.pluginsRootGetter = pluginsRootGetter;
         this.pluginManager = pluginManager;
 
         this.jsBundleCache = new BundleCache(".js");
@@ -424,7 +425,7 @@ public class PluginServiceImpl implements PluginService, InitializingBean, Dispo
         return Mono.fromCallable(
                 () -> {
                     var fileName = PluginUtils.generateFileName(plugin);
-                    var pluginRoot = Paths.get(pluginProperties.getPluginsRoot());
+                    var pluginRoot = pluginsRootGetter.get();
                     try {
                         Files.createDirectories(pluginRoot);
                     } catch (IOException e) {

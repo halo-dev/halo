@@ -34,8 +34,6 @@ spring:
 
 halo:
   work-dir: ${user.home}/.halo2
-  plugin:
-    plugins-root: ${halo.work-dir}/plugins
   attachment:
     resource-mappings:
       - pathPattern: /upload/**
