@@ -1,12 +1,10 @@
 package run.halo.app.plugin;
 
 import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Stack;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.lang3.StringUtils;
 import org.pf4j.CompoundPluginLoader;
 import org.pf4j.CompoundPluginRepository;
 import org.pf4j.DefaultPluginManager;
@@ -46,13 +44,16 @@ public class HaloPluginManager extends DefaultPluginManager implements SpringPlu
 
     private final PluginProperties pluginProperties;
 
+    private final PluginsRootGetter pluginsRootGetter;
+
     public HaloPluginManager(ApplicationContext rootContext,
         PluginProperties pluginProperties,
-        SystemVersionSupplier systemVersionSupplier) {
+        SystemVersionSupplier systemVersionSupplier, PluginsRootGetter pluginsRootGetter) {
         this.pluginProperties = pluginProperties;
         this.rootContext = rootContext;
         // We have to initialize share context lazily because the root context has not refreshed
         this.sharedContext = Lazy.of(() -> SharedApplicationContextFactory.create(rootContext));
+        this.pluginsRootGetter = pluginsRootGetter;
         super.runtimeMode = pluginProperties.getRuntimeMode();
 
         setExactVersionAllowed(pluginProperties.isExactVersionAllowed());
@@ -124,11 +125,7 @@ public class HaloPluginManager extends DefaultPluginManager implements SpringPlu
 
     @Override
     protected List<Path> createPluginsRoot() {
-        var pluginsRoot = pluginProperties.getPluginsRoot();
-        if (StringUtils.isNotBlank(pluginsRoot)) {
-            return List.of(Paths.get(pluginsRoot));
-        }
-        return super.createPluginsRoot();
+        return List.of(pluginsRootGetter.get());
     }
 
     @Override

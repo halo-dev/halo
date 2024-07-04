@@ -45,8 +45,11 @@ public class PluginAutoConfiguration {
     @Bean
     public SpringPluginManager pluginManager(ApplicationContext context,
         SystemVersionSupplier systemVersionSupplier,
-        PluginProperties pluginProperties) {
-        return new HaloPluginManager(context, pluginProperties, systemVersionSupplier);
+        PluginProperties pluginProperties,
+        PluginsRootGetter pluginsRootGetter) {
+        return new HaloPluginManager(
+            context, pluginProperties, systemVersionSupplier, pluginsRootGetter
+        );
     }
 
     @Bean
