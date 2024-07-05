@@ -85,6 +85,7 @@ public class DefaultPluginApplicationContextFactory implements PluginApplication
 
         sw.start("RegisterBeans");
         var beanFactory = context.getBeanFactory();
+        beanFactory.registerSingleton("pluginWrapper", pluginWrapper);
         context.registerBean(AggregatedRouterFunction.class);
 
         if (pluginWrapper.getPlugin() instanceof SpringPlugin springPlugin) {
