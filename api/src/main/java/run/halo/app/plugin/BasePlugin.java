@@ -1,8 +1,8 @@
 package run.halo.app.plugin;
 
+import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import org.pf4j.Plugin;
-import org.springframework.lang.NonNull;
 
 /**
  * This class will be extended by all plugins and serve as the common class between a plugin and
@@ -11,10 +11,11 @@ import org.springframework.lang.NonNull;
  * @author guqing
  * @since 2.0.0
  */
+@Getter
 @Slf4j
 public class BasePlugin extends Plugin {
 
-    protected final PluginContext context;
+    protected PluginContext context;
 
     /**
      * Constructor a plugin with the given plugin context.
@@ -25,8 +26,6 @@ public class BasePlugin extends Plugin {
         this.context = pluginContext;
     }
 
-    @NonNull
-    public PluginContext getContext() {
-        return context;
+    public BasePlugin() {
     }
 }
