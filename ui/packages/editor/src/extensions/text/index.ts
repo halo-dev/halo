@@ -1,6 +1,7 @@
 import ColorBubbleItem from "@/extensions/color/ColorBubbleItem.vue";
 import HighlightBubbleItem from "@/extensions/highlight/HighlightBubbleItem.vue";
 import LinkBubbleButton from "@/extensions/link/LinkBubbleButton.vue";
+import { RangeSelection } from "@/extensions/range-selection";
 import { i18n } from "@/locales";
 import type { EditorState } from "@/tiptap/pm";
 import { isActive, isTextSelection } from "@/tiptap/vue-3";
@@ -56,7 +57,10 @@ const Text = TiptapText.extend<ExtensionOptions>({
               return false;
             }
 
-            if (!isTextSelection(selection)) {
+            if (
+              !isTextSelection(selection) &&
+              !(selection instanceof RangeSelection)
+            ) {
               return false;
             }
 
