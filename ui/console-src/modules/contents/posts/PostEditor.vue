@@ -456,10 +456,6 @@ async function handleUploadImage(file: File, options?: AxiosRequestConfig) {
     return;
   }
 
-  if (!isUpdateMode.value) {
-    await handleSave();
-  }
-
   const { data } = await ucApiClient.storage.attachment.createAttachmentForPost(
     {
       file,
