@@ -10,12 +10,14 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.reactive.AutoConfigureWebTestClient;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.context.TestConfiguration;
+import org.springframework.dao.ConcurrencyFailureException;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ProblemDetail;
 import org.springframework.http.ResponseEntity;
 import org.springframework.test.web.reactive.server.WebTestClient;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
@@ -117,6 +119,21 @@ class I18nExceptionTest {
             });
     }
 
+    @Test
+    void shouldGetConflictError() {
+        webClient.put().uri("/response-entity/conflict-error")
+            .header("X-XSRF-TOKEN", "fake-token")
+            .cookie("XSRF-TOKEN", "fake-token")
+            .exchange()
+            .expectStatus().isEqualTo(HttpStatus.CONFLICT)
+            .expectBody(ProblemDetail.class)
+            .value(problemDetail -> {
+                assertEquals("Conflict", problemDetail.getTitle());
+                assertEquals("Conflict detected.",
+                    problemDetail.getDetail());
+            });
+    }
+
     @TestConfiguration
     static class TestConfig {
 
@@ -156,6 +173,10 @@ class I18nExceptionTest {
                 throw new GeneralException("Something went wrong");
             }
 
+            @PutMapping("/conflict-error")
+            ResponseEntity<String> throwConflictException() {
+                throw new ConcurrencyFailureException("Conflict detected");
+            }
         }
     }
 
