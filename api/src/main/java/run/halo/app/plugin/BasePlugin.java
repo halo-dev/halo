@@ -18,10 +18,13 @@ public class BasePlugin extends Plugin {
 
     protected PluginContext context;
 
-    @Deprecated
+    @Deprecated(since = "2.7.0", forRemoval = true)
     public BasePlugin(PluginWrapper wrapper) {
         super(wrapper);
-        log.info("Initialized plugin {}", wrapper.getPluginId());
+        log.warn("Deprecated constructor 'BasePlugin(PluginWrapper wrapper)' called, please use "
+                + "'BasePlugin(PluginContext pluginContext)' instead for plugin '{}',This "
+                + "constructor will be removed in 2.19.0",
+            wrapper.getPluginId());
     }
 
     /**
