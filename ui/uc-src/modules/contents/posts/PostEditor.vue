@@ -422,9 +422,6 @@ async function handleUploadImage(file: File, options?: AxiosRequestConfig) {
   if (!currentUserHasPermission(["uc:attachments:manage"])) {
     return;
   }
-  if (!isUpdateMode.value) {
-    await handleCreate();
-  }
 
   const { data } = await ucApiClient.storage.attachment.createAttachmentForPost(
     {
