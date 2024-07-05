@@ -100,10 +100,7 @@ public class DeviceServiceImpl implements DeviceService {
                     var userAgent =
                         exchange.getRequest().getHeaders().getFirst(HttpHeaders.USER_AGENT);
                     var deviceUa = existingDevice.getSpec().getUserAgent();
-                    var ipAddr = existingDevice.getSpec().getIpAddress();
-                    var clientIp = getClientIp(exchange.getRequest());
-                    if (!StringUtils.equals(deviceUa, userAgent)
-                        || !StringUtils.equals(clientIp, ipAddr)) {
+                    if (!StringUtils.equals(deviceUa, userAgent)) {
                         // User agent changed, create a new device
                         return Mono.empty();
                     }
