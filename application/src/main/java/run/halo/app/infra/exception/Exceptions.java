@@ -10,8 +10,11 @@ import java.util.Map;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.MessageSource;
 import org.springframework.core.annotation.MergedAnnotations;
+import org.springframework.dao.ConcurrencyFailureException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.HttpStatusCode;
+import org.springframework.http.ProblemDetail;
+import org.springframework.lang.NonNull;
 import org.springframework.lang.Nullable;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.web.ErrorResponse;
@@ -33,6 +36,9 @@ public enum Exceptions {
     public static final String REQUEST_NOT_PERMITTED_TYPE =
         "https://halo.run/probs/request-not-permitted";
 
+    public static final String CONFLICT_TYPE =
+        "https://halo.run/probs/conflict";
+
     /**
      * Non-ErrorResponse exception to type map.
      */
@@ -47,22 +53,11 @@ public enum Exceptions {
         if (t instanceof ErrorResponse er) {
             errorResponse = er;
         } else {
-            var responseStatusAnno =
-                MergedAnnotations.from(t.getClass(), TYPE_HIERARCHY).get(ResponseStatus.class);
-            if (status == null) {
-                status = responseStatusAnno.getValue("code", HttpStatus.class)
-                    .orElse(HttpStatus.INTERNAL_SERVER_ERROR);
+            var er = handleConflictException(t);
+            if (er == null) {
+                er = handleException(t, status);
             }
-            var type = EXCEPTION_TYPE_MAP.getOrDefault(t.getClass(), DEFAULT_TYPE);
-            var detail = responseStatusAnno.getValue("reason", String.class)
-                .orElseGet(t::getMessage);
-            var builder = ErrorResponse.builder(t, status, detail)
-                .type(URI.create(type));
-            if (status.is5xxServerError()) {
-                builder.detailMessageCode("problemDetail.internalServerError")
-                    .titleMessageCode("problemDetail.title.internalServerError");
-            }
-            errorResponse = builder.build();
+            errorResponse = er;
         }
         var problemDetail = errorResponse.updateAndGetBody(messageSource, getLocale(exchange));
         problemDetail.setInstance(exchange.getRequest().getURI());
@@ -70,6 +65,39 @@ public enum Exceptions {
         problemDetail.setProperty("timestamp", Instant.now());
         return errorResponse;
     }
+
+    @NonNull
+    private static ErrorResponse handleException(Throwable t, @Nullable HttpStatusCode status) {
+        var responseStatusAnno = MergedAnnotations.from(t.getClass(), TYPE_HIERARCHY)
+            .get(ResponseStatus.class);
+        if (status == null) {
+            status = responseStatusAnno.getValue("code", HttpStatus.class)
+                .orElse(HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+        var type = EXCEPTION_TYPE_MAP.getOrDefault(t.getClass(), DEFAULT_TYPE);
+        var detail = responseStatusAnno.getValue("reason", String.class)
+            .orElseGet(t::getMessage);
+        var builder = ErrorResponse.builder(t, status, detail)
+            .type(URI.create(type));
+        if (status.is5xxServerError()) {
+            builder.detailMessageCode("problemDetail.internalServerError")
+                .titleMessageCode("problemDetail.title.internalServerError");
+        }
+        return builder.build();
+    }
+
+    @Nullable
+    private static ErrorResponse handleConflictException(Throwable t) {
+        if (t instanceof ConcurrencyFailureException) {
+            return ErrorResponse.builder(t, ProblemDetail.forStatus(HttpStatus.CONFLICT))
+                .type(URI.create(CONFLICT_TYPE))
+                .titleMessageCode("problemDetail.title.conflict")
+                .detailMessageCode("problemDetail.conflict")
+                .build();
+        }
+        return null;
+    }
+
 
     public static Locale getLocale(ServerWebExchange exchange) {
         var locale = exchange.getLocaleContext().getLocale();
