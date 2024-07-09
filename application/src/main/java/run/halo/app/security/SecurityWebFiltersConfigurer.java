@@ -2,7 +2,9 @@ package run.halo.app.security;
 
 import static org.springframework.security.config.web.server.SecurityWebFiltersOrder.ANONYMOUS_AUTHENTICATION;
 import static org.springframework.security.config.web.server.SecurityWebFiltersOrder.AUTHENTICATION;
+import static org.springframework.security.config.web.server.SecurityWebFiltersOrder.FIRST;
 import static org.springframework.security.config.web.server.SecurityWebFiltersOrder.FORM_LOGIN;
+import static org.springframework.security.config.web.server.SecurityWebFiltersOrder.LAST;
 
 import lombok.Setter;
 import org.pf4j.ExtensionPoint;
@@ -30,7 +32,12 @@ public class SecurityWebFiltersConfigurer implements SecurityConfigurer {
     public void configure(ServerHttpSecurity http) {
         http
             .addFilterAt(
-                new SecurityWebFilterChainProxy(FormLoginSecurityWebFilter.class), FORM_LOGIN
+                new SecurityWebFilterChainProxy(BeforeSecurityWebFilter.class),
+                FIRST
+            )
+            .addFilterAt(
+                new SecurityWebFilterChainProxy(FormLoginSecurityWebFilter.class),
+                FORM_LOGIN
             )
             .addFilterAt(
                 new SecurityWebFilterChainProxy(AuthenticationSecurityWebFilter.class),
@@ -39,7 +46,12 @@ public class SecurityWebFiltersConfigurer implements SecurityConfigurer {
             .addFilterAt(
                 new SecurityWebFilterChainProxy(AnonymousAuthenticationSecurityWebFilter.class),
                 ANONYMOUS_AUTHENTICATION
-            );
+            )
+            .addFilterAt(
+                new SecurityWebFilterChainProxy(AfterSecurityWebFilter.class),
+                LAST
+            )
+        ;
     }
 
     public class SecurityWebFilterChainProxy implements WebFilter {
