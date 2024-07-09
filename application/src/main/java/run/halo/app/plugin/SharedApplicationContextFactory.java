@@ -62,6 +62,10 @@ public enum SharedApplicationContextFactory {
             rootContext.getBean(CacheManager.class));
         beanFactory.registerSingleton("loginHandlerEnhancer",
             rootContext.getBean(LoginHandlerEnhancer.class));
+        rootContext.getBeanProvider(PluginsRootGetter.class)
+            .ifUnique(pluginsRootGetter ->
+                beanFactory.registerSingleton("pluginsRootGetter", pluginsRootGetter)
+            );
         // TODO add more shared instance here
 
         sharedContext.refresh();

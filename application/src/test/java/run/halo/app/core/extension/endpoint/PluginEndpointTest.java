@@ -55,14 +55,10 @@ import run.halo.app.extension.Metadata;
 import run.halo.app.extension.ReactiveExtensionClient;
 import run.halo.app.infra.SystemVersionSupplier;
 import run.halo.app.infra.utils.FileUtils;
-import run.halo.app.plugin.PluginProperties;
 
 @Slf4j
 @ExtendWith(MockitoExtension.class)
 class PluginEndpointTest {
-
-    @Mock
-    PluginProperties pluginProperties;
 
     @Mock
     private ReactiveExtensionClient client;
@@ -221,8 +217,6 @@ class PluginEndpointTest {
 
             lenient().when(systemVersionSupplier.get()).thenReturn(Version.valueOf("0.0.0"));
             tempDirectory = Files.createTempDirectory("halo-test-plugin-upgrade-");
-            lenient().when(pluginProperties.getPluginsRoot())
-                .thenReturn(tempDirectory.resolve("plugins").toString());
             plugin002 = tempDirectory.resolve("plugin-0.0.2.jar");
 
             var plugin002Uri = requireNonNull(

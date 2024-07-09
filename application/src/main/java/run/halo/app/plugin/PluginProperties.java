@@ -60,10 +60,4 @@ public class PluginProperties {
      */
     private RuntimeMode runtimeMode = RuntimeMode.DEPLOYMENT;
 
-    /**
-     * Plugin root directory: default “plugins”; when non-jar mode plugin, the value should be an
-     * absolute directory address.
-     */
-    private String pluginsRoot;
-
 }

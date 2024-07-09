@@ -1,8 +1,9 @@
 package run.halo.app.plugin;
 
+import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import org.pf4j.Plugin;
-import org.springframework.lang.NonNull;
+import org.pf4j.PluginWrapper;
 
 /**
  * This class will be extended by all plugins and serve as the common class between a plugin and
@@ -11,10 +12,11 @@ import org.springframework.lang.NonNull;
  * @author guqing
  * @since 2.0.0
  */
+@Getter
 @Slf4j
 public class BasePlugin extends Plugin {
 
-    protected final PluginContext context;
+    protected PluginContext context;
 
     /**
      * Constructor a plugin with the given plugin context.
@@ -25,8 +27,15 @@ public class BasePlugin extends Plugin {
         this.context = pluginContext;
     }
 
-    @NonNull
-    public PluginContext getContext() {
-        return context;
+    @Deprecated(since = "2.7.0", forRemoval = true)
+    public BasePlugin(PluginWrapper wrapper) {
+        super(wrapper);
+        log.warn("Deprecated constructor 'BasePlugin(PluginWrapper wrapper)' called, please use "
+                + "'BasePlugin(PluginContext pluginContext)' instead for plugin '{}',This "
+                + "constructor will be removed in 2.19.0",
+            wrapper.getPluginId());
+    }
+
+    public BasePlugin() {
     }
 }
