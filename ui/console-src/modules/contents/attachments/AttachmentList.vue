@@ -540,6 +540,7 @@ onMounted(() => {
                           attachment?.spec.mediaType?.startsWith('video/')
                         "
                         :src="attachment.status?.permalink"
+                        classes="object-cover group-hover:opacity-75"
                       >
                         <template #loading>
                           <AttachmentLoading />
