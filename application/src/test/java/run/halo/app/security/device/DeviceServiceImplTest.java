@@ -25,7 +25,7 @@ class DeviceServiceImplTest {
     }
 
     @Test
-    void test() {
+    void instantFormatTest() {
         var instant = Instant.parse("2024-07-10T00:30:00.00Z");
         assertThat(instant.toString()).isEqualTo("2024-07-10T00:30:00Z");
         var dateTimeFormatter = DateTimeFormatter.ofPattern("yyyy/MM/dd hh:mm:ss")
