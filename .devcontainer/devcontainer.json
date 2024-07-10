@@ -1,0 +1,49 @@
+// For format details, see https://aka.ms/devcontainer.json. For config options, see the
+// README at: https://github.com/devcontainers/templates/tree/main/src/docker-in-docker
+{
+    "name": "Halo Dev Container",
+    // Or use a Dockerfile or Docker Compose file. More info: https://containers.dev/guide/dockerfile
+    "image": "mcr.microsoft.com/devcontainers/base:bullseye",
+
+    "features": {
+        "ghcr.io/devcontainers/features/docker-in-docker:2": {
+            "version": "20.10",
+            "enableNonRootDocker": "true",
+            "moby": "true"
+        },
+        "ghcr.io/devcontainers/features/java:1": {
+            "version": "17",
+            "jdkDistro": "tem"
+        },
+        "ghcr.io/devcontainers/features/node:1": {
+            "version": "20"
+        },
+        "ghcr.io/devcontainers/features/github-cli:1": {}
+    },
+    "customizations": {
+        "vscode": {
+            "extensions": [
+                "Vue.volar",
+                "vscodevim.vim",
+                "shengchen.vscode-checkstyle",
+                "streetsidesoftware.code-spell-checker",
+                "vscjava.vscode-gradle",
+                "vmware.vscode-boot-dev-pack",
+                "vscjava.vscode-java-pack",
+                "bradlc.vscode-tailwindcss"
+            ]
+        }
+    }
+
+    // Use 'forwardPorts' to make a list of ports inside the container available locally.
+    // "forwardPorts": [],
+
+    // Use 'postCreateCommand' to run commands after the container is created.
+    // "postCreateCommand": "docker --version",
+
+    // Configure tool-specific properties.
+    // "customizations": {},
+
+    // Uncomment to connect as root instead. More info: https://aka.ms/dev-containers-non-root.
+    // "remoteUser": "root"
+}
