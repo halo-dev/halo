@@ -35,9 +35,12 @@ import AttachmentGroupList from "./components/AttachmentGroupList.vue";
 import AttachmentListItem from "./components/AttachmentListItem.vue";
 import AttachmentPoliciesModal from "./components/AttachmentPoliciesModal.vue";
 import AttachmentUploadModal from "./components/AttachmentUploadModal.vue";
+import AttachmentLoading from "./components/AttachmentLoading.vue";
+import AttachmentError from "./components/AttachmentError.vue";
 import { useAttachmentControl } from "./composables/use-attachment";
 import { useFetchAttachmentGroup } from "./composables/use-attachment-group";
 import { useFetchAttachmentPolicy } from "./composables/use-attachment-policy";
+import LazyVideo from "@/components/video/LazyVideo.vue";
 
 const { t } = useI18n();
 
@@ -526,24 +529,26 @@ onMounted(() => {
                         classes="pointer-events-none object-cover group-hover:opacity-75 transform-gpu"
                       >
                         <template #loading>
-                          <div
-                            class="flex h-full items-center justify-center object-cover"
-                          >
-                            <span class="text-xs text-gray-400">
-                              {{ $t("core.common.status.loading") }}...
-                            </span>
-                          </div>
+                          <AttachmentLoading />
                         </template>
                         <template #error>
-                          <div
-                            class="flex h-full items-center justify-center object-cover"
-                          >
-                            <span class="text-xs text-red-400">
-                              {{ $t("core.common.status.loading_error") }}
-                            </span>
-                          </div>
+                          <AttachmentError />
                         </template>
                       </LazyImage>
+                      <LazyVideo
+                        v-else-if="
+                          attachment?.spec.mediaType?.startsWith('video/')
+                        "
+                        :src="attachment.status?.permalink"
+                        classes="object-cover group-hover:opacity-75"
+                      >
+                        <template #loading>
+                          <AttachmentLoading />
+                        </template>
+                        <template #error>
+                          <AttachmentError />
+                        </template>
+                      </LazyVideo>
                       <AttachmentFileTypeIcon
                         v-else
                         :file-name="attachment.spec.displayName"
