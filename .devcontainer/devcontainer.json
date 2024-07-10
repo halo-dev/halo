@@ -19,6 +19,20 @@
             "version": "20"
         },
         "ghcr.io/devcontainers/features/github-cli:1": {}
+    },
+    "customizations": {
+        "vscode": {
+            "extensions": [
+                "Vue.volar",
+                "vscodevim.vim",
+                "shengchen.vscode-checkstyle",
+                "streetsidesoftware.code-spell-checker",
+                "vscjava.vscode-gradle",
+                "vmware.vscode-boot-dev-pack",
+                "vscjava.vscode-java-pack",
+                "bradlc.vscode-tailwindcss"
+            ]
+        }
     }
 
     // Use 'forwardPorts' to make a list of ports inside the container available locally.
