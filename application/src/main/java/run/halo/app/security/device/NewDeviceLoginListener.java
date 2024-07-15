@@ -28,7 +28,7 @@ import run.halo.app.notification.UserIdentity;
 public class NewDeviceLoginListener implements ApplicationListener<NewDeviceLoginEvent> {
     static final String REASON_TYPE = "new-device-login";
     private static final DateTimeFormatter DATE_TIME_FORMATTER
-        = DateTimeFormatter.ofPattern("yyyy/MM/dd hh:mm:ss").withZone(ZoneOffset.systemDefault());
+        = DateTimeFormatter.ofPattern("yyyy/MM/dd hh:mm:ss ").withZone(ZoneOffset.systemDefault());
     private final NotificationCenter notificationCenter;
     private final NotificationReasonEmitter notificationReasonEmitter;
 
@@ -48,7 +48,8 @@ public class NewDeviceLoginListener implements ApplicationListener<NewDeviceLogi
             attributes.put("browser", device.getStatus().getBrowser());
             attributes.put("ipAddress", device.getSpec().getIpAddress());
             var lastLogin = device.getSpec().getLastAuthenticatedTime();
-            attributes.put("loginTime", DATE_TIME_FORMATTER.format(lastLogin));
+            attributes.put("loginTime",
+                DATE_TIME_FORMATTER.format(lastLogin) + ZoneOffset.systemDefault());
             builder.attributes(attributes)
                 .author(UserIdentity.of(device.getSpec().getPrincipalName()))
                 .subject(Reason.Subject.builder()

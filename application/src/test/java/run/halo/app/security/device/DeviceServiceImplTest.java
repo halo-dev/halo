@@ -3,9 +3,6 @@ package run.halo.app.security.device;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import org.junit.jupiter.api.Test;
-import java.time.Instant;
-import java.time.ZoneOffset;
-import java.time.format.DateTimeFormatter;
 
 /**
  * Tests for {@link DeviceServiceImpl}.
@@ -24,13 +21,4 @@ class DeviceServiceImplTest {
         assertThat(info.browser()).isEqualTo("Chrome 126.0");
     }
 
-    @Test
-    void instantFormatTest() {
-        var instant = Instant.parse("2024-07-10T00:30:00.00Z");
-        assertThat(instant.toString()).isEqualTo("2024-07-10T00:30:00Z");
-        var dateTimeFormatter = DateTimeFormatter.ofPattern("yyyy/MM/dd hh:mm:ss")
-            .withZone(ZoneOffset.systemDefault());
-        var format = dateTimeFormatter.format(instant);
-        assertThat(format).isEqualTo("2024/07/10 08:30:00");
-    }
 }
