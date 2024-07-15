@@ -2,6 +2,7 @@ package run.halo.app.search.post;
 
 import org.springframework.stereotype.Component;
 import reactor.core.publisher.Flux;
+import reactor.core.publisher.Mono;
 import run.halo.app.content.ContentWrapper;
 import run.halo.app.content.PostService;
 import run.halo.app.core.extension.content.Post;
@@ -36,6 +37,11 @@ public class PostHaloDocumentsProvider implements HaloDocumentsProvider {
         // get content
         return paginatedOperator.list(Post.class, options)
             .flatMap(post -> postService.getReleaseContent(post)
+                .switchIfEmpty(Mono.fromSupplier(() -> ContentWrapper.builder()
+                    .content("")
+                    .raw("")
+                    .rawType("")
+                    .build()))
                 .map(contentWrapper -> convert(post, contentWrapper))
             );
     }

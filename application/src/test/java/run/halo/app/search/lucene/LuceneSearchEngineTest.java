@@ -2,6 +2,7 @@ package run.halo.app.search.lucene;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertInstanceOf;
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.assertArg;
@@ -160,7 +161,7 @@ class LuceneSearchEngineTest {
         var gotHaloDoc = result.getHits().get(0);
         assertEquals("fake-id", gotHaloDoc.getId());
         assertEquals("<fake-tag>fake</fake-tag>-title", gotHaloDoc.getTitle());
-        assertEquals("<fake-tag>fake</fake-tag>-desc", gotHaloDoc.getDescription());
+        assertNull(gotHaloDoc.getDescription());
         assertEquals("<fake-tag>fake</fake-tag>-content", gotHaloDoc.getContent());
     }
 
@@ -169,13 +170,13 @@ class LuceneSearchEngineTest {
         haloDoc.setId("fake-id");
         haloDoc.setMetadataName("fake-name");
         haloDoc.setTitle("fake-title");
-        haloDoc.setDescription("fake-desc");
+        haloDoc.setDescription(null);
         haloDoc.setContent("fake-content");
         haloDoc.setType("fake-type");
         haloDoc.setOwnerName("fake-owner");
         var now = Instant.now();
         haloDoc.setCreationTimestamp(now);
-        haloDoc.setUpdateTimestamp(now);
+        haloDoc.setUpdateTimestamp(null);
         haloDoc.setPermalink("/fake-permalink");
         haloDoc.setAnnotations(Map.of("fake-anno-key", "fake-anno-value"));
         return haloDoc;
