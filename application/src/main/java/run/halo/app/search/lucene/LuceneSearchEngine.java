@@ -194,8 +194,11 @@ public class LuceneSearchEngine implements SearchEngine, InitializingBean, Dispo
                 }
 
                 var description = doc.get("description");
-                var hlDescription =
-                    highlighter.getBestFragment(this.analyzer, "description", description);
+                String hlDescription = null;
+                if (description != null) {
+                    hlDescription =
+                        highlighter.getBestFragment(this.analyzer, "description", description);
+                }
 
                 var content = doc.get("content");
                 var hlContent = highlighter.getBestFragment(this.analyzer, "content", content);
@@ -310,7 +313,9 @@ public class LuceneSearchEngine implements SearchEngine, InitializingBean, Dispo
             }
 
             doc.add(new TextField("title", haloDoc.getTitle(), YES));
-            doc.add(new TextField("description", haloDoc.getDescription(), YES));
+            if (haloDoc.getDescription() != null) {
+                doc.add(new TextField("description", haloDoc.getDescription(), YES));
+            }
             doc.add(new TextField("content", haloDoc.getContent(), YES));
             doc.add(new StringField("recycled", Boolean.toString(haloDoc.isRecycled()), YES));
             doc.add(new StringField("exposed", Boolean.toString(haloDoc.isExposed()), YES));
@@ -335,7 +340,9 @@ public class LuceneSearchEngine implements SearchEngine, InitializingBean, Dispo
             var creationTimestamp = haloDoc.getCreationTimestamp();
             doc.add(new LongField("creationTimestamp", creationTimestamp.toEpochMilli(), YES));
             var updateTimestamp = haloDoc.getUpdateTimestamp();
-            doc.add(new LongField("updateTimestamp", updateTimestamp.toEpochMilli(), YES));
+            if (updateTimestamp != null) {
+                doc.add(new LongField("updateTimestamp", updateTimestamp.toEpochMilli(), YES));
+            }
             doc.add(new StringField("permalink", haloDoc.getPermalink(), YES));
             return doc;
         }
@@ -375,8 +382,11 @@ public class LuceneSearchEngine implements SearchEngine, InitializingBean, Dispo
 
             var creationTimestamp = doc.getField("creationTimestamp").numericValue().longValue();
             haloDoc.setCreationTimestamp(Instant.ofEpochMilli(creationTimestamp));
-            var updateTimestamp = doc.getField("updateTimestamp").numericValue().longValue();
-            haloDoc.setUpdateTimestamp(Instant.ofEpochMilli(updateTimestamp));
+            var updateTimestampField = doc.getField("updateTimestamp");
+            if (updateTimestampField != null) {
+                var updateTimestamp = updateTimestampField.numericValue().longValue();
+                haloDoc.setUpdateTimestamp(Instant.ofEpochMilli(updateTimestamp));
+            }
             // handle content later
             return haloDoc;
         }

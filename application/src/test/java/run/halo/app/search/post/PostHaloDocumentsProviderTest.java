@@ -56,7 +56,23 @@ class PostHaloDocumentsProviderTest {
                 assertEquals("fake-content", doc.getContent());
             })
             .verifyComplete();
+    }
 
+    @Test
+    void shouldFetchAllIfNoContent() {
+        var post = createFakePost();
+        when(paginatedOperator.list(same(Post.class), any(ListOptions.class)))
+            .thenReturn(Flux.just(post));
+        when(postService.getReleaseContent(post)).thenReturn(Mono.empty());
+        provider.fetchAll()
+            .as(StepVerifier::create)
+            .assertNext(doc -> {
+                assertEquals("post.content.halo.run", doc.getType());
+                assertEquals("fake-post", doc.getMetadataName());
+                assertEquals("post.content.halo.run-fake-post", doc.getId());
+                assertEquals("", doc.getContent());
+            })
+            .verifyComplete();
     }
 
     Post createFakePost() {
