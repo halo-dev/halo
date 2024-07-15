@@ -112,7 +112,7 @@ public class PersistentTokenBasedRememberMeServices extends TokenBasedRememberMe
                 log.debug("Refreshing persistent login token for user '{}', series '{}'",
                     token.getUsername(), token.getSeries());
                 var newToken = new PersistentRememberMeToken(token.getUsername(), token.getSeries(),
-                    generateTokenData(), new Date());
+                    token.getTokenValue(), new Date());
                 return Mono.just(newToken);
             })
             .flatMap(newToken -> updateToken(newToken)
