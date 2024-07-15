@@ -1,7 +1,5 @@
 package run.halo.app.security.device;
 
-import java.time.ZoneOffset;
-import java.time.format.DateTimeFormatter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.ApplicationListener;
 import org.springframework.lang.NonNull;
@@ -27,8 +25,6 @@ import run.halo.app.notification.UserIdentity;
 @RequiredArgsConstructor
 public class NewDeviceLoginListener implements ApplicationListener<NewDeviceLoginEvent> {
     static final String REASON_TYPE = "new-device-login";
-    private static final DateTimeFormatter DATE_TIME_FORMATTER
-        = DateTimeFormatter.ofPattern("yyyy/MM/dd hh:mm:ss ").withZone(ZoneOffset.systemDefault());
     private final NotificationCenter notificationCenter;
     private final NotificationReasonEmitter notificationReasonEmitter;
 
@@ -47,9 +43,7 @@ public class NewDeviceLoginListener implements ApplicationListener<NewDeviceLogi
             attributes.put("os", device.getStatus().getOs());
             attributes.put("browser", device.getStatus().getBrowser());
             attributes.put("ipAddress", device.getSpec().getIpAddress());
-            var lastLogin = device.getSpec().getLastAuthenticatedTime();
-            attributes.put("loginTime",
-                DATE_TIME_FORMATTER.format(lastLogin) + ZoneOffset.systemDefault());
+            attributes.put("loginTime", device.getSpec().getLastAuthenticatedTime());
             builder.attributes(attributes)
                 .author(UserIdentity.of(device.getSpec().getPrincipalName()))
                 .subject(Reason.Subject.builder()
