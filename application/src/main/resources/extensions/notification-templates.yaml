@@ -168,7 +168,7 @@ spec:
       [(${subscriber.displayName})] 你好：
 
         你的 [(${site.title})] 账号被用于在 [(${os})] 的 [(${browser})] 上登录。
-        时间：[(${loginTime})] 
+        时间：[(${loginTime})]
         IP 地址：[(${ipAddress})] 
         如果你知悉上述信息，请忽略此电子邮件。
         如果你最近没有使用你的 Halo 账号登录并相信有人可能访问了你的账户，请尽快重设你的密码。
@@ -180,8 +180,8 @@ spec:
         <div class="body">
           <p th:text="|你的 ${site.title} 账号被用于在 ${os} 的 ${browser} 上登录：|"></p>
           <div class="device-info">
-            <p th:text="|时间： ${loginTime}。|"></p>
-            <p th:text="|IP 地址： ${ipAddress}。|"></p>
+            <p th:text="|时间： ${loginTime}|"></p>
+            <p th:text="|IP 地址： ${ipAddress}|"></p>
           </div>
           <p>如果你知悉上述信息，请忽略此电子邮件。</p>
           <p th:text="|如果你最近没有使用你的 ${site.title} 账号登录并相信有人可能访问了你的账户，请尽快重设你的密码。|"></p>
