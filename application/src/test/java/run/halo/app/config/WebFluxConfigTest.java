@@ -144,4 +144,14 @@ class WebFluxConfigTest {
         }
     }
 
+    @Nested
+    class StaticResourcesTest {
+
+        @Test
+        void shouldRespond404WhenThemeResourceNotFound() {
+            webClient.get().uri("/themes/fake-theme/assets/favicon.ico")
+                .exchange()
+                .expectStatus().isNotFound();
+        }
+    }
 }
