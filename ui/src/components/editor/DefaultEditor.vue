@@ -451,6 +451,13 @@ const currentLocale = i18n.global.locale.value as
 function onTitleInput(event: Event) {
   emit("update:title", (event.target as HTMLInputElement).value);
 }
+
+function handleFocusEditor(event) {
+  if (event.isComposing) {
+    return;
+  }
+  editor.value?.commands.focus("start");
+}
 </script>
 
 <template>
@@ -470,7 +477,7 @@ function onTitleInput(event: Event) {
           :placeholder="$t('core.components.default_editor.title_placeholder')"
           class="w-full border-x-0 !border-b border-t-0 !border-solid !border-gray-100 p-0 !py-2 text-4xl font-semibold placeholder:text-gray-300"
           @input="onTitleInput"
-          @keydown.enter="() => editor?.commands.focus('start')"
+          @keydown.enter="handleFocusEditor"
         />
       </template>
       <template v-if="showSidebar" #extra>
