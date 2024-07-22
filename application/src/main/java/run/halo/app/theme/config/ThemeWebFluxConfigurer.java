@@ -80,6 +80,9 @@ public class ThemeWebFluxConfigurer implements WebFluxConfigurer {
             var assetsPath = themeRoot.resolve(themeName + "/templates/assets/" + resourcePaths);
             FileUtils.checkDirectoryTraversal(themeRoot, assetsPath);
             var location = new FileSystemResource(assetsPath);
+            if (!location.isReadable()) {
+                return Mono.empty();
+            }
             return Mono.just(location);
         }
 
