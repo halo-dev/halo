@@ -27,6 +27,8 @@ public class IpAddressUtils {
         "HTTP_FORWARDED",
         "HTTP_VIA",
         "REMOTE_ADDR",
+        "X-Forwarded-Proto",
+        "X-Forwarded-Host"
     };
 
     /**
