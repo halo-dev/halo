@@ -2,7 +2,7 @@
   "openapi": "3.0.1",
   "info": {
     "title": "Halo",
-    "version": "2.17.0-SNAPSHOT"
+    "version": "2.18.0-SNAPSHOT"
   },
   "servers": [
     {
@@ -19726,12 +19726,12 @@
           },
           "visible": {
             "type": "string",
+            "default": "PUBLIC",
             "enum": [
               "PUBLIC",
               "INTERNAL",
               "PRIVATE"
-            ],
-            "default": "PUBLIC"
+            ]
           }
         }
       },
@@ -19861,6 +19861,15 @@
           }
         }
       },
+      "ReasonAttributes": {
+        "type": "object",
+        "properties": {
+          "empty": {
+            "type": "boolean"
+          }
+        },
+        "description": "Attributes used to transfer data"
+      },
       "ReasonList": {
         "required": [
           "first",
@@ -19971,13 +19980,7 @@
         "type": "object",
         "properties": {
           "attributes": {
-            "type": "object",
-            "properties": {
-              "empty": {
-                "type": "boolean"
-              }
-            },
-            "description": "Attributes used to transfer data"
+            "$ref": "#/components/schemas/ReasonAttributes"
           },
           "author": {
             "type": "string"
@@ -21207,11 +21210,8 @@
           "data": {
             "type": "object",
             "additionalProperties": {
-              "type": "array",
-              "items": {
-                "type": "string",
-                "format": "byte"
-              }
+              "type": "string",
+              "format": "byte"
             }
           },
           "kind": {
@@ -21626,12 +21626,12 @@
           },
           "visible": {
             "type": "string",
+            "default": "PUBLIC",
             "enum": [
               "PUBLIC",
               "INTERNAL",
               "PRIVATE"
-            ],
-            "default": "PUBLIC"
+            ]
           }
         }
       },
