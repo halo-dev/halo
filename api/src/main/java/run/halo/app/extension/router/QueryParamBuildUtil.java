@@ -30,6 +30,7 @@ public class QueryParamBuildUtil {
     public static void buildParametersFromType(Builder operationBuilder, Type queryParamType) {
         log.warn(
             "Deprecated method QueryParamBuildUtil.buildParametersFromType is called, please use "
-                + "'org.springdoc.core.fn.builders.operation.Builder#parameter' method instead.");
+                + "'org.springdoc.core.fn.builders.operation.Builder#parameter' method instead."
+                + "This method will be removed in Halo 2.20.0 version.");
     }
 }
