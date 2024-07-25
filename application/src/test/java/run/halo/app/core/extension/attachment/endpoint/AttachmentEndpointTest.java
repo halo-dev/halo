@@ -314,7 +314,7 @@ class AttachmentEndpointTest {
             DataBuffer dataBuffer = mock(DataBuffer.class);
 
             when(handler.upload(any())).thenReturn(Mono.just(attachment));
-            when(dataBufferFetcher.getHEAD(any())).thenReturn(Mono.just(response));
+            when(dataBufferFetcher.head(any())).thenReturn(Mono.just(response));
             when(dataBufferFetcher.fetch(any())).thenReturn(Flux.just(dataBuffer));
             when(extensionGetter.getExtensions(AttachmentHandler.class))
                 .thenReturn(Flux.just(handler));
@@ -340,7 +340,7 @@ class AttachmentEndpointTest {
             verify(client).get(Policy.class, "fake-policy");
             verify(client).get(ConfigMap.class, "fake-configmap");
             verify(client).create(attachment);
-            verify(dataBufferFetcher).getHEAD(any());
+            verify(dataBufferFetcher).head(any());
             verify(dataBufferFetcher).fetch(any());
             verify(handler).upload(any());
         }

@@ -20,7 +20,10 @@ rules:
   - apiGroups: [ "" ]
     resources: [ "settings" ]
     verbs: [ "get" ]
-  - nonResourceURLs: [ "/apis/api.console.halo.run/v1alpha1/attachments/upload" ]
+  - nonResourceURLs: [
+      "/apis/api.console.halo.run/v1alpha1/attachments/upload",
+      "/apis/api.console.halo.run/v1alpha1/attachments/-/upload-from-url"
+    ]
     verbs: [ "create" ]
 ---
 apiVersion: v1alpha1

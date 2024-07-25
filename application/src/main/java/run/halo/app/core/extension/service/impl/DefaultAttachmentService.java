@@ -1,8 +1,10 @@
 package run.halo.app.core.extension.service.impl;
 
 import java.net.URI;
+import java.net.URL;
 import java.nio.file.Paths;
 import java.time.Duration;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Consumer;
 import java.util.function.Function;
@@ -140,29 +142,30 @@ public class DefaultAttachmentService implements AttachmentService {
     }
 
     @Override
-    public Mono<Attachment> externalTransfer(@NonNull URI externalUrl, @NonNull String policyName,
+    public Mono<Attachment> uploadFromUrl(@NonNull URL url, @NonNull String policyName,
         String groupName, String filename) {
-        // TODO for the same link, you need to have a cache.
-
+        // TODO validate url
+        var uri = URI.create(url.toString());
         AtomicReference<MediaType> mediaTypeRef = new AtomicReference<>();
         AtomicReference<String> fileNameRef = new AtomicReference<>(filename);
 
-        Mono<Flux<DataBuffer>> contentMono = dataBufferFetcher.getHEAD(externalUrl)
+        Mono<Flux<DataBuffer>> contentMono = dataBufferFetcher.head(uri)
             .map(response -> {
                 var httpHeaders = response.getHeaders();
                 if (!StringUtils.hasText(fileNameRef.get())) {
-                    fileNameRef.set(getExternalUrlFilename(externalUrl, httpHeaders));
+                    fileNameRef.set(getExternalUrlFilename(uri, httpHeaders));
                 }
                 MediaType contentType = httpHeaders.getContentType();
                 mediaTypeRef.set(contentType);
                 // TODO validate media type
                 return response;
             })
-            .map(response -> dataBufferFetcher.fetch(externalUrl));
+            .map(response -> dataBufferFetcher.fetch(uri));
 
         return contentMono.flatMap(
                 (content) -> upload(policyName, groupName, fileNameRef.get(), content,
-                    mediaTypeRef.get()))
+                    mediaTypeRef.get())
+            )
             .onErrorResume(throwable -> Mono.error(
                 new ServerWebInputException(
                     "Failed to transfer the attachment from the external URL."))

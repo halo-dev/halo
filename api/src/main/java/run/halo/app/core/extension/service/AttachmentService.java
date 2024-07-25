@@ -1,6 +1,7 @@
 package run.halo.app.core.extension.service;
 
 import java.net.URI;
+import java.net.URL;
 import java.time.Duration;
 import java.util.function.Consumer;
 import org.springframework.core.io.buffer.DataBuffer;
@@ -94,12 +95,12 @@ public interface AttachmentService {
     /**
      * Transfer external links to attachments.
      *
-     * @param externalUrl external url
+     * @param url external url
      * @param policyName policy name
      * @param groupName group name
      * @param filename filename
      * @return attachment
      */
-    Mono<Attachment> externalTransfer(@NonNull URI externalUrl, @NonNull String policyName,
+    Mono<Attachment> uploadFromUrl(@NonNull URL url, @NonNull String policyName,
         String groupName, String filename);
 }

@@ -35,7 +35,7 @@ public class DefaultReactiveUrlDataBufferFetcher implements ReactiveUrlDataBuffe
     }
 
     @Override
-    public Mono<ResponseEntity<Void>> getHEAD(URI uri) {
+    public Mono<ResponseEntity<Void>> head(URI uri) {
         return webClient.head()
             .uri(uri)
             .retrieve()

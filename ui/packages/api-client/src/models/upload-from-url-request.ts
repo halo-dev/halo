@@ -17,32 +17,32 @@
 /**
  * 
  * @export
- * @interface ExternalTransferRequest
+ * @interface UploadFromUrlRequest
  */
-export interface ExternalTransferRequest {
+export interface UploadFromUrlRequest {
     /**
      * 
      * @type {string}
-     * @memberof ExternalTransferRequest
-     */
-    'externalUrl': string;
-    /**
-     * 
-     * @type {string}
-     * @memberof ExternalTransferRequest
+     * @memberof UploadFromUrlRequest
      */
     'filename'?: string;
     /**
      * 
      * @type {string}
-     * @memberof ExternalTransferRequest
+     * @memberof UploadFromUrlRequest
      */
     'groupName'?: string;
     /**
      * 
      * @type {string}
-     * @memberof ExternalTransferRequest
+     * @memberof UploadFromUrlRequest
      */
     'policyName': string;
+    /**
+     * 
+     * @type {string}
+     * @memberof UploadFromUrlRequest
+     */
+    'url': string;
 }
 

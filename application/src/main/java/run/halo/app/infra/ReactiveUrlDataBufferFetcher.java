@@ -28,5 +28,5 @@ public interface ReactiveUrlDataBufferFetcher {
      * @param uri uri to fetch
      * @return response entity
      */
-    Mono<ResponseEntity<Void>> getHEAD(URI uri);
+    Mono<ResponseEntity<Void>> head(URI uri);
 }

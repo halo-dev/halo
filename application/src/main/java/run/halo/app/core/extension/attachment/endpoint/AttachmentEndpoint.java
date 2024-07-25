@@ -22,7 +22,7 @@ import static run.halo.app.extension.router.selector.SelectorUtil.labelAndFieldS
 import io.swagger.v3.oas.annotations.enums.ParameterIn;
 import io.swagger.v3.oas.annotations.media.ArraySchema;
 import io.swagger.v3.oas.annotations.media.Schema;
-import java.net.URI;
+import java.net.URL;
 import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
@@ -60,7 +60,6 @@ import run.halo.app.extension.router.IListRequest;
 import run.halo.app.extension.router.IListRequest.QueryListRequest;
 import run.halo.app.extension.router.QueryParamBuildUtil;
 import run.halo.app.extension.router.selector.LabelSelector;
-import run.halo.app.infra.utils.PathUtils;
 
 @Slf4j
 @Component
@@ -105,14 +104,14 @@ public class AttachmentEndpoint implements CustomEndpoint {
                         ))
                     .response(responseBuilder().implementation(Attachment.class))
                     .build())
-            .POST("/attachments/external-transfer", contentType(MediaType.APPLICATION_JSON),
-                request -> request.bodyToMono(ExternalTransferRequest.class)
-                    .flatMap(externalTransferRequest -> {
-                        var externalUrl = externalTransferRequest.externalUrl();
-                        var policyName = externalTransferRequest.policyName();
-                        var groupName = externalTransferRequest.groupName();
-                        var fileName = externalTransferRequest.filename();
-                        return attachmentService.externalTransfer(externalUrl, policyName,
+            .POST("/attachments/-/upload-from-url", contentType(MediaType.APPLICATION_JSON),
+                request -> request.bodyToMono(UploadFromUrlRequest.class)
+                    .flatMap(uploadFromUrlRequest -> {
+                        var url = uploadFromUrlRequest.url();
+                        var policyName = uploadFromUrlRequest.policyName();
+                        var groupName = uploadFromUrlRequest.groupName();
+                        var fileName = uploadFromUrlRequest.filename();
+                        return attachmentService.uploadFromUrl(url, policyName,
                             groupName, fileName);
                     })
                     .flatMap(attachment -> ServerResponse.ok().bodyValue(attachment)),
@@ -123,7 +122,7 @@ public class AttachmentEndpoint implements CustomEndpoint {
                         .required(true)
                         .content(contentBuilder()
                             .mediaType(MediaType.APPLICATION_JSON_VALUE)
-                            .schema(schemaBuilder().implementation(ExternalTransferRequest.class))
+                            .schema(schemaBuilder().implementation(UploadFromUrlRequest.class))
                         ))
                     .response(responseBuilder().implementation(Attachment.class))
                     .build())
@@ -300,13 +299,13 @@ public class AttachmentEndpoint implements CustomEndpoint {
         }
     }
 
-    public record ExternalTransferRequest(@Schema(requiredMode = REQUIRED) URI externalUrl,
-                                          @Schema(requiredMode = REQUIRED) String policyName,
-                                          String groupName,
-                                          String filename) {
-        public ExternalTransferRequest {
-            if (Objects.isNull(externalUrl) || !PathUtils.isAbsoluteUri(externalUrl.toString())) {
-                throw new ServerWebInputException("External URL must be an absolute URL.");
+    public record UploadFromUrlRequest(@Schema(requiredMode = REQUIRED) URL url,
+                                       @Schema(requiredMode = REQUIRED) String policyName,
+                                       String groupName,
+                                       String filename) {
+        public UploadFromUrlRequest {
+            if (Objects.isNull(url)) {
+                throw new ServerWebInputException("Required url is missing.");
             }
 
             if (!StringUtils.hasText(policyName)) {

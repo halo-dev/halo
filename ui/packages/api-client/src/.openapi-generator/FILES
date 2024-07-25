@@ -150,7 +150,6 @@ models/extension-point-definition.ts
 models/extension-point-spec.ts
 models/extension-spec.ts
 models/extension.ts
-models/external-transfer-request.ts
 models/file-reverse-proxy-provider.ts
 models/grant-request.ts
 models/group-kind.ts
@@ -320,6 +319,7 @@ models/totp-auth-link-response.ts
 models/totp-request.ts
 models/two-factor-auth-settings.ts
 models/upgrade-from-uri-request.ts
+models/upload-from-url-request.ts
 models/user-connection-list.ts
 models/user-connection-spec.ts
 models/user-connection.ts
