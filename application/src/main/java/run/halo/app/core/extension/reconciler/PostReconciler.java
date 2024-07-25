@@ -10,6 +10,7 @@ import static run.halo.app.extension.ExtensionUtil.removeFinalizers;
 import static run.halo.app.extension.MetadataUtil.nullSafeAnnotations;
 import static run.halo.app.extension.MetadataUtil.nullSafeLabels;
 import static run.halo.app.extension.index.query.QueryFactory.equal;
+import static run.halo.app.extension.index.query.QueryFactory.in;
 
 import com.google.common.hash.Hashing;
 import java.time.Duration;
@@ -20,6 +21,7 @@ import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
+import java.util.stream.Collectors;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.BooleanUtils;
@@ -42,6 +44,7 @@ import run.halo.app.core.extension.content.Post;
 import run.halo.app.core.extension.content.Post.PostPhase;
 import run.halo.app.core.extension.content.Post.VisibleEnum;
 import run.halo.app.core.extension.content.Snapshot;
+import run.halo.app.core.extension.content.Tag;
 import run.halo.app.core.extension.notification.Subscription;
 import run.halo.app.event.post.PostDeletedEvent;
 import run.halo.app.event.post.PostPublishedEvent;
@@ -383,12 +386,13 @@ public class PostReconciler implements Reconciler<Reconciler.Request> {
             return StringUtils.EMPTY;
         }
         var content = contentWrapper.get();
-        var tags = post.getSpec().getTags();
+        var tags = listTagDisplayNames(post);
+
         var context = new ExcerptGenerator.Context()
             .setRaw(content.getRaw())
             .setContent(content.getContent())
-            .setRaw(content.getRawType())
-            .setKeywords(tags == null ? Set.of() : new HashSet<>(tags))
+            .setRawType(content.getRawType())
+            .setKeywords(tags)
             .setMaxLength(160);
         return extensionGetter.getEnabledExtension(ExcerptGenerator.class)
             .defaultIfEmpty(new DefaultExcerptGenerator())
@@ -400,6 +404,18 @@ public class PostReconciler implements Reconciler<Reconciler.Request> {
             })
             .blockOptional()
             .orElse(StringUtils.EMPTY);
+    }
+
+    private Set<String> listTagDisplayNames(Post post) {
+        return Optional.ofNullable(post.getSpec().getTags())
+            .map(tags -> client.listAll(Tag.class, ListOptions.builder()
+                .fieldQuery(in("metadata.name", tags))
+                .build(), Sort.unsorted())
+            )
+            .stream()
+            .flatMap(List::stream)
+            .map(tag -> tag.getSpec().getDisplayName())
+            .collect(Collectors.toSet());
     }
 
     static class DefaultExcerptGenerator implements ExcerptGenerator {
