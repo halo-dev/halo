@@ -4,7 +4,14 @@ body:
   - type: markdown
     id: preface
     attributes:
-      value: "Hello there! Thank you for submitting new features for Halo. Please spend a little bit to fill in the following instructions in detail."
+      value: |
+        Hello! Thank you for submitting a new feature suggestion for Halo. Before we begin, we highly recommend reading through the [Open Source Guides](https://opensource.guide/), which will greatly improve our mutual efficiency.
+
+        **Before submitting, please check:**
+
+        - You have searched for related issues in the [issues](https://github.com/halo-dev/halo/issues) list.
+        - This is a feature related to Halo. If it is not an issue with the project itself, it is recommended to submit it in the [Discussions](https://github.com/halo-dev/halo/discussions).
+        - If it is a feature suggestion for plugins and themes, please submit it in the respective plugin and theme repositories.
   - type: markdown
     id: environment
     attributes:

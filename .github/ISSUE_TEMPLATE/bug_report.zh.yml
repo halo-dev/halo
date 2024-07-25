@@ -6,7 +6,13 @@ body:
     id: preface
     attributes:
       value: |
-        感谢你花时间填写此错误报告！在开始之前，我们非常推荐阅读一遍[《开源最佳实践》](https://github.com/LinuxSuRen/open-source-best-practice)，这会在很大程度上提高我们彼此的效率。
+        感谢你花时间填写此错误报告！在开始之前，我们非常推荐阅读一遍[《开源软件指南》](https://opensource.guide/zh-hans/)，这会在很大程度上提高我们彼此的效率。
+
+        **在提交之前，请检查：**
+
+        - 已经在 [issues](https://github.com/halo-dev/halo/issues) 列表中搜索了相关问题。
+        - 这是 Halo 项目本身存在的问题，如果是非项目本身的问题（如：安装部署问题），建议在 [Discussions](https://github.com/halo-dev/halo/discussions) 提交。
+        - 如果是插件和主题的问题，请在对应的插件和主题仓库提交。
   - type: markdown
     id: environment
     attributes:
@@ -16,6 +22,18 @@ body:
     attributes:
       label: "系统信息"
       description: "访问 Console 的概览页面，点击右上角的复制按钮，将信息粘贴到此处。"
+      placeholder: |
+        - 外部访问地址: https://demo.halo.run
+        - 启动时间: 2024-07-21 14:50
+        - 版本: 2.x.x
+        - 构建时间: 2024-07-15 18:19
+        - Git Commit: 6d4bedd
+        - Java: IBM Semeru Runtime Open Edition / ...
+        - 数据库: PostgreSQL / 16.3 ...
+        - 操作系统: Linux / 5.15.0-88 ...
+        - 已激活主题: ...
+        - 已启动插件:
+            - ...
     validations:
       required: true
   - type: dropdown
@@ -40,6 +58,14 @@ body:
       description: "为了方便我们管理，请不要在同一个 issue 下报告多个不相关的问题。"
     validations:
       required: true
+  - type: textarea
+    id: reproduce-steps
+    attributes:
+      label: "复现步骤"
+      description: "如果可以稳定复现，请提供详细的步骤。"
+      placeholder: |
+        1. 打开 '...'
+        2. 点击 '...'
   - type: textarea
     id: logs
     attributes:
