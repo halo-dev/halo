@@ -25,6 +25,7 @@ import org.pf4j.PluginStateEvent;
 import org.pf4j.PluginStateListener;
 import org.pf4j.PluginStatusProvider;
 import org.pf4j.PluginWrapper;
+import org.springframework.beans.factory.InitializingBean;
 import org.springframework.context.ApplicationContext;
 import org.springframework.data.util.Lazy;
 import run.halo.app.infra.SystemVersionSupplier;
@@ -39,36 +40,41 @@ import run.halo.app.plugin.event.PluginStartedEvent;
  * @since 2.0.0
  */
 @Slf4j
-public class HaloPluginManager extends DefaultPluginManager implements SpringPluginManager {
+public class HaloPluginManager extends DefaultPluginManager
+    implements SpringPluginManager, InitializingBean {
 
     private final ApplicationContext rootContext;
 
-    private final Lazy<ApplicationContext> sharedContext;
+    private Lazy<ApplicationContext> sharedContext;
 
     private final PluginProperties pluginProperties;
+
+    private final SystemVersionSupplier systemVersionSupplier;
 
     public HaloPluginManager(ApplicationContext rootContext,
         PluginProperties pluginProperties,
         SystemVersionSupplier systemVersionSupplier) {
         this.pluginProperties = pluginProperties;
         this.rootContext = rootContext;
-        // We have to initialize share context lazily because the root context has not refreshed
-        this.sharedContext = Lazy.of(() -> SharedApplicationContextFactory.create(rootContext));
-        super.runtimeMode = pluginProperties.getRuntimeMode();
-
-        setExactVersionAllowed(pluginProperties.isExactVersionAllowed());
-        setSystemVersion(systemVersionSupplier.get().getNormalVersion());
-
-        super.initialize();
-
-        // the listener must be after the super#initialize
-        addPluginStateListener(new PluginStartedListener());
+        this.systemVersionSupplier = systemVersionSupplier;
     }
 
     @Override
     protected void initialize() {
         // Leave the implementation empty because the super#initialize eagerly initializes
         // components before properties set.
+    }
+
+    @Override
+    public void afterPropertiesSet() throws Exception {
+        super.runtimeMode = pluginProperties.getRuntimeMode();
+        this.sharedContext = Lazy.of(() -> SharedApplicationContextFactory.create(rootContext));
+        setExactVersionAllowed(pluginProperties.isExactVersionAllowed());
+        setSystemVersion(systemVersionSupplier.get().toStableVersion().toString());
+
+        super.initialize();
+        // the listener must be after the super#initialize
+        addPluginStateListener(new PluginStartedListener());
     }
 
     @Override
@@ -169,6 +175,10 @@ public class HaloPluginManager extends DefaultPluginManager implements SpringPlu
 
     @Override
     public List<PluginWrapper> getDependents(String pluginId) {
+        if (getPlugin(pluginId) == null) {
+            return List.of();
+        }
+
         var dependents = new ArrayList<PluginWrapper>();
         var stack = new Stack<String>();
         dependencyResolver.getDependents(pluginId).forEach(stack::push);
