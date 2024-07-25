@@ -67,6 +67,7 @@ export * from './extension-point-definition';
 export * from './extension-point-definition-list';
 export * from './extension-point-spec';
 export * from './extension-spec';
+export * from './external-transfer-request';
 export * from './file-reverse-proxy-provider';
 export * from './grant-request';
 export * from './group';

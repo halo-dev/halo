@@ -22,8 +22,10 @@ import static run.halo.app.extension.router.selector.SelectorUtil.labelAndFieldS
 import io.swagger.v3.oas.annotations.enums.ParameterIn;
 import io.swagger.v3.oas.annotations.media.ArraySchema;
 import io.swagger.v3.oas.annotations.media.Schema;
+import java.net.URI;
 import java.util.Collections;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.BooleanUtils;
@@ -58,6 +60,7 @@ import run.halo.app.extension.router.IListRequest;
 import run.halo.app.extension.router.IListRequest.QueryListRequest;
 import run.halo.app.extension.router.QueryParamBuildUtil;
 import run.halo.app.extension.router.selector.LabelSelector;
+import run.halo.app.infra.utils.PathUtils;
 
 @Slf4j
 @Component
@@ -99,6 +102,28 @@ public class AttachmentEndpoint implements CustomEndpoint {
                         .content(contentBuilder()
                             .mediaType(MediaType.MULTIPART_FORM_DATA_VALUE)
                             .schema(schemaBuilder().implementation(IUploadRequest.class))
+                        ))
+                    .response(responseBuilder().implementation(Attachment.class))
+                    .build())
+            .POST("/attachments/external-transfer", contentType(MediaType.APPLICATION_JSON),
+                request -> request.bodyToMono(ExternalTransferRequest.class)
+                    .flatMap(externalTransferRequest -> {
+                        var externalUrl = externalTransferRequest.externalUrl();
+                        var policyName = externalTransferRequest.policyName();
+                        var groupName = externalTransferRequest.groupName();
+                        var fileName = externalTransferRequest.filename();
+                        return attachmentService.externalTransfer(externalUrl, policyName,
+                            groupName, fileName);
+                    })
+                    .flatMap(attachment -> ServerResponse.ok().bodyValue(attachment)),
+                builder -> builder
+                    .operationId("ExternalTransferAttachment")
+                    .tag(tag)
+                    .requestBody(requestBodyBuilder()
+                        .required(true)
+                        .content(contentBuilder()
+                            .mediaType(MediaType.APPLICATION_JSON_VALUE)
+                            .schema(schemaBuilder().implementation(ExternalTransferRequest.class))
                         ))
                     .response(responseBuilder().implementation(Attachment.class))
                     .build())
@@ -272,6 +297,21 @@ public class AttachmentEndpoint implements CustomEndpoint {
             return !CollectionUtils.isEmpty(getAccepts())
                 && !getAccepts().contains("*")
                 && !getAccepts().contains("*/*");
+        }
+    }
+
+    public record ExternalTransferRequest(@Schema(requiredMode = REQUIRED) URI externalUrl,
+                                          @Schema(requiredMode = REQUIRED) String policyName,
+                                          String groupName,
+                                          String filename) {
+        public ExternalTransferRequest {
+            if (Objects.isNull(externalUrl) || !PathUtils.isAbsoluteUri(externalUrl.toString())) {
+                throw new ServerWebInputException("External URL must be an absolute URL.");
+            }
+
+            if (!StringUtils.hasText(policyName)) {
+                throw new ServerWebInputException("Policy name must not be blank");
+            }
         }
     }
 

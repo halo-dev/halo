@@ -150,6 +150,7 @@ models/extension-point-definition.ts
 models/extension-point-spec.ts
 models/extension-spec.ts
 models/extension.ts
+models/external-transfer-request.ts
 models/file-reverse-proxy-provider.ts
 models/grant-request.ts
 models/group-kind.ts

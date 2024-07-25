@@ -91,4 +91,15 @@ public interface AttachmentService {
      */
     Mono<URI> getSharedURL(Attachment attachment, Duration ttl);
 
+    /**
+     * Transfer external links to attachments.
+     *
+     * @param externalUrl external url
+     * @param policyName policy name
+     * @param groupName group name
+     * @param filename filename
+     * @return attachment
+     */
+    Mono<Attachment> externalTransfer(@NonNull URI externalUrl, @NonNull String policyName,
+        String groupName, String filename);
 }
