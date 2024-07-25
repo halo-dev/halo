@@ -16,13 +16,13 @@ public interface ExtensionGetter {
     <T extends ExtensionPoint> Mono<T> getEnabledExtension(Class<T> extensionPoint);
 
     /**
-     * Get the extension(s) according to the {@link ExtensionPointDefinition} queried
+     * Get the extension(s) according to the {@code ExtensionPointDefinition} queried
      * by incoming extension point class.
      *
      * @param extensionPoint extension point class
      * @return implementations of the corresponding extension point.
      * @throws IllegalArgumentException if the incoming extension point class does not have
-     *                                  the {@link ExtensionPointDefinition}.
+     *                                  the {@code ExtensionPointDefinition}.
      */
     <T extends ExtensionPoint> Flux<T> getEnabledExtensions(Class<T> extensionPoint);
 
