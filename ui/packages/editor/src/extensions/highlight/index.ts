@@ -16,8 +16,8 @@ const Highlight = TiptapHighlight.extend<ExtensionOptions & HighlightOptions>({
     return {
       ...this.parent?.(),
       style: {
-        default: "display: inline-block;",
-        parseHTML: (element) => element.getAttribute("style"),
+        default: null,
+        parseHTML: null,
       },
     };
   },
