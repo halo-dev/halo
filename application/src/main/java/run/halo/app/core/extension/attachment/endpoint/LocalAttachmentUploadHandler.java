@@ -15,15 +15,20 @@ import java.time.Duration;
 import java.util.ArrayList;
 import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.atomic.AtomicReference;
 import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
+import org.reactivestreams.Publisher;
 import org.springframework.core.io.buffer.DataBuffer;
 import org.springframework.core.io.buffer.DataBufferUtils;
 import org.springframework.http.MediaType;
+import org.springframework.http.codec.multipart.FilePart;
 import org.springframework.stereotype.Component;
+import org.springframework.util.CollectionUtils;
 import org.springframework.util.StringUtils;
+import org.springframework.util.unit.DataSize;
 import org.springframework.web.util.UriComponentsBuilder;
 import org.springframework.web.util.UriUtils;
 import reactor.core.Exceptions;
@@ -38,8 +43,12 @@ import run.halo.app.core.extension.attachment.Policy;
 import run.halo.app.extension.ConfigMap;
 import run.halo.app.extension.Metadata;
 import run.halo.app.infra.ExternalUrlSupplier;
+import run.halo.app.infra.FileCategoryMatcher;
 import run.halo.app.infra.exception.AttachmentAlreadyExistsException;
+import run.halo.app.infra.exception.FileSizeExceededException;
+import run.halo.app.infra.exception.FileTypeNotAllowedException;
 import run.halo.app.infra.properties.HaloProperties;
+import run.halo.app.infra.utils.FileTypeDetectUtils;
 import run.halo.app.infra.utils.JsonUtils;
 
 @Slf4j
@@ -81,7 +90,7 @@ class LocalAttachmentUploadHandler implements AttachmentHandler {
                 }
                 checkDirectoryTraversal(uploadRoot, attachmentPath);
 
-                return Mono.fromRunnable(
+                return validateFile(file, setting).then(Mono.fromRunnable(
                         () -> {
                             try {
                                 // init parent folders
@@ -125,8 +134,53 @@ class LocalAttachmentUploadHandler implements AttachmentHandler {
                         return attachment;
                     })
                     .onErrorMap(FileAlreadyExistsException.class,
-                        e -> new AttachmentAlreadyExistsException(e.getFile()));
+                        e -> new AttachmentAlreadyExistsException(e.getFile()))
+                );
             });
+    }
+
+    private Mono<Void> validateFile(FilePart file, PolicySetting setting) {
+        var validations = new ArrayList<Publisher<?>>(2);
+        var maxSize = setting.getMaxFileSize();
+        if (maxSize != null && maxSize.toBytes() > 0) {
+            validations.add(
+                file.content()
+                    .map(DataBuffer::readableByteCount)
+                    .reduce(0L, Long::sum)
+                    .filter(size -> size <= setting.getMaxFileSize().toBytes())
+                    .switchIfEmpty(Mono.error(new FileSizeExceededException(
+                        "File size exceeds the maximum limit",
+                        "problemDetail.attachment.upload.fileSizeExceeded",
+                        new Object[] {setting.getMaxFileSize().toKilobytes() + "KB"})
+                    ))
+            );
+        }
+        if (!CollectionUtils.isEmpty(setting.getAllowedFileTypes())) {
+            var typeValidator = file.content()
+                .next()
+                .handle((dataBuffer, sink) -> {
+                    var mimeType = "Unknown";
+                    try {
+                        mimeType = FileTypeDetectUtils.detectMimeType(dataBuffer.asInputStream());
+                        var isAllow = setting.getAllowedFileTypes()
+                            .stream()
+                            .map(FileCategoryMatcher::of)
+                            .anyMatch(matcher -> matcher.match(file.filename()));
+                        if (isAllow) {
+                            sink.next(dataBuffer);
+                            return;
+                        }
+                    } catch (IOException e) {
+                        log.warn("Failed to detect file type", e);
+                    }
+                    sink.error(new FileTypeNotAllowedException("File type is not allowed",
+                        "problemDetail.attachment.upload.fileTypeNotSupported",
+                        new Object[] {mimeType})
+                    );
+                });
+            validations.add(typeValidator);
+        }
+        return Mono.when(validations);
     }
 
     @Override
@@ -206,6 +260,16 @@ class LocalAttachmentUploadHandler implements AttachmentHandler {
 
         private String location;
 
+        private DataSize maxFileSize;
+
+        private Set<String> allowedFileTypes;
+
+        public void setMaxFileSize(String maxFileSize) {
+            if (!StringUtils.hasText(maxFileSize)) {
+                return;
+            }
+            this.maxFileSize = DataSize.parse(maxFileSize);
+        }
     }
 
     /**

@@ -65,6 +65,7 @@ dependencies {
     api "org.springframework.integration:spring-integration-core"
     api "com.github.java-json-tools:json-patch"
     api "org.thymeleaf.extras:thymeleaf-extras-springsecurity6"
+    api 'org.apache.tika:tika-core'
 
     api "io.github.resilience4j:resilience4j-spring-boot3"
     api "io.github.resilience4j:resilience4j-reactor"
