@@ -193,3 +193,7 @@ spec:
           label: "页脚"
           name: footer
           help: "注入代码到所有页面的页脚部分"
+        - $formkit: pay
+          productId: xxx
+          help: xxx
+          validation: required
