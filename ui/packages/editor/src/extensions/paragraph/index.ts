@@ -2,6 +2,7 @@ import ToolbarItem from "@/components/toolbar/ToolbarItem.vue";
 import ToolbarSubItem from "@/components/toolbar/ToolbarSubItem.vue";
 import { i18n } from "@/locales";
 import {
+  CoreEditor,
   EditorState,
   ResolvedPos,
   TextSelection,
@@ -11,6 +12,7 @@ import {
 } from "@/tiptap";
 import type { ExtensionOptions, ToolbarItem as TypeToolbarItem } from "@/types";
 import { deleteNodeByPos } from "@/utils";
+import { isListActive } from "@/utils/isListActive";
 import { isEmpty } from "@/utils/isNodeEmpty";
 import type { ParagraphOptions } from "@tiptap/extension-paragraph";
 import TiptapParagraph from "@tiptap/extension-paragraph";
@@ -97,15 +99,15 @@ const Paragraph = TiptapParagraph.extend<ExtensionOptions & ParagraphOptions>({
 
   addKeyboardShortcuts() {
     return {
-      Backspace: ({ editor }) => {
+      Backspace: ({ editor }: { editor: CoreEditor }) => {
         const { state, view } = editor;
         const { selection } = state;
 
-        if (
-          !isActive(state, Paragraph.name) ||
-          !(selection instanceof TextSelection) ||
-          !selection.empty
-        ) {
+        if (isListActive(editor) || !isActive(state, Paragraph.name)) {
+          return false;
+        }
+
+        if (!(selection instanceof TextSelection) || !selection.empty) {
           return false;
         }
 
