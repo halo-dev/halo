@@ -8,19 +8,6 @@ import MdiFormatColorHighlight from "~icons/mdi/format-color-highlight";
 import HighlightToolbarItem from "./HighlightToolbarItem.vue";
 
 const Highlight = TiptapHighlight.extend<ExtensionOptions & HighlightOptions>({
-  addAttributes() {
-    if (!this.options.multicolor) {
-      return {};
-    }
-
-    return {
-      ...this.parent?.(),
-      style: {
-        default: "display: inline-block;",
-        parseHTML: (element) => element.getAttribute("style"),
-      },
-    };
-  },
   addOptions() {
     return {
       ...this.parent?.(),
