@@ -7,6 +7,7 @@ import {
   type KeyboardShortcutCommand,
 } from "@/tiptap";
 import { TextSelection, Transaction } from "@/tiptap/pm";
+import { isListActive } from "@/utils/isListActive";
 
 declare module "@/tiptap" {
   interface Commands<ReturnType> {
@@ -193,14 +194,6 @@ const isTextIndent = (tr: Transaction, currNodePos: number) => {
     return true;
   }
   return false;
-};
-
-const isListActive = (editor: CoreEditor) => {
-  return (
-    editor.isActive("bulletList") ||
-    editor.isActive("orderedList") ||
-    editor.isActive("taskList")
-  );
 };
 
 const isFilterActive = (editor: CoreEditor) => {
