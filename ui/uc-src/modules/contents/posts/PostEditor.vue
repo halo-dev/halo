@@ -29,7 +29,7 @@ import { useMutation } from "@tanstack/vue-query";
 import { usePostUpdateMutate } from "@uc/modules/contents/posts/composables/use-post-update-mutate";
 import { useLocalStorage } from "@vueuse/core";
 import { useRouteQuery } from "@vueuse/router";
-import type { AxiosRequestConfig } from "axios";
+import { AxiosError, type AxiosRequestConfig } from "axios";
 import type { ComputedRef } from "vue";
 import { computed, nextTick, onMounted, provide, ref, toRef, watch } from "vue";
 import { useI18n } from "vue-i18n";
@@ -386,10 +386,16 @@ const { mutateAsync: handlePublish, isLoading: isPublishing } = useMutation({
   mutationFn: async () => {
     await handleSave({ mute: true });
 
-    return await ucApiClient.content.post.publishMyPost({
-      name: formState.value.metadata.name,
-    });
+    return await ucApiClient.content.post.publishMyPost(
+      {
+        name: formState.value.metadata.name,
+      },
+      {
+        mute: true,
+      }
+    );
   },
+  retry: 3,
   onSuccess() {
     Toast.success(t("core.common.toast.publish_success"), {
       duration: 2000,
@@ -397,8 +403,13 @@ const { mutateAsync: handlePublish, isLoading: isPublishing } = useMutation({
     handleClearCache(formState.value.metadata.name);
     router.push({ name: "Posts" });
   },
-  onError() {
-    Toast.error(t("core.common.toast.publish_failed_and_retry"));
+  onError(error: Error) {
+    if (error instanceof AxiosError) {
+      const { detail, title } = error.response?.data || {};
+      Toast.error(detail || title);
+    } else {
+      Toast.error(t("core.common.toast.publish_failed_and_retry"));
+    }
   },
 });
 
