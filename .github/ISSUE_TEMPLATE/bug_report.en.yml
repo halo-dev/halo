@@ -5,7 +5,14 @@ body:
   - type: markdown
     id: preface
     attributes:
-      value: "Thanks for taking the time to fill out this bug report!"
+      value: |
+        Thank you for taking the time to fill out this issue report! Before we begin, we highly recommend reading through the [Open Source Guides](https://opensource.guide/), which will greatly improve our mutual efficiency.
+
+        **Before submitting, please check:**
+
+        - You have searched for related issues in the [issues](https://github.com/halo-dev/halo/issues) list.
+        - This is an issue with the Halo project itself. If it is not an issue with the project itself(For example: Installation and deployment issues.), it is recommended to submit it in the [Discussions](https://github.com/halo-dev/halo/discussions).
+        - If it is an issue with plugins and themes, please submit it in the respective plugin and theme repositories.
   - type: markdown
     id: environment
     attributes:
@@ -15,6 +22,18 @@ body:
     attributes:
       label: "System information"
       description: "Access the actuator page of the Console, click the copy button in the upper right corner, and paste the information here."
+      placeholder: |
+        - External url: https://demo.halo.run
+        - Start time: 2024-07-21 14:50
+        - Version: 2.x.x
+        - Build time: 2024-07-15 18:19
+        - Git Commit: 6d4bedd
+        - Java: IBM Semeru Runtime Open Edition / ...
+        - Database: PostgreSQL / 16.3 ...
+        - Operating system: Linux / 5.15.0-88 ...
+        - Activated theme: ...
+        - Enabled plugins:
+            - ...
     validations:
       required: true
   - type: dropdown
@@ -39,6 +58,14 @@ body:
       description: "For ease of management, please do not report multiple unrelated issues under the same issue."
     validations:
       required: true
+  - type: textarea
+    id: reproduce-steps
+    attributes:
+      label: "Reproduce Steps"
+      description: "If it can be consistently reproduced, please provide detailed steps."
+      placeholder: |
+        1. Open '...'
+        2. Click '...'
   - type: textarea
     id: logs
     attributes:

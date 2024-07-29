@@ -14,6 +14,7 @@ import run.halo.app.infra.ExternalLinkProcessor;
 import run.halo.app.infra.ExternalUrlSupplier;
 import run.halo.app.notification.NotificationCenter;
 import run.halo.app.notification.NotificationReasonEmitter;
+import run.halo.app.plugin.extensionpoint.ExtensionGetter;
 import run.halo.app.security.LoginHandlerEnhancer;
 
 /**
@@ -66,6 +67,8 @@ public enum SharedApplicationContextFactory {
             .ifUnique(pluginsRootGetter ->
                 beanFactory.registerSingleton("pluginsRootGetter", pluginsRootGetter)
             );
+        beanFactory.registerSingleton("extensionGetter",
+            rootContext.getBean(ExtensionGetter.class));
         // TODO add more shared instance here
 
         sharedContext.refresh();

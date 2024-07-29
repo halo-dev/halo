@@ -4,7 +4,14 @@ body:
   - type: markdown
     id: preface
     attributes:
-      value: "你好！感谢你为 Halo 提交新特性建议。在开始之前，我们非常推荐阅读一遍[《开源最佳实践》](https://github.com/LinuxSuRen/open-source-best-practice)，这会在很大程度上提高我们彼此的效率。"
+      value: |
+        你好！感谢你为 Halo 提交新特性建议。在开始之前，我们非常推荐阅读一遍[《开源软件指南》](https://opensource.guide/zh-hans/)，这会在很大程度上提高我们彼此的效率。
+
+        **在提交之前，请检查：**
+
+        - 已经在 [issues](https://github.com/halo-dev/halo/issues) 列表中搜索了相关问题。
+        - 这是和 Halo 相关的特性，如果是非项目本身的问题，建议在 [Discussions](https://github.com/halo-dev/halo/discussions) 提交。
+        - 如果是插件和主题特性建议，请在对应的插件和主题仓库提交。
   - type: markdown
     id: environment
     attributes:

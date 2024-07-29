@@ -232,10 +232,10 @@ models/post-status.ts
 models/post-vo.ts
 models/post.ts
 models/public-key-response.ts
+models/reason-attributes.ts
 models/reason-list.ts
 models/reason-property.ts
 models/reason-selector.ts
-models/reason-spec-attributes.ts
 models/reason-spec.ts
 models/reason-subject.ts
 models/reason-type-info.ts
