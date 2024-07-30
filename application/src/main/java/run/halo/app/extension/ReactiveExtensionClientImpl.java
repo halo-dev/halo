@@ -140,10 +140,10 @@ public class ReactiveExtensionClientImpl implements ReactiveExtensionClient {
                 final long startTimeMs = System.currentTimeMillis();
                 return client.listByNames(storeNames)
                     .map(extensionStore -> converter.convertFrom(type, extensionStore))
-                    .doOnNext(s -> {
-                        log.debug("Successfully retrieved all by names from db for {} in {}ms",
-                            scheme.groupVersionKind(), System.currentTimeMillis() - startTimeMs);
-                    });
+                    .doOnComplete(() -> log.debug(
+                        "Successfully retrieved all by names from db for {} in {}ms",
+                        scheme.groupVersionKind(), System.currentTimeMillis() - startTimeMs)
+                    );
             });
     }
 
@@ -161,10 +161,10 @@ public class ReactiveExtensionClientImpl implements ReactiveExtensionClient {
                 final long startTimeMs = System.currentTimeMillis();
                 return client.listByNames(storeNames)
                     .map(extensionStore -> converter.convertFrom(type, extensionStore))
-                    .doOnNext(s -> {
-                        log.debug("Successfully retrieved by names from db for {} in {}ms",
-                            scheme.groupVersionKind(), System.currentTimeMillis() - startTimeMs);
-                    })
+                    .doOnComplete(() -> log.debug(
+                        "Successfully retrieved by names from db for {} in {}ms",
+                        scheme.groupVersionKind(), System.currentTimeMillis() - startTimeMs)
+                    )
                     .collectList()
                     .map(result -> new ListResult<>(page.getPageNumber(), page.getPageSize(),
                         objectKeys.getTotal(), result));
