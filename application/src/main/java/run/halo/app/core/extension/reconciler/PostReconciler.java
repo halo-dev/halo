@@ -388,11 +388,14 @@ public class PostReconciler implements Reconciler<Reconciler.Request> {
         var content = contentWrapper.get();
         var tags = listTagDisplayNames(post);
 
+        var keywords = new HashSet<>(tags);
+        keywords.add(post.getSpec().getTitle());
+
         var context = new ExcerptGenerator.Context()
             .setRaw(content.getRaw())
             .setContent(content.getContent())
             .setRawType(content.getRawType())
-            .setKeywords(tags)
+            .setKeywords(keywords)
             .setMaxLength(160);
         return extensionGetter.getEnabledExtension(ExcerptGenerator.class)
             .defaultIfEmpty(new DefaultExcerptGenerator())
