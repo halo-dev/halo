@@ -7,6 +7,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import java.util.LinkedHashMap;
 import java.util.Map;
+import java.util.Objects;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.DisposableBean;
@@ -186,7 +187,7 @@ public class DefaultReactiveSettingFetcher
     @Override
     public Controller setupWith(ControllerBuilder builder) {
         ExtensionMatcher matcher =
-            extension -> configMapName.equals(extension.getMetadata().getName());
+            extension -> Objects.equals(extension.getMetadata().getName(), configMapName);
         return builder
             .extension(new ConfigMap())
             .syncAllOnStart(true)
