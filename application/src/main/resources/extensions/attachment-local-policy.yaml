@@ -41,8 +41,8 @@ spec:
           validation: [['matches', '/^(0|[1-9]\d*)(?:[KMG]B)?$/']]
           validation-visibility: "live"
           validation-messages:
-            matches: "输入格式错误，遵循：整数+大写的单位(KB, MB, GB)"
-          help: "0 表示不限制，示例: 5KB, 10MB, 1GB"
+            matches: "输入格式错误，遵循：整数 + 大写的单位（KB, MB, GB）"
+          help: "0 表示不限制，示例：5KB、10MB、1GB"
         - $formkit: checkbox
           name: allowedFileTypes
           label: 文件类型限制
