@@ -21,7 +21,7 @@ const Column = Node.create({
         parseHTML: (element) => element.getAttribute("index"),
       },
       style: {
-        default: "min-width: 0;padding: 12px;flex: 1 1;box-sizing: border-box;",
+        default: "min-width: 0;flex: 1 1;box-sizing: border-box;",
         parseHTML: (element) => element.getAttribute("style"),
       },
     };

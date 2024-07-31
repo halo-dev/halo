@@ -10,6 +10,7 @@ import static run.halo.app.extension.ExtensionUtil.removeFinalizers;
 import static run.halo.app.extension.MetadataUtil.nullSafeAnnotations;
 import static run.halo.app.extension.MetadataUtil.nullSafeLabels;
 import static run.halo.app.extension.index.query.QueryFactory.equal;
+import static run.halo.app.extension.index.query.QueryFactory.in;
 
 import com.google.common.hash.Hashing;
 import java.time.Duration;
@@ -20,7 +21,9 @@ import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
+import java.util.stream.Collectors;
 import lombok.AllArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.BooleanUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.jsoup.Jsoup;
@@ -28,8 +31,10 @@ import org.springframework.context.ApplicationEvent;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Component;
+import reactor.core.publisher.Mono;
 import run.halo.app.content.CategoryService;
 import run.halo.app.content.ContentWrapper;
+import run.halo.app.content.ExcerptGenerator;
 import run.halo.app.content.NotificationReasonConst;
 import run.halo.app.content.PostService;
 import run.halo.app.content.comment.CommentService;
@@ -39,6 +44,7 @@ import run.halo.app.core.extension.content.Post;
 import run.halo.app.core.extension.content.Post.PostPhase;
 import run.halo.app.core.extension.content.Post.VisibleEnum;
 import run.halo.app.core.extension.content.Snapshot;
+import run.halo.app.core.extension.content.Tag;
 import run.halo.app.core.extension.notification.Subscription;
 import run.halo.app.event.post.PostDeletedEvent;
 import run.halo.app.event.post.PostPublishedEvent;
@@ -62,6 +68,7 @@ import run.halo.app.infra.utils.HaloUtils;
 import run.halo.app.metrics.CounterService;
 import run.halo.app.metrics.MeterUtils;
 import run.halo.app.notification.NotificationCenter;
+import run.halo.app.plugin.extensionpoint.ExtensionGetter;
 
 /**
  * <p>Reconciler for {@link Post}.</p>
@@ -75,6 +82,7 @@ import run.halo.app.notification.NotificationCenter;
  * @author guqing
  * @since 2.0.0
  */
+@Slf4j
 @AllArgsConstructor
 @Component
 public class PostReconciler implements Reconciler<Reconciler.Request> {
@@ -85,6 +93,7 @@ public class PostReconciler implements Reconciler<Reconciler.Request> {
     private final CounterService counterService;
     private final CommentService commentService;
     private final CategoryService categoryService;
+    private final ExtensionGetter extensionGetter;
 
     private final ApplicationEventPublisher eventPublisher;
     private final NotificationCenter notificationCenter;
@@ -155,14 +164,7 @@ public class PostReconciler implements Reconciler<Reconciler.Request> {
                 }
                 var isAutoGenerate = defaultIfNull(excerpt.getAutoGenerate(), true);
                 if (isAutoGenerate) {
-                    Optional<ContentWrapper> contentWrapper =
-                        postService.getContent(post.getSpec().getReleaseSnapshot(),
-                                post.getSpec().getBaseSnapshot())
-                            .blockOptional();
-                    if (contentWrapper.isPresent()) {
-                        String contentRevised = contentWrapper.get().getContent();
-                        status.setExcerpt(getExcerpt(contentRevised));
-                    }
+                    status.setExcerpt(getExcerpt(post));
                 } else {
                     status.setExcerpt(excerpt.getRaw());
                 }
@@ -375,11 +377,57 @@ public class PostReconciler implements Reconciler<Reconciler.Request> {
             .block();
     }
 
-    private String getExcerpt(String htmlContent) {
-        String shortHtmlContent = StringUtils.substring(htmlContent, 0, 500);
-        String text = Jsoup.parse(shortHtmlContent).text();
-        // TODO The default capture 150 words as excerpt
-        return StringUtils.substring(text, 0, 150);
+    private String getExcerpt(Post post) {
+        Optional<ContentWrapper> contentWrapper =
+            postService.getContent(post.getSpec().getReleaseSnapshot(),
+                    post.getSpec().getBaseSnapshot())
+                .blockOptional();
+        if (contentWrapper.isEmpty()) {
+            return StringUtils.EMPTY;
+        }
+        var content = contentWrapper.get();
+        var tags = listTagDisplayNames(post);
+
+        var keywords = new HashSet<>(tags);
+        keywords.add(post.getSpec().getTitle());
+
+        var context = new ExcerptGenerator.Context()
+            .setRaw(content.getRaw())
+            .setContent(content.getContent())
+            .setRawType(content.getRawType())
+            .setKeywords(keywords)
+            .setMaxLength(160);
+        return extensionGetter.getEnabledExtension(ExcerptGenerator.class)
+            .defaultIfEmpty(new DefaultExcerptGenerator())
+            .flatMap(generator -> generator.generate(context))
+            .onErrorResume(Throwable.class, e -> {
+                log.error("Failed to generate excerpt for post [{}]",
+                    post.getMetadata().getName(), e);
+                return Mono.empty();
+            })
+            .blockOptional()
+            .orElse(StringUtils.EMPTY);
+    }
+
+    private Set<String> listTagDisplayNames(Post post) {
+        return Optional.ofNullable(post.getSpec().getTags())
+            .map(tags -> client.listAll(Tag.class, ListOptions.builder()
+                .fieldQuery(in("metadata.name", tags))
+                .build(), Sort.unsorted())
+            )
+            .stream()
+            .flatMap(List::stream)
+            .map(tag -> tag.getSpec().getDisplayName())
+            .collect(Collectors.toSet());
+    }
+
+    static class DefaultExcerptGenerator implements ExcerptGenerator {
+        @Override
+        public Mono<String> generate(Context context) {
+            String shortHtmlContent = StringUtils.substring(context.getContent(), 0, 500);
+            String text = Jsoup.parse(shortHtmlContent).text();
+            return Mono.just(StringUtils.substring(text, 0, 150));
+        }
     }
 
     List<Snapshot> listSnapshots(Ref ref) {

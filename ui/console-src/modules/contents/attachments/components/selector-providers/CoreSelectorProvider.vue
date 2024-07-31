@@ -45,7 +45,7 @@ const emit = defineEmits<{
 
 const selectedGroup = ref();
 const page = ref(1);
-const size = ref(60);
+const size = ref(20);
 
 const {
   attachments,
@@ -138,7 +138,7 @@ function onGroupSelect(group: Group) {
   </VEmpty>
   <div
     v-else
-    class="mt-2 grid grid-cols-3 gap-x-2 gap-y-3 sm:grid-cols-3 md:grid-cols-6 xl:grid-cols-8 2xl:grid-cols-10"
+    class="mt-2 grid grid-cols-3 gap-x-2 gap-y-3 sm:grid-cols-3 md:grid-cols-5"
     role="list"
   >
     <VCard
@@ -218,7 +218,7 @@ function onGroupSelect(group: Group) {
         $t('core.components.pagination.total_label', { total: total })
       "
       :total="total"
-      :size-options="[60, 120, 200]"
+      :size-options="[20, 50, 100]"
     />
   </div>
   <AttachmentUploadModal v-if="uploadVisible" @close="onUploadModalClose" />
