@@ -25,6 +25,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.context.ApplicationEventPublisher;
 import reactor.core.publisher.Mono;
 import run.halo.app.content.ContentWrapper;
+import run.halo.app.content.ExcerptGenerator;
 import run.halo.app.content.NotificationReasonConst;
 import run.halo.app.content.PostService;
 import run.halo.app.content.TestPost;
@@ -36,6 +37,7 @@ import run.halo.app.event.post.PostPublishedEvent;
 import run.halo.app.extension.ExtensionClient;
 import run.halo.app.extension.controller.Reconciler;
 import run.halo.app.notification.NotificationCenter;
+import run.halo.app.plugin.extensionpoint.ExtensionGetter;
 
 /**
  * Tests for {@link PostReconciler}.
@@ -60,6 +62,9 @@ class PostReconcilerTest {
 
     @Mock
     private NotificationCenter notificationCenter;
+
+    @Mock
+    private ExtensionGetter extensionGetter;
 
     @InjectMocks
     private PostReconciler postReconciler;
@@ -96,7 +101,7 @@ class PostReconcilerTest {
         verify(postPermalinkPolicy, times(1)).permalink(any());
 
         Post value = captor.getValue();
-        assertThat(value.getStatus().getExcerpt()).isNull();
+        assertThat(value.getStatus().getExcerpt()).isEmpty();
         assertThat(value.getStatus().getContributors()).isEqualTo(List.of("guqing", "zhangsan"));
     }
 
@@ -125,6 +130,9 @@ class PostReconcilerTest {
 
         Snapshot snapshotV1 = TestPost.snapshotV1();
         snapshotV1.getSpec().setContributors(Set.of("guqing"));
+
+        when(extensionGetter.getEnabledExtension(eq(ExcerptGenerator.class)))
+            .thenReturn(Mono.empty());
 
         when(client.listAll(eq(Snapshot.class), any(), any()))
             .thenReturn(List.of(snapshotV1, snapshotV2));
@@ -162,6 +170,9 @@ class PostReconcilerTest {
             when(client.fetch(eq(Snapshot.class), eq(post.getSpec().getReleaseSnapshot())))
                 .thenReturn(Optional.of(snapshotV2));
 
+            when(extensionGetter.getEnabledExtension(eq(ExcerptGenerator.class)))
+                .thenReturn(Mono.empty());
+
             when(client.listAll(eq(Snapshot.class), any(), any()))
                 .thenReturn(List.of());
 
@@ -190,6 +201,9 @@ class PostReconcilerTest {
                     .content("<p>hello world</p>")
                     .rawType("markdown")
                     .build()));
+
+            when(extensionGetter.getEnabledExtension(eq(ExcerptGenerator.class)))
+                .thenReturn(Mono.empty());
 
             when(client.listAll(eq(Snapshot.class), any(), any()))
                 .thenReturn(List.of());
