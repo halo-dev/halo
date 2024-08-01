@@ -50,7 +50,7 @@ const handleInputFocus = () => {
   isFocus.value = true;
   setTimeout(() => {
     handleScrollIntoView();
-  });
+  }, 50);
 };
 
 const handleInputBlur = () => {
@@ -101,6 +101,9 @@ watch(
     if (newValue) {
       selectedOption.value =
         props.options.find((option) => option.value === newValue) || null;
+      selectedIndex.value = props.options.findIndex(
+        (option) => option.value === newValue
+      );
     }
   },
   {
@@ -109,26 +112,16 @@ watch(
 );
 
 watch(
-  [filterOptions, selectedOption],
+  selectedIndex,
   () => {
-    if (filterOptions.value.length > 0) {
-      selectedIndex.value = filterOptions.value.findIndex(
-        (option) => option.value === value.value
-      );
-    } else {
-      selectedIndex.value = -1;
-    }
+    setTimeout(() => {
+      handleScrollIntoView();
+    });
   },
   {
     immediate: true,
   }
 );
-
-watch(selectedIndex, () => {
-  setTimeout(() => {
-    handleScrollIntoView();
-  });
-});
 
 const handleScrollIntoView = () => {
   if (selectedIndex.value === -1) {
@@ -153,6 +146,7 @@ const handleScrollIntoView = () => {
     :auto-hide="false"
     :distance="0"
     :container="container || 'body'"
+    :popper-class="[containerClass]"
   >
     <div
       class="relative inline-block"
@@ -188,7 +182,7 @@ const handleScrollIntoView = () => {
     </div>
 
     <template #popper>
-      <div class="bg-white" :class="[containerClass]">
+      <div class="bg-white">
         <div class="select max-h-64 cursor-pointer p-1">
           <template v-if="filterOptions && filterOptions.length > 0">
             <div
