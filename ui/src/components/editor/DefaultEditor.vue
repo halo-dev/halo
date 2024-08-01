@@ -48,8 +48,7 @@ import {
   RichTextEditor,
   ToolbarItem,
   ToolboxItem,
-  lowlight,
-  type AnyExtension,
+  type Extensions,
 } from "@halo-dev/richtext-editor";
 // ui custom extension
 import { i18n } from "@/locales";
@@ -98,6 +97,7 @@ import {
   UiExtensionVideo,
 } from "./extensions";
 import { getContents } from "./utils/attachment";
+import { useExtension } from "./composables/use-extension";
 
 const { t } = useI18n();
 const { currentUserHasPermission } = usePermission();
@@ -190,8 +190,196 @@ const handleCloseAttachmentSelectorModal = () => {
   attachmentOptions.value = initAttachmentOptions;
 };
 
+const { filterDuplicateExtensions } = useExtension();
+
+const presetExtension = [
+  ExtensionBlockquote,
+  ExtensionBold,
+  ExtensionBulletList,
+  ExtensionCode,
+  ExtensionDocument,
+  ExtensionDropcursor.configure({
+    width: 2,
+    class: "dropcursor",
+    color: "skyblue",
+  }),
+  ExtensionGapcursor,
+  ExtensionHardBreak,
+  ExtensionHeading,
+  ExtensionHistory,
+  ExtensionHorizontalRule,
+  ExtensionItalic,
+  ExtensionOrderedList,
+  ExtensionStrike,
+  ExtensionText,
+  UiExtensionImage.configure({
+    inline: true,
+    allowBase64: false,
+    HTMLAttributes: {
+      loading: "lazy",
+    },
+    uploadImage: props.uploadImage,
+  }),
+  ExtensionTaskList,
+  ExtensionLink.configure({
+    autolink: false,
+    openOnClick: false,
+  }),
+  ExtensionTextAlign.configure({
+    types: ["heading", "paragraph"],
+  }),
+  ExtensionUnderline,
+  ExtensionTable.configure({
+    resizable: true,
+  }),
+  ExtensionSubscript,
+  ExtensionSuperscript,
+  ExtensionPlaceholder.configure({
+    placeholder: t(
+      "core.components.default_editor.extensions.placeholder.options.placeholder"
+    ),
+  }),
+  ExtensionHighlight,
+  ExtensionCommands,
+  ExtensionCodeBlock,
+  ExtensionIframe,
+  UiExtensionVideo.configure({
+    uploadVideo: props.uploadImage,
+  }),
+  UiExtensionAudio.configure({
+    uploadAudio: props.uploadImage,
+  }),
+  ExtensionCharacterCount,
+  ExtensionFontSize,
+  ExtensionColor,
+  ExtensionIndent,
+  Extension.create({
+    addGlobalAttributes() {
+      return [
+        {
+          types: ["heading"],
+          attributes: {
+            id: {
+              default: null,
+            },
+          },
+        },
+      ];
+    },
+  }),
+  Extension.create({
+    addOptions() {
+      // If user has no permission to view attachments, return
+      if (!currentUserHasPermission(["system:attachments:view"])) {
+        return this;
+      }
+
+      return {
+        getToolboxItems({ editor }: { editor: Editor }) {
+          return [
+            {
+              priority: 0,
+              component: markRaw(ToolboxItem),
+              props: {
+                editor,
+                icon: markRaw(IconFolder),
+                title: i18n.global.t(
+                  "core.components.default_editor.toolbox.attachment"
+                ),
+                action: () => {
+                  editor.commands.openAttachmentSelector((attachment) => {
+                    editor
+                      .chain()
+                      .focus()
+                      .insertContent(getContents(attachment))
+                      .run();
+                  });
+                  return true;
+                },
+              },
+            },
+          ];
+        },
+        getToolbarItems({ editor }: { editor: Editor }) {
+          return {
+            priority: 1000,
+            component: markRaw(ToolbarItem),
+            props: {
+              editor,
+              isActive: showSidebar.value,
+              icon: markRaw(RiLayoutRightLine),
+              title: i18n.global.t(
+                "core.components.default_editor.toolbox.show_hide_sidebar"
+              ),
+              action: () => {
+                showSidebar.value = !showSidebar.value;
+              },
+            },
+          };
+        },
+      };
+    },
+    addCommands() {
+      return {
+        openAttachmentSelector: (callback, options) => () => {
+          if (options) {
+            attachmentOptions.value = options;
+          }
+          attachmentSelectorModal.value = true;
+          attachmentResult.updateAttachment = (
+            attachments: AttachmentLike[]
+          ) => {
+            callback(attachments);
+          };
+          return true;
+        },
+      };
+    },
+  }),
+  ExtensionDraggable,
+  ExtensionColumns,
+  ExtensionColumn,
+  ExtensionNodeSelected,
+  ExtensionTrailingNode,
+  Extension.create({
+    addProseMirrorPlugins() {
+      return [
+        new Plugin({
+          key: new PluginKey("get-heading-id"),
+          props: {
+            decorations: (state) => {
+              const headings: HeadingNode[] = [];
+              const { doc } = state;
+              doc.descendants((node) => {
+                if (node.type.name === ExtensionHeading.name) {
+                  headings.push({
+                    level: node.attrs.level,
+                    text: node.textContent,
+                    id: node.attrs.id,
+                  });
+                }
+              });
+              headingNodes.value = headings;
+              if (!selectedHeadingNode.value) {
+                selectedHeadingNode.value = headings[0];
+              }
+              return DecorationSet.empty;
+            },
+          },
+        }),
+      ];
+    },
+  }),
+  ExtensionListKeymap,
+  UiExtensionUpload,
+  ExtensionSearchAndReplace,
+  ExtensionClearFormat,
+  ExtensionFormatBrush,
+  ExtensionRangeSelection,
+];
+
 onMounted(async () => {
-  const extensionsFromPlugins: AnyExtension[] = [];
+  const extensionsFromPlugins: Extensions = [];
 
   for (const pluginModule of pluginModules) {
     const callbackFunction =
@@ -214,196 +402,14 @@ onMounted(async () => {
     emit("update", html);
   }, 250);
 
+  const extension = filterDuplicateExtensions([
+    ...presetExtension,
+    ...extensionsFromPlugins,
+  ]);
+
   editor.value = new Editor({
     content: props.raw,
-    extensions: [
-      ExtensionBlockquote,
-      ExtensionBold,
-      ExtensionBulletList,
-      ExtensionCode,
-      ExtensionDocument,
-      ExtensionDropcursor.configure({
-        width: 2,
-        class: "dropcursor",
-        color: "skyblue",
-      }),
-      ExtensionGapcursor,
-      ExtensionHardBreak,
-      ExtensionHeading,
-      ExtensionHistory,
-      ExtensionHorizontalRule,
-      ExtensionItalic,
-      ExtensionOrderedList,
-      ExtensionStrike,
-      ExtensionText,
-      UiExtensionImage.configure({
-        inline: true,
-        allowBase64: false,
-        HTMLAttributes: {
-          loading: "lazy",
-        },
-        uploadImage: props.uploadImage,
-      }),
-      ExtensionTaskList,
-      ExtensionLink.configure({
-        autolink: false,
-        openOnClick: false,
-      }),
-      ExtensionTextAlign.configure({
-        types: ["heading", "paragraph"],
-      }),
-      ExtensionUnderline,
-      ExtensionTable.configure({
-        resizable: true,
-      }),
-      ExtensionSubscript,
-      ExtensionSuperscript,
-      ExtensionPlaceholder.configure({
-        placeholder: t(
-          "core.components.default_editor.extensions.placeholder.options.placeholder"
-        ),
-      }),
-      ExtensionHighlight,
-      ExtensionCommands,
-      ExtensionCodeBlock.configure({
-        lowlight,
-      }),
-      ExtensionIframe,
-      UiExtensionVideo.configure({
-        uploadVideo: props.uploadImage,
-      }),
-      UiExtensionAudio.configure({
-        uploadAudio: props.uploadImage,
-      }),
-      ExtensionCharacterCount,
-      ExtensionFontSize,
-      ExtensionColor,
-      ExtensionIndent,
-      ...extensionsFromPlugins,
-      Extension.create({
-        addGlobalAttributes() {
-          return [
-            {
-              types: ["heading"],
-              attributes: {
-                id: {
-                  default: null,
-                },
-              },
-            },
-          ];
-        },
-      }),
-      Extension.create({
-        addOptions() {
-          // If user has no permission to view attachments, return
-          if (!currentUserHasPermission(["system:attachments:view"])) {
-            return this;
-          }
-
-          return {
-            getToolboxItems({ editor }: { editor: Editor }) {
-              return [
-                {
-                  priority: 0,
-                  component: markRaw(ToolboxItem),
-                  props: {
-                    editor,
-                    icon: markRaw(IconFolder),
-                    title: i18n.global.t(
-                      "core.components.default_editor.toolbox.attachment"
-                    ),
-                    action: () => {
-                      editor.commands.openAttachmentSelector((attachment) => {
-                        editor
-                          .chain()
-                          .focus()
-                          .insertContent(getContents(attachment))
-                          .run();
-                      });
-                      return true;
-                    },
-                  },
-                },
-              ];
-            },
-            getToolbarItems({ editor }: { editor: Editor }) {
-              return {
-                priority: 1000,
-                component: markRaw(ToolbarItem),
-                props: {
-                  editor,
-                  isActive: showSidebar.value,
-                  icon: markRaw(RiLayoutRightLine),
-                  title: i18n.global.t(
-                    "core.components.default_editor.toolbox.show_hide_sidebar"
-                  ),
-                  action: () => {
-                    showSidebar.value = !showSidebar.value;
-                  },
-                },
-              };
-            },
-          };
-        },
-        addCommands() {
-          return {
-            openAttachmentSelector: (callback, options) => () => {
-              if (options) {
-                attachmentOptions.value = options;
-              }
-              attachmentSelectorModal.value = true;
-              attachmentResult.updateAttachment = (
-                attachments: AttachmentLike[]
-              ) => {
-                callback(attachments);
-              };
-              return true;
-            },
-          };
-        },
-      }),
-      ExtensionDraggable,
-      ExtensionColumns,
-      ExtensionColumn,
-      ExtensionNodeSelected,
-      ExtensionTrailingNode,
-      Extension.create({
-        addProseMirrorPlugins() {
-          return [
-            new Plugin({
-              key: new PluginKey("get-heading-id"),
-              props: {
-                decorations: (state) => {
-                  const headings: HeadingNode[] = [];
-                  const { doc } = state;
-                  doc.descendants((node) => {
-                    if (node.type.name === ExtensionHeading.name) {
-                      headings.push({
-                        level: node.attrs.level,
-                        text: node.textContent,
-                        id: node.attrs.id,
-                      });
-                    }
-                  });
-                  headingNodes.value = headings;
-                  if (!selectedHeadingNode.value) {
-                    selectedHeadingNode.value = headings[0];
-                  }
-                  return DecorationSet.empty;
-                },
-              },
-            }),
-          ];
-        },
-      }),
-      ExtensionListKeymap,
-      UiExtensionUpload,
-      ExtensionSearchAndReplace,
-      ExtensionClearFormat,
-      ExtensionFormatBrush,
-      ExtensionRangeSelection,
-    ],
+    extensions: extension,
     parseOptions: {
       preserveWhitespace: true,
     },
