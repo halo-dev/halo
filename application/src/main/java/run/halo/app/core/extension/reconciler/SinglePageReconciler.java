@@ -17,6 +17,9 @@ import org.jsoup.Jsoup;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Component;
 import org.springframework.util.Assert;
+import reactor.core.publisher.Mono;
+import run.halo.app.content.ContentWrapper;
+import run.halo.app.content.ExcerptGenerator;
 import run.halo.app.content.NotificationReasonConst;
 import run.halo.app.content.SinglePageService;
 import run.halo.app.content.comment.CommentService;
@@ -43,6 +46,7 @@ import run.halo.app.infra.utils.JsonUtils;
 import run.halo.app.metrics.CounterService;
 import run.halo.app.metrics.MeterUtils;
 import run.halo.app.notification.NotificationCenter;
+import run.halo.app.plugin.extensionpoint.ExtensionGetter;
 
 /**
  * <p>Reconciler for {@link SinglePage}.</p>
@@ -65,6 +69,7 @@ public class SinglePageReconciler implements Reconciler<Reconciler.Request> {
     private final SinglePageService singlePageService;
     private final CounterService counterService;
     private final CommentService commentService;
+    private final ExtensionGetter extensionGetter;
 
     private final ExternalUrlSupplier externalUrlSupplier;
 
@@ -318,12 +323,7 @@ public class SinglePageReconciler implements Reconciler<Reconciler.Request> {
             }
 
             if (excerpt.getAutoGenerate()) {
-                singlePageService.getContent(spec.getHeadSnapshot(), spec.getBaseSnapshot())
-                    .blockOptional()
-                    .ifPresent(content -> {
-                        String contentRevised = content.getContent();
-                        status.setExcerpt(getExcerpt(contentRevised));
-                    });
+                status.setExcerpt(getExcerpt(singlePage));
             } else {
                 status.setExcerpt(excerpt.getRaw());
             }
@@ -363,11 +363,40 @@ public class SinglePageReconciler implements Reconciler<Reconciler.Request> {
         });
     }
 
-    private String getExcerpt(String htmlContent) {
-        String shortHtmlContent = StringUtils.substring(htmlContent, 0, 500);
-        String text = Jsoup.parse(shortHtmlContent).text();
-        // TODO The default capture 150 words as excerpt
-        return StringUtils.substring(text, 0, 150);
+    private String getExcerpt(SinglePage singlePage) {
+        Optional<ContentWrapper> contentWrapper =
+            singlePageService.getContent(singlePage.getSpec().getReleaseSnapshot(),
+                    singlePage.getSpec().getBaseSnapshot())
+                .blockOptional();
+        if (contentWrapper.isEmpty()) {
+            return StringUtils.EMPTY;
+        }
+        var content = contentWrapper.get();
+        var context = new ExcerptGenerator.Context()
+            .setRaw(content.getRaw())
+            .setContent(content.getContent())
+            .setRaw(content.getRawType())
+            .setKeywords(Set.of())
+            .setMaxLength(160);
+        return extensionGetter.getEnabledExtension(ExcerptGenerator.class)
+            .defaultIfEmpty(new DefaultExcerptGenerator())
+            .flatMap(generator -> generator.generate(context))
+            .onErrorResume(Throwable.class, e -> {
+                log.error("Failed to generate excerpt for single page [{}]",
+                    singlePage.getMetadata().getName(), e);
+                return Mono.empty();
+            })
+            .blockOptional()
+            .orElse(StringUtils.EMPTY);
+    }
+
+    static class DefaultExcerptGenerator implements ExcerptGenerator {
+        @Override
+        public Mono<String> generate(Context context) {
+            String shortHtmlContent = StringUtils.substring(context.getContent(), 0, 500);
+            String text = Jsoup.parse(shortHtmlContent).text();
+            return Mono.just(StringUtils.substring(text, 0, 150));
+        }
     }
 
     private boolean isDeleted(SinglePage singlePage) {

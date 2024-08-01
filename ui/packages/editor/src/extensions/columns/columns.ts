@@ -322,7 +322,7 @@ const Columns = Node.create({
         parseHTML: (element) => element.getAttribute("cols"),
       },
       style: {
-        default: "display: flex;width: 100%;grid-gap: 8px;gap: 8px;",
+        default: "display: flex;width: 100%;gap: 1em;",
         parseHTML: (element) => element.getAttribute("style"),
       },
     };

@@ -7,6 +7,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import java.util.LinkedHashMap;
 import java.util.Map;
+import java.util.Objects;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.DisposableBean;
@@ -18,13 +19,13 @@ import org.springframework.lang.NonNull;
 import org.springframework.lang.Nullable;
 import reactor.core.publisher.Mono;
 import run.halo.app.extension.ConfigMap;
-import run.halo.app.extension.DefaultExtensionMatcher;
 import run.halo.app.extension.ExtensionClient;
+import run.halo.app.extension.ExtensionMatcher;
+import run.halo.app.extension.ListOptions;
 import run.halo.app.extension.ReactiveExtensionClient;
 import run.halo.app.extension.controller.Controller;
 import run.halo.app.extension.controller.ControllerBuilder;
 import run.halo.app.extension.controller.Reconciler;
-import run.halo.app.extension.router.selector.FieldSelector;
 import run.halo.app.infra.utils.JsonParseException;
 import run.halo.app.infra.utils.JsonUtils;
 
@@ -185,16 +186,17 @@ public class DefaultReactiveSettingFetcher
 
     @Override
     public Controller setupWith(ControllerBuilder builder) {
-        var configMap = new ConfigMap();
-        var extensionMatcher =
-            DefaultExtensionMatcher.builder(blockingClient, configMap.groupVersionKind())
-                .fieldSelector(FieldSelector.of(equal("metadata.name", configMapName)))
-                .build();
+        ExtensionMatcher matcher =
+            extension -> Objects.equals(extension.getMetadata().getName(), configMapName);
         return builder
-            .extension(configMap)
-            .syncAllOnStart(false)
-            .onAddMatcher(extensionMatcher)
-            .onUpdateMatcher(extensionMatcher)
+            .extension(new ConfigMap())
+            .syncAllOnStart(true)
+            .syncAllListOptions(ListOptions.builder()
+                .fieldQuery(equal("metadata.name", configMapName))
+                .build())
+            .onAddMatcher(matcher)
+            .onUpdateMatcher(matcher)
+            .onDeleteMatcher(matcher)
             .build();
     }
 

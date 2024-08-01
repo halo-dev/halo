@@ -35,6 +35,33 @@ spec:
           name: location
           label: 存储位置
           help: ~/.halo2/attachments/upload 下的子目录
+        - $formkit: text
+          name: maxFileSize
+          label: 最大单文件大小
+          validation: [['matches', '/^(0|[1-9]\d*)(?:[KMG]B)?$/']]
+          validation-visibility: "live"
+          validation-messages:
+            matches: "输入格式错误，遵循：整数 + 大写的单位（KB, MB, GB）"
+          help: "0 表示不限制，示例：5KB、10MB、1GB"
+        - $formkit: checkbox
+          name: allowedFileTypes
+          label: 文件类型限制
+          help: 限制允许上传的文件类型
+          options:
+            - label: 无限制
+              value: ALL
+            - label: 图片
+              value: IMAGE
+            - label: SVG
+              value: SVG
+            - label: 视频
+              value: VIDEO
+            - label: 音频
+              value: AUDIO
+            - label: 文档
+              value: DOCUMENT
+            - label: 压缩包
+              value: ARCHIVE
 ---
 apiVersion: storage.halo.run/v1alpha1
 kind: Group

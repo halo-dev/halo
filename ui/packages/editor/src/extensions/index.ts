@@ -5,7 +5,6 @@ import ExtensionDropcursor from "@tiptap/extension-dropcursor";
 import ExtensionHardBreak from "@tiptap/extension-hard-break";
 import ExtensionHorizontalRule from "@tiptap/extension-horizontal-rule";
 import ExtensionPlaceholder from "@tiptap/extension-placeholder";
-import ExtensionTextStyle from "@tiptap/extension-text-style";
 import ExtensionBlockquote from "./blockquote";
 import ExtensionBold from "./bold";
 import ExtensionBulletList from "./bullet-list";
@@ -29,6 +28,7 @@ import ExtensionTextAlign from "./text-align";
 import ExtensionUnderline from "./underline";
 
 // Custom extensions
+import ExtensionTextStyle from "@/extensions/text-style";
 import {
   ExtensionCodeBlock,
   type ExtensionCodeBlockOptions,

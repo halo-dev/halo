@@ -22,6 +22,7 @@ ext {
     lucene = "9.11.1"
     resilience4jVersion = "2.2.0"
     twoFactorAuth = "1.3"
+    tika = "2.9.2"
 }
 
 javaPlatform {
@@ -54,6 +55,7 @@ dependencies {
         api "io.github.resilience4j:resilience4j-spring-boot3:$resilience4jVersion"
         api "io.github.resilience4j:resilience4j-reactor:$resilience4jVersion"
         api "com.j256.two-factor-auth:two-factor-auth:$twoFactorAuth"
+        api "org.apache.tika:tika-core:$tika"
     }
 
 }
