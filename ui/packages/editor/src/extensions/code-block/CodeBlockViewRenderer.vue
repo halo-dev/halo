@@ -23,14 +23,17 @@ const props = defineProps<{
 }>();
 
 const languageOptions = computed(() => {
-  let languages = [];
+  let languages: Array<string> = [];
   const lang = props.extension.options.languages;
   if (typeof lang === "function") {
     languages = lang(props.editor.state);
   } else {
     languages = lang;
   }
-  languages.unshift("auto");
+  languages = languages || [];
+  if (languages.indexOf("auto") === -1) {
+    languages.unshift("auto");
+  }
   return languages.map((language) => ({
     label: language.replace(/( |^)[a-z]/g, (L) => L.toUpperCase()),
     value: language,
@@ -54,8 +57,6 @@ const themeOptions = computed(() => {
   } else {
     themes = theme;
   }
-
-  themes = themes || [];
 
   if (!themes) {
     return undefined;
