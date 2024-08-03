@@ -9,6 +9,8 @@
 目前支持扩展的数据列表：
 
 - 文章：`"post:list-item:operation:create"?: (post: Ref<ListedPost>) => | OperationItem<ListedPost>[] | Promise<OperationItem<ListedPost>[]>`
+- 评论：`"comment:list-item:operation:create"?: (comment: Ref<ListedComment>) => | OperationItem<ListedComment>[] | Promise<OperationItem<ListedComment>[]>`
+- 回复：`"reply:list-item:operation:create"?: (reply: Ref<ListedReply>) => | OperationItem<ListedReply>[] | Promise<OperationItem<ListedReply>[]>`
 - 插件：`"plugin:list-item:operation:create"?: (plugin: Ref<Plugin>) => | OperationItem<Plugin>[] | Promise<OperationItem<Plugin>[]>`
 - 备份：`"backup:list-item:operation:create"?: (backup: Ref<Backup>) => | OperationItem<Backup>[] | Promise<OperationItem<Backup>[]>`
 - 主题：`"theme:list-item:operation:create"?: (theme: Ref<Theme>) => | OperationItem<Theme>[] | Promise<OperationItem<Theme>[]>`
