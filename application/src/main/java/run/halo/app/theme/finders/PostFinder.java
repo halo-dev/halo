@@ -37,6 +37,8 @@ public interface PostFinder {
 
     Mono<ListResult<ListedPostVo>> list(@Nullable Integer page, @Nullable Integer size);
 
+    Mono<ListResult<ListedPostVo>> list(@Nullable Integer page, @Nullable Integer size, String sort);
+
     Mono<ListResult<ListedPostVo>> listByCategory(@Nullable Integer page, @Nullable Integer size,
         String categoryName);
 

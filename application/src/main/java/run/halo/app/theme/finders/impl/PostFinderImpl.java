@@ -144,6 +144,24 @@ public class PostFinderImpl implements PostFinder {
         return postPublicQueryService.list(listOptions, getPageRequest(page, size));
     }
 
+    @Override
+    public Mono<ListResult<ListedPostVo>> list(Integer page, Integer size, String sort) {
+        var listOptions = ListOptions.builder()
+            .fieldQuery(notEqual("status.hideFromList", BooleanUtils.TRUE))
+            .build();
+        var sorts = Sort.by(Sort.Direction.DESC,"spec.publishTime");
+        if (StringUtils.isNotBlank(sort)) {
+            if (sort.equals("visit")) {
+                sorts = Sort.by(Sort.Order.desc("stats.visit"));
+            }
+            if (sort.equals("comment")) {
+                sorts = Sort.by(Sort.Order.desc("stats.totalComment"));
+            }
+        }
+        var pageRequest = PageRequestImpl.of(pageNullSafe(page), sizeNullSafe(size), sorts);
+        return postPublicQueryService.list(listOptions, pageRequest);
+    }
+
     private PageRequestImpl getPageRequest(Integer page, Integer size) {
         return PageRequestImpl.of(pageNullSafe(page), sizeNullSafe(size), defaultSort());
     }
