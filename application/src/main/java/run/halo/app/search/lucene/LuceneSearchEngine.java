@@ -17,6 +17,7 @@ import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.lucene.analysis.Analyzer;
 import org.apache.lucene.analysis.charfilter.HTMLStripCharFilterFactory;
@@ -170,6 +171,45 @@ public class LuceneSearchEngine implements SearchEngine, InitializingBean, Dispo
                     new TermQuery(new Term("published", filterPublished.toString())), FILTER
                 );
             }
+
+            Optional.ofNullable(option.getIncludeTypes())
+                .filter(types -> !types.isEmpty())
+                .ifPresent(types -> {
+                    var typeTerms = types.stream()
+                        .distinct()
+                        .map(BytesRef::new)
+                        .toList();
+                    queryBuilder.add(new TermInSetQuery("type", typeTerms), FILTER);
+                });
+
+            Optional.ofNullable(option.getIncludeOwnerNames())
+                .filter(ownerNames -> !ownerNames.isEmpty())
+                .ifPresent(ownerNames -> {
+                    var ownerTerms = ownerNames.stream()
+                        .distinct()
+                        .map(BytesRef::new)
+                        .toList();
+                    queryBuilder.add(new TermInSetQuery("ownerName", ownerTerms), FILTER);
+                });
+
+            Optional.ofNullable(option.getIncludeTagNames())
+                .filter(tagNames -> !tagNames.isEmpty())
+                .ifPresent(tagNames -> tagNames
+                    .stream()
+                    .distinct()
+                    .forEach(tagName ->
+                        queryBuilder.add(new TermQuery(new Term("tag", tagName)), FILTER)
+                    ));
+
+            Optional.ofNullable(option.getIncludeCategoryNames())
+                .filter(categoryNames -> !categoryNames.isEmpty())
+                .ifPresent(categoryNames -> categoryNames
+                    .stream()
+                    .distinct()
+                    .forEach(categoryName ->
+                        queryBuilder.add(new TermQuery(new Term("category", categoryName)), FILTER)
+                    ));
+
             var finalQuery = queryBuilder.build();
             var limit = option.getLimit();
 

@@ -6,6 +6,7 @@ import static run.halo.app.core.extension.content.Post.VisibleEnum.PRIVATE;
 import static run.halo.app.core.extension.content.Post.VisibleEnum.PUBLIC;
 
 import java.time.Duration;
+import java.util.List;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -122,6 +123,9 @@ public class LuceneSearchEngineIntegrationTest {
         option.setKeyword("halo");
         option.setHighlightPreTag("<my-tag>");
         option.setHighlightPostTag("</my-tag>");
+        option.setIncludeTagNames(List.of("search"));
+        option.setIncludeCategoryNames(List.of("halo"));
+        option.setIncludeOwnerNames(List.of("admin"));
         retryTemplate.execute(context -> {
             webClient.post().uri("/apis/api.halo.run/v1alpha1/indices/-/search")
                 .bodyValue(option)
@@ -218,6 +222,8 @@ public class LuceneSearchEngineIntegrationTest {
         spec.setPriority(0);
         spec.setSlug("/first-post");
         spec.setDeleted(false);
+        spec.setTags(List.of("search"));
+        spec.setCategories(List.of("halo"));
         var excerpt = new Post.Excerpt();
         excerpt.setRaw("first post description");
         excerpt.setAutoGenerate(false);
