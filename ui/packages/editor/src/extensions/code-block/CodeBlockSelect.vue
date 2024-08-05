@@ -10,7 +10,6 @@ export interface Option {
 const props = defineProps<{
   container?: any;
   containerClass?: string;
-  placeholder?: string;
   options: Option[];
   filterSort?: (options: Option[], query: string) => number;
 }>();
@@ -19,9 +18,9 @@ const value = defineModel({
   default: "",
 });
 
-const emit = defineEmits({
-  select: () => true,
-});
+const emit = defineEmits<{
+  (event: "select"): void;
+}>();
 
 const isFocus = ref(false);
 const inputValue = ref<string>("");

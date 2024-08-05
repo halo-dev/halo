@@ -1,26 +1,19 @@
 <script lang="ts" setup>
 import { i18n } from "@/locales";
-import type { Decoration, PMNode, Editor } from "@/tiptap";
-import { Node, NodeViewContent, NodeViewWrapper } from "@/tiptap/vue-3";
+import {
+  NodeViewContent,
+  NodeViewWrapper,
+  type NodeViewProps,
+} from "@/tiptap/vue-3";
 import { useTimeout } from "@vueuse/core";
 import { computed } from "vue";
 import BxBxsCopy from "~icons/bx/bxs-copy";
 import RiArrowDownSFill from "~icons/ri/arrow-down-s-fill";
 import RiArrowRightSFill from "~icons/ri/arrow-right-s-fill";
 import IconCheckboxCircle from "~icons/ri/checkbox-circle-line";
-import type { ExtensionCodeBlockOptions } from "./code-block";
-import Select from "./Select.vue";
+import CodeBlockSelect from "./CodeBlockSelect.vue";
 
-const props = defineProps<{
-  editor: Editor;
-  node: PMNode;
-  decorations: Decoration[];
-  selected: boolean;
-  extension: Node<ExtensionCodeBlockOptions, any>;
-  getPos: () => number;
-  updateAttributes: (attributes: Record<string, any>) => void;
-  deleteNode: () => void;
-}>();
+const props = defineProps<NodeViewProps>();
 
 const languageOptions = computed(() => {
   let languages: Array<string> = [];
@@ -120,14 +113,14 @@ const handleCopyCode = () => {
             <RiArrowDownSFill v-else />
           </div>
         </div>
-        <Select
+        <CodeBlockSelect
           v-model="selectedLanguage"
           :container="editor.options.element"
-          :container-class="'w-40'"
+          :container-class="'w-48'"
           :options="languageOptions"
           @select="editor.commands.focus()"
         >
-        </Select>
+        </CodeBlockSelect>
         <Select
           v-if="themeOptions && themeOptions.length > 0"
           v-model="selectedTheme"

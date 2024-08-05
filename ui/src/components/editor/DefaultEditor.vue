@@ -192,7 +192,7 @@ const handleCloseAttachmentSelectorModal = () => {
 
 const { filterDuplicateExtensions } = useExtension();
 
-const presetExtension = [
+const presetExtensions = [
   ExtensionBlockquote,
   ExtensionBold,
   ExtensionBulletList,
@@ -402,14 +402,14 @@ onMounted(async () => {
     emit("update", html);
   }, 250);
 
-  const extension = filterDuplicateExtensions([
-    ...presetExtension,
+  const extensions = filterDuplicateExtensions([
+    ...presetExtensions,
     ...extensionsFromPlugins,
   ]);
 
   editor.value = new Editor({
     content: props.raw,
-    extensions: extension,
+    extensions,
     parseOptions: {
       preserveWhitespace: true,
     },
