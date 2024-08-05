@@ -18,7 +18,7 @@ import { useQueryClient } from "@tanstack/vue-query";
 import { computed, inject, ref, type Ref, toRefs, markRaw } from "vue";
 import { useI18n } from "vue-i18n";
 import ReplyCreationModal from "./ReplyCreationModal.vue";
-import {useOperationItemExtensionPoint} from "@console/composables/use-operation-extension-points";
+import { useOperationItemExtensionPoint } from "@console/composables/use-operation-extension-points";
 import EntityDropdownItems from "@/components/entity/EntityDropdownItems.vue";
 
 const { t } = useI18n();

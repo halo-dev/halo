@@ -36,7 +36,7 @@ import { computed, onMounted, provide, ref, type Ref, toRefs, markRaw } from "vu
 import { useI18n } from "vue-i18n";
 import ReplyCreationModal from "./ReplyCreationModal.vue";
 import ReplyListItem from "./ReplyListItem.vue";
-import {useOperationItemExtensionPoint} from "@console/composables/use-operation-extension-points";
+import { useOperationItemExtensionPoint } from "@console/composables/use-operation-extension-points";
 import EntityDropdownItems from "@/components/entity/EntityDropdownItems.vue";
 
 const { currentUserHasPermission } = usePermission();
