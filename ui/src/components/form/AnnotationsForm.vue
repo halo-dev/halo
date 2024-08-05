@@ -227,6 +227,7 @@ function onCustomFormToggle(e: Event) {
       </template>
     </FormKit>
 
+    <!-- @vue-ignore -->
     <details
       :open="showCustomForm"
       class="flex cursor-pointer space-y-4 py-4 transition-all first:pt-0"
