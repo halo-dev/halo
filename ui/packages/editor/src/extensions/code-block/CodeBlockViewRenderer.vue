@@ -121,7 +121,7 @@ const handleCopyCode = () => {
           @select="editor.commands.focus()"
         >
         </CodeBlockSelect>
-        <Select
+        <CodeBlockSelect
           v-if="themeOptions && themeOptions.length > 0"
           v-model="selectedTheme"
           :container="editor.options.element"
@@ -129,7 +129,7 @@ const handleCopyCode = () => {
           :options="themeOptions"
           @select="editor.commands.focus()"
         >
-        </Select>
+        </CodeBlockSelect>
       </div>
       <div class="pr-3 flex items-center">
         <div
