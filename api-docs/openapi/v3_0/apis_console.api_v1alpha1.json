@@ -2,7 +2,7 @@
   "openapi": "3.0.1",
   "info": {
     "title": "Halo",
-    "version": "2.18.0-SNAPSHOT"
+    "version": "2.19.0-SNAPSHOT"
   },
   "servers": [
     {

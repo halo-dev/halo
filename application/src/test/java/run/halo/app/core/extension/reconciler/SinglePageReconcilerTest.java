@@ -26,6 +26,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.context.ApplicationContext;
 import reactor.core.publisher.Mono;
 import run.halo.app.content.ContentWrapper;
+import run.halo.app.content.ExcerptGenerator;
 import run.halo.app.content.NotificationReasonConst;
 import run.halo.app.content.SinglePageService;
 import run.halo.app.content.TestPost;
@@ -39,6 +40,7 @@ import run.halo.app.extension.controller.Reconciler;
 import run.halo.app.infra.ExternalUrlSupplier;
 import run.halo.app.metrics.CounterService;
 import run.halo.app.notification.NotificationCenter;
+import run.halo.app.plugin.extensionpoint.ExtensionGetter;
 
 /**
  * Tests for {@link SinglePageReconciler}.
@@ -66,6 +68,9 @@ class SinglePageReconcilerTest {
     @Mock
     NotificationCenter notificationCenter;
 
+    @Mock
+    ExtensionGetter extensionGetter;
+
     @InjectMocks
     private SinglePageReconciler singlePageReconciler;
 
@@ -79,9 +84,10 @@ class SinglePageReconcilerTest {
         String name = "page-A";
         SinglePage page = pageV1();
         page.getSpec().setHeadSnapshot("page-A-head-snapshot");
+        page.getSpec().setReleaseSnapshot(page.getSpec().getHeadSnapshot());
         when(client.fetch(eq(SinglePage.class), eq(name)))
             .thenReturn(Optional.of(page));
-        when(singlePageService.getContent(eq(page.getSpec().getHeadSnapshot()),
+        when(singlePageService.getContent(eq(page.getSpec().getReleaseSnapshot()),
             eq(page.getSpec().getBaseSnapshot())))
             .thenReturn(Mono.just(ContentWrapper.builder()
                 .snapshotName(page.getSpec().getHeadSnapshot())
@@ -98,6 +104,9 @@ class SinglePageReconcilerTest {
         when(client.listAll(eq(Snapshot.class), any(), any()))
             .thenReturn(List.of(snapshotV1, snapshotV2));
         when(externalUrlSupplier.get()).thenReturn(URI.create(""));
+
+        when(extensionGetter.getEnabledExtension(eq(ExcerptGenerator.class)))
+            .thenReturn(Mono.empty());
 
         ArgumentCaptor<SinglePage> captor = ArgumentCaptor.forClass(SinglePage.class);
         singlePageReconciler.reconcile(new Reconciler.Request(name));
@@ -141,7 +150,7 @@ class SinglePageReconcilerTest {
             page.getSpec().setReleaseSnapshot("page-fake-released-snapshot");
             when(client.fetch(eq(SinglePage.class), eq(name)))
                 .thenReturn(Optional.of(page));
-            when(singlePageService.getContent(eq(page.getSpec().getHeadSnapshot()),
+            when(singlePageService.getContent(eq(page.getSpec().getReleaseSnapshot()),
                 eq(page.getSpec().getBaseSnapshot())))
                 .thenReturn(Mono.just(ContentWrapper.builder()
                     .snapshotName(page.getSpec().getHeadSnapshot())
@@ -155,6 +164,9 @@ class SinglePageReconcilerTest {
             snapshotV2.getSpec().setLastModifyTime(lastModifyTime);
             when(client.fetch(eq(Snapshot.class), eq(page.getSpec().getReleaseSnapshot())))
                 .thenReturn(Optional.of(snapshotV2));
+
+            when(extensionGetter.getEnabledExtension(eq(ExcerptGenerator.class)))
+                .thenReturn(Mono.empty());
 
             when(client.listAll(eq(Snapshot.class), any(), any()))
                 .thenReturn(List.of());
@@ -176,7 +188,7 @@ class SinglePageReconcilerTest {
             page.getSpec().setPublish(false);
             when(client.fetch(eq(SinglePage.class), eq(name)))
                 .thenReturn(Optional.of(page));
-            when(singlePageService.getContent(eq(page.getSpec().getHeadSnapshot()),
+            when(singlePageService.getContent(eq(page.getSpec().getReleaseSnapshot()),
                 eq(page.getSpec().getBaseSnapshot())))
                 .thenReturn(Mono.just(ContentWrapper.builder()
                     .snapshotName(page.getSpec().getHeadSnapshot())
@@ -185,6 +197,9 @@ class SinglePageReconcilerTest {
                     .rawType("markdown")
                     .build())
                 );
+
+            when(extensionGetter.getEnabledExtension(eq(ExcerptGenerator.class)))
+                .thenReturn(Mono.empty());
 
             when(client.listAll(eq(Snapshot.class), any(), any()))
                 .thenReturn(List.of());

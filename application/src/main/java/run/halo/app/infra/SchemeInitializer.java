@@ -181,10 +181,6 @@ public class SchemeInitializer implements ApplicationListener<ApplicationContext
                     return contributors == null ? Set.of() : Set.copyOf(contributors);
                 })));
             indexSpecs.add(new IndexSpec()
-                .setName("status.categories")
-                .setIndexFunc(
-                    simpleAttribute(Post.class, post -> post.getStatusOrDefault().getExcerpt())));
-            indexSpecs.add(new IndexSpec()
                 .setName("status.phase")
                 .setIndexFunc(
                     simpleAttribute(Post.class, post -> post.getStatusOrDefault().getPhase())));
