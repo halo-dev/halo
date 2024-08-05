@@ -13,10 +13,13 @@ import {
   VStatusDot,
   VTag,
 } from "@halo-dev/components";
+import type { OperationItem } from "@halo-dev/console-shared";
 import { useQueryClient } from "@tanstack/vue-query";
-import { computed, inject, ref, type Ref } from "vue";
+import { computed, inject, ref, type Ref, toRefs, markRaw } from "vue";
 import { useI18n } from "vue-i18n";
 import ReplyCreationModal from "./ReplyCreationModal.vue";
+import { useOperationItemExtensionPoint } from "@console/composables/use-operation-extension-points";
+import EntityDropdownItems from "@/components/entity/EntityDropdownItems.vue";
 
 const { t } = useI18n();
 const queryClient = useQueryClient();
@@ -32,6 +35,8 @@ const props = withDefaults(
     replies: undefined,
   }
 );
+
+const { reply } = toRefs(props);
 
 const quoteReply = computed(() => {
   const { quoteReply: replyName } = props.reply.reply.spec;
@@ -119,6 +124,31 @@ function onReplyCreationModalClose() {
   });
   replyModal.value = false;
 }
+
+const { operationItems } = useOperationItemExtensionPoint<ListedReply>(
+  "reply:list-item:operation:create",
+  reply,
+  computed((): OperationItem<ListedReply>[] => [
+    {
+      priority: 0,
+      component: markRaw(VDropdownItem),
+      label: t("core.comment.operations.approve_reply.button"),
+      permissions: ["system:comments:manage"],
+      action: handleApprove,
+      hidden: props.reply?.reply.spec.approved,
+    },
+    {
+      priority: 10,
+      component: markRaw(VDropdownItem),
+      props: {
+        type: "danger",
+      },
+      label: t("core.common.buttons.delete"),
+      permissions: ["system:comments:manage"],
+      action: handleDelete,
+    },
+  ])
+);
 </script>
 
 <template>
@@ -214,20 +244,7 @@ function onReplyCreationModalClose() {
       </VEntityField>
     </template>
     <template #dropdownItems>
-      <VDropdownItem
-        v-if="!reply?.reply.spec.approved"
-        v-permission="['system:comments:manage']"
-        @click="handleApprove"
-      >
-        {{ $t("core.comment.operations.approve_reply.button") }}
-      </VDropdownItem>
-      <VDropdownItem
-        v-permission="['system:comments:manage']"
-        type="danger"
-        @click="handleDelete"
-      >
-        {{ $t("core.common.buttons.delete") }}
-      </VDropdownItem>
+      <EntityDropdownItems :dropdown-items="operationItems" :item="reply" />
     </template>
   </VEntity>
 </template>
