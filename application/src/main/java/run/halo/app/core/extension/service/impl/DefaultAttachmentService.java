@@ -4,7 +4,6 @@ import java.net.URI;
 import java.net.URL;
 import java.nio.file.Paths;
 import java.time.Duration;
-import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Consumer;
 import java.util.function.Function;
@@ -157,7 +156,6 @@ public class DefaultAttachmentService implements AttachmentService {
                 }
                 MediaType contentType = httpHeaders.getContentType();
                 mediaTypeRef.set(contentType);
-                // TODO validate media type
                 return response;
             })
             .map(response -> dataBufferFetcher.fetch(uri));

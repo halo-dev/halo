@@ -125,7 +125,8 @@ public class AttachmentEndpoint implements CustomEndpoint {
                             .schema(schemaBuilder().implementation(UploadFromUrlRequest.class))
                         ))
                     .response(responseBuilder().implementation(Attachment.class))
-                    .build())
+                    .build()
+            )
             .GET("/attachments", this::search,
                 builder -> {
                     builder
