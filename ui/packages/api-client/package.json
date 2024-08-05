@@ -47,7 +47,7 @@
     "@openapitools/openapi-generator-cli": "^2.13.4",
     "@types/node": "^20.14.2",
     "rimraf": "^5.0.7",
-    "typescript": "^5.4.5",
+    "typescript": "~5.5.4",
     "unbuild": "^0.7.6",
     "vite-plugin-dts": "^3.9.1"
   },
