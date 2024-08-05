@@ -150,7 +150,7 @@
     "tailwindcss": "^3.2.7",
     "tailwindcss-safe-area": "^0.2.2",
     "tailwindcss-themer": "^2.0.3",
-    "typescript": "~5.3.0",
+    "typescript": "~5.5.4",
     "unplugin-icons": "^0.14.15",
     "vite": "^5.2.11",
     "vite-plugin-externals": "^0.6.2",
@@ -159,6 +159,6 @@
     "vite-plugin-static-copy": "^1.0.4",
     "vite-plugin-vue-devtools": "^7.2.1",
     "vitest": "^0.34.1",
-    "vue-tsc": "^1.8.27"
+    "vue-tsc": "^2.0.29"
   }
 }
