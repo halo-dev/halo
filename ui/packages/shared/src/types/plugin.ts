@@ -12,7 +12,7 @@ import type {
   Plugin,
   Theme,
   ListedComment,
-  ListedReply
+  ListedReply,
 } from "@halo-dev/api-client";
 import type { AnyExtension } from "@halo-dev/richtext-editor";
 import type { Component, Ref } from "vue";

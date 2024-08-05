@@ -133,7 +133,7 @@ const { operationItems } = useOperationItemExtensionPoint<ListedReply>(
       priority: 0,
       component: markRaw(VDropdownItem),
       label: t("core.comment.operations.approve_reply.button"),
-      permissions: ['system:comments:manage'],
+      permissions: ["system:comments:manage"],
       action: handleApprove,
       hidden: props.reply?.reply.spec.approved,
     },
@@ -144,7 +144,7 @@ const { operationItems } = useOperationItemExtensionPoint<ListedReply>(
         type: "danger",
       },
       label: t("core.common.buttons.delete"),
-      permissions: ['system:comments:manage'],
+      permissions: ["system:comments:manage"],
       action: handleDelete,
     },
   ])
