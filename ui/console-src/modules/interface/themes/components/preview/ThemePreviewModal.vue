@@ -9,7 +9,6 @@ import type {
 } from "@halo-dev/api-client";
 import { axiosInstance, consoleApiClient } from "@halo-dev/api-client";
 import {
-  IconArrowLeft,
   IconComputer,
   IconLink,
   IconPalette,
@@ -29,6 +28,7 @@ import { storeToRefs } from "pinia";
 import { computed, markRaw, onMounted, ref, toRaw } from "vue";
 import { useI18n } from "vue-i18n";
 import ThemePreviewListItem from "./ThemePreviewListItem.vue";
+import StickyBlock from "@/components/sticky-block/StickyBlock.vue";
 
 const props = withDefaults(
   defineProps<{
@@ -348,21 +348,23 @@ const iframeClasses = computed(() => {
                     />
                   </FormKit>
                 </div>
-                <div v-permission="['system:themes:manage']" class="pt-5">
-                  <div class="flex justify-start">
-                    <VButton
-                      :loading="saving"
-                      type="secondary"
-                      @click="
-                        $formkit.submit(
-                          `preview-setting-${activeSettingTab}` || ''
-                        )
-                      "
-                    >
-                      {{ $t("core.common.buttons.save") }}
-                    </VButton>
-                  </div>
-                </div>
+                <StickyBlock
+                  v-permission="['system:themes:manage']"
+                  class="-mx-4 -mb-4 -mr-3 rounded-b-base rounded-t-lg bg-white p-4 pt-5"
+                  position="bottom"
+                >
+                  <VButton
+                    :loading="saving"
+                    type="secondary"
+                    @click="
+                      $formkit.submit(
+                        `preview-setting-${activeSettingTab}` || ''
+                      )
+                    "
+                  >
+                    {{ $t("core.common.buttons.save") }}
+                  </VButton>
+                </StickyBlock>
               </div>
             </div>
           </transition>
@@ -397,25 +399,6 @@ const iframeClasses = computed(() => {
                 />
               </li>
             </ul>
-          </transition>
-          <transition
-            enter-active-class="transform transition ease-in-out duration-300"
-            enter-from-class="translate-y-full"
-            enter-to-class="translate-y-0"
-            leave-active-class="transform transition ease-in-out duration-300"
-            leave-from-class="translate-y-0"
-            leave-to-class="translate-y-full"
-          >
-            <div v-if="settingsVisible" class="fixed bottom-2 left-2">
-              <VButton
-                size="md"
-                circle
-                type="primary"
-                @click="handleOpenThemes"
-              >
-                <IconArrowLeft />
-              </VButton>
-            </div>
           </transition>
         </OverlayScrollbarsComponent>
       </transition>
