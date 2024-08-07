@@ -5,6 +5,7 @@ export const imageTypes: string[] = [
   "image/gif",
   "image/webp",
   "image/svg+xml",
+  "image/avif",
 ];
 
 export function isImage(mediaType: string | undefined): boolean {
