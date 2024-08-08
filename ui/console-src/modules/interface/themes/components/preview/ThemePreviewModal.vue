@@ -7,7 +7,7 @@ import type {
   SettingForm,
   Theme,
 } from "@halo-dev/api-client";
-import { axiosInstance, consoleApiClient } from "@halo-dev/api-client";
+import { consoleApiClient } from "@halo-dev/api-client";
 import {
   IconArrowLeft,
   IconComputer,
@@ -54,6 +54,7 @@ interface SettingTab {
 
 const { activatedTheme } = storeToRefs(useThemeStore());
 
+const previewFrame = ref<HTMLIFrameElement | null>(null);
 const themesVisible = ref(false);
 const switching = ref(false);
 const selectedTheme = ref<Theme>();
@@ -97,26 +98,6 @@ const modalTitle = computed(() => {
   return t("core.theme.preview_model.title", {
     display_name: selectedTheme.value?.spec.displayName,
   });
-});
-
-const {
-  data: previewHTML,
-  isLoading,
-  refetch: refetchPreviewHTML,
-} = useQuery({
-  queryKey: ["site-preview", previewUrl],
-  queryFn: async () => {
-    const { data } = await axiosInstance.get(previewUrl.value, {
-      headers: {
-        Accept: "text/html",
-        "Cache-Control": "no-cache",
-        Pragma: "no-cache",
-        Expires: "0",
-      },
-    });
-    return data;
-  },
-  enabled: computed(() => !!previewUrl.value),
 });
 
 // theme settings
@@ -169,6 +150,10 @@ const { formSchema, configMapFormData, convertToSave } = useSettingFormConvert(
   activeSettingTab
 );
 
+const handleRefresh = () => {
+  previewFrame.value?.contentWindow?.location.reload();
+};
+
 const handleSaveConfigMap = async () => {
   saving.value = true;
 
@@ -190,7 +175,7 @@ const handleSaveConfigMap = async () => {
 
   saving.value = false;
 
-  refetchPreviewHTML();
+  handleRefresh();
 };
 
 const handleOpenSettings = (theme?: Theme) => {
@@ -271,7 +256,7 @@ const iframeClasses = computed(() => {
           content: $t('core.common.buttons.refresh'),
           delay: 300,
         }"
-        @click="refetchPreviewHTML()"
+        @click="handleRefresh()"
       >
         <IconRefreshLine />
       </span>
@@ -422,12 +407,13 @@ const iframeClasses = computed(() => {
       <div
         class="flex h-full flex-1 items-center justify-center transition-all duration-300"
       >
-        <VLoading v-if="isLoading" />
+        <VLoading v-if="!previewUrl" />
         <iframe
           v-else
+          ref="previewFrame"
           class="border-none transition-all duration-500"
           :class="iframeClasses"
-          :srcdoc="previewHTML"
+          :src="previewUrl"
         ></iframe>
       </div>
     </div>
