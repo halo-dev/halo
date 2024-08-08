@@ -19,17 +19,12 @@ import {
   type Range,
 } from "@/tiptap/vue-3";
 import { deleteNode } from "@/utils";
-import type { CodeBlockLowlightOptions } from "@tiptap/extension-code-block-lowlight";
-import CodeBlockLowlight from "@tiptap/extension-code-block-lowlight";
 import { markRaw } from "vue";
 import MdiCodeBracesBox from "~icons/mdi/code-braces-box";
 import CodeBlockViewRenderer from "./CodeBlockViewRenderer.vue";
-
-export interface CustomCodeBlockLowlightOptions
-  extends CodeBlockLowlightOptions {
-  lowlight: any;
-  defaultLanguage: string | null | undefined;
-}
+import TiptapCodeBlock, {
+  type CodeBlockOptions,
+} from "@tiptap/extension-code-block";
 
 declare module "@/tiptap" {
   interface Commands<ReturnType> {
@@ -97,9 +92,23 @@ const getRenderContainer = (node: HTMLElement) => {
   return container;
 };
 
-export default CodeBlockLowlight.extend<
-  CustomCodeBlockLowlightOptions & CodeBlockLowlightOptions
->({
+export interface ExtensionCodeBlockOptions extends CodeBlockOptions {
+  /**
+   * Used for language list
+   *
+   * @default []
+   */
+  languages: Array<string> | ((state: EditorState) => Array<string>);
+
+  /**
+   * Used for theme list
+   *
+   * @default []
+   */
+  themes?: Array<string> | ((state: EditorState) => Array<string>);
+}
+
+export default TiptapCodeBlock.extend<ExtensionCodeBlockOptions>({
   allowGapCursor: true,
   // It needs to have a higher priority than range-selection,
   // otherwise the Mod-a shortcut key will be overridden.
@@ -116,6 +125,18 @@ export default CodeBlockLowlight.extend<
           if (attributes.collapsed) {
             return {
               collapsed: attributes.collapsed,
+            };
+          }
+          return {};
+        },
+      },
+      theme: {
+        default: null,
+        parseHTML: (element) => element.getAttribute("theme") || null,
+        renderHTML: (attributes) => {
+          if (attributes.theme) {
+            return {
+              theme: attributes.theme,
             };
           }
           return {};
@@ -197,7 +218,7 @@ export default CodeBlockLowlight.extend<
         if (this.editor.isActive("codeBlock")) {
           const { tr, selection } = this.editor.state;
           const codeBlack = findParentNode(
-            (node) => node.type.name === CodeBlockLowlight.name
+            (node) => node.type.name === TiptapCodeBlock.name
           )(selection);
           if (!codeBlack) {
             return false;
@@ -218,9 +239,12 @@ export default CodeBlockLowlight.extend<
   addNodeView() {
     return VueNodeViewRenderer(CodeBlockViewRenderer);
   },
+
   addOptions() {
     return {
       ...this.parent?.(),
+      languages: [],
+      themes: [],
       getToolbarItems({ editor }: { editor: Editor }) {
         return {
           priority: 160,
@@ -265,7 +289,7 @@ export default CodeBlockLowlight.extend<
         return {
           pluginKey: "codeBlockBubbleMenu",
           shouldShow: ({ state }: { state: EditorState }) => {
-            return isActive(state, CodeBlockLowlight.name);
+            return isActive(state, TiptapCodeBlock.name);
           },
           getRenderContainer: (node: HTMLElement) => {
             return getRenderContainer(node);
@@ -277,7 +301,7 @@ export default CodeBlockLowlight.extend<
                 icon: markRaw(MdiDeleteForeverOutline),
                 title: i18n.global.t("editor.common.button.delete"),
                 action: ({ editor }: { editor: Editor }) =>
-                  deleteNode(CodeBlockLowlight.name, editor),
+                  deleteNode(TiptapCodeBlock.name, editor),
               },
             },
           ],
