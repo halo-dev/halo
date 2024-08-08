@@ -2,7 +2,9 @@ package run.halo.app.infra;
 
 import java.net.URI;
 import org.springframework.core.io.buffer.DataBuffer;
+import org.springframework.http.ResponseEntity;
 import reactor.core.publisher.Flux;
+import reactor.core.publisher.Mono;
 
 /**
  * <p>{@link DataBuffer} stream fetcher from uri.</p>
@@ -10,7 +12,6 @@ import reactor.core.publisher.Flux;
  * @author guqing
  * @since 2.6.0
  */
-@FunctionalInterface
 public interface ReactiveUrlDataBufferFetcher {
 
     /**
@@ -20,4 +21,12 @@ public interface ReactiveUrlDataBufferFetcher {
      * @return data buffer flux
      */
     Flux<DataBuffer> fetch(URI uri);
+
+    /**
+     * <p>Get head of the uri.</p>
+     *
+     * @param uri uri to fetch
+     * @return response entity
+     */
+    Mono<ResponseEntity<Void>> head(URI uri);
 }
