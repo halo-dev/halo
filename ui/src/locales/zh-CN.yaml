@@ -1640,6 +1640,10 @@ core:
         fields:
           description: 备注
           string_data: 字符串数据
+    code:
+      fullscreen:
+        exit: 退出全屏
+        enter: 全屏编辑
   common:
     buttons:
       save: 保存
