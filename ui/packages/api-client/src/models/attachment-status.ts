@@ -26,5 +26,11 @@ export interface AttachmentStatus {
      * @memberof AttachmentStatus
      */
     'permalink'?: string;
+    /**
+     * 
+     * @type {{ [key: string]: string; }}
+     * @memberof AttachmentStatus
+     */
+    'thumbnails'?: { [key: string]: string; };
 }
 

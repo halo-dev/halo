@@ -45,7 +45,7 @@ const emit = defineEmits<{
 
 const selectedGroup = ref();
 const page = ref(1);
-const size = ref(20);
+const size = ref(60);
 
 const {
   attachments,
@@ -138,7 +138,7 @@ function onGroupSelect(group: Group) {
   </VEmpty>
   <div
     v-else
-    class="mt-2 grid grid-cols-3 gap-x-2 gap-y-3 sm:grid-cols-3 md:grid-cols-5"
+    class="mt-2 grid grid-cols-3 gap-x-2 gap-y-3 sm:grid-cols-3 md:grid-cols-6 xl:grid-cols-8 2xl:grid-cols-10"
     role="list"
   >
     <VCard
@@ -161,7 +161,9 @@ function onGroupSelect(group: Group) {
             v-if="isImage(attachment.spec.mediaType)"
             :key="attachment.metadata.name"
             :alt="attachment.spec.displayName"
-            :src="attachment.status?.permalink"
+            :src="
+              attachment.status?.thumbnails?.S || attachment.status?.permalink
+            "
             classes="pointer-events-none object-cover group-hover:opacity-75 transform-gpu"
           >
             <template #loading>
@@ -218,7 +220,7 @@ function onGroupSelect(group: Group) {
         $t('core.components.pagination.total_label', { total: total })
       "
       :total="total"
-      :size-options="[20, 50, 100]"
+      :size-options="[60, 120, 200]"
     />
   </div>
   <AttachmentUploadModal v-if="uploadVisible" @close="onUploadModalClose" />
