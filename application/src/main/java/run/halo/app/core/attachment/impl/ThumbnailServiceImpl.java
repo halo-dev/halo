@@ -10,7 +10,6 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 import reactor.core.publisher.Mono;
-import run.halo.app.core.attachment.LocalThumbnailProvider;
 import run.halo.app.core.attachment.ThumbnailProvider;
 import run.halo.app.core.attachment.ThumbnailProvider.ThumbnailContext;
 import run.halo.app.core.attachment.ThumbnailService;
@@ -29,7 +28,6 @@ import run.halo.app.plugin.extensionpoint.ExtensionGetter;
 @RequiredArgsConstructor
 public class ThumbnailServiceImpl implements ThumbnailService {
     private final ExtensionGetter extensionGetter;
-    private final LocalThumbnailProvider localThumbnailProvider;
     private final ReactiveExtensionClient client;
     private final ExternalLinkProcessor externalLinkProcessor;
 
@@ -70,7 +68,6 @@ public class ThumbnailServiceImpl implements ThumbnailService {
         return extensionGetter.getEnabledExtensions(ThumbnailProvider.class)
             .filterWhen(provider -> provider.supports(context))
             .next()
-            .defaultIfEmpty(localThumbnailProvider)
             .flatMap(provider -> provider.generate(context))
             .flatMap(uri -> {
                 var thumb = new Thumbnail();

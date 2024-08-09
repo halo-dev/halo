@@ -58,16 +58,16 @@ public class AttachmentReconciler implements Reconciler<Request> {
                         // Only for back-compatibility
                         return annotations.get(Constant.EXTERNAL_LINK_ANNO_KEY);
                     }))
+                    .flatMap(permalink -> {
+                        if (AttachmentUtils.isImage(attachment)) {
+                            return populateThumbnails(permalink, nullSafeStatus(attachment))
+                                .thenReturn(permalink);
+                        }
+                        return Mono.just(permalink);
+                    })
                     .doOnNext(permalink -> {
                         log.debug("Set permalink {} for attachment {}", permalink, request.name());
-                        var status = attachment.getStatus();
-                        if (status == null) {
-                            status = new AttachmentStatus();
-                            attachment.setStatus(status);
-                        }
-                        if (AttachmentUtils.isImage(attachment)) {
-                            populateThumbnails(permalink, status);
-                        }
+                        var status = nullSafeStatus(attachment);
                         status.setPermalink(permalink);
                     })
                     .blockOptional();
@@ -77,6 +77,15 @@ public class AttachmentReconciler implements Reconciler<Request> {
         return null;
     }
 
+    private static AttachmentStatus nullSafeStatus(Attachment attachment) {
+        var status = attachment.getStatus();
+        if (status == null) {
+            status = new AttachmentStatus();
+            attachment.setStatus(status);
+        }
+        return status;
+    }
+
     @Override
     public Controller setupWith(ControllerBuilder builder) {
         return builder
@@ -84,15 +93,15 @@ public class AttachmentReconciler implements Reconciler<Request> {
             .build();
     }
 
-    void populateThumbnails(String permalink, AttachmentStatus status) {
+    Mono<Void> populateThumbnails(String permalink, AttachmentStatus status) {
         var imageUri = URI.create(permalink);
-        Flux.fromArray(ThumbnailSize.values())
+        return Flux.fromArray(ThumbnailSize.values())
             .flatMap(size -> thumbnailService.generate(imageUri, size)
                 .map(thumbUri -> Map.entry(size.name(), thumbUri.toString()))
             )
             .collectMap(Map.Entry::getKey, Map.Entry::getValue)
             .doOnNext(status::setThumbnails)
-            .block();
+            .then();
     }
 
     void updateStatus(String attachmentName, AttachmentStatus status) {

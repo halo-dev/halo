@@ -98,9 +98,10 @@ class ThumbnailServiceImplTest {
     void createTest() throws MalformedURLException {
         var url = new URL("http://localhost:8090/test.jpg");
         when(extensionGetter.getEnabledExtensions(eq(ThumbnailProvider.class)))
-            .thenReturn(Flux.empty());
+            .thenReturn(Flux.just(localThumbnailProvider));
         var thumbUri = URI.create("/test-thumb.jpg");
         when(localThumbnailProvider.generate(any())).thenReturn(Mono.just(thumbUri));
+        when(localThumbnailProvider.supports(any())).thenReturn(Mono.just(true));
         when(client.create(any())).thenReturn(Mono.empty());
 
         thumbnailService.create(url, ThumbnailSize.M)
@@ -127,5 +128,17 @@ class ThumbnailServiceImplTest {
                 }
                 """.formatted(hash), JsonUtils.objectToJson(thumb), true);
         }));
+    }
+
+    @Test
+    void createTest2() throws MalformedURLException {
+        when(extensionGetter.getEnabledExtensions(eq(ThumbnailProvider.class)))
+            .thenReturn(Flux.empty());
+
+        // no thumbnail provider will do nothing
+        var url = new URL("http://localhost:8090/test.jpg");
+        thumbnailService.create(url, ThumbnailSize.M)
+            .as(StepVerifier::create)
+            .verifyComplete();
     }
 }
