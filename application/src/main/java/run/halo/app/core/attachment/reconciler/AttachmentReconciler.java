@@ -1,50 +1,55 @@
-package run.halo.app.core.extension.reconciler.attachment;
+package run.halo.app.core.attachment.reconciler;
+
+import static run.halo.app.extension.ExtensionUtil.addFinalizers;
+import static run.halo.app.extension.ExtensionUtil.removeFinalizers;
 
 import java.net.URI;
-import java.util.HashSet;
+import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
+import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
+import run.halo.app.core.attachment.AttachmentUtils;
+import run.halo.app.core.attachment.ThumbnailService;
+import run.halo.app.core.attachment.ThumbnailSize;
 import run.halo.app.core.extension.attachment.Attachment;
 import run.halo.app.core.extension.attachment.Attachment.AttachmentStatus;
 import run.halo.app.core.extension.attachment.Constant;
 import run.halo.app.core.extension.service.AttachmentService;
 import run.halo.app.extension.ExtensionClient;
+import run.halo.app.extension.ExtensionUtil;
 import run.halo.app.extension.controller.Controller;
 import run.halo.app.extension.controller.ControllerBuilder;
 import run.halo.app.extension.controller.Reconciler;
 import run.halo.app.extension.controller.Reconciler.Request;
-import run.halo.app.infra.ExternalUrlSupplier;
 
 @Slf4j
 @Component
+@RequiredArgsConstructor
 public class AttachmentReconciler implements Reconciler<Request> {
 
     private final ExtensionClient client;
 
-    private final ExternalUrlSupplier externalUrl;
-
     private final AttachmentService attachmentService;
 
-    public AttachmentReconciler(ExtensionClient client,
-        ExternalUrlSupplier externalUrl, AttachmentService attachmentService) {
-        this.client = client;
-        this.externalUrl = externalUrl;
-        this.attachmentService = attachmentService;
-    }
+    private final ThumbnailService thumbnailService;
 
     @Override
     public Result reconcile(Request request) {
         client.fetch(Attachment.class, request.name()).ifPresent(attachment -> {
-            // TODO Handle the finalizer
-            if (attachment.getMetadata().getDeletionTimestamp() != null) {
-                removeFinalizer(attachment);
+            if (ExtensionUtil.isDeleted(attachment)) {
+                if (removeFinalizers(attachment.getMetadata(), Set.of(Constant.FINALIZER_NAME))) {
+                    cleanUpResources(attachment);
+                    client.update(attachment);
+                }
                 return;
             }
             // add finalizer
-            addFinalizerIfNotSet(request.name(), attachment.getMetadata().getFinalizers());
+            addFinalizers(attachment.getMetadata(), Set.of(Constant.FINALIZER_NAME));
+
             var annotations = attachment.getMetadata().getAnnotations();
             if (annotations != null) {
                 attachmentService.getPermalink(attachment)
@@ -59,6 +64,9 @@ public class AttachmentReconciler implements Reconciler<Request> {
                         if (status == null) {
                             status = new AttachmentStatus();
                             attachment.setStatus(status);
+                        }
+                        if (AttachmentUtils.isImage(attachment)) {
+                            populateThumbnails(permalink, status);
                         }
                         status.setPermalink(permalink);
                     })
@@ -76,6 +84,17 @@ public class AttachmentReconciler implements Reconciler<Request> {
             .build();
     }
 
+    void populateThumbnails(String permalink, AttachmentStatus status) {
+        var imageUri = URI.create(permalink);
+        Flux.fromArray(ThumbnailSize.values())
+            .flatMap(size -> thumbnailService.generate(imageUri, size)
+                .map(thumbUri -> Map.entry(size.name(), thumbUri.toString()))
+            )
+            .collectMap(Map.Entry::getKey, Map.Entry::getValue)
+            .doOnNext(status::setThumbnails)
+            .block();
+    }
+
     void updateStatus(String attachmentName, AttachmentStatus status) {
         client.fetch(Attachment.class, attachmentName)
             .filter(attachment -> !Objects.deepEquals(attachment.getStatus(), status))
@@ -85,41 +104,7 @@ public class AttachmentReconciler implements Reconciler<Request> {
             });
     }
 
-    void removeFinalizer(Attachment oldAttachment) {
-        if (!hasFinalizer(oldAttachment, Constant.FINALIZER_NAME)) {
-            return;
-        }
-        attachmentService.delete(oldAttachment).block();
-        client.fetch(Attachment.class, oldAttachment.getMetadata().getName())
-            .ifPresent(attachment -> {
-                var finalizers = attachment.getMetadata().getFinalizers();
-                if (hasFinalizer(attachment, Constant.FINALIZER_NAME)
-                    && finalizers.remove(Constant.FINALIZER_NAME)) {
-                    // update it
-                    client.update(attachment);
-                }
-            });
+    void cleanUpResources(Attachment attachment) {
+        attachmentService.delete(attachment).block();
     }
-
-    boolean hasFinalizer(Attachment attachment, String finalizer) {
-        var finalizers = attachment.getMetadata().getFinalizers();
-        return finalizers != null && finalizers.contains(finalizer);
-    }
-
-    void addFinalizerIfNotSet(String attachmentName, Set<String> existingFinalizers) {
-        if (existingFinalizers != null && existingFinalizers.contains(Constant.FINALIZER_NAME)) {
-            return;
-        }
-
-        client.fetch(Attachment.class, attachmentName).ifPresent(attachment -> {
-            var finalizers = attachment.getMetadata().getFinalizers();
-            if (finalizers == null) {
-                finalizers = new HashSet<>();
-                attachment.getMetadata().setFinalizers(finalizers);
-            }
-            finalizers.add(Constant.FINALIZER_NAME);
-            client.update(attachment);
-        });
-    }
-
 }

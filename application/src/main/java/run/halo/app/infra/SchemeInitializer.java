@@ -33,8 +33,10 @@ import run.halo.app.core.extension.User;
 import run.halo.app.core.extension.UserConnection;
 import run.halo.app.core.extension.attachment.Attachment;
 import run.halo.app.core.extension.attachment.Group;
+import run.halo.app.core.extension.attachment.LocalThumbnail;
 import run.halo.app.core.extension.attachment.Policy;
 import run.halo.app.core.extension.attachment.PolicyTemplate;
+import run.halo.app.core.extension.attachment.Thumbnail;
 import run.halo.app.core.extension.content.Category;
 import run.halo.app.core.extension.content.Comment;
 import run.halo.app.core.extension.content.Post;
@@ -449,6 +451,25 @@ public class SchemeInitializer implements ApplicationListener<ApplicationContext
             );
         });
         schemeManager.register(PolicyTemplate.class);
+        schemeManager.register(Thumbnail.class, indexSpec -> {
+            indexSpec.add(new IndexSpec()
+                .setName(Thumbnail.ID_INDEX)
+                .setIndexFunc(simpleAttribute(Thumbnail.class, Thumbnail::idIndexFunc))
+            );
+        });
+        schemeManager.register(LocalThumbnail.class, indexSpec -> {
+            indexSpec.add(new IndexSpec()
+                .setName("spec.imageSignature")
+                .setIndexFunc(simpleAttribute(LocalThumbnail.class,
+                    thumbnail -> thumbnail.getSpec().getImageSignature())
+                ));
+            indexSpec.add(new IndexSpec()
+                .setName("spec.thumbSignature")
+                .setUnique(true)
+                .setIndexFunc(simpleAttribute(LocalThumbnail.class,
+                    thumbnail -> thumbnail.getSpec().getThumbSignature())
+                ));
+        });
         // metrics.halo.run
         schemeManager.register(Counter.class);
         // auth.halo.run
