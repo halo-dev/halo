@@ -1725,6 +1725,10 @@ core:
         fields:
           description: Description
           string_data: String Data
+    code:
+      fullscreen:
+        exit: Exit fullscreen
+        enter: Enter fullscreen to edit
   common:
     buttons:
       save: Save

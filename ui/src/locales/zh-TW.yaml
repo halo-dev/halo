@@ -1597,6 +1597,10 @@ core:
         fields:
           description: 備註
           string_data: 字符串數據
+    code:
+      fullscreen:
+        exit: 退出全屏
+        enter: 全屏编辑
   common:
     buttons:
       save: 保存
