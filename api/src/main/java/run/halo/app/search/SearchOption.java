@@ -53,22 +53,22 @@ public class SearchOption {
     private Boolean filterPublished;
 
     /**
-     * Types to include. If null, it will include all types.
+     * Types to include(or). If null, it will include all types.
      */
     private List<String> includeTypes;
 
     /**
-     * Owner names to include. If null, it will include all owners.
+     * Owner names to include(or). If null, it will include all owners.
      */
     private List<String> includeOwnerNames;
 
     /**
-     * Category names to include. If null, it will include all categories.
+     * Category names to include(and). If null, it will include all categories.
      */
     private List<String> includeCategoryNames;
 
     /**
-     * Tag names to include. If null, it will include all tags.
+     * Tag names to include(and). If null, it will include all tags.
      */
     private List<String> includeTagNames;
 

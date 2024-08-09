@@ -147,7 +147,7 @@ export function deleteCurrentNodeAndSetSelection(
   const { tr } = state;
   if (deleteNodeByPos($from)(tr) && dispatch) {
     if (beforePos !== 0) {
-      tr.setSelection(TextSelection.create(tr.doc, beforePos - 1));
+      tr.setSelection(TextSelection.near(tr.doc.resolve(beforePos - 1), -1));
     }
     dispatch(tr);
     return true;
