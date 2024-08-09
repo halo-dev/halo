@@ -104,7 +104,10 @@ const getGroupName = (name: string | undefined) => {
             >
               <LazyImage
                 :alt="attachment?.spec.displayName"
-                :src="attachment?.status?.permalink"
+                :src="
+                  attachment?.status?.thumbnails?.M ||
+                  attachment?.status?.permalink
+                "
                 classes="max-w-full cursor-pointer rounded sm:max-w-[50%]"
               >
                 <template #loading>

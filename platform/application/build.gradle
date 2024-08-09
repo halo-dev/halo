@@ -23,6 +23,7 @@ ext {
     resilience4jVersion = "2.2.0"
     twoFactorAuth = "1.3"
     tika = "2.9.2"
+    imgscalr = '4.2'
 }
 
 javaPlatform {
@@ -56,6 +57,7 @@ dependencies {
         api "io.github.resilience4j:resilience4j-reactor:$resilience4jVersion"
         api "com.j256.two-factor-auth:two-factor-auth:$twoFactorAuth"
         api "org.apache.tika:tika-core:$tika"
+        api "org.imgscalr:imgscalr-lib:$imgscalr"
     }
 
 }
