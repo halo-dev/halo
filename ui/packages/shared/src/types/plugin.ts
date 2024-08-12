@@ -11,6 +11,8 @@ import type {
   ListedPost,
   Plugin,
   Theme,
+  ListedComment,
+  ListedReply,
 } from "@halo-dev/api-client";
 import type { AnyExtension } from "@halo-dev/richtext-editor";
 import type { Component, Ref } from "vue";
@@ -51,6 +53,14 @@ export interface ExtensionPoint {
   "post:list-item:operation:create"?: (
     post: Ref<ListedPost>
   ) => OperationItem<ListedPost>[];
+
+  "comment:list-item:operation:create"?: (
+    comment: Ref<ListedComment>
+  ) => OperationItem<ListedComment>[];
+
+  "reply:list-item:operation:create"?: (
+    reply: Ref<ListedReply>
+  ) => OperationItem<ListedReply>[];
 
   "plugin:list-item:operation:create"?: (
     plugin: Ref<Plugin>

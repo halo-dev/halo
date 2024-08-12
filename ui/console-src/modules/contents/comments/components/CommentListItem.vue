@@ -29,12 +29,23 @@ import {
 import type {
   CommentSubjectRefProvider,
   CommentSubjectRefResult,
+  OperationItem,
 } from "@halo-dev/console-shared";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/vue-query";
-import { computed, onMounted, provide, ref, type Ref } from "vue";
+import {
+  computed,
+  onMounted,
+  provide,
+  ref,
+  type Ref,
+  toRefs,
+  markRaw,
+} from "vue";
 import { useI18n } from "vue-i18n";
 import ReplyCreationModal from "./ReplyCreationModal.vue";
 import ReplyListItem from "./ReplyListItem.vue";
+import { useOperationItemExtensionPoint } from "@console/composables/use-operation-extension-points";
+import EntityDropdownItems from "@/components/entity/EntityDropdownItems.vue";
 
 const { currentUserHasPermission } = usePermission();
 const { t } = useI18n();
@@ -49,6 +60,8 @@ const props = withDefaults(
     isSelected: false,
   }
 );
+
+const { comment } = toRefs(props);
 
 const hoveredReply = ref<ListedReply>();
 const showReplies = ref(false);
@@ -293,6 +306,35 @@ const subjectRefResult = computed(() => {
   }
   return subjectRef.resolve(subject);
 });
+
+const { operationItems } = useOperationItemExtensionPoint<ListedComment>(
+  "comment:list-item:operation:create",
+  comment,
+  computed((): OperationItem<ListedComment>[] => [
+    {
+      priority: 0,
+      component: markRaw(VDropdownItem),
+      label: t("core.comment.operations.approve_comment_in_batch.button"),
+      action: handleApprove,
+      hidden: props.comment?.comment.spec.approved,
+    },
+    {
+      priority: 10,
+      component: markRaw(VDropdownItem),
+      label: t("core.comment.operations.approve_applies_in_batch.button"),
+      action: handleApproveReplyInBatch,
+    },
+    {
+      priority: 20,
+      component: markRaw(VDropdownItem),
+      props: {
+        type: "danger",
+      },
+      label: t("core.common.buttons.delete"),
+      action: handleDelete,
+    },
+  ])
+);
 </script>
 
 <template>
@@ -419,18 +461,7 @@ const subjectRefResult = computed(() => {
       v-if="currentUserHasPermission(['system:comments:manage'])"
       #dropdownItems
     >
-      <VDropdownItem
-        v-if="!comment?.comment.spec.approved"
-        @click="handleApprove"
-      >
-        {{ $t("core.comment.operations.approve_comment_in_batch.button") }}
-      </VDropdownItem>
-      <VDropdownItem @click="handleApproveReplyInBatch">
-        {{ $t("core.comment.operations.approve_applies_in_batch.button") }}
-      </VDropdownItem>
-      <VDropdownItem type="danger" @click="handleDelete">
-        {{ $t("core.common.buttons.delete") }}
-      </VDropdownItem>
+      <EntityDropdownItems :dropdown-items="operationItems" :item="comment" />
     </template>
 
     <template v-if="showReplies" #footer>
