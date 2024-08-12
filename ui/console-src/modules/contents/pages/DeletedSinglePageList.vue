@@ -23,7 +23,6 @@ import {
   VStatusDot,
 } from "@halo-dev/components";
 import { useQuery } from "@tanstack/vue-query";
-import { cloneDeep } from "lodash-es";
 import { ref, watch } from "vue";
 import { useI18n } from "vue-i18n";
 
@@ -132,12 +131,17 @@ const handleRecovery = async (singlePage: SinglePage) => {
     confirmText: t("core.common.buttons.confirm"),
     cancelText: t("core.common.buttons.cancel"),
     onConfirm: async () => {
-      const singlePageToUpdate = cloneDeep(singlePage);
-      singlePageToUpdate.spec.deleted = false;
-      await coreApiClient.content.singlePage.updateSinglePage({
-        name: singlePageToUpdate.metadata.name,
-        singlePage: singlePageToUpdate,
+      await coreApiClient.content.singlePage.patchSinglePage({
+        name: singlePage.metadata.name,
+        jsonPatchInner: [
+          {
+            op: "add",
+            path: "/spec/deleted",
+            value: false,
+          },
+        ],
       });
+
       await refetch();
 
       Toast.success(t("core.common.toast.recovery_success"));
@@ -164,15 +168,15 @@ const handleRecoveryInBatch = async () => {
             return Promise.resolve();
           }
 
-          return coreApiClient.content.singlePage.updateSinglePage({
+          return coreApiClient.content.singlePage.patchSinglePage({
             name: singlePage.metadata.name,
-            singlePage: {
-              ...singlePage,
-              spec: {
-                ...singlePage.spec,
-                deleted: false,
+            jsonPatchInner: [
+              {
+                op: "add",
+                path: "/spec/deleted",
+                value: false,
               },
-            },
+            ],
           });
         })
       );
