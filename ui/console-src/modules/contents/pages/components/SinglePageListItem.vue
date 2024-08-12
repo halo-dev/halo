@@ -196,22 +196,25 @@ const handleDelete = async () => {
           <VStatusDot :text="$t('core.common.tooltips.publishing')" animate />
         </template>
       </VEntityField>
-      <VEntityField>
-        <template #description>
-          <IconEye
-            v-if="singlePage.page.spec.visible === 'PUBLIC'"
-            v-tooltip="$t('core.page.filters.visible.items.public')"
-            class="cursor-pointer text-sm transition-all hover:text-blue-600"
-            @click="changeVisibleMutation(singlePage.page)"
-          />
-          <IconEyeOff
-            v-if="singlePage.page.spec.visible === 'PRIVATE'"
-            v-tooltip="$t('core.page.filters.visible.items.private')"
-            class="cursor-pointer text-sm transition-all hover:text-blue-600"
-            @click="changeVisibleMutation(singlePage.page)"
-          />
-        </template>
-      </VEntityField>
+      <HasPermission :permissions="['system:singlepages:manage']">
+        <VEntityField>
+          <template #description>
+            <IconEye
+              v-if="singlePage.page.spec.visible === 'PUBLIC'"
+              v-tooltip="$t('core.page.filters.visible.items.public')"
+              class="cursor-pointer text-sm transition-all hover:text-blue-600"
+              @click="changeVisibleMutation(singlePage.page)"
+            />
+            <IconEyeOff
+              v-if="singlePage.page.spec.visible === 'PRIVATE'"
+              v-tooltip="$t('core.page.filters.visible.items.private')"
+              class="cursor-pointer text-sm transition-all hover:text-blue-600"
+              @click="changeVisibleMutation(singlePage.page)"
+            />
+          </template>
+        </VEntityField>
+      </HasPermission>
+
       <VEntityField v-if="singlePage?.page?.spec.deleted">
         <template #description>
           <VStatusDot
