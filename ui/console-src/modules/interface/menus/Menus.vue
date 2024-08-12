@@ -15,7 +15,6 @@ import {
 } from "@halo-dev/components";
 import { useQuery, useQueryClient } from "@tanstack/vue-query";
 import { useDebounceFn } from "@vueuse/core";
-import { cloneDeep } from "lodash-es";
 import { computed, ref } from "vue";
 import { useI18n } from "vue-i18n";
 import MenuItemEditingModal from "./components/MenuItemEditingModal.vue";
@@ -94,23 +93,26 @@ const onMenuItemEditingModalClose = () => {
 };
 
 const onMenuItemSaved = async (menuItem: MenuItem) => {
-  const menuToUpdate = cloneDeep(selectedMenu.value);
+  if (!selectedMenu.value) {
+    return;
+  }
 
   // update menu items
-  if (
-    menuToUpdate &&
-    !menuToUpdate.spec.menuItems?.includes(menuItem.metadata.name)
-  ) {
-    menuToUpdate.spec.menuItems = [
-      ...(menuToUpdate.spec.menuItems || []),
-      menuItem.metadata.name,
-    ];
-
-    await coreApiClient.menu.updateMenu({
-      name: menuToUpdate.metadata.name,
-      menu: menuToUpdate,
-    });
-  }
+  await coreApiClient.menu.patchMenu({
+    name: selectedMenu.value.metadata.name,
+    jsonPatchInner: [
+      {
+        op: "add",
+        path: "/spec/menuItems",
+        value: Array.from(
+          new Set([
+            ...(selectedMenu.value.spec.menuItems || []),
+            menuItem.metadata.name,
+          ])
+        ),
+      },
+    ],
+  });
 
   await queryClient.invalidateQueries({ queryKey: ["menus"] });
   await refetch();
@@ -124,9 +126,20 @@ const handleUpdateInBatch = useDebounceFn(async () => {
   try {
     batchUpdating.value = true;
     const promises = menuItemsToUpdate.map((menuItem) =>
-      coreApiClient.menuItem.updateMenuItem({
+      coreApiClient.menuItem.patchMenuItem({
         name: menuItem.metadata.name,
-        menuItem,
+        jsonPatchInner: [
+          {
+            op: "add",
+            path: "/spec/priority",
+            value: menuItem.spec.priority || 0,
+          },
+          {
+            op: "add",
+            path: "/spec/children",
+            value: menuItem.spec.children || [],
+          },
+        ],
       })
     );
     await Promise.all(promises);
@@ -165,16 +178,20 @@ const handleDelete = async (menuItem: MenuTreeItem) => {
       await refetch();
 
       // update items under menu
-      const menuToUpdate = cloneDeep(selectedMenu.value);
-      if (menuToUpdate) {
-        menuToUpdate.spec.menuItems = menuToUpdate.spec.menuItems?.filter(
-          (name) => ![menuItem.metadata.name, ...childrenNames].includes(name)
-        );
-        await coreApiClient.menu.updateMenu({
-          name: menuToUpdate.metadata.name,
-          menu: menuToUpdate,
-        });
-      }
+      await coreApiClient.menu.patchMenu({
+        name: selectedMenu.value?.metadata.name as string,
+        jsonPatchInner: [
+          {
+            op: "add",
+            path: "/spec/menuItems",
+            value:
+              selectedMenu.value?.spec.menuItems?.filter(
+                (name) =>
+                  ![menuItem.metadata.name, ...childrenNames].includes(name)
+              ) || [],
+          },
+        ],
+      });
 
       await queryClient.invalidateQueries({ queryKey: ["menus"] });
 
