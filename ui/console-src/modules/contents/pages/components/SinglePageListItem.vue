@@ -19,7 +19,6 @@ import {
   VStatusDot,
 } from "@halo-dev/components";
 import { useMutation, useQueryClient } from "@tanstack/vue-query";
-import { cloneDeep } from "lodash-es";
 import type { Ref } from "vue";
 import { computed, inject, ref } from "vue";
 import { useI18n } from "vue-i18n";
@@ -71,24 +70,21 @@ const isPublishing = computed(() => {
 
 const { mutate: changeVisibleMutation } = useMutation({
   mutationFn: async (singlePage: SinglePage) => {
-    const { data } = await coreApiClient.content.singlePage.getSinglePage({
+    return await coreApiClient.content.singlePage.patchSinglePage({
       name: singlePage.metadata.name,
+      jsonPatchInner: [
+        {
+          op: "add",
+          path: "/spec/visible",
+          value: singlePage.spec.visible === "PRIVATE" ? "PUBLIC" : "PRIVATE",
+        },
+      ],
     });
-    data.spec.visible = data.spec.visible === "PRIVATE" ? "PUBLIC" : "PRIVATE";
-    await coreApiClient.content.singlePage.updateSinglePage(
-      {
-        name: singlePage.metadata.name,
-        singlePage: data,
-      },
-      {
-        mute: true,
-      }
-    );
-    await queryClient.invalidateQueries({ queryKey: ["singlePages"] });
   },
   retry: 3,
   onSuccess: () => {
     Toast.success(t("core.common.toast.operation_success"));
+    queryClient.invalidateQueries({ queryKey: ["singlePages"] });
   },
   onError: () => {
     Toast.error(t("core.common.toast.operation_failed"));
@@ -103,12 +99,17 @@ const handleDelete = async () => {
     confirmText: t("core.common.buttons.confirm"),
     cancelText: t("core.common.buttons.cancel"),
     onConfirm: async () => {
-      const singlePageToUpdate = cloneDeep(props.singlePage.page);
-      singlePageToUpdate.spec.deleted = true;
-      await coreApiClient.content.singlePage.updateSinglePage({
+      await coreApiClient.content.singlePage.patchSinglePage({
         name: props.singlePage.page.metadata.name,
-        singlePage: singlePageToUpdate,
+        jsonPatchInner: [
+          {
+            op: "add",
+            path: "/spec/deleted",
+            value: true,
+          },
+        ],
       });
+
       await queryClient.invalidateQueries({ queryKey: ["singlePages"] });
 
       Toast.success(t("core.common.toast.delete_success"));
@@ -195,22 +196,25 @@ const handleDelete = async () => {
           <VStatusDot :text="$t('core.common.tooltips.publishing')" animate />
         </template>
       </VEntityField>
-      <VEntityField>
-        <template #description>
-          <IconEye
-            v-if="singlePage.page.spec.visible === 'PUBLIC'"
-            v-tooltip="$t('core.page.filters.visible.items.public')"
-            class="cursor-pointer text-sm transition-all hover:text-blue-600"
-            @click="changeVisibleMutation(singlePage.page)"
-          />
-          <IconEyeOff
-            v-if="singlePage.page.spec.visible === 'PRIVATE'"
-            v-tooltip="$t('core.page.filters.visible.items.private')"
-            class="cursor-pointer text-sm transition-all hover:text-blue-600"
-            @click="changeVisibleMutation(singlePage.page)"
-          />
-        </template>
-      </VEntityField>
+      <HasPermission :permissions="['system:singlepages:manage']">
+        <VEntityField>
+          <template #description>
+            <IconEye
+              v-if="singlePage.page.spec.visible === 'PUBLIC'"
+              v-tooltip="$t('core.page.filters.visible.items.public')"
+              class="cursor-pointer text-sm transition-all hover:text-blue-600"
+              @click="changeVisibleMutation(singlePage.page)"
+            />
+            <IconEyeOff
+              v-if="singlePage.page.spec.visible === 'PRIVATE'"
+              v-tooltip="$t('core.page.filters.visible.items.private')"
+              class="cursor-pointer text-sm transition-all hover:text-blue-600"
+              @click="changeVisibleMutation(singlePage.page)"
+            />
+          </template>
+        </VEntityField>
+      </HasPermission>
+
       <VEntityField v-if="singlePage?.page?.spec.deleted">
         <template #description>
           <VStatusDot
