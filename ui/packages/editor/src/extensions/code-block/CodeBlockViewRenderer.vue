@@ -16,7 +16,10 @@ import CodeBlockSelect from "./CodeBlockSelect.vue";
 const props = defineProps<NodeViewProps>();
 
 const languageOptions = computed(() => {
-  let languages: Array<string> = [];
+  let languages: Array<{
+    label: string;
+    value: string;
+  }> = [];
   const lang = props.extension.options.languages;
   if (typeof lang === "function") {
     languages = lang(props.editor.state);
@@ -24,13 +27,14 @@ const languageOptions = computed(() => {
     languages = lang;
   }
   languages = languages || [];
-  if (languages.indexOf("auto") === -1) {
-    languages.unshift("auto");
+  const languageValues = languages.map((language) => language.value);
+  if (languageValues.indexOf("auto") === -1) {
+    languages.unshift({
+      label: "Auto",
+      value: "auto",
+    });
   }
-  return languages.map((language) => ({
-    label: language.replace(/( |^)[a-z]/g, (L) => L.toUpperCase()),
-    value: language,
-  }));
+  return languages;
 });
 
 const selectedLanguage = computed({
@@ -43,7 +47,12 @@ const selectedLanguage = computed({
 });
 
 const themeOptions = computed(() => {
-  let themes: Array<string> | undefined = [];
+  let themes:
+    | Array<{
+        label: string;
+        value: string;
+      }>
+    | undefined = [];
   const theme = props.extension.options.themes;
   if (typeof theme === "function") {
     themes = theme(props.editor.state);
@@ -54,13 +63,7 @@ const themeOptions = computed(() => {
   if (!themes) {
     return undefined;
   }
-  return themes.map((theme) => ({
-    label: theme
-      .split("-")
-      .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
-      .join(" "),
-    value: theme,
-  }));
+  return themes;
 });
 
 const selectedTheme = computed({
@@ -115,8 +118,8 @@ const handleCopyCode = () => {
         </div>
         <CodeBlockSelect
           v-model="selectedLanguage"
+          class="w-48"
           :container="editor.options.element"
-          :container-class="'w-48'"
           :options="languageOptions"
           @select="editor.commands.focus()"
         >
@@ -125,7 +128,7 @@ const handleCopyCode = () => {
           v-if="themeOptions && themeOptions.length > 0"
           v-model="selectedTheme"
           :container="editor.options.element"
-          :container-class="'w-48'"
+          class="w-48"
           :options="themeOptions"
           @select="editor.commands.focus()"
         >

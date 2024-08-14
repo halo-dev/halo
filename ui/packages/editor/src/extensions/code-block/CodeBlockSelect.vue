@@ -144,14 +144,10 @@ const handleScrollIntoView = () => {
     :shown="isFocus"
     :auto-hide="false"
     :distance="0"
+    auto-size
     :container="container || 'body'"
-    :popper-class="[containerClass]"
   >
-    <div
-      class="relative inline-block"
-      :class="[containerClass]"
-      @keydown="handleOptionKeydown"
-    >
+    <div class="relative inline-block w-full" @keydown="handleOptionKeydown">
       <div class="h-8">
         <div
           class="select-input w-full h-full grid items-center text-sm rounded-md px-3 cursor-pointer box-border"
