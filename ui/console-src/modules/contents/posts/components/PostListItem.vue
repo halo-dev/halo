@@ -185,6 +185,7 @@ const { startFields, endFields } = useEntityFieldItemExtensionPoint<ListedPost>(
       priority: 30,
       position: "end",
       component: markRaw(VisibleField),
+      permissions: ["system:posts:manage"],
       props: {
         post: props.post,
       },
