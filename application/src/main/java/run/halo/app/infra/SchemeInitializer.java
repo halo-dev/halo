@@ -8,6 +8,7 @@ import static run.halo.app.extension.index.IndexAttributeFactory.simpleAttribute
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import java.util.Set;
+import java.util.stream.Collectors;
 import org.apache.commons.lang3.BooleanUtils;
 import org.apache.commons.lang3.ObjectUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -89,7 +90,22 @@ public class SchemeInitializer implements ApplicationListener<ApplicationContext
                 ));
         });
 
-        schemeManager.register(RoleBinding.class);
+        schemeManager.register(RoleBinding.class, is -> {
+            is.add(new IndexSpec()
+                .setName("roleRef.name")
+                .setIndexFunc(simpleAttribute(RoleBinding.class,
+                    roleBinding -> roleBinding.getRoleRef().getName())
+                )
+            );
+            is.add(new IndexSpec()
+                .setName("subjects")
+                .setIndexFunc(multiValueAttribute(RoleBinding.class,
+                    roleBinding -> roleBinding.getSubjects().stream()
+                        .map(RoleBinding.Subject::toString)
+                        .collect(Collectors.toSet()))
+                )
+            );
+        });
         schemeManager.register(User.class, indexSpecs -> {
             indexSpecs.add(new IndexSpec()
                 .setName("spec.displayName")

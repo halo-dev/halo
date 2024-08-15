@@ -1,6 +1,7 @@
 package run.halo.app.core.extension.service;
 
 import java.util.Collection;
+import java.util.Map;
 import java.util.Set;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
@@ -15,6 +16,10 @@ import run.halo.app.core.extension.RoleBinding.Subject;
 public interface RoleService {
 
     Flux<RoleRef> listRoleRefs(Subject subject);
+
+    Flux<String> getRolesByUsername(String username);
+
+    Mono<Map<String, Collection<String>>> getRolesByUsernames(Collection<String> usernames);
 
     Mono<Boolean> contains(Collection<String> source, Collection<String> candidates);
 

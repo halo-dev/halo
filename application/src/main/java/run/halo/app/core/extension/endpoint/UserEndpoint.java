@@ -35,6 +35,7 @@ import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -84,7 +85,6 @@ import run.halo.app.extension.PageRequestImpl;
 import run.halo.app.extension.ReactiveExtensionClient;
 import run.halo.app.extension.router.IListRequest;
 import run.halo.app.extension.router.selector.FieldSelector;
-import run.halo.app.infra.AnonymousUserConst;
 import run.halo.app.infra.SystemConfigurableEnvironmentFetcher;
 import run.halo.app.infra.SystemSetting;
 import run.halo.app.infra.ValidationUtils;
@@ -461,11 +461,14 @@ public class UserEndpoint implements CustomEndpoint {
     private Mono<ServerResponse> getUserByName(ServerRequest request) {
         final var name = request.pathVariable("name");
         return userService.getUser(name)
-            .flatMap(this::toDetailedUser)
-            .flatMap(user -> ServerResponse.ok()
-                .contentType(MediaType.APPLICATION_JSON)
-                .bodyValue(user)
-            );
+            .flatMap(user -> roleService.getRolesByUsername(name)
+                .collectList()
+                .flatMap(roleNames -> roleService.list(new HashSet<>(roleNames))
+                    .collectList()
+                    .map(roles -> new DetailedUser(user, roles))
+                )
+            )
+            .flatMap(detailedUser -> ServerResponse.ok().bodyValue(detailedUser));
     }
 
     record CreateUserRequest(@Schema(requiredMode = REQUIRED) String name,
@@ -604,22 +607,16 @@ public class UserEndpoint implements CustomEndpoint {
     Mono<ServerResponse> me(ServerRequest request) {
         return ReactiveSecurityContextHolder.getContext()
             .map(SecurityContext::getAuthentication)
-            .filter(obj -> !(obj instanceof TwoFactorAuthentication))
-            .map(Authentication::getName)
-            .defaultIfEmpty(AnonymousUserConst.PRINCIPAL)
-            .flatMap(userService::getUser)
-            .flatMap(this::toDetailedUser)
-            .flatMap(user -> ServerResponse.ok()
-                .contentType(MediaType.APPLICATION_JSON)
-                .bodyValue(user));
-    }
-
-    private Mono<DetailedUser> toDetailedUser(User user) {
-        Set<String> roleNames = roleNames(user);
-        return roleService.list(roleNames)
-            .collectList()
-            .map(roles -> new DetailedUser(user, roles))
-            .defaultIfEmpty(new DetailedUser(user, List.of()));
+            .filter(auth -> !(auth instanceof TwoFactorAuthentication))
+            .flatMap(auth -> userService.getUser(auth.getName())
+                .flatMap(user -> {
+                    var roleNames = authoritiesToRoles(auth.getAuthorities());
+                    return roleService.list(roleNames)
+                        .collectList()
+                        .map(roles -> new DetailedUser(user, roles));
+                })
+            )
+            .flatMap(detailedUser -> ServerResponse.ok().bodyValue(detailedUser));
     }
 
     Set<String> roleNames(User user) {
@@ -833,17 +830,28 @@ public class UserEndpoint implements CustomEndpoint {
     }
 
     private Mono<ListResult<ListedUser>> toListedUser(ListResult<User> listResult) {
-        return Flux.fromStream(listResult.get())
-            .concatMap(user -> {
-                Set<String> roleNames = roleNames(user);
-                return roleService.list(roleNames)
-                    .collectList()
-                    .map(roles -> new ListedUser(user, roles))
-                    .defaultIfEmpty(new ListedUser(user, List.of()));
-            })
-            .collectList()
-            .map(items -> convertFrom(listResult, items))
-            .defaultIfEmpty(convertFrom(listResult, List.of()));
+        var usernames = listResult.getItems().stream()
+            .map(user -> user.getMetadata().getName())
+            .collect(Collectors.toList());
+        return roleService.getRolesByUsernames(usernames)
+            .flatMap(usernameRolesMap -> {
+                var allRoleNames = new HashSet<String>();
+                usernameRolesMap.values().forEach(allRoleNames::addAll);
+                return roleService.list(allRoleNames)
+                    .collectMap(role -> role.getMetadata().getName())
+                    .map(roleMap -> {
+                        var listedUsers = listResult.getItems().stream()
+                            .map(user -> {
+                                var username = user.getMetadata().getName();
+                                var roles = Optional.ofNullable(usernameRolesMap.get(username))
+                                    .map(roleNames -> roleNames.stream().map(roleMap::get).toList())
+                                    .orElseGet(List::of);
+                                return new ListedUser(user, roles);
+                            })
+                            .toList();
+                        return convertFrom(listResult, listedUsers);
+                    });
+            });
     }
 
     <T> ListResult<T> convertFrom(ListResult<?> listResult, List<T> items) {
