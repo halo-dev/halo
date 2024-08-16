@@ -10,7 +10,6 @@ import static org.springdoc.core.fn.builders.requestbody.Builder.requestBodyBuil
 import static org.springdoc.core.fn.builders.schema.Builder.schemaBuilder;
 import static org.springframework.web.reactive.function.server.RequestPredicates.contentType;
 import static run.halo.app.extension.ListResult.generateGenericClass;
-import static run.halo.app.extension.index.query.QueryFactory.and;
 import static run.halo.app.extension.index.query.QueryFactory.contains;
 import static run.halo.app.extension.index.query.QueryFactory.equal;
 import static run.halo.app.extension.index.query.QueryFactory.in;
@@ -85,7 +84,6 @@ import run.halo.app.extension.MetadataUtil;
 import run.halo.app.extension.PageRequestImpl;
 import run.halo.app.extension.ReactiveExtensionClient;
 import run.halo.app.extension.router.IListRequest;
-import run.halo.app.extension.router.selector.FieldSelector;
 import run.halo.app.infra.SystemConfigurableEnvironmentFetcher;
 import run.halo.app.infra.SystemSetting;
 import run.halo.app.infra.ValidationUtils;
@@ -618,17 +616,6 @@ public class UserEndpoint implements CustomEndpoint {
                 })
             )
             .flatMap(detailedUser -> ServerResponse.ok().bodyValue(detailedUser));
-    }
-
-    Set<String> roleNames(User user) {
-        Assert.notNull(user, "User must not be null");
-        Map<String, String> annotations = MetadataUtil.nullSafeAnnotations(user);
-        String roleNamesJson = annotations.get(User.ROLE_NAMES_ANNO);
-        if (StringUtils.isBlank(roleNamesJson)) {
-            return Set.of();
-        }
-        return JsonUtils.jsonToObject(roleNamesJson, new TypeReference<>() {
-        });
     }
 
     record DetailedUser(@Schema(requiredMode = REQUIRED) User user,

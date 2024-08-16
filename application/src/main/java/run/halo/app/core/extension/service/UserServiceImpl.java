@@ -5,8 +5,11 @@ import static org.springframework.data.domain.Sort.Order.desc;
 import static run.halo.app.core.extension.RoleBinding.containsUser;
 import static run.halo.app.extension.index.query.QueryFactory.equal;
 
+import java.time.Clock;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.Set;
 import lombok.RequiredArgsConstructor;
 import org.apache.commons.lang3.BooleanUtils;
@@ -47,6 +50,12 @@ public class UserServiceImpl implements UserService {
     private final SystemConfigurableEnvironmentFetcher environmentFetcher;
 
     private final ApplicationEventPublisher eventPublisher;
+
+    private Clock clock = Clock.systemUTC();
+
+    void setClock(Clock clock) {
+        this.clock = clock;
+    }
 
     @Override
     public Mono<User> getUser(String username) {
@@ -129,7 +138,13 @@ public class UserServiceImpl implements UserService {
                         return mutableRoles.stream()
                             .map(roleName -> RoleBinding.create(username, roleName));
                     }).flatMap(client::create))
-                    .then(Mono.just(user));
+                    .then(Mono.defer(() -> {
+                        var annotations = Optional.ofNullable(user.getMetadata().getAnnotations())
+                            .orElseGet(HashMap::new);
+                        user.getMetadata().setAnnotations(annotations);
+                        annotations.put(User.REQUEST_TO_UPDATE, clock.instant().toString());
+                        return client.update(user);
+                    }));
             });
     }
 
