@@ -462,7 +462,7 @@ public class UserEndpoint implements CustomEndpoint {
         return userService.getUser(name)
             .flatMap(user -> roleService.getRolesByUsername(name)
                 .collectList()
-                .flatMap(roleNames -> roleService.list(new HashSet<>(roleNames))
+                .flatMap(roleNames -> roleService.list(new HashSet<>(roleNames), true)
                     .collectList()
                     .map(roles -> new DetailedUser(user, roles))
                 )
@@ -610,7 +610,7 @@ public class UserEndpoint implements CustomEndpoint {
             .flatMap(auth -> userService.getUser(auth.getName())
                 .flatMap(user -> {
                     var roleNames = authoritiesToRoles(auth.getAuthorities());
-                    return roleService.list(roleNames)
+                    return roleService.list(roleNames, true)
                         .collectList()
                         .map(roles -> new DetailedUser(user, roles));
                 })
@@ -646,7 +646,7 @@ public class UserEndpoint implements CustomEndpoint {
                 .flatMap(auth -> {
                     var roleNames = authoritiesToRoles(auth.getAuthorities());
                     var up = new UserPermission();
-                    var roles = roleService.list(roleNames)
+                    var roles = roleService.list(roleNames, true)
                         .collect(Collectors.toSet())
                         .doOnNext(up::setRoles)
                         .then();

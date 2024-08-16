@@ -229,7 +229,7 @@ class UserEndpointTest {
             role.setMetadata(new Metadata());
             role.getMetadata().setName("fake-super-role");
             role.setRules(List.of());
-            when(roleService.list(Set.of("fake-super-role"))).thenReturn(Flux.just(role));
+            when(roleService.list(Set.of("fake-super-role"), true)).thenReturn(Flux.just(role));
             webClient.get().uri("/users/-")
                 .exchange()
                 .expectStatus().isOk()

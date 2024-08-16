@@ -220,14 +220,21 @@ public class DefaultRoleService implements RoleService {
 
     @Override
     public Flux<Role> list(Set<String> roleNames) {
+        return list(roleNames, false);
+    }
+
+    @Override
+    public Flux<Role> list(Set<String> roleNames, boolean excludeHidden) {
         if (CollectionUtils.isEmpty(roleNames)) {
             return Flux.empty();
         }
-        var listOptions = ListOptions.builder()
+        var builder = ListOptions.builder()
             .andQuery(notDeleting())
-            .andQuery(QueryFactory.in("metadata.name", roleNames))
-            .build();
-        return client.listAll(Role.class, listOptions, defaultSort());
+            .andQuery(QueryFactory.in("metadata.name", roleNames));
+        if (excludeHidden) {
+            builder.labelSelector().notEq(Role.HIDDEN_LABEL_NAME, Boolean.TRUE.toString());
+        }
+        return client.listAll(Role.class, builder.build(), defaultSort());
     }
 
     @NonNull

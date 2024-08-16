@@ -312,6 +312,9 @@ class UserServiceImplTest {
 
     User createUser(String password) {
         var user = new User();
+        Metadata metadata = new Metadata();
+        metadata.setName("fake-user");
+        user.setMetadata(metadata);
         user.setSpec(new User.UserSpec());
         user.getSpec().setPassword(password);
         return user;
@@ -336,11 +339,13 @@ class UserServiceImplTest {
 
         @Test
         void shouldCreateRoleBindingIfNotExist() {
+            var user = createUser("fake-password");
             when(client.get(User.class, "fake-user"))
-                .thenReturn(Mono.just(createUser("fake-password")));
+                .thenReturn(Mono.just(user));
             when(client.list(same(RoleBinding.class), any(), any())).thenReturn(Flux.empty());
             when(client.create(isA(RoleBinding.class))).thenReturn(
                 Mono.just(mock(RoleBinding.class)));
+            when(client.update(user)).thenReturn(Mono.just(user));
 
             var grantRolesMono = userService.grantRoles("fake-user", Set.of("fake-role"));
             StepVerifier.create(grantRolesMono)
@@ -354,13 +359,15 @@ class UserServiceImplTest {
 
         @Test
         void shouldDeleteRoleBindingIfNotProvided() {
-            when(client.get(User.class, "fake-user")).thenReturn(Mono.just(mock(User.class)));
+            var user = createUser("fake-password");
+            when(client.get(User.class, "fake-user")).thenReturn(Mono.just(user));
             var notProvidedRoleBinding = RoleBinding.create("fake-user", "non-provided-fake-role");
             var existingRoleBinding = RoleBinding.create("fake-user", "fake-role");
             when(client.list(same(RoleBinding.class), any(), any())).thenReturn(
                 Flux.fromIterable(List.of(notProvidedRoleBinding, existingRoleBinding)));
             when(client.delete(isA(RoleBinding.class)))
                 .thenReturn(Mono.just(mock(RoleBinding.class)));
+            when(client.update(user)).thenReturn(Mono.just(user));
 
             StepVerifier.create(userService.grantRoles("fake-user", Set.of("fake-role")))
                 .expectNextCount(1)
@@ -373,7 +380,8 @@ class UserServiceImplTest {
 
         @Test
         void shouldUpdateRoleBindingIfExists() {
-            when(client.get(User.class, "fake-user")).thenReturn(Mono.just(mock(User.class)));
+            var user = createUser("fake-password");
+            when(client.get(User.class, "fake-user")).thenReturn(Mono.just(user));
             // add another subject
             var anotherSubject = new RoleBinding.Subject();
             anotherSubject.setName("another-fake-user");
@@ -388,6 +396,7 @@ class UserServiceImplTest {
                 Flux.fromIterable(List.of(notProvidedRoleBinding, existingRoleBinding)));
             when(client.update(isA(RoleBinding.class)))
                 .thenReturn(Mono.just(mock(RoleBinding.class)));
+            when(client.update(user)).thenReturn(Mono.just(user));
 
             StepVerifier.create(userService.grantRoles("fake-user", Set.of("fake-role")))
                 .expectNextCount(1)

@@ -34,5 +34,20 @@ public interface RoleService {
 
     Flux<Role> listDependenciesFlux(Set<String> names);
 
+    /**
+     * List roles by role names.
+     *
+     * @param roleNames role names
+     * @return roles
+     */
     Flux<Role> list(Set<String> roleNames);
+
+    /**
+     * List roles by role names.
+     *
+     * @param roleNames role names
+     * @param excludeHidden should exclude hidden roles
+     * @return roles
+     */
+    Flux<Role> list(Set<String> roleNames, boolean excludeHidden);
 }
