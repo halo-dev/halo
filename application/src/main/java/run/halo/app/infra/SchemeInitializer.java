@@ -7,6 +7,7 @@ import static run.halo.app.extension.index.IndexAttributeFactory.multiValueAttri
 import static run.halo.app.extension.index.IndexAttributeFactory.simpleAttribute;
 
 import com.fasterxml.jackson.core.type.TypeReference;
+import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 import org.apache.commons.lang3.BooleanUtils;
@@ -32,6 +33,7 @@ import run.halo.app.core.extension.Setting;
 import run.halo.app.core.extension.Theme;
 import run.halo.app.core.extension.User;
 import run.halo.app.core.extension.UserConnection;
+import run.halo.app.core.extension.UserConnection.UserConnectionSpec;
 import run.halo.app.core.extension.attachment.Attachment;
 import run.halo.app.core.extension.attachment.Group;
 import run.halo.app.core.extension.attachment.Policy;
@@ -52,6 +54,7 @@ import run.halo.app.core.extension.notification.Subscription;
 import run.halo.app.extension.ConfigMap;
 import run.halo.app.extension.DefaultSchemeManager;
 import run.halo.app.extension.DefaultSchemeWatcherManager;
+import run.halo.app.extension.MetadataOperator;
 import run.halo.app.extension.MetadataUtil;
 import run.halo.app.extension.Secret;
 import run.halo.app.extension.index.IndexSpec;
@@ -119,16 +122,16 @@ public class SchemeInitializer implements ApplicationListener<ApplicationContext
                 })));
             indexSpecs.add(new IndexSpec()
                 .setName(User.USER_RELATED_ROLES_INDEX)
-                .setIndexFunc(multiValueAttribute(User.class, user -> {
-                    var roleNamesAnno = MetadataUtil.nullSafeAnnotations(user)
-                        .get(User.ROLE_NAMES_ANNO);
-                    if (StringUtils.isBlank(roleNamesAnno)) {
-                        return Set.of();
-                    }
-                    return JsonUtils.jsonToObject(roleNamesAnno,
-                        new TypeReference<>() {
-                        });
-                })));
+                .setIndexFunc(multiValueAttribute(User.class, user ->
+                    Optional.ofNullable(user.getMetadata())
+                        .map(MetadataOperator::getAnnotations)
+                        .map(annotations -> annotations.get(User.ROLE_NAMES_ANNO))
+                        .filter(StringUtils::isNotBlank)
+                        .map(rolesJson -> JsonUtils.jsonToObject(rolesJson,
+                            new TypeReference<Set<String>>() {
+                            })
+                        )
+                        .orElseGet(Set::of))));
         });
         schemeManager.register(ReverseProxy.class);
         schemeManager.register(Setting.class);
@@ -469,7 +472,15 @@ public class SchemeInitializer implements ApplicationListener<ApplicationContext
         schemeManager.register(Counter.class);
         // auth.halo.run
         schemeManager.register(AuthProvider.class);
-        schemeManager.register(UserConnection.class);
+        schemeManager.register(UserConnection.class, is -> {
+            is.add(new IndexSpec()
+                .setName("spec.username")
+                .setIndexFunc(simpleAttribute(UserConnection.class,
+                    connection -> Optional.ofNullable(connection.getSpec())
+                        .map(UserConnectionSpec::getUsername)
+                        .orElse(null)
+                )));
+        });
 
         // security.halo.run
         schemeManager.register(PersonalAccessToken.class);

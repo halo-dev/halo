@@ -13,6 +13,7 @@ import static run.halo.app.extension.ListResult.generateGenericClass;
 import static run.halo.app.extension.index.query.QueryFactory.and;
 import static run.halo.app.extension.index.query.QueryFactory.contains;
 import static run.halo.app.extension.index.query.QueryFactory.equal;
+import static run.halo.app.extension.index.query.QueryFactory.in;
 import static run.halo.app.extension.index.query.QueryFactory.or;
 import static run.halo.app.extension.router.QueryParamBuildUtil.sortParameter;
 import static run.halo.app.extension.router.selector.SelectorUtil.labelAndFieldSelectorToListOptions;
@@ -768,29 +769,23 @@ public class UserEndpoint implements CustomEndpoint {
          * Converts query parameters to list options.
          */
         public ListOptions toListOptions() {
-            var listOptions =
+            var defaultListOptions =
                 labelAndFieldSelectorToListOptions(getLabelSelector(), getFieldSelector());
 
-            var fieldQuery = listOptions.getFieldSelector().query();
-            if (StringUtils.isNotBlank(getKeyword())) {
-                fieldQuery = and(
-                    fieldQuery,
-                    or(
-                        contains("spec.displayName", getKeyword()),
-                        equal("metadata.name", getKeyword())
-                    )
-                );
-            }
+            var builder = ListOptions.builder(defaultListOptions);
 
-            if (StringUtils.isNotBlank(getRole())) {
-                fieldQuery = and(
-                    fieldQuery,
-                    equal(User.USER_RELATED_ROLES_INDEX, getRole())
-                );
-            }
+            Optional.ofNullable(getKeyword())
+                .filter(StringUtils::isNotBlank)
+                .ifPresent(keyword -> builder.andQuery(or(
+                    contains("spec.displayName", keyword),
+                    equal("metadata.name", keyword)
+                )));
 
-            listOptions.setFieldSelector(FieldSelector.of(fieldQuery));
-            return listOptions;
+            Optional.ofNullable(getRole())
+                .filter(StringUtils::isNotBlank)
+                .ifPresent(role -> builder.andQuery(in(User.USER_RELATED_ROLES_INDEX, role)));
+
+            return builder.build();
         }
 
         public static void buildParameters(Builder builder) {
