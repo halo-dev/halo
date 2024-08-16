@@ -21,6 +21,6 @@ function optionsHandler(node: FormKitNode) {
 export const userSelect: FormKitTypeDefinition = {
   ...select,
   props: ["placeholder"],
-  forceTypeProp: "select",
+  forceTypeProp: "nativeSelect",
   features: [optionsHandler, selects, defaultIcon("select", "select")],
 };

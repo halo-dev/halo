@@ -25,6 +25,13 @@ const buttonClassification = {
     "bg-blue-500 hover:bg-blue-700 text-white text-sm font-normal py-3 px-5 rounded",
 };
 
+const selectClassification = {
+  label: textClassification.label,
+  wrapper: textClassification.wrapper,
+  inner:
+    "group py-0.5 min-h-[36px] inline-flex items-center w-full relative box-border border border-gray-300 formkit-invalid:border-red-500 rounded-base overflow-hidden focus-within:border-primary focus-within:shadow-sm w-full sm:max-w-lg transition-all",
+};
+
 const theme: Record<string, Record<string, string>> = {
   global: {
     form: "divide-y divide-gray-100",
@@ -64,7 +71,8 @@ const theme: Record<string, Record<string, string>> = {
       "form-range appearance-none w-full h-2 p-0 bg-gray-200 rounded-full focus:outline-none focus:ring-0 focus:shadow-none",
   },
   search: textClassification,
-  select: textClassification,
+  select: selectClassification,
+  nativeSelect: textClassification,
   submit: buttonClassification,
   tel: textClassification,
   text: textClassification,

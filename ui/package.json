@@ -52,6 +52,7 @@
     "@codemirror/view": "^6.5.1",
     "@emoji-mart/data": "^1.2.1",
     "@formkit/core": "^1.5.9",
+    "@formkit/drag-and-drop": "^0.1.6",
     "@formkit/i18n": "^1.5.9",
     "@formkit/inputs": "^1.5.9",
     "@formkit/themes": "^1.5.9",

@@ -23,6 +23,8 @@ import { singlePageSelect } from "./inputs/singlePage-select";
 import { tagCheckbox } from "./inputs/tag-checkbox";
 import { tagSelect } from "./inputs/tag-select";
 import { verificationForm } from "./inputs/verify-form";
+import { select as nativeSelect } from "@formkit/inputs";
+import { select } from "./inputs/select";
 import theme from "./theme";
 
 import { userSelect } from "./inputs/user-select";
@@ -67,6 +69,8 @@ const config: DefaultConfigOptions = {
     tagSelect,
     verificationForm,
     userSelect,
+    nativeSelect,
+    select,
   },
   locales: { zh, en },
   locale: "zh",
