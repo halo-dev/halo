@@ -237,7 +237,7 @@ const requestOptions = async (
     size: 20,
     total: 0,
   };
-  if (!selectProps.action || isLoading.value) {
+  if (!selectProps.action) {
     return responseData;
   }
   const requestConfig: AxiosRequestConfig = {
@@ -596,7 +596,6 @@ const handleNextPage = async () => {
   if (!hasMoreOptions.value || isFetchingMore.value || isLoading.value) {
     return;
   }
-  console.log("handleNextPage", isFetchingMore.value);
   isFetchingMore.value = true;
   const response = await fetchOptions(searchKeyword.value, page.value + 1);
   isLoading.value = false;
