@@ -279,7 +279,7 @@ class AttachmentEndpointTest {
             webClient
                 .mutateWith(mockUser("fake-user").password("fake-password"))
                 .post()
-                .uri("/attachments/external-transfer")
+                .uri("/attachments/-/upload-from-url")
                 .contentType(MediaType.APPLICATION_JSON)
                 .bodyValue(Map.of("policyName", "fake-policy"))
                 .exchange()
@@ -321,12 +321,12 @@ class AttachmentEndpointTest {
             when(client.create(attachment)).thenReturn(Mono.just(attachment));
 
             var fakeValue =
-                Map.of("policyName", "fake-policy", "externalUrl",
+                Map.of("policyName", "fake-policy", "url",
                     "http://localhost:8090/fake-url.jpg");
             webClient
                 .mutateWith(mockUser("fake-user").password("fake-password"))
                 .post()
-                .uri("/attachments/external-transfer")
+                .uri("/attachments/-/upload-from-url")
                 .contentType(MediaType.APPLICATION_JSON)
                 .bodyValue(fakeValue)
                 .exchange()
