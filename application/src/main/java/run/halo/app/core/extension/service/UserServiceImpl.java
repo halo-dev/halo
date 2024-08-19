@@ -228,6 +228,11 @@ public class UserServiceImpl implements UserService {
         );
     }
 
+    @Override
+    public String encryptPassword(String rawPassword) {
+        return passwordEncoder.encode(rawPassword);
+    }
+
     void publishPasswordChangedEvent(String username) {
         eventPublisher.publishEvent(new PasswordChangedEvent(this, username));
     }

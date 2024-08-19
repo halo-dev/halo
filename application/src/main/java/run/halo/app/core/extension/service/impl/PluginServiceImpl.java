@@ -230,10 +230,16 @@ public class PluginServiceImpl implements PluginService, InitializingBean, Dispo
     public Flux<DataBuffer> uglifyJsBundle() {
         var startedPlugins = List.copyOf(pluginManager.getStartedPlugins());
         String plugins = """
-            this.enabledPluginNames = [%s];
+            this.enabledPlugins = [%s]
             """.formatted(startedPlugins.stream()
-            .map(PluginWrapper::getPluginId)
-            .collect(Collectors.joining("','", "'", "'")));
+            .map(plugin -> """
+                {
+                  "name": "%s",
+                  "version": "%s"
+                }
+                """.formatted(plugin.getPluginId(), plugin.getDescriptor().getVersion())
+            )
+            .collect(Collectors.joining(", ")));
         return Flux.fromIterable(startedPlugins)
             .mapNotNull(pluginWrapper -> {
                 var pluginName = pluginWrapper.getPluginId();

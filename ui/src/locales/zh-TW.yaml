@@ -856,6 +856,8 @@ core:
       remote_download:
         title: 偵測到遠端下載地址，是否需要下載？
         description: 請仔細鑑別此地址是否可信：{url}
+      reload_window:
+        button: 需要重載頁面
     filters:
       status:
         items:

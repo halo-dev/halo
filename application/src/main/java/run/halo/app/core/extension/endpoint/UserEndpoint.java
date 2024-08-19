@@ -443,13 +443,9 @@ public class UserEndpoint implements CustomEndpoint {
             })
             .flatMap(userRequest -> {
                 User newUser = CreateUserRequest.from(userRequest);
-                return userService.createUser(newUser, userRequest.roles())
-                    .then(Mono.defer(() -> userService.updateWithRawPassword(userRequest.name(),
-                            userRequest.password()))
-                        .retryWhen(Retry.backoff(5, Duration.ofMillis(100))
-                            .filter(OptimisticLockingFailureException.class::isInstance)
-                        )
-                    );
+                var encryptedPwd = userService.encryptPassword(userRequest.password());
+                newUser.getSpec().setPassword(encryptedPwd);
+                return userService.createUser(newUser, userRequest.roles());
             })
             .flatMap(user -> ServerResponse.ok()
                 .contentType(MediaType.APPLICATION_JSON)
