@@ -8,7 +8,6 @@ import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.argThat;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.ArgumentMatchers.isA;
-import static org.mockito.ArgumentMatchers.same;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
@@ -18,7 +17,6 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static run.halo.app.extension.GroupVersionKind.fromExtension;
 
-import java.util.List;
 import java.util.Set;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
@@ -34,6 +32,7 @@ import reactor.core.publisher.Mono;
 import reactor.test.StepVerifier;
 import run.halo.app.core.extension.Role;
 import run.halo.app.core.extension.RoleBinding;
+import run.halo.app.core.extension.RoleBinding.Subject;
 import run.halo.app.core.extension.User;
 import run.halo.app.event.user.PasswordChangedEvent;
 import run.halo.app.extension.Metadata;
@@ -59,6 +58,9 @@ class UserServiceImplTest {
 
     @Mock
     ApplicationEventPublisher eventPublisher;
+
+    @Mock
+    RoleService roleService;
 
     @InjectMocks
     UserServiceImpl userService;
@@ -227,7 +229,7 @@ class UserServiceImplTest {
             var user = createUser("fake-password");
             when(client.get(User.class, "fake-user"))
                 .thenReturn(Mono.just(user));
-            when(client.list(same(RoleBinding.class), any(), any())).thenReturn(Flux.empty());
+            when(roleService.listRoleBindings(any(Subject.class))).thenReturn(Flux.empty());
             when(client.create(isA(RoleBinding.class))).thenReturn(
                 Mono.just(mock(RoleBinding.class)));
             when(client.update(user)).thenReturn(Mono.just(user));
@@ -237,8 +239,6 @@ class UserServiceImplTest {
                 .expectNextCount(1)
                 .verifyComplete();
 
-            verify(client).get(User.class, "fake-user");
-            verify(client).list(same(RoleBinding.class), any(), any());
             verify(client).create(isA(RoleBinding.class));
         }
 
@@ -248,8 +248,8 @@ class UserServiceImplTest {
             when(client.get(User.class, "fake-user")).thenReturn(Mono.just(user));
             var notProvidedRoleBinding = RoleBinding.create("fake-user", "non-provided-fake-role");
             var existingRoleBinding = RoleBinding.create("fake-user", "fake-role");
-            when(client.list(same(RoleBinding.class), any(), any())).thenReturn(
-                Flux.fromIterable(List.of(notProvidedRoleBinding, existingRoleBinding)));
+            when(roleService.listRoleBindings(any(Subject.class)))
+                .thenReturn(Flux.just(notProvidedRoleBinding, existingRoleBinding));
             when(client.delete(isA(RoleBinding.class)))
                 .thenReturn(Mono.just(mock(RoleBinding.class)));
             when(client.update(user)).thenReturn(Mono.just(user));
@@ -258,8 +258,6 @@ class UserServiceImplTest {
                 .expectNextCount(1)
                 .verifyComplete();
 
-            verify(client).get(User.class, "fake-user");
-            verify(client).list(same(RoleBinding.class), any(), any());
             verify(client).delete(notProvidedRoleBinding);
         }
 
@@ -268,7 +266,7 @@ class UserServiceImplTest {
             var user = createUser("fake-password");
             when(client.get(User.class, "fake-user")).thenReturn(Mono.just(user));
             // add another subject
-            var anotherSubject = new RoleBinding.Subject();
+            var anotherSubject = new Subject();
             anotherSubject.setName("another-fake-user");
             anotherSubject.setKind(User.KIND);
             anotherSubject.setApiGroup(User.GROUP);
@@ -277,8 +275,8 @@ class UserServiceImplTest {
 
             var existingRoleBinding = RoleBinding.create("fake-user", "fake-role");
 
-            when(client.list(same(RoleBinding.class), any(), any())).thenReturn(
-                Flux.fromIterable(List.of(notProvidedRoleBinding, existingRoleBinding)));
+            when(roleService.listRoleBindings(any(Subject.class)))
+                .thenReturn(Flux.just(notProvidedRoleBinding, existingRoleBinding));
             when(client.update(isA(RoleBinding.class)))
                 .thenReturn(Mono.just(mock(RoleBinding.class)));
             when(client.update(user)).thenReturn(Mono.just(user));
@@ -287,8 +285,6 @@ class UserServiceImplTest {
                 .expectNextCount(1)
                 .verifyComplete();
 
-            verify(client).get(User.class, "fake-user");
-            verify(client).list(same(RoleBinding.class), any(), any());
             verify(client).update(notProvidedRoleBinding);
         }
     }
