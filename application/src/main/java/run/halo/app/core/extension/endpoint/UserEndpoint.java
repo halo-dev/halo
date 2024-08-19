@@ -634,75 +634,43 @@ public class UserEndpoint implements CustomEndpoint {
 
     @NonNull
     private Mono<ServerResponse> getUserPermission(ServerRequest request) {
-        var name = request.pathVariable("name");
-        Mono<UserPermission> userPermission;
-        if (SELF_USER.equals(name)) {
-            userPermission = ReactiveSecurityContextHolder.getContext()
-                .map(SecurityContext::getAuthentication)
-                .flatMap(auth -> {
-                    var roleNames = authoritiesToRoles(auth.getAuthorities());
-                    var up = new UserPermission();
-                    var roles = roleService.list(roleNames, true)
-                        .collect(Collectors.toSet())
-                        .doOnNext(up::setRoles)
-                        .then();
-                    var permissions = roleService.listPermissions(roleNames)
-                        .distinct()
-                        .collectList()
-                        .doOnNext(up::setPermissions)
-                        .doOnNext(perms -> {
-                            var uiPermissions = uiPermissions(new HashSet<>(perms));
-                            up.setUiPermissions(uiPermissions);
-                        })
-                        .then();
-                    return roles.and(permissions).thenReturn(up);
+        var username = request.pathVariable("name");
+        return Mono.defer(() -> {
+            if (SELF_USER.equals(username)) {
+                return ReactiveSecurityContextHolder.getContext()
+                    .map(SecurityContext::getAuthentication)
+                    .map(auth -> authoritiesToRoles(auth.getAuthorities()));
+            }
+            return roleService.getRolesByUsername(username)
+                .collect(Collectors.toCollection(LinkedHashSet::new));
+        }).flatMap(roleNames -> {
+            var up = new UserPermission();
+            var setRoles = roleService.list(roleNames, true)
+                .collect(Collectors.toCollection(LinkedHashSet::new))
+                .doOnNext(up::setRoles);
+            var setPerms = roleService.listPermissions(roleNames)
+                .collect(Collectors.toCollection(LinkedHashSet::new))
+                .doOnNext(permissions -> {
+                    up.setPermissions(permissions);
+                    up.setUiPermissions(uiPermissions(permissions));
                 });
-        } else {
-            // get roles from username
-            userPermission = userService.listRoles(name)
-                .collect(Collectors.toSet())
-                .flatMap(roles -> {
-                    var up = new UserPermission();
-                    var setRoles = Mono.fromRunnable(() -> up.setRoles(roles)).then();
-                    var roleNames = roles.stream()
-                        .map(role -> role.getMetadata().getName())
-                        .collect(Collectors.toSet());
-                    var setPermissions = roleService.listPermissions(roleNames)
-                        .distinct()
-                        .collectList()
-                        .doOnNext(up::setPermissions)
-                        .doOnNext(perms -> {
-                            var uiPermissions = uiPermissions(new HashSet<>(perms));
-                            up.setUiPermissions(uiPermissions);
-                        })
-                        .then();
-                    return setRoles.and(setPermissions).thenReturn(up);
-                });
-        }
-
-        return ServerResponse.ok().body(userPermission, UserPermission.class);
+            return Mono.when(setRoles, setPerms).thenReturn(up);
+        }).flatMap(userPermission -> ServerResponse.ok().bodyValue(userPermission));
     }
 
     private Set<String> uiPermissions(Set<Role> roles) {
         if (CollectionUtils.isEmpty(roles)) {
             return Collections.emptySet();
         }
-        return roles.stream()
-            .<Set<String>>map(role -> {
-                var annotations = role.getMetadata().getAnnotations();
-                if (annotations == null) {
-                    return Set.of();
-                }
-                var uiPermissionsJson = annotations.get(Role.UI_PERMISSIONS_ANNO);
-                if (StringUtils.isBlank(uiPermissionsJson)) {
-                    return Set.of();
-                }
-                return JsonUtils.jsonToObject(uiPermissionsJson,
-                    new TypeReference<LinkedHashSet<String>>() {
-                    });
-            })
-            .flatMap(Set::stream)
-            .collect(Collectors.toSet());
+        var uiPerms = new LinkedHashSet<String>();
+        roles.forEach(role -> Optional.ofNullable(role.getMetadata().getAnnotations())
+            .map(annotations -> annotations.get(Role.UI_PERMISSIONS_ANNO))
+            .filter(StringUtils::isNotBlank)
+            .map(json -> JsonUtils.jsonToObject(json, new TypeReference<Set<String>>() {
+            }))
+            .ifPresent(uiPerms::addAll)
+        );
+        return uiPerms;
     }
 
     @Data
@@ -710,7 +678,7 @@ public class UserEndpoint implements CustomEndpoint {
         @Schema(requiredMode = REQUIRED)
         private Set<Role> roles;
         @Schema(requiredMode = REQUIRED)
-        private List<Role> permissions;
+        private Set<Role> permissions;
         @Schema(requiredMode = REQUIRED)
         private Set<String> uiPermissions;
 

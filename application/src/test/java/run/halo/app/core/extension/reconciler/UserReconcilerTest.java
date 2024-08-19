@@ -55,7 +55,6 @@ class UserReconcilerTest {
     @BeforeEach
     void setUp() {
         lenient().when(notificationCenter.unsubscribe(any(), any())).thenReturn(Mono.empty());
-        lenient().when(roleService.listRoleRefs(any())).thenReturn(Flux.empty());
     }
 
     @Test

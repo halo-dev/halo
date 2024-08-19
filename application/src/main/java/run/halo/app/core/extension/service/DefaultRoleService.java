@@ -49,14 +49,17 @@ public class DefaultRoleService implements RoleService {
         this.client = client;
     }
 
+    private Flux<RoleRef> listRoleRefs(Subject subject) {
+        return listRoleBindings(subject).map(RoleBinding::getRoleRef);
+    }
+
     @Override
-    public Flux<RoleRef> listRoleRefs(Subject subject) {
+    public Flux<RoleBinding> listRoleBindings(Subject subject) {
         var listOptions = ListOptions.builder()
             .andQuery(notDeleting())
             .andQuery(QueryFactory.in("subjects", subject.toString()))
             .build();
-        return client.listAll(RoleBinding.class, listOptions, defaultSort())
-            .map(RoleBinding::getRoleRef);
+        return client.listAll(RoleBinding.class, listOptions, defaultSort());
     }
 
     @Override
@@ -176,7 +179,7 @@ public class DefaultRoleService implements RoleService {
 
                 return Flux.fromIterable(dependencies)
                     .filter(dep -> !visited.contains(dep))
-                    .collect(Collectors.<String>toSet())
+                    .collect(Collectors.toSet())
                     .flatMapMany(deps -> listRoles(deps, additionalListOptions));
             })
             .concatWith(Flux.defer(() -> listAggregatedRoles(visited, additionalListOptions)));

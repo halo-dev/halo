@@ -2,10 +2,10 @@ package run.halo.app.core.extension.service;
 
 import static org.springframework.data.domain.Sort.Order.asc;
 import static org.springframework.data.domain.Sort.Order.desc;
-import static run.halo.app.core.extension.RoleBinding.containsUser;
 import static run.halo.app.extension.index.query.QueryFactory.equal;
 
 import java.time.Clock;
+import java.time.Duration;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Objects;
@@ -14,6 +14,7 @@ import java.util.Set;
 import lombok.RequiredArgsConstructor;
 import org.apache.commons.lang3.BooleanUtils;
 import org.springframework.context.ApplicationEventPublisher;
+import org.springframework.dao.OptimisticLockingFailureException;
 import org.springframework.data.domain.Sort;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -24,6 +25,7 @@ import org.springframework.util.StringUtils;
 import org.springframework.web.server.ServerWebInputException;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
+import reactor.util.retry.Retry;
 import run.halo.app.core.extension.Role;
 import run.halo.app.core.extension.RoleBinding;
 import run.halo.app.core.extension.User;
@@ -51,6 +53,8 @@ public class UserServiceImpl implements UserService {
 
     private final ApplicationEventPublisher eventPublisher;
 
+    private final RoleService roleService;
+
     private Clock clock = Clock.systemUTC();
 
     void setClock(Clock clock) {
@@ -60,8 +64,7 @@ public class UserServiceImpl implements UserService {
     @Override
     public Mono<User> getUser(String username) {
         return client.get(User.class, username)
-            .onErrorMap(ExtensionNotFoundException.class,
-                e -> new UserNotFoundException(username));
+            .onErrorMap(ExtensionNotFoundException.class, e -> new UserNotFoundException(username));
     }
 
     @Override
@@ -100,22 +103,17 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public Flux<Role> listRoles(String name) {
-        return client.list(RoleBinding.class, containsUser(name), null)
-            .filter(roleBinding -> Role.KIND.equals(roleBinding.getRoleRef().getKind()))
-            .map(roleBinding -> roleBinding.getRoleRef().getName())
-            .flatMap(roleName -> client.fetch(Role.class, roleName));
-    }
-
-    @Override
-    @Transactional
     public Mono<User> grantRoles(String username, Set<String> roles) {
         return client.get(User.class, username)
             .flatMap(user -> {
                 var bindingsToUpdate = new HashSet<RoleBinding>();
                 var bindingsToDelete = new HashSet<RoleBinding>();
                 var existingRoles = new HashSet<String>();
-                return client.list(RoleBinding.class, RoleBinding.containsUser(username), null)
+                var subject = new RoleBinding.Subject();
+                subject.setKind(User.KIND);
+                subject.setApiGroup(User.GROUP);
+                subject.setName(username);
+                return roleService.listRoleBindings(subject)
                     .doOnNext(binding -> {
                         var roleName = binding.getRoleRef().getName();
                         if (roles.contains(roleName)) {
@@ -199,7 +197,12 @@ public class UserServiceImpl implements UserService {
                     .then();
             })
             .then(Mono.defer(() -> client.create(user)
-                .flatMap(newUser -> grantRoles(user.getMetadata().getName(), roleNames)))
+                .flatMap(newUser -> grantRoles(user.getMetadata().getName(), roleNames)
+                    .retryWhen(
+                        Retry.backoff(5, Duration.ofMillis(100))
+                            .filter(OptimisticLockingFailureException.class::isInstance)
+                    )
+                ))
             );
     }
 

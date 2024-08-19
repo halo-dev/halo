@@ -394,9 +394,9 @@ class UserEndpointTest {
                 }
                 """, Role.class);
             when(roleService.listPermissions(eq(Set.of("test-A")))).thenReturn(Flux.just(roleA));
-            when(userService.listRoles(eq("fake-user"))).thenReturn(
-                Flux.fromIterable(List.of(roleA)));
             when(roleService.listDependenciesFlux(anySet())).thenReturn(Flux.just(roleA));
+            when(roleService.getRolesByUsername("fake-user")).thenReturn(Flux.just("test-A"));
+            when(roleService.list(Set.of("test-A"), true)).thenReturn(Flux.just(roleA));
 
             webClient.get().uri("/users/fake-user/permissions")
                 .exchange()
@@ -405,11 +405,9 @@ class UserEndpointTest {
                 .expectBody(UserEndpoint.UserPermission.class)
                 .value(userPermission -> {
                     assertEquals(Set.of(roleA), userPermission.getRoles());
-                    assertEquals(List.of(roleA), userPermission.getPermissions());
+                    assertEquals(Set.of(roleA), userPermission.getPermissions());
                     assertEquals(Set.of("permission-A"), userPermission.getUiPermissions());
                 });
-
-            verify(userService, times(1)).listRoles(eq("fake-user"));
         }
     }
 
