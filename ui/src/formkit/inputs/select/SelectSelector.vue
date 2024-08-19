@@ -17,7 +17,7 @@ const emit = defineEmits<{
 
 const selectLabel = computed(() => {
   if (props.selectedOptions && props.selectedOptions.length > 0) {
-    return props.selectedOptions[0].label;
+    return props.selectedOptions[0].label.toString();
   }
   return undefined;
 });

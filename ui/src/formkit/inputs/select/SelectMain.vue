@@ -336,17 +336,18 @@ const fetchSelectedOptions = async (): Promise<
   }
 
   const selectedValues: string[] = [];
-  if (typeof value === "string") {
-    selectedValues.push(value);
-  } else if (Array.isArray(value)) {
+  if (Array.isArray(value)) {
     selectedValues.push(...value);
-  }
-  if (selectedValues.length === 0) {
-    return [];
+  } else if (
+    typeof value === "string" ||
+    typeof value === "number" ||
+    typeof value === "boolean"
+  ) {
+    selectedValues.push(value.toString());
   }
 
   const currentOptions = options.value.filter((option) =>
-    selectedValues.includes(option.value)
+    selectedValues.includes(option.value.toString())
   );
 
   // Get options that are not yet mapped.
@@ -486,9 +487,9 @@ onMounted(async () => {
 });
 
 watch(
-  () => props.context.value,
+  () => options.value,
   async () => {
-    if (!selectOptions.value) {
+    if (!selectOptions.value && options.value.length > 0) {
       selectOptions.value = await fetchSelectedOptions();
     }
   },
