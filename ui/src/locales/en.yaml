@@ -940,6 +940,8 @@ core:
       remote_download:
         title: Remote download address detected, do you want to download?
         description: "Please carefully verify whether this address can be trusted: {url}"
+      reload_window:
+        button: Reload required
     filters:
       status:
         items:
@@ -1725,6 +1727,10 @@ core:
         fields:
           description: Description
           string_data: String Data
+    code:
+      fullscreen:
+        exit: Exit fullscreen
+        enter: Enter fullscreen to edit
   common:
     buttons:
       save: Save

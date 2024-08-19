@@ -12,7 +12,7 @@ import { useI18n } from "vue-i18n";
 const props = withDefaults(
   defineProps<{
     menu: Menu;
-    parentMenuItem: MenuItem;
+    parentMenuItem?: MenuItem;
     menuItem?: MenuItem;
   }>(),
   {
@@ -100,19 +100,23 @@ const handleSaveMenuItem = async () => {
 
       // if parent menu item is selected, add the new menu item to the parent menu item
       if (selectedParentMenuItem.value) {
-        const { data: menuItemToUpdate } =
+        const { data: parentMenuItem } =
           await coreApiClient.menuItem.getMenuItem({
             name: selectedParentMenuItem.value,
           });
 
-        menuItemToUpdate.spec.children = [
-          ...(menuItemToUpdate.spec.children || []),
-          data.metadata.name,
-        ];
-
-        await coreApiClient.menuItem.updateMenuItem({
-          name: menuItemToUpdate.metadata.name,
-          menuItem: menuItemToUpdate,
+        await coreApiClient.menuItem.patchMenuItem({
+          name: selectedParentMenuItem.value,
+          jsonPatchInner: [
+            {
+              op: "add",
+              path: "/spec/children",
+              value: [
+                ...(parentMenuItem.spec.children || []),
+                data.metadata.name,
+              ],
+            },
+          ],
         });
       }
 
@@ -218,7 +222,7 @@ onMounted(() => {
     }
   }
 
-  selectedParentMenuItem.value = props.parentMenuItem?.metadata.name;
+  selectedParentMenuItem.value = props.parentMenuItem?.metadata.name || "";
 
   setFocus("displayNameInput");
 });
