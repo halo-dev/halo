@@ -127,12 +127,14 @@ const isDisabled = (option: { label: string; value: string }) => {
 };
 
 const handleOptionScroll = (state: UseScrollReturn) => {
-  const scrollHeight = (selectOptionRef.value as HTMLElement).scrollHeight;
-  const clientHeight = (selectOptionRef.value as HTMLElement).clientHeight;
-  const scrollPercentage =
-    (state.y.value / (scrollHeight - clientHeight)) * 100;
-  if (scrollPercentage > 50) {
-    emit("loadMore");
+  if (selectOptionRef.value) {
+    const scrollHeight = (selectOptionRef.value as HTMLElement).scrollHeight;
+    const clientHeight = (selectOptionRef.value as HTMLElement).clientHeight;
+    const scrollPercentage =
+      (state.y.value / (scrollHeight - clientHeight)) * 100;
+    if (scrollPercentage > 50) {
+      emit("loadMore");
+    }
   }
 };
 
