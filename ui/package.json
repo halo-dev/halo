@@ -103,7 +103,7 @@
     "vue-demi": "^0.14.10",
     "vue-draggable-plus": "^0.5.3",
     "vue-grid-layout": "3.0.0-beta1",
-    "vue-i18n": "^9.14.0",
+    "vue-i18n": "^9.13.1",
     "vue-router": "^4.4.3"
   },
   "devDependencies": {
