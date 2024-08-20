@@ -387,7 +387,8 @@ class UserEndpointTest {
                     "metadata": {
                         "name": "test-A",
                         "annotations": {
-                            "rbac.authorization.halo.run/ui-permissions": "[\\"permission-A\\"]"
+                            "rbac.authorization.halo.run/ui-permissions": \
+                            "[\\"permission-A\\", \\"permission-A\\"]"
                         }
                     },
                     "rules": []
@@ -404,9 +405,9 @@ class UserEndpointTest {
                 .isOk()
                 .expectBody(UserEndpoint.UserPermission.class)
                 .value(userPermission -> {
-                    assertEquals(Set.of(roleA), userPermission.getRoles());
-                    assertEquals(Set.of(roleA), userPermission.getPermissions());
-                    assertEquals(Set.of("permission-A"), userPermission.getUiPermissions());
+                    assertEquals(List.of(roleA), userPermission.getRoles());
+                    assertEquals(List.of(roleA), userPermission.getPermissions());
+                    assertEquals(List.of("permission-A"), userPermission.getUiPermissions());
                 });
         }
     }

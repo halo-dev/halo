@@ -28,10 +28,11 @@ import io.swagger.v3.oas.annotations.media.ArraySchema;
 import io.swagger.v3.oas.annotations.media.Schema;
 import java.security.Principal;
 import java.time.Duration;
-import java.util.Collections;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedHashSet;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -646,10 +647,12 @@ public class UserEndpoint implements CustomEndpoint {
         }).flatMap(roleNames -> {
             var up = new UserPermission();
             var setRoles = roleService.list(roleNames, true)
-                .collect(Collectors.toCollection(LinkedHashSet::new))
+                .distinct()
+                .collectSortedList()
                 .doOnNext(up::setRoles);
             var setPerms = roleService.listPermissions(roleNames)
-                .collect(Collectors.toCollection(LinkedHashSet::new))
+                .distinct()
+                .collectSortedList()
                 .doOnNext(permissions -> {
                     up.setPermissions(permissions);
                     up.setUiPermissions(uiPermissions(permissions));
@@ -658,11 +661,11 @@ public class UserEndpoint implements CustomEndpoint {
         }).flatMap(userPermission -> ServerResponse.ok().bodyValue(userPermission));
     }
 
-    private Set<String> uiPermissions(Set<Role> roles) {
+    private List<String> uiPermissions(Collection<Role> roles) {
         if (CollectionUtils.isEmpty(roles)) {
-            return Collections.emptySet();
+            return List.of();
         }
-        var uiPerms = new LinkedHashSet<String>();
+        var uiPerms = new LinkedList<String>();
         roles.forEach(role -> Optional.ofNullable(role.getMetadata().getAnnotations())
             .map(annotations -> annotations.get(Role.UI_PERMISSIONS_ANNO))
             .filter(StringUtils::isNotBlank)
@@ -670,17 +673,17 @@ public class UserEndpoint implements CustomEndpoint {
             }))
             .ifPresent(uiPerms::addAll)
         );
-        return uiPerms;
+        return uiPerms.stream().distinct().sorted().toList();
     }
 
     @Data
     public static class UserPermission {
         @Schema(requiredMode = REQUIRED)
-        private Set<Role> roles;
+        private List<Role> roles;
         @Schema(requiredMode = REQUIRED)
-        private Set<Role> permissions;
+        private List<Role> permissions;
         @Schema(requiredMode = REQUIRED)
-        private Set<String> uiPermissions;
+        private List<String> uiPermissions;
 
     }
 
