@@ -6759,14 +6759,6 @@
                 "type": "string"
               }
             }
-          },
-          {
-            "description": "Keyword",
-            "in": "query",
-            "name": "keyword",
-            "schema": {
-              "type": "string"
-            }
           }
         ],
         "responses": {
