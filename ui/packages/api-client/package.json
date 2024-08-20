@@ -49,7 +49,7 @@
     "rimraf": "^5.0.7",
     "typescript": "~5.5.4",
     "unbuild": "^0.7.6",
-    "vite-plugin-dts": "^3.9.1"
+    "vite-plugin-dts": "^4.0.3"
   },
   "peerDependencies": {
     "axios": "^1.7.x"
