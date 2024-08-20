@@ -38,7 +38,7 @@
   "homepage": "https://github.com/halo-dev/halo/tree/main/ui/packages/shared#readme",
   "license": "MIT",
   "devDependencies": {
-    "vite-plugin-dts": "^3.9.1"
+    "vite-plugin-dts": "^4.0.3"
   },
   "peerDependencies": {
     "vue": "^3.4.27",

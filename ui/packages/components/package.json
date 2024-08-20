@@ -58,7 +58,7 @@
     "react-dom": "^18.2.0",
     "storybook": "^7.6.3",
     "unplugin-icons": "^0.14.15",
-    "vite-plugin-dts": "^3.9.1"
+    "vite-plugin-dts": "^4.0.3"
   },
   "peerDependencies": {
     "vue": "^3.4.27",
