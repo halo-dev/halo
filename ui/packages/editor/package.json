@@ -87,7 +87,7 @@
     "@iconify/json": "^2.2.117",
     "@types/linkifyjs": "^2.1.7",
     "release-it": "^16.1.5",
-    "vite-plugin-dts": "^3.9.1"
+    "vite-plugin-dts": "^4.0.3"
   },
   "peerDependencies": {
     "vue": "^3.4.27"

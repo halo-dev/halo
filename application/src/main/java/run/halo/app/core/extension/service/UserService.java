@@ -27,4 +27,6 @@ public interface UserService {
     Mono<Boolean> confirmPassword(String username, String rawPassword);
 
     Flux<User> listByEmail(String email);
+
+    String encryptPassword(String rawPassword);
 }
