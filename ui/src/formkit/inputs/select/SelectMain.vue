@@ -203,7 +203,7 @@ const initSelectProps = () => {
   selectProps.sortable = !isFalse(nodeProps.sortable);
   selectProps.remote = !isFalse(nodeProps.remote);
   selectProps.allowCreate = !isFalse(nodeProps.allowCreate);
-  selectProps.clearable = !isFalse(nodeProps.clearable);
+  selectProps.clearable = !isFalse(nodeProps.clearable) || true;
   if (selectProps.remote) {
     if (!nodeProps.remoteOption) {
       throw new Error("remoteOption is required when remote is true.");
@@ -487,11 +487,9 @@ onMounted(async () => {
 });
 
 watch(
-  () => options.value,
+  () => [options.value, props.context.value],
   async () => {
-    if (!selectOptions.value && options.value.length > 0) {
-      selectOptions.value = await fetchSelectedOptions();
-    }
+    selectOptions.value = await fetchSelectedOptions();
   },
   {
     immediate: true,

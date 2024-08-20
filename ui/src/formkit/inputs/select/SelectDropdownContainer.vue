@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import { computed, defineProps } from "vue";
+import { computed } from "vue";
 import SelectOption from "./SelectOption.vue";
 import { VEmpty, VLoading } from "@halo-dev/components";
 
