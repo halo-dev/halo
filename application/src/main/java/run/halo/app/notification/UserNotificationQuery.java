@@ -28,6 +28,7 @@ public class UserNotificationQuery extends SortableRequest {
     /**
      * Build a list options from the query object.
      */
+    @Override
     public ListOptions toListOptions() {
         var listOptions =
             labelAndFieldSelectorToListOptions(getLabelSelector(), getFieldSelector());
