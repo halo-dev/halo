@@ -533,16 +533,6 @@ public class SchemeInitializer implements ApplicationListener<ApplicationContext
                 .setIndexFunc(simpleAttribute(Notification.class,
                     notification -> notification.getSpec().getRecipient()))
             );
-            indexSpecs.add(new IndexSpec()
-                .setName("spec.title")
-                .setIndexFunc(simpleAttribute(Notification.class,
-                    notification -> notification.getSpec().getTitle()))
-            );
-            indexSpecs.add(new IndexSpec()
-                .setName("spec.rawContent")
-                .setIndexFunc(simpleAttribute(Notification.class,
-                    notification -> notification.getSpec().getRawContent()))
-            );
         });
     }
 
