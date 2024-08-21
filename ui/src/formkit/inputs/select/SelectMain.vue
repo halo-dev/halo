@@ -184,6 +184,7 @@ const selectProps: SelectProps = shallowReactive({
   placeholder: "",
 });
 
+const hasSelected = ref(false);
 const isRemote = computed(() => !!selectProps.action || !!selectProps.remote);
 const hasMoreOptions = computed(
   () => options.value && options.value.length < total.value
@@ -408,7 +409,7 @@ const mapUnresolvedOptions = async (
     console.warn(
       `It is not allowed to create options but has unmapped values. ${unmappedSelectValues}`
     );
-    return [];
+    return unmappedSelectValues.map((value) => ({ label: value, value }));
   }
 
   // Asynchronous request for options, fetch label and value via API.
@@ -493,15 +494,14 @@ onMounted(async () => {
       }
     }
   }
-  if (!selectOptions.value) {
-    selectOptions.value = await fetchSelectedOptions();
-  }
 });
 
 watch(
   () => [options.value, props.context.value],
   async () => {
-    selectOptions.value = await fetchSelectedOptions();
+    if (!hasSelected.value && options.value) {
+      selectOptions.value = await fetchSelectedOptions();
+    }
   },
   {
     immediate: true,
@@ -512,7 +512,7 @@ watch(
 // changes in attr options and update options accordingly.
 watch(
   () => props.context.attrs.options,
-  (attrOptions) => {
+  async (attrOptions) => {
     if (!isRemote.value) {
       options.value = attrOptions;
     }
@@ -521,6 +521,7 @@ watch(
 
 const handleUpdate = (value: Array<{ label: string; value: string }>) => {
   const values = value.map((item) => item.value);
+  hasSelected.value = true;
   selectOptions.value = value;
   if (selectProps.multiple) {
     props.context.node.input(values);
@@ -588,7 +589,7 @@ const debouncedFetchOptions = useDebounceFn(async () => {
     return;
   }
   options.value = response.options;
-}, 1000);
+}, 500);
 
 const handleSearch = async (value: string, event?: Event) => {
   if (event && event instanceof InputEvent) {

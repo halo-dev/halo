@@ -1,7 +1,8 @@
 <script lang="ts" setup>
-import { computed } from "vue";
+import { computed, watch } from "vue";
 import SelectOption from "./SelectOption.vue";
 import { VEmpty, VLoading } from "@halo-dev/components";
+import { useTimeout } from "@vueuse/shared";
 
 const props = defineProps<{
   options?: Array<Record<string, unknown> & { label: string; value: string }>;
@@ -61,6 +62,18 @@ const filterOptions = computed(() => {
   return options;
 });
 
+const { ready, start, stop } = useTimeout(200, { controls: true });
+
+watch(
+  () => props.loading,
+  (loading) => {
+    stop();
+    if (loading) {
+      start();
+    }
+  }
+);
+
 const handleLoadMore = () => {
   if (props.remote) {
     emit("loadMore");
@@ -70,7 +83,7 @@ const handleLoadMore = () => {
 
 <template>
   <div class="w-full">
-    <div v-if="loading && !nextLoading">
+    <div v-if="ready && loading && !nextLoading">
       <VLoading></VLoading>
     </div>
     <div v-else-if="filterOptions && filterOptions.length > 0">
