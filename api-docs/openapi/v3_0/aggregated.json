@@ -22881,14 +22881,12 @@
             }
           },
           "roles": {
-            "uniqueItems": true,
             "type": "array",
             "items": {
               "$ref": "#/components/schemas/Role"
             }
           },
           "uiPermissions": {
-            "uniqueItems": true,
             "type": "array",
             "items": {
               "type": "string"

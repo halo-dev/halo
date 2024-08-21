@@ -6,6 +6,8 @@ import static org.springframework.security.test.web.reactive.server.SecurityMock
 
 import java.time.Instant;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -17,6 +19,7 @@ import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.web.reactive.server.WebTestClient;
 import reactor.core.publisher.Flux;
+import reactor.core.publisher.Mono;
 import run.halo.app.core.extension.Role;
 import run.halo.app.core.extension.User;
 import run.halo.app.core.extension.service.RoleService;
@@ -46,7 +49,7 @@ public class UserEndpointIntegrationTest {
             .build();
         var role = new Role();
         role.setMetadata(new Metadata());
-        role.getMetadata().setName("super-role");
+        role.getMetadata().setName("fake-super-role");
         role.setRules(List.of(rule));
         when(roleService.listDependenciesFlux(anySet())).thenReturn(Flux.just(role));
         webClient = webClient.mutateWith(csrf());
@@ -68,6 +71,9 @@ public class UserEndpointIntegrationTest {
             client.create(unexpectedUser2).block();
 
             when(roleService.list(anySet())).thenReturn(Flux.empty());
+            when(roleService.getRolesByUsernames(
+                List.of("fake-user-2")
+            )).thenReturn(Mono.just(Map.of("fake-user-2", Set.of("fake-super-role"))));
 
             webClient.get().uri("/apis/api.console.halo.run/v1alpha1/users?keyword=Expected")
                 .exchange()
@@ -92,6 +98,8 @@ public class UserEndpointIntegrationTest {
             client.create(unexpectedUser2).block();
 
             when(roleService.list(anySet())).thenReturn(Flux.empty());
+            when(roleService.getRolesByUsernames(List.of("fake-user")))
+                .thenReturn(Mono.just(Map.of("fake-user", Set.of("fake-super-role"))));
 
             webClient.get().uri("/apis/api.console.halo.run/v1alpha1/users?keyword=fake-user")
                 .exchange()

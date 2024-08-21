@@ -1,11 +1,12 @@
 package run.halo.app.core.extension.service;
 
 import java.util.Collection;
+import java.util.Map;
 import java.util.Set;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import run.halo.app.core.extension.Role;
-import run.halo.app.core.extension.RoleBinding.RoleRef;
+import run.halo.app.core.extension.RoleBinding;
 import run.halo.app.core.extension.RoleBinding.Subject;
 
 /**
@@ -14,7 +15,11 @@ import run.halo.app.core.extension.RoleBinding.Subject;
  */
 public interface RoleService {
 
-    Flux<RoleRef> listRoleRefs(Subject subject);
+    Flux<RoleBinding> listRoleBindings(Subject subject);
+
+    Flux<String> getRolesByUsername(String username);
+
+    Mono<Map<String, Collection<String>>> getRolesByUsernames(Collection<String> usernames);
 
     Mono<Boolean> contains(Collection<String> source, Collection<String> candidates);
 
@@ -29,5 +34,20 @@ public interface RoleService {
 
     Flux<Role> listDependenciesFlux(Set<String> names);
 
+    /**
+     * List roles by role names.
+     *
+     * @param roleNames role names
+     * @return roles
+     */
     Flux<Role> list(Set<String> roleNames);
+
+    /**
+     * List roles by role names.
+     *
+     * @param roleNames role names
+     * @param excludeHidden should exclude hidden roles
+     * @return roles
+     */
+    Flux<Role> list(Set<String> roleNames, boolean excludeHidden);
 }
