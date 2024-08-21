@@ -1,7 +1,6 @@
 package run.halo.app.core.extension.service;
 
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.same;
 import static org.mockito.Mockito.eq;
 import static org.mockito.Mockito.never;
@@ -22,10 +21,12 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.data.domain.Sort;
 import reactor.core.publisher.Flux;
 import reactor.test.StepVerifier;
 import run.halo.app.core.extension.Role;
 import run.halo.app.core.extension.RoleBinding;
+import run.halo.app.extension.ListOptions;
 import run.halo.app.extension.Metadata;
 import run.halo.app.extension.ReactiveExtensionClient;
 import run.halo.app.infra.utils.JsonUtils;
@@ -39,7 +40,7 @@ import run.halo.app.infra.utils.JsonUtils;
 @ExtendWith(MockitoExtension.class)
 class DefaultRoleServiceTest {
     @Mock
-    private ReactiveExtensionClient extensionClient;
+    private ReactiveExtensionClient client;
 
     @InjectMocks
     private DefaultRoleService roleService;
@@ -56,7 +57,7 @@ class DefaultRoleServiceTest {
             var roleNames = Set.of("role1");
 
 
-            when(extensionClient.list(same(Role.class), any(), any()))
+            when(client.listAll(same(Role.class), any(ListOptions.class), any(Sort.class)))
                 .thenReturn(Flux.just(role1))
                 .thenReturn(Flux.just(role2))
                 .thenReturn(Flux.just(role3))
@@ -73,7 +74,11 @@ class DefaultRoleServiceTest {
                 .verifyComplete();
 
             // verify the mock invocations
-            verify(extensionClient, times(4)).list(same(Role.class), any(), any());
+            verify(client, times(4)).listAll(
+                same(Role.class),
+                any(ListOptions.class),
+                any(Sort.class)
+            );
         }
 
         @Test
@@ -86,7 +91,7 @@ class DefaultRoleServiceTest {
             var roleNames = Set.of("role1");
 
             // setup mocks
-            when(extensionClient.list(same(Role.class), any(), any()))
+            when(client.listAll(same(Role.class), any(ListOptions.class), any(Sort.class)))
                 .thenReturn(Flux.just(role1))
                 .thenReturn(Flux.just(role2))
                 .thenReturn(Flux.just(role3))
@@ -103,7 +108,11 @@ class DefaultRoleServiceTest {
                 .verifyComplete();
 
             // verify the mock invocations
-            verify(extensionClient, times(4)).list(same(Role.class), any(), any());
+            verify(client, times(4)).listAll(
+                same(Role.class),
+                any(ListOptions.class),
+                any(Sort.class)
+            );
         }
 
         @Test
@@ -118,13 +127,12 @@ class DefaultRoleServiceTest {
 
             var roleNames = Set.of("role1");
 
-            when(extensionClient.list(same(Role.class), any(), any()))
+            when(client.listAll(same(Role.class), any(ListOptions.class), any(Sort.class)))
                 .thenReturn(Flux.just(role1))
                 .thenReturn(Flux.just(role2))
                 .thenReturn(Flux.just(role3))
                 .thenReturn(Flux.just(role4))
-                .thenReturn(Flux.empty())
-            ;
+                .thenReturn(Flux.empty());
 
             // call the method under test
             var result = roleService.listDependenciesFlux(roleNames);
@@ -138,7 +146,11 @@ class DefaultRoleServiceTest {
                 .verifyComplete();
 
             // verify the mock invocations
-            verify(extensionClient, times(5)).list(same(Role.class), any(), any());
+            verify(client, times(5)).listAll(
+                same(Role.class),
+                any(ListOptions.class),
+                any(Sort.class)
+            );
         }
 
         @Test
@@ -153,7 +165,7 @@ class DefaultRoleServiceTest {
 
             Set<String> roleNames = Set.of("role1");
 
-            when(extensionClient.list(same(Role.class), any(), any()))
+            when(client.listAll(same(Role.class), any(ListOptions.class), any(Sort.class)))
                 .thenReturn(Flux.just(role1))
                 .thenReturn(Flux.just(role4, role2))
                 .thenReturn(Flux.just(role3))
@@ -171,7 +183,7 @@ class DefaultRoleServiceTest {
                 .verifyComplete();
 
             // verify the mock invocations
-            verify(extensionClient, times(4)).list(same(Role.class), any(), any());
+            verify(client, times(4)).listAll(same(Role.class), any(), any());
         }
 
         @Test
@@ -186,7 +198,7 @@ class DefaultRoleServiceTest {
 
             Set<String> roleNames = Set.of("role2");
 
-            when(extensionClient.list(same(Role.class), any(), any()))
+            when(client.listAll(same(Role.class), any(ListOptions.class), any(Sort.class)))
                 .thenReturn(Flux.just(role2))
                 .thenReturn(Flux.just(role3))
                 .thenReturn(Flux.empty());
@@ -201,16 +213,16 @@ class DefaultRoleServiceTest {
                 .verifyComplete();
 
             // verify the mock invocations
-            verify(extensionClient, times(3)).list(same(Role.class), any(), any());
+            verify(client, times(3)).listAll(
+                same(Role.class),
+                any(ListOptions.class),
+                any(Sort.class)
+            );
         }
 
         @Test
         void listDependenciesWithNullParam() {
             var result = roleService.listDependenciesFlux(null);
-
-            when(extensionClient.list(same(Role.class), any(), any()))
-                .thenReturn(Flux.empty())
-                .thenReturn(Flux.empty());
 
             // verify the result
             StepVerifier.create(result)
@@ -221,7 +233,11 @@ class DefaultRoleServiceTest {
                 .verifyComplete();
 
             // verify the mock invocations
-            verify(extensionClient, never()).fetch(eq(Role.class), anyString());
+            verify(client, never()).listAll(
+                eq(Role.class),
+                any(ListOptions.class),
+                any(Sort.class)
+            );
         }
 
         @Test
@@ -232,7 +248,7 @@ class DefaultRoleServiceTest {
 
             var roleNames = Set.of("role1");
 
-            when(extensionClient.list(same(Role.class), any(), any()))
+            when(client.listAll(same(Role.class), any(ListOptions.class), any(Sort.class)))
                 .thenReturn(Flux.just(role1))
                 .thenReturn(Flux.just(role2))
                 .thenReturn(Flux.just(role4))
@@ -248,7 +264,11 @@ class DefaultRoleServiceTest {
                 .verifyComplete();
 
             // verify the mock invocations
-            verify(extensionClient, times(4)).list(same(Role.class), any(), any());
+            verify(client, times(4)).listAll(
+                same(Role.class),
+                any(ListOptions.class),
+                any(Sort.class)
+            );
         }
 
         @Test

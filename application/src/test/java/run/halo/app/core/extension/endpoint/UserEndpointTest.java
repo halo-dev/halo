@@ -88,6 +88,8 @@ class UserEndpointTest {
 
         @Test
         void shouldListEmptyUsersWhenNoUsers() {
+            when(roleService.getRolesByUsernames(any())).thenReturn(Mono.just(Map.of()));
+            when(roleService.list(any())).thenReturn(Flux.empty());
             when(client.listBy(same(User.class), any(), any(PageRequest.class)))
                 .thenReturn(Mono.just(ListResult.emptyResult()));
 
@@ -109,6 +111,7 @@ class UserEndpointTest {
                 createUser("fake-user-3")
             );
             var expectResult = new ListResult<>(users);
+            when(roleService.getRolesByUsernames(any())).thenReturn(Mono.just(Map.of()));
             when(roleService.list(anySet())).thenReturn(Flux.empty());
             when(client.listBy(same(User.class), any(), any(PageRequest.class)))
                 .thenReturn(Mono.just(expectResult));
@@ -144,6 +147,7 @@ class UserEndpointTest {
             var expectResult = new ListResult<>(users);
             when(client.listBy(same(User.class), any(), any(PageRequest.class)))
                 .thenReturn(Mono.just(expectResult));
+            when(roleService.getRolesByUsernames(any())).thenReturn(Mono.just(Map.of()));
             when(roleService.list(anySet())).thenReturn(Flux.empty());
 
             bindToRouterFunction(endpoint.endpoint())
@@ -160,6 +164,7 @@ class UserEndpointTest {
             var expectResult = new ListResult<>(List.of(expectUser));
             when(client.listBy(same(User.class), any(), any(PageRequest.class)))
                 .thenReturn(Mono.just(expectResult));
+            when(roleService.getRolesByUsernames(any())).thenReturn(Mono.just(Map.of()));
             when(roleService.list(anySet())).thenReturn(Flux.empty());
 
             bindToRouterFunction(endpoint.endpoint())
@@ -219,22 +224,19 @@ class UserEndpointTest {
             metadata.setName("fake-user");
             var user = new User();
             user.setMetadata(metadata);
-            Map<String, String> annotations =
-                Map.of(User.ROLE_NAMES_ANNO, JsonUtils.objectToJson(Set.of("role-A")));
-            user.getMetadata().setAnnotations(annotations);
             when(userService.getUser("fake-user")).thenReturn(Mono.just(user));
             Role role = new Role();
             role.setMetadata(new Metadata());
-            role.getMetadata().setName("role-A");
+            role.getMetadata().setName("fake-super-role");
             role.setRules(List.of());
-            when(roleService.list(anySet())).thenReturn(Flux.just(role));
+            when(roleService.list(Set.of("fake-super-role"), true)).thenReturn(Flux.just(role));
             webClient.get().uri("/users/-")
                 .exchange()
                 .expectStatus().isOk()
                 .expectHeader().contentType(MediaType.APPLICATION_JSON)
                 .expectBody(UserEndpoint.DetailedUser.class)
                 .isEqualTo(new UserEndpoint.DetailedUser(user, List.of(role)));
-            verify(roleService).list(eq(Set.of("role-A")));
+            // verify(roleService).list(eq(Set.of("role-A")));
         }
     }
 
@@ -385,16 +387,17 @@ class UserEndpointTest {
                     "metadata": {
                         "name": "test-A",
                         "annotations": {
-                            "rbac.authorization.halo.run/ui-permissions": "[\\"permission-A\\"]"
+                            "rbac.authorization.halo.run/ui-permissions": \
+                            "[\\"permission-A\\", \\"permission-A\\"]"
                         }
                     },
                     "rules": []
                 }
                 """, Role.class);
             when(roleService.listPermissions(eq(Set.of("test-A")))).thenReturn(Flux.just(roleA));
-            when(userService.listRoles(eq("fake-user"))).thenReturn(
-                Flux.fromIterable(List.of(roleA)));
             when(roleService.listDependenciesFlux(anySet())).thenReturn(Flux.just(roleA));
+            when(roleService.getRolesByUsername("fake-user")).thenReturn(Flux.just("test-A"));
+            when(roleService.list(Set.of("test-A"), true)).thenReturn(Flux.just(roleA));
 
             webClient.get().uri("/users/fake-user/permissions")
                 .exchange()
@@ -402,12 +405,10 @@ class UserEndpointTest {
                 .isOk()
                 .expectBody(UserEndpoint.UserPermission.class)
                 .value(userPermission -> {
-                    assertEquals(Set.of(roleA), userPermission.getRoles());
+                    assertEquals(List.of(roleA), userPermission.getRoles());
                     assertEquals(List.of(roleA), userPermission.getPermissions());
-                    assertEquals(Set.of("permission-A"), userPermission.getUiPermissions());
+                    assertEquals(List.of("permission-A"), userPermission.getUiPermissions());
                 });
-
-            verify(userService, times(1)).listRoles(eq("fake-user"));
         }
     }
 

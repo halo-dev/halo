@@ -93,6 +93,7 @@ models/auth-provider-list.ts
 models/auth-provider-spec.ts
 models/auth-provider.ts
 models/author.ts
+models/backup-file.ts
 models/backup-list.ts
 models/backup-spec.ts
 models/backup-status.ts

@@ -5239,55 +5239,6 @@
         ]
       }
     },
-    "/apis/api.console.migration.halo.run/v1alpha1/backups/{name}/files/{filename}": {
-      "get": {
-        "operationId": "DownloadBackups",
-        "parameters": [
-          {
-            "description": "Backup name.",
-            "in": "path",
-            "name": "name",
-            "required": true,
-            "schema": {
-              "type": "string"
-            }
-          },
-          {
-            "description": "Backup filename.",
-            "in": "path",
-            "name": "filename",
-            "required": true,
-            "schema": {
-              "type": "string"
-            }
-          }
-        ],
-        "responses": {},
-        "tags": [
-          "MigrationV1alpha1Console"
-        ]
-      }
-    },
-    "/apis/api.console.migration.halo.run/v1alpha1/restorations": {
-      "post": {
-        "description": "Restore backup by uploading file or providing download link or backup name.",
-        "operationId": "RestoreBackup",
-        "requestBody": {
-          "content": {
-            "multipart/form-data": {
-              "schema": {
-                "$ref": "#/components/schemas/RestoreRequest"
-              }
-            }
-          },
-          "required": true
-        },
-        "responses": {},
-        "tags": [
-          "MigrationV1alpha1Console"
-        ]
-      }
-    },
     "/apis/api.content.halo.run/v1alpha1/categories": {
       "get": {
         "description": "Lists categories.",
@@ -7408,6 +7359,79 @@
         },
         "tags": [
           "UserConnectionV1alpha1"
+        ]
+      }
+    },
+    "/apis/console.api.migration.halo.run/v1alpha1/backup-files": {
+      "get": {
+        "description": "Get backup files from backup root.",
+        "operationId": "getBackupFiles",
+        "responses": {
+          "default": {
+            "content": {
+              "*/*": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/BackupFile"
+                  }
+                }
+              }
+            },
+            "description": "default response"
+          }
+        },
+        "tags": [
+          "MigrationV1alpha1Console"
+        ]
+      }
+    },
+    "/apis/console.api.migration.halo.run/v1alpha1/backups/{name}/files/{filename}": {
+      "get": {
+        "operationId": "DownloadBackups",
+        "parameters": [
+          {
+            "description": "Backup name.",
+            "in": "path",
+            "name": "name",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "description": "Backup filename.",
+            "in": "path",
+            "name": "filename",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {},
+        "tags": [
+          "MigrationV1alpha1Console"
+        ]
+      }
+    },
+    "/apis/console.api.migration.halo.run/v1alpha1/restorations": {
+      "post": {
+        "description": "Restore backup by uploading file or providing download link or backup name.",
+        "operationId": "RestoreBackup",
+        "requestBody": {
+          "content": {
+            "multipart/form-data": {
+              "schema": {
+                "$ref": "#/components/schemas/RestoreRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {},
+        "tags": [
+          "MigrationV1alpha1Console"
         ]
       }
     },
@@ -15300,6 +15324,22 @@
           }
         }
       },
+      "BackupFile": {
+        "type": "object",
+        "properties": {
+          "filename": {
+            "type": "string"
+          },
+          "lastModifiedTime": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "size": {
+            "type": "integer",
+            "format": "int64"
+          }
+        }
+      },
       "BackupList": {
         "required": [
           "first",
@@ -20684,6 +20724,10 @@
           "file": {
             "type": "string",
             "format": "binary"
+          },
+          "filename": {
+            "type": "string",
+            "description": "Filename of backup file in backups root."
           }
         }
       },
@@ -22881,14 +22925,12 @@
             }
           },
           "roles": {
-            "uniqueItems": true,
             "type": "array",
             "items": {
               "$ref": "#/components/schemas/Role"
             }
           },
           "uiPermissions": {
-            "uniqueItems": true,
             "type": "array",
             "items": {
               "type": "string"
