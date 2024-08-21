@@ -143,7 +143,6 @@ public class DefaultAttachmentService implements AttachmentService {
     @Override
     public Mono<Attachment> uploadFromUrl(@NonNull URL url, @NonNull String policyName,
         String groupName, String filename) {
-        // TODO validate url
         var uri = URI.create(url.toString());
         AtomicReference<MediaType> mediaTypeRef = new AtomicReference<>();
         AtomicReference<String> fileNameRef = new AtomicReference<>(filename);
@@ -176,9 +175,7 @@ public class DefaultAttachmentService implements AttachmentService {
             var path = externalUrl.getPath();
             fileName = Paths.get(path).getFileName().toString();
         }
-        if (!FileNameUtils.hasFileExtension(fileName)) {
-            // TODO get file extension from media type
-        }
+        // TODO get file extension from media type
         return fileName;
     }
 

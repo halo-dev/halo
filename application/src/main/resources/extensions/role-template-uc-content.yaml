@@ -114,6 +114,6 @@ rules:
   - apiGroups: [ "uc.api.content.halo.run" ]
     resources: [ "attachments" ]
     verbs: [ "create", "update", "delete" ]
-  - nonResourceURLs: [
-    "/apis/api.console.halo.run/v1alpha1/attachments/-/upload-from-url"
-  ]
+  - apiGroups: [ "uc.api.content.halo.run" ]
+    resources: [ "attachments/upload-from-url" ]
+    verbs: [ "create" ]
