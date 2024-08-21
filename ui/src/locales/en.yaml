@@ -1252,8 +1252,12 @@ core:
                 qrcode:
                   label: "Use the validator application to scan the QR code below:"
                 manual:
-                  label: "If you can't scan the QR code, click to view the alternative steps."
-                  help: "Manually configure the validator application with the following code:"
+                  label: >-
+                    If you can't scan the QR code, click to view the alternative
+                    steps.
+                  help: >-
+                    Manually configure the validator application with the
+                    following code:
     pat:
       operations:
         delete:
@@ -1460,7 +1464,10 @@ core:
         button: Download and restore
       restore_by_backup:
         button: Restore
-        title: Restore from this backup
+        title: Restore from backup file
+        description: >-
+          After clicking OK, data will be restored from the backup file
+          {filename}.
     list:
       phases:
         pending: Pending
@@ -1490,7 +1497,7 @@ core:
           fields:
             url: Remote URL
         backup:
-          label: Restore from backup
+          label: Restore from backup files
   exception:
     not_found:
       message: Page not found
