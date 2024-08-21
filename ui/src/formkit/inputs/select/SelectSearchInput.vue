@@ -1,6 +1,10 @@
 <script lang="ts" setup>
 import { ref } from "vue";
 
+defineProps<{
+  searchable: boolean;
+}>();
+
 const emit = defineEmits<{
   (event: "search", value: string, e?: Event): void;
   (event: "enter", value: string): void;
@@ -18,8 +22,12 @@ const inputValue = ref("");
         ref="inputHTMLRef"
         v-model="inputValue"
         type="text"
+        :readonly="!searchable"
         autocomplete="off"
         class="m-0 h-full w-full cursor-auto !appearance-none border-none bg-transparent p-0 pe-0 ps-0 text-base outline-none"
+        :class="{
+          '!cursor-pointer': !searchable,
+        }"
         @input="(event) => emit('search', inputValue, event)"
       />
     </span>

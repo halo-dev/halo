@@ -1,6 +1,10 @@
 <script lang="ts" setup>
 import { nextTick, ref, watch } from "vue";
 
+defineProps<{
+  searchable: boolean;
+}>();
+
 const emit = defineEmits<{
   (event: "search", value: string, e?: Event): void;
   (event: "enter", value: string): void;
@@ -46,6 +50,7 @@ defineExpose({
       <input
         ref="inputHTMLRef"
         v-model="inputValue"
+        :readonly="!searchable"
         type="text"
         autocomplete="off"
         class="m-0 h-full w-full cursor-auto !appearance-none border-none bg-transparent p-0 pe-0 ps-0 text-base outline-none"

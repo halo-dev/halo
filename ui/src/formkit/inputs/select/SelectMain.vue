@@ -71,6 +71,11 @@ export interface SelectProps {
    * Default placeholder text.
    */
   placeholder?: string;
+
+  /**
+   * Whether to enable search, default is false.
+   */
+  searchable?: boolean;
 }
 
 export interface SelectResponse {
@@ -204,6 +209,7 @@ const initSelectProps = () => {
   selectProps.remote = !isFalse(nodeProps.remote);
   selectProps.allowCreate = !isFalse(nodeProps.allowCreate);
   selectProps.clearable = !isFalse(nodeProps.clearable) || true;
+  selectProps.searchable = !isFalse(nodeProps.searchable);
   if (selectProps.remote) {
     if (!nodeProps.remoteOption) {
       throw new Error("remoteOption is required when remote is true.");
@@ -618,6 +624,7 @@ const handleNextPage = async () => {
     :selected="selectOptions"
     :remote="isRemote"
     :clearable="selectProps.clearable"
+    :searchable="selectProps.searchable"
     @update="handleUpdate"
     @search="handleSearch"
     @load-more="handleNextPage"

@@ -14,6 +14,7 @@ const props = withDefaults(
       label: string;
       value: string;
     }>;
+    searchable: boolean;
   }>(),
   {
     placeholder: "Select...",
@@ -76,7 +77,12 @@ const handleFocusout = (event: FocusEvent) => {
 };
 </script>
 <template>
-  <MultipleOverflow class="cursor-text">
+  <MultipleOverflow
+    class="cursor-text"
+    :class="{
+      '!cursor-pointer': !searchable,
+    }"
+  >
     <MultipleSelect
       :selected-options="selectedOptions"
       :sortable="sortable"
@@ -87,6 +93,7 @@ const handleFocusout = (event: FocusEvent) => {
       <MultipleOverflowItem>
         <MultipleSelectSearchInput
           ref="inputRef"
+          :searchable="searchable"
           @search="handleSearch"
           @keydown.backspace="handleSearchInputBackspace"
           @focusout="handleFocusout"

@@ -74,6 +74,10 @@ const props = defineProps({
     type: Boolean,
     default: false,
   },
+  searchable: {
+    type: Boolean,
+    default: false,
+  },
 });
 
 const emit = defineEmits<{
@@ -253,6 +257,7 @@ const handleSortSelectedOptions = (
             isDropdownVisible,
             selectedOptions,
             sortable,
+            searchable,
           }"
           @search="handleSearch"
           @delete-item="handleDeleteSelectItem"

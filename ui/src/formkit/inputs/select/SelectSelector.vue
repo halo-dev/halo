@@ -9,6 +9,7 @@ const props = defineProps<{
     value: string;
   }>;
   isDropdownVisible: boolean;
+  searchable: boolean;
 }>();
 
 const emit = defineEmits<{
@@ -40,7 +41,7 @@ const showPlaceholder = computed(() => {
 </script>
 
 <template>
-  <SelectSearchInput @search="handleSearch">
+  <SelectSearchInput :searchable="searchable" @search="handleSearch">
     <template #placeholder>
       <span
         v-if="showPlaceholder"
