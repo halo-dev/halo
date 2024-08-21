@@ -1,6 +1,8 @@
 package run.halo.app.migration.impl;
 
 import static java.nio.file.Files.deleteIfExists;
+import static java.util.Comparator.comparing;
+import static org.apache.commons.io.FilenameUtils.isExtension;
 import static org.springframework.util.FileSystemUtils.copyRecursively;
 import static run.halo.app.infra.utils.FileUtils.checkDirectoryTraversal;
 import static run.halo.app.infra.utils.FileUtils.copyRecursively;
@@ -19,8 +21,10 @@ import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 import java.util.Locale;
 import java.util.Set;
+import java.util.stream.BaseStream;
 import lombok.extern.slf4j.Slf4j;
 import org.reactivestreams.Publisher;
+import org.springframework.beans.factory.InitializingBean;
 import org.springframework.core.io.FileSystemResource;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.buffer.DataBuffer;
@@ -40,11 +44,12 @@ import run.halo.app.infra.exception.NotFoundException;
 import run.halo.app.infra.properties.HaloProperties;
 import run.halo.app.infra.utils.FileUtils;
 import run.halo.app.migration.Backup;
+import run.halo.app.migration.BackupFile;
 import run.halo.app.migration.MigrationService;
 
 @Slf4j
 @Service
-public class MigrationServiceImpl implements MigrationService {
+public class MigrationServiceImpl implements MigrationService, InitializingBean {
 
     private final ExtensionStoreRepository repository;
 
@@ -163,6 +168,49 @@ public class MigrationServiceImpl implements MigrationService {
         }).subscribeOn(scheduler);
     }
 
+    @Override
+    public Flux<BackupFile> getBackupFiles() {
+        return Flux.using(
+                () -> Files.list(getBackupsRoot()),
+                Flux::fromStream,
+                BaseStream::close
+            )
+            .filter(Files::isRegularFile)
+            .filter(Files::isReadable)
+            .filter(path -> isExtension(path.getFileName().toString(), "zip"))
+            .map(this::toBackupFile)
+            .sort(comparing(BackupFile::getLastModifiedTime).reversed()
+                .thenComparing(BackupFile::getFilename)
+            )
+            .subscribeOn(this.scheduler);
+    }
+
+    @Override
+    public Mono<BackupFile> getBackupFile(String filename) {
+        return Mono.fromCallable(() -> {
+            var backupsRoot = getBackupsRoot();
+            var backupFilePath = backupsRoot.resolve(filename);
+            checkDirectoryTraversal(backupsRoot, backupFilePath);
+            if (Files.notExists(backupFilePath)) {
+                return null;
+            }
+            return toBackupFile(backupFilePath);
+        }).subscribeOn(this.scheduler);
+    }
+
+    private BackupFile toBackupFile(Path path) {
+        var backupFile = new BackupFile();
+        backupFile.setPath(path);
+        backupFile.setFilename(path.getFileName().toString());
+        try {
+            backupFile.setSize(Files.size(path));
+            backupFile.setLastModifiedTime(Files.getLastModifiedTime(path).toInstant());
+            return backupFile;
+        } catch (IOException e) {
+            throw Exceptions.propagate(e);
+        }
+    }
+
     private Mono<Void> restoreWorkdir(Path backupRoot) {
         return Mono.<Void>create(sink -> {
             try {
@@ -263,5 +311,10 @@ public class MigrationServiceImpl implements MigrationService {
                     }).then(),
                 FileUtils::closeQuietly))
             .subscribeOn(scheduler);
+    }
+
+    @Override
+    public void afterPropertiesSet() throws Exception {
+        Files.createDirectories(getBackupsRoot());
     }
 }

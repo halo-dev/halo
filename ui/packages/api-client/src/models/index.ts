@@ -11,6 +11,7 @@ export * from './auth-provider-list';
 export * from './auth-provider-spec';
 export * from './author';
 export * from './backup';
+export * from './backup-file';
 export * from './backup-list';
 export * from './backup-spec';
 export * from './backup-status';

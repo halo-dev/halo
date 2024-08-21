@@ -1362,7 +1362,8 @@ core:
         button: 下载并恢复
       restore_by_backup:
         button: 恢复
-        title: 从此备份进行恢复
+        title: 从备份文件恢复
+        description: 点击确定后，将从备份文件 {filename} 恢复数据。
     list:
       phases:
         pending: 准备中
@@ -1386,7 +1387,7 @@ core:
           fields:
             url: 下载地址
         backup:
-          label: 从备份恢复
+          label: 从备份文件恢复
   exception:
     not_found:
       message: 没有找到该页面

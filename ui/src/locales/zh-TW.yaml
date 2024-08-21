@@ -1343,7 +1343,8 @@ core:
         button: 下載並還原
       restore_by_backup:
         button: 還原
-        title: 確認要從此備份進行還原嗎？
+        title: 從備份檔案恢復
+        description: 點選確定後，將從備份檔案 {filename} 還原資料。
     list:
       phases:
         pending: 準備中
@@ -1367,7 +1368,7 @@ core:
           fields:
             url: 下載地址
         backup:
-          label: 從備份還原
+          label: 從備份檔案恢復
   exception:
     not_found:
       message: 沒有找到該頁面
