@@ -161,13 +161,14 @@ const props = defineProps({
 });
 
 const options = shallowRef<
-  Array<
-    Record<string, unknown> & {
-      label: string;
-      value: string;
-    }
-  >
->([]);
+  | Array<
+      Record<string, unknown> & {
+        label: string;
+        value: string;
+      }
+    >
+  | undefined
+>(undefined);
 const selectOptions = shallowRef<
   | Array<{
       label: string;
@@ -184,7 +185,9 @@ const selectProps: SelectProps = shallowReactive({
 });
 
 const isRemote = computed(() => !!selectProps.action || !!selectProps.remote);
-const hasMoreOptions = computed(() => options.value.length < total.value);
+const hasMoreOptions = computed(
+  () => options.value && options.value.length < total.value
+);
 
 const initSelectProps = () => {
   const nodeProps = props.context.node.props;
@@ -352,16 +355,16 @@ const fetchSelectedOptions = async (): Promise<
     selectedValues.push(value.toString());
   }
 
-  const currentOptions = options.value.filter((option) =>
+  const currentOptions = options.value?.filter((option) =>
     selectedValues.includes(option.value.toString())
   );
 
   // Get options that are not yet mapped.
   const unmappedSelectValues = selectedValues.filter(
-    (value) => !currentOptions.find((option) => option.value === value)
+    (value) => !currentOptions?.find((option) => option.value === value)
   );
   if (unmappedSelectValues.length === 0) {
-    return currentOptions.sort((a, b) =>
+    return currentOptions?.sort((a, b) =>
       selectedValues.indexOf(a.value) > selectedValues.indexOf(b.value) ? 1 : -1
     );
   }
@@ -369,7 +372,7 @@ const fetchSelectedOptions = async (): Promise<
   // Map the unresolved options to label and value format.
   const mappedSelectOptions = await mapUnresolvedOptions(unmappedSelectValues);
   // Merge currentOptions and mappedSelectOptions, then sort them according to selectValues order.
-  return [...currentOptions, ...mappedSelectOptions].sort((a, b) =>
+  return [...(currentOptions || []), ...mappedSelectOptions].sort((a, b) =>
     selectedValues.indexOf(a.value) > selectedValues.indexOf(b.value) ? 1 : -1
   );
 };
@@ -476,14 +479,17 @@ const fetchRemoteMappedOptions = async (
 
 onMounted(async () => {
   initSelectProps();
-  options.value = props.context.attrs.options ?? [];
-  const response = await fetchOptions();
-  if (response) {
-    options.value = response.options;
-    if (selectProps.remoteOptimize) {
-      if (total.value !== 0 && total.value <= size.value) {
-        noNeedFetchOptions.value = true;
-        cacheAllOptions.value = response.options;
+  if (!isRemote.value) {
+    options.value = props.context.attrs.options;
+  } else {
+    const response = await fetchOptions();
+    if (response) {
+      options.value = response.options;
+      if (selectProps.remoteOptimize) {
+        if (total.value !== 0 && total.value <= size.value) {
+          noNeedFetchOptions.value = true;
+          cacheAllOptions.value = response.options;
+        }
       }
     }
   }
@@ -499,6 +505,17 @@ watch(
   },
   {
     immediate: true,
+  }
+);
+
+// When attr options are processed asynchronously, it is necessary to monitor
+// changes in attr options and update options accordingly.
+watch(
+  () => props.context.attrs.options,
+  (attrOptions) => {
+    if (!isRemote.value) {
+      options.value = attrOptions;
+    }
   }
 );
 
@@ -580,7 +597,11 @@ const handleSearch = async (value: string, event?: Event) => {
     }
   }
   // When the search keyword does not change, the data is no longer requested.
-  if (value === searchKeyword.value && options.value.length > 0) {
+  if (
+    value === searchKeyword.value &&
+    options.value &&
+    options.value?.length > 0
+  ) {
     return;
   }
   searchKeyword.value = value;
@@ -608,7 +629,7 @@ const handleNextPage = async () => {
   if (!response) {
     return;
   }
-  options.value = [...options.value, ...response.options];
+  options.value = [...(options.value || []), ...response.options];
 };
 </script>
 <template>
