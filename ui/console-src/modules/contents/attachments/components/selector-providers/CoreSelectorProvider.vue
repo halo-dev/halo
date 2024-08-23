@@ -102,6 +102,11 @@ function onUploadModalClose() {
   uploadVisible.value = false;
 }
 
+function onDetailModalClose() {
+  detailVisible.value = false;
+  selectedAttachment.value = undefined;
+}
+
 function onGroupSelect(group: Group) {
   selectedGroup.value = group.metadata.name;
   handleReset();
@@ -223,10 +228,10 @@ function onGroupSelect(group: Group) {
   </div>
   <AttachmentUploadModal v-if="uploadVisible" @close="onUploadModalClose" />
   <AttachmentDetailModal
-    v-model:visible="detailVisible"
+    v-if="detailVisible"
     :mount-to-body="true"
-    :attachment="selectedAttachment"
-    @close="selectedAttachment = undefined"
+    :name="selectedAttachment?.metadata.name"
+    @close="onDetailModalClose"
   >
     <template #actions>
       <span
