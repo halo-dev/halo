@@ -21,6 +21,7 @@ public class DefaultExtensionIterator<E extends Extension> implements ExtensionI
     private Pageable currentPageable;
     private List<E> currentData;
     private int currentIndex;
+    private long size;
 
     public DefaultExtensionIterator(ExtensionPaginatedLister<E> lister) {
         this(PageRequest.of(0, DEFAULT_PAGE_SIZE, Sort.by("name")), lister);
@@ -61,6 +62,12 @@ public class DefaultExtensionIterator<E extends Extension> implements ExtensionI
         if (!hasNext()) {
             throw new NoSuchElementException();
         }
+        this.size++;
         return currentData.get(currentIndex++);
+    }
+
+    @Override
+    public long size() {
+        return this.size;
     }
 }

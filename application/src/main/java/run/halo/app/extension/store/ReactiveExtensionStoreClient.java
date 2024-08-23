@@ -12,6 +12,8 @@ public interface ReactiveExtensionStoreClient {
 
     Mono<Page<ExtensionStore>> listByNamePrefix(String prefix, Pageable pageable);
 
+    Mono<Long> countByNamePrefix(String prefix);
+
     /**
      * List stores by names and return data according to given names order.
      *

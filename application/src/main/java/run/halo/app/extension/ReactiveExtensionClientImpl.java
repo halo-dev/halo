@@ -480,7 +480,20 @@ public class ReactiveExtensionClientImpl implements ReactiveExtensionClient {
 
         private void createIndexerFor(Scheme scheme) {
             setIndexBuildingStateFor(scheme.groupVersionKind().groupKind(), true);
-            indexerFactory.createIndexerFor(scheme.type(), createExtensionIterator(scheme));
+            var iterator = createExtensionIterator(scheme);
+            indexerFactory.createIndexerFor(scheme.type(), iterator);
+            // ensure data count matches index count
+            var prefix = ExtensionStoreUtil.buildStoreNamePrefix(scheme);
+            var indexedSize = indexedQueryEngine.retrieveAll(scheme.groupVersionKind(),
+                new ListOptions(), Sort.unsorted()).size();
+            long count = client.countByNamePrefix(prefix).blockOptional().orElseThrow();
+            if (count != iterator.size() || count != indexedSize) {
+                log.error("indexedSize: {}, count in db: {}, iterate size: {}", indexedSize, count,
+                    iterator.size());
+                throw new IllegalStateException("The number of indexed records is not equal to the "
+                    + "number of records in the database, this is a serious error, please submit "
+                    + "an issue to halo.");
+            }
             setIndexBuildingStateFor(scheme.groupVersionKind().groupKind(), false);
         }
     }
