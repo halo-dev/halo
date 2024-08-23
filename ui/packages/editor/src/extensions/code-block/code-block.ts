@@ -112,6 +112,18 @@ export interface CodeBlockOptions {
    * @example { class: 'foo' }
    */
   HTMLAttributes: Record<string, any>;
+
+  /**
+   * The default language for code block
+   * @default null
+   */
+  defaultLanguage: string | null | undefined;
+
+  /**
+   * The default theme for code block
+   * @default null
+   */
+  defaultTheme: string | null | undefined;
 }
 
 export interface ExtensionCodeBlockOptions extends CodeBlockOptions {
@@ -167,7 +179,7 @@ export default TiptapCodeBlock.extend<ExtensionCodeBlockOptions>({
         },
       },
       theme: {
-        default: null,
+        default: this.options.defaultTheme,
         parseHTML: (element) => element.getAttribute("theme") || null,
         renderHTML: (attributes) => {
           if (attributes.theme) {
@@ -281,6 +293,8 @@ export default TiptapCodeBlock.extend<ExtensionCodeBlockOptions>({
       ...this.parent?.(),
       languages: [],
       themes: [],
+      defaultLanguage: null,
+      defaultTheme: null,
       getToolbarItems({ editor }: { editor: Editor }) {
         return {
           priority: 160,
