@@ -63,7 +63,7 @@ async function onSubmit({ displayName }: { displayName: string }) {
       :model-value="attachment.spec.displayName"
       type="text"
       name="displayName"
-      validation="required"
+      validation="required:trim"
       :classes="{ outer: '!pb-0' }"
     ></FormKit>
   </FormKit>
