@@ -196,10 +196,12 @@ const showDisplayNameForm = ref(false);
                 <span>
                   {{ attachment?.spec.displayName }}
                 </span>
-                <IconRiPencilFill
-                  class="cursor-pointer text-sm text-gray-600 hover:text-gray-900"
-                  @click="showDisplayNameForm = true"
-                />
+                <HasPermission :permissions="['system:attachments:manage']">
+                  <IconRiPencilFill
+                    class="cursor-pointer text-sm text-gray-600 hover:text-gray-900"
+                    @click="showDisplayNameForm = true"
+                  />
+                </HasPermission>
               </div>
             </VDescriptionItem>
             <VDescriptionItem
