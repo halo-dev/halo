@@ -1428,11 +1428,6 @@ core:
         The external access url detected is inconsistent with the current access
         url, which may cause some links to fail to redirect properly. Please
         check the external access url settings.
-      h2_warning: >-
-        H2 database is only used in development and testing environments. It is
-        not recommended to use H2 database in production environment. 
-
-        If you must use it, please back up your data on time.
   backup:
     title: Backup and Restore
     tabs:
@@ -1699,6 +1694,13 @@ core:
         aspect_ratio_square: Crop square
         aspect_ratio_landscape: Crop landscape (16:9)
         aspect_ratio_portrait: Crop portrait (9:16)
+    h2_warning_alert:
+      title: "Warning: H2 database in use"
+      description: >-
+        The H2 database is only suitable for development and testing
+        environments and is not recommended for use in production environments.
+        H2 is very easy to cause data file corruption due to improper operation.
+        If you must use it, please back up the data on time.
   composables:
     content_cache:
       toast_recovered: Recovered unsaved content from cache

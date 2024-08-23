@@ -57,17 +57,11 @@ export const routes: Array<RouteRecordRaw> = [
   },
   {
     path: "/setup",
-    component: GatewayLayout,
-    children: [
-      {
-        path: "",
-        name: "Setup",
-        component: Setup,
-        meta: {
-          title: "core.setup.title",
-        },
-      },
-    ],
+    component: Setup,
+    name: "Setup",
+    meta: {
+      title: "core.setup.title",
+    },
   },
   {
     path: "/setup-initial-data",
