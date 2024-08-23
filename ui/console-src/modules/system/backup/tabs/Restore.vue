@@ -139,7 +139,7 @@ useQuery({
               maxNumberOfFiles: 1,
               allowedFileTypes: ['.zip'],
             }"
-            endpoint="/apis/api.console.migration.halo.run/v1alpha1/restorations"
+            endpoint="/apis/console.api.migration.halo.run/v1alpha1/restorations"
             width="100%"
             @uploaded="onProcessCompleted"
           />

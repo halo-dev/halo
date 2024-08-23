@@ -29,7 +29,6 @@ import org.springframework.core.io.FileSystemResource;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.buffer.DataBuffer;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
 import org.springframework.web.server.ServerWebInputException;
 import reactor.core.Exceptions;
@@ -136,7 +135,6 @@ public class MigrationServiceImpl implements MigrationService, InitializingBean 
     }
 
     @Override
-    @Transactional
     public Mono<Void> restore(Publisher<DataBuffer> content) {
         return Mono.usingWhen(
             createTempDir("halo-restore-", scheduler),

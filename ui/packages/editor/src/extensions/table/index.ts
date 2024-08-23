@@ -220,7 +220,7 @@ const Table = TiptapTable.extend<ExtensionOptions & TableOptions>({
       resizable: true,
       handleWidth: 5,
       cellMinWidth: 25,
-      View: TableView as unknown as NodeView,
+      View: TableView,
       lastColumnResizable: true,
       allowTableNodeSelection: false,
       getToolboxItems({ editor }: { editor: Editor }) {

@@ -18,7 +18,6 @@ import org.springframework.dao.OptimisticLockingFailureException;
 import org.springframework.data.domain.Sort;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.Assert;
 import org.springframework.util.CollectionUtils;
 import org.springframework.util.StringUtils;
@@ -147,7 +146,6 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    @Transactional
     public Mono<User> signUp(User user, String password) {
         if (!StringUtils.hasText(password)) {
             throw new IllegalArgumentException("Password must not be blank");
