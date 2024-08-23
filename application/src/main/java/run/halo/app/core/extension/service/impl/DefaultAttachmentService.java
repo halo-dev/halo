@@ -34,7 +34,6 @@ import run.halo.app.core.extension.service.AttachmentService;
 import run.halo.app.extension.ConfigMap;
 import run.halo.app.extension.ReactiveExtensionClient;
 import run.halo.app.infra.ReactiveUrlDataBufferFetcher;
-import run.halo.app.infra.utils.FileNameUtils;
 import run.halo.app.plugin.extensionpoint.ExtensionGetter;
 
 @Component
