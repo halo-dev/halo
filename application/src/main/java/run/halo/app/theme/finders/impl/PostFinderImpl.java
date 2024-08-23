@@ -26,6 +26,7 @@ import run.halo.app.extension.ListResult;
 import run.halo.app.extension.PageRequestImpl;
 import run.halo.app.extension.ReactiveExtensionClient;
 import run.halo.app.extension.exception.ExtensionNotFoundException;
+import run.halo.app.extension.index.query.Query;
 import run.halo.app.extension.index.query.QueryFactory;
 import run.halo.app.extension.router.selector.FieldSelector;
 import run.halo.app.extension.router.selector.LabelSelector;
@@ -114,6 +115,11 @@ public class PostFinderImpl implements PostFinder {
     @Override
     public Mono<NavigationPostVo> cursor(String currentName) {
         return postPredicateResolver.getListOptions()
+            .map(listOptions -> ListOptions.builder(listOptions)
+                // Exclude hidden posts
+                .andQuery(notHiddenPostQuery())
+                .build()
+            )
             .flatMap(postListOption -> {
                 var postNames = client.indexedQueryEngine()
                     .retrieve(Post.GVK, postListOption,
@@ -136,10 +142,14 @@ public class PostFinderImpl implements PostFinder {
             .defaultIfEmpty(NavigationPostVo.empty());
     }
 
+    private static Query notHiddenPostQuery() {
+        return notEqual("status.hideFromList", BooleanUtils.TRUE);
+    }
+
     @Override
     public Mono<ListResult<ListedPostVo>> list(Integer page, Integer size) {
         var listOptions = ListOptions.builder()
-            .fieldQuery(notEqual("status.hideFromList", BooleanUtils.TRUE))
+            .fieldQuery(notHiddenPostQuery())
             .build();
         return postPublicQueryService.list(listOptions, getPageRequest(page, size));
     }
@@ -207,9 +217,7 @@ public class PostFinderImpl implements PostFinder {
     public Mono<ListResult<PostArchiveVo>> archives(Integer page, Integer size, String year,
         String month) {
         var listOptions = new ListOptions();
-        listOptions.setFieldSelector(FieldSelector.of(
-            notEqual("status.hideFromList", BooleanUtils.TRUE))
-        );
+        listOptions.setFieldSelector(FieldSelector.of(notHiddenPostQuery()));
         var labelSelectorBuilder = LabelSelector.builder();
         if (StringUtils.isNotBlank(year)) {
             labelSelectorBuilder.eq(Post.ARCHIVE_YEAR_LABEL, year);

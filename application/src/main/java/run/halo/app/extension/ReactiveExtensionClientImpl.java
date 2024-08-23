@@ -312,6 +312,44 @@ public class ReactiveExtensionClientImpl implements ReactiveExtensionClient {
         return this.indexedQueryEngine;
     }
 
+    /**
+     * <p>Note of transactional:</p>
+     * <p>doSomething does not have a transaction, but methodOne and methodTwo have their own
+     * transactions.</p>
+     * <p>If methodTwo fails and throws an exception, the transaction in methodTwo will be rolled
+     * back, but the transaction in methodOne will not.</p>
+     * <pre>
+     * public void doSomething() {
+     *     // with manual transaction
+     *     methodOne();
+     *     // with manual transaction
+     *     methodTwo();
+     * }
+     * </pre>
+     * <p>If doSomething is annotated with &#64;Transactional, both methodOne and methodTwo will be
+     * executed within the same transaction context.</p>
+     * <p>If methodTwo fails and throws an exception, the entire transaction will be rolled back,
+     * including any changes made by methodOne.</p>
+     * <p>This ensures that all operations within the doSomething method either succeed or fail
+     * together.</p>
+     * <p>This example advises against adding transaction annotations to the outer method that
+     * invokes {@link #update(Extension)} or {@link #create(Extension)}, as doing so could
+     * undermine the intended transactional integrity of this method.</p>
+     *
+     * <p>Note another point:</p>
+     * After executing the {@code client.create(name, data)} method, an attempt is made to
+     * indexRecord. However, indexRecord might fail due to duplicate keys in the unique index,
+     * causing the index creation to fail. In such cases, the data created by {@code client
+     * .create(name, data)} should be rolled back to maintain consistency between the index and
+     * the data.
+     * <p><b>Until a better solution is found for this consistency problem, do not remove the
+     * manual transaction here.</b></p>
+     * <pre>
+     * client.create(name, data)
+     *  .doOnNext(extension -> indexer.indexRecord(convertToRealExtension(extension)))
+     *  .as(transactionalOperator::transactional);
+     * </pre>
+     */
     @SuppressWarnings("unchecked")
     <E extends Extension> Mono<E> doCreate(E oldExtension, String name, byte[] data) {
         return Mono.defer(() -> {
@@ -325,6 +363,9 @@ public class ReactiveExtensionClientImpl implements ReactiveExtensionClient {
         });
     }
 
+    /**
+     * see also {@link #doCreate(Extension, String, byte[])}.
+     */
     @SuppressWarnings("unchecked")
     <E extends Extension> Mono<E> doUpdate(E oldExtension, String name, Long version, byte[] data) {
         return Mono.defer(() -> {
