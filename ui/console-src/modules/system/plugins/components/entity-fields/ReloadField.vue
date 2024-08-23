@@ -18,6 +18,10 @@ const currentJsModuleInfo = enabledJsModulesInfo.find((jsModuleInfo) => {
 });
 
 const needsReloadWindow = computed(() => {
+  if (!currentJsModuleInfo) {
+    return false;
+  }
+
   const { version } = props.plugin.spec;
   const { phase } = props.plugin.status || {};
 
