@@ -137,6 +137,13 @@ public class TemplateEngineManager {
         engine.addDialect(new HaloProcessorDialect());
 
         templateResolvers.orderedStream().forEach(engine::addTemplateResolver);
+
+        // we collect all template resolvers and add them into composite template resolver
+        // to control the resolution flow
+        var compositeTemplateResolver =
+            new CompositeTemplateResolver(engine.getTemplateResolvers());
+        engine.setTemplateResolver(compositeTemplateResolver);
+
         dialects.orderedStream().forEach(engine::addDialect);
 
         return engine;
