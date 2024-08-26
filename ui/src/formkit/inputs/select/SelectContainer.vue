@@ -271,13 +271,13 @@ const handleSortSelectedOptions = (
         <IconArrowDownLine
           class="pointer-events-none"
           :class="{
-            'group-hover:hidden': clearable,
+            'group-hover/select:hidden': clearable,
           }"
         />
         <IconCloseCircle
           class="hidden cursor-pointer"
           :class="{
-            'group-hover:block': clearable,
+            'group-hover/select:block': clearable,
           }"
           @click.stop="clearAllSelectedOptions"
         />

@@ -212,7 +212,7 @@ const initSelectProps = () => {
   selectProps.sortable = !isFalse(nodeProps.sortable);
   selectProps.remote = !isFalse(nodeProps.remote);
   selectProps.allowCreate = !isFalse(nodeProps.allowCreate);
-  selectProps.clearable = !isFalse(nodeProps.clearable) || true;
+  selectProps.clearable = !isFalse(nodeProps.clearable);
   selectProps.searchable = !isFalse(nodeProps.searchable);
   if (selectProps.remote) {
     if (!nodeProps.remoteOption) {
@@ -538,7 +538,7 @@ const fetchOptions = async (
   tempKeyword = searchKeyword.value,
   tempPage = page.value,
   tempSize = size.value
-) => {
+): Promise<SelectResponse | undefined> => {
   if (isLoading.value || !isRemote.value) {
     return;
   }
@@ -548,7 +548,7 @@ const fetchOptions = async (
       option.label.includes(tempKeyword)
     );
     return {
-      options: filterOptions,
+      options: filterOptions || [],
       page: page.value,
       size: size.value,
       total: filterOptions?.length || 0,
@@ -556,7 +556,7 @@ const fetchOptions = async (
   }
   isLoading.value = true;
   try {
-    let response;
+    let response: SelectResponse | undefined;
     if (selectProps.action) {
       response = await requestOptions({
         page: tempPage,
@@ -572,10 +572,10 @@ const fetchOptions = async (
         size: tempSize,
       });
     }
-    page.value = response.page;
-    size.value = response.size;
-    total.value = response.total;
-    return response;
+    page.value = response?.page || 1;
+    size.value = response?.size || 20;
+    total.value = response?.total || 0;
+    return response as SelectResponse;
   } catch (error) {
     console.error("fetchOptions error", error);
   } finally {
