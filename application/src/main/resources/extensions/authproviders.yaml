@@ -11,6 +11,6 @@ spec:
   displayName: Local
   enabled: true
   description: Built-in authentication for Halo.
-  logo: https://halo.run/logo
-  website: https://halo.run
+  logo: https://www.halo.run/logo
+  website: https://www.halo.run
   authenticationUrl: /login

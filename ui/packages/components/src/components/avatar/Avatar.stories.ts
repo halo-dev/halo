@@ -27,14 +27,14 @@ type Story = StoryObj<typeof VAvatar>;
 
 export const Default: Story = {
   args: {
-    src: "https://halo.run/logo",
+    src: "https://www.halo.run/logo",
     alt: "Hello",
   },
 };
 
 export const Circle: Story = {
   args: {
-    src: "https://halo.run/logo",
+    src: "https://www.halo.run/logo",
     alt: "Hello",
     circle: true,
   },
