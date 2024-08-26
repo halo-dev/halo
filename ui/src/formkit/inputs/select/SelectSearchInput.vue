@@ -32,7 +32,7 @@ const inputValue = ref("");
       />
     </span>
     <span
-      class="pointer-events-none absolute inset-y-0 left-0 w-full text-ellipsis text-sm"
+      class="pointer-events-none absolute inset-y-0 left-0 w-full truncate text-sm"
     >
       <slot name="placeholder"></slot>
     </span>

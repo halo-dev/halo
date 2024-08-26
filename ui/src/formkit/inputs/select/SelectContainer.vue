@@ -238,9 +238,9 @@ const handleSortSelectedOptions = (
     auto-size
     :auto-hide="false"
     :distance="10"
-    :container="'body'"
+    container="body"
     class="w-full"
-    :popper-class="`select-container-dropdown`"
+    popper-class="select-container-dropdown"
   >
     <div
       ref="selectContainerRef"
@@ -266,7 +266,7 @@ const handleSortSelectedOptions = (
         ></component>
       </div>
       <span
-        class="absolute inset-y-0 right-2 flex w-4 items-center text-gray-500 hover:text-gray-700"
+        class="absolute inset-y-0 right-2.5 flex items-center text-gray-500 hover:text-gray-700"
       >
         <IconArrowDownLine
           class="pointer-events-none"

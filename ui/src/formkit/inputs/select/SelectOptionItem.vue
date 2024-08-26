@@ -6,6 +6,6 @@ defineProps<{
 
 <template>
   <div class="flex h-8 w-full items-center rounded px-3 py-1 text-base">
-    <span class="flex-1 text-ellipsis text-sm"> {{ option.label }} </span>
+    <span class="flex-1 truncate text-sm"> {{ option.label }} </span>
   </div>
 </template>

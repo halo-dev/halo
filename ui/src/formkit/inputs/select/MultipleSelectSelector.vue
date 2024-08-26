@@ -101,7 +101,7 @@ const handleFocusout = (event: FocusEvent) => {
 
         <span
           v-if="showPlaceholder"
-          class="pointer-events-none absolute inset-y-0 left-0 w-full text-ellipsis text-sm"
+          class="pointer-events-none absolute inset-y-0 left-0 w-full truncate text-sm"
         >
           <span class="w-full text-gray-400">
             {{ placeholder }}

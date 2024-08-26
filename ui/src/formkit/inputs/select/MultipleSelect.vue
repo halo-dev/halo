@@ -75,7 +75,7 @@ watch(
       >
         <span
           tabindex="-1"
-          class="select-item mr-1 inline-block cursor-default overflow-hidden text-ellipsis whitespace-pre"
+          class="select-item mr-1 inline-block cursor-default overflow-hidden truncate whitespace-pre"
         >
           {{ option.label }}
         </span>

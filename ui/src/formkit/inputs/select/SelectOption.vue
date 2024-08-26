@@ -1,9 +1,9 @@
 <script lang="ts" setup>
-import { computed, onMounted, onUnmounted, ref, watch } from "vue";
-import SelectOptionItem from "./SelectOptionItem.vue";
-import type { UseScrollReturn } from "@vueuse/core";
-import { vScroll } from "@vueuse/components";
 import { VLoading } from "@halo-dev/components";
+import { vScroll } from "@vueuse/components";
+import { useEventListener, type UseScrollReturn } from "@vueuse/core";
+import { computed, ref, watch } from "vue";
+import SelectOptionItem from "./SelectOptionItem.vue";
 
 const props = defineProps<{
   options: Array<Record<string, unknown> & { label: string; value: string }>;
@@ -26,14 +26,6 @@ const emit = defineEmits<{
 
 const selectedIndex = ref<number>(0);
 const selectOptionRef = ref<HTMLElement>();
-
-onMounted(() => {
-  document.addEventListener("keydown", handleKeydown);
-});
-
-onUnmounted(() => {
-  document.removeEventListener("keydown", handleKeydown);
-});
 
 const selectedValues = computed(() =>
   props.selectedOptions?.map((option) => option.value)
@@ -75,6 +67,8 @@ const handleKeydown = (event: KeyboardEvent) => {
     event.preventDefault();
   }
 };
+
+useEventListener(document, "keydown", handleKeydown);
 
 const handleSelected = (index: number) => {
   const option = props.options[index];
@@ -173,7 +167,7 @@ watch(
         :class="{
           'hover:bg-zinc-100': !isDisabled(option),
           'bg-zinc-100': !isDisabled(option) && selectedIndex === index,
-          'selected !bg-blue-100':
+          'selected !bg-zinc-200/60':
             selectedValues && selectedValues.includes(option.value),
           'cursor-not-allowed opacity-25': isDisabled(option),
         }"
