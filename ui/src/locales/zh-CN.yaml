@@ -1335,7 +1335,6 @@ core:
       os: 操作系统：{os}
     alert:
       external_url_invalid: 检测到外部访问地址与当前访问地址不一致，可能会导致部分链接无法正常跳转，请检查外部访问地址设置。
-      h2_warning: H2 数据库仅用于开发环境和测试环境，不推荐在生产环境中使用 H2 数据库。如果必须要使用，请按时进行数据备份。
   backup:
     title: 备份与恢复
     tabs:
@@ -1611,6 +1610,9 @@ core:
         aspect_ratio_square: 裁剪为正方形
         aspect_ratio_landscape: 裁剪为横向 (16:9)
         aspect_ratio_portrait: 裁剪为纵向 (9:16)
+    h2_warning_alert:
+      title: 警告：正在使用 H2 数据库
+      description: H2 数据库仅适用于开发环境和测试环境，不推荐在生产环境中使用，H2 非常容易因为操作不当导致数据文件损坏。如果必须要使用，请按时进行数据备份。
   composables:
     content_cache:
       toast_recovered: 已从缓存中恢复未保存的内容
