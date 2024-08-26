@@ -45,5 +45,7 @@ class DefaultExternalLinkProcessorTest {
 
         when(externalUrlSupplier.getRaw()).thenReturn(URI.create("https://halo.run/").toURL());
         assertThat(externalLinkProcessor.processLink("/test")).isEqualTo("https://halo.run/test");
+        assertThat(externalLinkProcessor.processLink("https://halo.run/test"))
+            .isEqualTo("https://halo.run/test");
     }
 }

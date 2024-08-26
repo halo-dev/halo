@@ -7127,6 +7127,243 @@
         ]
       }
     },
+    "/apis/storage.halo.run/v1alpha1/localthumbnails": {
+      "get": {
+        "description": "List LocalThumbnail",
+        "operationId": "listLocalThumbnail",
+        "parameters": [
+          {
+            "description": "Page number. Default is 0.",
+            "in": "query",
+            "name": "page",
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          },
+          {
+            "description": "Size number. Default is 0.",
+            "in": "query",
+            "name": "size",
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          },
+          {
+            "description": "Label selector. e.g.: hidden!\u003dtrue",
+            "in": "query",
+            "name": "labelSelector",
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            }
+          },
+          {
+            "description": "Field selector. e.g.: metadata.name\u003d\u003dhalo",
+            "in": "query",
+            "name": "fieldSelector",
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            }
+          },
+          {
+            "description": "Sorting criteria in the format: property,(asc|desc). Default sort order is ascending. Multiple sort criteria are supported.",
+            "in": "query",
+            "name": "sort",
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/LocalThumbnailList"
+                }
+              }
+            },
+            "description": "Response localthumbnails"
+          }
+        },
+        "tags": [
+          "LocalThumbnailV1alpha1"
+        ]
+      },
+      "post": {
+        "description": "Create LocalThumbnail",
+        "operationId": "createLocalThumbnail",
+        "requestBody": {
+          "content": {
+            "*/*": {
+              "schema": {
+                "$ref": "#/components/schemas/LocalThumbnail"
+              }
+            }
+          },
+          "description": "Fresh localthumbnail"
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/LocalThumbnail"
+                }
+              }
+            },
+            "description": "Response localthumbnails created just now"
+          }
+        },
+        "tags": [
+          "LocalThumbnailV1alpha1"
+        ]
+      }
+    },
+    "/apis/storage.halo.run/v1alpha1/localthumbnails/{name}": {
+      "delete": {
+        "description": "Delete LocalThumbnail",
+        "operationId": "deleteLocalThumbnail",
+        "parameters": [
+          {
+            "description": "Name of localthumbnail",
+            "in": "path",
+            "name": "name",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Response localthumbnail deleted just now"
+          }
+        },
+        "tags": [
+          "LocalThumbnailV1alpha1"
+        ]
+      },
+      "get": {
+        "description": "Get LocalThumbnail",
+        "operationId": "getLocalThumbnail",
+        "parameters": [
+          {
+            "description": "Name of localthumbnail",
+            "in": "path",
+            "name": "name",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/LocalThumbnail"
+                }
+              }
+            },
+            "description": "Response single localthumbnail"
+          }
+        },
+        "tags": [
+          "LocalThumbnailV1alpha1"
+        ]
+      },
+      "patch": {
+        "description": "Patch LocalThumbnail",
+        "operationId": "patchLocalThumbnail",
+        "parameters": [
+          {
+            "description": "Name of localthumbnail",
+            "in": "path",
+            "name": "name",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json-patch+json": {
+              "schema": {
+                "$ref": "#/components/schemas/JsonPatch"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/LocalThumbnail"
+                }
+              }
+            },
+            "description": "Response localthumbnail patched just now"
+          }
+        },
+        "tags": [
+          "LocalThumbnailV1alpha1"
+        ]
+      },
+      "put": {
+        "description": "Update LocalThumbnail",
+        "operationId": "updateLocalThumbnail",
+        "parameters": [
+          {
+            "description": "Name of localthumbnail",
+            "in": "path",
+            "name": "name",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "*/*": {
+              "schema": {
+                "$ref": "#/components/schemas/LocalThumbnail"
+              }
+            }
+          },
+          "description": "Updated localthumbnail"
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/LocalThumbnail"
+                }
+              }
+            },
+            "description": "Response localthumbnails updated just now"
+          }
+        },
+        "tags": [
+          "LocalThumbnailV1alpha1"
+        ]
+      }
+    },
     "/apis/storage.halo.run/v1alpha1/policies": {
       "get": {
         "description": "List Policy",
@@ -7598,6 +7835,243 @@
         },
         "tags": [
           "PolicyTemplateV1alpha1"
+        ]
+      }
+    },
+    "/apis/storage.halo.run/v1alpha1/thumbnails": {
+      "get": {
+        "description": "List Thumbnail",
+        "operationId": "listThumbnail",
+        "parameters": [
+          {
+            "description": "Page number. Default is 0.",
+            "in": "query",
+            "name": "page",
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          },
+          {
+            "description": "Size number. Default is 0.",
+            "in": "query",
+            "name": "size",
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          },
+          {
+            "description": "Label selector. e.g.: hidden!\u003dtrue",
+            "in": "query",
+            "name": "labelSelector",
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            }
+          },
+          {
+            "description": "Field selector. e.g.: metadata.name\u003d\u003dhalo",
+            "in": "query",
+            "name": "fieldSelector",
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            }
+          },
+          {
+            "description": "Sorting criteria in the format: property,(asc|desc). Default sort order is ascending. Multiple sort criteria are supported.",
+            "in": "query",
+            "name": "sort",
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ThumbnailList"
+                }
+              }
+            },
+            "description": "Response thumbnails"
+          }
+        },
+        "tags": [
+          "ThumbnailV1alpha1"
+        ]
+      },
+      "post": {
+        "description": "Create Thumbnail",
+        "operationId": "createThumbnail",
+        "requestBody": {
+          "content": {
+            "*/*": {
+              "schema": {
+                "$ref": "#/components/schemas/Thumbnail"
+              }
+            }
+          },
+          "description": "Fresh thumbnail"
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/Thumbnail"
+                }
+              }
+            },
+            "description": "Response thumbnails created just now"
+          }
+        },
+        "tags": [
+          "ThumbnailV1alpha1"
+        ]
+      }
+    },
+    "/apis/storage.halo.run/v1alpha1/thumbnails/{name}": {
+      "delete": {
+        "description": "Delete Thumbnail",
+        "operationId": "deleteThumbnail",
+        "parameters": [
+          {
+            "description": "Name of thumbnail",
+            "in": "path",
+            "name": "name",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Response thumbnail deleted just now"
+          }
+        },
+        "tags": [
+          "ThumbnailV1alpha1"
+        ]
+      },
+      "get": {
+        "description": "Get Thumbnail",
+        "operationId": "getThumbnail",
+        "parameters": [
+          {
+            "description": "Name of thumbnail",
+            "in": "path",
+            "name": "name",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/Thumbnail"
+                }
+              }
+            },
+            "description": "Response single thumbnail"
+          }
+        },
+        "tags": [
+          "ThumbnailV1alpha1"
+        ]
+      },
+      "patch": {
+        "description": "Patch Thumbnail",
+        "operationId": "patchThumbnail",
+        "parameters": [
+          {
+            "description": "Name of thumbnail",
+            "in": "path",
+            "name": "name",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json-patch+json": {
+              "schema": {
+                "$ref": "#/components/schemas/JsonPatch"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/Thumbnail"
+                }
+              }
+            },
+            "description": "Response thumbnail patched just now"
+          }
+        },
+        "tags": [
+          "ThumbnailV1alpha1"
+        ]
+      },
+      "put": {
+        "description": "Update Thumbnail",
+        "operationId": "updateThumbnail",
+        "parameters": [
+          {
+            "description": "Name of thumbnail",
+            "in": "path",
+            "name": "name",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "*/*": {
+              "schema": {
+                "$ref": "#/components/schemas/Thumbnail"
+              }
+            }
+          },
+          "description": "Updated thumbnail"
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/Thumbnail"
+                }
+              }
+            },
+            "description": "Response thumbnails updated just now"
+          }
+        },
+        "tags": [
+          "ThumbnailV1alpha1"
         ]
       }
     },
@@ -8099,6 +8573,12 @@
           "permalink": {
             "type": "string",
             "description": "Permalink of attachment.\nIf it is in local storage, the public URL will be set.\nIf it is in s3 storage, the Object URL will be set.\n"
+          },
+          "thumbnails": {
+            "type": "object",
+            "additionalProperties": {
+              "type": "string"
+            }
           }
         }
       },
@@ -9553,6 +10033,145 @@
           },
           "url": {
             "type": "string"
+          }
+        }
+      },
+      "LocalThumbnail": {
+        "required": [
+          "apiVersion",
+          "kind",
+          "metadata",
+          "spec"
+        ],
+        "type": "object",
+        "properties": {
+          "apiVersion": {
+            "type": "string"
+          },
+          "kind": {
+            "type": "string"
+          },
+          "metadata": {
+            "$ref": "#/components/schemas/Metadata"
+          },
+          "spec": {
+            "$ref": "#/components/schemas/LocalThumbnailSpec"
+          },
+          "status": {
+            "$ref": "#/components/schemas/LocalThumbnailStatus"
+          }
+        }
+      },
+      "LocalThumbnailList": {
+        "required": [
+          "first",
+          "hasNext",
+          "hasPrevious",
+          "items",
+          "last",
+          "page",
+          "size",
+          "total",
+          "totalPages"
+        ],
+        "type": "object",
+        "properties": {
+          "first": {
+            "type": "boolean",
+            "description": "Indicates whether current page is the first page."
+          },
+          "hasNext": {
+            "type": "boolean",
+            "description": "Indicates whether current page has previous page."
+          },
+          "hasPrevious": {
+            "type": "boolean",
+            "description": "Indicates whether current page has previous page."
+          },
+          "items": {
+            "type": "array",
+            "description": "A chunk of items.",
+            "items": {
+              "$ref": "#/components/schemas/LocalThumbnail"
+            }
+          },
+          "last": {
+            "type": "boolean",
+            "description": "Indicates whether current page is the last page."
+          },
+          "page": {
+            "type": "integer",
+            "description": "Page number, starts from 1. If not set or equal to 0, it means no pagination.",
+            "format": "int32"
+          },
+          "size": {
+            "type": "integer",
+            "description": "Size of each page. If not set or equal to 0, it means no pagination.",
+            "format": "int32"
+          },
+          "total": {
+            "type": "integer",
+            "description": "Total elements.",
+            "format": "int64"
+          },
+          "totalPages": {
+            "type": "integer",
+            "description": "Indicates total pages.",
+            "format": "int64"
+          }
+        }
+      },
+      "LocalThumbnailSpec": {
+        "required": [
+          "filePath",
+          "imageSignature",
+          "imageUri",
+          "size",
+          "thumbSignature",
+          "thumbnailUri"
+        ],
+        "type": "object",
+        "properties": {
+          "filePath": {
+            "type": "string"
+          },
+          "imageSignature": {
+            "minLength": 1,
+            "type": "string"
+          },
+          "imageUri": {
+            "minLength": 1,
+            "type": "string"
+          },
+          "size": {
+            "type": "string",
+            "enum": [
+              "S",
+              "M",
+              "L",
+              "XL"
+            ]
+          },
+          "thumbSignature": {
+            "minLength": 1,
+            "type": "string"
+          },
+          "thumbnailUri": {
+            "minLength": 1,
+            "type": "string"
+          }
+        }
+      },
+      "LocalThumbnailStatus": {
+        "type": "object",
+        "properties": {
+          "phase": {
+            "type": "string",
+            "enum": [
+              "PENDING",
+              "SUCCEEDED",
+              "FAILED"
+            ]
           }
         }
       },
@@ -12402,6 +13021,120 @@
               "FAILED",
               "UNKNOWN"
             ]
+          }
+        }
+      },
+      "Thumbnail": {
+        "required": [
+          "apiVersion",
+          "kind",
+          "metadata",
+          "spec"
+        ],
+        "type": "object",
+        "properties": {
+          "apiVersion": {
+            "type": "string"
+          },
+          "kind": {
+            "type": "string"
+          },
+          "metadata": {
+            "$ref": "#/components/schemas/Metadata"
+          },
+          "spec": {
+            "$ref": "#/components/schemas/ThumbnailSpec"
+          }
+        }
+      },
+      "ThumbnailList": {
+        "required": [
+          "first",
+          "hasNext",
+          "hasPrevious",
+          "items",
+          "last",
+          "page",
+          "size",
+          "total",
+          "totalPages"
+        ],
+        "type": "object",
+        "properties": {
+          "first": {
+            "type": "boolean",
+            "description": "Indicates whether current page is the first page."
+          },
+          "hasNext": {
+            "type": "boolean",
+            "description": "Indicates whether current page has previous page."
+          },
+          "hasPrevious": {
+            "type": "boolean",
+            "description": "Indicates whether current page has previous page."
+          },
+          "items": {
+            "type": "array",
+            "description": "A chunk of items.",
+            "items": {
+              "$ref": "#/components/schemas/Thumbnail"
+            }
+          },
+          "last": {
+            "type": "boolean",
+            "description": "Indicates whether current page is the last page."
+          },
+          "page": {
+            "type": "integer",
+            "description": "Page number, starts from 1. If not set or equal to 0, it means no pagination.",
+            "format": "int32"
+          },
+          "size": {
+            "type": "integer",
+            "description": "Size of each page. If not set or equal to 0, it means no pagination.",
+            "format": "int32"
+          },
+          "total": {
+            "type": "integer",
+            "description": "Total elements.",
+            "format": "int64"
+          },
+          "totalPages": {
+            "type": "integer",
+            "description": "Indicates total pages.",
+            "format": "int64"
+          }
+        }
+      },
+      "ThumbnailSpec": {
+        "required": [
+          "imageSignature",
+          "imageUri",
+          "size",
+          "thumbnailUri"
+        ],
+        "type": "object",
+        "properties": {
+          "imageSignature": {
+            "minLength": 1,
+            "type": "string"
+          },
+          "imageUri": {
+            "minLength": 1,
+            "type": "string"
+          },
+          "size": {
+            "type": "string",
+            "enum": [
+              "S",
+              "M",
+              "L",
+              "XL"
+            ]
+          },
+          "thumbnailUri": {
+            "minLength": 1,
+            "type": "string"
           }
         }
       },

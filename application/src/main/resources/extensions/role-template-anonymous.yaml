@@ -46,3 +46,6 @@ rules:
   - apiGroups: [ "api.notification.halo.run" ]
     resources: [ "subscriptions/unsubscribe" ]
     verbs: [ "get", "list" ]
+  - apiGroups: [ "api.storage.halo.run" ]
+    resources: [ "thumbnails/via-uri" ]
+    verbs: [ "get", "list" ]

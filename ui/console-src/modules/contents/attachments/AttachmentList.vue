@@ -509,7 +509,10 @@ watch(
                         v-if="isImage(attachment.spec.mediaType)"
                         :key="attachment.metadata.name"
                         :alt="attachment.spec.displayName"
-                        :src="attachment.status?.permalink"
+                        :src="
+                          attachment.status?.thumbnails?.S ||
+                          attachment.status?.permalink
+                        "
                         classes="pointer-events-none object-cover group-hover:opacity-75 transform-gpu"
                       >
                         <template #loading>

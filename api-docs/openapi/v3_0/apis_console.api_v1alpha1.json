@@ -3393,6 +3393,12 @@
           "permalink": {
             "type": "string",
             "description": "Permalink of attachment.\nIf it is in local storage, the public URL will be set.\nIf it is in s3 storage, the Object URL will be set.\n"
+          },
+          "thumbnails": {
+            "type": "object",
+            "additionalProperties": {
+              "type": "string"
+            }
           }
         }
       },

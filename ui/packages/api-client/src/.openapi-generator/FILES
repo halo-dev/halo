@@ -24,6 +24,7 @@ api/extension-point-definition-v1alpha1-api.ts
 api/group-v1alpha1-api.ts
 api/index-v1alpha1-public-api.ts
 api/indices-v1alpha1-console-api.ts
+api/local-thumbnail-v1alpha1-api.ts
 api/login-api.ts
 api/menu-item-v1alpha1-api.ts
 api/menu-v1alpha1-api.ts
@@ -71,6 +72,8 @@ api/tag-v1alpha1-console-api.ts
 api/tag-v1alpha1-public-api.ts
 api/theme-v1alpha1-api.ts
 api/theme-v1alpha1-console-api.ts
+api/thumbnail-v1alpha1-api.ts
+api/thumbnail-v1alpha1-public-api.ts
 api/two-factor-auth-v1alpha1-uc-api.ts
 api/user-connection-v1alpha1-api.ts
 api/user-v1alpha1-api.ts
@@ -182,6 +185,10 @@ models/listed-single-page.ts
 models/listed-snapshot-dto.ts
 models/listed-snapshot-spec.ts
 models/listed-user.ts
+models/local-thumbnail-list.ts
+models/local-thumbnail-spec.ts
+models/local-thumbnail-status.ts
+models/local-thumbnail.ts
 models/login-history.ts
 models/mark-specified-request.ts
 models/menu-item-list.ts
@@ -316,6 +323,9 @@ models/theme-list.ts
 models/theme-spec.ts
 models/theme-status.ts
 models/theme.ts
+models/thumbnail-list.ts
+models/thumbnail-spec.ts
+models/thumbnail.ts
 models/totp-auth-link-response.ts
 models/totp-request.ts
 models/two-factor-auth-settings.ts
