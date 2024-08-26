@@ -40,7 +40,7 @@ const meta: Meta<typeof VModal> = {
         <div class="flex flex-col">
           <img class="w-full" src="https://ryanc.cc/avatar" />
           <img class="w-full" src="https://ryanc.cc/avatar" />
-          <img class="w-full" src="https://halo.run/logo" />
+          <img class="w-full" src="https://www.halo.run/logo" />
         </div>
 
         <template #footer>

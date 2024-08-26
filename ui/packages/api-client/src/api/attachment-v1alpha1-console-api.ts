@@ -25,12 +25,57 @@ import { BASE_PATH, COLLECTION_FORMATS, RequestArgs, BaseAPI, RequiredError, ope
 import { Attachment } from '../models';
 // @ts-ignore
 import { AttachmentList } from '../models';
+// @ts-ignore
+import { UploadFromUrlRequest } from '../models';
 /**
  * AttachmentV1alpha1ConsoleApi - axios parameter creator
  * @export
  */
 export const AttachmentV1alpha1ConsoleApiAxiosParamCreator = function (configuration?: Configuration) {
     return {
+        /**
+         * 
+         * @param {UploadFromUrlRequest} uploadFromUrlRequest 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        externalTransferAttachment: async (uploadFromUrlRequest: UploadFromUrlRequest, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+            // verify required parameter 'uploadFromUrlRequest' is not null or undefined
+            assertParamExists('externalTransferAttachment', 'uploadFromUrlRequest', uploadFromUrlRequest)
+            const localVarPath = `/apis/api.console.halo.run/v1alpha1/attachments/-/upload-from-url`;
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'POST', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+            // authentication basicAuth required
+            // http basic authentication required
+            setBasicAuthToObject(localVarRequestOptions, configuration)
+
+            // authentication bearerAuth required
+            // http bearer authentication required
+            await setBearerAuthToObject(localVarHeaderParameter, configuration)
+
+
+    
+            localVarHeaderParameter['Content-Type'] = 'application/json';
+
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+            localVarRequestOptions.data = serializeDataIfNeeded(uploadFromUrlRequest, localVarRequestOptions, configuration)
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
         /**
          * 
          * @param {number} [page] Page number. Default is 0.
@@ -180,6 +225,18 @@ export const AttachmentV1alpha1ConsoleApiFp = function(configuration?: Configura
     return {
         /**
          * 
+         * @param {UploadFromUrlRequest} uploadFromUrlRequest 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async externalTransferAttachment(uploadFromUrlRequest: UploadFromUrlRequest, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<Attachment>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.externalTransferAttachment(uploadFromUrlRequest, options);
+            const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
+            const localVarOperationServerBasePath = operationServerMap['AttachmentV1alpha1ConsoleApi.externalTransferAttachment']?.[localVarOperationServerIndex]?.url;
+            return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
+        },
+        /**
+         * 
          * @param {number} [page] Page number. Default is 0.
          * @param {number} [size] Size number. Default is 0.
          * @param {Array<string>} [labelSelector] Label selector. e.g.: hidden!&#x3D;true
@@ -223,6 +280,15 @@ export const AttachmentV1alpha1ConsoleApiFactory = function (configuration?: Con
     return {
         /**
          * 
+         * @param {AttachmentV1alpha1ConsoleApiExternalTransferAttachmentRequest} requestParameters Request parameters.
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        externalTransferAttachment(requestParameters: AttachmentV1alpha1ConsoleApiExternalTransferAttachmentRequest, options?: RawAxiosRequestConfig): AxiosPromise<Attachment> {
+            return localVarFp.externalTransferAttachment(requestParameters.uploadFromUrlRequest, options).then((request) => request(axios, basePath));
+        },
+        /**
+         * 
          * @param {AttachmentV1alpha1ConsoleApiSearchAttachmentsRequest} requestParameters Request parameters.
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
@@ -241,6 +307,20 @@ export const AttachmentV1alpha1ConsoleApiFactory = function (configuration?: Con
         },
     };
 };
+
+/**
+ * Request parameters for externalTransferAttachment operation in AttachmentV1alpha1ConsoleApi.
+ * @export
+ * @interface AttachmentV1alpha1ConsoleApiExternalTransferAttachmentRequest
+ */
+export interface AttachmentV1alpha1ConsoleApiExternalTransferAttachmentRequest {
+    /**
+     * 
+     * @type {UploadFromUrlRequest}
+     * @memberof AttachmentV1alpha1ConsoleApiExternalTransferAttachment
+     */
+    readonly uploadFromUrlRequest: UploadFromUrlRequest
+}
 
 /**
  * Request parameters for searchAttachments operation in AttachmentV1alpha1ConsoleApi.
@@ -340,6 +420,17 @@ export interface AttachmentV1alpha1ConsoleApiUploadAttachmentRequest {
  * @extends {BaseAPI}
  */
 export class AttachmentV1alpha1ConsoleApi extends BaseAPI {
+    /**
+     * 
+     * @param {AttachmentV1alpha1ConsoleApiExternalTransferAttachmentRequest} requestParameters Request parameters.
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof AttachmentV1alpha1ConsoleApi
+     */
+    public externalTransferAttachment(requestParameters: AttachmentV1alpha1ConsoleApiExternalTransferAttachmentRequest, options?: RawAxiosRequestConfig) {
+        return AttachmentV1alpha1ConsoleApiFp(this.configuration).externalTransferAttachment(requestParameters.uploadFromUrlRequest, options).then((request) => request(this.axios, this.basePath));
+    }
+
     /**
      * 
      * @param {AttachmentV1alpha1ConsoleApiSearchAttachmentsRequest} requestParameters Request parameters.

@@ -1,12 +1,27 @@
 package run.halo.app.infra.utils;
 
 import com.google.common.io.Files;
+import java.util.regex.Pattern;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.apache.commons.lang3.StringUtils;
 
 public final class FileNameUtils {
 
     private FileNameUtils() {
+    }
+
+    /**
+     * Check whether the file name has an extension.
+     *
+     * @param filename is name of file.
+     * @return True if file name has extension, otherwise false.
+     */
+    public static boolean hasFileExtension(String filename) {
+        if (filename == null || filename.isEmpty()) {
+            return false;
+        }
+        var extensionRegex = ".*\\.[a-zA-Z0-9]+$";
+        return Pattern.matches(extensionRegex, filename);
     }
 
     public static String removeFileExtension(String filename, boolean removeAllExtensions) {

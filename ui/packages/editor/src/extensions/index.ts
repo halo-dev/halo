@@ -29,7 +29,10 @@ import ExtensionUnderline from "./underline";
 
 // Custom extensions
 import ExtensionTextStyle from "@/extensions/text-style";
-import { ExtensionCodeBlock, lowlight } from "@/extensions/code-block";
+import {
+  ExtensionCodeBlock,
+  type ExtensionCodeBlockOptions,
+} from "@/extensions/code-block";
 import { ExtensionCommands } from "../extensions/commands-menu";
 import ExtensionAudio from "./audio";
 import ExtensionClearFormat from "./clear-format";
@@ -67,7 +70,6 @@ const allExtensions = [
   ExtensionOrderedList,
   ExtensionStrike,
   ExtensionText,
-  ExtensionTextStyle,
   ExtensionImage,
   ExtensionTaskList,
   ExtensionHighlight,
@@ -92,9 +94,7 @@ const allExtensions = [
   ExtensionCommands.configure({
     suggestion: {},
   }),
-  ExtensionCodeBlock.configure({
-    lowlight,
-  }),
+  ExtensionCodeBlock,
   ExtensionIframe,
   ExtensionVideo,
   ExtensionAudio,
@@ -157,5 +157,6 @@ export {
   ExtensionVideo,
   RangeSelection,
   allExtensions,
-  lowlight,
 };
+
+export type { ExtensionCodeBlockOptions };

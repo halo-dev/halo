@@ -117,6 +117,36 @@
         ]
       }
     },
+    "/apis/api.console.halo.run/v1alpha1/attachments/-/upload-from-url": {
+      "post": {
+        "operationId": "ExternalTransferAttachment",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UploadFromUrlRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "default": {
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/Attachment"
+                }
+              }
+            },
+            "description": "default response"
+          }
+        },
+        "tags": [
+          "AttachmentV1alpha1Console"
+        ]
+      }
+    },
     "/apis/api.console.halo.run/v1alpha1/attachments/upload": {
       "post": {
         "operationId": "UploadAttachment",
@@ -6243,6 +6273,28 @@
           "file": {
             "type": "string",
             "format": "binary"
+          }
+        }
+      },
+      "UploadFromUrlRequest": {
+        "required": [
+          "policyName",
+          "url"
+        ],
+        "type": "object",
+        "properties": {
+          "filename": {
+            "type": "string"
+          },
+          "groupName": {
+            "type": "string"
+          },
+          "policyName": {
+            "type": "string"
+          },
+          "url": {
+            "type": "string",
+            "format": "url"
           }
         }
       },
