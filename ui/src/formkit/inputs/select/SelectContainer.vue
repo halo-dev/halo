@@ -97,7 +97,8 @@ const selectedOptions = computed({
   },
 });
 const hasClearable = computed(
-  () => props.clearable && selectedOptions.value.length == 0
+  () =>
+    props.clearable && (selectedOptions.value.length > 0 || searchKeyword.value)
 );
 
 const getInputHTMLRef = () => {
@@ -217,9 +218,6 @@ const handleKeyDown = (event: KeyboardEvent) => {
 };
 
 const clearAllSelectedOptions = () => {
-  if (selectedOptions.value.length === 0) {
-    return;
-  }
   if (!hasClearable.value) {
     return;
   }

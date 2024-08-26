@@ -3,6 +3,7 @@ import { computed, watch } from "vue";
 import SelectOption from "./SelectOption.vue";
 import { VEmpty, VLoading } from "@halo-dev/components";
 import { useTimeout } from "@vueuse/shared";
+import { i18n } from "@/locales";
 
 const props = defineProps<{
   options?: Array<Record<string, unknown> & { label: string; value: string }>;
@@ -95,7 +96,7 @@ const handleLoadMore = () => {
       ></SelectOption>
     </div>
     <div v-else>
-      <VEmpty title="No Data"></VEmpty>
+      <VEmpty :title="i18n.global.t('core.formkit.select.no_data')"></VEmpty>
     </div>
   </div>
 </template>
