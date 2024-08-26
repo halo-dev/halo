@@ -66,7 +66,7 @@
     5. `remoteOption`：当 `remote` 为 `true` 时，此配置项必须存在，用于为 Select 组件提供处理搜索及查询键值对的方法。
     6. `remoteOptimize`：是否开启远程数据源优化，默认为 `true`。开启后，将会对远程数据源进行优化，减少请求次数。仅在动态数据源下有效。
     7. `allowCreate`：是否允许创建新选项，默认为 `false`。仅在静态数据源下有效。
-    8. `clearable`：是否允许清空选项，默认为 `true`。
+    8. `clearable`：是否允许清空选项，默认为 `false`。
     9. `multiple`：是否多选，默认为 `false`。
     10. `maxCount`：多选时最大可选数量，默认为 `Infinity`。仅在多选时有效。
     11. `sortable`：是否支持拖动排序，默认为 `false`。仅在多选时有效。
@@ -115,7 +115,7 @@ select 是一个选择器类型的输入组件，使用者可以从一批待选�
     name="countries"
     placeholder="Select a country"
     allow-create
-    :clearable="false"
+    clearable
     sortable
     multiple
     searchable
