@@ -4,13 +4,18 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Optional;
+import org.attoparser.ParseException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
 import org.springframework.http.MediaType;
 import org.springframework.lang.NonNull;
 import org.springframework.stereotype.Component;
+import org.springframework.web.ErrorResponse;
 import org.springframework.web.reactive.result.view.View;
 import org.springframework.web.server.ServerWebExchange;
+import org.thymeleaf.exceptions.TemplateInputException;
+import org.thymeleaf.exceptions.TemplateProcessingException;
 import org.thymeleaf.spring6.view.reactive.ThymeleafReactiveView;
 import org.thymeleaf.spring6.view.reactive.ThymeleafReactiveViewResolver;
 import reactor.core.publisher.Flux;
@@ -54,7 +59,26 @@ public class HaloViewResolver extends ThymeleafReactiveViewResolver {
                 // calculate the engine before rendering
                 setTemplateEngine(engineManager.getTemplateEngine(theme));
                 exchange.getAttributes().put(ModelConst.POWERED_BY_HALO_TEMPLATE_ENGINE, true);
-                return super.render(model, contentType, exchange);
+                return super.render(model, contentType, exchange)
+                    .onErrorMap(TemplateProcessingException.class::isInstance, tee -> {
+                        if (tee instanceof TemplateInputException) {
+                            // map the error response exception while fragment not found
+                            return Optional.of(tee)
+                                .map(Throwable::getCause)
+                                .filter(ParseException.class::isInstance)
+                                .map(Throwable::getCause)
+                                .filter(TemplateProcessingException.class::isInstance)
+                                .map(Throwable::getCause)
+                                .filter(ErrorResponse.class::isInstance)
+                                .orElse(tee);
+                        }
+                        // map the error response exception while template not found
+                        return Optional.of(tee)
+                            .map(Throwable::getCause)
+                            .filter(ErrorResponse.class::isInstance)
+                            .orElse(tee);
+                    });
+
             });
         }
 
