@@ -17,20 +17,23 @@
 /**
  * 
  * @export
- * @interface AttachmentStatus
+ * @interface LocalThumbnailStatus
  */
-export interface AttachmentStatus {
-    /**
-     * Permalink of attachment. If it is in local storage, the public URL will be set. If it is in s3 storage, the Object URL will be set. 
-     * @type {string}
-     * @memberof AttachmentStatus
-     */
-    'permalink'?: string;
+export interface LocalThumbnailStatus {
     /**
      * 
-     * @type {{ [key: string]: string; }}
-     * @memberof AttachmentStatus
+     * @type {string}
+     * @memberof LocalThumbnailStatus
      */
-    'thumbnails'?: { [key: string]: string; };
+    'phase'?: LocalThumbnailStatusPhaseEnum;
 }
+
+export const LocalThumbnailStatusPhaseEnum = {
+    Pending: 'PENDING',
+    Succeeded: 'SUCCEEDED',
+    Failed: 'FAILED'
+} as const;
+
+export type LocalThumbnailStatusPhaseEnum = typeof LocalThumbnailStatusPhaseEnum[keyof typeof LocalThumbnailStatusPhaseEnum];
+
 
