@@ -35,6 +35,11 @@ public class ReactiveExtensionStoreClientImpl implements ReactiveExtensionStoreC
     }
 
     @Override
+    public Mono<Long> countByNamePrefix(String prefix) {
+        return this.repository.countByNameStartingWith(prefix);
+    }
+
+    @Override
     public Flux<ExtensionStore> listByNames(List<String> names) {
         ToIntFunction<ExtensionStore> comparator =
             store -> names.indexOf(store.getName());
