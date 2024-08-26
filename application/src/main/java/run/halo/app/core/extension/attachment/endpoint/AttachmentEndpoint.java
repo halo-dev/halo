@@ -27,6 +27,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.BooleanUtils;
 import org.springdoc.core.fn.builders.operation.Builder;
@@ -63,17 +64,12 @@ import run.halo.app.extension.router.selector.LabelSelector;
 
 @Slf4j
 @Component
+@RequiredArgsConstructor
 public class AttachmentEndpoint implements CustomEndpoint {
 
     private final AttachmentService attachmentService;
 
     private final ReactiveExtensionClient client;
-
-    public AttachmentEndpoint(AttachmentService attachmentService,
-        ReactiveExtensionClient client) {
-        this.attachmentService = attachmentService;
-        this.client = client;
-    }
 
     @Override
     public RouterFunction<ServerResponse> endpoint() {
@@ -189,7 +185,7 @@ public class AttachmentEndpoint implements CustomEndpoint {
                 example = "creationTimestamp,desc"))
         Sort getSort();
 
-        public static void buildParameters(Builder builder) {
+        static void buildParameters(Builder builder) {
             IListRequest.buildParameters(builder);
             builder.parameter(QueryParamBuildUtil.sortParameter())
                 .parameter(parameterBuilder()

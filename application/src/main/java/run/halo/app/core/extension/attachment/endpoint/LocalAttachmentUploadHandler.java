@@ -36,6 +36,7 @@ import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import reactor.core.scheduler.Schedulers;
 import reactor.util.retry.Retry;
+import run.halo.app.core.attachment.AttachmentRootGetter;
 import run.halo.app.core.extension.attachment.Attachment;
 import run.halo.app.core.extension.attachment.Attachment.AttachmentSpec;
 import run.halo.app.core.extension.attachment.Constant;
@@ -47,7 +48,6 @@ import run.halo.app.infra.FileCategoryMatcher;
 import run.halo.app.infra.exception.AttachmentAlreadyExistsException;
 import run.halo.app.infra.exception.FileSizeExceededException;
 import run.halo.app.infra.exception.FileTypeNotAllowedException;
-import run.halo.app.infra.properties.HaloProperties;
 import run.halo.app.infra.utils.FileTypeDetectUtils;
 import run.halo.app.infra.utils.JsonUtils;
 
@@ -55,18 +55,14 @@ import run.halo.app.infra.utils.JsonUtils;
 @Component
 class LocalAttachmentUploadHandler implements AttachmentHandler {
 
-    private final HaloProperties haloProp;
+    private final AttachmentRootGetter attachmentDirGetter;
 
     private final ExternalUrlSupplier externalUrl;
 
-    public LocalAttachmentUploadHandler(HaloProperties haloProp,
+    public LocalAttachmentUploadHandler(AttachmentRootGetter attachmentDirGetter,
         ExternalUrlSupplier externalUrl) {
-        this.haloProp = haloProp;
+        this.attachmentDirGetter = attachmentDirGetter;
         this.externalUrl = externalUrl;
-    }
-
-    Path getAttachmentsRoot() {
-        return haloProp.getWorkDir().resolve("attachments");
     }
 
     @Override
@@ -78,7 +74,7 @@ class LocalAttachmentUploadHandler implements AttachmentHandler {
                 var settingJson = configMap.getData().getOrDefault("default", "{}");
                 var setting = JsonUtils.jsonToObject(settingJson, PolicySetting.class);
 
-                final var attachmentsRoot = getAttachmentsRoot();
+                final var attachmentsRoot = attachmentDirGetter.get();
                 final var uploadRoot = attachmentsRoot.resolve("upload");
                 final var file = option.file();
                 final Path attachmentPath;
@@ -195,7 +191,7 @@ class LocalAttachmentUploadHandler implements AttachmentHandler {
                 if (annotations != null) {
                     var localRelativePath = annotations.get(Constant.LOCAL_REL_PATH_ANNO_KEY);
                     if (StringUtils.hasText(localRelativePath)) {
-                        var attachmentsRoot = getAttachmentsRoot();
+                        var attachmentsRoot = attachmentDirGetter.get();
                         var attachmentPath = attachmentsRoot.resolve(localRelativePath);
                         checkDirectoryTraversal(attachmentsRoot, attachmentPath);
 
@@ -255,23 +251,6 @@ class LocalAttachmentUploadHandler implements AttachmentHandler {
         return "local".equals(policy.getSpec().getTemplateName());
     }
 
-    @Data
-    public static class PolicySetting {
-
-        private String location;
-
-        private DataSize maxFileSize;
-
-        private Set<String> allowedFileTypes;
-
-        public void setMaxFileSize(String maxFileSize) {
-            if (!StringUtils.hasText(maxFileSize)) {
-                return;
-            }
-            this.maxFileSize = DataSize.parse(maxFileSize);
-        }
-    }
-
     /**
      * Write content into file. We will detect duplicate filename and auto-rename it with 3 times
      * retry.
@@ -306,5 +285,22 @@ class LocalAttachmentUploadHandler implements AttachmentHandler {
                 .onErrorResume(t -> deleteFileSilently(pathRef.get()).then(Mono.error(t)))
                 .then(Mono.fromSupplier(pathRef::get));
         });
+    }
+
+    @Data
+    public static class PolicySetting {
+
+        private String location;
+
+        private DataSize maxFileSize;
+
+        private Set<String> allowedFileTypes;
+
+        public void setMaxFileSize(String maxFileSize) {
+            if (!StringUtils.hasText(maxFileSize)) {
+                return;
+            }
+            this.maxFileSize = DataSize.parse(maxFileSize);
+        }
     }
 }
