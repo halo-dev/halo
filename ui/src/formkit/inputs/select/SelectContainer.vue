@@ -96,6 +96,9 @@ const selectedOptions = computed({
     emit("update", value);
   },
 });
+const hasClearable = computed(
+  () => props.clearable && selectedOptions.value.length == 0
+);
 
 const getInputHTMLRef = () => {
   nextTick(() => {
@@ -217,7 +220,7 @@ const clearAllSelectedOptions = () => {
   if (selectedOptions.value.length === 0) {
     return;
   }
-  if (!props.clearable) {
+  if (!hasClearable.value) {
     return;
   }
   selectedOptions.value = [];
@@ -271,13 +274,13 @@ const handleSortSelectedOptions = (
         <IconArrowDownLine
           class="pointer-events-none"
           :class="{
-            'group-hover/select:hidden': clearable,
+            'group-hover/select:hidden': hasClearable,
           }"
         />
         <IconCloseCircle
           class="hidden cursor-pointer"
           :class="{
-            'group-hover/select:block': clearable,
+            'group-hover/select:block': hasClearable,
           }"
           @click.stop="clearAllSelectedOptions"
         />
