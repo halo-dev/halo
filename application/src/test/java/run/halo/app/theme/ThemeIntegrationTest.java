@@ -15,6 +15,7 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Import;
 import org.springframework.http.MediaType;
+import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.web.reactive.server.WebTestClient;
 import org.springframework.web.reactive.function.server.RouterFunction;
 import org.springframework.web.reactive.function.server.RouterFunctions;
@@ -29,6 +30,7 @@ import run.halo.app.infra.InitializationStateGetter;
 @SpringBootTest
 @Import(ThemeIntegrationTest.TestConfig.class)
 @AutoConfigureWebTestClient
+@DirtiesContext
 public class ThemeIntegrationTest {
 
     @Autowired
