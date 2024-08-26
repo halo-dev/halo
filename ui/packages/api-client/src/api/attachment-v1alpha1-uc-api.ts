@@ -23,6 +23,8 @@ import { DUMMY_BASE_URL, assertParamExists, setApiKeyToObject, setBasicAuthToObj
 import { BASE_PATH, COLLECTION_FORMATS, RequestArgs, BaseAPI, RequiredError, operationServerMap } from '../base';
 // @ts-ignore
 import { Attachment } from '../models';
+// @ts-ignore
+import { UploadFromUrlRequest } from '../models';
 /**
  * AttachmentV1alpha1UcApi - axios parameter creator
  * @export
@@ -92,6 +94,54 @@ export const AttachmentV1alpha1UcApiAxiosParamCreator = function (configuration?
                 options: localVarRequestOptions,
             };
         },
+        /**
+         * Upload attachment from the given URL.
+         * @param {UploadFromUrlRequest} uploadFromUrlRequest 
+         * @param {boolean} [waitForPermalink] Wait for permalink.
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        externalTransferAttachment1: async (uploadFromUrlRequest: UploadFromUrlRequest, waitForPermalink?: boolean, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+            // verify required parameter 'uploadFromUrlRequest' is not null or undefined
+            assertParamExists('externalTransferAttachment1', 'uploadFromUrlRequest', uploadFromUrlRequest)
+            const localVarPath = `/apis/uc.api.content.halo.run/v1alpha1/attachments/-/upload-from-url`;
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'POST', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+            // authentication basicAuth required
+            // http basic authentication required
+            setBasicAuthToObject(localVarRequestOptions, configuration)
+
+            // authentication bearerAuth required
+            // http bearer authentication required
+            await setBearerAuthToObject(localVarHeaderParameter, configuration)
+
+            if (waitForPermalink !== undefined) {
+                localVarQueryParameter['waitForPermalink'] = waitForPermalink;
+            }
+
+
+    
+            localVarHeaderParameter['Content-Type'] = 'application/json';
+
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+            localVarRequestOptions.data = serializeDataIfNeeded(uploadFromUrlRequest, localVarRequestOptions, configuration)
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
     }
 };
 
@@ -117,6 +167,19 @@ export const AttachmentV1alpha1UcApiFp = function(configuration?: Configuration)
             const localVarOperationServerBasePath = operationServerMap['AttachmentV1alpha1UcApi.createAttachmentForPost']?.[localVarOperationServerIndex]?.url;
             return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
         },
+        /**
+         * Upload attachment from the given URL.
+         * @param {UploadFromUrlRequest} uploadFromUrlRequest 
+         * @param {boolean} [waitForPermalink] Wait for permalink.
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async externalTransferAttachment1(uploadFromUrlRequest: UploadFromUrlRequest, waitForPermalink?: boolean, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<Attachment>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.externalTransferAttachment1(uploadFromUrlRequest, waitForPermalink, options);
+            const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
+            const localVarOperationServerBasePath = operationServerMap['AttachmentV1alpha1UcApi.externalTransferAttachment1']?.[localVarOperationServerIndex]?.url;
+            return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
+        },
     }
 };
 
@@ -135,6 +198,15 @@ export const AttachmentV1alpha1UcApiFactory = function (configuration?: Configur
          */
         createAttachmentForPost(requestParameters: AttachmentV1alpha1UcApiCreateAttachmentForPostRequest, options?: RawAxiosRequestConfig): AxiosPromise<Attachment> {
             return localVarFp.createAttachmentForPost(requestParameters.file, requestParameters.waitForPermalink, requestParameters.postName, requestParameters.singlePageName, options).then((request) => request(axios, basePath));
+        },
+        /**
+         * Upload attachment from the given URL.
+         * @param {AttachmentV1alpha1UcApiExternalTransferAttachment1Request} requestParameters Request parameters.
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        externalTransferAttachment1(requestParameters: AttachmentV1alpha1UcApiExternalTransferAttachment1Request, options?: RawAxiosRequestConfig): AxiosPromise<Attachment> {
+            return localVarFp.externalTransferAttachment1(requestParameters.uploadFromUrlRequest, requestParameters.waitForPermalink, options).then((request) => request(axios, basePath));
         },
     };
 };
@@ -175,6 +247,27 @@ export interface AttachmentV1alpha1UcApiCreateAttachmentForPostRequest {
 }
 
 /**
+ * Request parameters for externalTransferAttachment1 operation in AttachmentV1alpha1UcApi.
+ * @export
+ * @interface AttachmentV1alpha1UcApiExternalTransferAttachment1Request
+ */
+export interface AttachmentV1alpha1UcApiExternalTransferAttachment1Request {
+    /**
+     * 
+     * @type {UploadFromUrlRequest}
+     * @memberof AttachmentV1alpha1UcApiExternalTransferAttachment1
+     */
+    readonly uploadFromUrlRequest: UploadFromUrlRequest
+
+    /**
+     * Wait for permalink.
+     * @type {boolean}
+     * @memberof AttachmentV1alpha1UcApiExternalTransferAttachment1
+     */
+    readonly waitForPermalink?: boolean
+}
+
+/**
  * AttachmentV1alpha1UcApi - object-oriented interface
  * @export
  * @class AttachmentV1alpha1UcApi
@@ -190,6 +283,17 @@ export class AttachmentV1alpha1UcApi extends BaseAPI {
      */
     public createAttachmentForPost(requestParameters: AttachmentV1alpha1UcApiCreateAttachmentForPostRequest, options?: RawAxiosRequestConfig) {
         return AttachmentV1alpha1UcApiFp(this.configuration).createAttachmentForPost(requestParameters.file, requestParameters.waitForPermalink, requestParameters.postName, requestParameters.singlePageName, options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
+     * Upload attachment from the given URL.
+     * @param {AttachmentV1alpha1UcApiExternalTransferAttachment1Request} requestParameters Request parameters.
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof AttachmentV1alpha1UcApi
+     */
+    public externalTransferAttachment1(requestParameters: AttachmentV1alpha1UcApiExternalTransferAttachment1Request, options?: RawAxiosRequestConfig) {
+        return AttachmentV1alpha1UcApiFp(this.configuration).externalTransferAttachment1(requestParameters.uploadFromUrlRequest, requestParameters.waitForPermalink, options).then((request) => request(this.axios, this.basePath));
     }
 }
 

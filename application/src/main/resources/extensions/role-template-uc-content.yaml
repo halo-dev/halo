@@ -114,3 +114,6 @@ rules:
   - apiGroups: [ "uc.api.content.halo.run" ]
     resources: [ "attachments" ]
     verbs: [ "create", "update", "delete" ]
+  - apiGroups: [ "uc.api.content.halo.run" ]
+    resources: [ "attachments/upload-from-url" ]
+    verbs: [ "create" ]
