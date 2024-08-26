@@ -1298,8 +1298,6 @@ core:
     content_cache:
       toast_recovered: Contenido no guardado recuperado de la caché
   formkit:
-    select:
-      no_data: No hay datos
     category_select:
       creation_label: Crear categoría {text}
     tag_select:
