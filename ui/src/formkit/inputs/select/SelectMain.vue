@@ -400,7 +400,7 @@ const mapUnresolvedOptions = async (
     value: string;
   }>
 > => {
-  if (!selectProps.action || !selectProps.remote) {
+  if (!isRemote.value) {
     if (selectProps.allowCreate) {
       // TODO: Add mapped values to options
       return unmappedSelectValues.map((value) => ({ label: value, value }));
@@ -413,10 +413,12 @@ const mapUnresolvedOptions = async (
   }
 
   // Asynchronous request for options, fetch label and value via API.
-  let mappedOptions: Array<{
-    label: string;
-    value: string;
-  }> = [];
+  let mappedOptions:
+    | Array<{
+        label: string;
+        value: string;
+      }>
+    | undefined = undefined;
   if (selectProps.action) {
     mappedOptions = await fetchRemoteMappedOptions(unmappedSelectValues);
   } else if (selectProps.remote) {
@@ -424,6 +426,10 @@ const mapUnresolvedOptions = async (
     mappedOptions = await remoteOption.findOptionsByValues(
       unmappedSelectValues
     );
+  }
+
+  if (!mappedOptions) {
+    return unmappedSelectValues.map((value) => ({ label: value, value }));
   }
   // Get values that are still unresolved.
   const unmappedValues = unmappedSelectValues.filter(
