@@ -320,6 +320,7 @@ models/totp-auth-link-response.ts
 models/totp-request.ts
 models/two-factor-auth-settings.ts
 models/upgrade-from-uri-request.ts
+models/upload-from-url-request.ts
 models/user-connection-list.ts
 models/user-connection-spec.ts
 models/user-connection.ts

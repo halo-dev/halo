@@ -2250,6 +2250,36 @@
         ]
       }
     },
+    "/apis/api.console.halo.run/v1alpha1/attachments/-/upload-from-url": {
+      "post": {
+        "operationId": "ExternalTransferAttachment",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UploadFromUrlRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "default": {
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/Attachment"
+                }
+              }
+            },
+            "description": "default response"
+          }
+        },
+        "tags": [
+          "AttachmentV1alpha1Console"
+        ]
+      }
+    },
     "/apis/api.console.halo.run/v1alpha1/attachments/upload": {
       "post": {
         "operationId": "UploadAttachment",
@@ -14136,6 +14166,47 @@
         ]
       }
     },
+    "/apis/uc.api.content.halo.run/v1alpha1/attachments/-/upload-from-url": {
+      "post": {
+        "description": "Upload attachment from the given URL.",
+        "operationId": "ExternalTransferAttachment_1",
+        "parameters": [
+          {
+            "description": "Wait for permalink.",
+            "in": "query",
+            "name": "waitForPermalink",
+            "schema": {
+              "type": "boolean"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UploadFromUrlRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "default": {
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/Attachment"
+                }
+              }
+            },
+            "description": "default response"
+          }
+        },
+        "tags": [
+          "AttachmentV1alpha1Uc"
+        ]
+      }
+    },
     "/apis/uc.api.content.halo.run/v1alpha1/posts": {
       "get": {
         "description": "List posts owned by the current user.",
@@ -22618,6 +22689,21 @@
           "file": {
             "type": "string",
             "format": "binary"
+          }
+        }
+      },
+      "UploadFromUrlRequest": {
+        "required": [
+          "url"
+        ],
+        "type": "object",
+        "properties": {
+          "filename": {
+            "type": "string"
+          },
+          "url": {
+            "type": "string",
+            "format": "url"
           }
         }
       },
