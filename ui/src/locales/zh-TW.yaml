@@ -1574,6 +1574,8 @@ core:
     content_cache:
       toast_recovered: 已從緩存中恢復未保存的內容
   formkit:
+    select:
+      no_data: 暫無數據
     category_select:
       creation_label: 創建 {text} 分類
     tag_select:

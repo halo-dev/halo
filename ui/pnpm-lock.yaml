@@ -44,6 +44,9 @@ importers:
       '@formkit/core':
         specifier: ^1.5.9
         version: 1.5.9
+      '@formkit/drag-and-drop':
+        specifier: ^0.1.6
+        version: 0.1.6
       '@formkit/i18n':
         specifier: ^1.5.9
         version: 1.5.9
@@ -2350,6 +2353,9 @@ packages:
 
   '@formkit/dev@1.5.9':
     resolution: {integrity: sha512-aeD53iH6WD/3jKiYyGmZgvocGQv77NHHD4MF5+I/DvApu0IP1gTArsmBFaBDEVr7t5o/xO2zH06Up7sJcA0+mA==}
+
+  '@formkit/drag-and-drop@0.1.6':
+    resolution: {integrity: sha512-wZyxvk7WTbQ12q8ZGvLoYner1ktBOUf+lCblJT3P0LyqpjGCKTfQMKJtwToKQzJgTbhvow4LBu+yP92Mux321w==}
 
   '@formkit/i18n@1.5.9':
     resolution: {integrity: sha512-4FVqE1YciXSwl2KUuGRvpizZXBnwZACVRMrNjSn2WokVsOPYdmgwP1+35nG6LVU6i8bcOv/8fASCLUO3ADe7mw==}
@@ -12684,6 +12690,8 @@ snapshots:
     dependencies:
       '@formkit/core': 1.5.9
       '@formkit/utils': 1.5.9
+
+  '@formkit/drag-and-drop@0.1.6': {}
 
   '@formkit/i18n@1.5.9':
     dependencies:

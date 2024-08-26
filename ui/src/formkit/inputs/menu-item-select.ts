@@ -20,6 +20,6 @@ function optionsHandler(node: FormKitNode) {
 export const menuItemSelect: FormKitTypeDefinition = {
   ...select,
   props: ["placeholder", "menuItems"],
-  forceTypeProp: "select",
+  forceTypeProp: "nativeSelect",
   features: [optionsHandler, selects, defaultIcon("select", "select")],
 };
