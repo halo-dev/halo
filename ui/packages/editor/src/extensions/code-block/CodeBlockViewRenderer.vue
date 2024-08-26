@@ -1,37 +1,77 @@
 <script lang="ts" setup>
 import { i18n } from "@/locales";
-import type { Decoration, Node as ProseMirrorNode } from "@/tiptap/pm";
-import type { Editor, Node } from "@/tiptap/vue-3";
-import { NodeViewContent, NodeViewWrapper } from "@/tiptap/vue-3";
+import {
+  NodeViewContent,
+  NodeViewWrapper,
+  type NodeViewProps,
+} from "@/tiptap/vue-3";
 import { useTimeout } from "@vueuse/core";
 import { computed } from "vue";
 import BxBxsCopy from "~icons/bx/bxs-copy";
 import RiArrowDownSFill from "~icons/ri/arrow-down-s-fill";
 import RiArrowRightSFill from "~icons/ri/arrow-right-s-fill";
 import IconCheckboxCircle from "~icons/ri/checkbox-circle-line";
-import lowlight from "./lowlight";
+import CodeBlockSelect from "./CodeBlockSelect.vue";
 
-const props = defineProps<{
-  editor: Editor;
-  node: ProseMirrorNode;
-  decorations: Decoration[];
-  selected: boolean;
-  extension: Node<any, any>;
-  getPos: () => number;
-  updateAttributes: (attributes: Record<string, any>) => void;
-  deleteNode: () => void;
-}>();
+const props = defineProps<NodeViewProps>();
 
-const languages = computed(() => {
-  return lowlight.listLanguages();
+const languageOptions = computed(() => {
+  let languages: Array<{
+    label: string;
+    value: string;
+  }> = [];
+  const lang = props.extension.options.languages;
+  if (typeof lang === "function") {
+    languages = lang(props.editor.state);
+  } else {
+    languages = lang;
+  }
+  languages = languages || [];
+  const languageValues = languages.map((language) => language.value);
+  if (languageValues.indexOf("auto") === -1) {
+    languages.unshift({
+      label: "Auto",
+      value: "auto",
+    });
+  }
+  return languages;
 });
 
 const selectedLanguage = computed({
   get: () => {
-    return props.node?.attrs.language;
+    return props.node?.attrs.language || "auto";
   },
   set: (language: string) => {
     props.updateAttributes({ language: language });
+  },
+});
+
+const themeOptions = computed(() => {
+  let themes:
+    | Array<{
+        label: string;
+        value: string;
+      }>
+    | undefined = [];
+  const theme = props.extension.options.themes;
+  if (typeof theme === "function") {
+    themes = theme(props.editor.state);
+  } else {
+    themes = theme;
+  }
+
+  if (!themes) {
+    return undefined;
+  }
+  return themes;
+});
+
+const selectedTheme = computed({
+  get: () => {
+    return props.node?.attrs.theme || themeOptions.value?.[0].value;
+  },
+  set: (theme: string) => {
+    props.updateAttributes({ theme: theme });
   },
 });
 
@@ -76,19 +116,23 @@ const handleCopyCode = () => {
             <RiArrowDownSFill v-else />
           </div>
         </div>
-        <select
+        <CodeBlockSelect
           v-model="selectedLanguage"
-          class="block !leading-8 text-sm text-gray-900 border select-none border-transparent rounded-md bg-transparent focus:ring-blue-500 focus:border-blue-500 cursor-pointer hover:bg-zinc-200"
+          class="w-48"
+          :container="editor.options.element"
+          :options="languageOptions"
+          @select="editor.commands.focus()"
         >
-          <option :value="null">auto</option>
-          <option
-            v-for="(language, index) in languages"
-            :key="index"
-            :value="language"
-          >
-            {{ language }}
-          </option>
-        </select>
+        </CodeBlockSelect>
+        <CodeBlockSelect
+          v-if="themeOptions && themeOptions.length > 0"
+          v-model="selectedTheme"
+          :container="editor.options.element"
+          class="w-48"
+          :options="themeOptions"
+          @select="editor.commands.focus()"
+        >
+        </CodeBlockSelect>
       </div>
       <div class="pr-3 flex items-center">
         <div
