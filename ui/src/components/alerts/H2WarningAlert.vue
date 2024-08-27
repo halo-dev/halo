@@ -17,7 +17,7 @@ const { data: info } = useQuery<Info>({
 </script>
 <template>
   <VAlert
-    v-if="!info?.database.name.startsWith('H2')"
+    v-if="info?.database.name.startsWith('H2')"
     class="mt-3"
     type="warning"
     :title="$t('core.components.h2_warning_alert.title')"
