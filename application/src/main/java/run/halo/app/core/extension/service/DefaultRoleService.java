@@ -72,7 +72,7 @@ public class DefaultRoleService implements RoleService {
     @Override
     public Mono<Map<String, Collection<String>>> getRolesByUsernames(Collection<String> usernames) {
         if (CollectionUtils.isEmpty(usernames)) {
-            return Mono.empty();
+            return Mono.just(Map.of());
         }
         var subjects = usernames.stream().map(DefaultRoleService::toUserSubject)
             .map(Object::toString)

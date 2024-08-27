@@ -8,6 +8,7 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -18,6 +19,8 @@ import org.assertj.core.api.AssertionsForInterfaceTypes;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.MethodSource;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
@@ -44,6 +47,19 @@ class DefaultRoleServiceTest {
 
     @InjectMocks
     private DefaultRoleService roleService;
+
+    @ParameterizedTest
+    @MethodSource("usernamesProvider")
+    void shouldReturnEmptyMapIfNoUsernamesProvided(Collection<String> usernames) {
+        roleService.getRolesByUsernames(usernames)
+            .as(StepVerifier::create)
+            .expectNext(Map.of())
+            .verifyComplete();
+    }
+
+    static Stream<Collection<String>> usernamesProvider() {
+        return Stream.of(null, List.of(), Set.of());
+    }
 
     @Nested
     class ListDependenciesTest {
