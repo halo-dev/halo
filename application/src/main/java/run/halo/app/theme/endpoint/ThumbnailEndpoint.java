@@ -1,7 +1,6 @@
 package run.halo.app.theme.endpoint;
 
 import static io.swagger.v3.oas.annotations.media.Schema.RequiredMode.REQUIRED;
-import static org.apache.commons.lang3.StringUtils.removeStart;
 import static org.springdoc.core.fn.builders.apiresponse.Builder.responseBuilder;
 import static org.springdoc.core.fn.builders.parameter.Builder.parameterBuilder;
 
@@ -27,7 +26,6 @@ import org.springframework.web.reactive.function.server.ServerRequest;
 import org.springframework.web.reactive.function.server.ServerResponse;
 import org.springframework.web.server.ServerWebInputException;
 import reactor.core.publisher.Mono;
-import run.halo.app.core.attachment.AttachmentUtils;
 import run.halo.app.core.attachment.LocalThumbnailService;
 import run.halo.app.core.attachment.ThumbnailService;
 import run.halo.app.core.attachment.ThumbnailSize;
@@ -64,7 +62,7 @@ public class ThumbnailEndpoint implements CustomEndpoint {
 
     private Mono<ServerResponse> getThumbnailByUri(ServerRequest request) {
         var query = new ThumbnailQuery(request.queryParams());
-        return thumbnailService.generate(query.getUri(), query.getWidth())
+        return thumbnailService.generate(query.getUri(), query.getSize())
             .defaultIfEmpty(query.getUri())
             .flatMap(uri -> ServerResponse.permanentRedirect(uri).build());
     }
@@ -82,17 +80,20 @@ public class ThumbnailEndpoint implements CustomEndpoint {
             if (StringUtils.isBlank(uriStr)) {
                 throw new ServerWebInputException("Required parameter 'uri' is missing");
             }
-            return AttachmentUtils.encodeUri(uriStr);
+            try {
+                return URI.create(uriStr);
+            } catch (IllegalArgumentException e) {
+                throw new ServerWebInputException("Invalid URI: " + uriStr);
+            }
         }
 
         @Schema(requiredMode = REQUIRED)
-        public ThumbnailSize getWidth() {
-            var width = params.getFirst("width");
-            if (StringUtils.isBlank(width)) {
-                throw new ServerWebInputException("Required parameter 'width' is missing");
+        public ThumbnailSize getSize() {
+            var size = params.getFirst("size");
+            if (StringUtils.isBlank(size)) {
+                throw new ServerWebInputException("Required parameter 'size' is missing");
             }
-            // Remove the 'w' prefix
-            return ThumbnailSize.fromWidth(removeStart(width, 'w'));
+            return ThumbnailSize.fromName(size);
         }
 
         public static void buildParameters(Builder builder) {
@@ -103,8 +104,8 @@ public class ThumbnailEndpoint implements CustomEndpoint {
                     .required(true))
                 .parameter(parameterBuilder()
                     .in(ParameterIn.QUERY)
-                    .name("width")
-                    .description("The width of the thumbnail")
+                    .name("size")
+                    .description("The size of the thumbnail,available values are s,m,l,xl")
                     .required(true));
         }
     }

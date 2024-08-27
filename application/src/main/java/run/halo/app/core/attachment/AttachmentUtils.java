@@ -5,12 +5,9 @@ import static run.halo.app.infra.FileCategoryMatcher.IMAGE;
 import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URL;
-import java.nio.charset.StandardCharsets;
 import lombok.experimental.UtilityClass;
 import org.springframework.lang.NonNull;
 import org.springframework.util.Assert;
-import org.springframework.web.util.UriComponentsBuilder;
-import org.springframework.web.util.UriUtils;
 import run.halo.app.core.extension.attachment.Attachment;
 
 @UtilityClass
@@ -40,17 +37,5 @@ public class AttachmentUtils {
         } catch (MalformedURLException e) {
             throw new IllegalArgumentException(e);
         }
-    }
-
-    /**
-     * Encode uri string to URI.
-     * This method will decode the uri string first and then encode it.
-     */
-    public static URI encodeUri(String uriStr) {
-        var decodedUriStr = UriUtils.decode(uriStr, StandardCharsets.UTF_8);
-        return UriComponentsBuilder.fromUriString(decodedUriStr)
-            .encode(StandardCharsets.UTF_8)
-            .build()
-            .toUri();
     }
 }
