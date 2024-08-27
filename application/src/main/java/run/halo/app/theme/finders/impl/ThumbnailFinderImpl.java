@@ -14,9 +14,9 @@ public class ThumbnailFinderImpl implements ThumbnailFinder {
     private final ThumbnailService thumbnailService;
 
     @Override
-    public Mono<String> gen(String url, String size) {
-        return thumbnailService.generate(URI.create(url), ThumbnailSize.fromName(size))
+    public Mono<String> gen(String uriStr, String size) {
+        return thumbnailService.generate(URI.create(uriStr), ThumbnailSize.fromName(size))
             .map(URI::toString)
-            .defaultIfEmpty(url);
+            .defaultIfEmpty(uriStr);
     }
 }

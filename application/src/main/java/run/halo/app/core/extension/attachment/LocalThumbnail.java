@@ -10,7 +10,6 @@ import lombok.Getter;
 import lombok.experimental.Accessors;
 import org.springframework.lang.NonNull;
 import run.halo.app.core.attachment.AttachmentRootGetter;
-import run.halo.app.core.attachment.ThumbnailSigner;
 import run.halo.app.core.attachment.ThumbnailSize;
 import run.halo.app.extension.AbstractExtension;
 import run.halo.app.extension.GVK;
@@ -31,10 +30,6 @@ public class LocalThumbnail extends AbstractExtension {
 
     public void setStatus(Status status) {
         this.status = (status == null ? new Status() : status);
-    }
-
-    public static String signatureFor(String imageUri) {
-        return ThumbnailSigner.generateSignature(imageUri);
     }
 
     @Data

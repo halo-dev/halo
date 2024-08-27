@@ -4,6 +4,8 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.net.MalformedURLException;
+import java.net.URISyntaxException;
 import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -138,8 +140,15 @@ public class ThumbnailGenerator {
 
     static class ImageDownloader {
         public Path downloadFile(URL url) throws IOException {
-            var encodedUri = AttachmentUtils.encodeUri(url.toString());
-            return downloadFileInternal(encodedUri.toURL());
+            return downloadFileInternal(encodedUrl(url));
+        }
+
+        private static URL encodedUrl(URL url) {
+            try {
+                return new URL(url.toURI().toASCIIString());
+            } catch (MalformedURLException | URISyntaxException e) {
+                throw new IllegalArgumentException(e);
+            }
         }
 
         Path downloadFileInternal(URL url) throws IOException {

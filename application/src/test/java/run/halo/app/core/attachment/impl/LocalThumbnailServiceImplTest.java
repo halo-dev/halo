@@ -7,6 +7,7 @@ import static org.mockito.ArgumentMatchers.isA;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+import static run.halo.app.core.attachment.ThumbnailSigner.generateSignature;
 
 import java.net.MalformedURLException;
 import java.net.URI;
@@ -54,7 +55,7 @@ class LocalThumbnailServiceImplTest {
     void endpointForTest() {
         var endpoint =
             localThumbnailService.buildThumbnailUri("2024", ThumbnailSize.L, "example.jpg");
-        assertThat(endpoint).isEqualTo("/upload/thumbnails/2024/w1200/example.jpg");
+        assertThat(endpoint.toString()).isEqualTo("/upload/thumbnails/2024/w1200/example.jpg");
     }
 
     @Test
@@ -90,23 +91,20 @@ class LocalThumbnailServiceImplTest {
     void signatureForImageUriTest() throws MalformedURLException {
         when(externalUrlSupplier.getRaw()).thenReturn(new URL("http://localhost:8090"));
         var signature = signatureForImageUriStr("http://localhost:8090/example.jpg");
-        assertThat(signature).isEqualTo(LocalThumbnail.signatureFor("/example.jpg"));
+        assertThat(signature).isEqualTo(generateSignature("/example.jpg"));
 
         signature = signatureForImageUriStr("http://localhost:8090/example.jpg");
-        assertThat(signature).isEqualTo(LocalThumbnail.signatureFor("/example.jpg"));
+        assertThat(signature).isEqualTo(generateSignature("/example.jpg"));
 
         signature = signatureForImageUriStr("http://localhost:8091/example.jpg");
-        assertThat(signature).isEqualTo(
-            LocalThumbnail.signatureFor("http://localhost:8091/example.jpg"));
+        assertThat(signature).isEqualTo(generateSignature("http://localhost:8091/example.jpg"));
 
         signature = signatureForImageUriStr("localhost:8090/example.jpg");
-        assertThat(signature).isEqualTo(
-            LocalThumbnail.signatureFor("localhost:8090/example.jpg"));
+        assertThat(signature).isEqualTo(generateSignature("localhost:8090/example.jpg"));
 
         when(externalUrlSupplier.getRaw()).thenReturn(null);
         signature = signatureForImageUriStr("http://localhost:8090/example.jpg");
-        assertThat(signature).isEqualTo(
-            LocalThumbnail.signatureFor("http://localhost:8090/example.jpg"));
+        assertThat(signature).isEqualTo(generateSignature("http://localhost:8090/example.jpg"));
     }
 
     String signatureForImageUriStr(String uriStr) {

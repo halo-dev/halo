@@ -74,13 +74,13 @@ public class LocalThumbnailServiceImpl implements LocalThumbnailService {
     }
 
     @Override
-    public Mono<URI> getOriginalImageUri(String thumbnailUri) {
+    public Mono<URI> getOriginalImageUri(URI thumbnailUri) {
         return fetchThumbnail(thumbnailUri)
             .map(local -> URI.create(local.getSpec().getImageUri()));
     }
 
     @Override
-    public Mono<Resource> getThumbnail(String thumbnailUri) {
+    public Mono<Resource> getThumbnail(URI thumbnailUri) {
         Assert.notNull(thumbnailUri, "Thumbnail URI must not be null.");
         return fetchThumbnail(thumbnailUri)
             .flatMap(thumbnail -> {
@@ -100,7 +100,7 @@ public class LocalThumbnailServiceImpl implements LocalThumbnailService {
             .flatMap(this::generate);
     }
 
-    private Mono<LocalThumbnail> fetchThumbnail(String thumbnailUri) {
+    private Mono<LocalThumbnail> fetchThumbnail(URI thumbnailUri) {
         Assert.notNull(thumbnailUri, "Thumbnail URI must not be null.");
         var thumbSignature = ThumbnailSigner.generateSignature(thumbnailUri);
         return client.listBy(LocalThumbnail.class, ListOptions.builder()
@@ -171,10 +171,10 @@ public class LocalThumbnailServiceImpl implements LocalThumbnailService {
                 thumbnail.setSpec(new LocalThumbnail.Spec()
                     .setImageSignature(signatureForImageUri(imageUri))
                     .setFilePath(toRelativeUnixPath(filePath))
-                    .setImageUri(ensureInSiteUriIsRelative(imageUri).toString())
+                    .setImageUri(ensureInSiteUriIsRelative(imageUri).toASCIIString())
                     .setSize(size)
                     .setThumbSignature(thumbSignature)
-                    .setThumbnailUri(thumbnailUri));
+                    .setThumbnailUri(thumbnailUri.toASCIIString()));
                 return client.create(thumbnail);
             });
     }
@@ -236,8 +236,9 @@ public class LocalThumbnailServiceImpl implements LocalThumbnailService {
     }
 
     @Override
-    public String buildThumbnailUri(String year, ThumbnailSize size, String filename) {
-        return "/upload/thumbnails/%s/w%s/%s".formatted(year, size.getWidth(), filename);
+    public URI buildThumbnailUri(String year, ThumbnailSize size, String filename) {
+        return URI.create("/upload/thumbnails/%s/w%s/%s".formatted(year, size.getWidth(),
+            filename));
     }
 
     private String toRelativeUnixPath(Path filePath) {
@@ -266,7 +267,7 @@ public class LocalThumbnailServiceImpl implements LocalThumbnailService {
      * image URL to the external URL.</p>
      */
     String signatureForImageUri(URI imageUri) {
-        var uriToSign = ensureInSiteUriIsRelative(imageUri).toString();
+        var uriToSign = ensureInSiteUriIsRelative(imageUri);
         return ThumbnailSigner.generateSignature(uriToSign);
     }
 

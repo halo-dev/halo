@@ -11,10 +11,10 @@ import reactor.core.publisher.Mono;
 public interface ThumbnailFinder {
 
     /**
-     * Generate thumbnail url from given image url and size.
+     * Generate thumbnail uri from given image uri and size.
      *
      * @param size the size of thumbnail to generate
      * @return the generated thumbnail url
      */
-    Mono<String> gen(String url, String size);
+    Mono<String> gen(String uri, String size);
 }

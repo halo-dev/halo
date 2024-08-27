@@ -48,7 +48,7 @@ public class ThumbnailServiceImpl implements ThumbnailService {
         var imageUrl = imageUrlOpt.get();
         return fetchThumbnail(imageUri, size)
             .map(thumbnail -> URI.create(thumbnail.getSpec().getThumbnailUri()))
-            .switchIfEmpty(create(imageUrl, size))
+            .switchIfEmpty(Mono.defer(() -> create(imageUrl, size)))
             .onErrorResume(Throwable.class, e -> {
                 log.warn("Failed to generate thumbnail for image: {}", imageUrl, e);
                 return Mono.just(URI.create(imageUrl.toString()));
@@ -108,8 +108,8 @@ public class ThumbnailServiceImpl implements ThumbnailService {
                 thumb.getMetadata().setGenerateName("thumb-");
                 thumb.setSpec(new Thumbnail.Spec()
                     .setSize(size)
-                    .setThumbnailUri(uri.toString())
-                    .setImageUri(imageUri.toString())
+                    .setThumbnailUri(uri.toASCIIString())
+                    .setImageUri(imageUri.toASCIIString())
                     .setImageSignature(signatureFor(imageUri))
                 );
                 return client.create(thumb)
@@ -119,7 +119,7 @@ public class ThumbnailServiceImpl implements ThumbnailService {
 
     private String signatureFor(URI imageUri) {
         var uri = localThumbnailService.ensureInSiteUriIsRelative(imageUri);
-        return ThumbnailSigner.generateSignature(uri.toString());
+        return ThumbnailSigner.generateSignature(uri);
     }
 
     Mono<Thumbnail> fetchThumbnail(URI imageUri, ThumbnailSize size) {

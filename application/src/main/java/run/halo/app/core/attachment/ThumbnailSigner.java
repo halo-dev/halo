@@ -1,6 +1,7 @@
 package run.halo.app.core.attachment;
 
 import java.math.BigInteger;
+import java.net.URI;
 import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
@@ -33,5 +34,9 @@ public class ThumbnailSigner {
         } catch (NoSuchAlgorithmException e) {
             throw new RuntimeException(ALGORITHM + " algorithm not found", e);
         }
+    }
+
+    public static String generateSignature(URI uri) {
+        return generateSignature(uri.toASCIIString());
     }
 }

@@ -19,7 +19,7 @@ public interface LocalThumbnailService {
      * @return The original image URI, {@link NotFoundException} will be thrown if the thumbnail
      * record does not exist by the given thumbnail URI
      */
-    Mono<URI> getOriginalImageUri(String thumbnailUri);
+    Mono<URI> getOriginalImageUri(URI thumbnailUri);
 
     /**
      * <p>Gets thumbnail file resource for the given year, size and filename.</p>
@@ -29,7 +29,7 @@ public interface LocalThumbnailService {
      * @param thumbnailUri The thumbnail URI string
      * @return The thumbnail file resource
      */
-    Mono<Resource> getThumbnail(String thumbnailUri);
+    Mono<Resource> getThumbnail(URI thumbnailUri);
 
     /**
      * <p>Gets thumbnail file resource for the given URI and size.</p>
@@ -77,5 +77,5 @@ public interface LocalThumbnailService {
 
     Path toFilePath(String thumbRelativeUnixPath);
 
-    String buildThumbnailUri(String year, ThumbnailSize size, String filename);
+    URI buildThumbnailUri(String year, ThumbnailSize size, String filename);
 }
