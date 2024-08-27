@@ -8,8 +8,10 @@ import static run.halo.app.extension.index.query.QueryFactory.notEqual;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.stream.Collectors;
 import lombok.AllArgsConstructor;
+import lombok.Data;
 import org.apache.commons.lang3.BooleanUtils;
 import org.apache.commons.lang3.ObjectUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -23,6 +25,7 @@ import run.halo.app.core.extension.content.Category;
 import run.halo.app.core.extension.content.Post;
 import run.halo.app.extension.ListOptions;
 import run.halo.app.extension.ListResult;
+import run.halo.app.extension.PageRequest;
 import run.halo.app.extension.PageRequestImpl;
 import run.halo.app.extension.ReactiveExtensionClient;
 import run.halo.app.extension.exception.ExtensionNotFoundException;
@@ -31,6 +34,8 @@ import run.halo.app.extension.index.query.QueryFactory;
 import run.halo.app.extension.router.selector.FieldSelector;
 import run.halo.app.extension.router.selector.LabelSelector;
 import run.halo.app.infra.utils.HaloUtils;
+import run.halo.app.infra.utils.JsonUtils;
+import run.halo.app.infra.utils.SortUtils;
 import run.halo.app.theme.finders.Finder;
 import run.halo.app.theme.finders.PostFinder;
 import run.halo.app.theme.finders.PostPublicQueryService;
@@ -144,6 +149,25 @@ public class PostFinderImpl implements PostFinder {
 
     private static Query notHiddenPostQuery() {
         return notEqual("status.hideFromList", BooleanUtils.TRUE);
+    }
+
+    @Override
+    public Mono<ListResult<ListedPostVo>> list(Map<String, Object> params) {
+        var query = Optional.ofNullable(params)
+            .map(map -> JsonUtils.mapToObject(map, PostQuery.class))
+            .orElse(new PostQuery());
+        if (StringUtils.isNotBlank(query.getCategoryName())) {
+            return listChildrenCategories(query.getCategoryName())
+                .map(category -> category.getMetadata().getName())
+                .collectList()
+                .map(categoryNames -> ListOptions.builder(query.toListOptions())
+                    .andQuery(in("spec.categories", categoryNames))
+                    .build()
+                )
+                .flatMap(
+                    listOptions -> postPublicQueryService.list(listOptions, query.toPageRequest()));
+        }
+        return postPublicQueryService.list(query.toListOptions(), query.toPageRequest());
     }
 
     @Override
@@ -270,14 +294,54 @@ public class PostFinderImpl implements PostFinder {
             .concatMap(postPublicQueryService::convertToListedVo);
     }
 
-    int pageNullSafe(Integer page) {
+    static int pageNullSafe(Integer page) {
         return ObjectUtils.defaultIfNull(page, 1);
     }
 
-    int sizeNullSafe(Integer size) {
+    static int sizeNullSafe(Integer size) {
         return ObjectUtils.defaultIfNull(size, 10);
     }
 
     record LinkNavigation(String prev, String current, String next) {
+    }
+
+    @Data
+    public static class PostQuery {
+        private Integer page;
+        private Integer size;
+        private String categoryName;
+        private String tagName;
+        private String owner;
+        private List<String> sort;
+
+        public ListOptions toListOptions() {
+            var builder = ListOptions.builder();
+            var hasQuery = false;
+            if (StringUtils.isNotBlank(owner)) {
+                builder.andQuery(equal("spec.owner", owner));
+                hasQuery = true;
+            }
+            if (StringUtils.isNotBlank(tagName)) {
+                builder.andQuery(equal("spec.tags", tagName));
+                hasQuery = true;
+            }
+            if (StringUtils.isNotBlank(categoryName)) {
+                builder.andQuery(in("spec.categories", categoryName));
+                hasQuery = true;
+            }
+            // Exclude hidden posts when no query
+            if (!hasQuery) {
+                builder.fieldQuery(notHiddenPostQuery());
+            }
+            return builder.build();
+        }
+
+        public PageRequest toPageRequest() {
+            var resolvedSort = Optional.of(SortUtils.resolve(sort))
+                .filter(Sort::isUnsorted)
+                .orElse(defaultSort());
+            return PageRequestImpl.of(pageNullSafe(getPage()),
+                sizeNullSafe(getSize()), resolvedSort);
+        }
     }
 }
