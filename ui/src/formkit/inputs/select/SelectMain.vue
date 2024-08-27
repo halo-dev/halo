@@ -13,6 +13,7 @@ import SelectContainer from "./SelectContainer.vue";
 import { axiosInstance } from "@halo-dev/api-client";
 import { get, has, type PropertyPath } from "lodash-es";
 import { useDebounceFn } from "@vueuse/core";
+import { useFuse } from "@vueuse/integrations/useFuse";
 import type { AxiosRequestConfig } from "axios";
 
 export interface SelectProps {
@@ -184,7 +185,6 @@ const selectProps: SelectProps = shallowReactive({
   placeholder: "",
 });
 
-const hasSelected = ref(false);
 const isRemote = computed(() => !!selectProps.action || !!selectProps.remote);
 const hasMoreOptions = computed(
   () => options.value && options.value.length < total.value
@@ -400,7 +400,7 @@ const mapUnresolvedOptions = async (
     value: string;
   }>
 > => {
-  if (!selectProps.action || !selectProps.remote) {
+  if (!isRemote.value) {
     if (selectProps.allowCreate) {
       // TODO: Add mapped values to options
       return unmappedSelectValues.map((value) => ({ label: value, value }));
@@ -413,17 +413,29 @@ const mapUnresolvedOptions = async (
   }
 
   // Asynchronous request for options, fetch label and value via API.
-  let mappedOptions: Array<{
-    label: string;
-    value: string;
-  }> = [];
-  if (selectProps.action) {
-    mappedOptions = await fetchRemoteMappedOptions(unmappedSelectValues);
-  } else if (selectProps.remote) {
-    const remoteOption = selectProps.remoteOption as SelectRemoteOption;
-    mappedOptions = await remoteOption.findOptionsByValues(
-      unmappedSelectValues
+  let mappedOptions:
+    | Array<{
+        label: string;
+        value: string;
+      }>
+    | undefined = undefined;
+  if (noNeedFetchOptions.value) {
+    mappedOptions = cacheAllOptions.value?.filter((option) =>
+      unmappedSelectValues.includes(option.value)
     );
+  } else {
+    if (selectProps.action) {
+      mappedOptions = await fetchRemoteMappedOptions(unmappedSelectValues);
+    } else if (selectProps.remote) {
+      const remoteOption = selectProps.remoteOption as SelectRemoteOption;
+      mappedOptions = await remoteOption.findOptionsByValues(
+        unmappedSelectValues
+      );
+    }
+  }
+
+  if (!mappedOptions) {
+    return unmappedSelectValues.map((value) => ({ label: value, value }));
   }
   // Get values that are still unresolved.
   const unmappedValues = unmappedSelectValues.filter(
@@ -496,11 +508,12 @@ onMounted(async () => {
   }
 });
 
-watch(
+const stopSelectedWatch = watch(
   () => [options.value, props.context.value],
   async () => {
-    if (!hasSelected.value && options.value) {
-      selectOptions.value = await fetchSelectedOptions();
+    if (options.value) {
+      const selectedOption = await fetchSelectedOptions();
+      selectOptions.value = selectedOption;
     }
   },
   {
@@ -521,7 +534,7 @@ watch(
 
 const handleUpdate = (value: Array<{ label: string; value: string }>) => {
   const values = value.map((item) => item.value);
-  hasSelected.value = true;
+  stopSelectedWatch();
   selectOptions.value = value;
   if (selectProps.multiple) {
     props.context.node.input(values);
@@ -544,14 +557,23 @@ const fetchOptions = async (
   }
   // If the total number of options is less than the page size, no more requests are made.
   if (noNeedFetchOptions.value) {
-    const filterOptions = cacheAllOptions.value?.filter((option) =>
-      option.label.includes(tempKeyword)
-    );
+    const { results } = useFuse<{
+      label: string;
+      value: string;
+    }>(tempKeyword, cacheAllOptions.value || [], {
+      fuseOptions: {
+        keys: ["label", "value"],
+        threshold: 0,
+        ignoreLocation: true,
+      },
+      matchAllWhenSearchEmpty: true,
+    });
+    const filterOptions = results.value?.map((fuseItem) => fuseItem.item) || [];
     return {
       options: filterOptions || [],
       page: page.value,
       size: size.value,
-      total: filterOptions?.length || 0,
+      total: filterOptions.length || 0,
     };
   }
   isLoading.value = true;
