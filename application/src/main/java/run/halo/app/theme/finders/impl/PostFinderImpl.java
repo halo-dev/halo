@@ -155,7 +155,7 @@ public class PostFinderImpl implements PostFinder {
     public Mono<ListResult<ListedPostVo>> list(Map<String, Object> params) {
         var query = Optional.ofNullable(params)
             .map(map -> JsonUtils.mapToObject(map, PostQuery.class))
-            .orElse(new PostQuery());
+            .orElseGet(PostQuery::new);
         if (StringUtils.isNotBlank(query.getCategoryName())) {
             return listChildrenCategories(query.getCategoryName())
                 .map(category -> category.getMetadata().getName())
