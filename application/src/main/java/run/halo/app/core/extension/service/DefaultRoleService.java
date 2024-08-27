@@ -190,15 +190,12 @@ public class DefaultRoleService implements RoleService {
         if (CollectionUtils.isEmpty(roleNames)) {
             return Flux.empty();
         }
-        var listOptionsBuilder = Optional.ofNullable(additionalListOptions)
+        var listOptions = Optional.ofNullable(additionalListOptions)
             .map(ListOptions::builder)
-            .orElseGet(ListOptions::builder);
-        roleNames.stream()
-            .map(roleName -> Role.ROLE_AGGREGATE_LABEL_PREFIX + roleName)
-            .forEach(
-                label -> listOptionsBuilder.labelSelector().eq(label, Boolean.TRUE.toString())
-            );
-        return client.listAll(Role.class, listOptionsBuilder.build(), ExtensionUtil.defaultSort());
+            .orElseGet(ListOptions::builder)
+            .andQuery(QueryFactory.in("labels.aggregateToRoles", roleNames))
+            .build();
+        return client.listAll(Role.class, listOptions, ExtensionUtil.defaultSort());
     }
 
     Predicate<RoleBinding> getRoleBindingPredicate(Subject targetSubject) {

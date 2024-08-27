@@ -3,6 +3,7 @@ package run.halo.app.infra;
 import static org.apache.commons.lang3.BooleanUtils.isTrue;
 import static org.apache.commons.lang3.BooleanUtils.toStringTrueFalse;
 import static org.apache.commons.lang3.ObjectUtils.defaultIfNull;
+import static run.halo.app.core.extension.Role.ROLE_AGGREGATE_LABEL_PREFIX;
 import static run.halo.app.extension.index.IndexAttributeFactory.multiValueAttribute;
 import static run.halo.app.extension.index.IndexAttributeFactory.simpleAttribute;
 
@@ -75,7 +76,23 @@ public class SchemeInitializer implements ApplicationListener<ApplicationContext
     public void onApplicationEvent(@NonNull ApplicationContextInitializedEvent event) {
         var schemeManager = createSchemeManager(event);
 
-        schemeManager.register(Role.class);
+        schemeManager.register(Role.class, is -> {
+            is.add(new IndexSpec()
+                .setName("labels.aggregateToRoles")
+                .setIndexFunc(multiValueAttribute(Role.class,
+                    role -> Optional.ofNullable(role.getMetadata().getLabels())
+                        .map(labels -> labels.keySet()
+                            .stream()
+                            .filter(key -> key.startsWith(ROLE_AGGREGATE_LABEL_PREFIX))
+                            .filter(key -> Boolean.parseBoolean(labels.get(key)))
+                            .map(
+                                key -> StringUtils.removeStart(key, ROLE_AGGREGATE_LABEL_PREFIX)
+                            )
+                            .collect(Collectors.toSet())
+                        )
+                        .orElseGet(Set::of)))
+            );
+        });
 
         // plugin.halo.run
         schemeManager.register(Plugin.class);
