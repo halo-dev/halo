@@ -225,11 +225,8 @@ const clearAllSelectedOptions = () => {
   if (!hasClearable.value) {
     return;
   }
-  if (props.autoSelect && props.options.length > 0) {
-    selectedOptions.value = [props.options[0]];
-  } else {
-    selectedOptions.value = [];
-  }
+
+  selectedOptions.value = [];
   clearInputValue();
 };
 

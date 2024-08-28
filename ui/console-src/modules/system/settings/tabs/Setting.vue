@@ -79,6 +79,7 @@ const handleSaveConfigMap = async () => {
         type="form"
         @submit="handleSaveConfigMap"
       >
+        <FormKit type="userSelect"> </FormKit>
         <FormKitSchema
           :schema="toRaw(formSchema)"
           :data="configMapFormData[group]"

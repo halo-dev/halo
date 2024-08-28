@@ -80,6 +80,8 @@ export interface SelectProps {
 
   /**
    * Whether to automatically select the first option. default is true.
+   *
+   * Only valid when `multiple` is false.
    */
   autoSelect?: boolean;
 }
@@ -521,8 +523,16 @@ const stopSelectedWatch = watch(
       const selectedOption = await fetchSelectedOptions();
       if (selectedOption) {
         selectOptions.value = selectedOption;
-      } else if (selectProps.autoSelect && options.value.length > 0) {
+        return;
+      }
+      if (
+        selectProps.autoSelect &&
+        options.value.length > 0 &&
+        !selectProps.multiple
+      ) {
+        // Automatically select the first option when the selected value is empty.
         selectOptions.value = [options.value[0]];
+        return;
       }
     }
   },

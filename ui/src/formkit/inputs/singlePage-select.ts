@@ -1,7 +1,7 @@
 import { singlePageLabels } from "@/constants/labels";
 import type { FormKitNode, FormKitTypeDefinition } from "@formkit/core";
-import { defaultIcon, select, selects } from "@formkit/inputs";
 import { consoleApiClient } from "@halo-dev/api-client";
+import { select } from "./select";
 
 async function search({ page, size, keyword }) {
   const { data } = await consoleApiClient.content.singlePage.listSinglePages({
@@ -60,5 +60,5 @@ function optionsHandler(node: FormKitNode) {
 export const singlePageSelect: FormKitTypeDefinition = {
   ...select,
   forceTypeProp: "select",
-  features: [optionsHandler, selects, defaultIcon("select", "select")],
+  features: [optionsHandler],
 };
