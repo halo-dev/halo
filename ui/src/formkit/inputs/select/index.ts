@@ -52,6 +52,7 @@ export const select: FormKitTypeDefinition = {
     "allowCreate",
     "remoteOptimize",
     "searchable",
+    "autoSelect",
   ],
 
   library: {

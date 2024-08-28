@@ -59,7 +59,6 @@ function optionsHandler(node: FormKitNode) {
 
 export const singlePageSelect: FormKitTypeDefinition = {
   ...select,
-  props: ["placeholder"],
-  forceTypeProp: "nativeSelect",
+  forceTypeProp: "select",
   features: [optionsHandler, selects, defaultIcon("select", "select")],
 };

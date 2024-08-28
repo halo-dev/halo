@@ -77,6 +77,11 @@ export interface SelectProps {
    * Whether to enable search, default is false.
    */
   searchable?: boolean;
+
+  /**
+   * Whether to automatically select the first option. default is true.
+   */
+  autoSelect?: boolean;
 }
 
 export interface SelectResponse {
@@ -214,6 +219,7 @@ const initSelectProps = () => {
   selectProps.allowCreate = !isFalse(nodeProps.allowCreate);
   selectProps.clearable = !isFalse(nodeProps.clearable);
   selectProps.searchable = !isFalse(nodeProps.searchable);
+  selectProps.autoSelect = !isFalse(nodeProps.autoSelect) || true;
   if (selectProps.remote) {
     if (!nodeProps.remoteOption) {
       throw new Error("remoteOption is required when remote is true.");
@@ -513,7 +519,11 @@ const stopSelectedWatch = watch(
   async () => {
     if (options.value) {
       const selectedOption = await fetchSelectedOptions();
-      selectOptions.value = selectedOption;
+      if (selectedOption) {
+        selectOptions.value = selectedOption;
+      } else if (selectProps.autoSelect && options.value.length > 0) {
+        selectOptions.value = [options.value[0]];
+      }
     }
   },
   {
@@ -669,6 +679,7 @@ const handleNextPage = async () => {
     :remote="isRemote"
     :clearable="selectProps.clearable"
     :searchable="selectProps.searchable"
+    :auto-select="selectProps.autoSelect"
     @update="handleUpdate"
     @search="handleSearch"
     @load-more="handleNextPage"

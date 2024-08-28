@@ -59,7 +59,6 @@ function optionsHandler(node: FormKitNode) {
 
 export const postSelect: FormKitTypeDefinition = {
   ...select,
-  props: ["placeholder"],
   forceTypeProp: "select",
   features: [optionsHandler],
 };

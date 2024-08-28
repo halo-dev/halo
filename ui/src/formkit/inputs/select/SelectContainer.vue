@@ -78,6 +78,10 @@ const props = defineProps({
     type: Boolean,
     default: false,
   },
+  autoSelect: {
+    type: Boolean,
+    default: true,
+  },
 });
 
 const emit = defineEmits<{
@@ -221,7 +225,11 @@ const clearAllSelectedOptions = () => {
   if (!hasClearable.value) {
     return;
   }
-  selectedOptions.value = [];
+  if (props.autoSelect && props.options.length > 0) {
+    selectedOptions.value = [props.options[0]];
+  } else {
+    selectedOptions.value = [];
+  }
   clearInputValue();
 };
 
