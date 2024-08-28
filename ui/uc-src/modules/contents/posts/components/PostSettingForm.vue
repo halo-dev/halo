@@ -135,13 +135,9 @@ const publishTimeHelp = computed(() => {
           />
           <FormKit
             :value="true"
-            :options="[
-              { label: $t('core.common.radio.yes'), value: true },
-              { label: $t('core.common.radio.no'), value: false },
-            ]"
             name="excerptAutoGenerate"
             :label="$t('core.post.settings.fields.auto_generate_excerpt.label')"
-            type="radio"
+            type="checkbox"
           >
           </FormKit>
           <FormKit
@@ -170,21 +166,13 @@ const publishTimeHelp = computed(() => {
         <div class="mt-5 divide-y divide-gray-100 md:col-span-3 md:mt-0">
           <FormKit
             name="allowComment"
-            :options="[
-              { label: $t('core.common.radio.yes'), value: true },
-              { label: $t('core.common.radio.no'), value: false },
-            ]"
             :label="$t('core.post.settings.fields.allow_comment.label')"
-            type="radio"
+            type="checkbox"
           ></FormKit>
           <FormKit
-            :options="[
-              { label: $t('core.common.radio.yes'), value: true },
-              { label: $t('core.common.radio.no'), value: false },
-            ]"
             :label="$t('core.post.settings.fields.pinned.label')"
             name="pinned"
-            type="radio"
+            type="checkbox"
           ></FormKit>
           <FormKit
             :options="[
