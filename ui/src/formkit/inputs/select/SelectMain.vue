@@ -516,6 +516,23 @@ onMounted(async () => {
   }
 });
 
+const getAutoSelectedOption = ():
+  | {
+      label: string;
+      value: string;
+    }
+  | undefined => {
+  if (!options.value || options.value.length === 0) {
+    return;
+  }
+
+  // Find the first option that is not disabled.
+  return options.value.find((option) => {
+    const attrs = option.attrs as Record<string, unknown>;
+    return isFalse(attrs?.disabled as string | boolean | undefined);
+  });
+};
+
 const stopSelectedWatch = watch(
   () => [options.value, props.context.value],
   async () => {
@@ -525,14 +542,17 @@ const stopSelectedWatch = watch(
         selectOptions.value = selectedOption;
         return;
       }
-      if (
+      const isAutoSelect =
         selectProps.autoSelect &&
-        options.value.length > 0 &&
-        !selectProps.multiple
-      ) {
+        !selectProps.multiple &&
+        !selectProps.placeholder;
+
+      if (isAutoSelect) {
         // Automatically select the first option when the selected value is empty.
-        selectOptions.value = [options.value[0]];
-        return;
+        const autoSelectedOption = getAutoSelectedOption();
+        if (autoSelectedOption) {
+          selectOptions.value = [autoSelectedOption];
+        }
       }
     }
   },

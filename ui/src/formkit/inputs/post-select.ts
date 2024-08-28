@@ -53,6 +53,7 @@ function optionsHandler(node: FormKitNode) {
         search,
         findOptionsByValues,
       },
+      searchable: true,
     };
   });
 }
