@@ -3,6 +3,9 @@ package run.halo.app.theme.finders;
 import org.springframework.lang.NonNull;
 import reactor.core.publisher.Mono;
 import run.halo.app.core.extension.content.SinglePage;
+import run.halo.app.extension.ListOptions;
+import run.halo.app.extension.ListResult;
+import run.halo.app.extension.PageRequest;
 import run.halo.app.theme.ReactiveSinglePageContentHandler;
 import run.halo.app.theme.finders.vo.ContentVo;
 import run.halo.app.theme.finders.vo.ListedSinglePageVo;
@@ -52,4 +55,7 @@ public interface SinglePageConversionService {
     Mono<ContentVo> getContent(String pageName);
 
     Mono<ListedSinglePageVo> convertToListedVo(SinglePage singlePage);
+
+    Mono<ListResult<ListedSinglePageVo>> listBy(ListOptions listOptions, PageRequest pageRequest);
+
 }

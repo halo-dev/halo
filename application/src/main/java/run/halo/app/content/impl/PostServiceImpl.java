@@ -38,7 +38,6 @@ import run.halo.app.core.extension.service.UserService;
 import run.halo.app.extension.ListOptions;
 import run.halo.app.extension.ListResult;
 import run.halo.app.extension.MetadataOperator;
-import run.halo.app.extension.PageRequestImpl;
 import run.halo.app.extension.ReactiveExtensionClient;
 import run.halo.app.extension.Ref;
 import run.halo.app.extension.router.selector.FieldSelector;
@@ -73,9 +72,9 @@ public class PostServiceImpl extends AbstractContentService implements PostServi
     @Override
     public Mono<ListResult<ListedPost>> listPost(PostQuery query) {
         return buildListOptions(query)
-            .flatMap(listOptions -> client.listBy(Post.class, listOptions,
-                PageRequestImpl.of(query.getPage(), query.getSize(), query.getSort())
-            ))
+            .flatMap(listOptions ->
+                client.listBy(Post.class, listOptions, query.toPageRequest())
+            )
             .flatMap(listResult -> Flux.fromStream(listResult.get())
                 .map(this::getListedPost)
                 .concatMap(Function.identity())

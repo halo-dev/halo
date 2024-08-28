@@ -403,7 +403,7 @@ public class PostEndpoint implements CustomEndpoint {
     /**
      * Convenient for testing, to avoid waiting too long for post published when testing.
      */
-    public void setMaxAttemptsWaitForPublish(int maxAttempts) {
+    void setMaxAttemptsWaitForPublish(int maxAttempts) {
         this.maxAttemptsWaitForPublish = maxAttempts;
     }
 }
