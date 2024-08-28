@@ -468,13 +468,13 @@ const fetchRemoteMappedOptions = async (
   };
   if (requestConfig.method === "GET") {
     requestConfig.params = {
-      labelSelector: `${selectProps.requestOption?.valueField?.toString()}=in(${unmappedSelectValues.join(
+      fieldSelector: `${selectProps.requestOption?.valueField?.toString()}=(${unmappedSelectValues.join(
         ","
       )})`,
     };
   } else {
     requestConfig.data = {
-      labelSelector: `${selectProps.requestOption?.valueField?.toString()}=in(${unmappedSelectValues.join(
+      fieldSelector: `${selectProps.requestOption?.valueField?.toString()}=(${unmappedSelectValues.join(
         ","
       )})`,
     };
