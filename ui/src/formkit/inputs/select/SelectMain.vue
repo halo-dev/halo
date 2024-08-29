@@ -373,6 +373,9 @@ const fetchSelectedOptions = async (): Promise<
     )
     .filter(Boolean);
   if (unmappedSelectValues.length === 0) {
+    if (!currentOptions || currentOptions.length === 0) {
+      return;
+    }
     return currentOptions?.sort((a, b) =>
       selectedValues.indexOf(a.value) > selectedValues.indexOf(b.value) ? 1 : -1
     );
