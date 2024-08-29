@@ -1,9 +1,13 @@
 name: "Packages preview release"
 on:
   push:
+    paths:
+      - "ui/packages/**"
     branches:
       - main
   pull_request:
+    paths:
+      - "ui/packages/**"
     branches:
       - main
 jobs:
