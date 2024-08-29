@@ -545,19 +545,18 @@ const stopSelectedWatch = watch(
       const isAutoSelect =
         selectProps.autoSelect &&
         !selectProps.multiple &&
-        !selectProps.placeholder;
+        !selectProps.placeholder &&
+        !props.context.node.value;
 
       if (isAutoSelect) {
         // Automatically select the first option when the selected value is empty.
         const autoSelectedOption = getAutoSelectedOption();
         if (autoSelectedOption) {
           selectOptions.value = [autoSelectedOption];
+          handleUpdate(selectOptions.value);
         }
       }
     }
-  },
-  {
-    immediate: true,
   }
 );
 
