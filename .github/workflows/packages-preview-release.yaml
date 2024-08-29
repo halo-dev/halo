@@ -14,6 +14,9 @@ jobs:
       - name: Setup Environment
         uses: ./.github/actions/setup-env
 
+      - name: Install Packages
+        run: pnpm --filter "./ui" install
+
       - name: Build Packages
         run: pnpm --filter "./ui/packages/**" build
 
