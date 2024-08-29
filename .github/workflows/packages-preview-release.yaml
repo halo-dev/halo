@@ -1,0 +1,21 @@
+name: "Packages preview release"
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+jobs:
+  packages-preview-release:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Setup Environment
+        uses: ./.github/actions/setup-env
+
+      - name: Build Packages
+        run: pnpm --filter "./ui/packages/**" build
+
+      - name: Release
+        run: pnpx pkg-pr-new publish --compact --pnpm './ui/packages/*'
