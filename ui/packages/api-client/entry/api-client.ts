@@ -1,4 +1,5 @@
 import axios, { AxiosInstance } from "axios";
+import QueryString from "qs";
 import {
   AnnotationSettingV1alpha1Api,
   AttachmentV1alpha1Api,
@@ -64,12 +65,15 @@ import {
   UserConnectionV1alpha1Api,
   UserV1alpha1Api,
   UserV1alpha1ConsoleApi,
-  UserV1alpha1PublicApi
+  UserV1alpha1PublicApi,
 } from "../src";
 
 const defaultAxiosInstance = axios.create({
-  baseURL: "/",
+  baseURL: "",
   withCredentials: true,
+  paramsSerializer: (params) => {
+    return QueryString.stringify(params, { arrayFormat: "repeat" });
+  },
 });
 
 defaultAxiosInstance.defaults.headers.common["X-Requested-With"] =
@@ -373,11 +377,7 @@ function createUcApiClient(axiosInstance: AxiosInstance) {
         baseURL,
         axiosInstance
       ),
-      device: new DeviceV1alpha1UcApi(
-        undefined,
-        baseURL,
-        axiosInstance
-      ),
+      device: new DeviceV1alpha1UcApi(undefined, baseURL, axiosInstance),
     },
     notification: {
       notification: new NotificationV1alpha1UcApi(
