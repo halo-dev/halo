@@ -85,7 +85,7 @@ public class PostFinderImpl implements PostFinder {
         return Sort.by(Sort.Order.desc("spec.pinned"),
             Sort.Order.desc("spec.priority"),
             Sort.Order.desc("spec.publishTime"),
-            Sort.Order.desc("metadata.name")
+            Sort.Order.asc("metadata.name")
         );
     }
 
@@ -337,11 +337,8 @@ public class PostFinderImpl implements PostFinder {
         }
 
         public PageRequest toPageRequest() {
-            var resolvedSort = Optional.of(SortUtils.resolve(sort))
-                .filter(Sort::isUnsorted)
-                .orElse(defaultSort());
             return PageRequestImpl.of(pageNullSafe(getPage()),
-                sizeNullSafe(getSize()), resolvedSort);
+                sizeNullSafe(getSize()), SortUtils.resolve(sort).and(defaultSort()));
         }
     }
 }

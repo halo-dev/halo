@@ -10,11 +10,13 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.function.Predicate;
+import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.data.domain.Sort;
 import reactor.core.publisher.Mono;
 import run.halo.app.content.PostService;
 import run.halo.app.core.extension.content.Post;
@@ -213,5 +215,22 @@ class PostFinderImplTest {
         postStatus.setExcerpt("hello world!");
         post.setStatus(postStatus);
         return post;
+    }
+
+    @Nested
+    class PostQueryTest {
+
+        @Test
+        void toPageRequestTest() {
+            var query = new PostFinderImpl.PostQuery();
+            var result = query.toPageRequest();
+            assertThat(result.getSort()).isEqualTo(PostFinderImpl.defaultSort());
+
+            query.setSort(List.of("spec.publishTime,desc"));
+            result = query.toPageRequest();
+            assertThat(result.getSort())
+                .isEqualTo(Sort.by(Sort.Order.desc("spec.publishTime"))
+                    .and(PostFinderImpl.defaultSort()));
+        }
     }
 }
