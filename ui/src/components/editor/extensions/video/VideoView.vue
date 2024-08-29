@@ -11,6 +11,7 @@ import RiVideoAddLine from "~icons/ri/video-add-line";
 import { EditorLinkObtain } from "../../components";
 import InlineBlockBox from "../../components/InlineBlockBox.vue";
 import type { AttachmentAttr } from "../../utils/attachment";
+import Video from "./index";
 
 const props = defineProps<{
   editor: Editor;
@@ -57,8 +58,13 @@ const handleSetExternalLink = (attachment: AttachmentAttr) => {
 };
 
 const resetUpload = () => {
-  if (props.getPos()) {
-    props.updateAttributes({
+  const canUpdateAttributes = props.editor.can().updateAttributes(Video.name, {
+    width: undefined,
+    height: undefined,
+    file: undefined,
+  });
+  if (canUpdateAttributes && props.getPos()) {
+    props.editor.commands.updateAttributes(Video.name, {
       width: undefined,
       height: undefined,
       file: undefined,

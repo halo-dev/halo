@@ -93,8 +93,14 @@ const handleUploadError = () => {
 const resetUpload = () => {
   fileBase64.value = undefined;
   uploadProgress.value = undefined;
-  if (props.getPos()) {
-    props.updateAttributes({
+
+  const canUpdateAttributes = props.editor.can().updateAttributes(Image.name, {
+    width: undefined,
+    height: undefined,
+    file: undefined,
+  });
+  if (canUpdateAttributes && props.getPos()) {
+    props.editor.commands.updateAttributes(Image.name, {
       width: undefined,
       height: undefined,
       file: undefined,

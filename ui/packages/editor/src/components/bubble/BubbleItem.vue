@@ -30,11 +30,7 @@ const handleBubbleItemClick = (editor: Editor) => {
   }
   const callback = props.action?.({ editor });
   if (typeof callback === "object") {
-    if (componentRef.value) {
-      componentRef.value = undefined;
-    } else {
-      componentRef.value = callback;
-    }
+    componentRef.value = callback;
   }
 };
 </script>
@@ -46,6 +42,7 @@ const handleBubbleItemClick = (editor: Editor) => {
     :auto-hide="true"
     :shown="!!componentRef"
     :distance="10"
+    @hide="componentRef = undefined"
   >
     <button
       v-if="visible({ editor })"
@@ -67,9 +64,7 @@ const handleBubbleItemClick = (editor: Editor) => {
       <div
         class="relative rounded-md bg-white overflow-hidden drop-shadow w-96 p-1 max-h-72 overflow-y-auto"
       >
-        <KeepAlive>
-          <component :is="componentRef" v-bind="props"></component>
-        </KeepAlive>
+        <component :is="componentRef" v-bind="props"></component>
       </div>
     </template>
   </VDropdown>
