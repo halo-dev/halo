@@ -14,7 +14,6 @@ import static run.halo.app.extension.index.query.QueryFactory.contains;
 import static run.halo.app.extension.index.query.QueryFactory.equal;
 import static run.halo.app.extension.index.query.QueryFactory.in;
 import static run.halo.app.extension.index.query.QueryFactory.or;
-import static run.halo.app.extension.router.QueryParamBuildUtil.sortParameter;
 import static run.halo.app.extension.router.selector.SelectorUtil.labelAndFieldSelectorToListOptions;
 import static run.halo.app.security.authorization.AuthorityUtils.authoritiesToRoles;
 
@@ -24,7 +23,6 @@ import io.github.resilience4j.ratelimiter.RateLimiterRegistry;
 import io.github.resilience4j.ratelimiter.RequestNotPermitted;
 import io.github.resilience4j.reactor.ratelimiter.operator.RateLimiterOperator;
 import io.swagger.v3.oas.annotations.enums.ParameterIn;
-import io.swagger.v3.oas.annotations.media.ArraySchema;
 import io.swagger.v3.oas.annotations.media.Schema;
 import java.security.Principal;
 import java.time.Duration;
@@ -48,7 +46,6 @@ import org.springdoc.core.fn.builders.operation.Builder;
 import org.springdoc.webflux.core.fn.SpringdocRouteBuilder;
 import org.springframework.core.io.buffer.DataBuffer;
 import org.springframework.dao.OptimisticLockingFailureException;
-import org.springframework.data.domain.Sort;
 import org.springframework.http.MediaType;
 import org.springframework.http.codec.multipart.FilePart;
 import org.springframework.http.codec.multipart.Part;
@@ -65,7 +62,6 @@ import org.springframework.web.reactive.function.BodyExtractors;
 import org.springframework.web.reactive.function.server.RouterFunction;
 import org.springframework.web.reactive.function.server.ServerRequest;
 import org.springframework.web.reactive.function.server.ServerResponse;
-import org.springframework.web.server.ServerWebExchange;
 import org.springframework.web.server.ServerWebInputException;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
@@ -84,7 +80,7 @@ import run.halo.app.extension.Metadata;
 import run.halo.app.extension.MetadataUtil;
 import run.halo.app.extension.PageRequestImpl;
 import run.halo.app.extension.ReactiveExtensionClient;
-import run.halo.app.extension.router.IListRequest;
+import run.halo.app.extension.router.SortableRequest;
 import run.halo.app.infra.SystemConfigurableEnvironmentFetcher;
 import run.halo.app.infra.SystemSetting;
 import run.halo.app.infra.ValidationUtils;
@@ -687,13 +683,10 @@ public class UserEndpoint implements CustomEndpoint {
 
     }
 
-    public static class ListRequest extends IListRequest.QueryListRequest {
-
-        private final ServerWebExchange exchange;
+    public static class ListRequest extends SortableRequest {
 
         public ListRequest(ServerRequest request) {
-            super(request.queryParams());
-            this.exchange = request.exchange();
+            super(request.exchange());
         }
 
         @Schema(name = "keyword")
@@ -704,19 +697,6 @@ public class UserEndpoint implements CustomEndpoint {
         @Schema(name = "role")
         public String getRole() {
             return queryParams.getFirst("role");
-        }
-
-        @ArraySchema(uniqueItems = true,
-            arraySchema = @Schema(name = "sort",
-                description = "Sort property and direction of the list result. Supported fields: "
-                    + "creationTimestamp"),
-            schema = @Schema(description = "like field,asc or field,desc",
-                implementation = String.class,
-                example = "creationTimestamp,desc"))
-        public Sort getSort() {
-            var sort = SortResolver.defaultInstance.resolve(exchange);
-            sort = sort.and(Sort.by("metadata.creationTimestamp", "metadata.name").descending());
-            return sort;
         }
 
         /**
@@ -743,9 +723,8 @@ public class UserEndpoint implements CustomEndpoint {
         }
 
         public static void buildParameters(Builder builder) {
-            IListRequest.buildParameters(builder);
-            builder.parameter(sortParameter())
-                .parameter(parameterBuilder()
+            SortableRequest.buildParameters(builder);
+            builder.parameter(parameterBuilder()
                     .in(ParameterIn.QUERY)
                     .name("keyword")
                     .description("Keyword to search")
@@ -770,8 +749,7 @@ public class UserEndpoint implements CustomEndpoint {
             .map(UserEndpoint.ListRequest::new)
             .flatMap(listRequest -> client.listBy(User.class, listRequest.toListOptions(),
                 PageRequestImpl.of(
-                    listRequest.getPage(), listRequest.getSize(),
-                    listRequest.getSort()
+                    listRequest.getPage(), listRequest.getSize(), listRequest.getSort()
                 )
             ))
             .flatMap(this::toListedUser)

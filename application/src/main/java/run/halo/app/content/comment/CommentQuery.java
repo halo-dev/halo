@@ -1,26 +1,23 @@
 package run.halo.app.content.comment;
 
 import static org.springdoc.core.fn.builders.parameter.Builder.parameterBuilder;
-import static run.halo.app.extension.index.query.QueryFactory.and;
+import static org.springframework.data.domain.Sort.Order.desc;
 import static run.halo.app.extension.index.query.QueryFactory.contains;
 import static run.halo.app.extension.index.query.QueryFactory.equal;
-import static run.halo.app.extension.router.selector.SelectorUtil.labelAndFieldSelectorToListOptions;
 
 import io.swagger.v3.oas.annotations.enums.ParameterIn;
+import java.util.Optional;
 import org.apache.commons.lang3.StringUtils;
 import org.springdoc.core.fn.builders.operation.Builder;
 import org.springframework.data.domain.Sort;
+import org.springframework.lang.Nullable;
 import org.springframework.web.reactive.function.server.ServerRequest;
-import org.springframework.web.server.ServerWebExchange;
 import run.halo.app.core.extension.User;
 import run.halo.app.core.extension.content.Comment;
-import run.halo.app.core.extension.endpoint.SortResolver;
 import run.halo.app.extension.ListOptions;
-import run.halo.app.extension.PageRequest;
-import run.halo.app.extension.PageRequestImpl;
 import run.halo.app.extension.router.IListRequest;
 import run.halo.app.extension.router.QueryParamBuildUtil;
-import run.halo.app.extension.router.selector.FieldSelector;
+import run.halo.app.extension.router.SortableRequest;
 
 /**
  * Query criteria for comment list.
@@ -28,64 +25,56 @@ import run.halo.app.extension.router.selector.FieldSelector;
  * @author guqing
  * @since 2.0.0
  */
-public class CommentQuery extends IListRequest.QueryListRequest {
-
-    private final ServerWebExchange exchange;
+public class CommentQuery extends SortableRequest {
 
     public CommentQuery(ServerRequest request) {
-        super(request.queryParams());
-        this.exchange = request.exchange();
+        super(request.exchange());
     }
 
+    @Nullable
     public String getKeyword() {
-        String keyword = queryParams.getFirst("keyword");
-        return StringUtils.isBlank(keyword) ? null : keyword;
+        return queryParams.getFirst("keyword");
     }
 
+    @Nullable
     public String getOwnerKind() {
-        String ownerKind = queryParams.getFirst("ownerKind");
-        return StringUtils.isBlank(ownerKind) ? null : ownerKind;
+        return queryParams.getFirst("ownerKind");
     }
 
+    @Nullable
     public String getOwnerName() {
-        String ownerName = queryParams.getFirst("ownerName");
-        return StringUtils.isBlank(ownerName) ? null : ownerName;
+        return queryParams.getFirst("ownerName");
     }
 
+    @Override
     public Sort getSort() {
-        var sort = SortResolver.defaultInstance.resolve(exchange);
-        return sort.and(Sort.by("status.lastReplyTime",
-            "spec.creationTime",
-            "metadata.name"
-        ).descending());
-    }
-
-    public PageRequest toPageRequest() {
-        return PageRequestImpl.of(getPage(), getSize(), getSort());
+        // set default sort by last reply time
+        return super.getSort().and(Sort.by(desc("status.lastReplyTime")));
     }
 
     /**
      * Convert to list options.
      */
+    @Override
     public ListOptions toListOptions() {
-        var listOptions =
-            labelAndFieldSelectorToListOptions(getLabelSelector(), getFieldSelector());
-        var fieldQuery = listOptions.getFieldSelector().query();
+        var builder = ListOptions.builder(super.toListOptions());
 
-        String keyword = getKeyword();
-        if (StringUtils.isNotBlank(keyword)) {
-            fieldQuery = and(fieldQuery, contains("spec.raw", keyword));
-        }
+        Optional.ofNullable(getKeyword())
+            .filter(StringUtils::isNotBlank)
+            .ifPresent(keyword -> builder.andQuery(contains("spec.raw", keyword)));
 
-        String ownerName = getOwnerName();
-        if (StringUtils.isNotBlank(ownerName)) {
-            String ownerKind = StringUtils.defaultIfBlank(getOwnerKind(), User.KIND);
-            fieldQuery = and(fieldQuery,
-                equal("spec.owner", Comment.CommentOwner.ownerIdentity(ownerKind, ownerName)));
-        }
+        Optional.ofNullable(getOwnerName())
+            .filter(StringUtils::isNotBlank)
+            .ifPresent(ownerName -> {
+                var ownerKind = Optional.ofNullable(getOwnerKind())
+                    .filter(StringUtils::isNotBlank)
+                    .orElse(User.KIND);
+                builder.andQuery(
+                    equal("spec.owner", Comment.CommentOwner.ownerIdentity(ownerKind, ownerName))
+                );
+            });
 
-        listOptions.setFieldSelector(FieldSelector.of(fieldQuery));
-        return listOptions;
+        return builder.build();
     }
 
     public static void buildParameters(Builder builder) {
