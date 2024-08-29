@@ -54,8 +54,7 @@ public abstract class AbstractCommentService {
         if (Comment.CommentOwner.KIND_EMAIL.equals(owner.getKind())) {
             return Mono.just(OwnerInfo.from(owner));
         }
-        throw new IllegalStateException(
-            "Unsupported owner kind: " + owner.getKind());
+        return Mono.error(new IllegalStateException("Unsupported owner kind: " + owner.getKind()));
     }
 
     protected Mono<CommentStats> fetchCommentStats(String commentName) {
@@ -73,6 +72,6 @@ public abstract class AbstractCommentService {
                 .upvote(counter.getUpvote())
                 .build()
             )
-            .defaultIfEmpty(CommentStats.empty());
+            .switchIfEmpty(Mono.fromSupplier(CommentStats::empty));
     }
 }
