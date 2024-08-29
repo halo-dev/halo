@@ -2,7 +2,6 @@ package run.halo.app.core.extension.endpoint;
 
 import static io.swagger.v3.oas.annotations.media.Schema.RequiredMode.NOT_REQUIRED;
 import static io.swagger.v3.oas.annotations.media.Schema.RequiredMode.REQUIRED;
-import static java.util.Comparator.comparing;
 import static org.springdoc.core.fn.builders.apiresponse.Builder.responseBuilder;
 import static org.springdoc.core.fn.builders.content.Builder.contentBuilder;
 import static org.springdoc.core.fn.builders.parameter.Builder.parameterBuilder;
@@ -12,12 +11,13 @@ import static org.springframework.boot.convert.ApplicationConversionService.getS
 import static org.springframework.core.io.buffer.DataBufferUtils.write;
 import static org.springframework.web.reactive.function.server.RequestPredicates.contentType;
 import static run.halo.app.extension.ListResult.generateGenericClass;
+import static run.halo.app.extension.index.query.QueryFactory.contains;
+import static run.halo.app.extension.index.query.QueryFactory.equal;
+import static run.halo.app.extension.index.query.QueryFactory.or;
 import static run.halo.app.extension.router.QueryParamBuildUtil.sortParameter;
-import static run.halo.app.extension.router.selector.SelectorUtil.labelAndFieldSelectorToPredicate;
 import static run.halo.app.infra.utils.FileUtils.deleteFileSilently;
 
 import io.swagger.v3.oas.annotations.enums.ParameterIn;
-import io.swagger.v3.oas.annotations.media.ArraySchema;
 import io.swagger.v3.oas.annotations.media.Schema;
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -27,13 +27,9 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.time.Duration;
 import java.time.Instant;
-import java.util.ArrayList;
-import java.util.Comparator;
-import java.util.List;
 import java.util.Map;
-import java.util.Objects;
+import java.util.Optional;
 import java.util.function.Function;
-import java.util.function.Predicate;
 import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
 import org.reactivestreams.Publisher;
@@ -57,7 +53,6 @@ import org.springframework.web.reactive.function.server.RouterFunction;
 import org.springframework.web.reactive.function.server.ServerRequest;
 import org.springframework.web.reactive.function.server.ServerResponse;
 import org.springframework.web.reactive.resource.NoResourceFoundException;
-import org.springframework.web.server.ServerWebExchange;
 import org.springframework.web.server.ServerWebInputException;
 import reactor.core.publisher.Mono;
 import reactor.core.scheduler.Scheduler;
@@ -67,11 +62,11 @@ import run.halo.app.core.extension.Plugin;
 import run.halo.app.core.extension.Setting;
 import run.halo.app.core.extension.service.PluginService;
 import run.halo.app.core.extension.theme.SettingUtils;
-import run.halo.app.extension.Comparators;
 import run.halo.app.extension.ConfigMap;
+import run.halo.app.extension.ListOptions;
 import run.halo.app.extension.ReactiveExtensionClient;
 import run.halo.app.extension.router.IListRequest;
-import run.halo.app.extension.router.IListRequest.QueryListRequest;
+import run.halo.app.extension.router.SortableRequest;
 import run.halo.app.infra.ReactiveUrlDataBufferFetcher;
 import run.halo.app.plugin.PluginNotFoundException;
 
@@ -548,13 +543,10 @@ public class PluginEndpoint implements CustomEndpoint, InitializingBean {
             .flatMap(resourceClosure);
     }
 
-    public static class ListRequest extends QueryListRequest {
-
-        private final ServerWebExchange exchange;
+    public static class ListRequest extends SortableRequest {
 
         public ListRequest(ServerRequest request) {
-            super(request.queryParams());
-            this.exchange = request.exchange();
+            super(request.exchange());
         }
 
         @Schema(name = "keyword", description = "Keyword of plugin name or description")
@@ -568,69 +560,35 @@ public class PluginEndpoint implements CustomEndpoint, InitializingBean {
             return enabled == null ? null : getSharedInstance().convert(enabled, Boolean.class);
         }
 
-        @ArraySchema(uniqueItems = true,
-            arraySchema = @Schema(name = "sort",
-                description = "Sort property and direction of the list result. Supported fields: "
-                    + "creationTimestamp"),
-            schema = @Schema(description = "like field,asc or field,desc",
-                implementation = String.class,
-                example = "creationTimestamp,desc"))
+        @Override
         public Sort getSort() {
-            return SortResolver.defaultInstance.resolve(exchange);
+            var orders = super.getSort().stream()
+                .map(order -> {
+                    if ("creationTimestamp".equals(order.getProperty())) {
+                        return order.withProperty("metadata.creationTimestamp");
+                    }
+                    return order;
+                })
+                .toList();
+            return Sort.by(orders);
         }
 
-        public Predicate<Plugin> toPredicate() {
-            Predicate<Plugin> displayNamePredicate = plugin -> {
-                var keyword = getKeyword();
-                if (!StringUtils.hasText(keyword)) {
-                    return true;
-                }
-                var displayName = plugin.getSpec().getDisplayName();
-                if (!StringUtils.hasText(displayName)) {
-                    return false;
-                }
-                return displayName.toLowerCase().contains(keyword.trim().toLowerCase());
-            };
-            Predicate<Plugin> descriptionPredicate = plugin -> {
-                var keyword = getKeyword();
-                if (!StringUtils.hasText(keyword)) {
-                    return true;
-                }
-                var description = plugin.getSpec().getDescription();
-                if (!StringUtils.hasText(description)) {
-                    return false;
-                }
-                return description.toLowerCase().contains(keyword.trim().toLowerCase());
-            };
-            Predicate<Plugin> enablePredicate = plugin -> {
-                var enabled = getEnabled();
-                if (enabled == null) {
-                    return true;
-                }
-                return Objects.equals(enabled, plugin.getSpec().getEnabled());
-            };
-            return displayNamePredicate.or(descriptionPredicate)
-                .and(enablePredicate)
-                .and(labelAndFieldSelectorToPredicate(getLabelSelector(), getFieldSelector()));
-        }
+        @Override
+        public ListOptions toListOptions() {
+            var builder = ListOptions.builder(super.toListOptions());
 
-        public Comparator<Plugin> toComparator() {
-            var sort = getSort();
-            var ctOrder = sort.getOrderFor("creationTimestamp");
-            List<Comparator<Plugin>> comparators = new ArrayList<>();
-            if (ctOrder != null) {
-                Comparator<Plugin> comparator =
-                    comparing(plugin -> plugin.getMetadata().getCreationTimestamp());
-                if (ctOrder.isDescending()) {
-                    comparator = comparator.reversed();
-                }
-                comparators.add(comparator);
-            }
-            comparators.add(Comparators.compareCreationTimestamp(false));
-            comparators.add(Comparators.compareName(true));
-            return comparators.stream()
-                .reduce(Comparator::thenComparing)
-                .orElse(null);
+            Optional.ofNullable(queryParams.getFirst("keyword"))
+                .filter(StringUtils::hasText)
+                .ifPresent(keyword -> builder.andQuery(or(
+                    contains("spec.displayName", keyword),
+                    contains("spec.description", keyword)
+                )));
+
+            Optional.ofNullable(queryParams.getFirst("enabled"))
+                .map(Boolean::parseBoolean)
+                .ifPresent(enabled -> builder.andQuery(equal("spec.enabled", enabled.toString())));
+
+            return builder.build();
         }
 
         public static void buildParameters(Builder builder) {
@@ -654,15 +612,11 @@ public class PluginEndpoint implements CustomEndpoint, InitializingBean {
     Mono<ServerResponse> list(ServerRequest request) {
         return Mono.just(request)
             .map(ListRequest::new)
-            .flatMap(listRequest -> {
-                var predicate = listRequest.toPredicate();
-                var comparator = listRequest.toComparator();
-                return client.list(Plugin.class,
-                    predicate,
-                    comparator,
-                    listRequest.getPage(),
-                    listRequest.getSize());
-            })
+            .flatMap(listRequest -> client.listBy(
+                Plugin.class,
+                listRequest.toListOptions(),
+                listRequest.toPageRequest()
+            ))
             .flatMap(listResult -> ServerResponse.ok().bodyValue(listResult));
     }
 

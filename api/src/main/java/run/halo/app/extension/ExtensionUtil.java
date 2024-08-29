@@ -1,5 +1,8 @@
 package run.halo.app.extension;
 
+import static org.springframework.data.domain.Sort.Order.asc;
+import static org.springframework.data.domain.Sort.Order.desc;
+
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
@@ -53,8 +56,8 @@ public enum ExtensionUtil {
      */
     public static Sort defaultSort() {
         return Sort.by(
-            Sort.Order.desc("metadata.creationTimestamp"),
-            Sort.Order.asc("metadata.name")
+            desc("metadata.creationTimestamp"),
+            asc("metadata.name")
         );
     }
 
