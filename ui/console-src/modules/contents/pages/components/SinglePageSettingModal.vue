@@ -328,15 +328,11 @@ const { handleGenerateSlug } = useSlugify(
             </FormKit>
             <FormKit
               v-model="formState.spec.excerpt.autoGenerate"
-              :options="[
-                { label: $t('core.common.radio.yes'), value: true },
-                { label: $t('core.common.radio.no'), value: false },
-              ]"
               name="autoGenerate"
               :label="
                 $t('core.page.settings.fields.auto_generate_excerpt.label')
               "
-              type="radio"
+              type="checkbox"
             >
             </FormKit>
             <FormKit
@@ -366,23 +362,15 @@ const { handleGenerateSlug } = useSlugify(
           <div class="mt-5 divide-y divide-gray-100 md:col-span-3 md:mt-0">
             <FormKit
               v-model="formState.spec.allowComment"
-              :options="[
-                { label: $t('core.common.radio.yes'), value: true },
-                { label: $t('core.common.radio.no'), value: false },
-              ]"
               name="allowComment"
               :label="$t('core.page.settings.fields.allow_comment.label')"
-              type="radio"
+              type="checkbox"
             ></FormKit>
             <FormKit
               v-model="formState.spec.pinned"
-              :options="[
-                { label: $t('core.common.radio.yes'), value: true },
-                { label: $t('core.common.radio.no'), value: false },
-              ]"
               :label="$t('core.page.settings.fields.pinned.label')"
               name="pinned"
-              type="radio"
+              type="checkbox"
             ></FormKit>
             <FormKit
               v-model="formState.spec.visible"
