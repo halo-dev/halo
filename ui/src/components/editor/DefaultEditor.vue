@@ -254,6 +254,7 @@ const presetExtensions = [
   ExtensionColor,
   ExtensionIndent,
   Extension.create({
+    name: "custom-heading-extension",
     addGlobalAttributes() {
       return [
         {
@@ -268,6 +269,7 @@ const presetExtensions = [
     },
   }),
   Extension.create({
+    name: "custom-attachment-extension",
     addOptions() {
       // If user has no permission to view attachments, return
       if (!currentUserHasPermission(["system:attachments:view"])) {
@@ -342,6 +344,7 @@ const presetExtensions = [
   ExtensionNodeSelected,
   ExtensionTrailingNode,
   Extension.create({
+    name: "get-heading-id-extension",
     addProseMirrorPlugins() {
       return [
         new Plugin({
