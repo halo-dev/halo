@@ -490,7 +490,7 @@ public class SchemeInitializer implements ApplicationListener<ApplicationContext
             );
             is.add(new IndexSpec()
                 .setName("spec.slug")
-                .setUnique(true)
+                .setUnique(false)
                 .setIndexFunc(
                     simpleAttribute(SinglePage.class, page -> Optional.ofNullable(page.getSpec())
                         .map(SinglePage.SinglePageSpec::getSlug)
