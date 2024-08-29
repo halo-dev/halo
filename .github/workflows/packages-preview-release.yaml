@@ -18,7 +18,7 @@ jobs:
         run: ./gradlew pnpmInstall
 
       - name: Build Packages
-        run: pnpm --filter "./ui/packages/**" build
+        run: cd ui && pnpm build:packages
 
       - name: Release
-        run: pnpx pkg-pr-new publish --compact --pnpm './ui/packages/*'
+        run: cd ui && pnpx pkg-pr-new publish --compact --pnpm './packages/*'
