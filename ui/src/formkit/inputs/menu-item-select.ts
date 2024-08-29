@@ -21,7 +21,7 @@ function optionsHandler(node: FormKitNode) {
 
 export const menuItemSelect: FormKitTypeDefinition = {
   ...select,
-  props: ["placeholder", "menuItems"],
+  props: ["menuItems", ...(select.props as string[])],
   forceTypeProp: "select",
   features: [optionsHandler],
 };

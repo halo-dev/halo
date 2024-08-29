@@ -71,6 +71,7 @@
     10. `maxCount`：多选时最大可选数量，默认为 `Infinity`。仅在多选时有效。
     11. `sortable`：是否支持拖动排序，默认为 `false`。仅在多选时有效。
     12. `searchable`：是否支持搜索内容，默认为 `false`。
+    13. `autoSelect`：当 value 不存在时，是否自动选择第一个选项，默认为 `true`。仅在单选时有效。
 
 在 Vue 单组件中使用：
 
@@ -120,16 +121,16 @@ select 是一个选择器类型的输入组件，使用者可以从一批待选�
     multiple
     searchable
     :options="[
-      { label: "China", value: "China" },
-      { label: "USA", value: "USA" },
-      { label: "Japan", value: "Japan" },
-      { label: "Korea", value: "Korea" },
-      { label: "France", value: "France" },
-      { label: "Italy", value: "Italy" },
-      { label: "Germany", value: "Germany" },
-      { label: "UK", value: "UK" },
-      { label: "Canada", value: "Canada" },
-      { label: "Australia", value: "Australia" },
+      { label: 'China', value: 'China' },
+      { label: 'USA', value: 'USA' },
+      { label: 'Japan', value: 'Japan' },
+      { label: 'Korea', value: 'Korea' },
+      { label: 'France', value: 'France' },
+      { label: 'Italy', value: 'Italy' },
+      { label: 'Germany', value: 'Germany' },
+      { label: 'UK', value: 'UK' },
+      { label: 'Canada', value: 'Canada' },
+      { label: 'Australia', value: 'Australia' },
     ]"
     help="Don’t worry, you can’t get this one wrong."
   />
@@ -196,6 +197,8 @@ const handleSelectPostAuthorRemote = {
   clearable: true
   placeholder: Select a country
   options:
+    - label: China
+      value: cn
     - label: France
       value: fr
     - label: Germany
@@ -231,7 +234,7 @@ const handleSelectPostAuthorRemote = {
 ```
 
 > [!NOTE]
-> 当远程数据具有分页时，可能会出现默认选项不在第一页的情况，此时 Select 组件将会发送另一个查询请求，以获取默认选项的数据。此接口会携带如下参数 `labelSelector: ${requestOption.valueField}=in(value1,value2,value3)`。
+> 当远程数据具有分页时，可能会出现默认选项不在第一页的情况，此时 Select 组件将会发送另一个查询请求，以获取默认选项的数据。此接口会携带如下参数 `fieldSelector: ${requestOption.valueField}=(value1,value2,value3)`。
 
 > 其中，value1, value2, value3 为默认选项的值。返回值与查询一致，通过 `requestOption` 解析。
 

@@ -1,7 +1,7 @@
 import { singlePageLabels } from "@/constants/labels";
 import type { FormKitNode, FormKitTypeDefinition } from "@formkit/core";
-import { defaultIcon, select, selects } from "@formkit/inputs";
 import { consoleApiClient } from "@halo-dev/api-client";
+import { select } from "./select";
 
 async function search({ page, size, keyword }) {
   const { data } = await consoleApiClient.content.singlePage.listSinglePages({
@@ -53,13 +53,13 @@ function optionsHandler(node: FormKitNode) {
         search,
         findOptionsByValues,
       },
+      searchable: true,
     };
   });
 }
 
 export const singlePageSelect: FormKitTypeDefinition = {
   ...select,
-  props: ["placeholder"],
-  forceTypeProp: "nativeSelect",
-  features: [optionsHandler, selects, defaultIcon("select", "select")],
+  forceTypeProp: "select",
+  features: [optionsHandler],
 };

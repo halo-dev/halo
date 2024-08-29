@@ -19,7 +19,6 @@ function optionsHandler(node: FormKitNode) {
 
 export const attachmentPolicySelect: FormKitTypeDefinition = {
   ...select,
-  props: ["placeholder"],
   forceTypeProp: "select",
   features: [optionsHandler],
 };

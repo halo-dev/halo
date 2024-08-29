@@ -77,6 +77,13 @@ export interface SelectProps {
    * Whether to enable search, default is false.
    */
   searchable?: boolean;
+
+  /**
+   * Whether to automatically select the first option. default is true.
+   *
+   * Only valid when `multiple` is false.
+   */
+  autoSelect?: boolean;
 }
 
 export interface SelectResponse {
@@ -214,6 +221,7 @@ const initSelectProps = () => {
   selectProps.allowCreate = !isFalse(nodeProps.allowCreate);
   selectProps.clearable = !isFalse(nodeProps.clearable);
   selectProps.searchable = !isFalse(nodeProps.searchable);
+  selectProps.autoSelect = !isFalse(nodeProps.autoSelect) || true;
   if (selectProps.remote) {
     if (!nodeProps.remoteOption) {
       throw new Error("remoteOption is required when remote is true.");
@@ -341,37 +349,42 @@ const fetchSelectedOptions = async (): Promise<
 > => {
   const node = props.context.node;
   const value = node.value;
-  if (!value) {
-    return undefined;
-  }
 
-  const selectedValues: string[] = [];
+  const selectedValues: Array<unknown> = [];
   if (Array.isArray(value)) {
     selectedValues.push(...value);
   } else if (
     typeof value === "string" ||
     typeof value === "number" ||
-    typeof value === "boolean"
+    typeof value === "boolean" ||
+    value === void 0
   ) {
-    selectedValues.push(value.toString());
+    selectedValues.push(value);
   }
 
   const currentOptions = options.value?.filter((option) =>
-    selectedValues.includes(option.value.toString())
+    selectedValues.includes(option.value)
   );
 
   // Get options that are not yet mapped.
-  const unmappedSelectValues = selectedValues.filter(
-    (value) => !currentOptions?.find((option) => option.value === value)
-  );
+  const unmappedSelectValues = selectedValues
+    .filter(
+      (value) => !currentOptions?.find((option) => option.value === value)
+    )
+    .filter(Boolean);
   if (unmappedSelectValues.length === 0) {
+    if (!currentOptions || currentOptions.length === 0) {
+      return;
+    }
     return currentOptions?.sort((a, b) =>
       selectedValues.indexOf(a.value) > selectedValues.indexOf(b.value) ? 1 : -1
     );
   }
 
   // Map the unresolved options to label and value format.
-  const mappedSelectOptions = await mapUnresolvedOptions(unmappedSelectValues);
+  const mappedSelectOptions = await mapUnresolvedOptions(
+    unmappedSelectValues.map(String)
+  );
   // Merge currentOptions and mappedSelectOptions, then sort them according to selectValues order.
   return [...(currentOptions || []), ...mappedSelectOptions].sort((a, b) =>
     selectedValues.indexOf(a.value) > selectedValues.indexOf(b.value) ? 1 : -1
@@ -508,16 +521,47 @@ onMounted(async () => {
   }
 });
 
+const getAutoSelectedOption = ():
+  | {
+      label: string;
+      value: string;
+    }
+  | undefined => {
+  if (!options.value || options.value.length === 0) {
+    return;
+  }
+
+  // Find the first option that is not disabled.
+  return options.value.find((option) => {
+    const attrs = option.attrs as Record<string, unknown>;
+    return isFalse(attrs?.disabled as string | boolean | undefined);
+  });
+};
+
 const stopSelectedWatch = watch(
   () => [options.value, props.context.value],
   async () => {
     if (options.value) {
       const selectedOption = await fetchSelectedOptions();
-      selectOptions.value = selectedOption;
+      if (selectedOption) {
+        selectOptions.value = selectedOption;
+        return;
+      }
+      const isAutoSelect =
+        selectProps.autoSelect &&
+        !selectProps.multiple &&
+        !selectProps.placeholder &&
+        !props.context.node.value;
+
+      if (isAutoSelect) {
+        // Automatically select the first option when the selected value is empty.
+        const autoSelectedOption = getAutoSelectedOption();
+        if (autoSelectedOption) {
+          selectOptions.value = [autoSelectedOption];
+          handleUpdate(selectOptions.value);
+        }
+      }
     }
-  },
-  {
-    immediate: true,
   }
 );
 
@@ -669,6 +713,7 @@ const handleNextPage = async () => {
     :remote="isRemote"
     :clearable="selectProps.clearable"
     :searchable="selectProps.searchable"
+    :auto-select="selectProps.autoSelect"
     @update="handleUpdate"
     @search="handleSearch"
     @load-more="handleNextPage"

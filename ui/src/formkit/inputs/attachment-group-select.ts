@@ -22,7 +22,6 @@ function optionsHandler(node: FormKitNode) {
 
 export const attachmentGroupSelect: FormKitTypeDefinition = {
   ...select,
-  props: ["placeholder"],
   forceTypeProp: "select",
   features: [optionsHandler],
 };

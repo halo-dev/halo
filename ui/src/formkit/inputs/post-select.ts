@@ -53,13 +53,13 @@ function optionsHandler(node: FormKitNode) {
         search,
         findOptionsByValues,
       },
+      searchable: true,
     };
   });
 }
 
 export const postSelect: FormKitTypeDefinition = {
   ...select,
-  props: ["placeholder"],
   forceTypeProp: "select",
   features: [optionsHandler],
 };
