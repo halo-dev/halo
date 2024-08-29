@@ -14,8 +14,8 @@ jobs:
       - name: Setup Environment
         uses: ./.github/actions/setup-env
 
-      - name: Install Packages
-        run: pnpm --filter "./ui" install
+      - name: Install Dependencies
+        run: ./gradlew pnpmInstall
 
       - name: Build Packages
         run: pnpm --filter "./ui/packages/**" build
