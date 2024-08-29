@@ -3,29 +3,22 @@ package run.halo.app.content.comment;
 import static run.halo.app.extension.index.query.QueryFactory.and;
 import static run.halo.app.extension.index.query.QueryFactory.equal;
 import static run.halo.app.extension.index.query.QueryFactory.isNull;
-import static run.halo.app.security.authorization.AuthorityUtils.COMMENT_MANAGEMENT_ROLE_NAME;
-import static run.halo.app.security.authorization.AuthorityUtils.authoritiesToRoles;
 
 import java.time.Duration;
 import java.time.Instant;
 import java.util.ArrayList;
-import java.util.Set;
 import java.util.function.Function;
 import java.util.function.UnaryOperator;
-import lombok.RequiredArgsConstructor;
 import org.apache.commons.lang3.BooleanUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.reactivestreams.Publisher;
 import org.springframework.dao.OptimisticLockingFailureException;
 import org.springframework.data.domain.Sort;
-import org.springframework.security.core.context.ReactiveSecurityContextHolder;
-import org.springframework.security.core.context.SecurityContext;
 import org.springframework.stereotype.Service;
 import org.springframework.util.Assert;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import reactor.util.retry.Retry;
-import run.halo.app.core.extension.User;
 import run.halo.app.core.extension.content.Comment;
 import run.halo.app.core.extension.content.Reply;
 import run.halo.app.core.extension.service.RoleService;
@@ -37,7 +30,6 @@ import run.halo.app.extension.PageRequestImpl;
 import run.halo.app.extension.ReactiveExtensionClient;
 import run.halo.app.extension.router.selector.FieldSelector;
 import run.halo.app.metrics.CounterService;
-import run.halo.app.metrics.MeterUtils;
 
 /**
  * A default implementation of {@link ReplyService}.
@@ -46,13 +38,12 @@ import run.halo.app.metrics.MeterUtils;
  * @since 2.0.0
  */
 @Service
-@RequiredArgsConstructor
-public class ReplyServiceImpl implements ReplyService {
+public class ReplyServiceImpl extends AbstractCommentService implements ReplyService {
 
-    private final ReactiveExtensionClient client;
-    private final UserService userService;
-    private final RoleService roleService;
-    private final CounterService counterService;
+    public ReplyServiceImpl(RoleService roleService, ReactiveExtensionClient client,
+        UserService userService, CounterService counterService) {
+        super(roleService, client, userService, counterService);
+    }
 
     @Override
     public Mono<Reply> create(String commentName, Reply reply) {
@@ -74,6 +65,12 @@ public class ReplyServiceImpl implements ReplyService {
     }
 
     private Mono<Comment> approveComment(Comment comment) {
+        return hasCommentManagePermission()
+            .filter(Boolean::booleanValue)
+            .flatMap(hasPermission -> doApproveComment(comment));
+    }
+
+    private Mono<Comment> doApproveComment(Comment comment) {
         UnaryOperator<Comment> updateFunc = commentToUpdate -> {
             commentToUpdate.getSpec().setApproved(true);
             commentToUpdate.getSpec().setApprovedTime(Instant.now());
@@ -85,6 +82,12 @@ public class ReplyServiceImpl implements ReplyService {
     }
 
     private Mono<Void> approveReply(String replyName) {
+        return hasCommentManagePermission()
+            .filter(Boolean::booleanValue)
+            .flatMap(hasPermission -> doApproveReply(replyName));
+    }
+
+    private Mono<Void> doApproveReply(String replyName) {
         return Mono.defer(() -> client.fetch(Reply.class, replyName)
                 .flatMap(reply -> {
                     reply.getSpec().setApproved(true);
@@ -144,15 +147,6 @@ public class ReplyServiceImpl implements ReplyService {
         return Mono.when(steps).thenReturn(reply);
     }
 
-    Mono<Boolean> hasCommentManagePermission() {
-        return ReactiveSecurityContextHolder.getContext()
-            .map(SecurityContext::getAuthentication)
-            .flatMap(authentication -> {
-                var roles = authoritiesToRoles(authentication.getAuthorities());
-                return roleService.contains(roles, Set.of(COMMENT_MANAGEMENT_ROLE_NAME));
-            });
-    }
-
     @Override
     public Mono<ListResult<ListedReply>> list(ReplyQuery query) {
         return client.listBy(Reply.class, query.toListOptions(), query.toPageRequest())
@@ -209,52 +203,14 @@ public class ReplyServiceImpl implements ReplyService {
     private Mono<ListedReply> toListedReply(Reply reply) {
         ListedReply.ListedReplyBuilder builder = ListedReply.builder()
             .reply(reply);
-        return getOwnerInfo(reply)
+        return getOwnerInfo(reply.getSpec().getOwner())
             .map(ownerInfo -> {
                 builder.owner(ownerInfo);
                 return builder;
             })
             .map(ListedReply.ListedReplyBuilder::build)
-            .flatMap(listedReply -> fetchStats(reply)
+            .flatMap(listedReply -> fetchReplyStats(reply.getMetadata().getName())
                 .doOnNext(listedReply::setStats)
                 .thenReturn(listedReply));
-    }
-
-    Mono<CommentStats> fetchStats(Reply reply) {
-        Assert.notNull(reply, "The reply must not be null.");
-        String name = reply.getMetadata().getName();
-        return counterService.getByName(MeterUtils.nameOf(Reply.class, name))
-            .map(counter -> CommentStats.builder()
-                .upvote(counter.getUpvote())
-                .build()
-            )
-            .defaultIfEmpty(CommentStats.empty());
-    }
-
-    private Mono<OwnerInfo> getOwnerInfo(Reply reply) {
-        Comment.CommentOwner owner = reply.getSpec().getOwner();
-        if (User.KIND.equals(owner.getKind())) {
-            return userService.getUserOrGhost(owner.getName())
-                .map(OwnerInfo::from);
-        }
-        if (Comment.CommentOwner.KIND_EMAIL.equals(owner.getKind())) {
-            return Mono.just(OwnerInfo.from(owner));
-        }
-        throw new IllegalStateException(
-            "Unsupported owner kind: " + owner.getKind());
-    }
-
-    private Comment.CommentOwner toCommentOwner(User user) {
-        Comment.CommentOwner owner = new Comment.CommentOwner();
-        owner.setKind(User.KIND);
-        owner.setName(user.getMetadata().getName());
-        owner.setDisplayName(user.getSpec().getDisplayName());
-        return owner;
-    }
-
-    private Mono<User> fetchCurrentUser() {
-        return ReactiveSecurityContextHolder.getContext()
-            .map(securityContext -> securityContext.getAuthentication().getName())
-            .flatMap(username -> client.fetch(User.class, username));
     }
 }

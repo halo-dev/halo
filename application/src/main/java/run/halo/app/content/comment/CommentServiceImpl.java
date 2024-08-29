@@ -6,19 +6,16 @@ import static run.halo.app.extension.index.query.QueryFactory.isNull;
 
 import java.time.Duration;
 import java.time.Instant;
-import java.util.Set;
 import java.util.function.Function;
 import org.apache.commons.lang3.BooleanUtils;
 import org.springframework.dao.OptimisticLockingFailureException;
 import org.springframework.data.domain.Sort;
 import org.springframework.lang.NonNull;
-import org.springframework.security.core.context.ReactiveSecurityContextHolder;
 import org.springframework.stereotype.Component;
 import org.springframework.util.Assert;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import reactor.util.retry.Retry;
-import run.halo.app.core.extension.User;
 import run.halo.app.core.extension.content.Comment;
 import run.halo.app.core.extension.service.RoleService;
 import run.halo.app.core.extension.service.UserService;
@@ -33,9 +30,7 @@ import run.halo.app.extension.router.selector.FieldSelector;
 import run.halo.app.infra.SystemConfigurableEnvironmentFetcher;
 import run.halo.app.infra.exception.AccessDeniedException;
 import run.halo.app.metrics.CounterService;
-import run.halo.app.metrics.MeterUtils;
 import run.halo.app.plugin.extensionpoint.ExtensionGetter;
-import run.halo.app.security.authorization.AuthorityUtils;
 
 /**
  * Comment service implementation.
@@ -44,28 +39,17 @@ import run.halo.app.security.authorization.AuthorityUtils;
  * @since 2.0.0
  */
 @Component
-public class CommentServiceImpl implements CommentService {
+public class CommentServiceImpl extends AbstractCommentService implements CommentService {
 
-    private final ReactiveExtensionClient client;
-    private final UserService userService;
-    private final RoleService roleService;
     private final ExtensionGetter extensionGetter;
-
     private final SystemConfigurableEnvironmentFetcher environmentFetcher;
-    private final CounterService counterService;
 
-    public CommentServiceImpl(ReactiveExtensionClient client,
-        UserService userService,
-        SystemConfigurableEnvironmentFetcher environmentFetcher,
-        CounterService counterService, RoleService roleService,
-        ExtensionGetter extensionGetter
-    ) {
-        this.client = client;
-        this.userService = userService;
-        this.environmentFetcher = environmentFetcher;
-        this.counterService = counterService;
-        this.roleService = roleService;
+    public CommentServiceImpl(RoleService roleService, ReactiveExtensionClient client,
+        UserService userService, CounterService counterService, ExtensionGetter extensionGetter,
+        SystemConfigurableEnvironmentFetcher environmentFetcher) {
+        super(roleService, client, userService, counterService);
         this.extensionGetter = extensionGetter;
+        this.environmentFetcher = environmentFetcher;
     }
 
     @Override
@@ -116,36 +100,34 @@ public class CommentServiceImpl implements CommentService {
                 }
 
                 comment.getSpec().setHidden(false);
-
-                // return if the comment owner is not null
-                if (comment.getSpec().getOwner() != null) {
-                    return Mono.just(comment);
-                }
-                // populate owner from current user
-                return fetchCurrentUser()
-                    .flatMap(currentUser -> ReactiveSecurityContextHolder.getContext()
-                        .flatMap(securityContext -> {
-                            var authentication = securityContext.getAuthentication();
-                            var roles = AuthorityUtils.authoritiesToRoles(
-                                authentication.getAuthorities());
-                            return roleService.contains(roles,
-                                    Set.of(AuthorityUtils.COMMENT_MANAGEMENT_ROLE_NAME))
-                                .doOnNext(result -> {
-                                    if (result) {
-                                        comment.getSpec().setApproved(true);
-                                        comment.getSpec().setApprovedTime(Instant.now());
-                                    }
-                                })
-                                .thenReturn(toCommentOwner(currentUser));
-                        }))
-                    .map(owner -> {
-                        comment.getSpec().setOwner(owner);
-                        return comment;
-                    })
-                    .switchIfEmpty(
-                        Mono.error(new IllegalStateException("The owner must not be null.")));
+                return Mono.just(comment);
             })
+            .flatMap(populatedComment -> Mono.when(populateOwner(populatedComment),
+                    populateApproveState(populatedComment))
+                .thenReturn(populatedComment)
+            )
             .flatMap(client::create);
+    }
+
+    private Mono<Void> populateApproveState(Comment comment) {
+        return hasCommentManagePermission()
+            .filter(Boolean::booleanValue)
+            .doOnNext(hasPermission -> {
+                comment.getSpec().setApproved(true);
+                comment.getSpec().setApprovedTime(Instant.now());
+            })
+            .then();
+    }
+
+    Mono<Void> populateOwner(Comment comment) {
+        if (comment.getSpec().getOwner() != null) {
+            return Mono.empty();
+        }
+        return fetchCurrentUser()
+            .switchIfEmpty(Mono.error(new IllegalStateException("The owner must not be null.")))
+            .map(this::toCommentOwner)
+            .doOnNext(owner -> comment.getSpec().setOwner(owner))
+            .then();
     }
 
     @Override
@@ -197,53 +179,17 @@ public class CommentServiceImpl implements CommentService {
         return false;
     }
 
-    private Comment.CommentOwner toCommentOwner(User user) {
-        Comment.CommentOwner owner = new Comment.CommentOwner();
-        owner.setKind(User.KIND);
-        owner.setName(user.getMetadata().getName());
-        owner.setDisplayName(user.getSpec().getDisplayName());
-        return owner;
-    }
-
-    private Mono<User> fetchCurrentUser() {
-        return ReactiveSecurityContextHolder.getContext()
-            .map(securityContext -> securityContext.getAuthentication().getName())
-            .flatMap(username -> client.fetch(User.class, username));
-    }
-
     private Mono<ListedComment> toListedComment(Comment comment) {
         var builder = ListedComment.builder().comment(comment);
         // not empty
-        var ownerInfoMono = getCommentOwnerInfo(comment.getSpec().getOwner())
+        var ownerInfoMono = getOwnerInfo(comment.getSpec().getOwner())
             .doOnNext(builder::owner);
         var subjectMono = getCommentSubject(comment.getSpec().getSubjectRef())
             .doOnNext(builder::subject);
-        var statsMono = fetchStats(comment.getMetadata().getName())
+        var statsMono = fetchCommentStats(comment.getMetadata().getName())
             .doOnNext(builder::stats);
         return Mono.when(ownerInfoMono, subjectMono, statsMono)
             .then(Mono.fromSupplier(builder::build));
-    }
-
-    Mono<CommentStats> fetchStats(String commentName) {
-        Assert.notNull(commentName, "The commentName must not be null.");
-        return counterService.getByName(MeterUtils.nameOf(Comment.class, commentName))
-            .map(counter -> CommentStats.builder()
-                .upvote(counter.getUpvote())
-                .build()
-            )
-            .defaultIfEmpty(CommentStats.empty());
-    }
-
-    private Mono<OwnerInfo> getCommentOwnerInfo(Comment.CommentOwner owner) {
-        if (User.KIND.equals(owner.getKind())) {
-            return userService.getUserOrGhost(owner.getName())
-                .map(OwnerInfo::from);
-        }
-        if (Comment.CommentOwner.KIND_EMAIL.equals(owner.getKind())) {
-            return Mono.just(OwnerInfo.from(owner));
-        }
-        throw new IllegalStateException(
-            "Unsupported owner kind: " + owner.getKind());
     }
 
     @SuppressWarnings("unchecked")
