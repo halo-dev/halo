@@ -64,7 +64,9 @@ const handleBubbleItemClick = (editor: Editor) => {
       <div
         class="relative rounded-md bg-white overflow-hidden drop-shadow w-96 p-1 max-h-72 overflow-y-auto"
       >
-        <component :is="componentRef" v-bind="props"></component>
+        <KeepAlive>
+          <component :is="componentRef" v-bind="props"></component>
+        </KeepAlive>
       </div>
     </template>
   </VDropdown>
