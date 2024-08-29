@@ -349,29 +349,29 @@ const fetchSelectedOptions = async (): Promise<
 > => {
   const node = props.context.node;
   const value = node.value;
-  if (!value) {
-    return undefined;
-  }
 
-  const selectedValues: string[] = [];
+  const selectedValues: Array<unknown> = [];
   if (Array.isArray(value)) {
     selectedValues.push(...value);
   } else if (
     typeof value === "string" ||
     typeof value === "number" ||
-    typeof value === "boolean"
+    typeof value === "boolean" ||
+    value === void 0
   ) {
-    selectedValues.push(value.toString());
+    selectedValues.push(value);
   }
 
   const currentOptions = options.value?.filter((option) =>
-    selectedValues.includes(option.value.toString())
+    selectedValues.includes(option.value)
   );
 
   // Get options that are not yet mapped.
-  const unmappedSelectValues = selectedValues.filter(
-    (value) => !currentOptions?.find((option) => option.value === value)
-  );
+  const unmappedSelectValues = selectedValues
+    .filter(
+      (value) => !currentOptions?.find((option) => option.value === value)
+    )
+    .filter(Boolean);
   if (unmappedSelectValues.length === 0) {
     return currentOptions?.sort((a, b) =>
       selectedValues.indexOf(a.value) > selectedValues.indexOf(b.value) ? 1 : -1
@@ -379,7 +379,9 @@ const fetchSelectedOptions = async (): Promise<
   }
 
   // Map the unresolved options to label and value format.
-  const mappedSelectOptions = await mapUnresolvedOptions(unmappedSelectValues);
+  const mappedSelectOptions = await mapUnresolvedOptions(
+    unmappedSelectValues.map(String)
+  );
   // Merge currentOptions and mappedSelectOptions, then sort them according to selectValues order.
   return [...(currentOptions || []), ...mappedSelectOptions].sort((a, b) =>
     selectedValues.indexOf(a.value) > selectedValues.indexOf(b.value) ? 1 : -1
