@@ -10,26 +10,20 @@ import static org.springdoc.core.fn.builders.schema.Builder.schemaBuilder;
 import static org.springframework.boot.convert.ApplicationConversionService.getSharedInstance;
 import static org.springframework.web.reactive.function.server.RequestPredicates.contentType;
 import static run.halo.app.extension.ListResult.generateGenericClass;
-import static run.halo.app.extension.index.query.QueryFactory.all;
-import static run.halo.app.extension.index.query.QueryFactory.and;
 import static run.halo.app.extension.index.query.QueryFactory.contains;
 import static run.halo.app.extension.index.query.QueryFactory.in;
 import static run.halo.app.extension.index.query.QueryFactory.isNull;
 import static run.halo.app.extension.index.query.QueryFactory.not;
 import static run.halo.app.extension.index.query.QueryFactory.startsWith;
-import static run.halo.app.extension.router.selector.SelectorUtil.labelAndFieldSelectorToListOptions;
 
 import io.swagger.v3.oas.annotations.enums.ParameterIn;
-import io.swagger.v3.oas.annotations.media.ArraySchema;
 import io.swagger.v3.oas.annotations.media.Schema;
 import java.net.URL;
-import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.lang3.BooleanUtils;
 import org.springdoc.core.fn.builders.operation.Builder;
 import org.springdoc.webflux.core.fn.SpringdocRouteBuilder;
 import org.springframework.data.domain.Sort;
@@ -45,21 +39,19 @@ import org.springframework.web.reactive.function.BodyExtractors;
 import org.springframework.web.reactive.function.server.RouterFunction;
 import org.springframework.web.reactive.function.server.ServerRequest;
 import org.springframework.web.reactive.function.server.ServerResponse;
-import org.springframework.web.server.ServerWebExchange;
 import org.springframework.web.server.ServerWebInputException;
 import reactor.core.publisher.Mono;
 import run.halo.app.core.extension.attachment.Attachment;
 import run.halo.app.core.extension.attachment.Group;
 import run.halo.app.core.extension.endpoint.CustomEndpoint;
-import run.halo.app.core.extension.endpoint.SortResolver;
 import run.halo.app.core.extension.service.AttachmentService;
 import run.halo.app.extension.ListOptions;
 import run.halo.app.extension.PageRequestImpl;
 import run.halo.app.extension.ReactiveExtensionClient;
 import run.halo.app.extension.index.query.QueryFactory;
 import run.halo.app.extension.router.IListRequest;
-import run.halo.app.extension.router.IListRequest.QueryListRequest;
 import run.halo.app.extension.router.QueryParamBuildUtil;
+import run.halo.app.extension.router.SortableRequest;
 import run.halo.app.extension.router.selector.LabelSelector;
 
 @Slf4j
@@ -131,7 +123,7 @@ public class AttachmentEndpoint implements CustomEndpoint {
                         .response(
                             responseBuilder().implementation(generateGenericClass(Attachment.class))
                         );
-                    ISearchRequest.buildParameters(builder);
+                    SearchRequest.buildParameters(builder);
                 }
             )
             .build();
@@ -159,33 +151,58 @@ public class AttachmentEndpoint implements CustomEndpoint {
             );
     }
 
-    public interface ISearchRequest extends IListRequest {
+    public static class SearchRequest extends SortableRequest {
 
-        @Schema(description = "Keyword for searching.")
-        Optional<String> getKeyword();
+        public SearchRequest(ServerRequest request) {
+            super(request.exchange());
+        }
 
-        @Schema(description = "Filter attachments without group. This parameter will ignore group"
-            + " parameter.")
-        Optional<Boolean> getUngrouped();
+        public Optional<String> getKeyword() {
+            return Optional.ofNullable(queryParams.getFirst("keyword"))
+                .filter(StringUtils::hasText);
+        }
 
-        @ArraySchema(uniqueItems = true,
-            arraySchema = @Schema(name = "accepts",
-                description = "Acceptable media types."),
-            schema = @Schema(description = "like image/*, video/mp4, text/*",
-                implementation = String.class,
-                example = "image/*"))
-        List<String> getAccepts();
+        public Optional<Boolean> getUngrouped() {
+            return Optional.ofNullable(queryParams.getFirst("ungrouped"))
+                .map(ungroupedStr -> getSharedInstance().convert(ungroupedStr, Boolean.class));
+        }
 
-        @ArraySchema(uniqueItems = true,
-            arraySchema = @Schema(name = "sort",
-                description = "Sort property and direction of the list result. Supported fields: "
-                    + "creationTimestamp, size"),
-            schema = @Schema(description = "like field,asc or field,desc",
-                implementation = String.class,
-                example = "creationTimestamp,desc"))
-        Sort getSort();
+        public Optional<List<String>> getAccepts() {
+            return Optional.ofNullable(queryParams.get("accepts"))
+                .filter(accepts -> !accepts.isEmpty()
+                    && !accepts.contains("*")
+                    && !accepts.contains("*/*")
+                );
+        }
 
-        static void buildParameters(Builder builder) {
+        public ListOptions toListOptions(List<String> hiddenGroups) {
+            var builder = ListOptions.builder(super.toListOptions());
+
+            getKeyword().ifPresent(keyword -> {
+                builder.andQuery(contains("spec.displayName", keyword));
+            });
+
+            getUngrouped()
+                .filter(ungrouped -> ungrouped)
+                .ifPresent(ungrouped -> builder.andQuery(isNull("spec.groupName")));
+
+            if (!CollectionUtils.isEmpty(hiddenGroups)) {
+                builder.andQuery(not(in("spec.groupName", hiddenGroups)));
+            }
+
+            getAccepts().flatMap(accepts -> accepts.stream()
+                    .filter(StringUtils::hasText)
+                    .map(accept -> accept.replace("/*", "/").toLowerCase())
+                    .distinct()
+                    .map(accept -> startsWith("spec.mediaType", accept))
+                    .reduce(QueryFactory::or)
+                )
+                .ifPresent(builder::andQuery);
+
+            return builder.build();
+        }
+
+        public static void buildParameters(Builder builder) {
             IListRequest.buildParameters(builder);
             builder.parameter(QueryParamBuildUtil.sortParameter())
                 .parameter(parameterBuilder()
@@ -217,82 +234,6 @@ public class AttachmentEndpoint implements CustomEndpoint {
                     )
                     .implementationArray(String.class)
                 );
-        }
-    }
-
-    public static class SearchRequest extends QueryListRequest implements ISearchRequest {
-
-        private final ServerWebExchange exchange;
-
-        public SearchRequest(ServerRequest request) {
-            super(request.queryParams());
-            this.exchange = request.exchange();
-        }
-
-        @Override
-        public Optional<String> getKeyword() {
-            return Optional.ofNullable(queryParams.getFirst("keyword"))
-                .filter(StringUtils::hasText);
-        }
-
-        @Override
-        public Optional<Boolean> getUngrouped() {
-            return Optional.ofNullable(queryParams.getFirst("ungrouped"))
-                .map(ungroupedStr -> getSharedInstance().convert(ungroupedStr, Boolean.class));
-        }
-
-        @Override
-        public List<String> getAccepts() {
-            return queryParams.getOrDefault("accepts", Collections.emptyList());
-        }
-
-        @Override
-        public Sort getSort() {
-            var sort = SortResolver.defaultInstance.resolve(exchange);
-            sort = sort.and(Sort.by(
-                Sort.Order.desc("metadata.creationTimestamp"),
-                Sort.Order.asc("metadata.name")
-            ));
-            return sort;
-        }
-
-        public ListOptions toListOptions(List<String> hiddenGroups) {
-            final var listOptions =
-                labelAndFieldSelectorToListOptions(getLabelSelector(), getFieldSelector());
-
-            var fieldQuery = all();
-            if (getKeyword().isPresent()) {
-                fieldQuery = and(fieldQuery, contains("spec.displayName", getKeyword().get()));
-            }
-
-            if (getUngrouped().isPresent() && BooleanUtils.isTrue(getUngrouped().get())) {
-                fieldQuery = and(fieldQuery, isNull("spec.groupName"));
-            }
-
-            if (!hiddenGroups.isEmpty()) {
-                fieldQuery = and(fieldQuery, not(in("spec.groupName", hiddenGroups)));
-            }
-
-            if (hasAccepts()) {
-                var acceptFieldQueryOptional = getAccepts().stream()
-                    .filter(StringUtils::hasText)
-                    .map((accept -> accept.replace("/*", "/").toLowerCase()))
-                    .distinct()
-                    .map(accept -> startsWith("spec.mediaType", accept))
-                    .reduce(QueryFactory::or);
-                if (acceptFieldQueryOptional.isPresent()) {
-                    fieldQuery = and(fieldQuery, acceptFieldQueryOptional.get());
-                }
-            }
-
-            listOptions.setFieldSelector(listOptions.getFieldSelector().andQuery(fieldQuery));
-            return listOptions;
-        }
-
-        private boolean hasAccepts() {
-            return !CollectionUtils.isEmpty(getAccepts())
-                && !getAccepts().contains("*")
-                && !getAccepts().contains("*/*");
         }
     }
 

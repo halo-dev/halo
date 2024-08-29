@@ -86,17 +86,16 @@ public class SinglePageServiceImpl extends AbstractContentService implements Sin
 
     @Override
     public Mono<ListResult<ListedSinglePage>> list(SinglePageQuery query) {
-        return client.list(SinglePage.class, query.toPredicate(),
-                query.toComparator(), query.getPage(), query.getSize())
-            .flatMap(listResult -> Flux.fromStream(
-                        listResult.get().map(this::getListedSinglePage)
-                    )
-                    .concatMap(Function.identity())
-                    .collectList()
-                    .map(listedSinglePages -> new ListResult<>(listResult.getPage(),
-                        listResult.getSize(),
-                        listResult.getTotal(), listedSinglePages)
-                    )
+        return client.listBy(SinglePage.class, query.toListOptions(), query.toPageRequest())
+            .flatMap(listResult -> Flux.fromStream(listResult.get().map(this::getListedSinglePage))
+                .concatMap(Function.identity())
+                .collectList()
+                .map(listedSinglePages -> new ListResult<>(
+                    listResult.getPage(),
+                    listResult.getSize(),
+                    listResult.getTotal(),
+                    listedSinglePages)
+                )
             );
     }
 

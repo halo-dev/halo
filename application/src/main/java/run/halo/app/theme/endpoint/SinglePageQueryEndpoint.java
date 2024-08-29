@@ -19,6 +19,7 @@ import run.halo.app.core.extension.endpoint.CustomEndpoint;
 import run.halo.app.extension.GroupVersion;
 import run.halo.app.extension.ListResult;
 import run.halo.app.extension.router.SortableRequest;
+import run.halo.app.theme.finders.SinglePageConversionService;
 import run.halo.app.theme.finders.SinglePageFinder;
 import run.halo.app.theme.finders.vo.ListedSinglePageVo;
 import run.halo.app.theme.finders.vo.SinglePageVo;
@@ -34,6 +35,8 @@ import run.halo.app.theme.finders.vo.SinglePageVo;
 public class SinglePageQueryEndpoint implements CustomEndpoint {
 
     private final SinglePageFinder singlePageFinder;
+
+    private final SinglePageConversionService singlePageConversionService;
 
     @Override
     public RouterFunction<ServerResponse> endpoint() {
@@ -79,15 +82,8 @@ public class SinglePageQueryEndpoint implements CustomEndpoint {
 
     private Mono<ServerResponse> listSinglePages(ServerRequest request) {
         var query = new SinglePagePublicQuery(request.exchange());
-        return singlePageFinder.list(query.getPage(),
-                query.getSize(),
-                query.toPredicate(),
-                query.toComparator()
-            )
-            .flatMap(result -> ServerResponse.ok()
-                .contentType(MediaType.APPLICATION_JSON)
-                .bodyValue(result)
-            );
+        return singlePageConversionService.listBy(query.toListOptions(), query.toPageRequest())
+            .flatMap(result -> ServerResponse.ok().bodyValue(result));
     }
 
     static class SinglePagePublicQuery extends SortableRequest {

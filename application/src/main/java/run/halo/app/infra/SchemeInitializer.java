@@ -8,6 +8,7 @@ import static run.halo.app.extension.index.IndexAttributeFactory.multiValueAttri
 import static run.halo.app.extension.index.IndexAttributeFactory.simpleAttribute;
 
 import com.fasterxml.jackson.core.type.TypeReference;
+import java.time.Instant;
 import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -95,7 +96,33 @@ public class SchemeInitializer implements ApplicationListener<ApplicationContext
         });
 
         // plugin.halo.run
-        schemeManager.register(Plugin.class);
+        schemeManager.register(Plugin.class, is -> {
+            is.add(new IndexSpec()
+                .setName("spec.displayName")
+                .setIndexFunc(
+                    simpleAttribute(Plugin.class, plugin -> Optional.ofNullable(plugin.getSpec())
+                        .map(Plugin.PluginSpec::getDisplayName)
+                        .orElse(null))
+                )
+            );
+            is.add(new IndexSpec()
+                .setName("spec.description")
+                .setIndexFunc(
+                    simpleAttribute(Plugin.class, plugin -> Optional.ofNullable(plugin.getSpec())
+                        .map(Plugin.PluginSpec::getDescription)
+                        .orElse(null))
+                )
+            );
+            is.add(new IndexSpec()
+                .setName("spec.enabled")
+                .setIndexFunc(
+                    simpleAttribute(Plugin.class, plugin -> Optional.ofNullable(plugin.getSpec())
+                        .map(Plugin.PluginSpec::getEnabled)
+                        .map(Object::toString)
+                        .orElse(Boolean.FALSE.toString()))
+                )
+            );
+        });
         schemeManager.register(SearchEngine.class);
         schemeManager.register(ExtensionPointDefinition.class, indexSpecs -> {
             indexSpecs.add(new IndexSpec()
@@ -443,7 +470,85 @@ public class SchemeInitializer implements ApplicationListener<ApplicationContext
                     return null;
                 })));
         });
-        schemeManager.register(SinglePage.class);
+        schemeManager.register(SinglePage.class, is -> {
+            is.add(new IndexSpec()
+                .setName("spec.publishTime")
+                .setIndexFunc(
+                    simpleAttribute(SinglePage.class, page -> Optional.ofNullable(page.getSpec())
+                        .map(SinglePage.SinglePageSpec::getPublishTime)
+                        .map(Instant::toString)
+                        .orElse(null))
+                )
+            );
+            is.add(new IndexSpec()
+                .setName("spec.title")
+                .setIndexFunc(
+                    simpleAttribute(SinglePage.class, page -> Optional.ofNullable(page.getSpec())
+                        .map(SinglePage.SinglePageSpec::getTitle)
+                        .orElse(null))
+                )
+            );
+            is.add(new IndexSpec()
+                .setName("spec.slug")
+                .setUnique(true)
+                .setIndexFunc(
+                    simpleAttribute(SinglePage.class, page -> Optional.ofNullable(page.getSpec())
+                        .map(SinglePage.SinglePageSpec::getSlug)
+                        .orElse(null))
+                )
+            );
+            is.add(new IndexSpec()
+                .setName("spec.visible")
+                .setIndexFunc(
+                    simpleAttribute(SinglePage.class, page -> Optional.ofNullable(page.getSpec())
+                        .map(SinglePage.SinglePageSpec::getVisible)
+                        .map(Post.VisibleEnum::name)
+                        .orElse(null))
+                )
+            );
+            is.add(new IndexSpec()
+                .setName("spec.pinned")
+                .setIndexFunc(
+                    simpleAttribute(SinglePage.class, page -> Optional.ofNullable(page.getSpec())
+                        .map(SinglePage.SinglePageSpec::getPinned)
+                        .map(Object::toString)
+                        .orElse(Boolean.FALSE.toString())))
+            );
+            is.add(new IndexSpec()
+                .setName("spec.priority")
+                .setIndexFunc(simpleAttribute(SinglePage.class,
+                    page -> Optional.ofNullable(page.getSpec())
+                        .map(SinglePage.SinglePageSpec::getPriority)
+                        .map(Object::toString)
+                        .orElse(Integer.toString(0)))
+                )
+            );
+            is.add(new IndexSpec()
+                .setName("status.excerpt")
+                .setIndexFunc(
+                    simpleAttribute(SinglePage.class, page -> Optional.ofNullable(page.getStatus())
+                        .map(SinglePage.SinglePageStatus::getExcerpt)
+                        .orElse(null))
+                )
+            );
+            is.add(new IndexSpec()
+                .setName("status.phase")
+                .setIndexFunc(
+                    simpleAttribute(SinglePage.class, page -> Optional.ofNullable(page.getStatus())
+                        .map(SinglePage.SinglePageStatus::getPhase)
+                        .orElse(null))
+                )
+            );
+            is.add(new IndexSpec()
+                .setName("status.contributors")
+                .setIndexFunc(multiValueAttribute(SinglePage.class,
+                    page -> Optional.ofNullable(page.getStatus())
+                        .map(SinglePage.SinglePageStatus::getContributors)
+                        .map(Set::copyOf)
+                        .orElse(null))
+                )
+            );
+        });
         // storage.halo.run
         schemeManager.register(Group.class);
         schemeManager.register(Policy.class);
