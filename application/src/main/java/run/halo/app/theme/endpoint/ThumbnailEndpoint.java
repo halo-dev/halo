@@ -9,6 +9,7 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import java.io.IOException;
 import java.net.URI;
 import java.time.Instant;
+import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import org.apache.commons.lang3.StringUtils;
 import org.springdoc.core.fn.builders.operation.Builder;
@@ -17,9 +18,11 @@ import org.springframework.boot.autoconfigure.web.WebProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.core.io.Resource;
 import org.springframework.http.CacheControl;
+import org.springframework.http.HttpHeaders;
 import org.springframework.stereotype.Component;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.reactive.function.BodyInserters;
+import org.springframework.web.reactive.function.client.WebClient;
 import org.springframework.web.reactive.function.server.RouterFunction;
 import org.springframework.web.reactive.function.server.RouterFunctions;
 import org.springframework.web.reactive.function.server.ServerRequest;
@@ -41,6 +44,7 @@ import run.halo.app.extension.GroupVersion;
 @Component
 @RequiredArgsConstructor
 public class ThumbnailEndpoint implements CustomEndpoint {
+    private final WebClient webClient = WebClient.builder().build();
     private final LocalThumbnailService localThumbnailService;
     private final WebProperties webProperties;
     private final ThumbnailService thumbnailService;
@@ -63,8 +67,26 @@ public class ThumbnailEndpoint implements CustomEndpoint {
     private Mono<ServerResponse> getThumbnailByUri(ServerRequest request) {
         var query = new ThumbnailQuery(request.queryParams());
         return thumbnailService.generate(query.getUri(), query.getSize())
+            .filterWhen(uri -> isAccessible(request, uri))
             .defaultIfEmpty(query.getUri())
-            .flatMap(uri -> ServerResponse.permanentRedirect(uri).build());
+            .flatMap(uri -> ServerResponse.temporaryRedirect(uri).build());
+    }
+
+    Mono<Boolean> isAccessible(ServerRequest request, URI uri) {
+        var url = Optional.of(uri)
+            .filter(URI::isAbsolute)
+            .orElseGet(() -> request.uriBuilder().replacePath(uri.toASCIIString()).build());
+        // resource handler does not support head access for Halo, so use get request here
+        return webClient.get()
+            .uri(url)
+            // https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Range
+            .header(HttpHeaders.RANGE, "bytes=0-0")
+            .exchangeToMono(response -> {
+                var statusCode = response.statusCode();
+                return Mono.just(statusCode.is2xxSuccessful() || statusCode.is3xxRedirection());
+            })
+            .onErrorReturn(false)
+            .defaultIfEmpty(false);
     }
 
     static class ThumbnailQuery {
