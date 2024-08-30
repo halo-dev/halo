@@ -46,6 +46,7 @@
   "devDependencies": {
     "@openapitools/openapi-generator-cli": "^2.13.4",
     "@types/node": "^20.14.2",
+    "@types/qs": "^6.9.15",
     "rimraf": "^5.0.7",
     "typescript": "~5.5.4",
     "unbuild": "^0.7.6",
@@ -53,5 +54,8 @@
   },
   "peerDependencies": {
     "axios": "^1.7.x"
+  },
+  "dependencies": {
+    "qs": "^6.13.0"
   }
 }
