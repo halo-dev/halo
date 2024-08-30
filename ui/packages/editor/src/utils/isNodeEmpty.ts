@@ -15,5 +15,9 @@ export const isParagraphEmpty = (node: PMNode) => {
     return false;
   }
 
+  if (node.childCount > 0) {
+    return false;
+  }
+
   return node.textContent.length === 0;
 };

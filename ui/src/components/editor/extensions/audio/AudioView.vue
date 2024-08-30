@@ -39,8 +39,13 @@ const handleSetExternalLink = (attachment: AttachmentAttr) => {
 };
 
 const resetUpload = () => {
-  if (props.getPos()) {
-    props.updateAttributes({
+  const canUpdateAttributes = props.editor.can().updateAttributes(Audio.name, {
+    width: undefined,
+    height: undefined,
+    file: undefined,
+  });
+  if (canUpdateAttributes && props.getPos()) {
+    props.editor.commands.updateAttributes(Audio.name, {
       width: undefined,
       height: undefined,
       file: undefined,
