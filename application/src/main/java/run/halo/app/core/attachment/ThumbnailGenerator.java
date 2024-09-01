@@ -74,7 +74,7 @@ public class ThumbnailGenerator {
             throw new UnsupportedOperationException(
                 "Unsupported image format for: " + formatNameOpt.orElse("unknown"));
         }
-        var thumbnail = Scalr.resize(img, Scalr.Method.SPEED, Scalr.Mode.FIT_TO_WIDTH,
+        var thumbnail = Scalr.resize(img, Scalr.Method.AUTOMATIC, Scalr.Mode.FIT_TO_WIDTH,
             size.getWidth());
         var formatName = formatNameOpt.orElse("jpg");
         var thumbnailFile = getThumbnailFile(formatName);
