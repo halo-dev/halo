@@ -186,7 +186,7 @@ onMounted(async () => {
       <H2WarningAlert class="max-w-md">
         <template #actions>
           <VButton type="secondary" size="sm" @click="setupInitialData()">
-            {{ $t("core.setup.operations.continue.button") }}
+            {{ $t("core.common.buttons.continue") }}
           </VButton>
         </template>
       </H2WarningAlert>

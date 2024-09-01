@@ -1381,8 +1381,6 @@ core:
         toast_success: 初始化成功
       setup_initial_data:
         loading: 正在初始化資料，請稍後...
-      continue:
-        button: 繼續初始化
     fields:
       site_title:
         label: 站點名稱
@@ -1653,6 +1651,7 @@ core:
       revoke: 撤銷
       disable: 禁用
       enable: 启用
+      continue: 繼續
     radio:
       "yes": 是
       "no": 否
