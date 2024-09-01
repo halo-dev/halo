@@ -1694,6 +1694,7 @@ core:
       revoke: 撤销
       disable: 禁用
       enable: 启用
+      continue: 继续
     radio:
       "yes": 是
       "no": 否

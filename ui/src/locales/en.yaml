@@ -1785,6 +1785,7 @@ core:
       revoke: Revoke
       disable: Disable
       enable: Enable
+      continue: Continue
     radio:
       "yes": "Yes"
       "no": "No"

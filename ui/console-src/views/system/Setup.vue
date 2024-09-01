@@ -1,5 +1,4 @@
 <script lang="ts" setup>
-import H2WarningAlert from "@/components/alerts/H2WarningAlert.vue";
 import LocaleChange from "@/components/common/LocaleChange.vue";
 import { useGlobalInfoStore } from "@/stores/global-info";
 import type { SystemInitializationRequest } from "@halo-dev/api-client";
@@ -51,8 +50,6 @@ const inputClasses = {
     <IconLogo class="mb-8 flex-none" />
 
     <div class="flex w-72 flex-col">
-      <H2WarningAlert class="mb-3" />
-
       <FormKit
         id="setup-form"
         v-model="formState"
