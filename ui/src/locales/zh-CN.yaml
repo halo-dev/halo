@@ -1402,6 +1402,8 @@ core:
         toast_success: 初始化成功
       setup_initial_data:
         loading: 正在初始化数据，请稍后...
+      continue:
+        button: 继续初始化
     fields:
       site_title:
         label: 站点名称

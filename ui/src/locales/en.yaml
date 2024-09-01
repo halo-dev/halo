@@ -1508,6 +1508,8 @@ core:
         toast_success: Setup successfully
       setup_initial_data:
         loading: Initializing data, please wait...
+      continue:
+        button: Continue
     fields:
       site_title:
         label: Site title

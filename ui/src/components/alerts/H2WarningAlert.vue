@@ -26,5 +26,8 @@ const { data: info } = useQuery<Info>({
     <template #description>
       {{ $t("core.components.h2_warning_alert.description") }}
     </template>
+    <template #actions>
+      <slot name="actions" />
+    </template>
   </VAlert>
 </template>

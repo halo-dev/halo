@@ -1,6 +1,8 @@
 <script lang="ts" setup>
+import H2WarningAlert from "@/components/alerts/H2WarningAlert.vue";
 import { useGlobalInfoStore } from "@/stores/global-info";
 import { useUserStore } from "@/stores/user";
+import type { Info } from "@/types";
 import {
   consoleApiClient,
   coreApiClient,
@@ -10,9 +12,10 @@ import {
   type SinglePageRequest,
   type Tag,
 } from "@halo-dev/api-client";
-import { VLoading } from "@halo-dev/components";
-import { useMutation } from "@tanstack/vue-query";
-import { onMounted, ref } from "vue";
+import { VButton, VLoading } from "@halo-dev/components";
+import { useMutation, useQuery } from "@tanstack/vue-query";
+import axios from "axios";
+import { onMounted, ref, watch } from "vue";
 import { useRouter } from "vue-router";
 import category from "./setup-data/category.json";
 import menuItems from "./setup-data/menu-items.json";
@@ -128,38 +131,72 @@ async function setupInitialData() {
         },
       },
     });
-    processing.value = false;
+
+    // Reload page to fetch plugin's bundle files
+    window.location.reload();
   }
-
-  await globalInfoStore.fetchGlobalInfo();
-
-  // Reload page to fetch plugin's bundle files
-  window.location.reload();
 }
 
 const userStore = useUserStore();
 
+const { data: info } = useQuery<Info>({
+  queryKey: ["system-info"],
+  queryFn: async () => {
+    const { data } = await axios.get<Info>(`/actuator/info`, {
+      withCredentials: true,
+    });
+    return data;
+  },
+  retry: 0,
+});
+
+watch(
+  () => info.value,
+  (value) => {
+    if (!value) {
+      return;
+    }
+    if (!value.database.name.startsWith("H2")) {
+      setupInitialData();
+    }
+  },
+  {
+    immediate: true,
+  }
+);
+
 onMounted(async () => {
   await globalInfoStore.fetchGlobalInfo();
 
-  if (
-    globalInfoStore.globalInfo &&
-    globalInfoStore.globalInfo.dataInitialized === false &&
-    !userStore.isAnonymous
-  ) {
-    setupInitialData();
+  if (userStore.isAnonymous) {
+    window.location.href = "/";
     return;
   }
 
-  router.push({ name: "Dashboard" });
+  if (globalInfoStore.globalInfo?.dataInitialized) {
+    router.push({ name: "Dashboard" });
+    return;
+  }
 });
 </script>
 
 <template>
   <div class="flex h-screen flex-col items-center justify-center">
-    <VLoading />
-    <div v-if="processing" class="text-xs text-gray-600">
-      {{ $t("core.setup.operations.setup_initial_data.loading") }}
-    </div>
+    <template v-if="info?.database.name.startsWith('H2') && !processing">
+      <H2WarningAlert class="max-w-md">
+        <template #actions>
+          <VButton type="secondary" size="sm" @click="setupInitialData()">
+            {{ $t("core.setup.operations.continue.button") }}
+          </VButton>
+        </template>
+      </H2WarningAlert>
+    </template>
+
+    <template v-if="processing">
+      <VLoading />
+      <div class="text-xs text-gray-600">
+        {{ $t("core.setup.operations.setup_initial_data.loading") }}
+      </div>
+    </template>
   </div>
 </template>
