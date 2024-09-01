@@ -20,6 +20,8 @@ export interface FormatBrushStore {
 }
 
 const formatBrush = Extension.create<any, FormatBrushStore>({
+  name: "formatBrush",
+
   addOptions() {
     return {
       ...this.parent?.(),
