@@ -576,9 +576,15 @@ watch(
   }
 );
 
+const handleSelectedUpdate = (
+  value: Array<{ label: string; value: string }>
+) => {
+  stopSelectedWatch();
+  handleUpdate(value);
+};
+
 const handleUpdate = (value: Array<{ label: string; value: string }>) => {
   const values = value.map((item) => item.value);
-  stopSelectedWatch();
   selectOptions.value = value;
   if (selectProps.multiple) {
     props.context.node.input(values);
@@ -714,7 +720,7 @@ const handleNextPage = async () => {
     :clearable="selectProps.clearable"
     :searchable="selectProps.searchable"
     :auto-select="selectProps.autoSelect"
-    @update="handleUpdate"
+    @update="handleSelectedUpdate"
     @search="handleSearch"
     @load-more="handleNextPage"
   />
