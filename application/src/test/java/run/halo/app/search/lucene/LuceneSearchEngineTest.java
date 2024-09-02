@@ -3,12 +3,19 @@ package run.halo.app.search.lucene;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.io.IOException;
 import java.nio.file.Path;
 import java.time.Instant;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.Executors;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.TimeoutException;
+import java.util.stream.IntStream;
 import org.apache.lucene.index.DirectoryReader;
 import org.apache.lucene.store.AlreadyClosedException;
 import org.junit.jupiter.api.AfterEach;
@@ -77,6 +84,35 @@ class LuceneSearchEngineTest {
     }
 
     @Test
+    void shouldAddOrUpdateDocumentConcurrently()
+        throws ExecutionException, InterruptedException, TimeoutException {
+        runConcurrently(() -> {
+            var haloDoc = createFakeHaloDoc();
+            searchEngine.addOrUpdate(List.of(haloDoc));
+        });
+    }
+
+    @Test
+    void shouldDeleteDocumentConcurrently()
+        throws ExecutionException, InterruptedException, TimeoutException {
+        runConcurrently(() -> {
+            var haloDoc = createFakeHaloDoc();
+            searchEngine.addOrUpdate(List.of(haloDoc));
+            searchEngine.deleteDocument(List.of(haloDoc.getId()));
+        });
+    }
+
+    @Test
+    void shouldDeleteAllConcurrently()
+        throws ExecutionException, InterruptedException, TimeoutException {
+        runConcurrently(() -> {
+            var haloDoc = createFakeHaloDoc();
+            searchEngine.addOrUpdate(List.of(haloDoc));
+            searchEngine.deleteAll();
+        });
+    }
+
+    @Test
     void shouldDestroy() throws Exception {
         var directory = this.searchEngine.getDirectory();
         this.searchEngine.destroy();
@@ -116,6 +152,17 @@ class LuceneSearchEngineTest {
         assertEquals("<fake-tag>fake</fake-tag>-title", gotHaloDoc.getTitle());
         assertNull(gotHaloDoc.getDescription());
         assertEquals("<fake-tag>fake</fake-tag>-content", gotHaloDoc.getContent());
+    }
+
+    void runConcurrently(Runnable runnable)
+        throws ExecutionException, InterruptedException, TimeoutException {
+        var executorService = Executors.newFixedThreadPool(10);
+        var futures = IntStream.of(0, 10)
+            .mapToObj(i -> CompletableFuture.runAsync(runnable, executorService))
+            .toArray(CompletableFuture[]::new);
+        CompletableFuture.allOf(futures).get(10, TimeUnit.SECONDS);
+        executorService.shutdownNow();
+        assertTrue(executorService.awaitTermination(10, TimeUnit.SECONDS));
     }
 
     HaloDocument createFakeHaloDoc() {
