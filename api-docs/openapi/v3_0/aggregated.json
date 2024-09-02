@@ -2,7 +2,7 @@
   "openapi": "3.0.1",
   "info": {
     "title": "Halo",
-    "version": "2.19.0-SNAPSHOT"
+    "version": "2.20.0-SNAPSHOT"
   },
   "servers": [
     {
@@ -6933,9 +6933,9 @@
             }
           },
           {
-            "description": "The width of the thumbnail",
+            "description": "The size of the thumbnail,available values are s,m,l,xl",
             "in": "query",
-            "name": "width",
+            "name": "size",
             "required": true,
             "schema": {
               "type": "string"
