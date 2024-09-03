@@ -231,14 +231,31 @@ public class PluginServiceImpl implements PluginService, InitializingBean, Dispo
     public Flux<DataBuffer> uglifyJsBundle() {
         var startedPlugins = List.copyOf(pluginManager.getStartedPlugins());
         var dataBufferFactory = DefaultDataBufferFactory.sharedInstance;
-        return Flux.fromIterable(startedPlugins)
-            .flatMap(pluginWrapper -> {
+        var end = Mono.fromSupplier(
+            () -> {
+                var sb = new StringBuilder("this.enabledPlugins = [");
+                var iterator = startedPlugins.iterator();
+                while (iterator.hasNext()) {
+                    var plugin = iterator.next();
+                    sb.append("""
+                        {"name":"%s","version":"%s"}\
+                        """
+                        .formatted(
+                            plugin.getPluginId(),
+                            plugin.getDescriptor().getVersion()
+                        )
+                    );
+                    if (iterator.hasNext()) {
+                        sb.append(',');
+                    }
+                }
+                sb.append(']');
+                return dataBufferFactory.wrap(sb.toString().getBytes(StandardCharsets.UTF_8));
+            });
+        var body = Flux.fromIterable(startedPlugins)
+            .sort(Comparator.comparing(PluginWrapper::getPluginId))
+            .concatMap(pluginWrapper -> {
                 var pluginId = pluginWrapper.getPluginId();
-                var head = Mono.<DataBuffer>fromSupplier(
-                    () -> dataBufferFactory.wrap(
-                        ("// Generated from plugin " + pluginId + "\n").getBytes()
-                    ));
-                var tail = Mono.fromSupplier(() -> dataBufferFactory.wrap("\n".getBytes()));
                 return Mono.<Resource>fromSupplier(
                         () -> BundleResourceUtils.getJsBundleResource(
                             pluginManager, pluginId, BundleResourceUtils.JS_BUNDLE
@@ -246,54 +263,39 @@ public class PluginServiceImpl implements PluginService, InitializingBean, Dispo
                     )
                     .filter(Resource::isReadable)
                     .flatMapMany(resource -> {
+                        var head = Mono.<DataBuffer>fromSupplier(
+                            () -> dataBufferFactory.wrap(
+                                ("// Generated from plugin " + pluginId + "\n").getBytes()
+                            ));
                         var content = DataBufferUtils.read(
                             resource, dataBufferFactory, StreamUtils.BUFFER_SIZE
                         );
-                        return head.concatWith(content).concatWith(tail);
+                        var tail = Mono.fromSupplier(() -> dataBufferFactory.wrap("\n".getBytes()));
+                        return Flux.concat(head, content, tail);
                     });
-            })
-            .concatWith(Mono.fromSupplier(
-                () -> {
-                    var sb = new StringBuilder("this.enabledPlugins = [");
-                    var iterator = startedPlugins.iterator();
-                    while (iterator.hasNext()) {
-                        var plugin = iterator.next();
-                        sb.append("""
-                            {"name":"%s","version":"%s"}\
-                            """
-                            .formatted(
-                                plugin.getPluginId(),
-                                plugin.getDescriptor().getVersion()
-                            )
-                        );
-                        if (iterator.hasNext()) {
-                            sb.append(',');
-                        }
-                    }
-                    sb.append(']');
-                    return dataBufferFactory.wrap(sb.toString().getBytes(StandardCharsets.UTF_8));
-                })
-            );
+            });
+        return Flux.concat(body, end);
     }
 
     @Override
     public Flux<DataBuffer> uglifyCssBundle() {
         return Flux.fromIterable(pluginManager.getStartedPlugins())
-            .flatMap(pluginWrapper -> {
+            .sort(Comparator.comparing(PluginWrapper::getPluginId))
+            .concatMap(pluginWrapper -> {
                 var pluginId = pluginWrapper.getPluginId();
                 var dataBufferFactory = DefaultDataBufferFactory.sharedInstance;
-                var head = Mono.<DataBuffer>fromSupplier(() -> dataBufferFactory.wrap(
-                    ("/* Generated from plugin " + pluginId + " */\n").getBytes()
-                ));
-                var tail = Mono.fromSupplier(() -> dataBufferFactory.wrap("\n".getBytes()));
                 return Mono.<Resource>fromSupplier(() -> BundleResourceUtils.getJsBundleResource(
                         pluginManager, pluginId, BundleResourceUtils.CSS_BUNDLE
                     ))
                     .filter(Resource::isReadable)
                     .flatMapMany(resource -> {
+                        var head = Mono.<DataBuffer>fromSupplier(() -> dataBufferFactory.wrap(
+                            ("/* Generated from plugin " + pluginId + " */\n").getBytes()
+                        ));
                         var content = DataBufferUtils.read(
                             resource, dataBufferFactory, StreamUtils.BUFFER_SIZE);
-                        return head.concatWith(content).concatWith(tail);
+                        var tail = Mono.fromSupplier(() -> dataBufferFactory.wrap("\n".getBytes()));
+                        return Flux.concat(head, content, tail);
                     });
             });
     }
