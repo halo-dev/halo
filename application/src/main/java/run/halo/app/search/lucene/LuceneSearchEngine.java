@@ -84,7 +84,7 @@ public class LuceneSearchEngine implements SearchEngine, InitializingBean, Dispo
 
     private Directory directory;
 
-    public LuceneSearchEngine(Path indexRootDir) throws IOException {
+    public LuceneSearchEngine(Path indexRootDir) {
         this.indexRootDir = indexRootDir;
     }
 
@@ -106,12 +106,14 @@ public class LuceneSearchEngine implements SearchEngine, InitializingBean, Dispo
 
         var writerConfig = new IndexWriterConfig(this.analyzer)
             .setOpenMode(CREATE_OR_APPEND);
-        try (var indexWriter = new IndexWriter(this.directory, writerConfig)) {
-            indexWriter.updateDocuments(deleteQuery, docs);
-        } catch (IOException e) {
-            throw Exceptions.propagate(e);
-        } finally {
-            this.refreshSearcherManager();
+        synchronized (this) {
+            try (var indexWriter = new IndexWriter(this.directory, writerConfig)) {
+                indexWriter.updateDocuments(deleteQuery, docs);
+            } catch (IOException e) {
+                throw Exceptions.propagate(e);
+            } finally {
+                this.refreshSearcherManager();
+            }
         }
     }
 
@@ -122,12 +124,14 @@ public class LuceneSearchEngine implements SearchEngine, InitializingBean, Dispo
         var deleteQuery = new TermInSetQuery("id", terms);
         var writerConfig = new IndexWriterConfig(this.analyzer)
             .setOpenMode(CREATE_OR_APPEND);
-        try (var indexWriter = new IndexWriter(this.directory, writerConfig)) {
-            indexWriter.deleteDocuments(deleteQuery);
-        } catch (IOException e) {
-            throw Exceptions.propagate(e);
-        } finally {
-            this.refreshSearcherManager();
+        synchronized (this) {
+            try (var indexWriter = new IndexWriter(this.directory, writerConfig)) {
+                indexWriter.deleteDocuments(deleteQuery);
+            } catch (IOException e) {
+                throw Exceptions.propagate(e);
+            } finally {
+                this.refreshSearcherManager();
+            }
         }
     }
 
@@ -135,12 +139,14 @@ public class LuceneSearchEngine implements SearchEngine, InitializingBean, Dispo
     public void deleteAll() {
         var writerConfig = new IndexWriterConfig(this.analyzer)
             .setOpenMode(CREATE_OR_APPEND);
-        try (var indexWriter = new IndexWriter(this.directory, writerConfig)) {
-            indexWriter.deleteAll();
-        } catch (IOException e) {
-            throw Exceptions.propagate(e);
-        } finally {
-            this.refreshSearcherManager();
+        synchronized (this) {
+            try (var indexWriter = new IndexWriter(this.directory, writerConfig)) {
+                indexWriter.deleteAll();
+            } catch (IOException e) {
+                throw Exceptions.propagate(e);
+            } finally {
+                this.refreshSearcherManager();
+            }
         }
     }
 
