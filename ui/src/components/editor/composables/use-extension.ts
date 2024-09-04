@@ -1,3 +1,4 @@
+import { randomUUID } from "@/utils/id";
 import {
   getExtensionField,
   type AnyConfig,
@@ -10,12 +11,17 @@ export function useExtension() {
     if (!extensions) {
       return;
     }
-
-    const resolvedExtensions = sort(flatten(extensions));
-
+    const resolvedExtensions = sort(extensions);
     const map = new Map<string, AnyExtension>();
-
     resolvedExtensions.forEach((extension) => {
+      if (!extension.name) {
+        console.warn(
+          `Extension name is missing for Extension, type: ${extension.type}.`
+        );
+        const key = randomUUID().toString();
+        map.set(key, extension);
+        return;
+      }
       const key = `${extension.type}-${extension.name}`;
       if (map.has(key)) {
         console.warn(
@@ -24,40 +30,7 @@ export function useExtension() {
       }
       map.set(key, extension);
     });
-
     return Array.from(map.values());
-  };
-
-  /**
-   * Create a flattened array of extensions by traversing the `addExtensions` field.
-   * @param extensions An array of Tiptap extensions
-   * @returns A flattened array of Tiptap extensions
-   */
-  const flatten = (extensions: Extensions): Extensions => {
-    return (
-      extensions
-        .map((extension) => {
-          const context = {
-            name: extension.name,
-            options: extension.options,
-            storage: extension.storage,
-          };
-
-          const addExtensions = getExtensionField<AnyConfig["addExtensions"]>(
-            extension,
-            "addExtensions",
-            context
-          );
-
-          if (addExtensions) {
-            return [extension, ...flatten(addExtensions())];
-          }
-
-          return extension;
-        })
-        // `Infinity` will break TypeScript so we set a number that is probably high enough
-        .flat(10)
-    );
   };
 
   /**
