@@ -1,5 +1,7 @@
 package run.halo.app.core.attachment;
 
+import static java.nio.file.StandardCopyOption.REPLACE_EXISTING;
+
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -74,10 +76,14 @@ public class ThumbnailGenerator {
             throw new UnsupportedOperationException(
                 "Unsupported image format for: " + formatNameOpt.orElse("unknown"));
         }
-        var thumbnail = Scalr.resize(img, Scalr.Method.AUTOMATIC, Scalr.Mode.FIT_TO_WIDTH,
-            size.getWidth());
         var formatName = formatNameOpt.orElse("jpg");
         var thumbnailFile = getThumbnailFile(formatName);
+        if (img.getWidth() <= size.getWidth()) {
+            Files.copy(tempImagePath, thumbnailFile.toPath(), REPLACE_EXISTING);
+            return;
+        }
+        var thumbnail = Scalr.resize(img, Scalr.Method.AUTOMATIC, Scalr.Mode.FIT_TO_WIDTH,
+            size.getWidth());
         ImageIO.write(thumbnail, formatName, thumbnailFile);
     }
 
