@@ -161,7 +161,8 @@ export interface SelectActionRequest {
   valueField?: PropertyPath;
 
   /**
-   * Field name for field selector, default is `name`.
+   * When using value to query detailed information, the default query
+   * parameter key for fieldSelector is `metadata.name`.
    */
   fieldSelectorKey?: PropertyPath;
 }
@@ -215,7 +216,7 @@ const initSelectProps = () => {
       labelField: "label",
       valueField: "value",
       totalField: "total",
-      fieldSelectorKey: "name",
+      fieldSelectorKey: "metadata.name",
       pageField: "page",
       sizeField: "size",
       parseData: undefined,
