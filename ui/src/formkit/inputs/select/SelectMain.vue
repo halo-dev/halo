@@ -1,5 +1,10 @@
 <script lang="ts" setup>
 import type { FormKitFrameworkContext } from "@formkit/core";
+import { axiosInstance } from "@halo-dev/api-client";
+import { useDebounceFn } from "@vueuse/core";
+import { useFuse } from "@vueuse/integrations/useFuse";
+import type { AxiosRequestConfig } from "axios";
+import { get, has, type PropertyPath } from "lodash-es";
 import {
   computed,
   onMounted,
@@ -9,12 +14,8 @@ import {
   watch,
   type PropType,
 } from "vue";
+import { isFalse } from "./isFalse";
 import SelectContainer from "./SelectContainer.vue";
-import { axiosInstance } from "@halo-dev/api-client";
-import { get, has, type PropertyPath } from "lodash-es";
-import { useDebounceFn } from "@vueuse/core";
-import { useFuse } from "@vueuse/integrations/useFuse";
-import type { AxiosRequestConfig } from "axios";
 
 export interface SelectProps {
   /**
@@ -228,10 +229,6 @@ const initSelectProps = () => {
     }
     selectProps.remoteOption = nodeProps.remoteOption;
   }
-};
-
-const isFalse = (value: string | boolean | undefined | null) => {
-  return [undefined, null, "false", false].includes(value);
 };
 
 const isLoading = ref(false);
