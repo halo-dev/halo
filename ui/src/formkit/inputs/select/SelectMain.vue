@@ -1,5 +1,10 @@
 <script lang="ts" setup>
 import type { FormKitFrameworkContext } from "@formkit/core";
+import { axiosInstance } from "@halo-dev/api-client";
+import { useDebounceFn } from "@vueuse/core";
+import { useFuse } from "@vueuse/integrations/useFuse";
+import type { AxiosRequestConfig } from "axios";
+import { get, has, type PropertyPath } from "lodash-es";
 import {
   computed,
   onMounted,
@@ -10,11 +15,6 @@ import {
   type PropType,
 } from "vue";
 import SelectContainer from "./SelectContainer.vue";
-import { axiosInstance } from "@halo-dev/api-client";
-import { get, has, type PropertyPath } from "lodash-es";
-import { useDebounceFn } from "@vueuse/core";
-import { useFuse } from "@vueuse/integrations/useFuse";
-import type { AxiosRequestConfig } from "axios";
 
 export interface SelectProps {
   /**
@@ -159,6 +159,11 @@ export interface SelectActionRequest {
    * Field name for value, default is `value`.
    */
   valueField?: PropertyPath;
+
+  /**
+   * Field name for field selector, default is `name`.
+   */
+  fieldSelectorKey?: PropertyPath;
 }
 
 const props = defineProps({
@@ -209,6 +214,8 @@ const initSelectProps = () => {
       itemsField: "items",
       labelField: "label",
       valueField: "value",
+      totalField: "total",
+      fieldSelectorKey: "name",
       pageField: "page",
       sizeField: "size",
       parseData: undefined,
@@ -481,13 +488,13 @@ const fetchRemoteMappedOptions = async (
   };
   if (requestConfig.method === "GET") {
     requestConfig.params = {
-      fieldSelector: `${selectProps.requestOption?.valueField?.toString()}=(${unmappedSelectValues.join(
+      fieldSelector: `${selectProps.requestOption?.fieldSelectorKey?.toString()}=(${unmappedSelectValues.join(
         ","
       )})`,
     };
   } else {
     requestConfig.data = {
-      fieldSelector: `${selectProps.requestOption?.valueField?.toString()}=(${unmappedSelectValues.join(
+      fieldSelector: `${selectProps.requestOption?.fieldSelectorKey?.toString()}=(${unmappedSelectValues.join(
         ","
       )})`,
     };
