@@ -74,14 +74,15 @@ public class ThumbnailGenerator {
         if (file.length() > MAX_FILE_SIZE) {
             throw new IOException("File size exceeds the limit: " + MAX_FILE_SIZE);
         }
-        var formatNameOpt = getFormatName(file);
-        var formatName = formatNameOpt.orElse("jpg");
+        String formatName = getFormatName(file)
+            .orElseThrow(() -> new UnsupportedOperationException("Unknown format"));
         if (isUnsupportedFormat(formatName)) {
-            throwUnsupportedException(formatName);
+            throw new UnsupportedOperationException("Unsupported image format for: " + formatName);
         }
+
         var img = ImageIO.read(file);
         if (img == null) {
-            throwUnsupportedException(formatNameOpt.orElse("unknown"));
+            throw new UnsupportedOperationException("Cannot read image file: " + file);
         }
         var thumbnailFile = getThumbnailFile(formatName);
         if (img.getWidth() <= size.getWidth()) {
@@ -91,10 +92,6 @@ public class ThumbnailGenerator {
         var thumbnail = Scalr.resize(img, Scalr.Method.AUTOMATIC, Scalr.Mode.FIT_TO_WIDTH,
             size.getWidth());
         ImageIO.write(thumbnail, formatName, thumbnailFile);
-    }
-
-    private static void throwUnsupportedException(String formatName) {
-        throw new UnsupportedOperationException("Unsupported image format for: " + formatName);
     }
 
     private static boolean isUnsupportedFormat(@NonNull String formatName) {
