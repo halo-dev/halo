@@ -45,7 +45,7 @@ export interface SelectProps {
   remoteOptimize?: boolean;
 
   /**
-   * Allows the creation of new options, only available in local mode.
+   * Allows the creation of new options, only available in local mode. Default is false.
    */
   allowCreate?: boolean;
 
@@ -209,7 +209,7 @@ const initSelectProps = () => {
   selectProps.maxCount = nodeProps.maxCount ?? NaN;
   selectProps.placeholder = nodeProps.placeholder ?? "";
   selectProps.action = nodeProps.action ?? "";
-  selectProps.remoteOptimize = nodeProps.remoteOptimize ?? true;
+  selectProps.remoteOptimize = !isFalse(nodeProps.remoteOptimize, true);
   selectProps.requestOption = {
     ...{
       method: "GET",
@@ -225,12 +225,12 @@ const initSelectProps = () => {
     ...(nodeProps.requestOption ?? {}),
   };
   selectProps.multiple = !isFalse(nodeProps.multiple);
-  selectProps.sortable = !isFalse(nodeProps.sortable);
+  selectProps.sortable = !isFalse(nodeProps.sortable, true);
   selectProps.remote = !isFalse(nodeProps.remote);
   selectProps.allowCreate = !isFalse(nodeProps.allowCreate);
   selectProps.clearable = !isFalse(nodeProps.clearable);
   selectProps.searchable = !isFalse(nodeProps.searchable);
-  selectProps.autoSelect = !isFalse(nodeProps.autoSelect) || true;
+  selectProps.autoSelect = !isFalse(nodeProps.autoSelect, true);
   if (selectProps.remote) {
     if (!nodeProps.remoteOption) {
       throw new Error("remoteOption is required when remote is true.");
@@ -543,14 +543,25 @@ const getAutoSelectedOption = ():
   });
 };
 
-const stopSelectedWatch = watch(
-  () => [options.value, props.context.value],
-  async () => {
-    if (options.value) {
+watch(
+  () => props.context.value,
+  async (newValue) => {
+    const selectedValues = selectOptions.value?.map((item) => item.value) || [];
+    if (selectedValues.length > 0 && selectedValues.includes(newValue)) {
+      return;
+    }
+    const selectedOption = await fetchSelectedOptions();
+    selectOptions.value = selectedOption;
+  }
+);
+
+watch(
+  () => options.value,
+  async (newOptions) => {
+    if (newOptions && newOptions.length > 0) {
       const selectedOption = await fetchSelectedOptions();
       if (selectedOption) {
         selectOptions.value = selectedOption;
-        return;
       }
       const isAutoSelect =
         selectProps.autoSelect &&
@@ -562,12 +573,12 @@ const stopSelectedWatch = watch(
         // Automatically select the first option when the selected value is empty.
         const autoSelectedOption = getAutoSelectedOption();
         if (autoSelectedOption) {
-          selectOptions.value = [autoSelectedOption];
-          handleUpdate(selectOptions.value);
+          handleUpdate([autoSelectedOption]);
         }
       }
     }
-  }
+  },
+  { once: true }
 );
 
 // When attr options are processed asynchronously, it is necessary to monitor
@@ -581,14 +592,27 @@ watch(
   }
 );
 
-const handleSelectedUpdate = (
-  value: Array<{ label: string; value: string }>
-) => {
-  stopSelectedWatch();
-  handleUpdate(value);
+const handleUpdate = async (value: Array<{ label: string; value: string }>) => {
+  const oldSelectValue = selectOptions.value;
+  if (
+    oldSelectValue &&
+    value.length === oldSelectValue.length &&
+    value.every((item, index) => item.value === oldSelectValue[index].value)
+  ) {
+    return;
+  }
+  const newValue = value.map((item) => {
+    return {
+      label: item.label,
+      value: item.value,
+    };
+  });
+  handleSetNodeValue(newValue);
+  await props.context.node.settled;
+  props.context.attrs.onChange?.(newValue);
 };
 
-const handleUpdate = (value: Array<{ label: string; value: string }>) => {
+const handleSetNodeValue = (value: Array<{ label: string; value: string }>) => {
   const values = value.map((item) => item.value);
   selectOptions.value = value;
   if (selectProps.multiple) {
@@ -725,7 +749,7 @@ const handleNextPage = async () => {
     :clearable="selectProps.clearable"
     :searchable="selectProps.searchable"
     :auto-select="selectProps.autoSelect"
-    @update="handleSelectedUpdate"
+    @update="handleUpdate"
     @search="handleSearch"
     @load-more="handleNextPage"
   />
