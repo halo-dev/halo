@@ -4,6 +4,7 @@ import { vScroll } from "@vueuse/components";
 import { useEventListener, type UseScrollReturn } from "@vueuse/core";
 import { computed, ref, watch } from "vue";
 import SelectOptionItem from "./SelectOptionItem.vue";
+import { isFalse } from "./isFalse";
 
 const props = defineProps<{
   options: Array<Record<string, unknown> & { label: string; value: string }>;
@@ -81,7 +82,7 @@ const handleSelected = (index: number) => {
     }
   }
   selectedIndex.value = index;
-  if (option) {
+  if (option && !isDisabled(option)) {
     emit("selected", option);
   }
 };
@@ -112,11 +113,15 @@ const reachMaximumLimit = computed(() => {
   return false;
 });
 
-const isDisabled = (option: { label: string; value: string }) => {
+const isDisabled = (
+  option: Record<string, unknown> & { label: string; value: string }
+) => {
+  const attrs = option.attrs as Record<string, unknown>;
   return (
-    reachMaximumLimit.value &&
-    selectedValues.value &&
-    !selectedValues.value.includes(option.value)
+    (reachMaximumLimit.value &&
+      selectedValues.value &&
+      !selectedValues.value.includes(option.value)) ||
+    !isFalse(attrs?.disabled as string | boolean | undefined)
   );
 };
 
