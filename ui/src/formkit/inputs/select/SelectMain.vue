@@ -14,6 +14,7 @@ import {
   watch,
   type PropType,
 } from "vue";
+import { isFalse } from "./isFalse";
 import SelectContainer from "./SelectContainer.vue";
 
 export interface SelectProps {
@@ -159,6 +160,12 @@ export interface SelectActionRequest {
    * Field name for value, default is `value`.
    */
   valueField?: PropertyPath;
+
+  /**
+   * When using value to query detailed information, the default query
+   * parameter key for fieldSelector is `metadata.name`.
+   */
+  fieldSelectorKey?: PropertyPath;
 }
 
 const props = defineProps({
@@ -209,6 +216,8 @@ const initSelectProps = () => {
       itemsField: "items",
       labelField: "label",
       valueField: "value",
+      totalField: "total",
+      fieldSelectorKey: "metadata.name",
       pageField: "page",
       sizeField: "size",
       parseData: undefined,
@@ -228,14 +237,6 @@ const initSelectProps = () => {
     }
     selectProps.remoteOption = nodeProps.remoteOption;
   }
-};
-
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-const isFalse = (value: any, onlyBoolean = false) => {
-  if (onlyBoolean) {
-    return [false, "false"].includes(value);
-  }
-  return [undefined, null, "false", false].includes(value);
 };
 
 const isLoading = ref(false);
@@ -485,13 +486,13 @@ const fetchRemoteMappedOptions = async (
   };
   if (requestConfig.method === "GET") {
     requestConfig.params = {
-      fieldSelector: `${selectProps.requestOption?.valueField?.toString()}=(${unmappedSelectValues.join(
+      fieldSelector: `${selectProps.requestOption?.fieldSelectorKey?.toString()}=(${unmappedSelectValues.join(
         ","
       )})`,
     };
   } else {
     requestConfig.data = {
-      fieldSelector: `${selectProps.requestOption?.valueField?.toString()}=(${unmappedSelectValues.join(
+      fieldSelector: `${selectProps.requestOption?.fieldSelectorKey?.toString()}=(${unmappedSelectValues.join(
         ","
       )})`,
     };

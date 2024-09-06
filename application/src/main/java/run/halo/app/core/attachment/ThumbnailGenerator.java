@@ -13,12 +13,14 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Iterator;
 import java.util.Optional;
+import java.util.Set;
 import javax.imageio.ImageIO;
 import javax.imageio.ImageReader;
 import javax.imageio.stream.ImageInputStream;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.imgscalr.Scalr;
+import org.springframework.lang.NonNull;
 
 @Slf4j
 @AllArgsConstructor
@@ -28,6 +30,8 @@ public class ThumbnailGenerator {
      * 30MB
      */
     static final int MAX_FILE_SIZE = 30 * 1024 * 1024;
+
+    private static final Set<String> UNSUPPORTED_FORMATS = Set.of("gif", "svg", "webp");
 
     private final ImageDownloader imageDownloader = new ImageDownloader();
     private final ThumbnailSize size;
@@ -70,13 +74,16 @@ public class ThumbnailGenerator {
         if (file.length() > MAX_FILE_SIZE) {
             throw new IOException("File size exceeds the limit: " + MAX_FILE_SIZE);
         }
-        var formatNameOpt = getFormatName(file);
+        String formatName = getFormatName(file)
+            .orElseThrow(() -> new UnsupportedOperationException("Unknown format"));
+        if (isUnsupportedFormat(formatName)) {
+            throw new UnsupportedOperationException("Unsupported image format for: " + formatName);
+        }
+
         var img = ImageIO.read(file);
         if (img == null) {
-            throw new UnsupportedOperationException(
-                "Unsupported image format for: " + formatNameOpt.orElse("unknown"));
+            throw new UnsupportedOperationException("Cannot read image file: " + file);
         }
-        var formatName = formatNameOpt.orElse("jpg");
         var thumbnailFile = getThumbnailFile(formatName);
         if (img.getWidth() <= size.getWidth()) {
             Files.copy(tempImagePath, thumbnailFile.toPath(), REPLACE_EXISTING);
@@ -85,6 +92,10 @@ public class ThumbnailGenerator {
         var thumbnail = Scalr.resize(img, Scalr.Method.AUTOMATIC, Scalr.Mode.FIT_TO_WIDTH,
             size.getWidth());
         ImageIO.write(thumbnail, formatName, thumbnailFile);
+    }
+
+    private static boolean isUnsupportedFormat(@NonNull String formatName) {
+        return UNSUPPORTED_FORMATS.contains(formatName.toLowerCase());
     }
 
     private File getThumbnailFile(String formatName) {
