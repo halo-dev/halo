@@ -133,6 +133,7 @@ public class UserServiceImpl implements UserService {
                         var mutableRoles = new HashSet<>(roles);
                         mutableRoles.removeAll(existingRoles);
                         return mutableRoles.stream()
+                            .filter(StringUtils::hasText)
                             .map(roleName -> RoleBinding.create(username, roleName));
                     }).flatMap(client::create))
                     .then(Mono.defer(() -> {

@@ -771,7 +771,11 @@ public class UserEndpoint implements CustomEndpoint {
                             .map(user -> {
                                 var username = user.getMetadata().getName();
                                 var roles = Optional.ofNullable(usernameRolesMap.get(username))
-                                    .map(roleNames -> roleNames.stream().map(roleMap::get).toList())
+                                    .map(roleNames -> roleNames.stream()
+                                        .map(roleMap::get)
+                                        .filter(Objects::nonNull)
+                                        .toList()
+                                    )
                                     .orElseGet(List::of);
                                 return new ListedUser(user, roles);
                             })
