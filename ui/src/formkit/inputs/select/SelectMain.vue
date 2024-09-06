@@ -14,6 +14,7 @@ import {
   watch,
   type PropType,
 } from "vue";
+import { isFalse } from "./isFalse";
 import SelectContainer from "./SelectContainer.vue";
 
 export interface SelectProps {
@@ -236,10 +237,6 @@ const initSelectProps = () => {
     }
     selectProps.remoteOption = nodeProps.remoteOption;
   }
-};
-
-const isFalse = (value: string | boolean | undefined | null) => {
-  return [undefined, null, "false", false].includes(value);
 };
 
 const isLoading = ref(false);
