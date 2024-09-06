@@ -591,7 +591,7 @@ watch(
   }
 );
 
-const handleUpdate = (value: Array<{ label: string; value: string }>) => {
+const handleUpdate = async (value: Array<{ label: string; value: string }>) => {
   const oldSelectValue = selectOptions.value;
   if (
     oldSelectValue &&
@@ -607,6 +607,7 @@ const handleUpdate = (value: Array<{ label: string; value: string }>) => {
     };
   });
   handleSetNodeValue(newValue);
+  await props.context.node.settled;
   props.context.attrs.onChange?.(newValue);
 };
 
