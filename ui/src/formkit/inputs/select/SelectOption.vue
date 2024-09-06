@@ -26,6 +26,8 @@ const emit = defineEmits<{
 
 const selectedIndex = ref<number>(0);
 const selectOptionRef = ref<HTMLElement>();
+const oldEvent = ref<MouseEvent | undefined>();
+const isCursorHidden = ref(false);
 
 const selectedValues = computed(() =>
   props.selectedOptions?.map((option) => option.value)
@@ -45,6 +47,9 @@ const getSelectedIndex = () => {
 };
 
 const handleKeydown = (event: KeyboardEvent) => {
+  if (selectOptionRef.value) {
+    isCursorHidden.value = true;
+  }
   const key = event.key;
   if (key === "ArrowUp") {
     selectedIndex.value =
@@ -133,7 +138,7 @@ const handleOptionScroll = (state: UseScrollReturn) => {
 };
 
 watch(
-  () => props.options,
+  props.options,
   () => {
     selectedIndex.value = getSelectedIndex();
   },
@@ -148,6 +153,48 @@ watch(
     handleScrollIntoView();
   }
 );
+
+/**
+ * check if cursor is changed
+ *
+ * @param newEvent
+ * @param oldEvent
+ */
+const isCursorChanged = (
+  newEvent: MouseEvent,
+  oldEvent: MouseEvent | undefined
+) => {
+  if (!oldEvent) {
+    return true;
+  }
+  return (
+    newEvent.screenX !== oldEvent.screenX ||
+    newEvent.screenY !== oldEvent.screenY
+  );
+};
+
+const handleMouseover = (event: MouseEvent) => {
+  if (isCursorHidden.value) {
+    if (!oldEvent.value) {
+      oldEvent.value = event;
+    }
+
+    if (isCursorChanged(event, oldEvent.value)) {
+      isCursorHidden.value = false;
+      oldEvent.value = undefined;
+    }
+    return;
+  }
+  const target = event.target as HTMLElement;
+  if (
+    target.classList.contains("select-option-item") &&
+    target instanceof HTMLElement
+  ) {
+    const parentElement = target.parentElement as HTMLElement;
+    const index = Array.from(parentElement.children).indexOf(target);
+    selectedIndex.value = index;
+  }
+};
 </script>
 
 <template>
@@ -155,17 +202,18 @@ watch(
     id="select-option"
     ref="selectOptionRef"
     v-scroll="[handleOptionScroll, { throttle: 10 }]"
-    class="select max-h-64 cursor-pointer overflow-y-auto p-1.5"
+    class="select max-h-64 overflow-y-auto p-1.5"
+    :class="[isCursorHidden ? 'cursor-none' : 'cursor-pointer']"
     role="list"
     tabindex="-1"
     @keydown="handleKeydown"
+    @mouseover="handleMouseover"
   >
     <template v-for="(option, index) in options" :key="option.value">
       <SelectOptionItem
         class="select-option-item"
         :option="option"
         :class="{
-          'hover:bg-zinc-100': !isDisabled(option),
           'bg-zinc-100': !isDisabled(option) && selectedIndex === index,
           'selected !bg-zinc-200/60':
             selectedValues && selectedValues.includes(option.value),
