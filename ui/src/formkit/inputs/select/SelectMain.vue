@@ -563,6 +563,14 @@ watch(
       if (selectedOption) {
         selectOptions.value = selectedOption;
       }
+    }
+  }
+);
+
+watch(
+  () => options.value,
+  async (newOptions) => {
+    if (newOptions && newOptions.length > 0) {
       const isAutoSelect =
         selectProps.autoSelect &&
         !selectProps.multiple &&
