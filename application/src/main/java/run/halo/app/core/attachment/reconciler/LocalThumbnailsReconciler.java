@@ -27,6 +27,7 @@ import run.halo.app.core.extension.attachment.Attachment;
 import run.halo.app.core.extension.attachment.Constant;
 import run.halo.app.core.extension.attachment.LocalThumbnail;
 import run.halo.app.extension.ExtensionClient;
+import run.halo.app.extension.ExtensionUtil;
 import run.halo.app.extension.ListOptions;
 import run.halo.app.extension.PageRequestImpl;
 import run.halo.app.extension.controller.Controller;
@@ -47,6 +48,9 @@ public class LocalThumbnailsReconciler implements Reconciler<Reconciler.Request>
     public Result reconcile(Request request) {
         client.fetch(LocalThumbnail.class, request.name())
             .ifPresent(thumbnail -> {
+                if (ExtensionUtil.isDeleted(thumbnail)) {
+                    return;
+                }
                 if (shouldGenerate(thumbnail)) {
                     requestGenerateThumbnail(thumbnail);
                     nullSafeAnnotations(thumbnail).remove(REQUEST_TO_GENERATE_ANNO);

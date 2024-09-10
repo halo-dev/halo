@@ -58,7 +58,7 @@ public class AttachmentReconciler implements Reconciler<Request> {
             var annotations = attachment.getMetadata().getAnnotations();
             if (annotations != null) {
                 attachmentService.getPermalink(attachment)
-                    .map(URI::toString)
+                    .map(URI::toASCIIString)
                     .switchIfEmpty(Mono.fromSupplier(() -> {
                         // Only for back-compatibility
                         return annotations.get(Constant.EXTERNAL_LINK_ANNO_KEY);
