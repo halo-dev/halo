@@ -4,11 +4,13 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.doReturn;
+import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.spy;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.net.HttpURLConnection;
 import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -57,7 +59,9 @@ class ThumbnailGeneratorTest {
             String mockImageData = "fakeImageData";
             InputStream mockInputStream = new ByteArrayInputStream(mockImageData.getBytes());
 
-            doAnswer(invocation -> mockInputStream).when(spyImageUrl).openStream();
+            var urlConnection = mock(HttpURLConnection.class);
+            doAnswer(invocation -> urlConnection).when(spyImageUrl).openConnection();
+            doReturn(mockInputStream).when(urlConnection).getInputStream();
 
             var path = imageDownloader.downloadFileInternal(spyImageUrl);
             assertThat(path).isNotNull();
@@ -81,8 +85,9 @@ class ThumbnailGeneratorTest {
             var fileSizeByte = ThumbnailGenerator.MAX_FILE_SIZE + 10;
             byte[] largeImageData = new byte[fileSizeByte];
             InputStream mockInputStream = new ByteArrayInputStream(largeImageData);
-
-            doReturn(mockInputStream).when(spyImageUrl).openStream();
+            var urlConnection = mock(HttpURLConnection.class);
+            doAnswer(invocation -> urlConnection).when(spyImageUrl).openConnection();
+            doReturn(mockInputStream).when(urlConnection).getInputStream();
             assertThatThrownBy(() -> imageDownloader.downloadFileInternal(spyImageUrl))
                 .isInstanceOf(IOException.class)
                 .hasMessageContaining("File size exceeds the limit");
