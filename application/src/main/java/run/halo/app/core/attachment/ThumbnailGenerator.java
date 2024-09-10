@@ -6,6 +6,7 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URISyntaxException;
 import java.net.URL;
@@ -172,7 +173,11 @@ public class ThumbnailGenerator {
             File tempFile = File.createTempFile("halo-image-thumb-", ".tmp");
             long totalBytesDownloaded = 0;
             var tempFilePath = tempFile.toPath();
-            try (InputStream inputStream = url.openStream();
+            HttpURLConnection connection = (HttpURLConnection) url.openConnection();
+            connection.setRequestProperty("User-Agent",
+                "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko)"
+                    + " Chrome/92.0.4515.131 Safari/537.36");
+            try (InputStream inputStream = connection.getInputStream();
                  FileOutputStream outputStream = new FileOutputStream(tempFile)) {
 
                 byte[] buffer = new byte[4096];
