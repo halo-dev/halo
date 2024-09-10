@@ -43,9 +43,12 @@ const filterOptions = computed(() => {
   }
 
   const options = props.options.filter((option) => {
-    return option.label
-      .toLocaleLowerCase()
-      .includes(keyword.toLocaleLowerCase());
+    if (option.label) {
+      return option.label
+        .toLocaleLowerCase()
+        .includes(keyword.toLocaleLowerCase());
+    }
+    return false;
   });
 
   if (props.allowCreate) {

@@ -563,13 +563,31 @@ watch(
       if (selectedOption) {
         selectOptions.value = selectedOption;
       }
-      const isAutoSelect =
-        selectProps.autoSelect &&
-        !selectProps.multiple &&
-        !selectProps.placeholder &&
-        !props.context.node.value;
+    }
+  }
+);
 
-      if (isAutoSelect) {
+const enableAutoSelect = () => {
+  if (!selectProps.autoSelect) {
+    return false;
+  }
+  if (selectProps.multiple || selectProps.placeholder) {
+    return false;
+  }
+
+  const value = props.context.node.value;
+  if (value === void 0 || value === null) {
+    return true;
+  }
+
+  return false;
+};
+
+watch(
+  () => options.value,
+  async (newOptions) => {
+    if (newOptions && newOptions.length > 0) {
+      if (enableAutoSelect()) {
         // Automatically select the first option when the selected value is empty.
         const autoSelectedOption = getAutoSelectedOption();
         if (autoSelectedOption) {
