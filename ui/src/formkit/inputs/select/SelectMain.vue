@@ -555,6 +555,18 @@ watch(
   }
 );
 
+watch(
+  () => options.value,
+  async (newOptions) => {
+    if (newOptions && newOptions.length > 0) {
+      const selectedOption = await fetchSelectedOptions();
+      if (selectedOption) {
+        selectOptions.value = selectedOption;
+      }
+    }
+  }
+);
+
 const enableAutoSelect = () => {
   if (!selectProps.autoSelect) {
     return false;
@@ -575,11 +587,6 @@ watch(
   () => options.value,
   async (newOptions) => {
     if (newOptions && newOptions.length > 0) {
-      const selectedOption = await fetchSelectedOptions();
-      if (selectedOption) {
-        selectOptions.value = selectedOption;
-      }
-
       if (enableAutoSelect()) {
         // Automatically select the first option when the selected value is empty.
         const autoSelectedOption = getAutoSelectedOption();
