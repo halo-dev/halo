@@ -551,7 +551,13 @@ public class SchemeInitializer implements ApplicationListener<ApplicationContext
         });
         // storage.halo.run
         schemeManager.register(Group.class);
-        schemeManager.register(Policy.class);
+        schemeManager.register(Policy.class, indexSpecs -> {
+            indexSpecs.add(new IndexSpec()
+                .setName("spec.configMapName")
+                .setIndexFunc(simpleAttribute(Policy.class,
+                    policy -> policy.getSpec().getConfigMapName()))
+            );
+        });
         schemeManager.register(Attachment.class, indexSpecs -> {
             indexSpecs.add(new IndexSpec()
                 .setName("spec.displayName")
