@@ -1,5 +1,6 @@
 package run.halo.app.plugin;
 
+import io.github.resilience4j.ratelimiter.RateLimiterRegistry;
 import org.springframework.cache.CacheManager;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.support.GenericApplicationContext;
@@ -16,6 +17,7 @@ import run.halo.app.notification.NotificationCenter;
 import run.halo.app.notification.NotificationReasonEmitter;
 import run.halo.app.plugin.extensionpoint.ExtensionGetter;
 import run.halo.app.security.LoginHandlerEnhancer;
+import run.halo.app.security.authentication.CryptoService;
 
 /**
  * Utility for creating shared application context.
@@ -69,6 +71,14 @@ public enum SharedApplicationContextFactory {
             );
         beanFactory.registerSingleton("extensionGetter",
             rootContext.getBean(ExtensionGetter.class));
+        rootContext.getBeanProvider(CryptoService.class)
+            .ifUnique(
+                cryptoService -> beanFactory.registerSingleton("cryptoService", cryptoService)
+            );
+        rootContext.getBeanProvider(RateLimiterRegistry.class)
+            .ifUnique(rateLimiterRegistry ->
+                beanFactory.registerSingleton("rateLimiterRegistry", rateLimiterRegistry)
+            );
         // TODO add more shared instance here
 
         sharedContext.refresh();
