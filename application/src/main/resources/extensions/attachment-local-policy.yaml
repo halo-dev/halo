@@ -28,8 +28,6 @@ apiVersion: v1alpha1
 kind: Setting
 metadata:
   name: local-policy-template-setting
-  labels:
-    storage.halo.run/policy-owner: default-policy
 spec:
   forms:
     - group: default
@@ -42,7 +40,7 @@ spec:
         - $formkit: text
           name: maxFileSize
           label: 最大单文件大小
-          validation: [['matches', '/^(0|[1-9]\d*)(?:[KMG]B)?$/']]
+          validation: [ [ 'matches', '/^(0|[1-9]\d*)(?:[KMG]B)?$/' ] ]
           validation-visibility: "live"
           validation-messages:
             matches: "输入格式错误，遵循：整数 + 大写的单位（KB, MB, GB）"
