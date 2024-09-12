@@ -1,13 +1,13 @@
 package run.halo.app.core.attachment;
 
-import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.assertArg;
 import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import org.junit.jupiter.api.Test;
@@ -15,16 +15,14 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import reactor.core.publisher.Flux;
-import reactor.core.publisher.Mono;
 import run.halo.app.core.extension.attachment.Attachment;
 import run.halo.app.core.extension.attachment.Policy;
 import run.halo.app.extension.ConfigMap;
 import run.halo.app.extension.ExtensionClient;
+import run.halo.app.extension.GroupVersionKind;
 import run.halo.app.extension.Metadata;
-import run.halo.app.extension.ReactiveExtensionClient;
 import run.halo.app.extension.controller.Reconciler;
-import run.halo.app.infra.ReactiveExtensionPaginatedOperator;
+import run.halo.app.extension.index.IndexedQueryEngine;
 
 /**
  * Tests for {@link PolicyConfigChangeDetector}.
@@ -36,10 +34,7 @@ import run.halo.app.infra.ReactiveExtensionPaginatedOperator;
 class PolicyConfigChangeDetectorTest {
 
     @Mock
-    private ReactiveExtensionPaginatedOperator paginatedOperator;
-
-    @Mock
-    private ReactiveExtensionClient reactiveClient;
+    private PolicyConfigChangeDetector.AttachmentUpdateTrigger updateTrigger;
 
     @Mock
     private ExtensionClient client;
@@ -58,18 +53,13 @@ class PolicyConfigChangeDetectorTest {
         when(client.fetch(eq(ConfigMap.class), eq("fake-config")))
             .thenReturn(Optional.of(configMap));
 
-        var attachment = new Attachment();
-        attachment.setMetadata(new Metadata());
-        attachment.getMetadata().setName("fake-attachment");
-        attachment.setSpec(new Attachment.AttachmentSpec());
-        when(paginatedOperator.list(eq(Attachment.class), any()))
-            .thenReturn(Flux.just(attachment));
-        when(reactiveClient.update(any())).thenReturn(Mono.empty());
+        var indexQueryEngine = mock(IndexedQueryEngine.class);
+        when(client.indexedQueryEngine()).thenReturn(indexQueryEngine);
+        when(indexQueryEngine.retrieveAll(eq(GroupVersionKind.fromExtension(Attachment.class)),
+            any(), any())).thenReturn(List.of("fake-attachment"));
 
         spyDetector.reconcile(new Reconciler.Request("fake-config"));
 
-        verify(spyDetector).updateAnnotation(eq(attachment));
-        verify(reactiveClient).update(assertArg(a -> assertThat(a.getMetadata().getAnnotations())
-            .containsKey(PolicyConfigChangeDetector.POLICY_UPDATED_AT)));
+        verify(updateTrigger).addAll(List.of("fake-attachment"));
     }
 }

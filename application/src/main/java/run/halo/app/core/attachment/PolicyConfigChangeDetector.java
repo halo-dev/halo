@@ -4,24 +4,25 @@ import static run.halo.app.extension.index.query.QueryFactory.equal;
 
 import java.time.Duration;
 import java.time.Instant;
-import java.util.function.Consumer;
+import java.util.List;
 import lombok.RequiredArgsConstructor;
-import org.springframework.dao.OptimisticLockingFailureException;
+import org.springframework.context.SmartLifecycle;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Component;
-import reactor.core.publisher.Mono;
-import reactor.util.retry.Retry;
 import run.halo.app.core.extension.attachment.Attachment;
 import run.halo.app.core.extension.attachment.Policy;
 import run.halo.app.extension.ConfigMap;
 import run.halo.app.extension.ExtensionClient;
 import run.halo.app.extension.ExtensionMatcher;
+import run.halo.app.extension.GroupVersionKind;
 import run.halo.app.extension.ListOptions;
 import run.halo.app.extension.MetadataUtil;
-import run.halo.app.extension.ReactiveExtensionClient;
 import run.halo.app.extension.controller.Controller;
 import run.halo.app.extension.controller.ControllerBuilder;
+import run.halo.app.extension.controller.DefaultController;
+import run.halo.app.extension.controller.DefaultQueue;
 import run.halo.app.extension.controller.Reconciler;
-import run.halo.app.infra.ReactiveExtensionPaginatedOperator;
+import run.halo.app.extension.controller.RequestQueue;
 
 /**
  * <p>Detects changes to {@link ConfigMap} that are referenced by {@link Policy} and updates the
@@ -36,9 +37,9 @@ import run.halo.app.infra.ReactiveExtensionPaginatedOperator;
 @RequiredArgsConstructor
 public class PolicyConfigChangeDetector implements Reconciler<Reconciler.Request> {
     static final String POLICY_UPDATED_AT = "storage.halo.run/policy-updated-at";
+    private final GroupVersionKind attachmentGvk = GroupVersionKind.fromExtension(Attachment.class);
     private final ExtensionClient client;
-    private final ReactiveExtensionClient reactiveClient;
-    private final ReactiveExtensionPaginatedOperator paginatedOperator;
+    private final AttachmentUpdateTrigger attachmentUpdateTrigger;
 
     @Override
     public Result reconcile(Request request) {
@@ -49,41 +50,15 @@ public class PolicyConfigChangeDetector implements Reconciler<Reconciler.Request
                     return;
                 }
                 var policyName = labels.get(Policy.POLICY_OWNER_LABEL);
-                paginatedOperator.list(Attachment.class, ListOptions.builder()
-                        .andQuery(equal("spec.policyName", policyName))
-                        .build()
-                    )
-                    .flatMap(this::updateAnnotation)
-                    .then()
-                    .block();
+                var attachmentNames = client.indexedQueryEngine()
+                    .retrieveAll(attachmentGvk, ListOptions.builder()
+                            .andQuery(equal("spec.policyName", policyName))
+                            .build(),
+                        Sort.unsorted()
+                    );
+                attachmentUpdateTrigger.addAll(attachmentNames);
             });
         return Result.doNotRetry();
-    }
-
-    protected Mono<Attachment> updateAnnotation(Attachment attachment) {
-        var updatedAt = Instant.now().toString();
-        populatePolicyUpdatedAt(attachment, updatedAt);
-        return reactiveClient.update(attachment)
-            .onErrorResume(OptimisticLockingFailureException.class,
-                e -> updateAttachmentWithRetry(
-                    attachment.getMetadata().getName(),
-                    a -> populatePolicyUpdatedAt(a, updatedAt)
-                )
-            );
-    }
-
-    private Mono<Attachment> updateAttachmentWithRetry(String name, Consumer<Attachment> consumer) {
-        return Mono.defer(() -> reactiveClient.get(Attachment.class, name)
-                .doOnNext(consumer)
-                .flatMap(reactiveClient::update)
-            )
-            .retryWhen(Retry.backoff(5, Duration.ofMillis(100))
-                .filter(OptimisticLockingFailureException.class::isInstance));
-    }
-
-    private void populatePolicyUpdatedAt(Attachment attachment, String value) {
-        var annotations = MetadataUtil.nullSafeAnnotations(attachment);
-        annotations.put(POLICY_UPDATED_AT, value);
     }
 
     @Override
@@ -100,5 +75,67 @@ public class PolicyConfigChangeDetector implements Reconciler<Reconciler.Request
             .onUpdateMatcher(matcher)
             .onDeleteMatcher(matcher)
             .build();
+    }
+
+    @Component
+    static class AttachmentUpdateTrigger implements Reconciler<String>, SmartLifecycle {
+        private final RequestQueue<String> queue;
+
+        private final Controller controller;
+
+        private volatile boolean running = false;
+
+        private final ExtensionClient client;
+
+        public AttachmentUpdateTrigger(ExtensionClient client) {
+            this.client = client;
+            this.queue = new DefaultQueue<>(Instant::now);
+            this.controller = this.setupWith(null);
+        }
+
+        @Override
+        public Result reconcile(String name) {
+            client.fetch(Attachment.class, name).ifPresent(attachment -> {
+                var annotations = MetadataUtil.nullSafeAnnotations(attachment);
+                annotations.put(POLICY_UPDATED_AT, Instant.now().toString());
+                client.update(attachment);
+            });
+            return Result.doNotRetry();
+        }
+
+        void addAll(List<String> names) {
+            for (String name : names) {
+                queue.addImmediately(name);
+            }
+        }
+
+        @Override
+        public Controller setupWith(ControllerBuilder builder) {
+            return new DefaultController<>(
+                "PolicyChangeAttachmentUpdater",
+                this,
+                queue,
+                null,
+                Duration.ofMillis(100),
+                Duration.ofMinutes(10)
+            );
+        }
+
+        @Override
+        public void start() {
+            controller.start();
+            running = true;
+        }
+
+        @Override
+        public void stop() {
+            running = false;
+            controller.dispose();
+        }
+
+        @Override
+        public boolean isRunning() {
+            return running;
+        }
     }
 }
