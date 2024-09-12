@@ -38,6 +38,7 @@
     9. removeControl: 是否显示删除按钮，默认为 `true`
 - `menuCheckbox`：选择一组菜单
 - `menuRadio`：选择一个菜单
+- `menuSelect`: 通用菜单选择组件，支持单选、多选、排序
 - `menuItemSelect`：选择菜单项
 - `postSelect`：选择文章
 - `singlePageSelect`：选择自定义页面
