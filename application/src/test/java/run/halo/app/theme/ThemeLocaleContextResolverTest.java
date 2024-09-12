@@ -62,6 +62,10 @@ class ThemeLocaleContextResolverTest {
             .isEqualTo(ENGLISH);
         assertThat(this.resolver.resolveLocaleContext(exchangeForParam("zh")).getLocale())
             .isEqualTo(CHINESE);
+        assertThat(this.resolver.resolveLocaleContext(exchangeForParam("zh-CN")).getLocale())
+            .isEqualTo(CHINA);
+        assertThat(this.resolver.resolveLocaleContext(exchangeForParam("zh-cn")).getLocale())
+            .isEqualTo(CHINA);
     }
 
     @Test

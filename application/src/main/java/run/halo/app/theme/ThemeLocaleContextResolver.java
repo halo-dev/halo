@@ -51,7 +51,7 @@ public class ThemeLocaleContextResolver extends AcceptHeaderLocaleContextResolve
 
         Locale locale;
         if (StringUtils.isNotBlank(language)) {
-            locale = new Locale(language);
+            locale = Locale.forLanguageTag(language);
         } else if (exchange.getAttribute(LOCALE_REQUEST_ATTRIBUTE_NAME) != null) {
             locale = exchange.getAttribute(LOCALE_REQUEST_ATTRIBUTE_NAME);
         } else {
