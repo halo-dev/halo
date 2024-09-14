@@ -93,6 +93,9 @@ public class ThemeMessageResolverIntegrationTest {
             .expectStatus()
             .isOk()
             .expectBody()
+            // make sure the "templates/index.properties" file is precedence over the
+            // "i18n/default.properties".
+            .xpath("/html/head/title").isEqualTo("Title from index.properties")
             .xpath("/html/body/div[1]").isEqualTo("foo")
             .xpath("/html/body/div[2]").isEqualTo("欢迎来到首页");
     }
@@ -105,7 +108,7 @@ public class ThemeMessageResolverIntegrationTest {
             .expectStatus()
             .isOk()
             .expectBody()
-            .xpath("/html/head/title").isEqualTo("Title")
+            .xpath("/html/head/title").isEqualTo("来自 index_zh.properties 的标题")
             .xpath("/html/body/div[1]").isEqualTo("zh")
             .xpath("/html/body/div[2]").isEqualTo("欢迎来到首页")
         ;
