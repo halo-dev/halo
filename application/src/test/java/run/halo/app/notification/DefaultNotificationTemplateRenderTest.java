@@ -9,6 +9,7 @@ import static org.mockito.Mockito.when;
 
 import java.net.MalformedURLException;
 import java.net.URI;
+import java.net.URL;
 import java.util.Map;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -88,7 +89,7 @@ class DefaultNotificationTemplateRenderTest {
                       以下是回复的具体内容：
                       
                       这是回复的内容
-   
+                       
                     Halo
                     http://localhost:8090
                     祝好！
@@ -100,5 +101,28 @@ class DefaultNotificationTemplateRenderTest {
         verify(environmentFetcher).fetch(eq(SystemSetting.Basic.GROUP),
             eq(SystemSetting.Basic.class));
         verify(externalUrlSupplier).getRaw();
+    }
+
+    @Test
+    void siteUrlTest() throws MalformedURLException {
+        when(environmentFetcher.fetch(eq(SystemSetting.Basic.GROUP), eq(SystemSetting.Basic.class)))
+            .thenReturn(Mono.just(new SystemSetting.Basic()));
+
+        var template = "<a th:href=\"|${site.url}/uc/notifications|\">查看通知</a>";
+        var expected = "<a href=\"http://localhost:8090/uc/notifications\">查看通知</a>";
+
+        when(externalUrlSupplier.getRaw()).thenReturn(new URL("http://localhost:8090/"));
+        templateRender.render(template,
+                Map.of())
+            .as(StepVerifier::create)
+            .expectNext(expected)
+            .verifyComplete();
+
+        when(externalUrlSupplier.getRaw()).thenReturn(new URL("http://localhost:8090"));
+        templateRender.render(template,
+                Map.of())
+            .as(StepVerifier::create)
+            .expectNext(expected)
+            .verifyComplete();
     }
 }
