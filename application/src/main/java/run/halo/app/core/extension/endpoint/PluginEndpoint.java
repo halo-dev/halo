@@ -17,6 +17,7 @@ import static run.halo.app.extension.index.query.QueryFactory.or;
 import static run.halo.app.extension.router.QueryParamBuildUtil.sortParameter;
 import static run.halo.app.infra.utils.FileUtils.deleteFileSilently;
 
+import com.fasterxml.jackson.databind.node.ObjectNode;
 import io.swagger.v3.oas.annotations.enums.ParameterIn;
 import io.swagger.v3.oas.annotations.media.Schema;
 import java.io.FileNotFoundException;
@@ -41,6 +42,7 @@ import org.springframework.core.io.buffer.DataBuffer;
 import org.springframework.dao.OptimisticLockingFailureException;
 import org.springframework.data.domain.Sort;
 import org.springframework.http.CacheControl;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.codec.multipart.FilePart;
 import org.springframework.http.codec.multipart.FormFieldPart;
@@ -61,6 +63,7 @@ import reactor.util.retry.Retry;
 import run.halo.app.core.extension.Plugin;
 import run.halo.app.core.extension.Setting;
 import run.halo.app.core.extension.service.PluginService;
+import run.halo.app.core.extension.service.SettingConfigService;
 import run.halo.app.core.extension.theme.SettingUtils;
 import run.halo.app.extension.ConfigMap;
 import run.halo.app.extension.ListOptions;
@@ -80,6 +83,8 @@ public class PluginEndpoint implements CustomEndpoint, InitializingBean {
 
     private final ReactiveUrlDataBufferFetcher reactiveUrlDataBufferFetcher;
 
+    private final SettingConfigService settingConfigService;
+
     private final WebProperties webProperties;
 
     private final Scheduler scheduler = Schedulers.boundedElastic();
@@ -91,10 +96,12 @@ public class PluginEndpoint implements CustomEndpoint, InitializingBean {
     public PluginEndpoint(ReactiveExtensionClient client,
         PluginService pluginService,
         ReactiveUrlDataBufferFetcher reactiveUrlDataBufferFetcher,
+        SettingConfigService settingConfigService,
         WebProperties webProperties) {
         this.client = client;
         this.pluginService = pluginService;
         this.reactiveUrlDataBufferFetcher = reactiveUrlDataBufferFetcher;
+        this.settingConfigService = settingConfigService;
         this.webProperties = webProperties;
     }
 
@@ -157,9 +164,9 @@ public class PluginEndpoint implements CustomEndpoint, InitializingBean {
                         .content(contentBuilder().mediaType(MediaType.MULTIPART_FORM_DATA_VALUE)
                             .schema(schemaBuilder().implementation(InstallRequest.class))))
             )
-            .PUT("plugins/{name}/config", this::updatePluginConfig,
-                builder -> builder.operationId("updatePluginConfig")
-                    .description("Update the configMap of plugin setting.")
+            .PUT("plugins/{name}/json-config", this::updatePluginJsonConfig,
+                builder -> builder.operationId("updatePluginJsonConfig")
+                    .description("Update the config of plugin setting.")
                     .tag(tag)
                     .parameter(parameterBuilder()
                         .name("name")
@@ -167,6 +174,26 @@ public class PluginEndpoint implements CustomEndpoint, InitializingBean {
                         .required(true)
                         .implementation(String.class)
                     )
+                    .requestBody(requestBodyBuilder()
+                        .required(true)
+                        .content(contentBuilder().mediaType(MediaType.APPLICATION_JSON_VALUE)
+                            .schema(schemaBuilder().implementation(ObjectNode.class))))
+                    .response(responseBuilder()
+                        .responseCode(String.valueOf(HttpStatus.NO_CONTENT.value()))
+                        .implementation(Void.class))
+            )
+            .PUT("plugins/{name}/config", this::updatePluginConfig,
+                builder -> builder.operationId("updatePluginConfig")
+                    .description(
+                        "Update the configMap of plugin setting, it is deprecated since 2.20.0")
+                    .tag(tag)
+                    .parameter(parameterBuilder()
+                        .name("name")
+                        .in(ParameterIn.PATH)
+                        .required(true)
+                        .implementation(String.class)
+                    )
+                    .deprecated(true)
                     .requestBody(requestBodyBuilder()
                         .required(true)
                         .content(contentBuilder().mediaType(MediaType.APPLICATION_JSON_VALUE)
@@ -243,7 +270,9 @@ public class PluginEndpoint implements CustomEndpoint, InitializingBean {
             )
             .GET("plugins/{name}/config", this::fetchPluginConfig,
                 builder -> builder.operationId("fetchPluginConfig")
-                    .description("Fetch configMap of plugin by configured configMapName.")
+                    .description(
+                        "Fetch configMap of plugin by configured configMapName. it is deprecated "
+                            + "since 2.20.0")
                     .tag(tag)
                     .parameter(parameterBuilder()
                         .name("name")
@@ -253,6 +282,20 @@ public class PluginEndpoint implements CustomEndpoint, InitializingBean {
                     )
                     .response(responseBuilder()
                         .implementation(ConfigMap.class))
+            )
+            .GET("plugins/{name}/json-config", this::fetchPluginJsonConfig,
+                builder -> builder.operationId("fetchPluginJsonConfig")
+                    .description(
+                        "Fetch converted json config of plugin by configured configMapName.")
+                    .tag(tag)
+                    .parameter(parameterBuilder()
+                        .name("name")
+                        .in(ParameterIn.PATH)
+                        .required(true)
+                        .implementation(String.class)
+                    )
+                    .response(responseBuilder()
+                        .implementation(ObjectNode.class))
             )
             .GET("plugin-presets", this::listPresets,
                 builder -> builder.operationId("ListPluginPresets")
@@ -273,6 +316,35 @@ public class PluginEndpoint implements CustomEndpoint, InitializingBean {
                     .response(responseBuilder().implementation(String.class))
             )
             .build();
+    }
+
+    private Mono<ServerResponse> fetchPluginJsonConfig(ServerRequest request) {
+        final var name = request.pathVariable("name");
+        return client.fetch(Plugin.class, name)
+            .mapNotNull(plugin -> plugin.getSpec().getConfigMapName())
+            .flatMap(settingConfigService::fetchConfig)
+            .flatMap(json -> ServerResponse.ok().bodyValue(json));
+    }
+
+    private Mono<ServerResponse> updatePluginJsonConfig(ServerRequest request) {
+        final var pluginName = request.pathVariable("name");
+        return client.fetch(Plugin.class, pluginName)
+            .doOnNext(plugin -> {
+                String configMapName = plugin.getSpec().getConfigMapName();
+                if (!StringUtils.hasText(configMapName)) {
+                    throw new ServerWebInputException(
+                        "Unable to complete the request because the plugin configMapName is blank");
+                }
+            })
+            .flatMap(plugin -> {
+                final String configMapName = plugin.getSpec().getConfigMapName();
+                return request.bodyToMono(ObjectNode.class)
+                    .switchIfEmpty(
+                        Mono.error(new ServerWebInputException("Required request body is missing")))
+                    .flatMap(configMapJsonData ->
+                        settingConfigService.upsertConfig(configMapName, configMapJsonData));
+            })
+            .then(ServerResponse.noContent().build());
     }
 
     Mono<ServerResponse> changePluginRunningState(ServerRequest request) {

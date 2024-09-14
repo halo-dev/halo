@@ -129,7 +129,30 @@ public class SettingUtils {
         }
     }
 
-    JsonNode mapToJsonNode(Map<String, String> map) {
+    /**
+     * Convert {@link Setting} related configMap data to JsonNode.
+     *
+     * @param configMap {@link ConfigMap} instance
+     * @return JsonNode
+     */
+    public static ObjectNode settingConfigToJson(ConfigMap configMap) {
+        if (configMap.getData() == null) {
+            return JsonNodeFactory.instance.objectNode();
+        }
+        return mapToJsonNode(configMap.getData());
+    }
+
+    /**
+     * Convert the result of {@link #settingConfigToJson(ConfigMap)} in reverse to Map.
+     *
+     * @param node JsonNode object
+     * @return {@link ConfigMap#getData()}
+     */
+    public static Map<String, String> settingConfigJsonToMap(ObjectNode node) {
+        return jsonNodeToStringMap(node);
+    }
+
+    ObjectNode mapToJsonNode(Map<String, String> map) {
         ObjectNode objectNode = JsonNodeFactory.instance.objectNode();
         map.forEach((k, v) -> {
             if (isJson(v)) {

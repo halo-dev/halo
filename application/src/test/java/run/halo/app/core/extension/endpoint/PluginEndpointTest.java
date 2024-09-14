@@ -22,6 +22,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.time.Instant;
 import java.util.List;
+import java.util.Map;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
@@ -45,6 +46,7 @@ import reactor.core.publisher.Mono;
 import run.halo.app.core.extension.Plugin;
 import run.halo.app.core.extension.Setting;
 import run.halo.app.core.extension.service.PluginService;
+import run.halo.app.core.extension.service.SettingConfigService;
 import run.halo.app.extension.ConfigMap;
 import run.halo.app.extension.ListOptions;
 import run.halo.app.extension.ListResult;
@@ -66,6 +68,9 @@ class PluginEndpointTest {
 
     @Mock
     PluginService pluginService;
+
+    @Mock
+    SettingConfigService settingConfigService;
 
     @Spy
     WebProperties webProperties = new WebProperties();
@@ -278,6 +283,22 @@ class PluginEndpointTest {
                 .exchange()
                 .expectStatus().isOk();
         }
+
+        @Test
+        void updateJsonConfigTest() {
+            Plugin plugin = createPlugin("fake-plugin");
+            plugin.getSpec().setConfigMapName("fake-config-map");
+
+            when(client.fetch(eq(Plugin.class), eq("fake-plugin"))).thenReturn(Mono.just(plugin));
+            when(settingConfigService.upsertConfig(eq("fake-config-map"), any()))
+                .thenReturn(Mono.empty());
+
+            webClient.put()
+                .uri("/plugins/fake-plugin/json-config")
+                .body(Mono.just(Map.of()), Map.class)
+                .exchange()
+                .expectStatus().is2xxSuccessful();
+        }
     }
 
     @Nested
@@ -323,6 +344,23 @@ class PluginEndpointTest {
                 .expectStatus().isOk();
 
             verify(client).fetch(eq(ConfigMap.class), eq("fake-config"));
+            verify(client).fetch(eq(Plugin.class), eq("fake"));
+        }
+
+        @Test
+        void fetchJsonConfig() {
+            Plugin plugin = createPlugin("fake");
+            plugin.getSpec().setConfigMapName("fake-config");
+
+            when(settingConfigService.fetchConfig(eq("fake-config")))
+                .thenReturn(Mono.empty());
+            when(client.fetch(eq(Plugin.class), eq("fake"))).thenReturn(Mono.just(plugin));
+            webClient.get()
+                .uri("/plugins/fake/json-config")
+                .exchange()
+                .expectStatus().isOk();
+
+            verify(settingConfigService).fetchConfig(eq("fake-config"));
             verify(client).fetch(eq(Plugin.class), eq("fake"));
         }
     }
