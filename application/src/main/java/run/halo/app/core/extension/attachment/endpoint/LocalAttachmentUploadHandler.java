@@ -6,6 +6,7 @@ import static run.halo.app.infra.utils.FileUtils.checkDirectoryTraversal;
 import static run.halo.app.infra.utils.FileUtils.deleteFileSilently;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.net.URI;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.FileAlreadyExistsException;
@@ -25,6 +26,7 @@ import org.springframework.core.io.buffer.DataBuffer;
 import org.springframework.core.io.buffer.DataBufferUtils;
 import org.springframework.http.MediaType;
 import org.springframework.http.codec.multipart.FilePart;
+import org.springframework.lang.NonNull;
 import org.springframework.stereotype.Component;
 import org.springframework.util.CollectionUtils;
 import org.springframework.util.StringUtils;
@@ -155,19 +157,14 @@ class LocalAttachmentUploadHandler implements AttachmentHandler {
             var typeValidator = file.content()
                 .next()
                 .handle((dataBuffer, sink) -> {
-                    var mimeType = "Unknown";
-                    try {
-                        mimeType = FileTypeDetectUtils.detectMimeType(dataBuffer.asInputStream());
-                        var isAllow = setting.getAllowedFileTypes()
-                            .stream()
-                            .map(FileCategoryMatcher::of)
-                            .anyMatch(matcher -> matcher.match(file.filename()));
-                        if (isAllow) {
-                            sink.next(dataBuffer);
-                            return;
-                        }
-                    } catch (IOException e) {
-                        log.warn("Failed to detect file type", e);
+                    var mimeType = detectMimeType(dataBuffer.asInputStream());
+                    var isAllow = setting.getAllowedFileTypes()
+                        .stream()
+                        .map(FileCategoryMatcher::of)
+                        .anyMatch(matcher -> matcher.match(mimeType));
+                    if (isAllow) {
+                        sink.next(dataBuffer);
+                        return;
                     }
                     sink.error(new FileTypeNotAllowedException("File type is not allowed",
                         "problemDetail.attachment.upload.fileTypeNotSupported",
@@ -177,6 +174,16 @@ class LocalAttachmentUploadHandler implements AttachmentHandler {
             validations.add(typeValidator);
         }
         return Mono.when(validations);
+    }
+
+    @NonNull
+    private String detectMimeType(InputStream inputStream) {
+        try {
+            return FileTypeDetectUtils.detectMimeType(inputStream);
+        } catch (IOException e) {
+            log.warn("Failed to detect file type", e);
+            return "Unknown";
+        }
     }
 
     @Override
