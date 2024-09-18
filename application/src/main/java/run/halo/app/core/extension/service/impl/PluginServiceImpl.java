@@ -40,6 +40,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.util.Assert;
 import org.springframework.util.CollectionUtils;
 import org.springframework.util.FileSystemUtils;
+import org.springframework.util.StreamUtils;
 import org.springframework.web.server.ServerWebInputException;
 import reactor.core.Exceptions;
 import reactor.core.publisher.Flux;
@@ -229,61 +230,73 @@ public class PluginServiceImpl implements PluginService, InitializingBean, Dispo
     @Override
     public Flux<DataBuffer> uglifyJsBundle() {
         var startedPlugins = List.copyOf(pluginManager.getStartedPlugins());
-        String plugins = """
-            this.enabledPlugins = [%s]
-            """.formatted(startedPlugins.stream()
-            .map(plugin -> """
-                {
-                  "name": "%s",
-                  "version": "%s"
+        var dataBufferFactory = DefaultDataBufferFactory.sharedInstance;
+        var end = Mono.fromSupplier(
+            () -> {
+                var sb = new StringBuilder("this.enabledPlugins = [");
+                var iterator = startedPlugins.iterator();
+                while (iterator.hasNext()) {
+                    var plugin = iterator.next();
+                    sb.append("""
+                        {"name":"%s","version":"%s"}\
+                        """
+                        .formatted(
+                            plugin.getPluginId(),
+                            plugin.getDescriptor().getVersion()
+                        )
+                    );
+                    if (iterator.hasNext()) {
+                        sb.append(',');
+                    }
                 }
-                """.formatted(plugin.getPluginId(), plugin.getDescriptor().getVersion())
-            )
-            .collect(Collectors.joining(", ")));
-        return Flux.fromIterable(startedPlugins)
-            .mapNotNull(pluginWrapper -> {
-                var pluginName = pluginWrapper.getPluginId();
-                return BundleResourceUtils.getJsBundleResource(pluginManager, pluginName,
-                    BundleResourceUtils.JS_BUNDLE);
-            })
-            .flatMap(resource -> {
-                try {
-                    // Specifying bufferSize as resource content length is
-                    // to append line breaks at the end of each plugin
-                    return DataBufferUtils.read(resource, DefaultDataBufferFactory.sharedInstance,
-                            (int) resource.contentLength())
-                        .doOnNext(dataBuffer -> {
-                            // add a new line after each plugin bundle to avoid syntax error
-                            dataBuffer.write("\n".getBytes(StandardCharsets.UTF_8));
-                        });
-                } catch (IOException e) {
-                    log.error("Failed to read plugin bundle resource", e);
-                    return Flux.empty();
-                }
-            })
-            .concatWith(Flux.defer(() -> {
-                var dataBuffer = DefaultDataBufferFactory.sharedInstance
-                    .wrap(plugins.getBytes(StandardCharsets.UTF_8));
-                return Flux.just(dataBuffer);
-            }));
+                sb.append(']');
+                return dataBufferFactory.wrap(sb.toString().getBytes(StandardCharsets.UTF_8));
+            });
+        var body = Flux.fromIterable(startedPlugins)
+            .sort(Comparator.comparing(PluginWrapper::getPluginId))
+            .concatMap(pluginWrapper -> {
+                var pluginId = pluginWrapper.getPluginId();
+                return Mono.<Resource>fromSupplier(
+                        () -> BundleResourceUtils.getJsBundleResource(
+                            pluginManager, pluginId, BundleResourceUtils.JS_BUNDLE
+                        )
+                    )
+                    .filter(Resource::isReadable)
+                    .flatMapMany(resource -> {
+                        var head = Mono.<DataBuffer>fromSupplier(
+                            () -> dataBufferFactory.wrap(
+                                ("// Generated from plugin " + pluginId + "\n").getBytes()
+                            ));
+                        var content = DataBufferUtils.read(
+                            resource, dataBufferFactory, StreamUtils.BUFFER_SIZE
+                        );
+                        var tail = Mono.fromSupplier(() -> dataBufferFactory.wrap("\n".getBytes()));
+                        return Flux.concat(head, content, tail);
+                    });
+            });
+        return Flux.concat(body, end);
     }
 
     @Override
     public Flux<DataBuffer> uglifyCssBundle() {
         return Flux.fromIterable(pluginManager.getStartedPlugins())
-            .mapNotNull(pluginWrapper -> {
-                String pluginName = pluginWrapper.getPluginId();
-                return BundleResourceUtils.getJsBundleResource(pluginManager, pluginName,
-                    BundleResourceUtils.CSS_BUNDLE);
-            })
-            .flatMap(resource -> {
-                try {
-                    return DataBufferUtils.read(resource, DefaultDataBufferFactory.sharedInstance,
-                        (int) resource.contentLength());
-                } catch (IOException e) {
-                    log.error("Failed to read plugin css bundle resource", e);
-                    return Flux.empty();
-                }
+            .sort(Comparator.comparing(PluginWrapper::getPluginId))
+            .concatMap(pluginWrapper -> {
+                var pluginId = pluginWrapper.getPluginId();
+                var dataBufferFactory = DefaultDataBufferFactory.sharedInstance;
+                return Mono.<Resource>fromSupplier(() -> BundleResourceUtils.getJsBundleResource(
+                        pluginManager, pluginId, BundleResourceUtils.CSS_BUNDLE
+                    ))
+                    .filter(Resource::isReadable)
+                    .flatMapMany(resource -> {
+                        var head = Mono.<DataBuffer>fromSupplier(() -> dataBufferFactory.wrap(
+                            ("/* Generated from plugin " + pluginId + " */\n").getBytes()
+                        ));
+                        var content = DataBufferUtils.read(
+                            resource, dataBufferFactory, StreamUtils.BUFFER_SIZE);
+                        var tail = Mono.fromSupplier(() -> dataBufferFactory.wrap("\n".getBytes()));
+                        return Flux.concat(head, content, tail);
+                    });
             });
     }
 
