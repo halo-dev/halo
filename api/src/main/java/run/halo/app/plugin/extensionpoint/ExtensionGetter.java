@@ -1,5 +1,6 @@
 package run.halo.app.plugin.extensionpoint;
 
+import java.util.List;
 import org.pf4j.ExtensionPoint;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
@@ -34,4 +35,14 @@ public interface ExtensionGetter {
      * @return a bunch of extension points.
      */
     <T extends ExtensionPoint> Flux<T> getExtensions(Class<T> extensionPointClass);
+
+    /**
+     * Get all extensions according to extension point class.
+     *
+     * @param extensionPointClass extension point class
+     * @param <T> type of extension point
+     * @return a bunch of extension points.
+     */
+    <T extends ExtensionPoint> List<T> getExtensionList(Class<T> extensionPointClass);
+
 }
