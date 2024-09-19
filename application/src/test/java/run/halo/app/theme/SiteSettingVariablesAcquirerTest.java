@@ -6,6 +6,7 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import com.github.zafarkhaja.semver.Version;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.Map;
@@ -20,6 +21,7 @@ import reactor.test.StepVerifier;
 import run.halo.app.extension.ConfigMap;
 import run.halo.app.infra.ExternalUrlSupplier;
 import run.halo.app.infra.SystemConfigurableEnvironmentFetcher;
+import run.halo.app.infra.SystemVersionSupplier;
 import run.halo.app.theme.finders.vo.SiteSettingVo;
 
 /**
@@ -32,6 +34,10 @@ import run.halo.app.theme.finders.vo.SiteSettingVo;
 public class SiteSettingVariablesAcquirerTest {
     @Mock
     private ExternalUrlSupplier externalUrlSupplier;
+
+    @Mock
+    private SystemVersionSupplier systemVersionSupplier;
+
     @Mock
     private SystemConfigurableEnvironmentFetcher environmentFetcher;
 
@@ -45,6 +51,7 @@ public class SiteSettingVariablesAcquirerTest {
 
         var url = new URL("https://halo.run");
         when(externalUrlSupplier.getURL(any())).thenReturn(url);
+        when(systemVersionSupplier.get()).thenReturn(Version.parse("0.0.0-alpha.1"));
         when(environmentFetcher.getConfigMap()).thenReturn(Mono.just(configMap));
 
         siteSettingVariablesAcquirer.acquire(mock(ServerWebExchange.class))
@@ -52,9 +59,13 @@ public class SiteSettingVariablesAcquirerTest {
             .consumeNextWith(result -> {
                 assertThat(result).containsKey("site");
                 assertThat(result.get("site")).isInstanceOf(SiteSettingVo.class);
-                assertThat((SiteSettingVo) result.get("site"))
+                var site = (SiteSettingVo) result.get("site");
+                assertThat(site)
                     .extracting(SiteSettingVo::getUrl)
                     .isEqualTo(url);
+                assertThat(site)
+                    .extracting(SiteSettingVo::getVersion)
+                    .isEqualTo("0.0.0-alpha.1");
             })
             .verifyComplete();
         verify(externalUrlSupplier).getURL(any());
