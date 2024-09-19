@@ -9,6 +9,7 @@ import org.springframework.web.reactive.function.server.ServerResponse;
 import reactor.core.publisher.Mono;
 import run.halo.app.core.extension.endpoint.CustomEndpoint;
 import run.halo.app.core.extension.endpoint.CustomEndpointsBuilder;
+import run.halo.app.infra.SecureServerRequest;
 
 /**
  * Aggregated router function built from all custom endpoints.
@@ -28,7 +29,7 @@ public class AggregatedRouterFunction implements RouterFunction<ServerResponse> 
 
     @Override
     public Mono<HandlerFunction<ServerResponse>> route(ServerRequest request) {
-        return aggregated.route(request);
+        return aggregated.route(new SecureServerRequest(request));
     }
 
     @Override
