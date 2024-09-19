@@ -74,7 +74,7 @@ class ThemeReconcilerTest {
     @BeforeEach
     void setUp() throws IOException {
         defaultTheme = ResourceUtils.getFile("classpath:themes/default");
-        lenient().when(systemVersionSupplier.get()).thenReturn(Version.valueOf("0.0.0"));
+        lenient().when(systemVersionSupplier.get()).thenReturn(Version.parse("0.0.0"));
     }
 
     @Test
@@ -190,7 +190,7 @@ class ThemeReconcilerTest {
 
     @Test
     void reconcileStatus() {
-        when(systemVersionSupplier.get()).thenReturn(Version.valueOf("2.3.0"));
+        when(systemVersionSupplier.get()).thenReturn(Version.parse("2.3.0"));
         Path testWorkDir = tempDirectory.resolve("reconcile-delete");
         when(themeRoot.get()).thenReturn(testWorkDir);
 
