@@ -78,7 +78,7 @@ class ThemeServiceImplTest {
         // init the folder
         Files.createDirectory(themeRoot.get());
 
-        lenient().when(systemVersionSupplier.get()).thenReturn(Version.valueOf("0.0.0"));
+        lenient().when(systemVersionSupplier.get()).thenReturn(Version.parse("0.0.0"));
     }
 
     @AfterEach
