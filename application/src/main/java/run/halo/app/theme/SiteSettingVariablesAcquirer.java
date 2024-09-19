@@ -31,7 +31,7 @@ public class SiteSettingVariablesAcquirer implements ViewContextBasedVariablesAc
             .map(configMap -> {
                 SiteSettingVo siteSettingVo = SiteSettingVo.from(configMap)
                     .withUrl(externalUrlSupplier.getURL(exchange.getRequest()))
-                    .withVersion(systemVersionSupplier.get().toStableVersion().toString());
+                    .withVersion(systemVersionSupplier.get().toString());
                 return Map.of("site", siteSettingVo);
             });
     }

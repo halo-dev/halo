@@ -51,7 +51,7 @@ public class SiteSettingVariablesAcquirerTest {
 
         var url = new URL("https://halo.run");
         when(externalUrlSupplier.getURL(any())).thenReturn(url);
-        when(systemVersionSupplier.get()).thenReturn(Version.parse("0.0.0"));
+        when(systemVersionSupplier.get()).thenReturn(Version.parse("0.0.0-alpha.1"));
         when(environmentFetcher.getConfigMap()).thenReturn(Mono.just(configMap));
 
         siteSettingVariablesAcquirer.acquire(mock(ServerWebExchange.class))
@@ -65,7 +65,7 @@ public class SiteSettingVariablesAcquirerTest {
                     .isEqualTo(url);
                 assertThat(site)
                     .extracting(SiteSettingVo::getVersion)
-                    .isEqualTo("0.0.0");
+                    .isEqualTo("0.0.0-alpha.1");
             })
             .verifyComplete();
         verify(externalUrlSupplier).getURL(any());
