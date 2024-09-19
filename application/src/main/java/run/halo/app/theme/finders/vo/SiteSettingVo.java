@@ -25,6 +25,9 @@ public class SiteSettingVo {
     @With
     URL url;
 
+    @With
+    String version;
+
     String subtitle;
 
     String logo;
