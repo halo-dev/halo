@@ -30,3 +30,7 @@ rules:
   - apiGroups: [ "" ]
     resources: [ "menus", "menuitems" ]
     verbs: [ "get", "list" ]
+  - apiGroups: [ "console.api.halo.run" ]
+    resources: [ "systemconfigs" ]
+    resourceNames: [ "menu" ]
+    verbs: [ "get" ]
