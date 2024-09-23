@@ -8,7 +8,7 @@ import org.springframework.web.reactive.function.server.ServerRequest;
 import org.springframework.web.reactive.function.server.ServerResponse;
 import reactor.core.publisher.Mono;
 import run.halo.app.core.extension.endpoint.CustomEndpoint;
-import run.halo.app.core.extension.endpoint.CustomEndpointsBuilder;
+import run.halo.app.core.endpoint.console.CustomEndpointsBuilder;
 
 /**
  * Aggregated router function built from all custom endpoints.

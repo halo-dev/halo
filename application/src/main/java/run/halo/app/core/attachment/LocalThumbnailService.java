@@ -6,7 +6,7 @@ import java.nio.file.Path;
 import org.springframework.core.io.Resource;
 import org.springframework.lang.NonNull;
 import reactor.core.publisher.Mono;
-import run.halo.app.core.extension.attachment.LocalThumbnail;
+import run.halo.app.core.attachment.extension.LocalThumbnail;
 import run.halo.app.infra.ExternalLinkProcessor;
 import run.halo.app.infra.exception.NotFoundException;
 
