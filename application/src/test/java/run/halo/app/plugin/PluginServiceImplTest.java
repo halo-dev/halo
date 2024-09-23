@@ -119,7 +119,7 @@ class PluginServiceImplTest {
                 getClass().getClassLoader().getResource("plugin/plugin-0.0.2")).toURI();
             FileUtils.jar(Paths.get(fakePluingUri), tempDirectory.resolve("plugin-0.0.2.jar"));
 
-            lenient().when(systemVersionSupplier.get()).thenReturn(Version.valueOf("0.0.0"));
+            lenient().when(systemVersionSupplier.get()).thenReturn(Version.parse("0.0.0"));
         }
 
         @Test

@@ -469,7 +469,7 @@ public class PluginServiceImpl implements PluginService, InitializingBean, Dispo
         Version version = systemVersion.get();
         // validate the plugin version
         // only use the nominal system version to compare, the format is like MAJOR.MINOR.PATCH
-        String systemVersion = version.getNormalVersion();
+        String systemVersion = version.toStableVersion().toString();
         String requires = newPlugin.getSpec().getRequires();
         if (!VersionUtils.satisfiesRequires(systemVersion, requires)) {
             throw new UnsatisfiedAttributeValueException(String.format(

@@ -6,6 +6,7 @@ import static run.halo.app.infra.utils.FileUtils.deleteRecursivelyAndSilently;
 import static run.halo.app.infra.utils.FileUtils.unzip;
 import static run.halo.app.theme.service.ThemeUtils.loadThemeManifest;
 import static run.halo.app.theme.service.ThemeUtils.locateThemeManifest;
+import static run.halo.app.theme.service.ThemeUtils.unzipThemeTo;
 
 import java.nio.file.Path;
 import java.time.Duration;
@@ -32,7 +33,6 @@ import reactor.util.retry.Retry;
 import run.halo.app.core.extension.AnnotationSetting;
 import run.halo.app.core.extension.Setting;
 import run.halo.app.core.extension.Theme;
-import run.halo.app.infra.utils.SettingUtils;
 import run.halo.app.extension.ConfigMap;
 import run.halo.app.extension.MetadataUtil;
 import run.halo.app.extension.ReactiveExtensionClient;
@@ -41,6 +41,7 @@ import run.halo.app.infra.SystemVersionSupplier;
 import run.halo.app.infra.ThemeRootGetter;
 import run.halo.app.infra.exception.ThemeUpgradeException;
 import run.halo.app.infra.exception.UnsatisfiedAttributeValueException;
+import run.halo.app.infra.utils.SettingUtils;
 import run.halo.app.infra.utils.VersionUtils;
 
 @Slf4j
@@ -59,7 +60,7 @@ public class ThemeServiceImpl implements ThemeService {
     @Override
     public Mono<Theme> install(Publisher<DataBuffer> content) {
         var themeRoot = this.themeRoot.get();
-        return ThemeUtils.unzipThemeTo(content, themeRoot, scheduler)
+        return unzipThemeTo(content, themeRoot, scheduler)
             .flatMap(this::persistent);
     }
 

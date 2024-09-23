@@ -6,11 +6,16 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.Optional;
 import org.attoparser.ParseException;
+import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.autoconfigure.thymeleaf.ThymeleafProperties;
+import org.springframework.boot.context.properties.PropertyMapper;
 import org.springframework.context.ApplicationContext;
+import org.springframework.core.Ordered;
 import org.springframework.http.MediaType;
 import org.springframework.lang.NonNull;
 import org.springframework.stereotype.Component;
+import org.springframework.util.unit.DataSize;
 import org.springframework.web.ErrorResponse;
 import org.springframework.web.reactive.result.view.View;
 import org.springframework.web.server.ServerWebExchange;
@@ -24,13 +29,16 @@ import run.halo.app.theme.finders.FinderRegistry;
 import run.halo.app.theme.router.ModelConst;
 
 @Component("thymeleafReactiveViewResolver")
-public class HaloViewResolver extends ThymeleafReactiveViewResolver {
+public class HaloViewResolver extends ThymeleafReactiveViewResolver implements InitializingBean {
 
     private final FinderRegistry finderRegistry;
 
-    public HaloViewResolver(FinderRegistry finderRegistry) {
-        setViewClass(HaloView.class);
+    private final ThymeleafProperties thymeleafProperties;
+
+    public HaloViewResolver(FinderRegistry finderRegistry,
+        ThymeleafProperties thymeleafProperties) {
         this.finderRegistry = finderRegistry;
+        this.thymeleafProperties = thymeleafProperties;
     }
 
     @Override
@@ -42,6 +50,37 @@ public class HaloViewResolver extends ThymeleafReactiveViewResolver {
                 finderRegistry.getFinders().forEach(view::addStaticVariable);
                 return view;
             });
+    }
+
+    @Override
+    public void afterPropertiesSet() throws Exception {
+        setViewClass(HaloView.class);
+        var map = PropertyMapper.get();
+        map.from(thymeleafProperties::getEncoding)
+            .whenNonNull()
+            .to(this::setDefaultCharset);
+        map.from(thymeleafProperties::getExcludedViewNames)
+            .whenNonNull()
+            .to(this::setExcludedViewNames);
+        map.from(thymeleafProperties::getViewNames)
+            .whenNonNull()
+            .to(this::setViewNames);
+
+        var reactive = thymeleafProperties.getReactive();
+        map.from(reactive::getMediaTypes)
+            .whenNonNull()
+            .to(this::setSupportedMediaTypes);
+        map.from(reactive::getFullModeViewNames)
+            .whenNonNull()
+            .to(this::setFullModeViewNames);
+        map.from(reactive::getChunkedModeViewNames)
+            .whenNonNull()
+            .to(this::setChunkedModeViewNames);
+        map.from(reactive::getMaxChunkSize)
+            .asInt(DataSize::toBytes)
+            .when(size -> size > 0)
+            .to(this::setResponseMaxChunkSizeBytes);
+        setOrder(Ordered.LOWEST_PRECEDENCE - 5);
     }
 
     public static class HaloView extends ThymeleafReactiveView {

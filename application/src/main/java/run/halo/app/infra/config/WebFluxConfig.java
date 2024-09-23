@@ -12,6 +12,7 @@ import java.util.List;
 import java.util.Objects;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.boot.autoconfigure.web.WebProperties;
+import org.springframework.boot.autoconfigure.web.reactive.WebFluxRegistrations;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -33,18 +34,20 @@ import org.springframework.web.reactive.function.server.RouterFunction;
 import org.springframework.web.reactive.function.server.ServerResponse;
 import org.springframework.web.reactive.resource.EncodedResourceResolver;
 import org.springframework.web.reactive.resource.PathResourceResolver;
+import org.springframework.web.reactive.result.method.annotation.RequestMappingHandlerAdapter;
 import org.springframework.web.reactive.result.view.ViewResolutionResultHandler;
 import org.springframework.web.reactive.result.view.ViewResolver;
 import reactor.core.publisher.Mono;
+import run.halo.app.core.endpoint.WebSocketHandlerMapping;
+import run.halo.app.core.endpoint.console.CustomEndpointsBuilder;
+import run.halo.app.core.extension.endpoint.CustomEndpoint;
+import run.halo.app.infra.SecureRequestMappingHandlerAdapter;
 import run.halo.app.infra.console.ProxyFilter;
 import run.halo.app.infra.console.WebSocketRequestPredicate;
-import run.halo.app.core.endpoint.WebSocketHandlerMapping;
-import run.halo.app.core.extension.endpoint.CustomEndpoint;
-import run.halo.app.core.endpoint.console.CustomEndpointsBuilder;
 import run.halo.app.infra.properties.AttachmentProperties;
 import run.halo.app.infra.properties.HaloProperties;
-import run.halo.app.plugin.extensionpoint.ExtensionGetter;
 import run.halo.app.infra.webfilter.AdditionalWebFilterChainProxy;
+import run.halo.app.plugin.extensionpoint.ExtensionGetter;
 
 @Configuration
 public class WebFluxConfig implements WebFluxConfigurer {
@@ -65,6 +68,19 @@ public class WebFluxConfig implements WebFluxConfigurer {
         this.haloProp = haloProp;
         this.resourceProperties = webProperties.getResources();
         this.applicationContext = applicationContext;
+    }
+
+    @Bean
+    WebFluxRegistrations webFluxRegistrations() {
+        return new WebFluxRegistrations() {
+            @Override
+            public RequestMappingHandlerAdapter getRequestMappingHandlerAdapter() {
+                // Because we have no chance to customize ServerWebExchangeMethodArgumentResolver,
+                // we have to use SecureRequestMappingHandlerAdapter to replace a secure
+                // ServerWebExchange.
+                return new SecureRequestMappingHandlerAdapter();
+            }
+        };
     }
 
     @Bean

@@ -183,7 +183,7 @@ class PluginEndpointTest {
             webClient = WebTestClient.bindToRouterFunction(endpoint.endpoint())
                 .build();
 
-            lenient().when(systemVersionSupplier.get()).thenReturn(Version.valueOf("0.0.0"));
+            lenient().when(systemVersionSupplier.get()).thenReturn(Version.parse("0.0.0"));
             tempDirectory = Files.createTempDirectory("halo-test-plugin-upgrade-");
             plugin002 = tempDirectory.resolve("plugin-0.0.2.jar");
 

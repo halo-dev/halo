@@ -57,7 +57,8 @@ public class HaloPostTemplateHandler extends AbstractTemplateHandler {
             var context = getContext();
             for (ElementTagPostProcessor elementTagPostProcessor : postProcessors) {
                 tagProcessorChain = tagProcessorChain.flatMap(
-                    tag -> elementTagPostProcessor.process(context, tag).defaultIfEmpty(tag)
+                    tag -> elementTagPostProcessor.process(new SecureTemplateContext(context), tag)
+                        .defaultIfEmpty(tag)
                 );
             }
             processedTag =
