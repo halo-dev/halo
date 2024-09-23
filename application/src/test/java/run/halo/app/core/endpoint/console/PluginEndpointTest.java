@@ -44,7 +44,6 @@ import org.springframework.web.server.ServerWebInputException;
 import reactor.core.publisher.Mono;
 import run.halo.app.core.extension.Plugin;
 import run.halo.app.core.extension.Setting;
-import run.halo.app.plugin.PluginService;
 import run.halo.app.extension.ConfigMap;
 import run.halo.app.extension.ListOptions;
 import run.halo.app.extension.ListResult;
@@ -53,6 +52,7 @@ import run.halo.app.extension.PageRequest;
 import run.halo.app.extension.ReactiveExtensionClient;
 import run.halo.app.infra.SystemVersionSupplier;
 import run.halo.app.infra.utils.FileUtils;
+import run.halo.app.plugin.PluginService;
 
 @Slf4j
 @ExtendWith(MockitoExtension.class)

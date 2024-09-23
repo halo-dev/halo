@@ -17,7 +17,6 @@ import org.springframework.util.FileSystemUtils;
 import run.halo.app.core.extension.AnnotationSetting;
 import run.halo.app.core.extension.Setting;
 import run.halo.app.core.extension.Theme;
-import run.halo.app.infra.utils.SettingUtils;
 import run.halo.app.extension.ExtensionClient;
 import run.halo.app.extension.MetadataUtil;
 import run.halo.app.extension.controller.Controller;
@@ -30,6 +29,7 @@ import run.halo.app.infra.SystemVersionSupplier;
 import run.halo.app.infra.ThemeRootGetter;
 import run.halo.app.infra.exception.ThemeUninstallException;
 import run.halo.app.infra.utils.JsonUtils;
+import run.halo.app.infra.utils.SettingUtils;
 import run.halo.app.infra.utils.VersionUtils;
 
 /**
