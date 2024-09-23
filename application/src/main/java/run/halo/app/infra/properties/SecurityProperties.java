@@ -18,6 +18,8 @@ public class SecurityProperties {
 
     private final TwoFactorAuthOptions twoFactorAuth = new TwoFactorAuthOptions();
 
+    private boolean disableBasicAuth = false;
+
     @Data
     public static class TwoFactorAuthOptions {
 
