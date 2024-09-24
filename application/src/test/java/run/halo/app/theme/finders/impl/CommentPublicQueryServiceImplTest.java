@@ -24,7 +24,7 @@ import run.halo.app.core.extension.Counter;
 import run.halo.app.core.extension.User;
 import run.halo.app.core.extension.content.Comment;
 import run.halo.app.core.extension.content.Post;
-import run.halo.app.core.extension.service.UserService;
+import run.halo.app.core.user.service.UserService;
 import run.halo.app.extension.GroupVersionKind;
 import run.halo.app.extension.ListResult;
 import run.halo.app.extension.Metadata;

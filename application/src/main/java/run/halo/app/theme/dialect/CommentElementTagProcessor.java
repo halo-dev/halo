@@ -45,6 +45,6 @@ public class CommentElementTagProcessor extends AbstractElementTagProcessor {
             structureHandler.replaceWith("", false);
             return;
         }
-        commentWidget.render(context, tag, structureHandler);
+        commentWidget.render(new SecureTemplateContext(context), tag, structureHandler);
     }
 }

@@ -38,7 +38,6 @@ import run.halo.app.theme.dialect.HaloProcessorDialect;
  * Tests expression parser for reactive return value.
  *
  * @author guqing
- * @see ReactivePropertyAccessor
  * @see ReactiveSpelVariableExpressionEvaluator
  * @since 2.0.0
  */

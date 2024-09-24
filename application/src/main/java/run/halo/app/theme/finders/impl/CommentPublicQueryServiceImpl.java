@@ -27,7 +27,7 @@ import run.halo.app.content.comment.OwnerInfo;
 import run.halo.app.core.extension.User;
 import run.halo.app.core.extension.content.Comment;
 import run.halo.app.core.extension.content.Reply;
-import run.halo.app.core.extension.service.UserService;
+import run.halo.app.core.user.service.UserService;
 import run.halo.app.extension.AbstractExtension;
 import run.halo.app.extension.ListOptions;
 import run.halo.app.extension.ListResult;

@@ -26,7 +26,7 @@ import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.web.reactive.server.WebTestClient;
 import reactor.core.publisher.Flux;
 import run.halo.app.core.extension.Role;
-import run.halo.app.core.extension.service.RoleService;
+import run.halo.app.core.user.service.RoleService;
 import run.halo.app.extension.ExtensionClient;
 import run.halo.app.extension.FakeExtension;
 import run.halo.app.extension.GroupVersionKind;

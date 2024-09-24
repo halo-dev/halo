@@ -14,6 +14,7 @@ import org.springframework.mock.http.server.reactive.MockServerHttpRequest;
 import org.springframework.mock.web.server.MockServerWebExchange;
 import org.springframework.web.server.WebFilterChain;
 import reactor.core.publisher.Mono;
+import run.halo.app.infra.webfilter.LocaleChangeWebFilter;
 
 class LocaleChangeWebFilterTest {
 

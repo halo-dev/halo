@@ -34,7 +34,7 @@ import run.halo.app.core.extension.content.Category;
 import run.halo.app.core.extension.content.Post;
 import run.halo.app.core.extension.content.Snapshot;
 import run.halo.app.core.extension.content.Tag;
-import run.halo.app.core.extension.service.UserService;
+import run.halo.app.core.user.service.UserService;
 import run.halo.app.extension.ListOptions;
 import run.halo.app.extension.ListResult;
 import run.halo.app.extension.MetadataOperator;

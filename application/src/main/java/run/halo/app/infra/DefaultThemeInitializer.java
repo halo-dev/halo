@@ -10,10 +10,10 @@ import org.springframework.core.io.buffer.DefaultDataBufferFactory;
 import org.springframework.stereotype.Component;
 import org.springframework.util.ResourceUtils;
 import org.springframework.util.StreamUtils;
-import run.halo.app.core.extension.theme.ThemeService;
 import run.halo.app.infra.properties.HaloProperties;
 import run.halo.app.infra.properties.ThemeProperties;
 import run.halo.app.infra.utils.FileUtils;
+import run.halo.app.theme.service.ThemeService;
 
 @Slf4j
 @Component
@@ -44,7 +44,7 @@ public class DefaultThemeInitializer implements ApplicationListener<ApplicationS
             // TODO Checking if any themes are installed here in the future might be better?
             if (!FileUtils.isEmpty(themeRoot)) {
                 log.debug("Skipped initializing default theme because there are themes "
-                          + "inside theme root");
+                    + "inside theme root");
                 return;
             }
             log.info("Initializing default theme from {}", location);
