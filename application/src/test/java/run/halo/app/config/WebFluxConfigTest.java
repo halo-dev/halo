@@ -25,7 +25,7 @@ import reactor.core.publisher.Flux;
 import reactor.test.StepVerifier;
 import run.halo.app.core.endpoint.WebSocketEndpoint;
 import run.halo.app.core.extension.Role;
-import run.halo.app.core.extension.service.RoleService;
+import run.halo.app.core.user.service.RoleService;
 import run.halo.app.extension.GroupVersion;
 import run.halo.app.extension.Metadata;
 

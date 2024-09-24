@@ -71,7 +71,9 @@ public class GlobalHeadInjectionProcessor extends AbstractElementModelProcessor 
 
         // apply processors to modelToInsert
         getTemplateHeadProcessors(context)
-            .concatMap(processor -> processor.process(context, modelToInsert, structureHandler))
+            .concatMap(processor -> processor.process(
+                new SecureTemplateContext(context), modelToInsert, structureHandler)
+            )
             .then()
             .block();
 

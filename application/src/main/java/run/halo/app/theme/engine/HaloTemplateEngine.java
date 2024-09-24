@@ -42,10 +42,19 @@ public class HaloTemplateEngine extends SpringWebFluxTemplateEngine {
         // We have to subscribe on blocking thread, because some blocking operations will be present
         // while processing.
         if (publisher instanceof Mono<DataBuffer> mono) {
-            return mono.subscribeOn(Schedulers.boundedElastic());
+            return mono.subscribeOn(Schedulers.boundedElastic())
+                // We should switch back to non-blocking thread.
+                // See https://github.com/spring-projects/spring-framework/issues/26958
+                // for more details.
+                .publishOn(Schedulers.parallel());
         }
         if (publisher instanceof Flux<DataBuffer> flux) {
-            return flux.subscribeOn(Schedulers.boundedElastic());
+            return flux
+                .subscribeOn(Schedulers.boundedElastic())
+                // We should switch back to non-blocking thread.
+                // See https://github.com/spring-projects/spring-framework/issues/26958
+                // for more details.
+                .publishOn(Schedulers.parallel());
         }
         return publisher;
     }

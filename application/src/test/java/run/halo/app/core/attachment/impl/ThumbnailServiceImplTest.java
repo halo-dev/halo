@@ -29,7 +29,7 @@ import run.halo.app.core.attachment.LocalThumbnailService;
 import run.halo.app.core.attachment.ThumbnailProvider;
 import run.halo.app.core.attachment.ThumbnailSigner;
 import run.halo.app.core.attachment.ThumbnailSize;
-import run.halo.app.core.extension.attachment.Thumbnail;
+import run.halo.app.core.attachment.extension.Thumbnail;
 import run.halo.app.extension.ListOptions;
 import run.halo.app.extension.PageRequest;
 import run.halo.app.extension.ReactiveExtensionClient;

@@ -60,6 +60,6 @@ class DefaultSystemVersionSupplierTest {
         when(buildPropertiesProvider.getIfUnique()).thenReturn(buildProperties);
         version = systemVersionSupplier.get();
         assertThat(version.toString()).isEqualTo("2.0.0-SNAPSHOT");
-        assertThat(version.getPreReleaseVersion()).isEqualTo("SNAPSHOT");
+        assertThat(version.preReleaseVersion().orElseThrow()).isEqualTo("SNAPSHOT");
     }
 }

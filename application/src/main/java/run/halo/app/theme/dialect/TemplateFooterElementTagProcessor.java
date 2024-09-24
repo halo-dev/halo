@@ -58,8 +58,8 @@ public class TemplateFooterElementTagProcessor extends AbstractElementTagProcess
         modelToInsert.add(context.getModelFactory().createText(globalFooterText));
 
         getTemplateFooterProcessors(context)
-            .concatMap(processor -> processor.process(context, tag,
-                structureHandler, modelToInsert)
+            .concatMap(processor -> processor.process(
+                new SecureTemplateContext(context), tag, structureHandler, modelToInsert)
             )
             .then()
             .block();
