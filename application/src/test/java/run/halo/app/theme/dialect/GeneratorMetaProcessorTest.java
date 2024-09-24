@@ -11,7 +11,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.reactive.AutoConfigureWebTestClient;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.reactive.server.WebTestClient;
 import org.springframework.util.ResourceUtils;
 import org.springframework.web.server.ServerWebExchange;
@@ -27,10 +27,10 @@ class GeneratorMetaProcessorTest {
     @Autowired
     WebTestClient webClient;
 
-    @MockBean
+    @MockitoBean
     InitializationStateGetter initializationStateGetter;
 
-    @MockBean
+    @MockitoBean
     ThemeResolver themeResolver;
 
     @BeforeEach

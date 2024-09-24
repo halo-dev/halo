@@ -44,21 +44,19 @@ import run.halo.app.metrics.CounterService;
 class CommentPublicQueryServiceImplTest {
 
     @Mock
-    private ReactiveExtensionClient client;
-    @Mock
-    private UserService userService;
+    ReactiveExtensionClient client;
 
     @Mock
-    private CounterService counterService;
+    UserService userService;
+
+    @Mock
+    CounterService counterService;
 
     @InjectMocks
-    private CommentPublicQueryServiceImpl commentPublicQueryService;
+    CommentPublicQueryServiceImpl commentPublicQueryService;
 
     @BeforeEach
     void setUp() {
-        User ghost = createUser();
-        ghost.getMetadata().setName("ghost");
-        when(userService.getUserOrGhost(eq("ghost"))).thenReturn(Mono.just(ghost));
         when(userService.getUserOrGhost(eq("fake-user"))).thenReturn(Mono.just(createUser()));
     }
 

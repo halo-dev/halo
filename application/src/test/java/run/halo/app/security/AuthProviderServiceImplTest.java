@@ -37,11 +37,12 @@ import run.halo.app.infra.utils.JsonUtils;
  */
 @ExtendWith(SpringExtension.class)
 class AuthProviderServiceImplTest {
+
     @Mock
-    private ReactiveExtensionClient client;
+    ReactiveExtensionClient client;
 
     @InjectMocks
-    private AuthProviderServiceImpl authProviderService;
+    AuthProviderServiceImpl authProviderService;
 
     @Test
     void testEnable() {
@@ -57,14 +58,12 @@ class AuthProviderServiceImplTest {
         when(client.fetch(eq(ConfigMap.class), eq(SystemSetting.SYSTEM_CONFIG)))
             .thenReturn(Mono.just(configMap));
 
-        AuthProvider local = createAuthProvider("local");
-        local.getMetadata().getLabels().put(AuthProvider.PRIVILEGED_LABEL, "true");
-        when(client.list(eq(AuthProvider.class), any(), any())).thenReturn(Flux.just(local));
-
         // Call the method being tested
-        Mono<AuthProvider> result = authProviderService.enable("github");
+        authProviderService.enable("github")
+            .as(StepVerifier::create)
+            .expectNext(authProvider)
+            .verifyComplete();
 
-        assertEquals(authProvider, result.block());
         ConfigMap value = captor.getValue();
         String providerSettingStr = value.getData().get(SystemSetting.AuthProvider.GROUP);
         Set<String> enabled =
@@ -84,7 +83,7 @@ class AuthProviderServiceImplTest {
 
         AuthProvider local = createAuthProvider("local");
         local.getMetadata().getLabels().put(AuthProvider.PRIVILEGED_LABEL, "true");
-        when(client.list(eq(AuthProvider.class), any(), any())).thenReturn(Flux.just(local));
+        // when(client.list(eq(AuthProvider.class), any(), any())).thenReturn(Flux.just(local));
 
         ArgumentCaptor<ConfigMap> captor = ArgumentCaptor.forClass(ConfigMap.class);
         when(client.update(captor.capture())).thenReturn(Mono.empty());
@@ -155,7 +154,7 @@ class AuthProviderServiceImplTest {
                                 "supportsBinding": false,
                                 "privileged": false
                             },{
-                                                        
+                            
                                 "name": "gitee",
                                 "displayName": "gitee",
                                 "enabled": false,
