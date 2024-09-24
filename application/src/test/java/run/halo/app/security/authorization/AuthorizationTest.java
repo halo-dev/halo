@@ -35,7 +35,7 @@ import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import run.halo.app.core.extension.Role;
 import run.halo.app.core.extension.Role.PolicyRule;
-import run.halo.app.core.extension.service.RoleService;
+import run.halo.app.core.user.service.RoleService;
 import run.halo.app.extension.ExtensionClient;
 import run.halo.app.extension.Metadata;
 import run.halo.app.infra.AnonymousUserConst;

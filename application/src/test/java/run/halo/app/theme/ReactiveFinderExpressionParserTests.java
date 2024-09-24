@@ -3,6 +3,7 @@ package run.halo.app.theme;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.lenient;
+import static org.mockito.Mockito.when;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ArrayNode;
@@ -14,6 +15,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.context.ApplicationContext;
 import org.thymeleaf.IEngineConfiguration;
 import org.thymeleaf.TemplateEngine;
@@ -29,13 +31,13 @@ import reactor.core.publisher.Mono;
 import run.halo.app.infra.SystemConfigurableEnvironmentFetcher;
 import run.halo.app.infra.SystemSetting;
 import run.halo.app.infra.utils.JsonUtils;
+import run.halo.app.plugin.extensionpoint.ExtensionGetter;
 import run.halo.app.theme.dialect.HaloProcessorDialect;
 
 /**
  * Tests expression parser for reactive return value.
  *
  * @author guqing
- * @see ReactivePropertyAccessor
  * @see ReactiveSpelVariableExpressionEvaluator
  * @since 2.0.0
  */
@@ -43,6 +45,9 @@ import run.halo.app.theme.dialect.HaloProcessorDialect;
 public class ReactiveFinderExpressionParserTests {
     @Mock
     private ApplicationContext applicationContext;
+
+    @Mock
+    private ObjectProvider<ExtensionGetter> extensionGetterProvider;
 
     @Mock
     private SystemConfigurableEnvironmentFetcher environmentFetcher;
@@ -62,6 +67,9 @@ public class ReactiveFinderExpressionParserTests {
         templateEngine.addTemplateResolver(new TestTemplateResolver());
         lenient().when(applicationContext.getBean(eq(SystemConfigurableEnvironmentFetcher.class)))
             .thenReturn(environmentFetcher);
+        when(applicationContext.getBeanProvider(ExtensionGetter.class))
+            .thenReturn(extensionGetterProvider);
+        when(extensionGetterProvider.getIfUnique()).thenReturn(null);
         lenient().when(environmentFetcher.fetchComment())
             .thenReturn(Mono.just(new SystemSetting.Comment()));
     }
@@ -155,7 +163,7 @@ public class ReactiveFinderExpressionParserTests {
                     var mapMono = /*[[${target.mapMono.foo}]]*/;
                     var arrayNodeMono = /*[[${target.arrayNodeMono.get(0).foo}]]*/;
                 </script>
-                 """);
+                """);
         }
 
     }

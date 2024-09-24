@@ -1,5 +1,6 @@
 package run.halo.app.plugin.extensionpoint;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.same;
 import static org.mockito.Mockito.mock;
@@ -43,6 +44,9 @@ class DefaultExtensionGetterTest {
 
     @Mock
     BeanFactory beanFactory;
+
+    @Mock
+    ObjectProvider<FakeExtensionPoint> extensionPointObjectProvider;
 
     @InjectMocks
     DefaultExtensionGetter getter;
@@ -207,6 +211,20 @@ class DefaultExtensionGetterTest {
             // order is not set
             .expectNext(anotherExtensionImpl)
             .verifyComplete();
+    }
+
+    @Test
+    void shouldGetExtensionsFromPluginManagerAndApplicationContext() {
+        var extensionFromPlugin = new FakeExtensionPointDefaultImpl();
+        var extensionFromAppContext = new FakeExtensionPointImpl();
+        when(pluginManager.getExtensions(FakeExtensionPoint.class))
+            .thenReturn(List.of(extensionFromPlugin));
+        when(beanFactory.getBeanProvider(FakeExtensionPoint.class))
+            .thenReturn(extensionPointObjectProvider);
+        when(extensionPointObjectProvider.orderedStream())
+            .thenReturn(Stream.of(extensionFromAppContext));
+        var extensions = getter.getExtensionList(FakeExtensionPoint.class);
+        assertEquals(List.of(extensionFromAppContext, extensionFromPlugin), extensions);
     }
 
     interface FakeExtensionPoint extends ExtensionPoint {

@@ -41,7 +41,7 @@ public class VersionUtils {
         try {
             return StringUtils.isBlank(constraint)
                 || "*".equals(constraint)
-                || Version.valueOf(version).satisfies(constraint);
+                || Version.parse(version).satisfies(constraint);
         } catch (Exception e) {
             throw new ServerWebInputException("Illegal requires version expression.", null, e);
         }

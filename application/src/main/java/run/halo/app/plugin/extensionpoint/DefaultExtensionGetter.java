@@ -2,7 +2,10 @@ package run.halo.app.plugin.extensionpoint;
 
 import static run.halo.app.extension.index.query.QueryFactory.equal;
 
+import java.util.LinkedList;
+import java.util.List;
 import java.util.Objects;
+import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import org.pf4j.ExtensionPoint;
 import org.pf4j.PluginManager;
@@ -39,6 +42,16 @@ public class DefaultExtensionGetter implements ExtensionGetter {
                 Flux.fromStream(() -> beanFactory.getBeanProvider(extensionPoint).orderedStream())
             )
             .sort(new AnnotationAwareOrderComparator());
+    }
+
+    @Override
+    public <T extends ExtensionPoint> List<T> getExtensionList(Class<T> extensionPoint) {
+        var extensions = new LinkedList<T>();
+        Optional.ofNullable(pluginManager.getExtensions(extensionPoint))
+            .ifPresent(extensions::addAll);
+        extensions.addAll(beanFactory.getBeanProvider(extensionPoint).orderedStream().toList());
+        extensions.sort(new AnnotationAwareOrderComparator());
+        return extensions;
     }
 
     @Override
