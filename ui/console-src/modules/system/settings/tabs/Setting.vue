@@ -9,7 +9,6 @@ import { Toast, VButton } from "@halo-dev/components";
 // hooks
 import { useGlobalInfoStore } from "@/stores/global-info";
 import { useSettingFormConvert } from "@console/composables/use-setting-form";
-import { useSystemConfigMapStore } from "@console/stores/system-configmap";
 import type { ConfigMap, Setting } from "@halo-dev/api-client";
 import { coreApiClient } from "@halo-dev/api-client";
 import { useQuery, useQueryClient } from "@tanstack/vue-query";
@@ -18,7 +17,6 @@ import { useI18n } from "vue-i18n";
 const SYSTEM_CONFIGMAP_NAME = "system";
 
 const { t } = useI18n();
-const systemConfigMapStore = useSystemConfigMapStore();
 const queryClient = useQueryClient();
 
 const group = inject<Ref<string>>("activeTab", ref("basic"));
@@ -52,7 +50,7 @@ const handleSaveConfigMap = async () => {
     return;
   }
 
-  const { data } = await coreApiClient.configMap.updateConfigMap({
+  await coreApiClient.configMap.updateConfigMap({
     name: SYSTEM_CONFIGMAP_NAME,
     configMap: configMapToUpdate,
   });
@@ -61,7 +59,6 @@ const handleSaveConfigMap = async () => {
 
   queryClient.invalidateQueries({ queryKey: ["system-configMap"] });
   await useGlobalInfoStore().fetchGlobalInfo();
-  systemConfigMapStore.configMap = data;
 
   saving.value = false;
 };

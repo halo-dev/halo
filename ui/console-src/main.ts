@@ -19,7 +19,6 @@ import {
   setupCoreModules,
   setupPluginModules,
 } from "@console/setup/setupModules";
-import { useSystemConfigMapStore } from "@console/stores/system-configmap";
 import { useThemeStore } from "@console/stores/theme";
 
 const app = createApp(App);
@@ -96,10 +95,6 @@ async function initApp() {
     } catch (e) {
       console.error("Failed to load plugins", e);
     }
-
-    // load system configMap
-    const systemConfigMapStore = useSystemConfigMapStore();
-    await systemConfigMapStore.fetchSystemConfigMap();
 
     if (globalInfoStore.globalInfo?.userInitialized) {
       await loadActivatedTheme();
