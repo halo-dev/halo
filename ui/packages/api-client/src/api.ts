@@ -77,6 +77,7 @@ export * from './api/single-page-v1alpha1-public-api';
 export * from './api/snapshot-v1alpha1-api';
 export * from './api/snapshot-v1alpha1-uc-api';
 export * from './api/subscription-v1alpha1-api';
+export * from './api/system-config-v1alpha1-console-api';
 export * from './api/system-v1alpha1-console-api';
 export * from './api/system-v1alpha1-public-api';
 export * from './api/tag-v1alpha1-api';
