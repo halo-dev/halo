@@ -142,3 +142,8 @@ export function fileToBase64(file: File): Promise<string> {
     reader.readAsDataURL(file);
   });
 }
+
+export function containsFileClipboardIdentifier(types: readonly string[]) {
+  const fileTypes = ["files", "application/x-moz-file", "public.file-url"];
+  return types.some((type) => fileTypes.includes(type.toLowerCase()));
+}
