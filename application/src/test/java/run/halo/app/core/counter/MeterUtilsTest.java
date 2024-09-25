@@ -1,4 +1,4 @@
-package run.halo.app.metrics;
+package run.halo.app.core.counter;
 
 import static org.assertj.core.api.Assertions.assertThat;
 

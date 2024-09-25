@@ -5,6 +5,7 @@ import static run.halo.app.extension.index.query.QueryFactory.startsWith;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Component;
+import run.halo.app.core.counter.MeterUtils;
 import run.halo.app.core.extension.Counter;
 import run.halo.app.core.extension.content.Post;
 import run.halo.app.event.post.PostStatsChangedEvent;
@@ -14,7 +15,6 @@ import run.halo.app.extension.controller.Controller;
 import run.halo.app.extension.controller.ControllerBuilder;
 import run.halo.app.extension.controller.Reconciler;
 import run.halo.app.extension.router.selector.FieldSelector;
-import run.halo.app.metrics.MeterUtils;
 
 @Component
 @RequiredArgsConstructor

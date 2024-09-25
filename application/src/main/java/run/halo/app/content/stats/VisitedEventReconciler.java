@@ -1,4 +1,4 @@
-package run.halo.app.metrics;
+package run.halo.app.content.stats;
 
 import java.time.Duration;
 import java.time.Instant;
@@ -14,6 +14,7 @@ import org.springframework.context.event.EventListener;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
+import run.halo.app.core.counter.MeterUtils;
 import run.halo.app.core.extension.Counter;
 import run.halo.app.event.post.VisitedEvent;
 import run.halo.app.extension.ExtensionClient;

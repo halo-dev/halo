@@ -20,6 +20,7 @@ import org.mockito.stubbing.Answer;
 import org.skyscreamer.jsonassert.JSONAssert;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import reactor.core.publisher.Mono;
+import run.halo.app.core.counter.CounterService;
 import run.halo.app.core.extension.Counter;
 import run.halo.app.core.extension.User;
 import run.halo.app.core.extension.content.Comment;
@@ -32,7 +33,6 @@ import run.halo.app.extension.ReactiveExtensionClient;
 import run.halo.app.extension.Ref;
 import run.halo.app.infra.AnonymousUserConst;
 import run.halo.app.infra.utils.JsonUtils;
-import run.halo.app.metrics.CounterService;
 
 /**
  * Tests for {@link CommentFinderImpl}.

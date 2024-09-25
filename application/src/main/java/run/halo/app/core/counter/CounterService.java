@@ -1,4 +1,4 @@
-package run.halo.app.metrics;
+package run.halo.app.core.counter;
 
 import reactor.core.publisher.Mono;
 import run.halo.app.core.extension.Counter;

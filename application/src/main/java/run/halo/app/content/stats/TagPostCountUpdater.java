@@ -1,4 +1,4 @@
-package run.halo.app.content;
+package run.halo.app.content.stats;
 
 import static org.apache.commons.lang3.ObjectUtils.defaultIfNull;
 import static run.halo.app.extension.index.query.QueryFactory.and;
@@ -12,6 +12,7 @@ import java.util.Set;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Component;
+import run.halo.app.content.AbstractEventReconciler;
 import run.halo.app.core.extension.content.Post;
 import run.halo.app.core.extension.content.Tag;
 import run.halo.app.core.extension.content.Tag.TagStatus;

@@ -1,4 +1,4 @@
-package run.halo.app.metrics;
+package run.halo.app.core.counter;
 
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Mono;

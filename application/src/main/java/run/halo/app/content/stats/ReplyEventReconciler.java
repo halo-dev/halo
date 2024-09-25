@@ -1,4 +1,4 @@
-package run.halo.app.metrics;
+package run.halo.app.content.stats;
 
 import static org.apache.commons.lang3.ObjectUtils.defaultIfNull;
 import static run.halo.app.extension.index.query.QueryFactory.and;
