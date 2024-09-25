@@ -10,8 +10,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
 import org.springframework.boot.test.autoconfigure.web.reactive.AutoConfigureWebTestClient;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.mock.mockito.SpyBean;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.test.context.bean.override.mockito.MockitoSpyBean;
 import org.springframework.test.web.reactive.server.WebTestClient;
 import run.halo.app.core.extension.Role;
 import run.halo.app.core.extension.RoleBinding;
@@ -28,7 +28,7 @@ import run.halo.app.extension.ReactiveExtensionClient;
 @AutoConfigureTestDatabase
 class SuperAdminInitializerTest {
 
-    @SpyBean
+    @MockitoSpyBean
     ReactiveExtensionClient client;
 
     @Autowired

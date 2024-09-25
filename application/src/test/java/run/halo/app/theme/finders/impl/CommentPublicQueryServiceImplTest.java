@@ -24,7 +24,7 @@ import run.halo.app.core.extension.Counter;
 import run.halo.app.core.extension.User;
 import run.halo.app.core.extension.content.Comment;
 import run.halo.app.core.extension.content.Post;
-import run.halo.app.core.extension.service.UserService;
+import run.halo.app.core.user.service.UserService;
 import run.halo.app.extension.GroupVersionKind;
 import run.halo.app.extension.ListResult;
 import run.halo.app.extension.Metadata;
@@ -44,21 +44,19 @@ import run.halo.app.metrics.CounterService;
 class CommentPublicQueryServiceImplTest {
 
     @Mock
-    private ReactiveExtensionClient client;
-    @Mock
-    private UserService userService;
+    ReactiveExtensionClient client;
 
     @Mock
-    private CounterService counterService;
+    UserService userService;
+
+    @Mock
+    CounterService counterService;
 
     @InjectMocks
-    private CommentPublicQueryServiceImpl commentPublicQueryService;
+    CommentPublicQueryServiceImpl commentPublicQueryService;
 
     @BeforeEach
     void setUp() {
-        User ghost = createUser();
-        ghost.getMetadata().setName("ghost");
-        when(userService.getUserOrGhost(eq("ghost"))).thenReturn(Mono.just(ghost));
         when(userService.getUserOrGhost(eq("fake-user"))).thenReturn(Mono.just(createUser()));
     }
 

@@ -10,6 +10,7 @@ import org.apache.tika.metadata.Metadata;
 import org.apache.tika.metadata.TikaCoreProperties;
 import org.apache.tika.mime.MimeTypeException;
 import org.apache.tika.mime.MimeTypes;
+import org.springframework.util.Assert;
 
 @UtilityClass
 public class FileTypeDetectUtils {
@@ -21,9 +22,11 @@ public class FileTypeDetectUtils {
      * <p>The type detection is based on the content of the given document stream and the name of
      * the document.</p>
      *
+     * @param inputStream the document stream must not be null
      * @throws IOException if the stream can not be read
      */
     public static String detectMimeType(InputStream inputStream, String name) throws IOException {
+        Assert.notNull(name, "The name of the document must not be null");
         var metadata = new Metadata();
         metadata.set(TikaCoreProperties.RESOURCE_NAME_KEY, name);
         return doDetectMimeType(inputStream, metadata);
@@ -32,7 +35,7 @@ public class FileTypeDetectUtils {
     /**
      * Detect mime type.
      *
-     * @param inputStream input stream will be closed after detection.
+     * @param inputStream input stream will be closed after detection, must not be null
      */
     public static String detectMimeType(InputStream inputStream) throws IOException {
         return doDetectMimeType(inputStream, new Metadata());
@@ -40,6 +43,7 @@ public class FileTypeDetectUtils {
 
     private static String doDetectMimeType(InputStream inputStream, Metadata metadata)
         throws IOException {
+        Assert.notNull(inputStream, "The inputStream must not be null");
         try (var stream = (!inputStream.markSupported()
             ? new BufferedInputStream(inputStream) : inputStream)) {
             return detector.detect(stream, metadata).toString();

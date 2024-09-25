@@ -27,6 +27,9 @@ spring:
       cache:
         cachecontrol:
           max-age: 365d
+  thymeleaf:
+    reactive:
+      maxChunkSize: 8KB
   cache:
     type: caffeine
     caffeine:

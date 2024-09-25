@@ -43,36 +43,40 @@ import run.halo.app.theme.finders.vo.SinglePageVo;
 @ExtendWith(SpringExtension.class)
 class PreviewRouterFunctionTest {
     @Mock
-    private ReactiveExtensionClient client;
+    ReactiveExtensionClient client;
 
     @Mock
-    private PostPublicQueryService postPublicQueryService;
+    PostPublicQueryService postPublicQueryService;
 
     @Mock
-    private ViewNameResolver viewNameResolver;
+    ViewNameResolver viewNameResolver;
 
     @Mock
-    private ViewResolver viewResolver;
+    ViewResolver viewResolver;
 
     @Mock
-    private PostService postService;
+    PostService postService;
 
     @Mock
-    private SinglePageConversionService singlePageConversionService;
+    SinglePageConversionService singlePageConversionService;
 
     @InjectMocks
-    private PreviewRouterFunction previewRouterFunction;
+    PreviewRouterFunction previewRouterFunction;
 
-    private WebTestClient webTestClient;
+    WebTestClient webTestClient;
 
     @BeforeEach
-    public void setUp() {
+    void setUp() {
         webTestClient = WebTestClient.bindToRouterFunction(previewRouterFunction.previewRouter())
             .handlerStrategies(HandlerStrategies.builder()
                 .viewResolver(viewResolver)
                 .build())
             .build();
+    }
 
+    @Test
+    @WithMockUser(username = "testuser")
+    void previewPost() {
         when(viewResolver.resolveViewName(any(), any()))
             .thenReturn(Mono.just(new EmptyView() {
                 @Override
@@ -81,11 +85,7 @@ class PreviewRouterFunctionTest {
                     return super.render(model, contentType, exchange);
                 }
             }));
-    }
 
-    @Test
-    @WithMockUser(username = "testuser")
-    public void previewPost() {
         Post post = new Post();
         post.setMetadata(new Metadata());
         post.getMetadata().setName("post1");
@@ -123,6 +123,15 @@ class PreviewRouterFunctionTest {
     @Test
     @WithMockUser(username = "testuser")
     public void previewSinglePage() {
+        when(viewResolver.resolveViewName(any(), any()))
+            .thenReturn(Mono.just(new EmptyView() {
+                @Override
+                public Mono<Void> render(Map<String, ?> model, MediaType contentType,
+                    ServerWebExchange exchange) {
+                    return super.render(model, contentType, exchange);
+                }
+            }));
+
         SinglePage singlePage = new SinglePage();
         singlePage.setMetadata(new Metadata());
         singlePage.getMetadata().setName("page1");

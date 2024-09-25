@@ -29,7 +29,7 @@ import org.springframework.web.reactive.function.server.ServerRequest;
 import org.springframework.web.reactive.function.server.ServerResponse;
 import org.springframework.web.server.ServerWebInputException;
 import reactor.core.publisher.Mono;
-import run.halo.app.core.extension.service.RoleService;
+import run.halo.app.core.user.service.RoleService;
 import run.halo.app.extension.ExtensionUtil;
 import run.halo.app.extension.Metadata;
 import run.halo.app.extension.ReactiveExtensionClient;

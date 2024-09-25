@@ -1,0 +1,475 @@
+package run.halo.app.core.endpoint.console;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anySet;
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.ArgumentMatchers.same;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
+import static org.springframework.security.test.web.reactive.server.SecurityMockServerConfigurers.mockUser;
+import static org.springframework.security.test.web.reactive.server.SecurityMockServerConfigurers.springSecurity;
+
+import java.time.Instant;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Nested;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.http.MediaType;
+import org.springframework.http.client.MultipartBodyBuilder;
+import org.springframework.test.web.reactive.server.WebTestClient;
+import org.springframework.web.reactive.function.BodyInserters;
+import reactor.core.publisher.Flux;
+import reactor.core.publisher.Mono;
+import run.halo.app.core.extension.Role;
+import run.halo.app.core.extension.User;
+import run.halo.app.core.extension.attachment.Attachment;
+import run.halo.app.core.extension.service.AttachmentService;
+import run.halo.app.core.user.service.RoleService;
+import run.halo.app.core.user.service.UserService;
+import run.halo.app.extension.ListResult;
+import run.halo.app.extension.Metadata;
+import run.halo.app.extension.PageRequest;
+import run.halo.app.extension.ReactiveExtensionClient;
+import run.halo.app.infra.SystemConfigurableEnvironmentFetcher;
+import run.halo.app.infra.SystemSetting;
+import run.halo.app.infra.exception.UserNotFoundException;
+import run.halo.app.infra.utils.JsonUtils;
+
+@ExtendWith(MockitoExtension.class)
+class UserEndpointTest {
+
+    WebTestClient webClient;
+
+    @Mock
+    RoleService roleService;
+
+    @Mock
+    AttachmentService attachmentService;
+
+    @Mock
+    SystemConfigurableEnvironmentFetcher environmentFetcher;
+
+    @Mock
+    ReactiveExtensionClient client;
+
+    @Mock
+    UserService userService;
+
+    @InjectMocks
+    UserEndpoint endpoint;
+
+    @BeforeEach
+    void setUp() {
+        webClient = WebTestClient.bindToRouterFunction(endpoint.endpoint())
+            .apply(springSecurity())
+            .build()
+            .mutateWith(mockUser("fake-user").password("fake-password").roles("fake-super-role"));
+    }
+
+    @Nested
+    class UserListTest {
+
+        @Test
+        void shouldListEmptyUsersWhenNoUsers() {
+            when(roleService.getRolesByUsernames(any())).thenReturn(Mono.just(Map.of()));
+            when(roleService.list(any())).thenReturn(Flux.empty());
+            when(client.listBy(same(User.class), any(), any(PageRequest.class)))
+                .thenReturn(Mono.just(ListResult.emptyResult()));
+
+            webClient.get().uri("/users")
+                .exchange()
+                .expectStatus().isOk()
+                .expectBody()
+                .jsonPath("$.items.length()").isEqualTo(0)
+                .jsonPath("$.total").isEqualTo(0);
+        }
+
+        @Test
+        void shouldListUsersWhenUserPresent() {
+            var users = List.of(
+                createUser("fake-user-1"),
+                createUser("fake-user-2"),
+                createUser("fake-user-3")
+            );
+            var expectResult = new ListResult<>(users);
+            when(roleService.getRolesByUsernames(any())).thenReturn(Mono.just(Map.of()));
+            when(roleService.list(anySet())).thenReturn(Flux.empty());
+            when(client.listBy(same(User.class), any(), any(PageRequest.class)))
+                .thenReturn(Mono.just(expectResult));
+
+            webClient.get().uri("/users")
+                .exchange()
+                .expectStatus().isOk()
+                .expectBody()
+                .jsonPath("$.items.length()").isEqualTo(3)
+                .jsonPath("$.total").isEqualTo(3);
+        }
+
+        @Test
+        void shouldFilterUsersWhenRoleProvided() {
+            var expectUser =
+                JsonUtils.jsonToObject("""
+                    {
+                        "apiVersion": "v1alpha1",
+                        "kind": "User",
+                        "metadata": {
+                            "name": "alice",
+                            "annotations": {
+                                "rbac.authorization.halo.run/role-names": "[\\"guest\\"]"
+                            }
+                        }
+                    }
+                    """, User.class);
+            var users = List.of(
+                expectUser
+            );
+            var expectResult = new ListResult<>(users);
+            when(client.listBy(same(User.class), any(), any(PageRequest.class)))
+                .thenReturn(Mono.just(expectResult));
+            when(roleService.getRolesByUsernames(any())).thenReturn(Mono.just(Map.of()));
+            when(roleService.list(anySet())).thenReturn(Flux.empty());
+
+            webClient.get().uri("/users?role=guest")
+                .exchange()
+                .expectStatus().isOk();
+        }
+
+        @Test
+        void shouldSortUsersWhenCreationTimestampSet() {
+            var expectUser =
+                createUser("fake-user-2", "expected display name");
+            var expectResult = new ListResult<>(List.of(expectUser));
+            when(client.listBy(same(User.class), any(), any(PageRequest.class)))
+                .thenReturn(Mono.just(expectResult));
+            when(roleService.getRolesByUsernames(any())).thenReturn(Mono.just(Map.of()));
+            when(roleService.list(anySet())).thenReturn(Flux.empty());
+
+            webClient.get().uri("/users?sort=creationTimestamp,desc")
+                .exchange()
+                .expectStatus().isOk();
+        }
+
+        User createUser(String name) {
+            return createUser(name, "fake display name");
+        }
+
+        User createUser(String name, String displayName) {
+            var metadata = new Metadata();
+            metadata.setName(name);
+            metadata.setCreationTimestamp(Instant.now());
+            var spec = new User.UserSpec();
+            spec.setDisplayName(displayName);
+            var user = new User();
+            user.setMetadata(metadata);
+            user.setSpec(spec);
+            return user;
+        }
+
+    }
+
+    @Nested
+    @DisplayName("GetUserDetail")
+    class GetUserDetailTest {
+
+        @Test
+        void shouldResponseErrorIfUserNotFound() {
+            when(userService.getUser("fake-user"))
+                .thenReturn(Mono.error(new UserNotFoundException("fake-user")));
+            webClient.get().uri("/users/-")
+                .exchange()
+                .expectStatus().isNotFound();
+
+            verify(userService).getUser(eq("fake-user"));
+        }
+
+        @Test
+        void shouldGetCurrentUserDetail() {
+            var metadata = new Metadata();
+            metadata.setName("fake-user");
+            var user = new User();
+            user.setMetadata(metadata);
+            when(userService.getUser("fake-user")).thenReturn(Mono.just(user));
+            Role role = new Role();
+            role.setMetadata(new Metadata());
+            role.getMetadata().setName("fake-super-role");
+            role.setRules(List.of());
+            when(roleService.list(Set.of("fake-super-role"), true)).thenReturn(Flux.just(role));
+            webClient.get().uri("/users/-")
+                .exchange()
+                .expectStatus().isOk()
+                .expectHeader().contentType(MediaType.APPLICATION_JSON)
+                .expectBody(UserEndpoint.DetailedUser.class)
+                .isEqualTo(new UserEndpoint.DetailedUser(user, List.of(role)));
+        }
+    }
+
+    @Nested
+    @DisplayName("UpdateProfile")
+    class UpdateProfileTest {
+
+        @Test
+        void shouldUpdateProfileCorrectly() {
+            var currentUser = createUser("fake-user");
+            var updatedUser = createUser("fake-user");
+            var requestUser = createUser("fake-user");
+
+            when(client.get(User.class, "fake-user")).thenReturn(Mono.just(currentUser));
+            when(client.update(currentUser)).thenReturn(Mono.just(updatedUser));
+
+            webClient.put().uri("/users/-")
+                .bodyValue(requestUser)
+                .exchange()
+                .expectStatus().isOk()
+                .expectBody(User.class)
+                .isEqualTo(updatedUser);
+
+            verify(client).get(User.class, "fake-user");
+            verify(client).update(currentUser);
+        }
+
+        @Test
+        void shouldGetErrorIfUsernameMismatch() {
+            var currentUser = createUser("fake-user");
+            var requestUser = createUser("another-fake-user");
+
+            when(client.get(User.class, "fake-user")).thenReturn(Mono.just(currentUser));
+
+            webClient.put().uri("/users/-")
+                .bodyValue(requestUser)
+                .exchange()
+                .expectStatus().isBadRequest();
+
+            verify(client).get(User.class, "fake-user");
+            verify(client, never()).update(currentUser);
+        }
+
+        User createUser(String name) {
+            var spec = new User.UserSpec();
+            spec.setEmail("hi@halo.run");
+            spec.setBio("Fake bio");
+            spec.setDisplayName("Faker");
+            spec.setPassword("fake-password");
+
+            var metadata = new Metadata();
+            metadata.setName(name);
+
+            var user = new User();
+            user.setSpec(spec);
+            user.setMetadata(metadata);
+            return user;
+        }
+    }
+
+    @Nested
+    @DisplayName("ChangePassword")
+    class ChangePasswordTest {
+
+        @Test
+        void shouldUpdateMyPasswordCorrectly() {
+            var user = new User();
+            when(userService.updateWithRawPassword("fake-user", "new-password"))
+                .thenReturn(Mono.just(user));
+            when(userService.confirmPassword("fake-user", "old-password"))
+                .thenReturn(Mono.just(true));
+            webClient.put().uri("/users/-/password")
+                .bodyValue(
+                    new UserEndpoint.ChangeOwnPasswordRequest("old-password", "new-password"))
+                .exchange()
+                .expectStatus().isOk()
+                .expectBody(User.class)
+                .isEqualTo(user);
+
+            verify(userService, times(1)).updateWithRawPassword("fake-user", "new-password");
+        }
+
+        @Test
+        void shouldUpdateOtherPasswordCorrectly() {
+            var user = new User();
+            when(userService.updateWithRawPassword("another-fake-user", "new-password"))
+                .thenReturn(Mono.just(user));
+            webClient.put()
+                .uri("/users/another-fake-user/password")
+                .bodyValue(
+                    new UserEndpoint.ChangeOwnPasswordRequest("old-password", "new-password"))
+                .exchange()
+                .expectStatus().isOk()
+                .expectBody(User.class)
+                .isEqualTo(user);
+
+            verify(userService, times(1)).updateWithRawPassword("another-fake-user",
+                "new-password");
+        }
+
+    }
+
+    @Nested
+    @DisplayName("GrantPermission")
+    class GrantPermissionEndpointTest {
+
+        @Test
+        void shouldGetBadRequestIfRequestBodyIsEmpty() {
+            webClient.post().uri("/users/fake-user/permissions")
+                .contentType(MediaType.APPLICATION_JSON)
+                .exchange()
+                .expectStatus().isBadRequest();
+
+            // Why one more time to verify? Because the SuperAdminInitializer will fetch admin user.
+            verify(client, never()).fetch(same(User.class), eq("fake-user"));
+            verify(client, never()).fetch(same(Role.class), eq("fake-role"));
+        }
+
+        @Test
+        void shouldGrantPermission() {
+            when(userService.grantRoles("fake-user", Set.of("fake-role"))).thenReturn(Mono.empty());
+
+            webClient.post().uri("/users/fake-user/permissions")
+                .contentType(MediaType.APPLICATION_JSON)
+                .bodyValue(new UserEndpoint.GrantRequest(Set.of("fake-role")))
+                .exchange()
+                .expectStatus().isOk();
+        }
+
+        @Test
+        void shouldGetPermission() {
+            Role roleA = JsonUtils.jsonToObject("""
+                {
+                    "apiVersion": "v1alpha1",
+                    "kind": "Role",
+                    "metadata": {
+                        "name": "test-A",
+                        "annotations": {
+                            "rbac.authorization.halo.run/ui-permissions": \
+                            "[\\"permission-A\\", \\"permission-A\\"]"
+                        }
+                    },
+                    "rules": []
+                }
+                """, Role.class);
+            when(roleService.listPermissions(eq(Set.of("test-A")))).thenReturn(Flux.just(roleA));
+            when(roleService.getRolesByUsername("fake-user")).thenReturn(Flux.just("test-A"));
+            when(roleService.list(Set.of("test-A"), true)).thenReturn(Flux.just(roleA));
+
+            webClient.get().uri("/users/fake-user/permissions")
+                .exchange()
+                .expectStatus()
+                .isOk()
+                .expectBody(UserEndpoint.UserPermission.class)
+                .value(userPermission -> {
+                    assertEquals(List.of(roleA), userPermission.getRoles());
+                    assertEquals(List.of(roleA), userPermission.getPermissions());
+                    assertEquals(List.of("permission-A"), userPermission.getUiPermissions());
+                });
+        }
+    }
+
+    @Test
+    void createWhenNameDuplicate() {
+        when(userService.createUser(any(User.class), anySet()))
+            .thenReturn(Mono.just(new User()));
+        var userRequest = new UserEndpoint.CreateUserRequest("fake-user",
+            "fake-email",
+            "",
+            "",
+            "",
+            "",
+            "",
+            Map.of(),
+            Set.of());
+        webClient.post().uri("/users")
+            .bodyValue(userRequest)
+            .exchange()
+            .expectStatus().isOk();
+    }
+
+    @Nested
+    class AvatarUploadTest {
+        @Test
+        void respondWithErrorIfTypeNotPNG() {
+
+            var multipartBodyBuilder = new MultipartBodyBuilder();
+            multipartBodyBuilder.part("file", "fake-file")
+                .contentType(MediaType.IMAGE_JPEG)
+                .filename("fake-filename.jpg");
+
+            SystemSetting.User user = mock(SystemSetting.User.class);
+            when(environmentFetcher.fetch(SystemSetting.User.GROUP, SystemSetting.User.class))
+                .thenReturn(Mono.just(user));
+
+            webClient
+                .post()
+                .uri("/users/-/avatar")
+                .contentType(MediaType.MULTIPART_FORM_DATA)
+                .body(BodyInserters.fromMultipartData(multipartBodyBuilder.build()))
+                .exchange()
+                .expectStatus()
+                .is4xxClientError();
+        }
+
+        @Test
+        void shouldUploadSuccessfully() {
+            var currentUser = createUser("fake-user");
+
+            Attachment attachment = new Attachment();
+            Metadata metadata = new Metadata();
+            metadata.setName("fake-attachment");
+            attachment.setMetadata(metadata);
+
+            var multipartBodyBuilder = new MultipartBodyBuilder();
+            multipartBodyBuilder.part("file", "fake-file")
+                .contentType(MediaType.IMAGE_PNG)
+                .filename("fake-filename.png");
+
+            SystemSetting.User user = mock(SystemSetting.User.class);
+            when(environmentFetcher.fetch(SystemSetting.User.GROUP, SystemSetting.User.class))
+                .thenReturn(Mono.just(user));
+            when(client.get(User.class, "fake-user")).thenReturn(Mono.just(currentUser));
+            when(attachmentService.upload(anyString(), anyString(), anyString(),
+                any(), any(MediaType.IMAGE_PNG.getClass()))).thenReturn(Mono.just(attachment));
+
+            when(client.update(currentUser)).thenReturn(Mono.just(currentUser));
+
+            webClient.post()
+                .uri("/users/-/avatar")
+                .contentType(MediaType.MULTIPART_FORM_DATA)
+                .body(BodyInserters.fromMultipartData(multipartBodyBuilder.build()))
+                .exchange()
+                .expectStatus()
+                .isOk()
+                .expectBody(User.class).isEqualTo(currentUser);
+
+            verify(client).get(User.class, "fake-user");
+            verify(client).update(currentUser);
+        }
+
+        User createUser(String name) {
+            var spec = new User.UserSpec();
+            spec.setEmail("hi@halo.run");
+            spec.setBio("Fake bio");
+            spec.setDisplayName("Faker");
+            spec.setAvatar("fake-avatar.png");
+            spec.setPassword("fake-password");
+
+            var metadata = new Metadata();
+            metadata.setName(name);
+            metadata.setAnnotations(new HashMap<>());
+
+            var user = new User();
+            user.setSpec(spec);
+            user.setMetadata(metadata);
+            return user;
+        }
+    }
+}
