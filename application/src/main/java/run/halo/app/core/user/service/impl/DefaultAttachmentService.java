@@ -71,7 +71,7 @@ public class DefaultAttachmentService implements AttachmentService {
                     .map(configMap -> new UploadOption(filePart, policy, configMap));
             })
             .flatMap(uploadContext -> extensionGetter.getExtensions(AttachmentHandler.class)
-                .concatMap(handler -> handler.upload(uploadContext))
+                .flatMapSequential(handler -> handler.upload(uploadContext))
                 .next())
             .switchIfEmpty(Mono.error(() -> new ServerErrorException(
                 "No suitable handler found for uploading the attachment.", null)))
@@ -113,7 +113,7 @@ public class DefaultAttachmentService implements AttachmentService {
             .flatMap(policy -> client.get(ConfigMap.class, policy.getSpec().getConfigMapName())
                 .map(configMap -> new DeleteOption(attachment, policy, configMap)))
             .flatMap(deleteOption -> extensionGetter.getExtensions(AttachmentHandler.class)
-                .concatMap(handler -> handler.delete(deleteOption))
+                .flatMapSequential(handler -> handler.delete(deleteOption))
                 .next());
     }
 
@@ -122,7 +122,8 @@ public class DefaultAttachmentService implements AttachmentService {
         return client.get(Policy.class, attachment.getSpec().getPolicyName())
             .flatMap(policy -> client.get(ConfigMap.class, policy.getSpec().getConfigMapName())
                 .flatMap(configMap -> extensionGetter.getExtensions(AttachmentHandler.class)
-                    .concatMap(handler -> handler.getPermalink(attachment, policy, configMap))
+                    .flatMapSequential(
+                        handler -> handler.getPermalink(attachment, policy, configMap))
                     .next()
                 )
             );
@@ -133,7 +134,8 @@ public class DefaultAttachmentService implements AttachmentService {
         return client.get(Policy.class, attachment.getSpec().getPolicyName())
             .flatMap(policy -> client.get(ConfigMap.class, policy.getSpec().getConfigMapName())
                 .flatMap(configMap -> extensionGetter.getExtensions(AttachmentHandler.class)
-                    .concatMap(handler -> handler.getSharedURL(attachment, policy, configMap, ttl))
+                    .flatMapSequential(
+                        handler -> handler.getSharedURL(attachment, policy, configMap, ttl))
                     .next()
                 )
             );

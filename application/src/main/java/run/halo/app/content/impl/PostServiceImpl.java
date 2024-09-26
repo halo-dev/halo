@@ -77,7 +77,7 @@ public class PostServiceImpl extends AbstractContentService implements PostServi
             )
             .flatMap(listResult -> Flux.fromStream(listResult.get())
                 .map(this::getListedPost)
-                .concatMap(Function.identity())
+                .flatMapSequential(Function.identity())
                 .collectList()
                 .map(listedPosts -> new ListResult<>(listResult.getPage(), listResult.getSize(),
                     listResult.getTotal(), listedPosts)
@@ -175,7 +175,7 @@ public class PostServiceImpl extends AbstractContentService implements PostServi
             return Flux.empty();
         }
         return Flux.fromIterable(usernames)
-            .concatMap(userService::getUserOrGhost)
+            .flatMapSequential(userService::getUserOrGhost)
             .map(user -> {
                 Contributor contributor = new Contributor();
                 contributor.setName(user.getMetadata().getName());

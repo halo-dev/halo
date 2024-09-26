@@ -34,7 +34,7 @@ public class DefaultPluginRouterFunctionRegistry
     public Mono<HandlerFunction<ServerResponse>> route(@NonNull ServerRequest request) {
         var secureRequest = new SecureServerRequest(request);
         return Flux.fromIterable(this.routerFunctions)
-            .concatMap(routerFunction -> routerFunction.route(secureRequest))
+            .flatMapSequential(routerFunction -> routerFunction.route(secureRequest))
             .next();
     }
 

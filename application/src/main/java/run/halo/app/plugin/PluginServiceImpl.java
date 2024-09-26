@@ -247,7 +247,7 @@ public class PluginServiceImpl implements PluginService, InitializingBean, Dispo
             });
         var body = Flux.fromIterable(startedPlugins)
             .sort(Comparator.comparing(PluginWrapper::getPluginId))
-            .concatMap(pluginWrapper -> {
+            .flatMapSequential(pluginWrapper -> {
                 var pluginId = pluginWrapper.getPluginId();
                 return Mono.<Resource>fromSupplier(
                         () -> BundleResourceUtils.getJsBundleResource(
@@ -274,7 +274,7 @@ public class PluginServiceImpl implements PluginService, InitializingBean, Dispo
     public Flux<DataBuffer> uglifyCssBundle() {
         return Flux.fromIterable(pluginManager.getStartedPlugins())
             .sort(Comparator.comparing(PluginWrapper::getPluginId))
-            .concatMap(pluginWrapper -> {
+            .flatMapSequential(pluginWrapper -> {
                 var pluginId = pluginWrapper.getPluginId();
                 var dataBufferFactory = DefaultDataBufferFactory.sharedInstance;
                 return Mono.<Resource>fromSupplier(() -> BundleResourceUtils.getJsBundleResource(

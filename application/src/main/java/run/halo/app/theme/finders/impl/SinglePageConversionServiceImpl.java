@@ -140,7 +140,7 @@ public class SinglePageConversionServiceImpl implements SinglePageConversionServ
 
         return client.listBy(SinglePage.class, rewroteListOptions, rewrotePageRequest)
             .flatMap(list -> Flux.fromStream(list.get())
-                .concatMap(this::convertToListedVo)
+                .flatMapSequential(this::convertToListedVo)
                 .collectList()
                 .map(pageVos ->
                     new ListResult<>(list.getPage(), list.getSize(), list.getTotal(), pageVos)

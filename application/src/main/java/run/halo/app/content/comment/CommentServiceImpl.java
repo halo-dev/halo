@@ -58,7 +58,7 @@ public class CommentServiceImpl extends AbstractCommentService implements Commen
                 commentQuery.toPageRequest())
             .flatMap(comments -> Flux.fromStream(comments.get()
                     .map(this::toListedComment))
-                .concatMap(Function.identity())
+                .flatMapSequential(Function.identity())
                 .collectList()
                 .map(list -> new ListResult<>(comments.getPage(), comments.getSize(),
                     comments.getTotal(), list)

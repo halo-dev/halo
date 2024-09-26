@@ -47,7 +47,7 @@ public class ExtensionCompositeRouterFunction implements
     @NonNull
     public Mono<HandlerFunction<ServerResponse>> route(@NonNull ServerRequest request) {
         return Flux.fromIterable(getRouterFunctions())
-            .concatMap(routerFunction -> routerFunction.route(request))
+            .flatMapSequential(routerFunction -> routerFunction.route(request))
             .next();
     }
 

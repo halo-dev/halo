@@ -88,7 +88,7 @@ public class SinglePageServiceImpl extends AbstractContentService implements Sin
     public Mono<ListResult<ListedSinglePage>> list(SinglePageQuery query) {
         return client.listBy(SinglePage.class, query.toListOptions(), query.toPageRequest())
             .flatMap(listResult -> Flux.fromStream(listResult.get().map(this::getListedSinglePage))
-                .concatMap(Function.identity())
+                .flatMapSequential(Function.identity())
                 .collectList()
                 .map(listedSinglePages -> new ListResult<>(
                     listResult.getPage(),

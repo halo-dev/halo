@@ -33,6 +33,6 @@ public class ContributorFinderImpl implements ContributorFinder {
             return Flux.empty();
         }
         return Flux.fromIterable(names)
-            .concatMap(this::getContributor);
+            .flatMapSequential(this::getContributor);
     }
 }
