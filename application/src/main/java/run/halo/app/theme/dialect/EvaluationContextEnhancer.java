@@ -12,6 +12,7 @@ import org.springframework.expression.MethodExecutor;
 import org.springframework.expression.MethodResolver;
 import org.springframework.expression.PropertyAccessor;
 import org.springframework.expression.TypedValue;
+import org.springframework.expression.spel.CompilablePropertyAccessor;
 import org.springframework.expression.spel.support.ReflectivePropertyAccessor;
 import org.springframework.integration.json.JsonPropertyAccessor;
 import org.springframework.lang.Nullable;
@@ -122,7 +123,7 @@ public class EvaluationContextEnhancer extends AbstractTemplateBoundariesProcess
         public PropertyAccessor createOptimalAccessor(EvaluationContext context, Object target,
             String name) {
             var optimalAccessor = delegate.createOptimalAccessor(context, target, name);
-            if (optimalAccessor instanceof OptimalPropertyAccessor optimalPropertyAccessor) {
+            if (optimalAccessor instanceof CompilablePropertyAccessor optimalPropertyAccessor) {
                 if (ReactiveUtils.isReactiveType(optimalPropertyAccessor.getPropertyType())) {
                     return this;
                 }
