@@ -485,7 +485,7 @@ core:
         cover:
           label: 封面图
   deleted_page:
-    title: 自定义页面回收站
+    title: 页面回收站
     empty:
       title: 没有自定义页面被放入回收站
       message: 你可以尝试刷新或者返回自定义页面管理

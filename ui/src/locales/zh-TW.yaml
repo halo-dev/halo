@@ -465,7 +465,7 @@ core:
         cover:
           label: 封面圖
   deleted_page:
-    title: 自定義頁面回收站
+    title: 頁面回收站
     empty:
       title: 沒有自定義頁面被放入回收站
       message: 你可以嘗試刷新或者返回自定義頁面管理
