@@ -26,6 +26,7 @@ import org.springframework.http.codec.ServerCodecConfigurer;
 import org.springframework.http.codec.json.Jackson2JsonDecoder;
 import org.springframework.http.codec.json.Jackson2JsonEncoder;
 import org.springframework.lang.NonNull;
+import org.springframework.web.filter.reactive.ServerWebExchangeContextFilter;
 import org.springframework.web.reactive.config.ResourceHandlerRegistration;
 import org.springframework.web.reactive.config.ResourceHandlerRegistry;
 import org.springframework.web.reactive.config.WebFluxConfigurer;
@@ -250,6 +251,13 @@ public class WebFluxConfig implements WebFluxConfigurer {
     @Order(-101)
     AdditionalWebFilterChainProxy additionalWebFilterChainProxy(ExtensionGetter extensionGetter) {
         return new AdditionalWebFilterChainProxy(extensionGetter);
+    }
+
+    @Bean
+    // We expect this filter to be executed before AdditionalWebFilterChainProxy
+    @Order(-102)
+    ServerWebExchangeContextFilter serverWebExchangeContextFilter() {
+        return new ServerWebExchangeContextFilter();
     }
 
 }
