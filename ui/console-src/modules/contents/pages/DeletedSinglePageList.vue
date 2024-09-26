@@ -281,7 +281,7 @@ watch(
               <VButton
                 v-permission="['system:singlepages:view']"
                 :route="{ name: 'SinglePages' }"
-                type="primary"
+                type="secondary"
               >
                 {{ $t("core.common.buttons.back") }}
               </VButton>

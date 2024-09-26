@@ -12,7 +12,6 @@ import {
   VEntity,
   VEntityField,
   VLoading,
-  VSpace,
   VStatusDot,
   VTag,
 } from "@halo-dev/components";
@@ -187,11 +186,9 @@ const handleSetPrimaryMenu = async (menu: Menu) => {
         :title="$t('core.menu.empty.title')"
       >
         <template #actions>
-          <VSpace>
-            <VButton size="sm" @click="refetch()">
-              {{ $t("core.common.buttons.refresh") }}
-            </VButton>
-          </VSpace>
+          <VButton size="sm" @click="refetch()">
+            {{ $t("core.common.buttons.refresh") }}
+          </VButton>
         </template>
       </VEmpty>
     </Transition>
