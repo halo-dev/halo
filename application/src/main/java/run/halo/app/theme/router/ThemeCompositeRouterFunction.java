@@ -55,7 +55,7 @@ public class ThemeCompositeRouterFunction implements RouterFunction<ServerRespon
     @NonNull
     public Mono<HandlerFunction<ServerResponse>> route(@NonNull ServerRequest request) {
         return Flux.fromIterable(cachedRouters)
-            .flatMapSequential(routerFunction -> routerFunction.route(request))
+            .concatMap(routerFunction -> routerFunction.route(request))
             .next();
     }
 

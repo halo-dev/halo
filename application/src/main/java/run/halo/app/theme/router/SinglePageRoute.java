@@ -65,7 +65,7 @@ public class SinglePageRoute
     @NonNull
     public Mono<HandlerFunction<ServerResponse>> route(@NonNull ServerRequest request) {
         return Flux.fromIterable(routerFunctions())
-            .flatMapSequential(routerFunction -> routerFunction.route(request))
+            .concatMap(routerFunction -> routerFunction.route(request))
             .next();
     }
 

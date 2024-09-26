@@ -131,7 +131,7 @@ public class PostRouteFactory implements RouteFactory {
     Mono<String> determineTemplate(ServerRequest request, PostVo postVo) {
         return Flux.fromIterable(defaultIfNull(postVo.getCategories(), List.of()))
             .filter(category -> isNotBlank(category.getSpec().getPostTemplate()))
-            .flatMapSequential(category -> viewNameResolver.resolveViewNameOrDefault(request,
+            .concatMap(category -> viewNameResolver.resolveViewNameOrDefault(request,
                 category.getSpec().getPostTemplate(), null)
             )
             .next()
