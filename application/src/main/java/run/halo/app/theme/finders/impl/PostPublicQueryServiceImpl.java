@@ -1,14 +1,13 @@
 package run.halo.app.theme.finders.impl;
 
-import java.util.List;
 import java.util.function.Function;
 import lombok.RequiredArgsConstructor;
 import org.springframework.lang.NonNull;
 import org.springframework.stereotype.Component;
 import org.springframework.util.Assert;
-import org.springframework.util.CollectionUtils;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
+import reactor.core.scheduler.Schedulers;
 import run.halo.app.content.ContentWrapper;
 import run.halo.app.content.PostService;
 import run.halo.app.core.extension.content.Post;
@@ -67,11 +66,7 @@ public class PostPublicQueryServiceImpl implements PostPublicQueryService {
             })
             .flatMap(listOptions -> client.listBy(Post.class, listOptions, page))
             .flatMap(list -> Flux.fromStream(list.get())
-                .concatMap(post -> convertToListedVo(post)
-                    .flatMap(postVo -> populateStats(postVo)
-                        .doOnNext(postVo::setStats).thenReturn(postVo)
-                    )
-                )
+                .flatMapSequential(this::convertToListedVo)
                 .collectList()
                 .map(postVos -> new ListResult<>(list.getPage(), list.getSize(), list.getTotal(),
                     postVos)
@@ -80,64 +75,56 @@ public class PostPublicQueryServiceImpl implements PostPublicQueryService {
             .defaultIfEmpty(ListResult.emptyResult());
     }
 
-
     @Override
     public Mono<ListedPostVo> convertToListedVo(@NonNull Post post) {
         Assert.notNull(post, "Post must not be null");
         ListedPostVo postVo = ListedPostVo.from(post);
-        postVo.setCategories(List.of());
-        postVo.setTags(List.of());
-        postVo.setContributors(List.of());
 
-        return Mono.just(postVo)
-            .flatMap(lp -> populateStats(postVo)
-                .doOnNext(lp::setStats)
-                .thenReturn(lp)
-            )
-            .flatMap(p -> {
-                String owner = p.getSpec().getOwner();
-                return contributorFinder.getContributor(owner)
-                    .doOnNext(p::setOwner)
-                    .thenReturn(p);
-            })
-            .flatMap(p -> {
-                List<String> tagNames = p.getSpec().getTags();
-                if (CollectionUtils.isEmpty(tagNames)) {
-                    return Mono.just(p);
-                }
-                return tagFinder.getByNames(tagNames)
-                    .collectList()
-                    .doOnNext(p::setTags)
-                    .thenReturn(p);
-            })
-            .flatMap(p -> {
-                List<String> categoryNames = p.getSpec().getCategories();
-                if (CollectionUtils.isEmpty(categoryNames)) {
-                    return Mono.just(p);
-                }
-                return categoryFinder.getByNames(categoryNames)
-                    .collectList()
-                    .doOnNext(p::setCategories)
-                    .thenReturn(p);
-            })
-            .flatMap(p -> contributorFinder.getContributors(p.getStatus().getContributors())
-                .collectList()
-                .doOnNext(p::setContributors)
-                .thenReturn(p)
-            )
-            .defaultIfEmpty(postVo);
+        var statsMono = fetchStats(post.getMetadata().getName())
+            .doOnNext(postVo::setStats)
+            .subscribeOn(Schedulers.boundedElastic());
+
+        var ownerMono = contributorFinder.getContributor(post.getSpec().getOwner())
+            .doOnNext(postVo::setOwner)
+            .subscribeOn(Schedulers.boundedElastic());
+
+        var tagMono = tagFinder.getByNames(post.getSpec().getTags())
+            .collectList()
+            .doOnNext(postVo::setTags)
+            .subscribeOn(Schedulers.boundedElastic());
+
+        var categoryMono = categoryFinder.getByNames(post.getSpec().getCategories())
+            .collectList()
+            .doOnNext(postVo::setCategories)
+            .subscribeOn(Schedulers.boundedElastic());
+
+        var contributorMono = contributorFinder.getContributors(
+                post.getStatusOrDefault().getContributors())
+            .collectList()
+            .doOnNext(postVo::setContributors)
+            .subscribeOn(Schedulers.boundedElastic());
+
+        return Mono.when(statsMono, ownerMono, tagMono, categoryMono, contributorMono)
+            .thenReturn(postVo);
     }
 
     @Override
     public Mono<PostVo> convertToVo(Post post, String snapshotName) {
         final String baseSnapshotName = post.getSpec().getBaseSnapshot();
-        return convertToListedVo(post)
-            .map(PostVo::from)
-            .flatMap(postVo -> postService.getContent(snapshotName, baseSnapshotName)
-                .flatMap(wrapper -> extendPostContent(post, wrapper))
-                .doOnNext(postVo::setContent)
-                .thenReturn(postVo)
-            );
+        var listedVoMono = convertToListedVo(post).map(PostVo::from)
+            .subscribeOn(Schedulers.boundedElastic());
+
+        var contentMono = postService.getContent(snapshotName, baseSnapshotName)
+            .flatMap(wrapper -> extendPostContent(post, wrapper))
+            .switchIfEmpty(Mono.fromSupplier(ContentVo::empty))
+            .subscribeOn(Schedulers.boundedElastic());
+
+        return Mono.zip(listedVoMono, contentMono)
+            .map(tuple -> {
+                PostVo postVo = tuple.getT1();
+                postVo.setContent(tuple.getT2());
+                return postVo;
+            });
     }
 
     @Override
@@ -176,10 +163,8 @@ public class PostPublicQueryServiceImpl implements PostPublicQueryService {
             );
     }
 
-    private <T extends ListedPostVo> Mono<StatsVo> populateStats(T postVo) {
-        return counterService.getByName(MeterUtils.nameOf(Post.class, postVo.getMetadata()
-                .getName())
-            )
+    private Mono<StatsVo> fetchStats(String postName) {
+        return counterService.getByName(MeterUtils.nameOf(Post.class, postName))
             .map(counter -> StatsVo.builder()
                 .visit(counter.getVisit())
                 .upvote(counter.getUpvote())

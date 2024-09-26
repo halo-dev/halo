@@ -19,7 +19,7 @@ public interface CategoryFinder {
 
     Mono<CategoryVo> getByName(String name);
 
-    Flux<CategoryVo> getByNames(List<String> names);
+    Flux<CategoryVo> getByNames(@Nullable List<String> names);
 
     Mono<ListResult<CategoryVo>> list(@Nullable Integer page, @Nullable Integer size);
 
