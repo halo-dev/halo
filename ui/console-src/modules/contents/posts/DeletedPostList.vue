@@ -280,7 +280,7 @@ watch(
               <VButton @click="refetch">
                 {{ $t("core.common.buttons.refresh") }}
               </VButton>
-              <VButton :route="{ name: 'Posts' }" type="primary">
+              <VButton :route="{ name: 'Posts' }" type="secondary">
                 {{ $t("core.common.buttons.back") }}
               </VButton>
             </VSpace>

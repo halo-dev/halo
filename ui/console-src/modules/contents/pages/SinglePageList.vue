@@ -432,7 +432,7 @@ watch(selectedPageNames, (newValue) => {
               <VButton
                 v-permission="['system:singlepages:manage']"
                 :route="{ name: 'SinglePageEditor' }"
-                type="primary"
+                type="secondary"
               >
                 <template #icon>
                   <IconAddCircle class="h-full w-full" />
