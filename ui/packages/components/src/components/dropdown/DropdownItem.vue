@@ -6,7 +6,7 @@ const props = withDefaults(
   defineProps<{
     selected?: boolean;
     disabled?: boolean;
-    type: "default" | "danger";
+    type?: "default" | "danger";
   }>(),
   {
     selected: false,

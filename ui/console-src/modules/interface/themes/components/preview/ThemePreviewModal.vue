@@ -1,4 +1,5 @@
 <script lang="ts" setup>
+import StickyBlock from "@/components/sticky-block/StickyBlock.vue";
 import { useSettingFormConvert } from "@console/composables/use-setting-form";
 import { useThemeStore } from "@console/stores/theme";
 import type {
@@ -28,7 +29,6 @@ import { storeToRefs } from "pinia";
 import { computed, markRaw, onMounted, ref, toRaw } from "vue";
 import { useI18n } from "vue-i18n";
 import ThemePreviewListItem from "./ThemePreviewListItem.vue";
-import StickyBlock from "@/components/sticky-block/StickyBlock.vue";
 
 const props = withDefaults(
   defineProps<{
@@ -304,6 +304,7 @@ const iframeClasses = computed(() => {
             @after-leave="switching = false"
           >
             <div v-show="settingsVisible" class="mb-20">
+              <!-- @vue-skip -->
               <VTabbar
                 v-model:active-id="activeSettingTab"
                 :items="settingTabs"

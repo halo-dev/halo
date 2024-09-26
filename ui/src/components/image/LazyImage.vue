@@ -3,12 +3,12 @@ import { onMounted, ref } from "vue";
 
 const props = withDefaults(
   defineProps<{
-    src: string;
+    src?: string;
     alt?: string;
     classes?: string | string[];
   }>(),
   {
-    src: "",
+    src: undefined,
     alt: "",
     classes: "",
   }
@@ -18,8 +18,12 @@ const isLoading = ref(false);
 const error = ref(false);
 
 const loadImage = async () => {
+  if (!props.src) {
+    throw new Error("src is required");
+  }
+
   const image = new Image();
-  image.src = props.src;
+  image.src = props.src || "";
   return new Promise((resolve, reject) => {
     image.onload = () => resolve(image);
     image.onerror = (err) => reject(err);
