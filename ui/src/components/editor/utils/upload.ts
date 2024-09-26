@@ -12,8 +12,6 @@ export interface FileProps {
   editor: CoreEditor;
 }
 
-const { currentUserHasPermission } = usePermission();
-
 /**
  * Handles file events, determining if the file is an image and triggering the appropriate upload process.
  *
@@ -21,6 +19,8 @@ const { currentUserHasPermission } = usePermission();
  * @returns {boolean} - True if a file is handled, otherwise false
  */
 export const handleFileEvent = ({ file, editor }: FileProps) => {
+  const { currentUserHasPermission } = usePermission();
+
   if (!file) {
     return false;
   }
