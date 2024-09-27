@@ -1,76 +1,4 @@
 core:
-  login:
-    title: 登录
-    fields:
-      username:
-        placeholder: 用户名
-      password:
-        placeholder: 密码
-      remember_me:
-        label: 保持登录会话
-    operations:
-      submit:
-        toast_success: 登录成功
-        toast_failed: 登录失败，用户名或密码错误
-        toast_csrf: CSRF Token 失效，请重新尝试
-      signup:
-        label: 没有账号
-        button: 立即注册
-      return_login:
-        label: 已有账号
-        button: 立即登录
-      return_site: 返回到首页
-      reset_password:
-        button: 找回密码
-    button: 登录
-    modal:
-      title: 重新登录
-    2fa:
-      fields:
-        code:
-          placeholder: 请输入两步验证码
-          label: 两步验证码
-  signup:
-    title: 注册
-    fields:
-      username:
-        placeholder: 用户名
-      display_name:
-        placeholder: 名称
-      email:
-        placeholder: 电子邮箱
-        matchFailed: 邮箱格式错误或服务商不受支持
-      verify_code:
-        placeholder: 验证码
-        operations:
-          send_code:
-            buttons:
-              sending: 发送中
-              send: 发送验证码
-              countdown: "{timer} 秒后重发"
-            toast_success: 验证码已发送
-            toast_email_empty: 请输入电子邮箱
-      password:
-        placeholder: 密码
-      password_confirm:
-        placeholder: 确认密码
-    operations:
-      submit:
-        button: 注册
-        toast_success: 注册成功
-  binding:
-    title: 账号绑定
-    common:
-      toast:
-        mounted: 当前登录方式未绑定账号，请先绑定或注册新账号
-    operations:
-      login_and_bind:
-        button: 登录并绑定
-      signup_and_bind:
-        button: 注册并绑定
-      bind:
-        toast_success: 绑定成功
-        toast_failed: 绑定失败，没有找到已启用的登录方式
   sidebar:
     search:
       placeholder: 搜索
@@ -1413,30 +1341,6 @@ core:
         label: 密码
       confirm_password:
         label: 确认密码
-  reset_password:
-    title: 重置密码
-    fields:
-      username:
-        label: 用户名
-      email:
-        label: 邮箱地址
-    operations:
-      send:
-        label: 发送验证邮件
-        toast_success: 如果你的用户名和邮箱地址匹配，我们将会发送一封邮件到你的邮箱。
-  uc_reset_password:
-    title: 重置密码
-    fields:
-      username:
-        label: 用户名
-      password:
-        label: 新密码
-      password_confirm:
-        label: 确认密码
-    operations:
-      reset:
-        button: 重置密码
-        toast_success: 重置成功
   rbac:
     Attachments Management: 附件
     Attachment Manage: 附件管理
@@ -1575,8 +1479,6 @@ core:
       page_label: 页
       size_label: 条 / 页
       total_label: 共 {total} 项数据
-    social_auth_providers:
-      title: 三方登录
     app_download_alert:
       description: Halo 的主题和插件可以在以下地址下载：
       sources:
