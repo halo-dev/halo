@@ -1,6 +1,5 @@
 <script lang="ts" setup>
 import GlobalSearchModal from "@/components/global-search/GlobalSearchModal.vue";
-import LoginModal from "@/components/login/LoginModal.vue";
 import { RoutesMenu } from "@/components/menu/RoutesMenu";
 import { useRouteMenuGenerator } from "@/composables/use-route-menu-generator";
 import { rbacAnnotations } from "@/constants/annotations";
@@ -303,7 +302,6 @@ onMounted(() => {
     v-if="globalSearchVisible"
     @close="globalSearchVisible = false"
   />
-  <LoginModal />
 </template>
 
 <style lang="scss">

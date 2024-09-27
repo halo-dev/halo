@@ -3,7 +3,7 @@ import { useUserStore } from "@/stores/user";
 import type { Router } from "vue-router";
 
 export function setupCheckStatesGuard(router: Router) {
-  router.beforeEach(async (to, from, next) => {
+  router.beforeEach(async (to, _, next) => {
     const userStore = useUserStore();
     const { globalInfo } = useGlobalInfoStore();
     const { userInitialized, dataInitialized } = globalInfo || {};
