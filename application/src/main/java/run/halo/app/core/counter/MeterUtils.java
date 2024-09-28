@@ -1,4 +1,4 @@
-package run.halo.app.metrics;
+package run.halo.app.core.counter;
 
 import io.micrometer.core.instrument.Counter;
 import io.micrometer.core.instrument.MeterRegistry;

@@ -1,4 +1,4 @@
-package run.halo.app.metrics;
+package run.halo.app.content.stats;
 
 import java.time.Duration;
 import java.time.Instant;

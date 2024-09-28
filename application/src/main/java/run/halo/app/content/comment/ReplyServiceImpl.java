@@ -20,6 +20,7 @@ import org.springframework.util.Assert;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import reactor.util.retry.Retry;
+import run.halo.app.core.counter.CounterService;
 import run.halo.app.core.extension.content.Comment;
 import run.halo.app.core.extension.content.Reply;
 import run.halo.app.core.user.service.RoleService;
@@ -31,7 +32,6 @@ import run.halo.app.extension.PageRequestImpl;
 import run.halo.app.extension.ReactiveExtensionClient;
 import run.halo.app.extension.router.selector.FieldSelector;
 import run.halo.app.infra.exception.RequestRestrictedException;
-import run.halo.app.metrics.CounterService;
 
 /**
  * A default implementation of {@link ReplyService}.

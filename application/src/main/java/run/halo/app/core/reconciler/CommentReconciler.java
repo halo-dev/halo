@@ -18,6 +18,7 @@ import org.springframework.lang.NonNull;
 import org.springframework.stereotype.Component;
 import run.halo.app.content.comment.ReplyNotificationSubscriptionHelper;
 import run.halo.app.content.comment.ReplyService;
+import run.halo.app.core.counter.MeterUtils;
 import run.halo.app.core.extension.Counter;
 import run.halo.app.core.extension.content.Comment;
 import run.halo.app.core.extension.content.Constant;
@@ -36,7 +37,6 @@ import run.halo.app.extension.controller.ControllerBuilder;
 import run.halo.app.extension.controller.Reconciler;
 import run.halo.app.extension.index.query.Query;
 import run.halo.app.extension.router.selector.FieldSelector;
-import run.halo.app.metrics.MeterUtils;
 
 /**
  * Reconciler for {@link Comment}.

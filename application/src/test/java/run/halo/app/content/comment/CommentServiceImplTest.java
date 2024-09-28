@@ -29,6 +29,8 @@ import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import reactor.test.StepVerifier;
 import run.halo.app.content.TestPost;
+import run.halo.app.core.counter.CounterService;
+import run.halo.app.core.counter.MeterUtils;
 import run.halo.app.core.extension.Counter;
 import run.halo.app.core.extension.User;
 import run.halo.app.core.extension.content.Comment;
@@ -44,8 +46,6 @@ import run.halo.app.extension.Ref;
 import run.halo.app.infra.SystemConfigurableEnvironmentFetcher;
 import run.halo.app.infra.SystemSetting;
 import run.halo.app.infra.utils.JsonUtils;
-import run.halo.app.metrics.CounterService;
-import run.halo.app.metrics.MeterUtils;
 import run.halo.app.plugin.extensionpoint.ExtensionGetter;
 import run.halo.app.security.authorization.AuthorityUtils;
 
