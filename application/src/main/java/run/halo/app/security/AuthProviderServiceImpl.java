@@ -19,9 +19,12 @@ import reactor.core.publisher.Mono;
 import run.halo.app.core.extension.AuthProvider;
 import run.halo.app.core.extension.UserConnection;
 import run.halo.app.extension.ConfigMap;
+import run.halo.app.extension.ExtensionUtil;
+import run.halo.app.extension.ListOptions;
 import run.halo.app.extension.Metadata;
 import run.halo.app.extension.MetadataUtil;
 import run.halo.app.extension.ReactiveExtensionClient;
+import run.halo.app.extension.index.query.QueryFactory;
 import run.halo.app.infra.SystemSetting;
 import run.halo.app.infra.utils.JsonUtils;
 
@@ -56,10 +59,10 @@ public class AuthProviderServiceImpl implements AuthProviderService {
 
     @Override
     public Mono<List<ListedAuthProvider>> listAll() {
-        return client.list(AuthProvider.class, provider ->
-                    provider.getMetadata().getDeletionTimestamp() == null,
-                defaultComparator()
-            )
+        var listOptions = ListOptions.builder()
+            .andQuery(ExtensionUtil.notDeleting())
+            .build();
+        return client.listAll(AuthProvider.class, listOptions, ExtensionUtil.defaultSort())
             .map(this::convertTo)
             .collectList()
             .flatMap(providers -> listMyConnections()
@@ -86,6 +89,17 @@ public class AuthProviderServiceImpl implements AuthProviderService {
             );
     }
 
+    @Override
+    public Flux<AuthProvider> getEnabledProviders() {
+        return fetchEnabledAuthProviders().flatMapMany(enabledNames -> {
+            var listOptions = ListOptions.builder()
+                .andQuery(QueryFactory.in("metadata.name", enabledNames))
+                .andQuery(ExtensionUtil.notDeleting())
+                .build();
+            return client.listAll(AuthProvider.class, listOptions, ExtensionUtil.defaultSort());
+        });
+    }
+
     private Mono<Set<String>> fetchEnabledAuthProviders() {
         return client.fetch(ConfigMap.class, SystemSetting.SYSTEM_CONFIG)
             .map(configMap -> {
@@ -97,12 +111,14 @@ public class AuthProviderServiceImpl implements AuthProviderService {
     Flux<UserConnection> listMyConnections() {
         return ReactiveSecurityContextHolder.getContext()
             .map(securityContext -> securityContext.getAuthentication().getName())
-            .flatMapMany(username -> client.list(UserConnection.class,
-                    persisted -> persisted.getSpec().getUsername().equals(username),
-                    Comparator.comparing(item -> item.getMetadata()
-                        .getCreationTimestamp())
-                )
-            );
+            .flatMapMany(username -> {
+                var listOptions = ListOptions.builder()
+                    .andQuery(QueryFactory.equal("spec.username", username))
+                    .andQuery(ExtensionUtil.notDeleting())
+                    .build();
+                return client.listAll(UserConnection.class, listOptions,
+                    ExtensionUtil.defaultSort());
+            });
     }
 
     private static Comparator<AuthProvider> defaultComparator() {

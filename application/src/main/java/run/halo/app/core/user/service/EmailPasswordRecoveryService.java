@@ -22,17 +22,21 @@ public interface EmailPasswordRecoveryService {
      */
     Mono<Void> sendPasswordResetEmail(String username, String email);
 
+    Mono<Void> sendPasswordResetEmail(String email);
+
     /**
      * <p>Reset password by token.</p>
      * if the token is invalid, it will return {@link Mono#error(Throwable)}}
      * if the token is valid, but the username is not the same, it will return
      * {@link Mono#error(Throwable)}
      *
-     * @param username username to reset password
      * @param newPassword new password
      * @param token token to validate the user
      * @return {@link Mono#empty()} if the token is invalid or the username is not the same.
      * @throws AccessDeniedException if the token is invalid
      */
-    Mono<Void> changePassword(String username, String newPassword, String token);
+    Mono<Void> changePassword(String newPassword, String token);
+
+    Mono<ResetToken> getValidResetToken(String token);
+
 }

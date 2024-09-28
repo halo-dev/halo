@@ -1,0 +1,20 @@
+<!doctype html>
+<html
+    xmlns:th="https://www.thymeleaf.org"
+    th:replace="~{gateway_modules/layout :: layout(title = |#{title} - ${site.title}|, head = null, body = ~{::body})}"
+>
+    <th:block th:fragment="body">
+        <div class="gateway-wrapper">
+            <div th:replace="~{gateway_modules/common_fragments::haloLogo}"></div>
+
+            <div class="halo-form-wrapper">
+                <form th:replace="~{gateway_modules/login_fragments::form}"></form>
+                <div th:replace="~{gateway_modules/login_fragments::formAuthProviders}"></div>
+                <div th:replace="~{gateway_modules/common_fragments::socialAuthProviders}"></div>
+            </div>
+
+            <div th:replace="~{gateway_modules/login_fragments::miscellaneous}"></div>
+            <div th:replace="~{gateway_modules/common_fragments::languageSwitcher}"></div>
+        </div>
+    </th:block>
+</html>

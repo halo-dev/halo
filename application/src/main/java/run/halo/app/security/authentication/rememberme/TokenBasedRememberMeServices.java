@@ -1,8 +1,5 @@
 package run.halo.app.security.authentication.rememberme;
 
-import static org.apache.commons.lang3.BooleanUtils.isTrue;
-import static org.apache.commons.lang3.BooleanUtils.toBoolean;
-
 import java.net.URLDecoder;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
@@ -58,23 +55,21 @@ import reactor.core.publisher.Mono;
 @RequiredArgsConstructor
 public class TokenBasedRememberMeServices implements ServerLogoutHandler, RememberMeServices {
 
-    public static final int TWO_WEEKS_S = 1209600;
-
-    public static final String DEFAULT_PARAMETER = "remember-me";
-
     public static final String DEFAULT_ALGORITHM = "SHA-256";
 
     private static final String DELIMITER = ":";
 
     protected final CookieSignatureKeyResolver cookieSignatureKeyResolver;
 
-    protected final ReactiveUserDetailsService userDetailsService;
+    private final ReactiveUserDetailsService userDetailsService;
 
     protected final RememberMeCookieResolver rememberMeCookieResolver;
 
     private UserDetailsChecker userDetailsChecker = new AccountStatusUserDetailsChecker();
 
     private GrantedAuthoritiesMapper authoritiesMapper = new NullAuthoritiesMapper();
+
+    private RememberMeRequestCache rememberMeRequestCache = new WebSessionRememberMeRequestCache();
 
     private static boolean equals(String expected, String actual) {
         byte[] expectedBytes = bytesUtf8(expected);
@@ -214,11 +209,12 @@ public class TokenBasedRememberMeServices implements ServerLogoutHandler, Rememb
     @Override
     public Mono<Void> loginSuccess(ServerWebExchange exchange,
         Authentication successfulAuthentication) {
-        if (!rememberMeRequested(exchange)) {
-            log.debug("Remember-me login not requested.");
-            return Mono.empty();
-        }
-        return onLoginSuccess(exchange, successfulAuthentication);
+        return rememberMeRequestCache.isRememberMe(exchange)
+            .filter(Boolean::booleanValue)
+            .switchIfEmpty(Mono.fromRunnable(() -> {
+                log.debug("Remember-me login not requested.");
+            }))
+            .flatMap(rememberMe -> onLoginSuccess(exchange, successfulAuthentication));
     }
 
     protected Mono<Void> onLoginSuccess(ServerWebExchange exchange,
@@ -280,18 +276,6 @@ public class TokenBasedRememberMeServices implements ServerLogoutHandler, Rememb
         Authentication authentication) {
         var tokenLifetime = rememberMeCookieResolver.getCookieMaxAge().toSeconds();
         return Instant.now().plusSeconds(tokenLifetime).toEpochMilli();
-    }
-
-    protected boolean rememberMeRequested(ServerWebExchange exchange) {
-        String rememberMe = exchange.getRequest().getQueryParams().getFirst(DEFAULT_PARAMETER);
-        if (isTrue(toBoolean(rememberMe))) {
-            return true;
-        }
-        if (log.isDebugEnabled()) {
-            log.debug("Did not send remember-me cookie (principal did not set parameter '{}')",
-                DEFAULT_PARAMETER);
-        }
-        return false;
     }
 
     protected String[] decodeCookie(String cookieValue) throws InvalidCookieException {

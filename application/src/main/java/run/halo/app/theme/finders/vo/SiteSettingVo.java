@@ -73,7 +73,7 @@ public class SiteSettingVo {
             .subtitle(basicSetting.getSubtitle())
             .logo(basicSetting.getLogo())
             .favicon(basicSetting.getFavicon())
-            .allowRegistration(userSetting.getAllowRegistration())
+            .allowRegistration(userSetting.isAllowRegistration())
             .post(PostSetting.builder()
                 .postPageSize(postSetting.getPostPageSize())
                 .archivePageSize(postSetting.getArchivePageSize())
