@@ -14,6 +14,7 @@ import java.io.IOException;
 import java.net.URI;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.Map;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
@@ -33,6 +34,7 @@ import org.springframework.web.server.ServerWebInputException;
 import reactor.core.publisher.Mono;
 import run.halo.app.core.extension.Setting;
 import run.halo.app.core.extension.Theme;
+import run.halo.app.core.user.service.SettingConfigService;
 import run.halo.app.extension.ConfigMap;
 import run.halo.app.extension.Metadata;
 import run.halo.app.extension.ReactiveExtensionClient;
@@ -69,6 +71,9 @@ class ThemeEndpointTest {
 
     @Mock
     private ReactiveUrlDataBufferFetcher urlDataBufferFetcher;
+
+    @Mock
+    private SettingConfigService settingConfigService;
 
     @InjectMocks
     ThemeEndpoint themeEndpoint;
@@ -299,8 +304,25 @@ class ThemeEndpointTest {
                 .exchange()
                 .expectStatus().isOk();
         }
-    }
 
+        @Test
+        void updateJsonConfigTest() {
+            Theme theme = new Theme();
+            theme.setMetadata(new Metadata());
+            theme.setSpec(new Theme.ThemeSpec());
+            theme.getSpec().setConfigMapName("fake-config-map");
+
+            when(client.fetch(eq(Theme.class), eq("fake-theme"))).thenReturn(Mono.just(theme));
+            when(settingConfigService.upsertConfig(eq("fake-config-map"), any()))
+                .thenReturn(Mono.empty());
+
+            webTestClient.put()
+                .uri("/themes/fake-theme/json-config")
+                .body(Mono.just(Map.of()), Map.class)
+                .exchange()
+                .expectStatus().is2xxSuccessful();
+        }
+    }
 
     @Test
     void fetchActivatedTheme() {
@@ -359,6 +381,26 @@ class ThemeEndpointTest {
             .expectStatus().isOk();
 
         verify(client).fetch(eq(ConfigMap.class), eq("fake-config"));
+        verify(client).fetch(eq(Theme.class), eq("fake"));
+    }
+
+    @Test
+    void fetchThemeJsonConfigTest() {
+        Theme theme = new Theme();
+        theme.setMetadata(new Metadata());
+        theme.getMetadata().setName("fake");
+        theme.setSpec(new Theme.ThemeSpec());
+        theme.getSpec().setConfigMapName("fake-config");
+
+        when(settingConfigService.fetchConfig(eq("fake-config"))).thenReturn(Mono.empty());
+
+        when(client.fetch(eq(Theme.class), eq("fake"))).thenReturn(Mono.just(theme));
+        webTestClient.get()
+            .uri("/themes/fake/json-config")
+            .exchange()
+            .expectStatus().isOk();
+
+        verify(settingConfigService).fetchConfig(eq("fake-config"));
         verify(client).fetch(eq(Theme.class), eq("fake"));
     }
 }
