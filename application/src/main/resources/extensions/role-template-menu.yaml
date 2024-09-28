@@ -14,6 +14,10 @@ rules:
   - apiGroups: [ "" ]
     resources: [ "menus", "menuitems" ]
     verbs: [ "*" ]
+  - apiGroups: [ "console.api.halo.run" ]
+    resources: [ "systemconfigs" ]
+    resourceNames: [ "menu" ]
+    verbs: [ "update" ]
 ---
 apiVersion: v1alpha1
 kind: "Role"
@@ -30,3 +34,7 @@ rules:
   - apiGroups: [ "" ]
     resources: [ "menus", "menuitems" ]
     verbs: [ "get", "list" ]
+  - apiGroups: [ "console.api.halo.run" ]
+    resources: [ "systemconfigs" ]
+    resourceNames: [ "menu" ]
+    verbs: [ "get" ]

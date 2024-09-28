@@ -7565,6 +7565,72 @@
         ]
       }
     },
+    "/apis/console.api.halo.run/v1alpha1/systemconfigs/{group}": {
+      "get": {
+        "description": "Get system config by group",
+        "operationId": "getSystemConfigByGroup",
+        "parameters": [
+          {
+            "description": "Group of the system config",
+            "in": "path",
+            "name": "group",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "default": {
+            "content": {
+              "*/*": {
+                "schema": {
+                  "type": "object"
+                }
+              },
+              "application/json": {}
+            },
+            "description": "default response"
+          }
+        },
+        "tags": [
+          "SystemConfigV1alpha1Console"
+        ]
+      },
+      "put": {
+        "description": "Update system config by group",
+        "operationId": "updateSystemConfigByGroup",
+        "parameters": [
+          {
+            "description": "Group of the system config",
+            "in": "path",
+            "name": "group",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "*/*": {
+              "schema": {
+                "type": "object"
+              }
+            }
+          }
+        },
+        "responses": {
+          "204 NO_CONTENT": {
+            "content": {},
+            "description": "default response"
+          }
+        },
+        "tags": [
+          "SystemConfigV1alpha1Console"
+        ]
+      }
+    },
     "/apis/console.api.migration.halo.run/v1alpha1/backup-files": {
       "get": {
         "description": "Get backup files from backup root.",
