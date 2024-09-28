@@ -1,78 +1,4 @@
 core:
-  login:
-    title: Login
-    fields:
-      username:
-        placeholder: Username
-      password:
-        placeholder: Password
-      remember_me:
-        label: Remember Me
-    operations:
-      submit:
-        toast_success: Login successful
-        toast_failed: Login failed, incorrect username or password
-        toast_csrf: CSRF Token expired, please try again
-      signup:
-        label: No account
-        button: Sign up
-      return_login:
-        label: Already have an account
-        button: Sign in
-      return_site: Return to site
-      reset_password:
-        button: Retrieve password
-    button: Login
-    modal:
-      title: Re-login
-    2fa:
-      fields:
-        code:
-          placeholder: Two-step verification code
-          label: Two-step verification code
-  signup:
-    title: Sign up
-    fields:
-      username:
-        placeholder: Username
-      display_name:
-        placeholder: Display name
-      email:
-        placeholder: Email
-        matchFailed: The email format is wrong or the service provider is not supported.
-      verify_code:
-        placeholder: Verification code
-        operations:
-          send_code:
-            buttons:
-              sending: sending
-              send: Send Code
-              countdown: resend after {timer} seconds
-            toast_success: verification code sent
-            toast_email_empty: please enter your email address
-      password:
-        placeholder: Password
-      password_confirm:
-        placeholder: Confirm password
-    operations:
-      submit:
-        button: Sign up
-        toast_success: Sign up successfully
-  binding:
-    title: Account binding
-    common:
-      toast:
-        mounted: >-
-          The current login method is not bound to an account, Please bind or
-          sign up a new account first
-    operations:
-      login_and_bind:
-        button: Login and Bind
-      signup_and_bind:
-        button: Signup and Bind
-      bind:
-        toast_success: Binding successfully
-        toast_failed: Binding failed, no enabled login method found
   sidebar:
     search:
       placeholder: Search
@@ -1657,8 +1583,6 @@ core:
       page_label: page
       size_label: items per page
       total_label: Total {total} items
-    social_auth_providers:
-      title: Third-party login
     app_download_alert:
       description: >-
         Themes and plugins for Halo can be downloaded at the following
@@ -1871,32 +1795,6 @@ core:
     setting_modal:
       title: Post settings
     title: My posts
-  uc_reset_password:
-    fields:
-      username:
-        label: username
-      password:
-        label: New Password
-      password_confirm:
-        label: Confirm Password
-    operations:
-      reset:
-        button: Reset Password
-        toast_success: Reset successful
-    title: Reset password
-  reset_password:
-    fields:
-      username:
-        label: Username
-      email:
-        label: email address
-    operations:
-      send:
-        label: Send verification email
-        toast_success: >-
-          If your username and email address match, we will send an email to
-          your email address.
-    title: Reset password
   tool:
     title: Tools
     empty:

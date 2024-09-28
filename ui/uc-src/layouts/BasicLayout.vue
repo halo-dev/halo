@@ -1,5 +1,4 @@
 <script lang="ts" setup>
-import LoginModal from "@/components/login/LoginModal.vue";
 import { RoutesMenu } from "@/components/menu/RoutesMenu";
 import { useRouteMenuGenerator } from "@/composables/use-route-menu-generator";
 import { rbacAnnotations } from "@/constants/annotations";
@@ -280,7 +279,6 @@ const disallowAccessConsole = computed(() => {
       </Teleport>
     </div>
   </div>
-  <LoginModal />
 </template>
 
 <style lang="scss">
