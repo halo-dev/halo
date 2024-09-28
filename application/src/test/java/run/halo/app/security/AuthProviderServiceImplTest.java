@@ -4,6 +4,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.ArgumentMatchers.same;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -16,6 +17,7 @@ import org.mockito.ArgumentCaptor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.skyscreamer.jsonassert.JSONAssert;
+import org.springframework.data.domain.Sort;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import reactor.core.publisher.Flux;
@@ -24,6 +26,7 @@ import reactor.test.StepVerifier;
 import run.halo.app.core.extension.AuthProvider;
 import run.halo.app.core.extension.UserConnection;
 import run.halo.app.extension.ConfigMap;
+import run.halo.app.extension.ListOptions;
 import run.halo.app.extension.Metadata;
 import run.halo.app.extension.ReactiveExtensionClient;
 import run.halo.app.infra.SystemSetting;
@@ -121,9 +124,10 @@ class AuthProviderServiceImplTest {
 
         AuthProvider gitee = createAuthProvider("gitee");
 
-        when(client.list(eq(AuthProvider.class), any(), any()))
+        when(client.listAll(same(AuthProvider.class), any(ListOptions.class), any(Sort.class)))
             .thenReturn(Flux.just(github, gitlab, gitee));
-        when(client.list(eq(UserConnection.class), any(), any())).thenReturn(Flux.empty());
+        when(client.listAll(same(UserConnection.class), any(ListOptions.class), any(Sort.class)))
+            .thenReturn(Flux.empty());
 
         ConfigMap configMap = new ConfigMap();
         configMap.setData(new HashMap<>());

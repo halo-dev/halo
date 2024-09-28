@@ -15,15 +15,18 @@ import org.springframework.stereotype.Component;
 import org.springframework.util.Assert;
 import org.springframework.web.server.ServerWebInputException;
 import reactor.core.publisher.Mono;
+import reactor.core.scheduler.Schedulers;
 import reactor.util.retry.Retry;
 import run.halo.app.core.extension.User;
 import run.halo.app.core.extension.notification.Reason;
 import run.halo.app.core.extension.notification.Subscription;
 import run.halo.app.core.user.service.EmailVerificationService;
-import run.halo.app.core.user.service.UserService;
+import run.halo.app.extension.ExtensionUtil;
 import run.halo.app.extension.GroupVersion;
+import run.halo.app.extension.ListOptions;
 import run.halo.app.extension.MetadataUtil;
 import run.halo.app.extension.ReactiveExtensionClient;
+import run.halo.app.extension.index.query.QueryFactory;
 import run.halo.app.infra.exception.EmailVerificationFailed;
 import run.halo.app.notification.NotificationCenter;
 import run.halo.app.notification.NotificationReasonEmitter;
@@ -47,7 +50,6 @@ public class EmailVerificationServiceImpl implements EmailVerificationService {
     private final ReactiveExtensionClient client;
     private final NotificationReasonEmitter reasonEmitter;
     private final NotificationCenter notificationCenter;
-    private final UserService userService;
 
     @Override
     public Mono<Void> sendVerificationCode(String username, String email) {
@@ -121,7 +123,10 @@ public class EmailVerificationServiceImpl implements EmailVerificationService {
     }
 
     Mono<Boolean> isEmailInUse(String username, String emailToVerify) {
-        return userService.listByEmail(emailToVerify)
+        var listOptions = ListOptions.builder()
+            .andQuery(QueryFactory.equal("spec.email", emailToVerify))
+            .build();
+        return client.listAll(User.class, listOptions, ExtensionUtil.defaultSort())
             .filter(user -> user.getSpec().isEmailVerified())
             .filter(user -> !user.getMetadata().getName().equals(username))
             .hasElements();
@@ -137,7 +142,9 @@ public class EmailVerificationServiceImpl implements EmailVerificationService {
     public Mono<Boolean> verifyRegisterVerificationCode(String email, String code) {
         Assert.state(StringUtils.isNotBlank(email), "Username must not be blank");
         Assert.state(StringUtils.isNotBlank(code), "Code must not be blank");
-        return Mono.just(emailVerificationManager.verifyCode(email, email, code));
+        return Mono.fromSupplier(() -> emailVerificationManager.verifyCode(email, email, code))
+            // Why use boundedElastic? Because the verification uses synchronized block.
+            .subscribeOn(Schedulers.boundedElastic());
     }
 
     Mono<Void> sendVerificationNotification(String username, String email) {
