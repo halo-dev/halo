@@ -1,0 +1,37 @@
+<div th:remove="tag" th:fragment="form">
+    <div class="form-item">
+        <label for="email"> Email </label>
+
+        <div class="form-input">
+            <input
+                type="email"
+                id="email"
+                name="email"
+                autocomplete="off"
+                spellcheck="false"
+                autocorrect="off"
+                autocapitalize="off"
+                required
+                autofocus
+            />
+        </div>
+    </div>
+    <div class="form-item">
+        <label for="code"> Code </label>
+        <div class="form-input-group">
+            <div class="form-input">
+                <input
+                    type="text"
+                    id="code"
+                    name="code"
+                    autocomplete="off"
+                    spellcheck="false"
+                    autocorrect="off"
+                    autocapitalize="off"
+                    required
+                />
+            </div>
+            <button type="button">Send</button>
+        </div>
+    </div>
+</div>

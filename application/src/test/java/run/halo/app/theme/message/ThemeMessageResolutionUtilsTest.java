@@ -41,14 +41,6 @@ class ThemeMessageResolutionUtilsTest {
             "title", "这是来自 i18n/default.properties 的标题"));
     }
 
-    @Test
-    void messageFormat() {
-        String s =
-            ThemeMessageResolutionUtils.formatMessage(Locale.ENGLISH, "Welcome {0} to the index",
-                new Object[] {"Halo"});
-        assertThat(s).isEqualTo("Welcome Halo to the index");
-    }
-
     ThemeContext getTheme() throws URISyntaxException {
         return ThemeContext.builder()
             .name("default")

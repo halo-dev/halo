@@ -70,12 +70,18 @@ class AuthorizationTest {
     void anonymousUserAccessProtectedApi() {
         when(userDetailsService.findByUsername(eq(AnonymousUserConst.PRINCIPAL)))
             .thenReturn(Mono.empty());
-        when(roleService.listDependenciesFlux(anySet())).thenReturn(Flux.empty());
 
-        webClient.get().uri("/apis/fake.halo.run/v1/posts").exchange().expectStatus()
-            .isUnauthorized();
+        webClient.get().uri("/apis/fake.halo.run/v1/posts")
+            .header("X-Requested-With", "XMLHttpRequest")
+            .exchange()
+            .expectStatus().isUnauthorized();
 
-        verify(roleService).listDependenciesFlux(anySet());
+        webClient.get().uri("/apis/fake.halo.run/v1/posts")
+            .exchange()
+            .expectStatus().isFound()
+            .expectHeader().location("/login?authentication_required");
+
+        verify(roleService, times(2)).listDependenciesFlux(anySet());
     }
 
     @Test
@@ -97,13 +103,19 @@ class AuthorizationTest {
             .isOk()
             .expectBody(String.class).isEqualTo("returned posts");
 
-        verify(roleService).listDependenciesFlux(anySet());
-
-        webClient.get().uri("/apis/fake.halo.run/v1/posts/hello-halo").exchange()
+        webClient.get().uri("/apis/fake.halo.run/v1/posts/hello-halo")
+            .header("X-Requested-With", "XMLHttpRequest")
+            .exchange()
             .expectStatus()
             .isUnauthorized();
 
-        verify(roleService, times(2)).listDependenciesFlux(anySet());
+        webClient.get().uri("/apis/fake.halo.run/v1/posts/hello-halo")
+            .exchange()
+            .expectStatus()
+            .isFound()
+            .expectHeader().location("/login?authentication_required");
+
+        verify(roleService, times(3)).listDependenciesFlux(anySet());
     }
 
     @Test

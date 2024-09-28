@@ -80,6 +80,10 @@ dependencies {
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
     testImplementation 'org.springframework.security:spring-security-test'
     testImplementation 'io.projectreactor:reactor-test'
+
+    // webjars
+    runtimeOnly 'org.webjars.npm:jsencrypt:3.3.2'
+    runtimeOnly 'org.webjars.npm:normalize.css:8.0.1'
 }
 
 tasks.register('createChecksums', Checksum) {

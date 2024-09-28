@@ -6,6 +6,7 @@ import { setupVueQuery } from "@/setup/setupVueQuery";
 import { useGlobalInfoStore } from "@/stores/global-info";
 import { useRoleStore } from "@/stores/role";
 import { useUserStore } from "@/stores/user";
+import { getCookie } from "@/utils/cookie";
 import { hasPermission } from "@/utils/permission";
 import { consoleApiClient } from "@halo-dev/api-client";
 import router from "@uc/router";
@@ -66,8 +67,7 @@ async function initApp() {
     await userStore.fetchCurrentUser();
 
     // set locale
-    i18n.global.locale.value =
-      localStorage.getItem("locale") || getBrowserLanguage();
+    i18n.global.locale.value = getCookie("language") || getBrowserLanguage();
 
     const globalInfoStore = useGlobalInfoStore();
     await globalInfoStore.fetchGlobalInfo();

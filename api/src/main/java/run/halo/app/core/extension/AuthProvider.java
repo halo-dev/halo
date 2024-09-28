@@ -48,6 +48,15 @@ public class AuthProvider extends AbstractExtension {
         @Schema(requiredMode = REQUIRED, description = "Authentication url of the auth provider")
         private String authenticationUrl;
 
+        private String method = "GET";
+
+        private boolean rememberMeSupport = false;
+
+        /**
+         * Auth type: form or oauth2.
+         */
+        private AuthType authType;
+
         private String bindingUrl;
 
         private String unbindUrl;
@@ -76,5 +85,11 @@ public class AuthProvider extends AbstractExtension {
     public static class ConfigMapRef {
         @Schema(requiredMode = REQUIRED, minLength = 1)
         private String name;
+    }
+
+    public enum AuthType {
+        FORM,
+        OAUTH2,
+        ;
     }
 }
