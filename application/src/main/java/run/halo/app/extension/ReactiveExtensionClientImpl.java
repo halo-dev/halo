@@ -19,6 +19,8 @@ import java.util.function.Predicate;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.boot.availability.AvailabilityChangeEvent;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.context.event.ContextRefreshedEvent;
 import org.springframework.context.event.EventListener;
 import org.springframework.dao.DataIntegrityViolationException;
@@ -30,6 +32,7 @@ import org.springframework.transaction.reactive.TransactionalOperator;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import reactor.util.retry.Retry;
+import run.halo.app.extension.availability.IndexBuildState;
 import run.halo.app.extension.exception.ExtensionNotFoundException;
 import run.halo.app.extension.index.DefaultExtensionIterator;
 import run.halo.app.extension.index.ExtensionIterator;
@@ -443,6 +446,7 @@ public class ReactiveExtensionClientImpl implements ReactiveExtensionClient {
         private final ExtensionConverter converter;
         private final ReactiveExtensionStoreClient client;
         private final SchemeWatcherManager schemeWatcherManager;
+        private final ApplicationEventPublisher eventPublisher;
 
         @NonNull
         private ExtensionIterator<Extension> createExtensionIterator(Scheme scheme) {
@@ -459,6 +463,8 @@ public class ReactiveExtensionClientImpl implements ReactiveExtensionClient {
 
         @EventListener(ContextRefreshedEvent.class)
         public void startBuildingIndex() {
+            AvailabilityChangeEvent.publish(eventPublisher, this, IndexBuildState.BUILDING);
+
             final long startTimeMs = System.currentTimeMillis();
             log.info("Start building index for all extensions, please wait...");
             schemeManager.schemes()
@@ -474,6 +480,8 @@ public class ReactiveExtensionClientImpl implements ReactiveExtensionClient {
                     indexerFactory.removeIndexer(scheme);
                 }
             });
+
+            AvailabilityChangeEvent.publish(eventPublisher, this, IndexBuildState.BUILT);
             log.info("Successfully built index in {}ms, Preparing to lunch application...",
                 System.currentTimeMillis() - startTimeMs);
         }
