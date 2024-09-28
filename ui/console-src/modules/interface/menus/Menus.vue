@@ -259,7 +259,7 @@ const handleDelete = async (menuItem: MenuTreeItem) => {
                   </VButton>
                   <VButton
                     v-permission="['system:menus:manage']"
-                    type="primary"
+                    type="secondary"
                     @click="menuItemEditingModal = true"
                   >
                     <template #icon>

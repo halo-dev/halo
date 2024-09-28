@@ -1,7 +1,7 @@
 <script lang="ts" setup>
 import type { Theme } from "@halo-dev/api-client";
 import { consoleApiClient } from "@halo-dev/api-client";
-import { VButton, VEmpty, VLoading, VSpace } from "@halo-dev/components";
+import { VButton, VEmpty, VLoading } from "@halo-dev/components";
 import { useQuery } from "@tanstack/vue-query";
 import ThemeListItem from "../ThemeListItem.vue";
 
@@ -29,11 +29,9 @@ const {
     <Transition v-else-if="!themes?.length" appear name="fade">
       <VEmpty :title="$t('core.theme.list_modal.not_installed_empty.title')">
         <template #actions>
-          <VSpace>
-            <VButton :loading="isFetching" @click="refetch">
-              {{ $t("core.common.buttons.refresh") }}
-            </VButton>
-          </VSpace>
+          <VButton :loading="isFetching" @click="refetch">
+            {{ $t("core.common.buttons.refresh") }}
+          </VButton>
         </template>
       </VEmpty>
     </Transition>
