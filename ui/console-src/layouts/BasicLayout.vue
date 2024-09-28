@@ -57,7 +57,7 @@ const handleLogout = () => {
         document.cookie =
           "XSRF-TOKEN=; Path=/; Expires=Thu, 01 Jan 1970 00:00:01 GMT;";
 
-        router.replace({ name: "Login" });
+        window.location.href = "/login";
       } catch (error) {
         console.error("Failed to logout", error);
       }
