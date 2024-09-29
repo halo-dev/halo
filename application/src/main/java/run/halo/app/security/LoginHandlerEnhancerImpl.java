@@ -6,6 +6,7 @@ import org.springframework.security.core.AuthenticationException;
 import org.springframework.stereotype.Component;
 import org.springframework.web.server.ServerWebExchange;
 import reactor.core.publisher.Mono;
+import run.halo.app.security.authentication.oauth2.OAuth2LoginHandlerEnhancer;
 import run.halo.app.security.authentication.rememberme.RememberMeRequestCache;
 import run.halo.app.security.authentication.rememberme.RememberMeServices;
 import run.halo.app.security.authentication.rememberme.WebSessionRememberMeRequestCache;
@@ -29,12 +30,17 @@ public class LoginHandlerEnhancerImpl implements LoginHandlerEnhancer {
     private final RememberMeRequestCache rememberMeRequestCache =
         new WebSessionRememberMeRequestCache();
 
+    private final OAuth2LoginHandlerEnhancer oauth2LoginHandlerEnhancer;
+
     @Override
     public Mono<Void> onLoginSuccess(ServerWebExchange exchange,
         Authentication successfulAuthentication) {
-        return rememberMeServices.loginSuccess(exchange, successfulAuthentication)
-            .then(deviceService.loginSuccess(exchange, successfulAuthentication))
-            .then(rememberMeRequestCache.removeRememberMe(exchange));
+        return Mono.when(
+            rememberMeServices.loginSuccess(exchange, successfulAuthentication),
+            deviceService.loginSuccess(exchange, successfulAuthentication),
+            rememberMeRequestCache.removeRememberMe(exchange),
+            oauth2LoginHandlerEnhancer.loginSuccess(exchange, successfulAuthentication)
+        );
     }
 
     @Override

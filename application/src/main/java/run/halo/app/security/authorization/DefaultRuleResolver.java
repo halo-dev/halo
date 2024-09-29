@@ -27,7 +27,7 @@ public class DefaultRuleResolver implements AuthorizationRuleResolver {
     public Mono<AuthorizingVisitor> visitRules(Authentication authentication,
         RequestInfo requestInfo) {
         var roleNames = AuthorityUtils.authoritiesToRoles(authentication.getAuthorities());
-        var record = new AttributesRecord(authentication, requestInfo);
+        var record = new AttributesRecord(requestInfo);
         var visitor = new AuthorizingVisitor(record);
 
         // If the request is an userspace scoped request,
