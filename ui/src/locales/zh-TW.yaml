@@ -1,76 +1,4 @@
 core:
-  login:
-    title: 登入
-    fields:
-      username:
-        placeholder: 用戶名
-      password:
-        placeholder: 密碼
-      remember_me:
-        label: 保持登入會話
-    operations:
-      submit:
-        toast_success: 登入成功
-        toast_failed: 登入失敗，用戶名或密碼錯誤
-        toast_csrf: CSRF Token 失效，請重新嘗試
-      signup:
-        label: 沒有帳號
-        button: 立即註冊
-      return_login:
-        label: 已有帳號
-        button: 立即登入
-      return_site: 返回到首頁
-      reset_password:
-        button: 找回密碼
-    button: 登入
-    modal:
-      title: 重新登入
-    2fa:
-      fields:
-        code:
-          placeholder: 請輸入兩步驟驗證碼
-          label: 兩步驟驗證碼
-  signup:
-    title: 註冊
-    fields:
-      username:
-        placeholder: 用戶名
-      display_name:
-        placeholder: 名稱
-      email:
-        placeholder: 電子郵箱
-        matchFailed: 郵箱格式錯誤或服務商不受支援
-      verify_code:
-        placeholder: 驗證碼
-        operations:
-          send_code:
-            buttons:
-              countdown: "{timer} 秒後重發"
-              send: 發送驗證碼
-              sending: 發送中
-            toast_email_empty: 請輸入電子郵件信箱
-            toast_success: 驗證碼已發送
-      password:
-        placeholder: 密碼
-      password_confirm:
-        placeholder: 確認密碼
-    operations:
-      submit:
-        button: 註冊
-        toast_success: 註冊成功
-  binding:
-    title: 帳號綁定
-    common:
-      toast:
-        mounted: 當前登入方式未綁定帳號，請先綁定或註冊新帳號
-    operations:
-      login_and_bind:
-        button: 登入並綁定
-      signup_and_bind:
-        button: 註冊並綁定
-      bind:
-        toast_success: 綁定成功
-        toast_failed: 綁定失敗，沒有找到已啟用的登入方式
   sidebar:
     search:
       placeholder: 搜尋
@@ -465,7 +393,7 @@ core:
         cover:
           label: 封面圖
   deleted_page:
-    title: 自定義頁面回收站
+    title: 頁面回收站
     empty:
       title: 沒有自定義頁面被放入回收站
       message: 你可以嘗試刷新或者返回自定義頁面管理
@@ -1530,8 +1458,6 @@ core:
       page_label: 頁
       size_label: 條 / 頁
       total_label: 共 {total} 項資料
-    social_auth_providers:
-      title: 三方登入
     app_download_alert:
       description: Halo 的主題和插件可以在以下地址下載：
       sources:
@@ -1735,30 +1661,6 @@ core:
     setting_modal:
       title: 文章設定
     title: 我的文章
-  uc_reset_password:
-    fields:
-      username:
-        label: 用戶名
-      password:
-        label: 新密碼
-      password_confirm:
-        label: 確認密碼
-    operations:
-      reset:
-        button: 重設密碼
-        toast_success: 重置成功
-    title: 重設密碼
-  reset_password:
-    fields:
-      username:
-        label: 使用者名稱
-      email:
-        label: 郵件地址
-    operations:
-      send:
-        label: 發送驗證郵件
-        toast_success: 如果你的用戶名和郵箱地址匹配，我們將會發送一封郵件到你的郵箱。
-    title: 重設密碼
   tool:
     title: 工具
     empty:

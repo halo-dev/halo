@@ -738,7 +738,7 @@
     },
     "/apis/api.console.halo.run/v1alpha1/plugins/{name}/config": {
       "get": {
-        "description": "Fetch configMap of plugin by configured configMapName.",
+        "description": "Fetch configMap of plugin by configured configMapName. it is deprecated since 2.20.0",
         "operationId": "fetchPluginConfig",
         "parameters": [
           {
@@ -767,7 +767,8 @@
         ]
       },
       "put": {
-        "description": "Update the configMap of plugin setting.",
+        "deprecated": true,
+        "description": "Update the configMap of plugin setting, it is deprecated since 2.20.0",
         "operationId": "updatePluginConfig",
         "parameters": [
           {
@@ -799,6 +800,70 @@
               }
             },
             "description": "default response"
+          }
+        },
+        "tags": [
+          "PluginV1alpha1Console"
+        ]
+      }
+    },
+    "/apis/api.console.halo.run/v1alpha1/plugins/{name}/json-config": {
+      "get": {
+        "description": "Fetch converted json config of plugin by configured configMapName.",
+        "operationId": "fetchPluginJsonConfig",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "name",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "default": {
+            "content": {
+              "*/*": {
+                "schema": {
+                  "type": "object"
+                }
+              }
+            },
+            "description": "default response"
+          }
+        },
+        "tags": [
+          "PluginV1alpha1Console"
+        ]
+      },
+      "put": {
+        "description": "Update the config of plugin setting.",
+        "operationId": "updatePluginJsonConfig",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "name",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "204": {
+            "content": {},
+            "description": "No Content"
           }
         },
         "tags": [
@@ -2412,7 +2477,8 @@
     },
     "/apis/api.console.halo.run/v1alpha1/themes/{name}/config": {
       "get": {
-        "description": "Fetch configMap of theme by configured configMapName.",
+        "deprecated": true,
+        "description": "Fetch configMap of theme by configured configMapName. It is deprecated.",
         "operationId": "fetchThemeConfig",
         "parameters": [
           {
@@ -2441,7 +2507,8 @@
         ]
       },
       "put": {
-        "description": "Update the configMap of theme setting.",
+        "deprecated": true,
+        "description": "Update the configMap of theme setting. It is deprecated.",
         "operationId": "updateThemeConfig",
         "parameters": [
           {
@@ -2496,6 +2563,70 @@
         ],
         "responses": {
           "204": {
+            "description": "No Content"
+          }
+        },
+        "tags": [
+          "ThemeV1alpha1Console"
+        ]
+      }
+    },
+    "/apis/api.console.halo.run/v1alpha1/themes/{name}/json-config": {
+      "get": {
+        "description": "Fetch converted json config of theme by configured configMapName.",
+        "operationId": "fetchThemeJsonConfig",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "name",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "default": {
+            "content": {
+              "*/*": {
+                "schema": {
+                  "type": "object"
+                }
+              }
+            },
+            "description": "default response"
+          }
+        },
+        "tags": [
+          "ThemeV1alpha1Console"
+        ]
+      },
+      "put": {
+        "description": "Update the configMap of theme setting.",
+        "operationId": "updateThemeJsonConfig",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "name",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "204": {
+            "content": {},
             "description": "No Content"
           }
         },
@@ -3133,6 +3264,72 @@
         },
         "tags": [
           "UserV1alpha1Console"
+        ]
+      }
+    },
+    "/apis/console.api.halo.run/v1alpha1/systemconfigs/{group}": {
+      "get": {
+        "description": "Get system config by group",
+        "operationId": "getSystemConfigByGroup",
+        "parameters": [
+          {
+            "description": "Group of the system config",
+            "in": "path",
+            "name": "group",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "default": {
+            "content": {
+              "*/*": {
+                "schema": {
+                  "type": "object"
+                }
+              },
+              "application/json": {}
+            },
+            "description": "default response"
+          }
+        },
+        "tags": [
+          "SystemConfigV1alpha1Console"
+        ]
+      },
+      "put": {
+        "description": "Update system config by group",
+        "operationId": "updateSystemConfigByGroup",
+        "parameters": [
+          {
+            "description": "Group of the system config",
+            "in": "path",
+            "name": "group",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "*/*": {
+              "schema": {
+                "type": "object"
+              }
+            }
+          }
+        },
+        "responses": {
+          "204 NO_CONTENT": {
+            "content": {},
+            "description": "default response"
+          }
+        },
+        "tags": [
+          "SystemConfigV1alpha1Console"
         ]
       }
     },

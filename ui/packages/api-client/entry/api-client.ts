@@ -55,6 +55,7 @@ import {
   SnapshotV1alpha1Api,
   SnapshotV1alpha1UcApi,
   SubscriptionV1alpha1Api,
+  SystemConfigV1alpha1ConsoleApi,
   SystemV1alpha1ConsoleApi,
   SystemV1alpha1PublicApi,
   TagV1alpha1Api,
@@ -320,6 +321,13 @@ function createConsoleApiClient(axiosInstance: AxiosInstance) {
     theme: {
       theme: new ThemeV1alpha1ConsoleApi(undefined, baseURL, axiosInstance),
     },
+    configMap: {
+      system: new SystemConfigV1alpha1ConsoleApi(
+        undefined,
+        baseURL,
+        axiosInstance
+      ),
+    },
   };
 }
 
@@ -448,6 +456,5 @@ export {
   createPublicApiClient,
   createUcApiClient,
   defaultPublicApiClient as publicApiClient,
-  defaultUcApiClient as ucApiClient
+  defaultUcApiClient as ucApiClient,
 };
-

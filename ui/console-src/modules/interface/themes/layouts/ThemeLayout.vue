@@ -235,7 +235,7 @@ onMounted(() => {
             <VButton @click="themesModal = true">
               {{ $t("core.theme.common.buttons.install") }}
             </VButton>
-            <VButton type="primary" @click="themesModal = true">
+            <VButton type="secondary" @click="themesModal = true">
               <template #icon>
                 <IconExchange class="h-full w-full" />
               </template>

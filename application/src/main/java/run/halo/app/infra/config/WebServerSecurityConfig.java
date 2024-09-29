@@ -11,6 +11,7 @@ import org.springframework.boot.autoconfigure.session.SessionProperties;
 import org.springframework.boot.autoconfigure.web.ServerProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.config.annotation.web.reactive.EnableWebFluxSecurity;
 import org.springframework.security.config.web.server.ServerHttpSecurity;
 import org.springframework.security.crypto.factory.PasswordEncoderFactories;
@@ -18,10 +19,10 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.server.SecurityWebFilterChain;
 import org.springframework.security.web.server.context.ServerSecurityContextRepository;
 import org.springframework.security.web.server.context.WebSessionServerSecurityContextRepository;
+import org.springframework.security.web.server.util.matcher.AndServerWebExchangeMatcher;
+import org.springframework.security.web.server.util.matcher.NegatedServerWebExchangeMatcher;
 import org.springframework.session.MapSession;
 import org.springframework.session.config.annotation.web.server.EnableSpringWebSession;
-import org.springframework.web.reactive.function.server.RouterFunction;
-import org.springframework.web.reactive.function.server.ServerResponse;
 import run.halo.app.core.user.service.RoleService;
 import run.halo.app.core.user.service.UserService;
 import run.halo.app.extension.ReactiveExtensionClient;
@@ -31,7 +32,6 @@ import run.halo.app.security.DefaultUserDetailService;
 import run.halo.app.security.authentication.CryptoService;
 import run.halo.app.security.authentication.SecurityConfigurer;
 import run.halo.app.security.authentication.impl.RsaKeyService;
-import run.halo.app.security.authentication.login.PublicKeyRouteBuilder;
 import run.halo.app.security.authentication.pat.PatAuthenticationManager;
 import run.halo.app.security.authentication.pat.PatServerWebExchangeMatcher;
 import run.halo.app.security.authentication.twofactor.TwoFactorAuthorizationManager;
@@ -59,20 +59,33 @@ public class WebServerSecurityConfig {
         CryptoService cryptoService,
         HaloProperties haloProperties) {
 
-        http.securityMatcher(pathMatchers("/**"))
+        var pathMatcher = pathMatchers("/**");
+        var staticResourcesMatcher = pathMatchers(HttpMethod.GET,
+            "/themes/{themeName}/assets/{*resourcePaths}",
+            "/plugins/{pluginName}/assets/**",
+            "/console/**",
+            "/uc/**",
+            "/upload/**",
+            "/webjars/**",
+            "/js/**",
+            "/styles/**",
+            "/halo-tracker.js",
+            "/images/**"
+        );
+
+        var securityMatcher = new AndServerWebExchangeMatcher(pathMatcher,
+            new NegatedServerWebExchangeMatcher(staticResourcesMatcher));
+
+        http.securityMatcher(securityMatcher)
             .authorizeExchange(spec -> spec.pathMatchers(
                     "/api/**",
                     "/apis/**",
                     "/oauth2/**",
-                    "/login/**",
-                    "/logout",
                     "/actuator/**"
                 )
-                .access(
-                    new TwoFactorAuthorizationManager(
-                        new RequestInfoAuthorizationManager(roleService)
-                    )
-                )
+                .access(new RequestInfoAuthorizationManager(roleService))
+                .pathMatchers("/challenges/two-factor/**")
+                .access(new TwoFactorAuthorizationManager())
                 .anyExchange().permitAll())
             .anonymous(spec -> {
                 spec.authorities(AnonymousUserConst.Role);
@@ -138,11 +151,6 @@ public class WebServerSecurityConfig {
     @Bean
     PasswordEncoder passwordEncoder() {
         return PasswordEncoderFactories.createDelegatingPasswordEncoder();
-    }
-
-    @Bean
-    RouterFunction<ServerResponse> publicKeyRoute(CryptoService cryptoService) {
-        return new PublicKeyRouteBuilder(cryptoService).build();
     }
 
     @Bean

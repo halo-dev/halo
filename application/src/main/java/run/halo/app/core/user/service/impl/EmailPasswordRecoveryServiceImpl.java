@@ -1,30 +1,28 @@
 package run.halo.app.core.user.service.impl;
 
-import com.google.common.cache.Cache;
-import com.google.common.cache.CacheBuilder;
+import java.time.Clock;
 import java.time.Duration;
-import java.util.concurrent.TimeUnit;
-import java.util.concurrent.atomic.AtomicInteger;
-import lombok.Data;
 import lombok.RequiredArgsConstructor;
-import lombok.experimental.Accessors;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.dao.OptimisticLockingFailureException;
+import org.springframework.security.core.token.Sha512DigestUtils;
 import org.springframework.stereotype.Component;
 import org.springframework.util.Assert;
+import org.springframework.web.util.UriComponentsBuilder;
 import reactor.core.publisher.Mono;
 import reactor.util.retry.Retry;
 import run.halo.app.core.extension.User;
 import run.halo.app.core.extension.notification.Reason;
 import run.halo.app.core.extension.notification.Subscription;
 import run.halo.app.core.user.service.EmailPasswordRecoveryService;
+import run.halo.app.core.user.service.InvalidResetTokenException;
+import run.halo.app.core.user.service.ResetToken;
+import run.halo.app.core.user.service.ResetTokenRepository;
 import run.halo.app.core.user.service.UserService;
 import run.halo.app.extension.GroupVersion;
 import run.halo.app.extension.ReactiveExtensionClient;
 import run.halo.app.infra.ExternalLinkProcessor;
-import run.halo.app.infra.exception.AccessDeniedException;
-import run.halo.app.infra.exception.RateLimitExceededException;
 import run.halo.app.notification.NotificationCenter;
 import run.halo.app.notification.NotificationReasonEmitter;
 import run.halo.app.notification.UserIdentity;
@@ -38,17 +36,21 @@ import run.halo.app.notification.UserIdentity;
 @Component
 @RequiredArgsConstructor
 public class EmailPasswordRecoveryServiceImpl implements EmailPasswordRecoveryService {
+
     public static final int MAX_ATTEMPTS = 5;
     public static final long LINK_EXPIRATION_MINUTES = 30;
+    private static final Duration RESET_TOKEN_LIFE_TIME =
+        Duration.ofMinutes(LINK_EXPIRATION_MINUTES);
     static final String RESET_PASSWORD_BY_EMAIL_REASON_TYPE = "reset-password-by-email";
 
-    private final ResetPasswordVerificationManager resetPasswordVerificationManager =
-        new ResetPasswordVerificationManager();
     private final ExternalLinkProcessor externalLinkProcessor;
     private final ReactiveExtensionClient client;
     private final NotificationReasonEmitter reasonEmitter;
     private final NotificationCenter notificationCenter;
     private final UserService userService;
+    private final ResetTokenRepository resetTokenRepository;
+
+    private Clock clock = Clock.systemDefaultZone();
 
     @Override
     public Mono<Void> sendPasswordResetEmail(String username, String email) {
@@ -66,22 +68,35 @@ public class EmailPasswordRecoveryServiceImpl implements EmailPasswordRecoverySe
     }
 
     @Override
-    public Mono<Void> changePassword(String username, String newPassword, String token) {
-        Assert.state(StringUtils.isNotBlank(username), "Username must not be blank");
+    public Mono<Void> sendPasswordResetEmail(String email) {
+        if (StringUtils.isBlank(email)) {
+            return Mono.empty();
+        }
+        return userService.listByEmail(email)
+            .filter(user -> user.getSpec().isEmailVerified())
+            .next()
+            .flatMap(user -> sendResetPasswordNotification(user.getMetadata().getName(), email));
+    }
+
+    @Override
+    public Mono<Void> changePassword(String newPassword, String token) {
         Assert.state(StringUtils.isNotBlank(newPassword), "NewPassword must not be blank");
         Assert.state(StringUtils.isNotBlank(token), "Token for reset password must not be blank");
-        var verified = resetPasswordVerificationManager.verifyToken(username, token);
-        if (!verified) {
-            return Mono.error(AccessDeniedException::new);
-        }
-        return userService.updateWithRawPassword(username, newPassword)
-            .retryWhen(Retry.backoff(8, Duration.ofMillis(100))
-                .filter(OptimisticLockingFailureException.class::isInstance))
-            .flatMap(user -> {
-                resetPasswordVerificationManager.removeToken(username);
-                return unSubscribeResetPasswordEmailNotification(user.getSpec().getEmail());
-            })
-            .then();
+        var tokenHash = hashToken(token);
+        return getValidResetToken(token).flatMap(resetToken ->
+            userService.updateWithRawPassword(resetToken.username(), newPassword)
+                .flatMap(user -> unSubscribeResetPasswordEmailNotification(
+                    user.getSpec().getEmail())
+                )
+                .then(resetTokenRepository.removeByTokenHash(tokenHash))
+        );
+    }
+
+    @Override
+    public Mono<ResetToken> getValidResetToken(String token) {
+        return resetTokenRepository.findByTokenHash(hashToken(token))
+            .filter(resetToken -> clock.instant().isBefore(resetToken.expiresAt()))
+            .switchIfEmpty(Mono.error(InvalidResetTokenException::new));
     }
 
     Mono<Void> unSubscribeResetPasswordEmailNotification(String email) {
@@ -95,26 +110,33 @@ public class EmailPasswordRecoveryServiceImpl implements EmailPasswordRecoverySe
                 .filter(OptimisticLockingFailureException.class::isInstance));
     }
 
-    Mono<Void> sendResetPasswordNotification(String username, String email) {
-        var token = resetPasswordVerificationManager.generateToken(username);
-        var link = getResetPasswordLink(username, token);
-
-        var subscribeNotification = autoSubscribeResetPasswordEmailNotification(email);
-        var interestReasonSubject = createInterestReason(email).getSubject();
-        var emitReasonMono = reasonEmitter.emit(RESET_PASSWORD_BY_EMAIL_REASON_TYPE,
-            builder -> builder.attribute("expirationAtMinutes", LINK_EXPIRATION_MINUTES)
-                .attribute("username", username)
-                .attribute("link", link)
-                .author(UserIdentity.of(username))
-                .subject(Reason.Subject.builder()
-                    .apiVersion(interestReasonSubject.getApiVersion())
-                    .kind(interestReasonSubject.getKind())
-                    .name(interestReasonSubject.getName())
-                    .title("使用邮箱地址重置密码：" + email)
-                    .build()
-                )
-        );
-        return Mono.when(subscribeNotification).then(emitReasonMono);
+    private Mono<Void> sendResetPasswordNotification(String username, String email) {
+        var token = generateToken();
+        var tokenHash = hashToken(token);
+        var expiresAt = clock.instant().plus(RESET_TOKEN_LIFE_TIME);
+        var uri = UriComponentsBuilder.fromUriString("/")
+            .pathSegment("password-reset", token)
+            .build(true)
+            .toUri();
+        var resetToken = new ResetToken(tokenHash, username, expiresAt);
+        return resetTokenRepository.save(resetToken)
+            .then(externalLinkProcessor.processLink(uri).flatMap(link -> {
+                var interestReasonSubject = createInterestReason(email).getSubject();
+                var emitReasonMono = reasonEmitter.emit(RESET_PASSWORD_BY_EMAIL_REASON_TYPE,
+                    builder -> builder.attribute("expirationAtMinutes", LINK_EXPIRATION_MINUTES)
+                        .attribute("username", username)
+                        .attribute("link", link)
+                        .author(UserIdentity.of(username))
+                        .subject(Reason.Subject.builder()
+                            .apiVersion(interestReasonSubject.getApiVersion())
+                            .kind(interestReasonSubject.getKind())
+                            .name(interestReasonSubject.getName())
+                            .title("使用邮箱地址重置密码：" + email)
+                            .build()
+                        )
+                );
+                return autoSubscribeResetPasswordEmailNotification(email).then(emitReasonMono);
+            }));
     }
 
     Mono<Void> autoSubscribeResetPasswordEmailNotification(String email) {
@@ -136,73 +158,12 @@ public class EmailPasswordRecoveryServiceImpl implements EmailPasswordRecoverySe
         return interestReason;
     }
 
-    private String getResetPasswordLink(String username, String token) {
-        return externalLinkProcessor.processLink(
-            "/uc/reset-password/" + username + "?reset_password_token=" + token);
+    private static String hashToken(String token) {
+        return Sha512DigestUtils.shaHex(token);
     }
 
-    static class ResetPasswordVerificationManager {
-        private final Cache<String, Verification> userTokenCache =
-            CacheBuilder.newBuilder()
-                .expireAfterWrite(LINK_EXPIRATION_MINUTES, TimeUnit.MINUTES)
-                .maximumSize(10000)
-                .build();
-
-        private final Cache<String, Boolean>
-            blackListCache = CacheBuilder.newBuilder()
-            .expireAfterWrite(Duration.ofHours(2))
-            .maximumSize(1000)
-            .build();
-
-        public boolean verifyToken(String username, String token) {
-            var verification = userTokenCache.getIfPresent(username);
-            if (verification == null) {
-                // expired or not generated
-                return false;
-            }
-            if (blackListCache.getIfPresent(username) != null) {
-                // in blacklist
-                throw new RateLimitExceededException(null);
-            }
-            synchronized (verification) {
-                if (verification.getAttempts().get() >= MAX_ATTEMPTS) {
-                    // add to blacklist to prevent brute force attack
-                    blackListCache.put(username, true);
-                    return false;
-                }
-                if (!verification.getToken().equals(token)) {
-                    verification.getAttempts().incrementAndGet();
-                    return false;
-                }
-            }
-            return true;
-        }
-
-        public void removeToken(String username) {
-            userTokenCache.invalidate(username);
-        }
-
-        public String generateToken(String username) {
-            Assert.state(StringUtils.isNotBlank(username), "Username must not be blank");
-            var verification = new Verification();
-            verification.setToken(RandomStringUtils.randomAlphanumeric(20));
-            verification.setAttempts(new AtomicInteger(0));
-            userTokenCache.put(username, verification);
-            return verification.getToken();
-        }
-
-        /**
-         * Only for test.
-         */
-        boolean contains(String username) {
-            return userTokenCache.getIfPresent(username) != null;
-        }
-
-        @Data
-        @Accessors(chain = true)
-        static class Verification {
-            private String token;
-            private AtomicInteger attempts;
-        }
+    private static String generateToken() {
+        return RandomStringUtils.secure().nextAlphanumeric(64);
     }
+
 }

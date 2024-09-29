@@ -65,6 +65,7 @@ api/single-page-v1alpha1-public-api.ts
 api/snapshot-v1alpha1-api.ts
 api/snapshot-v1alpha1-uc-api.ts
 api/subscription-v1alpha1-api.ts
+api/system-config-v1alpha1-console-api.ts
 api/system-v1alpha1-console-api.ts
 api/system-v1alpha1-public-api.ts
 api/tag-v1alpha1-api.ts

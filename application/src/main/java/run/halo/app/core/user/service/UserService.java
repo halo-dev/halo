@@ -17,7 +17,7 @@ public interface UserService {
 
     Mono<User> grantRoles(String username, Set<String> roles);
 
-    Mono<User> signUp(User user, String password);
+    Mono<User> signUp(SignUpData signUpData);
 
     Mono<User> createUser(User user, Set<String> roles);
 

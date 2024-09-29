@@ -50,6 +50,7 @@ const inputClasses = {
     <IconLogo class="mb-8 flex-none" />
 
     <div class="flex w-72 flex-col">
+      <!-- @vue-ignore -->
       <FormKit
         id="setup-form"
         v-model="formState"

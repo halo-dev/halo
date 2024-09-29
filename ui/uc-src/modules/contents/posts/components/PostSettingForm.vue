@@ -78,6 +78,7 @@ const publishTimeHelp = computed(() => {
 </script>
 
 <template>
+  <!-- @vue-ignore -->
   <FormKit
     id="post-setting-form"
     v-model="internalFormState"

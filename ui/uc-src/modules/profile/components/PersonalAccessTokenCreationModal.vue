@@ -120,6 +120,7 @@ const { mutate, isLoading } = useMutation({
           </div>
         </div>
         <div class="mt-5 divide-y divide-gray-100 md:col-span-3 md:mt-0">
+          <!-- @vue-ignore -->
           <FormKit
             id="pat-creation-form"
             v-model="formState.spec"
