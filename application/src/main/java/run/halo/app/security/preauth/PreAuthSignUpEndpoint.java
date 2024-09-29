@@ -103,8 +103,7 @@ class PreAuthSignUpEndpoint {
                                         "emailCode",
                                         signUpData.getEmailCode(),
                                         true,
-                                        // TODO Refine i18n
-                                        new String[] {"signup.error.email-captcha.invalid"},
+                                        new String[] {"signup.error.email-code.invalid"},
                                         null,
                                         "Invalid Email Code"));
                                 }
