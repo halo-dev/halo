@@ -96,14 +96,14 @@ function sendVerificationCode(button, sendRequest) {
         sendRequest()
             .then(() => {
                 startCountdown();
-                Toast.success("发送成功");
+                Toast.success(i18nResources.sendVerificationCodeSuccess);
             })
             .catch((e) => {
                 button.disabled = false;
                 if (e instanceof Error) {
                     Toast.error(e.message);
                 } else {
-                    Toast.error("发送失败，请稍后再试");
+                    Toast.error(i18nResources.sendVerificationCodeFailed);
                 }
             });
     });
@@ -151,4 +151,3 @@ document.addEventListener("DOMContentLoaded", () => {
         }
     });
 });
-
