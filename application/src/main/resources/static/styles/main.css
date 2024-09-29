@@ -408,3 +408,7 @@
         flex-direction: column;
     }
 }
+
+::-ms-reveal {
+    display: none;
+}
