@@ -19,7 +19,6 @@ import {
   ExtensionPointDefinitionV1alpha1Api,
   GroupV1alpha1Api,
   IndicesV1alpha1ConsoleApi,
-  LoginApi,
   MenuItemV1alpha1Api,
   MenuV1alpha1Api,
   MenuV1alpha1PublicApi,
@@ -66,7 +65,6 @@ import {
   UserConnectionV1alpha1Api,
   UserV1alpha1Api,
   UserV1alpha1ConsoleApi,
-  UserV1alpha1PublicApi,
 } from "../src";
 
 const defaultAxiosInstance = axios.create({
@@ -281,7 +279,6 @@ function createConsoleApiClient(axiosInstance: AxiosInstance) {
       baseURL,
       axiosInstance
     ),
-    login: new LoginApi(undefined, baseURL, axiosInstance),
     storage: {
       attachment: new AttachmentV1alpha1ConsoleApi(
         undefined,
@@ -431,7 +428,6 @@ function createPublicApiClient(axiosInstance: AxiosInstance) {
   return {
     menu: new MenuV1alpha1PublicApi(undefined, baseURL, axiosInstance),
     stats: new SystemV1alpha1PublicApi(undefined, baseURL, axiosInstance),
-    user: new UserV1alpha1PublicApi(undefined, baseURL, axiosInstance),
     content: {
       post: new PostV1alpha1PublicApi(undefined, baseURL, axiosInstance),
       comment: new CommentV1alpha1PublicApi(undefined, baseURL, axiosInstance),

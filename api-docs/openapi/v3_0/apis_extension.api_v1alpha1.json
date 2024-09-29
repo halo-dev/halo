@@ -8671,6 +8671,13 @@
         ],
         "type": "object",
         "properties": {
+          "authType": {
+            "type": "string",
+            "enum": [
+              "FORM",
+              "OAUTH2"
+            ]
+          },
           "authenticationUrl": {
             "type": "string",
             "description": "Authentication url of the auth provider"
@@ -8694,9 +8701,15 @@
           "logo": {
             "type": "string"
           },
+          "method": {
+            "type": "string"
+          },
           "priority": {
             "type": "integer",
             "format": "int32"
+          },
+          "rememberMeSupport": {
+            "type": "boolean"
           },
           "settingRef": {
             "$ref": "#/components/schemas/SettingRef"

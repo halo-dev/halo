@@ -506,123 +506,6 @@
           "MetricsV1alpha1Public"
         ]
       }
-    },
-    "/apis/api.halo.run/v1alpha1/users/-/send-password-reset-email": {
-      "post": {
-        "description": "Send password reset email when forgot password",
-        "operationId": "SendPasswordResetEmail",
-        "requestBody": {
-          "content": {
-            "*/*": {
-              "schema": {
-                "$ref": "#/components/schemas/PasswordResetEmailRequest"
-              }
-            }
-          },
-          "required": true
-        },
-        "responses": {
-          "204 NO_CONTENT": {
-            "content": {},
-            "description": "default response"
-          }
-        },
-        "tags": [
-          "UserV1alpha1Public"
-        ]
-      }
-    },
-    "/apis/api.halo.run/v1alpha1/users/-/send-register-verify-email": {
-      "post": {
-        "description": "Send registration verification email, which can be called when mustVerifyEmailOnRegistration in user settings is true",
-        "operationId": "SendRegisterVerifyEmail",
-        "requestBody": {
-          "content": {
-            "*/*": {
-              "schema": {
-                "$ref": "#/components/schemas/RegisterVerifyEmailRequest"
-              }
-            }
-          },
-          "required": true
-        },
-        "responses": {
-          "204 NO_CONTENT": {
-            "content": {},
-            "description": "default response"
-          }
-        },
-        "tags": [
-          "UserV1alpha1Public"
-        ]
-      }
-    },
-    "/apis/api.halo.run/v1alpha1/users/-/signup": {
-      "post": {
-        "description": "Sign up a new user",
-        "operationId": "SignUp",
-        "requestBody": {
-          "content": {
-            "*/*": {
-              "schema": {
-                "$ref": "#/components/schemas/SignUpRequest"
-              }
-            }
-          },
-          "required": true
-        },
-        "responses": {
-          "default": {
-            "content": {
-              "*/*": {
-                "schema": {
-                  "$ref": "#/components/schemas/User"
-                }
-              }
-            },
-            "description": "default response"
-          }
-        },
-        "tags": [
-          "UserV1alpha1Public"
-        ]
-      }
-    },
-    "/apis/api.halo.run/v1alpha1/users/{name}/reset-password": {
-      "put": {
-        "description": "Reset password by token",
-        "operationId": "ResetPasswordByToken",
-        "parameters": [
-          {
-            "description": "The name of the user",
-            "in": "path",
-            "name": "name",
-            "required": true,
-            "schema": {
-              "type": "string"
-            }
-          }
-        ],
-        "requestBody": {
-          "content": {
-            "*/*": {
-              "schema": {
-                "$ref": "#/components/schemas/ResetPasswordRequest"
-              }
-            }
-          },
-          "required": true
-        },
-        "responses": {
-          "204 NO_CONTENT": {
-            "content": {},
-            "description": "default response"
-          }
-        },
-        "tags": [
-          "UserV1alpha1Public"
-        ]
-      }
     }
   },
   "components": {
@@ -1244,33 +1127,6 @@
           }
         }
       },
-      "LoginHistory": {
-        "required": [
-          "loginAt",
-          "sourceIp",
-          "successful",
-          "userAgent"
-        ],
-        "type": "object",
-        "properties": {
-          "loginAt": {
-            "type": "string",
-            "format": "date-time"
-          },
-          "reason": {
-            "type": "string"
-          },
-          "sourceIp": {
-            "type": "string"
-          },
-          "successful": {
-            "type": "boolean"
-          },
-          "userAgent": {
-            "type": "string"
-          }
-        }
-      },
       "MenuItemSpec": {
         "type": "object",
         "properties": {
@@ -1488,21 +1344,6 @@
           }
         }
       },
-      "PasswordResetEmailRequest": {
-        "required": [
-          "email",
-          "username"
-        ],
-        "type": "object",
-        "properties": {
-          "email": {
-            "type": "string"
-          },
-          "username": {
-            "type": "string"
-          }
-        }
-      },
       "Ref": {
         "required": [
           "name"
@@ -1527,17 +1368,6 @@
           }
         },
         "description": "Extension reference object. The name is mandatory"
-      },
-      "RegisterVerifyEmailRequest": {
-        "required": [
-          "email"
-        ],
-        "type": "object",
-        "properties": {
-          "email": {
-            "type": "string"
-          }
-        }
       },
       "RemoveOperation": {
         "required": [
@@ -1800,22 +1630,6 @@
           }
         }
       },
-      "ResetPasswordRequest": {
-        "required": [
-          "newPassword",
-          "token"
-        ],
-        "type": "object",
-        "properties": {
-          "newPassword": {
-            "minLength": 6,
-            "type": "string"
-          },
-          "token": {
-            "type": "string"
-          }
-        }
-      },
       "SearchOption": {
         "required": [
           "keyword"
@@ -1904,27 +1718,6 @@
           }
         }
       },
-      "SignUpRequest": {
-        "required": [
-          "password",
-          "user"
-        ],
-        "type": "object",
-        "properties": {
-          "password": {
-            "minLength": 6,
-            "type": "string"
-          },
-          "user": {
-            "$ref": "#/components/schemas/User"
-          },
-          "verifyCode": {
-            "maxLength": 6,
-            "minLength": 6,
-            "type": "string"
-          }
-        }
-      },
       "SiteStatsVo": {
         "type": "object",
         "properties": {
@@ -1972,97 +1765,6 @@
           },
           "value": {
             "description": "Value can be any JSON value"
-          }
-        }
-      },
-      "User": {
-        "required": [
-          "apiVersion",
-          "kind",
-          "metadata",
-          "spec"
-        ],
-        "type": "object",
-        "properties": {
-          "apiVersion": {
-            "type": "string"
-          },
-          "kind": {
-            "type": "string"
-          },
-          "metadata": {
-            "$ref": "#/components/schemas/Metadata"
-          },
-          "spec": {
-            "$ref": "#/components/schemas/UserSpec"
-          },
-          "status": {
-            "$ref": "#/components/schemas/UserStatus"
-          }
-        }
-      },
-      "UserSpec": {
-        "required": [
-          "displayName",
-          "email"
-        ],
-        "type": "object",
-        "properties": {
-          "avatar": {
-            "type": "string"
-          },
-          "bio": {
-            "type": "string"
-          },
-          "disabled": {
-            "type": "boolean"
-          },
-          "displayName": {
-            "type": "string"
-          },
-          "email": {
-            "type": "string"
-          },
-          "emailVerified": {
-            "type": "boolean"
-          },
-          "loginHistoryLimit": {
-            "type": "integer",
-            "format": "int32"
-          },
-          "password": {
-            "type": "string"
-          },
-          "phone": {
-            "type": "string"
-          },
-          "registeredAt": {
-            "type": "string",
-            "format": "date-time"
-          },
-          "totpEncryptedSecret": {
-            "type": "string"
-          },
-          "twoFactorAuthEnabled": {
-            "type": "boolean"
-          }
-        }
-      },
-      "UserStatus": {
-        "type": "object",
-        "properties": {
-          "lastLoginAt": {
-            "type": "string",
-            "format": "date-time"
-          },
-          "loginHistories": {
-            "type": "array",
-            "items": {
-              "$ref": "#/components/schemas/LoginHistory"
-            }
-          },
-          "permalink": {
-            "type": "string"
           }
         }
       },
