@@ -37,7 +37,6 @@ export * from './api/group-v1alpha1-api';
 export * from './api/index-v1alpha1-public-api';
 export * from './api/indices-v1alpha1-console-api';
 export * from './api/local-thumbnail-v1alpha1-api';
-export * from './api/login-api';
 export * from './api/menu-item-v1alpha1-api';
 export * from './api/menu-v1alpha1-api';
 export * from './api/menu-v1alpha1-public-api';
@@ -91,5 +90,4 @@ export * from './api/two-factor-auth-v1alpha1-uc-api';
 export * from './api/user-connection-v1alpha1-api';
 export * from './api/user-v1alpha1-api';
 export * from './api/user-v1alpha1-console-api';
-export * from './api/user-v1alpha1-public-api';
 

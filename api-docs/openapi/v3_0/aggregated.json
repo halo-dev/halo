@@ -6512,123 +6512,6 @@
         ]
       }
     },
-    "/apis/api.halo.run/v1alpha1/users/-/send-password-reset-email": {
-      "post": {
-        "description": "Send password reset email when forgot password",
-        "operationId": "SendPasswordResetEmail",
-        "requestBody": {
-          "content": {
-            "*/*": {
-              "schema": {
-                "$ref": "#/components/schemas/PasswordResetEmailRequest"
-              }
-            }
-          },
-          "required": true
-        },
-        "responses": {
-          "204 NO_CONTENT": {
-            "content": {},
-            "description": "default response"
-          }
-        },
-        "tags": [
-          "UserV1alpha1Public"
-        ]
-      }
-    },
-    "/apis/api.halo.run/v1alpha1/users/-/send-register-verify-email": {
-      "post": {
-        "description": "Send registration verification email, which can be called when mustVerifyEmailOnRegistration in user settings is true",
-        "operationId": "SendRegisterVerifyEmail",
-        "requestBody": {
-          "content": {
-            "*/*": {
-              "schema": {
-                "$ref": "#/components/schemas/RegisterVerifyEmailRequest"
-              }
-            }
-          },
-          "required": true
-        },
-        "responses": {
-          "204 NO_CONTENT": {
-            "content": {},
-            "description": "default response"
-          }
-        },
-        "tags": [
-          "UserV1alpha1Public"
-        ]
-      }
-    },
-    "/apis/api.halo.run/v1alpha1/users/-/signup": {
-      "post": {
-        "description": "Sign up a new user",
-        "operationId": "SignUp",
-        "requestBody": {
-          "content": {
-            "*/*": {
-              "schema": {
-                "$ref": "#/components/schemas/SignUpRequest"
-              }
-            }
-          },
-          "required": true
-        },
-        "responses": {
-          "default": {
-            "content": {
-              "*/*": {
-                "schema": {
-                  "$ref": "#/components/schemas/User"
-                }
-              }
-            },
-            "description": "default response"
-          }
-        },
-        "tags": [
-          "UserV1alpha1Public"
-        ]
-      }
-    },
-    "/apis/api.halo.run/v1alpha1/users/{name}/reset-password": {
-      "put": {
-        "description": "Reset password by token",
-        "operationId": "ResetPasswordByToken",
-        "parameters": [
-          {
-            "description": "The name of the user",
-            "in": "path",
-            "name": "name",
-            "required": true,
-            "schema": {
-              "type": "string"
-            }
-          }
-        ],
-        "requestBody": {
-          "content": {
-            "*/*": {
-              "schema": {
-                "$ref": "#/components/schemas/ResetPasswordRequest"
-              }
-            }
-          },
-          "required": true
-        },
-        "responses": {
-          "204 NO_CONTENT": {
-            "content": {},
-            "description": "default response"
-          }
-        },
-        "tags": [
-          "UserV1alpha1Public"
-        ]
-      }
-    },
     "/apis/api.notification.halo.run/v1alpha1/notifiers/{name}/receiver-config": {
       "get": {
         "description": "Fetch receiver config of notifier",
@@ -15655,27 +15538,6 @@
           "PersonalAccessTokenV1alpha1Uc"
         ]
       }
-    },
-    "/login/public-key": {
-      "get": {
-        "description": "Read public key for encrypting password.",
-        "operationId": "GetPublicKey",
-        "responses": {
-          "default": {
-            "content": {
-              "*/*": {
-                "schema": {
-                  "$ref": "#/components/schemas/PublicKeyResponse"
-                }
-              }
-            },
-            "description": "default response"
-          }
-        },
-        "tags": [
-          "Login"
-        ]
-      }
     }
   },
   "components": {
@@ -16036,6 +15898,13 @@
         ],
         "type": "object",
         "properties": {
+          "authType": {
+            "type": "string",
+            "enum": [
+              "FORM",
+              "OAUTH2"
+            ]
+          },
           "authenticationUrl": {
             "type": "string",
             "description": "Authentication url of the auth provider"
@@ -16059,9 +15928,15 @@
           "logo": {
             "type": "string"
           },
+          "method": {
+            "type": "string"
+          },
           "priority": {
             "type": "integer",
             "format": "int32"
+          },
+          "rememberMeSupport": {
+            "type": "boolean"
           },
           "settingRef": {
             "$ref": "#/components/schemas/SettingRef"
@@ -19844,21 +19719,6 @@
           }
         }
       },
-      "PasswordResetEmailRequest": {
-        "required": [
-          "email",
-          "username"
-        ],
-        "type": "object",
-        "properties": {
-          "email": {
-            "type": "string"
-          },
-          "username": {
-            "type": "string"
-          }
-        }
-      },
       "PatSpec": {
         "required": [
           "name",
@@ -20792,14 +20652,6 @@
           }
         }
       },
-      "PublicKeyResponse": {
-        "type": "object",
-        "properties": {
-          "base64Format": {
-            "type": "string"
-          }
-        }
-      },
       "Reason": {
         "required": [
           "apiVersion",
@@ -21183,17 +21035,6 @@
           }
         },
         "description": "Extension reference object. The name is mandatory"
-      },
-      "RegisterVerifyEmailRequest": {
-        "required": [
-          "email"
-        ],
-        "type": "object",
-        "properties": {
-          "email": {
-            "type": "string"
-          }
-        }
       },
       "RememberMeToken": {
         "required": [
@@ -21620,22 +21461,6 @@
             "type": "integer",
             "description": "Indicates total pages.",
             "format": "int64"
-          }
-        }
-      },
-      "ResetPasswordRequest": {
-        "required": [
-          "newPassword",
-          "token"
-        ],
-        "type": "object",
-        "properties": {
-          "newPassword": {
-            "minLength": 6,
-            "type": "string"
-          },
-          "token": {
-            "type": "string"
           }
         }
       },
@@ -22388,27 +22213,6 @@
             "items": {
               "$ref": "#/components/schemas/SettingForm"
             }
-          }
-        }
-      },
-      "SignUpRequest": {
-        "required": [
-          "password",
-          "user"
-        ],
-        "type": "object",
-        "properties": {
-          "password": {
-            "minLength": 6,
-            "type": "string"
-          },
-          "user": {
-            "$ref": "#/components/schemas/User"
-          },
-          "verifyCode": {
-            "maxLength": 6,
-            "minLength": 6,
-            "type": "string"
           }
         }
       },
