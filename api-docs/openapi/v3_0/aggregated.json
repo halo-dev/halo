@@ -2871,7 +2871,7 @@
     },
     "/apis/api.console.halo.run/v1alpha1/plugins/{name}/config": {
       "get": {
-        "description": "Fetch configMap of plugin by configured configMapName.",
+        "description": "Fetch configMap of plugin by configured configMapName. it is deprecated since 2.20.0",
         "operationId": "fetchPluginConfig",
         "parameters": [
           {
@@ -2900,7 +2900,8 @@
         ]
       },
       "put": {
-        "description": "Update the configMap of plugin setting.",
+        "deprecated": true,
+        "description": "Update the configMap of plugin setting, it is deprecated since 2.20.0",
         "operationId": "updatePluginConfig",
         "parameters": [
           {
@@ -2932,6 +2933,70 @@
               }
             },
             "description": "default response"
+          }
+        },
+        "tags": [
+          "PluginV1alpha1Console"
+        ]
+      }
+    },
+    "/apis/api.console.halo.run/v1alpha1/plugins/{name}/json-config": {
+      "get": {
+        "description": "Fetch converted json config of plugin by configured configMapName.",
+        "operationId": "fetchPluginJsonConfig",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "name",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "default": {
+            "content": {
+              "*/*": {
+                "schema": {
+                  "type": "object"
+                }
+              }
+            },
+            "description": "default response"
+          }
+        },
+        "tags": [
+          "PluginV1alpha1Console"
+        ]
+      },
+      "put": {
+        "description": "Update the config of plugin setting.",
+        "operationId": "updatePluginJsonConfig",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "name",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "204": {
+            "content": {},
+            "description": "No Content"
           }
         },
         "tags": [
@@ -4545,7 +4610,8 @@
     },
     "/apis/api.console.halo.run/v1alpha1/themes/{name}/config": {
       "get": {
-        "description": "Fetch configMap of theme by configured configMapName.",
+        "deprecated": true,
+        "description": "Fetch configMap of theme by configured configMapName. It is deprecated.",
         "operationId": "fetchThemeConfig",
         "parameters": [
           {
@@ -4574,7 +4640,8 @@
         ]
       },
       "put": {
-        "description": "Update the configMap of theme setting.",
+        "deprecated": true,
+        "description": "Update the configMap of theme setting. It is deprecated.",
         "operationId": "updateThemeConfig",
         "parameters": [
           {
@@ -4629,6 +4696,70 @@
         ],
         "responses": {
           "204": {
+            "description": "No Content"
+          }
+        },
+        "tags": [
+          "ThemeV1alpha1Console"
+        ]
+      }
+    },
+    "/apis/api.console.halo.run/v1alpha1/themes/{name}/json-config": {
+      "get": {
+        "description": "Fetch converted json config of theme by configured configMapName.",
+        "operationId": "fetchThemeJsonConfig",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "name",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "default": {
+            "content": {
+              "*/*": {
+                "schema": {
+                  "type": "object"
+                }
+              }
+            },
+            "description": "default response"
+          }
+        },
+        "tags": [
+          "ThemeV1alpha1Console"
+        ]
+      },
+      "put": {
+        "description": "Update the configMap of theme setting.",
+        "operationId": "updateThemeJsonConfig",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "name",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "204": {
+            "content": {},
             "description": "No Content"
           }
         },
@@ -6381,123 +6512,6 @@
         ]
       }
     },
-    "/apis/api.halo.run/v1alpha1/users/-/send-password-reset-email": {
-      "post": {
-        "description": "Send password reset email when forgot password",
-        "operationId": "SendPasswordResetEmail",
-        "requestBody": {
-          "content": {
-            "*/*": {
-              "schema": {
-                "$ref": "#/components/schemas/PasswordResetEmailRequest"
-              }
-            }
-          },
-          "required": true
-        },
-        "responses": {
-          "204 NO_CONTENT": {
-            "content": {},
-            "description": "default response"
-          }
-        },
-        "tags": [
-          "UserV1alpha1Public"
-        ]
-      }
-    },
-    "/apis/api.halo.run/v1alpha1/users/-/send-register-verify-email": {
-      "post": {
-        "description": "Send registration verification email, which can be called when mustVerifyEmailOnRegistration in user settings is true",
-        "operationId": "SendRegisterVerifyEmail",
-        "requestBody": {
-          "content": {
-            "*/*": {
-              "schema": {
-                "$ref": "#/components/schemas/RegisterVerifyEmailRequest"
-              }
-            }
-          },
-          "required": true
-        },
-        "responses": {
-          "204 NO_CONTENT": {
-            "content": {},
-            "description": "default response"
-          }
-        },
-        "tags": [
-          "UserV1alpha1Public"
-        ]
-      }
-    },
-    "/apis/api.halo.run/v1alpha1/users/-/signup": {
-      "post": {
-        "description": "Sign up a new user",
-        "operationId": "SignUp",
-        "requestBody": {
-          "content": {
-            "*/*": {
-              "schema": {
-                "$ref": "#/components/schemas/SignUpRequest"
-              }
-            }
-          },
-          "required": true
-        },
-        "responses": {
-          "default": {
-            "content": {
-              "*/*": {
-                "schema": {
-                  "$ref": "#/components/schemas/User"
-                }
-              }
-            },
-            "description": "default response"
-          }
-        },
-        "tags": [
-          "UserV1alpha1Public"
-        ]
-      }
-    },
-    "/apis/api.halo.run/v1alpha1/users/{name}/reset-password": {
-      "put": {
-        "description": "Reset password by token",
-        "operationId": "ResetPasswordByToken",
-        "parameters": [
-          {
-            "description": "The name of the user",
-            "in": "path",
-            "name": "name",
-            "required": true,
-            "schema": {
-              "type": "string"
-            }
-          }
-        ],
-        "requestBody": {
-          "content": {
-            "*/*": {
-              "schema": {
-                "$ref": "#/components/schemas/ResetPasswordRequest"
-              }
-            }
-          },
-          "required": true
-        },
-        "responses": {
-          "204 NO_CONTENT": {
-            "content": {},
-            "description": "default response"
-          }
-        },
-        "tags": [
-          "UserV1alpha1Public"
-        ]
-      }
-    },
     "/apis/api.notification.halo.run/v1alpha1/notifiers/{name}/receiver-config": {
       "get": {
         "description": "Fetch receiver config of notifier",
@@ -7431,6 +7445,72 @@
         },
         "tags": [
           "UserConnectionV1alpha1"
+        ]
+      }
+    },
+    "/apis/console.api.halo.run/v1alpha1/systemconfigs/{group}": {
+      "get": {
+        "description": "Get system config by group",
+        "operationId": "getSystemConfigByGroup",
+        "parameters": [
+          {
+            "description": "Group of the system config",
+            "in": "path",
+            "name": "group",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "default": {
+            "content": {
+              "*/*": {
+                "schema": {
+                  "type": "object"
+                }
+              },
+              "application/json": {}
+            },
+            "description": "default response"
+          }
+        },
+        "tags": [
+          "SystemConfigV1alpha1Console"
+        ]
+      },
+      "put": {
+        "description": "Update system config by group",
+        "operationId": "updateSystemConfigByGroup",
+        "parameters": [
+          {
+            "description": "Group of the system config",
+            "in": "path",
+            "name": "group",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "*/*": {
+              "schema": {
+                "type": "object"
+              }
+            }
+          }
+        },
+        "responses": {
+          "204 NO_CONTENT": {
+            "content": {},
+            "description": "default response"
+          }
+        },
+        "tags": [
+          "SystemConfigV1alpha1Console"
         ]
       }
     },
@@ -15458,27 +15538,6 @@
           "PersonalAccessTokenV1alpha1Uc"
         ]
       }
-    },
-    "/login/public-key": {
-      "get": {
-        "description": "Read public key for encrypting password.",
-        "operationId": "GetPublicKey",
-        "responses": {
-          "default": {
-            "content": {
-              "*/*": {
-                "schema": {
-                  "$ref": "#/components/schemas/PublicKeyResponse"
-                }
-              }
-            },
-            "description": "default response"
-          }
-        },
-        "tags": [
-          "Login"
-        ]
-      }
     }
   },
   "components": {
@@ -15839,6 +15898,13 @@
         ],
         "type": "object",
         "properties": {
+          "authType": {
+            "type": "string",
+            "enum": [
+              "FORM",
+              "OAUTH2"
+            ]
+          },
           "authenticationUrl": {
             "type": "string",
             "description": "Authentication url of the auth provider"
@@ -15862,9 +15928,15 @@
           "logo": {
             "type": "string"
           },
+          "method": {
+            "type": "string"
+          },
           "priority": {
             "type": "integer",
             "format": "int32"
+          },
+          "rememberMeSupport": {
+            "type": "boolean"
           },
           "settingRef": {
             "$ref": "#/components/schemas/SettingRef"
@@ -19647,21 +19719,6 @@
           }
         }
       },
-      "PasswordResetEmailRequest": {
-        "required": [
-          "email",
-          "username"
-        ],
-        "type": "object",
-        "properties": {
-          "email": {
-            "type": "string"
-          },
-          "username": {
-            "type": "string"
-          }
-        }
-      },
       "PatSpec": {
         "required": [
           "name",
@@ -20595,14 +20652,6 @@
           }
         }
       },
-      "PublicKeyResponse": {
-        "type": "object",
-        "properties": {
-          "base64Format": {
-            "type": "string"
-          }
-        }
-      },
       "Reason": {
         "required": [
           "apiVersion",
@@ -20986,17 +21035,6 @@
           }
         },
         "description": "Extension reference object. The name is mandatory"
-      },
-      "RegisterVerifyEmailRequest": {
-        "required": [
-          "email"
-        ],
-        "type": "object",
-        "properties": {
-          "email": {
-            "type": "string"
-          }
-        }
       },
       "RememberMeToken": {
         "required": [
@@ -21423,22 +21461,6 @@
             "type": "integer",
             "description": "Indicates total pages.",
             "format": "int64"
-          }
-        }
-      },
-      "ResetPasswordRequest": {
-        "required": [
-          "newPassword",
-          "token"
-        ],
-        "type": "object",
-        "properties": {
-          "newPassword": {
-            "minLength": 6,
-            "type": "string"
-          },
-          "token": {
-            "type": "string"
           }
         }
       },
@@ -22191,27 +22213,6 @@
             "items": {
               "$ref": "#/components/schemas/SettingForm"
             }
-          }
-        }
-      },
-      "SignUpRequest": {
-        "required": [
-          "password",
-          "user"
-        ],
-        "type": "object",
-        "properties": {
-          "password": {
-            "minLength": 6,
-            "type": "string"
-          },
-          "user": {
-            "$ref": "#/components/schemas/User"
-          },
-          "verifyCode": {
-            "maxLength": 6,
-            "minLength": 6,
-            "type": "string"
           }
         }
       },

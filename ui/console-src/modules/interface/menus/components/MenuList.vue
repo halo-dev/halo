@@ -1,7 +1,7 @@
 <script lang="ts" setup>
 import { usePermission } from "@/utils/permission";
 import type { Menu } from "@halo-dev/api-client";
-import { coreApiClient } from "@halo-dev/api-client";
+import { consoleApiClient, coreApiClient } from "@halo-dev/api-client";
 import {
   Dialog,
   Toast,
@@ -12,7 +12,6 @@ import {
   VEntity,
   VEntityField,
   VLoading,
-  VSpace,
   VStatusDot,
   VTag,
 } from "@halo-dev/components";
@@ -21,6 +20,10 @@ import { useRouteQuery } from "@vueuse/router";
 import { onMounted, ref } from "vue";
 import { useI18n } from "vue-i18n";
 import MenuEditingModal from "./MenuEditingModal.vue";
+
+interface SystemMenuConfig {
+  primary: string;
+}
 
 const { currentUserHasPermission } = usePermission();
 const { t } = useI18n();
@@ -65,10 +68,10 @@ const {
     }
   },
   refetchInterval(data) {
-    const deletingMenus = data?.filter(
+    const hasDeletingMenu = data?.some(
       (menu) => !!menu.metadata.deletionTimestamp
     );
-    return deletingMenus?.length ? 1000 : false;
+    return hasDeletingMenu ? 1000 : false;
   },
 });
 
@@ -138,35 +141,25 @@ onMounted(async () => {
 const { data: primaryMenuName, refetch: refetchPrimaryMenuName } = useQuery({
   queryKey: ["primary-menu-name"],
   queryFn: async () => {
-    const { data } = await coreApiClient.configMap.getConfigMap({
-      name: "system",
-    });
+    const { data } =
+      await consoleApiClient.configMap.system.getSystemConfigByGroup({
+        group: "menu",
+      });
 
-    if (!data.data?.menu) {
-      return "";
-    }
+    const { primary } = (data as SystemMenuConfig) || {};
 
-    const menuConfig = JSON.parse(data.data.menu);
-
-    return menuConfig.primary;
+    return primary;
   },
 });
 
 const handleSetPrimaryMenu = async (menu: Menu) => {
-  const { data: systemConfigMap } = await coreApiClient.configMap.getConfigMap({
-    name: "system",
+  await consoleApiClient.configMap.system.updateSystemConfigByGroup({
+    group: "menu",
+    body: {
+      primary: menu.metadata.name,
+    },
   });
 
-  if (systemConfigMap.data) {
-    const menuConfigToUpdate = JSON.parse(systemConfigMap.data?.menu || "{}");
-    menuConfigToUpdate.primary = menu.metadata.name;
-    systemConfigMap.data["menu"] = JSON.stringify(menuConfigToUpdate);
-
-    await coreApiClient.configMap.updateConfigMap({
-      name: "system",
-      configMap: systemConfigMap,
-    });
-  }
   await refetchPrimaryMenuName();
 
   Toast.success(t("core.menu.operations.set_primary.toast_success"));
@@ -187,11 +180,9 @@ const handleSetPrimaryMenu = async (menu: Menu) => {
         :title="$t('core.menu.empty.title')"
       >
         <template #actions>
-          <VSpace>
-            <VButton size="sm" @click="refetch()">
-              {{ $t("core.common.buttons.refresh") }}
-            </VButton>
-          </VSpace>
+          <VButton size="sm" @click="refetch()">
+            {{ $t("core.common.buttons.refresh") }}
+          </VButton>
         </template>
       </VEmpty>
     </Transition>

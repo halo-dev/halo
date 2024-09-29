@@ -15,6 +15,9 @@ spring:
         use-last-modified: false
 
 halo:
+  security:
+    basic-auth:
+      disabled: false
   console:
     proxy:
       endpoint: http://localhost:3000/

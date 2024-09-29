@@ -1,5 +1,4 @@
 <script lang="ts" setup>
-import LoginModal from "@/components/login/LoginModal.vue";
 import { RoutesMenu } from "@/components/menu/RoutesMenu";
 import { useRouteMenuGenerator } from "@/composables/use-route-menu-generator";
 import { rbacAnnotations } from "@/constants/annotations";
@@ -53,7 +52,7 @@ const handleLogout = () => {
         document.cookie =
           "XSRF-TOKEN=; Path=/; Expires=Thu, 01 Jan 1970 00:00:01 GMT;";
 
-        window.location.href = "/console/login";
+        window.location.href = "/login";
       } catch (error) {
         console.error("Failed to logout", error);
       }
@@ -280,7 +279,6 @@ const disallowAccessConsole = computed(() => {
       </Teleport>
     </div>
   </div>
-  <LoginModal />
 </template>
 
 <style lang="scss">

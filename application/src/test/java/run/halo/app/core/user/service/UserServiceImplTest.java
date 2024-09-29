@@ -2,6 +2,8 @@ package run.halo.app.core.user.service;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertInstanceOf;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anySet;
 import static org.mockito.ArgumentMatchers.anyString;
@@ -27,6 +29,7 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.web.server.ServerWebInputException;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import reactor.test.StepVerifier;
@@ -34,15 +37,12 @@ import run.halo.app.core.extension.Role;
 import run.halo.app.core.extension.RoleBinding;
 import run.halo.app.core.extension.RoleBinding.Subject;
 import run.halo.app.core.extension.User;
-import run.halo.app.core.user.service.RoleService;
-import run.halo.app.core.user.service.UserServiceImpl;
 import run.halo.app.event.user.PasswordChangedEvent;
 import run.halo.app.extension.Metadata;
 import run.halo.app.extension.ReactiveExtensionClient;
 import run.halo.app.extension.exception.ExtensionNotFoundException;
 import run.halo.app.infra.SystemConfigurableEnvironmentFetcher;
 import run.halo.app.infra.SystemSetting;
-import run.halo.app.infra.exception.AccessDeniedException;
 import run.halo.app.infra.exception.DuplicateNameException;
 import run.halo.app.infra.exception.UserNotFoundException;
 
@@ -302,11 +302,14 @@ class UserServiceImplTest {
                 eq(SystemSetting.User.class)))
                 .thenReturn(Mono.just(userSetting));
 
-            User fakeUser = fakeSignUpUser("fake-user", "fake-password");
+            var signUpData = createSignUpData("fake-user", "fake-password");
 
-            userService.signUp(fakeUser, "fake-password")
+            userService.signUp(signUpData)
                 .as(StepVerifier::create)
-                .expectError(AccessDeniedException.class)
+                .consumeErrorWith(e -> {
+                    assertInstanceOf(ServerWebInputException.class, e);
+                    assertTrue(e.getMessage().contains("registration is not allowed"));
+                })
                 .verify();
         }
 
@@ -318,11 +321,14 @@ class UserServiceImplTest {
                 eq(SystemSetting.User.class)))
                 .thenReturn(Mono.just(userSetting));
 
-            User fakeUser = fakeSignUpUser("fake-user", "fake-password");
+            var signUpData = createSignUpData("fake-user", "fake-password");
 
-            userService.signUp(fakeUser, "fake-password")
+            userService.signUp(signUpData)
                 .as(StepVerifier::create)
-                .expectError(AccessDeniedException.class)
+                .consumeErrorWith(e -> {
+                    assertInstanceOf(ServerWebInputException.class, e);
+                    assertTrue(e.getMessage().contains("default role is not configured"));
+                })
                 .verify();
         }
 
@@ -336,11 +342,10 @@ class UserServiceImplTest {
                 .thenReturn(Mono.just(userSetting));
             when(passwordEncoder.encode(eq("fake-password"))).thenReturn("fake-password");
             when(client.fetch(eq(User.class), eq("fake-user")))
-                .thenReturn(Mono.just(fakeSignUpUser("test", "test")));
+                .thenReturn(Mono.just(createFakeUser("test", "test")));
 
-            User fakeUser = fakeSignUpUser("fake-user", "fake-password");
-
-            userService.signUp(fakeUser, "fake-password")
+            var signUpData = createSignUpData("fake-user", "fake-password");
+            userService.signUp(signUpData)
                 .as(StepVerifier::create)
                 .expectError(DuplicateNameException.class)
                 .verify();
@@ -358,7 +363,8 @@ class UserServiceImplTest {
             when(client.fetch(eq(User.class), eq("fake-user")))
                 .thenReturn(Mono.empty());
 
-            User fakeUser = fakeSignUpUser("fake-user", "fake-password");
+            User fakeUser = createFakeUser("fake-user", "fake-password");
+            var signUpData = createSignUpData("fake-user", "fake-password");
 
             when(client.fetch(eq(Role.class), anyString())).thenReturn(Mono.just(new Role()));
             when(client.create(any(User.class))).thenReturn(Mono.just(fakeUser));
@@ -366,7 +372,7 @@ class UserServiceImplTest {
             doReturn(Mono.just(fakeUser)).when(spyUserService).grantRoles(eq("fake-user"),
                 anySet());
 
-            spyUserService.signUp(fakeUser, "fake-password")
+            spyUserService.signUp(signUpData)
                 .as(StepVerifier::create)
                 .consumeNextWith(user -> {
                     assertThat(user.getMetadata().getName()).isEqualTo("fake-user");
@@ -378,13 +384,20 @@ class UserServiceImplTest {
             verify(spyUserService).grantRoles(eq("fake-user"), anySet());
         }
 
-        User fakeSignUpUser(String name, String password) {
+        User createFakeUser(String name, String password) {
             User user = new User();
             user.setMetadata(new Metadata());
             user.getMetadata().setName(name);
             user.setSpec(new User.UserSpec());
             user.getSpec().setPassword(password);
             return user;
+        }
+
+        SignUpData createSignUpData(String name, String password) {
+            SignUpData signUpData = new SignUpData();
+            signUpData.setUsername(name);
+            signUpData.setPassword(password);
+            return signUpData;
         }
     }
 

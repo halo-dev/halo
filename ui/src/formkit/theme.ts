@@ -2,9 +2,8 @@ const textClassification = {
   label: "block text-sm font-medium text-gray-700 formkit-invalid:text-red-500",
   wrapper: "flex flex-col gap-4",
   inner:
-    "inline-flex items-center w-full relative box-border border border-gray-300 formkit-invalid:border-red-500 h-9 rounded-base overflow-hidden focus-within:border-primary focus-within:shadow-sm w-full sm:max-w-lg transition-all",
-  input:
-    "bg-white resize-none w-full text-black block transition-all h-full px-3 text-sm",
+    "bg-white inline-flex items-center w-full relative box-border border border-gray-300 formkit-invalid:border-red-500 h-9 rounded-base overflow-hidden focus-within:border-primary focus-within:shadow-sm w-full sm:max-w-lg transition-all",
+  input: "resize-none w-full text-black block transition-all px-3 text-sm",
 };
 
 const boxClassification = {

@@ -20,6 +20,7 @@ import org.mockito.stubbing.Answer;
 import org.skyscreamer.jsonassert.JSONAssert;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import reactor.core.publisher.Mono;
+import run.halo.app.core.counter.CounterService;
 import run.halo.app.core.extension.Counter;
 import run.halo.app.core.extension.User;
 import run.halo.app.core.extension.content.Comment;
@@ -32,7 +33,6 @@ import run.halo.app.extension.ReactiveExtensionClient;
 import run.halo.app.extension.Ref;
 import run.halo.app.infra.AnonymousUserConst;
 import run.halo.app.infra.utils.JsonUtils;
-import run.halo.app.metrics.CounterService;
 
 /**
  * Tests for {@link CommentFinderImpl}.
@@ -44,21 +44,19 @@ import run.halo.app.metrics.CounterService;
 class CommentPublicQueryServiceImplTest {
 
     @Mock
-    private ReactiveExtensionClient client;
-    @Mock
-    private UserService userService;
+    ReactiveExtensionClient client;
 
     @Mock
-    private CounterService counterService;
+    UserService userService;
+
+    @Mock
+    CounterService counterService;
 
     @InjectMocks
-    private CommentPublicQueryServiceImpl commentPublicQueryService;
+    CommentPublicQueryServiceImpl commentPublicQueryService;
 
     @BeforeEach
     void setUp() {
-        User ghost = createUser();
-        ghost.getMetadata().setName("ghost");
-        when(userService.getUserOrGhost(eq("ghost"))).thenReturn(Mono.just(ghost));
         when(userService.getUserOrGhost(eq("fake-user"))).thenReturn(Mono.just(createUser()));
     }
 

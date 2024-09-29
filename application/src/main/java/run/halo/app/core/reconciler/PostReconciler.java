@@ -39,6 +39,8 @@ import run.halo.app.content.NotificationReasonConst;
 import run.halo.app.content.PostService;
 import run.halo.app.content.comment.CommentService;
 import run.halo.app.content.permalinks.PostPermalinkPolicy;
+import run.halo.app.core.counter.CounterService;
+import run.halo.app.core.counter.MeterUtils;
 import run.halo.app.core.extension.content.Constant;
 import run.halo.app.core.extension.content.Post;
 import run.halo.app.core.extension.content.Post.PostPhase;
@@ -65,8 +67,6 @@ import run.halo.app.extension.router.selector.FieldSelector;
 import run.halo.app.infra.Condition;
 import run.halo.app.infra.ConditionStatus;
 import run.halo.app.infra.utils.HaloUtils;
-import run.halo.app.metrics.CounterService;
-import run.halo.app.metrics.MeterUtils;
 import run.halo.app.notification.NotificationCenter;
 import run.halo.app.plugin.extensionpoint.ExtensionGetter;
 

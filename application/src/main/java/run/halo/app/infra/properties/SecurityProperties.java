@@ -25,7 +25,7 @@ public class SecurityProperties {
         /**
          * Whether basic authentication is disabled.
          */
-        private boolean disabled;
+        private boolean disabled = true;
     }
 
     @Data

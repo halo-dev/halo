@@ -33,13 +33,4 @@ public class ThemeMessageResolver extends StandardMessageResolver {
         return Collections.unmodifiableMap(properties);
     }
 
-    @Override
-    protected Map<String, String> resolveMessagesForOrigin(Class<?> origin, Locale locale) {
-        return ThemeMessageResolutionUtils.resolveMessagesForOrigin(origin, locale);
-    }
-
-    @Override
-    protected String formatMessage(Locale locale, String message, Object[] messageParameters) {
-        return ThemeMessageResolutionUtils.formatMessage(locale, message, messageParameters);
-    }
 }
