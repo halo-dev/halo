@@ -1,12 +1,13 @@
 <th:block th:fragment="basicStaticResources">
-    <script th:inline="javascript">
-        const resources = {
-            title: `[(#{title})]`,
-        };
-    </script>
-
     <link rel="stylesheet" href="/webjars/normalize.css/8.0.1/normalize.css" />
     <link rel="stylesheet" th:href="|/styles/main.css?v=${site.version}|" />
+
+    <script th:inline="javascript">
+        const i18nResources = {
+            sendVerificationCodeSuccess: `[(#{js.sendVerificationCode.success})]`,
+            sendVerificationCodeFailed: `[(#{js.sendVerificationCode.failed})]`,
+        };
+    </script>
 
     <script src="/js/main.js"></script>
 </th:block>
@@ -67,7 +68,10 @@
                 const selectedLanguage = document.getElementById("language-select").value;
                 const currentURL = new URL(window.location.href);
                 currentURL.searchParams.set("language", selectedLanguage);
-                window.location.href = currentURL.toString();
+
+                history.replaceState(null, "", currentURL.toString());
+
+                window.location.reload();
             }
         </script>
     </div>
