@@ -39,8 +39,8 @@ public enum AuthorityUtils {
         Collection<? extends GrantedAuthority> authorities) {
         return authorities.stream()
             .map(GrantedAuthority::getAuthority)
+            .filter(authority -> StringUtils.startsWith(authority, ROLE_PREFIX))
             .map(authority -> {
-                authority = StringUtils.removeStart(authority, SCOPE_PREFIX);
                 authority = StringUtils.removeStart(authority, ROLE_PREFIX);
                 return authority;
             })

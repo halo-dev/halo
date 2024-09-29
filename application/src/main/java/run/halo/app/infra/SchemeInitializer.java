@@ -630,6 +630,22 @@ public class SchemeInitializer implements ApplicationListener<ApplicationContext
                         .map(UserConnectionSpec::getUsername)
                         .orElse(null)
                 )));
+            is.add(new IndexSpec()
+                .setName("spec.registrationId")
+                .setIndexFunc(simpleAttribute(UserConnection.class,
+                    connection -> Optional.ofNullable(connection.getSpec())
+                        .map(UserConnectionSpec::getRegistrationId)
+                        .orElse(null)
+                ))
+            );
+            is.add(new IndexSpec()
+                .setName("spec.providerUserId")
+                .setIndexFunc(simpleAttribute(UserConnection.class,
+                    connection -> Optional.ofNullable(connection.getSpec())
+                        .map(UserConnectionSpec::getProviderUserId)
+                        .orElse(null)
+                ))
+            );
         });
 
         // security.halo.run

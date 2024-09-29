@@ -19,7 +19,10 @@
         <strong th:text="#{messages.logoutSuccess}"></strong>
     </div>
     <div class="alert" role="alert" th:if="${param.signup.size() > 0}">
-        <strong th:text="#{messages.signupSuccess}"> </strong>
+        <strong th:text="#{messages.signupSuccess}"></strong>
+    </div>
+    <div class="alert" role="alert" th:if="${param.oauth2_bind.size() > 0}">
+        <strong th:text="#{messages.oauth2_bind}"></strong>
     </div>
 
     <div th:replace="~{__${fragmentTemplateName}__::form}"></div>

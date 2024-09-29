@@ -2,9 +2,7 @@ package run.halo.app.infra.config;
 
 import static org.springframework.util.ResourceUtils.FILE_URL_PREFIX;
 import static org.springframework.web.reactive.function.server.RequestPredicates.accept;
-import static org.springframework.web.reactive.function.server.RequestPredicates.method;
 import static org.springframework.web.reactive.function.server.RequestPredicates.path;
-import static org.springframework.web.reactive.function.server.RouterFunctions.route;
 import static run.halo.app.infra.utils.FileUtils.checkDirectoryTraversal;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -18,7 +16,6 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.annotation.Order;
 import org.springframework.http.CacheControl;
-import org.springframework.http.HttpMethod;
 import org.springframework.http.MediaType;
 import org.springframework.http.codec.CodecConfigurer;
 import org.springframework.http.codec.HttpMessageWriter;
@@ -30,15 +27,14 @@ import org.springframework.web.filter.reactive.ServerWebExchangeContextFilter;
 import org.springframework.web.reactive.config.ResourceHandlerRegistration;
 import org.springframework.web.reactive.config.ResourceHandlerRegistry;
 import org.springframework.web.reactive.config.WebFluxConfigurer;
-import org.springframework.web.reactive.function.BodyInserters;
 import org.springframework.web.reactive.function.server.RouterFunction;
+import org.springframework.web.reactive.function.server.RouterFunctions;
 import org.springframework.web.reactive.function.server.ServerResponse;
 import org.springframework.web.reactive.resource.EncodedResourceResolver;
 import org.springframework.web.reactive.resource.PathResourceResolver;
 import org.springframework.web.reactive.result.method.annotation.RequestMappingHandlerAdapter;
 import org.springframework.web.reactive.result.view.ViewResolutionResultHandler;
 import org.springframework.web.reactive.result.view.ViewResolver;
-import reactor.core.publisher.Mono;
 import run.halo.app.core.endpoint.WebSocketHandlerMapping;
 import run.halo.app.core.endpoint.console.CustomEndpointsBuilder;
 import run.halo.app.core.extension.endpoint.CustomEndpoint;
@@ -126,34 +122,33 @@ public class WebFluxConfig implements WebFluxConfigurer {
     }
 
     @Bean
-    RouterFunction<ServerResponse> consoleIndexRedirection() {
-        var consolePredicate = method(HttpMethod.GET)
-            .and(path("/console/**").and(path("/console/assets/**").negate()))
+    RouterFunction<ServerResponse> consoleEndpoints() {
+        var consolePredicate = path("/console/**").and(path("/console/assets/**").negate())
             .and(accept(MediaType.TEXT_HTML))
             .and(new WebSocketRequestPredicate().negate());
-        return route(consolePredicate,
-            request -> this.serveIndex(haloProp.getConsole().getLocation() + "index.html"));
-    }
 
-    @Bean
-    RouterFunction<ServerResponse> ucIndexRedirect() {
-        var consolePredicate = method(HttpMethod.GET)
-            .and(path("/uc/**").and(path("/uc/assets/**").negate()))
+        var ucPredicate = path("/uc/**").and(path("/uc/assets/**").negate())
             .and(accept(MediaType.TEXT_HTML))
             .and(new WebSocketRequestPredicate().negate());
-        return route(consolePredicate,
-            request -> this.serveIndex(haloProp.getUc().getLocation() + "index.html"));
-    }
 
-    private Mono<ServerResponse> serveIndex(String indexLocation) {
-        var indexResource = applicationContext.getResource(indexLocation);
-        try {
-            return ServerResponse.ok()
-                .cacheControl(CacheControl.noStore())
-                .body(BodyInserters.fromResource(indexResource));
-        } catch (Throwable e) {
-            return Mono.error(e);
-        }
+        var consoleIndexHtml =
+            applicationContext.getResource(haloProp.getConsole().getLocation() + "index.html");
+
+        var ucIndexHtml =
+            applicationContext.getResource(haloProp.getUc().getLocation() + "index.html");
+
+        return RouterFunctions.route()
+            .GET(consolePredicate,
+                request -> ServerResponse.ok()
+                    .cacheControl(CacheControl.noStore())
+                    .bodyValue(consoleIndexHtml)
+            )
+            .GET(ucPredicate,
+                request -> ServerResponse.ok()
+                    .cacheControl(CacheControl.noStore())
+                    .bodyValue(ucIndexHtml)
+            )
+            .build();
     }
 
     @Override

@@ -37,7 +37,7 @@ class DefaultRuleResolverTest {
     void visitRules() {
         when(roleService.listDependenciesFlux(Set.of("ruleReadPost")))
             .thenReturn(Flux.just(mockRole()));
-        var fakeUser = new User("admin", "123456", createAuthorityList("ruleReadPost"));
+        var fakeUser = new User("admin", "123456", createAuthorityList("ROLE_ruleReadPost"));
         var authentication = authenticated(fakeUser, fakeUser.getPassword(),
             fakeUser.getAuthorities());
 
@@ -59,7 +59,7 @@ class DefaultRuleResolverTest {
     void visitRulesForUserspaceScope() {
         when(roleService.listDependenciesFlux(Set.of("ruleReadPost")))
             .thenReturn(Flux.just(mockRole()));
-        var fakeUser = new User("admin", "123456", createAuthorityList("ruleReadPost"));
+        var fakeUser = new User("admin", "123456", createAuthorityList("ROLE_ruleReadPost"));
         var authentication =
             authenticated(fakeUser, fakeUser.getPassword(), fakeUser.getAuthorities());
         var cases = List.of(

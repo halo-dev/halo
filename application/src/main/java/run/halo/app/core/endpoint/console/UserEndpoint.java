@@ -88,7 +88,6 @@ import run.halo.app.infra.ValidationUtils;
 import run.halo.app.infra.exception.RateLimitExceededException;
 import run.halo.app.infra.exception.UnsatisfiedAttributeValueException;
 import run.halo.app.infra.utils.JsonUtils;
-import run.halo.app.security.authentication.twofactor.TwoFactorAuthentication;
 
 @Component
 @RequiredArgsConstructor
@@ -600,7 +599,7 @@ public class UserEndpoint implements CustomEndpoint {
     Mono<ServerResponse> me(ServerRequest request) {
         return ReactiveSecurityContextHolder.getContext()
             .map(SecurityContext::getAuthentication)
-            .filter(auth -> !(auth instanceof TwoFactorAuthentication))
+            .filter(Authentication::isAuthenticated)
             .flatMap(auth -> userService.getUser(auth.getName())
                 .flatMap(user -> {
                     var roleNames = authoritiesToRoles(auth.getAuthorities());

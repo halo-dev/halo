@@ -4,6 +4,7 @@ import com.fasterxml.jackson.core.Version;
 import com.fasterxml.jackson.databind.module.SimpleModule;
 import org.springframework.security.jackson2.SecurityJackson2Modules;
 import run.halo.app.security.authentication.login.HaloUser;
+import run.halo.app.security.authentication.oauth2.HaloOAuth2AuthenticationToken;
 import run.halo.app.security.authentication.twofactor.TwoFactorAuthentication;
 
 /**
@@ -21,8 +22,12 @@ public class HaloSecurityJackson2Module extends SimpleModule {
     public void setupModule(SetupContext context) {
         SecurityJackson2Modules.enableDefaultTyping(context.getOwner());
         context.setMixInAnnotations(HaloUser.class, HaloUserMixin.class);
-        context.setMixInAnnotations(TwoFactorAuthentication.class,
-            TwoFactorAuthenticationMixin.class);
+        context.setMixInAnnotations(
+            TwoFactorAuthentication.class, TwoFactorAuthenticationMixin.class
+        );
+        context.setMixInAnnotations(
+            HaloOAuth2AuthenticationToken.class, HaloOAuth2AuthenticationTokenMixin.class
+        );
     }
 
 }

@@ -13,6 +13,7 @@ import org.springframework.web.server.ServerWebExchange;
 import org.thymeleaf.extras.springsecurity6.dialect.SpringSecurityDialect;
 import org.thymeleaf.extras.springsecurity6.util.SpringSecurityContextUtils;
 import org.thymeleaf.extras.springsecurity6.util.SpringVersionUtils;
+import run.halo.app.security.authorization.AuthorityUtils;
 
 /**
  * HaloSpringSecurityDialect overwrites value of thymeleafSpringSecurityContext.
@@ -40,7 +41,9 @@ public class HaloSpringSecurityDialect extends SpringSecurityDialect implements 
         // We have to build an anonymous authentication token here because the token won't be saved
         // into repository during anonymous authentication.
         var anonymousAuthentication =
-            new AnonymousAuthenticationToken("fallback", PRINCIPAL, createAuthorityList(Role));
+            new AnonymousAuthenticationToken(
+                "fallback", PRINCIPAL, createAuthorityList(AuthorityUtils.ROLE_PREFIX + Role)
+            );
         var anonymousSecurityContext = new SecurityContextImpl(anonymousAuthentication);
 
         final Function<ServerWebExchange, Object> secCtxInitializer =
