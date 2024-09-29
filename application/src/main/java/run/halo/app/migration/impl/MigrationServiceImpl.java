@@ -69,7 +69,8 @@ public class MigrationServiceImpl implements MigrationService, InitializingBean 
         "mysql/**",
         "mysqlBackup/**",
         "**/.idea/**",
-        "**/.vscode/**"
+        "**/.vscode/**",
+        "attachments/thumbnails/**"
     );
 
     private final DateTimeFormatter dateTimeFormatter;
