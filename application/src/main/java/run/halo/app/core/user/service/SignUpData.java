@@ -1,7 +1,16 @@
 package run.halo.app.core.user.service;
 
+import jakarta.validation.Constraint;
+import jakarta.validation.ConstraintValidator;
+import jakarta.validation.ConstraintValidatorContext;
+import jakarta.validation.Payload;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
+import java.lang.annotation.ElementType;
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
+import java.lang.annotation.Target;
+import java.util.Objects;
 import java.util.Optional;
 import lombok.Data;
 import org.springframework.util.MultiValueMap;
@@ -14,6 +23,7 @@ import org.springframework.util.StringUtils;
  * @since 2.20.0
  */
 @Data
+@SignUpData.SignUpDataConstraint
 public class SignUpData {
 
     @NotBlank
@@ -29,6 +39,9 @@ public class SignUpData {
 
     @NotBlank
     private String password;
+
+    @NotBlank
+    private String confirmPassword;
 
     public static SignUpData of(MultiValueMap<String, String> formData) {
         var form = new SignUpData();
@@ -52,6 +65,41 @@ public class SignUpData {
             .filter(StringUtils::hasText)
             .ifPresent(form::setEmailCode);
 
+        Optional.ofNullable(formData.getFirst("confirmPassword"))
+            .filter(StringUtils::hasText)
+            .ifPresent(form::setConfirmPassword);
+
         return form;
+    }
+
+    @Target({ElementType.TYPE})
+    @Retention(RetentionPolicy.RUNTIME)
+    @Constraint(validatedBy = {SignUpDataConstraintValidator.class})
+    public @interface SignUpDataConstraint {
+
+        String message() default "";
+
+        Class<?>[] groups() default { };
+
+        Class<? extends Payload>[] payload() default { };
+
+    }
+
+    private static class SignUpDataConstraintValidator
+        implements ConstraintValidator<SignUpDataConstraint, SignUpData> {
+
+        @Override
+        public boolean isValid(SignUpData signUpData, ConstraintValidatorContext context) {
+            var isValid = Objects.equals(signUpData.getPassword(), signUpData.getConfirmPassword());
+            if (!isValid) {
+                context.disableDefaultConstraintViolation();
+                context.buildConstraintViolationWithTemplate(
+                        "{signup.error.confirm-password-not-match}"
+                    )
+                    .addPropertyNode("confirmPassword")
+                    .addConstraintViolation();
+            }
+            return isValid;
+        }
     }
 }
