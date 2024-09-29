@@ -256,6 +256,9 @@ core:
       cancel_publish:
         title: 取消发布
         description: 确定要取消发布吗？
+      delete:
+        title: 删除文章
+        description: 该操作会将文章放入回收站，后续由网站管理员进行管理。
   post_editor:
     title: 文章编辑
     untitled: 未命名文章

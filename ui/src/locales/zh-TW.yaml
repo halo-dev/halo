@@ -1656,6 +1656,9 @@ core:
       cancel_publish:
         description: 確定要取消發布嗎？
         title: 取消發布
+      delete:
+        title: 刪除文章
+        description: 該操作會將文章放入回收站，後續由網站管理員進行管理。
     publish_modal:
       title: 發布文章
     setting_modal:
