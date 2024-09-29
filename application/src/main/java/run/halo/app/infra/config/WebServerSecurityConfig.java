@@ -79,7 +79,7 @@ public class WebServerSecurityConfig {
             })
             .securityContextRepository(securityContextRepository)
             .httpBasic(basic -> {
-                if (haloProperties.getSecurity().isDisableBasicAuth()) {
+                if (haloProperties.getSecurity().getBasicAuth().isDisabled()) {
                     basic.disable();
                 }
             })
