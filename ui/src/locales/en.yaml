@@ -1519,6 +1519,7 @@ core:
     Post Author: Allows you to manage your own posts
     Post Contributor: Contributions allowed
     Post Publisher: Allow to publish own posts
+    Recycle My Post: Recycle My Post
   components:
     submit_button:
       computed_text: "{text} ({shortcut})"

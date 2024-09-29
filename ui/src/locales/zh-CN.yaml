@@ -1418,6 +1418,7 @@ core:
     Post Author: 允许管理自己的文章
     Post Attachment Manager: 允许在文章中上传图片
     Post Publisher: 允许发布自己的文章
+    Recycle My Post: 允许删除自己的文章
   components:
     submit_button:
       computed_text: "{text}（{shortcut}）"
