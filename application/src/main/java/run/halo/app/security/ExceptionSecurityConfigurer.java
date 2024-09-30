@@ -1,7 +1,11 @@
 package run.halo.app.security;
 
+import static org.springframework.security.web.server.util.matcher.ServerWebExchangeMatchers.anyExchange;
+import static org.springframework.security.web.server.util.matcher.ServerWebExchangeMatchers.pathMatchers;
+
 import java.util.ArrayList;
 import org.springframework.context.MessageSource;
+import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.config.web.server.ServerHttpSecurity;
 import org.springframework.security.oauth2.server.resource.web.access.server.BearerTokenServerAccessDeniedHandler;
@@ -11,8 +15,6 @@ import org.springframework.security.web.server.authentication.AuthenticationConv
 import org.springframework.security.web.server.authorization.HttpStatusServerAccessDeniedHandler;
 import org.springframework.security.web.server.authorization.ServerWebExchangeDelegatingServerAccessDeniedHandler;
 import org.springframework.security.web.server.savedrequest.ServerRequestCache;
-import org.springframework.security.web.server.util.matcher.ServerWebExchangeMatcher;
-import org.springframework.security.web.server.util.matcher.ServerWebExchangeMatchers;
 import org.springframework.stereotype.Component;
 import org.springframework.web.reactive.function.server.ServerResponse;
 import run.halo.app.security.authentication.SecurityConfigurer;
@@ -40,7 +42,7 @@ public class ExceptionSecurityConfigurer implements SecurityConfigurer {
         http.exceptionHandling(exception -> {
             var accessDeniedHandlers =
                 new ArrayList<ServerWebExchangeDelegatingServerAccessDeniedHandler.DelegateEntry>(
-                    2
+                    3
                 );
             accessDeniedHandlers.add(
                 new ServerWebExchangeDelegatingServerAccessDeniedHandler.DelegateEntry(
@@ -51,19 +53,24 @@ public class ExceptionSecurityConfigurer implements SecurityConfigurer {
                 ));
             accessDeniedHandlers.add(
                 new ServerWebExchangeDelegatingServerAccessDeniedHandler.DelegateEntry(
-                    ServerWebExchangeMatchers.anyExchange(),
+                    pathMatchers(HttpMethod.GET, "/login", "/signup"),
+                    new RedirectAccessDeniedHandler("/uc")
+                ));
+            accessDeniedHandlers.add(
+                new ServerWebExchangeDelegatingServerAccessDeniedHandler.DelegateEntry(
+                    anyExchange(),
                     new HttpStatusServerAccessDeniedHandler(HttpStatus.FORBIDDEN)
                 )
             );
 
             var entryPoints =
-                new ArrayList<DelegatingServerAuthenticationEntryPoint.DelegateEntry>(3);
+                new ArrayList<DelegatingServerAuthenticationEntryPoint.DelegateEntry>(2);
             entryPoints.add(new DelegatingServerAuthenticationEntryPoint.DelegateEntry(
                 TwoFactorAuthenticationEntryPoint.MATCHER,
                 new TwoFactorAuthenticationEntryPoint(messageSource, context)
             ));
             entryPoints.add(new DelegatingServerAuthenticationEntryPoint.DelegateEntry(
-                exchange -> ServerWebExchangeMatcher.MatchResult.match(),
+                anyExchange(),
                 new DefaultServerAuthenticationEntryPoint(serverRequestCache)
             ));
 
