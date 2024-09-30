@@ -5,6 +5,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.web.server.WebFilterExchange;
 import org.springframework.security.web.server.authentication.RedirectServerAuthenticationSuccessHandler;
 import org.springframework.security.web.server.authentication.ServerAuthenticationSuccessHandler;
+import org.springframework.security.web.server.savedrequest.ServerRequestCache;
 import reactor.core.publisher.Mono;
 import run.halo.app.security.LoginHandlerEnhancer;
 
@@ -13,11 +14,14 @@ public class TotpAuthenticationSuccessHandler implements ServerAuthenticationSuc
 
     private final LoginHandlerEnhancer loginEnhancer;
 
-    private final ServerAuthenticationSuccessHandler successHandler =
-        new RedirectServerAuthenticationSuccessHandler("/uc");
+    private final ServerAuthenticationSuccessHandler successHandler;
 
-    public TotpAuthenticationSuccessHandler(LoginHandlerEnhancer loginEnhancer) {
+    public TotpAuthenticationSuccessHandler(LoginHandlerEnhancer loginEnhancer,
+        ServerRequestCache serverRequestCache) {
         this.loginEnhancer = loginEnhancer;
+        var successHandler = new RedirectServerAuthenticationSuccessHandler("/uc");
+        successHandler.setRequestCache(serverRequestCache);
+        this.successHandler = successHandler;
     }
 
     @Override

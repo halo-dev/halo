@@ -5,6 +5,7 @@ import org.springframework.cache.CacheManager;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.support.GenericApplicationContext;
 import org.springframework.security.web.server.context.ServerSecurityContextRepository;
+import org.springframework.security.web.server.savedrequest.ServerRequestCache;
 import run.halo.app.content.PostContentService;
 import run.halo.app.core.extension.service.AttachmentService;
 import run.halo.app.extension.DefaultSchemeManager;
@@ -78,6 +79,12 @@ public enum SharedApplicationContextFactory {
         rootContext.getBeanProvider(RateLimiterRegistry.class)
             .ifUnique(rateLimiterRegistry ->
                 beanFactory.registerSingleton("rateLimiterRegistry", rateLimiterRegistry)
+            );
+
+        // Authentication plugins may need this RequestCache to handle successful login redirect
+        rootContext.getBeanProvider(ServerRequestCache.class)
+            .ifUnique(serverRequestCache ->
+                beanFactory.registerSingleton("serverRequestCache", serverRequestCache)
             );
         // TODO add more shared instance here
 

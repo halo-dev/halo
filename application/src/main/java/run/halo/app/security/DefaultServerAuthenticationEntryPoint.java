@@ -5,6 +5,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.web.server.ServerAuthenticationEntryPoint;
 import org.springframework.security.web.server.authentication.RedirectServerAuthenticationEntryPoint;
+import org.springframework.security.web.server.savedrequest.ServerRequestCache;
 import org.springframework.security.web.server.util.matcher.ServerWebExchangeMatcher;
 import org.springframework.security.web.server.util.matcher.ServerWebExchangeMatcher.MatchResult;
 import org.springframework.web.server.ServerWebExchange;
@@ -30,9 +31,11 @@ public class DefaultServerAuthenticationEntryPoint implements ServerAuthenticati
 
     private final RedirectServerAuthenticationEntryPoint redirectEntryPoint;
 
-    public DefaultServerAuthenticationEntryPoint() {
-        this.redirectEntryPoint =
+    public DefaultServerAuthenticationEntryPoint(ServerRequestCache serverRequestCache) {
+        var entryPoint =
             new RedirectServerAuthenticationEntryPoint("/login?authentication_required");
+        entryPoint.setRequestCache(serverRequestCache);
+        this.redirectEntryPoint = entryPoint;
     }
 
     @Override
@@ -40,7 +43,7 @@ public class DefaultServerAuthenticationEntryPoint implements ServerAuthenticati
         return xhrMatcher.matches(exchange)
             .filter(MatchResult::isMatch)
             .switchIfEmpty(
-                Mono.defer(() -> this.redirectEntryPoint.commence(exchange, ex)).then(Mono.empty())
+                Mono.defer(() -> this.redirectEntryPoint.commence(exchange, ex).then(Mono.empty()))
             )
             .flatMap(match -> Mono.defer(
                 () -> {

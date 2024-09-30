@@ -22,6 +22,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.server.SecurityWebFilterChain;
 import org.springframework.security.web.server.context.ServerSecurityContextRepository;
 import org.springframework.security.web.server.context.WebSessionServerSecurityContextRepository;
+import org.springframework.security.web.server.savedrequest.ServerRequestCache;
 import org.springframework.security.web.server.util.matcher.AndServerWebExchangeMatcher;
 import org.springframework.security.web.server.util.matcher.MediaTypeServerWebExchangeMatcher;
 import org.springframework.security.web.server.util.matcher.NegatedServerWebExchangeMatcher;
@@ -36,6 +37,7 @@ import run.halo.app.extension.ReactiveExtensionClient;
 import run.halo.app.infra.AnonymousUserConst;
 import run.halo.app.infra.properties.HaloProperties;
 import run.halo.app.security.DefaultUserDetailService;
+import run.halo.app.security.HaloServerRequestCache;
 import run.halo.app.security.authentication.CryptoService;
 import run.halo.app.security.authentication.SecurityConfigurer;
 import run.halo.app.security.authentication.impl.RsaKeyService;
@@ -64,7 +66,8 @@ public class WebServerSecurityConfig {
         ServerSecurityContextRepository securityContextRepository,
         ReactiveExtensionClient client,
         CryptoService cryptoService,
-        HaloProperties haloProperties) {
+        HaloProperties haloProperties,
+        ServerRequestCache serverRequestCache) {
 
         var pathMatcher = pathMatchers("/**");
         var staticResourcesMatcher = pathMatchers(HttpMethod.GET,
@@ -134,12 +137,18 @@ public class WebServerSecurityConfig {
                     haloProperties.getSecurity().getReferrerOptions().getPolicy())
                 )
                 .hsts(hstsSpec -> hstsSpec.includeSubdomains(false))
-            );
+            )
+            .requestCache(spec -> spec.requestCache(serverRequestCache));
 
         // Integrate with other configurers separately
         securityConfigurers.orderedStream()
             .forEach(securityConfigurer -> securityConfigurer.configure(http));
         return http.build();
+    }
+
+    @Bean
+    ServerRequestCache serverRequestCache() {
+        return new HaloServerRequestCache();
     }
 
     @Bean
