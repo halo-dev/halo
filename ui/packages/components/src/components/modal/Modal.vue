@@ -126,6 +126,7 @@ watch(
       class="modal-wrapper"
       role="dialog"
       tabindex="0"
+      v-bind="$attrs"
       @keyup.esc.stop="handleClose()"
     >
       <transition
