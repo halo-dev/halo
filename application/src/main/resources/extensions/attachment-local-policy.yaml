@@ -10,6 +10,8 @@ apiVersion: storage.halo.run/v1alpha1
 kind: Policy
 metadata:
   name: default-policy
+  finalizers:
+    - system-protection
 spec:
   displayName: 本地存储
   templateName: local
