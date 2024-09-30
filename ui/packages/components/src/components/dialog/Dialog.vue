@@ -101,7 +101,7 @@ const handleClose = () => {
   <VModal
     :visible="visible"
     :width="450"
-    :layer-closable="true"
+    :layer-closable="false"
     @close="handleCancel()"
   >
     <div class="flex justify-between items-start py-2 mb-2">

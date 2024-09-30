@@ -1402,14 +1402,12 @@ core:
         first: >-
           1. The restore process may last for a long time, please do not refresh
           the page during this period.
-        second: >-
-          2. During the restore process, although the existing data will not be
-          cleaned up, if there is a conflict, the data will be overwritten.
+        second: 2. Before performing the restore, all existing data will be cleared. Please ensure that there is no data that needs to be retained.
         third: >-
           3. After the restore is completed, you need to restart Halo to load
           the system resources normally.
         complete: Restore completed, waiting for restart...
-      start: Start restore
+      start: I have read the above instructions, start restore
       tabs:
         local:
           label: Upload
