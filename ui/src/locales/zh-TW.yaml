@@ -1620,7 +1620,7 @@ core:
       descriptions:
         cannot_be_recovered: 該操作不可恢復。
         editor_not_found: 未找到符合 {raw_type} 格式的編輯器，請檢查是否已安裝編輯器插件。
-        login_expired: 當前登入已過期，點擊確定跳轉到登入頁面，請確保當前內容已保存，你可以點擊取消手動複製未保存的內容。
+        login_expired: 當前登入已過期，點擊確定跳轉到登入頁面，請確保當前內容已保存，你可以點擊取消之後手動複製未保存的內容。
     filters:
       results:
         keyword: 關鍵字：{keyword}
