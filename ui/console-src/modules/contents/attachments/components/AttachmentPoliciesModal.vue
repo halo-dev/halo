@@ -199,7 +199,12 @@ function getPolicyTemplateDisplayName(templateName: string) {
             </VEntityField>
           </template>
           <template #dropdownItems>
-            <VDropdownItem @click="handleOpenEditingModal(policy)">
+            <VDropdownItem
+              :disabled="
+                policy.metadata.finalizers?.includes(SYSTEM_PROTECTION)
+              "
+              @click="handleOpenEditingModal(policy)"
+            >
               {{ $t("core.common.buttons.edit") }}
             </VDropdownItem>
             <VDropdownItem
