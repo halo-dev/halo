@@ -1,6 +1,5 @@
 package run.halo.app.infra.config;
 
-import static org.springframework.security.config.Customizer.withDefaults;
 import static org.springframework.security.web.server.authentication.ServerWebExchangeDelegatingReactiveAuthenticationManagerResolver.builder;
 import static org.springframework.security.web.server.util.matcher.ServerWebExchangeMatchers.pathMatchers;
 
@@ -109,7 +108,11 @@ public class WebServerSecurityConfig {
                 spec.principal(AnonymousUserConst.PRINCIPAL);
             })
             .securityContextRepository(securityContextRepository)
-            .httpBasic(withDefaults())
+            .httpBasic(basic -> {
+                if (haloProperties.getSecurity().getBasicAuth().isDisabled()) {
+                    basic.disable();
+                }
+            })
             .oauth2ResourceServer(oauth2 -> {
                 var authManagerResolver = builder().add(
                         new PatServerWebExchangeMatcher(),
