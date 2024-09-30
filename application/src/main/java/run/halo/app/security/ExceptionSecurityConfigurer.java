@@ -10,6 +10,7 @@ import org.springframework.security.web.server.DelegatingServerAuthenticationEnt
 import org.springframework.security.web.server.authentication.AuthenticationConverterServerWebExchangeMatcher;
 import org.springframework.security.web.server.authorization.HttpStatusServerAccessDeniedHandler;
 import org.springframework.security.web.server.authorization.ServerWebExchangeDelegatingServerAccessDeniedHandler;
+import org.springframework.security.web.server.savedrequest.ServerRequestCache;
 import org.springframework.security.web.server.util.matcher.ServerWebExchangeMatcher;
 import org.springframework.security.web.server.util.matcher.ServerWebExchangeMatchers;
 import org.springframework.stereotype.Component;
@@ -24,10 +25,14 @@ public class ExceptionSecurityConfigurer implements SecurityConfigurer {
 
     private final ServerResponse.Context context;
 
+    private final ServerRequestCache serverRequestCache;
+
     public ExceptionSecurityConfigurer(MessageSource messageSource,
-        ServerResponse.Context context) {
+        ServerResponse.Context context,
+        ServerRequestCache serverRequestCache) {
         this.messageSource = messageSource;
         this.context = context;
+        this.serverRequestCache = serverRequestCache;
     }
 
     @Override
@@ -59,7 +64,7 @@ public class ExceptionSecurityConfigurer implements SecurityConfigurer {
             ));
             entryPoints.add(new DelegatingServerAuthenticationEntryPoint.DelegateEntry(
                 exchange -> ServerWebExchangeMatcher.MatchResult.match(),
-                new DefaultServerAuthenticationEntryPoint()
+                new DefaultServerAuthenticationEntryPoint(serverRequestCache)
             ));
 
             exception.authenticationEntryPoint(

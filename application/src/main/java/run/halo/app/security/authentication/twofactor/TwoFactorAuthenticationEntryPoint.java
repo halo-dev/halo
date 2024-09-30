@@ -3,8 +3,9 @@ package run.halo.app.security.authentication.twofactor;
 import java.net.URI;
 import org.springframework.context.MessageSource;
 import org.springframework.security.core.AuthenticationException;
+import org.springframework.security.web.server.DefaultServerRedirectStrategy;
 import org.springframework.security.web.server.ServerAuthenticationEntryPoint;
-import org.springframework.security.web.server.authentication.RedirectServerAuthenticationEntryPoint;
+import org.springframework.security.web.server.ServerRedirectStrategy;
 import org.springframework.security.web.server.util.matcher.ServerWebExchangeMatcher;
 import org.springframework.web.reactive.function.server.ServerResponse;
 import org.springframework.web.server.ServerWebExchange;
@@ -18,10 +19,13 @@ public class TwoFactorAuthenticationEntryPoint implements ServerAuthenticationEn
         .flatMap(a -> ServerWebExchangeMatcher.MatchResult.match())
         .switchIfEmpty(ServerWebExchangeMatcher.MatchResult.notMatch());
 
-    private static final String REDIRECT_LOCATION = "/challenges/two-factor/totp";
+    private static final URI REDIRECT_LOCATION = URI.create("/challenges/two-factor/totp");
 
-    private final RedirectServerAuthenticationEntryPoint redirectEntryPoint =
-        new RedirectServerAuthenticationEntryPoint(REDIRECT_LOCATION);
+    /**
+     * Because we don't want to cache the request before redirecting to the 2FA page,
+     * ServerRedirectStrategy is used to redirect the request.
+     */
+    private final ServerRedirectStrategy redirectStrategy = new DefaultServerRedirectStrategy();
 
     private final MessageSource messageSource;
 
@@ -45,10 +49,12 @@ public class TwoFactorAuthenticationEntryPoint implements ServerAuthenticationEn
     public Mono<Void> commence(ServerWebExchange exchange, AuthenticationException ex) {
         return XHR_MATCHER.matches(exchange)
             .filter(ServerWebExchangeMatcher.MatchResult::isMatch)
-            .switchIfEmpty(redirectEntryPoint.commence(exchange, ex).then(Mono.empty()))
+            .switchIfEmpty(
+                redirectStrategy.sendRedirect(exchange, REDIRECT_LOCATION).then(Mono.empty())
+            )
             .flatMap(isXhr -> {
                 var errorResponse = Exceptions.createErrorResponse(
-                    new TwoFactorAuthRequiredException(URI.create(REDIRECT_LOCATION)),
+                    new TwoFactorAuthRequiredException(REDIRECT_LOCATION),
                     null, exchange, messageSource);
                 return ServerResponse.status(errorResponse.getStatusCode())
                     .bodyValue(errorResponse.getBody())

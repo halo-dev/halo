@@ -8,6 +8,7 @@ import java.util.Objects;
 import java.util.Optional;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.context.annotation.Bean;
+import org.springframework.security.web.server.savedrequest.ServerRequestCache;
 import org.springframework.stereotype.Component;
 import org.springframework.web.reactive.function.server.RouterFunction;
 import org.springframework.web.reactive.function.server.RouterFunctions;
@@ -18,6 +19,7 @@ import run.halo.app.core.extension.AuthProvider;
 import run.halo.app.infra.actuator.GlobalInfoService;
 import run.halo.app.plugin.PluginConst;
 import run.halo.app.security.AuthProviderService;
+import run.halo.app.security.HaloServerRequestCache;
 import run.halo.app.security.authentication.CryptoService;
 
 /**
@@ -35,6 +37,8 @@ class PreAuthLoginEndpoint {
 
     private final AuthProviderService authProviderService;
 
+    private final ServerRequestCache serverRequestCache = new HaloServerRequestCache();
+
     PreAuthLoginEndpoint(CryptoService cryptoService, GlobalInfoService globalInfoService,
         AuthProviderService authProviderService) {
         this.cryptoService = cryptoService;
@@ -46,6 +50,7 @@ class PreAuthLoginEndpoint {
     RouterFunction<ServerResponse> preAuthLoginEndpoints() {
         return RouterFunctions.nest(path("/login"), RouterFunctions.route()
             .GET("", request -> {
+                // TODO get redirect URI and cache it
                 var exchange = request.exchange();
                 var contextPath = exchange.getRequest().getPath().contextPath().value();
                 var publicKey = cryptoService.readPublicKey()
@@ -78,15 +83,17 @@ class PreAuthLoginEndpoint {
                     .filter(ap -> !Objects.equals(loginMethod, ap.getMetadata().getName()))
                     .cache();
 
-                return ServerResponse.ok().render("login", Map.of(
-                    "action", contextPath + "/login",
-                    "publicKey", publicKey,
-                    "globalInfo", globalInfo,
-                    "authProvider", authProvider,
-                    "fragmentTemplateName", fragmentTemplateName,
-                    "socialAuthProviders", socialAuthProviders,
-                    "formAuthProviders", formAuthProviders
-                    // TODO Add more models here
+                return serverRequestCache.saveRequest(exchange).then(Mono.defer(() ->
+                    ServerResponse.ok().render("login", Map.of(
+                        "action", contextPath + "/login",
+                        "publicKey", publicKey,
+                        "globalInfo", globalInfo,
+                        "authProvider", authProvider,
+                        "fragmentTemplateName", fragmentTemplateName,
+                        "socialAuthProviders", socialAuthProviders,
+                        "formAuthProviders", formAuthProviders
+                        // TODO Add more models here
+                    ))
                 ));
             })
             .build());

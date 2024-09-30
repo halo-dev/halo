@@ -8,6 +8,7 @@ import org.springframework.security.config.web.server.ServerHttpSecurity;
 import org.springframework.security.web.server.authentication.AuthenticationWebFilter;
 import org.springframework.security.web.server.authentication.RedirectServerAuthenticationFailureHandler;
 import org.springframework.security.web.server.context.ServerSecurityContextRepository;
+import org.springframework.security.web.server.savedrequest.ServerRequestCache;
 import org.springframework.stereotype.Component;
 import run.halo.app.security.LoginHandlerEnhancer;
 import run.halo.app.security.authentication.SecurityConfigurer;
@@ -24,13 +25,17 @@ public class TwoFactorAuthSecurityConfigurer implements SecurityConfigurer {
 
     private final LoginHandlerEnhancer loginHandlerEnhancer;
 
+    private final ServerRequestCache serverRequestCache;
+
     public TwoFactorAuthSecurityConfigurer(
         ServerSecurityContextRepository securityContextRepository,
-        TotpAuthService totpAuthService, LoginHandlerEnhancer loginHandlerEnhancer
+        TotpAuthService totpAuthService, LoginHandlerEnhancer loginHandlerEnhancer,
+        ServerRequestCache serverRequestCache
     ) {
         this.securityContextRepository = securityContextRepository;
         this.totpAuthService = totpAuthService;
         this.loginHandlerEnhancer = loginHandlerEnhancer;
+        this.serverRequestCache = serverRequestCache;
     }
 
     @Override
@@ -43,7 +48,7 @@ public class TwoFactorAuthSecurityConfigurer implements SecurityConfigurer {
         filter.setSecurityContextRepository(securityContextRepository);
         filter.setServerAuthenticationConverter(new TotpCodeAuthenticationConverter());
         filter.setAuthenticationSuccessHandler(
-            new TotpAuthenticationSuccessHandler(loginHandlerEnhancer)
+            new TotpAuthenticationSuccessHandler(loginHandlerEnhancer, serverRequestCache)
         );
         filter.setAuthenticationFailureHandler(
             new RedirectServerAuthenticationFailureHandler("/challenges/two-factor/totp?error")
