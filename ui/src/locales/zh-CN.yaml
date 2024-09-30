@@ -1635,9 +1635,11 @@ core:
       titles:
         tip: 提示
         warning: 警告
+        login_expired: 登录已过期
       descriptions:
         cannot_be_recovered: 该操作不可恢复。
         editor_not_found: 未找到符合 {raw_type} 格式的编辑器，请检查是否已安装编辑器插件。
+        login_expired: 当前登录已过期，点击确定跳转到登录页面，请确保当前内容已保存，你可以点击取消之后手动复制未保存的内容。
     filters:
       results:
         keyword: 关键词：{keyword}

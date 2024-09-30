@@ -1748,11 +1748,13 @@ core:
       titles:
         tip: Tip
         warning: Warning
+        login_expired: Login expired
       descriptions:
         cannot_be_recovered: This operation is irreversible.
         editor_not_found: >-
           No editor found that matches the {raw_type} format. Please check if
           the editor plugin has been installed.
+        login_expired: The current session has expired. Click Confirm to go to the login page. Please ensure that the current content is saved. You can click Cancel to manually copy any unsaved content.
     filters:
       results:
         keyword: "Keyword: {keyword}"

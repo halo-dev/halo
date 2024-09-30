@@ -1,6 +1,6 @@
 import { i18n } from "@/locales";
 import { axiosInstance } from "@halo-dev/api-client";
-import { Toast } from "@halo-dev/components";
+import { Dialog, Toast } from "@halo-dev/components";
 import type { AxiosError } from "axios";
 
 export interface ProblemDetail {
@@ -44,9 +44,22 @@ export function setupApiClient() {
       const { title, detail } = errorResponse.data;
 
       if (status === 401) {
-        Toast.warning(i18n.global.t("core.common.toast.login_expired"));
-
-        // TODO: show dialog
+        Dialog.warning({
+          title: i18n.global.t("core.common.dialog.titles.login_expired"),
+          description: i18n.global.t(
+            "core.common.dialog.descriptions.login_expired"
+          ),
+          confirmType: "secondary",
+          confirmText: i18n.global.t("core.common.buttons.confirm"),
+          cancelText: i18n.global.t("core.common.buttons.cancel"),
+          uniqueId: "login_expired",
+          onConfirm: () => {
+            const currentPath = `${location.pathname}${location.search}`;
+            location.href = `/login?redirect_uri=${encodeURIComponent(
+              currentPath
+            )}`;
+          },
+        });
 
         return Promise.reject(error);
       }
