@@ -563,7 +563,7 @@ watch(
               <VButton
                 v-permission="['system:posts:manage']"
                 :route="{ name: 'PostEditor' }"
-                type="primary"
+                type="secondary"
               >
                 <template #icon>
                   <IconAddCircle class="h-full w-full" />

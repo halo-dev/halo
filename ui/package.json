@@ -100,7 +100,7 @@
     "short-unique-id": "^5.0.2",
     "transliteration": "^2.3.5",
     "ua-parser-js": "^1.0.38",
-    "vue": "^3.4.27",
+    "vue": "^3.5.8",
     "vue-demi": "^0.14.7",
     "vue-draggable-plus": "^0.4.1",
     "vue-grid-layout": "3.0.0-beta1",
@@ -122,7 +122,7 @@
     "@types/qs": "^6.9.7",
     "@types/randomstring": "^1.1.8",
     "@types/ua-parser-js": "^0.7.39",
-    "@vitejs/plugin-vue": "^5.1.2",
+    "@vitejs/plugin-vue": "^5.1.4",
     "@vitejs/plugin-vue-jsx": "^4.0.1",
     "@vitest/ui": "^0.34.1",
     "@vue/compiler-sfc": "^3.4.27",
@@ -151,7 +151,7 @@
     "tailwindcss": "^3.2.7",
     "tailwindcss-safe-area": "^0.2.2",
     "tailwindcss-themer": "^2.0.3",
-    "typescript": "~5.5.4",
+    "typescript": "~5.6.2",
     "unplugin-icons": "^0.19.2",
     "vite": "^5.4.1",
     "vite-plugin-externals": "^0.6.2",
@@ -160,6 +160,6 @@
     "vite-plugin-static-copy": "^1.0.6",
     "vite-plugin-vue-devtools": "^7.3.8",
     "vitest": "^0.34.1",
-    "vue-tsc": "^2.0.29"
+    "vue-tsc": "^2.1.6"
   }
 }

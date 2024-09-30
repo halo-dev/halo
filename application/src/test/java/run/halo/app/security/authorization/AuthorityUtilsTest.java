@@ -29,7 +29,7 @@ class AuthorityUtilsTest {
 
         var roles = authoritiesToRoles(authorities);
 
-        assertEquals(Set.of("admin", "owner", "manager", "faker", "system:read"), roles);
+        assertEquals(Set.of("admin", "owner", "manager"), roles);
     }
 
     @Test

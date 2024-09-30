@@ -1,7 +1,5 @@
 package run.halo.app.security.authorization;
 
-import java.security.Principal;
-
 /**
  * Attributes is used by an Authorizer to get information about a request
  * that is used to make an authorization decision.
@@ -10,10 +8,6 @@ import java.security.Principal;
  * @since 2.0.0
  */
 public interface Attributes {
-    /**
-     * @return the UserDetails object to authorize
-     */
-    Principal getPrincipal();
 
     /**
      * @return the verb associated with API requests(this includes get, list,

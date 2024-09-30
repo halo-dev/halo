@@ -1,19 +1,13 @@
 <script lang="ts" setup>
-// core libs
-import { computed, inject, ref, toRaw } from "vue";
-
-// components
-import { Toast, VButton } from "@halo-dev/components";
-
-// types
-import type { ConfigMap, Setting, Theme } from "@halo-dev/api-client";
-import type { Ref } from "vue";
-
-// hooks
 import StickyBlock from "@/components/sticky-block/StickyBlock.vue";
-import { useSettingFormConvert } from "@console/composables/use-setting-form";
+import type { FormKitSchemaCondition, FormKitSchemaNode } from "@formkit/core";
+import type { Setting, Theme } from "@halo-dev/api-client";
 import { consoleApiClient } from "@halo-dev/api-client";
+import { Toast, VButton } from "@halo-dev/components";
 import { useQuery, useQueryClient } from "@tanstack/vue-query";
+import { cloneDeep, set } from "lodash-es";
+import type { Ref } from "vue";
+import { computed, inject, ref, toRaw } from "vue";
 import { useI18n } from "vue-i18n";
 
 const { t } = useI18n();
@@ -26,10 +20,10 @@ const setting = inject<Ref<Setting | undefined>>("setting", ref());
 
 const saving = ref(false);
 
-const { data: configMap, suspense } = useQuery<ConfigMap>({
-  queryKey: ["theme-configMap", selectedTheme],
+const { data: configMapData, suspense } = useQuery({
+  queryKey: ["core:theme:configMap:data", selectedTheme],
   queryFn: async () => {
-    const { data } = await consoleApiClient.theme.theme.fetchThemeConfig({
+    const { data } = await consoleApiClient.theme.theme.fetchThemeJsonConfig({
       name: selectedTheme?.value?.metadata.name as string,
     });
     return data;
@@ -39,30 +33,37 @@ const { data: configMap, suspense } = useQuery<ConfigMap>({
   }),
 });
 
-const { configMapFormData, formSchema, convertToSave } = useSettingFormConvert(
-  setting,
-  configMap,
-  group
-);
+const currentConfigMapGroupData = computed(() => {
+  return configMapData.value?.[group.value];
+});
 
-const handleSaveConfigMap = async () => {
+const formSchema = computed(() => {
+  if (!setting.value) {
+    return;
+  }
+  const { forms } = setting.value.spec;
+  return forms.find((item) => item.group === group?.value)?.formSchema as (
+    | FormKitSchemaCondition
+    | FormKitSchemaNode
+  )[];
+});
+
+const handleSaveConfigMap = async (data: object) => {
   saving.value = true;
 
-  const configMapToUpdate = convertToSave();
-
-  if (!configMapToUpdate || !selectedTheme?.value) {
+  if (!selectedTheme?.value) {
     saving.value = false;
     return;
   }
 
-  await consoleApiClient.theme.theme.updateThemeConfig({
+  await consoleApiClient.theme.theme.updateThemeJsonConfig({
     name: selectedTheme?.value?.metadata.name,
-    configMap: configMapToUpdate,
+    body: set(cloneDeep(configMapData.value) || {}, group.value, data),
   });
 
   Toast.success(t("core.common.toast.save_success"));
 
-  queryClient.invalidateQueries({ queryKey: ["theme-configMap"] });
+  queryClient.invalidateQueries({ queryKey: ["core:theme:configMap:data"] });
 
   saving.value = false;
 };
@@ -73,18 +74,16 @@ await suspense();
   <Transition mode="out-in" name="fade">
     <div class="p-4">
       <FormKit
-        v-if="group && formSchema && configMapFormData?.[group]"
+        v-if="group && formSchema && currentConfigMapGroupData"
         :id="group"
-        v-model="configMapFormData[group]"
+        :value="currentConfigMapGroupData || {}"
         :name="group"
-        :actions="false"
-        :preserve="true"
         type="form"
         @submit="handleSaveConfigMap"
       >
         <FormKitSchema
           :schema="toRaw(formSchema)"
-          :data="configMapFormData[group]"
+          :data="toRaw(currentConfigMapGroupData)"
         />
       </FormKit>
       <StickyBlock

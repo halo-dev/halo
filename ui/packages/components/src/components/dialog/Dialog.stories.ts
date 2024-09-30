@@ -12,6 +12,7 @@ const meta: Meta<typeof VDialog> = {
     height: 400,
     setup() {
       const showDialog = () => {
+        // @ts-ignore
         args.visible = true;
       };
 

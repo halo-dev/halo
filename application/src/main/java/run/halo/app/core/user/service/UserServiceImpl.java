@@ -1,7 +1,6 @@
 package run.halo.app.core.user.service;
 
-import static org.springframework.data.domain.Sort.Order.asc;
-import static org.springframework.data.domain.Sort.Order.desc;
+import static run.halo.app.extension.ExtensionUtil.defaultSort;
 import static run.halo.app.extension.index.query.QueryFactory.equal;
 
 import java.time.Clock;
@@ -12,10 +11,8 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 import lombok.RequiredArgsConstructor;
-import org.apache.commons.lang3.BooleanUtils;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.dao.OptimisticLockingFailureException;
-import org.springframework.data.domain.Sort;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.util.Assert;
@@ -30,18 +27,20 @@ import run.halo.app.core.extension.RoleBinding;
 import run.halo.app.core.extension.User;
 import run.halo.app.event.user.PasswordChangedEvent;
 import run.halo.app.extension.ListOptions;
+import run.halo.app.extension.Metadata;
 import run.halo.app.extension.ReactiveExtensionClient;
 import run.halo.app.extension.exception.ExtensionNotFoundException;
 import run.halo.app.extension.router.selector.FieldSelector;
 import run.halo.app.infra.SystemConfigurableEnvironmentFetcher;
 import run.halo.app.infra.SystemSetting;
-import run.halo.app.infra.exception.AccessDeniedException;
 import run.halo.app.infra.exception.DuplicateNameException;
+import run.halo.app.infra.exception.EmailVerificationFailed;
 import run.halo.app.infra.exception.UserNotFoundException;
 
 @Service
 @RequiredArgsConstructor
 public class UserServiceImpl implements UserService {
+
     public static final String GHOST_USER_NAME = "ghost";
 
     private final ReactiveExtensionClient client;
@@ -53,6 +52,8 @@ public class UserServiceImpl implements UserService {
     private final ApplicationEventPublisher eventPublisher;
 
     private final RoleService roleService;
+
+    private final EmailVerificationService emailVerificationService;
 
     private Clock clock = Clock.systemUTC();
 
@@ -147,29 +148,49 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public Mono<User> signUp(User user, String password) {
-        if (!StringUtils.hasText(password)) {
-            throw new IllegalArgumentException("Password must not be blank");
-        }
+    public Mono<User> signUp(SignUpData signUpData) {
         return environmentFetcher.fetch(SystemSetting.User.GROUP, SystemSetting.User.class)
-            .switchIfEmpty(Mono.error(new IllegalStateException("User setting is not configured")))
-            .flatMap(userSetting -> {
-                Boolean allowRegistration = userSetting.getAllowRegistration();
-                if (BooleanUtils.isFalse(allowRegistration)) {
-                    return Mono.error(new AccessDeniedException("Registration is not allowed",
-                        "problemDetail.user.signUpFailed.disallowed",
-                        null));
+            .filter(SystemSetting.User::isAllowRegistration)
+            .switchIfEmpty(Mono.error(() -> new ServerWebInputException(
+                "The registration is not allowed by the administrator."
+            )))
+            .filter(setting -> StringUtils.hasText(setting.getDefaultRole()))
+            .switchIfEmpty(Mono.error(() -> new ServerWebInputException(
+                "The default role is not configured by the administrator."
+            )))
+            .flatMap(setting -> {
+                var user = new User();
+                user.setMetadata(new Metadata());
+                var metadata = user.getMetadata();
+                metadata.setName(signUpData.getUsername());
+                user.setSpec(new User.UserSpec());
+                var spec = user.getSpec();
+                spec.setPassword(passwordEncoder.encode(signUpData.getPassword()));
+                spec.setEmailVerified(false);
+                spec.setRegisteredAt(clock.instant());
+                spec.setEmail(signUpData.getEmail());
+                spec.setDisplayName(signUpData.getDisplayName());
+                Mono<Void> verifyEmail = Mono.empty();
+                if (setting.isMustVerifyEmailOnRegistration()) {
+                    if (!StringUtils.hasText(signUpData.getEmailCode())) {
+                        return Mono.error(
+                            new EmailVerificationFailed("Email captcha is required", null)
+                        );
+                    }
+                    verifyEmail = emailVerificationService.verifyRegisterVerificationCode(
+                            signUpData.getEmail(), signUpData.getEmailCode()
+                        )
+                        .filter(Boolean::booleanValue)
+                        .switchIfEmpty(Mono.error(() ->
+                            new EmailVerificationFailed("Invalid email captcha.", null)
+                        ))
+                        .doOnNext(spec::setEmailVerified)
+                        .then();
                 }
-                String defaultRole = userSetting.getDefaultRole();
-                if (!StringUtils.hasText(defaultRole)) {
-                    return Mono.error(new AccessDeniedException(
-                        "Default registration role is not configured by admin",
-                        "problemDetail.user.signUpFailed.disallowed",
-                        null));
-                }
-                String encodedPassword = passwordEncoder.encode(password);
-                user.getSpec().setPassword(encodedPassword);
-                return createUser(user, Set.of(defaultRole));
+                return verifyEmail.then(Mono.defer(() -> {
+                    var defaultRole = setting.getDefaultRole();
+                    return createUser(user, Set.of(defaultRole));
+                }));
             });
     }
 
@@ -225,9 +246,7 @@ public class UserServiceImpl implements UserService {
     public Flux<User> listByEmail(String email) {
         var listOptions = new ListOptions();
         listOptions.setFieldSelector(FieldSelector.of(equal("spec.email", email)));
-        return client.listAll(User.class, listOptions, Sort.by(desc("metadata.creationTimestamp"),
-            asc("metadata.name"))
-        );
+        return client.listAll(User.class, listOptions, defaultSort());
     }
 
     @Override

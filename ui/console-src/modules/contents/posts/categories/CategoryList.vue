@@ -117,7 +117,7 @@ const handleUpdateInBatch = useDebounceFn(async () => {
               </VButton>
               <VButton
                 v-permission="['system:posts:manage']"
-                type="primary"
+                type="secondary"
                 @click="creationModal = true"
               >
                 <template #icon>

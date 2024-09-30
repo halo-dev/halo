@@ -27,7 +27,7 @@ const props = withDefaults(
   defineProps<{
     category?: Category;
     parentCategory?: Category;
-    isChildLevelCategory: boolean;
+    isChildLevelCategory?: boolean;
   }>(),
   {
     category: undefined,

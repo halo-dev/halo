@@ -4,7 +4,10 @@ import {
   Plugin,
   PluginKey,
 } from "@halo-dev/richtext-editor";
-import { handleFileEvent } from "../../utils/upload";
+import {
+  containsFileClipboardIdentifier,
+  handleFileEvent,
+} from "../../utils/upload";
 
 export const Upload = Extension.create({
   name: "upload",
@@ -26,7 +29,8 @@ export const Upload = Extension.create({
             }
 
             const types = event.clipboardData.types;
-            if (!(types.length === 1 && types[0].toLowerCase() === "files")) {
+
+            if (!containsFileClipboardIdentifier(types)) {
               return false;
             }
 

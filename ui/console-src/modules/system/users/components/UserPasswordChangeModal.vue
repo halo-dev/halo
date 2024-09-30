@@ -66,6 +66,7 @@ const handleChangePassword = async () => {
     :title="$t('core.user.change_password_modal.title')"
     @close="emit('close')"
   >
+    <!-- @vue-ignore -->
     <FormKit
       id="password-form"
       v-model="formState"

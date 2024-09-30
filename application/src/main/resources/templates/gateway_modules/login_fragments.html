@@ -1,0 +1,98 @@
+<!-- Those fragments are only for login template-->
+<form
+        th:fragment="form"
+        class="halo-form"
+        name="login-form"
+        id="login-form"
+        th:action="${authProvider.spec.authenticationUrl}"
+        th:method="${authProvider.spec.method}"
+>
+    <div class="alert alert-error" role="alert" th:if="${param.error.size() > 0}" th:with="error = ${param.error[0]}">
+        <strong th:if="${error == 'invalid-credential'}">
+            <span th:text="#{error.invalid-credential}"></span>
+        </strong>
+        <strong th:if="${error == 'rate-limit-exceeded'}">
+            <span th:text="#{error.rate-limit-exceeded}"></span>
+        </strong>
+    </div>
+    <div class="alert" role="alert" th:if="${param.logout.size() > 0}">
+        <strong th:text="#{messages.logoutSuccess}"></strong>
+    </div>
+    <div class="alert" role="alert" th:if="${param.signup.size() > 0}">
+        <strong th:text="#{messages.signupSuccess}"></strong>
+    </div>
+    <div class="alert" role="alert" th:if="${param.oauth2_bind.size() > 0}">
+        <strong th:text="#{messages.oauth2_bind}"></strong>
+    </div>
+
+    <div th:replace="~{__${fragmentTemplateName}__::form}"></div>
+
+    <div th:if="${authProvider.spec.rememberMeSupport}" class="form-item-compact">
+        <input type="checkbox" id="remember-me" name="remember-me" value="true"/>
+        <label for="remember-me" th:text="#{form.rememberMe.label}"></label>
+    </div>
+
+    <div class="form-item">
+        <button type="submit" th:text="#{form.submit}"></button>
+    </div>
+</form>
+
+<div th:remove="tag" th:fragment="formAuthProviders">
+    <th:block th:unless="${#lists.isEmpty(formAuthProviders)}">
+        <div class="divider-wrapper">
+            <hr/>
+            <th:block th:text="#{otherLogin.label}"></th:block>
+            <hr/>
+        </div>
+        <ul class="auth-provider-items">
+            <li th:each="provider : ${formAuthProviders}">
+                <a th:href="'/login?method=' + ${provider.metadata.name}">
+                    <img th:src="${provider.spec.logo}"/>
+                    <span th:text="${provider.spec.displayName}"></span>
+                </a>
+            </li>
+        </ul>
+    </th:block>
+</div>
+
+<div th:remove="tag" th:fragment="miscellaneous">
+    <style>
+        .signup-notice,
+        .returntosite-notice {
+            font-size: var(--text-md);
+            color: var(--color-text);
+            text-align: center;
+            margin: 1em 0;
+        }
+
+        .signup-notice a {
+            color: var(--color-link);
+        }
+
+        .returntosite-notice a {
+            color: var(--color-text);
+            display: inline-flex;
+            align-items: center;
+            gap: 0.3em;
+        }
+
+        .returntosite-notice a,
+        .signup-notice a {
+            text-decoration: none;
+        }
+    </style>
+    <div th:if="${globalInfo.allowRegistration}" class="signup-notice">
+        <div>
+            <th:block th:text="#{signup.description}"></th:block>
+            <a th:href="@{/signup}" th:text="#{signup.link}"></a>
+        </div>
+    </div>
+    <div class="returntosite-notice">
+        <a th:href="@{/}">
+            <svg viewBox="0 0 24 24" width="1.2em" height="1.2em">
+                <path fill="currentColor" d="M21 11H6.83l3.58-3.59L9 6l-6 6l6 6l1.41-1.42L6.83 13H21z"></path>
+            </svg>
+            <span th:text="#{returnToSite}"></span>
+        </a>
+    </div>
+</div>

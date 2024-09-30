@@ -1,5 +1,4 @@
 import { i18n } from "@/locales";
-import { useUserStore } from "@/stores/user";
 import { axiosInstance } from "@halo-dev/api-client";
 import { Toast } from "@halo-dev/components";
 import type { AxiosError } from "axios";
@@ -45,9 +44,9 @@ export function setupApiClient() {
       const { title, detail } = errorResponse.data;
 
       if (status === 401) {
-        const userStore = useUserStore();
-        userStore.loginModalVisible = true;
         Toast.warning(i18n.global.t("core.common.toast.login_expired"));
+
+        // TODO: show dialog
 
         return Promise.reject(error);
       }

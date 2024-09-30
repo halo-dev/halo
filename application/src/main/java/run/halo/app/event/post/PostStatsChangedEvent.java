@@ -3,9 +3,9 @@ package run.halo.app.event.post;
 import lombok.Getter;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.context.ApplicationEvent;
+import run.halo.app.core.counter.MeterUtils;
 import run.halo.app.core.extension.Counter;
 import run.halo.app.core.extension.content.Post;
-import run.halo.app.metrics.MeterUtils;
 
 @Getter
 public class PostStatsChangedEvent extends ApplicationEvent {
