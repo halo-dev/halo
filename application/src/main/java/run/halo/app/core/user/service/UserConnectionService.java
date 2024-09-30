@@ -1,6 +1,7 @@
 package run.halo.app.core.user.service;
 
 import org.springframework.security.oauth2.core.user.OAuth2User;
+import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import run.halo.app.core.extension.UserConnection;
 
@@ -31,5 +32,14 @@ public interface UserConnectionService {
     Mono<UserConnection> updateUserConnectionIfPresent(
         String registrationId, OAuth2User oauth2User
     );
+
+    /**
+     * Remove user connection.
+     *
+     * @param registrationId Registration ID
+     * @param username Username
+     * @return A list of user connections
+     */
+    Flux<UserConnection> removeUserConnection(String registrationId, String username);
 
 }

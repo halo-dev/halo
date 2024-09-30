@@ -7,12 +7,15 @@ import static run.halo.app.extension.index.query.QueryFactory.equal;
 import java.time.Clock;
 import java.util.HashMap;
 import java.util.Optional;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.stereotype.Service;
+import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import run.halo.app.core.extension.UserConnection;
 import run.halo.app.core.extension.UserConnection.UserConnectionSpec;
 import run.halo.app.core.user.service.UserConnectionService;
+import run.halo.app.event.user.UserConnectionDisconnectedEvent;
 import run.halo.app.extension.ListOptions;
 import run.halo.app.extension.Metadata;
 import run.halo.app.extension.MetadataOperator;
@@ -25,10 +28,14 @@ public class UserConnectionServiceImpl implements UserConnectionService {
 
     private final ReactiveExtensionClient client;
 
+    private final ApplicationEventPublisher eventPublisher;
+
     private Clock clock = Clock.systemDefaultZone();
 
-    public UserConnectionServiceImpl(ReactiveExtensionClient client) {
+    public UserConnectionServiceImpl(ReactiveExtensionClient client,
+        ApplicationEventPublisher eventPublisher) {
         this.client = client;
+        this.eventPublisher = eventPublisher;
     }
 
     void setClock(Clock clock) {
@@ -89,6 +96,21 @@ public class UserConnectionServiceImpl implements UserConnectionService {
             .build();
         return client.listAll(UserConnection.class, listOptions, defaultSort()).next()
             .flatMap(connection -> updateUserConnection(connection, oauth2User));
+    }
+
+    @Override
+    public Flux<UserConnection> removeUserConnection(String registrationId, String username) {
+        var listOptions = ListOptions.builder()
+            .fieldQuery(and(
+                equal("spec.registrationId", registrationId),
+                equal("spec.username", username)
+            ))
+            .build();
+        return client.listAll(UserConnection.class, listOptions, defaultSort())
+            .flatMap(client::delete)
+            .doOnNext(deleted ->
+                eventPublisher.publishEvent(new UserConnectionDisconnectedEvent(this, deleted))
+            );
     }
 
     private void updateUserInfo(MetadataOperator metadata, OAuth2User oauth2User) {
