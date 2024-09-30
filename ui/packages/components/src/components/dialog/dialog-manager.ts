@@ -19,17 +19,32 @@ const defaultProps: DialogProps = {
   visible: false,
 };
 
+const DIALOG_CONTAINER_CLASS = ".dialog-container";
+const MODAL_WRAPPER_CLASS = ".modal-wrapper";
+
+function getOrCreateContainer() {
+  let container = document.body.querySelector(DIALOG_CONTAINER_CLASS);
+  if (!container) {
+    container = document.createElement("div");
+    container.className = "dialog-container";
+    document.body.appendChild(container);
+  }
+  return container;
+}
+
 const dialog: DialogEntry = (userProps: DialogProps) => {
   const props = {
     ...defaultProps,
     ...userProps,
   };
 
-  let container = document.body.querySelector(".dialog-container");
-  if (!container) {
-    container = document.createElement("div");
-    container.className = "dialog-container";
-    document.body.appendChild(container);
+  const container = getOrCreateContainer();
+
+  if (
+    props.uniqueId &&
+    container.querySelector(`[data-unique-id="${props.uniqueId}"]`)
+  ) {
+    return;
   }
 
   const { vnode, container: hostContainer } = createVNodeComponent(
@@ -37,19 +52,21 @@ const dialog: DialogEntry = (userProps: DialogProps) => {
     props
   );
 
-  if (hostContainer.firstElementChild) {
+  hostContainer.firstElementChild &&
     container.appendChild(hostContainer.firstElementChild);
-  }
 
-  if (vnode.component?.props) {
-    vnode.component.props.visible = true;
-  }
+  vnode.component?.props && (vnode.component.props.visible = true);
 
   if (vnode?.props) {
-    // close emit
-
     vnode.props.onClose = () => {
-      container?.remove();
+      const modals = container.querySelectorAll(MODAL_WRAPPER_CLASS);
+
+      if (modals.length > 1) {
+        hostContainer.firstElementChild?.remove();
+      } else {
+        container.remove();
+      }
+
       render(null, hostContainer);
     };
   }
