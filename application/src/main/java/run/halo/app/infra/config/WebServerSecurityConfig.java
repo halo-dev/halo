@@ -44,6 +44,7 @@ import run.halo.app.security.authentication.impl.RsaKeyService;
 import run.halo.app.security.authentication.pat.PatAuthenticationManager;
 import run.halo.app.security.authentication.pat.PatServerWebExchangeMatcher;
 import run.halo.app.security.authorization.AuthorityUtils;
+import run.halo.app.security.authorization.NotAuthenticatedAuthorizationManager;
 import run.halo.app.security.authorization.RequestInfoAuthorizationManager;
 import run.halo.app.security.session.InMemoryReactiveIndexedSessionRepository;
 import run.halo.app.security.session.ReactiveIndexedSessionRepository;
@@ -90,6 +91,8 @@ public class WebServerSecurityConfig {
                     "/apis/**",
                     "/actuator/**"
                 ).access(new RequestInfoAuthorizationManager(roleService))
+                .pathMatchers(HttpMethod.GET, "/login", "/signup")
+                .access(new NotAuthenticatedAuthorizationManager())
                 .pathMatchers(
                     "/login/**",
                     "/challenges/**",
