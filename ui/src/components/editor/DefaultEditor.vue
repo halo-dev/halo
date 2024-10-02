@@ -484,7 +484,7 @@ function handleFocusEditor(event) {
           :value="title"
           type="text"
           :placeholder="$t('core.components.default_editor.title_placeholder')"
-          class="w-full border-x-0 !border-b border-t-0 !border-solid !border-gray-100 p-0 !py-2 text-4xl font-semibold placeholder:text-gray-300"
+          class="w-full border-x-0 !border-b border-t-0 !border-solid !border-gray-100 p-0 !py-2 text-4xl font-semibold placeholder:text-gray-300 leading-none"
           @input="onTitleInput"
           @keydown.enter="handleFocusEditor"
         />
