@@ -3,6 +3,7 @@ plugins {
     id 'halo.publish'
     id 'jacoco'
     id "io.freefair.lombok"
+    id "com.github.ben-manes.versions"
 }
 
 group = 'run.halo.app'
