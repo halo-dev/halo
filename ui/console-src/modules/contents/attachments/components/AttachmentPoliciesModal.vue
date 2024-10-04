@@ -1,4 +1,5 @@
 <script lang="ts" setup>
+import { SYSTEM_PROTECTION } from "@/constants/finalizers";
 import { formatDatetime } from "@/utils/date";
 import type { Policy, PolicyTemplate } from "@halo-dev/api-client";
 import { consoleApiClient, coreApiClient } from "@halo-dev/api-client";
@@ -15,6 +16,7 @@ import {
   VModal,
   VSpace,
   VStatusDot,
+  VTag,
 } from "@halo-dev/components";
 import { ref } from "vue";
 import { useI18n } from "vue-i18n";
@@ -171,6 +173,14 @@ function getPolicyTemplateDisplayName(templateName: string) {
             ></VEntityField>
           </template>
           <template #end>
+            <VEntityField>
+              <template
+                v-if="policy.metadata.finalizers?.includes(SYSTEM_PROTECTION)"
+                #description
+              >
+                <VTag>{{ $t("core.common.text.system_protection") }}</VTag>
+              </template>
+            </VEntityField>
             <VEntityField v-if="policy.metadata.deletionTimestamp">
               <template #description>
                 <VStatusDot
@@ -189,10 +199,21 @@ function getPolicyTemplateDisplayName(templateName: string) {
             </VEntityField>
           </template>
           <template #dropdownItems>
-            <VDropdownItem @click="handleOpenEditingModal(policy)">
+            <VDropdownItem
+              :disabled="
+                policy.metadata.finalizers?.includes(SYSTEM_PROTECTION)
+              "
+              @click="handleOpenEditingModal(policy)"
+            >
               {{ $t("core.common.buttons.edit") }}
             </VDropdownItem>
-            <VDropdownItem type="danger" @click="handleDelete(policy)">
+            <VDropdownItem
+              :disabled="
+                policy.metadata.finalizers?.includes(SYSTEM_PROTECTION)
+              "
+              type="danger"
+              @click="handleDelete(policy)"
+            >
               {{ $t("core.common.buttons.delete") }}
             </VDropdownItem>
           </template>

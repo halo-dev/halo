@@ -1645,6 +1645,7 @@ core:
       none: 無
       tip: 提示
       warning: 警告
+      system_protection: 系統保留
     tooltips:
       unpublished_content_tip: 當前有內容已保存，但還未發布。
       publishing: 發布中
