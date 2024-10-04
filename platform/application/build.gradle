@@ -16,7 +16,7 @@ ext {
     pf4j = '3.12.0'
     javaDiffUtils = "4.12"
     guava = "33.3.1-jre"
-    jsoup = '1.15.3'
+    jsoup = '1.18.1'
     jsonPatch = "1.13"
     springDocOpenAPI = "2.6.0"
     lucene = "9.12.0"
