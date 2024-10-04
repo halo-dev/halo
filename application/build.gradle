@@ -13,6 +13,7 @@ plugins {
     id "io.freefair.lombok"
     id 'org.gradle.crypto.checksum'
     id 'org.springdoc.openapi-gradle-plugin'
+    id "com.github.ben-manes.versions"
 }
 
 group = 'run.halo.app'
