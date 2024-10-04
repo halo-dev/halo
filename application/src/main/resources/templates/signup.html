@@ -143,11 +143,11 @@
                         <th:block
                             th:replace="~{gateway_modules/input_fragments :: password(id = 'confirmPassword', name = 'confirmPassword', required = 'true', minlength = 6, enableToggle = true)}"
                         ></th:block>
-                         <p
-                             class="alert alert-error"
-                             th:if="${#fields.hasErrors('confirmPassword')}"
-                             th:errors="*{confirmPassword}"
-                         ></p>
+                        <p
+                            class="alert alert-error"
+                            th:if="${#fields.hasErrors('confirmPassword')}"
+                            th:errors="*{confirmPassword}"
+                        ></p>
                     </div>
 
                     <div class="form-item">
