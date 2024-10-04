@@ -64,6 +64,7 @@ public class MigrationServiceImpl implements MigrationService, InitializingBean 
         "backups/**",
         "db/**",
         "logs/**",
+        "indices/**",
         "docker-compose.yaml",
         "docker-compose.yml",
         "mysql/**",
