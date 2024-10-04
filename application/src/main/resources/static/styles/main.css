@@ -34,8 +34,10 @@
     --spacing-xl: 1.25em;
     --spacing-lg: 1em;
     --spacing-md: 0.875em;
-    --spacing-sm: 0.5em;
-    --text-md: 0.875em;
+    --spacing-sm: 0.625em;
+    --spacing-xs: 0.5em;
+    --text-base: 1em;
+    --text-sm: 0.875em;
 }
 
 .gateway-wrapper {
@@ -88,7 +90,7 @@
 .halo-form .form-item-group {
     gap: var(--spacing-lg);
     display: flex;
-    align-items: center;
+    align-items: flex-start;
     margin-bottom: 1.3em;
 }
 
@@ -142,7 +144,7 @@
 .halo-form .form-input-stack-select {
     all: unset;
     color: var(--color-text);
-    font-size: var(--text-md);
+    font-size: var(--text-sm);
     padding-right: 1.85em;
     display: inline-flex;
     align-items: center;
@@ -153,16 +155,18 @@
 
 .halo-form .form-input-stack-text {
     color: var(--color-text);
-    font-size: var(--text-md);
+    font-size: var(--text-sm);
 }
 
 .halo-form .form-item label {
     color: var(--color-text);
-    margin-bottom: 0.5em;
+    margin-bottom: 0.625em;
+    font-size: var(--text-base);
+    font-weight: 500;
 }
 
 .halo-form .form-item .form-label-group {
-    margin-bottom: 0.5em;
+    margin-bottom: 0.625em;
     display: flex;
     justify-content: space-between;
     align-items: center;
@@ -174,7 +178,7 @@
 
 .halo-form .form-item-extra-link {
     color: var(--color-link);
-    font-size: var(--text-md);
+    font-size: var(--text-sm);
     text-decoration: none;
 }
 
@@ -187,7 +191,7 @@
 
 .halo-form .form-item-compact label {
     color: var(--color-text);
-    font-size: var(--text-md);
+    font-size: var(--text-sm);
 }
 
 .halo-form button[type="submit"] {
@@ -263,7 +267,7 @@
     border-radius: var(--rounded-base);
     border: 1px solid var(--color-border);
     color: var(--color-text);
-    font-size: var(--text-md);
+    font-size: var(--text-sm);
     grid-column: span 1 / span 1;
     height: 100%;
     cursor: pointer;
@@ -281,7 +285,7 @@
 
 .auth-provider-items {
     all: unset;
-    gap: var(--spacing-md);
+    gap: var(--spacing-sm);
     margin: 0;
     display: flex;
     flex-wrap: wrap;
@@ -300,12 +304,12 @@
 
 .auth-provider-items li a {
     gap: var(--spacing-sm);
+    font-size: var(--text-sm);
     padding: 0.7em 1em;
     display: flex;
     align-items: center;
     color: #1f2937;
     text-decoration: none;
-    font-size: 0.8em;
 }
 
 .auth-provider-items li img {
@@ -328,7 +332,7 @@
 
 .divider-wrapper {
     color: var(--color-text);
-    font-size: var(--text-md);
+    font-size: var(--text-sm);
     gap: var(--spacing-lg);
     display: flex;
     align-items: center;
@@ -347,7 +351,7 @@
     border-radius: var(--rounded-base);
     margin-bottom: var(--spacing-xl);
     padding: var(--spacing-md) var(--spacing-xl);
-    font-size: var(--text-md);
+    font-size: var(--text-sm);
     overflow: hidden;
     position: relative;
     color: var(--color-text);
