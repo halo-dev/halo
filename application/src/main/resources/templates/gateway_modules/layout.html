@@ -10,6 +10,8 @@
         />
         <meta content="noindex,nofollow" name="robots" />
         <title th:text="${title}"></title>
+        <link rel="preload" href="/images/wordmark.svg" as="image" type="image/svg+xml" />
+        <link rel="preload" href="/images/logo.png" as="image" type="image/png" />
 
         <th:block th:replace="~{gateway_modules/common_fragments::basicStaticResources}"></th:block>
 
