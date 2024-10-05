@@ -20,53 +20,5 @@
             </div>
             <div th:replace="~{gateway_modules/common_fragments::languageSwitcher}"></div>
         </div>
-        <script th:inline="javascript">
-            document.addEventListener("DOMContentLoaded", function () {
-                function sendRequest() {
-                    return new Promise((resolve, reject) => {
-                        const email = document.getElementById("email").value;
-
-                        if (!email) {
-                            throw new Error(/*[[#{form.emailCode.send.emptyValidation}]]*/);
-                        }
-
-                        fetch("/signup/send-email-code", {
-                            method: "POST",
-                            body: JSON.stringify({ email: email }),
-                            headers: {
-                                "Content-Type": "application/json",
-                                [[${_csrf.headerName}]]: [[${_csrf.token}]],
-                            },
-                        })
-                            .then((response) => {
-                                if (response.ok) {
-                                    resolve(response);
-                                }
-                                reject(response);
-                            })
-                            .catch((e) => {
-                                reject(e);
-                            });
-                    });
-                }
-
-                const emailCodeSendButton = document.getElementById("emailCodeSendButton");
-                sendVerificationCode(emailCodeSendButton, sendRequest);
-
-                var password = document.getElementById("password"),
-                    confirm_password = document.getElementById("confirmPassword");
-
-                function validatePassword() {
-                    if (password.value != confirm_password.value) {
-                        confirm_password.setCustomValidity("Passwords Don't Match");
-                    } else {
-                        confirm_password.setCustomValidity("");
-                    }
-                }
-
-                password.onchange = validatePassword;
-                confirm_password.onkeyup = validatePassword;
-            });
-        </script>
     </th:block>
 </html>
