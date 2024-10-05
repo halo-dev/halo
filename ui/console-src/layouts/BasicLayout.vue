@@ -17,7 +17,6 @@ import {
   VTag,
 } from "@halo-dev/components";
 import { useEventListener } from "@vueuse/core";
-import axios from "axios";
 import {
   useOverlayScrollbars,
   type UseOverlayScrollbarsParams,
@@ -42,24 +41,11 @@ const { currentRoles, currentUser } = storeToRefs(userStore);
 const handleLogout = () => {
   Dialog.warning({
     title: t("core.sidebar.operations.logout.title"),
+    description: t("core.sidebar.operations.logout.description"),
     confirmText: t("core.common.buttons.confirm"),
     cancelText: t("core.common.buttons.cancel"),
     onConfirm: async () => {
-      try {
-        await axios.post(`/logout`, undefined, {
-          withCredentials: true,
-        });
-
-        await userStore.fetchCurrentUser();
-
-        // Clear csrf token
-        document.cookie =
-          "XSRF-TOKEN=; Path=/; Expires=Thu, 01 Jan 1970 00:00:01 GMT;";
-
-        window.location.href = "/login";
-      } catch (error) {
-        console.error("Failed to logout", error);
-      }
+      window.location.href = "/logout";
     },
   });
 };
