@@ -26,6 +26,7 @@ core:
       logout:
         tooltip: Logout
         title: Logout
+        description: Clicking Confirm will redirect to the logout page. Please ensure that the content you are editing is saved.
       profile:
         tooltip: Profile
       visit_homepage:
