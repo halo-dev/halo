@@ -1,42 +1,4 @@
 <!-- Those fragments are only for login template-->
-<form
-    th:fragment="form"
-    class="halo-form"
-    name="login-form"
-    id="login-form"
-    th:action="${authProvider.spec.authenticationUrl}"
-    th:method="${authProvider.spec.method}"
->
-    <div class="alert alert-error" role="alert" th:if="${param.error.size() > 0}" th:with="error = ${param.error[0]}">
-        <strong th:if="${error == 'invalid-credential'}">
-            <span th:text="#{error.invalid-credential}"></span>
-        </strong>
-        <strong th:if="${error == 'rate-limit-exceeded'}">
-            <span th:text="#{error.rate-limit-exceeded}"></span>
-        </strong>
-    </div>
-    <div class="alert" role="alert" th:if="${param.logout.size() > 0}">
-        <strong th:text="#{messages.logoutSuccess}"></strong>
-    </div>
-    <div class="alert" role="alert" th:if="${param.signup.size() > 0}">
-        <strong th:text="#{messages.signupSuccess}"></strong>
-    </div>
-    <div class="alert" role="alert" th:if="${param.oauth2_bind.size() > 0}">
-        <strong th:text="#{messages.oauth2_bind}"></strong>
-    </div>
-
-    <div th:replace="~{__${fragmentTemplateName}__::form}"></div>
-
-    <div th:if="${authProvider.spec.rememberMeSupport}" class="form-item-compact">
-        <input type="checkbox" id="remember-me" name="remember-me" value="true" />
-        <label for="remember-me" th:text="#{form.rememberMe.label}"></label>
-    </div>
-
-    <div class="form-item">
-        <button type="submit" th:text="#{form.submit}"></button>
-    </div>
-</form>
-
 <div th:remove="tag" th:fragment="formAuthProviders">
     <th:block th:unless="${#lists.isEmpty(formAuthProviders)}">
         <div class="divider-wrapper">
