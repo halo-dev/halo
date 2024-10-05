@@ -158,7 +158,7 @@
                     const email = document.getElementById("email").value;
 
                     if (!email) {
-                        throw new Error(/*[[#{form.emailCode.send.emptyValidation}]]*/);
+                        throw new Error(/*[[#{form.signup.emailCode.send.emptyValidation}]]*/);
                     }
 
                     fetch("/signup/send-email-code", {
