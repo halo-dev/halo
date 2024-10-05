@@ -26,6 +26,7 @@ core:
       logout:
         tooltip: 退出登录
         title: 退出登录
+        description: 点击确定将跳转至退出登录页面，请确保正在编辑的内容已保存。
       profile:
         tooltip: 个人中心
       visit_homepage:
