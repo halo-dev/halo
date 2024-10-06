@@ -1074,7 +1074,6 @@ core:
         permissions: Permissions
       fields:
         display_name: Display name
-        redirect_on_login: Default redirect location after logging in
         disallow_access_console:
           label: Disable access to Console
           help: Once checked, this role will not be able to access the Console

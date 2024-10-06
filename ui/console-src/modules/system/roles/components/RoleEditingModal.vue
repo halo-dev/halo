@@ -121,15 +121,6 @@ const handleCreateOrUpdateRole = async () => {
             <FormKit
               v-model="
                 formState.metadata.annotations[
-                  rbacAnnotations.REDIRECT_ON_LOGIN
-                ]
-              "
-              type="text"
-              :label="$t('core.role.editing_modal.fields.redirect_on_login')"
-            ></FormKit>
-            <FormKit
-              v-model="
-                formState.metadata.annotations[
                   rbacAnnotations.DISALLOW_ACCESS_CONSOLE
                 ]
               "
