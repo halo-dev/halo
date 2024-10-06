@@ -48,7 +48,9 @@
             <li th:each="provider : ${formAuthProviders}">
                 <a th:href="'/login?method=' + ${provider.metadata.name}">
                     <img th:src="${provider.spec.logo}" />
-                    <span th:text="${provider.spec.displayName}"></span>
+                    <span
+                        th:text="${#messages.msgOrNull('formAuthProviders.' + provider.metadata.name + '.displayName') ?: provider.spec.displayName}"
+                    ></span>
                 </a>
             </li>
         </ul>
