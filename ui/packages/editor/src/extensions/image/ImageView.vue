@@ -1,21 +1,11 @@
 <script lang="ts" setup>
 import { i18n } from "@/locales";
-import type { Decoration, Node as ProseMirrorNode } from "@/tiptap/pm";
-import type { Editor, Node } from "@/tiptap/vue-3";
+import type { NodeViewProps } from "@/tiptap/vue-3";
 import { NodeViewWrapper } from "@/tiptap/vue-3";
 import { computed, onMounted, ref } from "vue";
 import Image from "./index";
 
-const props = defineProps<{
-  editor: Editor;
-  node: ProseMirrorNode;
-  decorations: Decoration[];
-  selected: boolean;
-  extension: Node<any, any>;
-  getPos: () => number;
-  updateAttributes: (attributes: Record<string, any>) => void;
-  deleteNode: () => void;
-}>();
+const props = defineProps<NodeViewProps>();
 
 const src = computed({
   get: () => {
