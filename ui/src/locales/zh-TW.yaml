@@ -1394,6 +1394,7 @@ core:
     Post Author: 允許管理自己的文章
     Post Contributor: 允許投稿
     Post Publisher: 允許發布自己的文章
+    Recycle My Post: 允許刪除自己的文章
   components:
     submit_button:
       computed_text: "{text}（{shortcut}）"
@@ -1659,6 +1660,9 @@ core:
       cancel_publish:
         description: 確定要取消發布嗎？
         title: 取消發布
+      delete:
+        title: 刪除文章
+        description: 該操作會將文章放入回收站，後續由網站管理員進行管理。
     publish_modal:
       title: 發布文章
     setting_modal:

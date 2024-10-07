@@ -257,6 +257,9 @@ core:
       cancel_publish:
         title: 取消发布
         description: 确定要取消发布吗？
+      delete:
+        title: 删除文章
+        description: 该操作会将文章放入回收站，后续由网站管理员进行管理。
   post_editor:
     title: 文章编辑
     untitled: 未命名文章
@@ -1415,6 +1418,7 @@ core:
     Post Author: 允许管理自己的文章
     Post Attachment Manager: 允许在文章中上传图片
     Post Publisher: 允许发布自己的文章
+    Recycle My Post: 允许删除自己的文章
   components:
     submit_button:
       computed_text: "{text}（{shortcut}）"

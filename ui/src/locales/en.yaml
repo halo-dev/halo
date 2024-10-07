@@ -1517,6 +1517,7 @@ core:
     Post Author: Allows you to manage your own posts
     Post Contributor: Contributions allowed
     Post Publisher: Allow to publish own posts
+    Recycle My Post: Recycle My Post
   components:
     submit_button:
       computed_text: "{text} ({shortcut})"
@@ -1791,6 +1792,9 @@ core:
       cancel_publish:
         description: Are you sure you want to cancel publishing?
         title: Cancel publish
+      delete:
+        title: Delete post
+        description: This action will move the post to the recycle bin, where it will be managed by the site administrator.
     publish_modal:
       title: Publish post
     setting_modal:
