@@ -124,11 +124,25 @@ public class UcPostEndpoint implements CustomEndpoint {
                         .operationId("UnpublishMyPost")
                         .description("Unpublish my post.")
                         .parameter(namePathParam)
-                        .response(responseBuilder().implementation(Post.class)))
+                        .response(responseBuilder().implementation(Post.class))
+                    )
+                    .DELETE("/{name}/recycle", this::recycleMyPost, builder -> builder.tag(tag)
+                        .operationId("RecycleMyPost")
+                        .description("Move my post to recycle bin.")
+                        .parameter(namePathParam)
+                        .response(responseBuilder().implementation(Post.class))
+                    )
                     .build(),
                 builder -> {
                 })
             .build();
+    }
+
+    private Mono<ServerResponse> recycleMyPost(ServerRequest request) {
+        final var name = request.pathVariable("name");
+        return getCurrentUser()
+            .flatMap(username -> postService.recycleBy(name, username))
+            .flatMap(post -> ServerResponse.ok().bodyValue(post));
     }
 
     private Mono<ServerResponse> getMyPostDraft(ServerRequest request) {

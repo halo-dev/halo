@@ -7,11 +7,7 @@
         <div class="gateway-wrapper">
             <div class="halo-form-wrapper">
                 <h1 class="form-title" th:text="#{form.title}"></h1>
-                <form class="halo-form" id="logout-form" name="logout-form" th:action="@{/logout}" method="post">
-                    <div class="form-item">
-                        <button type="submit" th:text="#{form.submit}"></button>
-                    </div>
-                </form>
+                <form th:replace="~{gateway_modules/form_fragments::logout}"></form>
             </div>
         </div>
     </th:block>

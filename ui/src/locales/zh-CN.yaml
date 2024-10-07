@@ -257,6 +257,9 @@ core:
       cancel_publish:
         title: 取消发布
         description: 确定要取消发布吗？
+      delete:
+        title: 删除文章
+        description: 该操作会将文章放入回收站，后续由网站管理员进行管理。
   post_editor:
     title: 文章编辑
     untitled: 未命名文章
@@ -1001,7 +1004,6 @@ core:
         permissions: 权限
       fields:
         display_name: 名称
-        redirect_on_login: 登录之后默认跳转位置
         disallow_access_console:
           label: 禁止访问 Console
           help: 勾选之后，该角色将无法访问 Console
@@ -1303,10 +1305,10 @@ core:
     restore:
       tips:
         first: 1. 恢复过程可能会持续较长时间，期间请勿刷新页面。
-        second: 2. 在恢复的过程中，虽然已有的数据不会被清理掉，但如果有冲突的数据将被覆盖。
+        second: 2. 在执行恢复之前，会清空现有的所有数据，请确保当前没有需要保留的数据。
         third: 3. 恢复完成之后需要重启 Halo 才能够正常加载系统资源。
         complete: 恢复完成，等待重启...
-      start: 开始恢复
+      start: 我已阅读上方提示，开始恢复
       tabs:
         local:
           label: 上传
@@ -1416,6 +1418,7 @@ core:
     Post Author: 允许管理自己的文章
     Post Attachment Manager: 允许在文章中上传图片
     Post Publisher: 允许发布自己的文章
+    Recycle My Post: 允许删除自己的文章
   components:
     submit_button:
       computed_text: "{text}（{shortcut}）"

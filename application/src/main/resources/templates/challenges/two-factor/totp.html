@@ -8,35 +8,7 @@
             <div th:replace="~{gateway_modules/common_fragments::haloLogo}"></div>
             <div class="halo-form-wrapper">
                 <h1 class="form-title" th:text="#{title}"></h1>
-                <form
-                    class="halo-form"
-                    th:action="@{/challenges/two-factor/totp}"
-                    name="two-factor-form"
-                    id="two-factor-form"
-                    method="post"
-                >
-                    <div class="alert alert-error" role="alert" th:if="${param.error.size() > 0}">
-                        <strong th:text="#{messages.invalidError}"></strong>
-                    </div>
-                    <div class="form-item">
-                        <label for="code" th:text="#{form.code.label}"></label>
-                        <div class="form-input">
-                            <input
-                                type="text"
-                                inputmode="numeric"
-                                id="code"
-                                name="code"
-                                autocomplete="one-time-code"
-                                pattern="\d{6}"
-                                autofocus
-                                required
-                            />
-                        </div>
-                    </div>
-                    <div class="form-item">
-                        <button type="submit" th:text="#{form.submit}"></button>
-                    </div>
-                </form>
+                <form th:replace="~{gateway_modules/form_fragments::totp}"></form>
             </div>
         </div>
     </th:block>

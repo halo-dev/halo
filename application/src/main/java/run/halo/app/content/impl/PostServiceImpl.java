@@ -379,6 +379,15 @@ public class PostServiceImpl extends AbstractContentService implements PostServi
             });
     }
 
+    @Override
+    public Mono<Post> recycleBy(String postName, String username) {
+        return getByUsername(postName, username)
+            .flatMap(post -> updatePostWithRetry(post, record -> {
+                record.getSpec().setDeleted(true);
+                return record;
+            }));
+    }
+
     private Mono<Post> updatePostWithRetry(Post post, UnaryOperator<Post> func) {
         return client.update(func.apply(post))
             .onErrorResume(OptimisticLockingFailureException.class,

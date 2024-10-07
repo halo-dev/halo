@@ -1074,7 +1074,6 @@ core:
         permissions: Permissions
       fields:
         display_name: Display name
-        redirect_on_login: Default redirect location after logging in
         disallow_access_console:
           label: Disable access to Console
           help: Once checked, this role will not be able to access the Console
@@ -1403,14 +1402,12 @@ core:
         first: >-
           1. The restore process may last for a long time, please do not refresh
           the page during this period.
-        second: >-
-          2. During the restore process, although the existing data will not be
-          cleaned up, if there is a conflict, the data will be overwritten.
+        second: 2. Before performing the restore, all existing data will be cleared. Please ensure that there is no data that needs to be retained.
         third: >-
           3. After the restore is completed, you need to restart Halo to load
           the system resources normally.
         complete: Restore completed, waiting for restart...
-      start: Start restore
+      start: I have read the above instructions, start restore
       tabs:
         local:
           label: Upload
@@ -1520,6 +1517,7 @@ core:
     Post Author: Allows you to manage your own posts
     Post Contributor: Contributions allowed
     Post Publisher: Allow to publish own posts
+    Recycle My Post: Recycle My Post
   components:
     submit_button:
       computed_text: "{text} ({shortcut})"
@@ -1794,6 +1792,9 @@ core:
       cancel_publish:
         description: Are you sure you want to cancel publishing?
         title: Cancel publish
+      delete:
+        title: Delete post
+        description: This action will move the post to the recycle bin, where it will be managed by the site administrator.
     publish_modal:
       title: Publish post
     setting_modal:

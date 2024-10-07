@@ -86,7 +86,7 @@ const handleClose = () => {
   <VModal
     :visible="visible"
     :width="450"
-    :layer-closable="true"
+    :layer-closable="false"
     :data-unique-id="uniqueId"
     @close="handleCancel()"
   >

@@ -1,11 +1,6 @@
 <script lang="ts" setup>
 import { VButton } from "@halo-dev/components";
-import type {
-  Decoration,
-  Editor,
-  Node,
-  PMNode,
-} from "@halo-dev/richtext-editor";
+import type { NodeViewProps } from "@halo-dev/richtext-editor";
 import { computed, ref } from "vue";
 import RiVideoAddLine from "~icons/ri/video-add-line";
 import { EditorLinkObtain } from "../../components";
@@ -13,16 +8,7 @@ import InlineBlockBox from "../../components/InlineBlockBox.vue";
 import type { AttachmentAttr } from "../../utils/attachment";
 import Video from "./index";
 
-const props = defineProps<{
-  editor: Editor;
-  node: PMNode;
-  decorations: Decoration[];
-  selected: boolean;
-  extension: Node;
-  getPos: () => number;
-  updateAttributes: (attributes: Record<string, unknown>) => void;
-  deleteNode: () => void;
-}>();
+const props = defineProps<NodeViewProps>();
 
 const src = computed({
   get: () => {

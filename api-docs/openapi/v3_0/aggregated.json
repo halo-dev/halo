@@ -15117,6 +15117,38 @@
         ]
       }
     },
+    "/apis/uc.api.content.halo.run/v1alpha1/posts/{name}/recycle": {
+      "delete": {
+        "description": "Move my post to recycle bin.",
+        "operationId": "RecycleMyPost",
+        "parameters": [
+          {
+            "description": "Post name",
+            "in": "path",
+            "name": "name",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "default": {
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/Post"
+                }
+              }
+            },
+            "description": "default response"
+          }
+        },
+        "tags": [
+          "PostV1alpha1Uc"
+        ]
+      }
+    },
     "/apis/uc.api.content.halo.run/v1alpha1/posts/{name}/unpublish": {
       "put": {
         "description": "Unpublish my post.",

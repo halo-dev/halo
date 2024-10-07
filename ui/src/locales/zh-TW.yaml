@@ -981,7 +981,6 @@ core:
         permissions: 權限
       fields:
         display_name: 名稱
-        redirect_on_login: 登入之後預設跳轉位置
         disallow_access_console:
           label: 禁止訪問 Console
           help: 勾選之後，該角色將無法存取 Console
@@ -1282,10 +1281,10 @@ core:
     restore:
       tips:
         first: 1. 還原過程可能需要較長時間，期間請勿重新整理頁面。
-        second: 2. 在還原過程中，雖然已有的資料不會被清除，但若有衝突的資料將被覆蓋。
+        second: 2. 在執行恢復之前，會清空現有的所有數據，請確保當前沒有需要保留的數據。
         third: 3. 還原完成後需要重新啟動 Halo 才能正常載入系統資源。
         complete: 還原完成，等待重啟...
-      start: 開始還原
+      start: 我已閱讀上方提示，開始恢復
       tabs:
         local:
           label: 上傳
@@ -1395,6 +1394,7 @@ core:
     Post Author: 允許管理自己的文章
     Post Contributor: 允許投稿
     Post Publisher: 允許發布自己的文章
+    Recycle My Post: 允許刪除自己的文章
   components:
     submit_button:
       computed_text: "{text}（{shortcut}）"
@@ -1660,6 +1660,9 @@ core:
       cancel_publish:
         description: 確定要取消發布嗎？
         title: 取消發布
+      delete:
+        title: 刪除文章
+        description: 該操作會將文章放入回收站，後續由網站管理員進行管理。
     publish_modal:
       title: 發布文章
     setting_modal:
