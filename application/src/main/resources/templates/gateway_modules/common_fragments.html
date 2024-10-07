@@ -1,7 +1,9 @@
 <th:block th:fragment="basicStaticResources">
-    <link rel="stylesheet" href="/webjars/normalize.css/8.0.1/normalize.css" />
-    <link rel="stylesheet" th:href="|/styles/main.css?v=${site.version}|" />
+    <th:block th:replace="~{gateway_modules/common_fragments::basicStyleResources}"></th:block>
+    <th:block th:replace="~{gateway_modules/common_fragments::basicScriptResources}"></th:block>
+</th:block>
 
+<th:block th:fragment="basicScriptResources">
     <script th:inline="javascript">
         const i18nResources = {
             sendVerificationCodeSuccess: `[(#{js.sendVerificationCode.success})]`,
@@ -10,6 +12,11 @@
     </script>
 
     <script src="/js/main.js"></script>
+</th:block>
+
+<th:block th:fragment="basicStyleResources">
+    <link rel="stylesheet" href="/webjars/normalize.css/8.0.1/normalize.css" />
+    <link rel="stylesheet" th:href="|/styles/main.css?v=${site.version}|" />
 </th:block>
 
 <div th:remove="tag" th:fragment="languageSwitcher">
