@@ -1001,7 +1001,6 @@ core:
         permissions: 权限
       fields:
         display_name: 名称
-        redirect_on_login: 登录之后默认跳转位置
         disallow_access_console:
           label: 禁止访问 Console
           help: 勾选之后，该角色将无法访问 Console
