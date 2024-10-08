@@ -39,7 +39,7 @@ useEventListener(codeInputWrapperRef, "keydown", (e: KeyboardEvent) => {
       ref="codeInputWrapperRef"
       :style="{ height }"
       :class="{ '!fixed inset-0 z-[999] !block bg-white': fullscreen }"
-      class="group relative w-full"
+      class="group relative h-9 w-full"
     >
       <VPageHeader v-if="fullscreen" :title="context.label" class="border-b">
         <template #actions>
