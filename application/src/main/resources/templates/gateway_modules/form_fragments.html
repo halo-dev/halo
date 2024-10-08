@@ -153,12 +153,30 @@
 
     <script th:inline="javascript">
         document.addEventListener("DOMContentLoaded", function () {
+            var password = document.getElementById("password"),
+                confirm_password = document.getElementById("confirmPassword");
+
+            function validatePassword() {
+                if (password.value != confirm_password.value) {
+                    confirm_password.setCustomValidity("Passwords Don't Match");
+                } else {
+                    confirm_password.setCustomValidity("");
+                }
+            }
+
+            password.onchange = validatePassword;
+            confirm_password.onkeyup = validatePassword;
+        });
+    </script>
+
+    <script th:if="${globalInfo.mustVerifyEmailOnRegistration}" th:inline="javascript">
+        document.addEventListener("DOMContentLoaded", function () {
             function sendRequest() {
                 return new Promise((resolve, reject) => {
                     const email = document.getElementById("email").value;
 
                     if (!email) {
-                        throw new Error(/*[[#{form.signup.emailCode.send.emptyValidation}]]*/);
+                        throw new Error(/*[[#{form.signup.emailCode.send.emptyValidation}]]*/"");
                     }
 
                     fetch("/signup/send-email-code", {
@@ -183,20 +201,6 @@
 
             const emailCodeSendButton = document.getElementById("emailCodeSendButton");
             sendVerificationCode(emailCodeSendButton, sendRequest);
-
-            var password = document.getElementById("password"),
-                confirm_password = document.getElementById("confirmPassword");
-
-            function validatePassword() {
-                if (password.value != confirm_password.value) {
-                    confirm_password.setCustomValidity("Passwords Don't Match");
-                } else {
-                    confirm_password.setCustomValidity("");
-                }
-            }
-
-            password.onchange = validatePassword;
-            confirm_password.onkeyup = validatePassword;
         });
     </script>
 </form>
