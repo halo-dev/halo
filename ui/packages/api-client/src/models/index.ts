@@ -237,6 +237,7 @@ export * from './thumbnail-spec';
 export * from './totp-auth-link-response';
 export * from './totp-request';
 export * from './two-factor-auth-settings';
+export * from './uc-upload-request-form-data';
 export * from './upgrade-from-uri-request';
 export * from './upload-from-url-request';
 export * from './user';

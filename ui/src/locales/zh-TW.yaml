@@ -603,6 +603,50 @@ core:
       operations:
         select:
           result: （已選擇 {count} 項）
+  uc_attachment:
+    empty:
+      title: 當前沒有附件
+      message: 當前沒有附件，你可以嘗試重整或者上傳附件
+      actions:
+        upload: 上傳附件
+    filters:
+      sort:
+        items:
+          create_time_desc: 較近上傳
+          create_time_asc: 較晚上傳
+          size_desc: 文件大小降序
+          size_asc: 文件大小升序
+          display_name_asc: 文件名升序
+          display_name_desc: 文件名降序
+      view_type:
+        items:
+          grid: 網格模式
+          list: 列表模式
+    detail_modal:
+      title: 附件：{display_name}
+      fields:
+        preview: 預覽
+        display_name: 文件名稱
+        media_type: 文件類型
+        size: 文件大小
+        owner: 上傳者
+        creation_time: 上傳時間
+        permalink: 連結
+      preview:
+        click_to_exit: 點擊離開預覽
+        video_not_support: 當前瀏覽器不支援該影片播放
+        audio_not_support: 當前瀏覽器不支援該音頻播放
+        not_support: 此文件不支援預覽
+    upload_modal:
+      title: 上傳附件
+    select_modal:
+      title: 選擇附件
+      providers:
+        default:
+          label: 附件庫
+      operations:
+        select:
+          result: （已選擇 {count} 項）
   theme:
     title: 主題
     common:
@@ -1394,6 +1438,7 @@ core:
     Post Author: 允許管理自己的文章
     Post Contributor: 允許投稿
     Post Publisher: 允許發布自己的文章
+    UC Attachment Manage: 允許管理自己的附件
     Recycle My Post: 允許刪除自己的文章
   components:
     submit_button:

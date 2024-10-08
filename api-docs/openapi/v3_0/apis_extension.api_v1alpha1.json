@@ -13261,34 +13261,13 @@
       },
       "UserConnectionSpec": {
         "required": [
-          "accessToken",
-          "displayName",
           "providerUserId",
           "registrationId",
           "username"
         ],
         "type": "object",
         "properties": {
-          "accessToken": {
-            "type": "string"
-          },
-          "avatarUrl": {
-            "type": "string"
-          },
-          "displayName": {
-            "type": "string"
-          },
-          "expiresAt": {
-            "type": "string",
-            "format": "date-time"
-          },
-          "profileUrl": {
-            "type": "string"
-          },
           "providerUserId": {
-            "type": "string"
-          },
-          "refreshToken": {
             "type": "string"
           },
           "registrationId": {

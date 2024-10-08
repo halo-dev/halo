@@ -626,6 +626,50 @@ core:
       operations:
         select:
           result: （已选择 {count} 项）
+  uc_attachment:
+    empty:
+      title: 当前没有附件
+      message: 当前没有附件，你可以尝试刷新或者上传附件
+      actions:
+        upload: 上传附件
+    filters:
+      sort:
+        items:
+          create_time_desc: 较近上传
+          create_time_asc: 较晚上传
+          size_desc: 文件大小降序
+          size_asc: 文件大小升序
+          display_name_asc: 文件名升序
+          display_name_desc: 文件名降序
+      view_type:
+        items:
+          grid: 网格模式
+          list: 列表模式
+    detail_modal:
+      title: 附件：{display_name}
+      fields:
+        preview: 预览
+        display_name: 文件名称
+        media_type: 文件类型
+        size: 文件大小
+        owner: 上传者
+        creation_time: 上传时间
+        permalink: 链接
+      preview:
+        click_to_exit: 点击退出预览
+        video_not_support: 当前浏览器不支持该视频播放
+        audio_not_support: 当前浏览器不支持该音频播放
+        not_support: 此文件不支持预览
+    upload_modal:
+      title: 上传附件
+    select_modal:
+      title: 选择附件
+      providers:
+        default:
+          label: 附件库
+      operations:
+        select:
+          result: （已选择 {count} 项）
   theme:
     title: 主题
     common:
@@ -1418,6 +1462,7 @@ core:
     Post Author: 允许管理自己的文章
     Post Attachment Manager: 允许在文章中上传图片
     Post Publisher: 允许发布自己的文章
+    UC Attachment Manage: 允许管理自己的附件
     Recycle My Post: 允许删除自己的文章
   components:
     submit_button:
