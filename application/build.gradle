@@ -128,7 +128,7 @@ ext.presetPluginUrls = [
         // Currently, plugin-app-store is not open source, so we need to download it from the official website.
         // Please see https://github.com/halo-dev/plugin-app-store/issues/55
         // https://www.halo.run/store/apps/app-VYJbF
-        'https://www.halo.run/store/apps/app-VYJbF/releases/download/app-release-BpYuv/assets/app-release-BpYuv-LTHgb': 'appstore.jar',
+        'https://www.halo.run/store/apps/app-VYJbF/releases/download/app-release-CZSAd/assets/app-release-CZSAd-KZEqI': 'appstore.jar',
 ]
 
 tasks.register('downloadPluginPresets', Download) {
