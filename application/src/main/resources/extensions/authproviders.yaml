@@ -10,7 +10,7 @@ metadata:
 spec:
   displayName: Local
   description: Built-in authentication for Halo.
-  logo: /images/logo.png
+  logo: /images/login-methods/login-with-credentials.svg
   website: https://www.halo.run
   authenticationUrl: /login
   method: post
