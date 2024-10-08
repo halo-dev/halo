@@ -1,6 +1,6 @@
 server:
   port: 8090
-  forward-headers-strategy: framework
+  forward-headers-strategy: native
   compression:
     enabled: true
   error:
