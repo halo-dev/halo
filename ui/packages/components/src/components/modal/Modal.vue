@@ -156,7 +156,7 @@ watch(
         <div
           v-show="internalVisible"
           :style="contentStyles"
-          class="modal-content transform transition-all duration-300"
+          class="modal-content transition-all duration-300"
           :class="{ 'modal-focus': focus }"
         >
           <div v-if="$slots.header || title" class="modal-header group">
