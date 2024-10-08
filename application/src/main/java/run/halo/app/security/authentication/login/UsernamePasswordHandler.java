@@ -46,7 +46,7 @@ public class UsernamePasswordHandler implements ServerAuthenticationSuccessHandl
     private RememberMeRequestCache rememberMeRequestCache = new WebSessionRememberMeRequestCache();
 
     private final ServerAuthenticationSuccessHandler defaultSuccessHandler =
-        new RedirectServerAuthenticationSuccessHandler("/console/");
+        new RedirectServerAuthenticationSuccessHandler("/uc");
 
     public UsernamePasswordHandler(ServerResponse.Context context, MessageSource messageSource,
         LoginHandlerEnhancer loginHandlerEnhancer) {
