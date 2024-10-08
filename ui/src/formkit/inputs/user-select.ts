@@ -1,15 +1,16 @@
-// TODO: This is a temporary approach.
-// We will provide searchable user selection components in the future.
-
 import type { FormKitNode, FormKitTypeDefinition } from "@formkit/core";
 import { consoleApiClient } from "@halo-dev/api-client";
 import { select } from "./select";
+
+const ANONYMOUSUSER_NAME = "anonymousUser";
+const DELETEDUSER_NAME = "ghost";
 
 const search = async ({ page, size, keyword }) => {
   const { data } = await consoleApiClient.user.listUsers({
     page,
     size,
     keyword,
+    fieldSelector: [`name!=${ANONYMOUSUSER_NAME}`, `name!=${DELETEDUSER_NAME}`],
   });
   return {
     options: data.items?.map((user) => {
