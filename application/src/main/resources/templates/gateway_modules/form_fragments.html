@@ -55,9 +55,9 @@
             <span th:text="#{form.signup.error.rateLimitExceeded}"></span>
         </strong>
     </div>
-    <div class="alert alert-error" role="alert" th:if="${error == 'duplicate-name'}">
+    <div class="alert alert-error" role="alert" th:if="${error == 'duplicate-username'}">
         <strong>
-            <span th:text="#{form.signup.error.duplicateName}"></span>
+            <span th:text="#{form.signup.error.duplicateUsername}"></span>
         </strong>
     </div>
     <div class="form-item-group">
