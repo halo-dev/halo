@@ -1,0 +1,15 @@
+apiVersion: v1alpha1
+kind: Role
+metadata:
+  name: role-template-uc-attachment-manager
+  labels:
+    halo.run/role-template: "true"
+  annotations:
+    rbac.authorization.halo.run/module: "Attachments Management"
+    rbac.authorization.halo.run/display-name: "UC Attachment Manage"
+    rbac.authorization.halo.run/ui-permissions: |
+      [ "uc:attachments:manage" ]
+rules:
+  - apiGroups: [ "uc.api.storage.halo.run" ]
+    resources: [ "attachments", "attachments/upload", "attachments/upload-from-url" ]
+    verbs: [ "create", "list" ]

@@ -9,13 +9,17 @@ import static org.springdoc.core.fn.builders.requestbody.Builder.requestBodyBuil
 import static org.springdoc.core.fn.builders.schema.Builder.schemaBuilder;
 import static org.springdoc.webflux.core.fn.SpringdocRouteBuilder.route;
 import static org.springframework.web.reactive.function.server.RequestPredicates.contentType;
+import static run.halo.app.extension.index.query.QueryFactory.equal;
 
 import io.swagger.v3.oas.annotations.enums.ParameterIn;
 import io.swagger.v3.oas.annotations.media.Schema;
 import java.net.URL;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Objects;
 import java.util.function.Consumer;
+import lombok.Builder;
+import lombok.Getter;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.http.MediaType;
 import org.springframework.http.codec.multipart.FilePart;
@@ -25,6 +29,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.ReactiveSecurityContextHolder;
 import org.springframework.security.core.context.SecurityContext;
 import org.springframework.stereotype.Component;
+import org.springframework.util.Assert;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.reactive.function.BodyExtractors;
 import org.springframework.web.reactive.function.server.RouterFunction;
@@ -32,31 +37,40 @@ import org.springframework.web.reactive.function.server.ServerRequest;
 import org.springframework.web.reactive.function.server.ServerResponse;
 import org.springframework.web.server.ServerWebInputException;
 import reactor.core.publisher.Mono;
+import reactor.core.scheduler.Schedulers;
 import run.halo.app.content.PostService;
+import run.halo.app.core.attachment.AttachmentLister;
+import run.halo.app.core.attachment.SearchRequest;
 import run.halo.app.core.extension.attachment.Attachment;
 import run.halo.app.core.extension.content.Post;
 import run.halo.app.core.extension.endpoint.CustomEndpoint;
 import run.halo.app.core.extension.service.AttachmentService;
 import run.halo.app.extension.GroupVersion;
+import run.halo.app.extension.ListOptions;
+import run.halo.app.extension.ListResult;
 import run.halo.app.infra.SystemConfigurableEnvironmentFetcher;
 import run.halo.app.infra.SystemSetting;
 import run.halo.app.infra.exception.NotFoundException;
 
 @Component
-public class UcPostAttachmentEndpoint implements CustomEndpoint {
+public class UcAttachmentEndpoint implements CustomEndpoint {
 
     public static final String POST_NAME_LABEL = "content.halo.run/post-name";
     public static final String SINGLE_PAGE_NAME_LABEL = "content.halo.run/single-page-name";
 
     private final AttachmentService attachmentService;
 
+    private final AttachmentLister attachmentLister;
+
     private final PostService postService;
 
     private final SystemConfigurableEnvironmentFetcher systemSettingFetcher;
 
-    public UcPostAttachmentEndpoint(AttachmentService attachmentService, PostService postService,
+    public UcAttachmentEndpoint(AttachmentService attachmentService,
+        AttachmentLister attachmentLister, PostService postService,
         SystemConfigurableEnvironmentFetcher systemSettingFetcher) {
         this.attachmentService = attachmentService;
+        this.attachmentLister = attachmentLister;
         this.postService = postService;
         this.systemSettingFetcher = systemSettingFetcher;
     }
@@ -82,6 +96,19 @@ public class UcPostAttachmentEndpoint implements CustomEndpoint {
                     )
                     .response(responseBuilder().implementation(Attachment.class))
             )
+            .POST("/attachments/-/upload", contentType(MediaType.MULTIPART_FORM_DATA),
+                this::uploadAttachment, builder -> builder
+                    .operationId("UploadUcAttachment")
+                    .description("Upload attachment to user center storage.")
+                    .tag(tag)
+                    .requestBody(requestBodyBuilder()
+                        .required(true)
+                        .content(contentBuilder()
+                            .mediaType(MediaType.MULTIPART_FORM_DATA_VALUE)
+                            .schema(schemaBuilder().implementation(UcUploadRequest.class))
+                        ))
+                    .response(responseBuilder().implementation(Attachment.class))
+            )
             .POST("/attachments/-/upload-from-url", contentType(MediaType.APPLICATION_JSON),
                 this::uploadFromUrlForPost,
                 builder -> builder
@@ -103,7 +130,92 @@ public class UcPostAttachmentEndpoint implements CustomEndpoint {
                     .response(responseBuilder().implementation(Attachment.class))
                     .build()
             )
+            .GET("/attachments", this::listMyAttachments, builder -> {
+                builder.operationId("ListMyAttachments")
+                    .description("List attachments of the current user uploaded.")
+                    .tag(tag)
+                    .response(responseBuilder()
+                        .implementation(ListResult.generateGenericClass(Attachment.class))
+                    );
+                SearchRequest.buildParameters(builder);
+            })
             .build();
+    }
+
+    private Mono<ServerResponse> uploadAttachment(ServerRequest request) {
+        var builder = UploadContext.builder();
+        var filePartMono = request.body(BodyExtractors.toMultipartData())
+            .map(UcUploadRequest::new)
+            .switchIfEmpty(
+                Mono.error(new ServerWebInputException("Required request body is missing.")))
+            .doOnNext(uploadRequest -> builder.filePart(uploadRequest.getFile()))
+            .subscribeOn(Schedulers.boundedElastic());
+
+        var ownerMono = getCurrentUser()
+            .doOnNext(builder::owner);
+
+        var storagePolicyMono =
+            systemSettingFetcher.fetch(SystemSetting.User.GROUP, SystemSetting.User.class)
+                .mapNotNull(SystemSetting.User::getUcAttachmentPolicy)
+                .filter(StringUtils::isNotBlank)
+                .switchIfEmpty(Mono.error(new ServerWebInputException(
+                    "Please contact the administrator to configure the storage policy."))
+                )
+                .doOnNext(builder::storagePolicy)
+                .subscribeOn(Schedulers.boundedElastic());
+
+        return Mono.when(filePartMono, storagePolicyMono, ownerMono)
+            .then(Mono.fromSupplier(builder::build))
+            .flatMap(context -> attachmentService.upload(context.owner(),
+                context.storagePolicy(), null, context.filePart(), null)
+            )
+            .flatMap(attachment -> ServerResponse.ok().bodyValue(attachment));
+    }
+
+    private Mono<ServerResponse> listMyAttachments(ServerRequest request) {
+        return getCurrentUser()
+            .flatMap(username -> {
+                var searchRequest = new UcSearchRequest(request, username);
+                return attachmentLister.listBy(searchRequest)
+                    .flatMap(listResult -> ServerResponse.ok()
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .bodyValue(listResult)
+                    );
+            });
+    }
+
+    @Builder
+    record UploadContext(String owner, String storagePolicy, FilePart filePart) {
+    }
+
+    public record UcUploadRequest(MultiValueMap<String, Part> formData) {
+
+        @Schema(description = "The file to upload.", requiredMode = REQUIRED)
+        public FilePart getFile() {
+            if (formData.getFirst("file") instanceof FilePart file) {
+                return file;
+            }
+            throw new ServerWebInputException("Invalid part of file");
+        }
+    }
+
+    @Getter
+    public static class UcSearchRequest extends SearchRequest {
+        private final String owner;
+
+        public UcSearchRequest(ServerRequest request, String owner) {
+            super(request);
+            Assert.state(StringUtils.isNotBlank(owner), "Owner must not be blank.");
+            this.owner = owner;
+        }
+
+        @Override
+        public ListOptions toListOptions(List<String> hiddenGroups) {
+            var listOptions = super.toListOptions(hiddenGroups);
+            return ListOptions.builder(listOptions)
+                .andQuery((equal("spec.ownerName", owner)))
+                .build();
+        }
     }
 
     private Mono<ServerResponse> uploadFromUrlForPost(ServerRequest request) {
@@ -218,7 +330,7 @@ public class UcPostAttachmentEndpoint implements CustomEndpoint {
 
     @Override
     public GroupVersion groupVersion() {
-        return GroupVersion.parseAPIVersion("uc.api.content.halo.run/v1alpha1");
+        return GroupVersion.parseAPIVersion("uc.api.storage.halo.run/v1alpha1");
     }
 
     public record UploadFromUrlRequest(@Schema(requiredMode = REQUIRED) URL url,
