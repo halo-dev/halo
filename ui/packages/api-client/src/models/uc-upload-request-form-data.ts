@@ -17,32 +17,22 @@
 /**
  * 
  * @export
- * @interface UserConnectionSpec
+ * @interface UcUploadRequestFormData
  */
-export interface UserConnectionSpec {
+export interface UcUploadRequestFormData {
+    [key: string]: Array<object> | any;
+
     /**
      * 
-     * @type {string}
-     * @memberof UserConnectionSpec
+     * @type {{ [key: string]: object; }}
+     * @memberof UcUploadRequestFormData
      */
-    'providerUserId': string;
+    'all'?: { [key: string]: object; };
     /**
      * 
-     * @type {string}
-     * @memberof UserConnectionSpec
+     * @type {boolean}
+     * @memberof UcUploadRequestFormData
      */
-    'registrationId': string;
-    /**
-     * 
-     * @type {string}
-     * @memberof UserConnectionSpec
-     */
-    'updatedAt'?: string;
-    /**
-     * 
-     * @type {string}
-     * @memberof UserConnectionSpec
-     */
-    'username': string;
+    'empty'?: boolean;
 }
 

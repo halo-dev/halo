@@ -1,10 +1,8 @@
-import { matchMediaType } from "@/utils/media-type";
 import type { Attachment } from "@halo-dev/api-client";
 import { consoleApiClient, coreApiClient } from "@halo-dev/api-client";
 import { Dialog, Toast } from "@halo-dev/components";
 import { useQuery } from "@tanstack/vue-query";
-import { useClipboard } from "@vueuse/core";
-import { computed, nextTick, ref, watch, type Ref } from "vue";
+import { nextTick, ref, watch, type Ref } from "vue";
 import { useI18n } from "vue-i18n";
 
 interface useAttachmentControlReturn {
@@ -235,73 +233,5 @@ export function useAttachmentControl(filterOptions: {
     handleSelect,
     isChecked,
     handleReset,
-  };
-}
-
-export function useAttachmentPermalinkCopy(
-  attachment: Ref<Attachment | undefined>
-) {
-  const { copy } = useClipboard({ legacy: true });
-  const { t } = useI18n();
-
-  const mediaType = computed(() => {
-    return attachment.value?.spec.mediaType;
-  });
-
-  const isImage = computed(() => {
-    return mediaType.value && matchMediaType(mediaType.value, "image/*");
-  });
-
-  const isVideo = computed(() => {
-    return mediaType.value && matchMediaType(mediaType.value, "video/*");
-  });
-
-  const isAudio = computed(() => {
-    return mediaType.value && matchMediaType(mediaType.value, "audio/*");
-  });
-
-  const htmlText = computed(() => {
-    const { permalink } = attachment.value?.status || {};
-    const { displayName } = attachment.value?.spec || {};
-
-    if (isImage.value) {
-      return `<img src="${permalink}" alt="${displayName}" />`;
-    } else if (isVideo.value) {
-      return `<video src="${permalink}"></video>`;
-    } else if (isAudio.value) {
-      return `<audio src="${permalink}"></audio>`;
-    }
-    return `<a href="${permalink}">${displayName}</a>`;
-  });
-
-  const markdownText = computed(() => {
-    const { permalink } = attachment.value?.status || {};
-    const { displayName } = attachment.value?.spec || {};
-    if (isImage.value) {
-      return `![${displayName}](${permalink})`;
-    }
-    return `[${displayName}](${permalink})`;
-  });
-
-  const handleCopy = (format: "markdown" | "html" | "url") => {
-    const { permalink } = attachment.value?.status || {};
-
-    if (!permalink) return;
-
-    if (format === "url") {
-      copy(permalink);
-    } else if (format === "markdown") {
-      copy(markdownText.value);
-    } else if (format === "html") {
-      copy(htmlText.value);
-    }
-
-    Toast.success(t("core.common.toast.copy_success"));
-  };
-
-  return {
-    htmlText,
-    markdownText,
-    handleCopy,
   };
 }

@@ -71,6 +71,7 @@ public class SystemSetting {
         boolean mustVerifyEmailOnRegistration;
         String defaultRole;
         String avatarPolicy;
+        String ucAttachmentPolicy;
     }
 
     @Data

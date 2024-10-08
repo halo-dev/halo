@@ -1,8 +1,8 @@
-<script lang="ts" setup>
+<script setup lang="ts">
 import LazyImage from "@/components/image/LazyImage.vue";
 import { isImage } from "@/utils/image";
 import { matchMediaTypes } from "@/utils/media-type";
-import type { Attachment, Group } from "@halo-dev/api-client";
+import { ucApiClient, type Attachment } from "@halo-dev/api-client";
 import {
   IconArrowLeft,
   IconArrowRight,
@@ -21,14 +21,12 @@ import {
   VSpace,
 } from "@halo-dev/components";
 import type { AttachmentLike } from "@halo-dev/console-shared";
+import { useQuery } from "@tanstack/vue-query";
 import { useLocalStorage } from "@vueuse/core";
-import { computed, ref, watch, watchEffect } from "vue";
+import { computed, nextTick, ref, watch } from "vue";
 import { useI18n } from "vue-i18n";
-import { useAttachmentControl } from "../../composables/use-attachment";
-import { useFetchAttachmentPolicy } from "../../composables/use-attachment-policy";
 import AttachmentDetailModal from "../AttachmentDetailModal.vue";
-import AttachmentGroupList from "../AttachmentGroupList.vue";
-import AttachmentUploadModal from "../AttachmentUploadModal.vue";
+import AttachmentUploadModal from "./AttachmentUploadModal.vue";
 import AttachmentSelectorListItem from "./components/AttachmentSelectorListItem.vue";
 
 const { t } = useI18n();
@@ -53,66 +51,74 @@ const emit = defineEmits<{
   (event: "change-provider", providerId: string): void;
 }>();
 
-const { policies } = useFetchAttachmentPolicy();
-
-const keyword = ref("");
-const selectedGroup = ref();
-const selectedPolicy = ref();
-const selectedSort = ref();
 const page = ref(1);
 const size = ref(60);
-
-const {
-  attachments,
-  isLoading,
-  total,
-  selectedAttachment,
-  selectedAttachments,
-  handleFetchAttachments,
-  handleSelect,
-  handleSelectPrevious,
-  handleSelectNext,
-  handleReset,
-  isChecked,
-  isFetching,
-} = useAttachmentControl({
-  groupName: selectedGroup,
-  policyName: selectedPolicy,
-  sort: selectedSort,
-  accepts: computed(() => {
-    return props.accepts;
-  }),
-  page,
-  size,
-  keyword,
-});
-
-watch(
-  () => [selectedPolicy.value, selectedSort.value, keyword.value],
-  () => {
-    page.value = 1;
-  }
-);
+const keyword = ref("");
+const selectedSort = ref();
 
 const hasFilters = computed(() => {
-  return selectedPolicy.value || selectedSort.value;
+  return selectedSort.value;
 });
 
 function handleClearFilters() {
-  selectedPolicy.value = undefined;
   selectedSort.value = undefined;
 }
 
-const uploadVisible = ref(false);
-const detailVisible = ref(false);
-
-watchEffect(() => {
-  emit("update:selected", Array.from(selectedAttachments.value));
+const {
+  data,
+  isFetching,
+  isLoading,
+  refetch: handleFetchAttachments,
+} = useQuery({
+  queryKey: [
+    "uc:attachments:my",
+    props.accepts,
+    page,
+    size,
+    keyword,
+    selectedSort,
+  ],
+  queryFn: async () => {
+    const { data } = await ucApiClient.storage.attachment.listMyAttachments({
+      accepts: props.accepts,
+      page: page.value,
+      size: size.value,
+      keyword: keyword.value,
+      sort: [selectedSort.value],
+    });
+    return data;
+  },
 });
 
-const handleOpenDetail = (attachment: Attachment) => {
-  selectedAttachment.value = attachment;
-  detailVisible.value = true;
+// Upload
+const uploadVisible = ref(false);
+
+function onUploadModalClose() {
+  handleFetchAttachments();
+  uploadVisible.value = false;
+}
+
+// Select
+const selectedAttachment = ref<Attachment>();
+const selectedAttachments = ref<Set<Attachment>>(new Set<Attachment>());
+
+watch(
+  () => selectedAttachments.value,
+  (newValue) => {
+    emit("update:selected", Array.from(newValue));
+  },
+  {
+    deep: true,
+  }
+);
+
+const isChecked = (attachment: Attachment) => {
+  return (
+    attachment.metadata.name === selectedAttachment.value?.metadata.name ||
+    Array.from(selectedAttachments.value)
+      .map((item) => item.metadata.name)
+      .includes(attachment.metadata.name)
+  );
 };
 
 const isDisabled = (attachment: Attachment) => {
@@ -132,36 +138,85 @@ const isDisabled = (attachment: Attachment) => {
   return !isMatchMediaType;
 };
 
-function onUploadModalClose() {
-  handleFetchAttachments();
-  uploadVisible.value = false;
-}
-
-function onDetailModalClose() {
-  detailVisible.value = false;
-  selectedAttachment.value = undefined;
-}
-
-function onGroupSelect(group: Group) {
-  selectedGroup.value = group.metadata.name;
-  handleReset();
-}
+const handleSelect = async (attachment: Attachment | undefined) => {
+  if (!attachment) return;
+  if (selectedAttachments.value.has(attachment)) {
+    selectedAttachments.value.delete(attachment);
+    return;
+  }
+  selectedAttachments.value.add(attachment);
+};
 
 // View type
 const viewTypes = [
   {
     name: "list",
-    tooltip: t("core.attachment.filters.view_type.items.list"),
+    tooltip: t("core.uc_attachment.filters.view_type.items.list"),
     icon: IconList,
   },
   {
     name: "grid",
-    tooltip: t("core.attachment.filters.view_type.items.grid"),
+    tooltip: t("core.uc_attachment.filters.view_type.items.grid"),
     icon: IconGrid,
   },
 ];
 
 const viewType = useLocalStorage("attachment-selector-view-type", "grid");
+
+// Detail modal
+function handleOpenDetail(attachment: Attachment) {
+  selectedAttachment.value = attachment;
+}
+
+function onDetailModalClose() {
+  selectedAttachment.value = undefined;
+}
+
+const handleSelectPrevious = async () => {
+  if (!data.value) return;
+
+  const index = data.value.items.findIndex(
+    (attachment) =>
+      attachment.metadata.name === selectedAttachment.value?.metadata.name
+  );
+
+  if (index === undefined) return;
+
+  if (index > 0) {
+    selectedAttachment.value = data.value.items[index - 1];
+    return;
+  }
+
+  if (index === 0 && data.value.hasPrevious) {
+    page.value--;
+    await nextTick();
+    await handleFetchAttachments();
+    selectedAttachment.value = data.value.items[data.value.items.length - 1];
+  }
+};
+
+const handleSelectNext = async () => {
+  if (!data.value) return;
+
+  const index = data.value.items.findIndex(
+    (attachment) =>
+      attachment.metadata.name === selectedAttachment.value?.metadata.name
+  );
+
+  if (index === undefined) return;
+
+  if (index < data.value.items.length - 1) {
+    selectedAttachment.value = data.value.items[index + 1];
+    return;
+  }
+
+  if (index === data.value.items.length - 1 && data.value.hasNext) {
+    page.value++;
+    await nextTick();
+    await handleFetchAttachments();
+    selectedAttachment.value = data.value.items[0];
+  }
+};
 </script>
 <template>
   <div class="mb-3 block w-full rounded bg-gray-50 px-3 py-2">
@@ -174,22 +229,6 @@ const viewType = useLocalStorage("attachment-selector-view-type", "grid");
           <FilterCleanButton v-if="hasFilters" @click="handleClearFilters" />
 
           <FilterDropdown
-            v-model="selectedPolicy"
-            :label="$t('core.attachment.filters.storage_policy.label')"
-            :items="[
-              {
-                label: t('core.common.filters.item_labels.all'),
-              },
-              ...(policies?.map((policy) => {
-                return {
-                  label: policy.spec.displayName,
-                  value: policy.metadata.name,
-                };
-              }) || []),
-            ]"
-          />
-
-          <FilterDropdown
             v-model="selectedSort"
             :label="$t('core.common.filters.labels.sort')"
             :items="[
@@ -197,29 +236,35 @@ const viewType = useLocalStorage("attachment-selector-view-type", "grid");
                 label: t('core.common.filters.item_labels.default'),
               },
               {
-                label: t('core.attachment.filters.sort.items.create_time_desc'),
+                label: t(
+                  'core.uc_attachment.filters.sort.items.create_time_desc'
+                ),
                 value: 'metadata.creationTimestamp,desc',
               },
               {
-                label: t('core.attachment.filters.sort.items.create_time_asc'),
+                label: t(
+                  'core.uc_attachment.filters.sort.items.create_time_asc'
+                ),
                 value: 'metadata.creationTimestamp,asc',
               },
               {
                 label: t(
-                  'core.attachment.filters.sort.items.display_name_desc'
+                  'core.uc_attachment.filters.sort.items.display_name_desc'
                 ),
                 value: 'spec.displayName,desc',
               },
               {
-                label: t('core.attachment.filters.sort.items.display_name_asc'),
+                label: t(
+                  'core.uc_attachment.filters.sort.items.display_name_asc'
+                ),
                 value: 'spec.displayName,asc',
               },
               {
-                label: t('core.attachment.filters.sort.items.size_desc'),
+                label: t('core.uc_attachment.filters.sort.items.size_desc'),
                 value: 'spec.size,desc',
               },
               {
-                label: t('core.attachment.filters.sort.items.size_asc'),
+                label: t('core.uc_attachment.filters.sort.items.size_asc'),
                 value: 'spec.size,asc',
               },
             ]"
@@ -227,8 +272,8 @@ const viewType = useLocalStorage("attachment-selector-view-type", "grid");
 
           <div class="flex flex-row gap-2">
             <div
-              v-for="(item, index) in viewTypes"
-              :key="index"
+              v-for="item in viewTypes"
+              :key="item.name"
               v-tooltip="`${item.tooltip}`"
               :class="{
                 'bg-gray-200 font-bold text-black': viewType === item.name,
@@ -257,28 +302,21 @@ const viewType = useLocalStorage("attachment-selector-view-type", "grid");
     </div>
   </div>
 
-  <AttachmentGroupList readonly @select="onGroupSelect" />
-
-  <HasPermission
-    v-if="attachments?.length"
-    :permissions="['system:attachments:manage']"
-  >
-    <div class="mb-5">
-      <VButton @click="uploadVisible = true">
-        <template #icon>
-          <IconUpload class="h-full w-full" />
-        </template>
-        {{ $t("core.common.buttons.upload") }}
-      </VButton>
-    </div>
-  </HasPermission>
+  <div v-if="data?.total" class="mb-5">
+    <VButton @click="uploadVisible = true">
+      <template #icon>
+        <IconUpload class="h-full w-full" />
+      </template>
+      {{ $t("core.common.buttons.upload") }}
+    </VButton>
+  </div>
 
   <VLoading v-if="isLoading" />
 
   <VEmpty
-    v-else-if="!attachments?.length"
-    :message="$t('core.attachment.empty.message')"
-    :title="$t('core.attachment.empty.title')"
+    v-else-if="!data?.total"
+    :message="$t('core.uc_attachment.empty.message')"
+    :title="$t('core.uc_attachment.empty.title')"
   >
     <template #actions>
       <VSpace>
@@ -289,7 +327,7 @@ const viewType = useLocalStorage("attachment-selector-view-type", "grid");
           <template #icon>
             <IconUpload class="h-full w-full" />
           </template>
-          {{ $t("core.attachment.empty.actions.upload") }}
+          {{ $t("core.uc_attachment.empty.actions.upload") }}
         </VButton>
       </VSpace>
     </template>
@@ -302,7 +340,7 @@ const viewType = useLocalStorage("attachment-selector-view-type", "grid");
         role="list"
       >
         <VCard
-          v-for="(attachment, index) in attachments"
+          v-for="(attachment, index) in data.items"
           :key="index"
           :body-class="['!p-0']"
           :class="{
@@ -381,7 +419,7 @@ const viewType = useLocalStorage("attachment-selector-view-type", "grid");
         class="box-border h-full w-full divide-y divide-gray-100 overflow-hidden rounded-base border"
         role="list"
       >
-        <li v-for="attachment in attachments" :key="attachment.metadata.name">
+        <li v-for="attachment in data.items" :key="attachment.metadata.name">
           <AttachmentSelectorListItem
             :attachment="attachment"
             :is-selected="isChecked(attachment)"
@@ -409,17 +447,21 @@ const viewType = useLocalStorage("attachment-selector-view-type", "grid");
       :page-label="$t('core.components.pagination.page_label')"
       :size-label="$t('core.components.pagination.size_label')"
       :total-label="
-        $t('core.components.pagination.total_label', { total: total })
+        $t('core.components.pagination.total_label', {
+          total: data?.total || 0,
+        })
       "
-      :total="total"
+      :total="data?.total || 0"
       :size-options="[60, 120, 200]"
     />
   </div>
+
   <AttachmentUploadModal v-if="uploadVisible" @close="onUploadModalClose" />
+
   <AttachmentDetailModal
-    v-if="detailVisible"
+    v-if="selectedAttachment"
     :mount-to-body="true"
-    :name="selectedAttachment?.metadata.name"
+    :attachment="selectedAttachment"
     @close="onDetailModalClose"
   >
     <template #actions>
