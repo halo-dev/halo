@@ -244,7 +244,9 @@
     th:action="@{/password-reset/{resetToken}(resetToken=${resetToken})}"
     method="post"
 >
-    <p style="color: red" role="alert" th:if="${error}" th:text="${error}"></p>
+    <div class="alert alert-error" role="alert" th:if="${error}">
+        <strong th:text="${error}"></strong>
+    </div>
     <div class="form-item">
         <label for="password" th:text="#{form.passwordResetLink.password.label}">Password</label>
         <th:block
