@@ -119,3 +119,73 @@
         </ul>
     </th:block>
 </div>
+
+<div th:remove="tag" th:fragment="signupNoticeContent">
+    <style>
+        .signup-notice-content {
+            font-size: var(--text-sm);
+            color: var(--color-text);
+            text-align: center;
+            margin: 1em 0;
+        }
+
+        .signup-notice-content a {
+            color: var(--color-link);
+            text-decoration: none;
+        }
+    </style>
+    <div th:if="${globalInfo.allowRegistration}" class="signup-notice-content">
+        <div>
+            <th:block th:text="#{signupNotice.description}"></th:block>
+            <a th:href="@{/signup}" th:text="#{signupNotice.link}"></a>
+        </div>
+    </div>
+</div>
+
+<div th:remove="tag" th:fragment="loginNoticeContent">
+    <style>
+        .login-notice-content {
+            font-size: var(--text-sm);
+            color: var(--color-text);
+            text-align: center;
+            margin: 1em 0;
+        }
+
+        .login-notice-content a {
+            color: var(--color-link);
+            text-decoration: none;
+        }
+    </style>
+    <div th:if="${globalInfo.allowRegistration}" class="login-notice-content">
+        <div>
+            <th:block th:text="#{loginNotice.description}"></th:block>
+            <a th:href="@{/login}" th:text="#{loginNotice.link}"></a>
+        </div>
+    </div>
+</div>
+
+<div th:remove="tag" th:fragment="returnToSiteContent">
+    <style>
+        .returntosite-content {
+            font-size: var(--text-sm);
+            text-align: center;
+            margin: 1em 0;
+        }
+
+        .returntosite-content a {
+            color: var(--color-text);
+            display: inline-flex;
+            align-items: center;
+            gap: 0.3em;
+            text-decoration: none;
+        }
+    </style>
+    <div class="returntosite-content">
+        <a th:href="@{/}">
+            <svg viewBox="0 0 24 24" width="1.2em" height="1.2em">
+                <path fill="currentColor" d="M21 11H6.83l3.58-3.59L9 6l-6 6l6 6l1.41-1.42L6.83 13H21z"></path>
+            </svg>
+            <span th:text="#{returnToSite}"></span>
+        </a>
+    </div>
+</div>
