@@ -82,6 +82,6 @@ export interface SinglePageStatus {
      * @type {string}
      * @memberof SinglePageStatus
      */
-    'phase': string;
+    'phase'?: string;
 }
 

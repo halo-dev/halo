@@ -17,6 +17,41 @@
     }
   ],
   "paths": {
+    "/apis/uc.api.auth.halo.run/v1alpha1/user-connections/{registerId}/disconnect": {
+      "put": {
+        "description": "Disconnect my connection from a third-party platform.",
+        "operationId": "DisconnectMyConnection",
+        "parameters": [
+          {
+            "description": "The registration ID of the third-party platform.",
+            "in": "path",
+            "name": "registerId",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "default": {
+            "content": {
+              "*/*": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/UserConnection"
+                  }
+                }
+              }
+            },
+            "description": "default response"
+          }
+        },
+        "tags": [
+          "UserConnectionV1alpha1Uc"
+        ]
+      }
+    },
     "/apis/uc.api.content.halo.run/v1alpha1/posts": {
       "get": {
         "description": "List posts owned by the current user.",
@@ -1853,19 +1888,16 @@
           },
           "visible": {
             "type": "string",
-            "default": "PUBLIC",
             "enum": [
               "PUBLIC",
               "INTERNAL",
               "PRIVATE"
-            ]
+            ],
+            "default": "PUBLIC"
           }
         }
       },
       "PostStatus": {
-        "required": [
-          "phase"
-        ],
         "type": "object",
         "properties": {
           "commentsCount": {
@@ -2259,6 +2291,52 @@
           "url": {
             "type": "string",
             "format": "url"
+          }
+        }
+      },
+      "UserConnection": {
+        "required": [
+          "apiVersion",
+          "kind",
+          "metadata",
+          "spec"
+        ],
+        "type": "object",
+        "properties": {
+          "apiVersion": {
+            "type": "string"
+          },
+          "kind": {
+            "type": "string"
+          },
+          "metadata": {
+            "$ref": "#/components/schemas/Metadata"
+          },
+          "spec": {
+            "$ref": "#/components/schemas/UserConnectionSpec"
+          }
+        }
+      },
+      "UserConnectionSpec": {
+        "required": [
+          "providerUserId",
+          "registrationId",
+          "username"
+        ],
+        "type": "object",
+        "properties": {
+          "providerUserId": {
+            "type": "string"
+          },
+          "registrationId": {
+            "type": "string"
+          },
+          "updatedAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "username": {
+            "type": "string"
           }
         }
       },

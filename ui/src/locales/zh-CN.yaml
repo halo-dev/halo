@@ -1369,25 +1369,6 @@ core:
       message: 没有权限访问此页面
     actions:
       home: 返回首页
-  setup:
-    title: 系统初始化
-    operations:
-      submit:
-        button: 初始化
-        toast_success: 初始化成功
-      setup_initial_data:
-        loading: 正在初始化数据，请稍后...
-    fields:
-      site_title:
-        label: 站点名称
-      email:
-        label: 邮箱
-      username:
-        label: 用户名
-      password:
-        label: 密码
-      confirm_password:
-        label: 确认密码
   rbac:
     Attachments Management: 附件
     Attachment Manage: 附件管理

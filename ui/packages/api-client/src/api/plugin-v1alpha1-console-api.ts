@@ -385,43 +385,6 @@ export const PluginV1alpha1ConsoleApiAxiosParamCreator = function (configuration
             };
         },
         /**
-         * List all plugin presets in the system.
-         * @param {*} [options] Override http request option.
-         * @throws {RequiredError}
-         */
-        listPluginPresets: async (options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
-            const localVarPath = `/apis/api.console.halo.run/v1alpha1/plugin-presets`;
-            // use dummy base URL string because the URL constructor only accepts absolute URLs.
-            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
-            let baseOptions;
-            if (configuration) {
-                baseOptions = configuration.baseOptions;
-            }
-
-            const localVarRequestOptions = { method: 'GET', ...baseOptions, ...options};
-            const localVarHeaderParameter = {} as any;
-            const localVarQueryParameter = {} as any;
-
-            // authentication basicAuth required
-            // http basic authentication required
-            setBasicAuthToObject(localVarRequestOptions, configuration)
-
-            // authentication bearerAuth required
-            // http bearer authentication required
-            await setBearerAuthToObject(localVarHeaderParameter, configuration)
-
-
-    
-            setSearchParams(localVarUrlObj, localVarQueryParameter);
-            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
-            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
-
-            return {
-                url: toPathString(localVarUrlObj),
-                options: localVarRequestOptions,
-            };
-        },
-        /**
          * List plugins using query criteria and sort params
          * @param {number} [page] Page number. Default is 0.
          * @param {number} [size] Size number. Default is 0.
@@ -885,17 +848,6 @@ export const PluginV1alpha1ConsoleApiFp = function(configuration?: Configuration
             return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
         },
         /**
-         * List all plugin presets in the system.
-         * @param {*} [options] Override http request option.
-         * @throws {RequiredError}
-         */
-        async listPluginPresets(options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<Array<Plugin>>> {
-            const localVarAxiosArgs = await localVarAxiosParamCreator.listPluginPresets(options);
-            const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
-            const localVarOperationServerBasePath = operationServerMap['PluginV1alpha1ConsoleApi.listPluginPresets']?.[localVarOperationServerIndex]?.url;
-            return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
-        },
-        /**
          * List plugins using query criteria and sort params
          * @param {number} [page] Page number. Default is 0.
          * @param {number} [size] Size number. Default is 0.
@@ -1071,14 +1023,6 @@ export const PluginV1alpha1ConsoleApiFactory = function (configuration?: Configu
          */
         installPluginFromUri(requestParameters: PluginV1alpha1ConsoleApiInstallPluginFromUriRequest, options?: RawAxiosRequestConfig): AxiosPromise<Plugin> {
             return localVarFp.installPluginFromUri(requestParameters.installFromUriRequest, options).then((request) => request(axios, basePath));
-        },
-        /**
-         * List all plugin presets in the system.
-         * @param {*} [options] Override http request option.
-         * @throws {RequiredError}
-         */
-        listPluginPresets(options?: RawAxiosRequestConfig): AxiosPromise<Array<Plugin>> {
-            return localVarFp.listPluginPresets(options).then((request) => request(axios, basePath));
         },
         /**
          * List plugins using query criteria and sort params
@@ -1525,16 +1469,6 @@ export class PluginV1alpha1ConsoleApi extends BaseAPI {
      */
     public installPluginFromUri(requestParameters: PluginV1alpha1ConsoleApiInstallPluginFromUriRequest, options?: RawAxiosRequestConfig) {
         return PluginV1alpha1ConsoleApiFp(this.configuration).installPluginFromUri(requestParameters.installFromUriRequest, options).then((request) => request(this.axios, this.basePath));
-    }
-
-    /**
-     * List all plugin presets in the system.
-     * @param {*} [options] Override http request option.
-     * @throws {RequiredError}
-     * @memberof PluginV1alpha1ConsoleApi
-     */
-    public listPluginPresets(options?: RawAxiosRequestConfig) {
-        return PluginV1alpha1ConsoleApiFp(this.configuration).listPluginPresets(options).then((request) => request(this.axios, this.basePath));
     }
 
     /**

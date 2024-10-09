@@ -6,7 +6,6 @@ import {
   type RouteLocationNormalizedLoaded,
 } from "vue-router";
 import { setupAuthCheckGuard } from "./guards/auth-check";
-import { setupCheckStatesGuard } from "./guards/check-states";
 import { setupPermissionGuard } from "./guards/permission";
 
 const router = createRouter({
@@ -22,7 +21,6 @@ const router = createRouter({
   },
 });
 
-setupCheckStatesGuard(router);
 setupAuthCheckGuard(router);
 setupPermissionGuard(router);
 

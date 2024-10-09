@@ -88,6 +88,7 @@ export * from './api/thumbnail-v1alpha1-api';
 export * from './api/thumbnail-v1alpha1-public-api';
 export * from './api/two-factor-auth-v1alpha1-uc-api';
 export * from './api/user-connection-v1alpha1-api';
+export * from './api/user-connection-v1alpha1-uc-api';
 export * from './api/user-v1alpha1-api';
 export * from './api/user-v1alpha1-console-api';
 
