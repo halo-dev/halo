@@ -115,7 +115,7 @@ public class EmailPasswordRecoveryServiceImpl implements EmailPasswordRecoverySe
         var tokenHash = hashToken(token);
         var expiresAt = clock.instant().plus(RESET_TOKEN_LIFE_TIME);
         var uri = UriComponentsBuilder.fromUriString("/")
-            .pathSegment("password-reset", token)
+            .pathSegment("password-reset", "email", token)
             .build(true)
             .toUri();
         var resetToken = new ResetToken(tokenHash, username, expiresAt);

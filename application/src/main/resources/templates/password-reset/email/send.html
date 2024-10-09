@@ -9,6 +9,8 @@
             <div class="halo-form-wrapper">
                 <h1 class="form-title" th:text="${sent} ? #{sent.title} : #{title}"></h1>
                 <form th:replace="~{gateway_modules/form_fragments::passwordReset}"></form>
+
+                <div th:replace="~{gateway_modules/common_fragments::passwordResetMethods}"></div>
             </div>
 
             <div th:replace="~{gateway_modules/common_fragments::languageSwitcher}"></div>

@@ -42,6 +42,11 @@ halo:
       - pathPattern: /upload/**
         locations:
           - migrate-from-1.x
+  security:
+    password-reset-methods:
+      - name: email
+        href: /password-reset/email
+        icon: /images/password-reset-methods/email.svg
 
 springdoc:
   api-docs:

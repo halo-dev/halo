@@ -245,7 +245,7 @@
 <form
     th:fragment="passwordResetLink"
     class="halo-form"
-    th:action="@{/password-reset/{resetToken}(resetToken=${resetToken})}"
+    th:action="@{/password-reset/email/{resetToken}(resetToken=${resetToken})}"
     method="post"
 >
     <div class="alert alert-error" role="alert" th:if="${error}">
@@ -280,7 +280,7 @@
             <button type="submit" th:text="#{form.passwordReset.sent.submit}"></button>
         </div>
     </form>
-    <form th:unless="${sent}" class="halo-form" th:action="@{/password-reset}" method="post">
+    <form th:unless="${sent}" class="halo-form" th:action="@{/password-reset/email}" method="post">
         <div class="alert alert-error" th:if="${error}">
             <strong th:text="${error}"></strong>
         </div>
