@@ -71,7 +71,6 @@ import run.halo.app.extension.router.IListRequest;
 import run.halo.app.extension.router.SortableRequest;
 import run.halo.app.infra.ReactiveUrlDataBufferFetcher;
 import run.halo.app.infra.utils.SettingUtils;
-import run.halo.app.plugin.PluginNotFoundException;
 import run.halo.app.plugin.PluginService;
 
 @Slf4j
@@ -298,12 +297,6 @@ public class PluginEndpoint implements CustomEndpoint, InitializingBean {
                     .response(responseBuilder()
                         .implementation(ObjectNode.class))
             )
-            .GET("plugin-presets", this::listPresets,
-                builder -> builder.operationId("ListPluginPresets")
-                    .description("List all plugin presets in the system.")
-                    .tag(tag)
-                    .response(responseBuilder().implementationArray(Plugin.class))
-            )
             .GET("plugins/-/bundle.js", this::fetchJsBundle,
                 builder -> builder.operationId("fetchJsBundle")
                     .description("Merge all JS bundles of enabled plugins into one.")
@@ -472,10 +465,6 @@ public class PluginEndpoint implements CustomEndpoint, InitializingBean {
         return ServerResponse.ok().body(pluginService.reload(name), Plugin.class);
     }
 
-    private Mono<ServerResponse> listPresets(ServerRequest request) {
-        return ServerResponse.ok().body(pluginService.getPresets(), Plugin.class);
-    }
-
     private Mono<ServerResponse> fetchPluginConfig(ServerRequest request) {
         final var name = request.pathVariable("name");
         return client.fetch(Plugin.class, name)
@@ -564,10 +553,6 @@ public class PluginEndpoint implements CustomEndpoint, InitializingBean {
                     if (InstallSource.FILE.equals(source)) {
                         return installFromFile(installRequest.getFile(), pluginService::install);
                     }
-                    if (InstallSource.PRESET.equals(source)) {
-                        return installFromPreset(installRequest.getPresetName(),
-                            pluginService::install);
-                    }
                     return Mono.error(
                         new UnsupportedOperationException("Unsupported install source " + source));
                 }))
@@ -586,10 +571,6 @@ public class PluginEndpoint implements CustomEndpoint, InitializingBean {
                         return installFromFile(installRequest.getFile(),
                             path -> pluginService.upgrade(pluginName, path));
                     }
-                    if (InstallSource.PRESET.equals(source)) {
-                        return installFromPreset(installRequest.getPresetName(),
-                            path -> pluginService.upgrade(pluginName, path));
-                    }
                     return Mono.error(
                         new UnsupportedOperationException("Unsupported install source " + source));
                 }))
@@ -604,16 +585,6 @@ public class PluginEndpoint implements CustomEndpoint, InitializingBean {
             writeToTempFile(filePart.content()),
             resourceClosure,
             this::deleteFileIfExists);
-    }
-
-    private Mono<Plugin> installFromPreset(Mono<String> presetNameMono,
-        Function<Path, Mono<Plugin>> resourceClosure) {
-        return presetNameMono.flatMap(pluginService::getPreset)
-            .switchIfEmpty(
-                Mono.error(() -> new PluginNotFoundException("Plugin preset was not found.")))
-            .map(pluginPreset -> pluginPreset.getStatus().getLoadLocation())
-            .map(Path::of)
-            .flatMap(resourceClosure);
     }
 
     public static class ListRequest extends SortableRequest {

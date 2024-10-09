@@ -8,6 +8,8 @@ import run.halo.app.extension.ConfigMap;
 
 public interface ThemeService {
 
+    Mono<Void> installPresetTheme();
+
     Mono<Theme> install(Publisher<DataBuffer> content);
 
     Mono<Theme> upgrade(String themeName, Publisher<DataBuffer> content);
