@@ -1,6 +1,7 @@
 package run.halo.app.infra.exception.handlers;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.springframework.security.test.web.reactive.server.SecurityMockServerConfigurers.csrf;
 
 import java.util.Locale;
 import org.junit.jupiter.api.AfterEach;
@@ -121,9 +122,8 @@ class I18nExceptionTest {
 
     @Test
     void shouldGetConflictError() {
-        webClient.put().uri("/response-entity/conflict-error")
-            .header("X-XSRF-TOKEN", "fake-token")
-            .cookie("XSRF-TOKEN", "fake-token")
+        webClient.mutate().apply(csrf()).build()
+            .put().uri("/response-entity/conflict-error")
             .exchange()
             .expectStatus().isEqualTo(HttpStatus.CONFLICT)
             .expectBody(ProblemDetail.class)
