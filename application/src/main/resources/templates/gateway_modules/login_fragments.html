@@ -6,7 +6,7 @@
             <th:block th:text="#{otherLogin.label}"></th:block>
             <hr />
         </div>
-        <ul class="auth-provider-items">
+        <ul class="pill-items">
             <li th:each="provider : ${formAuthProviders}">
                 <a th:href="'/login?method=' + ${provider.metadata.name}">
                     <img th:src="${provider.spec.logo}" />
