@@ -17,6 +17,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.web.reactive.server.WebTestClient;
+import org.springframework.validation.Validator;
 import reactor.core.publisher.Mono;
 import run.halo.app.core.extension.User;
 import run.halo.app.core.user.service.EmailVerificationService;
@@ -49,6 +50,9 @@ class EmailVerificationCodeTest {
 
     @Mock
     RateLimiterRegistry rateLimiterRegistry;
+
+    @Mock
+    Validator validator;
 
     @InjectMocks
     UserEndpoint endpoint;

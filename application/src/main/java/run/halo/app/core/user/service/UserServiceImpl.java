@@ -33,8 +33,10 @@ import run.halo.app.extension.exception.ExtensionNotFoundException;
 import run.halo.app.extension.router.selector.FieldSelector;
 import run.halo.app.infra.SystemConfigurableEnvironmentFetcher;
 import run.halo.app.infra.SystemSetting;
+import run.halo.app.infra.ValidationUtils;
 import run.halo.app.infra.exception.DuplicateNameException;
 import run.halo.app.infra.exception.EmailVerificationFailed;
+import run.halo.app.infra.exception.UnsatisfiedAttributeValueException;
 import run.halo.app.infra.exception.UserNotFoundException;
 
 @Service
@@ -86,6 +88,10 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public Mono<User> updateWithRawPassword(String username, String rawPassword) {
+        if (!ValidationUtils.PASSWORD_PATTERN.matcher(rawPassword).matches()) {
+            return Mono.error(
+                new UnsatisfiedAttributeValueException("validation.error.password.pattern"));
+        }
         return getUser(username)
             .filter(user -> {
                 if (!StringUtils.hasText(user.getSpec().getPassword())) {

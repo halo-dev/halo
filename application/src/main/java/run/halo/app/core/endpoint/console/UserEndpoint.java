@@ -24,6 +24,7 @@ import io.github.resilience4j.ratelimiter.RequestNotPermitted;
 import io.github.resilience4j.reactor.ratelimiter.operator.RateLimiterOperator;
 import io.swagger.v3.oas.annotations.enums.ParameterIn;
 import io.swagger.v3.oas.annotations.media.Schema;
+import jakarta.validation.constraints.Email;
 import java.security.Principal;
 import java.time.Duration;
 import java.util.Collection;
@@ -58,6 +59,8 @@ import org.springframework.util.Assert;
 import org.springframework.util.CollectionUtils;
 import org.springframework.util.MultiValueMap;
 import org.springframework.util.unit.DataSize;
+import org.springframework.validation.BeanPropertyBindingResult;
+import org.springframework.validation.Validator;
 import org.springframework.web.reactive.function.BodyExtractors;
 import org.springframework.web.reactive.function.server.RouterFunction;
 import org.springframework.web.reactive.function.server.ServerRequest;
@@ -65,7 +68,6 @@ import org.springframework.web.reactive.function.server.ServerResponse;
 import org.springframework.web.server.ServerWebInputException;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
-import reactor.util.function.Tuples;
 import reactor.util.retry.Retry;
 import run.halo.app.core.extension.Role;
 import run.halo.app.core.extension.User;
@@ -84,7 +86,6 @@ import run.halo.app.extension.ReactiveExtensionClient;
 import run.halo.app.extension.router.SortableRequest;
 import run.halo.app.infra.SystemConfigurableEnvironmentFetcher;
 import run.halo.app.infra.SystemSetting;
-import run.halo.app.infra.ValidationUtils;
 import run.halo.app.infra.exception.RateLimitExceededException;
 import run.halo.app.infra.exception.UnsatisfiedAttributeValueException;
 import run.halo.app.infra.utils.JsonUtils;
@@ -104,6 +105,7 @@ public class UserEndpoint implements CustomEndpoint {
     private final EmailVerificationService emailVerificationService;
     private final RateLimiterRegistry rateLimiterRegistry;
     private final SystemConfigurableEnvironmentFetcher environmentFetcher;
+    private final Validator validator;
 
     @Override
     public RouterFunction<ServerResponse> endpoint() {
@@ -280,7 +282,9 @@ public class UserEndpoint implements CustomEndpoint {
             .onErrorMap(RequestNotPermitted.class, RateLimitExceededException::new);
     }
 
-    public record EmailVerifyRequest(@Schema(requiredMode = REQUIRED) String email) {
+    public record EmailVerifyRequest(@Schema(requiredMode = REQUIRED)
+                                     @Email
+                                     String email) {
     }
 
     public record VerifyCodeRequest(
@@ -289,25 +293,23 @@ public class UserEndpoint implements CustomEndpoint {
     }
 
     private Mono<ServerResponse> sendEmailVerificationCode(ServerRequest request) {
-        return request.bodyToMono(EmailVerifyRequest.class)
+        var emailMono = request.bodyToMono(EmailVerifyRequest.class)
             .switchIfEmpty(Mono.error(
                 () -> new ServerWebInputException("Request body is required."))
             )
-            .doOnNext(emailRequest -> {
-                if (!ValidationUtils.isValidEmail(emailRequest.email())) {
-                    throw new ServerWebInputException("Invalid email address.");
+            .doOnNext(emailReq -> {
+                var bindingResult = new BeanPropertyBindingResult(emailReq, "form");
+                validator.validate(emailReq, bindingResult);
+                if (bindingResult.hasErrors()) {
+                    // only email field is validated
+                    throw new ServerWebInputException("validation.error.email.pattern");
                 }
             })
-            .flatMap(emailRequest -> {
-                var email = emailRequest.email();
-                return ReactiveSecurityContextHolder.getContext()
-                    .map(SecurityContext::getAuthentication)
-                    .map(Principal::getName)
-                    .map(username -> Tuples.of(username, email));
-            })
+            .map(EmailVerifyRequest::email);
+        return Mono.zip(emailMono, getAuthenticatedUserName())
             .flatMap(tuple -> {
-                var username = tuple.getT1();
-                var email = tuple.getT2();
+                var email = tuple.getT1();
+                var username = tuple.getT2();
                 return Mono.just(username)
                     .transformDeferred(sendEmailVerificationCodeRateLimiter(username, email))
                     .flatMap(u -> emailVerificationService.sendVerificationCode(username, email))
@@ -346,9 +348,7 @@ public class UserEndpoint implements CustomEndpoint {
         if (!SELF_USER.equals(name)) {
             return client.get(User.class, name);
         }
-        return ReactiveSecurityContextHolder.getContext()
-            .map(SecurityContext::getAuthentication)
-            .map(Authentication::getName)
+        return getAuthenticatedUserName()
             .flatMap(currentUserName -> client.get(User.class, currentUserName));
     }
 
@@ -501,9 +501,7 @@ public class UserEndpoint implements CustomEndpoint {
     }
 
     private Mono<ServerResponse> updateProfile(ServerRequest request) {
-        return ReactiveSecurityContextHolder.getContext()
-            .map(SecurityContext::getAuthentication)
-            .map(Authentication::getName)
+        return getAuthenticatedUserName()
             .flatMap(currentUserName -> client.get(User.class, currentUserName))
             .flatMap(currentUser -> request.bodyToMono(User.class)
                 .filter(user -> user.getMetadata() != null
@@ -536,6 +534,12 @@ public class UserEndpoint implements CustomEndpoint {
             )
             .flatMap(client::update)
             .flatMap(updatedUser -> ServerResponse.ok().bodyValue(updatedUser));
+    }
+
+    private static Mono<String> getAuthenticatedUserName() {
+        return ReactiveSecurityContextHolder.getContext()
+            .map(SecurityContext::getAuthentication)
+            .map(Authentication::getName);
     }
 
     Mono<ServerResponse> changeAnyonePasswordForAdmin(ServerRequest request) {
