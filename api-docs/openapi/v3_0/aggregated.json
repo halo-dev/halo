@@ -2651,30 +2651,6 @@
         ]
       }
     },
-    "/apis/api.console.halo.run/v1alpha1/plugin-presets": {
-      "get": {
-        "description": "List all plugin presets in the system.",
-        "operationId": "ListPluginPresets",
-        "responses": {
-          "default": {
-            "content": {
-              "*/*": {
-                "schema": {
-                  "type": "array",
-                  "items": {
-                    "$ref": "#/components/schemas/Plugin"
-                  }
-                }
-              }
-            },
-            "description": "default response"
-          }
-        },
-        "tags": [
-          "PluginV1alpha1Console"
-        ]
-      }
-    },
     "/apis/api.console.halo.run/v1alpha1/plugins": {
       "get": {
         "description": "List plugins using query criteria and sort params",
@@ -4302,38 +4278,6 @@
               }
             },
             "description": "default response"
-          }
-        },
-        "tags": [
-          "SystemV1alpha1Console"
-        ]
-      }
-    },
-    "/apis/api.console.halo.run/v1alpha1/system/initialize": {
-      "post": {
-        "description": "Initialize system",
-        "operationId": "initialize",
-        "requestBody": {
-          "content": {
-            "*/*": {
-              "schema": {
-                "$ref": "#/components/schemas/SystemInitializationRequest"
-              }
-            }
-          }
-        },
-        "responses": {
-          "201": {
-            "description": "System initialization successfully.",
-            "headers": {
-              "Location": {
-                "description": "Redirect URL.",
-                "schema": {
-                  "type": "string"
-                },
-                "style": "simple"
-              }
-            }
           }
         },
         "tags": [
@@ -14722,6 +14666,41 @@
         ]
       }
     },
+    "/apis/uc.api.auth.halo.run/v1alpha1/user-connections/{registerId}/disconnect": {
+      "put": {
+        "description": "Disconnect my connection from a third-party platform.",
+        "operationId": "DisconnectMyConnection",
+        "parameters": [
+          {
+            "description": "The registration ID of the third-party platform.",
+            "in": "path",
+            "name": "registerId",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "default": {
+            "content": {
+              "*/*": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/UserConnection"
+                  }
+                }
+              }
+            },
+            "description": "default response"
+          }
+        },
+        "tags": [
+          "UserConnectionV1alpha1Uc"
+        ]
+      }
+    },
     "/apis/uc.api.content.halo.run/v1alpha1/posts": {
       "get": {
         "description": "List posts owned by the current user.",
@@ -20712,19 +20691,16 @@
           },
           "visible": {
             "type": "string",
-            "default": "PUBLIC",
             "enum": [
               "PUBLIC",
               "INTERNAL",
               "PRIVATE"
-            ]
+            ],
+            "default": "PUBLIC"
           }
         }
       },
       "PostStatus": {
-        "required": [
-          "phase"
-        ],
         "type": "object",
         "properties": {
           "commentsCount": {
@@ -22560,19 +22536,16 @@
           },
           "visible": {
             "type": "string",
-            "default": "PUBLIC",
             "enum": [
               "PUBLIC",
               "INTERNAL",
               "PRIVATE"
-            ]
+            ],
+            "default": "PUBLIC"
           }
         }
       },
       "SinglePageStatus": {
-        "required": [
-          "phase"
-        ],
         "type": "object",
         "properties": {
           "commentsCount": {
@@ -22971,29 +22944,6 @@
           }
         },
         "description": "The subscriber to be notified"
-      },
-      "SystemInitializationRequest": {
-        "required": [
-          "password",
-          "username"
-        ],
-        "type": "object",
-        "properties": {
-          "email": {
-            "type": "string"
-          },
-          "password": {
-            "minLength": 3,
-            "type": "string"
-          },
-          "siteTitle": {
-            "type": "string"
-          },
-          "username": {
-            "minLength": 1,
-            "type": "string"
-          }
-        }
       },
       "Tag": {
         "required": [

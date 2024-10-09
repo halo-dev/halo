@@ -1,8 +1,6 @@
 import Forbidden from "@/views/exceptions/Forbidden.vue";
 import NotFound from "@/views/exceptions/NotFound.vue";
 import BasicLayout from "@console/layouts/BasicLayout.vue";
-import Setup from "@console/views/system/Setup.vue";
-import SetupInitialData from "@console/views/system/SetupInitialData.vue";
 import type { RouteRecordRaw } from "vue-router";
 
 export const routes: Array<RouteRecordRaw> = [
@@ -21,22 +19,6 @@ export const routes: Array<RouteRecordRaw> = [
         component: Forbidden,
       },
     ],
-  },
-  {
-    path: "/setup",
-    component: Setup,
-    name: "Setup",
-    meta: {
-      title: "core.setup.title",
-    },
-  },
-  {
-    path: "/setup-initial-data",
-    name: "SetupInitialData",
-    component: SetupInitialData,
-    meta: {
-      title: "core.setup.title",
-    },
   },
 ];
 

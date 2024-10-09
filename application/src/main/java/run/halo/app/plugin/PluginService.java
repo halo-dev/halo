@@ -10,15 +10,7 @@ import run.halo.app.core.extension.Plugin;
 
 public interface PluginService {
 
-    Flux<Plugin> getPresets();
-
-    /**
-     * Gets a plugin information by preset name from plugin presets.
-     *
-     * @param presetName is preset name of plugin.
-     * @return plugin preset information.
-     */
-    Mono<Plugin> getPreset(String presetName);
+    Mono<Void> installPresetPlugins();
 
     /**
      * Installs a plugin from a temporary Jar path.

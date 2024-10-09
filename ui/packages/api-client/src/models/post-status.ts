@@ -82,6 +82,6 @@ export interface PostStatus {
      * @type {string}
      * @memberof PostStatus
      */
-    'phase': string;
+    'phase'?: string;
 }
 
