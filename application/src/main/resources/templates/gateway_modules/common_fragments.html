@@ -130,8 +130,10 @@
         <ul class="pill-items">
             <li th:each="method : ${otherMethods}">
                 <a th:href="${method.href}">
-                    <img th:src="${method.logo}" />
-                    <span th:text="${method.name}"></span>
+                    <img th:src="${method.icon}" />
+                    <span
+                        th:text="${#messages.msgOrNull('passwordResetMethods.' + method.name + '.displayName') ?: method.name}"
+                    ></span>
                 </a>
             </li>
         </ul>
