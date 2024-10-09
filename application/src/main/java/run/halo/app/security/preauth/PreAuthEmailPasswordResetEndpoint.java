@@ -33,7 +33,10 @@ import run.halo.app.infra.utils.IpAddressUtils;
  * @since 2.20.0
  */
 @Component
-class PreAuthPasswordResetEndpoint {
+class PreAuthEmailPasswordResetEndpoint {
+
+    private static final String SEND_TEMPLATE = "password-reset/email/send";
+    private static final String RESET_TEMPLATE = "password-reset/email/reset";
 
     private final EmailPasswordRecoveryService emailPasswordRecoveryService;
 
@@ -41,32 +44,44 @@ class PreAuthPasswordResetEndpoint {
 
     private final RateLimiterRegistry rateLimiterRegistry;
 
-    public PreAuthPasswordResetEndpoint(EmailPasswordRecoveryService emailPasswordRecoveryService,
+    private final PasswordResetAvailabilityProviders passwordResetAvailabilityProviders;
+
+    public PreAuthEmailPasswordResetEndpoint(
+        EmailPasswordRecoveryService emailPasswordRecoveryService,
         MessageSource messageSource,
-        RateLimiterRegistry rateLimiterRegistry
+        RateLimiterRegistry rateLimiterRegistry,
+        PasswordResetAvailabilityProviders passwordResetAvailabilityProviders
     ) {
         this.emailPasswordRecoveryService = emailPasswordRecoveryService;
         this.messageSource = messageSource;
         this.rateLimiterRegistry = rateLimiterRegistry;
+        this.passwordResetAvailabilityProviders = passwordResetAvailabilityProviders;
     }
 
     @Bean
     RouterFunction<ServerResponse> preAuthPasswordResetEndpoints() {
-        return RouterFunctions.nest(path("/password-reset"), RouterFunctions.route()
-            .GET("", request -> ServerResponse.ok().render("password-reset"))
+        return RouterFunctions.nest(path("/password-reset/email"), RouterFunctions.route()
+            .GET("", request -> {
+                return ServerResponse.ok().render(SEND_TEMPLATE, Map.of(
+                    "otherMethods",
+                    passwordResetAvailabilityProviders.getOtherAvailableMethods("email")
+                ));
+            })
             .GET("/{resetToken}",
                 request -> {
                     var token = request.pathVariable("resetToken");
                     return emailPasswordRecoveryService.getValidResetToken(token)
                         .flatMap(resetToken -> {
                             // TODO Check the 2FA of the user
-                            return ServerResponse.ok().render("password-reset-link", Map.of(
+                            return ServerResponse.ok().render(RESET_TEMPLATE, Map.of(
                                 "username", resetToken.username()
                             ));
                         })
                         .onErrorResume(InvalidResetTokenException.class,
                             e -> ServerResponse.status(HttpStatus.FOUND)
-                                .location(URI.create("/password-reset"))
+                                .location(
+                                    URI.create("/password-reset/email?error=invalid_reset_token")
+                                )
                                 .build()
                                 .transformDeferred(rateLimiterForPasswordResetVerification(
                                     request.exchange().getRequest()
@@ -94,7 +109,7 @@ class PreAuthPasswordResetEndpoint {
                                 "Password can't be blank",
                                 locale
                             );
-                            return ServerResponse.ok().render("password-reset-link", Map.of(
+                            return ServerResponse.ok().render(RESET_TEMPLATE, Map.of(
                                 "error", error
                             ));
                         }
@@ -105,13 +120,13 @@ class PreAuthPasswordResetEndpoint {
                                 "Password and confirm password mismatch",
                                 locale
                             );
-                            return ServerResponse.ok().render("password-reset-link", Map.of(
+                            return ServerResponse.ok().render(RESET_TEMPLATE, Map.of(
                                 "error", error
                             ));
                         }
                         return emailPasswordRecoveryService.changePassword(password, token)
                             .then(ServerResponse.status(HttpStatus.FOUND)
-                                .location(URI.create("/login?passwordReset"))
+                                .location(URI.create("/login?password_reset"))
                                 .build()
                             )
                             .onErrorResume(InvalidResetTokenException.class, e -> {
@@ -121,7 +136,7 @@ class PreAuthPasswordResetEndpoint {
                                     "Invalid reset token",
                                     locale
                                 );
-                                return ServerResponse.ok().render("password-reset-link", Map.of(
+                                return ServerResponse.ok().render(RESET_TEMPLATE, Map.of(
                                     "error", error
                                 )).transformDeferred(rateLimiterForPasswordResetVerification(
                                     request.exchange().getRequest()
@@ -148,12 +163,12 @@ class PreAuthPasswordResetEndpoint {
                                     "Email can't be blank",
                                     locale
                                 );
-                                return ServerResponse.ok().render("password-reset", Map.of(
+                                return ServerResponse.ok().render(SEND_TEMPLATE, Map.of(
                                     "error", error
                                 ));
                             }
                             return emailPasswordRecoveryService.sendPasswordResetEmail(email)
-                                .then(ServerResponse.ok().render("password-reset", Map.of(
+                                .then(ServerResponse.ok().render(SEND_TEMPLATE, Map.of(
                                     "sent", true
                                 )))
                                 .transformDeferred(rateLimiterForSendPasswordResetEmail(

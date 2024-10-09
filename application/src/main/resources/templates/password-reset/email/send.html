@@ -11,6 +11,10 @@
                 <form th:replace="~{gateway_modules/form_fragments::passwordReset}"></form>
             </div>
 
+            <div th:each="method : ${otherMethods}">
+                <span th:text="${method.name}"></span>
+            </div>
+
             <div th:replace="~{gateway_modules/common_fragments::languageSwitcher}"></div>
         </div>
     </th:block>
