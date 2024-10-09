@@ -13,12 +13,14 @@
         document.addEventListener("DOMContentLoaded", function () {
             const loginForm = document.getElementById("login-form");
             loginForm.addEventListener("submit", function (event) {
+                const plainPasswordInput = document.getElementById("plainPassword");
                 const passwordInput = document.getElementById("password");
-                const password = passwordInput.value;
-                passwordInput.value = encryptPassword(password);
+                passwordInput.value = encryptPassword(plainPasswordInput.value);
             });
         });
     </script>
+
+    <input type="hidden" name="password" id="password" />
 
     <div class="form-item">
         <label for="username" th:text="#{form.username.label}"> </label>
@@ -50,7 +52,7 @@
         </div>
 
         <th:block
-            th:replace="~{gateway_modules/input_fragments :: password(id = 'password', name = 'password', required = 'true', minlength = null, enableToggle = true)}"
+            th:replace="~{gateway_modules/input_fragments :: password(id = 'plainPassword', name = null, required = 'true', minlength = null, enableToggle = true)}"
         ></th:block>
     </div>
 </div>
