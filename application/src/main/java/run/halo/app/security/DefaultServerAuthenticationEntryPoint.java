@@ -10,6 +10,7 @@ import org.springframework.security.web.server.util.matcher.ServerWebExchangeMat
 import org.springframework.security.web.server.util.matcher.ServerWebExchangeMatcher.MatchResult;
 import org.springframework.web.server.ServerWebExchange;
 import reactor.core.publisher.Mono;
+import run.halo.app.infra.utils.HaloUtils;
 
 /**
  * Default authentication entry point.
@@ -22,8 +23,7 @@ import reactor.core.publisher.Mono;
 public class DefaultServerAuthenticationEntryPoint implements ServerAuthenticationEntryPoint {
 
     private final ServerWebExchangeMatcher xhrMatcher = exchange -> {
-        if (exchange.getRequest().getHeaders().getOrEmpty("X-Requested-With")
-            .contains("XMLHttpRequest")) {
+        if (HaloUtils.isXhr(exchange.getRequest().getHeaders())) {
             return MatchResult.match();
         }
         return MatchResult.notMatch();

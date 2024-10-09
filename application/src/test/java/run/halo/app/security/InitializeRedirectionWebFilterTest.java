@@ -2,6 +2,7 @@ package run.halo.app.security;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.lenient;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
@@ -14,6 +15,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.http.MediaType;
 import org.springframework.mock.http.server.reactive.MockServerHttpRequest;
 import org.springframework.mock.web.server.MockServerWebExchange;
 import org.springframework.security.web.server.ServerRedirectStrategy;
@@ -50,49 +52,57 @@ class InitializeRedirectionWebFilterTest {
         when(initializationStateGetter.userInitialized()).thenReturn(Mono.just(false));
 
         WebFilterChain chain = mock(WebFilterChain.class);
+        var paths = new String[] {"/", "/console/test", "/uc/test", "/login", "/signup"};
+        for (String path : paths) {
+            MockServerHttpRequest request = MockServerHttpRequest.get(path)
+                .accept(MediaType.TEXT_HTML).build();
+            MockServerWebExchange exchange = MockServerWebExchange.from(request);
 
-        MockServerHttpRequest request = MockServerHttpRequest.get("/").build();
-        MockServerWebExchange exchange = MockServerWebExchange.from(request);
+            when(serverRedirectStrategy.sendRedirect(any(), any())).thenReturn(Mono.empty().then());
 
-        when(serverRedirectStrategy.sendRedirect(any(), any())).thenReturn(Mono.empty().then());
+            Mono<Void> result = filter.filter(exchange, chain);
 
-        Mono<Void> result = filter.filter(exchange, chain);
+            StepVerifier.create(result)
+                .expectNextCount(0)
+                .expectComplete()
+                .verify();
 
-        StepVerifier.create(result)
-            .expectNextCount(0)
-            .expectComplete()
-            .verify();
-
-        verify(serverRedirectStrategy).sendRedirect(eq(exchange), eq(URI.create("/console")));
-        verify(chain, never()).filter(eq(exchange));
+            verify(serverRedirectStrategy).sendRedirect(eq(exchange),
+                eq(URI.create("/system/setup")));
+            verify(chain, never()).filter(eq(exchange));
+        }
     }
 
     @Test
     void shouldNotRedirectWhenSystemInitialized() {
-        when(initializationStateGetter.userInitialized()).thenReturn(Mono.just(true));
+        lenient().when(initializationStateGetter.userInitialized()).thenReturn(Mono.just(true));
 
         WebFilterChain chain = mock(WebFilterChain.class);
 
-        MockServerHttpRequest request = MockServerHttpRequest.get("/").build();
-        MockServerWebExchange exchange = MockServerWebExchange.from(request);
-        when(chain.filter(any())).thenReturn(Mono.empty().then());
-        Mono<Void> result = filter.filter(exchange, chain);
+        var paths = new String[] {"/test", "/apis/test", "system/setup", "/logout"};
+        for (String path : paths) {
+            MockServerHttpRequest request = MockServerHttpRequest.get(path)
+                .accept(MediaType.TEXT_HTML).build();
+            MockServerWebExchange exchange = MockServerWebExchange.from(request);
+            when(chain.filter(any())).thenReturn(Mono.empty().then());
+            Mono<Void> result = filter.filter(exchange, chain);
 
-        StepVerifier.create(result)
-            .expectNextCount(0)
-            .expectComplete()
-            .verify();
+            StepVerifier.create(result)
+                .expectNextCount(0)
+                .expectComplete()
+                .verify();
 
-        verify(serverRedirectStrategy, never()).sendRedirect(eq(exchange),
-            eq(URI.create("/console")));
-        verify(chain).filter(eq(exchange));
+            verify(serverRedirectStrategy, never()).sendRedirect(eq(exchange), any());
+            verify(chain).filter(eq(exchange));
+        }
     }
 
     @Test
-    void shouldNotRedirectWhenNotHomePage() {
+    void shouldNotRedirectTest() {
         WebFilterChain chain = mock(WebFilterChain.class);
 
-        MockServerHttpRequest request = MockServerHttpRequest.get("/test").build();
+        MockServerHttpRequest request = MockServerHttpRequest.get("/test")
+            .accept(MediaType.TEXT_HTML).build();
         MockServerWebExchange exchange = MockServerWebExchange.from(request);
         when(chain.filter(any())).thenReturn(Mono.empty().then());
         Mono<Void> result = filter.filter(exchange, chain);
@@ -102,8 +112,7 @@ class InitializeRedirectionWebFilterTest {
             .expectComplete()
             .verify();
 
-        verify(serverRedirectStrategy, never()).sendRedirect(eq(exchange),
-            eq(URI.create("/console")));
+        verify(serverRedirectStrategy, never()).sendRedirect(eq(exchange), any());
         verify(chain).filter(eq(exchange));
     }
 }

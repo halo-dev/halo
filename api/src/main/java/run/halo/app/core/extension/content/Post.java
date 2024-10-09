@@ -157,7 +157,6 @@ public class Post extends AbstractExtension {
 
     @Data
     public static class PostStatus {
-        @Schema(requiredMode = RequiredMode.REQUIRED)
         private String phase;
 
         @Schema

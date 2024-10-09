@@ -5,6 +5,7 @@ import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
 import java.time.Instant;
 import java.time.ZoneId;
+import lombok.experimental.UtilityClass;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.core.io.ClassPathResource;
@@ -14,11 +15,21 @@ import org.springframework.util.StreamUtils;
 import org.springframework.web.reactive.function.server.ServerRequest;
 
 /**
+ * Halo utilities.
+ *
  * @author guqing
- * @date 2022-04-12
+ * @since 2.0.0
  */
 @Slf4j
+@UtilityClass
 public class HaloUtils {
+
+    /**
+     * Check if the request is an XMLHttpRequest.
+     */
+    public static boolean isXhr(HttpHeaders headers) {
+        return headers.getOrEmpty("X-Requested-With").contains("XMLHttpRequest");
+    }
 
     /**
      * <p>Read the file under the classpath as a string.</p>
@@ -51,7 +62,7 @@ public class HaloUtils {
             // https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Sec-CH-UA
             userAgent = httpHeaders.getFirst("Sec-CH-UA");
         }
-        return StringUtils.defaultString(userAgent, "unknown");
+        return StringUtils.defaultIfBlank(userAgent, "unknown");
     }
 
     public static String getDayText(Instant instant) {
