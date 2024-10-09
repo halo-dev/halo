@@ -1,4 +1,4 @@
-package run.halo.app.core.endpoint;
+package run.halo.app.core.endpoint.console;
 
 import static org.springdoc.core.fn.builders.apiresponse.Builder.responseBuilder;
 import static org.springdoc.core.fn.builders.content.Builder.contentBuilder;

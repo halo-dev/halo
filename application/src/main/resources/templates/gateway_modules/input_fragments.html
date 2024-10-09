@@ -1,4 +1,4 @@
-<div th:remove="tag" th:fragment="password(id,name,required,minlength,enableToggle)">
+<div th:remove="tag" th:fragment="password(id,name,required,minlength,maxlength,enableToggle)">
     <div class="form-input" th:classappend="${enableToggle ? 'form-input-stack toggle-password-display-flag' : ''}">
         <input
             th:id="${id}"
@@ -10,6 +10,7 @@
             autocapitalize="off"
             th:required="${required}"
             th:minlength="${minlength}"
+            th:maxlength="${maxlength}"
         />
 
         <div th:if="${enableToggle}" class="form-input-stack-icon toggle-password-button">

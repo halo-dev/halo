@@ -217,7 +217,6 @@ export * from './subscription';
 export * from './subscription-list';
 export * from './subscription-spec';
 export * from './subscription-subscriber';
-export * from './system-initialization-request';
 export * from './tag';
 export * from './tag-list';
 export * from './tag-spec';

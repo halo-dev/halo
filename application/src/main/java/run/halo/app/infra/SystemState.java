@@ -3,11 +3,19 @@ package run.halo.app.infra;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.github.fge.jsonpatch.JsonPatchException;
 import com.github.fge.jsonpatch.mergepatch.JsonMergePatch;
+import java.time.Duration;
+import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.Map;
+import java.util.function.Consumer;
 import lombok.Data;
+import org.springframework.dao.OptimisticLockingFailureException;
 import org.springframework.lang.NonNull;
+import reactor.core.publisher.Mono;
+import reactor.util.retry.Retry;
 import run.halo.app.extension.ConfigMap;
+import run.halo.app.extension.Metadata;
+import run.halo.app.extension.ReactiveExtensionClient;
 import run.halo.app.infra.utils.JsonParseException;
 import run.halo.app.infra.utils.JsonUtils;
 
@@ -66,6 +74,33 @@ public class SystemState {
         } catch (JsonPatchException e) {
             throw new JsonParseException(e);
         }
+    }
+
+    /**
+     * <p>Update system state by the given {@link Consumer}.</p>
+     * <p>if the system state config map does not exist, it will create a new one.</p>
+     */
+    public static Mono<Void> upsetSystemState(ReactiveExtensionClient client,
+        Consumer<SystemState> consumer) {
+        return Mono.defer(() -> client.fetch(ConfigMap.class, SYSTEM_STATES_CONFIGMAP)
+                .switchIfEmpty(Mono.defer(() -> {
+                    ConfigMap configMap = new ConfigMap();
+                    configMap.setMetadata(new Metadata());
+                    configMap.getMetadata().setName(SYSTEM_STATES_CONFIGMAP);
+                    configMap.setData(new HashMap<>());
+                    return client.create(configMap);
+                }))
+                .flatMap(configMap -> {
+                    SystemState systemState = deserialize(configMap);
+                    consumer.accept(systemState);
+                    update(systemState, configMap);
+                    return client.update(configMap);
+                })
+            )
+            .retryWhen(Retry.backoff(5, Duration.ofMillis(100))
+                .filter(OptimisticLockingFailureException.class::isInstance)
+            )
+            .then();
     }
 
     private static String emptyJsonObject() {

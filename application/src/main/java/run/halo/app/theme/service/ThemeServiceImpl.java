@@ -8,6 +8,8 @@ import static run.halo.app.theme.service.ThemeUtils.loadThemeManifest;
 import static run.halo.app.theme.service.ThemeUtils.locateThemeManifest;
 import static run.halo.app.theme.service.ThemeUtils.unzipThemeTo;
 
+import java.io.IOException;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.time.Duration;
 import java.util.HashMap;
@@ -18,11 +20,17 @@ import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.reactivestreams.Publisher;
+import org.springframework.core.io.FileSystemResource;
+import org.springframework.core.io.UrlResource;
 import org.springframework.core.io.buffer.DataBuffer;
+import org.springframework.core.io.buffer.DataBufferUtils;
+import org.springframework.core.io.buffer.DefaultDataBufferFactory;
 import org.springframework.dao.OptimisticLockingFailureException;
 import org.springframework.retry.RetryException;
 import org.springframework.stereotype.Service;
 import org.springframework.util.Assert;
+import org.springframework.util.ResourceUtils;
+import org.springframework.util.StreamUtils;
 import org.springframework.web.server.ServerErrorException;
 import org.springframework.web.server.ServerWebInputException;
 import reactor.core.publisher.Flux;
@@ -41,6 +49,8 @@ import run.halo.app.infra.SystemVersionSupplier;
 import run.halo.app.infra.ThemeRootGetter;
 import run.halo.app.infra.exception.ThemeUpgradeException;
 import run.halo.app.infra.exception.UnsatisfiedAttributeValueException;
+import run.halo.app.infra.properties.HaloProperties;
+import run.halo.app.infra.utils.FileUtils;
 import run.halo.app.infra.utils.SettingUtils;
 import run.halo.app.infra.utils.VersionUtils;
 
@@ -53,9 +63,47 @@ public class ThemeServiceImpl implements ThemeService {
 
     private final ThemeRootGetter themeRoot;
 
+    private final HaloProperties haloProperties;
+
     private final SystemVersionSupplier systemVersionSupplier;
 
     private final Scheduler scheduler = Schedulers.boundedElastic();
+
+    @Override
+    public Mono<Void> installPresetTheme() {
+        var themeProps = haloProperties.getTheme();
+        var location = themeProps.getInitializer().getLocation();
+        return createThemeTempPath()
+            .flatMap(tempPath -> Mono.usingWhen(copyPresetThemeToPath(location, tempPath),
+                path -> {
+                    var content = DataBufferUtils.read(new FileSystemResource(path),
+                        DefaultDataBufferFactory.sharedInstance,
+                        StreamUtils.BUFFER_SIZE);
+                    return install(content);
+                }, path -> deleteRecursivelyAndSilently(tempPath, scheduler)
+            ))
+            .onErrorResume(IOException.class, e -> {
+                log.warn("Failed to initialize theme from {}", location, e);
+                return Mono.empty();
+            })
+            .then();
+    }
+
+    private Mono<Path> copyPresetThemeToPath(String location, Path tempDir) {
+        return Mono.fromCallable(
+            () -> {
+                var themeUrl = ResourceUtils.getURL(location);
+                var resource = new UrlResource(themeUrl);
+                var tempThemePath = tempDir.resolve("theme.zip");
+                FileUtils.copyResource(resource, tempThemePath);
+                return tempThemePath;
+            });
+    }
+
+    private static Mono<Path> createThemeTempPath() {
+        return Mono.fromCallable(() -> Files.createTempDirectory("halo-theme-preset"))
+            .subscribeOn(Schedulers.boundedElastic());
+    }
 
     @Override
     public Mono<Theme> install(Publisher<DataBuffer> content) {

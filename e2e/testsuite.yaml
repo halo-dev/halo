@@ -8,22 +8,18 @@ param:
   notificationName: "{{randAlpha 6}}"
   auth: "Basic YWRtaW46MTIzNDU2"
 items:
-- name: init
+- name: setup
   request:
-    api: /api.console.halo.run/v1alpha1/system/initialize
+    api: |
+      {{default "http://halo:8090" (env "SERVER")}}/system/setup
     method: POST
     header:
-      Content-Type: application/json
+      Content-Type: application/x-www-form-urlencoded
+      Accept: application/json
     body: |
-      {
-        "siteTitle": "testing",
-        "username": "admin",
-        "password": "123456",
-        "email": "testing@halo.com",
-        "password_confirm": "123456"
-      }
+      siteTitle=testing&username={{.param.userName}}&password=123456&email=testing@halo.run
   expect:
-    statusCode: 201
+    statusCode: 204
 - name: createPost
   request:
     api: /api.console.halo.run/v1alpha1/posts

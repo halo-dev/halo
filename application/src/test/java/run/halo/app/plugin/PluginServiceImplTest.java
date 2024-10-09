@@ -77,33 +77,6 @@ class PluginServiceImplTest {
     @InjectMocks
     PluginServiceImpl pluginService;
 
-    @Test
-    void getPresetsTest() {
-        var presets = pluginService.getPresets();
-        StepVerifier.create(presets)
-            .assertNext(plugin -> {
-                assertEquals("fake-plugin", plugin.getMetadata().getName());
-                assertEquals("0.0.2", plugin.getSpec().getVersion());
-                assertEquals(Plugin.Phase.PENDING, plugin.getStatus().getPhase());
-            })
-            .verifyComplete();
-    }
-
-    @Test
-    void getPresetIfNotFound() {
-        var plugin = pluginService.getPreset("not-found-plugin");
-        StepVerifier.create(plugin)
-            .verifyComplete();
-    }
-
-    @Test
-    void getPresetIfFound() {
-        var plugin = pluginService.getPreset("fake-plugin");
-        StepVerifier.create(plugin)
-            .expectNextCount(1)
-            .verifyComplete();
-    }
-
     @Nested
     class InstallUpdateReloadTest {
 

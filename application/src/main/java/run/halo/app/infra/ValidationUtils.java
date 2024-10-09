@@ -6,8 +6,14 @@ import org.apache.commons.lang3.StringUtils;
 
 @UtilityClass
 public class ValidationUtils {
-    public static final Pattern NAME_PATTERN =
-        Pattern.compile("^[a-z0-9]([-a-z0-9]*[a-z0-9])?(\\.[a-z0-9]([-a-z0-9]*[a-z0-9])?)*$");
+    public static final String NAME_REGEX =
+        "^[a-z0-9]([-a-z0-9]*[a-z0-9])?(\\.[a-z0-9]([-a-z0-9]*[a-z0-9])?)*$";
+    public static final Pattern NAME_PATTERN = Pattern.compile(NAME_REGEX);
+
+    /**
+     * No Chinese, no spaces.
+     */
+    public static final String PASSWORD_REGEX = "^(?!.*[\\u4e00-\\u9fa5])(?=\\S+$).+$";
 
     public static final String EMAIL_REGEX =
         "^[a-zA-Z0-9_+&*-]+(?:\\.[a-zA-Z0-9_+&*-]+)*@(?:[a-zA-Z0-9-]+\\.)+[a-zA-Z]{2,7}$";

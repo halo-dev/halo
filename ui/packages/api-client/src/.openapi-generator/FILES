@@ -76,6 +76,7 @@ api/thumbnail-v1alpha1-api.ts
 api/thumbnail-v1alpha1-public-api.ts
 api/two-factor-auth-v1alpha1-uc-api.ts
 api/user-connection-v1alpha1-api.ts
+api/user-connection-v1alpha1-uc-api.ts
 api/user-v1alpha1-api.ts
 api/user-v1alpha1-console-api.ts
 base.ts
@@ -303,7 +304,6 @@ models/subscription-list.ts
 models/subscription-spec.ts
 models/subscription-subscriber.ts
 models/subscription.ts
-models/system-initialization-request.ts
 models/tag-list.ts
 models/tag-spec.ts
 models/tag-status.ts

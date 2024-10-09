@@ -1104,25 +1104,6 @@ core:
       message: Acceso no autorizado a esta página
     actions:
       home: Ir a la página de inicio
-  setup:
-    title: Configuración
-    operations:
-      submit:
-        button: Configurar
-        toast_success: Configuración exitosa
-      setup_initial_data:
-        loading: Inicializando datos, por favor espera...
-    fields:
-      site_title:
-        label: Título del Sitio
-      email:
-        label: Correo Electrónico
-      username:
-        label: Nombre de Usuario
-      password:
-        label: Contraseña
-      confirm_password:
-        label: Confirmar Contraseña
   rbac:
     Attachments Management: Gestión de archivos adjuntos
     Attachment Manage: Gestor de adjuntos
