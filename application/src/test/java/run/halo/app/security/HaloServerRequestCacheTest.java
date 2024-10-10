@@ -33,23 +33,28 @@ class HaloServerRequestCacheTest {
     @Test
     void shouldSaveIfPageCacheable() {
         var mockExchange = MockServerWebExchange.from(
-            MockServerHttpRequest.get("/archives").accept(MediaType.TEXT_HTML)
+            MockServerHttpRequest.get("/archives")
+                .queryParam("q", "v")
+                .accept(MediaType.TEXT_HTML)
         );
         requestCache.saveRequest(mockExchange)
             .then(requestCache.getRedirectUri(mockExchange))
             .as(StepVerifier::create)
-            .expectNext(URI.create("/archives"))
+            .expectNext(URI.create("/archives?q=v"))
             .verifyComplete();
     }
 
     @Test
-    void shouldSaveIfQueryPresent() {
-        var mockExchange =
-            MockServerWebExchange.from(MockServerHttpRequest.get("/login?redirect_uri=/halo?q=v"));
+    void shouldSaveIfRedirectUriPresent() {
+        var mockExchange = MockServerWebExchange.from(
+            MockServerHttpRequest.get("/login")
+                .queryParam("redirect_uri", "/halo?q=v#fragment")
+        );
         requestCache.saveRequest(mockExchange)
             .then(requestCache.getRedirectUri(mockExchange))
             .as(StepVerifier::create)
-            .expectNext(URI.create("/halo?q=v"));
+            .expectNext(URI.create("/halo?q=v#fragment"))
+            .verifyComplete();
     }
 
     @Test

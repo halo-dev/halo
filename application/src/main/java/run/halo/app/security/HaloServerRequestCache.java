@@ -44,6 +44,7 @@ public class HaloServerRequestCache extends WebSessionServerRequestCache {
     public Mono<Void> saveRequest(ServerWebExchange exchange) {
         var redirectUriQuery = exchange.getRequest().getQueryParams().getFirst(REDIRECT_URI_QUERY);
         if (StringUtils.isNotBlank(redirectUriQuery)) {
+            // the query value is decoded, so we don't need to decode it again
             var redirectUri = URI.create(redirectUriQuery);
             return saveRedirectUri(exchange, redirectUri);
         }
@@ -64,8 +65,11 @@ public class HaloServerRequestCache extends WebSessionServerRequestCache {
         var requestPath = exchange.getRequest().getPath();
         var redirectPath = RequestPath.parse(redirectUri, requestPath.contextPath().value());
         var query = redirectUri.getRawQuery();
-        var finalRedirect =
-            redirectPath.pathWithinApplication() + (query == null ? "" : "?" + query);
+        var fragment = redirectUri.getRawFragment();
+        var finalRedirect = redirectPath.pathWithinApplication()
+            + (query == null ? "" : "?" + query)
+            + (fragment == null ? "" : "#" + fragment);
+
         return exchange.getSession()
             .map(WebSession::getAttributes)
             .doOnNext(attributes -> attributes.put(this.sessionAttrName, finalRedirect))
