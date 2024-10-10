@@ -151,3 +151,19 @@ document.addEventListener("DOMContentLoaded", () => {
         }
     });
 });
+
+function setupPasswordConfirmation(passwordId, confirmPasswordId) {
+    const password = document.getElementById(passwordId);
+    const confirmPassword = document.getElementById(confirmPasswordId);
+
+    function validatePasswordMatch() {
+        if (password.value !== confirmPassword.value) {
+            confirmPassword.setCustomValidity(i18nResources.passwordConfirmationFailed);
+        } else {
+            confirmPassword.setCustomValidity("");
+        }
+    }
+
+    password.addEventListener("change", validatePasswordMatch);
+    confirmPassword.addEventListener("input", validatePasswordMatch);
+}
