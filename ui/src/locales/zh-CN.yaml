@@ -1063,6 +1063,12 @@ core:
         title: 停用认证方式
       disable_privileged:
         tooltip: 系统保留的认证方式，无法禁用
+    list:
+      fields:
+        display_name:
+          local: 账号密码登录
+        description:
+          local: Halo 内置的默认登录方式
     detail:
       title: 身份认证详情
       fields:
