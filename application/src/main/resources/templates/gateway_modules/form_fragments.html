@@ -153,19 +153,7 @@
 
     <script th:inline="javascript">
         document.addEventListener("DOMContentLoaded", function () {
-            var password = document.getElementById("password"),
-                confirm_password = document.getElementById("confirmPassword");
-
-            function validatePassword() {
-                if (password.value != confirm_password.value) {
-                    confirm_password.setCustomValidity("Passwords Don't Match");
-                } else {
-                    confirm_password.setCustomValidity("");
-                }
-            }
-
-            password.onchange = validatePassword;
-            confirm_password.onkeyup = validatePassword;
+            setupPasswordConfirmation("password", "confirmPassword");
         });
     </script>
 
@@ -269,6 +257,12 @@
     <div class="form-item">
         <button type="submit" th:text="#{form.passwordResetLink.submit}"></button>
     </div>
+
+    <script th:inline="javascript">
+        document.addEventListener("DOMContentLoaded", function () {
+            setupPasswordConfirmation("password", "confirmPassword");
+        });
+    </script>
 </form>
 
 <th:block th:fragment="passwordReset">
