@@ -1040,6 +1040,12 @@ core:
         title: 停用認證方式
       disable_privileged:
         tooltip: 系統保留的認證方式，無法禁用
+    list:
+      fields:
+        display_name:
+          local: 帳號密碼登入
+        description:
+          local: Halo 內建的默認登入方式
     detail:
       title: 身份認證詳情
       fields:
