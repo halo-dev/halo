@@ -1,13 +1,13 @@
 <!doctype html>
 <html
     xmlns:th="https://www.thymeleaf.org"
-    th:replace="~{gateway_modules/layout:: layout(title = |#{title} - ${site.title}|, head = null, body = ~{::body})}"
+    th:replace="~{gateway_fragments/layout:: layout(title = |#{title} - ${site.title}|, head = null, body = ~{::body})}"
 >
     <th:block th:fragment="body">
         <div class="gateway-wrapper">
             <div class="halo-form-wrapper">
                 <h1 class="form-title" th:text="#{form.title}"></h1>
-                <form th:replace="~{gateway_modules/form_fragments::logout}"></form>
+                <form th:replace="~{gateway_fragments/logout::form}"></form>
             </div>
         </div>
     </th:block>

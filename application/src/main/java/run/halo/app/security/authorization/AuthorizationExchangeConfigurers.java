@@ -59,8 +59,7 @@ class AuthorizationExchangeConfigurers {
             "/login/**",
             "/challenges/**",
             "/password-reset/**",
-            "/signup",
-            "/logout"
+            "/signup"
         ).permitAll());
     }
 
@@ -69,7 +68,11 @@ class AuthorizationExchangeConfigurers {
     SecurityConfigurer authenticatedAuthorizationConfigurer() {
         // Anonymous user is not allowed
         return http -> http.authorizeExchange(
-            spec -> spec.pathMatchers("/console/**", "/uc/**").authenticated()
+            spec -> spec.pathMatchers(
+                "/console/**",
+                "/uc/**",
+                "/logout"
+            ).authenticated()
         );
     }
 
