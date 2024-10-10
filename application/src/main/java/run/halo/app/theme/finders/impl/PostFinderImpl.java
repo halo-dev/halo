@@ -20,6 +20,7 @@ import org.springframework.lang.NonNull;
 import org.springframework.util.Assert;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
+import reactor.core.scheduler.Schedulers;
 import run.halo.app.content.CategoryService;
 import run.halo.app.core.extension.content.Category;
 import run.halo.app.core.extension.content.Post;
@@ -134,13 +135,20 @@ public class PostFinderImpl implements PostFinder {
                 var previousNextPair = findPostNavigation(postNames, currentName);
                 String previousPostName = previousNextPair.prev();
                 String nextPostName = previousNextPair.next();
+
                 var builder = NavigationPostVo.builder();
                 var currentMono = getByName(currentName)
-                    .doOnNext(builder::current);
+                    .doOnNext(builder::current)
+                    .subscribeOn(Schedulers.boundedElastic());
+
                 var prevMono = fetchByName(previousPostName)
-                    .doOnNext(builder::previous);
+                    .doOnNext(builder::previous)
+                    .subscribeOn(Schedulers.boundedElastic());
+
                 var nextMono = fetchByName(nextPostName)
-                    .doOnNext(builder::next);
+                    .doOnNext(builder::next)
+                    .subscribeOn(Schedulers.boundedElastic());
+
                 return Mono.when(currentMono, prevMono, nextMono)
                     .then(Mono.fromSupplier(builder::build));
             })

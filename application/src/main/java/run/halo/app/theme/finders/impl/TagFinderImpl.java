@@ -47,6 +47,9 @@ public class TagFinderImpl implements TagFinder {
 
     @Override
     public Flux<TagVo> getByNames(List<String> names) {
+        if (CollectionUtils.isEmpty(names)) {
+            return Flux.empty();
+        }
         return Flux.fromIterable(names)
             .concatMap(this::getByName);
     }

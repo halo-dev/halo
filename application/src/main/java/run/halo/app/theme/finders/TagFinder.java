@@ -20,7 +20,7 @@ public interface TagFinder {
 
     Mono<TagVo> getByName(String name);
 
-    Flux<TagVo> getByNames(List<String> names);
+    Flux<TagVo> getByNames(@Nullable List<String> names);
 
     Mono<ListResult<TagVo>> list(@Nullable Integer page, @Nullable Integer size);
 
