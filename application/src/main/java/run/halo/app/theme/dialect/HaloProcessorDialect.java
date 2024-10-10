@@ -41,6 +41,7 @@ public class HaloProcessorDialect extends AbstractProcessorDialect
         processors.add(new EvaluationContextEnhancer());
         processors.add(new CommentElementTagProcessor(dialectPrefix));
         processors.add(new CommentEnabledVariableProcessor());
+        processors.add(new InjectionExcluderProcessor());
         return processors;
     }
 

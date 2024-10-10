@@ -48,6 +48,10 @@ public class TemplateFooterElementTagProcessor extends AbstractElementTagProcess
     protected void doProcess(ITemplateContext context, IProcessableElementTag tag,
         IElementTagStructureHandler structureHandler) {
 
+        if (context.containsVariable(InjectionExcluderProcessor.EXCLUDE_INJECTION_VARIABLE)) {
+            return;
+        }
+
         IModel modelToInsert = context.getModelFactory().createModel();
         /*
          * Obtain the Spring application context.
