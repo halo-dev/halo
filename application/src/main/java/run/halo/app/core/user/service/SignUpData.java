@@ -6,6 +6,7 @@ import jakarta.validation.ConstraintValidatorContext;
 import jakarta.validation.Payload;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Pattern;
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
@@ -15,6 +16,7 @@ import java.util.Optional;
 import lombok.Data;
 import org.springframework.util.MultiValueMap;
 import org.springframework.util.StringUtils;
+import run.halo.app.infra.ValidationUtils;
 
 /**
  * Sign up data.
@@ -27,6 +29,8 @@ import org.springframework.util.StringUtils;
 public class SignUpData {
 
     @NotBlank
+    @Pattern(regexp = ValidationUtils.NAME_REGEX,
+        message = "{validation.error.username.pattern}")
     private String username;
 
     @NotBlank
@@ -38,6 +42,8 @@ public class SignUpData {
     private String emailCode;
 
     @NotBlank
+    @Pattern(regexp = ValidationUtils.PASSWORD_REGEX,
+        message = "{validation.error.password.pattern}")
     private String password;
 
     @NotBlank
@@ -79,9 +85,9 @@ public class SignUpData {
 
         String message() default "";
 
-        Class<?>[] groups() default { };
+        Class<?>[] groups() default {};
 
-        Class<? extends Payload>[] payload() default { };
+        Class<? extends Payload>[] payload() default {};
 
     }
 

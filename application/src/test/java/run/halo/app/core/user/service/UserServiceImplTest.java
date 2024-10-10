@@ -44,6 +44,7 @@ import run.halo.app.extension.exception.ExtensionNotFoundException;
 import run.halo.app.infra.SystemConfigurableEnvironmentFetcher;
 import run.halo.app.infra.SystemSetting;
 import run.halo.app.infra.exception.DuplicateNameException;
+import run.halo.app.infra.exception.UnsatisfiedAttributeValueException;
 import run.halo.app.infra.exception.UserNotFoundException;
 
 @ExtendWith(MockitoExtension.class)
@@ -116,25 +117,25 @@ class UserServiceImplTest {
 
         @Test
         void shouldUpdatePasswordWithDifferentPassword() {
-            var oldUser = createUser("fake-password");
-            var newUser = createUser("new-password");
+            var oldUser = createUser("fake@password");
+            var newUser = createUser("new@password");
 
             when(client.get(User.class, "fake-user")).thenReturn(
                 Mono.just(oldUser));
             when(client.update(eq(oldUser))).thenReturn(Mono.just(newUser));
-            when(passwordEncoder.matches("new-password", "fake-password")).thenReturn(false);
-            when(passwordEncoder.encode("new-password")).thenReturn("encoded-new-password");
+            when(passwordEncoder.matches("new@password", "fake@password")).thenReturn(false);
+            when(passwordEncoder.encode("new@password")).thenReturn("encoded@new@password");
 
-            StepVerifier.create(userService.updateWithRawPassword("fake-user", "new-password"))
+            StepVerifier.create(userService.updateWithRawPassword("fake-user", "new@password"))
                 .expectNext(newUser)
                 .verifyComplete();
 
-            verify(passwordEncoder).matches("new-password", "fake-password");
-            verify(passwordEncoder).encode("new-password");
+            verify(passwordEncoder).matches("new@password", "fake@password");
+            verify(passwordEncoder).encode("new@password");
             verify(client).get(User.class, "fake-user");
             verify(client).update(argThat(extension -> {
                 var user = (User) extension;
-                return "encoded-new-password".equals(user.getSpec().getPassword());
+                return "encoded@new@password".equals(user.getSpec().getPassword());
             }));
             verify(eventPublisher).publishEvent(any(PasswordChangedEvent.class));
         }
@@ -142,21 +143,21 @@ class UserServiceImplTest {
         @Test
         void shouldUpdatePasswordIfNoPasswordBefore() {
             var oldUser = createUser(null);
-            var newUser = createUser("new-password");
+            var newUser = createUser("new@password");
 
             when(client.get(User.class, "fake-user")).thenReturn(Mono.just(oldUser));
             when(client.update(oldUser)).thenReturn(Mono.just(newUser));
-            when(passwordEncoder.encode("new-password")).thenReturn("encoded-new-password");
+            when(passwordEncoder.encode("new@password")).thenReturn("encoded@new@password");
 
-            StepVerifier.create(userService.updateWithRawPassword("fake-user", "new-password"))
+            StepVerifier.create(userService.updateWithRawPassword("fake-user", "new@password"))
                 .expectNext(newUser)
                 .verifyComplete();
 
-            verify(passwordEncoder, never()).matches("new-password", null);
-            verify(passwordEncoder).encode("new-password");
+            verify(passwordEncoder, never()).matches("new@password", null);
+            verify(passwordEncoder).encode("new@password");
             verify(client).update(argThat(extension -> {
                 var user = (User) extension;
-                return "encoded-new-password".equals(user.getSpec().getPassword());
+                return "encoded@new@password".equals(user.getSpec().getPassword());
             }));
             verify(client).get(User.class, "fake-user");
             verify(eventPublisher).publishEvent(any(PasswordChangedEvent.class));
@@ -166,16 +167,16 @@ class UserServiceImplTest {
         void shouldDoNothingIfPasswordNotChanged() {
             userService = spy(userService);
 
-            var oldUser = createUser("fake-password");
-            var newUser = createUser("new-password");
+            var oldUser = createUser("fake@password");
+            var newUser = createUser("new@password");
             when(client.get(User.class, "fake-user")).thenReturn(Mono.just(oldUser));
-            when(passwordEncoder.matches("fake-password", "fake-password")).thenReturn(true);
+            when(passwordEncoder.matches("fake@password", "fake@password")).thenReturn(true);
 
-            StepVerifier.create(userService.updateWithRawPassword("fake-user", "fake-password"))
+            StepVerifier.create(userService.updateWithRawPassword("fake-user", "fake@password"))
                 .expectNextCount(0)
                 .verifyComplete();
 
-            verify(passwordEncoder, times(1)).matches("fake-password", "fake-password");
+            verify(passwordEncoder, times(1)).matches("fake@password", "fake@password");
             verify(passwordEncoder, never()).encode(any());
             verify(client, never()).update(any());
             verify(client).get(User.class, "fake-user");
@@ -188,13 +189,23 @@ class UserServiceImplTest {
                 .thenReturn(Mono.error(
                     new ExtensionNotFoundException(fromExtension(User.class), "fake-user")));
 
-            StepVerifier.create(userService.updateWithRawPassword("fake-user", "new-password"))
+            StepVerifier.create(userService.updateWithRawPassword("fake-user", "new@password"))
                 .verifyError(UserNotFoundException.class);
 
             verify(passwordEncoder, never()).matches(anyString(), anyString());
             verify(passwordEncoder, never()).encode(anyString());
             verify(client, never()).update(any());
             verify(client).get(User.class, "fake-user");
+        }
+
+        @Test
+        void shouldThrowWhenPwdContainsInvalidChars() {
+            StepVerifier.create(userService.updateWithRawPassword("fake-user", "new-password"))
+                .expectError(UnsatisfiedAttributeValueException.class)
+                .verify();
+
+            verify(passwordEncoder, never()).encode(anyString());
+            verify(client, never()).update(any());
         }
 
     }

@@ -1664,6 +1664,7 @@ core:
       creation_label: Create {text} tag
     validation:
       trim: Please remove the leading and trailing spaces
+      password: "The password can only use uppercase and lowercase letters (A-Z, a-z), numbers (0-9), and the following special characters: !{'@'}#$%^&*"
     verification_form:
       no_action_defined: "{label} interface not defined"
       verify_success: "{label} successful"
