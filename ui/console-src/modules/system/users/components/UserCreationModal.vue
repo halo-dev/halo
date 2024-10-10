@@ -12,6 +12,7 @@ import { Toast, VButton, VModal, VSpace } from "@halo-dev/components";
 import { setFocus } from "@/formkit/utils/focus";
 import { useQueryClient } from "@tanstack/vue-query";
 import { useI18n } from "vue-i18n";
+import { PASSWORD_REGEX } from "@/constants/regex";
 
 const { t } = useI18n();
 const queryClient = useQueryClient();
@@ -112,9 +113,13 @@ const handleCreateUser = async () => {
         :label="$t('core.user.change_password_modal.fields.new_password.label')"
         type="password"
         name="password"
-        validation="required:trim|length:5,100|matches:/^\S.*\S$/"
+        :validation="[
+          ['required'],
+          ['length', 5, 257],
+          ['matches', PASSWORD_REGEX],
+        ]"
         :validation-messages="{
-          matches: $t('core.formkit.validation.trim'),
+          matches: $t('core.formkit.validation.password'),
         }"
       ></FormKit>
       <FormKit

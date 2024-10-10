@@ -1557,6 +1557,7 @@ core:
       creation_label: 创建 {text} 标签
     validation:
       trim: 不能以空格开头或结尾
+      password: "密码只能使用大小写字母 (A-Z, a-z)、数字 (0-9)，以及以下特殊字符: !{'@'}#$%^&*"
     verification_form:
       no_action_defined: 未定义{label}接口
       verify_success: "{label}成功"
