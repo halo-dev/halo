@@ -247,12 +247,12 @@
             border-radius: 0.5em;
             padding: 0.5em;
         "
-        th:with="currentUser = ${contributorFinder.getContributor(#authentication.name)}"
+        th:object="${user}"
     >
-        <img th:src="${currentUser.avatar}" style="width: 4em; border-radius: 100%" />
+        <img th:if="*{spec.avatar}" th:src="*{spec.avatar}" style="width: 4em; border-radius: 100%" />
         <div style="display: flex; flex-direction: column; gap: 0.5em; font-size: 0.875em">
             <span>当前登录的用户</span>
-            <span style="font-weight: 500" th:text="|${currentUser.displayName}(@${currentUser.name})|"></span>
+            <span style="font-weight: 500" th:text="|*{spec.displayName}(@*{metadata.name})|"></span>
         </div>
     </div>
     <div class="form-item">
