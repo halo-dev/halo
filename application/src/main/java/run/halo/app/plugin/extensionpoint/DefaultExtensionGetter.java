@@ -86,10 +86,10 @@ public class DefaultExtensionGetter implements ExtensionGetter {
                 }
                 var extensions = getExtensions(extensionPoint).cache();
                 return Flux.fromIterable(extensionDefNames)
-                    .concatMap(extensionDefName ->
+                    .flatMapSequential(extensionDefName ->
                         client.fetch(ExtensionDefinition.class, extensionDefName)
                     )
-                    .concatMap(extensionDef -> {
+                    .flatMapSequential(extensionDef -> {
                         var className = extensionDef.getSpec().getClassName();
                         return extensions.filter(
                             extension -> Objects.equals(extension.getClass().getName(),

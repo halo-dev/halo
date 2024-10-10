@@ -86,7 +86,7 @@ public class CommentPublicQueryServiceImpl implements CommentPublicQueryService 
                 return client.listBy(Comment.class, listOptions, pageRequest)
                     .flatMap(listResult -> Flux.fromStream(listResult.get())
                         .map(this::toCommentVo)
-                        .concatMap(Function.identity())
+                        .flatMapSequential(Function.identity())
                         .collectList()
                         .map(commentVos -> new ListResult<>(listResult.getPage(),
                             listResult.getSize(),
@@ -102,7 +102,7 @@ public class CommentPublicQueryServiceImpl implements CommentPublicQueryService 
     public Mono<ListResult<CommentWithReplyVo>> convertToWithReplyVo(ListResult<CommentVo> comments,
         int replySize) {
         return Flux.fromIterable(comments.getItems())
-            .concatMap(commentVo -> {
+            .flatMapSequential(commentVo -> {
                 var commentName = commentVo.getMetadata().getName();
                 return listReply(commentName, 1, replySize)
                     .map(replyList -> CommentWithReplyVo.from(commentVo)
@@ -135,7 +135,7 @@ public class CommentPublicQueryServiceImpl implements CommentPublicQueryService 
                     .orElse(PageRequestImpl.ofSize(0));
                 return client.listBy(Reply.class, listOptions, pageRequest)
                     .flatMap(list -> Flux.fromStream(list.get().map(this::toReplyVo))
-                        .concatMap(Function.identity())
+                        .flatMapSequential(Function.identity())
                         .collectList()
                         .map(replyVos -> new ListResult<>(list.getPage(), list.getSize(),
                             list.getTotal(),

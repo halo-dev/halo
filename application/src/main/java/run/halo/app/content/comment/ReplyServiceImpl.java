@@ -166,7 +166,7 @@ public class ReplyServiceImpl extends AbstractCommentService implements ReplySer
         return client.listBy(Reply.class, query.toListOptions(), query.toPageRequest())
             .flatMap(list -> Flux.fromStream(list.get()
                     .map(this::toListedReply))
-                .concatMap(Function.identity())
+                .flatMapSequential(Function.identity())
                 .collectList()
                 .map(listedReplies -> new ListResult<>(list.getPage(), list.getSize(),
                     list.getTotal(), listedReplies))

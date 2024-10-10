@@ -67,7 +67,7 @@ public class PostPublicQueryServiceImpl implements PostPublicQueryService {
             })
             .flatMap(listOptions -> client.listBy(Post.class, listOptions, page))
             .flatMap(list -> Flux.fromStream(list.get())
-                .concatMap(post -> convertToListedVo(post)
+                .flatMapSequential(post -> convertToListedVo(post)
                     .flatMap(postVo -> populateStats(postVo)
                         .doOnNext(postVo::setStats).thenReturn(postVo)
                     )
