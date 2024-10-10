@@ -1,7 +1,7 @@
 <!doctype html>
 <html
     xmlns:th="https://www.thymeleaf.org"
-    th:replace="~{gateway_modules/layout :: layout(title = |#{title} - Halo|, head = ~{::head}, body = ~{::body})}"
+    th:replace="~{gateway_fragments/layout :: layout(title = |#{title} - Halo|, head = ~{::head}, body = ~{::body})}"
 >
     <th:block th:fragment="head">
         <style>
@@ -12,7 +12,7 @@
     </th:block>
     <th:block th:fragment="body">
         <div class="gateway-wrapper setup-page-wrapper">
-            <div th:replace="~{gateway_modules/common_fragments::haloLogo}"></div>
+            <div th:replace="~{gateway_fragments/common::haloLogo}"></div>
 
             <div class="halo-form-wrapper">
                 <h1 class="form-title" th:text="#{title}"></h1>
@@ -79,7 +79,7 @@
                     <div class="form-item">
                         <label for="password" th:text="#{form.password.label}"></label>
                         <th:block
-                            th:replace="~{gateway_modules/input_fragments :: password(id = 'password', name = 'password', required = 'true', minlength = 5, maxlength = 257, enableToggle = true)}"
+                            th:replace="~{gateway_fragments/input :: password(id = 'password', name = 'password', required = 'true', minlength = 5, maxlength = 257, enableToggle = true)}"
                         ></th:block>
                         <p class="alert alert-error" th:if="${#fields.hasErrors('password')}" th:errors="*{password}"></p>
                     </div>
@@ -87,7 +87,7 @@
                     <div class="form-item">
                         <label for="confirmPassword" th:text="#{form.confirmPassword.label}"></label>
                         <th:block
-                            th:replace="~{gateway_modules/input_fragments :: password(id = 'confirmPassword', name = null, required = 'true', minlength = 5, maxlength = 257, enableToggle = true)}"
+                            th:replace="~{gateway_fragments/input :: password(id = 'confirmPassword', name = null, required = 'true', minlength = 5, maxlength = 257, enableToggle = true)}"
                         ></th:block>
                     </div>
 
@@ -97,7 +97,7 @@
                 </form>
             </div>
 
-            <div th:replace="~{gateway_modules/common_fragments::languageSwitcher}"></div>
+            <div th:replace="~{gateway_fragments/common::languageSwitcher}"></div>
         </div>
 
         <script th:inline="javascript">

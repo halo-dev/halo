@@ -1,21 +1,21 @@
 <!doctype html>
 <html
     xmlns:th="https://www.thymeleaf.org"
-    th:replace="~{gateway_modules/layout :: layout(title = |#{title} - ${site.title}|, head = null, body = ~{::body})}"
+    th:replace="~{gateway_fragments/layout :: layout(title = |#{title} - ${site.title}|, head = null, body = ~{::body})}"
 >
     <th:block th:fragment="body">
         <div class="gateway-wrapper">
-            <div th:replace="~{gateway_modules/common_fragments::haloLogo}"></div>
+            <div th:replace="~{gateway_fragments/common::haloLogo}"></div>
 
             <div class="halo-form-wrapper">
-                <form th:replace="~{gateway_modules/form_fragments::login}"></form>
-                <div th:replace="~{gateway_modules/login_fragments::formAuthProviders}"></div>
-                <div th:replace="~{gateway_modules/common_fragments::socialAuthProviders}"></div>
+                <div th:replace="~{gateway_fragments/login::form}"></div>
+                <div th:replace="~{gateway_fragments/login::formAuthProviders}"></div>
+                <div th:replace="~{gateway_fragments/common::socialAuthProviders}"></div>
             </div>
 
-            <div th:replace="~{gateway_modules/common_fragments::signupNoticeContent}"></div>
-            <div th:replace="~{gateway_modules/common_fragments::returnToSiteContent}"></div>
-            <div th:replace="~{gateway_modules/common_fragments::languageSwitcher}"></div>
+            <div th:replace="~{gateway_fragments/common::signupNoticeContent}"></div>
+            <div th:replace="~{gateway_fragments/common::returnToSiteContent}"></div>
+            <div th:replace="~{gateway_fragments/common::languageSwitcher}"></div>
         </div>
     </th:block>
 </html>
