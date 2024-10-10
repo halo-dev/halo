@@ -35,7 +35,11 @@
                                 autofocus
                             />
                         </div>
-                        <p class="alert alert-error" th:if="${#fields.hasErrors('siteTitle')}" th:errors="*{siteTitle}"></p>
+                        <p
+                            class="alert alert-error"
+                            th:if="${#fields.hasErrors('siteTitle')}"
+                            th:errors="*{siteTitle}"
+                        ></p>
                     </div>
 
                     <div class="form-item">
@@ -55,7 +59,11 @@
                                 required
                             />
                         </div>
-                        <p class="alert alert-error" th:if="${#fields.hasErrors('username')}" th:errors="*{username}"></p>
+                        <p
+                            class="alert alert-error"
+                            th:if="${#fields.hasErrors('username')}"
+                            th:errors="*{username}"
+                        ></p>
                     </div>
 
                     <div class="form-item">
@@ -81,7 +89,11 @@
                         <th:block
                             th:replace="~{gateway_fragments/input :: password(id = 'password', name = 'password', required = 'true', minlength = 5, maxlength = 257, enableToggle = true)}"
                         ></th:block>
-                        <p class="alert alert-error" th:if="${#fields.hasErrors('password')}" th:errors="*{password}"></p>
+                        <p
+                            class="alert alert-error"
+                            th:if="${#fields.hasErrors('password')}"
+                            th:errors="*{password}"
+                        ></p>
                     </div>
 
                     <div class="form-item">
@@ -102,19 +114,7 @@
 
         <script th:inline="javascript">
             document.addEventListener("DOMContentLoaded", function () {
-                var password = document.getElementById("password"),
-                    confirm_password = document.getElementById("confirmPassword");
-
-                function validatePassword() {
-                    if (password.value != confirm_password.value) {
-                        confirm_password.setCustomValidity("Passwords Don't Match");
-                    } else {
-                        confirm_password.setCustomValidity("");
-                    }
-                }
-
-                password.onchange = validatePassword;
-                confirm_password.onkeyup = validatePassword;
+                setupPasswordConfirmation("password", "confirmPassword");
             });
         </script>
     </th:block>
