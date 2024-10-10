@@ -1,27 +1,18 @@
 <form th:fragment="form" class="halo-form" id="logout-form" name="logout-form" th:action="@{/logout}" method="post">
-    <div
-        style="
-            display: flex;
-            margin-bottom: 2em;
-            align-items: center;
-            gap: 1em;
-            border: 1px dashed #d1d9e0b3;
-            border-radius: 0.5em;
-            padding: 0.5em;
-        "
-        th:object="${user}"
-    >
-        <img th:if="*{spec.avatar}" th:src="*{spec.avatar}" style="width: 4em; border-radius: 100%" />
-        <div style="display: flex; flex-direction: column; gap: 0.5em; font-size: 0.875em">
-            <span>当前登录的用户</span>
-            <span style="font-weight: 500" th:text="|*{spec.displayName}(@*{metadata.name})|"></span>
+    <div class="user-info" th:object="${user}">
+        <img th:if="*{spec.avatar}" th:src="*{spec.avatar}" class="user-avatar" />
+        <div class="user-details">
+            <span>当前登录的用户：</span>
+            <span class="user-name" th:text="|*{spec.displayName}(@*{metadata.name})|"></span>
         </div>
     </div>
     <div class="form-item">
-        <button type="submit" th:text="#{form.logout.submit}"></button>
+        <button type="submit" th:text="#{form.submit}"></button>
     </div>
 
     <div class="form-item">
-        <a href="javascript:history.back()">取消</a>
+        <a href="javascript:history.back()" class="cancel-link">
+            取消
+        </a>
     </div>
 </form>
