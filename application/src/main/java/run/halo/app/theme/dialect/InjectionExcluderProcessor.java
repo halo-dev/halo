@@ -70,8 +70,7 @@ public class InjectionExcluderProcessor extends AbstractTemplateBoundariesProces
         private final Set<Pattern> regexPatterns = Set.of(
             Pattern.compile("error/.*"),
             Pattern.compile("challenges/.*"),
-            Pattern.compile("password-reset/.*"),
-            Pattern.compile("login_.*")
+            Pattern.compile("password-reset/.*")
         );
 
         public boolean isExcluded(String templateName) {

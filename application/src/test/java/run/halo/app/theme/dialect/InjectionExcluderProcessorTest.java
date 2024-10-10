@@ -28,8 +28,7 @@ class InjectionExcluderProcessorTest {
                 "password-reset/email/reset",
                 "error/404",
                 "error/500",
-                "challenges/totp",
-                "login_local"
+                "challenges/totp"
             };
 
             for (String templateName : cases) {
