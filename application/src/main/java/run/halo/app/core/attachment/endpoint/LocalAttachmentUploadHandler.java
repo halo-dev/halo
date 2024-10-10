@@ -158,7 +158,7 @@ class LocalAttachmentUploadHandler implements AttachmentHandler {
             var typeValidator = file.content()
                 .next()
                 .handle((dataBuffer, sink) -> {
-                    var mimeType = detectMimeType(dataBuffer.asInputStream());
+                    var mimeType = detectMimeType(dataBuffer.asInputStream(), file.name());
                     var isAllow = setting.getAllowedFileTypes()
                         .stream()
                         .map(FileCategoryMatcher::of)
@@ -178,9 +178,9 @@ class LocalAttachmentUploadHandler implements AttachmentHandler {
     }
 
     @NonNull
-    private String detectMimeType(InputStream inputStream) {
+    private String detectMimeType(InputStream inputStream, String name) {
         try {
-            return FileTypeDetectUtils.detectMimeType(inputStream);
+            return FileTypeDetectUtils.detectMimeType(inputStream, name);
         } catch (IOException e) {
             log.warn("Failed to detect file type", e);
             return "Unknown";
