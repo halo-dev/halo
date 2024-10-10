@@ -2,7 +2,7 @@
     <div class="user-info" th:object="${user}">
         <img th:if="*{spec.avatar}" th:src="*{spec.avatar}" class="user-avatar" />
         <div class="user-details">
-            <span>当前登录的用户：</span>
+            <span th:text="#{form.currentUser.label}"></span>
             <span class="user-name" th:text="|*{spec.displayName}(@*{metadata.name})|"></span>
         </div>
     </div>
@@ -11,8 +11,6 @@
     </div>
 
     <div class="form-item">
-        <a href="javascript:history.back()" class="cancel-link">
-            取消
-        </a>
+        <a href="javascript:history.back()" class="cancel-link" th:text="#{form.cancel}"> </a>
     </div>
 </form>
