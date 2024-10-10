@@ -1,0 +1,16 @@
+<form th:fragment="form" class="halo-form" id="logout-form" name="logout-form" th:action="@{/logout}" method="post">
+    <div class="user-info" th:object="${user}">
+        <img th:if="*{spec.avatar}" th:src="*{spec.avatar}" class="user-avatar" />
+        <div class="user-details">
+            <span th:text="#{form.currentUser.label}"></span>
+            <span class="user-name" th:text="|*{spec.displayName}(@*{metadata.name})|"></span>
+        </div>
+    </div>
+    <div class="form-item">
+        <button type="submit" th:text="#{form.submit}"></button>
+    </div>
+
+    <div class="form-item">
+        <a href="javascript:history.back()" class="cancel-link" th:text="#{form.cancel}"> </a>
+    </div>
+</form>

@@ -7,6 +7,7 @@ import jakarta.validation.Payload;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Pattern;
+import jakarta.validation.constraints.Size;
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
@@ -29,6 +30,7 @@ import run.halo.app.infra.ValidationUtils;
 public class SignUpData {
 
     @NotBlank
+    @Size(min = 4, max = 63)
     @Pattern(regexp = ValidationUtils.NAME_REGEX,
         message = "{validation.error.username.pattern}")
     private String username;
@@ -42,6 +44,7 @@ public class SignUpData {
     private String emailCode;
 
     @NotBlank
+    @Size(min = 5, max = 257)
     @Pattern(regexp = ValidationUtils.PASSWORD_REGEX,
         message = "{validation.error.password.pattern}")
     private String password;
