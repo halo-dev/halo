@@ -3758,7 +3758,7 @@
             "description": "Old password."
           },
           "password": {
-            "minLength": 6,
+            "minLength": 5,
             "type": "string",
             "description": "New password."
           }
@@ -3771,7 +3771,7 @@
         "type": "object",
         "properties": {
           "password": {
-            "minLength": 6,
+            "minLength": 5,
             "type": "string",
             "description": "New password."
           }
@@ -5420,12 +5420,12 @@
           },
           "visible": {
             "type": "string",
+            "default": "PUBLIC",
             "enum": [
               "PUBLIC",
               "INTERNAL",
               "PRIVATE"
-            ],
-            "default": "PUBLIC"
+            ]
           }
         }
       },
@@ -5949,12 +5949,12 @@
           },
           "visible": {
             "type": "string",
+            "default": "PUBLIC",
             "enum": [
               "PUBLIC",
               "INTERNAL",
               "PRIVATE"
-            ],
-            "default": "PUBLIC"
+            ]
           }
         }
       },
