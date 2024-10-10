@@ -590,12 +590,21 @@ public class UserEndpoint implements CustomEndpoint {
     record ChangeOwnPasswordRequest(
         @Schema(description = "Old password.", requiredMode = REQUIRED)
         String oldPassword,
-        @Schema(description = "New password.", requiredMode = REQUIRED, minLength = 6)
+        @Schema(description = "New password.", requiredMode = REQUIRED, minLength = 5)
         String password) {
+
+        public ChangeOwnPasswordRequest {
+            if (password == null || password.length() < 5 || password.length() > 257) {
+                throw new UnsatisfiedAttributeValueException(
+                    "password is required.",
+                    "validation.error.password.size",
+                    new Object[] {5, 257});
+            }
+        }
     }
 
     record ChangePasswordRequest(
-        @Schema(description = "New password.", requiredMode = REQUIRED, minLength = 6)
+        @Schema(description = "New password.", requiredMode = REQUIRED, minLength = 5)
         String password) {
     }
 
