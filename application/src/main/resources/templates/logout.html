@@ -5,7 +5,7 @@
 >
     <th:block th:fragment="body">
         <div class="gateway-wrapper">
-            <div th:replace="~{gateway_modules/common_fragments::haloLogo}"></div>
+            <div th:replace="~{gateway_fragments/common::haloLogo}"></div>
             <div class="halo-form-wrapper">
                 <h1 class="form-title" th:text="#{form.title}"></h1>
                 <form th:replace="~{gateway_fragments/logout::form}"></form>
