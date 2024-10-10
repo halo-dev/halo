@@ -76,13 +76,13 @@ const handleChangeStatus = async () => {
       <VEntityField
         :title="
           $t(
-            `core.identity_authentication.list.fields.display_name.${authProvider.name}`,
+            `core.identity_authentication.fields.display_name.${authProvider.name}`,
             authProvider.displayName
           )
         "
         :description="
           $t(
-            `core.identity_authentication.list.fields.description.${authProvider.name}`,
+            `core.identity_authentication.fields.description.${authProvider.name}`,
             authProvider.description || ''
           )
         "
