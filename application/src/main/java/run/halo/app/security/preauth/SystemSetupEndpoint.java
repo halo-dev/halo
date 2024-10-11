@@ -118,8 +118,7 @@ public class SystemSetupEndpoint {
                 .map(initialized -> !initialized)
             )
             .flatMap(body -> {
-                var bindingResult = body.toBindingResult();
-                validator.validate(body, bindingResult);
+                var bindingResult = ValidationUtils.validate(body, validator, request.exchange());
                 if (bindingResult.hasErrors()) {
                     return handleValidationErrors(bindingResult, request);
                 }
@@ -208,7 +207,7 @@ public class SystemSetupEndpoint {
                     return redirectToConsole();
                 }
                 var body = new SetupRequest(new LinkedMultiValueMap<>());
-                var bindingResult = body.toBindingResult();
+                var bindingResult = new BeanPropertyBindingResult(body, "form");
                 return ServerResponse.ok().render(SETUP_TEMPLATE, bindingResult.getModel());
             });
     }
@@ -242,10 +241,6 @@ public class SystemSetupEndpoint {
         @Size(max = 80)
         public String getSiteTitle() {
             return formData.getFirst("siteTitle");
-        }
-
-        public BindingResult toBindingResult() {
-            return new BeanPropertyBindingResult(this, "form");
         }
     }
 

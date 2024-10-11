@@ -59,7 +59,6 @@ import org.springframework.util.Assert;
 import org.springframework.util.CollectionUtils;
 import org.springframework.util.MultiValueMap;
 import org.springframework.util.unit.DataSize;
-import org.springframework.validation.BeanPropertyBindingResult;
 import org.springframework.validation.Validator;
 import org.springframework.web.reactive.function.BodyExtractors;
 import org.springframework.web.reactive.function.server.RouterFunction;
@@ -86,6 +85,7 @@ import run.halo.app.extension.ReactiveExtensionClient;
 import run.halo.app.extension.router.SortableRequest;
 import run.halo.app.infra.SystemConfigurableEnvironmentFetcher;
 import run.halo.app.infra.SystemSetting;
+import run.halo.app.infra.ValidationUtils;
 import run.halo.app.infra.exception.RateLimitExceededException;
 import run.halo.app.infra.exception.UnsatisfiedAttributeValueException;
 import run.halo.app.infra.utils.JsonUtils;
@@ -298,8 +298,8 @@ public class UserEndpoint implements CustomEndpoint {
                 () -> new ServerWebInputException("Request body is required."))
             )
             .doOnNext(emailReq -> {
-                var bindingResult = new BeanPropertyBindingResult(emailReq, "form");
-                validator.validate(emailReq, bindingResult);
+                var bindingResult =
+                    ValidationUtils.validate(emailReq, validator, request.exchange());
                 if (bindingResult.hasErrors()) {
                     // only email field is validated
                     throw new ServerWebInputException("validation.error.email.pattern");
