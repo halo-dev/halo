@@ -2,28 +2,35 @@ package run.halo.app.security.preauth;
 
 import static org.springframework.web.reactive.function.server.RequestPredicates.contentType;
 import static org.springframework.web.reactive.function.server.RequestPredicates.path;
+import static run.halo.app.infra.ValidationUtils.validate;
 
 import io.github.resilience4j.ratelimiter.RateLimiterRegistry;
 import io.github.resilience4j.ratelimiter.RequestNotPermitted;
 import io.github.resilience4j.reactor.ratelimiter.operator.RateLimiterOperator;
+import jakarta.validation.constraints.Email;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Pattern;
+import jakarta.validation.constraints.Size;
 import java.net.URI;
-import java.util.Locale;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
-import java.util.Optional;
-import org.apache.commons.lang3.StringUtils;
+import lombok.Data;
 import org.springframework.context.MessageSource;
 import org.springframework.context.annotation.Bean;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.server.reactive.ServerHttpRequest;
 import org.springframework.stereotype.Component;
+import org.springframework.validation.Validator;
 import org.springframework.web.reactive.function.server.RouterFunction;
 import org.springframework.web.reactive.function.server.RouterFunctions;
 import org.springframework.web.reactive.function.server.ServerResponse;
+import reactor.core.publisher.Mono;
 import run.halo.app.core.user.service.EmailPasswordRecoveryService;
 import run.halo.app.core.user.service.InvalidResetTokenException;
-import run.halo.app.infra.exception.RateLimitExceededException;
+import run.halo.app.infra.ValidationUtils;
+import run.halo.app.infra.actuator.GlobalInfoService;
 import run.halo.app.infra.utils.IpAddressUtils;
 
 /**
@@ -38,150 +45,132 @@ class PreAuthEmailPasswordResetEndpoint {
     private static final String SEND_TEMPLATE = "password-reset/email/send";
     private static final String RESET_TEMPLATE = "password-reset/email/reset";
 
-    private final EmailPasswordRecoveryService emailPasswordRecoveryService;
-
-    private final MessageSource messageSource;
-
     private final RateLimiterRegistry rateLimiterRegistry;
 
-    private final PasswordResetAvailabilityProviders passwordResetAvailabilityProviders;
-
     public PreAuthEmailPasswordResetEndpoint(
-        EmailPasswordRecoveryService emailPasswordRecoveryService,
-        MessageSource messageSource,
-        RateLimiterRegistry rateLimiterRegistry,
-        PasswordResetAvailabilityProviders passwordResetAvailabilityProviders
+        RateLimiterRegistry rateLimiterRegistry
     ) {
-        this.emailPasswordRecoveryService = emailPasswordRecoveryService;
-        this.messageSource = messageSource;
         this.rateLimiterRegistry = rateLimiterRegistry;
-        this.passwordResetAvailabilityProviders = passwordResetAvailabilityProviders;
     }
 
     @Bean
-    RouterFunction<ServerResponse> preAuthPasswordResetEndpoints() {
+    RouterFunction<ServerResponse> preAuthPasswordResetEndpoints(
+        GlobalInfoService globalInfoService,
+        PasswordResetAvailabilityProviders availabilityProviders,
+        MessageSource messageSource,
+        EmailPasswordRecoveryService emailService,
+        Validator validator
+    ) {
         return RouterFunctions.nest(path("/password-reset/email"), RouterFunctions.route()
-            .GET("", request -> {
-                return ServerResponse.ok().render(SEND_TEMPLATE, Map.of(
-                    "otherMethods",
-                    passwordResetAvailabilityProviders.getOtherAvailableMethods("email")
-                ));
-            })
+            .GET("", request -> request.bind(SendForm.class)
+                .flatMap(sendForm -> ServerResponse.ok().render(SEND_TEMPLATE, Map.of(
+                    "otherMethods", availabilityProviders.getOtherAvailableMethods("email"),
+                    "globalInfo", globalInfoService.getGlobalInfo(),
+                    "form", sendForm
+                )))
+            )
             .GET("/{resetToken}",
                 request -> {
                     var token = request.pathVariable("resetToken");
-                    return emailPasswordRecoveryService.getValidResetToken(token)
-                        .flatMap(resetToken -> {
-                            // TODO Check the 2FA of the user
-                            return ServerResponse.ok().render(RESET_TEMPLATE, Map.of(
-                                "username", resetToken.username()
-                            ));
-                        })
-                        .onErrorResume(InvalidResetTokenException.class,
-                            e -> ServerResponse.status(HttpStatus.FOUND)
-                                .location(
-                                    URI.create("/password-reset/email?error=invalid_reset_token")
-                                )
-                                .build()
+                    return request.bind(ResetForm.class)
+                        .flatMap(resetForm -> {
+                            var model = new HashMap<String, Object>();
+                            model.put("form", resetForm);
+                            model.put("globalInfo", globalInfoService.getGlobalInfo());
+                            return emailService.getValidResetToken(token)
+                                .flatMap(resetToken -> {
+                                    // TODO Check the 2FA of the user
+                                    model.put("username", resetToken.username());
+                                    return ServerResponse.ok().render(RESET_TEMPLATE, model);
+                                })
                                 .transformDeferred(rateLimiterForPasswordResetVerification(
                                     request.exchange().getRequest()
                                 ))
-                                .onErrorMap(
-                                    RequestNotPermitted.class, RateLimitExceededException::new
+                                .onErrorResume(InvalidResetTokenException.class, e ->
+                                    ServerResponse.status(HttpStatus.FOUND)
+                                        .location(URI.create(
+                                            "/password-reset/email?error=invalid_reset_token")
+                                        )
+                                        .build()
                                 )
-                        );
+                                .onErrorResume(RequestNotPermitted.class, e -> {
+                                    model.put("error", "rate_limit_exceeded");
+                                    return ServerResponse.status(HttpStatus.TOO_MANY_REQUESTS)
+                                        .render(RESET_TEMPLATE, model);
+                                });
+                        });
                 }
             )
             .POST("/{resetToken}", request -> {
                 var token = request.pathVariable("resetToken");
-                return request.formData()
-                    .flatMap(formData -> {
-                        var locale = Optional.ofNullable(
-                                request.exchange().getLocaleContext().getLocale()
-                            )
-                            .orElseGet(Locale::getDefault);
-                        var password = formData.getFirst("password");
-                        var confirmPassword = formData.getFirst("confirmPassword");
-                        if (StringUtils.isBlank(password)) {
-                            var error = messageSource.getMessage(
-                                "passwordReset.password.blank",
-                                null,
-                                "Password can't be blank",
-                                locale
-                            );
-                            return ServerResponse.ok().render(RESET_TEMPLATE, Map.of(
-                                "error", error
-                            ));
-                        }
-                        if (!Objects.equals(password, confirmPassword)) {
-                            var error = messageSource.getMessage(
-                                "passwordReset.confirmPassword.mismatch",
-                                null,
-                                "Password and confirm password mismatch",
-                                locale
-                            );
-                            return ServerResponse.ok().render(RESET_TEMPLATE, Map.of(
-                                "error", error
-                            ));
-                        }
-                        return emailPasswordRecoveryService.changePassword(password, token)
-                            .then(ServerResponse.status(HttpStatus.FOUND)
-                                .location(URI.create("/login?password_reset"))
-                                .build()
-                            )
-                            .onErrorResume(InvalidResetTokenException.class, e -> {
-                                var error = messageSource.getMessage(
-                                    "passwordReset.resetToken.invalid",
-                                    null,
-                                    "Invalid reset token",
-                                    locale
+                return request.bind(ResetForm.class)
+                    .flatMap(resetForm -> emailService.getValidResetToken(token)
+                        .flatMap(resetToken -> {
+                            var bindingResult = validate(resetForm, validator, request.exchange());
+                            var model = bindingResult.getModel();
+                            model.put("globalInfo", globalInfoService.getGlobalInfo());
+                            model.put("username", resetToken.username());
+                            if (!Objects.equals(
+                                resetForm.getPassword(), resetForm.getConfirmPassword()
+                            )) {
+                                bindingResult.rejectValue(
+                                    "confirmPassword",
+                                    "validation.error.password.confirmPassword.mismatch",
+                                    "Password and confirm password mismatch"
                                 );
-                                return ServerResponse.ok().render(RESET_TEMPLATE, Map.of(
-                                    "error", error
-                                )).transformDeferred(rateLimiterForPasswordResetVerification(
-                                    request.exchange().getRequest()
-                                )).onErrorMap(
-                                    RequestNotPermitted.class, RateLimitExceededException::new
-                                );
-                            });
-                    });
-            })
-            .POST("", contentType(MediaType.APPLICATION_FORM_URLENCODED),
-                request -> {
-                    // get username and email
-                    return request.formData()
-                        .flatMap(formData -> {
-                            var locale = Optional.ofNullable(
-                                    request.exchange().getLocaleContext().getLocale()
-                                )
-                                .orElseGet(Locale::getDefault);
-                            var email = formData.getFirst("email");
-                            if (StringUtils.isBlank(email)) {
-                                var error = messageSource.getMessage(
-                                    "passwordReset.email.blank",
-                                    null,
-                                    "Email can't be blank",
-                                    locale
-                                );
-                                return ServerResponse.ok().render(SEND_TEMPLATE, Map.of(
-                                    "error", error
-                                ));
                             }
-                            return emailPasswordRecoveryService.sendPasswordResetEmail(email)
-                                .then(ServerResponse.ok().render(SEND_TEMPLATE, Map.of(
-                                    "sent", true
-                                )))
-                                .transformDeferred(rateLimiterForSendPasswordResetEmail(
+                            if (bindingResult.hasErrors()) {
+                                return ServerResponse.badRequest().render(RESET_TEMPLATE, model);
+                            }
+                            return emailService.changePassword(resetForm.getPassword(), token)
+                                .then(ServerResponse.status(HttpStatus.FOUND)
+                                    .location(URI.create("/login?password_reset"))
+                                    .build()
+                                )
+                                .transformDeferred(rateLimiterForPasswordResetVerification(
                                     request.exchange().getRequest()
                                 ))
-                                .onErrorMap(
-                                    RequestNotPermitted.class, RateLimitExceededException::new
-                                );
-                        });
-                })
+                                .onErrorResume(RequestNotPermitted.class, e -> {
+                                    model.put("error", "rate_limit_exceeded");
+                                    return ServerResponse.status(HttpStatus.TOO_MANY_REQUESTS)
+                                        .render(RESET_TEMPLATE, model);
+                                });
+                        })
+                        .onErrorResume(InvalidResetTokenException.class,
+                            e -> ServerResponse.status(HttpStatus.FOUND)
+                                .location(URI.create(
+                                    "/password-reset/email?error=invalid_reset_token"
+                                ))
+                                .build()
+                        )
+                    );
+            })
+            .POST("", contentType(MediaType.APPLICATION_FORM_URLENCODED),
+                request -> request.bind(SendForm.class)
+                    .flatMap(sendForm -> {
+                        // validate the send form
+                        var bindingResult = validate(sendForm, validator, request.exchange());
+                        var model = bindingResult.getModel();
+                        model.put("globalInfo", globalInfoService.getGlobalInfo());
+                        if (bindingResult.hasErrors()) {
+                            return ServerResponse.badRequest().render(SEND_TEMPLATE, model);
+                        }
+                        return emailService.sendPasswordResetEmail(sendForm.getEmail())
+                            .then(Mono.defer(() -> {
+                                model.put("sent", true);
+                                return ServerResponse.ok().render(SEND_TEMPLATE, model);
+                            }))
+                            .transformDeferred(rateLimiterForSendPasswordResetEmail(
+                                request.exchange().getRequest()
+                            ))
+                            .onErrorResume(RequestNotPermitted.class, e -> {
+                                model.put("error", "rate_limit_exceeded");
+                                return ServerResponse.status(HttpStatus.TOO_MANY_REQUESTS)
+                                    .render(SEND_TEMPLATE, model);
+                            });
+                    }))
             .build());
     }
-
 
     <T> RateLimiterOperator<T> rateLimiterForSendPasswordResetEmail(ServerHttpRequest request) {
         var clientIp = IpAddressUtils.getClientIp(request);
@@ -197,5 +186,30 @@ class PreAuthEmailPasswordResetEndpoint {
         var rateLimiter =
             rateLimiterRegistry.rateLimiter(rateLimiterKey, "password-reset-verification");
         return RateLimiterOperator.of(rateLimiter);
+    }
+
+    @Data
+    static class ResetForm {
+
+        @NotBlank
+        @Pattern(
+            regexp = ValidationUtils.PASSWORD_REGEX,
+            message = "{validation.error.password.pattern}"
+        )
+        @Size(min = 5, max = 257)
+        private String password;
+
+        @NotBlank
+        private String confirmPassword;
+
+    }
+
+    @Data
+    static class SendForm {
+
+        @NotBlank
+        @Email
+        private String email;
+
     }
 }
