@@ -4,6 +4,7 @@ import static org.springframework.http.MediaType.APPLICATION_FORM_URLENCODED;
 import static org.springframework.http.MediaType.APPLICATION_JSON;
 import static org.springframework.web.reactive.function.server.RequestPredicates.contentType;
 import static org.springframework.web.reactive.function.server.RequestPredicates.path;
+import static run.halo.app.infra.ValidationUtils.validate;
 
 import io.github.resilience4j.ratelimiter.RateLimiterRegistry;
 import io.github.resilience4j.ratelimiter.RequestNotPermitted;
@@ -81,10 +82,9 @@ class PreAuthSignUpEndpoint {
                     .map(SignUpData::of)
                     .flatMap(signUpData -> {
                         // sign up
-                        var bindingResult = new BeanPropertyBindingResult(signUpData, "form");
+                        var bindingResult = validate(signUpData, validator, request.exchange());
                         var model = bindingResult.getModel();
                         model.put("globalInfo", globalInfoService.getGlobalInfo());
-                        validator.validate(signUpData, bindingResult);
                         if (bindingResult.hasErrors()) {
                             return ServerResponse.ok().render("signup", model);
                         }
@@ -120,8 +120,7 @@ class PreAuthSignUpEndpoint {
             .POST("/send-email-code", contentType(APPLICATION_JSON),
                 request -> request.bodyToMono(SendEmailCodeBody.class)
                     .flatMap(body -> {
-                        var bindingResult = new BeanPropertyBindingResult(body, "body");
-                        validator.validate(body, bindingResult);
+                        var bindingResult = validate(body, "body", validator, request.exchange());
                         if (bindingResult.hasErrors()) {
                             return Mono.error(new RequestBodyValidationException(bindingResult));
                         }

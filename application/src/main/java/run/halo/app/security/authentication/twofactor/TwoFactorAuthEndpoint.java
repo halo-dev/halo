@@ -15,7 +15,6 @@ import org.springframework.security.core.context.ReactiveSecurityContextHolder;
 import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
-import org.springframework.validation.BeanPropertyBindingResult;
 import org.springframework.validation.Validator;
 import org.springframework.web.reactive.function.server.RouterFunction;
 import org.springframework.web.reactive.function.server.ServerRequest;
@@ -29,6 +28,7 @@ import run.halo.app.core.user.service.UserService;
 import run.halo.app.extension.GroupVersion;
 import run.halo.app.extension.ReactiveExtensionClient;
 import run.halo.app.infra.ExternalUrlSupplier;
+import run.halo.app.infra.ValidationUtils;
 import run.halo.app.infra.exception.AccessDeniedException;
 import run.halo.app.infra.exception.RequestBodyValidationException;
 import run.halo.app.security.authentication.twofactor.totp.TotpAuthService;
@@ -108,8 +108,9 @@ public class TwoFactorAuthEndpoint implements CustomEndpoint {
     private Mono<ServerResponse> deleteTotp(ServerRequest request) {
         var totpDeleteRequestMono = request.bodyToMono(PasswordRequest.class)
             .switchIfEmpty(Mono.error(() -> new ServerWebInputException("Request body required")))
-            .doOnNext(
-                passwordRequest -> this.validateRequest(passwordRequest, "passwordRequest"));
+            .doOnNext(passwordRequest -> this.validateRequest(passwordRequest, "passwordRequest",
+                request)
+            );
 
         var twoFactorAuthSettings =
             totpDeleteRequestMono.flatMap(passwordRequest -> getCurrentUser()
@@ -148,7 +149,8 @@ public class TwoFactorAuthEndpoint implements CustomEndpoint {
     private Mono<ServerResponse> toggleTwoFactor(ServerRequest request, boolean enabled) {
         return request.bodyToMono(PasswordRequest.class)
             .switchIfEmpty(Mono.error(() -> new ServerWebInputException("Request body required")))
-            .doOnNext(passwordRequest -> this.validateRequest(passwordRequest, "passwordRequest"))
+            .doOnNext(passwordRequest -> this.validateRequest(passwordRequest,
+                "passwordRequest", request))
             .flatMap(passwordRequest -> getCurrentUser()
                 .filter(user -> {
                     var encodedPassword = user.getSpec().getPassword();
@@ -199,7 +201,7 @@ public class TwoFactorAuthEndpoint implements CustomEndpoint {
     private Mono<ServerResponse> configureTotp(ServerRequest request) {
         var totpRequestMono = request.bodyToMono(TotpRequest.class)
             .switchIfEmpty(Mono.error(() -> new ServerWebInputException("Request body required.")))
-            .doOnNext(totpRequest -> this.validateRequest(totpRequest, "totp"));
+            .doOnNext(totpRequest -> this.validateRequest(totpRequest, "totp", request));
 
         var configuredUser = totpRequestMono.flatMap(totpRequest -> {
             // validate password
@@ -235,11 +237,11 @@ public class TwoFactorAuthEndpoint implements CustomEndpoint {
         return ServerResponse.ok().body(twoFactorAuthSettings, TwoFactorAuthSettings.class);
     }
 
-    private void validateRequest(Object target, String name) {
-        var errors = new BeanPropertyBindingResult(target, name);
-        validator.validate(target, errors);
-        if (errors.hasErrors()) {
-            throw new RequestBodyValidationException(errors);
+    private void validateRequest(Object target, String name, ServerRequest request) {
+        var bindingResult =
+            ValidationUtils.validate(target, name, validator, request.exchange());
+        if (bindingResult.hasErrors()) {
+            throw new RequestBodyValidationException(bindingResult);
         }
     }
 
