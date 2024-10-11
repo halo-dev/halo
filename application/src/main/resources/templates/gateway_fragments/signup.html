@@ -1,11 +1,11 @@
 <form
-        th:fragment="form"
-        class="halo-form"
-        name="signup-form"
-        id="signup-form"
-        th:action="@{/signup}"
-        th:object="${form}"
-        method="post"
+    th:fragment="form"
+    class="halo-form"
+    name="signup-form"
+    id="signup-form"
+    th:action="@{/signup}"
+    th:object="${form}"
+    method="post"
 >
     <div class="alert alert-error" role="alert" th:if="${error == 'invalid-email-code'}">
         <strong>
@@ -27,18 +27,18 @@
             <label for="username" th:text="#{form.username.label}"></label>
             <div class="form-input">
                 <input
-                        type="text"
-                        id="username"
-                        name="username"
-                        autocomplete="off"
-                        spellcheck="false"
-                        autocorrect="off"
-                        autocapitalize="off"
-                        autofocus
-                        required
-                        minlength="4"
-                        maxlength="63"
-                        th:field="*{username}"
+                    type="text"
+                    id="username"
+                    name="username"
+                    autocomplete="off"
+                    spellcheck="false"
+                    autocorrect="off"
+                    autocapitalize="off"
+                    autofocus
+                    required
+                    minlength="4"
+                    maxlength="63"
+                    th:field="*{username}"
                 />
             </div>
             <p class="alert alert-error" th:if="${#fields.hasErrors('username')}" th:errors="*{username}"></p>
@@ -48,15 +48,15 @@
             <label for="displayName" th:text="#{form.displayName.label}"></label>
             <div class="form-input">
                 <input
-                        type="text"
-                        id="displayName"
-                        name="displayName"
-                        autocomplete="off"
-                        spellcheck="false"
-                        autocorrect="off"
-                        autocapitalize="off"
-                        required
-                        th:field="*{displayName}"
+                    type="text"
+                    id="displayName"
+                    name="displayName"
+                    autocomplete="off"
+                    spellcheck="false"
+                    autocorrect="off"
+                    autocapitalize="off"
+                    required
+                    th:field="*{displayName}"
                 />
             </div>
             <p class="alert alert-error" th:if="${#fields.hasErrors('displayName')}" th:errors="*{displayName}"></p>
@@ -68,15 +68,15 @@
             <label for="email" th:text="#{form.email.label}"></label>
             <div class="form-input">
                 <input
-                        type="email"
-                        id="email"
-                        name="email"
-                        autocomplete="off"
-                        spellcheck="false"
-                        autocorrect="off"
-                        autocapitalize="off"
-                        required
-                        th:field="*{email}"
+                    type="email"
+                    id="email"
+                    name="email"
+                    autocomplete="off"
+                    spellcheck="false"
+                    autocorrect="off"
+                    autocapitalize="off"
+                    required
+                    th:field="*{email}"
                 />
             </div>
             <p class="alert alert-error" th:if="${#fields.hasErrors('email')}" th:errors="*{email}"></p>
@@ -98,7 +98,7 @@
     <div class="form-item">
         <label for="password" th:text="#{form.password.label}"></label>
         <th:block
-                th:replace="~{gateway_fragments/input :: password(id = 'password', name = 'password', required = 'true', minlength = 5, maxlength = 257, enableToggle = true)}"
+            th:replace="~{gateway_fragments/input :: password(id = 'password', name = 'password', required = 'true', minlength = 5, maxlength = 257, enableToggle = true)}"
         ></th:block>
         <p class="alert alert-error" th:if="${#fields.hasErrors('password')}" th:errors="*{password}"></p>
     </div>
@@ -106,7 +106,7 @@
     <div class="form-item">
         <label for="confirmPassword" th:text="#{form.confirmPassword.label}"></label>
         <th:block
-                th:replace="~{gateway_fragments/input :: password(id = 'confirmPassword', name = 'confirmPassword', required = 'true', minlength = 5, maxlength = 257, enableToggle = true)}"
+            th:replace="~{gateway_fragments/input :: password(id = 'confirmPassword', name = 'confirmPassword', required = 'true', minlength = 5, maxlength = 257, enableToggle = true)}"
         ></th:block>
         <p class="alert alert-error" th:if="${#fields.hasErrors('confirmPassword')}" th:errors="*{confirmPassword}"></p>
     </div>
@@ -128,7 +128,7 @@
                     const email = document.getElementById("email").value;
 
                     if (!email) {
-                        throw new Error(/*[[#{form.signup.emailCode.send.emptyValidation}]]*/"");
+                        throw new Error(/*[[#{form.emailCode.send.emptyValidation}]]*/"");
                     }
 
                     fetch("/signup/send-email-code", {
