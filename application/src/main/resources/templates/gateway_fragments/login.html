@@ -1,10 +1,10 @@
 <form
-        th:fragment="form"
-        class="halo-form"
-        name="login-form"
-        id="login-form"
-        th:action="${authProvider.spec.authenticationUrl}"
-        th:method="${authProvider.spec.method}"
+    th:fragment="form"
+    class="halo-form"
+    name="login-form"
+    id="login-form"
+    th:action="${authProvider.spec.authenticationUrl}"
+    th:method="${authProvider.spec.method}"
 >
     <div class="alert alert-error" role="alert" th:if="${param.error.size() > 0}" th:with="error = ${param.error[0]}">
         <strong th:if="${error == 'invalid-credential'}">
@@ -22,6 +22,9 @@
     </div>
     <div class="alert" role="alert" th:if="${param.oauth2_bind.size() > 0}">
         <strong th:text="#{form.messages.oauth2Bind}"></strong>
+    </div>
+    <div class="alert" role="alert" th:if="${param.password_reset.size() > 0}">
+        <strong th:text="#{form.messages.passwordReset}"></strong>
     </div>
 
     <div th:replace="~{__${fragmentTemplateName}__::form}"></div>
