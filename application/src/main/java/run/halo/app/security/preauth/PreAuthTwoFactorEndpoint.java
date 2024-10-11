@@ -1,10 +1,12 @@
 package run.halo.app.security.preauth;
 
+import java.util.Map;
 import org.springframework.context.annotation.Bean;
 import org.springframework.stereotype.Component;
 import org.springframework.web.reactive.function.server.RouterFunction;
 import org.springframework.web.reactive.function.server.RouterFunctions;
 import org.springframework.web.reactive.function.server.ServerResponse;
+import run.halo.app.infra.actuator.GlobalInfoService;
 
 /**
  * Pre-auth two-factor endpoints.
@@ -16,10 +18,12 @@ import org.springframework.web.reactive.function.server.ServerResponse;
 class PreAuthTwoFactorEndpoint {
 
     @Bean
-    RouterFunction<ServerResponse> preAuthTwoFactorEndpoints() {
+    RouterFunction<ServerResponse> preAuthTwoFactorEndpoints(GlobalInfoService globalInfoService) {
         return RouterFunctions.route()
             .GET("/challenges/two-factor/totp",
-                request -> ServerResponse.ok().render("challenges/two-factor/totp")
+                request -> ServerResponse.ok().render("challenges/two-factor/totp", Map.of(
+                    "globalInfo", globalInfoService.getGlobalInfo()
+                ))
             )
             .build();
     }
