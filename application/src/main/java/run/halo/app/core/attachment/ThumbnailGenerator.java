@@ -2,6 +2,10 @@ package run.halo.app.core.attachment;
 
 import static java.nio.file.StandardCopyOption.REPLACE_EXISTING;
 
+import com.drew.imaging.ImageMetadataReader;
+import com.drew.metadata.Directory;
+import com.drew.metadata.Metadata;
+import com.drew.metadata.exif.ExifIFD0Directory;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -92,7 +96,36 @@ public class ThumbnailGenerator {
         }
         var thumbnail = Scalr.resize(img, Scalr.Method.AUTOMATIC, Scalr.Mode.FIT_TO_WIDTH,
             size.getWidth());
+        // Rotate image if needed
+        var orientation = readExifOrientation(file);
+        if (orientation != null) {
+            thumbnail = Scalr.rotate(thumbnail, orientation);
+        }
         ImageIO.write(thumbnail, formatName, thumbnailFile);
+    }
+
+    private static Scalr.Rotation readExifOrientation(File inputFile) {
+        try {
+            Metadata metadata = ImageMetadataReader.readMetadata(inputFile);
+            Directory directory = metadata.getFirstDirectoryOfType(ExifIFD0Directory.class);
+            if (directory != null && directory.containsTag(ExifIFD0Directory.TAG_ORIENTATION)) {
+                return getScalrRotationFromExifOrientation(
+                    directory.getInt(ExifIFD0Directory.TAG_ORIENTATION));
+            }
+        } catch (Exception e) {
+            log.debug("Failed to read EXIF orientation from file: {}", inputFile, e);
+        }
+        return null;
+    }
+
+    private static Scalr.Rotation getScalrRotationFromExifOrientation(int orientation) {
+        // https://www.media.mit.edu/pia/Research/deepview/exif.html#:~:text=0x0112-,Orientation,-unsigned%20short
+        return switch (orientation) {
+            case 3 -> Scalr.Rotation.CW_180;
+            case 6 -> Scalr.Rotation.CW_90;
+            case 8 -> Scalr.Rotation.CW_270;
+            default -> null;
+        };
     }
 
     private static boolean isUnsupportedFormat(@NonNull String formatName) {
