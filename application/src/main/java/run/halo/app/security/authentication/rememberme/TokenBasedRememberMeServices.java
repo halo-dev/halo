@@ -203,7 +203,7 @@ public class TokenBasedRememberMeServices implements ServerLogoutHandler, Rememb
     public Mono<Void> loginFail(ServerWebExchange exchange) {
         log.debug("Interactive login attempt was unsuccessful.");
         cancelCookie(exchange);
-        return Mono.empty();
+        return rememberMeRequestCache.saveRememberMe(exchange);
     }
 
     @Override

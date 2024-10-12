@@ -1,7 +1,5 @@
 package run.halo.app.security.authentication.rememberme;
 
-import static java.lang.Boolean.parseBoolean;
-
 import org.springframework.web.server.ServerWebExchange;
 import org.springframework.web.server.WebSession;
 import reactor.core.publisher.Mono;
@@ -23,9 +21,7 @@ public class WebSessionRememberMeRequestCache implements RememberMeRequestCache 
     @Override
     public Mono<Void> saveRememberMe(ServerWebExchange exchange) {
         return resolveFromQuery(exchange)
-            .filter(Boolean::booleanValue)
             .switchIfEmpty(resolveFromForm(exchange))
-            .filter(Boolean::booleanValue)
             .flatMap(rememberMe -> exchange.getSession().doOnNext(
                 session -> session.getAttributes().put(SESSION_ATTRIBUTE_NAME, rememberMe))
             )
@@ -35,9 +31,7 @@ public class WebSessionRememberMeRequestCache implements RememberMeRequestCache 
     @Override
     public Mono<Boolean> isRememberMe(ServerWebExchange exchange) {
         return resolveFromQuery(exchange)
-            .filter(Boolean::booleanValue)
             .switchIfEmpty(resolveFromForm(exchange))
-            .filter(Boolean::booleanValue)
             .switchIfEmpty(resolveFromSession(exchange))
             .defaultIfEmpty(false);
     }
@@ -50,22 +44,20 @@ public class WebSessionRememberMeRequestCache implements RememberMeRequestCache 
     }
 
     private Mono<Boolean> resolveFromQuery(ServerWebExchange exchange) {
-        return Mono.just(
-            parseBoolean(exchange.getRequest().getQueryParams().getFirst(DEFAULT_PARAMETER))
-        );
+        return Mono.justOrEmpty(exchange.getRequest().getQueryParams().getFirst(DEFAULT_PARAMETER))
+            .map(Boolean::parseBoolean);
     }
 
     private Mono<Boolean> resolveFromForm(ServerWebExchange exchange) {
         return exchange.getFormData()
-            .map(form -> parseBoolean(form.getFirst(DEFAULT_PARAMETER)))
-            .filter(Boolean::booleanValue);
+            .mapNotNull(form -> form.getFirst(DEFAULT_PARAMETER))
+            .map(Boolean::parseBoolean);
     }
 
     private Mono<Boolean> resolveFromSession(ServerWebExchange exchange) {
         return exchange.getSession()
-            .map(session -> {
-                var rememberMeObject = session.getAttribute(SESSION_ATTRIBUTE_NAME);
-                return rememberMeObject instanceof Boolean rememberMe ? rememberMe : false;
-            });
+            .mapNotNull(session -> session.getAttribute(SESSION_ATTRIBUTE_NAME))
+            .filter(Boolean.class::isInstance)
+            .cast(Boolean.class);
     }
 }
