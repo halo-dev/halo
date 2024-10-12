@@ -49,7 +49,7 @@
         <ul class="pill-items">
             <li th:each="provider : ${formAuthProviders}">
                 <a th:href="'/login?method=' + ${provider.metadata.name}">
-                    <img th:src="${provider.spec.logo}" />
+                    <img th:src="${provider.spec.logo}" th:alt="|${provider.spec.displayName}'s icon|" />
                     <span
                         th:text="${#messages.msgOrNull('formAuthProviders.' + provider.metadata.name + '.displayName') ?: provider.spec.displayName}"
                     ></span>
