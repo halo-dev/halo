@@ -18,8 +18,12 @@ class CsrfConfigurer implements SecurityConfigurer {
     public void configure(ServerHttpSecurity http) {
         var csrfMatcher = new AndServerWebExchangeMatcher(
             CsrfWebFilter.DEFAULT_CSRF_MATCHER,
-            new NegatedServerWebExchangeMatcher(
-                pathMatchers("/api/**", "/apis/**", "/system/setup"))
+            new NegatedServerWebExchangeMatcher(pathMatchers(
+                "/api/**",
+                "/apis/**",
+                "/actuator/**",
+                "/system/setup"
+            ))
         );
         http.csrf(csrfSpec -> csrfSpec
             .csrfTokenRepository(new CookieServerCsrfTokenRepository())
