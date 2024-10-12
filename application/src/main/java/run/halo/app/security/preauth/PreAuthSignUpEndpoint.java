@@ -32,6 +32,7 @@ import run.halo.app.infra.exception.DuplicateNameException;
 import run.halo.app.infra.exception.EmailVerificationFailed;
 import run.halo.app.infra.exception.RateLimitExceededException;
 import run.halo.app.infra.exception.RequestBodyValidationException;
+import run.halo.app.infra.utils.HaloUtils;
 import run.halo.app.infra.utils.IpAddressUtils;
 
 /**
@@ -131,7 +132,9 @@ class PreAuthSignUpEndpoint {
                             )
                             .onErrorMap(RequestNotPermitted.class, RateLimitExceededException::new);
                     })
-                    .then(ServerResponse.accepted().build()))
+                    .then(ServerResponse.accepted().build())
+            )
+            .before(HaloUtils.noCache())
             .build());
     }
 
