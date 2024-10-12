@@ -30,7 +30,7 @@
     <div th:replace="~{__${fragmentTemplateName}__::form}"></div>
 
     <div th:if="${authProvider.spec.rememberMeSupport}" class="form-item-compact">
-        <input type="checkbox" id="remember-me" name="remember-me" value="true" />
+        <input type="checkbox" id="remember-me" name="remember-me" value="true" th:checked="${rememberMe}"/>
         <label for="remember-me" th:text="#{form.rememberMe.label}"></label>
     </div>
 
