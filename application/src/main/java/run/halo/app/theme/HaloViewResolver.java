@@ -97,7 +97,10 @@ public class HaloViewResolver extends ThymeleafReactiveViewResolver implements I
             return themeResolver.getTheme(exchange).flatMap(theme -> {
                 // calculate the engine before rendering
                 setTemplateEngine(engineManager.getTemplateEngine(theme));
-                exchange.getAttributes().put(ModelConst.POWERED_BY_HALO_TEMPLATE_ENGINE, true);
+                var noCache = (Boolean) exchange.getAttributes()
+                    .getOrDefault(ModelConst.NO_CACHE, false);
+                exchange.getAttributes()
+                    .put(ModelConst.POWERED_BY_HALO_TEMPLATE_ENGINE, !noCache);
                 return super.render(model, contentType, exchange)
                     .onErrorMap(TemplateProcessingException.class::isInstance, tee -> {
                         if (tee instanceof TemplateInputException) {

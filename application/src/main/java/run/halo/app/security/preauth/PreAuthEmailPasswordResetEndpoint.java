@@ -31,6 +31,7 @@ import run.halo.app.core.user.service.EmailPasswordRecoveryService;
 import run.halo.app.core.user.service.InvalidResetTokenException;
 import run.halo.app.infra.ValidationUtils;
 import run.halo.app.infra.actuator.GlobalInfoService;
+import run.halo.app.infra.utils.HaloUtils;
 import run.halo.app.infra.utils.IpAddressUtils;
 
 /**
@@ -168,7 +169,9 @@ class PreAuthEmailPasswordResetEndpoint {
                                 return ServerResponse.status(HttpStatus.TOO_MANY_REQUESTS)
                                     .render(SEND_TEMPLATE, model);
                             });
-                    }))
+                    })
+            )
+            .before(HaloUtils.noCache())
             .build());
     }
 

@@ -108,6 +108,8 @@ public class SystemSetupEndpoint {
                         .implementation(Void.class)
                     )
             )
+            .before(HaloUtils.noCache(), builder -> {
+            })
             .build();
     }
 

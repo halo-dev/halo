@@ -17,6 +17,7 @@ import org.springframework.web.server.ServerWebInputException;
 import reactor.core.publisher.Mono;
 import run.halo.app.core.extension.AuthProvider;
 import run.halo.app.infra.actuator.GlobalInfoService;
+import run.halo.app.infra.utils.HaloUtils;
 import run.halo.app.plugin.PluginConst;
 import run.halo.app.security.AuthProviderService;
 import run.halo.app.security.HaloServerRequestCache;
@@ -50,7 +51,6 @@ class PreAuthLoginEndpoint {
     RouterFunction<ServerResponse> preAuthLoginEndpoints() {
         return RouterFunctions.nest(path("/login"), RouterFunctions.route()
             .GET("", request -> {
-                // TODO get redirect URI and cache it
                 var exchange = request.exchange();
                 var contextPath = exchange.getRequest().getPath().contextPath().value();
                 var publicKey = cryptoService.readPublicKey()
@@ -96,6 +96,7 @@ class PreAuthLoginEndpoint {
                     ))
                 ));
             })
+            .before(HaloUtils.noCache())
             .build());
     }
 }

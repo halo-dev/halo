@@ -7,6 +7,7 @@ import org.springframework.web.reactive.function.server.RouterFunction;
 import org.springframework.web.reactive.function.server.RouterFunctions;
 import org.springframework.web.reactive.function.server.ServerResponse;
 import run.halo.app.infra.actuator.GlobalInfoService;
+import run.halo.app.infra.utils.HaloUtils;
 
 /**
  * Pre-auth two-factor endpoints.
@@ -25,6 +26,7 @@ class PreAuthTwoFactorEndpoint {
                     "globalInfo", globalInfoService.getGlobalInfo()
                 ))
             )
+            .before(HaloUtils.noCache())
             .build();
     }
 

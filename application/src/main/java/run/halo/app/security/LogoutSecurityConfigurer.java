@@ -26,6 +26,7 @@ import reactor.core.publisher.Mono;
 import run.halo.app.core.user.service.UserService;
 import run.halo.app.security.authentication.SecurityConfigurer;
 import run.halo.app.security.authentication.rememberme.RememberMeServices;
+import run.halo.app.theme.router.ModelConst;
 
 @Component
 @RequiredArgsConstructor
@@ -71,6 +72,10 @@ public class LogoutSecurityConfigurer implements SecurityConfigurer {
                         "action", contextPath + "/logout",
                         "user", user
                     ));
+                })
+                .before(request -> {
+                    request.exchange().getAttributes().put(ModelConst.NO_CACHE, true);
+                    return request;
                 })
                 .build();
         }
