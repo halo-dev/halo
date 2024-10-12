@@ -24,6 +24,7 @@ ext {
     twoFactorAuth = "1.3"
     tika = "2.9.2"
     imgscalr = '4.2'
+    exifExtractor = '2.19.0'
 }
 
 javaPlatform {
@@ -58,6 +59,7 @@ dependencies {
         api "com.j256.two-factor-auth:two-factor-auth:$twoFactorAuth"
         api "org.apache.tika:tika-core:$tika"
         api "org.imgscalr:imgscalr-lib:$imgscalr"
+        api "com.drewnoakes:metadata-extractor:$exifExtractor"
     }
 
 }
