@@ -143,6 +143,7 @@
     "postcss": "^8.4.21",
     "postcss-viewport-height-correction": "^1.1.1",
     "prettier": "^2.8.8",
+    "prettier-plugin-organize-imports": "^4.1.0",
     "prettier-plugin-tailwindcss": "^0.1.13",
     "randomstring": "^1.2.3",
     "rollup-plugin-gzip": "^3.1.0",

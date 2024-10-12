@@ -23,10 +23,10 @@ import AnnotationsForm from "@/components/form/AnnotationsForm.vue";
 import { setFocus } from "@/formkit/utils/focus";
 import { FormType } from "@/types/slug";
 import useSlugify from "@console/composables/use-slugify";
+import { reset, submitForm } from "@formkit/core";
 import { cloneDeep } from "lodash-es";
 import { onMounted } from "vue";
 import { useI18n } from "vue-i18n";
-import { submitForm, reset } from "@formkit/core";
 
 const props = withDefaults(
   defineProps<{

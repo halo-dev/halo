@@ -9,10 +9,10 @@ import SubmitButton from "@/components/button/SubmitButton.vue";
 import { Toast, VButton, VModal, VSpace } from "@halo-dev/components";
 
 // hooks
+import { PASSWORD_REGEX } from "@/constants/regex";
 import { setFocus } from "@/formkit/utils/focus";
 import { useQueryClient } from "@tanstack/vue-query";
 import { useI18n } from "vue-i18n";
-import { PASSWORD_REGEX } from "@/constants/regex";
 
 const { t } = useI18n();
 const queryClient = useQueryClient();

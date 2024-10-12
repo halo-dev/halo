@@ -1,9 +1,9 @@
 <script lang="ts" setup>
-import { computed, watch } from "vue";
-import SelectOption from "./SelectOption.vue";
+import { i18n } from "@/locales";
 import { VEmpty, VLoading } from "@halo-dev/components";
 import { useTimeout } from "@vueuse/shared";
-import { i18n } from "@/locales";
+import { computed, watch } from "vue";
+import SelectOption from "./SelectOption.vue";
 
 const props = defineProps<{
   options?: Array<Record<string, unknown> & { label: string; value: string }>;
