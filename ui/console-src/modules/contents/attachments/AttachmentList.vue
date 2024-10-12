@@ -1,6 +1,7 @@
 <script lang="ts" setup>
 import UserFilterDropdown from "@/components/filter/UserFilterDropdown.vue";
 import LazyImage from "@/components/image/LazyImage.vue";
+import LazyVideo from "@/components/video/LazyVideo.vue";
 import { isImage } from "@/utils/image";
 import type { Attachment, Group } from "@halo-dev/api-client";
 import { coreApiClient } from "@halo-dev/api-client";
@@ -31,16 +32,15 @@ import type { Ref } from "vue";
 import { computed, onMounted, provide, ref, watch } from "vue";
 import { useI18n } from "vue-i18n";
 import AttachmentDetailModal from "./components/AttachmentDetailModal.vue";
+import AttachmentError from "./components/AttachmentError.vue";
 import AttachmentGroupList from "./components/AttachmentGroupList.vue";
 import AttachmentListItem from "./components/AttachmentListItem.vue";
+import AttachmentLoading from "./components/AttachmentLoading.vue";
 import AttachmentPoliciesModal from "./components/AttachmentPoliciesModal.vue";
 import AttachmentUploadModal from "./components/AttachmentUploadModal.vue";
-import AttachmentLoading from "./components/AttachmentLoading.vue";
-import AttachmentError from "./components/AttachmentError.vue";
 import { useAttachmentControl } from "./composables/use-attachment";
 import { useFetchAttachmentGroup } from "./composables/use-attachment-group";
 import { useFetchAttachmentPolicy } from "./composables/use-attachment-policy";
-import LazyVideo from "@/components/video/LazyVideo.vue";
 
 const { t } = useI18n();
 

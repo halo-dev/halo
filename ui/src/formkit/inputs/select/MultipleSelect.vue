@@ -1,12 +1,12 @@
 <script lang="ts" setup>
-import MultipleSelectItem from "./MultipleSelectItem.vue";
-import MultipleOverflowItem from "./MultipleOverflowItem.vue";
-import { useDragAndDrop } from "@formkit/drag-and-drop/vue";
-import { watch } from "vue";
 import type {
   NodeDragEventData,
   NodeTouchEventData,
 } from "@formkit/drag-and-drop";
+import { useDragAndDrop } from "@formkit/drag-and-drop/vue";
+import { watch } from "vue";
+import MultipleOverflowItem from "./MultipleOverflowItem.vue";
+import MultipleSelectItem from "./MultipleSelectItem.vue";
 
 const props = defineProps<{
   selectedOptions: Array<{

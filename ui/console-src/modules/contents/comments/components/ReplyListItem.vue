@@ -1,5 +1,7 @@
 <script lang="ts" setup>
+import EntityDropdownItems from "@/components/entity/EntityDropdownItems.vue";
 import { formatDatetime } from "@/utils/date";
+import { useOperationItemExtensionPoint } from "@console/composables/use-operation-extension-points";
 import type { ListedComment, ListedReply } from "@halo-dev/api-client";
 import { coreApiClient } from "@halo-dev/api-client";
 import {
@@ -15,11 +17,9 @@ import {
 } from "@halo-dev/components";
 import type { OperationItem } from "@halo-dev/console-shared";
 import { useQueryClient } from "@tanstack/vue-query";
-import { computed, inject, ref, type Ref, toRefs, markRaw } from "vue";
+import { computed, inject, markRaw, ref, type Ref, toRefs } from "vue";
 import { useI18n } from "vue-i18n";
 import ReplyCreationModal from "./ReplyCreationModal.vue";
-import { useOperationItemExtensionPoint } from "@console/composables/use-operation-extension-points";
-import EntityDropdownItems from "@/components/entity/EntityDropdownItems.vue";
 
 const { t } = useI18n();
 const queryClient = useQueryClient();

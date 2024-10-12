@@ -90,6 +90,7 @@ import MdiFormatHeader5 from "~icons/mdi/format-header-5";
 import MdiFormatHeader6 from "~icons/mdi/format-header-6";
 import RiLayoutRightLine from "~icons/ri/layout-right-line";
 import { useAttachmentSelect } from "./composables/use-attachment";
+import { useExtension } from "./composables/use-extension";
 import {
   UiExtensionAudio,
   UiExtensionImage,
@@ -97,7 +98,6 @@ import {
   UiExtensionVideo,
 } from "./extensions";
 import { getContents } from "./utils/attachment";
-import { useExtension } from "./composables/use-extension";
 
 const { t } = useI18n();
 const { currentUserHasPermission } = usePermission();
