@@ -24,6 +24,7 @@ import org.springframework.web.reactive.function.server.RouterFunctions;
 import org.springframework.web.reactive.function.server.ServerResponse;
 import reactor.core.publisher.Mono;
 import run.halo.app.core.user.service.UserService;
+import run.halo.app.infra.actuator.GlobalInfoService;
 import run.halo.app.security.authentication.SecurityConfigurer;
 import run.halo.app.security.authentication.rememberme.RememberMeServices;
 
@@ -58,7 +59,10 @@ public class LogoutSecurityConfigurer implements SecurityConfigurer {
         }
 
         @Bean
-        RouterFunction<ServerResponse> logoutPage(UserService userService) {
+        RouterFunction<ServerResponse> logoutPage(
+            UserService userService,
+            GlobalInfoService globalInfoService
+        ) {
             return RouterFunctions.route()
                 .GET("/logout", request -> {
                     var user = ReactiveSecurityContextHolder.getContext()
@@ -68,6 +72,7 @@ public class LogoutSecurityConfigurer implements SecurityConfigurer {
                     var exchange = request.exchange();
                     var contextPath = exchange.getRequest().getPath().contextPath().value();
                     return ServerResponse.ok().render("logout", Map.of(
+                        "globalInfo", globalInfoService.getGlobalInfo(),
                         "action", contextPath + "/logout",
                         "user", user
                     ));
