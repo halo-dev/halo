@@ -30,57 +30,48 @@
     --rounded-sm: 0.125em;
     --rounded-base: 0.25em;
     --rounded-lg: 0.5em;
+    --spacing-2xl: 1.5em;
     --spacing-xl: 1.25em;
     --spacing-lg: 1em;
     --spacing-md: 0.875em;
     --spacing-sm: 0.625em;
     --spacing-xs: 0.5em;
+    --text-xl: 1.25em;
+    --text-2xl: 1.5em;
+    --text-lg: 1.125em;
     --text-base: 1em;
     --text-sm: 0.875em;
 }
 
 .gateway-wrapper {
+    padding: 5% var(--spacing-lg);
     margin: 0 auto;
     max-width: 28em;
-    padding: 5% 1em;
     line-height: 1.5;
-    font-family:
-        ui-sans-serif,
-        system-ui,
-        -apple-system,
-        BlinkMacSystemFont,
-        Segoe UI,
-        Roboto,
-        Helvetica Neue,
-        Arial,
-        Noto Sans,
-        sans-serif,
-        "Apple Color Emoji",
-        "Segoe UI Emoji",
-        Segoe UI Symbol,
-        "Noto Color Emoji";
+    font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, Segoe UI, Roboto, Helvetica Neue, Arial,
+        Noto Sans, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", Segoe UI Symbol, "Noto Color Emoji";
 }
 
 /* Form */
 .halo-form-wrapper {
     border-radius: var(--rounded-lg);
+    padding: var(--spacing-2xl);
     border: 1px solid #dfe6ecb3;
     background: #fff;
-    padding: 1.5em;
 }
 
 .form-title {
     all: unset;
-    margin-bottom: 1em;
+    font-size: var(--text-2xl);
+    margin-bottom: var(--spacing-lg);
     display: block;
     font-weight: 500;
-    font-size: 1.75em;
 }
 
 .halo-form .form-item {
+    margin-bottom: var(--spacing-2xl);
     display: flex;
     flex-direction: column;
-    margin-bottom: 1.5em;
     width: 100%;
 }
 
@@ -90,9 +81,9 @@
 
 .halo-form .form-item-group {
     gap: var(--spacing-lg);
+    margin-bottom: var(--spacing-2xl);
     display: flex;
     align-items: flex-start;
-    margin-bottom: 1.5em;
 }
 
 .halo-form .form-item-group .form-item {
@@ -118,7 +109,7 @@
     -webkit-appearance: none;
     -moz-appearance: none;
     display: block;
-    font-size: 1em;
+    font-size: var(--text-base);
     box-shadow: none;
     width: 100%;
     height: 100%;
@@ -185,7 +176,7 @@
 
 .halo-form .form-item-compact {
     gap: var(--spacing-sm);
-    margin-bottom: 1.5em;
+    margin-bottom: var(--spacing-2xl);
     display: flex;
     align-items: center;
 }
@@ -238,10 +229,7 @@
 .halo-form input[type="checkbox"]:focus {
     outline: 2px solid transparent;
     outline-offset: 2px;
-    box-shadow:
-        rgb(255, 255, 255) 0px 0px 0px 2px,
-        rgb(37, 99, 235) 0px 0px 0px 4px,
-        rgba(0, 0, 0, 0) 0px 0px 0px 0px;
+    box-shadow: rgb(255, 255, 255) 0px 0px 0px 2px, rgb(37, 99, 235) 0px 0px 0px 4px, rgba(0, 0, 0, 0) 0px 0px 0px 0px;
 }
 
 .halo-form input[type="checkbox"]:checked {
