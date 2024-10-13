@@ -151,7 +151,7 @@ public class SystemSetupEndpoint {
     }
 
     private static Mono<ServerResponse> redirectToConsole() {
-        return ServerResponse.seeOther(URI.create("/console")).build();
+        return ServerResponse.status(HttpStatus.FOUND).location(URI.create("/console")).build();
     }
 
     private Mono<Void> doInitialization(SetupRequest body) {
