@@ -8,7 +8,8 @@ data:
       "allowRegistration": false,
       "mustVerifyEmailOnRegistration": false,
       "defaultRole": "guest",
-      "avatarPolicy": "default-policy"
+      "avatarPolicy": "default-policy",
+      "ucAttachmentPolicy": "default-policy"
     }
   theme: |
     {
