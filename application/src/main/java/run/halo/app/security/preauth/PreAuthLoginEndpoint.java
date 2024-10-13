@@ -61,14 +61,21 @@ class PreAuthLoginEndpoint {
                 var publicKey = cryptoService.readPublicKey()
                     .map(key -> Base64.getEncoder().encodeToString(key));
                 var globalInfo = globalInfoService.getGlobalInfo().cache();
-                var loginMethod = request.queryParam("method").orElse("local");
                 var authProviders = authProviderService.getEnabledProviders().cache();
-                var authProvider = authProviders
-                    .filter(ap -> Objects.equals(loginMethod, ap.getMetadata().getName()))
-                    .next()
-                    .switchIfEmpty(Mono.error(() -> new ServerWebInputException(
-                        "Invalid login method " + loginMethod)
-                    ))
+
+                var allFormProviders = authProviders
+                    .filter(ap -> AuthProvider.AuthType.FORM.equals(ap.getSpec().getAuthType()))
+                    .cache();
+
+                var authProvider = Mono.justOrEmpty(request.queryParam("method"))
+                    .flatMap(method -> allFormProviders
+                        .filter(ap -> Objects.equals(method, ap.getMetadata().getName()))
+                        .next()
+                        .switchIfEmpty(Mono.error(
+                            () -> new ServerWebInputException("Invalid login method " + method))
+                        )
+                    )
+                    .switchIfEmpty(allFormProviders.next())
                     .cache();
 
                 var fragmentTemplateName = authProvider.map(ap -> {
@@ -83,9 +90,12 @@ class PreAuthLoginEndpoint {
                 var socialAuthProviders = authProviders
                     .filter(ap -> !AuthProvider.AuthType.FORM.equals(ap.getSpec().getAuthType()))
                     .cache();
-                var formAuthProviders = authProviders
-                    .filter(ap -> AuthProvider.AuthType.FORM.equals(ap.getSpec().getAuthType()))
-                    .filter(ap -> !Objects.equals(loginMethod, ap.getMetadata().getName()))
+                var formAuthProviders = allFormProviders
+                    .filterWhen(ap -> authProvider
+                        .map(provider -> !Objects.equals(provider.getMetadata().getName(),
+                            ap.getMetadata().getName())
+                        )
+                    )
                     .cache();
 
                 return serverRequestCache.saveRequest(exchange).then(Mono.defer(() ->
