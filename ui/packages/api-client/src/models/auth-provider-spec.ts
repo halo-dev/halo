@@ -31,7 +31,7 @@ export interface AuthProviderSpec {
      * @type {string}
      * @memberof AuthProviderSpec
      */
-    'authType'?: AuthProviderSpecAuthTypeEnum;
+    'authType': AuthProviderSpecAuthTypeEnum;
     /**
      * Authentication url of the auth provider
      * @type {string}
@@ -82,12 +82,6 @@ export interface AuthProviderSpec {
     'method'?: string;
     /**
      * 
-     * @type {number}
-     * @memberof AuthProviderSpec
-     */
-    'priority'?: number;
-    /**
-     * 
      * @type {boolean}
      * @memberof AuthProviderSpec
      */
@@ -114,7 +108,8 @@ export interface AuthProviderSpec {
 
 export const AuthProviderSpecAuthTypeEnum = {
     Form: 'FORM',
-    Oauth2: 'OAUTH2'
+    Oauth2: 'OAUTH2',
+    Other: 'OTHER'
 } as const;
 
 export type AuthProviderSpecAuthTypeEnum = typeof AuthProviderSpecAuthTypeEnum[keyof typeof AuthProviderSpecAuthTypeEnum];

@@ -8666,6 +8666,7 @@
       },
       "AuthProviderSpec": {
         "required": [
+          "authType",
           "authenticationUrl",
           "displayName"
         ],
@@ -8675,7 +8676,8 @@
             "type": "string",
             "enum": [
               "FORM",
-              "OAUTH2"
+              "OAUTH2",
+              "OTHER"
             ]
           },
           "authenticationUrl": {
@@ -8703,10 +8705,6 @@
           },
           "method": {
             "type": "string"
-          },
-          "priority": {
-            "type": "integer",
-            "format": "int32"
           },
           "rememberMeSupport": {
             "type": "boolean"

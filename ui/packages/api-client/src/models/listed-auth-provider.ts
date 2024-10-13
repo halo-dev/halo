@@ -25,6 +25,12 @@ export interface ListedAuthProvider {
      * @type {string}
      * @memberof ListedAuthProvider
      */
+    'authType'?: ListedAuthProviderAuthTypeEnum;
+    /**
+     * 
+     * @type {string}
+     * @memberof ListedAuthProvider
+     */
     'authenticationUrl'?: string;
     /**
      * 
@@ -76,6 +82,12 @@ export interface ListedAuthProvider {
     'name': string;
     /**
      * 
+     * @type {number}
+     * @memberof ListedAuthProvider
+     */
+    'priority'?: number;
+    /**
+     * 
      * @type {boolean}
      * @memberof ListedAuthProvider
      */
@@ -99,4 +111,13 @@ export interface ListedAuthProvider {
      */
     'website'?: string;
 }
+
+export const ListedAuthProviderAuthTypeEnum = {
+    Form: 'FORM',
+    Oauth2: 'OAUTH2',
+    Other: 'OTHER'
+} as const;
+
+export type ListedAuthProviderAuthTypeEnum = typeof ListedAuthProviderAuthTypeEnum[keyof typeof ListedAuthProviderAuthTypeEnum];
+
 

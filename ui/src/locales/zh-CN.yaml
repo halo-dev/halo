@@ -1068,6 +1068,11 @@ core:
         local: 账号密码登录
       description:
         local: Halo 内置的默认登录方式
+    list:
+      types:
+        form: 基础认证方式
+        oauth2: 三方认证方式
+        other: 其他认证方式
     detail:
       title: 身份认证详情
       fields:
