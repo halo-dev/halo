@@ -108,8 +108,7 @@ public class SystemSetupEndpoint {
                         .implementation(Void.class)
                     )
             )
-            .before(HaloUtils.noCache(), builder -> {
-            })
+            .before(HaloUtils.noCache(), builder -> builder.operationId("SetNoCacheForSetUpPage"))
             .build();
     }
 
