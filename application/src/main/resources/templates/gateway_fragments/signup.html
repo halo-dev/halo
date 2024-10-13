@@ -123,32 +123,32 @@
 
     <script th:if="${globalInfo.mustVerifyEmailOnRegistration}" th:inline="javascript">
         document.addEventListener("DOMContentLoaded", function () {
-            function sendRequest() {
-                return new Promise((resolve, reject) => {
-                    const email = document.getElementById("email").value;
+            const headerName = /*[[${_csrf.headerName}]]*/ "";
+            const token = /*[[${_csrf.token}]]*/ "";
+            async function sendRequest() {
+                const email = document.getElementById("email").value;
 
-                    if (!email) {
-                        throw new Error(/*[[#{form.emailCode.send.emptyValidation}]]*/"");
-                    }
+                if (!email) {
+                    throw new Error(/*[[#{form.emailCode.send.emptyValidation}]]*/ "");
+                }
 
-                    fetch("/signup/send-email-code", {
-                        method: "POST",
-                        body: JSON.stringify({ email: email }),
-                        headers: {
-                            "Content-Type": "application/json",
-                            [[${_csrf.headerName}]]: [[${_csrf.token}]],
-                        },
-                    })
-                        .then((response) => {
-                            if (response.ok) {
-                                resolve(response);
-                            }
-                            reject(response);
-                        })
-                        .catch((e) => {
-                            reject(e);
-                        });
+                const response = await fetch("/signup/send-email-code", {
+                    method: "POST",
+                    body: JSON.stringify({ email: email }),
+                    headers: {
+                        "Content-Type": "application/json",
+                        [headerName]: token,
+                    },
                 });
+
+                if (!response.ok) {
+                    const json = await response.json();
+                    if (json.errors && json.errors.length) {
+                        throw new Error(json.errors[0]);
+                    }
+                }
+
+                return response;
             }
 
             const emailCodeSendButton = document.getElementById("emailCodeSendButton");
