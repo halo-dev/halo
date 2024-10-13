@@ -516,7 +516,8 @@ public class PluginServiceImpl implements PluginService, InitializingBean, Dispo
                     return path;
                 });
         } catch (IOException e) {
-            return Flux.error(e);
+            log.debug("Failed to load preset plugins: {}", e.getMessage());
+            return Flux.empty();
         }
     }
 
