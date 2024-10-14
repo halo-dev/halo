@@ -58,7 +58,8 @@ public class AuthProvider extends AbstractExtension {
          * Auth type: form or oauth2.
          */
         @Getter(onMethod_ = @NonNull)
-        private AuthType authType = AuthType.OTHER;
+        @Schema(requiredMode = REQUIRED)
+        private AuthType authType = AuthType.OAUTH2;
 
         private String bindingUrl;
 
@@ -71,7 +72,7 @@ public class AuthProvider extends AbstractExtension {
         private ConfigMapRef configMapRef;
 
         public void setAuthType(AuthType authType) {
-            this.authType = (authType == null ? AuthType.OTHER : authType);
+            this.authType = (authType == null ? AuthType.OAUTH2 : authType);
         }
     }
 
@@ -94,7 +95,6 @@ public class AuthProvider extends AbstractExtension {
 
     public enum AuthType {
         FORM,
-        OAUTH2,
-        OTHER;
+        OAUTH2
     }
 }
