@@ -51,3 +51,11 @@ data:
     {
       "search-engine": ["search-engine-lucene"]
     }
+  authProvider: |
+    {
+      "states": [{
+          "name": "local",
+          "enabled": true,
+          "priority": 0
+      }]
+    }
