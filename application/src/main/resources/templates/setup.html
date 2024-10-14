@@ -16,7 +16,11 @@
 
             <div class="halo-form-wrapper">
                 <h1 class="form-title" th:text="#{title}"></h1>
-
+                <div class="alert alert-error" role="alert" th:if="${usingH2database}">
+                    <strong th:text="#{form.messages.h2.title}"></strong>
+                    <br />
+                    <span th:text="#{form.messages.h2.content}"> </span>
+                </div>
                 <form th:object="${form}" th:action="@{/system/setup}" class="halo-form" method="post">
                     <div class="form-item">
                         <label for="siteTitle" th:text="#{form.siteTitle.label}"></label>

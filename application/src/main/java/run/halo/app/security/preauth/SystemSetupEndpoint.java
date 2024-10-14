@@ -1,5 +1,6 @@
 package run.halo.app.security.preauth;
 
+import static io.r2dbc.spi.ConnectionFactoryOptions.DRIVER;
 import static io.swagger.v3.oas.annotations.media.Schema.RequiredMode.REQUIRED;
 import static org.springdoc.core.fn.builders.apiresponse.Builder.responseBuilder;
 import static org.springdoc.core.fn.builders.requestbody.Builder.requestBodyBuilder;
@@ -18,11 +19,14 @@ import java.time.Duration;
 import java.time.Instant;
 import java.util.LinkedHashMap;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Properties;
 import lombok.RequiredArgsConstructor;
 import org.springdoc.core.fn.builders.content.Builder;
 import org.springdoc.webflux.core.fn.SpringdocRouteBuilder;
+import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.beans.factory.config.PlaceholderConfigurerSupport;
+import org.springframework.boot.autoconfigure.r2dbc.R2dbcConnectionDetails;
 import org.springframework.context.annotation.Bean;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.dao.OptimisticLockingFailureException;
@@ -77,6 +81,7 @@ public class SystemSetupEndpoint {
     private final PluginService pluginService;
     private final ThemeService themeService;
     private final Validator validator;
+    private final ObjectProvider<R2dbcConnectionDetails> connectionDetails;
 
     @Bean
     RouterFunction<ServerResponse> setupPageRouter() {
@@ -138,8 +143,10 @@ public class SystemSetupEndpoint {
     private Mono<ServerResponse> handleValidationErrors(BindingResult bindingResult,
         ServerRequest request) {
         if (isHtmlRequest(request)) {
+            var model = bindingResult.getModel();
+            model.put("usingH2database", usingH2database());
             return ServerResponse.status(HttpStatus.BAD_REQUEST)
-                .render(SETUP_TEMPLATE, bindingResult.getModel());
+                .render(SETUP_TEMPLATE, model);
         }
         return Mono.error(new RequestBodyValidationException(bindingResult));
     }
@@ -209,8 +216,23 @@ public class SystemSetupEndpoint {
                 }
                 var body = new SetupRequest(new LinkedMultiValueMap<>());
                 var bindingResult = new BeanPropertyBindingResult(body, "form");
-                return ServerResponse.ok().render(SETUP_TEMPLATE, bindingResult.getModel());
+                var model = bindingResult.getModel();
+                model.put("usingH2database", usingH2database());
+                return ServerResponse.ok().render(SETUP_TEMPLATE, model);
             });
+    }
+
+    private boolean usingH2database() {
+        var rcd = connectionDetails.getIfUnique();
+        if (rcd == null) {
+            // If no R2dbcConnectionDetails is available, we assume H2(mem) is used.
+            return true;
+        }
+        var options = rcd.getConnectionFactoryOptions();
+        return Optional.ofNullable(options.getValue(DRIVER))
+            .map(Object::toString)
+            .map("h2"::equalsIgnoreCase)
+            .orElse(false);
     }
 
     record SetupRequest(MultiValueMap<String, String> formData) {
