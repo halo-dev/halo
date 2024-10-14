@@ -108,8 +108,7 @@ export interface AuthProviderSpec {
 
 export const AuthProviderSpecAuthTypeEnum = {
     Form: 'FORM',
-    Oauth2: 'OAUTH2',
-    Other: 'OTHER'
+    Oauth2: 'OAUTH2'
 } as const;
 
 export type AuthProviderSpecAuthTypeEnum = typeof AuthProviderSpecAuthTypeEnum[keyof typeof AuthProviderSpecAuthTypeEnum];

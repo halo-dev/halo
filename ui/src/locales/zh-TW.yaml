@@ -1049,7 +1049,6 @@ core:
       types:
         form: 基礎認證方式
         oauth2: 三方認證方式
-        other: 其他認證方式
     detail:
       title: 身份認證詳情
       fields:

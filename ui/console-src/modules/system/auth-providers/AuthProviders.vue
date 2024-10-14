@@ -17,7 +17,6 @@ const SYSTEM_CONFIGMAP_AUTH_PROVIDER = "authProvider";
 
 const formAuthProviders = ref<ListedAuthProvider[]>([]);
 const oauth2AuthProviders = ref<ListedAuthProvider[]>([]);
-const otherAuthProviders = ref<ListedAuthProvider[]>([]);
 
 const { isLoading, refetch } = useQuery<ListedAuthProvider[]>({
   queryKey: ["auth-providers"],
@@ -35,10 +34,6 @@ const { isLoading, refetch } = useQuery<ListedAuthProvider[]>({
       (authProvider) =>
         authProvider.authType === AuthProviderSpecAuthTypeEnum.Oauth2
     );
-
-    otherAuthProviders.value = data.filter(
-      (authProvider) => authProvider.authType === "OTHER"
-    );
   },
 });
 
@@ -52,7 +47,6 @@ async function onSortUpdate() {
     const allAuthProviders = [
       ...formAuthProviders.value,
       ...oauth2AuthProviders.value,
-      ...otherAuthProviders.value,
     ].filter(Boolean);
 
     await consoleApiClient.configMap.system.updateSystemConfigByGroup({
@@ -97,15 +91,6 @@ async function onSortUpdate() {
         :key="AuthProviderSpecAuthTypeEnum.Oauth2"
         v-model="oauth2AuthProviders"
         :title="$t('core.identity_authentication.list.types.oauth2')"
-        :loading="updating"
-        @update="onSortUpdate"
-      />
-
-      <AuthProvidersSection
-        v-if="otherAuthProviders.length"
-        key="OTHER"
-        v-model="otherAuthProviders"
-        :title="$t('core.identity_authentication.list.types.other')"
         :loading="updating"
         @update="onSortUpdate"
       />

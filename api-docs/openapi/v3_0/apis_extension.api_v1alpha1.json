@@ -8676,8 +8676,7 @@
             "type": "string",
             "enum": [
               "FORM",
-              "OAUTH2",
-              "OTHER"
+              "OAUTH2"
             ]
           },
           "authenticationUrl": {

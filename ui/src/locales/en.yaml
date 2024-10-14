@@ -1144,7 +1144,6 @@ core:
       types:
         form: Basic Authentication Method
         oauth2: Third-party Authentication Method
-        other: Other Authentication Methods
     detail:
       title: Identity authentication detail
       fields:
