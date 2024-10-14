@@ -19,7 +19,7 @@ ext {
     jsoup = '1.18.1'
     jsonPatch = "1.13"
     springDocOpenAPI = "2.6.0"
-    lucene = "9.12.0"
+    lucene = "10.0.0"
     resilience4jVersion = "2.2.0"
     twoFactorAuth = "1.3"
     tika = "2.9.2"
