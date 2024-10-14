@@ -16,6 +16,7 @@ export default definePlugin({
           meta: {
             title: "core.identity_authentication.title",
             searchable: true,
+            permissions: ["*"],
           },
         },
         {
@@ -24,6 +25,7 @@ export default definePlugin({
           component: AuthProviderDetail,
           meta: {
             title: "core.identity_authentication.detail.title",
+            permissions: ["*"],
           },
         },
       ],

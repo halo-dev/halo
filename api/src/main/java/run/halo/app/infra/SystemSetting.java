@@ -2,8 +2,9 @@ package run.halo.app.infra;
 
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
-import java.util.Set;
+import java.util.List;
 import lombok.Data;
+import lombok.experimental.Accessors;
 import org.springframework.boot.convert.ApplicationConversionService;
 import run.halo.app.extension.ConfigMap;
 import run.halo.app.infra.utils.JsonUtils;
@@ -113,7 +114,15 @@ public class SystemSetting {
     @Data
     public static class AuthProvider {
         public static final String GROUP = "authProvider";
-        private Set<String> enabled;
+        private List<AuthProviderState> states;
+    }
+
+    @Data
+    @Accessors(chain = true)
+    public static class AuthProviderState {
+        private String name;
+        private boolean enabled;
+        private int priority;
     }
 
     /**

@@ -292,12 +292,14 @@ function onGrantPermissionModalClose() {
           </template>
           {{ $t("core.user.actions.roles") }}
         </VButton>
-        <VButton :route="{ name: 'AuthProviders' }" size="sm" type="default">
-          <template #icon>
-            <IconLockPasswordLine class="h-full w-full" />
-          </template>
-          {{ $t("core.user.actions.identity_authentication") }}
-        </VButton>
+        <HasPermission :permissions="['*']">
+          <VButton :route="{ name: 'AuthProviders' }" size="sm" type="default">
+            <template #icon>
+              <IconLockPasswordLine class="h-full w-full" />
+            </template>
+            {{ $t("core.user.actions.identity_authentication") }}
+          </VButton>
+        </HasPermission>
         <VButton
           v-permission="['system:users:manage']"
           type="secondary"

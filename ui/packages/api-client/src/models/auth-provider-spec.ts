@@ -31,7 +31,7 @@ export interface AuthProviderSpec {
      * @type {string}
      * @memberof AuthProviderSpec
      */
-    'authType'?: AuthProviderSpecAuthTypeEnum;
+    'authType': AuthProviderSpecAuthTypeEnum;
     /**
      * Authentication url of the auth provider
      * @type {string}
@@ -80,12 +80,6 @@ export interface AuthProviderSpec {
      * @memberof AuthProviderSpec
      */
     'method'?: string;
-    /**
-     * 
-     * @type {number}
-     * @memberof AuthProviderSpec
-     */
-    'priority'?: number;
     /**
      * 
      * @type {boolean}

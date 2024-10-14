@@ -3568,6 +3568,7 @@
       },
       "AuthProviderSpec": {
         "required": [
+          "authType",
           "authenticationUrl",
           "displayName"
         ],
@@ -3605,10 +3606,6 @@
           },
           "method": {
             "type": "string"
-          },
-          "priority": {
-            "type": "integer",
-            "format": "int32"
           },
           "rememberMeSupport": {
             "type": "boolean"
@@ -4435,6 +4432,13 @@
         ],
         "type": "object",
         "properties": {
+          "authType": {
+            "type": "string",
+            "enum": [
+              "FORM",
+              "OAUTH2"
+            ]
+          },
           "authenticationUrl": {
             "type": "string"
           },
@@ -4461,6 +4465,10 @@
           },
           "name": {
             "type": "string"
+          },
+          "priority": {
+            "type": "integer",
+            "format": "int32"
           },
           "privileged": {
             "type": "boolean"

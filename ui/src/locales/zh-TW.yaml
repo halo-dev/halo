@@ -1045,6 +1045,10 @@ core:
         local: 帳號密碼登入
       description:
         local: Halo 內建的默認登入方式
+    list:
+      types:
+        form: 基礎認證方式
+        oauth2: 三方認證方式
     detail:
       title: 身份認證詳情
       fields:

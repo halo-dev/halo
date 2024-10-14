@@ -9,7 +9,6 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import java.util.HashMap;
-import java.util.Set;
 import org.json.JSONException;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -48,7 +47,7 @@ class AuthProviderServiceImplTest {
     AuthProviderServiceImpl authProviderService;
 
     @Test
-    void testEnable() {
+    void testEnable() throws JSONException {
         // Create a test auth provider
         AuthProvider authProvider = createAuthProvider("github");
         when(client.get(eq(AuthProvider.class), eq("github"))).thenReturn(Mono.just(authProvider));
@@ -56,10 +55,7 @@ class AuthProviderServiceImplTest {
         ArgumentCaptor<ConfigMap> captor = ArgumentCaptor.forClass(ConfigMap.class);
         when(client.update(captor.capture())).thenReturn(Mono.empty());
 
-        ConfigMap configMap = new ConfigMap();
-        configMap.setData(new HashMap<>());
-        when(client.fetch(eq(ConfigMap.class), eq(SystemSetting.SYSTEM_CONFIG)))
-            .thenReturn(Mono.just(configMap));
+        pileSystemConfigMap();
 
         // Call the method being tested
         authProviderService.enable("github")
@@ -68,50 +64,58 @@ class AuthProviderServiceImplTest {
             .verifyComplete();
 
         ConfigMap value = captor.getValue();
-        String providerSettingStr = value.getData().get(SystemSetting.AuthProvider.GROUP);
-        Set<String> enabled =
-            JsonUtils.jsonToObject(providerSettingStr, SystemSetting.AuthProvider.class)
-                .getEnabled();
-        assertThat(enabled).containsExactly("github");
+        JSONAssert.assertEquals("""
+                {
+                    "states": [
+                        {
+                            "name": "github",
+                            "enabled": true,
+                            "priority": 0
+                        }
+                    ]
+                }
+                """,
+            value.getData().get(SystemSetting.AuthProvider.GROUP),
+            true);
         // Verify the result
         verify(client).get(AuthProvider.class, "github");
-        verify(client).fetch(eq(ConfigMap.class), eq(SystemSetting.SYSTEM_CONFIG));
     }
 
     @Test
-    void testDisable() {
+    void testDisable() throws JSONException {
         // Create a test auth provider
         AuthProvider authProvider = createAuthProvider("github");
         when(client.get(eq(AuthProvider.class), eq("github"))).thenReturn(Mono.just(authProvider));
 
         AuthProvider local = createAuthProvider("local");
         local.getMetadata().getLabels().put(AuthProvider.PRIVILEGED_LABEL, "true");
-        // when(client.list(eq(AuthProvider.class), any(), any())).thenReturn(Flux.just(local));
 
         ArgumentCaptor<ConfigMap> captor = ArgumentCaptor.forClass(ConfigMap.class);
         when(client.update(captor.capture())).thenReturn(Mono.empty());
 
-        ConfigMap configMap = new ConfigMap();
-        configMap.setData(new HashMap<>());
-        configMap.getData().put(SystemSetting.AuthProvider.GROUP, "{\"enabled\":[\"github\"]}");
-        when(client.fetch(eq(ConfigMap.class), eq(SystemSetting.SYSTEM_CONFIG)))
-            .thenReturn(Mono.just(configMap));
+        pileSystemConfigMap();
 
         // Call the method being tested
         Mono<AuthProvider> result = authProviderService.disable("github");
 
         assertEquals(authProvider, result.block());
         ConfigMap value = captor.getValue();
-        String providerSettingStr = value.getData().get(SystemSetting.AuthProvider.GROUP);
-        Set<String> enabled =
-            JsonUtils.jsonToObject(providerSettingStr, SystemSetting.AuthProvider.class)
-                .getEnabled();
-        assertThat(enabled).isEmpty();
+        JSONAssert.assertEquals("""
+                {
+                    "states": [
+                        {
+                            "name": "github",
+                            "enabled": false,
+                            "priority": 0
+                        }
+                    ]
+                }
+                """,
+            value.getData().get(SystemSetting.AuthProvider.GROUP),
+            true);
         // Verify the result
         verify(client).get(AuthProvider.class, "github");
-        verify(client).fetch(eq(ConfigMap.class), eq(SystemSetting.SYSTEM_CONFIG));
     }
-
 
     @Test
     @WithMockUser(username = "admin")
@@ -129,11 +133,7 @@ class AuthProviderServiceImplTest {
         when(client.listAll(same(UserConnection.class), any(ListOptions.class), any(Sort.class)))
             .thenReturn(Flux.empty());
 
-        ConfigMap configMap = new ConfigMap();
-        configMap.setData(new HashMap<>());
-        configMap.getData().put(SystemSetting.AuthProvider.GROUP, "{\"enabled\":[\"github\"]}");
-        when(client.fetch(eq(ConfigMap.class), eq(SystemSetting.SYSTEM_CONFIG)))
-            .thenReturn(Mono.just(configMap));
+        pileSystemConfigMap();
 
         authProviderService.listAll()
             .as(StepVerifier::create)
@@ -142,29 +142,36 @@ class AuthProviderServiceImplTest {
                 try {
                     JSONAssert.assertEquals("""
                             [{
-                                "name": "github",
-                                "displayName": "github",
-                                "bindingUrl": "fake-binding-url",
-                                "enabled": true,
-                                "isBound": false,
-                                "supportsBinding": false,
-                                "privileged": false
-                            }, {
-                                "name": "gitlab",
-                                "displayName": "gitlab",
-                                "bindingUrl": "fake-binding-url",
-                                "enabled": false,
-                                "isBound": false,
-                                "supportsBinding": false,
-                                "privileged": false
-                            },{
-                            
-                                "name": "gitee",
-                                "displayName": "gitee",
-                                "enabled": false,
-                                "isBound": false,
-                                "supportsBinding": false,
-                                "privileged": false
+                                 "name": "gitee",
+                                 "displayName": "gitee",
+                                 "authType": "OAUTH2",
+                                 "isBound": false,
+                                 "enabled": false,
+                                 "priority": 0,
+                                 "supportsBinding": false,
+                                 "privileged": false
+                             },
+                             {
+                                 "name": "github",
+                                 "displayName": "github",
+                                 "bindingUrl": "fake-binding-url",
+                                 "authType": "OAUTH2",
+                                 "isBound": false,
+                                 "enabled": false,
+                                 "priority": 0,
+                                 "supportsBinding": false,
+                                 "privileged": false
+                             },
+                             {
+                                 "name": "gitlab",
+                                 "displayName": "gitlab",
+                                 "bindingUrl": "fake-binding-url",
+                                 "authType": "OAUTH2",
+                                 "isBound": false,
+                                 "enabled": false,
+                                 "priority": 0,
+                                 "supportsBinding": false,
+                                 "privileged": false
                             }]
                             """,
                         JsonUtils.objectToJson(result),
@@ -183,6 +190,14 @@ class AuthProviderServiceImplTest {
         authProvider.getMetadata().setLabels(new HashMap<>());
         authProvider.setSpec(new AuthProvider.AuthProviderSpec());
         authProvider.getSpec().setDisplayName(name);
+        authProvider.getSpec().setAuthType(AuthProvider.AuthType.OAUTH2);
         return authProvider;
+    }
+
+    void pileSystemConfigMap() {
+        ConfigMap configMap = new ConfigMap();
+        configMap.setData(new HashMap<>());
+        when(client.fetch(eq(ConfigMap.class), eq(SystemSetting.SYSTEM_CONFIG)))
+            .thenReturn(Mono.just(configMap));
     }
 }
