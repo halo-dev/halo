@@ -11,6 +11,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Objects;
 import java.util.function.Predicate;
+import org.springframework.security.authentication.AuthenticationTrustResolver;
+import org.springframework.security.authentication.AuthenticationTrustResolverImpl;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.context.ReactiveSecurityContextHolder;
@@ -64,6 +66,9 @@ public class UserScopedPatHandlerImpl implements UserScopedPatHandler {
 
     private Clock clock;
 
+    private final AuthenticationTrustResolver authTrustResolver =
+        new AuthenticationTrustResolverImpl();
+
     public UserScopedPatHandlerImpl(ReactiveExtensionClient client,
         CryptoService cryptoService,
         ExternalUrlSupplier externalUrl,
@@ -84,8 +89,8 @@ public class UserScopedPatHandlerImpl implements UserScopedPatHandler {
         this.clock = clock;
     }
 
-    private static Mono<Authentication> mustBeRealUser(Mono<Authentication> authentication) {
-        return authentication.filter(AuthorityUtils::isRealUser)
+    private Mono<Authentication> mustBeAuthenticated(Mono<Authentication> authentication) {
+        return authentication.filter(authTrustResolver::isAuthenticated)
             // Non-username-password authentication could not access the API at any time.
             .switchIfEmpty(Mono.error(AccessDeniedException::new));
     }
@@ -94,7 +99,7 @@ public class UserScopedPatHandlerImpl implements UserScopedPatHandler {
     public Mono<ServerResponse> create(ServerRequest request) {
         return ReactiveSecurityContextHolder.getContext()
             .map(SecurityContext::getAuthentication)
-            .transform(UserScopedPatHandlerImpl::mustBeRealUser)
+            .transform(this::mustBeAuthenticated)
             .flatMap(auth -> request.bodyToMono(PersonalAccessToken.class)
                 .switchIfEmpty(
                     Mono.error(() -> new ServerWebInputException("Missing request body.")))
@@ -222,7 +227,7 @@ public class UserScopedPatHandlerImpl implements UserScopedPatHandler {
     public Mono<ServerResponse> restore(ServerRequest request) {
         var restoredPat = ReactiveSecurityContextHolder.getContext()
             .map(SecurityContext::getAuthentication)
-            .transform(UserScopedPatHandlerImpl::mustBeRealUser)
+            .transform(this::mustBeAuthenticated)
             .flatMap(auth -> {
                 var name = request.pathVariable("name");
                 return getPat(name, auth.getName());
