@@ -8,6 +8,8 @@ import org.springframework.security.web.server.context.ServerSecurityContextRepo
 import org.springframework.security.web.server.savedrequest.ServerRequestCache;
 import run.halo.app.content.PostContentService;
 import run.halo.app.core.extension.service.AttachmentService;
+import run.halo.app.core.user.service.RoleService;
+import run.halo.app.core.user.service.UserService;
 import run.halo.app.extension.DefaultSchemeManager;
 import run.halo.app.extension.ExtensionClient;
 import run.halo.app.extension.ReactiveExtensionClient;
@@ -86,6 +88,10 @@ public enum SharedApplicationContextFactory {
             .ifUnique(serverRequestCache ->
                 beanFactory.registerSingleton("serverRequestCache", serverRequestCache)
             );
+        rootContext.getBeanProvider(UserService.class)
+            .ifUnique(userService -> beanFactory.registerSingleton("userService", userService));
+        rootContext.getBeanProvider(RoleService.class)
+            .ifUnique(roleService -> beanFactory.registerSingleton("roleService", roleService));
         // TODO add more shared instance here
 
         sharedContext.refresh();
