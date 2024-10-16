@@ -13,6 +13,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.experimental.Accessors;
 import org.apache.commons.lang3.BooleanUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.dao.OptimisticLockingFailureException;
 import org.springframework.lang.NonNull;
 import org.springframework.security.core.context.ReactiveSecurityContextHolder;
@@ -29,6 +30,7 @@ import run.halo.app.extension.ListOptions;
 import run.halo.app.extension.MetadataUtil;
 import run.halo.app.extension.ReactiveExtensionClient;
 import run.halo.app.extension.index.query.QueryFactory;
+import run.halo.app.infra.SystemConfigurableEnvironmentFetcher;
 import run.halo.app.infra.SystemSetting;
 import run.halo.app.infra.utils.JsonUtils;
 
@@ -42,6 +44,7 @@ import run.halo.app.infra.utils.JsonUtils;
 @RequiredArgsConstructor
 public class AuthProviderServiceImpl implements AuthProviderService {
     private final ReactiveExtensionClient client;
+    private final ObjectProvider<SystemConfigurableEnvironmentFetcher> environmentFetcherProvider;
 
     @Override
     public Mono<AuthProvider> enable(String name) {
@@ -146,7 +149,7 @@ public class AuthProviderServiceImpl implements AuthProviderService {
     }
 
     private Mono<List<SystemSetting.AuthProviderState>> fetchProviderStates() {
-        return fetchSystemConfigMap()
+        return getSystemConfigMap()
             .map(AuthProviderServiceImpl::getAuthProviderConfig)
             .map(SystemSetting.AuthProvider::getStates)
             .defaultIfEmpty(List.of())
@@ -218,7 +221,7 @@ public class AuthProviderServiceImpl implements AuthProviderService {
     }
 
     private Mono<ConfigMap> updateAuthProviderEnabled(String name, boolean enabled) {
-        return Mono.defer(() -> fetchSystemConfigMap()
+        return Mono.defer(() -> getSystemConfigMap()
                 .flatMap(configMap -> {
                     var providerConfig = getAuthProviderConfig(configMap);
                     var stateToFoundOpt = providerConfig.getStates()
@@ -244,7 +247,12 @@ public class AuthProviderServiceImpl implements AuthProviderService {
                 .filter(OptimisticLockingFailureException.class::isInstance));
     }
 
-    Mono<ConfigMap> fetchSystemConfigMap() {
-        return client.fetch(ConfigMap.class, SystemSetting.SYSTEM_CONFIG);
+    private Mono<ConfigMap> getSystemConfigMap() {
+        var systemFetcher = environmentFetcherProvider.getIfUnique();
+        if (systemFetcher == null) {
+            return Mono.error(
+                new IllegalStateException("No SystemConfigurableEnvironmentFetcher found"));
+        }
+        return systemFetcher.getConfigMap();
     }
 }

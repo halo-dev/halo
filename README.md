@@ -30,7 +30,7 @@
 如果你的设备有 Docker 环境，可以使用以下命令快速启动一个 Halo 的体验环境：
 
 ```bash
-docker run -d --name halo -p 8090:8090 -v ~/.halo2:/root/.halo2 halohub/halo:2.19
+docker run -d --name halo -p 8090:8090 -v ~/.halo2:/root/.halo2 halohub/halo:2.20
 ```
 
 或者点击下方按钮使用 [Gitpod](https://gitpod.io/) 启动一个体验环境：

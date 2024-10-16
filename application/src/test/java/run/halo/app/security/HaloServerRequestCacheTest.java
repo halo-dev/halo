@@ -60,8 +60,30 @@ class HaloServerRequestCacheTest {
     @Test
     void shouldRemoveIfRedirectUriFound() {
         var sessionManager = new DefaultWebSessionManager();
+        var mockExchange = MockServerWebExchange.builder(MockServerHttpRequest.get("/login")
+                .queryParam("redirect_uri", "/halo")
+            )
+            .sessionManager(sessionManager)
+            .build();
+        var removeExchange = mockExchange.mutate()
+            .request(builder -> builder.uri(URI.create("/halo")))
+            .build();
+        requestCache.saveRequest(mockExchange)
+            .then(Mono.defer(() -> requestCache.removeMatchingRequest(removeExchange)))
+            .as(StepVerifier::create)
+            .assertNext(request -> {
+                Assertions.assertEquals(URI.create("/halo"), request.getURI());
+            })
+            .verifyComplete();
+    }
+
+    @Test
+    void shouldRemoveIfRedirectUriFoundAndContainsFragment() {
+        var sessionManager = new DefaultWebSessionManager();
         var mockExchange =
-            MockServerWebExchange.builder(MockServerHttpRequest.get("/login?redirect_uri=/halo"))
+            MockServerWebExchange.builder(MockServerHttpRequest.get("/login")
+                    .queryParam("redirect_uri", "/halo#fragment")
+                )
                 .sessionManager(sessionManager)
                 .build();
         var removeExchange = mockExchange.mutate()

@@ -10,12 +10,14 @@ import static org.mockito.Mockito.when;
 
 import java.util.HashMap;
 import org.json.JSONException;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.skyscreamer.jsonassert.JSONAssert;
+import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.data.domain.Sort;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
@@ -28,6 +30,7 @@ import run.halo.app.extension.ConfigMap;
 import run.halo.app.extension.ListOptions;
 import run.halo.app.extension.Metadata;
 import run.halo.app.extension.ReactiveExtensionClient;
+import run.halo.app.infra.SystemConfigurableEnvironmentFetcher;
 import run.halo.app.infra.SystemSetting;
 import run.halo.app.infra.utils.JsonUtils;
 
@@ -43,8 +46,19 @@ class AuthProviderServiceImplTest {
     @Mock
     ReactiveExtensionClient client;
 
+    @Mock
+    ObjectProvider<SystemConfigurableEnvironmentFetcher> systemFetchProvider;
+
+    @Mock
+    SystemConfigurableEnvironmentFetcher systemConfigFetcher;
+
     @InjectMocks
     AuthProviderServiceImpl authProviderService;
+
+    @BeforeEach
+    void setUp() {
+        when(systemFetchProvider.getIfUnique()).thenReturn(systemConfigFetcher);
+    }
 
     @Test
     void testEnable() throws JSONException {
@@ -66,6 +80,7 @@ class AuthProviderServiceImplTest {
         ConfigMap value = captor.getValue();
         JSONAssert.assertEquals("""
                 {
+                    "enabled":["github"],
                     "states": [
                         {
                             "name": "github",
@@ -102,6 +117,7 @@ class AuthProviderServiceImplTest {
         ConfigMap value = captor.getValue();
         JSONAssert.assertEquals("""
                 {
+                    "enabled":[],
                     "states": [
                         {
                             "name": "github",
@@ -197,7 +213,7 @@ class AuthProviderServiceImplTest {
     void pileSystemConfigMap() {
         ConfigMap configMap = new ConfigMap();
         configMap.setData(new HashMap<>());
-        when(client.fetch(eq(ConfigMap.class), eq(SystemSetting.SYSTEM_CONFIG)))
+        when(systemConfigFetcher.getConfigMap())
             .thenReturn(Mono.just(configMap));
     }
 }

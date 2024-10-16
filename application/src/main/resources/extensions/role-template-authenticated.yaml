@@ -29,7 +29,7 @@ rules:
     resources: [ "plugins/bundle.js", "plugins/bundle.css" ]
     resourceNames: [ "-" ]
     verbs: [ "get" ]
-  - apisGroups: [ "uc.api.auth.halo.run" ]
+  - apiGroups: [ "uc.api.auth.halo.run" ]
     resources: [ "user-connections/disconnect" ]
     verbs: [ "update" ]
 ---
