@@ -15,7 +15,7 @@ import run.halo.app.extension.GroupVersion;
 import run.halo.app.security.PersonalAccessToken;
 
 @Component
-public class PatEndpoint implements CustomEndpoint {
+class PatEndpoint implements CustomEndpoint {
 
     private final UserScopedPatHandler patHandler;
 

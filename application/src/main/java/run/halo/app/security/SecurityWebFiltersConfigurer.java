@@ -11,6 +11,7 @@ import static org.springframework.security.config.web.server.SecurityWebFiltersO
 import lombok.Setter;
 import org.pf4j.ExtensionPoint;
 import org.springframework.core.annotation.AnnotationAwareOrderComparator;
+import org.springframework.core.annotation.Order;
 import org.springframework.security.config.web.server.ServerHttpSecurity;
 import org.springframework.security.web.server.WebFilterChainProxy;
 import org.springframework.stereotype.Component;
@@ -22,6 +23,8 @@ import run.halo.app.plugin.extensionpoint.ExtensionGetter;
 import run.halo.app.security.authentication.SecurityConfigurer;
 
 @Component
+// Specific an order here to control the order or security configurer initialization
+@Order(-100)
 public class SecurityWebFiltersConfigurer implements SecurityConfigurer {
 
     private final ExtensionGetter extensionGetter;
