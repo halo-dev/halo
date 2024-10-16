@@ -27,9 +27,15 @@
 
 ## 快速开始
 
+如果你的设备有 Docker 环境，可以使用以下命令快速启动一个 Halo 的体验环境：
+
 ```bash
 docker run -d --name halo -p 8090:8090 -v ~/.halo2:/root/.halo2 halohub/halo:2.20
 ```
+
+或者点击下方按钮使用 [Gitpod](https://gitpod.io/) 启动一个体验环境：
+
+[![Open in Gitpod](https://gitpod.io/button/open-in-gitpod.svg)](https://gitpod.io/#https://github.com/halo-sigs/gitpod-demo)
 
 以上仅作为体验使用，详细部署文档请查阅：<https://docs.halo.run/getting-started/install/docker-compose>
 
