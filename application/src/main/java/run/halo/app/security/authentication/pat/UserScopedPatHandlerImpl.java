@@ -1,7 +1,7 @@
-package run.halo.app.security.authentication.pat.impl;
+package run.halo.app.security.authentication.pat;
 
 import static run.halo.app.extension.Comparators.compareCreationTimestamp;
-import static run.halo.app.security.authentication.pat.PatServerWebExchangeMatcher.PAT_TOKEN_PREFIX;
+import static run.halo.app.security.authentication.pat.PatAuthenticationConverter.PAT_TOKEN_PREFIX;
 
 import com.nimbusds.jose.jwk.JWKSet;
 import com.nimbusds.jose.jwk.source.ImmutableJWKSet;
@@ -41,11 +41,10 @@ import run.halo.app.infra.exception.AccessDeniedException;
 import run.halo.app.infra.exception.NotFoundException;
 import run.halo.app.security.PersonalAccessToken;
 import run.halo.app.security.authentication.CryptoService;
-import run.halo.app.security.authentication.pat.UserScopedPatHandler;
 import run.halo.app.security.authorization.AuthorityUtils;
 
 @Service
-public class UserScopedPatHandlerImpl implements UserScopedPatHandler {
+class UserScopedPatHandlerImpl implements UserScopedPatHandler {
 
     private static final String ACCESS_TOKEN_ANNO_NAME = "security.halo.run/access-token";
 

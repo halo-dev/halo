@@ -1,6 +1,5 @@
 package run.halo.app.infra.config;
 
-import static org.springframework.security.web.server.authentication.ServerWebExchangeDelegatingReactiveAuthenticationManagerResolver.builder;
 import static org.springframework.security.web.server.util.matcher.ServerWebExchangeMatchers.pathMatchers;
 
 import java.util.concurrent.ConcurrentHashMap;
@@ -33,8 +32,6 @@ import run.halo.app.security.HaloServerRequestCache;
 import run.halo.app.security.authentication.CryptoService;
 import run.halo.app.security.authentication.SecurityConfigurer;
 import run.halo.app.security.authentication.impl.RsaKeyService;
-import run.halo.app.security.authentication.pat.PatAuthenticationManager;
-import run.halo.app.security.authentication.pat.PatServerWebExchangeMatcher;
 import run.halo.app.security.authorization.AuthorityUtils;
 import run.halo.app.security.session.InMemoryReactiveIndexedSessionRepository;
 import run.halo.app.security.session.ReactiveIndexedSessionRepository;
@@ -85,15 +82,6 @@ public class WebServerSecurityConfig {
                 if (haloProperties.getSecurity().getBasicAuth().isDisabled()) {
                     basic.disable();
                 }
-            })
-            .oauth2ResourceServer(oauth2 -> {
-                var authManagerResolver = builder().add(
-                        new PatServerWebExchangeMatcher(),
-                        new PatAuthenticationManager(client, cryptoService)
-                    )
-                    // TODO Add other authentication mangers here. e.g.: JwtAuthenticationManager.
-                    .build();
-                oauth2.authenticationManagerResolver(authManagerResolver);
             })
             .headers(headerSpec -> headerSpec
                 .frameOptions(frameSpec -> {
