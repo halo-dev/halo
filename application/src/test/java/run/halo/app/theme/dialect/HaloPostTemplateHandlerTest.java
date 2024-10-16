@@ -82,7 +82,8 @@ class HaloPostTemplateHandlerTest {
     void shouldHandleStandaloneElementIfOneElementTagProcessorProvided() {
         var processor = mock(ElementTagPostProcessor.class);
         var newTag = mock(IStandaloneElementTag.class);
-        when(processor.process(new SecureTemplateContext(templateContext), standaloneElementTag))
+        when(processor.process(SecureTemplateContextWrapper.wrap(templateContext),
+            standaloneElementTag))
             .thenReturn(Mono.just(newTag));
         when(extensionGetter.getExtensionList(ElementTagPostProcessor.class))
             .thenReturn(List.of(processor));
@@ -97,7 +98,8 @@ class HaloPostTemplateHandlerTest {
     void shouldHandleStandaloneElementIfTagTypeChanged() {
         var processor = mock(ElementTagPostProcessor.class);
         var newTag = mock(IStandaloneElementTag.class);
-        when(processor.process(new SecureTemplateContext(templateContext), standaloneElementTag))
+        when(processor.process(SecureTemplateContextWrapper.wrap(templateContext),
+            standaloneElementTag))
             .thenReturn(Mono.just(newTag));
         when(extensionGetter.getExtensionList(ElementTagPostProcessor.class))
             .thenReturn(List.of(processor));
@@ -114,9 +116,10 @@ class HaloPostTemplateHandlerTest {
         var processor2 = mock(ElementTagPostProcessor.class);
         var newTag1 = mock(IStandaloneElementTag.class);
         var newTag2 = mock(IStandaloneElementTag.class);
-        when(processor1.process(new SecureTemplateContext(templateContext), standaloneElementTag))
+        when(processor1.process(SecureTemplateContextWrapper.wrap(templateContext),
+            standaloneElementTag))
             .thenReturn(Mono.just(newTag1));
-        when(processor2.process(new SecureTemplateContext(templateContext), newTag1))
+        when(processor2.process(SecureTemplateContextWrapper.wrap(templateContext), newTag1))
             .thenReturn(Mono.just(newTag2));
         when(extensionGetter.getExtensionList(ElementTagPostProcessor.class))
             .thenReturn(List.of(processor1, processor2));
@@ -131,7 +134,8 @@ class HaloPostTemplateHandlerTest {
     void shouldNotHandleIfProcessedTagTypeChanged() {
         var processor = mock(ElementTagPostProcessor.class);
         var newTag = mock(IOpenElementTag.class);
-        when(processor.process(new SecureTemplateContext(templateContext), standaloneElementTag))
+        when(processor.process(SecureTemplateContextWrapper.wrap(templateContext),
+            standaloneElementTag))
             .thenReturn(Mono.just(newTag));
         when(extensionGetter.getExtensionList(ElementTagPostProcessor.class))
             .thenReturn(List.of(processor));
