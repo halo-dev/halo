@@ -47,6 +47,7 @@ import run.halo.app.extension.ReactiveExtensionClient;
 import run.halo.app.extension.Unstructured;
 import run.halo.app.infra.SystemVersionSupplier;
 import run.halo.app.infra.ThemeRootGetter;
+import run.halo.app.infra.exception.ThemeAlreadyExistsException;
 import run.halo.app.infra.exception.ThemeUpgradeException;
 import run.halo.app.infra.exception.UnsatisfiedAttributeValueException;
 import run.halo.app.infra.properties.HaloProperties;
@@ -84,6 +85,10 @@ public class ThemeServiceImpl implements ThemeService {
             ))
             .onErrorResume(IOException.class, e -> {
                 log.warn("Failed to initialize theme from {}", location, e);
+                return Mono.empty();
+            })
+            .onErrorResume(ThemeAlreadyExistsException.class, e -> {
+                log.warn("Failed to initialize theme from {}, because it already exists", location);
                 return Mono.empty();
             })
             .then();
