@@ -4757,6 +4757,1428 @@
         ]
       }
     },
+    "/apis/notification.halo.run/v1alpha1/notifications": {
+      "get": {
+        "description": "List Notification",
+        "operationId": "listNotification",
+        "parameters": [
+          {
+            "description": "Page number. Default is 0.",
+            "in": "query",
+            "name": "page",
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          },
+          {
+            "description": "Size number. Default is 0.",
+            "in": "query",
+            "name": "size",
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          },
+          {
+            "description": "Label selector. e.g.: hidden!\u003dtrue",
+            "in": "query",
+            "name": "labelSelector",
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            }
+          },
+          {
+            "description": "Field selector. e.g.: metadata.name\u003d\u003dhalo",
+            "in": "query",
+            "name": "fieldSelector",
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            }
+          },
+          {
+            "description": "Sorting criteria in the format: property,(asc|desc). Default sort order is ascending. Multiple sort criteria are supported.",
+            "in": "query",
+            "name": "sort",
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/NotificationList"
+                }
+              }
+            },
+            "description": "Response notifications"
+          }
+        },
+        "tags": [
+          "NotificationV1alpha1"
+        ]
+      },
+      "post": {
+        "description": "Create Notification",
+        "operationId": "createNotification",
+        "requestBody": {
+          "content": {
+            "*/*": {
+              "schema": {
+                "$ref": "#/components/schemas/Notification"
+              }
+            }
+          },
+          "description": "Fresh notification"
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/Notification"
+                }
+              }
+            },
+            "description": "Response notifications created just now"
+          }
+        },
+        "tags": [
+          "NotificationV1alpha1"
+        ]
+      }
+    },
+    "/apis/notification.halo.run/v1alpha1/notifications/{name}": {
+      "delete": {
+        "description": "Delete Notification",
+        "operationId": "deleteNotification",
+        "parameters": [
+          {
+            "description": "Name of notification",
+            "in": "path",
+            "name": "name",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Response notification deleted just now"
+          }
+        },
+        "tags": [
+          "NotificationV1alpha1"
+        ]
+      },
+      "get": {
+        "description": "Get Notification",
+        "operationId": "getNotification",
+        "parameters": [
+          {
+            "description": "Name of notification",
+            "in": "path",
+            "name": "name",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/Notification"
+                }
+              }
+            },
+            "description": "Response single notification"
+          }
+        },
+        "tags": [
+          "NotificationV1alpha1"
+        ]
+      },
+      "patch": {
+        "description": "Patch Notification",
+        "operationId": "patchNotification",
+        "parameters": [
+          {
+            "description": "Name of notification",
+            "in": "path",
+            "name": "name",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json-patch+json": {
+              "schema": {
+                "$ref": "#/components/schemas/JsonPatch"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/Notification"
+                }
+              }
+            },
+            "description": "Response notification patched just now"
+          }
+        },
+        "tags": [
+          "NotificationV1alpha1"
+        ]
+      },
+      "put": {
+        "description": "Update Notification",
+        "operationId": "updateNotification",
+        "parameters": [
+          {
+            "description": "Name of notification",
+            "in": "path",
+            "name": "name",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "*/*": {
+              "schema": {
+                "$ref": "#/components/schemas/Notification"
+              }
+            }
+          },
+          "description": "Updated notification"
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/Notification"
+                }
+              }
+            },
+            "description": "Response notifications updated just now"
+          }
+        },
+        "tags": [
+          "NotificationV1alpha1"
+        ]
+      }
+    },
+    "/apis/notification.halo.run/v1alpha1/notificationtemplates": {
+      "get": {
+        "description": "List NotificationTemplate",
+        "operationId": "listNotificationTemplate",
+        "parameters": [
+          {
+            "description": "Page number. Default is 0.",
+            "in": "query",
+            "name": "page",
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          },
+          {
+            "description": "Size number. Default is 0.",
+            "in": "query",
+            "name": "size",
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          },
+          {
+            "description": "Label selector. e.g.: hidden!\u003dtrue",
+            "in": "query",
+            "name": "labelSelector",
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            }
+          },
+          {
+            "description": "Field selector. e.g.: metadata.name\u003d\u003dhalo",
+            "in": "query",
+            "name": "fieldSelector",
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            }
+          },
+          {
+            "description": "Sorting criteria in the format: property,(asc|desc). Default sort order is ascending. Multiple sort criteria are supported.",
+            "in": "query",
+            "name": "sort",
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/NotificationTemplateList"
+                }
+              }
+            },
+            "description": "Response notificationtemplates"
+          }
+        },
+        "tags": [
+          "NotificationTemplateV1alpha1"
+        ]
+      },
+      "post": {
+        "description": "Create NotificationTemplate",
+        "operationId": "createNotificationTemplate",
+        "requestBody": {
+          "content": {
+            "*/*": {
+              "schema": {
+                "$ref": "#/components/schemas/NotificationTemplate"
+              }
+            }
+          },
+          "description": "Fresh notificationtemplate"
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/NotificationTemplate"
+                }
+              }
+            },
+            "description": "Response notificationtemplates created just now"
+          }
+        },
+        "tags": [
+          "NotificationTemplateV1alpha1"
+        ]
+      }
+    },
+    "/apis/notification.halo.run/v1alpha1/notificationtemplates/{name}": {
+      "delete": {
+        "description": "Delete NotificationTemplate",
+        "operationId": "deleteNotificationTemplate",
+        "parameters": [
+          {
+            "description": "Name of notificationtemplate",
+            "in": "path",
+            "name": "name",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Response notificationtemplate deleted just now"
+          }
+        },
+        "tags": [
+          "NotificationTemplateV1alpha1"
+        ]
+      },
+      "get": {
+        "description": "Get NotificationTemplate",
+        "operationId": "getNotificationTemplate",
+        "parameters": [
+          {
+            "description": "Name of notificationtemplate",
+            "in": "path",
+            "name": "name",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/NotificationTemplate"
+                }
+              }
+            },
+            "description": "Response single notificationtemplate"
+          }
+        },
+        "tags": [
+          "NotificationTemplateV1alpha1"
+        ]
+      },
+      "patch": {
+        "description": "Patch NotificationTemplate",
+        "operationId": "patchNotificationTemplate",
+        "parameters": [
+          {
+            "description": "Name of notificationtemplate",
+            "in": "path",
+            "name": "name",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json-patch+json": {
+              "schema": {
+                "$ref": "#/components/schemas/JsonPatch"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/NotificationTemplate"
+                }
+              }
+            },
+            "description": "Response notificationtemplate patched just now"
+          }
+        },
+        "tags": [
+          "NotificationTemplateV1alpha1"
+        ]
+      },
+      "put": {
+        "description": "Update NotificationTemplate",
+        "operationId": "updateNotificationTemplate",
+        "parameters": [
+          {
+            "description": "Name of notificationtemplate",
+            "in": "path",
+            "name": "name",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "*/*": {
+              "schema": {
+                "$ref": "#/components/schemas/NotificationTemplate"
+              }
+            }
+          },
+          "description": "Updated notificationtemplate"
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/NotificationTemplate"
+                }
+              }
+            },
+            "description": "Response notificationtemplates updated just now"
+          }
+        },
+        "tags": [
+          "NotificationTemplateV1alpha1"
+        ]
+      }
+    },
+    "/apis/notification.halo.run/v1alpha1/notifierDescriptors": {
+      "get": {
+        "description": "List NotifierDescriptor",
+        "operationId": "listNotifierDescriptor",
+        "parameters": [
+          {
+            "description": "Page number. Default is 0.",
+            "in": "query",
+            "name": "page",
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          },
+          {
+            "description": "Size number. Default is 0.",
+            "in": "query",
+            "name": "size",
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          },
+          {
+            "description": "Label selector. e.g.: hidden!\u003dtrue",
+            "in": "query",
+            "name": "labelSelector",
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            }
+          },
+          {
+            "description": "Field selector. e.g.: metadata.name\u003d\u003dhalo",
+            "in": "query",
+            "name": "fieldSelector",
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            }
+          },
+          {
+            "description": "Sorting criteria in the format: property,(asc|desc). Default sort order is ascending. Multiple sort criteria are supported.",
+            "in": "query",
+            "name": "sort",
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/NotifierDescriptorList"
+                }
+              }
+            },
+            "description": "Response notifierDescriptors"
+          }
+        },
+        "tags": [
+          "NotifierDescriptorV1alpha1"
+        ]
+      },
+      "post": {
+        "description": "Create NotifierDescriptor",
+        "operationId": "createNotifierDescriptor",
+        "requestBody": {
+          "content": {
+            "*/*": {
+              "schema": {
+                "$ref": "#/components/schemas/NotifierDescriptor"
+              }
+            }
+          },
+          "description": "Fresh notifierDescriptor"
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/NotifierDescriptor"
+                }
+              }
+            },
+            "description": "Response notifierDescriptors created just now"
+          }
+        },
+        "tags": [
+          "NotifierDescriptorV1alpha1"
+        ]
+      }
+    },
+    "/apis/notification.halo.run/v1alpha1/notifierDescriptors/{name}": {
+      "delete": {
+        "description": "Delete NotifierDescriptor",
+        "operationId": "deleteNotifierDescriptor",
+        "parameters": [
+          {
+            "description": "Name of notifierDescriptor",
+            "in": "path",
+            "name": "name",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Response notifierDescriptor deleted just now"
+          }
+        },
+        "tags": [
+          "NotifierDescriptorV1alpha1"
+        ]
+      },
+      "get": {
+        "description": "Get NotifierDescriptor",
+        "operationId": "getNotifierDescriptor",
+        "parameters": [
+          {
+            "description": "Name of notifierDescriptor",
+            "in": "path",
+            "name": "name",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/NotifierDescriptor"
+                }
+              }
+            },
+            "description": "Response single notifierDescriptor"
+          }
+        },
+        "tags": [
+          "NotifierDescriptorV1alpha1"
+        ]
+      },
+      "patch": {
+        "description": "Patch NotifierDescriptor",
+        "operationId": "patchNotifierDescriptor",
+        "parameters": [
+          {
+            "description": "Name of notifierDescriptor",
+            "in": "path",
+            "name": "name",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json-patch+json": {
+              "schema": {
+                "$ref": "#/components/schemas/JsonPatch"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/NotifierDescriptor"
+                }
+              }
+            },
+            "description": "Response notifierDescriptor patched just now"
+          }
+        },
+        "tags": [
+          "NotifierDescriptorV1alpha1"
+        ]
+      },
+      "put": {
+        "description": "Update NotifierDescriptor",
+        "operationId": "updateNotifierDescriptor",
+        "parameters": [
+          {
+            "description": "Name of notifierDescriptor",
+            "in": "path",
+            "name": "name",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "*/*": {
+              "schema": {
+                "$ref": "#/components/schemas/NotifierDescriptor"
+              }
+            }
+          },
+          "description": "Updated notifierDescriptor"
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/NotifierDescriptor"
+                }
+              }
+            },
+            "description": "Response notifierDescriptors updated just now"
+          }
+        },
+        "tags": [
+          "NotifierDescriptorV1alpha1"
+        ]
+      }
+    },
+    "/apis/notification.halo.run/v1alpha1/reasons": {
+      "get": {
+        "description": "List Reason",
+        "operationId": "listReason",
+        "parameters": [
+          {
+            "description": "Page number. Default is 0.",
+            "in": "query",
+            "name": "page",
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          },
+          {
+            "description": "Size number. Default is 0.",
+            "in": "query",
+            "name": "size",
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          },
+          {
+            "description": "Label selector. e.g.: hidden!\u003dtrue",
+            "in": "query",
+            "name": "labelSelector",
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            }
+          },
+          {
+            "description": "Field selector. e.g.: metadata.name\u003d\u003dhalo",
+            "in": "query",
+            "name": "fieldSelector",
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            }
+          },
+          {
+            "description": "Sorting criteria in the format: property,(asc|desc). Default sort order is ascending. Multiple sort criteria are supported.",
+            "in": "query",
+            "name": "sort",
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ReasonList"
+                }
+              }
+            },
+            "description": "Response reasons"
+          }
+        },
+        "tags": [
+          "ReasonV1alpha1"
+        ]
+      },
+      "post": {
+        "description": "Create Reason",
+        "operationId": "createReason",
+        "requestBody": {
+          "content": {
+            "*/*": {
+              "schema": {
+                "$ref": "#/components/schemas/Reason"
+              }
+            }
+          },
+          "description": "Fresh reason"
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/Reason"
+                }
+              }
+            },
+            "description": "Response reasons created just now"
+          }
+        },
+        "tags": [
+          "ReasonV1alpha1"
+        ]
+      }
+    },
+    "/apis/notification.halo.run/v1alpha1/reasons/{name}": {
+      "delete": {
+        "description": "Delete Reason",
+        "operationId": "deleteReason",
+        "parameters": [
+          {
+            "description": "Name of reason",
+            "in": "path",
+            "name": "name",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Response reason deleted just now"
+          }
+        },
+        "tags": [
+          "ReasonV1alpha1"
+        ]
+      },
+      "get": {
+        "description": "Get Reason",
+        "operationId": "getReason",
+        "parameters": [
+          {
+            "description": "Name of reason",
+            "in": "path",
+            "name": "name",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/Reason"
+                }
+              }
+            },
+            "description": "Response single reason"
+          }
+        },
+        "tags": [
+          "ReasonV1alpha1"
+        ]
+      },
+      "patch": {
+        "description": "Patch Reason",
+        "operationId": "patchReason",
+        "parameters": [
+          {
+            "description": "Name of reason",
+            "in": "path",
+            "name": "name",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json-patch+json": {
+              "schema": {
+                "$ref": "#/components/schemas/JsonPatch"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/Reason"
+                }
+              }
+            },
+            "description": "Response reason patched just now"
+          }
+        },
+        "tags": [
+          "ReasonV1alpha1"
+        ]
+      },
+      "put": {
+        "description": "Update Reason",
+        "operationId": "updateReason",
+        "parameters": [
+          {
+            "description": "Name of reason",
+            "in": "path",
+            "name": "name",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "*/*": {
+              "schema": {
+                "$ref": "#/components/schemas/Reason"
+              }
+            }
+          },
+          "description": "Updated reason"
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/Reason"
+                }
+              }
+            },
+            "description": "Response reasons updated just now"
+          }
+        },
+        "tags": [
+          "ReasonV1alpha1"
+        ]
+      }
+    },
+    "/apis/notification.halo.run/v1alpha1/reasontypes": {
+      "get": {
+        "description": "List ReasonType",
+        "operationId": "listReasonType",
+        "parameters": [
+          {
+            "description": "Page number. Default is 0.",
+            "in": "query",
+            "name": "page",
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          },
+          {
+            "description": "Size number. Default is 0.",
+            "in": "query",
+            "name": "size",
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          },
+          {
+            "description": "Label selector. e.g.: hidden!\u003dtrue",
+            "in": "query",
+            "name": "labelSelector",
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            }
+          },
+          {
+            "description": "Field selector. e.g.: metadata.name\u003d\u003dhalo",
+            "in": "query",
+            "name": "fieldSelector",
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            }
+          },
+          {
+            "description": "Sorting criteria in the format: property,(asc|desc). Default sort order is ascending. Multiple sort criteria are supported.",
+            "in": "query",
+            "name": "sort",
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ReasonTypeList"
+                }
+              }
+            },
+            "description": "Response reasontypes"
+          }
+        },
+        "tags": [
+          "ReasonTypeV1alpha1"
+        ]
+      },
+      "post": {
+        "description": "Create ReasonType",
+        "operationId": "createReasonType",
+        "requestBody": {
+          "content": {
+            "*/*": {
+              "schema": {
+                "$ref": "#/components/schemas/ReasonType"
+              }
+            }
+          },
+          "description": "Fresh reasontype"
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ReasonType"
+                }
+              }
+            },
+            "description": "Response reasontypes created just now"
+          }
+        },
+        "tags": [
+          "ReasonTypeV1alpha1"
+        ]
+      }
+    },
+    "/apis/notification.halo.run/v1alpha1/reasontypes/{name}": {
+      "delete": {
+        "description": "Delete ReasonType",
+        "operationId": "deleteReasonType",
+        "parameters": [
+          {
+            "description": "Name of reasontype",
+            "in": "path",
+            "name": "name",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Response reasontype deleted just now"
+          }
+        },
+        "tags": [
+          "ReasonTypeV1alpha1"
+        ]
+      },
+      "get": {
+        "description": "Get ReasonType",
+        "operationId": "getReasonType",
+        "parameters": [
+          {
+            "description": "Name of reasontype",
+            "in": "path",
+            "name": "name",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ReasonType"
+                }
+              }
+            },
+            "description": "Response single reasontype"
+          }
+        },
+        "tags": [
+          "ReasonTypeV1alpha1"
+        ]
+      },
+      "patch": {
+        "description": "Patch ReasonType",
+        "operationId": "patchReasonType",
+        "parameters": [
+          {
+            "description": "Name of reasontype",
+            "in": "path",
+            "name": "name",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json-patch+json": {
+              "schema": {
+                "$ref": "#/components/schemas/JsonPatch"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ReasonType"
+                }
+              }
+            },
+            "description": "Response reasontype patched just now"
+          }
+        },
+        "tags": [
+          "ReasonTypeV1alpha1"
+        ]
+      },
+      "put": {
+        "description": "Update ReasonType",
+        "operationId": "updateReasonType",
+        "parameters": [
+          {
+            "description": "Name of reasontype",
+            "in": "path",
+            "name": "name",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "*/*": {
+              "schema": {
+                "$ref": "#/components/schemas/ReasonType"
+              }
+            }
+          },
+          "description": "Updated reasontype"
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ReasonType"
+                }
+              }
+            },
+            "description": "Response reasontypes updated just now"
+          }
+        },
+        "tags": [
+          "ReasonTypeV1alpha1"
+        ]
+      }
+    },
+    "/apis/notification.halo.run/v1alpha1/subscriptions": {
+      "get": {
+        "description": "List Subscription",
+        "operationId": "listSubscription",
+        "parameters": [
+          {
+            "description": "Page number. Default is 0.",
+            "in": "query",
+            "name": "page",
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          },
+          {
+            "description": "Size number. Default is 0.",
+            "in": "query",
+            "name": "size",
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          },
+          {
+            "description": "Label selector. e.g.: hidden!\u003dtrue",
+            "in": "query",
+            "name": "labelSelector",
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            }
+          },
+          {
+            "description": "Field selector. e.g.: metadata.name\u003d\u003dhalo",
+            "in": "query",
+            "name": "fieldSelector",
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            }
+          },
+          {
+            "description": "Sorting criteria in the format: property,(asc|desc). Default sort order is ascending. Multiple sort criteria are supported.",
+            "in": "query",
+            "name": "sort",
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/SubscriptionList"
+                }
+              }
+            },
+            "description": "Response subscriptions"
+          }
+        },
+        "tags": [
+          "SubscriptionV1alpha1"
+        ]
+      },
+      "post": {
+        "description": "Create Subscription",
+        "operationId": "createSubscription",
+        "requestBody": {
+          "content": {
+            "*/*": {
+              "schema": {
+                "$ref": "#/components/schemas/Subscription"
+              }
+            }
+          },
+          "description": "Fresh subscription"
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/Subscription"
+                }
+              }
+            },
+            "description": "Response subscriptions created just now"
+          }
+        },
+        "tags": [
+          "SubscriptionV1alpha1"
+        ]
+      }
+    },
+    "/apis/notification.halo.run/v1alpha1/subscriptions/{name}": {
+      "delete": {
+        "description": "Delete Subscription",
+        "operationId": "deleteSubscription",
+        "parameters": [
+          {
+            "description": "Name of subscription",
+            "in": "path",
+            "name": "name",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Response subscription deleted just now"
+          }
+        },
+        "tags": [
+          "SubscriptionV1alpha1"
+        ]
+      },
+      "get": {
+        "description": "Get Subscription",
+        "operationId": "getSubscription",
+        "parameters": [
+          {
+            "description": "Name of subscription",
+            "in": "path",
+            "name": "name",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/Subscription"
+                }
+              }
+            },
+            "description": "Response single subscription"
+          }
+        },
+        "tags": [
+          "SubscriptionV1alpha1"
+        ]
+      },
+      "patch": {
+        "description": "Patch Subscription",
+        "operationId": "patchSubscription",
+        "parameters": [
+          {
+            "description": "Name of subscription",
+            "in": "path",
+            "name": "name",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json-patch+json": {
+              "schema": {
+                "$ref": "#/components/schemas/JsonPatch"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/Subscription"
+                }
+              }
+            },
+            "description": "Response subscription patched just now"
+          }
+        },
+        "tags": [
+          "SubscriptionV1alpha1"
+        ]
+      },
+      "put": {
+        "description": "Update Subscription",
+        "operationId": "updateSubscription",
+        "parameters": [
+          {
+            "description": "Name of subscription",
+            "in": "path",
+            "name": "name",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "*/*": {
+              "schema": {
+                "$ref": "#/components/schemas/Subscription"
+              }
+            }
+          },
+          "description": "Updated subscription"
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/Subscription"
+                }
+              }
+            },
+            "description": "Response subscriptions updated just now"
+          }
+        },
+        "tags": [
+          "SubscriptionV1alpha1"
+        ]
+      }
+    },
     "/apis/plugin.halo.run/v1alpha1/extensiondefinitions": {
       "get": {
         "description": "List ExtensionDefinition",
@@ -10007,6 +11429,49 @@
           }
         }
       },
+      "InterestReason": {
+        "required": [
+          "reasonType",
+          "subject"
+        ],
+        "type": "object",
+        "properties": {
+          "expression": {
+            "type": "string",
+            "description": "The expression to be interested in"
+          },
+          "reasonType": {
+            "type": "string",
+            "description": "The name of the reason definition to be interested in"
+          },
+          "subject": {
+            "$ref": "#/components/schemas/InterestReasonSubject"
+          }
+        },
+        "description": "The reason to be interested in"
+      },
+      "InterestReasonSubject": {
+        "required": [
+          "apiVersion",
+          "kind"
+        ],
+        "type": "object",
+        "properties": {
+          "apiVersion": {
+            "minLength": 1,
+            "type": "string"
+          },
+          "kind": {
+            "minLength": 1,
+            "type": "string"
+          },
+          "name": {
+            "type": "string",
+            "description": "if name is not specified, it presents all subjects of the specified reason type and custom resources"
+          }
+        },
+        "description": "The subject name of reason type to be interested in"
+      },
       "JsonPatch": {
         "minItems": 1,
         "uniqueItems": true,
@@ -10533,6 +11998,340 @@
             "type": "string",
             "description": "A JSON Pointer path pointing to the location to move/copy from.",
             "example": "/a/b/c"
+          }
+        }
+      },
+      "Notification": {
+        "required": [
+          "apiVersion",
+          "kind",
+          "metadata"
+        ],
+        "type": "object",
+        "properties": {
+          "apiVersion": {
+            "type": "string"
+          },
+          "kind": {
+            "type": "string"
+          },
+          "metadata": {
+            "$ref": "#/components/schemas/Metadata"
+          },
+          "spec": {
+            "$ref": "#/components/schemas/NotificationSpec"
+          }
+        }
+      },
+      "NotificationList": {
+        "required": [
+          "first",
+          "hasNext",
+          "hasPrevious",
+          "items",
+          "last",
+          "page",
+          "size",
+          "total",
+          "totalPages"
+        ],
+        "type": "object",
+        "properties": {
+          "first": {
+            "type": "boolean",
+            "description": "Indicates whether current page is the first page."
+          },
+          "hasNext": {
+            "type": "boolean",
+            "description": "Indicates whether current page has previous page."
+          },
+          "hasPrevious": {
+            "type": "boolean",
+            "description": "Indicates whether current page has previous page."
+          },
+          "items": {
+            "type": "array",
+            "description": "A chunk of items.",
+            "items": {
+              "$ref": "#/components/schemas/Notification"
+            }
+          },
+          "last": {
+            "type": "boolean",
+            "description": "Indicates whether current page is the last page."
+          },
+          "page": {
+            "type": "integer",
+            "description": "Page number, starts from 1. If not set or equal to 0, it means no pagination.",
+            "format": "int32"
+          },
+          "size": {
+            "type": "integer",
+            "description": "Size of each page. If not set or equal to 0, it means no pagination.",
+            "format": "int32"
+          },
+          "total": {
+            "type": "integer",
+            "description": "Total elements.",
+            "format": "int64"
+          },
+          "totalPages": {
+            "type": "integer",
+            "description": "Indicates total pages.",
+            "format": "int64"
+          }
+        }
+      },
+      "NotificationSpec": {
+        "required": [
+          "htmlContent",
+          "rawContent",
+          "reason",
+          "recipient",
+          "title"
+        ],
+        "type": "object",
+        "properties": {
+          "htmlContent": {
+            "type": "string"
+          },
+          "lastReadAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "rawContent": {
+            "type": "string"
+          },
+          "reason": {
+            "minLength": 1,
+            "type": "string",
+            "description": "The name of reason"
+          },
+          "recipient": {
+            "minLength": 1,
+            "type": "string",
+            "description": "The name of user"
+          },
+          "title": {
+            "minLength": 1,
+            "type": "string"
+          },
+          "unread": {
+            "type": "boolean"
+          }
+        }
+      },
+      "NotificationTemplate": {
+        "required": [
+          "apiVersion",
+          "kind",
+          "metadata"
+        ],
+        "type": "object",
+        "properties": {
+          "apiVersion": {
+            "type": "string"
+          },
+          "kind": {
+            "type": "string"
+          },
+          "metadata": {
+            "$ref": "#/components/schemas/Metadata"
+          },
+          "spec": {
+            "$ref": "#/components/schemas/NotificationTemplateSpec"
+          }
+        }
+      },
+      "NotificationTemplateList": {
+        "required": [
+          "first",
+          "hasNext",
+          "hasPrevious",
+          "items",
+          "last",
+          "page",
+          "size",
+          "total",
+          "totalPages"
+        ],
+        "type": "object",
+        "properties": {
+          "first": {
+            "type": "boolean",
+            "description": "Indicates whether current page is the first page."
+          },
+          "hasNext": {
+            "type": "boolean",
+            "description": "Indicates whether current page has previous page."
+          },
+          "hasPrevious": {
+            "type": "boolean",
+            "description": "Indicates whether current page has previous page."
+          },
+          "items": {
+            "type": "array",
+            "description": "A chunk of items.",
+            "items": {
+              "$ref": "#/components/schemas/NotificationTemplate"
+            }
+          },
+          "last": {
+            "type": "boolean",
+            "description": "Indicates whether current page is the last page."
+          },
+          "page": {
+            "type": "integer",
+            "description": "Page number, starts from 1. If not set or equal to 0, it means no pagination.",
+            "format": "int32"
+          },
+          "size": {
+            "type": "integer",
+            "description": "Size of each page. If not set or equal to 0, it means no pagination.",
+            "format": "int32"
+          },
+          "total": {
+            "type": "integer",
+            "description": "Total elements.",
+            "format": "int64"
+          },
+          "totalPages": {
+            "type": "integer",
+            "description": "Indicates total pages.",
+            "format": "int64"
+          }
+        }
+      },
+      "NotificationTemplateSpec": {
+        "type": "object",
+        "properties": {
+          "reasonSelector": {
+            "$ref": "#/components/schemas/ReasonSelector"
+          },
+          "template": {
+            "$ref": "#/components/schemas/TemplateContent"
+          }
+        }
+      },
+      "NotifierDescriptor": {
+        "required": [
+          "apiVersion",
+          "kind",
+          "metadata"
+        ],
+        "type": "object",
+        "properties": {
+          "apiVersion": {
+            "type": "string"
+          },
+          "kind": {
+            "type": "string"
+          },
+          "metadata": {
+            "$ref": "#/components/schemas/Metadata"
+          },
+          "spec": {
+            "$ref": "#/components/schemas/NotifierDescriptorSpec"
+          }
+        }
+      },
+      "NotifierDescriptorList": {
+        "required": [
+          "first",
+          "hasNext",
+          "hasPrevious",
+          "items",
+          "last",
+          "page",
+          "size",
+          "total",
+          "totalPages"
+        ],
+        "type": "object",
+        "properties": {
+          "first": {
+            "type": "boolean",
+            "description": "Indicates whether current page is the first page."
+          },
+          "hasNext": {
+            "type": "boolean",
+            "description": "Indicates whether current page has previous page."
+          },
+          "hasPrevious": {
+            "type": "boolean",
+            "description": "Indicates whether current page has previous page."
+          },
+          "items": {
+            "type": "array",
+            "description": "A chunk of items.",
+            "items": {
+              "$ref": "#/components/schemas/NotifierDescriptor"
+            }
+          },
+          "last": {
+            "type": "boolean",
+            "description": "Indicates whether current page is the last page."
+          },
+          "page": {
+            "type": "integer",
+            "description": "Page number, starts from 1. If not set or equal to 0, it means no pagination.",
+            "format": "int32"
+          },
+          "size": {
+            "type": "integer",
+            "description": "Size of each page. If not set or equal to 0, it means no pagination.",
+            "format": "int32"
+          },
+          "total": {
+            "type": "integer",
+            "description": "Total elements.",
+            "format": "int64"
+          },
+          "totalPages": {
+            "type": "integer",
+            "description": "Indicates total pages.",
+            "format": "int64"
+          }
+        }
+      },
+      "NotifierDescriptorSpec": {
+        "required": [
+          "displayName",
+          "notifierExtName"
+        ],
+        "type": "object",
+        "properties": {
+          "description": {
+            "type": "string"
+          },
+          "displayName": {
+            "minLength": 1,
+            "type": "string"
+          },
+          "notifierExtName": {
+            "minLength": 1,
+            "type": "string"
+          },
+          "receiverSettingRef": {
+            "$ref": "#/components/schemas/NotifierSettingRef"
+          },
+          "senderSettingRef": {
+            "$ref": "#/components/schemas/NotifierSettingRef"
+          }
+        }
+      },
+      "NotifierSettingRef": {
+        "required": [
+          "group",
+          "name"
+        ],
+        "type": "object",
+        "properties": {
+          "group": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
           }
         }
       },
@@ -11352,6 +13151,290 @@
           },
           "phase": {
             "type": "string"
+          }
+        }
+      },
+      "Reason": {
+        "required": [
+          "apiVersion",
+          "kind",
+          "metadata"
+        ],
+        "type": "object",
+        "properties": {
+          "apiVersion": {
+            "type": "string"
+          },
+          "kind": {
+            "type": "string"
+          },
+          "metadata": {
+            "$ref": "#/components/schemas/Metadata"
+          },
+          "spec": {
+            "$ref": "#/components/schemas/ReasonSpec"
+          }
+        }
+      },
+      "ReasonAttributes": {
+        "type": "object",
+        "properties": {
+          "empty": {
+            "type": "boolean"
+          }
+        },
+        "description": "Attributes used to transfer data"
+      },
+      "ReasonList": {
+        "required": [
+          "first",
+          "hasNext",
+          "hasPrevious",
+          "items",
+          "last",
+          "page",
+          "size",
+          "total",
+          "totalPages"
+        ],
+        "type": "object",
+        "properties": {
+          "first": {
+            "type": "boolean",
+            "description": "Indicates whether current page is the first page."
+          },
+          "hasNext": {
+            "type": "boolean",
+            "description": "Indicates whether current page has previous page."
+          },
+          "hasPrevious": {
+            "type": "boolean",
+            "description": "Indicates whether current page has previous page."
+          },
+          "items": {
+            "type": "array",
+            "description": "A chunk of items.",
+            "items": {
+              "$ref": "#/components/schemas/Reason"
+            }
+          },
+          "last": {
+            "type": "boolean",
+            "description": "Indicates whether current page is the last page."
+          },
+          "page": {
+            "type": "integer",
+            "description": "Page number, starts from 1. If not set or equal to 0, it means no pagination.",
+            "format": "int32"
+          },
+          "size": {
+            "type": "integer",
+            "description": "Size of each page. If not set or equal to 0, it means no pagination.",
+            "format": "int32"
+          },
+          "total": {
+            "type": "integer",
+            "description": "Total elements.",
+            "format": "int64"
+          },
+          "totalPages": {
+            "type": "integer",
+            "description": "Indicates total pages.",
+            "format": "int64"
+          }
+        }
+      },
+      "ReasonProperty": {
+        "required": [
+          "name",
+          "type"
+        ],
+        "type": "object",
+        "properties": {
+          "description": {
+            "type": "string"
+          },
+          "name": {
+            "minLength": 1,
+            "type": "string"
+          },
+          "optional": {
+            "type": "boolean",
+            "default": false
+          },
+          "type": {
+            "minLength": 1,
+            "type": "string"
+          }
+        }
+      },
+      "ReasonSelector": {
+        "required": [
+          "language",
+          "reasonType"
+        ],
+        "type": "object",
+        "properties": {
+          "language": {
+            "minLength": 1,
+            "type": "string",
+            "default": "default"
+          },
+          "reasonType": {
+            "minLength": 1,
+            "type": "string"
+          }
+        }
+      },
+      "ReasonSpec": {
+        "required": [
+          "author",
+          "reasonType",
+          "subject"
+        ],
+        "type": "object",
+        "properties": {
+          "attributes": {
+            "$ref": "#/components/schemas/ReasonAttributes"
+          },
+          "author": {
+            "type": "string"
+          },
+          "reasonType": {
+            "type": "string"
+          },
+          "subject": {
+            "$ref": "#/components/schemas/ReasonSubject"
+          }
+        }
+      },
+      "ReasonSubject": {
+        "required": [
+          "apiVersion",
+          "kind",
+          "name",
+          "title"
+        ],
+        "type": "object",
+        "properties": {
+          "apiVersion": {
+            "type": "string"
+          },
+          "kind": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "title": {
+            "type": "string"
+          },
+          "url": {
+            "type": "string"
+          }
+        }
+      },
+      "ReasonType": {
+        "required": [
+          "apiVersion",
+          "kind",
+          "metadata"
+        ],
+        "type": "object",
+        "properties": {
+          "apiVersion": {
+            "type": "string"
+          },
+          "kind": {
+            "type": "string"
+          },
+          "metadata": {
+            "$ref": "#/components/schemas/Metadata"
+          },
+          "spec": {
+            "$ref": "#/components/schemas/ReasonTypeSpec"
+          }
+        }
+      },
+      "ReasonTypeList": {
+        "required": [
+          "first",
+          "hasNext",
+          "hasPrevious",
+          "items",
+          "last",
+          "page",
+          "size",
+          "total",
+          "totalPages"
+        ],
+        "type": "object",
+        "properties": {
+          "first": {
+            "type": "boolean",
+            "description": "Indicates whether current page is the first page."
+          },
+          "hasNext": {
+            "type": "boolean",
+            "description": "Indicates whether current page has previous page."
+          },
+          "hasPrevious": {
+            "type": "boolean",
+            "description": "Indicates whether current page has previous page."
+          },
+          "items": {
+            "type": "array",
+            "description": "A chunk of items.",
+            "items": {
+              "$ref": "#/components/schemas/ReasonType"
+            }
+          },
+          "last": {
+            "type": "boolean",
+            "description": "Indicates whether current page is the last page."
+          },
+          "page": {
+            "type": "integer",
+            "description": "Page number, starts from 1. If not set or equal to 0, it means no pagination.",
+            "format": "int32"
+          },
+          "size": {
+            "type": "integer",
+            "description": "Size of each page. If not set or equal to 0, it means no pagination.",
+            "format": "int32"
+          },
+          "total": {
+            "type": "integer",
+            "description": "Total elements.",
+            "format": "int64"
+          },
+          "totalPages": {
+            "type": "integer",
+            "description": "Indicates total pages.",
+            "format": "int64"
+          }
+        }
+      },
+      "ReasonTypeSpec": {
+        "required": [
+          "description",
+          "displayName"
+        ],
+        "type": "object",
+        "properties": {
+          "description": {
+            "minLength": 1,
+            "type": "string"
+          },
+          "displayName": {
+            "minLength": 1,
+            "type": "string"
+          },
+          "properties": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ReasonProperty"
+            }
           }
         }
       },
@@ -12677,6 +14760,124 @@
           }
         }
       },
+      "Subscription": {
+        "required": [
+          "apiVersion",
+          "kind",
+          "metadata"
+        ],
+        "type": "object",
+        "properties": {
+          "apiVersion": {
+            "type": "string"
+          },
+          "kind": {
+            "type": "string"
+          },
+          "metadata": {
+            "$ref": "#/components/schemas/Metadata"
+          },
+          "spec": {
+            "$ref": "#/components/schemas/SubscriptionSpec"
+          }
+        }
+      },
+      "SubscriptionList": {
+        "required": [
+          "first",
+          "hasNext",
+          "hasPrevious",
+          "items",
+          "last",
+          "page",
+          "size",
+          "total",
+          "totalPages"
+        ],
+        "type": "object",
+        "properties": {
+          "first": {
+            "type": "boolean",
+            "description": "Indicates whether current page is the first page."
+          },
+          "hasNext": {
+            "type": "boolean",
+            "description": "Indicates whether current page has previous page."
+          },
+          "hasPrevious": {
+            "type": "boolean",
+            "description": "Indicates whether current page has previous page."
+          },
+          "items": {
+            "type": "array",
+            "description": "A chunk of items.",
+            "items": {
+              "$ref": "#/components/schemas/Subscription"
+            }
+          },
+          "last": {
+            "type": "boolean",
+            "description": "Indicates whether current page is the last page."
+          },
+          "page": {
+            "type": "integer",
+            "description": "Page number, starts from 1. If not set or equal to 0, it means no pagination.",
+            "format": "int32"
+          },
+          "size": {
+            "type": "integer",
+            "description": "Size of each page. If not set or equal to 0, it means no pagination.",
+            "format": "int32"
+          },
+          "total": {
+            "type": "integer",
+            "description": "Total elements.",
+            "format": "int64"
+          },
+          "totalPages": {
+            "type": "integer",
+            "description": "Indicates total pages.",
+            "format": "int64"
+          }
+        }
+      },
+      "SubscriptionSpec": {
+        "required": [
+          "reason",
+          "subscriber",
+          "unsubscribeToken"
+        ],
+        "type": "object",
+        "properties": {
+          "disabled": {
+            "type": "boolean",
+            "description": "Perhaps users need to unsubscribe and interact without receiving notifications again"
+          },
+          "reason": {
+            "$ref": "#/components/schemas/InterestReason"
+          },
+          "subscriber": {
+            "$ref": "#/components/schemas/SubscriptionSubscriber"
+          },
+          "unsubscribeToken": {
+            "type": "string",
+            "description": "The token to unsubscribe"
+          }
+        }
+      },
+      "SubscriptionSubscriber": {
+        "required": [
+          "name"
+        ],
+        "type": "object",
+        "properties": {
+          "name": {
+            "minLength": 1,
+            "type": "string"
+          }
+        },
+        "description": "The subscriber to be notified"
+      },
       "Tag": {
         "required": [
           "apiVersion",
@@ -12803,6 +15004,24 @@
           "visiblePostCount": {
             "type": "integer",
             "format": "int32"
+          }
+        }
+      },
+      "TemplateContent": {
+        "required": [
+          "title"
+        ],
+        "type": "object",
+        "properties": {
+          "htmlBody": {
+            "type": "string"
+          },
+          "rawBody": {
+            "type": "string"
+          },
+          "title": {
+            "minLength": 1,
+            "type": "string"
           }
         }
       },
