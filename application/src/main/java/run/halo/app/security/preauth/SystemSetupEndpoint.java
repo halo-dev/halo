@@ -3,7 +3,9 @@ package run.halo.app.security.preauth;
 import static io.r2dbc.spi.ConnectionFactoryOptions.DRIVER;
 import static io.swagger.v3.oas.annotations.media.Schema.RequiredMode.REQUIRED;
 import static org.springdoc.core.fn.builders.apiresponse.Builder.responseBuilder;
+import static org.springdoc.core.fn.builders.content.Builder.contentBuilder;
 import static org.springdoc.core.fn.builders.requestbody.Builder.requestBodyBuilder;
+import static org.springdoc.core.fn.builders.schema.Builder.schemaBuilder;
 import static org.springframework.web.reactive.function.server.RequestPredicates.accept;
 import static org.springframework.web.reactive.function.server.RequestPredicates.contentType;
 import static org.springframework.web.reactive.function.server.RequestPredicates.path;
@@ -85,7 +87,7 @@ public class SystemSetupEndpoint {
 
     @Bean
     RouterFunction<ServerResponse> setupPageRouter() {
-        final var tag = "System";
+        final var tag = "SystemV1alpha1Public";
         return SpringdocRouteBuilder.route()
             .GET(path("/system/setup").and(accept(MediaType.TEXT_HTML)), this::setupPage,
                 builder -> builder.operationId("JumpToSetupPage")
@@ -103,9 +105,11 @@ public class SystemSetupEndpoint {
                     .description("Setup system")
                     .tag(tag)
                     .requestBody(requestBodyBuilder()
-                        .implementation(SetupRequest.class)
-                        .content(Builder.contentBuilder()
-                            .mediaType(MediaType.APPLICATION_FORM_URLENCODED_VALUE)
+                        .required(true)
+                        .content(contentBuilder()
+                            .mediaType(MediaType.APPLICATION_JSON_VALUE)
+                            .schema(schemaBuilder()
+                                .implementation(SetupRequest.class))
                         )
                     )
                     .response(responseBuilder()
