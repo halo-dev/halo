@@ -45,15 +45,19 @@ public class LocaleChangeWebFilter implements WebFilter {
                     .getFirst(LANGUAGE_PARAMETER_NAME);
                 if (StringUtils.hasText(language)) {
                     var locale = Locale.forLanguageTag(language);
-                    exchange.getResponse()
-                        .addCookie(ResponseCookie.from(LANGUAGE_COOKIE_NAME, locale.toLanguageTag())
-                            .path("/")
-                            .secure(true)
-                            .build()
-                        );
+                    setLanguageCookie(exchange, locale);
                 }
             })
             .then(Mono.defer(() -> chain.filter(exchange)));
     }
 
+    void setLanguageCookie(ServerWebExchange exchange, Locale locale) {
+        var cookie = ResponseCookie.from(LANGUAGE_COOKIE_NAME, locale.toLanguageTag())
+            .path("/")
+            .httpOnly(true)
+            .secure("https".equalsIgnoreCase(exchange.getRequest().getURI().getScheme()))
+            .sameSite("Lax")
+            .build();
+        exchange.getResponse().getCookies().set(LANGUAGE_COOKIE_NAME, cookie);
+    }
 }
