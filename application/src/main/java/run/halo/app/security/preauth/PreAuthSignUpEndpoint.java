@@ -79,8 +79,7 @@ class PreAuthSignUpEndpoint {
             .POST(
                 "",
                 contentType(APPLICATION_FORM_URLENCODED),
-                request -> request.formData()
-                    .map(SignUpData::of)
+                request -> request.bind(SignUpData.class)
                     .flatMap(signUpData -> {
                         // sign up
                         var bindingResult = validate(signUpData, validator, request.exchange());
