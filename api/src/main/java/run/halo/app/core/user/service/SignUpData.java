@@ -13,10 +13,7 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 import java.util.Objects;
-import java.util.Optional;
 import lombok.Data;
-import org.springframework.util.MultiValueMap;
-import org.springframework.util.StringUtils;
 import run.halo.app.infra.ValidationUtils;
 
 /**
@@ -51,35 +48,6 @@ public class SignUpData {
 
     @NotBlank
     private String confirmPassword;
-
-    public static SignUpData of(MultiValueMap<String, String> formData) {
-        var form = new SignUpData();
-        Optional.ofNullable(formData.getFirst("username"))
-            .filter(StringUtils::hasText)
-            .ifPresent(form::setUsername);
-
-        Optional.ofNullable(formData.getFirst("displayName"))
-            .filter(StringUtils::hasText)
-            .ifPresent(form::setDisplayName);
-
-        Optional.ofNullable(formData.getFirst("email"))
-            .filter(StringUtils::hasText)
-            .ifPresent(form::setEmail);
-
-        Optional.ofNullable(formData.getFirst("password"))
-            .filter(StringUtils::hasText)
-            .ifPresent(form::setPassword);
-
-        Optional.ofNullable(formData.getFirst("emailCode"))
-            .filter(StringUtils::hasText)
-            .ifPresent(form::setEmailCode);
-
-        Optional.ofNullable(formData.getFirst("confirmPassword"))
-            .filter(StringUtils::hasText)
-            .ifPresent(form::setConfirmPassword);
-
-        return form;
-    }
 
     @Target({ElementType.TYPE})
     @Retention(RetentionPolicy.RUNTIME)
