@@ -65,12 +65,12 @@ public class UsernamePasswordHandler implements ServerAuthenticationSuccessHandl
                 .filter(ServerWebExchangeMatcher.MatchResult::isMatch)
                 .switchIfEmpty(Mono.defer(
                     () -> {
-                        URI location = URI.create("/login?error");
+                        URI location = URI.create("/login?error&method=local");
                         if (exception instanceof BadCredentialsException) {
-                            location = URI.create("/login?error=invalid-credential");
+                            location = URI.create("/login?error=invalid-credential&method=local");
                         }
                         if (exception instanceof TooManyRequestsException) {
-                            location = URI.create("/login?error=rate-limit-exceeded");
+                            location = URI.create("/login?error=rate-limit-exceeded&method=local");
                         }
                         return redirectStrategy.sendRedirect(exchange, location);
                     }).then(Mono.empty())
