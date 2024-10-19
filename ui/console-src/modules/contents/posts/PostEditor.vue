@@ -236,7 +236,7 @@ const handlePublish = async () => {
       if (returnToView.value === "true" && permalink) {
         window.location.href = permalink;
       } else {
-        router.back();
+        router.push({ name: "Posts" });
       }
     } else {
       const { data } = await consoleApiClient.content.post.draftPost({
