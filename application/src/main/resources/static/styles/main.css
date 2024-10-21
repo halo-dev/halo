@@ -234,6 +234,7 @@
     grid-template-columns: repeat(3, minmax(0, 1fr));
     align-items: center;
     display: grid;
+    height: 2.5em;
 }
 
 .halo-form .form-input {
