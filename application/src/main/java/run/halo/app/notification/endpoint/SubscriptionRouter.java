@@ -39,10 +39,11 @@ public class SubscriptionRouter {
 
     @Bean
     RouterFunction<ServerResponse> notificationSubscriptionRouter() {
+        final var tag = "NotificationV1alpha1Public";
         return SpringdocRouteBuilder.route()
             .GET(UNSUBSCRIBE_PATTERN, this::unsubscribe, builder -> {
                 builder.operationId("Unsubscribe")
-                    .tag("api.notification.halo.run/v1alpha1/Subscription")
+                    .tag(tag)
                     .description("Unsubscribe a subscription")
                     .parameter(parameterBuilder()
                         .in(ParameterIn.PATH)

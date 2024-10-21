@@ -6559,7 +6559,7 @@
           }
         },
         "tags": [
-          "api.notification.halo.run/v1alpha1/Subscription"
+          "NotificationV1alpha1Public"
         ]
       }
     },
@@ -15678,6 +15678,31 @@
         "tags": [
           "AttachmentV1alpha1Uc"
         ]
+      }
+    },
+    "/system/setup": {
+      "get": {
+        "description": "Jump to setup page",
+        "operationId": "JumpToSetupPage",
+        "responses": {
+          "default": {
+            "content": {
+              "text/html": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            },
+            "description": "default response"
+          }
+        },
+        "tags": [
+          "SystemV1alpha1Public"
+        ]
+      },
+      "post": {
+        "operationId": "SetNoCacheForSetUpPage",
+        "responses": {}
       }
     }
   },
