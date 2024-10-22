@@ -8,6 +8,8 @@ import java.util.Objects;
 import java.util.Optional;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.context.annotation.Bean;
+import org.springframework.core.Ordered;
+import org.springframework.core.annotation.Order;
 import org.springframework.security.web.server.savedrequest.ServerRequestCache;
 import org.springframework.stereotype.Component;
 import org.springframework.web.reactive.function.server.RouterFunction;
@@ -53,6 +55,7 @@ class PreAuthLoginEndpoint {
     }
 
     @Bean
+    @Order(Ordered.HIGHEST_PRECEDENCE + 100)
     RouterFunction<ServerResponse> preAuthLoginEndpoints() {
         return RouterFunctions.nest(path("/login"), RouterFunctions.route()
             .GET("", request -> {

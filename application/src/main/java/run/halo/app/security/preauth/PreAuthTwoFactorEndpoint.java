@@ -2,6 +2,8 @@ package run.halo.app.security.preauth;
 
 import java.util.Map;
 import org.springframework.context.annotation.Bean;
+import org.springframework.core.Ordered;
+import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
 import org.springframework.web.reactive.function.server.RouterFunction;
 import org.springframework.web.reactive.function.server.RouterFunctions;
@@ -19,6 +21,7 @@ import run.halo.app.infra.utils.HaloUtils;
 class PreAuthTwoFactorEndpoint {
 
     @Bean
+    @Order(Ordered.HIGHEST_PRECEDENCE + 100)
     RouterFunction<ServerResponse> preAuthTwoFactorEndpoints(GlobalInfoService globalInfoService) {
         return RouterFunctions.route()
             .GET("/challenges/two-factor/totp",

@@ -14,6 +14,8 @@ import jakarta.validation.constraints.NotBlank;
 import java.net.URI;
 import lombok.Data;
 import org.springframework.context.annotation.Bean;
+import org.springframework.core.Ordered;
+import org.springframework.core.annotation.Order;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.server.reactive.ServerHttpRequest;
 import org.springframework.stereotype.Component;
@@ -67,6 +69,7 @@ class PreAuthSignUpEndpoint {
     }
 
     @Bean
+    @Order(Ordered.HIGHEST_PRECEDENCE + 100)
     RouterFunction<ServerResponse> preAuthSignUpEndpoints() {
         return RouterFunctions.nest(path("/signup"), RouterFunctions.route()
             .GET("", request -> {

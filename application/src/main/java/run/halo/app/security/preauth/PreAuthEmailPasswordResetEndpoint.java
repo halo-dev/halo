@@ -18,6 +18,8 @@ import java.util.Objects;
 import lombok.Data;
 import org.springframework.context.MessageSource;
 import org.springframework.context.annotation.Bean;
+import org.springframework.core.Ordered;
+import org.springframework.core.annotation.Order;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.server.reactive.ServerHttpRequest;
@@ -55,6 +57,7 @@ class PreAuthEmailPasswordResetEndpoint {
     }
 
     @Bean
+    @Order(Ordered.HIGHEST_PRECEDENCE + 100)
     RouterFunction<ServerResponse> preAuthPasswordResetEndpoints(
         GlobalInfoService globalInfoService,
         PasswordResetAvailabilityProviders availabilityProviders,
