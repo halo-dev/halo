@@ -98,6 +98,8 @@ jobs:
           ghcr-token: ${{ secrets.GITHUB_TOKEN }}
           dockerhub-user: ${{ secrets.DOCKER_USERNAME }}
           dockerhub-token: ${{ secrets.DOCKER_TOKEN }}
+          f2c-registry-user: ${{ secrets.F2C_REGISTRY_USER }}
+          f2c-registry-token: ${{ secrets.F2C_REGISTRY_TOKEN }}
           push: true
           platforms: linux/amd64,linux/arm64/v8,linux/ppc64le,linux/s390x
 
