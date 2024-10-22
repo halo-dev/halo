@@ -22,10 +22,10 @@ import { DUMMY_BASE_URL, assertParamExists, setApiKeyToObject, setBasicAuthToObj
 // @ts-ignore
 import { BASE_PATH, COLLECTION_FORMATS, RequestArgs, BaseAPI, RequiredError, operationServerMap } from '../base';
 /**
- * ApiNotificationHaloRunV1alpha1SubscriptionApi - axios parameter creator
+ * NotificationV1alpha1PublicApi - axios parameter creator
  * @export
  */
-export const ApiNotificationHaloRunV1alpha1SubscriptionApiAxiosParamCreator = function (configuration?: Configuration) {
+export const NotificationV1alpha1PublicApiAxiosParamCreator = function (configuration?: Configuration) {
     return {
         /**
          * Unsubscribe a subscription
@@ -79,11 +79,11 @@ export const ApiNotificationHaloRunV1alpha1SubscriptionApiAxiosParamCreator = fu
 };
 
 /**
- * ApiNotificationHaloRunV1alpha1SubscriptionApi - functional programming interface
+ * NotificationV1alpha1PublicApi - functional programming interface
  * @export
  */
-export const ApiNotificationHaloRunV1alpha1SubscriptionApiFp = function(configuration?: Configuration) {
-    const localVarAxiosParamCreator = ApiNotificationHaloRunV1alpha1SubscriptionApiAxiosParamCreator(configuration)
+export const NotificationV1alpha1PublicApiFp = function(configuration?: Configuration) {
+    const localVarAxiosParamCreator = NotificationV1alpha1PublicApiAxiosParamCreator(configuration)
     return {
         /**
          * Unsubscribe a subscription
@@ -95,68 +95,68 @@ export const ApiNotificationHaloRunV1alpha1SubscriptionApiFp = function(configur
         async unsubscribe(name: string, token: string, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<string>> {
             const localVarAxiosArgs = await localVarAxiosParamCreator.unsubscribe(name, token, options);
             const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
-            const localVarOperationServerBasePath = operationServerMap['ApiNotificationHaloRunV1alpha1SubscriptionApi.unsubscribe']?.[localVarOperationServerIndex]?.url;
+            const localVarOperationServerBasePath = operationServerMap['NotificationV1alpha1PublicApi.unsubscribe']?.[localVarOperationServerIndex]?.url;
             return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
         },
     }
 };
 
 /**
- * ApiNotificationHaloRunV1alpha1SubscriptionApi - factory interface
+ * NotificationV1alpha1PublicApi - factory interface
  * @export
  */
-export const ApiNotificationHaloRunV1alpha1SubscriptionApiFactory = function (configuration?: Configuration, basePath?: string, axios?: AxiosInstance) {
-    const localVarFp = ApiNotificationHaloRunV1alpha1SubscriptionApiFp(configuration)
+export const NotificationV1alpha1PublicApiFactory = function (configuration?: Configuration, basePath?: string, axios?: AxiosInstance) {
+    const localVarFp = NotificationV1alpha1PublicApiFp(configuration)
     return {
         /**
          * Unsubscribe a subscription
-         * @param {ApiNotificationHaloRunV1alpha1SubscriptionApiUnsubscribeRequest} requestParameters Request parameters.
+         * @param {NotificationV1alpha1PublicApiUnsubscribeRequest} requestParameters Request parameters.
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        unsubscribe(requestParameters: ApiNotificationHaloRunV1alpha1SubscriptionApiUnsubscribeRequest, options?: RawAxiosRequestConfig): AxiosPromise<string> {
+        unsubscribe(requestParameters: NotificationV1alpha1PublicApiUnsubscribeRequest, options?: RawAxiosRequestConfig): AxiosPromise<string> {
             return localVarFp.unsubscribe(requestParameters.name, requestParameters.token, options).then((request) => request(axios, basePath));
         },
     };
 };
 
 /**
- * Request parameters for unsubscribe operation in ApiNotificationHaloRunV1alpha1SubscriptionApi.
+ * Request parameters for unsubscribe operation in NotificationV1alpha1PublicApi.
  * @export
- * @interface ApiNotificationHaloRunV1alpha1SubscriptionApiUnsubscribeRequest
+ * @interface NotificationV1alpha1PublicApiUnsubscribeRequest
  */
-export interface ApiNotificationHaloRunV1alpha1SubscriptionApiUnsubscribeRequest {
+export interface NotificationV1alpha1PublicApiUnsubscribeRequest {
     /**
      * Subscription name
      * @type {string}
-     * @memberof ApiNotificationHaloRunV1alpha1SubscriptionApiUnsubscribe
+     * @memberof NotificationV1alpha1PublicApiUnsubscribe
      */
     readonly name: string
 
     /**
      * Unsubscribe token
      * @type {string}
-     * @memberof ApiNotificationHaloRunV1alpha1SubscriptionApiUnsubscribe
+     * @memberof NotificationV1alpha1PublicApiUnsubscribe
      */
     readonly token: string
 }
 
 /**
- * ApiNotificationHaloRunV1alpha1SubscriptionApi - object-oriented interface
+ * NotificationV1alpha1PublicApi - object-oriented interface
  * @export
- * @class ApiNotificationHaloRunV1alpha1SubscriptionApi
+ * @class NotificationV1alpha1PublicApi
  * @extends {BaseAPI}
  */
-export class ApiNotificationHaloRunV1alpha1SubscriptionApi extends BaseAPI {
+export class NotificationV1alpha1PublicApi extends BaseAPI {
     /**
      * Unsubscribe a subscription
-     * @param {ApiNotificationHaloRunV1alpha1SubscriptionApiUnsubscribeRequest} requestParameters Request parameters.
+     * @param {NotificationV1alpha1PublicApiUnsubscribeRequest} requestParameters Request parameters.
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
-     * @memberof ApiNotificationHaloRunV1alpha1SubscriptionApi
+     * @memberof NotificationV1alpha1PublicApi
      */
-    public unsubscribe(requestParameters: ApiNotificationHaloRunV1alpha1SubscriptionApiUnsubscribeRequest, options?: RawAxiosRequestConfig) {
-        return ApiNotificationHaloRunV1alpha1SubscriptionApiFp(this.configuration).unsubscribe(requestParameters.name, requestParameters.token, options).then((request) => request(this.axios, this.basePath));
+    public unsubscribe(requestParameters: NotificationV1alpha1PublicApiUnsubscribeRequest, options?: RawAxiosRequestConfig) {
+        return NotificationV1alpha1PublicApiFp(this.configuration).unsubscribe(requestParameters.name, requestParameters.token, options).then((request) => request(this.axios, this.basePath));
     }
 }
 

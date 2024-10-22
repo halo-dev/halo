@@ -30,6 +30,43 @@ import { SiteStatsVo } from '../models';
 export const SystemV1alpha1PublicApiAxiosParamCreator = function (configuration?: Configuration) {
     return {
         /**
+         * Jump to setup page
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        jumpToSetupPage: async (options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+            const localVarPath = `/system/setup`;
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'GET', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+            // authentication basicAuth required
+            // http basic authentication required
+            setBasicAuthToObject(localVarRequestOptions, configuration)
+
+            // authentication bearerAuth required
+            // http bearer authentication required
+            await setBearerAuthToObject(localVarHeaderParameter, configuration)
+
+
+    
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+        /**
          * Gets site stats
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
@@ -77,6 +114,17 @@ export const SystemV1alpha1PublicApiFp = function(configuration?: Configuration)
     const localVarAxiosParamCreator = SystemV1alpha1PublicApiAxiosParamCreator(configuration)
     return {
         /**
+         * Jump to setup page
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async jumpToSetupPage(options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<string>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.jumpToSetupPage(options);
+            const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
+            const localVarOperationServerBasePath = operationServerMap['SystemV1alpha1PublicApi.jumpToSetupPage']?.[localVarOperationServerIndex]?.url;
+            return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
+        },
+        /**
          * Gets site stats
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
@@ -98,6 +146,14 @@ export const SystemV1alpha1PublicApiFactory = function (configuration?: Configur
     const localVarFp = SystemV1alpha1PublicApiFp(configuration)
     return {
         /**
+         * Jump to setup page
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        jumpToSetupPage(options?: RawAxiosRequestConfig): AxiosPromise<string> {
+            return localVarFp.jumpToSetupPage(options).then((request) => request(axios, basePath));
+        },
+        /**
          * Gets site stats
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
@@ -115,6 +171,16 @@ export const SystemV1alpha1PublicApiFactory = function (configuration?: Configur
  * @extends {BaseAPI}
  */
 export class SystemV1alpha1PublicApi extends BaseAPI {
+    /**
+     * Jump to setup page
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof SystemV1alpha1PublicApi
+     */
+    public jumpToSetupPage(options?: RawAxiosRequestConfig) {
+        return SystemV1alpha1PublicApiFp(this.configuration).jumpToSetupPage(options).then((request) => request(this.axios, this.basePath));
+    }
+
     /**
      * Gets site stats
      * @param {*} [options] Override http request option.
