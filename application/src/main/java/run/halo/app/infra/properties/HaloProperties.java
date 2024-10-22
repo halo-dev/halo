@@ -9,6 +9,7 @@ import java.util.HashSet;
 import java.util.Set;
 import lombok.Data;
 import org.springframework.boot.context.properties.ConfigurationProperties;
+import org.springframework.boot.context.properties.NestedConfigurationProperty;
 import org.springframework.validation.Errors;
 import org.springframework.validation.Validator;
 import org.springframework.validation.annotation.Validated;
@@ -45,21 +46,27 @@ public class HaloProperties implements Validator {
     private boolean requiredExtensionDisabled;
 
     @Valid
+    @NestedConfigurationProperty
     private final ExtensionProperties extension = new ExtensionProperties();
 
     @Valid
+    @NestedConfigurationProperty
     private final SecurityProperties security = new SecurityProperties();
 
     @Valid
+    @NestedConfigurationProperty
     private final ConsoleProperties console = new ConsoleProperties();
 
     @Valid
+    @NestedConfigurationProperty
     private final UcProperties uc = new UcProperties();
 
     @Valid
+    @NestedConfigurationProperty
     private final ThemeProperties theme = new ThemeProperties();
 
     @Valid
+    @NestedConfigurationProperty
     private final AttachmentProperties attachment = new AttachmentProperties();
 
     @Override
