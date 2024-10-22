@@ -238,7 +238,7 @@ const { handleGenerateSlug } = useSlugify(
                     )
                   "
                   class="group flex h-full cursor-pointer items-center border-l px-3 transition-all hover:bg-gray-100"
-                  @click="handleGenerateSlug(true, FormType.CATEGORY)"
+                  @click="handleGenerateSlug(true)"
                 >
                   <IconRefreshLine
                     class="h-4 w-4 text-gray-500 group-hover:text-gray-700"

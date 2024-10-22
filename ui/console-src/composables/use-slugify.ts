@@ -57,7 +57,7 @@ export default function useSlugify(
     source,
     () => {
       if (auto.value) {
-        handleGenerateSlug(false);
+        handleGenerateSlug(true);
       }
     },
     { immediate: true }
