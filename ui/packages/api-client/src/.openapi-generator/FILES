@@ -3,7 +3,6 @@
 .openapi-generator-ignore
 api.ts
 api/annotation-setting-v1alpha1-api.ts
-api/api-notification-halo-run-v1alpha1-subscription-api.ts
 api/attachment-v1alpha1-api.ts
 api/attachment-v1alpha1-console-api.ts
 api/attachment-v1alpha1-uc-api.ts
@@ -17,6 +16,7 @@ api/comment-v1alpha1-console-api.ts
 api/comment-v1alpha1-public-api.ts
 api/config-map-v1alpha1-api.ts
 api/counter-v1alpha1-api.ts
+api/default-api.ts
 api/device-v1alpha1-api.ts
 api/device-v1alpha1-uc-api.ts
 api/extension-definition-v1alpha1-api.ts
@@ -32,6 +32,7 @@ api/metrics-v1alpha1-public-api.ts
 api/migration-v1alpha1-console-api.ts
 api/notification-template-v1alpha1-api.ts
 api/notification-v1alpha1-api.ts
+api/notification-v1alpha1-public-api.ts
 api/notification-v1alpha1-uc-api.ts
 api/notifier-descriptor-v1alpha1-api.ts
 api/notifier-v1alpha1-console-api.ts

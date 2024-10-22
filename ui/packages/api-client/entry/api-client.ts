@@ -26,6 +26,7 @@ import {
   MigrationV1alpha1ConsoleApi,
   NotificationTemplateV1alpha1Api,
   NotificationV1alpha1Api,
+  NotificationV1alpha1PublicApi,
   NotificationV1alpha1UcApi,
   NotifierDescriptorV1alpha1Api,
   NotifierV1alpha1ConsoleApi,
@@ -435,6 +436,11 @@ function createPublicApiClient(axiosInstance: AxiosInstance) {
     metrics: {
       metrics: new MetricsV1alpha1PublicApi(undefined, baseURL, axiosInstance),
     },
+    notification: new NotificationV1alpha1PublicApi(
+      undefined,
+      baseURL,
+      axiosInstance
+    ),
   };
 }
 

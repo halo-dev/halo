@@ -15,7 +15,6 @@
 
 
 export * from './api/annotation-setting-v1alpha1-api';
-export * from './api/api-notification-halo-run-v1alpha1-subscription-api';
 export * from './api/attachment-v1alpha1-api';
 export * from './api/attachment-v1alpha1-console-api';
 export * from './api/attachment-v1alpha1-uc-api';
@@ -29,6 +28,7 @@ export * from './api/comment-v1alpha1-console-api';
 export * from './api/comment-v1alpha1-public-api';
 export * from './api/config-map-v1alpha1-api';
 export * from './api/counter-v1alpha1-api';
+export * from './api/default-api';
 export * from './api/device-v1alpha1-api';
 export * from './api/device-v1alpha1-uc-api';
 export * from './api/extension-definition-v1alpha1-api';
@@ -44,6 +44,7 @@ export * from './api/metrics-v1alpha1-public-api';
 export * from './api/migration-v1alpha1-console-api';
 export * from './api/notification-template-v1alpha1-api';
 export * from './api/notification-v1alpha1-api';
+export * from './api/notification-v1alpha1-public-api';
 export * from './api/notification-v1alpha1-uc-api';
 export * from './api/notifier-descriptor-v1alpha1-api';
 export * from './api/notifier-v1alpha1-console-api';
