@@ -4,7 +4,6 @@
     "vite.config.ts",
     "vite.uc.config.ts",
     "vitest.config.*",
-    "cypress.config.*",
     "src/vite/library-external.ts",
     "src/vite/config-builder.ts"
   ],
