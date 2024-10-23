@@ -30,6 +30,8 @@ import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.beans.factory.config.PlaceholderConfigurerSupport;
 import org.springframework.boot.autoconfigure.r2dbc.R2dbcConnectionDetails;
 import org.springframework.context.annotation.Bean;
+import org.springframework.core.Ordered;
+import org.springframework.core.annotation.Order;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.dao.OptimisticLockingFailureException;
 import org.springframework.http.HttpStatus;
@@ -86,6 +88,7 @@ public class SystemSetupEndpoint {
     private final ObjectProvider<R2dbcConnectionDetails> connectionDetails;
 
     @Bean
+    @Order(Ordered.HIGHEST_PRECEDENCE + 100)
     RouterFunction<ServerResponse> setupPageRouter() {
         final var tag = "SystemV1alpha1Public";
         return SpringdocRouteBuilder.route()
