@@ -54,7 +54,6 @@ public class LocaleChangeWebFilter implements WebFilter {
     void setLanguageCookie(ServerWebExchange exchange, Locale locale) {
         var cookie = ResponseCookie.from(LANGUAGE_COOKIE_NAME, locale.toLanguageTag())
             .path("/")
-            .httpOnly(true)
             .secure("https".equalsIgnoreCase(exchange.getRequest().getURI().getScheme()))
             .sameSite("Lax")
             .build();
