@@ -13,7 +13,6 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 import org.apache.commons.lang3.BooleanUtils;
-import org.apache.commons.lang3.ObjectUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.boot.context.event.ApplicationContextInitializedEvent;
 import org.springframework.context.ApplicationListener;
@@ -288,7 +287,7 @@ public class SchemeInitializer implements ApplicationListener<ApplicationContext
                         return "0";
                     }
                     var stats = JsonUtils.jsonToObject(statsStr, Stats.class);
-                    return ObjectUtils.defaultIfNull(stats.getVisit(), 0).toString();
+                    return defaultIfNull(stats.getVisit(), 0).toString();
                 })));
 
             indexSpecs.add(new IndexSpec()
@@ -300,7 +299,7 @@ public class SchemeInitializer implements ApplicationListener<ApplicationContext
                         return "0";
                     }
                     var stats = JsonUtils.jsonToObject(statsStr, Stats.class);
-                    return ObjectUtils.defaultIfNull(stats.getTotalComment(), 0).toString();
+                    return defaultIfNull(stats.getTotalComment(), 0).toString();
                 })));
         });
         schemeManager.register(Category.class, indexSpecs -> {
@@ -496,6 +495,13 @@ public class SchemeInitializer implements ApplicationListener<ApplicationContext
                         .map(SinglePage.SinglePageSpec::getSlug)
                         .orElse(null))
                 )
+            );
+            is.add(new IndexSpec()
+                .setName("spec.deleted")
+                .setIndexFunc(simpleAttribute(SinglePage.class, page -> {
+                    var deleted = defaultIfNull(page.getSpec().getDeleted(), false);
+                    return String.valueOf(deleted);
+                }))
             );
             is.add(new IndexSpec()
                 .setName("spec.visible")
