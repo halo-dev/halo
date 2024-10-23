@@ -388,6 +388,13 @@ class KeyComparatorTest {
             assertThat(comparator.compare("124", "123")).isGreaterThan(0);
             // Leading zeros
             assertThat(comparator.compare("00123", "123") > 0).isTrue();
+            assertThat(comparator.compare("0", "0")).isEqualTo(0);
+            assertThat(comparator.compare("0", "0000")).isLessThan(0);
+            assertThat(comparator.compare("0x", "0")).isGreaterThan(0);
+            assertThat(comparator.compare("0", "1")).isLessThan(0);
+            assertThat(comparator.compare("1", "0")).isGreaterThan(0);
+            assertThat(comparator.compare("001", "0")).isGreaterThan(0);
+            assertThat(comparator.compare("0x5e", "0000")).isLessThan(0);
         }
 
         @Test
@@ -430,6 +437,7 @@ class KeyComparatorTest {
             assertThat(comparator.compare("123.46", "123.45")).isGreaterThan(0);
             // Decimal equivalence
             assertThat(comparator.compare("123.5", "123.50")).isLessThan(0);
+            assertThat(comparator.compare("123.0005", "123.00050")).isLessThan(0);
         }
 
         @Test
