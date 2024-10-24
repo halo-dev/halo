@@ -5,6 +5,7 @@ import static org.springframework.security.web.server.util.matcher.ServerWebExch
 
 import java.util.ArrayList;
 import org.springframework.context.MessageSource;
+import org.springframework.core.annotation.Order;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.config.web.server.ServerHttpSecurity;
@@ -21,6 +22,7 @@ import run.halo.app.security.authentication.SecurityConfigurer;
 import run.halo.app.security.authentication.twofactor.TwoFactorAuthenticationEntryPoint;
 
 @Component
+@Order(0)
 public class ExceptionSecurityConfigurer implements SecurityConfigurer {
 
     private final MessageSource messageSource;

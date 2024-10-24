@@ -2,6 +2,7 @@ package run.halo.app.security;
 
 import static org.springframework.security.web.server.util.matcher.ServerWebExchangeMatchers.pathMatchers;
 
+import org.springframework.core.annotation.Order;
 import org.springframework.security.config.web.server.ServerHttpSecurity;
 import org.springframework.security.web.server.csrf.CookieServerCsrfTokenRepository;
 import org.springframework.security.web.server.csrf.CsrfWebFilter;
@@ -12,6 +13,7 @@ import org.springframework.stereotype.Component;
 import run.halo.app.security.authentication.SecurityConfigurer;
 
 @Component
+@Order(0)
 class CsrfConfigurer implements SecurityConfigurer {
 
     @Override
