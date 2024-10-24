@@ -2,6 +2,7 @@ package run.halo.app.security;
 
 import com.google.common.net.HttpHeaders;
 import java.util.List;
+import org.springframework.core.annotation.Order;
 import org.springframework.security.config.web.server.ServerHttpSecurity;
 import org.springframework.stereotype.Component;
 import org.springframework.web.cors.CorsConfiguration;
@@ -10,6 +11,7 @@ import org.springframework.web.cors.reactive.UrlBasedCorsConfigurationSource;
 import run.halo.app.security.authentication.SecurityConfigurer;
 
 @Component
+@Order(0)
 public class CorsConfigurer implements SecurityConfigurer {
     @Override
     public void configure(ServerHttpSecurity http) {

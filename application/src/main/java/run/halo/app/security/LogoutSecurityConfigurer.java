@@ -7,6 +7,7 @@ import java.util.Map;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Bean;
+import org.springframework.core.annotation.Order;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.security.config.web.server.ServerHttpSecurity;
@@ -31,6 +32,7 @@ import run.halo.app.theme.router.ModelConst;
 
 @Component
 @RequiredArgsConstructor
+@Order(0)
 public class LogoutSecurityConfigurer implements SecurityConfigurer {
     private final RememberMeServices rememberMeServices;
     private final ApplicationContext applicationContext;

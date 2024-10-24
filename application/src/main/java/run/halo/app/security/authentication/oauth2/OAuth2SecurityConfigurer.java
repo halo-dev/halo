@@ -1,5 +1,6 @@
 package run.halo.app.security.authentication.oauth2;
 
+import org.springframework.core.annotation.Order;
 import org.springframework.security.config.web.server.SecurityWebFiltersOrder;
 import org.springframework.security.config.web.server.ServerHttpSecurity;
 import org.springframework.security.core.userdetails.ReactiveUserDetailsService;
@@ -15,6 +16,7 @@ import run.halo.app.security.authentication.SecurityConfigurer;
  * @since 2.20.0
  */
 @Component
+@Order(0)
 class OAuth2SecurityConfigurer implements SecurityConfigurer {
 
     private final ServerSecurityContextRepository securityContextRepository;
