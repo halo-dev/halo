@@ -1,4 +1,4 @@
-package run.halo.app.core.user.service;
+package run.halo.app.core.user.service.impl;
 
 import static run.halo.app.extension.ExtensionUtil.defaultSort;
 import static run.halo.app.extension.index.query.QueryFactory.equal;
@@ -25,6 +25,12 @@ import reactor.util.retry.Retry;
 import run.halo.app.core.extension.Role;
 import run.halo.app.core.extension.RoleBinding;
 import run.halo.app.core.extension.User;
+import run.halo.app.core.user.service.EmailVerificationService;
+import run.halo.app.core.user.service.RoleService;
+import run.halo.app.core.user.service.SignUpData;
+import run.halo.app.core.user.service.UserPostCreatingHandler;
+import run.halo.app.core.user.service.UserPreCreatingHandler;
+import run.halo.app.core.user.service.UserService;
 import run.halo.app.event.user.PasswordChangedEvent;
 import run.halo.app.extension.ListOptions;
 import run.halo.app.extension.Metadata;
@@ -38,6 +44,7 @@ import run.halo.app.infra.exception.DuplicateNameException;
 import run.halo.app.infra.exception.EmailVerificationFailed;
 import run.halo.app.infra.exception.UnsatisfiedAttributeValueException;
 import run.halo.app.infra.exception.UserNotFoundException;
+import run.halo.app.plugin.extensionpoint.ExtensionGetter;
 
 @Service
 @RequiredArgsConstructor
@@ -56,6 +63,8 @@ public class UserServiceImpl implements UserService {
     private final RoleService roleService;
 
     private final EmailVerificationService emailVerificationService;
+
+    private final ExtensionGetter extensionGetter;
 
     private Clock clock = Clock.systemUTC();
 
@@ -222,13 +231,20 @@ public class UserServiceImpl implements UserService {
                     )
                     .then();
             })
-            .then(Mono.defer(() -> client.create(user)
-                .flatMap(newUser -> grantRoles(user.getMetadata().getName(), roleNames)
-                    .retryWhen(
-                        Retry.backoff(5, Duration.ofMillis(100))
+            .then(extensionGetter.getExtensions(UserPreCreatingHandler.class)
+                .concatMap(handler -> handler.preCreating(user))
+                .then(Mono.defer(() -> client.create(user)
+                    .flatMap(newUser -> grantRoles(user.getMetadata().getName(), roleNames)
+                        .retryWhen(Retry.backoff(5, Duration.ofMillis(100))
                             .filter(OptimisticLockingFailureException.class::isInstance)
+                        )
                     )
                 ))
+                .flatMap(createdUser -> extensionGetter.getExtensions(UserPostCreatingHandler.class)
+                    .concatMap(handler -> handler.postCreating(createdUser))
+                    .then()
+                    .thenReturn(createdUser)
+                )
             );
     }
 

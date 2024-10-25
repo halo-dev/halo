@@ -1,4 +1,4 @@
-package run.halo.app.core.user.service;
+package run.halo.app.core.user.service.impl;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -8,6 +8,7 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anySet;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.argThat;
+import static org.mockito.ArgumentMatchers.assertArg;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.ArgumentMatchers.isA;
 import static org.mockito.Mockito.doReturn;
@@ -19,6 +20,7 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static run.halo.app.extension.GroupVersionKind.fromExtension;
 
+import java.util.HashMap;
 import java.util.Set;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
@@ -37,6 +39,10 @@ import run.halo.app.core.extension.Role;
 import run.halo.app.core.extension.RoleBinding;
 import run.halo.app.core.extension.RoleBinding.Subject;
 import run.halo.app.core.extension.User;
+import run.halo.app.core.user.service.RoleService;
+import run.halo.app.core.user.service.SignUpData;
+import run.halo.app.core.user.service.UserPostCreatingHandler;
+import run.halo.app.core.user.service.UserPreCreatingHandler;
 import run.halo.app.event.user.PasswordChangedEvent;
 import run.halo.app.extension.Metadata;
 import run.halo.app.extension.ReactiveExtensionClient;
@@ -46,6 +52,7 @@ import run.halo.app.infra.SystemSetting;
 import run.halo.app.infra.exception.DuplicateNameException;
 import run.halo.app.infra.exception.UnsatisfiedAttributeValueException;
 import run.halo.app.infra.exception.UserNotFoundException;
+import run.halo.app.plugin.extensionpoint.ExtensionGetter;
 
 @ExtendWith(MockitoExtension.class)
 class UserServiceImplTest {
@@ -64,6 +71,9 @@ class UserServiceImplTest {
 
     @Mock
     RoleService roleService;
+
+    @Mock
+    ExtensionGetter extensionGetter;
 
     @InjectMocks
     UserServiceImpl userService;
@@ -305,6 +315,7 @@ class UserServiceImplTest {
 
     @Nested
     class SignUpTest {
+
         @Test
         void signUpWhenRegistrationNotAllowed() {
             SystemSetting.User userSetting = new SystemSetting.User();
@@ -354,6 +365,8 @@ class UserServiceImplTest {
             when(passwordEncoder.encode(eq("fake-password"))).thenReturn("fake-password");
             when(client.fetch(eq(User.class), eq("fake-user")))
                 .thenReturn(Mono.just(createFakeUser("test", "test")));
+            when(extensionGetter.getExtensions(UserPreCreatingHandler.class))
+                .thenReturn(Flux.empty());
 
             var signUpData = createSignUpData("fake-user", "fake-password");
             userService.signUp(signUpData)
@@ -382,6 +395,20 @@ class UserServiceImplTest {
             UserServiceImpl spyUserService = spy(userService);
             doReturn(Mono.just(fakeUser)).when(spyUserService).grantRoles(eq("fake-user"),
                 anySet());
+            when(extensionGetter.getExtensions(UserPreCreatingHandler.class))
+                .thenReturn(Flux.just(user -> {
+                    if (user.getMetadata().getAnnotations() == null) {
+                        user.getMetadata().setAnnotations(new HashMap<>());
+                    }
+                    user.getMetadata().getAnnotations()
+                        .put("pre.creating.handler.handled", "true");
+                    return Mono.empty();
+                }));
+            when(extensionGetter.getExtensions(UserPostCreatingHandler.class))
+                .thenReturn(Flux.just(user -> {
+                    assertEquals(fakeUser, user);
+                    return Mono.empty();
+                }));
 
             spyUserService.signUp(signUpData)
                 .as(StepVerifier::create)
@@ -391,7 +418,10 @@ class UserServiceImplTest {
                 })
                 .verifyComplete();
 
-            verify(client).create(any(User.class));
+            verify(client).create(assertArg(u -> {
+                var handled = u.getMetadata().getAnnotations().get("pre.creating.handler.handled");
+                assertEquals("true", handled);
+            }));
             verify(spyUserService).grantRoles(eq("fake-user"), anySet());
         }
 
