@@ -19,6 +19,8 @@ import AttachmentGroupBadge from "./AttachmentGroupBadge.vue";
 import AttachmentGroupEditingModal from "./AttachmentGroupEditingModal.vue";
 import AttachmentPolicyBadge from "./AttachmentPolicyBadge.vue";
 import AttachmentPolicyEditingModal from "./AttachmentPolicyEditingModal.vue";
+import AttachmentGroupEditingModal from "./AttachmentGroupEditingModal.vue";
+import UppyUpload from "@/components/upload/UppyUpload.vue";
 
 const emit = defineEmits<{
   (event: "close"): void;
