@@ -291,7 +291,7 @@ public class PostFinderImpl implements PostFinder {
     public Flux<ListedPostVo> listAll() {
         return postPredicateResolver.getListOptions()
             .flatMapMany(listOptions -> client.listAll(Post.class, listOptions, defaultSort()))
-            .concatMap(postPublicQueryService::convertToListedVo);
+            .flatMapSequential(postPublicQueryService::convertToListedVo);
     }
 
     static int pageNullSafe(Integer page) {

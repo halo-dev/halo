@@ -13,13 +13,14 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 import org.apache.commons.lang3.BooleanUtils;
-import org.apache.commons.lang3.ObjectUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.boot.context.event.ApplicationContextInitializedEvent;
 import org.springframework.context.ApplicationListener;
 import org.springframework.lang.NonNull;
 import org.springframework.stereotype.Component;
 import run.halo.app.content.Stats;
+import run.halo.app.core.attachment.extension.LocalThumbnail;
+import run.halo.app.core.attachment.extension.Thumbnail;
 import run.halo.app.core.extension.AnnotationSetting;
 import run.halo.app.core.extension.AuthProvider;
 import run.halo.app.core.extension.Counter;
@@ -38,10 +39,8 @@ import run.halo.app.core.extension.UserConnection;
 import run.halo.app.core.extension.UserConnection.UserConnectionSpec;
 import run.halo.app.core.extension.attachment.Attachment;
 import run.halo.app.core.extension.attachment.Group;
-import run.halo.app.core.extension.attachment.LocalThumbnail;
 import run.halo.app.core.extension.attachment.Policy;
 import run.halo.app.core.extension.attachment.PolicyTemplate;
-import run.halo.app.core.extension.attachment.Thumbnail;
 import run.halo.app.core.extension.content.Category;
 import run.halo.app.core.extension.content.Comment;
 import run.halo.app.core.extension.content.Post;
@@ -288,7 +287,7 @@ public class SchemeInitializer implements ApplicationListener<ApplicationContext
                         return "0";
                     }
                     var stats = JsonUtils.jsonToObject(statsStr, Stats.class);
-                    return ObjectUtils.defaultIfNull(stats.getVisit(), 0).toString();
+                    return defaultIfNull(stats.getVisit(), 0).toString();
                 })));
 
             indexSpecs.add(new IndexSpec()
@@ -300,7 +299,7 @@ public class SchemeInitializer implements ApplicationListener<ApplicationContext
                         return "0";
                     }
                     var stats = JsonUtils.jsonToObject(statsStr, Stats.class);
-                    return ObjectUtils.defaultIfNull(stats.getTotalComment(), 0).toString();
+                    return defaultIfNull(stats.getTotalComment(), 0).toString();
                 })));
         });
         schemeManager.register(Category.class, indexSpecs -> {
@@ -498,6 +497,13 @@ public class SchemeInitializer implements ApplicationListener<ApplicationContext
                 )
             );
             is.add(new IndexSpec()
+                .setName("spec.deleted")
+                .setIndexFunc(simpleAttribute(SinglePage.class, page -> {
+                    var deleted = defaultIfNull(page.getSpec().getDeleted(), false);
+                    return String.valueOf(deleted);
+                }))
+            );
+            is.add(new IndexSpec()
                 .setName("spec.visible")
                 .setIndexFunc(
                     simpleAttribute(SinglePage.class, page -> Optional.ofNullable(page.getSpec())
@@ -630,6 +636,22 @@ public class SchemeInitializer implements ApplicationListener<ApplicationContext
                         .map(UserConnectionSpec::getUsername)
                         .orElse(null)
                 )));
+            is.add(new IndexSpec()
+                .setName("spec.registrationId")
+                .setIndexFunc(simpleAttribute(UserConnection.class,
+                    connection -> Optional.ofNullable(connection.getSpec())
+                        .map(UserConnectionSpec::getRegistrationId)
+                        .orElse(null)
+                ))
+            );
+            is.add(new IndexSpec()
+                .setName("spec.providerUserId")
+                .setIndexFunc(simpleAttribute(UserConnection.class,
+                    connection -> Optional.ofNullable(connection.getSpec())
+                        .map(UserConnectionSpec::getProviderUserId)
+                        .orElse(null)
+                ))
+            );
         });
 
         // security.halo.run

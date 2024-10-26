@@ -55,7 +55,6 @@ import { i18n } from "@/locales";
 import { usePluginModuleStore } from "@/stores/plugin";
 import { formatDatetime } from "@/utils/date";
 import { usePermission } from "@/utils/permission";
-import AttachmentSelectorModal from "@console/modules/contents/attachments/components/AttachmentSelectorModal.vue";
 import type { Attachment } from "@halo-dev/api-client";
 import {
   IconCalendar,
@@ -72,6 +71,7 @@ import { useDebounceFn, useLocalStorage } from "@vueuse/core";
 import type { AxiosRequestConfig } from "axios";
 import { OverlayScrollbarsComponent } from "overlayscrollbars-vue";
 import {
+  defineAsyncComponent,
   inject,
   markRaw,
   onBeforeUnmount,
@@ -90,6 +90,7 @@ import MdiFormatHeader5 from "~icons/mdi/format-header-5";
 import MdiFormatHeader6 from "~icons/mdi/format-header-6";
 import RiLayoutRightLine from "~icons/ri/layout-right-line";
 import { useAttachmentSelect } from "./composables/use-attachment";
+import { useExtension } from "./composables/use-extension";
 import {
   UiExtensionAudio,
   UiExtensionImage,
@@ -97,7 +98,6 @@ import {
   UiExtensionVideo,
 } from "./extensions";
 import { getContents } from "./utils/attachment";
-import { useExtension } from "./composables/use-extension";
 
 const { t } = useI18n();
 const { currentUserHasPermission } = usePermission();
@@ -164,9 +164,6 @@ const headingIcons = {
 const headingNodes = ref<HeadingNode[]>();
 const selectedHeadingNode = ref<HeadingNode>();
 const extraActiveId = ref("toc");
-const attachmentSelectorModal = ref(false);
-
-const { onAttachmentSelect, attachmentResult } = useAttachmentSelect();
 
 const editor = shallowRef<Editor>();
 const editorTitleRef = ref();
@@ -175,11 +172,29 @@ const { pluginModules } = usePluginModuleStore();
 
 const showSidebar = useLocalStorage("halo:editor:show-sidebar", true);
 
+// Attachments
+const AttachmentSelectorModal = defineAsyncComponent({
+  loader: () => {
+    if (currentUserHasPermission(["system:attachments:manage"])) {
+      return import(
+        "@console/modules/contents/attachments/components/AttachmentSelectorModal.vue"
+      );
+    }
+    return import(
+      "@uc/modules/contents/attachments/components/AttachmentSelectorModal.vue"
+    );
+  },
+});
+
+const attachmentSelectorModal = ref(false);
+const { onAttachmentSelect, attachmentResult } = useAttachmentSelect();
+
 const initAttachmentOptions = {
   accepts: ["*/*"],
   min: undefined,
   max: undefined,
 };
+
 const attachmentOptions = ref<{
   accepts?: string[];
   min?: number;
@@ -272,7 +287,12 @@ const presetExtensions = [
     name: "custom-attachment-extension",
     addOptions() {
       // If user has no permission to view attachments, return
-      if (!currentUserHasPermission(["system:attachments:view"])) {
+      if (
+        !currentUserHasPermission([
+          "system:attachments:manage",
+          "uc:attachments:manage",
+        ])
+      ) {
         return this;
       }
 
@@ -302,6 +322,29 @@ const presetExtensions = [
             },
           ];
         },
+      };
+    },
+    addCommands() {
+      return {
+        openAttachmentSelector: (callback, options) => () => {
+          if (options) {
+            attachmentOptions.value = options;
+          }
+          attachmentSelectorModal.value = true;
+          attachmentResult.updateAttachment = (
+            attachments: AttachmentLike[]
+          ) => {
+            callback(attachments);
+          };
+          return true;
+        },
+      };
+    },
+  }),
+  Extension.create({
+    name: "custom-sidebar-toggle-extension",
+    addOptions() {
+      return {
         getToolbarItems({ editor }: { editor: Editor }) {
           return {
             priority: 1000,
@@ -318,22 +361,6 @@ const presetExtensions = [
               },
             },
           };
-        },
-      };
-    },
-    addCommands() {
-      return {
-        openAttachmentSelector: (callback, options) => () => {
-          if (options) {
-            attachmentOptions.value = options;
-          }
-          attachmentSelectorModal.value = true;
-          attachmentResult.updateAttachment = (
-            attachments: AttachmentLike[]
-          ) => {
-            callback(attachments);
-          };
-          return true;
         },
       };
     },
@@ -484,7 +511,7 @@ function handleFocusEditor(event) {
           :value="title"
           type="text"
           :placeholder="$t('core.components.default_editor.title_placeholder')"
-          class="w-full border-x-0 !border-b border-t-0 !border-solid !border-gray-100 p-0 !py-2 text-4xl font-semibold placeholder:text-gray-300"
+          class="w-full border-x-0 !border-b border-t-0 !border-solid !border-gray-100 p-0 !py-2 text-4xl font-semibold leading-none placeholder:text-gray-300"
           @input="onTitleInput"
           @keydown.enter="handleFocusEditor"
         />

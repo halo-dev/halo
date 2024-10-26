@@ -2,18 +2,18 @@
 import { IconArrowDownLine, IconCloseCircle } from "@halo-dev/components";
 import {
   computed,
+  defineEmits,
   nextTick,
   onMounted,
-  ref,
-  defineEmits,
-  type PropType,
   onUnmounted,
+  ref,
+  type PropType,
 } from "vue";
 
-import SelectSelector from "./SelectSelector.vue";
+import { Dropdown } from "floating-vue";
 import MultipleSelectSelector from "./MultipleSelectSelector.vue";
 import SelectDropdownContainer from "./SelectDropdownContainer.vue";
-import { Dropdown } from "floating-vue";
+import SelectSelector from "./SelectSelector.vue";
 
 const props = defineProps({
   multiple: {
@@ -95,7 +95,7 @@ const inputRef = ref<HTMLInputElement | null>();
 const searchKeyword = ref<string>("");
 const isDropdownVisible = ref<boolean>(false);
 const selectedOptions = computed({
-  get: () => props.selected,
+  get: () => [...props.selected],
   set: (value) => {
     emit("update", value);
   },

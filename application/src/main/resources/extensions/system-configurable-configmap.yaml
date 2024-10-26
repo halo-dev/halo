@@ -8,7 +8,8 @@ data:
       "allowRegistration": false,
       "mustVerifyEmailOnRegistration": false,
       "defaultRole": "guest",
-      "avatarPolicy": "default-policy"
+      "avatarPolicy": "default-policy",
+      "ucAttachmentPolicy": "default-policy"
     }
   theme: |
     {
@@ -49,4 +50,12 @@ data:
   extensionPointEnabled: |
     {
       "search-engine": ["search-engine-lucene"]
+    }
+  authProvider: |
+    {
+      "states": [{
+          "name": "local",
+          "enabled": true,
+          "priority": 0
+      }]
     }

@@ -3,7 +3,6 @@
 .openapi-generator-ignore
 api.ts
 api/annotation-setting-v1alpha1-api.ts
-api/api-notification-halo-run-v1alpha1-subscription-api.ts
 api/attachment-v1alpha1-api.ts
 api/attachment-v1alpha1-console-api.ts
 api/attachment-v1alpha1-uc-api.ts
@@ -17,6 +16,7 @@ api/comment-v1alpha1-console-api.ts
 api/comment-v1alpha1-public-api.ts
 api/config-map-v1alpha1-api.ts
 api/counter-v1alpha1-api.ts
+api/default-api.ts
 api/device-v1alpha1-api.ts
 api/device-v1alpha1-uc-api.ts
 api/extension-definition-v1alpha1-api.ts
@@ -25,7 +25,6 @@ api/group-v1alpha1-api.ts
 api/index-v1alpha1-public-api.ts
 api/indices-v1alpha1-console-api.ts
 api/local-thumbnail-v1alpha1-api.ts
-api/login-api.ts
 api/menu-item-v1alpha1-api.ts
 api/menu-v1alpha1-api.ts
 api/menu-v1alpha1-public-api.ts
@@ -33,6 +32,7 @@ api/metrics-v1alpha1-public-api.ts
 api/migration-v1alpha1-console-api.ts
 api/notification-template-v1alpha1-api.ts
 api/notification-v1alpha1-api.ts
+api/notification-v1alpha1-public-api.ts
 api/notification-v1alpha1-uc-api.ts
 api/notifier-descriptor-v1alpha1-api.ts
 api/notifier-v1alpha1-console-api.ts
@@ -65,6 +65,7 @@ api/single-page-v1alpha1-public-api.ts
 api/snapshot-v1alpha1-api.ts
 api/snapshot-v1alpha1-uc-api.ts
 api/subscription-v1alpha1-api.ts
+api/system-config-v1alpha1-console-api.ts
 api/system-v1alpha1-console-api.ts
 api/system-v1alpha1-public-api.ts
 api/tag-v1alpha1-api.ts
@@ -76,9 +77,9 @@ api/thumbnail-v1alpha1-api.ts
 api/thumbnail-v1alpha1-public-api.ts
 api/two-factor-auth-v1alpha1-uc-api.ts
 api/user-connection-v1alpha1-api.ts
+api/user-connection-v1alpha1-uc-api.ts
 api/user-v1alpha1-api.ts
 api/user-v1alpha1-console-api.ts
-api/user-v1alpha1-public-api.ts
 base.ts
 common.ts
 configuration.ts
@@ -216,7 +217,6 @@ models/notifier-info.ts
 models/notifier-setting-ref.ts
 models/owner-info.ts
 models/password-request.ts
-models/password-reset-email-request.ts
 models/pat-spec.ts
 models/personal-access-token-list.ts
 models/personal-access-token.ts
@@ -239,7 +239,6 @@ models/post-spec.ts
 models/post-status.ts
 models/post-vo.ts
 models/post.ts
-models/public-key-response.ts
 models/reason-attributes.ts
 models/reason-list.ts
 models/reason-property.ts
@@ -255,7 +254,6 @@ models/reason-type-spec.ts
 models/reason-type.ts
 models/reason.ts
 models/ref.ts
-models/register-verify-email-request.ts
 models/remember-me-token-list.ts
 models/remember-me-token-spec.ts
 models/remember-me-token.ts
@@ -268,7 +266,6 @@ models/reply-status.ts
 models/reply-vo-list.ts
 models/reply-vo.ts
 models/reply.ts
-models/reset-password-request.ts
 models/reverse-proxy-list.ts
 models/reverse-proxy-rule.ts
 models/reverse-proxy.ts
@@ -291,7 +288,6 @@ models/setting-list.ts
 models/setting-ref.ts
 models/setting-spec.ts
 models/setting.ts
-models/sign-up-request.ts
 models/single-page-list.ts
 models/single-page-request.ts
 models/single-page-spec.ts
@@ -309,7 +305,6 @@ models/subscription-list.ts
 models/subscription-spec.ts
 models/subscription-subscriber.ts
 models/subscription.ts
-models/system-initialization-request.ts
 models/tag-list.ts
 models/tag-spec.ts
 models/tag-status.ts
@@ -329,6 +324,7 @@ models/thumbnail.ts
 models/totp-auth-link-response.ts
 models/totp-request.ts
 models/two-factor-auth-settings.ts
+models/uc-upload-request-form-data.ts
 models/upgrade-from-uri-request.ts
 models/upload-from-url-request.ts
 models/user-connection-list.ts

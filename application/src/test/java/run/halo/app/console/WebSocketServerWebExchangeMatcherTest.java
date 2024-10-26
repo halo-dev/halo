@@ -8,6 +8,7 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.mock.http.server.reactive.MockServerHttpRequest;
 import org.springframework.mock.web.server.MockServerWebExchange;
 import reactor.test.StepVerifier;
+import run.halo.app.infra.console.WebSocketServerWebExchangeMatcher;
 
 class WebSocketServerWebExchangeMatcherTest {
 

@@ -17,7 +17,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.reactive.AutoConfigureWebTestClient;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.context.TestConfiguration;
-import org.springframework.boot.test.mock.mockito.SpyBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Import;
 import org.springframework.http.MediaType;
@@ -26,6 +25,7 @@ import org.springframework.security.core.userdetails.ReactiveUserDetailsPassword
 import org.springframework.security.core.userdetails.ReactiveUserDetailsService;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.annotation.DirtiesContext;
+import org.springframework.test.context.bean.override.mockito.MockitoSpyBean;
 import org.springframework.test.web.reactive.server.WebTestClient;
 import org.springframework.web.reactive.function.server.RouterFunction;
 import org.springframework.web.reactive.function.server.RouterFunctions;
@@ -35,7 +35,7 @@ import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import run.halo.app.core.extension.Role;
 import run.halo.app.core.extension.Role.PolicyRule;
-import run.halo.app.core.extension.service.RoleService;
+import run.halo.app.core.user.service.RoleService;
 import run.halo.app.extension.ExtensionClient;
 import run.halo.app.extension.Metadata;
 import run.halo.app.infra.AnonymousUserConst;
@@ -49,13 +49,13 @@ class AuthorizationTest {
     @Autowired
     WebTestClient webClient;
 
-    @SpyBean
+    @MockitoSpyBean
     ReactiveUserDetailsService userDetailsService;
 
-    @SpyBean
+    @MockitoSpyBean
     ReactiveUserDetailsPasswordService userDetailsPasswordService;
 
-    @SpyBean
+    @MockitoSpyBean
     RoleService roleService;
 
     @Autowired
@@ -70,12 +70,18 @@ class AuthorizationTest {
     void anonymousUserAccessProtectedApi() {
         when(userDetailsService.findByUsername(eq(AnonymousUserConst.PRINCIPAL)))
             .thenReturn(Mono.empty());
-        when(roleService.listDependenciesFlux(anySet())).thenReturn(Flux.empty());
 
-        webClient.get().uri("/apis/fake.halo.run/v1/posts").exchange().expectStatus()
-            .isUnauthorized();
+        webClient.get().uri("/apis/fake.halo.run/v1/posts")
+            .header("X-Requested-With", "XMLHttpRequest")
+            .exchange()
+            .expectStatus().isUnauthorized();
 
-        verify(roleService).listDependenciesFlux(anySet());
+        webClient.get().uri("/apis/fake.halo.run/v1/posts")
+            .exchange()
+            .expectStatus().isFound()
+            .expectHeader().location("/login?authentication_required");
+
+        verify(roleService, times(2)).listDependenciesFlux(anySet());
     }
 
     @Test
@@ -97,13 +103,19 @@ class AuthorizationTest {
             .isOk()
             .expectBody(String.class).isEqualTo("returned posts");
 
-        verify(roleService).listDependenciesFlux(anySet());
-
-        webClient.get().uri("/apis/fake.halo.run/v1/posts/hello-halo").exchange()
+        webClient.get().uri("/apis/fake.halo.run/v1/posts/hello-halo")
+            .header("X-Requested-With", "XMLHttpRequest")
+            .exchange()
             .expectStatus()
             .isUnauthorized();
 
-        verify(roleService, times(2)).listDependenciesFlux(anySet());
+        webClient.get().uri("/apis/fake.halo.run/v1/posts/hello-halo")
+            .exchange()
+            .expectStatus()
+            .isFound()
+            .expectHeader().location("/login?authentication_required");
+
+        verify(roleService, times(3)).listDependenciesFlux(anySet());
     }
 
     @Test

@@ -1,4 +1,5 @@
 <script lang="ts" setup>
+import AttachmentPermalinkList from "@/components/attachment/AttachmentPermalinkList.vue";
 import LazyImage from "@/components/image/LazyImage.vue";
 import { formatDatetime } from "@/utils/date";
 import { isImage } from "@/utils/image";
@@ -14,8 +15,7 @@ import {
 } from "@halo-dev/components";
 import { useQuery } from "@tanstack/vue-query";
 import prettyBytes from "pretty-bytes";
-import { computed, ref, toRefs } from "vue";
-import AttachmentPermalinkList from "./AttachmentPermalinkList.vue";
+import { computed, ref, toRefs, useTemplateRef } from "vue";
 import DisplayNameEditForm from "./DisplayNameEditForm.vue";
 
 const props = withDefaults(
@@ -35,6 +35,7 @@ const emit = defineEmits<{
 
 const { name } = toRefs(props);
 
+const modal = useTemplateRef<InstanceType<typeof VModal> | null>("modal");
 const onlyPreview = ref(false);
 
 const { data: attachment, isLoading } = useQuery({
@@ -92,6 +93,7 @@ const showDisplayNameForm = ref(false);
 </script>
 <template>
   <VModal
+    ref="modal"
     :title="
       $t('core.attachment.detail_modal.title', {
         display_name: attachment?.spec.displayName || '',
@@ -235,7 +237,7 @@ const showDisplayNameForm = ref(false);
 
     <template #footer>
       <VSpace>
-        <VButton type="default" @click="emit('close')">
+        <VButton type="default" @click="modal?.close()">
           {{ $t("core.common.buttons.close_and_shortcut") }}
         </VButton>
         <slot name="footer" />

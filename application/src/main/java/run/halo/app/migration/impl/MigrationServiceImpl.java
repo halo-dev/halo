@@ -64,12 +64,14 @@ public class MigrationServiceImpl implements MigrationService, InitializingBean 
         "backups/**",
         "db/**",
         "logs/**",
+        "indices/**",
         "docker-compose.yaml",
         "docker-compose.yml",
         "mysql/**",
         "mysqlBackup/**",
         "**/.idea/**",
-        "**/.vscode/**"
+        "**/.vscode/**",
+        "attachments/thumbnails/**"
     );
 
     private final DateTimeFormatter dateTimeFormatter;
@@ -139,7 +141,14 @@ public class MigrationServiceImpl implements MigrationService, InitializingBean 
         return Mono.usingWhen(
             createTempDir("halo-restore-", scheduler),
             tempDir -> unpackBackup(content, tempDir)
-                .then(Mono.defer(() -> restoreExtensions(tempDir)))
+                .then(Mono.defer(() ->
+                    // This step skips index verification such as unique index.
+                    // In order to avoid index conflicts after recovery or
+                    // OptimisticLockingFailureException when updating the same record,
+                    // so we need to truncate all extension stores before saving(create or update).
+                    repository.deleteAll()
+                        .then(restoreExtensions(tempDir)))
+                )
                 .then(Mono.defer(() -> restoreWorkdir(tempDir))),
             tempDir -> deleteRecursivelyAndSilently(tempDir, scheduler)
         );
@@ -239,13 +248,9 @@ public class MigrationServiceImpl implements MigrationService, InitializingBean 
                             sink.complete();
                         })
                     // reset version
-                    .doOnNext(extensionStore -> extensionStore.setVersion(null)).buffer(100)
-                    // We might encounter OptimisticLockingFailureException when saving extension
-                    // store,
-                    // So we have to delete all extension stores before saving.
-                    .flatMap(extensionStores -> repository.deleteAll(extensionStores)
-                        .thenMany(repository.saveAll(extensionStores))
-                    )
+                    .doOnNext(extensionStore -> extensionStore.setVersion(null))
+                    .buffer(100)
+                    .flatMap(repository::saveAll)
                     .doOnNext(extensionStore -> log.info("Restored extension store: {}",
                         extensionStore.getName()))
                     .then(),

@@ -20,7 +20,7 @@ import run.halo.app.core.attachment.ThumbnailProvider.ThumbnailContext;
 import run.halo.app.core.attachment.ThumbnailService;
 import run.halo.app.core.attachment.ThumbnailSigner;
 import run.halo.app.core.attachment.ThumbnailSize;
-import run.halo.app.core.extension.attachment.Thumbnail;
+import run.halo.app.core.attachment.extension.Thumbnail;
 import run.halo.app.extension.ListOptions;
 import run.halo.app.extension.ListResult;
 import run.halo.app.extension.Metadata;

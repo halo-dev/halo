@@ -14,7 +14,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Component;
 import reactor.core.publisher.Flux;
-import reactor.core.publisher.Mono;
 import run.halo.app.core.attachment.AttachmentUtils;
 import run.halo.app.core.attachment.ThumbnailService;
 import run.halo.app.core.attachment.ThumbnailSize;
@@ -28,6 +27,7 @@ import run.halo.app.extension.controller.Controller;
 import run.halo.app.extension.controller.ControllerBuilder;
 import run.halo.app.extension.controller.Reconciler;
 import run.halo.app.extension.controller.Reconciler.Request;
+import run.halo.app.extension.controller.RequeueException;
 
 @Slf4j
 @Component
@@ -57,18 +57,15 @@ public class AttachmentReconciler implements Reconciler<Request> {
 
             var annotations = attachment.getMetadata().getAnnotations();
             if (annotations != null) {
-                attachmentService.getPermalink(attachment)
-                    .map(URI::toString)
-                    .switchIfEmpty(Mono.fromSupplier(() -> {
-                        // Only for back-compatibility
-                        return annotations.get(Constant.EXTERNAL_LINK_ANNO_KEY);
-                    }))
-                    .doOnNext(permalink -> {
-                        log.debug("Set permalink {} for attachment {}", permalink, request.name());
-                        var status = nullSafeStatus(attachment);
-                        status.setPermalink(permalink);
-                    })
-                    .blockOptional();
+                var permalink = attachmentService.getPermalink(attachment)
+                    .map(URI::toASCIIString)
+                    .blockOptional()
+                    .orElseThrow(() -> new RequeueException(new Result(true, null),
+                        "Attachment handler is unavailable, requeue the request"
+                    ));
+                log.debug("Set permalink {} for attachment {}", permalink, request.name());
+                var status = nullSafeStatus(attachment);
+                status.setPermalink(permalink);
             }
             var permalink = nullSafeStatus(attachment).getPermalink();
             if (StringUtils.isNotBlank(permalink) && AttachmentUtils.isImage(attachment)) {

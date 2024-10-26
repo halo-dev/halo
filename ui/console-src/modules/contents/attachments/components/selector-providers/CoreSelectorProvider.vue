@@ -259,14 +259,19 @@ const viewType = useLocalStorage("attachment-selector-view-type", "grid");
 
   <AttachmentGroupList readonly @select="onGroupSelect" />
 
-  <div v-if="attachments?.length" class="mb-5">
-    <VButton @click="uploadVisible = true">
-      <template #icon>
-        <IconUpload class="h-full w-full" />
-      </template>
-      {{ $t("core.common.buttons.upload") }}
-    </VButton>
-  </div>
+  <HasPermission
+    v-if="attachments?.length"
+    :permissions="['system:attachments:manage']"
+  >
+    <div class="mb-5">
+      <VButton @click="uploadVisible = true">
+        <template #icon>
+          <IconUpload class="h-full w-full" />
+        </template>
+        {{ $t("core.common.buttons.upload") }}
+      </VButton>
+    </div>
+  </HasPermission>
 
   <VLoading v-if="isLoading" />
 

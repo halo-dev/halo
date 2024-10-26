@@ -39,7 +39,8 @@ metadata:
     # Currently, yaml definition does not support i18n, please see https://github.com/halo-dev/halo/issues/3573
     rbac.authorization.halo.run/display-name: "Post Author"
     rbac.authorization.halo.run/dependencies: |
-      [ "role-template-post-contributor", "role-template-post-publisher", "role-template-post-attachment-manager" ]
+      [ "role-template-post-contributor", "role-template-post-publisher", "role-template-recycle-my-post",
+        "role-template-uc-attachment-manager" ]
 rules: [ ]
 
 ---
@@ -99,21 +100,32 @@ rules:
     verbs: [ "update" ]
 
 ---
+# TODO remove this in next major version
+apiVersion: v1alpha1
+kind: Role
+metadata:
+  name: role-template-recycle-my-post
+  labels:
+    halo.run/role-template: "true"
+  annotations:
+    rbac.authorization.halo.run/module: "Posts Management"
+    rbac.authorization.halo.run/display-name: "Recycle My Post"
+    rbac.authorization.halo.run/ui-permissions: |
+      [ "uc:posts:recycle" ]
+rules:
+  - apiGroups: [ "uc.api.content.halo.run" ]
+    resources: [ "posts/recycle" ]
+    verbs: [ "delete" ]
+
+---
 apiVersion: v1alpha1
 kind: Role
 metadata:
   name: role-template-post-attachment-manager
+  deletionTimestamp: 2024-09-30T14:00:41.813954138Z
   labels:
     halo.run/role-template: "true"
   annotations:
     rbac.authorization.halo.run/module: "Posts Management"
     rbac.authorization.halo.run/display-name: "Post Attachment Manager"
-    rbac.authorization.halo.run/ui-permissions: |
-      [ "uc:attachments:manage" ]
-rules:
-  - apiGroups: [ "uc.api.content.halo.run" ]
-    resources: [ "attachments" ]
-    verbs: [ "create", "update", "delete" ]
-  - apiGroups: [ "uc.api.content.halo.run" ]
-    resources: [ "attachments/upload-from-url" ]
-    verbs: [ "create" ]
+rules: [ ]

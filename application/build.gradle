@@ -13,6 +13,7 @@ plugins {
     id "io.freefair.lombok"
     id 'org.gradle.crypto.checksum'
     id 'org.springdoc.openapi-gradle-plugin'
+    id "com.github.ben-manes.versions"
 }
 
 group = 'run.halo.app'
@@ -80,6 +81,10 @@ dependencies {
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
     testImplementation 'org.springframework.security:spring-security-test'
     testImplementation 'io.projectreactor:reactor-test'
+
+    // webjars
+    runtimeOnly 'org.webjars.npm:jsencrypt:3.3.2'
+    runtimeOnly 'org.webjars.npm:normalize.css:8.0.1'
 }
 
 tasks.register('createChecksums', Checksum) {
@@ -123,7 +128,7 @@ ext.presetPluginUrls = [
         // Currently, plugin-app-store is not open source, so we need to download it from the official website.
         // Please see https://github.com/halo-dev/plugin-app-store/issues/55
         // https://www.halo.run/store/apps/app-VYJbF
-        'https://www.halo.run/store/apps/app-VYJbF/releases/download/app-release-BpYuv/assets/app-release-BpYuv-LTHgb': 'appstore.jar',
+        'https://www.halo.run/store/apps/app-VYJbF/releases/download/app-release-dEEUO/assets/app-release-dEEUO-ZRgkG': 'appstore.jar',
 ]
 
 tasks.register('downloadPluginPresets', Download) {

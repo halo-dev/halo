@@ -11,13 +11,13 @@ import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import run.halo.app.content.ContentWrapper;
 import run.halo.app.content.PostService;
+import run.halo.app.core.counter.CounterService;
+import run.halo.app.core.counter.MeterUtils;
 import run.halo.app.core.extension.content.Post;
 import run.halo.app.extension.ListOptions;
 import run.halo.app.extension.ListResult;
 import run.halo.app.extension.PageRequest;
 import run.halo.app.extension.ReactiveExtensionClient;
-import run.halo.app.metrics.CounterService;
-import run.halo.app.metrics.MeterUtils;
 import run.halo.app.plugin.extensionpoint.ExtensionGetter;
 import run.halo.app.theme.ReactivePostContentHandler;
 import run.halo.app.theme.finders.CategoryFinder;
@@ -67,7 +67,7 @@ public class PostPublicQueryServiceImpl implements PostPublicQueryService {
             })
             .flatMap(listOptions -> client.listBy(Post.class, listOptions, page))
             .flatMap(list -> Flux.fromStream(list.get())
-                .concatMap(post -> convertToListedVo(post)
+                .flatMapSequential(post -> convertToListedVo(post)
                     .flatMap(postVo -> populateStats(postVo)
                         .doOnNext(postVo::setStats).thenReturn(postVo)
                     )

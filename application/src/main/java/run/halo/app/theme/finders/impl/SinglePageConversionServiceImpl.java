@@ -19,14 +19,14 @@ import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import run.halo.app.content.ContentWrapper;
 import run.halo.app.content.SinglePageService;
+import run.halo.app.core.counter.CounterService;
+import run.halo.app.core.counter.MeterUtils;
 import run.halo.app.core.extension.content.SinglePage;
 import run.halo.app.extension.ListOptions;
 import run.halo.app.extension.ListResult;
 import run.halo.app.extension.PageRequest;
 import run.halo.app.extension.PageRequestImpl;
 import run.halo.app.extension.ReactiveExtensionClient;
-import run.halo.app.metrics.CounterService;
-import run.halo.app.metrics.MeterUtils;
 import run.halo.app.plugin.extensionpoint.ExtensionGetter;
 import run.halo.app.theme.ReactiveSinglePageContentHandler;
 import run.halo.app.theme.ReactiveSinglePageContentHandler.SinglePageContentContext;
@@ -140,7 +140,7 @@ public class SinglePageConversionServiceImpl implements SinglePageConversionServ
 
         return client.listBy(SinglePage.class, rewroteListOptions, rewrotePageRequest)
             .flatMap(list -> Flux.fromStream(list.get())
-                .concatMap(this::convertToListedVo)
+                .flatMapSequential(this::convertToListedVo)
                 .collectList()
                 .map(pageVos ->
                     new ListResult<>(list.getPage(), list.getSize(), list.getTotal(), pageVos)

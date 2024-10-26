@@ -5,6 +5,7 @@ import static io.swagger.v3.oas.annotations.media.Schema.RequiredMode.REQUIRED;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Builder;
 import lombok.Data;
+import run.halo.app.core.extension.AuthProvider;
 
 /**
  * A listed value object for {@link run.halo.app.core.extension.AuthProvider}.
@@ -35,11 +36,15 @@ public class ListedAuthProvider {
 
     String unbindingUrl;
 
+    AuthProvider.AuthType authType;
+
     Boolean isBound;
 
     Boolean enabled;
 
+    int priority;
+
     Boolean supportsBinding;
-    
+
     Boolean privileged;
 }

@@ -3,11 +3,11 @@ import { onMounted, ref } from "vue";
 
 const props = withDefaults(
   defineProps<{
-    src: string;
+    src?: string;
     classes?: string | string[];
   }>(),
   {
-    src: "",
+    src: undefined,
     classes: "",
   }
 );
@@ -16,6 +16,10 @@ const isLoading = ref(false);
 const error = ref(false);
 
 const loadVideo = async () => {
+  if (!props.src) {
+    throw new Error("src is required");
+  }
+
   const video = document.createElement("video");
   video.src = props.src;
   return new Promise((resolve, reject) => {

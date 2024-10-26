@@ -1,7 +1,9 @@
 <script lang="ts" setup>
+import EntityDropdownItems from "@/components/entity/EntityDropdownItems.vue";
 import { usePluginModuleStore } from "@/stores/plugin";
 import { formatDatetime } from "@/utils/date";
 import { usePermission } from "@/utils/permission";
+import { useOperationItemExtensionPoint } from "@console/composables/use-operation-extension-points";
 import type {
   Extension,
   ListedComment,
@@ -34,18 +36,16 @@ import type {
 import { useMutation, useQuery, useQueryClient } from "@tanstack/vue-query";
 import {
   computed,
+  markRaw,
   onMounted,
   provide,
   ref,
   type Ref,
   toRefs,
-  markRaw,
 } from "vue";
 import { useI18n } from "vue-i18n";
 import ReplyCreationModal from "./ReplyCreationModal.vue";
 import ReplyListItem from "./ReplyListItem.vue";
-import { useOperationItemExtensionPoint } from "@console/composables/use-operation-extension-points";
-import EntityDropdownItems from "@/components/entity/EntityDropdownItems.vue";
 
 const { currentUserHasPermission } = usePermission();
 const { t } = useI18n();

@@ -1,8 +1,6 @@
 package run.halo.app.core.extension.attachment.endpoint;
 
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.ArgumentMatchers.same;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
@@ -19,7 +17,6 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.core.io.buffer.DataBuffer;
-import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatusCode;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -28,15 +25,15 @@ import org.springframework.test.web.reactive.server.WebTestClient;
 import org.springframework.web.reactive.function.BodyInserters;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
+import run.halo.app.core.attachment.AttachmentLister;
+import run.halo.app.core.attachment.endpoint.AttachmentEndpoint;
 import run.halo.app.core.extension.attachment.Attachment;
-import run.halo.app.core.extension.attachment.Group;
 import run.halo.app.core.extension.attachment.Policy;
 import run.halo.app.core.extension.attachment.Policy.PolicySpec;
-import run.halo.app.core.extension.service.impl.DefaultAttachmentService;
+import run.halo.app.core.user.service.impl.DefaultAttachmentService;
 import run.halo.app.extension.ConfigMap;
 import run.halo.app.extension.ListResult;
 import run.halo.app.extension.Metadata;
-import run.halo.app.extension.PageRequest;
 import run.halo.app.extension.ReactiveExtensionClient;
 import run.halo.app.infra.ReactiveUrlDataBufferFetcher;
 import run.halo.app.plugin.extensionpoint.ExtensionGetter;
@@ -53,6 +50,9 @@ class AttachmentEndpointTest {
     @Mock
     ReactiveUrlDataBufferFetcher dataBufferFetcher;
 
+    @Mock
+    AttachmentLister attachmentLister;
+
     AttachmentEndpoint endpoint;
 
     WebTestClient webClient;
@@ -61,7 +61,7 @@ class AttachmentEndpointTest {
     void setUp() {
         var attachmentService =
             new DefaultAttachmentService(client, extensionGetter, dataBufferFetcher);
-        endpoint = new AttachmentEndpoint(attachmentService, client);
+        endpoint = new AttachmentEndpoint(attachmentService, attachmentLister);
         webClient = WebTestClient.bindToRouterFunction(endpoint.endpoint())
             .apply(springSecurity())
             .build();
@@ -239,11 +239,7 @@ class AttachmentEndpointTest {
 
         @Test
         void shouldListUngroupedAttachments() {
-            when(client.listAll(eq(Group.class), any(), any(Sort.class)))
-                .thenReturn(Flux.empty());
-
-            when(client.listBy(same(Attachment.class), any(), any(PageRequest.class)))
-                .thenReturn(Mono.just(ListResult.emptyResult()));
+            when(attachmentLister.listBy(any())).thenReturn(Mono.just(ListResult.emptyResult()));
 
             webClient
                 .get()
@@ -256,11 +252,7 @@ class AttachmentEndpointTest {
 
         @Test
         void searchAttachmentWhenGroupIsEmpty() {
-            when(client.listAll(eq(Group.class), any(), any(Sort.class)))
-                .thenReturn(Flux.empty());
-
-            when(client.listBy(eq(Attachment.class), any(), any(PageRequest.class)))
-                .thenReturn(Mono.empty());
+            when(attachmentLister.listBy(any())).thenReturn(Mono.just(ListResult.emptyResult()));
 
             webClient
                 .get()
@@ -268,7 +260,7 @@ class AttachmentEndpointTest {
                 .exchange()
                 .expectStatus().isOk();
 
-            verify(client).listBy(eq(Attachment.class), any(), any(PageRequest.class));
+            verify(attachmentLister).listBy(any());
         }
     }
 

@@ -16,9 +16,10 @@ import org.springframework.util.Assert;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import reactor.util.retry.Retry;
+import run.halo.app.core.counter.CounterService;
 import run.halo.app.core.extension.content.Comment;
-import run.halo.app.core.extension.service.RoleService;
-import run.halo.app.core.extension.service.UserService;
+import run.halo.app.core.user.service.RoleService;
+import run.halo.app.core.user.service.UserService;
 import run.halo.app.extension.Extension;
 import run.halo.app.extension.ListOptions;
 import run.halo.app.extension.ListResult;
@@ -29,7 +30,6 @@ import run.halo.app.extension.Ref;
 import run.halo.app.extension.router.selector.FieldSelector;
 import run.halo.app.infra.SystemConfigurableEnvironmentFetcher;
 import run.halo.app.infra.exception.AccessDeniedException;
-import run.halo.app.metrics.CounterService;
 import run.halo.app.plugin.extensionpoint.ExtensionGetter;
 
 /**
@@ -58,7 +58,7 @@ public class CommentServiceImpl extends AbstractCommentService implements Commen
                 commentQuery.toPageRequest())
             .flatMap(comments -> Flux.fromStream(comments.get()
                     .map(this::toListedComment))
-                .concatMap(Function.identity())
+                .flatMapSequential(Function.identity())
                 .collectList()
                 .map(list -> new ListResult<>(comments.getPage(), comments.getSize(),
                     comments.getTotal(), list)

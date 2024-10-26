@@ -17,25 +17,122 @@
     }
   ],
   "paths": {
-    "/apis/uc.api.content.halo.run/v1alpha1/attachments": {
-      "post": {
-        "description": "Create attachment for the given post.",
-        "operationId": "CreateAttachmentForPost",
+    "/apis/api.notification.halo.run/v1alpha1/notifiers/{name}/receiver-config": {
+      "get": {
+        "description": "Fetch receiver config of notifier",
+        "operationId": "FetchReceiverConfig",
         "parameters": [
           {
-            "description": "Wait for permalink.",
-            "in": "query",
-            "name": "waitForPermalink",
+            "description": "Notifier name",
+            "in": "path",
+            "name": "name",
+            "required": true,
             "schema": {
-              "type": "boolean"
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "default": {
+            "content": {
+              "*/*": {
+                "schema": {
+                  "type": "object"
+                }
+              }
+            },
+            "description": "default response"
+          }
+        },
+        "tags": [
+          "NotifierV1alpha1Uc"
+        ]
+      },
+      "post": {
+        "description": "Save receiver config of notifier",
+        "operationId": "SaveReceiverConfig",
+        "parameters": [
+          {
+            "description": "Notifier name",
+            "in": "path",
+            "name": "name",
+            "required": true,
+            "schema": {
+              "type": "string"
             }
           }
         ],
         "requestBody": {
           "content": {
-            "multipart/form-data": {
+            "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/PostAttachmentRequest"
+                "type": "object"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "default": {
+            "content": {},
+            "description": "default response"
+          }
+        },
+        "tags": [
+          "NotifierV1alpha1Uc"
+        ]
+      }
+    },
+    "/apis/api.notification.halo.run/v1alpha1/userspaces/{username}/notification-preferences": {
+      "get": {
+        "description": "List notification preferences for the authenticated user.",
+        "operationId": "ListUserNotificationPreferences",
+        "parameters": [
+          {
+            "description": "Username",
+            "in": "path",
+            "name": "username",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "default": {
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ReasonTypeNotifierMatrix"
+                }
+              }
+            },
+            "description": "default response"
+          }
+        },
+        "tags": [
+          "NotificationV1alpha1Uc"
+        ]
+      },
+      "post": {
+        "description": "Save notification preferences for the authenticated user.",
+        "operationId": "SaveUserNotificationPreferences",
+        "parameters": [
+          {
+            "description": "Username",
+            "in": "path",
+            "name": "username",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "*/*": {
+              "schema": {
+                "$ref": "#/components/schemas/ReasonTypeNotifierCollectionRequest"
               }
             }
           }
@@ -45,7 +142,7 @@
             "content": {
               "*/*": {
                 "schema": {
-                  "$ref": "#/components/schemas/Attachment"
+                  "$ref": "#/components/schemas/ReasonTypeNotifierMatrix"
                 }
               }
             },
@@ -53,21 +150,105 @@
           }
         },
         "tags": [
-          "AttachmentV1alpha1Uc"
+          "NotificationV1alpha1Uc"
         ]
       }
     },
-    "/apis/uc.api.content.halo.run/v1alpha1/attachments/-/upload-from-url": {
-      "post": {
-        "description": "Upload attachment from the given URL.",
-        "operationId": "ExternalTransferAttachment",
+    "/apis/api.notification.halo.run/v1alpha1/userspaces/{username}/notifications": {
+      "get": {
+        "description": "List notifications for the authenticated user.",
+        "operationId": "ListUserNotifications",
         "parameters": [
           {
-            "description": "Wait for permalink.",
-            "in": "query",
-            "name": "waitForPermalink",
+            "description": "Username",
+            "in": "path",
+            "name": "username",
+            "required": true,
             "schema": {
-              "type": "boolean"
+              "type": "string"
+            }
+          },
+          {
+            "description": "Page number. Default is 0.",
+            "in": "query",
+            "name": "page",
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          },
+          {
+            "description": "Size number. Default is 0.",
+            "in": "query",
+            "name": "size",
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          },
+          {
+            "description": "Label selector. e.g.: hidden!\u003dtrue",
+            "in": "query",
+            "name": "labelSelector",
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            }
+          },
+          {
+            "description": "Field selector. e.g.: metadata.name\u003d\u003dhalo",
+            "in": "query",
+            "name": "fieldSelector",
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            }
+          },
+          {
+            "description": "Sorting criteria in the format: property,(asc|desc). Default sort order is ascending. Multiple sort criteria are supported.",
+            "in": "query",
+            "name": "sort",
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            }
+          }
+        ],
+        "responses": {
+          "default": {
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/NotificationList"
+                }
+              }
+            },
+            "description": "default response"
+          }
+        },
+        "tags": [
+          "NotificationV1alpha1Uc"
+        ]
+      }
+    },
+    "/apis/api.notification.halo.run/v1alpha1/userspaces/{username}/notifications/-/mark-specified-as-read": {
+      "put": {
+        "description": "Mark the specified notifications as read.",
+        "operationId": "MarkNotificationsAsRead",
+        "parameters": [
+          {
+            "description": "Username",
+            "in": "path",
+            "name": "username",
+            "required": true,
+            "schema": {
+              "type": "string"
             }
           }
         ],
@@ -75,7 +256,7 @@
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/UploadFromUrlRequest"
+                "$ref": "#/components/schemas/MarkSpecifiedRequest"
               }
             }
           },
@@ -86,7 +267,10 @@
             "content": {
               "*/*": {
                 "schema": {
-                  "$ref": "#/components/schemas/Attachment"
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
                 }
               }
             },
@@ -94,7 +278,124 @@
           }
         },
         "tags": [
-          "AttachmentV1alpha1Uc"
+          "NotificationV1alpha1Uc"
+        ]
+      }
+    },
+    "/apis/api.notification.halo.run/v1alpha1/userspaces/{username}/notifications/{name}": {
+      "delete": {
+        "description": "Delete the specified notification.",
+        "operationId": "DeleteSpecifiedNotification",
+        "parameters": [
+          {
+            "description": "Username",
+            "in": "path",
+            "name": "username",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "description": "Notification name",
+            "in": "path",
+            "name": "name",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "default": {
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/Notification"
+                }
+              }
+            },
+            "description": "default response"
+          }
+        },
+        "tags": [
+          "NotificationV1alpha1Uc"
+        ]
+      }
+    },
+    "/apis/api.notification.halo.run/v1alpha1/userspaces/{username}/notifications/{name}/mark-as-read": {
+      "put": {
+        "description": "Mark the specified notification as read.",
+        "operationId": "MarkNotificationAsRead",
+        "parameters": [
+          {
+            "description": "Username",
+            "in": "path",
+            "name": "username",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "description": "Notification name",
+            "in": "path",
+            "name": "name",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "default": {
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/Notification"
+                }
+              }
+            },
+            "description": "default response"
+          }
+        },
+        "tags": [
+          "NotificationV1alpha1Uc"
+        ]
+      }
+    },
+    "/apis/uc.api.auth.halo.run/v1alpha1/user-connections/{registerId}/disconnect": {
+      "put": {
+        "description": "Disconnect my connection from a third-party platform.",
+        "operationId": "DisconnectMyConnection",
+        "parameters": [
+          {
+            "description": "The registration ID of the third-party platform.",
+            "in": "path",
+            "name": "registerId",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "default": {
+            "content": {
+              "*/*": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/UserConnection"
+                  }
+                }
+              }
+            },
+            "description": "default response"
+          }
+        },
+        "tags": [
+          "UserConnectionV1alpha1Uc"
         ]
       }
     },
@@ -384,6 +685,38 @@
       "put": {
         "description": "Publish my post.",
         "operationId": "PublishMyPost",
+        "parameters": [
+          {
+            "description": "Post name",
+            "in": "path",
+            "name": "name",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "default": {
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/Post"
+                }
+              }
+            },
+            "description": "default response"
+          }
+        },
+        "tags": [
+          "PostV1alpha1Uc"
+        ]
+      }
+    },
+    "/apis/uc.api.content.halo.run/v1alpha1/posts/{name}/recycle": {
+      "delete": {
+        "description": "Move my post to recycle bin.",
+        "operationId": "RecycleMyPost",
         "parameters": [
           {
             "description": "Post name",
@@ -833,6 +1166,217 @@
           "PersonalAccessTokenV1alpha1Uc"
         ]
       }
+    },
+    "/apis/uc.api.storage.halo.run/v1alpha1/attachments": {
+      "get": {
+        "description": "List attachments of the current user uploaded.",
+        "operationId": "ListMyAttachments",
+        "parameters": [
+          {
+            "description": "Page number. Default is 0.",
+            "in": "query",
+            "name": "page",
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          },
+          {
+            "description": "Size number. Default is 0.",
+            "in": "query",
+            "name": "size",
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          },
+          {
+            "description": "Label selector. e.g.: hidden!\u003dtrue",
+            "in": "query",
+            "name": "labelSelector",
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            }
+          },
+          {
+            "description": "Field selector. e.g.: metadata.name\u003d\u003dhalo",
+            "in": "query",
+            "name": "fieldSelector",
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            }
+          },
+          {
+            "description": "Sorting criteria in the format: property,(asc|desc). Default sort order is ascending. Multiple sort criteria are supported.",
+            "in": "query",
+            "name": "sort",
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            }
+          },
+          {
+            "description": "Filter attachments without group. This parameter will ignore group parameter.",
+            "in": "query",
+            "name": "ungrouped",
+            "schema": {
+              "type": "boolean"
+            }
+          },
+          {
+            "description": "Keyword for searching.",
+            "in": "query",
+            "name": "keyword",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "description": "Acceptable media types.",
+            "in": "query",
+            "name": "accepts",
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            }
+          }
+        ],
+        "responses": {
+          "default": {
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/AttachmentList"
+                }
+              }
+            },
+            "description": "default response"
+          }
+        },
+        "tags": [
+          "AttachmentV1alpha1Uc"
+        ]
+      },
+      "post": {
+        "description": "Create attachment for the given post.",
+        "operationId": "CreateAttachmentForPost",
+        "parameters": [
+          {
+            "description": "Wait for permalink.",
+            "in": "query",
+            "name": "waitForPermalink",
+            "schema": {
+              "type": "boolean"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "multipart/form-data": {
+              "schema": {
+                "$ref": "#/components/schemas/PostAttachmentRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "default": {
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/Attachment"
+                }
+              }
+            },
+            "description": "default response"
+          }
+        },
+        "tags": [
+          "AttachmentV1alpha1Uc"
+        ]
+      }
+    },
+    "/apis/uc.api.storage.halo.run/v1alpha1/attachments/-/upload": {
+      "post": {
+        "description": "Upload attachment to user center storage.",
+        "operationId": "UploadUcAttachment",
+        "requestBody": {
+          "content": {
+            "multipart/form-data": {
+              "schema": {
+                "$ref": "#/components/schemas/UcUploadRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "default": {
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/Attachment"
+                }
+              }
+            },
+            "description": "default response"
+          }
+        },
+        "tags": [
+          "AttachmentV1alpha1Uc"
+        ]
+      }
+    },
+    "/apis/uc.api.storage.halo.run/v1alpha1/attachments/-/upload-from-url": {
+      "post": {
+        "description": "Upload attachment from the given URL.",
+        "operationId": "ExternalTransferAttachment",
+        "parameters": [
+          {
+            "description": "Wait for permalink.",
+            "in": "query",
+            "name": "waitForPermalink",
+            "schema": {
+              "type": "boolean"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UploadFromUrlRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "default": {
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/Attachment"
+                }
+              }
+            },
+            "description": "default response"
+          }
+        },
+        "tags": [
+          "AttachmentV1alpha1Uc"
+        ]
+      }
     }
   },
   "components": {
@@ -885,6 +1429,65 @@
           },
           "status": {
             "$ref": "#/components/schemas/AttachmentStatus"
+          }
+        }
+      },
+      "AttachmentList": {
+        "required": [
+          "first",
+          "hasNext",
+          "hasPrevious",
+          "items",
+          "last",
+          "page",
+          "size",
+          "total",
+          "totalPages"
+        ],
+        "type": "object",
+        "properties": {
+          "first": {
+            "type": "boolean",
+            "description": "Indicates whether current page is the first page."
+          },
+          "hasNext": {
+            "type": "boolean",
+            "description": "Indicates whether current page has previous page."
+          },
+          "hasPrevious": {
+            "type": "boolean",
+            "description": "Indicates whether current page has previous page."
+          },
+          "items": {
+            "type": "array",
+            "description": "A chunk of items.",
+            "items": {
+              "$ref": "#/components/schemas/Attachment"
+            }
+          },
+          "last": {
+            "type": "boolean",
+            "description": "Indicates whether current page is the last page."
+          },
+          "page": {
+            "type": "integer",
+            "description": "Page number, starts from 1. If not set or equal to 0, it means no pagination.",
+            "format": "int32"
+          },
+          "size": {
+            "type": "integer",
+            "description": "Size of each page. If not set or equal to 0, it means no pagination.",
+            "format": "int32"
+          },
+          "total": {
+            "type": "integer",
+            "description": "Total elements.",
+            "format": "int64"
+          },
+          "totalPages": {
+            "type": "integer",
+            "description": "Indicates total pages.",
+            "format": "int64"
           }
         }
       },
@@ -1330,6 +1933,17 @@
           }
         }
       },
+      "MarkSpecifiedRequest": {
+        "type": "object",
+        "properties": {
+          "names": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          }
+        }
+      },
       "Metadata": {
         "required": [
           "name"
@@ -1409,6 +2023,143 @@
             "example": "/a/b/c"
           }
         }
+      },
+      "Notification": {
+        "required": [
+          "apiVersion",
+          "kind",
+          "metadata"
+        ],
+        "type": "object",
+        "properties": {
+          "apiVersion": {
+            "type": "string"
+          },
+          "kind": {
+            "type": "string"
+          },
+          "metadata": {
+            "$ref": "#/components/schemas/Metadata"
+          },
+          "spec": {
+            "$ref": "#/components/schemas/NotificationSpec"
+          }
+        }
+      },
+      "NotificationList": {
+        "required": [
+          "first",
+          "hasNext",
+          "hasPrevious",
+          "items",
+          "last",
+          "page",
+          "size",
+          "total",
+          "totalPages"
+        ],
+        "type": "object",
+        "properties": {
+          "first": {
+            "type": "boolean",
+            "description": "Indicates whether current page is the first page."
+          },
+          "hasNext": {
+            "type": "boolean",
+            "description": "Indicates whether current page has previous page."
+          },
+          "hasPrevious": {
+            "type": "boolean",
+            "description": "Indicates whether current page has previous page."
+          },
+          "items": {
+            "type": "array",
+            "description": "A chunk of items.",
+            "items": {
+              "$ref": "#/components/schemas/Notification"
+            }
+          },
+          "last": {
+            "type": "boolean",
+            "description": "Indicates whether current page is the last page."
+          },
+          "page": {
+            "type": "integer",
+            "description": "Page number, starts from 1. If not set or equal to 0, it means no pagination.",
+            "format": "int32"
+          },
+          "size": {
+            "type": "integer",
+            "description": "Size of each page. If not set or equal to 0, it means no pagination.",
+            "format": "int32"
+          },
+          "total": {
+            "type": "integer",
+            "description": "Total elements.",
+            "format": "int64"
+          },
+          "totalPages": {
+            "type": "integer",
+            "description": "Indicates total pages.",
+            "format": "int64"
+          }
+        }
+      },
+      "NotificationSpec": {
+        "required": [
+          "htmlContent",
+          "rawContent",
+          "reason",
+          "recipient",
+          "title"
+        ],
+        "type": "object",
+        "properties": {
+          "htmlContent": {
+            "type": "string"
+          },
+          "lastReadAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "rawContent": {
+            "type": "string"
+          },
+          "reason": {
+            "minLength": 1,
+            "type": "string",
+            "description": "The name of reason"
+          },
+          "recipient": {
+            "minLength": 1,
+            "type": "string",
+            "description": "The name of user"
+          },
+          "title": {
+            "minLength": 1,
+            "type": "string"
+          },
+          "unread": {
+            "type": "boolean"
+          }
+        }
+      },
+      "NotifierInfo": {
+        "type": "object",
+        "properties": {
+          "description": {
+            "type": "string"
+          },
+          "displayName": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          }
+        }
+      },
+      "Part": {
+        "type": "object"
       },
       "PasswordRequest": {
         "required": [
@@ -1639,9 +2390,6 @@
         }
       },
       "PostStatus": {
-        "required": [
-          "phase"
-        ],
         "type": "object",
         "properties": {
           "commentsCount": {
@@ -1686,6 +2434,81 @@
             "type": "string"
           },
           "phase": {
+            "type": "string"
+          }
+        }
+      },
+      "ReasonTypeInfo": {
+        "type": "object",
+        "properties": {
+          "description": {
+            "type": "string"
+          },
+          "displayName": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "uiPermissions": {
+            "uniqueItems": true,
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          }
+        }
+      },
+      "ReasonTypeNotifierCollectionRequest": {
+        "required": [
+          "reasonTypeNotifiers"
+        ],
+        "type": "object",
+        "properties": {
+          "reasonTypeNotifiers": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ReasonTypeNotifierRequest"
+            }
+          }
+        }
+      },
+      "ReasonTypeNotifierMatrix": {
+        "type": "object",
+        "properties": {
+          "notifiers": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/NotifierInfo"
+            }
+          },
+          "reasonTypes": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ReasonTypeInfo"
+            }
+          },
+          "stateMatrix": {
+            "type": "array",
+            "items": {
+              "type": "array",
+              "items": {
+                "type": "boolean"
+              }
+            }
+          }
+        }
+      },
+      "ReasonTypeNotifierRequest": {
+        "type": "object",
+        "properties": {
+          "notifiers": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "reasonType": {
             "type": "string"
           }
         }
@@ -1990,6 +2813,39 @@
           }
         }
       },
+      "UcUploadRequest": {
+        "required": [
+          "file"
+        ],
+        "type": "object",
+        "properties": {
+          "file": {
+            "type": "string",
+            "format": "binary"
+          },
+          "formData": {
+            "type": "object",
+            "properties": {
+              "all": {
+                "type": "object",
+                "additionalProperties": {
+                  "$ref": "#/components/schemas/Part"
+                },
+                "writeOnly": true
+              },
+              "empty": {
+                "type": "boolean"
+              }
+            },
+            "additionalProperties": {
+              "type": "array",
+              "items": {
+                "$ref": "#/components/schemas/Part"
+              }
+            }
+          }
+        }
+      },
       "UploadFromUrlRequest": {
         "required": [
           "url"
@@ -2002,6 +2858,52 @@
           "url": {
             "type": "string",
             "format": "url"
+          }
+        }
+      },
+      "UserConnection": {
+        "required": [
+          "apiVersion",
+          "kind",
+          "metadata",
+          "spec"
+        ],
+        "type": "object",
+        "properties": {
+          "apiVersion": {
+            "type": "string"
+          },
+          "kind": {
+            "type": "string"
+          },
+          "metadata": {
+            "$ref": "#/components/schemas/Metadata"
+          },
+          "spec": {
+            "$ref": "#/components/schemas/UserConnectionSpec"
+          }
+        }
+      },
+      "UserConnectionSpec": {
+        "required": [
+          "providerUserId",
+          "registrationId",
+          "username"
+        ],
+        "type": "object",
+        "properties": {
+          "providerUserId": {
+            "type": "string"
+          },
+          "registrationId": {
+            "type": "string"
+          },
+          "updatedAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "username": {
+            "type": "string"
           }
         }
       },

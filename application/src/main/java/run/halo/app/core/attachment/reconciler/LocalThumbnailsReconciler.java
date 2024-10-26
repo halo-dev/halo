@@ -1,7 +1,7 @@
 package run.halo.app.core.attachment.reconciler;
 
 import static org.springframework.data.domain.Sort.Order.desc;
-import static run.halo.app.core.extension.attachment.LocalThumbnail.REQUEST_TO_GENERATE_ANNO;
+import static run.halo.app.core.attachment.extension.LocalThumbnail.REQUEST_TO_GENERATE_ANNO;
 import static run.halo.app.extension.MetadataUtil.nullSafeAnnotations;
 import static run.halo.app.extension.index.query.QueryFactory.and;
 import static run.halo.app.extension.index.query.QueryFactory.equal;
@@ -23,10 +23,11 @@ import run.halo.app.core.attachment.AttachmentRootGetter;
 import run.halo.app.core.attachment.AttachmentUtils;
 import run.halo.app.core.attachment.LocalThumbnailService;
 import run.halo.app.core.attachment.ThumbnailGenerator;
+import run.halo.app.core.attachment.extension.LocalThumbnail;
 import run.halo.app.core.extension.attachment.Attachment;
 import run.halo.app.core.extension.attachment.Constant;
-import run.halo.app.core.extension.attachment.LocalThumbnail;
 import run.halo.app.extension.ExtensionClient;
+import run.halo.app.extension.ExtensionUtil;
 import run.halo.app.extension.ListOptions;
 import run.halo.app.extension.PageRequestImpl;
 import run.halo.app.extension.controller.Controller;
@@ -47,6 +48,9 @@ public class LocalThumbnailsReconciler implements Reconciler<Reconciler.Request>
     public Result reconcile(Request request) {
         client.fetch(LocalThumbnail.class, request.name())
             .ifPresent(thumbnail -> {
+                if (ExtensionUtil.isDeleted(thumbnail)) {
+                    return;
+                }
                 if (shouldGenerate(thumbnail)) {
                     requestGenerateThumbnail(thumbnail);
                     nullSafeAnnotations(thumbnail).remove(REQUEST_TO_GENERATE_ANNO);

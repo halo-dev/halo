@@ -5,7 +5,9 @@ import static org.apache.commons.lang3.StringUtils.defaultString;
 import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Optional;
 import lombok.RequiredArgsConstructor;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Component;
 import org.thymeleaf.TemplateEngine;
 import org.thymeleaf.context.Context;
@@ -40,13 +42,16 @@ public class DefaultNotificationTemplateRender implements NotificationTemplateRe
     @Override
     public Mono<String> render(String template, Map<String, Object> model) {
         var context = new Context(Locale.getDefault(), model);
+        var externalUrl = Optional.ofNullable(externalUrlSupplier.getRaw())
+            .map(url -> StringUtils.removeEnd(url.toString(), "/"))
+            .orElse(StringUtils.EMPTY);
         var globalAttributeMono = getBasicSetting()
             .doOnNext(basic -> {
                 var site = new HashMap<>();
                 site.put("title", basic.getTitle());
                 site.put("logo", basic.getLogo());
                 site.put("subtitle", basic.getSubtitle());
-                site.put("url", externalUrlSupplier.getRaw());
+                site.put("url", externalUrl);
                 context.setVariable("site", site);
             });
         return Mono.when(globalAttributeMono)

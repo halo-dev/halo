@@ -25,43 +25,7 @@ export interface UserConnectionSpec {
      * @type {string}
      * @memberof UserConnectionSpec
      */
-    'accessToken': string;
-    /**
-     * 
-     * @type {string}
-     * @memberof UserConnectionSpec
-     */
-    'avatarUrl'?: string;
-    /**
-     * 
-     * @type {string}
-     * @memberof UserConnectionSpec
-     */
-    'displayName': string;
-    /**
-     * 
-     * @type {string}
-     * @memberof UserConnectionSpec
-     */
-    'expiresAt'?: string;
-    /**
-     * 
-     * @type {string}
-     * @memberof UserConnectionSpec
-     */
-    'profileUrl'?: string;
-    /**
-     * 
-     * @type {string}
-     * @memberof UserConnectionSpec
-     */
     'providerUserId': string;
-    /**
-     * 
-     * @type {string}
-     * @memberof UserConnectionSpec
-     */
-    'refreshToken'?: string;
     /**
      * 
      * @type {string}

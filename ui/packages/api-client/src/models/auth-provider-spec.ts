@@ -27,6 +27,12 @@ import { SettingRef } from './setting-ref';
  */
 export interface AuthProviderSpec {
     /**
+     * 
+     * @type {string}
+     * @memberof AuthProviderSpec
+     */
+    'authType': AuthProviderSpecAuthTypeEnum;
+    /**
      * Authentication url of the auth provider
      * @type {string}
      * @memberof AuthProviderSpec
@@ -70,10 +76,16 @@ export interface AuthProviderSpec {
     'logo'?: string;
     /**
      * 
-     * @type {number}
+     * @type {string}
      * @memberof AuthProviderSpec
      */
-    'priority'?: number;
+    'method'?: string;
+    /**
+     * 
+     * @type {boolean}
+     * @memberof AuthProviderSpec
+     */
+    'rememberMeSupport'?: boolean;
     /**
      * 
      * @type {SettingRef}
@@ -93,4 +105,12 @@ export interface AuthProviderSpec {
      */
     'website'?: string;
 }
+
+export const AuthProviderSpecAuthTypeEnum = {
+    Form: 'FORM',
+    Oauth2: 'OAUTH2'
+} as const;
+
+export type AuthProviderSpecAuthTypeEnum = typeof AuthProviderSpecAuthTypeEnum[keyof typeof AuthProviderSpecAuthTypeEnum];
+
 

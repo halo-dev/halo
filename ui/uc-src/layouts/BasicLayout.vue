@@ -1,5 +1,4 @@
 <script lang="ts" setup>
-import LoginModal from "@/components/login/LoginModal.vue";
 import { RoutesMenu } from "@/components/menu/RoutesMenu";
 import { useRouteMenuGenerator } from "@/composables/use-route-menu-generator";
 import { rbacAnnotations } from "@/constants/annotations";
@@ -14,7 +13,6 @@ import {
   VAvatar,
   VTag,
 } from "@halo-dev/components";
-import axios from "axios";
 import {
   useOverlayScrollbars,
   type UseOverlayScrollbarsParams,
@@ -39,24 +37,11 @@ const { currentRoles, currentUser } = storeToRefs(userStore);
 const handleLogout = () => {
   Dialog.warning({
     title: t("core.sidebar.operations.logout.title"),
+    description: t("core.sidebar.operations.logout.description"),
     confirmText: t("core.common.buttons.confirm"),
     cancelText: t("core.common.buttons.cancel"),
     onConfirm: async () => {
-      try {
-        await axios.post(`/logout`, undefined, {
-          withCredentials: true,
-        });
-
-        await userStore.fetchCurrentUser();
-
-        // Clear csrf token
-        document.cookie =
-          "XSRF-TOKEN=; Path=/; Expires=Thu, 01 Jan 1970 00:00:01 GMT;";
-
-        window.location.href = "/console/login";
-      } catch (error) {
-        console.error("Failed to logout", error);
-      }
+      window.location.href = "/logout";
     },
   });
 };
@@ -280,7 +265,6 @@ const disallowAccessConsole = computed(() => {
       </Teleport>
     </div>
   </div>
-  <LoginModal />
 </template>
 
 <style lang="scss">

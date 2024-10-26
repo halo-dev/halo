@@ -6,7 +6,9 @@ import static io.swagger.v3.oas.annotations.media.Schema.RequiredMode.REQUIRED;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
+import lombok.Getter;
 import lombok.ToString;
+import org.springframework.lang.NonNull;
 import run.halo.app.extension.AbstractExtension;
 import run.halo.app.extension.GVK;
 
@@ -48,17 +50,30 @@ public class AuthProvider extends AbstractExtension {
         @Schema(requiredMode = REQUIRED, description = "Authentication url of the auth provider")
         private String authenticationUrl;
 
+        private String method = "GET";
+
+        private boolean rememberMeSupport = false;
+
+        /**
+         * Auth type: form or oauth2.
+         */
+        @Getter(onMethod_ = @NonNull)
+        @Schema(requiredMode = REQUIRED)
+        private AuthType authType = AuthType.OAUTH2;
+
         private String bindingUrl;
 
         private String unbindUrl;
-
-        private int priority;
 
         @Schema(requiredMode = NOT_REQUIRED)
         private SettingRef settingRef;
 
         @Schema(requiredMode = NOT_REQUIRED)
         private ConfigMapRef configMapRef;
+
+        public void setAuthType(AuthType authType) {
+            this.authType = (authType == null ? AuthType.OAUTH2 : authType);
+        }
     }
 
     @Data
@@ -76,5 +91,10 @@ public class AuthProvider extends AbstractExtension {
     public static class ConfigMapRef {
         @Schema(requiredMode = REQUIRED, minLength = 1)
         private String name;
+    }
+
+    public enum AuthType {
+        FORM,
+        OAUTH2
     }
 }

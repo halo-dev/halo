@@ -5,14 +5,14 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.context.ReactiveSecurityContextHolder;
 import org.springframework.util.Assert;
 import reactor.core.publisher.Mono;
+import run.halo.app.core.counter.CounterService;
+import run.halo.app.core.counter.MeterUtils;
 import run.halo.app.core.extension.User;
 import run.halo.app.core.extension.content.Comment;
 import run.halo.app.core.extension.content.Reply;
-import run.halo.app.core.extension.service.RoleService;
-import run.halo.app.core.extension.service.UserService;
+import run.halo.app.core.user.service.RoleService;
+import run.halo.app.core.user.service.UserService;
 import run.halo.app.extension.ReactiveExtensionClient;
-import run.halo.app.metrics.CounterService;
-import run.halo.app.metrics.MeterUtils;
 import run.halo.app.security.authorization.AuthorityUtils;
 
 @RequiredArgsConstructor

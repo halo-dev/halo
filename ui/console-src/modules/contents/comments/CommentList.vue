@@ -364,11 +364,9 @@ const handleApproveInBatch = async () => {
           :title="$t('core.comment.empty.title')"
         >
           <template #actions>
-            <VSpace>
-              <VButton @click="refetch">
-                {{ $t("core.common.buttons.refresh") }}
-              </VButton>
-            </VSpace>
+            <VButton @click="refetch">
+              {{ $t("core.common.buttons.refresh") }}
+            </VButton>
           </template>
         </VEmpty>
       </Transition>

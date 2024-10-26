@@ -1,0 +1,60 @@
+<form
+    th:fragment="form"
+    class="halo-form"
+    name="login-form"
+    id="login-form"
+    th:action="${authProvider.spec.authenticationUrl}"
+    th:method="${authProvider.spec.method}"
+>
+    <div class="alert alert-error" role="alert" th:if="${param.error.size() > 0}" th:with="error = ${param.error[0]}">
+        <strong th:if="${error == 'invalid-credential'}">
+            <span th:text="#{form.error.invalidCredential}"></span>
+        </strong>
+        <strong th:if="${error == 'rate-limit-exceeded'}">
+            <span th:text="#{form.error.rateLimitExceeded}"></span>
+        </strong>
+    </div>
+    <div class="alert" role="alert" th:if="${param.logout.size() > 0}">
+        <strong th:text="#{form.messages.logoutSuccess}"></strong>
+    </div>
+    <div class="alert" role="alert" th:if="${param.signup.size() > 0}">
+        <strong th:text="#{form.messages.signupSuccess}"></strong>
+    </div>
+    <div class="alert" role="alert" th:if="${param.oauth2_bind.size() > 0}">
+        <strong th:text="#{form.messages.oauth2Bind}"></strong>
+    </div>
+    <div class="alert" role="alert" th:if="${param.password_reset.size() > 0}">
+        <strong th:text="#{form.messages.passwordReset}"></strong>
+    </div>
+
+    <div th:replace="~{__${fragmentTemplateName}__::form}"></div>
+
+    <div th:if="${authProvider.spec.rememberMeSupport}" class="form-item-compact">
+        <input type="checkbox" id="remember-me" name="remember-me" value="true" th:checked="${rememberMe}"/>
+        <label for="remember-me" th:text="#{form.rememberMe.label}"></label>
+    </div>
+
+    <div class="form-item">
+        <button type="submit" th:text="#{form.submit}"></button>
+    </div>
+</form>
+
+<div th:remove="tag" th:fragment="formAuthProviders">
+    <th:block th:unless="${#lists.isEmpty(formAuthProviders)}">
+        <div class="divider-wrapper">
+            <hr />
+            <th:block th:text="#{otherLogin.label}"></th:block>
+            <hr />
+        </div>
+        <ul class="pill-items">
+            <li th:each="provider : ${formAuthProviders}">
+                <a th:href="'/login?method=' + ${provider.metadata.name}">
+                    <img th:src="${provider.spec.logo}" th:alt="|${provider.spec.displayName}'s icon|" />
+                    <span
+                        th:text="${#messages.msgOrNull('formAuthProviders.' + provider.metadata.name + '.displayName') ?: provider.spec.displayName}"
+                    ></span>
+                </a>
+            </li>
+        </ul>
+    </th:block>
+</div>

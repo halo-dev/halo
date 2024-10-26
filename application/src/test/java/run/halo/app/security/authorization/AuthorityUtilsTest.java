@@ -3,16 +3,12 @@ package run.halo.app.security.authorization;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.mockito.Mockito.mock;
 import static run.halo.app.security.authorization.AuthorityUtils.authoritiesToRoles;
 import static run.halo.app.security.authorization.AuthorityUtils.containsSuperRole;
-import static run.halo.app.security.authorization.AuthorityUtils.isRealUser;
 
 import java.util.List;
 import java.util.Set;
 import org.junit.jupiter.api.Test;
-import org.springframework.security.authentication.RememberMeAuthenticationToken;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 
 class AuthorityUtilsTest {
@@ -29,7 +25,7 @@ class AuthorityUtilsTest {
 
         var roles = authoritiesToRoles(authorities);
 
-        assertEquals(Set.of("admin", "owner", "manager", "faker", "system:read"), roles);
+        assertEquals(Set.of("admin", "owner", "manager"), roles);
     }
 
     @Test
@@ -39,9 +35,4 @@ class AuthorityUtilsTest {
         assertFalse(containsSuperRole(Set.of("admin")));
     }
 
-    @Test
-    void shouldReturnTrueWhenAuthenticationIsRealUser() {
-        assertTrue(isRealUser(mock(UsernamePasswordAuthenticationToken.class)));
-        assertTrue(isRealUser(mock(RememberMeAuthenticationToken.class)));
-    }
 }

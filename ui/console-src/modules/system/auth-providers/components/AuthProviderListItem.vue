@@ -74,8 +74,18 @@ const handleChangeStatus = async () => {
         </template>
       </VEntityField>
       <VEntityField
-        :title="authProvider.displayName"
-        :description="authProvider.description"
+        :title="
+          $t(
+            `core.identity_authentication.fields.display_name.${authProvider.name}`,
+            authProvider.displayName
+          )
+        "
+        :description="
+          $t(
+            `core.identity_authentication.fields.description.${authProvider.name}`,
+            authProvider.description || ''
+          )
+        "
         :route="{
           name: 'AuthProviderDetail',
           params: { name: authProvider.name },

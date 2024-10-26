@@ -1,76 +1,4 @@
 core:
-  login:
-    title: 登入
-    fields:
-      username:
-        placeholder: 用戶名
-      password:
-        placeholder: 密碼
-      remember_me:
-        label: 保持登入會話
-    operations:
-      submit:
-        toast_success: 登入成功
-        toast_failed: 登入失敗，用戶名或密碼錯誤
-        toast_csrf: CSRF Token 失效，請重新嘗試
-      signup:
-        label: 沒有帳號
-        button: 立即註冊
-      return_login:
-        label: 已有帳號
-        button: 立即登入
-      return_site: 返回到首頁
-      reset_password:
-        button: 找回密碼
-    button: 登入
-    modal:
-      title: 重新登入
-    2fa:
-      fields:
-        code:
-          placeholder: 請輸入兩步驟驗證碼
-          label: 兩步驟驗證碼
-  signup:
-    title: 註冊
-    fields:
-      username:
-        placeholder: 用戶名
-      display_name:
-        placeholder: 名稱
-      email:
-        placeholder: 電子郵箱
-        matchFailed: 郵箱格式錯誤或服務商不受支援
-      verify_code:
-        placeholder: 驗證碼
-        operations:
-          send_code:
-            buttons:
-              countdown: "{timer} 秒後重發"
-              send: 發送驗證碼
-              sending: 發送中
-            toast_email_empty: 請輸入電子郵件信箱
-            toast_success: 驗證碼已發送
-      password:
-        placeholder: 密碼
-      password_confirm:
-        placeholder: 確認密碼
-    operations:
-      submit:
-        button: 註冊
-        toast_success: 註冊成功
-  binding:
-    title: 帳號綁定
-    common:
-      toast:
-        mounted: 當前登入方式未綁定帳號，請先綁定或註冊新帳號
-    operations:
-      login_and_bind:
-        button: 登入並綁定
-      signup_and_bind:
-        button: 註冊並綁定
-      bind:
-        toast_success: 綁定成功
-        toast_failed: 綁定失敗，沒有找到已啟用的登入方式
   sidebar:
     search:
       placeholder: 搜尋
@@ -98,6 +26,7 @@ core:
       logout:
         tooltip: 登出
         title: 登出
+        description: 點擊確定將跳轉至退出登入頁面，請確保正在編輯的內容已保存。
       profile:
         tooltip: 個人中心
       visit_homepage:
@@ -465,7 +394,7 @@ core:
         cover:
           label: 封面圖
   deleted_page:
-    title: 自定義頁面回收站
+    title: 頁面回收站
     empty:
       title: 沒有自定義頁面被放入回收站
       message: 你可以嘗試刷新或者返回自定義頁面管理
@@ -666,6 +595,50 @@ core:
             title: 沒有存儲策略
             description: 在上傳之前，需要新建一個存儲策略
           not_select: 請先選擇存儲策略
+    select_modal:
+      title: 選擇附件
+      providers:
+        default:
+          label: 附件庫
+      operations:
+        select:
+          result: （已選擇 {count} 項）
+  uc_attachment:
+    empty:
+      title: 當前沒有附件
+      message: 當前沒有附件，你可以嘗試重整或者上傳附件
+      actions:
+        upload: 上傳附件
+    filters:
+      sort:
+        items:
+          create_time_desc: 較近上傳
+          create_time_asc: 較晚上傳
+          size_desc: 文件大小降序
+          size_asc: 文件大小升序
+          display_name_asc: 文件名升序
+          display_name_desc: 文件名降序
+      view_type:
+        items:
+          grid: 網格模式
+          list: 列表模式
+    detail_modal:
+      title: 附件：{display_name}
+      fields:
+        preview: 預覽
+        display_name: 文件名稱
+        media_type: 文件類型
+        size: 文件大小
+        owner: 上傳者
+        creation_time: 上傳時間
+        permalink: 連結
+      preview:
+        click_to_exit: 點擊離開預覽
+        video_not_support: 當前瀏覽器不支援該影片播放
+        audio_not_support: 當前瀏覽器不支援該音頻播放
+        not_support: 此文件不支援預覽
+    upload_modal:
+      title: 上傳附件
     select_modal:
       title: 選擇附件
       providers:
@@ -1052,7 +1025,6 @@ core:
         permissions: 權限
       fields:
         display_name: 名稱
-        redirect_on_login: 登入之後預設跳轉位置
         disallow_access_console:
           label: 禁止訪問 Console
           help: 勾選之後，該角色將無法存取 Console
@@ -1068,6 +1040,15 @@ core:
         title: 停用認證方式
       disable_privileged:
         tooltip: 系統保留的認證方式，無法禁用
+    fields:
+      display_name:
+        local: 帳號密碼登入
+      description:
+        local: Halo 內建的默認登入方式
+    list:
+      types:
+        form: 基礎認證方式
+        oauth2: 三方認證方式
     detail:
       title: 身份認證詳情
       fields:
@@ -1353,10 +1334,10 @@ core:
     restore:
       tips:
         first: 1. 還原過程可能需要較長時間，期間請勿重新整理頁面。
-        second: 2. 在還原過程中，雖然已有的資料不會被清除，但若有衝突的資料將被覆蓋。
+        second: 2. 在執行恢復之前，會清空現有的所有數據，請確保當前沒有需要保留的數據。
         third: 3. 還原完成後需要重新啟動 Halo 才能正常載入系統資源。
         complete: 還原完成，等待重啟...
-      start: 開始還原
+      start: 我已閱讀上方提示，開始恢復
       tabs:
         local:
           label: 上傳
@@ -1373,25 +1354,6 @@ core:
       message: 沒有權限訪問此頁面
     actions:
       home: 返回首頁
-  setup:
-    title: 系統初始化
-    operations:
-      submit:
-        button: 初始化
-        toast_success: 初始化成功
-      setup_initial_data:
-        loading: 正在初始化資料，請稍後...
-    fields:
-      site_title:
-        label: 站點名稱
-      email:
-        label: 電子郵箱
-      username:
-        label: 用戶名
-      password:
-        label: 密碼
-      confirm_password:
-        label: 確認密碼
   rbac:
     Attachments Management: 附件
     Attachment Manage: 附件管理
@@ -1466,6 +1428,8 @@ core:
     Post Author: 允許管理自己的文章
     Post Contributor: 允許投稿
     Post Publisher: 允許發布自己的文章
+    UC Attachment Manage: 允許管理自己的附件
+    Recycle My Post: 允許刪除自己的文章
   components:
     submit_button:
       computed_text: "{text}（{shortcut}）"
@@ -1530,8 +1494,6 @@ core:
       page_label: 頁
       size_label: 條 / 頁
       total_label: 共 {total} 項資料
-    social_auth_providers:
-      title: 三方登入
     app_download_alert:
       description: Halo 的主題和插件可以在以下地址下載：
       sources:
@@ -1582,6 +1544,7 @@ core:
       creation_label: 創建 {text} 標籤
     validation:
       trim: 不能以空格開頭或結尾
+      password: "密碼只能使用大小寫字母 (A-Z, a-z)、數字 (0-9)，以及以下特殊字符: !{'@'}#$%^&*"
     verification_form:
       no_action_defined: 未定義{label}介面
       verify_success: "{label}成功"
@@ -1690,9 +1653,11 @@ core:
       titles:
         tip: 提示
         warning: 警告
+        login_expired: 登入已過期
       descriptions:
         cannot_be_recovered: 該操作不可恢復。
         editor_not_found: 未找到符合 {raw_type} 格式的編輯器，請檢查是否已安裝編輯器插件。
+        login_expired: 當前登入已過期，點擊確定跳轉到登入頁面，請確保當前內容已保存，你可以點擊取消之後手動複製未保存的內容。
     filters:
       results:
         keyword: 關鍵字：{keyword}
@@ -1717,6 +1682,7 @@ core:
       none: 無
       tip: 提示
       warning: 警告
+      system_protection: 系統保留
     tooltips:
       unpublished_content_tip: 當前有內容已保存，但還未發布。
       publishing: 發布中
@@ -1730,35 +1696,14 @@ core:
       cancel_publish:
         description: 確定要取消發布嗎？
         title: 取消發布
+      delete:
+        title: 刪除文章
+        description: 該操作會將文章放入回收站，後續由網站管理員進行管理。
     publish_modal:
       title: 發布文章
     setting_modal:
       title: 文章設定
     title: 我的文章
-  uc_reset_password:
-    fields:
-      username:
-        label: 用戶名
-      password:
-        label: 新密碼
-      password_confirm:
-        label: 確認密碼
-    operations:
-      reset:
-        button: 重設密碼
-        toast_success: 重置成功
-    title: 重設密碼
-  reset_password:
-    fields:
-      username:
-        label: 使用者名稱
-      email:
-        label: 郵件地址
-    operations:
-      send:
-        label: 發送驗證郵件
-        toast_success: 如果你的用戶名和郵箱地址匹配，我們將會發送一封郵件到你的郵箱。
-    title: 重設密碼
   tool:
     title: 工具
     empty:

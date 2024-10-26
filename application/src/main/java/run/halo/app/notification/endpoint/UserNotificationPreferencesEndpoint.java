@@ -174,6 +174,11 @@ public class UserNotificationPreferencesEndpoint implements CustomEndpoint {
                             var notifierNames =
                                 reasonTypeNotifierMap.getNotifiers(reasonType.name());
                             for (String notifierName : notifierNames) {
+                                // Skip if the notifier enabled in the user preference does not
+                                // exist to avoid null index
+                                if (!notifierIndexMap.containsKey(notifierName)) {
+                                    continue;
+                                }
                                 var notifierIndex = notifierIndexMap.get(notifierName);
                                 stateMatrix[reasonTypeIndex][notifierIndex] = true;
                             }

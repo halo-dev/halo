@@ -114,7 +114,9 @@ useQuery({
           <ul>
             <li>{{ $t("core.backup.restore.tips.first") }}</li>
             <li>
-              {{ $t("core.backup.restore.tips.second") }}
+              <strong>
+                {{ $t("core.backup.restore.tips.second") }}
+              </strong>
             </li>
             <li>
               {{ $t("core.backup.restore.tips.third") }}

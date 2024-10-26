@@ -78,6 +78,7 @@ const publishTimeHelp = computed(() => {
 </script>
 
 <template>
+  <!-- @vue-ignore -->
   <FormKit
     id="post-setting-form"
     v-model="internalFormState"
@@ -113,7 +114,7 @@ const publishTimeHelp = computed(() => {
               <div
                 v-tooltip="$t('core.post.settings.fields.slug.refresh_message')"
                 class="group flex h-full cursor-pointer items-center border-l px-3 transition-all hover:bg-gray-100"
-                @click="handleGenerateSlug(true, FormType.POST)"
+                @click="handleGenerateSlug(true)"
               >
                 <IconRefreshLine
                   class="h-4 w-4 text-gray-500 group-hover:text-gray-700"
@@ -194,7 +195,9 @@ const publishTimeHelp = computed(() => {
             max="9999-12-31T23:59"
             :help="publishTimeHelp"
           ></FormKit>
-          <HasPermission :permissions="['system:attachments:view']">
+          <HasPermission
+            :permissions="['system:attachments:view', 'uc:attachments:manage']"
+          >
             <FormKit
               name="cover"
               :label="$t('core.post.settings.fields.cover.label')"

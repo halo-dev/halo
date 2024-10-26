@@ -1,78 +1,4 @@
 core:
-  login:
-    title: Login
-    fields:
-      username:
-        placeholder: Username
-      password:
-        placeholder: Password
-      remember_me:
-        label: Remember Me
-    operations:
-      submit:
-        toast_success: Login successful
-        toast_failed: Login failed, incorrect username or password
-        toast_csrf: CSRF Token expired, please try again
-      signup:
-        label: No account
-        button: Sign up
-      return_login:
-        label: Already have an account
-        button: Sign in
-      return_site: Return to site
-      reset_password:
-        button: Retrieve password
-    button: Login
-    modal:
-      title: Re-login
-    2fa:
-      fields:
-        code:
-          placeholder: Two-step verification code
-          label: Two-step verification code
-  signup:
-    title: Sign up
-    fields:
-      username:
-        placeholder: Username
-      display_name:
-        placeholder: Display name
-      email:
-        placeholder: Email
-        matchFailed: The email format is wrong or the service provider is not supported.
-      verify_code:
-        placeholder: Verification code
-        operations:
-          send_code:
-            buttons:
-              sending: sending
-              send: Send Code
-              countdown: resend after {timer} seconds
-            toast_success: verification code sent
-            toast_email_empty: please enter your email address
-      password:
-        placeholder: Password
-      password_confirm:
-        placeholder: Confirm password
-    operations:
-      submit:
-        button: Sign up
-        toast_success: Sign up successfully
-  binding:
-    title: Account binding
-    common:
-      toast:
-        mounted: >-
-          The current login method is not bound to an account, Please bind or
-          sign up a new account first
-    operations:
-      login_and_bind:
-        button: Login and Bind
-      signup_and_bind:
-        button: Signup and Bind
-      bind:
-        toast_success: Binding successfully
-        toast_failed: Binding failed, no enabled login method found
   sidebar:
     search:
       placeholder: Search
@@ -100,6 +26,7 @@ core:
       logout:
         tooltip: Logout
         title: Logout
+        description: Clicking Confirm will redirect to the logout page. Please ensure that the content you are editing is saved.
       profile:
         tooltip: Profile
       visit_homepage:
@@ -735,6 +662,52 @@ core:
       operations:
         select:
           result: ({count} items selected)
+  uc_attachment:
+    empty:
+      title: There are no attachments.
+      message: >-
+        There are no attachments, you can try refreshing or
+        uploading attachments.
+      actions:
+        upload: Upload Attachment
+    filters:
+      sort:
+        items:
+          create_time_desc: Latest uploaded
+          create_time_asc: Earliest uploaded
+          size_desc: Descending order by file size
+          size_asc: Ascending order by file size
+          display_name_asc: Ascending order by display name
+          display_name_desc: Descending order by display name
+      view_type:
+        items:
+          grid: Grid Mode
+          list: List Mode
+    detail_modal:
+      title: "Attachment: {display_name}"
+      fields:
+        preview: Preview
+        display_name: Display name
+        media_type: Media type
+        size: Size
+        owner: Owner
+        creation_time: Creation time
+        permalink: Permalink
+      preview:
+        click_to_exit: Click to exit preview
+        video_not_support: The current browser does not support video playback.
+        audio_not_support: The current browser does not support audio playback.
+        not_support: This file does not support preview.
+    upload_modal:
+      title: Upload attachment
+    select_modal:
+      title: Select attachment
+      providers:
+        default:
+          label: Attachments
+      operations:
+        select:
+          result: ({count} items selected)
   theme:
     title: Themes
     common:
@@ -1147,7 +1120,6 @@ core:
         permissions: Permissions
       fields:
         display_name: Display name
-        redirect_on_login: Default redirect location after logging in
         disallow_access_console:
           label: Disable access to Console
           help: Once checked, this role will not be able to access the Console
@@ -1163,6 +1135,15 @@ core:
         title: Disable identity authentication method
       disable_privileged:
         tooltip: The authentication method reserved by the system cannot be disabled
+    fields:
+      display_name:
+        local: Login with credentials
+      description:
+        local: Default login method built into Halo
+    list:
+      types:
+        form: Basic Authentication Method
+        oauth2: Third-party Authentication Method
     detail:
       title: Identity authentication detail
       fields:
@@ -1476,14 +1457,12 @@ core:
         first: >-
           1. The restore process may last for a long time, please do not refresh
           the page during this period.
-        second: >-
-          2. During the restore process, although the existing data will not be
-          cleaned up, if there is a conflict, the data will be overwritten.
+        second: 2. Before performing the restore, all existing data will be cleared. Please ensure that there is no data that needs to be retained.
         third: >-
           3. After the restore is completed, you need to restart Halo to load
           the system resources normally.
         complete: Restore completed, waiting for restart...
-      start: Start restore
+      start: I have read the above instructions, start restore
       tabs:
         local:
           label: Upload
@@ -1500,25 +1479,6 @@ core:
       message: Unauthorized access to this page
     actions:
       home: Back to home
-  setup:
-    title: Setup
-    operations:
-      submit:
-        button: Setup
-        toast_success: Setup successfully
-      setup_initial_data:
-        loading: Initializing data, please wait...
-    fields:
-      site_title:
-        label: Site title
-      email:
-        label: Email
-      username:
-        label: Username
-      password:
-        label: Password
-      confirm_password:
-        label: Confirm password
   rbac:
     Attachments Management: Attachments
     Attachment Manage: Attachment Manage
@@ -1593,6 +1553,8 @@ core:
     Post Author: Allows you to manage your own posts
     Post Contributor: Contributions allowed
     Post Publisher: Allow to publish own posts
+    UC Attachment Manage: Allow to manage own attachments
+    Recycle My Post: Recycle My Post
   components:
     submit_button:
       computed_text: "{text} ({shortcut})"
@@ -1657,8 +1619,6 @@ core:
       page_label: page
       size_label: items per page
       total_label: Total {total} items
-    social_auth_providers:
-      title: Third-party login
     app_download_alert:
       description: >-
         Themes and plugins for Halo can be downloaded at the following
@@ -1713,6 +1673,7 @@ core:
       creation_label: Create {text} tag
     validation:
       trim: Please remove the leading and trailing spaces
+      password: "The password can only use uppercase and lowercase letters (A-Z, a-z), numbers (0-9), and the following special characters: !{'@'}#$%^&*"
     verification_form:
       no_action_defined: "{label} interface not defined"
       verify_success: "{label} successful"
@@ -1824,11 +1785,13 @@ core:
       titles:
         tip: Tip
         warning: Warning
+        login_expired: Login expired
       descriptions:
         cannot_be_recovered: This operation is irreversible.
         editor_not_found: >-
           No editor found that matches the {raw_type} format. Please check if
           the editor plugin has been installed.
+        login_expired: The current session has expired. Click Confirm to go to the login page. Please ensure that the current content is saved. You can click Cancel to manually copy any unsaved content.
     filters:
       results:
         keyword: "Keyword: {keyword}"
@@ -1853,6 +1816,7 @@ core:
       none: None
       tip: Tip
       warning: Warning
+      system_protection: System protection
     tooltips:
       unpublished_content_tip: There is content that has been saved but not yet published.
       publishing: Publishing
@@ -1866,37 +1830,14 @@ core:
       cancel_publish:
         description: Are you sure you want to cancel publishing?
         title: Cancel publish
+      delete:
+        title: Delete post
+        description: This action will move the post to the recycle bin, where it will be managed by the site administrator.
     publish_modal:
       title: Publish post
     setting_modal:
       title: Post settings
     title: My posts
-  uc_reset_password:
-    fields:
-      username:
-        label: username
-      password:
-        label: New Password
-      password_confirm:
-        label: Confirm Password
-    operations:
-      reset:
-        button: Reset Password
-        toast_success: Reset successful
-    title: Reset password
-  reset_password:
-    fields:
-      username:
-        label: Username
-      email:
-        label: email address
-    operations:
-      send:
-        label: Send verification email
-        toast_success: >-
-          If your username and email address match, we will send an email to
-          your email address.
-    title: Reset password
   tool:
     title: Tools
     empty:

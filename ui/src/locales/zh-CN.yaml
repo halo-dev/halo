@@ -1,76 +1,4 @@
 core:
-  login:
-    title: 登录
-    fields:
-      username:
-        placeholder: 用户名
-      password:
-        placeholder: 密码
-      remember_me:
-        label: 保持登录会话
-    operations:
-      submit:
-        toast_success: 登录成功
-        toast_failed: 登录失败，用户名或密码错误
-        toast_csrf: CSRF Token 失效，请重新尝试
-      signup:
-        label: 没有账号
-        button: 立即注册
-      return_login:
-        label: 已有账号
-        button: 立即登录
-      return_site: 返回到首页
-      reset_password:
-        button: 找回密码
-    button: 登录
-    modal:
-      title: 重新登录
-    2fa:
-      fields:
-        code:
-          placeholder: 请输入两步验证码
-          label: 两步验证码
-  signup:
-    title: 注册
-    fields:
-      username:
-        placeholder: 用户名
-      display_name:
-        placeholder: 名称
-      email:
-        placeholder: 电子邮箱
-        matchFailed: 邮箱格式错误或服务商不受支持
-      verify_code:
-        placeholder: 验证码
-        operations:
-          send_code:
-            buttons:
-              sending: 发送中
-              send: 发送验证码
-              countdown: "{timer} 秒后重发"
-            toast_success: 验证码已发送
-            toast_email_empty: 请输入电子邮箱
-      password:
-        placeholder: 密码
-      password_confirm:
-        placeholder: 确认密码
-    operations:
-      submit:
-        button: 注册
-        toast_success: 注册成功
-  binding:
-    title: 账号绑定
-    common:
-      toast:
-        mounted: 当前登录方式未绑定账号，请先绑定或注册新账号
-    operations:
-      login_and_bind:
-        button: 登录并绑定
-      signup_and_bind:
-        button: 注册并绑定
-      bind:
-        toast_success: 绑定成功
-        toast_failed: 绑定失败，没有找到已启用的登录方式
   sidebar:
     search:
       placeholder: 搜索
@@ -98,6 +26,7 @@ core:
       logout:
         tooltip: 退出登录
         title: 退出登录
+        description: 点击确定将跳转至退出登录页面，请确保正在编辑的内容已保存。
       profile:
         tooltip: 个人中心
       visit_homepage:
@@ -328,6 +257,9 @@ core:
       cancel_publish:
         title: 取消发布
         description: 确定要取消发布吗？
+      delete:
+        title: 删除文章
+        description: 该操作会将文章放入回收站，后续由网站管理员进行管理。
   post_editor:
     title: 文章编辑
     untitled: 未命名文章
@@ -485,7 +417,7 @@ core:
         cover:
           label: 封面图
   deleted_page:
-    title: 自定义页面回收站
+    title: 页面回收站
     empty:
       title: 没有自定义页面被放入回收站
       message: 你可以尝试刷新或者返回自定义页面管理
@@ -686,6 +618,50 @@ core:
             title: 没有存储策略
             description: 在上传之前，需要新建一个存储策略
           not_select: 请先选择存储策略
+    select_modal:
+      title: 选择附件
+      providers:
+        default:
+          label: 附件库
+      operations:
+        select:
+          result: （已选择 {count} 项）
+  uc_attachment:
+    empty:
+      title: 当前没有附件
+      message: 当前没有附件，你可以尝试刷新或者上传附件
+      actions:
+        upload: 上传附件
+    filters:
+      sort:
+        items:
+          create_time_desc: 较近上传
+          create_time_asc: 较晚上传
+          size_desc: 文件大小降序
+          size_asc: 文件大小升序
+          display_name_asc: 文件名升序
+          display_name_desc: 文件名降序
+      view_type:
+        items:
+          grid: 网格模式
+          list: 列表模式
+    detail_modal:
+      title: 附件：{display_name}
+      fields:
+        preview: 预览
+        display_name: 文件名称
+        media_type: 文件类型
+        size: 文件大小
+        owner: 上传者
+        creation_time: 上传时间
+        permalink: 链接
+      preview:
+        click_to_exit: 点击退出预览
+        video_not_support: 当前浏览器不支持该视频播放
+        audio_not_support: 当前浏览器不支持该音频播放
+        not_support: 此文件不支持预览
+    upload_modal:
+      title: 上传附件
     select_modal:
       title: 选择附件
       providers:
@@ -1072,7 +1048,6 @@ core:
         permissions: 权限
       fields:
         display_name: 名称
-        redirect_on_login: 登录之后默认跳转位置
         disallow_access_console:
           label: 禁止访问 Console
           help: 勾选之后，该角色将无法访问 Console
@@ -1088,6 +1063,15 @@ core:
         title: 停用认证方式
       disable_privileged:
         tooltip: 系统保留的认证方式，无法禁用
+    fields:
+      display_name:
+        local: 账号密码登录
+      description:
+        local: Halo 内置的默认登录方式
+    list:
+      types:
+        form: 基础认证方式
+        oauth2: 三方认证方式
     detail:
       title: 身份认证详情
       fields:
@@ -1374,10 +1358,10 @@ core:
     restore:
       tips:
         first: 1. 恢复过程可能会持续较长时间，期间请勿刷新页面。
-        second: 2. 在恢复的过程中，虽然已有的数据不会被清理掉，但如果有冲突的数据将被覆盖。
+        second: 2. 在执行恢复之前，会清空现有的所有数据，请确保当前没有需要保留的数据。
         third: 3. 恢复完成之后需要重启 Halo 才能够正常加载系统资源。
         complete: 恢复完成，等待重启...
-      start: 开始恢复
+      start: 我已阅读上方提示，开始恢复
       tabs:
         local:
           label: 上传
@@ -1394,49 +1378,6 @@ core:
       message: 没有权限访问此页面
     actions:
       home: 返回首页
-  setup:
-    title: 系统初始化
-    operations:
-      submit:
-        button: 初始化
-        toast_success: 初始化成功
-      setup_initial_data:
-        loading: 正在初始化数据，请稍后...
-    fields:
-      site_title:
-        label: 站点名称
-      email:
-        label: 邮箱
-      username:
-        label: 用户名
-      password:
-        label: 密码
-      confirm_password:
-        label: 确认密码
-  reset_password:
-    title: 重置密码
-    fields:
-      username:
-        label: 用户名
-      email:
-        label: 邮箱地址
-    operations:
-      send:
-        label: 发送验证邮件
-        toast_success: 如果你的用户名和邮箱地址匹配，我们将会发送一封邮件到你的邮箱。
-  uc_reset_password:
-    title: 重置密码
-    fields:
-      username:
-        label: 用户名
-      password:
-        label: 新密码
-      password_confirm:
-        label: 确认密码
-    operations:
-      reset:
-        button: 重置密码
-        toast_success: 重置成功
   rbac:
     Attachments Management: 附件
     Attachment Manage: 附件管理
@@ -1511,6 +1452,8 @@ core:
     Post Author: 允许管理自己的文章
     Post Attachment Manager: 允许在文章中上传图片
     Post Publisher: 允许发布自己的文章
+    UC Attachment Manage: 允许管理自己的附件
+    Recycle My Post: 允许删除自己的文章
   components:
     submit_button:
       computed_text: "{text}（{shortcut}）"
@@ -1575,8 +1518,6 @@ core:
       page_label: 页
       size_label: 条 / 页
       total_label: 共 {total} 项数据
-    social_auth_providers:
-      title: 三方登录
     app_download_alert:
       description: Halo 的主题和插件可以在以下地址下载：
       sources:
@@ -1625,6 +1566,7 @@ core:
       creation_label: 创建 {text} 标签
     validation:
       trim: 不能以空格开头或结尾
+      password: "密码只能使用大小写字母 (A-Z, a-z)、数字 (0-9)，以及以下特殊字符: !{'@'}#$%^&*"
     verification_form:
       no_action_defined: 未定义{label}接口
       verify_success: "{label}成功"
@@ -1733,9 +1675,11 @@ core:
       titles:
         tip: 提示
         warning: 警告
+        login_expired: 登录已过期
       descriptions:
         cannot_be_recovered: 该操作不可恢复。
         editor_not_found: 未找到符合 {raw_type} 格式的编辑器，请检查是否已安装编辑器插件。
+        login_expired: 当前登录已过期，点击确定跳转到登录页面，请确保当前内容已保存，你可以点击取消之后手动复制未保存的内容。
     filters:
       results:
         keyword: 关键词：{keyword}
@@ -1760,6 +1704,7 @@ core:
       none: 无
       tip: 提示
       warning: 警告
+      system_protection: 系统保留
     tooltips:
       unpublished_content_tip: 当前有内容已保存，但还未发布。
       publishing: 发布中

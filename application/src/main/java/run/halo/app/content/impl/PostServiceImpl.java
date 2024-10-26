@@ -30,11 +30,13 @@ import run.halo.app.content.PostQuery;
 import run.halo.app.content.PostRequest;
 import run.halo.app.content.PostService;
 import run.halo.app.content.Stats;
+import run.halo.app.core.counter.CounterService;
+import run.halo.app.core.counter.MeterUtils;
 import run.halo.app.core.extension.content.Category;
 import run.halo.app.core.extension.content.Post;
 import run.halo.app.core.extension.content.Snapshot;
 import run.halo.app.core.extension.content.Tag;
-import run.halo.app.core.extension.service.UserService;
+import run.halo.app.core.user.service.UserService;
 import run.halo.app.extension.ListOptions;
 import run.halo.app.extension.ListResult;
 import run.halo.app.extension.MetadataOperator;
@@ -43,8 +45,6 @@ import run.halo.app.extension.Ref;
 import run.halo.app.extension.router.selector.FieldSelector;
 import run.halo.app.infra.Condition;
 import run.halo.app.infra.ConditionStatus;
-import run.halo.app.metrics.CounterService;
-import run.halo.app.metrics.MeterUtils;
 
 /**
  * A default implementation of {@link PostService}.
@@ -77,7 +77,7 @@ public class PostServiceImpl extends AbstractContentService implements PostServi
             )
             .flatMap(listResult -> Flux.fromStream(listResult.get())
                 .map(this::getListedPost)
-                .concatMap(Function.identity())
+                .flatMapSequential(Function.identity())
                 .collectList()
                 .map(listedPosts -> new ListResult<>(listResult.getPage(), listResult.getSize(),
                     listResult.getTotal(), listedPosts)
@@ -175,7 +175,7 @@ public class PostServiceImpl extends AbstractContentService implements PostServi
             return Flux.empty();
         }
         return Flux.fromIterable(usernames)
-            .concatMap(userService::getUserOrGhost)
+            .flatMapSequential(userService::getUserOrGhost)
             .map(user -> {
                 Contributor contributor = new Contributor();
                 contributor.setName(user.getMetadata().getName());
@@ -377,6 +377,15 @@ public class PostServiceImpl extends AbstractContentService implements PostServi
                     .flatMap(client::delete)
                     .flatMap(deleted -> restoredContent(baseSnapshotName, deleted));
             });
+    }
+
+    @Override
+    public Mono<Post> recycleBy(String postName, String username) {
+        return getByUsername(postName, username)
+            .flatMap(post -> updatePostWithRetry(post, record -> {
+                record.getSpec().setDeleted(true);
+                return record;
+            }));
     }
 
     private Mono<Post> updatePostWithRetry(Post post, UnaryOperator<Post> func) {

@@ -1,6 +1,5 @@
 <script lang="ts" setup>
-import type { Type as ButtonType } from "@/components/button/interface";
-import type { Type } from "@/components/dialog/interface";
+import type { DialogProps, Type } from "@/components/dialog/interface";
 import { markRaw, ref, type Component, type Raw } from "vue";
 import {
   IconCheckboxCircle,
@@ -12,36 +11,22 @@ import {
 import { VButton } from "../button";
 import { VModal } from "../modal";
 
-const props = withDefaults(
-  defineProps<{
-    type?: Type;
-    title?: string;
-    description?: string;
-    confirmText?: string;
-    confirmType?: ButtonType;
-    showCancel?: boolean;
-    cancelText?: string;
-    visible?: boolean;
-    onConfirm?: () => void;
-    onCancel?: () => void;
-  }>(),
-  {
-    type: "info",
-    title: "提示",
-    description: "",
-    confirmText: "确定",
-    confirmType: "primary",
-    showCancel: true,
-    cancelText: "取消",
-    visible: false,
-    onConfirm: () => {
-      return;
-    },
-    onCancel: () => {
-      return;
-    },
-  }
-);
+const props = withDefaults(defineProps<DialogProps>(), {
+  type: "info",
+  title: "提示",
+  description: "",
+  confirmText: "确定",
+  confirmType: "primary",
+  showCancel: true,
+  cancelText: "取消",
+  visible: false,
+  onConfirm: () => {
+    return;
+  },
+  onCancel: () => {
+    return;
+  },
+});
 
 const emit = defineEmits<{
   (event: "update:visible", visible: boolean): void;
@@ -101,7 +86,8 @@ const handleClose = () => {
   <VModal
     :visible="visible"
     :width="450"
-    :layer-closable="true"
+    :layer-closable="false"
+    :data-unique-id="uniqueId"
     @close="handleCancel()"
   >
     <div class="flex justify-between items-start py-2 mb-2">

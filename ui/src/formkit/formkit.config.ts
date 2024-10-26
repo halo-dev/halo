@@ -1,5 +1,5 @@
 import { en, zh } from "@formkit/i18n";
-import { group as nativeGroup } from "@formkit/inputs";
+import { group as nativeGroup, select as nativeSelect } from "@formkit/inputs";
 import { generateClasses } from "@formkit/themes";
 import type { DefaultConfigOptions } from "@formkit/vue";
 import { attachment } from "./inputs/attachment";
@@ -19,14 +19,14 @@ import { postSelect } from "./inputs/post-select";
 import { repeater } from "./inputs/repeater";
 import { roleSelect } from "./inputs/role-select";
 import { secret } from "./inputs/secret";
+import { select } from "./inputs/select";
 import { singlePageSelect } from "./inputs/singlePage-select";
 import { tagCheckbox } from "./inputs/tag-checkbox";
 import { tagSelect } from "./inputs/tag-select";
 import { verificationForm } from "./inputs/verify-form";
-import { select as nativeSelect } from "@formkit/inputs";
-import { select } from "./inputs/select";
 import theme from "./theme";
 
+import { menuSelect } from "./inputs/menu-select";
 import { userSelect } from "./inputs/user-select";
 import autoScrollToErrors from "./plugins/auto-scroll-to-errors";
 import passwordPreventAutocomplete from "./plugins/password-prevent-autocomplete";
@@ -58,6 +58,7 @@ const config: DefaultConfigOptions = {
     menuCheckbox,
     menuItemSelect,
     menuRadio,
+    menuSelect,
     nativeGroup,
     password,
     postSelect,

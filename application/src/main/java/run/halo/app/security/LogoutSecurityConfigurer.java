@@ -1,25 +1,33 @@
 package run.halo.app.security;
 
-import static org.springframework.security.config.web.server.SecurityWebFiltersOrder.LOGOUT_PAGE_GENERATING;
 import static run.halo.app.security.authentication.WebExchangeMatchers.ignoringMediaTypeAll;
 
 import java.net.URI;
+import java.util.Map;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.ApplicationContext;
+import org.springframework.context.annotation.Bean;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.security.config.web.server.ServerHttpSecurity;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.ReactiveSecurityContextHolder;
+import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.web.server.WebFilterExchange;
 import org.springframework.security.web.server.authentication.logout.DelegatingServerLogoutHandler;
 import org.springframework.security.web.server.authentication.logout.RedirectServerLogoutSuccessHandler;
 import org.springframework.security.web.server.authentication.logout.ServerLogoutHandler;
 import org.springframework.security.web.server.authentication.logout.ServerLogoutSuccessHandler;
-import org.springframework.security.web.server.ui.LogoutPageGeneratingWebFilter;
 import org.springframework.stereotype.Component;
+import org.springframework.web.reactive.function.server.RouterFunction;
+import org.springframework.web.reactive.function.server.RouterFunctions;
+import org.springframework.web.reactive.function.server.ServerResponse;
 import reactor.core.publisher.Mono;
+import run.halo.app.core.user.service.UserService;
+import run.halo.app.infra.actuator.GlobalInfoService;
 import run.halo.app.security.authentication.SecurityConfigurer;
 import run.halo.app.security.authentication.rememberme.RememberMeServices;
+import run.halo.app.theme.router.ModelConst;
 
 @Component
 @RequiredArgsConstructor
@@ -31,8 +39,8 @@ public class LogoutSecurityConfigurer implements SecurityConfigurer {
     public void configure(ServerHttpSecurity http) {
         var serverLogoutHandlers = getLogoutHandlers();
         http.logout(
-            logout -> logout.logoutSuccessHandler(new LogoutSuccessHandler(serverLogoutHandlers)));
-        http.addFilterAt(new LogoutPageGeneratingWebFilter(), LOGOUT_PAGE_GENERATING);
+            logout -> logout.logoutSuccessHandler(new LogoutSuccessHandler(serverLogoutHandlers))
+        );
     }
 
     private class LogoutSuccessHandler implements ServerLogoutSuccessHandler {
@@ -42,13 +50,39 @@ public class LogoutSecurityConfigurer implements SecurityConfigurer {
 
         public LogoutSuccessHandler(ServerLogoutHandler... logoutHandler) {
             var defaultHandler = new RedirectServerLogoutSuccessHandler();
-            defaultHandler.setLogoutSuccessUrl(URI.create("/console/?logout"));
+            defaultHandler.setLogoutSuccessUrl(URI.create("/login?logout"));
             this.defaultHandler = defaultHandler;
             if (logoutHandler.length == 1) {
                 this.logoutHandler = logoutHandler[0];
             } else {
                 this.logoutHandler = new DelegatingServerLogoutHandler(logoutHandler);
             }
+        }
+
+        @Bean
+        RouterFunction<ServerResponse> logoutPage(
+            UserService userService,
+            GlobalInfoService globalInfoService
+        ) {
+            return RouterFunctions.route()
+                .GET("/logout", request -> {
+                    var user = ReactiveSecurityContextHolder.getContext()
+                        .map(SecurityContext::getAuthentication)
+                        .map(Authentication::getName)
+                        .flatMap(userService::getUser);
+                    var exchange = request.exchange();
+                    var contextPath = exchange.getRequest().getPath().contextPath().value();
+                    return ServerResponse.ok().render("logout", Map.of(
+                        "globalInfo", globalInfoService.getGlobalInfo(),
+                        "action", contextPath + "/logout",
+                        "user", user
+                    ));
+                })
+                .before(request -> {
+                    request.exchange().getAttributes().put(ModelConst.NO_CACHE, true);
+                    return request;
+                })
+                .build();
         }
 
         @Override

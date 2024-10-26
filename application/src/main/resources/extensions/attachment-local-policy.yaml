@@ -10,6 +10,8 @@ apiVersion: storage.halo.run/v1alpha1
 kind: Policy
 metadata:
   name: default-policy
+  finalizers:
+    - system-protection
 spec:
   displayName: 本地存储
   templateName: local
@@ -19,6 +21,8 @@ apiVersion: v1alpha1
 kind: ConfigMap
 metadata:
   name: default-policy-config
+  labels:
+    storage.halo.run/policy-owner: default-policy
 data:
   default: "{\"location\":\"\"}"
 ---
@@ -38,7 +42,7 @@ spec:
         - $formkit: text
           name: maxFileSize
           label: 最大单文件大小
-          validation: [['matches', '/^(0|[1-9]\d*)(?:[KMG]B)?$/']]
+          validation: [ [ 'matches', '/^(0|[1-9]\d*)(?:[KMG]B)?$/' ] ]
           validation-visibility: "live"
           validation-messages:
             matches: "输入格式错误，遵循：整数 + 大写的单位（KB, MB, GB）"

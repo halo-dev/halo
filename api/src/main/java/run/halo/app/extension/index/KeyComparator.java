@@ -60,14 +60,6 @@ public class KeyComparator implements Comparator<String> {
         int i = startA;
         int j = startB;
 
-        // Skip leading zeros for both numbers
-        while (i < a.length() && a.charAt(i) == '0') {
-            i++;
-        }
-        while (j < b.length() && b.charAt(j) == '0') {
-            j++;
-        }
-
         // Compare lengths of remaining digits
         int lengthA = countDigits(a, i);
         int lengthB = countDigits(b, j);
@@ -114,13 +106,6 @@ public class KeyComparator implements Comparator<String> {
         int i = startA;
         int j = startB;
 
-        while (i < pointA && a.charAt(i) == '0') {
-            i++;
-        }
-        while (j < pointB && b.charAt(j) == '0') {
-            j++;
-        }
-
         int lengthA = pointA - i;
         int lengthB = pointB - j;
         if (lengthA != lengthB) {
@@ -150,6 +135,7 @@ public class KeyComparator implements Comparator<String> {
             j++;
         }
 
+        // If one number has more digits left, and they're not all zeroes, it is larger
         while (i < a.length() && Character.isDigit(a.charAt(i))) {
             if (a.charAt(i) != '0') {
                 return 1;

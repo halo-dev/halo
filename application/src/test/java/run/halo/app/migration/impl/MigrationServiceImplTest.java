@@ -120,7 +120,7 @@ class MigrationServiceImplTest {
         expectStore.setVersion(null);
 
         when(haloProperties.getWorkDir()).thenReturn(workdir);
-        when(repository.deleteAll(List.of(expectStore))).thenReturn(Mono.empty());
+        when(repository.deleteAll()).thenReturn(Mono.empty());
         when(repository.saveAll(List.of(expectStore))).thenReturn(Flux.empty());
 
         var content = DataBufferUtils.read(backupFile,
@@ -132,7 +132,7 @@ class MigrationServiceImplTest {
 
 
         verify(haloProperties).getWorkDir();
-        verify(repository).deleteAll(List.of(expectStore));
+        verify(repository).deleteAll();
         verify(repository).saveAll(List.of(expectStore));
 
         // make sure the workdir is recovered.

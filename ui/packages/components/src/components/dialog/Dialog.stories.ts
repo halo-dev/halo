@@ -1,6 +1,6 @@
 import type { Meta, StoryObj } from "@storybook/vue3";
 
-import { VDialog } from ".";
+import { Dialog, VDialog } from ".";
 import { VButton } from "../button";
 
 const meta: Meta<typeof VDialog> = {
@@ -12,7 +12,11 @@ const meta: Meta<typeof VDialog> = {
     height: 400,
     setup() {
       const showDialog = () => {
-        args.visible = true;
+        Dialog.success({
+          title: "Hi",
+          // @ts-ignore
+          type: args.type,
+        });
       };
 
       return {
@@ -23,7 +27,6 @@ const meta: Meta<typeof VDialog> = {
     template: `
       <div style="height: 400px">
         <VButton @click="showDialog" >点击显示Dialog</VButton>
-        <VDialog v-bind="args" @onCancel="args.visible = false" />
       </div>
     `,
   }),

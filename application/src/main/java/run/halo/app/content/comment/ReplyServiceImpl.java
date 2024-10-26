@@ -1,5 +1,6 @@
 package run.halo.app.content.comment;
 
+import static org.apache.commons.lang3.BooleanUtils.isTrue;
 import static run.halo.app.extension.index.query.QueryFactory.and;
 import static run.halo.app.extension.index.query.QueryFactory.equal;
 import static run.halo.app.extension.index.query.QueryFactory.isNull;
@@ -8,8 +9,8 @@ import java.time.Duration;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.function.Function;
+import java.util.function.Supplier;
 import java.util.function.UnaryOperator;
-import org.apache.commons.lang3.BooleanUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.reactivestreams.Publisher;
 import org.springframework.dao.OptimisticLockingFailureException;
@@ -19,17 +20,18 @@ import org.springframework.util.Assert;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import reactor.util.retry.Retry;
+import run.halo.app.core.counter.CounterService;
 import run.halo.app.core.extension.content.Comment;
 import run.halo.app.core.extension.content.Reply;
-import run.halo.app.core.extension.service.RoleService;
-import run.halo.app.core.extension.service.UserService;
+import run.halo.app.core.user.service.RoleService;
+import run.halo.app.core.user.service.UserService;
 import run.halo.app.extension.ListOptions;
 import run.halo.app.extension.ListResult;
 import run.halo.app.extension.PageRequest;
 import run.halo.app.extension.PageRequestImpl;
 import run.halo.app.extension.ReactiveExtensionClient;
 import run.halo.app.extension.router.selector.FieldSelector;
-import run.halo.app.metrics.CounterService;
+import run.halo.app.infra.exception.RequestRestrictedException;
 
 /**
  * A default implementation of {@link ReplyService}.
@@ -40,6 +42,9 @@ import run.halo.app.metrics.CounterService;
 @Service
 public class ReplyServiceImpl extends AbstractCommentService implements ReplyService {
 
+    private final Supplier<RequestRestrictedException> requestRestrictedExceptionSupplier =
+        () -> new RequestRestrictedException("problemDetail.comment.waitingForApproval");
+
     public ReplyServiceImpl(RoleService roleService, ReactiveExtensionClient client,
         UserService userService, CounterService counterService) {
         super(roleService, client, userService, counterService);
@@ -48,26 +53,32 @@ public class ReplyServiceImpl extends AbstractCommentService implements ReplySer
     @Override
     public Mono<Reply> create(String commentName, Reply reply) {
         return client.get(Comment.class, commentName)
-            .flatMap(comment -> prepareReply(commentName, reply)
-                .flatMap(client::create)
-                .flatMap(createdReply -> {
-                    var quotedReply = createdReply.getSpec().getQuoteReply();
-                    if (StringUtils.isBlank(quotedReply)) {
-                        return Mono.just(createdReply);
-                    }
-                    return approveReply(quotedReply)
-                        .thenReturn(createdReply);
-                })
-                .flatMap(createdReply -> approveComment(comment)
-                    .thenReturn(createdReply)
-                )
-            );
+            .flatMap(this::approveComment)
+            .filter(comment -> isTrue(comment.getSpec().getApproved()))
+            .switchIfEmpty(Mono.error(requestRestrictedExceptionSupplier))
+            .flatMap(comment -> prepareReply(commentName, reply))
+            .flatMap(this::doCreateReply);
+    }
+
+    private Mono<Reply> doCreateReply(Reply prepared) {
+        var quotedReply = prepared.getSpec().getQuoteReply();
+        if (StringUtils.isBlank(quotedReply)) {
+            return client.create(prepared);
+        }
+        return approveReply(quotedReply)
+            .filter(reply -> isTrue(reply.getSpec().getApproved()))
+            .switchIfEmpty(Mono.error(requestRestrictedExceptionSupplier))
+            .flatMap(approvedQuoteReply -> client.create(prepared));
     }
 
     private Mono<Comment> approveComment(Comment comment) {
         return hasCommentManagePermission()
-            .filter(Boolean::booleanValue)
-            .flatMap(hasPermission -> doApproveComment(comment));
+            .flatMap(hasPermission -> {
+                if (hasPermission) {
+                    return doApproveComment(comment);
+                }
+                return Mono.just(comment);
+            });
     }
 
     private Mono<Comment> doApproveComment(Comment comment) {
@@ -81,14 +92,18 @@ public class ReplyServiceImpl extends AbstractCommentService implements ReplySer
                 e -> updateCommentWithRetry(comment.getMetadata().getName(), updateFunc));
     }
 
-    private Mono<Void> approveReply(String replyName) {
+    private Mono<Reply> approveReply(String replyName) {
         return hasCommentManagePermission()
-            .filter(Boolean::booleanValue)
-            .flatMap(hasPermission -> doApproveReply(replyName));
+            .flatMap(hasPermission -> {
+                if (hasPermission) {
+                    return doApproveReply(replyName);
+                }
+                return client.get(Reply.class, replyName);
+            });
     }
 
-    private Mono<Void> doApproveReply(String replyName) {
-        return Mono.defer(() -> client.fetch(Reply.class, replyName)
+    private Mono<Reply> doApproveReply(String replyName) {
+        return Mono.defer(() -> client.get(Reply.class, replyName)
                 .flatMap(reply -> {
                     reply.getSpec().setApproved(true);
                     reply.getSpec().setApprovedTime(Instant.now());
@@ -96,8 +111,7 @@ public class ReplyServiceImpl extends AbstractCommentService implements ReplySer
                 })
             )
             .retryWhen(Retry.backoff(8, Duration.ofMillis(100))
-                .filter(OptimisticLockingFailureException.class::isInstance))
-            .then();
+                .filter(OptimisticLockingFailureException.class::isInstance));
     }
 
     private Mono<Comment> updateCommentWithRetry(String name, UnaryOperator<Comment> updateFunc) {
@@ -123,7 +137,7 @@ public class ReplyServiceImpl extends AbstractCommentService implements ReplySer
         if (reply.getSpec().getApproved() == null) {
             reply.getSpec().setApproved(false);
         }
-        if (BooleanUtils.isTrue(reply.getSpec().getApproved())
+        if (isTrue(reply.getSpec().getApproved())
             && reply.getSpec().getApprovedTime() == null) {
             reply.getSpec().setApprovedTime(Instant.now());
         }
@@ -152,7 +166,7 @@ public class ReplyServiceImpl extends AbstractCommentService implements ReplySer
         return client.listBy(Reply.class, query.toListOptions(), query.toPageRequest())
             .flatMap(list -> Flux.fromStream(list.get()
                     .map(this::toListedReply))
-                .concatMap(Function.identity())
+                .flatMapSequential(Function.identity())
                 .collectList()
                 .map(listedReplies -> new ListResult<>(list.getPage(), list.getSize(),
                     list.getTotal(), listedReplies))
