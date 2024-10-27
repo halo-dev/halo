@@ -35,6 +35,7 @@ import VscodeIconsFileTypeYaml from "~icons/vscode-icons/file-type-yaml";
 const FileTypeIconsMap = {
   // image
   ".jpg": markRaw(VscodeIconsFileTypeImage),
+  ".jpeg": markRaw(VscodeIconsFileTypeImage),
   ".png": markRaw(VscodeIconsFileTypeImage),
   ".gif": markRaw(VscodeIconsFileTypeImage),
   ".webp": markRaw(VscodeIconsFileTypeImage),
