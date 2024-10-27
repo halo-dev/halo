@@ -1,4 +1,5 @@
 <script lang="ts" setup>
+import UppyUpload from "@/components/upload/UppyUpload.vue";
 import type { PolicyTemplate } from "@halo-dev/api-client";
 import {
   IconAddCircle,
@@ -15,6 +16,7 @@ import {
   useFetchAttachmentPolicyTemplate,
 } from "../composables/use-attachment-policy";
 import AttachmentGroupBadge from "./AttachmentGroupBadge.vue";
+import AttachmentGroupEditingModal from "./AttachmentGroupEditingModal.vue";
 import AttachmentPolicyBadge from "./AttachmentPolicyBadge.vue";
 import AttachmentPolicyEditingModal from "./AttachmentPolicyEditingModal.vue";
 
@@ -22,7 +24,7 @@ const emit = defineEmits<{
   (event: "close"): void;
 }>();
 
-const { groups } = useFetchAttachmentGroup();
+const { groups, handleFetchGroups } = useFetchAttachmentGroup();
 const { policies, handleFetchPolicies } = useFetchAttachmentPolicy();
 const { policyTemplates } = useFetchAttachmentPolicyTemplate();
 
@@ -30,6 +32,7 @@ const modal = ref<InstanceType<typeof VModal> | null>(null);
 const selectedGroupName = useLocalStorage("attachment-upload-group", "");
 const selectedPolicyName = useLocalStorage("attachment-upload-policy", "");
 const policyEditingModal = ref(false);
+const groupEditingModal = ref(false);
 const policyTemplateNameToCreate = ref();
 
 onMounted(() => {
@@ -43,13 +46,23 @@ const handleOpenCreateNewPolicyModal = (policyTemplate: PolicyTemplate) => {
   policyEditingModal.value = true;
 };
 
+const handleOpenCreateNewGroupModal = () => {
+  groupEditingModal.value = true;
+};
+
 const onEditingModalClose = async () => {
   await handleFetchPolicies();
   policyTemplateNameToCreate.value = undefined;
   selectedPolicyName.value = policies.value?.[0].metadata.name;
   policyEditingModal.value = false;
 };
+
+const onGroupEditingModalClose = async () => {
+  await handleFetchGroups();
+  groupEditingModal.value = false;
+};
 </script>
+
 <template>
   <VModal
     ref="modal"
@@ -128,7 +141,15 @@ const onEditingModalClose = async () => {
           :is-selected="group.metadata.name === selectedGroupName"
           :features="{ actions: false, checkIcon: true }"
           @click="selectedGroupName = group.metadata.name"
-        >
+        />
+
+        <AttachmentGroupBadge @click="handleOpenCreateNewGroupModal">
+          <template #text>
+            <span>{{ $t("core.common.buttons.new") }}</span>
+          </template>
+          <template #actions>
+            <IconAddCircle />
+          </template>
         </AttachmentGroupBadge>
       </div>
       <UppyUpload
@@ -154,5 +175,10 @@ const onEditingModalClose = async () => {
     v-if="policyEditingModal"
     :template-name="policyTemplateNameToCreate"
     @close="onEditingModalClose"
+  />
+
+  <AttachmentGroupEditingModal
+    v-if="groupEditingModal"
+    @close="onGroupEditingModalClose"
   />
 </template>
