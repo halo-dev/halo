@@ -1,4 +1,5 @@
 <script lang="ts" setup>
+import UppyUpload from "@/components/upload/UppyUpload.vue";
 import type { PolicyTemplate } from "@halo-dev/api-client";
 import {
   IconAddCircle,
@@ -15,10 +16,9 @@ import {
   useFetchAttachmentPolicyTemplate,
 } from "../composables/use-attachment-policy";
 import AttachmentGroupBadge from "./AttachmentGroupBadge.vue";
+import AttachmentGroupEditingModal from "./AttachmentGroupEditingModal.vue";
 import AttachmentPolicyBadge from "./AttachmentPolicyBadge.vue";
 import AttachmentPolicyEditingModal from "./AttachmentPolicyEditingModal.vue";
-import AttachmentGroupEditingModal from "./AttachmentGroupEditingModal.vue";
-import UppyUpload from "@/components/upload/UppyUpload.vue";
 
 const emit = defineEmits<{
   (event: "close"): void;
