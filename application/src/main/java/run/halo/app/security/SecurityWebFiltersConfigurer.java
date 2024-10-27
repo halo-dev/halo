@@ -24,7 +24,7 @@ import run.halo.app.security.authentication.SecurityConfigurer;
 
 @Component
 // Specific an order here to control the order or security configurer initialization
-@Order(-100)
+@Order(100)
 public class SecurityWebFiltersConfigurer implements SecurityConfigurer {
 
     private final ExtensionGetter extensionGetter;

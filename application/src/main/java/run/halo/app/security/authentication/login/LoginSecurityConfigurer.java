@@ -3,6 +3,7 @@ package run.halo.app.security.authentication.login;
 import io.github.resilience4j.ratelimiter.RateLimiterRegistry;
 import io.micrometer.observation.ObservationRegistry;
 import org.springframework.context.MessageSource;
+import org.springframework.core.annotation.Order;
 import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.ObservationReactiveAuthenticationManager;
 import org.springframework.security.authentication.ReactiveAuthenticationManager;
@@ -28,6 +29,7 @@ import run.halo.app.security.authentication.SecurityConfigurer;
 import run.halo.app.security.authentication.twofactor.TwoFactorAuthentication;
 
 @Component
+@Order(0)
 public class LoginSecurityConfigurer implements SecurityConfigurer {
 
     private final ObservationRegistry observationRegistry;

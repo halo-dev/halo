@@ -2,6 +2,7 @@ package run.halo.app.security.authentication.twofactor;
 
 import static org.springframework.security.web.server.util.matcher.ServerWebExchangeMatchers.pathMatchers;
 
+import org.springframework.core.annotation.Order;
 import org.springframework.http.HttpMethod;
 import org.springframework.security.config.web.server.SecurityWebFiltersOrder;
 import org.springframework.security.config.web.server.ServerHttpSecurity;
@@ -17,6 +18,7 @@ import run.halo.app.security.authentication.twofactor.totp.TotpAuthenticationMan
 import run.halo.app.security.authentication.twofactor.totp.TotpCodeAuthenticationConverter;
 
 @Component
+@Order(0)
 public class TwoFactorAuthSecurityConfigurer implements SecurityConfigurer {
 
     private final ServerSecurityContextRepository securityContextRepository;
