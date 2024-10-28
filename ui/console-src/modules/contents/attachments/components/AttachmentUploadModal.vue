@@ -143,14 +143,17 @@ const onGroupEditingModalClose = async () => {
           @click="selectedGroupName = group.metadata.name"
         />
 
-        <AttachmentPolicyBadge @click="handleOpenCreateNewGroupModal">
+        <AttachmentGroupBadge
+          :features="{ actions: false }"
+          @click="handleOpenCreateNewGroupModal"
+        >
           <template #text>
             <span>{{ $t("core.common.buttons.new") }}</span>
           </template>
           <template #actions>
             <IconAddCircle />
           </template>
-        </AttachmentPolicyBadge>
+        </AttachmentGroupBadge>
       </div>
       <UppyUpload
         endpoint="/apis/api.console.halo.run/v1alpha1/attachments/upload"

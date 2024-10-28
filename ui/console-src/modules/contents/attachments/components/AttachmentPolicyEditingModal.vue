@@ -47,14 +47,6 @@ const formState = ref<Policy>({
 
 const isUpdateMode = !!props.policy;
 
-const { data: policies } = useQuery({
-  queryKey: ["core:attachment:policies"],
-  queryFn: async () => {
-    const { data } = await coreApiClient.storage.policy.listPolicy(); // 修改为 listPolicy
-    return data;
-  },
-});
-
 onMounted(async () => {
   if (props.policy) {
     formState.value = cloneDeep(props.policy);
@@ -143,12 +135,13 @@ const submitting = ref(false);
 const handleSave = async () => {
   try {
     submitting.value = true;
-    const nameExists = policies.value?.items.some(
+    const { data: policies } = await coreApiClient.storage.policy.listPolicy();
+    const hasDisplayNameDuplicate = policies.items.some(
       (policy) => policy.spec.displayName === formState.value.spec.displayName
     );
 
-    if (nameExists) {
-      alert("该存储策略名称已存在，请重新创建!");
+    if (hasDisplayNameDuplicate) {
+      Toast.error(t("core.common.toast.policy_name_exists"));
       return;
     }
 

@@ -1671,6 +1671,8 @@ core:
       unknown_error: 未知错误
       disable_success: 禁用成功
       enable_success: 啟用成功
+      group_name_exists: 该分组名称已存在，请重新创建
+      policy_name_exists: 该存储策略已存在，请重新创建
     dialog:
       titles:
         tip: 提示
