@@ -44,6 +44,18 @@ const modalTitle = props.group
 const handleSave = async () => {
   try {
     isSubmitting.value = true;
+    const existingGroupsResponse =
+      await coreApiClient.storage.group.listGroup();
+    const existingGroups = existingGroupsResponse.data.items || [];
+    const nameExists = existingGroups.some(
+      (group) => group.spec.displayName === formState.value.spec.displayName
+    );
+
+    if (nameExists) {
+      alert("该分组名称已存在，请重新创建!");
+      return;
+    }
+
     if (props.group) {
       await coreApiClient.storage.group.updateGroup({
         name: formState.value.metadata.name,
