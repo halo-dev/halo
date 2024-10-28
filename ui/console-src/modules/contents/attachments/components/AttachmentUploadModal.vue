@@ -19,8 +19,6 @@ import AttachmentGroupBadge from "./AttachmentGroupBadge.vue";
 import AttachmentGroupEditingModal from "./AttachmentGroupEditingModal.vue";
 import AttachmentPolicyBadge from "./AttachmentPolicyBadge.vue";
 import AttachmentPolicyEditingModal from "./AttachmentPolicyEditingModal.vue";
-import AttachmentGroupEditingModal from "./AttachmentGroupEditingModal.vue";
-import UppyUpload from "@/components/upload/UppyUpload.vue";
 
 const emit = defineEmits<{
   (event: "close"): void;
@@ -145,14 +143,14 @@ const onGroupEditingModalClose = async () => {
           @click="selectedGroupName = group.metadata.name"
         />
 
-        <AttachmentGroupBadge @click="handleOpenCreateNewGroupModal">
+        <AttachmentPolicyBadge @click="handleOpenCreateNewGroupModal">
           <template #text>
             <span>{{ $t("core.common.buttons.new") }}</span>
           </template>
           <template #actions>
             <IconAddCircle />
           </template>
-        </AttachmentGroupBadge>
+        </AttachmentPolicyBadge>
       </div>
       <UppyUpload
         endpoint="/apis/api.console.halo.run/v1alpha1/attachments/upload"
