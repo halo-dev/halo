@@ -14,9 +14,9 @@ const queryClient = useQueryClient();
 
 withDefaults(
   defineProps<{
-    formState: SecretFormState;
+    formState?: SecretFormState;
   }>(),
-  {}
+  { formState: undefined }
 );
 
 const emit = defineEmits<{
