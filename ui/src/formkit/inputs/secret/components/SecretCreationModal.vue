@@ -12,6 +12,13 @@ import SecretForm from "./SecretForm.vue";
 const { t } = useI18n();
 const queryClient = useQueryClient();
 
+withDefaults(
+  defineProps<{
+    formState: SecretFormState;
+  }>(),
+  {}
+);
+
 const emit = defineEmits<{
   (event: "close"): void;
 }>();
@@ -61,7 +68,7 @@ function onSubmit(data: SecretFormState) {
     :width="600"
     @close="emit('close')"
   >
-    <SecretForm @submit="onSubmit" />
+    <SecretForm :form-state="formState" @submit="onSubmit" />
 
     <template #footer>
       <VSpace>
