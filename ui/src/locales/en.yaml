@@ -1062,6 +1062,8 @@ core:
           title: Update profile
         change_password:
           title: Change password
+          grant_permission:
+            title: Assign roles
         profile:
           title: Profile
       fields:
