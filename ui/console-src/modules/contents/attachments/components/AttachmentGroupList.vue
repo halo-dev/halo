@@ -1,4 +1,5 @@
 <script lang="ts" setup>
+import HasPermission from "@/components/permission/HasPermission.vue";
 import type { Group } from "@halo-dev/api-client";
 import { IconAddCircle } from "@halo-dev/components";
 import { useQueryClient } from "@tanstack/vue-query";
@@ -25,7 +26,7 @@ const emit = defineEmits<{
 }>();
 
 const queryClient = useQueryClient();
-
+const isNewGroup = ref(false);
 const defaultGroups: Group[] = [
   {
     spec: {
@@ -67,10 +68,16 @@ const onCreationModalClose = () => {
   queryClient.invalidateQueries({ queryKey: ["attachment-groups"] });
   creationModalVisible.value = false;
 };
+
+const handleBadgeClick = () => {
+  creationModalVisible.value = true;
+  isNewGroup.value = true;
+};
 </script>
 <template>
   <AttachmentGroupEditingModal
     v-if="!readonly && creationModalVisible"
+    :is-new="isNewGroup"
     @close="onCreationModalClose"
   />
   <div
@@ -100,7 +107,7 @@ const onCreationModalClose = () => {
     >
       <AttachmentGroupBadge
         :features="{ actions: false }"
-        @click="creationModalVisible = true"
+        @click="handleBadgeClick"
       >
         <template #text>
           <span>{{ $t("core.common.buttons.new") }}</span>
