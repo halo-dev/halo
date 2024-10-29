@@ -11,9 +11,11 @@ import { useI18n } from "vue-i18n";
 const props = withDefaults(
   defineProps<{
     group?: Group;
+    isNew?: boolean;
   }>(),
   {
     group: undefined,
+    isNew: false,
   }
 );
 
@@ -44,15 +46,17 @@ const modalTitle = props.group
 const handleSave = async () => {
   try {
     isSubmitting.value = true;
-    const { data: groups } = await coreApiClient.storage.group.listGroup();
-    const hasDisplayNameDuplicate = groups.items.some(
-      (group) => group.spec.displayName === formState.value.spec.displayName
-    );
-    if (hasDisplayNameDuplicate) {
-      Toast.error(
-        t("core.attachment.group_editing_modal.toast.group_name_exists")
+    if (props.isNew) {
+      const { data: groups } = await coreApiClient.storage.group.listGroup();
+      const hasDisplayNameDuplicate = groups.items.some(
+        (group) => group.spec.displayName === formState.value.spec.displayName
       );
-      return;
+      if (hasDisplayNameDuplicate) {
+        Toast.error(
+          t("core.attachment.group_editing_modal.toast.group_name_exists")
+        );
+        return;
+      }
     }
 
     if (props.group) {

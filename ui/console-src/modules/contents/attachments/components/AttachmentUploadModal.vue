@@ -33,6 +33,8 @@ const selectedGroupName = useLocalStorage("attachment-upload-group", "");
 const selectedPolicyName = useLocalStorage("attachment-upload-policy", "");
 const policyEditingModal = ref(false);
 const groupEditingModal = ref(false);
+const isNewPolicy = ref(false);
+const isNewGroup = ref(false);
 const policyTemplateNameToCreate = ref();
 
 onMounted(() => {
@@ -41,12 +43,16 @@ onMounted(() => {
   }
 });
 
-const handleOpenCreateNewPolicyModal = (policyTemplate: PolicyTemplate) => {
+const handleOpenCreateNewPolicyModal = async (
+  policyTemplate: PolicyTemplate
+) => {
   policyTemplateNameToCreate.value = policyTemplate.metadata.name;
+  isNewPolicy.value = true;
   policyEditingModal.value = true;
 };
 
 const handleOpenCreateNewGroupModal = () => {
+  isNewGroup.value = true;
   groupEditingModal.value = true;
 };
 
@@ -177,11 +183,13 @@ const onGroupEditingModalClose = async () => {
   <AttachmentPolicyEditingModal
     v-if="policyEditingModal"
     :template-name="policyTemplateNameToCreate"
+    :is-new="isNewPolicy"
     @close="onEditingModalClose"
   />
 
   <AttachmentGroupEditingModal
     v-if="groupEditingModal"
+    :is-new="isNewGroup"
     @close="onGroupEditingModalClose"
   />
 </template>

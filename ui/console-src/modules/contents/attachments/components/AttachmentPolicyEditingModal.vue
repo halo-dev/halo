@@ -14,10 +14,12 @@ const props = withDefaults(
   defineProps<{
     policy?: Policy;
     templateName?: string;
+    isNew?: boolean;
   }>(),
   {
     policy: undefined,
     templateName: undefined,
+    isNew: false,
   }
 );
 
@@ -135,18 +137,20 @@ const submitting = ref(false);
 const handleSave = async () => {
   try {
     submitting.value = true;
-    const { data: policies } = await coreApiClient.storage.policy.listPolicy();
-    const hasDisplayNameDuplicate = policies.items.some(
-      (policy) => policy.spec.displayName === formState.value.spec.displayName
-    );
-
-    if (hasDisplayNameDuplicate) {
-      Toast.error(
-        t("core.attachment.policy_editing_modal.toast.policy_name_exists")
+    if (props.isNew) {
+      const { data: policies } =
+        await coreApiClient.storage.policy.listPolicy();
+      const hasDisplayNameDuplicate = policies.items.some(
+        (policy) => policy.spec.displayName === formState.value.spec.displayName
       );
-      return;
-    }
 
+      if (hasDisplayNameDuplicate) {
+        Toast.error(
+          t("core.attachment.policy_editing_modal.toast.policy_name_exists")
+        );
+        return;
+      }
+    }
     const configMapToUpdate = convertToSave();
 
     if (isUpdateMode) {
