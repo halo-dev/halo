@@ -3,8 +3,11 @@ import UserAvatar from "@/components/user-avatar/UserAvatar.vue";
 import { usePluginModuleStore } from "@/stores/plugin";
 import { useUserStore } from "@/stores/user";
 import { usePermission } from "@/utils/permission";
-import { consoleApiClient } from "@halo-dev/api-client";
+import type { User } from "@halo-dev/api-client";
+import { consoleApiClient, coreApiClient } from "@halo-dev/api-client";
 import {
+  Dialog,
+  Toast,
   VButton,
   VDropdown,
   VDropdownItem,
@@ -23,7 +26,8 @@ import {
   type Ref,
 } from "vue";
 import { useI18n } from "vue-i18n";
-import { useRoute } from "vue-router";
+import { useRoute, useRouter } from "vue-router";
+import GrantPermissionModal from "./components/GrantPermissionModal.vue";
 import UserEditingModal from "./components/UserEditingModal.vue";
 import UserPasswordChangeModal from "./components/UserPasswordChangeModal.vue";
 import DetailTab from "./tabs/Detail.vue";
@@ -34,9 +38,9 @@ const { currentUser } = useUserStore();
 
 const editingModal = ref(false);
 const passwordChangeModal = ref(false);
-
+const grantPermissionModal = ref<boolean>(false);
 const { params } = useRoute();
-
+const router = useRouter();
 const {
   data: user,
   isLoading,
@@ -97,12 +101,37 @@ const tabbarItems = computed(() => {
     }));
 });
 
+const handleDelete = async (userToDelete: User) => {
+  Dialog.warning({
+    title: t("core.user.operations.delete.title"),
+    description: t("core.common.dialog.descriptions.cannot_be_recovered"),
+    confirmType: "danger",
+    confirmText: t("core.common.buttons.confirm"),
+    cancelText: t("core.common.buttons.cancel"),
+    onConfirm: async () => {
+      try {
+        await coreApiClient.user.deleteUser({
+          name: userToDelete.metadata.name,
+        });
+        Toast.success(t("core.common.toast.delete_success"));
+        router.push({ name: "Users" });
+      } catch (e) {
+        console.error("Failed to delete user", e);
+      }
+    },
+  });
+};
+
 function handleRouteToUC() {
   window.location.href = "/uc";
 }
 
 function onPasswordChangeModalClose() {
   passwordChangeModal.value = false;
+  refetch();
+}
+function onGrantPermissionModalClose() {
+  grantPermissionModal.value = false;
   refetch();
 }
 </script>
@@ -117,6 +146,12 @@ function onPasswordChangeModalClose() {
     v-if="passwordChangeModal"
     :user="user?.user"
     @close="onPasswordChangeModalClose"
+  />
+
+  <GrantPermissionModal
+    v-if="grantPermissionModal"
+    :user="user?.user"
+    @close="onGrantPermissionModalClose"
   />
 
   <header class="bg-white">
@@ -153,6 +188,12 @@ function onPasswordChangeModalClose() {
               </VDropdownItem>
               <VDropdownItem @click="passwordChangeModal = true">
                 {{ $t("core.user.detail.actions.change_password.title") }}
+              </VDropdownItem>
+              <VDropdownItem @click="grantPermissionModal = true">
+                {{ $t("core.user.detail.actions.grant_permission.title") }}
+              </VDropdownItem>
+              <VDropdownItem type="danger" @click="handleDelete(user?.user)">
+                {{ $t("core.common.buttons.delete") }}
               </VDropdownItem>
             </template>
           </VDropdown>
