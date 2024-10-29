@@ -26,7 +26,9 @@ core:
       logout:
         tooltip: Logout
         title: Logout
-        description: Clicking Confirm will redirect to the logout page. Please ensure that the content you are editing is saved.
+        description: >-
+          Clicking Confirm will redirect to the logout page. Please ensure that
+          the content you are editing is saved.
       profile:
         tooltip: Profile
       visit_homepage:
@@ -598,6 +600,8 @@ core:
       fields:
         display_name:
           label: Display name
+      toast:
+        group_name_exists: Group name already exists
     group_list:
       internal_groups:
         all: All
@@ -643,6 +647,8 @@ core:
       fields:
         display_name:
           label: Display name
+      toast:
+        policy_name_exists: Storage policy name already exists
     upload_modal:
       title: Upload attachment
       filters:
@@ -666,8 +672,8 @@ core:
     empty:
       title: There are no attachments.
       message: >-
-        There are no attachments, you can try refreshing or
-        uploading attachments.
+        There are no attachments, you can try refreshing or uploading
+        attachments.
       actions:
         upload: Upload Attachment
     filters:
@@ -1457,7 +1463,9 @@ core:
         first: >-
           1. The restore process may last for a long time, please do not refresh
           the page during this period.
-        second: 2. Before performing the restore, all existing data will be cleared. Please ensure that there is no data that needs to be retained.
+        second: >-
+          2. Before performing the restore, all existing data will be cleared.
+          Please ensure that there is no data that needs to be retained.
         third: >-
           3. After the restore is completed, you need to restart Halo to load
           the system resources normally.
@@ -1673,7 +1681,9 @@ core:
       creation_label: Create {text} tag
     validation:
       trim: Please remove the leading and trailing spaces
-      password: "The password can only use uppercase and lowercase letters (A-Z, a-z), numbers (0-9), and the following special characters: !{'@'}#$%^&*"
+      password: >-
+        The password can only use uppercase and lowercase letters (A-Z, a-z),
+        numbers (0-9), and the following special characters: !{'@'}#$%^&*
     verification_form:
       no_action_defined: "{label} interface not defined"
       verify_success: "{label} successful"
@@ -1791,7 +1801,10 @@ core:
         editor_not_found: >-
           No editor found that matches the {raw_type} format. Please check if
           the editor plugin has been installed.
-        login_expired: The current session has expired. Click Confirm to go to the login page. Please ensure that the current content is saved. You can click Cancel to manually copy any unsaved content.
+        login_expired: >-
+          The current session has expired. Click Confirm to go to the login
+          page. Please ensure that the current content is saved. You can click
+          Cancel to manually copy any unsaved content.
     filters:
       results:
         keyword: "Keyword: {keyword}"
@@ -1832,7 +1845,9 @@ core:
         title: Cancel publish
       delete:
         title: Delete post
-        description: This action will move the post to the recycle bin, where it will be managed by the site administrator.
+        description: >-
+          This action will move the post to the recycle bin, where it will be
+          managed by the site administrator.
     publish_modal:
       title: Publish post
     setting_modal:

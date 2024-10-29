@@ -49,7 +49,9 @@ const handleSave = async () => {
       (group) => group.spec.displayName === formState.value.spec.displayName
     );
     if (hasDisplayNameDuplicate) {
-      Toast.error(t("core.common.toast.group_name_exists"));
+      Toast.error(
+        t("core.attachment.group_editing_modal.toast.group_name_exists")
+      );
       return;
     }
 

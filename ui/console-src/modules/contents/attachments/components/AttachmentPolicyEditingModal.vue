@@ -141,7 +141,9 @@ const handleSave = async () => {
     );
 
     if (hasDisplayNameDuplicate) {
-      Toast.error(t("core.common.toast.policy_name_exists"));
+      Toast.error(
+        t("core.attachment.policy_editing_modal.toast.policy_name_exists")
+      );
       return;
     }
 
