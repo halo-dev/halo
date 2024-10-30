@@ -26,7 +26,6 @@ const emit = defineEmits<{
 }>();
 
 const queryClient = useQueryClient();
-const isNewGroup = ref(false);
 const defaultGroups: Group[] = [
   {
     spec: {
@@ -68,16 +67,10 @@ const onCreationModalClose = () => {
   queryClient.invalidateQueries({ queryKey: ["attachment-groups"] });
   creationModalVisible.value = false;
 };
-
-const handleBadgeClick = () => {
-  creationModalVisible.value = true;
-  isNewGroup.value = true;
-};
 </script>
 <template>
   <AttachmentGroupEditingModal
     v-if="!readonly && creationModalVisible"
-    :is-new="isNewGroup"
     @close="onCreationModalClose"
   />
   <div
@@ -107,7 +100,7 @@ const handleBadgeClick = () => {
     >
       <AttachmentGroupBadge
         :features="{ actions: false }"
-        @click="handleBadgeClick"
+        @click="creationModalVisible = true"
       >
         <template #text>
           <span>{{ $t("core.common.buttons.new") }}</span>

@@ -14,12 +14,10 @@ const props = withDefaults(
   defineProps<{
     policy?: Policy;
     templateName?: string;
-    isNew?: boolean;
   }>(),
   {
     policy: undefined,
     templateName: undefined,
-    isNew: false,
   }
 );
 
@@ -137,7 +135,18 @@ const submitting = ref(false);
 const handleSave = async () => {
   try {
     submitting.value = true;
-    if (props.isNew) {
+    const configMapToUpdate = convertToSave();
+    if (isUpdateMode) {
+      await coreApiClient.configMap.updateConfigMap({
+        name: configMap.value.metadata.name,
+        configMap: configMapToUpdate,
+      });
+
+      await coreApiClient.storage.policy.updatePolicy({
+        name: formState.value.metadata.name,
+        policy: formState.value,
+      });
+    } else {
       const { data: policies } =
         await coreApiClient.storage.policy.listPolicy();
       const hasDisplayNameDuplicate = policies.items.some(
@@ -150,20 +159,6 @@ const handleSave = async () => {
         );
         return;
       }
-    }
-    const configMapToUpdate = convertToSave();
-
-    if (isUpdateMode) {
-      await coreApiClient.configMap.updateConfigMap({
-        name: configMap.value.metadata.name,
-        configMap: configMapToUpdate,
-      });
-
-      await coreApiClient.storage.policy.updatePolicy({
-        name: formState.value.metadata.name,
-        policy: formState.value,
-      });
-    } else {
       const { data: newConfigMap } =
         await coreApiClient.configMap.createConfigMap({
           configMap: configMapToUpdate,

@@ -11,11 +11,9 @@ import { useI18n } from "vue-i18n";
 const props = withDefaults(
   defineProps<{
     group?: Group;
-    isNew?: boolean;
   }>(),
   {
     group: undefined,
-    isNew: false,
   }
 );
 
@@ -46,7 +44,12 @@ const modalTitle = props.group
 const handleSave = async () => {
   try {
     isSubmitting.value = true;
-    if (props.isNew) {
+    if (props.group) {
+      await coreApiClient.storage.group.updateGroup({
+        name: formState.value.metadata.name,
+        group: formState.value,
+      });
+    } else {
       const { data: groups } = await coreApiClient.storage.group.listGroup();
       const hasDisplayNameDuplicate = groups.items.some(
         (group) => group.spec.displayName === formState.value.spec.displayName
@@ -57,14 +60,6 @@ const handleSave = async () => {
         );
         return;
       }
-    }
-
-    if (props.group) {
-      await coreApiClient.storage.group.updateGroup({
-        name: formState.value.metadata.name,
-        group: formState.value,
-      });
-    } else {
       await coreApiClient.storage.group.createGroup({
         group: formState.value,
       });

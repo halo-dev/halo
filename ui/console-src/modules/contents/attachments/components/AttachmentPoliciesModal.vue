@@ -40,17 +40,14 @@ const selectedPolicy = ref<Policy>();
 const selectedTemplateName = ref();
 
 const policyEditingModal = ref(false);
-const isNewPolicy = ref(false);
 
 const handleOpenEditingModal = (policy: Policy) => {
   selectedPolicy.value = policy;
-  isNewPolicy.value = false;
   policyEditingModal.value = true;
 };
 
 const handleOpenCreateNewPolicyModal = (policyTemplate: PolicyTemplate) => {
   selectedTemplateName.value = policyTemplate.metadata.name;
-  isNewPolicy.value = true;
   policyEditingModal.value = true;
 };
 
@@ -234,7 +231,6 @@ function getPolicyTemplateDisplayName(templateName: string) {
     v-if="policyEditingModal"
     :policy="selectedPolicy"
     :template-name="selectedTemplateName"
-    :is-new="isNewPolicy"
     @close="onEditingModalClose"
   />
 </template>
