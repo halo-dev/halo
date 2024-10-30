@@ -33,7 +33,9 @@ import run.halo.app.core.extension.endpoint.CustomEndpoint;
 import run.halo.app.core.extension.notification.NotifierDescriptor;
 import run.halo.app.core.extension.notification.ReasonType;
 import run.halo.app.extension.Comparators;
+import run.halo.app.extension.ExtensionUtil;
 import run.halo.app.extension.GroupVersion;
+import run.halo.app.extension.ListOptions;
 import run.halo.app.extension.MetadataUtil;
 import run.halo.app.extension.ReactiveExtensionClient;
 import run.halo.app.infra.utils.JsonUtils;
@@ -140,7 +142,12 @@ public class UserNotificationPreferencesEndpoint implements CustomEndpoint {
     }
 
     Mono<ReasonTypeNotifierMatrix> listReasonTypeNotifierMatrix(String username) {
-        return client.list(ReasonType.class, null, Comparators.defaultComparator())
+        var listOptions = ListOptions.builder()
+            .labelSelector()
+            .notExists(MetadataUtil.HIDDEN_LABEL)
+            .end()
+            .build();
+        return client.listAll(ReasonType.class, listOptions, ExtensionUtil.defaultSort())
             .map(ReasonTypeInfo::from)
             .collectList()
             .flatMap(reasonTypes -> client.list(NotifierDescriptor.class, null,
