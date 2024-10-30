@@ -998,6 +998,8 @@ core:
           title: 修改资料
         change_password:
           title: 修改密码
+        grant_permission:
+          title: 分配角色
         profile:
           title: 个人中心
       fields:
