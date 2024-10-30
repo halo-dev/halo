@@ -549,6 +549,8 @@ core:
       fields:
         display_name:
           label: 名稱
+      toast:
+        group_name_exists: 分組名稱已存在
     group_list:
       internal_groups:
         all: 全部
@@ -584,6 +586,8 @@ core:
       fields:
         display_name:
           label: 名稱
+      toast:
+        policy_name_exists: 儲存策略名稱已存在
     upload_modal:
       title: 上傳附件
       filters:

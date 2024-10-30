@@ -135,9 +135,7 @@ const submitting = ref(false);
 const handleSave = async () => {
   try {
     submitting.value = true;
-
     const configMapToUpdate = convertToSave();
-
     if (isUpdateMode) {
       await coreApiClient.configMap.updateConfigMap({
         name: configMap.value.metadata.name,
@@ -149,6 +147,18 @@ const handleSave = async () => {
         policy: formState.value,
       });
     } else {
+      const { data: policies } =
+        await coreApiClient.storage.policy.listPolicy();
+      const hasDisplayNameDuplicate = policies.items.some(
+        (policy) => policy.spec.displayName === formState.value.spec.displayName
+      );
+
+      if (hasDisplayNameDuplicate) {
+        Toast.error(
+          t("core.attachment.policy_editing_modal.toast.policy_name_exists")
+        );
+        return;
+      }
       const { data: newConfigMap } =
         await coreApiClient.configMap.createConfigMap({
           configMap: configMapToUpdate,

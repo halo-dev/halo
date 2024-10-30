@@ -41,7 +41,9 @@ onMounted(() => {
   }
 });
 
-const handleOpenCreateNewPolicyModal = (policyTemplate: PolicyTemplate) => {
+const handleOpenCreateNewPolicyModal = async (
+  policyTemplate: PolicyTemplate
+) => {
   policyTemplateNameToCreate.value = policyTemplate.metadata.name;
   policyEditingModal.value = true;
 };
@@ -143,7 +145,10 @@ const onGroupEditingModalClose = async () => {
           @click="selectedGroupName = group.metadata.name"
         />
 
-        <AttachmentGroupBadge @click="handleOpenCreateNewGroupModal">
+        <AttachmentGroupBadge
+          :features="{ actions: false }"
+          @click="handleOpenCreateNewGroupModal"
+        >
           <template #text>
             <span>{{ $t("core.common.buttons.new") }}</span>
           </template>
