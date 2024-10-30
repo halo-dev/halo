@@ -192,7 +192,11 @@ function onGrantPermissionModalClose() {
               <VDropdownItem @click="grantPermissionModal = true">
                 {{ $t("core.user.detail.actions.grant_permission.title") }}
               </VDropdownItem>
-              <VDropdownItem type="danger" @click="handleDelete(user?.user)">
+              <VDropdownItem
+                v-if="user?.user"
+                type="danger"
+                @click="handleDelete(user.user)"
+              >
                 {{ $t("core.common.buttons.delete") }}
               </VDropdownItem>
             </template>
