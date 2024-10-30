@@ -1063,7 +1063,7 @@ core:
         change_password:
           title: Change password
           grant_permission:
-            title: Assign roles
+            title: Grant permission
         profile:
           title: Profile
       fields:
