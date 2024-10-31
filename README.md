@@ -5,7 +5,6 @@
 </p>
 
 <p align="center"><b>Halo</b> [ˈheɪloʊ]，强大易用的开源建站工具。</p>
-
 <p align="center">
 <a href="https://github.com/halo-dev/halo/releases"><img alt="GitHub release" src="https://img.shields.io/github/release/halo-dev/halo.svg?style=flat-square&include_prereleases" /></a>
 <a href="https://hub.docker.com/r/halohub/halo"><img alt="Docker pulls" src="https://img.shields.io/docker/pulls/halohub/halo?style=flat-square" /></a>
@@ -19,6 +18,9 @@
 <a href="https://bbs.halo.run">社区</a>
 <a href="https://gitee.com/halo-dev">Gitee</a>
 <a href="https://t.me/halo_dev">Telegram 频道</a>
+</p>
+<p align="center">
+    <a href="https://market.aliyun.com/common/dashi/halo?userCode=kmemb8jp" target="_blank"><img src="https://img.alicdn.com/imgextra/i2/O1CN01H5JIwY1rZ0OobDjnJ_!!6000000005644-2-tps-1000-216.png" style="width: 250px; height: auto;" /></a>
 </p>
 
 [![Watch the video](https://www.halo.run/upload/halo-github-screenshot.png)](https://www.bilibili.com/video/BV15x4y1U7RU/?share_source=copy_web&vd_source=0ab6cf86ca512a363f04f18b86f55b86)
