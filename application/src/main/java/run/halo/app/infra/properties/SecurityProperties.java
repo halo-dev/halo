@@ -7,6 +7,7 @@ import java.time.Duration;
 import java.util.ArrayList;
 import java.util.List;
 import lombok.Data;
+import org.springframework.boot.actuate.autoconfigure.endpoint.web.CorsEndpointProperties;
 import org.springframework.security.web.server.header.ReferrerPolicyServerHttpHeadersWriter.ReferrerPolicy;
 import org.springframework.security.web.server.header.XFrameOptionsServerHttpHeadersWriter.Mode;
 
@@ -16,6 +17,8 @@ public class SecurityProperties {
     private final FrameOptions frameOptions = new FrameOptions();
 
     private final ReferrerOptions referrerOptions = new ReferrerOptions();
+
+    private final CorsOptions corsOptions = new CorsOptions();
 
     private final RememberMeOptions rememberMe = new RememberMeOptions();
 
@@ -40,6 +43,24 @@ public class SecurityProperties {
          * Whether two-factor authentication is disabled.
          */
         private boolean disabled;
+
+    }
+
+    @Data
+    public static class CorsOptions {
+
+        private boolean disabled;
+
+        private final List<CorsConfig> configs = new ArrayList<>();
+
+    }
+
+    @Data
+    public static class CorsConfig {
+
+        private String pathPattern;
+
+        private CorsEndpointProperties config;
 
     }
 
