@@ -20,7 +20,7 @@
 <a href="https://t.me/halo_dev">Telegram 频道</a>
 </p>
 <p align="center">
-    <a href="https://market.aliyun.com/common/dashi/halo?userCode=kmemb8jp" target="_blank"><img src="https://img.alicdn.com/imgextra/i2/O1CN01H5JIwY1rZ0OobDjnJ_!!6000000005644-2-tps-1000-216.png" alt="1Panel-dev%2FMaxKB | Aliyun" style="width: 250px; height: auto;" /></a>
+    <a href="https://market.aliyun.com/common/dashi/halo?userCode=kmemb8jp" target="_blank"><img src="https://img.alicdn.com/imgextra/i2/O1CN01H5JIwY1rZ0OobDjnJ_!!6000000005644-2-tps-1000-216.png" style="width: 250px; height: auto;" /></a>
 </p>
 
 [![Watch the video](https://www.halo.run/upload/halo-github-screenshot.png)](https://www.bilibili.com/video/BV15x4y1U7RU/?share_source=copy_web&vd_source=0ab6cf86ca512a363f04f18b86f55b86)
