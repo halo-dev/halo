@@ -9,9 +9,9 @@ body:
 
         **在提交之前，请检查：**
 
-        - 已经在 [issues](https://github.com/halo-dev/halo/issues) 列表中搜索了相关问题。
-        - 这是和 Halo 相关的特性，如果是非项目本身的问题，建议在 [Discussions](https://github.com/halo-dev/halo/discussions) 提交。
-        - 如果是插件和主题特性建议，请在对应的插件和主题仓库提交。
+        - [ ] 已经在 [issues](https://github.com/halo-dev/halo/issues) 列表中搜索了相关问题。
+        - [ ] 这是和 Halo 相关的特性，如果是非项目本身的问题，建议在 [Discussions](https://github.com/halo-dev/halo/discussions) 提交。
+        - [ ] 如果是插件和主题特性建议，请在对应的插件和主题仓库提交。
   - type: markdown
     id: environment
     attributes:

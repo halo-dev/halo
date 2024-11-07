@@ -10,10 +10,10 @@ body:
 
         **在提交之前，请检查：**
 
-        - 已经在 [issues](https://github.com/halo-dev/halo/issues) 列表中搜索了相关问题。
-        - 这是 Halo 项目本身存在的问题，如果是非项目本身的问题（如：安装部署问题），建议在 [Discussions](https://github.com/halo-dev/halo/discussions) 提交。
-        - 已经尝试过停用所有的插件，排除是插件导致的问题。
-        - 如果是插件和主题的问题，请在对应的插件和主题仓库提交。
+        - [ ] 已经在 [issues](https://github.com/halo-dev/halo/issues) 列表中搜索了相关问题。
+        - [ ] 这是 Halo 项目本身存在的问题，如果是非项目本身的问题（如：安装部署问题），建议在 [Discussions](https://github.com/halo-dev/halo/discussions) 提交。
+        - [ ] 已经尝试过停用所有的插件，排除是插件导致的问题。
+        - [ ] 如果是插件和主题的问题，请在对应的插件和主题仓库提交。
   - type: markdown
     id: environment
     attributes:
