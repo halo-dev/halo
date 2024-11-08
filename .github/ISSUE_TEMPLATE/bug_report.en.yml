@@ -10,7 +10,7 @@ body:
       options:
         - label: I have searched for related issues in the [issues](https://github.com/halo-dev/halo/issues) list.
           required: true
-        - label: This is an issue with the Halo project itself. If it is not an issue with the project itself(For example: Installation and deployment issues.), it is recommended to submit it in the [Discussions](https://github.com/halo-dev/halo/discussions).
+        - label: "This is an issue with the Halo project itself. If it is not an issue with the project itself(For example: Installation and deployment issues.), it is recommended to submit it in the [Discussions](https://github.com/halo-dev/halo/discussions)."
           required: true
         - label: I have tried disabling all plugins to rule out plugins as the cause of the problem.
           required: true
