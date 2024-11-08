@@ -2,18 +2,20 @@ name: Bug Report
 description: File a bug report
 labels: [bug]
 body:
-  - type: markdown
+  - type: checkboxes
     id: preface
     attributes:
-      value: |
-        Thank you for taking the time to fill out this issue report! Before we begin, we highly recommend reading through the [Open Source Guides](https://opensource.guide/), which will greatly improve our mutual efficiency.
-
-        **Before submitting, please check:**
-
-        - You have searched for related issues in the [issues](https://github.com/halo-dev/halo/issues) list.
-        - This is an issue with the Halo project itself. If it is not an issue with the project itself(For example: Installation and deployment issues.), it is recommended to submit it in the [Discussions](https://github.com/halo-dev/halo/discussions).
-        - You have tried disabling all plugins to rule out plugins as the cause of the problem.
-        - If it is an issue with plugins and themes, please submit it in the respective plugin and theme repositories.
+      label: Prerequisites
+      description: Thank you for taking the time to fill out this issue report! Before we begin, we highly recommend reading through the [Open Source Guides](https://opensource.guide/), which will greatly improve our mutual efficiency.
+      options:
+        - label: I have searched for related issues in the [issues](https://github.com/halo-dev/halo/issues) list.
+          required: true
+        - label: "This is an issue with the Halo project itself. If it is not an issue with the project itself(For example: Installation and deployment issues.), it is recommended to submit it in the [Discussions](https://github.com/halo-dev/halo/discussions)."
+          required: true
+        - label: I have tried disabling all plugins to rule out plugins as the cause of the problem.
+          required: true
+        - label: If it is an issue with plugins and themes, please submit it in the respective plugin and theme repositories.
+          required: true
   - type: markdown
     id: environment
     attributes:
