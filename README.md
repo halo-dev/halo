@@ -48,6 +48,10 @@ docker run -d --name halo -p 8090:8090 -v ~/.halo2:/root/.halo2 halohub/halo:2.2
 - 用户名：`demo`
 - 密码：`P@ssw0rd123..`
 
+## 专业版
+
+相比于社区版，Halo 专业版为用户提供了大量增强功能及技术支持服务，增强功能包括短信验证码注册登录、全站私有化、LDAP 登录、三方账号登录及自定义 LOGO 等。 [点击查看专业版详细介绍](https://www.lxware.cn/halo)。
+
 ## 生态
 
 可访问 [官方应用市场](https://www.halo.run/store/apps) 或 [awesome-halo 仓库](https://github.com/halo-sigs/awesome-halo) 查看适用于 Halo 2.x 的主题和插件。
