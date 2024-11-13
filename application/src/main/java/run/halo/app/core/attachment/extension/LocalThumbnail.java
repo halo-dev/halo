@@ -19,6 +19,7 @@ import run.halo.app.extension.GVK;
 @GVK(group = "storage.halo.run", version = "v1alpha1", kind = "LocalThumbnail",
     plural = "localthumbnails", singular = "localthumbnail")
 public class LocalThumbnail extends AbstractExtension {
+    public static final String UNIQUE_IMAGE_AND_SIZE_INDEX = "uniqueImageAndSize";
     public static final String REQUEST_TO_GENERATE_ANNO = "storage.halo.run/request-to-generate";
 
     @Schema(requiredMode = REQUIRED)
@@ -79,5 +80,14 @@ public class LocalThumbnail extends AbstractExtension {
 
     public enum Phase {
         PENDING, SUCCEEDED, FAILED
+    }
+
+    public static String uniqueImageAndSize(LocalThumbnail localThumbnail) {
+        return uniqueImageAndSize(localThumbnail.getSpec().getImageSignature(),
+            localThumbnail.getSpec().getSize());
+    }
+
+    public static String uniqueImageAndSize(String imageSignature, ThumbnailSize size) {
+        return imageSignature + "-" + size.name();
     }
 }

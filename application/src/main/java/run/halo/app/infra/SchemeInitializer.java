@@ -612,6 +612,14 @@ public class SchemeInitializer implements ApplicationListener<ApplicationContext
             );
         });
         schemeManager.register(LocalThumbnail.class, indexSpec -> {
+            // make sure image and size are unique
+            indexSpec.add(new IndexSpec()
+                .setUnique(true)
+                .setName(LocalThumbnail.UNIQUE_IMAGE_AND_SIZE_INDEX)
+                .setIndexFunc(simpleAttribute(LocalThumbnail.class,
+                    LocalThumbnail::uniqueImageAndSize)
+                )
+            );
             indexSpec.add(new IndexSpec()
                 .setName("spec.imageSignature")
                 .setIndexFunc(simpleAttribute(LocalThumbnail.class,
