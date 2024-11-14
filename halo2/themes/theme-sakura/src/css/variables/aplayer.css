@@ -1,0 +1,25 @@
+.aplayer {
+  --aplayer-color: #000;
+  --aplayer-background-color: #fff;
+  --aplayer-list-border: 1px solid #eee;
+  --aplayer-list-light-background-color: #e9e9e9;
+  --aplayer-list-top-border: 1px solid var(--aplayer-list-light-background-color);
+  --aplayer-list-author-color: #666;
+  --aplayer-body-miniswitcher-background-color: #e6e6e6;
+  --aplayer-lrc-text-shadow: -1px -1px 0 #fff;
+  --aplayer-list-hover-background-color: #efefef;
+}
+
+.dark {
+  & .aplayer {
+    --aplayer-color: #eee;
+    --aplayer-background-color: #232629;
+    --aplayer-list-border: none;
+    --aplayer-list-light-background-color: #31363b;
+    --aplayer-list-top-border: none;
+    --aplayer-list-author-color: eee;
+    --aplayer-body-miniswitcher-background-color: var(--aplayer-background-color);
+    --aplayer-lrc-text-shadow: -1px -1px 0 #989898;
+    --aplayer-list-hover-background-color: var(--theme-color);
+  }
+}

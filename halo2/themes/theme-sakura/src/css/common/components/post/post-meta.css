@@ -1,0 +1,31 @@
+.meta-container {
+  display: flex;
+  margin: 0;
+  font-size: 0.875rem;
+  padding: 1.125rem 0 0;
+
+  & .post-meta-item {
+    display: flex;
+    align-items: center;
+
+    & img {
+      width: 2.25rem;
+      height: 2.25rem;
+      border-radius: 100%;
+      margin-right: 0.75rem;
+      display: block;
+      object-fit: cover;
+    }
+
+    &:not(:last-child) {
+      &::after {
+        content: "·";
+        margin: 0 0.3125rem;
+      }
+    }
+  }
+
+  @mixin screens-md {
+    flex-wrap: wrap;
+  }
+}

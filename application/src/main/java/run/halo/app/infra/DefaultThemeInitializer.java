@@ -19,10 +19,13 @@ import run.halo.app.infra.utils.FileUtils;
 @Component
 public class DefaultThemeInitializer implements ApplicationListener<ApplicationStartedEvent> {
 
+    // 主题管理服务
     private final ThemeService themeService;
 
+    // 主题存储路径管理
     private final ThemeRootGetter themeRoot;
 
+    // 主题相关的配置信息
     private final ThemeProperties themeProps;
 
     public DefaultThemeInitializer(ThemeService themeService, ThemeRootGetter themeRoot,
@@ -32,6 +35,7 @@ public class DefaultThemeInitializer implements ApplicationListener<ApplicationS
         this.themeProps = haloProps.getTheme();
     }
 
+    // spring 启动的时候会被调用
     @Override
     public void onApplicationEvent(ApplicationStartedEvent event) {
         if (themeProps.getInitializer().isDisabled()) {
@@ -52,6 +56,7 @@ public class DefaultThemeInitializer implements ApplicationListener<ApplicationS
             var content = DataBufferUtils.read(new UrlResource(themeUrl),
                 DefaultDataBufferFactory.sharedInstance,
                 StreamUtils.BUFFER_SIZE);
+            // 安装主题，并且等待安装完成，核心方法
             var theme = themeService.install(content).block();
             log.info("Initialized default theme: {}", theme);
             // Because default active theme is default, we don't need to enabled it manually.

@@ -1,0 +1,29 @@
+.notice {
+  padding: 20px;
+  border: 1px dashed #ddd;
+  color: var(--color);
+  position: relative;
+  display: block;
+  background: var(--notice-background-color);
+  border-radius: 10px;
+  animation: main 0.6s;
+
+  & .notice-content {
+    display: contents;
+    vertical-align: middle;
+    width: 100%;
+  }
+
+  & .iconify {
+    top: 0;
+    color: #999;
+    font-size: 1.125em;
+    padding-right: 10px;
+    padding-bottom: 5px;
+  }
+
+  @mixin screens-md {
+    margin-top: 40px;
+    margin-bottom: 20px;
+  }
+}

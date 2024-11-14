@@ -1,0 +1,291 @@
+.entry-content {
+  margin-top: 1.25rem;
+  position: relative;
+
+  &::before,
+  &::after {
+    content: "";
+    display: table;
+    table-layout: fixed;
+  }
+
+  &::after {
+    clear: both;
+  }
+
+  & .begin {
+    float: left;
+    font-size: 3.6em;
+    line-height: 1em;
+    margin-right: 3px;
+    margin-top: 2px;
+    font-weight: 700;
+  }
+
+  & h2 {
+    &::after {
+      content: "\00B6";
+      position: absolute;
+      color: #ff6d6d;
+      font-family: serif;
+      padding-left: 6px;
+      font-size: 1em;
+    }
+  }
+
+  & h3 {
+    padding-bottom: 0.5em;
+    border-bottom: 1px dashed #ddd;
+    color: #7d7d7d;
+
+    &::after {
+      content: "#";
+    }
+  }
+
+  & h4 {
+    &::after {
+      content: "▌";
+    }
+  }
+
+  & h5 {
+    &::after {
+      content: "♯";
+    }
+  }
+
+  & h3,
+  & h4,
+  & h5 {
+    padding-left: 1em;
+
+    &::after {
+      left: 0;
+      position: absolute;
+      color: #ff6d6d;
+    }
+  }
+
+  & h1,
+  & h2,
+  & h3,
+  & h4,
+  & h5,
+  & h6 {
+    color: var(--entry-content-heading-color);
+  }
+
+  & a {
+    color: #e67474;
+    position: relative;
+
+    &:hover {
+      color: var(--theme-color);
+      text-decoration: none;
+
+      &::after {
+        transform: scaleX(1);
+        transform-origin: bottom left;
+      }
+    }
+
+    &::after {
+      content: "";
+      position: absolute;
+      width: 100%;
+      transform: scaleX(0);
+      height: 2px;
+      bottom: 0;
+      left: 0;
+      background-color: var(--theme-color);
+      transform-origin: bottom right;
+      transition: transform 0.25s ease-out;
+    }
+
+    & img {
+      &.alignleft,
+      &.alignright,
+      &.aligncenter {
+        cursor: -webkit-zoom-in;
+      }
+    }
+  }
+
+  & p {
+    color: var(--entry-content-text-color);
+    line-height: 1.875em;
+  }
+
+  & hr {
+    margin-top: 2.5em;
+    margin-bottom: 2.5em;
+    display: block;
+    border: 0;
+    text-align: center;
+    background: 0 0;
+
+    &::before {
+      content: "...";
+      display: inline-block;
+      margin-left: 0.6em;
+      color: rgba(0, 0, 0, 0.8);
+      position: relative;
+      top: -1.875em;
+      font-size: 1.75em;
+      letter-spacing: 0.6em;
+    }
+  }
+
+  & code:not(.hljs) {
+    background: #fefac7;
+    color: #e67474;
+    word-break: break-word;
+    font-family: Source Code Pro, monospace;
+    padding: 2px;
+    text-shadow: none;
+    border-radius: 5px;
+  }
+
+  & > ol,
+  & > ul {
+    border: 1px dashed #ddd;
+  }
+
+  & ol,
+  & ul {
+    color: var(--entry-content-list-color);
+    margin-left: 0;
+    border-radius: 10px;
+    padding-inline-start: 30px;
+
+    & li {
+      margin: 1em 0;
+    }
+  }
+
+  & ul {
+    list-style: disc;
+  }
+
+  & ol {
+    list-style: decimal;
+
+    & ol {
+      list-style: lower-alpha;
+
+      & ol {
+        list-style: lower-roman;
+
+        & ol {
+          list-style: decimal;
+        }
+      }
+    }
+  }
+
+  & p,
+  & ul,
+  & ol {
+    transition: color 1s;
+  }
+
+  & .post-password-form {
+    text-align: center;
+  }
+
+  & .wp-smiley {
+    border: none;
+    margin-bottom: 0;
+    margin-top: 0;
+    padding: 0;
+  }
+
+  & .table-wrapper {
+    overflow: auto;
+    color: var(--entry-content-table-color);
+
+    &::-webkit-scrollbar {
+      height: 4px;
+      width: 4px;
+    }
+
+    &::-webkit-scrollbar-track-piece {
+      background: transparent;
+    }
+
+    &::-webkit-scrollbar-thumb {
+      background: rgba(176, 176, 176, 0.4);
+      cursor: pointer;
+      border-radius: 2px;
+
+      &:hover {
+        background: #b0b0b0;
+      }
+    }
+
+    & > table {
+      border-collapse: collapse;
+      overflow: auto;
+      max-width: 100%;
+      margin-right: 0.5rem;
+      vertical-align: text-top;
+
+      & th {
+        background-color: rgba(0, 0, 0, 0.1);
+      }
+
+      & tr {
+        word-break: keep-all;
+
+        &:nth-child(2n) {
+          background-color: var(--background-color);
+        }
+      }
+
+      & td,
+      & th {
+        padding: 0.5em 1em;
+        border: 1px solid #ddd;
+        line-height: 1.5;
+        font-size: 0.9em;
+      }
+
+      & tbody {
+        & > tr {
+          transition: all 0.28s ease;
+
+          &:hover {
+            background-color: rgba(0, 0, 0, 0.2);
+          }
+        }
+      }
+    }
+  }
+
+  & mark {
+    & > .mark-text {
+      mix-blend-mode: difference;
+    }
+  }
+
+  @mixin screens-md {
+    & p {
+      font-size: 0.875em;
+    }
+
+    & .begin {
+      margin-top: 6px;
+    }
+  }
+}
+
+.serif {
+  & .entry-content {
+    & h2 {
+      &::after {
+        font-size: 1.13em;
+      }
+    }
+  }
+}

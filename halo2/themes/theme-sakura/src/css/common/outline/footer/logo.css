@@ -1,0 +1,23 @@
+.footer-logo {
+  & p {
+    margin-bottom: 8px;
+    width: 2rem;
+    height: 2rem;
+    opacity: 0.8;
+    margin: 0 auto;
+    background-size: cover;
+    background-position: center center;
+    background-repeat: no-repeat;
+    animation: poi-deg 12s infinite linear;
+  }
+}
+
+@keyframes poi-deg {
+  0% {
+    transform: rotate(0deg);
+  }
+
+  100% {
+    transform: rotate(360deg);
+  }
+}

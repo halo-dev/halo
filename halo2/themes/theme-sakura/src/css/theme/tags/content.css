@@ -1,0 +1,38 @@
+.tag-wordcloud-container {
+  position: relative;
+  left: calc((100% - 100vw) / 2);
+
+  & .wordcloud {
+    width: 100vw;
+    height: 500px;
+  }
+}
+
+.tags-content {
+  margin: 50px 0;
+
+  & .tag-title {
+    margin-bottom: 10px;
+    color: var(--card-container-title-color);
+    font-size: 1.75rem;
+    font-weight: 400;
+  }
+
+  & .tag-chips {
+    margin: 1rem auto 0.5rem;
+    max-width: 850px;
+    text-align: center;
+
+    & .tag-length {
+      color: #9b8b2a;
+      margin-top: 0px;
+      margin-left: 5px;
+      margin-right: -2px;
+      font-size: 0.9rem;
+    }
+  }
+
+  @mixin screens-md {
+    margin: 20px 0;
+  }
+}

@@ -1,0 +1,20 @@
+<style type="text/css" th:inline="css" th:fragment="variables-moments">
+  .moment-container {
+    --single-bg-and-btn-color: /*[(${theme.config.journal.journal_color_bg_1})]*/ ;
+    --single-font-color: /*[(${theme.config.journal.journal_color_font_1})]*/ ;
+
+    --double-bg-and-btn-color: /*[(${theme.config.journal.journal_color_bg_2})]*/ ;
+    --double-font-color:  /*[(${theme.config.journal.journal_color_font_2})]*/ ;
+
+    [# th:if="${not #strings.isEmpty(theme.config.journal.journal_bg)}"]
+      [# th:if="${theme.config.journal.journal_bg_blur}"]
+        --single-bg-and-btn-color: linear-gradient(60deg, rgba(255, 165, 150, 0.5) 5%, rgba(0, 228, 255, 0.35) 95%) 0% 0% / cover, url(/*[(${theme.config.journal.journal_bg})]*/) 0% 0% / cover;
+        --double-bg-and-btn-color: linear-gradient(60deg, rgba(255, 165, 150, 0.5) 5%, rgba(0, 228, 255, 0.35) 95%) 0% 0% / cover, url(/*[(${theme.config.journal.journal_bg})]*/) 0% 0% / cover;
+      [/]
+      [# th:unless="${theme.config.journal.journal_bg_blur}"]
+        --single-bg-and-btn-color: url(/*[(${theme.config.journal.journal_bg})]*/) 0% 0% / cover;
+        --double-bg-and-btn-color: url(/*[(${theme.config.journal.journal_bg})]*/) 0% 0% / cover;
+      [/]
+    [/]
+  }
+</style>

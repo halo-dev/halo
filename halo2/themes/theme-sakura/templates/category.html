@@ -1,0 +1,39 @@
+<!--/* 分类页面 */-->
+<!DOCTYPE html>
+<html
+  xmlns:th="https://www.thymeleaf.org"
+  th:replace="~{layout :: layout(_title = ~{::title}, _header = ~{::header}, _content = ~{::content})}"
+>
+  <th:block th:fragment="title">
+    <th:block th:text="${category.spec.displayName} + '|' + ${site.title}"></th:block>
+  </th:block>
+
+  <th:block th:fragment="header">
+    <div class="category-header">
+      <th:block th:replace="~{macro/page-header :: page-header(extension = ${category}, frontCover = ${category.spec.cover}, headerTitle = ~{::headerTitle})}" />
+    </div>
+  </th:block>
+
+  <th:block th:fragment="headerTitle">
+    <!--/* 具有背景图的情况下，分类和标签的标题样式问题 */-->
+    <h1 class="cat-title" data-i18n="page.categories.item_title" th:i18n-options="|{ title: '${category.spec.displayName}' }|"></h1>
+    <span class="cat-des" th:text="${category.spec.description}"></span>
+  </th:block>
+
+  <th:block th:fragment="content">
+    <div id="primary" th:with="postItems=${posts.items}">
+      <main id="main" class="site-main" role="main">
+        <th:block th:if="${posts.totalPages gt 0}">
+          <th:block th:each="post : ${postItems}">
+            <th:block th:replace="~{macro/content :: content(${post})}" />
+          </th:block>
+          <div class="clearer"></div>
+        </th:block>
+        <th:block th:unless="${posts.totalPages gt 0}">
+          <th:block th:replace="~{macro/content-none}" />
+        </th:block>
+      </main>
+      <th:block th:replace="~{module/list-pagination :: pagination(${posts})}"></th:block>
+    </div>
+  </th:block>
+</html>

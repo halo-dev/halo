@@ -5,5 +5,5 @@ pluginManagement {
     }
 }
 
-rootProject.name = 'halo'
+rootProject.name = 'ahri-cool'
 include 'api', 'application', 'platform:application', 'platform:plugin', 'ui'

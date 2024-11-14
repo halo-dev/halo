@@ -1,0 +1,113 @@
+<!--/*-->
+NEXT / PREVIOUS POSTS
+<!--*/-->
+<th:block th:fragment="post-nextprev(post)">
+  <th:block th:if="${theme.config.post.post_nepre}">
+    <section th:with="postCursor = ${postFinder.cursor(post.metadata.name)}" class="post-pagination">
+      <div th:if="${postCursor.hasPrevious()}" class="pagination-container previous">
+        <a
+          data-pjax
+          th:href="@{${postCursor.previous.status.permalink}}"
+          rel="prev"
+          aria-label="request for the previous page of the article"
+        >
+          <img
+            th:if="${not #strings.isEmpty(postCursor.previous.spec.cover)}"
+            class="lazyload"
+            th:src="${#theme.assets('/images/load/orange.progress-bar-stripe-loader.svg')}"
+            th:data-src="${postCursor.previous.spec.cover}"
+            alt="The cover picture of the previous content"
+            height="160"
+            width="390"
+            onerror="imgError(this)"
+          />
+          <img
+            th:if="${#strings.isEmpty(postCursor.previous.spec.cover)} and ${theme.config.random_image.rimage_cover_open} and ${#annotations.getOrDefault(post, 'randomImage', true)} and ${not #strings.isEmpty(theme.config.random_image.rimage_url)}"
+            th:with="randomUrl = |${theme.config.random_image.rimage_url}?${_templateId}id=${postCursor.previous.metadata.name}&${theme.config.random_image.rimage_custom_param_name}=${postCursor.previous.metadata.name}&type=url&itype=${theme.config.random_image.rimage_cover_itype}${theme.config.random_image.rimage_cover_itype != 'image' ? '&id=' + theme.config.random_image.rimage_cover_id : ''}${#strings.isEmpty(theme.config.random_image.rimage_other_params) ? '' : '&' + theme.config.random_image.rimage_other_params}|"
+            th:src="${theme.config.random_image.rimage_cover_lqip == 'loading' ? #theme.assets('/images/load/orange.progress-bar-stripe-loader.svg') : (randomUrl + (#strings.isEmpty(theme.config.random_image.rimage_cover_lqip_params) ? '' : '&' + theme.config.random_image.rimage_cover_lqip_params))}"
+            th:data-srcset="|
+            ${randomUrl}&th=400 400w,
+            ${randomUrl}&th=960 960w,
+            ${randomUrl}&th=1280 1280w,
+            ${randomUrl}&th=1440 1440w,
+            ${randomUrl}&th=1920 1920w
+            |"
+            data-sizes="auto"
+            class="lazyload"
+            th:classappend="${theme.config.random_image.rimage_cover_lqip == 'lowquality' ? 'blur-up' : ''}"
+            alt="The cover picture of the previous content"
+            height="160"
+            width="390"
+            onerror="imgError(this)"
+          />
+          <img
+            th:if="${#strings.isEmpty(postCursor.previous.spec.cover)} and (!${theme.config.random_image.rimage_cover_open} or !${#annotations.getOrDefault(post, 'randomImage', true)} or ${#strings.isEmpty(theme.config.random_image.rimage_url)})"
+            class="lazyload"
+            th:src="${#theme.assets('/images/load/orange.progress-bar-stripe-loader.svg')}"
+            th:data-src="${#theme.assets('/images/default/temp.webp')}"
+            alt="The cover picture of the previous content"
+            height="160"
+            width="390"
+            onerror="imgError(this)"
+          />
+          <span class="label" data-i18n="post.prev"></span>
+          <div class="info">
+            <h3 th:text="${postCursor.previous.spec.title}"></h3>
+          </div>
+        </a>
+      </div>
+      <div th:if="${postCursor.hasNext()}" class="pagination-container next">
+        <a
+          data-pjax
+          th:href="@{${postCursor.next.status.permalink}}"
+          rel="next"
+          aria-label="request for the next page of the article"
+        >
+          <img
+            th:if="${not #strings.isEmpty(postCursor.next.spec.cover)}"
+            class="lazyload"
+            th:src="${#theme.assets('/images/load/orange.progress-bar-stripe-loader.svg')}"
+            th:data-src="${postCursor.next.spec.cover}"
+            alt="The cover picture of the next content"
+            height="160"
+            width="390"
+            onerror="imgError(this)"
+          />
+          <img
+            th:if="${#strings.isEmpty(postCursor.next.spec.cover)} and ${theme.config.random_image.rimage_cover_open} and ${#annotations.getOrDefault(post, 'randomImage', true)} and ${not #strings.isEmpty(theme.config.random_image.rimage_url)}"
+            th:with="randomUrl = |${theme.config.random_image.rimage_url}?${_templateId}id=${postCursor.next.metadata.name}&${theme.config.random_image.rimage_custom_param_name}=${postCursor.next.metadata.name}&type=url&itype=${theme.config.random_image.rimage_cover_itype}${theme.config.random_image.rimage_cover_itype != 'image' ? '&id=' + theme.config.random_image.rimage_cover_id : ''}${#strings.isEmpty(theme.config.random_image.rimage_other_params) ? '' : '&' + theme.config.random_image.rimage_other_params}|"
+            th:src="${theme.config.random_image.rimage_cover_lqip == 'loading' ? #theme.assets('/images/load/orange.progress-bar-stripe-loader.svg') : (randomUrl + (#strings.isEmpty(theme.config.random_image.rimage_cover_lqip_params) ? '' : '&' + theme.config.random_image.rimage_cover_lqip_params))}"
+            th:data-srcset="|
+          ${randomUrl}&th=400 400w,
+          ${randomUrl}&th=960 960w,
+          ${randomUrl}&th=1280 1280w,
+          ${randomUrl}&th=1440 1440w,
+          ${randomUrl}&th=1920 1920w
+          |"
+            data-sizes="auto"
+            class="lazyload"
+            th:classappend="${theme.config.random_image.rimage_cover_lqip == 'lowquality' ? 'blur-up' : ''}"
+            alt="The cover picture of the next content"
+            height="160"
+            width="390"
+            onerror="imgError(this)"
+          />
+          <img
+            th:if="${#strings.isEmpty(postCursor.next.spec.cover)} and (!${theme.config.random_image.rimage_cover_open} or !${#annotations.getOrDefault(post, 'randomImage', true)} or ${#strings.isEmpty(theme.config.random_image.rimage_url)})"
+            class="lazyload"
+            th:src="${#theme.assets('/images/load/orange.progress-bar-stripe-loader.svg')}"
+            th:data-src="${#theme.assets('/images/default/temp.webp')}"
+            alt="The cover picture of the next content"
+            height="160"
+            width="390"
+            onerror="imgError(this)"
+          />
+          <span class="label" data-i18n="post.next"></span>
+          <div class="info">
+            <h3 th:text="${postCursor.next.spec.title}"></h3>
+          </div>
+        </a>
+      </div>
+    </section>
+  </th:block>
+</th:block>

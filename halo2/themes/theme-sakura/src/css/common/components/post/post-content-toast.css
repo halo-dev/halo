@@ -1,0 +1,52 @@
+.word_count {
+  margin: 0;
+}
+
+.minicode {
+  box-shadow: 0 1px 2px rgb(0 0 0 / 20%);
+  border-radius: 5px;
+  margin: 0.625em 0;
+  display: flex;
+  align-items: center;
+  color: var(--minicode-color);
+
+  & a {
+    padding: 5px;
+  }
+
+  & .content-toast {
+    display: block;
+    padding: 0.5em 0.5em 0.5em 1em;
+    height: 1.25em;
+    word-break: keep-all;
+    white-space: nowrap;
+    overflow: hidden;
+    width: 95%;
+    transition: width, padding 0.5s ease;
+    overflow-x: auto;
+  }
+
+  & .hide-minicode {
+    line-height: inherit;
+    cursor: pointer;
+    padding-right: 5px;
+  }
+
+  &:hover {
+    transform: scale(1.01);
+    transition: all 0.5s ease;
+  }
+
+  &.hide {
+    margin: 0;
+    
+    & .content-toast {
+      height: 0;
+      padding: 0;
+    }
+
+    & .hide-minicode {
+      display: none;
+    }
+  }
+}

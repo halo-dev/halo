@@ -1,0 +1,61 @@
+.author-profile {
+  margin: 3rem 0;
+  text-align: center;
+
+  & .info {
+    overflow: hidden;
+    text-align: center;
+
+    & .profile {
+      display: inline-block;
+
+      & img {
+        width: 4.375rem;
+        height: 4.375rem;
+        padding: 3px;
+        border: 1px solid #ddd;
+        border-radius: 100%;
+        object-fit: cover;
+      }
+    }
+
+    & .meta {
+      display: block;
+      text-align: center;
+
+      & h3 {
+        margin: 0.625rem 0 0;
+        text-transform: none;
+
+        & a {
+          display: block;
+          font-size: 1.125rem;
+          font-weight: 400;
+          line-height: normal;
+          letter-spacing: 1px;
+          color: #b0b0b0;
+        }
+      }
+    }
+  }
+
+  & p {
+    font-size: 0.815rem;
+    margin: 1rem 0 0;
+    color: #7d8588;
+    letter-spacing: 0;
+    display: inline-block;
+    padding: 1rem;
+    border-top: 1px solid #eee;
+    border-bottom: 1px solid #eee;
+
+    & .iconify {
+      color: var(--theme-color);
+      margin-right: 0.625em;
+    }
+  }
+
+  @mixin screens-md {
+    display: none;
+  }
+}

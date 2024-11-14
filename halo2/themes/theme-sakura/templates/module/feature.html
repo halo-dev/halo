@@ -1,0 +1,38 @@
+<div class="top-feature" th:if="${not #arrays.isEmpty(theme.config.focus.features)}" th:fragment="feature">
+  <h1 class="fes-title" style="font-family: 'Ubuntu', sans-serif">
+    <span
+      th:if="${not #strings.isEmpty(theme.config.focus.feature_icon)}"
+      class="iconify"
+      th:data-icon="${theme.config.focus.feature_icon}"
+    ></span>
+    <span
+      th:if="${not #strings.isEmpty(theme.config.focus.feature_title)}"
+      th:text="${theme.config.focus.feature_title}"
+    ></span>
+    <span th:if="${#strings.isEmpty(theme.config.focus.feature_title)}" data-i18n="home.feature.title"></span>
+  </h1>
+
+  <div class="top-feature-inner">
+    <div class="top-feature-item" th:each="feature : ${theme.config.focus.features}">
+      <div class="feature-container">
+        <a data-pjax th:href="${feature.link}" target="_blank" aria-label="visit the concentrated content">
+          <img
+            th:src="${feature.image}"
+            th:alt="${feature.title}"
+            alt="cover picture of focusing on content"
+            width="780"
+            height="160"
+          />
+          <div class="info">
+            <h3>
+              <span th:text="${feature.title}"></span>
+            </h3>
+            <p>
+              <span th:text="${feature.description}"></span>
+            </p>
+          </div>
+        </a>
+      </div>
+    </div>
+  </div>
+</div>

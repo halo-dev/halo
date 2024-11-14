@@ -1,0 +1,139 @@
+.post-share {
+  float: right;
+  list-style: none;
+  margin-right: 1.25rem;
+
+  &:hover {
+    & .show-share,
+    & .share-hidden {
+      opacity: 1;
+      display: inline-block;
+    }
+  }
+
+  & img {
+    &:hover {
+      opacity: 0.8;
+    }
+  }
+
+  & ul {
+    list-style: none;
+    opacity: 0;
+    display: none;
+    margin: 0;
+    vertical-align: middle;
+    position: relative;
+    transition: opacity 0.4s ease-out;
+
+    & li {
+      & i {
+        font-size: 1.25rem;
+      }
+
+      & a {
+        &:hover {
+          color: var(--theme-color);
+        }
+      }
+    }
+  }
+
+  & li {
+    float: left;
+    margin-right: 1.875rem;
+
+    & img {
+      width: 1.125rem;
+      height: 1.125rem;
+      display: block;
+    }
+  }
+
+  & .social-share {
+    opacity: 0;
+    display: none;
+  }
+
+  & .show-share {
+    cursor: pointer;
+    opacity: 0.6;
+    transition: opacity 0.1s ease-out;
+    color: var(--theme-color);
+  }
+
+  @mixin screens-md {
+    display: none;
+  }
+}
+
+.post-share {
+  & .s-wechat {
+    position: relative;
+
+    &:hover {
+      & .wechat-qrcode {
+        display: block;
+      }
+    }
+
+    & .wechat-qrcode {
+      display: none;
+      border-radius: 5px;
+      border: 1px solid #eee;
+      position: absolute;
+      top: -215px;
+      left: -95px;
+      width: 200px;
+      height: 192px;
+      color: var(--color);
+      font-size: 12px;
+      text-align: center;
+      background-color: var(--background-color);
+      box-shadow: 0 2px 10px #b0b0b0;
+      transition: all 200ms;
+
+      &::after {
+        content: "";
+        position: absolute;
+        left: 50%;
+        margin-left: -6px;
+        bottom: -13px;
+        width: 0;
+        height: 0;
+        border-width: 8px 6px 6px 6px;
+        border-style: solid;
+        border-color: #fff transparent transparent transparent;
+      }
+
+      & h4 {
+        font-weight: normal;
+        height: 26px;
+        line-height: 26px;
+        font-size: 12px;
+        background-color: #fff;
+        margin: 0;
+        padding: 0;
+        color: #7d7d7d;
+      }
+
+      & img {
+        width: auto;
+        height: auto;
+      }
+
+      & .qrcode {
+        margin: 1px auto;
+      }
+
+      & .help {
+        & p {
+          font-weight: normal;
+          line-height: 16px;
+          padding: 0;
+          margin: 0;
+        }
+      }
+    }
+  }
+}

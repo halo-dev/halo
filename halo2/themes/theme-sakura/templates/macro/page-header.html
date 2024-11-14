@@ -1,0 +1,64 @@
+<!--/*
+  * 页面头部
+  * extension Halo 模型
+  * frontCover 封面图
+  * headerTitle 页面标题
+  * id 可选，每个模型唯一 id，不传入则默认取 extension.metadata.name
+  * isRandomImage 可选,是否使用随机图. 不传则默认取 annotations 下的 randomImage 属性
+  */-->
+<div class="page-header" 
+  th:fragment="page-header(extension, frontCover)" 
+  th:with="randomCoverAvailable = ${(isRandomImage == null ? #annotations.getOrDefault(extension, 'randomImage', true) : isRandomImage) and not #strings.isEmpty(theme.config.random_image.rimage_url) and (_templateId == 'post' ? theme.config.random_image.rimage_cover_open : theme.config.random_image.rimage_cover_sheet_open)}" 
+  th:classappend="${((not #strings.isEmpty(frontCover)) or randomCoverAvailable) ? 'is-decorate' : ''}">
+  <th:block>
+    <div
+      class="pattern-center single-center no-select"
+      th:if="${not #strings.isEmpty(frontCover) || randomCoverAvailable}"
+    >
+      <div class="pattern-attachment-img" itemscope itemtype="http://schema.org/ImageGallery">
+        <!--/* 优先使用自定义封面图 */-->
+        <th:block th:if="${not #strings.isEmpty(frontCover)}">
+          <img
+            class="lazyload"
+            th:attr="data-src=${frontCover}"
+            th:src="${#theme.assets('/images/load/orange.progress-bar-stripe-loader.svg')}"
+            itemprop="contentUrl"
+            alt="large picture of the cover"
+            width="1920"
+            height="400"
+          />
+        </th:block>
+
+        <!--/* 随机图 */-->
+        <th:block
+          th:if="${#strings.isEmpty(frontCover) && randomCoverAvailable}"
+          th:with="randomImage = |${theme.config.random_image.rimage_url}?${_templateId}id=${id != null ? id : extension.metadata.name}&${theme.config.random_image.rimage_custom_param_name}=${id != null ? id : extension.metadata.name}&type=url&itype=${theme.config.random_image.rimage_cover_itype}${theme.config.random_image.rimage_cover_itype != 'image' ? '&id=' + theme.config.random_image.rimage_cover_id : ''}${#strings.isEmpty(theme.config.random_image.rimage_other_params) ? '' : '&' + theme.config.random_image.rimage_other_params}|"
+        >
+          <img
+            th:src="${theme.config.random_image.rimage_cover_lqip == 'loading' ? #theme.assets('/images/load/orange.progress-bar-stripe-loader.svg') : (randomImage + (#strings.isEmpty(theme.config.random_image.rimage_cover_lqip_params) ? '' : '&' + theme.config.random_image.rimage_cover_lqip_params))}"
+            th:data-srcset="|
+            ${randomImage}&th=640 640w,
+            ${randomImage}&th=960 960w,
+            ${randomImage}&th=1280 1280w,
+            ${randomImage}&th=1440 1440w,
+            ${randomImage}&th=1920 1920w
+            |"
+            th:class="lazyload"
+            th:classappend="${theme.config.random_image.rimage_cover_lqip == 'lowquality' ? 'blur-up' : ''}"
+            onerror="imgError(this)"
+            itemprop="contentUrl"
+            alt="large picture of the cover"
+            width="1920"
+            height="400"
+          />
+        </th:block>
+      </div>
+    </div>
+  </th:block>
+  <th:block th:if="${headerTitle != null}">
+    <div class="pattern-title" itemprop="name headline">
+      <!--/* 标题需要支持国际化方案 */-->
+      <th:block th:replace="${headerTitle}" />
+    </div>
+  </th:block>
+</div>

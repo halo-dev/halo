@@ -1,0 +1,23 @@
+apiVersion: theme.halo.run/v1alpha1
+kind: Theme
+spec:
+  customTemplates:
+    page:
+      - name: 友情链接
+        description: 支持可预设文本的友链
+        screenshot: 
+        file: page_links.html
+  displayName: Sakura
+  author:
+    name: LIlGG
+    website: https://lixingyong.com
+  description: Halo 2.x 版本樱花🌸主题
+  logo: /themes/theme-sakura/assets/images/search/iloli.gif
+  website: https://github.com/LIlGG/halo-theme-sakura
+  repo: https://github.com/LIlGG/halo-theme-sakura.git
+  settingName: theme-sakura-setting
+  configMapName: theme-sakura-configMap
+  version: 2.4.0
+  require: ">=2.11.0"
+metadata:
+  name: theme-sakura

@@ -1,0 +1,52 @@
+<th:block th:fragment="mobile-sidebar">
+  <div class="mobile-sidebar">
+    <div class="avatar">
+      <img
+        th:src="${site.logo ?: #theme.assets('/images/default/avatar.webp')}"
+        alt="site logo"
+        width="90"
+        height="90"
+      />
+    </div>
+
+    <p
+      th:if="${not #strings.isEmpty(theme.config.mainScreen.glitch_text)}"
+      class="glitch-text"
+      th:text="${theme.config.mainScreen.glitch_text}"
+    ></p>
+
+    <th:block th:if="${theme.config.mainScreen.focus_infos and not #lists.isEmpty(theme.config.sns.mobile_items)}">
+      <p class="socials">
+        <a
+          class="social-item"
+          th:each="item : ${theme.config.sns.mobile_items}"
+          th:href="${item.url}"
+          target="_blank"
+          aria-label="access the webmaster's social media accounts"
+        >
+          <th:block th:if="${item.type == 'preset'}">
+            <img th:src="@{/assets/images/sns/{icon}(icon=${item.icon})}" width="18" height="18" alt="sns" />
+          </th:block>
+          <th:block th:if="${item.type == 'custom'}">
+            <img th:src="${item.custom_icon}" width="18" height="18" alt="sns" />
+          </th:block>
+        </a>
+      </p>
+    </th:block>
+
+    <!--/* <div class="search">
+      <form class="search-form" method="get" action="/search" role="search">
+        <input class="m-search-input" type="search" name="keyword" placeholder="搜索..." required />
+      </form>
+    </div> */-->
+
+    <th:block th:replace="~{module/header/menu}"></th:block>
+    <div class="footer">
+      <p>
+        ©
+        <th:block th:text="${#dates.format(new java.util.Date().getTime(), 'yyyy')}" />
+        <th:block th:text="${site.title}"></th:block>
+      </p>
+    </div>
+  </div>
+</th:block>

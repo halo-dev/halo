@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html
+  xmlns:th="https://www.thymeleaf.org"
+  th:replace="~{layout :: layout(_title = ~{::title}, _header = ~{::header}, _content = ~{::content})}"
+>
+  <th:block th:fragment="title">
+    <th:block th:text="${title} + '|' + ${site.title}"></th:block>
+  </th:block>
+
+  <th:block th:fragment="header">
+    <th:block
+      th:replace="~{macro/page-header :: page-header(extension=${moments}, frontCover=${theme.config.patternimg.journals_patternimg}, headerTitle = ~{::headerTitle}, id='moments', isRandomImage=true)}"
+    />
+  </th:block>
+
+  <th:block th:fragment="headerTitle">
+    <h1 th:text="${title}"></h1>
+  </th:block>
+
+  <th:block th:fragment="content">
+    <span class="moment-container">
+      <img
+        class="lazyload avatar"
+        th:data-src="${moment.owner.avatar != null ? moment.owner.avatar : #theme.assets('/images/default/avatar.webp')}"
+        th:alt="${moment.owner.displayName}"
+        onerror="imgError(this)"
+        th:src="${#theme.assets('/images/load/trans.ajax-spinner-preloader.svg')}"
+        width="48"
+        height="48"
+      />
+      <div class="moment-inner">
+        <span class="moment-content">
+          <th:block th:utext="${moment.spec.content.html}"></th:block>
+        </span>
+        <div
+          class="moment-medium fancybox-content"
+          th:if="${not #lists.isEmpty(moment.spec.content.medium)}"
+          th:classappend="|medium-${#lists.size(moment.spec.content.medium)}|"
+        >
+          <th:block th:each="momentItem : ${moment.spec.content.medium}">
+            <img
+              class="lazyload"
+              th:if="${momentItem.type.name == 'PHOTO'}"
+              th:src="${#strings.isEmpty(momentItem.url) ? #theme.assets('/images/load/load.gif') : momentItem.url}"
+              th:data-src="${momentItem.url}"
+              width="400"
+              height="400"
+              alt="moment picture"
+            />
+            <video
+              th:if="${momentItem.type.name == 'VIDEO'}"
+              th:src="${momentItem.url}"
+              width="400"
+              height="400"
+            ></video>
+          </th:block>
+        </div>
+        <div class="moment-footer">
+          <div class="moment-time">
+            <th:block th:with="momentHour=${#dates.hour(moment.spec.releaseTime)}">
+              <th:block th:if="${momentHour >= 5 and momentHour < 8}">
+                <span class="iconify moment-time-icon" data-icon="mdi:weather-sunset-up"></span>
+              </th:block>
+              <th:block th:if="${momentHour >= 8 and momentHour < 18}">
+                <span class="iconify moment-time-icon" data-icon="mdi:weather-sunny"></span>
+              </th:block>
+              <th:block th:if="${momentHour >= 18 and momentHour < 20}">
+                <span class="iconify moment-time-icon" data-icon="mdi:weather-sunset-down"></span>
+              </th:block>
+              <th:block th:if="${momentHour >= 20 or momentHour < 5}">
+                <span class="iconify moment-time-icon" data-icon="mdi:weather-night"></span>
+              </th:block>
+            </th:block>
+            <time
+              data-i18n="page.moments.time"
+              th:i18n-options="|{
+                'time': '${moment.spec.releaseTime}',
+                'params': { 
+                  'separator': '-', 
+                  'options': { 
+                    'year': 'numeric', 
+                    'month': '2-digit', 
+                    'day': '2-digit', 
+                    'hour': 'numeric', 
+                    'minute': 'numeric', 
+                    'second': 'numeric' 
+                  } 
+                } 
+              }|"
+              th:data-datetime="${moment.spec.releaseTime}"
+              itemprop="dateCreated datePublished"
+            >
+            </time>
+          </div>
+          <!-- 评论内容 -->
+          <div class="moment-tools">
+            <span th:if="${haloCommentEnabled and theme.config.journal.journal_comment}" class="comment-js noselect">
+              <span class="iconify" data-icon="solar:chat-dots-outline"></span>
+              <span class="noticom" th:text="${moment.stats.totalComment}"></span>
+            </span>
+            <span
+              th:if="${theme.config.journal.journal_likes}"
+              class="moment-like noselect"
+              th:data-links="${moment.stats.upvote}"
+            >
+              <span class="iconify" data-icon="solar:like-broken"></span>
+              <span class="moment-like-text" th:text="${moment.stats.upvote}"></span>
+            </span>
+          </div>
+        </div>
+        <div th:if="${haloCommentEnabled and theme.config.journal.journal_comment}" class="comment-box">
+          <!--/* 评论组件 */-->
+          <th:block
+            th:replace="~{module/comment :: comment(group = 'moment.halo.run', kind = 'Moment', name = ${moment.metadata.name})}"
+          />
+        </div>
+      </div>
+    </span>
+  </th:block>
+</html>

@@ -1,0 +1,18 @@
+<th:block th:fragment="search-inner">
+  <form class="js-search-modal search-form search-form-modal" method="get" action="/search" role="search">
+    <div class="search-form-inner">
+      <p data-i18n="search.search_modal.title"></p>
+      <div class="search-form-input">
+        <span class="iconify icon-search" data-icon="solar:magnifer-outline"> </span>
+        <input
+          class="text-input js-search-input"
+          type="search"
+          name="keyword"
+          data-i18n="[placeholder]search.search_modal.placeholder"
+          required
+        />
+      </div>
+    </div>
+    <div class="search-close"></div>
+  </form>
+</th:block>

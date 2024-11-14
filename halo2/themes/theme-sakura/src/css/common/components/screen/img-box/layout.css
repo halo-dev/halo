@@ -1,0 +1,54 @@
+.centerbg {
+  width: 100%;
+  height: var(--first-screen-height);
+  margin: 0;
+  padding: 0;
+  position: relative;
+
+  @mixin screens-md {
+    height: 18.75rem;
+    background-attachment: scroll;
+  }
+
+  & .cover-bg {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+
+  & .blend-overlay {
+    position: absolute;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    left: 0;
+    opacity: 0.3;
+    mix-blend-mode: hard-light;
+    background: var(--first-screen-background-blend-overlay);
+  }
+}
+
+.focusinfo {
+  position: relative;
+  z-index: 2;
+  text-align: center;
+  height: 100%;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  transition: 0.4s ease all;
+
+  & img {
+    width: 8.125rem;
+    height: 8.125rem;
+    padding: 2px;
+    border-radius: 100%;
+  }
+
+  @mixin screens-md {
+    display: none;
+  }
+}

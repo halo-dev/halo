@@ -1,0 +1,60 @@
+<!--/* 首页随机图使用 style 实现，详见 decorate.html*/-->
+<figure id="centerbg" class="centerbg" th:fragment="imgbox">
+  <th:block
+    th:if="${theme.config.random_image.rimage_cover_back_open and (not #strings.isEmpty(theme.config.random_image.rimage_url))}"
+  >
+    <img
+      th:with="
+      imageUrl = |${theme.config.random_image.rimage_url}?home=home&type=url&itype=${theme.config.random_image.rimage_cover_back_itype}${theme.config.random_image.rimage_cover_back_itype != 'image' ? '&id=' + theme.config.random_image.rimage_cover_back_id : ''}${#strings.isEmpty(theme.config.random_image.rimage_other_params) ? '' : '&' + theme.config.random_image.rimage_other_params}|,
+      randomNum = |${theme.config.random_image.rimage_cover_back_num != 0 ? ((T(java.lang.Math).random() * 10) % theme.config.random_image.rimage_cover_back_num).intValue() : #strings.randomAlphanumeric(1)}|
+      "
+      th:src="|${imageUrl}${#strings.isEmpty(theme.config.random_image.rimage_cover_lqip_params) ? '' : '&' + theme.config.random_image.rimage_cover_lqip_params}&t=${randomNum}|"
+      th:data-src="|${imageUrl}&t=${randomNum}|"
+      th:data-url="${imageUrl}"
+      th:data-currIndex="${randomNum}"
+      class="lazyload cover-bg lazyload blur-up bg-change-js"
+      alt="background picture of the home page"
+      width="1920"
+      height="1080"
+      onerror="imgError(this)"
+    />
+    <div class="blend-overlay"></div>
+  </th:block>
+  <th:block
+    th:unless="${theme.config.random_image.rimage_cover_back_open and (not #strings.isEmpty(theme.config.random_image.rimage_url))}"
+  >
+    <img
+      class="cover-bg"
+      th:src="${theme.config.mainScreen.focus_img_1 ?: #theme.assets('/images/default/hd.webp')}"
+      alt="background picture of the home page"
+      width="1920"
+      height="1080"
+    />
+  </th:block>
+
+  <div class="focusinfo">
+    <th:block th:replace="~{module/home/focus_tou}"></th:block>
+    <div
+      class="header-info no-select"
+      th:classappend="${#strings.isEmpty(site.subtitle) ? '' : 'info-desc'}"
+      th:if="${theme.config.mainScreen.focus_infos and (not #strings.isEmpty(site.subtitle) or not #arrays.isEmpty(theme.config.sns.items))}"
+    >
+      <p th:if="${not #strings.isEmpty(site.subtitle)}">
+        <span class="iconify" data-icon="fa:quote-left"></span>
+        <span class="desc" th:text="${site.subtitle}"></span>
+        <span class="iconify" data-icon="fa:quote-right"></span>
+      </p>
+      <div class="top-social" th:if="${not #arrays.isEmpty(theme.config.sns.items)}">
+        <ul>
+          <li id="bg-prev">
+            <img class="flipx" th:src="@{/assets/images/next-b.svg}" alt="prev" width="28" height="28" />
+          </li>
+          <th:block th:replace="~{module/home/top_social}"></th:block>
+          <li id="bg-next">
+            <img th:src="@{/assets/images/next-b.svg}" alt="next" width="28" height="28" />
+          </li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</figure>

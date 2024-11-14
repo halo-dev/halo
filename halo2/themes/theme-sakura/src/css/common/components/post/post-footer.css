@@ -1,0 +1,139 @@
+.post-footer {
+  & .single-reward {
+    position: relative;
+    width: 100%;
+    margin: 2.25rem auto;
+    text-align: center;
+    z-index: 1;
+
+    & .reward-open {
+      position: relative;
+      width: 2.5rem;
+      height: 2.5rem;
+      font-size: 1.125rem;
+      color: #fff;
+      line-height: 2.5rem;
+      display: inline-block;
+      border-radius: 100%;
+      background: #d34836;
+      cursor: pointer;
+
+      &:hover {
+        & .reward-main {
+          display: block !important;
+        }
+      }
+    }
+
+    & .reward-main {
+      position: absolute;
+      left: -9.375rem;
+      margin: 0;
+      padding: 1rem 0 0;
+      background: 0 0;
+      display: none;
+      animation: main 0.4s;
+    }
+
+    & .reward-row {
+      margin: 0;
+      background: #fff;
+      display: flex;
+      border-radius: 4px;
+      cursor: auto;
+      padding: 1rem;
+
+      &::before {
+        content: "";
+        width: 0;
+        height: 0;
+        border-left: 0.8125rem solid transparent;
+        border-right: 0.8125rem solid transparent;
+        border-bottom: 0.8125rem solid #fff;
+        position: absolute;
+        top: 0.3rem;
+        left: 0;
+        right: 0;
+        margin: 0 auto;
+      }
+
+      & li {
+        list-style-type: none;
+        padding: 0 0.75rem;
+        display: inline-block;
+
+        & img {
+          width: 8.125rem;
+          max-width: 8.125rem;
+          border-radius: 3px;
+          position: relative;
+        }
+
+        & .reward-name {
+          display: block;
+          line-height: normal;
+          font-size: 0.8125rem;
+          color: #504e4e;
+        }
+      }
+    }
+  }
+
+  & .post-footer-meta {
+    padding-top: 1.25rem;
+    padding-bottom: 1.875rem;
+    border-bottom: 1px dashed #ddd;
+    border-top: 1px dashed #ddd;
+    margin-top: 1.875rem;
+  }
+
+  @mixin screens-md {
+    & p {
+      font-size: 0.875rem;
+    }
+
+    & .post-footer-meta {
+      display: none;
+    }
+  }
+}
+
+.post-license {
+  text-align: center;
+  padding-bottom: 5px;
+  font-size: 0.875rem;
+
+  & a {
+    color: #b0b0b0;
+
+    &:hover {
+      color: #888;
+    }
+  }
+}
+
+.post-tags {
+  float: left;
+  font-size: 0.8125rem;
+  color: #b0b0b0;
+  text-transform: uppercase;
+
+  & a {
+    color: #b0b0b0;
+    margin-right: 5px;
+
+    &:hover {
+      color: var(--threme-color);
+    }
+  }
+
+  & svg {
+    margin-right: 5px;
+  }
+
+  @mixin screens-md {
+    text-align: center;
+    float: none;
+    font-size: 0.75rem;
+  }
+}

@@ -2,7 +2,7 @@ version: "3"
 
 services:
   halo:
-    image: hub.docker.com/sexyahri/ahri-cool
+    image: sexyahri/ahri-cool
     restart: on-failure:3
     depends_on:
       halodb:

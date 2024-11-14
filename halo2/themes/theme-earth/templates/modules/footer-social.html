@@ -1,0 +1,60 @@
+<div th:with="social_medias = ${theme.config.footer.social_media}" class="mt-4 flex justify-center space-x-6 sm:mt-0">
+  <th:block th:each="social_media : ${social_medias}">
+    <a
+      th:if="${social_media.url_type == 'normal'}"
+      th:href="${social_media.url}"
+      class="text-gray-500 hover:text-gray-900 dark:hover:text-white"
+      th:title="${social_media.name}"
+    >
+      <div th:classappend="${social_media.icon}" class="h-5 w-5"></div>
+    </a>
+    <span
+      th:if="${social_media.url_type == 'image'}"
+      x-data="{openImageModal:false}"
+      class="cursor-pointer text-gray-500 hover:text-gray-900 dark:hover:text-white"
+    >
+      <div th:classappend="${social_media.icon}" class="h-5 w-5" @click="openImageModal = true"></div>
+      <div>
+        <div
+          class="fixed inset-0 z-50 bg-gray-800/40 opacity-100 backdrop-blur-sm dark:bg-black/80"
+          aria-hidden="true"
+          x-show="openImageModal"
+          x-transition:enter="ease-in-out duration-300"
+          x-transition:enter-start="opacity-0"
+          x-transition:enter-end="opacity-100"
+          x-transition:leave="ease-in-out duration-300"
+          x-transition:leave-start="opacity-100"
+          x-transition:leave-end="opacity-0"
+        ></div>
+        <div
+          class="fixed inset-0 z-50 overflow-y-auto"
+          tabindex="-1"
+          x-show="openImageModal"
+          x-transition:enter="ease-out duration-200"
+          x-transition:enter-start="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95"
+          x-transition:enter-end="opacity-100 translate-y-0 sm:scale-100"
+          x-transition:leave="ease-in duration-100"
+          x-transition:leave-start="opacity-100 translate-y-0 sm:scale-100"
+          x-transition:leave-end="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95"
+        >
+          <div class="flex min-h-full flex-col items-center justify-center p-4 text-center sm:p-0">
+            <div
+              @click.outside="openImageModal = false"
+              class="relative transform overflow-hidden rounded-lg bg-white px-4 pb-4 pt-5 text-left shadow-xl transition-all sm:my-8 sm:w-full sm:max-w-sm sm:p-6"
+            >
+              <img th:src="${social_media.url}" />
+            </div>
+            <div>
+              <div
+                @click="openImageModal = false"
+                class="group inline-flex items-center justify-center rounded-full bg-white p-1.5"
+              >
+                <i class="i-tabler-x block text-gray-600 group-hover:text-gray-900"></i>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </span>
+  </th:block>
+</div>

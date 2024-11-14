@@ -1,0 +1,9 @@
+/**
+* 全局变量表，使用 w3c 标准语法。
+* 如果具有多个相同命名的变量，则依据变量作用域确定优先级。
+*/
+@import "layout.css";
+
+@import "moments.css";
+
+@import "aplayer.css";

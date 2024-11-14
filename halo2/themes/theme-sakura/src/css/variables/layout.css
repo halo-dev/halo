@@ -1,0 +1,130 @@
+:root {
+  /* 主题色 */
+  --theme-color: orange;
+  /* 主题亮度 */
+  --theme-brightness: 1;
+
+  /* layout - content */
+  --site-content-max-width: 780px;
+  --site-content-background-color: rgba(255, 255, 255, 0.8);
+
+  /* 加载图 */
+  --loading-image: none;
+
+  /* 鼠标样式 */
+  --cursor-link: pointer;
+  --cursor-link-active: inherit;
+  --cursor-text: inherit;
+  --cursor-normal: inherit;
+  --cursor-hover: inherit;
+
+  /* 回到顶部 */
+  --cd-top-image: none no-repeat center;
+  --cd-top-display: block;
+  --mobile-cd-top-display: none;
+  --mobile-cd-top-bottom: 70px;
+
+  /* 标准文章列表 */
+  --standard-post-list-border-radius: 0;
+
+  /* 第一屏 */
+  --first-screen-height: 100vh;
+  --first-screen-after: none;
+  --first-screen-filter-images: none;
+  --first-screen-background-blend-overlay: none;
+  --first-screen-header-info-text-color: #eaeadf;
+  --first-screen-header-info-background-color: rgba(0, 0, 0, 0.5);
+
+  /* header */
+  --header-height: 4.6875rem;
+  --yya-header-top: 0;
+  --header-background: #fff;
+
+  --body-color: #464646;
+  --color: #666;
+  --background-color: #fff;
+  --header-user-option-hover-background-color: #fff;
+
+  /* 公告通知 */
+  --notice-background-color: #fbfbfb50;
+
+  /* 首页分割线 */
+  --home-divider-border: 1px dashed #eee;
+
+  /* 文章列表 */
+  --post-list-thumb-box-shadow: 0 1px 20px -6px rgba(0, 0, 0, 0.5);
+  --post-list-thumb-title-color: #504e4e;
+  --post-list-thumb-meta-color: #505050;
+  --post-list-thumb-abstract-color: rgba(0, 0, 0, 0.66);
+  --post-list-thumb-more-color: #666;
+
+  /* 小工具控件 */
+  --widget-background-color: #fff;
+  --theme-item-background-color: #fff;
+
+  /* 移动端控件 */
+  --mobile-nav-toggle-background-color: var(--theme-color);
+  --mobile-menu-text-color: #333;
+
+  /* minicode */
+  --minicode-color: #000;
+
+  /* 内容主体 */
+  --entry-content-text-color: #7d7d7d;
+  --entry-content-heading-color: #000;
+  --entry-content-list-color: #666;
+  --entry-content-table-color: #000;
+  --entry-content-pre-white-space: var(--pre-white-space, pre);
+
+  /* card */
+  --card-container-box-shadow: 0 -15px 35px rgba(50, 50, 93, 0.1), 0 5px 15px rgba(0, 0, 0, 0.07);
+  --card-container-title-color: #34495e;
+
+  /* photo */
+  --photo-group-change-color: #ccc;
+  --photo-group-change-active-color: #222;
+
+  /* links */
+  --links-description-color: #999;
+}
+
+.dark {
+  --theme-brightness: 0.7;
+  --body-color: #eee;
+  --header-background: rgba(49, 54, 59, 0.85);
+  --header-user-option-hover-background-color: #31363b;
+  --color: #eee;
+  --background-color: #31363b;
+  --first-screen-background-blend-overlay: var(--background-color);
+  --first-screen-header-info-text-color: #fff;
+  --first-screen-header-info-background-color: rgba(0, 0, 0, 0.7);
+  --notice-background-color: #222;
+  --home-divider-border: 6px dotted #535a63;
+  --post-list-thumb-box-shadow: 0 1px 35px -8px rgba(0, 0, 0, 0.8);
+  --post-list-thumb-title-color: #b0b0b0;
+  --post-list-thumb-meta-color: #888;
+  --post-list-thumb-abstract-color: #b0b0b0;
+  --post-list-thumb-more-color: #888;
+  --widget-background-color: rgba(38, 38, 38, 0.8);
+  --theme-item-background-color: #31363b;
+  --mobile-menu-text-color: #eee;
+  --entry-content-heading-color: #ccc;
+  --entry-content-text-color: #ffffffcc;
+  --entry-content-list-color: #ffffffcc;
+  --entry-content-table-color: #ffffffcc;
+  --card-container-box-shadow: 0 1px 35px -8px rgba(0, 0, 0, 0.8);
+  --card-container-title-color: #ccc;
+  --photo-group-change-color: #222;
+  --photo-group-change-active-color: #ccc;
+  --links-description-color: #b0b0b0;
+  --site-content-background-color: transparent;
+}
+
+.video-container {
+  --video-play-image: none;
+  --video-pause-image: none;
+}
+
+.search-form {
+  --search-form-image: none;
+}

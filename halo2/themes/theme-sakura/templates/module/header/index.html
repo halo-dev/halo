@@ -1,0 +1,17 @@
+<th:block th:fragment="header">
+  <div class="header-before">
+    <th:block th:replace="~{module/header/nav-toggle}"></th:block>
+    <th:block th:replace="~{module/header/brand}"></th:block>
+  </div>
+  <div class="header-content">
+    <div class="lower-container">
+      <div class="lower">
+        <th:block th:replace="~{module/header/menu}"></th:block>
+      </div>
+    </div>
+  </div>
+  <div class="header-after">
+    <th:block th:replace="~{module/header/search}"></th:block>
+    <th:block th:replace="~{module/header/user}"></th:block>
+  </div>
+</th:block>

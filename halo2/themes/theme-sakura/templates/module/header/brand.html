@@ -1,0 +1,11 @@
+<!--/* 站点个人信息 */-->
+<div class="site-branding" th:fragment="brand">
+  <div th:if="${not #strings.isEmpty(site.logo)} and ${theme.config.general.site_title == 'logo'}" class="site-title">
+    <a data-pjax th:href="${site.url}" aria-label="access the homepage of this website">
+      <img th:src="${site.logo}" th:alt="${site.title}" height="40" width="40"/>
+    </a>
+  </div>
+  <h1 th:if="${#strings.isEmpty(site.logo)} or ${theme.config.general.site_title == 'text'}" class="site-title">
+    <a data-pjax th:href="${site.url}" th:text="${site.title}" aria-label="access the homepage of this website"></a>
+  </h1>
+</div>

@@ -56,8 +56,11 @@ public class ThemeServiceImpl implements ThemeService {
 
     private final Scheduler scheduler = Schedulers.boundedElastic();
 
+    // Mono 是一个异步的返回，相当于future对象
+    // Mono.block() 可以等待事件完成
     @Override
     public Mono<Theme> install(Publisher<DataBuffer> content) {
+        // 这里会返回 ~/.halo2/themes 这个目录
         var themeRoot = this.themeRoot.get();
         return unzipThemeTo(content, themeRoot, scheduler)
             .flatMap(this::persistent);

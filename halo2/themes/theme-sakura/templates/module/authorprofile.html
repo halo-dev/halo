@@ -1,0 +1,25 @@
+<th:block th:fragment="authorprofile(post)">
+  <section th:if="${theme.config.post.author_profile}" class="author-profile">
+    <div class="info" itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <a th:href="${post.owner.permalink}" class="profile gravatar" aria-label="visiting the author's website of the current article">
+        <img
+          th:src="${post.owner.avatar ?: #theme.assets('/images/default/avatar.webp')}"
+          itemprop="image"
+          th:alt="${post.owner.displayName}"
+          width="70"
+          height="70"
+        />
+      </a>
+      <div class="meta">
+        <h3 itemprop="name">
+          <a th:href="${site.url}" itemprop="url" rel="author" th:text="${post.owner.displayName}" aria-label="website address"></a>
+        </h3>
+      </div>
+    </div>
+    <p>
+      <span class="iconify" data-icon="solar:pen-line-duotone"></span>
+      <span th:if="${not #strings.isEmpty(post.owner.bio)}" th:text="${post.owner.bio}" itemprop="description" ></span>
+      <span th:unless="${not #strings.isEmpty(post.owner.bio)}" data-i18n="user.description"></span>
+    </p>
+  </section>
+</th:block>

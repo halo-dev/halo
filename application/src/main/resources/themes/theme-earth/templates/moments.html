@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html
+  xmlns:th="https://www.thymeleaf.org"
+  th:replace="~{modules/layout :: html(title = '瞬间 - ' + ${site.title}, hero = null, content = ~{::content}, head = null, footer = null, sidebar = ~{::sidebar}, contentClass = '')}"
+>
+  <th:block th:fragment="content">
+    <div class="rounded-xl bg-white p-4 dark:bg-slate-800">
+      <h1 class="mb-9 text-2xl font-medium dark:text-slate-50">瞬间</h1>
+      <div class="mb-8">
+        <nav class="flex flex-wrap gap-4" aria-label="Tabs">
+          <a
+            th:href="@{/moments}"
+            class="rounded bg-gray-100 px-1 py-0.5 text-sm text-gray-900 hover:bg-gray-200 dark:bg-slate-600 dark:text-slate-50 dark:hover:bg-slate-700 dark:hover:text-slate-100"
+            th:classappend="${#lists.isEmpty(param.tag) ? '!bg-gray-200 dark:!bg-slate-700 dark:!text-slate-100 ring-2 ring-gray-300 dark:ring-slate-600' : ''}"
+          >
+            <span>全部</span>
+          </a>
+          <a
+            th:each="tag : ${tags}"
+            th:href="@{|?tag=${tag.name}|}"
+            class="rounded bg-gray-100 px-1 py-0.5 text-sm text-gray-900 hover:bg-gray-200 dark:bg-slate-600 dark:text-slate-50 dark:hover:bg-slate-700 dark:hover:text-slate-100"
+            th:classappend="${#lists.contains(param.tag, tag.name) ? '!bg-gray-200 dark:!bg-slate-700 dark:!text-slate-100 ring-2 ring-gray-300 dark:ring-slate-600' : ''}"
+          >
+            <span th:text="|#${tag.name}|"></span>
+            <sup th:text="${tag.momentCount}"></sup>
+          </a>
+        </nav>
+      </div>
+      <div>
+        <ul
+          role="list"
+          class="divide-y divide-gray-100 dark:divide-slate-700"
+          x-data="upvote('moment','moment.halo.run','moments')"
+        >
+          <li
+            th:each="moment : ${moments.items}"
+            th:attr="x-data=|{name:'${moment.metadata.name}',showComment:false}|"
+            th:with="content=${moment.spec.content}"
+            class="animated fadeIn flex w-full items-start gap-2 py-5"
+          >
+            <img 
+              th:src="${moment.owner.avatar ?: #theme.assets('/images/default-avatar.svg')}"
+              th:title="${moment.owner.displayName}"
+              th:alt="${moment.owner.displayName}"
+              class="h-12 w-12 rounded-full"
+            />
+            <div class="ml-6" style="width: calc(100% - 4.75rem)">
+              <div
+                th:utext="${content.html}"
+                class="moment-content prose prose-base !max-w-none break-words dark:prose-invert prose-pre:p-0"
+              ></div>
+              <div
+                th:unless="${#lists.isEmpty(moment.spec.content.medium)}"
+                class="moment-media mt-4 grid w-full grid-cols-3 gap-2 sm:w-1/2"
+              >
+                <div class="aspect-h-1 aspect-w-1" th:each="media : ${moment.spec.content.medium}">
+                  <img
+                    th:if="${#strings.equals(media.type,'PHOTO')}"
+                    class="transform-gpu rounded-lg object-cover"
+                    th:src="${media.url}"
+                  />
+                  <div
+                    th:if="${#strings.equals(media.type,'VIDEO')}"
+                    x-data="{openVideoModal:false}"
+                    class="aspect-h-1 aspect-w-1"
+                  >
+                    <video th:src="${media.url}" class="rounded-lg object-cover"></video>
+                    <div
+                      th:if="${#strings.equals(media.type,'VIDEO')}"
+                      class="absolute flex h-full w-full cursor-pointer items-center justify-center rounded-lg bg-gray-50 opacity-50 transition-all hover:opacity-70"
+                      @click="openVideoModal = true"
+                    >
+                      <i class="i-tabler-play !h-7 !w-7"></i>
+                    </div>
+                    <template x-teleport="body">
+                      <div>
+                        <div
+                          class="fixed inset-0 z-50 bg-gray-800/40 opacity-100 backdrop-blur-sm"
+                          aria-hidden="true"
+                          x-show="openVideoModal"
+                          x-transition:enter="ease-in-out duration-300"
+                          x-transition:enter-start="opacity-0"
+                          x-transition:enter-end="opacity-100"
+                          x-transition:leave="ease-in-out duration-300"
+                          x-transition:leave-start="opacity-100"
+                          x-transition:leave-end="opacity-0"
+                        ></div>
+                        <div
+                          class="fixed inset-0 z-50 overflow-y-auto"
+                          tabindex="-1"
+                          x-show="openVideoModal"
+                          x-transition:enter="ease-out duration-200"
+                          x-transition:enter-start="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95"
+                          x-transition:enter-end="opacity-100 translate-y-0 sm:scale-100"
+                          x-transition:leave="ease-in duration-100"
+                          x-transition:leave-start="opacity-100 translate-y-0 sm:scale-100"
+                          x-transition:leave-end="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95"
+                        >
+                          <div class="flex min-h-full flex-col items-center justify-center p-4 text-center sm:p-0">
+                            <div
+                              @click.outside="openVideoModal = false"
+                              class="relative my-4 transform overflow-hidden rounded-lg bg-white text-left shadow-xl transition-all sm:w-full sm:max-w-xl"
+                            >
+                              <video th:src="${media.url}" class="w-full" controls></video>
+                            </div>
+                            <div>
+                              <div
+                                @click="openVideoModal = false"
+                                class="group inline-flex items-center justify-center rounded-full bg-white p-1.5"
+                              >
+                                <i class="i-tabler-x block text-gray-600 group-hover:text-gray-900"></i>
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    </template>
+                  </div>
+                </div>
+              </div>
+              <div class="mt-3 flex items-center gap-4">
+                <div
+                  class="inline-flex cursor-pointer items-center text-sm text-gray-400 transition-all hover:text-red-700 dark:text-slate-400 dark:hover:text-red-700"
+                  x-bind:class="{'!text-red-700': upvoted(name)}"
+                  @click="handleUpvote(name)"
+                >
+                  <i x-show="upvoted(name)" class="i-tabler-heart-filled h-3 w-3"></i>
+                  <i x-show="!upvoted(name)" class="i-tabler-heart h-3 w-3"></i>
+                  <span
+                    class="ml-1"
+                    th:attr="data-upvote-moment-name=${moment.metadata.name}"
+                    th:text="${moment.stats.upvote}"
+                  >
+                  </span>
+                </div>
+                <div
+                  class="inline-flex cursor-pointer items-center text-sm text-gray-400 transition-all hover:text-black dark:text-slate-400 dark:hover:text-slate-300"
+                  :class="{'!text-black dark:!text-slate-300':showComment}"
+                  x-on:click="showComment = !showComment"
+                >
+                  <i class="i-tabler-message-circle h-3 w-3"></i>
+                  <span class="ml-1" th:text="${moment.stats.approvedComment}"> </span>
+                </div>
+                <div class="inline-flex items-center text-sm text-gray-400 transition-all dark:text-slate-400">
+                  <i class="i-tabler-calendar h-3 w-3"></i>
+                  <span class="ml-1" th:text="${#dates.format(moment.spec.releaseTime,'yyyy-MM-dd')}"> </span>
+                </div>
+              </div>
+
+              <div class="mt-2" x-show="showComment">
+                <halo:comment
+                  group="moment.halo.run"
+                  kind="Moment"
+                  th:attr="name=${moment.metadata.name}"
+                  colorScheme="window.main.currentColorScheme"
+                />
+              </div>
+            </div>
+          </li>
+        </ul>
+      </div>
+
+      <div class="mt-6 flex items-center justify-between" th:if="${moments.hasPrevious() || moments.hasNext()}">
+        <a
+          th:href="@{${moments.prevUrl}}"
+          class="whitespace-no-wrap group inline-flex items-center justify-center gap-1 rounded-md border border-gray-200 bg-white px-4 py-1 text-sm font-medium leading-6 text-gray-600 shadow-sm hover:bg-gray-50 focus:shadow-none focus:outline-none dark:border-slate-600 dark:bg-slate-700 dark:text-slate-100 dark:hover:bg-slate-600 dark:hover:text-white"
+        >
+          <span class="i-tabler-arrow-left text-lg transition-all group-hover:-translate-x-1"></span>
+          <span>上一页</span>
+        </a>
+        <span
+          class="text-sm text-gray-900 dark:text-slate-50"
+          th:text="|${moments.page} / ${moments.totalPages}|"
+        ></span>
+        <a
+          th:href="@{${moments.nextUrl}}"
+          class="whitespace-no-wrap group inline-flex items-center justify-center gap-1 rounded-md border border-gray-200 bg-white px-4 py-1 text-sm font-medium leading-6 text-gray-600 shadow-sm hover:bg-gray-50 focus:shadow-none focus:outline-none dark:border-slate-600 dark:bg-slate-700 dark:text-slate-100 dark:hover:bg-slate-600 dark:hover:text-white"
+        >
+          <span>下一页</span>
+          <span class="i-tabler-arrow-right text-lg transition-all group-hover:translate-x-1"></span>
+        </a>
+      </div>
+    </div>
+  </th:block>
+</html>

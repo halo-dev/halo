@@ -1,0 +1,19 @@
+<th:block th:fragment="group(photoGroups)">
+  <div class="photos-group">
+    <nav id="gallery-filter">
+      <ul>
+        <li>
+          <span data-filter="*" class="active" data-i18n="page.photos.all"></span>
+        </li>
+        <th:block th:each="group : ${photoGroups}">
+          <li>
+            <span
+              th:data-filter="|.group-${#strings.trim(group.metadata.name)}|"
+              th:text="${group.spec.displayName}"
+            ></span>
+          </li>
+        </th:block>
+      </ul>
+    </nav>
+  </div>
+</th:block>

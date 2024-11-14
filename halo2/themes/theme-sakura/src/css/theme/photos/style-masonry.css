@@ -1,0 +1,113 @@
+.masonry-container {
+  margin: auto 4vw;
+
+  & .photos-content {
+    margin: 1.5em auto;
+
+    & .gallery {
+      & .gallery-item {
+        margin: 0;
+        margin-bottom: 10px;
+
+        @mixin col 3;
+        @mixin col 4;
+        @mixin col 5 {
+          & .gallery-caption {
+            font-size: 0.85em;
+          }
+        }
+        @mixin col 6;
+        @mixin col 7;
+        @mixin col 8;
+
+        & .gallery-icon {
+          position: relative;
+          z-index: 9;
+          transition: opacity 0.2s ease;
+          text-align: center;
+
+          & a {
+            display: block;
+            width: 100%;
+            height: 100%;
+            position: relative;
+            z-index: 9;
+          }
+
+          & img {
+            width: 100%;
+            height: auto;
+            margin: 0 0 -5px 0;
+          }
+        }
+      }
+    }
+  }
+
+  @mixin screens-md {
+    & .photos-content {
+      & .gallery {
+        & .gallery-item {
+          width: 100% !important;
+        }
+      }
+    }
+  }
+}
+
+.masonry-tools {
+  display: flex;
+  justify-content: space-between;
+
+  & .grid-changer {
+    float: right;
+
+    & ul {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+      font-size: 0.8em;
+
+      & li {
+        display: inline-block;
+        margin-left: 0.2em;
+
+        & span {
+          display: block;
+          width: 30px;
+          height: 30px;
+          text-align: center;
+          color: var(--photo-group-change-color);
+          position: relative;
+          border: 2px solid var(--photo-group-change-color);
+          transition: all 0.2s ease;
+
+          &:hover {
+            border-color: var(--theme-color);
+            color: var(--theme-color);
+          }
+
+          &.active {
+            &,
+            &:hover {
+              border-color: var(--photo-group-change-active-color);
+              color: var(--photo-group-change-active-color);;
+            }
+          }
+
+          & svg {
+            fill: var(--photo-group-change-active-color);;
+          }
+        }
+      }
+    }
+  }
+
+  @mixin screens-md {
+    justify-content: center;
+    
+    & .grid-changer {
+      display: none;
+    }
+  }
+}

@@ -1,0 +1,41 @@
+# EditorConfig is awesome: https://EditorConfig.org
+
+# top-most EditorConfig file
+root = true
+
+[*]
+indent_style = space
+indent_size = 2
+tab_width = 2
+end_of_line = lf
+charset = utf-8
+trim_trailing_whitespace = false
+insert_final_newline = false
+max_line_length = 120
+
+[{*.htm, *.html, *.sht, *.shtm, *.shtml}]
+ij_html_add_new_line_before_tags = body, div, p, form, h1, h2, h3
+ij_html_align_attributes = true
+ij_html_align_text = false
+ij_html_attribute_wrap = normal
+ij_html_block_comment_at_first_column = true
+ij_html_do_not_align_children_of_min_lines = 0
+ij_html_do_not_break_if_inline_tags = title, h1, h2, h3, h4, h5, h6, p
+ij_html_do_not_indent_children_of_tags = html, body, thead, tbody, tfoot
+ij_html_enforce_quotes = false
+ij_html_inline_tags = a, abbr, acronym, b, basefont, bdo, big, br, cite, cite, code, dfn, em, font, i, img, input, kbd, label, q, s, samp, select, small, span, strike, strong, sub, sup, textarea, tt, u, var
+ij_html_keep_blank_lines = 2
+ij_html_keep_indents_on_empty_lines = false
+ij_html_keep_line_breaks = true
+ij_html_keep_line_breaks_in_text = true
+ij_html_keep_whitespaces = false
+ij_html_keep_whitespaces_inside = span, pre, textarea
+ij_html_line_comment_at_first_column = true
+ij_html_new_line_after_last_attribute = never
+ij_html_new_line_before_first_attribute = never
+ij_html_quote_style = double
+ij_html_remove_new_line_before_tags = br
+ij_html_space_after_tag_name = false
+ij_html_space_around_equality_in_attribute = false
+ij_html_space_inside_empty_tag = false
+ij_html_text_wrap = normal

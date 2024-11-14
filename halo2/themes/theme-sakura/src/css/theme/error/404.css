@@ -1,0 +1,74 @@
+.error-404 {
+  margin-top: -100px;
+  margin-bottom: 5px;
+
+  & .error-img {
+    text-align: center;
+    width: 80%;
+    margin: 0 auto;
+  }
+
+  & .err-button {
+    text-align: center;
+
+    &.back {
+      & a {
+        padding: 7px 30px;
+        margin: 0 10px;
+        border: 1px solid var(--theme-color);
+        color: var(--theme-color);
+        border-radius: 50px;
+
+        &:hover {
+          box-shadow: 0 0 4px var(--theme-color);
+        }
+      }
+
+      & .gohome {
+        background: var(--theme-color);
+        color: #fff;
+      }
+    }
+  }
+
+  & .error-search {
+    margin-top: 1.5em;
+
+    & > p {
+      text-align: center;
+      font-size: 15px;
+      margin-bottom: 1em;
+    }
+
+    & .search-box {
+      position: relative;
+      margin-bottom: 3.125em;
+
+      & svg {
+        font-size: 1.5em;
+        line-height: 1;
+        color: #ddd;
+        position: absolute;
+        top: 50%;
+        transform: translateY(-50%);
+        left: 1rem;
+      }
+
+      & input {
+        font-size: 1rem;
+        background: #fff;
+        background: var(--background-color);
+        padding: 0.75rem 1.5rem 0.75rem 4rem;
+        width: 100%;
+        outline: none;
+        border-radius: 50px;
+        box-sizing: border-box;
+        transition: background 1s;
+      }
+    }
+  }
+
+  @mixin screens-md {
+    margin-top: 0;
+  }
+}

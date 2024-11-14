@@ -1,0 +1,286 @@
+.moments-container {
+  margin: 20px 0;
+  filter: brightness(var(--theme-brightness));
+
+  & .moments-inner {
+    padding: 0;
+    margin: 0;
+    list-style: none;
+    display: inline;
+    position: relative;
+
+    & .moments-item {
+      margin-bottom: 30px;
+
+      &:nth-child(odd) {
+        & .moment-container {
+          & .moment-inner {
+            background: var(--single-bg-and-btn-color);
+            color: var(--single-font-color);
+
+            &::after {
+              border-right-color: var(--single-bg-and-btn-color);
+              color: black;
+            }
+          }
+        }
+      }
+    }
+  }
+
+  & .pagination {
+    display: flex;
+    justify-content: center;
+
+    & .at_button {
+      background-color: #e6e6fa;
+      border: none;
+      padding: 8px 16px;
+      text-align: center;
+      text-decoration: none;
+      height: 20px;
+      display: inline-block;
+      font-size: 12px;
+      border-radius: 12px;
+      outline: none;
+      cursor: pointer;
+      transition: box-shadow 0.5s ease 0s;
+
+      &:hover {
+        background-color: #f0ffff;
+        box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.24), 0 8px 16px 0 rgba(0, 0, 0, 0.19);
+      }
+
+      &.loading {
+        background-color: unset;
+        border: none;
+      }
+    }
+  }
+
+  @mixin screens-md {
+    & .moments-inner {
+      & .moments-item {
+        & .moment-container {
+          & .avatar {
+            display: none;
+          }
+
+          & .moment-inner {
+            &::after {
+              display: none;
+            }
+
+            & .moment-content {
+              & img {
+                max-width: 50%;
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}
+
+.moment-container {
+  display: flex;
+
+  & .avatar {
+    width: 48px;
+    height: 48px;
+    object-fit: cover;
+    border: 1px solid #ddd;
+    padding: 2px;
+    float: left;
+    border-radius: 100%;
+    transition: transform 0.4s ease-out;
+
+    &:hover {
+      transform: rotateZ(360deg);
+    }
+  }
+
+  & .moment-inner {
+    width: 100%;
+    margin: auto 15px;
+    padding: 0.8em 1.2em;
+    position: relative;
+    background: var(--double-bg-and-btn-color);
+    background-position: center;
+    color: var(--double-font-color);
+    border-radius: 5px;
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.15);
+    transition: all 0.3s ease 0s;
+
+    &::after {
+      right: 100%;
+      border: solid transparent;
+      content: " ";
+      height: 0;
+      width: 0;
+      position: absolute;
+      pointer-events: none;
+      border-right-color: #f0ffff;
+      border-width: 10px;
+      top: 4px;
+    }
+
+    &:hover {
+      box-shadow: 0 2px 16px rgba(0, 0, 0, 0.15);
+    }
+
+    & .moment-content {
+      font-size: 1.2em;
+      font-weight: 400;
+      line-height: 1.5;
+
+      & > p {
+        overflow: unset;
+      }
+
+      & .comment-box {
+        display: none;
+      }
+    }
+
+    & .moment-medium {
+      width: 66%;
+      font-size: 0;
+      display: table;
+
+      & a {
+        display: inline-block;
+        border-radius: 8px;
+        overflow: hidden;
+        float: left;
+        position: relative;
+      }
+
+      & img,
+      & video {
+        aspect-ratio: 1 / 1;
+        object-fit: cover;
+      }
+
+      &.medium-1 {
+        & a {
+          width: 100%;
+        }
+      }
+
+      &.medium-2,
+      &.medium-4 {
+        & a {
+          width: 46%;
+          margin: 2%;
+        }
+      }
+
+      &.medium-3 {
+        & a {
+          width: 29.33%;
+          margin: 2%;
+
+          &:nth-child(1) {
+            width: 62.67%;
+          }
+        }
+      }
+
+      &.medium-5,
+      &.medium-8 {
+        & a {
+          width: 29.33%;
+          margin: 2%;
+
+          &:nth-child(n + 1):nth-child(-n + 2) {
+            width: 46%;
+            margin: 2%;
+          }
+        }
+      }
+
+      &.medium-6 {
+        & a {
+          width: 29.33%;
+          margin: 2.2% 2%;
+
+          &:nth-child(1) {
+            width: 62.67%;
+          }
+        }
+      }
+
+      &.medium-7 {
+        & a {
+          width: 29.33%;
+          margin: 2%;
+
+          &:nth-child(n + 4):nth-child(-n + 7) {
+            width: 21%;
+          }
+        }
+      }
+
+      &.medium-9 {
+        & a {
+          width: 29.33%;
+          margin: 2%;
+        }
+      }
+    }
+
+    & .moment-footer {
+      margin-top: 10px;
+      border-top: 1px dashed #fff;
+      padding-top: 5px;
+      font-size: 14px;
+      display: flex;
+      justify-content: space-between;
+
+      & .moment-tools {
+        margin-left: 15px;
+
+        & .comment-js,
+        & .moment-like {
+          float: right;
+          margin-left: 15px;
+        }
+
+        & .comment-js {
+          cursor: pointer;
+        }
+
+        & .moment-like {
+          cursor: pointer;
+
+          &:hover,
+          &.on {
+            color: #00a1d6;
+          }
+        }
+      }
+    }
+
+    & .comment-box {
+      display: none;
+      padding-top: 10px;
+    }
+  }
+}
+
+.code-block-fullscreen-html-scroll {
+  /* 解决 journals 中，代码块 fixed 定位相对于父 DOM 而不是视窗的 BUG */
+  & .moment-content {
+    z-index: auto !important;
+    transform: none !important;
+  }
+}
+
+:host {
+  display: inline-block;
+  overflow: hidden;
+  text-align: initial;
+  white-space: nowrap;
+}

@@ -1,0 +1,34 @@
+@import "header";
+
+@import "content";
+
+@import "footer";
+
+@import "sidebar";
+
+@import "comment.css";
+
+.container {
+  transition: background 1s;
+
+  @mixin screens-md {
+    & {
+      transition-duration: .5s;
+      position: relative;
+      overflow: hidden;
+      z-index: 2
+    }
+
+    &.open {
+      &::before {
+        content: "";
+        width: 100%;
+        height: 100%;
+        position: fixed;
+        background-color: rgba(0, 0, 0, .4);
+        z-index: 9;
+      }
+    }
+  }
+}
+

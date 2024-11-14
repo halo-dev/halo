@@ -1,0 +1,10 @@
+<style type="text/css" th:inline="css" th:fragment="variables-post">
+  :root {
+    [# th:if="${theme.config.post.post_auto_collapse}"]
+      --yya-header-top: -100px;
+    [/]
+    [# th:if="${theme.config.post.code_change_line}"]
+      --pre-white-space: pre-wrap;
+    [/]
+  }
+</style>

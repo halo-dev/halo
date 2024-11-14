@@ -1,0 +1,25 @@
+<article th:fragment="item(document)" class="document document-list" itemscope itemtype="http://schema.org/Article">
+  <link itemprop="mainEntityOfPage" th:href="@{${document.permalink}}" />
+
+  <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+    <meta itemprop="name" th:content="${site.title}" />
+    <meta itemprop="description" th:content="${site.subtitle}" />
+  </span>
+
+  <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
+    <meta itemprop="name" th:content="${document.title}" />
+    <meta itemprop="description" th:content="${document.description}" />
+  </span>
+
+  <th:block th:switch="${document.type}">
+    <th:block th:case="post.content.halo.run">
+      <th:block th:replace="~{macro/content :: content(${postFinder.getByName(document.metadataName)})}" />
+    </th:block>
+    <th:block th:case="singlepage.content.halo.run">
+      <th:block th:replace="~{macro/content :: content(${postFinder.getByName(document.metadataName)})}" />
+    </th:block>
+    <th:block th:case="moment.moment.halo.run">
+      <th:block th:replace="~{module/search/search-moment :: content(${document})}" />
+    </th:block>
+  </th:block>
+</article>

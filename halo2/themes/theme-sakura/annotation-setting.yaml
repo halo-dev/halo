@@ -1,0 +1,86 @@
+apiVersion: v1alpha1
+kind: AnnotationSetting
+metadata:
+  generateName: annotation-setting-
+spec:
+  targetRef:
+    group: ""
+    kind: MenuItem
+  formSchema:
+    - $formkit: "text"
+      name: "icon"
+      label: "图标"
+      help: "图标名称，支持所有 iconify 图标。例如 https://icones.netlify.app/"
+    - $formkit: "text"
+      name: "animation"
+      label: "动画"
+      help: "对图标所使用的微动画，支持的类型查看 https://l-lin.github.io/font-awesome-animation/#animation-list"
+---
+
+apiVersion: v1alpha1
+kind: AnnotationSetting
+metadata:
+  generateName: annotation-setting-
+spec:
+  targetRef:
+    group: content.halo.run
+    kind: Post
+  formSchema:
+    - $formkit: checkbox
+      name: randomImage
+      label: 使用随机封面
+      value: "true"
+      on-value: "true"
+      off-value: "false"
+    - $formkit: checkbox
+      name: original
+      label: 原创文章
+      value: "false"
+      on-value: "true"
+      off-value: "false"
+    - $formkit: checkbox
+      name: toc
+      label: 自动生成目录
+      value: "true"
+      on-value: "true"
+      off-value: "false"
+
+---
+
+apiVersion: v1alpha1
+kind: AnnotationSetting
+metadata:
+  generateName: annotation-setting-
+spec:
+  targetRef:
+    group: content.halo.run
+    kind: SinglePage
+  formSchema:
+    - $formkit: checkbox
+      name: randomImage
+      label: 使用随机图
+      value: "true"
+      on-value: "true"
+      off-value: "false"
+
+    - $formkit: checkbox
+      name: toc
+      label: 自动生成目录
+      value: "true"
+      on-value: "true"
+      off-value: "false"
+      
+---
+
+apiVersion: v1alpha1
+kind: AnnotationSetting
+metadata:
+  generateName: annotation-setting-
+spec:
+  targetRef:
+    group: ""
+    kind: User
+  formSchema:
+    - $formkit: attachment
+      name: cover
+      label: 用户详情页封面图

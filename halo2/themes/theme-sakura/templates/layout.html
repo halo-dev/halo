@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html xmlns:th="https://www.thymeleaf.org" lang="zh-CN" th:fragment="layout(_title, _header, _content)">
+  <head>
+    <!--/* 引入公共 Head */-->
+    <th:block th:replace="~{module/head/index}" />
+    <!--/* title */-->
+    <title>
+      <th:block th:if="${_title != null}"> <th:block th:replace="${_title}"></th:block> </th:block> <th:block
+      th:unless="${_title != null}"> <th:block th:if="${#strings.isEmpty(site.subtitle)}"
+      th:text="${site.title}"></th:block> <th:block th:unless="${#strings.isEmpty(site.subtitle)}"
+      th:text="|${site.title} - ${site.subtitle}|"></th:block> </th:block>
+    </title>
+
+    <!--/* noscript */-->
+    <th:block th:replace="~{scripts/noscript}" />
+  </head>
+  <body itemscope itemtype="http://schema.org/WebPage" class="serif">
+    <div class="pjax">
+      <!--/* variables.html 根据配置设置 css 变量值，全局 css 通过变量值进行处理 */-->
+      <th:block th:replace="~{module/variables/index}"></th:block>
+    </div>
+
+    <section id="main-container" class="container">
+      <!--/* 导航栏 */-->
+      <header class="site-header" itemscope itemtype="http://schema.org/WPHeader">
+        <div class="header-inner" th:insert="~{module/header/index}"></div>
+      </header>
+
+      <main id="page" class="main site wrapper">
+        <!--/* 挂钩，文章 header 等内容 */-->
+        <div class="column">
+          <!--/* 页面头部，如文章页的随机图？文本？视频？ */-->
+          <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+            <th:block th:if="${_header != null}">
+              <th:block th:replace="${_header}" />
+            </th:block>
+          </header>
+        </div>
+
+        <!--/* 挂钩，不同路由将使用不同的内容进行渲染 */-->
+        <div id="content" class="main-inner site-content" th:classappend="${_templateId}">
+          <th:block th:replace="${_content}" />
+          <!--/* sidebar，侧边栏 */-->
+          <th:block th:if="${_sidebar != null}">
+            <th:block th:replace="${_sidebar}" />
+          </th:block>
+        </div>
+      </main>
+    </section>
+
+    <section class="site-sidebar">
+      <div class="sidebar-inner">
+        <!--/* 侧边栏 */-->
+        <th:block th:replace="~{module/sidebar/index}" />
+      </div>
+    </section>
+
+    <footer class="site-footer" role="contentinfo">
+      <div class="site-info">
+        <th:block th:replace="~{module/footer}" />
+      </div>
+    </footer>
+
+    <!--/* 全局小部件，如回到顶部等 */-->
+    <th:block th:replace="~{module/widgets/index}" />
+
+    <!--/* script */-->
+    <!--/* 主题自身的 script */-->
+    <th:block th:replace="~{scripts/index}" />
+    <!--/* 与 pjax 生命周期相关的 script。每个页面都应重新请求获取（如果仅是需要重新执行则不必放在这里） */-->
+    <div id="pjax" th:if="${theme.config.others.poi_pjax}"></div>
+  </body>
+</html>

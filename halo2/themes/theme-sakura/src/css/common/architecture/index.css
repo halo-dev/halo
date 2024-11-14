@@ -1,0 +1,22 @@
+/*
+* Sakura 基础架构。规范化 CSS 及初始化各标签。只建议处理 HTML 自带标签的 CSS。
+*/
+/* 规范化 */
+@import "normalize.css";
+
+/* 基础，例如 body，html 等通用标签 */
+@import "base.css";
+
+@import "inputs.css";
+
+@import "links.css";
+
+/* 按钮 */
+@import "buttons.css";
+
+/* 表格 */
+@import "tables.css";
+
+@import "scrollbar.css";
+
+@import "iconify.css";

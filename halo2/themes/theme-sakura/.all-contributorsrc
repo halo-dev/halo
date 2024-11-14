@@ -1,0 +1,65 @@
+{
+  "projectName": "halo-theme-sakura",
+  "projectOwner": "LIlGG",
+  "repoType": "github",
+  "repoHost": "https://github.com",
+  "files": [
+    "README.md"
+  ],
+  "imageSize": 100,
+  "contributorsPerLine": 7,
+  "contributors": [
+    {
+      "login": "LIlGG",
+      "name": "Takagi",
+      "avatar_url": "https://avatars2.githubusercontent.com/u/31335418?v=4",
+      "profile": "https://lixingyong.com",
+      "contributions": [
+        "code",
+        "doc",
+        "example"
+      ]
+    },
+    {
+      "login": "ruibaby",
+      "name": "Ryan Wang",
+      "avatar_url": "https://avatars2.githubusercontent.com/u/21301288?v=4",
+      "profile": "https://ryanc.cc",
+      "contributions": [
+        "design",
+        "ideas"
+      ]
+    },
+    {
+      "login": "parasomn1a",
+      "name": "Parasomnia",
+      "avatar_url": "https://avatars2.githubusercontent.com/u/22992947?v=4",
+      "profile": "https://mashiro.best",
+      "contributions": [
+        "code",
+        "design"
+      ]
+    },
+    {
+      "login": "mashirozx",
+      "name": "Mashiro",
+      "avatar_url": "https://avatars2.githubusercontent.com/u/16148054?v=4",
+      "profile": "https://2heng.xin",
+      "contributions": [
+        "design",
+        "ideas"
+      ]
+    },
+    {
+      "login": "ShiinaKin",
+      "name": "mashirot",
+      "avatar_url": "https://avatars.githubusercontent.com/u/52254895?v=4",
+      "profile": "https://github.com/ShiinaKin",
+      "contributions": [
+        "code"
+      ]
+    }
+  ],
+  "commitType": "docs",
+  "commitConvention": "angular"
+}

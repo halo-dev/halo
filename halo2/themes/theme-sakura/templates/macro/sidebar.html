@@ -1,0 +1,12 @@
+<th:block th:fragment="sidebar(isToc)">
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+      <th:block th:if="${isToc}">
+        <div class="toc-container">
+          <!--/* 由 js 填充 */-->
+          <div class="toc"></div>
+        </div>
+      </th:block>
+    </div>
+  </aside>
+</th:block>

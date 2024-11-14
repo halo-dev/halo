@@ -1,0 +1,111 @@
+.aplayer {
+
+  &.aplayer-fixed {
+    background: var(--aplayer-background-color);
+    color: var(--aplayer-color);
+
+    & .aplayer-list {
+      border: var(--aplayer-list-border) !important;
+
+      & ol {
+        & li {
+          border-top: var(--aplayer-list-top-border);
+
+          &:hover {
+            background: var(--aplayer-list-hover-background-color);
+          }
+
+          &.aplayer-list-light {
+            background: var(--aplayer-list-light-background-color) !important;
+          }
+
+          & .aplayer-list-author {
+            color: var(--aplayer-list-author-color);
+          }
+        }
+      }
+    }
+
+    & .aplayer-body {
+      background: var(--aplayer-background-color) !important;
+      color: var(--aplayer-color);
+
+      & .aplayer-info {
+        border-top: var(--aplayer-list-top-border);
+
+        & .aplayer-controller {
+          & .aplayer-time {
+            & .aplayer-icon {
+              &:hover {
+                & path {
+                  fill: var(--theme-color);
+                }
+              }
+            }
+          }
+        }
+      }
+
+      & .aplayer-miniswitcher {
+        background: var(--aplayer-body-miniswitcher-background-color);
+        color: var(--aplayer-color);
+
+        &:hover {
+          & path {
+            fill: var(--theme-color);
+          }
+        }
+      }
+    }
+
+    & .aplayer-lrc {
+      text-shadow: var(--aplayer-lrc-text-shadow);
+    }
+  }
+
+  & .aplayer-list {
+    & ol {
+      &::-webkit-scrollbar-thumb {
+        background-color: var(--theme-color) !important;
+
+        &:hover {
+          background-color: var(--theme-color) !important;
+        }
+      }
+    }
+  }
+
+  & .aplayer-lrc {
+    pointer-events: none;
+
+    &::before,
+    &::after {
+      background: rgba(255, 255, 255, 0);
+      filter: none;
+    }
+
+    & .aplayer-lrc-current {
+      color: var(--theme-color);
+      font-size: 15px;
+      font-weight: bold;
+    }
+  }
+
+  & .aplayer-icon,
+  & .aplayer-miniswitcher {
+    border-radius: 0 6px 6px 0 !important;
+  }
+}
+
+.aplayer-narrow {
+  & .ap-hover {
+    border-radius: 0 6px 6px 0 !important;
+    left: -66px !important;
+
+    @mixin pc-hover {
+      &:hover {
+        left: 0 !important;
+      }
+    }
+  }
+}

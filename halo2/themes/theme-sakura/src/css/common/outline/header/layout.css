@@ -1,0 +1,116 @@
+.site-header {
+  position: relative;
+  right: 0;
+  height: var(--header-height);
+  width: 100%;
+  z-index: 10;
+
+  &::before,
+  &::after {
+    content: "";
+    display: table;
+    table-layout: fixed;
+  }
+
+  &::after {
+    clear: both;
+  }
+
+  &.iconsearch {
+    font-size: 1.125rem;
+    position: relative;
+    z-index: 10;
+
+    &:hover {
+      cursor: pointer;
+      color: var(--theme-color);
+    }
+  }
+
+  & .header-inner {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: var(--header-height);
+    width: 100%;
+    margin: 0 auto;
+    position: fixed;
+    box-sizing: border-box;
+    top: 0;
+    transition: top 0.3s ease-in-out;
+
+    & .header-after,
+    & .header-content,
+    & .header-before {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    & .header-after,
+    & .header-before {
+      position: absolute;
+    }
+
+    & .header-before {
+      left: 1.25rem;
+    }
+
+    & .header-content {
+      flex: 1;
+    }
+
+    & .header-after {
+      right: 1.25rem;
+    }
+  }
+
+  @mixin screens-md {
+    &,
+    & .header-inner {
+      height: 2.5rem;
+      position: absolute;
+    }
+
+    & .header-inner {
+      padding: 0;
+
+      & .header-after,
+      & .header-before {
+        position: initial;
+      }
+
+      & .header-before {
+        flex: 1;
+        justify-content: space-between;
+      }
+
+      & .header-content {
+        display: none;
+      }
+    }
+  }
+}
+
+/* 导航栏向下滚动样式 */
+.yya {
+  & .header-inner {
+    position: fixed;
+    top: var(--yya-header-top);
+    background: var(--header-background);
+    box-shadow: 0 1px 40px -8px #00000080;
+  }
+
+  &.sabit {
+    & .header-inner {
+      top: 0;
+    }
+  }
+
+  @mixin screens-md {
+    & .header-inner {
+      background: transparent;
+      box-shadow: none;
+    }
+  }
+}

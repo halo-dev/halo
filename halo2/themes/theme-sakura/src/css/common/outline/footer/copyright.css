@@ -1,0 +1,16 @@
+.footer-copyright {
+  & p {
+    font-family: "Ubuntu", sans-serif;
+
+    & span {
+      & .iconify {
+        font-size: inherit;
+        color: #e74c3c;
+      }
+
+      & a {
+        text-decoration: none;
+      }
+    }
+  }
+}

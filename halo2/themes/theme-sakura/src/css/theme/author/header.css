@@ -1,0 +1,15 @@
+.author-header {
+  & .page-header {
+    & .pattern-title {
+      display: flex;
+      align-items: center;
+
+      & h1 {
+        display: inline-block;
+        font-size: 25px;
+        font-weight: 400;
+        width: auto;
+      }
+    }
+  }
+}

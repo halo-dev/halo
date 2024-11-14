@@ -1,0 +1,1066 @@
+apiVersion: v1alpha1
+kind: Setting
+metadata:
+  name: theme-sakura-setting
+spec:
+  forms:
+    - group: general
+      label: 基本设置
+      formSchema:
+        - $formkit: color
+          name: theme_skin
+          label: 主题基色
+          value: "#FE9600"
+        - $formkit: select
+          name: cursor_skin
+          label: 鼠标风格
+          value: sakura
+          options:
+            - value: sakura
+              label: 默认
+            - value: no_cursor
+              label: 无样式
+        - $formkit: select
+          name: site_title
+          label: 站点标题
+          value: logo
+          options:
+            - value: logo
+              label: 优先使用站点Logo
+            - value: text
+              label: 仅使用站点标题文本
+        - $formkit: checkbox
+          name: top_search
+          label: 开启搜索功能
+          value: true
+        - $formkit: select
+          name: post_list_style
+          id: post_list_style
+          label: 首页文章风格
+          value: imageflow
+          options:
+            - value: standard
+              label: 标准
+            - value: imageflow
+              label: 图文
+        - $formkit: select
+          name: list_type
+          if: "$get(post_list_style).value == standard"
+          label: 标准风格文章特色图
+          value: round
+          options:
+            - value: round
+              label: 圆形
+            - value: square
+              label: 方形
+        - $formkit: select
+          name: pagenav_style
+          label: 文章列表分页模式
+          value: ajax
+          options:
+            - value: ajax
+              label: Ajax 加载
+            - value: np
+              label: 上一页和下一页
+        - $formkit: select
+          name: date_format
+          label: 日期展示格式
+          value: date
+          options:
+            - value: date
+              label: 日期
+            - value: time
+              label: 时间
+            - value: datetime
+              label: 日期时间
+        - $formkit: checkbox
+          name: hour12
+          label: 使用 12 小时制
+          value: false
+    - group: patternimg
+      label: 头部装饰图
+      formSchema:
+        - $formkit: attachment
+          name: archives_patternimg
+          label: 归档页装饰图
+        - $formkit: attachment
+          name: photos_patternimg
+          label: 图库页装饰图
+        - $formkit: attachment
+          name: journals_patternimg
+          label: 瞬间页装饰图
+        - $formkit: attachment
+          name: links_patternimg
+          label: 友链页装饰图
+        - $formkit: attachment
+          name: searh_patternimg
+          label: 搜索页装饰图
+        - $formkit: attachment
+          name: tag_patternimg
+          label: 标签页默认装饰图
+        - $formkit: attachment
+          name: category_patternimg
+          label: 分类页默认装饰图
+    - group: mainScreen
+      label: 首屏
+      formSchema:
+        - $formkit: checkbox
+          name: head_focus
+          id: head_focus
+          key: head_focus
+          label: 展示首屏
+          help: 关闭之后首屏将直接从文章开始显示
+          value: true
+        - $formkit: attachment
+          if: "$get(head_focus).value == true"
+          name: focus_img_1
+          label: 背景图
+        - $formkit: select
+          if: "$get(head_focus).value == true"
+          name: focus_img_filter
+          label: 背景图滤镜
+          value: filter-grid
+          options:
+            - value: filter-nothing
+              label: 无
+            - value: filter-undertint
+              label: 浅色
+            - value: filter-dim
+              label: 暗淡
+            - value: filter-grid
+              label: 网格
+        - $formkit: select
+          if: "$get(head_focus).value == true"
+          name: focus_tou
+          id: focus_tou
+          key: focus_tou
+          label: 头部样式
+          value: "glitch-text"
+          options:
+            - value: "no-tou"
+              label: 无
+            - value: avatar
+              label: 头像
+            - value: "glitch-text"
+              label: 故障文字
+        - $formkit: text
+          name: glitch_text
+          id: glitch_text
+          key: glitch_text
+          label: 聚焦故障文本
+          value: Hi,Friend
+          help: 移动端：将显示在导航栏中，桌面端：该文本只有头部样式开启故障文字才能显示
+        - $formkit: checkbox
+          name: focus_infos
+          if: "$get(head_focus).value == true"
+          label: 显示社交信息
+          value: true
+        - $formkit: checkbox
+          name: focus_height
+          id: focus_height
+          key: focus_height
+          if: "$get(head_focus).value == true"
+          label: 占满全屏
+          help: 全屏显示则首屏独占全屏，非全屏则只会占一半页面
+          value: true
+        - $formkit: checkbox
+          name: focus_wave
+          id: focus_wave
+          key: focus_wave
+          if: "$get(head_focus).value == true && $get(focus_height).value == true"
+          label: 波浪效果
+          value: false
+        - $formkit: checkbox
+          name: focus_godown
+          id: focus_godown
+          key: focus_godown
+          if: "$get(head_focus).value == true"
+          label: 快捷下滑功能
+          value: true
+        - $formkit: checkbox
+          if: "$get(head_focus).value == true && $get(focus_height).value == true"
+          name: bgvideo
+          id: bgvideo
+          key: bgvideo
+          label: 背景视频
+          value: false
+        - $formkit: attachment
+          if: "$get(bgvideo).value == true"
+          id: bgvideo_url
+          name: bgvideo_url
+          key: bgvideo_url
+          label: 视频链接
+          help: 支持流媒体
+    - group: sns
+      label: 社交网络
+      formSchema:
+        - $formkit: repeater
+          name: items
+          label: 社交网络
+          children:
+            - $formkit: select
+              name: type
+              key: type
+              label: 类型
+              value: preset
+              options:
+                - label: 预设
+                  value: preset
+                - label: 自定义
+                  value: custom
+            - $formkit: select
+              if: "$value.type == preset"
+              name: icon
+              key: icon
+              label: 预设图标
+              options:
+                - label: 微信
+                  value: wechat.png
+                - label: 微博
+                  value: weibo.png
+                - label: 腾讯 QQ
+                  value: qq.png
+                - label: QQ 空间
+                  value: qzone.png
+                - label: GitHub
+                  value: github.png
+                - label: Lofter
+                  value: lofter.png
+                - label: 哔哩哔哩
+                  value: bilibili.png
+                - label: 网易云音乐
+                  value: wangyiyun.png
+                - label: Twitter
+                  value: twitter.png
+                - label: Facebook
+                  value: facebook.png
+                - label: Google Plus
+                  value: googleplus.png
+                - label: 简书
+                  value: jianshu.png
+                - label: CSDN
+                  value: csdn.png
+                - label: 知乎
+                  value: zhihu.png
+                - label: Telegram
+                  value: telegram.svg
+                - label: 邮箱
+                  value: email.svg
+                - label: Stack Overflow
+                  value: stackoverflow.svg
+            - $formkit: attachment
+              if: "$value.type === custom"
+              name: custom_icon
+              key: custom_icon
+              accepts:
+                - "image/*"
+              max: 1
+              label: 自定义图标
+              validation: "required"
+            - $formkit: select
+              name: url_type
+              key: url_type
+              label: 展示形式
+              value: normal
+              options:
+                - label: 跳转链接
+                  value: normal
+                - label: 图片
+                  value: image
+            - $formkit: text
+              if: "$value.url_type == normal"
+              name: url
+              key: url
+              label: 链接
+              validation: "required"
+            - $formkit: attachment
+              if: "$value.url_type == image"
+              name: image
+              key: image
+              label: 图片
+              accepts:
+                - "image/*"
+              max: 1
+              validation: "required"
+        - $formkit: repeater
+          name: mobile_items
+          label: 移动端侧边栏社交网络
+          children:
+            - $formkit: select
+              name: type
+              key: type
+              label: 类型
+              value: preset
+              options:
+                - label: 预设
+                  value: preset
+                - label: 自定义
+                  value: custom
+            - $formkit: select
+              name: icon
+              key: icon
+              label: 图标
+              if: "$value.type === preset"
+              options:
+                - label: 微信
+                  value: wechat.png
+                - label: 微博
+                  value: weibo.png
+                - label: 腾讯 QQ
+                  value: qq.png
+                - label: QQ 空间
+                  value: qzone.png
+                - label: GitHub
+                  value: github.png
+                - label: Lofter
+                  value: lofter.png
+                - label: 哔哩哔哩
+                  value: bilibili.png
+                - label: 网易云音乐
+                  value: wangyiyun.png
+                - label: Twitter
+                  value: twitter.png
+                - label: Facebook
+                  value: facebook.png
+                - label: Google Plus
+                  value: googleplus.png
+                - label: 简书
+                  value: jianshu.png
+                - label: CSDN
+                  value: csdn.png
+                - label: 知乎
+                  value: zhihu.png
+                - label: Telegram
+                  value: telegram.svg
+                - label: 邮箱
+                  value: email.svg
+                - label: Stack Overflow
+                  value: stackoverflow.svg
+            - $formkit: attachment
+              if: "$value.type === custom"
+              name: custom_icon
+              key: custom_icon
+              accepts:
+                - "image/*"
+              max: 1
+              label: 自定义图标
+              validation: "required"
+            - $formkit: text
+              name: url
+              label: 链接
+              validation: "required"
+    - group: focus
+      label: 聚焦图
+      formSchema:
+        - $formkit: checkbox
+          name: top_feature
+          id: top_feature
+          label: 展示聚焦内容
+          value: true
+        - $formkit: text
+          if: "$get(top_feature).value == true"
+          name: feature_icon
+          label: 聚焦图标
+          placeholder: 聚焦前的小图标，不填写就不显示！
+          value: fa:anchor
+        - $formkit: text
+          if: "$get(top_feature).value == true"
+          name: feature_title
+          label: 聚焦标题
+        - $formkit: repeater
+          if: "$get(top_feature).value == true"
+          name: features
+          max: 3
+          label: 聚焦内容
+          value: []
+          children:
+            - $formkit: text
+              name: title
+              label: 标题
+            - $formkit: text
+              name: link
+              label: 链接
+            - $formkit: attachment
+              name: image
+              label: 图片
+              placeholder: 尺寸 257px * 160px
+            - $formkit: text
+              name: description
+              label: 描述
+    - group: post
+      label: 文章页
+      formSchema:
+        - $formkit: checkbox
+          name: post_auto_collapse
+          label: 导航栏自动收起
+          value: true
+        - $formkit: checkbox
+          name: post_toc
+          key: post_toc
+          id: post_toc
+          label: 文章目录树
+          value: true
+        - $formkit: select
+          name: toc_depth
+          if: "$get(post_toc).value == true"
+          label: 文章目录树展开级别
+          value: 0
+          options:
+            - value: 0
+              label: 不展开
+            - value: 1
+              label: 展开一级标题
+            - value: 2
+              label: 展开二级标题
+            - value: 3
+              label: 展开三级标题
+            - value: 4
+              label: 展开四级标题
+            - value: 5
+              label: 全部展开
+        - $formkit: checkbox
+          name: post_share
+          label: 使用文章分享
+          value: true
+        - $formkit: checkbox
+          name: post_original_copy
+          label: 复制内容增加版权声明
+          help: 需要在发布文章时的元数据上选中原创才可以生效
+          value: false
+        - $formkit: checkbox
+          name: post_word_count_toast
+          id: post_word_count_toast
+          label: 文章字数统计及阅读时间提示
+          value: true
+        - $formkit: checkbox
+          name: post_edit_time_toast
+          id: post_edit_time_toast
+          key: post_edit_time_toast
+          label: 文章距上次编辑时间提示
+          value: true
+        - $formkit: checkbox
+          name: custom_toast
+          id: custom_toast
+          key: custom_toast
+          label: 自定义提示语
+          value: false
+          help: 默认提示语会采用国际化方案，如果你想自定义提示语，可以开启此选项
+        - $formkit: text
+          if: "$get(post_word_count_toast).value == true && $get(custom_toast).value == true"
+          name: post_word_count_toast_normal
+          label: 阅读时间正常提示语
+        - $formkit: text
+          if: "$get(post_word_count_toast).value == true && $get(custom_toast).value == true"
+          name: post_word_count_toast_medium
+          label: 阅读时间略长提示语
+        - $formkit: text
+          if: "$get(post_word_count_toast).value == true && $get(custom_toast).value == true"
+          name: post_word_count_toast_difficulty
+          label: 阅读时间超长提示语
+        - $formkit: text
+          if: "$get(post_edit_time_toast).value == true && $get(custom_toast).value == true"
+          name: post_edit_time_toast_normal
+          label: 近期更新过文章提示语
+        - $formkit: text
+          if: "$get(post_edit_time_toast).value == true && $get(custom_toast).value == true"
+          name: post_edit_time_toast_medium
+          label: 一段时间未更新文章提示语
+        - $formkit: text
+          if: "$get(post_edit_time_toast).value == true && $get(custom_toast).value == true"
+          name: post_edit_time_toast_difficulty
+          label: 很长时间未更新文章提示语
+        - $formkit: checkbox
+          name: post_nepre
+          label: 上一篇/下一篇
+          value: true
+        - $formkit: checkbox
+          name: author_profile
+          label: 博主信息
+          value: true
+        - $formkit: repeater
+          name: reward
+          label: 文章打赏
+          value: []
+          children:
+            - $formkit: text
+              name: label
+              label: 打赏方式名称
+            - $formkit: attachment
+              name: code
+              label: 打赏二维码
+              validation: "required"
+        - $formkit: checkbox
+          name: code_line
+          label: 代码块增加行号
+          value: true
+        - $formkit: checkbox
+          name: code_change_line
+          label: 代码块自动换行
+          value: false
+        - $formkit: select
+          name: code_pretty
+          label: 文章代码高亮主题
+          value: Dracula
+          options:
+            - value: AndroidStudio
+              label: AndroidStudio
+            - value: Dark
+              label: Dark
+            - value: Docco
+              label: Docco
+            - value: Dracula
+              label: Dracula
+            - value: Far
+              label: Far
+            - value: Github
+              label: Github
+            - value: Tomorrow Night
+              label: Tomorrow Night
+    - group: tagAndCategory
+      label: 标签及分类页
+      formSchema:
+        - $formkit: checkbox
+          name: tag_cloud
+          label: 标签云
+          value: true
+        - $formkit: checkbox
+          name: category_radar
+          label: 分类雷达
+          help: 需要至少具有 3 个分类时才会显示
+          value: true
+    - group: journal
+      label: 瞬间
+      formSchema:
+        - $formkit: checkbox
+          name: journal_likes
+          label: 点赞功能
+          value: false
+        - $formkit: checkbox
+          name: journal_comment
+          label: 评论功能
+          value: false
+        - $formkit: select
+          name: journal_type
+          id: journal_type
+          label: 瞬间背景类型
+          value: color
+          options:
+            - value: color
+              label: 颜色板
+            - value: image
+              label: 图片
+        - $formkit: color
+          if: "$get(journal_type).value == color"
+          name: journal_color_bg_1
+          label: 单数-瞬间背景颜色&按钮颜色
+          value: "#E6E6FA"
+          help: 瞬间单数卡片的背景色以及按钮的默认颜色
+        - $formkit: color
+          if: "$get(journal_type).value == color"
+          name: journal_color_font_1
+          label: 单数-瞬间字体颜色
+          value: "#000000"
+          help: 瞬间单数卡片的字体颜色
+        - $formkit: color
+          if: "$get(journal_type).value == color"
+          name: journal_color_bg_2
+          label: 双数-瞬间背景颜色&按钮颜色
+          value: "#F0FFFF"
+          help: 瞬间双数卡片的背景色以及按钮的默认颜色
+        - $formkit: color
+          if: "$get(journal_type).value == color"
+          name: journal_color_font_2
+          label: 双数-瞬间字体颜色
+          value: "#000000"
+          help: 瞬间双数卡片的字体颜色
+        - $formkit: attachment
+          if: "$get(journal_type).value == image"
+          id: journal_bg
+          key: journal_bg
+          name: journal_bg
+          label: 瞬间背景图片
+          help: 使用图片作为瞬间背景
+        - $formkit: checkbox
+          if: "$get(journal_type).value == image"
+          id: journal_bg_cover
+          key: journal_bg_cover
+          name: journal_bg_blur
+          label: 背景图片虚化
+          value: false
+    - group: photos
+      label: 相册页
+      formSchema:
+        - $formkit: text
+          name: default_group
+          label: 默认展示分组
+          placeholder: 请填写分组名称
+          value: ""
+        - $formkit: select
+          name: masonry_column
+          label: 瀑布流列数(移动端始终为1)
+          value: 3
+          options:
+            - value: 2
+              label: 2
+            - value: 3
+              label: 3
+            - value: 4
+              label: 4
+            - value: 5
+              label: 5
+            - value: 6
+              label: 6
+            - value: 7
+              label: 7
+            - value: 8
+              label: 8
+        - $formkit: select
+          name: masonry_changer_min
+          label: 瀑布流切换功能最小列数
+          value: 3
+          options:
+            - value: 2
+              label: 2
+            - value: 3
+              label: 3
+            - value: 4
+              label: 4
+            - value: 5
+              label: 5
+            - value: 6
+              label: 6
+            - value: 7
+              label: 7
+            - value: 8
+              label: 8
+        - $formkit: select
+          name: masonry_changer_max
+          label: 瀑布流切换功能最大列数
+          value: 5
+          options:
+            - value: 2
+              label: 2
+            - value: 3
+              label: 3
+            - value: 4
+              label: 4
+            - value: 5
+              label: 5
+            - value: 6
+              label: 6
+            - value: 7
+              label: 7
+            - value: 8
+              label: 8
+    - group: random_image
+      label: 随机图
+      formSchema:
+        - $formkit: text
+          name: rimage_url
+          label: 随机图 API 地址
+          validation: "required|url"
+          value: https://api.lixingyong.com/api/images
+          help: 随机图 API 地址。
+        - $formkit: text
+          name: rimage_other_params
+          label: 第三方 API 自定义参数
+          help: 第三方 API 自定义参数，如 category=dongman 。参数会跟随在随机图 API 地址后面
+        - $formkit: select
+          name: rimage_cover_lqip
+          id: rimage_cover_lqip
+          key: rimage_cover_lqip
+          label: 延迟占位方式
+          value: loading
+          help: 在图片还未加载之前的过渡效果
+          options:
+            - value: loading
+              label: 固定加载图
+            - value: lowquality
+              label: 低质量图
+        - $formkit: text
+          if: "$get(rimage_cover_lqip).value == 'lowquality'"
+          name: rimage_cover_lqip_params
+          label: API 低质量图参数
+          value: "th=150"
+        - $formkit: checkbox
+          name: rimage_cover_open
+          id: rimage_cover_open
+          key: rimage_cover_open
+          label: 文章使用随机封面图
+          value: false
+          help: 文章是否使用随机图的设置随机获取图片
+        - $formkit: text
+          if: "$get(rimage_cover_open).value == true"
+          name: rimage_custom_param_name
+          label: 随机图 API 资源标识变量
+          validation: "required"
+          value: postid
+          help: 随机图 API 资源标识变量，默认为 postid，可根据随机图 API 的需要自行设置。
+        - $formkit: checkbox
+          name: rimage_cover_sheet_open
+          id: rimage_cover_sheet_open
+          key: rimage_cover_sheet_open
+          label: 页面使用随机封面图图
+          value: false
+          help: 页面是否使用随机图的设置随机获取图片
+        - $formkit: select
+          if: "$get(rimage_cover_open).value == true || $get(rimage_cover_sheet_open).value == true"
+          name: rimage_cover_itype
+          id: rimage_cover_itype
+          label: 封面列表图库获取范围
+          value: image
+          help: 将依据设置范围从图库中对应的内容里返回图片
+          options:
+            - value: image
+              label: 所有图片
+            - value: album
+              label: 相册
+            - value: category
+              label: 分类
+            - value: user
+              label: 用户
+        - $formkit: text
+          if: "($get(rimage_cover_open).value == true || $get(rimage_cover_sheet_open).value == true) && $get(rimage_cover_itype).value != image"
+          name: rimage_cover_id
+          label: 封面图获取范围编号
+          help: 相册编号、分类编号或用户名
+          validation: "required"
+        - $formkit: checkbox
+          name: rimage_cover_back_open
+          id: rimage_cover_back_open
+          key: rimage_cover_back_open
+          label: 首页背景使用随机图
+          value: false
+          help: 首页背景是否启用随机图，如果启用，则第一屏中的首页背景图片将会无效化
+        - $formkit: select
+          if: "$get(rimage_cover_back_open).value == true"
+          name: rimage_cover_back_itype
+          id: rimage_cover_back_itype
+          key: rimage_cover_back_itype
+          label: 背景图获取范围
+          value: image
+          help: 封面图获取范围，设置之后，将从设置范围中返回图片
+          options:
+            - value: image
+              label: 所有图片
+            - value: album
+              label: 相册
+            - value: category
+              label: 分类
+            - value: user
+              label: 用户
+        - $formkit: text
+          if: "$get(rimage_cover_back_open).value == true && $get(rimage_cover_back_itype).value != image"
+          name: rimage_cover_back_id
+          label: 背景图获取范围编号
+          help: 如相册编号、分类编号或用户名
+        - $formkit: select
+          if: "$get(rimage_cover_back_open).value == true"
+          name: rimage_cover_back_num
+          label: 背景图片循环张数
+          value: 5
+          options:
+            - value: 3
+              label: 三张
+            - value: 5
+              label: 五张
+            - value: 10
+              label: 十张
+            - value: 0
+              label: 无限
+    - group: theme
+      label: 主题风格
+      formSchema:
+        - $formkit: checkbox
+          name: theme_change
+          id: theme_change
+          label: 开启主题切换
+          value: true
+          help: 所有主题的样式可以自定义，但建议默认即可
+        - $formkit: repeater
+          if: "$get(theme_change).value == true"
+          name: bg_themes
+          min: 1
+          max: 8
+          label: 主题配置
+          value:
+            - bg_name: white
+              bg_url:
+              bg_img_strategy: none
+              bg_icon: fa:television
+              bg_night: false
+              bg_isdefault: true
+            - bg_name: sakura
+              bg_url: /themes/theme-sakura/assets/images/themes/sakura.png
+              bg_img_strategy: none
+              bg_icon: fluent-emoji-high-contrast:cherry-blossom
+              bg_night: false
+              bg_isdefault: false
+            - bg_name: gribs
+              bg_url: /themes/theme-sakura/assets/images/themes/gribs.jpg
+              bg_img_strategy: none
+              bg_icon: fa:slack
+              bg_night: false
+              bg_isdefault: false
+            - bg_name: KAdots
+              bg_url: /themes/theme-sakura/assets/images/themes/kyotoanimation.png
+              bg_img_strategy: none
+              bg_icon: tabler:chart-grid-dots
+              bg_night: false
+              bg_isdefault: false
+            - bg_name: totem
+              bg_url: /themes/theme-sakura/assets/images/themes/little-monster.png
+              bg_img_strategy: none
+              bg_icon: fa:optin-monster
+              bg_night: false
+              bg_isdefault: false
+            - bg_name: pixiv
+              bg_url: /themes/theme-sakura/assets/images/themes/star02.png
+              bg_img_strategy: none
+              bg_icon: simple-icons:pixiv
+              bg_night: false
+              bg_isdefault: false
+            - bg_name: bing
+              bg_url: https://api.1314.cool/bingimg/
+              bg_img_strategy: cover
+              bg_icon: jam:bing
+              bg_night: false
+              bg_isdefault: false
+            - bg_name: dark
+              bg_url:
+              bg_img_strategy: cover
+              bg_icon: fa:moon-o
+              bg_night: true
+              bg_isdefault: false
+          children:
+            - $formkit: text
+              name: bg_name
+              label: 主题名称
+            - $formkit: attachment
+              name: bg_url
+              label: 主题图片/图片库链接
+              help: 不输入则为白色背景
+            - $formkit: select
+              label: 主题图片处理策略
+              name: bg_img_strategy
+              value: none
+              options:
+                - value: none
+                  label: 无
+                - value: no-repeat
+                  label: 不重复
+                - value: repeat
+                  label: 重复
+                - value: cover
+                  label: 完全覆盖背景
+            - $formkit: text
+              name: bg_icon
+              label: 主题图标
+              help: 图标可能无法立即生效
+              validation: required
+            - $formkit: checkbox
+              name: bg_night
+              label: 黑夜模式
+              help: 开启后，当前主题被选中的同时也会进入黑夜模式
+              value: false
+            - $formkit: checkbox
+              name: bg_isdefault
+              label: 是否为默认主题
+              help: 同时只能存在一个默认主题
+              value: false
+    - group: additional
+      label: 背景音乐
+      formSchema:
+        - $formkit: checkbox
+          name: aplayer_float
+          id: aplayer_float
+          label: 吸底背景音乐
+          value: false
+        - $formkit: text
+          if: "$get(aplayer_float).value == true"
+          name: aplayer_host
+          label: Meting API 地址
+          value: https://api.injahow.cn/meting/
+          help: 支持 Meting 类型格式的 API，主题不保证 API 可用度，如无法使用请自行搭建。 https://github.com/injahow/meting-api
+        - $formkit: select
+          if: "$get(aplayer_float).value == true"
+          name: aplayer_server
+          label: 音乐服务商
+          help: 不同接口所支持的音乐服务商不同，如无法使用请自行更换
+          value: netease
+          options:
+            - value: netease
+              label: 网易云音乐
+            - value: tencent
+              label: QQ 音乐
+            - value: xiami
+              label: 虾米音乐
+            - value: kugou
+              label: 酷狗音乐
+            - value: baidu
+              label: 百度音乐
+        - $formkit: select
+          if: "$get(aplayer_float).value == true"
+          name: aplayer_type
+          label: 类别
+          value: playlist
+          options:
+            - value: song
+              label: 单曲
+            - value: playlist
+              label: 歌单
+            - value: album
+              label: 专辑
+            - value: artist
+              label: 歌手
+            - value: search
+              label: 搜索
+        - $formkit: text
+          if: "$get(aplayer_float).value == true"
+          name: aplayer_id
+          label: id
+          value: 2345868969
+        - $formkit: select
+          if: "$get(aplayer_float).value == true"
+          name: aplayer_preload
+          label: 预加载
+          value: none
+          options:
+            - value: none
+              label: 无
+            - value: metadata
+              label: 仅元数据
+            - value: auto
+              label: 自动
+        - $formkit: number
+          if: "$get(aplayer_float).value == true"
+          name: aplayer_volume
+          label: 默认音量大小
+          value: 0.7
+        - $formkit: checkbox
+          if: "$get(aplayer_float).value == true"
+          name: aplayer_autoplay
+          label: 自动播放
+          value: false
+          help: 由于浏览器限制，此功能可能无法生效！（也建议不要开启，会产生噪音，影响用户体验）
+        - $formkit: select
+          if: "$get(aplayer_float).value == true"
+          name: aplayer_order
+          label: 播放顺序
+          value: random
+          options:
+            - value: list
+              label: 列表
+            - value: random
+              label: 随机
+        - $formkit: color
+          if: "$get(aplayer_float).value == true"
+          name: aplayer_theme
+          label: 主题色
+          value: "#FFA500"
+    - group: toast
+      label: 提示及监听
+      formSchema:
+        - $formkit: checkbox
+          name: open_toast
+          id: open_toast
+          label: 全局提示功能
+          value: true
+        - $formkit: number
+          if: "$get(open_toast).value == true"
+          name: toast_width
+          label: 提示组件宽度
+          value: 260
+          min: 260
+          max: 540
+          step: 10
+        - $formkit: number
+          if: "$get(open_toast).value == true"
+          name: toast_height
+          label: 提示组件高度
+          value: 60
+          min: 60
+          max: 200
+          step: 5
+        - $formkit: select
+          if: "$get(open_toast).value == true"
+          name: toast_top
+          label: 提示组件相对屏幕垂直位置
+          value: top
+          options:
+            - value: top
+              label: 顶部
+            - value: centent
+              label: 居中
+        - $formkit: color
+          if: "$get(open_toast).value == true"
+          name: toast_color
+          label: 提示组件文本颜色
+          value: "#fff"
+        - $formkit: number
+          if: "$get(open_toast).value == true"
+          name: toast_font_size
+          label: 提示组件文本大小
+          value: 14
+          min: 1
+    - group: others
+      label: 其他
+      formSchema:
+        - $formkit: checkbox
+          name: poi_pjax
+          label: 开启 PJAX 局部刷新
+          value: true
+        # Halo 2.x 邮件服务还未实现
+        # - $formkit: text
+        #   name: reply_mail_img
+        #   label: 邮件回复模块图片
+        #   value: /themes/theme-sakura/assets/images/email/head.webp
+        - $formkit: select
+          name: top_back_mode
+          label: 回到顶部样式
+          value: lanyard
+          options:
+            - value: lanyard
+              label: 挂绳
+            - value: simplify
+              label: 精简
+        - $formkit: text
+          name: top_back_img
+          label: 回到顶部图片
+          value: /themes/theme-sakura/assets/images/scroll.png
+        - $formkit: text
+          name: footer_logo
+          label: 页脚 Logo
+          value: /themes/theme-sakura/assets/images/footer/sakura.svg
+        - $formkit: text
+          name: footer_case_number
+          label: ICP 备案信息
+          value: ""
+          help: 为空则不展示 ICP 备案号（建议添加）
+        - $formkit: text
+          name: footer_ga_case_number
+          label: 公安备案信息
+          value: ""
+          help: 为空则不展示公安备案信息
+        - $formkit: text
+          name: footer_ga_select_number
+          label: 公安联网备案号
+          value: ""
+          help: 应与公安备案信息内的编号一致
+        - $formkit: checkbox
+          name: head_notice
+          id: head_notice
+          label: 开启公告
+          value: false
+        - $formkit: code
+          if: "$get(head_notice).value == true"
+          name: notice_title
+          label: 公告内容
+          height: 300px
+          placeholder: 公告内容，文字超出142个字节将会被滚动显示（移动端无效），一个汉字 = 3字节，一个字母 = 1字节。
+          language: html
+        - $formkit: checkbox
+          name: keep_record_mode
+          label: 备案模式
+          value: false
+          help: 备案模式，开启之后将隐藏所有留言、评论功能

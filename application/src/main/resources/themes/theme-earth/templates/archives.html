@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html
+  xmlns:th="https://www.thymeleaf.org"
+  th:replace="~{modules/layout :: html(title = '归档 - ' + ${site.title}, hero = null, content = ~{::content}, head = null, footer = null, sidebar = ~{::sidebar}, contentClass = '')}"
+>
+  <th:block th:fragment="content">
+    <div class="rounded-xl bg-white p-4 dark:bg-slate-800">
+      <h1 class="mb-6 text-2xl font-medium dark:text-slate-50">归档</h1>
+      <div class="flex flex-col gap-4">
+        <th:block th:each="archive : ${archives.items}">
+          <th:block th:each="month : ${archive.months}">
+            <div class="grid grid-cols-12 gap-4">
+              <div class="col-span-12 sm:col-span-3">
+                <h2
+                  class="sticky top-16 mt-2 text-lg font-medium dark:text-slate-50"
+                  th:text="|${archive.year} 年 ${month.month} 月|"
+                ></h2>
+              </div>
+              <div class="col-span-12 sm:col-span-9">
+                <th:block th:each="post : ${month.posts}">
+                  <div
+                    class="my-2 rounded border border-gray-300 bg-white shadow-sm hover:border-gray-400 hover:shadow dark:border-slate-600 dark:bg-slate-700 dark:hover:border-slate-700"
+                  >
+                    <div class="relative flex flex-col gap-2 p-4">
+                      <div class="flex min-w-0 flex-wrap items-center justify-between gap-4">
+                        <div class="col-span-7 flex flex-nowrap truncate">
+                          <a
+                            th:href="${post.status.permalink}"
+                            class="truncate text-xl font-medium text-gray-900 hover:text-gray-500 hover:underline dark:text-slate-50 dark:hover:text-white"
+                            th:text="${post.spec.title}"
+                          ></a>
+                        </div>
+                        <div class="col-span-3 col-start-11">
+                          <p
+                            class="truncate text-sm text-gray-600 dark:text-slate-100"
+                            th:text="${#dates.format(post.spec.publishTime, 'yyyy-MM-dd')}"
+                          ></p>
+                        </div>
+                      </div>
+                      <div
+                        th:if="${not #lists.isEmpty(post.categories)} or ${not #lists.isEmpty(post.tags)}"
+                        class="flex flex-wrap items-center gap-2"
+                      >
+                        <a
+                          th:if="${#lists.size(post.categories)} gt 0"
+                          th:href="@{${post.categories[0].status.permalink}}"
+                          th:title="${post.categories[0].spec.displayName}"
+                          th:text="${post.categories[0].spec.displayName}"
+                          class="mr-1 text-sm font-medium text-gray-800 hover:text-gray-900 dark:text-slate-500 dark:hover:text-slate-600"
+                        >
+                        </a>
+                        <a
+                          th:each="tag : ${post.tags}"
+                          th:href="@{${tag.status.permalink}}"
+                          th:title="${tag.spec.displayName}"
+                          th:text="|#${tag.spec.displayName}|"
+                          class="cursor-pointer text-sm italic text-gray-600 hover:text-gray-900 dark:text-slate-400 dark:hover:text-slate-500"
+                        >
+                        </a>
+                      </div>
+                      <div class="text-sm font-light line-clamp-6 dark:text-slate-200">
+                        <th:block th:text="${post.status.excerpt}"></th:block>
+                      </div>
+                    </div>
+                  </div>
+                </th:block>
+              </div>
+            </div>
+          </th:block>
+        </th:block>
+      </div>
+
+      <div th:if="${archives.total == 0}" class="mt-6 flex items-center justify-center">
+        <span class="text-sm font-light text-gray-600">当前没有文章</span>
+      </div>
+
+      <div class="mt-6 flex items-center justify-between" th:if="${archives.hasPrevious() || archives.hasNext()}">
+        <a
+          th:href="@{${archives.prevUrl}}"
+          class="whitespace-no-wrap group inline-flex items-center justify-center gap-1 rounded-md border border-gray-200 bg-white px-4 py-1 text-sm font-medium leading-6 text-gray-600 shadow-sm hover:bg-gray-50 focus:shadow-none focus:outline-none dark:border-slate-600 dark:bg-slate-700 dark:text-slate-100 dark:hover:bg-slate-600 dark:hover:text-white"
+        >
+          <span class="i-tabler-arrow-left text-lg transition-all group-hover:-translate-x-1"></span>
+          <span>上一页</span>
+        </a>
+        <span
+          class="text-sm text-gray-900 dark:text-slate-50"
+          th:text="|${archives.page} / ${archives.totalPages}|"
+        ></span>
+        <a
+          th:href="@{${archives.nextUrl}}"
+          class="whitespace-no-wrap group inline-flex items-center justify-center gap-1 rounded-md border border-gray-200 bg-white px-4 py-1 text-sm font-medium leading-6 text-gray-600 shadow-sm hover:bg-gray-50 focus:shadow-none focus:outline-none dark:border-slate-600 dark:bg-slate-700 dark:text-slate-100 dark:hover:bg-slate-600 dark:hover:text-white"
+        >
+          <span>下一页</span>
+          <span class="i-tabler-arrow-right text-lg transition-all group-hover:translate-x-1"></span>
+        </a>
+      </div>
+    </div>
+  </th:block>
+</html>

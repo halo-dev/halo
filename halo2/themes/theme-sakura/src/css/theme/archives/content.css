@@ -1,0 +1,128 @@
+.archives-inner {
+  margin-top: 50px;
+  margin-bottom: 100px;
+  position: relative;
+
+  & .archives-content {
+    &::before {
+      content: "";
+      position: absolute;
+      height: calc(100% - 65px);
+      border-left: 1px dashed #fff;
+      left: 17px;
+      top: 30px;
+    }
+  }
+
+  & h2 {
+    font-weight: 400;
+    color: #666;
+    padding-bottom: 15px;
+    border-bottom: 1px dashed #fff;
+    text-align: center;
+  }
+
+  & .archive-item {
+    &.active {
+      & .archive-posts {
+        max-height: max-content;
+        transition-timing-function: cubic-bezier(.5, 0, .3, 1);
+      }
+    }
+
+    margin-top: 35px;
+    position: relative;
+    z-index: 1;
+
+    & .archive-title {
+      display: flex;
+      align-items: center;
+
+      & .archive-time {
+        & svg {
+          padding: 10px;
+          border-radius: 100px;
+          background: var(--theme-color);
+          color: #fff;
+        }
+      }
+
+      & h3 {
+        letter-spacing: 2px;
+        font-style: italic;
+        font-size: 20px;
+        font-weight: 400;
+        color: var(--theme-color);
+        margin-left: 10px;
+    
+        &:hover {
+          color: #ddd !important;
+          cursor: pointer;
+        }
+      }
+    }
+
+    & .archive-posts {
+      max-height: 0;
+      overflow: hidden;
+      transition: max-height 0.5s ease-in-out; 
+
+      & .archive-post-item {
+        position: relative;
+
+        & .archive-post-circle {
+          height: 11px;
+          width: 11px;
+          background: var(--theme-color);
+          display: inline-block;
+          position: absolute;
+          margin-top: 22px;
+          border-radius: 100px;
+          left: 12px;
+        }
+
+        & .arrow-left-ar  {
+          width: 0;
+          height: 0;
+          display: block;
+          float: left;
+          margin-top: 10px;
+          border-left: 20px solid transparent;
+          border-bottom: 20px solid #f5f5f5;
+          margin-left: 26px;
+        }
+
+        & .brick {
+          margin-left: 46px;
+
+          & a {
+            color: #7d7d7d;
+            padding: 20px;
+            background: #f5f5f5;
+            margin-bottom: 20px;
+            display: block;
+            letter-spacing: 0px;
+          }
+
+          & em {
+            font-style: normal;
+            margin-left: 5px;
+          }
+
+          & .time {
+            float: right;
+            color: #ccc;
+
+            & svg {
+              margin: 3px;
+            }
+          }
+        }
+      }
+    }
+  }
+
+  @mixin screens-md {
+    margin: 0 20px;
+  }
+}

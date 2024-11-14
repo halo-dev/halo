@@ -1,0 +1,41 @@
+.header-info {
+  max-width: 30%;
+  position: relative;
+  margin: 0;
+  font-size: 1rem;
+  color: var(--first-screen-header-info-text-color);
+  background: var(--first-screen-header-info-background-color);
+  padding: 1rem;
+  letter-spacing: 0;
+  line-height: 2rem;
+  border-radius: 10px;
+  box-sizing: initial;
+  white-space: nowrap;
+  margin-top: 1.25rem;
+
+  &::before {
+    position: absolute;
+    left: 30%;
+    border-width: 15px;
+    border-style: solid;
+    border-color: transparent;
+    border-bottom-color: var(--first-screen-header-info-background-color);
+  }
+
+  & p {
+    margin: 0;
+    font-family: "Ubuntu", sans-serif;
+    font-weight: 700;
+    overflow: hidden;
+    white-space: nowrap;
+    transition: color 0.4s;
+  }
+
+  & .desc {
+    overflow: hidden;
+    white-space: normal;
+    text-overflow: clip;
+    word-break: keep-all;
+    display: inline;
+  }
+}

@@ -1,0 +1,7 @@
+<th:block th:fragment="content-page(page)">
+  <article th:id="|post-${page.metadata.name}|" class="page-article"
+    th:classappend="|post-${page.metadata.name}|">
+
+    <div class="entry-content fancybox-content" th:utext="${page.content.content}"></div>
+  </article>
+</th:block>

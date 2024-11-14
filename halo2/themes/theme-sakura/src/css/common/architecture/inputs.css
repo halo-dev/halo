@@ -1,0 +1,87 @@
+input {
+  font-size: 1rem;
+  font: inherit;
+  margin: 0;
+  line-height: normal;
+}
+
+input:-webkit-autofill {
+  -webkit-box-shadow: 0 0 0px 1000px white inset;
+}
+
+input[type="button"],
+input[type="reset"],
+input[type="submit"] {
+  cursor: pointer;
+  border: 1px solid;
+  border-color: #ccc #ccc #b0b0b0;
+  border-radius: 3px;
+  background: #ddd;
+  box-shadow: none;
+  color: rgba(0, 0, 0, 0.8);
+  font-size: 0.75rem;
+  line-height: 1;
+  padding: 0.6em 1em 0.4em;
+  -webkit-appearance: button;
+
+  &:hover {
+    border-color: #ccc #b0b0b0 #b0b0b0;
+    box-shadow: none;
+  }
+
+  &:focus,
+  &:active {
+    border-color: #b0b0b0 #b0b0b0 #b0b0b0;
+    box-shadow: none;
+  }
+}
+
+input[disabled] {
+  cursor: default;
+}
+
+input::-moz-focus-inner {
+  border: 0;
+  padding: 0;
+}
+
+input[type="checkbox"],
+input[type="radio"] {
+  box-sizing: border-box;
+  padding: 0;
+}
+
+input[type="number"]::-webkit-inner-spin-button,
+input[type="number"]::-webkit-outer-spin-button {
+  height: auto;
+}
+
+input[type="search"]::-webkit-search-cancel-button,
+input[type="search"]::-webkit-search-decoration {
+  -webkit-appearance: none;
+}
+
+input[type="text"],
+input[type="email"],
+input[type="url"],
+input[type="password"],
+input[type="search"],
+input[type="number"],
+input[type="tel"],
+input[type="range"],
+input[type="date"],
+input[type="month"],
+input[type="week"],
+input[type="time"],
+input[type="datetime"],
+input[type="datetime-local"],
+input[type="color"] {
+  color: var(--color);
+  border: 1px solid #ccc;
+  border-radius: 3px;
+  padding: 3px;
+
+  &:focus {
+    color: #000000;
+  }
+}

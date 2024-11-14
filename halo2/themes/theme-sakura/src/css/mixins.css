@@ -1,0 +1,57 @@
+/**
+* mixin 功能，为全局 CSS 提供公共的 mixin。
+* 使用 postcss 插件 postcss-mixins。https://github.com/postcss/postcss-mixins
+*/
+/** 设备分辨率 **/
+@define-mixin screens-sm {
+  @media (max-width: 640px) {
+    @mixin-content;
+  }
+}
+
+@define-mixin screens-md {
+  @media (max-width: 768px) {
+    @mixin-content;
+  }
+}
+
+@define-mixin screens-lg {
+  @media (max-width: 1024px) {
+    @mixin-content;
+  }
+}
+
+@define-mixin screens-xl {
+  @media (max-width: 1280px) {
+    @mixin-content;
+  }
+}
+
+@define-mixin screens-2xl {
+  @media (max-width: 1536px) {
+    @mixin-content;
+  }
+}
+
+@define-mixin dark {
+  @media (prefers-color-scheme: dark) {
+    @mixin-content;
+  }
+}
+
+@define-mixin col $col: 3 {
+  &.col-$(col) {
+    width: calc((100% - ($(col) - 1) * 10px) / $(col));
+  }
+}
+ 
+/**
+ * 解决 hover 在移动端的黏着触发问题
+ *
+ * @see https://issues.chromium.org/issues/40364091
+ */
+@define-mixin pc-hover {
+  @media (any-hover: hover) {
+    @mixin-content;
+  }
+}

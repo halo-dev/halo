@@ -1,0 +1,19 @@
+<!--/* 列表所使用的分页 */-->
+<th:block th:fragment="pagination(posts)">
+  <th:block th:if="${theme.config.general.pagenav_style == 'ajax'}">
+    <div id="pagination" class="list-pagination">
+      <a th:if="${posts.hasNext()}" th:href="@{${posts.nextUrl}}" data-i18n="page.next" aria-label="request for the next page of the article"></a>
+      <span th:unless="${posts.hasNext()}" data-i18n="page.theend"></span>
+    </div>
+  </th:block>
+  <th:block th:unless="${theme.config.general.pagenav_style == 'ajax'}">
+    <nav class="list-navigator">
+      <a data-pjax th:if="${posts.hasPrevious()}" th:href="@{${posts.prevUrl}}" aria-label="request for the previous page of the article">
+        <span class="iconify" data-icon="fa:chevron-left"></span>
+      </a>
+      <a data-pjax th:if="${posts.hasNext()}" th:href="@{${posts.nextUrl}}" aria-label="request for the next page of the article">
+        <span class="iconify" data-icon="fa:chevron-right"></span>
+      </a>
+    </nav>
+  </th:block>
+</th:block>

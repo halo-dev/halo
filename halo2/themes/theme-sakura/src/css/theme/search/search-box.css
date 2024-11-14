@@ -1,0 +1,40 @@
+.search-container {
+  margin-top: 3.5rem;
+
+  & .search-box {
+    position: relative;
+    margin-bottom: 3.125rem;
+
+    & svg {
+      font-size: 1.5em;
+      line-height: 1;
+      color: #ddd;
+      position: absolute;
+      top: 50%;
+      transform: translateY(-50%);
+      left: 1rem;
+    }
+
+    & input {
+      font-size: 1rem;
+      background: #fff;
+      background: var(--background-color);
+      padding: 0.75rem 1.5rem 0.75rem 4rem;
+      width: 100%;
+      outline: none;
+      border-radius: 50px;
+      box-sizing: border-box;
+      transition: background 1s;
+    }
+  }
+
+  & h1.search-title {
+    font-size: 20px;
+    font-weight: 400;
+    border: 1px dashed #ddd;
+    padding: 10px 15px;
+    color: #828282;
+    margin-bottom: 30px;
+    text-align: center;
+  }
+}

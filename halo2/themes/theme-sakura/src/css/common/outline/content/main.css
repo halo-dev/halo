@@ -1,0 +1,27 @@
+.site-content {
+  max-width: var(--site-content-max-width);
+  margin-left: auto;
+  margin-right: auto;
+  background-color: var(--site-content-background-color);
+  padding: 0 10px;
+
+  &::before,
+  &::after {
+    content: "";
+    display: table;
+    table-layout: fixed;
+  }
+
+  &::after {
+    clear: both;
+  }
+
+  @mixin screens-md {
+    padding: 0 4%;
+  }
+}
+
+.main-inner {
+  position: relative;
+  z-index: 1;
+}

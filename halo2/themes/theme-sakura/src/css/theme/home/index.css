@@ -1,0 +1,58 @@
+@import "header.css";
+
+@import "notice.css";
+
+@import "top-feature.css";
+
+@import "content.css";
+
+.is-homepage {
+  & .site-header {
+    position: fixed;
+
+    &.yya {
+      & .header-inner .lower-container {
+        display: block;
+      }
+    }
+
+    & .header-inner {
+      transition: background 1s;
+
+      & .lower-container {
+        display: none;
+      }
+    }
+
+    &:hover {
+      & .header-inner {
+        position: fixed;
+        top: 0;
+        background: var(--header-background);
+
+        & .lower-container {
+          display: block;
+        }
+      }
+    }
+  }
+
+  @mixin screens-md {
+    & .site-header {
+      &:hover {
+        & .header-inner {
+          background: transparent;
+        }
+      }
+    }
+  }
+}
+
+/* 非首页时 */
+section:not(.is-homepage) .site-header .header-inner {
+  box-shadow: 0 1px 40px -8px #00000080;
+
+  @mixin screens-md {
+    box-shadow: none;
+  }
+}

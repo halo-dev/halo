@@ -1,0 +1,57 @@
+<th:block th:fragment="content-masonry-photos">
+  <div class="masonry-container">
+    <div class="masonry-tools">
+      <th:block th:replace="~{module/photo/group :: group(${photoFinder.groupBy()})}" />
+      <!--/* 工具栏 */-->
+      <nav id="grid-changer" class="grid-changer">
+        <ul>
+          <li>
+            <span class="active" th:data-col="|${theme.config.photos.masonry_changer_min}|">
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 30 30">
+                <rect width="10" height="10" x="10" y="10"></rect>
+              </svg>
+            </span>
+          </li>
+          <li>
+            <span th:data-col="|${theme.config.photos.masonry_changer_max}|">
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 30 30">
+                <rect width="7" height="7" x="7" y="7"></rect>
+                <rect width="7" height="7" x="15" y="7"></rect>
+                <rect width="7" height="7" x="7" y="15"></rect>
+                <rect width="7" height="7" x="15" y="15"></rect>
+              </svg>
+            </span>
+          </li>
+        </ul>
+      </nav>
+    </div>
+
+    <div class="photos-content fancybox-content loading">
+      <div class="gallery masonry-gallery">
+        <th:block th:each="photo : ${photoFinder.listAll()}">
+          <figure
+            class="gallery-item"
+            th:classappend="|group-${#strings.trim(photo.spec.groupName)} col-${theme.config.photos.masonry_column}|"
+          >
+            <header class="gallery-icon">
+              <img
+                class="lazyload"
+                th:src="${#strings.isEmpty(photo.spec.cover) ? #theme.assets('/images/load/load.gif') : photo.spec.cover}"
+                th:alt="${photo.spec.displayName}"
+                th:data-src="${photo.spec.url}"
+                height="500"
+                width="500"
+              />
+            </header>
+            <figcaption class="gallery-caption">
+              <div class="entry-summary">
+                <h3 th:text="${photo.spec.displayName}"></h3>
+                <p th:if="${not #strings.isEmpty(photo.spec.description)}" th:text="${photo.spec.description}"></p>
+              </div>
+            </figcaption>
+          </figure>
+        </th:block>
+      </div>
+    </div>
+  </div>
+</th:block>

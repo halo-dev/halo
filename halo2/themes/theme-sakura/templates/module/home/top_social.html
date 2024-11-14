@@ -1,0 +1,26 @@
+<th:block th:fragment="top_social">
+  <th:block th:each="item : ${theme.config.sns.items}">
+    <li th:classappend="${item.url_type == 'image'} ? 'social-image' : ''">
+      <th:block th:if="${item.url_type == 'normal'}">
+        <a th:href="${item.url}" target="_blank" aria-label="access the webmaster's social media networks">
+          <th:block th:insert="~{::common_social(${item})}"></th:block>
+        </a>
+      </th:block>
+      <th:block th:if="${item.url_type == 'image'}">
+        <th:block th:insert="~{::common_social(${item})}"></th:block>
+      </th:block>
+    </li>
+  </th:block>
+
+  <th:block th:fragment="common_social(item)">
+    <th:block th:if="${item.type == 'preset'}">
+      <img th:src="@{/assets/images/sns/{icon}(icon=${item.icon})}" alt="sns" width="28" height="28" />
+    </th:block>
+    <th:block th:if="${item.type == 'custom'}">
+      <img th:src="${item.custom_icon}" alt="sns" width="28" height="28" />
+    </th:block>
+    <div th:if="${item.url_type == 'image'}" class="social-image-inner">
+      <img th:src="${item.image}" alt="sns" width="28" height="28" />
+    </div>
+  </th:block>
+</th:block>

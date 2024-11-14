@@ -1,0 +1,14 @@
+.page-none-content {
+  margin: 1.5em 0 0;
+
+  & .page-header {
+    & .page-title {
+      font-size: 1.25rem;
+      font-weight: 400;
+      border: 1px dashed #ddd;
+      padding: 0.625rem 0.9375rem;
+      color: #7d7d7d;
+      margin-bottom: 1.875rem;
+    }
+  }
+}

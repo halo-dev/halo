@@ -1,0 +1,20 @@
+span {
+  &.copy-code {
+    color: #fff;
+    position: absolute;
+    right: 0.625em;
+    display: inline-table;
+    top: 0.375em;
+    padding-right: 0.125em;
+    font-size: 1rem;
+    z-index: 1;
+
+    &:hover {
+      color: rgba(255, 255, 255, 0.5);
+    }
+
+    &::after {
+      display: none;
+    }
+  }
+}
