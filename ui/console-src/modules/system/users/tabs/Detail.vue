@@ -4,9 +4,9 @@ import { formatDatetime } from "@/utils/date";
 import type { DetailedUser } from "@halo-dev/api-client";
 import {
   IconInformation,
-  IconUserSettings,
   VDescription,
   VDescriptionItem,
+  VSpace,
   VTag,
 } from "@halo-dev/components";
 import RiVerifiedBadgeLine from "~icons/ri/verified-badge-line";
@@ -55,24 +55,23 @@ withDefaults(defineProps<{ user?: DetailedUser }>(), {
         :label="$t('core.user.detail.fields.roles')"
         class="!px-2"
       >
-        <VTag
-          v-for="(role, index) in user?.roles"
-          :key="index"
-          @click="
-            $router.push({
-              name: 'RoleDetail',
-              params: { name: role.metadata.name },
-            })
-          "
-        >
-          <template #leftIcon>
-            <IconUserSettings />
-          </template>
-          {{
-            role.metadata.annotations?.[rbacAnnotations.DISPLAY_NAME] ||
-            role.metadata.name
-          }}
-        </VTag>
+        <VSpace>
+          <VTag
+            v-for="role in user?.roles"
+            :key="role.metadata.name"
+            @click="
+              $router.push({
+                name: 'RoleDetail',
+                params: { name: role.metadata.name },
+              })
+            "
+          >
+            {{
+              role.metadata.annotations?.[rbacAnnotations.DISPLAY_NAME] ||
+              role.metadata.name
+            }}
+          </VTag>
+        </VSpace>
       </VDescriptionItem>
       <VDescriptionItem
         :label="$t('core.user.detail.fields.bio')"

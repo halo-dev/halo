@@ -469,19 +469,18 @@ function onGrantPermissionModalClose() {
               <template #end>
                 <VEntityField>
                   <template #description>
-                    <div
-                      v-for="(role, roleIndex) in user.roles"
-                      :key="roleIndex"
-                      class="flex items-center"
-                    >
-                      <VTag>
+                    <VSpace>
+                      <VTag
+                        v-for="role in user.roles"
+                        :key="role.metadata.name"
+                      >
                         {{
                           role.metadata.annotations?.[
                             rbacAnnotations.DISPLAY_NAME
                           ] || role.metadata.name
                         }}
                       </VTag>
-                    </div>
+                    </VSpace>
                   </template>
                 </VEntityField>
                 <VEntityField v-if="user.user.metadata.deletionTimestamp">

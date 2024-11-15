@@ -5,11 +5,11 @@ import type { DetailedUser, ListedAuthProvider } from "@halo-dev/api-client";
 import { consoleApiClient } from "@halo-dev/api-client";
 import {
   Dialog,
-  IconUserSettings,
   VAlert,
   VButton,
   VDescription,
   VDescriptionItem,
+  VSpace,
   VTag,
 } from "@halo-dev/components";
 import { useQuery } from "@tanstack/vue-query";
@@ -133,15 +133,14 @@ const emailVerifyModal = ref(false);
         :label="$t('core.uc_profile.detail.fields.roles')"
         class="!px-2"
       >
-        <VTag v-for="role in user?.roles" :key="role.metadata.name">
-          <template #leftIcon>
-            <IconUserSettings />
-          </template>
-          {{
-            role.metadata.annotations?.[rbacAnnotations.DISPLAY_NAME] ||
-            role.metadata.name
-          }}
-        </VTag>
+        <VSpace>
+          <VTag v-for="role in user?.roles" :key="role.metadata.name">
+            {{
+              role.metadata.annotations?.[rbacAnnotations.DISPLAY_NAME] ||
+              role.metadata.name
+            }}
+          </VTag>
+        </VSpace>
       </VDescriptionItem>
       <VDescriptionItem
         :label="$t('core.uc_profile.detail.fields.bio')"

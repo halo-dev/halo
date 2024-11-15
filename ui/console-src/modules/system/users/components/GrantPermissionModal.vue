@@ -1,9 +1,14 @@
 <script lang="ts" setup>
 import SubmitButton from "@/components/button/SubmitButton.vue";
+import { rbacAnnotations } from "@/constants/annotations";
 import type { User } from "@halo-dev/api-client";
 import { consoleApiClient } from "@halo-dev/api-client";
-import { VButton, VModal, VSpace } from "@halo-dev/components";
-import { ref } from "vue";
+import { Toast, VButton, VModal, VSpace } from "@halo-dev/components";
+import { useMutation } from "@tanstack/vue-query";
+import { computed, ref } from "vue";
+import { useI18n } from "vue-i18n";
+
+const { t } = useI18n();
 
 const props = withDefaults(
   defineProps<{
@@ -19,25 +24,35 @@ const emit = defineEmits<{
 }>();
 
 const modal = ref<InstanceType<typeof VModal> | null>(null);
-const selectedRole = ref("");
-const isSubmitting = ref(false);
 
-const handleGrantPermission = async () => {
-  try {
-    isSubmitting.value = true;
-    await consoleApiClient.user.grantPermission({
+const currentRoles = computed(() => {
+  if (!props.user) {
+    return [];
+  }
+  return JSON.parse(
+    props.user.metadata.annotations?.[rbacAnnotations.ROLE_NAMES] || "[]"
+  );
+});
+
+const { mutate, isLoading } = useMutation({
+  mutationKey: ["core:user:grant-permissions"],
+  mutationFn: async ({ roles }: { roles: string[] }) => {
+    return await consoleApiClient.user.grantPermission({
       name: props.user?.metadata.name as string,
       grantRequest: {
-        roles: [selectedRole.value],
+        roles: roles,
       },
     });
+  },
+  onSuccess() {
+    Toast.success(t("core.common.toast.operation_success"));
     modal.value?.close();
-  } catch (error) {
-    console.error("Failed to grant permission to user", error);
-  } finally {
-    isSubmitting.value = false;
-  }
-};
+  },
+});
+
+function onSubmit(data: { roles: string[] }) {
+  mutate({ roles: data.roles });
+}
 </script>
 
 <template>
@@ -52,18 +67,23 @@ const handleGrantPermission = async () => {
       name="grant-permission-form"
       :config="{ validationVisibility: 'submit' }"
       type="form"
-      @submit="handleGrantPermission"
+      @submit="onSubmit"
     >
       <FormKit
-        v-model="selectedRole"
+        multiple
+        name="roles"
+        :value="currentRoles"
         :label="$t('core.user.grant_permission_modal.fields.role.label')"
         type="roleSelect"
+        :placeholder="
+          $t('core.user.grant_permission_modal.fields.role.placeholder')
+        "
       ></FormKit>
     </FormKit>
     <template #footer>
       <VSpace>
         <SubmitButton
-          :loading="isSubmitting"
+          :loading="isLoading"
           type="secondary"
           :text="$t('core.common.buttons.submit')"
           @submit="$formkit.submit('grant-permission-form')"
