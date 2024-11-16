@@ -1,0 +1,163 @@
+/* 按钮 */
+.change-skin-gear {
+  position: fixed;
+  bottom: -999px;
+  right: 5px;
+  width: auto;
+  height: auto;
+  z-index: 9;
+  visibility: visible;
+  white-space: nowrap;
+  padding: 10px;
+  cursor: pointer;
+  border-radius: 10px 10px 0 0;
+
+  & svg {
+    display: inline-block;
+  }
+
+  @mixin screens-md {
+    display: none !important;
+
+    & span:before {
+      content: "";
+    }
+
+    & svg {
+      font-size: 20px;
+    }
+  }
+}
+
+.rotating {
+  animation: rotating 3s linear infinite;
+}
+
+@keyframes rotating {
+  from {
+    transform: rotate(0deg);
+  }
+
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* 移动端按钮 */
+.mobile-change-skin {
+  display: none;
+  position: fixed;
+  bottom: 1rem;
+  right: 10px;
+  width: 3rem;
+  height: 3rem;
+  z-index: 9;
+  border: 0;
+  outline: 0;
+  opacity: 0;
+  pointer-events: none;
+  background-color: var(--widget-background-color);
+  color: var(--theme-color);
+  cursor: pointer;
+  padding: 1rem;
+  border-radius: 8px;
+  box-shadow: 0px 0px 2px 0px rgba(0, 0, 0, 0.12), 0px 2px 2px 0px rgba(0, 0, 0, 0.24);
+  transition: all 0.3s ease;
+
+  &.cd-is-visible {
+    opacity: 1;
+    pointer-events: auto;
+  }
+
+  & svg {
+    display: inline-block;
+  }
+
+  @mixin screens-md {
+    display: block;
+  }
+}
+
+.skin-menu {
+  position: fixed;
+  bottom: 3rem;
+  right: 2rem;
+  height: auto;
+  width: 14rem;
+  border-radius: 5px;
+  background-color: var(--widget-background-color);
+  box-shadow: 0 1px 40px -8px rgba(0, 0, 0, 0.5);
+  z-index: 9;
+  font-family: "Ubuntu", sans-serif;
+  transform: scaleX(0);
+  transition: 0.5s;
+
+  &.show {
+    transform: scaleX(1);
+  }
+
+  &::after {
+    content: "";
+    position: absolute;
+    bottom: -1rem;
+    left: 50%;
+    margin-left: -0.375rem;
+    border-width: 0.5rem;
+    border-style: solid;
+    border-color: #fff transparent transparent;
+    border-top-color: var(--widget-background-color);
+  }
+
+  & .row-container {
+    height: auto;
+    margin: 0;
+    padding: 0;
+    text-align: center;
+
+    &.font-family-controls {
+      padding: 3px 12px 16px;
+    }
+
+    & .menu-list {
+      display: block;
+      text-align: center;
+      padding: 0;
+      margin: 10px auto;
+    }
+  }
+
+  & .menu-list {
+    & li {
+      display: inline-block;
+      margin: 6px;
+      line-height: 2.25rem;
+      width: 2.25rem;
+      background-color: var( --theme-item-background-color);
+      border-radius: 50%;
+      cursor: pointer;
+
+      &:hover {
+        background-color: var(--theme-color);
+        color: var(--theme-color);
+
+        & svg {
+          color: #fff;
+        }
+      }
+    }
+  }
+
+  @mixin screens-md {
+    bottom: 1rem;
+    right: 70px;
+    transform: scaleY(0);
+
+    &.show {
+      transform: scaleY(1);
+    }
+
+    &::after {
+      display: none;
+    }
+  }
+}

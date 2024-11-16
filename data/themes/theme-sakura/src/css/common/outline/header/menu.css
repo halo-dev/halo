@@ -1,0 +1,197 @@
+.lower-container {
+  position: absolute;
+  text-align: center;
+  pointer-events: none;
+
+  & .lower {
+    display: inline-block;
+    font-size: 1rem;
+    position: relative;
+    pointer-events: auto;
+    animation: fadeInRight 1s;
+  }
+
+  @mixin screens-md {
+    & .lower {
+      display: none;
+    }
+  }
+
+  @mixin screens-xl {
+    & .lower {
+      left: 15px;
+    }
+  }
+}
+
+.navbar {
+  position: relative;
+  float: right;
+  animation: fadeInRight 0.2s;
+
+  & ul,
+  & li {
+    list-style: none;
+    margin-left: 0;
+  }
+
+  & .menu-root {
+    margin: 0;
+    padding: 0;
+    display: flex;
+
+    & .menu-item {
+      display: flex;
+      justify-content: center;
+      position: relative;
+
+      &:hover {
+        & > .sub-menu {
+          display: inline-block !important;
+          transition: all 0.4s;
+        }
+      }
+    }
+
+    /* 所有子菜单 */
+    & .sub-menu {
+      display: none;
+      opacity: 1;
+      position: absolute;
+      left: calc(100% + 20px);
+      top: 50%;
+      transform: translateY(-50%);
+      background: var(--background-color);
+      z-index: 10;
+      padding: 0.625rem;
+      width: auto;
+      text-align: center;
+      border-radius: 5px;
+      box-shadow: 0 1px 40px -8px rgba(0, 0, 0, 0.5);
+      animation: menuFadeInRight 0.3s 0.1s ease both;
+
+      &::before {
+        content: "";
+        position: absolute;
+        top: 50%;
+        left: -20px;
+        transform: translateY(-50%);
+        border-width: 10px;
+        border-style: solid;
+        border-color: transparent var(--background-color) transparent transparent;
+      }
+    }
+
+    /* 直接子菜单 */
+    & > .menu-item {
+      padding: 0 0.875rem;
+      position: relative;
+      transition: all 1s ease;
+
+      & > .sub-menu {
+        top: 100%;
+        left: auto;
+        transform: none;
+        animation: fadeInUp 0.3s 0.1s ease both;
+
+        &::before {
+          top: -20px;
+          left: 50%;
+          margin-left: -10px;
+          transform: none;
+          border-color: transparent transparent;
+          border-bottom-color: var(--background-color);
+        }
+      }
+
+      & li {
+        width: 100%;
+        padding: 0;
+
+        & a {
+          &::after {
+            content: "";
+            display: none;
+          }
+        }
+      }
+
+      & a {
+        padding: 10px 0;
+        display: inline-block;
+        color: var(--color);
+        width: auto;
+        white-space: nowrap;
+        position: relative;
+
+        &:hover {
+          color: var(--theme-color);
+        }
+
+        &::after {
+          content: "";
+          display: block;
+          position: absolute;
+          bottom: -1rem;
+          height: 6px;
+          background-color: var(--theme-color);
+          width: 100%;
+          max-width: 0;
+          transition: max-width 0.25s ease-in-out;
+        }
+
+        &:hover:after {
+          max-width: 100%;
+        }
+      }
+    }
+  }
+
+  @mixin screens-md {
+    & .navbar ul li .animated-hover svg {
+      display: inline;
+    }
+  }
+
+  @mixin screens-xl {
+    & .navbar.hide {
+      display: none;
+    }
+  }
+}
+
+@keyframes fadeInRight {
+  0% {
+    opacity: 0;
+    transform: translateX(30px);
+  }
+
+  100% {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@keyframes menuFadeInRight {
+  0% {
+    opacity: 0;
+    transform: translateX(10px) translateY(-50%);
+  }
+
+  100% {
+    opacity: 1;
+    transform: translateX(0) translateY(-50%);
+  }
+}
+
+@keyframes fadeInUp {
+  0% {
+    opacity: 0;
+    -webkit-transform: translateY(10px);
+  }
+
+  100% {
+    opacity: 1;
+    -webkit-transform: translateY(0);
+  }
+}

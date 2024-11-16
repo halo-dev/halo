@@ -1,0 +1,57 @@
+<th:block th:fragment="post-meta(post)">
+  <div class="meta-container">
+    <div class="post-meta-item">
+      <span class="post-meta-item-avatar" itemprop="about" itemscope itemtype="http://schema.org/Thing">
+        <a th:href="${site.url}" itemprop="url" rel="index" aria-label="website URL">
+          <img
+            th:src="${post.owner.avatar ?: #theme.assets('/images/default/avatar.webp')}"
+            alt="author avatar"
+            width="36"
+            height="36"
+          />
+        </a>
+      </span>
+
+      <span class="post-authore-item-name" data-pjax itemprop="about" itemscope itemtype="http://schema.org/Thing">
+        <a
+          th:href="${site.url}"
+          th:text="${post.owner.displayName}"
+          itemprop="url"
+          rel="index"
+          aria-label="website URL"
+        ></a>
+      </span>
+    </div>
+
+    <div class="post-meta-item">
+      <time
+        data-i18n="post.time"
+        th:i18n-options="|{
+          'time': '${post.spec.publishTime}', 
+          'params': { 
+            'separator': '-'
+          } 
+        }|"
+        th:data-datetime="${post.spec.publishTime}"
+        itemprop="dateCreated datePublished"
+      >
+      </time>
+    </div>
+
+    <div class="post-meta-item">
+      <time
+        data-i18n="post.edit_time"
+        th:i18n-options="|{
+          'editTime': '${post.status.lastModifyTime}', 
+          'params': { 'separator': '-'} 
+        }|"
+        th:data-datetime="${post.status.lastModifyTime}"
+        itemprop="dateModified"
+      ></time>
+    </div>
+
+    <div class="post-meta-item">
+      <span data-i18n="post.visits" th:i18n-options="|{ visit: '${post.stats.visit}'}|"></span>
+    </div>
+  </div>
+</th:block>

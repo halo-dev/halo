@@ -1,0 +1,11 @@
+<th:block
+  th:if="${theme.config.mainScreen.focus_height} and (${not #strings.isEmpty(theme.config.mainScreen.bgvideo_url)} or ${not #strings.isEmpty(theme.config.mainScreen.bgvideo_id)})"
+>
+  <div class="video-container">
+    <div class="controls">
+      <div class="video-btn video-play"></div>
+      <div class="video-btn video-pause"></div>
+    </div>
+    <div class="video-status"></div>
+  </div>
+</th:block>

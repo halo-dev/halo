@@ -1,0 +1,75 @@
+.cd-top {
+  display: var(--cd-top-display);
+  z-index: 9;
+  position: fixed;
+  top: -900px;
+  right: 1.5rem;
+  width: 4.5rem;
+  height: 900px;
+  background-size: contain;
+  transition: all 0.5s ease-in-out;
+  opacity: 1;
+  background: var(--cd-top-image);
+  cursor: var(--cursor-hover);
+
+  &.cd-is-visible {
+    top: -326px;
+  }
+
+  &:hover,
+  &.cd-fade-out,
+  &.cd-is-visible {
+    opacity: 1;
+  }
+
+  & span {
+    display: none;
+    color: #000;
+    position: absolute;
+    bottom: 0;
+    height: 20px;
+    width: 50px;
+    text-align: center;
+  }
+
+  @media screen and (max-width: 860px) {
+    display: none;
+    height: 60px;
+    width: 50px;
+
+    & span {
+      height: 10px;
+      width: 50px;
+    }
+  }
+}
+
+.m-cd-top {
+  display: var(--mobile-cd-top-display);
+  bottom: var(--mobile-cd-top-bottom);
+  opacity: 0;
+  position: fixed;
+  font-size: 1rem;
+  right: 10px;
+  width: 3rem;
+  height: 3rem;
+  z-index: 9;
+  border: 0;
+  outline: 0;
+  background-color: var(--widget-background-color);
+  color: var(--theme-color);
+  cursor: pointer;
+  padding: 1rem;
+  border-radius: 8px;
+  box-shadow: 0px 0px 2px 0px rgba(0, 0, 0, 0.12), 0px 2px 2px 0px rgba(0, 0, 0, 0.24);
+  overflow: hidden;
+  transition: all 0.3s ease;
+
+  &.cd-is-visible {
+    opacity: 1;
+  }
+
+  @media screen and (max-width: 860px) {
+    display: block;
+  }
+}

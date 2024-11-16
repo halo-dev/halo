@@ -1,0 +1,30 @@
+<th:block th:fragment="focus_tou">
+  <th:block th:if="${theme.config.mainScreen.focus_tou == 'avatar'}">
+    <div class="header-tou no-select">
+      <a th:href="${site.url}" aria-label="access the homepage of this website.">
+        <img
+          th:if="${#strings.isEmpty(site.logo)}"
+          th:src="@{/assets/images/default/avatar.webp}"
+          alt="site logo"
+          height="120"
+          width="120"
+        />
+        <img
+          th:unless="${#strings.isEmpty(site.logo)}"
+          th:src="${site.logo}"
+          alt="site logo"
+          height="120"
+          width="120"
+        />
+      </a>
+    </div>
+  </th:block>
+  <th:block th:if="${theme.config.mainScreen.focus_tou == 'glitch-text'}">
+    <h1
+      th:if="${not #strings.isEmpty(theme.config.mainScreen.glitch_text)}"
+      class="center-text glitch"
+      th:attr="data-text=${theme.config.mainScreen.glitch_text}"
+      th:text="${theme.config.mainScreen.glitch_text}"
+    ></h1>
+  </th:block>
+</th:block>

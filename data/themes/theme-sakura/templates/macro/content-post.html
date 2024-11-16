@@ -1,0 +1,78 @@
+<th:block th:fragment="content-post(post)">
+  <article
+    th:id="'post-'+${post.metadata.name}"
+    class="post-article"
+    th:data-owner="${post.owner.displayName}"
+    th:data-url="${post.status.permalink}"
+    th:data-siteName="${site.title}"
+  >
+    <link itemprop="mainEntityOfPage" th:href="@{${post.status.permalink}}" />
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" th:content="${post.owner.avatar}" />
+      <meta itemprop="name" th:content="${post.owner.displayName}" />
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" th:content="${site.title}" />
+      <meta itemprop="description" th:content="${site.subtitle}" />
+    </span>
+
+    <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
+      <meta itemprop="name" th:content="${post.spec.title}" />
+      <meta itemprop="description" th:content="${post.status.excerpt}" />
+    </span>
+
+    <div class="entry-content fancybox-content" itemprop="articleBody">
+      <th:block th:utext="${post.content.content}"></th:block>
+    </div>
+
+    <footer class="post-footer">
+      <div>
+        <p>
+          Q.E.D.
+          <span class="iconify" data-icon="fa:meetup" style="color: #d34836"></span>
+        </p>
+      </div>
+
+      <div
+        th:if="${not #arrays.isEmpty(theme.config.post.reward)}"
+        class="single-reward"
+      >
+        <div class="reward-open">
+          <span data-i18n="post.reward"></span>
+          <div class="reward-main">
+            <ul class="reward-row">
+              <li th:each="item : ${theme.config.post.reward}">
+                <img th:src="${item.code}" alt="reword" width="325" height="325"/>
+                <span class="reward-name" th:text="${item.label}"></span>
+              </li>
+            </ul>
+          </div>
+        </div>
+      </div>
+      <div class="post-footer-meta">
+        <div class="post-license" itemprop="license">
+          <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" target="_blank" rel="nofollow"
+            aria-label="accessing the Creative Commons License">
+            <span class="iconify" data-icon="fa:creative-commons"></span>
+            <span data-i18n="post.license"></span>
+          </a>
+        </div>
+        <div class="post-tags">
+          <th:block th:if="${not #lists.isEmpty(post.tags)}">
+            <span class="iconify" data-icon="system-uicons:tags" style="scale: 1.3;"></span>
+            <a
+              th:each="tag : ${post.tags}"
+              th:href="@{${tag.status.permalink}}"
+              rel="tag"
+              th:text="${tag.spec.displayName}"
+              aria-label="viewing the tags associated with this article"
+            ></a>
+          </th:block>
+        </div>
+        <th:block th:replace="~{module/sharelike :: sharelike(${post})}" />
+      </div>
+    </footer>
+  </article>
+</th:block>

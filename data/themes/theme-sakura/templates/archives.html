@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html
+  xmlns:th="https://www.thymeleaf.org"
+  th:replace="~{layout :: layout(_title = ~{::title}, _header = ~{::header}, _content = ~{::content})}"
+>
+  <th:block th:fragment="header">
+    <th:block
+    th:replace="~{macro/page-header :: page-header(extension=${archives}, frontCover=${theme.config.patternimg.archives_patternimg}, headerTitle =  ~{::headerTitle},, id='archives', isRandomImage = true)}"
+    />
+  </th:block>
+
+  <th:block th:fragment="headerTitle">
+    <h1 data-i18n="page.archives.title"></h1>
+  </th:block>
+
+  <th:block th:fragment="content">
+    <article class="archives-article">
+      <div id="archives-temp" class="archives-inner">
+        <div class="archives-content">
+          <th:block th:each="archive, archiveStat : ${postFinder.archives(1, 0).items}">
+            <th:block th:each="month, monthStat : ${archive.months}">
+              <div class="archive-item" th:classappend="${archiveStat.index == 0 ? 'active' : ''}" th:id="|arti-${archive.year}-${month.month}|">
+                <div class="archive-title">
+                  <span class="archive-time">
+                    <span class="iconify" data-icon="ph:read-cv-logo-bold"></span>
+                  </span>
+                  <h3 th:text="${archive.year}+'-'+${month.month}"></h3>
+                </div>
+                <div
+                  class="archive-posts"
+                  th:classappend="|archives-${monthStat.index}|"
+                  th:attr="data-date=${archive.year}+'-'+${month.month}"
+                  style="overflow: hidden">
+                  <div class="archive-post-item" th:each="post : ${month.posts}">
+                    <span class="archive-post-circle"></span>
+                    <div class="arrow-left-ar"></div>
+                    <div class="brick">
+                      <a data-pjax th:href="@{${post.status.permalink}}" aria-label="get the next article">
+                        <span class="time">
+                          <span class="iconify iconify--large" data-icon="ic:round-access-time"></span>
+                          <th:block th:text="${#dates.format(post.spec.publishTime,'MM-dd')}"></th:block>
+                        </span>
+                        <th:block th:text="${post.spec.title}"></th:block>
+                      </a>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </th:block>
+          </th:block>
+        </div>
+      </div>
+    </article>
+  </th:block>
+</html>

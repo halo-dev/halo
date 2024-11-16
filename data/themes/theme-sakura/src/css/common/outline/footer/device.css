@@ -1,0 +1,24 @@
+.footer-device {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+
+  & .footer-beian {
+    display: flex;
+    align-items: center;
+
+    & a {
+      display: flex;
+      text-decoration: none;
+
+      & img {
+        object-fit: contain;
+      }
+    }
+  }
+
+  & p {
+    margin: 0;
+    margin-right: 8px;
+  }
+}

@@ -1,0 +1,225 @@
+.highlight-wrap {
+  display: flex;
+  position: relative;
+  background: #21252b;
+  border-radius: 6px;
+  line-height: 1.6;
+  font-size: 1em;
+  margin-bottom: 1.6em;
+  max-width: 100%;
+  text-shadow: none;
+  color: #000;
+  padding-top: 2em;
+  box-shadow: 0 0.625em 2em 0px rgba(0, 0, 0, 0.4);
+  filter: brightness(var(--theme-brightness));
+  white-space: var(--entry-content-pre-white-space);
+
+  &::before {
+    content: " ";
+    position: absolute;
+    border-radius: 50%;
+    background: #fc625d;
+    width: 0.75em;
+    height: 0.75em;
+    left: 0.75em;
+    margin-top: -1.25em;
+    box-shadow: 1.25em 0 #fdbc40, 2.5em 0 #35cd4b;
+    z-index: 1;
+  }
+
+  & code {
+    word-break: break-word;
+    font-family: "Source Code Pro", monospace, Helvetica, Tahoma, Arial, STXihei, "STHeiti Light", "Microsoft YaHei",
+      sans-serif;
+    text-shadow: none;
+    border-radius: 0 0 6px 6px;
+    width: 100%;
+    cursor: var(--cursor-text);
+
+    &::-webkit-scrollbar {
+      height: 0.625rem;
+      width: 0.625rem;
+      background-color: #222;
+    }
+
+    &::-webkit-scrollbar-track {
+      -webkit-box-shadow: inset 0 0 6px rgba(0, 0, 0, 0.3);
+      background-color: #21252b;
+    }
+
+    &::-webkit-scrollbar-thumb {
+      border-radius: 10px;
+      -webkit-box-shadow: inset 0 0 6px rgba(0, 0, 0, 0.5);
+      background-color: var(--theme-color);
+    }
+
+    &[data-rel] {
+      &::before {
+        color: #fff;
+        content: attr(data-rel);
+        height: 2.25em;
+        line-height: 2.25em;
+        background: #21252b;
+        font-size: 1rem;
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        font-family: Ubuntu, sans-serif;
+        font-weight: 700;
+        text-indent: 1rem;
+        text-align: center;
+        float: left;
+        border-radius: 6px 6px 0 0;
+        pointer-events: none;
+      }
+    }
+
+    & .hljs-ln-line {
+      &,
+      & span {
+        &::selection {
+          background: var(--background-color);
+          color: #21252b;
+        }
+      }
+    }
+
+    & .hljs-comment,
+    & .hljs-quote {
+      color: #888f96;
+      font-style: italic;
+    }
+
+    & .hljs-doctag,
+    & .hljs-formula,
+    & .hljs-keyword {
+      color: #c678dd;
+    }
+
+    & .hljs-deletion,
+    & .hljs-name,
+    & .hljs-section,
+    & .hljs-selector-tag,
+    & .hljs-subst {
+      color: #e06c75;
+    }
+
+    & .hljs-literal {
+      color: #56b6c2;
+    }
+
+    & .hljs-addition,
+    & .hljs-attribute,
+    & .hljs-meta-string,
+    & .hljs-regexp,
+    & .hljs-string {
+      color: #98c379;
+    }
+
+    & .hljs-built_in,
+    & .hljs-class .hljs-title {
+      color: #e6c07b;
+    }
+
+    & .hljs-attr,
+    & .hljs-number,
+    & .hljs-selector-attr,
+    & .hljs-selector-class,
+    & .hljs-selector-id,
+    & .hljs-selector-pseudo,
+    & .hljs-template-variable,
+    & .hljs-type,
+    & .hljs-variable {
+      color: #d19a66;
+    }
+
+    & .hljs-bullet,
+    & .hljs-link,
+    & .hljs-meta,
+    & .hljs-selector-tag {
+      color: #61aeee;
+    }
+
+    & .hljs-emphasis {
+      font-style: italic;
+    }
+
+    & .hljs-strong {
+      font-weight: bold;
+    }
+
+    & .hljs-link {
+      text-decoration: underline;
+    }
+
+    & .hljs-ln {
+      margin: 0.375em 0 0;
+
+      & .hljs-ln-line {
+        &.hljs-ln-numbers {
+          user-select: none;
+          text-align: center;
+          color: #888f96;
+          font-family: "Source Code Pro", monospace, Helvetica, Tahoma, Arial, STXihei, "STHeiti Light", "Microsoft YaHei",
+            sans-serif;
+          vertical-align: top;
+          position: absolute;
+          left: 0;
+          width: 2em;
+        }
+  
+        &.hljs-ln-code {
+          width: 100vw;
+          padding-left: 1.625em;
+  
+          &:hover {
+            background-color: rgba(255, 255, 255, 0.1);
+          }
+        }
+      }
+    }
+  }
+}
+
+.code-block-fullscreen {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  min-width: 100%;
+  z-index: 10;
+  margin: 0;
+  animation: elastic 1s;
+
+  & code {
+    --widthA: 100%;
+    --widthB: calc(var(--widthA) - 30px);
+    height: var(--widthB);
+    min-height: 99%;
+    overflow: auto;
+  }
+}
+
+.code-block-fullscreen-html-scroll {
+  overflow: hidden;
+}
+
+@keyframes elastic {
+  0% {
+    transform: scale(0);
+  }
+
+  55% {
+    transform: scale(1);
+  }
+
+  70% {
+    transform: scale(0.98);
+  }
+
+  100% {
+    transform: scale(1);
+  }
+}

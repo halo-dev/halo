@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html
+  xmlns:th="https://www.thymeleaf.org"
+  th:replace="~{layout :: layout(_title = ~{::title}, _header = ~{::header}, _content = ~{::content})}"
+>
+  <th:block th:fragment="header">
+    <th:block
+      th:replace="~{macro/page-header :: page-header(extension=${tags}, frontCover=${theme.config.patternimg.tag_patternimg}, headerTitle = ~{::headerTitle}, id='tags')}"
+    />
+  </th:block>
+
+  <th:block th:fragment="headerTitle">
+    <h1 data-i18n="page.tags.title"></h1>
+  </th:block>
+
+  <th:block th:fragment="content">
+    <div class="tags-container">
+      <th:block th:if="${theme.config.tagAndCategory.tag_cloud}">
+        <div class="tag-wordcloud-container">
+          <script type="text/javascript" th:inline="javascript">
+            const tags = /*[[${tagFinder.listAll()}]]*/
+
+            const wordClouds = tags.map(tag => {
+                return {
+                    text: tag.spec.displayName,
+                    size: tag.postCount,
+                    link: tag.status.permalink,
+                    color: tag.spec.color
+                }
+            })
+          </script>
+          <div id="tag-wordcloud" class="wordcloud"></div>
+        </div>
+      </th:block>
+      <div class="card-container tags-content">
+        <div id="tags" class="chip-container">
+          <div class="card">
+            <div class="card-content">
+              <div
+                th:unless="${not #strings.isEmpty(theme.config.patternimg.tag_patternimg)} or (${theme.config.random_image.rimage_cover_sheet_open} and ${not #strings.isEmpty(theme.config.random_image.rimage_url)})"
+                class="tag-title"
+              >
+                <span class="iconify iconify--xxlarge" data-icon="fa:tags"></span>
+                <span data-i18n="page.tags.title"></span>
+              </div>
+              <div class="tag-chips">
+                <a
+                  data-pjax
+                  th:each="tag : ${tags}"
+                  th:href="@{${tag.status.permalink}}"
+                  th:title="|${tag.spec.displayName}: ${tag.postCount}|"
+                  aria-label="get the next tag"
+                >
+                  <span class="chip chip-default" th:style="|background-color: ${tag.spec.color}|" th:attr="data-tagname=${tag.spec.displayName}">
+                    <th:block th:text="${tag.spec.displayName}"></th:block>
+                    <span class="tag-length" th:text="${tag.postCount}"> </span>
+                  </span>
+                </a>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </th:block>
+</html>

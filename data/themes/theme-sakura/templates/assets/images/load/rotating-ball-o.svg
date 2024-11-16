@@ -1,0 +1,10 @@
+<svg width="80px"  height="80px"  xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" preserveAspectRatio="xMidYMid" class="lds-disk">
+    <g transform="translate(50,50)">
+      <g ng-attr-transform="scale({{config.scale}})" transform="scale(0.6)">
+        <circle cx="0" cy="0" r="50" ng-attr-fill="{{config.c1}}" fill="#FFA500"></circle>
+        <circle cx="0" ng-attr-cy="{{config.cy}}" ng-attr-r="{{config.r}}" ng-attr-fill="{{config.c2}}" cy="-28" r="15" fill="#fff8eb" transform="rotate(312)">
+          <animateTransform attributeName="transform" type="rotate" calcMode="linear" values="0 0 0;360 0 0" keyTimes="0;1" dur="1s" begin="0s" repeatCount="indefinite"></animateTransform>
+        </circle>
+      </g>
+    </g>
+  </svg>

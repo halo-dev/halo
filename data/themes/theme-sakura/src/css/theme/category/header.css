@@ -1,0 +1,40 @@
+.category-header {
+  & .page-header {
+    & .pattern-title {
+      display: flex;
+      align-items: center;
+
+      & h1 {
+        display: inline-block;
+        font-size: 25px;
+        font-weight: 400;
+        width: auto;
+
+        &::before {
+          content: "";
+        }
+
+        &::after {
+          content: "";
+          padding-right: 15px;
+          border-right: 1px dashed #ddd;
+          font-size: 30px;
+          vertical-align: middle;
+        }
+
+        @mixin screens-md {
+          &::after {
+            border-right: none;
+          }
+        }
+      }
+
+      & .cat-des {
+        display: block;
+        text-align: center;
+        color: #999;
+        margin-left: 10px;
+      }
+    }
+  }
+}

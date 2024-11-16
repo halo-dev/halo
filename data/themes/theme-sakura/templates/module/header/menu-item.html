@@ -1,0 +1,24 @@
+<li class="menu-item" th:classappend="|menu-item-${menuItem.metadata.name}|" th:fragment="menu-item(menuItem)">
+  <a
+    data-pjax
+    th:href="@{${menuItem.status?.href}}"
+    th:target="${menuItem.spec.target?.value}"
+    aria-label="navigate to the target menu"
+  >
+    <span class="faa-parent animated-hover" th:classappend="|${#annotations.contains(menuItem, 'animation') ? 'animation' : ''}|">
+      <span
+        th:if="${#annotations.contains(menuItem, 'icon') and #annotations.get(menuItem, 'icon') != ''}"
+        class="iconify"
+        th:classappend="|${#annotations.get(menuItem, 'animation')}|"
+        th:data-icon="${#annotations.get(menuItem, 'icon')}"
+      >
+      </span>
+      <th:block th:text="${menuItem.status.displayName}"></th:block>
+    </span>
+  </a>
+  <ul th:if="${not #lists.isEmpty(menuItem.children)}" class="sub-menu">
+    <th:block th:each="child : ${menuItem.children}">
+      <th:block th:replace="~{module/header/menu-item :: menu-item(${child})}" />
+    </th:block>
+  </ul>
+</li>

@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html
+  xmlns:th="https://www.thymeleaf.org"
+  th:replace="~{layout :: layout(_title = ~{::title}, _header = ~{::header}, _content = ~{::content})}"
+>
+  <th:block th:fragment="title">
+    <th:block data-i18="notfound.title" th:i18n-options="|{title: '${site.title}'}|"></th:block>
+  </th:block>
+
+  <th:block th:fragment="content">
+    <div class="error-404">
+      <section>
+        <div class="error-img">
+          <div class="anim-icon" id="404"></div>
+        </div>
+        <div class="err-button back">
+          <a
+            id="golast"
+            data-pjax
+            href="javascript:history.go(-1);"
+            data-i18n="notfound.golast"
+            aria-label="go back to the previous page."
+          ></a>
+          <a
+            id="gohome"
+            data-pjax
+            th:href="@{/}"
+            class="gohome"
+            data-i18n="notfound.gohome"
+            aria-label="return to the previous page"
+          ></a>
+        </div>
+        <th:block th:if="${pluginFinder.available('PluginSearchWidget', '>=1.5.0')}">
+          <div class="error-search">
+            <p data-i18n="notfound.search"></p>
+            <p data-i18="notfound.search_2">Don't worry, search in site?</p>
+            <div class="search-box" style="display: block; width: 284px; margin: auto">
+              <form method="get" action="/search" role="search">
+                <span class="iconify icon-search" data-icon="solar:magnifer-outline"> </span>
+                <input
+                  class="text-input i18n"
+                  style="padding: 8px 20px 8px 46px"
+                  type="search"
+                  name="keyword"
+                  data-i18n="[placeholder]notfound.searchinput"
+                  required
+                />
+              </form>
+            </div>
+          </div>
+        </th:block>
+      </section>
+      <script>
+        var the_dom = window.location.hostname;
+      </script>
+      <script th:src="${#theme.assets('/js/404.js')}" type="text/javascript"></script>
+      <script>
+        var Poi = {
+          themeBase: "[(${#theme.assets('')})]",
+        };
+      </script>
+    </div>
+  </th:block>
+</html>

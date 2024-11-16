@@ -1,0 +1,5 @@
+<th:block th:fragment="comment(group, kind, name)">
+  <div class="comment" th:attr="name=${name},kind=${kind},group=${group}" th:unless="${theme.config.others.keep_record_mode}">
+    <halo:comment th:attr="name=${name},kind=${kind},group=${group}" />
+  </div>
+</th:block>

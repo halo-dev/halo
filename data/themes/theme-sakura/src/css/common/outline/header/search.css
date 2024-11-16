@@ -1,0 +1,14 @@
+.searchbox {
+  animation: fadeInRight 1s;
+
+  & .iconsearch {
+    color: var(--body-color);
+    cursor: pointer;
+    font-size: 1.875rem;
+    transition: all 0.3s ease-in-out;
+  }
+
+  @mixin screens-md {
+    display: none;
+  }
+}

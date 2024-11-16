@@ -1,0 +1,10 @@
+<th:block th:fragment="notice">
+  <div
+    th:if="${not #strings.isEmpty(theme.config.others.notice_title)}"
+    th:style="${theme.config.mainScreen.focus_height ? 'margin-top: 20px;':''}"
+    class="notice"
+  >
+    <span class="iconify" data-icon="solar:volume-loud-linear"></span>
+    <div class="notice-content" th:utext="${theme.config.others.notice_title}"></div>
+  </div>
+</th:block>

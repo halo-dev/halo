@@ -1,0 +1,17 @@
+.headertop-down {
+  position: absolute;
+  bottom: 3.125rem;
+  left: 50%;
+  cursor: pointer;
+  z-index: 3;
+
+  & .iconify {
+    font-size: 1.75em;
+    color: #fff;
+    transform: scale(1.5, 1) translateX(-33.34%);
+  }
+
+  @mixin screens-md {
+    display: none;
+  }
+}

@@ -1,0 +1,21 @@
+.is-collapsible {
+  overflow: hidden;
+  transition: all 0.3s ease-in-out;
+}
+
+.is-collapsed {
+  max-height: 0;
+}
+
+.is-position-fixed {
+  position: fixed;
+  top: 0;
+}
+
+.is-active-link {
+  font-weight: bold;
+
+  &::before {
+    background-color: var(--theme-color) !important;
+  }
+}

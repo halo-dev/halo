@@ -35,6 +35,11 @@ import run.halo.app.theme.router.factories.TagsRouteFactory;
  * @see SinglePageRoute
  * @since 2.0.0
  */
+
+// 路由的自动注册
+// 实现了RouteFunction 并且加了 @Component 会被 webflux 自动识别并添加到路由表中
+// 也可以通过通过WebfluxConfig 来手动设置的路由
+
 @Component
 @RequiredArgsConstructor
 public class ThemeCompositeRouterFunction implements RouterFunction<ServerResponse> {
@@ -91,16 +96,18 @@ public class ThemeCompositeRouterFunction implements RouterFunction<ServerRespon
      *
      * @param event {@link PermalinkRuleChangedEvent}
      */
+    // 监听分隔符变化的时间，当分隔符变化的时候刷新路由。
     @EventListener
     public void onPermalinkRuleChanged(PermalinkRuleChangedEvent event) {
         this.cachedRouters = routerFunctions();
     }
-
+    // 监听应用启动的事件。在应用启动的时候初始化路由。
     @EventListener
     public void onApplicationStarted(ApplicationStartedEvent event) {
         this.cachedRouters = routerFunctions();
     }
 
+    // Record 关键字用来生成一种特殊类的，有点类似python的tuple
     record RoutePattern(DefaultTemplateEnum identifier, String pattern) {
     }
 

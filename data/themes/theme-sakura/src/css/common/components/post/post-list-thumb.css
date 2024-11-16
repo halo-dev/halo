@@ -1,0 +1,240 @@
+.post-list-thumb {
+  display: flex;
+  width: 100%;
+  height: 18.75rem;
+  position: relative;
+  margin: 1.25rem 0 1.25rem;
+  border-radius: 10px;
+  background-color: var(--background-color);
+  box-shadow: var(--post-list-thumb-box-shadow);
+  opacity: 1;
+  animation: main 0.6s;
+  transition: box-shadow 0.3s ease;
+
+  &:hover {
+    & img {
+      transform: scale(1.1);
+    }
+  }
+
+  & .post-thumb {
+    min-width: 55%;
+
+    & a {
+      height: 18.75rem;
+      position: relative;
+      display: block;
+      background-repeat: no-repeat;
+      background-size: cover;
+      overflow: hidden;
+      border-radius: 0 10px 10px 0;
+
+      & img {
+        display: block;
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        pointer-events: none;
+        transition: all 0.6s;
+      }
+    }
+  }
+
+  & .post-content-wrap {
+    position: relative;
+    display: inline-block;
+    padding-left: 0;
+    width: 100%;
+    padding: 0 1.875rem;
+    margin-top: 1.25rem;
+
+    & .post-date {
+      color: var(--post-list-thumb-meta-color);
+      font-size: 0.75rem;
+      transition: background 1s;
+    }
+
+    & .post-meta {
+      &,
+      & a {
+        color: var(--post-list-thumb-meta-color);
+        font-size: 0.75rem;
+      }
+
+      & .comments-number {
+        margin: 0 0.625rem;
+      }
+    }
+
+    & .float-content {
+      position: relative;
+      width: 100%;
+      right: 0;
+      margin: 0;
+      padding: 0;
+      z-index: 9;
+      color: var(--post-list-thumb-abstract-color);
+
+      & .post-text {
+        display: inline-block;
+        text-align: justify;
+        font-size: 0.875rem;
+      }
+
+      & .iconify {
+        font-size: 1.875em;
+        color: var(--post-list-thumb-more-color);
+        margin-right: 5px;
+
+        &:hover {
+          color: var(--theme-color);
+        }
+      }
+
+      & p {
+        display: -webkit-box;
+        -webkit-box-orient: vertical;
+        -webkit-line-clamp: 3;
+        height: 4.375rem;
+        overflow: hidden;
+        text-align: left;
+        word-break: break-word;
+      }
+    }
+  }
+
+  &.post-list-thumb-right {
+    flex-direction: row-reverse;
+
+    & .post-content-wrap {
+      text-align: right;
+
+      & .float-content {
+        & p {
+          text-align: right;
+        }
+      }
+    }
+
+    & .post-thumb {
+      & a {
+        border-radius: 10px 0 0 10px;
+      }
+    }
+  }
+
+  & .post-title {
+    color: var(--post-list-thumb-title-color);
+
+    & h1 {
+      font-size: 1.17em;
+      margin: 1em 0;
+      text-overflow: ellipsis;
+      display: -webkit-box;
+      -webkit-box-orient: vertical;
+      -webkit-line-clamp: 2;
+      overflow: hidden;
+      word-wrap: break-word;
+    }
+  }
+
+  @mixin screens-md {
+    margin: 0;
+    height: auto;
+    padding: 0;
+    border: 0;
+    margin-bottom: 1.25rem;
+
+    &,
+    &.post-list-thumb-right {
+      flex-direction: column-reverse;
+    }
+
+    &::before {
+      content: "";
+      width: 1px;
+      height: 100px;
+      background-color: rgba(0, 0, 0, 0);
+      position: absolute;
+      left: 0;
+      right: 0;
+      margin: auto;
+      bottom: -6.375rem;
+      z-index: 0;
+    }
+
+    & .post-thumb {
+      width: 100%;
+      left: 0;
+
+      & a {
+        border-radius: 10px 10px 0 0;
+      }
+    }
+
+    & .post-content-wrap {
+      width: 100%;
+      left: 0;
+      text-align: left;
+      margin: 0;
+      padding: 1.25rem;
+      float: none;
+      box-shadow: none;
+      box-sizing: border-box;
+      border-top: 0;
+
+      & .float-content {
+        width: 100%;
+        left: 0;
+        box-shadow: none;
+        padding: 0;
+        margin: 0;
+        transition: color 1s;
+
+        & p {
+          height: auto;
+          display: block;
+        }
+
+        & .post-bottom {
+          display: none;
+          text-align: right;
+        }
+      }
+    }
+
+    &.post-list-thumb-right {
+      & .post-content-wrap {
+        text-align: left;
+        & .float-content {
+          & p {
+            text-align: left;
+          }
+        }
+      }
+
+      & .post-thumb {
+        & a {
+          border-radius: 10px 10px 0 0;
+        }
+      }
+    }
+  }
+
+  @mixin screens-sm {
+    & .post-thumb {
+      & a {
+        height: 13.125rem;
+      }
+    }
+
+    & .post-content-wrap {
+      & .float-content {
+        & .post-text {
+          font-size: 0.8125rem;
+          margin-bottom: 1em;
+        }
+      }
+    }
+  }
+}

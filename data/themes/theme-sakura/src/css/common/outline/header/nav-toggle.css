@@ -1,0 +1,48 @@
+.site-nav-toggle {
+  display: none;
+
+  @mixin screens-md {
+    transition-duration: 0.5s;
+    height: 2.5rem;
+    display: block;
+    z-index: 10;
+    
+    &.open {
+      display: none;
+    }
+
+    & .nav-toggle {
+      background: 0 0;
+      width: 2.5rem;
+      height: 2.5rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+
+      & .icon {
+        transition-duration: 0.2s;
+        width: 1.875rem;
+        height: 3px;
+        background-color: var(--mobile-nav-toggle-background-color);
+
+        &::before,
+        &::after {
+          transition-duration: 0.5s;
+          background-color: var(--mobile-nav-toggle-background-color);
+          position: absolute;
+          content: "";
+          width: 1.875rem;
+          height: 3px;
+        }
+
+        &::before {
+          top: 10px;
+        }
+
+        &::after {
+          bottom: 10px;
+        }
+      }
+    }
+  }
+}

@@ -1,0 +1,37 @@
+<div
+  class="header-user-avatar"
+  th:with="currentUser = ${contributorFinder.getContributor(#authentication.name)}"
+  th:fragment="user"
+>
+  <th:block th:if="${currentUser.avatar}">
+    <img
+      th:src="${currentUser.avatar}"
+      width="30"
+      height="30"
+      alt="user avatar"
+    />
+  </th:block>
+  <th:block th:unless="${currentUser.avatar}">
+    <span class="iconify iconify--xxlarge" data-icon="solar:user-circle-linear"></span>
+  </th:block>
+
+  <div class="header-user-menu">
+    <th:block sec:authorize="isAnonymous()">
+      <div class="herder-user-name no-logged">
+        <a href="/console" data-i18n="user.login" aria-label="access the console command line interface"></a>
+      </div>
+    </th:block>
+    <th:block sec:authorize="isAuthenticated()">
+      <div class="herder-user-name">
+        <div data-i18n="user.has_logged"></div>
+        <div class="herder-user-name-u" th:text="${currentUser.displayName}"></div>
+      </div>
+      <div class="user-menu-option">
+        <!-- 个人资料 -->
+        <a href="/uc/profile" target="_blank" data-i18n="user.info" aria-label="access the personal profile page"></a>
+        <!-- 退出登录 -->
+        <a href="/logout" target="_top" data-i18n="user.logout" aria-label="log out of the account"></a>
+      </div>
+    </th:block>
+  </div>
+</div>

@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html
+  xmlns:th="https://www.thymeleaf.org"
+  th:replace="~{layout :: layout(_title = ~{::title}, _header = ~{::header}, _content = ~{::content})}"
+>
+  <th:block th:fragment="title">
+    <th:block th:text="${searchResult.keyword} + '|' + ${site.title}"></th:block>
+  </th:block>
+
+  <th:block th:fragment="content">
+    <div class="search-container">
+      <th:block th:if="${searchResult.total gt 0}">
+        <h1
+          class="search-title"
+          data-i18n="search.search_result.title"
+          th:i18n-options="|{keyword: '${searchResult.keyword}'}|"
+        ></h1>
+        <th:block th:each="document : ${searchResult.hits}">
+          <th:block th:replace="~{module/search/search-item :: item(${document})}" />
+        </th:block>
+      </th:block>
+      <th:block th:unless="${searchResult.total gt 0}">
+        <div class="search-box">
+          <form class="search-form-inner" method="get" action="/search" role="search">
+            <span class="iconify icon-search" data-icon="solar:magnifer-outline"> </span>
+            <input
+              class="text-input"
+              type="search"
+              name="keyword"
+              data-i18n="[placeholder]search.search_modal.placeholder"
+              required
+            />
+          </form>
+        </div>
+        <div class="search-empty">
+          <p data-i18n="search.search-empty"></p>
+        </div>
+        <th:block th:replace="~{macro/content-none}" />
+      </th:block>
+    </div>
+  </th:block>
+</html>

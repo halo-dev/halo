@@ -1,0 +1,53 @@
+.main {
+  position: relative;
+}
+
+.wrapper {
+  animation: fade-in;
+  animation-duration: 0.5s;
+
+  @mixin screens-md {
+    transition-duration: 0.5s;
+    width: 100%;
+    height: auto;
+    position: relative;
+
+    & section {
+      & h1 {
+        font-weight: 300;
+        font-size: 1.875rem;
+        margin-bottom: 0.625rem;
+      }
+
+      & h2 {
+        font-weight: 300;
+        font-size: 1.25rem;
+        margin-bottom: 2.5rem;
+      }
+
+      & p {
+        margin-bottom: 2.5rem;
+      }
+    }
+  }
+
+  @media screen and (max-width: 860px) {
+    & section .gallery-caption p {
+      margin-bottom: 0;
+    }
+  }
+}
+
+@keyframes fade-in {
+  0% {
+    opacity: 0;
+  }
+
+  40% {
+    opacity: 0;
+  }
+
+  100% {
+    opacity: 1;
+  }
+}

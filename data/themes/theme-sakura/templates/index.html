@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html
+  xmlns:th="https://www.thymeleaf.org"
+  th:replace="~{layout :: layout(_title = ~{::title}, _header = ~{::header}, _content = ~{::content})}"
+>
+  <th:block th:fragment="header">
+    <th:block th:if="${theme.config.mainScreen.head_focus}">
+      <div class="headertop">
+        <div th:replace="~{module/home/index}"></div>
+      </div>
+    </th:block>
+  </th:block>
+
+  <th:block th:fragment="content">
+    <!--/* 通知 */-->
+    <th:block th:if="${theme.config.others.head_notice}">
+      <th:block th:replace="~{module/home/notice}" />
+    </th:block>
+
+    <!--/* 聚焦栏目 */-->
+    <th:block th:if="${theme.config.focus.top_feature}">
+      <th:block th:replace="~{module/feature}" />
+    </th:block>
+
+    <div id="primary" class="content-area" th:with="postItems=${posts.items}">
+      <div id="main" class="site-main">
+        <h1 class="main-title" style="font-family: 'Ubuntu', sans-serif">
+          <span class="iconify" data-icon="fa:envira"></span>
+          <span data-i18n="home.discovery"> </span>
+        </h1>
+        <th:block th:if="${posts.totalPages gt 0}">
+          <!--/* Start the Loop */-->
+          <th:block th:if="${theme.config.general.post_list_style == 'standard'}">
+            <th:block th:each="post : ${postItems}">
+              <th:block th:replace="~{macro/content :: content(${post})}" />
+            </th:block>
+          </th:block>
+          <th:block th:unless="${theme.config.general.post_list_style == 'standard'}">
+            <th:block th:replace="~{macro/content-thumb :: content-thumb(${postItems})}" />
+          </th:block>
+        </th:block>
+        <th:block th:unless="${posts.total gt 0}">
+          <th:block th:replace="~{macro/content-none}" />
+        </th:block>
+      </div>
+      <!--/* #main */-->
+
+      <!--/* #pagination */-->
+      <th:block th:replace="~{module/list-pagination :: pagination(${posts})}"></th:block>
+    </div>
+    <!--/* #primary */-->
+  </th:block>
+</html>

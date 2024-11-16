@@ -60,6 +60,9 @@ import run.halo.app.theme.service.ThemeUtils;
  * @author guqing
  * @since 2.0.0
  */
+
+//  区别于Spring MVC 有 Controller Service 等。 WebFlux 是一个响应式编程框架，定义endpoint的方式是由RouterFunction
+//  和 HandlerFunction 来代替传统的 @controller 注解
 @Slf4j
 @Component
 @AllArgsConstructor
@@ -79,9 +82,12 @@ public class ThemeEndpoint implements CustomEndpoint {
 
     private final SettingConfigService settingConfigService;
 
+    // 定义路由
     @Override
     public RouterFunction<ServerResponse> endpoint() {
         var tag = "ThemeV1alpha1Console";
+        // 使用SpringdocRouteBuilder.route() 来构造RouterFunction 来配置路由
+        // 函数式路由可以带来更细粒度的控制，更符合响应式编程的特性
         return SpringdocRouteBuilder.route()
             .POST("themes/install", contentType(MediaType.MULTIPART_FORM_DATA),
                 this::install, builder -> builder.operationId("InstallTheme")

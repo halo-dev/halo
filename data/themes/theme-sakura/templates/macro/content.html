@@ -1,0 +1,126 @@
+<article th:fragment="content(post)" class="post post-list" itemscope itemtype="http://schema.org/Article">
+  <link itemprop="mainEntityOfPage" th:href="@{${post.status.permalink}}" />
+
+  <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <meta itemprop="image" th:content="${post.owner.avatar}" />
+    <meta itemprop="name" th:content="${post.owner.displayName}" />
+  </span>
+
+  <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+    <meta itemprop="name" th:content="${site.title}" />
+    <meta itemprop="description" th:content="${site.subtitle}" />
+  </span>
+
+  <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
+    <meta itemprop="name" th:content="${post.spec.title}" />
+    <meta itemprop="description" th:content="${post.status.excerpt}" />
+  </span>
+
+  <div class="feature">
+    <a data-pjax th:href="@{${post.status.permalink}}" aria-label="viewing the article details">
+      <div class="overlay">
+        <div class="overlay-inner">
+          <span class="iconify" data-icon="solar:file-text-outline"></span>
+        </div>
+      </div>
+      <img
+        th:if="${not #strings.isEmpty(post.spec.cover)}"
+        class="lazyload"
+        th:src="${#theme.assets('/images/load/orange.progress-bar-stripe-loader.svg')}"
+        th:data-src="${post.spec.cover}"
+        alt="thumbnail of the cover of the post"
+        width="100"
+        height="100"
+        onerror="imgError(this)"
+      />
+      <img
+        th:if="${#strings.isEmpty(post.spec.cover)} and ${theme.config.random_image.rimage_cover_open} and ${#annotations.getOrDefault(post, 'randomImage', true)} and ${not #strings.isEmpty(theme.config.random_image.rimage_url)}"
+        th:with="randomUrl = |${theme.config.random_image.rimage_url}?postid=${post.metadata.name}&${theme.config.random_image.rimage_custom_param_name}=${post.metadata.name}&type=url&itype=${theme.config.random_image.rimage_cover_itype}${theme.config.random_image.rimage_cover_itype != 'image' ? '&id=' + theme.config.random_image.rimage_cover_id : ''}${#strings.isEmpty(theme.config.random_image.rimage_other_params) ? '' : '&' + theme.config.random_image.rimage_other_params}|"
+        th:src="${theme.config.random_image.rimage_cover_lqip == 'loading' ? #theme.assets('/images/load/orange.progress-bar-stripe-loader.svg') : (randomUrl + (#strings.isEmpty(theme.config.random_image.rimage_cover_lqip_params) ? '' : '&' + theme.config.random_image.rimage_cover_lqip_params))}"
+        th:data-srcset="|
+        ${randomUrl}&th=150 150w,
+        ${randomUrl}&th=640 640w,
+        ${randomUrl}&th=960 960w,
+        ${randomUrl}&th=1280 1280w,
+        ${randomUrl}&th=1440 1440w,
+        ${randomUrl}&th=1920 1920w
+        |"
+        data-sizes="auto"
+        class="lazyload attachment-post-thumbnail size-post-thumbnail"
+        th:classappend="${theme.config.random_image.rimage_cover_lqip == 'lowquality' ? 'blur-up' : ''}"
+        alt="thumbnail of the cover of the post"
+        width="100"
+        height="100"
+        onerror="imgError(this)"
+      />
+      <img
+        th:if="${#strings.isEmpty(post.spec.cover)} and (!${theme.config.random_image.rimage_cover_open} or !${#annotations.getOrDefault(post, 'randomImage', true)} or ${#strings.isEmpty(theme.config.random_image.rimage_url)})"
+        class="lazyload"
+        th:src="${#theme.assets('/images/load/orange.progress-bar-stripe-loader.svg')}"
+        th:data-src="${#theme.assets('/images/default/temp.webp')}"
+        alt="thumbnail of the cover of the post"
+        width="100"
+        height="100"
+        onerror="imgError(this)"
+      />
+    </a>
+  </div>
+
+  <header class="entry-header">
+    <h1 class="entry-title">
+      <a
+        data-pjax
+        th:href="@{${post.status.permalink}}"
+        th:text="${post.spec.title}"
+        aria-label="viewing the article details"
+      ></a>
+    </h1>
+    <div class="p-time">
+      <span th:if="${post.spec.pinned}" class="iconify hotpost" data-icon="solar:fire-outline"></span>
+      <span class="iconify" data-icon="solar:clock-circle-linear"></span>
+      <time
+        data-i18n="postlist.time"
+        th:i18n-options="|{
+          'time': '${post.spec.publishTime}', 
+          'params': { 'separator': '-' }
+        }|"
+        th:datetime="${post.spec.publishTime}"
+        itemprop="dateCreated datePublished"
+      >
+      </time>
+    </div>
+  </header>
+
+  <section>
+    <p th:text="${post.status.excerpt}"></p>
+  </section>
+
+  <footer class="entry-footer">
+    <div class="post-more">
+      <a data-pjax th:href="@{${post.status.permalink}}" aria-label="viewing the article details">
+        <span class="iconify" data-icon="akar-icons:more-horizontal-fill"></span>
+      </a>
+    </div>
+    <div class="info-meta">
+      <div class="comnum" th:unless="${theme.config.others.keep_record_mode}">
+        <span>
+          <span class="iconify" data-icon="solar:chat-line-line-duotone"></span>
+          <a
+            data-pjax
+            th:href="@{${post.status.permalink}+'#comments'}"
+            aria-label="jumping to the comments section of the current article"
+          >
+            <span data-i18n="postlist.comments" th:i18n-options="|{comment: '${post.stats.comment}'}|"> </span>
+          </a>
+        </span>
+      </div>
+      <div class="views">
+        <span>
+          <span class="iconify" data-icon="solar:eye-linear"></span>
+          <span data-i18n="postlist.heat" th:i18n-options="|{visit: '${post.stats.visit}'}|"> </span>
+        </span>
+      </div>
+    </div>
+  </footer>
+  <hr />
+</article>

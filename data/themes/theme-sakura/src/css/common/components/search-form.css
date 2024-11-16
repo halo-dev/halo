@@ -1,0 +1,126 @@
+.search-form {
+  &.is-visible {
+    opacity: 0.99;
+    visibility: visible;
+    animation: search-visible 0.5s;
+    background-repeat: no-repeat;
+    background-position: bottom right;
+    background-image: var(--search-form-background);
+  }
+
+  & .search-form-input {
+    position: relative;
+  }
+
+  & svg {
+    font-size: 2rem;
+    line-height: 1;
+    color: #ddd;
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    left: 1rem;
+  }
+
+  & input {
+    font-size: 1.5rem;
+    background: var(--background-color);
+    padding: 0.75rem 1.5rem 0.75rem 4rem;
+    width: 100%;
+    outline: none;
+    border-radius: 50px;
+    box-sizing: border-box;
+    transition: background 1s;
+
+    &::-webkit-input-placeholder,
+    &::-moz-placeholder,
+    &:-ms-input-placeholder {
+      color: #ddd;
+    }
+
+    &:focus {
+      color: var(--color);
+    }
+  }
+
+  & .search-close {
+    position: absolute;
+    width: 2.25rem;
+    height: 2.25rem;
+    background: 0 0;
+    top: 20px;
+    right: 15px;
+    cursor: pointer;
+
+    &::before,
+    &::after {
+      background-color: var(--color);
+      position: absolute;
+      content: "";
+      width: 1.875rem;
+      height: 0.125rem;
+      top: 17px;
+      left: 2px;
+    }
+
+    &::after {
+      transform: rotate(45deg);
+    }
+
+    &::before {
+      transform: rotate(-45deg);
+    }
+  }
+}
+
+.search-form-modal {
+  transition: visibility 0.25s ease, opacity 0.25s ease;
+  overflow: hidden;
+  z-index: 10;
+  position: fixed;
+  top: 0;
+  right: 0;
+  left: 0;
+  bottom: 0;
+  background: var(--background-color);
+  visibility: hidden;
+  opacity: 0;
+
+  & .search-form-inner {
+    display: flex;
+    flex-direction: column;
+    max-width: 640px;
+    padding: 0 20px;
+    margin: auto;
+    text-align: left;
+    position: absolute;
+    width: 100%;
+    left: 0;
+    right: 0;
+    height: 285px;
+    top: 0;
+    bottom: 0;
+
+    & p {
+      padding-left: 24px;
+    }
+  }
+}
+
+@keyframes search-visible {
+  0% {
+    transform: scale(0);
+  }
+
+  55% {
+    transform: scale(1);
+  }
+
+  70% {
+    transform: scale(0.98);
+  }
+
+  100% {
+    transform: scale(1);
+  }
+}

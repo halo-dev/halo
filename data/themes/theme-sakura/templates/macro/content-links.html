@@ -1,0 +1,34 @@
+<th:block th:fragment="content-links">
+  <article class="link-article">
+    <th:block
+      th:if="${_templateId == 'page'}"
+      th:utext="${singlePage.content.content}">
+    </th:block>
+    <div class="links" th:if="${pluginFinder.available('PluginLinks')}">
+      <th:block th:each="group : ${linkFinder.groupBy()}" th:if="${not #lists.isEmpty(group.links)}">
+        <h3 class="link-title">
+          <span class="fake-title" th:text="${group.spec.displayName}"></span>
+        </h3>
+        <ul class="link-items">
+          <li 
+            class="link-item" th:each="link : ${group.links}">
+            <a 
+              class="link-item-inner" th:href="${link.spec.url}" th:title="${link.spec.displayName}"
+              target="_blank" rel="noopener noreferrer" aria-label="will visit the URL pointed to by the friend link">
+                <img 
+                  class="lazyload" 
+                  th:attr="data-src=${link.spec.logo}"
+                  th:src="${#theme.assets('/images/load/trans.ajax-spinner-preloader.svg')}" 
+                  th:alt="${link.spec.displayName}"
+                  width="65"
+                  height="65"
+                  onerror="imgError(this)">
+                <span class="sitename" th:text="${link.spec.displayName}"></span>
+                <div class="linkdes" th:text="${link.spec.description}"></div>
+            </a>
+          </li> 
+        </ul>
+      </th:block>
+    </div>       
+  </article>
+</th:block>

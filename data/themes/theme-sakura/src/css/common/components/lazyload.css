@@ -1,0 +1,18 @@
+.lazyload {
+  filter: blur(0px);
+  transition: 0.3s filter linear, 0.3s -webkit-filter linear;
+}
+
+.lazyload[src*="#lazyload-blur"],
+.lazyload[style*="#lazyload-blur"] {
+  filter: blur(10px);
+}
+
+.blur-up {
+  filter: blur(5px);
+  transition: filter 400ms;
+
+  &.lazyloaded {
+    filter: blur(0);
+  }
+}

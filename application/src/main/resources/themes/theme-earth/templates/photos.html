@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html
+  xmlns:th="https://www.thymeleaf.org"
+  th:replace="~{modules/layout :: html(title = '图库 - ' + ${site.title}, hero = null, content = ~{::content}, head = null, footer = null, sidebar = ~{::sidebar}, contentClass = '')}"
+>
+  <th:block th:fragment="content">
+    <div class="rounded-xl bg-white p-4 dark:bg-slate-800">
+      <h1 class="mb-9 text-2xl font-medium dark:text-slate-50">图库</h1>
+      <div class="mb-8">
+        <nav class="flex flex-wrap gap-4" aria-label="Tabs">
+          <a
+            th:href="@{/photos}"
+            class="rounded bg-gray-100 px-1 py-0.5 text-sm text-gray-900 hover:bg-gray-200 dark:bg-slate-600 dark:text-slate-50 dark:hover:bg-slate-700 dark:hover:text-slate-100"
+            th:classappend="${#lists.isEmpty(param.group) ? '!bg-gray-200 dark:!bg-slate-700 dark:!text-slate-100 ring-2 ring-gray-300 dark:ring-slate-600' : ''}"
+          >
+            <span>全部</span>
+          </a>
+          <a
+            th:each="group : ${photoFinder.groupBy()}"
+            th:href="@{|/photos?group=${group.metadata.name}|}"
+            class="rounded bg-gray-100 px-1 py-0.5 text-sm text-gray-900 hover:bg-gray-200 dark:bg-slate-600 dark:text-slate-50 dark:hover:bg-slate-700 dark:hover:text-slate-100"
+            th:classappend="${#lists.contains(param.group, group.metadata.name) ? '!bg-gray-200 dark:!bg-slate-700 dark:!text-slate-100 ring-2 ring-gray-300 dark:ring-slate-600' : ''}"
+            th:text="${group.spec.displayName}"
+          >
+          </a>
+        </nav>
+      </div>
+
+      <div
+        id="photos"
+        class="columns-1 gap-3 pb-12 sm:columns-2 sm:gap-3 md:columns-3 lg:columns-4 [&>div:not(:first-child)]:mt-3"
+      >
+        <div th:each="photo : ${photos.items}" class="group relative h-auto max-w-full">
+          <img
+            class="animated fadeIn transform-gpu rounded-lg transition-all"
+            th:src="${photo.spec.url}"
+            th:alt="${photo.spec.displayName}"
+          />
+        </div>
+      </div>
+
+      <div class="mt-6 flex items-center justify-between" th:if="${photos.hasPrevious() || photos.hasNext()}">
+        <a
+          th:href="@{${photos.prevUrl}}"
+          class="whitespace-no-wrap group inline-flex items-center justify-center gap-1 rounded-md border border-gray-200 bg-white px-4 py-1 text-sm font-medium leading-6 text-gray-600 shadow-sm hover:bg-gray-50 focus:shadow-none focus:outline-none dark:border-slate-600 dark:bg-slate-700 dark:text-slate-100 dark:hover:bg-slate-600 dark:hover:text-white"
+        >
+          <span class="i-tabler-arrow-left text-lg transition-all group-hover:-translate-x-1"></span>
+          <span>上一页</span>
+        </a>
+        <span class="text-sm text-gray-900 dark:text-slate-50" th:text="|${photos.page} / ${photos.totalPages}|"></span>
+        <a
+          th:href="@{${photos.nextUrl}}"
+          class="whitespace-no-wrap group inline-flex items-center justify-center gap-1 rounded-md border border-gray-200 bg-white px-4 py-1 text-sm font-medium leading-6 text-gray-600 shadow-sm hover:bg-gray-50 focus:shadow-none focus:outline-none dark:border-slate-600 dark:bg-slate-700 dark:text-slate-100 dark:hover:bg-slate-600 dark:hover:text-white"
+        >
+          <span>下一页</span>
+          <span class="i-tabler-arrow-right text-lg transition-all group-hover:translate-x-1"></span>
+        </a>
+      </div>
+    </div>
+  </th:block>
+</html>

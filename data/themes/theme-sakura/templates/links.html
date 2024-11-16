@@ -1,0 +1,22 @@
+<!--
+    Template Name: links
+-->
+<!DOCTYPE html>
+<html
+  xmlns:th="https://www.thymeleaf.org"
+  th:replace="~{layout :: layout(_title = ~{::title}, _header = ~{::header}, _content = ~{::content})}"
+>
+  <th:block th:fragment="header">
+    <th:block
+      th:replace="~{macro/page-header :: page-header(extension=${links}, frontCover=${theme.config.patternimg.links_patternimg}, headerTitle = ~{::headerTitle}, id='links', isRandomImage=true)}"
+    />
+  </th:block>
+
+  <th:block th:fragment="headerTitle">
+    <h1 data-i18n="page.links.title"></h1>
+  </th:block>
+
+  <th:block th:fragment="content">
+    <th:block th:replace="~{macro/content-links}" />
+  </th:block>
+</html>

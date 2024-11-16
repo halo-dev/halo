@@ -1,0 +1,30 @@
+name: 问题或建议
+description: 提交一个新的 ISSUE
+body:
+  - type: markdown
+    id: environment
+    attributes:
+      value: "## 环境信息"
+  - type: input
+    id: version-sakura
+    validations:
+      required: true
+    attributes:
+      label: "目前使用的 Sakura 版本？"
+  - type: input
+    id: version-halo
+    validations:
+      required: true
+    attributes:
+      label: "目前使用的 halo 版本？"
+  - type: markdown
+    id: details
+    attributes:
+      value: "## 详细信息"
+  - type: textarea
+    id: what-happened
+    attributes:
+      label: "建议/问题"
+      description: "有建议或者问题可以写在这里"
+    validations:
+      required: true

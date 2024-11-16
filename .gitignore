@@ -78,3 +78,7 @@ application/src/main/resources/uc/
 application/src/main/resources/presets/
 
 .pnpm-store
+
+database/
+data/keys/
+data/halo/

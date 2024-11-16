@@ -1,0 +1,338 @@
+::-moz-selection {
+  background: #464646;
+  color: #fff;
+}
+
+::selection {
+  background: #464646;
+  color: #fff;
+}
+
+::-moz-selection {
+  background: #464646;
+  color: #fff;
+}
+
+html {
+  font-family: sans-serif;
+  text-size-adjust: 100%;
+  overflow-x: hidden;
+  word-break: break-all;
+  box-sizing: border-box;
+  font-size: 100%;
+}
+
+body,
+select,
+textarea {
+  color: var(--body-color);
+  font-size: 1em;
+  line-height: 1.5;
+}
+
+body {
+  background: var(--background-color);
+  background-attachment: fixed;
+  margin: 0;
+  cursor: var(--cursor-normal);
+  text-shadow: 0px 0px 1px rgba(0, 0, 0, 0.1);
+
+  &.serif {
+    font-family: "Noto Serif SC", Georgia, serif;
+  }
+}
+
+article,
+aside,
+details,
+figcaption,
+figure,
+footer,
+header,
+main,
+menu,
+nav,
+section,
+summary {
+  display: block;
+}
+
+details > summary:first-of-type {
+  display: list-item;
+}
+
+audio,
+canvas,
+progress,
+video {
+  display: inline-block;
+  vertical-align: baseline;
+}
+
+audio:not([controls]) {
+  display: none;
+  height: 0;
+}
+
+[hidden],
+template {
+  display: none;
+}
+
+abbr[title] {
+  border-bottom: 1px dotted;
+}
+
+dfn {
+  font-style: italic;
+}
+
+mark {
+  background: #ff0;
+  color: #000;
+}
+
+small {
+  font-size: 80%;
+}
+
+sub,
+sup {
+  font-size: 75%;
+  line-height: 0;
+  position: relative;
+  vertical-align: baseline;
+}
+
+sup {
+  top: -0.5em;
+}
+
+sub {
+  bottom: -0.25em;
+}
+
+img {
+  border: 0;
+  filter: brightness(var(--theme-brightness));
+}
+
+svg:not(:root) {
+  overflow: hidden;
+}
+
+figure {
+  margin: 1em 40px;
+}
+
+hr {
+  box-sizing: content-box;
+  height: 0;
+}
+
+code,
+kbd,
+samp {
+  font-family: monospace;
+  font-size: 1em;
+}
+
+optgroup,
+select,
+textarea {
+  color: inherit;
+  font: inherit;
+  margin: 0;
+}
+
+select {
+  text-transform: none;
+  border: 1px solid #ccc;
+}
+
+fieldset {
+  border: 1px solid #b0b0b0;
+  margin: 0 2px;
+  padding: 0.35em 0.625em 0.75em;
+}
+
+legend {
+  border: 0;
+  padding: 0;
+}
+
+textarea {
+  overflow: auto;
+}
+
+optgroup {
+  font-weight: 700;
+}
+
+td,
+th {
+  padding: 0;
+}
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+  clear: both;
+}
+
+p {
+  margin-bottom: 1.5em;
+  cursor: var(--cursor-text);
+  word-break: normal;
+  overflow-wrap: break-word;
+}
+
+dfn,
+cite,
+em,
+svg {
+  font-style: italic;
+}
+
+blockquote {
+  margin: 1em;
+  padding: 0 1em;
+  color: #656d76;
+  border-left: 0.25em solid #c6cbd1;
+
+  & p {
+    margin: 5px 0;
+  }
+}
+
+address {
+  margin: 0 0 1.5em;
+}
+
+kbd {
+  display: inline-block;
+  padding: 3px 5px;
+  font-size: 1em;
+  line-height: 1em;
+  color: #444d56;
+  vertical-align: middle;
+  background-color: #fff;
+  border: solid 1px #c6cbd1;
+  border-bottom-color: #959da5;
+  border-radius: 3px;
+  box-shadow: inset 0 -1px 0 #959da5;
+  font-family: "Source Code Pro", monospace, Helvetica, Tahoma, Arial, STXihei, "STHeiti Light", "Microsoft YaHei",
+    sans-serif;
+}
+
+code,
+kbd,
+tt,
+var {
+  font-size: 1em;
+}
+
+abbr,
+acronym {
+  border-bottom: 1px dotted #666;
+  cursor: help;
+}
+
+mark,
+ins {
+  background: #fefac7;
+  text-decoration: none;
+}
+
+big {
+  font-size: 125%;
+}
+
+*:before,
+*:after {
+  box-sizing: inherit;
+}
+
+q:before,
+q:after {
+  content: "";
+}
+
+q {
+}
+
+hr {
+  background-color: #ccc;
+  border: 0;
+  height: 1px;
+  margin-bottom: 1.5em;
+}
+
+ul,
+ol {
+  margin: 0 0 1.5em 3em;
+}
+
+ul {
+  list-style: disc;
+}
+
+ol {
+  list-style: decimal;
+}
+
+li > ul,
+li > ol {
+  margin-bottom: 0;
+  margin-left: 1.5em;
+}
+
+dt {
+  font-weight: 700;
+}
+
+dd {
+  margin: 0 1.5em 1.5em;
+}
+
+img {
+  height: auto;
+  max-width: 100%;
+}
+
+textarea {
+  padding-left: 3px;
+  width: 100%;
+  color: var(--color);
+  border: 1px solid #ccc;
+  border-radius: 3px;
+
+  &:focus {
+    color: #000000;
+  }
+}
+
+embed,
+iframe,
+object {
+  max-width: 100%;
+}
+
+iframe {
+  filter: brightness(var(--theme-brightness));
+}
+
+.noselect {
+  user-select: none;
+}
+
+.is-show {
+  display: block !important;
+}
+
+.is-hide {
+  display: none;
+}

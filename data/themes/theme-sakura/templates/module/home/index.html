@@ -1,0 +1,13 @@
+<!--/* 首屏 */-->
+<th:block th:fragment="header">
+  <th:block th:replace="~{module/home/img_box}"></th:block>
+  <th:block th:if="${theme.config.mainScreen.bgvideo}">
+    <th:block th:replace="~{module/home/video_box}"></th:block>
+  </th:block>
+  <th:block th:if="${theme.config.mainScreen.focus_wave}">
+    <th:block th:replace="~{module/home/wave}"></th:block>
+  </th:block>
+  <th:block th:if="${theme.config.mainScreen.focus_godown}">
+    <th:block th:replace="~{module/home/go_down}"></th:block>
+  </th:block>
+</th:block>

@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html xmlns:th="https://www.thymeleaf.org"
+  th:replace="~{layout :: layout(_title = ~{::title}, _header = ~{::header}, _content = ~{::content})}">
+<th:block th:fragment="header">
+  <th:block
+    th:replace="~{macro/page-header :: page-header(extension=${categories}, frontCover=${theme.config.patternimg.category_patternimg}, headerTitle = ~{::headerTitle},  id='categories')}" />
+</th:block>
+
+<th:block th:fragment="headerTitle">
+  <h1 data-i18n="page.categories.title"></h1>
+</th:block>
+
+<th:block th:fragment="content">
+  <div class="categories-container">
+    <div class="card-container">
+      <div class="container chip-container">
+        <div class="card">
+          <div class="card-content">
+            <div
+              th:unless="${not #strings.isEmpty(theme.config.patternimg.category_patternimg)} or (${theme.config.random_image.rimage_cover_sheet_open} and ${not #strings.isEmpty(theme.config.random_image.rimage_url)})"
+              class="categories-title">
+              <span class="iconify iconify--xlarge" data-icon="fa:bookmark"></span>&nbsp;&nbsp;<span data-i18n="page.categories.title"></span>
+            </div>
+            <div class="categories-chips">
+              <a data-pjax th:each="category : ${categories}" th:href="@{${category.status.permalink}}"
+                th:title="${category.spec.displayName}+': '+${category.postCount}"
+                aria-label="get the next category">
+                <span class="chip chip-default" th:attr="data-tagname=${category.spec.displayName}">
+                  <th:block th:text="${category.spec.displayName}"></th:block>
+                  <span class="categories-length" th:text="${category.postCount}"></span>
+                </span>
+              </a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <th:block th:if="${theme.config.tagAndCategory.category_radar}">
+      <div class="card-container category-show">
+        <div class="card">
+          <div id="category-echarts"></div>
+          <script type="text/javascript" th:inline="javascript">
+            const categories = /*[[${categoryFinder.listAll()}]]*/
+            const categoryRadar = categories.reduce((acc,curr)=> (acc[curr.spec.displayName]=curr.postCount,acc),{});
+          </script>
+        </div>
+      </div>
+    </th:block>
+  </div>
+</th:block>
+
+</html>

@@ -1,0 +1,76 @@
+<!--/* 页脚设置 */-->
+<th:block th:fragment="footer">
+  <div class="footer-logo">
+    <p
+      th:style="'background-image: url(' + ${theme.config.others.footer_logo ?: #theme.assets('/images/footer/sakura.svg')} + ');'"
+    ></p>
+  </div>
+  <div class="footer-halo">
+    <halo:footer />
+  </div>
+  <div class="footer-copyright">
+    <!--/* 请尊重作者，务必保留版权声明! */-->
+    <p>
+      <span
+        >Powered
+        <span class="iconify animated" data-icon="fa:vimeo"></span>
+        by
+        <a
+          rel="me"
+          target="_blank"
+          href="http://halo.run"
+          title="一款现代化的开源建站 / CMS 系统。"
+          aria-label="engines are supported on this website"
+          >Halo</a
+        >
+      </span>
+      •
+      <span
+        >Crafted with
+        <span class="iconify" data-icon="fa-heart"></span>
+        by
+        <a
+          rel="me"
+          target="_blank"
+          href="https://github.com/LIlGG/halo-theme-sakura"
+          aria-label="the theme used by this website"
+          >LIlGG</a
+        >
+      </span>
+    </p>
+  </div>
+  <div class="footer-device">
+    <p class="footer-site-time">
+      ©
+      <th:block th:text="${#dates.format(new java.util.Date().getTime(), 'yyyy')}" />
+      <th:block th:text="${site.title}"></th:block>
+    </p>
+    <p class="footer-beian">
+      <th:block th:if="${not #strings.isEmpty(theme.config.others.footer_case_number)}">
+        <a
+          href="https://beian.miit.gov.cn/"
+          target="_blank"
+          th:text="${theme.config.others.footer_case_number}"
+          aria-label="gongan filing address"
+        ></a>
+      </th:block>
+      <th:block th:if="${not #strings.isEmpty(theme.config.others.footer_ga_case_number)}">
+        <a
+          th:href="@{|https://beian.mps.gov.cn/#/query/webSearch?code=${theme.config.others.footer_ga_select_number}|}"
+          style="margin-left: 8px"
+          target="_blank"
+          aria-label="gongan filing address"
+        >
+          <img
+            th:src="${#theme.assets('/images/footer/gongan.png')}"
+            alt="badge for gongan"
+            width="16"
+            height="16"
+            style="margin-right: 4px"
+          />
+          <span th:text="${theme.config.others.footer_ga_case_number}"></span>
+        </a>
+      </th:block>
+    </p>
+  </div>
+</th:block>

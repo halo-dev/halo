@@ -1,0 +1,50 @@
+.headertop {
+  position: relative;
+  overflow: hidden;
+  width: 100%;
+  animation: header 1s;
+
+  &::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    z-index: 1;
+    background-attachment: fixed;
+    background: var(--first-screen-filter-images);
+  }
+
+  &::after {
+    content: "";
+    display: var(--first-screen-after);
+    width: 150%;
+    height: 4.375rem;
+    background: var(--background-color);
+    left: -25%;
+    bottom: -2.875rem;
+    border-radius: 100%;
+    position: absolute;
+    z-index: 1;
+    transition: background 1s;
+  }
+
+  @mixin screens-md {
+    &::after {
+      display: block;
+    }
+  }
+}
+
+@keyframes header {
+	0% {
+		opacity: 0;
+		transform: translateY(-50px);
+	}
+
+	100% {
+		opacity: 1;
+		transform: translateY(0);
+	}
+}

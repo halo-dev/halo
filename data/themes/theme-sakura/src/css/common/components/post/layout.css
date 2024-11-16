@@ -1,0 +1,30 @@
+h1 {
+  & a {
+    color: #504e4e;
+
+    &:hover {
+      color: var(--theme-color);
+    }
+  }
+}
+
+.entry-footer {
+  list-style: none;
+}
+
+.hotpost {
+  color: #ff3b00;
+}
+
+.page-header {
+	position: relative;
+	text-align: center;
+	margin-bottom: 3rem;
+	color: #999
+}
+
+@mixin screens-md {
+  .page-header {
+    margin-bottom: 0;
+  }  
+}

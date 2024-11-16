@@ -1,0 +1,38 @@
+.site-footer {
+  background-color: var(--site-content-background-color);
+  max-width: var(--site-content-max-width);
+  padding: 0 10px;
+  margin: auto;
+  padding-bottom: 2%;
+  position: relative;
+
+  &::before,
+  &::after {
+    content: "";
+    display: table;
+    table-layout: fixed;
+  }
+
+  &::after {
+    clear: both;
+  }
+
+  & .site-info {
+    margin: 2rem auto;
+    text-align: center;
+    font-size: 0.8125rem;
+    color: #b0b0b0;
+
+    & a {
+      color: #b0b0b0;
+
+      &:hover {
+        color: var(--theme-color);
+      }
+    }
+  }
+
+  @mixin screens-lg {
+    padding: 30px;
+  }
+}

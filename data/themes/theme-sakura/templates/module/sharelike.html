@@ -1,0 +1,85 @@
+<!--/*-->
+分享/点赞页 实际上我感觉原版的分享风格更好看，因此保留原版的 简单起见，这里暂时不封装
+<!--*/-->
+<th:block th:fragment="sharelike(post)">
+  <th:block th:if="${theme.config.post.post_share}">
+    <div class="post-share">
+      <ul class="social-share share-hidden">
+        <li>
+          <a
+            th:href="@{http://service.weibo.com/share/share.php?url={url}&appkey=&title={title}|{author}&pic={pic}(url=${post.status.permalink},title=${post.spec.title},author=${post.owner.displayName},pic=${post.spec.cover})}"
+            onclick="window.open(this.href, 'weibo-share', 'width=490,height=700');return false;"
+            class="s-weibo"
+            data-i18n="[title]share.weibo"
+            aria-label="Social Network - weibo"
+          >
+            <img th:src="${#theme.assets('/images/sns/weibo.png')}" alt="weibo" height="32" width="32" />
+          </a>
+        </li>
+        <li>
+          <a
+            th:href="@{http://connect.qq.com/widget/shareqq/index.html?url={url}&title={title}|{author}&source={title}|{author}&desc={desc}&pics={pics}&summary={summary}(url=${post.status.permalink},title=${post.spec.title},author=${post.owner.displayName},desc=${post.status.excerpt},pics=${post.spec.cover},summary=${post.status.excerpt})}"
+            onclick="window.open(this.href, 'qq-share', 'width=730,height=500');return false;"
+            class="s-qq"
+            data-i18n="[title]share.qq"
+            aria-label="Social Network - qq"
+          >
+            <img th:src="${#theme.assets('/images/sns/qq.png')}" alt="qq" height="32" width="32" />
+          </a>
+        </li>
+        <li>
+          <a href="javascript:" class="s-wechat" aria-label="Social Network - wechat">
+            <div class="wechat-qrcode">
+              <h4 data-i18n="share.wechat.qcode_title"></h4>
+              <canvas
+                id="qrcode"
+                class="qrcode"
+                th:title="${post.spec.title}"
+                th:attr="data-url=@{|${site.url}${post.status.permalink}|}"
+              ></canvas>
+              <div class="help">
+                <p data-i18n="share.wechat.help_1"></p>
+                <p data-i18n="share.wechat.help_2"></p>
+              </div>
+            </div>
+            <img th:src="${#theme.assets('/images/sns/wechat.png')}" alt="wechat" height="32" width="32" />
+          </a>
+        </li>
+        <li>
+          <a
+            th:href="@{http://shuo.douban.com/!service/share?href={href}&name={name}|{author}&text={text}&image={image}&starid=0&aid=0&style=11(href=${post.status.permalink},name=${post.spec.title},author=${post.owner.displayName},text=${post.status.excerpt},image=${post.spec.cover})}"
+            onclick="window.open(this.href, 'douban-share', 'width=490,height=600');return false;"
+            class="s-douban"
+            data-i18n="[title]share.douban"
+            aria-label="Social Network - douban"
+          >
+            <img th:src="${#theme.assets('/images/sns/douban.png')}" alt="douban" height="32" width="32" />
+          </a>
+        </li>
+        <li>
+          <a
+            th:href="@{http://sns.qzone.qq.com/cgi-bin/qzshare/cgi_qzshare_onekey?url={url}&title={title}|{author}&desc={desc}&summary={summary}&site={site}(url=${post.status.permalink},title=${post.spec.title},author=${post.owner.displayName},desc=${post.status.excerpt},summary=${post.status.excerpt},site=${site.title})}"
+            onclick="window.open(this.href, 'qzone-share', 'width=490,height=600');return false;"
+            class="s-qzone"
+            data-i18n="[title]share.qzone"
+            aria-label="Social Network - qzone"
+          >
+            <img th:src="${#theme.assets('/images/sns/qzone.png')}" alt="qzone" height="32" width="32" />
+          </a>
+        </li>
+        <li>
+          <a
+            th:href="@{http://www.linkedin.com/shareArticle?mini=true&ro=true&title={title}|{author}&url={url}&summary={summary}&source={source}&armin=armin(title=${post.spec.title},author=${post.owner.displayName},url=${post.status.permalink},summary=${post.status.excerpt},source=${site.title})}"
+            onclick="window.open(this.href, 'linkedin-share', 'width=490,height=600');return false;"
+            class="s-linkedin"
+            data-i18n="[title]share.linkedin"
+            aria-label="Social Network - linkedin"
+          >
+            <img th:src="${#theme.assets('/images/sns/linkedin.png')}" alt="linkedin" height="32" width="32" />
+          </a>
+        </li>
+      </ul>
+      <span class="iconify show-share" data-icon="akar-icons:arrow-forward-thick"></span>
+    </div>
+  </th:block>
+</th:block>

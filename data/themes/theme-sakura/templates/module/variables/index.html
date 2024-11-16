@@ -1,0 +1,13 @@
+<!--/* 首屏 */-->
+<th:block th:fragment="variables">
+  <th:block th:replace="~{module/variables/layout}"></th:block>
+  <th:block th:if="${_templateId == 'moments' or _templateId == 'moment'}">
+    <th:block th:replace="~{module/variables/moments}"></th:block>
+  </th:block>
+  <th:block th:if="${_templateId == 'post'}">
+    <th:block th:replace="~{module/variables/post}"></th:block>
+  </th:block>
+  <th:block th:if="${_templateId == 'photos'}">
+    <th:block th:replace="~{module/variables/photos}"></th:block>
+  </th:block>
+</th:block>

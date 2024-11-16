@@ -1,0 +1,33 @@
+.home-wave {
+  z-index: 1;
+  position: relative;
+  width: 400%;
+  transition: 0.4s ease all;
+
+  & > div {
+    position: absolute;
+    bottom: 0;
+    width: 100%;
+  }
+
+  & .wave-1 {
+    height: 65px;
+    left: -236px;
+    animation: wave 100s linear 0s infinite;
+  }
+
+  & .wave-2 {
+    height: 80px;
+    left: 0px;
+    animation: wave 240s linear 0s infinite;
+  }
+}
+
+@keyframes wave {
+  0% {
+    transform: translateX(0%);
+  }
+  100% {
+    transform: translateX(-50.5%);
+  }
+}

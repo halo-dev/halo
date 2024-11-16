@@ -1,0 +1,39 @@
+.card-container {
+  position: relative;
+  text-align: center;
+  border: 0;
+  border-radius: 10px;
+  color: rgba(0, 0, 0, 0.87);
+  background: var(--background-color);
+  background-size: cover;
+  box-shadow: var(--card-container-box-shadow);
+
+  & .chip-container {
+    & .card-content {
+      padding: 1.5rem;
+      border-radius: 0 0 2px 2px;
+
+      & .chip {
+        margin: 0.625rem;
+        padding: 1.25rem;
+        display: inline-flex;
+        line-height: 0;
+        font-size: 1rem;
+        font-weight: 500;
+        border-radius: 5px;
+        cursor: pointer;
+        box-shadow: 0 3px 5px rgba(0, 0, 0, 0.12);
+        z-index: 0;
+
+        &:hover {
+          color: #fff;
+          background: linear-gradient(to right, #4cbf30 0%, #0f9d58 100%);
+        }
+
+        &.chip-default {
+          color: #34495e;
+        }
+      }
+    }
+  }
+}

@@ -1,0 +1,59 @@
+<style type="text/css" th:inline="css" th:fragment="variables-root">
+  :root {
+    --theme-color: [(${theme.config.general.theme_skin})];
+    --loading-image: url("[(${#theme.assets('/images/load/rotating-ball-o.svg')})]");
+
+    [# th:if="${theme.config.general.cursor_skin == 'sakura'}"]
+      --cursor-link: url("[(${#theme.assets('/cursor/ayuda.cur')})]"), auto;
+      --cursor-link-active: url("[(${#theme.assets('/cursor/work.cur')})]"), alias;
+      --cursor-text: url("[(${#theme.assets('/cursor/texto.cur')})]"), auto;
+      --cursor-normal: url("[(${#theme.assets('/cursor/normal.cur')})]"), auto;
+      --cursor-hover: url("[(${#theme.assets('/cursor/No_Disponible.cur')})]"), auto;
+    [/]
+
+    --cd-top-image: url([(${theme.config.others.top_back_img ?: #theme.assets("/images/scroll.png")})]) no-repeat center;
+    [# th:if="${theme.config.others.top_back_mode == 'simplify'}"]
+      --cd-top-display: none;
+      --mobile-cd-top-display: block;
+    [/]
+
+    [# th:if="${theme.config.general.list_type == 'round'}"]
+      --standard-post-list-border-radius: 50%;
+    [/]
+
+    [# th:unless="${theme.config.mainScreen.focus_height}"]
+      --first-screen-height: 50vh;
+      --first-screen-after: block;
+    [/]
+
+    [# th:switch="${theme.config.mainScreen.focus_img_filter}"]
+      [# th:case="filter-nothing"]
+      --first-screen-filter-images: none;
+      [/]
+      [# th:case="filter-undertint"]
+      --first-screen-filter-images: rgba(255, 255, 255, .3);
+      [/]
+      [# th:case="filter-dim"]
+      --first-screen-filter-images: rgba(0, 0, 0, .3);
+      [/]
+      [# th:case="filter-grid"]
+      --first-screen-filter-images: url("[(${#theme.assets('/images/themes/grid.png')})]");
+      [/]
+    [/]
+
+    --yya-header-top: 0;
+  }
+
+  /**
+  * 图片资源
+  */
+  .video-container {
+    /* 背景视频按钮 */
+    --video-play-image: url("[(${#theme.assets('/images/video/play@32x32.png')})]");
+    --video-pause-image: url("[(${#theme.assets('/images/video/pause@32x32.png')})]");
+  }
+
+  .search-form {
+    --search-form-background: url("[(${#theme.assets('/images/search/iloli.gif')})]");
+  }
+</style>

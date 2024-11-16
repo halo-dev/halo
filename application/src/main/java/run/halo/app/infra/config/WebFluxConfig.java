@@ -46,6 +46,8 @@ import run.halo.app.infra.properties.HaloProperties;
 import run.halo.app.infra.webfilter.AdditionalWebFilterChainProxy;
 import run.halo.app.plugin.extensionpoint.ExtensionGetter;
 
+// webflux 是一个新的响应式，异步编程框架。区别于spring mvc
+// webflux 不仅仅是一个响应式编程框架，同时也是一个完整的http服务器，可以通过内置的netty运行。
 @Configuration
 public class WebFluxConfig implements WebFluxConfigurer {
 
@@ -67,6 +69,9 @@ public class WebFluxConfig implements WebFluxConfigurer {
         this.applicationContext = applicationContext;
     }
 
+    // @Bean 和 @Component 类似，都是定义Spring Bean，@Bean 注解在带有返回值的方法上，@Component 注解在类上
+    // @Bean 注解的函数只有被调用后才会在spring中注册
+    // @Component 注解会被自动扫描，实例化，并且注册
     @Bean
     WebFluxRegistrations webFluxRegistrations() {
         return new WebFluxRegistrations() {
@@ -107,6 +112,8 @@ public class WebFluxConfig implements WebFluxConfigurer {
         configurer.defaultCodecs().jackson2JsonEncoder(new Jackson2JsonEncoder(objectMapper));
     }
 
+    // 自定义路由
+    // 这里定义的halo后端的路由，类似于 flask 的blueprint
     @Bean
     RouterFunction<ServerResponse> customEndpoints(ApplicationContext context) {
         var builder = new CustomEndpointsBuilder();
@@ -121,6 +128,10 @@ public class WebFluxConfig implements WebFluxConfigurer {
         return handlerMapping;
     }
 
+    // 前端路由
+    // RouterFunction 来定义对特定请求路径的匹配条件（Predicate），判断请求是否符合重定向的条件。
+    // 包含 console/** 但是不包含 /console/assets/** （这个路径后面会处理）
+    // 如果符合重定向条件，就会重定向到前端应用 */index.html 前端路由框架会来处理后续路径。
     @Bean
     RouterFunction<ServerResponse> consoleEndpoints() {
         var consolePredicate = path("/console/**").and(path("/console/assets/**").negate())
@@ -203,7 +214,9 @@ public class WebFluxConfig implements WebFluxConfigurer {
                 registration.addResourceLocations(FILE_URL_PREFIX + path + "/");
             }
         }
-
+        // 对于其他 url（包括主页）的访问
+        // 访问的是 .hola/static 这个路径下的文件以及  resourceProperties.getStaticLocations()
+        // 这个路径下面的文件
         var haloStaticPath = haloProp.getWorkDir().resolve("static");
         registry.addResourceHandler("/**")
             .addResourceLocations(FILE_URL_PREFIX + haloStaticPath + "/")

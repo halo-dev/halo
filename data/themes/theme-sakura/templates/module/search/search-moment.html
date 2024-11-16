@@ -1,0 +1,50 @@
+<article th:fragment="content(momentDoc)" class="moment-list" itemscope itemtype="http://schema.org/Article">
+  <link itemprop="mainEntityOfPage" th:href="@{${momentDoc.permalink}}" />
+
+  <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+    <meta itemprop="name" th:content="${site.title}" />
+    <meta itemprop="description" th:content="${site.subtitle}" />
+  </span>
+
+  <span hidden itemprop="moment" itemscope itemtype="http://schema.org/CreativeWork">
+    <meta itemprop="name" th:content="${momentDoc.title}" />
+    <meta itemprop="description" th:content="${momentDoc.description}" />
+  </span>
+
+  <header class="entry-header">
+    <h3 class="entry-title">
+      <a
+        data-pjax
+        th:href="@{${momentDoc.permalink}}"
+        th:text="${momentDoc.title}"
+        aria-label="viewing the article details"
+      ></a>
+    </h3>
+    <div class="p-time">
+      <span class="iconify" data-icon="solar:clock-circle-linear"></span>
+      <time
+        data-i18n="postlist.time"
+        th:i18n-options="|{
+          'time': '${momentDoc.updateTimestamp}', 
+          'params': { 'separator': '-' }
+        }|"
+        th:datetime="${momentDoc.updateTimestamp}"
+        itemprop="dateCreated datePublished"
+      >
+      </time>
+    </div>
+  </header>
+
+  <section>
+    <div><p th:text="${momentDoc.description}"></p></div>
+  </section>
+
+  <footer class="entry-footer">
+    <div class="post-more">
+      <a data-pjax th:href="@{${momentDoc.permalink}}" aria-label="viewing the article details">
+        <span class="iconify" data-icon="akar-icons:more-horizontal-fill"></span>
+      </a>
+    </div>
+  </footer>
+  <hr />
+</article>

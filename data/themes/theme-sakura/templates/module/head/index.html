@@ -1,0 +1,40 @@
+<th:block th:fragment="module_head">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+  <meta name="theme-color" th:content="${theme.config.general.theme_skin}"/>
+  <meta name="generator" content="Halo 2.0.0">
+
+  <!--/* css */-->
+  <link rel="preload" th:href="@{/assets/dist/css/main.min.css?v={version}(version=${theme.spec.version})}" as="style">
+  <link rel="stylesheet" th:href="@{/assets/dist/css/main.min.css?v={version}(version=${theme.spec.version})}">
+
+  <!--/* 字体 */-->
+  <th:block th:replace="~{module/head/fonts}" />
+  
+  <!--/* 高亮代码样式 */-->
+  <link
+    rel="stylesheet"
+    th:href="@{/assets/dist/css/highlight-{code_pretty}.min.css(code_pretty=${theme.config.post.code_pretty})}"
+    type="text/css"
+    media="noexist"
+    onload="this.media='all'"
+  />
+
+  <!--/* 获取主题设置中的所有属性保存在 JS 变量中 */-->
+  <script th:inline="javascript">
+    const config = [(${theme.config})]
+  </script>
+
+  <!--/* 每页可变属性 */-->
+  <script class="pjax" th:inline="javascript" >
+    var pageData = {
+      '_templateId': '[(${_templateId})]',
+      [# th:if="${_templateId == 'post'}"]
+      "postLastModifyTime": "[(${#dates.format(post.status.lastModifyTime, 'yyyy-MM-dd HH:mm:ss')})]",
+      "isOriginal": "[(${#annotations.getOrDefault(post, 'original', false) })]",
+      [/]
+      'version': '[(${theme.spec.version})]',
+      'showSearchModal': [(${pluginFinder.available('PluginSearchWidget', '>=1.5.0')})],
+    }
+  </script>
+</th:block>
