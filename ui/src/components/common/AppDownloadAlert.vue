@@ -13,11 +13,11 @@ import { VAlert } from "@halo-dev/components";
         >
           <template #url>
             <a
-              href="https://halo.run/store/apps"
+              href="https://www.halo.run/store/apps"
               target="_blank"
               class="underline-offset-2 hover:text-gray-900 hover:underline"
             >
-              https://halo.run/store/apps
+              https://www.halo.run/store/apps
             </a>
           </template>
         </i18n-t>

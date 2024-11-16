@@ -3,28 +3,20 @@ import { FormType } from "@/types/slug";
 import { randomUUID } from "@/utils/id";
 import ShortUniqueId from "short-unique-id";
 import { slugify } from "transliteration";
-import { watch, type Ref } from "vue";
+import { computed, watch, type Ref } from "vue";
+
 const uid = new ShortUniqueId();
-const Strategy = {
-  generateByTitle: (value: string) => {
-    if (!value) return "";
-    return slugify(value, { trim: true });
-  },
-  shortUUID: (value: string) => {
-    if (!value) return "";
-    return uid.randomUUID(8);
-  },
-  UUID: (value: string) => {
-    if (!value) return "";
-    return randomUUID();
-  },
-  timestamp: (value: string) => {
-    if (!value) return "";
-    return new Date().getTime().toString();
-  },
+
+type SlugStrategy = (value?: string) => string;
+
+const strategies: Record<string, SlugStrategy> = {
+  generateByTitle: (value?: string) => slugify(value || "", { trim: true }),
+  shortUUID: () => uid.randomUUID(8),
+  UUID: () => randomUUID(),
+  timestamp: () => new Date().getTime().toString(),
 };
 
-const onceList = ["shortUUID", "UUID", "timestamp"];
+const onceStrategies = new Set(["shortUUID", "UUID", "timestamp"]);
 
 export default function useSlugify(
   source: Ref<string>,
@@ -32,35 +24,43 @@ export default function useSlugify(
   auto: Ref<boolean>,
   formType: FormType
 ) {
-  const handleGenerateSlug = (forceUpdate = false, formType: FormType) => {
-    const globalInfoStore = useGlobalInfoStore();
-    const mode = globalInfoStore.globalInfo?.postSlugGenerationStrategy;
+  const globalInfoStore = useGlobalInfoStore();
 
-    if (!mode) {
+  const currentStrategy = computed(
+    () =>
+      globalInfoStore.globalInfo?.postSlugGenerationStrategy ||
+      "generateByTitle"
+  );
+
+  const generateSlug = (value: string): string => {
+    const strategy =
+      formType === FormType.POST
+        ? strategies[currentStrategy.value]
+        : strategies.generateByTitle;
+
+    return strategy(value);
+  };
+
+  const handleGenerateSlug = (forceUpdate = false) => {
+    if (
+      !forceUpdate &&
+      onceStrategies.has(currentStrategy.value) &&
+      target.value
+    ) {
       return;
     }
-    if (formType != FormType.POST) {
-      target.value = Strategy["generateByTitle"](source.value);
-      return;
-    }
-    if (forceUpdate) {
-      target.value = Strategy[mode](source.value);
-      return;
-    }
-    if (onceList.includes(mode) && target.value) return;
-    target.value = Strategy[mode](source.value);
+
+    target.value = generateSlug(source.value);
   };
 
   watch(
-    () => source.value,
+    source,
     () => {
       if (auto.value) {
-        handleGenerateSlug(false, formType);
+        handleGenerateSlug(true);
       }
     },
-    {
-      immediate: true,
-    }
+    { immediate: true }
   );
 
   return {

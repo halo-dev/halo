@@ -20,6 +20,8 @@ import org.springframework.security.core.Authentication;
 abstract class TwoFactorAuthenticationMixin {
 
     @JsonCreator
-    TwoFactorAuthenticationMixin(@JsonProperty("previous") Authentication previous) {
+    TwoFactorAuthenticationMixin(
+        @JsonProperty("previous") Authentication previous
+    ) {
     }
 }

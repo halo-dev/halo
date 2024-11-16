@@ -8,7 +8,6 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Component;
-import org.springframework.transaction.annotation.Transactional;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import run.halo.app.infra.exception.DuplicateNameException;
@@ -33,6 +32,11 @@ public class ReactiveExtensionStoreClientImpl implements ReactiveExtensionStoreC
             .collectList()
             .zipWith(this.repository.countByNameStartingWith(prefix))
             .map(p -> new PageImpl<>(p.getT1(), pageable, p.getT2()));
+    }
+
+    @Override
+    public Mono<Long> countByNamePrefix(String prefix) {
+        return this.repository.countByNameStartingWith(prefix);
     }
 
     @Override
@@ -61,7 +65,6 @@ public class ReactiveExtensionStoreClientImpl implements ReactiveExtensionStoreC
     }
 
     @Override
-    @Transactional
     public Mono<ExtensionStore> delete(String name, Long version) {
         return repository.findById(name)
             .flatMap(extensionStore -> {

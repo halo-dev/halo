@@ -16,6 +16,7 @@ import run.halo.app.extension.GVK;
 @GVK(group = Constant.GROUP, version = Constant.VERSION, kind = KIND,
     plural = "policies", singular = "policy")
 public class Policy extends AbstractExtension {
+    public static final String POLICY_OWNER_LABEL = "storage.halo.run/policy-owner";
 
     public static final String KIND = "Policy";
 

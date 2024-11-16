@@ -25,6 +25,7 @@ import java.util.zip.ZipInputStream;
 import java.util.zip.ZipOutputStream;
 import lombok.extern.slf4j.Slf4j;
 import org.reactivestreams.Publisher;
+import org.springframework.core.io.Resource;
 import org.springframework.core.io.buffer.DataBuffer;
 import org.springframework.lang.NonNull;
 import org.springframework.util.AntPathMatcher;
@@ -294,6 +295,14 @@ public abstract class FileUtils {
                     }
                 })
             .subscribeOn(scheduler);
+    }
+
+    public static void copyResource(Resource resource, Path path) {
+        try (var inputStream = resource.getInputStream()) {
+            Files.copy(inputStream, path, REPLACE_EXISTING);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     public static void copy(Path source, Path dest, CopyOption... options) {

@@ -1,10 +1,11 @@
 <script lang="ts" setup>
 import StickyBlock from "@/components/sticky-block/StickyBlock.vue";
-import { useSettingFormConvert } from "@console/composables/use-setting-form";
-import type { ConfigMap, Plugin, Setting } from "@halo-dev/api-client";
+import type { FormKitSchemaCondition, FormKitSchemaNode } from "@formkit/core";
+import type { Plugin, Setting } from "@halo-dev/api-client";
 import { consoleApiClient } from "@halo-dev/api-client";
 import { Toast, VButton } from "@halo-dev/components";
 import { useQuery, useQueryClient } from "@tanstack/vue-query";
+import { cloneDeep, set } from "lodash-es";
 import { computed, inject, ref, toRaw, type Ref } from "vue";
 import { useI18n } from "vue-i18n";
 
@@ -16,12 +17,14 @@ const plugin = inject<Ref<Plugin | undefined>>("plugin");
 const setting = inject<Ref<Setting | undefined>>("setting", ref());
 const saving = ref(false);
 
-const { data: configMap } = useQuery<ConfigMap>({
-  queryKey: ["plugin-configMap", plugin],
+const { data: configMapData } = useQuery({
+  queryKey: ["core:plugin:configMap:data", plugin],
   queryFn: async () => {
-    const { data } = await consoleApiClient.plugin.plugin.fetchPluginConfig({
-      name: plugin?.value?.metadata.name as string,
-    });
+    const { data } = await consoleApiClient.plugin.plugin.fetchPluginJsonConfig(
+      {
+        name: plugin?.value?.metadata.name as string,
+      }
+    );
     return data;
   },
   enabled: computed(() => {
@@ -29,28 +32,37 @@ const { data: configMap } = useQuery<ConfigMap>({
   }),
 });
 
-const { configMapFormData, formSchema, convertToSave } = useSettingFormConvert(
-  setting,
-  configMap,
-  group
-);
+const currentConfigMapGroupData = computed(() => {
+  return configMapData.value?.[group.value];
+});
 
-const handleSaveConfigMap = async () => {
+const formSchema = computed(() => {
+  if (!setting.value) {
+    return;
+  }
+  const { forms } = setting.value.spec;
+  return forms.find((item) => item.group === group?.value)?.formSchema as (
+    | FormKitSchemaCondition
+    | FormKitSchemaNode
+  )[];
+});
+
+const handleSaveConfigMap = async (data: object) => {
   saving.value = true;
-  const configMapToUpdate = convertToSave();
-  if (!configMapToUpdate || !plugin?.value) {
+
+  if (!plugin?.value) {
     saving.value = false;
     return;
   }
 
-  await consoleApiClient.plugin.plugin.updatePluginConfig({
+  await consoleApiClient.plugin.plugin.updatePluginJsonConfig({
     name: plugin.value.metadata.name,
-    configMap: configMapToUpdate,
+    body: set(cloneDeep(configMapData.value) || {}, group.value, data),
   });
 
   Toast.success(t("core.common.toast.save_success"));
 
-  queryClient.invalidateQueries({ queryKey: ["plugin-configMap"] });
+  queryClient.invalidateQueries({ queryKey: ["core:plugin:configMap:data"] });
 
   saving.value = false;
 };
@@ -60,18 +72,16 @@ const handleSaveConfigMap = async () => {
     <div class="rounded-b-base bg-white p-4">
       <div>
         <FormKit
-          v-if="group && formSchema && configMapFormData?.[group]"
+          v-if="group && formSchema && currentConfigMapGroupData"
           :id="group"
-          v-model="configMapFormData[group]"
+          :value="currentConfigMapGroupData"
           :name="group"
-          :actions="false"
-          :preserve="true"
           type="form"
           @submit="handleSaveConfigMap"
         >
           <FormKitSchema
             :schema="toRaw(formSchema)"
-            :data="configMapFormData[group]"
+            :data="toRaw(currentConfigMapGroupData)"
           />
         </FormKit>
       </div>

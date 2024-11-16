@@ -1,26 +1,63 @@
-// TODO: This is a temporary approach.
-// We will provide searchable user selection components in the future.
-
 import type { FormKitNode, FormKitTypeDefinition } from "@formkit/core";
-import { defaultIcon, select, selects } from "@formkit/inputs";
-import { coreApiClient } from "@halo-dev/api-client";
+import { consoleApiClient } from "@halo-dev/api-client";
+import { select } from "./select";
+
+const ANONYMOUSUSER_NAME = "anonymousUser";
+const DELETEDUSER_NAME = "ghost";
+
+const search = async ({ page, size, keyword }) => {
+  const { data } = await consoleApiClient.user.listUsers({
+    page,
+    size,
+    keyword,
+    fieldSelector: [`name!=${ANONYMOUSUSER_NAME}`, `name!=${DELETEDUSER_NAME}`],
+  });
+  return {
+    options: data.items?.map((user) => {
+      return {
+        value: user.user.metadata.name,
+        label: user.user.spec.displayName,
+      };
+    }),
+    total: data.total,
+    size: data.size,
+    page: data.page,
+  };
+};
+
+const findOptionsByValues = async (values: string[]) => {
+  if (values.length === 0) {
+    return [];
+  }
+
+  const { data } = await consoleApiClient.user.listUsers({
+    fieldSelector: [`metadata.name=(${values.join(",")})`],
+  });
+
+  return data.items?.map((user) => {
+    return {
+      value: user.user.metadata.name,
+      label: user.user.spec.displayName,
+    };
+  });
+};
 
 function optionsHandler(node: FormKitNode) {
   node.on("created", async () => {
-    const { data } = await coreApiClient.user.listUser();
-
-    node.props.options = data.items.map((user) => {
-      return {
-        value: user.metadata.name,
-        label: user.spec.displayName,
-      };
-    });
+    node.props = {
+      ...node.props,
+      remote: true,
+      remoteOption: {
+        search,
+        findOptionsByValues,
+      },
+      searchable: true,
+    };
   });
 }
 
 export const userSelect: FormKitTypeDefinition = {
   ...select,
-  props: ["placeholder"],
   forceTypeProp: "select",
-  features: [optionsHandler, selects, defaultIcon("select", "select")],
+  features: [optionsHandler],
 };

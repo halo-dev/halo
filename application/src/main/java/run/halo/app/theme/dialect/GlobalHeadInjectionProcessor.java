@@ -42,6 +42,9 @@ public class GlobalHeadInjectionProcessor extends AbstractElementModelProcessor 
     @Override
     protected void doProcess(ITemplateContext context, IModel model,
         IElementModelStructureHandler structureHandler) {
+        if (context.containsVariable(InjectionExcluderProcessor.EXCLUDE_INJECTION_VARIABLE)) {
+            return;
+        }
 
         // note that this is important!!
         Object processedAlready = context.getVariable(PROCESS_FLAG);
@@ -71,7 +74,9 @@ public class GlobalHeadInjectionProcessor extends AbstractElementModelProcessor 
 
         // apply processors to modelToInsert
         getTemplateHeadProcessors(context)
-            .concatMap(processor -> processor.process(context, modelToInsert, structureHandler))
+            .concatMap(processor -> processor.process(
+                SecureTemplateContextWrapper.wrap(context), modelToInsert, structureHandler)
+            )
             .then()
             .block();
 

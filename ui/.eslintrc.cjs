@@ -18,12 +18,6 @@ module.exports = {
     "@typescript-eslint/ban-ts-comment": 0,
     "vue/no-v-html": 0,
   },
-  overrides: [
-    {
-      files: ["cypress/integration/**.spec.{js,ts,jsx,tsx}"],
-      extends: ["plugin:cypress/recommended"],
-    },
-  ],
   ignorePatterns: ["!.storybook", "packages/api-client"],
   parserOptions: {
     ecmaVersion: "latest",

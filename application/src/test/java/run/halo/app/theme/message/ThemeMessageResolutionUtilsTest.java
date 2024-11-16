@@ -29,24 +29,16 @@ class ThemeMessageResolutionUtilsTest {
     void resolveMessagesForTemplateForDefault() throws URISyntaxException {
         Map<String, String> properties =
             ThemeMessageResolutionUtils.resolveMessagesForTemplate(Locale.CHINESE, getTheme());
-        assertThat(properties).hasSize(1);
-        assertThat(properties).containsEntry("index.welcome", "欢迎来到首页");
+        assertThat(properties).isEqualTo(Map.of("index.welcome", "欢迎来到首页",
+            "title", "来自 i18n/zh.properties 的标题"));
     }
 
     @Test
     void resolveMessagesForTemplateForEnglish() throws URISyntaxException {
         Map<String, String> properties =
             ThemeMessageResolutionUtils.resolveMessagesForTemplate(Locale.ENGLISH, getTheme());
-        assertThat(properties).hasSize(1);
-        assertThat(properties).containsEntry("index.welcome", "Welcome to the index");
-    }
-
-    @Test
-    void messageFormat() {
-        String s =
-            ThemeMessageResolutionUtils.formatMessage(Locale.ENGLISH, "Welcome {0} to the index",
-                new Object[] {"Halo"});
-        assertThat(s).isEqualTo("Welcome Halo to the index");
+        assertThat(properties).isEqualTo(Map.of("index.welcome", "Welcome to the index",
+            "title", "这是来自 i18n/default.properties 的标题"));
     }
 
     ThemeContext getTheme() throws URISyntaxException {

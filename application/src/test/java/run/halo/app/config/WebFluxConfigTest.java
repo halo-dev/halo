@@ -1,6 +1,7 @@
 package run.halo.app.config;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.when;
 
 import java.net.URI;
@@ -9,36 +10,47 @@ import java.util.Set;
 import org.hamcrest.core.StringStartsWith;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.ValueSource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.reactive.AutoConfigureWebTestClient;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.context.TestConfiguration;
-import org.springframework.boot.test.mock.mockito.SpyBean;
 import org.springframework.boot.test.web.server.LocalServerPort;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Import;
+import org.springframework.security.test.context.support.WithMockUser;
+import org.springframework.test.context.bean.override.mockito.MockitoSpyBean;
 import org.springframework.test.web.reactive.server.WebTestClient;
+import org.springframework.web.filter.reactive.ServerWebExchangeContextFilter;
+import org.springframework.web.reactive.function.server.RouterFunction;
+import org.springframework.web.reactive.function.server.RouterFunctions;
+import org.springframework.web.reactive.function.server.ServerResponse;
 import org.springframework.web.reactive.socket.WebSocketHandler;
 import org.springframework.web.reactive.socket.WebSocketMessage;
 import org.springframework.web.reactive.socket.client.ReactorNettyWebSocketClient;
 import reactor.core.publisher.Flux;
+import reactor.core.publisher.Mono;
 import reactor.test.StepVerifier;
 import run.halo.app.core.endpoint.WebSocketEndpoint;
 import run.halo.app.core.extension.Role;
-import run.halo.app.core.extension.service.RoleService;
+import run.halo.app.core.user.service.RoleService;
 import run.halo.app.extension.GroupVersion;
 import run.halo.app.extension.Metadata;
 
 @SpringBootTest(properties = "halo.console.location=classpath:/console/", webEnvironment =
     SpringBootTest.WebEnvironment.RANDOM_PORT)
-@Import(WebFluxConfigTest.WebSocketSupportTest.TestWebSocketConfiguration.class)
+@Import({
+    WebFluxConfigTest.WebSocketSupportTest.TestWebSocketConfiguration.class,
+    WebFluxConfigTest.ServerWebExchangeContextFilterTest.TestConfig.class
+})
 @AutoConfigureWebTestClient
 class WebFluxConfigTest {
 
     @Autowired
     WebTestClient webClient;
 
-    @SpyBean
+    @MockitoSpyBean
     RoleService roleService;
 
     @LocalServerPort
@@ -112,23 +124,32 @@ class WebFluxConfigTest {
     @Nested
     class ConsoleRequest {
 
-        @Test
-        void shouldRequestConsoleIndex() {
-            List.of(
-                    "/console",
-                    "/console/index",
-                    "/console/index.html",
-                    "/console/dashboard",
-                    "/console/fake"
-                )
-                .forEach(uri -> webClient.get().uri(uri)
-                    .exchange()
-                    .expectStatus().isOk()
-                    .expectBody(String.class).value(StringStartsWith.startsWith("console index"))
-                );
+        @WithMockUser
+        @ParameterizedTest
+        @ValueSource(strings = {
+            "/console",
+            "/console/index",
+            "/console/index.html",
+            "/console/dashboard",
+            "/console/fake"
+        })
+        void shouldRequestConsoleIndex(String uri) {
+            webClient.get().uri(uri)
+                .exchange()
+                .expectStatus().isOk()
+                .expectBody(String.class).value(StringStartsWith.startsWith("console index"));
         }
 
         @Test
+        void shouldRedirectToLoginPageIfUnauthenticated() {
+            webClient.get().uri("/console")
+                .exchange()
+                .expectStatus().isFound()
+                .expectHeader().location("/login?authentication_required");
+        }
+
+        @Test
+        @WithMockUser
         void shouldRequestConsoleAssetsCorrectly() {
             webClient.get().uri("/console/assets/fake.txt")
                 .exchange()
@@ -137,6 +158,7 @@ class WebFluxConfigTest {
         }
 
         @Test
+        @WithMockUser
         void shouldResponseNotFoundWhenAssetsNotExist() {
             webClient.get().uri("/console/assets/not-found.txt")
                 .exchange()
@@ -153,5 +175,35 @@ class WebFluxConfigTest {
                 .exchange()
                 .expectStatus().isNotFound();
         }
+    }
+
+
+    @Nested
+    class ServerWebExchangeContextFilterTest {
+
+        @TestConfiguration
+        static class TestConfig {
+
+            @Bean
+            RouterFunction<ServerResponse> assertServerWebExchangeRoute() {
+                return RouterFunctions.route()
+                    .GET("/assert-server-web-exchange",
+                        request -> Mono.deferContextual(contextView -> {
+                            var exchange = ServerWebExchangeContextFilter.getExchange(contextView);
+                            assertTrue(exchange.isPresent());
+                            return ServerResponse.ok().build();
+                        }))
+                    .build();
+            }
+
+        }
+
+        @Test
+        void shouldGetExchangeFromContextView() {
+            webClient.get().uri("/assert-server-web-exchange")
+                .exchange()
+                .expectStatus().isOk();
+        }
+
     }
 }

@@ -1,11 +1,16 @@
 package run.halo.app.plugin;
 
+import io.github.resilience4j.ratelimiter.RateLimiterRegistry;
 import org.springframework.cache.CacheManager;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.support.GenericApplicationContext;
+import org.springframework.security.core.userdetails.ReactiveUserDetailsService;
 import org.springframework.security.web.server.context.ServerSecurityContextRepository;
+import org.springframework.security.web.server.savedrequest.ServerRequestCache;
 import run.halo.app.content.PostContentService;
 import run.halo.app.core.extension.service.AttachmentService;
+import run.halo.app.core.user.service.RoleService;
+import run.halo.app.core.user.service.UserService;
 import run.halo.app.extension.DefaultSchemeManager;
 import run.halo.app.extension.ExtensionClient;
 import run.halo.app.extension.ReactiveExtensionClient;
@@ -16,6 +21,7 @@ import run.halo.app.notification.NotificationCenter;
 import run.halo.app.notification.NotificationReasonEmitter;
 import run.halo.app.plugin.extensionpoint.ExtensionGetter;
 import run.halo.app.security.LoginHandlerEnhancer;
+import run.halo.app.security.authentication.CryptoService;
 
 /**
  * Utility for creating shared application context.
@@ -69,6 +75,28 @@ public enum SharedApplicationContextFactory {
             );
         beanFactory.registerSingleton("extensionGetter",
             rootContext.getBean(ExtensionGetter.class));
+        rootContext.getBeanProvider(CryptoService.class)
+            .ifUnique(
+                cryptoService -> beanFactory.registerSingleton("cryptoService", cryptoService)
+            );
+        rootContext.getBeanProvider(RateLimiterRegistry.class)
+            .ifUnique(rateLimiterRegistry ->
+                beanFactory.registerSingleton("rateLimiterRegistry", rateLimiterRegistry)
+            );
+
+        // Authentication plugins may need this RequestCache to handle successful login redirect
+        rootContext.getBeanProvider(ServerRequestCache.class)
+            .ifUnique(serverRequestCache ->
+                beanFactory.registerSingleton("serverRequestCache", serverRequestCache)
+            );
+        rootContext.getBeanProvider(UserService.class)
+            .ifUnique(userService -> beanFactory.registerSingleton("userService", userService));
+        rootContext.getBeanProvider(RoleService.class)
+            .ifUnique(roleService -> beanFactory.registerSingleton("roleService", roleService));
+        rootContext.getBeanProvider(ReactiveUserDetailsService.class)
+            .ifUnique(userDetailsService ->
+                beanFactory.registerSingleton("userDetailsService", userDetailsService)
+            );
         // TODO add more shared instance here
 
         sharedContext.refresh();

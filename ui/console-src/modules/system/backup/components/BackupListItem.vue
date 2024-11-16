@@ -82,7 +82,7 @@ const getFailureMessage = computed(() => {
 
 function handleDownload() {
   window.open(
-    `/apis/api.console.migration.halo.run/v1alpha1/backups/${props.backup.metadata.name}/files/${props.backup.status?.filename}`,
+    `/apis/console.api.migration.halo.run/v1alpha1/backups/${props.backup.metadata.name}/files/${props.backup.status?.filename}`,
     "_blank"
   );
 }

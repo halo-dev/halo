@@ -75,13 +75,18 @@
         }
       }
 
-      ul {
+      ul,
+      ol {
         list-style-type: revert-layer;
       }
 
       code br {
         display: initial;
       }
+    }
+
+    .v-popper__arrow-container {
+      display: none;
     }
   }
 

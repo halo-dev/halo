@@ -1,4 +1,5 @@
 <script lang="ts" setup>
+import HasPermission from "@/components/permission/HasPermission.vue";
 import type { Group } from "@halo-dev/api-client";
 import { IconAddCircle } from "@halo-dev/components";
 import { useQueryClient } from "@tanstack/vue-query";
@@ -25,7 +26,6 @@ const emit = defineEmits<{
 }>();
 
 const queryClient = useQueryClient();
-
 const defaultGroups: Group[] = [
   {
     spec: {

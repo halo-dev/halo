@@ -16,8 +16,8 @@ rules:
     resources: [ "plugins" ]
     verbs: [ "create", "patch", "update", "delete", "deletecollection" ]
   - apiGroups: [ "api.console.halo.run" ]
-    resources: [ "plugins/upgrade", "plugins/resetconfig", "plugins/config", "plugins/reload",
-                 "plugins/install-from-uri", "plugins/upgrade-from-uri", "plugins/plugin-state" ]
+    resources: [ "plugins/upgrade", "plugins/resetconfig", "plugins/config", "plugins/json-config",
+                 "plugins/reload", "plugins/install-from-uri", "plugins/upgrade-from-uri", "plugins/plugin-state" ]
     verbs: [ "*" ]
   - apiGroups: [ "api.console.halo.run" ]
     resources: [ "plugin-presets" ]
@@ -41,5 +41,5 @@ rules:
     resources: [ "plugins" ]
     verbs: [ "get", "list" ]
   - apiGroups: [ "api.console.halo.run" ]
-    resources: [ "plugins", "plugins/setting", "plugins/config" ]
+    resources: [ "plugins", "plugins/setting", "plugins/config", "plugins/json-config" ]
     verbs: [ "get", "list" ]

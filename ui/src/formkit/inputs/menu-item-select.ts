@@ -1,6 +1,6 @@
 import type { FormKitNode, FormKitTypeDefinition } from "@formkit/core";
-import { defaultIcon, select, selects } from "@formkit/inputs";
 import { coreApiClient } from "@halo-dev/api-client";
+import { select } from "./select";
 
 function optionsHandler(node: FormKitNode) {
   node.on("created", async () => {
@@ -8,18 +8,20 @@ function optionsHandler(node: FormKitNode) {
       fieldSelector: [`name=(${node.props.menuItems.join(",")})`],
     });
 
-    node.props.options = data.items.map((menuItem) => {
-      return {
-        value: menuItem.metadata.name,
-        label: menuItem.status?.displayName,
-      };
-    });
+    if (node.context) {
+      node.context.attrs.options = data.items.map((menuItem) => {
+        return {
+          value: menuItem.metadata.name,
+          label: menuItem.status?.displayName,
+        };
+      });
+    }
   });
 }
 
 export const menuItemSelect: FormKitTypeDefinition = {
   ...select,
-  props: ["placeholder", "menuItems"],
+  props: ["menuItems", ...(select.props as string[])],
   forceTypeProp: "select",
-  features: [optionsHandler, selects, defaultIcon("select", "select")],
+  features: [optionsHandler],
 };

@@ -1,8 +1,8 @@
 ## README
 
 <p align="center">
-    <a href="https://halo.run" target="_blank" rel="noopener noreferrer">
-        <img width="100" src="https://halo.run/logo" alt="Halo logo" />
+    <a href="https://www.halo.run" target="_blank" rel="noopener noreferrer">
+        <img width="100" src="https://www.halo.run/logo" alt="Halo logo" />
     </a>
 </p>
 

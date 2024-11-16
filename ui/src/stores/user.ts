@@ -6,7 +6,6 @@ interface UserStoreState {
   currentUser?: User;
   currentRoles?: Role[];
   isAnonymous: boolean;
-  loginModalVisible: boolean;
 }
 
 export const useUserStore = defineStore("user", {
@@ -14,7 +13,6 @@ export const useUserStore = defineStore("user", {
     currentUser: undefined,
     currentRoles: [],
     isAnonymous: true,
-    loginModalVisible: false,
   }),
   actions: {
     async fetchCurrentUser() {

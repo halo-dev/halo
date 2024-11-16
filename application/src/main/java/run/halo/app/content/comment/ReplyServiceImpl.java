@@ -1,43 +1,37 @@
 package run.halo.app.content.comment;
 
+import static org.apache.commons.lang3.BooleanUtils.isTrue;
 import static run.halo.app.extension.index.query.QueryFactory.and;
 import static run.halo.app.extension.index.query.QueryFactory.equal;
 import static run.halo.app.extension.index.query.QueryFactory.isNull;
-import static run.halo.app.security.authorization.AuthorityUtils.COMMENT_MANAGEMENT_ROLE_NAME;
-import static run.halo.app.security.authorization.AuthorityUtils.authoritiesToRoles;
 
 import java.time.Duration;
 import java.time.Instant;
 import java.util.ArrayList;
-import java.util.Set;
 import java.util.function.Function;
+import java.util.function.Supplier;
 import java.util.function.UnaryOperator;
-import lombok.RequiredArgsConstructor;
-import org.apache.commons.lang3.BooleanUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.reactivestreams.Publisher;
 import org.springframework.dao.OptimisticLockingFailureException;
 import org.springframework.data.domain.Sort;
-import org.springframework.security.core.context.ReactiveSecurityContextHolder;
-import org.springframework.security.core.context.SecurityContext;
 import org.springframework.stereotype.Service;
 import org.springframework.util.Assert;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import reactor.util.retry.Retry;
-import run.halo.app.core.extension.User;
+import run.halo.app.core.counter.CounterService;
 import run.halo.app.core.extension.content.Comment;
 import run.halo.app.core.extension.content.Reply;
-import run.halo.app.core.extension.service.RoleService;
-import run.halo.app.core.extension.service.UserService;
+import run.halo.app.core.user.service.RoleService;
+import run.halo.app.core.user.service.UserService;
 import run.halo.app.extension.ListOptions;
 import run.halo.app.extension.ListResult;
 import run.halo.app.extension.PageRequest;
 import run.halo.app.extension.PageRequestImpl;
 import run.halo.app.extension.ReactiveExtensionClient;
 import run.halo.app.extension.router.selector.FieldSelector;
-import run.halo.app.metrics.CounterService;
-import run.halo.app.metrics.MeterUtils;
+import run.halo.app.infra.exception.RequestRestrictedException;
 
 /**
  * A default implementation of {@link ReplyService}.
@@ -46,34 +40,48 @@ import run.halo.app.metrics.MeterUtils;
  * @since 2.0.0
  */
 @Service
-@RequiredArgsConstructor
-public class ReplyServiceImpl implements ReplyService {
+public class ReplyServiceImpl extends AbstractCommentService implements ReplyService {
 
-    private final ReactiveExtensionClient client;
-    private final UserService userService;
-    private final RoleService roleService;
-    private final CounterService counterService;
+    private final Supplier<RequestRestrictedException> requestRestrictedExceptionSupplier =
+        () -> new RequestRestrictedException("problemDetail.comment.waitingForApproval");
+
+    public ReplyServiceImpl(RoleService roleService, ReactiveExtensionClient client,
+        UserService userService, CounterService counterService) {
+        super(roleService, client, userService, counterService);
+    }
 
     @Override
     public Mono<Reply> create(String commentName, Reply reply) {
         return client.get(Comment.class, commentName)
-            .flatMap(comment -> prepareReply(commentName, reply)
-                .flatMap(client::create)
-                .flatMap(createdReply -> {
-                    var quotedReply = createdReply.getSpec().getQuoteReply();
-                    if (StringUtils.isBlank(quotedReply)) {
-                        return Mono.just(createdReply);
-                    }
-                    return approveReply(quotedReply)
-                        .thenReturn(createdReply);
-                })
-                .flatMap(createdReply -> approveComment(comment)
-                    .thenReturn(createdReply)
-                )
-            );
+            .flatMap(this::approveComment)
+            .filter(comment -> isTrue(comment.getSpec().getApproved()))
+            .switchIfEmpty(Mono.error(requestRestrictedExceptionSupplier))
+            .flatMap(comment -> prepareReply(commentName, reply))
+            .flatMap(this::doCreateReply);
+    }
+
+    private Mono<Reply> doCreateReply(Reply prepared) {
+        var quotedReply = prepared.getSpec().getQuoteReply();
+        if (StringUtils.isBlank(quotedReply)) {
+            return client.create(prepared);
+        }
+        return approveReply(quotedReply)
+            .filter(reply -> isTrue(reply.getSpec().getApproved()))
+            .switchIfEmpty(Mono.error(requestRestrictedExceptionSupplier))
+            .flatMap(approvedQuoteReply -> client.create(prepared));
     }
 
     private Mono<Comment> approveComment(Comment comment) {
+        return hasCommentManagePermission()
+            .flatMap(hasPermission -> {
+                if (hasPermission) {
+                    return doApproveComment(comment);
+                }
+                return Mono.just(comment);
+            });
+    }
+
+    private Mono<Comment> doApproveComment(Comment comment) {
         UnaryOperator<Comment> updateFunc = commentToUpdate -> {
             commentToUpdate.getSpec().setApproved(true);
             commentToUpdate.getSpec().setApprovedTime(Instant.now());
@@ -84,8 +92,18 @@ public class ReplyServiceImpl implements ReplyService {
                 e -> updateCommentWithRetry(comment.getMetadata().getName(), updateFunc));
     }
 
-    private Mono<Void> approveReply(String replyName) {
-        return Mono.defer(() -> client.fetch(Reply.class, replyName)
+    private Mono<Reply> approveReply(String replyName) {
+        return hasCommentManagePermission()
+            .flatMap(hasPermission -> {
+                if (hasPermission) {
+                    return doApproveReply(replyName);
+                }
+                return client.get(Reply.class, replyName);
+            });
+    }
+
+    private Mono<Reply> doApproveReply(String replyName) {
+        return Mono.defer(() -> client.get(Reply.class, replyName)
                 .flatMap(reply -> {
                     reply.getSpec().setApproved(true);
                     reply.getSpec().setApprovedTime(Instant.now());
@@ -93,8 +111,7 @@ public class ReplyServiceImpl implements ReplyService {
                 })
             )
             .retryWhen(Retry.backoff(8, Duration.ofMillis(100))
-                .filter(OptimisticLockingFailureException.class::isInstance))
-            .then();
+                .filter(OptimisticLockingFailureException.class::isInstance));
     }
 
     private Mono<Comment> updateCommentWithRetry(String name, UnaryOperator<Comment> updateFunc) {
@@ -120,7 +137,7 @@ public class ReplyServiceImpl implements ReplyService {
         if (reply.getSpec().getApproved() == null) {
             reply.getSpec().setApproved(false);
         }
-        if (BooleanUtils.isTrue(reply.getSpec().getApproved())
+        if (isTrue(reply.getSpec().getApproved())
             && reply.getSpec().getApprovedTime() == null) {
             reply.getSpec().setApprovedTime(Instant.now());
         }
@@ -144,21 +161,12 @@ public class ReplyServiceImpl implements ReplyService {
         return Mono.when(steps).thenReturn(reply);
     }
 
-    Mono<Boolean> hasCommentManagePermission() {
-        return ReactiveSecurityContextHolder.getContext()
-            .map(SecurityContext::getAuthentication)
-            .flatMap(authentication -> {
-                var roles = authoritiesToRoles(authentication.getAuthorities());
-                return roleService.contains(roles, Set.of(COMMENT_MANAGEMENT_ROLE_NAME));
-            });
-    }
-
     @Override
     public Mono<ListResult<ListedReply>> list(ReplyQuery query) {
         return client.listBy(Reply.class, query.toListOptions(), query.toPageRequest())
             .flatMap(list -> Flux.fromStream(list.get()
                     .map(this::toListedReply))
-                .concatMap(Function.identity())
+                .flatMapSequential(Function.identity())
                 .collectList()
                 .map(listedReplies -> new ListResult<>(list.getPage(), list.getSize(),
                     list.getTotal(), listedReplies))
@@ -209,52 +217,14 @@ public class ReplyServiceImpl implements ReplyService {
     private Mono<ListedReply> toListedReply(Reply reply) {
         ListedReply.ListedReplyBuilder builder = ListedReply.builder()
             .reply(reply);
-        return getOwnerInfo(reply)
+        return getOwnerInfo(reply.getSpec().getOwner())
             .map(ownerInfo -> {
                 builder.owner(ownerInfo);
                 return builder;
             })
             .map(ListedReply.ListedReplyBuilder::build)
-            .flatMap(listedReply -> fetchStats(reply)
+            .flatMap(listedReply -> fetchReplyStats(reply.getMetadata().getName())
                 .doOnNext(listedReply::setStats)
                 .thenReturn(listedReply));
-    }
-
-    Mono<CommentStats> fetchStats(Reply reply) {
-        Assert.notNull(reply, "The reply must not be null.");
-        String name = reply.getMetadata().getName();
-        return counterService.getByName(MeterUtils.nameOf(Reply.class, name))
-            .map(counter -> CommentStats.builder()
-                .upvote(counter.getUpvote())
-                .build()
-            )
-            .defaultIfEmpty(CommentStats.empty());
-    }
-
-    private Mono<OwnerInfo> getOwnerInfo(Reply reply) {
-        Comment.CommentOwner owner = reply.getSpec().getOwner();
-        if (User.KIND.equals(owner.getKind())) {
-            return userService.getUserOrGhost(owner.getName())
-                .map(OwnerInfo::from);
-        }
-        if (Comment.CommentOwner.KIND_EMAIL.equals(owner.getKind())) {
-            return Mono.just(OwnerInfo.from(owner));
-        }
-        throw new IllegalStateException(
-            "Unsupported owner kind: " + owner.getKind());
-    }
-
-    private Comment.CommentOwner toCommentOwner(User user) {
-        Comment.CommentOwner owner = new Comment.CommentOwner();
-        owner.setKind(User.KIND);
-        owner.setName(user.getMetadata().getName());
-        owner.setDisplayName(user.getSpec().getDisplayName());
-        return owner;
-    }
-
-    private Mono<User> fetchCurrentUser() {
-        return ReactiveSecurityContextHolder.getContext()
-            .map(securityContext -> securityContext.getAuthentication().getName())
-            .flatMap(username -> client.fetch(User.class, username));
     }
 }

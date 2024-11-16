@@ -8,6 +8,7 @@ import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Objects;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.DisposableBean;
@@ -26,7 +27,6 @@ import run.halo.app.extension.ReactiveExtensionClient;
 import run.halo.app.extension.controller.Controller;
 import run.halo.app.extension.controller.ControllerBuilder;
 import run.halo.app.extension.controller.Reconciler;
-import run.halo.app.infra.utils.JsonParseException;
 import run.halo.app.infra.utils.JsonUtils;
 
 /**
@@ -35,6 +35,7 @@ import run.halo.app.infra.utils.JsonUtils;
  * @author guqing
  * @since 2.0.0
  */
+@Slf4j
 public class DefaultReactiveSettingFetcher
     implements ReactiveSettingFetcher, Reconciler<Reconciler.Request>, DisposableBean,
     ApplicationContextAware {
@@ -130,12 +131,21 @@ public class DefaultReactiveSettingFetcher
         try {
             return JsonUtils.DEFAULT_JSON_MAPPER.readTree(json);
         } catch (JsonProcessingException e) {
-            throw new JsonParseException(e);
+            // ignore
+            log.error("Failed to parse plugin [{}] config json: [{}]", pluginName, json, e);
         }
+        return JsonNodeFactory.instance.missingNode();
     }
 
     private <T> T convertValue(JsonNode jsonNode, Class<T> clazz) {
-        return JsonUtils.DEFAULT_JSON_MAPPER.convertValue(jsonNode, clazz);
+        try {
+            return JsonUtils.DEFAULT_JSON_MAPPER.convertValue(jsonNode, clazz);
+        } catch (IllegalArgumentException e) {
+            // ignore
+            log.error("Failed to convert plugin [{}] configMap [{}] to class [{}]",
+                pluginName, configMapName, clazz, e);
+        }
+        return null;
     }
 
     @NonNull

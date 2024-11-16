@@ -136,15 +136,36 @@ const handleSaveConfigMap = async () => {
   await handleFetchConfigMap();
   saving.value = false;
 };
+
+const displayName = computed(() => {
+  if (!authProvider.value) {
+    return t("core.common.status.loading");
+  }
+
+  return t(
+    `core.identity_authentication.fields.display_name.${authProvider.value?.metadata.name}`,
+    authProvider.value?.spec.displayName || ""
+  );
+});
+
+const description = computed(() => {
+  if (!authProvider.value) {
+    return t("core.common.status.loading");
+  }
+
+  return t(
+    `core.identity_authentication.fields.description.${authProvider.value?.metadata.name}`,
+    authProvider.value?.spec.description || ""
+  );
+});
 </script>
 
 <template>
-  <VPageHeader :title="authProvider?.spec.displayName">
+  <VPageHeader :title="displayName">
     <template #icon>
       <VAvatar
-        v-if="authProvider"
-        :src="authProvider.spec.logo"
-        :alt="authProvider.spec.displayName"
+        :src="authProvider?.spec.logo"
+        :alt="authProvider?.spec.displayName"
         class="mr-2"
         size="sm"
       />
@@ -168,13 +189,13 @@ const handleSaveConfigMap = async () => {
               :label="
                 $t('core.identity_authentication.detail.fields.display_name')
               "
-              :content="authProvider?.spec.displayName"
+              :content="displayName"
             />
             <VDescriptionItem
               :label="
                 $t('core.identity_authentication.detail.fields.description')
               "
-              :content="authProvider?.spec.description"
+              :content="description"
             />
             <VDescriptionItem
               :label="$t('core.identity_authentication.detail.fields.website')"

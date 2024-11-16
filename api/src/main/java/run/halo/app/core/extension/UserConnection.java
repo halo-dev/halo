@@ -48,36 +48,9 @@ public class UserConnection extends AbstractExtension {
         private String providerUserId;
 
         /**
-         * The display name for the user's connection to the OAuth provider.
+         * The time when the user connection was last updated.
          */
-        @Schema(requiredMode = REQUIRED)
-        private String displayName;
-
-        /**
-         * The URL to the user's profile page on the OAuth provider.
-         * For example, the user's GitHub profile URL.
-         */
-        private String profileUrl;
-
-        /**
-         * The URL to the user's avatar image on the OAuth provider.
-         * For example, the user's GitHub avatar URL.
-         */
-        private String avatarUrl;
-
-        /**
-         * The access token provided by the OAuth provider.
-         */
-        @Schema(requiredMode = REQUIRED)
-        private String accessToken;
-
-        /**
-         * The refresh token provided by the OAuth provider (if applicable).
-         */
-        private String refreshToken;
-
-        private Instant expiresAt;
-
         private Instant updatedAt;
+
     }
 }

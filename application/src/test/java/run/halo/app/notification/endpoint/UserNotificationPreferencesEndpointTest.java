@@ -1,6 +1,8 @@
 package run.halo.app.notification.endpoint;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.assertArg;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.when;
 
@@ -15,6 +17,7 @@ import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import run.halo.app.core.extension.notification.NotifierDescriptor;
 import run.halo.app.core.extension.notification.ReasonType;
+import run.halo.app.extension.ExtensionUtil;
 import run.halo.app.extension.ReactiveExtensionClient;
 import run.halo.app.notification.UserNotificationPreferenceService;
 
@@ -43,11 +46,16 @@ class UserNotificationPreferencesEndpointTest {
         webTestClient = WebTestClient
             .bindToRouterFunction(userNotificationPreferencesEndpoint.endpoint())
             .build();
+
+        when(client.listAll(eq(ReasonType.class), assertArg(option ->
+                assertThat(option.toString())
+                    .isEqualTo("labelSelector: (halo.run/hidden NOT_EXISTS)")),
+            eq(ExtensionUtil.defaultSort()))
+        ).thenReturn(Flux.empty());
     }
 
     @Test
     void listNotificationPreferences() {
-        when(client.list(eq(ReasonType.class), eq(null), any())).thenReturn(Flux.empty());
         when(client.list(eq(NotifierDescriptor.class), eq(null), any())).thenReturn(Flux.empty());
         when(userNotificationPreferenceService.getByUser(any())).thenReturn(Mono.empty());
         webTestClient.post()
@@ -59,7 +67,6 @@ class UserNotificationPreferencesEndpointTest {
 
     @Test
     void saveNotificationPreferences() {
-        when(client.list(eq(ReasonType.class), eq(null), any())).thenReturn(Flux.empty());
         when(client.list(eq(NotifierDescriptor.class), eq(null), any())).thenReturn(Flux.empty());
         when(userNotificationPreferenceService.getByUser(any())).thenReturn(Mono.empty());
         webTestClient.post()

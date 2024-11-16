@@ -223,7 +223,7 @@ const handlePublish = async () => {
       if (returnToView.value && permalink) {
         window.location.href = permalink;
       } else {
-        router.back();
+        router.push({ name: "SinglePages" });
       }
     } else {
       formState.value.page.spec.publish = true;

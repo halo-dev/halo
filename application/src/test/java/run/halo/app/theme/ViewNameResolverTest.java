@@ -2,14 +2,13 @@ package run.halo.app.theme;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
-import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 
-import java.io.File;
 import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.nio.file.Files;
+import java.nio.file.Path;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -35,40 +34,41 @@ import reactor.test.StepVerifier;
 class ViewNameResolverTest {
 
     @Mock
-    private ThemeResolver themeResolver;
+    ThemeResolver themeResolver;
 
     @Mock
-    private ThymeleafProperties thymeleafProperties;
+    ThymeleafProperties thymeleafProperties;
 
     @InjectMocks
-    private DefaultViewNameResolver viewNameResolver;
+    DefaultViewNameResolver viewNameResolver;
 
     @TempDir
-    private File themePath;
+    Path themePath;
 
     @BeforeEach
     void setUp() throws IOException {
         when(thymeleafProperties.getSuffix()).thenReturn(ThymeleafProperties.DEFAULT_SUFFIX);
+    }
 
-        var templatesPath = themePath.toPath().resolve("templates");
+    @Test
+    void resolveViewNameOrDefault() throws URISyntaxException, IOException {
+        var templatesPath = themePath.resolve("templates");
         if (!Files.exists(templatesPath)) {
             Files.createDirectory(templatesPath);
         }
         Files.createFile(templatesPath.resolve("post_news.html"));
         Files.createFile(templatesPath.resolve("post_docs.html"));
 
-        when(themeResolver.getTheme(any()))
+
+        var exchange = Mockito.mock(ServerWebExchange.class);
+        when(themeResolver.getTheme(exchange))
             .thenReturn(Mono.fromSupplier(() -> ThemeContext.builder()
                 .name("fake-theme")
-                .path(themePath.toPath())
+                .path(themePath)
                 .active(true)
                 .build())
             );
-    }
 
-    @Test
-    void resolveViewNameOrDefault() throws URISyntaxException {
-        ServerWebExchange exchange = Mockito.mock(ServerWebExchange.class);
         MockServerRequest request = MockServerRequest.builder()
             .uri(new URI("/")).method(HttpMethod.GET)
             .exchange(exchange)

@@ -17,7 +17,6 @@
       "@uc/*": ["./uc-src/*"],
       "@console/*": ["./console-src/*"]
     },
-    "noStrictGenericChecks": true,
     "ignoreDeprecations": "5.0",
     "types": ["unplugin-icons/types/vue"]
   }

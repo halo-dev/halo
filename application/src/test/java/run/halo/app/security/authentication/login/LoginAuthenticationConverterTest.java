@@ -27,8 +27,8 @@ import org.springframework.util.MultiValueMap;
 import org.springframework.web.server.ServerWebExchange;
 import reactor.core.publisher.Mono;
 import reactor.test.StepVerifier;
-import run.halo.app.infra.exception.RateLimitExceededException;
 import run.halo.app.security.authentication.CryptoService;
+import run.halo.app.security.authentication.exception.TooManyRequestsException;
 
 @ExtendWith(MockitoExtension.class)
 class LoginAuthenticationConverterTest {
@@ -77,7 +77,7 @@ class LoginAuthenticationConverterTest {
         when(rateLimiterRegistry.rateLimiter("authentication-from-ip-unknown", "authentication"))
             .thenReturn(rateLimiter);
         StepVerifier.create(converter.convert(exchange))
-            .expectError(RateLimitExceededException.class)
+            .expectError(TooManyRequestsException.class)
             .verify();
 
         verify(cryptoService, never()).decrypt(password.getBytes());

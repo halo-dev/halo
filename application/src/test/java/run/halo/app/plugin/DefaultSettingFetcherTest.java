@@ -23,11 +23,11 @@ import org.mockito.Mock;
 import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.skyscreamer.jsonassert.JSONAssert;
-import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.cache.Cache;
 import org.springframework.cache.CacheManager;
 import org.springframework.cache.concurrent.ConcurrentMapCache;
 import org.springframework.context.ApplicationContext;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import reactor.core.publisher.Mono;
 import run.halo.app.core.extension.Plugin;
 import run.halo.app.extension.ConfigMap;
@@ -55,7 +55,7 @@ class DefaultSettingFetcherTest {
     @Mock
     private CacheManager cacheManager;
 
-    @MockBean
+    @MockitoBean
     private final PluginContext pluginContext = PluginContext.builder()
         .name("fake")
         .configMapName("fake-config")

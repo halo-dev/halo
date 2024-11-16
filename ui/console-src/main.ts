@@ -14,12 +14,12 @@ import { setupVueQuery } from "@/setup/setupVueQuery";
 import { useGlobalInfoStore } from "@/stores/global-info";
 import { useRoleStore } from "@/stores/role";
 import { useUserStore } from "@/stores/user";
+import { getCookie } from "@/utils/cookie";
 import { hasPermission } from "@/utils/permission";
 import {
   setupCoreModules,
   setupPluginModules,
 } from "@console/setup/setupModules";
-import { useSystemConfigMapStore } from "@console/stores/system-configmap";
 import { useThemeStore } from "@console/stores/theme";
 
 const app = createApp(App);
@@ -79,8 +79,7 @@ async function initApp() {
     await userStore.fetchCurrentUser();
 
     // set locale
-    i18n.global.locale.value =
-      localStorage.getItem("locale") || getBrowserLanguage();
+    i18n.global.locale.value = getCookie("language") || getBrowserLanguage();
 
     const globalInfoStore = useGlobalInfoStore();
     await globalInfoStore.fetchGlobalInfo();
@@ -96,10 +95,6 @@ async function initApp() {
     } catch (e) {
       console.error("Failed to load plugins", e);
     }
-
-    // load system configMap
-    const systemConfigMapStore = useSystemConfigMapStore();
-    await systemConfigMapStore.fetchSystemConfigMap();
 
     if (globalInfoStore.globalInfo?.userInitialized) {
       await loadActivatedTheme();

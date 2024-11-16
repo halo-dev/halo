@@ -81,7 +81,7 @@ const handleOpenPreview = (theme: Theme) => {
             </VButton>
             <VButton
               v-permission="['system:themes:manage']"
-              type="primary"
+              type="secondary"
               @click="activeTabId = 'local-upload'"
             >
               <template #icon>

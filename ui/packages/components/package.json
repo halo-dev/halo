@@ -1,6 +1,6 @@
 {
   "name": "@halo-dev/components",
-  "version": "2.19.0",
+  "version": "2.20.0",
   "description": "",
   "files": [
     "dist"
@@ -58,10 +58,10 @@
     "react-dom": "^18.2.0",
     "storybook": "^7.6.3",
     "unplugin-icons": "^0.14.15",
-    "vite-plugin-dts": "^3.9.1"
+    "vite-plugin-dts": "^4.2.2"
   },
   "peerDependencies": {
-    "vue": "^3.4.27",
+    "vue": "^3.5.11",
     "vue-router": "^4.3.2"
   },
   "exports": {

@@ -23,10 +23,10 @@ import AnnotationsForm from "@/components/form/AnnotationsForm.vue";
 import { setFocus } from "@/formkit/utils/focus";
 import { FormType } from "@/types/slug";
 import useSlugify from "@console/composables/use-slugify";
+import { reset, submitForm } from "@formkit/core";
 import { cloneDeep } from "lodash-es";
 import { onMounted } from "vue";
 import { useI18n } from "vue-i18n";
-import { submitForm, reset } from "@formkit/core";
 
 const props = withDefaults(
   defineProps<{
@@ -208,7 +208,7 @@ const { handleGenerateSlug } = useSlugify(
                     )
                   "
                   class="group flex h-full cursor-pointer items-center border-l px-3 transition-all hover:bg-gray-100"
-                  @click="handleGenerateSlug(true, FormType.TAG)"
+                  @click="handleGenerateSlug(true)"
                 >
                   <IconRefreshLine
                     class="h-4 w-4 text-gray-500 group-hover:text-gray-700"

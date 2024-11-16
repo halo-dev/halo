@@ -237,15 +237,15 @@ const handleDeleteInBatch = async () => {
             return Promise.resolve();
           }
 
-          return coreApiClient.content.singlePage.updateSinglePage({
+          return coreApiClient.content.singlePage.patchSinglePage({
             name: page.metadata.name,
-            singlePage: {
-              ...page,
-              spec: {
-                ...page.spec,
-                deleted: true,
+            jsonPatchInner: [
+              {
+                op: "add",
+                path: "/spec/deleted",
+                value: true,
               },
-            },
+            ],
           });
         })
       );
@@ -432,7 +432,7 @@ watch(selectedPageNames, (newValue) => {
               <VButton
                 v-permission="['system:singlepages:manage']"
                 :route="{ name: 'SinglePageEditor' }"
-                type="primary"
+                type="secondary"
               >
                 <template #icon>
                   <IconAddCircle class="h-full w-full" />

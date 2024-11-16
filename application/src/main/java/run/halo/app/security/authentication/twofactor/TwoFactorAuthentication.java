@@ -38,8 +38,8 @@ public class TwoFactorAuthentication extends AbstractAuthenticationToken {
 
     @Override
     public boolean isAuthenticated() {
-        // return true for accessing anonymous resources
-        return true;
+        // for further authentication
+        return false;
     }
 
     public Authentication getPrevious() {

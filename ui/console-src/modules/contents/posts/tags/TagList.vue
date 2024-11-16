@@ -267,7 +267,7 @@ watch(selectedTagNames, (newVal) => {
               <VButton @click="() => handleFetchTags">
                 {{ $t("core.common.buttons.refresh") }}
               </VButton>
-              <VButton type="primary" @click="editingModal = true">
+              <VButton type="secondary" @click="editingModal = true">
                 <template #icon>
                   <IconAddCircle class="h-full w-full" />
                 </template>

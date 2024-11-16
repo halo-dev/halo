@@ -1,59 +1,34 @@
 package run.halo.app.search.lucene;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertInstanceOf;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.assertArg;
-import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.Mockito.doThrow;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.io.IOException;
 import java.nio.file.Path;
 import java.time.Instant;
 import java.util.List;
 import java.util.Map;
-import org.apache.lucene.analysis.Analyzer;
-import org.apache.lucene.analysis.standard.StandardAnalyzer;
-import org.apache.lucene.document.Document;
-import org.apache.lucene.index.IndexWriter;
-import org.apache.lucene.index.StoredFields;
-import org.apache.lucene.search.IndexSearcher;
-import org.apache.lucene.search.Query;
-import org.apache.lucene.search.ScoreDoc;
-import org.apache.lucene.search.SearcherManager;
-import org.apache.lucene.search.Sort;
-import org.apache.lucene.search.TopFieldDocs;
-import org.apache.lucene.search.TotalHits;
-import org.apache.lucene.store.Directory;
-import org.assertj.core.util.Streams;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.Executors;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.TimeoutException;
+import java.util.stream.IntStream;
+import org.apache.lucene.index.DirectoryReader;
+import org.apache.lucene.store.AlreadyClosedException;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.api.io.TempDir;
-import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import run.halo.app.search.HaloDocument;
 import run.halo.app.search.SearchOption;
 
 @ExtendWith(MockitoExtension.class)
 class LuceneSearchEngineTest {
-
-    @Mock
-    IndexWriter indexWriter;
-
-    @Mock
-    SearcherManager searcherManager;
-
-    @Mock
-    Directory directory;
-
-    @Mock
-    Analyzer analyzer;
 
     LuceneSearchEngine searchEngine;
 
@@ -62,91 +37,105 @@ class LuceneSearchEngineTest {
 
     @BeforeEach
     void setUp() throws Exception {
-        var searchEngine = new LuceneSearchEngine(tempDir);
-        searchEngine.setIndexWriter(indexWriter);
-        searchEngine.setDirectory(directory);
-        searchEngine.setSearcherManager(searcherManager);
-        searchEngine.setAnalyzer(analyzer);
-        this.searchEngine = searchEngine;
+        this.searchEngine = new LuceneSearchEngine(tempDir);
+        this.searchEngine.afterPropertiesSet();
     }
 
+    @AfterEach
+    void cleanUp() throws Exception {
+        this.searchEngine.destroy();
+    }
 
     @Test
     void shouldAddOrUpdateDocument() throws IOException {
         var haloDoc = createFakeHaloDoc();
         searchEngine.addOrUpdate(List.of(haloDoc));
-        verify(this.indexWriter).updateDocuments(any(Query.class), assertArg(docs -> {
-            var docList = Streams.stream(docs).toList();
-            assertEquals(1, docList.size());
-            var doc = docList.get(0);
-            assertInstanceOf(Document.class, doc);
-            var document = (Document) doc;
-            assertEquals("fake-id", document.get("id"));
-        }));
-        verify(this.searcherManager).maybeRefreshBlocking();
-        verify(this.indexWriter).commit();
+        // validate the index
+        var reader = DirectoryReader.open(searchEngine.getDirectory());
+        assertEquals(1, reader.getDocCount("id"));
     }
 
     @Test
     void shouldDeleteDocument() throws IOException {
+        var haloDoc = createFakeHaloDoc();
+        searchEngine.addOrUpdate(List.of(haloDoc));
+
+        var reader = DirectoryReader.open(searchEngine.getDirectory());
+        assertEquals(1, reader.getDocCount("id"));
+
         this.searchEngine.deleteDocument(List.of("fake-id"));
-        verify(this.indexWriter).deleteDocuments(any(Query.class));
-        verify(this.searcherManager).maybeRefreshBlocking();
-        verify(this.indexWriter).commit();
+
+        reader = DirectoryReader.open(searchEngine.getDirectory());
+        assertEquals(0, reader.getDocCount("id"));
     }
 
     @Test
     void shouldDeleteAll() throws IOException {
+        var haloDoc = createFakeHaloDoc();
+        searchEngine.addOrUpdate(List.of(haloDoc));
+
+        var reader = DirectoryReader.open(searchEngine.getDirectory());
+        assertEquals(1, reader.getDocCount("id"));
+
         this.searchEngine.deleteAll();
 
-        verify(this.indexWriter).deleteAll();
-        verify(this.searcherManager).maybeRefreshBlocking();
-        verify(this.indexWriter).commit();
+        reader = DirectoryReader.open(searchEngine.getDirectory());
+        assertEquals(0, reader.getDocCount("id"));
+    }
+
+    @Test
+    void shouldAddOrUpdateDocumentConcurrently()
+        throws ExecutionException, InterruptedException, TimeoutException {
+        runConcurrently(() -> {
+            var haloDoc = createFakeHaloDoc();
+            searchEngine.addOrUpdate(List.of(haloDoc));
+        });
+    }
+
+    @Test
+    void shouldDeleteDocumentConcurrently()
+        throws ExecutionException, InterruptedException, TimeoutException {
+        runConcurrently(() -> {
+            var haloDoc = createFakeHaloDoc();
+            searchEngine.addOrUpdate(List.of(haloDoc));
+            searchEngine.deleteDocument(List.of(haloDoc.getId()));
+        });
+    }
+
+    @Test
+    void shouldDeleteAllConcurrently()
+        throws ExecutionException, InterruptedException, TimeoutException {
+        runConcurrently(() -> {
+            var haloDoc = createFakeHaloDoc();
+            searchEngine.addOrUpdate(List.of(haloDoc));
+            searchEngine.deleteAll();
+        });
     }
 
     @Test
     void shouldDestroy() throws Exception {
+        var directory = this.searchEngine.getDirectory();
         this.searchEngine.destroy();
-        verify(this.analyzer).close();
-        verify(this.searcherManager).close();
-        verify(this.indexWriter).close();
-        verify(this.directory).close();
+        assertThrows(AlreadyClosedException.class, () -> DirectoryReader.open(directory));
     }
 
     @Test
-    void shouldAlwaysDestroyAllEvenErrorOccurred() throws Exception {
-        var analyzerCloseError = new IOException("analyzer close error");
-        doThrow(analyzerCloseError).when(this.analyzer).close();
-
-        var directoryCloseError = new IOException("directory close error");
-        doThrow(directoryCloseError).when(this.directory).close();
-        var e = assertThrows(IOException.class, () -> this.searchEngine.destroy());
-        assertEquals(analyzerCloseError, e);
-        assertEquals(directoryCloseError, e.getSuppressed()[0]);
-        verify(this.analyzer).close();
-        verify(this.searcherManager).close();
-        verify(this.indexWriter).close();
-        verify(this.directory).close();
+    void shouldSearchNothingIfIndexNotFound() {
+        var option = new SearchOption();
+        option.setKeyword("fake");
+        option.setLimit(123);
+        option.setHighlightPreTag("<fake-tag>");
+        option.setHighlightPostTag("</fake-tag>");
+        var result = this.searchEngine.search(option);
+        assertEquals(0, result.getTotal());
+        assertEquals("fake", result.getKeyword());
+        assertEquals(123, result.getLimit());
+        assertEquals(0, result.getHits().size());
     }
 
     @Test
-    void shouldSearch() throws IOException {
-        var searcher = mock(IndexSearcher.class);
-        when(this.searcherManager.acquire()).thenReturn(searcher);
-        this.searchEngine.setAnalyzer(new StandardAnalyzer());
-
-        var totalHits = new TotalHits(1234, TotalHits.Relation.EQUAL_TO);
-        var scoreDoc = new ScoreDoc(1, 1.0f);
-
-        var topFieldDocs = new TopFieldDocs(totalHits, new ScoreDoc[] {scoreDoc}, null);
-        when(searcher.search(any(Query.class), eq(123), any(Sort.class)))
-            .thenReturn(topFieldDocs);
-        var storedFields = mock(StoredFields.class);
-
-        var haloDoc = createFakeHaloDoc();
-        var doc = this.searchEngine.getHaloDocumentConverter().convert(haloDoc);
-        when(storedFields.document(1)).thenReturn(doc);
-        when(searcher.storedFields()).thenReturn(storedFields);
+    void shouldSearch() {
+        this.searchEngine.addOrUpdate(List.of(createFakeHaloDoc()));
 
         var option = new SearchOption();
         option.setKeyword("fake");
@@ -154,7 +143,7 @@ class LuceneSearchEngineTest {
         option.setHighlightPreTag("<fake-tag>");
         option.setHighlightPostTag("</fake-tag>");
         var result = this.searchEngine.search(option);
-        assertEquals(1234, result.getTotal());
+        assertEquals(1, result.getTotal());
         assertEquals("fake", result.getKeyword());
         assertEquals(123, result.getLimit());
         assertEquals(1, result.getHits().size());
@@ -163,6 +152,17 @@ class LuceneSearchEngineTest {
         assertEquals("<fake-tag>fake</fake-tag>-title", gotHaloDoc.getTitle());
         assertNull(gotHaloDoc.getDescription());
         assertEquals("<fake-tag>fake</fake-tag>-content", gotHaloDoc.getContent());
+    }
+
+    void runConcurrently(Runnable runnable)
+        throws ExecutionException, InterruptedException, TimeoutException {
+        var executorService = Executors.newFixedThreadPool(10);
+        var futures = IntStream.of(0, 10)
+            .mapToObj(i -> CompletableFuture.runAsync(runnable, executorService))
+            .toArray(CompletableFuture[]::new);
+        CompletableFuture.allOf(futures).get(10, TimeUnit.SECONDS);
+        executorService.shutdownNow();
+        assertTrue(executorService.awaitTermination(10, TimeUnit.SECONDS));
     }
 
     HaloDocument createFakeHaloDoc() {

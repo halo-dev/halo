@@ -50,6 +50,16 @@ const handleSave = async () => {
         group: formState.value,
       });
     } else {
+      const { data: groups } = await coreApiClient.storage.group.listGroup();
+      const hasDisplayNameDuplicate = groups.items.some(
+        (group) => group.spec.displayName === formState.value.spec.displayName
+      );
+      if (hasDisplayNameDuplicate) {
+        Toast.error(
+          t("core.attachment.group_editing_modal.toast.group_name_exists")
+        );
+        return;
+      }
       await coreApiClient.storage.group.createGroup({
         group: formState.value,
       });

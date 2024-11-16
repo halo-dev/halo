@@ -1,10 +1,12 @@
 package run.halo.app.theme.finders;
 
+import java.util.Map;
 import org.springframework.lang.Nullable;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import run.halo.app.core.extension.content.Post;
 import run.halo.app.extension.ListResult;
+import run.halo.app.theme.finders.impl.PostFinderImpl.PostQuery;
 import run.halo.app.theme.finders.vo.ContentVo;
 import run.halo.app.theme.finders.vo.ListedPostVo;
 import run.halo.app.theme.finders.vo.NavigationPostVo;
@@ -20,8 +22,7 @@ import run.halo.app.theme.finders.vo.PostVo;
 public interface PostFinder {
 
     /**
-     * Gets post detail by name.
-     * <p>
+     * <p>Gets post detail by name.</p>
      * We ensure the post is public, non-deleted and published.
      *
      * @param postName is post name
@@ -34,6 +35,13 @@ public interface PostFinder {
     Mono<NavigationPostVo> cursor(String current);
 
     Flux<ListedPostVo> listAll();
+
+    /**
+     * Lists posts by query params.
+     *
+     * @param params query params see {@link PostQuery}
+     */
+    Mono<ListResult<ListedPostVo>> list(Map<String, Object> params);
 
     Mono<ListResult<ListedPostVo>> list(@Nullable Integer page, @Nullable Integer size);
 

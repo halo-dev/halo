@@ -4,7 +4,7 @@ import java.util.List;
 import lombok.RequiredArgsConstructor;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
-import run.halo.app.core.extension.service.UserService;
+import run.halo.app.core.user.service.UserService;
 import run.halo.app.theme.finders.ContributorFinder;
 import run.halo.app.theme.finders.Finder;
 import run.halo.app.theme.finders.vo.ContributorVo;
@@ -33,6 +33,6 @@ public class ContributorFinderImpl implements ContributorFinder {
             return Flux.empty();
         }
         return Flux.fromIterable(names)
-            .concatMap(this::getContributor);
+            .flatMapSequential(this::getContributor);
     }
 }

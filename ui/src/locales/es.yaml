@@ -1,60 +1,4 @@
 core:
-  login:
-    title: Inicio de sesión
-    fields:
-      username:
-        placeholder: Usuario
-      password:
-        placeholder: Contraseña
-    operations:
-      submit:
-        toast_success: Inicio de sesión exitoso
-        toast_failed: >-
-          Error en el inicio de sesión, nombre de usuario o contraseña
-          incorrectos
-        toast_csrf: Token CSRF no válido, por favor inténtalo de nuevo
-      signup:
-        label: No tienes una cuenta
-        button: Registrarse ahora
-      return_login:
-        label: Ya tienes una cuenta
-        button: Iniciar sesión ahora
-      return_site: Volver a la página de inicio
-    button: Iniciar sesión
-    modal:
-      title: Volver a iniciar sesión
-  signup:
-    title: Registrarse
-    fields:
-      username:
-        placeholder: Nombre de usuario
-      display_name:
-        placeholder: Nombre para mostrar
-      password:
-        placeholder: Contraseña
-      password_confirm:
-        placeholder: Confirmar contraseña
-    operations:
-      submit:
-        button: Registrarse
-        toast_success: Registrado exitosamente
-  binding:
-    title: Vinculación de cuentas
-    common:
-      toast:
-        mounted: >-
-          El método de inicio de sesión actual no está vinculado a una cuenta.
-          Por favor, vincula o registra una nueva cuenta primero.
-    operations:
-      login_and_bind:
-        button: Iniciar sesión y vincular
-      signup_and_bind:
-        button: Registrarse y vincular
-      bind:
-        toast_success: Vinculación exitosa
-        toast_failed: >-
-          Vinculación fallida, no se encontró ningún método de inicio de sesión
-          habilitado.
   sidebar:
     search:
       placeholder: Buscar
@@ -1160,25 +1104,6 @@ core:
       message: Acceso no autorizado a esta página
     actions:
       home: Ir a la página de inicio
-  setup:
-    title: Configuración
-    operations:
-      submit:
-        button: Configurar
-        toast_success: Configuración exitosa
-      setup_initial_data:
-        loading: Inicializando datos, por favor espera...
-    fields:
-      site_title:
-        label: Título del Sitio
-      email:
-        label: Correo Electrónico
-      username:
-        label: Nombre de Usuario
-      password:
-        label: Contraseña
-      confirm_password:
-        label: Confirmar Contraseña
   rbac:
     Attachments Management: Gestión de archivos adjuntos
     Attachment Manage: Gestor de adjuntos
@@ -1285,8 +1210,6 @@ core:
       page_label: página
       size_label: elementos por página
       total_label: Total de {total} elementos
-    social_auth_providers:
-      title: Inicio de sesión de terceros
     app_download_alert:
       description: >-
         Los temas y complementos para Halo se pueden descargar en las siguientes

@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html
+    xmlns:th="https://www.thymeleaf.org"
+    th:replace="~{gateway_fragments/layout:: layout(title = |#{title} - ${site.title}|, head = ~{::head}, body = ~{::body})}"
+>
+    <th:block th:fragment="body">
+        <div class="gateway-wrapper logout-page-wrapper">
+            <div th:replace="~{gateway_fragments/common::haloLogo}"></div>
+            <div class="halo-form-wrapper">
+                <h1 class="form-title" th:text="#{form.title}"></h1>
+                <form th:replace="~{gateway_fragments/logout::form}"></form>
+            </div>
+            <div th:replace="~{gateway_fragments/common::languageSwitcher}"></div>
+        </div>
+    </th:block>
+
+    <th:block th:fragment="head">
+        <style>
+            .logout-page-wrapper .user-info {
+                border-radius: var(--rounded-lg);
+                padding: var(--spacing-xs);
+                gap: var(--spacing-lg);
+                display: flex;
+                margin-bottom: 2em;
+                align-items: center;
+                border: 1px dashed #dfe6ecb3;
+            }
+
+            .logout-page-wrapper .user-avatar {
+                width: 4em;
+                border-radius: 100%;
+            }
+
+            .logout-page-wrapper .user-details {
+                color: var(--color-text);
+                font-size: var(--text-sm);
+                gap: var(--spacing-xs);
+                display: flex;
+                flex-direction: column;
+            }
+
+            .logout-page-wrapper .user-name {
+                font-weight: 600;
+                color: #333;
+            }
+
+            .logout-page-wrapper .cancel-link {
+                color: var(--color-link);
+                font-size: var(--text-sm);
+                text-decoration: none;
+                text-align: center;
+            }
+        </style>
+    </th:block>
+</html>

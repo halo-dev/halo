@@ -50,4 +50,6 @@ public interface PostService {
     Mono<Post> revertToSpecifiedSnapshot(String postName, String snapshotName);
 
     Mono<ContentWrapper> deleteContent(String postName, String snapshotName);
+
+    Mono<Post> recycleBy(String postName, String username);
 }

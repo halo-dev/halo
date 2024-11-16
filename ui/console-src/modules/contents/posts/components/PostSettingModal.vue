@@ -331,7 +331,7 @@ const showCancelPublishButton = computed(() => {
                     $t('core.post.settings.fields.slug.refresh_message')
                   "
                   class="group flex h-full cursor-pointer items-center border-l px-3 transition-all hover:bg-gray-100"
-                  @click="handleGenerateSlug(true, FormType.POST)"
+                  @click="handleGenerateSlug(true)"
                 >
                   <IconRefreshLine
                     class="h-4 w-4 text-gray-500 group-hover:text-gray-700"
@@ -355,15 +355,11 @@ const showCancelPublishButton = computed(() => {
             />
             <FormKit
               v-model="formState.spec.excerpt.autoGenerate"
-              :options="[
-                { label: $t('core.common.radio.yes'), value: true },
-                { label: $t('core.common.radio.no'), value: false },
-              ]"
               name="autoGenerate"
               :label="
                 $t('core.post.settings.fields.auto_generate_excerpt.label')
               "
-              type="radio"
+              type="checkbox"
             >
             </FormKit>
             <FormKit
@@ -398,22 +394,14 @@ const showCancelPublishButton = computed(() => {
             ></FormKit>
             <FormKit
               v-model="formState.spec.allowComment"
-              :options="[
-                { label: $t('core.common.radio.yes'), value: true },
-                { label: $t('core.common.radio.no'), value: false },
-              ]"
               :label="$t('core.post.settings.fields.allow_comment.label')"
-              type="radio"
+              type="checkbox"
             ></FormKit>
             <FormKit
               v-model="formState.spec.pinned"
-              :options="[
-                { label: $t('core.common.radio.yes'), value: true },
-                { label: $t('core.common.radio.no'), value: false },
-              ]"
               :label="$t('core.post.settings.fields.pinned.label')"
               name="pinned"
-              type="radio"
+              type="checkbox"
             ></FormKit>
             <FormKit
               v-model="formState.spec.visible"

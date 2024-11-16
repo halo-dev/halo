@@ -1,11 +1,6 @@
 <script lang="ts" setup>
 import { IconImageAddLine, VButton } from "@halo-dev/components";
-import {
-  Editor,
-  type Decoration,
-  type Node,
-  type PMNode,
-} from "@halo-dev/richtext-editor";
+import { type NodeViewProps } from "@halo-dev/richtext-editor";
 import { computed, onMounted, ref } from "vue";
 import { EditorLinkObtain } from "../../components";
 import InlineBlockBox from "../../components/InlineBlockBox.vue";
@@ -13,16 +8,7 @@ import { type AttachmentAttr } from "../../utils/attachment";
 import { fileToBase64 } from "../../utils/upload";
 import Image from "./index";
 
-const props = defineProps<{
-  editor: Editor;
-  node: PMNode;
-  decorations: Decoration[];
-  selected: boolean;
-  extension: Node;
-  getPos: () => number;
-  updateAttributes: (attributes: Record<string, unknown>) => void;
-  deleteNode: () => void;
-}>();
+const props = defineProps<NodeViewProps>();
 
 const src = computed({
   get: () => {
@@ -93,8 +79,14 @@ const handleUploadError = () => {
 const resetUpload = () => {
   fileBase64.value = undefined;
   uploadProgress.value = undefined;
-  if (props.getPos()) {
-    props.updateAttributes({
+
+  const canUpdateAttributes = props.editor.can().updateAttributes(Image.name, {
+    width: undefined,
+    height: undefined,
+    file: undefined,
+  });
+  if (canUpdateAttributes && props.getPos()) {
+    props.editor.commands.updateAttributes(Image.name, {
       width: undefined,
       height: undefined,
       file: undefined,

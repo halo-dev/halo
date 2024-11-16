@@ -23,7 +23,6 @@ import {
   VStatusDot,
 } from "@halo-dev/components";
 import { useQuery } from "@tanstack/vue-query";
-import { cloneDeep } from "lodash-es";
 import { ref, watch } from "vue";
 import { useI18n } from "vue-i18n";
 import PostTag from "./tags/components/PostTag.vue";
@@ -132,11 +131,15 @@ const handleRecovery = async (post: Post) => {
     confirmText: t("core.common.buttons.confirm"),
     cancelText: t("core.common.buttons.cancel"),
     onConfirm: async () => {
-      const postToUpdate = cloneDeep(post);
-      postToUpdate.spec.deleted = false;
-      await coreApiClient.content.post.updatePost({
-        name: postToUpdate.metadata.name,
-        post: postToUpdate,
+      await coreApiClient.content.post.patchPost({
+        name: post.metadata.name,
+        jsonPatchInner: [
+          {
+            op: "add",
+            path: "/spec/deleted",
+            value: false,
+          },
+        ],
       });
 
       await refetch();
@@ -157,23 +160,23 @@ const handleRecoveryInBatch = async () => {
     onConfirm: async () => {
       await Promise.all(
         selectedPostNames.value.map((name) => {
-          const post = posts.value?.find(
+          const isPostExist = posts.value?.some(
             (item) => item.post.metadata.name === name
-          )?.post;
+          );
 
-          if (!post) {
+          if (!isPostExist) {
             return Promise.resolve();
           }
 
-          return coreApiClient.content.post.updatePost({
-            name: post.metadata.name,
-            post: {
-              ...post,
-              spec: {
-                ...post.spec,
-                deleted: false,
+          return coreApiClient.content.post.patchPost({
+            name: name,
+            jsonPatchInner: [
+              {
+                op: "add",
+                path: "/spec/deleted",
+                value: false,
               },
-            },
+            ],
           });
         })
       );
@@ -277,7 +280,7 @@ watch(
               <VButton @click="refetch">
                 {{ $t("core.common.buttons.refresh") }}
               </VButton>
-              <VButton :route="{ name: 'Posts' }" type="primary">
+              <VButton :route="{ name: 'Posts' }" type="secondary">
                 {{ $t("core.common.buttons.back") }}
               </VButton>
             </VSpace>

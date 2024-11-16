@@ -13,9 +13,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.reactive.AutoConfigureWebTestClient;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.context.TestConfiguration;
-import org.springframework.boot.test.mock.mockito.SpyBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.http.MediaType;
+import org.springframework.test.context.bean.override.mockito.MockitoSpyBean;
 import org.springframework.test.web.reactive.server.WebTestClient;
 import org.springframework.util.ResourceUtils;
 import org.springframework.web.reactive.function.server.RequestPredicates;
@@ -38,14 +38,14 @@ import run.halo.app.theme.ThemeResolver;
 @AutoConfigureWebTestClient
 public class ThemeMessageResolverIntegrationTest {
 
-    @SpyBean
+    @MockitoSpyBean
     private ThemeResolver themeResolver;
 
     private URL defaultThemeUrl;
 
     private URL otherThemeUrl;
 
-    @SpyBean
+    @MockitoSpyBean
     private InitializationStateGetter initializationStateGetter;
 
     @Autowired
@@ -93,6 +93,9 @@ public class ThemeMessageResolverIntegrationTest {
             .expectStatus()
             .isOk()
             .expectBody()
+            // make sure the "templates/index.properties" file is precedence over the
+            // "i18n/default.properties".
+            .xpath("/html/head/title").isEqualTo("Title from index.properties")
             .xpath("/html/body/div[1]").isEqualTo("foo")
             .xpath("/html/body/div[2]").isEqualTo("欢迎来到首页");
     }
@@ -105,7 +108,7 @@ public class ThemeMessageResolverIntegrationTest {
             .expectStatus()
             .isOk()
             .expectBody()
-            .xpath("/html/head/title").isEqualTo("Title")
+            .xpath("/html/head/title").isEqualTo("来自 index_zh.properties 的标题")
             .xpath("/html/body/div[1]").isEqualTo("zh")
             .xpath("/html/body/div[2]").isEqualTo("欢迎来到首页")
         ;

@@ -13,6 +13,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.context.ApplicationContext;
 import org.thymeleaf.IEngineConfiguration;
 import org.thymeleaf.TemplateEngine;
@@ -49,6 +50,9 @@ class CommentElementTagProcessorTest {
     private ExtensionGetter extensionGetter;
 
     @Mock
+    private ObjectProvider<ExtensionGetter>  extensionGetterProvider;
+
+    @Mock
     private SystemConfigurableEnvironmentFetcher environmentFetcher;
 
     private TemplateEngine templateEngine;
@@ -61,6 +65,9 @@ class CommentElementTagProcessorTest {
         templateEngine.addTemplateResolver(new TestTemplateResolver());
         lenient().when(applicationContext.getBean(eq(ExtensionGetter.class)))
             .thenReturn(extensionGetter);
+        when(applicationContext.getBeanProvider(ExtensionGetter.class))
+            .thenReturn(extensionGetterProvider);
+        when(extensionGetterProvider.getIfUnique()).thenReturn(null);
     }
 
     @Test

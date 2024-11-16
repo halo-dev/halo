@@ -1,8 +1,14 @@
 package run.halo.app.extension;
 
+import static org.springframework.data.domain.Sort.Order.asc;
+import static org.springframework.data.domain.Sort.Order.desc;
+
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
+import org.springframework.data.domain.Sort;
+import run.halo.app.extension.index.query.Query;
+import run.halo.app.extension.index.query.QueryFactory;
 
 public enum ExtensionUtil {
     ;
@@ -32,6 +38,27 @@ public enum ExtensionUtil {
             metadata.setFinalizers(existingFinalizers);
         }
         return removed;
+    }
+
+    /**
+     * Query for not deleting.
+     *
+     * @return Query
+     */
+    public static Query notDeleting() {
+        return QueryFactory.isNull("metadata.deletionTimestamp");
+    }
+
+    /**
+     * Default sort by creation timestamp desc and name asc.
+     *
+     * @return Sort
+     */
+    public static Sort defaultSort() {
+        return Sort.by(
+            desc("metadata.creationTimestamp"),
+            asc("metadata.name")
+        );
     }
 
 }

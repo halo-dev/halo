@@ -47,3 +47,13 @@ spec:
   displayName: "Lucene 搜索引擎"
   description: "Halo 自带的本地搜索引擎"
   icon: /images/extension-points/lucene.png
+---
+apiVersion: plugin.halo.run/v1alpha1
+kind: ExtensionDefinition
+metadata:
+  name: post-content-thumbnail-handler
+spec:
+  className: run.halo.app.content.PostContentThumbnailHandler
+  extensionPointName: reactive-post-content-handler
+  displayName: "文章内容缩略图处理"
+  description: "处理文章的 HTML 内容为 img 标签追加缩略图"

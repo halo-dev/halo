@@ -4,7 +4,6 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertInstanceOf;
 import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
@@ -24,10 +23,8 @@ import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import reactor.test.StepVerifier;
 import run.halo.app.core.extension.Role;
-import run.halo.app.core.extension.RoleBinding.RoleRef;
-import run.halo.app.core.extension.RoleBinding.Subject;
-import run.halo.app.core.extension.service.RoleService;
-import run.halo.app.core.extension.service.UserService;
+import run.halo.app.core.user.service.RoleService;
+import run.halo.app.core.user.service.UserService;
 import run.halo.app.extension.Metadata;
 import run.halo.app.infra.exception.UserNotFoundException;
 
@@ -85,17 +82,8 @@ class DefaultUserDetailServiceTest {
     void shouldFindUserDetailsByExistingUsername() {
         var foundUser = createFakeUser();
 
-        var roleGvk = new Role().groupVersionKind();
-        var roleRef = new RoleRef();
-        roleRef.setKind(roleGvk.kind());
-        roleRef.setApiGroup(roleGvk.group());
-        roleRef.setName("fake-role");
-
-        var userGvk = foundUser.groupVersionKind();
-        var subject = new Subject(userGvk.kind(), "faker", userGvk.group());
-
         when(userService.getUser("faker")).thenReturn(Mono.just(foundUser));
-        when(roleService.listRoleRefs(subject)).thenReturn(Flux.just(roleRef));
+        when(roleService.getRolesByUsername("faker")).thenReturn(Flux.just("fake-role"));
 
         var userDetailsMono = userDetailService.findByUsername("faker");
 
@@ -115,7 +103,7 @@ class DefaultUserDetailServiceTest {
     void shouldFindHaloUserDetailsWith2faDisabledWhen2faNotEnabled() {
         var fakeUser = createFakeUser();
         when(userService.getUser("faker")).thenReturn(Mono.just(fakeUser));
-        when(roleService.listRoleRefs(any())).thenReturn(Flux.empty());
+        when(roleService.getRolesByUsername("faker")).thenReturn(Flux.empty());
         userDetailService.findByUsername("faker")
             .as(StepVerifier::create)
             .assertNext(userDetails -> {
@@ -130,7 +118,7 @@ class DefaultUserDetailServiceTest {
         var fakeUser = createFakeUser();
         fakeUser.getSpec().setTwoFactorAuthEnabled(true);
         when(userService.getUser("faker")).thenReturn(Mono.just(fakeUser));
-        when(roleService.listRoleRefs(any())).thenReturn(Flux.empty());
+        when(roleService.getRolesByUsername("faker")).thenReturn(Flux.empty());
         userDetailService.findByUsername("faker")
             .as(StepVerifier::create)
             .assertNext(userDetails -> {
@@ -146,7 +134,7 @@ class DefaultUserDetailServiceTest {
         fakeUser.getSpec().setTwoFactorAuthEnabled(true);
         fakeUser.getSpec().setTotpEncryptedSecret("fake-totp-encrypted-secret");
         when(userService.getUser("faker")).thenReturn(Mono.just(fakeUser));
-        when(roleService.listRoleRefs(any())).thenReturn(Flux.empty());
+        when(roleService.getRolesByUsername("faker")).thenReturn(Flux.empty());
         userDetailService.findByUsername("faker")
             .as(StepVerifier::create)
             .assertNext(userDetails -> {
@@ -163,7 +151,7 @@ class DefaultUserDetailServiceTest {
         fakeUser.getSpec().setTwoFactorAuthEnabled(true);
         fakeUser.getSpec().setTotpEncryptedSecret("fake-totp-encrypted-secret");
         when(userService.getUser("faker")).thenReturn(Mono.just(fakeUser));
-        when(roleService.listRoleRefs(any())).thenReturn(Flux.empty());
+        when(roleService.getRolesByUsername("faker")).thenReturn(Flux.empty());
         userDetailService.findByUsername("faker")
             .as(StepVerifier::create)
             .assertNext(userDetails -> {
@@ -174,49 +162,13 @@ class DefaultUserDetailServiceTest {
     }
 
     @Test
-    void shouldFindUserDetailsByExistingUsernameButKindOfRoleRefIsNotRole() {
-        var foundUser = createFakeUser();
-
-        var roleRef = new RoleRef();
-        roleRef.setKind("FakeRole");
-        roleRef.setApiGroup("fake.halo.run");
-        roleRef.setName("fake-role");
-
-        var userGvk = foundUser.groupVersionKind();
-        var subject = new Subject(userGvk.kind(), "faker", userGvk.group());
-
-        when(userService.getUser("faker")).thenReturn(Mono.just(foundUser));
-        when(roleService.listRoleRefs(subject)).thenReturn(Flux.just(roleRef));
-
-        var userDetailsMono = userDetailService.findByUsername("faker");
-
-        StepVerifier.create(userDetailsMono)
-            .expectSubscription()
-            .assertNext(gotUser -> {
-                assertEquals(foundUser.getMetadata().getName(), gotUser.getUsername());
-                assertEquals(foundUser.getSpec().getPassword(), gotUser.getPassword());
-                assertEquals(2, gotUser.getAuthorities().size());
-                assertEquals(
-                    Set.of("ROLE_anonymous", "ROLE_authenticated"),
-                    authorityListToSet(gotUser.getAuthorities())
-                );
-            })
-            .verifyComplete();
-    }
-
-    @Test
     void shouldFindUserDetailsByExistingUsernameButWithoutAnyRoles() {
         var foundUser = createFakeUser();
 
-        var userGvk = foundUser.groupVersionKind();
-        var subject = new Subject(userGvk.kind(), "faker", userGvk.group());
-
         when(userService.getUser("faker")).thenReturn(Mono.just(foundUser));
-        when(roleService.listRoleRefs(subject)).thenReturn(Flux.empty());
+        when(roleService.getRolesByUsername("faker")).thenReturn(Flux.empty());
 
-        var userDetailsMono = userDetailService.findByUsername("faker");
-
-        StepVerifier.create(userDetailsMono)
+        StepVerifier.create(userDetailService.findByUsername("faker"))
             .expectSubscription()
             .assertNext(gotUser -> {
                 assertEquals(foundUser.getMetadata().getName(), gotUser.getUsername());
@@ -238,6 +190,13 @@ class DefaultUserDetailServiceTest {
         StepVerifier.create(userDetailsMono)
             .expectError(AuthenticationException.class)
             .verify();
+    }
+
+    Role createRole(String roleName) {
+        var role = new Role();
+        role.setMetadata(new Metadata());
+        role.getMetadata().setName(roleName);
+        return role;
     }
 
     UserDetails createFakeUserDetails() {

@@ -12,6 +12,7 @@ import { useQueryClient } from "@tanstack/vue-query";
 import { onClickOutside } from "@vueuse/core";
 import Fuse from "fuse.js";
 import { computed, ref, watch, type PropType } from "vue";
+import SecretCreationModal from "./components/SecretCreationModal.vue";
 import SecretEditModal from "./components/SecretEditModal.vue";
 import SecretListModal from "./components/SecretListModal.vue";
 import { Q_KEY, useSecretsFetch } from "./composables/use-secrets-fetch";
@@ -24,6 +25,8 @@ const props = defineProps({
     required: true,
   },
 });
+
+const requiredKey = computed(() => props.context.requiredKey);
 
 const selectedSecret = ref<Secret>();
 const dropdownVisible = ref(false);
@@ -137,10 +140,11 @@ const scrollToSelected = () => {
 
 // Check required key and edit secret
 function hasRequiredKey(secret: Secret) {
-  return !!secret.stringData?.[props.context.requiredKey as string];
+  return !!secret.stringData?.[requiredKey.value as string];
 }
 const secretToUpdate = ref<Secret>();
 const secretEditModalVisible = ref(false);
+const secretCreationModalVisible = ref(false);
 
 const handleSelect = (secret?: Secret) => {
   if (!secret || secret.metadata.name === props.context._value) {
@@ -159,7 +163,7 @@ const handleSelect = (secret?: Secret) => {
   if (!hasRequiredKey(secret)) {
     const stringDataToUpdate = {
       ...secret.stringData,
-      [props.context.requiredKey as string]: "",
+      [requiredKey.value ? (requiredKey.value as string) : ""]: "",
     };
     secretToUpdate.value = {
       ...secret,
@@ -177,6 +181,11 @@ const secretListModalVisible = ref(false);
 
 // Create new secret
 async function handleCreateSecret() {
+  if (!requiredKey.value) {
+    secretCreationModalVisible.value = true;
+    return;
+  }
+
   const { data: newSecret } = await coreApiClient.secret.createSecret({
     secret: {
       metadata: {
@@ -187,7 +196,7 @@ async function handleCreateSecret() {
       apiVersion: "v1alpha1",
       type: "Opaque",
       stringData: {
-        [props.context.requiredKey as string]: text.value,
+        [requiredKey.value as string]: text.value,
       },
     },
   });
@@ -211,6 +220,13 @@ async function handleCreateSecret() {
     v-if="secretEditModalVisible && secretToUpdate"
     :secret="secretToUpdate"
     @close="secretEditModalVisible = false"
+  />
+  <SecretCreationModal
+    v-if="secretCreationModalVisible"
+    :form-state="{
+      stringDataArray: [{ key: requiredKey ? requiredKey  as string : '', value: text || '' }],
+    }"
+    @close="secretCreationModalVisible = false"
   />
   <div
     ref="wrapperRef"

@@ -1,29 +1,65 @@
 import { postLabels } from "@/constants/labels";
 import type { FormKitNode, FormKitTypeDefinition } from "@formkit/core";
-import { defaultIcon, select, selects } from "@formkit/inputs";
 import { consoleApiClient } from "@halo-dev/api-client";
+import { select } from "./select";
 
-function optionsHandler(node: FormKitNode) {
-  node.on("created", async () => {
-    const { data } = await consoleApiClient.content.post.listPosts({
-      labelSelector: [
-        `${postLabels.DELETED}=false`,
-        `${postLabels.PUBLISHED}=true`,
-      ],
-    });
+async function search({ page, size, keyword }) {
+  const { data } = await consoleApiClient.content.post.listPosts({
+    page,
+    size,
+    keyword,
+    labelSelector: [
+      `${postLabels.DELETED}=false`,
+      `${postLabels.PUBLISHED}=true`,
+    ],
+  });
 
-    node.props.options = data.items.map((post) => {
+  return {
+    options: data.items.map((post) => {
       return {
         value: post.post.metadata.name,
         label: post.post.spec.title,
       };
-    });
+    }),
+    total: data.total,
+    size: data.size,
+    page: data.page,
+  };
+}
+
+async function findOptionsByValues(values: string[]) {
+  if (values.length === 0) {
+    return [];
+  }
+
+  const { data } = await consoleApiClient.content.post.listPosts({
+    fieldSelector: [`metadata.name=(${values.join(",")})`],
+  });
+
+  return data.items.map((post) => {
+    return {
+      value: post.post.metadata.name,
+      label: post.post.spec.title,
+    };
+  });
+}
+
+function optionsHandler(node: FormKitNode) {
+  node.on("created", async () => {
+    node.props = {
+      ...node.props,
+      remote: true,
+      remoteOption: {
+        search,
+        findOptionsByValues,
+      },
+      searchable: true,
+    };
   });
 }
 
 export const postSelect: FormKitTypeDefinition = {
   ...select,
-  props: ["placeholder"],
   forceTypeProp: "select",
-  features: [optionsHandler, selects, defaultIcon("select", "select")],
+  features: [optionsHandler],
 };
