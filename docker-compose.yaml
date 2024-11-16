@@ -2,7 +2,7 @@ version: "3"
 
 services:
   halo:
-    image: sexyahri/ahri-cool
+    image: sexyahri/ahri-cool:latest
     restart: on-failure:3
     depends_on:
       halodb:
@@ -27,13 +27,14 @@ services:
       - --spring.sql.init.platform=postgresql
       # 外部访问地址，请根据实际需要修改
       - --halo.external-url=http://localhost:8090/
+
   halodb:
     image: postgres:15.4
     restart: on-failure:3
     networks:
       halo_network:
     volumes:
-      - ./db:/var/lib/postgresql/data
+      - ~/holadb:/var/lib/postgresql/data
     healthcheck:
       test: [ "CMD", "pg_isready" ]
       interval: 10s

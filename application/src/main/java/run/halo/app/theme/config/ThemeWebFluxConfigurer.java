@@ -21,8 +21,8 @@ import run.halo.app.infra.ThemeRootGetter;
 import run.halo.app.infra.utils.FileUtils;
 
 
-这个项目中唯二的两个路由
-这个路由仅能访问主题的静态资源 themes/{themeName}/assets/{*resourcePaths}
+// 这个项目中唯二的两个路由
+// 这个路由仅能访问主题的静态资源 themes/{themeName}/assets/{*resourcePaths}
 
 @Component
 public class ThemeWebFluxConfigurer implements WebFluxConfigurer {
