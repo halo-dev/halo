@@ -9,13 +9,13 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.pf4j.PluginWrapper;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.mock.mockito.SpyBean;
+import org.springframework.test.context.bean.override.mockito.MockitoSpyBean;
 import run.halo.app.search.SearchService;
 
 @SpringBootTest
 class DefaultPluginApplicationContextFactoryTest {
 
-    @SpyBean
+    @MockitoSpyBean
     SpringPluginManager pluginManager;
 
     DefaultPluginApplicationContextFactory factory;

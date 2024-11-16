@@ -13,6 +13,7 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
+import org.springframework.util.StringUtils;
 import run.halo.app.extension.AbstractExtension;
 import run.halo.app.extension.ExtensionOperator;
 import run.halo.app.extension.GVK;
@@ -117,6 +118,14 @@ public class RoleBinding extends AbstractExtension {
             return subject -> User.KIND.equals(subject.getKind())
                 && User.GROUP.equals(subject.apiGroup)
                 && usernames.contains(subject.getName());
+        }
+
+        @Override
+        public String toString() {
+            if (StringUtils.hasText(apiGroup)) {
+                return apiGroup + "/" + kind + "/" + name;
+            }
+            return kind + "/" + name;
         }
     }
 

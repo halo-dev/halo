@@ -2,7 +2,7 @@
   "openapi": "3.0.1",
   "info": {
     "title": "Halo",
-    "version": "2.19.0-SNAPSHOT"
+    "version": "2.20.9-SNAPSHOT"
   },
   "servers": [
     {
@@ -2250,6 +2250,36 @@
         ]
       }
     },
+    "/apis/api.console.halo.run/v1alpha1/attachments/-/upload-from-url": {
+      "post": {
+        "operationId": "ExternalTransferAttachment",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UploadFromUrlRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "default": {
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/Attachment"
+                }
+              }
+            },
+            "description": "default response"
+          }
+        },
+        "tags": [
+          "AttachmentV1alpha1Console"
+        ]
+      }
+    },
     "/apis/api.console.halo.run/v1alpha1/attachments/upload": {
       "post": {
         "operationId": "UploadAttachment",
@@ -2621,30 +2651,6 @@
         ]
       }
     },
-    "/apis/api.console.halo.run/v1alpha1/plugin-presets": {
-      "get": {
-        "description": "List all plugin presets in the system.",
-        "operationId": "ListPluginPresets",
-        "responses": {
-          "default": {
-            "content": {
-              "*/*": {
-                "schema": {
-                  "type": "array",
-                  "items": {
-                    "$ref": "#/components/schemas/Plugin"
-                  }
-                }
-              }
-            },
-            "description": "default response"
-          }
-        },
-        "tags": [
-          "PluginV1alpha1Console"
-        ]
-      }
-    },
     "/apis/api.console.halo.run/v1alpha1/plugins": {
       "get": {
         "description": "List plugins using query criteria and sort params",
@@ -2841,7 +2847,7 @@
     },
     "/apis/api.console.halo.run/v1alpha1/plugins/{name}/config": {
       "get": {
-        "description": "Fetch configMap of plugin by configured configMapName.",
+        "description": "Fetch configMap of plugin by configured configMapName. it is deprecated since 2.20.0",
         "operationId": "fetchPluginConfig",
         "parameters": [
           {
@@ -2870,7 +2876,8 @@
         ]
       },
       "put": {
-        "description": "Update the configMap of plugin setting.",
+        "deprecated": true,
+        "description": "Update the configMap of plugin setting, it is deprecated since 2.20.0",
         "operationId": "updatePluginConfig",
         "parameters": [
           {
@@ -2902,6 +2909,70 @@
               }
             },
             "description": "default response"
+          }
+        },
+        "tags": [
+          "PluginV1alpha1Console"
+        ]
+      }
+    },
+    "/apis/api.console.halo.run/v1alpha1/plugins/{name}/json-config": {
+      "get": {
+        "description": "Fetch converted json config of plugin by configured configMapName.",
+        "operationId": "fetchPluginJsonConfig",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "name",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "default": {
+            "content": {
+              "*/*": {
+                "schema": {
+                  "type": "object"
+                }
+              }
+            },
+            "description": "default response"
+          }
+        },
+        "tags": [
+          "PluginV1alpha1Console"
+        ]
+      },
+      "put": {
+        "description": "Update the config of plugin setting.",
+        "operationId": "updatePluginJsonConfig",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "name",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "204": {
+            "content": {},
+            "description": "No Content"
           }
         },
         "tags": [
@@ -4214,38 +4285,6 @@
         ]
       }
     },
-    "/apis/api.console.halo.run/v1alpha1/system/initialize": {
-      "post": {
-        "description": "Initialize system",
-        "operationId": "initialize",
-        "requestBody": {
-          "content": {
-            "*/*": {
-              "schema": {
-                "$ref": "#/components/schemas/SystemInitializationRequest"
-              }
-            }
-          }
-        },
-        "responses": {
-          "201": {
-            "description": "System initialization successfully.",
-            "headers": {
-              "Location": {
-                "description": "Redirect URL.",
-                "schema": {
-                  "type": "string"
-                },
-                "style": "simple"
-              }
-            }
-          }
-        },
-        "tags": [
-          "SystemV1alpha1Console"
-        ]
-      }
-    },
     "/apis/api.console.halo.run/v1alpha1/tags": {
       "get": {
         "description": "List Post Tags.",
@@ -4515,7 +4554,8 @@
     },
     "/apis/api.console.halo.run/v1alpha1/themes/{name}/config": {
       "get": {
-        "description": "Fetch configMap of theme by configured configMapName.",
+        "deprecated": true,
+        "description": "Fetch configMap of theme by configured configMapName. It is deprecated.",
         "operationId": "fetchThemeConfig",
         "parameters": [
           {
@@ -4544,7 +4584,8 @@
         ]
       },
       "put": {
-        "description": "Update the configMap of theme setting.",
+        "deprecated": true,
+        "description": "Update the configMap of theme setting. It is deprecated.",
         "operationId": "updateThemeConfig",
         "parameters": [
           {
@@ -4599,6 +4640,70 @@
         ],
         "responses": {
           "204": {
+            "description": "No Content"
+          }
+        },
+        "tags": [
+          "ThemeV1alpha1Console"
+        ]
+      }
+    },
+    "/apis/api.console.halo.run/v1alpha1/themes/{name}/json-config": {
+      "get": {
+        "description": "Fetch converted json config of theme by configured configMapName.",
+        "operationId": "fetchThemeJsonConfig",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "name",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "default": {
+            "content": {
+              "*/*": {
+                "schema": {
+                  "type": "object"
+                }
+              }
+            },
+            "description": "default response"
+          }
+        },
+        "tags": [
+          "ThemeV1alpha1Console"
+        ]
+      },
+      "put": {
+        "description": "Update the configMap of theme setting.",
+        "operationId": "updateThemeJsonConfig",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "name",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "204": {
+            "content": {},
             "description": "No Content"
           }
         },
@@ -5236,55 +5341,6 @@
         },
         "tags": [
           "UserV1alpha1Console"
-        ]
-      }
-    },
-    "/apis/api.console.migration.halo.run/v1alpha1/backups/{name}/files/{filename}": {
-      "get": {
-        "operationId": "DownloadBackups",
-        "parameters": [
-          {
-            "description": "Backup name.",
-            "in": "path",
-            "name": "name",
-            "required": true,
-            "schema": {
-              "type": "string"
-            }
-          },
-          {
-            "description": "Backup filename.",
-            "in": "path",
-            "name": "filename",
-            "required": true,
-            "schema": {
-              "type": "string"
-            }
-          }
-        ],
-        "responses": {},
-        "tags": [
-          "MigrationV1alpha1Console"
-        ]
-      }
-    },
-    "/apis/api.console.migration.halo.run/v1alpha1/restorations": {
-      "post": {
-        "description": "Restore backup by uploading file or providing download link or backup name.",
-        "operationId": "RestoreBackup",
-        "requestBody": {
-          "content": {
-            "multipart/form-data": {
-              "schema": {
-                "$ref": "#/components/schemas/RestoreRequest"
-              }
-            }
-          },
-          "required": true
-        },
-        "responses": {},
-        "tags": [
-          "MigrationV1alpha1Console"
         ]
       }
     },
@@ -6400,123 +6456,6 @@
         ]
       }
     },
-    "/apis/api.halo.run/v1alpha1/users/-/send-password-reset-email": {
-      "post": {
-        "description": "Send password reset email when forgot password",
-        "operationId": "SendPasswordResetEmail",
-        "requestBody": {
-          "content": {
-            "*/*": {
-              "schema": {
-                "$ref": "#/components/schemas/PasswordResetEmailRequest"
-              }
-            }
-          },
-          "required": true
-        },
-        "responses": {
-          "204 NO_CONTENT": {
-            "content": {},
-            "description": "default response"
-          }
-        },
-        "tags": [
-          "UserV1alpha1Public"
-        ]
-      }
-    },
-    "/apis/api.halo.run/v1alpha1/users/-/send-register-verify-email": {
-      "post": {
-        "description": "Send registration verification email, which can be called when mustVerifyEmailOnRegistration in user settings is true",
-        "operationId": "SendRegisterVerifyEmail",
-        "requestBody": {
-          "content": {
-            "*/*": {
-              "schema": {
-                "$ref": "#/components/schemas/RegisterVerifyEmailRequest"
-              }
-            }
-          },
-          "required": true
-        },
-        "responses": {
-          "204 NO_CONTENT": {
-            "content": {},
-            "description": "default response"
-          }
-        },
-        "tags": [
-          "UserV1alpha1Public"
-        ]
-      }
-    },
-    "/apis/api.halo.run/v1alpha1/users/-/signup": {
-      "post": {
-        "description": "Sign up a new user",
-        "operationId": "SignUp",
-        "requestBody": {
-          "content": {
-            "*/*": {
-              "schema": {
-                "$ref": "#/components/schemas/SignUpRequest"
-              }
-            }
-          },
-          "required": true
-        },
-        "responses": {
-          "default": {
-            "content": {
-              "*/*": {
-                "schema": {
-                  "$ref": "#/components/schemas/User"
-                }
-              }
-            },
-            "description": "default response"
-          }
-        },
-        "tags": [
-          "UserV1alpha1Public"
-        ]
-      }
-    },
-    "/apis/api.halo.run/v1alpha1/users/{name}/reset-password": {
-      "put": {
-        "description": "Reset password by token",
-        "operationId": "ResetPasswordByToken",
-        "parameters": [
-          {
-            "description": "The name of the user",
-            "in": "path",
-            "name": "name",
-            "required": true,
-            "schema": {
-              "type": "string"
-            }
-          }
-        ],
-        "requestBody": {
-          "content": {
-            "*/*": {
-              "schema": {
-                "$ref": "#/components/schemas/ResetPasswordRequest"
-              }
-            }
-          },
-          "required": true
-        },
-        "responses": {
-          "204 NO_CONTENT": {
-            "content": {},
-            "description": "default response"
-          }
-        },
-        "tags": [
-          "UserV1alpha1Public"
-        ]
-      }
-    },
     "/apis/api.notification.halo.run/v1alpha1/notifiers/{name}/receiver-config": {
       "get": {
         "description": "Fetch receiver config of notifier",
@@ -6620,7 +6559,7 @@
           }
         },
         "tags": [
-          "api.notification.halo.run/v1alpha1/Subscription"
+          "NotificationV1alpha1Public"
         ]
       }
     },
@@ -6758,14 +6697,6 @@
               "items": {
                 "type": "string"
               }
-            }
-          },
-          {
-            "description": "Keyword",
-            "in": "query",
-            "name": "keyword",
-            "schema": {
-              "type": "string"
             }
           }
         ],
@@ -6942,6 +6873,48 @@
         },
         "tags": [
           "PluginV1alpha1Public"
+        ]
+      }
+    },
+    "/apis/api.storage.halo.run/v1alpha1/thumbnails/-/via-uri": {
+      "get": {
+        "description": "Get thumbnail by URI",
+        "operationId": "GetThumbnailByUri",
+        "parameters": [
+          {
+            "description": "The URI of the image",
+            "in": "query",
+            "name": "uri",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "description": "The size of the thumbnail,available values are s,m,l,xl",
+            "in": "query",
+            "name": "size",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "default": {
+            "content": {
+              "*/*": {
+                "schema": {
+                  "type": "string",
+                  "format": "binary"
+                }
+              }
+            },
+            "description": "default response"
+          }
+        },
+        "tags": [
+          "ThumbnailV1alpha1Public"
         ]
       }
     },
@@ -7416,6 +7389,145 @@
         },
         "tags": [
           "UserConnectionV1alpha1"
+        ]
+      }
+    },
+    "/apis/console.api.halo.run/v1alpha1/systemconfigs/{group}": {
+      "get": {
+        "description": "Get system config by group",
+        "operationId": "getSystemConfigByGroup",
+        "parameters": [
+          {
+            "description": "Group of the system config",
+            "in": "path",
+            "name": "group",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "default": {
+            "content": {
+              "*/*": {
+                "schema": {
+                  "type": "object"
+                }
+              },
+              "application/json": {}
+            },
+            "description": "default response"
+          }
+        },
+        "tags": [
+          "SystemConfigV1alpha1Console"
+        ]
+      },
+      "put": {
+        "description": "Update system config by group",
+        "operationId": "updateSystemConfigByGroup",
+        "parameters": [
+          {
+            "description": "Group of the system config",
+            "in": "path",
+            "name": "group",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "*/*": {
+              "schema": {
+                "type": "object"
+              }
+            }
+          }
+        },
+        "responses": {
+          "204 NO_CONTENT": {
+            "content": {},
+            "description": "default response"
+          }
+        },
+        "tags": [
+          "SystemConfigV1alpha1Console"
+        ]
+      }
+    },
+    "/apis/console.api.migration.halo.run/v1alpha1/backup-files": {
+      "get": {
+        "description": "Get backup files from backup root.",
+        "operationId": "getBackupFiles",
+        "responses": {
+          "default": {
+            "content": {
+              "*/*": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/BackupFile"
+                  }
+                }
+              }
+            },
+            "description": "default response"
+          }
+        },
+        "tags": [
+          "MigrationV1alpha1Console"
+        ]
+      }
+    },
+    "/apis/console.api.migration.halo.run/v1alpha1/backups/{name}/files/{filename}": {
+      "get": {
+        "operationId": "DownloadBackups",
+        "parameters": [
+          {
+            "description": "Backup name.",
+            "in": "path",
+            "name": "name",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "description": "Backup filename.",
+            "in": "path",
+            "name": "filename",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {},
+        "tags": [
+          "MigrationV1alpha1Console"
+        ]
+      }
+    },
+    "/apis/console.api.migration.halo.run/v1alpha1/restorations": {
+      "post": {
+        "description": "Restore backup by uploading file or providing download link or backup name.",
+        "operationId": "RestoreBackup",
+        "requestBody": {
+          "content": {
+            "multipart/form-data": {
+              "schema": {
+                "$ref": "#/components/schemas/RestoreRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {},
+        "tags": [
+          "MigrationV1alpha1Console"
         ]
       }
     },
@@ -13369,6 +13481,243 @@
         ]
       }
     },
+    "/apis/storage.halo.run/v1alpha1/localthumbnails": {
+      "get": {
+        "description": "List LocalThumbnail",
+        "operationId": "listLocalThumbnail",
+        "parameters": [
+          {
+            "description": "Page number. Default is 0.",
+            "in": "query",
+            "name": "page",
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          },
+          {
+            "description": "Size number. Default is 0.",
+            "in": "query",
+            "name": "size",
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          },
+          {
+            "description": "Label selector. e.g.: hidden!\u003dtrue",
+            "in": "query",
+            "name": "labelSelector",
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            }
+          },
+          {
+            "description": "Field selector. e.g.: metadata.name\u003d\u003dhalo",
+            "in": "query",
+            "name": "fieldSelector",
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            }
+          },
+          {
+            "description": "Sorting criteria in the format: property,(asc|desc). Default sort order is ascending. Multiple sort criteria are supported.",
+            "in": "query",
+            "name": "sort",
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/LocalThumbnailList"
+                }
+              }
+            },
+            "description": "Response localthumbnails"
+          }
+        },
+        "tags": [
+          "LocalThumbnailV1alpha1"
+        ]
+      },
+      "post": {
+        "description": "Create LocalThumbnail",
+        "operationId": "createLocalThumbnail",
+        "requestBody": {
+          "content": {
+            "*/*": {
+              "schema": {
+                "$ref": "#/components/schemas/LocalThumbnail"
+              }
+            }
+          },
+          "description": "Fresh localthumbnail"
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/LocalThumbnail"
+                }
+              }
+            },
+            "description": "Response localthumbnails created just now"
+          }
+        },
+        "tags": [
+          "LocalThumbnailV1alpha1"
+        ]
+      }
+    },
+    "/apis/storage.halo.run/v1alpha1/localthumbnails/{name}": {
+      "delete": {
+        "description": "Delete LocalThumbnail",
+        "operationId": "deleteLocalThumbnail",
+        "parameters": [
+          {
+            "description": "Name of localthumbnail",
+            "in": "path",
+            "name": "name",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Response localthumbnail deleted just now"
+          }
+        },
+        "tags": [
+          "LocalThumbnailV1alpha1"
+        ]
+      },
+      "get": {
+        "description": "Get LocalThumbnail",
+        "operationId": "getLocalThumbnail",
+        "parameters": [
+          {
+            "description": "Name of localthumbnail",
+            "in": "path",
+            "name": "name",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/LocalThumbnail"
+                }
+              }
+            },
+            "description": "Response single localthumbnail"
+          }
+        },
+        "tags": [
+          "LocalThumbnailV1alpha1"
+        ]
+      },
+      "patch": {
+        "description": "Patch LocalThumbnail",
+        "operationId": "patchLocalThumbnail",
+        "parameters": [
+          {
+            "description": "Name of localthumbnail",
+            "in": "path",
+            "name": "name",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json-patch+json": {
+              "schema": {
+                "$ref": "#/components/schemas/JsonPatch"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/LocalThumbnail"
+                }
+              }
+            },
+            "description": "Response localthumbnail patched just now"
+          }
+        },
+        "tags": [
+          "LocalThumbnailV1alpha1"
+        ]
+      },
+      "put": {
+        "description": "Update LocalThumbnail",
+        "operationId": "updateLocalThumbnail",
+        "parameters": [
+          {
+            "description": "Name of localthumbnail",
+            "in": "path",
+            "name": "name",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "*/*": {
+              "schema": {
+                "$ref": "#/components/schemas/LocalThumbnail"
+              }
+            }
+          },
+          "description": "Updated localthumbnail"
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/LocalThumbnail"
+                }
+              }
+            },
+            "description": "Response localthumbnails updated just now"
+          }
+        },
+        "tags": [
+          "LocalThumbnailV1alpha1"
+        ]
+      }
+    },
     "/apis/storage.halo.run/v1alpha1/policies": {
       "get": {
         "description": "List Policy",
@@ -13843,6 +14192,243 @@
         ]
       }
     },
+    "/apis/storage.halo.run/v1alpha1/thumbnails": {
+      "get": {
+        "description": "List Thumbnail",
+        "operationId": "listThumbnail",
+        "parameters": [
+          {
+            "description": "Page number. Default is 0.",
+            "in": "query",
+            "name": "page",
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          },
+          {
+            "description": "Size number. Default is 0.",
+            "in": "query",
+            "name": "size",
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          },
+          {
+            "description": "Label selector. e.g.: hidden!\u003dtrue",
+            "in": "query",
+            "name": "labelSelector",
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            }
+          },
+          {
+            "description": "Field selector. e.g.: metadata.name\u003d\u003dhalo",
+            "in": "query",
+            "name": "fieldSelector",
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            }
+          },
+          {
+            "description": "Sorting criteria in the format: property,(asc|desc). Default sort order is ascending. Multiple sort criteria are supported.",
+            "in": "query",
+            "name": "sort",
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ThumbnailList"
+                }
+              }
+            },
+            "description": "Response thumbnails"
+          }
+        },
+        "tags": [
+          "ThumbnailV1alpha1"
+        ]
+      },
+      "post": {
+        "description": "Create Thumbnail",
+        "operationId": "createThumbnail",
+        "requestBody": {
+          "content": {
+            "*/*": {
+              "schema": {
+                "$ref": "#/components/schemas/Thumbnail"
+              }
+            }
+          },
+          "description": "Fresh thumbnail"
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/Thumbnail"
+                }
+              }
+            },
+            "description": "Response thumbnails created just now"
+          }
+        },
+        "tags": [
+          "ThumbnailV1alpha1"
+        ]
+      }
+    },
+    "/apis/storage.halo.run/v1alpha1/thumbnails/{name}": {
+      "delete": {
+        "description": "Delete Thumbnail",
+        "operationId": "deleteThumbnail",
+        "parameters": [
+          {
+            "description": "Name of thumbnail",
+            "in": "path",
+            "name": "name",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Response thumbnail deleted just now"
+          }
+        },
+        "tags": [
+          "ThumbnailV1alpha1"
+        ]
+      },
+      "get": {
+        "description": "Get Thumbnail",
+        "operationId": "getThumbnail",
+        "parameters": [
+          {
+            "description": "Name of thumbnail",
+            "in": "path",
+            "name": "name",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/Thumbnail"
+                }
+              }
+            },
+            "description": "Response single thumbnail"
+          }
+        },
+        "tags": [
+          "ThumbnailV1alpha1"
+        ]
+      },
+      "patch": {
+        "description": "Patch Thumbnail",
+        "operationId": "patchThumbnail",
+        "parameters": [
+          {
+            "description": "Name of thumbnail",
+            "in": "path",
+            "name": "name",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json-patch+json": {
+              "schema": {
+                "$ref": "#/components/schemas/JsonPatch"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/Thumbnail"
+                }
+              }
+            },
+            "description": "Response thumbnail patched just now"
+          }
+        },
+        "tags": [
+          "ThumbnailV1alpha1"
+        ]
+      },
+      "put": {
+        "description": "Update Thumbnail",
+        "operationId": "updateThumbnail",
+        "parameters": [
+          {
+            "description": "Name of thumbnail",
+            "in": "path",
+            "name": "name",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "*/*": {
+              "schema": {
+                "$ref": "#/components/schemas/Thumbnail"
+              }
+            }
+          },
+          "description": "Updated thumbnail"
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/Thumbnail"
+                }
+              }
+            },
+            "description": "Response thumbnails updated just now"
+          }
+        },
+        "tags": [
+          "ThumbnailV1alpha1"
+        ]
+      }
+    },
     "/apis/theme.halo.run/v1alpha1/themes": {
       "get": {
         "description": "List Theme",
@@ -14080,35 +14666,30 @@
         ]
       }
     },
-    "/apis/uc.api.content.halo.run/v1alpha1/attachments": {
-      "post": {
-        "description": "Create attachment for the given post.",
-        "operationId": "CreateAttachmentForPost",
+    "/apis/uc.api.auth.halo.run/v1alpha1/user-connections/{registerId}/disconnect": {
+      "put": {
+        "description": "Disconnect my connection from a third-party platform.",
+        "operationId": "DisconnectMyConnection",
         "parameters": [
           {
-            "description": "Wait for permalink.",
-            "in": "query",
-            "name": "waitForPermalink",
+            "description": "The registration ID of the third-party platform.",
+            "in": "path",
+            "name": "registerId",
+            "required": true,
             "schema": {
-              "type": "boolean"
+              "type": "string"
             }
           }
         ],
-        "requestBody": {
-          "content": {
-            "multipart/form-data": {
-              "schema": {
-                "$ref": "#/components/schemas/PostAttachmentRequest"
-              }
-            }
-          }
-        },
         "responses": {
           "default": {
             "content": {
               "*/*": {
                 "schema": {
-                  "$ref": "#/components/schemas/Attachment"
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/UserConnection"
+                  }
                 }
               }
             },
@@ -14116,7 +14697,7 @@
           }
         },
         "tags": [
-          "AttachmentV1alpha1Uc"
+          "UserConnectionV1alpha1Uc"
         ]
       }
     },
@@ -14406,6 +14987,38 @@
       "put": {
         "description": "Publish my post.",
         "operationId": "PublishMyPost",
+        "parameters": [
+          {
+            "description": "Post name",
+            "in": "path",
+            "name": "name",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "default": {
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/Post"
+                }
+              }
+            },
+            "description": "default response"
+          }
+        },
+        "tags": [
+          "PostV1alpha1Uc"
+        ]
+      }
+    },
+    "/apis/uc.api.content.halo.run/v1alpha1/posts/{name}/recycle": {
+      "delete": {
+        "description": "Move my post to recycle bin.",
+        "operationId": "RecycleMyPost",
         "parameters": [
           {
             "description": "Post name",
@@ -14856,16 +15469,96 @@
         ]
       }
     },
-    "/login/public-key": {
+    "/apis/uc.api.storage.halo.run/v1alpha1/attachments": {
       "get": {
-        "description": "Read public key for encrypting password.",
-        "operationId": "GetPublicKey",
+        "description": "List attachments of the current user uploaded.",
+        "operationId": "ListMyAttachments",
+        "parameters": [
+          {
+            "description": "Page number. Default is 0.",
+            "in": "query",
+            "name": "page",
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          },
+          {
+            "description": "Size number. Default is 0.",
+            "in": "query",
+            "name": "size",
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          },
+          {
+            "description": "Label selector. e.g.: hidden!\u003dtrue",
+            "in": "query",
+            "name": "labelSelector",
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            }
+          },
+          {
+            "description": "Field selector. e.g.: metadata.name\u003d\u003dhalo",
+            "in": "query",
+            "name": "fieldSelector",
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            }
+          },
+          {
+            "description": "Sorting criteria in the format: property,(asc|desc). Default sort order is ascending. Multiple sort criteria are supported.",
+            "in": "query",
+            "name": "sort",
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            }
+          },
+          {
+            "description": "Filter attachments without group. This parameter will ignore group parameter.",
+            "in": "query",
+            "name": "ungrouped",
+            "schema": {
+              "type": "boolean"
+            }
+          },
+          {
+            "description": "Keyword for searching.",
+            "in": "query",
+            "name": "keyword",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "description": "Acceptable media types.",
+            "in": "query",
+            "name": "accepts",
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            }
+          }
+        ],
         "responses": {
           "default": {
             "content": {
               "*/*": {
                 "schema": {
-                  "$ref": "#/components/schemas/PublicKeyResponse"
+                  "$ref": "#/components/schemas/AttachmentList"
                 }
               }
             },
@@ -14873,8 +15566,143 @@
           }
         },
         "tags": [
-          "Login"
+          "AttachmentV1alpha1Uc"
         ]
+      },
+      "post": {
+        "description": "Create attachment for the given post.",
+        "operationId": "CreateAttachmentForPost",
+        "parameters": [
+          {
+            "description": "Wait for permalink.",
+            "in": "query",
+            "name": "waitForPermalink",
+            "schema": {
+              "type": "boolean"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "multipart/form-data": {
+              "schema": {
+                "$ref": "#/components/schemas/PostAttachmentRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "default": {
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/Attachment"
+                }
+              }
+            },
+            "description": "default response"
+          }
+        },
+        "tags": [
+          "AttachmentV1alpha1Uc"
+        ]
+      }
+    },
+    "/apis/uc.api.storage.halo.run/v1alpha1/attachments/-/upload": {
+      "post": {
+        "description": "Upload attachment to user center storage.",
+        "operationId": "UploadUcAttachment",
+        "requestBody": {
+          "content": {
+            "multipart/form-data": {
+              "schema": {
+                "$ref": "#/components/schemas/UcUploadRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "default": {
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/Attachment"
+                }
+              }
+            },
+            "description": "default response"
+          }
+        },
+        "tags": [
+          "AttachmentV1alpha1Uc"
+        ]
+      }
+    },
+    "/apis/uc.api.storage.halo.run/v1alpha1/attachments/-/upload-from-url": {
+      "post": {
+        "description": "Upload attachment from the given URL.",
+        "operationId": "ExternalTransferAttachment_1",
+        "parameters": [
+          {
+            "description": "Wait for permalink.",
+            "in": "query",
+            "name": "waitForPermalink",
+            "schema": {
+              "type": "boolean"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UploadFromUrlRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "default": {
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/Attachment"
+                }
+              }
+            },
+            "description": "default response"
+          }
+        },
+        "tags": [
+          "AttachmentV1alpha1Uc"
+        ]
+      }
+    },
+    "/system/setup": {
+      "get": {
+        "description": "Jump to setup page",
+        "operationId": "JumpToSetupPage",
+        "responses": {
+          "default": {
+            "content": {
+              "text/html": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            },
+            "description": "default response"
+          }
+        },
+        "tags": [
+          "SystemV1alpha1Public"
+        ]
+      },
+      "post": {
+        "operationId": "SetNoCacheForSetUpPage",
+        "responses": {}
       }
     }
   },
@@ -15138,6 +15966,12 @@
           "permalink": {
             "type": "string",
             "description": "Permalink of attachment.\nIf it is in local storage, the public URL will be set.\nIf it is in s3 storage, the Object URL will be set.\n"
+          },
+          "thumbnails": {
+            "type": "object",
+            "additionalProperties": {
+              "type": "string"
+            }
           }
         }
       },
@@ -15225,11 +16059,19 @@
       },
       "AuthProviderSpec": {
         "required": [
+          "authType",
           "authenticationUrl",
           "displayName"
         ],
         "type": "object",
         "properties": {
+          "authType": {
+            "type": "string",
+            "enum": [
+              "FORM",
+              "OAUTH2"
+            ]
+          },
           "authenticationUrl": {
             "type": "string",
             "description": "Authentication url of the auth provider"
@@ -15253,9 +16095,11 @@
           "logo": {
             "type": "string"
           },
-          "priority": {
-            "type": "integer",
-            "format": "int32"
+          "method": {
+            "type": "string"
+          },
+          "rememberMeSupport": {
+            "type": "boolean"
           },
           "settingRef": {
             "$ref": "#/components/schemas/SettingRef"
@@ -15305,6 +16149,22 @@
           },
           "status": {
             "$ref": "#/components/schemas/BackupStatus"
+          }
+        }
+      },
+      "BackupFile": {
+        "type": "object",
+        "properties": {
+          "filename": {
+            "type": "string"
+          },
+          "lastModifiedTime": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "size": {
+            "type": "integer",
+            "format": "int64"
           }
         }
       },
@@ -15657,7 +16517,7 @@
             "description": "Old password."
           },
           "password": {
-            "minLength": 6,
+            "minLength": 5,
             "type": "string",
             "description": "New password."
           }
@@ -15670,7 +16530,7 @@
         "type": "object",
         "properties": {
           "password": {
-            "minLength": 6,
+            "minLength": 5,
             "type": "string",
             "description": "New password."
           }
@@ -17459,6 +18319,13 @@
         ],
         "type": "object",
         "properties": {
+          "authType": {
+            "type": "string",
+            "enum": [
+              "FORM",
+              "OAUTH2"
+            ]
+          },
           "authenticationUrl": {
             "type": "string"
           },
@@ -17485,6 +18352,10 @@
           },
           "name": {
             "type": "string"
+          },
+          "priority": {
+            "type": "integer",
+            "format": "int32"
           },
           "privileged": {
             "type": "boolean"
@@ -18084,6 +18955,145 @@
           }
         },
         "description": "A chunk of items."
+      },
+      "LocalThumbnail": {
+        "required": [
+          "apiVersion",
+          "kind",
+          "metadata",
+          "spec"
+        ],
+        "type": "object",
+        "properties": {
+          "apiVersion": {
+            "type": "string"
+          },
+          "kind": {
+            "type": "string"
+          },
+          "metadata": {
+            "$ref": "#/components/schemas/Metadata"
+          },
+          "spec": {
+            "$ref": "#/components/schemas/LocalThumbnailSpec"
+          },
+          "status": {
+            "$ref": "#/components/schemas/LocalThumbnailStatus"
+          }
+        }
+      },
+      "LocalThumbnailList": {
+        "required": [
+          "first",
+          "hasNext",
+          "hasPrevious",
+          "items",
+          "last",
+          "page",
+          "size",
+          "total",
+          "totalPages"
+        ],
+        "type": "object",
+        "properties": {
+          "first": {
+            "type": "boolean",
+            "description": "Indicates whether current page is the first page."
+          },
+          "hasNext": {
+            "type": "boolean",
+            "description": "Indicates whether current page has previous page."
+          },
+          "hasPrevious": {
+            "type": "boolean",
+            "description": "Indicates whether current page has previous page."
+          },
+          "items": {
+            "type": "array",
+            "description": "A chunk of items.",
+            "items": {
+              "$ref": "#/components/schemas/LocalThumbnail"
+            }
+          },
+          "last": {
+            "type": "boolean",
+            "description": "Indicates whether current page is the last page."
+          },
+          "page": {
+            "type": "integer",
+            "description": "Page number, starts from 1. If not set or equal to 0, it means no pagination.",
+            "format": "int32"
+          },
+          "size": {
+            "type": "integer",
+            "description": "Size of each page. If not set or equal to 0, it means no pagination.",
+            "format": "int32"
+          },
+          "total": {
+            "type": "integer",
+            "description": "Total elements.",
+            "format": "int64"
+          },
+          "totalPages": {
+            "type": "integer",
+            "description": "Indicates total pages.",
+            "format": "int64"
+          }
+        }
+      },
+      "LocalThumbnailSpec": {
+        "required": [
+          "filePath",
+          "imageSignature",
+          "imageUri",
+          "size",
+          "thumbSignature",
+          "thumbnailUri"
+        ],
+        "type": "object",
+        "properties": {
+          "filePath": {
+            "type": "string"
+          },
+          "imageSignature": {
+            "minLength": 1,
+            "type": "string"
+          },
+          "imageUri": {
+            "minLength": 1,
+            "type": "string"
+          },
+          "size": {
+            "type": "string",
+            "enum": [
+              "S",
+              "M",
+              "L",
+              "XL"
+            ]
+          },
+          "thumbSignature": {
+            "minLength": 1,
+            "type": "string"
+          },
+          "thumbnailUri": {
+            "minLength": 1,
+            "type": "string"
+          }
+        }
+      },
+      "LocalThumbnailStatus": {
+        "type": "object",
+        "properties": {
+          "phase": {
+            "type": "string",
+            "enum": [
+              "PENDING",
+              "SUCCEEDED",
+              "FAILED"
+            ]
+          }
+        }
       },
       "LoginHistory": {
         "required": [
@@ -18872,6 +19882,9 @@
           }
         }
       },
+      "Part": {
+        "type": "object"
+      },
       "PasswordRequest": {
         "required": [
           "password"
@@ -18879,21 +19892,6 @@
         "type": "object",
         "properties": {
           "password": {
-            "type": "string"
-          }
-        }
-      },
-      "PasswordResetEmailRequest": {
-        "required": [
-          "email",
-          "username"
-        ],
-        "type": "object",
-        "properties": {
-          "email": {
-            "type": "string"
-          },
-          "username": {
             "type": "string"
           }
         }
@@ -19736,9 +20734,6 @@
         }
       },
       "PostStatus": {
-        "required": [
-          "phase"
-        ],
         "type": "object",
         "properties": {
           "commentsCount": {
@@ -19828,14 +20823,6 @@
             "items": {
               "$ref": "#/components/schemas/TagVo"
             }
-          }
-        }
-      },
-      "PublicKeyResponse": {
-        "type": "object",
-        "properties": {
-          "base64Format": {
-            "type": "string"
           }
         }
       },
@@ -20222,17 +21209,6 @@
           }
         },
         "description": "Extension reference object. The name is mandatory"
-      },
-      "RegisterVerifyEmailRequest": {
-        "required": [
-          "email"
-        ],
-        "type": "object",
-        "properties": {
-          "email": {
-            "type": "string"
-          }
-        }
       },
       "RememberMeToken": {
         "required": [
@@ -20662,22 +21638,6 @@
           }
         }
       },
-      "ResetPasswordRequest": {
-        "required": [
-          "newPassword",
-          "token"
-        ],
-        "type": "object",
-        "properties": {
-          "newPassword": {
-            "minLength": 6,
-            "type": "string"
-          },
-          "token": {
-            "type": "string"
-          }
-        }
-      },
       "RestoreRequest": {
         "type": "object",
         "properties": {
@@ -20692,6 +21652,10 @@
           "file": {
             "type": "string",
             "format": "binary"
+          },
+          "filename": {
+            "type": "string",
+            "description": "Filename of backup file in backups root."
           }
         }
       },
@@ -21426,27 +22390,6 @@
           }
         }
       },
-      "SignUpRequest": {
-        "required": [
-          "password",
-          "user"
-        ],
-        "type": "object",
-        "properties": {
-          "password": {
-            "minLength": 6,
-            "type": "string"
-          },
-          "user": {
-            "$ref": "#/components/schemas/User"
-          },
-          "verifyCode": {
-            "maxLength": 6,
-            "minLength": 6,
-            "type": "string"
-          }
-        }
-      },
       "SinglePage": {
         "required": [
           "apiVersion",
@@ -21636,9 +22579,6 @@
         }
       },
       "SinglePageStatus": {
-        "required": [
-          "phase"
-        ],
         "type": "object",
         "properties": {
           "commentsCount": {
@@ -22037,29 +22977,6 @@
           }
         },
         "description": "The subscriber to be notified"
-      },
-      "SystemInitializationRequest": {
-        "required": [
-          "password",
-          "username"
-        ],
-        "type": "object",
-        "properties": {
-          "email": {
-            "type": "string"
-          },
-          "password": {
-            "minLength": 3,
-            "type": "string"
-          },
-          "siteTitle": {
-            "type": "string"
-          },
-          "username": {
-            "minLength": 1,
-            "type": "string"
-          }
-        }
       },
       "Tag": {
         "required": [
@@ -22513,6 +23430,120 @@
           }
         }
       },
+      "Thumbnail": {
+        "required": [
+          "apiVersion",
+          "kind",
+          "metadata",
+          "spec"
+        ],
+        "type": "object",
+        "properties": {
+          "apiVersion": {
+            "type": "string"
+          },
+          "kind": {
+            "type": "string"
+          },
+          "metadata": {
+            "$ref": "#/components/schemas/Metadata"
+          },
+          "spec": {
+            "$ref": "#/components/schemas/ThumbnailSpec"
+          }
+        }
+      },
+      "ThumbnailList": {
+        "required": [
+          "first",
+          "hasNext",
+          "hasPrevious",
+          "items",
+          "last",
+          "page",
+          "size",
+          "total",
+          "totalPages"
+        ],
+        "type": "object",
+        "properties": {
+          "first": {
+            "type": "boolean",
+            "description": "Indicates whether current page is the first page."
+          },
+          "hasNext": {
+            "type": "boolean",
+            "description": "Indicates whether current page has previous page."
+          },
+          "hasPrevious": {
+            "type": "boolean",
+            "description": "Indicates whether current page has previous page."
+          },
+          "items": {
+            "type": "array",
+            "description": "A chunk of items.",
+            "items": {
+              "$ref": "#/components/schemas/Thumbnail"
+            }
+          },
+          "last": {
+            "type": "boolean",
+            "description": "Indicates whether current page is the last page."
+          },
+          "page": {
+            "type": "integer",
+            "description": "Page number, starts from 1. If not set or equal to 0, it means no pagination.",
+            "format": "int32"
+          },
+          "size": {
+            "type": "integer",
+            "description": "Size of each page. If not set or equal to 0, it means no pagination.",
+            "format": "int32"
+          },
+          "total": {
+            "type": "integer",
+            "description": "Total elements.",
+            "format": "int64"
+          },
+          "totalPages": {
+            "type": "integer",
+            "description": "Indicates total pages.",
+            "format": "int64"
+          }
+        }
+      },
+      "ThumbnailSpec": {
+        "required": [
+          "imageSignature",
+          "imageUri",
+          "size",
+          "thumbnailUri"
+        ],
+        "type": "object",
+        "properties": {
+          "imageSignature": {
+            "minLength": 1,
+            "type": "string"
+          },
+          "imageUri": {
+            "minLength": 1,
+            "type": "string"
+          },
+          "size": {
+            "type": "string",
+            "enum": [
+              "S",
+              "M",
+              "L",
+              "XL"
+            ]
+          },
+          "thumbnailUri": {
+            "minLength": 1,
+            "type": "string"
+          }
+        }
+      },
       "TotpAuthLinkResponse": {
         "type": "object",
         "properties": {
@@ -22561,6 +23592,39 @@
           }
         }
       },
+      "UcUploadRequest": {
+        "required": [
+          "file"
+        ],
+        "type": "object",
+        "properties": {
+          "file": {
+            "type": "string",
+            "format": "binary"
+          },
+          "formData": {
+            "type": "object",
+            "properties": {
+              "all": {
+                "type": "object",
+                "additionalProperties": {
+                  "$ref": "#/components/schemas/Part"
+                },
+                "writeOnly": true
+              },
+              "empty": {
+                "type": "boolean"
+              }
+            },
+            "additionalProperties": {
+              "type": "array",
+              "items": {
+                "$ref": "#/components/schemas/Part"
+              }
+            }
+          }
+        }
+      },
       "UpgradeFromUriRequest": {
         "required": [
           "uri"
@@ -22582,6 +23646,21 @@
           "file": {
             "type": "string",
             "format": "binary"
+          }
+        }
+      },
+      "UploadFromUrlRequest": {
+        "required": [
+          "url"
+        ],
+        "type": "object",
+        "properties": {
+          "filename": {
+            "type": "string"
+          },
+          "url": {
+            "type": "string",
+            "format": "url"
           }
         }
       },
@@ -22695,34 +23774,13 @@
       },
       "UserConnectionSpec": {
         "required": [
-          "accessToken",
-          "displayName",
           "providerUserId",
           "registrationId",
           "username"
         ],
         "type": "object",
         "properties": {
-          "accessToken": {
-            "type": "string"
-          },
-          "avatarUrl": {
-            "type": "string"
-          },
-          "displayName": {
-            "type": "string"
-          },
-          "expiresAt": {
-            "type": "string",
-            "format": "date-time"
-          },
-          "profileUrl": {
-            "type": "string"
-          },
           "providerUserId": {
-            "type": "string"
-          },
-          "refreshToken": {
             "type": "string"
           },
           "registrationId": {
@@ -22889,14 +23947,12 @@
             }
           },
           "roles": {
-            "uniqueItems": true,
             "type": "array",
             "items": {
               "$ref": "#/components/schemas/Role"
             }
           },
           "uiPermissions": {
-            "uniqueItems": true,
             "type": "array",
             "items": {
               "type": "string"

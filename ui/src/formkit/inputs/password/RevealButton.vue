@@ -24,7 +24,7 @@ function handleChange() {
     @click="handleChange"
   >
     <IconEye
-      v-if="context.node.props.type === 'password'"
+      v-if="context.node.props.type !== 'password'"
       class="h-4 w-4 text-gray-500 group-hover:text-gray-700"
     />
     <IconEyeOff

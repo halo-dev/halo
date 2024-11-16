@@ -14,4 +14,10 @@ import run.halo.app.extension.Extension;
  */
 public interface ExtensionIterator<E extends Extension> extends Iterator<E> {
 
+    /**
+     * Get the total size of the extensions that this iterator iterates over.
+     *
+     * @return the total size of the extensions.
+     */
+    long size();
 }

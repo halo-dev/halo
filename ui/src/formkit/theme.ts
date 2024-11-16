@@ -2,9 +2,8 @@ const textClassification = {
   label: "block text-sm font-medium text-gray-700 formkit-invalid:text-red-500",
   wrapper: "flex flex-col gap-4",
   inner:
-    "inline-flex items-center w-full relative box-border border border-gray-300 formkit-invalid:border-red-500 h-9 rounded-base overflow-hidden focus-within:border-primary focus-within:shadow-sm w-full sm:max-w-lg transition-all",
-  input:
-    "bg-white resize-none w-full text-black block transition-all h-full px-3 text-sm",
+    "bg-white inline-flex items-center w-full relative box-border border border-gray-300 formkit-invalid:border-red-500 h-9 rounded-base overflow-hidden focus-within:border-primary focus-within:shadow-sm w-full sm:max-w-lg transition-all",
+  input: "resize-none w-full text-black block transition-all px-3 text-sm",
 };
 
 const boxClassification = {
@@ -23,6 +22,13 @@ const buttonClassification = {
   wrapper: "mb-1",
   input:
     "bg-blue-500 hover:bg-blue-700 text-white text-sm font-normal py-3 px-5 rounded",
+};
+
+const selectClassification = {
+  label: textClassification.label,
+  wrapper: textClassification.wrapper,
+  inner:
+    "group/select py-0.5 min-h-[36px] inline-flex items-center w-full relative box-border border border-gray-300 formkit-invalid:border-red-500 rounded-base overflow-hidden focus-within:border-primary focus-within:shadow-sm w-full sm:max-w-lg transition-all",
 };
 
 const theme: Record<string, Record<string, string>> = {
@@ -64,7 +70,8 @@ const theme: Record<string, Record<string, string>> = {
       "form-range appearance-none w-full h-2 p-0 bg-gray-200 rounded-full focus:outline-none focus:ring-0 focus:shadow-none",
   },
   search: textClassification,
-  select: textClassification,
+  select: selectClassification,
+  nativeSelect: textClassification,
   submit: buttonClassification,
   tel: textClassification,
   text: textClassification,

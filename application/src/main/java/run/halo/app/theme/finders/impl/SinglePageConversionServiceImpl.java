@@ -1,19 +1,32 @@
 package run.halo.app.theme.finders.impl;
 
+import static org.springframework.data.domain.Sort.Order.asc;
+import static org.springframework.data.domain.Sort.Order.desc;
+import static run.halo.app.core.extension.content.Post.VisibleEnum.PUBLIC;
+import static run.halo.app.core.extension.content.SinglePage.PUBLISHED_LABEL;
+import static run.halo.app.extension.ExtensionUtil.notDeleting;
+import static run.halo.app.extension.index.query.QueryFactory.equal;
+
 import java.util.List;
 import java.util.function.Function;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Sort;
 import org.springframework.lang.NonNull;
 import org.springframework.stereotype.Component;
 import org.springframework.util.Assert;
 import org.springframework.util.CollectionUtils;
+import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import run.halo.app.content.ContentWrapper;
 import run.halo.app.content.SinglePageService;
+import run.halo.app.core.counter.CounterService;
+import run.halo.app.core.counter.MeterUtils;
 import run.halo.app.core.extension.content.SinglePage;
+import run.halo.app.extension.ListOptions;
+import run.halo.app.extension.ListResult;
+import run.halo.app.extension.PageRequest;
+import run.halo.app.extension.PageRequestImpl;
 import run.halo.app.extension.ReactiveExtensionClient;
-import run.halo.app.metrics.CounterService;
-import run.halo.app.metrics.MeterUtils;
 import run.halo.app.plugin.extensionpoint.ExtensionGetter;
 import run.halo.app.theme.ReactiveSinglePageContentHandler;
 import run.halo.app.theme.ReactiveSinglePageContentHandler.SinglePageContentContext;
@@ -101,6 +114,40 @@ public class SinglePageConversionServiceImpl implements SinglePageConversionServ
             .flatMap(this::populateStats)
             .flatMap(this::populateContributors);
     }
+
+    @Override
+    public Mono<ListResult<ListedSinglePageVo>> listBy(ListOptions listOptions,
+        PageRequest pageRequest) {
+        // rewrite list options
+        var rewroteListOptions = ListOptions.builder(listOptions)
+            .andQuery(notDeleting())
+            .andQuery(equal("spec.deleted", Boolean.FALSE.toString()))
+            .andQuery(equal("spec.visible", PUBLIC.name()))
+            .labelSelector()
+            .eq(PUBLISHED_LABEL, Boolean.TRUE.toString())
+            .end()
+            .build();
+
+        // rewrite sort
+        var rewroteSort = pageRequest.getSort()
+            .and(Sort.by(
+                desc("spec.pinned"),
+                asc("spec.priority")
+            ));
+
+        var rewrotePageRequest =
+            PageRequestImpl.of(pageRequest.getPageNumber(), pageRequest.getPageSize(), rewroteSort);
+
+        return client.listBy(SinglePage.class, rewroteListOptions, rewrotePageRequest)
+            .flatMap(list -> Flux.fromStream(list.get())
+                .flatMapSequential(this::convertToListedVo)
+                .collectList()
+                .map(pageVos ->
+                    new ListResult<>(list.getPage(), list.getSize(), list.getTotal(), pageVos)
+                )
+            );
+    }
+
 
     Mono<SinglePageVo> convert(SinglePage singlePage, String snapshotName) {
         Assert.notNull(singlePage, "Single page must not be null");

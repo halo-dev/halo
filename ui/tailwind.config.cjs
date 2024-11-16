@@ -37,21 +37,6 @@ module.exports = {
           },
         },
       },
-      themes: [
-        {
-          name: "theme-dark",
-          extend: {
-            colors: {
-              primary: "black",
-              secondary: "#0E1731",
-            },
-            borderRadius: {
-              base: "2px",
-            },
-          },
-        },
-      ],
     }),
   ],
-  safelist: ["theme-dark"],
 };

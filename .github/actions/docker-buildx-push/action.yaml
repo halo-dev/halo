@@ -14,6 +14,14 @@ inputs:
     description: Token for the DockerHub account
     required: false
     default: ""
+  f2c-registry-user:
+    description: "User name of Fit2Cloud Docker Registry."
+    required: false
+    default: ""
+  f2c-registry-token:
+    description: "Token of Fit2Cloud Docker Registry."
+    required: false
+    default: ""
   push:
     description: Should push the docker image or not.
     required: false
@@ -37,6 +45,7 @@ runs:
         images: |
           ghcr.io/${{ github.repository_owner }}/${{ inputs.image-name }}
           halohub/${{ inputs.image-name }}
+          registry.fit2cloud.com/halo/${{ inputs.image-name }}
         tags: |
           type=schedule,pattern=nightly-{{date 'YYYYMMDD'}},enabled=${{ github.event_name == 'schedule' }}
           type=ref,event=branch,enabled=${{ github.event_name == 'push' }}
@@ -64,6 +73,13 @@ runs:
       with:
         username: ${{ inputs.dockerhub-user }}
         password: ${{ inputs.dockerhub-token }}
+    - name: Login to Fit2Cloud Docker Registry
+      if: inputs.f2c-registry-token != '' && github.event_name != 'pull_request'
+      uses: docker/login-action@v3
+      with:
+        registry: registry.fit2cloud.com
+        username: ${{ inputs.f2c-registry-user }}
+        password: ${{ inputs.f2c-registry-token }}
     - name: Build and push
       uses: docker/build-push-action@v5
       with:

@@ -24,10 +24,12 @@ import org.springframework.util.DigestUtils;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import run.halo.app.content.comment.OwnerInfo;
+import run.halo.app.core.counter.CounterService;
+import run.halo.app.core.counter.MeterUtils;
 import run.halo.app.core.extension.User;
 import run.halo.app.core.extension.content.Comment;
 import run.halo.app.core.extension.content.Reply;
-import run.halo.app.core.extension.service.UserService;
+import run.halo.app.core.user.service.UserService;
 import run.halo.app.extension.AbstractExtension;
 import run.halo.app.extension.ListOptions;
 import run.halo.app.extension.ListResult;
@@ -38,8 +40,6 @@ import run.halo.app.extension.Ref;
 import run.halo.app.extension.index.query.Query;
 import run.halo.app.extension.router.selector.FieldSelector;
 import run.halo.app.infra.AnonymousUserConst;
-import run.halo.app.metrics.CounterService;
-import run.halo.app.metrics.MeterUtils;
 import run.halo.app.theme.finders.CommentPublicQueryService;
 import run.halo.app.theme.finders.vo.CommentStatsVo;
 import run.halo.app.theme.finders.vo.CommentVo;
@@ -86,7 +86,7 @@ public class CommentPublicQueryServiceImpl implements CommentPublicQueryService 
                 return client.listBy(Comment.class, listOptions, pageRequest)
                     .flatMap(listResult -> Flux.fromStream(listResult.get())
                         .map(this::toCommentVo)
-                        .concatMap(Function.identity())
+                        .flatMapSequential(Function.identity())
                         .collectList()
                         .map(commentVos -> new ListResult<>(listResult.getPage(),
                             listResult.getSize(),
@@ -102,7 +102,7 @@ public class CommentPublicQueryServiceImpl implements CommentPublicQueryService 
     public Mono<ListResult<CommentWithReplyVo>> convertToWithReplyVo(ListResult<CommentVo> comments,
         int replySize) {
         return Flux.fromIterable(comments.getItems())
-            .concatMap(commentVo -> {
+            .flatMapSequential(commentVo -> {
                 var commentName = commentVo.getMetadata().getName();
                 return listReply(commentName, 1, replySize)
                     .map(replyList -> CommentWithReplyVo.from(commentVo)
@@ -135,7 +135,7 @@ public class CommentPublicQueryServiceImpl implements CommentPublicQueryService 
                     .orElse(PageRequestImpl.ofSize(0));
                 return client.listBy(Reply.class, listOptions, pageRequest)
                     .flatMap(list -> Flux.fromStream(list.get().map(this::toReplyVo))
-                        .concatMap(Function.identity())
+                        .flatMapSequential(Function.identity())
                         .collectList()
                         .map(replyVos -> new ListResult<>(list.getPage(), list.getSize(),
                             list.getTotal(),

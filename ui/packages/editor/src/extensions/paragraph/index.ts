@@ -102,7 +102,6 @@ const Paragraph = TiptapParagraph.extend<ExtensionOptions & ParagraphOptions>({
       Backspace: ({ editor }: { editor: CoreEditor }) => {
         const { state, view } = editor;
         const { selection } = state;
-
         if (isListActive(editor) || !isActive(state, Paragraph.name)) {
           return false;
         }
@@ -118,7 +117,6 @@ const Paragraph = TiptapParagraph.extend<ExtensionOptions & ParagraphOptions>({
         }
 
         const beforePos = $from.before($from.depth);
-
         if (isEmpty($from.parent)) {
           return deleteCurrentNodeAndSetSelection(
             $from,

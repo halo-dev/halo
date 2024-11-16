@@ -26,9 +26,9 @@ public class DefaultSystemVersionSupplier implements SystemVersionSupplier {
     public Version get() {
         var properties = buildProperties.getIfUnique();
         if (properties == null) {
-            return Version.valueOf(DEFAULT_VERSION);
+            return Version.parse(DEFAULT_VERSION);
         }
         var projectVersion = Objects.toString(properties.getVersion(), DEFAULT_VERSION);
-        return Version.valueOf(projectVersion);
+        return Version.parse(projectVersion);
     }
 }

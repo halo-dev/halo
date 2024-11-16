@@ -29,6 +29,7 @@ import { useI18n } from "vue-i18n";
 import { useRouter } from "vue-router";
 import AuthorField from "./entity-fields/AuthorField.vue";
 import LogoField from "./entity-fields/LogoField.vue";
+import ReloadField from "./entity-fields/ReloadField.vue";
 import SwitchField from "./entity-fields/SwitchField.vue";
 
 const { currentUserHasPermission } = usePermission();
@@ -217,6 +218,14 @@ const { startFields, endFields } = useEntityFieldItemExtensionPoint<Plugin>(
         component: markRaw(VEntityField),
         props: {
           description: props.plugin.spec.version,
+        },
+      },
+      {
+        position: "end",
+        priority: 41,
+        component: markRaw(ReloadField),
+        props: {
+          plugin: props.plugin,
         },
       },
       {

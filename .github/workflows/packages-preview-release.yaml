@@ -1,0 +1,28 @@
+name: "Packages preview release"
+on:
+  push:
+    paths:
+      - "ui/packages/**"
+    branches:
+      - main
+  pull_request:
+    paths:
+      - "ui/packages/**"
+    branches:
+      - main
+jobs:
+  packages-preview-release:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Setup Environment
+        uses: ./.github/actions/setup-env
+
+      - name: Install Dependencies
+        run: ./gradlew pnpmInstall
+
+      - name: Build Packages
+        run: cd ui && pnpm build:packages
+
+      - name: Release
+        run: cd ui && pnpx pkg-pr-new publish --compact --pnpm './packages/*'

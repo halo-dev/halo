@@ -2,7 +2,7 @@
   "openapi": "3.0.1",
   "info": {
     "title": "Halo",
-    "version": "2.19.0-SNAPSHOT"
+    "version": "2.20.9-SNAPSHOT"
   },
   "servers": [
     {
@@ -106,6 +106,36 @@
               "*/*": {
                 "schema": {
                   "$ref": "#/components/schemas/AttachmentList"
+                }
+              }
+            },
+            "description": "default response"
+          }
+        },
+        "tags": [
+          "AttachmentV1alpha1Console"
+        ]
+      }
+    },
+    "/apis/api.console.halo.run/v1alpha1/attachments/-/upload-from-url": {
+      "post": {
+        "operationId": "ExternalTransferAttachment",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UploadFromUrlRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "default": {
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/Attachment"
                 }
               }
             },
@@ -488,30 +518,6 @@
         ]
       }
     },
-    "/apis/api.console.halo.run/v1alpha1/plugin-presets": {
-      "get": {
-        "description": "List all plugin presets in the system.",
-        "operationId": "ListPluginPresets",
-        "responses": {
-          "default": {
-            "content": {
-              "*/*": {
-                "schema": {
-                  "type": "array",
-                  "items": {
-                    "$ref": "#/components/schemas/Plugin"
-                  }
-                }
-              }
-            },
-            "description": "default response"
-          }
-        },
-        "tags": [
-          "PluginV1alpha1Console"
-        ]
-      }
-    },
     "/apis/api.console.halo.run/v1alpha1/plugins": {
       "get": {
         "description": "List plugins using query criteria and sort params",
@@ -708,7 +714,7 @@
     },
     "/apis/api.console.halo.run/v1alpha1/plugins/{name}/config": {
       "get": {
-        "description": "Fetch configMap of plugin by configured configMapName.",
+        "description": "Fetch configMap of plugin by configured configMapName. it is deprecated since 2.20.0",
         "operationId": "fetchPluginConfig",
         "parameters": [
           {
@@ -737,7 +743,8 @@
         ]
       },
       "put": {
-        "description": "Update the configMap of plugin setting.",
+        "deprecated": true,
+        "description": "Update the configMap of plugin setting, it is deprecated since 2.20.0",
         "operationId": "updatePluginConfig",
         "parameters": [
           {
@@ -769,6 +776,70 @@
               }
             },
             "description": "default response"
+          }
+        },
+        "tags": [
+          "PluginV1alpha1Console"
+        ]
+      }
+    },
+    "/apis/api.console.halo.run/v1alpha1/plugins/{name}/json-config": {
+      "get": {
+        "description": "Fetch converted json config of plugin by configured configMapName.",
+        "operationId": "fetchPluginJsonConfig",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "name",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "default": {
+            "content": {
+              "*/*": {
+                "schema": {
+                  "type": "object"
+                }
+              }
+            },
+            "description": "default response"
+          }
+        },
+        "tags": [
+          "PluginV1alpha1Console"
+        ]
+      },
+      "put": {
+        "description": "Update the config of plugin setting.",
+        "operationId": "updatePluginJsonConfig",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "name",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "204": {
+            "content": {},
+            "description": "No Content"
           }
         },
         "tags": [
@@ -2081,38 +2152,6 @@
         ]
       }
     },
-    "/apis/api.console.halo.run/v1alpha1/system/initialize": {
-      "post": {
-        "description": "Initialize system",
-        "operationId": "initialize",
-        "requestBody": {
-          "content": {
-            "*/*": {
-              "schema": {
-                "$ref": "#/components/schemas/SystemInitializationRequest"
-              }
-            }
-          }
-        },
-        "responses": {
-          "201": {
-            "description": "System initialization successfully.",
-            "headers": {
-              "Location": {
-                "description": "Redirect URL.",
-                "schema": {
-                  "type": "string"
-                },
-                "style": "simple"
-              }
-            }
-          }
-        },
-        "tags": [
-          "SystemV1alpha1Console"
-        ]
-      }
-    },
     "/apis/api.console.halo.run/v1alpha1/tags": {
       "get": {
         "description": "List Post Tags.",
@@ -2382,7 +2421,8 @@
     },
     "/apis/api.console.halo.run/v1alpha1/themes/{name}/config": {
       "get": {
-        "description": "Fetch configMap of theme by configured configMapName.",
+        "deprecated": true,
+        "description": "Fetch configMap of theme by configured configMapName. It is deprecated.",
         "operationId": "fetchThemeConfig",
         "parameters": [
           {
@@ -2411,7 +2451,8 @@
         ]
       },
       "put": {
-        "description": "Update the configMap of theme setting.",
+        "deprecated": true,
+        "description": "Update the configMap of theme setting. It is deprecated.",
         "operationId": "updateThemeConfig",
         "parameters": [
           {
@@ -2466,6 +2507,70 @@
         ],
         "responses": {
           "204": {
+            "description": "No Content"
+          }
+        },
+        "tags": [
+          "ThemeV1alpha1Console"
+        ]
+      }
+    },
+    "/apis/api.console.halo.run/v1alpha1/themes/{name}/json-config": {
+      "get": {
+        "description": "Fetch converted json config of theme by configured configMapName.",
+        "operationId": "fetchThemeJsonConfig",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "name",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "default": {
+            "content": {
+              "*/*": {
+                "schema": {
+                  "type": "object"
+                }
+              }
+            },
+            "description": "default response"
+          }
+        },
+        "tags": [
+          "ThemeV1alpha1Console"
+        ]
+      },
+      "put": {
+        "description": "Update the configMap of theme setting.",
+        "operationId": "updateThemeJsonConfig",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "name",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "204": {
+            "content": {},
             "description": "No Content"
           }
         },
@@ -3106,6 +3211,145 @@
         ]
       }
     },
+    "/apis/console.api.halo.run/v1alpha1/systemconfigs/{group}": {
+      "get": {
+        "description": "Get system config by group",
+        "operationId": "getSystemConfigByGroup",
+        "parameters": [
+          {
+            "description": "Group of the system config",
+            "in": "path",
+            "name": "group",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "default": {
+            "content": {
+              "*/*": {
+                "schema": {
+                  "type": "object"
+                }
+              },
+              "application/json": {}
+            },
+            "description": "default response"
+          }
+        },
+        "tags": [
+          "SystemConfigV1alpha1Console"
+        ]
+      },
+      "put": {
+        "description": "Update system config by group",
+        "operationId": "updateSystemConfigByGroup",
+        "parameters": [
+          {
+            "description": "Group of the system config",
+            "in": "path",
+            "name": "group",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "*/*": {
+              "schema": {
+                "type": "object"
+              }
+            }
+          }
+        },
+        "responses": {
+          "204 NO_CONTENT": {
+            "content": {},
+            "description": "default response"
+          }
+        },
+        "tags": [
+          "SystemConfigV1alpha1Console"
+        ]
+      }
+    },
+    "/apis/console.api.migration.halo.run/v1alpha1/backup-files": {
+      "get": {
+        "description": "Get backup files from backup root.",
+        "operationId": "getBackupFiles",
+        "responses": {
+          "default": {
+            "content": {
+              "*/*": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/BackupFile"
+                  }
+                }
+              }
+            },
+            "description": "default response"
+          }
+        },
+        "tags": [
+          "MigrationV1alpha1Console"
+        ]
+      }
+    },
+    "/apis/console.api.migration.halo.run/v1alpha1/backups/{name}/files/{filename}": {
+      "get": {
+        "operationId": "DownloadBackups",
+        "parameters": [
+          {
+            "description": "Backup name.",
+            "in": "path",
+            "name": "name",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "description": "Backup filename.",
+            "in": "path",
+            "name": "filename",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {},
+        "tags": [
+          "MigrationV1alpha1Console"
+        ]
+      }
+    },
+    "/apis/console.api.migration.halo.run/v1alpha1/restorations": {
+      "post": {
+        "description": "Restore backup by uploading file or providing download link or backup name.",
+        "operationId": "RestoreBackup",
+        "requestBody": {
+          "content": {
+            "multipart/form-data": {
+              "schema": {
+                "$ref": "#/components/schemas/RestoreRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {},
+        "tags": [
+          "MigrationV1alpha1Console"
+        ]
+      }
+    },
     "/apis/console.api.notification.halo.run/v1alpha1/notifiers/default-email-notifier/verify-connection": {
       "post": {
         "description": "Verify email sender config.",
@@ -3290,6 +3534,12 @@
           "permalink": {
             "type": "string",
             "description": "Permalink of attachment.\nIf it is in local storage, the public URL will be set.\nIf it is in s3 storage, the Object URL will be set.\n"
+          },
+          "thumbnails": {
+            "type": "object",
+            "additionalProperties": {
+              "type": "string"
+            }
           }
         }
       },
@@ -3318,11 +3568,19 @@
       },
       "AuthProviderSpec": {
         "required": [
+          "authType",
           "authenticationUrl",
           "displayName"
         ],
         "type": "object",
         "properties": {
+          "authType": {
+            "type": "string",
+            "enum": [
+              "FORM",
+              "OAUTH2"
+            ]
+          },
           "authenticationUrl": {
             "type": "string",
             "description": "Authentication url of the auth provider"
@@ -3346,9 +3604,11 @@
           "logo": {
             "type": "string"
           },
-          "priority": {
-            "type": "integer",
-            "format": "int32"
+          "method": {
+            "type": "string"
+          },
+          "rememberMeSupport": {
+            "type": "boolean"
           },
           "settingRef": {
             "$ref": "#/components/schemas/SettingRef"
@@ -3373,6 +3633,22 @@
           },
           "website": {
             "type": "string"
+          }
+        }
+      },
+      "BackupFile": {
+        "type": "object",
+        "properties": {
+          "filename": {
+            "type": "string"
+          },
+          "lastModifiedTime": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "size": {
+            "type": "integer",
+            "format": "int64"
           }
         }
       },
@@ -3479,7 +3755,7 @@
             "description": "Old password."
           },
           "password": {
-            "minLength": 6,
+            "minLength": 5,
             "type": "string",
             "description": "New password."
           }
@@ -3492,7 +3768,7 @@
         "type": "object",
         "properties": {
           "password": {
-            "minLength": 6,
+            "minLength": 5,
             "type": "string",
             "description": "New password."
           }
@@ -4156,6 +4432,13 @@
         ],
         "type": "object",
         "properties": {
+          "authType": {
+            "type": "string",
+            "enum": [
+              "FORM",
+              "OAUTH2"
+            ]
+          },
           "authenticationUrl": {
             "type": "string"
           },
@@ -4182,6 +4465,10 @@
           },
           "name": {
             "type": "string"
+          },
+          "priority": {
+            "type": "integer",
+            "format": "int32"
           },
           "privileged": {
             "type": "boolean"
@@ -5151,9 +5438,6 @@
         }
       },
       "PostStatus": {
-        "required": [
-          "phase"
-        ],
         "type": "object",
         "properties": {
           "commentsCount": {
@@ -5402,6 +5686,27 @@
           "observedVersion": {
             "type": "integer",
             "format": "int64"
+          }
+        }
+      },
+      "RestoreRequest": {
+        "type": "object",
+        "properties": {
+          "backupName": {
+            "type": "string",
+            "description": "Backup metadata name."
+          },
+          "downloadUrl": {
+            "type": "string",
+            "description": "Remote backup HTTP URL."
+          },
+          "file": {
+            "type": "string",
+            "format": "binary"
+          },
+          "filename": {
+            "type": "string",
+            "description": "Filename of backup file in backups root."
           }
         }
       },
@@ -5662,9 +5967,6 @@
         }
       },
       "SinglePageStatus": {
-        "required": [
-          "phase"
-        ],
         "type": "object",
         "properties": {
           "commentsCount": {
@@ -5731,29 +6033,6 @@
           "visit": {
             "type": "integer",
             "format": "int32"
-          }
-        }
-      },
-      "SystemInitializationRequest": {
-        "required": [
-          "password",
-          "username"
-        ],
-        "type": "object",
-        "properties": {
-          "email": {
-            "type": "string"
-          },
-          "password": {
-            "minLength": 3,
-            "type": "string"
-          },
-          "siteTitle": {
-            "type": "string"
-          },
-          "username": {
-            "minLength": 1,
-            "type": "string"
           }
         }
       },
@@ -6136,6 +6415,28 @@
           }
         }
       },
+      "UploadFromUrlRequest": {
+        "required": [
+          "policyName",
+          "url"
+        ],
+        "type": "object",
+        "properties": {
+          "filename": {
+            "type": "string"
+          },
+          "groupName": {
+            "type": "string"
+          },
+          "policyName": {
+            "type": "string"
+          },
+          "url": {
+            "type": "string",
+            "format": "url"
+          }
+        }
+      },
       "User": {
         "required": [
           "apiVersion",
@@ -6236,14 +6537,12 @@
             }
           },
           "roles": {
-            "uniqueItems": true,
             "type": "array",
             "items": {
               "$ref": "#/components/schemas/Role"
             }
           },
           "uiPermissions": {
-            "uniqueItems": true,
             "type": "array",
             "items": {
               "type": "string"

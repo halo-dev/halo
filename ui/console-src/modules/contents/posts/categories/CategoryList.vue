@@ -40,9 +40,20 @@ const handleUpdateInBatch = useDebounceFn(async () => {
   try {
     batchUpdating.value = true;
     const promises = categoriesToUpdate.map((category) =>
-      coreApiClient.content.category.updateCategory({
+      coreApiClient.content.category.patchCategory({
         name: category.metadata.name,
-        category: category,
+        jsonPatchInner: [
+          {
+            op: "add",
+            path: "/spec/children",
+            value: category.spec.children || [],
+          },
+          {
+            op: "add",
+            path: "/spec/priority",
+            value: category.spec.priority || 0,
+          },
+        ],
       })
     );
     await Promise.all(promises);
@@ -106,7 +117,7 @@ const handleUpdateInBatch = useDebounceFn(async () => {
               </VButton>
               <VButton
                 v-permission="['system:posts:manage']"
-                type="primary"
+                type="secondary"
                 @click="creationModal = true"
               >
                 <template #icon>

@@ -1,5 +1,6 @@
 <script lang="ts" setup>
 import SubmitButton from "@/components/button/SubmitButton.vue";
+import { PASSWORD_REGEX } from "@/constants/regex";
 import { setFocus } from "@/formkit/utils/focus";
 import { consoleApiClient } from "@halo-dev/api-client";
 import { VButton, VModal, VSpace } from "@halo-dev/components";
@@ -56,6 +57,7 @@ const handleChangePassword = async () => {
     :title="$t('core.uc_profile.change_password_modal.title')"
     @close="emit('close')"
   >
+    <!-- @vue-ignore -->
     <FormKit
       id="password-form"
       v-model="formState"
@@ -80,9 +82,13 @@ const handleChangePassword = async () => {
         "
         name="password"
         type="password"
-        validation="required:trim|length:5,100|matches:/^\S.*\S$/"
+        :validation="[
+          ['required'],
+          ['length', 5, 257],
+          ['matches', PASSWORD_REGEX],
+        ]"
         :validation-messages="{
-          matches: $t('core.formkit.validation.trim'),
+          matches: $t('core.formkit.validation.password'),
         }"
       ></FormKit>
       <FormKit
@@ -93,10 +99,7 @@ const handleChangePassword = async () => {
         "
         name="password_confirm"
         type="password"
-        validation="confirm|required:trim|length:5,100|matches:/^\S.*\S$/"
-        :validation-messages="{
-          matches: $t('core.formkit.validation.trim'),
-        }"
+        validation="confirm|required"
       ></FormKit>
     </FormKit>
     <template #footer>

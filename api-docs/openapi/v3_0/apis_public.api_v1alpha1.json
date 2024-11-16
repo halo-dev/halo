@@ -2,7 +2,7 @@
   "openapi": "3.0.1",
   "info": {
     "title": "Halo",
-    "version": "2.19.0-SNAPSHOT"
+    "version": "2.20.9-SNAPSHOT"
   },
   "servers": [
     {
@@ -17,6 +17,628 @@
     }
   ],
   "paths": {
+    "/apis/api.content.halo.run/v1alpha1/categories": {
+      "get": {
+        "description": "Lists categories.",
+        "operationId": "queryCategories",
+        "parameters": [
+          {
+            "description": "Page number. Default is 0.",
+            "in": "query",
+            "name": "page",
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          },
+          {
+            "description": "Size number. Default is 0.",
+            "in": "query",
+            "name": "size",
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          },
+          {
+            "description": "Label selector. e.g.: hidden!\u003dtrue",
+            "in": "query",
+            "name": "labelSelector",
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            }
+          },
+          {
+            "description": "Field selector. e.g.: metadata.name\u003d\u003dhalo",
+            "in": "query",
+            "name": "fieldSelector",
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            }
+          },
+          {
+            "description": "Sorting criteria in the format: property,(asc|desc). Default sort order is ascending. Multiple sort criteria are supported.",
+            "in": "query",
+            "name": "sort",
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            }
+          }
+        ],
+        "responses": {
+          "default": {
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/CategoryVoList"
+                }
+              }
+            },
+            "description": "default response"
+          }
+        },
+        "tags": [
+          "CategoryV1alpha1Public"
+        ]
+      }
+    },
+    "/apis/api.content.halo.run/v1alpha1/categories/{name}": {
+      "get": {
+        "description": "Gets category by name.",
+        "operationId": "queryCategoryByName",
+        "parameters": [
+          {
+            "description": "Category name",
+            "in": "path",
+            "name": "name",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "default": {
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/CategoryVo"
+                }
+              }
+            },
+            "description": "default response"
+          }
+        },
+        "tags": [
+          "CategoryV1alpha1Public"
+        ]
+      }
+    },
+    "/apis/api.content.halo.run/v1alpha1/categories/{name}/posts": {
+      "get": {
+        "description": "Lists posts by category name.",
+        "operationId": "queryPostsByCategoryName",
+        "parameters": [
+          {
+            "description": "Category name",
+            "in": "path",
+            "name": "name",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "description": "Page number. Default is 0.",
+            "in": "query",
+            "name": "page",
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          },
+          {
+            "description": "Size number. Default is 0.",
+            "in": "query",
+            "name": "size",
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          },
+          {
+            "description": "Label selector. e.g.: hidden!\u003dtrue",
+            "in": "query",
+            "name": "labelSelector",
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            }
+          },
+          {
+            "description": "Field selector. e.g.: metadata.name\u003d\u003dhalo",
+            "in": "query",
+            "name": "fieldSelector",
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            }
+          },
+          {
+            "description": "Sorting criteria in the format: property,(asc|desc). Default sort order is ascending. Multiple sort criteria are supported.",
+            "in": "query",
+            "name": "sort",
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            }
+          }
+        ],
+        "responses": {
+          "default": {
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ListedPostVoList"
+                }
+              }
+            },
+            "description": "default response"
+          }
+        },
+        "tags": [
+          "CategoryV1alpha1Public"
+        ]
+      }
+    },
+    "/apis/api.content.halo.run/v1alpha1/posts": {
+      "get": {
+        "description": "Lists posts.",
+        "operationId": "queryPosts",
+        "parameters": [
+          {
+            "description": "Page number. Default is 0.",
+            "in": "query",
+            "name": "page",
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          },
+          {
+            "description": "Size number. Default is 0.",
+            "in": "query",
+            "name": "size",
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          },
+          {
+            "description": "Label selector. e.g.: hidden!\u003dtrue",
+            "in": "query",
+            "name": "labelSelector",
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            }
+          },
+          {
+            "description": "Field selector. e.g.: metadata.name\u003d\u003dhalo",
+            "in": "query",
+            "name": "fieldSelector",
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            }
+          },
+          {
+            "description": "Sorting criteria in the format: property,(asc|desc). Default sort order is ascending. Multiple sort criteria are supported.",
+            "in": "query",
+            "name": "sort",
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            }
+          }
+        ],
+        "responses": {
+          "default": {
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ListedPostVoList"
+                }
+              }
+            },
+            "description": "default response"
+          }
+        },
+        "tags": [
+          "PostV1alpha1Public"
+        ]
+      }
+    },
+    "/apis/api.content.halo.run/v1alpha1/posts/{name}": {
+      "get": {
+        "description": "Gets a post by name.",
+        "operationId": "queryPostByName",
+        "parameters": [
+          {
+            "description": "Post name",
+            "in": "path",
+            "name": "name",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "default": {
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/PostVo"
+                }
+              }
+            },
+            "description": "default response"
+          }
+        },
+        "tags": [
+          "PostV1alpha1Public"
+        ]
+      }
+    },
+    "/apis/api.content.halo.run/v1alpha1/posts/{name}/navigation": {
+      "get": {
+        "description": "Gets a post navigation by name.",
+        "operationId": "queryPostNavigationByName",
+        "parameters": [
+          {
+            "description": "Post name",
+            "in": "path",
+            "name": "name",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "default": {
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/NavigationPostVo"
+                }
+              }
+            },
+            "description": "default response"
+          }
+        },
+        "tags": [
+          "PostV1alpha1Public"
+        ]
+      }
+    },
+    "/apis/api.content.halo.run/v1alpha1/singlepages": {
+      "get": {
+        "description": "Lists single pages",
+        "operationId": "querySinglePages",
+        "parameters": [
+          {
+            "description": "Page number. Default is 0.",
+            "in": "query",
+            "name": "page",
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          },
+          {
+            "description": "Size number. Default is 0.",
+            "in": "query",
+            "name": "size",
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          },
+          {
+            "description": "Label selector. e.g.: hidden!\u003dtrue",
+            "in": "query",
+            "name": "labelSelector",
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            }
+          },
+          {
+            "description": "Field selector. e.g.: metadata.name\u003d\u003dhalo",
+            "in": "query",
+            "name": "fieldSelector",
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            }
+          },
+          {
+            "description": "Sorting criteria in the format: property,(asc|desc). Default sort order is ascending. Multiple sort criteria are supported.",
+            "in": "query",
+            "name": "sort",
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            }
+          }
+        ],
+        "responses": {
+          "default": {
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ListedSinglePageVoList"
+                }
+              }
+            },
+            "description": "default response"
+          }
+        },
+        "tags": [
+          "SinglePageV1alpha1Public"
+        ]
+      }
+    },
+    "/apis/api.content.halo.run/v1alpha1/singlepages/{name}": {
+      "get": {
+        "description": "Gets single page by name",
+        "operationId": "querySinglePageByName",
+        "parameters": [
+          {
+            "description": "SinglePage name",
+            "in": "path",
+            "name": "name",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "default": {
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/SinglePageVo"
+                }
+              }
+            },
+            "description": "default response"
+          }
+        },
+        "tags": [
+          "SinglePageV1alpha1Public"
+        ]
+      }
+    },
+    "/apis/api.content.halo.run/v1alpha1/tags": {
+      "get": {
+        "description": "Lists tags",
+        "operationId": "queryTags",
+        "parameters": [
+          {
+            "description": "Page number. Default is 0.",
+            "in": "query",
+            "name": "page",
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          },
+          {
+            "description": "Size number. Default is 0.",
+            "in": "query",
+            "name": "size",
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          },
+          {
+            "description": "Label selector. e.g.: hidden!\u003dtrue",
+            "in": "query",
+            "name": "labelSelector",
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            }
+          },
+          {
+            "description": "Field selector. e.g.: metadata.name\u003d\u003dhalo",
+            "in": "query",
+            "name": "fieldSelector",
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            }
+          },
+          {
+            "description": "Sorting criteria in the format: property,(asc|desc). Default sort order is ascending. Multiple sort criteria are supported.",
+            "in": "query",
+            "name": "sort",
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            }
+          }
+        ],
+        "responses": {
+          "default": {
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/TagVoList"
+                }
+              }
+            },
+            "description": "default response"
+          }
+        },
+        "tags": [
+          "TagV1alpha1Public"
+        ]
+      }
+    },
+    "/apis/api.content.halo.run/v1alpha1/tags/{name}": {
+      "get": {
+        "description": "Gets tag by name",
+        "operationId": "queryTagByName",
+        "parameters": [
+          {
+            "description": "Tag name",
+            "in": "path",
+            "name": "name",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "default": {
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/TagVo"
+                }
+              }
+            },
+            "description": "default response"
+          }
+        },
+        "tags": [
+          "TagV1alpha1Public"
+        ]
+      }
+    },
+    "/apis/api.content.halo.run/v1alpha1/tags/{name}/posts": {
+      "get": {
+        "description": "Lists posts by tag name",
+        "operationId": "queryPostsByTagName",
+        "parameters": [
+          {
+            "description": "Tag name",
+            "in": "path",
+            "name": "name",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "description": "Page number. Default is 0.",
+            "in": "query",
+            "name": "page",
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          },
+          {
+            "description": "Size number. Default is 0.",
+            "in": "query",
+            "name": "size",
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          },
+          {
+            "description": "Label selector. e.g.: hidden!\u003dtrue",
+            "in": "query",
+            "name": "labelSelector",
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            }
+          },
+          {
+            "description": "Field selector. e.g.: metadata.name\u003d\u003dhalo",
+            "in": "query",
+            "name": "fieldSelector",
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            }
+          },
+          {
+            "description": "Sorting criteria in the format: property,(asc|desc). Default sort order is ascending. Multiple sort criteria are supported.",
+            "in": "query",
+            "name": "sort",
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            }
+          }
+        ],
+        "responses": {
+          "default": {
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ListedPostVo"
+                }
+              }
+            },
+            "description": "default response"
+          }
+        },
+        "tags": [
+          "TagV1alpha1Public"
+        ]
+      }
+    },
     "/apis/api.halo.run/v1alpha1/comments": {
       "get": {
         "description": "List comments.",
@@ -507,76 +1129,36 @@
         ]
       }
     },
-    "/apis/api.halo.run/v1alpha1/users/-/send-password-reset-email": {
-      "post": {
-        "description": "Send password reset email when forgot password",
-        "operationId": "SendPasswordResetEmail",
-        "requestBody": {
-          "content": {
-            "*/*": {
-              "schema": {
-                "$ref": "#/components/schemas/PasswordResetEmailRequest"
-              }
+    "/apis/api.notification.halo.run/v1alpha1/subscriptions/{name}/unsubscribe": {
+      "get": {
+        "description": "Unsubscribe a subscription",
+        "operationId": "Unsubscribe",
+        "parameters": [
+          {
+            "description": "Subscription name",
+            "in": "path",
+            "name": "name",
+            "required": true,
+            "schema": {
+              "type": "string"
             }
           },
-          "required": true
-        },
-        "responses": {
-          "204 NO_CONTENT": {
-            "content": {},
-            "description": "default response"
+          {
+            "description": "Unsubscribe token",
+            "in": "query",
+            "name": "token",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
           }
-        },
-        "tags": [
-          "UserV1alpha1Public"
-        ]
-      }
-    },
-    "/apis/api.halo.run/v1alpha1/users/-/send-register-verify-email": {
-      "post": {
-        "description": "Send registration verification email, which can be called when mustVerifyEmailOnRegistration in user settings is true",
-        "operationId": "SendRegisterVerifyEmail",
-        "requestBody": {
-          "content": {
-            "*/*": {
-              "schema": {
-                "$ref": "#/components/schemas/RegisterVerifyEmailRequest"
-              }
-            }
-          },
-          "required": true
-        },
-        "responses": {
-          "204 NO_CONTENT": {
-            "content": {},
-            "description": "default response"
-          }
-        },
-        "tags": [
-          "UserV1alpha1Public"
-        ]
-      }
-    },
-    "/apis/api.halo.run/v1alpha1/users/-/signup": {
-      "post": {
-        "description": "Sign up a new user",
-        "operationId": "SignUp",
-        "requestBody": {
-          "content": {
-            "*/*": {
-              "schema": {
-                "$ref": "#/components/schemas/SignUpRequest"
-              }
-            }
-          },
-          "required": true
-        },
+        ],
         "responses": {
           "default": {
             "content": {
               "*/*": {
                 "schema": {
-                  "$ref": "#/components/schemas/User"
+                  "type": "string"
                 }
               }
             },
@@ -584,17 +1166,17 @@
           }
         },
         "tags": [
-          "UserV1alpha1Public"
+          "NotificationV1alpha1Public"
         ]
       }
     },
-    "/apis/api.halo.run/v1alpha1/users/{name}/reset-password": {
-      "put": {
-        "description": "Reset password by token",
-        "operationId": "ResetPasswordByToken",
+    "/apis/api.plugin.halo.run/v1alpha1/plugins/{name}/available": {
+      "get": {
+        "description": "Gets plugin available by name.",
+        "operationId": "queryPluginAvailableByName",
         "parameters": [
           {
-            "description": "The name of the user",
+            "description": "Plugin name",
             "in": "path",
             "name": "name",
             "required": true,
@@ -603,24 +1185,62 @@
             }
           }
         ],
-        "requestBody": {
-          "content": {
-            "*/*": {
-              "schema": {
-                "$ref": "#/components/schemas/ResetPasswordRequest"
-              }
-            }
-          },
-          "required": true
-        },
         "responses": {
-          "204 NO_CONTENT": {
-            "content": {},
+          "default": {
+            "content": {
+              "*/*": {
+                "schema": {
+                  "type": "boolean"
+                }
+              }
+            },
             "description": "default response"
           }
         },
         "tags": [
-          "UserV1alpha1Public"
+          "PluginV1alpha1Public"
+        ]
+      }
+    },
+    "/apis/api.storage.halo.run/v1alpha1/thumbnails/-/via-uri": {
+      "get": {
+        "description": "Get thumbnail by URI",
+        "operationId": "GetThumbnailByUri",
+        "parameters": [
+          {
+            "description": "The URI of the image",
+            "in": "query",
+            "name": "uri",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "description": "The size of the thumbnail,available values are s,m,l,xl",
+            "in": "query",
+            "name": "size",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "default": {
+            "content": {
+              "*/*": {
+                "schema": {
+                  "type": "string",
+                  "format": "binary"
+                }
+              }
+            },
+            "description": "default response"
+          }
+        },
+        "tags": [
+          "ThumbnailV1alpha1Public"
         ]
       }
     }
@@ -649,6 +1269,151 @@
           },
           "value": {
             "description": "Value can be any JSON value"
+          }
+        }
+      },
+      "CategorySpec": {
+        "required": [
+          "displayName",
+          "priority",
+          "slug"
+        ],
+        "type": "object",
+        "properties": {
+          "children": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "cover": {
+            "type": "string"
+          },
+          "description": {
+            "type": "string"
+          },
+          "displayName": {
+            "minLength": 1,
+            "type": "string"
+          },
+          "hideFromList": {
+            "type": "boolean"
+          },
+          "postTemplate": {
+            "maxLength": 255,
+            "type": "string"
+          },
+          "preventParentPostCascadeQuery": {
+            "type": "boolean"
+          },
+          "priority": {
+            "type": "integer",
+            "format": "int32",
+            "default": 0
+          },
+          "slug": {
+            "minLength": 1,
+            "type": "string"
+          },
+          "template": {
+            "maxLength": 255,
+            "type": "string"
+          }
+        }
+      },
+      "CategoryStatus": {
+        "type": "object",
+        "properties": {
+          "permalink": {
+            "type": "string"
+          },
+          "postCount": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "visiblePostCount": {
+            "type": "integer",
+            "format": "int32"
+          }
+        }
+      },
+      "CategoryVo": {
+        "required": [
+          "metadata"
+        ],
+        "type": "object",
+        "properties": {
+          "metadata": {
+            "$ref": "#/components/schemas/Metadata"
+          },
+          "postCount": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "spec": {
+            "$ref": "#/components/schemas/CategorySpec"
+          },
+          "status": {
+            "$ref": "#/components/schemas/CategoryStatus"
+          }
+        }
+      },
+      "CategoryVoList": {
+        "required": [
+          "first",
+          "hasNext",
+          "hasPrevious",
+          "items",
+          "last",
+          "page",
+          "size",
+          "total",
+          "totalPages"
+        ],
+        "type": "object",
+        "properties": {
+          "first": {
+            "type": "boolean",
+            "description": "Indicates whether current page is the first page."
+          },
+          "hasNext": {
+            "type": "boolean",
+            "description": "Indicates whether current page has previous page."
+          },
+          "hasPrevious": {
+            "type": "boolean",
+            "description": "Indicates whether current page has previous page."
+          },
+          "items": {
+            "type": "array",
+            "description": "A chunk of items.",
+            "items": {
+              "$ref": "#/components/schemas/CategoryVo"
+            }
+          },
+          "last": {
+            "type": "boolean",
+            "description": "Indicates whether current page is the last page."
+          },
+          "page": {
+            "type": "integer",
+            "description": "Page number, starts from 1. If not set or equal to 0, it means no pagination.",
+            "format": "int32"
+          },
+          "size": {
+            "type": "integer",
+            "description": "Size of each page. If not set or equal to 0, it means no pagination.",
+            "format": "int32"
+          },
+          "total": {
+            "type": "integer",
+            "description": "Total elements.",
+            "format": "int64"
+          },
+          "totalPages": {
+            "type": "integer",
+            "description": "Indicates total pages.",
+            "format": "int64"
           }
         }
       },
@@ -1030,6 +1795,79 @@
           }
         }
       },
+      "Condition": {
+        "required": [
+          "lastTransitionTime",
+          "status",
+          "type"
+        ],
+        "type": "object",
+        "properties": {
+          "lastTransitionTime": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "message": {
+            "maxLength": 32768,
+            "type": "string"
+          },
+          "reason": {
+            "maxLength": 1024,
+            "pattern": "^[A-Za-z]([A-Za-z0-9_,:]*[A-Za-z0-9_])?$",
+            "type": "string"
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "TRUE",
+              "FALSE",
+              "UNKNOWN"
+            ]
+          },
+          "type": {
+            "maxLength": 316,
+            "pattern": "^([a-z0-9]([-a-z0-9]*[a-z0-9])?(\\.[a-z0-9]([-a-z0-9]*[a-z0-9])?)*/)?(([A-Za-z0-9][-A-Za-z0-9_.]*)?[A-Za-z0-9])$",
+            "type": "string"
+          }
+        }
+      },
+      "ContentVo": {
+        "type": "object",
+        "properties": {
+          "content": {
+            "type": "string"
+          },
+          "raw": {
+            "type": "string"
+          }
+        }
+      },
+      "ContributorVo": {
+        "required": [
+          "metadata"
+        ],
+        "type": "object",
+        "properties": {
+          "avatar": {
+            "type": "string"
+          },
+          "bio": {
+            "type": "string"
+          },
+          "displayName": {
+            "type": "string"
+          },
+          "metadata": {
+            "$ref": "#/components/schemas/Metadata"
+          },
+          "name": {
+            "type": "string"
+          },
+          "permalink": {
+            "type": "string"
+          }
+        }
+      },
       "CopyOperation": {
         "required": [
           "op",
@@ -1080,6 +1918,21 @@
             "type": "string"
           },
           "screen": {
+            "type": "string"
+          }
+        }
+      },
+      "Excerpt": {
+        "required": [
+          "autoGenerate"
+        ],
+        "type": "object",
+        "properties": {
+          "autoGenerate": {
+            "type": "boolean",
+            "default": true
+          },
+          "raw": {
             "type": "string"
           }
         }
@@ -1244,30 +2097,192 @@
           }
         }
       },
-      "LoginHistory": {
+      "ListedPostVo": {
         "required": [
-          "loginAt",
-          "sourceIp",
-          "successful",
-          "userAgent"
+          "metadata"
         ],
         "type": "object",
         "properties": {
-          "loginAt": {
-            "type": "string",
-            "format": "date-time"
+          "categories": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/CategoryVo"
+            }
           },
-          "reason": {
-            "type": "string"
+          "contributors": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ContributorVo"
+            }
           },
-          "sourceIp": {
-            "type": "string"
+          "metadata": {
+            "$ref": "#/components/schemas/Metadata"
           },
-          "successful": {
-            "type": "boolean"
+          "owner": {
+            "$ref": "#/components/schemas/ContributorVo"
           },
-          "userAgent": {
-            "type": "string"
+          "spec": {
+            "$ref": "#/components/schemas/PostSpec"
+          },
+          "stats": {
+            "$ref": "#/components/schemas/StatsVo"
+          },
+          "status": {
+            "$ref": "#/components/schemas/PostStatus"
+          },
+          "tags": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/TagVo"
+            }
+          }
+        }
+      },
+      "ListedPostVoList": {
+        "required": [
+          "first",
+          "hasNext",
+          "hasPrevious",
+          "items",
+          "last",
+          "page",
+          "size",
+          "total",
+          "totalPages"
+        ],
+        "type": "object",
+        "properties": {
+          "first": {
+            "type": "boolean",
+            "description": "Indicates whether current page is the first page."
+          },
+          "hasNext": {
+            "type": "boolean",
+            "description": "Indicates whether current page has previous page."
+          },
+          "hasPrevious": {
+            "type": "boolean",
+            "description": "Indicates whether current page has previous page."
+          },
+          "items": {
+            "type": "array",
+            "description": "A chunk of items.",
+            "items": {
+              "$ref": "#/components/schemas/ListedPostVo"
+            }
+          },
+          "last": {
+            "type": "boolean",
+            "description": "Indicates whether current page is the last page."
+          },
+          "page": {
+            "type": "integer",
+            "description": "Page number, starts from 1. If not set or equal to 0, it means no pagination.",
+            "format": "int32"
+          },
+          "size": {
+            "type": "integer",
+            "description": "Size of each page. If not set or equal to 0, it means no pagination.",
+            "format": "int32"
+          },
+          "total": {
+            "type": "integer",
+            "description": "Total elements.",
+            "format": "int64"
+          },
+          "totalPages": {
+            "type": "integer",
+            "description": "Indicates total pages.",
+            "format": "int64"
+          }
+        }
+      },
+      "ListedSinglePageVo": {
+        "required": [
+          "metadata"
+        ],
+        "type": "object",
+        "properties": {
+          "contributors": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ContributorVo"
+            }
+          },
+          "metadata": {
+            "$ref": "#/components/schemas/Metadata"
+          },
+          "owner": {
+            "$ref": "#/components/schemas/ContributorVo"
+          },
+          "spec": {
+            "$ref": "#/components/schemas/SinglePageSpec"
+          },
+          "stats": {
+            "$ref": "#/components/schemas/StatsVo"
+          },
+          "status": {
+            "$ref": "#/components/schemas/SinglePageStatus"
+          }
+        },
+        "description": "A chunk of items."
+      },
+      "ListedSinglePageVoList": {
+        "required": [
+          "first",
+          "hasNext",
+          "hasPrevious",
+          "items",
+          "last",
+          "page",
+          "size",
+          "total",
+          "totalPages"
+        ],
+        "type": "object",
+        "properties": {
+          "first": {
+            "type": "boolean",
+            "description": "Indicates whether current page is the first page."
+          },
+          "hasNext": {
+            "type": "boolean",
+            "description": "Indicates whether current page has previous page."
+          },
+          "hasPrevious": {
+            "type": "boolean",
+            "description": "Indicates whether current page has previous page."
+          },
+          "items": {
+            "type": "array",
+            "description": "A chunk of items.",
+            "items": {
+              "$ref": "#/components/schemas/ListedSinglePageVo"
+            }
+          },
+          "last": {
+            "type": "boolean",
+            "description": "Indicates whether current page is the last page."
+          },
+          "page": {
+            "type": "integer",
+            "description": "Page number, starts from 1. If not set or equal to 0, it means no pagination.",
+            "format": "int32"
+          },
+          "size": {
+            "type": "integer",
+            "description": "Size of each page. If not set or equal to 0, it means no pagination.",
+            "format": "int32"
+          },
+          "total": {
+            "type": "integer",
+            "description": "Total elements.",
+            "format": "int64"
+          },
+          "totalPages": {
+            "type": "integer",
+            "description": "Indicates total pages.",
+            "format": "int64"
           }
         }
       },
@@ -1468,6 +2483,20 @@
           }
         }
       },
+      "NavigationPostVo": {
+        "type": "object",
+        "properties": {
+          "current": {
+            "$ref": "#/components/schemas/PostVo"
+          },
+          "next": {
+            "$ref": "#/components/schemas/PostVo"
+          },
+          "previous": {
+            "$ref": "#/components/schemas/PostVo"
+          }
+        }
+      },
       "OwnerInfo": {
         "type": "object",
         "properties": {
@@ -1488,18 +2517,196 @@
           }
         }
       },
-      "PasswordResetEmailRequest": {
+      "PostSpec": {
         "required": [
-          "email",
-          "username"
+          "allowComment",
+          "deleted",
+          "excerpt",
+          "pinned",
+          "priority",
+          "publish",
+          "slug",
+          "title",
+          "visible"
         ],
         "type": "object",
         "properties": {
-          "email": {
+          "allowComment": {
+            "type": "boolean",
+            "default": true
+          },
+          "baseSnapshot": {
             "type": "string"
           },
-          "username": {
+          "categories": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "cover": {
             "type": "string"
+          },
+          "deleted": {
+            "type": "boolean",
+            "default": false
+          },
+          "excerpt": {
+            "$ref": "#/components/schemas/Excerpt"
+          },
+          "headSnapshot": {
+            "type": "string"
+          },
+          "htmlMetas": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "additionalProperties": {
+                "type": "string"
+              }
+            }
+          },
+          "owner": {
+            "type": "string"
+          },
+          "pinned": {
+            "type": "boolean",
+            "default": false
+          },
+          "priority": {
+            "type": "integer",
+            "format": "int32",
+            "default": 0
+          },
+          "publish": {
+            "type": "boolean",
+            "default": false
+          },
+          "publishTime": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "releaseSnapshot": {
+            "type": "string"
+          },
+          "slug": {
+            "minLength": 1,
+            "type": "string"
+          },
+          "tags": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "template": {
+            "type": "string"
+          },
+          "title": {
+            "minLength": 1,
+            "type": "string"
+          },
+          "visible": {
+            "type": "string",
+            "default": "PUBLIC",
+            "enum": [
+              "PUBLIC",
+              "INTERNAL",
+              "PRIVATE"
+            ]
+          }
+        }
+      },
+      "PostStatus": {
+        "type": "object",
+        "properties": {
+          "commentsCount": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "conditions": {
+            "type": "array",
+            "properties": {
+              "empty": {
+                "type": "boolean"
+              }
+            },
+            "items": {
+              "$ref": "#/components/schemas/Condition"
+            }
+          },
+          "contributors": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "excerpt": {
+            "type": "string"
+          },
+          "hideFromList": {
+            "type": "boolean"
+          },
+          "inProgress": {
+            "type": "boolean"
+          },
+          "lastModifyTime": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "observedVersion": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "permalink": {
+            "type": "string"
+          },
+          "phase": {
+            "type": "string"
+          }
+        }
+      },
+      "PostVo": {
+        "required": [
+          "metadata"
+        ],
+        "type": "object",
+        "properties": {
+          "categories": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/CategoryVo"
+            }
+          },
+          "content": {
+            "$ref": "#/components/schemas/ContentVo"
+          },
+          "contributors": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ContributorVo"
+            }
+          },
+          "metadata": {
+            "$ref": "#/components/schemas/Metadata"
+          },
+          "owner": {
+            "$ref": "#/components/schemas/ContributorVo"
+          },
+          "spec": {
+            "$ref": "#/components/schemas/PostSpec"
+          },
+          "stats": {
+            "$ref": "#/components/schemas/StatsVo"
+          },
+          "status": {
+            "$ref": "#/components/schemas/PostStatus"
+          },
+          "tags": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/TagVo"
+            }
           }
         }
       },
@@ -1527,17 +2734,6 @@
           }
         },
         "description": "Extension reference object. The name is mandatory"
-      },
-      "RegisterVerifyEmailRequest": {
-        "required": [
-          "email"
-        ],
-        "type": "object",
-        "properties": {
-          "email": {
-            "type": "string"
-          }
-        }
       },
       "RemoveOperation": {
         "required": [
@@ -1800,22 +2996,6 @@
           }
         }
       },
-      "ResetPasswordRequest": {
-        "required": [
-          "newPassword",
-          "token"
-        ],
-        "type": "object",
-        "properties": {
-          "newPassword": {
-            "minLength": 6,
-            "type": "string"
-          },
-          "token": {
-            "type": "string"
-          }
-        }
-      },
       "SearchOption": {
         "required": [
           "keyword"
@@ -1904,24 +3084,172 @@
           }
         }
       },
-      "SignUpRequest": {
+      "SinglePageSpec": {
         "required": [
-          "password",
-          "user"
+          "allowComment",
+          "deleted",
+          "excerpt",
+          "pinned",
+          "priority",
+          "publish",
+          "slug",
+          "title",
+          "visible"
         ],
         "type": "object",
         "properties": {
-          "password": {
-            "minLength": 6,
+          "allowComment": {
+            "type": "boolean",
+            "default": true
+          },
+          "baseSnapshot": {
             "type": "string"
           },
-          "user": {
-            "$ref": "#/components/schemas/User"
-          },
-          "verifyCode": {
-            "maxLength": 6,
-            "minLength": 6,
+          "cover": {
             "type": "string"
+          },
+          "deleted": {
+            "type": "boolean",
+            "default": false
+          },
+          "excerpt": {
+            "$ref": "#/components/schemas/Excerpt"
+          },
+          "headSnapshot": {
+            "type": "string"
+          },
+          "htmlMetas": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "additionalProperties": {
+                "type": "string"
+              }
+            }
+          },
+          "owner": {
+            "type": "string"
+          },
+          "pinned": {
+            "type": "boolean",
+            "default": false
+          },
+          "priority": {
+            "type": "integer",
+            "format": "int32",
+            "default": 0
+          },
+          "publish": {
+            "type": "boolean",
+            "default": false
+          },
+          "publishTime": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "releaseSnapshot": {
+            "type": "string"
+          },
+          "slug": {
+            "minLength": 1,
+            "type": "string"
+          },
+          "template": {
+            "type": "string"
+          },
+          "title": {
+            "minLength": 1,
+            "type": "string"
+          },
+          "visible": {
+            "type": "string",
+            "default": "PUBLIC",
+            "enum": [
+              "PUBLIC",
+              "INTERNAL",
+              "PRIVATE"
+            ]
+          }
+        }
+      },
+      "SinglePageStatus": {
+        "type": "object",
+        "properties": {
+          "commentsCount": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "conditions": {
+            "type": "array",
+            "properties": {
+              "empty": {
+                "type": "boolean"
+              }
+            },
+            "items": {
+              "$ref": "#/components/schemas/Condition"
+            }
+          },
+          "contributors": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "excerpt": {
+            "type": "string"
+          },
+          "hideFromList": {
+            "type": "boolean"
+          },
+          "inProgress": {
+            "type": "boolean"
+          },
+          "lastModifyTime": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "observedVersion": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "permalink": {
+            "type": "string"
+          },
+          "phase": {
+            "type": "string"
+          }
+        }
+      },
+      "SinglePageVo": {
+        "required": [
+          "metadata"
+        ],
+        "type": "object",
+        "properties": {
+          "content": {
+            "$ref": "#/components/schemas/ContentVo"
+          },
+          "contributors": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ContributorVo"
+            }
+          },
+          "metadata": {
+            "$ref": "#/components/schemas/Metadata"
+          },
+          "owner": {
+            "$ref": "#/components/schemas/ContributorVo"
+          },
+          "spec": {
+            "$ref": "#/components/schemas/SinglePageSpec"
+          },
+          "stats": {
+            "$ref": "#/components/schemas/StatsVo"
+          },
+          "status": {
+            "$ref": "#/components/schemas/SinglePageStatus"
           }
         }
       },
@@ -1950,6 +3278,147 @@
           }
         }
       },
+      "StatsVo": {
+        "type": "object",
+        "properties": {
+          "comment": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "upvote": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "visit": {
+            "type": "integer",
+            "format": "int32"
+          }
+        }
+      },
+      "TagSpec": {
+        "required": [
+          "displayName",
+          "slug"
+        ],
+        "type": "object",
+        "properties": {
+          "color": {
+            "pattern": "^#([a-fA-F0-9]{6}|[a-fA-F0-9]{3})$",
+            "type": "string"
+          },
+          "cover": {
+            "type": "string"
+          },
+          "displayName": {
+            "minLength": 1,
+            "type": "string"
+          },
+          "slug": {
+            "minLength": 1,
+            "type": "string"
+          }
+        }
+      },
+      "TagStatus": {
+        "type": "object",
+        "properties": {
+          "observedVersion": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "permalink": {
+            "type": "string"
+          },
+          "postCount": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "visiblePostCount": {
+            "type": "integer",
+            "format": "int32"
+          }
+        }
+      },
+      "TagVo": {
+        "required": [
+          "metadata"
+        ],
+        "type": "object",
+        "properties": {
+          "metadata": {
+            "$ref": "#/components/schemas/Metadata"
+          },
+          "postCount": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "spec": {
+            "$ref": "#/components/schemas/TagSpec"
+          },
+          "status": {
+            "$ref": "#/components/schemas/TagStatus"
+          }
+        }
+      },
+      "TagVoList": {
+        "required": [
+          "first",
+          "hasNext",
+          "hasPrevious",
+          "items",
+          "last",
+          "page",
+          "size",
+          "total",
+          "totalPages"
+        ],
+        "type": "object",
+        "properties": {
+          "first": {
+            "type": "boolean",
+            "description": "Indicates whether current page is the first page."
+          },
+          "hasNext": {
+            "type": "boolean",
+            "description": "Indicates whether current page has previous page."
+          },
+          "hasPrevious": {
+            "type": "boolean",
+            "description": "Indicates whether current page has previous page."
+          },
+          "items": {
+            "type": "array",
+            "description": "A chunk of items.",
+            "items": {
+              "$ref": "#/components/schemas/TagVo"
+            }
+          },
+          "last": {
+            "type": "boolean",
+            "description": "Indicates whether current page is the last page."
+          },
+          "page": {
+            "type": "integer",
+            "description": "Page number, starts from 1. If not set or equal to 0, it means no pagination.",
+            "format": "int32"
+          },
+          "size": {
+            "type": "integer",
+            "description": "Size of each page. If not set or equal to 0, it means no pagination.",
+            "format": "int32"
+          },
+          "total": {
+            "type": "integer",
+            "description": "Total elements.",
+            "format": "int64"
+          },
+          "totalPages": {
+            "type": "integer",
+            "description": "Indicates total pages.",
+            "format": "int64"
+          }
+        }
+      },
       "TestOperation": {
         "required": [
           "op",
@@ -1972,97 +3441,6 @@
           },
           "value": {
             "description": "Value can be any JSON value"
-          }
-        }
-      },
-      "User": {
-        "required": [
-          "apiVersion",
-          "kind",
-          "metadata",
-          "spec"
-        ],
-        "type": "object",
-        "properties": {
-          "apiVersion": {
-            "type": "string"
-          },
-          "kind": {
-            "type": "string"
-          },
-          "metadata": {
-            "$ref": "#/components/schemas/Metadata"
-          },
-          "spec": {
-            "$ref": "#/components/schemas/UserSpec"
-          },
-          "status": {
-            "$ref": "#/components/schemas/UserStatus"
-          }
-        }
-      },
-      "UserSpec": {
-        "required": [
-          "displayName",
-          "email"
-        ],
-        "type": "object",
-        "properties": {
-          "avatar": {
-            "type": "string"
-          },
-          "bio": {
-            "type": "string"
-          },
-          "disabled": {
-            "type": "boolean"
-          },
-          "displayName": {
-            "type": "string"
-          },
-          "email": {
-            "type": "string"
-          },
-          "emailVerified": {
-            "type": "boolean"
-          },
-          "loginHistoryLimit": {
-            "type": "integer",
-            "format": "int32"
-          },
-          "password": {
-            "type": "string"
-          },
-          "phone": {
-            "type": "string"
-          },
-          "registeredAt": {
-            "type": "string",
-            "format": "date-time"
-          },
-          "totpEncryptedSecret": {
-            "type": "string"
-          },
-          "twoFactorAuthEnabled": {
-            "type": "boolean"
-          }
-        }
-      },
-      "UserStatus": {
-        "type": "object",
-        "properties": {
-          "lastLoginAt": {
-            "type": "string",
-            "format": "date-time"
-          },
-          "loginHistories": {
-            "type": "array",
-            "items": {
-              "$ref": "#/components/schemas/LoginHistory"
-            }
-          },
-          "permalink": {
-            "type": "string"
           }
         }
       },

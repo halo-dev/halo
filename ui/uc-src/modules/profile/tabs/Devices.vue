@@ -1,8 +1,8 @@
 <script lang="ts" setup>
+import { ucApiClient } from "@halo-dev/api-client";
 import { VLoading } from "@halo-dev/components";
 import { useQuery } from "@tanstack/vue-query";
 import DeviceListItem from "./components/DeviceListItem.vue";
-import { ucApiClient } from "@halo-dev/api-client";
 
 const { data, isLoading } = useQuery({
   queryKey: ["uc:devices"],

@@ -17,7 +17,7 @@ import org.springframework.web.reactive.function.server.ServerResponse;
 import reactor.test.StepVerifier;
 
 @SpringBootTest(webEnvironment = RANDOM_PORT,
-    properties = "server.forward-headers-strategy=framework")
+    properties = "server.forward-headers-strategy=native")
 class XForwardHeaderTest {
 
     @LocalServerPort

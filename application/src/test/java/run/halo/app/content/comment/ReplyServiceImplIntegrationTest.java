@@ -14,8 +14,8 @@ import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.mock.mockito.SpyBean;
 import org.springframework.test.annotation.DirtiesContext;
+import org.springframework.test.context.bean.override.mockito.MockitoSpyBean;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import reactor.test.StepVerifier;
@@ -56,7 +56,7 @@ class ReplyServiceImplIntegrationTest {
         @Autowired
         private SchemeManager schemeManager;
 
-        @SpyBean
+        @MockitoSpyBean
         private ReactiveExtensionClient reactiveClient;
 
         @Autowired
@@ -65,7 +65,7 @@ class ReplyServiceImplIntegrationTest {
         @Autowired
         private IndexerFactory indexerFactory;
 
-        @SpyBean
+        @MockitoSpyBean
         private ReplyServiceImpl replyService;
 
         Mono<Extension> deleteImmediately(Extension extension) {

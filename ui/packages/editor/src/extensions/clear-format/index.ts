@@ -7,6 +7,8 @@ import { markRaw } from "vue";
 import MdiEraser from "~icons/mdi/eraser";
 
 const clearFormat = Extension.create<ExtensionOptions>({
+  name: "clearFormat",
+
   addOptions() {
     return {
       getToolbarItems({ editor }: { editor: Editor }) {

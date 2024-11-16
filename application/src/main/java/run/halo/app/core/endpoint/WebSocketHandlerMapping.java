@@ -19,7 +19,7 @@ import org.springframework.web.reactive.socket.WebSocketHandler;
 import org.springframework.web.server.ServerWebExchange;
 import org.springframework.web.util.pattern.PathPattern;
 import reactor.core.publisher.Mono;
-import run.halo.app.console.WebSocketUtils;
+import run.halo.app.infra.console.WebSocketUtils;
 
 public class WebSocketHandlerMapping extends AbstractHandlerMapping
     implements WebSocketEndpointManager, InitializingBean {

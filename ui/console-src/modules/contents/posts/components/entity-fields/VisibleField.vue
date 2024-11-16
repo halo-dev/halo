@@ -17,24 +17,21 @@ withDefaults(
 
 const { mutate: changeVisibleMutation } = useMutation({
   mutationFn: async (post: Post) => {
-    const { data } = await coreApiClient.content.post.getPost({
+    return await coreApiClient.content.post.patchPost({
       name: post.metadata.name,
+      jsonPatchInner: [
+        {
+          op: "add",
+          path: "/spec/visible",
+          value: post.spec.visible === "PRIVATE" ? "PUBLIC" : "PRIVATE",
+        },
+      ],
     });
-    data.spec.visible = data.spec.visible === "PRIVATE" ? "PUBLIC" : "PRIVATE";
-    await coreApiClient.content.post.updatePost(
-      {
-        name: post.metadata.name,
-        post: data,
-      },
-      {
-        mute: true,
-      }
-    );
-    await queryClient.invalidateQueries({ queryKey: ["posts"] });
   },
   retry: 3,
   onSuccess: () => {
     Toast.success(t("core.common.toast.operation_success"));
+    queryClient.invalidateQueries({ queryKey: ["posts"] });
   },
   onError: () => {
     Toast.error(t("core.common.toast.operation_failed"));

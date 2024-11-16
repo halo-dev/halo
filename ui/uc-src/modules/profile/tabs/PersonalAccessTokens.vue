@@ -56,7 +56,7 @@ const creationModal = ref(false);
           <VButton @click="refetch">
             {{ $t("core.common.buttons.refresh") }}
           </VButton>
-          <VButton type="primary" @click="creationModal = true">
+          <VButton type="secondary" @click="creationModal = true">
             <template #icon>
               <IconAddCircle class="h-full w-full" />
             </template>

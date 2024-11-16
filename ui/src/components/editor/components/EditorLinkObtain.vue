@@ -194,7 +194,9 @@ defineExpose({
             </VButton>
           </HasPermission>
 
-          <HasPermission :permissions="['system:attachments:manage']">
+          <HasPermission
+            :permissions="['system:attachments:view', 'uc:attachments:manage']"
+          >
             <VButton @click="openAttachmentSelector">
               {{
                 $t(

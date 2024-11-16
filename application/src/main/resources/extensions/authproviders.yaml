@@ -9,8 +9,10 @@ metadata:
     - system-protection
 spec:
   displayName: Local
-  enabled: true
   description: Built-in authentication for Halo.
-  logo: https://halo.run/logo
-  website: https://halo.run
+  logo: /images/login-methods/login-with-credentials.svg
+  website: https://www.halo.run
   authenticationUrl: /login
+  method: post
+  rememberMeSupport: true
+  authType: form

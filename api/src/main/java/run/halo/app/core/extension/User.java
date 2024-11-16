@@ -46,6 +46,8 @@ public class User extends AbstractExtension {
 
     public static final String HIDDEN_USER_LABEL = "halo.run/hidden-user";
 
+    public static final String REQUEST_TO_UPDATE = "halo.run/request-to-update";
+
     @Schema(requiredMode = REQUIRED)
     private UserSpec spec = new UserSpec();
 

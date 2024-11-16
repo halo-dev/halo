@@ -1,0 +1,125 @@
+<!doctype html>
+<html
+    xmlns:th="https://www.thymeleaf.org"
+    th:replace="~{gateway_fragments/layout :: layout(title = |#{title} - Halo|, head = ~{::head}, body = ~{::body})}"
+>
+    <th:block th:fragment="head">
+        <style>
+            .setup-page-wrapper {
+                max-width: 35em;
+            }
+        </style>
+    </th:block>
+    <th:block th:fragment="body">
+        <div class="gateway-wrapper setup-page-wrapper">
+            <div th:replace="~{gateway_fragments/common::haloLogo}"></div>
+
+            <div class="halo-form-wrapper">
+                <h1 class="form-title" th:text="#{title}"></h1>
+                <div class="alert alert-error" role="alert" th:if="${usingH2database}">
+                    <strong th:text="#{form.messages.h2.title}"></strong>
+                    <br />
+                    <span th:text="#{form.messages.h2.content}"> </span>
+                </div>
+                <form th:object="${form}" th:action="@{/system/setup}" class="halo-form" method="post">
+                    <div class="form-item">
+                        <label for="siteTitle" th:text="#{form.siteTitle.label}"></label>
+                        <div class="form-input">
+                            <input
+                                name="siteTitle"
+                                id="siteTitle"
+                                type="text"
+                                th:field="*{siteTitle}"
+                                autocomplete="off"
+                                spellcheck="false"
+                                autocorrect="off"
+                                autocapitalize="off"
+                                maxlength="80"
+                                required
+                                autofocus
+                            />
+                        </div>
+                        <p
+                            class="alert alert-error"
+                            th:if="${#fields.hasErrors('siteTitle')}"
+                            th:errors="*{siteTitle}"
+                        ></p>
+                    </div>
+
+                    <div class="form-item">
+                        <label for="username" th:text="#{form.username.label}"></label>
+                        <div class="form-input">
+                            <input
+                                name="username"
+                                id="username"
+                                type="text"
+                                th:field="*{username}"
+                                autocomplete="off"
+                                spellcheck="false"
+                                autocorrect="off"
+                                autocapitalize="off"
+                                maxlength="63"
+                                minlength="4"
+                                required
+                            />
+                        </div>
+                        <p
+                            class="alert alert-error"
+                            th:if="${#fields.hasErrors('username')}"
+                            th:errors="*{username}"
+                        ></p>
+                    </div>
+
+                    <div class="form-item">
+                        <label for="email" th:text="#{form.email.label}"></label>
+                        <div class="form-input">
+                            <input
+                                name="email"
+                                id="email"
+                                type="email"
+                                th:field="*{email}"
+                                autocomplete="off"
+                                spellcheck="false"
+                                autocorrect="off"
+                                autocapitalize="off"
+                                required
+                            />
+                        </div>
+                        <p class="alert alert-error" th:if="${#fields.hasErrors('email')}" th:errors="*{email}"></p>
+                    </div>
+
+                    <div class="form-item">
+                        <label for="password" th:text="#{form.password.label}"></label>
+                        <th:block
+                            th:replace="~{gateway_fragments/input :: password(id = 'password', name = 'password', required = 'true', minlength = 5, maxlength = 257, enableToggle = true)}"
+                        ></th:block>
+                        <p
+                            class="alert alert-error"
+                            th:if="${#fields.hasErrors('password')}"
+                            th:errors="*{password}"
+                        ></p>
+                    </div>
+
+                    <div class="form-item">
+                        <label for="confirmPassword" th:text="#{form.confirmPassword.label}"></label>
+                        <th:block
+                            th:replace="~{gateway_fragments/input :: password(id = 'confirmPassword', name = null, required = 'true', minlength = 5, maxlength = 257, enableToggle = true)}"
+                        ></th:block>
+                    </div>
+
+                    <div class="form-item">
+                        <button type="submit" th:text="#{form.submit}">初始化</button>
+                    </div>
+                </form>
+            </div>
+
+            <div th:replace="~{gateway_fragments/common::languageSwitcher}"></div>
+        </div>
+
+        <script th:inline="javascript">
+            document.addEventListener("DOMContentLoaded", function () {
+                setupPasswordConfirmation("password", "confirmPassword");
+            });
+        </script>
+    </th:block>
+</html>

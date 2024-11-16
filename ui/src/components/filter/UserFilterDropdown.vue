@@ -1,7 +1,10 @@
 <script lang="ts" setup>
 import { setFocus } from "@/formkit/utils/focus";
-import { useUserFetch } from "@console/modules/system/users/composables/use-user";
-import type { User } from "@halo-dev/api-client";
+import {
+  consoleApiClient,
+  coreApiClient,
+  type User,
+} from "@halo-dev/api-client";
 import {
   IconArrowDown,
   VAvatar,
@@ -9,8 +12,9 @@ import {
   VEntity,
   VEntityField,
 } from "@halo-dev/components";
-import Fuse from "fuse.js";
-import { computed, ref, watch } from "vue";
+import { useQuery } from "@tanstack/vue-query";
+import { refDebounced } from "@vueuse/shared";
+import { ref, toRefs } from "vue";
 
 const props = withDefaults(
   defineProps<{
@@ -22,19 +26,70 @@ const props = withDefaults(
   }
 );
 
+const { modelValue } = toRefs(props);
+
 const emit = defineEmits<{
   (event: "update:modelValue", value?: string): void;
 }>();
 
-const { users } = useUserFetch({ fetchOnMounted: true });
+const keyword = ref("");
+const debouncedKeyword = refDebounced(keyword, 300);
+
+const { data: selectedUser } = useQuery({
+  queryKey: ["core:users:by-name", modelValue],
+  queryFn: async () => {
+    if (!modelValue.value) {
+      return null;
+    }
+
+    const { data } = await coreApiClient.user.getUser({
+      name: modelValue.value,
+    });
+
+    return data;
+  },
+  cacheTime: 0,
+});
+
+const { data: users } = useQuery({
+  queryKey: ["core:users", debouncedKeyword],
+  queryFn: async () => {
+    const { data } = await consoleApiClient.user.listUsers({
+      fieldSelector: [`name!=anonymousUser`],
+      keyword: debouncedKeyword.value,
+      page: 1,
+      size: 30,
+    });
+
+    const pureUsers = data?.items?.map((user) => user.user);
+
+    if (!pureUsers?.length) {
+      return [selectedUser.value].filter(Boolean) as User[];
+    }
+
+    if (selectedUser.value) {
+      return [
+        selectedUser.value,
+        ...pureUsers.filter(
+          (user) => user.metadata.name !== selectedUser.value?.metadata.name
+        ),
+      ];
+    }
+
+    return pureUsers;
+  },
+  staleTime: 2000,
+});
 
 const dropdown = ref();
 
 const handleSelect = (user: User) => {
-  if (user.metadata.name === props.modelValue) {
+  const { name } = user.metadata || {};
+
+  if (name === props.modelValue) {
     emit("update:modelValue", undefined);
   } else {
-    emit("update:modelValue", user.metadata.name);
+    emit("update:modelValue", name);
   }
 
   dropdown.value.hide();
@@ -45,34 +100,6 @@ function onDropdownShow() {
     setFocus("userFilterDropdownInput");
   }, 200);
 }
-
-// search
-const keyword = ref("");
-
-let fuse: Fuse<User> | undefined = undefined;
-
-watch(
-  () => users.value,
-  () => {
-    fuse = new Fuse(users.value, {
-      keys: ["spec.displayName", "metadata.name", "spec.email"],
-      useExtendedSearch: true,
-      threshold: 0.2,
-    });
-  }
-);
-
-const searchResults = computed(() => {
-  if (!fuse || !keyword.value) {
-    return users.value;
-  }
-
-  return fuse?.search(keyword.value).map((item) => item.item);
-});
-
-const selectedUser = computed(() => {
-  return users.value.find((user) => user.metadata.name === props.modelValue);
-});
 </script>
 
 <template>
@@ -107,8 +134,9 @@ const selectedUser = computed(() => {
             role="list"
           >
             <li
-              v-for="(user, index) in searchResults"
-              :key="index"
+              v-for="user in users"
+              :key="user.metadata.name"
+              class="cursor-pointer"
               @click="handleSelect(user)"
             >
               <VEntity :is-selected="modelValue === user.metadata.name">

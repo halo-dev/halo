@@ -1,0 +1,25 @@
+<!doctype html>
+<html th:lang="${#locale.toLanguageTag}" th:fragment="layout (title,head,body)">
+    <head>
+        <meta charset="UTF-8" />
+        <meta content="IE=edge" http-equiv="X-UA-Compatible" />
+        <meta content="webkit" name="renderer" />
+        <meta
+            content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover"
+            name="viewport"
+        />
+        <meta content="noindex,nofollow" name="robots" />
+        <title th:text="${title}"></title>
+        <link rel="preload" href="/images/wordmark.svg" as="image" type="image/svg+xml" />
+        <link rel="preload" href="/images/logo.png" as="image" type="image/png" />
+
+        <th:block th:replace="~{gateway_fragments/common::basicStaticResources}"></th:block>
+
+        <th:block th:if="${head != null}">
+            <th:block th:replace="${head}" />
+        </th:block>
+    </head>
+    <body class="gateway-page">
+        <th:block th:replace="${body}" />
+    </body>
+</html>

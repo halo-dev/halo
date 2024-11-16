@@ -5,6 +5,8 @@ import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
 import java.time.Instant;
 import java.time.ZoneId;
+import java.util.function.UnaryOperator;
+import lombok.experimental.UtilityClass;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.core.io.ClassPathResource;
@@ -12,13 +14,24 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.util.Assert;
 import org.springframework.util.StreamUtils;
 import org.springframework.web.reactive.function.server.ServerRequest;
+import run.halo.app.theme.router.ModelConst;
 
 /**
+ * Halo utilities.
+ *
  * @author guqing
- * @date 2022-04-12
+ * @since 2.0.0
  */
 @Slf4j
+@UtilityClass
 public class HaloUtils {
+
+    /**
+     * Check if the request is an XMLHttpRequest.
+     */
+    public static boolean isXhr(HttpHeaders headers) {
+        return headers.getOrEmpty("X-Requested-With").contains("XMLHttpRequest");
+    }
 
     /**
      * <p>Read the file under the classpath as a string.</p>
@@ -51,7 +64,7 @@ public class HaloUtils {
             // https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Sec-CH-UA
             userAgent = httpHeaders.getFirst("Sec-CH-UA");
         }
-        return StringUtils.defaultString(userAgent, "unknown");
+        return StringUtils.defaultIfBlank(userAgent, "unknown");
     }
 
     public static String getDayText(Instant instant) {
@@ -69,5 +82,17 @@ public class HaloUtils {
     public static String getYearText(Instant instant) {
         Assert.notNull(instant, "Instant must not be null");
         return String.valueOf(instant.atZone(ZoneId.systemDefault()).getYear());
+    }
+
+    /**
+     * Mark the response as no cache.
+     *
+     * @return the server request operator
+     */
+    public static UnaryOperator<ServerRequest> noCache() {
+        return request -> {
+            request.exchange().getAttributes().put(ModelConst.NO_CACHE, true);
+            return request;
+        };
     }
 }

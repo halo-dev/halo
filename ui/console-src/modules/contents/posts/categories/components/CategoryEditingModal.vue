@@ -10,6 +10,7 @@ import { setFocus } from "@/formkit/utils/focus";
 import { FormType } from "@/types/slug";
 import useSlugify from "@console/composables/use-slugify";
 import { useThemeCustomTemplates } from "@console/modules/interface/themes/composables/use-theme";
+import { reset, submitForm } from "@formkit/core";
 import type { Category } from "@halo-dev/api-client";
 import {
   IconRefreshLine,
@@ -21,13 +22,12 @@ import {
 import { useQueryClient } from "@tanstack/vue-query";
 import { cloneDeep } from "lodash-es";
 import { useI18n } from "vue-i18n";
-import { submitForm, reset } from "@formkit/core";
 
 const props = withDefaults(
   defineProps<{
     category?: Category;
     parentCategory?: Category;
-    isChildLevelCategory: boolean;
+    isChildLevelCategory?: boolean;
   }>(),
   {
     category: undefined,
@@ -109,11 +109,9 @@ const handleSaveCategory = async () => {
         parentCategory = data;
       }
 
-      const priority = parentCategory?.spec.children
+      formState.value.spec.priority = parentCategory?.spec.children
         ? parentCategory.spec.children.length + 1
         : 0;
-
-      formState.value.spec.priority = priority;
 
       const { data: createdCategory } =
         await coreApiClient.content.category.createCategory({
@@ -121,16 +119,20 @@ const handleSaveCategory = async () => {
         });
 
       if (parentCategory) {
-        parentCategory.spec.children = Array.from(
-          new Set([
-            ...(parentCategory.spec.children || []),
-            createdCategory.metadata.name,
-          ])
-        );
-
-        await coreApiClient.content.category.updateCategory({
+        await coreApiClient.content.category.patchCategory({
           name: selectedParentCategory.value,
-          category: parentCategory,
+          jsonPatchInner: [
+            {
+              op: "add",
+              path: "/spec/children",
+              value: Array.from(
+                new Set([
+                  ...(parentCategory.spec.children || []),
+                  createdCategory.metadata.name,
+                ])
+              ),
+            },
+          ],
         });
       }
     }
@@ -236,7 +238,7 @@ const { handleGenerateSlug } = useSlugify(
                     )
                   "
                   class="group flex h-full cursor-pointer items-center border-l px-3 transition-all hover:bg-gray-100"
-                  @click="handleGenerateSlug(true, FormType.CATEGORY)"
+                  @click="handleGenerateSlug(true)"
                 >
                   <IconRefreshLine
                     class="h-4 w-4 text-gray-500 group-hover:text-gray-700"

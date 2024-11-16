@@ -1,0 +1,58 @@
+<div th:remove="tag" th:fragment="form">
+    <script src="/webjars/jsencrypt/3.3.2/bin/jsencrypt.min.js" defer></script>
+    <script th:inline="javascript" type="text/javascript">
+        const publicKey = /*[[${publicKey}]]*/ "";
+
+        // Encrypt function
+        function encryptPassword(password) {
+            const encrypt = new JSEncrypt();
+            encrypt.setPublicKey(publicKey);
+            return encrypt.encrypt(password);
+        }
+
+        document.addEventListener("DOMContentLoaded", function () {
+            const loginForm = document.getElementById("login-form");
+            loginForm.addEventListener("submit", function (event) {
+                const plainPasswordInput = document.getElementById("plainPassword");
+                const passwordInput = document.getElementById("password");
+                passwordInput.value = encryptPassword(plainPasswordInput.value);
+            });
+        });
+    </script>
+
+    <input type="hidden" name="password" id="password" />
+
+    <div class="form-item">
+        <label for="username" th:text="#{form.username.label}"> </label>
+
+        <div class="form-input">
+            <input
+                id="username"
+                name="username"
+                type="text"
+                autocomplete="off"
+                spellcheck="false"
+                autocorrect="off"
+                autocapitalize="off"
+                required
+                autofocus
+            />
+        </div>
+    </div>
+    <div class="form-item">
+        <div class="form-label-group">
+            <label for="plainPassword" th:text="#{form.password.label}"> </label>
+            <a
+                class="form-item-extra-link"
+                tabindex="-1"
+                th:href="@{/password-reset/email}"
+                th:text="#{form.password.forgot}"
+            >
+            </a>
+        </div>
+
+        <th:block
+            th:replace="~{gateway_fragments/input :: password(id = 'plainPassword', name = null, required = 'true', minlength = null, maxlength = 257, enableToggle = true)}"
+        ></th:block>
+    </div>
+</div>

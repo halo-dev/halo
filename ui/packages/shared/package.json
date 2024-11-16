@@ -1,6 +1,6 @@
 {
   "name": "@halo-dev/console-shared",
-  "version": "2.19.0",
+  "version": "2.20.0",
   "description": "",
   "files": [
     "dist"
@@ -38,10 +38,10 @@
   "homepage": "https://github.com/halo-dev/halo/tree/main/ui/packages/shared#readme",
   "license": "MIT",
   "devDependencies": {
-    "vite-plugin-dts": "^3.9.1"
+    "vite-plugin-dts": "^4.2.2"
   },
   "peerDependencies": {
-    "vue": "^3.4.27",
+    "vue": "^3.5.11",
     "vue-router": "^4.3.2"
   },
   "dependencies": {

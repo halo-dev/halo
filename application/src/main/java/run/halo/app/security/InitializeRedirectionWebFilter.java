@@ -1,13 +1,17 @@
 package run.halo.app.security;
 
+import static org.springframework.security.web.server.util.matcher.ServerWebExchangeMatchers.pathMatchers;
+
 import java.net.URI;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpMethod;
+import org.springframework.http.MediaType;
 import org.springframework.lang.NonNull;
 import org.springframework.security.web.server.DefaultServerRedirectStrategy;
 import org.springframework.security.web.server.ServerRedirectStrategy;
-import org.springframework.security.web.server.util.matcher.PathPatternParserServerWebExchangeMatcher;
+import org.springframework.security.web.server.util.matcher.AndServerWebExchangeMatcher;
+import org.springframework.security.web.server.util.matcher.MediaTypeServerWebExchangeMatcher;
 import org.springframework.security.web.server.util.matcher.ServerWebExchangeMatcher;
 import org.springframework.stereotype.Component;
 import org.springframework.util.Assert;
@@ -26,9 +30,11 @@ import run.halo.app.infra.InitializationStateGetter;
 @Component
 @RequiredArgsConstructor
 public class InitializeRedirectionWebFilter implements WebFilter {
-    private final URI location = URI.create("/console");
-    private final ServerWebExchangeMatcher redirectMatcher =
-        new PathPatternParserServerWebExchangeMatcher("/", HttpMethod.GET);
+    private final URI location = URI.create("/system/setup");
+    private final ServerWebExchangeMatcher redirectMatcher = new AndServerWebExchangeMatcher(
+        pathMatchers(HttpMethod.GET, "/", "/console/**", "/uc/**", "/login", "/signup"),
+        new MediaTypeServerWebExchangeMatcher(MediaType.TEXT_HTML)
+    );
 
     private final InitializationStateGetter initializationStateGetter;
 

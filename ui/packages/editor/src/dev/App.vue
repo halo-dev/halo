@@ -45,7 +45,6 @@ import {
   ExtensionUnderline,
   ExtensionVideo,
   RichTextEditor,
-  lowlight,
   useEditor,
 } from "../index";
 
@@ -99,9 +98,7 @@ const editor = useEditor({
     ExtensionVideo,
     ExtensionAudio,
     ExtensionCommands,
-    ExtensionCodeBlock.configure({
-      lowlight,
-    }),
+    ExtensionCodeBlock,
     ExtensionIframe,
     ExtensionColor,
     ExtensionFontSize,

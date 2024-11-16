@@ -3,10 +3,12 @@ package run.halo.app.infra;
 import java.net.URI;
 import org.springframework.core.io.buffer.DataBuffer;
 import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.http.client.reactive.ReactorClientHttpConnector;
 import org.springframework.stereotype.Component;
 import org.springframework.web.reactive.function.client.WebClient;
 import reactor.core.publisher.Flux;
+import reactor.core.publisher.Mono;
 import reactor.netty.http.client.HttpClient;
 
 /**
@@ -30,5 +32,13 @@ public class DefaultReactiveUrlDataBufferFetcher implements ReactiveUrlDataBuffe
             .accept(MediaType.APPLICATION_OCTET_STREAM)
             .retrieve()
             .bodyToFlux(DataBuffer.class);
+    }
+
+    @Override
+    public Mono<ResponseEntity<Void>> head(URI uri) {
+        return webClient.head()
+            .uri(uri)
+            .retrieve()
+            .toBodilessEntity();
     }
 }

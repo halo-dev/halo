@@ -13,6 +13,7 @@ plugins {
     id "io.freefair.lombok"
     id 'org.gradle.crypto.checksum'
     id 'org.springdoc.openapi-gradle-plugin'
+    id "com.github.ben-manes.versions"
 }
 
 group = 'run.halo.app'
@@ -80,6 +81,10 @@ dependencies {
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
     testImplementation 'org.springframework.security:spring-security-test'
     testImplementation 'io.projectreactor:reactor-test'
+
+    // webjars
+    runtimeOnly 'org.webjars.npm:jsencrypt:3.3.2'
+    runtimeOnly 'org.webjars.npm:normalize.css:8.0.1'
 }
 
 tasks.register('createChecksums', Checksum) {
@@ -103,6 +108,7 @@ tasks.named('build') {
 
 tasks.named('test', Test) {
     useJUnitPlatform()
+    maxHeapSize = '1G'
     finalizedBy jacocoTestReport
 }
 
@@ -114,15 +120,15 @@ tasks.named('jacocoTestReport', JacocoReport) {
 }
 
 ext.presetPluginUrls = [
-        'https://github.com/halo-dev/plugin-comment-widget/releases/download/v2.4.0/plugin-comment-widget-2.4.0.jar'  : 'plugin-comment-widget.jar',
-        'https://github.com/halo-dev/plugin-search-widget/releases/download/v1.5.0/plugin-search-widget-1.5.0.jar'    : 'plugin-search-widget.jar',
+        'https://github.com/halo-dev/plugin-comment-widget/releases/download/v2.5.1/plugin-comment-widget-2.5.1.jar'  : 'plugin-comment-widget.jar',
+        'https://github.com/halo-dev/plugin-search-widget/releases/download/v1.6.2/plugin-search-widget-1.6.2.jar'    : 'plugin-search-widget.jar',
         'https://github.com/halo-dev/plugin-sitemap/releases/download/v1.1.2/plugin-sitemap-1.1.2.jar'                : 'plugin-sitemap.jar',
         'https://github.com/halo-dev/plugin-feed/releases/download/v1.3.0/plugin-feed-1.3.0.jar'                      : 'plugin-feed.jar',
 
         // Currently, plugin-app-store is not open source, so we need to download it from the official website.
         // Please see https://github.com/halo-dev/plugin-app-store/issues/55
         // https://www.halo.run/store/apps/app-VYJbF
-        'https://www.halo.run/store/apps/app-VYJbF/releases/download/app-release-SRWfv/assets/app-release-SRWfv-VLtMA': 'appstore.jar',
+        'https://www.halo.run/store/apps/app-VYJbF/releases/download/app-release-WBIAX/assets/app-release-WBIAX-TRVeq': 'appstore.jar',
 ]
 
 tasks.register('downloadPluginPresets', Download) {

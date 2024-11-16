@@ -118,6 +118,11 @@ spec:
           label: "头像存储位置"
           value: "default-policy"
           help: 指定用户上传头像的存储策略
+        - $formkit: attachmentPolicySelect
+          name: ucAttachmentPolicy
+          label: "个人中心附件存储位置"
+          value: "default-policy"
+          help: 指定用户在个人中心上传的附件的存储位置
     - group: comment
       label: 评论设置
       formSchema:

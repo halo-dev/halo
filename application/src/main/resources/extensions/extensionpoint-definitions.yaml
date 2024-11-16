@@ -97,3 +97,13 @@ spec:
   displayName: 摘要生成器
   type: SINGLETON
   description: "提供自动生成摘要的方式扩展，如使用算法提取或使用 AI 生成。"
+---
+apiVersion: plugin.halo.run/v1alpha1
+kind: ExtensionPointDefinition
+metadata:
+  name: thumbnail-provider
+spec:
+  className: run.halo.app.core.attachment.ThumbnailProvider
+  displayName: 图片缩略图生成
+  type: MULTI_INSTANCE
+  description: "提供生成图片缩略图的扩展方式"
