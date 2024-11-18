@@ -192,7 +192,8 @@ public class DeviceServiceImpl implements DeviceService {
                 Pattern.CASE_INSENSITIVE);
 
         static final Pattern OS_REGEX =
-            Pattern.compile("(Windows NT|Mac OS X|Android|Linux|iPhone|iPad|Windows Phone|OpenHarmony)");
+            Pattern.compile(
+                "(Windows NT|Mac OS X|Android|Linux|iPhone|iPad|Windows Phone|OpenHarmony)");
         static final Pattern[] osRegexes = {
             Pattern.compile("Windows NT (\\d+\\.\\d+)"),
             Pattern.compile("Mac OS X (\\d+[\\._]\\d+([\\._]\\d+)?)"),
