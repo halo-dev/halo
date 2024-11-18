@@ -21,4 +21,13 @@ class DeviceServiceImplTest {
         assertThat(info.browser()).isEqualTo("Chrome 126.0");
     }
 
+    @Test
+    void deviceInfoParseOpenHarmonyTest() {
+        var info = DeviceServiceImpl.DeviceInfo.parse(
+            "Mozilla/5.0 (Phone; OpenHarmony 5.0) AppleWebKit/537.36 (KHTML, like Gecko) "
+                + "Chrome/114.0.0.0 Safari/537.36 ArkWeb/4.1.6.1 Mobile HuaweiBrowser/5.0.4.300");
+        assertThat(info.os()).isEqualTo("OpenHarmony 5.0");
+        assertThat(info.browser()).isEqualTo("Chrome 114.0");
+    }
+    
 }
