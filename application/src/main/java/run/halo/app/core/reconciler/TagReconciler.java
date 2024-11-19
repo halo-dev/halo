@@ -52,9 +52,16 @@ public class TagReconciler implements Reconciler<Reconciler.Request> {
                 String newPattern = tagPermalinkPolicy.pattern();
                 annotations.put(Constant.PERMALINK_PATTERN_ANNO, newPattern);
 
-                String permalink = tagPermalinkPolicy.permalink(tag);
                 var status = tag.getStatusOrDefault();
+                String permalink = tagPermalinkPolicy.permalink(tag);
                 status.setPermalink(permalink);
+
+                if (status.getPostCount() == null) {
+                    status.setPostCount(0);
+                }
+                if (status.getVisiblePostCount() == null) {
+                    status.setVisiblePostCount(0);
+                }
 
                 // Update the observed version.
                 status.setObservedVersion(tag.getMetadata().getVersion() + 1);

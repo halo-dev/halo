@@ -1,5 +1,7 @@
 package run.halo.app.theme.finders.vo;
 
+import static org.apache.commons.lang3.ObjectUtils.defaultIfNull;
+
 import lombok.Builder;
 import lombok.Value;
 import run.halo.app.core.extension.content.Tag;
@@ -33,7 +35,7 @@ public class TagVo implements ExtensionVoOperator {
             .metadata(tag.getMetadata())
             .spec(spec)
             .status(status)
-            .postCount(tag.getStatusOrDefault().getVisiblePostCount())
+            .postCount(defaultIfNull(status.getVisiblePostCount(), 0))
             .build();
     }
 }
