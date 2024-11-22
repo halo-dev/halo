@@ -1059,6 +1059,9 @@ core:
         role:
           label: Role
           placeholder: Please select a role
+      roles_preview:
+        all: The currently selected role contains all permissions
+        includes: "The currently selected role contains the following permissions:"
     detail:
       title: User detail
       tabs:

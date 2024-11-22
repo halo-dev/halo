@@ -966,6 +966,9 @@ core:
         role:
           label: 角色
           placeholder: 請選擇角色
+      roles_preview:
+        all: 目前所選角色包含所有權限
+        includes: 目前選定角色所包含的權限：
     detail:
       title: 用戶詳情
       tabs:

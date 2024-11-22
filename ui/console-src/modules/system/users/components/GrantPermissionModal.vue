@@ -142,11 +142,13 @@ const currentRoleTemplates = computed(() => {
           v-if="selectedRoleNames.includes(SUPER_ROLE_NAME)"
           class="text-sm text-gray-600 mt-4"
         >
-          当前所选角色包含所有权限
+          {{ $t("core.user.grant_permission_modal.roles_preview.all") }}
         </div>
 
         <div v-else-if="currentRoleTemplates?.length" class="space-y-3 mt-4">
-          <span class="text-sm text-gray-600"> 当前所选角色包含的权限： </span>
+          <span class="text-sm text-gray-600">
+            {{ $t("core.user.grant_permission_modal.roles_preview.includes") }}
+          </span>
           <RolesView :role-templates="currentRoleTemplates" />
         </div>
       </div>
