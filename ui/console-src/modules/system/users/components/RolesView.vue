@@ -19,10 +19,12 @@ const { roleTemplates } = toRefs(props);
 const { roleTemplateGroups } = useRoleTemplateSelection(roleTemplates);
 </script>
 <template>
-  <dl class="divide-y divide-gray-100">
+  <dl
+    class="divide-y divide-gray-100 border border-gray-100 rounded-base overflow-hidden"
+  >
     <div
-      v-for="(group, groupIndex) in roleTemplateGroups"
-      :key="groupIndex"
+      v-for="(group, index) in roleTemplateGroups"
+      :key="index"
       class="bg-white px-4 py-5 hover:bg-gray-50 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6"
     >
       <dt class="text-sm font-medium text-gray-900">
@@ -55,7 +57,7 @@ const { roleTemplateGroups } = useRoleTemplateSelection(roleTemplates);
       </dt>
       <dd class="mt-1 text-sm text-gray-900 sm:col-span-2 sm:mt-0">
         <ul class="space-y-2">
-          <li v-for="(role, index) in group.roles" :key="index">
+          <li v-for="role in group.roles" :key="role.metadata.name">
             <label
               class="inline-flex w-72 cursor-pointer flex-row items-center gap-4 rounded-base border p-5 hover:border-primary"
             >

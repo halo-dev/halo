@@ -137,16 +137,16 @@ const currentRoleTemplates = computed(() => {
         ></FormKit>
       </FormKit>
 
-      <div v-if="selectedRoleNames.length" class="mt-4">
-        <span
+      <div v-if="selectedRoleNames.length">
+        <div
           v-if="selectedRoleNames.includes(SUPER_ROLE_NAME)"
-          class="text-sm text-gray-600"
+          class="text-sm text-gray-600 mt-4"
         >
-          包含所有权限
-        </span>
+          当前所选角色包含所有权限
+        </div>
 
-        <div v-else-if="currentRoleTemplates?.length" class="space-y-3">
-          <span class="text-sm text-gray-600">包含的权限如下：</span>
+        <div v-else-if="currentRoleTemplates?.length" class="space-y-3 mt-4">
+          <span class="text-sm text-gray-600"> 当前所选角色包含的权限： </span>
           <RolesView :role-templates="currentRoleTemplates" />
         </div>
       </div>
