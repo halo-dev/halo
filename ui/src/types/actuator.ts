@@ -14,6 +14,7 @@ export interface GlobalInfo {
   favicon?: string;
   postSlugGenerationStrategy: ModeType;
   mustVerifyEmailOnRegistration: boolean;
+  mustInputUsernameOnRegistration: boolean;
   siteTitle: string;
 }
 

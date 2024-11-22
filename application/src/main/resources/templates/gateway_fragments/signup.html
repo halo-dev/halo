@@ -44,7 +44,8 @@
             <p class="alert alert-error" th:if="${#fields.hasErrors('username')}" th:errors="*{username}"></p>
         </div>
 
-        <div class="form-item">
+        <!-- when mustInputUsernameOnRegistration is false, the displayName field will be displayed -->
+        <div class="form-item" th:if="${globalInfo.mustInputUsernameOnRegistration}">
             <label for="displayName" th:text="#{form.displayName.label}"></label>
             <div class="form-input">
                 <input
@@ -118,6 +119,21 @@
     <script th:inline="javascript">
         document.addEventListener("DOMContentLoaded", function () {
             setupPasswordConfirmation("password", "confirmPassword");
+
+            // When mustInputUsernameOnRegistration is false, the username field will be used as the display name
+            const mustVerifyEmail = /*[[${globalInfo.mustInputUsernameOnRegistration}]]*/ false;
+            if (!mustVerifyEmail) {
+                const usernameInput = document.getElementById("username");
+                const form = document.getElementById("signup-form");
+
+                form.addEventListener("submit", function () {
+                    const displayNameInput = document.createElement("input");
+                    displayNameInput.type = "hidden";
+                    displayNameInput.name = "displayName";
+                    displayNameInput.value = usernameInput.value;
+                    form.appendChild(displayNameInput);
+                });
+            }
         });
     </script>
 

@@ -72,6 +72,7 @@ public class SystemSetting {
         public static final String GROUP = "user";
         boolean allowRegistration;
         boolean mustVerifyEmailOnRegistration;
+        boolean mustInputUsernameOnRegistration;
         String defaultRole;
         String avatarPolicy;
         String ucAttachmentPolicy;

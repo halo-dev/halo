@@ -99,9 +99,11 @@ public class GlobalInfoServiceImpl implements GlobalInfoService {
         if (userSetting == null) {
             info.setAllowRegistration(false);
             info.setMustVerifyEmailOnRegistration(false);
+            info.setMustInputUsernameOnRegistration(false);
         } else {
             info.setAllowRegistration(userSetting.isAllowRegistration());
             info.setMustVerifyEmailOnRegistration(userSetting.isMustVerifyEmailOnRegistration());
+            info.setMustInputUsernameOnRegistration(userSetting.isMustInputUsernameOnRegistration());
         }
     }
 
