@@ -33,6 +33,8 @@ core:
         tooltip: Profile
       visit_homepage:
         title: Visit homepage
+    profile:
+      aggregate_role: Aggregate Role
   uc_sidebar:
     menu:
       items:
@@ -42,6 +44,8 @@ core:
     operations:
       console:
         tooltip: Console
+    profile:
+      aggregate_role: Aggregate Role
   dashboard:
     title: Dashboard
     actions:

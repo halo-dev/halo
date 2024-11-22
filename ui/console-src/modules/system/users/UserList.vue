@@ -11,7 +11,7 @@ import {
   IconAddCircle,
   IconLockPasswordLine,
   IconRefreshLine,
-  IconUserFollow,
+  IconShieldUser,
   IconUserSettings,
   Toast,
   VAvatar,
@@ -288,7 +288,7 @@ function onGrantPermissionModalClose() {
           type="default"
         >
           <template #icon>
-            <IconUserFollow class="h-full w-full" />
+            <IconShieldUser class="h-full w-full" />
           </template>
           {{ $t("core.user.actions.roles") }}
         </VButton>
@@ -474,6 +474,9 @@ function onGrantPermissionModalClose() {
                         v-for="role in user.roles"
                         :key="role.metadata.name"
                       >
+                        <template #leftIcon>
+                          <IconShieldUser />
+                        </template>
                         {{
                           role.metadata.annotations?.[
                             rbacAnnotations.DISPLAY_NAME

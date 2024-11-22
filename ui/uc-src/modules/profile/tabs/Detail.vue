@@ -5,6 +5,7 @@ import type { DetailedUser, ListedAuthProvider } from "@halo-dev/api-client";
 import { consoleApiClient } from "@halo-dev/api-client";
 import {
   Dialog,
+  IconShieldUser,
   VAlert,
   VButton,
   VDescription,
@@ -135,6 +136,9 @@ const emailVerifyModal = ref(false);
       >
         <VSpace>
           <VTag v-for="role in user?.roles" :key="role.metadata.name">
+            <template #leftIcon>
+              <IconShieldUser />
+            </template>
             {{
               role.metadata.annotations?.[rbacAnnotations.DISPLAY_NAME] ||
               role.metadata.name

@@ -31,6 +31,8 @@ core:
         tooltip: 個人中心
       visit_homepage:
         title: 訪問首頁
+    profile:
+      aggregate_role: 聚合角色
   uc_sidebar:
     menu:
       items:
@@ -40,6 +42,8 @@ core:
     operations:
       console:
         tooltip: 管理控制台
+    profile:
+      aggregate_role: 聚合角色
   dashboard:
     title: 儀表板
     actions:

@@ -101,7 +101,7 @@ const tabbarItems = computed(() => {
     }));
 });
 
-const handleDelete = async (userToDelete: User) => {
+const handleDelete = async (user: User) => {
   Dialog.warning({
     title: t("core.user.operations.delete.title"),
     description: t("core.common.dialog.descriptions.cannot_be_recovered"),
@@ -111,7 +111,7 @@ const handleDelete = async (userToDelete: User) => {
     onConfirm: async () => {
       try {
         await coreApiClient.user.deleteUser({
-          name: userToDelete.metadata.name,
+          name: user.metadata.name,
         });
         Toast.success(t("core.common.toast.delete_success"));
         router.push({ name: "Users" });
@@ -189,11 +189,17 @@ function onGrantPermissionModalClose() {
               <VDropdownItem @click="passwordChangeModal = true">
                 {{ $t("core.user.detail.actions.change_password.title") }}
               </VDropdownItem>
-              <VDropdownItem @click="grantPermissionModal = true">
+              <VDropdownItem
+                v-if="currentUser?.metadata.name !== user?.user.metadata.name"
+                @click="grantPermissionModal = true"
+              >
                 {{ $t("core.user.detail.actions.grant_permission.title") }}
               </VDropdownItem>
               <VDropdownItem
-                v-if="user?.user"
+                v-if="
+                  user &&
+                  currentUser?.metadata.name !== user?.user.metadata.name
+                "
                 type="danger"
                 @click="handleDelete(user.user)"
               >
