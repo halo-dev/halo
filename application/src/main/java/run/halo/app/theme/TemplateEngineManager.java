@@ -5,7 +5,6 @@ import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.boot.autoconfigure.thymeleaf.ThymeleafProperties;
 import org.springframework.stereotype.Component;
 import org.springframework.util.ConcurrentLruCache;
-import org.thymeleaf.TemplateEngine;
 import org.thymeleaf.dialect.IDialect;
 import org.thymeleaf.spring6.ISpringWebFluxTemplateEngine;
 import org.thymeleaf.spring6.dialect.SpringStandardDialect;
@@ -72,12 +71,7 @@ public class TemplateEngineManager {
 
     public Mono<Void> clearCache(String themeName) {
         return themeResolver.getThemeContext(themeName)
-            .doOnNext(themeContext -> {
-                CacheKey cacheKey = buildCacheKey(themeContext);
-                TemplateEngine templateEngine =
-                    (TemplateEngine) engineCache.get(cacheKey);
-                templateEngine.clearTemplateCache();
-            })
+            .doOnNext(themeContext -> engineCache.remove(buildCacheKey(themeContext)))
             .then();
     }
 
