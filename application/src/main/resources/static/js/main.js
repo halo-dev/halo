@@ -93,6 +93,7 @@ function sendVerificationCode(button, sendRequest) {
 
     button.addEventListener("click", () => {
         button.disabled = true;
+        button.textContent = "Sending...";
         sendRequest()
             .then(() => {
                 startCountdown();
@@ -100,6 +101,7 @@ function sendVerificationCode(button, sendRequest) {
             })
             .catch((e) => {
                 button.disabled = false;
+                button.textContent = "Send";
                 if (e instanceof Error) {
                     Toast.error(e.message);
                 } else {
