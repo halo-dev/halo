@@ -2,6 +2,7 @@ version: "3"
 
 services:
   halo:
+    build: .
     image: sexyahri/ahri-cool:latest
     restart: on-failure:3
     depends_on:
@@ -34,7 +35,7 @@ services:
     networks:
       halo_network:
     volumes:
-      - ~/holadb:/var/lib/postgresql/data
+      - ./database:/var/lib/postgresql/data
     healthcheck:
       test: [ "CMD", "pg_isready" ]
       interval: 10s
