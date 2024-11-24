@@ -33,6 +33,8 @@ core:
         tooltip: Profile
       visit_homepage:
         title: Visit homepage
+    profile:
+      aggregate_role: Aggregate Role
   uc_sidebar:
     menu:
       items:
@@ -42,6 +44,8 @@ core:
     operations:
       console:
         tooltip: Console
+    profile:
+      aggregate_role: Aggregate Role
   dashboard:
     title: Dashboard
     actions:
@@ -1059,6 +1063,9 @@ core:
         role:
           label: Role
           placeholder: Please select a role
+      roles_preview:
+        all: The currently selected role contains all permissions
+        includes: "The currently selected role contains the following permissions:"
     detail:
       title: User detail
       tabs:

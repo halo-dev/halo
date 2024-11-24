@@ -9,11 +9,13 @@ import { coreMenuGroups } from "@console/router/constant";
 import {
   Dialog,
   IconAccountCircleLine,
+  IconArrowDownLine,
   IconLogoutCircleRLine,
   IconMore,
   IconSearch,
-  IconUserSettings,
+  IconShieldUser,
   VAvatar,
+  VDropdown,
   VTag,
 } from "@halo-dev/components";
 import { useEventListener } from "@vueuse/core";
@@ -152,10 +154,10 @@ onMounted(() => {
             >
               {{ currentUser?.spec.displayName }}
             </div>
-            <div v-if="currentRoles?.[0]" class="flex">
-              <VTag>
+            <div v-if="currentRoles?.length" class="flex mt-1">
+              <VTag v-if="currentRoles.length === 1">
                 <template #leftIcon>
-                  <IconUserSettings />
+                  <IconShieldUser />
                 </template>
                 {{
                   currentRoles[0].metadata.annotations?.[
@@ -163,6 +165,41 @@ onMounted(() => {
                   ] || currentRoles[0].metadata.name
                 }}
               </VTag>
+              <VDropdown v-else>
+                <div class="flex gap-1">
+                  <VTag>
+                    <template #leftIcon>
+                      <IconShieldUser />
+                    </template>
+                    {{ $t("core.sidebar.profile.aggregate_role") }}
+                  </VTag>
+                  <IconArrowDownLine />
+                </div>
+                <template #popper>
+                  <div class="p-1">
+                    <h2
+                      class="text-gray-600 text-sm font-semibold border-b border-gray-100 pb-1.5"
+                    >
+                      {{ $t("core.sidebar.profile.aggregate_role") }}
+                    </h2>
+                    <div class="flex gap-2 flex-wrap mt-2">
+                      <VTag
+                        v-for="role in currentRoles"
+                        :key="role.metadata.name"
+                      >
+                        <template #leftIcon>
+                          <IconShieldUser />
+                        </template>
+                        {{
+                          role.metadata.annotations?.[
+                            rbacAnnotations.DISPLAY_NAME
+                          ] || role.metadata.name
+                        }}
+                      </VTag>
+                    </div>
+                  </div>
+                </template>
+              </VDropdown>
             </div>
           </div>
 
@@ -299,6 +336,7 @@ onMounted(() => {
 
   .profile-placeholder {
     height: 70px;
+    flex: none;
 
     .current-profile {
       height: 70px;

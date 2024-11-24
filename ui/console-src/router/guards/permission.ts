@@ -1,4 +1,5 @@
 import { rbacAnnotations } from "@/constants/annotations";
+import { SUPER_ROLE_NAME } from "@/constants/constants";
 import { useRoleStore } from "@/stores/role";
 import { useUserStore } from "@/stores/user";
 import { hasPermission } from "@/utils/permission";
@@ -24,6 +25,10 @@ export function setupPermissionGuard(router: Router) {
 }
 
 function isConsoleAccessDisallowed(currentRoles?: Role[]): boolean {
+  if (currentRoles?.some((role) => role.metadata.name === SUPER_ROLE_NAME)) {
+    return false;
+  }
+
   return (
     currentRoles?.some(
       (role) =>

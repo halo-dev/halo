@@ -31,6 +31,8 @@ core:
         tooltip: 个人中心
       visit_homepage:
         title: 访问首页
+    profile:
+      aggregate_role: 聚合角色
   uc_sidebar:
     menu:
       items:
@@ -40,6 +42,8 @@ core:
     operations:
       console:
         tooltip: 管理控制台
+    profile:
+      aggregate_role: 聚合角色
   dashboard:
     title: 仪表板
     actions:
@@ -989,6 +993,9 @@ core:
         role:
           label: 角色
           placeholder: 请选择角色
+      roles_preview:
+        all: 当前所选角色包含所有权限
+        includes: 当前所选角色包含的权限：
     detail:
       title: 用户详情
       tabs:
