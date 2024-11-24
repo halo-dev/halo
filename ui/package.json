@@ -155,5 +155,6 @@
     "vite-plugin-vue-devtools": "^7.3.8",
     "vitest": "^0.34.1",
     "vue-tsc": "^2.1.6"
-  }
+  },
+  "packageManager": "pnpm@9.14.2+sha512.6e2baf77d06b9362294152c851c4f278ede37ab1eba3a55fda317a4a17b209f4dbb973fb250a77abc463a341fcb1f17f17cfa24091c4eb319cda0d9b84278387"
 }

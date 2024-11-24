@@ -76,7 +76,7 @@ public class CommentFinderEndpoint implements CustomEndpoint {
         final var tag = "CommentV1alpha1Public";
         return SpringdocRouteBuilder.route()
             .POST("comments", this::createComment,
-                builder -> builder.operationId("CreateComment")
+                builder -> builder.operationId("CreateComment_1")
                     .description("Create a comment.")
                     .tag(tag)
                     .requestBody(requestBodyBuilder()
@@ -90,7 +90,7 @@ public class CommentFinderEndpoint implements CustomEndpoint {
                         .implementation(Comment.class))
             )
             .POST("comments/{name}/reply", this::createReply,
-                builder -> builder.operationId("CreateReply")
+                builder -> builder.operationId("CreateReply_1")
                     .description("Create a reply.")
                     .tag(tag)
                     .parameter(parameterBuilder().name("name")
@@ -108,7 +108,7 @@ public class CommentFinderEndpoint implements CustomEndpoint {
                         .implementation(Reply.class))
             )
             .GET("comments", this::listComments, builder -> {
-                builder.operationId("ListComments")
+                builder.operationId("ListComments_1")
                     .description("List comments.")
                     .tag(tag)
                     .response(responseBuilder()
