@@ -12,6 +12,7 @@ import static run.halo.app.core.attachment.ThumbnailSigner.generateSignature;
 import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URL;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Path;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -20,6 +21,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.web.util.UriUtils;
 import reactor.core.publisher.Mono;
 import reactor.test.StepVerifier;
 import run.halo.app.core.attachment.AttachmentRootGetter;
@@ -61,14 +63,14 @@ class LocalThumbnailServiceImplTest {
     @Test
     void geImageFileNameTest() throws MalformedURLException {
         var fileName =
-            LocalThumbnailServiceImpl.geImageFileName(new URL("https://halo.run/example.jpg"));
+            LocalThumbnailServiceImpl.geImageFileName(URI.create("https://halo.run/example.jpg"));
         assertThat(fileName).isEqualTo("example.jpg");
 
-        fileName = LocalThumbnailServiceImpl.geImageFileName(new URL("https://halo.run/"));
+        fileName = LocalThumbnailServiceImpl.geImageFileName(URI.create("https://halo.run/"));
         assertThat(fileName).isNotBlank();
 
-        fileName = LocalThumbnailServiceImpl.geImageFileName(
-            new URL("https://halo.run/.1fasfg(*&^%$.jpg"));
+        var encoded = UriUtils.encode("https://halo.run/.1fasfg(*&^%$.jpg", StandardCharsets.UTF_8);
+        fileName = LocalThumbnailServiceImpl.geImageFileName(URI.create(encoded));
         assertThat(fileName).isNotBlank();
     }
 
