@@ -1571,7 +1571,9 @@ core:
     Post Contributor: Contributions allowed
     Post Publisher: Allow to publish own posts
     UC Attachment Manage: Allow to manage own attachments
+    role-template-uc-attachment-manager: Allow to manage own attachments
     Recycle My Post: Recycle My Post
+    role-template-recycle-my-post: Recycle My Post
   components:
     submit_button:
       computed_text: "{text} ({shortcut})"

@@ -1466,7 +1466,9 @@ core:
     Post Attachment Manager: 允许在文章中上传图片
     Post Publisher: 允许发布自己的文章
     UC Attachment Manage: 允许管理自己的附件
+    role-template-uc-attachment-manager: 允许管理自己的附件
     Recycle My Post: 允许删除自己的文章
+    role-template-recycle-my-post: 允许删除自己的文章
   components:
     submit_button:
       computed_text: "{text}（{shortcut}）"
