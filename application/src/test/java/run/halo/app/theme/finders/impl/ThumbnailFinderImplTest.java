@@ -42,13 +42,13 @@ class ThumbnailFinderImplTest {
 
     @Test
     void shouldGenWhenUriIsValid() {
-        when(thumbnailService.generate(any(), any()))
+        when(thumbnailService.get(any(), any()))
             .thenReturn(Mono.just(URI.create("/test-thumb.jpg")));
         thumbnailFinder.gen("/test.jpg", "l")
             .as(StepVerifier::create)
             .expectNext("/test-thumb.jpg")
             .verifyComplete();
 
-        verify(thumbnailService).generate(any(), any());
+        verify(thumbnailService).get(any(), any());
     }
 }

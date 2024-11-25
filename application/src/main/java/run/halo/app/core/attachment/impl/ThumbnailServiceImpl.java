@@ -56,6 +56,13 @@ public class ThumbnailServiceImpl implements ThumbnailService {
     }
 
     @Override
+    public Mono<URI> get(URI imageUri, ThumbnailSize size) {
+        return fetchThumbnail(imageUri, size)
+            .map(thumbnail -> URI.create(thumbnail.getSpec().getThumbnailUri()))
+            .defaultIfEmpty(imageUri);
+    }
+
+    @Override
     public Mono<Void> delete(URI imageUri) {
         Assert.notNull(imageUri, "Image uri must not be null");
         Mono<Void> deleteMono;
