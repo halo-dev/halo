@@ -1360,6 +1360,9 @@ core:
             url: 下載地址
         backup:
           label: 從備份檔案恢復
+          empty:
+            title: 沒有備份文件
+            message: 目前沒有掃描到備份文件，你可以手動將備份文件上傳到 Halo 工作目錄的 backups 目錄。
   exception:
     not_found:
       message: 沒有找到該頁面
