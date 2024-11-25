@@ -62,6 +62,7 @@ public class MenuItem extends AbstractExtension {
         private Integer priority;
 
         @ArraySchema(
+            uniqueItems = true,
             arraySchema = @Schema(description = "Children of this menu item"),
             schema = @Schema(description = "The name of menu item child"))
         private LinkedHashSet<String> children;

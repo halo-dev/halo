@@ -27,8 +27,8 @@ public class Menu extends AbstractExtension {
         @Schema(description = "The display name of the menu.", requiredMode = REQUIRED)
         private String displayName;
 
-        @Schema(description = "Names of menu children below this menu.")
         @ArraySchema(
+            uniqueItems = true,
             arraySchema = @Schema(description = "Menu items of this menu."),
             schema = @Schema(description = "Name of menu item.")
         )

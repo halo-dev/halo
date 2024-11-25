@@ -2,7 +2,7 @@
   "openapi": "3.0.1",
   "info": {
     "title": "Halo",
-    "version": "2.20.9-SNAPSHOT"
+    "version": "2.20.10-SNAPSHOT"
   },
   "servers": [
     {
@@ -1340,7 +1340,7 @@
     "/apis/uc.api.storage.halo.run/v1alpha1/attachments/-/upload-from-url": {
       "post": {
         "description": "Upload attachment from the given URL.",
-        "operationId": "ExternalTransferAttachment",
+        "operationId": "ExternalTransferAttachment_1",
         "parameters": [
           {
             "description": "Wait for permalink.",

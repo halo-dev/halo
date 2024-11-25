@@ -112,7 +112,7 @@ public class UcAttachmentEndpoint implements CustomEndpoint {
             .POST("/attachments/-/upload-from-url", contentType(MediaType.APPLICATION_JSON),
                 this::uploadFromUrlForPost,
                 builder -> builder
-                    .operationId("ExternalTransferAttachment")
+                    .operationId("ExternalTransferAttachment_1")
                     .description("Upload attachment from the given URL.")
                     .tag(tag)
                     .parameter(parameterBuilder()
