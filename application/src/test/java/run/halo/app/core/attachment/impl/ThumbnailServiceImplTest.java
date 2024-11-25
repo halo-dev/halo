@@ -7,6 +7,7 @@ import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.ArgumentMatchers.isA;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.spy;
+import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static run.halo.app.extension.index.query.QueryFactory.equal;
@@ -15,6 +16,11 @@ import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
+import java.util.concurrent.ConcurrentLinkedQueue;
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -116,26 +122,28 @@ class ThumbnailServiceImplTest {
             .thenReturn(insiteUri);
         when(client.create(any())).thenReturn(Mono.empty());
 
+        when(client.listBy(eq(Thumbnail.class), any(), isA(PageRequest.class)))
+            .thenReturn(Mono.empty());
+
         thumbnailService.create(url, ThumbnailSize.M)
             .as(StepVerifier::create)
             .expectNext(thumbUri)
             .verifyComplete();
 
-        when(client.listBy(eq(Thumbnail.class), any(), isA(PageRequest.class)))
-            .thenReturn(Mono.empty());
         thumbnailService.fetchThumbnail(url.toURI(), ThumbnailSize.M)
             .as(StepVerifier::create)
             .verifyComplete();
         var hash = ThumbnailSigner.generateSignature(insiteUri.toString());
 
-        verify(client).listBy(eq(Thumbnail.class), assertArg(options -> {
-            var exceptOptions = ListOptions.builder()
-                .fieldQuery(equal(Thumbnail.ID_INDEX,
-                    Thumbnail.idIndexFunc(hash, ThumbnailSize.M.name())
-                ))
-                .build();
-            assertThat(options.toString()).isEqualTo(exceptOptions.toString());
-        }), isA(PageRequest.class));
+        verify(client, times(2)).listBy(eq(Thumbnail.class),
+            assertArg(options -> {
+                var exceptOptions = ListOptions.builder()
+                    .fieldQuery(equal(Thumbnail.ID_INDEX,
+                        Thumbnail.idIndexFunc(hash, ThumbnailSize.M.name())
+                    ))
+                    .build();
+                assertThat(options.toString()).isEqualTo(exceptOptions.toString());
+            }), isA(PageRequest.class));
 
         verify(localThumbnailProvider).generate(any());
 
@@ -168,5 +176,50 @@ class ThumbnailServiceImplTest {
         thumbnailService.create(url, ThumbnailSize.M)
             .as(StepVerifier::create)
             .verifyComplete();
+    }
+
+    @Nested
+    class ThumbnailGenerateConcurrencyTest {
+
+        @Test
+        public void concurrentThumbnailGeneration() throws InterruptedException {
+            var spyThumbnailService = spy(thumbnailService);
+
+            URI imageUri = URI.create("http://localhost:8090/test.jpg");
+
+            doReturn(Mono.empty()).when(spyThumbnailService).fetchThumbnail(eq(imageUri), any());
+
+            var createdUri = URI.create("/test-thumb.jpg");
+            doReturn(Mono.just(createdUri)).when(spyThumbnailService).create(any(), any());
+
+            int threadCount = 10;
+            ExecutorService executor = Executors.newFixedThreadPool(threadCount);
+            var latch = new CountDownLatch(threadCount);
+
+            var results = new ConcurrentLinkedQueue<Mono<URI>>();
+
+            for (int i = 0; i < threadCount; i++) {
+                executor.submit(() -> {
+                    try {
+                        results.add(spyThumbnailService.generate(imageUri, ThumbnailSize.M));
+                    } finally {
+                        latch.countDown();
+                    }
+                });
+            }
+
+            latch.await();
+
+            results.forEach(result -> {
+                StepVerifier.create(result)
+                    .expectNext(createdUri)
+                    .verifyComplete();
+            });
+
+            verify(spyThumbnailService).fetchThumbnail(eq(imageUri), eq(ThumbnailSize.M));
+            verify(spyThumbnailService).create(any(), eq(ThumbnailSize.M));
+
+            executor.shutdown();
+        }
     }
 }
