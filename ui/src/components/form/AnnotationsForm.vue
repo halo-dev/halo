@@ -230,7 +230,7 @@ function onCustomFormToggle(e: Event) {
     <!-- @vue-ignore -->
     <details
       :open="showCustomForm"
-      class="flex cursor-pointer space-y-4 py-4 transition-all first:pt-0"
+      class="flex flex-col cursor-pointer space-y-4 py-4 transition-all first:pt-0"
       @toggle="onCustomFormToggle"
     >
       <summary class="group flex items-center justify-between">
