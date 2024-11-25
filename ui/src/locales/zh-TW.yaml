@@ -1442,7 +1442,9 @@ core:
     Post Contributor: 允許投稿
     Post Publisher: 允許發布自己的文章
     UC Attachment Manage: 允許管理自己的附件
+    role-template-uc-attachment-manager: 允許管理自己的附件
     Recycle My Post: 允許刪除自己的文章
+    role-template-recycle-my-post: 允許刪除自己的文章
   components:
     submit_button:
       computed_text: "{text}（{shortcut}）"
