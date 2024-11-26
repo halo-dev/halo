@@ -70,9 +70,8 @@ public class ThumbnailMigration {
         cleanupThumbnail(Thumbnail.class,
             thumbnail -> new UniqueKey(thumbnail.getSpec().getImageUri(),
                 thumbnail.getSpec().getSize().name()))
-            .collectList()
-            .doOnNext(
-                thumbnails -> log.info("Deleted {} duplicate thumbnail records", thumbnails.size()))
+            .count()
+            .doOnNext(count -> log.info("Deleted {} duplicate thumbnail records", count))
             .block();
 
         cleanupThumbnail(LocalThumbnail.class,
@@ -82,9 +81,8 @@ public class ThumbnailMigration {
                 var filePath = localThumbnailService.toFilePath(thumb.getSpec().getFilePath());
                 return deleteFile(filePath).thenReturn(thumb.getMetadata().getName());
             })
-            .collectList()
-            .doOnNext(
-                names -> log.info("Deleted {} duplicate local thumbnail records.", names.size()))
+            .count()
+            .doOnNext(count -> log.info("Deleted {} duplicate local thumbnail records.", count))
             .block();
         log.info("Duplicate thumbnails have been cleaned up.");
     }
