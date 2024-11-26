@@ -87,13 +87,13 @@ const Toast = (function () {
     };
 })();
 
-function sendVerificationCode(button, sendRequest) {
+function sendVerificationCode(button, sendRequest,sentButtonName,sendingButtonName) {
     let timer;
     const countdown = 60;
 
     button.addEventListener("click", () => {
         button.disabled = true;
-        button.textContent = "Sending...";
+        button.textContent = sendingButtonName;
         sendRequest()
             .then(() => {
                 startCountdown();
@@ -101,7 +101,7 @@ function sendVerificationCode(button, sendRequest) {
             })
             .catch((e) => {
                 button.disabled = false;
-                button.textContent = "Send";
+                button.textContent = sentButtonName;
                 if (e instanceof Error) {
                     Toast.error(e.message);
                 } else {
@@ -121,7 +121,7 @@ function sendVerificationCode(button, sendRequest) {
                 remainingTime--;
             } else {
                 clearInterval(timer);
-                button.textContent = "Send";
+                button.textContent = sentButtonName;
                 button.disabled = false;
                 button.classList.remove("disabled");
             }
