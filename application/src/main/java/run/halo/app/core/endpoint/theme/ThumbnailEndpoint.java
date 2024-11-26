@@ -66,7 +66,7 @@ public class ThumbnailEndpoint implements CustomEndpoint {
 
     private Mono<ServerResponse> getThumbnailByUri(ServerRequest request) {
         var query = new ThumbnailQuery(request.queryParams());
-        return thumbnailService.generate(query.getUri(), query.getSize())
+        return thumbnailService.get(query.getUri(), query.getSize())
             .filterWhen(uri -> isAccessible(request, uri))
             .defaultIfEmpty(query.getUri())
             .flatMap(uri -> ServerResponse.temporaryRedirect(uri).build());

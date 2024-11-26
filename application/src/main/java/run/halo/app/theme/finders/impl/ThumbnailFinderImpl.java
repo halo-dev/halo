@@ -18,7 +18,7 @@ public class ThumbnailFinderImpl implements ThumbnailFinder {
     @Override
     public Mono<String> gen(String uriStr, String size) {
         return Mono.fromSupplier(() -> URI.create(uriStr))
-            .flatMap(uri -> thumbnailService.generate(uri, ThumbnailSize.fromName(size)))
+            .flatMap(uri -> thumbnailService.get(uri, ThumbnailSize.fromName(size)))
             .map(URI::toString)
             .onErrorResume(Throwable.class, e -> {
                 log.debug("Failed to generate thumbnail for [{}], error: [{}]", uriStr,
