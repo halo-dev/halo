@@ -6,7 +6,9 @@ import static run.halo.app.extension.index.query.QueryFactory.startsWith;
 import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URL;
+import java.util.Map;
 import java.util.Optional;
+import java.util.concurrent.ConcurrentHashMap;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Sort;
@@ -38,9 +40,24 @@ public class ThumbnailServiceImpl implements ThumbnailService {
     private final ExternalLinkProcessor externalLinkProcessor;
     private final ThumbnailProvider thumbnailProvider;
     private final LocalThumbnailService localThumbnailService;
+    private final Map<CacheKey, Mono<URI>> ongoingTasks = new ConcurrentHashMap<>();
 
     @Override
     public Mono<URI> generate(URI imageUri, ThumbnailSize size) {
+        var cacheKey = new CacheKey(imageUri, size);
+        // Combine caching to implement more elegant deduplication logic, ensure that only
+        // one thread executes the logic of create at the same time, and there is no global lock
+        // restriction
+        return ongoingTasks.computeIfAbsent(cacheKey, k -> doGenerate(imageUri, size)
+            // In the case of concurrency, doGenerate must return the same instance
+            .cache()
+            .doFinally(signalType -> ongoingTasks.remove(cacheKey)));
+    }
+
+    record CacheKey(URI imageUri, ThumbnailSize size) {
+    }
+
+    private Mono<URI> doGenerate(URI imageUri, ThumbnailSize size) {
         var imageUrlOpt = toImageUrl(imageUri);
         if (imageUrlOpt.isEmpty()) {
             return Mono.empty();
@@ -91,7 +108,7 @@ public class ThumbnailServiceImpl implements ThumbnailService {
         return Optional.empty();
     }
 
-    Mono<URI> create(URL imageUrl, ThumbnailSize size) {
+    protected Mono<URI> create(URL imageUrl, ThumbnailSize size) {
         var context = ThumbnailContext.builder()
             .imageUrl(imageUrl)
             .size(size)
@@ -112,8 +129,12 @@ public class ThumbnailServiceImpl implements ThumbnailService {
                     .setImageUri(imageUri.toASCIIString())
                     .setImageSignature(signatureFor(imageUri))
                 );
-                return client.create(thumb)
-                    .thenReturn(uri);
+                // double check
+                return fetchThumbnail(imageUri, size)
+                    .map(thumbnail -> URI.create(thumbnail.getSpec().getThumbnailUri()))
+                    .switchIfEmpty(Mono.defer(() -> client.create(thumb)
+                        .thenReturn(uri))
+                    );
             });
     }
 
