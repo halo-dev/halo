@@ -31,6 +31,8 @@ core:
         tooltip: 個人中心
       visit_homepage:
         title: 訪問首頁
+    profile:
+      aggregate_role: 聚合角色
   uc_sidebar:
     menu:
       items:
@@ -40,6 +42,8 @@ core:
     operations:
       console:
         tooltip: 管理控制台
+    profile:
+      aggregate_role: 聚合角色
   dashboard:
     title: 儀表板
     actions:
@@ -966,6 +970,9 @@ core:
         role:
           label: 角色
           placeholder: 請選擇角色
+      roles_preview:
+        all: 目前所選角色包含所有權限
+        includes: 目前選定角色所包含的權限：
     detail:
       title: 用戶詳情
       tabs:
@@ -1353,6 +1360,9 @@ core:
             url: 下載地址
         backup:
           label: 從備份檔案恢復
+          empty:
+            title: 沒有備份文件
+            message: 目前沒有掃描到備份文件，你可以手動將備份文件上傳到 Halo 工作目錄的 backups 目錄。
   exception:
     not_found:
       message: 沒有找到該頁面
@@ -1435,7 +1445,9 @@ core:
     Post Contributor: 允許投稿
     Post Publisher: 允許發布自己的文章
     UC Attachment Manage: 允許管理自己的附件
+    role-template-uc-attachment-manager: 允許管理自己的附件
     Recycle My Post: 允許刪除自己的文章
+    role-template-recycle-my-post: 允許刪除自己的文章
   components:
     submit_button:
       computed_text: "{text}（{shortcut}）"

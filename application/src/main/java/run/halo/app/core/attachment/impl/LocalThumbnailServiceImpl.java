@@ -64,8 +64,8 @@ public class LocalThumbnailServiceImpl implements LocalThumbnailService {
             .resolve(fileName);
     }
 
-    static String geImageFileName(URL imageUrl) {
-        var fileName = substringAfterLast(imageUrl.getPath(), "/");
+    static String geImageFileName(URI imageUri) {
+        var fileName = substringAfterLast(imageUri.getPath(), "/");
         fileName = defaultIfBlank(fileName, randomAlphanumeric(10));
         return ThumbnailGenerator.sanitizeFileName(fileName);
     }
@@ -113,11 +113,12 @@ public class LocalThumbnailServiceImpl implements LocalThumbnailService {
 
     private Mono<LocalThumbnail> fetchByImageHashAndSize(String imageSignature,
         ThumbnailSize size) {
+        var indexValue = LocalThumbnail.uniqueImageAndSize(imageSignature, size);
         return client.listBy(LocalThumbnail.class, ListOptions.builder()
-                .fieldQuery(equal("spec.imageSignature", imageSignature))
-                .build(), PageRequestImpl.ofSize(ThumbnailSize.values().length))
+                .fieldQuery(equal(LocalThumbnail.UNIQUE_IMAGE_AND_SIZE_INDEX, indexValue))
+                .build(), PageRequestImpl.ofSize(ThumbnailSize.values().length)
+            )
             .flatMapMany(result -> Flux.fromIterable(result.getItems()))
-            .filter(thumbnail -> thumbnail.getSpec().getSize().equals(size))
             .next();
     }
 
@@ -158,9 +159,15 @@ public class LocalThumbnailServiceImpl implements LocalThumbnailService {
     public Mono<LocalThumbnail> create(URL imageUrl, ThumbnailSize size) {
         Assert.notNull(imageUrl, "Image URL must not be null.");
         Assert.notNull(size, "Thumbnail size must not be null.");
-        var year = getYear();
-        var originalFileName = geImageFileName(imageUrl);
         var imageUri = URI.create(imageUrl.toString());
+        var imageHash = signatureForImageUri(imageUri);
+        return fetchByImageHashAndSize(imageHash, size)
+            .switchIfEmpty(Mono.defer(() -> doCreate(imageUri, size)));
+    }
+
+    private Mono<LocalThumbnail> doCreate(URI imageUri, ThumbnailSize size) {
+        var year = getYear();
+        var originalFileName = geImageFileName(imageUri);
         return generateUniqueThumbFileName(originalFileName, year, size)
             .flatMap(thumbFileName -> {
                 var filePath =

@@ -2,7 +2,7 @@
   "openapi": "3.0.1",
   "info": {
     "title": "Halo",
-    "version": "2.20.9-SNAPSHOT"
+    "version": "2.20.10-SNAPSHOT"
   },
   "servers": [
     {
@@ -19391,10 +19391,10 @@
           "menuItems": {
             "uniqueItems": true,
             "type": "array",
-            "description": "Names of menu children below this menu.",
+            "description": "Menu items of this menu.",
             "items": {
               "type": "string",
-              "description": "Names of menu children below this menu."
+              "description": "Name of menu item."
             }
           }
         },

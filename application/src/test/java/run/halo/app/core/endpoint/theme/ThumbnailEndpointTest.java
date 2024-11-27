@@ -39,7 +39,7 @@ class ThumbnailEndpointTest {
 
     @Test
     void thumbnailUriNotAccessible() {
-        when(thumbnailService.generate(any(), any()))
+        when(thumbnailService.get(any(), any()))
             .thenReturn(Mono.just(URI.create("/thumbnail-not-found.png")));
         webClient.get()
             .uri("/thumbnails/-/via-uri?size=l&uri=/myavatar.png")

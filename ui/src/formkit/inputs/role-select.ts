@@ -1,6 +1,5 @@
 import { rbacAnnotations } from "@/constants/annotations";
 import { roleLabels } from "@/constants/labels";
-import { i18n } from "@/locales";
 import type { FormKitNode, FormKitTypeDefinition } from "@formkit/core";
 import { coreApiClient } from "@halo-dev/api-client";
 import { select } from "./select";
@@ -14,12 +13,6 @@ function optionsHandler(node: FormKitNode) {
     });
 
     const options = [
-      {
-        label: i18n.global.t(
-          "core.user.grant_permission_modal.fields.role.placeholder"
-        ),
-        value: "",
-      },
       ...data.items.map((role) => {
         return {
           label:
