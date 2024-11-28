@@ -172,7 +172,7 @@ public class CommentPublicQueryServiceImpl implements CommentPublicQueryService 
         specOwner.setName("");
         var email = owner.getEmail();
         if (StringUtils.isNotBlank(email)) {
-            var emailHash = DigestUtils.md5DigestAsHex(email.getBytes());
+            var emailHash = DigestUtils.sha256DigestAsHex(email.getBytes());
             if (specOwner.getAnnotations() == null) {
                 specOwner.setAnnotations(new HashMap<>(2));
             }
@@ -224,7 +224,7 @@ public class CommentPublicQueryServiceImpl implements CommentPublicQueryService 
         specOwner.setName("");
         var email = owner.getEmail();
         if (StringUtils.isNotBlank(email)) {
-            var emailHash = DigestUtils.md5DigestAsHex(email.getBytes());
+            var emailHash = DigestUtils.sha256DigestAsHex(email.getBytes());
             if (specOwner.getAnnotations() == null) {
                 specOwner.setAnnotations(new HashMap<>(2));
             }
