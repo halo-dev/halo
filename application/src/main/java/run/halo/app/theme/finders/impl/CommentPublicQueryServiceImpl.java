@@ -11,6 +11,7 @@ import java.security.Principal;
 import java.util.HashMap;
 import java.util.Optional;
 import java.util.function.Function;
+import com.google.common.hash.Hashing;
 import lombok.RequiredArgsConstructor;
 import org.apache.commons.lang3.BooleanUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -172,7 +173,9 @@ public class CommentPublicQueryServiceImpl implements CommentPublicQueryService 
         specOwner.setName("");
         var email = owner.getEmail();
         if (StringUtils.isNotBlank(email)) {
-            var emailHash = DigestUtils.sha256DigestAsHex(email.getBytes());
+            var emailHash = Hashing.sha256()
+                                  .hashString(email, java.nio.charset.StandardCharsets.UTF_8)
+                                  .toString();
             if (specOwner.getAnnotations() == null) {
                 specOwner.setAnnotations(new HashMap<>(2));
             }
@@ -224,7 +227,9 @@ public class CommentPublicQueryServiceImpl implements CommentPublicQueryService 
         specOwner.setName("");
         var email = owner.getEmail();
         if (StringUtils.isNotBlank(email)) {
-            var emailHash = DigestUtils.sha256DigestAsHex(email.getBytes());
+            var emailHash = Hashing.sha256()
+                                  .hashString(email, java.nio.charset.StandardCharsets.UTF_8)
+                                  .toString();
             if (specOwner.getAnnotations() == null) {
                 specOwner.setAnnotations(new HashMap<>(2));
             }
