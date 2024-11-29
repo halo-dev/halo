@@ -11,6 +11,7 @@ import java.util.stream.Stream;
 import lombok.extern.slf4j.Slf4j;
 import org.pf4j.PluginRuntimeException;
 import org.springframework.beans.factory.support.DefaultBeanNameGenerator;
+import org.springframework.beans.factory.support.DefaultListableBeanFactory;
 import org.springframework.boot.env.PropertySourceLoader;
 import org.springframework.boot.env.YamlPropertySourceLoader;
 import org.springframework.context.ApplicationContext;
@@ -65,13 +66,19 @@ public class DefaultPluginApplicationContextFactory implements PluginApplication
 
         var sw = new StopWatch("CreateApplicationContextFor" + pluginId);
         sw.start("Create");
-        var context = new PluginApplicationContext(pluginId, pluginManager);
+
+        var pluginWrapper = pluginManager.getPlugin(pluginId);
+        var classLoader = pluginWrapper.getPluginClassLoader();
+
+        // create a custom bean factory to set the class loader
+        var beanFactory = new DefaultListableBeanFactory();
+        beanFactory.setBeanClassLoader(classLoader);
+
+        var context = new PluginApplicationContext(pluginId, pluginManager, beanFactory);
         context.setBeanNameGenerator(DefaultBeanNameGenerator.INSTANCE);
         context.registerShutdownHook();
         context.setParent(pluginManager.getSharedContext());
 
-        var pluginWrapper = pluginManager.getPlugin(pluginId);
-        var classLoader = pluginWrapper.getPluginClassLoader();
         var resourceLoader = new DefaultResourceLoader(classLoader);
         context.setResourceLoader(resourceLoader);
         sw.stop();
@@ -84,7 +91,6 @@ public class DefaultPluginApplicationContextFactory implements PluginApplication
         sw.stop();
 
         sw.start("RegisterBeans");
-        var beanFactory = context.getBeanFactory();
         beanFactory.registerSingleton("pluginWrapper", pluginWrapper);
         context.registerBean(AggregatedRouterFunction.class);
 

@@ -21,10 +21,12 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Objects;
 import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.function.Predicate;
 import java.util.stream.Collectors;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.pf4j.DependencyResolver;
+import org.pf4j.PluginDependency;
 import org.pf4j.PluginDescriptor;
 import org.pf4j.PluginWrapper;
 import org.reactivestreams.Publisher;
@@ -269,11 +271,11 @@ public class PluginServiceImpl implements PluginService, InitializingBean, Dispo
             .sort(Comparator.comparing(PluginWrapper::getPluginId))
             .flatMapSequential(pluginWrapper -> {
                 var pluginId = pluginWrapper.getPluginId();
-                return Mono.<Resource>fromSupplier(
-                        () -> BundleResourceUtils.getJsBundleResource(
+                return Mono.fromSupplier(() -> BundleResourceUtils.getJsBundleResource(
                             pluginManager, pluginId, BundleResourceUtils.JS_BUNDLE
                         )
                     )
+                    .cast(Resource.class)
                     .filter(Resource::isReadable)
                     .flatMapMany(resource -> {
                         var head = Mono.<DataBuffer>fromSupplier(
@@ -297,9 +299,10 @@ public class PluginServiceImpl implements PluginService, InitializingBean, Dispo
             .flatMapSequential(pluginWrapper -> {
                 var pluginId = pluginWrapper.getPluginId();
                 var dataBufferFactory = DefaultDataBufferFactory.sharedInstance;
-                return Mono.<Resource>fromSupplier(() -> BundleResourceUtils.getJsBundleResource(
+                return Mono.fromSupplier(() -> BundleResourceUtils.getJsBundleResource(
                         pluginManager, pluginId, BundleResourceUtils.CSS_BUNDLE
                     ))
+                    .cast(Resource.class)
                     .filter(Resource::isReadable)
                     .flatMapMany(resource -> {
                         var head = Mono.<DataBuffer>fromSupplier(() -> dataBufferFactory.wrap(
@@ -344,14 +347,9 @@ public class PluginServiceImpl implements PluginService, InitializingBean, Dispo
                     // preflight check
                     if (requestToEnable) {
                         // make sure the dependencies are enabled
-                        var dependencies = plugin.getSpec().getPluginDependencies().keySet();
-                        var notStartedDependencies = dependencies.stream()
-                            .filter(dependency -> {
-                                var pluginWrapper = pluginManager.getPlugin(dependency);
-                                return pluginWrapper == null
-                                    || !Objects.equals(STARTED, pluginWrapper.getPluginState());
-                            })
-                            .toList();
+                        var notStartedDependencies = getRequiredDependencies(plugin,
+                            pw -> pw == null || !Objects.equals(STARTED, pw.getPluginState())
+                        );
                         if (!CollectionUtils.isEmpty(notStartedDependencies)) {
                             return Mono.error(
                                 new PluginDependenciesNotEnabledException(notStartedDependencies)
@@ -414,6 +412,28 @@ public class PluginServiceImpl implements PluginService, InitializingBean, Dispo
         }
 
         return updatedPlugin;
+    }
+
+    @Override
+    public List<String> getRequiredDependencies(Plugin plugin,
+        Predicate<PluginWrapper> predicate) {
+        return getPluginDependency(plugin)
+            .stream()
+            .filter(dependency -> !dependency.isOptional())
+            .map(PluginDependency::getPluginId)
+            .filter(dependencyPlugin -> {
+                var pluginWrapper = pluginManager.getPlugin(dependencyPlugin);
+                return predicate.test(pluginWrapper);
+            })
+            .sorted()
+            .toList();
+    }
+
+    private static List<PluginDependency> getPluginDependency(Plugin plugin) {
+        return plugin.getSpec().getPluginDependencies().keySet()
+            .stream()
+            .map(PluginDependency::new)
+            .toList();
     }
 
     Mono<Plugin> findPluginManifest(Path path) {
