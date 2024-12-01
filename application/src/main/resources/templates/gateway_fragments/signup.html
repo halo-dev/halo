@@ -152,9 +152,7 @@
             }
 
             const emailCodeSendButton = document.getElementById("emailCodeSendButton");
-            const sendingButtonName = /*[[#{form.emailCode.sending}]]*/ "";
-            const sentButtonName = /*[[#{form.emailCode.sendButton}]]*/ "";
-            sendVerificationCode(emailCodeSendButton, sendRequest,sentButtonName,sendingButtonName);
+            sendVerificationCode(emailCodeSendButton, sendRequest);
         });
     </script>
 </form>
