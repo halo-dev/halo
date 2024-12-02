@@ -18,7 +18,6 @@ import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.context.ApplicationContext;
-import run.halo.app.core.reconciler.SystemSettingReconciler;
 import run.halo.app.extension.ConfigMap;
 import run.halo.app.extension.ExtensionClient;
 import run.halo.app.extension.Metadata;
@@ -59,7 +58,7 @@ class SystemSettingReconcilerTest {
             rules.setArchives("archives-new");
             return rules;
         });
-        when(environmentFetcher.getConfigMapBlocking()).thenReturn(Optional.of(configMap));
+        when(environmentFetcher.loadConfigMapBlocking()).thenReturn(Optional.of(configMap));
         when(client.fetch(eq(ConfigMap.class), eq(SystemSetting.SYSTEM_CONFIG)))
             .thenReturn(Optional.of(configMap));
         systemSettingReconciler.reconcile(new Reconciler.Request(SystemSetting.SYSTEM_CONFIG));
@@ -83,7 +82,7 @@ class SystemSettingReconcilerTest {
             rules.setTags("tags-new");
             return rules;
         });
-        when(environmentFetcher.getConfigMapBlocking()).thenReturn(Optional.of(configMap));
+        when(environmentFetcher.loadConfigMapBlocking()).thenReturn(Optional.of(configMap));
         when(client.fetch(eq(ConfigMap.class), eq(SystemSetting.SYSTEM_CONFIG)))
             .thenReturn(Optional.of(configMap));
         systemSettingReconciler.reconcile(new Reconciler.Request(SystemSetting.SYSTEM_CONFIG));
@@ -104,7 +103,7 @@ class SystemSettingReconcilerTest {
             rules.setCategories("categories-new");
             return rules;
         });
-        when(environmentFetcher.getConfigMapBlocking()).thenReturn(Optional.of(configMap));
+        when(environmentFetcher.loadConfigMapBlocking()).thenReturn(Optional.of(configMap));
         when(client.fetch(eq(ConfigMap.class), eq(SystemSetting.SYSTEM_CONFIG)))
             .thenReturn(Optional.of(configMap));
         systemSettingReconciler.reconcile(new Reconciler.Request(SystemSetting.SYSTEM_CONFIG));
@@ -125,7 +124,7 @@ class SystemSettingReconcilerTest {
             rules.setPost("/post-new/{slug}");
             return rules;
         });
-        when(environmentFetcher.getConfigMapBlocking()).thenReturn(Optional.of(configMap));
+        when(environmentFetcher.loadConfigMapBlocking()).thenReturn(Optional.of(configMap));
         when(client.fetch(eq(ConfigMap.class), eq(SystemSetting.SYSTEM_CONFIG)))
             .thenReturn(Optional.of(configMap));
         systemSettingReconciler.reconcile(new Reconciler.Request(SystemSetting.SYSTEM_CONFIG));

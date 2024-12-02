@@ -177,7 +177,7 @@ public class SystemSetupEndpoint {
             )
             .subscribeOn(Schedulers.boundedElastic());
 
-        var basicConfigMono = Mono.defer(() -> systemConfigFetcher.getConfigMap()
+        var basicConfigMono = Mono.defer(() -> systemConfigFetcher.loadConfigMap()
                 .flatMap(configMap -> {
                     mergeToBasicConfig(body, configMap);
                     return client.update(configMap);
