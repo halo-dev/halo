@@ -70,7 +70,21 @@ public class DefaultPluginApplicationContextFactory implements PluginApplication
         var pluginWrapper = pluginManager.getPlugin(pluginId);
         var classLoader = pluginWrapper.getPluginClassLoader();
 
-        // create a custom bean factory to set the class loader
+        /*
+         * Manually creating a BeanFactory and setting the plugin's ClassLoader is necessary
+         * to ensure that conditional annotations (e.g., @ConditionalOnClass) within the plugin
+         * context can correctly load classes.
+         * When PluginApplicationContext is created, its constructor initializes an
+         * AnnotatedBeanDefinitionReader, which in turn creates a ConditionEvaluator.
+         * ConditionEvaluator is responsible for evaluating conditional annotations such as
+         * @ConditionalOnClass.
+         * It relies on the BeanDefinitionRegistry's ClassLoader to load the classes specified in
+         * the annotations.
+         * Without explicitly setting the plugin's ClassLoader, the default application
+         * ClassLoader is used, which fails to load classes from the plugin.
+         * Therefore, a custom DefaultListableBeanFactory with the plugin ClassLoader is required
+         * to resolve this issue.
+         */
         var beanFactory = new DefaultListableBeanFactory();
         beanFactory.setBeanClassLoader(classLoader);
 

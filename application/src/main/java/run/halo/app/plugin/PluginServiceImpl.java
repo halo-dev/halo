@@ -271,12 +271,7 @@ public class PluginServiceImpl implements PluginService, InitializingBean, Dispo
             .sort(Comparator.comparing(PluginWrapper::getPluginId))
             .flatMapSequential(pluginWrapper -> {
                 var pluginId = pluginWrapper.getPluginId();
-                return Mono.fromSupplier(() -> BundleResourceUtils.getJsBundleResource(
-                            pluginManager, pluginId, BundleResourceUtils.JS_BUNDLE
-                        )
-                    )
-                    .cast(Resource.class)
-                    .filter(Resource::isReadable)
+                return getBundleResource(pluginId, BundleResourceUtils.JS_BUNDLE)
                     .flatMapMany(resource -> {
                         var head = Mono.<DataBuffer>fromSupplier(
                             () -> dataBufferFactory.wrap(
@@ -299,11 +294,7 @@ public class PluginServiceImpl implements PluginService, InitializingBean, Dispo
             .flatMapSequential(pluginWrapper -> {
                 var pluginId = pluginWrapper.getPluginId();
                 var dataBufferFactory = DefaultDataBufferFactory.sharedInstance;
-                return Mono.fromSupplier(() -> BundleResourceUtils.getJsBundleResource(
-                        pluginManager, pluginId, BundleResourceUtils.CSS_BUNDLE
-                    ))
-                    .cast(Resource.class)
-                    .filter(Resource::isReadable)
+                return getBundleResource(pluginId, BundleResourceUtils.CSS_BUNDLE)
                     .flatMapMany(resource -> {
                         var head = Mono.<DataBuffer>fromSupplier(() -> dataBufferFactory.wrap(
                             ("/* Generated from plugin " + pluginId + " */\n").getBytes()
@@ -314,6 +305,13 @@ public class PluginServiceImpl implements PluginService, InitializingBean, Dispo
                         return Flux.concat(head, content, tail);
                     });
             });
+    }
+
+    private Mono<Resource> getBundleResource(String pluginName, String bundleName) {
+        return Mono.fromSupplier(
+                () -> BundleResourceUtils.getJsBundleResource(pluginManager, pluginName, bundleName)
+            )
+            .filter(Resource::isReadable);
     }
 
     @Override
