@@ -1,6 +1,9 @@
 package run.halo.app.plugin;
 
 import java.nio.file.Path;
+import java.util.List;
+import java.util.function.Predicate;
+import org.pf4j.PluginWrapper;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.buffer.DataBuffer;
 import org.springframework.web.server.ServerWebInputException;
@@ -102,4 +105,14 @@ public interface PluginService {
      */
     Mono<Plugin> changeState(String pluginName, boolean requestToEnable, boolean wait);
 
+    /**
+     * Gets required dependencies of the given plugin.
+     *
+     * @param plugin the plugin to get dependencies from
+     * {@link Plugin.PluginSpec#getPluginDependencies()}
+     * @param predicate the predicate to filter by {@link PluginWrapper},such as enabled or disabled
+     * @return plugin names of required dependencies
+     */
+    List<String> getRequiredDependencies(Plugin plugin,
+        Predicate<PluginWrapper> predicate);
 }

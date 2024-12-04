@@ -2,6 +2,7 @@ package run.halo.app.plugin;
 
 import java.util.List;
 import java.util.concurrent.locks.StampedLock;
+import org.springframework.beans.factory.support.DefaultListableBeanFactory;
 import org.springframework.context.ApplicationEvent;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 import org.springframework.core.ResolvableType;
@@ -27,7 +28,9 @@ public class PluginApplicationContext extends AnnotationConfigApplicationContext
 
     private final SpringPluginManager pluginManager;
 
-    public PluginApplicationContext(String pluginId, SpringPluginManager pluginManager) {
+    public PluginApplicationContext(String pluginId, SpringPluginManager pluginManager,
+        DefaultListableBeanFactory beanFactory) {
+        super(beanFactory);
         this.pluginId = pluginId;
         this.pluginManager = pluginManager;
     }

@@ -3,7 +3,9 @@ package run.halo.app.plugin.extensionpoint;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.when;
 import static run.halo.app.infra.SystemSetting.ExtensionPointEnabled.GROUP;
 
@@ -82,10 +84,12 @@ class DefaultExtensionGetterTest {
         when(beanFactory.getBeanProvider(FakeExtensionPoint.class)).thenReturn(objectProvider);
 
         var extensionImpl = new FakeExtensionPointImpl();
-        when(pluginManager.getExtensions(FakeExtensionPoint.class))
-            .thenReturn(List.of(extensionImpl));
 
-        getter.getEnabledExtensions(FakeExtensionPoint.class)
+        var spyGetter = spy(getter);
+        doReturn(List.of(extensionImpl)).when(spyGetter)
+            .lookExtensions(eq(FakeExtensionPoint.class));
+
+        spyGetter.getEnabledExtensions(FakeExtensionPoint.class)
             .as(StepVerifier::create)
             .expectNext(extensionImpl)
             .verifyComplete();
@@ -110,10 +114,11 @@ class DefaultExtensionGetterTest {
             .thenReturn(Stream.of(extensionDefaultImpl));
         when(beanFactory.getBeanProvider(FakeExtensionPoint.class)).thenReturn(objectProvider);
 
-        when(pluginManager.getExtensions(FakeExtensionPoint.class))
-            .thenReturn(List.of());
+        var spyGetter = spy(getter);
+        doReturn(List.of()).when(spyGetter)
+            .lookExtensions(eq(FakeExtensionPoint.class));
 
-        getter.getEnabledExtensions(FakeExtensionPoint.class)
+        spyGetter.getEnabledExtensions(FakeExtensionPoint.class)
             .as(StepVerifier::create)
             .expectNext(extensionDefaultImpl)
             .verifyComplete();
@@ -159,10 +164,12 @@ class DefaultExtensionGetterTest {
         var extensionImpl = new FakeExtensionPointImpl();
         var anotherExtensionImpl = new FakeExtensionPoint() {
         };
-        when(pluginManager.getExtensions(FakeExtensionPoint.class))
-            .thenReturn(List.of(extensionImpl, anotherExtensionImpl));
 
-        getter.getEnabledExtensions(FakeExtensionPoint.class)
+        var spyGetter = spy(getter);
+        doReturn(List.of(extensionImpl, anotherExtensionImpl)).when(spyGetter)
+            .lookExtensions(eq(FakeExtensionPoint.class));
+
+        spyGetter.getEnabledExtensions(FakeExtensionPoint.class)
             .as(StepVerifier::create)
             // should keep the order of enabled extensions
             .expectNext(extensionDefaultImpl)
@@ -194,10 +201,12 @@ class DefaultExtensionGetterTest {
         var extensionImpl = new FakeExtensionPointImpl();
         var anotherExtensionImpl = new FakeExtensionPoint() {
         };
-        when(pluginManager.getExtensions(FakeExtensionPoint.class))
-            .thenReturn(List.of(extensionImpl, anotherExtensionImpl));
 
-        getter.getEnabledExtensions(FakeExtensionPoint.class)
+        var spyGetter = spy(getter);
+        doReturn(List.of(extensionImpl, anotherExtensionImpl)).when(spyGetter)
+            .lookExtensions(eq(FakeExtensionPoint.class));
+
+        spyGetter.getEnabledExtensions(FakeExtensionPoint.class)
             .as(StepVerifier::create)
             // should keep the order according to @Order annotation
             // order is 1
@@ -213,13 +222,16 @@ class DefaultExtensionGetterTest {
     void shouldGetExtensionsFromPluginManagerAndApplicationContext() {
         var extensionFromPlugin = new FakeExtensionPointDefaultImpl();
         var extensionFromAppContext = new FakeExtensionPointImpl();
-        when(pluginManager.getExtensions(FakeExtensionPoint.class))
-            .thenReturn(List.of(extensionFromPlugin));
+
+        var spyGetter = spy(getter);
+        doReturn(List.of(extensionFromPlugin)).when(spyGetter)
+            .lookExtensions(eq(FakeExtensionPoint.class));
+
         when(beanFactory.getBeanProvider(FakeExtensionPoint.class))
             .thenReturn(extensionPointObjectProvider);
         when(extensionPointObjectProvider.orderedStream())
             .thenReturn(Stream.of(extensionFromAppContext));
-        var extensions = getter.getExtensionList(FakeExtensionPoint.class);
+        var extensions = spyGetter.getExtensionList(FakeExtensionPoint.class);
         assertEquals(List.of(extensionFromAppContext, extensionFromPlugin), extensions);
     }
 

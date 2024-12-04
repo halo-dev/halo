@@ -1,20 +1,25 @@
 package run.halo.app.plugin.extensionpoint;
 
+import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Objects;
-import java.util.Optional;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.pf4j.ExtensionPoint;
 import org.pf4j.PluginManager;
+import org.pf4j.PluginWrapper;
 import org.springframework.beans.factory.BeanFactory;
 import org.springframework.core.annotation.AnnotationAwareOrderComparator;
+import org.springframework.lang.NonNull;
 import org.springframework.stereotype.Component;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import run.halo.app.infra.SystemConfigurableEnvironmentFetcher;
 import run.halo.app.infra.SystemSetting.ExtensionPointEnabled;
+import run.halo.app.plugin.SpringPlugin;
 
+@Slf4j
 @Component
 @RequiredArgsConstructor
 public class DefaultExtensionGetter implements ExtensionGetter {
@@ -31,7 +36,7 @@ public class DefaultExtensionGetter implements ExtensionGetter {
 
     @Override
     public <T extends ExtensionPoint> Flux<T> getExtensions(Class<T> extensionPoint) {
-        return Flux.fromIterable(pluginManager.getExtensions(extensionPoint))
+        return Flux.fromIterable(lookExtensions(extensionPoint))
             .concatWith(
                 Flux.fromStream(() -> beanFactory.getBeanProvider(extensionPoint).orderedStream())
             )
@@ -41,8 +46,7 @@ public class DefaultExtensionGetter implements ExtensionGetter {
     @Override
     public <T extends ExtensionPoint> List<T> getExtensionList(Class<T> extensionPoint) {
         var extensions = new LinkedList<T>();
-        Optional.ofNullable(pluginManager.getExtensions(extensionPoint))
-            .ifPresent(extensions::addAll);
+        extensions.addAll(lookExtensions(extensionPoint));
         extensions.addAll(beanFactory.getBeanProvider(extensionPoint).orderedStream().toList());
         extensions.sort(new AnnotationAwareOrderComparator());
         return extensions;
@@ -96,4 +100,29 @@ public class DefaultExtensionGetter implements ExtensionGetter {
         return extensionPointDefinitionGetter.getByClassName(extensionPoint.getName());
     }
 
+    @NonNull
+    protected <T> List<T> lookExtensions(Class<T> type) {
+        List<T> beans = new ArrayList<>();
+        // avoid concurrent modification
+        var startedPlugins = List.copyOf(pluginManager.getStartedPlugins());
+        for (PluginWrapper startedPlugin : startedPlugins) {
+            if (startedPlugin.getPlugin() instanceof SpringPlugin springPlugin) {
+                var pluginApplicationContext = springPlugin.getApplicationContext();
+                if (pluginApplicationContext == null) {
+                    continue;
+                }
+                try {
+                    pluginApplicationContext.getBeansOfType(type)
+                        .forEach((name, bean) -> beans.add(bean));
+                } catch (Throwable e) {
+                    // Ignore
+                    log.error("Error while looking for extensions of type {}", type, e);
+                }
+            } else {
+                var extensions = pluginManager.getExtensions(type, startedPlugin.getPluginId());
+                beans.addAll(extensions);
+            }
+        }
+        return beans;
+    }
 }

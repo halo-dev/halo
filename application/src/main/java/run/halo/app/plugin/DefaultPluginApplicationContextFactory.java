@@ -11,6 +11,7 @@ import java.util.stream.Stream;
 import lombok.extern.slf4j.Slf4j;
 import org.pf4j.PluginRuntimeException;
 import org.springframework.beans.factory.support.DefaultBeanNameGenerator;
+import org.springframework.beans.factory.support.DefaultListableBeanFactory;
 import org.springframework.boot.env.PropertySourceLoader;
 import org.springframework.boot.env.YamlPropertySourceLoader;
 import org.springframework.context.ApplicationContext;
@@ -65,13 +66,33 @@ public class DefaultPluginApplicationContextFactory implements PluginApplication
 
         var sw = new StopWatch("CreateApplicationContextFor" + pluginId);
         sw.start("Create");
-        var context = new PluginApplicationContext(pluginId, pluginManager);
+
+        var pluginWrapper = pluginManager.getPlugin(pluginId);
+        var classLoader = pluginWrapper.getPluginClassLoader();
+
+        /*
+         * Manually creating a BeanFactory and setting the plugin's ClassLoader is necessary
+         * to ensure that conditional annotations (e.g., @ConditionalOnClass) within the plugin
+         * context can correctly load classes.
+         * When PluginApplicationContext is created, its constructor initializes an
+         * AnnotatedBeanDefinitionReader, which in turn creates a ConditionEvaluator.
+         * ConditionEvaluator is responsible for evaluating conditional annotations such as
+         * @ConditionalOnClass.
+         * It relies on the BeanDefinitionRegistry's ClassLoader to load the classes specified in
+         * the annotations.
+         * Without explicitly setting the plugin's ClassLoader, the default application
+         * ClassLoader is used, which fails to load classes from the plugin.
+         * Therefore, a custom DefaultListableBeanFactory with the plugin ClassLoader is required
+         * to resolve this issue.
+         */
+        var beanFactory = new DefaultListableBeanFactory();
+        beanFactory.setBeanClassLoader(classLoader);
+
+        var context = new PluginApplicationContext(pluginId, pluginManager, beanFactory);
         context.setBeanNameGenerator(DefaultBeanNameGenerator.INSTANCE);
         context.registerShutdownHook();
         context.setParent(pluginManager.getSharedContext());
 
-        var pluginWrapper = pluginManager.getPlugin(pluginId);
-        var classLoader = pluginWrapper.getPluginClassLoader();
         var resourceLoader = new DefaultResourceLoader(classLoader);
         context.setResourceLoader(resourceLoader);
         sw.stop();
@@ -84,7 +105,6 @@ public class DefaultPluginApplicationContextFactory implements PluginApplication
         sw.stop();
 
         sw.start("RegisterBeans");
-        var beanFactory = context.getBeanFactory();
         beanFactory.registerSingleton("pluginWrapper", pluginWrapper);
         context.registerBean(AggregatedRouterFunction.class);
 

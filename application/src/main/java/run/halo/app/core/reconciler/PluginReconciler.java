@@ -32,7 +32,6 @@ import java.util.function.Predicate;
 import java.util.function.Supplier;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
-import org.pf4j.PluginDependency;
 import org.pf4j.PluginState;
 import org.pf4j.PluginWrapper;
 import org.pf4j.RuntimeMode;
@@ -48,6 +47,7 @@ import run.halo.app.extension.ConfigMap;
 import run.halo.app.extension.ExtensionClient;
 import run.halo.app.extension.ExtensionUtil;
 import run.halo.app.extension.Metadata;
+import run.halo.app.extension.MetadataUtil;
 import run.halo.app.extension.Unstructured;
 import run.halo.app.extension.controller.Controller;
 import run.halo.app.extension.controller.ControllerBuilder;
@@ -60,8 +60,10 @@ import run.halo.app.infra.ConditionStatus;
 import run.halo.app.infra.utils.PathUtils;
 import run.halo.app.infra.utils.SettingUtils;
 import run.halo.app.infra.utils.YamlUnstructuredLoader;
+import run.halo.app.plugin.OptionalDependentResolver;
 import run.halo.app.plugin.PluginConst;
 import run.halo.app.plugin.PluginProperties;
+import run.halo.app.plugin.PluginService;
 import run.halo.app.plugin.SpringPluginManager;
 
 /**
@@ -85,13 +87,16 @@ public class PluginReconciler implements Reconciler<Request> {
 
     private final PluginProperties pluginProperties;
 
+    private final PluginService pluginService;
+
     private Clock clock;
 
     public PluginReconciler(ExtensionClient client, SpringPluginManager pluginManager,
-        PluginProperties pluginProperties) {
+        PluginProperties pluginProperties, PluginService pluginService) {
         this.client = client;
         this.pluginManager = pluginManager;
         this.pluginProperties = pluginProperties;
+        this.pluginService = pluginService;
         this.clock = Clock.systemUTC();
     }
 
@@ -280,18 +285,9 @@ public class PluginReconciler implements Reconciler<Request> {
         status.setPhase(Plugin.Phase.STARTING);
 
         // check if the parent plugin is started
-        var pw = pluginManager.getPlugin(pluginName);
-        var unstartedDependencies = pw.getDescriptor().getDependencies()
-            .stream()
-            .filter(pd -> {
-                if (pd.isOptional()) {
-                    return false;
-                }
-                var parent = pluginManager.getPlugin(pd.getPluginId());
-                return parent == null || !PluginState.STARTED.equals(parent.getPluginState());
-            })
-            .map(PluginDependency::getPluginId)
-            .toList();
+        var unstartedDependencies = pluginService.getRequiredDependencies(plugin, pw ->
+            pw == null || !PluginState.STARTED.equals(pw.getPluginState())
+        );
         var conditions = status.getConditions();
         if (!CollectionUtils.isEmpty(unstartedDependencies)) {
             removeConditionBy(conditions, ConditionType.READY);
@@ -337,7 +333,29 @@ public class PluginReconciler implements Reconciler<Request> {
         status.setPhase(Plugin.Phase.STARTED);
 
         log.info("Started plugin {}", pluginName);
+
+        requestToReloadPluginsOptionallyDependentOn(pluginName);
+
         return null;
+    }
+
+    void requestToReloadPluginsOptionallyDependentOn(String pluginName) {
+        var startedPlugins = pluginManager.getStartedPlugins()
+            .stream()
+            .map(PluginWrapper::getDescriptor)
+            .toList();
+        var resolver = new OptionalDependentResolver(startedPlugins);
+        var dependents = resolver.getOptionalDependents(pluginName);
+        for (String dependentName : dependents) {
+            client.fetch(Plugin.class, dependentName)
+                .ifPresent(childPlugin -> {
+                    var annotations = MetadataUtil.nullSafeAnnotations(childPlugin);
+                    // loadLocation never be null for started plugins
+                    annotations.put(RELOAD_ANNO,
+                        childPlugin.getStatus().getLoadLocation().toString());
+                    client.update(childPlugin);
+                });
+        }
     }
 
     private Result disablePlugin(Plugin plugin) {
@@ -515,15 +533,9 @@ public class PluginReconciler implements Reconciler<Request> {
         }
 
         // check dependencies before loading
-        var unresolvedParentPlugins = plugin.getSpec().getPluginDependencies().keySet()
-            .stream()
-            .filter(dependency -> {
-                var parentPlugin = pluginManager.getPlugin(dependency);
-                return parentPlugin == null
-                    || pluginManager.getUnresolvedPlugins().contains(parentPlugin);
-            })
-            .sorted()
-            .toList();
+        var unresolvedParentPlugins = pluginService.getRequiredDependencies(plugin,
+            pw -> pw == null || pluginManager.getUnresolvedPlugins().contains(pw)
+        );
         if (!unresolvedParentPlugins.isEmpty()) {
             // requeue if the parent plugin is not loaded yet.
             removeConditionBy(conditions, ConditionType.INITIALIZED);
