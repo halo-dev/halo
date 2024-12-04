@@ -17,6 +17,7 @@ import run.halo.app.extension.ReactiveExtensionClient;
 import run.halo.app.infra.BackupRootGetter;
 import run.halo.app.infra.ExternalLinkProcessor;
 import run.halo.app.infra.ExternalUrlSupplier;
+import run.halo.app.infra.SystemInfoGetter;
 import run.halo.app.notification.NotificationCenter;
 import run.halo.app.notification.NotificationReasonEmitter;
 import run.halo.app.plugin.extensionpoint.ExtensionGetter;
@@ -96,6 +97,10 @@ public enum SharedApplicationContextFactory {
         rootContext.getBeanProvider(ReactiveUserDetailsService.class)
             .ifUnique(userDetailsService ->
                 beanFactory.registerSingleton("userDetailsService", userDetailsService)
+            );
+        rootContext.getBeanProvider(SystemInfoGetter.class)
+            .ifUnique(systemInfoGetter ->
+                beanFactory.registerSingleton("systemInfoGetter", systemInfoGetter)
             );
         // TODO add more shared instance here
 
