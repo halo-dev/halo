@@ -7,7 +7,6 @@ import Icons from "unplugin-icons/vite";
 import { fileURLToPath } from "url";
 import { defineConfig, type Plugin } from "vite";
 import { VitePWA } from "vite-plugin-pwa";
-import VueDevTools from "vite-plugin-vue-devtools";
 import { setupLibraryExternal } from "./library-external";
 
 interface Options {
@@ -44,7 +43,6 @@ export const sharedPlugins = [
     },
     disable: true,
   }),
-  VueDevTools(),
 ];
 
 export function createViteConfig(options: Options) {
