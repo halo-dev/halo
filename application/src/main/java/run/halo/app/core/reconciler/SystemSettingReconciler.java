@@ -295,6 +295,6 @@ public class SystemSettingReconciler implements Reconciler<Reconciler.Request> {
     }
 
     private Optional<ConfigMap> getConfigMap(String name) {
-        return environmentFetcher.getConfigMapBlocking();
+        return environmentFetcher.loadConfigMapBlocking();
     }
 }

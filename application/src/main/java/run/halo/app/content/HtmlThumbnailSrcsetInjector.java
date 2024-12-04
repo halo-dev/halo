@@ -65,7 +65,7 @@ public class HtmlThumbnailSrcsetInjector {
      */
     public static Mono<String> generateSrcset(URI src, ThumbnailService thumbnailService) {
         return Flux.fromArray(ThumbnailSize.values())
-            .flatMap(size -> thumbnailService.generate(src, size)
+            .flatMap(size -> thumbnailService.get(src, size)
                 .map(thumbnail -> thumbnail.toString() + " " + size.getWidth() + "w")
             )
             .collect(StringBuilder::new, (builder, srcsetValue) -> {

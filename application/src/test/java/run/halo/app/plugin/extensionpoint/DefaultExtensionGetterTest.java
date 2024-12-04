@@ -3,7 +3,6 @@ package run.halo.app.plugin.extensionpoint;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.ArgumentMatchers.same;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.spy;
@@ -25,10 +24,7 @@ import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.core.annotation.Order;
 import reactor.core.publisher.Mono;
 import reactor.test.StepVerifier;
-import run.halo.app.extension.ListOptions;
-import run.halo.app.extension.ListResult;
 import run.halo.app.extension.Metadata;
-import run.halo.app.extension.ReactiveExtensionClient;
 import run.halo.app.infra.SystemConfigurableEnvironmentFetcher;
 import run.halo.app.infra.SystemSetting.ExtensionPointEnabled;
 import run.halo.app.plugin.extensionpoint.ExtensionPointDefinition.ExtensionPointType;
@@ -37,7 +33,10 @@ import run.halo.app.plugin.extensionpoint.ExtensionPointDefinition.ExtensionPoin
 class DefaultExtensionGetterTest {
 
     @Mock
-    ReactiveExtensionClient client;
+    ExtensionPointDefinitionGetter extensionPointDefinitionGetter;
+
+    @Mock
+    ExtensionDefinitionGetter extensionDefinitionGetter;
 
     @Mock
     PluginManager pluginManager;
@@ -57,15 +56,14 @@ class DefaultExtensionGetterTest {
     @Test
     void shouldGetExtensionBySingletonDefinitionWhenExtensionPointEnabledSet() {
         // prepare extension point definition
-        when(client.listBy(same(ExtensionPointDefinition.class), any(ListOptions.class), any()))
-            .thenReturn(Mono.fromSupplier(() -> {
-                var epd = createExtensionPointDefinition("fake-extension-point",
+        when(extensionPointDefinitionGetter.getByClassName(any()))
+            .thenReturn(Mono.fromSupplier(
+                () -> createExtensionPointDefinition("fake-extension-point",
                     FakeExtensionPoint.class,
-                    ExtensionPointType.SINGLETON);
-                return new ListResult<>(List.of(epd));
-            }));
+                    ExtensionPointType.SINGLETON))
+            );
 
-        when(client.fetch(ExtensionDefinition.class, "fake-extension"))
+        when(extensionDefinitionGetter.get(eq("fake-extension")))
             .thenReturn(Mono.fromSupplier(() -> createExtensionDefinition(
                 "fake-extension",
                 FakeExtensionPointImpl.class,
@@ -99,13 +97,12 @@ class DefaultExtensionGetterTest {
 
     @Test
     void shouldGetDefaultSingletonDefinitionWhileExtensionPointEnabledNotSet() {
-        when(client.listBy(same(ExtensionPointDefinition.class), any(ListOptions.class), any()))
-            .thenReturn(Mono.fromSupplier(() -> {
-                var epd = createExtensionPointDefinition("fake-extension-point",
+        when(extensionPointDefinitionGetter.getByClassName(any()))
+            .thenReturn(Mono.fromSupplier(
+                () -> createExtensionPointDefinition("fake-extension-point",
                     FakeExtensionPoint.class,
-                    ExtensionPointType.SINGLETON);
-                return new ListResult<>(List.of(epd));
-            }));
+                    ExtensionPointType.SINGLETON))
+            );
 
         when(configFetcher.fetch(GROUP, ExtensionPointEnabled.class))
             .thenReturn(Mono.empty());
@@ -130,21 +127,20 @@ class DefaultExtensionGetterTest {
     @Test
     void shouldGetMultiInstanceExtensionWhileExtensionPointEnabledSet() {
         // prepare extension point definition
-        when(client.listBy(same(ExtensionPointDefinition.class), any(ListOptions.class), any()))
-            .thenReturn(Mono.fromSupplier(() -> {
-                var epd = createExtensionPointDefinition("fake-extension-point",
+        when(extensionPointDefinitionGetter.getByClassName(any()))
+            .thenReturn(Mono.fromSupplier(
+                () -> createExtensionPointDefinition("fake-extension-point",
                     FakeExtensionPoint.class,
-                    ExtensionPointType.MULTI_INSTANCE);
-                return new ListResult<>(List.of(epd));
-            }));
+                    ExtensionPointType.MULTI_INSTANCE))
+            );
 
-        when(client.fetch(ExtensionDefinition.class, "fake-extension"))
+        when(extensionDefinitionGetter.get(eq("fake-extension")))
             .thenReturn(Mono.fromSupplier(() -> createExtensionDefinition(
                 "fake-extension",
                 FakeExtensionPointImpl.class,
                 "fake-extension-point")));
 
-        when(client.fetch(ExtensionDefinition.class, "default-fake-extension"))
+        when(extensionDefinitionGetter.get(eq("default-fake-extension")))
             .thenReturn(Mono.fromSupplier(() -> createExtensionDefinition(
                 "default-fake-extension",
                 FakeExtensionPointDefaultImpl.class,
@@ -185,13 +181,12 @@ class DefaultExtensionGetterTest {
     @Test
     void shouldGetMultiInstanceExtensionWhileExtensionPointEnabledNotSet() {
         // prepare extension point definition
-        when(client.listBy(same(ExtensionPointDefinition.class), any(ListOptions.class), any()))
-            .thenReturn(Mono.fromSupplier(() -> {
-                var epd = createExtensionPointDefinition("fake-extension-point",
+        when(extensionPointDefinitionGetter.getByClassName(any()))
+            .thenReturn(Mono.fromSupplier(
+                () -> createExtensionPointDefinition("fake-extension-point",
                     FakeExtensionPoint.class,
-                    ExtensionPointType.MULTI_INSTANCE);
-                return new ListResult<>(List.of(epd));
-            }));
+                    ExtensionPointType.MULTI_INSTANCE))
+            );
 
         when(configFetcher.fetch(GROUP, ExtensionPointEnabled.class))
             .thenReturn(Mono.empty());

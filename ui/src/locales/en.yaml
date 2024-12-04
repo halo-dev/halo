@@ -1489,6 +1489,12 @@ core:
             url: Remote URL
         backup:
           label: Restore from backup files
+          empty:
+            title: No backup files
+            message: >-
+              Currently no backup files are scanned. You can manually upload the
+              backup files to the backups directory of the Halo working
+              directory.
   exception:
     not_found:
       message: Page not found

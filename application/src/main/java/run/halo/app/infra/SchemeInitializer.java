@@ -607,6 +607,8 @@ public class SchemeInitializer implements ApplicationListener<ApplicationContext
         schemeManager.register(PolicyTemplate.class);
         schemeManager.register(Thumbnail.class, indexSpec -> {
             indexSpec.add(new IndexSpec()
+                // see run.halo.app.core.attachment.ThumbnailMigration
+                // .setUnique(true)
                 .setName(Thumbnail.ID_INDEX)
                 .setIndexFunc(simpleAttribute(Thumbnail.class, Thumbnail::idIndexFunc))
             );
@@ -614,7 +616,8 @@ public class SchemeInitializer implements ApplicationListener<ApplicationContext
         schemeManager.register(LocalThumbnail.class, indexSpec -> {
             // make sure image and size are unique
             indexSpec.add(new IndexSpec()
-                .setUnique(true)
+                // see run.halo.app.core.attachment.ThumbnailMigration
+                // .setUnique(true)
                 .setName(LocalThumbnail.UNIQUE_IMAGE_AND_SIZE_INDEX)
                 .setIndexFunc(simpleAttribute(LocalThumbnail.class,
                     LocalThumbnail::uniqueImageAndSize)

@@ -18,5 +18,16 @@ public interface ThumbnailService {
      */
     Mono<URI> generate(URI imageUri, ThumbnailSize size);
 
+    /**
+     * <p>Get thumbnail by the given image uri and size.</p>
+     * <p>It depends on the {@link #generate(URI, ThumbnailSize)} method, currently the thumbnail
+     * generation is limited to the attachment service, that is, the thumbnail is strongly
+     * associated with the attachment.</p>
+     *
+     * @return if thumbnail exists, return the thumbnail uri, otherwise return the original image
+     * uri
+     */
+    Mono<URI> get(URI imageUri, ThumbnailSize size);
+
     Mono<Void> delete(URI imageUri);
 }
