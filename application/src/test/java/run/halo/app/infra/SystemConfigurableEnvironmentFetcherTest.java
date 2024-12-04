@@ -44,8 +44,8 @@ class SystemConfigurableEnvironmentFetcherTest {
     }
 
     @Test
-    void getConfigMap() {
-        environmentFetcher.getConfigMap()
+    void loadConfigMap() {
+        environmentFetcher.loadConfigMap()
             .as(StepVerifier::create)
             .consumeNextWith(configMap -> {
                 assertThat(configMap.getMetadata().getName())

@@ -76,7 +76,7 @@ public class SystemConfigEndpoint implements CustomEndpoint {
     private Mono<ServerResponse> updateConfigByGroup(ServerRequest request) {
         final var group = request.pathVariable("group");
         return request.bodyToMono(ObjectNode.class)
-            .flatMap(objectNode -> configurableEnvironmentFetcher.getConfigMap()
+            .flatMap(objectNode -> configurableEnvironmentFetcher.loadConfigMap()
                 .flatMap(configMap -> {
                     var data = configMap.getData();
                     data.put(group, JsonUtils.objectToJson(objectNode));
