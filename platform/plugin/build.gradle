@@ -19,3 +19,13 @@ dependencies {
         // e.g.: api 'halo.run.plugin:links-api:1.1.0'
     }
 }
+
+publishing {
+    publications.named('mavenJava', MavenPublication) {
+        from components.javaPlatform
+        pom {
+            name = 'Plugin platform'
+            description = "$project.description"
+        }
+    }
+}
