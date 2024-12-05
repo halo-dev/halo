@@ -174,8 +174,8 @@ public class CommentPublicQueryServiceImpl implements CommentPublicQueryService 
         var email = owner.getEmail();
         if (StringUtils.isNotBlank(email)) {
             var emailHash = Hashing.sha256()
-                                  .hashString(email.toLowerCase(), java.nio.charset.StandardCharsets.UTF_8)
-                                  .toString();
+                 .hashString(email.toLowerCase(), java.nio.charset.StandardCharsets.UTF_8)
+                 .toString();
             if (specOwner.getAnnotations() == null) {
                 specOwner.setAnnotations(new HashMap<>(2));
             }
@@ -228,8 +228,8 @@ public class CommentPublicQueryServiceImpl implements CommentPublicQueryService 
         var email = owner.getEmail();
         if (StringUtils.isNotBlank(email)) {
             var emailHash = Hashing.sha256()
-                                  .hashString(email.toLowerCase(), java.nio.charset.StandardCharsets.UTF_8)
-                                  .toString();
+                .hashString(email.toLowerCase(), java.nio.charset.StandardCharsets.UTF_8)
+                .toString();
             if (specOwner.getAnnotations() == null) {
                 specOwner.setAnnotations(new HashMap<>(2));
             }
