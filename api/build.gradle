@@ -91,6 +91,16 @@ java {
     withJavadocJar()
 }
 
+publishing {
+    publications.named('mavenJava', MavenPublication) {
+        from components.java
+        pom {
+            name = 'API library'
+            description = "$project.description"
+        }
+    }
+}
+
 tasks.named('test') {
     useJUnitPlatform()
     finalizedBy jacocoTestReport

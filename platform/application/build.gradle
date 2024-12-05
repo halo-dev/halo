@@ -4,7 +4,6 @@ plugins {
     id 'org.springframework.boot' apply false
     id 'java-platform'
     id 'halo.publish'
-    id 'signing'
 }
 
 group = 'run.halo.tools.platform'
@@ -62,4 +61,14 @@ dependencies {
         api "com.drewnoakes:metadata-extractor:$exifExtractor"
     }
 
+}
+
+publishing {
+    publications.named('mavenJava', MavenPublication) {
+        from components.javaPlatform
+        pom {
+            name = 'Application platform.'
+            description = "$project.description"
+        }
+    }
 }
