@@ -41,6 +41,9 @@ public class GlobalInfo {
 
     private Boolean mustVerifyEmailOnRegistration;
 
+    // must input username on registration
+    private Boolean mustInputUsernameOnRegistration;
+
     private String siteTitle;
 
     @Data

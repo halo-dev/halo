@@ -7,6 +7,7 @@ data:
     {
       "allowRegistration": false,
       "mustVerifyEmailOnRegistration": false,
+      "mustInputUsernameOnRegistration": true,
       "defaultRole": "guest",
       "avatarPolicy": "default-policy",
       "ucAttachmentPolicy": "default-policy"

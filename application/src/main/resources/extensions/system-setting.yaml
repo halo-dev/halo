@@ -102,6 +102,12 @@ spec:
           label: "开放注册"
           value: false
         - $formkit: checkbox
+          name: mustInputUsernameOnRegistration
+          label: "注册时需要填写名称"
+          if: "$get(allowRegistration).value === true"
+          help: "如果关闭此选项，名称默认为用户名"
+          value: false
+        - $formkit: checkbox
           name: mustVerifyEmailOnRegistration
           label: "注册需验证邮箱"
           if: "$get(allowRegistration).value === true"
