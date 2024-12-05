@@ -7,11 +7,11 @@ import static run.halo.app.extension.index.query.QueryFactory.equal;
 import static run.halo.app.extension.index.query.QueryFactory.isNull;
 import static run.halo.app.extension.index.query.QueryFactory.or;
 
+import com.google.common.hash.Hashing;
 import java.security.Principal;
 import java.util.HashMap;
 import java.util.Optional;
 import java.util.function.Function;
-import com.google.common.hash.Hashing;
 import lombok.RequiredArgsConstructor;
 import org.apache.commons.lang3.BooleanUtils;
 import org.apache.commons.lang3.StringUtils;
