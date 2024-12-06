@@ -48,7 +48,6 @@ import org.springframework.core.io.DefaultResourceLoader;
 import run.halo.app.core.extension.Plugin;
 import run.halo.app.core.extension.ReverseProxy;
 import run.halo.app.core.extension.Setting;
-import run.halo.app.core.reconciler.PluginReconciler;
 import run.halo.app.extension.ConfigMap;
 import run.halo.app.extension.ExtensionClient;
 import run.halo.app.extension.Metadata;
@@ -58,6 +57,7 @@ import run.halo.app.extension.controller.RequeueException;
 import run.halo.app.infra.Condition;
 import run.halo.app.infra.ConditionStatus;
 import run.halo.app.plugin.PluginProperties;
+import run.halo.app.plugin.PluginService;
 import run.halo.app.plugin.SpringPluginManager;
 
 /**
@@ -77,6 +77,9 @@ class PluginReconcilerTest {
 
     @Mock
     PluginProperties pluginProperties;
+
+    @Mock
+    private PluginService pluginService;
 
     @InjectMocks
     PluginReconciler reconciler;
@@ -110,6 +113,12 @@ class PluginReconcilerTest {
 
         @TempDir
         Path tempPath;
+
+        @BeforeEach
+        void setUp() {
+            lenient().when(pluginService.getRequiredDependencies(any(), any()))
+                .thenReturn(List.of());
+        }
 
         @Test
         void shouldNotStartPluginWithDevModeInNonDevEnv() {
@@ -277,7 +286,7 @@ class PluginReconcilerTest {
                 .thenReturn(mockPluginWrapperForSetting())
                 .thenReturn(mockPluginWrapperForStaticResources())
                 // before starting
-                .thenReturn(mockPluginWrapper(PluginState.STOPPED))
+                .thenReturn(mockPluginWrapper(PluginState.STARTED))
                 // sync plugin state
                 .thenReturn(mockPluginWrapper(PluginState.STARTED));
             when(pluginManager.startPlugin(name)).thenReturn(PluginState.STARTED);
@@ -308,7 +317,7 @@ class PluginReconcilerTest {
 
             verify(pluginManager).startPlugin(name);
             verify(pluginManager).loadPlugin(loadLocation);
-            verify(pluginManager, times(5)).getPlugin(name);
+            verify(pluginManager, times(4)).getPlugin(name);
             verify(client).update(fakePlugin);
             verify(client).fetch(Setting.class, settingName);
             verify(client).create(any(Setting.class));

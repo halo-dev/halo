@@ -1,42 +1,29 @@
 plugins {
     id 'maven-publish'
+    id 'signing'
 }
 
 publishing {
-    publications {
-        def pubName = "${archivesBaseName}"
-        pluginManager.withPlugin('java-platform') {
-            pubName = pubName + 'Pom'
-        }
-        pluginManager.withPlugin('java') {
-            pubName = pubName + 'Library'
-        }
-        "${pubName}"(MavenPublication) {
-            pluginManager.withPlugin('java-platform') {
-                from components.javaPlatform
+    publications.register('mavenJava', MavenPublication) {
+        pom {
+            url = 'https://github.com/halo-dev/halo'
+            licenses {
+                license {
+                    name = 'The GNU General Public License v3.0'
+                    url = 'https://www.gnu.org/licenses/gpl-3.0.en.html'
+                }
             }
-            pluginManager.withPlugin('java') {
-                from components.java
+            developers {
+                developer {
+                    id = 'johnniang'
+                    name = 'JohnNiang'
+                    email = 'johnniang@foxmail.com'
+                }
             }
-            pom {
-                licenses {
-                    license {
-                        name = 'The GNU General Public License v3.0'
-                        url = 'https://www.gnu.org/licenses/gpl-3.0.en.html'
-                    }
-                }
-                developers {
-                    developer {
-                        id = 'johnniang'
-                        name = 'JohnNiang'
-                        email = 'johnniang@foxmil.com'
-                    }
-                }
-                scm {
-                    connection = 'scm:git:https://github.com/halo-dev/halo.git'
-                    developerConnection = 'scm:git:ssh://git@github.com:halo-dev/halo.git'
-                    url = 'https://github.com/halo-dev/halo'
-                }
+            scm {
+                connection = 'scm:git:https://github.com/halo-dev/halo.git'
+                developerConnection = 'scm:git:ssh://git@github.com:halo-dev/halo.git'
+                url = 'https://github.com/halo-dev/halo'
             }
         }
     }
@@ -53,4 +40,8 @@ publishing {
             }
         }
     }
+}
+
+signing {
+    sign publishing.publications.mavenJava
 }

@@ -1,19 +1,28 @@
 package run.halo.app.infra;
 
+import static run.halo.app.extension.index.query.QueryFactory.equal;
+
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import com.github.fge.jsonpatch.JsonPatchException;
 import com.github.fge.jsonpatch.mergepatch.JsonMergePatch;
 import java.util.LinkedHashMap;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Optional;
+import java.util.concurrent.atomic.AtomicReference;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.core.convert.ConversionService;
 import org.springframework.lang.NonNull;
 import org.springframework.stereotype.Component;
 import reactor.core.publisher.Mono;
 import run.halo.app.extension.ConfigMap;
+import run.halo.app.extension.ExtensionMatcher;
+import run.halo.app.extension.ListOptions;
 import run.halo.app.extension.ReactiveExtensionClient;
+import run.halo.app.extension.controller.Controller;
+import run.halo.app.extension.controller.ControllerBuilder;
+import run.halo.app.extension.controller.Reconciler;
 import run.halo.app.infra.utils.JsonParseException;
 import run.halo.app.infra.utils.JsonUtils;
 
@@ -27,9 +36,10 @@ import run.halo.app.infra.utils.JsonUtils;
  * @since 2.0.0
  */
 @Component
-public class SystemConfigurableEnvironmentFetcher {
+public class SystemConfigurableEnvironmentFetcher implements Reconciler<Reconciler.Request> {
     private final ReactiveExtensionClient extensionClient;
     private final ConversionService conversionService;
+    private final AtomicReference<ConfigMap> configMapCache = new AtomicReference<>();
 
     public SystemConfigurableEnvironmentFetcher(ReactiveExtensionClient extensionClient,
         ConversionService conversionService) {
@@ -71,31 +81,27 @@ public class SystemConfigurableEnvironmentFetcher {
             .defaultIfEmpty(Map.of());
     }
 
-    /**
-     * Gets config map.
-     *
-     * @return a new {@link ConfigMap} named <code>system</code> by json merge patch.
-     */
     public Mono<ConfigMap> getConfigMap() {
-        Mono<ConfigMap> mapMono =
-            extensionClient.fetch(ConfigMap.class, SystemSetting.SYSTEM_CONFIG_DEFAULT);
-        if (mapMono == null) {
-            return Mono.empty();
-        }
-        return mapMono.flatMap(systemDefault ->
-                extensionClient.fetch(ConfigMap.class, SystemSetting.SYSTEM_CONFIG)
-                    .map(system -> {
-                        Map<String, String> defaultData = systemDefault.getData();
-                        Map<String, String> data = system.getData();
-                        Map<String, String> mergedData = mergeData(defaultData, data);
-                        system.setData(mergedData);
-                        return system;
-                    })
-                    .switchIfEmpty(Mono.just(systemDefault)));
+        return Mono.fromSupplier(configMapCache::get)
+            .switchIfEmpty(Mono.defer(this::loadConfigMapInternal));
     }
 
-    public Optional<ConfigMap> getConfigMapBlocking() {
-        return getConfigMap().blockOptional();
+    /**
+     * Load the system config map from the extension client.
+     *
+     * @return latest configMap from {@link ReactiveExtensionClient} without any cache.
+     */
+    public Mono<ConfigMap> loadConfigMap() {
+        return loadConfigMapInternal();
+    }
+
+    /**
+     * Gets the system config map without any cache.
+     *
+     * @return load configMap from {@link ReactiveExtensionClient}
+     */
+    public Optional<ConfigMap> loadConfigMapBlocking() {
+        return loadConfigMapInternal().blockOptional();
     }
 
     private Map<String, String> mergeData(Map<String, String> defaultData,
@@ -132,7 +138,7 @@ public class SystemConfigurableEnvironmentFetcher {
         return copiedDefault;
     }
 
-    String mergeRemappingFunction(String dataV, String defaultV) {
+    private String mergeRemappingFunction(String dataV, String defaultV) {
         JsonNode dataJsonValue = nullSafeToJsonNode(dataV);
         // original
         JsonNode defaultJsonValue = nullSafeToJsonNode(defaultV);
@@ -147,8 +153,57 @@ public class SystemConfigurableEnvironmentFetcher {
         }
     }
 
-    JsonNode nullSafeToJsonNode(String json) {
+    private JsonNode nullSafeToJsonNode(String json) {
         return StringUtils.isBlank(json) ? JsonNodeFactory.instance.nullNode()
             : JsonUtils.jsonToObject(json, JsonNode.class);
+    }
+
+    @Override
+    public Result reconcile(Request request) {
+        loadConfigMapInternal()
+            // should never happen
+            .switchIfEmpty(Mono.error(new IllegalStateException("System configMap not found.")))
+            .doOnNext(configMapCache::set)
+            .block();
+        return Result.doNotRetry();
+    }
+
+    @Override
+    public Controller setupWith(ControllerBuilder builder) {
+        ExtensionMatcher matcher = extension -> Objects.equals(extension.getMetadata().getName(),
+            SystemSetting.SYSTEM_CONFIG);
+        return builder
+            .extension(new ConfigMap())
+            .syncAllOnStart(true)
+            .syncAllListOptions(ListOptions.builder()
+                .fieldQuery(equal("metadata.name", SystemSetting.SYSTEM_CONFIG))
+                .build())
+            .onAddMatcher(matcher)
+            .onUpdateMatcher(matcher)
+            .onDeleteMatcher(matcher)
+            .build();
+    }
+
+    /**
+     * Gets config map.
+     *
+     * @return a new {@link ConfigMap} named <code>system</code> by json merge patch.
+     */
+    private Mono<ConfigMap> loadConfigMapInternal() {
+        Mono<ConfigMap> mapMono =
+            extensionClient.fetch(ConfigMap.class, SystemSetting.SYSTEM_CONFIG_DEFAULT);
+        if (mapMono == null) {
+            return Mono.empty();
+        }
+        return mapMono.flatMap(systemDefault ->
+            extensionClient.fetch(ConfigMap.class, SystemSetting.SYSTEM_CONFIG)
+                .map(system -> {
+                    Map<String, String> defaultData = systemDefault.getData();
+                    Map<String, String> data = system.getData();
+                    Map<String, String> mergedData = mergeData(defaultData, data);
+                    system.setData(mergedData);
+                    return system;
+                })
+                .switchIfEmpty(Mono.just(systemDefault)));
     }
 }
