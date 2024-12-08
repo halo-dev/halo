@@ -389,7 +389,8 @@ class CommentPublicQueryServiceIntegrationTest {
                                 "name":"",
                                 "displayName":"fake-display-name",
                                 "annotations":{
-                                    "email-hash": "79783106d88279c6c8f94f1f4dec22bdb9f90a8d14c9d6c6628a11430e236cbf"
+                                    "email-hash": \
+                    "79783106d88279c6c8f94f1f4dec22bdb9f90a8d14c9d6c6628a11430e236cbf"
                                 }
                             },
                             "creationTime": "2024-03-11T06:23:42.923294424Z",

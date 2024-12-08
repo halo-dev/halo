@@ -1,6 +1,7 @@
 package run.halo.app.theme.finders.impl;
 
 
+import static java.nio.charset.StandardCharsets.UTF_8;
 import static org.apache.commons.lang3.ObjectUtils.defaultIfNull;
 import static run.halo.app.extension.index.query.QueryFactory.and;
 import static run.halo.app.extension.index.query.QueryFactory.equal;
@@ -173,8 +174,8 @@ public class CommentPublicQueryServiceImpl implements CommentPublicQueryService 
         var email = owner.getEmail();
         if (StringUtils.isNotBlank(email)) {
             var emailHash = Hashing.sha256()
-                 .hashString(email.toLowerCase(), java.nio.charset.StandardCharsets.UTF_8)
-                 .toString();
+                .hashString(email.toLowerCase(), UTF_8)
+                .toString();
             if (specOwner.getAnnotations() == null) {
                 specOwner.setAnnotations(new HashMap<>(2));
             }
@@ -227,7 +228,7 @@ public class CommentPublicQueryServiceImpl implements CommentPublicQueryService 
         var email = owner.getEmail();
         if (StringUtils.isNotBlank(email)) {
             var emailHash = Hashing.sha256()
-                .hashString(email.toLowerCase(), java.nio.charset.StandardCharsets.UTF_8)
+                .hashString(email.toLowerCase(), UTF_8)
                 .toString();
             if (specOwner.getAnnotations() == null) {
                 specOwner.setAnnotations(new HashMap<>(2));
