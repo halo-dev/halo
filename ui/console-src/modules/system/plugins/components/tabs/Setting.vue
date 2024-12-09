@@ -76,6 +76,7 @@ const handleSaveConfigMap = async (data: object) => {
           :id="group"
           :value="currentConfigMapGroupData"
           :name="group"
+          :preserve="true"
           type="form"
           @submit="handleSaveConfigMap"
         >
