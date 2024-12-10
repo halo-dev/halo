@@ -34,6 +34,7 @@ export default defineConfig({
       name: "HaloComponents",
       formats: ["es", "iife"],
       fileName: (format) => `halo-components.${format}.js`,
+      cssFileName: "style",
     },
     rollupOptions: {
       external: [
