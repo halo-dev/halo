@@ -72,7 +72,7 @@ export function setupApiClient() {
 
       const contentType = error.response?.headers["content-type"];
 
-      if (contentType === "text/html") {
+      if (contentType.toLowerCase().includes("text/html")) {
         createHTMLContentModal({
           uniqueId: objectHash(error.response?.data || ""),
           title: error.response?.status.toString(),
