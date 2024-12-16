@@ -119,9 +119,9 @@
     "@types/qs": "^6.9.7",
     "@types/randomstring": "^1.1.8",
     "@types/ua-parser-js": "^0.7.39",
+    "@vitejs/plugin-vue": "^5.2.1",
+    "@vitejs/plugin-vue-jsx": "^4.1.1",
     "@vitejs/plugin-legacy": "^6.0.0",
-    "@vitejs/plugin-vue": "^5.1.4",
-    "@vitejs/plugin-vue-jsx": "^4.0.1",
     "@vitest/ui": "^0.34.1",
     "@vue/compiler-sfc": "^3.5.11",
     "@vue/eslint-config-prettier": "^7.1.0",
@@ -143,7 +143,7 @@
     "prettier-plugin-tailwindcss": "^0.1.13",
     "randomstring": "^1.2.3",
     "rollup-plugin-gzip": "^3.1.0",
-    "sass": "^1.56.2",
+    "sass-embedded": "^1.82.0",
     "start-server-and-test": "^1.14.0",
     "tailwindcss": "^3.2.7",
     "tailwindcss-safe-area": "^0.2.2",
@@ -151,7 +151,7 @@
     "terser": "^5.37.0",
     "typescript": "~5.6.2",
     "unplugin-icons": "^0.19.2",
-    "vite": "^5.4.1",
+    "vite": "^6.0.3",
     "vite-plugin-externals": "^0.6.2",
     "vite-plugin-html": "^3.2.2",
     "vite-plugin-pwa": "^0.20.0",
@@ -159,5 +159,5 @@
     "vitest": "^0.34.1",
     "vue-tsc": "^2.1.6"
   },
-  "packageManager": "pnpm@9.14.2+sha512.6e2baf77d06b9362294152c851c4f278ede37ab1eba3a55fda317a4a17b209f4dbb973fb250a77abc463a341fcb1f17f17cfa24091c4eb319cda0d9b84278387"
+  "packageManager": "pnpm@9.15.0+sha512.76e2379760a4328ec4415815bcd6628dee727af3779aaa4c914e3944156c4299921a89f976381ee107d41f12cfa4b66681ca9c718f0668fa0831ed4c6d8ba56c"
 }

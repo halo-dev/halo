@@ -42,6 +42,7 @@ export default ({ mode }: { mode: string }) => {
         name: "RichTextEditor",
         formats: ["es", "iife"],
         fileName: (format) => `rich-text-editor.${format}.js`,
+        cssFileName: "style",
       },
       minify: isProduction,
       rollupOptions: {
