@@ -9,6 +9,8 @@ import { defineConfig, type Plugin } from "vite";
 import { VitePWA } from "vite-plugin-pwa";
 import { setupLibraryExternal } from "./library-external";
 
+import legacy from "@vitejs/plugin-legacy";
+
 interface Options {
   base: string;
   entryFile: string;
@@ -42,6 +44,11 @@ export const sharedPlugins = [
       theme_color: "#fff",
     },
     disable: true,
+  }),
+  legacy({
+    targets: ["defaults", "not IE 11"],
+    polyfills: ["es/object/has-own"],
+    modernPolyfills: ["es/object/has-own"],
   }),
 ];
 
