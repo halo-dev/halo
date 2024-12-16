@@ -1,6 +1,7 @@
 <script lang="ts" setup>
 import { i18n } from "@/locales";
 import type { ProblemDetail } from "@/setup/setupApiClient";
+import { createHTMLContentModal } from "@/utils/modal";
 import { Toast } from "@halo-dev/components";
 import type { Restrictions } from "@uppy/core";
 import Uppy, { type SuccessResponse } from "@uppy/core";
@@ -13,7 +14,8 @@ import zh_CN from "@uppy/locales/lib/zh_CN";
 import zh_TW from "@uppy/locales/lib/zh_TW";
 import { Dashboard } from "@uppy/vue";
 import XHRUpload from "@uppy/xhr-upload";
-import { computed, onUnmounted } from "vue";
+import objectHash from "object-hash";
+import { computed, h, onUnmounted } from "vue";
 
 const props = withDefaults(
   defineProps<{
@@ -91,6 +93,40 @@ const uppy = computed(() => {
           const responseBody = response as XMLHttpRequest;
           const { status, statusText } = responseBody;
           const defaultMessage = [status, statusText].join(": ");
+
+          // Catch error requests where the response is text/html,
+          // which usually comes from a reverse proxy or WAF
+          // fixme: Because there is no responseType in the response, we can only judge it in this way for now.
+          const parser = new DOMParser();
+          const doc = parser.parseFromString(
+            responseBody.response,
+            "text/html"
+          );
+
+          if (
+            Array.from(doc.body.childNodes).some((node) => node.nodeType === 1)
+          ) {
+            createHTMLContentModal({
+              uniqueId: objectHash(responseBody.response || ""),
+              title: responseBody.status.toString(),
+              width: 700,
+              height: "calc(100vh - 20px)",
+              centered: true,
+              content: h("iframe", {
+                srcdoc: responseBody.response,
+                sandbox: "",
+                referrerpolicy: "no-referrer",
+                loading: "lazy",
+                style: {
+                  width: "100%",
+                  height: "100%",
+                },
+              }),
+            });
+
+            return new Error(defaultMessage);
+          }
+
           Toast.error(defaultMessage, { duration: 5000 });
           return new Error(defaultMessage);
         }

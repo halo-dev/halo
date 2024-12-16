@@ -1,7 +1,10 @@
 import { i18n } from "@/locales";
+import { createHTMLContentModal } from "@/utils/modal";
 import { axiosInstance } from "@halo-dev/api-client";
 import { Dialog, Toast } from "@halo-dev/components";
 import type { AxiosError } from "axios";
+import objectHash from "object-hash";
+import { h } from "vue";
 
 export interface ProblemDetail {
   detail: string;
@@ -16,7 +19,7 @@ export function setupApiClient() {
     (response) => {
       return response;
     },
-    async (error: AxiosError<ProblemDetail>) => {
+    async (error: AxiosError) => {
       if (error.code === "ERR_CANCELED") {
         return Promise.reject(error);
       }
@@ -41,7 +44,7 @@ export function setupApiClient() {
       }
 
       const { status } = errorResponse;
-      const { title, detail } = errorResponse.data;
+      const { title, detail } = errorResponse.data as ProblemDetail;
 
       if (status === 401) {
         Dialog.warning({
@@ -59,6 +62,33 @@ export function setupApiClient() {
               currentPath
             )}`;
           },
+        });
+
+        return Promise.reject(error);
+      }
+
+      // Catch error requests where the response is text/html,
+      // which usually comes from a reverse proxy or WAF
+
+      const contentType = error.response?.headers["content-type"];
+
+      if (contentType === "text/html") {
+        createHTMLContentModal({
+          uniqueId: objectHash(error.response?.data || ""),
+          title: error.response?.status.toString(),
+          width: 700,
+          height: "calc(100vh - 20px)",
+          centered: true,
+          content: h("iframe", {
+            srcdoc: error.response?.data?.toString(),
+            sandbox: "",
+            referrerpolicy: "no-referrer",
+            loading: "lazy",
+            style: {
+              width: "100%",
+              height: "100%",
+            },
+          }),
         });
 
         return Promise.reject(error);
