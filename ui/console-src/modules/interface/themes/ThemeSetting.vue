@@ -78,6 +78,7 @@ await suspense();
         :id="group"
         :value="currentConfigMapGroupData || {}"
         :name="group"
+        :preserve="true"
         type="form"
         @submit="handleSaveConfigMap"
       >
