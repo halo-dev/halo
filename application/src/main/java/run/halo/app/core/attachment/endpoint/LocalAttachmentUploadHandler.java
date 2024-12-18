@@ -36,6 +36,7 @@ import org.springframework.web.util.UriUtils;
 import reactor.core.Exceptions;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
+import reactor.core.publisher.SynchronousSink;
 import reactor.core.scheduler.Schedulers;
 import reactor.util.retry.Retry;
 import run.halo.app.core.attachment.AttachmentRootGetter;
@@ -159,6 +160,10 @@ class LocalAttachmentUploadHandler implements AttachmentHandler {
                 .next()
                 .handle((dataBuffer, sink) -> {
                     var mimeType = detectMimeType(dataBuffer.asInputStream(), file.name());
+                    if (!FileTypeDetectUtils.isValidExtensionForMime(mimeType, file.name())) {
+                        handleFileTypeError(sink, "fileTypeNotMatch", mimeType);
+                        return;
+                    }
                     var isAllow = setting.getAllowedFileTypes()
                         .stream()
                         .map(FileCategoryMatcher::of)
@@ -167,14 +172,19 @@ class LocalAttachmentUploadHandler implements AttachmentHandler {
                         sink.next(dataBuffer);
                         return;
                     }
-                    sink.error(new FileTypeNotAllowedException("File type is not allowed",
-                        "problemDetail.attachment.upload.fileTypeNotSupported",
-                        new Object[] {mimeType})
-                    );
+                    handleFileTypeError(sink, "fileTypeNotSupported", mimeType);
                 });
             validations.add(typeValidator);
         }
         return Mono.when(validations);
+    }
+
+    private static void handleFileTypeError(SynchronousSink<Object> sink, String detailCode,
+        String mimeType) {
+        sink.error(new FileTypeNotAllowedException("File type is not allowed",
+            "problemDetail.attachment.upload." + detailCode,
+            new Object[] {mimeType})
+        );
     }
 
     @NonNull
