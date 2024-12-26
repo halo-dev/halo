@@ -24,6 +24,7 @@ import {
 import { useQueryClient } from "@tanstack/vue-query";
 import { computed } from "vue";
 import { useI18n } from "vue-i18n";
+import { usePostPublishMutate } from "../composables/use-post-publish-mutate";
 
 const { t } = useI18n();
 const queryClient = useQueryClient();
@@ -67,13 +68,17 @@ const isPublishing = computed(() => {
   );
 });
 
-async function handlePublish() {
-  await ucApiClient.content.post.publishMyPost({
-    name: props.post.post.metadata.name,
-  });
+const { mutateAsync: postPublishMutate } = usePostPublishMutate();
 
-  Toast.success(t("core.common.toast.publish_success"));
-  queryClient.invalidateQueries({ queryKey: ["my-posts"] });
+async function handlePublish() {
+  try {
+    await postPublishMutate({ name: props.post.post.metadata.name });
+
+    Toast.success(t("core.common.toast.publish_success"));
+    queryClient.invalidateQueries({ queryKey: ["my-posts"] });
+  } catch (_) {
+    Toast.error(t("core.common.toast.publish_failed_and_retry"));
+  }
 }
 
 function handleUnpublish() {
