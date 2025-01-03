@@ -7,6 +7,7 @@ import { Toast, VButton, VModal, VSpace } from "@halo-dev/components";
 import { useMutation } from "@tanstack/vue-query";
 import { ref } from "vue";
 import { useI18n } from "vue-i18n";
+import { usePostPublishMutate } from "../composables/use-post-publish-mutate";
 import type { PostFormState } from "../types";
 import PostSettingForm from "./PostSettingForm.vue";
 
@@ -30,6 +31,8 @@ const emit = defineEmits<{
 }>();
 
 const modal = ref<InstanceType<typeof VModal> | null>(null);
+
+const { mutateAsync: postPublishMutate } = usePostPublishMutate();
 
 const { mutate, isLoading } = useMutation({
   mutationKey: ["uc:create-post"],
@@ -55,7 +58,7 @@ const { mutate, isLoading } = useMutation({
         htmlMetas: [],
         pinned: data.pinned,
         priority: 0,
-        publish: false,
+        publish: props.publish,
         publishTime: data.publishTime,
         slug: data.slug,
         tags: data.tags,
@@ -69,9 +72,7 @@ const { mutate, isLoading } = useMutation({
     });
 
     if (props.publish) {
-      await ucApiClient.content.post.publishMyPost({
-        name: post.metadata.name,
-      });
+      await postPublishMutate({ name: post.metadata.name });
     }
 
     return createdPost;
