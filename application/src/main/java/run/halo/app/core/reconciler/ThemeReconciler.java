@@ -10,6 +10,7 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
 import java.util.UUID;
+import lombok.RequiredArgsConstructor;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.retry.support.RetryTemplate;
 import org.springframework.stereotype.Component;
@@ -31,6 +32,7 @@ import run.halo.app.infra.exception.ThemeUninstallException;
 import run.halo.app.infra.utils.JsonUtils;
 import run.halo.app.infra.utils.SettingUtils;
 import run.halo.app.infra.utils.VersionUtils;
+import run.halo.app.theme.TemplateEngineManager;
 
 /**
  * Reconciler for theme.
@@ -39,6 +41,7 @@ import run.halo.app.infra.utils.VersionUtils;
  * @since 2.0.0
  */
 @Component
+@RequiredArgsConstructor
 public class ThemeReconciler implements Reconciler<Request> {
     private static final String FINALIZER_NAME = "theme-protection";
 
@@ -46,19 +49,13 @@ public class ThemeReconciler implements Reconciler<Request> {
 
     private final ThemeRootGetter themeRoot;
     private final SystemVersionSupplier systemVersionSupplier;
+    private final TemplateEngineManager templateEngineManager;
 
     private final RetryTemplate retryTemplate = RetryTemplate.builder()
         .maxAttempts(20)
         .fixedBackoff(300)
         .retryOn(IllegalStateException.class)
         .build();
-
-    public ThemeReconciler(ExtensionClient client, ThemeRootGetter themeRoot,
-        SystemVersionSupplier systemVersionSupplier) {
-        this.client = client;
-        this.themeRoot = themeRoot;
-        this.systemVersionSupplier = systemVersionSupplier;
-    }
 
     @Override
     public Result reconcile(Request request) {
@@ -173,6 +170,7 @@ public class ThemeReconciler implements Reconciler<Request> {
     }
 
     private void reconcileThemeDeletion(Theme theme) {
+        templateEngineManager.clearCache(theme.getMetadata().getName()).block();
         deleteThemeFiles(theme);
         // delete theme setting form
         String settingName = theme.getSpec().getSettingName();

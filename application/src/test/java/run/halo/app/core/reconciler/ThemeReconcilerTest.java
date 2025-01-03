@@ -32,10 +32,10 @@ import org.skyscreamer.jsonassert.JSONAssert;
 import org.springframework.retry.RetryException;
 import org.springframework.util.FileSystemUtils;
 import org.springframework.util.ResourceUtils;
+import reactor.core.publisher.Mono;
 import run.halo.app.core.extension.AnnotationSetting;
 import run.halo.app.core.extension.Setting;
 import run.halo.app.core.extension.Theme;
-import run.halo.app.core.reconciler.ThemeReconciler;
 import run.halo.app.extension.ConfigMap;
 import run.halo.app.extension.ExtensionClient;
 import run.halo.app.extension.Metadata;
@@ -44,6 +44,7 @@ import run.halo.app.extension.controller.Reconciler;
 import run.halo.app.infra.SystemVersionSupplier;
 import run.halo.app.infra.ThemeRootGetter;
 import run.halo.app.infra.utils.JsonUtils;
+import run.halo.app.theme.TemplateEngineManager;
 
 /**
  * Tests for {@link ThemeReconciler}.
@@ -66,6 +67,9 @@ class ThemeReconcilerTest {
     @Mock
     private File defaultTheme;
 
+    @Mock
+    private TemplateEngineManager templateEngineManager;
+
     @InjectMocks
     ThemeReconciler themeReconciler;
 
@@ -76,6 +80,7 @@ class ThemeReconcilerTest {
     void setUp() throws IOException {
         defaultTheme = ResourceUtils.getFile("classpath:themes/default");
         lenient().when(systemVersionSupplier.get()).thenReturn(Version.parse("0.0.0"));
+        lenient().when(templateEngineManager.clearCache(any())).thenReturn(Mono.empty());
     }
 
     @Test
@@ -128,7 +133,8 @@ class ThemeReconcilerTest {
         when(themeRoot.get()).thenReturn(testWorkDir);
 
         final ThemeReconciler themeReconciler =
-            new ThemeReconciler(extensionClient, themeRoot, systemVersionSupplier);
+            new ThemeReconciler(extensionClient, themeRoot, systemVersionSupplier,
+                templateEngineManager);
 
         final int[] retryFlags = {0, 0};
         when(extensionClient.fetch(eq(Setting.class), eq("theme-test-setting")))
@@ -157,6 +163,7 @@ class ThemeReconcilerTest {
         verify(extensionClient, times(2)).fetch(eq(Theme.class), eq(metadata.getName()));
         verify(extensionClient, times(3)).fetch(eq(Setting.class), eq(settingName));
         verify(extensionClient, times(3)).list(eq(AnnotationSetting.class), any(), eq(null));
+        verify(templateEngineManager).clearCache(eq(metadata.getName()));
     }
 
     @Test
@@ -167,7 +174,8 @@ class ThemeReconcilerTest {
         when(themeRoot.get()).thenReturn(testWorkDir);
 
         final ThemeReconciler themeReconciler =
-            new ThemeReconciler(extensionClient, themeRoot, systemVersionSupplier);
+            new ThemeReconciler(extensionClient, themeRoot, systemVersionSupplier,
+                templateEngineManager);
 
         final int[] retryFlags = {0};
         when(extensionClient.fetch(eq(Setting.class), eq("theme-test-setting")))
@@ -196,7 +204,8 @@ class ThemeReconcilerTest {
         when(themeRoot.get()).thenReturn(testWorkDir);
 
         final ThemeReconciler themeReconciler =
-            new ThemeReconciler(extensionClient, themeRoot, systemVersionSupplier);
+            new ThemeReconciler(extensionClient, themeRoot, systemVersionSupplier,
+                templateEngineManager);
         Theme theme = fakeTheme();
         theme.setStatus(null);
         theme.getSpec().setRequires(">2.3.0");
