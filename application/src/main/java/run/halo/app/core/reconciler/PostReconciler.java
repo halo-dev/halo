@@ -57,6 +57,7 @@ import run.halo.app.extension.DefaultExtensionMatcher;
 import run.halo.app.extension.ExtensionClient;
 import run.halo.app.extension.ExtensionOperator;
 import run.halo.app.extension.ListOptions;
+import run.halo.app.extension.MetadataUtil;
 import run.halo.app.extension.Ref;
 import run.halo.app.extension.controller.Controller;
 import run.halo.app.extension.controller.ControllerBuilder;
@@ -386,6 +387,16 @@ public class PostReconciler implements Reconciler<Reconciler.Request> {
             return StringUtils.EMPTY;
         }
         var content = contentWrapper.get();
+
+        var contentChecksum = Hashing.sha256().hashString(content.getContent(), UTF_8).toString();
+        var annotations = MetadataUtil.nullSafeAnnotations(post);
+        var oldChecksum = annotations.get(Constant.CONTENT_CHECKSUM_ANNO);
+        if (Objects.equals(oldChecksum, contentChecksum)) {
+            return post.getStatusOrDefault().getExcerpt();
+        }
+        // update the checksum and generate new excerpt
+        annotations.put(Constant.CONTENT_CHECKSUM_ANNO, contentChecksum);
+
         var tags = listTagDisplayNames(post);
 
         var keywords = new HashSet<>(tags);
