@@ -1,7 +1,7 @@
 <script lang="ts" setup>
-import { computed, defineProps, ref, watch } from "vue";
-import IconArrowDownLine from "~icons/ri/arrow-down-s-line";
 import { Dropdown as VDropdown } from "floating-vue";
+import { computed, ref, watch } from "vue";
+import IconArrowDownLine from "~icons/ri/arrow-down-s-line";
 
 export interface Option {
   label: string;
