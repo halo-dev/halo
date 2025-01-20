@@ -5,7 +5,7 @@ settings:
   excludeLinksFromLockfile: false
 
 overrides:
-  axios: ^1.7.x
+  axios: ^1.7.9
 
 importers:
 
@@ -121,7 +121,7 @@ importers:
         version: 10.9.0(vue@3.5.11(typescript@5.6.2))
       '@vueuse/integrations':
         specifier: ^10.9.0
-        version: 10.9.0(axios@1.7.2)(fuse.js@6.6.2)(qrcode@1.5.3)(sortablejs@1.14.0)(vue@3.5.11(typescript@5.6.2))
+        version: 10.9.0(axios@1.7.9)(fuse.js@6.6.2)(qrcode@1.5.3)(sortablejs@1.14.0)(vue@3.5.11(typescript@5.6.2))
       '@vueuse/router':
         specifier: ^10.9.0
         version: 10.9.0(vue-router@4.3.2(vue@3.5.11(typescript@5.6.2)))(vue@3.5.11(typescript@5.6.2))
@@ -129,8 +129,8 @@ importers:
         specifier: ^10.9.0
         version: 10.9.0(vue@3.5.11(typescript@5.6.2))
       axios:
-        specifier: ^1.7.x
-        version: 1.7.2(debug@4.3.2)
+        specifier: ^1.7.9
+        version: 1.7.9(debug@4.3.2)
       codemirror:
         specifier: ^6.0.1
         version: 6.0.1(@lezer/common@1.0.1)
@@ -373,8 +373,8 @@ importers:
   packages/api-client:
     dependencies:
       axios:
-        specifier: ^1.7.x
-        version: 1.7.2(debug@4.3.2)
+        specifier: ^1.7.9
+        version: 1.7.9(debug@4.3.2)
       qs:
         specifier: ^6.13.0
         version: 6.13.0
@@ -3054,7 +3054,7 @@ packages:
     resolution: {integrity: sha512-Z6GuOUdNQjP7FX+OuV2Ybyamse+/e0BFdTWBX5JxpBDKA+YkdLynDgG6HTF04zy6e9zPa19UX0WA2VDoehwhXQ==}
     peerDependencies:
       '@nestjs/common': ^7.0.0 || ^8.0.0 || ^9.0.0 || ^10.0.0
-      axios: ^1.7.x
+      axios: ^1.7.9
       rxjs: ^6.0.0 || ^7.0.0
 
   '@nestjs/common@10.3.0':
@@ -4724,7 +4724,7 @@ packages:
     resolution: {integrity: sha512-acK+A01AYdWSvL4BZmCoJAcyHJ6EqhmkQEXbQLwev1MY7NBnS+hcEMx/BzVoR9zKI+UqEPMD9u6PsyAuiTRT4Q==}
     peerDependencies:
       async-validator: '*'
-      axios: ^1.7.x
+      axios: ^1.7.9
       change-case: '*'
       drauu: '*'
       focus-trap: '*'
@@ -5099,8 +5099,8 @@ packages:
     resolution: {integrity: sha512-wvUjBtSGN7+7SjNpq/9M2Tg350UZD3q62IFZLbRAR1bSMlCo1ZaeW+BJ+D090e4hIIZLBcTDWe4Mh4jvUDajzQ==}
     engines: {node: '>= 0.4'}
 
-  axios@1.7.2:
-    resolution: {integrity: sha512-2A8QhOMrbomlDuiLeK9XibIBzuHeRcqqNOHp0Cyp5EoJ1IFDh+XZH3A6BkXtv0K4gFGCI0Y4BM7B1wOEi0Rmgw==}
+  axios@1.7.9:
+    resolution: {integrity: sha512-LhLcE7Hbiryz8oMDdDptSrWowmB4Bl6RCt6sIJKpRB4XtVf0iEgewX3au/pJqm+Py1kCASkb/FFKjxQaLtxJvw==}
 
   babel-core@7.0.0-bridge.0:
     resolution: {integrity: sha512-poPX9mZH/5CSanm50Q+1toVci6pv5KSRv/5TWCwtzQS5XEwn40BcCrgIeMFWP9CKKIniKXNxoIOnOq4VVlGXhg==}
@@ -10314,8 +10314,8 @@ packages:
   vue-component-type-helpers@2.0.19:
     resolution: {integrity: sha512-cN3f1aTxxKo4lzNeQAkVopswuImUrb5Iurll9Gaw5cqpnbTAxtEMM1mgi6ou4X79OCyqYv1U1mzBHJkzmiK82w==}
 
-  vue-component-type-helpers@2.1.10:
-    resolution: {integrity: sha512-lfgdSLQKrUmADiSV6PbBvYgQ33KF3Ztv6gP85MfGaGaSGMTXORVaHT1EHfsqCgzRNBstPKYDmvAV9Do5CmJ07A==}
+  vue-component-type-helpers@2.2.0:
+    resolution: {integrity: sha512-cYrAnv2me7bPDcg9kIcGwjJiSB6Qyi08+jLDo9yuvoFQjzHiPTzML7RnkJB1+3P6KMsX/KbCD4QE3Tv/knEllw==}
 
   vue-demi@0.13.11:
     resolution: {integrity: sha512-IR8HoEEGM65YY3ZJYAjMlKygDQn25D5ajNFNoKh9RSDMQtlzCxtfQjdQgv9jjK+m3377SsJXY8ysq8kLCZL25A==}
@@ -13810,10 +13810,10 @@ snapshots:
       pump: 3.0.0
       tar-fs: 2.1.1
 
-  '@nestjs/axios@3.0.2(@nestjs/common@10.3.0(reflect-metadata@0.1.13)(rxjs@7.8.1))(axios@1.7.2)(rxjs@7.8.1)':
+  '@nestjs/axios@3.0.2(@nestjs/common@10.3.0(reflect-metadata@0.1.13)(rxjs@7.8.1))(axios@1.7.9)(rxjs@7.8.1)':
     dependencies:
       '@nestjs/common': 10.3.0(reflect-metadata@0.1.13)(rxjs@7.8.1)
-      axios: 1.7.2(debug@4.3.2)
+      axios: 1.7.9(debug@4.3.2)
       rxjs: 7.8.1
 
   '@nestjs/common@10.3.0(reflect-metadata@0.1.13)(rxjs@7.8.1)':
@@ -13943,11 +13943,11 @@ snapshots:
 
   '@openapitools/openapi-generator-cli@2.13.4':
     dependencies:
-      '@nestjs/axios': 3.0.2(@nestjs/common@10.3.0(reflect-metadata@0.1.13)(rxjs@7.8.1))(axios@1.7.2)(rxjs@7.8.1)
+      '@nestjs/axios': 3.0.2(@nestjs/common@10.3.0(reflect-metadata@0.1.13)(rxjs@7.8.1))(axios@1.7.9)(rxjs@7.8.1)
       '@nestjs/common': 10.3.0(reflect-metadata@0.1.13)(rxjs@7.8.1)
       '@nestjs/core': 10.3.0(@nestjs/common@10.3.0(reflect-metadata@0.1.13)(rxjs@7.8.1))(reflect-metadata@0.1.13)(rxjs@7.8.1)
       '@nuxtjs/opencollective': 0.3.2
-      axios: 1.7.2(debug@4.3.2)
+      axios: 1.7.9(debug@4.3.2)
       chalk: 4.1.2
       commander: 8.3.0
       compare-versions: 4.1.4
@@ -15097,7 +15097,7 @@ snapshots:
       ts-dedent: 2.2.0
       type-fest: 2.19.0
       vue: 3.5.11(typescript@5.6.2)
-      vue-component-type-helpers: 2.1.10
+      vue-component-type-helpers: 2.2.0
     transitivePeerDependencies:
       - encoding
       - supports-color
@@ -16070,13 +16070,13 @@ snapshots:
       - '@vue/composition-api'
       - vue
 
-  '@vueuse/integrations@10.9.0(axios@1.7.2)(fuse.js@6.6.2)(qrcode@1.5.3)(sortablejs@1.14.0)(vue@3.5.11(typescript@5.6.2))':
+  '@vueuse/integrations@10.9.0(axios@1.7.9)(fuse.js@6.6.2)(qrcode@1.5.3)(sortablejs@1.14.0)(vue@3.5.11(typescript@5.6.2))':
     dependencies:
       '@vueuse/core': 10.9.0(vue@3.5.11(typescript@5.6.2))
       '@vueuse/shared': 10.9.0(vue@3.5.11(typescript@5.6.2))
       vue-demi: 0.14.10(vue@3.5.11(typescript@5.6.2))
     optionalDependencies:
-      axios: 1.7.2(debug@4.3.2)
+      axios: 1.7.9(debug@4.3.2)
       fuse.js: 6.6.2
       qrcode: 1.5.3
       sortablejs: 1.14.0
@@ -16443,7 +16443,7 @@ snapshots:
     dependencies:
       possible-typed-array-names: 1.0.0
 
-  axios@1.7.2(debug@4.3.2):
+  axios@1.7.9(debug@4.3.2):
     dependencies:
       follow-redirects: 1.15.6(debug@4.3.2)
       form-data: 4.0.0
@@ -22280,7 +22280,7 @@ snapshots:
 
   vue-component-type-helpers@2.0.19: {}
 
-  vue-component-type-helpers@2.1.10: {}
+  vue-component-type-helpers@2.2.0: {}
 
   vue-demi@0.13.11(vue@3.5.11(typescript@5.6.2)):
     dependencies:
@@ -22399,7 +22399,7 @@ snapshots:
 
   wait-on@6.0.0(debug@4.3.2):
     dependencies:
-      axios: 1.7.2(debug@4.3.2)
+      axios: 1.7.9(debug@4.3.2)
       joi: 17.6.1
       lodash: 4.17.21
       minimist: 1.2.6

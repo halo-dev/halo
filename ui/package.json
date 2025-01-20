@@ -34,7 +34,7 @@
     ]
   },
   "resolutions": {
-    "axios": "^1.7.x"
+    "axios": "^1.7.9"
   },
   "dependencies": {
     "@codemirror/commands": "^6.1.2",
@@ -76,7 +76,7 @@
     "@vueuse/integrations": "^10.9.0",
     "@vueuse/router": "^10.9.0",
     "@vueuse/shared": "^10.9.0",
-    "axios": "^1.7.2",
+    "axios": "^1.7.9",
     "codemirror": "^6.0.1",
     "colorjs.io": "^0.4.3",
     "cropperjs": "^1.5.13",
