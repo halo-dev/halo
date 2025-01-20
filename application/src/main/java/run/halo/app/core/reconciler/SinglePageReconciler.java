@@ -3,6 +3,7 @@ package run.halo.app.core.reconciler;
 import static java.nio.charset.StandardCharsets.UTF_8;
 import static org.springframework.web.util.UriUtils.encodePath;
 
+import com.google.common.hash.Hashing;
 import java.time.Instant;
 import java.util.HashSet;
 import java.util.List;
@@ -25,6 +26,7 @@ import run.halo.app.content.SinglePageService;
 import run.halo.app.content.comment.CommentService;
 import run.halo.app.core.counter.CounterService;
 import run.halo.app.core.counter.MeterUtils;
+import run.halo.app.core.extension.content.Constant;
 import run.halo.app.core.extension.content.Post;
 import run.halo.app.core.extension.content.SinglePage;
 import run.halo.app.core.extension.content.Snapshot;
@@ -372,6 +374,16 @@ public class SinglePageReconciler implements Reconciler<Reconciler.Request> {
             return StringUtils.EMPTY;
         }
         var content = contentWrapper.get();
+
+        var contentChecksum = Hashing.sha256().hashString(content.getContent(), UTF_8).toString();
+        var annotations = MetadataUtil.nullSafeAnnotations(singlePage);
+        var oldChecksum = annotations.get(Constant.CONTENT_CHECKSUM_ANNO);
+        if (Objects.equals(oldChecksum, contentChecksum)) {
+            return singlePage.getStatusOrDefault().getExcerpt();
+        }
+        // update the checksum and generate new excerpt
+        annotations.put(Constant.CONTENT_CHECKSUM_ANNO, contentChecksum);
+
         var context = new ExcerptGenerator.Context()
             .setRaw(content.getRaw())
             .setContent(content.getContent())
