@@ -13,8 +13,10 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.time.Duration;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Set;
 import java.util.function.Predicate;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -41,7 +43,10 @@ import reactor.util.retry.Retry;
 import run.halo.app.core.extension.AnnotationSetting;
 import run.halo.app.core.extension.Setting;
 import run.halo.app.core.extension.Theme;
+import run.halo.app.core.extension.notification.NotificationTemplate;
 import run.halo.app.extension.ConfigMap;
+import run.halo.app.extension.Extension;
+import run.halo.app.extension.GroupVersionKind;
 import run.halo.app.extension.MetadataUtil;
 import run.halo.app.extension.ReactiveExtensionClient;
 import run.halo.app.extension.Unstructured;
@@ -114,7 +119,7 @@ public class ThemeServiceImpl implements ThemeService {
     public Mono<Theme> install(Publisher<DataBuffer> content) {
         var themeRoot = this.themeRoot.get();
         return unzipThemeTo(content, themeRoot, scheduler)
-            .flatMap(this::persistent);
+            .flatMap(theme -> persistent(theme, false));
     }
 
     @Override
@@ -155,7 +160,7 @@ public class ThemeServiceImpl implements ThemeService {
 
                         return deleteThemeAndWaitForComplete(themeName)
                             .then(copyTheme)
-                            .then(this.persistent(newTheme));
+                            .then(this.persistent(newTheme, true));
                     });
             },
             tempDir -> deleteRecursivelyAndSilently(tempDir, scheduler)
@@ -173,7 +178,7 @@ public class ThemeServiceImpl implements ThemeService {
      * @return a theme custom model
      * @see Theme
      */
-    public Mono<Theme> persistent(Unstructured themeManifest) {
+    private Mono<Theme> persistent(Unstructured themeManifest, boolean isUpgrade) {
         Assert.state(StringUtils.equals(Theme.KIND, themeManifest.getKind()),
             "Theme manifest kind must be Theme.");
         return client.create(themeManifest)
@@ -204,34 +209,27 @@ public class ThemeServiceImpl implements ThemeService {
                     return Mono.error(new IllegalStateException(
                         "Theme must only have one config.yaml or config.yml."));
                 }
-                var spec = theme.getSpec();
                 return Flux.fromIterable(unstructureds)
-                    .filter(unstructured -> {
-                        String name = unstructured.getMetadata().getName();
-                        boolean isThemeSetting = unstructured.getKind().equals(Setting.KIND)
-                            && StringUtils.equals(spec.getSettingName(), name);
-
-                        boolean isThemeConfig = unstructured.getKind().equals(ConfigMap.KIND)
-                            && StringUtils.equals(spec.getConfigMapName(), name);
-
-                        boolean isAnnotationSetting = unstructured.getKind()
-                            .equals(AnnotationSetting.KIND);
-                        return isThemeSetting || isThemeConfig || isAnnotationSetting;
-                    })
+                    .filter(unstructured -> ExtensionWhitelist.of(theme).isAllowed(unstructured))
                     .doOnNext(unstructured ->
                         populateThemeNameLabel(unstructured, theme.getMetadata().getName()))
-                    .flatMap(this::createOrUpdate)
+                    .flatMap(unstructured -> {
+                        if (isUpgrade) {
+                            return createOrUpdate(unstructured);
+                        }
+                        return client.create(unstructured);
+                    })
                     .then(Mono.just(theme));
             });
     }
 
-    Mono<Unstructured> createOrUpdate(Unstructured unstructured) {
+    private Mono<Unstructured> createOrUpdate(Unstructured unstructured) {
         return Mono.defer(() -> client.fetch(unstructured.groupVersionKind(),
                     unstructured.getMetadata().getName())
                 .flatMap(existUnstructured -> {
-                    existUnstructured.getMetadata()
-                        .setVersion(unstructured.getMetadata().getVersion());
-                    return client.update(existUnstructured);
+                    unstructured.getMetadata()
+                        .setVersion(existUnstructured.getMetadata().getVersion());
+                    return client.update(unstructured);
                 })
                 .switchIfEmpty(Mono.defer(() -> client.create(unstructured)))
             )
@@ -264,17 +262,12 @@ public class ThemeServiceImpl implements ThemeService {
                     })
                     .flatMap(client::update);
             }))
-            .flatMap(theme -> {
-                String settingName = theme.getSpec().getSettingName();
-                return Flux.fromIterable(ThemeUtils.loadThemeResources(getThemePath(theme)))
-                    .filter(unstructured -> (Setting.KIND.equals(unstructured.getKind())
-                        && unstructured.getMetadata().getName().equals(settingName))
-                        || AnnotationSetting.KIND.equals(unstructured.getKind())
-                    )
-                    .doOnNext(unstructured -> populateThemeNameLabel(unstructured, name))
-                    .flatMap(client::create)
-                    .then(Mono.just(theme));
-            });
+            .flatMap(theme -> Flux.fromIterable(ThemeUtils.loadThemeResources(getThemePath(theme)))
+                .filter(unstructured -> ExtensionWhitelist.of(theme).isAllowed(unstructured))
+                .doOnNext(unstructured -> populateThemeNameLabel(unstructured, name))
+                .flatMap(this::createOrUpdate)
+                .then(Mono.just(theme))
+            );
     }
 
     private static void populateThemeNameLabel(Unstructured unstructured, String themeName) {
@@ -372,5 +365,62 @@ public class ThemeServiceImpl implements ThemeService {
                 .onRetryExhaustedThrow((spec, signal) ->
                     new ServerErrorException("Wait timeout for theme deleted", null)))
             .then();
+    }
+
+    static class ExtensionWhitelist {
+        private final Set<AllowedExtension> rules;
+
+        private ExtensionWhitelist(Theme theme) {
+            this.rules = getRules(theme);
+        }
+
+        public static ExtensionWhitelist of(Theme theme) {
+            return new ExtensionWhitelist(theme);
+        }
+
+        public boolean isAllowed(Unstructured unstructured) {
+            return this.rules.stream()
+                .anyMatch(rule -> rule.matches(unstructured));
+        }
+
+        private Set<AllowedExtension> getRules(Theme theme) {
+            var rules = new HashSet<AllowedExtension>();
+            rules.add(AllowedExtension.of(AnnotationSetting.class));
+            rules.add(AllowedExtension.of(NotificationTemplate.class));
+
+            var configMapName = theme.getSpec().getConfigMapName();
+            if (StringUtils.isNotBlank(configMapName)) {
+                rules.add(AllowedExtension.of(ConfigMap.class, configMapName));
+            }
+
+            var settingName = theme.getSpec().getSettingName();
+            if (StringUtils.isNotBlank(settingName)) {
+                rules.add(AllowedExtension.of(Setting.class, settingName));
+            }
+            return rules;
+        }
+    }
+
+    record AllowedExtension(String apiGroup, String kind, String name) {
+        AllowedExtension {
+            Assert.notNull(apiGroup, "The apiGroup must not be null");
+            Assert.notNull(kind, "Kind must not be null");
+        }
+
+        public static <E extends Extension> AllowedExtension of(Class<E> clazz) {
+            return of(clazz, null);
+        }
+
+        public static <E extends Extension> AllowedExtension of(Class<E> clazz, String name) {
+            var gvk = GroupVersionKind.fromExtension(clazz);
+            return new AllowedExtension(gvk.group(), gvk.kind(), name);
+        }
+
+        public boolean matches(Unstructured unstructured) {
+            var groupVersionKind = unstructured.groupVersionKind();
+            return this.apiGroup.equals(groupVersionKind.group())
+                && this.kind.equals(groupVersionKind.kind())
+                && (this.name == null || this.name.equals(unstructured.getMetadata().getName()));
+        }
     }
 }

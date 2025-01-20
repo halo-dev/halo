@@ -368,6 +368,8 @@ class ThemeServiceImplTest {
 
         when(client.list(eq(AnnotationSetting.class), any(), eq(null))).thenReturn(Flux.empty());
 
+        when(client.fetch(eq(Setting.GVK), eq("fake-setting")))
+            .thenReturn(Mono.empty());
         themeService.reloadTheme("fake-theme")
             .as(StepVerifier::create)
             .consumeNextWith(themeUpdated -> {
