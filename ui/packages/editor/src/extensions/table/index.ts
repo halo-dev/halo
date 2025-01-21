@@ -15,6 +15,7 @@ import {
   type EditorState,
   type NodeView,
   type Node as ProseMirrorNode,
+  type ViewMutationRecord,
 } from "@/tiptap/pm";
 import type { ExtensionOptions, NodeBubbleMenu } from "@/types";
 import TiptapTable, {
@@ -185,9 +186,7 @@ class TableView implements NodeView {
     }
   }
 
-  ignoreMutation(
-    mutation: MutationRecord | { type: "selection"; target: Element }
-  ) {
+  ignoreMutation(mutation: ViewMutationRecord) {
     return (
       mutation.type === "attributes" &&
       (mutation.target === this.table ||
