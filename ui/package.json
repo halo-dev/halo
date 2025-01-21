@@ -34,7 +34,7 @@
     ]
   },
   "resolutions": {
-    "axios": "^1.7.x"
+    "axios": "^1.7.9"
   },
   "dependencies": {
     "@codemirror/commands": "^6.1.2",
@@ -60,7 +60,7 @@
     "@halo-dev/console-shared": "workspace:*",
     "@halo-dev/richtext-editor": "workspace:*",
     "@tanstack/vue-query": "^4.37.1",
-    "@tiptap/extension-character-count": "^2.10.2",
+    "@tiptap/extension-character-count": "^2.11.2",
     "@uppy/core": "^3.11.3",
     "@uppy/dashboard": "^3.8.3",
     "@uppy/drag-drop": "^3.1.0",
@@ -76,7 +76,7 @@
     "@vueuse/integrations": "^10.11.1",
     "@vueuse/router": "^10.11.1",
     "@vueuse/shared": "^10.11.1",
-    "axios": "^1.7.2",
+    "axios": "^1.7.9",
     "codemirror": "^6.0.1",
     "colorjs.io": "^0.4.3",
     "cropperjs": "^1.5.13",
