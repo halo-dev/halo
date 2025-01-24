@@ -76,7 +76,7 @@ watch(
             </h2>
           </div>
           <ul
-            class="box-border h-full w-full divide-y divide-gray-100 overflow-auto"
+            class="box-border h-full w-full divide-y divide-gray-100 overflow-auto pb-12"
             role="list"
           >
             <li
