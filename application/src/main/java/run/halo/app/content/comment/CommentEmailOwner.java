@@ -31,7 +31,7 @@ public record CommentEmailOwner(String email, String avatar, String displayName,
         Comment.CommentOwner commentOwner = new Comment.CommentOwner();
         commentOwner.setKind(Comment.CommentOwner.KIND_EMAIL);
         // email nullable
-        commentOwner.setName(StringUtils.defaultString(email, StringUtils.EMPTY));
+        commentOwner.setName(StringUtils.defaultString(email));
 
         commentOwner.setDisplayName(displayName);
         Map<String, String> annotations = new LinkedHashMap<>();

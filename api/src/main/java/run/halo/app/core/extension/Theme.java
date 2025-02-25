@@ -5,6 +5,7 @@ import static io.swagger.v3.oas.annotations.media.Schema.RequiredMode.REQUIRED;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import java.util.List;
+import java.util.Objects;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.ToString;
@@ -83,7 +84,7 @@ public class Theme extends AbstractExtension {
 
         @NonNull
         public String getVersion() {
-            return StringUtils.defaultString(this.version, WILDCARD);
+            return Objects.toString(this.version, WILDCARD);
         }
 
         /**
@@ -96,14 +97,14 @@ public class Theme extends AbstractExtension {
             if (StringUtils.isNotBlank(this.requires)) {
                 return this.requires;
             }
-            return StringUtils.defaultString(this.require, WILDCARD);
+            return Objects.toString(this.require, WILDCARD);
         }
 
         /**
          * Compatible with {@link #website} property.
          */
         public String getHomepage() {
-            return StringUtils.defaultString(this.homepage, this.website);
+            return Objects.toString(this.homepage, this.website);
         }
     }
 

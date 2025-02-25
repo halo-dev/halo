@@ -116,7 +116,7 @@ public class RequestInfoFactory {
                 return requestInfo;
             }
 
-            requestInfo.apiGroup = StringUtils.defaultString(currentParts[0], "");
+            requestInfo.apiGroup = StringUtils.defaultString(currentParts[0]);
             currentParts = Arrays.copyOfRange(currentParts, 1, currentParts.length);
         }
         requestInfo.isResourceRequest = true;

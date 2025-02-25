@@ -2,8 +2,8 @@ package run.halo.app.core.reconciler;
 
 import java.util.HashSet;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Set;
-import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Component;
 import run.halo.app.core.extension.ReverseProxy;
 import run.halo.app.extension.ExtensionClient;
@@ -99,7 +99,7 @@ public class ReverseProxyReconciler implements Reconciler<Reconciler.Request> {
         if (labels == null) {
             return PluginConst.SYSTEM_PLUGIN_NAME;
         }
-        return StringUtils.defaultString(labels.get(PluginConst.PLUGIN_NAME_LABEL_NAME),
+        return Objects.toString(labels.get(PluginConst.PLUGIN_NAME_LABEL_NAME),
             PluginConst.SYSTEM_PLUGIN_NAME);
     }
 }
