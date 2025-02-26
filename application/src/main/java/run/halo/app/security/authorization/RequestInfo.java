@@ -45,17 +45,17 @@ public class RequestInfo {
         String apiVersion, String resource, String name, String subresource, String subName,
         String[] parts) {
         this.isResourceRequest = isResourceRequest;
-        this.path = StringUtils.defaultString(path, "");
-        this.namespace = StringUtils.defaultString(namespace, "");
-        this.userspace = StringUtils.defaultString(userspace, "");
-        this.verb = StringUtils.defaultString(verb, "");
-        this.apiPrefix = StringUtils.defaultString(apiPrefix, "");
-        this.apiGroup = StringUtils.defaultString(apiGroup, "");
-        this.apiVersion = StringUtils.defaultString(apiVersion, "");
-        this.resource = StringUtils.defaultString(resource, "");
-        this.subresource = StringUtils.defaultString(subresource, "");
-        this.subName = StringUtils.defaultString(subName, "");
-        this.name = StringUtils.defaultString(name, "");
+        this.path = StringUtils.defaultString(path);
+        this.namespace = StringUtils.defaultString(namespace);
+        this.userspace = StringUtils.defaultString(userspace);
+        this.verb = StringUtils.defaultString(verb);
+        this.apiPrefix = StringUtils.defaultString(apiPrefix);
+        this.apiGroup = StringUtils.defaultString(apiGroup);
+        this.apiVersion = StringUtils.defaultString(apiVersion);
+        this.resource = StringUtils.defaultString(resource);
+        this.subresource = StringUtils.defaultString(subresource);
+        this.subName = StringUtils.defaultString(subName);
+        this.name = StringUtils.defaultString(name);
         this.parts = Objects.requireNonNullElseGet(parts, () -> new String[] {});
     }
 }

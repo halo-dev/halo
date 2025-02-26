@@ -117,6 +117,5 @@ public class SinglePageQuery extends SortableRequest {
                 .description("SinglePages filtered by keyword.")
                 .implementation(String.class)
                 .required(false));
-        ;
     }
 }

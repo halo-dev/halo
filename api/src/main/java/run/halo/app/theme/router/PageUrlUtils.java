@@ -6,6 +6,7 @@ import org.apache.commons.lang3.math.NumberUtils;
 import org.springframework.web.reactive.function.server.ServerRequest;
 import run.halo.app.extension.ListResult;
 import run.halo.app.infra.utils.PathUtils;
+import java.util.Objects;
 
 /**
  * A utility class for template page url.
@@ -83,7 +84,7 @@ public class PageUrlUtils {
                 return PathUtils.combinePath(segments);
             }
         }
-        return StringUtils.defaultString(path, "/");
+        return Objects.toString(path, "/");
     }
 
     private static String appendPagePart(String path, long page) {
