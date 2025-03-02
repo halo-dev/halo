@@ -1,5 +1,8 @@
 blank_issues_enabled: false
 contact_links:
+  - name: 商业产品反馈
+    url: https://github.com/orgs/lxware-dev/discussions
+    about: Halo 专业版以及应用市场商业应用的问题，建议优先在这里反馈。
   - name: 对 Halo 有其他问题
     url: https://bbs.halo.run
     about: 如果你对 Halo 有其他想要提问的，我们欢迎到我们的官方社区进行提问。
