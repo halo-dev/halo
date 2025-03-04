@@ -2,15 +2,16 @@ package run.halo.app.extension.controller;
 
 import java.time.Duration;
 import java.time.Instant;
+import java.util.concurrent.Executor;
 import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.concurrent.ThreadFactory;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicLong;
 import java.util.function.Supplier;
 import java.util.stream.IntStream;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.lang3.concurrent.BasicThreadFactory;
+import org.springframework.boot.system.JavaVersion;
+import org.springframework.boot.task.SimpleAsyncTaskExecutorBuilder;
+import org.springframework.core.task.SimpleAsyncTaskExecutor;
 import org.springframework.dao.OptimisticLockingFailureException;
 import org.springframework.lang.Nullable;
 import org.springframework.util.Assert;
@@ -32,7 +33,7 @@ public class DefaultController<R> implements Controller {
 
     private volatile boolean started = false;
 
-    private final ExecutorService executor;
+    private final Executor executor;
 
     @Nullable
     private final Synchronizer<R> synchronizer;
@@ -53,6 +54,18 @@ public class DefaultController<R> implements Controller {
         Duration minDelay,
         Duration maxDelay,
         ExecutorService executor, int workerCount) {
+        this(name, reconciler, queue, synchronizer, nowSupplier, minDelay, maxDelay,
+            (Executor) executor, workerCount);
+    }
+
+    public DefaultController(String name,
+        Reconciler<R> reconciler,
+        RequestQueue<R> queue,
+        Synchronizer<R> synchronizer,
+        Supplier<Instant> nowSupplier,
+        Duration minDelay,
+        Duration maxDelay,
+        Executor executor, int workerCount) {
         Assert.isTrue(workerCount > 0, "Worker count must not be less than 1");
         this.name = name;
         this.reconciler = reconciler;
@@ -92,15 +105,17 @@ public class DefaultController<R> implements Controller {
         Duration minDelay,
         Duration maxDelay, int workerCount) {
         this(name, reconciler, queue, synchronizer, nowSupplier, minDelay, maxDelay,
-            Executors.newFixedThreadPool(workerCount, threadFactory(name)), workerCount);
+            executor(workerCount, name), workerCount);
     }
 
-    private static ThreadFactory threadFactory(String name) {
-        return new BasicThreadFactory.Builder()
-            .namingPattern(name + "-t-%d")
-            .daemon(false)
-            .uncaughtExceptionHandler((t, e) ->
-                log.error("Controller " + t.getName() + " encountered an error unexpectedly", e))
+    private static SimpleAsyncTaskExecutor executor(int workerCount, String name) {
+        boolean virtualThreads =
+            JavaVersion.getJavaVersion().isEqualOrNewerThan(JavaVersion.TWENTY_ONE);
+        return new SimpleAsyncTaskExecutorBuilder()
+            .virtualThreads(virtualThreads)
+            .concurrencyLimit(workerCount)
+            .taskTerminationTimeout(Duration.ofSeconds(10))
+            .threadNamePrefix(name + "-")
             .build();
     }
 
@@ -123,7 +138,7 @@ public class DefaultController<R> implements Controller {
         log.info("Starting controller {}", name);
         IntStream.range(0, getWorkerCount())
             .mapToObj(i -> new Worker())
-            .forEach(executor::submit);
+            .forEach(executor::execute);
     }
 
     /**
@@ -226,14 +241,18 @@ public class DefaultController<R> implements Controller {
             synchronizer.dispose();
         }
 
-        executor.shutdownNow();
         try {
-            if (!executor.awaitTermination(10, TimeUnit.SECONDS)) {
-                log.warn("Wait timeout for controller {} shutdown", name);
-            } else {
-                log.info("Controller {} is disposed", name);
+            if (executor instanceof AutoCloseable closeable) {
+                closeable.close();
+                if (Thread.currentThread().isInterrupted()) {
+                    log.warn("Wait timeout for controller {} shutdown", name);
+                } else {
+                    log.info("Controller {} is disposed", name);
+                }
+            } else if (executor instanceof ExecutorService executorService) {
+                closeExecutorService(executorService);
             }
-        } catch (InterruptedException e) {
+        } catch (Exception e) {
             log.warn("Interrupted while waiting for controller {} shutdown", name);
         } finally {
             queue.dispose();
@@ -247,5 +266,36 @@ public class DefaultController<R> implements Controller {
 
     public boolean isStarted() {
         return started;
+    }
+
+    /**
+     * Close executor service.
+     * <br>
+     * This method copied from
+     * <a href="https://github.com/openjdk/jdk/blob/890adb6410dab4606a4f26a942aed02fb2f55387/src/java.base/share/classes/java/util/concurrent/ExecutorService.java#L410-L429">ExecutorService#close implemented in JDK 21</a>
+     *
+     * @param executorService executor service to be closed
+     */
+    // TODO Remove this method and use ExecutorService#close instead after using JDK 21 as the
+    // minimum version
+    private static void closeExecutorService(ExecutorService executorService) {
+        boolean terminated = executorService.isTerminated();
+        if (!terminated) {
+            executorService.shutdown();
+            boolean interrupted = false;
+            while (!terminated) {
+                try {
+                    terminated = executorService.awaitTermination(1L, TimeUnit.MINUTES);
+                } catch (InterruptedException e) {
+                    if (!interrupted) {
+                        executorService.shutdownNow();
+                        interrupted = true;
+                    }
+                }
+            }
+            if (interrupted) {
+                Thread.currentThread().interrupt();
+            }
+        }
     }
 }

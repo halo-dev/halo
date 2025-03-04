@@ -25,4 +25,4 @@ RUN ln -sf /usr/share/zoneinfo/$TZ /etc/localtime \
 
 Expose 8090
 
-ENTRYPOINT ["sh", "-c", "java ${JVM_OPTS} org.springframework.boot.loader.launch.JarLauncher ${0} ${@}"]
+ENTRYPOINT ["sh", "-c", "java -Dreactor.schedulers.defaultBoundedElasticOnVirtualThreads=true ${JVM_OPTS} org.springframework.boot.loader.launch.JarLauncher ${0} ${@}"]
