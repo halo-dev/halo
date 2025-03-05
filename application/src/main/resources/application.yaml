@@ -34,6 +34,9 @@ spring:
     type: caffeine
     caffeine:
       spec: expireAfterAccess=1h, maximumSize=10000
+  threads:
+    virtual:
+      enabled: true
 
 halo:
   work-dir: ${user.home}/.halo2
