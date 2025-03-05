@@ -1282,6 +1282,10 @@ core:
         revoke:
           title: 撤销设备
           description: 确定要撤销该设备吗？撤销之后，此设备会退出登录
+        revoke_others:
+          title: 撤销其他所有设备
+          description: 确定要撤销其他所有设备吗？撤销之后，其他设备会退出登录
+          toast_success: 已撤销其他设备的登录状态
   uc_notification:
     title: 消息
     tabs:
