@@ -1,0 +1,700 @@
+core:
+  sidebar:
+    menu:
+      items:
+        tools: Tools
+    operations:
+      logout:
+        tooltip: Logout
+        description: Clicking Confirm will redirect to the logout page. Please ensure that the content you are editing is saved.
+      profile:
+        tooltip: Profile
+    profile:
+      aggregate_role: Aggregate Role
+  uc_sidebar:
+    menu:
+      items:
+        profile: Profile
+        notification: Notifications
+        posts: Posts
+    operations:
+      console:
+        tooltip: Console
+    profile:
+      aggregate_role: Aggregate Role
+  dashboard:
+    widgets:
+      presets:
+        recent_published:
+          publishTime: Publish Time {publishTime}
+        notification:
+          title: Notifications
+          empty:
+            title: No unread notifications
+  post:
+    operations:
+      publish_in_batch:
+        title: Publish posts
+        description: Batch publish posts, the selected posts will be set to published status
+      cancel_publish_in_batch:
+        title: Cancel publish posts
+        description: Batch cancel publish posts, the selected posts will be set to unpublished status
+      batch_setting:
+        button: Batch settings
+    filters:
+      status:
+        items:
+          scheduling: Scheduling publish
+      sort:
+        items:
+          last_modify_time_desc: Recently Updated
+          last_modify_time_asc: Earliest Updated
+    list:
+      fields:
+        schedule_publish:
+          tooltip: Schedule publish
+    settings:
+      fields:
+        publish_time:
+          help:
+            schedule_publish: Schedule a timed task and publish it at {datetime}
+        owner:
+          label: Owner
+    tag:
+      filters:
+        sort:
+          items:
+            create_time_desc: Latest Created
+            create_time_asc: Earliest Created
+            display_name_desc: Descending order by tag name
+            display_name_asc: Ascending order by tag name
+    batch_setting_modal:
+      title: Post batch settings
+      fields:
+        common:
+          enabled: Enabled
+          op:
+            label: Operate
+            options:
+              add: Add
+              replace: Replace
+              remove_all: Remove all
+        category_group: Category
+        category_names: Select categories
+        tag_group: Tag
+        tag_names: Select tags
+        visible_group: Visible
+        visible_value: "Select visible option "
+        allow_comment_group: " Allow comment"
+        allow_comment_value: Choose whether to allow comments
+        owner_group: Owner
+        owner_value: Select owner
+  post_editor:
+    actions:
+      snapshots: Snapshots
+  post_tag:
+    operations:
+      delete_in_batch:
+        title: Delete the selected tags
+  post_category:
+    editing_modal:
+      fields:
+        template:
+          help: Customize the rendering template of the category archive page, which requires support from the theme
+        post_template:
+          label: Custom post template
+          help: Customize the rendering template of posts in the current category, which requires support from the theme
+        hide_from_list:
+          label: Hide from list
+          help: After turning on this option, this category and its subcategories, as well as its posts, will not be displayed in the front-end list. You need to actively visit the category archive page. This feature is only effective for the first-level directory.
+    list:
+      fields:
+        prevent_parent_post_cascade_query: Prevent parent category from including this category and its subcategories in cascade post queries
+        hide_from_list: This category is hidden, This category and its subcategories, as well as its posts, will not be displayed in the front-end list. You need to actively visit the category archive page
+  page_editor:
+    actions:
+      snapshots: Snapshots
+  attachment:
+    filters:
+      sort:
+        items:
+          display_name_asc: Ascending order by display name
+          display_name_desc: Descending order by display name
+    group_editing_modal:
+      toast:
+        group_name_exists: Group name already exists
+    policy_editing_modal:
+      toast:
+        policy_name_exists: Storage policy name already exists
+  uc_attachment:
+    empty:
+      title: There are no attachments.
+      message: There are no attachments, you can try refreshing or uploading attachments.
+      actions:
+        upload: Upload Attachment
+    filters:
+      sort:
+        items:
+          create_time_desc: Latest uploaded
+          create_time_asc: Earliest uploaded
+          size_desc: Descending order by file size
+          size_asc: Ascending order by file size
+          display_name_asc: Ascending order by display name
+          display_name_desc: Descending order by display name
+      view_type:
+        items:
+          grid: Grid Mode
+          list: List Mode
+    detail_modal:
+      title: "Attachment: {display_name}"
+      fields:
+        preview: Preview
+        display_name: Display name
+        media_type: Media type
+        size: Size
+        owner: Owner
+        creation_time: Creation time
+        permalink: Permalink
+      preview:
+        click_to_exit: Click to exit preview
+        video_not_support: The current browser does not support video playback.
+        audio_not_support: The current browser does not support audio playback.
+        not_support: This file does not support preview.
+    upload_modal:
+      title: Upload attachment
+    select_modal:
+      title: Select attachment
+      providers:
+        default:
+          label: Attachments
+      operations:
+        select:
+          result: ({count} items selected)
+  theme:
+    operations:
+      existed_during_installation:
+        title: The theme already exists.
+        description: The currently installed theme already exists, do you want to upgrade?
+      clear_templates_cache:
+        button: Clear templates cache
+        title: Clear templates cache
+        description: This feature allows you to refresh the cache to view the latest web results after modifying template files at runtime.
+      export_configuration:
+        button: Export theme configuration
+      import_configuration:
+        button: Import theme configuration
+        version_mismatch:
+          title: Version mismatch
+          description: The imported configuration file version does not match the  current theme version, which may lead to compatibility issues. Do you want to continue importing?
+        invalid_format: Invalid theme configuration file
+        mismatched_theme: Configuration file does not match the selected theme
+    list_modal:
+      tabs:
+        local_upload: Local install / upgrade
+        remote_download:
+          label: Remote
+          fields:
+            url: Remote URL
+    detail:
+      fields:
+        homepage: Website
+        description: Description
+        license: License
+        issues: Issues feedback
+  plugin:
+    operations:
+      uninstall_in_batch:
+        title: Uninstall the selected plugins
+      uninstall_and_delete_config:
+        button: Uninstall and delete config
+      uninstall_and_delete_config_in_batch:
+        button: Uninstall and delete config
+        title: Uninstall the selected plugins and its corresponding configuration
+      change_status_in_batch:
+        activate_title: Activate the selected plugins
+        inactivate_title: Inactivate the selected plugins
+      reload_window:
+        button: Reload required
+    detail:
+      fields:
+        homepage: Homepage
+        repo: Source Repository
+        load_location: Storage Location
+        issues: Issues feedback
+      operations:
+        view_conditions:
+          button: View recent conditions
+    conditions_modal:
+      title: Recent conditions
+      fields:
+        type: Type
+        status: Status
+        reason: Reason
+        message: Message
+        last_transition_time: Last transition time
+    extension-settings:
+      title: Extension settings
+      extension-point-definition:
+        title: Extension point definitions
+      extension-definition:
+        empty:
+          title: There is currently no extension point implemented
+    actions:
+      extension-point-settings: Extension settings
+  user:
+    grant_permission_modal:
+      roles_preview:
+        all: The currently selected role contains all permissions
+        includes: "The currently selected role contains the following permissions:"
+    detail:
+      actions:
+        grant_permission:
+          title: Grant permission
+        profile:
+          title: Profile
+      fields:
+        email_verified:
+          tooltip: Verified
+        email_not_verified:
+          tooltip: Not verified
+  role:
+    editing_modal:
+      fields:
+        disallow_access_console:
+          label: Disable access to Console
+          help: Once checked, this role will not be able to access the Console
+  identity_authentication:
+    fields:
+      display_name:
+        local: Login with credentials
+      description:
+        local: Default login method built into Halo
+    list:
+      types:
+        form: Basic Authentication Method
+        oauth2: Third-party Authentication Method
+  uc_profile:
+    title: Profile
+    tabs:
+      detail: Detail
+      notification-preferences: Notification Preferences
+      pat: Personal Access Tokens
+      2fa: 2FA
+      devices: Devices
+    actions:
+      update_profile:
+        title: Update profile
+      change_password:
+        title: Change password
+    detail:
+      fields:
+        display_name: Display name
+        username: Username
+        email: Email
+        roles: Roles
+        bio: Bio
+        creation_time: Creation time
+        identity_authentication: Identity authentication
+      operations:
+        bind:
+          button: Bind
+        unbind:
+          button: Unbind
+          title: Unbind the login method for {display_name}
+      email_not_set:
+        description: Your email address has not been set yet. Click the button below to set it up.
+        title: Set up email
+      email_not_verified:
+        description: Your email address has not been verified yet, click the button below to verify it
+        title: Verify email
+      email_verified:
+        tooltip: Verified
+    2fa:
+      operations:
+        enable:
+          button: Enable 2FA
+          title: Enable 2FA
+        disable:
+          title: Disable 2FA
+        disable_totp:
+          title: Disable TOTP
+      password_validation_form:
+        fields:
+          password:
+            label: Password
+            help: Login password of the current account
+      methods:
+        title: Two-factor methods
+        totp:
+          title: TOTP
+          description: Configure two-step verification with TOTP application
+          fields:
+            status:
+              configured: Configured
+              not_configured: Not configured
+          operations:
+            reconfigure:
+              button: Reconfigure
+            configure:
+              button: Configure
+              title: TOTP configuration
+              fields:
+                code:
+                  label: Verification code
+                  help: 6-digit verification code obtained from the validator application
+                password:
+                  label: Password
+                  help: Login password of the current account
+                qrcode:
+                  label: "Use the validator application to scan the QR code below:"
+                manual:
+                  label: If you can't scan the QR code, click to view the alternative steps.
+                  help: "Manually configure the validator application with the following code:"
+    pat:
+      operations:
+        delete:
+          title: Delete Personal Access Token
+          description: Are you sure you want to delete this personal access token?
+        revoke:
+          button: Revoke
+          title: Revoke Personal Access Token
+          description: Are you sure you want to revoke this personal access token?
+          toast_success: Revocation succeeded
+        copy:
+          title: Please copy and save immediately, Token will only be displayed once.
+        restore:
+          button: Restore
+          toast_success: Restore successfully
+      list:
+        empty:
+          title: No personal access tokens have been created
+          message: You can try refreshing or creating a new personal access token
+        fields:
+          expiresAt:
+            dynamic: Expires on {expiresAt}
+            forever: Never expires
+          status:
+            normal: Normal
+            revoked: Revoked
+            expired: Expired
+      creation_modal:
+        title: Create Personal Access Token
+        groups:
+          general: General
+          permissions: Permissions
+        fields:
+          name:
+            label: Name
+          expiresAt:
+            label: Expiration Time
+            help: Leave empty for no expiration
+          description:
+            label: Description
+    notification-preferences:
+      fields:
+        type: Type
+    editing_modal:
+      title: Edit Profile
+      groups:
+        general: General
+        annotations: Annotations
+      fields:
+        username:
+          label: Username
+          validation: Can only contain numbers, lowercase letters, periods (.), and hyphens (-), and cannot start or end with a period (.) or hyphen (-).
+        display_name:
+          label: Display name
+        email:
+          label: Email
+        phone:
+          label: Phone
+        avatar:
+          label: Avatar
+        bio:
+          label: Bio
+    change_password_modal:
+      title: Change password
+      fields:
+        new_password:
+          label: New password
+        confirm_password:
+          label: Confirm password
+        old_password:
+          label: Old password
+    email_verify_modal:
+      fields:
+        code:
+          label: Verification code
+        email:
+          label: Email address
+        new_email:
+          label: New email address
+        password:
+          label: Password
+          help: The login password for the current account
+      operations:
+        send_code:
+          buttons:
+            countdown: Resend in {timer} seconds
+            send: Send the verification code
+            sending: sending
+          toast_email_empty: Please enter your email address
+          toast_success: Verification code sent
+        verify:
+          toast_success: Verification successful
+      titles:
+        modify: Modify email address
+        verify: Verify email
+    device:
+      list:
+        fields:
+          current: Current
+          last_accessed_time: "Last accessed time: {time}"
+      detail_modal:
+        title: Login device details
+        fields:
+          os: OS
+          browser: Browser
+          creation_timestamp: Creation time
+          last_accessed_times: Last accessed time
+          last_authenticated_time: Last authenticated time
+      operations:
+        revoke:
+          title: Revoke device
+          description: Are you sure you want to revoke this device? After revoking, this device will be logged out
+        revoke_others:
+          title: Revoke all other devices
+          description: Are you sure you want to revoke all other devices? After you revoke, other devices will be logged out
+          toast_success: Login status of other devices has been revoked
+  uc_notification:
+    title: Notifications
+    tabs:
+      unread: Unread
+      read: Read
+    empty:
+      titles:
+        unread: No unread notifications
+        read: No read notifications
+    operations:
+      mark_as_read:
+        button: Mark as read
+      delete:
+        description: Are you sure you want to delete this notification?
+        title: Delete
+  overview:
+    fields:
+      activated_theme: Activated theme
+      enabled_plugins: Enabled plugins
+  backup:
+    operations:
+      remote_download:
+        button: Download and restore
+      restore_by_backup:
+        button: Restore
+        title: Restore from backup file
+        description: After clicking OK, data will be restored from the backup file {filename}.
+    restore:
+      tabs:
+        local:
+          label: Upload
+        remote:
+          label: Remote
+          fields:
+            url: Remote URL
+        backup:
+          label: Restore from backup files
+          empty:
+            title: No backup files
+            message: Currently no backup files are scanned. You can manually upload the backup files to the backups directory of the Halo working directory.
+  rbac:
+    role-template-manage-posts: Post Manage
+    role-template-post-author: Allows you to manage your own posts
+    role-template-post-contributor: Contributions allowed
+    role-template-post-publisher: Allow to publish own posts
+    role-template-post-attachment-manager: Allow images to be uploaded in posts
+    Actuator Management: System Information
+    Actuator Manage: Access System Information
+    Cache Management: Cache
+    Cache Manage: Cache Manage
+    Notification Configuration: Notification Configuration
+    role-template-notifier-config: Configure Notifier
+    Post Attachment Manager: Allow images to be uploaded in posts
+    Post Author: Allows you to manage your own posts
+    Post Contributor: Contributions allowed
+    Post Publisher: Allow to publish own posts
+    UC Attachment Manage: Allow to manage own attachments
+    role-template-uc-attachment-manager: Allow to manage own attachments
+    Recycle My Post: Recycle My Post
+    role-template-recycle-my-post: Recycle My Post
+  components:
+    annotations_form:
+      buttons:
+        expand: View more
+        collapse: Collapse
+    default_editor:
+      extensions:
+        upload:
+          error: Upload failed
+          click_retry: Click to retry
+          loading: Loading
+          attachment:
+            title: Attachment Library
+          permalink:
+            title: Input Link
+            placeholder: Input link and press Enter to confirm
+          operations:
+            replace:
+              button: Replace
+      toolbox:
+        show_hide_sidebar: Show/Hide Sidebar
+      title_placeholder: Please enter the title
+    user_avatar:
+      title: Avatar
+      toast_upload_failed: Failed to upload avatar
+      toast_remove_failed: Failed to delete avatar
+      cropper_modal:
+        title: Crop Avatar
+      remove:
+        title: Delete avatar
+      tooltips:
+        upload: Upload
+        zoom_in: Zoom In
+        zoom_out: Zoom Out
+        flip_horizontal: Flip Horizontal
+        flip_vertical: Flip Vertical
+        reset: Reset
+    editor_provider_selector:
+      tooltips:
+        disallow: The content format is different and cannot be switched
+    uppy:
+      image_editor:
+        revert: Revert
+        rotate: Rotate
+        zoom_in: Zoom in
+        zoom_out: Zoom out
+        flip_horizontal: Flip horizontal
+        aspect_ratio_square: Crop square
+        aspect_ratio_landscape: Crop landscape (16:9)
+        aspect_ratio_portrait: Crop portrait (9:16)
+    h2_warning_alert:
+      title: "Warning: H2 database in use"
+      description: The H2 database is only suitable for development and testing environments and is not recommended for use in production environments. H2 is very easy to cause data file corruption due to improper operation. If you must use it, please back up the data on time.
+  formkit:
+    select:
+      no_data: No data
+    validation:
+      password: "The password can only use uppercase and lowercase letters (A-Z, a-z), numbers (0-9), and the following special characters: !{'@'}#$%^&*"
+    verification_form:
+      no_action_defined: "{label} interface not defined"
+      verify_success: "{label} successful"
+      verify_failed: "{label} failed"
+    secret:
+      creation_label: Create a new secret based on the text entered
+      placeholder: Search for an existing secret or enter new content to create one
+      required_key_missing_label: The needed fields are missing, Please select and complete them
+      creation_modal:
+        title: Create secret
+      edit_modal:
+        title: Edit secret
+      list_modal:
+        title: Secrets
+      operations:
+        delete:
+          title: Delete secret
+          description: Are you sure you want to delete this secret? Please make sure that this secret is not being used anywhere, otherwise you need to reset it in a specific place
+      form:
+        fields:
+          description: Description
+          string_data: String Data
+    code:
+      fullscreen:
+        exit: Exit fullscreen
+        enter: Enter fullscreen to edit
+  common:
+    buttons:
+      activate: Activate
+      inactivate: Inactivate
+      select: Select
+      view_all: View all
+      verify: Verify
+      modify: Modify
+      access: Access
+      schedule_publish: Schedule publish
+      revoke: Revoke
+      disable: Disable
+      enable: Enable
+      continue: Continue
+    toast:
+      disable_success: Disabled successfully
+      enable_success: Enabled successfully
+    dialog:
+      titles:
+        login_expired: Login expired
+      descriptions:
+        login_expired: The current session has expired. Click Confirm to go to the login page. Please ensure that the current content is saved. You can click Cancel to manually copy any unsaved content.
+    status:
+      starting_up: Starting
+    text:
+      system_protection: System protection
+  uc_post:
+    creation_modal:
+      title: Create post
+    operations:
+      cancel_publish:
+        description: Are you sure you want to cancel publishing?
+        title: Cancel publish
+      delete:
+        title: Delete post
+        description: This action will move the post to the recycle bin, where it will be managed by the site administrator.
+    publish_modal:
+      title: Publish post
+    setting_modal:
+      title: Post settings
+    title: My posts
+  tool:
+    title: Tools
+    empty:
+      title: There are no tools available
+      message: There are currently no tools available, and system tools may be provided by plugins
+  post_snapshots:
+    operations:
+      revert:
+        button: Revert
+        title: Revert snapshot
+        description: Are you sure you want to restore this snapshot? This operation will create a new snapshot based on this one and publish it.
+        toast_success: Reverted successfully
+      delete:
+        title: Delete snapshot
+        description: Are you sure you want to delete this snapshot? This operation is irreversible.
+      cleanup:
+        button: Cleanup
+        title: Cleanup snapshots
+        description: Are you sure you want to delete all unused snapshots? Only published, base version, and draft versions will be retained.
+        toast_empty: There are no snapshots to be cleaned up
+        toast_success: Cleanup completed
+    status:
+      released: Released
+      draft: Draft
+      base: Base
+    title: Post snapshots
+  page_snapshots:
+    operations:
+      revert:
+        button: Revert
+        title: Revert snapshot
+        description: Are you sure you want to restore this snapshot? This operation will create a new snapshot based on this one and publish it.
+        toast_success: Reverted successfully
+      delete:
+        title: Delete snapshot
+        description: Are you sure you want to delete this snapshot? This operation is irreversible.
+      cleanup:
+        button: Cleanup
+        title: Cleanup snapshots
+        description: Are you sure you want to delete all unused snapshots? Only published, base version, and draft versions will be retained.
+        toast_empty: There are no snapshots to be cleaned up
+        toast_success: Cleanup completed
+    status:
+      released: Released
+      draft: Draft
+      base: Base
+    title: Page snapshots
