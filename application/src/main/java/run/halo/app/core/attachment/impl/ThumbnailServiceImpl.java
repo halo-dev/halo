@@ -50,8 +50,9 @@ public class ThumbnailServiceImpl implements ThumbnailService {
         // restriction
         return ongoingTasks.computeIfAbsent(cacheKey, k -> doGenerate(imageUri, size)
             // In the case of concurrency, doGenerate must return the same instance
+            .doFinally(signalType -> ongoingTasks.remove(cacheKey))
             .cache()
-            .doFinally(signalType -> ongoingTasks.remove(cacheKey)));
+        );
     }
 
     record CacheKey(URI imageUri, ThumbnailSize size) {

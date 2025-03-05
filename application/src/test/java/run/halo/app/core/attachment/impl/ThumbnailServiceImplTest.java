@@ -192,7 +192,7 @@ class ThumbnailServiceImplTest {
             var createdUri = URI.create("/test-thumb.jpg");
             doReturn(Mono.just(createdUri)).when(spyThumbnailService).create(any(), any());
 
-            int threadCount = 10;
+            int threadCount = 100;
             ExecutorService executor = Executors.newFixedThreadPool(threadCount);
             var latch = new CountDownLatch(threadCount);
 
