@@ -223,6 +223,14 @@ core:
         allow_comment_value: 選擇是否允許評論
         owner_group: 作者
         owner_value: 設置作者
+    tag:
+      filters:
+        sort:
+          items:
+            create_time_desc: 較近建立
+            create_time_asc: 較早建立
+            display_name_desc: 標籤名稱降序
+            display_name_asc: 標籤名稱升序
   deleted_post:
     title: 文章回收站
     empty:
@@ -1246,6 +1254,7 @@ core:
       list:
         fields:
           last_accessed_time: 上次訪問：{time}
+          current: 目前設備
       detail_modal:
         title: 登入設備詳情
         fields:
@@ -1547,9 +1556,7 @@ core:
         aspect_ratio_portrait: 裁剪為縱向 (9:16)
     h2_warning_alert:
       title: 警告：正在使用 H2 資料庫
-      description: >-
-        H2 資料庫僅適用於開發環境和測試環境，不建議在生產環境中使用，H2
-        非常容易因為操作不當而導致資料檔案損壞。如果必須要使用，請按時進行資料備份。
+      description: H2 資料庫僅適用於開發環境和測試環境，不建議在生產環境中使用，H2 非常容易因為操作不當而導致資料檔案損壞。如果必須要使用，請按時進行資料備份。
   composables:
     content_cache:
       toast_recovered: 已從緩存中恢復未保存的內容

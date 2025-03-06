@@ -1075,8 +1075,8 @@ core:
           title: Update profile
         change_password:
           title: Change password
-          grant_permission:
-            title: Grant permission
+        grant_permission:
+          title: Grant permission
         profile:
           title: Profile
       fields:
