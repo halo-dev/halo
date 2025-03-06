@@ -13,6 +13,7 @@ import org.pf4j.ExtensionFactory;
 import org.pf4j.ExtensionFinder;
 import org.pf4j.JarPluginLoader;
 import org.pf4j.JarPluginRepository;
+import org.pf4j.PluginDescriptor;
 import org.pf4j.PluginDescriptorFinder;
 import org.pf4j.PluginFactory;
 import org.pf4j.PluginLoader;
@@ -27,6 +28,8 @@ import org.springframework.context.ApplicationContext;
 import org.springframework.data.util.Lazy;
 import run.halo.app.infra.SystemVersionSupplier;
 import run.halo.app.plugin.event.PluginStartedEvent;
+import run.halo.app.plugin.loader.DevPluginLoader;
+import run.halo.app.plugin.loader.HaloPluginClassLoader;
 
 /**
  * PluginManager to hold the main ApplicationContext.
@@ -106,7 +109,15 @@ public class HaloPluginManager extends DefaultPluginManager
     protected PluginLoader createPluginLoader() {
         var compoundLoader = new CompoundPluginLoader();
         compoundLoader.add(new DevPluginLoader(this, this.pluginProperties), this::isDevelopment);
-        compoundLoader.add(new JarPluginLoader(this));
+        compoundLoader.add(new JarPluginLoader(this) {
+            @Override
+            public ClassLoader loadPlugin(Path pluginPath, PluginDescriptor pluginDescriptor) {
+                var pluginClassLoader = new HaloPluginClassLoader(this.pluginManager,
+                    pluginDescriptor, this.getClass().getClassLoader());
+                pluginClassLoader.addFile(pluginPath.toFile());
+                return pluginClassLoader;
+            }
+        });
         return compoundLoader;
     }
 
