@@ -1254,6 +1254,12 @@ core:
                   help: >-
                     Manually configure the validator application with the
                     following code:
+              tips: >-
+                Please keep your two-step verification device safe. If the
+                device is lost or damaged, you will not be able to log in. It is
+                recommended that you install the authenticator app on multiple
+                devices or keep a backup of the key in case the primary device
+                cannot be used.
     pat:
       operations:
         delete:
