@@ -350,6 +350,7 @@ core:
                 manual:
                   label: If you can't scan the QR code, click to view the alternative steps.
                   help: "Manually configure the validator application with the following code:"
+              tips: Please keep your two-step verification device safe. If the device is lost or damaged, you will not be able to log in. It is recommended that you install the authenticator app on multiple devices or keep a backup of the key in case the primary device cannot be used.
     pat:
       operations:
         delete:
@@ -462,10 +463,6 @@ core:
         revoke:
           title: Revoke device
           description: Are you sure you want to revoke this device? After revoking, this device will be logged out
-        revoke_others:
-          title: Revoke all other devices
-          description: Are you sure you want to revoke all other devices? After you revoke, other devices will be logged out
-          toast_success: Login status of other devices has been revoked
   uc_notification:
     title: Notifications
     tabs:

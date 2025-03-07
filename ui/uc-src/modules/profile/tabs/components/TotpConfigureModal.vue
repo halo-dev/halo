@@ -1,7 +1,7 @@
 <script lang="ts" setup>
 import type { TotpRequest } from "@halo-dev/api-client";
 import { ucApiClient } from "@halo-dev/api-client";
-import { Toast, VButton, VModal, VSpace } from "@halo-dev/components";
+import { Toast, VAlert, VButton, VModal, VSpace } from "@halo-dev/components";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/vue-query";
 import { useQRCode } from "@vueuse/integrations/useQRCode";
 import { computed, ref } from "vue";
@@ -54,7 +54,15 @@ function onSubmit(data: TotpRequest) {
     @close="emit('close')"
   >
     <div>
-      <div class="mb-4 space-y-3 border-b border-gray-100 pb-4 text-gray-900">
+      <VAlert
+        :title="$t('core.common.text.tip')"
+        :description="
+          $t('core.uc_profile.2fa.methods.totp.operations.configure.tips')
+        "
+        type="warning"
+        :closable="false"
+      ></VAlert>
+      <div class="my-4 space-y-3 border-b border-gray-100 pb-4 text-gray-900">
         <div class="text-sm font-semibold">
           {{
             $t(
