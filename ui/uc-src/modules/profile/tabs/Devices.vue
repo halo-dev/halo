@@ -1,8 +1,13 @@
 <script lang="ts" setup>
 import { ucApiClient } from "@halo-dev/api-client";
-import { VLoading } from "@halo-dev/components";
-import { useQuery } from "@tanstack/vue-query";
+import { Dialog, Toast, VButton, VLoading } from "@halo-dev/components";
+import { useQuery, useQueryClient } from "@tanstack/vue-query";
+import { computed } from "vue";
+import { useI18n } from "vue-i18n";
 import DeviceListItem from "./components/DeviceListItem.vue";
+
+const { t } = useI18n();
+const queryClient = useQueryClient();
 
 const { data, isLoading } = useQuery({
   queryKey: ["uc:devices"],
@@ -18,12 +23,45 @@ const { data, isLoading } = useQuery({
     return hasDeletingData ? 1000 : false;
   },
 });
+
+const otherDevices = computed(() => {
+  if (!data.value) {
+    return [];
+  }
+
+  return data.value.filter((device) => !device.currentDevice);
+});
+
+function handleRevokeOtherDevices() {
+  Dialog.warning({
+    title: t("core.uc_profile.device.operations.revoke_others.title"),
+    description: t(
+      "core.uc_profile.device.operations.revoke_others.description"
+    ),
+    confirmType: "danger",
+    confirmText: t("core.common.buttons.confirm"),
+    cancelText: t("core.common.buttons.cancel"),
+    async onConfirm() {
+      for (const device of otherDevices.value) {
+        await ucApiClient.security.device.revokeDevice({
+          deviceId: device.device.metadata.name,
+        });
+      }
+
+      queryClient.invalidateQueries({ queryKey: ["uc:devices"] });
+
+      Toast.success(
+        t("core.uc_profile.device.operations.revoke_others.toast_success")
+      );
+    },
+  });
+}
 </script>
 
 <template>
   <VLoading v-if="isLoading" />
 
-  <Transition v-else appear name="fade">
+  <TransitionGroup v-else appear name="fade">
     <ul
       class="box-border h-full w-full divide-y divide-gray-100 overflow-hidden rounded-base border"
       role="list"
@@ -32,5 +70,10 @@ const { data, isLoading } = useQuery({
         <DeviceListItem :device="device" />
       </li>
     </ul>
-  </Transition>
+    <div v-if="otherDevices.length" class="mt-5">
+      <VButton @click="handleRevokeOtherDevices">
+        {{ $t("core.uc_profile.device.operations.revoke_others.title") }}
+      </VButton>
+    </div>
+  </TransitionGroup>
 </template>

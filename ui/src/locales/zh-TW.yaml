@@ -1267,6 +1267,10 @@ core:
         revoke:
           title: 撤銷設備
           description: 確定要撤銷該設備嗎？撤銷之後，此裝置會退出登錄
+        revoke_others:
+          title: 撤銷其他所有設備
+          toast_success: 已撤銷其他設備的登入狀態
+          description: 確定要撤銷其他所有設備嗎？撤銷之後，其他設備會登出登入
   uc_notification:
     title: 訊息
     tabs:

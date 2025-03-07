@@ -1371,6 +1371,12 @@ core:
           description: >-
             Are you sure you want to revoke this device? After revoking, this
             device will be logged out
+        revoke_others:
+          title: Revoke all other devices
+          description: >-
+            Are you sure you want to revoke all other devices? After you revoke,
+            other devices will be logged out
+          toast_success: Login status of other devices has been revoked
   uc_notification:
     title: Notifications
     tabs:
