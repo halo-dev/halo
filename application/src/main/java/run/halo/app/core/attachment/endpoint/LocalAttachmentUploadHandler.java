@@ -159,8 +159,8 @@ class LocalAttachmentUploadHandler implements AttachmentHandler {
             var typeValidator = file.content()
                 .next()
                 .handle((dataBuffer, sink) -> {
-                    var mimeType = detectMimeType(dataBuffer.asInputStream(), file.name());
-                    if (!FileTypeDetectUtils.isValidExtensionForMime(mimeType, file.name())) {
+                    var mimeType = detectMimeType(dataBuffer.asInputStream(), file.filename());
+                    if (!FileTypeDetectUtils.isValidExtensionForMime(mimeType, file.filename())) {
                         handleFileTypeError(sink, "fileTypeNotMatch", mimeType);
                         return;
                     }
