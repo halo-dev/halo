@@ -32,6 +32,7 @@ public class SystemSetting {
     public static class ThemeRouteRules {
         public static final String GROUP = "routeRules";
 
+        private boolean disableThemePreview;
         private String categories;
         private String archives;
         private String post;
