@@ -5,6 +5,7 @@ import static org.springframework.web.reactive.function.server.RequestPredicates
 import static run.halo.app.theme.router.PageUrlUtils.totalPage;
 
 import java.util.Map;
+import java.util.Set;
 import lombok.AllArgsConstructor;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Component;
@@ -16,10 +17,12 @@ import org.springframework.web.reactive.function.server.ServerResponse;
 import org.springframework.web.server.i18n.LocaleContextResolver;
 import reactor.core.publisher.Mono;
 import run.halo.app.core.extension.User;
+import run.halo.app.core.user.service.RoleService;
 import run.halo.app.extension.ReactiveExtensionClient;
 import run.halo.app.infra.SystemConfigurableEnvironmentFetcher;
 import run.halo.app.infra.SystemSetting;
 import run.halo.app.infra.exception.NotFoundException;
+import run.halo.app.security.authorization.AuthorityUtils;
 import run.halo.app.theme.DefaultTemplateEnum;
 import run.halo.app.theme.finders.PostFinder;
 import run.halo.app.theme.finders.vo.ListedPostVo;
@@ -42,6 +45,7 @@ public class AuthorPostsRouteFactory implements RouteFactory {
 
     private final PostFinder postFinder;
     private final ReactiveExtensionClient client;
+    private final RoleService roleService;
     private SystemConfigurableEnvironmentFetcher environmentFetcher;
 
     private final TitleVisibilityIdentifyCalculator titleVisibilityIdentifyCalculator;
@@ -58,14 +62,29 @@ public class AuthorPostsRouteFactory implements RouteFactory {
     HandlerFunction<ServerResponse> handlerFunction() {
         return request -> {
             String name = request.pathVariable("name");
-            return ServerResponse.ok()
-                .render(DefaultTemplateEnum.AUTHOR.getValue(),
-                    Map.of("author", getByName(name),
-                        "posts", postList(request, name),
-                        ModelConst.TEMPLATE_ID, DefaultTemplateEnum.AUTHOR.getValue()
-                    )
-                );
+            return hasPostManageRole(name)
+                .flatMap(hasPostManageRole -> {
+                    if (hasPostManageRole) {
+                        return ServerResponse.ok()
+                            .render(DefaultTemplateEnum.AUTHOR.getValue(),
+                                Map.of("author", getByName(name),
+                                    "posts", postList(request, name),
+                                    ModelConst.TEMPLATE_ID, DefaultTemplateEnum.AUTHOR.getValue()
+                                )
+                            );
+                    }
+                    return Mono.error(new NotFoundException("Author page not found."));
+                });
         };
+    }
+
+    protected Mono<Boolean> hasPostManageRole(String username) {
+        return roleService.getRolesByUsername(username)
+            .collectList()
+            .flatMap(roles -> roleService.contains(roles,
+                Set.of(AuthorityUtils.POST_CONTRIBUTOR_ROLE_NAME))
+            )
+            .defaultIfEmpty(false);
     }
 
     private Mono<UrlContextListResult<ListedPostVo>> postList(ServerRequest request, String name) {
