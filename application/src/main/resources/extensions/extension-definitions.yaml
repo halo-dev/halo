@@ -57,3 +57,13 @@ spec:
   extensionPointName: reactive-post-content-handler
   displayName: "文章内容缩略图处理"
   description: "处理文章的 HTML 内容为 img 标签追加缩略图"
+---
+apiVersion: plugin.halo.run/v1alpha1
+kind: ExtensionDefinition
+metadata:
+  name: page-content-thumbnail-handler
+spec:
+  className: run.halo.app.content.PageContentThumbnailHandler
+  extensionPointName: reactive-page-content-handler
+  displayName: "自定义页面内容缩略图处理"
+  description: "处理页面的 HTML 内容为 img 标签追加缩略图"
