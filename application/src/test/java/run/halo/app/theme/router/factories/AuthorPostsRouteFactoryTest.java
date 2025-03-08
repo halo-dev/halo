@@ -1,6 +1,9 @@
 package run.halo.app.theme.router.factories;
 
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.doReturn;
+import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.when;
 
 import org.junit.jupiter.api.Test;
@@ -30,7 +33,10 @@ class AuthorPostsRouteFactoryTest extends RouteFactoryTestSuite {
 
     @Test
     void create() {
-        RouterFunction<ServerResponse> routerFunction = authorPostsRouteFactory.create(null);
+        var spyAuthorRoute = spy(authorPostsRouteFactory);
+        doReturn(Mono.just(true)).when(spyAuthorRoute).hasPostManageRole(anyString());
+
+        RouterFunction<ServerResponse> routerFunction = spyAuthorRoute.create(null);
         WebTestClient webClient = getWebTestClient(routerFunction);
 
         when(client.fetch(eq(User.class), eq("fake-user")))
