@@ -242,6 +242,13 @@ core:
     actions:
       extension-point-settings: Extension settings
   user:
+    operations:
+      enable:
+        title: Enable
+        description: Are you sure you want to enable this user?
+      disable:
+        title: Disable
+        description: Are you sure you want to disable this user? This user will not be able to log in after being disabled
     grant_permission_modal:
       roles_preview:
         all: The currently selected role contains all permissions
@@ -257,6 +264,8 @@ core:
           tooltip: Verified
         email_not_verified:
           tooltip: Not verified
+    fields:
+      disabled: Disabled
   role:
     editing_modal:
       fields:

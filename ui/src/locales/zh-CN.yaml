@@ -951,6 +951,12 @@ core:
         title: 修改密码
       grant_permission:
         title: 分配角色
+      enable:
+        title: 取消禁用
+        description: 确定取消禁用该用户吗？
+      disable:
+        title: 禁用
+        description: 确定禁用该用户吗？禁用之后该用户将无法登录系统
     filters:
       role:
         label: 角色
@@ -1021,6 +1027,8 @@ core:
           tooltip: 已验证
         email_not_verified:
           tooltip: 未验证
+    fields:
+      disabled: 已禁用
   role:
     title: 角色
     common:

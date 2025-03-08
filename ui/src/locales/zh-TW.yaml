@@ -936,6 +936,12 @@ core:
         title: 修改密碼
       grant_permission:
         title: 分配角色
+      enable:
+        title: 取消停用
+        description: 確定要取消停用該用戶嗎？
+      disable:
+        title: 停用
+        description: 確定要停用該用戶嗎？停用後該用戶將無法登入系統
     filters:
       role:
         label: 角色
@@ -1006,6 +1012,8 @@ core:
           tooltip: 已驗證
         email_not_verified:
           tooltip: 未驗證
+    fields:
+      disabled: 已停用
   role:
     title: 角色
     common:
