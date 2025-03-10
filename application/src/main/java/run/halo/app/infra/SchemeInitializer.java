@@ -9,6 +9,7 @@ import static run.halo.app.extension.index.IndexAttributeFactory.simpleAttribute
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import java.time.Instant;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -177,6 +178,13 @@ public class SchemeInitializer implements ApplicationListener<ApplicationContext
                             })
                         )
                         .orElseGet(Set::of))));
+            indexSpecs.add(new IndexSpec()
+                .setName("spec.disabled")
+                .setIndexFunc(simpleAttribute(User.class, user ->
+                    Objects.requireNonNullElse(user.getSpec().getDisabled(), Boolean.FALSE)
+                        .toString())
+                )
+            );
         });
         schemeManager.register(ReverseProxy.class);
         schemeManager.register(Setting.class);

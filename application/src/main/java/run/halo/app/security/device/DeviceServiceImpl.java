@@ -1,5 +1,6 @@
 package run.halo.app.security.device;
 
+import static run.halo.app.extension.ExtensionUtil.defaultSort;
 import static run.halo.app.infra.utils.IpAddressUtils.getClientIp;
 import static run.halo.app.security.authentication.rememberme.PersistentTokenBasedRememberMeServices.REMEMBER_ME_SERIES_REQUEST_NAME;
 
@@ -24,8 +25,10 @@ import org.springframework.web.server.ServerWebExchange;
 import reactor.core.publisher.Mono;
 import reactor.util.retry.Retry;
 import run.halo.app.core.extension.Device;
+import run.halo.app.extension.ListOptions;
 import run.halo.app.extension.Metadata;
 import run.halo.app.extension.ReactiveExtensionClient;
+import run.halo.app.extension.index.query.QueryFactory;
 import run.halo.app.security.authentication.rememberme.PersistentRememberMeTokenRepository;
 
 @Slf4j
@@ -130,6 +133,20 @@ public class DeviceServiceImpl implements DeviceService {
             .flatMap(this::removeRememberMeToken)
             .flatMap(client::delete)
             .flatMap(revoked -> sessionRepository.deleteById(revoked.getSpec().getSessionId()));
+    }
+
+    @Override
+    public Mono<Void> revoke(String username) {
+        var listOptions = ListOptions.builder()
+            .andQuery(QueryFactory.equal("spec.principalName", username))
+            .build();
+        return client.listAll(Device.class, listOptions, defaultSort())
+            .flatMap(this::removeRememberMeToken)
+            .flatMap(device -> sessionRepository.deleteById(device.getSpec().getSessionId())
+                .thenReturn(device)
+            )
+            .flatMap(client::delete)
+            .then();
     }
 
     private Mono<Device> removeRememberMeToken(Device device) {
