@@ -222,6 +222,88 @@ export const UserV1alpha1ConsoleApiAxiosParamCreator = function (configuration?:
             };
         },
         /**
+         * Disable user by username
+         * @param {string} username Username
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        disableUser: async (username: string, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+            // verify required parameter 'username' is not null or undefined
+            assertParamExists('disableUser', 'username', username)
+            const localVarPath = `/apis/console.api.security.halo.run/v1alpha1/users/{username}/disable`
+                .replace(`{${"username"}}`, encodeURIComponent(String(username)));
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'POST', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+            // authentication basicAuth required
+            // http basic authentication required
+            setBasicAuthToObject(localVarRequestOptions, configuration)
+
+            // authentication bearerAuth required
+            // http bearer authentication required
+            await setBearerAuthToObject(localVarHeaderParameter, configuration)
+
+
+    
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+        /**
+         * Enable user by username
+         * @param {string} username Username
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        enableUser: async (username: string, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+            // verify required parameter 'username' is not null or undefined
+            assertParamExists('enableUser', 'username', username)
+            const localVarPath = `/apis/console.api.security.halo.run/v1alpha1/users/{username}/enable`
+                .replace(`{${"username"}}`, encodeURIComponent(String(username)));
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'POST', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+            // authentication basicAuth required
+            // http basic authentication required
+            setBasicAuthToObject(localVarRequestOptions, configuration)
+
+            // authentication bearerAuth required
+            // http bearer authentication required
+            await setBearerAuthToObject(localVarHeaderParameter, configuration)
+
+
+    
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+        /**
          * Get current user detail
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
@@ -700,6 +782,30 @@ export const UserV1alpha1ConsoleApiFp = function(configuration?: Configuration) 
             return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
         },
         /**
+         * Disable user by username
+         * @param {string} username Username
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async disableUser(username: string, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<User>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.disableUser(username, options);
+            const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
+            const localVarOperationServerBasePath = operationServerMap['UserV1alpha1ConsoleApi.disableUser']?.[localVarOperationServerIndex]?.url;
+            return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
+        },
+        /**
+         * Enable user by username
+         * @param {string} username Username
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async enableUser(username: string, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<User>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.enableUser(username, options);
+            const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
+            const localVarOperationServerBasePath = operationServerMap['UserV1alpha1ConsoleApi.enableUser']?.[localVarOperationServerIndex]?.url;
+            return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
+        },
+        /**
          * Get current user detail
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
@@ -861,6 +967,24 @@ export const UserV1alpha1ConsoleApiFactory = function (configuration?: Configura
             return localVarFp.deleteUserAvatar(requestParameters.name, options).then((request) => request(axios, basePath));
         },
         /**
+         * Disable user by username
+         * @param {UserV1alpha1ConsoleApiDisableUserRequest} requestParameters Request parameters.
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        disableUser(requestParameters: UserV1alpha1ConsoleApiDisableUserRequest, options?: RawAxiosRequestConfig): AxiosPromise<User> {
+            return localVarFp.disableUser(requestParameters.username, options).then((request) => request(axios, basePath));
+        },
+        /**
+         * Enable user by username
+         * @param {UserV1alpha1ConsoleApiEnableUserRequest} requestParameters Request parameters.
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        enableUser(requestParameters: UserV1alpha1ConsoleApiEnableUserRequest, options?: RawAxiosRequestConfig): AxiosPromise<User> {
+            return localVarFp.enableUser(requestParameters.username, options).then((request) => request(axios, basePath));
+        },
+        /**
          * Get current user detail
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
@@ -1004,6 +1128,34 @@ export interface UserV1alpha1ConsoleApiDeleteUserAvatarRequest {
      * @memberof UserV1alpha1ConsoleApiDeleteUserAvatar
      */
     readonly name: string
+}
+
+/**
+ * Request parameters for disableUser operation in UserV1alpha1ConsoleApi.
+ * @export
+ * @interface UserV1alpha1ConsoleApiDisableUserRequest
+ */
+export interface UserV1alpha1ConsoleApiDisableUserRequest {
+    /**
+     * Username
+     * @type {string}
+     * @memberof UserV1alpha1ConsoleApiDisableUser
+     */
+    readonly username: string
+}
+
+/**
+ * Request parameters for enableUser operation in UserV1alpha1ConsoleApi.
+ * @export
+ * @interface UserV1alpha1ConsoleApiEnableUserRequest
+ */
+export interface UserV1alpha1ConsoleApiEnableUserRequest {
+    /**
+     * Username
+     * @type {string}
+     * @memberof UserV1alpha1ConsoleApiEnableUser
+     */
+    readonly username: string
 }
 
 /**
@@ -1223,6 +1375,28 @@ export class UserV1alpha1ConsoleApi extends BaseAPI {
      */
     public deleteUserAvatar(requestParameters: UserV1alpha1ConsoleApiDeleteUserAvatarRequest, options?: RawAxiosRequestConfig) {
         return UserV1alpha1ConsoleApiFp(this.configuration).deleteUserAvatar(requestParameters.name, options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
+     * Disable user by username
+     * @param {UserV1alpha1ConsoleApiDisableUserRequest} requestParameters Request parameters.
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof UserV1alpha1ConsoleApi
+     */
+    public disableUser(requestParameters: UserV1alpha1ConsoleApiDisableUserRequest, options?: RawAxiosRequestConfig) {
+        return UserV1alpha1ConsoleApiFp(this.configuration).disableUser(requestParameters.username, options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
+     * Enable user by username
+     * @param {UserV1alpha1ConsoleApiEnableUserRequest} requestParameters Request parameters.
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof UserV1alpha1ConsoleApi
+     */
+    public enableUser(requestParameters: UserV1alpha1ConsoleApiEnableUserRequest, options?: RawAxiosRequestConfig) {
+        return UserV1alpha1ConsoleApiFp(this.configuration).enableUser(requestParameters.username, options).then((request) => request(this.axios, this.basePath));
     }
 
     /**

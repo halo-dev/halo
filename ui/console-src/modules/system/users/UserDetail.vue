@@ -10,11 +10,13 @@ import {
   Toast,
   VButton,
   VDropdown,
+  VDropdownDivider,
   VDropdownItem,
   VTabbar,
+  VTag,
 } from "@halo-dev/components";
 import type { UserTab } from "@halo-dev/console-shared";
-import { useQuery } from "@tanstack/vue-query";
+import { useQuery, useQueryClient } from "@tanstack/vue-query";
 import { useRouteQuery } from "@vueuse/router";
 import {
   computed,
@@ -30,8 +32,10 @@ import { useRoute, useRouter } from "vue-router";
 import GrantPermissionModal from "./components/GrantPermissionModal.vue";
 import UserEditingModal from "./components/UserEditingModal.vue";
 import UserPasswordChangeModal from "./components/UserPasswordChangeModal.vue";
+import { useUserEnableDisable } from "./composables/use-user";
 import DetailTab from "./tabs/Detail.vue";
 
+const queryClient = useQueryClient();
 const { currentUserHasPermission } = usePermission();
 const { t } = useI18n();
 const { currentUser } = useUserStore();
@@ -134,6 +138,8 @@ function onGrantPermissionModalClose() {
   grantPermissionModal.value = false;
   refetch();
 }
+
+const { handleEnableOrDisableUser } = useUserEnableDisable();
 </script>
 <template>
   <UserEditingModal
@@ -162,9 +168,14 @@ function onGrantPermissionModalClose() {
             <UserAvatar :name="user?.user.metadata.name" />
           </div>
           <div class="block">
-            <h1 class="truncate text-lg font-bold text-gray-900">
-              {{ user?.user.spec.displayName }}
-            </h1>
+            <div class="flex items-center gap-2">
+              <h1 class="truncate text-lg font-bold text-gray-900">
+                {{ user?.user.spec.displayName }}
+              </h1>
+              <VTag v-if="user?.user.spec.disabled">
+                {{ $t("core.user.fields.disabled") }}
+              </VTag>
+            </div>
             <span v-if="!isLoading" class="text-sm text-gray-600">
               @{{ user?.user.metadata.name }}
             </span>
@@ -194,6 +205,33 @@ function onGrantPermissionModalClose() {
                 @click="grantPermissionModal = true"
               >
                 {{ $t("core.user.detail.actions.grant_permission.title") }}
+              </VDropdownItem>
+              <VDropdownDivider
+                v-if="currentUser?.metadata.name !== user?.user.metadata.name"
+              />
+              <VDropdownItem
+                v-if="
+                  !!user &&
+                  currentUser?.metadata.name !== user?.user.metadata.name
+                "
+                type="danger"
+                @click="
+                  handleEnableOrDisableUser({
+                    name: user.user.metadata.name,
+                    operation: user.user.spec.disabled ? 'enable' : 'disable',
+                    onSuccess: () => {
+                      queryClient.invalidateQueries({
+                        queryKey: ['user-detail'],
+                      });
+                    },
+                  })
+                "
+              >
+                {{
+                  user.user.spec.disabled
+                    ? $t("core.user.operations.enable.title")
+                    : $t("core.user.operations.disable.title")
+                }}
               </VDropdownItem>
               <VDropdownItem
                 v-if="

@@ -2,7 +2,6 @@
 import { useFetchRole } from "@/composables/use-role";
 import { rbacAnnotations } from "@/constants/annotations";
 import { useUserStore } from "@/stores/user";
-import { formatDatetime } from "@/utils/date";
 import { usePermission } from "@/utils/permission";
 import type { ListedUser, User } from "@halo-dev/api-client";
 import { consoleApiClient, coreApiClient } from "@halo-dev/api-client";
@@ -14,40 +13,28 @@ import {
   IconShieldUser,
   IconUserSettings,
   Toast,
-  VAvatar,
   VButton,
   VCard,
-  VDropdownItem,
   VEmpty,
-  VEntity,
-  VEntityField,
   VLoading,
   VPageHeader,
   VPagination,
   VSpace,
-  VStatusDot,
-  VTag,
 } from "@halo-dev/components";
 import { useQuery } from "@tanstack/vue-query";
 import { useRouteQuery } from "@vueuse/router";
 import { computed, onMounted, ref, watch } from "vue";
 import { useI18n } from "vue-i18n";
-import GrantPermissionModal from "./components/GrantPermissionModal.vue";
 import UserCreationModal from "./components/UserCreationModal.vue";
-import UserEditingModal from "./components/UserEditingModal.vue";
-import UserPasswordChangeModal from "./components/UserPasswordChangeModal.vue";
+import UserListItem from "./components/UserListItem.vue";
 
 const { currentUserHasPermission } = usePermission();
 const { t } = useI18n();
 
 const checkedAll = ref(false);
-const editingModal = ref<boolean>(false);
 const creationModal = ref<boolean>(false);
-const passwordChangeModal = ref<boolean>(false);
-const grantPermissionModal = ref<boolean>(false);
 
 const selectedUserNames = ref<string[]>([]);
-const selectedUser = ref<User>();
 const keyword = useRouteQuery<string>("keyword", "");
 
 const userStore = useUserStore();
@@ -122,33 +109,7 @@ const {
 
     return hasDeletingData ? 1000 : false;
   },
-  onSuccess() {
-    selectedUser.value = undefined;
-  },
 });
-
-const handleDelete = async (user: User) => {
-  Dialog.warning({
-    title: t("core.user.operations.delete.title"),
-    description: t("core.common.dialog.descriptions.cannot_be_recovered"),
-    confirmType: "danger",
-    confirmText: t("core.common.buttons.confirm"),
-    cancelText: t("core.common.buttons.cancel"),
-    onConfirm: async () => {
-      try {
-        await coreApiClient.user.deleteUser({
-          name: user.metadata.name,
-        });
-
-        Toast.success(t("core.common.toast.delete_success"));
-      } catch (e) {
-        console.error("Failed to delete user", e);
-      } finally {
-        await refetch();
-      }
-    },
-  });
-};
 
 const handleDeleteInBatch = async () => {
   Dialog.warning({
@@ -184,10 +145,7 @@ watch(selectedUserNames, (newValue) => {
 });
 
 const checkSelection = (user: User) => {
-  return (
-    user.metadata.name === selectedUser.value?.metadata.name ||
-    selectedUserNames.value.includes(user.metadata.name)
-  );
+  return selectedUserNames.value.includes(user.metadata.name);
 };
 
 const handleCheckAllChange = (e: Event) => {
@@ -209,21 +167,6 @@ const handleCheckAllChange = (e: Event) => {
   }
 };
 
-const handleOpenCreateModal = (user: User) => {
-  selectedUser.value = user;
-  editingModal.value = true;
-};
-
-const handleOpenPasswordChangeModal = (user: User) => {
-  selectedUser.value = user;
-  passwordChangeModal.value = true;
-};
-
-const handleOpenGrantPermissionModal = (user: User) => {
-  selectedUser.value = user;
-  grantPermissionModal.value = true;
-};
-
 // Route query action
 const routeQueryAction = useRouteQuery<string | undefined>("action");
 
@@ -237,43 +180,9 @@ function onCreationModalClose() {
   creationModal.value = false;
   routeQueryAction.value = undefined;
 }
-
-function onEditingModalClose() {
-  editingModal.value = false;
-  selectedUser.value = undefined;
-}
-
-function onPasswordChangeModalClose() {
-  passwordChangeModal.value = false;
-  refetch();
-}
-
-function onGrantPermissionModalClose() {
-  grantPermissionModal.value = false;
-  selectedUser.value = undefined;
-  refetch();
-}
 </script>
 <template>
-  <UserEditingModal
-    v-if="editingModal && selectedUser"
-    :user="selectedUser"
-    @close="onEditingModalClose"
-  />
-
   <UserCreationModal v-if="creationModal" @close="onCreationModalClose" />
-
-  <UserPasswordChangeModal
-    v-if="passwordChangeModal"
-    :user="selectedUser"
-    @close="onPasswordChangeModalClose"
-  />
-
-  <GrantPermissionModal
-    v-if="grantPermissionModal"
-    :user="selectedUser"
-    @close="onGrantPermissionModalClose"
-  />
 
   <VPageHeader :title="$t('core.user.title')">
     <template #icon>
@@ -413,7 +322,7 @@ function onGrantPermissionModalClose() {
               <VButton
                 v-permission="['system:users:manage']"
                 type="secondary"
-                @click="editingModal = true"
+                @click="creationModal = true"
               >
                 <template #icon>
                   <IconAddCircle class="h-full w-full" />
@@ -431,7 +340,7 @@ function onGrantPermissionModalClose() {
           role="list"
         >
           <li v-for="(user, index) in users" :key="index">
-            <VEntity :is-selected="checkSelection(user.user)">
+            <UserListItem :user="user" :is-selected="checkSelection(user.user)">
               <template
                 v-if="currentUserHasPermission(['system:users:manage'])"
                 #checkbox
@@ -439,7 +348,7 @@ function onGrantPermissionModalClose() {
                 <input
                   v-model="selectedUserNames"
                   :value="user.user.metadata.name"
-                  name="post-checkbox"
+                  name="user-checkbox"
                   type="checkbox"
                   :disabled="
                     user.user.metadata.name ===
@@ -447,95 +356,7 @@ function onGrantPermissionModalClose() {
                   "
                 />
               </template>
-              <template #start>
-                <VEntityField>
-                  <template #description>
-                    <VAvatar
-                      :alt="user.user.spec.displayName"
-                      :src="user.user.spec.avatar"
-                      size="md"
-                    ></VAvatar>
-                  </template>
-                </VEntityField>
-                <VEntityField
-                  :title="user.user.spec.displayName"
-                  :description="user.user.metadata.name"
-                  :route="{
-                    name: 'UserDetail',
-                    params: { name: user.user.metadata.name },
-                  }"
-                />
-              </template>
-              <template #end>
-                <VEntityField>
-                  <template #description>
-                    <VSpace>
-                      <VTag
-                        v-for="role in user.roles"
-                        :key="role.metadata.name"
-                      >
-                        <template #leftIcon>
-                          <IconShieldUser />
-                        </template>
-                        {{
-                          role.metadata.annotations?.[
-                            rbacAnnotations.DISPLAY_NAME
-                          ] || role.metadata.name
-                        }}
-                      </VTag>
-                    </VSpace>
-                  </template>
-                </VEntityField>
-                <VEntityField v-if="user.user.metadata.deletionTimestamp">
-                  <template #description>
-                    <VStatusDot
-                      v-tooltip="$t('core.common.status.deleting')"
-                      state="warning"
-                      animate
-                    />
-                  </template>
-                </VEntityField>
-                <VEntityField>
-                  <template #description>
-                    <span class="truncate text-xs tabular-nums text-gray-500">
-                      {{ formatDatetime(user.user.metadata.creationTimestamp) }}
-                    </span>
-                  </template>
-                </VEntityField>
-              </template>
-              <template
-                v-if="currentUserHasPermission(['system:users:manage'])"
-                #dropdownItems
-              >
-                <VDropdownItem @click="handleOpenCreateModal(user.user)">
-                  {{ $t("core.user.operations.update_profile.title") }}
-                </VDropdownItem>
-                <VDropdownItem
-                  @click="handleOpenPasswordChangeModal(user.user)"
-                >
-                  {{ $t("core.user.operations.change_password.title") }}
-                </VDropdownItem>
-                <VDropdownItem
-                  v-if="
-                    userStore.currentUser?.metadata.name !==
-                    user.user.metadata.name
-                  "
-                  @click="handleOpenGrantPermissionModal(user.user)"
-                >
-                  {{ $t("core.user.operations.grant_permission.title") }}
-                </VDropdownItem>
-                <VDropdownItem
-                  v-if="
-                    userStore.currentUser?.metadata.name !==
-                    user.user.metadata.name
-                  "
-                  type="danger"
-                  @click="handleDelete(user.user)"
-                >
-                  {{ $t("core.common.buttons.delete") }}
-                </VDropdownItem>
-              </template>
-            </VEntity>
+            </UserListItem>
           </li>
         </ul>
       </Transition>
