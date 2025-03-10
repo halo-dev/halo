@@ -463,6 +463,10 @@ core:
         revoke:
           title: Revoke device
           description: Are you sure you want to revoke this device? After revoking, this device will be logged out
+        revoke_others:
+          title: Revoke all other devices
+          description: Are you sure you want to revoke all other devices? After you revoke, other devices will be logged out
+          toast_success: Login status of other devices has been revoked
   uc_notification:
     title: Notifications
     tabs:
@@ -478,6 +482,12 @@ core:
       delete:
         description: Are you sure you want to delete this notification?
         title: Delete
+      delete_all:
+        title: Delete all current notifications
+        description: Are you sure you want to delete all current notifications? You cannot restore them after deletion.
+      mark_all_as_read:
+        title: Mark all current notifications as read
+        description: Mark all current messages as read. Do you want to continue?
   overview:
     fields:
       activated_theme: Activated theme

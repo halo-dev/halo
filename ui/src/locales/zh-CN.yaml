@@ -1170,8 +1170,7 @@ core:
                 manual:
                   label: 如果无法扫描二维码，点击查看代替步骤
                   help: 使用以下代码手动配置验证器应用：
-              tips: >-
-                请妥善保管您的两步验证设备，如果设备丢失或损坏，你将无法登录系统。建议你在多个设备上安装验证器应用，或保存好密钥的备份，以防主要设备无法使用。
+              tips: 请妥善保管您的两步验证设备，如果设备丢失或损坏，你将无法登录系统。建议你在多个设备上安装验证器应用，或保存好密钥的备份，以防主要设备无法使用。
     pat:
       operations:
         delete:
@@ -1303,6 +1302,12 @@ core:
       delete:
         title: 删除消息
         description: 确定要删除该消息吗？
+      delete_all:
+        title: 删除当前所有通知
+        description: 确定要删除当前所有通知吗？删除后将无法恢复。
+      mark_all_as_read:
+        title: 将当前所有通知标记为已读
+        description: 将当前所有通知标记为已读，是否继续？
   setting:
     title: 设置
   overview:

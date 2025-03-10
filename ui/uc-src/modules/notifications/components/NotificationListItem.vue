@@ -47,6 +47,9 @@ function handleDelete() {
   Dialog.warning({
     title: t("core.uc_notification.operations.delete.title"),
     description: t("core.uc_notification.operations.delete.description"),
+    confirmText: t("core.common.buttons.confirm"),
+    cancelText: t("core.common.buttons.cancel"),
+    confirmType: "danger",
     async onConfirm() {
       await ucApiClient.notification.notification.deleteSpecifiedNotification({
         name: props.notification.metadata.name,
