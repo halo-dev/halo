@@ -3,6 +3,7 @@ package run.halo.app.infra.console;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.core.io.buffer.DataBuffer;
 import org.springframework.http.HttpMethod;
+import org.springframework.http.HttpStatus;
 import org.springframework.security.web.server.util.matcher.AndServerWebExchangeMatcher;
 import org.springframework.security.web.server.util.matcher.NegatedServerWebExchangeMatcher;
 import org.springframework.security.web.server.util.matcher.ServerWebExchangeMatcher;
@@ -58,14 +59,22 @@ public class ProxyFilter implements WebFilter {
                 .headers(httpHeaders -> httpHeaders.addAll(exchange.getRequest().getHeaders()))
                 .exchangeToMono(clientResponse -> {
                     var response = exchange.getResponse();
+                    var httpStatusCode = clientResponse.statusCode();
                     // set headers
-                    response.getHeaders().putAll(clientResponse.headers().asHttpHeaders());
+                    var httpHeaders = clientResponse.headers().asHttpHeaders();
+                    response.getHeaders().putAll(httpHeaders);
                     // set cookies
                     response.getCookies().putAll(clientResponse.cookies());
                     // set status code
-                    response.setStatusCode(clientResponse.statusCode());
+                    response.setStatusCode(httpStatusCode);
+                    var contentLength = clientResponse.headers().contentLength().orElse(0L);
+                    if (httpStatusCode.is3xxRedirection()
+                        || httpStatusCode.equals(HttpStatus.NO_CONTENT)
+                        || contentLength == 0) {
+                        return Mono.empty();
+                    }
                     var body = clientResponse.bodyToFlux(DataBuffer.class);
-                    return exchange.getResponse().writeWith(body);
+                    return response.writeWith(body);
                 }));
     }
 }
