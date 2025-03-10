@@ -13,6 +13,7 @@ export default definePlugin({
       meta: {
         title: "core.uc_notification.title",
         searchable: true,
+        hideFooter: true,
         menu: {
           name: "core.uc_sidebar.menu.items.notification",
           group: "dashboard",

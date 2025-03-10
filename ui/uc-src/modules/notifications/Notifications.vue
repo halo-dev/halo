@@ -2,7 +2,11 @@
 import { useUserStore } from "@/stores/user";
 import { ucApiClient } from "@halo-dev/api-client";
 import {
+  Dialog,
+  IconCheckboxCircle,
+  IconDeleteBin,
   IconNotificationBadgeLine,
+  Toast,
   VButton,
   VCard,
   VEmpty,
@@ -10,13 +14,16 @@ import {
   VPageHeader,
   VTabbar,
 } from "@halo-dev/components";
-import { useQuery } from "@tanstack/vue-query";
+import { useQuery, useQueryClient } from "@tanstack/vue-query";
 import { useRouteQuery } from "@vueuse/router";
 import { OverlayScrollbarsComponent } from "overlayscrollbars-vue";
 import { computed } from "vue";
+import { useI18n } from "vue-i18n";
 import NotificationContent from "./components/NotificationContent.vue";
 import NotificationListItem from "./components/NotificationListItem.vue";
 
+const queryClient = useQueryClient();
+const { t } = useI18n();
 const { currentUser } = useUserStore();
 
 const activeTab = useRouteQuery("tab", "unread");
@@ -54,6 +61,71 @@ const selectedNotification = computed(() => {
     (item) => item.metadata.name === selectedNotificationName.value
   );
 });
+
+function handleDeleteNotifications() {
+  Dialog.warning({
+    title: t("core.uc_notification.operations.delete_all.title"),
+    description: t("core.uc_notification.operations.delete_all.description"),
+    confirmText: t("core.common.buttons.confirm"),
+    cancelText: t("core.common.buttons.cancel"),
+    confirmType: "danger",
+    onConfirm: async () => {
+      if (!notifications.value || notifications.value.items.length === 0) {
+        return;
+      }
+
+      if (!currentUser) {
+        throw new Error("Current user is not found");
+      }
+
+      for (const notification of notifications.value.items) {
+        await ucApiClient.notification.notification.deleteSpecifiedNotification(
+          {
+            username: currentUser.metadata.name,
+            name: notification.metadata.name,
+          }
+        );
+      }
+
+      await queryClient.invalidateQueries({ queryKey: ["user-notifications"] });
+
+      Toast.success(t("core.common.toast.delete_success"));
+    },
+  });
+}
+
+function handleMarkAllAsRead() {
+  Dialog.warning({
+    title: t("core.uc_notification.operations.mark_all_as_read.title"),
+    description: t(
+      "core.uc_notification.operations.mark_all_as_read.description"
+    ),
+    confirmText: t("core.common.buttons.confirm"),
+    cancelText: t("core.common.buttons.cancel"),
+    onConfirm: async () => {
+      if (!notifications.value || notifications.value.items.length === 0) {
+        return;
+      }
+
+      if (!currentUser) {
+        throw new Error("Current user is not found");
+      }
+
+      const names = notifications.value?.items.map(
+        (notification) => notification.metadata.name
+      );
+
+      await ucApiClient.notification.notification.markNotificationsAsRead({
+        username: currentUser.metadata.name,
+        markSpecifiedRequest: {
+          names,
+        },
+      });
+
+      await queryClient.invalidateQueries({ queryKey: ["user-notifications"] });
+    },
+  });
+}
 </script>
 
 <template>
@@ -69,17 +141,12 @@ const selectedNotification = computed(() => {
     >
       <div class="grid h-full grid-cols-12 divide-y sm:divide-x sm:divide-y-0">
         <div
-          class="relative col-span-12 h-full overflow-auto sm:col-span-6 lg:col-span-5 xl:col-span-3"
+          class="relative col-span-12 flex h-full flex-col overflow-hidden sm:col-span-6 lg:col-span-5 xl:col-span-3"
         >
-          <OverlayScrollbarsComponent
-            element="div"
-            :options="{ scrollbars: { autoHide: 'scroll' } }"
-            class="h-full w-full"
-            defer
-          >
+          <div class="sticky top-0 z-10 flex-none">
             <VTabbar
               v-model:active-id="activeTab"
-              class="sticky top-0 z-10 !rounded-none"
+              class="!rounded-none"
               :items="[
                 { id: 'unread', label: $t('core.uc_notification.tabs.unread') },
                 { id: 'read', label: $t('core.uc_notification.tabs.read') },
@@ -87,6 +154,37 @@ const selectedNotification = computed(() => {
               type="outline"
               @change="selectedNotificationName = undefined"
             ></VTabbar>
+
+            <div
+              class="absolute right-4 top-1/2 -translate-y-1/2 flex items-center gap-2"
+            >
+              <button
+                v-if="activeTab === 'unread'"
+                class="flex items-center justify-center h-7 w-7 rounded-full cursor-pointer hover:bg-gray-200 disabled:pointer-events-none disabled:opacity-70"
+                :disabled="!notifications?.items.length"
+                @click="handleMarkAllAsRead"
+              >
+                <IconCheckboxCircle
+                  class="w-4 h-4 text-gray-600 group-hover:text-gray-900"
+                />
+              </button>
+              <button
+                class="flex items-center justify-center h-7 w-7 group rounded-full cursor-pointer hover:bg-gray-200 disabled:pointer-events-none disabled:opacity-70"
+                :disabled="!notifications?.items.length"
+                @click="handleDeleteNotifications"
+              >
+                <IconDeleteBin
+                  class="h-4 w-4 text-gray-600 group-hover:text-red-600"
+                />
+              </button>
+            </div>
+          </div>
+          <OverlayScrollbarsComponent
+            element="div"
+            :options="{ scrollbars: { autoHide: 'scroll' } }"
+            class="h-full w-full flex-1"
+            defer
+          >
             <VLoading v-if="isLoading" />
             <Transition
               v-else-if="!notifications?.items.length"

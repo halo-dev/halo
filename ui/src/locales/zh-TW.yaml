@@ -1287,6 +1287,12 @@ core:
       delete:
         description: 確定要刪除該訊息嗎？
         title: 刪除訊息
+      delete_all:
+        title: 刪除目前所有通知
+        description: 確定要刪除目前所有通知嗎？刪除後將無法復原。
+      mark_all_as_read:
+        title: 將目前所有通知標示為已讀
+        description: 將目前所有通知標示為已讀，是否繼續？
   setting:
     title: 設置
   overview:

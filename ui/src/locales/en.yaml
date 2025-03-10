@@ -1398,6 +1398,14 @@ core:
       delete:
         description: Are you sure you want to delete this notification?
         title: Delete
+      delete_all:
+        title: Delete all current notifications
+        description: >-
+          Are you sure you want to delete all current notifications? You cannot
+          restore them after deletion.
+      mark_all_as_read:
+        title: Mark all current notifications as read
+        description: Mark all current messages as read. Do you want to continue?
   setting:
     title: Settings
   overview:
