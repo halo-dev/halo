@@ -7556,6 +7556,70 @@
         ]
       }
     },
+    "/apis/console.api.security.halo.run/v1alpha1/users/{username}/disable": {
+      "post": {
+        "description": "Disable user by username",
+        "operationId": "DisableUser",
+        "parameters": [
+          {
+            "description": "Username",
+            "in": "path",
+            "name": "username",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "default": {
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/User"
+                }
+              }
+            },
+            "description": "The user has been disabled."
+          }
+        },
+        "tags": [
+          "UserV1alpha1Console"
+        ]
+      }
+    },
+    "/apis/console.api.security.halo.run/v1alpha1/users/{username}/enable": {
+      "post": {
+        "description": "Enable user by username",
+        "operationId": "EnableUser",
+        "parameters": [
+          {
+            "description": "Username",
+            "in": "path",
+            "name": "username",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "default": {
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/User"
+                }
+              }
+            },
+            "description": "The user has been enabled."
+          }
+        },
+        "tags": [
+          "UserV1alpha1Console"
+        ]
+      }
+    },
     "/apis/content.halo.run/v1alpha1/categories": {
       "get": {
         "description": "List Category",

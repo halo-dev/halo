@@ -15,6 +15,8 @@ import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.dao.OptimisticLockingFailureException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.ReactiveTransactionManager;
+import org.springframework.transaction.reactive.TransactionalOperator;
 import org.springframework.util.Assert;
 import org.springframework.util.CollectionUtils;
 import org.springframework.util.StringUtils;
@@ -45,6 +47,7 @@ import run.halo.app.infra.exception.EmailVerificationFailed;
 import run.halo.app.infra.exception.UnsatisfiedAttributeValueException;
 import run.halo.app.infra.exception.UserNotFoundException;
 import run.halo.app.plugin.extensionpoint.ExtensionGetter;
+import run.halo.app.security.device.DeviceService;
 
 @Service
 @RequiredArgsConstructor
@@ -65,6 +68,10 @@ public class UserServiceImpl implements UserService {
     private final EmailVerificationService emailVerificationService;
 
     private final ExtensionGetter extensionGetter;
+
+    private final DeviceService deviceService;
+
+    private final ReactiveTransactionManager transactionManager;
 
     private Clock clock = Clock.systemUTC();
 
@@ -274,6 +281,25 @@ public class UserServiceImpl implements UserService {
     @Override
     public String encryptPassword(String rawPassword) {
         return passwordEncoder.encode(rawPassword);
+    }
+
+    @Override
+    public Mono<User> disable(String username) {
+        var tx = TransactionalOperator.create(transactionManager);
+        return client.fetch(User.class, username)
+            .filter(user -> !Boolean.TRUE.equals(user.getSpec().getDisabled()))
+            .flatMap(user -> deviceService.revoke(username).thenReturn(user))
+            .doOnNext(user -> user.getSpec().setDisabled(true))
+            .flatMap(client::update)
+            .as(tx::transactional);
+    }
+
+    @Override
+    public Mono<User> enable(String username) {
+        return client.fetch(User.class, username)
+            .filter(user -> Boolean.TRUE.equals(user.getSpec().getDisabled()))
+            .doOnNext(user -> user.getSpec().setDisabled(false))
+            .flatMap(client::update);
     }
 
     void publishPasswordChangedEvent(String username) {

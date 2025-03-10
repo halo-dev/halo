@@ -26,4 +26,9 @@ public interface UserService {
     Flux<User> listByEmail(String email);
 
     String encryptPassword(String rawPassword);
+
+    Mono<User> disable(String username);
+
+    Mono<User> enable(String username);
+
 }

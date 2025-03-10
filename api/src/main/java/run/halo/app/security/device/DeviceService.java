@@ -11,4 +11,6 @@ public interface DeviceService {
     Mono<Void> changeSessionId(ServerWebExchange exchange);
 
     Mono<Void> revoke(String principalName, String deviceId);
+
+    Mono<Void> revoke(String username);
 }
