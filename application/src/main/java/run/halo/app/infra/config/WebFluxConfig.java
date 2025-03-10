@@ -14,6 +14,7 @@ import org.springframework.boot.autoconfigure.web.reactive.WebFluxRegistrations;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.core.Ordered;
 import org.springframework.core.annotation.Order;
 import org.springframework.http.CacheControl;
 import org.springframework.http.MediaType;
@@ -218,6 +219,7 @@ public class WebFluxConfig implements WebFluxConfigurer {
 
     @ConditionalOnProperty(name = "halo.console.proxy.enabled", havingValue = "true")
     @Bean
+    @Order(Ordered.HIGHEST_PRECEDENCE)
     ProxyFilter consoleProxyFilter() {
         return new ProxyFilter("/console/**", haloProp.getConsole().getProxy());
     }
@@ -225,6 +227,7 @@ public class WebFluxConfig implements WebFluxConfigurer {
 
     @ConditionalOnProperty(name = "halo.uc.proxy.enabled", havingValue = "true")
     @Bean
+    @Order(Ordered.HIGHEST_PRECEDENCE)
     ProxyFilter ucProxyFilter() {
         return new ProxyFilter("/uc/**", haloProp.getUc().getProxy());
     }
