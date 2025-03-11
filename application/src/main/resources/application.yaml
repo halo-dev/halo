@@ -57,6 +57,8 @@ springdoc:
   writer-with-order-by-keys: true
 
 logging:
+  level:
+    org.thymeleaf.TemplateEngine: OFF
   file:
     name: ${halo.work-dir}/logs/halo.log
   logback:
