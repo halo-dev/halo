@@ -146,7 +146,7 @@ spec:
           label: "关闭主题预览"
           value: false
           name: disableThemePreview
-          help: "关闭后，主题预览功能将始终预览的是已激活主题，但超级管理员仍然可以通过主题管理页面预览主题"
+          help: "关闭后，未包含主题管理权限的用户将无法通过参数预览未激活的主题"
         - $formkit: text
           label: "分类页路由前缀"
           value: "categories"
