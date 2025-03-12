@@ -28,6 +28,8 @@ public enum AuthorityUtils {
 
     public static final String POST_CONTRIBUTOR_ROLE_NAME = "role-template-post-contributor";
 
+    public static final String THEME_MANAGEMENT_ROLE_NAME = "role-template-manage-themes";
+
     /**
      * Converts an array of GrantedAuthority objects to a role set.
      *
