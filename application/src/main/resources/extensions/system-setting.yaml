@@ -142,6 +142,11 @@ spec:
     - group: routeRules
       label: 主题路由设置
       formSchema:
+        - $formkit: checkbox
+          label: "关闭主题预览"
+          value: false
+          name: disableThemePreview
+          help: "关闭后，未包含主题管理权限的用户将无法通过参数预览未激活的主题"
         - $formkit: text
           label: "分类页路由前缀"
           value: "categories"
