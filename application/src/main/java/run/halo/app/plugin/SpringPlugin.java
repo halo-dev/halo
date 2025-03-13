@@ -52,7 +52,6 @@ public class SpringPlugin extends Plugin {
             log.error(
                 "Cleaning up plugin resources for plugin {} due to not being able to start plugin.",
                 pluginId);
-            log.debug("Error occurred when starting plugin {}", pluginId, t);
             this.stop();
             // propagate exception to invoker.
             throw t;
