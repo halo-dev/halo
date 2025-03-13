@@ -310,6 +310,7 @@ public class PluginReconciler implements Reconciler<Request> {
                     """.formatted(pluginName, pluginState));
             }
         } catch (Throwable e) {
+            log.debug("Error occurred when starting plugin {}", pluginName, e);
             conditions.addAndEvictFIFO(Condition.builder()
                 .type(ConditionType.READY)
                 .status(ConditionStatus.FALSE)
