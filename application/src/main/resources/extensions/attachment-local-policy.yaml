@@ -66,6 +66,20 @@ spec:
               value: DOCUMENT
             - label: 压缩包
               value: ARCHIVE
+        - $formkit: checkbox
+          name: alwaysRandomizeFilename
+          label: 是否总是随机文件名
+          help: 勾选后将随机生成文件名
+        - $formkit: number
+          number: integer
+          if: $alwaysRandomizeFilename
+          name: randomLength
+          label: 随机文件名长度
+          help: 默认值为 32。因为文件名的长度限制，随机文件名的长度范围为 [8, 64]。
+          validation: "between:8,64"
+          validation-visibility: live
+          min: 8
+          max: 64
 ---
 apiVersion: storage.halo.run/v1alpha1
 kind: Group

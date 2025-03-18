@@ -52,6 +52,7 @@ import run.halo.app.infra.FileCategoryMatcher;
 import run.halo.app.infra.exception.AttachmentAlreadyExistsException;
 import run.halo.app.infra.exception.FileSizeExceededException;
 import run.halo.app.infra.exception.FileTypeNotAllowedException;
+import run.halo.app.infra.utils.FileNameUtils;
 import run.halo.app.infra.utils.FileTypeDetectUtils;
 import run.halo.app.infra.utils.JsonUtils;
 
@@ -75,18 +76,22 @@ class LocalAttachmentUploadHandler implements AttachmentHandler {
             .filter(option -> this.shouldHandle(option.policy()))
             .flatMap(option -> {
                 var configMap = option.configMap();
-                var settingJson = configMap.getData().getOrDefault("default", "{}");
-                var setting = JsonUtils.jsonToObject(settingJson, PolicySetting.class);
+                var setting = Optional.ofNullable(configMap)
+                    .map(ConfigMap::getData)
+                    .map(data -> data.get("default"))
+                    .map(json -> JsonUtils.jsonToObject(json, PolicySetting.class))
+                    .orElseGet(PolicySetting::new);
 
                 final var attachmentsRoot = attachmentDirGetter.get();
                 final var uploadRoot = attachmentsRoot.resolve("upload");
                 final var file = option.file();
                 final Path attachmentPath;
+                final String filename = getFilename(file.filename(), setting);
                 if (StringUtils.hasText(setting.getLocation())) {
                     attachmentPath =
-                        uploadRoot.resolve(setting.getLocation()).resolve(file.filename());
+                        uploadRoot.resolve(setting.getLocation()).resolve(filename);
                 } else {
-                    attachmentPath = uploadRoot.resolve(file.filename());
+                    attachmentPath = uploadRoot.resolve(filename);
                 }
                 checkDirectoryTraversal(uploadRoot, attachmentPath);
 
@@ -102,7 +107,7 @@ class LocalAttachmentUploadHandler implements AttachmentHandler {
                     .subscribeOn(Schedulers.boundedElastic())
                     .then(writeContent(file.content(), attachmentPath, true))
                     .map(path -> {
-                        log.info("Wrote attachment {} into {}", file.filename(), path);
+                        log.info("Wrote attachment {} into {}", filename, path);
                         // TODO check the file extension
                         var metadata = new Metadata();
                         metadata.setName(UUID.randomUUID().toString());
@@ -305,6 +310,21 @@ class LocalAttachmentUploadHandler implements AttachmentHandler {
         });
     }
 
+    private static String getFilename(String filename, PolicySetting setting) {
+        if (!setting.isAlwaysRandomizeFilename()) {
+            return filename;
+        }
+        var length = setting.getRandomLength();
+        if (length < 8) {
+            length = 8;
+        } else if (length > 64) {
+            // The max filename length is 256, so we limit the random length to 64
+            // for most cases.
+            length = 64;
+        }
+        return FileNameUtils.randomFileName(filename, length);
+    }
+
     @Data
     public static class PolicySetting {
 
@@ -313,6 +333,10 @@ class LocalAttachmentUploadHandler implements AttachmentHandler {
         private DataSize maxFileSize;
 
         private Set<String> allowedFileTypes;
+
+        private boolean alwaysRandomizeFilename;
+
+        private int randomLength = 32;
 
         public void setMaxFileSize(String maxFileSize) {
             if (!StringUtils.hasText(maxFileSize)) {
