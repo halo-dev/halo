@@ -242,15 +242,17 @@ public class DefaultController<R> implements Controller {
         }
 
         try {
-            if (executor instanceof AutoCloseable closeable) {
+            // we have to check if the executor is an instance of ExecutorService at first.
+            // Because ExecutorService extends AutoCloseable interface in Java 21
+            if (executor instanceof ExecutorService executorService) {
+                closeExecutorService(executorService);
+            } else if (executor instanceof AutoCloseable closeable) {
                 closeable.close();
                 if (Thread.currentThread().isInterrupted()) {
                     log.warn("Wait timeout for controller {} shutdown", name);
                 } else {
                     log.info("Controller {} is disposed", name);
                 }
-            } else if (executor instanceof ExecutorService executorService) {
-                closeExecutorService(executorService);
             }
         } catch (Exception e) {
             log.warn("Interrupted while waiting for controller {} shutdown", name);
