@@ -12,6 +12,7 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.FileAlreadyExistsException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.time.Clock;
 import java.time.Duration;
 import java.util.ArrayList;
 import java.util.Map;
@@ -21,6 +22,7 @@ import java.util.UUID;
 import java.util.concurrent.atomic.AtomicReference;
 import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.RandomStringUtils;
 import org.reactivestreams.Publisher;
 import org.springframework.core.io.buffer.DataBuffer;
 import org.springframework.core.io.buffer.DataBufferUtils;
@@ -52,6 +54,7 @@ import run.halo.app.infra.FileCategoryMatcher;
 import run.halo.app.infra.exception.AttachmentAlreadyExistsException;
 import run.halo.app.infra.exception.FileSizeExceededException;
 import run.halo.app.infra.exception.FileTypeNotAllowedException;
+import run.halo.app.infra.utils.FileNameUtils;
 import run.halo.app.infra.utils.FileTypeDetectUtils;
 import run.halo.app.infra.utils.JsonUtils;
 
@@ -63,10 +66,21 @@ class LocalAttachmentUploadHandler implements AttachmentHandler {
 
     private final ExternalUrlSupplier externalUrl;
 
+    private Clock clock = Clock.systemUTC();
+
     public LocalAttachmentUploadHandler(AttachmentRootGetter attachmentDirGetter,
         ExternalUrlSupplier externalUrl) {
         this.attachmentDirGetter = attachmentDirGetter;
         this.externalUrl = externalUrl;
+    }
+
+    /**
+     * Set clock for test.
+     *
+     * @param clock new clock
+     */
+    void setClock(Clock clock) {
+        this.clock = clock;
     }
 
     @Override
@@ -75,18 +89,22 @@ class LocalAttachmentUploadHandler implements AttachmentHandler {
             .filter(option -> this.shouldHandle(option.policy()))
             .flatMap(option -> {
                 var configMap = option.configMap();
-                var settingJson = configMap.getData().getOrDefault("default", "{}");
-                var setting = JsonUtils.jsonToObject(settingJson, PolicySetting.class);
+                var setting = Optional.ofNullable(configMap)
+                    .map(ConfigMap::getData)
+                    .map(data -> data.get("default"))
+                    .map(json -> JsonUtils.jsonToObject(json, PolicySetting.class))
+                    .orElseGet(PolicySetting::new);
 
                 final var attachmentsRoot = attachmentDirGetter.get();
                 final var uploadRoot = attachmentsRoot.resolve("upload");
                 final var file = option.file();
                 final Path attachmentPath;
+                final String filename = getFilename(file.filename(), setting);
                 if (StringUtils.hasText(setting.getLocation())) {
                     attachmentPath =
-                        uploadRoot.resolve(setting.getLocation()).resolve(file.filename());
+                        uploadRoot.resolve(setting.getLocation()).resolve(filename);
                 } else {
-                    attachmentPath = uploadRoot.resolve(file.filename());
+                    attachmentPath = uploadRoot.resolve(filename);
                 }
                 checkDirectoryTraversal(uploadRoot, attachmentPath);
 
@@ -102,7 +120,7 @@ class LocalAttachmentUploadHandler implements AttachmentHandler {
                     .subscribeOn(Schedulers.boundedElastic())
                     .then(writeContent(file.content(), attachmentPath, true))
                     .map(path -> {
-                        log.info("Wrote attachment {} into {}", file.filename(), path);
+                        log.info("Wrote attachment {} into {}", filename, path);
                         // TODO check the file extension
                         var metadata = new Metadata();
                         metadata.setName(UUID.randomUUID().toString());
@@ -305,6 +323,56 @@ class LocalAttachmentUploadHandler implements AttachmentHandler {
         });
     }
 
+    private String getFilename(String filename, PolicySetting setting) {
+        if (!setting.isAlwaysRenameFilename()) {
+            return filename;
+        }
+        var renameStrategy = setting.getRenameStrategy();
+        if (renameStrategy == null) {
+            return filename;
+        }
+        var renameMethod = renameStrategy.getMethod();
+        if (renameMethod == null) {
+            renameMethod = RenameMethod.RANDOM;
+        }
+        var excludeOriginalFilename = renameStrategy.isExcludeOriginalFilename();
+        switch (renameMethod) {
+            case TIMESTAMP -> {
+                return FileNameUtils.renameFilename(
+                    filename,
+                    () -> {
+                        var now = clock.instant();
+                        return now.toEpochMilli() + "";
+                    },
+                    excludeOriginalFilename);
+            }
+            case UUID -> {
+                return FileNameUtils.renameFilename(
+                    filename,
+                    () -> UUID.randomUUID().toString(),
+                    excludeOriginalFilename
+                );
+            }
+            default -> {
+                return FileNameUtils.renameFilename(
+                    filename,
+                    () -> {
+                        var length = renameStrategy.getRandomLength();
+                        if (length < 8) {
+                            length = 8;
+                        } else if (length > 64) {
+                            // The max filename length is 256, so we limit the random length to 64
+                            // for most cases.
+                            length = 64;
+                        }
+                        return RandomStringUtils.secure().nextAlphabetic(length);
+                    },
+                    excludeOriginalFilename);
+            }
+        }
+    }
+
+
     @Data
     public static class PolicySetting {
 
@@ -314,6 +382,10 @@ class LocalAttachmentUploadHandler implements AttachmentHandler {
 
         private Set<String> allowedFileTypes;
 
+        private boolean alwaysRenameFilename;
+
+        private RenameStrategy renameStrategy;
+
         public void setMaxFileSize(String maxFileSize) {
             if (!StringUtils.hasText(maxFileSize)) {
                 return;
@@ -321,4 +393,22 @@ class LocalAttachmentUploadHandler implements AttachmentHandler {
             this.maxFileSize = DataSize.parse(maxFileSize);
         }
     }
+
+    public enum RenameMethod {
+        RANDOM,
+        UUID,
+        TIMESTAMP
+    }
+
+    @Data
+    public static class RenameStrategy {
+
+        private RenameMethod method;
+
+        private int randomLength = 32;
+
+        private boolean excludeOriginalFilename;
+
+    }
+
 }

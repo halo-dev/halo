@@ -66,6 +66,39 @@ spec:
               value: DOCUMENT
             - label: 压缩包
               value: ARCHIVE
+        - $formkit: checkbox
+          name: alwaysRenameFilename
+          label: 是否总是重命名文件名
+          help: 勾选后上传后的文件名将被重命名
+        - $formkit: group
+          if: $alwaysRenameFilename
+          name: renameStrategy
+          label: 重命名策略
+          children:
+            - $formkit: radio
+              name: method
+              label: 重命名方法
+              options:
+                - label: 随机字符串
+                  value: RANDOM
+                - label: UUID
+                  value: UUID
+                - label: 时间戳（毫秒级）
+                  value: TIMESTAMP
+            - $formkit: number
+              number: integer
+              if: $renameStrategy.renameMethod === RANDOM
+              name: randomLength
+              label: 随机文件名长度
+              help: 默认值为 32。因为文件名的长度限制，随机文件名的长度范围为 [8, 64]。
+              validation: "between:8,64"
+              validation-visibility: live
+              min: 8
+              max: 64
+            - $formkit: checkbox
+              name: excludeOriginalFilename
+              label: 是否排除原始文件名
+              help: 勾选后重命名后的文件名将不包含原始文件名
 ---
 apiVersion: storage.halo.run/v1alpha1
 kind: Group
