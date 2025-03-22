@@ -12,6 +12,7 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.FileAlreadyExistsException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.time.Clock;
 import java.time.Duration;
 import java.util.ArrayList;
 import java.util.Map;
@@ -21,6 +22,7 @@ import java.util.UUID;
 import java.util.concurrent.atomic.AtomicReference;
 import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.RandomStringUtils;
 import org.reactivestreams.Publisher;
 import org.springframework.core.io.buffer.DataBuffer;
 import org.springframework.core.io.buffer.DataBufferUtils;
@@ -64,10 +66,21 @@ class LocalAttachmentUploadHandler implements AttachmentHandler {
 
     private final ExternalUrlSupplier externalUrl;
 
+    private Clock clock = Clock.systemUTC();
+
     public LocalAttachmentUploadHandler(AttachmentRootGetter attachmentDirGetter,
         ExternalUrlSupplier externalUrl) {
         this.attachmentDirGetter = attachmentDirGetter;
         this.externalUrl = externalUrl;
+    }
+
+    /**
+     * Set clock for test.
+     *
+     * @param clock new clock
+     */
+    void setClock(Clock clock) {
+        this.clock = clock;
     }
 
     @Override
@@ -310,20 +323,55 @@ class LocalAttachmentUploadHandler implements AttachmentHandler {
         });
     }
 
-    private static String getFilename(String filename, PolicySetting setting) {
-        if (!setting.isAlwaysRandomizeFilename()) {
+    private String getFilename(String filename, PolicySetting setting) {
+        if (!setting.isAlwaysRenameFilename()) {
             return filename;
         }
-        var length = setting.getRandomLength();
-        if (length < 8) {
-            length = 8;
-        } else if (length > 64) {
-            // The max filename length is 256, so we limit the random length to 64
-            // for most cases.
-            length = 64;
+        var renameStrategy = setting.getRenameStrategy();
+        if (renameStrategy == null) {
+            return filename;
         }
-        return FileNameUtils.randomFileName(filename, length);
+        var renameMethod = renameStrategy.getMethod();
+        if (renameMethod == null) {
+            renameMethod = RenameMethod.RANDOM;
+        }
+        var excludeOriginalFilename = renameStrategy.isExcludeOriginalFilename();
+        switch (renameMethod) {
+            case TIMESTAMP -> {
+                return FileNameUtils.renameFilename(
+                    filename,
+                    () -> {
+                        var now = clock.instant();
+                        return now.toEpochMilli() + "";
+                    },
+                    excludeOriginalFilename);
+            }
+            case UUID -> {
+                return FileNameUtils.renameFilename(
+                    filename,
+                    () -> UUID.randomUUID().toString(),
+                    excludeOriginalFilename
+                );
+            }
+            default -> {
+                return FileNameUtils.renameFilename(
+                    filename,
+                    () -> {
+                        var length = renameStrategy.getRandomLength();
+                        if (length < 8) {
+                            length = 8;
+                        } else if (length > 64) {
+                            // The max filename length is 256, so we limit the random length to 64
+                            // for most cases.
+                            length = 64;
+                        }
+                        return RandomStringUtils.secure().nextAlphabetic(length);
+                    },
+                    excludeOriginalFilename);
+            }
+        }
     }
+
 
     @Data
     public static class PolicySetting {
@@ -334,9 +382,9 @@ class LocalAttachmentUploadHandler implements AttachmentHandler {
 
         private Set<String> allowedFileTypes;
 
-        private boolean alwaysRandomizeFilename;
+        private boolean alwaysRenameFilename;
 
-        private int randomLength = 32;
+        private RenameStrategy renameStrategy;
 
         public void setMaxFileSize(String maxFileSize) {
             if (!StringUtils.hasText(maxFileSize)) {
@@ -345,4 +393,22 @@ class LocalAttachmentUploadHandler implements AttachmentHandler {
             this.maxFileSize = DataSize.parse(maxFileSize);
         }
     }
+
+    public enum RenameMethod {
+        RANDOM,
+        UUID,
+        TIMESTAMP
+    }
+
+    @Data
+    public static class RenameStrategy {
+
+        private RenameMethod method;
+
+        private int randomLength = 32;
+
+        private boolean excludeOriginalFilename;
+
+    }
+
 }
