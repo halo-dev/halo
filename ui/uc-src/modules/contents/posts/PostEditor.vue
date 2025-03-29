@@ -367,18 +367,19 @@ useSaveKeybinding(handleSaveClick);
 
 const postPublishModal = ref(false);
 
-function handlePublishClick() {
+async function handlePublishClick() {
   if (isUpdateMode.value) {
-    handlePublish();
+    await handlePublish();
   } else {
     // Set editor title to post
+    await handleCreate();
     postPublishModal.value = true;
   }
 }
 
-function onPublishPostSuccess() {
-  handleClearCache();
-  router.push({ name: "Posts" });
+async function onPublishPostSuccess(post: Post) {
+  formState.value = post;
+  await handlePublish();
 }
 
 const { mutateAsync: handlePublish, isLoading: isPublishing } = useMutation({
