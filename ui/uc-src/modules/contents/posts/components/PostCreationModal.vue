@@ -1,10 +1,17 @@
 <script lang="ts" setup>
 import { contentAnnotations } from "@/constants/annotations";
+import { randomUUID } from "@/utils/id";
 import type { Content, Post } from "@halo-dev/api-client";
-import { VButton, VModal, VSpace } from "@halo-dev/components";
+import { ucApiClient } from "@halo-dev/api-client";
+import { Toast, VButton, VModal, VSpace } from "@halo-dev/components";
+import { useMutation } from "@tanstack/vue-query";
 import { ref } from "vue";
+import { useI18n } from "vue-i18n";
+import { usePostPublishMutate } from "../composables/use-post-publish-mutate";
 import type { PostFormState } from "../types";
 import PostSettingForm from "./PostSettingForm.vue";
+
+const { t } = useI18n();
 
 const props = withDefaults(
   defineProps<{
@@ -25,38 +32,72 @@ const emit = defineEmits<{
 
 const modal = ref<InstanceType<typeof VModal> | null>(null);
 
+const { mutateAsync: postPublishMutate } = usePostPublishMutate();
+
+const { mutate, isLoading } = useMutation({
+  mutationKey: ["uc:create-post"],
+  mutationFn: async ({ data }: { data: PostFormState }) => {
+    const post: Post = {
+      apiVersion: "content.halo.run/v1alpha1",
+      kind: "Post",
+      metadata: {
+        annotations: {
+          [contentAnnotations.CONTENT_JSON]: JSON.stringify(props.content),
+        },
+        name: randomUUID(),
+      },
+      spec: {
+        allowComment: data.allowComment,
+        categories: data.categories,
+        cover: data.cover,
+        deleted: false,
+        excerpt: {
+          autoGenerate: data.excerptAutoGenerate,
+          raw: data.excerptRaw,
+        },
+        htmlMetas: [],
+        pinned: data.pinned,
+        priority: 0,
+        publish: props.publish,
+        publishTime: data.publishTime,
+        slug: data.slug,
+        tags: data.tags,
+        title: data.title,
+        visible: data.visible,
+      },
+    };
+
+    const { data: createdPost } = await ucApiClient.content.post.createMyPost({
+      post,
+    });
+
+    if (props.publish) {
+      await postPublishMutate({ name: post.metadata.name });
+    }
+
+    return createdPost;
+  },
+  onSuccess(data) {
+    if (props.publish) {
+      Toast.success(t("core.common.toast.publish_success"));
+    } else {
+      Toast.success(t("core.common.toast.save_success"));
+    }
+
+    emit("success", data);
+    modal.value?.close();
+  },
+  onError() {
+    if (props.publish) {
+      Toast.error(t("core.common.toast.publish_failed_and_retry"));
+    } else {
+      Toast.error(t("core.common.toast.save_failed_and_retry"));
+    }
+  },
+});
+
 function onSubmit(data: PostFormState) {
-  const post: Post = {
-    apiVersion: "content.halo.run/v1alpha1",
-    kind: "Post",
-    metadata: {
-      annotations: {
-        [contentAnnotations.CONTENT_JSON]: JSON.stringify(props.content),
-      },
-      name: props.post.metadata.name,
-    },
-    spec: {
-      allowComment: data.allowComment,
-      categories: data.categories,
-      cover: data.cover,
-      deleted: false,
-      excerpt: {
-        autoGenerate: data.excerptAutoGenerate,
-        raw: data.excerptRaw,
-      },
-      htmlMetas: [],
-      pinned: data.pinned,
-      priority: 0,
-      publish: props.publish,
-      publishTime: data.publishTime,
-      slug: data.slug,
-      tags: data.tags,
-      title: data.title,
-      visible: data.visible,
-    },
-  };
-  emit("success", post);
-  modal.value?.close();
+  mutate({ data });
 }
 </script>
 
@@ -82,7 +123,11 @@ function onSubmit(data: PostFormState) {
 
     <template #footer>
       <VSpace>
-        <VButton type="secondary" @click="$formkit.submit('post-setting-form')">
+        <VButton
+          :loading="isLoading"
+          type="secondary"
+          @click="$formkit.submit('post-setting-form')"
+        >
           {{
             props.publish
               ? $t("core.common.buttons.publish")

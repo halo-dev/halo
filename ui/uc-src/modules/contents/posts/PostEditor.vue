@@ -168,8 +168,8 @@ const {
 );
 
 useAutoSaveContent(currentCache, toRef(content.value, "raw"), async () => {
-  // Do not save when the setting modal is open
-  if (postSettingEditModal.value) {
+  // Do not save when the setting modal or the creation modal is open
+  if (postSettingEditModal.value || postPublishModal.value) {
     return;
   }
   if (isUpdateMode.value) {
@@ -367,19 +367,18 @@ useSaveKeybinding(handleSaveClick);
 
 const postPublishModal = ref(false);
 
-async function handlePublishClick() {
+function handlePublishClick() {
   if (isUpdateMode.value) {
-    await handlePublish();
+    handlePublish();
   } else {
     // Set editor title to post
-    await handleCreate();
     postPublishModal.value = true;
   }
 }
 
-async function onPublishPostSuccess(post: Post) {
-  formState.value = post;
-  await handlePublish();
+function onPublishPostSuccess() {
+  handleClearCache();
+  router.push({ name: "Posts" });
 }
 
 const { mutateAsync: handlePublish, isLoading: isPublishing } = useMutation({
