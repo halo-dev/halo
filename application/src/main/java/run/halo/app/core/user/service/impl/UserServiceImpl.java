@@ -43,6 +43,7 @@ import run.halo.app.infra.SystemConfigurableEnvironmentFetcher;
 import run.halo.app.infra.SystemSetting;
 import run.halo.app.infra.ValidationUtils;
 import run.halo.app.infra.exception.DuplicateNameException;
+import run.halo.app.infra.exception.EmailAlreadyTakenException;
 import run.halo.app.infra.exception.EmailVerificationFailed;
 import run.halo.app.infra.exception.UnsatisfiedAttributeValueException;
 import run.halo.app.infra.exception.UserNotFoundException;
@@ -206,7 +207,12 @@ public class UserServiceImpl implements UserService {
                         .switchIfEmpty(Mono.error(() ->
                             new EmailVerificationFailed("Invalid email captcha.", null)
                         ))
-                        .doOnNext(spec::setEmailVerified)
+                        .then(this.checkEmailAlreadyVerified(signUpData.getEmail()))
+                        .filter(has -> !has)
+                        .switchIfEmpty(Mono.error(
+                            () -> new EmailAlreadyTakenException("Email is already taken")
+                        ))
+                        .doOnNext(v -> spec.setEmailVerified(true))
                         .then();
                 }
                 return verifyEmail.then(Mono.defer(() -> {
@@ -276,6 +282,14 @@ public class UserServiceImpl implements UserService {
         var listOptions = new ListOptions();
         listOptions.setFieldSelector(FieldSelector.of(equal("spec.email", email)));
         return client.listAll(User.class, listOptions, defaultSort());
+    }
+
+    @Override
+    public Mono<Boolean> checkEmailAlreadyVerified(String email) {
+        return listByEmail(email)
+            // TODO Use index query in the future
+            .filter(u -> u.getSpec().isEmailVerified())
+            .hasElements();
     }
 
     @Override

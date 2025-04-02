@@ -31,6 +31,7 @@ import run.halo.app.core.user.service.SignUpData;
 import run.halo.app.core.user.service.UserService;
 import run.halo.app.infra.actuator.GlobalInfoService;
 import run.halo.app.infra.exception.DuplicateNameException;
+import run.halo.app.infra.exception.EmailAlreadyTakenException;
 import run.halo.app.infra.exception.EmailVerificationFailed;
 import run.halo.app.infra.exception.RateLimitExceededException;
 import run.halo.app.infra.exception.RequestBodyValidationException;
@@ -111,6 +112,15 @@ class PreAuthSignUpEndpoint {
                                         "Invalid Email Code"));
                                 }
                             )
+                            .doOnError(EmailAlreadyTakenException.class, e -> {
+                                bindingResult.addError(new FieldError("form",
+                                    "email",
+                                    signUpData.getEmail(),
+                                    true,
+                                    new String[] {"signup.error.email.already-taken"},
+                                    null,
+                                    "Email Already Taken"));
+                            })
                             .doOnError(RateLimitExceededException.class,
                                 e -> model.put("error", "rate-limit-exceeded")
                             )

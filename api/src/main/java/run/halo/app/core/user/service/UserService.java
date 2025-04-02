@@ -25,6 +25,8 @@ public interface UserService {
 
     Flux<User> listByEmail(String email);
 
+    Mono<Boolean> checkEmailAlreadyVerified(String email);
+
     String encryptPassword(String rawPassword);
 
     Mono<User> disable(String username);
