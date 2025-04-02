@@ -168,8 +168,8 @@ const {
 );
 
 useAutoSaveContent(currentCache, toRef(content.value, "raw"), async () => {
-  // Do not save when the setting modal is open
-  if (postSettingEditModal.value) {
+  // Do not save when the setting modal or the creation modal is open
+  if (postSettingEditModal.value || postPublishModal.value) {
     return;
   }
   if (isUpdateMode.value) {
