@@ -388,6 +388,10 @@ public class PostReconciler implements Reconciler<Reconciler.Request> {
         }
         var content = contentWrapper.get();
 
+        if (StringUtils.isAnyBlank(content.getContent(), content.getRaw())) {
+            return StringUtils.EMPTY;
+        }
+
         var contentChecksum = Hashing.sha256().hashString(content.getContent(), UTF_8).toString();
         var annotations = MetadataUtil.nullSafeAnnotations(post);
         var oldChecksum = annotations.get(Constant.CONTENT_CHECKSUM_ANNO);

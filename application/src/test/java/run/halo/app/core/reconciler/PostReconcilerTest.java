@@ -107,6 +107,42 @@ class PostReconcilerTest {
     }
 
     @Test
+    void shouldGenerateBlankExcerptWhenContentIsNull() {
+        var name = "post-A";
+        Post post = TestPost.postV1();
+        post.getSpec().setPublish(true);
+        post.getSpec().setHeadSnapshot("post-A-head-snapshot");
+        post.getSpec().setReleaseSnapshot("post-fake-released-snapshot");
+        when(client.fetch(eq(Post.class), eq(name)))
+            .thenReturn(Optional.of(post));
+        when(postService.getContent(eq(post.getSpec().getReleaseSnapshot()),
+            eq(post.getSpec().getBaseSnapshot())))
+            .thenReturn(Mono.just(ContentWrapper.builder()
+                .snapshotName(post.getSpec().getHeadSnapshot())
+                .raw(null)
+                .content(null)
+                .rawType("markdown")
+                .build()));
+
+        Snapshot snapshotV2 = TestPost.snapshotV2();
+        snapshotV2.getMetadata().setLabels(new HashMap<>());
+        snapshotV2.getSpec().setContributors(Set.of("guqing", "zhangsan"));
+
+        Snapshot snapshotV1 = TestPost.snapshotV1();
+        snapshotV1.getSpec().setContributors(Set.of("guqing"));
+
+        when(client.listAll(eq(Snapshot.class), any(), any()))
+            .thenReturn(List.of(snapshotV1, snapshotV2));
+
+        ArgumentCaptor<Post> captor = ArgumentCaptor.forClass(Post.class);
+        postReconciler.reconcile(new Reconciler.Request(name));
+
+        verify(client, times(1)).update(captor.capture());
+        Post value = captor.getValue();
+        assertThat(value.getStatus().getExcerpt()).isEqualTo("");
+    }
+
+    @Test
     void reconcileExcerpt() {
         // https://github.com/halo-dev/halo/issues/2452
         String name = "post-A";
