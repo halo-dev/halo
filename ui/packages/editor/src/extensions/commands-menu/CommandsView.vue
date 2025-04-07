@@ -114,7 +114,7 @@ defineExpose({
   rounded-md
   bg-white
   overflow-hidden
-  drop-shadow
+  shadow
   w-52
   p-1
   max-h-72
