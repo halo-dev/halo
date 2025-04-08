@@ -59,7 +59,7 @@ function getToolboxItemsFromExtensions() {
 </script>
 <template>
   <div
-    class="editor-header py-1 space-x-1 px-1 overflow-auto border-b drop-shadow-sm bg-white text-center"
+    class="editor-header py-1 space-x-1 px-1 overflow-auto border-b shadow-sm bg-white text-center"
   >
     <div class="h-full inline-flex items-center">
       <VMenu>
@@ -68,7 +68,7 @@ function getToolboxItemsFromExtensions() {
         </button>
         <template #popper>
           <div
-            class="relative rounded-md bg-white overflow-hidden drop-shadow w-56 p-1 max-h-96 overflow-y-auto space-y-1.5"
+            class="relative rounded-md bg-white overflow-hidden shadow w-56 p-1 max-h-96 overflow-y-auto space-y-1.5"
           >
             <component
               :is="toolboxItem.component"
@@ -106,7 +106,7 @@ function getToolboxItemsFromExtensions() {
             />
             <template #popper>
               <div
-                class="relative rounded-md bg-white overflow-hidden drop-shadow w-56 p-1 max-h-96 overflow-y-auto space-y-1.5"
+                class="relative rounded-md bg-white overflow-hidden shadow w-56 p-1 max-h-96 overflow-y-auto space-y-1.5"
               >
                 <component
                   v-bind="child.props"

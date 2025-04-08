@@ -71,7 +71,7 @@ const shouldShow = (
     :default-animation="bubbleMenu.defaultAnimation"
   >
     <div
-      class="bubble-menu bg-white flex items-center rounded-md p-1 border drop-shadow space-x-1"
+      class="bubble-menu bg-white flex items-center rounded-md p-1 border shadow space-x-1"
     >
       <template v-if="bubbleMenu.items">
         <template

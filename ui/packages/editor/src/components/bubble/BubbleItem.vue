@@ -62,7 +62,7 @@ const handleBubbleItemClick = (editor: Editor) => {
     </button>
     <template #popper>
       <div
-        class="relative rounded-md bg-white overflow-hidden drop-shadow w-96 p-1 max-h-72 overflow-y-auto"
+        class="relative rounded-md bg-white overflow-hidden shadow w-96 p-1 max-h-72 overflow-y-auto"
       >
         <KeepAlive>
           <component :is="componentRef" v-bind="props"></component>
