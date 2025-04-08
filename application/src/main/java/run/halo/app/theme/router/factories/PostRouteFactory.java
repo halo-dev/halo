@@ -4,6 +4,7 @@ import static org.apache.commons.lang3.ObjectUtils.defaultIfNull;
 import static org.apache.commons.lang3.StringUtils.isNotBlank;
 import static org.springframework.web.reactive.function.server.RequestPredicates.GET;
 import static org.springframework.web.reactive.function.server.RequestPredicates.accept;
+import static run.halo.app.content.permalinks.PostPermalinkPolicy.DEFAULT_CATEGORY;
 
 import com.google.common.cache.Cache;
 import com.google.common.cache.CacheBuilder;
@@ -33,11 +34,11 @@ import org.springframework.web.reactive.function.server.ServerResponse;
 import org.springframework.web.server.i18n.LocaleContextResolver;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
+import run.halo.app.content.PostService;
 import run.halo.app.core.extension.content.Post;
 import run.halo.app.extension.MetadataUtil;
 import run.halo.app.extension.ReactiveExtensionClient;
 import run.halo.app.extension.index.query.QueryFactory;
-import run.halo.app.infra.exception.NotFoundException;
 import run.halo.app.infra.utils.JsonUtils;
 import run.halo.app.theme.DefaultTemplateEnum;
 import run.halo.app.theme.ViewNameResolver;
@@ -69,6 +70,7 @@ public class PostRouteFactory implements RouteFactory {
     private final TitleVisibilityIdentifyCalculator titleVisibilityIdentifyCalculator;
 
     private final LocaleContextResolver localeContextResolver;
+    private final PostService postService;
 
     @Override
     public RouterFunction<ServerResponse> create(String pattern) {
@@ -151,9 +153,27 @@ public class PostRouteFactory implements RouteFactory {
                     && matchIfPresent(variable.getMonth(), labels.get(Post.ARCHIVE_MONTH_LABEL))
                     && matchIfPresent(variable.getDay(), labels.get(Post.ARCHIVE_DAY_LABEL));
             })
+            .filterWhen(post -> {
+                if (isNotBlank(variable.getCategorySlug())) {
+                    var categoryNames = post.getSpec().getCategories();
+                    return postService.listCategories(categoryNames)
+                        .next()
+                        .filter(category -> category.getSpec().getSlug()
+                            .equals(variable.getCategorySlug())
+                        )
+                        .map(category -> category.getSpec().getSlug())
+                        .switchIfEmpty(Mono.defer(() -> {
+                            if (DEFAULT_CATEGORY.equals(variable.getCategorySlug())) {
+                                return Mono.just(DEFAULT_CATEGORY);
+                            }
+                            return Mono.empty();
+                        }))
+                        .hasElement();
+                }
+                return Mono.just(true);
+            })
             .next()
-            .flatMap(post -> postFinder.getByName(post.getMetadata().getName()))
-            .switchIfEmpty(Mono.error(new NotFoundException("Post not found")));
+            .flatMap(post -> postFinder.getByName(post.getMetadata().getName()));
     }
 
     Flux<Post> postsByPredicates(PostPatternVariable patternVariable) {
@@ -196,6 +216,7 @@ public class PostRouteFactory implements RouteFactory {
         String year;
         String month;
         String day;
+        String categorySlug;
 
         static PostPatternVariable from(ServerRequest request) {
             Map<String, String> variables = mergedVariables(request);
