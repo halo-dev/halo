@@ -1,5 +1,7 @@
 package run.halo.app.security.authentication.pat;
 
+import static run.halo.app.security.PersonalAccessToken.PAT_TOKEN_PREFIX;
+
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.oauth2.server.resource.authentication.BearerTokenAuthenticationToken;
@@ -14,8 +16,6 @@ import reactor.core.publisher.Mono;
  * @since 2.20.4
  */
 class PatAuthenticationConverter extends ServerBearerTokenAuthenticationConverter {
-
-    public static final String PAT_TOKEN_PREFIX = "pat_";
 
     @Override
     public Mono<Authentication> convert(ServerWebExchange exchange) {

@@ -20,6 +20,8 @@ public class PersonalAccessToken extends AbstractExtension {
 
     public static final String KIND = "PersonalAccessToken";
 
+    public static final String PAT_TOKEN_PREFIX = "pat_";
+
     private Spec spec = new Spec();
 
     @Data
