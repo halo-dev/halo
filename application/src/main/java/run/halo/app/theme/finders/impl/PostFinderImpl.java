@@ -325,10 +325,6 @@ public class PostFinderImpl implements PostFinder {
                 builder.andQuery(equal("spec.tags", tagName));
                 hasQuery = true;
             }
-            if (StringUtils.isNotBlank(categoryName)) {
-                builder.andQuery(in("spec.categories", categoryName));
-                hasQuery = true;
-            }
             // Exclude hidden posts when no query
             if (!hasQuery) {
                 builder.fieldQuery(notHiddenPostQuery());
