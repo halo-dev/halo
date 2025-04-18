@@ -180,6 +180,8 @@ spec:
               value: '/{year:\d{4}}/{month:\d{2}}/{slug}'
             - label: '/{year}/{month}/{day}/{slug}'
               value: '/{year:\d{4}}/{month:\d{2}}/{day:\d{2}}/{slug}'
+            - label: '/categories/{categorySlug}/{slug}'
+              value: '/categories/{categorySlug}/{slug}'
           name: post
           validation: required
     - group: codeInjection

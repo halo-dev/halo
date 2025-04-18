@@ -4,9 +4,11 @@ import static run.halo.app.extension.index.query.QueryFactory.in;
 
 import java.time.Duration;
 import java.time.Instant;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Objects;
 import java.util.function.Function;
+import java.util.function.ToIntFunction;
 import java.util.function.UnaryOperator;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
@@ -161,13 +163,17 @@ public class PostServiceImpl extends AbstractContentService implements PostServi
         return client.listAll(Tag.class, listOptions, Sort.by("metadata.creationTimestamp"));
     }
 
-    private Flux<Category> listCategories(List<String> categoryNames) {
+    @Override
+    public Flux<Category> listCategories(List<String> categoryNames) {
         if (categoryNames == null) {
             return Flux.empty();
         }
+        ToIntFunction<Category> comparator =
+            category -> categoryNames.indexOf(category.getMetadata().getName());
         var listOptions = new ListOptions();
         listOptions.setFieldSelector(FieldSelector.of(in("metadata.name", categoryNames)));
-        return client.listAll(Category.class, listOptions, Sort.by("metadata.creationTimestamp"));
+        return client.listAll(Category.class, listOptions, Sort.unsorted())
+            .sort(Comparator.comparingInt(comparator));
     }
 
     private Flux<Contributor> listContributors(List<String> usernames) {
