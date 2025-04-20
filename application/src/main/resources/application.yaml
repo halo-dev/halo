@@ -44,7 +44,7 @@ spring:
       spec: expireAfterAccess=1h, maximumSize=10000
     redis:
       time-to-live: 3600000
-      key-prefix: halo:
+      key-prefix: "halo:"
   threads:
     virtual:
       enabled: true
