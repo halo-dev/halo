@@ -42,6 +42,8 @@ import run.halo.app.extension.ListResult;
 import run.halo.app.extension.MetadataOperator;
 import run.halo.app.extension.ReactiveExtensionClient;
 import run.halo.app.extension.Ref;
+import run.halo.app.infra.messaging.RedisStreamEventPublisher;
+import java.util.Map;
 import run.halo.app.extension.router.selector.FieldSelector;
 import run.halo.app.infra.Condition;
 import run.halo.app.infra.ConditionStatus;
@@ -59,14 +61,17 @@ public class PostServiceImpl extends AbstractContentService implements PostServi
     private final CounterService counterService;
     private final UserService userService;
     private final CategoryService categoryService;
+    private final RedisStreamEventPublisher eventPublisher;
 
     public PostServiceImpl(ReactiveExtensionClient client, CounterService counterService,
-        UserService userService, CategoryService categoryService) {
+        UserService userService, CategoryService categoryService,
+        RedisStreamEventPublisher eventPublisher) {
         super(client);
         this.client = client;
         this.counterService = counterService;
         this.userService = userService;
         this.categoryService = categoryService;
+        this.eventPublisher = eventPublisher;
     }
 
     @Override
@@ -211,7 +216,9 @@ public class PostServiceImpl extends AbstractContentService implements PostServi
                     );
             })
             .retryWhen(Retry.backoff(5, Duration.ofMillis(100))
-                .filter(OptimisticLockingFailureException.class::isInstance));
+                .filter(OptimisticLockingFailureException.class::isInstance))
+            .doOnSuccess(post -> eventPublisher.publish(Map.of(
+                "entity", "post", "id", post.getMetadata().getName(), "action", "draft")));
     }
 
     private Mono<Post> waitForPostToDraftConcludingWork(String postName,
@@ -305,13 +312,17 @@ public class PostServiceImpl extends AbstractContentService implements PostServi
             spec.setHeadSnapshot(spec.getBaseSnapshot());
         }
         spec.setReleaseSnapshot(spec.getHeadSnapshot());
-        return client.update(post);
+        return client.update(post)
+            .doOnSuccess(p -> eventPublisher.publish(Map.of(
+                "entity", "post", "id", p.getMetadata().getName(), "action", "publish")));
     }
 
     @Override
     public Mono<Post> unpublish(Post post) {
         post.getSpec().setPublish(false);
-        return client.update(post);
+        return client.update(post)
+            .doOnSuccess(p -> eventPublisher.publish(Map.of(
+                "entity", "post", "id", p.getMetadata().getName(), "action", "unpublish")));
     }
 
     @Override
@@ -385,7 +396,9 @@ public class PostServiceImpl extends AbstractContentService implements PostServi
             .flatMap(post -> updatePostWithRetry(post, record -> {
                 record.getSpec().setDeleted(true);
                 return record;
-            }));
+            }))
+            .doOnSuccess(p -> eventPublisher.publish(Map.of(
+                "entity", "post", "id", p.getMetadata().getName(), "action", "delete")));
     }
 
     private Mono<Post> updatePostWithRetry(Post post, UnaryOperator<Post> func) {

@@ -7,6 +7,7 @@ import static run.halo.app.extension.index.query.QueryFactory.isNull;
 import java.security.Principal;
 import java.time.Duration;
 import java.time.Instant;
+import java.util.Map;
 import java.util.UUID;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -26,6 +27,7 @@ import run.halo.app.extension.MetadataUtil;
 import run.halo.app.extension.ReactiveExtensionClient;
 import run.halo.app.extension.Ref;
 import run.halo.app.extension.router.selector.FieldSelector;
+import run.halo.app.infra.messaging.RedisStreamEventPublisher;
 
 /**
  * Abstract Service for {@link Snapshot}.
@@ -34,10 +36,37 @@ import run.halo.app.extension.router.selector.FieldSelector;
  * @since 2.0.0
  */
 @Slf4j
-@AllArgsConstructor
 public abstract class AbstractContentService {
+    
+    protected final RedisStreamEventPublisher eventPublisher;
 
     private final ReactiveExtensionClient client;
+    
+    public AbstractContentService(ReactiveExtensionClient client) {
+        this.client = client;
+        this.eventPublisher = null;
+    }
+    
+    public AbstractContentService(ReactiveExtensionClient client, RedisStreamEventPublisher eventPublisher) {
+        this.client = client;
+        this.eventPublisher = eventPublisher;
+    }
+    
+    /**
+     * Publish snapshot change event to notify other instances.
+     * 
+     * @param snapshot The snapshot that was modified
+     * @param action The action performed (create, update, delete)
+     */
+    protected void publishSnapshotEvent(Snapshot snapshot, String action) {
+        if (eventPublisher != null && snapshot != null) {
+            eventPublisher.publish(Map.of(
+                "entity", "snapshot", 
+                "id", snapshot.getMetadata().getName(),
+                "action", action
+            ));
+        }
+    }
 
     public Mono<ContentWrapper> getContent(String snapshotName, String baseSnapshotName) {
         if (StringUtils.isBlank(snapshotName) || StringUtils.isBlank(baseSnapshotName)) {
@@ -105,7 +134,8 @@ public abstract class AbstractContentService {
                 })
                 .thenReturn(source)
             )
-            .flatMap(client::create);
+            .flatMap(client::create)
+            .doOnSuccess(snap -> publishSnapshotEvent(snap, "create"));
     }
 
     protected Mono<ContentWrapper> updateContent(String baseSnapshotName,
@@ -133,6 +163,7 @@ public abstract class AbstractContentService {
                     .thenReturn(headSnapshot)
                 )
                 .flatMap(client::update)
+                .doOnSuccess(snapshot -> publishSnapshotEvent(snapshot, "update"))
             )
             .retryWhen(Retry.backoff(5, Duration.ofMillis(100))
                 .filter(throwable -> throwable instanceof OptimisticLockingFailureException))

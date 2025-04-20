@@ -36,6 +36,9 @@ import run.halo.app.extension.ReactiveExtensionClient;
 import run.halo.app.extension.Ref;
 import run.halo.app.infra.Condition;
 import run.halo.app.infra.ConditionStatus;
+import run.halo.app.infra.messaging.RedisStreamEventPublisher;
+
+import java.util.Map;
 
 /**
  * Single page service implementation.
@@ -50,13 +53,15 @@ public class SinglePageServiceImpl extends AbstractContentService implements Sin
     private final ReactiveExtensionClient client;
     private final CounterService counterService;
     private final UserService userService;
+    private final RedisStreamEventPublisher eventPublisher;
 
     public SinglePageServiceImpl(ReactiveExtensionClient client, CounterService counterService,
-        UserService userService) {
-        super(client);
+        UserService userService, RedisStreamEventPublisher eventPublisher) {
+        super(client, eventPublisher);
         this.client = client;
         this.counterService = counterService;
         this.userService = userService;
+        this.eventPublisher = eventPublisher;
     }
 
     @Override
@@ -110,6 +115,15 @@ public class SinglePageServiceImpl extends AbstractContentService implements Sin
                 }
             )
             .flatMap(client::create)
+            .doOnSuccess(page -> {
+                if (eventPublisher != null) {
+                    eventPublisher.publish(Map.of(
+                        "entity", "singlepage", 
+                        "id", page.getMetadata().getName(),
+                        "action", "create"
+                    ));
+                }
+            })
             .flatMap(page -> {
                 var contentRequest =
                     new ContentRequest(Ref.of(page), page.getSpec().getHeadSnapshot(),
@@ -251,7 +265,16 @@ public class SinglePageServiceImpl extends AbstractContentService implements Sin
             spec.setHeadSnapshot(spec.getBaseSnapshot());
         }
         spec.setReleaseSnapshot(spec.getHeadSnapshot());
-        return client.update(singlePage);
+        return client.update(singlePage)
+            .doOnSuccess(page -> {
+                if (eventPublisher != null) {
+                    eventPublisher.publish(Map.of(
+                        "entity", "singlepage", 
+                        "id", page.getMetadata().getName(),
+                        "action", "update"
+                    ));
+                }
+            });
     }
 
     Mono<SinglePage> publishPageWithRetry(SinglePage page) {

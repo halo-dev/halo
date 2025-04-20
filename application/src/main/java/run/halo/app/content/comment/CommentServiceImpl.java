@@ -31,6 +31,8 @@ import run.halo.app.extension.router.selector.FieldSelector;
 import run.halo.app.infra.SystemConfigurableEnvironmentFetcher;
 import run.halo.app.infra.exception.AccessDeniedException;
 import run.halo.app.plugin.extensionpoint.ExtensionGetter;
+import run.halo.app.infra.messaging.RedisStreamEventPublisher;
+import java.util.Map;
 
 /**
  * Comment service implementation.
@@ -43,13 +45,15 @@ public class CommentServiceImpl extends AbstractCommentService implements Commen
 
     private final ExtensionGetter extensionGetter;
     private final SystemConfigurableEnvironmentFetcher environmentFetcher;
+    private final RedisStreamEventPublisher eventPublisher;
 
     public CommentServiceImpl(RoleService roleService, ReactiveExtensionClient client,
         UserService userService, CounterService counterService, ExtensionGetter extensionGetter,
-        SystemConfigurableEnvironmentFetcher environmentFetcher) {
+        SystemConfigurableEnvironmentFetcher environmentFetcher, RedisStreamEventPublisher eventPublisher) {
         super(roleService, client, userService, counterService);
         this.extensionGetter = extensionGetter;
         this.environmentFetcher = environmentFetcher;
+        this.eventPublisher = eventPublisher;
     }
 
     @Override
@@ -106,7 +110,9 @@ public class CommentServiceImpl extends AbstractCommentService implements Commen
                     populateApproveState(populatedComment))
                 .thenReturn(populatedComment)
             )
-            .flatMap(client::create);
+            .flatMap(client::create)
+            .doOnSuccess(c -> eventPublisher.publish(Map.of(
+                "entity", "comment", "id", c.getMetadata().getName(), "action", "create")));
     }
 
     private Mono<Void> populateApproveState(Comment comment) {

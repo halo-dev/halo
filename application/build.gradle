@@ -74,6 +74,11 @@ tasks.named('jar') {
 
 dependencies {
     implementation project(':api')
+    // Redis for distributed messaging and caching
+    implementation 'org.springframework.boot:spring-boot-starter-data-redis'
+    // ShedLock for distributed scheduling
+    implementation 'net.javacrumbs.shedlock:shedlock-spring:5.12.0'
+    implementation 'net.javacrumbs.shedlock:shedlock-provider-redis-spring:5.12.0'
 
     annotationProcessor "org.springframework.boot:spring-boot-configuration-processor"
     annotationProcessor "org.springframework:spring-context-indexer"

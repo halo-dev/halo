@@ -10,6 +10,14 @@ spring:
   output:
     ansi:
       enabled: detect
+  # Redis configuration for distributed deployment
+  data:
+    redis:
+      host: ${REDIS_HOST:localhost}
+      port: ${REDIS_PORT:6379}
+      password: ${REDIS_PASSWORD:}
+      database: ${REDIS_DATABASE:0}
+      timeout: 10000
   r2dbc:
     url: r2dbc:h2:file:///${halo.work-dir}/db/halo-next?MODE=MySQL&DB_CLOSE_ON_EXIT=FALSE
     username: admin
@@ -31,9 +39,12 @@ spring:
     reactive:
       maxChunkSize: 8KB
   cache:
-    type: caffeine
+    type: ${CACHE_TYPE:caffeine}
     caffeine:
       spec: expireAfterAccess=1h, maximumSize=10000
+    redis:
+      time-to-live: 3600000
+      key-prefix: halo:
   threads:
     virtual:
       enabled: true
@@ -50,6 +61,18 @@ halo:
       - name: email
         href: /password-reset/email
         icon: /images/password-reset-methods/email.svg
+  # Distributed deployment configuration
+  distributed:
+    # Enable distributed messaging and scheduling across instances
+    enabled: false
+    # Redis Stream key for domain events
+    stream-key: ${HALO_STREAM_KEY:halo:distributed:stream}
+    # Consumer group name for Redis Stream
+    consumer-group: ${HALO_CONSUMER_GROUP:halo-consumer-group}
+    # Prefix for ShedLock scheduler locks
+    scheduler-lock-prefix: ${HALO_SCHEDULER_LOCK_PREFIX:halo:scheduler-lock:}
+    # Polling interval (ms) for Redis Stream listener
+    listener-interval: 1000
 
 springdoc:
   api-docs:

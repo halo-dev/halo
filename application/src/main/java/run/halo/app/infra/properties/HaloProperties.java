@@ -68,6 +68,52 @@ public class HaloProperties implements Validator {
     @Valid
     @NestedConfigurationProperty
     private final AttachmentProperties attachment = new AttachmentProperties();
+    
+    /**
+     * Distributed deployment properties.
+     */
+    @Valid
+    @NestedConfigurationProperty
+    private final DistributedProperties distributed = new DistributedProperties();
+    
+    /**
+     * Properties for distributed deployment: messaging and scheduling.
+     */
+    public static class DistributedProperties {
+        /** Enable distributed features (messaging, cache sync, scheduling). */
+        private boolean enabled = false;
+        /** Redis Stream key for change events. */
+        private String streamKey = "halo:distributed:stream";
+        /** Consumer group name for Redis Stream. */
+        private String consumerGroup = "halo-consumer-group";
+        /** Prefix for ShedLock distributed scheduler locks. */
+        private String schedulerLockPrefix = "halo:scheduler-lock:";
+
+        public boolean isEnabled() {
+            return enabled;
+        }
+        public void setEnabled(boolean enabled) {
+            this.enabled = enabled;
+        }
+        public String getStreamKey() {
+            return streamKey;
+        }
+        public void setStreamKey(String streamKey) {
+            this.streamKey = streamKey;
+        }
+        public String getConsumerGroup() {
+            return consumerGroup;
+        }
+        public void setConsumerGroup(String consumerGroup) {
+            this.consumerGroup = consumerGroup;
+        }
+        public String getSchedulerLockPrefix() {
+            return schedulerLockPrefix;
+        }
+        public void setSchedulerLockPrefix(String schedulerLockPrefix) {
+            this.schedulerLockPrefix = schedulerLockPrefix;
+        }
+    }
 
     @Override
     public boolean supports(Class<?> clazz) {

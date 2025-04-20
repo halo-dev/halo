@@ -6,6 +6,7 @@ import org.springframework.boot.builder.SpringApplicationBuilder;
 import org.springframework.boot.context.metrics.buffering.BufferingApplicationStartup;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.scheduling.annotation.EnableScheduling;
+import org.springframework.cache.annotation.EnableCaching;
 import run.halo.app.infra.properties.HaloProperties;
 
 /**
@@ -17,6 +18,7 @@ import run.halo.app.infra.properties.HaloProperties;
  * @date 2017-11-14
  */
 @EnableScheduling
+@EnableCaching
 @SpringBootApplication(scanBasePackages = "run.halo.app", exclude =
     IntegrationAutoConfiguration.class)
 @EnableConfigurationProperties({HaloProperties.class})

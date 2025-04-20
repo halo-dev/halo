@@ -6,6 +6,9 @@ import reactor.core.publisher.Mono;
 import run.halo.app.core.extension.content.Post;
 import run.halo.app.extension.ReactiveExtensionClient;
 import run.halo.app.extension.Ref;
+import run.halo.app.infra.messaging.RedisStreamEventPublisher;
+
+import java.util.Map;
 
 /**
  * Provides ability to get post content for the specified post.
@@ -16,10 +19,12 @@ import run.halo.app.extension.Ref;
 @Component
 public class PostContentServiceImpl extends AbstractContentService implements PostContentService {
     private final ReactiveExtensionClient client;
+    private final RedisStreamEventPublisher eventPublisher;
 
-    public PostContentServiceImpl(ReactiveExtensionClient client) {
-        super(client);
+    public PostContentServiceImpl(ReactiveExtensionClient client, RedisStreamEventPublisher eventPublisher) {
+        super(client, eventPublisher);
         this.client = client;
+        this.eventPublisher = eventPublisher;
     }
 
     @Override
