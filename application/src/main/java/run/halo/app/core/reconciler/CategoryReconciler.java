@@ -8,18 +8,22 @@ import java.util.Map;
 import java.util.Set;
 import lombok.AllArgsConstructor;
 import org.springframework.context.ApplicationEventPublisher;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Component;
 import org.springframework.util.CollectionUtils;
 import run.halo.app.content.CategoryService;
 import run.halo.app.content.permalinks.CategoryPermalinkPolicy;
 import run.halo.app.core.extension.content.Category;
 import run.halo.app.core.extension.content.Constant;
+import run.halo.app.core.extension.content.Post;
 import run.halo.app.event.post.CategoryHiddenStateChangeEvent;
 import run.halo.app.extension.ExtensionClient;
 import run.halo.app.extension.ExtensionUtil;
+import run.halo.app.extension.ListOptions;
 import run.halo.app.extension.controller.Controller;
 import run.halo.app.extension.controller.ControllerBuilder;
 import run.halo.app.extension.controller.Reconciler;
+import run.halo.app.extension.index.query.QueryFactory;
 
 /**
  * Reconciler for {@link Category}.
@@ -43,6 +47,7 @@ public class CategoryReconciler implements Reconciler<Reconciler.Request> {
                 if (ExtensionUtil.isDeleted(category)) {
                     if (removeFinalizers(category.getMetadata(), Set.of(FINALIZER_NAME))) {
                         refreshHiddenState(category, false);
+                        updateCategoryForPost(category.getMetadata().getName());
                         client.update(category);
                     }
                     return;
@@ -117,5 +122,19 @@ public class CategoryReconciler implements Reconciler<Reconciler.Request> {
     void populatePermalink(Category category) {
         category.getStatusOrDefault()
             .setPermalink(categoryPermalinkPolicy.permalink(category));
+    }
+
+    private void updateCategoryForPost(String categoryName) {
+        var posts = client.listAll(Post.class, ListOptions.builder()
+            .fieldQuery(QueryFactory.equal("spec.categories", categoryName))
+            .build(), Sort.by("metadata.creationTimestamp", "metadata.name")
+        );
+        for (Post post : posts) {
+            var categoryNames = post.getSpec().getCategories();
+            if (!CollectionUtils.isEmpty(categoryNames)) {
+                categoryNames.remove(categoryName);
+            }
+            client.update(post);
+        }
     }
 }
