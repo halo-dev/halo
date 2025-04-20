@@ -9,6 +9,7 @@ import org.springframework.security.authentication.AuthenticationTrustResolver;
 import org.springframework.security.authentication.AuthenticationTrustResolverImpl;
 import org.springframework.security.authorization.AuthorizationDecision;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.web.server.authentication.SwitchUserWebFilter;
 import org.springframework.security.web.server.util.matcher.AndServerWebExchangeMatcher;
 import org.springframework.security.web.server.util.matcher.MediaTypeServerWebExchangeMatcher;
 import org.springframework.security.web.server.util.matcher.NegatedServerWebExchangeMatcher;
@@ -55,12 +56,18 @@ class AuthorizationExchangeConfigurers {
     @Bean
     @Order(200)
     SecurityConfigurer preAuthenticationAuthorizationConfigurer() {
-        return http -> http.authorizeExchange(spec -> spec.pathMatchers(
-            "/login/**",
-            "/challenges/**",
-            "/password-reset/**",
-            "/signup"
-        ).permitAll());
+        return http -> http.authorizeExchange(spec -> spec
+            .pathMatchers("/login/impersonate")
+            .hasRole(AuthorityUtils.SUPER_ROLE_NAME)
+            .pathMatchers("/logout/impersonate")
+            .hasAuthority(SwitchUserWebFilter.ROLE_PREVIOUS_ADMINISTRATOR)
+            .pathMatchers(
+                "/login/**",
+                "/challenges/**",
+                "/password-reset/**",
+                "/signup"
+            )
+            .permitAll());
     }
 
     @Bean
