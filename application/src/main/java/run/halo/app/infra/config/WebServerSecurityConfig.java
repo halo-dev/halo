@@ -25,7 +25,6 @@ import org.springframework.session.MapSession;
 import org.springframework.session.config.annotation.web.server.EnableSpringWebSession;
 import run.halo.app.core.user.service.RoleService;
 import run.halo.app.core.user.service.UserService;
-import run.halo.app.extension.ReactiveExtensionClient;
 import run.halo.app.infra.AnonymousUserConst;
 import run.halo.app.infra.properties.HaloProperties;
 import run.halo.app.security.DefaultUserDetailService;
@@ -51,11 +50,8 @@ public class WebServerSecurityConfig {
 
     @Bean
     SecurityWebFilterChain filterChain(ServerHttpSecurity http,
-        RoleService roleService,
         ObjectProvider<SecurityConfigurer> securityConfigurers,
         ServerSecurityContextRepository securityContextRepository,
-        ReactiveExtensionClient client,
-        CryptoService cryptoService,
         HaloProperties haloProperties,
         ServerRequestCache serverRequestCache) {
 
