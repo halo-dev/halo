@@ -109,10 +109,18 @@ management:
     health:
       probes:
         enabled: true
+      show-details: always
+      show-components: always
+      group:
+        distributed:
+          include: distributedHealthIndicator
   info:
     java:
       enabled: true
     os:
+      enabled: true
+  health:
+    redis:
       enabled: true
 
 resilience4j.ratelimiter:
