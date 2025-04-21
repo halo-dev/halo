@@ -10,7 +10,8 @@ import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 import run.halo.app.infra.properties.HaloProperties;
 
-import javax.annotation.PostConstruct;
+import org.springframework.boot.context.event.ApplicationReadyEvent;
+import org.springframework.context.event.EventListener;
 import java.time.Duration;
 import java.util.Map;
 
@@ -28,7 +29,7 @@ public class RedisStreamManager {
     
     private static final int MAX_STREAM_LENGTH = 10000;
     
-    @PostConstruct
+    @EventListener(ApplicationReadyEvent.class)
     public void init() {
         if (!properties.getDistributed().isEnabled()) {
             return;
