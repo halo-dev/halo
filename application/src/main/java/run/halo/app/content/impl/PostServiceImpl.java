@@ -42,8 +42,11 @@ import run.halo.app.extension.ListResult;
 import run.halo.app.extension.MetadataOperator;
 import run.halo.app.extension.ReactiveExtensionClient;
 import run.halo.app.extension.Ref;
+import run.halo.app.infra.messaging.DistributedEvent;
+import run.halo.app.infra.messaging.OutboxService;
 import run.halo.app.infra.messaging.RedisStreamEventPublisher;
 import java.util.Map;
+import java.util.HashMap;
 import run.halo.app.extension.router.selector.FieldSelector;
 import run.halo.app.infra.Condition;
 import run.halo.app.infra.ConditionStatus;
@@ -62,16 +65,18 @@ public class PostServiceImpl extends AbstractContentService implements PostServi
     private final UserService userService;
     private final CategoryService categoryService;
     private final RedisStreamEventPublisher eventPublisher;
+    private final OutboxService outboxService;
 
     public PostServiceImpl(ReactiveExtensionClient client, CounterService counterService,
         UserService userService, CategoryService categoryService,
-        RedisStreamEventPublisher eventPublisher) {
+        RedisStreamEventPublisher eventPublisher, OutboxService outboxService) {
         super(client);
         this.client = client;
         this.counterService = counterService;
         this.userService = userService;
         this.categoryService = categoryService;
         this.eventPublisher = eventPublisher;
+        this.outboxService = outboxService;
     }
 
     @Override
@@ -217,8 +222,17 @@ public class PostServiceImpl extends AbstractContentService implements PostServi
             })
             .retryWhen(Retry.backoff(5, Duration.ofMillis(100))
                 .filter(OptimisticLockingFailureException.class::isInstance))
-            .doOnSuccess(post -> eventPublisher.publish(Map.of(
-                "entity", "post", "id", post.getMetadata().getName(), "action", "draft")));
+            .flatMap(post -> {
+                // Create a distributed event and save to outbox
+                DistributedEvent event = DistributedEvent.builder()
+                    .type(DistributedEvent.EventType.POST_CREATED)
+                    .entityId(post.getMetadata().getName())
+                    .entityType("Post")
+                    .operation("DRAFT")
+                    .build();
+                return outboxService.saveEvent(event)
+                    .thenReturn(post);
+            });
     }
 
     private Mono<Post> waitForPostToDraftConcludingWork(String postName,
@@ -313,16 +327,34 @@ public class PostServiceImpl extends AbstractContentService implements PostServi
         }
         spec.setReleaseSnapshot(spec.getHeadSnapshot());
         return client.update(post)
-            .doOnSuccess(p -> eventPublisher.publish(Map.of(
-                "entity", "post", "id", p.getMetadata().getName(), "action", "publish")));
+            .flatMap(updatedPost -> {
+                // Create a distributed event and save to outbox
+                DistributedEvent event = DistributedEvent.builder()
+                    .type(DistributedEvent.EventType.POST_UPDATED)
+                    .entityId(updatedPost.getMetadata().getName())
+                    .entityType("Post")
+                    .operation("PUBLISH")
+                    .build();
+                return outboxService.saveEvent(event)
+                    .thenReturn(updatedPost);
+            });
     }
 
     @Override
     public Mono<Post> unpublish(Post post) {
         post.getSpec().setPublish(false);
         return client.update(post)
-            .doOnSuccess(p -> eventPublisher.publish(Map.of(
-                "entity", "post", "id", p.getMetadata().getName(), "action", "unpublish")));
+            .flatMap(updatedPost -> {
+                // Create a distributed event and save to outbox
+                DistributedEvent event = DistributedEvent.builder()
+                    .type(DistributedEvent.EventType.POST_UPDATED)
+                    .entityId(updatedPost.getMetadata().getName())
+                    .entityType("Post")
+                    .operation("UNPUBLISH")
+                    .build();
+                return outboxService.saveEvent(event)
+                    .thenReturn(updatedPost);
+            });
     }
 
     @Override
@@ -397,8 +429,17 @@ public class PostServiceImpl extends AbstractContentService implements PostServi
                 record.getSpec().setDeleted(true);
                 return record;
             }))
-            .doOnSuccess(p -> eventPublisher.publish(Map.of(
-                "entity", "post", "id", p.getMetadata().getName(), "action", "delete")));
+            .flatMap(deletedPost -> {
+                // Create a distributed event and save to outbox
+                DistributedEvent event = DistributedEvent.builder()
+                    .type(DistributedEvent.EventType.POST_DELETED)
+                    .entityId(deletedPost.getMetadata().getName())
+                    .entityType("Post")
+                    .operation("RECYCLE")
+                    .build();
+                return outboxService.saveEvent(event)
+                    .thenReturn(deletedPost);
+            });
     }
 
     private Mono<Post> updatePostWithRetry(Post post, UnaryOperator<Post> func) {

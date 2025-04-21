@@ -73,6 +73,14 @@ halo:
     scheduler-lock-prefix: ${HALO_SCHEDULER_LOCK_PREFIX:halo:scheduler-lock:}
     # Polling interval (ms) for Redis Stream listener
     listener-interval: 1000
+    # Outbox processor interval (ms)
+    outbox-processor-interval: 5000
+    # Full checksum scheduler cron expression
+    full-checksum-cron: 0 0 * * * ?
+    # Maximum Redis Stream length
+    max-stream-length: 10000
+    # Message ID expiration time (ms) for deduplication
+    message-expiration: 3600000
 
 springdoc:
   api-docs:
