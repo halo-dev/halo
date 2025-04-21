@@ -84,8 +84,8 @@ public class FullDataChecksumTask {
                         }
                         
                         // Store checksums in Redis
-                        Boolean result = redisTemplate.opsForHash().putAll(checksumKey, checksums);
-                        return Mono.just(result);
+                        redisTemplate.opsForHash().putAll(checksumKey, checksums);
+                        return Mono.empty();
                     })
                     .then()
                     // Set expiration to avoid stale data
