@@ -4,6 +4,7 @@ import static run.halo.app.theme.ThemeLocaleContextResolver.LANGUAGE_COOKIE_NAME
 import static run.halo.app.theme.ThemeLocaleContextResolver.LANGUAGE_PARAMETER_NAME;
 
 import java.util.Locale;
+import java.util.Optional;
 import java.util.Set;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.MediaType;
@@ -20,6 +21,7 @@ import org.springframework.web.server.ServerWebExchange;
 import org.springframework.web.server.WebFilter;
 import org.springframework.web.server.WebFilterChain;
 import reactor.core.publisher.Mono;
+import run.halo.app.theme.UserLocaleRequestAttributeWriteFilter;
 
 @Component
 public class LocaleChangeWebFilter implements WebFilter {
@@ -43,10 +45,11 @@ public class LocaleChangeWebFilter implements WebFilter {
                 var language = request
                     .getQueryParams()
                     .getFirst(LANGUAGE_PARAMETER_NAME);
-                if (StringUtils.hasText(language)) {
-                    var locale = Locale.forLanguageTag(language);
-                    setLanguageCookie(exchange, locale);
-                }
+                Optional.ofNullable(language)
+                    .filter(StringUtils::hasText)
+                    .map(Locale::forLanguageTag)
+                    .or(() -> UserLocaleRequestAttributeWriteFilter.getUserLocale(request))
+                    .ifPresent(locale -> setLanguageCookie(exchange, locale));
             })
             .then(Mono.defer(() -> chain.filter(exchange)));
     }

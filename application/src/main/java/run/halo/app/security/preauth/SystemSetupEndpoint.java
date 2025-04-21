@@ -212,6 +212,7 @@ public class SystemSetupEndpoint {
         String basic = data.getOrDefault(SystemSetting.Basic.GROUP, "{}");
         var basicSetting = JsonUtils.jsonToObject(basic, SystemSetting.Basic.class);
         basicSetting.setTitle(body.getSiteTitle());
+        basicSetting.setLanguage(body.getLanguage());
         data.put(SystemSetting.Basic.GROUP, JsonUtils.objectToJson(basicSetting));
     }
 
@@ -271,6 +272,11 @@ public class SystemSetupEndpoint {
         @Size(max = 80)
         public String getSiteTitle() {
             return formData.getFirst("siteTitle");
+        }
+
+        @Pattern(regexp = "^(zh-CN|zh-TW|en-US)$")
+        public String getLanguage() {
+            return formData.getFirst("language");
         }
     }
 

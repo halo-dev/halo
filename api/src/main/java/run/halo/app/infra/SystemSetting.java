@@ -3,10 +3,13 @@ package run.halo.app.infra;
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Locale;
+import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 import lombok.Data;
 import lombok.experimental.Accessors;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.boot.convert.ApplicationConversionService;
 import run.halo.app.extension.ConfigMap;
 import run.halo.app.infra.utils.JsonUtils;
@@ -66,6 +69,13 @@ public class SystemSetting {
         String subtitle;
         String logo;
         String favicon;
+        String language;
+
+        public Optional<Locale> getSystemLocale() {
+            return Optional.ofNullable(language)
+                .filter(StringUtils::isNotBlank)
+                .map(Locale::forLanguageTag);
+        }
     }
 
     @Data
