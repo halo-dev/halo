@@ -87,11 +87,11 @@ public class HaloServerRequestCache extends WebSessionServerRequestCache {
             .then();
     }
 
-    private static String uriInApplication(ServerHttpRequest request, URI uri) {
+    public static String uriInApplication(ServerHttpRequest request, URI uri) {
         return uriInApplication(request, uri, true);
     }
 
-    private static String uriInApplication(
+    public static String uriInApplication(
         ServerHttpRequest request, URI uri, boolean appendFragment
     ) {
         var path = RequestPath.parse(uri, request.getPath().contextPath().value());

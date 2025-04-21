@@ -15,7 +15,7 @@ import reactor.core.publisher.Mono;
  * @author johnniang
  * @since 2.20.4
  */
-class PatAuthenticationConverter extends ServerBearerTokenAuthenticationConverter {
+public class PatAuthenticationConverter extends ServerBearerTokenAuthenticationConverter {
 
     @Override
     public Mono<Authentication> convert(ServerWebExchange exchange) {
