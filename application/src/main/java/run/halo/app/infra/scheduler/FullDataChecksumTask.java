@@ -4,12 +4,14 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import net.javacrumbs.shedlock.spring.annotation.SchedulerLock;
 import org.springframework.cache.CacheManager;
+import org.springframework.data.domain.Sort;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import run.halo.app.core.extension.content.Post;
+import run.halo.app.extension.ListOptions;
 import run.halo.app.extension.ReactiveExtensionClient;
 import run.halo.app.infra.properties.HaloProperties;
 
@@ -42,21 +44,21 @@ public class FullDataChecksumTask {
     @Scheduled(cron = "${halo.distributed.full-checksum-cron:0 0 * * * ?}") // Default: Every hour
     @SchedulerLock(name = "fullDataChecksum", lockAtLeastFor = "5m", lockAtMostFor = "30m")
     public void runFullChecksum() {
-        if (!properties.getDistributed().isEnabled()) {
-            return;
-        }
-        
-        log.info("Starting full data checksum verification task");
-        
-        // Generate checksums for posts
-        generatePostChecksums()
-            .doOnComplete(() -> log.info("Post checksums completed"))
-            .subscribe();
-        
-        // Add other entity checksum generation here:
-        // generateCommentChecksums().subscribe();
-        // generateTagChecksums().subscribe();
-        // etc.
+    if (!properties.getDistributed().isEnabled()) {
+    return;
+    }
+    
+    log.info("Starting full data checksum verification task");
+    
+    // Generate checksums for posts
+    generatePostChecksums()
+    .doOnSuccess(result -> log.info("Post checksums completed"))
+    .subscribe();
+    
+    // Add other entity checksum generation here:
+    // generateCommentChecksums().subscribe();
+    // generateTagChecksums().subscribe();
+    // etc.
     }
     
     /**
@@ -71,20 +73,19 @@ public class FullDataChecksumTask {
         return Mono.fromCallable(() -> redisTemplate.delete(checksumKey))
             .then(
                 // Process posts in batches
-                client.listAll(Post.class)
+                client.listAll(Post.class, new ListOptions(), Sort.by("metadata.creationTimestamp"))
                     .buffer(BATCH_SIZE)
                     .flatMap(posts -> {
                         Map<String, String> checksums = new HashMap<>();
                         for (Post post : posts) {
                             String name = post.getMetadata().getName();
-                            String resourceVersion = post.getMetadata().getResourceVersion();
+                            String resourceVersion = post.getMetadata().getVersion().toString();
                             checksums.put(name, resourceVersion);
                         }
                         
                         // Store checksums in Redis
-                        return Mono.fromCallable(() -> 
-                            redisTemplate.opsForHash().putAll(checksumKey, checksums)
-                        );
+                        Boolean result = redisTemplate.opsForHash().putAll(checksumKey, checksums);
+                        return Mono.just(result);
                     })
                     .then()
                     // Set expiration to avoid stale data
@@ -131,7 +132,7 @@ public class FullDataChecksumTask {
             // Get from cache if exists
             Post cachedPost = postCache.get(postName, Post.class);
             if (cachedPost == null || 
-                !resourceVersion.equals(cachedPost.getMetadata().getResourceVersion())) {
+                !resourceVersion.equals(cachedPost.getMetadata().getVersion().toString())) {
                 
                 // Cache miss or version mismatch, refresh from database
                 refreshedCount++;

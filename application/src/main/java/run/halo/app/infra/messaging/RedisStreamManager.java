@@ -120,14 +120,14 @@ public class RedisStreamManager {
             PendingMessages pendingMessages = redisTemplate.opsForStream()
                 .pending(streamKey, consumerGroup, Range.unbounded(), 1);
                 
-            if (pendingMessages.getCount() > 0) {
+            if (pendingMessages.getTotalPendingMessages() > 0) {
                 log.info("Consumer group has {} pending messages", 
-                        pendingMessages.getCount());
+                        pendingMessages.getTotalPendingMessages());
                 
                 // 如果有大量未处理的消息，可以考虑重新分配或清理
-                if (pendingMessages.getCount() > 1000) {
+                if (pendingMessages.getTotalPendingMessages() > 1000) {
                     log.warn("Large number of pending messages ({}), consider manual intervention", 
-                            pendingMessages.getCount());
+                            pendingMessages.getTotalPendingMessages());
                 }
             }
         } catch (Exception e) {
