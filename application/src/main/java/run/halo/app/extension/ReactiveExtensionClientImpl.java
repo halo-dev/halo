@@ -1,6 +1,6 @@
 package run.halo.app.extension;
 
-import static org.apache.commons.lang3.RandomStringUtils.randomAlphabetic;
+import static org.apache.commons.lang3.RandomStringUtils.secureStrong;
 import static org.springframework.util.StringUtils.hasText;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -31,6 +31,7 @@ import org.springframework.transaction.ReactiveTransactionManager;
 import org.springframework.transaction.reactive.TransactionalOperator;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
+import reactor.core.scheduler.Schedulers;
 import reactor.util.retry.Retry;
 import run.halo.app.extension.availability.IndexBuildState;
 import run.halo.app.extension.exception.ExtensionNotFoundException;
@@ -43,6 +44,8 @@ import run.halo.app.extension.store.ReactiveExtensionStoreClient;
 @Slf4j
 @Component
 public class ReactiveExtensionClientImpl implements ReactiveExtensionClient {
+
+    public static final int GENERATE_NAME_RANDOM_LENGTH = 8;
 
     private final ReactiveExtensionStoreClient client;
 
@@ -218,27 +221,36 @@ public class ReactiveExtensionClientImpl implements ReactiveExtensionClient {
 
     @Override
     public <E extends Extension> Mono<E> create(E extension) {
-        checkClientWritable(extension);
-        return Mono.just(extension)
-            .doOnNext(ext -> {
-                var metadata = extension.getMetadata();
-                // those fields should be managed by halo.
-                metadata.setCreationTimestamp(Instant.now());
-                metadata.setDeletionTimestamp(null);
-                metadata.setVersion(null);
+        return Mono.fromCallable(
+                () -> {
+                    checkClientWritable(extension);
+                    var metadata = extension.getMetadata();
+                    // those fields should be managed by halo.
+                    metadata.setCreationTimestamp(Instant.now());
+                    metadata.setDeletionTimestamp(null);
+                    metadata.setVersion(null);
 
-                if (!hasText(metadata.getName())) {
-                    if (!hasText(metadata.getGenerateName())) {
-                        throw new IllegalArgumentException(
-                            "The metadata.generateName must not be blank when metadata.name is "
-                                + "blank");
+                    if (!hasText(metadata.getName())) {
+                        if (!hasText(metadata.getGenerateName())) {
+                            throw new IllegalArgumentException(
+                                "The metadata.generateName must not be blank when metadata.name is "
+                                    + "blank");
+                        }
+
+                        // generate name with random text
+                        // use secureStrong() to make sure the generated name is unpredictable.
+                        metadata.setName(metadata.getGenerateName() + secureStrong()
+                            .nextAlphanumeric(GENERATE_NAME_RANDOM_LENGTH)
+                            // Prevent data conflicts caused by database case sensitivity
+                            .toLowerCase()
+                        );
                     }
-                    // generate name with random text
-                    metadata.setName(metadata.getGenerateName() + randomAlphabetic(5));
-                }
-                extension.setMetadata(metadata);
-            })
-            .map(converter::convertTo)
+                    extension.setMetadata(metadata);
+                    return converter.convertTo(extension);
+                })
+            // the method secureStrong() may invoke blocking SecureRandom, so we need to subscribe
+            // on boundedElastic thread pool.
+            .subscribeOn(Schedulers.boundedElastic())
             .flatMap(extStore -> doCreate(extension, extStore.getName(), extStore.getData())
                 .doOnNext(created -> watchers.onAdd(convertToRealExtension(created)))
             )
