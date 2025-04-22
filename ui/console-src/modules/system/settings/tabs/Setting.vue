@@ -16,7 +16,7 @@ import { useI18n } from "vue-i18n";
 
 const SYSTEM_CONFIGMAP_NAME = "system";
 
-const { t } = useI18n();
+const { t, locale } = useI18n();
 const queryClient = useQueryClient();
 
 const group = inject<Ref<string>>("activeTab", ref("basic"));
@@ -59,6 +59,8 @@ const handleSaveConfigMap = async () => {
 
   queryClient.invalidateQueries({ queryKey: ["system-configMap"] });
   await useGlobalInfoStore().fetchGlobalInfo();
+
+  locale.value = configMapFormData.value.basic.language;
 
   saving.value = false;
 };

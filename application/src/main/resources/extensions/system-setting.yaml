@@ -29,12 +29,14 @@ spec:
           name: language
           value: 'zh-CN'
           options:
+            - label: 'English'
+              value: 'en-US'
+            - label: 'Español'
+              value: 'es'
             - label: '简体中文'
               value: 'zh-CN'
             - label: '繁体中文'
               value: 'zh-TW'
-            - label: 'English'
-              value: 'en-US'
     - group: post
       label: 文章设置
       formSchema:
