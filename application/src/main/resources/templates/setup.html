@@ -1,4 +1,4 @@
-<!doctype html>
+<!DOCTYPE html>
 <html
     xmlns:th="https://www.thymeleaf.org"
     th:replace="~{gateway_fragments/layout :: layout(title = |#{title} - Halo|, head = ~{::head}, body = ~{::body})}"
@@ -22,6 +22,18 @@
                     <span th:text="#{form.messages.h2.content}"> </span>
                 </div>
                 <form th:object="${form}" th:action="@{/system/setup}" class="halo-form" method="post">
+                    <div class="form-item">
+                        <label for="language" th:text="#{form.language.label}"></label>
+                        <div class="form-input">
+                            <select name="language" id="language">
+                                <option value="en" th:selected="${#locale.toLanguageTag} == 'en'">English</option>
+                                <option value="es" th:selected="${#locale.toLanguageTag} == 'es'">Español</option>
+                                <option value="zh-CN" th:selected="${#locale.toLanguageTag} == 'zh-CN'">简体中文</option>
+                                <option value="zh-TW" th:selected="${#locale.toLanguageTag} == 'zh-TW'">繁体中文</option>
+                            </select>
+                        </div>
+                    </div>
+
                     <div class="form-item">
                         <label for="siteTitle" th:text="#{form.siteTitle.label}"></label>
                         <div class="form-input">
@@ -112,13 +124,19 @@
                     </div>
                 </form>
             </div>
-
-            <div th:replace="~{gateway_fragments/common::languageSwitcher}"></div>
         </div>
 
         <script th:inline="javascript">
             document.addEventListener("DOMContentLoaded", function () {
                 setupPasswordConfirmation("password", "confirmPassword");
+            });
+
+            document.getElementById("language").addEventListener("change", function () {
+                const selectedLanguage = this.value;
+                const currentURL = new URL(window.location.href);
+                currentURL.searchParams.set("language", selectedLanguage);
+                history.replaceState(null, "", currentURL.toString());
+                window.location.reload();
             });
         </script>
     </th:block>
