@@ -291,7 +291,7 @@ public class DefaultNotificationCenter implements NotificationCenter {
     Mono<Locale> getLocaleFromSubscriber(Subscriber subscriber) {
         // TODO get locale from subscriber
         return environmentFetcher.getBasic()
-            .map(SystemSetting.Basic::getSystemLocale)
+            .map(SystemSetting.Basic::useSystemLocale)
             .map(localeOpt -> localeOpt.orElse(Locale.getDefault()));
     }
 }

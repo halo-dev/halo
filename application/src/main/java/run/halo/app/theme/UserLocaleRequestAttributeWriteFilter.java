@@ -28,7 +28,7 @@ public class UserLocaleRequestAttributeWriteFilter implements WebFilter {
     @NonNull
     public Mono<Void> filter(@NonNull ServerWebExchange exchange, @NonNull WebFilterChain chain) {
         return environmentFetcher.getBasic()
-            .map(SystemSetting.Basic::getSystemLocale)
+            .map(SystemSetting.Basic::useSystemLocale)
             .doOnNext(localeOpt -> localeOpt
                 .ifPresent(locale -> exchange.getAttributes().put(USER_LOCALE_ATTRIBUTE, locale))
             )

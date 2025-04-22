@@ -1,5 +1,6 @@
 package run.halo.app.infra;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
@@ -71,7 +72,8 @@ public class SystemSetting {
         String favicon;
         String language;
 
-        public Optional<Locale> getSystemLocale() {
+        @JsonIgnore
+        public Optional<Locale> useSystemLocale() {
             return Optional.ofNullable(language)
                 .filter(StringUtils::isNotBlank)
                 .map(Locale::forLanguageTag);
