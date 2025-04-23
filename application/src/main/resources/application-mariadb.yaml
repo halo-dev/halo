@@ -5,5 +5,8 @@ spring:
     password: mariadb
   sql:
     init:
+      schema-locations:
+        - classpath:schema-mariadb.sql
+        - classpath:schema-mariadb-outbox.sql
       mode: always
-      platform: mysql
+      platform: mariadb

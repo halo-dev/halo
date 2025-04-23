@@ -5,5 +5,8 @@ spring:
     password: openpostgresql
   sql:
     init:
+      schema-locations:
+        - classpath:schema-postgresql.sql
+        - classpath:schema-postgresql-outbox.sql
       mode: always
       platform: postgresql

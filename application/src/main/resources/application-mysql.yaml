@@ -5,5 +5,8 @@ spring:
     password: openmysql
   sql:
     init:
+      schema-locations:
+        - classpath:schema-mysql.sql
+        - classpath:schema-mysql-outbox.sql
       mode: always
       platform: mysql
