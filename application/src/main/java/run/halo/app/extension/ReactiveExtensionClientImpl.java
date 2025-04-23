@@ -1,6 +1,6 @@
 package run.halo.app.extension;
 
-import static org.apache.commons.lang3.RandomStringUtils.secureStrong;
+import static org.apache.commons.lang3.RandomStringUtils.secure;
 import static org.springframework.util.StringUtils.hasText;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -238,8 +238,7 @@ public class ReactiveExtensionClientImpl implements ReactiveExtensionClient {
                         }
 
                         // generate name with random text
-                        // use secureStrong() to make sure the generated name is unpredictable.
-                        metadata.setName(metadata.getGenerateName() + secureStrong()
+                        metadata.setName(metadata.getGenerateName() + secure()
                             .nextAlphanumeric(GENERATE_NAME_RANDOM_LENGTH)
                             // Prevent data conflicts caused by database case sensitivity
                             .toLowerCase()
