@@ -31,7 +31,6 @@ const formState = ref<CreateUserRequest>({
   password: "",
   roles: [],
 });
-const selectedRole = ref("");
 const isSubmitting = ref(false);
 
 onMounted(() => {
@@ -41,10 +40,6 @@ onMounted(() => {
 const handleCreateUser = async () => {
   try {
     isSubmitting.value = true;
-
-    if (selectedRole.value) {
-      formState.value.roles = [selectedRole.value];
-    }
 
     await consoleApiClient.user.createUser({
       createUserRequest: formState.value,
@@ -122,10 +117,12 @@ const handleCreateUser = async () => {
           matches: $t('core.formkit.validation.password'),
         }"
       ></FormKit>
+      <!-- @vue-ignore -->
       <FormKit
-        v-model="selectedRole"
+        v-model="formState.roles"
         :label="$t('core.user.grant_permission_modal.fields.role.label')"
         type="roleSelect"
+        multiple
         validation="required"
       ></FormKit>
       <FormKit
