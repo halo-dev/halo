@@ -289,7 +289,7 @@ public class SystemSetupEndpoint {
                     var processedContent =
                         PROPERTY_PLACEHOLDER_HELPER.replacePlaceholders(rawContent, properties);
                     // load yaml to unstructured
-                    var stringResource = new InMemoryResource(processedContent);
+                    var stringResource = new InMemoryResource(processedContent.getBytes(StandardCharsets.UTF_8));
                     var loader = new YamlUnstructuredLoader(stringResource);
                     return loader.load();
                 })
