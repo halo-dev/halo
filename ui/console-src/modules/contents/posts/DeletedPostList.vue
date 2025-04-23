@@ -23,6 +23,7 @@ import {
   VStatusDot,
 } from "@halo-dev/components";
 import { useQuery } from "@tanstack/vue-query";
+import { chunk } from "lodash-es";
 import { ref, watch } from "vue";
 import { useI18n } from "vue-i18n";
 import PostTag from "./tags/components/PostTag.vue";
@@ -109,13 +110,18 @@ const handleDeletePermanentlyInBatch = async () => {
     confirmText: t("core.common.buttons.confirm"),
     cancelText: t("core.common.buttons.cancel"),
     onConfirm: async () => {
-      await Promise.all(
-        selectedPostNames.value.map((name) => {
-          return coreApiClient.content.post.deletePost({
-            name,
-          });
-        })
-      );
+      const chunks = chunk(selectedPostNames.value, 5);
+
+      for (const chunk of chunks) {
+        await Promise.all(
+          chunk.map((name) => {
+            return coreApiClient.content.post.deletePost({
+              name,
+            });
+          })
+        );
+      }
+
       await refetch();
       selectedPostNames.value = [];
 
@@ -158,28 +164,33 @@ const handleRecoveryInBatch = async () => {
     confirmText: t("core.common.buttons.confirm"),
     cancelText: t("core.common.buttons.cancel"),
     onConfirm: async () => {
-      await Promise.all(
-        selectedPostNames.value.map((name) => {
-          const isPostExist = posts.value?.some(
-            (item) => item.post.metadata.name === name
-          );
+      const chunks = chunk(selectedPostNames.value, 5);
 
-          if (!isPostExist) {
-            return Promise.resolve();
-          }
+      for (const chunk of chunks) {
+        await Promise.all(
+          chunk.map((name) => {
+            const isPostExist = posts.value?.some(
+              (item) => item.post.metadata.name === name
+            );
 
-          return coreApiClient.content.post.patchPost({
-            name: name,
-            jsonPatchInner: [
-              {
-                op: "add",
-                path: "/spec/deleted",
-                value: false,
-              },
-            ],
-          });
-        })
-      );
+            if (!isPostExist) {
+              return Promise.resolve();
+            }
+
+            return coreApiClient.content.post.patchPost({
+              name: name,
+              jsonPatchInner: [
+                {
+                  op: "add",
+                  path: "/spec/deleted",
+                  value: false,
+                },
+              ],
+            });
+          })
+        );
+      }
+
       await refetch();
       selectedPostNames.value = [];
 

@@ -23,6 +23,7 @@ import {
 } from "@halo-dev/components";
 import { useQuery } from "@tanstack/vue-query";
 import { useRouteQuery } from "@vueuse/router";
+import { chunk } from "lodash-es";
 import type { Ref } from "vue";
 import { computed, provide, ref, watch } from "vue";
 import { useI18n } from "vue-i18n";
@@ -266,13 +267,18 @@ const handleDeleteInBatch = async () => {
     confirmText: t("core.common.buttons.confirm"),
     cancelText: t("core.common.buttons.cancel"),
     onConfirm: async () => {
-      await Promise.all(
-        selectedPostNames.value.map((name) => {
-          return consoleApiClient.content.post.recyclePost({
-            name,
-          });
-        })
-      );
+      const chunks = chunk(selectedPostNames.value, 5);
+
+      for (const chunk of chunks) {
+        await Promise.all(
+          chunk.map((name) => {
+            return consoleApiClient.content.post.recyclePost({
+              name,
+            });
+          })
+        );
+      }
+
       await refetch();
       selectedPostNames.value = [];
 
@@ -288,9 +294,14 @@ const handlePublishInBatch = async () => {
     confirmText: t("core.common.buttons.confirm"),
     cancelText: t("core.common.buttons.cancel"),
     onConfirm: async () => {
-      for (const i in selectedPostNames.value) {
-        const name = selectedPostNames.value[i];
-        await consoleApiClient.content.post.publishPost({ name });
+      const chunks = chunk(selectedPostNames.value, 5);
+
+      for (const chunk of chunks) {
+        await Promise.all(
+          chunk.map((name) => {
+            return consoleApiClient.content.post.publishPost({ name });
+          })
+        );
       }
 
       await refetch();
@@ -308,9 +319,14 @@ const handleCancelPublishInBatch = async () => {
     confirmText: t("core.common.buttons.confirm"),
     cancelText: t("core.common.buttons.cancel"),
     onConfirm: async () => {
-      for (const i in selectedPostNames.value) {
-        const name = selectedPostNames.value[i];
-        await consoleApiClient.content.post.unpublishPost({ name });
+      const chunks = chunk(selectedPostNames.value, 5);
+
+      for (const chunk of chunks) {
+        await Promise.all(
+          chunk.map((name) => {
+            return consoleApiClient.content.post.unpublishPost({ name });
+          })
+        );
       }
 
       await refetch();
