@@ -6,6 +6,8 @@ import static run.halo.app.theme.ThemeLocaleContextResolver.LANGUAGE_PARAMETER_N
 import java.util.Locale;
 import java.util.Optional;
 import java.util.Set;
+import org.springframework.core.Ordered;
+import org.springframework.core.annotation.Order;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseCookie;
@@ -23,7 +25,12 @@ import org.springframework.web.server.WebFilterChain;
 import reactor.core.publisher.Mono;
 import run.halo.app.theme.UserLocaleRequestAttributeWriteFilter;
 
+/**
+ * {@link UserLocaleRequestAttributeWriteFilter} is before {@link LocaleChangeWebFilter} to
+ * obtain the locale.
+ */
 @Component
+@Order(Ordered.HIGHEST_PRECEDENCE + 1)
 public class LocaleChangeWebFilter implements WebFilter {
 
     private final ServerWebExchangeMatcher matcher;
