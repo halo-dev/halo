@@ -274,7 +274,7 @@ public class SystemSetupEndpoint {
             return formData.getFirst("siteTitle");
         }
 
-        @Pattern(regexp = "^(zh-CN|zh-TW|en-US)$")
+        @Pattern(regexp = "^(zh-CN|zh-TW|en-US|es)$")
         public String getLanguage() {
             return formData.getFirst("language");
         }
