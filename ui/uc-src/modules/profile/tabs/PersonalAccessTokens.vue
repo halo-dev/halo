@@ -5,6 +5,7 @@ import {
   IconAddCircle,
   VButton,
   VEmpty,
+  VEntityContainer,
   VLoading,
   VSpace,
 } from "@halo-dev/components";
@@ -68,14 +69,15 @@ const creationModal = ref(false);
   </Transition>
 
   <Transition v-else appear name="fade">
-    <ul
-      class="box-border h-full w-full divide-y divide-gray-100 overflow-hidden rounded-base border"
-      role="list"
-    >
-      <li v-for="(token, index) in pats" :key="index">
-        <PersonalAccessTokenListItem :token="token" />
-      </li>
-    </ul>
+    <div class="rounded-base border overflow-hidden">
+      <VEntityContainer>
+        <PersonalAccessTokenListItem
+          v-for="token in pats"
+          :key="token.metadata.name"
+          :token="token"
+        />
+      </VEntityContainer>
+    </div>
   </Transition>
 
   <PersonalAccessTokenCreationModal

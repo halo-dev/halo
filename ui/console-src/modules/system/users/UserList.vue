@@ -16,6 +16,7 @@ import {
   VButton,
   VCard,
   VEmpty,
+  VEntityContainer,
   VLoading,
   VPageHeader,
   VPagination,
@@ -335,30 +336,30 @@ function onCreationModalClose() {
       </Transition>
 
       <Transition v-else appear name="fade">
-        <ul
-          class="box-border h-full w-full divide-y divide-gray-100"
-          role="list"
-        >
-          <li v-for="(user, index) in users" :key="index">
-            <UserListItem :user="user" :is-selected="checkSelection(user.user)">
-              <template
-                v-if="currentUserHasPermission(['system:users:manage'])"
-                #checkbox
-              >
-                <input
-                  v-model="selectedUserNames"
-                  :value="user.user.metadata.name"
-                  name="user-checkbox"
-                  type="checkbox"
-                  :disabled="
-                    user.user.metadata.name ===
-                    userStore.currentUser?.metadata.name
-                  "
-                />
-              </template>
-            </UserListItem>
-          </li>
-        </ul>
+        <VEntityContainer>
+          <UserListItem
+            v-for="user in users"
+            :key="user.user.metadata.name"
+            :user="user"
+            :is-selected="checkSelection(user.user)"
+          >
+            <template
+              v-if="currentUserHasPermission(['system:users:manage'])"
+              #checkbox
+            >
+              <input
+                v-model="selectedUserNames"
+                :value="user.user.metadata.name"
+                name="user-checkbox"
+                type="checkbox"
+                :disabled="
+                  user.user.metadata.name ===
+                  userStore.currentUser?.metadata.name
+                "
+              />
+            </template>
+          </UserListItem>
+        </VEntityContainer>
       </Transition>
 
       <template #footer>

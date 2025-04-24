@@ -1,6 +1,12 @@
 <script lang="ts" setup>
 import { ucApiClient } from "@halo-dev/api-client";
-import { Dialog, Toast, VButton, VLoading } from "@halo-dev/components";
+import {
+  Dialog,
+  Toast,
+  VButton,
+  VEntityContainer,
+  VLoading,
+} from "@halo-dev/components";
 import { useQuery, useQueryClient } from "@tanstack/vue-query";
 import { computed } from "vue";
 import { useI18n } from "vue-i18n";
@@ -62,14 +68,15 @@ function handleRevokeOtherDevices() {
   <VLoading v-if="isLoading" />
 
   <TransitionGroup v-else appear name="fade">
-    <ul
-      class="box-border h-full w-full divide-y divide-gray-100 overflow-hidden rounded-base border"
-      role="list"
-    >
-      <li v-for="device in data" :key="device?.device.spec.sessionId">
-        <DeviceListItem :device="device" />
-      </li>
-    </ul>
+    <div class="overflow-hidden rounded-base border">
+      <VEntityContainer>
+        <DeviceListItem
+          v-for="device in data"
+          :key="device?.device.spec.sessionId"
+          :device="device"
+        />
+      </VEntityContainer>
+    </div>
     <div v-if="otherDevices.length" class="mt-5">
       <VButton @click="handleRevokeOtherDevices">
         {{ $t("core.uc_profile.device.operations.revoke_others.title") }}
