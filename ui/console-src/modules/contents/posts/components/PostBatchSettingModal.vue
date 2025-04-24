@@ -6,6 +6,7 @@ import {
 } from "@halo-dev/api-client";
 import { Toast, VButton, VModal, VSpace } from "@halo-dev/components";
 import { useMutation, useQueryClient } from "@tanstack/vue-query";
+import { chunk } from "lodash-es";
 import { ref } from "vue";
 import { useI18n } from "vue-i18n";
 
@@ -50,61 +51,66 @@ const modal = ref<InstanceType<typeof VModal> | null>(null);
 const { mutate, isLoading } = useMutation({
   mutationKey: ["batch-update-posts"],
   mutationFn: async ({ data }: { data: FormData }) => {
-    for (const key in props.posts) {
-      const post = props.posts[key];
-      const jsonPatchInner: JsonPatchInner[] = [];
-      if (data.category.enabled) {
-        jsonPatchInner.push({
-          op: "add",
-          path: "/spec/categories",
-          value: computeArrayPatchValue(
-            data.category.op,
-            post.post.spec.categories || [],
-            data.category.names || []
-          ),
-        });
-      }
+    const postChunks = chunk(props.posts, 5);
 
-      if (data.tag.enabled) {
-        jsonPatchInner.push({
-          op: "add",
-          path: "/spec/tags",
-          value: computeArrayPatchValue(
-            data.tag.op,
-            post.post.spec.tags || [],
-            data.tag.names || []
-          ),
-        });
-      }
+    for (const postChunk of postChunks) {
+      await Promise.all(
+        postChunk.map((post) => {
+          const jsonPatchInner: JsonPatchInner[] = [];
+          if (data.category.enabled) {
+            jsonPatchInner.push({
+              op: "add",
+              path: "/spec/categories",
+              value: computeArrayPatchValue(
+                data.category.op,
+                post.post.spec.categories || [],
+                data.category.names || []
+              ),
+            });
+          }
 
-      if (data.owner.enabled) {
-        jsonPatchInner.push({
-          op: "add",
-          path: "/spec/owner",
-          value: data.owner.value,
-        });
-      }
+          if (data.tag.enabled) {
+            jsonPatchInner.push({
+              op: "add",
+              path: "/spec/tags",
+              value: computeArrayPatchValue(
+                data.tag.op,
+                post.post.spec.tags || [],
+                data.tag.names || []
+              ),
+            });
+          }
 
-      if (data.visible.enabled) {
-        jsonPatchInner.push({
-          op: "add",
-          path: "/spec/visible",
-          value: data.visible.value,
-        });
-      }
+          if (data.owner.enabled) {
+            jsonPatchInner.push({
+              op: "add",
+              path: "/spec/owner",
+              value: data.owner.value,
+            });
+          }
 
-      if (data.allowComment.enabled) {
-        jsonPatchInner.push({
-          op: "add",
-          path: "/spec/allowComment",
-          value: data.allowComment.value,
-        });
-      }
+          if (data.visible.enabled) {
+            jsonPatchInner.push({
+              op: "add",
+              path: "/spec/visible",
+              value: data.visible.value,
+            });
+          }
 
-      await coreApiClient.content.post.patchPost({
-        name: post.post.metadata.name,
-        jsonPatchInner,
-      });
+          if (data.allowComment.enabled) {
+            jsonPatchInner.push({
+              op: "add",
+              path: "/spec/allowComment",
+              value: data.allowComment.value,
+            });
+          }
+
+          return coreApiClient.content.post.patchPost({
+            name: post.post.metadata.name,
+            jsonPatchInner,
+          });
+        })
+      );
     }
 
     Toast.success(t("core.common.toast.save_success"));

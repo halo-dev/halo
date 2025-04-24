@@ -72,7 +72,7 @@ public class Unstructured implements Extension {
         return new UnstructuredMetadata();
     }
 
-    @EqualsAndHashCode(exclude = "tatersion")
+    @EqualsAndHashCode(exclude = "version")
     class UnstructuredMetadata implements MetadataOperator {
 
         @Override
