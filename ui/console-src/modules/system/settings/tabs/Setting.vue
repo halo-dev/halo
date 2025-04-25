@@ -60,7 +60,9 @@ const handleSaveConfigMap = async () => {
   queryClient.invalidateQueries({ queryKey: ["system-configMap"] });
   await useGlobalInfoStore().fetchGlobalInfo();
 
-  locale.value = configMapFormData.value.basic.language;
+  const language = configMapFormData.value.basic.language;
+  locale.value = language;
+  document.cookie = `language=${language}; path=/`;
 
   saving.value = false;
 };
