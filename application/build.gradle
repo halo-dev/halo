@@ -79,7 +79,8 @@ dependencies {
     // ShedLock for distributed scheduling
     implementation 'net.javacrumbs.shedlock:shedlock-spring:5.12.0'
     implementation 'net.javacrumbs.shedlock:shedlock-provider-redis-spring:5.12.0'
-
+    
+    annotationProcessor platform(project(':platform:application'))
     annotationProcessor "org.springframework.boot:spring-boot-configuration-processor"
     annotationProcessor "org.springframework:spring-context-indexer"
 
