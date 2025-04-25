@@ -30,7 +30,7 @@ spec:
           value: 'zh-CN'
           options:
             - label: 'English'
-              value: 'en-US'
+              value: 'en'
             - label: 'Español'
               value: 'es'
             - label: '简体中文'
