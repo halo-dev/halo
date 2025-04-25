@@ -1,0 +1,49 @@
+server:
+  port: 8090
+spring:
+  r2dbc:
+    url: r2dbc:pool:postgresql://170.106.99.35:5432/halo-test
+    username: admin
+    password: 123456
+  sql:
+    init:
+      mode: always
+      platform: postgresql
+      schema-locations:
+        - classpath:schema-postgresql.sql
+        - classpath:schema-postgresql-outbox.sql
+  # 使用正确的 Redis 配置路径和格式
+  data:
+    redis:
+      host: localhost
+      port: 6379
+      password: 123456
+      timeout: 30000
+      lettuce:
+        pool:
+          max-active: 8
+          max-idle: 8
+          min-idle: 0
+          max-wait: -1ms
+      # 添加客户端名称
+      client-name: halo-client
+  cache:
+    type: redis
+    redis:
+      time-to-live: 3600000
+      key-prefix: "halo:"
+halo:
+  work-dir: ${user.home}/.halo2
+  external-url: http://localhost:8090
+  attachment:
+    resource-mappings:
+      - pathPattern: /upload/**
+        locations:
+          - migrate-from-1.x
+  distributed:
+    enabled: true
+    stream-key: halo:distributed:stream
+    consumer-group: halo-consumer-group
+    scheduler-lock-prefix: "halo:scheduler-lock:"
+    listener-interval: 1000
+    outbox-processor-interval: 5000
