@@ -77,7 +77,7 @@ public class SiteSettingVo {
             .logo(basicSetting.getLogo())
             .favicon(basicSetting.getFavicon())
             .allowRegistration(userSetting.isAllowRegistration())
-            .language(basicSetting.useSystemLocale().orElse(Locale.getDefault()).toString())
+            .language(basicSetting.useSystemLocale().orElse(Locale.getDefault()).toLanguageTag())
             .post(PostSetting.builder()
                 .postPageSize(postSetting.getPostPageSize())
                 .archivePageSize(postSetting.getArchivePageSize())
