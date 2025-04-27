@@ -13,6 +13,7 @@ import {
   VCard,
   VDropdownItem,
   VEntity,
+  VEntityContainer,
   VEntityField,
   VLoading,
   VPageHeader,
@@ -241,84 +242,79 @@ const handleDelete = async (role: Role) => {
       </template>
       <VLoading v-if="isLoading" />
       <Transition v-else appear name="fade">
-        <ul
-          class="box-border h-full w-full divide-y divide-gray-100"
-          role="list"
-        >
-          <li v-for="(role, index) in searchResults" :key="index">
-            <VEntity>
-              <template #start>
-                <VEntityField
-                  :title="
-                    role.metadata.annotations?.[rbacAnnotations.DISPLAY_NAME] ||
-                    role.metadata.name
-                  "
-                  :description="getRoleCountText(role)"
-                  :route="{
-                    name: 'RoleDetail',
-                    params: {
-                      name: role.metadata.name,
-                    },
-                  }"
-                ></VEntityField>
-              </template>
-              <template #end>
-                <!-- TODO: 支持显示用户数量 -->
-                <VEntityField v-if="false" description="0 个用户" />
-                <VEntityField>
-                  <template #description>
-                    <VTag>
-                      {{
-                        isSystemReserved(role)
-                          ? t("core.role.common.text.system_reserved")
-                          : t("core.role.common.text.custom")
-                      }}
-                    </VTag>
-                  </template>
-                </VEntityField>
-                <VEntityField v-if="role.metadata.deletionTimestamp">
-                  <template #description>
-                    <VStatusDot
-                      v-tooltip="$t('core.common.status.deleting')"
-                      state="warning"
-                      animate
-                    />
-                  </template>
-                </VEntityField>
-                <VEntityField>
-                  <template #description>
-                    <span class="truncate text-xs tabular-nums text-gray-500">
-                      {{ formatDatetime(role.metadata.creationTimestamp) }}
-                    </span>
-                  </template>
-                </VEntityField>
-              </template>
-              <template
-                v-if="currentUserHasPermission(['system:roles:manage'])"
-                #dropdownItems
+        <VEntityContainer>
+          <VEntity v-for="role in searchResults" :key="role.metadata.name">
+            <template #start>
+              <VEntityField
+                :title="
+                  role.metadata.annotations?.[rbacAnnotations.DISPLAY_NAME] ||
+                  role.metadata.name
+                "
+                :description="getRoleCountText(role)"
+                :route="{
+                  name: 'RoleDetail',
+                  params: {
+                    name: role.metadata.name,
+                  },
+                }"
+              ></VEntityField>
+            </template>
+            <template #end>
+              <!-- TODO: 支持显示用户数量 -->
+              <VEntityField v-if="false" description="0 个用户" />
+              <VEntityField>
+                <template #description>
+                  <VTag>
+                    {{
+                      isSystemReserved(role)
+                        ? t("core.role.common.text.system_reserved")
+                        : t("core.role.common.text.custom")
+                    }}
+                  </VTag>
+                </template>
+              </VEntityField>
+              <VEntityField v-if="role.metadata.deletionTimestamp">
+                <template #description>
+                  <VStatusDot
+                    v-tooltip="$t('core.common.status.deleting')"
+                    state="warning"
+                    animate
+                  />
+                </template>
+              </VEntityField>
+              <VEntityField>
+                <template #description>
+                  <span class="truncate text-xs tabular-nums text-gray-500">
+                    {{ formatDatetime(role.metadata.creationTimestamp) }}
+                  </span>
+                </template>
+              </VEntityField>
+            </template>
+            <template
+              v-if="currentUserHasPermission(['system:roles:manage'])"
+              #dropdownItems
+            >
+              <VDropdownItem
+                v-if="!isSystemReserved(role)"
+                @click="handleOpenEditingModal(role)"
               >
-                <VDropdownItem
-                  v-if="!isSystemReserved(role)"
-                  @click="handleOpenEditingModal(role)"
-                >
-                  {{ $t("core.common.buttons.edit") }}
-                </VDropdownItem>
-                <VDropdownItem
-                  v-if="!isSystemReserved(role)"
-                  type="danger"
-                  @click="handleDelete(role)"
-                >
-                  {{ $t("core.common.buttons.delete") }}
-                </VDropdownItem>
-                <VDropdownItem @click="handleCloneRole(role)">
-                  {{
-                    $t("core.role.operations.create_based_on_this_role.button")
-                  }}
-                </VDropdownItem>
-              </template>
-            </VEntity>
-          </li>
-        </ul>
+                {{ $t("core.common.buttons.edit") }}
+              </VDropdownItem>
+              <VDropdownItem
+                v-if="!isSystemReserved(role)"
+                type="danger"
+                @click="handleDelete(role)"
+              >
+                {{ $t("core.common.buttons.delete") }}
+              </VDropdownItem>
+              <VDropdownItem @click="handleCloneRole(role)">
+                {{
+                  $t("core.role.operations.create_based_on_this_role.button")
+                }}
+              </VDropdownItem>
+            </template>
+          </VEntity>
+        </VEntityContainer>
       </Transition>
     </VCard>
   </div>

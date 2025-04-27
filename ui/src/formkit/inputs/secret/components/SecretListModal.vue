@@ -1,5 +1,10 @@
 <script lang="ts" setup>
-import { IconAddCircle, VButton, VModal } from "@halo-dev/components";
+import {
+  IconAddCircle,
+  VButton,
+  VEntityContainer,
+  VModal,
+} from "@halo-dev/components";
 import { ref } from "vue";
 import { useSecretsFetch } from "../composables/use-secrets-fetch";
 import SecretCreationModal from "./SecretCreationModal.vue";
@@ -32,11 +37,13 @@ const creationModalVisible = ref(false);
         <IconAddCircle />
       </span>
     </template>
-    <ul class="box-border h-full w-full divide-y divide-gray-100" role="list">
-      <li v-for="secret in data?.items" :key="secret.metadata.name">
-        <SecretListItem :secret="secret" />
-      </li>
-    </ul>
+    <VEntityContainer>
+      <SecretListItem
+        v-for="secret in data?.items"
+        :key="secret.metadata.name"
+        :secret="secret"
+      />
+    </VEntityContainer>
     <template #footer>
       <VButton @click="modal?.close()">
         {{ $t("core.common.buttons.close") }}
