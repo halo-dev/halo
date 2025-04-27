@@ -62,7 +62,7 @@ const handleSaveConfigMap = async () => {
 
   const language = configMapFormData.value.basic.language;
   locale.value = language;
-  document.cookie = `language=${language}; path=/`;
+  document.cookie = `language=${language}; path=/; SameSite=Lax; Secure`;
 
   saving.value = false;
 };
