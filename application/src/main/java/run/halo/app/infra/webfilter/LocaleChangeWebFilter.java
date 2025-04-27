@@ -1,10 +1,11 @@
 package run.halo.app.infra.webfilter;
 
 import static run.halo.app.theme.ThemeLocaleContextResolver.LANGUAGE_COOKIE_NAME;
-import static run.halo.app.theme.ThemeLocaleContextResolver.LANGUAGE_PARAMETER_NAME;
 
 import java.util.Locale;
 import java.util.Set;
+import org.springframework.core.Ordered;
+import org.springframework.core.annotation.Order;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseCookie;
@@ -15,18 +16,26 @@ import org.springframework.security.web.server.util.matcher.ServerWebExchangeMat
 import org.springframework.security.web.server.util.matcher.ServerWebExchangeMatcher.MatchResult;
 import org.springframework.security.web.server.util.matcher.ServerWebExchangeMatchers;
 import org.springframework.stereotype.Component;
-import org.springframework.util.StringUtils;
 import org.springframework.web.server.ServerWebExchange;
 import org.springframework.web.server.WebFilter;
 import org.springframework.web.server.WebFilterChain;
 import reactor.core.publisher.Mono;
+import run.halo.app.theme.ThemeLocaleContextResolver;
+import run.halo.app.theme.UserLocaleRequestAttributeWriteFilter;
 
+/**
+ * {@link UserLocaleRequestAttributeWriteFilter} is before {@link LocaleChangeWebFilter} to
+ * obtain the locale.
+ */
 @Component
+@Order(Ordered.HIGHEST_PRECEDENCE + 1)
 public class LocaleChangeWebFilter implements WebFilter {
 
     private final ServerWebExchangeMatcher matcher;
+    private final ThemeLocaleContextResolver themeLocaleContextResolver;
 
-    public LocaleChangeWebFilter() {
+    public LocaleChangeWebFilter(ThemeLocaleContextResolver themeLocaleContextResolver) {
+        this.themeLocaleContextResolver = themeLocaleContextResolver;
         var pathMatcher = ServerWebExchangeMatchers.pathMatchers(HttpMethod.GET, "/**");
         var textHtmlMatcher = new MediaTypeServerWebExchangeMatcher(MediaType.TEXT_HTML);
         textHtmlMatcher.setIgnoredMediaTypes(Set.of(MediaType.ALL));
@@ -35,16 +44,14 @@ public class LocaleChangeWebFilter implements WebFilter {
 
     @Override
     @NonNull
-    public Mono<Void> filter(ServerWebExchange exchange, WebFilterChain chain) {
+    public Mono<Void> filter(ServerWebExchange exchange, @NonNull WebFilterChain chain) {
         var request = exchange.getRequest();
         return matcher.matches(exchange)
             .filter(MatchResult::isMatch)
             .doOnNext(result -> {
-                var language = request
-                    .getQueryParams()
-                    .getFirst(LANGUAGE_PARAMETER_NAME);
-                if (StringUtils.hasText(language)) {
-                    var locale = Locale.forLanguageTag(language);
+                var localeContext = themeLocaleContextResolver.resolveLocaleContext(exchange);
+                var locale = localeContext.getLocale();
+                if (locale != null) {
                     setLanguageCookie(exchange, locale);
                 }
             })

@@ -24,6 +24,19 @@ spec:
           name: favicon
           accepts:
             - 'image/*'
+        - $formkit: select
+          label: "首选语言"
+          name: language
+          value: 'zh-CN'
+          options:
+            - label: 'English'
+              value: 'en'
+            - label: 'Español'
+              value: 'es'
+            - label: '简体中文'
+              value: 'zh-CN'
+            - label: '繁体中文'
+              value: 'zh-TW'
     - group: post
       label: 文章设置
       formSchema:
