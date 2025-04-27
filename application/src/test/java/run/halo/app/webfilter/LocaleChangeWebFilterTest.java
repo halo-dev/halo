@@ -15,6 +15,7 @@ import org.springframework.mock.web.server.MockServerWebExchange;
 import org.springframework.web.server.WebFilterChain;
 import reactor.core.publisher.Mono;
 import run.halo.app.infra.webfilter.LocaleChangeWebFilter;
+import run.halo.app.theme.ThemeLocaleContextResolver;
 
 class LocaleChangeWebFilterTest {
 
@@ -22,7 +23,8 @@ class LocaleChangeWebFilterTest {
 
     @BeforeEach
     void setUp() {
-        filter = new LocaleChangeWebFilter();
+        var themeLocaleContextResolver = new ThemeLocaleContextResolver();
+        filter = new LocaleChangeWebFilter(themeLocaleContextResolver);
     }
 
     @Test

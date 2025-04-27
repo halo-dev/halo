@@ -74,6 +74,7 @@ tasks.named('jar') {
 
 dependencies {
     implementation project(':api')
+    annotationProcessor platform(project(':platform:application'))
 
     annotationProcessor "org.springframework.boot:spring-boot-configuration-processor"
     annotationProcessor "org.springframework:spring-context-indexer"
@@ -81,6 +82,8 @@ dependencies {
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
     testImplementation 'org.springframework.security:spring-security-test'
     testImplementation 'io.projectreactor:reactor-test'
+
+    annotationProcessor 'com.github.therapi:therapi-runtime-javadoc-scribe'
 
     // webjars
     runtimeOnly 'org.webjars.npm:jsencrypt:3.3.2'

@@ -26,6 +26,7 @@ repositories {
 
 dependencies {
     api platform(project(':platform:application'))
+    annotationProcessor platform(project(':platform:application'))
 
     api 'org.springframework.boot:spring-boot-starter-actuator'
     api 'org.springframework.boot:spring-boot-starter-data-jpa'
@@ -80,6 +81,9 @@ dependencies {
     runtimeOnly 'org.postgresql:r2dbc-postgresql'
     runtimeOnly 'org.mariadb:r2dbc-mariadb'
     runtimeOnly 'io.asyncer:r2dbc-mysql'
+    runtimeOnly 'com.github.therapi:therapi-runtime-javadoc'
+
+    annotationProcessor "com.github.therapi:therapi-runtime-javadoc-scribe"
 
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
     testImplementation 'org.springframework.security:spring-security-test'

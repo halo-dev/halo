@@ -59,6 +59,11 @@ public class SystemConfigurableEnvironmentFetcher implements Reconciler<Reconcil
             });
     }
 
+    public Mono<SystemSetting.Basic> getBasic() {
+        return fetch(SystemSetting.Basic.GROUP, SystemSetting.Basic.class)
+            .switchIfEmpty(Mono.just(new SystemSetting.Basic()));
+    }
+
     public Mono<SystemSetting.Comment> fetchComment() {
         return fetch(SystemSetting.Comment.GROUP, SystemSetting.Comment.class)
             .switchIfEmpty(Mono.just(new SystemSetting.Comment()));

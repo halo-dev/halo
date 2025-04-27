@@ -24,6 +24,7 @@ ext {
     tika = "2.9.2"
     imgscalr = '4.2'
     exifExtractor = '2.19.0'
+    therapiVersion = '0.13.0'
 }
 
 javaPlatform {
@@ -59,6 +60,8 @@ dependencies {
         api "org.apache.tika:tika-core:$tika"
         api "org.imgscalr:imgscalr-lib:$imgscalr"
         api "com.drewnoakes:metadata-extractor:$exifExtractor"
+        api "com.github.therapi:therapi-runtime-javadoc:$therapiVersion"
+        api "com.github.therapi:therapi-runtime-javadoc-scribe:$therapiVersion"
     }
 
 }

@@ -29,12 +29,14 @@ public class ThemeLocaleContextResolver extends AcceptHeaderLocaleContextResolve
 
     public static final String TIME_ZONE_COOKIE_NAME = "time_zone";
 
+
     @Override
     @NonNull
     public LocaleContext resolveLocaleContext(@NonNull ServerWebExchange exchange) {
         var request = exchange.getRequest();
         var locale = getLocaleFromQueryParameter(request)
             .or(() -> getLocaleFromCookie(request))
+            .or(() -> UserLocaleRequestAttributeWriteFilter.getUserLocale(request))
             .orElseGet(() -> super.resolveLocaleContext(exchange).getLocale());
 
         var timeZone = getTimeZoneFromCookie(request)
@@ -62,5 +64,4 @@ public class ThemeLocaleContextResolver extends AcceptHeaderLocaleContextResolve
             .filter(StringUtils::isNotBlank)
             .map(TimeZone::getTimeZone);
     }
-
 }

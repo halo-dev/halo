@@ -119,6 +119,7 @@ public class GlobalInfoServiceImpl implements GlobalInfoService {
         if (basic != null) {
             info.setFavicon(basic.getFavicon());
             info.setSiteTitle(basic.getTitle());
+            basic.useSystemLocale().ifPresent(info::setLocale);
         }
     }
 

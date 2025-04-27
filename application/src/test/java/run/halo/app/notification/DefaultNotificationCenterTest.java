@@ -30,6 +30,8 @@ import run.halo.app.core.extension.notification.ReasonType;
 import run.halo.app.core.extension.notification.Subscription;
 import run.halo.app.extension.Metadata;
 import run.halo.app.extension.ReactiveExtensionClient;
+import run.halo.app.infra.SystemConfigurableEnvironmentFetcher;
+import run.halo.app.infra.SystemSetting;
 
 /**
  * Tests for {@link DefaultNotificationCenter}.
@@ -60,6 +62,9 @@ class DefaultNotificationCenterTest {
 
     @Mock
     private SubscriptionService subscriptionService;
+
+    @Mock
+    private SystemConfigurableEnvironmentFetcher environmentFetcher;
 
     @InjectMocks
     private DefaultNotificationCenter notificationCenter;
@@ -317,6 +322,7 @@ class DefaultNotificationCenterTest {
     void getLocaleFromSubscriberTest() {
         var subscription = mock(Subscriber.class);
 
+        when(environmentFetcher.getBasic()).thenReturn(Mono.just(new SystemSetting.Basic()));
         notificationCenter.getLocaleFromSubscriber(subscription)
             .as(StepVerifier::create)
             .expectNext(Locale.getDefault())
