@@ -45,7 +45,9 @@ import run.halo.app.infra.console.WebSocketRequestPredicate;
 import run.halo.app.infra.properties.AttachmentProperties;
 import run.halo.app.infra.properties.HaloProperties;
 import run.halo.app.infra.webfilter.AdditionalWebFilterChainProxy;
+import run.halo.app.infra.webfilter.LocaleChangeWebFilter;
 import run.halo.app.plugin.extensionpoint.ExtensionGetter;
+import run.halo.app.theme.UserLocaleRequestAttributeWriteFilter;
 
 @Configuration
 public class WebFluxConfig implements WebFluxConfigurer {
@@ -219,15 +221,22 @@ public class WebFluxConfig implements WebFluxConfigurer {
 
     @ConditionalOnProperty(name = "halo.console.proxy.enabled", havingValue = "true")
     @Bean
-    @Order(Ordered.HIGHEST_PRECEDENCE)
+    @Order(Ordered.HIGHEST_PRECEDENCE + 2)
     ProxyFilter consoleProxyFilter() {
         return new ProxyFilter("/console/**", haloProp.getConsole().getProxy());
     }
 
 
+    /**
+     * Order of this filter is higher than
+     * {@link LocaleChangeWebFilter} to allow change locale in dev
+     * mode.
+     * {@link UserLocaleRequestAttributeWriteFilter} is before {@link LocaleChangeWebFilter} to
+     * obtain the locale
+     */
     @ConditionalOnProperty(name = "halo.uc.proxy.enabled", havingValue = "true")
     @Bean
-    @Order(Ordered.HIGHEST_PRECEDENCE)
+    @Order(Ordered.HIGHEST_PRECEDENCE + 2)
     ProxyFilter ucProxyFilter() {
         return new ProxyFilter("/uc/**", haloProp.getUc().getProxy());
     }
