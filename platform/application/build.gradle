@@ -25,6 +25,7 @@ ext {
     imgscalr = '4.2'
     exifExtractor = '2.19.0'
     therapiVersion = '0.13.0'
+    bouncycastleVersion = '1.80'
 }
 
 javaPlatform {
@@ -37,6 +38,7 @@ dependencies {
     constraints {
         api "org.springdoc:springdoc-openapi-starter-webflux-ui:$springDocOpenAPI"
         api 'org.openapi4j:openapi-schema-validator:1.0.7'
+        api "org.bouncycastle:bcpkix-jdk18on:$bouncycastleVersion"
 
         // Apache Lucene
         api "org.apache.lucene:lucene-core:$lucene"

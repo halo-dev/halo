@@ -50,6 +50,7 @@ dependencies {
     api "org.springdoc:springdoc-openapi-starter-webflux-ui"
     api 'org.openapi4j:openapi-schema-validator'
     api "net.bytebuddy:byte-buddy"
+    api "org.bouncycastle:bcpkix-jdk18on"
 
     // Apache Lucene
     api "org.apache.lucene:lucene-core"
