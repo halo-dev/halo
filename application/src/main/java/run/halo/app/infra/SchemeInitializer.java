@@ -343,6 +343,11 @@ public class SchemeInitializer implements ApplicationListener<ApplicationContext
                 .setIndexFunc(simpleAttribute(Tag.class, tag -> tag.getSpec().getSlug()))
             );
             indexSpecs.add(new IndexSpec()
+                .setName("status.postCount")
+                .setIndexFunc(simpleAttribute(Tag.class,
+                    tag -> defaultIfNull(tag.getStatus().getPostCount(), 0).toString()))
+            );
+            indexSpecs.add(new IndexSpec()
                 .setName(Tag.REQUIRE_SYNC_ON_STARTUP_INDEX_NAME)
                 .setIndexFunc(simpleAttribute(Tag.class, tag -> {
                     var version = tag.getMetadata().getVersion();

@@ -68,6 +68,7 @@ core:
             create_time_asc: Earliest Created
             display_name_desc: Descending order by tag name
             display_name_asc: Ascending order by tag name
+            post_desc: Most Posts
     batch_setting_modal:
       title: Post batch settings
       fields:

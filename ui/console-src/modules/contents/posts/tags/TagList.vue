@@ -238,6 +238,10 @@ watch(selectedTagNames, (newVal) => {
                     ),
                     value: 'spec.displayName,asc',
                   },
+                  {
+                    label: t('core.post.tag.filters.sort.items.post_desc'),
+                    value: 'status.postCount,desc',
+                  },
                 ]"
               />
               <div class="flex flex-row gap-2">
