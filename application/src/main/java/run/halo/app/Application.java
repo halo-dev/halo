@@ -4,9 +4,8 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.autoconfigure.integration.IntegrationAutoConfiguration;
 import org.springframework.boot.builder.SpringApplicationBuilder;
 import org.springframework.boot.context.metrics.buffering.BufferingApplicationStartup;
-import org.springframework.boot.context.properties.EnableConfigurationProperties;
+import org.springframework.boot.context.properties.ConfigurationPropertiesScan;
 import org.springframework.scheduling.annotation.EnableScheduling;
-import run.halo.app.infra.properties.HaloProperties;
 
 /**
  * Halo main class.
@@ -19,7 +18,7 @@ import run.halo.app.infra.properties.HaloProperties;
 @EnableScheduling
 @SpringBootApplication(scanBasePackages = "run.halo.app", exclude =
     IntegrationAutoConfiguration.class)
-@EnableConfigurationProperties({HaloProperties.class})
+@ConfigurationPropertiesScan(basePackages = "run.halo.app.infra.properties")
 public class Application {
 
     public static void main(String[] args) {
