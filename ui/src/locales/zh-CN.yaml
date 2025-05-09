@@ -210,6 +210,7 @@ core:
             create_time_asc: 较早创建
             display_name_desc: 标签名降序
             display_name_asc: 标签名升序
+            post_desc: 最多文章量
     batch_setting_modal:
       title: 文章批量设置
       fields:

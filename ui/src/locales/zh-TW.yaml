@@ -231,6 +231,7 @@ core:
             create_time_asc: 較早建立
             display_name_desc: 標籤名稱降序
             display_name_asc: 標籤名稱升序
+            post_desc: 最多文章量
   deleted_post:
     title: 文章回收站
     empty:
