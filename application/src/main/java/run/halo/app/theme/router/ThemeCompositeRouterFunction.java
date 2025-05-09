@@ -4,7 +4,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
-import org.springframework.boot.context.event.ApplicationStartedEvent;
+import org.springframework.boot.context.event.ApplicationReadyEvent;
+import org.springframework.context.SmartLifecycle;
 import org.springframework.context.event.EventListener;
 import org.springframework.lang.NonNull;
 import org.springframework.stereotype.Component;
@@ -37,7 +38,8 @@ import run.halo.app.theme.router.factories.TagsRouteFactory;
  */
 @Component
 @RequiredArgsConstructor
-public class ThemeCompositeRouterFunction implements RouterFunction<ServerResponse> {
+public class ThemeCompositeRouterFunction
+    implements RouterFunction<ServerResponse>, SmartLifecycle {
     private final SystemConfigurableEnvironmentFetcher environmentFetcher;
 
     private final ArchiveRouteFactory archiveRouteFactory;
@@ -50,6 +52,7 @@ public class ThemeCompositeRouterFunction implements RouterFunction<ServerRespon
     private final IndexRouteFactory indexRouteFactory;
 
     private List<RouterFunction<ServerResponse>> cachedRouters = List.of();
+    private volatile boolean running;
 
     @Override
     @NonNull
@@ -99,8 +102,31 @@ public class ThemeCompositeRouterFunction implements RouterFunction<ServerRespon
     }
 
     @EventListener
-    public void onApplicationStarted(ApplicationStartedEvent event) {
+    public void onApplicationStarted(ApplicationReadyEvent event) {
         this.cachedRouters = routerFunctions();
+    }
+
+    @Override
+    public void start() {
+        if (running) {
+            return;
+        }
+        running = true;
+        this.cachedRouters = routerFunctions();
+    }
+
+    @Override
+    public void stop() {
+        if (!running) {
+            return;
+        }
+        running = false;
+        this.cachedRouters = List.of();
+    }
+
+    @Override
+    public boolean isRunning() {
+        return running;
     }
 
     record RoutePattern(DefaultTemplateEnum identifier, String pattern) {

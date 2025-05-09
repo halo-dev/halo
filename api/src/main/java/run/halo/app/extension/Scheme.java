@@ -55,7 +55,8 @@ public record Scheme(Class<? extends Extension> type,
             new GroupVersionKind(gvk.group(), gvk.version(), gvk.kind()),
             gvk.plural(),
             gvk.singular(),
-            schema);
+            // Deep copy for schema to avoid mutation by others.
+            schema.deepCopy());
     }
 
     /**

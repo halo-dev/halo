@@ -1,14 +1,14 @@
 package run.halo.app.extension.gc;
 
-import org.springframework.beans.factory.DisposableBean;
-import org.springframework.context.ApplicationListener;
+import org.springframework.context.SmartLifecycle;
 import org.springframework.stereotype.Component;
 import run.halo.app.extension.controller.Controller;
-import run.halo.app.infra.ExtensionInitializedEvent;
+import run.halo.app.infra.InitializationPhase;
 
 @Component
-public class GcControllerInitializer
-    implements ApplicationListener<ExtensionInitializedEvent>, DisposableBean {
+class GcControllerInitializer implements SmartLifecycle {
+
+    private volatile boolean running;
 
     private final Controller gcController;
 
@@ -17,12 +17,30 @@ public class GcControllerInitializer
     }
 
     @Override
-    public void onApplicationEvent(ExtensionInitializedEvent event) {
+    public void start() {
+        if (running) {
+            return;
+        }
+        running = true;
         gcController.start();
     }
 
     @Override
-    public void destroy() throws Exception {
+    public void stop() {
+        if (!running) {
+            return;
+        }
+        running = false;
         gcController.dispose();
+    }
+
+    @Override
+    public boolean isRunning() {
+        return running;
+    }
+
+    @Override
+    public int getPhase() {
+        return InitializationPhase.GC_CONTROLLER.getPhase();
     }
 }

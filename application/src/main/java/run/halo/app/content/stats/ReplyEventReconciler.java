@@ -30,6 +30,7 @@ import run.halo.app.extension.controller.Reconciler;
 import run.halo.app.extension.controller.RequestQueue;
 import run.halo.app.extension.index.query.Query;
 import run.halo.app.extension.router.selector.FieldSelector;
+import run.halo.app.infra.InitializationPhase;
 
 /**
  * Update the comment status after receiving the reply event.
@@ -148,6 +149,11 @@ public class ReplyEventReconciler
     @Override
     public boolean isRunning() {
         return this.running;
+    }
+
+    @Override
+    public int getPhase() {
+        return InitializationPhase.CONTROLLERS.getPhase();
     }
 
     @EventListener(ReplyEvent.class)

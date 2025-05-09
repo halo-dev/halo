@@ -14,14 +14,8 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
-import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.Predicate;
-import lombok.NonNull;
-import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.boot.availability.AvailabilityChangeEvent;
-import org.springframework.context.ApplicationEventPublisher;
-import org.springframework.context.event.ContextRefreshedEvent;
 import org.springframework.context.event.EventListener;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.data.domain.Sort;
@@ -33,10 +27,9 @@ import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import reactor.core.scheduler.Schedulers;
 import reactor.util.retry.Retry;
-import run.halo.app.extension.availability.IndexBuildState;
+import run.halo.app.extension.event.IndexerBuiltEvent;
+import run.halo.app.extension.event.SchemeRemovedEvent;
 import run.halo.app.extension.exception.ExtensionNotFoundException;
-import run.halo.app.extension.index.DefaultExtensionIterator;
-import run.halo.app.extension.index.ExtensionIterator;
 import run.halo.app.extension.index.IndexedQueryEngine;
 import run.halo.app.extension.index.IndexerFactory;
 import run.halo.app.extension.store.ReactiveExtensionStoreClient;
@@ -61,8 +54,11 @@ public class ReactiveExtensionClientImpl implements ReactiveExtensionClient {
 
     private final IndexedQueryEngine indexedQueryEngine;
 
-    private final ConcurrentMap<GroupKind, AtomicBoolean> indexBuildingState =
-        new ConcurrentHashMap<>();
+    /**
+     * The indexer building state map, the key is the group kind, and the value indicates whether
+     * the indexer is built.
+     */
+    private final ConcurrentMap<GroupKind, Boolean> indexerBuiltMap = new ConcurrentHashMap<>();
 
     private TransactionalOperator transactionalOperator;
 
@@ -409,16 +405,21 @@ public class ReactiveExtensionClientImpl implements ReactiveExtensionClient {
      * extension, otherwise the {@link IllegalStateException} will be thrown.
      */
     private <E extends Extension> void checkClientWritable(E extension) {
-        var buildingState = indexBuildingState.get(extension.groupVersionKind().groupKind());
-        if (buildingState != null && buildingState.get()) {
+        var built = indexerBuiltMap.get(extension.groupVersionKind().groupKind());
+        if (built == null || !built) {
             throw new IllegalStateException("Index is building for " + extension.groupVersionKind()
                 + ", please wait for a moment and try again.");
         }
     }
 
-    void setIndexBuildingStateFor(GroupKind groupKind, boolean building) {
-        indexBuildingState.computeIfAbsent(groupKind, k -> new AtomicBoolean(building))
-            .set(building);
+    @EventListener
+    void onIndexerBuiltEvent(IndexerBuiltEvent event) {
+        this.indexerBuiltMap.put(event.getScheme().groupVersionKind().groupKind(), true);
+    }
+
+    @EventListener
+    void onSchemeRemovedEvent(SchemeRemovedEvent event) {
+        this.indexerBuiltMap.remove(event.getScheme().groupVersionKind().groupKind());
     }
 
     @Override
@@ -449,71 +450,4 @@ public class ReactiveExtensionClientImpl implements ReactiveExtensionClient {
         return true;
     }
 
-    @Component
-    @RequiredArgsConstructor
-    class IndexBuildsManager {
-        private final SchemeManager schemeManager;
-        private final IndexerFactory indexerFactory;
-        private final ExtensionConverter converter;
-        private final ReactiveExtensionStoreClient client;
-        private final SchemeWatcherManager schemeWatcherManager;
-        private final ApplicationEventPublisher eventPublisher;
-
-        @NonNull
-        private ExtensionIterator<Extension> createExtensionIterator(Scheme scheme) {
-            var type = scheme.type();
-            var prefix = ExtensionStoreUtil.buildStoreNamePrefix(scheme);
-            return new DefaultExtensionIterator<>(pageable ->
-                client.listByNamePrefix(prefix, pageable)
-                    .map(page ->
-                        page.map(store -> (Extension) converter.convertFrom(type, store))
-                    )
-                    .block()
-            );
-        }
-
-        @EventListener(ContextRefreshedEvent.class)
-        public void startBuildingIndex() {
-            AvailabilityChangeEvent.publish(eventPublisher, this, IndexBuildState.BUILDING);
-
-            final long startTimeMs = System.currentTimeMillis();
-            log.info("Start building index for all extensions, please wait...");
-            schemeManager.schemes()
-                .forEach(this::createIndexerFor);
-
-            schemeWatcherManager.register(event -> {
-                if (event instanceof SchemeWatcherManager.SchemeRegistered schemeRegistered) {
-                    createIndexerFor(schemeRegistered.getNewScheme());
-                    return;
-                }
-                if (event instanceof SchemeWatcherManager.SchemeUnregistered schemeUnregistered) {
-                    var scheme = schemeUnregistered.getDeletedScheme();
-                    indexerFactory.removeIndexer(scheme);
-                }
-            });
-
-            AvailabilityChangeEvent.publish(eventPublisher, this, IndexBuildState.BUILT);
-            log.info("Successfully built index in {}ms, Preparing to lunch application...",
-                System.currentTimeMillis() - startTimeMs);
-        }
-
-        private void createIndexerFor(Scheme scheme) {
-            setIndexBuildingStateFor(scheme.groupVersionKind().groupKind(), true);
-            var iterator = createExtensionIterator(scheme);
-            indexerFactory.createIndexerFor(scheme.type(), iterator);
-            // ensure data count matches index count
-            var prefix = ExtensionStoreUtil.buildStoreNamePrefix(scheme);
-            var indexedSize = indexedQueryEngine.retrieveAll(scheme.groupVersionKind(),
-                new ListOptions(), Sort.unsorted()).size();
-            long count = client.countByNamePrefix(prefix).blockOptional().orElseThrow();
-            if (count != iterator.size() || count != indexedSize) {
-                log.error("indexedSize: {}, count in db: {}, iterate size: {}", indexedSize, count,
-                    iterator.size());
-                throw new IllegalStateException("The number of indexed records is not equal to the "
-                    + "number of records in the database, this is a serious error, please submit "
-                    + "an issue to halo.");
-            }
-            setIndexBuildingStateFor(scheme.groupVersionKind().groupKind(), false);
-        }
-    }
 }

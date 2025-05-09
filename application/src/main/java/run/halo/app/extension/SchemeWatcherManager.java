@@ -2,7 +2,15 @@ package run.halo.app.extension;
 
 import java.util.List;
 import org.springframework.lang.NonNull;
+import run.halo.app.extension.event.SchemeAddedEvent;
+import run.halo.app.extension.event.SchemeRemovedEvent;
 
+/**
+ * Manages scheme watchers.
+ *
+ * @deprecated Please listen to {@link SchemeAddedEvent} and {@link SchemeRemovedEvent} instead.
+ */
+@Deprecated
 public interface SchemeWatcherManager {
 
     void register(@NonNull SchemeWatcher watcher);
@@ -17,10 +25,12 @@ public interface SchemeWatcherManager {
 
     }
 
+    @Deprecated
     interface ChangeEvent {
 
     }
 
+    @Deprecated
     class SchemeRegistered implements ChangeEvent {
         private final Scheme newScheme;
 
@@ -33,6 +43,7 @@ public interface SchemeWatcherManager {
         }
     }
 
+    @Deprecated
     class SchemeUnregistered implements ChangeEvent {
 
         private final Scheme deletedScheme;
