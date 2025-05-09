@@ -39,6 +39,7 @@ import run.halo.app.core.extension.content.Post;
 import run.halo.app.extension.MetadataUtil;
 import run.halo.app.extension.ReactiveExtensionClient;
 import run.halo.app.extension.index.query.QueryFactory;
+import run.halo.app.infra.exception.NotFoundException;
 import run.halo.app.infra.utils.JsonUtils;
 import run.halo.app.theme.DefaultTemplateEnum;
 import run.halo.app.theme.ViewNameResolver;
@@ -105,7 +106,8 @@ public class PostRouteFactory implements RouteFactory {
     HandlerFunction<ServerResponse> handlerFunction() {
         return request -> {
             PostPatternVariable patternVariable = PostPatternVariable.from(request);
-            return postResponse(request, patternVariable);
+            return postResponse(request, patternVariable)
+                .switchIfEmpty(Mono.error(() -> new NotFoundException("Post not found.")));
         };
     }
 
