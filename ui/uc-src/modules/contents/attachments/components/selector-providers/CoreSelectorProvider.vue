@@ -16,6 +16,7 @@ import {
   VButton,
   VCard,
   VEmpty,
+  VEntityContainer,
   VLoading,
   VPagination,
   VSpace,
@@ -415,12 +416,11 @@ const handleSelectNext = async () => {
       </div>
     </Transition>
     <Transition v-if="viewType === 'list'" appear name="fade">
-      <ul
-        class="box-border h-full w-full divide-y divide-gray-100 overflow-hidden rounded-base border"
-        role="list"
-      >
-        <li v-for="attachment in data.items" :key="attachment.metadata.name">
+      <div class="overflow-hidden rounded-base border">
+        <VEntityContainer>
           <AttachmentSelectorListItem
+            v-for="attachment in data.items"
+            :key="attachment.metadata.name"
             :attachment="attachment"
             :is-selected="isChecked(attachment)"
             @select="handleSelect"
@@ -435,8 +435,8 @@ const handleSelectNext = async () => {
               />
             </template>
           </AttachmentSelectorListItem>
-        </li>
-      </ul>
+        </VEntityContainer>
+      </div>
     </Transition>
   </div>
 

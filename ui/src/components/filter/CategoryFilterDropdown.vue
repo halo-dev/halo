@@ -6,6 +6,7 @@ import {
   IconArrowDown,
   VDropdown,
   VEntity,
+  VEntityContainer,
   VEntityField,
 } from "@halo-dev/components";
 import Fuse from "fuse.js";
@@ -106,34 +107,30 @@ const selectedCategory = computed(() => {
           ></FormKit>
         </div>
         <div>
-          <ul
-            class="box-border h-full w-full divide-y divide-gray-100"
-            role="list"
-          >
-            <li
-              v-for="(category, index) in searchResults"
-              :key="index"
+          <VEntityContainer>
+            <VEntity
+              v-for="category in searchResults"
+              :key="category.metadata.name"
+              :is-selected="modelValue === category.metadata.name"
               @click="handleSelect(category)"
             >
-              <VEntity :is-selected="modelValue === category.metadata.name">
-                <template #start>
-                  <VEntityField
-                    :title="category.spec.displayName"
-                    :description="category.status?.permalink"
-                  />
-                </template>
-                <template #end>
-                  <VEntityField
-                    :description="
-                      $t('core.common.fields.post_count', {
-                        count: category.status?.postCount || 0,
-                      })
-                    "
-                  />
-                </template>
-              </VEntity>
-            </li>
-          </ul>
+              <template #start>
+                <VEntityField
+                  :title="category.spec.displayName"
+                  :description="category.status?.permalink"
+                />
+              </template>
+              <template #end>
+                <VEntityField
+                  :description="
+                    $t('core.common.fields.post_count', {
+                      count: category.status?.postCount || 0,
+                    })
+                  "
+                />
+              </template>
+            </VEntity>
+          </VEntityContainer>
         </div>
       </div>
     </template>

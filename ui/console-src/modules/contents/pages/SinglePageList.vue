@@ -14,6 +14,7 @@ import {
   VButton,
   VCard,
   VEmpty,
+  VEntityContainer,
   VLoading,
   VPageHeader,
   VPagination,
@@ -444,21 +445,15 @@ watch(selectedPageNames, (newValue) => {
         </VEmpty>
       </Transition>
       <Transition v-else appear name="fade">
-        <ul
-          class="box-border h-full w-full divide-y divide-gray-100"
-          role="list"
-        >
-          <li
+        <VEntityContainer>
+          <SinglePageListItem
             v-for="singlePage in singlePages"
             :key="singlePage.page.metadata.name"
-          >
-            <SinglePageListItem
-              :single-page="singlePage"
-              :is-selected="checkSelection(singlePage.page)"
-              @open-setting-modal="handleOpenSettingModal"
-            />
-          </li>
-        </ul>
+            :single-page="singlePage"
+            :is-selected="checkSelection(singlePage.page)"
+            @open-setting-modal="handleOpenSettingModal"
+          />
+        </VEntityContainer>
       </Transition>
 
       <template #footer>
