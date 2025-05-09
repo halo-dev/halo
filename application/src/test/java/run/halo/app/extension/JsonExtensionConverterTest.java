@@ -11,11 +11,16 @@ import java.util.Locale;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.context.ApplicationEventPublisher;
 import run.halo.app.extension.exception.ExtensionConvertException;
 import run.halo.app.extension.exception.SchemaViolationException;
 import run.halo.app.extension.index.IndexSpecRegistry;
 import run.halo.app.extension.store.ExtensionStore;
 
+@ExtendWith(MockitoExtension.class)
 class JsonExtensionConverterTest {
 
     JSONExtensionConverter converter;
@@ -24,13 +29,16 @@ class JsonExtensionConverterTest {
 
     Locale localeDefault;
 
+    @Mock
+    ApplicationEventPublisher eventPublisher;
+
     @BeforeEach
     void setUp() {
         localeDefault = Locale.getDefault();
         Locale.setDefault(Locale.ENGLISH);
         var indexSpecRegistry = mock(IndexSpecRegistry.class);
 
-        DefaultSchemeManager schemeManager = new DefaultSchemeManager(indexSpecRegistry, null);
+        var schemeManager = new DefaultSchemeManager(indexSpecRegistry, eventPublisher);
         converter = new JSONExtensionConverter(schemeManager);
         objectMapper = converter.getObjectMapper();
 

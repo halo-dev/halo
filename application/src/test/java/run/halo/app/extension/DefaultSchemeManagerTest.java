@@ -7,20 +7,16 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.isA;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
 
-import java.util.List;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import run.halo.app.extension.SchemeWatcherManager.SchemeRegistered;
-import run.halo.app.extension.SchemeWatcherManager.SchemeUnregistered;
-import run.halo.app.extension.SchemeWatcherManager.SchemeWatcher;
+import org.springframework.context.ApplicationEventPublisher;
+import run.halo.app.extension.event.SchemeAddedEvent;
+import run.halo.app.extension.event.SchemeRemovedEvent;
 import run.halo.app.extension.exception.SchemeNotFoundException;
 import run.halo.app.extension.index.IndexSpecRegistry;
 
@@ -31,7 +27,7 @@ class DefaultSchemeManagerTest {
     private IndexSpecRegistry indexSpecRegistry;
 
     @Mock
-    SchemeWatcherManager watcherManager;
+    ApplicationEventPublisher eventPublisher;
 
     @InjectMocks
     DefaultSchemeManager schemeManager;
@@ -80,36 +76,22 @@ class DefaultSchemeManagerTest {
 
     @Test
     void shouldTriggerOnChangeOnlyOnceWhenRegisterTwice() {
-        final var watcher = mock(SchemeWatcher.class);
-        when(watcherManager.watchers()).thenReturn(List.of(watcher));
-
         schemeManager.register(FakeExtension.class);
-        verify(watcherManager, times(1)).watchers();
-        verify(watcher, times(1)).onChange(isA(SchemeRegistered.class));
-
         schemeManager.register(FakeExtension.class);
-        verify(watcherManager, times(1)).watchers();
-        verify(watcher, times(1)).onChange(isA(SchemeRegistered.class));
+
+        verify(eventPublisher).publishEvent(isA(SchemeAddedEvent.class));
         verify(indexSpecRegistry).indexFor(any(Scheme.class));
     }
 
     @Test
     void shouldTriggerOnChangeOnlyOnceWhenUnregisterTwice() {
-
-        final var watcher = mock(SchemeWatcher.class);
-        when(watcherManager.watchers()).thenReturn(List.of(watcher));
-
         schemeManager.register(FakeExtension.class);
-
         var scheme = schemeManager.get(FakeExtension.class);
-
         schemeManager.unregister(scheme);
-        verify(watcherManager, times(2)).watchers();
-        verify(watcher, times(1)).onChange(isA(SchemeUnregistered.class));
-
         schemeManager.unregister(scheme);
-        verify(watcherManager, times(2)).watchers();
-        verify(watcher, times(1)).onChange(isA(SchemeUnregistered.class));
+
+        verify(eventPublisher).publishEvent(isA(SchemeAddedEvent.class));
+        verify(eventPublisher).publishEvent(isA(SchemeRemovedEvent.class));
         verify(indexSpecRegistry).indexFor(any(Scheme.class));
     }
 

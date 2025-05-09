@@ -4,6 +4,7 @@ import java.util.Objects;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 import org.springframework.lang.NonNull;
+import org.springframework.stereotype.Component;
 import run.halo.app.extension.Extension;
 import run.halo.app.extension.ExtensionStoreUtil;
 import run.halo.app.extension.Scheme;
@@ -14,6 +15,7 @@ import run.halo.app.extension.Scheme;
  * @author guqing
  * @since 2.12.0
  */
+@Component
 public class IndexSpecRegistryImpl implements IndexSpecRegistry {
     private final ConcurrentMap<String, IndexSpecs> extensionIndexSpecs = new ConcurrentHashMap<>();
 

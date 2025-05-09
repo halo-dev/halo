@@ -16,7 +16,7 @@ import run.halo.app.extension.Extension;
  * @since 2.12.0
  */
 public class DefaultExtensionIterator<E extends Extension> implements ExtensionIterator<E> {
-    static final int DEFAULT_PAGE_SIZE = 500;
+    static final int DEFAULT_PAGE_SIZE = 100;
     private final ExtensionPaginatedLister<E> lister;
     private Pageable currentPageable;
     private List<E> currentData;

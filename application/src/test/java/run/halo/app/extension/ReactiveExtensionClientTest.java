@@ -45,6 +45,7 @@ import reactor.core.Exceptions;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import reactor.test.StepVerifier;
+import run.halo.app.extension.event.IndexerBuiltEvent;
 import run.halo.app.extension.exception.SchemeNotFoundException;
 import run.halo.app.extension.index.Indexer;
 import run.halo.app.extension.index.IndexerFactory;
@@ -88,6 +89,7 @@ class ReactiveExtensionClientTest {
         client.setTransactionalOperator(transactionalOperator);
         lenient().when(transactionalOperator.transactional(any(Mono.class)))
             .thenAnswer(invocation -> invocation.getArgument(0));
+        client.onIndexerBuiltEvent(new IndexerBuiltEvent(this, fakeScheme));
     }
 
     FakeExtension createFakeExtension(String name, Long version) {

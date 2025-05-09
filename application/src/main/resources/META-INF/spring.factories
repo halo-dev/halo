@@ -1,1 +1,0 @@
-org.springframework.context.ApplicationListener=run.halo.app.infra.SchemeInitializer

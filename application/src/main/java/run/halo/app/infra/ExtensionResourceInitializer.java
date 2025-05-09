@@ -6,9 +6,8 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.boot.context.event.ApplicationStartedEvent;
 import org.springframework.context.ApplicationEventPublisher;
-import org.springframework.context.ApplicationListener;
+import org.springframework.context.SmartLifecycle;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.support.PathMatchingResourcePatternResolver;
 import org.springframework.stereotype.Component;
@@ -31,7 +30,9 @@ import run.halo.app.infra.utils.YamlUnstructuredLoader;
  */
 @Slf4j
 @Component
-public class ExtensionResourceInitializer implements ApplicationListener<ApplicationStartedEvent> {
+public class ExtensionResourceInitializer implements SmartLifecycle {
+
+    private volatile boolean running;
 
     public static final Set<String> REQUIRED_EXTENSION_LOCATIONS =
         Set.of("classpath:/extensions/*.yaml", "classpath:/extensions/*.yml");
@@ -48,7 +49,12 @@ public class ExtensionResourceInitializer implements ApplicationListener<Applica
         this.eventPublisher = eventPublisher;
     }
 
-    public void onApplicationEvent(ApplicationStartedEvent initializedEvent) {
+    @Override
+    public void start() {
+        if (running) {
+            return;
+        }
+        running = true;
         var locations = new HashSet<String>();
         if (!haloProperties.isRequiredExtensionDisabled()) {
             locations.addAll(REQUIRED_EXTENSION_LOCATIONS);
@@ -84,9 +90,29 @@ public class ExtensionResourceInitializer implements ApplicationListener<Applica
                 }
             })
             .then(Mono.fromRunnable(
-                () -> eventPublisher.publishEvent(new ExtensionInitializedEvent(this))))
+                () -> eventPublisher.publishEvent(new ExtensionInitializedEvent(this)))
+            )
             .block(Duration.ofMinutes(1));
     }
+
+    @Override
+    public void stop() {
+        if (!running) {
+            return;
+        }
+        running = false;
+    }
+
+    @Override
+    public boolean isRunning() {
+        return running;
+    }
+
+    @Override
+    public int getPhase() {
+        return InitializationPhase.EXTENSION_RESOURCES.getPhase();
+    }
+
 
     private Mono<Unstructured> createOrUpdate(Unstructured extension) {
         return Mono.just(extension)

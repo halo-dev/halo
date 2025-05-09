@@ -14,10 +14,8 @@ import java.util.Set;
 import java.util.function.Consumer;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.boot.context.event.ApplicationStartedEvent;
-import org.springframework.context.ApplicationListener;
-import org.springframework.lang.NonNull;
-import org.springframework.scheduling.annotation.Async;
+import org.springframework.boot.ApplicationArguments;
+import org.springframework.boot.ApplicationRunner;
 import org.springframework.stereotype.Component;
 import reactor.core.publisher.Mono;
 import run.halo.app.core.extension.User;
@@ -38,15 +36,14 @@ import run.halo.app.infra.ReactiveExtensionPaginatedOperatorImpl;
 @Slf4j
 @Component
 @RequiredArgsConstructor
-public class SubscriptionMigration implements ApplicationListener<ApplicationStartedEvent> {
+public class SubscriptionMigration implements ApplicationRunner {
     private final NotificationCenter notificationCenter;
     private final ReactiveExtensionClient client;
     private final SubscriptionService subscriptionService;
     private final ReactiveExtensionPaginatedOperator paginatedOperator;
 
     @Override
-    @Async
-    public void onApplicationEvent(@NonNull ApplicationStartedEvent event) {
+    public void run(ApplicationArguments args) throws Exception {
         handleAnonymousSubscription();
         cleanupUserSubscription();
     }

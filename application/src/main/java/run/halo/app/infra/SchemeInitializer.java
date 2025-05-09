@@ -15,9 +15,7 @@ import java.util.Set;
 import java.util.stream.Collectors;
 import org.apache.commons.lang3.BooleanUtils;
 import org.apache.commons.lang3.StringUtils;
-import org.springframework.boot.context.event.ApplicationContextInitializedEvent;
-import org.springframework.context.ApplicationListener;
-import org.springframework.lang.NonNull;
+import org.springframework.context.SmartLifecycle;
 import org.springframework.stereotype.Component;
 import run.halo.app.content.Stats;
 import run.halo.app.core.attachment.extension.LocalThumbnail;
@@ -56,13 +54,11 @@ import run.halo.app.core.extension.notification.Reason;
 import run.halo.app.core.extension.notification.ReasonType;
 import run.halo.app.core.extension.notification.Subscription;
 import run.halo.app.extension.ConfigMap;
-import run.halo.app.extension.DefaultSchemeManager;
-import run.halo.app.extension.DefaultSchemeWatcherManager;
 import run.halo.app.extension.MetadataOperator;
 import run.halo.app.extension.MetadataUtil;
+import run.halo.app.extension.SchemeManager;
 import run.halo.app.extension.Secret;
 import run.halo.app.extension.index.IndexSpec;
-import run.halo.app.extension.index.IndexSpecRegistryImpl;
 import run.halo.app.infra.utils.JsonUtils;
 import run.halo.app.migration.Backup;
 import run.halo.app.plugin.extensionpoint.ExtensionDefinition;
@@ -71,12 +67,22 @@ import run.halo.app.search.extension.SearchEngine;
 import run.halo.app.security.PersonalAccessToken;
 
 @Component
-public class SchemeInitializer implements ApplicationListener<ApplicationContextInitializedEvent> {
+class SchemeInitializer implements SmartLifecycle {
+
+    private final SchemeManager schemeManager;
+
+    private volatile boolean running;
+
+    public SchemeInitializer(SchemeManager schemeManager) {
+        this.schemeManager = schemeManager;
+    }
 
     @Override
-    public void onApplicationEvent(@NonNull ApplicationContextInitializedEvent event) {
-        var schemeManager = createSchemeManager(event);
-
+    public void start() {
+        if (running) {
+            return;
+        }
+        running = true;
         schemeManager.register(Role.class, is -> {
             is.add(new IndexSpec()
                 .setName("labels.aggregateToRoles")
@@ -759,16 +765,22 @@ public class SchemeInitializer implements ApplicationListener<ApplicationContext
         });
     }
 
-    private static DefaultSchemeManager createSchemeManager(
-        ApplicationContextInitializedEvent event) {
-        var indexSpecRegistry = new IndexSpecRegistryImpl();
-        var watcherManager = new DefaultSchemeWatcherManager();
-        var schemeManager = new DefaultSchemeManager(indexSpecRegistry, watcherManager);
+    @Override
+    public void stop() {
+        if (!running) {
+            return;
+        }
+        running = false;
+        schemeManager.schemes().forEach(schemeManager::unregister);
+    }
 
-        var beanFactory = event.getApplicationContext().getBeanFactory();
-        beanFactory.registerSingleton("indexSpecRegistry", indexSpecRegistry);
-        beanFactory.registerSingleton("schemeWatcherManager", watcherManager);
-        beanFactory.registerSingleton("schemeManager", schemeManager);
-        return schemeManager;
+    @Override
+    public boolean isRunning() {
+        return running;
+    }
+
+    @Override
+    public int getPhase() {
+        return InitializationPhase.SCHEME.getPhase();
     }
 }

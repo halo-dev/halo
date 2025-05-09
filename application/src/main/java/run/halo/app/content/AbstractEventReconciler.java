@@ -9,6 +9,7 @@ import run.halo.app.extension.controller.DefaultController;
 import run.halo.app.extension.controller.DefaultQueue;
 import run.halo.app.extension.controller.Reconciler;
 import run.halo.app.extension.controller.RequestQueue;
+import run.halo.app.infra.InitializationPhase;
 
 /**
  * An abstract class for reconciling events.
@@ -58,5 +59,10 @@ public abstract class AbstractEventReconciler<E> implements Reconciler<E>, Smart
     @Override
     public boolean isRunning() {
         return running;
+    }
+
+    @Override
+    public int getPhase() {
+        return InitializationPhase.CONTROLLERS.getPhase();
     }
 }

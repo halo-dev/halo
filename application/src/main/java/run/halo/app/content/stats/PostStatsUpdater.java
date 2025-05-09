@@ -16,6 +16,7 @@ import run.halo.app.extension.controller.DefaultController;
 import run.halo.app.extension.controller.DefaultQueue;
 import run.halo.app.extension.controller.Reconciler;
 import run.halo.app.extension.controller.RequestQueue;
+import run.halo.app.infra.InitializationPhase;
 import run.halo.app.infra.utils.JsonUtils;
 
 @Component
@@ -70,6 +71,11 @@ public class PostStatsUpdater implements Reconciler<PostStatsUpdater.StatsReques
     @Override
     public boolean isRunning() {
         return this.running;
+    }
+
+    @Override
+    public int getPhase() {
+        return InitializationPhase.CONTROLLERS.getPhase();
     }
 
     @EventListener(PostStatsChangedEvent.class)

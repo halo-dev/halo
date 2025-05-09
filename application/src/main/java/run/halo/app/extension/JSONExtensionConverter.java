@@ -1,29 +1,27 @@
 package run.halo.app.extension;
 
-import static org.openapi4j.core.validation.ValidationSeverity.ERROR;
-import static org.springframework.util.StringUtils.arrayToCommaDelimitedString;
 import static run.halo.app.extension.ExtensionStoreUtil.buildStoreName;
 import static run.halo.app.extension.Unstructured.OBJECT_MAPPER;
 
-import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.Optional;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentMap;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import org.openapi4j.core.exception.ResolutionException;
 import org.openapi4j.core.model.v3.OAI3;
 import org.openapi4j.core.model.v3.OAI3Context;
-import org.openapi4j.core.validation.ValidationResult;
-import org.openapi4j.core.validation.ValidationResults;
-import org.openapi4j.schema.validator.BaseJsonValidator;
 import org.openapi4j.schema.validator.ValidationContext;
 import org.openapi4j.schema.validator.ValidationData;
 import org.openapi4j.schema.validator.v3.SchemaValidator;
+import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Component;
-import org.springframework.util.StringUtils;
+import reactor.core.Exceptions;
+import run.halo.app.extension.event.SchemeRemovedEvent;
 import run.halo.app.extension.exception.ExtensionConvertException;
 import run.halo.app.extension.exception.SchemaViolationException;
 import run.halo.app.extension.store.ExtensionStore;
@@ -41,6 +39,8 @@ public class JSONExtensionConverter implements ExtensionConverter {
     public final ObjectMapper objectMapper;
 
     private final SchemeManager schemeManager;
+
+    private final ConcurrentMap<Scheme, SchemaValidator> validatorMap = new ConcurrentHashMap<>();
 
     public JSONExtensionConverter(SchemeManager schemeManager) {
         this.schemeManager = schemeManager;
@@ -93,51 +93,41 @@ public class JSONExtensionConverter implements ExtensionConverter {
         }
     }
 
-    private SchemaValidator getValidator(Scheme scheme)
-        throws MalformedURLException, ResolutionException {
-        var context = new ValidationContext<OAI3>(
-            new OAI3Context(new URL("file:/"), scheme.openApiSchema()));
-        context.setFastFail(false);
-        return new SchemaValidator(context, null, scheme.openApiSchema());
+    @EventListener
+    void onSchemeRemovedEvent(SchemeRemovedEvent event) {
+        var removed = validatorMap.remove(event.getScheme());
+        if (log.isDebugEnabled()) {
+            if (removed == null) {
+                log.debug("No available validator found while removing validator for scheme: {}",
+                    event.getScheme().groupVersionKind()
+                );
+            } else {
+                log.debug("Removed schema validator {} for scheme: {}",
+                    removed, event.getScheme().groupVersionKind()
+                );
+            }
+        }
     }
 
-    public static class ExtraValidationValidator extends BaseJsonValidator<OAI3> {
-
-        private String[] fieldNames;
-
-        private static final ValidationResult ERR =
-            new ValidationResult(ERROR, 1100, "Fields '%s' should not be blank at the same time");
-
-        private static final ValidationResults.CrumbInfo CRUMB_INFO =
-            new ValidationResults.CrumbInfo("not-blank-at-least-one", true);
-
-        protected ExtraValidationValidator(ValidationContext<OAI3> context,
-            JsonNode schemaNode, JsonNode schemaParentNode,
-            SchemaValidator parentSchema) {
-            super(context, schemaNode, schemaParentNode, parentSchema);
-
-            var withNode = schemaNode.get("not-blank-at-least-one");
-            if (withNode != null && withNode.isTextual()) {
-                fieldNames = StringUtils.commaDelimitedListToStringArray(withNode.asText());
-                withNode.asText();
-            }
-        }
-
-        @Override
-        public boolean validate(JsonNode valueNode, ValidationData<?> validation) {
-            if (fieldNames == null) {
-                return false;
-            }
-            for (var fieldName : fieldNames) {
-                JsonNode value = valueNode.get(fieldName);
-                if (value != null && value.isTextual() && StringUtils.hasText(value.asText())) {
-                    return false;
+    private SchemaValidator getValidator(Scheme scheme)
+        throws MalformedURLException, ResolutionException {
+        return validatorMap.computeIfAbsent(scheme, s -> {
+            try {
+                var context = new ValidationContext<OAI3>(
+                    new OAI3Context(new URL("file:/"), scheme.openApiSchema())
+                );
+                context.setFastFail(false);
+                var validator = new SchemaValidator(context, null, scheme.openApiSchema());
+                if (log.isDebugEnabled()) {
+                    log.debug("Created schema validator {} for scheme: {}",
+                        validator, scheme.groupVersionKind()
+                    );
                 }
+                return validator;
+            } catch (ResolutionException | MalformedURLException e) {
+                throw Exceptions.propagate(e);
             }
-            // or all of them are blank string
-            validation.add(CRUMB_INFO, ERR, arrayToCommaDelimitedString(fieldNames));
-            return false;
-        }
+        });
     }
 
 }
