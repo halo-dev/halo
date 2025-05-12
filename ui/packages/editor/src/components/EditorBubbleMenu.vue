@@ -3,7 +3,7 @@ import BubbleItem from "@/components/bubble/BubbleItem.vue";
 import BubbleMenu from "@/components/bubble/BubbleMenu.vue";
 import type { EditorState, EditorView } from "@/tiptap/pm";
 import type { AnyExtension, Editor } from "@/tiptap/vue-3";
-import type { NodeBubbleMenu } from "@/types";
+import type { NodeBubbleMenuType } from "@/types";
 import type { PropType } from "vue";
 
 const props = defineProps({
@@ -25,7 +25,7 @@ const getBubbleMenuFromExtensions = () => {
 
       const nodeBubbleMenu = getBubbleMenu({
         editor: props.editor,
-      }) as NodeBubbleMenu;
+      }) as NodeBubbleMenuType;
 
       if (nodeBubbleMenu.items) {
         nodeBubbleMenu.items = nodeBubbleMenu.items.sort(
@@ -35,7 +35,7 @@ const getBubbleMenuFromExtensions = () => {
 
       return nodeBubbleMenu;
     })
-    .filter(Boolean) as NodeBubbleMenu[];
+    .filter(Boolean) as NodeBubbleMenuType[];
 };
 
 const shouldShow = (
@@ -48,7 +48,7 @@ const shouldShow = (
     from?: number;
     to?: number;
   },
-  bubbleMenu: NodeBubbleMenu
+  bubbleMenu: NodeBubbleMenuType
 ) => {
   if (!props.editor.isEditable) {
     return false;

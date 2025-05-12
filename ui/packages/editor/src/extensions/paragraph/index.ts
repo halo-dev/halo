@@ -10,7 +10,7 @@ import {
   type Dispatch,
   type Editor,
 } from "@/tiptap";
-import type { ExtensionOptions, ToolbarItem as TypeToolbarItem } from "@/types";
+import type { ExtensionOptions, ToolbarItemType } from "@/types";
 import { deleteNodeByPos } from "@/utils";
 import { isListActive } from "@/utils/isListActive";
 import { isEmpty } from "@/utils/isNodeEmpty";
@@ -59,7 +59,7 @@ const Paragraph = TiptapParagraph.extend<ExtensionOptions & ParagraphOptions>({
           allowPropagationDownward: true,
         };
       },
-      getToolbarItems({ editor }: { editor: Editor }): TypeToolbarItem {
+      getToolbarItems({ editor }: { editor: Editor }): ToolbarItemType {
         return {
           priority: 220,
           component: markRaw(ToolbarItem),

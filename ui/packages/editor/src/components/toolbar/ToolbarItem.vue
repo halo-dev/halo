@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import type { ToolbarItem } from "@/types";
+import type { ToolbarItemType } from "@/types";
 import { vTooltip } from "floating-vue";
 import type { Component } from "vue";
 import MdiMenuDown from "~icons/mdi/menu-down";
@@ -11,7 +11,7 @@ withDefaults(
     title?: string;
     action?: () => void;
     icon?: Component;
-    children?: ToolbarItem[];
+    children?: ToolbarItemType[];
   }>(),
   {
     isActive: false,

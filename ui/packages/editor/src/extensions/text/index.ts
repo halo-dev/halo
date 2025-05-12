@@ -5,7 +5,7 @@ import { RangeSelection } from "@/extensions/range-selection";
 import { i18n } from "@/locales";
 import type { EditorState } from "@/tiptap/pm";
 import { isActive, isTextSelection } from "@/tiptap/vue-3";
-import type { ExtensionOptions, NodeBubbleMenu } from "@/types";
+import type { ExtensionOptions, NodeBubbleMenuType } from "@/types";
 import { Text as TiptapText } from "@tiptap/extension-text";
 import { markRaw } from "vue";
 import MdiCodeTags from "~icons/mdi/code-tags";
@@ -32,7 +32,7 @@ const Text = TiptapText.extend<ExtensionOptions>({
   addOptions() {
     return {
       ...this.parent?.(),
-      getBubbleMenu(): NodeBubbleMenu {
+      getBubbleMenu(): NodeBubbleMenuType {
         return {
           pluginKey: "textBubbleMenu",
           shouldShow: ({ state, from, to }) => {

@@ -5,7 +5,7 @@ import {
   type Editor,
   type Range,
 } from "@/tiptap/vue-3";
-import type { CommandMenuItem } from "@/types";
+import type { CommandMenuItemType } from "@/types";
 import Suggestion from "@tiptap/suggestion";
 import type { Instance } from "tippy.js";
 import tippy from "tippy.js";
@@ -31,7 +31,7 @@ export default Extension.create({
         }: {
           editor: Editor;
           range: Range;
-          props: CommandMenuItem;
+          props: CommandMenuItemType;
         }) => {
           props.command({ editor, range });
         },
@@ -104,7 +104,7 @@ export default Extension.create({
 function getToolbarItemsFromExtensions(editor: Editor) {
   const extensionManager = editor?.extensionManager;
   return extensionManager.extensions
-    .reduce((acc: CommandMenuItem[], extension: AnyExtension) => {
+    .reduce((acc: CommandMenuItemType[], extension: AnyExtension) => {
       const { getCommandMenuItems } = extension.options;
 
       if (!getCommandMenuItems) {
