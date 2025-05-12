@@ -10,6 +10,7 @@ import {
   VButton,
   VCard,
   VEmpty,
+  VEntityContainer,
   VLoading,
   VPageHeader,
   VPagination,
@@ -371,26 +372,23 @@ const handleApproveInBatch = async () => {
         </VEmpty>
       </Transition>
       <Transition v-else appear name="fade">
-        <ul
-          class="box-border h-full w-full divide-y divide-gray-100"
-          role="list"
-        >
-          <li v-for="comment in comments" :key="comment.comment.metadata.name">
-            <CommentListItem
-              :comment="comment"
-              :is-selected="checkSelection(comment)"
-            >
-              <template #checkbox>
-                <input
-                  v-model="selectedCommentNames"
-                  :value="comment?.comment?.metadata.name"
-                  name="comment-checkbox"
-                  type="checkbox"
-                />
-              </template>
-            </CommentListItem>
-          </li>
-        </ul>
+        <VEntityContainer>
+          <CommentListItem
+            v-for="comment in comments"
+            :key="comment.comment.metadata.name"
+            :comment="comment"
+            :is-selected="checkSelection(comment)"
+          >
+            <template #checkbox>
+              <input
+                v-model="selectedCommentNames"
+                :value="comment?.comment?.metadata.name"
+                name="comment-checkbox"
+                type="checkbox"
+              />
+            </template>
+          </CommentListItem>
+        </VEntityContainer>
       </Transition>
 
       <template #footer>

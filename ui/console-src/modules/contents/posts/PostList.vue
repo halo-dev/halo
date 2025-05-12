@@ -16,6 +16,7 @@ import {
   VButton,
   VCard,
   VEmpty,
+  VEntityContainer,
   VLoading,
   VPageHeader,
   VPagination,
@@ -591,18 +592,15 @@ watch(
         </VEmpty>
       </Transition>
       <Transition v-else appear name="fade">
-        <ul
-          class="box-border h-full w-full divide-y divide-gray-100"
-          role="list"
-        >
-          <li v-for="post in posts" :key="post.post.metadata.name">
-            <PostListItem
-              :post="post"
-              :is-selected="checkSelection(post.post)"
-              @open-setting-modal="handleOpenSettingModal"
-            />
-          </li>
-        </ul>
+        <VEntityContainer>
+          <PostListItem
+            v-for="post in posts"
+            :key="post.post.metadata.name"
+            :post="post"
+            :is-selected="checkSelection(post.post)"
+            @open-setting-modal="handleOpenSettingModal"
+          />
+        </VEntityContainer>
       </Transition>
 
       <template #footer>

@@ -8,6 +8,7 @@ import {
   VButton,
   VCard,
   VEmpty,
+  VEntityContainer,
   VLoading,
   VPageHeader,
   VPagination,
@@ -187,14 +188,13 @@ const {
         </VEmpty>
       </Transition>
       <Transition v-else appear name="fade">
-        <ul
-          class="box-border h-full w-full divide-y divide-gray-100"
-          role="list"
-        >
-          <li v-for="post in posts.items" :key="post.post.metadata.name">
-            <PostListItem :post="post" />
-          </li>
-        </ul>
+        <VEntityContainer>
+          <PostListItem
+            v-for="post in posts.items"
+            :key="post.post.metadata.name"
+            :post="post"
+          />
+        </VEntityContainer>
       </Transition>
 
       <template #footer>

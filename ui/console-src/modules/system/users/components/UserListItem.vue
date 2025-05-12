@@ -13,7 +13,6 @@ import {
   VDropdownItem,
   VEntity,
   VEntityField,
-  VSpace,
   VStatusDot,
   VTag,
 } from "@halo-dev/components";
@@ -142,7 +141,7 @@ const { handleEnableOrDisableUser } = useUserEnableDisable();
     <template #end>
       <VEntityField>
         <template #description>
-          <VSpace>
+          <div class="flex flex-wrap gap-2">
             <VTag v-for="role in user.roles" :key="role.metadata.name">
               <template #leftIcon>
                 <IconShieldUser />
@@ -152,7 +151,7 @@ const { handleEnableOrDisableUser } = useUserEnableDisable();
                 role.metadata.name
               }}
             </VTag>
-          </VSpace>
+          </div>
         </template>
       </VEntityField>
       <VEntityField v-if="user.user.metadata.deletionTimestamp">

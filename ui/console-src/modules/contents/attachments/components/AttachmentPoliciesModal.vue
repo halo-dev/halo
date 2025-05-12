@@ -12,6 +12,7 @@ import {
   VDropdownItem,
   VEmpty,
   VEntity,
+  VEntityContainer,
   VEntityField,
   VModal,
   VSpace,
@@ -157,69 +158,59 @@ function getPolicyTemplateDisplayName(templateName: string) {
         </VSpace>
       </template>
     </VEmpty>
-    <ul
-      v-else
-      class="box-border h-full w-full divide-y divide-gray-100"
-      role="list"
-    >
-      <li v-for="(policy, index) in policies" :key="index">
-        <VEntity>
-          <template #start>
-            <VEntityField
-              :title="policy.spec.displayName"
-              :description="
-                getPolicyTemplateDisplayName(policy.spec.templateName)
-              "
-            ></VEntityField>
-          </template>
-          <template #end>
-            <VEntityField>
-              <template
-                v-if="policy.metadata.finalizers?.includes(SYSTEM_PROTECTION)"
-                #description
-              >
-                <VTag>{{ $t("core.common.text.system_protection") }}</VTag>
-              </template>
-            </VEntityField>
-            <VEntityField v-if="policy.metadata.deletionTimestamp">
-              <template #description>
-                <VStatusDot
-                  v-tooltip="$t('core.common.status.deleting')"
-                  state="warning"
-                  animate
-                />
-              </template>
-            </VEntityField>
-            <VEntityField>
-              <template #description>
-                <span class="truncate text-xs tabular-nums text-gray-500">
-                  {{ formatDatetime(policy.metadata.creationTimestamp) }}
-                </span>
-              </template>
-            </VEntityField>
-          </template>
-          <template #dropdownItems>
-            <VDropdownItem
-              :disabled="
-                policy.metadata.finalizers?.includes(SYSTEM_PROTECTION)
-              "
-              @click="handleOpenEditingModal(policy)"
+    <VEntityContainer v-else>
+      <VEntity v-for="policy in policies" :key="policy.metadata.name">
+        <template #start>
+          <VEntityField
+            :title="policy.spec.displayName"
+            :description="
+              getPolicyTemplateDisplayName(policy.spec.templateName)
+            "
+          ></VEntityField>
+        </template>
+        <template #end>
+          <VEntityField>
+            <template
+              v-if="policy.metadata.finalizers?.includes(SYSTEM_PROTECTION)"
+              #description
             >
-              {{ $t("core.common.buttons.edit") }}
-            </VDropdownItem>
-            <VDropdownItem
-              :disabled="
-                policy.metadata.finalizers?.includes(SYSTEM_PROTECTION)
-              "
-              type="danger"
-              @click="handleDelete(policy)"
-            >
-              {{ $t("core.common.buttons.delete") }}
-            </VDropdownItem>
-          </template>
-        </VEntity>
-      </li>
-    </ul>
+              <VTag>{{ $t("core.common.text.system_protection") }}</VTag>
+            </template>
+          </VEntityField>
+          <VEntityField v-if="policy.metadata.deletionTimestamp">
+            <template #description>
+              <VStatusDot
+                v-tooltip="$t('core.common.status.deleting')"
+                state="warning"
+                animate
+              />
+            </template>
+          </VEntityField>
+          <VEntityField>
+            <template #description>
+              <span class="truncate text-xs tabular-nums text-gray-500">
+                {{ formatDatetime(policy.metadata.creationTimestamp) }}
+              </span>
+            </template>
+          </VEntityField>
+        </template>
+        <template #dropdownItems>
+          <VDropdownItem
+            :disabled="policy.metadata.finalizers?.includes(SYSTEM_PROTECTION)"
+            @click="handleOpenEditingModal(policy)"
+          >
+            {{ $t("core.common.buttons.edit") }}
+          </VDropdownItem>
+          <VDropdownItem
+            :disabled="policy.metadata.finalizers?.includes(SYSTEM_PROTECTION)"
+            type="danger"
+            @click="handleDelete(policy)"
+          >
+            {{ $t("core.common.buttons.delete") }}
+          </VDropdownItem>
+        </template>
+      </VEntity>
+    </VEntityContainer>
     <template #footer>
       <VButton @click="modal?.close()">
         {{ $t("core.common.buttons.close_and_shortcut") }}

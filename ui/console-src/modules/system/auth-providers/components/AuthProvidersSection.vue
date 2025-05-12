@@ -24,25 +24,28 @@ function onReload() {
 </script>
 <template>
   <VCard :title="title" :body-class="['!p-0']">
-    <VueDraggable
-      v-model="modelValue"
-      ghost-class="opacity-50"
-      handle=".drag-element"
-      class="box-border h-full w-full divide-y divide-gray-100"
-      :class="{
-        'cursor-progress opacity-60': loading,
-      }"
-      role="list"
-      tag="ul"
-      :disabled="loading"
-      @update="emit('update')"
-    >
-      <li v-for="authProvider in modelValue" :key="authProvider.name">
-        <AuthProviderListItem
-          :auth-provider="authProvider"
-          @reload="onReload"
-        />
-      </li>
-    </VueDraggable>
+    <div class="w-full overflow-x-auto">
+      <table class="w-full border-spacing-0">
+        <VueDraggable
+          v-model="modelValue"
+          ghost-class="opacity-50"
+          handle=".drag-element"
+          class="divide-y divide-gray-100"
+          :class="{
+            'cursor-progress opacity-60': loading,
+          }"
+          tag="tbody"
+          :disabled="loading"
+          @update="emit('update')"
+        >
+          <AuthProviderListItem
+            v-for="authProvider in modelValue"
+            :key="authProvider.name"
+            :auth-provider="authProvider"
+            @reload="onReload"
+          />
+        </VueDraggable>
+      </table>
+    </div>
   </VCard>
 </template>

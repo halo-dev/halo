@@ -21,6 +21,7 @@ import {
   VDropdown,
   VDropdownItem,
   VEmpty,
+  VEntityContainer,
   VLoading,
   VPageHeader,
   VPagination,
@@ -575,22 +576,16 @@ watch(
               </div>
             </Transition>
             <Transition v-if="viewType === 'list'" appear name="fade">
-              <ul
-                class="box-border h-full w-full divide-y divide-gray-100"
-                role="list"
-              >
-                <li
+              <VEntityContainer>
+                <AttachmentListItem
                   v-for="attachment in attachments"
                   :key="attachment.metadata.name"
-                >
-                  <AttachmentListItem
-                    :attachment="attachment"
-                    :is-selected="isChecked(attachment)"
-                    @select="handleSelect"
-                    @open-detail="handleClickItem"
-                  />
-                </li>
-              </ul>
+                  :attachment="attachment"
+                  :is-selected="isChecked(attachment)"
+                  @select="handleSelect"
+                  @open-detail="handleClickItem"
+                />
+              </VEntityContainer>
             </Transition>
           </div>
 

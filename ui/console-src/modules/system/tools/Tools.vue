@@ -7,6 +7,7 @@ import {
   VCard,
   VEmpty,
   VEntity,
+  VEntityContainer,
   VEntityField,
   VPageHeader,
 } from "@halo-dev/components";
@@ -53,46 +54,37 @@ const routes = computed(() => {
         :title="$t('core.tool.empty.title')"
         :message="$t('core.tool.empty.message')"
       ></VEmpty>
-      <ul
-        v-else
-        class="box-border h-full w-full divide-y divide-gray-100"
-        role="list"
-      >
-        <li v-for="route in routes" :key="route.name">
-          <VEntity>
-            <template #start>
-              <VEntityField>
-                <template #description>
-                  <component
-                    :is="route.meta?.menu?.icon"
-                    v-if="route.meta?.menu?.icon"
-                    class="text-lg"
-                  />
-                  <IconToolsFill v-else class="text-lg" />
-                </template>
-              </VEntityField>
-              <VEntityField
-                :route="{ name: route.name }"
-                :title="route.meta?.menu?.name"
-                :description="route.meta?.description"
-              ></VEntityField>
-            </template>
+      <VEntityContainer v-else>
+        <VEntity v-for="route in routes" :key="route.name">
+          <template #start>
+            <VEntityField>
+              <template #description>
+                <component
+                  :is="route.meta?.menu?.icon"
+                  v-if="route.meta?.menu?.icon"
+                  class="text-lg"
+                />
+                <IconToolsFill v-else class="text-lg" />
+              </template>
+            </VEntityField>
+            <VEntityField
+              :route="{ name: route.name }"
+              :title="route.meta?.menu?.name"
+              :description="route.meta?.description"
+            ></VEntityField>
+          </template>
 
-            <template #end>
-              <VEntityField>
-                <template #description>
-                  <VButton
-                    size="sm"
-                    @click="$router.push({ name: route.name })"
-                  >
-                    {{ $t("core.common.buttons.access") }}
-                  </VButton>
-                </template>
-              </VEntityField>
-            </template>
-          </VEntity>
-        </li>
-      </ul>
+          <template #end>
+            <VEntityField>
+              <template #description>
+                <VButton size="sm" @click="$router.push({ name: route.name })">
+                  {{ $t("core.common.buttons.access") }}
+                </VButton>
+              </template>
+            </VEntityField>
+          </template>
+        </VEntity>
+      </VEntityContainer>
     </VCard>
   </div>
 </template>

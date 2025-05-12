@@ -36,7 +36,7 @@ const externalUrl = computed(() => {
     width="27rem"
   >
     <template #extra>
-      <VSpace class="mt-1 sm:mt-0">
+      <VSpace>
         <RouterLink
           v-if="post.post.status?.inProgress"
           v-tooltip="$t('core.common.tooltips.unpublished_content_tip')"
