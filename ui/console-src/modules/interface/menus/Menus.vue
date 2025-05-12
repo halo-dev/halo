@@ -1,24 +1,31 @@
 <script lang="ts" setup>
+import { usePermission } from "@/utils/permission";
 import type { Menu, MenuItem } from "@halo-dev/api-client";
 import { coreApiClient } from "@halo-dev/api-client";
 import {
   Dialog,
   IconAddCircle,
+  IconList,
   IconListSettings,
+  IconMore,
   Toast,
   VButton,
   VCard,
+  VDropdown,
+  VDropdownItem,
   VEmpty,
   VLoading,
   VPageHeader,
   VSpace,
+  VStatusDot,
+  VTag,
 } from "@halo-dev/components";
+import { Draggable } from "@he-tree/vue";
+import "@he-tree/vue/style/default.css";
 import { useQuery, useQueryClient } from "@tanstack/vue-query";
-import { useDebounceFn } from "@vueuse/core";
 import { computed, ref } from "vue";
 import { useI18n } from "vue-i18n";
 import MenuItemEditingModal from "./components/MenuItemEditingModal.vue";
-import MenuItemListItem from "./components/MenuItemListItem.vue";
 import MenuList from "./components/MenuList.vue";
 import type { MenuTreeItem } from "./utils";
 import {
@@ -31,12 +38,14 @@ import {
 
 const { t } = useI18n();
 const queryClient = useQueryClient();
+const { currentUserHasPermission } = usePermission();
 
 const menuTreeItems = ref<MenuTreeItem[]>([] as MenuTreeItem[]);
 const selectedMenu = ref<Menu>();
 const selectedMenuItem = ref<MenuItem>();
 const selectedParentMenuItem = ref<MenuItem>();
 const menuItemEditingModal = ref();
+const isDragging = ref(false);
 
 const {
   data: menuItems,
@@ -120,7 +129,11 @@ const onMenuItemSaved = async (menuItem: MenuItem) => {
 
 const batchUpdating = ref(false);
 
-const handleUpdateInBatch = useDebounceFn(async () => {
+async function handleUpdateInBatch() {
+  if (batchUpdating.value) {
+    return;
+  }
+
   const menuTreeItemsToUpdate = resetMenuItemsTreePriority(menuTreeItems.value);
   const menuItemsToUpdate = convertTreeToMenuItems(menuTreeItemsToUpdate);
   try {
@@ -149,8 +162,9 @@ const handleUpdateInBatch = useDebounceFn(async () => {
     await queryClient.invalidateQueries({ queryKey: ["menus"] });
     await refetch();
     batchUpdating.value = false;
+    isDragging.value = false;
   }
-}, 300);
+}
 
 const handleDelete = async (menuItem: MenuTreeItem) => {
   Dialog.info({
@@ -199,6 +213,27 @@ const handleDelete = async (menuItem: MenuTreeItem) => {
     },
   });
 };
+
+const TargetRef = {
+  Post: t("core.menu.menu_item_editing_modal.fields.ref_kind.options.post"),
+  SinglePage: t(
+    "core.menu.menu_item_editing_modal.fields.ref_kind.options.single_page"
+  ),
+  Category: t(
+    "core.menu.menu_item_editing_modal.fields.ref_kind.options.category"
+  ),
+  Tag: t("core.menu.menu_item_editing_modal.fields.ref_kind.options.tag"),
+};
+
+function getMenuItemRefDisplayName(menuItem: MenuTreeItem) {
+  const { kind } = menuItem.spec.targetRef || {};
+
+  if (kind && TargetRef[kind]) {
+    return TargetRef[kind];
+  }
+
+  return undefined;
+}
 </script>
 <template>
   <MenuItemEditingModal
@@ -272,19 +307,102 @@ const handleDelete = async (menuItem: MenuTreeItem) => {
             </VEmpty>
           </Transition>
           <Transition v-else appear name="fade">
-            <MenuItemListItem
+            <Draggable
               v-model="menuTreeItems"
               :class="{
                 'cursor-progress opacity-60': batchUpdating,
               }"
-              @change="handleUpdateInBatch"
-              @delete="handleDelete"
-              @open-editing="handleOpenEditingModal"
-              @open-create-by-parent="handleOpenCreateByParentModal"
-            />
+              trigger-class="drag-element"
+              :indent="40"
+              @after-drop="handleUpdateInBatch"
+              @before-drag-start="isDragging = true"
+            >
+              <template #default="{ node }">
+                <div
+                  class="px-4 py-3 hover:bg-gray-50 w-full group items-center flex justify-between relative"
+                >
+                  <div>
+                    <div
+                      v-permission="['system:menus:manage']"
+                      class="drag-element absolute inset-y-0 left-0 hidden w-3.5 cursor-move items-center bg-gray-100 transition-all hover:bg-gray-200 group-hover:flex"
+                      :class="{
+                        '!hidden': isDragging,
+                      }"
+                    >
+                      <IconList class="h-3.5 w-3.5" />
+                    </div>
+                    <div class="gap-1 flex flex-col">
+                      <div class="inline-flex items-center gap-2">
+                        <span
+                          class="truncate text-sm font-medium text-gray-900"
+                        >
+                          {{ node.status.displayName }}
+                        </span>
+                        <VTag v-if="getMenuItemRefDisplayName(node)">
+                          {{ getMenuItemRefDisplayName(node) }}
+                        </VTag>
+                      </div>
+                      <a
+                        v-if="node.status?.href"
+                        :href="node.status?.href"
+                        :title="node.status?.href"
+                        target="_blank"
+                        class="truncate text-xs text-gray-500 group-hover:text-gray-900"
+                      >
+                        {{ node.status.href }}
+                      </a>
+                    </div>
+                  </div>
+                  <div class="flex items-center gap-6">
+                    <VStatusDot
+                      v-if="node.metadata.deletionTimestamp"
+                      v-tooltip="$t('core.common.status.deleting')"
+                      state="warning"
+                      animate
+                    />
+                    <VDropdown
+                      v-if="currentUserHasPermission(['system:menus:manage'])"
+                    >
+                      <div
+                        class="cursor-pointer rounded p-1 transition-all hover:text-blue-600 group-hover:bg-gray-200/60"
+                        @click.stop
+                      >
+                        <IconMore />
+                      </div>
+                      <template #popper>
+                        <VDropdownItem @click="handleOpenEditingModal(node)">
+                          {{ $t("core.common.buttons.edit") }}
+                        </VDropdownItem>
+                        <VDropdownItem
+                          @click="handleOpenCreateByParentModal(node)"
+                        >
+                          {{
+                            $t("core.menu.operations.add_sub_menu_item.button")
+                          }}
+                        </VDropdownItem>
+                        <VDropdownItem
+                          type="danger"
+                          @click="handleDelete(node)"
+                        >
+                          {{ $t("core.common.buttons.delete") }}
+                        </VDropdownItem>
+                      </template>
+                    </VDropdown>
+                  </div>
+                </div>
+              </template>
+            </Draggable>
           </Transition>
         </VCard>
       </div>
     </div>
   </div>
 </template>
+<style>
+.vtlist-inner {
+  @apply divide-y divide-gray-100;
+}
+.he-tree-drag-placeholder {
+  height: 60px;
+}
+</style>
