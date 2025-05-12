@@ -1,7 +1,7 @@
 <script lang="ts" setup>
 import {
   getCategoryPath,
-  type CategoryTree,
+  type CategoryTreeNode,
 } from "@console/modules/contents/posts/categories/utils";
 import type { Category } from "@halo-dev/api-client";
 import { IconCheckboxCircle } from "@halo-dev/components";
@@ -14,17 +14,20 @@ const props = withDefaults(
   {}
 );
 
-const categoriesTree = inject<Ref<CategoryTree[]>>("categoriesTree", ref([]));
-const selectedCategory = inject<Ref<Category | CategoryTree | undefined>>(
+const categoriesTree = inject<Ref<CategoryTreeNode[]>>(
+  "categoriesTree",
+  ref([])
+);
+const selectedCategory = inject<Ref<Category | CategoryTreeNode | undefined>>(
   "selectedCategory",
   ref(undefined)
 );
 
 const isSelected =
-  inject<(category: Category | CategoryTree) => boolean>("isSelected");
+  inject<(category: Category | CategoryTreeNode) => boolean>("isSelected");
 
 const emit = defineEmits<{
-  (event: "select", category: CategoryTree | Category): void;
+  (event: "select", category: CategoryTreeNode | Category): void;
 }>();
 
 const label = computed(() => {
@@ -33,7 +36,7 @@ const label = computed(() => {
     props.category.metadata.name
   );
   return categories
-    ?.map((category: CategoryTree) => category.spec.displayName)
+    ?.map((category: CategoryTreeNode) => category.spec.displayName)
     .join(" / ");
 });
 </script>

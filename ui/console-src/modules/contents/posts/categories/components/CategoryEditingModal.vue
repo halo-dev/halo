@@ -1,9 +1,4 @@
 <script lang="ts" setup>
-// core libs
-import { coreApiClient } from "@halo-dev/api-client";
-import { computed, nextTick, onMounted, ref } from "vue";
-
-// components
 import SubmitButton from "@/components/button/SubmitButton.vue";
 import AnnotationsForm from "@/components/form/AnnotationsForm.vue";
 import { setFocus } from "@/formkit/utils/focus";
@@ -12,6 +7,7 @@ import useSlugify from "@console/composables/use-slugify";
 import { useThemeCustomTemplates } from "@console/modules/interface/themes/composables/use-theme";
 import { reset, submitForm } from "@formkit/core";
 import type { Category } from "@halo-dev/api-client";
+import { coreApiClient } from "@halo-dev/api-client";
 import {
   IconRefreshLine,
   Toast,
@@ -21,6 +17,7 @@ import {
 } from "@halo-dev/components";
 import { useQueryClient } from "@tanstack/vue-query";
 import { cloneDeep } from "lodash-es";
+import { computed, nextTick, onMounted, ref } from "vue";
 import { useI18n } from "vue-i18n";
 
 const props = withDefaults(
@@ -186,7 +183,13 @@ const { handleGenerateSlug } = useSlugify(
 );
 </script>
 <template>
-  <VModal ref="modal" :title="modalTitle" :width="700" @close="emit('close')">
+  <VModal
+    ref="modal"
+    mount-to-body
+    :title="modalTitle"
+    :width="700"
+    @close="emit('close')"
+  >
     <FormKit
       id="category-form"
       type="form"
