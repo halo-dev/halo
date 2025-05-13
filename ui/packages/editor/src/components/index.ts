@@ -11,5 +11,5 @@ export * from "./toolbar";
 export * from "./toolbox";
 
 export { default as RichTextEditor } from "./Editor.vue";
-export * from "./EditorBubbleMenu.vue";
-export * from "./EditorHeader.vue";
+export { default as EditorBubbleMenu } from "./EditorBubbleMenu.vue";
+export { default as EditorHeader } from "./EditorHeader.vue";

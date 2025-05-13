@@ -9,7 +9,7 @@ import {
   VueNodeViewRenderer,
   type Editor,
 } from "@/tiptap/vue-3";
-import type { ExtensionOptions, NodeBubbleMenu } from "@/types";
+import type { ExtensionOptions, NodeBubbleMenuType } from "@/types";
 import { deleteNode } from "@/utils";
 import type { ImageOptions } from "@tiptap/extension-image";
 import TiptapImage from "@tiptap/extension-image";
@@ -127,7 +127,7 @@ const Image = TiptapImage.extend<ExtensionOptions & ImageOptions>({
           },
         ];
       },
-      getBubbleMenu({ editor }: { editor: Editor }): NodeBubbleMenu {
+      getBubbleMenu({ editor }: { editor: Editor }): NodeBubbleMenuType {
         return {
           pluginKey: "imageBubbleMenu",
           shouldShow: ({ state }: { state: EditorState }): boolean => {

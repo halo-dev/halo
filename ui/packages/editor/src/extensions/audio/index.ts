@@ -12,7 +12,7 @@ import {
   nodeInputRule,
   type Range,
 } from "@/tiptap/vue-3";
-import type { ExtensionOptions, NodeBubbleMenu } from "@/types";
+import type { ExtensionOptions, NodeBubbleMenuType } from "@/types";
 import { deleteNode } from "@/utils";
 import { markRaw } from "vue";
 import MdiLinkVariant from "~icons/mdi/link-variant";
@@ -171,7 +171,7 @@ const Audio = Node.create<ExtensionOptions>({
           },
         };
       },
-      getBubbleMenu({ editor }: { editor: Editor }): NodeBubbleMenu {
+      getBubbleMenu({ editor }: { editor: Editor }): NodeBubbleMenuType {
         return {
           pluginKey: "audioBubbleMenu",
           shouldShow: ({ state }: { state: EditorState }) => {
