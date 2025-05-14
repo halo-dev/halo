@@ -1,27 +1,28 @@
 <script lang="ts" setup>
-import type { CategoryTree } from "@console/modules/contents/posts/categories/utils";
+import type { CategoryTreeNode } from "@console/modules/contents/posts/categories/utils";
 import type { Category } from "@halo-dev/api-client";
 import { IconCheckboxCircle } from "@halo-dev/components";
 import { inject, ref, type Ref } from "vue";
 
 withDefaults(
   defineProps<{
-    category: CategoryTree;
+    category: CategoryTreeNode;
   }>(),
   {}
 );
 
-const isSelected = inject<(category: CategoryTree) => boolean>("isSelected");
-const selectedCategory = inject<Ref<Category | CategoryTree | undefined>>(
+const isSelected =
+  inject<(category: CategoryTreeNode) => boolean>("isSelected");
+const selectedCategory = inject<Ref<Category | CategoryTreeNode | undefined>>(
   "selectedCategory",
   ref(undefined)
 );
 
 const emit = defineEmits<{
-  (event: "select", category: CategoryTree): void;
+  (event: "select", category: CategoryTreeNode): void;
 }>();
 
-const onSelect = (childCategory: CategoryTree) => {
+const onSelect = (childCategory: CategoryTreeNode) => {
   emit("select", childCategory);
 };
 </script>
@@ -54,11 +55,11 @@ const onSelect = (childCategory: CategoryTree) => {
     </div>
 
     <ul
-      v-if="category.spec.children.length > 0"
+      v-if="category.children.length > 0"
       class="my-2.5 ml-2.5 border-l pl-1.5"
     >
       <CategoryListItem
-        v-for="(childCategory, index) in category.spec.children"
+        v-for="(childCategory, index) in category.children"
         :key="index"
         :category="childCategory"
         @select="onSelect"

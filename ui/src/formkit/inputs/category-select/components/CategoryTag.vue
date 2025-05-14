@@ -1,6 +1,8 @@
 <script lang="ts" setup>
-import type { CategoryTree } from "@console/modules/contents/posts/categories/utils";
-import { getCategoryPath } from "@console/modules/contents/posts/categories/utils";
+import {
+  getCategoryPath,
+  type CategoryTreeNode,
+} from "@console/modules/contents/posts/categories/utils";
 import type { Category } from "@halo-dev/api-client";
 import { IconClose } from "@halo-dev/components";
 import { computed, inject, ref, type Ref } from "vue";
@@ -13,10 +15,13 @@ const props = withDefaults(
 );
 
 const emit = defineEmits<{
-  (event: "select", category: CategoryTree | Category): void;
+  (event: "select", category: CategoryTreeNode | Category): void;
 }>();
 
-const categoriesTree = inject<Ref<CategoryTree[]>>("categoriesTree", ref([]));
+const categoriesTree = inject<Ref<CategoryTreeNode[]>>(
+  "categoriesTree",
+  ref([])
+);
 
 const label = computed(() => {
   const categories = getCategoryPath(
@@ -24,7 +29,7 @@ const label = computed(() => {
     props.category.metadata.name
   );
   return categories
-    ?.map((category: CategoryTree) => category.spec.displayName)
+    ?.map((category: CategoryTreeNode) => category.spec.displayName)
     .join(" / ");
 });
 </script>

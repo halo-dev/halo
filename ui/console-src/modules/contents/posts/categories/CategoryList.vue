@@ -1,9 +1,5 @@
 <script lang="ts" setup>
-// core libs
 import { coreApiClient } from "@halo-dev/api-client";
-import { ref } from "vue";
-
-// components
 import {
   IconAddCircle,
   IconBookRead,
@@ -14,16 +10,13 @@ import {
   VPageHeader,
   VSpace,
 } from "@halo-dev/components";
+import { Draggable } from "@he-tree/vue";
+import "@he-tree/vue/style/default.css";
+import { ref } from "vue";
 import CategoryEditingModal from "./components/CategoryEditingModal.vue";
 import CategoryListItem from "./components/CategoryListItem.vue";
-
-import { convertTreeToCategories, resetCategoriesTreePriority } from "./utils";
-
-// libs
-import { useDebounceFn } from "@vueuse/core";
-
-// hooks
 import { usePostCategory } from "./composables/use-post-category";
+import { convertTreeToCategories, resetCategoriesTreePriority } from "./utils";
 
 const creationModal = ref(false);
 
@@ -31,8 +24,9 @@ const { categories, categoriesTree, isLoading, handleFetchCategories } =
   usePostCategory();
 
 const batchUpdating = ref(false);
+const isDragging = ref(false);
 
-const handleUpdateInBatch = useDebounceFn(async () => {
+async function handleUpdateInBatch() {
   const categoriesTreeToUpdate = resetCategoriesTreePriority(
     categoriesTree.value
   );
@@ -62,8 +56,9 @@ const handleUpdateInBatch = useDebounceFn(async () => {
   } finally {
     await handleFetchCategories();
     batchUpdating.value = false;
+    isDragging.value = false;
   }
-}, 300);
+}
 </script>
 <template>
   <CategoryEditingModal v-if="creationModal" @close="creationModal = false" />
@@ -130,14 +125,33 @@ const handleUpdateInBatch = useDebounceFn(async () => {
         </VEmpty>
       </Transition>
       <Transition v-else appear name="fade">
-        <CategoryListItem
+        <Draggable
           v-model="categoriesTree"
           :class="{
             'cursor-progress opacity-60': batchUpdating,
           }"
-          @change="handleUpdateInBatch"
-        />
+          trigger-class="drag-element"
+          :indent="40"
+          @after-drop="handleUpdateInBatch"
+          @before-drag-start="isDragging = true"
+        >
+          <template #default="{ node, stat }">
+            <CategoryListItem
+              :category-tree-node="node"
+              :is-child-level="stat.level > 1"
+              :is-dragging="isDragging"
+            />
+          </template>
+        </Draggable>
       </Transition>
     </VCard>
   </div>
 </template>
+<style>
+.vtlist-inner {
+  @apply divide-y divide-gray-100;
+}
+.he-tree-drag-placeholder {
+  height: 60px;
+}
+</style>
