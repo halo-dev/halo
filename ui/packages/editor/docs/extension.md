@@ -13,23 +13,23 @@ export interface ExtensionOptions {
     editor,
   }: {
     editor: Editor;
-  }) => ToolbarItem | ToolbarItem[];
+  }) => ToolbarItemType | ToolbarItemType[];
 
   // Slash Command 扩展
-  getCommandMenuItems?: () => CommandMenuItem | CommandMenuItem[];
+  getCommandMenuItems?: () => CommandMenuItemType | CommandMenuItemType[];
 
   // 悬浮菜单扩展
-  getBubbleMenu?: ({ editor }: { editor: Editor }) => NodeBubbleMenu;
+  getBubbleMenu?: ({ editor }: { editor: Editor }) => NodeBubbleMenuType;
 
   // 工具箱扩展
   getToolboxItems?: ({
     editor,
   }: {
     editor: Editor;
-  }) => ToolboxItem | ToolboxItem[];
+  }) => ToolboxItemType | ToolboxItemType[];
 
   // 拖拽扩展
-  getDraggable?: ({ editor }: { editor: Editor }) => DraggableItem | boolean;
+  getDraggable?: ({ editor }: { editor: Editor }) => DraggableItemType | boolean;
 }
 ```
 
@@ -62,10 +62,10 @@ getToolbarItems?: ({
   editor,
 }: {
   editor: Editor;
-}) => ToolbarItem | ToolbarItem[];
+}) => ToolbarItemType | ToolbarItemType[];
 
 // 工具栏
-export interface ToolbarItem {
+export interface ToolbarItemType {
   priority: number;
   component: Component;
   props: {
@@ -76,7 +76,7 @@ export interface ToolbarItem {
     title?: string;
     action?: () => void;
   };
-  children?: ToolbarItem[];
+  children?: ToolbarItemType[];
 }
 ```
 
@@ -130,9 +130,9 @@ getToolboxItems?: ({
   editor,
 }: {
   editor: Editor;
-}) => ToolboxItem | ToolboxItem[];
+}) => ToolboxItemType | ToolboxItemType[];
 
-export interface ToolboxItem {
+export interface ToolboxItemType {
   priority: number;
   component: Component;
   props: {
@@ -195,9 +195,9 @@ Slash Command （斜杠命令）的扩展，可用于在当前行快捷执行功
 
 ```ts
 // Slash Command 扩展
-getCommandMenuItems?: () => CommandMenuItem | CommandMenuItem[];
+getCommandMenuItems?: () => CommandMenuItemType | CommandMenuItemType[];
 
-export interface CommandMenuItem {
+export interface CommandMenuItemType {
   priority: number;
   icon: Component;
   title: string;
@@ -255,16 +255,16 @@ export interface CommandMenuItem {
 
 ```ts
 // 悬浮菜单扩展
-getBubbleMenu?: ({ editor }: { editor: Editor }) => NodeBubbleMenu;
+getBubbleMenu?: ({ editor }: { editor: Editor }) => NodeBubbleMenuType;
 
 interface BubbleMenuProps {
   pluginKey?: string;                                             // 悬浮菜单插件 Key，建议命名方式 xxxBubbleMenu
   editor?: Editor;
   shouldShow: (props: {                                           // 悬浮菜单显示的条件
     editor: Editor;
+    state: EditorState;
     node?: HTMLElement;
     view?: EditorView;
-    state?: EditorState;
     oldState?: EditorState;
     from?: number;
     to?: number;
@@ -275,17 +275,17 @@ interface BubbleMenuProps {
 }
 
 // 悬浮菜单
-export interface NodeBubbleMenu extends BubbleMenuProps {
+export interface NodeBubbleMenuType extends BubbleMenuProps {
   component?: Component;                                           // 不使用默认的样式，与 items 二选一
-  items?: BubbleItem[];                                            // 悬浮菜单子项，使用默认的形式进行，与 items 二选一
+  items?: BubbleItemType[];                                       // 悬浮菜单子项，使用默认的形式进行，与 items 二选一
 }
 
 // 悬浮菜单子项
-export interface BubbleItem {
+export interface BubbleItemType {
   priority: number;                                                // 优先级，数字越小优先级越大，越靠前
   component?: Component;                                           // 完全自定义子项样式
-  props: {
-    isActive: ({ editor }: { editor: Editor }) => boolean;         // 当前功能是否已经处于活动状态
+  props?: {                                                        // 子项属性，可选
+    isActive?: ({ editor }: { editor: Editor }) => boolean;         // 当前功能是否已经处于活动状态
     visible?: ({ editor }: { editor: Editor }) => boolean;         // 是否显示当前子项
     icon?: Component;                                              // 图标
     iconStyle?: string;                                            // 图标自定义样式
@@ -363,16 +363,16 @@ addOptions() {
 
 ```ts
 // 拖拽扩展
-getDraggable?: ({ editor }: { editor: Editor }) => DraggableItem | boolean;
+getDraggable?: ({ editor }: { editor: Editor }) => DraggableItemType | boolean;
 
-export interface DraggableItem {
+export interface DraggableItemType {
   getRenderContainer?: ({               // 拖拽按钮计算偏移位置的基准 DOM
     dom,
     view,
   }: {
     dom: HTMLElement;
     view: EditorView;
-  }) => DragSelectionNode;
+  }) => DragSelectionNodeType;
   handleDrop?: ({                       // 完成拖拽功能之后的处理。返回 true 则会阻止拖拽的发生
     view,
     event,
@@ -391,14 +391,14 @@ export interface DraggableItem {
   allowPropagationDownward?: boolean;   // 是否允许拖拽事件向内部传播，
 }
 
-export interface DragSelectionNode {
+export interface DragSelectionNodeType {
   $pos?: ResolvedPos;
   node?: Node;
   el: HTMLElement;
   nodeOffset?: number;
   dragDomOffset?: {
-    x: number;
-    y: number;
+    x?: number;
+    y?: number;
   };
 }
 ```

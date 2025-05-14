@@ -8,7 +8,7 @@ import type {
 } from "@/tiptap/pm";
 import type { Editor, Range } from "@/tiptap/vue-3";
 import type { Component } from "vue";
-export interface ToolbarItem {
+export interface ToolbarItemType {
   priority: number;
   component: Component;
   props: {
@@ -19,7 +19,7 @@ export interface ToolbarItem {
     title?: string;
     action?: () => void;
   };
-  children?: ToolbarItem[];
+  children?: ToolbarItemType[];
 }
 
 interface BubbleMenuProps {
@@ -39,12 +39,12 @@ interface BubbleMenuProps {
   defaultAnimation?: boolean;
 }
 
-export interface NodeBubbleMenu extends BubbleMenuProps {
+export interface NodeBubbleMenuType extends BubbleMenuProps {
   component?: Component;
-  items?: BubbleItem[];
+  items?: BubbleItemType[];
 }
 
-export interface BubbleItem {
+export interface BubbleItemType {
   priority: number;
   component?: Component;
   props?: {
@@ -56,7 +56,7 @@ export interface BubbleItem {
     action?: ({ editor }: { editor: Editor }) => Component | void;
   };
 }
-export interface ToolboxItem {
+export interface ToolboxItemType {
   priority: number;
   component: Component;
   props: {
@@ -73,22 +73,26 @@ export interface ExtensionOptions {
     editor,
   }: {
     editor: Editor;
-  }) => ToolbarItem | ToolbarItem[];
+  }) => ToolbarItemType | ToolbarItemType[];
 
-  getCommandMenuItems?: () => CommandMenuItem | CommandMenuItem[];
+  getCommandMenuItems?: () => CommandMenuItemType | CommandMenuItemType[];
 
-  getBubbleMenu?: ({ editor }: { editor: Editor }) => NodeBubbleMenu;
+  getBubbleMenu?: ({ editor }: { editor: Editor }) => NodeBubbleMenuType;
 
   getToolboxItems?: ({
     editor,
   }: {
     editor: Editor;
-  }) => ToolboxItem | ToolboxItem[];
+  }) => ToolboxItemType | ToolboxItemType[];
 
-  getDraggable?: ({ editor }: { editor: Editor }) => DraggableItem | boolean;
+  getDraggable?: ({
+    editor,
+  }: {
+    editor: Editor;
+  }) => DraggableItemType | boolean;
 }
 
-export interface CommandMenuItem {
+export interface CommandMenuItemType {
   priority: number;
   icon: Component;
   title: string;
@@ -96,7 +100,7 @@ export interface CommandMenuItem {
   command: ({ editor, range }: { editor: Editor; range: Range }) => void;
 }
 
-export interface DragSelectionNode {
+export interface DragSelectionNodeType {
   $pos?: ResolvedPos;
   node?: Node;
   el: HTMLElement;
@@ -107,14 +111,14 @@ export interface DragSelectionNode {
   };
 }
 
-export interface DraggableItem {
+export interface DraggableItemType {
   getRenderContainer?: ({
     dom,
     view,
   }: {
     dom: HTMLElement;
     view: EditorView;
-  }) => DragSelectionNode;
+  }) => DragSelectionNodeType;
   handleDrop?: ({
     view,
     event,

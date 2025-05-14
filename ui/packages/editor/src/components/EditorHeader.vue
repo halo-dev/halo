@@ -1,6 +1,6 @@
 <script lang="ts" setup>
 import { Editor, type AnyExtension } from "@/tiptap/vue-3";
-import type { ToolbarItem, ToolboxItem } from "@/types";
+import type { ToolbarItemType, ToolboxItemType } from "@/types";
 import { Dropdown as VDropdown, Menu as VMenu } from "floating-vue";
 import MdiPlusCircle from "~icons/mdi/plus-circle";
 
@@ -14,7 +14,7 @@ const props = defineProps({
 function getToolbarItemsFromExtensions() {
   const extensionManager = props.editor?.extensionManager;
   return extensionManager.extensions
-    .reduce((acc: ToolbarItem[], extension: AnyExtension) => {
+    .reduce((acc: ToolbarItemType[], extension: AnyExtension) => {
       const { getToolbarItems } = extension.options;
 
       if (!getToolbarItems) {
@@ -37,7 +37,7 @@ function getToolbarItemsFromExtensions() {
 function getToolboxItemsFromExtensions() {
   const extensionManager = props.editor?.extensionManager;
   return extensionManager.extensions
-    .reduce((acc: ToolboxItem[], extension: AnyExtension) => {
+    .reduce((acc: ToolboxItemType[], extension: AnyExtension) => {
       const { getToolboxItems } = extension.options;
 
       if (!getToolboxItems) {

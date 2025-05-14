@@ -1,144 +1,39 @@
-import type { MenuItem, MenuItemSpec } from "@halo-dev/api-client";
+import type { MenuItem } from "@halo-dev/api-client";
 import { cloneDeep } from "lodash-es";
 
-export interface MenuTreeItemSpec extends Omit<MenuItemSpec, "children"> {
+export interface MenuTreeItem extends MenuItem {
   children: MenuTreeItem[];
 }
 
-export interface MenuTreeItem extends Omit<MenuItem, "spec"> {
-  spec: MenuTreeItemSpec;
-}
-
 /**
- * Convert a flat array of menu items into flattens a menu tree.
- *
- * Example:
- *
- * ```json
- * [
- *   {
- *     "spec": {
- *       "displayName": "文章分类",
- *       "href": "https://ryanc.cc/categories",
- *       "children": [
- *         "caeef383-3828-4039-9114-6f9ad3b4a37e",
- *         "ded1943d-9fdb-4563-83ee-2f04364872e0"
- *       ]
- *     },
- *     "apiVersion": "v1alpha1",
- *     "kind": "MenuItem",
- *     "metadata": {
- *       "name": "40e4ba86-5c7e-43c2-b4c0-cee376d26564",
- *       "version": 12,
- *       "creationTimestamp": "2022-08-05T04:19:37.252228Z"
- *     }
- *   },
- *   {
- *     "spec": {
- *       "displayName": "Halo",
- *       "href": "https://ryanc.cc/categories/halo",
- *       "children": []
- *     },
- *     "apiVersion": "v1alpha1",
- *     "kind": "MenuItem",
- *     "metadata": {
- *       "name": "caeef383-3828-4039-9114-6f9ad3b4a37e",
- *       "version": 4,
- *       "creationTimestamp": "2022-07-28T06:50:32.777556Z"
- *     }
- *   },
- *   {
- *     "spec": {
- *       "displayName": "Java",
- *       "href": "https://ryanc.cc/categories/java",
- *       "children": []
- *     },
- *     "apiVersion": "v1alpha1",
- *     "kind": "MenuItem",
- *     "metadata": {
- *       "name": "ded1943d-9fdb-4563-83ee-2f04364872e0",
- *       "version": 1,
- *       "creationTimestamp": "2022-08-05T04:22:03.377364Z"
- *     }
- *   }
- * ]
- * ```
- *
- * will be transformed to:
- *
- * ```json
- * [
- *   {
- *     "spec": {
- *       "displayName": "文章分类",
- *       "href": "https://ryanc.cc/categories",
- *       "children": [
- *         {
- *           "spec": {
- *             "displayName": "Halo",
- *             "href": "https://ryanc.cc/categories/halo",
- *             "children": []
- *           },
- *           "apiVersion": "v1alpha1",
- *           "kind": "MenuItem",
- *           "metadata": {
- *             "name": "caeef383-3828-4039-9114-6f9ad3b4a37e",
- *             "version": 4,
- *             "creationTimestamp": "2022-07-28T06:50:32.777556Z"
- *           }
- *         },
- *         {
- *           "spec": {
- *             "displayName": "Java",
- *             "href": "https://ryanc.cc/categories/java",
- *             "children": []
- *           },
- *           "apiVersion": "v1alpha1",
- *           "kind": "MenuItem",
- *           "metadata": {
- *             "name": "ded1943d-9fdb-4563-83ee-2f04364872e0",
- *             "version": 1,
- *             "creationTimestamp": "2022-08-05T04:22:03.377364Z"
- *           }
- *         }
- *       ]
- *     },
- *     "apiVersion": "v1alpha1",
- *     "kind": "MenuItem",
- *     "metadata": {
- *       "name": "40e4ba86-5c7e-43c2-b4c0-cee376d26564",
- *       "version": 12,
- *       "creationTimestamp": "2022-08-05T04:19:37.252228Z"
- *     }
- *   }
- * ]
- * ```
+ * Convert a flat array of menu items into a menu tree with children at the top level.
  *
  * @param menuItems
  */
 export function buildMenuItemsTree(menuItems: MenuItem[]): MenuTreeItem[] {
   const menuItemsToUpdate = cloneDeep(menuItems);
 
-  const menuItemsMap = {};
-  const parentMap = {};
+  const menuItemsMap: Record<string, MenuTreeItem> = {};
+  const parentMap: Record<string, string> = {};
 
   menuItemsToUpdate.forEach((menuItem) => {
-    menuItemsMap[menuItem.metadata.name] = menuItem;
-    // @ts-ignore
-    menuItem.spec.children.forEach((child) => {
+    menuItemsMap[menuItem.metadata.name] = {
+      ...menuItem,
+      children: [],
+    };
+    (menuItem.spec.children as string[]).forEach((child) => {
       parentMap[child] = menuItem.metadata.name;
     });
-    menuItem.spec.children = [];
   });
 
-  menuItemsToUpdate.forEach((menuItem) => {
-    const parentName = parentMap[menuItem.metadata.name];
+  Object.values(menuItemsMap).forEach((menuTreeItem) => {
+    const parentName = parentMap[menuTreeItem.metadata.name];
     if (parentName && menuItemsMap[parentName]) {
-      menuItemsMap[parentName].spec.children.push(menuItem);
+      menuItemsMap[parentName].children.push(menuTreeItem);
     }
   });
 
-  const menuTreeItems = menuItemsToUpdate.filter(
+  const menuTreeItems = Object.values(menuItemsMap).filter(
     (node) => parentMap[node.metadata.name] === undefined
   );
 
@@ -151,26 +46,25 @@ export function buildMenuItemsTree(menuItems: MenuItem[]): MenuTreeItem[] {
  * @param menuTreeItems
  */
 export function sortMenuItemsTree(
-  menuTreeItems: MenuTreeItem[] | MenuItem[]
+  menuTreeItems: MenuTreeItem[]
 ): MenuTreeItem[] {
   return menuTreeItems
     .sort((a, b) => {
-      if (a.spec.priority < b.spec.priority) {
+      const aPriority = a.spec.priority ?? 0;
+      const bPriority = b.spec.priority ?? 0;
+      if (aPriority < bPriority) {
         return -1;
       }
-      if (a.spec.priority > b.spec.priority) {
+      if (aPriority > bPriority) {
         return 1;
       }
       return 0;
     })
     .map((menuTreeItem) => {
-      if (menuTreeItem.spec.children.length) {
+      if (menuTreeItem.children.length) {
         return {
           ...menuTreeItem,
-          spec: {
-            ...menuTreeItem.spec,
-            children: sortMenuItemsTree(menuTreeItem.spec.children),
-          },
+          children: sortMenuItemsTree(menuTreeItem.children),
         };
       }
       return menuTreeItem;
@@ -187,8 +81,8 @@ export function resetMenuItemsTreePriority(
 ): MenuTreeItem[] {
   for (let i = 0; i < menuItems.length; i++) {
     menuItems[i].spec.priority = i;
-    if (menuItems[i].spec.children) {
-      resetMenuItemsTreePriority(menuItems[i].spec.children);
+    if (menuItems[i].children) {
+      resetMenuItemsTreePriority(menuItems[i].children);
     }
   }
   return menuItems;
@@ -206,9 +100,10 @@ export function convertTreeToMenuItems(menuTreeItems: MenuTreeItem[]) {
     if (!node) {
       return;
     }
-    const children = node.spec.children || [];
+    const children = node.children || [];
+    const { ...rest } = node;
     menuItemsMap.set(node.metadata.name, {
-      ...node,
+      ...rest,
       spec: {
         ...node.spec,
         children: children.map((child) => child.metadata.name),
@@ -231,8 +126,8 @@ export function getChildrenNames(menuTreeItem: MenuTreeItem): string[] {
   const childrenNames: string[] = [];
 
   function getChildrenNamesRecursive(menuTreeItem: MenuTreeItem) {
-    if (menuTreeItem.spec.children) {
-      menuTreeItem.spec.children.forEach((child) => {
+    if (menuTreeItem.children) {
+      menuTreeItem.children.forEach((child) => {
         childrenNames.push(child.metadata.name);
         getChildrenNamesRecursive(child);
       });
@@ -252,11 +147,12 @@ export function getChildrenNames(menuTreeItem: MenuTreeItem): string[] {
 export function convertMenuTreeItemToMenuItem(
   menuTreeItem: MenuTreeItem
 ): MenuItem {
-  const childNames = menuTreeItem.spec.children.map(
+  const childNames = (menuTreeItem.children || []).map(
     (child) => child.metadata.name
   );
+  const { ...rest } = menuTreeItem;
   return {
-    ...menuTreeItem,
+    ...rest,
     spec: {
       ...menuTreeItem.spec,
       children: childNames,

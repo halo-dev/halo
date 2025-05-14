@@ -202,7 +202,7 @@ const selectedRef = computed(() => {
   );
 });
 
-const selectedRefKind = ref<string>("");
+const selectedRefKind = ref<string>();
 const selectedRefName = ref<string>("");
 
 const onMenuItemSourceChange = () => {
