@@ -15,7 +15,7 @@ import {
   __serializeForClipboard as serializeForClipboard,
 } from "@/tiptap/pm";
 import { Editor, Extension } from "@/tiptap/vue-3";
-import type { DraggableItem, ExtensionOptions } from "@/types";
+import type { DraggableItemType, ExtensionOptions } from "@/types";
 
 // https://developer.mozilla.org/zh-CN/docs/Web/API/HTML_Drag_and_Drop_API
 // https://github.com/ueberdosis/tiptap/blob/7832b96afbfc58574785043259230801e179310f/demos/src/Experiments/GlobalDragHandle/Vue/DragHandle.js
@@ -28,7 +28,7 @@ export interface ActiveNode {
   domOffsetTop: number;
 }
 
-let draggableItem: DraggableItem | boolean | undefined = undefined;
+let draggableItem: DraggableItemType | boolean | undefined = undefined;
 let draggableHandleDom: HTMLElement | null = null;
 let currEditorView: EditorView;
 let activeNode: ActiveNode | null = null;
@@ -238,7 +238,7 @@ const getExtensionDraggableItem = (editor: Editor, node: Node) => {
  **/
 const getRenderContainer = (
   view: EditorView,
-  draggableItem: DraggableItem | undefined,
+  draggableItem: DraggableItemType | undefined,
   dom: HTMLElement
 ): ActiveNode => {
   const renderContainer = draggableItem?.getRenderContainer?.({ dom, view });
@@ -291,7 +291,7 @@ const getDraggableItem = ({
   dom: HTMLElement;
   event?: any;
   depth?: number;
-}): DraggableItem | boolean | undefined => {
+}): DraggableItemType | boolean | undefined => {
   const parentNode = findParentNodeByDepth(view, dom, depth);
   if (!parentNode) {
     return;

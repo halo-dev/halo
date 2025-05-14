@@ -16,5 +16,5 @@ export default plugin;
 export * from "./components";
 export * from "./extensions";
 export * from "./tiptap";
+export * from "./types";
 export * from "./utils";
-// TODO: export * from "./types";

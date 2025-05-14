@@ -17,7 +17,7 @@ import {
   type Node as ProseMirrorNode,
   type ViewMutationRecord,
 } from "@/tiptap/pm";
-import type { ExtensionOptions, NodeBubbleMenu } from "@/types";
+import type { ExtensionOptions, NodeBubbleMenuType } from "@/types";
 import TiptapTable, {
   createColGroup,
   type TableOptions,
@@ -255,7 +255,7 @@ const Table = TiptapTable.extend<ExtensionOptions & TableOptions>({
           },
         };
       },
-      getBubbleMenu({ editor }): NodeBubbleMenu {
+      getBubbleMenu({ editor }): NodeBubbleMenuType {
         return {
           pluginKey: "tableBubbleMenu",
           shouldShow: ({ state }: { state: EditorState }): boolean => {

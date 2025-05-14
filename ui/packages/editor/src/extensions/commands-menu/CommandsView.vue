@@ -1,17 +1,17 @@
 <script lang="ts" setup>
 import { i18n } from "@/locales";
-import type { CommandMenuItem } from "@/types";
+import type { CommandMenuItemType } from "@/types";
 import scrollIntoView from "scroll-into-view-if-needed";
 import { ref, watch, type PropType } from "vue";
 
 const props = defineProps({
   items: {
-    type: Array as PropType<CommandMenuItem[]>,
+    type: Array as PropType<CommandMenuItemType[]>,
     required: true,
   },
 
   command: {
-    type: Function as PropType<(item: CommandMenuItem) => void>,
+    type: Function as PropType<(item: CommandMenuItemType) => void>,
     required: true,
   },
 });

@@ -13,7 +13,7 @@ import {
   nodePasteRule,
   type Range,
 } from "@/tiptap/vue-3";
-import type { ExtensionOptions, NodeBubbleMenu } from "@/types";
+import type { ExtensionOptions, NodeBubbleMenuType } from "@/types";
 import { deleteNode } from "@/utils";
 import { isAllowedUri } from "@/utils/is-allowed-uri";
 import { markRaw } from "vue";
@@ -260,7 +260,7 @@ const Iframe = Node.create<ExtensionOptions>({
           },
         ];
       },
-      getBubbleMenu({ editor }: { editor: Editor }): NodeBubbleMenu {
+      getBubbleMenu({ editor }: { editor: Editor }): NodeBubbleMenuType {
         return {
           pluginKey: "iframeBubbleMenu",
           shouldShow: ({ state }: { state: EditorState }) => {

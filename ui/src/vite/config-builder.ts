@@ -98,6 +98,7 @@ export function createViteConfig(options: Options) {
               "overlayscrollbars",
               "overlayscrollbars-vue",
               "floating-vue",
+              "@he-tree/vue",
             ],
           },
         },
