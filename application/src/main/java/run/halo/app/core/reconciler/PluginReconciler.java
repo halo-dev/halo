@@ -14,6 +14,8 @@ import static run.halo.app.plugin.PluginUtils.isDevelopmentMode;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.io.PrintWriter;
+import java.io.StringWriter;
 import java.net.MalformedURLException;
 import java.net.URISyntaxException;
 import java.net.URL;
@@ -302,21 +304,30 @@ public class PluginReconciler implements Reconciler<Request> {
             return Result.requeue(Duration.ofSeconds(1));
         }
 
+        PluginState pluginState;
         try {
-            var pluginState = pluginManager.startPlugin(pluginName);
-            if (!PluginState.STARTED.equals(pluginState)) {
-                throw new IllegalStateException("""
-                    Failed to start plugin %s(%s).\
-                    """.formatted(pluginName, pluginState));
-            }
+            pluginState = pluginManager.startPlugin(pluginName);
         } catch (Throwable e) {
             log.debug("Error occurred when starting plugin {}", pluginName, e);
+            var writer = new StringWriter();
+            e.printStackTrace(new PrintWriter(writer));
             conditions.addAndEvictFIFO(Condition.builder()
                 .type(ConditionType.READY)
                 .status(ConditionStatus.FALSE)
                 .reason(ConditionReason.START_ERROR)
-                .message(e.getMessage())
+                .message(writer.toString())
                 .lastTransitionTime(clock.instant())
+                .build());
+            status.setPhase(Plugin.Phase.FAILED);
+            return Result.doNotRetry();
+        }
+        if (!PluginState.STARTED.equals(pluginState)) {
+            conditions.addAndEvictFIFO(Condition.builder()
+                    .type(ConditionType.READY)
+                    .status(ConditionStatus.FALSE)
+                    .reason(ConditionReason.START_ERROR)
+                    .message("Failed to start plugin " + pluginName + "(" + pluginState + ").")
+                    .lastTransitionTime(clock.instant())
                 .build());
             status.setPhase(Plugin.Phase.FAILED);
             return Result.doNotRetry();
