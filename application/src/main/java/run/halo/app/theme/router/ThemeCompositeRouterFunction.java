@@ -4,7 +4,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
-import org.springframework.boot.context.event.ApplicationReadyEvent;
 import org.springframework.context.SmartLifecycle;
 import org.springframework.context.event.EventListener;
 import org.springframework.lang.NonNull;
@@ -96,11 +95,6 @@ public class ThemeCompositeRouterFunction
      */
     @EventListener
     public void onPermalinkRuleChanged(PermalinkRuleChangedEvent event) {
-        this.cachedRouters = routerFunctions();
-    }
-
-    @EventListener
-    public void onApplicationStarted(ApplicationReadyEvent event) {
         this.cachedRouters = routerFunctions();
     }
 

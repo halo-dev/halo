@@ -6,14 +6,10 @@ import static org.springframework.web.reactive.function.server.RequestPredicates
 import static org.springframework.web.reactive.function.server.RequestPredicates.accept;
 import static run.halo.app.content.permalinks.PostPermalinkPolicy.DEFAULT_CATEGORY;
 
-import com.google.common.cache.Cache;
-import com.google.common.cache.CacheBuilder;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-import java.util.concurrent.ExecutionException;
-import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -241,9 +237,6 @@ public class PostRouteFactory implements RouteFactory {
     @Getter
     static class PatternParser {
         private static final Pattern PATTERN_COMPILE = Pattern.compile("([^&?]*)=\\{(.*?)\\}(&|$)");
-        private static final Cache<String, Matcher> MATCHER_CACHE = CacheBuilder.newBuilder()
-            .maximumSize(5)
-            .build();
 
         private final String pattern;
         private String paramName;
@@ -252,21 +245,13 @@ public class PostRouteFactory implements RouteFactory {
 
         PatternParser(String pattern) {
             this.pattern = pattern;
-            Matcher matcher = patternToMatcher(pattern);
+            var matcher = PATTERN_COMPILE.matcher(pattern);
             if (matcher.find()) {
                 this.paramName = matcher.group(1);
                 this.placeholderName = matcher.group(2);
                 this.isQueryParamPattern = true;
             } else {
                 this.isQueryParamPattern = false;
-            }
-        }
-
-        Matcher patternToMatcher(String pattern) {
-            try {
-                return MATCHER_CACHE.get(pattern, () -> PATTERN_COMPILE.matcher(pattern));
-            } catch (ExecutionException e) {
-                throw new RuntimeException(e);
             }
         }
 

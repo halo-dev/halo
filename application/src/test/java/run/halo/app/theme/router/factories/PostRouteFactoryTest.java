@@ -7,6 +7,7 @@ import static org.mockito.Mockito.when;
 
 import java.util.Locale;
 import java.util.Map;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -65,6 +66,14 @@ class PostRouteFactoryTest extends RouteFactoryTestSuite {
 
     @InjectMocks
     private PostRouteFactory postRouteFactory;
+
+    @Test
+    void shouldBeSameResultWhenParsePattenMultiply() {
+        var parser = new PostRouteFactory.PatternParser("/?p={slug}");
+        Assertions.assertTrue(parser.isQueryParamPattern());
+        parser = new PostRouteFactory.PatternParser("/?p={slug}");
+        Assertions.assertTrue(parser.isQueryParamPattern());
+    }
 
     @Test
     void create() {
