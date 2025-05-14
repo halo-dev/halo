@@ -19,7 +19,15 @@ export default defineConfig({
     },
   },
   test: {
-    dir: "./src",
+    include: ["**/*.spec.ts"],
+    exclude: [
+      "./packages/**",
+      "node_modules",
+      "dist",
+      ".idea",
+      ".git",
+      ".cache",
+    ],
     reporters: "html",
     outputFile: "build/test-result/index.html",
     transformMode: {

@@ -1,4 +1,5 @@
 import messages from "@intlify/unplugin-vue-i18n/messages";
+import { VueQueryPlugin } from "@tanstack/vue-query";
 import { mount } from "@vue/test-utils";
 import { createPinia, setActivePinia } from "pinia";
 import { beforeEach, describe, expect, it } from "vitest";
@@ -20,6 +21,7 @@ describe("CategoryEditingModal", function () {
               locale: "en",
               messages,
             }),
+            VueQueryPlugin,
           ],
         },
       })

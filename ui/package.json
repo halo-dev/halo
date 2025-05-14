@@ -59,6 +59,8 @@
     "@halo-dev/components": "workspace:*",
     "@halo-dev/console-shared": "workspace:*",
     "@halo-dev/richtext-editor": "workspace:*",
+    "@he-tree/tree-utils": "0.1.0-alpha.6",
+    "@he-tree/vue": "^2.9.4",
     "@tanstack/vue-query": "^4.37.1",
     "@tiptap/extension-character-count": "^2.11.2",
     "@uppy/core": "^3.11.3",
