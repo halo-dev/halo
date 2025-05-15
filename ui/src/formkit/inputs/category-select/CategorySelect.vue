@@ -2,8 +2,10 @@
 import HasPermission from "@/components/permission/HasPermission.vue";
 import { usePermission } from "@/utils/permission";
 import { usePostCategory } from "@console/modules/contents/posts/categories/composables/use-post-category";
-import type { CategoryTree } from "@console/modules/contents/posts/categories/utils";
-import { convertTreeToCategories } from "@console/modules/contents/posts/categories/utils";
+import {
+  convertTreeToCategories,
+  type CategoryTreeNode,
+} from "@console/modules/contents/posts/categories/utils";
 import type { FormKitFrameworkContext } from "@formkit/core";
 import type { Category } from "@halo-dev/api-client";
 import { coreApiClient } from "@halo-dev/api-client";
@@ -38,11 +40,11 @@ const multiple = computed(() => {
 
 const { categories, categoriesTree, handleFetchCategories } = usePostCategory();
 
-provide<Ref<CategoryTree[]>>("categoriesTree", categoriesTree);
+provide<Ref<CategoryTreeNode[]>>("categoriesTree", categoriesTree);
 
-const selectedCategory = ref<Category | CategoryTree>();
+const selectedCategory = ref<Category | CategoryTreeNode>();
 
-provide<Ref<Category | CategoryTree | undefined>>(
+provide<Ref<Category | CategoryTreeNode | undefined>>(
   "selectedCategory",
   selectedCategory
 );
@@ -109,19 +111,19 @@ const selectedCategories = computed(() => {
   return [category].filter(Boolean) as Category[];
 });
 
-const isSelected = (category: CategoryTree | Category) => {
+const isSelected = (category: CategoryTreeNode | Category) => {
   if (multiple.value) {
     return (props.context._value || []).includes(category.metadata.name);
   }
   return props.context._value === category.metadata.name;
 };
 
-provide<(category: CategoryTree | Category) => boolean>(
+provide<(category: CategoryTreeNode | Category) => boolean>(
   "isSelected",
   isSelected
 );
 
-const handleSelect = (category: CategoryTree | Category) => {
+const handleSelect = (category: CategoryTreeNode | Category) => {
   if (multiple.value) {
     const currentValue = props.context._value || [];
     if (currentValue.includes(category.metadata.name)) {
