@@ -117,12 +117,12 @@ const lastCondition = computed(() => {
         v-if="errorAlertVisible && lastCondition"
         class="w-full px-4 pb-2 sm:px-6"
       >
-        <VAlert
-          type="error"
-          :title="lastCondition.reason"
-          :description="lastCondition.message"
-          :closable="false"
-        >
+        <VAlert type="error" :title="lastCondition.reason" :closable="false">
+          <template #description>
+            <div class="overflow-x-auto">
+              <pre>{{ lastCondition.message }}</pre>
+            </div>
+          </template>
           <template #actions>
             <VButton size="sm" @click="conditionsModalVisible = true">
               {{ $t("core.plugin.detail.operations.view_conditions.button") }}
