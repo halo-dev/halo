@@ -1,20 +1,10 @@
-import type { Category } from "@halo-dev/api-client";
 import { coreApiClient } from "@halo-dev/api-client";
 import { useQuery } from "@tanstack/vue-query";
-import type { Ref } from "vue";
 import { ref } from "vue";
-import type { CategoryTree } from "../utils";
-import { buildCategoriesTree } from "../utils";
+import { buildCategoriesTree, type CategoryTreeNode } from "../utils";
 
-interface usePostCategoryReturn {
-  categories: Ref<Category[] | undefined>;
-  categoriesTree: Ref<CategoryTree[]>;
-  isLoading: Ref<boolean>;
-  handleFetchCategories: () => void;
-}
-
-export function usePostCategory(): usePostCategoryReturn {
-  const categoriesTree = ref<CategoryTree[]>([] as CategoryTree[]);
+export function usePostCategory() {
+  const categoriesTree = ref<CategoryTreeNode[]>([] as CategoryTreeNode[]);
 
   const {
     data: categories,
