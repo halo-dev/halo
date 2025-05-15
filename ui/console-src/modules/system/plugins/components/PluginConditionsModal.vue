@@ -72,7 +72,7 @@ const modal = ref();
             {{ condition.reason || "-" }}
           </td>
           <td class="whitespace-nowrap px-4 py-3 text-sm text-gray-500">
-            {{ condition.message || "-" }}
+            <pre>{{ condition.message || "-" }}</pre>
           </td>
           <td
             v-tooltip="formatDatetime(condition.lastTransitionTime)"
