@@ -79,7 +79,7 @@ const wrapperStyles = computed(() => {
     @apply inline-flex items-center flex-row;
 
     .entity-field-title {
-      @apply mr-0 truncate text-sm font-medium text-gray-900 sm:mr-2;
+      @apply truncate text-sm font-medium text-gray-900 mr-2;
     }
   }
 

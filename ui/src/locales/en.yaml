@@ -996,6 +996,9 @@ core:
       extension-definition:
         empty:
           title: There is currently no extension point implemented
+        operation:
+          use:
+            button: Use
     actions:
       extension-point-settings: Extension settings
   user:

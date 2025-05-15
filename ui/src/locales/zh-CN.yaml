@@ -931,6 +931,9 @@ core:
       extension-definition:
         empty:
           title: 当前没有扩展点实现
+        operation:
+          use:
+            button: 使用
     actions:
       extension-point-settings: 扩展配置
   user:
@@ -1179,7 +1182,8 @@ core:
                 manual:
                   label: 如果无法扫描二维码，点击查看代替步骤
                   help: 使用以下代码手动配置验证器应用：
-              tips: 请妥善保管您的两步验证设备，如果设备丢失或损坏，你将无法登录系统。建议你在多个设备上安装验证器应用，或保存好密钥的备份，以防主要设备无法使用。
+              tips: >-
+                请妥善保管您的两步验证设备，如果设备丢失或损坏，你将无法登录系统。建议你在多个设备上安装验证器应用，或保存好密钥的备份，以防主要设备无法使用。
     pat:
       operations:
         delete:

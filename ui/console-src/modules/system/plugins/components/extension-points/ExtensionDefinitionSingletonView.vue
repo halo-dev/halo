@@ -3,7 +3,14 @@ import {
   coreApiClient,
   type ExtensionPointDefinition,
 } from "@halo-dev/api-client";
-import { Toast, VEmpty, VLoading } from "@halo-dev/components";
+import {
+  Toast,
+  VButton,
+  VEmpty,
+  VEntityContainer,
+  VEntityField,
+  VLoading,
+} from "@halo-dev/components";
 import { useQuery, useQueryClient } from "@tanstack/vue-query";
 import { computed, ref, toRefs, type Ref } from "vue";
 import { useI18n } from "vue-i18n";
@@ -63,7 +70,10 @@ const isSubmitting = ref(false);
 
 async function onExtensionChange(e: Event) {
   const value = (e.target as HTMLInputElement).value;
+  await handleChange(value);
+}
 
+async function handleChange(value: string) {
   if (!extensionPointDefinition.value) return;
 
   isSubmitting.value = true;
@@ -120,34 +130,42 @@ async function onExtensionChange(e: Event) {
       ></VEmpty>
     </Transition>
     <Transition v-else name="fade" appear>
-      <ul
-        class="box-border h-full w-full divide-y divide-gray-100 overflow-hidden rounded-base border"
-        role="list"
+      <div
+        class="overflow-hidden rounded-base border"
+        :class="{ 'pointer-events-none opacity-50': isSubmitting }"
       >
-        <li
-          v-for="item in extensionDefinitions?.items"
-          :key="item.metadata.name"
-        >
-          <label
-            class="cursor-pointer transition-all"
-            :class="{ 'pointer-events-none opacity-50': isSubmitting }"
-            @click.stop
+        <VEntityContainer>
+          <ExtensionDefinitionListItem
+            v-for="item in extensionDefinitions?.items"
+            :key="item.metadata.name"
+            :extension-definition="item"
           >
-            <ExtensionDefinitionListItem :extension-definition="item">
-              <template #selection-indicator>
-                <input
-                  :value="item.metadata.name"
-                  type="radio"
-                  name="activated-extension"
-                  :checked="item.metadata.name === value"
-                  :disabled="isSubmitting"
-                  @change="onExtensionChange"
-                />
-              </template>
-            </ExtensionDefinitionListItem>
-          </label>
-        </li>
-      </ul>
+            <template #selection-indicator>
+              <input
+                :value="item.metadata.name"
+                type="radio"
+                name="activated-extension"
+                :checked="item.metadata.name === value"
+                :disabled="isSubmitting"
+                @change="onExtensionChange"
+              />
+            </template>
+            <template #end>
+              <VEntityField v-if="item.metadata.name !== value">
+                <template #description>
+                  <VButton size="sm" @click="handleChange(item.metadata.name)">
+                    {{
+                      $t(
+                        "core.plugin.extension-settings.extension-definition.operation.use.button"
+                      )
+                    }}
+                  </VButton>
+                </template>
+              </VEntityField>
+            </template>
+          </ExtensionDefinitionListItem>
+        </VEntityContainer>
+      </div>
     </Transition>
   </div>
 </template>

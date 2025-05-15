@@ -19,6 +19,7 @@ import {
   IconTablet,
   Toast,
   VButton,
+  VEntityContainer,
   VLoading,
   VModal,
   VTabbar,
@@ -366,25 +367,18 @@ const iframeClasses = computed(() => {
             @before-leave="switching = true"
             @after-leave="switching = false"
           >
-            <ul
-              v-show="themesVisible"
-              class="box-border h-full w-full divide-y divide-gray-100"
-              role="list"
-            >
-              <li
-                v-for="(item, index) in themes"
-                :key="index"
+            <VEntityContainer v-show="themesVisible">
+              <ThemePreviewListItem
+                v-for="item in themes"
+                :key="item.metadata.name"
+                :theme="item"
+                :is-selected="
+                  selectedTheme?.metadata.name === item.metadata.name
+                "
                 @click="handleSelect(item)"
-              >
-                <ThemePreviewListItem
-                  :theme="item"
-                  :is-selected="
-                    selectedTheme?.metadata.name === item.metadata.name
-                  "
-                  @open-settings="handleOpenSettings(item)"
-                />
-              </li>
-            </ul>
+                @open-settings="handleOpenSettings(item)"
+              />
+            </VEntityContainer>
           </transition>
         </OverlayScrollbarsComponent>
       </transition>

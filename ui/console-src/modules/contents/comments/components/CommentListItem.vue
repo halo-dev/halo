@@ -22,6 +22,7 @@ import {
   VDropdownItem,
   VEmpty,
   VEntity,
+  VEntityContainer,
   VEntityField,
   VLoading,
   VSpace,
@@ -343,13 +344,7 @@ const { operationItems } = useOperationItemExtensionPoint<ListedComment>(
     :comment="comment"
     @close="onReplyCreationModalClose"
   />
-  <VEntity :is-selected="isSelected" :class="{ 'hover:bg-white': showReplies }">
-    <template v-if="showReplies" #prepend>
-      <div class="absolute inset-y-0 left-0 w-[1px] bg-black/50"></div>
-      <div class="absolute inset-y-0 right-0 w-[1px] bg-black/50"></div>
-      <div class="absolute inset-x-0 top-0 h-[1px] bg-black/50"></div>
-      <div class="absolute inset-x-0 bottom-0 h-[1px] bg-black/50"></div>
-    </template>
+  <VEntity :is-selected="isSelected">
     <template
       v-if="currentUserHasPermission(['system:comments:manage'])"
       #checkbox
@@ -465,10 +460,7 @@ const { operationItems } = useOperationItemExtensionPoint<ListedComment>(
     </template>
 
     <template v-if="showReplies" #footer>
-      <!-- Replies -->
-      <div
-        class="ml-8 mt-3 divide-y divide-gray-100 rounded-base border-t border-gray-100 pt-3"
-      >
+      <div class="pl-8">
         <VLoading v-if="isLoading" />
         <Transition v-else-if="!replies?.length" appear name="fade">
           <VEmpty
@@ -491,16 +483,15 @@ const { operationItems } = useOperationItemExtensionPoint<ListedComment>(
           </VEmpty>
         </Transition>
         <Transition v-else appear name="fade">
-          <div>
+          <VEntityContainer>
             <ReplyListItem
               v-for="reply in replies"
               :key="reply.reply.metadata.name"
-              :class="{ 'hover:bg-white': showReplies }"
               :reply="reply"
               :comment="comment"
               :replies="replies"
             ></ReplyListItem>
-          </div>
+          </VEntityContainer>
         </Transition>
       </div>
     </template>

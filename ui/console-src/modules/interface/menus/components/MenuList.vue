@@ -10,6 +10,7 @@ import {
   VDropdownItem,
   VEmpty,
   VEntity,
+  VEntityContainer,
   VEntityField,
   VLoading,
   VStatusDot,
@@ -187,66 +188,63 @@ const handleSetPrimaryMenu = async (menu: Menu) => {
       </VEmpty>
     </Transition>
     <Transition v-else appear name="fade">
-      <ul class="box-border h-full w-full divide-y divide-gray-100" role="list">
-        <li
-          v-for="(menu, index) in menus"
-          :key="index"
+      <VEntityContainer>
+        <VEntity
+          v-for="menu in menus"
+          :key="menu.metadata.name"
+          :is-selected="selectedMenu?.metadata.name === menu.metadata.name"
           @click="handleSelect(menu)"
         >
-          <VEntity
-            :is-selected="selectedMenu?.metadata.name === menu.metadata.name"
-          >
-            <template #start>
-              <VEntityField
-                :title="menu.spec?.displayName"
-                :description="
-                  $t('core.menu.list.fields.items_count', {
-                    count: menu.spec.menuItems?.length || 0,
-                  })
-                "
-              >
-                <template v-if="menu.metadata.name === primaryMenuName" #extra>
-                  <VTag>
-                    {{ $t("core.menu.list.fields.primary") }}
-                  </VTag>
-                </template>
-              </VEntityField>
-            </template>
-            <template #end>
-              <VEntityField v-if="menu.metadata.deletionTimestamp">
-                <template #description>
-                  <VStatusDot
-                    v-tooltip="$t('core.common.status.deleting')"
-                    state="warning"
-                    animate
-                  />
-                </template>
-              </VEntityField>
-            </template>
-            <template
-              v-if="currentUserHasPermission(['system:menus:manage'])"
-              #dropdownItems
+          <template #start>
+            <VEntityField
+              :title="menu.spec?.displayName"
+              :description="
+                $t('core.menu.list.fields.items_count', {
+                  count: menu.spec.menuItems?.length || 0,
+                })
+              "
             >
-              <VDropdownItem
-                v-if="primaryMenuName !== menu.metadata.name"
-                @click="handleSetPrimaryMenu(menu)"
-              >
-                {{ $t("core.menu.operations.set_primary.button") }}
-              </VDropdownItem>
-              <VDropdownItem @click="handleOpenEditingModal(menu)">
-                {{ $t("core.common.buttons.edit") }}
-              </VDropdownItem>
-              <VDropdownItem
-                :disabled="primaryMenuName === menu.metadata.name"
-                type="danger"
-                @click="handleDeleteMenu(menu)"
-              >
-                {{ $t("core.common.buttons.delete") }}
-              </VDropdownItem>
-            </template>
-          </VEntity>
-        </li>
-      </ul>
+              <template v-if="menu.metadata.name === primaryMenuName" #extra>
+                <VTag>
+                  {{ $t("core.menu.list.fields.primary") }}
+                </VTag>
+              </template>
+            </VEntityField>
+          </template>
+          <template #end>
+            <VEntityField v-if="menu.metadata.deletionTimestamp">
+              <template #description>
+                <VStatusDot
+                  v-tooltip="$t('core.common.status.deleting')"
+                  state="warning"
+                  animate
+                />
+              </template>
+            </VEntityField>
+          </template>
+          <template
+            v-if="currentUserHasPermission(['system:menus:manage'])"
+            #dropdownItems
+          >
+            <VDropdownItem
+              v-if="primaryMenuName !== menu.metadata.name"
+              @click="handleSetPrimaryMenu(menu)"
+            >
+              {{ $t("core.menu.operations.set_primary.button") }}
+            </VDropdownItem>
+            <VDropdownItem @click="handleOpenEditingModal(menu)">
+              {{ $t("core.common.buttons.edit") }}
+            </VDropdownItem>
+            <VDropdownItem
+              :disabled="primaryMenuName === menu.metadata.name"
+              type="danger"
+              @click="handleDeleteMenu(menu)"
+            >
+              {{ $t("core.common.buttons.delete") }}
+            </VDropdownItem>
+          </template>
+        </VEntity>
+      </VEntityContainer>
     </Transition>
     <template v-if="currentUserHasPermission(['system:menus:manage'])" #footer>
       <VButton block type="secondary" @click="handleOpenEditingModal()">

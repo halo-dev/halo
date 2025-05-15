@@ -111,6 +111,7 @@ const onEmojiSelect = (emoji: { native: string }) => {
     ref="modal"
     :title="$t('core.comment.reply_modal.title')"
     :width="500"
+    :mount-to-body="true"
     @close="emit('close')"
   >
     <FormKit

@@ -10,6 +10,7 @@ import {
   VAvatar,
   VDropdown,
   VEntity,
+  VEntityContainer,
   VEntityField,
 } from "@halo-dev/components";
 import { useQuery } from "@tanstack/vue-query";
@@ -129,36 +130,31 @@ function onDropdownShow() {
           ></FormKit>
         </div>
         <div>
-          <ul
-            class="box-border h-full w-full divide-y divide-gray-100"
-            role="list"
-          >
-            <li
+          <VEntityContainer>
+            <VEntity
               v-for="user in users"
               :key="user.metadata.name"
-              class="cursor-pointer"
+              :is-selected="modelValue === user.metadata.name"
               @click="handleSelect(user)"
             >
-              <VEntity :is-selected="modelValue === user.metadata.name">
-                <template #start>
-                  <VEntityField>
-                    <template #description>
-                      <VAvatar
-                        :key="user.metadata.name"
-                        :alt="user.spec.displayName"
-                        :src="user.spec.avatar"
-                        size="md"
-                      ></VAvatar>
-                    </template>
-                  </VEntityField>
-                  <VEntityField
-                    :title="user.spec.displayName"
-                    :description="user.metadata.name"
-                  />
-                </template>
-              </VEntity>
-            </li>
-          </ul>
+              <template #start>
+                <VEntityField>
+                  <template #description>
+                    <VAvatar
+                      :key="user.metadata.name"
+                      :alt="user.spec.displayName"
+                      :src="user.spec.avatar"
+                      size="md"
+                    ></VAvatar>
+                  </template>
+                </VEntityField>
+                <VEntityField
+                  :title="user.spec.displayName"
+                  :description="user.metadata.name"
+                />
+              </template>
+            </VEntity>
+          </VEntityContainer>
         </div>
       </div>
     </template>
