@@ -724,6 +724,7 @@ public class UserEndpoint implements CustomEndpoint {
             Optional.ofNullable(getKeyword())
                 .filter(StringUtils::isNotBlank)
                 .ifPresent(keyword -> builder.andQuery(or(
+                    equal("spec.email", keyword),
                     contains("spec.displayName", keyword),
                     equal("metadata.name", keyword)
                 )));
