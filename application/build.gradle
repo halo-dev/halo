@@ -68,6 +68,10 @@ bootJar {
     }
 }
 
+gitProperties {
+    dotGitDirectory = layout.settingsDirectory.dir('.git')
+}
+
 tasks.named('jar') {
     enabled = false
 }
