@@ -2,7 +2,7 @@
   "openapi": "3.0.1",
   "info": {
     "title": "Halo",
-    "version": "2.20.11-SNAPSHOT"
+    "version": "2.20.22-SNAPSHOT"
   },
   "servers": [
     {
@@ -10025,7 +10025,8 @@
           "spec": {
             "$ref": "#/components/schemas/AuthProviderSpec"
           }
-        }
+        },
+        "description": "Auth provider extension."
       },
       "AuthProviderList": {
         "required": [
@@ -10096,6 +10097,7 @@
         "properties": {
           "authType": {
             "type": "string",
+            "description": "Auth type: form or oauth2.",
             "enum": [
               "FORM",
               "OAUTH2"
@@ -10267,7 +10269,8 @@
             "type": "string"
           },
           "filename": {
-            "type": "string"
+            "type": "string",
+            "description": "Name of backup file."
           },
           "phase": {
             "type": "string",
@@ -10280,6 +10283,7 @@
           },
           "size": {
             "type": "integer",
+            "description": "Size of backup file. Data unit: byte",
             "format": "int64"
           },
           "startTimestamp": {
@@ -10398,14 +10402,17 @@
             "type": "string"
           },
           "hideFromList": {
-            "type": "boolean"
+            "type": "boolean",
+            "description": "\u003cp\u003eWhether to hide the category from the category list.\u003c/p\u003e\n \u003cp\u003eWhen set to true, the category including its subcategories and related posts will\n not be displayed in the category list, but it can still be accessed by permalink.\u003c/p\u003e\n \u003cp\u003eLimitation: It only takes effect on the theme-side categorized list and it only\n allows to be set to true on the first level(root node) of categories.\u003c/p\u003e"
           },
           "postTemplate": {
             "maxLength": 255,
-            "type": "string"
+            "type": "string",
+            "description": "\u003cp\u003eUsed to specify the template for the posts associated with the category.\u003c/p\u003e\n \u003cp\u003eThe priority is not as high as that of the post.\u003c/p\u003e\n \u003cp\u003eIf the post also specifies a template, the post\u0027s template will prevail.\u003c/p\u003e"
           },
           "preventParentPostCascadeQuery": {
-            "type": "boolean"
+            "type": "boolean",
+            "description": "\u003cp\u003eif a category is queried for related posts, the default behavior is to\n query all posts under the category including its subcategories, but if this field is\n set to true, cascade query behavior will be terminated here.\u003c/p\u003e\n \u003cp\u003eFor example, if a category has subcategories A and B, and A has subcategories C and\n D and C marked this field as true, when querying posts under A category,all posts under A\n and B will be queried, but C and D will not be queried.\u003c/p\u003e"
           },
           "priority": {
             "type": "integer",
@@ -10430,10 +10437,12 @@
           },
           "postCount": {
             "type": "integer",
+            "description": "包括当前和其下所有层级的文章数量 (depth\u003dmax).",
             "format": "int32"
           },
           "visiblePostCount": {
             "type": "integer",
+            "description": "包括当前和其下所有层级的已发布且公开的文章数量 (depth\u003dmax).",
             "format": "int32"
           }
         }
@@ -10581,6 +10590,7 @@
           },
           "creationTime": {
             "type": "string",
+            "description": "The user-defined creation time default is \u003ccode\u003emetadata.creationTimestamp\u003c/code\u003e.",
             "format": "date-time"
           },
           "hidden": {
@@ -10656,19 +10666,23 @@
         "properties": {
           "lastTransitionTime": {
             "type": "string",
+            "description": "Last time the condition transitioned from one status to another.",
             "format": "date-time"
           },
           "message": {
             "maxLength": 32768,
-            "type": "string"
+            "type": "string",
+            "description": "Human-readable message indicating details about last transition.\n This may be an empty string."
           },
           "reason": {
             "maxLength": 1024,
             "pattern": "^[A-Za-z]([A-Za-z0-9_,:]*[A-Za-z0-9_])?$",
-            "type": "string"
+            "type": "string",
+            "description": "Unique, one-word, CamelCase reason for the condition\u0027s last transition."
           },
           "status": {
             "type": "string",
+            "description": "Status is the status of the condition. Can be True, False, Unknown.",
             "enum": [
               "TRUE",
               "FALSE",
@@ -10678,9 +10692,11 @@
           "type": {
             "maxLength": 316,
             "pattern": "^([a-z0-9]([-a-z0-9]*[a-z0-9])?(\\.[a-z0-9]([-a-z0-9]*[a-z0-9])?)*/)?(([A-Za-z0-9][-A-Za-z0-9_.]*)?[A-Za-z0-9])$",
-            "type": "string"
+            "type": "string",
+            "description": "type of condition in CamelCase or in foo.example.com/CamelCase.\n example: Ready, Initialized.\n maxLength: 316."
           }
-        }
+        },
+        "description": "EqualsAndHashCode 排除了lastTransitionTime否则失败时，lastTransitionTime 会被更新\n 导致 equals 为 false，一直被加入队列."
       },
       "ConfigMap": {
         "required": [
@@ -10705,7 +10721,8 @@
           "metadata": {
             "$ref": "#/components/schemas/Metadata"
           }
-        }
+        },
+        "description": "\u003cp\u003eConfigMap holds configuration data to consume.\u003c/p\u003e"
       },
       "ConfigMapList": {
         "required": [
@@ -10843,7 +10860,8 @@
             "type": "integer",
             "format": "int32"
           }
-        }
+        },
+        "description": "A counter for number of requests by extension resource name."
       },
       "CounterList": {
         "required": [
@@ -11097,7 +11115,8 @@
           "spec": {
             "$ref": "#/components/schemas/ExtensionSpec"
           }
-        }
+        },
+        "description": "Extension definition.\n An {@link ExtensionDefinition ExtensionDefinition} is a type of metadata that provides additional information about\n an extension. An extension is a way to add new functionality to an existing class, structure,\n enumeration, or protocol type without needing to subclass it."
       },
       "ExtensionDefinitionList": {
         "required": [
@@ -11179,7 +11198,8 @@
           "spec": {
             "$ref": "#/components/schemas/ExtensionPointSpec"
           }
-        }
+        },
+        "description": "Extension point definition.\n An {@link ExtensionPointDefinition ExtensionPointDefinition} is a concept used in \u003ccode\u003eHalo\u003c/code\u003e to allow for the\n dynamic extension of system. It defines a location within \u003ccode\u003eHalo\u003c/code\u003e where\n additional functionality can be added through the use of plugins or extensions."
       },
       "ExtensionPointDefinitionList": {
         "required": [
@@ -11335,12 +11355,15 @@
         "type": "object",
         "properties": {
           "group": {
-            "type": "string"
+            "type": "string",
+            "description": "is group name of Extension."
           },
           "kind": {
-            "type": "string"
+            "type": "string",
+            "description": "is kind name of Extension."
           }
-        }
+        },
+        "description": "GroupKind contains group and kind data only."
       },
       "GroupList": {
         "required": [
@@ -11509,7 +11532,8 @@
           "url": {
             "type": "string"
           }
-        }
+        },
+        "description": "Common data objects for license."
       },
       "LocalThumbnail": {
         "required": [
@@ -11608,11 +11632,13 @@
         "type": "object",
         "properties": {
           "filePath": {
-            "type": "string"
+            "type": "string",
+            "description": "Consider the compatibility of the system and migration, use unix-style relative paths\n here."
           },
           "imageSignature": {
             "minLength": 1,
-            "type": "string"
+            "type": "string",
+            "description": "A hash signature for the image uri."
           },
           "imageUri": {
             "minLength": 1,
@@ -11629,7 +11655,8 @@
           },
           "thumbSignature": {
             "minLength": 1,
-            "type": "string"
+            "type": "string",
+            "description": "A hash signature for the thumbnail uri."
           },
           "thumbnailUri": {
             "minLength": 1,
@@ -11931,15 +11958,18 @@
             "type": "object",
             "additionalProperties": {
               "type": "string"
-            }
+            },
+            "description": "Annotations are like key-value format."
           },
           "creationTimestamp": {
             "type": "string",
+            "description": "Creation timestamp of the Extension.",
             "format": "date-time",
             "nullable": true
           },
           "deletionTimestamp": {
             "type": "string",
+            "description": "Deletion timestamp of the Extension.",
             "format": "date-time",
             "nullable": true
           },
@@ -11960,7 +11990,8 @@
             "type": "object",
             "additionalProperties": {
               "type": "string"
-            }
+            },
+            "description": "Labels are like key-value format."
           },
           "name": {
             "type": "string",
@@ -11968,10 +11999,12 @@
           },
           "version": {
             "type": "integer",
+            "description": "Current version of the Extension. It will be bumped up every update.",
             "format": "int64",
             "nullable": true
           }
-        }
+        },
+        "description": "Metadata of Extension."
       },
       "MoveOperation": {
         "required": [
@@ -12021,7 +12054,8 @@
           "spec": {
             "$ref": "#/components/schemas/NotificationSpec"
           }
-        }
+        },
+        "description": "\u003cp\u003e{@link Notification Notification} is a custom extension that used to store notification information for\n inner use, it\u0027s on-site notification.\u003c/p\u003e\n\n \u003cp\u003eSupports the following operations:\u003c/p\u003e\n \u003cul\u003e\n    \u003cli\u003eMarked as read: {@link NotificationSpec#setUnread(boolean) NotificationSpec#setUnread(boolean)}\u003c/li\u003e\n    \u003cli\u003eGet the last read time: {@link NotificationSpec#getLastReadAt NotificationSpec#getLastReadAt()}\u003c/li\u003e\n    \u003cli\u003eFilter by recipient: {@link NotificationSpec#getRecipient NotificationSpec#getRecipient()}\u003c/li\u003e\n \u003c/ul\u003e"
       },
       "NotificationList": {
         "required": [
@@ -12141,7 +12175,8 @@
           "spec": {
             "$ref": "#/components/schemas/NotificationTemplateSpec"
           }
-        }
+        },
+        "description": "\u003cp\u003e{@link NotificationTemplate NotificationTemplate} is a custom extension that defines a notification template.\u003c/p\u003e\n \u003cp\u003eIt describes the notification template\u0027s name, description, and the template content.\u003c/p\u003e\n \u003cp\u003e{@link Spec#getReasonSelector Spec#getReasonSelector()} is used to select the template by reasonType and language,\n if multiple templates are matched, the best match will be selected. This is useful when you\n want to override the default template.\u003c/p\u003e"
       },
       "NotificationTemplateList": {
         "required": [
@@ -12233,7 +12268,8 @@
           "spec": {
             "$ref": "#/components/schemas/NotifierDescriptorSpec"
           }
-        }
+        },
+        "description": "\u003cp\u003e{@link NotifierDescriptor NotifierDescriptor} is a custom extension that defines a notifier.\u003c/p\u003e\n \u003cp\u003eIt describes the notifier\u0027s name, description, and the extension name of the notifier to\n let the user know what the notifier is and what it can do in the UI and also let the\n \u003ccode\u003eNotificationCenter\u003c/code\u003e know how to load the notifier and prepare the notifier\u0027s settings.\u003c/p\u003e"
       },
       "NotifierDescriptorList": {
         "required": [
@@ -12489,7 +12525,8 @@
           "status": {
             "$ref": "#/components/schemas/PluginStatus"
           }
-        }
+        },
+        "description": "A custom resource for Plugin."
       },
       "PluginAuthor": {
         "required": [
@@ -12615,14 +12652,16 @@
             "type": "string"
           },
           "requires": {
-            "type": "string"
+            "type": "string",
+            "description": "SemVer format."
           },
           "settingName": {
             "type": "string"
           },
           "version": {
             "pattern": "^(0|[1-9]\\d*)\\.(0|[1-9]\\d*)\\.(0|[1-9]\\d*)(?:-((?:0|[1-9]\\d*|\\d*[a-zA-Z-][0-9a-zA-Z-]*)(?:\\.(?:0|[1-9]\\d*|\\d*[a-zA-Z-][0-9a-zA-Z-]*))*))?(?:\\+([0-9a-zA-Z-]+(?:\\.[0-9a-zA-Z-]+)*))?$",
-            "type": "string"
+            "type": "string",
+            "description": "plugin version."
           }
         }
       },
@@ -12774,35 +12813,41 @@
         "properties": {
           "apiGroups": {
             "type": "array",
+            "description": "APIGroups is the name of the APIGroup that contains the resources.\n If multiple API groups are specified, any action requested against one of the enumerated\n resources in any API group will be allowed.",
             "items": {
               "type": "string"
             }
           },
           "nonResourceURLs": {
             "type": "array",
+            "description": "NonResourceURLs is a set of partial urls that a user should have access to.\n *s are allowed, but only as the full, final step in the path\n If an action is not a resource API request, then the URL is split on \u0027/\u0027 and is checked\n against the NonResourceURLs to look for a match.\n Since non-resource URLs are not namespaced, this field is only applicable for\n ClusterRoles referenced from a ClusterRoleBinding.\n Rules can either apply to API resources (such as \"pods\" or \"secrets\") or non-resource\n URL paths (such as \"/api\"),  but not both.",
             "items": {
               "type": "string"
             }
           },
           "resourceNames": {
             "type": "array",
+            "description": "ResourceNames is an optional white list of names that the rule applies to.  An empty set\n means that everything is allowed.",
             "items": {
               "type": "string"
             }
           },
           "resources": {
             "type": "array",
+            "description": "Resources is a list of resources this rule applies to.  \u0027*\u0027 represents all resources in\n the specified apiGroups.\n \u0027*\u0026#47;foo\u0027 represents the subresource \u0027foo\u0027 for all resources in the specified\n apiGroups.",
             "items": {
               "type": "string"
             }
           },
           "verbs": {
             "type": "array",
+            "description": "about who the rule applies to or which namespace the rule applies to.",
             "items": {
               "type": "string"
             }
           }
-        }
+        },
+        "description": "PolicyRule holds information that describes a policy rule, but does not contain information\n about whom the rule applies to or which namespace the rule applies to."
       },
       "PolicySpec": {
         "required": [
@@ -12944,7 +12989,8 @@
           "status": {
             "$ref": "#/components/schemas/PostStatus"
           }
-        }
+        },
+        "description": "\u003cp\u003ePost extension.\u003c/p\u003e"
       },
       "PostList": {
         "required": [
@@ -13075,7 +13121,8 @@
             "format": "date-time"
           },
           "releaseSnapshot": {
-            "type": "string"
+            "type": "string",
+            "description": "文章引用到的已发布的内容，用于主题端显示."
           },
           "slug": {
             "minLength": 1,
@@ -13133,7 +13180,8 @@
             "type": "string"
           },
           "hideFromList": {
-            "type": "boolean"
+            "type": "boolean",
+            "description": "see {@link Category.CategorySpec#isHideFromList Category.CategorySpec#isHideFromList()}."
           },
           "inProgress": {
             "type": "boolean"
@@ -13174,7 +13222,8 @@
           "spec": {
             "$ref": "#/components/schemas/ReasonSpec"
           }
-        }
+        },
+        "description": "\u003cp\u003e{@link Reason Reason} is a custom extension that defines a reason for a notification, It represents\n an instance of a {@link ReasonType ReasonType}.\u003c/p\u003e\n \u003cp\u003eIt can be understood as an event that triggers a notification.\u003c/p\u003e"
       },
       "ReasonAttributes": {
         "type": "object",
@@ -13354,7 +13403,8 @@
           "spec": {
             "$ref": "#/components/schemas/ReasonTypeSpec"
           }
-        }
+        },
+        "description": "\u003cp\u003e{@link ReasonType ReasonType} is a custom extension that defines a type of reason.\u003c/p\u003e\n \u003cp\u003eOne {@link ReasonType ReasonType} can have multiple {@link Reason Reason}s to notify.\u003c/p\u003e"
       },
       "ReasonTypeList": {
         "required": [
@@ -13739,6 +13789,7 @@
           },
           "creationTime": {
             "type": "string",
+            "description": "The user-defined creation time default is \u003ccode\u003emetadata.creationTimestamp\u003c/code\u003e.",
             "format": "date-time"
           },
           "hidden": {
@@ -13804,7 +13855,8 @@
               "$ref": "#/components/schemas/ReverseProxyRule"
             }
           }
-        }
+        },
+        "description": "\u003cp\u003eThe reverse proxy custom resource is used to configure a path to proxy it to a directory or\n file.\u003c/p\u003e\n \u003cp\u003eHTTP proxy may be added in the future.\u003c/p\u003e"
       },
       "ReverseProxyList": {
         "required": [
@@ -13924,11 +13976,13 @@
           },
           "subjects": {
             "type": "array",
+            "description": "Subjects holds references to the objects the role applies to.",
             "items": {
               "$ref": "#/components/schemas/Subject"
             }
           }
-        }
+        },
+        "description": "RoleBinding references a role, but does not contain it.\n It can reference a Role in the global.\n It adds who information via Subjects."
       },
       "RoleBindingList": {
         "required": [
@@ -14052,15 +14106,19 @@
         "type": "object",
         "properties": {
           "apiGroup": {
-            "type": "string"
+            "type": "string",
+            "description": "APIGroup is the group for the resource being referenced."
           },
           "kind": {
-            "type": "string"
+            "type": "string",
+            "description": "Kind is the type of resource being referenced."
           },
           "name": {
-            "type": "string"
+            "type": "string",
+            "description": "Name is the name of resource being referenced."
           }
-        }
+        },
+        "description": "RoleRef contains information that points to the role being used."
       },
       "SearchEngine": {
         "required": [
@@ -14083,7 +14141,8 @@
           "spec": {
             "$ref": "#/components/schemas/SearchEngineSpec"
           }
-        }
+        },
+        "description": "Search engine extension."
       },
       "SearchEngineList": {
         "required": [
@@ -14186,7 +14245,8 @@
             "additionalProperties": {
               "type": "string",
               "format": "byte"
-            }
+            },
+            "description": "\u003cp\u003eThe total bytes of the values in\n the Data field must be less than {@link run.halo.app.extension.Secret#MAX_SECRET_SIZE #MAX_SECRET_SIZE} bytes.\u003c/p\u003e\n \u003cp\u003e\u003ccode\u003edata\u003c/code\u003e contains the secret data. Each key must consist of alphanumeric\n characters, \u0027-\u0027, \u0027_\u0027 or \u0027.\u0027. The serialized form of the secret data is a\n base64 encoded string, representing the arbitrary (possibly non-string)\n data value here. Described in\n \u003ca href\u003d\"https://tools.ietf.org/html/rfc4648#section-4\"\u003erfc4648#section-4\u003c/a\u003e\n \u003c/p\u003e"
           },
           "kind": {
             "type": "string"
@@ -14198,12 +14258,15 @@
             "type": "object",
             "additionalProperties": {
               "type": "string"
-            }
+            },
+            "description": "\u003ccode\u003estringData\u003c/code\u003e allows specifying non-binary secret data in string form.\n It is provided as a write-only input field for convenience.\n All keys and values are merged into the data field on write, overwriting any existing\n values.\n The stringData field is never output when reading from the API."
           },
           "type": {
-            "type": "string"
+            "type": "string",
+            "description": "Used to facilitate programmatic handling of secret data.\n More info:\n \u003ca href\u003d\"https://kubernetes.io/docs/concepts/configuration/secret/#secret-types\"\u003esecret-types\u003c/a\u003e"
           }
-        }
+        },
+        "description": "Secret is a small piece of sensitive data which should be kept secret, such as a password,\n a token, or a key."
       },
       "SecretList": {
         "required": [
@@ -14285,7 +14348,8 @@
           "spec": {
             "$ref": "#/components/schemas/SettingSpec"
           }
-        }
+        },
+        "description": "{@link Setting Setting} is a custom extension to generate forms based on configuration."
       },
       "SettingForm": {
         "minLength": 1,
@@ -14424,7 +14488,8 @@
           "status": {
             "$ref": "#/components/schemas/SinglePageStatus"
           }
-        }
+        },
+        "description": "\u003cp\u003eSingle page extension.\u003c/p\u003e"
       },
       "SinglePageList": {
         "required": [
@@ -14549,7 +14614,8 @@
             "format": "date-time"
           },
           "releaseSnapshot": {
-            "type": "string"
+            "type": "string",
+            "description": "引用到的已发布的内容，用于主题端显示."
           },
           "slug": {
             "minLength": 1,
@@ -14601,7 +14667,8 @@
             "type": "string"
           },
           "hideFromList": {
-            "type": "boolean"
+            "type": "boolean",
+            "description": "see {@link Category.CategorySpec#isHideFromList Category.CategorySpec#isHideFromList()}."
           },
           "inProgress": {
             "type": "boolean"
@@ -14657,7 +14724,8 @@
           "rawType": {
             "maxLength": 50,
             "minLength": 1,
-            "type": "string"
+            "type": "string",
+            "description": "such as: markdown | html | json | asciidoc | latex."
           },
           "subjectRef": {
             "$ref": "#/components/schemas/Ref"
@@ -14750,13 +14818,16 @@
         "type": "object",
         "properties": {
           "apiGroup": {
-            "type": "string"
+            "type": "string",
+            "description": "APIGroup holds the API group of the referenced subject.\n Defaults to \"\" for ServiceAccount subjects.\n Defaults to \"rbac.authorization.halo.run\" for User and Group subjects."
           },
           "kind": {
-            "type": "string"
+            "type": "string",
+            "description": "Kind of object being referenced. Values defined by this API group are \"User\", \"Group\",\n and \"ServiceAccount\".\n If the Authorizer does not recognize the kind value, the Authorizer should report\n an error."
           },
           "name": {
-            "type": "string"
+            "type": "string",
+            "description": "Name of the object being referenced."
           }
         }
       },
@@ -14780,7 +14851,8 @@
           "spec": {
             "$ref": "#/components/schemas/SubscriptionSpec"
           }
-        }
+        },
+        "description": "\u003cp\u003e{@link Subscription Subscription} is a custom extension that defines a subscriber to be notified when a\n certain {@link Reason Reason} is triggered.\u003c/p\u003e\n \u003cp\u003eIt holds a {@link Subscriber Subscriber} to the user to be notified, a {@link InterestReason InterestReason} to\n subscribe to.\u003c/p\u003e"
       },
       "SubscriptionList": {
         "required": [
@@ -14972,7 +15044,8 @@
         "properties": {
           "color": {
             "pattern": "^#([a-fA-F0-9]{6}|[a-fA-F0-9]{3})$",
-            "type": "string"
+            "type": "string",
+            "description": "Color regex explanation.\n \u003cpre\u003e\n ^                 # start of the line\n #                 # start with a number sign `#`\n (                 # start of (group 1)\n   [a-fA-F0-9]{6}  # support z-f, A-F and 0-9, with a length of 6\n   |               # or\n   [a-fA-F0-9]{3}  # support z-f, A-F and 0-9, with a length of 3\n )                 # end of (group 1)\n $                 # end of the line\n \u003c/pre\u003e"
           },
           "cover": {
             "type": "string"
@@ -15046,7 +15119,8 @@
           "screenshot": {
             "type": "string"
           }
-        }
+        },
+        "description": "Type used to describe custom template page."
       },
       "TestOperation": {
         "required": [
@@ -15097,7 +15171,8 @@
           "status": {
             "$ref": "#/components/schemas/ThemeStatus"
           }
-        }
+        },
+        "description": "\u003cp\u003eTheme extension.\u003c/p\u003e"
       },
       "ThemeList": {
         "required": [
@@ -15183,7 +15258,8 @@
             "type": "string"
           },
           "homepage": {
-            "type": "string"
+            "type": "string",
+            "description": "Compatible with {@link run.halo.app.core.extension.Theme$ThemeSpec#website #website} property."
           },
           "issues": {
             "type": "string"
@@ -15206,7 +15282,8 @@
             "deprecated": true
           },
           "requires": {
-            "type": "string"
+            "type": "string",
+            "description": "if requires is not empty, then return requires, else return require or \u003ccode\u003eWILDCARD\u003c/code\u003e."
           },
           "settingName": {
             "type": "string"
@@ -15385,7 +15462,8 @@
           "status": {
             "$ref": "#/components/schemas/UserStatus"
           }
-        }
+        },
+        "description": "The extension represents user details of Halo."
       },
       "UserConnection": {
         "required": [
@@ -15408,7 +15486,8 @@
           "spec": {
             "$ref": "#/components/schemas/UserConnectionSpec"
           }
-        }
+        },
+        "description": "User connection extension."
       },
       "UserConnectionList": {
         "required": [
@@ -15478,17 +15557,21 @@
         "type": "object",
         "properties": {
           "providerUserId": {
-            "type": "string"
+            "type": "string",
+            "description": "The unique identifier for the user\u0027s connection to the OAuth provider.\n for example, the user\u0027s GitHub id."
           },
           "registrationId": {
-            "type": "string"
+            "type": "string",
+            "description": "The name of the OAuth provider (e.g. Google, Facebook, Twitter)."
           },
           "updatedAt": {
             "type": "string",
+            "description": "The time when the user connection was last updated.",
             "format": "date-time"
           },
           "username": {
-            "type": "string"
+            "type": "string",
+            "description": "The {@link Metadata#getName Metadata#getName()} of the user associated with the OAuth connection."
           }
         }
       },
