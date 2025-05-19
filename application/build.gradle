@@ -97,12 +97,16 @@ tasks.register('createChecksums', Checksum) {
     checksumAlgorithm = Checksum.Algorithm.SHA256
 }
 
-tasks.named('processResources', ProcessResources) {
+tasks.register('copyUiDist', Copy) {
     from project(':ui').layout.buildDirectory.dir('dist')
     into layout.buildDirectory.dir('resources/main')
     configure {
         mustRunAfter project(':ui').tasks.named('build')
     }
+}
+
+tasks.named('processResources', ProcessResources) {
+    dependsOn tasks.named('copyUiDist')
 }
 
 tasks.named('build') {
