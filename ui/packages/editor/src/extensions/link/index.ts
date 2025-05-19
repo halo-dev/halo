@@ -8,10 +8,14 @@ const Link = TiptapLink.extend<ExtensionOptions & LinkOptions>({
       ...this.parent?.(),
       ...{
         HTMLAttributes: {
-          rel: null,
+          rel: "noopener noreferrer",
         },
       },
     };
+  },
+
+  renderHTML({ HTMLAttributes }) {
+    return ["a", HTMLAttributes, 0];
   },
 
   addPasteRules() {

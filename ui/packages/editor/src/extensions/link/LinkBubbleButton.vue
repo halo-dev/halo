@@ -25,6 +25,7 @@ const href = computed({
     props.editor.commands.setLink({
       href: value,
       target: target.value ? "_blank" : "_self",
+      rel: rel.value ? "nofollow" : "",
     });
   },
 });
@@ -38,6 +39,21 @@ const target = computed({
     props.editor.commands.setLink({
       href: href.value,
       target: value ? "_blank" : "_self",
+      rel: rel.value ? "nofollow" : "",
+    });
+  },
+});
+
+const rel = computed({
+  get() {
+    const attrs = props.editor.getAttributes("link");
+    return attrs?.rel === "nofollow";
+  },
+  set(value) {
+    props.editor.commands.setLink({
+      href: href.value,
+      target: target.value ? "_blank" : "_self",
+      rel: value ? "nofollow" : "",
     });
   },
 });
@@ -66,6 +82,7 @@ const handleLinkBubbleButton = () => {
       props.editor.commands.setLink({
         href: text,
         target: "_self",
+        rel: "",
       });
     }
   }
@@ -100,7 +117,7 @@ const handleLinkBubbleButton = () => {
           :placeholder="i18n.global.t('editor.extensions.link.placeholder')"
           class="bg-gray-50 rounded-md hover:bg-gray-100 block px-2 w-full py-1.5 text-sm text-gray-900 border border-gray-300 focus:ring-blue-500 focus:border-blue-500"
         />
-        <label class="inline-flex items-center mt-2">
+        <label class="inline-flex items-center mt-2 mr-2">
           <input
             v-model="target"
             type="checkbox"
@@ -108,6 +125,17 @@ const handleLinkBubbleButton = () => {
           />
           <span class="ml-2 text-sm text-gray-500">
             {{ i18n.global.t("editor.extensions.link.open_in_new_window") }}
+          </span>
+        </label>
+        <label class="inline-flex items-center mt-2">
+          <!-- nofollow -->
+          <input
+            v-model="rel"
+            type="checkbox"
+            class="form-checkbox text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
+          />
+          <span class="ml-2 text-sm text-gray-500">
+            {{ i18n.global.t("editor.extensions.link.nofollow") }}
           </span>
         </label>
       </div>
