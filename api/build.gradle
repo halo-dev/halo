@@ -2,8 +2,8 @@ plugins {
     id 'java-library'
     id 'halo.publish'
     id 'jacoco'
-    id "io.freefair.lombok"
-    id "com.github.ben-manes.versions"
+    alias(libs.plugins.lombok)
+    alias(libs.plugins.versions)
 }
 
 group = 'run.halo.app'
