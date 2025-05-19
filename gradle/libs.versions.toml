@@ -1,7 +1,7 @@
 [versions]
 lucene = '9.12.0'
-resilience4j = '2.2.0'
-therapi = '0.13.0'
+resilience4j = '2.3.0'
+therapi = '0.15.0'
 
 [libraries]
 lucene-core = { module = 'org.apache.lucene:lucene-core', version.ref = 'lucene' }
@@ -17,13 +17,13 @@ resilience4j-springboot3 = { module = 'io.github.resilience4j:resilience4j-sprin
 resilience4j-reactor = { module = 'io.github.resilience4j:resilience4j-reactor', version.ref = 'resilience4j' }
 
 apache-commons-lang3 = 'org.apache.commons:commons-lang3:3.12.0'
-apache-tika-core = 'org.apache.tika:tika-core:2.9.2'
+apache-tika-core = 'org.apache.tika:tika-core:3.1.0'
 
 encoding-base62 = 'io.seruco.encoding:base62:0.1.3'
 pf4j = 'org.pf4j:pf4j:3.13.0'
-guava = 'com.google.guava:guava:33.3.1-jre'
+guava = 'com.google.guava:guava:33.4.8-jre'
 java-diff-utils = 'io.github.java-diff-utils:java-diff-utils:4.15'
-jsoup = 'org.jsoup:jsoup:1.18.1'
+jsoup = 'org.jsoup:jsoup:1.20.1'
 json-patch = 'com.github.java-json-tools:json-patch:1.13'
 springdoc-openapi = 'org.springdoc:springdoc-openapi-starter-webflux-ui:2.8.8'
 openapi-schema-validator = 'org.openapi4j:openapi-schema-validator:1.0.7'
@@ -41,9 +41,9 @@ therapi = ['therapi-runtime-javadoc', 'therapi-runtime-javadoc-scribe']
 [plugins]
 spring-boot = 'org.springframework.boot:3.4.5'
 spring-dependency-management = 'io.spring.dependency-management:1.1.7'
-git-properties = 'com.gorylenko.gradle-git-properties:2.4.1'
+git-properties = 'com.gorylenko.gradle-git-properties:2.5.0'
 undercouch-download = 'de.undercouch.download:5.6.0'
-lombok = 'io.freefair.lombok:8.13'
+lombok = 'io.freefair.lombok:8.13.1'
 checksum = 'org.gradle.crypto.checksum:1.4.0'
 node = 'com.github.node-gradle.node:7.1.0'
 openapi-generator = 'org.openapi.generator:7.12.0'
