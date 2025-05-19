@@ -1,6 +1,6 @@
 {
   "name": "@halo-dev/api-client",
-  "version": "2.20.21",
+  "version": "2.21.0",
   "description": "API Client for Halo 2",
   "homepage": "https://github.com/halo-dev/halo/tree/main/ui/packages/api-client#readme",
   "bugs": {
