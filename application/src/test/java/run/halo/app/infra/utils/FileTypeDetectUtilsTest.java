@@ -36,7 +36,7 @@ class FileTypeDetectUtilsTest {
     void detectMimeTypeWithNameTest() throws IOException {
         var stream = getFileInputStream("classpath:file-type-detect/index.js");
         String mimeType = FileTypeDetectUtils.detectMimeType(stream, "index.js");
-        assertThat(mimeType).isEqualTo("application/javascript");
+        assertThat(mimeType).isEqualTo("text/javascript");
 
         stream = getFileInputStream("classpath:file-type-detect/index.html");
         mimeType =
