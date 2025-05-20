@@ -17,12 +17,16 @@ plugins {
 }
 
 group = 'run.halo.app'
-compileJava.options.encoding = 'UTF-8'
-compileTestJava.options.encoding = 'UTF-8'
+
+tasks.withType(JavaCompile).configureEach {
+    options.release = 21
+    options.encoding = 'UTF-8'
+}
 
 java {
-    sourceCompatibility = JavaVersion.VERSION_17
-    targetCompatibility = JavaVersion.VERSION_17
+    toolchain {
+        languageVersion = JavaLanguageVersion.of(21)
+    }
 }
 
 idea {
@@ -101,12 +105,16 @@ tasks.register('createChecksums', Checksum) {
     checksumAlgorithm = Checksum.Algorithm.SHA256
 }
 
-tasks.named('processResources', ProcessResources) {
+tasks.register('copyUiDist', Copy) {
     from project(':ui').layout.buildDirectory.dir('dist')
     into layout.buildDirectory.dir('resources/main')
     configure {
         mustRunAfter project(':ui').tasks.named('build')
     }
+}
+
+tasks.named('processResources', ProcessResources) {
+    dependsOn tasks.named('copyUiDist')
 }
 
 tasks.named('build') {
