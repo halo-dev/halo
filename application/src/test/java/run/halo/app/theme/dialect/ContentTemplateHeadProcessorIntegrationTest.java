@@ -12,6 +12,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import org.jsoup.Jsoup;
+import org.jsoup.nodes.Document;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -106,11 +107,11 @@ class ContentTemplateHeadProcessorIntegrationTest {
             .thenReturn(Mono.empty());
 
         lenient().when(applicationContext.getBeanProvider(ExtensionGetter.class))
-                .thenAnswer(invocation -> {
-                    var objectProvider = mock(ObjectProvider.class);
-                    when(objectProvider.getIfUnique()).thenReturn(extensionGetter);
-                    return objectProvider;
-                });
+            .thenAnswer(invocation -> {
+                var objectProvider = mock(ObjectProvider.class);
+                when(objectProvider.getIfUnique()).thenReturn(extensionGetter);
+                return objectProvider;
+            });
         lenient().when(extensionGetter.getExtensions(TemplateHeadProcessor.class)).thenReturn(
             Flux.fromIterable(map.values()).sort(AnnotationAwareOrderComparator.INSTANCE)
         );
@@ -145,7 +146,9 @@ class ContentTemplateHeadProcessorIntegrationTest {
             2. global head meta is overridden by content head meta
             3. but global head meta is not overridden by global seo meta
          */
-        assertThat(Jsoup.parse(result).html()).isEqualTo("""
+        var outputSettings = new Document.OutputSettings().prettyPrint(true);
+        var actual = Jsoup.parse(result).outputSettings(outputSettings).html();
+        var expected = Jsoup.parse("""
             <!doctype html>
             <html lang="en">
              <head>
@@ -155,10 +158,10 @@ class ContentTemplateHeadProcessorIntegrationTest {
               <meta name="description" content="post-description">
               <meta name="other" content="post-other-meta">
              </head>
-             <body>
-              this is body
-             </body>
-            </html>""");
+             <body>this is body</body>
+            </html>"""
+        ).outputSettings(outputSettings).html();
+        assertThat(actual).isEqualTo(expected);
     }
 
     Map<String, String> mutableMetaMap(String nameValue, String contentValue) {
