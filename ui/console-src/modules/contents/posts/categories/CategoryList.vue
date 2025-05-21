@@ -147,11 +147,11 @@ async function handleUpdateInBatch() {
     </VCard>
   </div>
 </template>
-<style>
-.vtlist-inner {
+<style scoped>
+:deep(.vtlist-inner) {
   @apply divide-y divide-gray-100;
 }
-.he-tree-drag-placeholder {
+:deep(.he-tree-drag-placeholder) {
   height: 60px;
 }
 </style>

@@ -4,6 +4,7 @@ import { ucApiClient } from "@halo-dev/api-client";
 import {
   VButton,
   VEntity,
+  VEntityContainer,
   VEntityField,
   VLoading,
   VSpace,
@@ -60,16 +61,13 @@ const totpDeletionModalVisible = ref(false);
   <VLoading v-if="isLoading" />
 
   <Transition v-else appear name="fade">
-    <ul
-      class="box-border h-full w-full divide-y divide-gray-100 overflow-hidden rounded-base border"
-      role="list"
-    >
-      <li class="bg-gray-50 px-4 py-3">
+    <div class="rounded-base border overflow-hidden">
+      <div class="bg-gray-50 px-4 py-3">
         <span class="text-sm font-semibold text-gray-900">
           {{ $t("core.uc_profile.2fa.methods.title") }}
         </span>
-      </li>
-      <li>
+      </div>
+      <VEntityContainer>
         <VEntity>
           <template #start>
             <VEntityField>
@@ -122,8 +120,8 @@ const totpDeletionModalVisible = ref(false);
             </VEntityField>
           </template>
         </VEntity>
-      </li>
-    </ul>
+      </VEntityContainer>
+    </div>
   </Transition>
 
   <TotpConfigureModal

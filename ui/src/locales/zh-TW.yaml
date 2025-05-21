@@ -916,6 +916,9 @@ core:
       extension-definition:
         empty:
           title: 當前沒有擴展點實現
+        operation:
+          use:
+            button: 使用
     actions:
       extension-point-settings: 擴展配置
   user:
@@ -1164,7 +1167,8 @@ core:
                 manual:
                   label: 如果您無法掃描二維碼，請按一下查看替代步驟。
                   help: 使用以下程式碼手動配置驗證器應用程式：
-              tips: 請妥善保管您的兩步驟驗證裝置，如果裝置遺失或損壞，您將無法登入系統。建議您在多個裝置上安裝驗證器應用程式，或保存好金鑰的備份，以防主要裝置無法使用。
+              tips: >-
+                請妥善保管您的兩步驟驗證裝置，如果裝置遺失或損壞，您將無法登入系統。建議您在多個裝置上安裝驗證器應用程式，或保存好金鑰的備份，以防主要裝置無法使用。
     pat:
       operations:
         delete:
@@ -1576,7 +1580,9 @@ core:
         aspect_ratio_portrait: 裁剪為縱向 (9:16)
     h2_warning_alert:
       title: 警告：正在使用 H2 資料庫
-      description: H2 資料庫僅適用於開發環境和測試環境，不建議在生產環境中使用，H2 非常容易因為操作不當而導致資料檔案損壞。如果必須要使用，請按時進行資料備份。
+      description: >-
+        H2 資料庫僅適用於開發環境和測試環境，不建議在生產環境中使用，H2
+        非常容易因為操作不當而導致資料檔案損壞。如果必須要使用，請按時進行資料備份。
   composables:
     content_cache:
       toast_recovered: 已從緩存中恢復未保存的內容

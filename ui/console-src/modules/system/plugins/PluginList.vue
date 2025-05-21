@@ -16,6 +16,7 @@ import {
   VDropdown,
   VDropdownItem,
   VEmpty,
+  VEntityContainer,
   VLoading,
   VPageHeader,
   VSpace,
@@ -323,17 +324,14 @@ onMounted(() => {
       </Transition>
 
       <Transition v-else appear name="fade">
-        <ul
-          class="box-border h-full w-full divide-y divide-gray-100"
-          role="list"
-        >
-          <li v-for="plugin in data" :key="plugin.metadata.name">
-            <PluginListItem
-              :plugin="plugin"
-              :is-selected="selectedNames.includes(plugin.metadata.name)"
-            />
-          </li>
-        </ul>
+        <VEntityContainer>
+          <PluginListItem
+            v-for="plugin in data"
+            :key="plugin.metadata.name"
+            :plugin="plugin"
+            :is-selected="selectedNames.includes(plugin.metadata.name)"
+          />
+        </VEntityContainer>
       </Transition>
 
       <template #footer>
