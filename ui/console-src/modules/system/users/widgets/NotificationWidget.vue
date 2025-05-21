@@ -8,6 +8,7 @@ import {
   VCard,
   VEmpty,
   VEntity,
+  VEntityContainer,
   VEntityField,
   VLoading,
 } from "@halo-dev/components";
@@ -75,33 +76,29 @@ function handleRouteToNotification(notification: Notification) {
       class="h-full w-full"
       defer
     >
-      <ul class="box-border h-full w-full divide-y divide-gray-100" role="list">
-        <li
+      <VEntityContainer>
+        <VEntity
           v-for="notification in notifications"
           :key="notification.metadata.name"
         >
-          <VEntity>
-            <template #start>
-              <VEntityField
-                :title="notification.spec?.title"
-                :description="notification.spec?.rawContent"
-                @click="handleRouteToNotification(notification)"
-              />
-            </template>
-            <template #end>
-              <VEntityField>
-                <template #description>
-                  <span class="truncate text-xs tabular-nums text-gray-500">
-                    {{
-                      relativeTimeTo(notification.metadata.creationTimestamp)
-                    }}
-                  </span>
-                </template>
-              </VEntityField>
-            </template>
-          </VEntity>
-        </li>
-      </ul>
+          <template #start>
+            <VEntityField
+              :title="notification.spec?.title"
+              :description="notification.spec?.rawContent"
+              @click="handleRouteToNotification(notification)"
+            />
+          </template>
+          <template #end>
+            <VEntityField>
+              <template #description>
+                <span class="truncate text-xs tabular-nums text-gray-500">
+                  {{ relativeTimeTo(notification.metadata.creationTimestamp) }}
+                </span>
+              </template>
+            </VEntityField>
+          </template>
+        </VEntity>
+      </VEntityContainer>
     </OverlayScrollbarsComponent>
   </VCard>
 </template>

@@ -22,42 +22,46 @@ const classes = computed(() => {
 </script>
 
 <template>
-  <div :class="classes" class="entity-wrapper group">
-    <div v-show="isSelected" class="entity-selected-indicator"></div>
-    <slot name="prepend" />
-    <div class="entity-body">
-      <div v-if="$slots.checkbox" class="entity-checkbox">
-        <slot name="checkbox" />
-      </div>
+  <tr :class="classes" v-bind="$attrs" class="entity-wrapper group">
+    <td class="entity-start-wrapper">
+      <slot name="prepend" />
+      <div v-show="isSelected" class="entity-selected-indicator"></div>
       <div class="entity-start">
+        <div v-if="$slots.checkbox" class="entity-checkbox">
+          <slot name="checkbox" />
+        </div>
         <slot name="start" />
       </div>
+    </td>
+    <td class="entity-end-wrapper">
       <div class="entity-end">
         <slot name="end" />
+        <div v-if="$slots.dropdownItems" class="entity-dropdown">
+          <VDropdown>
+            <div
+              class="entity-dropdown-trigger group-hover:bg-gray-200/60"
+              :class="{ '!bg-gray-300/60': isSelected }"
+              @click.stop
+            >
+              <IconMore />
+            </div>
+            <template #popper>
+              <slot name="dropdownItems"></slot>
+            </template>
+          </VDropdown>
+        </div>
       </div>
-      <div v-if="$slots.dropdownItems" class="entity-dropdown">
-        <VDropdown>
-          <div
-            class="entity-dropdown-trigger group-hover:bg-gray-200/60"
-            :class="{ '!bg-gray-300/60': isSelected }"
-            @click.stop
-          >
-            <IconMore />
-          </div>
-          <template #popper>
-            <slot name="dropdownItems"></slot>
-          </template>
-        </VDropdown>
-      </div>
-    </div>
-    <div v-if="$slots.footer">
+    </td>
+  </tr>
+  <tr v-if="$slots.footer">
+    <td colspan="2">
       <slot name="footer" />
-    </div>
-  </div>
+    </td>
+  </tr>
 </template>
 <style lang="scss">
 .entity-wrapper {
-  @apply relative block px-4 py-3 transition-all hover:bg-gray-50 w-full;
+  @apply relative transition-all hover:bg-gray-50 w-full;
 
   &.entity-selected {
     @apply bg-gray-100;
@@ -72,19 +76,24 @@ const classes = computed(() => {
   }
 
   .entity-checkbox {
-    @apply mr-4 hidden items-center sm:flex;
+    @apply hidden sm:inline-flex;
+  }
+
+  .entity-start-wrapper,
+  .entity-end-wrapper {
+    @apply align-middle w-auto px-4 py-3;
   }
 
   .entity-start {
-    @apply flex flex-1 items-center gap-4;
+    @apply flex items-center gap-4;
   }
 
   .entity-end {
-    @apply flex flex-col items-end gap-4 sm:flex-row sm:items-center sm:gap-6;
+    @apply flex items-center gap-6 justify-end;
   }
 
   .entity-dropdown {
-    @apply ml-4 inline-flex items-center;
+    @apply inline-flex items-center;
   }
 
   .entity-dropdown-trigger {

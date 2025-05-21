@@ -1,7 +1,7 @@
 plugins {
   id 'idea'
-  id 'com.github.node-gradle.node'
-  id 'org.openapi.generator' version '7.6.0'
+  alias(libs.plugins.node)
+  alias(libs.plugins.openapi.generator)
 }
 
 idea {

@@ -158,7 +158,11 @@ const { operationItems } = useOperationItemExtensionPoint<ListedReply>(
     :reply="reply"
     @close="onReplyCreationModalClose"
   />
-  <VEntity class="!px-0 !py-2" :class="{ 'animate-breath': isHoveredReply }">
+  <VEntity
+    v-bind="$attrs"
+    class="border-l border-dashed border-gray-100"
+    :class="{ 'animate-breath': isHoveredReply }"
+  >
     <template #start>
       <VEntityField>
         <template #description>

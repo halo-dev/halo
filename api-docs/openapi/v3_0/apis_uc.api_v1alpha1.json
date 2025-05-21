@@ -2,7 +2,7 @@
   "openapi": "3.0.1",
   "info": {
     "title": "Halo",
-    "version": "2.20.11-SNAPSHOT"
+    "version": "2.21.0-SNAPSHOT"
   },
   "servers": [
     {
@@ -1597,14 +1597,17 @@
             "type": "string"
           },
           "hideFromList": {
-            "type": "boolean"
+            "type": "boolean",
+            "description": "\u003cp\u003eWhether to hide the category from the category list.\u003c/p\u003e\n \u003cp\u003eWhen set to true, the category including its subcategories and related posts will\n not be displayed in the category list, but it can still be accessed by permalink.\u003c/p\u003e\n \u003cp\u003eLimitation: It only takes effect on the theme-side categorized list and it only\n allows to be set to true on the first level(root node) of categories.\u003c/p\u003e"
           },
           "postTemplate": {
             "maxLength": 255,
-            "type": "string"
+            "type": "string",
+            "description": "\u003cp\u003eUsed to specify the template for the posts associated with the category.\u003c/p\u003e\n \u003cp\u003eThe priority is not as high as that of the post.\u003c/p\u003e\n \u003cp\u003eIf the post also specifies a template, the post\u0027s template will prevail.\u003c/p\u003e"
           },
           "preventParentPostCascadeQuery": {
-            "type": "boolean"
+            "type": "boolean",
+            "description": "\u003cp\u003eif a category is queried for related posts, the default behavior is to\n query all posts under the category including its subcategories, but if this field is\n set to true, cascade query behavior will be terminated here.\u003c/p\u003e\n \u003cp\u003eFor example, if a category has subcategories A and B, and A has subcategories C and\n D and C marked this field as true, when querying posts under A category,all posts under A\n and B will be queried, but C and D will not be queried.\u003c/p\u003e"
           },
           "priority": {
             "type": "integer",
@@ -1629,10 +1632,12 @@
           },
           "postCount": {
             "type": "integer",
+            "description": "包括当前和其下所有层级的文章数量 (depth\u003dmax).",
             "format": "int32"
           },
           "visiblePostCount": {
             "type": "integer",
+            "description": "包括当前和其下所有层级的已发布且公开的文章数量 (depth\u003dmax).",
             "format": "int32"
           }
         }
@@ -1647,19 +1652,23 @@
         "properties": {
           "lastTransitionTime": {
             "type": "string",
+            "description": "Last time the condition transitioned from one status to another.",
             "format": "date-time"
           },
           "message": {
             "maxLength": 32768,
-            "type": "string"
+            "type": "string",
+            "description": "Human-readable message indicating details about last transition.\n This may be an empty string."
           },
           "reason": {
             "maxLength": 1024,
             "pattern": "^[A-Za-z]([A-Za-z0-9_,:]*[A-Za-z0-9_])?$",
-            "type": "string"
+            "type": "string",
+            "description": "Unique, one-word, CamelCase reason for the condition\u0027s last transition."
           },
           "status": {
             "type": "string",
+            "description": "Status is the status of the condition. Can be True, False, Unknown.",
             "enum": [
               "TRUE",
               "FALSE",
@@ -1669,9 +1678,11 @@
           "type": {
             "maxLength": 316,
             "pattern": "^([a-z0-9]([-a-z0-9]*[a-z0-9])?(\\.[a-z0-9]([-a-z0-9]*[a-z0-9])?)*/)?(([A-Za-z0-9][-A-Za-z0-9_.]*)?[A-Za-z0-9])$",
-            "type": "string"
+            "type": "string",
+            "description": "type of condition in CamelCase or in foo.example.com/CamelCase.\n example: Ready, Initialized.\n maxLength: 316."
           }
-        }
+        },
+        "description": "EqualsAndHashCode 排除了lastTransitionTime否则失败时，lastTransitionTime 会被更新\n 导致 equals 为 false，一直被加入队列."
       },
       "Contributor": {
         "type": "object",
@@ -1685,7 +1696,8 @@
           "name": {
             "type": "string"
           }
-        }
+        },
+        "description": "Contributor from user."
       },
       "CopyOperation": {
         "required": [
@@ -1954,15 +1966,18 @@
             "type": "object",
             "additionalProperties": {
               "type": "string"
-            }
+            },
+            "description": "Annotations are like key-value format."
           },
           "creationTimestamp": {
             "type": "string",
+            "description": "Creation timestamp of the Extension.",
             "format": "date-time",
             "nullable": true
           },
           "deletionTimestamp": {
             "type": "string",
+            "description": "Deletion timestamp of the Extension.",
             "format": "date-time",
             "nullable": true
           },
@@ -1983,7 +1998,8 @@
             "type": "object",
             "additionalProperties": {
               "type": "string"
-            }
+            },
+            "description": "Labels are like key-value format."
           },
           "name": {
             "type": "string",
@@ -1991,10 +2007,12 @@
           },
           "version": {
             "type": "integer",
+            "description": "Current version of the Extension. It will be bumped up every update.",
             "format": "int64",
             "nullable": true
           }
-        }
+        },
+        "description": "Metadata of Extension."
       },
       "MoveOperation": {
         "required": [
@@ -2044,7 +2062,8 @@
           "spec": {
             "$ref": "#/components/schemas/NotificationSpec"
           }
-        }
+        },
+        "description": "\u003cp\u003e{@link Notification Notification} is a custom extension that used to store notification information for\n inner use, it\u0027s on-site notification.\u003c/p\u003e\n\n \u003cp\u003eSupports the following operations:\u003c/p\u003e\n \u003cul\u003e\n    \u003cli\u003eMarked as read: {@link NotificationSpec#setUnread(boolean) NotificationSpec#setUnread(boolean)}\u003c/li\u003e\n    \u003cli\u003eGet the last read time: {@link NotificationSpec#getLastReadAt NotificationSpec#getLastReadAt()}\u003c/li\u003e\n    \u003cli\u003eFilter by recipient: {@link NotificationSpec#getRecipient NotificationSpec#getRecipient()}\u003c/li\u003e\n \u003c/ul\u003e"
       },
       "NotificationList": {
         "required": [
@@ -2267,7 +2286,8 @@
           "status": {
             "$ref": "#/components/schemas/PostStatus"
           }
-        }
+        },
+        "description": "\u003cp\u003ePost extension.\u003c/p\u003e"
       },
       "PostAttachmentRequest": {
         "required": [
@@ -2359,7 +2379,8 @@
             "format": "date-time"
           },
           "releaseSnapshot": {
-            "type": "string"
+            "type": "string",
+            "description": "文章引用到的已发布的内容，用于主题端显示."
           },
           "slug": {
             "minLength": 1,
@@ -2417,7 +2438,8 @@
             "type": "string"
           },
           "hideFromList": {
-            "type": "boolean"
+            "type": "boolean",
+            "description": "see {@link Category.CategorySpec#isHideFromList Category.CategorySpec#isHideFromList()}."
           },
           "inProgress": {
             "type": "boolean"
@@ -2619,7 +2641,8 @@
           "rawType": {
             "maxLength": 50,
             "minLength": 1,
-            "type": "string"
+            "type": "string",
+            "description": "such as: markdown | html | json | asciidoc | latex."
           },
           "subjectRef": {
             "$ref": "#/components/schemas/Ref"
@@ -2668,7 +2691,8 @@
             "type": "integer",
             "format": "int32"
           }
-        }
+        },
+        "description": "Stats value object."
       },
       "Tag": {
         "required": [
@@ -2705,7 +2729,8 @@
         "properties": {
           "color": {
             "pattern": "^#([a-fA-F0-9]{6}|[a-fA-F0-9]{3})$",
-            "type": "string"
+            "type": "string",
+            "description": "Color regex explanation.\n \u003cpre\u003e\n ^                 # start of the line\n #                 # start with a number sign `#`\n (                 # start of (group 1)\n   [a-fA-F0-9]{6}  # support z-f, A-F and 0-9, with a length of 6\n   |               # or\n   [a-fA-F0-9]{3}  # support z-f, A-F and 0-9, with a length of 3\n )                 # end of (group 1)\n $                 # end of the line\n \u003c/pre\u003e"
           },
           "cover": {
             "type": "string"
@@ -2770,6 +2795,7 @@
         "properties": {
           "authLink": {
             "type": "string",
+            "description": "QR Code with base64 encoded.",
             "format": "uri"
           },
           "rawSecret": {
@@ -2800,7 +2826,8 @@
         "type": "object",
         "properties": {
           "available": {
-            "type": "boolean"
+            "type": "boolean",
+            "description": "Check if 2FA is available."
           },
           "emailVerified": {
             "type": "boolean"
@@ -2882,7 +2909,8 @@
           "spec": {
             "$ref": "#/components/schemas/UserConnectionSpec"
           }
-        }
+        },
+        "description": "User connection extension."
       },
       "UserConnectionSpec": {
         "required": [
@@ -2893,17 +2921,21 @@
         "type": "object",
         "properties": {
           "providerUserId": {
-            "type": "string"
+            "type": "string",
+            "description": "The unique identifier for the user\u0027s connection to the OAuth provider.\n for example, the user\u0027s GitHub id."
           },
           "registrationId": {
-            "type": "string"
+            "type": "string",
+            "description": "The name of the OAuth provider (e.g. Google, Facebook, Twitter)."
           },
           "updatedAt": {
             "type": "string",
+            "description": "The time when the user connection was last updated.",
             "format": "date-time"
           },
           "username": {
-            "type": "string"
+            "type": "string",
+            "description": "The {@link Metadata#getName Metadata#getName()} of the user associated with the OAuth connection."
           }
         }
       },
