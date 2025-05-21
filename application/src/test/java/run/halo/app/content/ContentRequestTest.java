@@ -42,10 +42,10 @@ class ContentRequestTest {
     @Test
     void toSnapshot() throws JSONException {
         String expectedContentPath =
-            "<p>Four score and seven</p>\n<p>years ago our fathers</p>\n<br/>\n<p>brought forth "
-                + "on this continent</p>\n";
+            "<p>Four score and seven</p>\\n<p>years ago our fathers</p>\\n<br/>\\n<p>brought forth "
+                + "on this continent</p>\\n";
         String expectedRawPatch =
-            "Four score and seven\nyears ago our fathers\n\nbrought forth on this continent\n";
+            "Four score and seven\\nyears ago our fathers\\n\\nbrought forth on this continent\\n";
         Snapshot snapshot = contentRequest.toSnapshot();
         snapshot.getMetadata().setName("7b149646-ac60-4a5c-98ee-78b2dd0631b2");
         JSONAssert.assertEquals(JsonUtils.objectToJson(snapshot),
