@@ -5,6 +5,7 @@ import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Component;
 import reactor.core.publisher.Mono;
 import run.halo.app.event.user.UserLoginEvent;
+import run.halo.app.event.user.UserLogoutEvent;
 
 /**
  * User login or logout processing service.
@@ -29,7 +30,7 @@ public class UserLoginOrLogoutProcessing {
     public Mono<Void> logoutProcessing(String username, Boolean logoutStatus) {
         return userService.getUser(username)
             .doOnNext(user -> {
-                eventPublisher.publishEvent(new UserLoginEvent(this, user, logoutStatus));
+                eventPublisher.publishEvent(new UserLogoutEvent(this, user, logoutStatus));
             })
             .then();
     }
