@@ -71,6 +71,7 @@ public class SystemSetting {
         String logo;
         String favicon;
         String language;
+        String externalUrl;
 
         @JsonIgnore
         public Optional<Locale> useSystemLocale() {
