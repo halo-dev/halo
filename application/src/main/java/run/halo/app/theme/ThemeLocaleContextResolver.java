@@ -4,6 +4,7 @@ import java.util.Locale;
 import java.util.Optional;
 import java.util.TimeZone;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.LocaleUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.context.i18n.LocaleContext;
 import org.springframework.context.i18n.SimpleTimeZoneAwareLocaleContext;
@@ -38,6 +39,10 @@ public class ThemeLocaleContextResolver extends AcceptHeaderLocaleContextResolve
             .or(() -> getLocaleFromCookie(request))
             .or(() -> UserLocaleRequestAttributeWriteFilter.getUserLocale(request))
             .orElseGet(() -> super.resolveLocaleContext(exchange).getLocale());
+
+        if (LocaleUtils.isLanguageUndetermined(locale)) {
+            locale = null;
+        }
 
         var timeZone = getTimeZoneFromCookie(request)
             .orElseGet(TimeZone::getDefault);

@@ -3,6 +3,7 @@ package run.halo.app.infra.webfilter;
 import static run.halo.app.theme.ThemeLocaleContextResolver.LANGUAGE_COOKIE_NAME;
 
 import java.util.Locale;
+import java.util.Objects;
 import java.util.Set;
 import org.springframework.core.Ordered;
 import org.springframework.core.annotation.Order;
@@ -45,20 +46,24 @@ public class LocaleChangeWebFilter implements WebFilter {
     @Override
     @NonNull
     public Mono<Void> filter(ServerWebExchange exchange, @NonNull WebFilterChain chain) {
-        var request = exchange.getRequest();
         return matcher.matches(exchange)
             .filter(MatchResult::isMatch)
             .doOnNext(result -> {
                 var localeContext = themeLocaleContextResolver.resolveLocaleContext(exchange);
                 var locale = localeContext.getLocale();
                 if (locale != null) {
-                    setLanguageCookie(exchange, locale);
+                    setLanguageCookieIfAbsent(exchange, locale);
                 }
             })
             .then(Mono.defer(() -> chain.filter(exchange)));
     }
 
-    void setLanguageCookie(ServerWebExchange exchange, Locale locale) {
+    void setLanguageCookieIfAbsent(ServerWebExchange exchange, Locale locale) {
+        var languageCookie = exchange.getRequest().getCookies().getFirst(LANGUAGE_COOKIE_NAME);
+        if (languageCookie != null
+            && Objects.equals(languageCookie.getValue(), locale.toLanguageTag())) {
+            return;
+        }
         var cookie = ResponseCookie.from(LANGUAGE_COOKIE_NAME, locale.toLanguageTag())
             .path("/")
             .secure("https".equalsIgnoreCase(exchange.getRequest().getURI().getScheme()))

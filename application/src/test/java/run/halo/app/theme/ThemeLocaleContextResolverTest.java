@@ -177,6 +177,15 @@ class ThemeLocaleContextResolverTest {
         assertThat(this.resolver.resolveLocaleContext(exchange).getLocale()).isEqualTo(US);
     }
 
+    @Test
+    void resolveUnderminedLocale() {
+        var request = MockServerHttpRequest.get("/")
+            .header(HttpHeaders.ACCEPT_LANGUAGE, "und")
+            .build();
+        var exchange = MockServerWebExchange.from(request);
+
+        assertThat(this.resolver.resolveLocaleContext(exchange).getLocale()).isNull();
+    }
 
     private ServerWebExchange exchange(Locale... locales) {
         return MockServerWebExchange.from(
