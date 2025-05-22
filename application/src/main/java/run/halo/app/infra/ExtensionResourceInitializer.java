@@ -89,10 +89,9 @@ public class ExtensionResourceInitializer implements SmartLifecycle {
                         extension.getMetadata().getName());
                 }
             })
-            .then(Mono.fromRunnable(
-                () -> eventPublisher.publishEvent(new ExtensionInitializedEvent(this)))
-            )
+            .then()
             .block(Duration.ofMinutes(1));
+        eventPublisher.publishEvent(new ExtensionInitializedEvent(this));
     }
 
     @Override
