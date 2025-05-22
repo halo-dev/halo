@@ -64,7 +64,6 @@ public class WebServerSecurityConfig {
             "/uc/assets/**",
             "/themes/{themeName}/assets/{*resourcePaths}",
             "/plugins/{pluginName}/assets/**",
-            "/upload/**",
             "/webjars/**",
             "/js/**",
             "/styles/**",
