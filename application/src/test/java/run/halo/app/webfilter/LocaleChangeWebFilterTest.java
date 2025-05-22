@@ -9,6 +9,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
+import org.springframework.http.HttpCookie;
 import org.springframework.http.MediaType;
 import org.springframework.mock.http.server.reactive.MockServerHttpRequest;
 import org.springframework.mock.web.server.MockServerWebExchange;
@@ -44,11 +45,43 @@ class LocaleChangeWebFilterTest {
     }
 
     @Test
-    void shouldRespondLanguageCookieWithUndefinedLanguageTag() {
+    void shouldNotRespondLanguageCookieIfChanged() {
         WebFilterChain webFilterChain = filterExchange -> {
             var languageCookie = filterExchange.getResponse().getCookies().getFirst("language");
             assertNotNull(languageCookie);
-            assertEquals("und", languageCookie.getValue());
+            assertEquals("zh-CN", languageCookie.getValue());
+            return Mono.empty();
+        };
+        var exchange = MockServerWebExchange.from(MockServerHttpRequest.get("/home")
+            .accept(MediaType.TEXT_HTML)
+            .cookie(new HttpCookie("language", "zh-HK"))
+            .queryParam("language", "zh-CN")
+            .build()
+        );
+        this.filter.filter(exchange, webFilterChain).block();
+    }
+
+    @Test
+    void shouldNotRespondLanguageCookieIfNotChanged() {
+        WebFilterChain webFilterChain = filterExchange -> {
+            var languageCookie = filterExchange.getResponse().getCookies().getFirst("language");
+            assertNull(languageCookie);
+            return Mono.empty();
+        };
+        var exchange = MockServerWebExchange.from(MockServerHttpRequest.get("/home")
+            .accept(MediaType.TEXT_HTML)
+            .cookie(new HttpCookie("language", "zh-CN"))
+            .queryParam("language", "zh-CN")
+            .build()
+        );
+        this.filter.filter(exchange, webFilterChain).block();
+    }
+
+    @Test
+    void shouldNotRespondLanguageCookieWithUndeterminedLanguageTag() {
+        WebFilterChain webFilterChain = filterExchange -> {
+            var languageCookie = filterExchange.getResponse().getCookies().getFirst("language");
+            assertNull(languageCookie);
             return Mono.empty();
         };
         var exchange = MockServerWebExchange.from(MockServerHttpRequest.get("/home")
