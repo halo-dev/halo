@@ -1,8 +1,9 @@
 <script lang="ts" setup>
 import H2WarningAlert from "@/components/alerts/H2WarningAlert.vue";
-import type { GlobalInfo, Info, Startup } from "@/types";
+import type { Info, Startup } from "@/types";
 import { formatDatetime } from "@/utils/date";
 import { usePermission } from "@/utils/permission";
+import { useGlobalInfoFetch } from "@console/composables/use-global-info";
 import { useThemeStore } from "@console/stores/theme";
 import type { Plugin } from "@halo-dev/api-client";
 import { consoleApiClient } from "@halo-dev/api-client";
@@ -10,7 +11,6 @@ import {
   IconClipboardLine,
   IconTerminalBoxLine,
   Toast,
-  VAlert,
   VButton,
   VCard,
   VDescription,
@@ -24,6 +24,7 @@ import { useClipboard } from "@vueuse/core";
 import axios from "axios";
 import { computed } from "vue";
 import { useI18n } from "vue-i18n";
+import ExternalUrlItem from "./components/ExternalUrlItem.vue";
 
 const { t } = useI18n();
 const themeStore = useThemeStore();
@@ -40,16 +41,7 @@ const { data: info } = useQuery<Info>({
   retry: 0,
 });
 
-const { data: globalInfo } = useQuery<GlobalInfo>({
-  queryKey: ["system-global-info"],
-  queryFn: async () => {
-    const { data } = await axios.get<GlobalInfo>(`/actuator/globalinfo`, {
-      withCredentials: true,
-    });
-    return data;
-  },
-  retry: 0,
-});
+const { globalInfo } = useGlobalInfoFetch();
 
 const { data: startup } = useQuery<Startup>({
   queryKey: ["system-startup-info"],
@@ -74,20 +66,6 @@ const { data: plugins, isLoading: isPluginsLoading } = useQuery<Plugin[]>({
     return data.items;
   },
   enabled: computed(() => currentUserHasPermission(["system:plugins:view"])),
-});
-
-const isExternalUrlValid = computed(() => {
-  if (!globalInfo.value?.useAbsolutePermalink) {
-    return true;
-  }
-
-  if (!globalInfo.value?.externalUrl) {
-    return true;
-  }
-
-  const url = new URL(globalInfo.value.externalUrl);
-  const { host: currentHost, protocol: currentProtocol } = window.location;
-  return url.host === currentHost && url.protocol === currentProtocol;
 });
 
 // copy system information to clipboard
@@ -243,25 +221,7 @@ const handleDownloadLogfile = () => {
         </div>
         <div class="border-t border-gray-200">
           <VDescription>
-            <VDescriptionItem :label="$t('core.overview.fields.external_url')">
-              <span v-if="globalInfo?.externalUrl">
-                {{ globalInfo?.externalUrl }}
-              </span>
-              <span v-else>
-                {{ $t("core.overview.fields_values.external_url.not_setup") }}
-              </span>
-              <VAlert
-                v-if="!isExternalUrlValid"
-                class="mt-3"
-                type="warning"
-                :title="$t('core.common.text.warning')"
-                :closable="false"
-              >
-                <template #description>
-                  {{ $t("core.overview.alert.external_url_invalid") }}
-                </template>
-              </VAlert>
-            </VDescriptionItem>
+            <ExternalUrlItem />
             <VDescriptionItem
               v-if="startup?.timeline.startTime"
               :label="$t('core.overview.fields.start_time')"

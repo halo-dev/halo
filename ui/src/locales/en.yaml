@@ -1458,6 +1458,16 @@ core:
         The external access url detected is inconsistent with the current access
         url, which may cause some links to fail to redirect properly. Please
         check the external access url settings.
+    external_url_form:
+      operations:
+        save:
+          title: Modify external url
+          description: >-
+            Modifying the external access address requires restarting the Halo
+            service. It will automatically restart after the modification is
+            completed. Do you want to continue?
+      tips:
+        restarting: Modification completed, waiting for restart...
   backup:
     title: Backup and Restore
     tabs:
