@@ -1341,6 +1341,13 @@ core:
       os: 操作系統：{os}
     alert:
       external_url_invalid: 檢測到外部訪問地址與當前訪問地址不一致，可能會導致部分連結無法正常跳轉，請檢查外部訪問地址設置。
+    external_url_form:
+      operations:
+        save:
+          title: 修改外部訪問地址
+          description: 修改外部訪問地址需要重啟 Halo 服務，修改完成之後會自動進行重啟，是否繼續？
+      tips:
+        restarting: 修改完成，等待重啟...
   backup:
     title: 備份與還原
     tabs:

@@ -61,17 +61,17 @@ public class SystemConfigurableEnvironmentFetcher implements Reconciler<Reconcil
 
     public Mono<SystemSetting.Basic> getBasic() {
         return fetch(SystemSetting.Basic.GROUP, SystemSetting.Basic.class)
-            .switchIfEmpty(Mono.just(new SystemSetting.Basic()));
+            .switchIfEmpty(Mono.fromSupplier(SystemSetting.Basic::new));
     }
 
     public Mono<SystemSetting.Comment> fetchComment() {
         return fetch(SystemSetting.Comment.GROUP, SystemSetting.Comment.class)
-            .switchIfEmpty(Mono.just(new SystemSetting.Comment()));
+            .switchIfEmpty(Mono.fromSupplier(SystemSetting.Comment::new));
     }
 
     public Mono<SystemSetting.Post> fetchPost() {
         return fetch(SystemSetting.Post.GROUP, SystemSetting.Post.class)
-            .switchIfEmpty(Mono.just(new SystemSetting.Post()));
+            .switchIfEmpty(Mono.fromSupplier(SystemSetting.Post::new));
     }
 
     public Mono<SystemSetting.ThemeRouteRules> fetchRouteRules() {
@@ -123,15 +123,17 @@ public class SystemConfigurableEnvironmentFetcher implements Reconciler<Reconcil
         data.forEach((group, dataValue) -> {
             // https://www.rfc-editor.org/rfc/rfc7386
             String defaultV = copiedDefault.get(group);
-            String newValue;
+            String newValue = null;
             if (dataValue == null) {
-                if (copiedDefault.containsKey(group)) {
-                    newValue = null;
-                } else {
+                if (!copiedDefault.containsKey(group)) {
                     newValue = defaultV;
                 }
             } else {
-                newValue = mergeRemappingFunction(dataValue, defaultV);
+                if (copiedDefault.containsKey(group)) {
+                    newValue = mergeRemappingFunction(dataValue, defaultV);
+                } else {
+                    newValue = dataValue;
+                }
             }
 
             if (newValue == null) {
@@ -195,20 +197,18 @@ public class SystemConfigurableEnvironmentFetcher implements Reconciler<Reconcil
      * @return a new {@link ConfigMap} named <code>system</code> by json merge patch.
      */
     private Mono<ConfigMap> loadConfigMapInternal() {
-        Mono<ConfigMap> mapMono =
+        var defaultConfigMono =
             extensionClient.fetch(ConfigMap.class, SystemSetting.SYSTEM_CONFIG_DEFAULT);
-        if (mapMono == null) {
-            return Mono.empty();
-        }
-        return mapMono.flatMap(systemDefault ->
-            extensionClient.fetch(ConfigMap.class, SystemSetting.SYSTEM_CONFIG)
-                .map(system -> {
-                    Map<String, String> defaultData = systemDefault.getData();
-                    Map<String, String> data = system.getData();
+        var configMono = extensionClient.fetch(ConfigMap.class, SystemSetting.SYSTEM_CONFIG);
+        return defaultConfigMono.flatMap(defaultConfig -> configMono.map(
+                config -> {
+                    Map<String, String> defaultData = defaultConfig.getData();
+                    Map<String, String> data = config.getData();
                     Map<String, String> mergedData = mergeData(defaultData, data);
-                    system.setData(mergedData);
-                    return system;
+                    config.setData(mergedData);
+                    return config;
                 })
-                .switchIfEmpty(Mono.just(systemDefault)));
+            .defaultIfEmpty(defaultConfig)
+        );
     }
 }

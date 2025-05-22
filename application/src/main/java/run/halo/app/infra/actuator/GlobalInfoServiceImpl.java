@@ -12,6 +12,7 @@ import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Mono;
 import run.halo.app.extension.ConfigMap;
+import run.halo.app.infra.ExternalUrlSupplier;
 import run.halo.app.infra.InitializationStateGetter;
 import run.halo.app.infra.SystemConfigurableEnvironmentFetcher;
 import run.halo.app.infra.SystemSetting;
@@ -36,20 +37,24 @@ public class GlobalInfoServiceImpl implements GlobalInfoService {
     private final ObjectProvider<SystemConfigurableEnvironmentFetcher>
         systemConfigFetcher;
 
+    private final ExternalUrlSupplier externalUrl;
+
     public GlobalInfoServiceImpl(HaloProperties haloProperties,
         AuthProviderService authProviderService,
         InitializationStateGetter initializationStateGetter,
-        ObjectProvider<SystemConfigurableEnvironmentFetcher> systemConfigFetcher) {
+        ObjectProvider<SystemConfigurableEnvironmentFetcher> systemConfigFetcher,
+        ExternalUrlSupplier externalUrl) {
         this.haloProperties = haloProperties;
         this.authProviderService = authProviderService;
         this.initializationStateGetter = initializationStateGetter;
         this.systemConfigFetcher = systemConfigFetcher;
+        this.externalUrl = externalUrl;
     }
 
     @Override
     public Mono<GlobalInfo> getGlobalInfo() {
         final var info = new GlobalInfo();
-        info.setExternalUrl(haloProperties.getExternalUrl());
+        info.setExternalUrl(externalUrl.getRaw());
         info.setUseAbsolutePermalink(haloProperties.isUseAbsolutePermalink());
         info.setLocale(Locale.getDefault());
         info.setTimeZone(TimeZone.getDefault());

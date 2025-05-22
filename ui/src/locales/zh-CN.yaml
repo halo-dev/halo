@@ -1356,6 +1356,13 @@ core:
       os: 操作系统：{os}
     alert:
       external_url_invalid: 检测到外部访问地址与当前访问地址不一致，可能会导致部分链接无法正常跳转，请检查外部访问地址设置。
+    external_url_form:
+      operations:
+        save:
+          title: 修改外部访问地址
+          description: 修改外部访问地址需要重启 Halo 服务，修改完成之后会自动进行重启，是否继续？
+      tips:
+        restarting: 修改完成，等待重启...
   backup:
     title: 备份与恢复
     tabs:
