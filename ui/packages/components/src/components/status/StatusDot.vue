@@ -40,7 +40,7 @@ const classes = computed(() => {
   }
 
   .status-dot-text {
-    @apply text-gray-500 text-xs;
+    @apply text-gray-500 text-xs whitespace-nowrap;
   }
 
   &.status-dot-animate {
