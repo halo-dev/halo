@@ -3,6 +3,7 @@ package run.halo.app.security;
 import static run.halo.app.security.authentication.WebExchangeMatchers.ignoringMediaTypeAll;
 
 import java.net.URI;
+import java.util.ArrayList;
 import java.util.Map;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.ApplicationContext;
@@ -19,8 +20,10 @@ import org.springframework.security.web.server.DefaultServerRedirectStrategy;
 import org.springframework.security.web.server.ServerRedirectStrategy;
 import org.springframework.security.web.server.WebFilterExchange;
 import org.springframework.security.web.server.authentication.logout.DelegatingServerLogoutHandler;
+import org.springframework.security.web.server.authentication.logout.SecurityContextServerLogoutHandler;
 import org.springframework.security.web.server.authentication.logout.ServerLogoutHandler;
 import org.springframework.security.web.server.authentication.logout.ServerLogoutSuccessHandler;
+import org.springframework.security.web.server.context.ServerSecurityContextRepository;
 import org.springframework.security.web.server.savedrequest.ServerRequestCache;
 import org.springframework.security.web.server.savedrequest.WebSessionServerRequestCache;
 import org.springframework.security.web.server.util.matcher.ServerWebExchangeMatcher;
@@ -34,15 +37,12 @@ import run.halo.app.core.user.service.UserLoginOrLogoutProcessing;
 import run.halo.app.core.user.service.UserService;
 import run.halo.app.infra.actuator.GlobalInfoService;
 import run.halo.app.security.authentication.SecurityConfigurer;
-import run.halo.app.security.authentication.rememberme.RememberMeServices;
 import run.halo.app.theme.router.ModelConst;
 
 @Component
 @RequiredArgsConstructor
 @Order(0)
-public class LogoutSecurityConfigurer implements SecurityConfigurer {
-
-    private final RememberMeServices rememberMeServices;
+class LogoutSecurityConfigurer implements SecurityConfigurer {
 
     private final ApplicationContext applicationContext;
 
@@ -50,12 +50,27 @@ public class LogoutSecurityConfigurer implements SecurityConfigurer {
 
     private final ServerRequestCache serverRequestCache = new HaloServerRequestCache();
 
+    private final ServerSecurityContextRepository securityContextRepository;
+
     @Override
     public void configure(ServerHttpSecurity http) {
-        var serverLogoutHandlers = getLogoutHandlers();
-        http.logout(
-            logout -> logout.logoutSuccessHandler(new LogoutSuccessHandler(serverLogoutHandlers))
+        http.logout(logout -> logout
+            .logoutHandler(getLogoutHandler())
+            .logoutSuccessHandler(new LogoutSuccessHandler())
         );
+    }
+
+    private ServerLogoutHandler getLogoutHandler() {
+        var defaultLogoutHandler = new SecurityContextServerLogoutHandler();
+        defaultLogoutHandler.setSecurityContextRepository(securityContextRepository);
+        var logoutHandlers = new ArrayList<ServerLogoutHandler>();
+        logoutHandlers.add(defaultLogoutHandler);
+        applicationContext.getBeanProvider(ServerLogoutHandler.class)
+            .forEach(logoutHandlers::add);
+        if (logoutHandlers.size() == 1) {
+            return logoutHandlers.getFirst();
+        }
+        return new DelegatingServerLogoutHandler(logoutHandlers);
     }
 
     @Bean
@@ -93,25 +108,17 @@ public class LogoutSecurityConfigurer implements SecurityConfigurer {
     private class LogoutSuccessHandler implements ServerLogoutSuccessHandler {
 
         private final ServerLogoutSuccessHandler defaultHandler;
-        private final ServerLogoutHandler logoutHandler;
 
-        public LogoutSuccessHandler(ServerLogoutHandler... logoutHandlers) {
+        public LogoutSuccessHandler() {
             var redirectHandler = new RequestCacheRedirectLogoutSuccessHandler();
             redirectHandler.setRequestCache(serverRequestCache);
             this.defaultHandler = redirectHandler;
-            if (logoutHandlers.length == 1) {
-                this.logoutHandler = logoutHandlers[0];
-            } else {
-                this.logoutHandler = new DelegatingServerLogoutHandler(logoutHandlers);
-            }
         }
 
         @Override
         public Mono<Void> onLogoutSuccess(WebFilterExchange exchange,
             Authentication authentication) {
-            return logoutHandler.logout(exchange, authentication)
-                .then(rememberMeServices.loginFail(exchange.getExchange()))
-                .then(userLoginOrLogoutProcessing.logoutProcessing(authentication.getName()))
+            return userLoginOrLogoutProcessing.logoutProcessing(authentication.getName())
                 .then(ignoringMediaTypeAll(MediaType.APPLICATION_JSON)
                     .matches(exchange.getExchange())
                     .filter(ServerWebExchangeMatcher.MatchResult::isMatch)
@@ -125,11 +132,6 @@ public class LogoutSecurityConfigurer implements SecurityConfigurer {
                     })
                 );
         }
-    }
-
-    private ServerLogoutHandler[] getLogoutHandlers() {
-        return applicationContext.getBeansOfType(ServerLogoutHandler.class).values()
-            .toArray(new ServerLogoutHandler[0]);
     }
 
     private static class RequestCacheRedirectLogoutSuccessHandler

@@ -367,7 +367,7 @@ public class TokenBasedRememberMeServices implements ServerLogoutHandler, Rememb
             log.debug("Logout of user {}", (authentication != null) ? authentication.getName()
                 : "Unknown");
         }
-        return onLogout(exchange, authentication);
+        return loginFail(exchange.getExchange()).then(onLogout(exchange, authentication));
     }
 
     protected Mono<Void> onLogout(WebFilterExchange exchange, Authentication authentication) {
