@@ -33,7 +33,7 @@ editor:
       placeholder: 链接地址
       open_in_new_window: 在新窗口中打开
       cancel_link: 取消链接
-      nofollow: SEO不跟踪
+      nofollow: 搜索引擎忽略链接关系
     audio:
       disable_autoplay: 关闭自动播放
       enable_autoplay: 开启自动播放
