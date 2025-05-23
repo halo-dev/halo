@@ -216,13 +216,11 @@ const { operationItems } = useOperationItemExtensionPoint<ListedReply>(
     <template #end>
       <VEntityField v-if="!reply?.reply.spec.approved">
         <template #description>
-          <VStatusDot state="success">
-            <template #text>
-              <span class="text-xs text-gray-500">
-                {{ $t("core.comment.list.fields.pending_review") }}
-              </span>
-            </template>
-          </VStatusDot>
+          <VStatusDot
+            state="warning"
+            animate
+            :text="$t('core.comment.list.fields.pending_review')"
+          />
         </template>
       </VEntityField>
       <VEntityField v-if="reply?.reply.metadata.deletionTimestamp">
