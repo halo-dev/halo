@@ -8,7 +8,7 @@ const Link = TiptapLink.extend<ExtensionOptions & LinkOptions>({
       ...this.parent?.(),
       ...{
         HTMLAttributes: {
-          rel: "noopener noreferrer",
+          rel: null,
         },
       },
     };
