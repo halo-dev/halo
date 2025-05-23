@@ -16,12 +16,8 @@ public class UserLoginEvent extends ApplicationEvent {
     @Getter
     private final User user;
 
-    @Getter
-    private final Boolean loginStatus;
-
-    public UserLoginEvent(Object source, User user, Boolean loginStatus) {
+    public UserLoginEvent(Object source, User user) {
         super(source);
         this.user = user;
-        this.loginStatus = loginStatus;
     }
 }

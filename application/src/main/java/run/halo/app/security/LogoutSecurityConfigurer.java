@@ -30,6 +30,7 @@ import org.springframework.web.reactive.function.server.RouterFunction;
 import org.springframework.web.reactive.function.server.RouterFunctions;
 import org.springframework.web.reactive.function.server.ServerResponse;
 import reactor.core.publisher.Mono;
+import run.halo.app.core.user.service.UserLoginOrLogoutProcessing;
 import run.halo.app.core.user.service.UserService;
 import run.halo.app.infra.actuator.GlobalInfoService;
 import run.halo.app.security.authentication.SecurityConfigurer;
@@ -44,6 +45,8 @@ public class LogoutSecurityConfigurer implements SecurityConfigurer {
     private final RememberMeServices rememberMeServices;
 
     private final ApplicationContext applicationContext;
+
+    private final UserLoginOrLogoutProcessing userLoginOrLogoutProcessing;
 
     private final ServerRequestCache serverRequestCache = new HaloServerRequestCache();
 
@@ -108,6 +111,7 @@ public class LogoutSecurityConfigurer implements SecurityConfigurer {
             Authentication authentication) {
             return logoutHandler.logout(exchange, authentication)
                 .then(rememberMeServices.loginFail(exchange.getExchange()))
+                .then(userLoginOrLogoutProcessing.logoutProcessing(authentication.getName()))
                 .then(ignoringMediaTypeAll(MediaType.APPLICATION_JSON)
                     .matches(exchange.getExchange())
                     .filter(ServerWebExchangeMatcher.MatchResult::isMatch)

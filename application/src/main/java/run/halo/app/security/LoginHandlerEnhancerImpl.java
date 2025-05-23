@@ -43,7 +43,7 @@ public class LoginHandlerEnhancerImpl implements LoginHandlerEnhancer {
             deviceService.loginSuccess(exchange, successfulAuthentication),
             rememberMeRequestCache.removeRememberMe(exchange),
             oauth2LoginHandlerEnhancer.loginSuccess(exchange, successfulAuthentication),
-            userLoginOrLogoutProcessing.loginProcessing(successfulAuthentication.getName(), true)
+            userLoginOrLogoutProcessing.loginProcessing(successfulAuthentication.getName())
         );
     }
 
