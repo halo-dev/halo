@@ -74,8 +74,13 @@ management:
         include: "*"
   endpoint:
     shutdown:
-      enabled: true
+      access: unrestricted
+    heapdump:
+      access: unrestricted
     health:
+      show-details: when-authorized
+      show-components: when-authorized
+      roles: super-role
       probes:
         enabled: true
   info:
