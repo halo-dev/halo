@@ -91,6 +91,8 @@ dependencies {
     testImplementation 'org.springframework.security:spring-security-test'
     testImplementation 'io.projectreactor:reactor-test'
 
+    testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
+
     annotationProcessor 'com.github.therapi:therapi-runtime-javadoc-scribe'
 
     // webjars
