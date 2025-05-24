@@ -3,7 +3,6 @@ package run.halo.app.search;
 import static org.springdoc.core.fn.builders.apiresponse.Builder.responseBuilder;
 import static org.springdoc.core.fn.builders.requestbody.Builder.requestBodyBuilder;
 
-import java.util.List;
 import org.springdoc.webflux.core.fn.SpringdocRouteBuilder;
 import org.springframework.stereotype.Component;
 import org.springframework.web.reactive.function.server.RouterFunction;
@@ -13,7 +12,6 @@ import org.springframework.web.server.ServerWebInputException;
 import reactor.core.publisher.Mono;
 import run.halo.app.core.extension.endpoint.CustomEndpoint;
 import run.halo.app.extension.GroupVersion;
-import run.halo.app.search.post.PostHaloDocumentsProvider;
 
 @Component
 public class IndexEndpoint implements CustomEndpoint {
@@ -30,18 +28,6 @@ public class IndexEndpoint implements CustomEndpoint {
     public RouterFunction<ServerResponse> endpoint() {
         final var tag = "IndexV1alpha1Public";
         return SpringdocRouteBuilder.route()
-            .GET("/indices/post", this::search,
-                builder -> {
-                    builder.operationId("SearchPost")
-                        .tag(tag)
-                        .description(
-                            "Search posts with fuzzy query. This method is deprecated, please use"
-                                + " POST /indices/-/search instead.")
-                        .deprecated(true)
-                        .response(responseBuilder().implementation(SearchResult.class));
-                    SearchParam.buildParameters(builder);
-                }
-            )
             .POST("/indices/-/search", this::indicesSearch,
                 builder -> builder.operationId("IndicesSearch")
                     .tag(tag)
@@ -60,23 +46,6 @@ public class IndexEndpoint implements CustomEndpoint {
     private Mono<ServerResponse> indicesSearch(ServerRequest serverRequest) {
         return serverRequest.bodyToMono(SearchOption.class)
             .switchIfEmpty(Mono.error(() -> new ServerWebInputException("Request body required.")))
-            .flatMap(this::performSearch)
-            .flatMap(result -> ServerResponse.ok().bodyValue(result));
-    }
-
-    private Mono<ServerResponse> search(ServerRequest request) {
-        return Mono.fromSupplier(
-                () -> new SearchParam(request.queryParams()))
-            .map(param -> {
-                var option = new SearchOption();
-                option.setIncludeTypes(List.of(PostHaloDocumentsProvider.POST_DOCUMENT_TYPE));
-
-                option.setKeyword(param.getKeyword());
-                option.setLimit(param.getLimit());
-                option.setHighlightPreTag(param.getHighlightPreTag());
-                option.setHighlightPostTag(param.getHighlightPostTag());
-                return option;
-            })
             .flatMap(this::performSearch)
             .flatMap(result -> ServerResponse.ok().bodyValue(result));
     }

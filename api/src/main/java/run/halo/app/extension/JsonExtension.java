@@ -255,5 +255,20 @@ public class JsonExtension implements Extension {
                 objectNode.set("finalizers", objectMapper.valueToTree(finalizers));
             }
         }
+
+        @Override
+        public boolean equals(Object o) {
+            if (o == null || getClass() != o.getClass()) {
+                return false;
+            }
+
+            ObjectNodeMetadata that = (ObjectNodeMetadata) o;
+            return Objects.equals(objectNode, that.objectNode);
+        }
+
+        @Override
+        public int hashCode() {
+            return Objects.hashCode(objectNode);
+        }
     }
 }

@@ -4,7 +4,6 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
-import static run.halo.app.extension.MetadataOperator.metadataDeepEquals;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -73,7 +72,7 @@ class UnstructuredTest {
 
         assertEquals("fake.halo.run/v1alpha1", extension.getApiVersion());
         assertEquals("Fake", extension.getKind());
-        metadataDeepEquals(createMetadata(), extension.getMetadata());
+        MetadataOperator.equals(createMetadata(), extension.getMetadata());
     }
 
     @Test
@@ -82,7 +81,7 @@ class UnstructuredTest {
 
         assertEquals("fake.halo.run/v1alpha1", extension.getApiVersion());
         assertEquals("Fake", extension.getKind());
-        assertTrue(metadataDeepEquals(createMetadata(), extension.getMetadata()));
+        assertTrue(MetadataOperator.equals(createMetadata(), extension.getMetadata()));
     }
 
     @Test
