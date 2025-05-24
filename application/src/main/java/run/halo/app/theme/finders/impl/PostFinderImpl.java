@@ -5,10 +5,13 @@ import static run.halo.app.extension.index.query.QueryFactory.equal;
 import static run.halo.app.extension.index.query.QueryFactory.in;
 import static run.halo.app.extension.index.query.QueryFactory.notEqual;
 
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.Random;
 import java.util.stream.Collectors;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -292,6 +295,30 @@ public class PostFinderImpl implements PostFinder {
         return postPredicateResolver.getListOptions()
             .flatMapMany(listOptions -> client.listAll(Post.class, listOptions, defaultSort()))
             .flatMapSequential(postPublicQueryService::convertToListedVo);
+    }
+
+    @Override
+    public Flux<ListedPostVo> random(Integer limit) {
+
+        return postPredicateResolver.getListOptions()
+            .flatMapMany(listOptions -> client.listAll(Post.class, listOptions, Sort.unsorted()))
+            .collectList()
+            .defaultIfEmpty(Collections.emptyList())
+            .flatMapMany(posts -> Flux.fromIterable(shufflePostList(posts).stream().limit(limit).collect(Collectors.toList())))
+            .flatMapSequential(postPublicQueryService::convertToListedVo);
+    }
+
+    private List<Post> shufflePostList(List<Post> list){
+        List<Post> shuffledList = new ArrayList<>(list);
+        Random random = new Random();
+        for(int i= shuffledList.size() - 1; i > 0; i--) {
+            int index = random.nextInt(i + 1);
+            // 交换元素
+            Post temp = shuffledList.get(index);
+            shuffledList.set(index, shuffledList.get(i));
+            shuffledList.set(i, temp);
+        }
+        return shuffledList;
     }
 
     static int pageNullSafe(Integer page) {
