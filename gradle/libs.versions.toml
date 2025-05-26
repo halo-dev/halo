@@ -1,5 +1,5 @@
 [versions]
-lucene = '9.12.0'
+lucene = '10.2.1'
 resilience4j = '2.3.0'
 therapi = '0.15.0'
 
