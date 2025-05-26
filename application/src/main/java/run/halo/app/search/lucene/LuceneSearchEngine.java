@@ -273,7 +273,7 @@ public class LuceneSearchEngine implements SearchEngine, InitializingBean, Dispo
             }
             var result = new SearchResult();
             result.setHits(haloDocs);
-            result.setTotal(hits.totalHits.value);
+            result.setTotal(hits.totalHits.value());
             result.setKeyword(keyword);
             result.setLimit(limit);
             result.setProcessingTimeMillis(stopWatch.getTotalTimeMillis());
