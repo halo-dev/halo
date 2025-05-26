@@ -1,13 +1,8 @@
 <script lang="ts" setup>
 import StickyBlock from "@/components/sticky-block/StickyBlock.vue";
-import { useSettingFormConvert } from "@console/composables/use-setting-form";
 import { useThemeStore } from "@console/stores/theme";
-import type {
-  ConfigMap,
-  Setting,
-  SettingForm,
-  Theme,
-} from "@halo-dev/api-client";
+import type { FormKitSchemaCondition, FormKitSchemaNode } from "@formkit/core";
+import type { Setting, SettingForm, Theme } from "@halo-dev/api-client";
 import { consoleApiClient } from "@halo-dev/api-client";
 import {
   IconComputer,
@@ -24,7 +19,8 @@ import {
   VModal,
   VTabbar,
 } from "@halo-dev/components";
-import { useQuery } from "@tanstack/vue-query";
+import { useQuery, useQueryClient } from "@tanstack/vue-query";
+import { cloneDeep, set } from "lodash-es";
 import { OverlayScrollbarsComponent } from "overlayscrollbars-vue";
 import { storeToRefs } from "pinia";
 import { computed, markRaw, onMounted, ref, toRaw } from "vue";
@@ -46,6 +42,7 @@ const emit = defineEmits<{
   (event: "close"): void;
 }>();
 
+const queryClient = useQueryClient();
 const { t } = useI18n();
 
 interface SettingTab {
@@ -132,10 +129,10 @@ const { data: setting } = useQuery<Setting>({
   enabled: computed(() => !!selectedTheme.value?.spec.settingName),
 });
 
-const { data: configMap, refetch: handleFetchConfigMap } = useQuery<ConfigMap>({
-  queryKey: ["theme-configMap", selectedTheme],
+const { data: configMapData } = useQuery({
+  queryKey: ["core:theme:configMap:data", selectedTheme],
   queryFn: async () => {
-    const { data } = await consoleApiClient.theme.theme.fetchThemeConfig({
+    const { data } = await consoleApiClient.theme.theme.fetchThemeJsonConfig({
       name: selectedTheme?.value?.metadata.name as string,
     });
     return data;
@@ -145,34 +142,43 @@ const { data: configMap, refetch: handleFetchConfigMap } = useQuery<ConfigMap>({
   ),
 });
 
-const { formSchema, configMapFormData, convertToSave } = useSettingFormConvert(
-  setting,
-  configMap,
-  activeSettingTab
-);
+const currentConfigMapGroupData = computed(() => {
+  return configMapData.value?.[activeSettingTab.value];
+});
+
+const formSchema = computed(() => {
+  if (!setting.value) {
+    return;
+  }
+  const { forms } = setting.value.spec;
+  return forms.find((item) => item.group === activeSettingTab.value)
+    ?.formSchema as (FormKitSchemaCondition | FormKitSchemaNode)[];
+});
 
 const handleRefresh = () => {
   previewFrame.value?.contentWindow?.location.reload();
 };
 
-const handleSaveConfigMap = async () => {
+const handleSaveConfigMap = async (data: object) => {
   saving.value = true;
 
-  const configMapToUpdate = convertToSave();
-
-  if (!configMapToUpdate || !selectedTheme?.value) {
+  if (!selectedTheme?.value) {
     saving.value = false;
     return;
   }
 
-  await consoleApiClient.theme.theme.updateThemeConfig({
+  await consoleApiClient.theme.theme.updateThemeJsonConfig({
     name: selectedTheme?.value?.metadata.name,
-    configMap: configMapToUpdate,
+    body: set(
+      cloneDeep(configMapData.value) || {},
+      activeSettingTab.value,
+      data
+    ),
   });
 
   Toast.success(t("core.common.toast.save_success"));
 
-  await handleFetchConfigMap();
+  queryClient.invalidateQueries({ queryKey: ["core:theme:configMap:data"] });
 
   saving.value = false;
 
@@ -313,28 +319,23 @@ const iframeClasses = computed(() => {
                 type="outline"
               ></VTabbar>
               <div class="bg-white p-3">
-                <div v-for="(tab, index) in settingTabs" :key="index">
-                  <FormKit
-                    v-if="
-                      tab.id === activeSettingTab &&
-                      configMapFormData[tab.id] &&
-                      formSchema
-                    "
-                    :id="`preview-setting-${tab.id}`"
-                    :key="tab.id"
-                    v-model="configMapFormData[tab.id]"
-                    :name="tab.id"
-                    :actions="false"
-                    :preserve="true"
-                    type="form"
-                    @submit="handleSaveConfigMap"
-                  >
-                    <FormKitSchema
-                      :schema="toRaw(formSchema)"
-                      :data="configMapFormData[tab.id]"
-                    />
-                  </FormKit>
-                </div>
+                <FormKit
+                  v-if="
+                    activeSettingTab && formSchema && currentConfigMapGroupData
+                  "
+                  :id="activeSettingTab"
+                  :key="activeSettingTab"
+                  :value="currentConfigMapGroupData || {}"
+                  :name="activeSettingTab"
+                  :preserve="true"
+                  type="form"
+                  @submit="handleSaveConfigMap"
+                >
+                  <FormKitSchema
+                    :schema="toRaw(formSchema)"
+                    :data="toRaw(currentConfigMapGroupData)"
+                  />
+                </FormKit>
                 <StickyBlock
                   v-permission="['system:themes:manage']"
                   class="-mx-4 -mb-4 -mr-3 rounded-b-base rounded-t-lg bg-white p-4 pt-5"
@@ -343,11 +344,7 @@ const iframeClasses = computed(() => {
                   <VButton
                     :loading="saving"
                     type="secondary"
-                    @click="
-                      $formkit.submit(
-                        `preview-setting-${activeSettingTab}` || ''
-                      )
-                    "
+                    @click="$formkit.submit(activeSettingTab)"
                   >
                     {{ $t("core.common.buttons.save") }}
                   </VButton>

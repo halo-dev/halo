@@ -441,17 +441,6 @@
         ]
       }
     },
-    "/apis/api.console.halo.run/v1alpha1/indices/post": {
-      "post": {
-        "deprecated": true,
-        "description": "Build or rebuild post indices for full text search. This method is deprecated, please use POST /indices/-/rebuild instead.",
-        "operationId": "BuildPostIndices",
-        "responses": {},
-        "tags": [
-          "IndicesV1alpha1Console"
-        ]
-      }
-    },
     "/apis/api.console.halo.run/v1alpha1/notifiers/{name}/sender-config": {
       "get": {
         "description": "Fetch sender config of notifier",
@@ -701,77 +690,6 @@
               "*/*": {
                 "schema": {
                   "$ref": "#/components/schemas/Plugin"
-                }
-              }
-            },
-            "description": "default response"
-          }
-        },
-        "tags": [
-          "PluginV1alpha1Console"
-        ]
-      }
-    },
-    "/apis/api.console.halo.run/v1alpha1/plugins/{name}/config": {
-      "get": {
-        "description": "Fetch configMap of plugin by configured configMapName. it is deprecated since 2.20.0",
-        "operationId": "fetchPluginConfig",
-        "parameters": [
-          {
-            "in": "path",
-            "name": "name",
-            "required": true,
-            "schema": {
-              "type": "string"
-            }
-          }
-        ],
-        "responses": {
-          "default": {
-            "content": {
-              "*/*": {
-                "schema": {
-                  "$ref": "#/components/schemas/ConfigMap"
-                }
-              }
-            },
-            "description": "default response"
-          }
-        },
-        "tags": [
-          "PluginV1alpha1Console"
-        ]
-      },
-      "put": {
-        "deprecated": true,
-        "description": "Update the configMap of plugin setting, it is deprecated since 2.20.0",
-        "operationId": "updatePluginConfig",
-        "parameters": [
-          {
-            "in": "path",
-            "name": "name",
-            "required": true,
-            "schema": {
-              "type": "string"
-            }
-          }
-        ],
-        "requestBody": {
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/ConfigMap"
-              }
-            }
-          },
-          "required": true
-        },
-        "responses": {
-          "default": {
-            "content": {
-              "*/*": {
-                "schema": {
-                  "$ref": "#/components/schemas/ConfigMap"
                 }
               }
             },
@@ -2408,78 +2326,6 @@
               "*/*": {
                 "schema": {
                   "$ref": "#/components/schemas/Theme"
-                }
-              }
-            },
-            "description": "default response"
-          }
-        },
-        "tags": [
-          "ThemeV1alpha1Console"
-        ]
-      }
-    },
-    "/apis/api.console.halo.run/v1alpha1/themes/{name}/config": {
-      "get": {
-        "deprecated": true,
-        "description": "Fetch configMap of theme by configured configMapName. It is deprecated.",
-        "operationId": "fetchThemeConfig",
-        "parameters": [
-          {
-            "in": "path",
-            "name": "name",
-            "required": true,
-            "schema": {
-              "type": "string"
-            }
-          }
-        ],
-        "responses": {
-          "default": {
-            "content": {
-              "*/*": {
-                "schema": {
-                  "$ref": "#/components/schemas/ConfigMap"
-                }
-              }
-            },
-            "description": "default response"
-          }
-        },
-        "tags": [
-          "ThemeV1alpha1Console"
-        ]
-      },
-      "put": {
-        "deprecated": true,
-        "description": "Update the configMap of theme setting. It is deprecated.",
-        "operationId": "updateThemeConfig",
-        "parameters": [
-          {
-            "in": "path",
-            "name": "name",
-            "required": true,
-            "schema": {
-              "type": "string"
-            }
-          }
-        ],
-        "requestBody": {
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/ConfigMap"
-              }
-            }
-          },
-          "required": true
-        },
-        "responses": {
-          "default": {
-            "content": {
-              "*/*": {
-                "schema": {
-                  "$ref": "#/components/schemas/ConfigMap"
                 }
               }
             },
@@ -5280,10 +5126,6 @@
           "logo": {
             "type": "string"
           },
-          "pluginClass": {
-            "type": "string",
-            "deprecated": true
-          },
           "pluginDependencies": {
             "type": "object",
             "additionalProperties": {
@@ -6432,8 +6274,7 @@
       "ThemeSpec": {
         "required": [
           "author",
-          "displayName",
-          "version"
+          "displayName"
         ],
         "type": "object",
         "properties": {
@@ -6454,8 +6295,7 @@
             "type": "string"
           },
           "homepage": {
-            "type": "string",
-            "description": "Compatible with {@link run.halo.app.core.extension.Theme$ThemeSpec#website #website} property."
+            "type": "string"
           },
           "issues": {
             "type": "string"
@@ -6472,24 +6312,14 @@
           "repo": {
             "type": "string"
           },
-          "require": {
-            "type": "string",
-            "description": "Deprecated, use `requires` instead.",
-            "deprecated": true
-          },
           "requires": {
-            "type": "string",
-            "description": "if requires is not empty, then return requires, else return require or \u003ccode\u003eWILDCARD\u003c/code\u003e."
+            "type": "string"
           },
           "settingName": {
             "type": "string"
           },
           "version": {
             "type": "string"
-          },
-          "website": {
-            "type": "string",
-            "deprecated": true
           }
         }
       },

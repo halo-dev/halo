@@ -56,7 +56,6 @@ api/reply-v1alpha1-console-api.ts
 api/reverse-proxy-v1alpha1-api.ts
 api/role-binding-v1alpha1-api.ts
 api/role-v1alpha1-api.ts
-api/search-engine-v1alpha1-api.ts
 api/secret-v1alpha1-api.ts
 api/setting-v1alpha1-api.ts
 api/single-page-v1alpha1-api.ts
@@ -276,9 +275,6 @@ models/role-binding.ts
 models/role-list.ts
 models/role-ref.ts
 models/role.ts
-models/search-engine-list.ts
-models/search-engine-spec.ts
-models/search-engine.ts
 models/search-option.ts
 models/search-result.ts
 models/secret-list.ts

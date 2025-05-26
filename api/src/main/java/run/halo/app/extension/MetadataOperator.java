@@ -66,34 +66,46 @@ public interface MetadataOperator {
 
     void setFinalizers(Set<String> finalizers);
 
-    static boolean metadataDeepEquals(MetadataOperator left, MetadataOperator right) {
+    /**
+     * Equals method for metadata.
+     *
+     * @param left metadata
+     * @param right metadata
+     * @return true if equals, false otherwise
+     */
+    static boolean equals(MetadataOperator left, MetadataOperator right) {
         if (left == null && right == null) {
             return true;
         }
         if (left == null || right == null) {
             return false;
         }
-        if (!Objects.equals(left.getName(), right.getName())) {
-            return false;
-        }
-        if (!Objects.equals(left.getLabels(), right.getLabels())) {
-            return false;
-        }
-        if (!Objects.equals(left.getAnnotations(), right.getAnnotations())) {
-            return false;
-        }
-        if (!Objects.equals(left.getCreationTimestamp(), right.getCreationTimestamp())) {
-            return false;
-        }
-        if (!Objects.equals(left.getDeletionTimestamp(), right.getDeletionTimestamp())) {
-            return false;
-        }
-        if (!Objects.equals(left.getVersion(), right.getVersion())) {
-            return false;
-        }
-        if (!Objects.equals(left.getFinalizers(), right.getFinalizers())) {
-            return false;
-        }
-        return true;
+        return Objects.equals(left.getName(), right.getName())
+            && Objects.equals(left.getGenerateName(), right.getGenerateName())
+            && Objects.equals(left.getLabels(), right.getLabels())
+            && Objects.equals(left.getAnnotations(), right.getAnnotations())
+            && Objects.equals(left.getCreationTimestamp(), right.getCreationTimestamp())
+            && Objects.equals(left.getDeletionTimestamp(), right.getDeletionTimestamp())
+            && Objects.equals(left.getVersion(), right.getVersion())
+            && Objects.equals(left.getFinalizers(), right.getFinalizers());
+    }
+
+    /**
+     * Hash code for metadata.
+     *
+     * @param metadata metadata
+     * @return hash code
+     */
+    static int hashCode(MetadataOperator metadata) {
+        return Objects.hash(
+            metadata.getName(),
+            metadata.getGenerateName(),
+            metadata.getLabels(),
+            metadata.getAnnotations(),
+            metadata.getCreationTimestamp(),
+            metadata.getDeletionTimestamp(),
+            metadata.getVersion(),
+            metadata.getFinalizers()
+        );
     }
 }

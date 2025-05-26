@@ -133,14 +133,6 @@ public class ControllerBuilder {
         if (syncAllListOptions != null) {
             return syncAllListOptions;
         }
-        // In order to be compatible with the previous version of the code
-        // The previous version of the code determined syncAllListOptions through onAddMatcher
-        // TODO Will be removed later
-        if (onAddMatcher != null) {
-            return new ListOptions()
-                .setLabelSelector(onAddMatcher.getLabelSelector())
-                .setFieldSelector(onAddMatcher.getFieldSelector());
-        }
         return new ListOptions();
     }
 }

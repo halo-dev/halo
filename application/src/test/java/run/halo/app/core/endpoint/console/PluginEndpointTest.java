@@ -46,7 +46,6 @@ import reactor.core.publisher.Mono;
 import run.halo.app.core.extension.Plugin;
 import run.halo.app.core.extension.Setting;
 import run.halo.app.core.user.service.SettingConfigService;
-import run.halo.app.extension.ConfigMap;
 import run.halo.app.extension.ListOptions;
 import run.halo.app.extension.ListResult;
 import run.halo.app.extension.Metadata;
@@ -240,48 +239,9 @@ class PluginEndpointTest {
 
             when(client.fetch(eq(Plugin.class), eq("fake-plugin"))).thenReturn(Mono.just(plugin));
             webClient.put()
-                .uri("/plugins/fake-plugin/config")
+                .uri("/plugins/fake-plugin/json-config")
                 .exchange()
                 .expectStatus().isBadRequest();
-        }
-
-        @Test
-        void updateWhenConfigMapNameNotMatch() {
-            Plugin plugin = createPlugin("fake-plugin");
-            plugin.getSpec().setConfigMapName("fake-config-map");
-
-            when(client.fetch(eq(Plugin.class), eq("fake-plugin"))).thenReturn(Mono.just(plugin));
-            webClient.put()
-                .uri("/plugins/fake-plugin/config")
-                .body(Mono.fromSupplier(() -> {
-                    ConfigMap configMap = new ConfigMap();
-                    configMap.setMetadata(new Metadata());
-                    configMap.getMetadata().setName("not-match");
-                    return configMap;
-                }), ConfigMap.class)
-                .exchange()
-                .expectStatus().isBadRequest();
-        }
-
-        @Test
-        void updateWhenConfigMapNameMatch() {
-            Plugin plugin = createPlugin("fake-plugin");
-            plugin.getSpec().setConfigMapName("fake-config-map");
-
-            when(client.fetch(eq(Plugin.class), eq("fake-plugin"))).thenReturn(Mono.just(plugin));
-            when(client.fetch(eq(ConfigMap.class), eq("fake-config-map"))).thenReturn(Mono.empty());
-            when(client.create(any(ConfigMap.class))).thenReturn(Mono.empty());
-
-            webClient.put()
-                .uri("/plugins/fake-plugin/config")
-                .body(Mono.fromSupplier(() -> {
-                    ConfigMap configMap = new ConfigMap();
-                    configMap.setMetadata(new Metadata());
-                    configMap.getMetadata().setName("fake-config-map");
-                    return configMap;
-                }), ConfigMap.class)
-                .exchange()
-                .expectStatus().isOk();
         }
 
         @Test
@@ -326,24 +286,6 @@ class PluginEndpointTest {
                 .expectStatus().isOk();
 
             verify(client).fetch(eq(Setting.class), eq("fake-setting"));
-            verify(client).fetch(eq(Plugin.class), eq("fake"));
-        }
-
-        @Test
-        void fetchConfig() {
-            Plugin plugin = createPlugin("fake");
-            plugin.getSpec().setConfigMapName("fake-config");
-
-            when(client.fetch(eq(ConfigMap.class), eq("fake-config")))
-                .thenReturn(Mono.just(new ConfigMap()));
-
-            when(client.fetch(eq(Plugin.class), eq("fake"))).thenReturn(Mono.just(plugin));
-            webClient.get()
-                .uri("/plugins/fake/config")
-                .exchange()
-                .expectStatus().isOk();
-
-            verify(client).fetch(eq(ConfigMap.class), eq("fake-config"));
             verify(client).fetch(eq(Plugin.class), eq("fake"));
         }
 

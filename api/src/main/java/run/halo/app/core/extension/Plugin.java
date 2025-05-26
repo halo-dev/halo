@@ -89,9 +89,6 @@ public class Plugin extends AbstractExtension {
          */
         private String requires = "*";
 
-        @Deprecated
-        private String pluginClass;
-
         private Boolean enabled = false;
 
         private String settingName;
