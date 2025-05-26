@@ -33,6 +33,7 @@ editor:
       placeholder: Link address
       open_in_new_window: Open in new window
       cancel_link: Cancel link
+      nofollow: No follow
     audio:
       disable_autoplay: Disable auto play
       enable_autoplay: Enable auto play
