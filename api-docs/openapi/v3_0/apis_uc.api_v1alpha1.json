@@ -2187,6 +2187,7 @@
         "type": "object",
         "properties": {
           "password": {
+            "minLength": 1,
             "type": "string"
           }
         }
@@ -2815,9 +2816,11 @@
             "type": "string"
           },
           "password": {
+            "minLength": 1,
             "type": "string"
           },
           "secret": {
+            "minLength": 1,
             "type": "string"
           }
         }
