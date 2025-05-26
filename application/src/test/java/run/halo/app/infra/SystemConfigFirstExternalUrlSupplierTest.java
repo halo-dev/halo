@@ -55,7 +55,7 @@ class SystemConfigFirstExternalUrlSupplierTest {
         }
 
         @Test
-        void getURIWhenBasePathSetAndNotUsingAbsolutePermalink() throws MalformedURLException {
+        void getURIWhenBasePathSetAndNotUsingAbsolutePermalink() {
             when(webFluxProperties.getBasePath()).thenReturn("/blog");
             when(haloProperties.isUseAbsolutePermalink()).thenReturn(false);
 
@@ -137,14 +137,31 @@ class SystemConfigFirstExternalUrlSupplierTest {
     class SystemConfigSupplier {
 
         @Test
-        void shouldGetUrlCorrectly() throws Exception {
+        void shouldGetUrlWhenUseAbsolutePermalink() throws Exception {
             var basic = new SystemSetting.Basic();
             basic.setExternalUrl("https://www.halo.run");
             when(systemConfigFetcher.getBasic()).thenReturn(Mono.just(basic));
+            when(haloProperties.isUseAbsolutePermalink()).thenReturn(true);
             externalUrl.onExtensionInitialized(null);
             assertEquals(URI.create("https://www.halo.run").toURL(), externalUrl.getRaw());
             assertEquals(URI.create("https://www.halo.run"), externalUrl.get());
 
+            var mockRequest = mock(HttpRequest.class);
+            assertEquals(URI.create("https://www.halo.run").toURL(),
+                externalUrl.getURL(mockRequest));
+        }
+
+        @Test
+        void shouldGetUrlWhenNotUsingAbsolutePermalink() throws MalformedURLException {
+            var basic = new SystemSetting.Basic();
+            basic.setExternalUrl("https://www.halo.run");
+            when(systemConfigFetcher.getBasic()).thenReturn(Mono.just(basic));
+            when(haloProperties.isUseAbsolutePermalink()).thenReturn(false);
+            when(webFluxProperties.getBasePath()).thenReturn("/fake");
+            externalUrl.onExtensionInitialized(null);
+
+            assertEquals(URI.create("https://www.halo.run").toURL(), externalUrl.getRaw());
+            assertEquals(URI.create("/fake"), externalUrl.get());
             var mockRequest = mock(HttpRequest.class);
             assertEquals(URI.create("https://www.halo.run").toURL(),
                 externalUrl.getURL(mockRequest));

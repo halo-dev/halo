@@ -63,13 +63,12 @@ class SystemConfigFirstExternalUrlSupplier implements ExternalUrlSupplier {
     @Override
     public URI get() {
         try {
-            if (externalUrl != null) {
-                return externalUrl.toURI();
-            }
             if (!haloProperties.isUseAbsolutePermalink()) {
                 return URI.create(getBasePath());
             }
-
+            if (externalUrl != null) {
+                return externalUrl.toURI();
+            }
             return haloProperties.getExternalUrl().toURI();
         } catch (URISyntaxException e) {
             throw Exceptions.propagate(e);
