@@ -182,25 +182,6 @@ public class PluginEndpoint implements CustomEndpoint, InitializingBean {
                         .responseCode(String.valueOf(HttpStatus.NO_CONTENT.value()))
                         .implementation(Void.class))
             )
-            .PUT("plugins/{name}/config", this::updatePluginConfig,
-                builder -> builder.operationId("updatePluginConfig")
-                    .description(
-                        "Update the configMap of plugin setting, it is deprecated since 2.20.0")
-                    .tag(tag)
-                    .parameter(parameterBuilder()
-                        .name("name")
-                        .in(ParameterIn.PATH)
-                        .required(true)
-                        .implementation(String.class)
-                    )
-                    .deprecated(true)
-                    .requestBody(requestBodyBuilder()
-                        .required(true)
-                        .content(contentBuilder().mediaType(MediaType.APPLICATION_JSON_VALUE)
-                            .schema(schemaBuilder().implementation(ConfigMap.class))))
-                    .response(responseBuilder()
-                        .implementation(ConfigMap.class))
-            )
             .PUT("plugins/{name}/reset-config", this::resetSettingConfig,
                 builder -> builder.operationId("ResetPluginConfig")
                     .description("Reset the configMap of plugin setting.")
@@ -267,21 +248,6 @@ public class PluginEndpoint implements CustomEndpoint, InitializingBean {
                     )
                     .response(responseBuilder()
                         .implementation(Setting.class))
-            )
-            .GET("plugins/{name}/config", this::fetchPluginConfig,
-                builder -> builder.operationId("fetchPluginConfig")
-                    .description(
-                        "Fetch configMap of plugin by configured configMapName. it is deprecated "
-                            + "since 2.20.0")
-                    .tag(tag)
-                    .parameter(parameterBuilder()
-                        .name("name")
-                        .in(ParameterIn.PATH)
-                        .required(true)
-                        .implementation(String.class)
-                    )
-                    .response(responseBuilder()
-                        .implementation(ConfigMap.class))
             )
             .GET("plugins/{name}/json-config", this::fetchPluginJsonConfig,
                 builder -> builder.operationId("fetchPluginJsonConfig")

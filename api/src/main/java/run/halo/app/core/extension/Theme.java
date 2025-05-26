@@ -10,7 +10,6 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.ToString;
 import org.apache.commons.lang3.ObjectUtils;
-import org.apache.commons.lang3.StringUtils;
 import org.springframework.lang.NonNull;
 import org.springframework.util.Assert;
 import run.halo.app.extension.AbstractExtension;
@@ -55,23 +54,16 @@ public class Theme extends AbstractExtension {
 
         private String logo;
 
-        @Deprecated(forRemoval = true, since = "2.7.0")
-        private String website;
-
         private String homepage;
 
         private String repo;
 
         private String issues;
 
-        private String version;
-
-        @Deprecated(forRemoval = true, since = "2.2.0")
-        @Schema(description = "Deprecated, use `requires` instead.")
-        private String require;
+        private String version = WILDCARD;
 
         @Schema(requiredMode = NOT_REQUIRED)
-        private String requires;
+        private String requires = WILDCARD;
 
         private String settingName;
 
@@ -82,30 +74,6 @@ public class Theme extends AbstractExtension {
         @Schema
         private CustomTemplates customTemplates;
 
-        @NonNull
-        public String getVersion() {
-            return Objects.toString(this.version, WILDCARD);
-        }
-
-        /**
-         * if requires is not empty, then return requires, else return require or {@code WILDCARD}.
-         *
-         * @return requires to satisfies system version
-         */
-        @NonNull
-        public String getRequires() {
-            if (StringUtils.isNotBlank(this.requires)) {
-                return this.requires;
-            }
-            return Objects.toString(this.require, WILDCARD);
-        }
-
-        /**
-         * Compatible with {@link #website} property.
-         */
-        public String getHomepage() {
-            return Objects.toString(this.homepage, this.website);
-        }
     }
 
     @Data

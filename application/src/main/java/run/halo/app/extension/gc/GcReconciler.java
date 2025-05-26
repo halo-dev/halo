@@ -4,18 +4,20 @@ import java.time.Duration;
 import java.time.Instant;
 import java.util.function.Predicate;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Component;
 import org.springframework.util.CollectionUtils;
 import run.halo.app.extension.Extension;
 import run.halo.app.extension.ExtensionClient;
 import run.halo.app.extension.ExtensionConverter;
 import run.halo.app.extension.SchemeManager;
-import run.halo.app.extension.SchemeWatcherManager;
 import run.halo.app.extension.controller.Controller;
 import run.halo.app.extension.controller.ControllerBuilder;
 import run.halo.app.extension.controller.DefaultController;
 import run.halo.app.extension.controller.DefaultQueue;
 import run.halo.app.extension.controller.Reconciler;
+import run.halo.app.extension.controller.RequestQueue;
+import run.halo.app.extension.event.SchemeAddedEvent;
 import run.halo.app.extension.index.IndexerFactory;
 import run.halo.app.extension.store.ExtensionStoreClient;
 
@@ -29,23 +31,23 @@ class GcReconciler implements Reconciler<GcRequest> {
 
     private final ExtensionConverter converter;
 
-    private final SchemeManager schemeManager;
-
     private final IndexerFactory indexerFactory;
 
-    private final SchemeWatcherManager schemeWatcherManager;
+    private final RequestQueue<GcRequest> queue;
+
+    private final GcSynchronizer synchronizer;
 
     GcReconciler(ExtensionClient client,
         ExtensionStoreClient storeClient,
         ExtensionConverter converter,
-        SchemeManager schemeManager, IndexerFactory indexerFactory,
-        SchemeWatcherManager schemeWatcherManager) {
+        SchemeManager schemeManager,
+        IndexerFactory indexerFactory) {
         this.client = client;
         this.storeClient = storeClient;
         this.converter = converter;
-        this.schemeManager = schemeManager;
         this.indexerFactory = indexerFactory;
-        this.schemeWatcherManager = schemeWatcherManager;
+        this.queue = new DefaultQueue<>(Instant::now, Duration.ofMillis(500));
+        this.synchronizer = new GcSynchronizer(client, queue, schemeManager);
     }
 
     @Override
@@ -68,8 +70,6 @@ class GcReconciler implements Reconciler<GcRequest> {
 
     @Override
     public Controller setupWith(ControllerBuilder builder) {
-        var queue = new DefaultQueue<GcRequest>(Instant::now, Duration.ofMillis(500));
-        var synchronizer = new GcSynchronizer(client, queue, schemeManager, schemeWatcherManager);
         return new DefaultController<>(
             "garbage-collector-controller",
             this,
@@ -79,6 +79,11 @@ class GcReconciler implements Reconciler<GcRequest> {
             Duration.ofSeconds(1000),
             // TODO Make it configurable
             10);
+    }
+
+    @EventListener
+    void onSchemeAddedEvent(SchemeAddedEvent event) {
+        synchronizer.onApplicationEvent(event);
     }
 
     private Predicate<Extension> deletable() {

@@ -28,15 +28,6 @@ public class IndicesEndpoint implements CustomEndpoint {
     public RouterFunction<ServerResponse> endpoint() {
         final var tag = "IndicesV1alpha1Console";
         return SpringdocRouteBuilder.route()
-            .POST("indices/post", this::rebuildIndices,
-                builder -> builder.operationId("BuildPostIndices")
-                    .tag(tag)
-                    .deprecated(true)
-                    .description("""
-                        Build or rebuild post indices for full text search. \
-                        This method is deprecated, please use POST /indices/-/rebuild instead.\
-                        """)
-            )
             .POST("/indices/-/rebuild", this::rebuildIndices,
                 builder -> builder.operationId("RebuildAllIndices")
                     .tag(tag)

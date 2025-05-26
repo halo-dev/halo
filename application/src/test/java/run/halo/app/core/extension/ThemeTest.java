@@ -43,9 +43,6 @@ class ThemeTest {
         themeSpec.setDescription("test-description");
         themeSpec.setConfigMapName("test-config-map");
         themeSpec.setSettingName("test-setting");
-
-        themeSpec.setVersion(null);
-        themeSpec.setRequires(null);
         JSONAssert.assertEquals("""
                 {
                     "spec": {

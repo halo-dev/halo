@@ -34,7 +34,7 @@ class IndicesEndpointTest {
     }
 
     @ParameterizedTest
-    @ValueSource(strings = {"/indices/-/rebuild", "/indices/post"})
+    @ValueSource(strings = {"/indices/-/rebuild"})
     void shouldRebuildIndices(String uri) {
         client.post().uri(uri)
             .exchange()
