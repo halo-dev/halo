@@ -7127,243 +7127,6 @@
         ]
       }
     },
-    "/apis/plugin.halo.run/v1alpha1/searchengines": {
-      "get": {
-        "description": "List SearchEngine",
-        "operationId": "listSearchEngine",
-        "parameters": [
-          {
-            "description": "Page number. Default is 0.",
-            "in": "query",
-            "name": "page",
-            "schema": {
-              "type": "integer",
-              "format": "int32"
-            }
-          },
-          {
-            "description": "Size number. Default is 0.",
-            "in": "query",
-            "name": "size",
-            "schema": {
-              "type": "integer",
-              "format": "int32"
-            }
-          },
-          {
-            "description": "Label selector. e.g.: hidden!\u003dtrue",
-            "in": "query",
-            "name": "labelSelector",
-            "schema": {
-              "type": "array",
-              "items": {
-                "type": "string"
-              }
-            }
-          },
-          {
-            "description": "Field selector. e.g.: metadata.name\u003d\u003dhalo",
-            "in": "query",
-            "name": "fieldSelector",
-            "schema": {
-              "type": "array",
-              "items": {
-                "type": "string"
-              }
-            }
-          },
-          {
-            "description": "Sorting criteria in the format: property,(asc|desc). Default sort order is ascending. Multiple sort criteria are supported.",
-            "in": "query",
-            "name": "sort",
-            "schema": {
-              "type": "array",
-              "items": {
-                "type": "string"
-              }
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "content": {
-              "*/*": {
-                "schema": {
-                  "$ref": "#/components/schemas/SearchEngineList"
-                }
-              }
-            },
-            "description": "Response searchengines"
-          }
-        },
-        "tags": [
-          "SearchEngineV1alpha1"
-        ]
-      },
-      "post": {
-        "description": "Create SearchEngine",
-        "operationId": "createSearchEngine",
-        "requestBody": {
-          "content": {
-            "*/*": {
-              "schema": {
-                "$ref": "#/components/schemas/SearchEngine"
-              }
-            }
-          },
-          "description": "Fresh searchengine"
-        },
-        "responses": {
-          "200": {
-            "content": {
-              "*/*": {
-                "schema": {
-                  "$ref": "#/components/schemas/SearchEngine"
-                }
-              }
-            },
-            "description": "Response searchengines created just now"
-          }
-        },
-        "tags": [
-          "SearchEngineV1alpha1"
-        ]
-      }
-    },
-    "/apis/plugin.halo.run/v1alpha1/searchengines/{name}": {
-      "delete": {
-        "description": "Delete SearchEngine",
-        "operationId": "deleteSearchEngine",
-        "parameters": [
-          {
-            "description": "Name of searchengine",
-            "in": "path",
-            "name": "name",
-            "required": true,
-            "schema": {
-              "type": "string"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "Response searchengine deleted just now"
-          }
-        },
-        "tags": [
-          "SearchEngineV1alpha1"
-        ]
-      },
-      "get": {
-        "description": "Get SearchEngine",
-        "operationId": "getSearchEngine",
-        "parameters": [
-          {
-            "description": "Name of searchengine",
-            "in": "path",
-            "name": "name",
-            "required": true,
-            "schema": {
-              "type": "string"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "content": {
-              "*/*": {
-                "schema": {
-                  "$ref": "#/components/schemas/SearchEngine"
-                }
-              }
-            },
-            "description": "Response single searchengine"
-          }
-        },
-        "tags": [
-          "SearchEngineV1alpha1"
-        ]
-      },
-      "patch": {
-        "description": "Patch SearchEngine",
-        "operationId": "patchSearchEngine",
-        "parameters": [
-          {
-            "description": "Name of searchengine",
-            "in": "path",
-            "name": "name",
-            "required": true,
-            "schema": {
-              "type": "string"
-            }
-          }
-        ],
-        "requestBody": {
-          "content": {
-            "application/json-patch+json": {
-              "schema": {
-                "$ref": "#/components/schemas/JsonPatch"
-              }
-            }
-          }
-        },
-        "responses": {
-          "200": {
-            "content": {
-              "*/*": {
-                "schema": {
-                  "$ref": "#/components/schemas/SearchEngine"
-                }
-              }
-            },
-            "description": "Response searchengine patched just now"
-          }
-        },
-        "tags": [
-          "SearchEngineV1alpha1"
-        ]
-      },
-      "put": {
-        "description": "Update SearchEngine",
-        "operationId": "updateSearchEngine",
-        "parameters": [
-          {
-            "description": "Name of searchengine",
-            "in": "path",
-            "name": "name",
-            "required": true,
-            "schema": {
-              "type": "string"
-            }
-          }
-        ],
-        "requestBody": {
-          "content": {
-            "*/*": {
-              "schema": {
-                "$ref": "#/components/schemas/SearchEngine"
-              }
-            }
-          },
-          "description": "Updated searchengine"
-        },
-        "responses": {
-          "200": {
-            "content": {
-              "*/*": {
-                "schema": {
-                  "$ref": "#/components/schemas/SearchEngine"
-                }
-              }
-            },
-            "description": "Response searchengines updated just now"
-          }
-        },
-        "tags": [
-          "SearchEngineV1alpha1"
-        ]
-      }
-    },
     "/apis/security.halo.run/v1alpha1/devices": {
       "get": {
         "description": "List Device",
@@ -11540,7 +11303,8 @@
           "apiVersion",
           "kind",
           "metadata",
-          "spec"
+          "spec",
+          "status"
         ],
         "type": "object",
         "properties": {
@@ -12637,10 +12401,6 @@
           },
           "logo": {
             "type": "string"
-          },
-          "pluginClass": {
-            "type": "string",
-            "deprecated": true
           },
           "pluginDependencies": {
             "type": "object",
@@ -14120,115 +13880,6 @@
         },
         "description": "RoleRef contains information that points to the role being used."
       },
-      "SearchEngine": {
-        "required": [
-          "apiVersion",
-          "kind",
-          "metadata",
-          "spec"
-        ],
-        "type": "object",
-        "properties": {
-          "apiVersion": {
-            "type": "string"
-          },
-          "kind": {
-            "type": "string"
-          },
-          "metadata": {
-            "$ref": "#/components/schemas/Metadata"
-          },
-          "spec": {
-            "$ref": "#/components/schemas/SearchEngineSpec"
-          }
-        },
-        "description": "Search engine extension."
-      },
-      "SearchEngineList": {
-        "required": [
-          "first",
-          "hasNext",
-          "hasPrevious",
-          "items",
-          "last",
-          "page",
-          "size",
-          "total",
-          "totalPages"
-        ],
-        "type": "object",
-        "properties": {
-          "first": {
-            "type": "boolean",
-            "description": "Indicates whether current page is the first page."
-          },
-          "hasNext": {
-            "type": "boolean",
-            "description": "Indicates whether current page has previous page."
-          },
-          "hasPrevious": {
-            "type": "boolean",
-            "description": "Indicates whether current page has previous page."
-          },
-          "items": {
-            "type": "array",
-            "description": "A chunk of items.",
-            "items": {
-              "$ref": "#/components/schemas/SearchEngine"
-            }
-          },
-          "last": {
-            "type": "boolean",
-            "description": "Indicates whether current page is the last page."
-          },
-          "page": {
-            "type": "integer",
-            "description": "Page number, starts from 1. If not set or equal to 0, it means no pagination.",
-            "format": "int32"
-          },
-          "size": {
-            "type": "integer",
-            "description": "Size of each page. If not set or equal to 0, it means no pagination.",
-            "format": "int32"
-          },
-          "total": {
-            "type": "integer",
-            "description": "Total elements.",
-            "format": "int64"
-          },
-          "totalPages": {
-            "type": "integer",
-            "description": "Indicates total pages.",
-            "format": "int64"
-          }
-        }
-      },
-      "SearchEngineSpec": {
-        "required": [
-          "displayName"
-        ],
-        "type": "object",
-        "properties": {
-          "description": {
-            "type": "string"
-          },
-          "displayName": {
-            "type": "string"
-          },
-          "logo": {
-            "type": "string"
-          },
-          "postSearchImpl": {
-            "type": "string"
-          },
-          "settingRef": {
-            "$ref": "#/components/schemas/Ref"
-          },
-          "website": {
-            "type": "string"
-          }
-        }
-      },
       "Secret": {
         "required": [
           "apiVersion",
@@ -15236,8 +14887,7 @@
       "ThemeSpec": {
         "required": [
           "author",
-          "displayName",
-          "version"
+          "displayName"
         ],
         "type": "object",
         "properties": {
@@ -15258,8 +14908,7 @@
             "type": "string"
           },
           "homepage": {
-            "type": "string",
-            "description": "Compatible with {@link run.halo.app.core.extension.Theme$ThemeSpec#website #website} property."
+            "type": "string"
           },
           "issues": {
             "type": "string"
@@ -15276,24 +14925,14 @@
           "repo": {
             "type": "string"
           },
-          "require": {
-            "type": "string",
-            "description": "Deprecated, use `requires` instead.",
-            "deprecated": true
-          },
           "requires": {
-            "type": "string",
-            "description": "if requires is not empty, then return requires, else return require or \u003ccode\u003eWILDCARD\u003c/code\u003e."
+            "type": "string"
           },
           "settingName": {
             "type": "string"
           },
           "version": {
             "type": "string"
-          },
-          "website": {
-            "type": "string",
-            "deprecated": true
           }
         }
       },

@@ -922,64 +922,6 @@
         ]
       }
     },
-    "/apis/api.halo.run/v1alpha1/indices/post": {
-      "get": {
-        "deprecated": true,
-        "description": "Search posts with fuzzy query. This method is deprecated, please use POST /indices/-/search instead.",
-        "operationId": "SearchPost",
-        "parameters": [
-          {
-            "description": "Keyword to search",
-            "in": "query",
-            "name": "keyword",
-            "required": true,
-            "schema": {
-              "type": "string"
-            }
-          },
-          {
-            "description": "Limit of search results",
-            "in": "query",
-            "name": "limit",
-            "schema": {
-              "type": "integer",
-              "format": "int32"
-            }
-          },
-          {
-            "description": "Highlight pre tag",
-            "in": "query",
-            "name": "highlightPreTag",
-            "schema": {
-              "type": "string"
-            }
-          },
-          {
-            "description": "Highlight post tag",
-            "in": "query",
-            "name": "highlightPostTag",
-            "schema": {
-              "type": "string"
-            }
-          }
-        ],
-        "responses": {
-          "default": {
-            "content": {
-              "*/*": {
-                "schema": {
-                  "$ref": "#/components/schemas/SearchResult"
-                }
-              }
-            },
-            "description": "default response"
-          }
-        },
-        "tags": [
-          "IndexV1alpha1Public"
-        ]
-      }
-    },
     "/apis/api.halo.run/v1alpha1/menus/-": {
       "get": {
         "description": "Gets primary menu.",
@@ -1986,6 +1928,7 @@
             }
           },
           "content": {
+            "minLength": 1,
             "type": "string",
             "description": "Document content. Safety content, without HTML tag."
           },
@@ -2003,18 +1946,22 @@
             "description": "Whether the document is exposed to the public."
           },
           "id": {
+            "minLength": 1,
             "type": "string",
             "description": "Document ID. It should be unique globally."
           },
           "metadataName": {
+            "minLength": 1,
             "type": "string",
             "description": "Metadata name of the corresponding extension."
           },
           "ownerName": {
+            "minLength": 1,
             "type": "string",
             "description": "Document owner metadata name."
           },
           "permalink": {
+            "minLength": 1,
             "type": "string",
             "description": "Document permalink."
           },
@@ -2034,10 +1981,12 @@
             }
           },
           "title": {
+            "minLength": 1,
             "type": "string",
             "description": "Document title."
           },
           "type": {
+            "minLength": 1,
             "type": "string",
             "description": "Document type. e.g.: post.content.halo.run, singlepage.content.halo.run, moment.moment\n .halo.run, doc.doc.halo.run."
           },
@@ -3114,6 +3063,7 @@
             }
           },
           "keyword": {
+            "minLength": 1,
             "type": "string",
             "description": "Search keyword."
           },

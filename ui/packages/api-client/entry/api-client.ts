@@ -47,7 +47,6 @@ import {
   ReverseProxyV1alpha1Api,
   RoleBindingV1alpha1Api,
   RoleV1alpha1Api,
-  SearchEngineV1alpha1Api,
   SecretV1alpha1Api,
   SettingV1alpha1Api,
   SinglePageV1alpha1Api,
@@ -178,11 +177,6 @@ function createCoreApiClient(axiosInstance: AxiosInstance) {
       ),
       plugin: new PluginV1alpha1Api(undefined, baseURL, axiosInstance),
       reverseProxy: new ReverseProxyV1alpha1Api(
-        undefined,
-        baseURL,
-        axiosInstance
-      ),
-      searchEngine: new SearchEngineV1alpha1Api(
         undefined,
         baseURL,
         axiosInstance

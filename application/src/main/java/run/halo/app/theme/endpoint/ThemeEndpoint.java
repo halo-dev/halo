@@ -165,24 +165,6 @@ public class ThemeEndpoint implements CustomEndpoint {
                     .response(responseBuilder()
                         .implementation(ConfigMap.class))
             )
-            .PUT("themes/{name}/config", this::updateThemeConfig,
-                builder -> builder.operationId("updateThemeConfig")
-                    .description("Update the configMap of theme setting. It is deprecated.")
-                    .tag(tag)
-                    .deprecated(true)
-                    .parameter(parameterBuilder()
-                        .name("name")
-                        .in(ParameterIn.PATH)
-                        .required(true)
-                        .implementation(String.class)
-                    )
-                    .requestBody(requestBodyBuilder()
-                        .required(true)
-                        .content(contentBuilder().mediaType(MediaType.APPLICATION_JSON_VALUE)
-                            .schema(schemaBuilder().implementation(ConfigMap.class))))
-                    .response(responseBuilder()
-                        .implementation(ConfigMap.class))
-            )
             .PUT("themes/{name}/json-config", this::updateThemeJsonConfig,
                 builder -> builder.operationId("updateThemeJsonConfig")
                     .description("Update the configMap of theme setting.")
@@ -257,21 +239,6 @@ public class ThemeEndpoint implements CustomEndpoint {
                     )
                     .response(responseBuilder()
                         .implementation(Setting.class))
-            )
-            .GET("themes/{name}/config", this::fetchThemeConfig,
-                builder -> builder.operationId("fetchThemeConfig")
-                    .description(
-                        "Fetch configMap of theme by configured configMapName. It is deprecated.")
-                    .tag(tag)
-                    .deprecated(true)
-                    .parameter(parameterBuilder()
-                        .name("name")
-                        .in(ParameterIn.PATH)
-                        .required(true)
-                        .implementation(String.class)
-                    )
-                    .response(responseBuilder()
-                        .implementation(ConfigMap.class))
             )
             .GET("themes/{name}/json-config", this::fetchThemeJsonConfig,
                 builder -> builder.operationId("fetchThemeJsonConfig")
@@ -374,53 +341,6 @@ public class ThemeEndpoint implements CustomEndpoint {
                 .thenReturn(theme)
             )
             .flatMap(activatedTheme -> ServerResponse.ok().bodyValue(activatedTheme));
-    }
-
-    @Deprecated(since = "2.20.0", forRemoval = true)
-    private Mono<ServerResponse> updateThemeConfig(ServerRequest request) {
-        final var themeName = request.pathVariable("name");
-        return client.fetch(Theme.class, themeName)
-            .doOnNext(theme -> {
-                String configMapName = theme.getSpec().getConfigMapName();
-                if (StringUtils.isBlank(configMapName)) {
-                    throw new ServerWebInputException(
-                        "Unable to complete the request because the theme configMapName is blank.");
-                }
-            })
-            .flatMap(theme -> {
-                final var configMapName = theme.getSpec().getConfigMapName();
-                return request.bodyToMono(ConfigMap.class)
-                    .doOnNext(configMapToUpdate -> {
-                        var configMapNameToUpdate = configMapToUpdate.getMetadata().getName();
-                        if (!configMapName.equals(configMapNameToUpdate)) {
-                            throw new ServerWebInputException(
-                                "The name from the request body does not match the theme "
-                                    + "configMapName name.");
-                        }
-                    })
-                    .flatMap(configMapToUpdate -> client.fetch(ConfigMap.class, configMapName)
-                        .map(persisted -> {
-                            configMapToUpdate.getMetadata()
-                                .setVersion(persisted.getMetadata().getVersion());
-                            return configMapToUpdate;
-                        })
-                        .switchIfEmpty(client.create(configMapToUpdate))
-                    )
-                    .flatMap(client::update)
-                    .retryWhen(Retry.backoff(5, Duration.ofMillis(300))
-                        .filter(OptimisticLockingFailureException.class::isInstance)
-                    );
-            })
-            .flatMap(configMap -> ServerResponse.ok().bodyValue(configMap));
-    }
-
-    @Deprecated(since = "2.20.0", forRemoval = true)
-    private Mono<ServerResponse> fetchThemeConfig(ServerRequest request) {
-        return themeNameInPathVariableOrActivated(request)
-            .flatMap(themeName -> client.fetch(Theme.class, themeName))
-            .mapNotNull(theme -> theme.getSpec().getConfigMapName())
-            .flatMap(configMapName -> client.fetch(ConfigMap.class, configMapName))
-            .flatMap(configMap -> ServerResponse.ok().bodyValue(configMap));
     }
 
     private Mono<ServerResponse> fetchActivatedTheme(ServerRequest request) {

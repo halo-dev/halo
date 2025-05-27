@@ -80,7 +80,6 @@ class AuthProviderServiceImplTest {
         ConfigMap value = captor.getValue();
         JSONAssert.assertEquals("""
                 {
-                    "enabled":["github"],
                     "states": [
                         {
                             "name": "github",
@@ -117,7 +116,6 @@ class AuthProviderServiceImplTest {
         ConfigMap value = captor.getValue();
         JSONAssert.assertEquals("""
                 {
-                    "enabled":[],
                     "states": [
                         {
                             "name": "github",

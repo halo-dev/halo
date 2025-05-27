@@ -86,29 +86,6 @@ class IndexEndpointTest {
     }
 
     @Test
-    void shouldBeCompatibleWithOldSearchApi() {
-        var searchResult = new SearchResult();
-        when(searchService.search(any(SearchOption.class)))
-            .thenReturn(Mono.just(searchResult));
-
-        client.get().uri(uriBuilder -> uriBuilder.path("/indices/post")
-                .queryParam("keyword", "halo")
-                .build())
-            .exchange()
-            .expectStatus().isOk()
-            .expectBody(SearchResult.class)
-            .isEqualTo(searchResult);
-
-        verify(searchService).search(assertArg(o -> {
-            assertEquals("halo", o.getKeyword());
-            // make sure the filters are overwritten
-            assertTrue(o.getFilterExposed());
-            assertTrue(o.getFilterPublished());
-            assertFalse(o.getFilterRecycled());
-        }));
-    }
-
-    @Test
     void shouldFailWhenSearchEngineIsUnavailable() {
         when(searchService.search(any(SearchOption.class)))
             .thenReturn(Mono.error(new SearchEngineUnavailableException()));

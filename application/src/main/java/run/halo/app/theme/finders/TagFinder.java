@@ -1,8 +1,6 @@
 package run.halo.app.theme.finders;
 
-import java.util.Comparator;
 import java.util.List;
-import java.util.function.Predicate;
 import org.springframework.lang.Nullable;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
@@ -23,10 +21,6 @@ public interface TagFinder {
     Flux<TagVo> getByNames(List<String> names);
 
     Mono<ListResult<TagVo>> list(@Nullable Integer page, @Nullable Integer size);
-
-    @Deprecated(since = "2.12.0")
-    Mono<ListResult<TagVo>> list(@Nullable Integer page, @Nullable Integer size,
-        @Nullable Predicate<Tag> predicate, @Nullable Comparator<Tag> comparator);
 
     List<TagVo> convertToVo(List<Tag> tags);
 

@@ -4,8 +4,6 @@ import java.util.Objects;
 import lombok.Builder;
 import lombok.Getter;
 import org.springframework.util.Assert;
-import run.halo.app.extension.router.selector.FieldSelector;
-import run.halo.app.extension.router.selector.LabelSelector;
 
 public class WatcherExtensionMatchers {
     @Getter
@@ -28,11 +26,11 @@ public class WatcherExtensionMatchers {
         this.client = client;
         this.gvk = gvk;
         this.onAddMatcher =
-            Objects.requireNonNullElse(onAddMatcher, emptyMatcher(client, gvk));
+            Objects.requireNonNullElseGet(onAddMatcher, () -> emptyMatcher(client, gvk));
         this.onUpdateMatcher =
-            Objects.requireNonNullElse(onUpdateMatcher, emptyMatcher(client, gvk));
+            Objects.requireNonNullElseGet(onUpdateMatcher, () -> emptyMatcher(client, gvk));
         this.onDeleteMatcher =
-            Objects.requireNonNullElse(onDeleteMatcher, emptyMatcher(client, gvk));
+            Objects.requireNonNullElseGet(onDeleteMatcher, () -> emptyMatcher(client, gvk));
     }
 
     public GroupVersionKind getGroupVersionKind() {
@@ -61,31 +59,7 @@ public class WatcherExtensionMatchers {
         return DefaultExtensionMatcher.builder(client, gvk).build();
     }
 
-    /**
-     * Remove this method when the deprecated methods are removed.
-     */
     ExtensionMatcher delegateExtensionMatcher(ExtensionMatcher matcher) {
-        return new ExtensionMatcher() {
-
-            @Override
-            public GroupVersionKind getGvk() {
-                return matcher.getGvk();
-            }
-
-            @Override
-            public LabelSelector getLabelSelector() {
-                return matcher.getLabelSelector();
-            }
-
-            @Override
-            public FieldSelector getFieldSelector() {
-                return matcher.getFieldSelector();
-            }
-
-            @Override
-            public boolean match(Extension extension) {
-                return extension.groupVersionKind().equals(gvk) && matcher.match(extension);
-            }
-        };
+        return extension -> extension.groupVersionKind().equals(gvk) && matcher.match(extension);
     }
 }
