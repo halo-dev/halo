@@ -22,6 +22,18 @@ java {
     toolchain {
         languageVersion = JavaLanguageVersion.of(21)
     }
+    withJavadocJar()
+    withSourcesJar()
+}
+
+jar {
+    manifest {
+        attributes(
+                'Implementation-Title': project.name,
+                'Implementation-Version': project.version,
+                'Implementation-Vendor': 'Halo Project',
+        )
+    }
 }
 
 repositories {
@@ -97,11 +109,6 @@ dependencies {
     testImplementation 'io.projectreactor:reactor-test'
 
     testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
-}
-
-java {
-    withSourcesJar()
-    withJavadocJar()
 }
 
 publishing {
