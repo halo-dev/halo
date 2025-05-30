@@ -5,6 +5,7 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.time.Duration;
+import java.util.Optional;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.autoconfigure.web.reactive.WebFluxProperties;
 import org.springframework.context.event.EventListener;
@@ -43,18 +44,28 @@ class SystemConfigFirstExternalUrlSupplier implements ExternalUrlSupplier {
 
     @EventListener
     void onExtensionInitialized(ExtensionInitializedEvent ignored) {
-        systemConfigFetcher.getBasic()
+        refetchExternalUrl().ifPresent(externalUrl -> this.externalUrl = externalUrl);
+    }
+
+    @EventListener
+    void onExternalUrlChanged(ExternalUrlChangedEvent event) {
+        this.externalUrl = event.getExternalUrl();
+    }
+
+    Optional<URL> refetchExternalUrl() {
+        return systemConfigFetcher.getBasic()
             .mapNotNull(SystemSetting.Basic::getExternalUrl)
             .filter(StringUtils::hasText)
-            .doOnNext(externalUrlString -> {
+            .mapNotNull(externalUrlString -> {
                 try {
-                    this.externalUrl = URI.create(externalUrlString).toURL();
+                    return URI.create(externalUrlString).toURL();
                 } catch (MalformedURLException e) {
                     log.error("""
                         Cannot parse external URL {} from system config. Fallback to default \
                         external URL supplier from properties.\
                         """, externalUrlString, e);
                     // For continuing the application startup, we need to return null here.
+                    return null;
                 }
             })
             .blockOptional(Duration.ofSeconds(10));
