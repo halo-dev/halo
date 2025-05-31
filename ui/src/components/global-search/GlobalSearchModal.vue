@@ -77,23 +77,27 @@ const handleBuildSearchIndex = () => {
   });
 
   if (currentUserHasPermission(["system:users:view"])) {
-    coreApiClient.user.listUser().then((response) => {
-      response.data.items.forEach((user) => {
-        fuse.add({
-          title: user.spec.displayName,
-          icon: {
-            component: markRaw(IconUserSettings),
-          },
-          group: t("core.components.global_search.groups.user"),
-          route: {
-            name: "UserDetail",
-            params: {
-              name: user.metadata.name,
+    coreApiClient.user
+      .listUser({
+        labelSelector: ["!halo.run/hidden-user"],
+      })
+      .then((response) => {
+        response.data.items.forEach((user) => {
+          fuse.add({
+            title: user.spec.displayName,
+            icon: {
+              component: markRaw(IconUserSettings),
             },
-          },
+            group: t("core.components.global_search.groups.user"),
+            route: {
+              name: "UserDetail",
+              params: {
+                name: user.metadata.name,
+              },
+            },
+          });
         });
       });
-    });
   }
 
   if (currentUserHasPermission(["system:plugins:view"])) {
