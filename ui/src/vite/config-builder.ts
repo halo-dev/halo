@@ -9,8 +9,6 @@ import { defineConfig, type Plugin } from "vite";
 import { VitePWA } from "vite-plugin-pwa";
 import { setupLibraryExternal } from "./library-external";
 
-import legacy from "@vitejs/plugin-legacy";
-
 interface Options {
   base: string;
   entryFile: string;
@@ -45,11 +43,11 @@ export const sharedPlugins = [
     },
     disable: true,
   }),
-  legacy({
-    targets: ["defaults", "not IE 11"],
-    polyfills: ["es/object/has-own"],
-    modernPolyfills: ["es/object/has-own"],
-  }),
+  // legacy({
+  //   targets: ["defaults", "not IE 11"],
+  //   polyfills: ["es/object/has-own"],
+  //   modernPolyfills: ["es/object/has-own"],
+  // }),
 ];
 
 export function createViteConfig(options: Options) {
@@ -84,25 +82,25 @@ export function createViteConfig(options: Options) {
       outDir: path.resolve(rootDir, outDir),
       emptyOutDir: true,
       chunkSizeWarningLimit: 2048,
-      rollupOptions: {
-        output: {
-          manualChunks: {
-            vendor: [
-              "lodash-es",
-              "vue-grid-layout",
-              "transliteration",
-              "vue-draggable-plus",
-              "emoji-mart",
-              "colorjs.io",
-              "jsencrypt",
-              "overlayscrollbars",
-              "overlayscrollbars-vue",
-              "floating-vue",
-              "@he-tree/vue",
-            ],
-          },
-        },
-      },
+      // rollupOptions: {
+      //   output: {
+      //     manualChunks: {
+      //       vendor: [
+      //         "lodash-es",
+      //         "vue-grid-layout",
+      //         "transliteration",
+      //         "vue-draggable-plus",
+      //         "emoji-mart",
+      //         "colorjs.io",
+      //         "jsencrypt",
+      //         "overlayscrollbars",
+      //         "overlayscrollbars-vue",
+      //         "floating-vue",
+      //         "@he-tree/vue",
+      //       ],
+      //     },
+      //   },
+      // },
     },
   });
 }
