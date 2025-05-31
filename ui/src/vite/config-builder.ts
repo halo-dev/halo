@@ -85,25 +85,28 @@ export function createViteConfig(options: Options) {
       outDir: path.resolve(rootDir, outDir),
       emptyOutDir: true,
       chunkSizeWarningLimit: 2048,
-      // rollupOptions: {
-      //   output: {
-      //     manualChunks: {
-      //       vendor: [
-      //         "lodash-es",
-      //         "vue-grid-layout",
-      //         "transliteration",
-      //         "vue-draggable-plus",
-      //         "emoji-mart",
-      //         "colorjs.io",
-      //         "jsencrypt",
-      //         "overlayscrollbars",
-      //         "overlayscrollbars-vue",
-      //         "floating-vue",
-      //         "@he-tree/vue",
-      //       ],
-      //     },
-      //   },
-      // },
+      rollupOptions: {
+        output: {
+          advancedChunks: {
+            groups: [
+              "lodash-es",
+              "vue-grid-layout",
+              "transliteration",
+              "vue-draggable-plus",
+              "emoji-mart",
+              "colorjs.io",
+              "overlayscrollbars",
+              "overlayscrollbars-vue",
+              "floating-vue",
+              "@he-tree/vue",
+              "pretty-bytes",
+            ].map((name) => ({
+              name: "vendor",
+              test: name,
+            })),
+          },
+        },
+      },
     },
   });
 }
