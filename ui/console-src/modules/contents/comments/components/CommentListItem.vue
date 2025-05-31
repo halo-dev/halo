@@ -1,7 +1,7 @@
 <script lang="ts" setup>
 import EntityDropdownItems from "@/components/entity/EntityDropdownItems.vue";
 import { usePluginModuleStore } from "@/stores/plugin";
-import { formatDatetime } from "@/utils/date";
+import { formatDatetime, relativeTimeTo } from "@/utils/date";
 import { usePermission } from "@/utils/permission";
 import { useOperationItemExtensionPoint } from "@console/composables/use-operation-extension-points";
 import type {
@@ -17,7 +17,6 @@ import {
   IconAddCircle,
   IconExternalLinkLine,
   Toast,
-  VAvatar,
   VButton,
   VDropdownItem,
   VEmpty,
@@ -27,7 +26,6 @@ import {
   VLoading,
   VSpace,
   VStatusDot,
-  VTag,
 } from "@halo-dev/components";
 import type {
   CommentSubjectRefProvider,
@@ -45,6 +43,7 @@ import {
   toRefs,
 } from "vue";
 import { useI18n } from "vue-i18n";
+import OwnerButton from "./OwnerButton.vue";
 import ReplyCreationModal from "./ReplyCreationModal.vue";
 import ReplyListItem from "./ReplyListItem.vue";
 
@@ -69,6 +68,13 @@ const showReplies = ref(false);
 const replyModal = ref(false);
 
 provide<Ref<ListedReply | undefined>>("hoveredReply", hoveredReply);
+
+const creationTime = computed(() => {
+  return (
+    props.comment?.comment.spec.creationTime ||
+    props.comment?.comment.metadata.creationTimestamp
+  );
+});
 
 const handleDelete = async () => {
   Dialog.warning({
@@ -352,27 +358,15 @@ const { operationItems } = useOperationItemExtensionPoint<ListedComment>(
       <slot name="checkbox" />
     </template>
     <template #start>
-      <VEntityField>
-        <template #description>
-          <VAvatar
-            circle
-            :src="comment?.owner.avatar"
-            :alt="comment?.owner.displayName"
-            size="md"
-          ></VAvatar>
-        </template>
-      </VEntityField>
-      <VEntityField
-        class="w-28 min-w-[7rem]"
-        :title="comment?.owner?.displayName"
-        :description="comment?.owner?.email"
-      ></VEntityField>
       <VEntityField width="100%">
         <template #description>
           <div class="flex flex-col gap-2">
             <div class="mb-1 flex items-center gap-2">
-              <VTag>{{ subjectRefResult.label }}</VTag>
+              <OwnerButton :owner="comment?.owner" />
+              <!-- TODO: i18n -->
+              <span class="text-sm text-gray-900">commented on</span>
               <RouterLink
+                v-tooltip="`${subjectRefResult.label}`"
                 :to="subjectRefResult.route || $route"
                 class="line-clamp-2 inline-block text-sm font-medium text-gray-900 hover:text-gray-600"
               >
@@ -387,9 +381,10 @@ const { operationItems } = useOperationItemExtensionPoint<ListedComment>(
                 <IconExternalLinkLine class="h-3.5 w-3.5" />
               </a>
             </div>
-            <div class="break-all text-sm text-gray-900">
-              {{ comment?.comment?.spec.content }}
-            </div>
+            <pre
+              class="sm:whitespace-pre-wrap break-words break-all text-sm text-gray-900"
+              >{{ comment?.comment?.spec.content }}</pre
+            >
             <div class="flex items-center gap-3 text-xs">
               <span
                 class="select-none text-gray-700 hover:text-gray-900"
@@ -437,18 +432,10 @@ const { operationItems } = useOperationItemExtensionPoint<ListedComment>(
           />
         </template>
       </VEntityField>
-      <VEntityField>
-        <template #description>
-          <span class="truncate text-xs tabular-nums text-gray-500">
-            {{
-              formatDatetime(
-                comment?.comment.spec.creationTime ||
-                  comment?.comment.metadata.creationTimestamp
-              )
-            }}
-          </span>
-        </template>
-      </VEntityField>
+      <VEntityField
+        v-tooltip="formatDatetime(creationTime)"
+        :description="relativeTimeTo(creationTime)"
+      />
     </template>
     <template
       v-if="currentUserHasPermission(['system:comments:manage'])"

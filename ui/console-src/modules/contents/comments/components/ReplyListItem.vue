@@ -1,6 +1,7 @@
 <script lang="ts" setup>
 import EntityDropdownItems from "@/components/entity/EntityDropdownItems.vue";
-import { formatDatetime } from "@/utils/date";
+import { formatDatetime, relativeTimeTo } from "@/utils/date";
+import { usePermission } from "@/utils/permission";
 import { useOperationItemExtensionPoint } from "@console/composables/use-operation-extension-points";
 import type { ListedComment, ListedReply } from "@halo-dev/api-client";
 import { coreApiClient } from "@halo-dev/api-client";
@@ -8,7 +9,6 @@ import {
   Dialog,
   IconReplyLine,
   Toast,
-  VAvatar,
   VDropdownItem,
   VEntity,
   VEntityField,
@@ -19,8 +19,10 @@ import type { OperationItem } from "@halo-dev/console-shared";
 import { useQueryClient } from "@tanstack/vue-query";
 import { computed, inject, markRaw, ref, type Ref, toRefs } from "vue";
 import { useI18n } from "vue-i18n";
+import OwnerButton from "./OwnerButton.vue";
 import ReplyCreationModal from "./ReplyCreationModal.vue";
 
+const { currentUserHasPermission } = usePermission();
 const { t } = useI18n();
 const queryClient = useQueryClient();
 
@@ -37,6 +39,13 @@ const props = withDefaults(
 );
 
 const { reply } = toRefs(props);
+
+const creationTime = computed(() => {
+  return (
+    props.reply?.reply.spec.creationTime ||
+    props.reply?.reply.metadata.creationTimestamp
+  );
+});
 
 const quoteReply = computed(() => {
   const { quoteReply: replyName } = props.reply.reply.spec;
@@ -164,27 +173,17 @@ const { operationItems } = useOperationItemExtensionPoint<ListedReply>(
     :class="{ 'animate-breath': isHoveredReply }"
   >
     <template #start>
-      <VEntityField>
-        <template #description>
-          <VAvatar
-            circle
-            :src="reply?.owner.avatar"
-            :alt="reply?.owner.displayName"
-            size="md"
-          ></VAvatar>
-        </template>
-      </VEntityField>
-      <VEntityField
-        class="w-28 min-w-[7rem]"
-        :title="reply?.owner.displayName"
-        :description="reply?.owner.email"
-      ></VEntityField>
-      <VEntityField width="60%">
+      <VEntityField width="100%">
         <template #description>
           <div class="flex flex-col gap-2">
-            <div class="text-sm text-gray-800">
-              <p class="break-all">
-                <a
+            <div class="mb-1 flex items-center gap-2">
+              <OwnerButton :owner="reply?.owner" />
+              <!-- TODO: i18n -->
+              <span class="text-sm text-gray-900">replied:</span>
+            </div>
+            <pre
+              class="sm:whitespace-pre-wrap break-words break-all text-sm text-gray-900"
+            ><a
                   v-if="quoteReply"
                   class="mr-1 inline-flex flex-row items-center gap-1 rounded bg-gray-200 px-1 py-0.5 text-xs font-medium text-gray-600 hover:text-blue-500 hover:underline"
                   href="javascript:void(0)"
@@ -193,11 +192,7 @@ const { operationItems } = useOperationItemExtensionPoint<ListedReply>(
                 >
                   <IconReplyLine />
                   <span>{{ quoteReply.owner.displayName }}</span>
-                </a>
-                <br v-if="quoteReply" />
-                {{ reply?.reply.spec.content }}
-              </p>
-            </div>
+                </a><br v-if="quoteReply" />{{ reply?.reply.spec.content }}</pre>
             <div class="flex items-center gap-3 text-xs">
               <span
                 class="select-none text-gray-700 hover:text-gray-900"
@@ -232,20 +227,15 @@ const { operationItems } = useOperationItemExtensionPoint<ListedReply>(
           />
         </template>
       </VEntityField>
-      <VEntityField>
-        <template #description>
-          <span class="truncate text-xs tabular-nums text-gray-500">
-            {{
-              formatDatetime(
-                reply?.reply?.spec.creationTime ||
-                  reply?.reply.metadata.creationTimestamp
-              )
-            }}
-          </span>
-        </template>
-      </VEntityField>
+      <VEntityField
+        v-tooltip="formatDatetime(creationTime)"
+        :description="relativeTimeTo(creationTime)"
+      />
     </template>
-    <template #dropdownItems>
+    <template
+      v-if="currentUserHasPermission(['system:comments:manage'])"
+      #dropdownItems
+    >
       <EntityDropdownItems :dropdown-items="operationItems" :item="reply" />
     </template>
   </VEntity>
