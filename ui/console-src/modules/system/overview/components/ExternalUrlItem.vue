@@ -11,6 +11,10 @@ import ExternalUrlForm from "./ExternalUrlForm.vue";
 const { globalInfo } = useGlobalInfoFetch();
 
 const isExternalUrlValid = computed(() => {
+  if (!globalInfo.value) {
+    return true;
+  }
+
   if (!globalInfo.value?.externalUrl) {
     return false;
   }

@@ -44,9 +44,9 @@ const emit = defineEmits<{
   (event: "open-detail", attachment: Attachment): void;
 }>();
 
-const selectedAttachments = inject<Ref<Set<Attachment>>>(
-  "selectedAttachments",
-  ref<Set<Attachment>>(new Set())
+const selectedAttachmentNames = inject<Ref<Set<string>>>(
+  "selectedAttachmentNames",
+  ref<Set<string>>(new Set())
 );
 
 const policyDisplayName = computed(() => {
@@ -69,7 +69,7 @@ const handleDelete = () => {
           name: props.attachment.metadata.name,
         });
 
-        selectedAttachments.value.delete(props.attachment);
+        selectedAttachmentNames.value.delete(props.attachment.metadata.name);
 
         Toast.success(t("core.common.toast.delete_success"));
       } catch (e) {
@@ -140,7 +140,7 @@ const { operationItems } = useOperationItemExtensionPoint<Attachment>(
       #checkbox
     >
       <input
-        :checked="selectedAttachments.has(attachment)"
+        :checked="selectedAttachmentNames.has(attachment.metadata.name)"
         type="checkbox"
         @click="emit('select', attachment)"
       />

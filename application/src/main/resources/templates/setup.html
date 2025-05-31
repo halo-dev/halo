@@ -22,6 +22,7 @@
                     <span th:text="#{form.messages.h2.content}"> </span>
                 </div>
                 <form th:object="${form}" th:action="@{/system/setup}" class="halo-form" method="post">
+
                     <div class="form-item">
                         <label for="language" th:text="#{form.language.label}"></label>
                         <div class="form-input">
@@ -32,6 +33,20 @@
                                 <option value="zh-TW" th:selected="${#locale.toLanguageTag} == 'zh-TW'">繁体中文</option>
                             </select>
                         </div>
+                    </div>
+
+                    <div class="form-item">
+                        <label for="externalUrl" th:text="#{form.externalUrl.label}"></label>
+                        <div class="form-input">
+                            <input name="externalUrl"
+                                   type="url"
+                                   th:field="*{externalUrl}"
+                                   autocomplete="off"
+                                   spellcheck="false"
+                                   autocapitalize="off"
+                                   required/>
+                        </div>
+                        <p class="alert alert-error" th:if="${#fields.hasErrors('externalUrl')}" th:errors="*{externalUrl}"></p>
                     </div>
 
                     <div class="form-item">

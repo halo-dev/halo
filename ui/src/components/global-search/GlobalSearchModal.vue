@@ -10,8 +10,6 @@ import {
   IconPalette,
   IconSettings,
   IconUserSettings,
-  VEntity,
-  VEntityField,
   VModal,
 } from "@halo-dev/components";
 import { useEventListener } from "@vueuse/core";
@@ -373,7 +371,7 @@ useEventListener("keydown", handleKeydown);
       </div>
       <ul
         v-if="searchResults.length > 0"
-        class="box-border flex h-full w-full flex-col gap-0.5"
+        class="box-border flex h-full w-full flex-col gap-1"
         role="list"
       >
         <li
@@ -382,33 +380,29 @@ useEventListener("keydown", handleKeydown);
           :key="itemIndex"
           @click="handleRoute(item)"
         >
-          <VEntity
-            class="rounded-md px-2 py-2.5 hover:bg-gray-100"
+          <div
+            class="flex items-center rounded-md px-2 py-2.5 cursor-pointer hover:bg-gray-100"
             :class="{ 'bg-gray-100': selectedIndex === itemIndex }"
           >
-            <template #start>
-              <VEntityField>
-                <template #description>
-                  <div class="h-5 w-5 rounded border p-0.5">
-                    <component
-                      :is="item.icon.component"
-                      v-if="'component' in item.icon"
-                      class="h-full w-full"
-                    />
-                    <img
-                      v-if="'src' in item.icon"
-                      :src="item.icon.src"
-                      class="h-full w-full object-cover"
-                    />
-                  </div>
-                </template>
-              </VEntityField>
-              <VEntityField :title="item.title"></VEntityField>
-            </template>
-            <template #end>
-              <VEntityField :description="item.group"></VEntityField>
-            </template>
-          </VEntity>
+            <div class="inline-flex items-center gap-3 flex-1">
+              <div class="h-5 w-5 rounded border p-0.5">
+                <component
+                  :is="item.icon.component"
+                  v-if="'component' in item.icon"
+                  class="h-full w-full"
+                />
+                <img
+                  v-if="'src' in item.icon"
+                  :src="item.icon.src"
+                  class="h-full w-full object-cover"
+                />
+              </div>
+              <span class="text-sm font-medium">{{ item.title }}</span>
+            </div>
+            <div class="text-xs text-gray-500 flex-shrink-0 flex-none">
+              {{ item.group }}
+            </div>
+          </div>
         </li>
       </ul>
     </div>
