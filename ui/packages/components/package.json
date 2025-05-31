@@ -44,7 +44,6 @@
   "homepage": "https://github.com/halo-dev/halo/tree/main/ui/packages/components#readme",
   "license": "MIT",
   "devDependencies": {
-    "@iconify-json/ri": "^1.1.15",
     "@storybook/addon-essentials": "^7.6.3",
     "@storybook/addon-interactions": "^7.6.3",
     "@storybook/addon-links": "^7.6.3",
@@ -56,9 +55,7 @@
     "eslint-plugin-storybook": "^0.6.15",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
-    "storybook": "^7.6.3",
-    "unplugin-icons": "^0.14.15",
-    "vite-plugin-dts": "^4.2.2"
+    "storybook": "^7.6.3"
   },
   "peerDependencies": {
     "vue": "^3.5.13",

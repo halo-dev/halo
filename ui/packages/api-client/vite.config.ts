@@ -4,6 +4,9 @@ import { defineConfig } from "vite";
 import Dts from "vite-plugin-dts";
 
 export default defineConfig({
+  experimental: {
+    enableNativePlugin: true,
+  },
   plugins: [
     Dts({
       tsconfigPath: "./tsconfig.json",
