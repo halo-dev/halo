@@ -33,6 +33,9 @@
       "eslint --fix --max-warnings=0"
     ]
   },
+  "browserslist": [
+    "defaults"
+  ],
   "resolutions": {
     "axios": "^1.7.9"
   },
