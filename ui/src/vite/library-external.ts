@@ -99,6 +99,7 @@ export const setupLibraryExternal = (
         attrs: {
           src: `${isProduction ? baseUrl : "/"}${target.dest}/${target.rename}`,
           type: "text/javascript",
+          "vite-ignore": true,
         },
       };
     })
