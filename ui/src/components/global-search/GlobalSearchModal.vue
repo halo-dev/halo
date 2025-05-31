@@ -81,7 +81,7 @@ const handleBuildSearchIndex = () => {
   if (currentUserHasPermission(["system:users:view"])) {
     coreApiClient.user
       .listUser({
-        fieldSelector: ["name!=anonymousUser", "name!=ghost"],
+        labelSelector: ["!halo.run/hidden-user"],
       })
       .then((response) => {
         response.data.items.forEach((user) => {
