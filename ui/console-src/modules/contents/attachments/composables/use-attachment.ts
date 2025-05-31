@@ -2,7 +2,14 @@ import type { Attachment } from "@halo-dev/api-client";
 import { consoleApiClient, coreApiClient } from "@halo-dev/api-client";
 import { Dialog, Toast } from "@halo-dev/components";
 import { useQuery } from "@tanstack/vue-query";
-import { nextTick, ref, watch, type Ref } from "vue";
+import {
+  computed,
+  nextTick,
+  ref,
+  watch,
+  type ComputedRef,
+  type Ref,
+} from "vue";
 import { useI18n } from "vue-i18n";
 
 interface useAttachmentControlReturn {
@@ -10,7 +17,8 @@ interface useAttachmentControlReturn {
   isLoading: Ref<boolean>;
   isFetching: Ref<boolean>;
   selectedAttachment: Ref<Attachment | undefined>;
-  selectedAttachments: Ref<Set<Attachment>>;
+  selectedAttachments: ComputedRef<Attachment[]>;
+  selectedAttachmentNames: Ref<Set<string>>;
   checkedAll: Ref<boolean>;
   total: Ref<number>;
   handleFetchAttachments: () => void;
@@ -39,7 +47,7 @@ export function useAttachmentControl(filterOptions: {
     filterOptions;
 
   const selectedAttachment = ref<Attachment>();
-  const selectedAttachments = ref<Set<Attachment>>(new Set<Attachment>());
+  const selectedAttachmentNames = ref<Set<string>>(new Set<string>());
   const checkedAll = ref(false);
 
   const total = ref(0);
@@ -155,15 +163,15 @@ export function useAttachmentControl(filterOptions: {
       cancelText: t("core.common.buttons.cancel"),
       onConfirm: async () => {
         try {
-          const promises = Array.from(selectedAttachments.value).map(
-            (attachment) => {
+          const promises = Array.from(selectedAttachmentNames.value).map(
+            (name) => {
               return coreApiClient.storage.attachment.deleteAttachment({
-                name: attachment.metadata.name,
+                name,
               });
             }
           );
           await Promise.all(promises);
-          selectedAttachments.value.clear();
+          selectedAttachmentNames.value.clear();
 
           Toast.success(t("core.common.toast.delete_success"));
         } catch (e) {
@@ -178,44 +186,47 @@ export function useAttachmentControl(filterOptions: {
   const handleCheckAll = (checkAll: boolean) => {
     if (checkAll) {
       data.value?.forEach((attachment) => {
-        selectedAttachments.value.add(attachment);
+        selectedAttachmentNames.value.add(attachment.metadata.name);
       });
     } else {
-      selectedAttachments.value.clear();
+      selectedAttachmentNames.value.clear();
     }
   };
 
   const handleSelect = async (attachment: Attachment | undefined) => {
     if (!attachment) return;
-    if (selectedAttachments.value.has(attachment)) {
-      selectedAttachments.value.delete(attachment);
+    if (selectedAttachmentNames.value.has(attachment.metadata.name)) {
+      selectedAttachmentNames.value.delete(attachment.metadata.name);
       return;
     }
-    selectedAttachments.value.add(attachment);
+    selectedAttachmentNames.value.add(attachment.metadata.name);
   };
 
   watch(
-    () => selectedAttachments.value.size,
+    () => selectedAttachmentNames.value.size,
     (newValue) => {
       checkedAll.value = newValue === data.value?.length;
     }
   );
 
   const isChecked = (attachment: Attachment) => {
-    return (
-      attachment.metadata.name === selectedAttachment.value?.metadata.name ||
-      Array.from(selectedAttachments.value)
-        .map((item) => item.metadata.name)
-        .includes(attachment.metadata.name)
-    );
+    return selectedAttachmentNames.value.has(attachment.metadata.name);
   };
 
   const handleReset = () => {
     page.value = 1;
     selectedAttachment.value = undefined;
-    selectedAttachments.value.clear();
+    selectedAttachmentNames.value.clear();
     checkedAll.value = false;
   };
+
+  const selectedAttachments = computed(() => {
+    return (
+      data.value?.filter((attachment) =>
+        selectedAttachmentNames.value.has(attachment.metadata.name)
+      ) || []
+    );
+  });
 
   return {
     attachments: data,
@@ -223,6 +234,7 @@ export function useAttachmentControl(filterOptions: {
     isFetching,
     selectedAttachment,
     selectedAttachments,
+    selectedAttachmentNames,
     checkedAll,
     total,
     handleFetchAttachments: refetch,

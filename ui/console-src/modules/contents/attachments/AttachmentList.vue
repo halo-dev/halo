@@ -99,7 +99,7 @@ function handleClearFilters() {
 const {
   attachments,
   selectedAttachment,
-  selectedAttachments,
+  selectedAttachmentNames,
   checkedAll,
   isLoading,
   isFetching,
@@ -128,13 +128,13 @@ const {
   size: size,
 });
 
-provide<Ref<Set<Attachment>>>("selectedAttachments", selectedAttachments);
+provide<Ref<Set<string>>>("selectedAttachmentNames", selectedAttachmentNames);
 
 const handleMove = async (group: Group) => {
   try {
-    const promises = Array.from(selectedAttachments.value).map((attachment) => {
+    const promises = Array.from(selectedAttachmentNames.value).map((name) => {
       return coreApiClient.storage.attachment.patchAttachment({
-        name: attachment.metadata.name,
+        name,
         jsonPatchInner: [
           {
             op: "add",
@@ -146,7 +146,7 @@ const handleMove = async (group: Group) => {
     });
 
     await Promise.all(promises);
-    selectedAttachments.value.clear();
+    selectedAttachmentNames.value.clear();
 
     Toast.success(t("core.attachment.operations.move.toast_success"));
   } catch (e) {
@@ -161,13 +161,13 @@ const handleClickItem = (attachment: Attachment) => {
     return;
   }
 
-  if (selectedAttachments.value.size > 0) {
+  if (selectedAttachmentNames.value.size > 0) {
     handleSelect(attachment);
     return;
   }
 
   selectedAttachment.value = attachment;
-  selectedAttachments.value.clear();
+  selectedAttachmentNames.value.clear();
   detailVisible.value = true;
 };
 
@@ -299,14 +299,14 @@ watch(
                 </div>
                 <div class="flex w-full flex-1 items-center sm:w-auto">
                   <SearchInput
-                    v-if="!selectedAttachments.size"
+                    v-if="!selectedAttachmentNames.size"
                     v-model="keyword"
                   />
                   <VSpace v-else>
                     <VButton type="danger" @click="handleDeleteInBatch">
                       {{ $t("core.common.buttons.delete") }}
                     </VButton>
-                    <VButton @click="selectedAttachments.clear()">
+                    <VButton @click="selectedAttachmentNames.clear()">
                       {{
                         $t("core.attachment.operations.deselect_items.button")
                       }}
@@ -560,12 +560,18 @@ watch(
                     <div
                       v-if="!attachment.metadata.deletionTimestamp"
                       v-permission="['system:attachments:manage']"
-                      :class="{ '!flex': selectedAttachments.has(attachment) }"
+                      :class="{
+                        '!flex': selectedAttachmentNames.has(
+                          attachment.metadata.name
+                        ),
+                      }"
                       class="absolute left-0 top-0 hidden h-1/3 w-full cursor-pointer justify-end bg-gradient-to-b from-gray-300 to-transparent ease-in-out group-hover:flex"
                     >
                       <IconCheckboxFill
                         :class="{
-                          '!text-primary': selectedAttachments.has(attachment),
+                          '!text-primary': selectedAttachmentNames.has(
+                            attachment.metadata.name
+                          ),
                         }"
                         class="mr-1 mt-1 h-6 w-6 cursor-pointer text-white transition-all hover:text-primary"
                         @click.stop="handleSelect(attachment)"

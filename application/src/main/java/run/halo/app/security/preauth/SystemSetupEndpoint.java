@@ -9,10 +9,12 @@ import static org.springdoc.core.fn.builders.schema.Builder.schemaBuilder;
 import static org.springframework.web.reactive.function.server.RequestPredicates.accept;
 import static org.springframework.web.reactive.function.server.RequestPredicates.contentType;
 import static org.springframework.web.reactive.function.server.RequestPredicates.path;
+import static run.halo.app.infra.ValidationUtils.validate;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Size;
 import java.net.URI;
@@ -23,12 +25,15 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Properties;
+import lombok.Data;
 import lombok.RequiredArgsConstructor;
+import org.hibernate.validator.constraints.URL;
 import org.springdoc.core.fn.builders.content.Builder;
 import org.springdoc.webflux.core.fn.SpringdocRouteBuilder;
 import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.beans.factory.config.PlaceholderConfigurerSupport;
 import org.springframework.boot.autoconfigure.r2dbc.R2dbcConnectionDetails;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.context.annotation.Bean;
 import org.springframework.core.Ordered;
 import org.springframework.core.annotation.Order;
@@ -38,8 +43,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.security.util.InMemoryResource;
 import org.springframework.stereotype.Component;
-import org.springframework.util.LinkedMultiValueMap;
-import org.springframework.util.MultiValueMap;
 import org.springframework.util.PropertyPlaceholderHelper;
 import org.springframework.util.StreamUtils;
 import org.springframework.validation.BeanPropertyBindingResult;
@@ -55,6 +58,8 @@ import reactor.util.retry.Retry;
 import run.halo.app.extension.ConfigMap;
 import run.halo.app.extension.ReactiveExtensionClient;
 import run.halo.app.extension.Unstructured;
+import run.halo.app.infra.ExternalUrlChangedEvent;
+import run.halo.app.infra.ExternalUrlSupplier;
 import run.halo.app.infra.InitializationStateGetter;
 import run.halo.app.infra.SystemConfigurableEnvironmentFetcher;
 import run.halo.app.infra.SystemSetting;
@@ -86,6 +91,8 @@ public class SystemSetupEndpoint {
     private final ThemeService themeService;
     private final Validator validator;
     private final ObjectProvider<R2dbcConnectionDetails> connectionDetails;
+    private final ExternalUrlSupplier externalUrl;
+    private final ApplicationEventPublisher eventPublisher;
 
     @Bean
     @Order(Ordered.HIGHEST_PRECEDENCE + 100)
@@ -125,19 +132,19 @@ public class SystemSetupEndpoint {
     }
 
     private Mono<ServerResponse> setup(ServerRequest request) {
-        return request.formData()
-            .map(SetupRequest::new)
-            .filterWhen(body -> initializationStateGetter.userInitialized()
-                .map(initialized -> !initialized)
+        return initializationStateGetter.userInitialized()
+            .filter(initialized -> !initialized)
+            .flatMap(ignored -> request.bind(SetupRequest.class)
+                .flatMap(setupRequest -> {
+                    // validate it
+                    var bindingResult = validate(setupRequest, validator, request.exchange());
+                    if (bindingResult.hasErrors()) {
+                        return handleValidationErrors(bindingResult, request);
+                    }
+                    return doInitialization(setupRequest).then(handleSetupSuccessfully(request));
+                })
             )
-            .flatMap(body -> {
-                var bindingResult = ValidationUtils.validate(body, validator, request.exchange());
-                if (bindingResult.hasErrors()) {
-                    return handleValidationErrors(bindingResult, request);
-                }
-                return doInitialization(body)
-                    .then(Mono.defer(() -> handleSetupSuccessfully(request)));
-            });
+            .switchIfEmpty(redirectToConsole());
     }
 
     private static Mono<ServerResponse> handleSetupSuccessfully(ServerRequest request) {
@@ -187,8 +194,15 @@ public class SystemSetupEndpoint {
                 .filter(t -> t instanceof OptimisticLockingFailureException)
             )
             .subscribeOn(Schedulers.boundedElastic())
-            .then();
-        return Mono.when(superUserMono, basicConfigMono,
+            .then(Mono.fromCallable(() -> {
+                eventPublisher.publishEvent(
+                    new ExternalUrlChangedEvent(this, URI.create(body.getExternalUrl()).toURL())
+                );
+                return null;
+            }));
+        return Mono.when(
+                basicConfigMono,
+                superUserMono,
                 initializeNecessaryData(body.getUsername()),
                 pluginService.installPresetPlugins(),
                 themeService.installPresetTheme()
@@ -213,6 +227,7 @@ public class SystemSetupEndpoint {
         var basicSetting = JsonUtils.jsonToObject(basic, SystemSetting.Basic.class);
         basicSetting.setTitle(body.getSiteTitle());
         basicSetting.setLanguage(body.getLanguage());
+        basicSetting.setExternalUrl(body.getExternalUrl());
         data.put(SystemSetting.Basic.GROUP, JsonUtils.objectToJson(basicSetting));
     }
 
@@ -222,8 +237,11 @@ public class SystemSetupEndpoint {
                 if (initialized) {
                     return redirectToConsole();
                 }
-                var body = new SetupRequest(new LinkedMultiValueMap<>());
-                var bindingResult = new BeanPropertyBindingResult(body, "form");
+                var setupRequest = new SetupRequest();
+                setupRequest.setExternalUrl(
+                    externalUrl.getURL(request.exchange().getRequest()).toString()
+                );
+                var bindingResult = new BeanPropertyBindingResult(setupRequest, "form");
                 var model = bindingResult.getModel();
                 model.put("usingH2database", usingH2database());
                 return ServerResponse.ok().render(SETUP_TEMPLATE, model);
@@ -243,41 +261,36 @@ public class SystemSetupEndpoint {
             .orElse(false);
     }
 
-    record SetupRequest(MultiValueMap<String, String> formData) {
+    @Data
+    static class SetupRequest {
 
         @Schema(requiredMode = REQUIRED, minLength = 4, maxLength = 63)
         @NotBlank
         @Size(min = 4, max = 63)
         @Pattern(regexp = ValidationUtils.NAME_REGEX,
             message = "{validation.error.username.pattern}")
-        public String getUsername() {
-            return formData.getFirst("username");
-        }
+        private String username;
 
         @Schema(requiredMode = REQUIRED, minLength = 5, maxLength = 257)
         @NotBlank
         @Pattern(regexp = ValidationUtils.PASSWORD_REGEX,
             message = "{validation.error.password.pattern}")
         @Size(min = 5, max = 257)
-        public String getPassword() {
-            return formData.getFirst("password");
-        }
+        private String password;
 
         @Email
-        public String getEmail() {
-            return formData.getFirst("email");
-        }
+        private String email;
 
         @NotBlank
         @Size(max = 80)
-        public String getSiteTitle() {
-            return formData.getFirst("siteTitle");
-        }
+        private String siteTitle;
 
         @Pattern(regexp = "^(zh-CN|zh-TW|en|es)$")
-        public String getLanguage() {
-            return formData.getFirst("language");
-        }
+        private String language;
+
+        @NotNull
+        @URL(regexp = "^(http|https).*")
+        private String externalUrl;
     }
 
     Flux<Unstructured> loadPresetExtensions(String username) {
@@ -295,7 +308,7 @@ public class SystemSetupEndpoint {
                     var processedContent =
                         PROPERTY_PLACEHOLDER_HELPER.replacePlaceholders(rawContent, properties);
                     // load yaml to unstructured
-                    var stringResource = 
+                    var stringResource =
                         new InMemoryResource(processedContent.getBytes(StandardCharsets.UTF_8));
                     var loader = new YamlUnstructuredLoader(stringResource);
                     return loader.load();
