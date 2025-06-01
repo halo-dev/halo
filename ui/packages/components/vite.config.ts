@@ -9,7 +9,7 @@ import path from "path";
 
 export default defineConfig({
   experimental: {
-    enableNativePlugin: true,
+    enableNativePlugin: false,
   },
   plugins: [
     Vue(),
