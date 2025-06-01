@@ -18,6 +18,7 @@ import {
   IconExternalLinkLine,
   Toast,
   VButton,
+  VDropdownDivider,
   VDropdownItem,
   VEmpty,
   VEntity,
@@ -43,6 +44,7 @@ import {
   toRefs,
 } from "vue";
 import { useI18n } from "vue-i18n";
+import CommentDetailModal from "./CommentDetailModal.vue";
 import OwnerButton from "./OwnerButton.vue";
 import ReplyCreationModal from "./ReplyCreationModal.vue";
 import ReplyListItem from "./ReplyListItem.vue";
@@ -328,11 +330,24 @@ const { operationItems } = useOperationItemExtensionPoint<ListedComment>(
     {
       priority: 10,
       component: markRaw(VDropdownItem),
+      label: "Detail",
+      hidden: !props.comment?.comment.spec.approved,
+      action: () => {
+        detailModalVisible.value = true;
+      },
+    },
+    {
+      priority: 20,
+      component: markRaw(VDropdownDivider),
+    },
+    {
+      priority: 30,
+      component: markRaw(VDropdownItem),
       label: t("core.comment.operations.approve_applies_in_batch.button"),
       action: handleApproveReplyInBatch,
     },
     {
-      priority: 20,
+      priority: 40,
       component: markRaw(VDropdownItem),
       props: {
         type: "danger",
@@ -342,6 +357,9 @@ const { operationItems } = useOperationItemExtensionPoint<ListedComment>(
     },
   ])
 );
+
+// Comment detail modal
+const detailModalVisible = ref(false);
 </script>
 
 <template>
@@ -349,6 +367,11 @@ const { operationItems } = useOperationItemExtensionPoint<ListedComment>(
     v-if="replyModal"
     :comment="comment"
     @close="onReplyCreationModalClose"
+  />
+  <CommentDetailModal
+    v-if="detailModalVisible"
+    :comment="comment"
+    @close="detailModalVisible = false"
   />
   <VEntity :is-selected="isSelected">
     <template
@@ -362,13 +385,18 @@ const { operationItems } = useOperationItemExtensionPoint<ListedComment>(
         <template #description>
           <div class="flex flex-col gap-2">
             <div class="mb-1 flex items-center gap-2">
-              <OwnerButton :owner="comment?.owner" />
+              <OwnerButton
+                :owner="comment?.owner"
+                @click="detailModalVisible = true"
+              />
               <!-- TODO: i18n -->
-              <span class="text-sm text-gray-900">commented on</span>
+              <span class="text-sm text-gray-900 whitespace-nowrap">
+                commented on
+              </span>
               <RouterLink
                 v-tooltip="`${subjectRefResult.label}`"
                 :to="subjectRefResult.route || $route"
-                class="line-clamp-2 inline-block text-sm font-medium text-gray-900 hover:text-gray-600"
+                class="inline-block truncate max-w-md text-sm font-medium text-gray-900 hover:text-gray-600"
               >
                 {{ subjectRefResult.title }}
               </RouterLink>
@@ -376,7 +404,7 @@ const { operationItems } = useOperationItemExtensionPoint<ListedComment>(
                 v-if="subjectRefResult.externalUrl"
                 :href="subjectRefResult.externalUrl"
                 target="_blank"
-                class="hidden text-gray-600 hover:text-gray-900 group-hover:block"
+                class="invisible text-gray-600 hover:text-gray-900 group-hover:visible"
               >
                 <IconExternalLinkLine class="h-3.5 w-3.5" />
               </a>

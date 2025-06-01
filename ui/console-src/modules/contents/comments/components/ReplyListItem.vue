@@ -179,7 +179,9 @@ const { operationItems } = useOperationItemExtensionPoint<ListedReply>(
             <div class="mb-1 flex items-center gap-2">
               <OwnerButton :owner="reply?.owner" />
               <!-- TODO: i18n -->
-              <span class="text-sm text-gray-900">replied:</span>
+              <span class="text-sm text-gray-900 whitespace-nowrap">
+                replied:
+              </span>
             </div>
             <pre
               class="sm:whitespace-pre-wrap break-words break-all text-sm text-gray-900"
