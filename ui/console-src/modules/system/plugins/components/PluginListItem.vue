@@ -1,5 +1,4 @@
 <script lang="ts" setup>
-import { formatDatetime } from "@/utils/date";
 import { usePermission } from "@/utils/permission";
 import {
   PluginStatusPhaseEnum,
@@ -227,15 +226,6 @@ const { startFields, endFields } = useEntityFieldItemExtensionPoint<Plugin>(
         props: {
           plugin: props.plugin,
         },
-      },
-      {
-        position: "end",
-        priority: 50,
-        component: markRaw(VEntityField),
-        props: {
-          description: formatDatetime(props.plugin.metadata.creationTimestamp),
-        },
-        hidden: !props.plugin.metadata.creationTimestamp,
       },
       {
         position: "end",
