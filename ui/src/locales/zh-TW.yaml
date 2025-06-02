@@ -890,6 +890,7 @@ core:
         repo: 源碼倉庫
         load_location: 存儲位置
         issues: 問題回饋
+        creation_time: 安裝時間
       operations:
         view_conditions:
           button: 查看最近狀態

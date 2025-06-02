@@ -222,6 +222,7 @@ core:
         repo: Source Repository
         load_location: Storage Location
         issues: Issues feedback
+        creation_time: Installation Time
       operations:
         view_conditions:
           button: View recent conditions
@@ -505,6 +506,13 @@ core:
     fields:
       activated_theme: Activated theme
       enabled_plugins: Enabled plugins
+    external_url_form:
+      operations:
+        save:
+          title: Modify external url
+          description: Modifying the external access address requires restarting the Halo service. It will automatically restart after the modification is completed. Do you want to continue?
+      tips:
+        restarting: Modification completed, waiting for restart...
   backup:
     operations:
       remote_download:

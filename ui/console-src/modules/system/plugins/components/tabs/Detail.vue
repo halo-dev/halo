@@ -275,6 +275,10 @@ const lastCondition = computed(() => {
             </span>
           </VDescriptionItem>
           <VDescriptionItem
+            :label="$t('core.plugin.detail.fields.creation_time')"
+            :content="formatDatetime(plugin?.metadata.creationTimestamp)"
+          />
+          <VDescriptionItem
             :label="$t('core.plugin.detail.fields.last_starttime')"
             :content="formatDatetime(plugin?.status?.lastStartTime)"
           />
