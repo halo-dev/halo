@@ -15,13 +15,13 @@
   "exports": {
     ".": {
       "import": "./dist/index.mjs",
-      "require": "./dist/index.js",
-      "types": "./dist/index.d.mts"
-    }
+      "require": "./dist/index.js"
+    },
+    "./package.json": "./package.json"
   },
   "main": "./dist/index.js",
   "module": "./dist/index.mjs",
-  "types": "./dist/index.d.mts",
+  "types": "./dist/index.d.ts",
   "files": [
     "dist"
   ],
@@ -35,8 +35,7 @@
   },
   "devDependencies": {
     "@halo-dev/api-client": "workspace:*",
-    "@types/js-yaml": "^4.0.9",
-    "tsdown": "^0.12.5"
+    "@types/js-yaml": "^4.0.9"
   },
   "peerDependencies": {
     "vite": "^4.0.0 || ^6.0.0"

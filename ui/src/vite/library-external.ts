@@ -75,7 +75,7 @@ export const setupLibraryExternal = (
       rename: `halo-components.iife.${staticSuffix}.js`,
     },
     {
-      src: "./node_modules/@halo-dev/console-shared/dist/halo-console-shared.iife.js",
+      src: "./node_modules/@halo-dev/console-shared/dist/index.iife.js",
       dest: "assets/console-shared",
       rename: `halo-console-shared.iife.${staticSuffix}.js`,
     },
@@ -85,7 +85,7 @@ export const setupLibraryExternal = (
       rename: `halo-rich-text-editor.iife.${staticSuffix}.js`,
     },
     {
-      src: "./node_modules/@halo-dev/api-client/dist/halo-api-client.iife.js",
+      src: "./node_modules/@halo-dev/api-client/dist/index.iife.js",
       dest: "assets/api-client",
       rename: `halo-api-client.iife.${staticSuffix}.js`,
     },

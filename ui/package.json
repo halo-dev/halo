@@ -154,6 +154,7 @@
     "tailwindcss-safe-area": "^0.2.2",
     "tailwindcss-themer": "^2.0.3",
     "terser": "^5.37.0",
+    "tsdown": "^0.12.6",
     "typescript": "~5.6.2",
     "unplugin-icons": "^22.1.0",
     "vite": "^6.0.3",

@@ -2,46 +2,43 @@
   "name": "@halo-dev/console-shared",
   "version": "2.21.0",
   "description": "",
-  "files": [
-    "dist"
-  ],
-  "scripts": {
-    "dev": "vite build --watch",
-    "build": "vite build",
-    "typecheck": "vue-tsc --noEmit -p tsconfig.app.json --composite false",
-    "lint": "eslint ./src --ext .vue,.js,.jsx,.cjs,.mjs,.ts,.tsx,.cts,.mts",
-    "prettier": "prettier --write './src/**/*.{vue,js,jsx,ts,tsx,css,scss,json,yml,yaml,html}'"
-  },
   "keywords": [],
-  "author": {
-    "name": "@halo-dev",
-    "url": "https://github.com/halo-dev"
-  },
-  "main": "./dist/halo-console-shared.iife.js",
-  "module": "./dist/halo-console-shared.es.js",
-  "types": "./dist/index.d.ts",
-  "exports": {
-    ".": {
-      "types": "./dist/index.d.ts",
-      "import": "./dist/halo-console-shared.es.js"
-    },
-    "./dist/style.css": "./dist/style.css"
+  "homepage": "https://github.com/halo-dev/halo/tree/main/ui/packages/shared#readme",
+  "bugs": {
+    "url": "https://github.com/halo-dev/halo/issues"
   },
   "repository": {
     "type": "git",
     "url": "https://github.com/halo-dev/halo.git",
     "directory": "ui/packages/shared"
   },
-  "bugs": {
-    "url": "https://github.com/halo-dev/halo/issues"
-  },
-  "homepage": "https://github.com/halo-dev/halo/tree/main/ui/packages/shared#readme",
   "license": "MIT",
-  "peerDependencies": {
-    "vue": "^3.5.13",
-    "vue-router": "^4.3.2"
+  "author": {
+    "name": "@halo-dev",
+    "url": "https://github.com/halo-dev"
+  },
+  "exports": {
+    ".": "./dist/index.mjs",
+    "./package.json": "./package.json"
+  },
+  "main": "./dist/index.mjs",
+  "module": "./dist/index.mjs",
+  "types": "./dist/index.d.mts",
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "build": "tsdown",
+    "dev": "tsdown --watch",
+    "lint": "eslint ./src --ext .vue,.js,.jsx,.cjs,.mjs,.ts,.tsx,.cts,.mts",
+    "prettier": "prettier --write './src/**/*.{vue,js,jsx,ts,tsx,css,scss,json,yml,yaml,html}'",
+    "typecheck": "tsc --noEmit -p tsconfig.app.json --composite false"
   },
   "dependencies": {
     "@halo-dev/api-client": "workspace:*"
+  },
+  "peerDependencies": {
+    "vue": "^3.5.13",
+    "vue-router": "^4.3.2"
   }
 }
