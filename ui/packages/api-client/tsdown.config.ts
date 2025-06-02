@@ -4,14 +4,13 @@ export default defineConfig({
   entry: ["./entry/index.ts"],
   format: ["esm", "iife"],
   external: ["axios"],
-  // TODO: It seems not working
   noExternal: ["qs"],
   outputOptions: {
     globals: {
       axios: "axios",
     },
   },
-  platform: "neutral",
+  platform: "browser",
   globalName: "HaloApiClient",
   tsconfig: "./tsconfig.json",
   minify: true,
