@@ -4,6 +4,7 @@ import { definePlugin } from "@halo-dev/console-shared";
 import Dashboard from "./Dashboard.vue";
 
 import { markRaw } from "vue";
+import DashboardDesigner from "./DashboardDesigner.vue";
 import QuickLinkWidget from "./widgets/QuickLinkWidget.vue";
 import ViewsStatsWidget from "./widgets/ViewsStatsWidget.vue";
 
@@ -33,6 +34,15 @@ export default definePlugin({
               priority: 0,
               mobile: true,
             },
+          },
+        },
+        {
+          path: "dashboard/designer",
+          name: "DashboardDesigner",
+          component: DashboardDesigner,
+          meta: {
+            title: "Dashboard Designer",
+            searchable: false,
           },
         },
       ],

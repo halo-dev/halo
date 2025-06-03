@@ -8,9 +8,7 @@ const { data: stats } = useDashboardStats();
   <VCard class="h-full" :body-class="['h-full']">
     <div class="flex h-full">
       <div class="flex items-center gap-4">
-        <span
-          class="hidden rounded-full bg-gray-100 p-2.5 text-gray-600 sm:block"
-        >
+        <span class="rounded-full bg-gray-100 p-2.5 text-gray-600">
           <IconBookRead class="h-5 w-5" />
         </span>
 

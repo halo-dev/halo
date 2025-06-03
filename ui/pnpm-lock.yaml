@@ -19032,7 +19032,7 @@ snapshots:
 
   jest-worker@26.6.2:
     dependencies:
-      '@types/node': 20.14.2
+      '@types/node': 18.19.34
       merge-stream: 2.0.0
       supports-color: 7.2.0
 

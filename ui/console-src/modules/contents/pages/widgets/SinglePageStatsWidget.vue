@@ -1,13 +1,13 @@
 <script lang="ts" setup>
 import { singlePageLabels } from "@/constants/labels";
-import { consoleApiClient } from "@halo-dev/api-client";
+import { coreApiClient } from "@halo-dev/api-client";
 import { IconPages, VCard } from "@halo-dev/components";
 import { useQuery } from "@tanstack/vue-query";
 
 const { data: total } = useQuery({
   queryKey: ["widget-singlePage-count"],
   queryFn: async () => {
-    const { data } = await consoleApiClient.content.singlePage.listSinglePages({
+    const { data } = await coreApiClient.content.singlePage.listSinglePage({
       labelSelector: [
         `${singlePageLabels.DELETED}=false`,
         `${singlePageLabels.PUBLISHED}=true`,
@@ -23,9 +23,7 @@ const { data: total } = useQuery({
   <VCard class="h-full" :body-class="['h-full']">
     <div class="flex h-full">
       <div class="flex items-center gap-4">
-        <span
-          class="hidden rounded-full bg-gray-100 p-2.5 text-gray-600 sm:block"
-        >
+        <span class="rounded-full bg-gray-100 p-2.5 text-gray-600">
           <IconPages class="h-5 w-5" />
         </span>
 

@@ -12,3 +12,4 @@ export * from "./states/theme-list-tabs";
 export * from "./states/user-tab";
 export * from "./types/menus";
 export * from "./types/plugin";
+export * from "./types/widget";
