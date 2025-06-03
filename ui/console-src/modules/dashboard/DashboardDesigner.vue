@@ -1,15 +1,12 @@
 <script lang="ts" setup>
 import { randomUUID } from "@/utils/id";
-import { usePermission } from "@/utils/permission";
 import { consoleApiClient } from "@halo-dev/api-client";
 import {
   IconAddCircle,
-  IconCloseCircle,
   IconComputer,
   IconDashboard,
   IconPhone,
   IconSave,
-  IconSettings,
   IconTablet,
   VButton,
   VLoading,
@@ -24,11 +21,11 @@ import { useQueryClient } from "@tanstack/vue-query";
 import { cloneDeep } from "lodash-es";
 import { computed, defineComponent, h, markRaw, ref } from "vue";
 import { useRouter } from "vue-router";
+import WidgetItem from "./components/WidgetItem.vue";
 import WidgetsHubModal from "./components/WidgetsHubModal.vue";
 import { useDashboardWidgetsFetch } from "./composables/use-dashboard-widgets-fetch";
 import "./styles/dashboard.css";
 
-const { currentUserHasPermission } = usePermission();
 const queryClient = useQueryClient();
 const router = useRouter();
 
@@ -124,6 +121,17 @@ function handleRemove(item: DashboardWidget) {
   };
 }
 
+function handleUpdate(item: DashboardWidget) {
+  const cloneWidgets = cloneDeep(layout.value);
+  const index = cloneWidgets.findIndex((widget) => widget.i === item.i);
+  cloneWidgets[index] = item;
+  layout.value = cloneWidgets;
+  layouts.value = {
+    ...layouts.value,
+    [currentBreakpoint.value]: cloneWidgets,
+  };
+}
+
 const widgetsHubModalVisible = ref(false);
 
 async function handleSave() {
@@ -206,30 +214,13 @@ async function handleSave() {
       :vertical-compact="true"
       @breakpoint-changed="breakpointChangedEvent"
     >
-      <template v-for="item in layout">
-        <grid-item
-          v-if="currentUserHasPermission(item.permissions)"
-          :key="item.i"
-          :h="item.h"
-          :i="item.i"
-          :w="item.w"
-          :x="item.x"
-          :y="item.y"
-        >
-          <component :is="item.componentName" />
-          <div
-            class="absolute p-2 right-0 top-0 rounded-base bg-gray-100 inline-flex gap-2"
-          >
-            <IconSettings
-              class="cursor-pointer text-lg text-gray-500 hover:text-gray-900"
-            />
-            <IconCloseCircle
-              class="cursor-pointer text-lg text-gray-500 hover:text-gray-900"
-              @click="handleRemove(item)"
-            />
-          </div>
-        </grid-item>
-      </template>
+      <WidgetItem
+        v-for="item in layout"
+        :key="item.i"
+        :item="item"
+        @remove="handleRemove(item)"
+        @update="handleUpdate"
+      />
     </grid-layout>
   </div>
   <WidgetsHubModal

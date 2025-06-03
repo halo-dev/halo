@@ -157,6 +157,7 @@ const actions: Action[] = [
 </script>
 <template>
   <VCard
+    v-bind="$attrs"
     :body-class="['h-full', '@container', '!p-0', '!overflow-auto']"
     class="h-full"
     :title="$t('core.dashboard.widgets.presets.quicklink.title')"

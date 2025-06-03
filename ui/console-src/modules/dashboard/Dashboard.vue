@@ -72,7 +72,7 @@ const { layouts, layout, isLoading } =
           :x="item.x"
           :y="item.y"
         >
-          <component :is="item.componentName" />
+          <component :is="item.componentName" :config="item.config" />
         </grid-item>
       </template>
     </grid-layout>
