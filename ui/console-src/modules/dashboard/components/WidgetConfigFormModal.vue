@@ -1,7 +1,8 @@
 <script setup lang="ts">
+import type { FormKitSchemaDefinition } from "@formkit/core";
 import { VButton, VModal, VSpace } from "@halo-dev/components";
-import type { DashboardWidgetDefinition } from "packages/shared/dist";
-import { computed, useTemplateRef } from "vue";
+import type { DashboardWidgetDefinition } from "@halo-dev/console-shared";
+import { computed, toRaw, useTemplateRef } from "vue";
 
 const props = defineProps<{
   widgetDefinition: DashboardWidgetDefinition;
@@ -14,7 +15,7 @@ const emit = defineEmits<{
 }>();
 
 const formSchema = computed(() => {
-  return props.widgetDefinition.configFormKitSchema;
+  return props.widgetDefinition.configFormKitSchema as FormKitSchemaDefinition;
 });
 
 const initialConfig =
@@ -38,7 +39,6 @@ function onSubmit(config: Record<string, unknown>) {
         type="form"
         @submit="onSubmit"
       >
-        <!-- @vue-skip -->
         <FormKitSchema
           :schema="toRaw(formSchema)"
           :data="toRaw(initialConfig)"
