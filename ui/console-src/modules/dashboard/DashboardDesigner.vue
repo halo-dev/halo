@@ -29,16 +29,21 @@ import "./styles/dashboard.css";
 const queryClient = useQueryClient();
 const router = useRouter();
 
+const selectBreakpoint = ref();
 const currentBreakpoint = ref("lg");
-const realBreakpoint = ref();
+const originalBreakpoint = ref();
 
 function breakpointChangedEvent(breakpoint: string) {
-  if (!realBreakpoint.value) {
-    realBreakpoint.value = breakpoint;
+  if (!originalBreakpoint.value) {
+    originalBreakpoint.value = breakpoint;
   }
+  if (!selectBreakpoint.value) {
+    selectBreakpoint.value = breakpoint;
+  }
+  currentBreakpoint.value = breakpoint;
 }
 
-const deviceOptions = [
+const deviceOptionDefinitions = [
   { id: "lg", pixels: 1200, icon: markRaw(IconComputer) },
   {
     id: "md",
@@ -61,16 +66,28 @@ const deviceOptions = [
   { id: "xs", pixels: 480, icon: markRaw(IconPhone) },
 ];
 
-const currentDevice = computed(() => {
-  return deviceOptions.find((option) => option.id === currentBreakpoint.value);
+const deviceOptions = computed(() => {
+  const breakpointOrder = ["lg", "md", "sm", "xs"];
+  const currentIndex = breakpointOrder.indexOf(originalBreakpoint.value);
+
+  return deviceOptionDefinitions.filter((option) => {
+    const optionIndex = breakpointOrder.indexOf(option.id);
+    return optionIndex >= currentIndex;
+  });
 });
 
 const designContainerStyles = computed(() => {
-  if (currentBreakpoint.value === "lg") {
+  if (currentBreakpoint.value === "lg" && !selectBreakpoint.value) {
     return {};
   }
+  if (originalBreakpoint.value === "xs") {
+    return {};
+  }
+  const device = deviceOptions.value.find(
+    (option) => option.id === selectBreakpoint.value
+  );
   return {
-    width: `${currentDevice.value?.pixels}px`,
+    width: `${device?.pixels}px`,
     margin: "1rem auto",
     border: "1px dashed #e0e0e0",
     borderRadius: "0.75rem",
@@ -170,10 +187,8 @@ async function handleSave() {
     </div>
     <div class="hidden sm:block">
       <VTabbar
-        v-model:active-id="currentBreakpoint"
-        :items="
-          realBreakpoint === 'lg' ? (deviceOptions as any): [currentDevice]
-        "
+        v-model:active-id="selectBreakpoint"
+        :items="deviceOptions as any"
         type="outline"
       ></VTabbar>
     </div>
