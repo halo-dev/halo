@@ -14743,6 +14743,71 @@
         ]
       }
     },
+    "/apis/uc.api.halo.run/v1alpha1/user-preferences/{group}": {
+      "get": {
+        "description": "Get my preference by group.",
+        "operationId": "getMyPreference",
+        "parameters": [
+          {
+            "description": "Group of user preference, e.g. `notification`.",
+            "in": "path",
+            "name": "group",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "default": {
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/JsonNode"
+                }
+              }
+            },
+            "description": "default response"
+          }
+        },
+        "tags": [
+          "UserPreferenceV1alpha1Uc"
+        ]
+      },
+      "put": {
+        "description": "Create or update my preference by group.",
+        "operationId": "updateMyPreference",
+        "parameters": [
+          {
+            "description": "Group of user preference, e.g. `notification`.",
+            "in": "path",
+            "name": "group",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "*/*": {
+              "schema": {
+                "$ref": "#/components/schemas/JsonNode"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "204": {
+            "description": "No content, preference updated successfully."
+          }
+        },
+        "tags": [
+          "UserPreferenceV1alpha1Uc"
+        ]
+      }
+    },
     "/apis/uc.api.security.halo.run/v1alpha1/authentications/two-factor/settings": {
       "get": {
         "description": "Get Two-factor authentication settings.",
@@ -17894,6 +17959,9 @@
           }
         },
         "description": "The subject name of reason type to be interested in"
+      },
+      "JsonNode": {
+        "type": "object"
       },
       "JsonPatch": {
         "minItems": 1,

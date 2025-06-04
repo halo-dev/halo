@@ -970,6 +970,7 @@ core:
         repo: Source Repository
         load_location: Storage Location
         issues: Issues feedback
+        creation_time: Installation Time
       operations:
         view_conditions:
           button: View recent conditions
