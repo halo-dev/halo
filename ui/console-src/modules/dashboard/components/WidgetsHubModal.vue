@@ -23,6 +23,34 @@ const availableWidgetDefinitions = computed(() => {
   return [...internalWidgetDefinitions, ...widgetDefinitions.value];
 });
 
+const groupedWidgetDefinitions = computed(() => {
+  const filteredWidgets = availableWidgetDefinitions.value.filter(
+    (widget) => activeId.value === "" || widget.group === activeId.value
+  );
+
+  const groups = filteredWidgets.reduce((acc, widget) => {
+    const key = `${widget.defaultSize.w}-${widget.defaultSize.h}`;
+    if (!acc[key]) {
+      acc[key] = [];
+    }
+    acc[key].push(widget);
+    return acc;
+  }, {} as Record<string, DashboardWidgetDefinition[]>);
+
+  return Object.entries(groups)
+    .map(([key, widgets]) => {
+      const [w, h] = key.split("-").map(Number);
+      return { w, h, widgets };
+    })
+    .sort((a, b) => {
+      if (a.w !== b.w) {
+        return a.w - b.w;
+      }
+      return a.h - b.h;
+    })
+    .map((group) => group.widgets);
+});
+
 const groupWidgetDefinitions = computed(() => {
   return availableWidgetDefinitions.value.reduce((acc, item) => {
     acc[item.group] = acc[item.group] || [];
@@ -40,7 +68,7 @@ const groupWidgetDefinitionsKeys = computed(() => {
   <VModal
     ref="modal"
     height="calc(100vh - 20px)"
-    :width="1280"
+    :width="1380"
     :layer-closable="true"
     :title="$t('core.dashboard.widgets.modal_title')"
     @close="emit('close')"
@@ -55,26 +83,32 @@ const groupWidgetDefinitionsKeys = computed(() => {
       ]"
       type="outline"
     ></VTabbar>
-    <div class="mt-4 flex flex-col gap-5">
-      <template v-for="item in availableWidgetDefinitions" :key="item.name">
-        <div
-          v-if="
-            activeId === '' ||
-            (item.group === activeId &&
-              currentUserHasPermission(item.permissions))
-          "
-          :style="{
-            width: `${100 / (12 / item.defaultSize.w)}%`,
-            height: `${item.defaultSize.h * 36}px`,
-          }"
-          class="cursor-pointer"
-          @click="emit('add-widget', item)"
-        >
-          <div class="pointer-events-none w-full h-full">
-            <component :is="item.componentName" />
+    <div class="mt-4 flex flex-col gap-5 -m-2">
+      <div
+        v-for="(group, index) in groupedWidgetDefinitions"
+        :key="index"
+        class="flex flex-wrap"
+      >
+        <template v-for="item in group" :key="item.name">
+          <div
+            v-if="
+              activeId === '' ||
+              (item.group === activeId &&
+                currentUserHasPermission(item.permissions))
+            "
+            :style="{
+              width: `${100 / (12 / item.defaultSize.w)}%`,
+              height: `${item.defaultSize.h * 36}px`,
+            }"
+            class="cursor-pointer p-2"
+            @click="emit('add-widget', item)"
+          >
+            <div class="pointer-events-none w-full h-full">
+              <component :is="item.componentName" />
+            </div>
           </div>
-        </div>
-      </template>
+        </template>
+      </div>
     </div>
     <template #footer>
       <VButton @click="modal?.close()">
