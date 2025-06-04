@@ -207,6 +207,7 @@ async function handleSave() {
       :row-height="30"
       :use-css-transforms="true"
       :vertical-compact="true"
+      :breakpoints="{ lg: 1200, md: 996, sm: 768, xs: 480 }"
       @breakpoint-changed="breakpointChangedEvent"
     >
       <WidgetItem
