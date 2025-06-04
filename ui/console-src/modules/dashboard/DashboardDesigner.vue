@@ -98,10 +98,15 @@ const designContainerStyles = computed(() => {
 const { layouts, layout } = useDashboardWidgetsFetch(currentBreakpoint);
 
 function handleAddWidget(widgetDefinition: DashboardWidgetDefinition) {
+  const zeroXWidgets = layout.value.filter((widget) => widget.x === 0);
+  const maxY = zeroXWidgets.reduce((max, widget) => {
+    return Math.max(max, widget.y + widget.h);
+  }, 0);
+
   const newWidget: DashboardWidget = {
     i: randomUUID(),
     x: 0,
-    y: 0,
+    y: maxY + 1,
     w: widgetDefinition.defaultSize.w,
     h: widgetDefinition.defaultSize.h,
     minW: widgetDefinition.defaultSize.minW,
