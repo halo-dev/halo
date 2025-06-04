@@ -6,7 +6,7 @@ defineProps<{
 </script>
 <template>
   <div
-    class="flex flex-col rounded-lg ring-1 ring-[#eaecf0] shadow-sm bg-white w-full h-full"
+    class="flex flex-col rounded-lg overflow-hidden ring-1 ring-[#eaecf0] shadow-sm bg-white w-full h-full"
   >
     <div
       v-if="title || $slots.actions"

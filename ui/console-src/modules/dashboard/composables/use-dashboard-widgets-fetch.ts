@@ -4,14 +4,14 @@ import type {
   DashboardWidget,
 } from "@halo-dev/console-shared";
 import { useQuery } from "@tanstack/vue-query";
-import { ref, type Ref } from "vue";
+import { computed, ref, type Ref } from "vue";
 
 export function useDashboardWidgetsFetch(breakpoint: Ref<string>) {
   const layouts = ref<DashboardResponsiveLayout>({});
   const layout = ref<DashboardWidget[]>([]);
 
   const { isLoading } = useQuery({
-    queryKey: ["core:dashboard:widgets", breakpoint.value],
+    queryKey: ["core:dashboard:widgets", breakpoint],
     queryFn: async () => {
       const { data } = await ucApiClient.user.preference.getMyPreference({
         group: "dashboard-widgets",
@@ -25,6 +25,7 @@ export function useDashboardWidgetsFetch(breakpoint: Ref<string>) {
       layouts.value = data;
       layout.value = data[breakpoint.value] || data["lg"] || [];
     },
+    enabled: computed(() => !!breakpoint.value),
   });
 
   return {

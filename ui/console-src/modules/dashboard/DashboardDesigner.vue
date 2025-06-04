@@ -9,7 +9,6 @@ import {
   IconSave,
   IconTablet,
   VButton,
-  VLoading,
   VSpace,
   VTabbar,
 } from "@halo-dev/components";
@@ -31,6 +30,13 @@ const queryClient = useQueryClient();
 const router = useRouter();
 
 const currentBreakpoint = ref("lg");
+const realBreakpoint = ref();
+
+function breakpointChangedEvent(breakpoint: string) {
+  if (!realBreakpoint.value) {
+    realBreakpoint.value = breakpoint;
+  }
+}
 
 const deviceOptions = [
   { id: "lg", pixels: 1200, icon: markRaw(IconComputer) },
@@ -72,18 +78,7 @@ const designContainerStyles = computed(() => {
   };
 });
 
-function breakpointChangedEvent(breakpoint: string) {
-  console.log(breakpoint);
-  currentBreakpoint.value = breakpoint;
-  if (!layout.value) {
-    return;
-  }
-  layout.value = layouts.value[breakpoint] || layout.value["lg"] || [];
-  console.log(layout.value);
-}
-
-const { layouts, layout, isLoading } =
-  useDashboardWidgetsFetch(currentBreakpoint);
+const { layouts, layout } = useDashboardWidgetsFetch(currentBreakpoint);
 
 function handleAddWidget(widgetDefinition: DashboardWidgetDefinition) {
   const newWidget: DashboardWidget = {
@@ -92,6 +87,10 @@ function handleAddWidget(widgetDefinition: DashboardWidgetDefinition) {
     y: 0,
     w: widgetDefinition.defaultSize.w,
     h: widgetDefinition.defaultSize.h,
+    minW: widgetDefinition.defaultSize.minW,
+    minH: widgetDefinition.defaultSize.minH,
+    maxW: widgetDefinition.defaultSize.maxW,
+    maxH: widgetDefinition.defaultSize.maxH,
     name: widgetDefinition.name,
     componentName: widgetDefinition.componentName,
     config: widgetDefinition.defaultConfig,
@@ -169,10 +168,12 @@ async function handleSave() {
         <span>{{ `编辑仪表盘` }}</span>
       </h2>
     </div>
-    <div>
+    <div class="hidden sm:block">
       <VTabbar
         v-model:active-id="currentBreakpoint"
-        :items="deviceOptions as any"
+        :items="
+          realBreakpoint === 'lg' ? (deviceOptions as any): [currentDevice]
+        "
         type="outline"
       ></VTabbar>
     </div>
@@ -195,9 +196,7 @@ async function handleSave() {
   </div>
 
   <div class="dashboard m-4 transition-all" :style="designContainerStyles">
-    <VLoading v-if="isLoading" />
     <grid-layout
-      v-if="!isLoading"
       v-model:layout="layout"
       :responsive-layouts="layouts"
       :col-num="12"

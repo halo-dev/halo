@@ -10,6 +10,8 @@ export const internalWidgetDefinitions: DashboardWidgetDefinition[] = [
     defaultSize: {
       w: 3,
       h: 3,
+      minH: 2,
+      minW: 1,
     },
   },
   {
@@ -21,6 +23,8 @@ export const internalWidgetDefinitions: DashboardWidgetDefinition[] = [
     defaultSize: {
       w: 6,
       h: 12,
+      minH: 6,
+      minW: 3,
     },
     permissions: ["system:posts:view"],
   },
@@ -33,6 +37,8 @@ export const internalWidgetDefinitions: DashboardWidgetDefinition[] = [
     defaultSize: {
       w: 3,
       h: 3,
+      minH: 2,
+      minW: 1,
     },
     permissions: ["system:singlepages:view"],
   },
@@ -45,6 +51,8 @@ export const internalWidgetDefinitions: DashboardWidgetDefinition[] = [
     defaultSize: {
       w: 3,
       h: 3,
+      minH: 2,
+      minW: 1,
     },
     permissions: ["system:comments:view"],
   },
@@ -57,6 +65,8 @@ export const internalWidgetDefinitions: DashboardWidgetDefinition[] = [
     defaultSize: {
       w: 3,
       h: 3,
+      minH: 2,
+      minW: 1,
     },
   },
   {
@@ -68,6 +78,8 @@ export const internalWidgetDefinitions: DashboardWidgetDefinition[] = [
     defaultSize: {
       w: 3,
       h: 3,
+      minH: 2,
+      minW: 1,
     },
   },
   {
@@ -89,6 +101,8 @@ export const internalWidgetDefinitions: DashboardWidgetDefinition[] = [
     defaultSize: {
       w: 6,
       h: 12,
+      minH: 6,
+      minW: 3,
     },
   },
   {
@@ -100,6 +114,8 @@ export const internalWidgetDefinitions: DashboardWidgetDefinition[] = [
     defaultSize: {
       w: 6,
       h: 12,
+      minH: 6,
+      minW: 3,
     },
   },
 ];

@@ -12,6 +12,10 @@ export interface DashboardWidget {
   w: number;
   h: number;
   i: number | string;
+  minW?: number;
+  minH?: number;
+  maxW?: number;
+  maxH?: number;
   name: string;
   componentName: string;
   config?: Record<string, unknown>;
@@ -22,11 +26,15 @@ export interface DashboardWidgetDefinition {
   name: string;
   componentName: string;
   group: string;
-  configFormKitSchema: Record<string, unknown>[];
+  configFormKitSchema?: Record<string, unknown>[];
   defaultConfig?: Record<string, unknown>;
   defaultSize: {
     w: number;
     h: number;
+    minW?: number;
+    minH?: number;
+    maxW?: number;
+    maxH?: number;
   };
   permissions?: string[];
 }

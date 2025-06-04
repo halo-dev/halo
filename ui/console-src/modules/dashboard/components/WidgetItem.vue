@@ -50,6 +50,10 @@ function handleSaveConfig(config: Record<string, unknown>) {
     :w="item.w"
     :x="item.x"
     :y="item.y"
+    :min-w="item.minW"
+    :min-h="item.minH"
+    :max-w="item.maxW"
+    :max-h="item.maxH"
   >
     <component :is="item.componentName" :config="item.config" />
     <div
@@ -58,13 +62,15 @@ function handleSaveConfig(config: Record<string, unknown>) {
       <div
         v-if="widgetDefinition?.configFormKitSchema?.length"
         class="h-full w-8 flex cursor-pointer items-center justify-center bg-black hover:bg-gray-800 text-white"
+        @click="configModalVisible = true"
       >
-        <IconSettings class="text-base" @click="configModalVisible = true" />
+        <IconSettings class="text-base" />
       </div>
       <div
         class="h-full w-8 flex cursor-pointer items-center justify-center bg-red-500 hover:bg-red-600 text-white"
+        @click="emit('remove')"
       >
-        <IconCloseCircle class="text-base" @click="emit('remove')" />
+        <IconCloseCircle class="text-base" />
       </div>
     </div>
   </grid-item>

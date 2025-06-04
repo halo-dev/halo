@@ -4,7 +4,6 @@ import {
   IconDashboard,
   IconSettings,
   VButton,
-  VLoading,
   VPageHeader,
 } from "@halo-dev/components";
 import { ref } from "vue";
@@ -13,20 +12,13 @@ import "./styles/dashboard.css";
 
 const { currentUserHasPermission } = usePermission();
 
-const currentBreakpoint = ref("lg");
+const currentBreakpoint = ref();
 
 function breakpointChangedEvent(breakpoint: string) {
   currentBreakpoint.value = breakpoint;
-  console.log(breakpoint);
-  if (!layout.value) {
-    return;
-  }
-  layout.value = layouts.value[breakpoint] || layout.value["lg"];
-  console.log(layout.value);
 }
 
-const { layouts, layout, isLoading } =
-  useDashboardWidgetsFetch(currentBreakpoint);
+const { layouts, layout } = useDashboardWidgetsFetch(currentBreakpoint);
 </script>
 <template>
   <VPageHeader :title="$t('core.dashboard.title')">
@@ -47,9 +39,7 @@ const { layouts, layout, isLoading } =
   </VPageHeader>
 
   <div class="dashboard m-4">
-    <VLoading v-if="isLoading" />
     <grid-layout
-      v-if="!isLoading"
       v-model:layout="layout"
       :responsive-layouts="layouts"
       :col-num="12"
@@ -71,6 +61,10 @@ const { layouts, layout, isLoading } =
           :w="item.w"
           :x="item.x"
           :y="item.y"
+          :min-w="item.minW"
+          :min-h="item.minH"
+          :max-w="item.maxW"
+          :max-h="item.maxH"
         >
           <component :is="item.componentName" :config="item.config" />
         </grid-item>
