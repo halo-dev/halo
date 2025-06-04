@@ -44,8 +44,9 @@ class ThumbnailEndpointTest {
         webClient.get()
             .uri("/thumbnails/-/via-uri?size=l&uri=/myavatar.png")
             .exchange()
-            .expectAll(responseSpec -> responseSpec.expectHeader().location("/myavatar.png"))
             .expectStatus()
-            .is3xxRedirection();
+            .isFound()
+            .expectHeader()
+            .location("/myavatar.png");
     }
 }

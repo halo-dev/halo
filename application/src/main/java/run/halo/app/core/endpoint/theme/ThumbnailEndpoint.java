@@ -19,6 +19,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.core.io.Resource;
 import org.springframework.http.CacheControl;
 import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Component;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.reactive.function.BodyInserters;
@@ -69,7 +70,7 @@ public class ThumbnailEndpoint implements CustomEndpoint {
         return thumbnailService.get(query.getUri(), query.getSize())
             .filterWhen(uri -> isAccessible(request, uri))
             .defaultIfEmpty(query.getUri())
-            .flatMap(uri -> ServerResponse.temporaryRedirect(uri).build());
+            .flatMap(uri -> ServerResponse.status(HttpStatus.FOUND).location(uri).build());
     }
 
     Mono<Boolean> isAccessible(ServerRequest request, URI uri) {
@@ -177,7 +178,7 @@ public class ThumbnailEndpoint implements CustomEndpoint {
     }
 
     private Mono<ServerResponse> fallback(URI imageUri) {
-        return ServerResponse.temporaryRedirect(imageUri).build();
+        return ServerResponse.status(HttpStatus.FOUND).location(imageUri).build();
     }
 
     private static CacheControl getCacheControl(WebProperties.Resources resourceProperties) {
