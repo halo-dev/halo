@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { VButton, VModal, VSpace } from "@halo-dev/components";
 import type { DashboardWidgetDefinition } from "packages/shared/dist";
-import { computed, toRaw, useTemplateRef } from "vue";
+import { computed, useTemplateRef } from "vue";
 
 const props = defineProps<{
   widgetDefinition: DashboardWidgetDefinition;
@@ -38,7 +38,7 @@ function onSubmit(config: Record<string, unknown>) {
         type="form"
         @submit="onSubmit"
       >
-        <!-- @vue-ignore -->
+        <!-- @vue-skip -->
         <FormKitSchema
           :schema="toRaw(formSchema)"
           :data="toRaw(initialConfig)"
