@@ -65,6 +65,7 @@ import {
   UserConnectionV1alpha1Api,
   UserV1alpha1Api,
   UserV1alpha1ConsoleApi,
+  UserPreferenceV1alpha1UcApi,
 } from "../src";
 
 const defaultAxiosInstance = axios.create({
@@ -381,6 +382,13 @@ function createUcApiClient(axiosInstance: AxiosInstance) {
     },
     notification: {
       notification: new NotificationV1alpha1UcApi(
+        undefined,
+        baseURL,
+        axiosInstance
+      ),
+    },
+    user: {
+      preference: new UserPreferenceV1alpha1UcApi(
         undefined,
         baseURL,
         axiosInstance
