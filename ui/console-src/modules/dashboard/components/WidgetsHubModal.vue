@@ -97,7 +97,7 @@ const groupWidgetDefinitionsKeys = computed(() => {
                 currentUserHasPermission(item.permissions))
             "
             :style="{
-              width: `${100 / (12 / item.defaultSize.w)}%`,
+              width: `${item.defaultSize.w * 100}px`,
               height: `${item.defaultSize.h * 36}px`,
             }"
             class="cursor-pointer p-2"
