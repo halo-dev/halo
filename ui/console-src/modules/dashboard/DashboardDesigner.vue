@@ -128,6 +128,11 @@ function handleAddWidget(widgetDefinition: DashboardWidgetDefinition) {
   };
 
   widgetsHubModalVisible.value = false;
+
+  window.scrollTo({
+    top: document.body.scrollHeight,
+    behavior: "smooth",
+  });
 }
 
 function handleRemove(item: DashboardWidget) {
