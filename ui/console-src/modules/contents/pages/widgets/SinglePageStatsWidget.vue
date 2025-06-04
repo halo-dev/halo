@@ -1,7 +1,8 @@
 <script lang="ts" setup>
 import { singlePageLabels } from "@/constants/labels";
+import WidgetCard from "@console/modules/dashboard/components/WidgetCard.vue";
 import { coreApiClient } from "@halo-dev/api-client";
-import { IconPages, VCard } from "@halo-dev/components";
+import { IconPages } from "@halo-dev/components";
 import { useQuery } from "@tanstack/vue-query";
 
 const { data: total } = useQuery({
@@ -20,8 +21,8 @@ const { data: total } = useQuery({
 });
 </script>
 <template>
-  <VCard class="h-full" :body-class="['h-full']">
-    <div class="flex h-full">
+  <WidgetCard>
+    <div class="flex h-full px-4 py-3">
       <div class="flex items-center gap-4">
         <span class="rounded-full bg-gray-100 p-2.5 text-gray-600">
           <IconPages class="h-5 w-5" />
@@ -37,5 +38,5 @@ const { data: total } = useQuery({
         </div>
       </div>
     </div>
-  </VCard>
+  </WidgetCard>
 </template>

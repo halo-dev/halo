@@ -44,6 +44,7 @@ function handleSaveConfig(config: Record<string, unknown>) {
   <grid-item
     v-if="currentUserHasPermission(item.permissions)"
     :key="item.i"
+    class="group/grid-item"
     :h="item.h"
     :i="item.i"
     :w="item.w"
@@ -52,17 +53,19 @@ function handleSaveConfig(config: Record<string, unknown>) {
   >
     <component :is="item.componentName" :config="item.config" />
     <div
-      class="absolute p-2 right-0 top-0 rounded-base bg-gray-100 inline-flex gap-2"
+      class="absolute hidden h-8 right-0 top-0 rounded-tr-lg bg-gray-100 overflow-hidden group-hover/grid-item:inline-flex items-center"
     >
-      <IconSettings
+      <div
         v-if="widgetDefinition?.configFormKitSchema?.length"
-        class="cursor-pointer text-lg text-gray-500 hover:text-gray-900"
-        @click="configModalVisible = true"
-      />
-      <IconCloseCircle
-        class="cursor-pointer text-lg text-gray-500 hover:text-gray-900"
-        @click="emit('remove')"
-      />
+        class="h-full w-8 flex cursor-pointer items-center justify-center bg-black hover:bg-gray-800 text-white"
+      >
+        <IconSettings class="text-base" @click="configModalVisible = true" />
+      </div>
+      <div
+        class="h-full w-8 flex cursor-pointer items-center justify-center bg-red-500 hover:bg-red-600 text-white"
+      >
+        <IconCloseCircle class="text-base" @click="emit('remove')" />
+      </div>
     </div>
   </grid-item>
   <WidgetConfigFormModal

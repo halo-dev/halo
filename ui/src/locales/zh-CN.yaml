@@ -45,7 +45,7 @@ core:
     profile:
       aggregate_role: 聚合角色
   dashboard:
-    title: 仪表板
+    title: 仪表盘
     actions:
       setting: 设置
       done: 完成

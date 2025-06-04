@@ -4,12 +4,14 @@ import { definePlugin } from "@halo-dev/console-shared";
 import Dashboard from "./Dashboard.vue";
 
 import { markRaw } from "vue";
+import WidgetCard from "./components/WidgetCard.vue";
 import DashboardDesigner from "./DashboardDesigner.vue";
 import QuickLinkWidget from "./widgets/QuickLinkWidget.vue";
 import ViewsStatsWidget from "./widgets/ViewsStatsWidget.vue";
 
 export default definePlugin({
   components: {
+    WidgetCard,
     QuickLinkWidget,
     ViewsStatsWidget,
   },

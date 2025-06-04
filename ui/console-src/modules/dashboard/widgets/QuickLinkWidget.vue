@@ -14,12 +14,12 @@ import {
   IconUserSettings,
   IconWindowLine,
   Toast,
-  VCard,
 } from "@halo-dev/components";
 import { OverlayScrollbarsComponent } from "overlayscrollbars-vue";
 import { markRaw, ref, type Component } from "vue";
 import { useI18n } from "vue-i18n";
 import { useRouter } from "vue-router";
+import WidgetCard from "../components/WidgetCard.vue";
 
 interface Action {
   icon: Component;
@@ -156,10 +156,9 @@ const actions: Action[] = [
 ];
 </script>
 <template>
-  <VCard
+  <WidgetCard
     v-bind="$attrs"
-    :body-class="['h-full', '@container', '!p-0', '!overflow-auto']"
-    class="h-full"
+    :body-class="['@container', '!overflow-auto']"
     :title="$t('core.dashboard.widgets.presets.quicklink.title')"
   >
     <OverlayScrollbarsComponent
@@ -200,7 +199,7 @@ const actions: Action[] = [
         </div>
       </div>
     </OverlayScrollbarsComponent>
-  </VCard>
+  </WidgetCard>
   <ThemePreviewModal
     v-if="themePreviewVisible"
     :title="
