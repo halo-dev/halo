@@ -161,28 +161,40 @@ function handleUpdate(item: DashboardWidget) {
 
 const widgetsHubModalVisible = ref(false);
 
+const isSubmitting = ref(false);
+
 async function handleSave() {
-  const { data } = await ucApiClient.user.preference.getMyPreference({
-    group: "dashboard-widgets",
-  });
+  try {
+    isSubmitting.value = true;
 
-  const dashboardData: DashboardResponsiveLayout = {
-    ...data,
-    [currentBreakpoint.value]: layout.value,
-  };
+    const { data } = await ucApiClient.user.preference.getMyPreference({
+      group: "dashboard-widgets",
+    });
 
-  if (currentBreakpoint.value === "xs") {
-    dashboardData.xxs = layout.value;
+    const dashboardData: DashboardResponsiveLayout = {
+      ...data,
+      [currentBreakpoint.value]: layout.value,
+    };
+
+    if (currentBreakpoint.value === "xs") {
+      dashboardData.xxs = layout.value;
+    }
+
+    await ucApiClient.user.preference.updateMyPreference({
+      group: "dashboard-widgets",
+      body: dashboardData,
+    });
+
+    await queryClient.invalidateQueries({
+      queryKey: ["core:dashboard:widgets"],
+    });
+
+    router.replace({ name: "Dashboard" });
+  } catch (error) {
+    console.error("Failed to save dashboard widgets config", error);
+  } finally {
+    isSubmitting.value = false;
   }
-
-  await ucApiClient.user.preference.updateMyPreference({
-    group: "dashboard-widgets",
-    body: dashboardData,
-  });
-
-  await queryClient.invalidateQueries({ queryKey: ["core:dashboard:widgets"] });
-
-  router.replace({ name: "Dashboard" });
 }
 </script>
 <template>
@@ -210,7 +222,7 @@ async function handleSave() {
           </template>
           {{ $t("core.dashboard.actions.add_widget") }}
         </VButton>
-        <VButton type="secondary" @click="handleSave">
+        <VButton type="secondary" :loading="isSubmitting" @click="handleSave">
           <template #icon>
             <IconSave class="h-full w-full" />
           </template>
