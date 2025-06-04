@@ -1,6 +1,6 @@
 <script lang="ts" setup>
 import { randomUUID } from "@/utils/id";
-import { consoleApiClient } from "@halo-dev/api-client";
+import { ucApiClient } from "@halo-dev/api-client";
 import {
   IconAddCircle,
   IconComputer,
@@ -14,6 +14,7 @@ import {
   VTabbar,
 } from "@halo-dev/components";
 import type {
+  DashboardResponsiveLayout,
   DashboardWidget,
   DashboardWidgetDefinition,
 } from "@halo-dev/console-shared";
@@ -135,14 +136,12 @@ function handleUpdate(item: DashboardWidget) {
 const widgetsHubModalVisible = ref(false);
 
 async function handleSave() {
-  const { data } = await consoleApiClient.plugin.plugin.fetchPluginJsonConfig({
-    name: "app-store-integration",
+  const { data } = await ucApiClient.user.preference.getMyPreference({
+    group: "dashboard-widgets",
   });
 
-  const configMapData = data as Record<string, any>;
-
-  const dashboardData = {
-    ...configMapData.dashboard,
+  const dashboardData: DashboardResponsiveLayout = {
+    ...data,
     [currentBreakpoint.value]: layout.value,
   };
 
@@ -150,12 +149,9 @@ async function handleSave() {
     dashboardData.xxs = layout.value;
   }
 
-  await consoleApiClient.plugin.plugin.updatePluginJsonConfig({
-    name: "app-store-integration",
-    body: {
-      ...data,
-      dashboard: dashboardData,
-    },
+  await ucApiClient.user.preference.updateMyPreference({
+    group: "dashboard-widgets",
+    body: dashboardData,
   });
 
   await queryClient.invalidateQueries({ queryKey: ["core:dashboard:widgets"] });

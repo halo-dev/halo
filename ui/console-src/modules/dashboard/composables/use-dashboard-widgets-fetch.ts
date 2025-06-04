@@ -1,4 +1,4 @@
-import { consoleApiClient } from "@halo-dev/api-client";
+import { ucApiClient } from "@halo-dev/api-client";
 import type {
   DashboardResponsiveLayout,
   DashboardWidget,
@@ -13,12 +13,13 @@ export function useDashboardWidgetsFetch(breakpoint: Ref<string>) {
   const { isLoading } = useQuery({
     queryKey: ["core:dashboard:widgets", breakpoint.value],
     queryFn: async () => {
-      const { data } =
-        await consoleApiClient.plugin.plugin.fetchPluginJsonConfig({
-          name: "app-store-integration",
-        });
-      const configMapData = data as Record<string, unknown>;
-      return configMapData.dashboard as DashboardResponsiveLayout;
+      const { data } = await ucApiClient.user.preference.getMyPreference({
+        group: "dashboard-widgets",
+      });
+      if (!data) {
+        return {};
+      }
+      return data as DashboardResponsiveLayout;
     },
     onSuccess: (data) => {
       layouts.value = data;

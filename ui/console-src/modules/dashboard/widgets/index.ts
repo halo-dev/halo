@@ -20,7 +20,7 @@ export const internalWidgetDefinitions: DashboardWidgetDefinition[] = [
     defaultConfig: {},
     defaultSize: {
       w: 6,
-      h: 10,
+      h: 12,
     },
   },
   {
@@ -41,7 +41,7 @@ export const internalWidgetDefinitions: DashboardWidgetDefinition[] = [
     },
     defaultSize: {
       w: 6,
-      h: 10,
+      h: 12,
     },
   },
 ];
