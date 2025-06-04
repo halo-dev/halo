@@ -104,7 +104,10 @@ const groupWidgetDefinitionsKeys = computed(() => {
             @click="emit('add-widget', item)"
           >
             <div class="pointer-events-none w-full h-full">
-              <component :is="item.componentName" />
+              <component
+                :is="item.componentName"
+                :config="item.defaultConfig"
+              />
             </div>
           </div>
         </template>
