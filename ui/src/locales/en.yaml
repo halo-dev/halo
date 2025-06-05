@@ -97,6 +97,10 @@ core:
                 This operation will recreate search engine indexes for all
                 published posts.
               success_message: Refresh search engine index successfully.
+          config:
+            fields:
+              enabled_items:
+                label: Enabled Items
         user_stats:
           title: Users
         comment_stats:

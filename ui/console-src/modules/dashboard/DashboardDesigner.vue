@@ -28,8 +28,10 @@ import {
   markRaw,
   nextTick,
   ref,
+  useTemplateRef,
   watch,
 } from "vue";
+import type { GridLayout } from "vue-grid-layout";
 import { useI18n } from "vue-i18n";
 import { onBeforeRouteLeave, useRouter } from "vue-router";
 import RiArrowGoBackLine from "~icons/ri/arrow-go-back-line";
@@ -44,6 +46,9 @@ const router = useRouter();
 
 const currentBreakpoint = ref("lg");
 const originalBreakpoint = ref();
+
+const gridLayoutRef =
+  useTemplateRef<InstanceType<typeof GridLayout>>("gridLayoutRef");
 
 const { layouts, layout, originalLayout, isLoading } =
   useDashboardWidgetsFetch(currentBreakpoint);
@@ -61,6 +66,9 @@ watch(
     layouts.value[currentBreakpoint.value] = layout.value;
     if (currentBreakpoint.value === "xs") {
       layouts.value.xxs = layout.value;
+    }
+    if (gridLayoutRef.value) {
+      gridLayoutRef.value.initResponsiveFeatures();
     }
   },
   {
@@ -311,6 +319,7 @@ useEventListener(window, "beforeunload", (e) => {
 
   <div class="dashboard m-4 transition-all" :style="designContainerStyles">
     <grid-layout
+      ref="gridLayoutRef"
       v-model:layout="layout"
       :responsive-layouts="layouts"
       :col-num="12"

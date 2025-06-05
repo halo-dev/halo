@@ -86,17 +86,18 @@ export const internalWidgetDefinitions: DashboardWidgetDefinition[] = [
     name: "core:quick-link",
     componentName: "QuickLinkWidget",
     group: "core.dashboard.widgets.groups.other",
-    // TODO: remove this, just for testing
-    configFormKitSchema: [
-      {
-        $formkit: "text",
-        name: "title",
-        label: "Title",
-        placeholder: "Title",
-      },
-    ],
     defaultConfig: {
-      title: "Quick Link",
+      enabled_items: [
+        "core:user-center",
+        "core:theme-preview",
+        "core:new-post",
+        "core:new-page",
+        "core:upload-attachment",
+        "core:theme-manage",
+        "core:plugin-manage",
+        "core:new-user",
+        "core:refresh-search-engine",
+      ],
     },
     defaultSize: {
       w: 6,

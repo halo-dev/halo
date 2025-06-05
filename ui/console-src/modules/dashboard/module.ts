@@ -6,8 +6,8 @@ import Dashboard from "./Dashboard.vue";
 import { markRaw } from "vue";
 import WidgetCard from "./components/WidgetCard.vue";
 import DashboardDesigner from "./DashboardDesigner.vue";
-import QuickLinkWidget from "./widgets/QuickLinkWidget.vue";
-import ViewsStatsWidget from "./widgets/ViewsStatsWidget.vue";
+import QuickLinkWidget from "./widgets/presets/quick-link/QuickLinkWidget.vue";
+import ViewsStatsWidget from "./widgets/presets/view-stats/ViewsStatsWidget.vue";
 
 export default definePlugin({
   components: {

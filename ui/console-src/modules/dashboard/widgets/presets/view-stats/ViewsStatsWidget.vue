@@ -1,7 +1,7 @@
 <script lang="ts" setup>
 import { useDashboardStats } from "@console/composables/use-dashboard-stats";
 import { IconEye } from "@halo-dev/components";
-import WidgetCard from "../components/WidgetCard.vue";
+import WidgetCard from "../../../components/WidgetCard.vue";
 
 const { data: stats } = useDashboardStats();
 </script>

@@ -93,6 +93,10 @@ core:
               dialog_title: 刷新搜尋引擎索引
               dialog_content: 此操作會對所有已發佈的文章重新創建本地搜尋引擎的索引。
               success_message: 刷新成功
+          config:
+            fields:
+              enabled_items:
+                label: 啟用的功能
         user_stats:
           title: 用戶
         comment_stats:

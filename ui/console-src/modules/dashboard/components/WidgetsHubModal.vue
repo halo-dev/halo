@@ -106,6 +106,7 @@ const groupWidgetDefinitionsKeys = computed(() => {
             <div class="pointer-events-none w-full h-full">
               <component
                 :is="item.componentName"
+                preview-mode
                 :config="item.defaultConfig"
               />
             </div>

@@ -55,7 +55,12 @@ function handleSaveConfig(config: Record<string, unknown>) {
     :max-w="item.maxW"
     :max-h="item.maxH"
   >
-    <component :is="item.componentName" :config="item.config" />
+    <component
+      :is="item.componentName"
+      edit-mode
+      :config="item.config"
+      @update:config="handleSaveConfig"
+    />
     <div
       class="absolute hidden h-8 right-0 top-0 rounded-tr-lg bg-gray-100 overflow-hidden group-hover/grid-item:inline-flex items-center"
     >
@@ -75,7 +80,11 @@ function handleSaveConfig(config: Record<string, unknown>) {
     </div>
   </grid-item>
   <WidgetConfigFormModal
-    v-if="widgetDefinition && configModalVisible"
+    v-if="
+      widgetDefinition &&
+      widgetDefinition.configFormKitSchema &&
+      configModalVisible
+    "
     :widget-definition="widgetDefinition"
     :config="item.config"
     @close="configModalVisible = false"

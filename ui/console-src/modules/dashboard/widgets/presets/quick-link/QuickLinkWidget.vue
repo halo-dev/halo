@@ -1,41 +1,49 @@
 <script lang="ts" setup>
-import ThemePreviewModal from "@console/modules/interface/themes/components/preview/ThemePreviewModal.vue";
+import type { FormKitOptionsList } from "@formkit/inputs";
 import { consoleApiClient } from "@halo-dev/api-client";
 import {
   Dialog,
   IconAccountCircleLine,
-  IconArrowRight,
   IconBookRead,
   IconFolder,
   IconPages,
   IconPalette,
   IconPlug,
   IconSearch,
+  IconSettings,
   IconUserSettings,
   IconWindowLine,
   Toast,
+  VButton,
+  VModal,
+  VSpace,
 } from "@halo-dev/components";
 import { OverlayScrollbarsComponent } from "overlayscrollbars-vue";
-import { markRaw, ref, type Component } from "vue";
+import { computed, markRaw, ref, useTemplateRef } from "vue";
 import { useI18n } from "vue-i18n";
 import { useRouter } from "vue-router";
-import WidgetCard from "../components/WidgetCard.vue";
+import WidgetCard from "../../../components/WidgetCard.vue";
+import QuickLinkItem from "./QuickLinkItem.vue";
+import ThemePreviewItem from "./ThemePreviewItem.vue";
+import type { QuickLinkItemDefinition } from "./types";
 
-interface Action {
-  icon: Component;
-  title: string;
-  action: () => void;
-  permissions?: string[];
-}
+const props = defineProps<{
+  editMode?: boolean;
+  config?: {
+    enabled_items?: string[];
+  };
+}>();
 
 const router = useRouter();
-
-const themePreviewVisible = ref(false);
-
 const { t } = useI18n();
 
-const actions: Action[] = [
+const emit = defineEmits<{
+  (e: "update:config", config: Record<string, unknown>): void;
+}>();
+
+const items: QuickLinkItemDefinition[] = [
   {
+    id: "core:user-center",
     icon: markRaw(IconAccountCircleLine),
     title: t(
       "core.dashboard.widgets.presets.quicklink.actions.user_center.title"
@@ -45,16 +53,16 @@ const actions: Action[] = [
     },
   },
   {
+    id: "core:theme-preview",
     icon: markRaw(IconWindowLine),
     title: t(
       "core.dashboard.widgets.presets.quicklink.actions.view_site.title"
     ),
-    action: () => {
-      themePreviewVisible.value = true;
-    },
+    component: markRaw(ThemePreviewItem),
     permissions: ["system:themes:view"],
   },
   {
+    id: "core:new-post",
     icon: markRaw(IconBookRead),
     title: t("core.dashboard.widgets.presets.quicklink.actions.new_post.title"),
     action: () => {
@@ -65,6 +73,7 @@ const actions: Action[] = [
     permissions: ["system:posts:manage"],
   },
   {
+    id: "core:new-page",
     icon: markRaw(IconPages),
     title: t("core.dashboard.widgets.presets.quicklink.actions.new_page.title"),
     action: () => {
@@ -75,6 +84,7 @@ const actions: Action[] = [
     permissions: ["system:singlepages:manage"],
   },
   {
+    id: "core:upload-attachment",
     icon: markRaw(IconFolder),
     title: t(
       "core.dashboard.widgets.presets.quicklink.actions.upload_attachment.title"
@@ -90,6 +100,7 @@ const actions: Action[] = [
     permissions: ["system:attachments:manage"],
   },
   {
+    id: "core:theme-manage",
     icon: markRaw(IconPalette),
     title: t(
       "core.dashboard.widgets.presets.quicklink.actions.theme_manage.title"
@@ -102,6 +113,7 @@ const actions: Action[] = [
     permissions: ["system:themes:view"],
   },
   {
+    id: "core:plugin-manage",
     icon: markRaw(IconPlug),
     title: t(
       "core.dashboard.widgets.presets.quicklink.actions.plugin_manage.title"
@@ -114,6 +126,7 @@ const actions: Action[] = [
     permissions: ["system:plugins:view"],
   },
   {
+    id: "core:new-user",
     icon: markRaw(IconUserSettings),
     title: t("core.dashboard.widgets.presets.quicklink.actions.new_user.title"),
     action: () => {
@@ -127,6 +140,7 @@ const actions: Action[] = [
     permissions: ["system:users:manage"],
   },
   {
+    id: "core:refresh-search-engine",
     icon: markRaw(IconSearch),
     title: t(
       "core.dashboard.widgets.presets.quicklink.actions.refresh_search_engine.title"
@@ -154,13 +168,55 @@ const actions: Action[] = [
     permissions: ["system:posts:manage"],
   },
 ];
+
+const modal = useTemplateRef<InstanceType<typeof VModal> | null>("modal");
+const configVisible = ref(false);
+
+function onConfigFormSubmit(data: { enabled_items: string[] }) {
+  emit("update:config", data);
+  configVisible.value = false;
+}
+
+const itemOptions = computed(() => {
+  return items.map((item) => ({
+    label: item.title,
+    value: item.id,
+  })) as FormKitOptionsList;
+});
+
+const availableItems = computed(() => {
+  const enabledItems = props.config?.enabled_items;
+
+  console.log(enabledItems);
+
+  if (!enabledItems || enabledItems.length === 0) {
+    return [];
+  }
+
+  const indexMap = new Map();
+  enabledItems.forEach((id, index) => {
+    indexMap.set(id, index);
+  });
+
+  return items
+    .filter((item) => indexMap.has(item.id))
+    .sort((a, b) => indexMap.get(a.id) - indexMap.get(b.id));
+});
 </script>
 <template>
-  <WidgetCard
-    v-bind="$attrs"
-    :body-class="['@container', '!overflow-auto']"
-    :title="$t('core.dashboard.widgets.presets.quicklink.title')"
-  >
+  <WidgetCard v-bind="$attrs" :body-class="['@container', '!overflow-auto']">
+    <template #title>
+      <div class="inline-flex items-center gap-2">
+        <div class="text-base font-medium flex-1 shrink">
+          {{ $t("core.dashboard.widgets.presets.quicklink.title") }}
+        </div>
+        <IconSettings
+          v-if="editMode"
+          class="hover:text-gray-600 cursor-pointer"
+          @click="configVisible = true"
+        />
+      </div>
+    </template>
     <OverlayScrollbarsComponent
       element="div"
       :options="{ scrollbars: { autoHide: 'scroll' } }"
@@ -171,40 +227,56 @@ const actions: Action[] = [
       <div
         class="grid grid-cols-1 gap-2 overflow-hidden @sm:grid-cols-2 @md:grid-cols-3"
       >
-        <div
-          v-for="(action, index) in actions"
-          :key="index"
-          v-permission="action.permissions"
-          class="group relative cursor-pointer rounded-lg bg-gray-50 p-4 transition-all hover:bg-gray-100"
-          @click="action.action"
-        >
-          <div>
-            <span
-              class="inline-flex rounded-lg bg-teal-50 p-3 text-teal-700 ring-4 ring-white"
-            >
-              <component :is="action.icon"></component>
-            </span>
-          </div>
-          <div class="mt-8">
-            <h3 class="text-sm font-semibold">
-              {{ action.title }}
-            </h3>
-          </div>
-          <span
-            aria-hidden="true"
-            class="pointer-events-none absolute right-6 top-6 text-gray-300 transition-all group-hover:translate-x-1 group-hover:text-gray-400"
-          >
-            <IconArrowRight />
-          </span>
-        </div>
+        <template v-for="item in availableItems" :key="item.id">
+          <QuickLinkItem v-if="!item.component" :item="item" />
+          <component :is="item.component" v-else :item="item" />
+        </template>
       </div>
     </OverlayScrollbarsComponent>
   </WidgetCard>
-  <ThemePreviewModal
-    v-if="themePreviewVisible"
-    :title="
-      $t('core.dashboard.widgets.presets.quicklink.actions.view_site.title')
-    "
-    @close="themePreviewVisible = false"
-  />
+  <VModal
+    v-if="configVisible"
+    ref="modal"
+    mount-to-body
+    :title="$t('core.dashboard_designer.config_modal.title')"
+    @close="configVisible = false"
+  >
+    <div>
+      <FormKit
+        id="quick-link-widget-config"
+        name="quick-link-widget-config"
+        type="form"
+        :preserve="true"
+        @submit="onConfigFormSubmit"
+      >
+        <FormKit
+          type="select"
+          :label="
+            $t(
+              'core.dashboard.widgets.presets.quicklink.config.fields.enabled_items.label'
+            )
+          "
+          name="enabled_items"
+          :options="itemOptions"
+          :value="config?.enabled_items || []"
+          multiple
+          searchable
+          sortable
+        />
+      </FormKit>
+    </div>
+    <template #footer>
+      <VSpace>
+        <VButton
+          type="secondary"
+          @click="$formkit.submit('quick-link-widget-config')"
+        >
+          {{ $t("core.common.buttons.save") }}
+        </VButton>
+        <VButton @click="modal?.close()">
+          {{ $t("core.common.buttons.cancel") }}
+        </VButton>
+      </VSpace>
+    </template>
+  </VModal>
 </template>
