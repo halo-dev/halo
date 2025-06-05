@@ -1,3 +1,5 @@
+import type { Component, Raw } from "vue";
+
 export interface DashboardResponsiveLayout {
   lg?: DashboardWidget[];
   md?: DashboardWidget[];
@@ -16,15 +18,14 @@ export interface DashboardWidget {
   minH?: number;
   maxW?: number;
   maxH?: number;
-  name: string;
-  componentName: string;
+  id: string;
   config?: Record<string, unknown>;
   permissions?: string[];
 }
 
 export interface DashboardWidgetDefinition {
-  name: string;
-  componentName: string;
+  id: string;
+  component: Raw<Component>;
   group: string;
   configFormKitSchema?: Record<string, unknown>[];
   defaultConfig?: Record<string, unknown>;

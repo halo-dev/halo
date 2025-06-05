@@ -1,10 +1,11 @@
 <script setup lang="ts">
 import { usePermission } from "@/utils/permission";
 import { IconCloseCircle, IconSettings } from "@halo-dev/components";
-import type { DashboardWidget } from "@halo-dev/console-shared";
-import { computed, ref } from "vue";
-import { useDashboardExtensionPoint } from "../composables/use-dashboard-extension-point";
-import { internalWidgetDefinitions } from "../widgets";
+import type {
+  DashboardWidget,
+  DashboardWidgetDefinition,
+} from "@halo-dev/console-shared";
+import { computed, inject, ref, type ComputedRef } from "vue";
 import WidgetConfigFormModal from "./WidgetConfigFormModal.vue";
 
 const props = defineProps<{
@@ -18,15 +19,13 @@ const emit = defineEmits<{
 
 const { currentUserHasPermission } = usePermission();
 
-const { widgetDefinitions } = useDashboardExtensionPoint();
-
-const availableWidgetDefinitions = computed(() => {
-  return [...internalWidgetDefinitions, ...widgetDefinitions.value];
-});
+const availableWidgetDefinitions = inject<
+  ComputedRef<DashboardWidgetDefinition[]>
+>("availableWidgetDefinitions");
 
 const widgetDefinition = computed(() => {
-  return availableWidgetDefinitions.value.find(
-    (definition) => definition.name === props.item.name
+  return availableWidgetDefinitions?.value?.find(
+    (definition) => definition.id === props.item.id
   );
 });
 
@@ -56,7 +55,7 @@ function handleSaveConfig(config: Record<string, unknown>) {
     :max-h="item.maxH"
   >
     <component
-      :is="item.componentName"
+      :is="widgetDefinition?.component"
       edit-mode
       :config="item.config"
       @update:config="handleSaveConfig"

@@ -1,4 +1,5 @@
 <script lang="ts" setup>
+import WidgetCard from "@console/modules/dashboard/components/WidgetCard.vue";
 import type { FormKitOptionsList } from "@formkit/inputs";
 import { consoleApiClient } from "@halo-dev/api-client";
 import {
@@ -22,7 +23,6 @@ import { OverlayScrollbarsComponent } from "overlayscrollbars-vue";
 import { computed, markRaw, ref, useTemplateRef } from "vue";
 import { useI18n } from "vue-i18n";
 import { useRouter } from "vue-router";
-import WidgetCard from "../../../components/WidgetCard.vue";
 import QuickLinkItem from "./QuickLinkItem.vue";
 import ThemePreviewItem from "./ThemePreviewItem.vue";
 import type { QuickLinkItemDefinition } from "./types";

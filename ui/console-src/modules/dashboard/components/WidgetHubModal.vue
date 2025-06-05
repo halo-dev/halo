@@ -2,9 +2,7 @@
 import { usePermission } from "@/utils/permission";
 import { VButton, VModal, VTabbar } from "@halo-dev/components";
 import type { DashboardWidgetDefinition } from "packages/shared/dist";
-import { computed, ref, useTemplateRef } from "vue";
-import { useDashboardExtensionPoint } from "../composables/use-dashboard-extension-point";
-import { internalWidgetDefinitions } from "../widgets";
+import { computed, inject, ref, useTemplateRef, type ComputedRef } from "vue";
 
 const { currentUserHasPermission } = usePermission();
 
@@ -17,18 +15,16 @@ const modal = useTemplateRef<InstanceType<typeof VModal> | null>("modal");
 
 const activeId = ref("");
 
-const { widgetDefinitions } = useDashboardExtensionPoint();
-
-const availableWidgetDefinitions = computed(() => {
-  return [...internalWidgetDefinitions, ...widgetDefinitions.value];
-});
+const availableWidgetDefinitions = inject<
+  ComputedRef<DashboardWidgetDefinition[]>
+>("availableWidgetDefinitions");
 
 const groupedWidgetDefinitions = computed(() => {
-  const filteredWidgets = availableWidgetDefinitions.value.filter(
+  const filteredWidgets = availableWidgetDefinitions?.value?.filter(
     (widget) => activeId.value === "" || widget.group === activeId.value
   );
 
-  const groups = filteredWidgets.reduce((acc, widget) => {
+  const groups = filteredWidgets?.reduce((acc, widget) => {
     const key = `${widget.defaultSize.w}-${widget.defaultSize.h}`;
     if (!acc[key]) {
       acc[key] = [];
@@ -37,7 +33,7 @@ const groupedWidgetDefinitions = computed(() => {
     return acc;
   }, {} as Record<string, DashboardWidgetDefinition[]>);
 
-  return Object.entries(groups)
+  return Object.entries(groups || {})
     .map(([key, widgets]) => {
       const [w, h] = key.split("-").map(Number);
       return { w, h, widgets };
@@ -52,7 +48,7 @@ const groupedWidgetDefinitions = computed(() => {
 });
 
 const groupWidgetDefinitions = computed(() => {
-  return availableWidgetDefinitions.value.reduce((acc, item) => {
+  return availableWidgetDefinitions?.value?.reduce((acc, item) => {
     acc[item.group] = acc[item.group] || [];
     acc[item.group].push(item);
     return acc;
@@ -60,7 +56,7 @@ const groupWidgetDefinitions = computed(() => {
 });
 
 const groupWidgetDefinitionsKeys = computed(() => {
-  return Object.keys(groupWidgetDefinitions.value);
+  return Object.keys(groupWidgetDefinitions.value || {});
 });
 </script>
 
@@ -89,7 +85,7 @@ const groupWidgetDefinitionsKeys = computed(() => {
         :key="index"
         class="flex flex-wrap"
       >
-        <template v-for="item in group" :key="item.name">
+        <template v-for="item in group" :key="item.id">
           <div
             v-if="
               activeId === '' ||
@@ -105,7 +101,7 @@ const groupWidgetDefinitionsKeys = computed(() => {
           >
             <div class="pointer-events-none w-full h-full">
               <component
-                :is="item.componentName"
+                :is="item.component"
                 preview-mode
                 :config="item.defaultConfig"
               />

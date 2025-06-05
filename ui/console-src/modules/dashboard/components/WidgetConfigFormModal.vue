@@ -37,9 +37,9 @@ function onSubmit(config: Record<string, unknown>) {
     <div>
       <FormKit
         v-if="formSchema"
-        :id="widgetDefinition.name"
+        :id="widgetDefinition.id"
         :value="initialConfig"
-        :name="widgetDefinition.name"
+        :name="widgetDefinition.id"
         :preserve="true"
         type="form"
         @submit="onSubmit"
@@ -52,10 +52,7 @@ function onSubmit(config: Record<string, unknown>) {
     </div>
     <template #footer>
       <VSpace>
-        <VButton
-          type="secondary"
-          @click="$formkit.submit(widgetDefinition.name)"
-        >
+        <VButton type="secondary" @click="$formkit.submit(widgetDefinition.id)">
           {{ $t("core.common.buttons.save") }}
         </VButton>
         <VButton @click="modal?.close()">

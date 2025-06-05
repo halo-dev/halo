@@ -5,27 +5,34 @@ import { onMounted, ref } from "vue";
 const EXTENSION_POINT_NAME = "console:dashboard:widgets:create";
 
 export function useDashboardExtensionPoint() {
-  const { pluginModules } = usePluginModuleStore();
+  const { pluginModuleMap } = usePluginModuleStore();
 
   const widgetDefinitions = ref<DashboardWidgetDefinition[]>([]);
 
   onMounted(async () => {
-    const items: DashboardWidgetDefinition[] = [];
-    for (const pluginModule of pluginModules) {
+    const finalDefinitions: DashboardWidgetDefinition[] = [];
+    for (const [name, module] of Object.entries(pluginModuleMap)) {
       try {
         const callbackFunction =
-          pluginModule?.extensionPoints?.[EXTENSION_POINT_NAME];
+          module?.extensionPoints?.[EXTENSION_POINT_NAME];
 
         if (typeof callbackFunction !== "function") {
           continue;
         }
 
-        items.push(...(await callbackFunction()));
+        const definitions = await callbackFunction();
+
+        // Reset id
+        definitions.forEach((definition) => {
+          definition.id = `${name}-${definition.id}`;
+        });
+
+        finalDefinitions.push(...definitions);
       } catch (error) {
-        console.error(`Error processing plugin module:`, pluginModule, error);
+        console.error(`Error processing plugin module:`, name, error);
       }
     }
-    widgetDefinitions.value = items;
+    widgetDefinitions.value = finalDefinitions;
   });
 
   return { widgetDefinitions };

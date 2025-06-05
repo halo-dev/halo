@@ -1,16 +1,17 @@
 <script lang="ts" setup>
-import { usePermission } from "@/utils/permission";
 import {
   IconDashboard,
   IconSettings,
   VButton,
   VPageHeader,
 } from "@halo-dev/components";
-import { ref } from "vue";
+import type { DashboardWidgetDefinition } from "packages/shared/dist";
+import { computed, type ComputedRef, provide, ref } from "vue";
+import WidgetViewItem from "./components/WidgetViewItem.vue";
+import { useDashboardExtensionPoint } from "./composables/use-dashboard-extension-point";
 import { useDashboardWidgetsFetch } from "./composables/use-dashboard-widgets-fetch";
 import "./styles/dashboard.css";
-
-const { currentUserHasPermission } = usePermission();
+import { internalWidgetDefinitions } from "./widgets";
 
 const currentBreakpoint = ref();
 
@@ -19,6 +20,17 @@ function breakpointChangedEvent(breakpoint: string) {
 }
 
 const { layouts, layout } = useDashboardWidgetsFetch(currentBreakpoint);
+
+const { widgetDefinitions } = useDashboardExtensionPoint();
+
+const availableWidgetDefinitions = computed(() => {
+  return [...internalWidgetDefinitions, ...widgetDefinitions.value];
+});
+
+provide<ComputedRef<DashboardWidgetDefinition[]>>(
+  "availableWidgetDefinitions",
+  availableWidgetDefinitions
+);
 </script>
 <template>
   <VPageHeader :title="$t('core.dashboard.title')">
@@ -53,23 +65,7 @@ const { layouts, layout } = useDashboardWidgetsFetch(currentBreakpoint);
       :breakpoints="{ lg: 1200, md: 996, sm: 768, xs: 480 }"
       @breakpoint-changed="breakpointChangedEvent"
     >
-      <template v-for="item in layout">
-        <grid-item
-          v-if="currentUserHasPermission(item.permissions)"
-          :key="item.i"
-          :h="item.h"
-          :i="item.i"
-          :w="item.w"
-          :x="item.x"
-          :y="item.y"
-          :min-w="item.minW"
-          :min-h="item.minH"
-          :max-w="item.maxW"
-          :max-h="item.maxH"
-        >
-          <component :is="item.componentName" :config="item.config" />
-        </grid-item>
-      </template>
+      <WidgetViewItem v-for="item in layout" :key="item.i" :item="item" />
     </grid-layout>
   </div>
 </template>

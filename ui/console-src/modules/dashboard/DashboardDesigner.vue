@@ -27,18 +27,22 @@ import {
   h,
   markRaw,
   nextTick,
+  provide,
   ref,
   useTemplateRef,
   watch,
+  type ComputedRef,
 } from "vue";
 import type { GridLayout } from "vue-grid-layout";
 import { useI18n } from "vue-i18n";
 import { onBeforeRouteLeave, useRouter } from "vue-router";
 import RiArrowGoBackLine from "~icons/ri/arrow-go-back-line";
-import WidgetItem from "./components/WidgetItem.vue";
-import WidgetsHubModal from "./components/WidgetsHubModal.vue";
+import WidgetEditableItem from "./components/WidgetEditableItem.vue";
+import WidgetHubModal from "./components/WidgetHubModal.vue";
+import { useDashboardExtensionPoint } from "./composables/use-dashboard-extension-point";
 import { useDashboardWidgetsFetch } from "./composables/use-dashboard-widgets-fetch";
 import "./styles/dashboard.css";
+import { internalWidgetDefinitions } from "./widgets";
 
 const { t } = useI18n();
 const queryClient = useQueryClient();
@@ -49,6 +53,17 @@ const originalBreakpoint = ref();
 
 const gridLayoutRef =
   useTemplateRef<InstanceType<typeof GridLayout>>("gridLayoutRef");
+
+const { widgetDefinitions } = useDashboardExtensionPoint();
+
+const availableWidgetDefinitions = computed(() => {
+  return [...internalWidgetDefinitions, ...widgetDefinitions.value];
+});
+
+provide<ComputedRef<DashboardWidgetDefinition[]>>(
+  "availableWidgetDefinitions",
+  availableWidgetDefinitions
+);
 
 const { layouts, layout, originalLayout, isLoading } =
   useDashboardWidgetsFetch(currentBreakpoint);
@@ -179,8 +194,7 @@ function handleAddWidget(widgetDefinition: DashboardWidgetDefinition) {
     minH: widgetDefinition.defaultSize.minH,
     maxW: widgetDefinition.defaultSize.maxW,
     maxH: widgetDefinition.defaultSize.maxH,
-    name: widgetDefinition.name,
-    componentName: widgetDefinition.componentName,
+    id: widgetDefinition.id,
     config: widgetDefinition.defaultConfig,
     permissions: widgetDefinition.permissions,
   };
@@ -333,7 +347,7 @@ useEventListener(window, "beforeunload", (e) => {
       :breakpoints="{ lg: 1200, md: 996, sm: 768, xs: 480 }"
       @breakpoint-changed="onBreakpointChange"
     >
-      <WidgetItem
+      <WidgetEditableItem
         v-for="item in layout"
         :key="item.i"
         :item="item"
@@ -342,7 +356,7 @@ useEventListener(window, "beforeunload", (e) => {
       />
     </grid-layout>
   </div>
-  <WidgetsHubModal
+  <WidgetHubModal
     v-if="widgetsHubModalVisible"
     @close="widgetsHubModalVisible = false"
     @add-widget="handleAddWidget"

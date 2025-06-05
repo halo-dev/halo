@@ -1,9 +1,18 @@
 import type { DashboardWidgetDefinition } from "@halo-dev/console-shared";
+import { markRaw } from "vue";
+import CommentStatsWidget from "./presets/comments/CommentStatsWidget.vue";
+import QuickLinkWidget from "./presets/core/quick-link/QuickLinkWidget.vue";
+import ViewsStatsWidget from "./presets/core/view-stats/ViewsStatsWidget.vue";
+import PostStatsWidget from "./presets/posts/PostStatsWidget.vue";
+import RecentPublishedWidget from "./presets/posts/RecentPublishedWidget.vue";
+import SinglePageStatsWidget from "./presets/single-pages/SinglePageStatsWidget.vue";
+import NotificationWidget from "./presets/users/NotificationWidget.vue";
+import UserStatsWidget from "./presets/users/UserStatsWidget.vue";
 
 export const internalWidgetDefinitions: DashboardWidgetDefinition[] = [
   {
-    name: "core:post:stats",
-    componentName: "PostStatsWidget",
+    id: "core:post:stats",
+    component: markRaw(PostStatsWidget),
     group: "core.dashboard.widgets.groups.post",
     configFormKitSchema: [],
     defaultConfig: {},
@@ -15,8 +24,8 @@ export const internalWidgetDefinitions: DashboardWidgetDefinition[] = [
     },
   },
   {
-    name: "core:post:recent-published",
-    componentName: "RecentPublishedWidget",
+    id: "core:post:recent-published",
+    component: markRaw(RecentPublishedWidget),
     group: "core.dashboard.widgets.groups.post",
     configFormKitSchema: [],
     defaultConfig: {},
@@ -29,8 +38,8 @@ export const internalWidgetDefinitions: DashboardWidgetDefinition[] = [
     permissions: ["system:posts:view"],
   },
   {
-    name: "core:singlepage:stats",
-    componentName: "SinglePageStatsWidget",
+    id: "core:singlepage:stats",
+    component: markRaw(SinglePageStatsWidget),
     group: "core.dashboard.widgets.groups.page",
     configFormKitSchema: [],
     defaultConfig: {},
@@ -43,8 +52,8 @@ export const internalWidgetDefinitions: DashboardWidgetDefinition[] = [
     permissions: ["system:singlepages:view"],
   },
   {
-    name: "core:comment:stats",
-    componentName: "CommentStatsWidget",
+    id: "core:comment:stats",
+    component: markRaw(CommentStatsWidget),
     group: "core.dashboard.widgets.groups.comment",
     configFormKitSchema: [],
     defaultConfig: {},
@@ -57,8 +66,8 @@ export const internalWidgetDefinitions: DashboardWidgetDefinition[] = [
     permissions: ["system:comments:view"],
   },
   {
-    name: "core:user:stats",
-    componentName: "UserStatsWidget",
+    id: "core:user:stats",
+    component: markRaw(UserStatsWidget),
     group: "core.dashboard.widgets.groups.user",
     configFormKitSchema: [],
     defaultConfig: {},
@@ -70,8 +79,8 @@ export const internalWidgetDefinitions: DashboardWidgetDefinition[] = [
     },
   },
   {
-    name: "core:view:stats",
-    componentName: "ViewsStatsWidget",
+    id: "core:view:stats",
+    component: markRaw(ViewsStatsWidget),
     group: "core.dashboard.widgets.groups.other",
     configFormKitSchema: [],
     defaultConfig: {},
@@ -83,8 +92,8 @@ export const internalWidgetDefinitions: DashboardWidgetDefinition[] = [
     },
   },
   {
-    name: "core:quick-link",
-    componentName: "QuickLinkWidget",
+    id: "core:quick-link",
+    component: markRaw(QuickLinkWidget),
     group: "core.dashboard.widgets.groups.other",
     defaultConfig: {
       enabled_items: [
@@ -107,8 +116,8 @@ export const internalWidgetDefinitions: DashboardWidgetDefinition[] = [
     },
   },
   {
-    name: "core:notifications",
-    componentName: "NotificationWidget",
+    id: "core:notifications",
+    component: markRaw(NotificationWidget),
     group: "core.dashboard.widgets.groups.other",
     configFormKitSchema: [],
     defaultConfig: {},
