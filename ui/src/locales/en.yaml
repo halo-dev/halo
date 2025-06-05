@@ -71,8 +71,8 @@ core:
           title: Notifications
           empty:
             title: No unread notifications
-        quicklink:
-          title: Quick Link
+        quickaction:
+          title: Quick Action
           actions:
             user_center:
               title: User Center

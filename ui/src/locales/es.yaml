@@ -47,8 +47,8 @@ core:
           title: Publicaciones Recientes
           visits: "{visits} Visitas"
           comments: "{comments} Comentarios"
-        quicklink:
-          title: Enlace Rápido
+        quickaction:
+          title: Acción Rápida
           actions:
             user_center:
               title: Perfil de Usuario

@@ -1,7 +1,7 @@
 import type { DashboardWidgetDefinition } from "@halo-dev/console-shared";
 import { markRaw } from "vue";
 import CommentStatsWidget from "./presets/comments/CommentStatsWidget.vue";
-import QuickLinkWidget from "./presets/core/quick-link/QuickLinkWidget.vue";
+import QuickActionWidget from "./presets/core/quick-action/QuickActionWidget.vue";
 import ViewsStatsWidget from "./presets/core/view-stats/ViewsStatsWidget.vue";
 import PostStatsWidget from "./presets/posts/PostStatsWidget.vue";
 import RecentPublishedWidget from "./presets/posts/RecentPublishedWidget.vue";
@@ -92,8 +92,8 @@ export const internalWidgetDefinitions: DashboardWidgetDefinition[] = [
     },
   },
   {
-    id: "core:quick-link",
-    component: markRaw(QuickLinkWidget),
+    id: "core:quick-action",
+    component: markRaw(QuickActionWidget),
     group: "core.dashboard.widgets.groups.other",
     defaultConfig: {
       enabled_items: [

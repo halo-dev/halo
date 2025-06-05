@@ -23,9 +23,9 @@ import { OverlayScrollbarsComponent } from "overlayscrollbars-vue";
 import { computed, markRaw, ref, useTemplateRef } from "vue";
 import { useI18n } from "vue-i18n";
 import { useRouter } from "vue-router";
-import QuickLinkItem from "./QuickLinkItem.vue";
+import QuickActionItem from "./QuickActionItem.vue";
 import ThemePreviewItem from "./ThemePreviewItem.vue";
-import type { QuickLinkItemDefinition } from "./types";
+import type { QuickActionItemDefinition } from "./types";
 
 const props = defineProps<{
   editMode?: boolean;
@@ -41,12 +41,12 @@ const emit = defineEmits<{
   (e: "update:config", config: Record<string, unknown>): void;
 }>();
 
-const items: QuickLinkItemDefinition[] = [
+const items: QuickActionItemDefinition[] = [
   {
     id: "core:user-center",
     icon: markRaw(IconAccountCircleLine),
     title: t(
-      "core.dashboard.widgets.presets.quicklink.actions.user_center.title"
+      "core.dashboard.widgets.presets.quickaction.actions.user_center.title"
     ),
     action: () => {
       window.location.href = "/uc/profile";
@@ -56,7 +56,7 @@ const items: QuickLinkItemDefinition[] = [
     id: "core:theme-preview",
     icon: markRaw(IconWindowLine),
     title: t(
-      "core.dashboard.widgets.presets.quicklink.actions.view_site.title"
+      "core.dashboard.widgets.presets.quickaction.actions.view_site.title"
     ),
     component: markRaw(ThemePreviewItem),
     permissions: ["system:themes:view"],
@@ -64,7 +64,9 @@ const items: QuickLinkItemDefinition[] = [
   {
     id: "core:new-post",
     icon: markRaw(IconBookRead),
-    title: t("core.dashboard.widgets.presets.quicklink.actions.new_post.title"),
+    title: t(
+      "core.dashboard.widgets.presets.quickaction.actions.new_post.title"
+    ),
     action: () => {
       router.push({
         name: "PostEditor",
@@ -75,7 +77,9 @@ const items: QuickLinkItemDefinition[] = [
   {
     id: "core:new-page",
     icon: markRaw(IconPages),
-    title: t("core.dashboard.widgets.presets.quicklink.actions.new_page.title"),
+    title: t(
+      "core.dashboard.widgets.presets.quickaction.actions.new_page.title"
+    ),
     action: () => {
       router.push({
         name: "SinglePageEditor",
@@ -87,7 +91,7 @@ const items: QuickLinkItemDefinition[] = [
     id: "core:upload-attachment",
     icon: markRaw(IconFolder),
     title: t(
-      "core.dashboard.widgets.presets.quicklink.actions.upload_attachment.title"
+      "core.dashboard.widgets.presets.quickaction.actions.upload_attachment.title"
     ),
     action: () => {
       router.push({
@@ -103,7 +107,7 @@ const items: QuickLinkItemDefinition[] = [
     id: "core:theme-manage",
     icon: markRaw(IconPalette),
     title: t(
-      "core.dashboard.widgets.presets.quicklink.actions.theme_manage.title"
+      "core.dashboard.widgets.presets.quickaction.actions.theme_manage.title"
     ),
     action: () => {
       router.push({
@@ -116,7 +120,7 @@ const items: QuickLinkItemDefinition[] = [
     id: "core:plugin-manage",
     icon: markRaw(IconPlug),
     title: t(
-      "core.dashboard.widgets.presets.quicklink.actions.plugin_manage.title"
+      "core.dashboard.widgets.presets.quickaction.actions.plugin_manage.title"
     ),
     action: () => {
       router.push({
@@ -128,7 +132,9 @@ const items: QuickLinkItemDefinition[] = [
   {
     id: "core:new-user",
     icon: markRaw(IconUserSettings),
-    title: t("core.dashboard.widgets.presets.quicklink.actions.new_user.title"),
+    title: t(
+      "core.dashboard.widgets.presets.quickaction.actions.new_user.title"
+    ),
     action: () => {
       router.push({
         name: "Users",
@@ -143,15 +149,15 @@ const items: QuickLinkItemDefinition[] = [
     id: "core:refresh-search-engine",
     icon: markRaw(IconSearch),
     title: t(
-      "core.dashboard.widgets.presets.quicklink.actions.refresh_search_engine.title"
+      "core.dashboard.widgets.presets.quickaction.actions.refresh_search_engine.title"
     ),
     action: () => {
       Dialog.warning({
         title: t(
-          "core.dashboard.widgets.presets.quicklink.actions.refresh_search_engine.dialog_title"
+          "core.dashboard.widgets.presets.quickaction.actions.refresh_search_engine.dialog_title"
         ),
         description: t(
-          "core.dashboard.widgets.presets.quicklink.actions.refresh_search_engine.dialog_content"
+          "core.dashboard.widgets.presets.quickaction.actions.refresh_search_engine.dialog_content"
         ),
         confirmText: t("core.common.buttons.confirm"),
         cancelText: t("core.common.buttons.cancel"),
@@ -159,7 +165,7 @@ const items: QuickLinkItemDefinition[] = [
           await consoleApiClient.content.indices.rebuildAllIndices();
           Toast.success(
             t(
-              "core.dashboard.widgets.presets.quicklink.actions.refresh_search_engine.success_message"
+              "core.dashboard.widgets.presets.quickaction.actions.refresh_search_engine.success_message"
             )
           );
         },
@@ -208,7 +214,7 @@ const availableItems = computed(() => {
     <template #title>
       <div class="inline-flex items-center gap-2">
         <div class="text-base font-medium flex-1 shrink">
-          {{ $t("core.dashboard.widgets.presets.quicklink.title") }}
+          {{ $t("core.dashboard.widgets.presets.quickaction.title") }}
         </div>
         <IconSettings
           v-if="editMode"
@@ -228,7 +234,7 @@ const availableItems = computed(() => {
         class="grid grid-cols-1 gap-2 overflow-hidden @sm:grid-cols-2 @md:grid-cols-3"
       >
         <template v-for="item in availableItems" :key="item.id">
-          <QuickLinkItem v-if="!item.component" :item="item" />
+          <QuickActionItem v-if="!item.component" :item="item" />
           <component :is="item.component" v-else :item="item" />
         </template>
       </div>
@@ -243,8 +249,8 @@ const availableItems = computed(() => {
   >
     <div>
       <FormKit
-        id="quick-link-widget-config"
-        name="quick-link-widget-config"
+        id="quick-action-widget-config"
+        name="quick-action-widget-config"
         type="form"
         :preserve="true"
         @submit="onConfigFormSubmit"
@@ -253,7 +259,7 @@ const availableItems = computed(() => {
           type="select"
           :label="
             $t(
-              'core.dashboard.widgets.presets.quicklink.config.fields.enabled_items.label'
+              'core.dashboard.widgets.presets.quickaction.config.fields.enabled_items.label'
             )
           "
           name="enabled_items"
@@ -269,7 +275,7 @@ const availableItems = computed(() => {
       <VSpace>
         <VButton
           type="secondary"
-          @click="$formkit.submit('quick-link-widget-config')"
+          @click="$formkit.submit('quick-action-widget-config')"
         >
           {{ $t("core.common.buttons.save") }}
         </VButton>

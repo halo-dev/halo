@@ -69,7 +69,7 @@ core:
           title: 通知
           empty:
             title: 當前沒有未讀的消息
-        quicklink:
+        quickaction:
           title: 快捷訪問
           actions:
             user_center:

@@ -1,6 +1,6 @@
 import type { Component } from "vue";
 
-export interface QuickLinkItemDefinition {
+export interface QuickActionItemDefinition {
   id: string;
   icon?: Component;
   component?: Component;

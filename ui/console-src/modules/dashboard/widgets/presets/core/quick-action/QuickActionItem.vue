@@ -1,9 +1,9 @@
 <script lang="ts" setup>
 import { usePermission } from "@/utils/permission";
 import { IconArrowRight } from "@halo-dev/components";
-import type { QuickLinkItemDefinition } from "./types";
+import type { QuickActionItemDefinition } from "./types";
 defineProps<{
-  item: QuickLinkItemDefinition;
+  item: QuickActionItemDefinition;
 }>();
 
 const { currentUserHasPermission } = usePermission();
