@@ -31,10 +31,7 @@ core:
     title: Panel de control
     actions:
       setting: Configuración
-      done: Hecho
-      add_widget: Agregar Widget
     widgets:
-      modal_title: Widgets
       groups:
         post: Publicación
         page: Página

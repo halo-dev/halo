@@ -70,7 +70,7 @@ const groupWidgetDefinitionsKeys = computed(() => {
     height="calc(100vh - 20px)"
     :width="1380"
     :layer-closable="true"
-    :title="$t('core.dashboard.widgets.modal_title')"
+    :title="$t('core.dashboard_designer.widgets_modal.title')"
     @close="emit('close')"
   >
     <VTabbar

@@ -48,10 +48,7 @@ core:
     title: 仪表盘
     actions:
       setting: 设置
-      done: 完成
-      add_widget: 添加组件
     widgets:
-      modal_title: 小组件
       groups:
         post: 文章
         page: 页面
@@ -102,6 +99,21 @@ core:
           title: 评论
         views_stats:
           title: 浏览量
+  dashboard_designer:
+    title: 编辑仪表盘
+    actions:
+      add_widget: 添加部件
+    widgets_modal:
+      title: 小部件
+    config_modal:
+      title: 部件配置
+    operations:
+      back:
+        title: 布局未保存
+        description: 当前编辑的布局还未保存，放弃后，当前布局将丢失，是否继续？
+        confirm_text: 放弃
+      change_breakpoint:
+        tips_not_saved: 请先保存当前布局
   post:
     title: 文章
     actions:
@@ -1183,8 +1195,7 @@ core:
                 manual:
                   label: 如果无法扫描二维码，点击查看代替步骤
                   help: 使用以下代码手动配置验证器应用：
-              tips: >-
-                请妥善保管您的两步验证设备，如果设备丢失或损坏，你将无法登录系统。建议你在多个设备上安装验证器应用，或保存好密钥的备份，以防主要设备无法使用。
+              tips: 请妥善保管您的两步验证设备，如果设备丢失或损坏，你将无法登录系统。建议你在多个设备上安装验证器应用，或保存好密钥的备份，以防主要设备无法使用。
     pat:
       operations:
         delete:

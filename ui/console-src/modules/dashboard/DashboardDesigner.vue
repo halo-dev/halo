@@ -2,38 +2,95 @@
 import { randomUUID } from "@/utils/id";
 import { ucApiClient } from "@halo-dev/api-client";
 import {
+  Dialog,
   IconAddCircle,
   IconComputer,
   IconDashboard,
   IconPhone,
   IconSave,
   IconTablet,
+  Toast,
   VButton,
   VSpace,
   VTabbar,
 } from "@halo-dev/components";
 import type {
-  DashboardResponsiveLayout,
   DashboardWidget,
   DashboardWidgetDefinition,
 } from "@halo-dev/console-shared";
 import { useQueryClient } from "@tanstack/vue-query";
-import { cloneDeep } from "lodash-es";
-import { computed, defineComponent, h, markRaw, ref } from "vue";
-import { useRouter } from "vue-router";
+import { useEventListener } from "@vueuse/core";
+import { cloneDeep, isEqual } from "lodash-es";
+import {
+  computed,
+  defineComponent,
+  h,
+  markRaw,
+  nextTick,
+  ref,
+  watch,
+} from "vue";
+import { useI18n } from "vue-i18n";
+import { onBeforeRouteLeave, useRouter } from "vue-router";
+import RiArrowGoBackLine from "~icons/ri/arrow-go-back-line";
 import WidgetItem from "./components/WidgetItem.vue";
 import WidgetsHubModal from "./components/WidgetsHubModal.vue";
 import { useDashboardWidgetsFetch } from "./composables/use-dashboard-widgets-fetch";
 import "./styles/dashboard.css";
 
+const { t } = useI18n();
 const queryClient = useQueryClient();
 const router = useRouter();
 
-const selectBreakpoint = ref();
 const currentBreakpoint = ref("lg");
 const originalBreakpoint = ref();
 
-function breakpointChangedEvent(breakpoint: string) {
+const { layouts, layout, originalLayout, isLoading } =
+  useDashboardWidgetsFetch(currentBreakpoint);
+
+const hasLayoutChanged = computed(() => {
+  if (!originalLayout.value || isLoading.value) {
+    return false;
+  }
+  return !isEqual(originalLayout.value, layout.value);
+});
+
+watch(
+  () => layout.value,
+  () => {
+    layouts.value[currentBreakpoint.value] = layout.value;
+    if (currentBreakpoint.value === "xs") {
+      layouts.value.xxs = layout.value;
+    }
+  },
+  {
+    immediate: true,
+    deep: true,
+  }
+);
+
+const selectBreakpoint = ref();
+
+async function handleBreakpointChange(breakpoint: string | number) {
+  if (isLoading.value) {
+    return;
+  }
+
+  if (hasLayoutChanged.value) {
+    Toast.error(
+      t("core.dashboard_designer.operations.change_breakpoint.tips_not_saved")
+    );
+    return;
+  }
+
+  originalLayout.value = undefined;
+
+  await nextTick();
+
+  selectBreakpoint.value = breakpoint;
+}
+
+function onBreakpointChange(breakpoint: string) {
   if (!originalBreakpoint.value) {
     originalBreakpoint.value = breakpoint;
   }
@@ -83,6 +140,9 @@ const designContainerStyles = computed(() => {
   if (originalBreakpoint.value === "xs") {
     return {};
   }
+  if (selectBreakpoint.value === "lg") {
+    return {};
+  }
   const device = deviceOptions.value.find(
     (option) => option.id === selectBreakpoint.value
   );
@@ -94,8 +154,6 @@ const designContainerStyles = computed(() => {
     padding: "2px",
   };
 });
-
-const { layouts, layout } = useDashboardWidgetsFetch(currentBreakpoint);
 
 function handleAddWidget(widgetDefinition: DashboardWidgetDefinition) {
   const zeroXWidgets = layout.value.filter((widget) => widget.x === 0);
@@ -122,10 +180,6 @@ function handleAddWidget(widgetDefinition: DashboardWidgetDefinition) {
   const newLayout = [...layout.value, newWidget];
 
   layout.value = newLayout;
-  layouts.value = {
-    ...layouts.value,
-    [currentBreakpoint.value]: newLayout,
-  };
 
   widgetsHubModalVisible.value = false;
 
@@ -136,27 +190,19 @@ function handleAddWidget(widgetDefinition: DashboardWidgetDefinition) {
 }
 
 function handleRemove(item: DashboardWidget) {
-  const cloneWidgets = cloneDeep(layout.value);
-  cloneWidgets.splice(
-    cloneWidgets.findIndex((widget) => widget.i === item.i),
+  const widgetsToUpdate = cloneDeep(layout.value);
+  widgetsToUpdate.splice(
+    widgetsToUpdate.findIndex((widget) => widget.i === item.i),
     1
   );
-  layout.value = cloneWidgets;
-  layouts.value = {
-    ...layouts.value,
-    [currentBreakpoint.value]: cloneWidgets,
-  };
+  layout.value = widgetsToUpdate;
 }
 
 function handleUpdate(item: DashboardWidget) {
-  const cloneWidgets = cloneDeep(layout.value);
-  const index = cloneWidgets.findIndex((widget) => widget.i === item.i);
-  cloneWidgets[index] = item;
-  layout.value = cloneWidgets;
-  layouts.value = {
-    ...layouts.value,
-    [currentBreakpoint.value]: cloneWidgets,
-  };
+  const widgetsToUpdate = cloneDeep(layout.value);
+  const index = widgetsToUpdate.findIndex((widget) => widget.i === item.i);
+  widgetsToUpdate[index] = item;
+  layout.value = widgetsToUpdate;
 }
 
 const widgetsHubModalVisible = ref(false);
@@ -167,69 +213,100 @@ async function handleSave() {
   try {
     isSubmitting.value = true;
 
-    const { data } = await ucApiClient.user.preference.getMyPreference({
-      group: "dashboard-widgets",
-    });
-
-    const dashboardData: DashboardResponsiveLayout = {
-      ...data,
-      [currentBreakpoint.value]: layout.value,
-    };
-
-    if (currentBreakpoint.value === "xs") {
-      dashboardData.xxs = layout.value;
-    }
-
     await ucApiClient.user.preference.updateMyPreference({
       group: "dashboard-widgets",
-      body: dashboardData,
+      body: layouts.value,
     });
+
+    originalLayout.value = undefined;
 
     await queryClient.invalidateQueries({
       queryKey: ["core:dashboard:widgets"],
     });
-
-    router.replace({ name: "Dashboard" });
   } catch (error) {
     console.error("Failed to save dashboard widgets config", error);
   } finally {
     isSubmitting.value = false;
   }
 }
+
+function handleBack() {
+  router.replace({ name: "Dashboard" });
+}
+
+onBeforeRouteLeave((_, __, next) => {
+  if (hasLayoutChanged.value) {
+    handleShowLeaveWarning(next);
+    return;
+  }
+  next();
+});
+
+function handleShowLeaveWarning(next: () => void) {
+  Dialog.warning({
+    title: t("core.dashboard_designer.operations.back.title"),
+    description: t("core.dashboard_designer.operations.back.description"),
+    confirmText: t("core.dashboard_designer.operations.back.confirm_text"),
+    confirmType: "danger",
+    cancelText: t("core.common.buttons.cancel"),
+    onConfirm: () => {
+      next();
+    },
+  });
+}
+
+useEventListener(window, "beforeunload", (e) => {
+  if (hasLayoutChanged.value) {
+    e.preventDefault();
+    e.returnValue = t("core.dashboard_designer.operations.back.description");
+    return t("core.dashboard_designer.operations.back.description");
+  }
+});
 </script>
 <template>
   <div
-    class="flex items-center justify-between bg-white p-4 h-14 sticky top-0 z-10"
+    class="flex items-center justify-between bg-white px-4 py-1.5 gap-5 flex-wrap sticky top-0 z-10"
   >
-    <div class="self-center">
-      <h2 class="flex items-center truncate text-xl font-bold text-gray-800">
-        <IconDashboard class="mr-2 self-center" />
-        <span>{{ `编辑仪表盘` }}</span>
-      </h2>
-    </div>
-    <div class="hidden sm:block">
+    <h2 class="flex items-center truncate text-xl font-bold text-gray-800">
+      <IconDashboard class="mr-2 self-center" />
+      <span>{{ $t("core.dashboard_designer.title") }}</span>
+    </h2>
+    <div
+      class="hidden sm:block"
+      :class="{ 'opacity-50 !cursor-progress': isLoading }"
+    >
       <VTabbar
-        v-model:active-id="selectBreakpoint"
+        :active-id="selectBreakpoint"
         :items="deviceOptions as any"
         type="outline"
+        @change="handleBreakpointChange"
       ></VTabbar>
     </div>
-    <div class="self-center">
-      <VSpace>
-        <VButton @click="widgetsHubModalVisible = true">
-          <template #icon>
-            <IconAddCircle class="h-full w-full" />
-          </template>
-          {{ $t("core.dashboard.actions.add_widget") }}
-        </VButton>
-        <VButton type="secondary" :loading="isSubmitting" @click="handleSave">
-          <template #icon>
-            <IconSave class="h-full w-full" />
-          </template>
-          {{ $t("core.common.buttons.save") }}
-        </VButton>
-      </VSpace>
-    </div>
+    <VSpace>
+      <VButton @click="handleBack">
+        <template #icon>
+          <RiArrowGoBackLine class="h-full w-full" />
+        </template>
+        {{ $t("core.common.buttons.back") }}
+      </VButton>
+      <VButton @click="widgetsHubModalVisible = true">
+        <template #icon>
+          <IconAddCircle class="h-full w-full" />
+        </template>
+        {{ $t("core.dashboard_designer.actions.add_widget") }}
+      </VButton>
+      <VButton
+        :disabled="!hasLayoutChanged"
+        type="secondary"
+        :loading="isSubmitting"
+        @click="handleSave"
+      >
+        <template #icon>
+          <IconSave class="h-full w-full" />
+        </template>
+        {{ $t("core.common.buttons.save") }}
+      </VButton>
+    </VSpace>
   </div>
 
   <div class="dashboard m-4 transition-all" :style="designContainerStyles">
@@ -245,7 +322,7 @@ async function handleSave() {
       :use-css-transforms="true"
       :vertical-compact="true"
       :breakpoints="{ lg: 1200, md: 996, sm: 768, xs: 480 }"
-      @breakpoint-changed="breakpointChangedEvent"
+      @breakpoint-changed="onBreakpointChange"
     >
       <WidgetItem
         v-for="item in layout"

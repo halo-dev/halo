@@ -28,7 +28,12 @@ function onSubmit(config: Record<string, unknown>) {
 }
 </script>
 <template>
-  <VModal ref="modal" mount-to-body title="Config" @close="emit('close')">
+  <VModal
+    ref="modal"
+    mount-to-body
+    :title="$t('core.dashboard_designer.config_modal.title')"
+    @close="emit('close')"
+  >
     <div>
       <FormKit
         v-if="formSchema"

@@ -43,7 +43,7 @@ export default definePlugin({
           name: "DashboardDesigner",
           component: DashboardDesigner,
           meta: {
-            title: "Dashboard Designer",
+            title: "core.dashboard_designer.title",
             searchable: false,
           },
         },

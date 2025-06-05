@@ -50,10 +50,7 @@ core:
     title: Dashboard
     actions:
       setting: Setting
-      done: Done
-      add_widget: Add Widget
     widgets:
-      modal_title: Widgets
       groups:
         post: Post
         page: Page
@@ -106,6 +103,23 @@ core:
           title: Comments
         views_stats:
           title: Visits
+  dashboard_designer:
+    title: Edit Dashboard
+    actions:
+      add_widget: Add Widget
+    widgets_modal:
+      title: Widgets
+    config_modal:
+      title: Widget Config
+    operations:
+      back:
+        title: Layout not saved
+        description: >-
+          The current layout has not been saved, if you leave, the current layout
+          will be lost, do you want to continue?
+        confirm_text: Leave
+      change_breakpoint:
+        tips_not_saved: Please save the current layout first
   post:
     title: Posts
     actions:

@@ -45,13 +45,10 @@ core:
     profile:
       aggregate_role: 聚合角色
   dashboard:
-    title: 儀表板
+    title: 儀表盤
     actions:
       setting: 設置
-      done: 完成
-      add_widget: 添加組件
     widgets:
-      modal_title: 小組件
       groups:
         post: 文章
         page: 頁面
@@ -102,6 +99,21 @@ core:
           title: 留言
         views_stats:
           title: 瀏覽量
+  dashboard_designer:
+    title: 編輯儀表盤
+    actions:
+      add_widget: 添加部件
+    widgets_modal:
+      title: 小部件
+    config_modal:
+      title: 部件配置
+    operations:
+      back:
+        title: 佈局未儲存
+        description: 當前編輯的佈局還未儲存，放棄後，當前佈局將遺失，是否繼續？
+        confirm_text: 放棄
+      change_breakpoint:
+        tips_not_saved: 請先儲存當前佈局
   post:
     title: 文章
     actions:
@@ -1168,8 +1180,7 @@ core:
                 manual:
                   label: 如果您無法掃描二維碼，請按一下查看替代步驟。
                   help: 使用以下程式碼手動配置驗證器應用程式：
-              tips: >-
-                請妥善保管您的兩步驟驗證裝置，如果裝置遺失或損壞，您將無法登入系統。建議您在多個裝置上安裝驗證器應用程式，或保存好金鑰的備份，以防主要裝置無法使用。
+              tips: 請妥善保管您的兩步驟驗證裝置，如果裝置遺失或損壞，您將無法登入系統。建議您在多個裝置上安裝驗證器應用程式，或保存好金鑰的備份，以防主要裝置無法使用。
     pat:
       operations:
         delete:
@@ -1588,9 +1599,7 @@ core:
         aspect_ratio_portrait: 裁剪為縱向 (9:16)
     h2_warning_alert:
       title: 警告：正在使用 H2 資料庫
-      description: >-
-        H2 資料庫僅適用於開發環境和測試環境，不建議在生產環境中使用，H2
-        非常容易因為操作不當而導致資料檔案損壞。如果必須要使用，請按時進行資料備份。
+      description: H2 資料庫僅適用於開發環境和測試環境，不建議在生產環境中使用，H2 非常容易因為操作不當而導致資料檔案損壞。如果必須要使用，請按時進行資料備份。
   composables:
     content_cache:
       toast_recovered: 已從緩存中恢復未保存的內容

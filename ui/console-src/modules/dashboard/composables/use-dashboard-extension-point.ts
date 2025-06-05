@@ -11,7 +11,6 @@ export function useDashboardExtensionPoint() {
 
   onMounted(async () => {
     const items: DashboardWidgetDefinition[] = [];
-    console.log(pluginModules);
     for (const pluginModule of pluginModules) {
       try {
         const callbackFunction =
@@ -22,13 +21,11 @@ export function useDashboardExtensionPoint() {
         }
 
         items.push(...(await callbackFunction()));
-        console.log(items);
       } catch (error) {
         console.error(`Error processing plugin module:`, pluginModule, error);
       }
     }
     widgetDefinitions.value = items;
-    console.log(items);
   });
 
   return { widgetDefinitions };

@@ -31,6 +31,21 @@ core:
           title: Notifications
           empty:
             title: No unread notifications
+  dashboard_designer:
+    title: Edit Dashboard
+    actions:
+      add_widget: Add Widget
+    widgets_modal:
+      title: Widgets
+    config_modal:
+      title: Widget Config
+    operations:
+      back:
+        title: Layout not saved
+        description: The current layout has not been saved, if you leave, the current layout will be lost, do you want to continue?
+        confirm_text: Leave
+      change_breakpoint:
+        tips_not_saved: Please save the current layout first
   post:
     operations:
       publish_in_batch:
