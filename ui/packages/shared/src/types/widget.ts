@@ -39,3 +39,12 @@ export interface DashboardWidgetDefinition {
   };
   permissions?: string[];
 }
+
+export interface DashboardWidgetQuickActionItem {
+  id: string;
+  icon?: Raw<Component>;
+  component?: Raw<Component>;
+  title?: string;
+  action?: () => void;
+  permissions?: string[];
+}

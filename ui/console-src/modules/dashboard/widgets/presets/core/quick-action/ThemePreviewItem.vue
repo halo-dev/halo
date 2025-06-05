@@ -1,11 +1,11 @@
 <script lang="ts" setup>
 import ThemePreviewModal from "@console/modules/interface/themes/components/preview/ThemePreviewModal.vue";
+import type { DashboardWidgetQuickActionItem } from "packages/shared/dist";
 import { ref } from "vue";
 import QuickActionItem from "./QuickActionItem.vue";
-import type { QuickActionItemDefinition } from "./types";
 
 defineProps<{
-  item: QuickActionItemDefinition;
+  item: DashboardWidgetQuickActionItem;
 }>();
 
 const visible = ref(false);

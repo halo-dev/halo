@@ -1,9 +1,9 @@
 <script lang="ts" setup>
 import { usePermission } from "@/utils/permission";
 import { IconArrowRight } from "@halo-dev/components";
-import type { QuickActionItemDefinition } from "./types";
+import type { DashboardWidgetQuickActionItem } from "packages/shared/dist";
 defineProps<{
-  item: QuickActionItemDefinition;
+  item: DashboardWidgetQuickActionItem;
 }>();
 
 const { currentUserHasPermission } = usePermission();

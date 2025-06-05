@@ -20,12 +20,13 @@ import {
   VSpace,
 } from "@halo-dev/components";
 import { OverlayScrollbarsComponent } from "overlayscrollbars-vue";
+import type { DashboardWidgetQuickActionItem } from "packages/shared/dist";
 import { computed, markRaw, ref, useTemplateRef } from "vue";
 import { useI18n } from "vue-i18n";
 import { useRouter } from "vue-router";
 import QuickActionItem from "./QuickActionItem.vue";
 import ThemePreviewItem from "./ThemePreviewItem.vue";
-import type { QuickActionItemDefinition } from "./types";
+import { useDashboardQuickActionExtensionPoint } from "./composables/use-dashboard-extension-point";
 
 const props = defineProps<{
   editMode?: boolean;
@@ -41,7 +42,7 @@ const emit = defineEmits<{
   (e: "update:config", config: Record<string, unknown>): void;
 }>();
 
-const items: QuickActionItemDefinition[] = [
+const presetItems: DashboardWidgetQuickActionItem[] = [
   {
     id: "core:user-center",
     icon: markRaw(IconAccountCircleLine),
@@ -175,6 +176,12 @@ const items: QuickActionItemDefinition[] = [
   },
 ];
 
+const { quickActionItems } = useDashboardQuickActionExtensionPoint();
+
+const allQuickActionItems = computed(() => {
+  return [...presetItems, ...quickActionItems.value];
+});
+
 const modal = useTemplateRef<InstanceType<typeof VModal> | null>("modal");
 const configVisible = ref(false);
 
@@ -184,7 +191,7 @@ function onConfigFormSubmit(data: { enabled_items: string[] }) {
 }
 
 const itemOptions = computed(() => {
-  return items.map((item) => ({
+  return allQuickActionItems.value.map((item) => ({
     label: item.title,
     value: item.id,
   })) as FormKitOptionsList;
@@ -203,8 +210,7 @@ const availableItems = computed(() => {
   enabledItems.forEach((id, index) => {
     indexMap.set(id, index);
   });
-
-  return items
+  return allQuickActionItems.value
     .filter((item) => indexMap.has(item.id))
     .sort((a, b) => indexMap.get(a.id) - indexMap.get(b.id));
 });
