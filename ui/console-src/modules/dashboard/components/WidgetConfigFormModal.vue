@@ -31,7 +31,7 @@ function onSubmit(config: Record<string, unknown>) {
   <VModal ref="modal" mount-to-body title="Config" @close="emit('close')">
     <div>
       <FormKit
-        v-if="formSchema?.length"
+        v-if="formSchema"
         :id="widgetDefinition.name"
         :value="initialConfig"
         :name="widgetDefinition.name"
