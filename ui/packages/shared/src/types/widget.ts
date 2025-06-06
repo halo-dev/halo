@@ -40,11 +40,27 @@ export interface DashboardWidgetDefinition {
   permissions?: string[];
 }
 
-export interface DashboardWidgetQuickActionItem {
+interface DashboardWidgetQuickActionBaseItem {
   id: string;
-  icon?: Raw<Component>;
-  component?: Raw<Component>;
-  title?: string;
-  action?: () => void;
   permissions?: string[];
 }
+
+interface DashboardWidgetQuickActionComponentItem
+  extends DashboardWidgetQuickActionBaseItem {
+  component: Raw<Component>;
+  icon?: Raw<Component>;
+  title?: string;
+  action?: () => void;
+}
+
+interface DashboardWidgetQuickActionStandardItem
+  extends DashboardWidgetQuickActionBaseItem {
+  component?: never;
+  icon: Raw<Component>;
+  title: string;
+  action: () => void;
+}
+
+export type DashboardWidgetQuickActionItem =
+  | DashboardWidgetQuickActionComponentItem
+  | DashboardWidgetQuickActionStandardItem;
