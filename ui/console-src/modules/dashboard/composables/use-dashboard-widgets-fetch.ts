@@ -4,13 +4,13 @@ import type {
   DashboardWidget,
 } from "@halo-dev/console-shared";
 import { useQuery } from "@tanstack/vue-query";
-import { cloneDeep } from "lodash-es";
 import { computed, ref, type Ref } from "vue";
+import { DefaultResponsiveLayouts } from "../widgets/defaults";
 
 export function useDashboardWidgetsFetch(breakpoint: Ref<string>) {
   const layouts = ref<DashboardResponsiveLayout>({});
   const layout = ref<DashboardWidget[]>([]);
-  const originalLayout = ref<DashboardWidget[] | undefined>();
+  const originalLayout = ref<DashboardWidget[]>([]);
 
   const { isLoading } = useQuery({
     queryKey: ["core:dashboard:widgets", breakpoint],
@@ -19,20 +19,19 @@ export function useDashboardWidgetsFetch(breakpoint: Ref<string>) {
         group: "dashboard-widgets",
       });
       if (!data) {
-        return {};
+        return null;
       }
       return data as DashboardResponsiveLayout;
     },
     cacheTime: 0,
     onSuccess: (data) => {
-      layouts.value = data;
-      layout.value = data[breakpoint.value] || data["lg"] || [];
+      layouts.value = data || DefaultResponsiveLayouts;
 
-      if (!originalLayout.value) {
-        originalLayout.value = cloneDeep(
-          layout.value.length > 0 ? layout.value : undefined
-        );
-      }
+      const layoutData =
+        layouts.value[breakpoint.value] || layouts.value["lg"] || [];
+
+      layout.value = layoutData;
+      originalLayout.value = layoutData;
     },
     enabled: computed(() => !!breakpoint.value),
   });

@@ -200,8 +200,6 @@ const itemOptions = computed(() => {
 const availableItems = computed(() => {
   const enabledItems = props.config?.enabled_items;
 
-  console.log(enabledItems);
-
   if (!enabledItems || enabledItems.length === 0) {
     return [];
   }

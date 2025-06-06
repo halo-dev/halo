@@ -18,7 +18,7 @@ const { data: stats } = useDashboardStats();
             {{ $t("core.dashboard.widgets.presets.comment_stats.title") }}
           </span>
           <p class="text-2xl font-medium text-gray-900">
-            {{ stats?.approvedComments }}
+            {{ stats?.approvedComments || 0 }}
           </p>
         </div>
       </div>

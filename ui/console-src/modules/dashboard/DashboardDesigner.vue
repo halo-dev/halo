@@ -26,7 +26,6 @@ import {
   defineComponent,
   h,
   markRaw,
-  nextTick,
   provide,
   ref,
   useTemplateRef,
@@ -69,7 +68,7 @@ const { layouts, layout, originalLayout, isLoading } =
   useDashboardWidgetsFetch(currentBreakpoint);
 
 const hasLayoutChanged = computed(() => {
-  if (!originalLayout.value || isLoading.value) {
+  if (isLoading.value) {
     return false;
   }
   return !isEqual(originalLayout.value, layout.value);
@@ -105,10 +104,6 @@ async function handleBreakpointChange(breakpoint: string | number) {
     );
     return;
   }
-
-  originalLayout.value = undefined;
-
-  await nextTick();
 
   selectBreakpoint.value = breakpoint;
 }
@@ -240,8 +235,6 @@ async function handleSave() {
       body: layouts.value,
     });
 
-    originalLayout.value = undefined;
-
     await queryClient.invalidateQueries({
       queryKey: ["core:dashboard:widgets"],
     });
@@ -345,6 +338,7 @@ useEventListener(window, "beforeunload", (e) => {
       :use-css-transforms="true"
       :vertical-compact="true"
       :breakpoints="{ lg: 1200, md: 996, sm: 768, xs: 480 }"
+      :cols="{ lg: 12, md: 12, sm: 6, xs: 4 }"
       @breakpoint-changed="onBreakpointChange"
     >
       <WidgetEditableItem
