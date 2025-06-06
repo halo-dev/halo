@@ -1770,6 +1770,7 @@ core:
       tip: 提示
       warning: 警告
       system_protection: 系统保留
+      all: 全部
     tooltips:
       unpublished_content_tip: 当前有内容已保存，但还未发布。
       publishing: 发布中

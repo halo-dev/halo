@@ -684,6 +684,7 @@ core:
       starting_up: Starting
     text:
       system_protection: System protection
+      all: All
   uc_post:
     creation_modal:
       title: Create post

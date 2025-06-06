@@ -1910,6 +1910,7 @@ core:
       tip: Tip
       warning: Warning
       system_protection: System protection
+      all: All
     tooltips:
       unpublished_content_tip: There is content that has been saved but not yet published.
       publishing: Publishing

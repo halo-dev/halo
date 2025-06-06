@@ -72,7 +72,7 @@ const groupWidgetDefinitionsKeys = computed(() => {
     <VTabbar
       v-model:active-id="activeId"
       :items="[
-        { id: '', label: 'All' },
+        { id: '', label: $t('core.common.text.all') },
         ...groupWidgetDefinitionsKeys.map((group) => {
           return { id: group, label: $t(group, group) };
         }),
