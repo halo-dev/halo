@@ -478,8 +478,8 @@ core:
         title: 確定要審核通過該留言的所有回覆嗎？
       delete_reply:
         title: 刪除回覆
-      approve_reply:
-        button: 審核通過
+      review:
+        button: 審核
       reply:
         button: 回覆
     filters:
@@ -1765,6 +1765,7 @@ core:
       warning: 警告
       system_protection: 系統保留
       all: 全部
+      detail: 詳情
     tooltips:
       unpublished_content_tip: 當前有內容已保存，但還未發布。
       publishing: 發布中

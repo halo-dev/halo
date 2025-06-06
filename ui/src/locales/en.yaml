@@ -521,8 +521,8 @@ core:
           review?
       delete_reply:
         title: Delete reply
-      approve_reply:
-        button: Approve
+      review:
+        button: Review
       reply:
         button: Reply
     filters:
@@ -1920,6 +1920,7 @@ core:
       warning: Warning
       system_protection: System protection
       all: All
+      detail: Detail
     tooltips:
       unpublished_content_tip: There is content that has been saved but not yet published.
       publishing: Publishing

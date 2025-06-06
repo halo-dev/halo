@@ -1,25 +1,11 @@
 <script lang="ts" setup>
 import SubmitButton from "@/components/button/SubmitButton.vue";
-import type {
-  ListedComment,
-  ListedReply,
-  ReplyRequest,
-} from "@halo-dev/api-client";
-import {
-  IconMotionLine,
-  Toast,
-  VButton,
-  VDropdown,
-  VModal,
-  VSpace,
-} from "@halo-dev/components";
-// @ts-ignore
-import { setFocus } from "@/formkit/utils/focus";
-import i18n from "@emoji-mart/data/i18n/zh.json";
+import type { ListedComment, ListedReply } from "@halo-dev/api-client";
 import { consoleApiClient } from "@halo-dev/api-client";
-import { Picker } from "emoji-mart";
-import { onMounted, ref } from "vue";
+import { Toast, VButton, VModal, VSpace } from "@halo-dev/components";
+import { ref } from "vue";
 import { useI18n } from "vue-i18n";
+import ReplyFormItems from "./ReplyFormItems.vue";
 
 const { t } = useI18n();
 
@@ -40,31 +26,20 @@ const emit = defineEmits<{
 }>();
 
 const modal = ref<InstanceType<typeof VModal> | null>(null);
-const formState = ref<ReplyRequest>({
-  raw: "",
-  content: "",
-  allowNotification: true,
-  quoteReply: undefined,
-});
-const saving = ref(false);
+const isSubmitting = ref(false);
 
-onMounted(() => {
-  setFocus("content-input");
-});
-
-const handleCreateReply = async () => {
+const onSubmit = async (data: { raw: string }) => {
   try {
-    saving.value = true;
-
-    if (props.reply) {
-      formState.value.quoteReply = props.reply.reply.metadata.name;
-    }
-
-    formState.value.content = formState.value.raw;
+    isSubmitting.value = true;
 
     await consoleApiClient.content.comment.createReply({
       name: props.comment?.comment.metadata.name as string,
-      replyRequest: formState.value,
+      replyRequest: {
+        raw: data.raw,
+        content: data.raw,
+        allowNotification: true,
+        quoteReply: props.reply?.reply.metadata.name,
+      },
     });
 
     modal.value?.close();
@@ -75,34 +50,8 @@ const handleCreateReply = async () => {
   } catch (error) {
     console.error("Failed to create comment reply", error);
   } finally {
-    saving.value = false;
+    isSubmitting.value = false;
   }
-};
-
-// Emoji picker
-const emojiPickerRef = ref<HTMLElement | null>(null);
-
-const handleCreateEmojiPicker = async () => {
-  if (emojiPickerRef.value?.childElementCount) {
-    return;
-  }
-
-  const data = await import("@emoji-mart/data");
-
-  const emojiPicker = new Picker({
-    data: Object.assign({}, data),
-    theme: "light",
-    autoFocus: true,
-    i18n: i18n,
-    onEmojiSelect: onEmojiSelect,
-  });
-
-  emojiPickerRef.value?.appendChild(emojiPicker as unknown as Node);
-};
-
-const onEmojiSelect = (emoji: { native: string }) => {
-  formState.value.raw += emoji.native;
-  setFocus("content-input");
 };
 </script>
 
@@ -119,32 +68,17 @@ const onEmojiSelect = (emoji: { native: string }) => {
       name="create-reply-form"
       type="form"
       :config="{ validationVisibility: 'submit' }"
-      @submit="handleCreateReply"
+      :classes="{
+        form: '!divide-none',
+      }"
+      @submit="onSubmit"
     >
-      <FormKit
-        id="content-input"
-        v-model="formState.raw"
-        type="textarea"
-        :validation-label="$t('core.comment.reply_modal.fields.content.label')"
-        :rows="6"
-        value=""
-        validation="required|length:0,1024"
-      ></FormKit>
+      <ReplyFormItems />
     </FormKit>
-    <div class="mt-2 flex justify-end">
-      <VDropdown :classes="['!p-0']" @show="handleCreateEmojiPicker">
-        <IconMotionLine
-          class="h-5 w-5 cursor-pointer text-gray-500 transition-all hover:text-gray-900"
-        />
-        <template #popper>
-          <div ref="emojiPickerRef"></div>
-        </template>
-      </VDropdown>
-    </div>
     <template #footer>
       <VSpace>
         <SubmitButton
-          :loading="saving"
+          :loading="isSubmitting"
           type="secondary"
           :text="$t('core.common.buttons.submit')"
           @submit="$formkit.submit('create-reply-form')"

@@ -9,6 +9,7 @@ import {
   Dialog,
   IconReplyLine,
   Toast,
+  VDropdownDivider,
   VDropdownItem,
   VEntity,
   VEntityField,
@@ -21,6 +22,7 @@ import { computed, inject, markRaw, ref, type Ref, toRefs } from "vue";
 import { useI18n } from "vue-i18n";
 import OwnerButton from "./OwnerButton.vue";
 import ReplyCreationModal from "./ReplyCreationModal.vue";
+import ReplyDetailModal from "./ReplyDetailModal.vue";
 
 const { currentUserHasPermission } = usePermission();
 const { t } = useI18n();
@@ -76,37 +78,12 @@ const handleDelete = async () => {
       } catch (error) {
         console.error("Failed to delete comment reply", error);
       } finally {
-        queryClient.invalidateQueries({ queryKey: ["comment-replies"] });
+        queryClient.invalidateQueries({
+          queryKey: ["comment-replies", props.comment.comment.metadata.name],
+        });
       }
     },
   });
-};
-
-const handleApprove = async () => {
-  try {
-    await coreApiClient.content.reply.patchReply({
-      name: props.reply.reply.metadata.name,
-      jsonPatchInner: [
-        {
-          op: "add",
-          path: "/spec/approved",
-          value: true,
-        },
-        {
-          op: "add",
-          path: "/spec/approvedTime",
-          // TODO: 暂时由前端设置发布时间。see https://github.com/halo-dev/halo/pull/2746
-          value: new Date().toISOString(),
-        },
-      ],
-    });
-
-    Toast.success(t("core.common.toast.operation_success"));
-  } catch (error) {
-    console.error("Failed to approve comment reply", error);
-  } finally {
-    queryClient.invalidateQueries({ queryKey: ["comment-replies"] });
-  }
 };
 
 // Show hovered reply
@@ -141,13 +118,28 @@ const { operationItems } = useOperationItemExtensionPoint<ListedReply>(
     {
       priority: 0,
       component: markRaw(VDropdownItem),
-      label: t("core.comment.operations.approve_reply.button"),
+      label: t("core.comment.operations.review.button"),
       permissions: ["system:comments:manage"],
-      action: handleApprove,
+      action: () => {
+        detailModalVisible.value = true;
+      },
       hidden: props.reply?.reply.spec.approved,
     },
     {
       priority: 10,
+      component: markRaw(VDropdownItem),
+      label: t("core.common.text.detail"),
+      hidden: !props.reply?.reply.spec.approved,
+      action: () => {
+        detailModalVisible.value = true;
+      },
+    },
+    {
+      priority: 20,
+      component: markRaw(VDropdownDivider),
+    },
+    {
+      priority: 30,
       component: markRaw(VDropdownItem),
       props: {
         type: "danger",
@@ -158,6 +150,8 @@ const { operationItems } = useOperationItemExtensionPoint<ListedReply>(
     },
   ])
 );
+
+const detailModalVisible = ref(false);
 </script>
 
 <template>
@@ -166,6 +160,13 @@ const { operationItems } = useOperationItemExtensionPoint<ListedReply>(
     :comment="comment"
     :reply="reply"
     @close="onReplyCreationModalClose"
+  />
+  <ReplyDetailModal
+    v-if="detailModalVisible"
+    :comment="comment"
+    :reply="reply"
+    :quote-reply="quoteReply"
+    @close="detailModalVisible = false"
   />
   <VEntity
     v-bind="$attrs"
@@ -177,7 +178,10 @@ const { operationItems } = useOperationItemExtensionPoint<ListedReply>(
         <template #description>
           <div class="flex flex-col gap-2">
             <div class="mb-1 flex items-center gap-2">
-              <OwnerButton :owner="reply?.owner" />
+              <OwnerButton
+                :owner="reply?.owner"
+                @click="detailModalVisible = true"
+              />
               <!-- TODO: i18n -->
               <span class="text-sm text-gray-900 whitespace-nowrap">
                 replied:
@@ -187,7 +191,7 @@ const { operationItems } = useOperationItemExtensionPoint<ListedReply>(
               class="sm:whitespace-pre-wrap break-words break-all text-sm text-gray-900"
             ><a
                   v-if="quoteReply"
-                  class="mr-1 inline-flex flex-row items-center gap-1 rounded bg-gray-200 px-1 py-0.5 text-xs font-medium text-gray-600 hover:text-blue-500 hover:underline"
+                  class="mr-1 inline-flex flex-row items-center gap-1 rounded bg-slate-100 px-1 py-0.5 text-xs font-medium text-slate-700 hover:bg-slate-200 hover:text-slate-800 hover:underline"
                   href="javascript:void(0)"
                   @mouseenter="handleShowQuoteReply(true)"
                   @mouseleave="handleShowQuoteReply(false)"

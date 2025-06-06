@@ -4,9 +4,11 @@ import {
   consoleApiClient,
   coreApiClient,
   type ListedComment,
+  type ListedReply,
 } from "@halo-dev/api-client";
 import {
   IconExternalLinkLine,
+  IconReplyLine,
   Toast,
   VButton,
   VDescription,
@@ -25,8 +27,12 @@ import ReplyFormItems from "./ReplyFormItems.vue";
 const props = withDefaults(
   defineProps<{
     comment: ListedComment;
+    reply: ListedReply;
+    quoteReply?: ListedReply;
   }>(),
-  {}
+  {
+    quoteReply: undefined,
+  }
 );
 
 const queryClient = useQueryClient();
@@ -38,12 +44,12 @@ const emit = defineEmits<{
 
 const modal = useTemplateRef<InstanceType<typeof VModal> | null>("modal");
 
-const { os, browser } = useUserAgent(props.comment.comment.spec.userAgent);
+const { os, browser } = useUserAgent(props.reply.reply.spec.userAgent);
 
 const creationTime = computed(() => {
   return (
-    props.comment?.comment.spec.creationTime ||
-    props.comment?.comment.metadata.creationTimestamp
+    props.reply?.reply.spec.creationTime ||
+    props.reply?.reply.metadata.creationTimestamp
   );
 });
 
@@ -51,8 +57,8 @@ const newReply = ref("");
 
 async function handleApprove() {
   if (!newReply.value) {
-    await coreApiClient.content.comment.patchComment({
-      name: props.comment.comment.metadata.name,
+    await coreApiClient.content.reply.patchReply({
+      name: props.reply.reply.metadata.name,
       jsonPatchInner: [
         {
           op: "add",
@@ -73,19 +79,21 @@ async function handleApprove() {
         raw: newReply.value,
         content: newReply.value,
         allowNotification: true,
-        quoteReply: undefined,
+        quoteReply: props.reply.reply.metadata.name,
       },
     });
   }
   modal.value?.close();
-  queryClient.invalidateQueries({ queryKey: ["comments"] });
+  queryClient.invalidateQueries({
+    queryKey: ["comment-replies", props.comment.comment.metadata.name],
+  });
   Toast.success(t("core.common.toast.operation_success"));
 }
 
 const { subjectRefResult } = useSubjectRef(props.comment);
 
 const websiteOfAnonymous = computed(() => {
-  return props.comment.comment.spec.owner.annotations?.["website"];
+  return props.reply.reply.spec.owner.annotations?.["website"];
 });
 </script>
 <template>
@@ -93,7 +101,7 @@ const websiteOfAnonymous = computed(() => {
     ref="modal"
     :body-class="['!p-0']"
     :width="900"
-    title="Comment detail"
+    title="Reply detail"
     mount-to-body
     :centered="false"
     @close="emit('close')"
@@ -103,18 +111,18 @@ const websiteOfAnonymous = computed(() => {
         <VDescriptionItem label="Owner">
           <div class="flex items-center gap-3">
             <OwnerButton
-              v-if="comment.comment.spec.owner.kind === 'User'"
-              :owner="comment.comment.spec.owner"
+              v-if="reply.owner.kind === 'User'"
+              :owner="reply.owner"
               @click="
                 $router.push({
                   name: 'UserDetail',
-                  params: { name: comment.comment.spec.owner.name },
+                  params: { name: reply.owner.name },
                 })
               "
             />
             <ul v-else class="space-y-1">
-              <li>{{ comment.comment.spec.owner.displayName }}</li>
-              <li>{{ comment.comment.spec.owner.name }}</li>
+              <li>{{ reply.owner.displayName }}</li>
+              <li>{{ reply.owner.name }}</li>
               <li v-if="websiteOfAnonymous">
                 <a :href="websiteOfAnonymous" target="_blank">{{
                   websiteOfAnonymous
@@ -124,10 +132,10 @@ const websiteOfAnonymous = computed(() => {
           </div>
         </VDescriptionItem>
         <VDescriptionItem label="IP">
-          {{ comment.comment.spec.ipAddress }}
+          {{ reply.reply.spec.ipAddress }}
         </VDescriptionItem>
         <VDescriptionItem label="User agent">
-          <span v-tooltip="comment.comment.spec.userAgent">
+          <span v-tooltip="reply.reply.spec.userAgent">
             {{ os }} {{ browser }}
           </span>
         </VDescriptionItem>
@@ -155,16 +163,25 @@ const websiteOfAnonymous = computed(() => {
             </a>
           </div>
         </VDescriptionItem>
-        <VDescriptionItem label="Content">
+        <VDescriptionItem label="Original comment">
           <pre
             class="whitespace-pre-wrap break-words break-all text-sm text-gray-900"
             >{{ comment.comment.spec.content }}</pre
           >
         </VDescriptionItem>
-        <VDescriptionItem
-          v-if="!comment.comment.spec.approved"
-          label="New reply"
-        >
+        <VDescriptionItem label="Content">
+          <pre
+            class="sm:whitespace-pre-wrap break-words break-all text-sm text-gray-900"
+          ><span
+                  v-if="quoteReply"
+                  v-tooltip="`${quoteReply.owner.displayName}: ${quoteReply.reply.spec.content}`"
+                  class="mr-1 inline-flex cursor-pointer flex-row items-center gap-1 rounded bg-slate-100 px-1 py-0.5 text-xs font-medium text-slate-700 hover:bg-slate-200 hover:text-slate-800 hover:underline"
+                >
+                  <IconReplyLine />
+                  <span>{{ quoteReply.owner.displayName }}</span>
+                </span><br v-if="quoteReply" />{{ reply?.reply.spec.content }}</pre>
+        </VDescriptionItem>
+        <VDescriptionItem v-if="!reply.reply.spec.approved" label="New reply">
           <ReplyFormItems
             :required="false"
             :auto-focus="false"
@@ -176,7 +193,7 @@ const websiteOfAnonymous = computed(() => {
     <template #footer>
       <VSpace>
         <VButton
-          v-if="!comment.comment.spec.approved"
+          v-if="!reply.reply.spec.approved"
           type="secondary"
           @click="handleApprove"
         >

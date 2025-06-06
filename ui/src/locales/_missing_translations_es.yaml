@@ -144,6 +144,10 @@ core:
   page_editor:
     actions:
       snapshots: Snapshots
+  comment:
+    operations:
+      review:
+        button: Review
   attachment:
     filters:
       sort:
@@ -694,6 +698,7 @@ core:
     text:
       system_protection: System protection
       all: All
+      detail: Detail
   uc_post:
     creation_modal:
       title: Create post

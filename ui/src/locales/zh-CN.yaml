@@ -493,8 +493,8 @@ core:
         title: 确定要审核通过该评论的所有回复吗？
       delete_reply:
         title: 删除回复
-      approve_reply:
-        button: 审核通过
+      review:
+        button: 审核
       reply:
         button: 回复
     filters:
@@ -1780,6 +1780,7 @@ core:
       warning: 警告
       system_protection: 系统保留
       all: 全部
+      detail: 详情
     tooltips:
       unpublished_content_tip: 当前有内容已保存，但还未发布。
       publishing: 发布中
