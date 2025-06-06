@@ -497,6 +497,12 @@ core:
         button: 审核
       reply:
         button: 回复
+      approve:
+        button: 通过
+      reply_and_approve:
+        button: 回复并通过
+      cancel_approve:
+        button: 取消通过
     filters:
       status:
         items:
@@ -530,6 +536,25 @@ core:
       operations:
         submit:
           toast_success: 回复成功
+    text:
+      commented_on: 评论在
+      replied_below: 回复：
+    detail_modal:
+      fields:
+        owner: 评论者
+        creation_time: 评论时间
+        commented_on: 评论在
+        new_reply: 新回复
+        user_agent: 用户代理（UA）
+    comment_detail_modal:
+      title: 评论详情
+      fields:
+        content: 评论内容
+    reply_detail_modal:
+      title: 回复详情
+      fields:
+        original_comment: 原评论
+        content: 回复内容
   attachment:
     title: 附件库
     common:

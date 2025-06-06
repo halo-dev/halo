@@ -85,7 +85,7 @@ async function handleApprove() {
   }
   modal.value?.close();
   queryClient.invalidateQueries({
-    queryKey: ["comment-replies", props.comment.comment.metadata.name],
+    queryKey: ["core:comment-replies", props.comment.comment.metadata.name],
   });
   Toast.success(t("core.common.toast.operation_success"));
 }
@@ -101,14 +101,14 @@ const websiteOfAnonymous = computed(() => {
     ref="modal"
     :body-class="['!p-0']"
     :width="900"
-    title="Reply detail"
+    :title="$t('core.comment.reply_detail_modal.title')"
     mount-to-body
     :centered="false"
     @close="emit('close')"
   >
     <div>
       <VDescription>
-        <VDescriptionItem label="Owner">
+        <VDescriptionItem :label="$t('core.comment.detail_modal.fields.owner')">
           <div class="flex items-center gap-3">
             <OwnerButton
               v-if="reply.owner.kind === 'User'"
@@ -134,17 +134,23 @@ const websiteOfAnonymous = computed(() => {
         <VDescriptionItem label="IP">
           {{ reply.reply.spec.ipAddress }}
         </VDescriptionItem>
-        <VDescriptionItem label="User agent">
+        <VDescriptionItem
+          :label="$t('core.comment.detail_modal.fields.user_agent')"
+        >
           <span v-tooltip="reply.reply.spec.userAgent">
             {{ os }} {{ browser }}
           </span>
         </VDescriptionItem>
-        <VDescriptionItem label="Created at">
+        <VDescriptionItem
+          :label="$t('core.comment.detail_modal.fields.creation_time')"
+        >
           <span v-tooltip="formatDatetime(creationTime)">
             {{ relativeTimeTo(creationTime) }}
           </span>
         </VDescriptionItem>
-        <VDescriptionItem label="Commented on">
+        <VDescriptionItem
+          :label="$t('core.comment.detail_modal.fields.commented_on')"
+        >
           <div class="flex items-center gap-2">
             <RouterLink
               v-tooltip="`${subjectRefResult.label}`"
@@ -163,15 +169,20 @@ const websiteOfAnonymous = computed(() => {
             </a>
           </div>
         </VDescriptionItem>
-        <VDescriptionItem label="Original comment">
+        <VDescriptionItem
+          :label="$t('core.comment.reply_detail_modal.fields.original_comment')"
+        >
+          <OwnerButton :owner="comment.owner" />
           <pre
-            class="whitespace-pre-wrap break-words break-all text-sm text-gray-900"
+            class="whitespace-pre-wrap mt-2 break-words text-sm text-gray-900"
             >{{ comment.comment.spec.content }}</pre
           >
         </VDescriptionItem>
-        <VDescriptionItem label="Content">
+        <VDescriptionItem
+          :label="$t('core.comment.reply_detail_modal.fields.content')"
+        >
           <pre
-            class="sm:whitespace-pre-wrap break-words break-all text-sm text-gray-900"
+            class="whitespace-pre-wrap break-words text-sm text-gray-900"
           ><span
                   v-if="quoteReply"
                   v-tooltip="`${quoteReply.owner.displayName}: ${quoteReply.reply.spec.content}`"
@@ -181,7 +192,10 @@ const websiteOfAnonymous = computed(() => {
                   <span>{{ quoteReply.owner.displayName }}</span>
                 </span><br v-if="quoteReply" />{{ reply?.reply.spec.content }}</pre>
         </VDescriptionItem>
-        <VDescriptionItem v-if="!reply.reply.spec.approved" label="New reply">
+        <VDescriptionItem
+          v-if="!reply.reply.spec.approved"
+          :label="$t('core.comment.detail_modal.fields.new_reply')"
+        >
           <ReplyFormItems
             :required="false"
             :auto-focus="false"
@@ -197,7 +211,11 @@ const websiteOfAnonymous = computed(() => {
           type="secondary"
           @click="handleApprove"
         >
-          {{ newReply ? "Reply and approve" : "Approve" }}
+          {{
+            newReply
+              ? $t("core.comment.operations.reply_and_approve.button")
+              : $t("core.comment.operations.approve.button")
+          }}
         </VButton>
         <VButton @click="modal?.close()">
           {{ $t("core.common.buttons.close") }}

@@ -78,7 +78,7 @@ async function handleApprove() {
     });
   }
   modal.value?.close();
-  queryClient.invalidateQueries({ queryKey: ["comments"] });
+  queryClient.invalidateQueries({ queryKey: ["core:comments"] });
   Toast.success(t("core.common.toast.operation_success"));
 }
 
@@ -93,14 +93,14 @@ const websiteOfAnonymous = computed(() => {
     ref="modal"
     :body-class="['!p-0']"
     :width="900"
-    title="Comment detail"
+    :title="$t('core.comment.comment_detail_modal.title')"
     mount-to-body
     :centered="false"
     @close="emit('close')"
   >
     <div>
       <VDescription>
-        <VDescriptionItem label="Owner">
+        <VDescriptionItem :label="$t('core.comment.detail_modal.fields.owner')">
           <div class="flex items-center gap-3">
             <OwnerButton
               v-if="comment.comment.spec.owner.kind === 'User'"
@@ -126,17 +126,23 @@ const websiteOfAnonymous = computed(() => {
         <VDescriptionItem label="IP">
           {{ comment.comment.spec.ipAddress }}
         </VDescriptionItem>
-        <VDescriptionItem label="User agent">
+        <VDescriptionItem
+          :label="$t('core.comment.detail_modal.fields.user_agent')"
+        >
           <span v-tooltip="comment.comment.spec.userAgent">
             {{ os }} {{ browser }}
           </span>
         </VDescriptionItem>
-        <VDescriptionItem label="Created at">
+        <VDescriptionItem
+          :label="$t('core.comment.detail_modal.fields.creation_time')"
+        >
           <span v-tooltip="formatDatetime(creationTime)">
             {{ relativeTimeTo(creationTime) }}
           </span>
         </VDescriptionItem>
-        <VDescriptionItem label="Commented on">
+        <VDescriptionItem
+          :label="$t('core.comment.detail_modal.fields.commented_on')"
+        >
           <div class="flex items-center gap-2">
             <RouterLink
               v-tooltip="`${subjectRefResult.label}`"
@@ -155,15 +161,16 @@ const websiteOfAnonymous = computed(() => {
             </a>
           </div>
         </VDescriptionItem>
-        <VDescriptionItem label="Content">
-          <pre
-            class="whitespace-pre-wrap break-words break-all text-sm text-gray-900"
-            >{{ comment.comment.spec.content }}</pre
-          >
+        <VDescriptionItem
+          :label="$t('core.comment.comment_detail_modal.fields.content')"
+        >
+          <pre class="whitespace-pre-wrap break-words text-sm text-gray-900">{{
+            comment.comment.spec.content
+          }}</pre>
         </VDescriptionItem>
         <VDescriptionItem
           v-if="!comment.comment.spec.approved"
-          label="New reply"
+          :label="$t('core.comment.detail_modal.fields.new_reply')"
         >
           <ReplyFormItems
             :required="false"
@@ -180,7 +187,11 @@ const websiteOfAnonymous = computed(() => {
           type="secondary"
           @click="handleApprove"
         >
-          {{ newReply ? "Reply and approve" : "Approve" }}
+          {{
+            newReply
+              ? $t("core.comment.operations.reply_and_approve.button")
+              : $t("core.comment.operations.approve.button")
+          }}
         </VButton>
         <VButton @click="modal?.close()">
           {{ $t("core.common.buttons.close") }}

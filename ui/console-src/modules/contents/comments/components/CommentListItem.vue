@@ -22,9 +22,10 @@ import {
   VStatusDot,
 } from "@halo-dev/components";
 import type { OperationItem } from "@halo-dev/console-shared";
-import { useMutation, useQuery, useQueryClient } from "@tanstack/vue-query";
+import { useQuery, useQueryClient } from "@tanstack/vue-query";
 import { computed, markRaw, provide, ref, type Ref, toRefs } from "vue";
 import { useI18n } from "vue-i18n";
+import { useCommentLastReadTimeMutate } from "../composables/use-comment-last-readtime-mutate";
 import { useSubjectRef } from "../composables/use-subject-ref";
 import CommentDetailModal from "./CommentDetailModal.vue";
 import OwnerButton from "./OwnerButton.vue";
@@ -50,6 +51,7 @@ const { comment } = toRefs(props);
 const hoveredReply = ref<ListedReply>();
 const showReplies = ref(false);
 const replyModal = ref(false);
+const detailModalVisible = ref(false);
 
 provide<Ref<ListedReply | undefined>>("hoveredReply", hoveredReply);
 
@@ -77,7 +79,7 @@ const handleDelete = async () => {
       } catch (error) {
         console.error("Failed to delete comment", error);
       } finally {
-        queryClient.invalidateQueries({ queryKey: ["comments"] });
+        queryClient.invalidateQueries({ queryKey: ["core:comments"] });
       }
     },
   });
@@ -93,25 +95,30 @@ const handleApproveReplyInBatch = async () => {
         const repliesToUpdate = replies.value?.filter((reply) => {
           return !reply.reply.spec.approved;
         });
-        const promises = repliesToUpdate?.map((reply) => {
-          return coreApiClient.content.reply.patchReply({
-            name: reply.reply.metadata.name,
-            jsonPatchInner: [
-              {
-                op: "add",
-                path: "/spec/approved",
-                value: true,
-              },
-              {
-                op: "add",
-                path: "/spec/approvedTime",
-                // TODO: 暂时由前端设置发布时间。see https://github.com/halo-dev/halo/pull/2746
-                value: new Date().toISOString(),
-              },
-            ],
-          });
-        });
-        await Promise.all(promises || []);
+
+        if (!repliesToUpdate?.length) {
+          return;
+        }
+
+        await Promise.all(
+          repliesToUpdate?.map((reply) => {
+            return coreApiClient.content.reply.patchReply({
+              name: reply.reply.metadata.name,
+              jsonPatchInner: [
+                {
+                  op: "add",
+                  path: "/spec/approved",
+                  value: true,
+                },
+                {
+                  op: "add",
+                  path: "/spec/approvedTime",
+                  value: new Date().toISOString(),
+                },
+              ],
+            });
+          })
+        );
 
         Toast.success(t("core.common.toast.operation_success"));
       } catch (e) {
@@ -123,13 +130,35 @@ const handleApproveReplyInBatch = async () => {
   });
 };
 
+async function handleCancelApprove() {
+  await coreApiClient.content.comment.patchComment({
+    name: props.comment.comment.metadata.name,
+    jsonPatchInner: [
+      {
+        op: "add",
+        path: "/spec/approved",
+        value: false,
+      },
+      {
+        op: "add",
+        path: "/spec/approvedTime",
+        value: "",
+      },
+    ],
+  });
+
+  Toast.success(t("core.common.toast.operation_success"));
+
+  queryClient.invalidateQueries({ queryKey: ["core:comments"] });
+}
+
 const {
   data: replies,
   isLoading,
   refetch,
 } = useQuery<ListedReply[]>({
   queryKey: [
-    "comment-replies",
+    "core:comment-replies",
     props.comment.comment.metadata.name,
     showReplies,
   ],
@@ -142,54 +171,34 @@ const {
     return data.items;
   },
   refetchInterval(data) {
-    const deletingReplies = data?.filter(
+    const hasDeletingReplies = data?.some(
       (reply) => !!reply.reply.metadata.deletionTimestamp
     );
-    return deletingReplies?.length ? 1000 : false;
+    return hasDeletingReplies ? 1000 : false;
   },
   enabled: computed(() => showReplies.value),
 });
 
-const { mutateAsync: updateCommentLastReadTimeMutate } = useMutation({
-  mutationKey: ["update-comment-last-read-time"],
-  mutationFn: async () => {
-    return coreApiClient.content.comment.patchComment(
-      {
-        name: props.comment.comment.metadata.name,
-        jsonPatchInner: [
-          {
-            op: "add",
-            path: "/spec/lastReadTime",
-            value: new Date().toISOString(),
-          },
-        ],
-      },
-      {
-        mute: true,
-      }
-    );
-  },
-  retry: 3,
-});
+const { mutate: updateCommentLastReadTimeMutate } =
+  useCommentLastReadTimeMutate(props.comment);
 
 const handleToggleShowReplies = async () => {
   showReplies.value = !showReplies.value;
 
-  if (props.comment.comment.status?.unreadReplyCount) {
-    await updateCommentLastReadTimeMutate();
+  if (props.comment.comment.status?.unreadReplyCount && showReplies.value) {
+    updateCommentLastReadTimeMutate();
   }
-
-  queryClient.invalidateQueries({ queryKey: ["comments"] });
 };
 
 const onReplyCreationModalClose = () => {
-  queryClient.invalidateQueries({ queryKey: ["comments"] });
-
   if (showReplies.value) {
     refetch();
   }
 
+  queryClient.invalidateQueries({ queryKey: ["core:comments"] });
+  updateCommentLastReadTimeMutate();
   replyModal.value = false;
+  detailModalVisible.value = false;
 };
 
 const { subjectRefResult } = useSubjectRef(props.comment);
@@ -218,16 +227,26 @@ const { operationItems } = useOperationItemExtensionPoint<ListedComment>(
     },
     {
       priority: 20,
-      component: markRaw(VDropdownDivider),
-    },
-    {
-      priority: 30,
       component: markRaw(VDropdownItem),
       label: t("core.comment.operations.approve_applies_in_batch.button"),
       action: handleApproveReplyInBatch,
     },
     {
+      priority: 30,
+      component: markRaw(VDropdownDivider),
+    },
+    {
       priority: 40,
+      component: markRaw(VDropdownItem),
+      props: {
+        type: "danger",
+      },
+      label: t("core.comment.operations.cancel_approve.button"),
+      hidden: !props.comment?.comment.spec.approved,
+      action: handleCancelApprove,
+    },
+    {
+      priority: 50,
       component: markRaw(VDropdownItem),
       props: {
         type: "danger",
@@ -237,9 +256,6 @@ const { operationItems } = useOperationItemExtensionPoint<ListedComment>(
     },
   ])
 );
-
-// Comment detail modal
-const detailModalVisible = ref(false);
 </script>
 
 <template>
@@ -251,7 +267,7 @@ const detailModalVisible = ref(false);
   <CommentDetailModal
     v-if="detailModalVisible"
     :comment="comment"
-    @close="detailModalVisible = false"
+    @close="onReplyCreationModalClose"
   />
   <VEntity :is-selected="isSelected">
     <template
@@ -269,9 +285,8 @@ const detailModalVisible = ref(false);
                 :owner="comment?.owner"
                 @click="detailModalVisible = true"
               />
-              <!-- TODO: i18n -->
               <span class="text-sm text-gray-900 whitespace-nowrap">
-                commented on
+                {{ $t("core.comment.text.commented_on") }}
               </span>
               <RouterLink
                 v-tooltip="`${subjectRefResult.label}`"
@@ -290,7 +305,7 @@ const detailModalVisible = ref(false);
               </a>
             </div>
             <pre
-              class="sm:whitespace-pre-wrap break-words break-all text-sm text-gray-900"
+              class="whitespace-pre-wrap break-words text-sm text-gray-900"
               >{{ comment?.comment?.spec.content }}</pre
             >
             <div class="flex items-center gap-3 text-xs">

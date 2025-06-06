@@ -145,9 +145,34 @@ core:
     actions:
       snapshots: Snapshots
   comment:
+    text:
+      commented_on: commented on
+      replied_below: "replied:"
     operations:
       review:
         button: Review
+      approve:
+        button: Approve
+      reply_and_approve:
+        button: Reply and approve
+      cancel_approve:
+        button: Cancel approve
+    detail_modal:
+      fields:
+        owner: Commentator
+        creation_time: Comment time
+        commented_on: Commented on
+        new_reply: New reply
+        user_agent: User agent
+    comment_detail_modal:
+      title: Comment detail
+      fields:
+        content: Comment content
+    reply_detail_modal:
+      title: Reply detail
+      fields:
+        original_comment: Original comment
+        content: Reply content
   attachment:
     filters:
       sort:

@@ -500,6 +500,9 @@ core:
       title: There are no replies currently.
       message: You can try refreshing or creating a new reply.
       new: New Reply
+    text:
+      commented_on: commented on
+      replied_below: "replied:"
     operations:
       delete_comment:
         title: Delete comment
@@ -525,6 +528,12 @@ core:
         button: Review
       reply:
         button: Reply
+      approve:
+        button: Approve
+      reply_and_approve:
+        button: Reply and approve
+      cancel_approve:
+        button: Cancel approve
     filters:
       status:
         items:
@@ -558,6 +567,22 @@ core:
       operations:
         submit:
           toast_success: Reply successfully
+    detail_modal:
+      fields:
+        owner: Commentator
+        creation_time: Comment time
+        commented_on: Commented on
+        new_reply: New reply
+        user_agent: User agent
+    comment_detail_modal:
+      title: Comment detail
+      fields:
+        content: Comment content
+    reply_detail_modal:
+      title: Reply detail
+      fields:
+        original_comment: Original comment
+        content: Reply content
   attachment:
     title: Attachments
     common:

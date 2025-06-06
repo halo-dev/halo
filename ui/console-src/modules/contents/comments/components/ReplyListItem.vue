@@ -20,6 +20,7 @@ import type { OperationItem } from "@halo-dev/console-shared";
 import { useQueryClient } from "@tanstack/vue-query";
 import { computed, inject, markRaw, ref, type Ref, toRefs } from "vue";
 import { useI18n } from "vue-i18n";
+import { useCommentLastReadTimeMutate } from "../composables/use-comment-last-readtime-mutate";
 import OwnerButton from "./OwnerButton.vue";
 import ReplyCreationModal from "./ReplyCreationModal.vue";
 import ReplyDetailModal from "./ReplyDetailModal.vue";
@@ -79,12 +80,37 @@ const handleDelete = async () => {
         console.error("Failed to delete comment reply", error);
       } finally {
         queryClient.invalidateQueries({
-          queryKey: ["comment-replies", props.comment.comment.metadata.name],
+          queryKey: [
+            "core:comment-replies",
+            props.comment.comment.metadata.name,
+          ],
         });
       }
     },
   });
 };
+
+async function handleCancelApprove() {
+  await coreApiClient.content.reply.patchReply({
+    name: props.reply?.reply.metadata.name as string,
+    jsonPatchInner: [
+      {
+        op: "add",
+        path: "/spec/approved",
+        value: false,
+      },
+      {
+        op: "add",
+        path: "/spec/approvedTime",
+        value: "",
+      },
+    ],
+  });
+  Toast.success(t("core.common.toast.operation_success"));
+  queryClient.invalidateQueries({
+    queryKey: ["core:comment-replies", props.comment.comment.metadata.name],
+  });
+}
 
 // Show hovered reply
 const hoveredReply = inject<Ref<ListedReply | undefined>>("hoveredReply");
@@ -103,12 +129,19 @@ const isHoveredReply = computed(() => {
 
 // Create reply
 const replyModal = ref(false);
+const detailModalVisible = ref(false);
+
+const { mutate: updateCommentLastReadTimeMutate } =
+  useCommentLastReadTimeMutate(props.comment);
 
 function onReplyCreationModalClose() {
   queryClient.invalidateQueries({
-    queryKey: ["comment-replies", props.comment.comment.metadata.name],
+    queryKey: ["core:comment-replies", props.comment.comment.metadata.name],
   });
+  queryClient.invalidateQueries({ queryKey: ["core:comments"] });
+  updateCommentLastReadTimeMutate();
   replyModal.value = false;
+  detailModalVisible.value = false;
 }
 
 const { operationItems } = useOperationItemExtensionPoint<ListedReply>(
@@ -144,14 +177,22 @@ const { operationItems } = useOperationItemExtensionPoint<ListedReply>(
       props: {
         type: "danger",
       },
+      label: t("core.comment.operations.cancel_approve.button"),
+      hidden: !props.reply?.reply.spec.approved,
+      action: handleCancelApprove,
+    },
+    {
+      priority: 40,
+      component: markRaw(VDropdownItem),
+      props: {
+        type: "danger",
+      },
       label: t("core.common.buttons.delete"),
       permissions: ["system:comments:manage"],
       action: handleDelete,
     },
   ])
 );
-
-const detailModalVisible = ref(false);
 </script>
 
 <template>
@@ -166,7 +207,7 @@ const detailModalVisible = ref(false);
     :comment="comment"
     :reply="reply"
     :quote-reply="quoteReply"
-    @close="detailModalVisible = false"
+    @close="onReplyCreationModalClose"
   />
   <VEntity
     v-bind="$attrs"
@@ -182,13 +223,12 @@ const detailModalVisible = ref(false);
                 :owner="reply?.owner"
                 @click="detailModalVisible = true"
               />
-              <!-- TODO: i18n -->
               <span class="text-sm text-gray-900 whitespace-nowrap">
-                replied:
+                {{ $t("core.comment.text.replied_below") }}
               </span>
             </div>
             <pre
-              class="sm:whitespace-pre-wrap break-words break-all text-sm text-gray-900"
+              class="whitespace-pre-wrap break-words text-sm text-gray-900"
             ><a
                   v-if="quoteReply"
                   class="mr-1 inline-flex flex-row items-center gap-1 rounded bg-slate-100 px-1 py-0.5 text-xs font-medium text-slate-700 hover:bg-slate-200 hover:text-slate-800 hover:underline"
