@@ -48,8 +48,8 @@ const messages = locales.reduce((acc, cur) => {
 
 const i18n = createI18n({
   legacy: false,
-  locale: "zh-CN",
-  fallbackLocale: "zh-CN",
+  locale: "en",
+  fallbackLocale: "en",
   messages,
 });
 

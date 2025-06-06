@@ -68,7 +68,6 @@ function listFeature(node: FormKitNode) {
     };
     fns.createAppend = () => () => {
       const value = node._value as unknown[];
-      console.log(fn(node));
       value.push(fn(node)), node.input(value, false);
     };
     fns.createRemover = (index: number) => () => {

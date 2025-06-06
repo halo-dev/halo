@@ -31,6 +31,35 @@ core:
           title: Notifications
           empty:
             title: No unread notifications
+        quickaction:
+          config:
+            fields:
+              enabled_items:
+                label: Enabled Items
+  dashboard_designer:
+    title: Edit Dashboard
+    actions:
+      add_widget: Add Widget
+    widgets_modal:
+      title: Widgets
+    config_modal:
+      title: Widget Config
+    breakpoints:
+      lg: Desktop
+      md: Tablet (Horizontal)
+      sm: Tablet
+      xs: Mobile
+    operations:
+      back:
+        title: Layout not saved
+        description: The current layout has not been saved, if you leave, the current layout will be lost, do you want to continue?
+        confirm_text: Leave
+      change_breakpoint:
+        tips_not_saved: Please save the current layout first
+      copy_from_layout:
+        button: Copy from layout
+      open_widgets_hub:
+        button: Widgets Hub
   post:
     operations:
       publish_in_batch:
@@ -664,6 +693,7 @@ core:
       starting_up: Starting
     text:
       system_protection: System protection
+      all: All
   uc_post:
     creation_modal:
       title: Create post

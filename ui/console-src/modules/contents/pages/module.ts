@@ -6,12 +6,8 @@ import DeletedSinglePageList from "./DeletedSinglePageList.vue";
 import SinglePageEditor from "./SinglePageEditor.vue";
 import SinglePageList from "./SinglePageList.vue";
 import SinglePageSnapshots from "./SinglePageSnapshots.vue";
-import SinglePageStatsWidget from "./widgets/SinglePageStatsWidget.vue";
 
 export default definePlugin({
-  components: {
-    SinglePageStatsWidget,
-  },
   routes: [
     {
       path: "/single-pages",

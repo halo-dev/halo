@@ -1,11 +1,11 @@
 <script lang="ts" setup>
 import { useUserStore } from "@/stores/user";
 import { relativeTimeTo } from "@/utils/date";
+import WidgetCard from "@console/modules/dashboard/components/WidgetCard.vue";
 import type { Notification } from "@halo-dev/api-client";
 import { ucApiClient } from "@halo-dev/api-client";
 import {
   VButton,
-  VCard,
   VEmpty,
   VEntity,
   VEntityContainer,
@@ -43,20 +43,17 @@ function handleRouteToNotification(notification: Notification) {
 </script>
 
 <template>
-  <VCard
-    :body-class="['h-full', '@container', '!p-0', '!overflow-auto']"
-    class="h-full"
+  <WidgetCard
+    :body-class="['@container', '!overflow-auto']"
     :title="$t('core.dashboard.widgets.presets.notification.title')"
   >
     <template #actions>
-      <div style="padding: 12px 16px">
-        <a
-          class="text-sm text-gray-600 hover:text-gray-900"
-          href="/uc/notifications"
-        >
-          {{ $t("core.common.buttons.view_all") }}
-        </a>
-      </div>
+      <a
+        class="text-sm text-gray-600 hover:text-gray-900"
+        href="/uc/notifications"
+      >
+        {{ $t("core.common.buttons.view_all") }}
+      </a>
     </template>
     <VLoading v-if="isLoading" />
     <VEmpty
@@ -100,5 +97,5 @@ function handleRouteToNotification(notification: Notification) {
         </VEntity>
       </VEntityContainer>
     </OverlayScrollbarsComponent>
-  </VCard>
+  </WidgetCard>
 </template>
