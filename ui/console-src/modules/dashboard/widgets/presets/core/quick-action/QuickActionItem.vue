@@ -1,7 +1,7 @@
 <script lang="ts" setup>
 import { usePermission } from "@/utils/permission";
 import { IconArrowRight } from "@halo-dev/components";
-import type { DashboardWidgetQuickActionItem } from "packages/shared/dist";
+import type { DashboardWidgetQuickActionItem } from "@halo-dev/console-shared";
 defineProps<{
   item: DashboardWidgetQuickActionItem;
 }>();
