@@ -70,3 +70,10 @@ provide<ComputedRef<DashboardWidgetDefinition[]>>(
     </grid-layout>
   </div>
 </template>
+
+<style scoped>
+:deep(.vue-grid-item) {
+  -ms-touch-action: unset !important;
+  touch-action: unset !important;
+}
+</style>
