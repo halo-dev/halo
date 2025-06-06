@@ -105,6 +105,8 @@ core:
           title: Users
         comment_stats:
           title: Comments
+        pending_comments:
+          title: Pending Comments
         views_stats:
           title: Visits
   dashboard_designer:

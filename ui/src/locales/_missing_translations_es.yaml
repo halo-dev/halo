@@ -36,6 +36,8 @@ core:
             fields:
               enabled_items:
                 label: Enabled Items
+        pending_comments:
+          title: Pending Comments
   dashboard_designer:
     title: Edit Dashboard
     actions:

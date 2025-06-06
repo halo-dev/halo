@@ -103,6 +103,8 @@ core:
           title: 留言
         views_stats:
           title: 瀏覽量
+        pending_comments:
+          title: 新評論
   dashboard_designer:
     title: 編輯儀表盤
     actions:

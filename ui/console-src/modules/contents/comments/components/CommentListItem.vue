@@ -326,7 +326,7 @@ const { operationItems } = useOperationItemExtensionPoint<ListedComment>(
                 animate
               />
               <span
-                class="select-none text-gray-700 hover:text-gray-900"
+                class="select-none cursor-pointer text-gray-700 hover:text-gray-900"
                 @click="replyModal = true"
               >
                 {{ $t("core.comment.operations.reply.button") }}

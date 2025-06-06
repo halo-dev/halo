@@ -103,6 +103,8 @@ core:
           title: 评论
         views_stats:
           title: 浏览量
+        pending_comments:
+          title: 新评论
   dashboard_designer:
     title: 编辑仪表盘
     actions:
