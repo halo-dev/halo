@@ -88,9 +88,8 @@ const groupWidgetDefinitionsKeys = computed(() => {
         <template v-for="item in group" :key="item.id">
           <div
             v-if="
-              activeId === '' ||
-              (item.group === activeId &&
-                currentUserHasPermission(item.permissions))
+              (activeId === '' || item.group === activeId) &&
+              currentUserHasPermission(item.permissions)
             "
             :style="{
               width: `${item.defaultSize.w * 100}px`,

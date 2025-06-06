@@ -63,7 +63,7 @@ export const internalWidgetDefinitions: DashboardWidgetDefinition[] = [
       minH: 2,
       minW: 1,
     },
-    permissions: ["system:comments:view"],
+    permissions: [],
   },
   {
     id: "core:user:stats",

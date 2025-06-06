@@ -23,7 +23,6 @@ const DefaultResponsiveLayouts: DashboardResponsiveLayout = {
       minH: 2,
       id: "core:comment:stats",
       config: {},
-      permissions: ["system:comments:view"],
     },
     {
       i: "ee42743e-06d8-4106-9481-42443bb8b2f0",
@@ -115,7 +114,6 @@ const DefaultResponsiveLayouts: DashboardResponsiveLayout = {
       minH: 2,
       id: "core:comment:stats",
       config: {},
-      permissions: ["system:comments:view"],
     },
     {
       i: "bb71aa3a-1170-4e1d-a0f3-290b4ca77ca1",
@@ -196,7 +194,6 @@ const DefaultResponsiveLayouts: DashboardResponsiveLayout = {
       minH: 2,
       id: "core:comment:stats",
       config: {},
-      permissions: ["system:comments:view"],
     },
     {
       i: "bb71aa3a-1170-4e1d-a0f3-290b4ca77ca1",
@@ -266,7 +263,6 @@ const DefaultResponsiveLayouts: DashboardResponsiveLayout = {
       minH: 2,
       id: "core:comment:stats",
       config: {},
-      permissions: ["system:comments:view"],
     },
     {
       i: "b3cc217f-5008-49bd-b6a3-b760c1afc4f9",
@@ -347,7 +343,6 @@ const DefaultResponsiveLayouts: DashboardResponsiveLayout = {
       minH: 2,
       id: "core:comment:stats",
       config: {},
-      permissions: ["system:comments:view"],
     },
     {
       i: "d6508199-b7a3-47dc-aabf-4e3634760b78",
