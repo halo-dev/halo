@@ -14,7 +14,6 @@ import {
   VEntity,
   VEntityField,
   VStatusDot,
-  VTag,
 } from "@halo-dev/components";
 import type { OperationItem } from "@halo-dev/console-shared";
 import { useQueryClient } from "@tanstack/vue-query";
@@ -211,7 +210,7 @@ const { operationItems } = useOperationItemExtensionPoint<ListedReply>(
   />
   <VEntity
     v-bind="$attrs"
-    class="border-l border-dashed border-gray-100"
+    class="border-l border-dashed !border-gray-200"
     :class="{ 'animate-breath': isHoveredReply }"
   >
     <template #start>
@@ -241,14 +240,11 @@ const { operationItems } = useOperationItemExtensionPoint<ListedReply>(
                 </a><br v-if="quoteReply" />{{ reply?.reply.spec.content }}</pre>
             <div class="flex items-center gap-3 text-xs">
               <span
-                class="select-none text-gray-700 hover:text-gray-900"
+                class="select-none cursor-pointer text-gray-700 hover:text-gray-900"
                 @click="replyModal = true"
               >
                 {{ $t("core.comment.operations.reply.button") }}
               </span>
-              <div v-if="false" class="flex items-center">
-                <VTag>New</VTag>
-              </div>
             </div>
           </div>
         </template>
