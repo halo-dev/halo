@@ -310,7 +310,7 @@ const { operationItems } = useOperationItemExtensionPoint<ListedComment>(
             >
             <div class="flex items-center gap-3 text-xs">
               <span
-                class="select-none text-gray-700 hover:text-gray-900"
+                class="select-none cursor-pointer text-gray-700 hover:text-gray-900"
                 @click="handleToggleShowReplies"
               >
                 {{
