@@ -1,5 +1,5 @@
 import { usePluginModuleStore } from "@/stores/plugin";
-import type { DashboardWidgetQuickActionItem } from "packages/shared/dist";
+import type { DashboardWidgetQuickActionItem } from "@halo-dev/console-shared";
 import { onMounted, ref } from "vue";
 
 const EXTENSION_POINT_NAME =

@@ -1,5 +1,5 @@
 import { usePluginModuleStore } from "@/stores/plugin";
-import type { DashboardWidgetDefinition } from "packages/shared/dist";
+import type { DashboardWidgetDefinition } from "@halo-dev/console-shared";
 import { onMounted, ref } from "vue";
 
 const EXTENSION_POINT_NAME = "console:dashboard:widgets:create";
