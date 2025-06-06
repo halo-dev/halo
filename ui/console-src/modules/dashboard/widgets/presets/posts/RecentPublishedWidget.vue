@@ -1,11 +1,11 @@
 <script lang="ts" setup>
 import { postLabels } from "@/constants/labels";
 import { formatDatetime } from "@/utils/date";
+import WidgetCard from "@console/modules/dashboard/components/WidgetCard.vue";
 import type { ListedPost } from "@halo-dev/api-client";
 import { consoleApiClient } from "@halo-dev/api-client";
 import {
   IconExternalLinkLine,
-  VCard,
   VEntity,
   VEntityContainer,
   VEntityField,
@@ -31,9 +31,8 @@ const { data } = useQuery<ListedPost[]>({
 });
 </script>
 <template>
-  <VCard
-    :body-class="['h-full', '!p-0', '!overflow-auto']"
-    class="h-full"
+  <WidgetCard
+    :body-class="['!overflow-auto']"
     :title="$t('core.dashboard.widgets.presets.recent_published.title')"
   >
     <OverlayScrollbarsComponent
@@ -100,5 +99,5 @@ const { data } = useQuery<ListedPost[]>({
         </VEntity>
       </VEntityContainer>
     </OverlayScrollbarsComponent>
-  </VCard>
+  </WidgetCard>
 </template>

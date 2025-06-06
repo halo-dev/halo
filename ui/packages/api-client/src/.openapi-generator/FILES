@@ -77,6 +77,7 @@ api/thumbnail-v1alpha1-public-api.ts
 api/two-factor-auth-v1alpha1-uc-api.ts
 api/user-connection-v1alpha1-api.ts
 api/user-connection-v1alpha1-uc-api.ts
+api/user-preference-v1alpha1-uc-api.ts
 api/user-v1alpha1-api.ts
 api/user-v1alpha1-console-api.ts
 base.ts

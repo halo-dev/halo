@@ -45,13 +45,10 @@ core:
     profile:
       aggregate_role: 聚合角色
   dashboard:
-    title: 仪表板
+    title: 仪表盘
     actions:
       setting: 设置
-      done: 完成
-      add_widget: 添加组件
     widgets:
-      modal_title: 小组件
       groups:
         post: 文章
         page: 页面
@@ -72,7 +69,7 @@ core:
           title: 通知
           empty:
             title: 当前没有未读的消息
-        quicklink:
+        quickaction:
           title: 快捷访问
           actions:
             user_center:
@@ -96,12 +93,40 @@ core:
               dialog_title: 刷新搜索引擎索引
               dialog_content: 此操作会对所有已发布的文章重新创建本地搜索引擎的索引。
               success_message: 刷新成功
+          config:
+            fields:
+              enabled_items:
+                label: 启用的功能
         user_stats:
           title: 用户
         comment_stats:
           title: 评论
         views_stats:
           title: 浏览量
+  dashboard_designer:
+    title: 编辑仪表盘
+    actions:
+      add_widget: 添加部件
+    widgets_modal:
+      title: 小部件
+    config_modal:
+      title: 部件配置
+    operations:
+      back:
+        title: 布局未保存
+        description: 当前编辑的布局还未保存，放弃后，当前布局将丢失，是否继续？
+        confirm_text: 放弃
+      change_breakpoint:
+        tips_not_saved: 请先保存当前布局
+      copy_from_layout:
+        button: 从其他布局复制
+      open_widgets_hub:
+        button: 小部件中心
+    breakpoints:
+      lg: 桌面端
+      md: 平板端（横向）
+      sm: 平板端
+      xs: 手机端
   post:
     title: 文章
     actions:
@@ -905,6 +930,7 @@ core:
         repo: 源码仓库
         load_location: 存储位置
         issues: 问题反馈
+        creation_time: 安装时间
       operations:
         view_conditions:
           button: 查看最近状态
@@ -1182,8 +1208,7 @@ core:
                 manual:
                   label: 如果无法扫描二维码，点击查看代替步骤
                   help: 使用以下代码手动配置验证器应用：
-              tips: >-
-                请妥善保管您的两步验证设备，如果设备丢失或损坏，你将无法登录系统。建议你在多个设备上安装验证器应用，或保存好密钥的备份，以防主要设备无法使用。
+              tips: 请妥善保管您的两步验证设备，如果设备丢失或损坏，你将无法登录系统。建议你在多个设备上安装验证器应用，或保存好密钥的备份，以防主要设备无法使用。
     pat:
       operations:
         delete:
@@ -1754,6 +1779,7 @@ core:
       tip: 提示
       warning: 警告
       system_protection: 系统保留
+      all: 全部
     tooltips:
       unpublished_content_tip: 当前有内容已保存，但还未发布。
       publishing: 发布中

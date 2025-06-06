@@ -50,10 +50,7 @@ core:
     title: Dashboard
     actions:
       setting: Setting
-      done: Done
-      add_widget: Add Widget
     widgets:
-      modal_title: Widgets
       groups:
         post: Post
         page: Page
@@ -74,8 +71,8 @@ core:
           title: Notifications
           empty:
             title: No unread notifications
-        quicklink:
-          title: Quick Link
+        quickaction:
+          title: Quick Action
           actions:
             user_center:
               title: User Center
@@ -100,12 +97,42 @@ core:
                 This operation will recreate search engine indexes for all
                 published posts.
               success_message: Refresh search engine index successfully.
+          config:
+            fields:
+              enabled_items:
+                label: Enabled Items
         user_stats:
           title: Users
         comment_stats:
           title: Comments
         views_stats:
           title: Visits
+  dashboard_designer:
+    title: Edit Dashboard
+    actions:
+      add_widget: Add Widget
+    widgets_modal:
+      title: Widgets
+    config_modal:
+      title: Widget Config
+    breakpoints:
+      lg: Desktop
+      md: Tablet (Horizontal)
+      sm: Tablet
+      xs: Mobile
+    operations:
+      back:
+        title: Layout not saved
+        description: >-
+          The current layout has not been saved, if you leave, the current layout
+          will be lost, do you want to continue?
+        confirm_text: Leave
+      change_breakpoint:
+        tips_not_saved: Please save the current layout first
+      copy_from_layout:
+        button: Copy from layout
+      open_widgets_hub:
+        button: Widgets Hub
   post:
     title: Posts
     actions:
@@ -970,6 +997,7 @@ core:
         repo: Source Repository
         load_location: Storage Location
         issues: Issues feedback
+        creation_time: Installation Time
       operations:
         view_conditions:
           button: View recent conditions
@@ -1891,6 +1919,7 @@ core:
       tip: Tip
       warning: Warning
       system_protection: System protection
+      all: All
     tooltips:
       unpublished_content_tip: There is content that has been saved but not yet published.
       publishing: Publishing

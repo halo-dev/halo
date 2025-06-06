@@ -9,14 +9,8 @@ import PostList from "./PostList.vue";
 import PostSnapshots from "./PostSnapshots.vue";
 import CategoryList from "./categories/CategoryList.vue";
 import TagList from "./tags/TagList.vue";
-import PostStatsWidget from "./widgets/PostStatsWidget.vue";
-import RecentPublishedWidget from "./widgets/RecentPublishedWidget.vue";
 
 export default definePlugin({
-  components: {
-    PostStatsWidget,
-    RecentPublishedWidget,
-  },
   routes: [
     {
       path: "/posts",
