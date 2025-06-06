@@ -11,6 +11,9 @@ export default ({ mode }: { mode: string }) => {
   const isProduction = mode === "production";
 
   return defineConfig({
+    experimental: {
+      enableNativePlugin: true,
+    },
     plugins: [
       Vue(),
       Icons({
@@ -28,7 +31,7 @@ export default ({ mode }: { mode: string }) => {
       }),
     ],
     define: {
-      "process.env": process.env,
+      "process.env.NODE_ENV": '"production"',
     },
     resolve: {
       alias: {
@@ -46,10 +49,11 @@ export default ({ mode }: { mode: string }) => {
       },
       minify: isProduction,
       rollupOptions: {
-        external: ["vue"],
+        external: ["vue", "vue-demi"],
         output: {
           globals: {
             vue: "Vue",
+            "vue-demi": "VueDemi",
           },
           exports: "named",
         },

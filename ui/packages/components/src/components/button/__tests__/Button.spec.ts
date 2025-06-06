@@ -68,7 +68,7 @@ describe("Button", () => {
 
     // default: false
     const button = mount(VButton, {
-      emits: { click: onClick },
+      emits: { click: onClick() },
     });
 
     await button.trigger("click");
