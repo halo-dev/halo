@@ -84,8 +84,6 @@ export interface DashboardWidgetDefinition {
 
 ### 小部件组件开发
 
-小部件组件需要接收以下 props：
-
 ```vue
 <template>
   <WidgetCard v-bind="$attrs" :body-class="['!p-0']">
