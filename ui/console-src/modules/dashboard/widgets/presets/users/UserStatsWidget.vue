@@ -2,6 +2,13 @@
 import { useDashboardStats } from "@console/composables/use-dashboard-stats";
 import WidgetCard from "@console/modules/dashboard/components/WidgetCard.vue";
 import { IconUserSettings } from "@halo-dev/components";
+import NumberFlow from "@number-flow/vue";
+
+defineProps<{
+  config: {
+    enable_animation: boolean;
+  };
+}>();
 
 const { data: stats } = useDashboardStats();
 </script>
@@ -13,13 +20,20 @@ const { data: stats } = useDashboardStats();
           <IconUserSettings class="h-5 w-5" />
         </span>
 
-        <div>
+        <div class="flex flex-col">
           <span class="text-sm text-gray-500">
             {{ $t("core.dashboard.widgets.presets.user_stats.title") }}
           </span>
-          <p class="text-2xl font-medium text-gray-900">
+          <NumberFlow
+            v-if="config.enable_animation"
+            class="text-2xl font-medium text-gray-900"
+            :value="stats?.users || 0"
+            :format="{ notation: 'compact' }"
+          >
+          </NumberFlow>
+          <span v-else class="text-2xl font-medium text-gray-900">
             {{ stats?.users || 0 }}
-          </p>
+          </span>
         </div>
       </div>
     </div>

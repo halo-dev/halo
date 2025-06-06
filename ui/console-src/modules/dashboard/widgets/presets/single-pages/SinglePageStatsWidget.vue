@@ -3,7 +3,14 @@ import { singlePageLabels } from "@/constants/labels";
 import WidgetCard from "@console/modules/dashboard/components/WidgetCard.vue";
 import { coreApiClient } from "@halo-dev/api-client";
 import { IconPages } from "@halo-dev/components";
+import NumberFlow from "@number-flow/vue";
 import { useQuery } from "@tanstack/vue-query";
+
+defineProps<{
+  config: {
+    enable_animation: boolean;
+  };
+}>();
 
 const { data: total } = useQuery({
   queryKey: ["widget-singlePage-count"],
@@ -28,13 +35,20 @@ const { data: total } = useQuery({
           <IconPages class="h-5 w-5" />
         </span>
 
-        <div>
+        <div class="flex flex-col">
           <span class="text-sm text-gray-500">
             {{ $t("core.dashboard.widgets.presets.page_stats.title") }}
           </span>
-          <p class="text-2xl font-medium text-gray-900">
+          <NumberFlow
+            v-if="config.enable_animation"
+            class="text-2xl font-medium text-gray-900"
+            :value="total || 0"
+            :format="{ notation: 'compact' }"
+          >
+          </NumberFlow>
+          <span v-else class="text-2xl font-medium text-gray-900">
             {{ total || 0 }}
-          </p>
+          </span>
         </div>
       </div>
     </div>

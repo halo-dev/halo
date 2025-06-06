@@ -14,8 +14,16 @@ export const internalWidgetDefinitions: DashboardWidgetDefinition[] = [
     id: "core:post:stats",
     component: markRaw(PostStatsWidget),
     group: "core.dashboard.widgets.groups.post",
-    configFormKitSchema: [],
-    defaultConfig: {},
+    configFormKitSchema: [
+      {
+        $formkit: "checkbox",
+        label: "Enable animation",
+        name: "enable_animation",
+      },
+    ],
+    defaultConfig: {
+      enable_animation: true,
+    },
     defaultSize: {
       w: 3,
       h: 3,
@@ -41,8 +49,16 @@ export const internalWidgetDefinitions: DashboardWidgetDefinition[] = [
     id: "core:singlepage:stats",
     component: markRaw(SinglePageStatsWidget),
     group: "core.dashboard.widgets.groups.page",
-    configFormKitSchema: [],
-    defaultConfig: {},
+    configFormKitSchema: [
+      {
+        $formkit: "checkbox",
+        label: "Enable animation",
+        name: "enable_animation",
+      },
+    ],
+    defaultConfig: {
+      enable_animation: true,
+    },
     defaultSize: {
       w: 3,
       h: 3,
@@ -55,8 +71,16 @@ export const internalWidgetDefinitions: DashboardWidgetDefinition[] = [
     id: "core:comment:stats",
     component: markRaw(CommentStatsWidget),
     group: "core.dashboard.widgets.groups.comment",
-    configFormKitSchema: [],
-    defaultConfig: {},
+    configFormKitSchema: [
+      {
+        $formkit: "checkbox",
+        label: "Enable animation",
+        name: "enable_animation",
+      },
+    ],
+    defaultConfig: {
+      enable_animation: true,
+    },
     defaultSize: {
       w: 3,
       h: 3,
@@ -69,8 +93,16 @@ export const internalWidgetDefinitions: DashboardWidgetDefinition[] = [
     id: "core:user:stats",
     component: markRaw(UserStatsWidget),
     group: "core.dashboard.widgets.groups.user",
-    configFormKitSchema: [],
-    defaultConfig: {},
+    configFormKitSchema: [
+      {
+        $formkit: "checkbox",
+        label: "Enable animation",
+        name: "enable_animation",
+      },
+    ],
+    defaultConfig: {
+      enable_animation: true,
+    },
     defaultSize: {
       w: 3,
       h: 3,
@@ -82,8 +114,16 @@ export const internalWidgetDefinitions: DashboardWidgetDefinition[] = [
     id: "core:view:stats",
     component: markRaw(ViewsStatsWidget),
     group: "core.dashboard.widgets.groups.other",
-    configFormKitSchema: [],
-    defaultConfig: {},
+    configFormKitSchema: [
+      {
+        $formkit: "checkbox",
+        label: "Enable animation",
+        name: "enable_animation",
+      },
+    ],
+    defaultConfig: {
+      enable_animation: true,
+    },
     defaultSize: {
       w: 3,
       h: 3,

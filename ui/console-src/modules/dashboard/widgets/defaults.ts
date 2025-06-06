@@ -11,7 +11,9 @@ const DefaultResponsiveLayouts: DashboardResponsiveLayout = {
       minW: 2,
       minH: 2,
       id: "core:post:stats",
-      config: {},
+      config: {
+        enable_animation: true,
+      },
     },
     {
       i: "96a9ac85-ec47-4c4b-bd02-184ee047f6a5",
@@ -22,7 +24,9 @@ const DefaultResponsiveLayouts: DashboardResponsiveLayout = {
       minW: 2,
       minH: 2,
       id: "core:comment:stats",
-      config: {},
+      config: {
+        enable_animation: true,
+      },
     },
     {
       i: "ee42743e-06d8-4106-9481-42443bb8b2f0",
@@ -33,7 +37,9 @@ const DefaultResponsiveLayouts: DashboardResponsiveLayout = {
       minW: 2,
       minH: 2,
       id: "core:user:stats",
-      config: {},
+      config: {
+        enable_animation: true,
+      },
     },
     {
       i: "19a92835-c12d-486b-9546-f16bd7a7da98",
@@ -44,7 +50,9 @@ const DefaultResponsiveLayouts: DashboardResponsiveLayout = {
       minW: 2,
       minH: 2,
       id: "core:view:stats",
-      config: {},
+      config: {
+        enable_animation: true,
+      },
     },
     {
       i: "e45cd079-a406-42de-a196-e11c64f6d893",
@@ -91,7 +99,9 @@ const DefaultResponsiveLayouts: DashboardResponsiveLayout = {
       minW: 2,
       minH: 2,
       id: "core:post:stats",
-      config: {},
+      config: {
+        enable_animation: true,
+      },
     },
     {
       i: "7c868acd-10e8-4e92-99f3-ff00b4aa4ec4",
@@ -102,7 +112,9 @@ const DefaultResponsiveLayouts: DashboardResponsiveLayout = {
       minW: 2,
       minH: 2,
       id: "core:user:stats",
-      config: {},
+      config: {
+        enable_animation: true,
+      },
     },
     {
       i: "90b458dc-679e-4b59-b0a9-86b02cf6ae59",
@@ -113,7 +125,9 @@ const DefaultResponsiveLayouts: DashboardResponsiveLayout = {
       minW: 2,
       minH: 2,
       id: "core:comment:stats",
-      config: {},
+      config: {
+        enable_animation: true,
+      },
     },
     {
       i: "bb71aa3a-1170-4e1d-a0f3-290b4ca77ca1",
@@ -124,7 +138,9 @@ const DefaultResponsiveLayouts: DashboardResponsiveLayout = {
       minW: 2,
       minH: 2,
       id: "core:view:stats",
-      config: {},
+      config: {
+        enable_animation: true,
+      },
     },
     {
       i: "c3e467a7-9a15-4732-9ba1-45f36a49d25e",
@@ -171,7 +187,9 @@ const DefaultResponsiveLayouts: DashboardResponsiveLayout = {
       minW: 2,
       minH: 2,
       id: "core:post:stats",
-      config: {},
+      config: {
+        enable_animation: true,
+      },
     },
     {
       i: "7c868acd-10e8-4e92-99f3-ff00b4aa4ec4",
@@ -182,7 +200,9 @@ const DefaultResponsiveLayouts: DashboardResponsiveLayout = {
       minW: 2,
       minH: 2,
       id: "core:user:stats",
-      config: {},
+      config: {
+        enable_animation: true,
+      },
     },
     {
       i: "90b458dc-679e-4b59-b0a9-86b02cf6ae59",
@@ -193,7 +213,9 @@ const DefaultResponsiveLayouts: DashboardResponsiveLayout = {
       minW: 2,
       minH: 2,
       id: "core:comment:stats",
-      config: {},
+      config: {
+        enable_animation: true,
+      },
     },
     {
       i: "bb71aa3a-1170-4e1d-a0f3-290b4ca77ca1",
@@ -204,7 +226,9 @@ const DefaultResponsiveLayouts: DashboardResponsiveLayout = {
       minW: 2,
       minH: 2,
       id: "core:view:stats",
-      config: {},
+      config: {
+        enable_animation: true,
+      },
     },
     {
       i: "c3e467a7-9a15-4732-9ba1-45f36a49d25e",
@@ -251,7 +275,9 @@ const DefaultResponsiveLayouts: DashboardResponsiveLayout = {
       minW: 2,
       minH: 2,
       id: "core:post:stats",
-      config: {},
+      config: {
+        enable_animation: true,
+      },
     },
     {
       i: "31a29ecc-e2d6-449c-9850-994e2fd6d9c6",
@@ -262,7 +288,9 @@ const DefaultResponsiveLayouts: DashboardResponsiveLayout = {
       minW: 2,
       minH: 2,
       id: "core:comment:stats",
-      config: {},
+      config: {
+        enable_animation: true,
+      },
     },
     {
       i: "b3cc217f-5008-49bd-b6a3-b760c1afc4f9",
@@ -273,7 +301,9 @@ const DefaultResponsiveLayouts: DashboardResponsiveLayout = {
       minW: 2,
       minH: 2,
       id: "core:user:stats",
-      config: {},
+      config: {
+        enable_animation: true,
+      },
     },
     {
       i: "b7afa21f-c24b-4fa2-9c98-de06e3c48687",
@@ -284,7 +314,9 @@ const DefaultResponsiveLayouts: DashboardResponsiveLayout = {
       minW: 2,
       minH: 2,
       id: "core:view:stats",
-      config: {},
+      config: {
+        enable_animation: true,
+      },
     },
     {
       i: "1f329a9f-d1aa-4337-98b3-34d8732b9143",
@@ -331,7 +363,9 @@ const DefaultResponsiveLayouts: DashboardResponsiveLayout = {
       minW: 2,
       minH: 2,
       id: "core:post:stats",
-      config: {},
+      config: {
+        enable_animation: true,
+      },
     },
     {
       i: "44932f76-7667-4b77-99e7-9778c8f54062",
@@ -342,7 +376,9 @@ const DefaultResponsiveLayouts: DashboardResponsiveLayout = {
       minW: 2,
       minH: 2,
       id: "core:comment:stats",
-      config: {},
+      config: {
+        enable_animation: true,
+      },
     },
     {
       i: "d6508199-b7a3-47dc-aabf-4e3634760b78",
@@ -353,7 +389,9 @@ const DefaultResponsiveLayouts: DashboardResponsiveLayout = {
       minW: 2,
       minH: 2,
       id: "core:user:stats",
-      config: {},
+      config: {
+        enable_animation: true,
+      },
     },
     {
       i: "3525a65d-2c69-4c0f-a378-6c9f1f06ad4c",
@@ -364,7 +402,9 @@ const DefaultResponsiveLayouts: DashboardResponsiveLayout = {
       minW: 2,
       minH: 2,
       id: "core:view:stats",
-      config: {},
+      config: {
+        enable_animation: true,
+      },
     },
     {
       i: "1bf7eba4-2805-495b-85cd-ebd9ecd9ab82",
