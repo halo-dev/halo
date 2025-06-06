@@ -19,8 +19,8 @@ import {
   VModal,
   VSpace,
 } from "@halo-dev/components";
+import type { DashboardWidgetQuickActionItem } from "@halo-dev/console-shared";
 import { OverlayScrollbarsComponent } from "overlayscrollbars-vue";
-import type { DashboardWidgetQuickActionItem } from "packages/shared/dist";
 import { computed, markRaw, ref, useTemplateRef } from "vue";
 import { useI18n } from "vue-i18n";
 import { useRouter } from "vue-router";
