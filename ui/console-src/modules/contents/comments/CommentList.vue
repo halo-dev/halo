@@ -18,6 +18,7 @@ import {
 } from "@halo-dev/components";
 import { useQuery } from "@tanstack/vue-query";
 import { useRouteQuery } from "@vueuse/router";
+import { chunk } from "lodash-es";
 import { computed, ref, watch } from "vue";
 import { useI18n } from "vue-i18n";
 import CommentListItem from "./components/CommentListItem.vue";
@@ -25,7 +26,6 @@ import CommentListItem from "./components/CommentListItem.vue";
 const { t } = useI18n();
 
 const checkAll = ref(false);
-const selectedComment = ref<ListedComment>();
 const selectedCommentNames = ref<string[]>([]);
 
 const keyword = useRouteQuery<string>("keyword", "");
@@ -81,7 +81,7 @@ const {
   refetch,
 } = useQuery<ListedComment[]>({
   queryKey: [
-    "comments",
+    "core:comments",
     page,
     size,
     selectedApprovedStatus,
@@ -139,12 +139,8 @@ const handleCheckAllChange = (e: Event) => {
   }
 };
 
-const checkSelection = (comment: ListedComment) => {
-  return (
-    comment.comment.metadata.name ===
-      selectedComment.value?.comment.metadata.name ||
-    selectedCommentNames.value.includes(comment.comment.metadata.name)
-  );
+const isSelection = (comment: ListedComment) => {
+  return selectedCommentNames.value.includes(comment.comment.metadata.name);
 };
 
 watch(
@@ -165,12 +161,18 @@ const handleDeleteInBatch = async () => {
     cancelText: t("core.common.buttons.cancel"),
     onConfirm: async () => {
       try {
-        const promises = selectedCommentNames.value.map((name) => {
-          return coreApiClient.content.comment.deleteComment({
-            name,
-          });
-        });
-        await Promise.all(promises);
+        const commentChunk = chunk(selectedCommentNames.value, 5);
+
+        for (const item of commentChunk) {
+          await Promise.all(
+            item.map((name) => {
+              return coreApiClient.content.comment.deleteComment({
+                name,
+              });
+            })
+          );
+        }
+
         selectedCommentNames.value = [];
 
         Toast.success(t("core.common.toast.delete_success"));
@@ -198,25 +200,34 @@ const handleApproveInBatch = async () => {
           );
         });
 
-        const promises = commentsToUpdate?.map((comment) => {
-          return coreApiClient.content.comment.patchComment({
-            name: comment.comment.metadata.name,
-            jsonPatchInner: [
-              {
-                op: "add",
-                path: "/spec/approved",
-                value: true,
-              },
-              {
-                op: "add",
-                path: "/spec/approvedTime",
-                // TODO: 暂时由前端设置发布时间。see https://github.com/halo-dev/halo/pull/2746
-                value: new Date().toISOString(),
-              },
-            ],
-          });
-        });
-        await Promise.all(promises || []);
+        if (!commentsToUpdate?.length) {
+          return;
+        }
+
+        const commentChunk = chunk(commentsToUpdate, 5);
+
+        for (const item of commentChunk) {
+          await Promise.all(
+            item.map((comment) => {
+              return coreApiClient.content.comment.patchComment({
+                name: comment.comment.metadata.name,
+                jsonPatchInner: [
+                  {
+                    op: "add",
+                    path: "/spec/approved",
+                    value: true,
+                  },
+                  {
+                    op: "add",
+                    path: "/spec/approvedTime",
+                    value: new Date().toISOString(),
+                  },
+                ],
+              });
+            })
+          );
+        }
+
         selectedCommentNames.value = [];
 
         Toast.success(t("core.common.toast.operation_success"));
@@ -377,7 +388,7 @@ const handleApproveInBatch = async () => {
             v-for="comment in comments"
             :key="comment.comment.metadata.name"
             :comment="comment"
-            :is-selected="checkSelection(comment)"
+            :is-selected="isSelection(comment)"
           >
             <template #checkbox>
               <input

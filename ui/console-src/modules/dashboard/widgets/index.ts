@@ -1,6 +1,7 @@
 import type { DashboardWidgetDefinition } from "@halo-dev/console-shared";
 import { markRaw } from "vue";
 import CommentStatsWidget from "./presets/comments/CommentStatsWidget.vue";
+import PendingCommentsWidget from "./presets/comments/PendingCommentsWidget.vue";
 import QuickActionWidget from "./presets/core/quick-action/QuickActionWidget.vue";
 import ViewsStatsWidget from "./presets/core/view-stats/ViewsStatsWidget.vue";
 import PostStatsWidget from "./presets/posts/PostStatsWidget.vue";
@@ -88,6 +89,19 @@ export const internalWidgetDefinitions: DashboardWidgetDefinition[] = [
       minW: 2,
     },
     permissions: [],
+  },
+  {
+    id: "core:comment:pending",
+    component: markRaw(PendingCommentsWidget),
+    group: "core.dashboard.widgets.groups.comment",
+    configFormKitSchema: [],
+    defaultConfig: {},
+    defaultSize: {
+      w: 6,
+      h: 12,
+      minH: 6,
+      minW: 3,
+    },
   },
   {
     id: "core:user:stats",
