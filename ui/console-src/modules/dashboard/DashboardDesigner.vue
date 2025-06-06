@@ -11,6 +11,8 @@ import {
   IconTablet,
   Toast,
   VButton,
+  VDropdown,
+  VDropdownItem,
   VSpace,
   VTabbar,
 } from "@halo-dev/components";
@@ -36,6 +38,8 @@ import type { GridLayout } from "vue-grid-layout";
 import { useI18n } from "vue-i18n";
 import { onBeforeRouteLeave, useRouter } from "vue-router";
 import RiArrowGoBackLine from "~icons/ri/arrow-go-back-line";
+import RiBox3Line from "~icons/ri/box-3-line";
+import RiFileCopyLine from "~icons/ri/file-copy-line";
 import WidgetEditableItem from "./components/WidgetEditableItem.vue";
 import WidgetHubModal from "./components/WidgetHubModal.vue";
 import { useDashboardExtensionPoint } from "./composables/use-dashboard-extension-point";
@@ -119,10 +123,16 @@ function onBreakpointChange(breakpoint: string) {
 }
 
 const deviceOptionDefinitions = [
-  { id: "lg", pixels: 1200, icon: markRaw(IconComputer) },
+  {
+    id: "lg",
+    pixels: 1200,
+    text: t("core.dashboard_designer.breakpoints.lg"),
+    icon: markRaw(IconComputer),
+  },
   {
     id: "md",
     pixels: 996,
+    text: t("core.dashboard_designer.breakpoints.md"),
     icon: markRaw(
       defineComponent({
         render() {
@@ -136,9 +146,15 @@ const deviceOptionDefinitions = [
   {
     id: "sm",
     pixels: 768,
+    text: t("core.dashboard_designer.breakpoints.sm"),
     icon: markRaw(IconTablet),
   },
-  { id: "xs", pixels: 480, icon: markRaw(IconPhone) },
+  {
+    id: "xs",
+    pixels: 480,
+    text: t("core.dashboard_designer.breakpoints.xs"),
+    icon: markRaw(IconPhone),
+  },
 ];
 
 const deviceOptions = computed(() => {
@@ -277,6 +293,27 @@ useEventListener(window, "beforeunload", (e) => {
     return t("core.dashboard_designer.operations.back.description");
   }
 });
+
+function handleCopyFromLayout(breakpoint: string) {
+  const layoutToCopy = layouts.value[breakpoint] as DashboardWidget[];
+  if (!layoutToCopy) {
+    return;
+  }
+
+  const zeroXWidgets = layout.value.filter((widget) => widget.x === 0);
+  const maxY = zeroXWidgets.reduce((max, widget) => {
+    return Math.max(max, widget.y + widget.h);
+  }, 0);
+
+  layout.value = [
+    ...layout.value,
+    ...layoutToCopy.map((widget, index) => ({
+      ...widget,
+      i: randomUUID(),
+      y: maxY + index + 1,
+    })),
+  ];
+}
 </script>
 <template>
   <div
@@ -304,12 +341,50 @@ useEventListener(window, "beforeunload", (e) => {
         </template>
         {{ $t("core.common.buttons.back") }}
       </VButton>
-      <VButton @click="widgetsHubModalVisible = true">
-        <template #icon>
-          <IconAddCircle class="h-full w-full" />
+      <VDropdown>
+        <VButton>
+          <template #icon>
+            <IconAddCircle class="h-full w-full" />
+          </template>
+          {{ $t("core.dashboard_designer.actions.add_widget") }}
+        </VButton>
+        <template #popper>
+          <VDropdownItem @click="widgetsHubModalVisible = true">
+            <template #prefix-icon>
+              <RiBox3Line />
+            </template>
+            {{
+              $t("core.dashboard_designer.operations.open_widgets_hub.button")
+            }}
+          </VDropdownItem>
+          <VDropdown :triggers="['click']" placement="left">
+            <VDropdownItem>
+              <template #prefix-icon>
+                <RiFileCopyLine />
+              </template>
+              {{
+                $t("core.dashboard_designer.operations.copy_from_layout.button")
+              }}
+            </VDropdownItem>
+            <template #popper>
+              <VDropdownItem
+                v-for="item in [
+                  ...deviceOptionDefinitions.filter(
+                    (item) => item.id !== currentBreakpoint
+                  ),
+                ]"
+                :key="item.id"
+                @click="handleCopyFromLayout(item.id)"
+              >
+                <template #prefix-icon>
+                  <component :is="item.icon" />
+                </template>
+                {{ item.text }}
+              </VDropdownItem>
+            </template>
+          </VDropdown>
         </template>
-        {{ $t("core.dashboard_designer.actions.add_widget") }}
-      </VButton>
+      </VDropdown>
       <VButton
         :disabled="!hasLayoutChanged"
         type="secondary"

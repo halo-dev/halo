@@ -118,6 +118,15 @@ core:
         confirm_text: 放弃
       change_breakpoint:
         tips_not_saved: 请先保存当前布局
+      copy_from_layout:
+        button: 从其他布局复制
+      open_widgets_hub:
+        button: 小部件中心
+    breakpoints:
+      lg: 桌面端
+      md: 平板端（横向）
+      sm: 平板端
+      xs: 手机端
   post:
     title: 文章
     actions:

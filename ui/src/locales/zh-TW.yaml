@@ -118,6 +118,15 @@ core:
         confirm_text: 放棄
       change_breakpoint:
         tips_not_saved: 請先儲存當前佈局
+      copy_from_layout:
+        button: 從其他布局複製
+      open_widgets_hub:
+        button: 小部件中心
+    breakpoints:
+      lg: 桌面端
+      md: 平板端（橫向）
+      sm: 平板端
+      xs: 手機端
   post:
     title: 文章
     actions:

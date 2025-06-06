@@ -115,6 +115,11 @@ core:
       title: Widgets
     config_modal:
       title: Widget Config
+    breakpoints:
+      lg: Desktop
+      md: Tablet (Horizontal)
+      sm: Tablet
+      xs: Mobile
     operations:
       back:
         title: Layout not saved
@@ -124,6 +129,10 @@ core:
         confirm_text: Leave
       change_breakpoint:
         tips_not_saved: Please save the current layout first
+      copy_from_layout:
+        button: Copy from layout
+      open_widgets_hub:
+        button: Widgets Hub
   post:
     title: Posts
     actions:
