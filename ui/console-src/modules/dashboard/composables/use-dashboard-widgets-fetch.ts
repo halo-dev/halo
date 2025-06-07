@@ -4,6 +4,7 @@ import type {
   DashboardWidget,
 } from "@halo-dev/console-shared";
 import { useQuery } from "@tanstack/vue-query";
+import { cloneDeep } from "lodash-es";
 import { computed, ref, type Ref } from "vue";
 import { DefaultResponsiveLayouts } from "../widgets/defaults";
 
@@ -31,7 +32,7 @@ export function useDashboardWidgetsFetch(breakpoint: Ref<string>) {
         layouts.value[breakpoint.value] || layouts.value["lg"] || [];
 
       layout.value = layoutData;
-      originalLayout.value = layoutData;
+      originalLayout.value = cloneDeep(layoutData);
     },
     enabled: computed(() => !!breakpoint.value),
   });
