@@ -1,8 +1,8 @@
 <script setup lang="ts">
 import type { FormKitSchemaDefinition } from "@formkit/core";
-import { VButton, VModal, VSpace } from "@halo-dev/components";
+import { VButton, VLoading, VModal, VSpace } from "@halo-dev/components";
 import type { DashboardWidgetDefinition } from "@halo-dev/console-shared";
-import { computed, toRaw, useTemplateRef } from "vue";
+import { onMounted, ref, toRaw, useTemplateRef } from "vue";
 
 const props = defineProps<{
   widgetDefinition: DashboardWidgetDefinition;
@@ -14,8 +14,24 @@ const emit = defineEmits<{
   (e: "save", config: Record<string, unknown>): void;
 }>();
 
-const formSchema = computed(() => {
-  return props.widgetDefinition.configFormKitSchema as FormKitSchemaDefinition;
+const formSchema = ref<FormKitSchemaDefinition>();
+const isLoading = ref(false);
+
+onMounted(async () => {
+  const { configFormKitSchema } = props.widgetDefinition || {};
+  const isFunction = typeof configFormKitSchema === "function";
+
+  try {
+    isLoading.value = true;
+    const schema = isFunction
+      ? await configFormKitSchema()
+      : configFormKitSchema;
+    formSchema.value = (schema || []) as FormKitSchemaDefinition;
+  } catch (e) {
+    console.error(e);
+  } finally {
+    isLoading.value = false;
+  }
 });
 
 const initialConfig =
@@ -35,6 +51,7 @@ function onSubmit(config: Record<string, unknown>) {
     @close="emit('close')"
   >
     <div>
+      <VLoading v-if="isLoading" />
       <FormKit
         v-if="formSchema"
         :id="widgetDefinition.id"

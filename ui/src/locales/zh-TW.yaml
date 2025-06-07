@@ -105,6 +105,10 @@ core:
           title: 瀏覽量
         pending_comments:
           title: 新評論
+      common_form:
+        fields:
+          enable_animation:
+            label: 啟用動畫
   dashboard_designer:
     title: 編輯儀表盤
     actions:
