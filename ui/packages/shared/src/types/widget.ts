@@ -27,7 +27,10 @@ export interface DashboardWidgetDefinition {
   id: string;
   component: Raw<Component>;
   group: string;
-  configFormKitSchema?: Record<string, unknown>[];
+  configFormKitSchema?:
+    | Record<string, unknown>[]
+    | (() => Promise<Record<string, unknown>[]>)
+    | (() => Record<string, unknown>[]);
   defaultConfig?: Record<string, unknown>;
   defaultSize: {
     w: number;

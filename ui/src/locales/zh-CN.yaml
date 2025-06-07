@@ -105,6 +105,10 @@ core:
           title: 浏览量
         pending_comments:
           title: 新评论
+      common_form:
+        fields:
+          enable_animation:
+            label: 启用动画
   dashboard_designer:
     title: 编辑仪表盘
     actions:

@@ -51,6 +51,10 @@ core:
     actions:
       setting: Setting
     widgets:
+      common_form:
+        fields:
+          enable_animation:
+            label: Enable animation
       groups:
         post: Post
         page: Page
