@@ -68,7 +68,7 @@ onMounted(async () => {
     <template #actions>
       <VButton type="secondary" @click="handleCreate">
         <template #icon>
-          <IconAddCircle class="h-full w-full" />
+          <IconAddCircle />
         </template>
         {{ $t("core.backup.operations.create.button") }}
       </VButton>

@@ -468,6 +468,7 @@ const { handleGenerateSlug } = useSlugify(
           "
           :loading="publishCanceling"
           type="danger"
+          ghost
           @click="handleUnpublish()"
         >
           {{ $t("core.common.buttons.cancel_publish") }}

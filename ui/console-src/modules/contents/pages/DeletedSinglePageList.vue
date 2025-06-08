@@ -217,7 +217,7 @@ watch(
           type="secondary"
         >
           <template #icon>
-            <IconAddCircle class="h-full w-full" />
+            <IconAddCircle />
           </template>
           {{ $t("core.common.buttons.new") }}
         </VButton>
