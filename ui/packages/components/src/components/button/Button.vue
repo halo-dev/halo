@@ -50,6 +50,7 @@ const props = withDefaults(
     disabled?: boolean;
     loading?: boolean;
     route?: RouteLocationRaw | undefined;
+    ghost?: boolean;
   }>(),
   {
     type: "default",
@@ -59,6 +60,7 @@ const props = withDefaults(
     disabled: false,
     loading: false,
     route: undefined,
+    ghost: false,
   }
 );
 
@@ -74,6 +76,7 @@ const classes = computed(() => {
     { "btn-circle": props.circle },
     { "btn-block": props.block },
     { "btn-loading": props.loading },
+    { "btn-ghost": props.ghost },
   ];
 });
 
@@ -141,8 +144,7 @@ function handleClick() {
 }
 
 .btn-danger {
-  background-color: #d71d1d !important;
-  @apply text-white;
+  @apply text-white bg-danger #{!important};
 }
 
 .btn-block {
@@ -208,5 +210,56 @@ function handleClick() {
 
 .btn-xs.btn-circle {
   @apply w-6;
+}
+
+.btn-ghost {
+  @apply bg-transparent #{!important};
+  &.btn-default {
+    @apply border-none #{!important};
+
+    &:hover {
+      @apply bg-gray-100 #{!important};
+    }
+
+    .btn-icon {
+      @apply text-secondary #{!important};
+    }
+  }
+
+  &.btn-primary {
+    @apply text-primary #{!important};
+
+    &:hover {
+      @apply bg-primary/10 #{!important};
+    }
+
+    .btn-icon {
+      @apply text-primary #{!important};
+    }
+  }
+
+  &.btn-secondary {
+    @apply text-secondary #{!important};
+
+    &:hover {
+      @apply bg-secondary/10 #{!important};
+    }
+
+    .btn-icon {
+      @apply text-secondary #{!important};
+    }
+  }
+
+  &.btn-danger {
+    @apply text-danger #{!important};
+
+    &:hover {
+      @apply bg-danger/10 #{!important};
+    }
+
+    .btn-icon {
+      @apply text-danger #{!important};
+    }
+  }
 }
 </style>
