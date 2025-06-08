@@ -38,6 +38,14 @@ core:
                 label: Enabled Items
         pending_comments:
           title: Pending Comments
+        iframe:
+          title: Iframe
+          empty:
+            title: Please enter the URL in the configuration
+          config:
+            fields:
+              title:
+                label: Title
   dashboard_designer:
     title: Edit Dashboard
     actions:

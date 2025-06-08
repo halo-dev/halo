@@ -105,6 +105,14 @@ core:
           title: 浏览量
         pending_comments:
           title: 新评论
+        iframe:
+          title: 网页嵌入
+          empty:
+            title: 请在配置中输入 URL
+          config:
+            fields:
+              title:
+                label: 标题
   dashboard_designer:
     title: 编辑仪表盘
     actions:

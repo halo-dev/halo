@@ -105,6 +105,14 @@ core:
           title: 瀏覽量
         pending_comments:
           title: 新評論
+        iframe:
+          title: 網頁嵌入
+          empty:
+            title: 請在配置中輸入 URL
+          config:
+            fields:
+              title:
+                label: 標題
   dashboard_designer:
     title: 編輯儀表盤
     actions:

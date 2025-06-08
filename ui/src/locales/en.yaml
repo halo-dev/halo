@@ -109,6 +109,14 @@ core:
           title: Pending Comments
         views_stats:
           title: Visits
+        iframe:
+          title: Iframe
+          empty:
+            title: Please enter the URL in the configuration
+          config:
+            fields:
+              title:
+                label: Title
   dashboard_designer:
     title: Edit Dashboard
     actions:
