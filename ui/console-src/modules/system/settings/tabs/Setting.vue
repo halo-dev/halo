@@ -1,102 +1,108 @@
 <script lang="ts" setup>
-// core libs
-import { computed, inject, ref, toRaw, type Ref } from "vue";
-
-// components
+import HasPermission from "@/components/permission/HasPermission.vue";
 import StickyBlock from "@/components/sticky-block/StickyBlock.vue";
-import { Toast, VButton } from "@halo-dev/components";
-
-// hooks
 import { useGlobalInfoStore } from "@/stores/global-info";
-import { useSettingFormConvert } from "@console/composables/use-setting-form";
-import type { ConfigMap, Setting } from "@halo-dev/api-client";
-import { coreApiClient } from "@halo-dev/api-client";
+import type { FormKitSchemaCondition, FormKitSchemaNode } from "@formkit/core";
+import type { Setting } from "@halo-dev/api-client";
+import { consoleApiClient } from "@halo-dev/api-client";
+import { Toast, VButton, VLoading } from "@halo-dev/components";
 import { useQuery, useQueryClient } from "@tanstack/vue-query";
+import { computed, inject, ref, toRaw, type Ref } from "vue";
 import { useI18n } from "vue-i18n";
-
-const SYSTEM_CONFIGMAP_NAME = "system";
 
 const { t, locale } = useI18n();
 const queryClient = useQueryClient();
 
 const group = inject<Ref<string>>("activeTab", ref("basic"));
 const setting = inject<Ref<Setting | undefined>>("setting", ref());
-const saving = ref(false);
+const isSubmitting = ref(false);
 
-const { data: configMap } = useQuery<ConfigMap>({
-  queryKey: ["system-configMap"],
+const { data: configMapGroupData, isLoading } = useQuery({
+  queryKey: ["core:system:configMap:group-data", group],
   queryFn: async () => {
-    const { data } = await coreApiClient.configMap.getConfigMap({
-      name: SYSTEM_CONFIGMAP_NAME,
-    });
-    return data;
+    const { data } =
+      await consoleApiClient.configMap.system.getSystemConfigByGroup({
+        group: group.value,
+      });
+    return data as Record<string, unknown>;
   },
-  enabled: computed(() => !!setting.value),
+  enabled: computed(() => !!group.value),
 });
 
-const { configMapFormData, formSchema, convertToSave } = useSettingFormConvert(
-  setting,
-  configMap,
-  group
-);
-
-const handleSaveConfigMap = async () => {
-  saving.value = true;
-
-  const configMapToUpdate = convertToSave();
-
-  if (!configMapToUpdate) {
-    saving.value = false;
+const formSchema = computed(() => {
+  if (!setting.value) {
     return;
   }
+  const { forms } = setting.value.spec;
+  return forms.find((item) => item.group === group?.value)?.formSchema as (
+    | FormKitSchemaCondition
+    | FormKitSchemaNode
+  )[];
+});
 
-  await coreApiClient.configMap.updateConfigMap({
-    name: SYSTEM_CONFIGMAP_NAME,
-    configMap: configMapToUpdate,
-  });
+const handleSaveConfigMap = async (data: Record<string, unknown>) => {
+  try {
+    isSubmitting.value = true;
+    await consoleApiClient.configMap.system.updateSystemConfigByGroup({
+      group: group.value,
+      body: data,
+    });
 
-  Toast.success(t("core.common.toast.save_success"));
+    queryClient.invalidateQueries({
+      queryKey: ["core:system:configMap:group-data"],
+    });
 
-  queryClient.invalidateQueries({ queryKey: ["system-configMap"] });
-  await useGlobalInfoStore().fetchGlobalInfo();
+    await useGlobalInfoStore().fetchGlobalInfo();
 
-  const language = configMapFormData.value.basic.language;
-  locale.value = language;
-  document.cookie = `language=${language}; path=/; SameSite=Lax; Secure`;
+    if (group.value === "basic") {
+      const language = data.language;
+      locale.value = language as string;
+      document.cookie = `language=${language}; path=/; SameSite=Lax; Secure`;
+    }
 
-  saving.value = false;
+    Toast.success(t("core.common.toast.save_success"));
+  } catch (error) {
+    console.error(error);
+    Toast.error(t("core.common.toast.save_failed_and_retry"));
+  } finally {
+    isSubmitting.value = false;
+  }
 };
 </script>
 <template>
   <div class="p-4">
+    <VLoading v-if="isLoading" />
     <FormKit
-      v-if="group && formSchema && configMapFormData?.[group]"
+      v-else-if="group && formSchema && configMapGroupData"
       :id="group"
-      v-model="configMapFormData[group]"
+      :value="configMapGroupData"
       :name="group"
-      :actions="false"
       :preserve="true"
       type="form"
       @submit="handleSaveConfigMap"
     >
       <FormKitSchema
         :schema="toRaw(formSchema)"
-        :data="configMapFormData[group]"
+        :data="toRaw(configMapGroupData)"
       />
     </FormKit>
 
-    <StickyBlock
-      v-permission="['system:configmaps:manage']"
-      class="-mx-4 -mb-4 rounded-b-base rounded-t-lg bg-white p-4 pt-5"
-      position="bottom"
+    <HasPermission
+      v-if="!isLoading"
+      :permissions="['system:configmaps:manage']"
     >
-      <VButton
-        :loading="saving"
-        type="secondary"
-        @click="$formkit.submit(group || '')"
+      <StickyBlock
+        class="-mx-4 -mb-4 rounded-b-base rounded-t-lg bg-white p-4 pt-5"
+        position="bottom"
       >
-        {{ $t("core.common.buttons.save") }}
-      </VButton>
-    </StickyBlock>
+        <VButton
+          :loading="isSubmitting"
+          type="secondary"
+          @click="$formkit.submit(group || '')"
+        >
+          {{ $t("core.common.buttons.save") }}
+        </VButton>
+      </StickyBlock>
+    </HasPermission>
   </div>
 </template>
