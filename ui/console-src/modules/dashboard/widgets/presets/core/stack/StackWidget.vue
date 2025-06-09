@@ -77,9 +77,18 @@ async function handleSave(config: StackWidgetConfig) {
 }
 </script>
 <template>
-  <WidgetCard v-if="!config.widgets?.length" title="Widget Stack">
+  <WidgetCard
+    v-if="!config.widgets?.length"
+    :title="$t('core.dashboard.widgets.presets.stack.title')"
+  >
     <div class="flex items-center justify-center w-full h-full">
-      <VButton @click="configVisible = true"> Add Widget </VButton>
+      <VButton @click="configVisible = true">
+        {{
+          $t(
+            "core.dashboard.widgets.presets.stack.operations.add_widget.button"
+          )
+        }}
+      </VButton>
     </div>
   </WidgetCard>
   <div
@@ -93,7 +102,9 @@ async function handleSave(config: StackWidgetConfig) {
       class="flex absolute z-10 bg-white inset-0 rounded-t-lg flex-none justify-between h-10 items-center px-4 border-b border-[#eaecf0]"
     >
       <div class="inline-flex items-center gap-2">
-        <div class="text-base font-medium flex-1 shrink">Widget Stack</div>
+        <div class="text-base font-medium flex-1 shrink">
+          {{ $t("core.dashboard.widgets.presets.stack.title") }}
+        </div>
         <IconSettings
           v-if="editMode"
           class="hover:text-gray-600 cursor-pointer"

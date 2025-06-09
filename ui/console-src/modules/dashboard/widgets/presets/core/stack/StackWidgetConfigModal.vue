@@ -10,11 +10,14 @@ import {
   VModal,
   VSpace,
 } from "@halo-dev/components";
+import type { DashboardWidgetDefinition } from "@halo-dev/console-shared";
 import { cloneDeep } from "lodash-es";
-import type { DashboardWidgetDefinition } from "packages/shared/dist";
 import { onMounted, ref, toRaw, useTemplateRef } from "vue";
+import { useI18n } from "vue-i18n";
 import WidgetEditableItem from "./components/WidgetEditableItem.vue";
 import type { SimpleWidget, StackWidgetConfig } from "./types";
+
+const { t } = useI18n();
 
 const props = defineProps<{
   config: StackWidgetConfig;
@@ -37,8 +40,9 @@ const widgetsHubModalVisible = ref(false);
 
 function handleAddWidget(widgetDefinition: DashboardWidgetDefinition) {
   if (widgetDefinition.id === "core:stack") {
-    // TODO: i18n
-    Toast.error("You cannot add a stack widget to a stack widget");
+    Toast.error(
+      t("core.dashboard.widgets.presets.stack.config_modal.toast.nest_warning")
+    );
     return;
   }
 
@@ -96,7 +100,7 @@ function handleMoveWidget(widget: SimpleWidget, direction: -1 | 1) {
   <VModal
     ref="modal"
     mount-to-body
-    title="Configure Widget Stack"
+    :title="$t('core.dashboard.widgets.presets.stack.config_modal.title')"
     :width="800"
     :centered="false"
     @close="emit('close')"
@@ -104,6 +108,7 @@ function handleMoveWidget(widget: SimpleWidget, direction: -1 | 1) {
     <div class="flex flex-col gap-5">
       <FormKit
         id="stack-widget-config-form"
+        v-slot="{ value }"
         type="form"
         name="stack-widget-config-form"
         :preserve="true"
@@ -112,22 +117,35 @@ function handleMoveWidget(widget: SimpleWidget, direction: -1 | 1) {
         <FormKit
           type="checkbox"
           name="auto_play"
-          label="Auto Play"
+          :label="
+            $t(
+              'core.dashboard.widgets.presets.stack.config_modal.fields.auto_play.label'
+            )
+          "
           :value="config.auto_play || false"
         />
         <FormKit
+          v-if="value?.auto_play"
           type="number"
           number
           name="auto_play_interval"
           validation="required"
           :value="config.auto_play_interval || 3000"
-          label="Interval"
+          :label="
+            $t(
+              'core.dashboard.widgets.presets.stack.config_modal.fields.auto_play_interval.label'
+            )
+          "
         />
         <div class="py-4 flex flex-col gap-4">
           <label
             class="formkit-label block text-sm font-medium text-gray-700 formkit-invalid:text-red-500"
           >
-            Widgets
+            {{
+              $t(
+                "core.dashboard.widgets.presets.stack.config_modal.fields.widgets.label"
+              )
+            }}
           </label>
           <div class="flex flex-col gap-2 border border-dashed p-2 rounded-lg">
             <WidgetEditableItem
