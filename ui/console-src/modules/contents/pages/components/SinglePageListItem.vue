@@ -3,6 +3,7 @@ import PostContributorList from "@/components/user/PostContributorList.vue";
 import { singlePageLabels } from "@/constants/labels";
 import { formatDatetime, relativeTimeTo } from "@/utils/date";
 import { usePermission } from "@/utils/permission";
+import { generateThumbnailUrl } from "@/utils/thumbnail";
 import type { ListedSinglePage, SinglePage } from "@halo-dev/api-client";
 import { coreApiClient } from "@halo-dev/api-client";
 import {
@@ -131,6 +132,16 @@ const handleDelete = async () => {
       />
     </template>
     <template #start>
+      <VEntityField v-if="singlePage.page.spec.cover">
+        <template #description>
+          <div class="aspect-h-2 rounded-md overflow-hidden aspect-w-3 w-20">
+            <img
+              class="object-cover w-full h-full"
+              :src="generateThumbnailUrl(singlePage.page.spec.cover, 's')"
+            />
+          </div>
+        </template>
+      </VEntityField>
       <VEntityField
         :title="singlePage.page.spec.title"
         :route="{
