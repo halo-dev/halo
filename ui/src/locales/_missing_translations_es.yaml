@@ -27,6 +27,8 @@ core:
       presets:
         recent_published:
           publishTime: Publish Time {publishTime}
+          empty:
+            title: No published posts
         notification:
           title: Notifications
           empty:
@@ -38,6 +40,8 @@ core:
                 label: Enabled Items
         pending_comments:
           title: Pending Comments
+          empty:
+            title: No pending comments
   dashboard_designer:
     title: Edit Dashboard
     actions:

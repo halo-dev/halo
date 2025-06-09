@@ -65,6 +65,8 @@ core:
           visits: 訪問量 {visits}
           comments: 留言 {comments}
           publishTime: 發佈日期 {publishTime}
+          empty:
+            title: 沒有已發布文章
         notification:
           title: 通知
           empty:
@@ -105,6 +107,8 @@ core:
           title: 瀏覽量
         pending_comments:
           title: 新評論
+          empty:
+            title: 沒有待審核評論
   dashboard_designer:
     title: 編輯儀表盤
     actions:

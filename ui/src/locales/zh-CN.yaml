@@ -65,6 +65,8 @@ core:
           visits: 访问量 {visits}
           comments: 评论 {comments}
           publishTime: 发布日期 {publishTime}
+          empty:
+            title: 暂无已发布文章
         notification:
           title: 通知
           empty:
@@ -105,6 +107,8 @@ core:
           title: 浏览量
         pending_comments:
           title: 新评论
+          empty:
+            title: 暂无待审核评论
   dashboard_designer:
     title: 编辑仪表盘
     actions:

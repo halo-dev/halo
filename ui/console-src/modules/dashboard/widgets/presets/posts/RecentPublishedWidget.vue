@@ -6,15 +6,18 @@ import type { ListedPost } from "@halo-dev/api-client";
 import { consoleApiClient } from "@halo-dev/api-client";
 import {
   IconExternalLinkLine,
+  VButton,
+  VEmpty,
   VEntity,
   VEntityContainer,
   VEntityField,
+  VLoading,
   VSpace,
 } from "@halo-dev/components";
 import { useQuery } from "@tanstack/vue-query";
 import { OverlayScrollbarsComponent } from "overlayscrollbars-vue";
 
-const { data } = useQuery<ListedPost[]>({
+const { data, isLoading, isFetching, refetch } = useQuery<ListedPost[]>({
   queryKey: ["widget-recent-posts"],
   queryFn: async () => {
     const { data } = await consoleApiClient.content.post.listPosts({
@@ -35,7 +38,19 @@ const { data } = useQuery<ListedPost[]>({
     :body-class="['!overflow-auto']"
     :title="$t('core.dashboard.widgets.presets.recent_published.title')"
   >
+    <VLoading v-if="isLoading" />
+    <VEmpty
+      v-else-if="!data?.length"
+      :title="$t('core.dashboard.widgets.presets.recent_published.empty.title')"
+    >
+      <template #actions>
+        <VButton :loading="isFetching" @click="refetch">
+          {{ $t("core.common.buttons.refresh") }}
+        </VButton>
+      </template>
+    </VEmpty>
     <OverlayScrollbarsComponent
+      v-else
       element="div"
       :options="{ scrollbars: { autoHide: 'scroll' } }"
       class="h-full w-full"
