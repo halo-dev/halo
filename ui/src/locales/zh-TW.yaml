@@ -104,6 +104,22 @@ core:
           title: 瀏覽量
         pending_comments:
           title: 新評論
+        stack:
+          title: 堆疊部件
+          operations:
+            add_widget:
+              button: 添加部件
+          config_modal:
+            title: 堆疊部件配置
+            fields:
+              auto_play:
+                label: 自動切換
+              auto_play_interval:
+                label: 自動切換間隔
+              widgets:
+                label: 部件
+            toast:
+              nest_warning: 不能將堆疊部件添加到堆疊部件中
   dashboard_designer:
     title: 編輯儀表盤
     actions:
