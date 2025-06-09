@@ -1,6 +1,6 @@
 <script lang="ts" setup>
 import PostContributorList from "@/components/user/PostContributorList.vue";
-import { formatDatetime } from "@/utils/date";
+import { formatDatetime, relativeTimeTo } from "@/utils/date";
 import { usePermission } from "@/utils/permission";
 import type { ListedPost, Post } from "@halo-dev/api-client";
 import { consoleApiClient, coreApiClient } from "@halo-dev/api-client";
@@ -390,12 +390,11 @@ watch(
                   />
                 </template>
               </VEntityField>
-              <VEntityField>
-                <template #description>
-                  <span class="truncate text-xs tabular-nums text-gray-500">
-                    {{ formatDatetime(post.post.spec.publishTime) }}
-                  </span>
-                </template>
+              <VEntityField
+                v-if="post.post.spec.publishTime"
+                v-tooltip="formatDatetime(post.post.spec.publishTime)"
+                :description="relativeTimeTo(post.post.spec.publishTime)"
+              >
               </VEntityField>
             </template>
             <template
