@@ -1,6 +1,6 @@
 <script lang="ts" setup>
 import {
-  coreApiClient,
+  consoleApiClient,
   type ExtensionPointDefinition,
 } from "@halo-dev/api-client";
 import {
@@ -16,6 +16,8 @@ import { computed, ref, toRefs, type Ref } from "vue";
 import { useI18n } from "vue-i18n";
 import { useExtensionDefinitionFetch } from "../../composables/use-extension-definition-fetch";
 import ExtensionDefinitionListItem from "./ExtensionDefinitionListItem.vue";
+
+const EXTENSION_POINT_ENABLED_GROUP = "extensionPointEnabled";
 
 const { t } = useI18n();
 const queryClient = useQueryClient();
@@ -45,16 +47,13 @@ const { data: value } = useQuery({
   queryFn: async () => {
     if (!extensionPointDefinition.value) return null;
 
-    const { data } = await coreApiClient.configMap.getConfigMap({
-      name: "system",
-    });
-
-    const extensionPointEnabled = JSON.parse(
-      data.data?.["extensionPointEnabled"] || "{}"
-    );
+    const { data: extensionPointEnabled } =
+      await consoleApiClient.configMap.system.getSystemConfigByGroup({
+        group: EXTENSION_POINT_ENABLED_GROUP,
+      });
 
     const extensionPointValue =
-      extensionPointEnabled[extensionPointDefinition.value?.metadata.name];
+      extensionPointEnabled?.[extensionPointDefinition.value?.metadata.name];
 
     // check is array
     if (Array.isArray(extensionPointValue)) {
@@ -79,27 +78,17 @@ async function handleChange(value: string) {
   isSubmitting.value = true;
 
   try {
-    const { data: configMap } = await coreApiClient.configMap.getConfigMap({
-      name: "system",
-    });
+    const { data: extensionPointEnabled } =
+      await consoleApiClient.configMap.system.getSystemConfigByGroup({
+        group: EXTENSION_POINT_ENABLED_GROUP,
+      });
 
-    const extensionPointEnabled = JSON.parse(
-      configMap.data?.["extensionPointEnabled"] || "{}"
-    );
-
-    extensionPointEnabled[extensionPointDefinition.value?.metadata.name] = [
-      value,
-    ];
-
-    await coreApiClient.configMap.patchConfigMap({
-      name: "system",
-      jsonPatchInner: [
-        {
-          op: "add",
-          path: "/data/extensionPointEnabled",
-          value: JSON.stringify(extensionPointEnabled),
-        },
-      ],
+    await consoleApiClient.configMap.system.updateSystemConfigByGroup({
+      group: EXTENSION_POINT_ENABLED_GROUP,
+      body: {
+        ...extensionPointEnabled,
+        [extensionPointDefinition.value?.metadata.name]: [value],
+      },
     });
 
     Toast.success(t("core.common.toast.save_success"));
