@@ -1,51 +1,80 @@
 <script lang="ts" setup>
 import WidgetCard from "@console/modules/dashboard/components/WidgetCard.vue";
-import {
-  IconArrowLeft,
-  IconArrowRight,
-  IconSettings,
-  VButton,
-} from "@halo-dev/components";
-import { ref } from "vue";
+import { IconSettings, VButton } from "@halo-dev/components";
+import { nextTick, onMounted, onUnmounted, ref } from "vue";
 import StackWidgetConfigModal from "./StackWidgetConfigModal.vue";
+import IndexIndicator from "./components/IndexIndicator.vue";
 import WidgetViewItem from "./components/WidgetViewItem.vue";
-import type { SimpleWidget } from "./types";
+import type { StackWidgetConfig } from "./types";
 
 const props = defineProps<{
-  config: {
-    widgets: SimpleWidget[];
-  };
+  config: StackWidgetConfig;
   editMode?: boolean;
   previewMode?: boolean;
 }>();
 
 const emit = defineEmits<{
-  (e: "update:config", config: Record<string, unknown>): void;
+  (e: "update:config", config: StackWidgetConfig): void;
 }>();
 
 const configVisible = ref(false);
 
-function handleSave(config: { widgets: SimpleWidget[] }) {
-  emit("update:config", config);
-}
-
 const index = ref(0);
 
-const handlePrev = () => {
-  if (index.value <= 0) {
-    index.value = props.config.widgets.length - 1;
-  } else {
-    index.value--;
-  }
-};
+function handleNavigate(direction: -1 | 1) {
+  const targetIndex = index.value + direction;
 
-const handleNext = () => {
-  if (index.value >= props.config.widgets.length - 1) {
+  if (targetIndex < 0) {
+    index.value = props.config.widgets.length - 1;
+  } else if (targetIndex >= props.config.widgets.length) {
     index.value = 0;
   } else {
-    index.value++;
+    index.value = targetIndex;
   }
-};
+}
+
+// auto play
+const autoPlayInterval = ref<NodeJS.Timeout | null>(null);
+
+function startAutoPlay() {
+  if (!props.config.auto_play || configVisible.value) {
+    return;
+  }
+  if (autoPlayInterval.value) {
+    clearInterval(autoPlayInterval.value);
+  }
+  autoPlayInterval.value = setInterval(() => {
+    handleNavigate(1);
+  }, props.config.auto_play_interval || 3000);
+}
+
+function stopAutoPlay() {
+  if (autoPlayInterval.value) {
+    clearInterval(autoPlayInterval.value);
+    autoPlayInterval.value = null;
+  }
+}
+
+onMounted(() => {
+  startAutoPlay();
+});
+
+onUnmounted(() => {
+  stopAutoPlay();
+});
+
+async function handleSave(config: StackWidgetConfig) {
+  emit("update:config", config);
+  configVisible.value = false;
+
+  await nextTick();
+
+  if (config.auto_play) {
+    startAutoPlay();
+  } else {
+    stopAutoPlay();
+  }
+}
 </script>
 <template>
   <WidgetCard v-if="!config.widgets?.length" title="Widget Stack">
@@ -55,7 +84,9 @@ const handleNext = () => {
   </WidgetCard>
   <div
     v-else
-    class="bg-white w-full h-full rounded-lg relative group/stack-item"
+    class="bg-white w-full h-full rounded-lg relative group/stack-item overflow-hidden"
+    @mouseenter="stopAutoPlay"
+    @mouseleave="startAutoPlay"
   >
     <div
       v-if="editMode || previewMode"
@@ -71,49 +102,25 @@ const handleNext = () => {
       </div>
     </div>
 
-    <WidgetViewItem
-      v-for="(widget, i) in config.widgets"
-      v-show="index === i"
-      :key="widget.i"
-      :item="widget"
-    />
+    <TransitionGroup name="fade">
+      <WidgetViewItem
+        v-for="(widget, i) in config.widgets"
+        v-show="index === i"
+        :key="widget.i"
+        :item="widget"
+      />
+    </TransitionGroup>
 
     <div
-      class="absolute bottom-2 left-0 right-0 z-10 flex items-center justify-center gap-6 group-hover/stack-item:opacity-100 opacity-0 transition-all duration-200"
+      class="absolute bottom-2 left-0 right-0 z-10 flex justify-center group-hover/stack-item:opacity-100 opacity-0 transition-all duration-200"
     >
-      <button
-        v-if="config.widgets?.length"
-        class="w-7 h-7 flex items-center justify-center rounded-full bg-black/10 hover:bg-black/20 transition-all duration-200 focus:outline-none group"
-        @click="handlePrev"
-      >
-        <IconArrowLeft />
-      </button>
-
-      <div class="flex items-center gap-2">
-        <div
-          v-for="(widget, i) in config.widgets"
-          :key="widget.i"
-          class="group cursor-pointer"
-          @click="index = i"
-        >
-          <div
-            :class="[
-              'w-2 h-2 rounded-full transition-all duration-200 ease-in-out transform',
-              index === i
-                ? 'bg-primary scale-150'
-                : 'bg-gray-300 group-hover:bg-gray-400',
-            ]"
-          />
-        </div>
-      </div>
-
-      <button
-        v-if="config.widgets?.length"
-        class="w-7 h-7 flex items-center justify-center rounded-full bg-black/10 hover:bg-black/20 transition-all duration-200 focus:outline-none group"
-        @click="handleNext"
-      >
-        <IconArrowRight />
-      </button>
+      <IndexIndicator
+        :index="index"
+        :total="config.widgets.length"
+        @prev="handleNavigate(-1)"
+        @next="handleNavigate(1)"
+        @update:index="index = $event"
+      />
     </div>
   </div>
 

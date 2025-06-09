@@ -14,22 +14,15 @@ import { cloneDeep } from "lodash-es";
 import type { DashboardWidgetDefinition } from "packages/shared/dist";
 import { onMounted, ref, toRaw, useTemplateRef } from "vue";
 import WidgetEditableItem from "./components/WidgetEditableItem.vue";
-import type { SimpleWidget } from "./types";
+import type { SimpleWidget, StackWidgetConfig } from "./types";
 
 const props = defineProps<{
-  config: {
-    widgets: SimpleWidget[];
-  };
+  config: StackWidgetConfig;
 }>();
 
 const emit = defineEmits<{
   (e: "close"): void;
-  (
-    e: "save",
-    config: {
-      widgets: SimpleWidget[];
-    }
-  ): void;
+  (e: "save", config: StackWidgetConfig): void;
 }>();
 
 const widgets = ref<SimpleWidget[]>();
@@ -60,11 +53,12 @@ function handleAddWidget(widgetDefinition: DashboardWidgetDefinition) {
   widgetsHubModalVisible.value = false;
 }
 
-function handleSave() {
+function handleSave(data: { auto_play: boolean; auto_play_interval: number }) {
   emit("save", {
+    auto_play: data.auto_play,
+    auto_play_interval: data.auto_play_interval,
     widgets: widgets.value || [],
   });
-  modal.value?.close();
 }
 
 function handleRemoveWidget(widget: SimpleWidget) {
@@ -107,41 +101,75 @@ function handleMoveWidget(widget: SimpleWidget, direction: -1 | 1) {
     :centered="false"
     @close="emit('close')"
   >
-    <div>
-      <div class="flex flex-col gap-2 pb-5">
-        <WidgetEditableItem
-          v-for="(widget, index) in widgets"
-          :key="widget.id"
-          :item="widget"
-          @remove="handleRemoveWidget(widget)"
-          @update:config="handleUpdateWidgetConfig(widget, $event)"
-        >
-          <template #actions>
-            <ActionButton
-              v-if="index > 0"
-              class="bg-gray-200"
-              @click="handleMoveWidget(widget, -1)"
+    <div class="flex flex-col gap-5">
+      <FormKit
+        id="stack-widget-config-form"
+        type="form"
+        name="stack-widget-config-form"
+        :preserve="true"
+        @submit="handleSave"
+      >
+        <FormKit
+          type="checkbox"
+          name="auto_play"
+          label="Auto Play"
+          :value="config.auto_play || false"
+        />
+        <FormKit
+          type="number"
+          number
+          name="auto_play_interval"
+          validation="required"
+          :value="config.auto_play_interval || 3000"
+          label="Interval"
+        />
+        <div class="py-4 flex flex-col gap-4">
+          <label
+            class="formkit-label block text-sm font-medium text-gray-700 formkit-invalid:text-red-500"
+          >
+            Widgets
+          </label>
+          <div class="flex flex-col gap-2 border border-dashed p-2 rounded-lg">
+            <WidgetEditableItem
+              v-for="(widget, index) in widgets"
+              :key="widget.id"
+              :item="widget"
+              @remove="handleRemoveWidget(widget)"
+              @update:config="handleUpdateWidgetConfig(widget, $event)"
             >
-              <IconArrowUpLine class="text-gray-600" />
-            </ActionButton>
-            <ActionButton
-              v-if="index < (widgets?.length || 0) - 1"
-              class="bg-gray-200"
-              @click="handleMoveWidget(widget, 1)"
-            >
-              <IconArrowDownLine class="text-gray-600" />
-            </ActionButton>
-          </template>
-        </WidgetEditableItem>
-      </div>
+              <template #actions>
+                <ActionButton
+                  v-if="index > 0"
+                  class="bg-gray-200"
+                  @click="handleMoveWidget(widget, -1)"
+                >
+                  <IconArrowUpLine class="text-gray-600" />
+                </ActionButton>
+                <ActionButton
+                  v-if="index < (widgets?.length || 0) - 1"
+                  class="bg-gray-200"
+                  @click="handleMoveWidget(widget, 1)"
+                >
+                  <IconArrowDownLine class="text-gray-600" />
+                </ActionButton>
+              </template>
+            </WidgetEditableItem>
 
-      <VButton @click="widgetsHubModalVisible = true">
-        {{ $t("core.common.buttons.add") }}
-      </VButton>
+            <div class="flex justify-left">
+              <VButton @click="widgetsHubModalVisible = true">
+                {{ $t("core.common.buttons.add") }}
+              </VButton>
+            </div>
+          </div>
+        </div>
+      </FormKit>
     </div>
     <template #footer>
       <VSpace>
-        <VButton type="secondary" @click="handleSave">
+        <VButton
+          type="secondary"
+          @click="$formkit.submit('stack-widget-config-form')"
+        >
           {{ $t("core.common.buttons.save") }}
         </VButton>
         <VButton @click="emit('close')">
