@@ -27,7 +27,7 @@ import type { AttachmentSelectProvider } from "../states/attachment-selector";
 import type { FunctionalPage } from "../states/pages";
 
 export interface RouteRecordAppend {
-  parentName: RouteRecordName;
+  parentName: NonNullable<RouteRecordName>;
   route: RouteRecordRaw;
 }
 

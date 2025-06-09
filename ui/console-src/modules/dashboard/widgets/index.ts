@@ -3,6 +3,7 @@ import { markRaw } from "vue";
 import CommentStatsWidget from "./presets/comments/CommentStatsWidget.vue";
 import PendingCommentsWidget from "./presets/comments/PendingCommentsWidget.vue";
 import QuickActionWidget from "./presets/core/quick-action/QuickActionWidget.vue";
+import StackWidget from "./presets/core/stack/StackWidget.vue";
 import ViewsStatsWidget from "./presets/core/view-stats/ViewsStatsWidget.vue";
 import PostStatsWidget from "./presets/posts/PostStatsWidget.vue";
 import RecentPublishedWidget from "./presets/posts/RecentPublishedWidget.vue";
@@ -181,6 +182,18 @@ export const internalWidgetDefinitions: DashboardWidgetDefinition[] = [
       h: 12,
       minH: 6,
       minW: 3,
+    },
+  },
+  {
+    id: "core:stack",
+    component: markRaw(StackWidget),
+    group: "core.dashboard.widgets.groups.other",
+    defaultConfig: {},
+    defaultSize: {
+      w: 6,
+      h: 12,
+      minH: 1,
+      minW: 1,
     },
   },
 ];

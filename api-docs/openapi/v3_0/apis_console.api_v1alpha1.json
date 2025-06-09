@@ -3284,6 +3284,89 @@
           "UserV1alpha1Console"
         ]
       }
+    },
+    "/apis/console.api.storage.halo.run/v1alpha1/policies/{name}/configs/{group}": {
+      "get": {
+        "description": "Get policy config by group",
+        "operationId": "getPolicyConfigByGroup",
+        "parameters": [
+          {
+            "description": "Name of the policy",
+            "in": "path",
+            "name": "name",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "description": "Name of the group",
+            "in": "path",
+            "name": "group",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "default": {
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/JsonNode"
+                }
+              }
+            },
+            "description": "default response"
+          }
+        },
+        "tags": [
+          "PolicyAlpha1Console"
+        ]
+      },
+      "put": {
+        "description": "Update policy config by group",
+        "operationId": "updatePolicyConfigByGroup",
+        "parameters": [
+          {
+            "description": "Name of the policy",
+            "in": "path",
+            "name": "name",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "description": "Name of the group",
+            "in": "path",
+            "name": "group",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/JsonNode"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "204": {
+            "description": "No Content"
+          }
+        },
+        "tags": [
+          "PolicyAlpha1Console"
+        ]
+      }
     }
   },
   "components": {
@@ -4325,6 +4408,9 @@
             "format": "uri"
           }
         }
+      },
+      "JsonNode": {
+        "type": "object"
       },
       "JsonPatch": {
         "minItems": 1,

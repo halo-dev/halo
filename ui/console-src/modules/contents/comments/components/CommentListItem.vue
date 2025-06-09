@@ -386,7 +386,7 @@ const { operationItems } = useOperationItemExtensionPoint<ListedComment>(
                 <HasPermission :permissions="['system:comments:manage']">
                   <VButton type="secondary" @click="replyModal = true">
                     <template #icon>
-                      <IconAddCircle class="h-full w-full" />
+                      <IconAddCircle />
                     </template>
                     {{ $t("core.comment.reply_empty.new") }}
                   </VButton>

@@ -307,7 +307,7 @@ const handleSelectNext = async () => {
   <div v-if="data?.total" class="mb-5">
     <VButton @click="uploadVisible = true">
       <template #icon>
-        <IconUpload class="h-full w-full" />
+        <IconUpload />
       </template>
       {{ $t("core.common.buttons.upload") }}
     </VButton>
@@ -327,7 +327,7 @@ const handleSelectNext = async () => {
         </VButton>
         <VButton type="secondary" @click="uploadVisible = true">
           <template #icon>
-            <IconUpload class="h-full w-full" />
+            <IconUpload />
           </template>
           {{ $t("core.uc_attachment.empty.actions.upload") }}
         </VButton>

@@ -43,3 +43,23 @@ export function useDashboardWidgetsFetch(breakpoint: Ref<string>) {
     isLoading,
   };
 }
+
+export function useDashboardWidgetsViewFetch(breakpoint: Ref<string>) {
+  return useQuery({
+    queryKey: ["core:dashboard:widgets:view", breakpoint],
+    queryFn: async () => {
+      const { data } = await ucApiClient.user.preference.getMyPreference({
+        group: "dashboard-widgets",
+      });
+
+      const layouts = (data ||
+        DefaultResponsiveLayouts) as DashboardResponsiveLayout;
+
+      return {
+        layouts,
+        layout: layouts[breakpoint.value] || layouts.lg || [],
+      };
+    },
+    enabled: computed(() => !!breakpoint.value),
+  });
+}

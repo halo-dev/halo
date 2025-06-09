@@ -216,7 +216,7 @@ const handleDelete = async (role: Role) => {
         @click="editingModal = true"
       >
         <template #icon>
-          <IconAddCircle class="h-full w-full" />
+          <IconAddCircle />
         </template>
         {{ $t("core.common.buttons.new") }}
       </VButton>

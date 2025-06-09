@@ -67,6 +67,7 @@ const groupWidgetDefinitionsKeys = computed(() => {
     :width="1380"
     :layer-closable="true"
     :title="$t('core.dashboard_designer.widgets_modal.title')"
+    mount-to-body
     @close="emit('close')"
   >
     <VTabbar

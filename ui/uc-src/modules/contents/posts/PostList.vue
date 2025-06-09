@@ -109,7 +109,7 @@ const {
     <template #actions>
       <VButton :route="{ name: 'PostEditor' }" type="secondary">
         <template #icon>
-          <IconAddCircle class="h-full w-full" />
+          <IconAddCircle />
         </template>
         {{ $t("core.common.buttons.new") }}
       </VButton>
@@ -179,7 +179,7 @@ const {
                 type="secondary"
               >
                 <template #icon>
-                  <IconAddCircle class="h-full w-full" />
+                  <IconAddCircle />
                 </template>
                 {{ $t("core.common.buttons.new") }}
               </VButton>

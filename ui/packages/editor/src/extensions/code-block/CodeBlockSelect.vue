@@ -14,7 +14,7 @@ const props = defineProps<{
   filterSort?: (options: Option[], query: string) => number;
 }>();
 
-const value = defineModel({
+const value = defineModel<string>({
   default: "",
 });
 
