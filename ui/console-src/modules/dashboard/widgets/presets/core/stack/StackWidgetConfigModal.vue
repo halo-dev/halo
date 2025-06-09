@@ -5,6 +5,7 @@ import WidgetHubModal from "@console/modules/dashboard/components/WidgetHubModal
 import {
   IconArrowDownLine,
   IconArrowUpLine,
+  Toast,
   VButton,
   VModal,
   VSpace,
@@ -42,6 +43,12 @@ const modal = useTemplateRef<InstanceType<typeof VModal> | null>("modal");
 const widgetsHubModalVisible = ref(false);
 
 function handleAddWidget(widgetDefinition: DashboardWidgetDefinition) {
+  if (widgetDefinition.id === "core:stack") {
+    // TODO: i18n
+    Toast.error("You cannot add a stack widget to a stack widget");
+    return;
+  }
+
   widgets.value = [
     ...(widgets.value || []),
     {
