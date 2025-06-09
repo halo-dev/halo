@@ -24,6 +24,10 @@ core:
       aggregate_role: Aggregate Role
   dashboard:
     widgets:
+      common_form:
+        fields:
+          enable_animation:
+            label: Enable animation
       presets:
         recent_published:
           publishTime: Publish Time {publishTime}
