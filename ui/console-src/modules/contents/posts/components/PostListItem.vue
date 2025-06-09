@@ -205,6 +205,7 @@ const { startFields, endFields } = useEntityFieldItemExtensionPoint<ListedPost>(
       priority: 50,
       position: "end",
       component: markRaw(PublishTimeField),
+      hidden: !props.post.post.spec.publishTime,
       props: {
         post: props.post,
       },

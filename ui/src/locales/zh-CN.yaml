@@ -64,7 +64,6 @@ core:
           title: 最近文章
           visits: 访问量 {visits}
           comments: 评论 {comments}
-          publishTime: 发布日期 {publishTime}
         notification:
           title: 通知
           empty:
