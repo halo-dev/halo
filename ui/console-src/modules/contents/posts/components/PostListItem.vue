@@ -22,6 +22,7 @@ import { computed, inject, markRaw, ref, toRefs } from "vue";
 import { useI18n } from "vue-i18n";
 import { useRouter } from "vue-router";
 import ContributorsField from "./entity-fields/ContributorsField.vue";
+import CoverField from "./entity-fields/CoverField.vue";
 import PublishStatusField from "./entity-fields/PublishStatusField.vue";
 import PublishTimeField from "./entity-fields/PublishTimeField.vue";
 import TitleField from "./entity-fields/TitleField.vue";
@@ -159,6 +160,15 @@ const { startFields, endFields } = useEntityFieldItemExtensionPoint<ListedPost>(
   computed((): EntityFieldItem[] => [
     {
       priority: 10,
+      position: "start",
+      component: markRaw(CoverField),
+      hidden: !props.post.post.spec.cover,
+      props: {
+        post: props.post,
+      },
+    },
+    {
+      priority: 20,
       position: "start",
       component: markRaw(TitleField),
       props: {
