@@ -39,7 +39,7 @@ const creationModal = ref(false);
   <div v-if="pats?.length" class="my-5 flex justify-end">
     <VButton type="secondary" @click="creationModal = true">
       <template #icon>
-        <IconAddCircle class="h-full w-full" />
+        <IconAddCircle />
       </template>
       {{ $t("core.common.buttons.new") }}
     </VButton>
@@ -59,7 +59,7 @@ const creationModal = ref(false);
           </VButton>
           <VButton type="secondary" @click="creationModal = true">
             <template #icon>
-              <IconAddCircle class="h-full w-full" />
+              <IconAddCircle />
             </template>
             {{ $t("core.common.buttons.new") }}
           </VButton>

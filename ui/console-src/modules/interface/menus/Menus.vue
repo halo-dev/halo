@@ -298,7 +298,7 @@ function getMenuItemRefDisplayName(menuItem: MenuTreeItem) {
                     @click="menuItemEditingModal = true"
                   >
                     <template #icon>
-                      <IconAddCircle class="h-full w-full" />
+                      <IconAddCircle />
                     </template>
                     {{ $t("core.common.buttons.new") }}
                   </VButton>

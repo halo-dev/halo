@@ -498,6 +498,7 @@ const showCancelPublishButton = computed(() => {
           v-if="showCancelPublishButton"
           :loading="publishCanceling"
           type="danger"
+          ghost
           @click="handleUnpublish()"
         >
           {{ $t("core.common.buttons.cancel_publish") }}

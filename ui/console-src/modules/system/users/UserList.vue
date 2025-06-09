@@ -198,14 +198,14 @@ function onCreationModalClose() {
           type="default"
         >
           <template #icon>
-            <IconShieldUser class="h-full w-full" />
+            <IconShieldUser />
           </template>
           {{ $t("core.user.actions.roles") }}
         </VButton>
         <HasPermission :permissions="['*']">
           <VButton :route="{ name: 'AuthProviders' }" size="sm" type="default">
             <template #icon>
-              <IconLockPasswordLine class="h-full w-full" />
+              <IconLockPasswordLine />
             </template>
             {{ $t("core.user.actions.identity_authentication") }}
           </VButton>
@@ -216,7 +216,7 @@ function onCreationModalClose() {
           @click="creationModal = true"
         >
           <template #icon>
-            <IconAddCircle class="h-full w-full" />
+            <IconAddCircle />
           </template>
           {{ $t("core.common.buttons.new") }}
         </VButton>
@@ -326,7 +326,7 @@ function onCreationModalClose() {
                 @click="creationModal = true"
               >
                 <template #icon>
-                  <IconAddCircle class="h-full w-full" />
+                  <IconAddCircle />
                 </template>
                 {{ $t("core.common.buttons.new") }}
               </VButton>
