@@ -61,8 +61,8 @@
     "vite-plugin-dts": "^4.2.2"
   },
   "peerDependencies": {
-    "vue": "^3.5.13",
-    "vue-router": "^4.3.2"
+    "vue": "^3.5.16",
+    "vue-router": "^4.5.1"
   },
   "exports": {
     ".": {
