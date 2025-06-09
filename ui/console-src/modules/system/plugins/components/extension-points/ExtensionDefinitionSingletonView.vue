@@ -78,24 +78,17 @@ async function handleChange(value: string) {
   isSubmitting.value = true;
 
   try {
-    let { data: extensionPointEnabled } =
+    const { data: extensionPointEnabled } =
       await consoleApiClient.configMap.system.getSystemConfigByGroup({
         group: EXTENSION_POINT_ENABLED_GROUP,
       });
 
-    if (extensionPointEnabled) {
-      extensionPointEnabled[extensionPointDefinition.value?.metadata.name] = [
-        value,
-      ];
-    } else {
-      extensionPointEnabled = {
-        [extensionPointDefinition.value?.metadata.name]: [value],
-      };
-    }
-
     await consoleApiClient.configMap.system.updateSystemConfigByGroup({
       group: EXTENSION_POINT_ENABLED_GROUP,
-      body: extensionPointEnabled,
+      body: {
+        ...extensionPointEnabled,
+        [extensionPointDefinition.value?.metadata.name]: [value],
+      },
     });
 
     Toast.success(t("core.common.toast.save_success"));
