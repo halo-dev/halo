@@ -260,7 +260,7 @@ watch(
           @click="policyVisible = true"
         >
           <template #icon>
-            <IconDatabase2Line class="h-full w-full" />
+            <IconDatabase2Line />
           </template>
           {{ $t("core.attachment.actions.storage_policies") }}
         </VButton>
@@ -270,7 +270,7 @@ watch(
           @click="uploadVisible = true"
         >
           <template #icon>
-            <IconUpload class="h-full w-full" />
+            <IconUpload />
           </template>
           {{ $t("core.common.buttons.upload") }}
         </VButton>
@@ -475,7 +475,7 @@ watch(
                     @click="uploadVisible = true"
                   >
                     <template #icon>
-                      <IconUpload class="h-full w-full" />
+                      <IconUpload />
                     </template>
                     {{ $t("core.attachment.empty.actions.upload") }}
                   </VButton>

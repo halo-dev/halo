@@ -68,38 +68,36 @@ const handleSaveConfigMap = async (data: object) => {
 };
 </script>
 <template>
-  <Transition mode="out-in" name="fade">
-    <div class="rounded-b-base bg-white p-4">
-      <div>
-        <FormKit
-          v-if="group && formSchema && currentConfigMapGroupData"
-          :id="group"
-          :value="currentConfigMapGroupData"
-          :name="group"
-          :preserve="true"
-          type="form"
-          @submit="handleSaveConfigMap"
-        >
-          <FormKitSchema
-            :schema="toRaw(formSchema)"
-            :data="toRaw(currentConfigMapGroupData)"
-          />
-        </FormKit>
-      </div>
-
-      <StickyBlock
-        v-permission="['system:plugins:manage']"
-        class="-mx-4 -mb-4 rounded-b-base rounded-t-lg bg-white p-4 pt-5"
-        position="bottom"
+  <div class="rounded-b-base bg-white p-4">
+    <div>
+      <FormKit
+        v-if="group && formSchema && currentConfigMapGroupData"
+        :id="group"
+        :value="currentConfigMapGroupData"
+        :name="group"
+        :preserve="true"
+        type="form"
+        @submit="handleSaveConfigMap"
       >
-        <VButton
-          :loading="saving"
-          type="secondary"
-          @click="$formkit.submit(group || '')"
-        >
-          {{ $t("core.common.buttons.save") }}
-        </VButton>
-      </StickyBlock>
+        <FormKitSchema
+          :schema="toRaw(formSchema)"
+          :data="toRaw(currentConfigMapGroupData)"
+        />
+      </FormKit>
     </div>
-  </Transition>
+
+    <StickyBlock
+      v-permission="['system:plugins:manage']"
+      class="-mx-4 -mb-4 rounded-b-base rounded-t-lg bg-white p-4 pt-5"
+      position="bottom"
+    >
+      <VButton
+        :loading="saving"
+        type="secondary"
+        @click="$formkit.submit(group || '')"
+      >
+        {{ $t("core.common.buttons.save") }}
+      </VButton>
+    </StickyBlock>
+  </div>
 </template>

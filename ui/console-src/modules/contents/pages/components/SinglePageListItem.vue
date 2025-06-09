@@ -1,8 +1,9 @@
 <script lang="ts" setup>
 import PostContributorList from "@/components/user/PostContributorList.vue";
 import { singlePageLabels } from "@/constants/labels";
-import { formatDatetime } from "@/utils/date";
+import { formatDatetime, relativeTimeTo } from "@/utils/date";
 import { usePermission } from "@/utils/permission";
+import { generateThumbnailUrl } from "@/utils/thumbnail";
 import type { ListedSinglePage, SinglePage } from "@halo-dev/api-client";
 import { coreApiClient } from "@halo-dev/api-client";
 import {
@@ -131,6 +132,16 @@ const handleDelete = async () => {
       />
     </template>
     <template #start>
+      <VEntityField v-if="singlePage.page.spec.cover">
+        <template #description>
+          <div class="aspect-h-2 rounded-md overflow-hidden aspect-w-3 w-20">
+            <img
+              class="object-cover w-full h-full"
+              :src="generateThumbnailUrl(singlePage.page.spec.cover, 's')"
+            />
+          </div>
+        </template>
+      </VEntityField>
       <VEntityField
         :title="singlePage.page.spec.title"
         :route="{
@@ -224,12 +235,11 @@ const handleDelete = async () => {
           />
         </template>
       </VEntityField>
-      <VEntityField>
-        <template #description>
-          <span class="truncate text-xs tabular-nums text-gray-500">
-            {{ formatDatetime(singlePage.page.spec.publishTime) }}
-          </span>
-        </template>
+      <VEntityField
+        v-if="singlePage.page.spec.publishTime"
+        v-tooltip="formatDatetime(singlePage.page.spec.publishTime)"
+        :description="relativeTimeTo(singlePage.page.spec.publishTime)"
+      >
       </VEntityField>
     </template>
     <template

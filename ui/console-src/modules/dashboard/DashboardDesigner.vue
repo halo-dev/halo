@@ -37,7 +37,6 @@ import {
 import type { GridLayout } from "vue-grid-layout";
 import { useI18n } from "vue-i18n";
 import { onBeforeRouteLeave, useRouter } from "vue-router";
-import RiArrowGoBackLine from "~icons/ri/arrow-go-back-line";
 import RiBox3Line from "~icons/ri/box-3-line";
 import RiFileCopyLine from "~icons/ri/file-copy-line";
 import WidgetEditableItem from "./components/WidgetEditableItem.vue";
@@ -254,6 +253,10 @@ async function handleSave() {
     await queryClient.invalidateQueries({
       queryKey: ["core:dashboard:widgets"],
     });
+
+    await queryClient.invalidateQueries({
+      queryKey: ["core:dashboard:widgets:view"],
+    });
   } catch (error) {
     console.error("Failed to save dashboard widgets config", error);
   } finally {
@@ -335,16 +338,13 @@ function handleCopyFromLayout(breakpoint: string) {
       ></VTabbar>
     </div>
     <VSpace>
-      <VButton @click="handleBack">
-        <template #icon>
-          <RiArrowGoBackLine class="h-full w-full" />
-        </template>
+      <VButton ghost @click="handleBack">
         {{ $t("core.common.buttons.back") }}
       </VButton>
       <VDropdown>
         <VButton>
           <template #icon>
-            <IconAddCircle class="h-full w-full" />
+            <IconAddCircle />
           </template>
           {{ $t("core.dashboard_designer.actions.add_widget") }}
         </VButton>
@@ -392,7 +392,7 @@ function handleCopyFromLayout(breakpoint: string) {
         @click="handleSave"
       >
         <template #icon>
-          <IconSave class="h-full w-full" />
+          <IconSave />
         </template>
         {{ $t("core.common.buttons.save") }}
       </VButton>

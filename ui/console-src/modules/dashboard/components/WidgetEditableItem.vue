@@ -6,6 +6,7 @@ import type {
   DashboardWidgetDefinition,
 } from "@halo-dev/console-shared";
 import { computed, inject, ref, type ComputedRef } from "vue";
+import ActionButton from "./ActionButton.vue";
 import WidgetConfigFormModal from "./WidgetConfigFormModal.vue";
 
 const props = defineProps<{
@@ -61,21 +62,18 @@ function handleSaveConfig(config: Record<string, unknown>) {
       @update:config="handleSaveConfig"
     />
     <div
-      class="absolute hidden h-8 right-0 top-0 rounded-tr-lg bg-gray-100 overflow-hidden group-hover/grid-item:inline-flex items-center"
+      class="absolute z-[100] hidden h-8 right-0 top-0 rounded-tr-lg bg-gray-100 overflow-hidden group-hover/grid-item:inline-flex items-center"
     >
-      <div
+      <ActionButton
         v-if="widgetDefinition?.configFormKitSchema"
-        class="h-full w-8 flex cursor-pointer items-center justify-center bg-black hover:bg-gray-800 text-white"
+        class="bg-black"
         @click="configModalVisible = true"
       >
-        <IconSettings class="text-base" />
-      </div>
-      <div
-        class="h-full w-8 flex cursor-pointer items-center justify-center bg-red-500 hover:bg-red-600 text-white"
-        @click="emit('remove')"
-      >
-        <IconCloseCircle class="text-base" />
-      </div>
+        <IconSettings />
+      </ActionButton>
+      <ActionButton class="bg-red-500" @click="emit('remove')">
+        <IconCloseCircle />
+      </ActionButton>
     </div>
   </grid-item>
   <WidgetConfigFormModal
