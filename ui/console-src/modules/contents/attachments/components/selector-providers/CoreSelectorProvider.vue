@@ -265,7 +265,7 @@ const viewType = useLocalStorage("attachment-selector-view-type", "grid");
     <div class="mb-5">
       <VButton @click="uploadVisible = true">
         <template #icon>
-          <IconUpload class="h-full w-full" />
+          <IconUpload />
         </template>
         {{ $t("core.common.buttons.upload") }}
       </VButton>
@@ -286,7 +286,7 @@ const viewType = useLocalStorage("attachment-selector-view-type", "grid");
         </VButton>
         <VButton type="secondary" @click="uploadVisible = true">
           <template #icon>
-            <IconUpload class="h-full w-full" />
+            <IconUpload />
           </template>
           {{ $t("core.attachment.empty.actions.upload") }}
         </VButton>

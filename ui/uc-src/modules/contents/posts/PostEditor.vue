@@ -484,7 +484,7 @@ useSlugify(
           @click="handleSaveClick"
         >
           <template #icon>
-            <IconSave class="h-full w-full" />
+            <IconSave />
           </template>
           {{ $t("core.common.buttons.save") }}
         </VButton>
@@ -495,7 +495,7 @@ useSlugify(
           @click="handleOpenPostSettingEditModal"
         >
           <template #icon>
-            <IconSettings class="h-full w-full" />
+            <IconSettings />
           </template>
           {{ $t("core.common.buttons.setting") }}
         </VButton>
@@ -506,7 +506,7 @@ useSlugify(
             @click="handlePublishClick"
           >
             <template #icon>
-              <IconSendPlaneFill class="h-full w-full" />
+              <IconSendPlaneFill />
             </template>
             {{ $t("core.common.buttons.publish") }}
           </VButton>

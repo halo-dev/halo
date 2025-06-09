@@ -43,7 +43,7 @@ provide<ComputedRef<DashboardWidgetDefinition[]>>(
         @click="$router.push({ name: 'DashboardDesigner' })"
       >
         <template #icon>
-          <IconSettings class="h-full w-full" />
+          <IconSettings />
         </template>
         {{ $t("core.dashboard.actions.setting") }}
       </VButton>

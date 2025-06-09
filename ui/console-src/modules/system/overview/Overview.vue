@@ -200,7 +200,7 @@ const handleDownloadLogfile = () => {
     <template #actions>
       <VButton size="sm" @click="handleCopy">
         <template #icon>
-          <IconClipboardLine class="h-full w-full" />
+          <IconClipboardLine />
         </template>
         {{ $t("core.common.buttons.copy") }}
       </VButton>
