@@ -109,7 +109,7 @@ const handleClose = () => {
       </div>
     </div>
     <template #footer>
-      <div class="flex flex-col sm:flex-row gap-[10px]">
+      <div class="flex flex-row flex-wrap gap-3">
         <VButton :loading="loading" :type="confirmType" @click="handleConfirm">
           {{ confirmText }}
         </VButton>
