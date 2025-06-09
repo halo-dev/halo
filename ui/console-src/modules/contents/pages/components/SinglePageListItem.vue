@@ -1,7 +1,7 @@
 <script lang="ts" setup>
 import PostContributorList from "@/components/user/PostContributorList.vue";
 import { singlePageLabels } from "@/constants/labels";
-import { formatDatetime } from "@/utils/date";
+import { formatDatetime, relativeTimeTo } from "@/utils/date";
 import { usePermission } from "@/utils/permission";
 import type { ListedSinglePage, SinglePage } from "@halo-dev/api-client";
 import { coreApiClient } from "@halo-dev/api-client";
@@ -224,12 +224,11 @@ const handleDelete = async () => {
           />
         </template>
       </VEntityField>
-      <VEntityField>
-        <template #description>
-          <span class="truncate text-xs tabular-nums text-gray-500">
-            {{ formatDatetime(singlePage.page.spec.publishTime) }}
-          </span>
-        </template>
+      <VEntityField
+        v-if="singlePage.page.spec.publishTime"
+        v-tooltip="formatDatetime(singlePage.page.spec.publishTime)"
+        :description="relativeTimeTo(singlePage.page.spec.publishTime)"
+      >
       </VEntityField>
     </template>
     <template
