@@ -85,7 +85,7 @@ const handleOpenPreview = (theme: Theme) => {
               @click="activeTabId = 'local-upload'"
             >
               <template #icon>
-                <IconAddCircle class="h-full w-full" />
+                <IconAddCircle />
               </template>
               {{ $t("core.theme.common.buttons.install") }}
             </VButton>

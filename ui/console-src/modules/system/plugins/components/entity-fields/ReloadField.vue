@@ -38,7 +38,7 @@ function handleReloadWindow() {
 <template>
   <VButton v-if="needsReloadWindow" size="xs" @click="handleReloadWindow">
     <template #icon>
-      <IconInformation class="h-full w-full" />
+      <IconInformation />
     </template>
     {{ $t("core.plugin.operations.reload_window.button") }}
   </VButton>

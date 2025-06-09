@@ -210,13 +210,13 @@ onMounted(() => {
           </VButton>
           <VButton type="default" size="sm" @click="previewModal = true">
             <template #icon>
-              <IconEye class="h-full w-full" />
+              <IconEye />
             </template>
             {{ $t("core.common.buttons.preview") }}
           </VButton>
           <VButton type="secondary" @click="themesModal = true">
             <template #icon>
-              <IconListSettings class="h-full w-full" />
+              <IconListSettings />
             </template>
             {{ $t("core.theme.actions.management") }}
           </VButton>
@@ -237,7 +237,7 @@ onMounted(() => {
             </VButton>
             <VButton type="secondary" @click="themesModal = true">
               <template #icon>
-                <IconExchange class="h-full w-full" />
+                <IconExchange />
               </template>
               {{ $t("core.theme.empty.actions.switch") }}
             </VButton>

@@ -42,6 +42,22 @@ core:
           title: Pending Comments
           empty:
             title: No pending comments
+        stack:
+          title: Widget Stack
+          operations:
+            add_widget:
+              button: Add Widget
+          config_modal:
+            title: Widget Stack Config
+            fields:
+              auto_play:
+                label: Auto play
+              auto_play_interval:
+                label: Auto play interval
+              widgets:
+                label: Widgets
+            toast:
+              nest_warning: You cannot add a stack widget to a stack widget
   dashboard_designer:
     title: Edit Dashboard
     actions:

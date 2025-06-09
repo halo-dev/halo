@@ -1,12 +1,14 @@
 <script setup lang="ts">
 import { setFocus } from "@/formkit/utils/focus";
 import { useGlobalInfoFetch } from "@console/composables/use-global-info";
-import { coreApiClient } from "@halo-dev/api-client";
+import { consoleApiClient } from "@halo-dev/api-client";
 import { Dialog, Toast, VButton, VLoading, VSpace } from "@halo-dev/components";
 import { useQuery } from "@tanstack/vue-query";
 import axios from "axios";
 import { computed, onMounted, ref } from "vue";
 import { useI18n } from "vue-i18n";
+
+const BASIC_GROUP = "basic";
 
 const { t } = useI18n();
 const { globalInfo } = useGlobalInfoFetch();
@@ -27,23 +29,17 @@ function onSubmit({ externalUrl }: { externalUrl: string }) {
     confirmText: t("core.common.buttons.confirm"),
     cancelText: t("core.common.buttons.cancel"),
     onConfirm: async () => {
-      const { data: configMap } = await coreApiClient.configMap.getConfigMap({
-        name: "system",
-      });
+      const { data: basicConfig } =
+        await consoleApiClient.configMap.system.getSystemConfigByGroup({
+          group: BASIC_GROUP,
+        });
 
-      const basicConfig = JSON.parse(configMap.data?.["basic"] || "{}");
-
-      basicConfig.externalUrl = externalUrl.trim();
-
-      await coreApiClient.configMap.patchConfigMap({
-        name: "system",
-        jsonPatchInner: [
-          {
-            op: "add",
-            path: "/data/basic",
-            value: JSON.stringify(basicConfig),
-          },
-        ],
+      await consoleApiClient.configMap.system.updateSystemConfigByGroup({
+        group: BASIC_GROUP,
+        body: {
+          ...basicConfig,
+          externalUrl: externalUrl.trim(),
+        },
       });
 
       await axios.post(`/actuator/restart`);

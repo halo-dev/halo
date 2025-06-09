@@ -486,7 +486,7 @@ async function handleUploadImage(file: File, options?: AxiosRequestConfig) {
           "
         >
           <template #icon>
-            <IconHistoryLine class="h-full w-full" />
+            <IconHistoryLine />
           </template>
           {{ $t("core.page_editor.actions.snapshots") }}
         </VButton>
@@ -497,13 +497,13 @@ async function handleUploadImage(file: File, options?: AxiosRequestConfig) {
           @click="handlePreview"
         >
           <template #icon>
-            <IconEye class="h-full w-full" />
+            <IconEye />
           </template>
           {{ $t("core.common.buttons.preview") }}
         </VButton>
         <VButton :loading="saving" size="sm" type="default" @click="handleSave">
           <template #icon>
-            <IconSave class="h-full w-full" />
+            <IconSave />
           </template>
           {{ $t("core.common.buttons.save") }}
         </VButton>
@@ -514,7 +514,7 @@ async function handleUploadImage(file: File, options?: AxiosRequestConfig) {
           @click="handleOpenSettingModal"
         >
           <template #icon>
-            <IconSettings class="h-full w-full" />
+            <IconSettings />
           </template>
           {{ $t("core.common.buttons.setting") }}
         </VButton>
@@ -524,7 +524,7 @@ async function handleUploadImage(file: File, options?: AxiosRequestConfig) {
           @click="handlePublishClick"
         >
           <template #icon>
-            <IconSendPlaneFill class="h-full w-full" />
+            <IconSendPlaneFill />
           </template>
           {{ $t("core.common.buttons.publish") }}
         </VButton>

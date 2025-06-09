@@ -31,6 +31,7 @@ module.exports = {
           colors: {
             primary: "#4CCBA0",
             secondary: "#0E1731",
+            danger: "#D71D1D",
           },
           borderRadius: {
             base: "4px",
