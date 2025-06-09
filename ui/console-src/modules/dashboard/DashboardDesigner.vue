@@ -257,6 +257,8 @@ async function handleSave() {
     await queryClient.invalidateQueries({
       queryKey: ["core:dashboard:widgets:view"],
     });
+
+    Toast.success(t("core.common.toast.save_success"));
   } catch (error) {
     console.error("Failed to save dashboard widgets config", error);
   } finally {

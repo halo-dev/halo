@@ -1,5 +1,6 @@
 <script lang="ts" setup>
 import EntityDropdownItems from "@/components/entity/EntityDropdownItems.vue";
+import HasPermission from "@/components/permission/HasPermission.vue";
 import { formatDatetime, relativeTimeTo } from "@/utils/date";
 import { usePermission } from "@/utils/permission";
 import { useOperationItemExtensionPoint } from "@console/composables/use-operation-extension-points";
@@ -238,14 +239,16 @@ const { operationItems } = useOperationItemExtensionPoint<ListedReply>(
                   <IconReplyLine />
                   <span>{{ quoteReply.owner.displayName }}</span>
                 </a><br v-if="quoteReply" />{{ reply?.reply.spec.content }}</pre>
-            <div class="flex items-center gap-3 text-xs">
-              <span
-                class="select-none cursor-pointer text-gray-700 hover:text-gray-900"
-                @click="replyModal = true"
-              >
-                {{ $t("core.comment.operations.reply.button") }}
-              </span>
-            </div>
+            <HasPermission :permissions="['system:comments:manage']">
+              <div class="flex items-center gap-3 text-xs">
+                <span
+                  class="select-none cursor-pointer text-gray-700 hover:text-gray-900"
+                  @click="replyModal = true"
+                >
+                  {{ $t("core.comment.operations.reply.button") }}
+                </span>
+              </div>
+            </HasPermission>
           </div>
         </template>
       </VEntityField>

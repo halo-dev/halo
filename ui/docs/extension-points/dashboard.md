@@ -68,7 +68,10 @@ export interface DashboardWidgetDefinition {
   id: string;                                    // 小部件唯一标识符
   component: Raw<Component>;                     // 小部件 Vue 组件
   group: string;                                 // 小部件分组，用于在小部件库中分类显示
-  configFormKitSchema?: Record<string, unknown>[]; // 配置表单 FormKit 定义
+  configFormKitSchema?:
+    | Record<string, unknown>[]
+    | (() => Promise<Record<string, unknown>[]>)
+    | (() => Record<string, unknown>[]);         // 配置表单 FormKit 定义，支持异步函数
   defaultConfig?: Record<string, unknown>;       // 默认配置
   defaultSize: {                                 // 默认尺寸
     w: number;                                   // 宽度（网格单位），根据不同屏幕尺寸，网格单位不同，可参考：{ lg: 12, md: 12, sm: 6, xs: 4 }

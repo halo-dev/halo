@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import HasPermission from "@/components/permission/HasPermission.vue";
 import { formatDatetime, relativeTimeTo } from "@/utils/date";
 import {
   consoleApiClient,
@@ -168,31 +169,35 @@ const websiteOfAnonymous = computed(() => {
             comment.comment.spec.content
           }}</pre>
         </VDescriptionItem>
-        <VDescriptionItem
-          v-if="!comment.comment.spec.approved"
-          :label="$t('core.comment.detail_modal.fields.new_reply')"
-        >
-          <ReplyFormItems
-            :required="false"
-            :auto-focus="false"
-            @update="newReply = $event"
-          />
-        </VDescriptionItem>
+        <HasPermission :permissions="['system:comments:manage']">
+          <VDescriptionItem
+            v-if="!comment.comment.spec.approved"
+            :label="$t('core.comment.detail_modal.fields.new_reply')"
+          >
+            <ReplyFormItems
+              :required="false"
+              :auto-focus="false"
+              @update="newReply = $event"
+            />
+          </VDescriptionItem>
+        </HasPermission>
       </VDescription>
     </div>
     <template #footer>
       <VSpace>
-        <VButton
-          v-if="!comment.comment.spec.approved"
-          type="secondary"
-          @click="handleApprove"
-        >
-          {{
-            newReply
-              ? $t("core.comment.operations.reply_and_approve.button")
-              : $t("core.comment.operations.approve.button")
-          }}
-        </VButton>
+        <HasPermission :permissions="['system:comments:manage']">
+          <VButton
+            v-if="!comment.comment.spec.approved"
+            type="secondary"
+            @click="handleApprove"
+          >
+            {{
+              newReply
+                ? $t("core.comment.operations.reply_and_approve.button")
+                : $t("core.comment.operations.approve.button")
+            }}
+          </VButton>
+        </HasPermission>
         <VButton @click="modal?.close()">
           {{ $t("core.common.buttons.close") }}
         </VButton>

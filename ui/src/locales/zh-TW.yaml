@@ -64,6 +64,8 @@ core:
           title: 最近文章
           visits: 訪問量 {visits}
           comments: 留言 {comments}
+          empty:
+            title: 沒有已發布文章
         notification:
           title: 通知
           empty:
@@ -104,6 +106,8 @@ core:
           title: 瀏覽量
         pending_comments:
           title: 新評論
+          empty:
+            title: 沒有待審核評論
         iframe:
           title: 網頁嵌入
           empty:
@@ -128,6 +132,10 @@ core:
                 label: 部件
             toast:
               nest_warning: 不能將堆疊部件添加到堆疊部件中
+      common_form:
+        fields:
+          enable_animation:
+            label: 啟用動畫
   dashboard_designer:
     title: 編輯儀表盤
     actions:

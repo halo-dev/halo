@@ -65,7 +65,7 @@ function handleSaveConfig(config: Record<string, unknown>) {
       class="absolute z-[100] hidden h-8 right-0 top-0 rounded-tr-lg bg-gray-100 overflow-hidden group-hover/grid-item:inline-flex items-center"
     >
       <ActionButton
-        v-if="widgetDefinition?.configFormKitSchema?.length"
+        v-if="widgetDefinition?.configFormKitSchema"
         class="bg-black"
         @click="configModalVisible = true"
       >

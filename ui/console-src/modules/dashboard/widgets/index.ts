@@ -18,10 +18,12 @@ export const internalWidgetDefinitions: DashboardWidgetDefinition[] = [
     id: "core:post:stats",
     component: markRaw(PostStatsWidget),
     group: "core.dashboard.widgets.groups.post",
-    configFormKitSchema: [
+    configFormKitSchema: () => [
       {
         $formkit: "checkbox",
-        label: "Enable animation",
+        label: i18n.global.t(
+          "core.dashboard.widgets.common_form.fields.enable_animation.label"
+        ),
         name: "enable_animation",
       },
     ],
@@ -39,7 +41,6 @@ export const internalWidgetDefinitions: DashboardWidgetDefinition[] = [
     id: "core:post:recent-published",
     component: markRaw(RecentPublishedWidget),
     group: "core.dashboard.widgets.groups.post",
-    configFormKitSchema: [],
     defaultConfig: {},
     defaultSize: {
       w: 6,
@@ -53,10 +54,12 @@ export const internalWidgetDefinitions: DashboardWidgetDefinition[] = [
     id: "core:singlepage:stats",
     component: markRaw(SinglePageStatsWidget),
     group: "core.dashboard.widgets.groups.page",
-    configFormKitSchema: [
+    configFormKitSchema: () => [
       {
         $formkit: "checkbox",
-        label: "Enable animation",
+        label: i18n.global.t(
+          "core.dashboard.widgets.common_form.fields.enable_animation.label"
+        ),
         name: "enable_animation",
       },
     ],
@@ -75,10 +78,12 @@ export const internalWidgetDefinitions: DashboardWidgetDefinition[] = [
     id: "core:comment:stats",
     component: markRaw(CommentStatsWidget),
     group: "core.dashboard.widgets.groups.comment",
-    configFormKitSchema: [
+    configFormKitSchema: () => [
       {
         $formkit: "checkbox",
-        label: "Enable animation",
+        label: i18n.global.t(
+          "core.dashboard.widgets.common_form.fields.enable_animation.label"
+        ),
         name: "enable_animation",
       },
     ],
@@ -97,7 +102,6 @@ export const internalWidgetDefinitions: DashboardWidgetDefinition[] = [
     id: "core:comment:pending",
     component: markRaw(PendingCommentsWidget),
     group: "core.dashboard.widgets.groups.comment",
-    configFormKitSchema: [],
     defaultConfig: {},
     defaultSize: {
       w: 6,
@@ -105,15 +109,18 @@ export const internalWidgetDefinitions: DashboardWidgetDefinition[] = [
       minH: 6,
       minW: 3,
     },
+    permissions: ["system:comments:view"],
   },
   {
     id: "core:user:stats",
     component: markRaw(UserStatsWidget),
     group: "core.dashboard.widgets.groups.user",
-    configFormKitSchema: [
+    configFormKitSchema: () => [
       {
         $formkit: "checkbox",
-        label: "Enable animation",
+        label: i18n.global.t(
+          "core.dashboard.widgets.common_form.fields.enable_animation.label"
+        ),
         name: "enable_animation",
       },
     ],
@@ -131,10 +138,12 @@ export const internalWidgetDefinitions: DashboardWidgetDefinition[] = [
     id: "core:view:stats",
     component: markRaw(ViewsStatsWidget),
     group: "core.dashboard.widgets.groups.other",
-    configFormKitSchema: [
+    configFormKitSchema: () => [
       {
         $formkit: "checkbox",
-        label: "Enable animation",
+        label: i18n.global.t(
+          "core.dashboard.widgets.common_form.fields.enable_animation.label"
+        ),
         name: "enable_animation",
       },
     ],
@@ -176,7 +185,6 @@ export const internalWidgetDefinitions: DashboardWidgetDefinition[] = [
     id: "core:notifications",
     component: markRaw(NotificationWidget),
     group: "core.dashboard.widgets.groups.other",
-    configFormKitSchema: [],
     defaultConfig: {},
     defaultSize: {
       w: 6,
