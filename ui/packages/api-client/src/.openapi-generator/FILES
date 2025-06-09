@@ -42,6 +42,7 @@ api/personal-access-token-v1alpha1-uc-api.ts
 api/plugin-v1alpha1-api.ts
 api/plugin-v1alpha1-console-api.ts
 api/plugin-v1alpha1-public-api.ts
+api/policy-alpha1-console-api.ts
 api/policy-template-v1alpha1-api.ts
 api/policy-v1alpha1-api.ts
 api/post-v1alpha1-api.ts
