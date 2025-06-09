@@ -1,21 +1,19 @@
 <script setup lang="ts">
 import { usePermission } from "@/utils/permission";
+import ActionButton from "@console/modules/dashboard/components/ActionButton.vue";
+import WidgetConfigFormModal from "@console/modules/dashboard/components/WidgetConfigFormModal.vue";
 import { IconCloseCircle, IconSettings } from "@halo-dev/components";
-import type {
-  DashboardWidget,
-  DashboardWidgetDefinition,
-} from "@halo-dev/console-shared";
+import type { DashboardWidgetDefinition } from "@halo-dev/console-shared";
 import { computed, inject, ref, type ComputedRef } from "vue";
-import ActionButton from "./ActionButton.vue";
-import WidgetConfigFormModal from "./WidgetConfigFormModal.vue";
+import type { SimpleWidget } from "../types";
 
 const props = defineProps<{
-  item: DashboardWidget;
+  item: SimpleWidget;
 }>();
 
 const emit = defineEmits<{
   (e: "remove"): void;
-  (e: "update", item: DashboardWidget): void;
+  (e: "update:config", config: Record<string, unknown>): void;
 }>();
 
 const { currentUserHasPermission } = usePermission();
@@ -30,30 +28,25 @@ const widgetDefinition = computed(() => {
   );
 });
 
+const defaultSize = computed(() => {
+  return widgetDefinition.value?.defaultSize || { w: 1, h: 1 };
+});
+
 const configModalVisible = ref(false);
 
 function handleSaveConfig(config: Record<string, unknown>) {
-  emit("update", {
-    ...props.item,
-    config,
-  });
+  emit("update:config", config);
   configModalVisible.value = false;
 }
 </script>
 <template>
-  <grid-item
-    v-if="currentUserHasPermission(item.permissions)"
-    :key="item.i"
-    class="group/grid-item"
-    :h="item.h"
-    :i="item.i"
-    :w="item.w"
-    :x="item.x"
-    :y="item.y"
-    :min-w="item.minW"
-    :min-h="item.minH"
-    :max-w="item.maxW"
-    :max-h="item.maxH"
+  <div
+    v-if="currentUserHasPermission(widgetDefinition?.permissions)"
+    class="group/grid-item relative"
+    :style="{
+      width: `${defaultSize.w * 100}px`,
+      height: `${defaultSize.h * 36}px`,
+    }"
   >
     <component
       :is="widgetDefinition?.component"
@@ -62,8 +55,9 @@ function handleSaveConfig(config: Record<string, unknown>) {
       @update:config="handleSaveConfig"
     />
     <div
-      class="absolute z-[100] hidden h-8 right-0 top-0 rounded-tr-lg bg-gray-100 overflow-hidden group-hover/grid-item:inline-flex items-center"
+      class="absolute hidden h-8 right-0 top-0 rounded-tr-lg bg-gray-100 overflow-hidden group-hover/grid-item:inline-flex items-center"
     >
+      <slot name="actions" />
       <ActionButton
         v-if="widgetDefinition?.configFormKitSchema?.length"
         class="bg-black"
@@ -75,7 +69,7 @@ function handleSaveConfig(config: Record<string, unknown>) {
         <IconCloseCircle />
       </ActionButton>
     </div>
-  </grid-item>
+  </div>
   <WidgetConfigFormModal
     v-if="
       widgetDefinition &&
