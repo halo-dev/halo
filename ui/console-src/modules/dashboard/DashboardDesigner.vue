@@ -254,6 +254,10 @@ async function handleSave() {
     await queryClient.invalidateQueries({
       queryKey: ["core:dashboard:widgets"],
     });
+
+    await queryClient.invalidateQueries({
+      queryKey: ["core:dashboard:widgets:view"],
+    });
   } catch (error) {
     console.error("Failed to save dashboard widgets config", error);
   } finally {
