@@ -64,6 +64,8 @@ core:
           title: 最近文章
           visits: 訪問量 {visits}
           comments: 留言 {comments}
+          empty:
+            title: 沒有已發布文章
         notification:
           title: 通知
           empty:
@@ -104,6 +106,8 @@ core:
           title: 瀏覽量
         pending_comments:
           title: 新評論
+          empty:
+            title: 沒有待審核評論
         stack:
           title: 堆疊部件
           operations:

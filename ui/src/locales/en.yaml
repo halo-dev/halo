@@ -70,6 +70,8 @@ core:
           title: Recent Posts
           visits: "{visits} Visits"
           comments: "{comments} Comments"
+          empty:
+            title: No published posts
         notification:
           title: Notifications
           empty:
@@ -110,6 +112,8 @@ core:
           title: Comments
         pending_comments:
           title: Pending Comments
+          empty:
+            title: No pending comments
         views_stats:
           title: Visits
         stack:
