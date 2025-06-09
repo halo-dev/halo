@@ -1,5 +1,6 @@
 <script lang="ts" setup>
 import EntityDropdownItems from "@/components/entity/EntityDropdownItems.vue";
+import HasPermission from "@/components/permission/HasPermission.vue";
 import { formatDatetime, relativeTimeTo } from "@/utils/date";
 import { usePermission } from "@/utils/permission";
 import { useOperationItemExtensionPoint } from "@console/composables/use-operation-extension-points";
@@ -325,12 +326,14 @@ const { operationItems } = useOperationItemExtensionPoint<ListedComment>(
                 state="success"
                 animate
               />
-              <span
-                class="select-none cursor-pointer text-gray-700 hover:text-gray-900"
-                @click="replyModal = true"
-              >
-                {{ $t("core.comment.operations.reply.button") }}
-              </span>
+              <HasPermission :permissions="['system:comments:manage']">
+                <span
+                  class="select-none cursor-pointer text-gray-700 hover:text-gray-900"
+                  @click="replyModal = true"
+                >
+                  {{ $t("core.comment.operations.reply.button") }}
+                </span>
+              </HasPermission>
             </div>
           </div>
         </template>
@@ -380,12 +383,14 @@ const { operationItems } = useOperationItemExtensionPoint<ListedComment>(
                 <VButton @click="refetch()">
                   {{ $t("core.common.buttons.refresh") }}
                 </VButton>
-                <VButton type="secondary" @click="replyModal = true">
-                  <template #icon>
-                    <IconAddCircle class="h-full w-full" />
-                  </template>
-                  {{ $t("core.comment.reply_empty.new") }}
-                </VButton>
+                <HasPermission :permissions="['system:comments:manage']">
+                  <VButton type="secondary" @click="replyModal = true">
+                    <template #icon>
+                      <IconAddCircle class="h-full w-full" />
+                    </template>
+                    {{ $t("core.comment.reply_empty.new") }}
+                  </VButton>
+                </HasPermission>
               </VSpace>
             </template>
           </VEmpty>

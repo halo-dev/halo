@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import HasPermission from "@/components/permission/HasPermission.vue";
 import { formatDatetime, relativeTimeTo } from "@/utils/date";
 import CommentDetailModal from "@console/modules/contents/comments/components/CommentDetailModal.vue";
 import OwnerButton from "@console/modules/contents/comments/components/OwnerButton.vue";
@@ -103,20 +104,22 @@ const handleDelete = async () => {
               class="whitespace-pre-wrap break-words text-sm text-gray-900 line-clamp-4"
               >{{ comment?.comment?.spec.content }}</pre
             >
-            <div class="flex items-center gap-3 text-xs">
-              <span
-                class="select-none cursor-pointer text-gray-700 hover:text-gray-900"
-                @click="detailModalVisible = true"
-              >
-                {{ $t("core.comment.operations.review.button") }}
-              </span>
-              <span
-                class="select-none cursor-pointer text-gray-700 hover:text-red-600"
-                @click="handleDelete"
-              >
-                {{ $t("core.common.buttons.delete") }}
-              </span>
-            </div>
+            <HasPermission :permissions="['system:comments:manage']">
+              <div class="flex items-center gap-3 text-xs">
+                <span
+                  class="select-none cursor-pointer text-gray-700 hover:text-gray-900"
+                  @click="detailModalVisible = true"
+                >
+                  {{ $t("core.comment.operations.review.button") }}
+                </span>
+                <span
+                  class="select-none cursor-pointer text-gray-700 hover:text-red-600"
+                  @click="handleDelete"
+                >
+                  {{ $t("core.common.buttons.delete") }}
+                </span>
+              </div>
+            </HasPermission>
           </div>
         </template>
       </VEntityField>
