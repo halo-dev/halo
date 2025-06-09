@@ -68,37 +68,35 @@ const handleSaveConfigMap = async () => {
 };
 </script>
 <template>
-  <Transition mode="out-in" name="fade">
-    <div class="p-4">
-      <FormKit
-        v-if="group && formSchema && configMapFormData?.[group]"
-        :id="group"
-        v-model="configMapFormData[group]"
-        :name="group"
-        :actions="false"
-        :preserve="true"
-        type="form"
-        @submit="handleSaveConfigMap"
-      >
-        <FormKitSchema
-          :schema="toRaw(formSchema)"
-          :data="configMapFormData[group]"
-        />
-      </FormKit>
+  <div class="p-4">
+    <FormKit
+      v-if="group && formSchema && configMapFormData?.[group]"
+      :id="group"
+      v-model="configMapFormData[group]"
+      :name="group"
+      :actions="false"
+      :preserve="true"
+      type="form"
+      @submit="handleSaveConfigMap"
+    >
+      <FormKitSchema
+        :schema="toRaw(formSchema)"
+        :data="configMapFormData[group]"
+      />
+    </FormKit>
 
-      <StickyBlock
-        v-permission="['system:configmaps:manage']"
-        class="-mx-4 -mb-4 rounded-b-base rounded-t-lg bg-white p-4 pt-5"
-        position="bottom"
+    <StickyBlock
+      v-permission="['system:configmaps:manage']"
+      class="-mx-4 -mb-4 rounded-b-base rounded-t-lg bg-white p-4 pt-5"
+      position="bottom"
+    >
+      <VButton
+        :loading="saving"
+        type="secondary"
+        @click="$formkit.submit(group || '')"
       >
-        <VButton
-          :loading="saving"
-          type="secondary"
-          @click="$formkit.submit(group || '')"
-        >
-          {{ $t("core.common.buttons.save") }}
-        </VButton>
-      </StickyBlock>
-    </div>
-  </Transition>
+        {{ $t("core.common.buttons.save") }}
+      </VButton>
+    </StickyBlock>
+  </div>
 </template>
