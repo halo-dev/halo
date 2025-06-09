@@ -64,7 +64,6 @@ core:
           title: 最近文章
           visits: 訪問量 {visits}
           comments: 留言 {comments}
-          publishTime: 發佈日期 {publishTime}
         notification:
           title: 通知
           empty:
@@ -113,6 +112,22 @@ core:
             fields:
               title:
                 label: 標題
+        stack:
+          title: 堆疊部件
+          operations:
+            add_widget:
+              button: 添加部件
+          config_modal:
+            title: 堆疊部件配置
+            fields:
+              auto_play:
+                label: 自動切換
+              auto_play_interval:
+                label: 自動切換間隔
+              widgets:
+                label: 部件
+            toast:
+              nest_warning: 不能將堆疊部件添加到堆疊部件中
   dashboard_designer:
     title: 編輯儀表盤
     actions:

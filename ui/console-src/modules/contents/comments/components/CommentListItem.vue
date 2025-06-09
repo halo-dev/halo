@@ -382,7 +382,7 @@ const { operationItems } = useOperationItemExtensionPoint<ListedComment>(
                 </VButton>
                 <VButton type="secondary" @click="replyModal = true">
                   <template #icon>
-                    <IconAddCircle class="h-full w-full" />
+                    <IconAddCircle />
                   </template>
                   {{ $t("core.comment.reply_empty.new") }}
                 </VButton>
