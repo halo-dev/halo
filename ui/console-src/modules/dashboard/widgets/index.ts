@@ -3,6 +3,7 @@ import type { DashboardWidgetDefinition } from "@halo-dev/console-shared";
 import { markRaw } from "vue";
 import CommentStatsWidget from "./presets/comments/CommentStatsWidget.vue";
 import PendingCommentsWidget from "./presets/comments/PendingCommentsWidget.vue";
+import IframeWidget from "./presets/core/iframe/IframeWidget.vue";
 import QuickActionWidget from "./presets/core/quick-action/QuickActionWidget.vue";
 import StackWidget from "./presets/core/stack/StackWidget.vue";
 import ViewsStatsWidget from "./presets/core/view-stats/ViewsStatsWidget.vue";
@@ -202,6 +203,33 @@ export const internalWidgetDefinitions: DashboardWidgetDefinition[] = [
       h: 12,
       minH: 1,
       minW: 1,
+    },
+  },
+  {
+    id: "core:iframe",
+    component: markRaw(IframeWidget),
+    group: "core.dashboard.widgets.groups.other",
+    configFormKitSchema: () => [
+      {
+        $formkit: "text",
+        label: i18n.global.t(
+          "core.dashboard.widgets.presets.iframe.config.fields.title.label"
+        ),
+        name: "title",
+      },
+      {
+        $formkit: "url",
+        label: "URL",
+        name: "url",
+        validation: "required|url",
+      },
+    ],
+    defaultConfig: {},
+    defaultSize: {
+      w: 6,
+      h: 12,
+      minH: 2,
+      minW: 2,
     },
   },
 ];

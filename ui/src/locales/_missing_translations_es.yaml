@@ -46,6 +46,14 @@ core:
           title: Pending Comments
           empty:
             title: No pending comments
+        iframe:
+          title: Iframe
+          empty:
+            title: Please enter the URL in the configuration
+          config:
+            fields:
+              title:
+                label: Title
         stack:
           title: Widget Stack
           operations:

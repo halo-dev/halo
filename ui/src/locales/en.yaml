@@ -116,6 +116,14 @@ core:
             title: No pending comments
         views_stats:
           title: Visits
+        iframe:
+          title: Iframe
+          empty:
+            title: Please enter the URL in the configuration
+          config:
+            fields:
+              title:
+                label: Title
         stack:
           title: Widget Stack
           operations:

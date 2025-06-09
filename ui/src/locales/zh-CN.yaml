@@ -108,6 +108,14 @@ core:
           title: 新评论
           empty:
             title: 暂无待审核评论
+        iframe:
+          title: 网页嵌入
+          empty:
+            title: 请在配置中输入 URL
+          config:
+            fields:
+              title:
+                label: 标题
         stack:
           title: 堆叠部件
           operations:

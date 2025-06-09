@@ -108,6 +108,14 @@ core:
           title: 新評論
           empty:
             title: 沒有待審核評論
+        iframe:
+          title: 網頁嵌入
+          empty:
+            title: 請在配置中輸入 URL
+          config:
+            fields:
+              title:
+                label: 標題
         stack:
           title: 堆疊部件
           operations:
