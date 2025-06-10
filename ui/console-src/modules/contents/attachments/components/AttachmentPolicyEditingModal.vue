@@ -1,14 +1,15 @@
 <script lang="ts" setup>
 import SubmitButton from "@/components/button/SubmitButton.vue";
 import { setFocus } from "@/formkit/utils/focus";
-import { useSettingFormConvert } from "@console/composables/use-setting-form";
+import type { FormKitSchemaCondition, FormKitSchemaNode } from "@formkit/core";
 import type { Policy } from "@halo-dev/api-client";
-import { coreApiClient } from "@halo-dev/api-client";
+import { consoleApiClient, coreApiClient } from "@halo-dev/api-client";
 import { Toast, VButton, VLoading, VModal, VSpace } from "@halo-dev/components";
 import { useQuery } from "@tanstack/vue-query";
-import { cloneDeep } from "lodash-es";
 import { computed, onMounted, ref, toRaw, toRefs } from "vue";
 import { useI18n } from "vue-i18n";
+
+const CONFIG_MAP_GROUP = "default";
 
 const props = withDefaults(
   defineProps<{
@@ -31,55 +32,36 @@ const { t } = useI18n();
 
 const modal = ref<InstanceType<typeof VModal> | null>(null);
 
-const formState = ref<Policy>({
-  spec: {
-    displayName: "",
-    templateName: "",
-    configMapName: "",
-  },
-  apiVersion: "storage.halo.run/v1alpha1",
-  kind: "Policy",
-  metadata: {
-    name: "",
-    generateName: "attachment-policy-",
-  },
-});
-
-const isUpdateMode = !!props.policy;
+const isUpdateMode = computed(() => !!props.policy);
 
 onMounted(async () => {
-  if (props.policy) {
-    formState.value = cloneDeep(props.policy);
-  }
-  if (props.templateName) {
-    formState.value.spec.templateName = props.templateName;
-  }
-
   setFocus("displayNameInput");
 });
 
+const templateName = computed(() => {
+  return props.policy?.spec.templateName || props.templateName;
+});
+
 const { data: policyTemplate } = useQuery({
-  queryKey: [
-    "core:attachment:policy-template",
-    formState.value.spec.templateName,
-  ],
+  queryKey: ["core:attachment:policy-template", templateName],
   cacheTime: 0,
   queryFn: async () => {
+    if (!templateName.value) {
+      throw new Error("No template name found");
+    }
+
     const { data } =
       await coreApiClient.storage.policyTemplate.getPolicyTemplate({
-        name: formState.value.spec.templateName,
+        name: templateName.value,
       });
     return data;
   },
   retry: 0,
-  enabled: computed(() => !!formState.value.spec.templateName),
+  enabled: computed(() => !!templateName.value),
 });
 
 const { data: setting, isLoading } = useQuery({
-  queryKey: [
-    "core:attachment:policy-template:setting",
-    policyTemplate.value?.spec?.settingName,
-  ],
+  queryKey: ["core:attachment:policy-template:setting", policyTemplate],
   cacheTime: 0,
   queryFn: async () => {
     if (!policyTemplate.value?.spec?.settingName) {
@@ -96,61 +78,72 @@ const { data: setting, isLoading } = useQuery({
   enabled: computed(() => !!policyTemplate.value?.spec?.settingName),
 });
 
-const { data: configMap } = useQuery({
-  queryKey: [
-    "core:attachment:policy-template:configMap",
-    policy.value?.spec.configMapName,
-  ],
+const { data: configMapGroupData } = useQuery({
+  queryKey: ["core:attachment:policy-template:configMap", policy],
   cacheTime: 0,
-  initialData: {
-    data: {},
-    apiVersion: "v1alpha1",
-    kind: "ConfigMap",
-    metadata: {
-      generateName: "configMap-",
-      name: "",
-    },
-  },
   retry: 0,
   queryFn: async () => {
-    if (!policy.value?.spec.configMapName) {
-      throw new Error("No configMap found");
+    if (!policy.value) {
+      return {};
     }
-    const { data } = await coreApiClient.configMap.getConfigMap({
-      name: policy.value?.spec.configMapName,
-    });
-    return data;
+
+    const { data } =
+      await consoleApiClient.storage.policy.getPolicyConfigByGroup({
+        name: policy.value.metadata.name,
+        group: CONFIG_MAP_GROUP,
+      });
+
+    return (data || {}) as Record<string, unknown>;
   },
-  enabled: computed(() => !!policy.value?.spec.configMapName),
 });
 
-const { configMapFormData, formSchema, convertToSave } = useSettingFormConvert(
-  setting,
-  configMap,
-  ref("default")
-);
+const formSchema = computed(() => {
+  if (!setting.value) {
+    return;
+  }
+  const { forms } = setting.value.spec;
+  return forms.find((item) => item.group === CONFIG_MAP_GROUP)?.formSchema as (
+    | FormKitSchemaCondition
+    | FormKitSchemaNode
+  )[];
+});
 
-const submitting = ref(false);
+const isSubmitting = ref(false);
 
-const handleSave = async () => {
+const handleSave = async (data: {
+  displayName: string;
+  [key: string]: unknown;
+}) => {
+  console.log(data);
   try {
-    submitting.value = true;
-    const configMapToUpdate = convertToSave();
-    if (isUpdateMode) {
-      await coreApiClient.configMap.updateConfigMap({
-        name: configMap.value.metadata.name,
-        configMap: configMapToUpdate,
+    isSubmitting.value = true;
+    if (isUpdateMode.value) {
+      if (!policy.value) {
+        throw new Error("No policy found");
+      }
+
+      await consoleApiClient.storage.policy.updatePolicyConfigByGroup({
+        name: policy.value.metadata.name,
+        group: CONFIG_MAP_GROUP,
+        body: data,
       });
 
       await coreApiClient.storage.policy.updatePolicy({
-        name: formState.value.metadata.name,
-        policy: formState.value,
+        name: policy.value.metadata.name,
+        policy: {
+          ...policy.value,
+          spec: {
+            ...policy.value.spec,
+            displayName: data.displayName,
+          },
+        },
       });
     } else {
       const { data: policies } =
         await coreApiClient.storage.policy.listPolicy();
+
       const hasDisplayNameDuplicate = policies.items.some(
-        (policy) => policy.spec.displayName === formState.value.spec.displayName
+        (policy) => policy.spec.displayName === data.displayName
       );
 
       if (hasDisplayNameDuplicate) {
@@ -159,15 +152,36 @@ const handleSave = async () => {
         );
         return;
       }
+
       const { data: newConfigMap } =
         await coreApiClient.configMap.createConfigMap({
-          configMap: configMapToUpdate,
+          configMap: {
+            data: {
+              [CONFIG_MAP_GROUP]: JSON.stringify(data),
+            },
+            apiVersion: "v1alpha1",
+            kind: "ConfigMap",
+            metadata: {
+              generateName: "configMap-",
+              name: "",
+            },
+          },
         });
 
-      formState.value.spec.configMapName = newConfigMap.metadata.name;
-
       await coreApiClient.storage.policy.createPolicy({
-        policy: formState.value,
+        policy: {
+          spec: {
+            displayName: data.displayName,
+            templateName: templateName.value as string,
+            configMapName: newConfigMap.metadata.name,
+          },
+          apiVersion: "storage.halo.run/v1alpha1",
+          kind: "Policy",
+          metadata: {
+            name: "",
+            generateName: "attachment-policy-",
+          },
+        },
       });
     }
 
@@ -176,7 +190,7 @@ const handleSave = async () => {
   } catch (e) {
     console.error("Failed to save attachment policy", e);
   } finally {
-    submitting.value = false;
+    isSubmitting.value = false;
   }
 };
 
@@ -200,11 +214,10 @@ const modalTitle = props.policy
       <VLoading v-if="isLoading" />
       <template v-else>
         <FormKit
-          v-if="formSchema && configMapFormData"
+          v-if="formSchema && configMapGroupData"
           id="attachment-policy-form"
-          v-model="configMapFormData['default']"
+          :value="toRaw(configMapGroupData) || {}"
           name="attachment-policy-form"
-          :actions="false"
           :preserve="true"
           type="form"
           :config="{ validationVisibility: 'submit' }"
@@ -212,7 +225,7 @@ const modalTitle = props.policy
         >
           <FormKit
             id="displayNameInput"
-            v-model="formState.spec.displayName"
+            :value="policy?.spec.displayName"
             :label="
               $t(
                 'core.attachment.policy_editing_modal.fields.display_name.label'
@@ -224,7 +237,7 @@ const modalTitle = props.policy
           ></FormKit>
           <FormKitSchema
             :schema="toRaw(formSchema)"
-            :data="configMapFormData['default']"
+            :data="toRaw(configMapGroupData) || {}"
           />
         </FormKit>
       </template>
@@ -233,7 +246,7 @@ const modalTitle = props.policy
     <template #footer>
       <VSpace>
         <SubmitButton
-          :loading="submitting"
+          :loading="isSubmitting"
           type="secondary"
           :text="$t('core.common.buttons.submit')"
           @submit="$formkit.submit('attachment-policy-form')"

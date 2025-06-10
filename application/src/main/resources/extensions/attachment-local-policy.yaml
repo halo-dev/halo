@@ -68,12 +68,18 @@ spec:
               value: ARCHIVE
         - $formkit: checkbox
           name: alwaysRenameFilename
+          id: alwaysRenameFilename
           label: 是否总是重命名文件名
           help: 勾选后上传后的文件名将被重命名
+          value: false
         - $formkit: group
-          if: $alwaysRenameFilename
+          if: $get(alwaysRenameFilename).value
+          id: renameStrategy
           name: renameStrategy
           label: 重命名策略
+          value:
+            method: RANDOM
+            randomLength: 32
           children:
             - $formkit: radio
               name: method
@@ -87,8 +93,9 @@ spec:
                   value: TIMESTAMP
             - $formkit: number
               number: integer
-              if: $renameStrategy.renameMethod === RANDOM
+              if: "$value.method === RANDOM"
               name: randomLength
+              id: randomLength
               label: 随机文件名长度
               help: 默认值为 32。因为文件名的长度限制，随机文件名的长度范围为 [8, 64]。
               validation: "between:8,64"
