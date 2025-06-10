@@ -364,8 +364,6 @@ core:
         title: ¿Estás seguro de que deseas aprobar todas las respuestas a este comentario para su revisión?
       delete_reply:
         title: ¿Estás seguro de que deseas eliminar esta respuesta?
-      approve_reply:
-        button: Aprobar
       reply:
         button: Responder
     filters:

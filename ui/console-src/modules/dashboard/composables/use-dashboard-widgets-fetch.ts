@@ -4,6 +4,7 @@ import type {
   DashboardWidget,
 } from "@halo-dev/console-shared";
 import { useQuery } from "@tanstack/vue-query";
+import { cloneDeep } from "lodash-es";
 import { computed, ref, type Ref } from "vue";
 import { DefaultResponsiveLayouts } from "../widgets/defaults";
 
@@ -31,7 +32,7 @@ export function useDashboardWidgetsFetch(breakpoint: Ref<string>) {
         layouts.value[breakpoint.value] || layouts.value["lg"] || [];
 
       layout.value = layoutData;
-      originalLayout.value = layoutData;
+      originalLayout.value = cloneDeep(layoutData);
     },
     enabled: computed(() => !!breakpoint.value),
   });
@@ -42,4 +43,24 @@ export function useDashboardWidgetsFetch(breakpoint: Ref<string>) {
     originalLayout,
     isLoading,
   };
+}
+
+export function useDashboardWidgetsViewFetch(breakpoint: Ref<string>) {
+  return useQuery({
+    queryKey: ["core:dashboard:widgets:view", breakpoint],
+    queryFn: async () => {
+      const { data } = await ucApiClient.user.preference.getMyPreference({
+        group: "dashboard-widgets",
+      });
+
+      const layouts = (data ||
+        DefaultResponsiveLayouts) as DashboardResponsiveLayout;
+
+      return {
+        layouts,
+        layout: layouts[breakpoint.value] || layouts.lg || [],
+      };
+    },
+    enabled: computed(() => !!breakpoint.value),
+  });
 }

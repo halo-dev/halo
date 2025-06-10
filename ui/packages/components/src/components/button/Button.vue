@@ -35,6 +35,7 @@
     </span>
   </button>
 </template>
+
 <script lang="ts" setup>
 import { computed } from "vue";
 import type { RouteLocationRaw } from "vue-router";
@@ -50,6 +51,7 @@ const props = withDefaults(
     disabled?: boolean;
     loading?: boolean;
     route?: RouteLocationRaw | undefined;
+    ghost?: boolean;
   }>(),
   {
     type: "default",
@@ -59,6 +61,7 @@ const props = withDefaults(
     disabled: false,
     loading: false,
     route: undefined,
+    ghost: false,
   }
 );
 
@@ -74,6 +77,7 @@ const classes = computed(() => {
     { "btn-circle": props.circle },
     { "btn-block": props.block },
     { "btn-loading": props.loading },
+    { "btn-ghost": props.ghost },
   ];
 });
 
@@ -85,128 +89,199 @@ function handleClick() {
   emit("click");
 }
 </script>
+
 <style lang="scss">
+@use "sass:map";
+$btn-sizes: (
+  xs: (
+    height: theme("spacing.6"),
+    padding-x: theme("spacing.2"),
+    font-size: theme("fontSize.xs"),
+    icon-size: theme("spacing.3"),
+    icon-margin: theme("spacing.2"),
+  ),
+  sm: (
+    height: theme("spacing.7"),
+    padding-x: theme("spacing.3"),
+    font-size: theme("fontSize.xs"),
+    icon-size: theme("spacing.3"),
+    icon-margin: theme("spacing.2"),
+  ),
+  md: (
+    height: theme("spacing.9"),
+    padding-x: theme("spacing.4"),
+    font-size: theme("fontSize.sm"),
+    icon-size: theme("spacing.5"),
+    icon-margin: theme("spacing.3"),
+  ),
+  lg: (
+    height: theme("spacing.11"),
+    padding-x: theme("spacing.5"),
+    font-size: theme("fontSize.lg"),
+    icon-size: theme("spacing.5"),
+    icon-margin: theme("spacing.3"),
+  ),
+);
+
+$btn-themes: (
+  default: (
+    bg: transparent,
+    color: inherit,
+    border: 1px solid #d9d9d9,
+    hover-bg: theme("colors.gray.100"),
+    icon-color: theme("colors.secondary"),
+    ghost-color: inherit,
+    ghost-hover-bg: theme("colors.gray.100"),
+    ghost-icon-color: theme("colors.secondary"),
+  ),
+  primary: (
+    bg: theme("colors.primary"),
+    color: #fff,
+    border: none,
+    hover-bg: theme("colors.primary"),
+    icon-color: #fff,
+    ghost-color: theme("colors.primary"),
+    ghost-hover-bg: theme("colors.primary / 10%"),
+    ghost-icon-color: theme("colors.primary"),
+  ),
+  secondary: (
+    bg: theme("colors.secondary"),
+    color: #fff,
+    border: none,
+    hover-bg: theme("colors.secondary"),
+    icon-color: #fff,
+    ghost-color: theme("colors.secondary"),
+    ghost-hover-bg: theme("colors.secondary / 10%"),
+    ghost-icon-color: theme("colors.secondary"),
+  ),
+  danger: (
+    bg: theme("colors.danger"),
+    color: #fff,
+    border: none,
+    hover-bg: theme("colors.danger"),
+    icon-color: #fff,
+    ghost-color: theme("colors.danger"),
+    ghost-hover-bg: theme("colors.danger / 10%"),
+    ghost-icon-color: theme("colors.danger"),
+  ),
+);
+
 .btn {
-  @apply rounded-base
-  inline-flex
-  flex-shrink-0
-  cursor-pointer
-  select-none
-  flex-wrap
-  items-center
-  justify-center
-  transition-all
-  text-center
-  text-sm
-  no-underline
-  h-9
-  px-4
-  outline-0
-  border-none
-  appearance-none
-  align-middle;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  flex-wrap: wrap;
+  cursor: pointer;
+  user-select: none;
+  appearance: none;
+  border-radius: theme("borderRadius.base");
+  transition: all 150ms cubic-bezier(0.4, 0, 0.2, 1);
+  text-align: center;
+  text-decoration: none;
+  vertical-align: middle;
+  outline-width: 0;
+  border-style: none;
+  $md-config: map.get($btn-sizes, md);
+  height: map.get($md-config, height);
+  padding-left: map.get($md-config, padding-x);
+  padding-right: map.get($md-config, padding-x);
+  font-size: map.get($md-config, font-size);
 
   &:hover {
-    @apply opacity-90;
+    opacity: 0.9;
   }
 
   &:active {
-    @apply opacity-100;
+    opacity: 1;
   }
 
   &:disabled {
-    @apply opacity-50
-    cursor-not-allowed;
+    opacity: 0.5;
+    cursor: not-allowed;
   }
-}
 
-.btn-default {
-  border: 1px solid #d9d9d9;
+  &.btn-loading {
+    cursor: not-allowed;
 
-  &:hover {
-    @apply bg-gray-100;
+    &:hover {
+      opacity: 1;
+    }
+  }
+
+  &.btn-block {
+    width: 100%;
   }
 
   .btn-icon {
-    @apply text-secondary;
+    height: map.get($md-config, icon-size);
+    width: map.get($md-config, icon-size);
+    margin-right: map.get($md-config, icon-margin);
+    color: #fff;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+
+    > * {
+      height: 100%;
+      width: 100%;
+    }
   }
 }
 
-.btn-primary {
-  @apply text-white bg-primary #{!important};
-}
+@each $size, $config in $btn-sizes {
+  .btn-#{$size} {
+    height: map.get($config, height);
+    padding-left: map.get($config, padding-x);
+    padding-right: map.get($config, padding-x);
+    font-size: map.get($config, font-size);
 
-.btn-secondary {
-  @apply text-white bg-secondary #{!important};
-}
+    .btn-icon {
+      height: map.get($config, icon-size);
+      width: map.get($config, icon-size);
+      margin-right: map.get($config, icon-margin);
+    }
 
-.btn-danger {
-  background-color: #d71d1d !important;
-  @apply text-white;
-}
-
-.btn-block {
-  @apply w-full;
-}
-
-.btn-icon {
-  @apply h-5 w-5
-  text-white
-  mr-3;
-}
-
-.btn-loading {
-  @apply cursor-not-allowed;
-  &:hover {
-    @apply opacity-100;
+    &.btn-circle {
+      width: map.get($config, height);
+      padding: 0;
+      border-radius: 9999px;
+    }
   }
 }
 
-.btn-lg {
-  @apply h-11
-  px-5
-  text-lg;
-}
+@each $theme, $config in $btn-themes {
+  .btn-#{$theme} {
+    background-color: map.get($config, bg) !important;
+    color: map.get($config, color);
+    border: map.get($config, border);
 
-.btn-sm {
-  @apply h-7
-  px-3
-  text-xs;
+    &:hover {
+      background-color: map.get($config, hover-bg) !important;
+    }
 
-  .btn-icon {
-    @apply h-3
-    w-3
-    mr-2;
+    .btn-icon {
+      color: map.get($config, icon-color);
+    }
   }
 }
 
-.btn-xs {
-  @apply h-6
-  px-2
-  text-xs;
+.btn-ghost {
+  background-color: transparent !important;
 
-  .btn-icon {
-    @apply h-3
-    w-3
-    mr-2;
+  @each $theme, $config in $btn-themes {
+    &.btn-#{$theme} {
+      color: map.get($config, ghost-color);
+      border: none;
+
+      &:hover {
+        background-color: map.get($config, ghost-hover-bg) !important;
+      }
+
+      .btn-icon {
+        color: map.get($config, ghost-icon-color);
+      }
+    }
   }
-}
-
-.btn-circle {
-  @apply w-9
-  p-0
-  rounded-full;
-}
-
-.btn-lg.btn-circle {
-  @apply w-11;
-}
-
-.btn-sm.btn-circle {
-  @apply w-7;
-}
-
-.btn-xs.btn-circle {
-  @apply w-6;
 }
 </style>

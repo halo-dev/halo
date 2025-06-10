@@ -64,7 +64,8 @@ core:
           title: 最近文章
           visits: 访问量 {visits}
           comments: 评论 {comments}
-          publishTime: 发布日期 {publishTime}
+          empty:
+            title: 暂无已发布文章
         notification:
           title: 通知
           empty:
@@ -103,6 +104,38 @@ core:
           title: 评论
         views_stats:
           title: 浏览量
+        pending_comments:
+          title: 新评论
+          empty:
+            title: 暂无待审核评论
+        iframe:
+          title: 网页嵌入
+          empty:
+            title: 请在配置中输入 URL
+          config:
+            fields:
+              title:
+                label: 标题
+        stack:
+          title: 堆叠部件
+          operations:
+            add_widget:
+              button: 添加部件
+          config_modal:
+            title: 堆叠部件配置
+            fields:
+              auto_play:
+                label: 自动切换
+              auto_play_interval:
+                label: 自动切换间隔
+              widgets:
+                label: 部件
+            toast:
+              nest_warning: 不能将堆叠部件添加到堆叠部件中
+      common_form:
+        fields:
+          enable_animation:
+            label: 启用动画
   dashboard_designer:
     title: 编辑仪表盘
     actions:
@@ -493,10 +526,16 @@ core:
         title: 确定要审核通过该评论的所有回复吗？
       delete_reply:
         title: 删除回复
-      approve_reply:
-        button: 审核通过
+      review:
+        button: 审核
       reply:
         button: 回复
+      approve:
+        button: 通过
+      reply_and_approve:
+        button: 回复并通过
+      cancel_approve:
+        button: 取消通过
     filters:
       status:
         items:
@@ -530,6 +569,25 @@ core:
       operations:
         submit:
           toast_success: 回复成功
+    text:
+      commented_on: 评论在
+      replied_below: 回复：
+    detail_modal:
+      fields:
+        owner: 评论者
+        creation_time: 评论时间
+        commented_on: 评论在
+        new_reply: 新回复
+        user_agent: 用户代理（UA）
+    comment_detail_modal:
+      title: 评论详情
+      fields:
+        content: 评论内容
+    reply_detail_modal:
+      title: 回复详情
+      fields:
+        original_comment: 原评论
+        content: 回复内容
   attachment:
     title: 附件库
     common:
@@ -1780,6 +1838,7 @@ core:
       warning: 警告
       system_protection: 系统保留
       all: 全部
+      detail: 详情
     tooltips:
       unpublished_content_tip: 当前有内容已保存，但还未发布。
       publishing: 发布中

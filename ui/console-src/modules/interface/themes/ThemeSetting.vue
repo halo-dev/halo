@@ -71,35 +71,33 @@ const handleSaveConfigMap = async (data: object) => {
 await suspense();
 </script>
 <template>
-  <Transition mode="out-in" name="fade">
-    <div class="p-4">
-      <FormKit
-        v-if="group && formSchema && currentConfigMapGroupData"
-        :id="group"
-        :value="currentConfigMapGroupData || {}"
-        :name="group"
-        :preserve="true"
-        type="form"
-        @submit="handleSaveConfigMap"
+  <div class="p-4">
+    <FormKit
+      v-if="group && formSchema && currentConfigMapGroupData"
+      :id="group"
+      :value="currentConfigMapGroupData || {}"
+      :name="group"
+      :preserve="true"
+      type="form"
+      @submit="handleSaveConfigMap"
+    >
+      <FormKitSchema
+        :schema="toRaw(formSchema)"
+        :data="toRaw(currentConfigMapGroupData)"
+      />
+    </FormKit>
+    <StickyBlock
+      v-permission="['system:themes:manage']"
+      class="-mx-4 -mb-4 rounded-b-base rounded-t-lg bg-white p-4 pt-5"
+      position="bottom"
+    >
+      <VButton
+        :loading="saving"
+        type="secondary"
+        @click="$formkit.submit(group || '')"
       >
-        <FormKitSchema
-          :schema="toRaw(formSchema)"
-          :data="toRaw(currentConfigMapGroupData)"
-        />
-      </FormKit>
-      <StickyBlock
-        v-permission="['system:themes:manage']"
-        class="-mx-4 -mb-4 rounded-b-base rounded-t-lg bg-white p-4 pt-5"
-        position="bottom"
-      >
-        <VButton
-          :loading="saving"
-          type="secondary"
-          @click="$formkit.submit(group || '')"
-        >
-          {{ $t("core.common.buttons.save") }}
-        </VButton>
-      </StickyBlock>
-    </div>
-  </Transition>
+        {{ $t("core.common.buttons.save") }}
+      </VButton>
+    </StickyBlock>
+  </div>
 </template>

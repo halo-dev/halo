@@ -51,6 +51,10 @@ core:
     actions:
       setting: Setting
     widgets:
+      common_form:
+        fields:
+          enable_animation:
+            label: Enable animation
       groups:
         post: Post
         page: Page
@@ -66,7 +70,8 @@ core:
           title: Recent Posts
           visits: "{visits} Visits"
           comments: "{comments} Comments"
-          publishTime: Publish Time {publishTime}
+          empty:
+            title: No published posts
         notification:
           title: Notifications
           empty:
@@ -105,8 +110,36 @@ core:
           title: Users
         comment_stats:
           title: Comments
+        pending_comments:
+          title: Pending Comments
+          empty:
+            title: No pending comments
         views_stats:
           title: Visits
+        iframe:
+          title: Iframe
+          empty:
+            title: Please enter the URL in the configuration
+          config:
+            fields:
+              title:
+                label: Title
+        stack:
+          title: Widget Stack
+          operations:
+            add_widget:
+              button: Add Widget
+          config_modal:
+            title: Widget Stack Config
+            fields:
+              auto_play:
+                label: Auto play
+              auto_play_interval:
+                label: Auto play interval
+              widgets:
+                label: Widgets
+            toast:
+              nest_warning: You cannot add a stack widget to a stack widget
   dashboard_designer:
     title: Edit Dashboard
     actions:
@@ -500,6 +533,9 @@ core:
       title: There are no replies currently.
       message: You can try refreshing or creating a new reply.
       new: New Reply
+    text:
+      commented_on: commented on
+      replied_below: "replied:"
     operations:
       delete_comment:
         title: Delete comment
@@ -521,10 +557,16 @@ core:
           review?
       delete_reply:
         title: Delete reply
-      approve_reply:
-        button: Approve
+      review:
+        button: Review
       reply:
         button: Reply
+      approve:
+        button: Approve
+      reply_and_approve:
+        button: Reply and approve
+      cancel_approve:
+        button: Cancel approve
     filters:
       status:
         items:
@@ -558,6 +600,22 @@ core:
       operations:
         submit:
           toast_success: Reply successfully
+    detail_modal:
+      fields:
+        owner: Commentator
+        creation_time: Comment time
+        commented_on: Commented on
+        new_reply: New reply
+        user_agent: User agent
+    comment_detail_modal:
+      title: Comment detail
+      fields:
+        content: Comment content
+    reply_detail_modal:
+      title: Reply detail
+      fields:
+        original_comment: Original comment
+        content: Reply content
   attachment:
     title: Attachments
     common:
@@ -1920,6 +1978,7 @@ core:
       warning: Warning
       system_protection: System protection
       all: All
+      detail: Detail
     tooltips:
       unpublished_content_tip: There is content that has been saved but not yet published.
       publishing: Publishing

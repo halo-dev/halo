@@ -173,7 +173,7 @@ watch(selectedTagNames, (newVal) => {
         @click="editingModal = true"
       >
         <template #icon>
-          <IconAddCircle class="h-full w-full" />
+          <IconAddCircle />
         </template>
         {{ $t("core.common.buttons.new") }}
       </VButton>
@@ -274,7 +274,7 @@ watch(selectedTagNames, (newVal) => {
               </VButton>
               <VButton type="secondary" @click="editingModal = true">
                 <template #icon>
-                  <IconAddCircle class="h-full w-full" />
+                  <IconAddCircle />
                 </template>
                 {{ $t("core.common.buttons.new") }}
               </VButton>

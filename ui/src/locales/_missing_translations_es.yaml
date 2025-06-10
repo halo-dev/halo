@@ -24,9 +24,15 @@ core:
       aggregate_role: Aggregate Role
   dashboard:
     widgets:
+      common_form:
+        fields:
+          enable_animation:
+            label: Enable animation
       presets:
         recent_published:
           publishTime: Publish Time {publishTime}
+          empty:
+            title: No published posts
         notification:
           title: Notifications
           empty:
@@ -36,6 +42,34 @@ core:
             fields:
               enabled_items:
                 label: Enabled Items
+        pending_comments:
+          title: Pending Comments
+          empty:
+            title: No pending comments
+        iframe:
+          title: Iframe
+          empty:
+            title: Please enter the URL in the configuration
+          config:
+            fields:
+              title:
+                label: Title
+        stack:
+          title: Widget Stack
+          operations:
+            add_widget:
+              button: Add Widget
+          config_modal:
+            title: Widget Stack Config
+            fields:
+              auto_play:
+                label: Auto play
+              auto_play_interval:
+                label: Auto play interval
+              widgets:
+                label: Widgets
+            toast:
+              nest_warning: You cannot add a stack widget to a stack widget
   dashboard_designer:
     title: Edit Dashboard
     actions:
@@ -144,6 +178,35 @@ core:
   page_editor:
     actions:
       snapshots: Snapshots
+  comment:
+    text:
+      commented_on: commented on
+      replied_below: "replied:"
+    operations:
+      review:
+        button: Review
+      approve:
+        button: Approve
+      reply_and_approve:
+        button: Reply and approve
+      cancel_approve:
+        button: Cancel approve
+    detail_modal:
+      fields:
+        owner: Commentator
+        creation_time: Comment time
+        commented_on: Commented on
+        new_reply: New reply
+        user_agent: User agent
+    comment_detail_modal:
+      title: Comment detail
+      fields:
+        content: Comment content
+    reply_detail_modal:
+      title: Reply detail
+      fields:
+        original_comment: Original comment
+        content: Reply content
   attachment:
     filters:
       sort:
@@ -694,6 +757,7 @@ core:
     text:
       system_protection: System protection
       all: All
+      detail: Detail
   uc_post:
     creation_modal:
       title: Create post

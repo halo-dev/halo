@@ -64,7 +64,8 @@ core:
           title: 最近文章
           visits: 訪問量 {visits}
           comments: 留言 {comments}
-          publishTime: 發佈日期 {publishTime}
+          empty:
+            title: 沒有已發布文章
         notification:
           title: 通知
           empty:
@@ -103,6 +104,38 @@ core:
           title: 留言
         views_stats:
           title: 瀏覽量
+        pending_comments:
+          title: 新評論
+          empty:
+            title: 沒有待審核評論
+        iframe:
+          title: 網頁嵌入
+          empty:
+            title: 請在配置中輸入 URL
+          config:
+            fields:
+              title:
+                label: 標題
+        stack:
+          title: 堆疊部件
+          operations:
+            add_widget:
+              button: 添加部件
+          config_modal:
+            title: 堆疊部件配置
+            fields:
+              auto_play:
+                label: 自動切換
+              auto_play_interval:
+                label: 自動切換間隔
+              widgets:
+                label: 部件
+            toast:
+              nest_warning: 不能將堆疊部件添加到堆疊部件中
+      common_form:
+        fields:
+          enable_animation:
+            label: 啟用動畫
   dashboard_designer:
     title: 編輯儀表盤
     actions:
@@ -478,10 +511,16 @@ core:
         title: 確定要審核通過該留言的所有回覆嗎？
       delete_reply:
         title: 刪除回覆
-      approve_reply:
-        button: 審核通過
+      review:
+        button: 審核
       reply:
         button: 回覆
+      approve:
+        button: 通過
+      reply_and_approve:
+        button: 回覆並通過
+      cancel_approve:
+        button: 取消通過
     filters:
       status:
         items:
@@ -515,6 +554,25 @@ core:
       operations:
         submit:
           toast_success: 回覆成功
+    text:
+      commented_on: 評論在
+      replied_below: 回覆：
+    detail_modal:
+      fields:
+        owner: 評論者
+        creation_time: 評論時間
+        commented_on: 評論在
+        new_reply: 新回覆
+        user_agent: 用戶代理（UA）
+    comment_detail_modal:
+      title: 評論詳情
+      fields:
+        content: 評論內容
+    reply_detail_modal:
+      title: 回覆詳情
+      fields:
+        original_comment: 原評論
+        content: 回覆內容
   attachment:
     title: 附件庫
     common:
@@ -1765,6 +1823,7 @@ core:
       warning: 警告
       system_protection: 系統保留
       all: 全部
+      detail: 詳情
     tooltips:
       unpublished_content_tip: 當前有內容已保存，但還未發布。
       publishing: 發布中

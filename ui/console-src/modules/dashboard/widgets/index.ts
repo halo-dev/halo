@@ -1,7 +1,11 @@
+import { i18n } from "@/locales";
 import type { DashboardWidgetDefinition } from "@halo-dev/console-shared";
 import { markRaw } from "vue";
 import CommentStatsWidget from "./presets/comments/CommentStatsWidget.vue";
+import PendingCommentsWidget from "./presets/comments/PendingCommentsWidget.vue";
+import IframeWidget from "./presets/core/iframe/IframeWidget.vue";
 import QuickActionWidget from "./presets/core/quick-action/QuickActionWidget.vue";
+import StackWidget from "./presets/core/stack/StackWidget.vue";
 import ViewsStatsWidget from "./presets/core/view-stats/ViewsStatsWidget.vue";
 import PostStatsWidget from "./presets/posts/PostStatsWidget.vue";
 import RecentPublishedWidget from "./presets/posts/RecentPublishedWidget.vue";
@@ -14,10 +18,12 @@ export const internalWidgetDefinitions: DashboardWidgetDefinition[] = [
     id: "core:post:stats",
     component: markRaw(PostStatsWidget),
     group: "core.dashboard.widgets.groups.post",
-    configFormKitSchema: [
+    configFormKitSchema: () => [
       {
         $formkit: "checkbox",
-        label: "Enable animation",
+        label: i18n.global.t(
+          "core.dashboard.widgets.common_form.fields.enable_animation.label"
+        ),
         name: "enable_animation",
       },
     ],
@@ -35,7 +41,6 @@ export const internalWidgetDefinitions: DashboardWidgetDefinition[] = [
     id: "core:post:recent-published",
     component: markRaw(RecentPublishedWidget),
     group: "core.dashboard.widgets.groups.post",
-    configFormKitSchema: [],
     defaultConfig: {},
     defaultSize: {
       w: 6,
@@ -49,10 +54,12 @@ export const internalWidgetDefinitions: DashboardWidgetDefinition[] = [
     id: "core:singlepage:stats",
     component: markRaw(SinglePageStatsWidget),
     group: "core.dashboard.widgets.groups.page",
-    configFormKitSchema: [
+    configFormKitSchema: () => [
       {
         $formkit: "checkbox",
-        label: "Enable animation",
+        label: i18n.global.t(
+          "core.dashboard.widgets.common_form.fields.enable_animation.label"
+        ),
         name: "enable_animation",
       },
     ],
@@ -71,10 +78,12 @@ export const internalWidgetDefinitions: DashboardWidgetDefinition[] = [
     id: "core:comment:stats",
     component: markRaw(CommentStatsWidget),
     group: "core.dashboard.widgets.groups.comment",
-    configFormKitSchema: [
+    configFormKitSchema: () => [
       {
         $formkit: "checkbox",
-        label: "Enable animation",
+        label: i18n.global.t(
+          "core.dashboard.widgets.common_form.fields.enable_animation.label"
+        ),
         name: "enable_animation",
       },
     ],
@@ -90,13 +99,28 @@ export const internalWidgetDefinitions: DashboardWidgetDefinition[] = [
     permissions: [],
   },
   {
+    id: "core:comment:pending",
+    component: markRaw(PendingCommentsWidget),
+    group: "core.dashboard.widgets.groups.comment",
+    defaultConfig: {},
+    defaultSize: {
+      w: 6,
+      h: 12,
+      minH: 6,
+      minW: 3,
+    },
+    permissions: ["system:comments:view"],
+  },
+  {
     id: "core:user:stats",
     component: markRaw(UserStatsWidget),
     group: "core.dashboard.widgets.groups.user",
-    configFormKitSchema: [
+    configFormKitSchema: () => [
       {
         $formkit: "checkbox",
-        label: "Enable animation",
+        label: i18n.global.t(
+          "core.dashboard.widgets.common_form.fields.enable_animation.label"
+        ),
         name: "enable_animation",
       },
     ],
@@ -114,10 +138,12 @@ export const internalWidgetDefinitions: DashboardWidgetDefinition[] = [
     id: "core:view:stats",
     component: markRaw(ViewsStatsWidget),
     group: "core.dashboard.widgets.groups.other",
-    configFormKitSchema: [
+    configFormKitSchema: () => [
       {
         $formkit: "checkbox",
-        label: "Enable animation",
+        label: i18n.global.t(
+          "core.dashboard.widgets.common_form.fields.enable_animation.label"
+        ),
         name: "enable_animation",
       },
     ],
@@ -159,13 +185,51 @@ export const internalWidgetDefinitions: DashboardWidgetDefinition[] = [
     id: "core:notifications",
     component: markRaw(NotificationWidget),
     group: "core.dashboard.widgets.groups.other",
-    configFormKitSchema: [],
     defaultConfig: {},
     defaultSize: {
       w: 6,
       h: 12,
       minH: 6,
       minW: 3,
+    },
+  },
+  {
+    id: "core:stack",
+    component: markRaw(StackWidget),
+    group: "core.dashboard.widgets.groups.other",
+    defaultConfig: {},
+    defaultSize: {
+      w: 6,
+      h: 12,
+      minH: 1,
+      minW: 1,
+    },
+  },
+  {
+    id: "core:iframe",
+    component: markRaw(IframeWidget),
+    group: "core.dashboard.widgets.groups.other",
+    configFormKitSchema: () => [
+      {
+        $formkit: "text",
+        label: i18n.global.t(
+          "core.dashboard.widgets.presets.iframe.config.fields.title.label"
+        ),
+        name: "title",
+      },
+      {
+        $formkit: "url",
+        label: "URL",
+        name: "url",
+        validation: "required|url",
+      },
+    ],
+    defaultConfig: {},
+    defaultSize: {
+      w: 6,
+      h: 12,
+      minH: 2,
+      minW: 2,
     },
   },
 ];

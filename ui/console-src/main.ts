@@ -49,7 +49,7 @@ async function loadUserPermissions() {
       const { value } = binding;
       const { any, enable } = binding.modifiers;
 
-      if (hasPermission(uiPermissions, value, any)) {
+      if (hasPermission(uiPermissions, value, any ?? false)) {
         return;
       }
 

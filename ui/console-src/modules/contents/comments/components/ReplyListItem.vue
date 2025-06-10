@@ -1,6 +1,8 @@
 <script lang="ts" setup>
 import EntityDropdownItems from "@/components/entity/EntityDropdownItems.vue";
-import { formatDatetime } from "@/utils/date";
+import HasPermission from "@/components/permission/HasPermission.vue";
+import { formatDatetime, relativeTimeTo } from "@/utils/date";
+import { usePermission } from "@/utils/permission";
 import { useOperationItemExtensionPoint } from "@console/composables/use-operation-extension-points";
 import type { ListedComment, ListedReply } from "@halo-dev/api-client";
 import { coreApiClient } from "@halo-dev/api-client";
@@ -8,19 +10,22 @@ import {
   Dialog,
   IconReplyLine,
   Toast,
-  VAvatar,
+  VDropdownDivider,
   VDropdownItem,
   VEntity,
   VEntityField,
   VStatusDot,
-  VTag,
 } from "@halo-dev/components";
 import type { OperationItem } from "@halo-dev/console-shared";
 import { useQueryClient } from "@tanstack/vue-query";
 import { computed, inject, markRaw, ref, type Ref, toRefs } from "vue";
 import { useI18n } from "vue-i18n";
+import { useCommentLastReadTimeMutate } from "../composables/use-comment-last-readtime-mutate";
+import OwnerButton from "./OwnerButton.vue";
 import ReplyCreationModal from "./ReplyCreationModal.vue";
+import ReplyDetailModal from "./ReplyDetailModal.vue";
 
+const { currentUserHasPermission } = usePermission();
 const { t } = useI18n();
 const queryClient = useQueryClient();
 
@@ -37,6 +42,13 @@ const props = withDefaults(
 );
 
 const { reply } = toRefs(props);
+
+const creationTime = computed(() => {
+  return (
+    props.reply?.reply.spec.creationTime ||
+    props.reply?.reply.metadata.creationTimestamp
+  );
+});
 
 const quoteReply = computed(() => {
   const { quoteReply: replyName } = props.reply.reply.spec;
@@ -67,38 +79,38 @@ const handleDelete = async () => {
       } catch (error) {
         console.error("Failed to delete comment reply", error);
       } finally {
-        queryClient.invalidateQueries({ queryKey: ["comment-replies"] });
+        queryClient.invalidateQueries({
+          queryKey: [
+            "core:comment-replies",
+            props.comment.comment.metadata.name,
+          ],
+        });
       }
     },
   });
 };
 
-const handleApprove = async () => {
-  try {
-    await coreApiClient.content.reply.patchReply({
-      name: props.reply.reply.metadata.name,
-      jsonPatchInner: [
-        {
-          op: "add",
-          path: "/spec/approved",
-          value: true,
-        },
-        {
-          op: "add",
-          path: "/spec/approvedTime",
-          // TODO: 暂时由前端设置发布时间。see https://github.com/halo-dev/halo/pull/2746
-          value: new Date().toISOString(),
-        },
-      ],
-    });
-
-    Toast.success(t("core.common.toast.operation_success"));
-  } catch (error) {
-    console.error("Failed to approve comment reply", error);
-  } finally {
-    queryClient.invalidateQueries({ queryKey: ["comment-replies"] });
-  }
-};
+async function handleCancelApprove() {
+  await coreApiClient.content.reply.patchReply({
+    name: props.reply?.reply.metadata.name as string,
+    jsonPatchInner: [
+      {
+        op: "add",
+        path: "/spec/approved",
+        value: false,
+      },
+      {
+        op: "add",
+        path: "/spec/approvedTime",
+        value: "",
+      },
+    ],
+  });
+  Toast.success(t("core.common.toast.operation_success"));
+  queryClient.invalidateQueries({
+    queryKey: ["core:comment-replies", props.comment.comment.metadata.name],
+  });
+}
 
 // Show hovered reply
 const hoveredReply = inject<Ref<ListedReply | undefined>>("hoveredReply");
@@ -117,12 +129,19 @@ const isHoveredReply = computed(() => {
 
 // Create reply
 const replyModal = ref(false);
+const detailModalVisible = ref(false);
+
+const { mutate: updateCommentLastReadTimeMutate } =
+  useCommentLastReadTimeMutate(props.comment);
 
 function onReplyCreationModalClose() {
   queryClient.invalidateQueries({
-    queryKey: ["comment-replies", props.comment.comment.metadata.name],
+    queryKey: ["core:comment-replies", props.comment.comment.metadata.name],
   });
+  queryClient.invalidateQueries({ queryKey: ["core:comments"] });
+  updateCommentLastReadTimeMutate();
   replyModal.value = false;
+  detailModalVisible.value = false;
 }
 
 const { operationItems } = useOperationItemExtensionPoint<ListedReply>(
@@ -132,13 +151,38 @@ const { operationItems } = useOperationItemExtensionPoint<ListedReply>(
     {
       priority: 0,
       component: markRaw(VDropdownItem),
-      label: t("core.comment.operations.approve_reply.button"),
+      label: t("core.comment.operations.review.button"),
       permissions: ["system:comments:manage"],
-      action: handleApprove,
+      action: () => {
+        detailModalVisible.value = true;
+      },
       hidden: props.reply?.reply.spec.approved,
     },
     {
       priority: 10,
+      component: markRaw(VDropdownItem),
+      label: t("core.common.text.detail"),
+      hidden: !props.reply?.reply.spec.approved,
+      action: () => {
+        detailModalVisible.value = true;
+      },
+    },
+    {
+      priority: 20,
+      component: markRaw(VDropdownDivider),
+    },
+    {
+      priority: 30,
+      component: markRaw(VDropdownItem),
+      props: {
+        type: "danger",
+      },
+      label: t("core.comment.operations.cancel_approve.button"),
+      hidden: !props.reply?.reply.spec.approved,
+      action: handleCancelApprove,
+    },
+    {
+      priority: 40,
       component: markRaw(VDropdownItem),
       props: {
         type: "danger",
@@ -158,57 +202,53 @@ const { operationItems } = useOperationItemExtensionPoint<ListedReply>(
     :reply="reply"
     @close="onReplyCreationModalClose"
   />
+  <ReplyDetailModal
+    v-if="detailModalVisible"
+    :comment="comment"
+    :reply="reply"
+    :quote-reply="quoteReply"
+    @close="onReplyCreationModalClose"
+  />
   <VEntity
     v-bind="$attrs"
-    class="border-l border-dashed border-gray-100"
+    class="border-l border-dashed !border-gray-200"
     :class="{ 'animate-breath': isHoveredReply }"
   >
     <template #start>
-      <VEntityField>
-        <template #description>
-          <VAvatar
-            circle
-            :src="reply?.owner.avatar"
-            :alt="reply?.owner.displayName"
-            size="md"
-          ></VAvatar>
-        </template>
-      </VEntityField>
-      <VEntityField
-        class="w-28 min-w-[7rem]"
-        :title="reply?.owner.displayName"
-        :description="reply?.owner.email"
-      ></VEntityField>
-      <VEntityField width="60%">
+      <VEntityField width="100%">
         <template #description>
           <div class="flex flex-col gap-2">
-            <div class="text-sm text-gray-800">
-              <p class="break-all">
-                <a
+            <div class="mb-1 flex items-center gap-2">
+              <OwnerButton
+                :owner="reply?.owner"
+                @click="detailModalVisible = true"
+              />
+              <span class="text-sm text-gray-900 whitespace-nowrap">
+                {{ $t("core.comment.text.replied_below") }}
+              </span>
+            </div>
+            <pre
+              class="whitespace-pre-wrap break-words text-sm text-gray-900"
+            ><a
                   v-if="quoteReply"
-                  class="mr-1 inline-flex flex-row items-center gap-1 rounded bg-gray-200 px-1 py-0.5 text-xs font-medium text-gray-600 hover:text-blue-500 hover:underline"
+                  class="mr-1 inline-flex flex-row items-center gap-1 rounded bg-slate-100 px-1 py-0.5 text-xs font-medium text-slate-700 hover:bg-slate-200 hover:text-slate-800 hover:underline"
                   href="javascript:void(0)"
                   @mouseenter="handleShowQuoteReply(true)"
                   @mouseleave="handleShowQuoteReply(false)"
                 >
                   <IconReplyLine />
                   <span>{{ quoteReply.owner.displayName }}</span>
-                </a>
-                <br v-if="quoteReply" />
-                {{ reply?.reply.spec.content }}
-              </p>
-            </div>
-            <div class="flex items-center gap-3 text-xs">
-              <span
-                class="select-none text-gray-700 hover:text-gray-900"
-                @click="replyModal = true"
-              >
-                {{ $t("core.comment.operations.reply.button") }}
-              </span>
-              <div v-if="false" class="flex items-center">
-                <VTag>New</VTag>
+                </a><br v-if="quoteReply" />{{ reply?.reply.spec.content }}</pre>
+            <HasPermission :permissions="['system:comments:manage']">
+              <div class="flex items-center gap-3 text-xs">
+                <span
+                  class="select-none cursor-pointer text-gray-700 hover:text-gray-900"
+                  @click="replyModal = true"
+                >
+                  {{ $t("core.comment.operations.reply.button") }}
+                </span>
               </div>
-            </div>
+            </HasPermission>
           </div>
         </template>
       </VEntityField>
@@ -232,20 +272,15 @@ const { operationItems } = useOperationItemExtensionPoint<ListedReply>(
           />
         </template>
       </VEntityField>
-      <VEntityField>
-        <template #description>
-          <span class="truncate text-xs tabular-nums text-gray-500">
-            {{
-              formatDatetime(
-                reply?.reply?.spec.creationTime ||
-                  reply?.reply.metadata.creationTimestamp
-              )
-            }}
-          </span>
-        </template>
-      </VEntityField>
+      <VEntityField
+        v-tooltip="formatDatetime(creationTime)"
+        :description="relativeTimeTo(creationTime)"
+      />
     </template>
-    <template #dropdownItems>
+    <template
+      v-if="currentUserHasPermission(['system:comments:manage'])"
+      #dropdownItems
+    >
       <EntityDropdownItems :dropdown-items="operationItems" :item="reply" />
     </template>
   </VEntity>

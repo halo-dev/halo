@@ -169,7 +169,7 @@ onMounted(() => {
             @click="$router.push({ name: 'PluginExtensionPointSettings' })"
           >
             <template #icon>
-              <IconSettings class="h-full w-full" />
+              <IconSettings />
             </template>
             {{ $t("core.plugin.actions.extension-point-settings") }}
           </VButton>
@@ -181,7 +181,7 @@ onMounted(() => {
           @click="pluginInstallationModalVisible = true"
         >
           <template #icon>
-            <IconAddCircle class="h-full w-full" />
+            <IconAddCircle />
           </template>
           {{ $t("core.common.buttons.install") }}
         </VButton>
@@ -314,7 +314,7 @@ onMounted(() => {
                 @click="pluginInstallationModalVisible = true"
               >
                 <template #icon>
-                  <IconAddCircle class="h-full w-full" />
+                  <IconAddCircle />
                 </template>
                 {{ $t("core.plugin.empty.actions.install") }}
               </VButton>
