@@ -72,7 +72,7 @@ export const setupLibraryExternal = (
       rename: `components.[hash].js`,
     },
     {
-      src: "./node_modules/@halo-dev/console-shared/dist/halo-console-shared.iife.js",
+      src: "./node_modules/@halo-dev/console-shared/dist/index.iife.js",
       dest: "assets/console-shared",
       rename: `console-shared.[hash].js`,
     },
@@ -82,7 +82,7 @@ export const setupLibraryExternal = (
       rename: `editor.[hash].js`,
     },
     {
-      src: "./node_modules/@halo-dev/api-client/dist/halo-api-client.iife.js",
+      src: "./node_modules/@halo-dev/api-client/dist/index.iife.js",
       dest: "assets/api-client",
       rename: `api-client.[hash].js`,
     },
@@ -102,8 +102,9 @@ export const setupLibraryExternal = (
         injectTo: "head",
         tag: "script",
         attrs: {
-          src: `${isProduction ? baseUrl : "/"}${target.dest}/${target.rename}`,
+          src: `${baseUrl}${target.dest}/${target.rename}`,
           type: "text/javascript",
+          "vite-ignore": true,
         },
       };
     })

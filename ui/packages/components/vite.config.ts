@@ -8,6 +8,9 @@ import Dts from "vite-plugin-dts";
 import path from "path";
 
 export default defineConfig({
+  experimental: {
+    enableNativePlugin: false,
+  },
   plugins: [
     Vue(),
     VueJsx(),
@@ -20,7 +23,7 @@ export default defineConfig({
     }) as Plugin,
   ],
   define: {
-    "process.env": process.env,
+    "process.env.NODE_ENV": '"production"',
   },
   resolve: {
     alias: {
@@ -53,7 +56,6 @@ export default defineConfig({
           "@vueuse/router": "VueUse",
         },
         exports: "named",
-        generatedCode: "es5",
       },
     },
     sourcemap: true,
