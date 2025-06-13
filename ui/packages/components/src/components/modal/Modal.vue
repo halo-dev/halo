@@ -236,7 +236,8 @@ watch(
 
       .modal-header-title {
         @apply text-base
-        font-medium;
+        font-medium
+        truncate;
       }
 
       .modal-header-actions {
