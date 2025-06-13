@@ -9,6 +9,7 @@ core:
         system: System
         tool: Tool
       items:
+        home: Home
         dashboard: Dashboard
         posts: Posts
         single_pages: Pages

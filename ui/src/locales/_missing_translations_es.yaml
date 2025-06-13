@@ -2,6 +2,7 @@ core:
   sidebar:
     menu:
       items:
+        home: Home
         tools: Tools
     operations:
       logout:
@@ -30,7 +31,6 @@ core:
             label: Enable animation
       presets:
         recent_published:
-          publishTime: Publish Time {publishTime}
           empty:
             title: No published posts
         notification:
