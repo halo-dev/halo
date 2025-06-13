@@ -76,7 +76,7 @@ const wrapperStyles = computed(() => {
   @apply inline-flex flex-col gap-1 max-w-xs;
 
   .entity-field-title-body {
-    @apply inline-flex items-center flex-row;
+    @apply inline-flex items-center flex-row whitespace-nowrap;
 
     .entity-field-title {
       @apply truncate text-sm font-medium text-gray-900 mr-2;
@@ -84,7 +84,7 @@ const wrapperStyles = computed(() => {
   }
 
   .entity-field-description-body {
-    @apply inline-flex items-center;
+    @apply inline-flex items-center whitespace-nowrap;
 
     .entity-field-description {
       @apply text-xs text-gray-500 truncate;
