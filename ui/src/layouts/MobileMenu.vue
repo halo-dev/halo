@@ -2,6 +2,7 @@
 import { RoutesMenu } from "@/components/menu/RoutesMenu";
 import { IconMore } from "@halo-dev/components";
 import type { OverlayScrollbars } from "overlayscrollbars";
+import { OverlayScrollbarsComponent } from "overlayscrollbars-vue";
 import type { MenuGroupType, MenuItemType } from "packages/shared/dist";
 import { inject, ref, watch } from "vue";
 import { useRoute } from "vue-router";
@@ -23,6 +24,7 @@ const bodyScrollInstance =
 watch(
   () => moreMenuVisible.value,
   (value) => {
+    // Lock body scroll when the drawer is open
     bodyScrollInstance?.()?.options({
       overflow: {
         x: value ? "hidden" : "scroll",
@@ -63,27 +65,34 @@ watch(
     <Teleport to="body">
       <div v-if="moreMenuVisible" class="drawer drawer--visible">
         <transition
-          enter-active-class="ease-in duration-200"
+          enter-active-class="ease-out duration-400"
           enter-from-class="opacity-0"
           enter-to-class="opacity-100"
+          leave-active-class="ease-in duration-200"
+          leave-from-class="opacity-100"
+          leave-to-class="opacity-0"
           appear
         >
           <div class="drawer__overlay" @click="moreMenuVisible = false"></div>
         </transition>
         <transition
-          enter-active-class="transform transition ease-in duration-300"
-          enter-from-class="translate-y-full"
-          enter-to-class="translate-y-0"
+          enter-active-class="transform transition ease-out duration-500"
+          enter-from-class="translate-y-full scale-95"
+          enter-to-class="translate-y-0 scale-100"
+          leave-active-class="transform transition ease-in duration-300"
+          leave-from-class="translate-y-0 scale-100"
+          leave-to-class="translate-y-full scale-95"
           appear
         >
-          <div v-show="moreMenuVisible" class="drawer__content">
-            <div class="drawer__body">
-              <RoutesMenu
-                :menus="menus"
-                class="drawer__menu"
-                @select="moreMenuVisible = false"
-              />
-            </div>
+          <div class="drawer__content">
+            <OverlayScrollbarsComponent
+              element="div"
+              :options="{ scrollbars: { autoHide: 'scroll' } }"
+              class="drawer__body"
+              defer
+            >
+              <RoutesMenu :menus="menus" @select="moreMenuVisible = false" />
+            </OverlayScrollbarsComponent>
             <div class="drawer__footer">
               <UserProfileBanner :platform="platform" />
             </div>
@@ -183,10 +192,6 @@ watch(
     flex: 1;
     min-height: 0;
     overflow-y: auto;
-  }
-
-  &__menu {
-    padding: 0;
   }
 
   &__footer {
