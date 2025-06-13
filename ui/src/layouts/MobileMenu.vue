@@ -1,11 +1,12 @@
 <script lang="ts" setup>
 import { RoutesMenu } from "@/components/menu/RoutesMenu";
-import { IconMore } from "@halo-dev/components";
+import { IconMore, VMenu, VMenuItem } from "@halo-dev/components";
 import type { OverlayScrollbars } from "overlayscrollbars";
 import { OverlayScrollbarsComponent } from "overlayscrollbars-vue";
 import type { MenuGroupType, MenuItemType } from "packages/shared/dist";
 import { inject, ref, watch } from "vue";
 import { useRoute } from "vue-router";
+import RiArrowLeftLine from "~icons/ri/arrow-left-line";
 import UserProfileBanner from "./UserProfileBanner.vue";
 
 defineProps<{
@@ -33,6 +34,10 @@ watch(
     });
   }
 );
+
+function handleSelectHome() {
+  window.open("/", "_blank");
+}
 </script>
 <template>
   <div v-if="minimenus" class="mobile-nav mobile-nav--fixed">
@@ -91,6 +96,17 @@ watch(
               class="drawer__body"
               defer
             >
+              <VMenu class="!pb-1">
+                <VMenuItem
+                  id="home"
+                  :title="$t('core.sidebar.menu.items.home')"
+                  @select="handleSelectHome"
+                >
+                  <template #icon>
+                    <RiArrowLeftLine />
+                  </template>
+                </VMenuItem>
+              </VMenu>
               <RoutesMenu :menus="menus" @select="moreMenuVisible = false" />
             </OverlayScrollbarsComponent>
             <div class="drawer__footer">

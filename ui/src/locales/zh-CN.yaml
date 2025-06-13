@@ -22,6 +22,7 @@ core:
         overview: 概览
         backup: 备份
         tools: 工具
+        home: 首页
     operations:
       logout:
         tooltip: 退出登录
