@@ -684,6 +684,9 @@ core:
         video_not_support: The current browser does not support video playback.
         audio_not_support: The current browser does not support audio playback.
         not_support: This file does not support preview.
+    permalink_list:
+      relative: Relative path
+      absolute: Absolute path
     group_editing_modal:
       titles:
         create: Create attachment group

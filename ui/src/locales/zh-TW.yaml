@@ -704,6 +704,9 @@ core:
       operations:
         select:
           result: （已選擇 {count} 項）
+    permalink_list:
+      relative: 相對路徑
+      absolute: 完整路徑
   uc_attachment:
     empty:
       title: 當前沒有附件
