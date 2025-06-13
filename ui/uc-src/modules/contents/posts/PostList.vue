@@ -104,7 +104,7 @@ const {
 <template>
   <VPageHeader :title="$t('core.uc_post.title')">
     <template #icon>
-      <IconBookRead class="mr-2 self-center" />
+      <IconBookRead />
     </template>
     <template #actions>
       <VButton :route="{ name: 'PostEditor' }" type="secondary">

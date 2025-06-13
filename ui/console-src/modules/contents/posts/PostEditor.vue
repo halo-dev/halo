@@ -29,7 +29,6 @@ import {
   Toast,
   VButton,
   VPageHeader,
-  VSpace,
 } from "@halo-dev/components";
 import type { EditorProvider } from "@halo-dev/console-shared";
 import { useLocalStorage } from "@vueuse/core";
@@ -503,68 +502,64 @@ useSlugify(
 
   <VPageHeader :title="$t('core.post.title')">
     <template #icon>
-      <IconBookRead class="mr-2 self-center" />
+      <IconBookRead />
     </template>
     <template #actions>
-      <VSpace>
-        <EditorProviderSelector
-          v-if="editorProviders.length > 1"
-          :provider="currentEditorProvider"
-          :allow-forced-select="!isUpdateMode"
-          @select="handleChangeEditorProvider"
-        />
-        <VButton
-          v-if="isUpdateMode"
-          size="sm"
-          type="default"
-          @click="
-            $router.push({ name: 'PostSnapshots', query: { name: name } })
-          "
-        >
-          <template #icon>
-            <IconHistoryLine />
-          </template>
-          {{ $t("core.post_editor.actions.snapshots") }}
-        </VButton>
-        <VButton
-          size="sm"
-          type="default"
-          :loading="previewPending"
-          @click="handlePreview"
-        >
-          <template #icon>
-            <IconEye />
-          </template>
-          {{ $t("core.common.buttons.preview") }}
-        </VButton>
-        <VButton :loading="saving" size="sm" type="default" @click="handleSave">
-          <template #icon>
-            <IconSave />
-          </template>
-          {{ $t("core.common.buttons.save") }}
-        </VButton>
-        <VButton
-          v-if="isUpdateMode"
-          size="sm"
-          type="default"
-          @click="handleOpenSettingModal"
-        >
-          <template #icon>
-            <IconSettings />
-          </template>
-          {{ $t("core.common.buttons.setting") }}
-        </VButton>
-        <VButton
-          type="secondary"
-          :loading="publishing"
-          @click="handlePublishClick"
-        >
-          <template #icon>
-            <IconSendPlaneFill />
-          </template>
-          {{ $t("core.common.buttons.publish") }}
-        </VButton>
-      </VSpace>
+      <EditorProviderSelector
+        v-if="editorProviders.length > 1"
+        :provider="currentEditorProvider"
+        :allow-forced-select="!isUpdateMode"
+        @select="handleChangeEditorProvider"
+      />
+      <VButton
+        v-if="isUpdateMode"
+        size="sm"
+        type="default"
+        @click="$router.push({ name: 'PostSnapshots', query: { name: name } })"
+      >
+        <template #icon>
+          <IconHistoryLine />
+        </template>
+        {{ $t("core.post_editor.actions.snapshots") }}
+      </VButton>
+      <VButton
+        size="sm"
+        type="default"
+        :loading="previewPending"
+        @click="handlePreview"
+      >
+        <template #icon>
+          <IconEye />
+        </template>
+        {{ $t("core.common.buttons.preview") }}
+      </VButton>
+      <VButton :loading="saving" size="sm" type="default" @click="handleSave">
+        <template #icon>
+          <IconSave />
+        </template>
+        {{ $t("core.common.buttons.save") }}
+      </VButton>
+      <VButton
+        v-if="isUpdateMode"
+        size="sm"
+        type="default"
+        @click="handleOpenSettingModal"
+      >
+        <template #icon>
+          <IconSettings />
+        </template>
+        {{ $t("core.common.buttons.setting") }}
+      </VButton>
+      <VButton
+        type="secondary"
+        :loading="publishing"
+        @click="handlePublishClick"
+      >
+        <template #icon>
+          <IconSendPlaneFill />
+        </template>
+        {{ $t("core.common.buttons.publish") }}
+      </VButton>
     </template>
   </VPageHeader>
   <div class="editor border-t" style="height: calc(100vh - 3.5rem)">

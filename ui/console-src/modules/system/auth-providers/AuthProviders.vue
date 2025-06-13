@@ -71,7 +71,7 @@ async function onSortUpdate() {
 <template>
   <VPageHeader :title="$t('core.identity_authentication.title')">
     <template #icon>
-      <IconLockPasswordLine class="mr-2 self-center" />
+      <IconLockPasswordLine />
     </template>
   </VPageHeader>
 

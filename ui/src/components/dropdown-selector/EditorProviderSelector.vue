@@ -34,7 +34,9 @@ fetchEditorProviders();
       class="group flex w-full cursor-pointer items-center gap-2 rounded p-1 hover:bg-gray-100"
     >
       <VAvatar v-if="provider?.logo" :src="provider.logo" size="xs"></VAvatar>
-      <div class="select-none text-sm text-gray-600 group-hover:text-gray-900">
+      <div
+        class="select-none text-sm text-gray-600 group-hover:text-gray-900 whitespace-nowrap"
+      >
         {{ provider?.displayName }}
       </div>
       <IconExchange class="h-4 w-4 text-gray-600 group-hover:text-gray-900" />

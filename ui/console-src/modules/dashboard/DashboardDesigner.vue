@@ -13,7 +13,6 @@ import {
   VButton,
   VDropdown,
   VDropdownItem,
-  VSpace,
   VTabbar,
 } from "@halo-dev/components";
 import type {
@@ -321,12 +320,12 @@ function handleCopyFromLayout(breakpoint: string) {
 }
 </script>
 <template>
-  <div
-    class="flex items-center justify-between bg-white px-4 py-1.5 gap-5 flex-wrap sticky top-0 z-10"
-  >
-    <h2 class="flex items-center truncate text-xl font-bold text-gray-800">
+  <div class="page-header py-1.5">
+    <h2 class="page-header__title">
       <IconDashboard class="mr-2 self-center" />
-      <span>{{ $t("core.dashboard_designer.title") }}</span>
+      <span class="page-header__title-text">
+        {{ $t("core.dashboard_designer.title") }}
+      </span>
     </h2>
     <div
       class="hidden sm:block"
@@ -339,7 +338,7 @@ function handleCopyFromLayout(breakpoint: string) {
         @change="handleBreakpointChange"
       ></VTabbar>
     </div>
-    <VSpace>
+    <div class="page-header__actions">
       <VButton ghost @click="handleBack">
         {{ $t("core.common.buttons.back") }}
       </VButton>
@@ -398,7 +397,7 @@ function handleCopyFromLayout(breakpoint: string) {
         </template>
         {{ $t("core.common.buttons.save") }}
       </VButton>
-    </VSpace>
+    </div>
   </div>
 
   <div class="dashboard m-4 transition-all" :style="designContainerStyles">

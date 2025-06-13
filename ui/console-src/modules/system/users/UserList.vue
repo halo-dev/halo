@@ -187,40 +187,38 @@ function onCreationModalClose() {
 
   <VPageHeader :title="$t('core.user.title')">
     <template #icon>
-      <IconUserSettings class="mr-2 self-center" />
+      <IconUserSettings />
     </template>
     <template #actions>
-      <VSpace>
-        <VButton
-          v-permission="['system:roles:view']"
-          :route="{ name: 'Roles' }"
-          size="sm"
-          type="default"
-        >
+      <VButton
+        v-permission="['system:roles:view']"
+        :route="{ name: 'Roles' }"
+        size="sm"
+        type="default"
+      >
+        <template #icon>
+          <IconShieldUser />
+        </template>
+        {{ $t("core.user.actions.roles") }}
+      </VButton>
+      <HasPermission :permissions="['*']">
+        <VButton :route="{ name: 'AuthProviders' }" size="sm" type="default">
           <template #icon>
-            <IconShieldUser />
+            <IconLockPasswordLine />
           </template>
-          {{ $t("core.user.actions.roles") }}
+          {{ $t("core.user.actions.identity_authentication") }}
         </VButton>
-        <HasPermission :permissions="['*']">
-          <VButton :route="{ name: 'AuthProviders' }" size="sm" type="default">
-            <template #icon>
-              <IconLockPasswordLine />
-            </template>
-            {{ $t("core.user.actions.identity_authentication") }}
-          </VButton>
-        </HasPermission>
-        <VButton
-          v-permission="['system:users:manage']"
-          type="secondary"
-          @click="creationModal = true"
-        >
-          <template #icon>
-            <IconAddCircle />
-          </template>
-          {{ $t("core.common.buttons.new") }}
-        </VButton>
-      </VSpace>
+      </HasPermission>
+      <VButton
+        v-permission="['system:users:manage']"
+        type="secondary"
+        @click="creationModal = true"
+      >
+        <template #icon>
+          <IconAddCircle />
+        </template>
+        {{ $t("core.common.buttons.new") }}
+      </VButton>
     </template>
   </VPageHeader>
 
