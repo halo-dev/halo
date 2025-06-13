@@ -1,6 +1,5 @@
 package run.halo.app.extension.store;
 
-import jakarta.persistence.Lob;
 import lombok.Data;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.annotation.Version;
@@ -25,7 +24,6 @@ public class ExtensionStore {
     /**
      * Exactly Extension body, which might be base64 format.
      */
-    @Lob
     private byte[] data;
 
     /**
