@@ -102,8 +102,9 @@ export const setupLibraryExternal = (
         injectTo: "head",
         tag: "script",
         attrs: {
-          src: `${isProduction ? baseUrl : "/"}${target.dest}/${target.rename}`,
+          src: `${baseUrl}${target.dest}/${target.rename}`,
           type: "text/javascript",
+          "vite-ignore": true,
         },
       };
     })
