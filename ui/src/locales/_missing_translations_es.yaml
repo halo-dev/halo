@@ -213,6 +213,9 @@ core:
         items:
           display_name_asc: Ascending order by display name
           display_name_desc: Descending order by display name
+    permalink_list:
+      relative: Relative path
+      absolute: Absolute path
     group_editing_modal:
       toast:
         group_name_exists: Group name already exists
