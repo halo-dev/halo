@@ -317,7 +317,7 @@ watch(
               />
             </template>
             <template #start>
-              <VEntityField :title="post.post.spec.title" width="27rem">
+              <VEntityField :title="post.post.spec.title">
                 <template #description>
                   <div class="flex flex-col gap-1.5">
                     <VSpace class="flex-wrap !gap-y-1">
