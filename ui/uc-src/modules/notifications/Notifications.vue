@@ -131,7 +131,7 @@ function handleMarkAllAsRead() {
 <template>
   <VPageHeader :title="$t('core.uc_notification.title')">
     <template #icon>
-      <IconNotificationBadgeLine class="mr-2 self-center" />
+      <IconNotificationBadgeLine />
     </template>
   </VPageHeader>
   <div class="m-0 md:m-4">

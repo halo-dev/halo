@@ -35,7 +35,7 @@ provide<ComputedRef<DashboardWidgetDefinition[]>>(
 <template>
   <VPageHeader :title="$t('core.dashboard.title')">
     <template #icon>
-      <IconDashboard class="mr-2 self-center" />
+      <IconDashboard />
     </template>
     <template #actions>
       <VButton

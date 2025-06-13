@@ -43,7 +43,7 @@ const routes = computed(() => {
 <template>
   <VPageHeader :title="$t('core.tool.title')">
     <template #icon>
-      <IconToolsFill class="mr-2 self-center" />
+      <IconToolsFill />
     </template>
   </VPageHeader>
 

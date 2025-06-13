@@ -243,7 +243,7 @@ const handleApproveInBatch = async () => {
 <template>
   <VPageHeader :title="$t('core.comment.title')">
     <template #icon>
-      <IconMessage class="mr-2 self-center" />
+      <IconMessage />
     </template>
   </VPageHeader>
 

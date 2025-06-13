@@ -80,7 +80,7 @@ provide<Ref<Setting | undefined>>("setting", setting);
 <template>
   <VPageHeader :title="$t('core.setting.title')">
     <template #icon>
-      <IconSettings class="mr-2 self-center" />
+      <IconSettings />
     </template>
   </VPageHeader>
 

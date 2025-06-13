@@ -204,24 +204,22 @@ watch(
 <template>
   <VPageHeader :title="$t('core.deleted_page.title')">
     <template #icon>
-      <IconDeleteBin class="mr-2 self-center text-green-600" />
+      <IconDeleteBin class="text-green-600" />
     </template>
     <template #actions>
-      <VSpace>
-        <VButton :route="{ name: 'SinglePages' }" size="sm">
-          {{ $t("core.common.buttons.back") }}
-        </VButton>
-        <VButton
-          v-permission="['system:singlepages:manage']"
-          :route="{ name: 'SinglePageEditor' }"
-          type="secondary"
-        >
-          <template #icon>
-            <IconAddCircle />
-          </template>
-          {{ $t("core.common.buttons.new") }}
-        </VButton>
-      </VSpace>
+      <VButton :route="{ name: 'SinglePages' }" size="sm">
+        {{ $t("core.common.buttons.back") }}
+      </VButton>
+      <VButton
+        v-permission="['system:singlepages:manage']"
+        :route="{ name: 'SinglePageEditor' }"
+        type="secondary"
+      >
+        <template #icon>
+          <IconAddCircle />
+        </template>
+        {{ $t("core.common.buttons.new") }}
+      </VButton>
     </template>
   </VPageHeader>
   <div class="m-0 md:m-4">
