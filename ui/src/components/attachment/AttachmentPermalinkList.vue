@@ -10,11 +10,9 @@ import { useI18n } from "vue-i18n";
 const props = withDefaults(
   defineProps<{
     attachment?: Attachment;
-    mountToBody?: boolean;
   }>(),
   {
     attachment: undefined,
-    mountToBody: false,
   }
 );
 
