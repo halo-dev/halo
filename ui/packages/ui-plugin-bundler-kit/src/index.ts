@@ -3,20 +3,42 @@ import fs from "fs";
 import yaml from "js-yaml";
 import { Plugin } from "vite";
 
-export function HaloUIPluginBundlerKit(): Plugin {
+const DEFAULT_OUT_DIR_DEV = "../src/main/resources/console";
+const DEFAULT_OUT_DIR_PROD = "../build/resources/main/console";
+const DEFAULT_MANIFEST_PATH = "../src/main/resources/plugin.yaml";
+
+interface HaloUIPluginBundlerKitOptions {
+  outDir?:
+    | string
+    | {
+        dev: string;
+        prod: string;
+      };
+  manifestPath?: string;
+}
+
+export function HaloUIPluginBundlerKit(
+  options: HaloUIPluginBundlerKitOptions = {}
+): Plugin {
   return {
     name: "halo-ui-plugin-bundler-kit",
     config(config, env) {
       const isProduction = env.mode === "production";
 
-      // fixme: allow user to config outDir
-      const outDir = isProduction
-        ? "../src/main/resources/console"
-        : "../build/resources/main/console";
+      let outDir = isProduction ? DEFAULT_OUT_DIR_PROD : DEFAULT_OUT_DIR_DEV;
 
-      // fixme: allow user to config manifest path
+      if (options.outDir) {
+        if (typeof options.outDir === "string") {
+          outDir = options.outDir;
+        } else {
+          outDir = isProduction ? options.outDir.prod : options.outDir.dev;
+        }
+      }
+
+      const manifestPath = options.manifestPath || DEFAULT_MANIFEST_PATH;
+
       const manifest = yaml.load(
-        fs.readFileSync("../src/main/resources/plugin.yaml", "utf8")
+        fs.readFileSync(manifestPath, "utf8")
       ) as HaloPlugin;
 
       return {
