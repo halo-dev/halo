@@ -1,9 +1,9 @@
 <script lang="ts" setup>
 import { RoutesMenu } from "@/components/menu/RoutesMenu";
 import { IconMore, VMenu, VMenuItem } from "@halo-dev/components";
+import type { MenuGroupType, MenuItemType } from "@halo-dev/console-shared";
 import type { OverlayScrollbars } from "overlayscrollbars";
 import { OverlayScrollbarsComponent } from "overlayscrollbars-vue";
-import type { MenuGroupType, MenuItemType } from "packages/shared/dist";
 import { inject, ref, watch } from "vue";
 import { useRoute } from "vue-router";
 import RiArrowLeftLine from "~icons/ri/arrow-left-line";
