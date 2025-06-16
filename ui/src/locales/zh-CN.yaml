@@ -22,6 +22,7 @@ core:
         overview: 概览
         backup: 备份
         tools: 工具
+        home: 首页
     operations:
       logout:
         tooltip: 退出登录
@@ -718,6 +719,9 @@ core:
       operations:
         select:
           result: （已选择 {count} 项）
+    permalink_list:
+      relative: 相对路径
+      absolute: 完整路径
   uc_attachment:
     empty:
       title: 当前没有附件

@@ -246,7 +246,7 @@ function getMenuItemRefDisplayName(menuItem: MenuTreeItem) {
   />
   <VPageHeader :title="$t('core.menu.title')">
     <template #icon>
-      <IconListSettings class="mr-2 self-center" />
+      <IconListSettings />
     </template>
   </VPageHeader>
   <div class="m-0 md:m-4">

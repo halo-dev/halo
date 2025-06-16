@@ -4,12 +4,13 @@ import { i18n } from "@/locales";
 import { useGlobalInfoStore } from "@/stores/global-info";
 import type { FormKitConfig } from "@formkit/core";
 import { useFavicon } from "@vueuse/core";
+import type { OverlayScrollbars } from "overlayscrollbars";
 import {
   useOverlayScrollbars,
   type UseOverlayScrollbarsParams,
 } from "overlayscrollbars-vue";
 import { storeToRefs } from "pinia";
-import { computed, inject, onMounted, reactive } from "vue";
+import { computed, inject, onMounted, provide, reactive } from "vue";
 import { RouterView } from "vue-router";
 
 useAppTitle();
@@ -35,10 +36,12 @@ const reactiveParams = reactive<UseOverlayScrollbarsParams>({
   },
   defer: true,
 });
-const [initialize] = useOverlayScrollbars(reactiveParams);
+const [initialize, instance] = useOverlayScrollbars(reactiveParams);
 onMounted(() => {
   if (body) initialize({ target: body });
 });
+
+provide<() => OverlayScrollbars | null>("bodyScrollInstance", instance);
 
 // setup formkit locale
 // see https://formkit.com/essentials/internationalization

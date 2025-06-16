@@ -22,7 +22,6 @@ import {
   Toast,
   VButton,
   VPageHeader,
-  VSpace,
 } from "@halo-dev/components";
 import type { EditorProvider } from "@halo-dev/console-shared";
 import { useMutation } from "@tanstack/vue-query";
@@ -467,51 +466,49 @@ useSlugify(
 <template>
   <VPageHeader :title="$t('core.post.title')">
     <template #icon>
-      <IconBookRead class="mr-2 self-center" />
+      <IconBookRead />
     </template>
     <template #actions>
-      <VSpace>
-        <EditorProviderSelector
-          v-if="editorProviders.length > 1"
-          :provider="currentEditorProvider"
-          :allow-forced-select="!isUpdateMode"
-          @select="handleChangeEditorProvider"
-        />
+      <EditorProviderSelector
+        v-if="editorProviders.length > 1"
+        :provider="currentEditorProvider"
+        :allow-forced-select="!isUpdateMode"
+        @select="handleChangeEditorProvider"
+      />
+      <VButton
+        size="sm"
+        type="default"
+        :loading="isSaving && !isPublishing"
+        @click="handleSaveClick"
+      >
+        <template #icon>
+          <IconSave />
+        </template>
+        {{ $t("core.common.buttons.save") }}
+      </VButton>
+      <VButton
+        v-if="isUpdateMode"
+        size="sm"
+        type="default"
+        @click="handleOpenPostSettingEditModal"
+      >
+        <template #icon>
+          <IconSettings />
+        </template>
+        {{ $t("core.common.buttons.setting") }}
+      </VButton>
+      <HasPermission :permissions="['uc:posts:publish']">
         <VButton
-          size="sm"
-          type="default"
-          :loading="isSaving && !isPublishing"
-          @click="handleSaveClick"
+          :loading="isPublishing"
+          type="secondary"
+          @click="handlePublishClick"
         >
           <template #icon>
-            <IconSave />
+            <IconSendPlaneFill />
           </template>
-          {{ $t("core.common.buttons.save") }}
+          {{ $t("core.common.buttons.publish") }}
         </VButton>
-        <VButton
-          v-if="isUpdateMode"
-          size="sm"
-          type="default"
-          @click="handleOpenPostSettingEditModal"
-        >
-          <template #icon>
-            <IconSettings />
-          </template>
-          {{ $t("core.common.buttons.setting") }}
-        </VButton>
-        <HasPermission :permissions="['uc:posts:publish']">
-          <VButton
-            :loading="isPublishing"
-            type="secondary"
-            @click="handlePublishClick"
-          >
-            <template #icon>
-              <IconSendPlaneFill />
-            </template>
-            {{ $t("core.common.buttons.publish") }}
-          </VButton>
-        </HasPermission>
-      </VSpace>
+      </HasPermission>
     </template>
   </VPageHeader>
   <div class="editor border-t" style="height: calc(100vh - 3.5rem)">

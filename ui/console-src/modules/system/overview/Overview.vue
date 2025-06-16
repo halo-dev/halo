@@ -195,7 +195,7 @@ const handleDownloadLogfile = () => {
 <template>
   <VPageHeader :title="$t('core.overview.title')">
     <template #icon>
-      <IconTerminalBoxLine class="mr-2 self-center" />
+      <IconTerminalBoxLine />
     </template>
     <template #actions>
       <VButton size="sm" @click="handleCopy">

@@ -47,7 +47,6 @@ dependencies {
     annotationProcessor platform(project(':platform:application'))
 
     api 'org.springframework.boot:spring-boot-starter-actuator'
-    api 'org.springframework.boot:spring-boot-starter-data-jpa'
     api 'org.springframework.boot:spring-boot-starter-mail'
     api 'org.springframework.boot:spring-boot-starter-thymeleaf'
     api 'org.springframework.boot:spring-boot-starter-webflux'

@@ -104,7 +104,7 @@ const handleUpdateRole = async () => {
 <template>
   <VPageHeader :title="$t('core.role.detail.title')">
     <template #icon>
-      <IconShieldUser class="mr-2 self-center" />
+      <IconShieldUser />
     </template>
   </VPageHeader>
   <div class="m-0 md:m-4">

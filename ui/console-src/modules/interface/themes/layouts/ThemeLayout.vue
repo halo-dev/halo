@@ -195,32 +195,30 @@ onMounted(() => {
   <BasicLayout>
     <VPageHeader :title="selectedTheme?.spec.displayName">
       <template #icon>
-        <IconPalette class="mr-2 self-center" />
+        <IconPalette />
       </template>
       <template #actions>
-        <VSpace>
-          <VButton
-            v-show="!isActivated"
-            v-permission="['system:themes:manage']"
-            size="sm"
-            type="primary"
-            @click="handleActiveTheme()"
-          >
-            {{ $t("core.common.buttons.activate") }}
-          </VButton>
-          <VButton type="default" size="sm" @click="previewModal = true">
-            <template #icon>
-              <IconEye />
-            </template>
-            {{ $t("core.common.buttons.preview") }}
-          </VButton>
-          <VButton type="secondary" @click="themesModal = true">
-            <template #icon>
-              <IconListSettings />
-            </template>
-            {{ $t("core.theme.actions.management") }}
-          </VButton>
-        </VSpace>
+        <VButton
+          v-show="!isActivated"
+          v-permission="['system:themes:manage']"
+          size="sm"
+          type="primary"
+          @click="handleActiveTheme()"
+        >
+          {{ $t("core.common.buttons.activate") }}
+        </VButton>
+        <VButton type="default" size="sm" @click="previewModal = true">
+          <template #icon>
+            <IconEye />
+          </template>
+          {{ $t("core.common.buttons.preview") }}
+        </VButton>
+        <VButton type="secondary" @click="themesModal = true">
+          <template #icon>
+            <IconListSettings />
+          </template>
+          {{ $t("core.theme.actions.management") }}
+        </VButton>
       </template>
     </VPageHeader>
 

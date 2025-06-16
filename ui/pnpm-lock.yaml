@@ -328,9 +328,6 @@ importers:
       prettier-plugin-tailwindcss:
         specifier: ^0.1.13
         version: 0.1.13(prettier@2.8.8)
-      randomstring:
-        specifier: ^1.2.3
-        version: 1.2.3
       rollup-plugin-gzip:
         specifier: ^3.1.0
         version: 3.1.0(rollup@4.28.1)
@@ -5013,10 +5010,6 @@ packages:
     resolution: {integrity: sha512-HGyxoOTYUyCM6stUe6EJgnd4EoewAI7zMdfqO+kGjnlZmBDz/cR5pf8r/cR4Wq60sL/p0IkcjUEEPwS3GFrIyw==}
     engines: {node: '>=8'}
 
-  array-uniq@1.0.2:
-    resolution: {integrity: sha512-GVYjmpL05al4dNlKJm53mKE4w9OOLiuVHWorsIA3YVz+Hu0hcn6PtE3Ydl0EqU7v+7ABC4mjjWsnLUxbpno+CA==}
-    engines: {node: '>=0.10.0'}
-
   array.prototype.map@1.0.6:
     resolution: {integrity: sha512-nK1psgF2cXqP3wSyCSq0Hc7zwNq3sfljQqaG27r/7a7ooNUnn5nGq6yYWyks9jMO5EoFQ0ax80hSg6oXSRNXaw==}
     engines: {node: '>= 0.4'}
@@ -8691,15 +8684,8 @@ packages:
   ramda@0.29.0:
     resolution: {integrity: sha512-BBea6L67bYLtdbOqfp8f58fPMqEwx0doL+pAi8TZyp2YWz8R9G8z9x75CZI8W+ftqhFHCpEX2cRnUUXK130iKA==}
 
-  randombytes@2.0.3:
-    resolution: {integrity: sha512-lDVjxQQFoCG1jcrP06LNo2lbWp4QTShEXnhActFBwYuHprllQV6VUpwreApsYqCgD+N1mHoqJ/BI/4eV4R2GYg==}
-
   randombytes@2.1.0:
     resolution: {integrity: sha512-vYl3iOX+4CKUWuxGi9Ukhie6fsqXqS9FE2Zaic4tNFD2N2QQaXOMFbuKK4QmDHC0JO6B1Zp41J0LpT0oR68amQ==}
-
-  randomstring@1.2.3:
-    resolution: {integrity: sha512-3dEFySepTzp2CvH6W/ASYGguPPveBuz5MpZ7MuoUkoVehmyNl9+F9c9GFVrz2QPbM9NXTIHGcmJDY/3j4677kQ==}
-    hasBin: true
 
   range-parser@1.2.1:
     resolution: {integrity: sha512-Hrgsx+orqoygnmhFbKaHE6c296J+HTAQXoxEF6gNupROmmGJRoyzfG3ccAveqCBrwr/2yxQ5BVd/GTl5agOwSg==}
@@ -15923,24 +15909,24 @@ snapshots:
 
   '@types/babel__core@7.20.5':
     dependencies:
-      '@babel/parser': 7.26.3
-      '@babel/types': 7.26.3
+      '@babel/parser': 7.27.5
+      '@babel/types': 7.27.6
       '@types/babel__generator': 7.6.7
       '@types/babel__template': 7.4.4
       '@types/babel__traverse': 7.20.4
 
   '@types/babel__generator@7.6.7':
     dependencies:
-      '@babel/types': 7.26.3
+      '@babel/types': 7.27.6
 
   '@types/babel__template@7.4.4':
     dependencies:
-      '@babel/parser': 7.26.3
-      '@babel/types': 7.26.3
+      '@babel/parser': 7.27.5
+      '@babel/types': 7.27.6
 
   '@types/babel__traverse@7.20.4':
     dependencies:
-      '@babel/types': 7.26.3
+      '@babel/types': 7.27.6
 
   '@types/body-parser@1.19.5':
     dependencies:
@@ -16971,8 +16957,6 @@ snapshots:
   array-flatten@1.1.1: {}
 
   array-union@2.1.0: {}
-
-  array-uniq@1.0.2: {}
 
   array.prototype.map@1.0.6:
     dependencies:
@@ -21054,16 +21038,9 @@ snapshots:
 
   ramda@0.29.0: {}
 
-  randombytes@2.0.3: {}
-
   randombytes@2.1.0:
     dependencies:
       safe-buffer: 5.2.1
-
-  randomstring@1.2.3:
-    dependencies:
-      array-uniq: 1.0.2
-      randombytes: 2.0.3
 
   range-parser@1.2.1: {}
 

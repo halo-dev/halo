@@ -164,7 +164,7 @@ watch(selectedTagNames, (newVal) => {
   />
   <VPageHeader :title="$t('core.post_tag.title')">
     <template #icon>
-      <IconBookRead class="mr-2 self-center" />
+      <IconBookRead />
     </template>
     <template #actions>
       <VButton

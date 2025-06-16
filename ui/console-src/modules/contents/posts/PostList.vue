@@ -384,31 +384,29 @@ watch(
   />
   <VPageHeader :title="$t('core.post.title')">
     <template #icon>
-      <IconBookRead class="mr-2 self-center" />
+      <IconBookRead />
     </template>
     <template #actions>
-      <VSpace>
-        <VButton :route="{ name: 'Categories' }" size="sm">
-          {{ $t("core.post.actions.categories") }}
-        </VButton>
-        <VButton :route="{ name: 'Tags' }" size="sm">
-          {{ $t("core.post.actions.tags") }}
-        </VButton>
-        <VButton :route="{ name: 'DeletedPosts' }" size="sm">
-          {{ $t("core.post.actions.recycle_bin") }}
-        </VButton>
+      <VButton :route="{ name: 'Categories' }" size="sm">
+        {{ $t("core.post.actions.categories") }}
+      </VButton>
+      <VButton :route="{ name: 'Tags' }" size="sm">
+        {{ $t("core.post.actions.tags") }}
+      </VButton>
+      <VButton :route="{ name: 'DeletedPosts' }" size="sm">
+        {{ $t("core.post.actions.recycle_bin") }}
+      </VButton>
 
-        <VButton
-          v-permission="['system:posts:manage']"
-          :route="{ name: 'PostEditor' }"
-          type="secondary"
-        >
-          <template #icon>
-            <IconAddCircle />
-          </template>
-          {{ $t("core.common.buttons.new") }}
-        </VButton>
-      </VSpace>
+      <VButton
+        v-permission="['system:posts:manage']"
+        :route="{ name: 'PostEditor' }"
+        type="secondary"
+      >
+        <template #icon>
+          <IconAddCircle />
+        </template>
+        {{ $t("core.common.buttons.new") }}
+      </VButton>
     </template>
   </VPageHeader>
 
