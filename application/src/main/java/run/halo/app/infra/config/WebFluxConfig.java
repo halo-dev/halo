@@ -25,6 +25,7 @@ import org.springframework.http.codec.json.Jackson2JsonDecoder;
 import org.springframework.http.codec.json.Jackson2JsonEncoder;
 import org.springframework.lang.NonNull;
 import org.springframework.web.filter.reactive.ServerWebExchangeContextFilter;
+import org.springframework.web.filter.reactive.UrlHandlerFilter;
 import org.springframework.web.reactive.config.ResourceHandlerRegistration;
 import org.springframework.web.reactive.config.ResourceHandlerRegistry;
 import org.springframework.web.reactive.config.WebFluxConfigurer;
@@ -267,4 +268,11 @@ public class WebFluxConfig implements WebFluxConfigurer {
         return new ServerWebExchangeContextFilter();
     }
 
+    @Bean
+    @Order(Ordered.HIGHEST_PRECEDENCE)
+    UrlHandlerFilter urlHandlerFilter() {
+        return UrlHandlerFilter
+            .trailingSlashHandler("/**").mutateRequest()
+            .build();
+    }
 }

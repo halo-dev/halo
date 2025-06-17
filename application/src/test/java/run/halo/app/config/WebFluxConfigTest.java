@@ -42,7 +42,8 @@ import run.halo.app.extension.Metadata;
     SpringBootTest.WebEnvironment.RANDOM_PORT)
 @Import({
     WebFluxConfigTest.WebSocketSupportTest.TestWebSocketConfiguration.class,
-    WebFluxConfigTest.ServerWebExchangeContextFilterTest.TestConfig.class
+    WebFluxConfigTest.ServerWebExchangeContextFilterTest.TestConfig.class,
+    WebFluxConfigTest.UrlHandlerFilterTest.TestConfig.class
 })
 @AutoConfigureWebTestClient
 class WebFluxConfigTest {
@@ -203,6 +204,31 @@ class WebFluxConfigTest {
             webClient.get().uri("/assert-server-web-exchange")
                 .exchange()
                 .expectStatus().isOk();
+        }
+
+    }
+
+    @Nested
+    class UrlHandlerFilterTest {
+
+        @TestConfiguration
+        static class TestConfig {
+
+            @Bean
+            RouterFunction<ServerResponse> urlHandlerFilterTestRoute() {
+                return RouterFunctions.route()
+                    .GET("/fake", request -> ServerResponse.ok().bodyValue("ok"))
+                    .build();
+            }
+
+        }
+
+        @Test
+        void shouldHandleUrlWithTrailingSlash() {
+            webClient.get().uri("/fake/")
+                .exchange()
+                .expectStatus().isOk()
+                .expectBody(String.class).isEqualTo("ok");
         }
 
     }
