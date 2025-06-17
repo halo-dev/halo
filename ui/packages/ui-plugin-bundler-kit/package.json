@@ -12,15 +12,14 @@
   },
   "license": "GPL-3.0",
   "author": "@halo-dev",
+  "type": "module",
   "exports": {
     ".": {
-      "import": "./dist/index.mjs",
-      "require": "./dist/index.cjs",
-      "types": "./dist/index.d.ts"
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.mjs"
     }
   },
-  "main": "./dist/index.cjs",
-  "module": "./dist/index.mjs",
+  "main": "./dist/index.mjs",
   "types": "./dist/index.d.ts",
   "files": [
     "dist"
@@ -30,14 +29,20 @@
     "dev": "unbuild --stub",
     "prepublishOnly": "pnpm run build"
   },
-  "devDependencies": {
+  "dependencies": {
     "@halo-dev/api-client": "workspace:*",
+    "js-yaml": "^4.1.0"
+  },
+  "devDependencies": {
     "@types/js-yaml": "^4.0.9",
-    "js-yaml": "^4.1.0",
-    "unbuild": "^0.7.6"
+    "unbuild": "^3.5.0"
   },
   "peerDependencies": {
-    "vite": "^4.0.0 || ^5.0.0"
+    "@rsbuild/core": "^1.0.0",
+    "@rsbuild/plugin-vue": "^1.0.0",
+    "@vitejs/plugin-vue": "^4.0.0 || ^5.0.0",
+    "@vitejs/plugin-vue-jsx": "^4.0.0",
+    "vite": "^4.0.0 || ^5.0.0 || ^6.0.0"
   },
   "engines": {
     "node": "^18.0.0 || >=20.0.0"

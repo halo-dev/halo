@@ -1,0 +1,77 @@
+import { defineConfig, mergeConfig, UserConfig } from "vite";
+import Vue from "@vitejs/plugin-vue";
+import VueJsx from "@vitejs/plugin-vue-jsx";
+import { EXTERNALS, GLOBALS } from "./constants/externals";
+import { DEFAULT_OUT_DIR_DEV, DEFAULT_OUT_DIR_PROD } from "./constants/build";
+import { getHaloPluginManifest } from "./utils/halo-plugin";
+import { DEFAULT_MANIFEST_PATH } from "./constants/halo-plugin";
+
+export interface ViteUserConfig {
+  /**
+   * Halo plugin manifest path.
+   *
+   * @default "../src/main/resources/plugin.yaml"
+   */
+  manifestPath?: string;
+
+  /**
+   * Custom Vite config.
+   */
+  vite: UserConfig;
+}
+
+function createVitePresetsConfig(manifestPath: string) {
+  const manifest = getHaloPluginManifest(manifestPath);
+
+  return defineConfig(({ mode }) => {
+    const isProduction = mode === "production";
+
+    return {
+      plugins: [Vue(), VueJsx()],
+      define: {
+        "process.env": process.env,
+      },
+      build: {
+        outDir: isProduction ? DEFAULT_OUT_DIR_PROD : DEFAULT_OUT_DIR_DEV,
+        emptyOutDir: true,
+        lib: {
+          entry: "src/index.ts",
+          name: manifest.metadata.name,
+          formats: ["iife"],
+          fileName: () => "main.js",
+        },
+        rollupOptions: {
+          external: EXTERNALS,
+          output: {
+            globals: GLOBALS,
+            extend: true,
+          },
+        },
+      },
+    };
+  });
+}
+
+/**
+ * Vite config for Halo UI Plugin.
+ *
+ * @example
+ * ```ts
+ * import { viteConfig } from "@halo-dev/ui-plugin-bundler-kit";
+ *
+ * export default viteConfig({
+ *   vite: {
+ *     // your custom vite config
+ *   },
+ * });
+ * ```
+ */
+export function viteConfig(config: ViteUserConfig) {
+  const presetsConfigFn = createVitePresetsConfig(
+    config.manifestPath || DEFAULT_MANIFEST_PATH
+  );
+  return defineConfig((env) => {
+    const presetsConfig = presetsConfigFn(env);
+    return mergeConfig(presetsConfig, config.vite);
+  });
+}
