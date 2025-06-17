@@ -59,7 +59,7 @@ function handleSaveConfig(config: Record<string, unknown>) {
     >
       <slot name="actions" />
       <ActionButton
-        v-if="widgetDefinition?.configFormKitSchema?.length"
+        v-if="widgetDefinition?.configFormKitSchema"
         class="bg-black"
         @click="configModalVisible = true"
       >
