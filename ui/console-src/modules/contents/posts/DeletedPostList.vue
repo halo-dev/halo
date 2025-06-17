@@ -2,6 +2,7 @@
 import PostContributorList from "@/components/user/PostContributorList.vue";
 import { formatDatetime, relativeTimeTo } from "@/utils/date";
 import { usePermission } from "@/utils/permission";
+import { generateThumbnailUrl } from "@/utils/thumbnail";
 import type { ListedPost, Post } from "@halo-dev/api-client";
 import { consoleApiClient, coreApiClient } from "@halo-dev/api-client";
 import {
@@ -317,6 +318,18 @@ watch(
               />
             </template>
             <template #start>
+              <VEntityField v-if="post.post.spec.cover">
+                <template #description>
+                  <div
+                    class="aspect-h-2 rounded-md overflow-hidden aspect-w-3 w-20"
+                  >
+                    <img
+                      class="object-cover w-full h-full"
+                      :src="generateThumbnailUrl(post.post.spec.cover, 's')"
+                    />
+                  </div>
+                </template>
+              </VEntityField>
               <VEntityField :title="post.post.spec.title">
                 <template #description>
                   <div class="flex flex-col gap-1.5">
