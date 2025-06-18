@@ -245,7 +245,9 @@ For Rsbuild:
 > Relative to the root directory of the Halo plugin project
 
 - **Development**: `build/resources/main/console`
-- **Production**: `src/main/resources/console`
+- **Production**: `ui/build/dist`
+
+> **Note**: The production build output directory of `HaloUIPluginBundlerKit` is still `src/main/resources/console` to ensure compatibility.
 
 ## Requirements
 

@@ -1,8 +1,10 @@
 import { Plugin } from "vite";
 import { EXTERNALS, GLOBALS } from "./constants/externals";
 import { DEFAULT_MANIFEST_PATH } from "./constants/halo-plugin";
-import { DEFAULT_OUT_DIR_DEV, DEFAULT_OUT_DIR_PROD } from "./constants/build";
+import { DEFAULT_OUT_DIR_DEV } from "./constants/build";
 import { getHaloPluginManifest } from "./utils/halo-plugin";
+
+const LEGACY_OUT_DIR_PROD = "../src/main/resources/console";
 
 interface HaloUIPluginBundlerKitOptions {
   outDir?:
@@ -25,7 +27,7 @@ export function HaloUIPluginBundlerKit(
     config(config, env) {
       const isProduction = env.mode === "production";
 
-      let outDir = isProduction ? DEFAULT_OUT_DIR_PROD : DEFAULT_OUT_DIR_DEV;
+      let outDir = isProduction ? LEGACY_OUT_DIR_PROD : DEFAULT_OUT_DIR_DEV;
 
       if (options.outDir) {
         if (typeof options.outDir === "string") {
