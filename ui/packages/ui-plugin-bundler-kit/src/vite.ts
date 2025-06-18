@@ -26,6 +26,7 @@ function createVitePresetsConfig(manifestPath: string) {
     const isProduction = mode === "production";
 
     return {
+      mode: mode || "production",
       plugins: [Vue()],
       define: {
         "process.env": process.env,

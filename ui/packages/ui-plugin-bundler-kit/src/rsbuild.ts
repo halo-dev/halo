@@ -2,6 +2,7 @@ import {
   defineConfig,
   mergeRsbuildConfig,
   type RsbuildConfig,
+  type RsbuildMode,
 } from "@rsbuild/core";
 import { getHaloPluginManifest } from "./utils/halo-plugin";
 import { DEFAULT_OUT_DIR_DEV, DEFAULT_OUT_DIR_PROD } from "./constants/build";
@@ -26,12 +27,13 @@ export interface RsBuildUserConfig {
 function createRsbuildPresetsConfig(manifestPath: string) {
   const manifest = getHaloPluginManifest(manifestPath);
 
-  return defineConfig(({ env }) => {
-    const isProduction = env === "production";
+  return defineConfig(({ envMode }) => {
+    const isProduction = envMode === "production";
 
     const outDir = isProduction ? DEFAULT_OUT_DIR_PROD : DEFAULT_OUT_DIR_DEV;
 
     return {
+      mode: (envMode as RsbuildMode) || "production",
       source: {
         entry: {
           main: "./src/index.ts",
