@@ -34,6 +34,7 @@ function createRsbuildPresetsConfig(manifestPath: string) {
 
     return {
       mode: (envMode as RsbuildMode) || "production",
+      plugins: [pluginVue()],
       source: {
         entry: {
           main: "./src/index.ts",
@@ -42,9 +43,27 @@ function createRsbuildPresetsConfig(manifestPath: string) {
       dev: {
         hmr: false,
       },
-      plugins: [pluginVue()],
+      performance: {
+        chunkSplit: {
+          strategy: "custom",
+        },
+      },
       tools: {
         rspack: {
+          optimization: {
+            splitChunks: {
+              chunks: "async",
+            },
+            moduleIds: "named",
+            nodeEnv: true,
+          },
+          experiments: {
+            rspackFuture: {
+              bundlerInfo: {
+                force: false,
+              },
+            },
+          },
           module: {
             parser: {
               javascript: {
