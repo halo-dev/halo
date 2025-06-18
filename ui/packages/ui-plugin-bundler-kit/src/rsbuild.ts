@@ -128,12 +128,12 @@ function createRsbuildPresetsConfig(manifestPath: string) {
  * @param config
  * @returns
  */
-export function rsbuildConfig(config: RsBuildUserConfig) {
+export function rsbuildConfig(config?: RsBuildUserConfig) {
   const presetsConfigFn = createRsbuildPresetsConfig(
-    config.manifestPath || DEFAULT_MANIFEST_PATH
+    config?.manifestPath || DEFAULT_MANIFEST_PATH
   );
   return defineConfig((env) => {
     const presetsConfig = presetsConfigFn(env);
-    return mergeRsbuildConfig(presetsConfig, config.rsbuild);
+    return mergeRsbuildConfig(presetsConfig, config?.rsbuild || {});
   });
 }

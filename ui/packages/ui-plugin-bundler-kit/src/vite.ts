@@ -66,12 +66,12 @@ function createVitePresetsConfig(manifestPath: string) {
  * });
  * ```
  */
-export function viteConfig(config: ViteUserConfig) {
+export function viteConfig(config?: ViteUserConfig) {
   const presetsConfigFn = createVitePresetsConfig(
-    config.manifestPath || DEFAULT_MANIFEST_PATH
+    config?.manifestPath || DEFAULT_MANIFEST_PATH
   );
   return defineConfig((env) => {
     const presetsConfig = presetsConfigFn(env);
-    return mergeConfig(presetsConfig, config.vite);
+    return mergeConfig(presetsConfig, config?.vite || {});
   });
 }
