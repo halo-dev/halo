@@ -2,6 +2,7 @@
 import PostContributorList from "@/components/user/PostContributorList.vue";
 import { formatDatetime, relativeTimeTo } from "@/utils/date";
 import { usePermission } from "@/utils/permission";
+import { generateThumbnailUrl } from "@/utils/thumbnail";
 import type { ListedSinglePage, SinglePage } from "@halo-dev/api-client";
 import { consoleApiClient, coreApiClient } from "@halo-dev/api-client";
 import {
@@ -306,6 +307,20 @@ watch(
               />
             </template>
             <template #start>
+              <VEntityField v-if="singlePage.page.spec.cover">
+                <template #description>
+                  <div
+                    class="aspect-h-2 rounded-md overflow-hidden aspect-w-3 w-20"
+                  >
+                    <img
+                      class="object-cover w-full h-full"
+                      :src="
+                        generateThumbnailUrl(singlePage.page.spec.cover, 's')
+                      "
+                    />
+                  </div>
+                </template>
+              </VEntityField>
               <VEntityField
                 :title="singlePage.page.spec.title"
                 max-width="30rem"

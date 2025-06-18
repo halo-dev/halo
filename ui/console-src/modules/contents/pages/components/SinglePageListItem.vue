@@ -14,8 +14,8 @@ import {
   VDropdownItem,
   VEntity,
 } from "@halo-dev/components";
+import type { EntityFieldItem, OperationItem } from "@halo-dev/console-shared";
 import { useQueryClient } from "@tanstack/vue-query";
-import type { EntityFieldItem, OperationItem } from "packages/shared/dist";
 import type { Ref } from "vue";
 import { computed, inject, markRaw, ref, toRefs } from "vue";
 import { useI18n } from "vue-i18n";
