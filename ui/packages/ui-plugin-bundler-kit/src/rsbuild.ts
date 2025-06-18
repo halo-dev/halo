@@ -26,8 +26,8 @@ export interface RsBuildUserConfig {
 function createRsbuildPresetsConfig(manifestPath: string) {
   const manifest = getHaloPluginManifest(manifestPath);
 
-  return defineConfig(({ envMode }) => {
-    const isProduction = envMode === "production";
+  return defineConfig(({ env }) => {
+    const isProduction = env === "production";
 
     const outDir = isProduction ? DEFAULT_OUT_DIR_PROD : DEFAULT_OUT_DIR_DEV;
 
