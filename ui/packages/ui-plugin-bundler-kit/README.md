@@ -234,7 +234,7 @@ For Rsbuild:
 ```json
 {
   "scripts": {
-    "dev": "rsbuild dev --mode=development --watch",
+    "dev": "rsbuild dev --env-mode=development --watch",
     "build": "rsbuild build"
   }
 }
