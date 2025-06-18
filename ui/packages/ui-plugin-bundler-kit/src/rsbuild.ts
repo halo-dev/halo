@@ -9,6 +9,7 @@ import { DEFAULT_OUT_DIR_DEV, DEFAULT_OUT_DIR_PROD } from "./constants/build";
 import { pluginVue } from "@rsbuild/plugin-vue";
 import { GLOBALS } from "./constants/externals";
 import { DEFAULT_MANIFEST_PATH } from "./constants/halo-plugin";
+import { RsbuildConfigSyncFn } from "@rsbuild/core/dist-types/loadConfig";
 
 export interface RsBuildUserConfig {
   /**
@@ -21,7 +22,7 @@ export interface RsBuildUserConfig {
   /**
    * Custom Rsbuild config.
    */
-  rsbuild: RsbuildConfig;
+  rsbuild: RsbuildConfig | RsbuildConfigSyncFn;
 }
 
 function createRsbuildPresetsConfig(manifestPath: string) {
@@ -134,6 +135,10 @@ export function rsbuildConfig(config?: RsBuildUserConfig) {
   );
   return defineConfig((env) => {
     const presetsConfig = presetsConfigFn(env);
-    return mergeRsbuildConfig(presetsConfig, config?.rsbuild || {});
+    const userConfig =
+      typeof config?.rsbuild === "function"
+        ? config.rsbuild(env)
+        : config?.rsbuild || {};
+    return mergeRsbuildConfig(presetsConfig, userConfig);
   });
 }

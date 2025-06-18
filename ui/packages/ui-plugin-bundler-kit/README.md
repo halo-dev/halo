@@ -114,7 +114,7 @@ interface ViteUserConfig {
   /**
    * Custom Vite configuration
    */
-  vite: UserConfig;
+  vite: UserConfig | UserConfigFnObject;
 }
 ```
 
@@ -131,7 +131,7 @@ interface RsBuildUserConfig {
   /**
    * Custom Rsbuild configuration
    */
-  rsbuild: RsbuildConfig;
+  rsbuild: RsbuildConfig | RsbuildConfigSyncFn;
 }
 ```
 
