@@ -55,7 +55,6 @@ function createRsbuildPresetsConfig(manifestPath: string) {
               chunks: "async",
             },
             moduleIds: "named",
-            nodeEnv: true,
           },
           experiments: {
             rspackFuture: {
