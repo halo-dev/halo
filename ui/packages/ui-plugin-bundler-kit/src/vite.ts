@@ -1,6 +1,5 @@
 import { defineConfig, mergeConfig, UserConfig } from "vite";
 import Vue from "@vitejs/plugin-vue";
-import VueJsx from "@vitejs/plugin-vue-jsx";
 import { EXTERNALS, GLOBALS } from "./constants/externals";
 import { DEFAULT_OUT_DIR_DEV, DEFAULT_OUT_DIR_PROD } from "./constants/build";
 import { getHaloPluginManifest } from "./utils/halo-plugin";
@@ -27,7 +26,7 @@ function createVitePresetsConfig(manifestPath: string) {
     const isProduction = mode === "production";
 
     return {
-      plugins: [Vue(), VueJsx()],
+      plugins: [Vue()],
       define: {
         "process.env": process.env,
       },

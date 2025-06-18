@@ -61,7 +61,7 @@ export default viteConfig({
 });
 ```
 
-> **Note**: Vue and Vue JSX plugins are pre-configured, no need to add them manually.
+> **Note**: Vue plugin is pre-configured, no need to add it manually.
 
 ### Rsbuild Configuration
 
@@ -254,7 +254,6 @@ For Rsbuild:
   - `@rsbuild/core`: ^1.0.0 (when using Rsbuild)
   - `@rsbuild/plugin-vue`: ^1.0.0 (when using Rsbuild)
   - `@vitejs/plugin-vue`: ^4.0.0 || ^5.0.0 (when using Vite)
-  - `@vitejs/plugin-vue-jsx`: ^4.0.0 (when using Vite)
   - `vite`: ^4.0.0 || ^5.0.0 || ^6.0.0 (when using Vite)
 
 ## Vite vs Rsbuild
