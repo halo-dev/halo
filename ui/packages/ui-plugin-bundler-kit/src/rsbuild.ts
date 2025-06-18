@@ -3,13 +3,13 @@ import {
   mergeRsbuildConfig,
   type RsbuildConfig,
   type RsbuildMode,
+  type ConfigParams,
 } from "@rsbuild/core";
 import { getHaloPluginManifest } from "./utils/halo-plugin";
 import { DEFAULT_OUT_DIR_DEV, DEFAULT_OUT_DIR_PROD } from "./constants/build";
 import { pluginVue } from "@rsbuild/plugin-vue";
 import { GLOBALS } from "./constants/externals";
 import { DEFAULT_MANIFEST_PATH } from "./constants/halo-plugin";
-import { RsbuildConfigSyncFn } from "@rsbuild/core/dist-types/loadConfig";
 
 export interface RsBuildUserConfig {
   /**
@@ -22,7 +22,7 @@ export interface RsBuildUserConfig {
   /**
    * Custom Rsbuild config.
    */
-  rsbuild: RsbuildConfig | RsbuildConfigSyncFn;
+  rsbuild: RsbuildConfig | ((env: ConfigParams) => RsbuildConfig);
 }
 
 function createRsbuildPresetsConfig(manifestPath: string) {

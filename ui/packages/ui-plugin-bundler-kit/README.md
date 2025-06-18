@@ -131,7 +131,7 @@ interface RsBuildUserConfig {
   /**
    * Custom Rsbuild configuration
    */
-  rsbuild: RsbuildConfig | RsbuildConfigSyncFn;
+  rsbuild: RsbuildConfig | ((env: ConfigParams) => RsbuildConfig);
 }
 ```
 
