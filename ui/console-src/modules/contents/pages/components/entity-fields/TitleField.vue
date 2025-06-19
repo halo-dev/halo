@@ -32,6 +32,7 @@ const externalUrl = computed(() => {
       name: 'SinglePageEditor',
       query: { name: singlePage.page.metadata.name },
     }"
+    max-width="30rem"
   >
     <template #extra>
       <VSpace>
