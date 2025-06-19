@@ -1,4 +1,9 @@
-import { defineConfig, mergeConfig, UserConfig } from "vite";
+import {
+  defineConfig,
+  mergeConfig,
+  UserConfig,
+  UserConfigFnObject,
+} from "vite";
 import Vue from "@vitejs/plugin-vue";
 import { EXTERNALS, GLOBALS } from "./constants/externals";
 import { DEFAULT_OUT_DIR_DEV, DEFAULT_OUT_DIR_PROD } from "./constants/build";
@@ -16,7 +21,7 @@ export interface ViteUserConfig {
   /**
    * Custom Vite config.
    */
-  vite: UserConfig;
+  vite: UserConfig | UserConfigFnObject;
 }
 
 function createVitePresetsConfig(manifestPath: string) {
@@ -72,6 +77,10 @@ export function viteConfig(config?: ViteUserConfig) {
   );
   return defineConfig((env) => {
     const presetsConfig = presetsConfigFn(env);
-    return mergeConfig(presetsConfig, config?.vite || {});
+    const userConfig =
+      typeof config?.vite === "function"
+        ? config.vite(env)
+        : config?.vite || {};
+    return mergeConfig(presetsConfig, userConfig);
   });
 }
