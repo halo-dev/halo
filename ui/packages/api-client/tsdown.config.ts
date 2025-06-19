@@ -15,4 +15,7 @@ export default defineConfig({
   tsconfig: "./tsconfig.json",
   minify: true,
   exports: true,
+  dts: {
+    tsgo: true
+  }
 });
