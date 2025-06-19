@@ -21,6 +21,7 @@ import {
   setupPluginModules,
 } from "@console/setup/setupModules";
 import { useThemeStore } from "@console/stores/theme";
+import "core-js/es/object/has-own";
 
 const app = createApp(App);
 
