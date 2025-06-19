@@ -321,7 +321,10 @@ watch(
                   </div>
                 </template>
               </VEntityField>
-              <VEntityField :title="singlePage.page.spec.title">
+              <VEntityField
+                :title="singlePage.page.spec.title"
+                max-width="30rem"
+              >
                 <template #description>
                   <VSpace>
                     <span class="text-xs text-gray-500">

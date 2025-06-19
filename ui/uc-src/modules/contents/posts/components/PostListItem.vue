@@ -138,6 +138,7 @@ function handleDelete() {
           name: 'PostEditor',
           query: { name: post.post.metadata.name },
         }"
+        max-width="30rem"
       >
         <template #extra>
           <VSpace class="mt-1 sm:mt-0">

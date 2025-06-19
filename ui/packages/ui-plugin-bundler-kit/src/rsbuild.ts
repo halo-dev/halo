@@ -3,6 +3,7 @@ import {
   mergeRsbuildConfig,
   type RsbuildConfig,
   type RsbuildMode,
+  type ConfigParams,
 } from "@rsbuild/core";
 import { getHaloPluginManifest } from "./utils/halo-plugin";
 import { DEFAULT_OUT_DIR_DEV, DEFAULT_OUT_DIR_PROD } from "./constants/build";
@@ -21,7 +22,7 @@ export interface RsBuildUserConfig {
   /**
    * Custom Rsbuild config.
    */
-  rsbuild: RsbuildConfig;
+  rsbuild: RsbuildConfig | ((env: ConfigParams) => RsbuildConfig);
 }
 
 function createRsbuildPresetsConfig(manifestPath: string) {
@@ -134,6 +135,10 @@ export function rsbuildConfig(config?: RsBuildUserConfig) {
   );
   return defineConfig((env) => {
     const presetsConfig = presetsConfigFn(env);
-    return mergeRsbuildConfig(presetsConfig, config?.rsbuild || {});
+    const userConfig =
+      typeof config?.rsbuild === "function"
+        ? config.rsbuild(env)
+        : config?.rsbuild || {};
+    return mergeRsbuildConfig(presetsConfig, userConfig);
   });
 }
