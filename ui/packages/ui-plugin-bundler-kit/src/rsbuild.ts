@@ -129,7 +129,9 @@ function createRsbuildPresetsConfig(manifestPath: string) {
  * @param config
  * @returns
  */
-export function rsbuildConfig(config?: RsBuildUserConfig) {
+export function rsbuildConfig(
+  config?: RsBuildUserConfig
+): (env: ConfigParams) => RsbuildConfig {
   const presetsConfigFn = createRsbuildPresetsConfig(
     config?.manifestPath || DEFAULT_MANIFEST_PATH
   );

@@ -20,14 +20,12 @@
     }
   ],
   "exports": {
-    ".": {
-      "types": "./dist/entry/index.d.ts",
-      "import": "./dist/halo-api-client.es.js"
-    }
+    ".": "./dist/index.mjs",
+    "./package.json": "./package.json"
   },
-  "main": "./dist/halo-api-client.iife.js",
-  "module": "./dist/halo-api-client.es.js",
-  "types": "./dist/entry/index.d.ts",
+  "main": "./dist/index.mjs",
+  "module": "./dist/index.mjs",
+  "types": "./dist/index.d.mts",
   "typesVersions": {
     "*": {
       "*": [
@@ -40,22 +38,18 @@
     "dist"
   ],
   "scripts": {
-    "build": "vite build",
+    "build": "tsdown",
     "gen": "rimraf --glob './src/**' && openapi-generator-cli generate -i ../../../api-docs/openapi/v3_0/aggregated.json -g typescript-axios -c ./.openapi_config.yaml -o ./src --type-mappings='set=Array'"
-  },
-  "devDependencies": {
-    "@openapitools/openapi-generator-cli": "^2.13.4",
-    "@types/node": "^20.14.2",
-    "@types/qs": "^6.9.15",
-    "rimraf": "^5.0.7",
-    "typescript": "~5.5.4",
-    "unbuild": "^0.7.6",
-    "vite-plugin-dts": "^4.2.2"
-  },
-  "peerDependencies": {
-    "axios": "^1.7.x"
   },
   "dependencies": {
     "qs": "^6.13.0"
+  },
+  "devDependencies": {
+    "@openapitools/openapi-generator-cli": "^2.13.4",
+    "@types/qs": "^6.9.15",
+    "rimraf": "^5.0.7"
+  },
+  "peerDependencies": {
+    "axios": "^1.7.x"
   }
 }
