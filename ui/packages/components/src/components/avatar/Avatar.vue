@@ -43,7 +43,7 @@ const loadImage = async (isInit: boolean) => {
         reject(err);
       };
     });
-  } catch (e) {
+  } catch (_) {
     error.value = true;
   } finally {
     isLoading.value = false;

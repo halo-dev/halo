@@ -33,6 +33,7 @@ let draggableHandleDom: HTMLElement | null = null;
 let currEditorView: EditorView;
 let activeNode: ActiveNode | null = null;
 let activeSelection: NodeSelection | null = null;
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 let mouseleaveTimer: any;
 let dragging = false;
 let hoverOrClickDragItem = false;
@@ -161,6 +162,7 @@ const handleDragStartEvent = (event: DragEvent) => {
     event.dataTransfer.clearData();
     event.dataTransfer.setData("text/html", dom.innerHTML);
     event.dataTransfer.setData("text/plain", text);
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     event.dataTransfer.setDragImage(activeNode?.el as any, 0, 0);
 
     currEditorView.dragging = {
@@ -289,6 +291,7 @@ const getDraggableItem = ({
   editor: Editor;
   view: EditorView;
   dom: HTMLElement;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   event?: any;
   depth?: number;
 }): DraggableItemType | boolean | undefined => {

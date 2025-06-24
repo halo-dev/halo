@@ -34,7 +34,7 @@ onMounted(async () => {
   isLoading.value = true;
   try {
     await loadImage();
-  } catch (e) {
+  } catch (_) {
     error.value = true;
   } finally {
     isLoading.value = false;

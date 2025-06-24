@@ -1,4 +1,4 @@
-<script setup lang="tsx">
+<script setup lang="ts">
 import type { OwnerInfo } from "@halo-dev/api-client";
 import { VAvatar } from "@halo-dev/components";
 

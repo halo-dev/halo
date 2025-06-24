@@ -8,6 +8,7 @@ export interface Option {
   value: string;
 }
 const props = defineProps<{
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   container?: any;
   containerClass?: string;
   options: Option[];

@@ -18,7 +18,6 @@
     "test:unit:ui": "vitest --watch --ui",
     "test:unit:coverage": "vitest run --coverage",
     "typecheck": "vue-tsc --noEmit -p tsconfig.app.json --composite false",
-    "lint": "eslint ./src --ext .vue,.js,.jsx,.cjs,.mjs,.ts,.tsx,.cts,.mts",
     "prettier": "prettier --write './src/**/*.{vue,js,jsx,ts,tsx,css,scss,json,yml,yaml,html}'",
     "storybook": "storybook dev -p 6006",
     "build-storybook": "storybook build"
@@ -52,7 +51,6 @@
     "@storybook/testing-library": "^0.0.14-next.2",
     "@storybook/vue3": "^7.6.3",
     "@storybook/vue3-vite": "^7.6.3",
-    "eslint-plugin-storybook": "^0.6.15",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
     "storybook": "^7.6.3"

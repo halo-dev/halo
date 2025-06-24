@@ -282,6 +282,7 @@ export function arrow(axis: "vert" | "horiz", dir: number): Command {
 
 export const arrowGapCursor = (
   dir: number,
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   dirStr: any,
   state: EditorState,
   view?: EditorView
