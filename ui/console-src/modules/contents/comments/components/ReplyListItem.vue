@@ -215,7 +215,7 @@ const { operationItems } = useOperationItemExtensionPoint<ListedReply>(
     :class="{ 'animate-breath': isHoveredReply }"
   >
     <template #start>
-      <VEntityField width="100%">
+      <VEntityField width="100%" max-width="100%">
         <template #description>
           <div class="flex flex-col gap-2">
             <div class="mb-1 flex items-center gap-2">
