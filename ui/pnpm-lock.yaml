@@ -617,8 +617,8 @@ importers:
         specifier: ^1.0.0
         version: 1.0.7(@rsbuild/core@1.3.22)(@vue/compiler-sfc@3.5.16)(esbuild@0.25.5)(vue@3.5.16(typescript@5.8.3))
       '@vitejs/plugin-vue':
-        specifier: ^4.0.0 || ^5.0.0
-        version: 5.2.4(rolldown-vite@7.0.0(@types/node@18.13.0)(esbuild@0.25.5)(jiti@2.4.2)(less@4.2.0)(sass-embedded@1.83.0)(terser@5.37.0))(vue@3.5.16(typescript@5.8.3))
+        specifier: ^5.0.0 || ^6.0.0
+        version: 6.0.0(rolldown-vite@7.0.0(@types/node@18.13.0)(esbuild@0.25.5)(jiti@2.4.2)(less@4.2.0)(sass-embedded@1.83.0)(terser@5.37.0))(vue@3.5.16(typescript@5.8.3))
       js-yaml:
         specifier: ^4.1.0
         version: 4.1.0
@@ -4682,13 +4682,6 @@ packages:
   '@vitejs/plugin-vue@4.2.3':
     resolution: {integrity: sha512-R6JDUfiZbJA9cMiguQ7jxALsgiprjBeHL5ikpXfJCH62pPHtI+JdJ5xWj6Ev73yXSlYl86+blXn1kZHQ7uElxw==}
     engines: {node: ^14.18.0 || >=16.0.0}
-    peerDependencies:
-      vite: npm:rolldown-vite@7.0.0
-      vue: ^3.2.25
-
-  '@vitejs/plugin-vue@5.2.4':
-    resolution: {integrity: sha512-7Yx/SXSOcQq5HiiV3orevHUFn+pmMB4cgbEkDYgnkUWb0WfeQ/wa2yFv6D5ICiCQOVpjA7vYDXrC7AGO8yjDHA==}
-    engines: {node: ^18.0.0 || >=20.0.0}
     peerDependencies:
       vite: npm:rolldown-vite@7.0.0
       vue: ^3.2.25
@@ -15940,11 +15933,6 @@ snapshots:
       - supports-color
 
   '@vitejs/plugin-vue@4.2.3(rolldown-vite@7.0.0(@types/node@18.13.0)(esbuild@0.25.5)(jiti@2.4.2)(less@4.2.0)(sass-embedded@1.83.0)(terser@5.37.0))(vue@3.5.16(typescript@5.8.3))':
-    dependencies:
-      vite: rolldown-vite@7.0.0(@types/node@18.13.0)(esbuild@0.25.5)(jiti@2.4.2)(less@4.2.0)(sass-embedded@1.83.0)(terser@5.37.0)
-      vue: 3.5.16(typescript@5.8.3)
-
-  '@vitejs/plugin-vue@5.2.4(rolldown-vite@7.0.0(@types/node@18.13.0)(esbuild@0.25.5)(jiti@2.4.2)(less@4.2.0)(sass-embedded@1.83.0)(terser@5.37.0))(vue@3.5.16(typescript@5.8.3))':
     dependencies:
       vite: rolldown-vite@7.0.0(@types/node@18.13.0)(esbuild@0.25.5)(jiti@2.4.2)(less@4.2.0)(sass-embedded@1.83.0)(terser@5.37.0)
       vue: 3.5.16(typescript@5.8.3)
