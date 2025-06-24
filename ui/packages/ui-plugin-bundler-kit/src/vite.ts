@@ -44,6 +44,7 @@ function createVitePresetsConfig(manifestPath: string) {
           name: manifest.metadata.name,
           formats: ["iife"],
           fileName: () => "main.js",
+          cssFileName: "style",
         },
         rollupOptions: {
           external: EXTERNALS,
