@@ -8,10 +8,21 @@ import run.halo.app.theme.router.ModelConst;
 
 /**
  * Provides template variables related to preview mode.
+ * This acquirer checks if the current request is in preview mode and provides
+ * the corresponding template variable.
+ *
+ * @author humphreyLi
+ * @since 2.6.0
  */
 @Component
 public class PreviewContextVariablesAcquirer implements ViewContextBasedVariablesAcquirer {
 
+    /**
+     * Acquires template variables for preview mode.
+     *
+     * @param exchange the server web exchange
+     * @return a Mono containing template variables map
+     */
     @Override
     public Mono<Map<String, Object>> acquire(ServerWebExchange exchange) {
         Boolean preview = (Boolean) exchange.getAttribute(ModelConst.IS_PREVIEW);

@@ -60,6 +60,18 @@ public class PreviewRouterFunction {
             .build();
     }
 
+    /**
+     * Handles preview requests for posts.
+     *
+     * @param request the server request containing post name and optional snapshot name
+     * @return a Mono containing the server response with rendered post content
+     */
+    /**
+     * Handles preview requests for posts.
+     *
+     * @param request the server request containing post name and optional snapshot name
+     * @return a Mono containing the server response with rendered post content
+     */
     private Mono<ServerResponse> previewPost(ServerRequest request) {
         final var name = request.pathVariable("name");
         return currentAuthenticatedUserName()
@@ -112,6 +124,12 @@ public class PreviewRouterFunction {
             });
     }
 
+    /**
+     * Handles preview requests for single pages.
+     *
+     * @param request the server request containing page name and optional snapshot name
+     * @return a Mono containing the server response with rendered page content
+     */
     private Mono<ServerResponse> previewSinglePage(ServerRequest request) {
         final var name = request.pathVariable("name");
         return currentAuthenticatedUserName()
@@ -160,6 +178,13 @@ public class PreviewRouterFunction {
             });
     }
 
+    /**
+     * Checks if the current user can preview the content.
+     * Users can preview content if they are one of the contributors.
+     *
+     * @param contributors the list of contributors
+     * @return a Mono containing true if the user can preview, false otherwise
+     */
     private Mono<Boolean> canPreview(List<ContributorVo> contributors) {
         Assert.notNull(contributors, "The contributors must not be null");
         Set<String> contributorNames = contributors.stream()
