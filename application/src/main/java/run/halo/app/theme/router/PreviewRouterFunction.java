@@ -29,6 +29,7 @@ import run.halo.app.theme.finders.PostPublicQueryService;
 import run.halo.app.theme.finders.SinglePageConversionService;
 import run.halo.app.theme.finders.vo.ContributorVo;
 import run.halo.app.theme.finders.vo.PostVo;
+import run.halo.app.theme.router.ModelConst;
 
 /**
  * <p>Preview router for previewing posts and single pages.</p>
@@ -81,6 +82,8 @@ public class PreviewRouterFunction {
             .flatMap(postVo -> {
                 String template = postVo.getSpec().getTemplate();
                 Map<String, Object> model = ModelMapUtils.postModel(postVo);
+                // Mark as preview mode for downstream view processing
+                request.exchange().getAttributes().put(ModelConst.IS_PREVIEW, Boolean.TRUE);
                 return viewNameResolver.resolveViewNameOrDefault(request, template,
                         DefaultTemplateEnum.POST.getValue())
                     .flatMap(templateName -> ServerResponse.ok().render(templateName, model));
@@ -148,6 +151,8 @@ public class PreviewRouterFunction {
             .switchIfEmpty(Mono.error(() -> new NotFoundException("Single page not found.")))
             .flatMap(singlePageVo -> {
                 Map<String, Object> model = ModelMapUtils.singlePageModel(singlePageVo);
+                // Mark as preview mode for downstream view processing
+                request.exchange().getAttributes().put(ModelConst.IS_PREVIEW, Boolean.TRUE);
                 String template = singlePageVo.getSpec().getTemplate();
                 return viewNameResolver.resolveViewNameOrDefault(request, template,
                         DefaultTemplateEnum.SINGLE_PAGE.getValue())

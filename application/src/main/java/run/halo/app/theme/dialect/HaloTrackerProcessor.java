@@ -41,6 +41,11 @@ public class HaloTrackerProcessor implements TemplateHeadProcessor {
     }
 
     private String getTrackerScript(ITemplateContext context) {
+        // Skip script injection in preview mode
+        Object previewFlag = context.getVariable("isPreview");
+        if (Boolean.TRUE.equals(previewFlag)) {
+            return StringUtils.EMPTY;
+        }
         String resourceName = (String) context.getVariable("name");
         String externalUrl = externalUrlGetter.get().getPath();
         Object groupVersionKind = context.getVariable("groupVersionKind");

@@ -17,4 +17,6 @@ public enum ModelConst {
     public static final String NO_CACHE = "HALO_TEMPLATE_ENGINE.NO_CACHE";
 
     public static final Integer DEFAULT_PAGE_SIZE = 10;
+
+    public static final String IS_PREVIEW = "HALO.PREVIEW.MODE";
 }
