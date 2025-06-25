@@ -19,6 +19,7 @@ import {
 } from "./util";
 
 export interface TableCellOptions {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   HTMLAttributes: Record<string, any>;
 }
 

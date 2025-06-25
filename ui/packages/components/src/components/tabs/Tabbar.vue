@@ -225,43 +225,17 @@ onUnmounted(() => {
 .tabbar-wrapper {
   @apply relative;
   .indicator {
-    @apply absolute
-    top-0
-    z-10
-    w-20
-    h-full
-    flex
-    items-center
-    from-transparent
-    from-10%
-    via-white/80
-    via-30%
-    to-white
-    to-70%
-    pt-1
-    pointer-events-none
-    pb-1.5;
+    @apply pointer-events-none absolute top-0 z-10 flex h-full w-20 items-center from-transparent from-10% via-white/80 via-30% to-white to-70% pb-1.5 pt-1;
 
     &.left {
-      @apply left-0
-      justify-start
-      bg-gradient-to-l;
+      @apply left-0 justify-start bg-gradient-to-l;
     }
     &.right {
-      @apply right-0
-      justify-end
-      bg-gradient-to-r;
+      @apply right-0 justify-end bg-gradient-to-r;
     }
     .arrow-left,
     .arrow-right {
-      @apply w-10
-      h-9
-      flex
-      justify-center
-      items-center
-      pointer-events-auto
-      cursor-pointer
-      select-none;
+      @apply pointer-events-auto flex h-9 w-10 cursor-pointer select-none items-center justify-center;
       svg {
         font-size: 1.5em;
       }
@@ -269,11 +243,7 @@ onUnmounted(() => {
   }
 
   .tabbar-items {
-    @apply flex
-    items-center
-    flex-row
-    overflow-x-auto
-    py-0.5;
+    @apply flex flex-row items-center overflow-x-auto py-0.5;
 
     &::-webkit-scrollbar-track-piece {
       background-color: #f8f8f8;
@@ -301,15 +271,7 @@ onUnmounted(() => {
   }
 
   .tabbar-item {
-    @apply inline-flex
-    cursor-pointer
-    self-center
-    transition-all
-    text-sm
-    justify-center
-    gap-2
-    h-9
-    whitespace-nowrap;
+    @apply inline-flex h-9 cursor-pointer justify-center gap-2 self-center whitespace-nowrap text-sm transition-all;
 
     .tabbar-item-label,
     .tabbar-item-icon {
@@ -327,15 +289,12 @@ onUnmounted(() => {
     }
 
     .tabbar-item {
-      @apply px-5
-      py-1
-      border-b-gray-100;
+      @apply border-b-gray-100 px-5 py-1;
 
       border-bottom-width: 2px;
 
       &.tabbar-item-active {
-        @apply text-secondary
-        border-b-secondary;
+        @apply border-b-secondary text-secondary;
       }
     }
   }
@@ -347,14 +306,10 @@ onUnmounted(() => {
     }
 
     .tabbar-item {
-      @apply px-6
-      py-1
-      opacity-70
-      rounded-base;
+      @apply rounded-base px-6 py-1 opacity-70;
 
       &.tabbar-item-active {
-        @apply bg-gray-100
-        opacity-100;
+        @apply bg-gray-100 opacity-100;
       }
 
       &:hover {
@@ -364,26 +319,17 @@ onUnmounted(() => {
   }
 
   &.tabbar-outline {
-    @apply px-1
-    py-0.5
-    bg-gray-100
-    rounded-base;
+    @apply rounded-base bg-gray-100 px-1 py-0.5;
 
     .tabbar-items {
-      @apply gap-1
-      justify-start;
+      @apply justify-start gap-1;
     }
 
     .tabbar-item {
-      @apply px-6
-      py-1
-      opacity-70
-      rounded-sm;
+      @apply rounded-sm px-6 py-1 opacity-70;
 
       &.tabbar-item-active {
-        @apply bg-white
-        opacity-100
-        shadow-sm;
+        @apply bg-white opacity-100 shadow-sm;
       }
 
       &:hover {

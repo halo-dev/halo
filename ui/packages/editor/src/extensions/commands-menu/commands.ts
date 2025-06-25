@@ -47,6 +47,7 @@ export default Extension.create({
           let popup: Instance[];
 
           return {
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
             onStart: (props: Record<string, any>) => {
               component = new VueRenderer(CommandsView, {
                 props,
@@ -68,6 +69,7 @@ export default Extension.create({
               });
             },
 
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
             onUpdate(props: Record<string, any>) {
               component.updateProps(props);
 
@@ -80,6 +82,7 @@ export default Extension.create({
               });
             },
 
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
             onKeyDown(props: Record<string, any>) {
               if (props.event.key === "Escape") {
                 popup[0].hide();

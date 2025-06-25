@@ -140,12 +140,12 @@ const currentRoleTemplates = computed(() => {
       <div v-if="selectedRoleNames.length">
         <div
           v-if="selectedRoleNames.includes(SUPER_ROLE_NAME)"
-          class="text-sm text-gray-600 mt-4"
+          class="mt-4 text-sm text-gray-600"
         >
           {{ $t("core.user.grant_permission_modal.roles_preview.all") }}
         </div>
 
-        <div v-else-if="currentRoleTemplates?.length" class="space-y-3 mt-4">
+        <div v-else-if="currentRoleTemplates?.length" class="mt-4 space-y-3">
           <span class="text-sm text-gray-600">
             {{ $t("core.user.grant_permission_modal.roles_preview.includes") }}
           </span>

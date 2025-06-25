@@ -217,12 +217,12 @@ const availableItems = computed(() => {
   <WidgetCard v-bind="$attrs" :body-class="['@container', '!overflow-auto']">
     <template #title>
       <div class="inline-flex items-center gap-2">
-        <div class="text-base font-medium flex-1 shrink">
+        <div class="flex-1 shrink text-base font-medium">
           {{ $t("core.dashboard.widgets.presets.quickaction.title") }}
         </div>
         <IconSettings
           v-if="editMode"
-          class="hover:text-gray-600 cursor-pointer"
+          class="cursor-pointer hover:text-gray-600"
           @click="configVisible = true"
         />
       </div>

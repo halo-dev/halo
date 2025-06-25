@@ -28,10 +28,13 @@ const modal = ref<InstanceType<typeof VModal> | null>(null);
 const { mutate, isLoading } = useMutation({
   mutationKey: ["create-secret"],
   mutationFn: async ({ data }: { data: SecretFormState }) => {
-    const stringData = data.stringDataArray.reduce((acc, { key, value }) => {
-      acc[key] = value;
-      return acc;
-    }, {} as Record<string, string>);
+    const stringData = data.stringDataArray.reduce(
+      (acc, { key, value }) => {
+        acc[key] = value;
+        return acc;
+      },
+      {} as Record<string, string>
+    );
 
     return await coreApiClient.secret.createSecret({
       secret: {

@@ -96,7 +96,7 @@ async function handleChange(value: string) {
     queryClient.invalidateQueries({
       queryKey: Q_KEY(extensionPointDefinitionName),
     });
-  } catch (error) {
+  } catch (_) {
     Toast.error(t("core.common.toast.save_failed_and_retry"));
   } finally {
     isSubmitting.value = false;

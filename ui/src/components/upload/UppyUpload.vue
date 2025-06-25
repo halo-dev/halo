@@ -89,7 +89,7 @@ const uppy = computed(() => {
               return new Error(message);
             }
           }
-        } catch (e) {
+        } catch (_) {
           const responseBody = response as XMLHttpRequest;
           const { status, statusText } = responseBody;
           const defaultMessage = [status, statusText].join(": ");

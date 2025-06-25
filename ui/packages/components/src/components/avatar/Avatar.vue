@@ -43,7 +43,7 @@ const loadImage = async (isInit: boolean) => {
         reject(err);
       };
     });
-  } catch (e) {
+  } catch (_) {
     error.value = true;
   } finally {
     isLoading.value = false;
@@ -129,23 +129,23 @@ const placeholderText = computed(() => {
   @apply inline-flex items-center justify-center overflow-hidden bg-gray-100;
 
   img {
-    @apply w-full h-full object-cover;
+    @apply h-full w-full object-cover;
   }
 
   .avatar-fallback {
-    @apply w-full h-full flex items-center justify-center;
+    @apply flex h-full w-full items-center justify-center;
   }
 
   .avatar-loading {
-    @apply animate-spin w-5 h-5;
+    @apply h-5 w-5 animate-spin;
   }
 
   .avatar-placeholder {
-    @apply text-sm text-gray-800 font-medium;
+    @apply text-sm font-medium text-gray-800;
   }
 
   .avatar-error {
-    @apply w-5 h-5 text-red-500;
+    @apply h-5 w-5 text-red-500;
   }
 
   &.avatar-circle {
@@ -157,7 +157,7 @@ const placeholderText = computed(() => {
   }
 
   &.avatar-xs {
-    @apply w-6 h-6;
+    @apply h-6 w-6;
 
     .avatar-placeholder {
       @apply text-xs;
@@ -165,7 +165,7 @@ const placeholderText = computed(() => {
   }
 
   &.avatar-sm {
-    @apply w-8 h-8;
+    @apply h-8 w-8;
 
     .avatar-placeholder {
       @apply text-xs;
@@ -173,11 +173,11 @@ const placeholderText = computed(() => {
   }
 
   &.avatar-md {
-    @apply w-10 h-10;
+    @apply h-10 w-10;
   }
 
   &.avatar-lg {
-    @apply w-12 h-12;
+    @apply h-12 w-12;
   }
 }
 </style>

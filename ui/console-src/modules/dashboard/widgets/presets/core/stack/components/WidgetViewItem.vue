@@ -24,7 +24,7 @@ const widgetDefinition = computed(() => {
 <template>
   <div
     v-if="currentUserHasPermission(widgetDefinition?.permissions)"
-    class="relative w-full h-full"
+    class="relative h-full w-full"
   >
     <component :is="widgetDefinition?.component" :config="item.config" />
   </div>

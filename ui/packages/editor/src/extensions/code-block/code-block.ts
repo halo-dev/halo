@@ -19,10 +19,10 @@ import {
   type Range,
 } from "@/tiptap/vue-3";
 import { deleteNode } from "@/utils";
+import TiptapCodeBlock from "@tiptap/extension-code-block";
 import { markRaw } from "vue";
 import MdiCodeBracesBox from "~icons/mdi/code-braces-box";
 import CodeBlockViewRenderer from "./CodeBlockViewRenderer.vue";
-import TiptapCodeBlock from "@tiptap/extension-code-block";
 
 declare module "@/tiptap" {
   interface Commands<ReturnType> {
@@ -41,7 +41,7 @@ const updateIndent = (tr: Transaction, type: IndentType): Transaction => {
     return tr;
   }
   const { from, to } = selection;
-  doc.nodesBetween(from, to, (node, pos) => {
+  doc.nodesBetween(from, to, (_node, pos) => {
     if (from - to == 0 && type === "indent") {
       tr.insertText("  ", from, to);
       return false;
@@ -111,6 +111,7 @@ export interface CodeBlockOptions {
    * @default {}
    * @example { class: 'foo' }
    */
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   HTMLAttributes: Record<string, any>;
 
   /**

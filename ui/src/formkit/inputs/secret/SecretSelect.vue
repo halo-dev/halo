@@ -224,7 +224,9 @@ async function handleCreateSecret() {
   <SecretCreationModal
     v-if="secretCreationModalVisible"
     :form-state="{
-      stringDataArray: [{ key: requiredKey ? requiredKey  as string : '', value: text || '' }],
+      stringDataArray: [
+        { key: requiredKey ? (requiredKey as string) : '', value: text || '' },
+      ],
     }"
     @close="secretCreationModalVisible = false"
   />

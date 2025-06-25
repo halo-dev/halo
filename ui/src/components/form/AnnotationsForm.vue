@@ -3,7 +3,7 @@ import {
   reset,
   submitForm,
   type FormKitNode,
-  type FormKitSchemaCondition,
+  type FormKitSchemaDefinition,
   type FormKitSchemaNode,
 } from "@formkit/core";
 
@@ -77,10 +77,13 @@ const annotations = ref<{
 const customAnnotationsState = ref<{ key: string; value: string }[]>([]);
 
 const customAnnotations = computed(() => {
-  return customAnnotationsState.value.reduce((acc, cur) => {
-    acc[cur.key] = cur.value;
-    return acc;
-  }, {} as { [key: string]: string });
+  return customAnnotationsState.value.reduce(
+    (acc, cur) => {
+      acc[cur.key] = cur.value;
+      return acc;
+    },
+    {} as { [key: string]: string }
+  );
 });
 
 const handleProcessCustomAnnotations = () => {
@@ -133,12 +136,15 @@ const handleProcessCustomAnnotations = () => {
       }
     })
     .filter(Boolean)
-    .reduce((acc, cur) => {
-      if (cur) {
-        acc[cur.key] = cur.value;
-      }
-      return acc;
-    }, {} as { [key: string]: string });
+    .reduce(
+      (acc, cur) => {
+        if (cur) {
+          acc[cur.key] = cur.value;
+        }
+        return acc;
+      },
+      {} as { [key: string]: string }
+    );
 };
 
 onMounted(async () => {
@@ -222,7 +228,9 @@ function onCustomFormToggle(e: Event) {
         <FormKitSchema
           v-if="annotationSetting.spec?.formSchema"
           :key="index"
-          :schema="annotationSetting.spec?.formSchema as (FormKitSchemaCondition| FormKitSchemaNode[])"
+          :schema="
+            annotationSetting.spec?.formSchema as FormKitSchemaDefinition
+          "
         />
       </template>
     </FormKit>
@@ -230,7 +238,7 @@ function onCustomFormToggle(e: Event) {
     <!-- @vue-ignore -->
     <details
       :open="showCustomForm"
-      class="flex flex-col cursor-pointer space-y-4 py-4 transition-all first:pt-0"
+      class="flex cursor-pointer flex-col space-y-4 py-4 transition-all first:pt-0"
       @toggle="onCustomFormToggle"
     >
       <summary class="group flex items-center justify-between">

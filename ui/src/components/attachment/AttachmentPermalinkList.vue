@@ -134,7 +134,7 @@ const formats = computed(
     ]"
     type="outline"
   ></VTabbar>
-  <ul class="flex flex-col space-y-2 mt-3">
+  <ul class="mt-3 flex flex-col space-y-2">
     <li v-for="format in formats" :key="format.key">
       <div
         class="flex w-full cursor-pointer items-center justify-between space-x-3 rounded border p-3 hover:border-primary"

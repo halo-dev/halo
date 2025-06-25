@@ -32,11 +32,11 @@ function handleUnsetColor() {
     <template #prefix>
       <div class="p-1">
         <div
-          class="flex items-center gap-2 rounded cursor-pointer hover:bg-gray-100 p-1"
+          class="flex cursor-pointer items-center gap-2 rounded p-1 hover:bg-gray-100"
           @click="handleUnsetColor"
         >
           <div
-            class="h-5 w-5 rounded-sm cursor-pointer hover:ring-1 ring-offset-1 ring-gray-300 bg-black"
+            class="h-5 w-5 cursor-pointer rounded-sm bg-black ring-gray-300 ring-offset-1 hover:ring-1"
           ></div>
           <span class="text-xs text-gray-600">
             {{ i18n.global.t("editor.common.button.restore_default") }}

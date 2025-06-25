@@ -95,7 +95,7 @@ defineExpose({
       >
         <component :is="item.icon" class="command-icon group-hover:!bg-white" />
         <span
-          class="command-title group-hover:text-gray-900 group-hover:font-medium"
+          class="command-title group-hover:font-medium group-hover:text-gray-900"
         >
           {{ i18n.global.t(item.title) }}
         </span>
@@ -110,18 +110,10 @@ defineExpose({
 </template>
 <style lang="scss">
 .command-items {
-  @apply relative
-  rounded-md
-  bg-white
-  overflow-hidden
-  shadow
-  w-52
-  p-1
-  max-h-72
-  overflow-y-auto;
+  @apply relative max-h-72 w-52 overflow-hidden overflow-y-auto rounded-md bg-white p-1 shadow;
 
   .command-item {
-    @apply flex flex-row items-center rounded gap-4 p-1;
+    @apply flex flex-row items-center gap-4 rounded p-1;
 
     &.is-selected {
       @apply bg-gray-100;
@@ -131,22 +123,21 @@ defineExpose({
       }
 
       .command-title {
-        @apply text-gray-900 font-medium;
+        @apply font-medium text-gray-900;
       }
     }
 
     .command-icon {
-      @apply bg-gray-100 p-1 rounded w-6 h-6;
+      @apply h-6 w-6 rounded bg-gray-100 p-1;
     }
 
     .command-title {
-      @apply text-xs 
-      text-gray-600;
+      @apply text-xs text-gray-600;
     }
   }
 
   .command-empty {
-    @apply flex justify-center items-center p-1 text-xs text-gray-600;
+    @apply flex items-center justify-center p-1 text-xs text-gray-600;
   }
 }
 </style>

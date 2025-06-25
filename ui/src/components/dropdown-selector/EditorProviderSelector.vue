@@ -35,7 +35,7 @@ fetchEditorProviders();
     >
       <VAvatar v-if="provider?.logo" :src="provider.logo" size="xs"></VAvatar>
       <div
-        class="select-none text-sm text-gray-600 group-hover:text-gray-900 whitespace-nowrap"
+        class="select-none whitespace-nowrap text-sm text-gray-600 group-hover:text-gray-900"
       >
         {{ provider?.displayName }}
       </div>
