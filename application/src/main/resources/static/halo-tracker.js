@@ -17,32 +17,6 @@
         
         if (!currentScript) return;
         
-        // 预览检测函数
-        var isPreviewMode = function() {
-            // 检测预览路径
-            if (pathname.startsWith('/preview/')) {
-                return true;
-            }
-            
-            // 检测主题预览参数
-            if (search.includes('preview-theme=')) {
-                return true;
-            }
-            
-            // 检测其他预览标识
-            if (localStorage && localStorage.getItem('halo.preview.mode') === 'true') {
-                return true;
-            }
-            
-            return false;
-        };
-        
-        // 如果是预览模式，直接返回不执行统计
-        if (isPreviewMode()) {
-            console.debug('Preview mode detected, skipping visit tracking');
-            return;
-        }
-        
         var wrap = function(obj, method, handler) {
             var original = obj[method];
             return function() {
