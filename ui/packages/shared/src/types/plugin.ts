@@ -8,12 +8,12 @@ import type { UserProfileTab, UserTab } from "@/states/user-tab";
 import type {
   Attachment,
   Backup,
-  ListedPost,
-  Plugin,
-  Theme,
   ListedComment,
+  ListedPost,
   ListedReply,
   ListedSinglePage,
+  Plugin,
+  Theme,
 } from "@halo-dev/api-client";
 import type { AnyExtension } from "@halo-dev/richtext-editor";
 import type { Component, Ref } from "vue";

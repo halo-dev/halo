@@ -1,15 +1,15 @@
 import {
   defineConfig,
   mergeRsbuildConfig,
+  type ConfigParams,
   type RsbuildConfig,
   type RsbuildMode,
-  type ConfigParams,
 } from "@rsbuild/core";
-import { getHaloPluginManifest } from "./utils/halo-plugin";
-import { DEFAULT_OUT_DIR_DEV, DEFAULT_OUT_DIR_PROD } from "./constants/build";
 import { pluginVue } from "@rsbuild/plugin-vue";
+import { DEFAULT_OUT_DIR_DEV, DEFAULT_OUT_DIR_PROD } from "./constants/build";
 import { GLOBALS } from "./constants/externals";
 import { DEFAULT_MANIFEST_PATH } from "./constants/halo-plugin";
+import { getHaloPluginManifest } from "./utils/halo-plugin";
 
 export interface RsBuildUserConfig {
   /**

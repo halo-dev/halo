@@ -31,7 +31,6 @@
   "scripts": {
     "build": "vite build --config ./vite.lib.config.ts",
     "dev": "vite",
-    "prettier": "prettier --write './src/**/*.{vue,js,jsx,ts,tsx,css,scss,json,yml,yaml,html}'",
     "release": "release-it",
     "test:unit:coverage": "vitest run --environment jsdom --coverage",
     "test:unit:ui": "vitest --environment jsdom --watch --ui",

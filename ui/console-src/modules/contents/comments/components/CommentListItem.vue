@@ -286,13 +286,13 @@ const { operationItems } = useOperationItemExtensionPoint<ListedComment>(
                 :owner="comment?.owner"
                 @click="detailModalVisible = true"
               />
-              <span class="text-sm text-gray-900 whitespace-nowrap">
+              <span class="whitespace-nowrap text-sm text-gray-900">
                 {{ $t("core.comment.text.commented_on") }}
               </span>
               <RouterLink
                 v-tooltip="`${subjectRefResult.label}`"
                 :to="subjectRefResult.route || $route"
-                class="inline-block truncate max-w-md text-sm font-medium text-gray-900 hover:text-gray-600"
+                class="inline-block max-w-md truncate text-sm font-medium text-gray-900 hover:text-gray-600"
               >
                 {{ subjectRefResult.title }}
               </RouterLink>
@@ -311,7 +311,7 @@ const { operationItems } = useOperationItemExtensionPoint<ListedComment>(
             >
             <div class="flex items-center gap-3 text-xs">
               <span
-                class="select-none cursor-pointer text-gray-700 hover:text-gray-900"
+                class="cursor-pointer select-none text-gray-700 hover:text-gray-900"
                 @click="handleToggleShowReplies"
               >
                 {{
@@ -328,7 +328,7 @@ const { operationItems } = useOperationItemExtensionPoint<ListedComment>(
               />
               <HasPermission :permissions="['system:comments:manage']">
                 <span
-                  class="select-none cursor-pointer text-gray-700 hover:text-gray-900"
+                  class="cursor-pointer select-none text-gray-700 hover:text-gray-900"
                   @click="replyModal = true"
                 >
                   {{ $t("core.comment.operations.reply.button") }}

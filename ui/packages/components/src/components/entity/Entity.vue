@@ -61,7 +61,7 @@ const classes = computed(() => {
 </template>
 <style lang="scss">
 .entity-wrapper {
-  @apply relative transition-all hover:bg-gray-50 w-full;
+  @apply relative w-full transition-all hover:bg-gray-50;
 
   &.entity-selected {
     @apply bg-gray-100;
@@ -72,7 +72,7 @@ const classes = computed(() => {
   }
 
   .entity-body {
-    @apply relative flex flex-row items-center w-full;
+    @apply relative flex w-full flex-row items-center;
   }
 
   .entity-checkbox {
@@ -81,7 +81,7 @@ const classes = computed(() => {
 
   .entity-start-wrapper,
   .entity-end-wrapper {
-    @apply align-middle w-auto px-4 py-3;
+    @apply w-auto px-4 py-3 align-middle;
   }
 
   .entity-start {
@@ -89,7 +89,7 @@ const classes = computed(() => {
   }
 
   .entity-end {
-    @apply flex items-center gap-6 justify-end;
+    @apply flex items-center justify-end gap-6;
   }
 
   .entity-dropdown {

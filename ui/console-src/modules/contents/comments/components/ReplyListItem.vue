@@ -223,7 +223,7 @@ const { operationItems } = useOperationItemExtensionPoint<ListedReply>(
                 :owner="reply?.owner"
                 @click="detailModalVisible = true"
               />
-              <span class="text-sm text-gray-900 whitespace-nowrap">
+              <span class="whitespace-nowrap text-sm text-gray-900">
                 {{ $t("core.comment.text.replied_below") }}
               </span>
             </div>
@@ -242,7 +242,7 @@ const { operationItems } = useOperationItemExtensionPoint<ListedReply>(
             <HasPermission :permissions="['system:comments:manage']">
               <div class="flex items-center gap-3 text-xs">
                 <span
-                  class="select-none cursor-pointer text-gray-700 hover:text-gray-900"
+                  class="cursor-pointer select-none text-gray-700 hover:text-gray-900"
                   @click="replyModal = true"
                 >
                   {{ $t("core.comment.operations.reply.button") }}

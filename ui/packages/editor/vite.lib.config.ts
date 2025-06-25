@@ -1,11 +1,11 @@
 import { fileURLToPath, URL } from "url";
 
-import { defineConfig } from "vite";
-import Vue from "@vitejs/plugin-vue";
-import Icons from "unplugin-icons/vite";
-import dts from "vite-plugin-dts";
-import path from "path";
 import VueI18nPlugin from "@intlify/unplugin-vue-i18n/vite";
+import Vue from "@vitejs/plugin-vue";
+import path from "path";
+import Icons from "unplugin-icons/vite";
+import { defineConfig } from "vite";
+import dts from "vite-plugin-dts";
 
 export default ({ mode }: { mode: string }) => {
   const isProduction = mode === "production";

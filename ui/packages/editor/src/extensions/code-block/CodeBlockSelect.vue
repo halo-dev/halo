@@ -151,17 +151,17 @@ const handleScrollIntoView = () => {
     <div class="relative inline-block w-full" @keydown="handleOptionKeydown">
       <div class="h-8">
         <div
-          class="select-input w-full h-full grid items-center text-sm rounded-md px-3 cursor-pointer box-border"
+          class="select-input box-border grid h-full w-full cursor-pointer items-center rounded-md px-3 text-sm"
           :class="{
             'bg-white': isFocus,
             'border-[1px]': isFocus,
           }"
         >
-          <span class="absolute top-0 bottom-0">
+          <span class="absolute bottom-0 top-0">
             <input
               ref="inputRef"
               v-model="inputValue"
-              class="appearance-none bg-transparent h-full ps-0 pe-0 border-none outline-none m-0 p-0 cursor-auto"
+              class="m-0 h-full cursor-auto appearance-none border-none bg-transparent p-0 pe-0 ps-0 outline-none"
               :placeholder="isFocus ? displayLabel : ''"
               @focus="handleInputFocus"
               @blur="handleInputBlur"
@@ -185,7 +185,7 @@ const handleScrollIntoView = () => {
               v-for="(option, index) in filterOptions"
               :key="option.value"
               :index="index"
-              class="w-full h-8 flex items-center rounded-md text-base px-3 py-1 hover:bg-zinc-100"
+              class="flex h-8 w-full items-center rounded-md px-3 py-1 text-base hover:bg-zinc-100"
               :class="{
                 'bg-zinc-200': option.value === value,
                 'bg-zinc-100': selectedIndex === index,
@@ -199,7 +199,7 @@ const handleScrollIntoView = () => {
           </template>
           <template v-else>
             <div
-              class="w-full h-8 flex items-center rounded-md text-base px-3 py-1"
+              class="flex h-8 w-full items-center rounded-md px-3 py-1 text-base"
             >
               <span class="flex-1 text-ellipsis text-sm">No options</span>
             </div>

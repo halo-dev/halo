@@ -36,7 +36,7 @@ withDefaults(
   }
 
   .description-item__content {
-    @apply mt-1 text-sm text-gray-900 sm:col-span-6 md:col-span-5 lg:col-span-3 sm:mt-0;
+    @apply mt-1 text-sm text-gray-900 sm:col-span-6 sm:mt-0 md:col-span-5 lg:col-span-3;
   }
 }
 </style>

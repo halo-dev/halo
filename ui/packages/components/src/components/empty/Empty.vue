@@ -27,31 +27,18 @@ defineProps<{
 </template>
 <style lang="scss">
 .empty-wrapper {
-  @apply flex
-  flex-col
-  items-center
-  justify-center
-  my-10
-  px-10;
+  @apply my-10 flex flex-col items-center justify-center px-10;
 
   .empty-title {
-    @apply text-sm
-    text-gray-900
-    text-center
-    font-medium;
+    @apply text-center text-sm font-medium text-gray-900;
   }
 
   .empty-message {
-    @apply text-gray-500
-    text-xs
-    text-center
-    mt-1.5;
+    @apply mt-1.5 text-center text-xs text-gray-500;
   }
 
   .empty-actions {
-    @apply flex
-    flex-row
-    mt-5;
+    @apply mt-5 flex flex-row;
   }
 }
 </style>

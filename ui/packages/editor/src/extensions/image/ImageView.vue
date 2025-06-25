@@ -95,11 +95,11 @@ onMounted(() => {
 
 <template>
   <node-view-wrapper as="div" class="inline-block w-full">
-    <div v-if="!src" class="p-1.5 w-full">
+    <div v-if="!src" class="w-full p-1.5">
       <input
         ref="inputRef"
         v-model.lazy="src"
-        class="block px-2 w-full py-1.5 text-sm text-gray-900 border border-gray-300 rounded-md bg-gray-50 focus:ring-blue-500 focus:border-blue-500"
+        class="block w-full rounded-md border border-gray-300 bg-gray-50 px-2 py-1.5 text-sm text-gray-900 focus:border-blue-500 focus:ring-blue-500"
         :placeholder="i18n.global.t('editor.common.placeholder.link_input')"
         tabindex="-1"
         @focus="handleSetFocus"
@@ -108,9 +108,9 @@ onMounted(() => {
     <div
       v-else
       ref="resizeRef"
-      class="resize-x inline-block overflow-hidden text-center relative rounded-md max-w-full"
+      class="relative inline-block max-w-full resize-x overflow-hidden rounded-md text-center"
       :class="{
-        'ring-2 rounded': selected,
+        'rounded ring-2': selected,
       }"
       :style="{
         width: node.attrs.width,
@@ -122,7 +122,7 @@ onMounted(() => {
         :title="node.attrs.title"
         :alt="alt"
         :href="href"
-        class="w-full h-full"
+        class="h-full w-full"
         @load="onImageLoaded"
       />
     </div>

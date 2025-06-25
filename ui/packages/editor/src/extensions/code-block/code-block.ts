@@ -19,10 +19,10 @@ import {
   type Range,
 } from "@/tiptap/vue-3";
 import { deleteNode } from "@/utils";
+import TiptapCodeBlock from "@tiptap/extension-code-block";
 import { markRaw } from "vue";
 import MdiCodeBracesBox from "~icons/mdi/code-braces-box";
 import CodeBlockViewRenderer from "./CodeBlockViewRenderer.vue";
-import TiptapCodeBlock from "@tiptap/extension-code-block";
 
 declare module "@/tiptap" {
   interface Commands<ReturnType> {

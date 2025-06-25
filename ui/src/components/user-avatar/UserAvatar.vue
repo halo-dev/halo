@@ -161,7 +161,7 @@ const hasAvatar = computed(() => {
       circle
       width="100%"
       height="100%"
-      class="ring-4 ring-white shadow-xl"
+      class="shadow-xl ring-4 ring-white"
     />
     <VDropdown
       v-if="currentUserHasPermission(['system:users:manage']) || isCurrentUser"

@@ -137,7 +137,7 @@ function handleMoveWidget(widget: SimpleWidget, direction: -1 | 1) {
             )
           "
         />
-        <div class="py-4 flex flex-col gap-4">
+        <div class="flex flex-col gap-4 py-4">
           <label
             class="formkit-label block text-sm font-medium text-gray-700 formkit-invalid:text-red-500"
           >
@@ -147,7 +147,7 @@ function handleMoveWidget(widget: SimpleWidget, direction: -1 | 1) {
               )
             }}
           </label>
-          <div class="flex flex-col gap-2 border border-dashed p-2 rounded-lg">
+          <div class="flex flex-col gap-2 rounded-lg border border-dashed p-2">
             <WidgetEditableItem
               v-for="(widget, index) in widgets"
               :key="widget.id"
@@ -173,7 +173,7 @@ function handleMoveWidget(widget: SimpleWidget, direction: -1 | 1) {
               </template>
             </WidgetEditableItem>
 
-            <div class="flex justify-left">
+            <div class="justify-left flex">
               <VButton @click="widgetsHubModalVisible = true">
                 {{ $t("core.common.buttons.add") }}
               </VButton>

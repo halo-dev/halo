@@ -6,22 +6,22 @@ defineProps<{
 </script>
 <template>
   <div
-    class="flex flex-col rounded-lg overflow-hidden ring-1 ring-[#eaecf0] shadow-sm bg-white w-full h-full"
+    class="flex h-full w-full flex-col overflow-hidden rounded-lg bg-white shadow-sm ring-1 ring-[#eaecf0]"
   >
     <div
       v-if="title || $slots.title || $slots.actions"
-      class="flex flex-none justify-between h-10 items-center px-4 border-b border-[#eaecf0]"
+      class="flex h-10 flex-none items-center justify-between border-b border-[#eaecf0] px-4"
     >
       <slot name="title">
-        <div class="text-base font-medium flex-1 shrink">
+        <div class="flex-1 shrink text-base font-medium">
           {{ title }}
         </div>
       </slot>
-      <div class="text-base font-medium flex-none">
+      <div class="flex-none text-base font-medium">
         <slot name="actions" />
       </div>
     </div>
-    <div :class="bodyClass" class="flex-1 min-h-0 shrink w-full">
+    <div :class="bodyClass" class="min-h-0 w-full flex-1 shrink">
       <slot />
     </div>
   </div>

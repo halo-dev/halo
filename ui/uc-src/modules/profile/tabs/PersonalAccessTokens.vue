@@ -69,7 +69,7 @@ const creationModal = ref(false);
   </Transition>
 
   <Transition v-else appear name="fade">
-    <div class="rounded-base border overflow-hidden">
+    <div class="overflow-hidden rounded-base border">
       <VEntityContainer>
         <PersonalAccessTokenListItem
           v-for="token in pats"

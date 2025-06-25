@@ -15,11 +15,11 @@ const emit = defineEmits<{
 
 <template>
   <div
-    class="bg-white rounded-full p-1 flex gap-4 items-center hover:shadow transition-all"
+    class="flex items-center gap-4 rounded-full bg-white p-1 transition-all hover:shadow"
   >
     <button
       v-if="total > 1"
-      class="w-7 h-7 flex items-center justify-center rounded-full bg-transparent hover:bg-gray-100 transition-all duration-200 focus:outline-none group"
+      class="group flex h-7 w-7 items-center justify-center rounded-full bg-transparent transition-all duration-200 hover:bg-gray-100 focus:outline-none"
       @click="emit('prev')"
     >
       <IconArrowLeft class="text-gray-400 group-hover:text-gray-900" />
@@ -33,9 +33,9 @@ const emit = defineEmits<{
         @click="emit('update:index', i - 1)"
       >
         <div
-          class="w-2 h-2 rounded-full transition-all duration-200 ease-in-out transform"
+          class="h-2 w-2 transform rounded-full transition-all duration-200 ease-in-out"
           :class="{
-            'bg-primary scale-150': index === i - 1,
+            'scale-150 bg-primary': index === i - 1,
             'bg-gray-300 group-hover:bg-gray-400': index !== i - 1,
           }"
         />
@@ -44,7 +44,7 @@ const emit = defineEmits<{
 
     <button
       v-if="total > 1"
-      class="w-7 h-7 flex items-center justify-center rounded-full bg-transparent hover:bg-gray-100 transition-all duration-200 focus:outline-none group"
+      class="group flex h-7 w-7 items-center justify-center rounded-full bg-transparent transition-all duration-200 hover:bg-gray-100 focus:outline-none"
       @click="emit('next')"
     >
       <IconArrowRight class="text-gray-400 group-hover:text-gray-900" />

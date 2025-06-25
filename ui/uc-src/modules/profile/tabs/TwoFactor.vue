@@ -61,7 +61,7 @@ const totpDeletionModalVisible = ref(false);
   <VLoading v-if="isLoading" />
 
   <Transition v-else appear name="fade">
-    <div class="rounded-base border overflow-hidden">
+    <div class="overflow-hidden rounded-base border">
       <div class="bg-gray-50 px-4 py-3">
         <span class="text-sm font-semibold text-gray-900">
           {{ $t("core.uc_profile.2fa.methods.title") }}
