@@ -2,110 +2,110 @@
     'use strict';
     
     (function(window) {
-        var screen = window.screen;
-        var width = screen.width;
-        var height = screen.height;
-        var language = window.navigator.language;
-        var location = window.location;
-        var localStorage = window.localStorage;
-        var document = window.document;
-        var history = window.history;
-        var hostname = location.hostname;
-        var pathname = location.pathname;
-        var search = location.search;
-        var currentScript = document.currentScript;
+        const screen = window.screen;
+        const width = screen.width;
+        const height = screen.height;
+        const language = window.navigator.language;
+        const location = window.location;
+        const localStorage = window.localStorage;
+        const document = window.document;
+        const history = window.history;
+        const hostname = location.hostname;
+        const pathname = location.pathname;
+        const search = location.search;
+        const currentScript = document.currentScript;
         
         if (!currentScript) return;
         
-        var wrap = function(obj, method, handler) {
-            var original = obj[method];
-            return function() {
-                var args = [];
-                for (var i = arguments.length; i--;) args[i] = arguments[i];
-                handler.apply(null, args);
+        const wrap = (obj, method, handler) => {
+            const original = obj[method];
+            return (...args) => {
+                handler(...args);
                 return original.apply(obj, args);
             };
         };
         
-        var isDisabled = function() {
-            return (localStorage && localStorage.getItem("haloTracker.disabled")) ||
-                   (doNotTrack && (function() {
-                       var dnt = window.doNotTrack;
-                       var navigator = window.navigator;
-                       var external = window.external;
-                       var prop = "msTrackingProtectionEnabled";
-                       var value = dnt || navigator.doNotTrack || navigator.msDoNotTrack || 
-                                  (external && prop in external && external[prop]());
-                       return value == "1" || value === "yes";
-                   })()) ||
+        const isDisabled = () => {
+            const checkDoNotTrack = () => {
+                const dnt = window.doNotTrack;
+                const navigator = window.navigator;
+                const external = window.external;
+                const prop = "msTrackingProtectionEnabled";
+                const value = dnt || navigator.doNotTrack || navigator.msDoNotTrack || 
+                           (external && prop in external && external[prop]());
+                return value === "1" || value === "yes";
+            };
+            
+            return !!(localStorage && localStorage.getItem("haloTracker.disabled")) ||
+                   (doNotTrack && checkDoNotTrack()) ||
                    (domains && !allowedDomains.includes(hostname));
         };
         
-        var prefix = "data-";
-        var getAttribute = currentScript.getAttribute.bind(currentScript);
-        var group = getAttribute(prefix + "group") || "";
-        var plural = getAttribute(prefix + "plural");
-        var name = getAttribute(prefix + "name");
-        var hostUrl = getAttribute(prefix + "host-url");
-        var autoTrack = getAttribute(prefix + "auto-track") !== "false";
-        var doNotTrack = getAttribute(prefix + "do-not-track");
-        var domains = getAttribute(prefix + "domains") || "";
-        var allowedDomains = domains.split(",").map(function(domain) {
-            return domain.trim();
+        const prefix = "data-";
+        const getAttribute = currentScript.getAttribute.bind(currentScript);
+        const group = getAttribute(prefix + "group") || "";
+        const plural = getAttribute(prefix + "plural");
+        const name = getAttribute(prefix + "name");
+        const hostUrl = getAttribute(prefix + "host-url");
+        const autoTrack = getAttribute(prefix + "auto-track") !== "false";
+        const doNotTrack = getAttribute(prefix + "do-not-track");
+        const domains = getAttribute(prefix + "domains") || "";
+        const allowedDomains = domains.split(",").map(domain => domain.trim());
+        
+        const endpoint = `${hostUrl ? hostUrl.replace(/\/$/, "") : currentScript.src.split("/").slice(0, -1).join("/")}` +
+                       "/apis/api.halo.run/v1alpha1/trackers/counter";
+        const screenSize = `${width}x${height}`;
+        const url = pathname + search;
+        let referrer = document.referrer;
+        
+        const createTrackData = (customUrl, customReferrer) => ({
+            group,
+            plural,
+            name,
+            hostname,
+            screen: screenSize,
+            language,
+            url: customUrl,
+            referrer: customReferrer
         });
         
-        var endpoint = (hostUrl ? hostUrl.replace(/\/$/, "") : currentScript.src.split("/").slice(0, -1).join("/")) + 
-                       "/apis/api.halo.run/v1alpha1/trackers/counter";
-        var screenSize = width + "x" + height;
-        var url = pathname + search;
-        var referrer = document.referrer;
-        
-        var trackView = function(customUrl, customReferrer) {
-            if (customUrl === undefined) customUrl = url;
-            if (customReferrer === undefined) customReferrer = referrer;
+        const sendTrackingRequest = (data) => {
+            if (isDisabled()) {
+                return Promise.resolve();
+            }
             
-            return function(data) {
-                if (!isDisabled()) {
-                    return fetch(endpoint, {
-                        method: "POST",
-                        body: JSON.stringify(Object.assign({}, data)),
-                        headers: {
-                            "Content-Type": "application/json"
-                        }
-                    }).then(function(response) {
-                        return response.text();
-                    }).then(function(result) {
-                        console.debug("Visit count:", result);
-                    });
+            return fetch(endpoint, {
+                method: "POST",
+                body: JSON.stringify(data),
+                headers: {
+                    "Content-Type": "application/json"
                 }
-            }({
-                group: group,
-                plural: plural,
-                name: name,
-                hostname: hostname,
-                screen: screenSize,
-                language: language,
-                url: customUrl,
-                referrer: customReferrer
+            })
+            .then(response => response.text())
+            .then(result => {
+                console.debug("Visit count:", result);
             });
         };
         
-        var handlePushState = function(originalMethod, state, title, url) {
-            if (url) {
-                referrer = location.pathname + location.search;
-                var newUrl = url.toString();
-                var newPath = newUrl.substring(0, 4) === "http" ? 
-                             "/" + newUrl.split("/").splice(3).join("/") : newUrl;
-                if (newPath !== referrer) {
-                    trackView();
-                }
+        const trackView = (customUrl = url, customReferrer = referrer) => {
+            const trackData = createTrackData(customUrl, customReferrer);
+            return sendTrackingRequest(trackData);
+        };
+        
+        const handlePushState = (state, title, newUrl) => {
+            if (!newUrl) return;
+            
+            referrer = location.pathname + location.search;
+            const urlString = newUrl.toString();
+            const newPath = urlString.substring(0, 4) === "http" ? 
+                         "/" + urlString.split("/").splice(3).join("/") : urlString;
+            if (newPath !== referrer) {
+                trackView();
             }
         };
         
         if (!window.haloTracker) {
-            var trackEvent = function(event) {
-                return trackEvent(event);
-            };
+            const trackEvent = event => trackEvent(event);
             trackEvent.trackView = trackView;
             window.haloTracker = trackEvent;
         }
@@ -114,7 +114,7 @@
             history.pushState = wrap(history, "pushState", handlePushState);
             history.replaceState = wrap(history, "replaceState", handlePushState);
             
-            var track = function() {
+            const track = () => {
                 if (document.readyState === "complete") {
                     trackView();
                 }
