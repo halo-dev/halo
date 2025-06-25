@@ -52,10 +52,13 @@ const dialog: DialogEntry = (userProps: DialogProps) => {
     props
   );
 
-  hostContainer.firstElementChild &&
+  if (hostContainer.firstElementChild) {
     container.appendChild(hostContainer.firstElementChild);
+  }
 
-  vnode.component?.props && (vnode.component.props.visible = true);
+  if (vnode.component?.props) {
+    vnode.component.props.visible = true;
+  }
 
   if (vnode?.props) {
     vnode.props.onClose = () => {

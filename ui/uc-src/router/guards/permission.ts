@@ -3,7 +3,7 @@ import { hasPermission } from "@/utils/permission";
 import type { Router } from "vue-router";
 
 export function setupPermissionGuard(router: Router) {
-  router.beforeEach((to, from, next) => {
+  router.beforeEach((to, _from, next) => {
     const roleStore = useRoleStore();
     const { uiPermissions } = roleStore.permissions;
     const { meta } = to;

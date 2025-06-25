@@ -20,7 +20,7 @@ const { roleTemplateGroups } = useRoleTemplateSelection(roleTemplates);
 </script>
 <template>
   <dl
-    class="divide-y divide-gray-100 border border-gray-100 rounded-base overflow-hidden"
+    class="divide-y divide-gray-100 overflow-hidden rounded-base border border-gray-100"
   >
     <div
       v-for="(group, index) in roleTemplateGroups"

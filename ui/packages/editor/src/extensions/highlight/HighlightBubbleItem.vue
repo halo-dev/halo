@@ -33,7 +33,7 @@ function handleUnsetColor() {
     <template #prefix>
       <div class="p-1">
         <div
-          class="flex items-center gap-2 rounded cursor-pointer hover:bg-gray-100 p-1"
+          class="flex cursor-pointer items-center gap-2 rounded p-1 hover:bg-gray-100"
           @click="handleUnsetColor"
         >
           <div class="inline-flex items-center gap-2">
@@ -46,11 +46,11 @@ function handleUnsetColor() {
       </div>
       <div class="p-1">
         <div
-          class="flex items-center gap-2 rounded cursor-pointer hover:bg-gray-100 p-1"
+          class="flex cursor-pointer items-center gap-2 rounded p-1 hover:bg-gray-100"
           @click="handleSetColor()"
         >
           <div
-            class="h-5 w-5 rounded-sm cursor-pointer hover:ring-1 ring-offset-1 ring-gray-300"
+            class="h-5 w-5 cursor-pointer rounded-sm ring-gray-300 ring-offset-1 hover:ring-1"
             :style="{ 'background-color': '#fff8c5' }"
           ></div>
           <span class="text-xs text-gray-600">

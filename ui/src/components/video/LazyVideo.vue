@@ -32,7 +32,7 @@ onMounted(async () => {
   isLoading.value = true;
   try {
     await loadVideo();
-  } catch (e) {
+  } catch (_) {
     error.value = true;
   } finally {
     isLoading.value = false;

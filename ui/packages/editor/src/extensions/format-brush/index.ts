@@ -16,9 +16,11 @@ declare module "@/tiptap" {
 
 export interface FormatBrushStore {
   formatBrush: boolean;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   formatBrushMarks: any[];
 }
 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 const formatBrush = Extension.create<any, FormatBrushStore>({
   name: "formatBrush",
 

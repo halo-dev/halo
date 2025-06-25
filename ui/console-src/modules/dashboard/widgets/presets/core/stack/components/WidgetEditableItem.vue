@@ -55,7 +55,7 @@ function handleSaveConfig(config: Record<string, unknown>) {
       @update:config="handleSaveConfig"
     />
     <div
-      class="absolute hidden h-8 right-0 top-0 rounded-tr-lg bg-gray-100 overflow-hidden group-hover/grid-item:inline-flex items-center"
+      class="absolute right-0 top-0 hidden h-8 items-center overflow-hidden rounded-tr-lg bg-gray-100 group-hover/grid-item:inline-flex"
     >
       <slot name="actions" />
       <ActionButton

@@ -1,7 +1,7 @@
 <script setup lang="ts"></script>
 <template>
   <div
-    class="h-full text-base w-8 flex cursor-pointer items-center justify-center hover:opacity-80 text-white transition-all"
+    class="flex h-full w-8 cursor-pointer items-center justify-center text-base text-white transition-all hover:opacity-80"
   >
     <slot />
   </div>

@@ -66,6 +66,7 @@ const getColumnsNodeTypes = (
 
 type ColOperateType = "addBefore" | "addAfter" | "delete";
 const addOrDeleteCol = (
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   dispatch: any,
   state: EditorState,
   type: ColOperateType
@@ -103,6 +104,7 @@ const addOrDeleteCol = (
 
     colsJSON.attrs.cols = colsJSON.content.length;
 
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     colsJSON.content.forEach((colJSON: any, index: number) => {
       colJSON.attrs.index = index;
     });
@@ -110,7 +112,7 @@ const addOrDeleteCol = (
     const nextCols = PMNode.fromJSON(state.schema, colsJSON);
 
     let nextSelectPos = maybeColumns.pos;
-    nextCols.content.forEach((col, pos, index) => {
+    nextCols.content.forEach((col, _pos, index) => {
       if (index < nextIndex) {
         nextSelectPos += col.nodeSize;
       }
@@ -130,6 +132,7 @@ const addOrDeleteCol = (
 };
 
 type GotoColType = "before" | "after";
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 const gotoCol = (state: EditorState, dispatch: any, type: GotoColType) => {
   const maybeColumns = findParentNode(
     (node) => node.type.name === Columns.name
@@ -151,7 +154,7 @@ const gotoCol = (state: EditorState, dispatch: any, type: GotoColType) => {
     }
 
     let nextSelectPos = maybeColumns.pos;
-    cols.content.forEach((col, pos, index) => {
+    cols.content.forEach((col, _pos, index) => {
       if (index < nextIndex) {
         nextSelectPos += col.nodeSize;
       }

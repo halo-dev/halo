@@ -1,9 +1,9 @@
+import TextStyle from "@/extensions/text-style";
 import { i18n } from "@/locales";
 import type { Editor } from "@/tiptap/vue-3";
 import type { ExtensionOptions } from "@/types";
 import type { ColorOptions } from "@tiptap/extension-color";
 import TiptapColor from "@tiptap/extension-color";
-import TextStyle from "@/extensions/text-style";
 import { markRaw } from "vue";
 import MdiFormatColor from "~icons/mdi/format-color";
 import ColorToolbarItem from "./ColorToolbarItem.vue";

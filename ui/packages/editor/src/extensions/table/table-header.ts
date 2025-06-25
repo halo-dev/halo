@@ -13,6 +13,7 @@ import MdiPlus from "~icons/mdi/plus";
 import { getCellsInRow, isColumnSelected, selectColumn } from "./util";
 
 export interface TableCellOptions {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   HTMLAttributes: Record<string, any>;
 }
 

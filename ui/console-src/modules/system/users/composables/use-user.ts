@@ -36,7 +36,9 @@ export function useUserFetch(options?: {
   };
 
   onMounted(() => {
-    fetchOnMounted && handleFetchUsers();
+    if (fetchOnMounted) {
+      handleFetchUsers();
+    }
   });
 
   return {

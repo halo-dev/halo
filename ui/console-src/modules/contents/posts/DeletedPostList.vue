@@ -321,10 +321,10 @@ watch(
               <VEntityField v-if="post.post.spec.cover">
                 <template #description>
                   <div
-                    class="aspect-h-2 rounded-md overflow-hidden aspect-w-3 w-20"
+                    class="aspect-h-2 aspect-w-3 w-20 overflow-hidden rounded-md"
                   >
                     <img
-                      class="object-cover w-full h-full"
+                      class="h-full w-full object-cover"
                       :src="generateThumbnailUrl(post.post.spec.cover, 's')"
                     />
                   </div>

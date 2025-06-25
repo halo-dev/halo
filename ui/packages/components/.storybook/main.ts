@@ -1,4 +1,3 @@
-/* eslint-disable storybook/no-uninstalled-addons */
 import type { StorybookConfig } from "@storybook/vue3-vite";
 
 const config: StorybookConfig = {

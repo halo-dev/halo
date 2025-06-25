@@ -90,22 +90,22 @@ const handleClose = () => {
     :data-unique-id="uniqueId"
     @close="handleCancel()"
   >
-    <div class="flex justify-between items-start py-2 mb-2">
+    <div class="mb-2 flex items-start justify-between py-2">
       <div class="flex flex-row items-center gap-3">
         <component
           :is="icons[type].icon"
           :class="`text-${icons[type].color}-500`"
-          class="w-6 h-6 flex-none"
+          class="h-6 w-6 flex-none"
         ></component>
-        <div class="text-base text-gray-900 font-bold">{{ title }}</div>
+        <div class="text-base font-bold text-gray-900">{{ title }}</div>
       </div>
       <div>
         <IconClose class="cursor-pointer" @click="handleCancel" />
       </div>
     </div>
     <div class="flex items-center gap-4">
-      <div class="flex-1 flex items-stretch">
-        <div class="text-sm text-gray-700 break-all">{{ description }}</div>
+      <div class="flex flex-1 items-stretch">
+        <div class="break-all text-sm text-gray-700">{{ description }}</div>
       </div>
     </div>
     <template #footer>

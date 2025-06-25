@@ -174,7 +174,7 @@ const websiteOfAnonymous = computed(() => {
         >
           <OwnerButton :owner="comment.owner" />
           <pre
-            class="whitespace-pre-wrap mt-2 break-words text-sm text-gray-900"
+            class="mt-2 whitespace-pre-wrap break-words text-sm text-gray-900"
             >{{ comment.comment.spec.content }}</pre
           >
         </VDescriptionItem>
