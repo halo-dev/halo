@@ -319,7 +319,7 @@ function getMenuItemRefDisplayName(menuItem: MenuTreeItem) {
             >
               <template #default="{ node }">
                 <div
-                  class="px-4 py-3 hover:bg-gray-50 w-full group items-center flex justify-between relative"
+                  class="group relative flex w-full items-center justify-between px-4 py-3 hover:bg-gray-50"
                 >
                   <div>
                     <div
@@ -331,7 +331,7 @@ function getMenuItemRefDisplayName(menuItem: MenuTreeItem) {
                     >
                       <IconList class="h-3.5 w-3.5" />
                     </div>
-                    <div class="gap-1 flex flex-col">
+                    <div class="flex flex-col gap-1">
                       <div class="inline-flex items-center gap-2">
                         <span
                           class="truncate text-sm font-medium text-gray-900"

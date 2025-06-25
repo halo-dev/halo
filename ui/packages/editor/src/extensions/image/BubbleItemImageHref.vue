@@ -1,8 +1,8 @@
 <script setup lang="ts">
+import { ExtensionImage, ExtensionLink } from "@/extensions";
 import { i18n } from "@/locales";
 import type { Editor } from "@/tiptap/vue-3";
 import { computed, type Component } from "vue";
-import { ExtensionLink, ExtensionImage } from "@/extensions";
 
 const props = defineProps<{
   editor: Editor;
@@ -41,13 +41,13 @@ const target = computed({
   <input
     v-model.lazy="href"
     :placeholder="i18n.global.t('editor.common.placeholder.alt_href')"
-    class="bg-gray-50 rounded-md hover:bg-gray-100 block px-2 w-full py-1.5 text-sm text-gray-900 border border-gray-300 focus:ring-blue-500 focus:border-blue-500"
+    class="block w-full rounded-md border border-gray-300 bg-gray-50 px-2 py-1.5 text-sm text-gray-900 hover:bg-gray-100 focus:border-blue-500 focus:ring-blue-500"
   />
-  <label class="inline-flex items-center mt-2">
+  <label class="mt-2 inline-flex items-center">
     <input
       v-model="target"
       type="checkbox"
-      class="form-checkbox text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
+      class="form-checkbox rounded border-gray-300 text-blue-600 focus:ring-blue-500"
     />
     <span class="ml-2 text-sm text-gray-500">
       {{ i18n.global.t("editor.extensions.link.open_in_new_window") }}

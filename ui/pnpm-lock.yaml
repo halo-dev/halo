@@ -279,7 +279,7 @@ importers:
         version: 3.5.16
       '@vue/eslint-config-prettier':
         specifier: ^10.2.0
-        version: 10.2.0(@types/eslint@8.56.10)(eslint@9.29.0(jiti@2.4.2))(prettier@2.8.8)
+        version: 10.2.0(@types/eslint@8.56.10)(eslint@9.29.0(jiti@2.4.2))(prettier@3.6.0)
       '@vue/eslint-config-typescript':
         specifier: ^14.5.0
         version: 14.5.1(eslint-plugin-vue@9.33.0(eslint@9.29.0(jiti@2.4.2)))(eslint@9.29.0(jiti@2.4.2))(typescript@5.8.3)
@@ -323,14 +323,14 @@ importers:
         specifier: ^1.1.1
         version: 1.1.1
       prettier:
-        specifier: ^2.8.8
-        version: 2.8.8
+        specifier: ^3.6.0
+        version: 3.6.0
       prettier-plugin-organize-imports:
         specifier: ^4.1.0
-        version: 4.1.0(prettier@2.8.8)(typescript@5.8.3)(vue-tsc@2.2.10(typescript@5.8.3))
+        version: 4.1.0(prettier@3.6.0)(typescript@5.8.3)(vue-tsc@2.2.10(typescript@5.8.3))
       prettier-plugin-tailwindcss:
-        specifier: ^0.1.13
-        version: 0.1.13(prettier@2.8.8)
+        specifier: ^0.6.13
+        version: 0.6.13(prettier-plugin-organize-imports@4.1.0(prettier@3.6.0)(typescript@5.8.3)(vue-tsc@2.2.10(typescript@5.8.3)))(prettier@3.6.0)
       rollup-plugin-gzip:
         specifier: ^3.1.0
         version: 3.1.0(rollup@4.43.0)
@@ -8672,15 +8672,69 @@ packages:
       vue-tsc:
         optional: true
 
-  prettier-plugin-tailwindcss@0.1.13:
-    resolution: {integrity: sha512-/EKQURUrxLu66CMUg4+1LwGdxnz8of7IDvrSLqEtDqhLH61SAlNNUSr90UTvZaemujgl3OH/VHg+fyGltrNixw==}
-    engines: {node: '>=12.17.0'}
+  prettier-plugin-tailwindcss@0.6.13:
+    resolution: {integrity: sha512-uQ0asli1+ic8xrrSmIOaElDu0FacR4x69GynTh2oZjFY10JUt6EEumTQl5tB4fMeD6I1naKd+4rXQQ7esT2i1g==}
+    engines: {node: '>=14.21.3'}
     peerDependencies:
-      prettier: '>=2.2.0'
+      '@ianvs/prettier-plugin-sort-imports': '*'
+      '@prettier/plugin-pug': '*'
+      '@shopify/prettier-plugin-liquid': '*'
+      '@trivago/prettier-plugin-sort-imports': '*'
+      '@zackad/prettier-plugin-twig': '*'
+      prettier: ^3.0
+      prettier-plugin-astro: '*'
+      prettier-plugin-css-order: '*'
+      prettier-plugin-import-sort: '*'
+      prettier-plugin-jsdoc: '*'
+      prettier-plugin-marko: '*'
+      prettier-plugin-multiline-arrays: '*'
+      prettier-plugin-organize-attributes: '*'
+      prettier-plugin-organize-imports: '*'
+      prettier-plugin-sort-imports: '*'
+      prettier-plugin-style-order: '*'
+      prettier-plugin-svelte: '*'
+    peerDependenciesMeta:
+      '@ianvs/prettier-plugin-sort-imports':
+        optional: true
+      '@prettier/plugin-pug':
+        optional: true
+      '@shopify/prettier-plugin-liquid':
+        optional: true
+      '@trivago/prettier-plugin-sort-imports':
+        optional: true
+      '@zackad/prettier-plugin-twig':
+        optional: true
+      prettier-plugin-astro:
+        optional: true
+      prettier-plugin-css-order:
+        optional: true
+      prettier-plugin-import-sort:
+        optional: true
+      prettier-plugin-jsdoc:
+        optional: true
+      prettier-plugin-marko:
+        optional: true
+      prettier-plugin-multiline-arrays:
+        optional: true
+      prettier-plugin-organize-attributes:
+        optional: true
+      prettier-plugin-organize-imports:
+        optional: true
+      prettier-plugin-sort-imports:
+        optional: true
+      prettier-plugin-style-order:
+        optional: true
+      prettier-plugin-svelte:
+        optional: true
 
   prettier@2.8.8:
     resolution: {integrity: sha512-tdN8qQGvNjw4CHbY+XXk0JgCXn9QiF21a55rBe5LJAU+kDyC4WQn4+awm2Xfk2lQMk5fKup9XgzTZtGkjBdP9Q==}
     engines: {node: '>=10.13.0'}
+    hasBin: true
+
+  prettier@3.6.0:
+    resolution: {integrity: sha512-ujSB9uXHJKzM/2GBuE0hBOUgC77CN3Bnpqa+g80bkv3T3A93wL/xlzDATHhnhkzifz/UE2SNOvmbTz5hSkDlHw==}
+    engines: {node: '>=14'}
     hasBin: true
 
   pretty-bytes@5.6.0:
@@ -16232,12 +16286,12 @@ snapshots:
     dependencies:
       rfdc: 1.4.1
 
-  '@vue/eslint-config-prettier@10.2.0(@types/eslint@8.56.10)(eslint@9.29.0(jiti@2.4.2))(prettier@2.8.8)':
+  '@vue/eslint-config-prettier@10.2.0(@types/eslint@8.56.10)(eslint@9.29.0(jiti@2.4.2))(prettier@3.6.0)':
     dependencies:
       eslint: 9.29.0(jiti@2.4.2)
       eslint-config-prettier: 10.1.5(eslint@9.29.0(jiti@2.4.2))
-      eslint-plugin-prettier: 5.5.0(@types/eslint@8.56.10)(eslint-config-prettier@10.1.5(eslint@9.29.0(jiti@2.4.2)))(eslint@9.29.0(jiti@2.4.2))(prettier@2.8.8)
-      prettier: 2.8.8
+      eslint-plugin-prettier: 5.5.0(@types/eslint@8.56.10)(eslint-config-prettier@10.1.5(eslint@9.29.0(jiti@2.4.2)))(eslint@9.29.0(jiti@2.4.2))(prettier@3.6.0)
+      prettier: 3.6.0
     transitivePeerDependencies:
       - '@types/eslint'
 
@@ -17927,10 +17981,10 @@ snapshots:
     dependencies:
       eslint: 9.29.0(jiti@2.4.2)
 
-  eslint-plugin-prettier@5.5.0(@types/eslint@8.56.10)(eslint-config-prettier@10.1.5(eslint@9.29.0(jiti@2.4.2)))(eslint@9.29.0(jiti@2.4.2))(prettier@2.8.8):
+  eslint-plugin-prettier@5.5.0(@types/eslint@8.56.10)(eslint-config-prettier@10.1.5(eslint@9.29.0(jiti@2.4.2)))(eslint@9.29.0(jiti@2.4.2))(prettier@3.6.0):
     dependencies:
       eslint: 9.29.0(jiti@2.4.2)
-      prettier: 2.8.8
+      prettier: 3.6.0
       prettier-linter-helpers: 1.0.0
       synckit: 0.11.8
     optionalDependencies:
@@ -20383,18 +20437,22 @@ snapshots:
     dependencies:
       fast-diff: 1.2.0
 
-  prettier-plugin-organize-imports@4.1.0(prettier@2.8.8)(typescript@5.8.3)(vue-tsc@2.2.10(typescript@5.8.3)):
+  prettier-plugin-organize-imports@4.1.0(prettier@3.6.0)(typescript@5.8.3)(vue-tsc@2.2.10(typescript@5.8.3)):
     dependencies:
-      prettier: 2.8.8
+      prettier: 3.6.0
       typescript: 5.8.3
     optionalDependencies:
       vue-tsc: 2.2.10(typescript@5.8.3)
 
-  prettier-plugin-tailwindcss@0.1.13(prettier@2.8.8):
+  prettier-plugin-tailwindcss@0.6.13(prettier-plugin-organize-imports@4.1.0(prettier@3.6.0)(typescript@5.8.3)(vue-tsc@2.2.10(typescript@5.8.3)))(prettier@3.6.0):
     dependencies:
-      prettier: 2.8.8
+      prettier: 3.6.0
+    optionalDependencies:
+      prettier-plugin-organize-imports: 4.1.0(prettier@3.6.0)(typescript@5.8.3)(vue-tsc@2.2.10(typescript@5.8.3))
 
   prettier@2.8.8: {}
+
+  prettier@3.6.0: {}
 
   pretty-bytes@5.6.0: {}
 

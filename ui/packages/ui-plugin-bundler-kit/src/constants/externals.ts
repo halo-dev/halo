@@ -13,4 +13,4 @@ const GLOBALS = {
 
 const EXTERNALS = Object.keys(GLOBALS) as string[];
 
-export { GLOBALS, EXTERNALS };
+export { EXTERNALS, GLOBALS };

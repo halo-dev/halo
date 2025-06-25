@@ -102,7 +102,7 @@ const handleLinkBubbleButton = () => {
           ? i18n.global.t('editor.extensions.link.edit_link')
           : i18n.global.t('editor.extensions.link.add_link')
       "
-      class="text-gray-600 text-lg hover:bg-gray-100 p-2 rounded-md"
+      class="rounded-md p-2 text-lg text-gray-600 hover:bg-gray-100"
       :class="{ 'bg-gray-200 !text-black': isActive({ editor }) }"
     >
       <MdiLinkVariant />
@@ -110,29 +110,29 @@ const handleLinkBubbleButton = () => {
 
     <template #popper>
       <div
-        class="relative rounded-md bg-white overflow-hidden shadow w-96 p-1 max-h-72 overflow-y-auto"
+        class="relative max-h-72 w-96 overflow-hidden overflow-y-auto rounded-md bg-white p-1 shadow"
       >
         <input
           v-model.lazy="href"
           :placeholder="i18n.global.t('editor.extensions.link.placeholder')"
-          class="bg-gray-50 rounded-md hover:bg-gray-100 block px-2 w-full py-1.5 text-sm text-gray-900 border border-gray-300 focus:ring-blue-500 focus:border-blue-500"
+          class="block w-full rounded-md border border-gray-300 bg-gray-50 px-2 py-1.5 text-sm text-gray-900 hover:bg-gray-100 focus:border-blue-500 focus:ring-blue-500"
         />
-        <label class="inline-flex items-center mt-2 mr-2">
+        <label class="mr-2 mt-2 inline-flex items-center">
           <input
             v-model="target"
             type="checkbox"
-            class="form-checkbox text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
+            class="form-checkbox rounded border-gray-300 text-blue-600 focus:ring-blue-500"
           />
           <span class="ml-2 text-sm text-gray-500">
             {{ i18n.global.t("editor.extensions.link.open_in_new_window") }}
           </span>
         </label>
-        <label class="inline-flex items-center mt-2">
+        <label class="mt-2 inline-flex items-center">
           <!-- nofollow -->
           <input
             v-model="rel"
             type="checkbox"
-            class="form-checkbox text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
+            class="form-checkbox rounded border-gray-300 text-blue-600 focus:ring-blue-500"
           />
           <span class="ml-2 text-sm text-gray-500">
             {{ i18n.global.t("editor.extensions.link.nofollow") }}

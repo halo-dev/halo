@@ -28,11 +28,11 @@ import ExtensionTextAlign from "./text-align";
 import ExtensionUnderline from "./underline";
 
 // Custom extensions
-import ExtensionTextStyle from "@/extensions/text-style";
 import {
   ExtensionCodeBlock,
   type ExtensionCodeBlockOptions,
 } from "@/extensions/code-block";
+import ExtensionTextStyle from "@/extensions/text-style";
 import { ExtensionCommands } from "../extensions/commands-menu";
 import ExtensionAudio from "./audio";
 import ExtensionClearFormat from "./clear-format";
@@ -110,6 +110,7 @@ const allExtensions = [
 ];
 
 export {
+  allExtensions,
   ExtensionAudio,
   ExtensionBlockquote,
   ExtensionBold,
@@ -156,7 +157,6 @@ export {
   ExtensionUnderline,
   ExtensionVideo,
   RangeSelection,
-  allExtensions,
 };
 
 export type { ExtensionCodeBlockOptions };

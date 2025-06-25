@@ -155,17 +155,17 @@ watch(
 <template>
   <Transition v-show="visible" appear name="slide">
     <div
-      class="absolute float-right top-0 right-5 z-50 flex justify-end bg-white shadow p-1 !pt-2 rounded min-w-[500px]"
+      class="absolute right-5 top-0 z-50 float-right flex min-w-[500px] justify-end rounded bg-white p-1 !pt-2 shadow"
       @keydown.escape.prevent="handleCloseSearch"
     >
-      <section class="w-full flex flex-col gap-1">
-        <div class="flex items-center relative">
+      <section class="flex w-full flex-col gap-1">
+        <div class="relative flex items-center">
           <div class="relative w-full max-w-[55%]">
             <input
               ref="searchInput"
               v-model="searchTerm"
               type="text"
-              class="block w-full p-1 ps-2 !pr-[5.5rem] bg-gray-50 rounded border !border-solid !text-sm !leading-7 border-gray-300 text-gray-900 focus:ring-blue-500 focus:border-blue-500"
+              class="block w-full rounded border !border-solid border-gray-300 bg-gray-50 p-1 !pr-[5.5rem] ps-2 !text-sm !leading-7 text-gray-900 focus:border-blue-500 focus:ring-blue-500"
               :placeholder="
                 i18n.global.t(
                   'editor.extensions.search_and_replace.search_placeholder'
@@ -174,7 +174,7 @@ watch(
               tabindex="2"
               @keydown.enter.prevent="findNextSearchResult"
             />
-            <div class="absolute inset-y-0 end-0 flex items-center pr-1 gap-1">
+            <div class="absolute inset-y-0 end-0 flex items-center gap-1 pr-1">
               <button
                 :title="
                   i18n.global.t(
@@ -182,7 +182,7 @@ watch(
                   )
                 "
                 type="button"
-                class="p-0.5 rounded-sm hover:bg-gray-200"
+                class="rounded-sm p-0.5 hover:bg-gray-200"
                 :class="{
                   '!bg-blue-200 outline outline-1 outline-blue-500 hover:!bg-blue-200':
                     caseSensitive,
@@ -198,7 +198,7 @@ watch(
                   )
                 "
                 type="button"
-                class="p-0.5 rounded-sm hover:bg-gray-200"
+                class="rounded-sm p-0.5 hover:bg-gray-200"
                 :class="{
                   '!bg-blue-200 outline outline-1 outline-blue-500 hover:!bg-blue-200':
                     matchWord,
@@ -214,7 +214,7 @@ watch(
                   )
                 "
                 type="button"
-                class="p-0.5 rounded-sm hover:bg-gray-200"
+                class="rounded-sm p-0.5 hover:bg-gray-200"
                 :class="{
                   '!bg-blue-200 outline outline-1 outline-blue-500 hover:!bg-blue-200':
                     regex,
@@ -225,7 +225,7 @@ watch(
               </button>
             </div>
           </div>
-          <div class="min-w-[130px] text-sm mx-2">
+          <div class="mx-2 min-w-[130px] text-sm">
             <div v-if="findState.findCount === 0">
               <span :class="{ 'text-red-600': searchTerm.length > 0 }">{{
                 i18n.global.t("editor.extensions.search_and_replace.not_found")
@@ -245,7 +245,7 @@ watch(
               </span>
             </div>
           </div>
-          <div class="h-full flex items-center absolute right-0">
+          <div class="absolute right-0 flex h-full items-center">
             <button
               :title="
                 i18n.global.t(
@@ -253,9 +253,9 @@ watch(
                 )
               "
               type="button"
-              class="p-0.5 rounded-sm opacity-50"
+              class="rounded-sm p-0.5 opacity-50"
               :class="{
-                'hover:!bg-gray-200 !opacity-100': findState.findCount > 0,
+                '!opacity-100 hover:!bg-gray-200': findState.findCount > 0,
               }"
               :disabled="findState.findCount === 0"
               @click="findPreviousSearchResult"
@@ -267,9 +267,9 @@ watch(
                 i18n.global.t('editor.extensions.search_and_replace.find_next')
               "
               type="button"
-              class="p-0.5 rounded-sm opacity-50"
+              class="rounded-sm p-0.5 opacity-50"
               :class="{
-                'hover:!bg-gray-200 !opacity-100': findState.findCount > 0,
+                '!opacity-100 hover:!bg-gray-200': findState.findCount > 0,
               }"
               :disabled="findState.findCount === 0"
               @click="findNextSearchResult"
@@ -281,7 +281,7 @@ watch(
                 i18n.global.t('editor.extensions.search_and_replace.close')
               "
               type="button"
-              class="p-0.5 rounded-sm hover:bg-gray-200"
+              class="rounded-sm p-0.5 hover:bg-gray-200"
               @click="handleCloseSearch"
             >
               <MdiClose></MdiClose>
@@ -294,7 +294,7 @@ watch(
             <input
               v-model="replaceTerm"
               type="text"
-              class="block w-full p-1 ps-2 rounded bg-gray-50 border !border-solid !text-sm !leading-7 border-gray-300 text-gray-900 focus:ring-blue-500 focus:border-blue-500"
+              class="block w-full rounded border !border-solid border-gray-300 bg-gray-50 p-1 ps-2 !text-sm !leading-7 text-gray-900 focus:border-blue-500 focus:ring-blue-500"
               :placeholder="
                 i18n.global.t(
                   'editor.extensions.search_and_replace.replace_placeholder'
@@ -304,15 +304,15 @@ watch(
               @keydown.enter.prevent="replace"
             />
           </div>
-          <div class="flex items-center gap-2 mx-2">
+          <div class="mx-2 flex items-center gap-2">
             <button
               :title="
                 i18n.global.t('editor.extensions.search_and_replace.replace')
               "
               type="button"
-              class="p-0.5 rounded-sm opacity-50"
+              class="rounded-sm p-0.5 opacity-50"
               :class="{
-                'hover:!bg-gray-200 !opacity-100': findState.findCount > 0,
+                '!opacity-100 hover:!bg-gray-200': findState.findCount > 0,
               }"
               :disabled="findState.findCount === 0"
               @click="replace"
@@ -326,9 +326,9 @@ watch(
                 )
               "
               type="button"
-              class="p-0.5 rounded-sm opacity-50"
+              class="rounded-sm p-0.5 opacity-50"
               :class="{
-                'hover:!bg-gray-200 !opacity-100': findState.findCount > 0,
+                '!opacity-100 hover:!bg-gray-200': findState.findCount > 0,
               }"
               :disabled="findState.findCount === 0"
               @click="replaceAll"

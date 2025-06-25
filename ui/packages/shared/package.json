@@ -30,7 +30,6 @@
   "scripts": {
     "build": "tsdown",
     "dev": "tsdown --watch",
-    "prettier": "prettier --write './src/**/*.{vue,js,jsx,ts,tsx,css,scss,json,yml,yaml,html}'",
     "typecheck": "tsc --noEmit -p tsconfig.app.json --composite false"
   },
   "dependencies": {

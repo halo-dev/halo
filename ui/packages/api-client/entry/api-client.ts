@@ -34,6 +34,7 @@ import {
   PersonalAccessTokenV1alpha1UcApi,
   PluginV1alpha1Api,
   PluginV1alpha1ConsoleApi,
+  PolicyAlpha1ConsoleApi,
   PolicyTemplateV1alpha1Api,
   PolicyV1alpha1Api,
   PostV1alpha1Api,
@@ -63,10 +64,9 @@ import {
   ThemeV1alpha1ConsoleApi,
   TwoFactorAuthV1alpha1UcApi,
   UserConnectionV1alpha1Api,
+  UserPreferenceV1alpha1UcApi,
   UserV1alpha1Api,
   UserV1alpha1ConsoleApi,
-  UserPreferenceV1alpha1UcApi,
-  PolicyAlpha1ConsoleApi,
 } from "../src";
 
 const defaultAxiosInstance = axios.create({

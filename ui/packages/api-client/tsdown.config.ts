@@ -16,6 +16,6 @@ export default defineConfig({
   minify: true,
   exports: true,
   dts: {
-    tsgo: true
-  }
+    tsgo: true,
+  },
 });

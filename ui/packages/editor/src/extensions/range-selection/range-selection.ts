@@ -147,7 +147,10 @@ class RangeSelection extends Selection {
 Selection.jsonID("range", RangeSelection);
 
 class RangeBookmark {
-  constructor(readonly anchor: number, readonly head: number) {}
+  constructor(
+    readonly anchor: number,
+    readonly head: number
+  ) {}
 
   map(mapping: Mappable) {
     return new RangeBookmark(mapping.map(this.anchor), mapping.map(this.head));

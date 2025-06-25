@@ -71,7 +71,7 @@ watch(
     value=""
     :validation="['length:0,1024', required ? 'required' : ''].join('|')"
   ></FormKit>
-  <div class="flex justify-end w-full sm:max-w-lg">
+  <div class="flex w-full justify-end sm:max-w-lg">
     <VDropdown :classes="['!p-0']" @show="handleCreateEmojiPicker">
       <IconMotionLine
         class="h-5 w-5 cursor-pointer text-gray-500 transition-all hover:text-gray-900"

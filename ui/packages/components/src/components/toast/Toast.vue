@@ -139,18 +139,18 @@ defineExpose({ close });
 </template>
 <style lang="scss">
 .toast-container {
-  @apply fixed pointer-events-none flex z-[9999] flex-col box-border transition-all w-full left-0 top-0 items-center justify-center p-4 gap-3;
+  @apply pointer-events-none fixed left-0 top-0 z-[9999] box-border flex w-full flex-col items-center justify-center gap-3 p-4 transition-all;
 
   .toast-wrapper {
-    @apply inline-block max-w-xs pointer-events-auto relative;
+    @apply pointer-events-auto relative inline-block max-w-xs;
   }
 
   .toast-body {
-    @apply cursor-pointer flex items-center px-2.5 py-2 overflow-hidden break-all bg-white shadow hover:shadow-md transition-all rounded gap-2;
+    @apply flex cursor-pointer items-center gap-2 overflow-hidden break-all rounded bg-white px-2.5 py-2 shadow transition-all hover:shadow-md;
   }
 
   .toast-content {
-    @apply text-sm flex flex-col gap-1;
+    @apply flex flex-col gap-1 text-sm;
   }
 
   .toast-description {
@@ -158,11 +158,11 @@ defineExpose({ close });
   }
 
   .toast-control {
-    @apply text-gray-600 hover:text-gray-900 transition-all cursor-pointer rounded-full hover:bg-gray-100 p-0.5;
+    @apply cursor-pointer rounded-full p-0.5 text-gray-600 transition-all hover:bg-gray-100 hover:text-gray-900;
   }
 
   .toast-count {
-    @apply bg-red-500 rounded-full absolute -right-1 -top-1 w-4 h-4 flex items-center justify-center;
+    @apply absolute -right-1 -top-1 flex h-4 w-4 items-center justify-center rounded-full bg-red-500;
 
     span {
       @apply text-[0.7rem] text-white;

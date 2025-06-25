@@ -78,13 +78,13 @@ function getWidthStyleValue(value: string | number) {
 
 <style lang="scss">
 .entity-field-wrapper {
-  @apply inline-flex flex-col gap-1 max-w-xs;
+  @apply inline-flex max-w-xs flex-col gap-1;
 
   .entity-field-title-body {
-    @apply inline-flex items-center flex-row whitespace-nowrap;
+    @apply inline-flex flex-row items-center whitespace-nowrap;
 
     .entity-field-title {
-      @apply truncate text-sm font-medium text-gray-900 mr-2;
+      @apply mr-2 truncate text-sm font-medium text-gray-900;
     }
   }
 
@@ -92,7 +92,7 @@ function getWidthStyleValue(value: string | number) {
     @apply inline-flex items-center whitespace-nowrap;
 
     .entity-field-description {
-      @apply text-xs text-gray-500 truncate;
+      @apply truncate text-xs text-gray-500;
     }
   }
 }
