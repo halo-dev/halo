@@ -93,7 +93,9 @@ export function useContentCache(
         (c: ContentCache) => c.name === ""
       );
     }
-    index > -1 && content_caches.value.splice(index, 1);
+    if (index > -1) {
+      content_caches.value.splice(index, 1);
+    }
   };
 
   return {

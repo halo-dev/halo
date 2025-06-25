@@ -150,6 +150,7 @@ export const findTable = (selection: Selection) => {
     | undefined;
 };
 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 export const isRectSelected = (rect: any) => (selection: CellSelection) => {
   const map = TableMap.get(selection.$anchorCell.node(-1));
   const start = selection.$anchorCell.start(-1);
@@ -170,10 +171,12 @@ export const isRectSelected = (rect: any) => (selection: CellSelection) => {
   return true;
 };
 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 export const isCellSelection = (selection: any) => {
   return selection instanceof CellSelection;
 };
 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 export const isColumnSelected = (columnIndex: number) => (selection: any) => {
   if (isCellSelection(selection)) {
     const map = TableMap.get(selection.$anchorCell.node(-1));
@@ -199,6 +202,7 @@ export const isColumnSelected = (columnIndex: number) => (selection: any) => {
   return false;
 };
 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 export const isRowSelected = (rowIndex: number) => (selection: any) => {
   if (isCellSelection(selection)) {
     const map = TableMap.get(selection.$anchorCell.node(-1));
@@ -223,6 +227,7 @@ export const isRowSelected = (rowIndex: number) => (selection: any) => {
   return false;
 };
 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 export const isTableSelected = (selection: any) => {
   if (isCellSelection(selection)) {
     const map = TableMap.get(selection.$anchorCell.node(-1));

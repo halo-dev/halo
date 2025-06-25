@@ -45,6 +45,7 @@ class RangeSelection extends Selection {
     return new RangeBookmark(this.anchor, this.head);
   }
 
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   toJSON(): any {
     return { type: "range", anchor: this.anchor, head: this.head };
   }
@@ -125,6 +126,7 @@ class RangeSelection extends Selection {
     return new RangeSelection(doc.resolve(anchor), doc.resolve(head));
   }
 
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   static fromJSON(doc: Node, json: any) {
     if (typeof json.anchor != "number" || typeof json.head != "number") {
       throw new RangeError("Invalid input for RangeSelection.fromJSON");

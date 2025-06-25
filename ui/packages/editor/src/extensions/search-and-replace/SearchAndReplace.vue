@@ -58,6 +58,7 @@ const findPreviousSearchResult = () => {
   props.editor.commands.findPrevious();
 };
 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 const updateSearchReplace = (value: any) => {
   const { editor, pluginKey } = props;
   if (!editor || !pluginKey) {

@@ -282,7 +282,7 @@ const Blockquote = TiptapHeading.extend<ExtensionOptions & HeadingOptions>({
     return [
       new Plugin({
         key: new PluginKey("generate-heading-id"),
-        appendTransaction: (transactions, oldState, newState) => {
+        appendTransaction: (transactions, _oldState, newState) => {
           const isChangeHeading = transactions.some((transaction) => {
             const composition = this.editor.view.composing;
             if (beforeComposition !== undefined && !composition) {
