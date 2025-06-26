@@ -381,10 +381,10 @@ useEventListener("keydown", handleKeydown);
           @click="handleRoute(item)"
         >
           <div
-            class="flex items-center rounded-md px-2 py-2.5 cursor-pointer hover:bg-gray-100"
+            class="flex cursor-pointer items-center rounded-md px-2 py-2.5 hover:bg-gray-100"
             :class="{ 'bg-gray-100': selectedIndex === itemIndex }"
           >
-            <div class="inline-flex items-center gap-3 flex-1">
+            <div class="inline-flex flex-1 items-center gap-3">
               <div class="h-5 w-5 rounded border p-0.5">
                 <component
                   :is="item.icon.component"
@@ -399,7 +399,7 @@ useEventListener("keydown", handleKeydown);
               </div>
               <span class="text-sm font-medium">{{ item.title }}</span>
             </div>
-            <div class="text-xs text-gray-500 flex-shrink-0 flex-none">
+            <div class="flex-none flex-shrink-0 text-xs text-gray-500">
               {{ item.group }}
             </div>
           </div>

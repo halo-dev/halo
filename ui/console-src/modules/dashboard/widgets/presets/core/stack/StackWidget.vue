@@ -81,7 +81,7 @@ async function handleSave(config: StackWidgetConfig) {
     v-if="!config.widgets?.length"
     :title="$t('core.dashboard.widgets.presets.stack.title')"
   >
-    <div class="flex items-center justify-center w-full h-full">
+    <div class="flex h-full w-full items-center justify-center">
       <VButton @click="configVisible = true">
         {{
           $t(
@@ -93,21 +93,21 @@ async function handleSave(config: StackWidgetConfig) {
   </WidgetCard>
   <div
     v-else
-    class="bg-white w-full h-full rounded-lg relative group/stack-item overflow-hidden"
+    class="group/stack-item relative h-full w-full overflow-hidden rounded-lg bg-white"
     @mouseenter="stopAutoPlay"
     @mouseleave="startAutoPlay"
   >
     <div
       v-if="editMode || previewMode"
-      class="flex absolute z-10 bg-white inset-0 rounded-t-lg flex-none justify-between h-10 items-center px-4 border-b border-[#eaecf0]"
+      class="absolute inset-0 z-10 flex h-10 flex-none items-center justify-between rounded-t-lg border-b border-[#eaecf0] bg-white px-4"
     >
       <div class="inline-flex items-center gap-2">
-        <div class="text-base font-medium flex-1 shrink">
+        <div class="flex-1 shrink text-base font-medium">
           {{ $t("core.dashboard.widgets.presets.stack.title") }}
         </div>
         <IconSettings
           v-if="editMode"
-          class="hover:text-gray-600 cursor-pointer"
+          class="cursor-pointer hover:text-gray-600"
           @click="configVisible = true"
         />
       </div>
@@ -123,7 +123,7 @@ async function handleSave(config: StackWidgetConfig) {
     </TransitionGroup>
 
     <div
-      class="absolute bottom-2 left-0 right-0 z-10 flex justify-center group-hover/stack-item:opacity-100 opacity-0 transition-all duration-200"
+      class="absolute bottom-2 left-0 right-0 z-10 flex justify-center opacity-0 transition-all duration-200 group-hover/stack-item:opacity-100"
     >
       <IndexIndicator
         :index="index"

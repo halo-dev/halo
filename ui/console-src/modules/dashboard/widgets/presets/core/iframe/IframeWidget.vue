@@ -20,7 +20,7 @@ defineProps<{
   >
     <div
       v-if="!config.url"
-      class="flex items-center justify-center w-full h-full"
+      class="flex h-full w-full items-center justify-center"
     >
       <span class="text-sm text-gray-600">
         {{ $t("core.dashboard.widgets.presets.iframe.empty.title") }}
@@ -32,7 +32,7 @@ defineProps<{
       sandbox="allow-scripts allow-same-origin"
       credentialless
       referrerpolicy="no-referrer"
-      class="w-full h-full border-none"
+      class="h-full w-full border-none"
       :class="{
         'pointer-events-none': editMode,
       }"

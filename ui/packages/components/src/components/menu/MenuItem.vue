@@ -84,20 +84,11 @@ function handleExpand() {
 }
 
 .menu-item-title {
-  @apply transition-all
-  text-base
-  flex
-  select-none
-  relative
-  px-2
-  py-[0.4rem]
-  font-normal
-  rounded-base;
+  @apply relative flex select-none rounded-base px-2 py-[0.4rem] text-base font-normal transition-all;
 
   &:hover,
   &.active {
-    @apply bg-gray-100
-    font-medium;
+    @apply bg-gray-100 font-medium;
   }
 
   &.active::after {
@@ -113,7 +104,7 @@ function handleExpand() {
 }
 
 .menu-icon-collapse {
-  @apply group-hover:bg-gray-200 p-0.5 rounded-full;
+  @apply rounded-full p-0.5 group-hover:bg-gray-200;
 
   &.open {
     @apply bg-gray-200;
@@ -132,7 +123,7 @@ function handleExpand() {
 }
 
 .sub-menu-items {
-  @apply pl-5 my-1;
+  @apply my-1 pl-5;
 
   .menu-item-title {
     @apply p-1.5 text-sm;

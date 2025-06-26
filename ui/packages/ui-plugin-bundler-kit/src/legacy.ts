@@ -1,7 +1,7 @@
 import { Plugin } from "vite";
+import { DEFAULT_OUT_DIR_DEV } from "./constants/build";
 import { EXTERNALS, GLOBALS } from "./constants/externals";
 import { DEFAULT_MANIFEST_PATH } from "./constants/halo-plugin";
-import { DEFAULT_OUT_DIR_DEV } from "./constants/build";
 import { getHaloPluginManifest } from "./utils/halo-plugin";
 
 const LEGACY_OUT_DIR_PROD = "../src/main/resources/console";

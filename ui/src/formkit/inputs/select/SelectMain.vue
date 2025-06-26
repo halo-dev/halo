@@ -446,9 +446,8 @@ const mapUnresolvedOptions = async (
       mappedOptions = await fetchRemoteMappedOptions(unmappedSelectValues);
     } else if (selectProps.remote) {
       const remoteOption = selectProps.remoteOption as SelectRemoteOption;
-      mappedOptions = await remoteOption.findOptionsByValues(
-        unmappedSelectValues
-      );
+      mappedOptions =
+        await remoteOption.findOptionsByValues(unmappedSelectValues);
     }
   }
 

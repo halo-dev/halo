@@ -1,2 +1,3 @@
 pnpm-lock.yaml
-packages/api-client
+packages/api-client/src
+docs

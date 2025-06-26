@@ -376,8 +376,8 @@ const dropPoint = (doc: Node, pos: number, slice: Slice) => {
         dep == $pos.depth
           ? 0
           : $pos.pos <= ($pos.start(dep + 1) + $pos.end(dep + 1)) / 2
-          ? -1
-          : 1;
+            ? -1
+            : 1;
       const insertPos = $pos.index(dep) + (bias > 0 ? 1 : 0);
       const parent = $pos.node(dep);
       let fits = false;
@@ -396,8 +396,8 @@ const dropPoint = (doc: Node, pos: number, slice: Slice) => {
         return bias == 0
           ? $pos.pos
           : bias < 0
-          ? $pos.before(dep + 1)
-          : $pos.after(dep + 1);
+            ? $pos.before(dep + 1)
+            : $pos.after(dep + 1);
       }
     }
   }
