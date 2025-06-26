@@ -44,6 +44,7 @@ import {
   ExtensionTrailingNode,
   ExtensionUnderline,
   ExtensionVideo,
+  ExtensionDetails,
   RichTextEditor,
   useEditor,
 } from "../index";
@@ -113,6 +114,9 @@ const editor = useEditor({
     ExtensionClearFormat,
     ExtensionFormatBrush,
     ExtensionRangeSelection,
+    ExtensionDetails.configure({
+      persist: true,
+    }),
   ],
   parseOptions: {
     preserveWhitespace: true,

@@ -26,6 +26,7 @@ import ExtensionTable from "./table";
 import ExtensionTaskList from "./task-list";
 import ExtensionTextAlign from "./text-align";
 import ExtensionUnderline from "./underline";
+import ExtensionDetails from "./details";
 
 // Custom extensions
 import ExtensionTextStyle from "@/extensions/text-style";
@@ -107,6 +108,7 @@ const allExtensions = [
   ExtensionClearFormat,
   ExtensionFormatBrush,
   ExtensionRangeSelection,
+  ExtensionDetails,
 ];
 
 export {
@@ -155,6 +157,7 @@ export {
   ExtensionTrailingNode,
   ExtensionUnderline,
   ExtensionVideo,
+  ExtensionDetails,
   RangeSelection,
   allExtensions,
 };
