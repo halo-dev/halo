@@ -8,6 +8,18 @@ import ToolbarItem from "@/components/toolbar/ToolbarItem.vue";
 import { i18n } from "@/locales";
 import MdiExpandHorizontal from "~icons/mdi/expand-horizontal";
 
+const getRenderContainer = (node: HTMLElement) => {
+  let container = node;
+  if (container.nodeName === "#text") {
+    container = node.parentElement as HTMLElement;
+  }
+
+  while (container && container.dataset.type !== "details") {
+    container = container.parentElement as HTMLElement;
+  }
+  return container;
+};
+
 const Details = TiptapDetails.extend<ExtensionOptions & DetailsOptions>({
   addOptions() {
     return {
@@ -53,6 +65,15 @@ const Details = TiptapDetails.extend<ExtensionOptions & DetailsOptions>({
                   .run();
               }
             },
+          },
+        };
+      },
+      getDraggable() {
+        return {
+          getRenderContainer({ dom }: { dom: HTMLElement }) {
+            return {
+              el: getRenderContainer(dom),
+            };
           },
         };
       },
