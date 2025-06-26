@@ -88,6 +88,8 @@ editor:
       toolbar_item:
         title: 格式刷
         cancel: 取消格式刷
+    details:
+      command_item: 折叠内容
   components:
     color_picker:
       more_color: 更多颜色
