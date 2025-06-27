@@ -10,7 +10,7 @@ inputs:
   pnpm-version:
     description: pnpm version.
     required: false
-    default: "9"
+    default: "10"
 
   java-version:
     description: Java version.
