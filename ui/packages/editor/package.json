@@ -13,6 +13,7 @@
   },
   "license": "GPL-3.0",
   "author": "@halo-dev",
+  "type": "module",
   "exports": {
     ".": {
       "types": "./dist/index.d.ts",

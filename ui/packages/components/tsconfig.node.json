@@ -1,9 +1,15 @@
 {
   "extends": "@tsconfig/node18/tsconfig.json",
-  "include": ["vite.config.*", "vitest.config.*"],
+  "include": [
+    "vite.config.*",
+    "vitest.config.*",
+    "tailwind.config.ts",
+    "../../tailwind.config.ts"
+  ],
   "compilerOptions": {
     "composite": true,
     "module": "ESNext",
+    "moduleResolution": "Bundler",
     "types": ["node"]
   }
 }
