@@ -17,4 +17,10 @@ public enum ModelConst {
     public static final String NO_CACHE = "HALO_TEMPLATE_ENGINE.NO_CACHE";
 
     public static final Integer DEFAULT_PAGE_SIZE = 10;
+
+    /**
+     * This key is used to indicate preview mode in template processing.
+     * When set to true, certain features like script injection will be skipped.
+     */
+    public static final String IS_PREVIEW = "HALO.PREVIEW.MODE";
 }
