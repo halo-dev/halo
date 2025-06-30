@@ -6,7 +6,7 @@ import { json } from "@codemirror/lang-json";
 import { LanguageSupport, StreamLanguage } from "@codemirror/language";
 import { yaml } from "@codemirror/legacy-modes/mode/yaml";
 import type { EditorStateConfig } from "@codemirror/state";
-import { EditorState } from "@codemirror/state";
+import { Compartment, EditorState } from "@codemirror/state";
 import { EditorView } from "@codemirror/view";
 import { basicSetup } from "codemirror";
 import { onBeforeUnmount, onMounted, shallowRef, watch } from "vue";
@@ -42,16 +42,20 @@ const emit = defineEmits<{
   (e: "change", value: string): void;
 }>();
 
-const customTheme = EditorView.theme({
-  "&": {
-    height: props.height,
-    width: "100%",
-  },
-});
-
 const wrapper = shallowRef<HTMLDivElement>();
 const cmState = shallowRef<EditorState>();
 const cmView = shallowRef<EditorView>();
+
+const themeCompartment = new Compartment();
+
+const createCustomTheme = (height: string) => {
+  return EditorView.theme({
+    "&": {
+      height,
+      width: "100%",
+    },
+  });
+};
 
 const createCmEditor = () => {
   const language =
@@ -62,7 +66,7 @@ const createCmEditor = () => {
   let extensions = [
     basicSetup,
     EditorView.lineWrapping,
-    customTheme,
+    themeCompartment.of(createCustomTheme(props.height)),
     language,
     EditorView.updateListener.of((viewUpdate) => {
       if (viewUpdate.docChanged) {
@@ -102,6 +106,17 @@ onMounted(() => {
             to: cmView.value?.state.doc.length,
             insert: newValue,
           },
+        });
+      }
+    }
+  );
+
+  watch(
+    () => props.height,
+    (newHeight) => {
+      if (cmView.value) {
+        cmView.value.dispatch({
+          effects: themeCompartment.reconfigure(createCustomTheme(newHeight)),
         });
       }
     }
