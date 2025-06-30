@@ -16,7 +16,7 @@ import {
 } from "@/tiptap/pm";
 import { Editor, Extension } from "@/tiptap/vue-3";
 import type { DraggableItemType, ExtensionOptions } from "@/types";
-import { throttle } from "@/utils/throttle";
+import { throttle } from "lodash-es";
 
 // https://developer.mozilla.org/zh-CN/docs/Web/API/HTML_Drag_and_Drop_API
 // https://github.com/ueberdosis/tiptap/blob/7832b96afbfc58574785043259230801e179310f/demos/src/Experiments/GlobalDragHandle/Vue/DragHandle.js
