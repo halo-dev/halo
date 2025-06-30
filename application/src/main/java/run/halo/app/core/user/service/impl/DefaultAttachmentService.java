@@ -147,14 +147,13 @@ public class DefaultAttachmentService implements AttachmentService {
         AtomicReference<String> fileNameRef = new AtomicReference<>(filename);
 
         Mono<Flux<DataBuffer>> contentMono = dataBufferFetcher.head(uri)
-            .map(response -> {
-                var httpHeaders = response.getHeaders();
+            .map(httpHeaders -> {
                 if (!StringUtils.hasText(fileNameRef.get())) {
                     fileNameRef.set(getExternalUrlFilename(uri, httpHeaders));
                 }
                 MediaType contentType = httpHeaders.getContentType();
                 mediaTypeRef.set(contentType);
-                return response;
+                return httpHeaders;
             })
             .map(response -> dataBufferFetcher.fetch(uri));
 

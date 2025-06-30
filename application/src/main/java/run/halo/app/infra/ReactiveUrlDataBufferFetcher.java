@@ -2,6 +2,7 @@ package run.halo.app.infra;
 
 import java.net.URI;
 import org.springframework.core.io.buffer.DataBuffer;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseEntity;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
@@ -28,5 +29,5 @@ public interface ReactiveUrlDataBufferFetcher {
      * @param uri uri to fetch
      * @return response entity
      */
-    Mono<ResponseEntity<Void>> head(URI uri);
+    Mono<HttpHeaders> head(URI uri);
 }
