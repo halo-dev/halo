@@ -1,5 +1,4 @@
 <script lang="ts" setup>
-import UppyUpload from "@/components/upload/UppyUpload.vue";
 import type { PolicyTemplate } from "@halo-dev/api-client";
 import {
   IconAddCircle,

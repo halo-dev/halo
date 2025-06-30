@@ -16,6 +16,7 @@ import {
 } from "@/tiptap/pm";
 import { Editor, Extension } from "@/tiptap/vue-3";
 import type { DraggableItemType, ExtensionOptions } from "@/types";
+import { throttle } from "lodash-es";
 
 // https://developer.mozilla.org/zh-CN/docs/Web/API/HTML_Drag_and_Drop_API
 // https://github.com/ueberdosis/tiptap/blob/7832b96afbfc58574785043259230801e179310f/demos/src/Experiments/GlobalDragHandle/Vue/DragHandle.js
@@ -376,8 +377,8 @@ const dropPoint = (doc: Node, pos: number, slice: Slice) => {
         dep == $pos.depth
           ? 0
           : $pos.pos <= ($pos.start(dep + 1) + $pos.end(dep + 1)) / 2
-            ? -1
-            : 1;
+          ? -1
+          : 1;
       const insertPos = $pos.index(dep) + (bias > 0 ? 1 : 0);
       const parent = $pos.node(dep);
       let fits = false;
@@ -396,8 +397,8 @@ const dropPoint = (doc: Node, pos: number, slice: Slice) => {
         return bias == 0
           ? $pos.pos
           : bias < 0
-            ? $pos.before(dep + 1)
-            : $pos.after(dep + 1);
+          ? $pos.before(dep + 1)
+          : $pos.after(dep + 1);
       }
     }
   }
@@ -468,7 +469,7 @@ const Draggable = Extension.create({
         props: {
           handleDOMEvents: {
             // @ts-ignore
-            mousemove: (view: EditorView, event) => {
+            mousemove: throttle((view: EditorView, event: MouseEvent) => {
               const coords = { left: event.clientX, top: event.clientY };
               const pos = view.posAtCoords(coords);
               if (!pos || !pos.pos) return false;
@@ -479,6 +480,7 @@ const Draggable = Extension.create({
                 view.nodeDOM(nodePos) ||
                 view.domAtPos(nodePos)?.node ||
                 event.target;
+
               if (!nodeDom) {
                 hideDragHandleDOM();
                 return false;
@@ -514,14 +516,14 @@ const Draggable = Extension.create({
               }
               renderDragHandleDOM(view, activeNode);
               return false;
-            },
-            mouseleave: () => {
+            }, 100),
+            mouseleave: throttle(() => {
               clearTimeout(mouseleaveTimer);
               mouseleaveTimer = setTimeout(() => {
                 hideDragHandleDOM();
-              }, 400);
+              }, 800);
               return false;
-            },
+            }, 100),
           },
           handleKeyDown() {
             if (!draggableHandleDom) return false;
