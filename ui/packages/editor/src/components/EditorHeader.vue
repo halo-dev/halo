@@ -1,7 +1,7 @@
 <script lang="ts" setup>
 import { Editor, type AnyExtension } from "@/tiptap/vue-3";
 import type { ToolbarItemType, ToolboxItemType } from "@/types";
-import { Dropdown as VDropdown, Menu as VMenu } from "floating-vue";
+import { Dropdown as VDropdown } from "floating-vue";
 import MdiPlusCircle from "~icons/mdi/plus-circle";
 
 const props = defineProps({
@@ -62,10 +62,16 @@ function getToolboxItemsFromExtensions() {
     class="editor-header space-x-1 overflow-auto border-b bg-white px-1 py-1 text-center shadow-sm"
   >
     <div class="inline-flex h-full items-center">
-      <VMenu>
-        <button class="rounded-md p-1.5 hover:bg-gray-100" tabindex="-1">
-          <MdiPlusCircle class="text-[#4CCBA0]" />
-        </button>
+      <VDropdown :triggers="['click']" :popper-triggers="['click']">
+        <template #default="{ shown }">
+          <button
+            class="rounded-md p-1.5 hover:bg-gray-100 active:bg-gray-200"
+            :class="{ 'bg-gray-200': shown }"
+            tabindex="-1"
+          >
+            <MdiPlusCircle class="text-[#4CCBA0]" />
+          </button>
+        </template>
         <template #popper>
           <div
             class="relative max-h-96 w-56 space-y-1.5 overflow-hidden overflow-y-auto rounded-md bg-white p-1 shadow"
@@ -79,7 +85,7 @@ function getToolboxItemsFromExtensions() {
             />
           </div>
         </template>
-      </VMenu>
+      </VDropdown>
       <div class="!mx-1 h-5 w-[1px] bg-gray-100"></div>
       <div
         v-for="(item, index) in getToolbarItemsFromExtensions()"
@@ -98,12 +104,15 @@ function getToolboxItemsFromExtensions() {
             :triggers="['click']"
             :popper-triggers="['click']"
           >
-            <component
-              :is="item.component"
-              v-bind="item.props"
-              :children="item.children"
-              tabindex="-1"
-            />
+            <template #default="{ shown }">
+              <component
+                :is="item.component"
+                v-bind="item.props"
+                :children="item.children"
+                tabindex="-1"
+                :class="{ 'bg-gray-200': shown }"
+              />
+            </template>
             <template #popper>
               <div
                 class="relative max-h-96 w-56 space-y-1.5 overflow-hidden overflow-y-auto rounded-md bg-white p-1 shadow"
