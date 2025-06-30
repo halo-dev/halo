@@ -17,6 +17,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.core.io.buffer.DataBuffer;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatusCode;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -303,10 +304,11 @@ class AttachmentEndpointTest {
             attachment.setMetadata(metadata);
 
             ResponseEntity<Void> response = new ResponseEntity<>(HttpStatusCode.valueOf(200));
+            HttpHeaders headers = response.getHeaders();
             DataBuffer dataBuffer = mock(DataBuffer.class);
 
             when(handler.upload(any())).thenReturn(Mono.just(attachment));
-            when(dataBufferFetcher.head(any())).thenReturn(Mono.just(response));
+            when(dataBufferFetcher.head(any())).thenReturn(Mono.just(headers));
             when(dataBufferFetcher.fetch(any())).thenReturn(Flux.just(dataBuffer));
             when(extensionGetter.getExtensions(AttachmentHandler.class))
                 .thenReturn(Flux.just(handler));

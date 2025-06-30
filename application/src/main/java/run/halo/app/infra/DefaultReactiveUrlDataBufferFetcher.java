@@ -49,7 +49,7 @@ public class DefaultReactiveUrlDataBufferFetcher implements ReactiveUrlDataBuffe
         ContentLengthFetcher() {
             this.webClient = WebClient.builder()
                 .exchangeStrategies(ExchangeStrategies.builder()
-                    .codecs(config -> config.defaultCodecs().maxInMemorySize(1)) // 只缓冲1字节
+                    .codecs(config -> config.defaultCodecs().maxInMemorySize(1))
                     .build())
                 .build();
         }

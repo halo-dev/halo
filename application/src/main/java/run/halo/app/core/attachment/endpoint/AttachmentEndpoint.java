@@ -118,8 +118,10 @@ public class AttachmentEndpoint implements CustomEndpoint {
     }
 
     public record UploadFromUrlRequest(@Schema(requiredMode = REQUIRED) URL url,
-                                       @Schema(requiredMode = REQUIRED, description = "Storage policy name") String policyName,
-                                       @Schema(description = "The name of the group to which the attachment belongs") String groupName,
+                                       @Schema(requiredMode = REQUIRED, description = "Storage "
+                                           + "policy name") String policyName,
+                                       @Schema(description = "The name of the group to which the "
+                                           + "attachment belongs") String groupName,
                                        @Schema(description = "Custom file name") String filename) {
         public UploadFromUrlRequest {
             if (Objects.isNull(url)) {
