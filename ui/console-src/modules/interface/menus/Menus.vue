@@ -45,7 +45,6 @@ const selectedMenu = ref<Menu>();
 const selectedMenuItem = ref<MenuItem>();
 const selectedParentMenuItem = ref<MenuItem>();
 const menuItemEditingModal = ref();
-const isDragging = ref(false);
 
 const {
   data: menuItems,
@@ -162,7 +161,6 @@ async function handleUpdateInBatch() {
     await queryClient.invalidateQueries({ queryKey: ["menus"] });
     await refetch();
     batchUpdating.value = false;
-    isDragging.value = false;
   }
 }
 
@@ -312,10 +310,10 @@ function getMenuItemRefDisplayName(menuItem: MenuTreeItem) {
               :class="{
                 'cursor-progress opacity-60': batchUpdating,
               }"
+              :disable-drag="batchUpdating"
               trigger-class="drag-element"
               :indent="40"
               @after-drop="handleUpdateInBatch"
-              @before-drag-start="isDragging = true"
             >
               <template #default="{ node }">
                 <div
@@ -325,9 +323,6 @@ function getMenuItemRefDisplayName(menuItem: MenuTreeItem) {
                     <div
                       v-permission="['system:menus:manage']"
                       class="drag-element absolute inset-y-0 left-0 hidden w-3.5 cursor-move items-center bg-gray-100 transition-all hover:bg-gray-200 group-hover:flex"
-                      :class="{
-                        '!hidden': isDragging,
-                      }"
                     >
                       <IconList class="h-3.5 w-3.5" />
                     </div>
