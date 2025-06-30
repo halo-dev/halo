@@ -1420,7 +1420,7 @@
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/UploadFromUrlRequest"
+                "$ref": "#/components/schemas/UcUploadFromUrlRequest"
               }
             }
           },
@@ -2470,12 +2470,12 @@
           },
           "visible": {
             "type": "string",
-            "default": "PUBLIC",
             "enum": [
               "PUBLIC",
               "INTERNAL",
               "PRIVATE"
-            ]
+            ],
+            "default": "PUBLIC"
           }
         }
       },
@@ -2911,6 +2911,22 @@
           }
         }
       },
+      "UcUploadFromUrlRequest": {
+        "required": [
+          "url"
+        ],
+        "type": "object",
+        "properties": {
+          "filename": {
+            "type": "string",
+            "description": "Custom file name"
+          },
+          "url": {
+            "type": "string",
+            "format": "url"
+          }
+        }
+      },
       "UcUploadRequest": {
         "required": [
           "file"
@@ -2941,21 +2957,6 @@
                 "$ref": "#/components/schemas/Part"
               }
             }
-          }
-        }
-      },
-      "UploadFromUrlRequest": {
-        "required": [
-          "url"
-        ],
-        "type": "object",
-        "properties": {
-          "filename": {
-            "type": "string"
-          },
-          "url": {
-            "type": "string",
-            "format": "url"
           }
         }
       },

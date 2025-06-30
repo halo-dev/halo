@@ -26,9 +26,9 @@ import { Attachment } from '../models';
 // @ts-ignore
 import { AttachmentList } from '../models';
 // @ts-ignore
-import { UcUploadRequestFormData } from '../models';
+import { UcUploadFromUrlRequest } from '../models';
 // @ts-ignore
-import { UploadFromUrlRequest } from '../models';
+import { UcUploadRequestFormData } from '../models';
 /**
  * AttachmentV1alpha1UcApi - axios parameter creator
  * @export
@@ -100,14 +100,14 @@ export const AttachmentV1alpha1UcApiAxiosParamCreator = function (configuration?
         },
         /**
          * Upload attachment from the given URL.
-         * @param {UploadFromUrlRequest} uploadFromUrlRequest 
+         * @param {UcUploadFromUrlRequest} ucUploadFromUrlRequest 
          * @param {boolean} [waitForPermalink] Wait for permalink.
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        externalTransferAttachment1: async (uploadFromUrlRequest: UploadFromUrlRequest, waitForPermalink?: boolean, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
-            // verify required parameter 'uploadFromUrlRequest' is not null or undefined
-            assertParamExists('externalTransferAttachment1', 'uploadFromUrlRequest', uploadFromUrlRequest)
+        externalTransferAttachment1: async (ucUploadFromUrlRequest: UcUploadFromUrlRequest, waitForPermalink?: boolean, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+            // verify required parameter 'ucUploadFromUrlRequest' is not null or undefined
+            assertParamExists('externalTransferAttachment1', 'ucUploadFromUrlRequest', ucUploadFromUrlRequest)
             const localVarPath = `/apis/uc.api.storage.halo.run/v1alpha1/attachments/-/upload-from-url`;
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
@@ -139,7 +139,7 @@ export const AttachmentV1alpha1UcApiAxiosParamCreator = function (configuration?
             setSearchParams(localVarUrlObj, localVarQueryParameter);
             let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
             localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
-            localVarRequestOptions.data = serializeDataIfNeeded(uploadFromUrlRequest, localVarRequestOptions, configuration)
+            localVarRequestOptions.data = serializeDataIfNeeded(ucUploadFromUrlRequest, localVarRequestOptions, configuration)
 
             return {
                 url: toPathString(localVarUrlObj),
@@ -303,13 +303,13 @@ export const AttachmentV1alpha1UcApiFp = function(configuration?: Configuration)
         },
         /**
          * Upload attachment from the given URL.
-         * @param {UploadFromUrlRequest} uploadFromUrlRequest 
+         * @param {UcUploadFromUrlRequest} ucUploadFromUrlRequest 
          * @param {boolean} [waitForPermalink] Wait for permalink.
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async externalTransferAttachment1(uploadFromUrlRequest: UploadFromUrlRequest, waitForPermalink?: boolean, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<Attachment>> {
-            const localVarAxiosArgs = await localVarAxiosParamCreator.externalTransferAttachment1(uploadFromUrlRequest, waitForPermalink, options);
+        async externalTransferAttachment1(ucUploadFromUrlRequest: UcUploadFromUrlRequest, waitForPermalink?: boolean, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<Attachment>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.externalTransferAttachment1(ucUploadFromUrlRequest, waitForPermalink, options);
             const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
             const localVarOperationServerBasePath = operationServerMap['AttachmentV1alpha1UcApi.externalTransferAttachment1']?.[localVarOperationServerIndex]?.url;
             return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
@@ -372,7 +372,7 @@ export const AttachmentV1alpha1UcApiFactory = function (configuration?: Configur
          * @throws {RequiredError}
          */
         externalTransferAttachment1(requestParameters: AttachmentV1alpha1UcApiExternalTransferAttachment1Request, options?: RawAxiosRequestConfig): AxiosPromise<Attachment> {
-            return localVarFp.externalTransferAttachment1(requestParameters.uploadFromUrlRequest, requestParameters.waitForPermalink, options).then((request) => request(axios, basePath));
+            return localVarFp.externalTransferAttachment1(requestParameters.ucUploadFromUrlRequest, requestParameters.waitForPermalink, options).then((request) => request(axios, basePath));
         },
         /**
          * List attachments of the current user uploaded.
@@ -438,10 +438,10 @@ export interface AttachmentV1alpha1UcApiCreateAttachmentForPostRequest {
 export interface AttachmentV1alpha1UcApiExternalTransferAttachment1Request {
     /**
      * 
-     * @type {UploadFromUrlRequest}
+     * @type {UcUploadFromUrlRequest}
      * @memberof AttachmentV1alpha1UcApiExternalTransferAttachment1
      */
-    readonly uploadFromUrlRequest: UploadFromUrlRequest
+    readonly ucUploadFromUrlRequest: UcUploadFromUrlRequest
 
     /**
      * Wait for permalink.
@@ -561,7 +561,7 @@ export class AttachmentV1alpha1UcApi extends BaseAPI {
      * @memberof AttachmentV1alpha1UcApi
      */
     public externalTransferAttachment1(requestParameters: AttachmentV1alpha1UcApiExternalTransferAttachment1Request, options?: RawAxiosRequestConfig) {
-        return AttachmentV1alpha1UcApiFp(this.configuration).externalTransferAttachment1(requestParameters.uploadFromUrlRequest, requestParameters.waitForPermalink, options).then((request) => request(this.axios, this.basePath));
+        return AttachmentV1alpha1UcApiFp(this.configuration).externalTransferAttachment1(requestParameters.ucUploadFromUrlRequest, requestParameters.waitForPermalink, options).then((request) => request(this.axios, this.basePath));
     }
 
     /**

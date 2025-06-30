@@ -711,6 +711,15 @@ core:
             title: 没有存储策略
             description: 在上传之前，需要新建一个存储策略
           not_select: 请先选择存储策略
+      upload_options:
+        local_upload: 本地上传
+        download: 通过链接下载
+      download_form:
+        fields:
+          url:
+            label: 链接地址
+        toast:
+          success: 下载成功
     select_modal:
       title: 选择附件
       providers:

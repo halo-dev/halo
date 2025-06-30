@@ -333,8 +333,9 @@ public class UcAttachmentEndpoint implements CustomEndpoint {
         return GroupVersion.parseAPIVersion("uc.api.storage.halo.run/v1alpha1");
     }
 
+    @Schema(name = "UcUploadFromUrlRequest")
     public record UploadFromUrlRequest(@Schema(requiredMode = REQUIRED) URL url,
-                                       String filename) {
+                                       @Schema(description = "Custom file name") String filename) {
         public UploadFromUrlRequest {
             if (Objects.isNull(url)) {
                 throw new ServerWebInputException("Required url is missing.");

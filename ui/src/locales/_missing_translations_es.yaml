@@ -222,6 +222,16 @@ core:
     policy_editing_modal:
       toast:
         policy_name_exists: Storage policy name already exists
+    upload_modal:
+      upload_options:
+        local_upload: Upload
+        download: Download from url
+      download_form:
+        fields:
+          url:
+            label: URL
+        toast:
+          success: Downloaded successfully
   uc_attachment:
     empty:
       title: There are no attachments.

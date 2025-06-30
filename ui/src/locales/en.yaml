@@ -158,8 +158,8 @@ core:
       back:
         title: Layout not saved
         description: >-
-          The current layout has not been saved, if you leave, the current layout
-          will be lost, do you want to continue?
+          The current layout has not been saved, if you leave, the current
+          layout will be lost, do you want to continue?
         confirm_text: Leave
       change_breakpoint:
         tips_not_saved: Please save the current layout first
@@ -754,6 +754,15 @@ core:
             title: No storage policy
             description: Before uploading, a new storage policy needs to be created.
           not_select: Please select a storage policy first.
+      upload_options:
+        local_upload: Upload
+        download: Download from url
+      download_form:
+        fields:
+          url:
+            label: URL
+        toast:
+          success: Downloaded successfully
     select_modal:
       title: Select attachment
       providers:
