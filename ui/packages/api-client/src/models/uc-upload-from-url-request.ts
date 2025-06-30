@@ -17,31 +17,19 @@
 /**
  * 
  * @export
- * @interface UploadFromUrlRequest
+ * @interface UcUploadFromUrlRequest
  */
-export interface UploadFromUrlRequest {
+export interface UcUploadFromUrlRequest {
     /**
      * Custom file name
      * @type {string}
-     * @memberof UploadFromUrlRequest
+     * @memberof UcUploadFromUrlRequest
      */
     'filename'?: string;
     /**
-     * The name of the group to which the attachment belongs
-     * @type {string}
-     * @memberof UploadFromUrlRequest
-     */
-    'groupName'?: string;
-    /**
-     * Storage policy name
-     * @type {string}
-     * @memberof UploadFromUrlRequest
-     */
-    'policyName': string;
-    /**
      * 
      * @type {string}
-     * @memberof UploadFromUrlRequest
+     * @memberof UcUploadFromUrlRequest
      */
     'url': string;
 }

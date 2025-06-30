@@ -51,6 +51,7 @@ async function onSubmit(data: { url: string }) {
     id="upload-from-url"
     type="form"
     name="upload-from-url"
+    :config="{ validationVisibility: 'submit' }"
     @submit="onSubmit"
   >
     <FormKit
