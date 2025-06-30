@@ -13,6 +13,7 @@ import {
   ExtensionColumn,
   ExtensionColumns,
   ExtensionCommands,
+  ExtensionDetails,
   ExtensionDocument,
   ExtensionDraggable,
   ExtensionDropcursor,
@@ -406,6 +407,9 @@ const presetExtensions = [
   ExtensionClearFormat,
   ExtensionFormatBrush,
   ExtensionRangeSelection,
+  ExtensionDetails.configure({
+    persist: true,
+  }),
 ];
 
 onMounted(async () => {
