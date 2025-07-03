@@ -1,5 +1,6 @@
 package run.halo.app.theme.dialect;
 
+import org.apache.commons.lang3.BooleanUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Component;
 import org.thymeleaf.context.ITemplateContext;
@@ -21,6 +22,8 @@ import run.halo.app.infra.utils.PathUtils;
 @Component
 public class HaloTrackerProcessor implements TemplateHeadProcessor {
 
+    public static final String SKIP_TRACKER = HaloTrackerProcessor.class.getName() + ".SKIP_TRACKER";
+
     private final ExternalUrlSupplier externalUrlGetter;
 
     public HaloTrackerProcessor(ExternalUrlSupplier externalUrlGetter) {
@@ -30,6 +33,12 @@ public class HaloTrackerProcessor implements TemplateHeadProcessor {
     @Override
     public Mono<Void> process(ITemplateContext context, IModel model,
         IElementModelStructureHandler structureHandler) {
+        // Check if tracker should be skipped
+        var isSkip = (Boolean) context.getVariable(SKIP_TRACKER);
+        if (BooleanUtils.isTrue(isSkip)) {
+            return Mono.empty();
+        }
+        
         final IModelFactory modelFactory = context.getModelFactory();
         return Mono.just(getTrackerScript(context))
             .filter(StringUtils::isNotBlank)
@@ -41,12 +50,6 @@ public class HaloTrackerProcessor implements TemplateHeadProcessor {
     }
 
     private String getTrackerScript(ITemplateContext context) {
-        // Skip script injection in preview mode to avoid tracking preview requests
-        Object previewFlag = context.getVariable("isPreview");
-        if (Boolean.TRUE.equals(previewFlag)) {
-            return StringUtils.EMPTY;
-        }
-        
         String resourceName = (String) context.getVariable("name");
         String externalUrl = externalUrlGetter.get().getPath();
         Object groupVersionKind = context.getVariable("groupVersionKind");
