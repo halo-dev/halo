@@ -171,7 +171,10 @@
   "packageManager": "pnpm@10.12.4+sha512.5ea8b0deed94ed68691c9bad4c955492705c5eeb8a87ef86bc62c74a26b037b08ff9570f108b2e4dbd1dd1a9186fea925e527f141c648e85af45631074680184",
   "pnpm": {
     "overrides": {
-      "vite": "npm:rolldown-vite@7.0.3"
+      "vite": "npm:rolldown-vite@7.0.3",
+      "prosemirror-model": "1.25.1",
+      "prosemirror-view": "1.40.0",
+      "prosemirror-transform": "1.10.4"
     },
     "onlyBuiltDependencies": [
       "@nestjs/core",
