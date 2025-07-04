@@ -25,14 +25,11 @@ import run.halo.app.infra.AnonymousUserConst;
 import run.halo.app.infra.exception.NotFoundException;
 import run.halo.app.theme.DefaultTemplateEnum;
 import run.halo.app.theme.ViewNameResolver;
+import run.halo.app.theme.dialect.HaloTrackerProcessor;
 import run.halo.app.theme.finders.PostPublicQueryService;
 import run.halo.app.theme.finders.SinglePageConversionService;
 import run.halo.app.theme.finders.vo.ContributorVo;
 import run.halo.app.theme.finders.vo.PostVo;
-import run.halo.app.theme.finders.vo.SinglePageVo;
-import run.halo.app.theme.dialect.HaloTrackerProcessor;
-import run.halo.app.theme.router.ModelConst;
-import run.halo.app.theme.router.ModelMapUtils;
 
 /**
  * <p>Preview router for previewing posts and single pages.</p>
@@ -63,18 +60,6 @@ public class PreviewRouterFunction {
             .build();
     }
 
-    /**
-     * Handles preview requests for posts.
-     *
-     * @param request the server request containing post name and optional snapshot name
-     * @return a Mono containing the server response with rendered post content
-     */
-    /**
-     * Handles preview requests for posts.
-     *
-     * @param request the server request containing post name and optional snapshot name
-     * @return a Mono containing the server response with rendered post content
-     */
     private Mono<ServerResponse> previewPost(ServerRequest request) {
         final var name = request.pathVariable("name");
         return currentAuthenticatedUserName()
@@ -98,7 +83,8 @@ public class PreviewRouterFunction {
                 String template = postVo.getSpec().getTemplate();
                 Map<String, Object> model = ModelMapUtils.postModel(postVo);
                 // Mark as preview mode for downstream view processing
-                request.exchange().getAttributes().put(HaloTrackerProcessor.SKIP_TRACKER, Boolean.TRUE);
+                request.exchange().getAttributes()
+                    .put(HaloTrackerProcessor.SKIP_TRACKER, Boolean.TRUE);
                 return viewNameResolver.resolveViewNameOrDefault(request, template,
                         DefaultTemplateEnum.POST.getValue())
                     .flatMap(templateName -> ServerResponse.ok().render(templateName, model));
@@ -127,12 +113,6 @@ public class PreviewRouterFunction {
             });
     }
 
-    /**
-     * Handles preview requests for single pages.
-     *
-     * @param request the server request containing page name and optional snapshot name
-     * @return a Mono containing the server response with rendered page content
-     */
     private Mono<ServerResponse> previewSinglePage(ServerRequest request) {
         final var name = request.pathVariable("name");
         return currentAuthenticatedUserName()
@@ -173,7 +153,8 @@ public class PreviewRouterFunction {
             .flatMap(singlePageVo -> {
                 Map<String, Object> model = ModelMapUtils.singlePageModel(singlePageVo);
                 // Mark as preview mode for downstream view processing
-                request.exchange().getAttributes().put(HaloTrackerProcessor.SKIP_TRACKER, Boolean.TRUE);
+                request.exchange().getAttributes()
+                    .put(HaloTrackerProcessor.SKIP_TRACKER, Boolean.TRUE);
                 String template = singlePageVo.getSpec().getTemplate();
                 return viewNameResolver.resolveViewNameOrDefault(request, template,
                         DefaultTemplateEnum.SINGLE_PAGE.getValue())
@@ -181,13 +162,6 @@ public class PreviewRouterFunction {
             });
     }
 
-    /**
-     * Checks if the current user can preview the content.
-     * Users can preview content if they are one of the contributors.
-     *
-     * @param contributors the list of contributors
-     * @return a Mono containing true if the user can preview, false otherwise
-     */
     private Mono<Boolean> canPreview(List<ContributorVo> contributors) {
         Assert.notNull(contributors, "The contributors must not be null");
         Set<String> contributorNames = contributors.stream()
