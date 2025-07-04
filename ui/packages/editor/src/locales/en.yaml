@@ -88,6 +88,8 @@ editor:
       toolbar_item:
         title: Format Brush
         cancel: Cancel Format Brush
+    details:
+      command_item: Details
   components:
     color_picker:
       more_color: More

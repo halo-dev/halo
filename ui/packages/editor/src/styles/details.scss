@@ -1,0 +1,56 @@
+.halo-rich-text-editor {
+  .details {
+    display: flex;
+    gap: 0.25rem;
+    margin: 1.5rem 0;
+    border: 1px solid theme("colors.gray.200");
+    border-radius: 0.5rem;
+    padding: 0.5rem;
+
+    summary {
+      all: unset;
+      font-weight: 700;
+    }
+
+    > button {
+      align-items: center;
+      background: transparent;
+      border-radius: 4px;
+      display: flex;
+      font-size: 0.625rem;
+      height: 1.25rem;
+      justify-content: center;
+      line-height: 1;
+      margin-top: 0.1rem;
+      padding: 0;
+      width: 1.25rem;
+
+      &:hover {
+        background-color: theme("colors.gray.200");
+      }
+
+      &::before {
+        content: "\25B6";
+      }
+    }
+
+    &.is-open > button::before {
+      transform: rotate(90deg);
+    }
+
+    > div {
+      display: flex;
+      flex-direction: column;
+      gap: 1rem;
+      width: 100%;
+
+      > [data-type="detailsContent"] > :last-child {
+        margin-bottom: 0.5rem;
+      }
+    }
+
+    .details {
+      margin: 0.5rem 0;
+    }
+  }
+}

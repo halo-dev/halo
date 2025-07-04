@@ -33,9 +33,7 @@ function createVitePresetsConfig(manifestPath: string) {
     return {
       mode: mode || "production",
       plugins: [Vue()],
-      define: {
-        "process.env": process.env,
-      },
+      define: { "process.env.NODE_ENV": "'production'" },
       build: {
         outDir: isProduction ? DEFAULT_OUT_DIR_PROD : DEFAULT_OUT_DIR_DEV,
         emptyOutDir: true,

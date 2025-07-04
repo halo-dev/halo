@@ -30,6 +30,7 @@ type IndentOptions = {
 };
 const Indent = Extension.create<IndentOptions, never>({
   name: "indent",
+  priority: 10000,
 
   addOptions() {
     return {
@@ -115,6 +116,28 @@ const Indent = Extension.create<IndentOptions, never>({
       "Shift-Tab": getOutdent(false),
       "Mod-]": getIndent(),
       "Mod-[": getOutdent(false),
+      Backspace: ({ editor }) => {
+        const { selection } = editor.state;
+        const { $from } = selection;
+
+        if ($from.parentOffset === 0) {
+          const node = $from.parent;
+
+          if (node.attrs.lineIndent) {
+            return editor
+              .chain()
+              .focus()
+              .updateAttributes(node.type.name, { lineIndent: false })
+              .run();
+          }
+
+          if (node.attrs.indent && node.attrs.indent > 0) {
+            return getOutdent(false)({ editor });
+          }
+        }
+
+        return false;
+      },
     };
   },
 

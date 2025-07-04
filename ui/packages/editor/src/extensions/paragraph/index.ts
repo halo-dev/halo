@@ -176,6 +176,11 @@ export function handleDeletePreviousNode(
     return false;
   }
 
+  const allowGapCursor = nodeBefore.type.spec.allowGapCursor;
+  if (!allowGapCursor) {
+    return false;
+  }
+
   if (deleteNodeByPos($from.doc.resolve(beforePos - 1))(tr)) {
     dispatch(tr);
     return true;
