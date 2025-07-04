@@ -22,7 +22,8 @@ import run.halo.app.infra.utils.PathUtils;
 @Component
 public class HaloTrackerProcessor implements TemplateHeadProcessor {
 
-    public static final String SKIP_TRACKER = HaloTrackerProcessor.class.getName() + ".SKIP_TRACKER";
+    public static final String SKIP_TRACKER =
+        HaloTrackerProcessor.class.getName() + ".SKIP_TRACKER";
 
     private final ExternalUrlSupplier externalUrlGetter;
 
@@ -38,7 +39,7 @@ public class HaloTrackerProcessor implements TemplateHeadProcessor {
         if (BooleanUtils.isTrue(isSkip)) {
             return Mono.empty();
         }
-        
+
         final IModelFactory modelFactory = context.getModelFactory();
         return Mono.just(getTrackerScript(context))
             .filter(StringUtils::isNotBlank)
