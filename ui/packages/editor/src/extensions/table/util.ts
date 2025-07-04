@@ -1,11 +1,12 @@
 import type { EditorState, Rect, Selection, Transaction } from "@/tiptap/pm";
-import { CellSelection, Node, TableMap, selectedRect } from "@/tiptap/pm";
+import { CellSelection, Node, selectedRect, TableMap } from "@/tiptap/pm";
 import { findParentNode } from "@/tiptap/vue-3";
 
 export const selectTable = (tr: Transaction) => {
   const table = findTable(tr.selection);
   if (table) {
-    const { map } = TableMap.get(table.node);
+    const { node } = table;
+    const { map } = TableMap.get(node);
     if (map && map.length) {
       const head = table.start + map[0];
       const anchor = table.start + map[map.length - 1];
