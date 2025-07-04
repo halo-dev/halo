@@ -322,6 +322,7 @@ models/thumbnail.ts
 models/totp-auth-link-response.ts
 models/totp-request.ts
 models/two-factor-auth-settings.ts
+models/uc-upload-from-url-request.ts
 models/uc-upload-request-form-data.ts
 models/upgrade-from-uri-request.ts
 models/upload-from-url-request.ts
