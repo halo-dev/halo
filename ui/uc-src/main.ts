@@ -1,3 +1,4 @@
+import { useColorScheme } from "@/composables/use-color-scheme";
 import { getBrowserLanguage, i18n, setupI18n } from "@/locales";
 import { setupApiClient } from "@/setup/setupApiClient";
 import { setupComponents } from "@/setup/setupComponents";
@@ -17,6 +18,9 @@ import { createApp, type DirectiveBinding } from "vue";
 import App from "./App.vue";
 
 const app = createApp(App);
+
+// Initialize color scheme
+useColorScheme();
 
 setupComponents(app);
 setupI18n(app);
