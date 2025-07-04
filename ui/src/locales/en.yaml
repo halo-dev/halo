@@ -1942,6 +1942,12 @@ core:
       unknown_error: Unknown error
       disable_success: Disabled successfully
       enable_success: Enabled successfully
+    scheme:
+      title: Appearance
+      tooltip: Switch color scheme
+      light: Light
+      dark: Dark
+      system: System
     dialog:
       titles:
         tip: Tip

@@ -1,4 +1,5 @@
 <script lang="ts" setup>
+import ColorSchemeSwitcher from "@/components/color-scheme-switcher/ColorSchemeSwitcher.vue";
 import { rbacAnnotations } from "@/constants/annotations";
 import { SUPER_ROLE_NAME } from "@/constants/constants";
 import { useUserStore } from "@/stores/user";
@@ -148,6 +149,7 @@ const actions = computed(() => {
     </div>
 
     <div class="user-profile__actions">
+      <ColorSchemeSwitcher />
       <button
         v-for="action in actions"
         :key="action.label"

@@ -9,6 +9,7 @@ import { getBrowserLanguage, i18n, setupI18n } from "@/locales";
 import { setupComponents } from "@/setup/setupComponents";
 import "@/setup/setupStyles";
 // core modules
+import { useColorScheme } from "@/composables/use-color-scheme";
 import { setupApiClient } from "@/setup/setupApiClient";
 import { setupVueQuery } from "@/setup/setupVueQuery";
 import { useGlobalInfoStore } from "@/stores/global-info";
@@ -24,6 +25,9 @@ import { useThemeStore } from "@console/stores/theme";
 import "core-js/es/object/has-own";
 
 const app = createApp(App);
+
+// Initialize color scheme
+useColorScheme();
 
 setupComponents(app);
 setupI18n(app);
