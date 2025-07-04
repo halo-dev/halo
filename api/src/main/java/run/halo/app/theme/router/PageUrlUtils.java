@@ -1,12 +1,12 @@
 package run.halo.app.theme.router;
 
+import java.util.Objects;
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.math.NumberUtils;
 import org.springframework.web.reactive.function.server.ServerRequest;
 import run.halo.app.extension.ListResult;
 import run.halo.app.infra.utils.PathUtils;
-import java.util.Objects;
 
 /**
  * A utility class for template page url.

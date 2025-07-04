@@ -27,12 +27,10 @@ const queryClient = useQueryClient();
 const props = withDefaults(
   defineProps<{
     isChildLevel?: boolean;
-    isDragging?: boolean;
     categoryTreeNode: CategoryTreeNode;
   }>(),
   {
     isChildLevel: false,
-    isDragging: false,
   }
 );
 
@@ -92,9 +90,6 @@ const handleOpenCreateByParentModal = () => {
       <div
         v-permission="['system:posts:manage']"
         class="drag-element absolute inset-y-0 left-0 hidden w-3.5 cursor-move items-center bg-gray-100 transition-all hover:bg-gray-200 group-hover:flex"
-        :class="{
-          '!hidden': isDragging,
-        }"
       >
         <IconList class="h-3.5 w-3.5" />
       </div>
