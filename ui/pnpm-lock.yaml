@@ -94,8 +94,8 @@ importers:
         specifier: ^4.37.1
         version: 4.37.1(vue@3.5.16(typescript@5.8.3))
       '@tiptap/extension-character-count':
-        specifier: ^2.11.2
-        version: 2.11.2(@tiptap/core@2.24.1(@tiptap/pm@2.24.1))(@tiptap/pm@2.24.1)
+        specifier: ^2.24.1
+        version: 2.24.1(@tiptap/core@2.24.1(@tiptap/pm@2.24.1))(@tiptap/pm@2.24.1)
       '@uppy/core':
         specifier: ^3.11.3
         version: 3.11.3
@@ -4074,8 +4074,8 @@ packages:
     peerDependencies:
       '@tiptap/core': ^2.7.0
 
-  '@tiptap/extension-character-count@2.11.2':
-    resolution: {integrity: sha512-Oc43NqzYO8A5jit5i10t4nAXtb79ANakTUK1O4CQFQs8Ym1Mwn2sWNPEYG31SSbbTRYOwVRUfvjMTQYcrI6FVg==}
+  '@tiptap/extension-character-count@2.24.1':
+    resolution: {integrity: sha512-0Iuwv7gP++GJLnulDSXtNZ935r5atxI4ZuRowkenfU8M0g5junjCPmzrXgaMSboqx5JC3ewFwlHnoZ7k/YaVVQ==}
     peerDependencies:
       '@tiptap/core': ^2.7.0
       '@tiptap/pm': ^2.7.0
@@ -15460,7 +15460,7 @@ snapshots:
     dependencies:
       '@tiptap/core': 2.24.1(@tiptap/pm@2.24.1)
 
-  '@tiptap/extension-character-count@2.11.2(@tiptap/core@2.24.1(@tiptap/pm@2.24.1))(@tiptap/pm@2.24.1)':
+  '@tiptap/extension-character-count@2.24.1(@tiptap/core@2.24.1(@tiptap/pm@2.24.1))(@tiptap/pm@2.24.1)':
     dependencies:
       '@tiptap/core': 2.24.1(@tiptap/pm@2.24.1)
       '@tiptap/pm': 2.24.1
