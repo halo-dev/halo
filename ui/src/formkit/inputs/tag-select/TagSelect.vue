@@ -13,6 +13,7 @@ import {
 } from "@halo-dev/components";
 import { onClickOutside } from "@vueuse/core";
 import Fuse from "fuse.js";
+import ShortUniqueId from "short-unique-id";
 import { slugify } from "transliteration";
 import { computed, ref, watch, type PropType } from "vue";
 
@@ -191,16 +192,29 @@ const scrollToSelected = () => {
   }
 };
 
+const uid = new ShortUniqueId();
+
 const handleCreateTag = async () => {
   if (!currentUserHasPermission(["system:posts:manage"])) {
     return;
+  }
+
+  let slug = slugify(text.value, { trim: true });
+
+  // Check if slug is unique, if not, add -1 to the slug
+  const { data: tagsWithSameSlug } = await coreApiClient.content.tag.listTag({
+    fieldSelector: [`spec.slug=${slug}`],
+  });
+
+  if (tagsWithSameSlug.total) {
+    slug = `${slug}-${uid.randomUUID(8)}`;
   }
 
   const { data } = await coreApiClient.content.tag.createTag({
     tag: {
       spec: {
         displayName: text.value,
-        slug: slugify(text.value, { trim: true }),
+        slug,
         color: "#ffffff",
         cover: "",
       },
