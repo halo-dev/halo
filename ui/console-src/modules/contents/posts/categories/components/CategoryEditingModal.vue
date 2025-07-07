@@ -5,7 +5,7 @@ import { setFocus } from "@/formkit/utils/focus";
 import { FormType } from "@/types/slug";
 import useSlugify from "@console/composables/use-slugify";
 import { useThemeCustomTemplates } from "@console/modules/interface/themes/composables/use-theme";
-import { reset, submitForm } from "@formkit/core";
+import { reset, submitForm, type FormKitNode } from "@formkit/core";
 import type { Category } from "@halo-dev/api-client";
 import { coreApiClient } from "@halo-dev/api-client";
 import {
@@ -181,6 +181,28 @@ const { handleGenerateSlug } = useSlugify(
   computed(() => !isUpdateMode),
   FormType.CATEGORY
 );
+
+// fixme: check if slug is unique
+// Finally, we need to check if the slug is unique in the database
+async function slugUniqueValidation(node: FormKitNode) {
+  const value = node.value;
+  if (!value) {
+    return true;
+  }
+
+  const fieldSelector = [`spec.slug=${value}`];
+
+  if (props.category) {
+    fieldSelector.push(`metadata.name!=${props.category.metadata.name}`);
+  }
+
+  const { data: categoriesWithSameSlug } =
+    await coreApiClient.content.category.listCategory({
+      fieldSelector,
+    });
+
+  return !categoriesWithSameSlug.total;
+}
 </script>
 <template>
   <VModal
@@ -231,7 +253,13 @@ const { handleGenerateSlug } = useSlugify(
               name="slug"
               :label="$t('core.post_category.editing_modal.fields.slug.label')"
               type="text"
-              validation="required|length:0,50"
+              validation="required|length:0,50|slugUniqueValidation"
+              :validation-rules="{ slugUniqueValidation }"
+              :validation-messages="{
+                slugUniqueValidation: $t(
+                  'core.common.form.validation.slug_unique'
+                ),
+              }"
             >
               <template #suffix>
                 <div
