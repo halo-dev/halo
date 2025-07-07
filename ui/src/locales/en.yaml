@@ -1998,6 +1998,9 @@ core:
       recovering: Recovering
     fields:
       post_count: "{count} Posts"
+    form:
+      validation:
+        slug_unique: The current slug already exists
   uc_post:
     creation_modal:
       title: Create post

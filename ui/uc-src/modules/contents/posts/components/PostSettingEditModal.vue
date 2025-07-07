@@ -65,20 +65,21 @@ async function onSubmit(data: PostFormState) {
   >
     <PostSettingForm
       :form-state="{
-        title: props.post.spec.title,
-        slug: props.post.spec.slug,
-        cover: props.post.spec.cover,
-        categories: props.post.spec.categories,
-        tags: props.post.spec.tags,
-        allowComment: props.post.spec.allowComment,
-        visible: props.post.spec.visible,
-        pinned: props.post.spec.pinned,
-        publishTime: props.post.spec.publishTime
-          ? toDatetimeLocal(props.post.spec.publishTime)
+        title: post.spec.title,
+        slug: post.spec.slug,
+        cover: post.spec.cover,
+        categories: post.spec.categories,
+        tags: post.spec.tags,
+        allowComment: post.spec.allowComment,
+        visible: post.spec.visible,
+        pinned: post.spec.pinned,
+        publishTime: post.spec.publishTime
+          ? toDatetimeLocal(post.spec.publishTime)
           : undefined,
-        excerptAutoGenerate: props.post.spec.excerpt.autoGenerate,
-        excerptRaw: props.post.spec.excerpt.raw,
+        excerptAutoGenerate: post.spec.excerpt.autoGenerate,
+        excerptRaw: post.spec.excerpt.raw,
       }"
+      :name="post.metadata.name"
       update-mode
       @submit="onSubmit"
     />
