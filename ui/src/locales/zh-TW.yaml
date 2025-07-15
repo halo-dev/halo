@@ -1031,9 +1031,15 @@ core:
       enable:
         title: 取消停用
         description: 確定要取消停用該用戶嗎？
+      enable_in_batch:
+        title: 批量启用
+        description: 確定要启用所選用戶嗎？啟用後該用戶將可以重新登入系統
       disable:
         title: 停用
         description: 確定要停用該用戶嗎？停用後該用戶將無法登入系統
+      disable_in_batch:
+        title: 批量停用
+        description: 確定要停用所選用戶嗎？停用後這些用戶將無法登入系統
     filters:
       role:
         label: 角色
@@ -1792,6 +1798,8 @@ core:
       unknown_error: 未知錯誤
       disable_success: 禁用成功
       enable_success: 啟用成功
+      no_users_to_enable: 所有選中的用戶都已啟用
+      no_users_to_disable: 所有選中的用戶都已停用
     dialog:
       titles:
         tip: 提示

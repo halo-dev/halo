@@ -1046,9 +1046,15 @@ core:
       enable:
         title: 取消禁用
         description: 确定取消禁用该用户吗？
+      enable_in_batch:
+        title: 批量启用
+        description: 确定要启用所选用户吗？启用后该用户将可以重新登录系统
       disable:
         title: 禁用
-        description: 确定禁用该用户吗？禁用之后该用户将无法登录系统
+        description: 确定禁用该用户吗？禁用后该用户将无法登录系统
+      disable_in_batch:
+        title: 批量禁用
+        description: 确定要禁用所选用户吗？禁用后这些用户将无法登录系统
     filters:
       role:
         label: 角色
@@ -1805,8 +1811,10 @@ core:
       not_found: 资源不存在
       server_internal_error: 服务器内部错误
       unknown_error: 未知错误
-      disable_success: 禁用成功
-      enable_success: 啟用成功
+      disable_success: 停用成功
+      enable_success: 启用成功
+      no_users_to_enable: 所有选中的用户已启用
+      no_users_to_disable: 所有选中的用户已停用
     dialog:
       titles:
         tip: 提示

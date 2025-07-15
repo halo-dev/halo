@@ -137,6 +137,72 @@ const handleDeleteInBatch = async () => {
   });
 };
 
+const handleEnableInBatch = async () => {
+  Dialog.warning({
+    title: t("core.user.operations.enable_in_batch.title"),
+    description: t("core.user.operations.enable_in_batch.description"),
+    confirmType: "primary",
+    confirmText: t("core.common.buttons.confirm"),
+    cancelText: t("core.common.buttons.cancel"),
+    onConfirm: async () => {
+      const userNamesToEnable = selectedUserNames.value.filter((name) => {
+        if (name === userStore.currentUser?.metadata.name) {
+          return false;
+        }
+        const user = users.value?.find((u) => u.user.metadata.name === name);
+        return user?.user.spec.disabled === true;
+      });
+      if (!userNamesToEnable.length) {
+        Toast.info(t("core.common.toast.no_users_to_enable"));
+        return;
+      }
+      await Promise.all(
+        userNamesToEnable.map((name) => {
+          return consoleApiClient.user.enableUser({
+            username: name,
+          });
+        })
+      );
+      await refetch();
+      selectedUserNames.value.length = 0;
+      Toast.success(t("core.common.toast.enable_success"));
+    },
+  });
+};
+
+const handleDisableInBatch = async () => {
+  Dialog.warning({
+    title: t("core.user.operations.disable_in_batch.title"),
+    description: t("core.user.operations.disable_in_batch.description"),
+    confirmType: "danger",
+    confirmText: t("core.common.buttons.confirm"),
+    cancelText: t("core.common.buttons.cancel"),
+    onConfirm: async () => {
+      const userNamesToDisable = selectedUserNames.value.filter((name) => {
+        if (name === userStore.currentUser?.metadata.name) {
+          return false;
+        }
+        const user = users.value?.find((u) => u.user.metadata.name === name);
+        return user?.user.spec.disabled === false;
+      });
+      if (!userNamesToDisable.length) {
+        Toast.info(t("core.common.toast.no_users_to_disable"));
+        return;
+      }
+      await Promise.all(
+        userNamesToDisable.map((name) => {
+          return consoleApiClient.user.disableUser({
+            username: name,
+          });
+        })
+      );
+      await refetch();
+      selectedUserNames.value.length = 0;
+      Toast.success(t("core.common.toast.disable_success"));
+    },
+  });
+};
+
 watch(selectedUserNames, (newValue) => {
   checkedAll.value =
     newValue.length ===
@@ -242,6 +308,12 @@ function onCreationModalClose() {
             <div class="flex w-full flex-1 items-center sm:w-auto">
               <SearchInput v-if="!selectedUserNames.length" v-model="keyword" />
               <VSpace v-else>
+                <VButton type="secondary" @click="handleDisableInBatch">
+                  {{ $t("core.common.buttons.disable") }}
+                </VButton>
+                <VButton type="secondary" @click="handleEnableInBatch">
+                  {{ $t("core.common.buttons.enable") }}
+                </VButton>
                 <VButton type="danger" @click="handleDeleteInBatch">
                   {{ $t("core.common.buttons.delete") }}
                 </VButton>
