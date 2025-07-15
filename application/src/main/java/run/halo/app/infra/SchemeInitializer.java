@@ -654,7 +654,8 @@ class SchemeInitializer implements SmartLifecycle {
             indexSpec.add(new IndexSpec()
                 .setName("status.phase")
                 .setIndexFunc(
-                    simpleAttribute(LocalThumbnail.class, thumbnail -> Optional.ofNullable(thumbnail.getStatus())
+                    simpleAttribute(LocalThumbnail.class,
+                        thumbnail -> Optional.of(thumbnail.getStatus())
                         .map(LocalThumbnail.Status::getPhase)
                         .map(LocalThumbnail.Phase::name)
                         .orElse(null))
