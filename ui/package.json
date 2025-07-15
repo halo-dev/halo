@@ -11,8 +11,8 @@
     "build": "vue-tsc --noEmit -p tsconfig.app.json --composite false && run-p build:console build:uc",
     "build:uc": "vite build --config ./vite.uc.config.ts",
     "build:console": "vite build --config ./vite.config.ts",
-    "build:packages": "pnpm --filter \"./packages/**\" build",
-    "api-client:gen": "pnpm --filter \"./packages/api-client\" gen",
+    "build:packages": "pnpm -r run build",
+    "api-client:gen": "pnpm -C packages/api-client gen",
     "test:unit": "vitest --run && pnpm run test:unit:packages",
     "test:unit:watch": "vitest --watch",
     "test:unit:ui": "vitest --watch --ui",
@@ -20,8 +20,8 @@
     "typecheck": "vue-tsc --noEmit -p tsconfig.app.json --composite false && pnpm run typecheck:packages",
     "lint": "eslint . --max-warnings=0 -f html -o build/lint-result/index.html",
     "prettier": "prettier . --write",
-    "typecheck:packages": "pnpm --parallel --filter \"./packages/**\" run typecheck",
-    "test:unit:packages": "pnpm --parallel --filter \"./packages/**\" run test:unit"
+    "typecheck:packages": "pnpm --parallel -r run typecheck",
+    "test:unit:packages": "pnpm --parallel -r run test:unit"
   },
   "lint-staged": {
     "**/*": "prettier --write --ignore-unknown",
