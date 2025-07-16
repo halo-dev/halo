@@ -1116,7 +1116,7 @@ core:
         title: Enable
         description: Are you sure you want to enable this user?
       enable_in_batch:
-        title: Enable in Batch
+        title: Enable
         description: >-
           Are you sure you want to enable the selected users? They will be able 
           to log in again after being enabled.

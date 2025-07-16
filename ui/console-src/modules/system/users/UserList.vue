@@ -24,6 +24,7 @@ import {
 } from "@halo-dev/components";
 import { useQuery } from "@tanstack/vue-query";
 import { useRouteQuery } from "@vueuse/router";
+import { chunk } from "lodash-es";
 import { computed, onMounted, ref, watch } from "vue";
 import { useI18n } from "vue-i18n";
 import UserCreationModal from "./components/UserCreationModal.vue";
@@ -123,18 +124,48 @@ const handleDeleteInBatch = async () => {
       const userNamesToDelete = selectedUserNames.value.filter(
         (name) => name != userStore.currentUser?.metadata.name
       );
-      await Promise.all(
-        userNamesToDelete.map((name) => {
-          return coreApiClient.user.deleteUser({
-            name,
-          });
-        })
-      );
+      const chunks = chunk(userNamesToDelete, 5);
+      for (const chunk of chunks) {
+        await Promise.all(
+          chunk.map((name) => {
+            return coreApiClient.user.deleteUser({
+              name,
+            });
+          })
+        );
+      }
       await refetch();
       selectedUserNames.value.length = 0;
       Toast.success(t("core.common.toast.delete_success"));
     },
   });
+};
+
+const handleUserBatchOperation = async ({
+  filterCondition,
+  apiMethod,
+  successMessageKey,
+  emptyMessageKey,
+}) => {
+  const filteredUserNames = selectedUserNames.value.filter((name) => {
+    if (name === userStore.currentUser?.metadata.name) return false;
+    const user = users.value?.find((u) => u.user.metadata.name === name);
+    return user && filterCondition(user.user);
+  });
+
+  if (!filteredUserNames.length) {
+    Toast.info(t(emptyMessageKey));
+    return;
+  }
+
+  const chunks = chunk(filteredUserNames, 5);
+  for (const chunk of chunks) {
+    await Promise.all(chunk.map((name) => apiMethod(name)));
+  }
+
+  await refetch();
+  selectedUserNames.value.length = 0;
+  Toast.success(t(successMessageKey));
 };
 
 const handleEnableInBatch = async () => {
@@ -145,27 +176,13 @@ const handleEnableInBatch = async () => {
     confirmText: t("core.common.buttons.confirm"),
     cancelText: t("core.common.buttons.cancel"),
     onConfirm: async () => {
-      const userNamesToEnable = selectedUserNames.value.filter((name) => {
-        if (name === userStore.currentUser?.metadata.name) {
-          return false;
-        }
-        const user = users.value?.find((u) => u.user.metadata.name === name);
-        return user?.user.spec.disabled === true;
+      await handleUserBatchOperation({
+        filterCondition: (user) => user.spec.disabled === true,
+        apiMethod: (name) =>
+          consoleApiClient.user.enableUser({ username: name }),
+        successMessageKey: "core.common.toast.enable_success",
+        emptyMessageKey: "core.common.toast.no_users_to_enable",
       });
-      if (!userNamesToEnable.length) {
-        Toast.info(t("core.common.toast.no_users_to_enable"));
-        return;
-      }
-      await Promise.all(
-        userNamesToEnable.map((name) => {
-          return consoleApiClient.user.enableUser({
-            username: name,
-          });
-        })
-      );
-      await refetch();
-      selectedUserNames.value.length = 0;
-      Toast.success(t("core.common.toast.enable_success"));
     },
   });
 };
@@ -178,27 +195,13 @@ const handleDisableInBatch = async () => {
     confirmText: t("core.common.buttons.confirm"),
     cancelText: t("core.common.buttons.cancel"),
     onConfirm: async () => {
-      const userNamesToDisable = selectedUserNames.value.filter((name) => {
-        if (name === userStore.currentUser?.metadata.name) {
-          return false;
-        }
-        const user = users.value?.find((u) => u.user.metadata.name === name);
-        return user?.user.spec.disabled === false;
+      await handleUserBatchOperation({
+        filterCondition: (user) => user.spec.disabled === false,
+        apiMethod: (name) =>
+          consoleApiClient.user.disableUser({ username: name }),
+        successMessageKey: "core.common.toast.disable_success",
+        emptyMessageKey: "core.common.toast.no_users_to_disable",
       });
-      if (!userNamesToDisable.length) {
-        Toast.info(t("core.common.toast.no_users_to_disable"));
-        return;
-      }
-      await Promise.all(
-        userNamesToDisable.map((name) => {
-          return consoleApiClient.user.disableUser({
-            username: name,
-          });
-        })
-      );
-      await refetch();
-      selectedUserNames.value.length = 0;
-      Toast.success(t("core.common.toast.disable_success"));
     },
   });
 };
