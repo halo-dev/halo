@@ -1032,7 +1032,7 @@ core:
         title: 取消停用
         description: 確定要取消停用該用戶嗎？
       enable_in_batch:
-        title: 批量启用
+        title: 启用
         description: 確定要启用所選用戶嗎？啟用後該用戶將可以重新登入系統
       disable:
         title: 停用
