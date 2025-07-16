@@ -1126,7 +1126,7 @@ core:
           Are you sure you want to disable this user? This user will not be able
           to log in after being disabled
       disable_in_batch:
-        title: Disable Selected Users
+        title: Disable
         description: >-
           Are you sure you want to disable the selected users? They will no longer 
           be able to log in after being disabled.
