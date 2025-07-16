@@ -696,6 +696,15 @@ core:
             title: 沒有存儲策略
             description: 在上傳之前，需要新建一個存儲策略
           not_select: 請先選擇存儲策略
+      upload_options:
+        local_upload: 本地上傳
+        download: 通過鏈接下載
+      download_form:
+        fields:
+          url:
+            label: 鏈接地址
+        toast:
+          success: 下載成功
     select_modal:
       title: 選擇附件
       providers:

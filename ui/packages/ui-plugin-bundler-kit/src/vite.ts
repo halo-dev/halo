@@ -1,14 +1,14 @@
+import Vue from "@vitejs/plugin-vue";
 import {
   defineConfig,
   mergeConfig,
   UserConfig,
   UserConfigFnObject,
 } from "vite";
-import Vue from "@vitejs/plugin-vue";
-import { EXTERNALS, GLOBALS } from "./constants/externals";
 import { DEFAULT_OUT_DIR_DEV, DEFAULT_OUT_DIR_PROD } from "./constants/build";
-import { getHaloPluginManifest } from "./utils/halo-plugin";
+import { EXTERNALS, GLOBALS } from "./constants/externals";
 import { DEFAULT_MANIFEST_PATH } from "./constants/halo-plugin";
+import { getHaloPluginManifest } from "./utils/halo-plugin";
 
 export interface ViteUserConfig {
   /**
@@ -33,9 +33,7 @@ function createVitePresetsConfig(manifestPath: string) {
     return {
       mode: mode || "production",
       plugins: [Vue()],
-      define: {
-        "process.env": process.env,
-      },
+      define: { "process.env.NODE_ENV": "'production'" },
       build: {
         outDir: isProduction ? DEFAULT_OUT_DIR_PROD : DEFAULT_OUT_DIR_DEV,
         emptyOutDir: true,
@@ -44,6 +42,7 @@ function createVitePresetsConfig(manifestPath: string) {
           name: manifest.metadata.name,
           formats: ["iife"],
           fileName: () => "main.js",
+          cssFileName: "style",
         },
         rollupOptions: {
           external: EXTERNALS,

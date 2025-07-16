@@ -24,14 +24,17 @@ const groupedWidgetDefinitions = computed(() => {
     (widget) => activeId.value === "" || widget.group === activeId.value
   );
 
-  const groups = filteredWidgets?.reduce((acc, widget) => {
-    const key = `${widget.defaultSize.w}-${widget.defaultSize.h}`;
-    if (!acc[key]) {
-      acc[key] = [];
-    }
-    acc[key].push(widget);
-    return acc;
-  }, {} as Record<string, DashboardWidgetDefinition[]>);
+  const groups = filteredWidgets?.reduce(
+    (acc, widget) => {
+      const key = `${widget.defaultSize.w}-${widget.defaultSize.h}`;
+      if (!acc[key]) {
+        acc[key] = [];
+      }
+      acc[key].push(widget);
+      return acc;
+    },
+    {} as Record<string, DashboardWidgetDefinition[]>
+  );
 
   return Object.entries(groups || {})
     .map(([key, widgets]) => {
@@ -48,11 +51,14 @@ const groupedWidgetDefinitions = computed(() => {
 });
 
 const groupWidgetDefinitions = computed(() => {
-  return availableWidgetDefinitions?.value?.reduce((acc, item) => {
-    acc[item.group] = acc[item.group] || [];
-    acc[item.group].push(item);
-    return acc;
-  }, {} as Record<string, DashboardWidgetDefinition[]>);
+  return availableWidgetDefinitions?.value?.reduce(
+    (acc, item) => {
+      acc[item.group] = acc[item.group] || [];
+      acc[item.group].push(item);
+      return acc;
+    },
+    {} as Record<string, DashboardWidgetDefinition[]>
+  );
 });
 
 const groupWidgetDefinitionsKeys = computed(() => {
@@ -80,7 +86,7 @@ const groupWidgetDefinitionsKeys = computed(() => {
       ]"
       type="outline"
     ></VTabbar>
-    <div class="mt-4 flex flex-col gap-5 -m-2">
+    <div class="-m-2 mt-4 flex flex-col gap-5">
       <div
         v-for="(group, index) in groupedWidgetDefinitions"
         :key="index"
@@ -99,7 +105,7 @@ const groupWidgetDefinitionsKeys = computed(() => {
             class="cursor-pointer p-2"
             @click="emit('add-widget', item)"
           >
-            <div class="pointer-events-none w-full h-full">
+            <div class="pointer-events-none h-full w-full">
               <component
                 :is="item.component"
                 preview-mode

@@ -26,13 +26,14 @@ import ExtensionTable from "./table";
 import ExtensionTaskList from "./task-list";
 import ExtensionTextAlign from "./text-align";
 import ExtensionUnderline from "./underline";
+import ExtensionDetails from "./details";
 
 // Custom extensions
-import ExtensionTextStyle from "@/extensions/text-style";
 import {
   ExtensionCodeBlock,
   type ExtensionCodeBlockOptions,
 } from "@/extensions/code-block";
+import ExtensionTextStyle from "@/extensions/text-style";
 import { ExtensionCommands } from "../extensions/commands-menu";
 import ExtensionAudio from "./audio";
 import ExtensionClearFormat from "./clear-format";
@@ -107,9 +108,11 @@ const allExtensions = [
   ExtensionClearFormat,
   ExtensionFormatBrush,
   ExtensionRangeSelection,
+  ExtensionDetails,
 ];
 
 export {
+  allExtensions,
   ExtensionAudio,
   ExtensionBlockquote,
   ExtensionBold,
@@ -155,8 +158,8 @@ export {
   ExtensionTrailingNode,
   ExtensionUnderline,
   ExtensionVideo,
+  ExtensionDetails,
   RangeSelection,
-  allExtensions,
 };
 
 export type { ExtensionCodeBlockOptions };

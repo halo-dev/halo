@@ -1,11 +1,11 @@
 import { fileURLToPath, URL } from "url";
 
-import { defineConfig, type Plugin } from "vite";
 import Vue from "@vitejs/plugin-vue";
 import VueJsx from "@vitejs/plugin-vue-jsx";
-import Icons from "unplugin-icons/vite";
-import Dts from "vite-plugin-dts";
 import path from "path";
+import Icons from "unplugin-icons/vite";
+import { defineConfig, type Plugin } from "vite";
+import Dts from "vite-plugin-dts";
 
 export default defineConfig({
   experimental: {

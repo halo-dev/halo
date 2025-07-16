@@ -238,14 +238,14 @@ export class BubbleMenuView {
     const placement = this.tippyOptions?.placement
       ? this.tippyOptions?.placement
       : isNodeSelection(selection)
-      ? ACTIVE_BUBBLE_MENUS.length > 1
-        ? "bottom"
-        : "top"
-      : this.tippy?.props.fixed
-      ? "bottom-start"
-      : Math.abs(cursorAt - to) <= Math.abs(cursorAt - from)
-      ? "bottom-start"
-      : "top-start";
+        ? ACTIVE_BUBBLE_MENUS.length > 1
+          ? "bottom"
+          : "top"
+        : this.tippy?.props.fixed
+          ? "bottom-start"
+          : Math.abs(cursorAt - to) <= Math.abs(cursorAt - from)
+            ? "bottom-start"
+            : "top-start";
 
     const otherBubbleMenus = ACTIVE_BUBBLE_MENUS.filter(
       (instance) =>
@@ -258,8 +258,8 @@ export class BubbleMenuView {
     let offsetY = otherBubbleMenus.length
       ? otherBubbleMenus.reduce((prev, instance, currentIndex, array) => {
           const prevY = array[currentIndex - 1]
-            ? array[currentIndex - 1]?.popperInstance?.state?.modifiersData
-                ?.popperOffsets?.y ?? 0
+            ? (array[currentIndex - 1]?.popperInstance?.state?.modifiersData
+                ?.popperOffsets?.y ?? 0)
             : 0;
           const currentY =
             instance?.popperInstance?.state?.modifiersData?.popperOffsets?.y ??
@@ -272,7 +272,7 @@ export class BubbleMenuView {
 
           return prev;
         }, 0)
-      : offset?.[1] ?? 10;
+      : (offset?.[1] ?? 10);
     if (!offsetY) {
       offsetY = 10;
     }

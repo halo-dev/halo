@@ -9,7 +9,7 @@ export const repeats = function (node: FormKitNode) {
 type FnType = (index: number) => object;
 
 function createValue(num: number, fn: FnType) {
-  return new Array(num).fill("").map((value, index) => fn(index));
+  return new Array(num).fill("").map((_, index) => fn(index));
 }
 
 function repeaterFeature(node: FormKitNode) {
@@ -50,20 +50,23 @@ function repeaterFeature(node: FormKitNode) {
     const fns = node.context.fns;
     fns.createShift = (index: number, offset: number) => () => {
       const value = node._value as unknown[];
-      value.splice(index + offset, 0, value.splice(index, 1)[0]),
-        node.input(value, false);
+      value.splice(index + offset, 0, value.splice(index, 1)[0]);
+      node.input(value, false);
     };
     fns.createInsert = (index: number) => () => {
       const value = node._value as unknown[];
-      value.splice(index + 1, 0, {}), node.input(value, false);
+      value.splice(index + 1, 0, {});
+      node.input(value, false);
     };
     fns.createAppend = () => () => {
       const value = node._value as unknown[];
-      value.push({}), node.input(value, false);
+      value.push({});
+      node.input(value, false);
     };
     fns.createRemover = (index: number) => () => {
       const value = node._value as unknown[];
-      value.splice(index, 1), node.input(value, false);
+      value.splice(index, 1);
+      node.input(value, false);
     };
   }
 }

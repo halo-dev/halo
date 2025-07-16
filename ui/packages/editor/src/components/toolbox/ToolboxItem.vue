@@ -26,12 +26,12 @@ const action = () => {
 
 <template>
   <div
-    class="flex flex-row items-center rounded gap-3 py-1 px-1.5 group cursor-pointer hover:bg-gray-100"
+    class="group flex cursor-pointer flex-row items-center gap-3 rounded px-1.5 py-1 hover:bg-gray-100"
     @click="action"
   >
     <component
       :is="icon"
-      class="bg-gray-100 p-1.5 rounded w-7 h-7 group-hover:bg-white"
+      class="h-7 w-7 rounded bg-gray-100 p-1.5 group-hover:bg-white"
     />
     <div class="flex flex-col gap-0.5">
       <span

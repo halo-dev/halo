@@ -1,5 +1,4 @@
 <script lang="ts" setup>
-import UppyUpload from "@/components/upload/UppyUpload.vue";
 import type { PolicyTemplate } from "@halo-dev/api-client";
 import {
   IconAddCircle,
@@ -7,6 +6,8 @@ import {
   VDropdown,
   VDropdownItem,
   VModal,
+  VTabItem,
+  VTabs,
 } from "@halo-dev/components";
 import { useLocalStorage } from "@vueuse/core";
 import { onMounted, ref } from "vue";
@@ -19,6 +20,7 @@ import AttachmentGroupBadge from "./AttachmentGroupBadge.vue";
 import AttachmentGroupEditingModal from "./AttachmentGroupEditingModal.vue";
 import AttachmentPolicyBadge from "./AttachmentPolicyBadge.vue";
 import AttachmentPolicyEditingModal from "./AttachmentPolicyEditingModal.vue";
+import UploadFromUrl from "./UploadFromUrl.vue";
 
 const emit = defineEmits<{
   (event: "close"): void;
@@ -63,6 +65,8 @@ const onGroupEditingModalClose = async () => {
   await handleFetchGroups();
   groupEditingModal.value = false;
 };
+
+const activeTab = ref("upload");
 </script>
 
 <template>
@@ -157,22 +161,43 @@ const onGroupEditingModalClose = async () => {
           </template>
         </AttachmentGroupBadge>
       </div>
-      <UppyUpload
-        endpoint="/apis/api.console.halo.run/v1alpha1/attachments/upload"
-        :disabled="!selectedPolicyName"
-        :meta="{
-          policyName: selectedPolicyName,
-          groupName: selectedGroupName,
-        }"
-        width="100%"
-        :allowed-meta-fields="['policyName', 'groupName']"
-        :note="
-          selectedPolicyName
-            ? ''
-            : $t('core.attachment.upload_modal.filters.policy.not_select')
-        "
-        :done-button-handler="() => modal?.close()"
-      />
+
+      <div class="mb-3">
+        <VTabs v-model:active-id="activeTab" type="outline">
+          <VTabItem
+            id="upload"
+            :label="
+              $t('core.attachment.upload_modal.upload_options.local_upload')
+            "
+          >
+            <UppyUpload
+              endpoint="/apis/api.console.halo.run/v1alpha1/attachments/upload"
+              :disabled="!selectedPolicyName"
+              :meta="{
+                policyName: selectedPolicyName,
+                groupName: selectedGroupName,
+              }"
+              width="100%"
+              :allowed-meta-fields="['policyName', 'groupName']"
+              :note="
+                selectedPolicyName
+                  ? ''
+                  : $t('core.attachment.upload_modal.filters.policy.not_select')
+              "
+              :done-button-handler="() => modal?.close()"
+            />
+          </VTabItem>
+          <VTabItem
+            id="download"
+            :label="$t('core.attachment.upload_modal.upload_options.download')"
+          >
+            <UploadFromUrl
+              :policy-name="selectedPolicyName"
+              :group-name="selectedGroupName"
+            />
+          </VTabItem>
+        </VTabs>
+      </div>
     </div>
   </VModal>
 

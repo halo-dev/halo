@@ -32,7 +32,7 @@ withDefaults(
       { 'cursor-not-allowed opacity-70': disabled },
       { 'hover:bg-gray-100': !disabled },
     ]"
-    class="inline-flex items-center space-x-1 p-1.5 rounded-md"
+    class="inline-flex items-center space-x-1 rounded-md p-1.5 active:bg-gray-200"
     :disabled="disabled"
     tabindex="-1"
     @click="action"

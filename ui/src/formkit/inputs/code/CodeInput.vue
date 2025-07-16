@@ -31,6 +31,15 @@ useEventListener(codeInputWrapperRef, "keydown", (e: KeyboardEvent) => {
     fullscreen.value = false;
   }
 });
+
+const editorHeight = computed(() => {
+  if (fullscreen.value) {
+    // VPageHeader height is 3.5rem
+    return "calc(100vh - 3.5rem)";
+  }
+
+  return "100%";
+});
 </script>
 
 <template>
@@ -52,7 +61,7 @@ useEventListener(codeInputWrapperRef, "keydown", (e: KeyboardEvent) => {
       <VCodemirror
         :model-value="props.context._value"
         v-bind="context.attrs"
-        height="100%"
+        :height="editorHeight"
         :language="language"
         class="block w-full"
         @change="onChange"
@@ -62,6 +71,7 @@ useEventListener(codeInputWrapperRef, "keydown", (e: KeyboardEvent) => {
         v-if="!fullscreen"
         v-tooltip="$t('core.formkit.code.fullscreen.enter')"
         class="absolute bottom-2 right-2 inline-flex cursor-pointer items-center justify-center rounded-full bg-primary p-1.5 text-white opacity-0 transition-all hover:!opacity-90 hover:shadow group-hover:opacity-100"
+        type="button"
         @click="fullscreen = true"
       >
         <RiFullscreenLine class="text-xs" />

@@ -21,10 +21,10 @@ provide(AvatarGroupContextInjectionKey, props);
 
 <style lang="scss">
 .avatar-group-wrapper {
-  @apply -space-x-2.5 inline-flex;
+  @apply inline-flex -space-x-2.5;
 
   > * {
-    @apply hover:z-10 ring-2 ring-white transition-all;
+    @apply ring-2 ring-white transition-all hover:z-10;
   }
 }
 </style>

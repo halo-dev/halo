@@ -27,12 +27,10 @@ const queryClient = useQueryClient();
 const props = withDefaults(
   defineProps<{
     isChildLevel?: boolean;
-    isDragging?: boolean;
     categoryTreeNode: CategoryTreeNode;
   }>(),
   {
     isChildLevel: false,
-    isDragging: false,
   }
 );
 
@@ -86,19 +84,16 @@ const handleOpenCreateByParentModal = () => {
 </script>
 <template>
   <div
-    class="px-4 py-3 hover:bg-gray-50 w-full group items-center flex justify-between relative"
+    class="group relative flex w-full items-center justify-between px-4 py-3 hover:bg-gray-50"
   >
     <div>
       <div
         v-permission="['system:posts:manage']"
         class="drag-element absolute inset-y-0 left-0 hidden w-3.5 cursor-move items-center bg-gray-100 transition-all hover:bg-gray-200 group-hover:flex"
-        :class="{
-          '!hidden': isDragging,
-        }"
       >
         <IconList class="h-3.5 w-3.5" />
       </div>
-      <div class="gap-1 flex flex-col">
+      <div class="flex flex-col gap-1">
         <div class="inline-flex items-center gap-2">
           <span class="truncate text-sm font-medium text-gray-900">
             {{ categoryTreeNode.spec.displayName }}

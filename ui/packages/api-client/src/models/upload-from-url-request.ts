@@ -21,11 +21,23 @@
  */
 export interface UploadFromUrlRequest {
     /**
-     * 
+     * Custom file name
      * @type {string}
      * @memberof UploadFromUrlRequest
      */
     'filename'?: string;
+    /**
+     * The name of the group to which the attachment belongs
+     * @type {string}
+     * @memberof UploadFromUrlRequest
+     */
+    'groupName'?: string;
+    /**
+     * Storage policy name
+     * @type {string}
+     * @memberof UploadFromUrlRequest
+     */
+    'policyName': string;
     /**
      * 
      * @type {string}

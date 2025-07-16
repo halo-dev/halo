@@ -329,7 +329,7 @@ function handleCopyFromLayout(breakpoint: string) {
     </h2>
     <div
       class="hidden sm:block"
-      :class="{ 'opacity-50 !cursor-progress': isLoading }"
+      :class="{ '!cursor-progress opacity-50': isLoading }"
     >
       <VTabbar
         :active-id="selectBreakpoint"

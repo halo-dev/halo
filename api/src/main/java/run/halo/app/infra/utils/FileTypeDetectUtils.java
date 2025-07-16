@@ -73,7 +73,7 @@ public class FileTypeDetectUtils {
     /**
      * <p>Recommend to use this method to verify whether the file extension matches the file type
      * after matching the file type to avoid XSS attacks such as bypassing detection by polyglot
-     * file</p>
+     * file.</p>
      *
      * @param mimeType file mime type,such as "image/png"
      * @param fileName file name,such as "test.png"

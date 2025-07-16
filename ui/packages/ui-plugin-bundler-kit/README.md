@@ -273,20 +273,20 @@ Both Vite and Rsbuild are excellent build tools, but they have different strengt
 **Example with dynamic imports:**
 
 ```typescript
-import { definePlugin } from '@halo-dev/console-shared';
-import { defineAsyncComponent } from 'vue';
-import { VLoading } from '@halo-dev/components';
+import { definePlugin } from "@halo-dev/console-shared";
+import { defineAsyncComponent } from "vue";
+import { VLoading } from "@halo-dev/components";
 
 export default definePlugin({
   routes: [
     {
-      parentName: 'Root',
+      parentName: "Root",
       route: {
-        path: 'demo',
-        name: 'DemoPage',
+        path: "demo",
+        name: "DemoPage",
         // Lazy load heavy components
         component: defineAsyncComponent({
-          loader: () => import('./views/DemoPage.vue'),
+          loader: () => import("./views/DemoPage.vue"),
           loadingComponent: VLoading,
         }),
       },
@@ -306,14 +306,14 @@ export default definePlugin({
 
 ### Summary
 
-| Feature | Vite | Rsbuild |
-|---------|------|---------|
-| Code Splitting | ❌ Limited | ✅ Excellent |
-| Vue Ecosystem | ✅ Excellent | ✅ Good |
-| Build Performance | ✅ Good | ✅ Excellent |
-| Dev Experience | ✅ Excellent | ✅ Excellent |
-| Plugin Ecosystem | ✅ Rich | ✅ Growing |
-| Configuration | ✅ Simple | ⚖️ Moderate |
+| Feature           | Vite         | Rsbuild      |
+| ----------------- | ------------ | ------------ |
+| Code Splitting    | ❌ Limited   | ✅ Excellent |
+| Vue Ecosystem     | ✅ Excellent | ✅ Good      |
+| Build Performance | ✅ Good      | ✅ Excellent |
+| Dev Experience    | ✅ Excellent | ✅ Excellent |
+| Plugin Ecosystem  | ✅ Rich      | ✅ Growing   |
+| Configuration     | ✅ Simple    | ⚖️ Moderate  |
 
 **Recommendation**: Use **Rsbuild** for complex plugins with large frontend codebases, and **Vite** for simpler plugins or when you need extensive Vue ecosystem integration.
 

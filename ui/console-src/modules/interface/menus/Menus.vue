@@ -45,7 +45,6 @@ const selectedMenu = ref<Menu>();
 const selectedMenuItem = ref<MenuItem>();
 const selectedParentMenuItem = ref<MenuItem>();
 const menuItemEditingModal = ref();
-const isDragging = ref(false);
 
 const {
   data: menuItems,
@@ -162,7 +161,6 @@ async function handleUpdateInBatch() {
     await queryClient.invalidateQueries({ queryKey: ["menus"] });
     await refetch();
     batchUpdating.value = false;
-    isDragging.value = false;
   }
 }
 
@@ -312,26 +310,23 @@ function getMenuItemRefDisplayName(menuItem: MenuTreeItem) {
               :class="{
                 'cursor-progress opacity-60': batchUpdating,
               }"
+              :disable-drag="batchUpdating"
               trigger-class="drag-element"
               :indent="40"
               @after-drop="handleUpdateInBatch"
-              @before-drag-start="isDragging = true"
             >
               <template #default="{ node }">
                 <div
-                  class="px-4 py-3 hover:bg-gray-50 w-full group items-center flex justify-between relative"
+                  class="group relative flex w-full items-center justify-between px-4 py-3 hover:bg-gray-50"
                 >
                   <div>
                     <div
                       v-permission="['system:menus:manage']"
                       class="drag-element absolute inset-y-0 left-0 hidden w-3.5 cursor-move items-center bg-gray-100 transition-all hover:bg-gray-200 group-hover:flex"
-                      :class="{
-                        '!hidden': isDragging,
-                      }"
                     >
                       <IconList class="h-3.5 w-3.5" />
                     </div>
-                    <div class="gap-1 flex flex-col">
+                    <div class="flex flex-col gap-1">
                       <div class="inline-flex items-center gap-2">
                         <span
                           class="truncate text-sm font-medium text-gray-900"

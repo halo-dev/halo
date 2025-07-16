@@ -5471,12 +5471,12 @@
           },
           "visible": {
             "type": "string",
-            "default": "PUBLIC",
             "enum": [
               "PUBLIC",
               "INTERNAL",
               "PRIVATE"
-            ]
+            ],
+            "default": "PUBLIC"
           }
         }
       },
@@ -6007,12 +6007,12 @@
           },
           "visible": {
             "type": "string",
-            "default": "PUBLIC",
             "enum": [
               "PUBLIC",
               "INTERNAL",
               "PRIVATE"
-            ]
+            ],
+            "default": "PUBLIC"
           }
         }
       },
@@ -6468,13 +6468,16 @@
         "type": "object",
         "properties": {
           "filename": {
-            "type": "string"
+            "type": "string",
+            "description": "Custom file name"
           },
           "groupName": {
-            "type": "string"
+            "type": "string",
+            "description": "The name of the group to which the attachment belongs"
           },
           "policyName": {
-            "type": "string"
+            "type": "string",
+            "description": "Storage policy name"
           },
           "url": {
             "type": "string",

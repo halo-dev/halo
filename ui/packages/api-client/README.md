@@ -14,8 +14,8 @@ import {
   createConsoleApiClient,
   createUcApiClient,
   createPublicApiClient,
-  axiosInstance
-} from "@halo-dev/api-client"
+  axiosInstance,
+} from "@halo-dev/api-client";
 ```
 
 - **coreApiClient**: 为 Halo 所有自定义模型的 CRUD 接口封装的 api client。
@@ -37,11 +37,11 @@ pnpm install @halo-dev/api-client axios
 由于已经在 Console 和 UC 项目中引入并设置好了 Axios 拦截器，所以直接使用即可：
 
 ```javascript
-import { coreApiClient } from "@halo-dev/api-client"
+import { coreApiClient } from "@halo-dev/api-client";
 
-coreApiClient.content.post.listPost().then(response => {
+coreApiClient.content.post.listPost().then((response) => {
   // handle response
-})
+});
 ```
 
 此外，在最新的 `@halo-dev/ui-plugin-bundler-kit@2.17.0` 中，已经排除了 `@halo-dev/api-client`、`axios` 依赖，所以最终产物中的相关依赖会自动使用 Halo 本身提供的依赖，无需关心最终产物大小。
@@ -55,15 +55,15 @@ pnpm install @halo-dev/api-client axios
 ```
 
 ```javascript
-import axios from "axios"
+import axios from "axios";
 
 const axiosInstance = axios.create({
-  baseURL: "http://localhost:8090"
-})
+  baseURL: "http://localhost:8090",
+});
 
-const coreApiClient = createCoreApiClient(axiosInstance)
+const coreApiClient = createCoreApiClient(axiosInstance);
 
-coreApiClient.content.post.listPost().then(response => {
+coreApiClient.content.post.listPost().then((response) => {
   // handle response
-})
+});
 ```

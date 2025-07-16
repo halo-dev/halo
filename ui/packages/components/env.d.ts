@@ -1,5 +1,3 @@
-
-
 /// <reference types="vite/client" />
 /// <reference types="histoire" />
 /// <reference types="unplugin-icons/types/vue" />

@@ -37,37 +37,18 @@ const classes = computed(() => {
 </template>
 <style lang="scss">
 .tag-wrapper {
-  @apply rounded-base
-  inline-flex
-  flex-shrink-0
-  flex-wrap
-  box-border
-  cursor-pointer
-  text-center
-  items-center
-  justify-center
-  w-auto
-  align-middle
-  h-5
-  text-xs
-  border
-  border-solid
-  px-1;
+  @apply box-border inline-flex h-5 w-auto flex-shrink-0 cursor-pointer flex-wrap items-center justify-center rounded-base border border-solid px-1 text-center align-middle text-xs;
 
   &.tag-default {
     border: 1px solid #d9d9d9;
   }
 
   &.tag-primary {
-    @apply text-white
-    bg-primary
-    border-primary;
+    @apply border-primary bg-primary text-white;
   }
 
   &.tag-secondary {
-    @apply text-white
-    bg-secondary
-    border-secondary;
+    @apply border-secondary bg-secondary text-white;
   }
 
   &.tag-danger {
