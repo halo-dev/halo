@@ -1038,7 +1038,7 @@ core:
         title: 停用
         description: 確定要停用該用戶嗎？停用後該用戶將無法登入系統
       disable_in_batch:
-        title: 批量停用
+        title: 停用
         description: 確定要停用所選用戶嗎？停用後這些用戶將無法登入系統
     filters:
       role:
