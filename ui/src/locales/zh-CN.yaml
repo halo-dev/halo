@@ -1047,7 +1047,7 @@ core:
         title: 取消禁用
         description: 确定取消禁用该用户吗？
       enable_in_batch:
-        title: 批量启用
+        title: 启用
         description: 确定要启用所选用户吗？启用后该用户将可以重新登录系统
       disable:
         title: 禁用
