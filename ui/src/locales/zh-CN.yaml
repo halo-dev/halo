@@ -1053,7 +1053,7 @@ core:
         title: 禁用
         description: 确定禁用该用户吗？禁用后该用户将无法登录系统
       disable_in_batch:
-        title: 批量禁用
+        title: 禁用
         description: 确定要禁用所选用户吗？禁用后这些用户将无法登录系统
     filters:
       role:
