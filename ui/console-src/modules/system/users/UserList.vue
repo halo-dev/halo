@@ -124,16 +124,13 @@ const handleDeleteInBatch = async () => {
       const userNamesToDelete = selectedUserNames.value.filter(
         (name) => name != userStore.currentUser?.metadata.name
       );
-      const chunks = chunk(userNamesToDelete, 5);
-      for (const chunk of chunks) {
-        await Promise.all(
-          chunk.map((name) => {
-            return coreApiClient.user.deleteUser({
-              name,
-            });
-          })
-        );
-      }
+      await Promise.all(
+        userNamesToDelete.map((name) => {
+          return coreApiClient.user.deleteUser({
+            name,
+          });
+        })
+      );
       await refetch();
       selectedUserNames.value.length = 0;
       Toast.success(t("core.common.toast.delete_success"));
@@ -177,7 +174,7 @@ const handleEnableInBatch = async () => {
     cancelText: t("core.common.buttons.cancel"),
     onConfirm: async () => {
       await handleUserBatchOperation({
-        filterCondition: (user) => user.spec.disabled === true,
+        filterCondition: (user) => !!user.spec.disabled,
         apiMethod: (name) =>
           consoleApiClient.user.enableUser({ username: name }),
         successMessageKey: "core.common.toast.enable_success",
@@ -196,7 +193,7 @@ const handleDisableInBatch = async () => {
     cancelText: t("core.common.buttons.cancel"),
     onConfirm: async () => {
       await handleUserBatchOperation({
-        filterCondition: (user) => user.spec.disabled === false,
+        filterCondition: (user) => !user.spec.disabled,
         apiMethod: (name) =>
           consoleApiClient.user.disableUser({ username: name }),
         successMessageKey: "core.common.toast.disable_success",
