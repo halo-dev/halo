@@ -34,6 +34,7 @@ import type { EditorProvider } from "@halo-dev/console-shared";
 import { useLocalStorage } from "@vueuse/core";
 import { useRouteQuery } from "@vueuse/router";
 import type { AxiosRequestConfig } from "axios";
+import ShortUniqueId from "short-unique-id";
 import {
   computed,
   nextTick,
@@ -48,6 +49,8 @@ import { useI18n } from "vue-i18n";
 import { useRouter } from "vue-router";
 import PostSettingModal from "./components/PostSettingModal.vue";
 import { usePostUpdateMutate } from "./composables/use-post-update-mutate";
+
+const uid = new ShortUniqueId();
 
 const router = useRouter();
 const { t } = useI18n();
@@ -151,6 +154,21 @@ provide<ComputedRef<string | undefined>>(
   computed(() => formState.value.post.status?.permalink)
 );
 
+// Slug generation
+const { handleGenerateSlug } = useSlugify(
+  computed(() => formState.value.post.spec.title),
+  computed({
+    get() {
+      return formState.value.post.spec.slug;
+    },
+    set(value) {
+      formState.value.post.spec.slug = value;
+    },
+  }),
+  computed(() => !isUpdateMode.value),
+  FormType.POST
+);
+
 const handleSave = async (options?: { mute?: boolean }) => {
   try {
     if (!options?.mute) {
@@ -160,10 +178,6 @@ const handleSave = async (options?: { mute?: boolean }) => {
     // Set default title and slug
     if (!formState.value.post.spec.title) {
       formState.value.post.spec.title = t("core.post_editor.untitled");
-    }
-
-    if (!formState.value.post.spec.slug) {
-      formState.value.post.spec.slug = new Date().getTime().toString();
     }
 
     if (isUpdateMode.value) {
@@ -185,6 +199,21 @@ const handleSave = async (options?: { mute?: boolean }) => {
     } else {
       // Clear new post content cache
       handleClearCache();
+
+      if (!formState.value.post.spec.slug) {
+        handleGenerateSlug(true);
+      }
+
+      // fixme: check if slug is unique
+      // Finally, we need to check if the slug is unique in the database
+      const { data: postsWithSameSlug } =
+        await coreApiClient.content.post.listPost({
+          fieldSelector: [`spec.slug=${formState.value.post.spec.slug}`],
+        });
+
+      if (postsWithSameSlug.total) {
+        formState.value.post.spec.slug = `${formState.value.post.spec.slug}-${uid.randomUUID(8)}`;
+      }
 
       const { data } = await consoleApiClient.content.post.draftPost({
         postRequest: formState.value,
@@ -465,21 +494,6 @@ async function handleUploadImage(file: File, options?: AxiosRequestConfig) {
   );
   return data;
 }
-
-// Slug generation
-useSlugify(
-  computed(() => formState.value.post.spec.title),
-  computed({
-    get() {
-      return formState.value.post.spec.slug;
-    },
-    set(value) {
-      formState.value.post.spec.slug = value;
-    },
-  }),
-  computed(() => !isUpdateMode.value),
-  FormType.POST
-);
 </script>
 
 <template>
