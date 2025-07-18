@@ -581,6 +581,7 @@ core:
         ungrouped: 未分組
     actions:
       storage_policies: 存儲策略
+      thumbnails: 縮略圖
     empty:
       title: 當前分組沒有附件
       message: 當前分組沒有附件，你可以嘗試重整或者上傳附件
@@ -634,6 +635,7 @@ core:
         owner: 上傳者
         creation_time: 上傳時間
         permalink: 連結
+        thumbnails: 縮略圖
       preview:
         click_to_exit: 點擊離開預覽
         video_not_support: 當前瀏覽器不支援該影片播放
@@ -716,6 +718,21 @@ core:
     permalink_list:
       relative: 相對路徑
       absolute: 完整路徑
+    thumbnails_modal:
+      title: 縮略圖記錄
+      empty:
+        title: 沒有縮略圖記錄
+        message: 當前沒有縮略圖記錄，縮略圖會在上傳圖片附件後自動生成。
+      operations:
+        retry_all_failed:
+          button: 重試所有失敗記錄
+          tips_empty: 沒有失敗記錄
+          tips_success: 重試所有失敗記錄成功
+    thumbnails:
+      phase:
+        pending: 等待生成
+        succeeded: 生成成功
+        failed: 生成失敗
   uc_attachment:
     empty:
       title: 當前沒有附件
@@ -1773,6 +1790,7 @@ core:
       disable: 禁用
       enable: 启用
       continue: 繼續
+      retry: 重試
     radio:
       "yes": 是
       "no": 否
