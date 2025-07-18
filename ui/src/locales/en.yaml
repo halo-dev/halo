@@ -1124,11 +1124,21 @@ core:
       enable:
         title: Enable
         description: Are you sure you want to enable this user?
+      enable_in_batch:
+        title: Enable
+        description: >-
+          Are you sure you want to enable the selected users? They will be able 
+          to log in again after being enabled.
       disable:
         title: Disable
         description: >-
           Are you sure you want to disable this user? This user will not be able
           to log in after being disabled
+      disable_in_batch:
+        title: Disable
+        description: >-
+          Are you sure you want to disable the selected users? They will no longer 
+          be able to log in after being disabled.
     filters:
       role:
         label: Role
@@ -1951,6 +1961,8 @@ core:
       unknown_error: Unknown error
       disable_success: Disabled successfully
       enable_success: Enabled successfully
+      no_users_to_enable: All selected users are already enabled
+      no_users_to_disable: All selected users are already disabled
     dialog:
       titles:
         tip: Tip

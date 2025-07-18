@@ -24,6 +24,7 @@ import {
 } from "@halo-dev/components";
 import { useQuery } from "@tanstack/vue-query";
 import { useRouteQuery } from "@vueuse/router";
+import { chunk } from "lodash-es";
 import { computed, onMounted, ref, watch } from "vue";
 import { useI18n } from "vue-i18n";
 import UserCreationModal from "./components/UserCreationModal.vue";
@@ -137,6 +138,71 @@ const handleDeleteInBatch = async () => {
   });
 };
 
+const handleUserBatchOperation = async ({
+  filterCondition,
+  apiMethod,
+  successMessageKey,
+  emptyMessageKey,
+}) => {
+  const filteredUserNames = selectedUserNames.value.filter((name) => {
+    if (name === userStore.currentUser?.metadata.name) return false;
+    const user = users.value?.find((u) => u.user.metadata.name === name);
+    return user && filterCondition(user.user);
+  });
+
+  if (!filteredUserNames.length) {
+    Toast.info(t(emptyMessageKey));
+    return;
+  }
+
+  const chunks = chunk(filteredUserNames, 5);
+  for (const chunk of chunks) {
+    await Promise.all(chunk.map((name) => apiMethod(name)));
+  }
+
+  await refetch();
+  selectedUserNames.value.length = 0;
+  Toast.success(t(successMessageKey));
+};
+
+const handleEnableInBatch = async () => {
+  Dialog.warning({
+    title: t("core.user.operations.enable_in_batch.title"),
+    description: t("core.user.operations.enable_in_batch.description"),
+    confirmType: "primary",
+    confirmText: t("core.common.buttons.confirm"),
+    cancelText: t("core.common.buttons.cancel"),
+    onConfirm: async () => {
+      await handleUserBatchOperation({
+        filterCondition: (user) => !!user.spec.disabled,
+        apiMethod: (name) =>
+          consoleApiClient.user.enableUser({ username: name }),
+        successMessageKey: "core.common.toast.enable_success",
+        emptyMessageKey: "core.common.toast.no_users_to_enable",
+      });
+    },
+  });
+};
+
+const handleDisableInBatch = async () => {
+  Dialog.warning({
+    title: t("core.user.operations.disable_in_batch.title"),
+    description: t("core.user.operations.disable_in_batch.description"),
+    confirmType: "danger",
+    confirmText: t("core.common.buttons.confirm"),
+    cancelText: t("core.common.buttons.cancel"),
+    onConfirm: async () => {
+      await handleUserBatchOperation({
+        filterCondition: (user) => !user.spec.disabled,
+        apiMethod: (name) =>
+          consoleApiClient.user.disableUser({ username: name }),
+        successMessageKey: "core.common.toast.disable_success",
+        emptyMessageKey: "core.common.toast.no_users_to_disable",
+      });
+    },
+  });
+};
+
 watch(selectedUserNames, (newValue) => {
   checkedAll.value =
     newValue.length ===
@@ -242,6 +308,12 @@ function onCreationModalClose() {
             <div class="flex w-full flex-1 items-center sm:w-auto">
               <SearchInput v-if="!selectedUserNames.length" v-model="keyword" />
               <VSpace v-else>
+                <VButton type="secondary" @click="handleDisableInBatch">
+                  {{ $t("core.common.buttons.disable") }}
+                </VButton>
+                <VButton type="secondary" @click="handleEnableInBatch">
+                  {{ $t("core.common.buttons.enable") }}
+                </VButton>
                 <VButton type="danger" @click="handleDeleteInBatch">
                   {{ $t("core.common.buttons.delete") }}
                 </VButton>
