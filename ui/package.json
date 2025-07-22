@@ -156,10 +156,10 @@
     "tailwindcss": "^3.4.17",
     "tailwindcss-themer": "^4.1.1",
     "terser": "^5.37.0",
-    "tsdown": "^0.12.8",
+    "tsdown": "^0.13.0",
     "typescript": "~5.8.0",
     "unplugin-icons": "^22.1.0",
-    "vite": "^7.0.0",
+    "vite": "^7.0.5",
     "vite-plugin-dts": "^4.5.4",
     "vite-plugin-externals": "^0.6.2",
     "vite-plugin-html": "^3.2.2",
@@ -171,7 +171,7 @@
   "packageManager": "pnpm@10.12.4+sha512.5ea8b0deed94ed68691c9bad4c955492705c5eeb8a87ef86bc62c74a26b037b08ff9570f108b2e4dbd1dd1a9186fea925e527f141c648e85af45631074680184",
   "pnpm": {
     "overrides": {
-      "vite": "npm:rolldown-vite@7.0.3",
+      "vite": "npm:rolldown-vite@7.0.10",
       "prosemirror-model": "1.25.1",
       "prosemirror-view": "1.40.0",
       "prosemirror-transform": "1.10.4"
