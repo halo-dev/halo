@@ -1,10 +1,12 @@
 <script lang="ts" setup>
-// core libs
-import { coreApiClient } from "@halo-dev/api-client";
-import { computed, nextTick, ref, watch } from "vue";
-
-// components
 import SubmitButton from "@/components/button/SubmitButton.vue";
+import AnnotationsForm from "@/components/form/AnnotationsForm.vue";
+import { setFocus } from "@/formkit/utils/focus";
+import { FormType } from "@/types/slug";
+import useSlugify from "@console/composables/use-slugify";
+import { reset, submitForm, type FormKitNode } from "@formkit/core";
+import type { Tag } from "@halo-dev/api-client";
+import { coreApiClient } from "@halo-dev/api-client";
 import {
   IconArrowLeft,
   IconArrowRight,
@@ -14,18 +16,8 @@ import {
   VModal,
   VSpace,
 } from "@halo-dev/components";
-
-// types
-import type { Tag } from "@halo-dev/api-client";
-
-// libs
-import AnnotationsForm from "@/components/form/AnnotationsForm.vue";
-import { setFocus } from "@/formkit/utils/focus";
-import { FormType } from "@/types/slug";
-import useSlugify from "@console/composables/use-slugify";
-import { reset, submitForm } from "@formkit/core";
 import { cloneDeep } from "lodash-es";
-import { onMounted } from "vue";
+import { computed, nextTick, onMounted, ref, watch } from "vue";
 import { useI18n } from "vue-i18n";
 
 const props = withDefaults(
@@ -153,6 +145,27 @@ const { handleGenerateSlug } = useSlugify(
   computed(() => !isUpdateMode.value),
   FormType.TAG
 );
+
+// fixme: check if slug is unique
+// Finally, we need to check if the slug is unique in the database
+async function slugUniqueValidation(node: FormKitNode) {
+  const value = node.value;
+  if (!value) {
+    return true;
+  }
+
+  const fieldSelector = [`spec.slug=${value}`];
+
+  if (props.tag) {
+    fieldSelector.push(`metadata.name!=${props.tag.metadata.name}`);
+  }
+
+  const { data: tagsWithSameSlug } = await coreApiClient.content.tag.listTag({
+    fieldSelector,
+  });
+
+  return !tagsWithSameSlug.total;
+}
 </script>
 <template>
   <VModal ref="modal" :title="modalTitle" :width="700" @close="emit('close')">
@@ -198,7 +211,13 @@ const { handleGenerateSlug } = useSlugify(
               :label="$t('core.post_tag.editing_modal.fields.slug.label')"
               name="slug"
               type="text"
-              validation="required|length:0,50"
+              validation="required|length:0,50|slugUniqueValidation"
+              :validation-rules="{ slugUniqueValidation }"
+              :validation-messages="{
+                slugUniqueValidation: $t(
+                  'core.common.form.validation.slug_unique'
+                ),
+              }"
             >
               <template #suffix>
                 <div
