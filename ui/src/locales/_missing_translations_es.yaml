@@ -208,11 +208,16 @@ core:
         original_comment: Original comment
         content: Reply content
   attachment:
+    actions:
+      thumbnails: Thumbnails
     filters:
       sort:
         items:
           display_name_asc: Ascending order by display name
           display_name_desc: Descending order by display name
+    detail_modal:
+      fields:
+        thumbnails: Thumbnails
     permalink_list:
       relative: Relative path
       absolute: Absolute path
@@ -232,6 +237,21 @@ core:
             label: URL
         toast:
           success: Downloaded successfully
+    thumbnails_modal:
+      title: Thumbnail records
+      empty:
+        title: No thumbnail records
+        message: There are currently no thumbnail records, thumbnails will be automatically generated after uploading image attachments.
+      operations:
+        retry_all_failed:
+          button: Retry all failed records
+          tips_empty: No failed thumbnail records
+          tips_success: All failed records retried successfully
+    thumbnails:
+      phase:
+        pending: Pending
+        succeeded: Succeeded
+        failed: Failed
   uc_attachment:
     empty:
       title: There are no attachments.
@@ -757,6 +777,7 @@ core:
       disable: Disable
       enable: Enable
       continue: Continue
+      retry: Retry
     toast:
       disable_success: Disabled successfully
       enable_success: Enabled successfully
