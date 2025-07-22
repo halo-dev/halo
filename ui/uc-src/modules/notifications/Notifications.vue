@@ -16,6 +16,7 @@ import {
 } from "@halo-dev/components";
 import { useQuery, useQueryClient } from "@tanstack/vue-query";
 import { useRouteQuery } from "@vueuse/router";
+import { chunk } from "lodash-es";
 import { OverlayScrollbarsComponent } from "overlayscrollbars-vue";
 import { computed } from "vue";
 import { useI18n } from "vue-i18n";
@@ -78,12 +79,16 @@ function handleDeleteNotifications() {
         throw new Error("Current user is not found");
       }
 
-      for (const notification of notifications.value.items) {
-        await ucApiClient.notification.notification.deleteSpecifiedNotification(
-          {
-            username: currentUser.metadata.name,
-            name: notification.metadata.name,
-          }
+      const notificationChunks = chunk(notifications.value.items, 5);
+
+      for (const chunk of notificationChunks) {
+        await Promise.all(
+          chunk.map((notification) =>
+            ucApiClient.notification.notification.deleteSpecifiedNotification({
+              username: currentUser.metadata.name,
+              name: notification.metadata.name,
+            })
+          )
         );
       }
 
