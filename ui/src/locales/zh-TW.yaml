@@ -1869,6 +1869,9 @@ core:
       recovering: 還原中
     fields:
       post_count: "{count} 篇文章"
+    form:
+      validation:
+        slug_unique: 當前別名已存在
   uc_post:
     creation_modal:
       title: 創建文章

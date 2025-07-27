@@ -1884,6 +1884,9 @@ core:
       recovering: 恢复中
     fields:
       post_count: "{count} 篇文章"
+    form:
+      validation:
+        slug_unique: 当前别名已存在
   tool:
     title: 工具
     empty:
