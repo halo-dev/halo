@@ -6,7 +6,7 @@ import { formatDatetime, toDatetimeLocal, toISOString } from "@/utils/date";
 import { randomUUID } from "@/utils/id";
 import useSlugify from "@console/composables/use-slugify";
 import { useThemeCustomTemplates } from "@console/modules/interface/themes/composables/use-theme";
-import { submitForm } from "@formkit/core";
+import { submitForm, type FormKitNode } from "@formkit/core";
 import type { Post } from "@halo-dev/api-client";
 import { consoleApiClient, coreApiClient } from "@halo-dev/api-client";
 import {
@@ -258,6 +258,29 @@ const { handleGenerateSlug } = useSlugify(
   FormType.POST
 );
 
+// fixme: check if slug is unique
+// Finally, we need to check if the slug is unique in the database
+async function slugUniqueValidation(node: FormKitNode) {
+  const value = node.value;
+  if (!value) {
+    return true;
+  }
+
+  const fieldSelector = [`spec.slug=${value}`];
+
+  if (isUpdateMode.value) {
+    fieldSelector.push(`metadata.name!=${formState.value.metadata.name}`);
+  }
+
+  const { data: postsWithSameSlug } = await coreApiClient.content.post.listPost(
+    {
+      fieldSelector,
+    }
+  );
+
+  return !postsWithSameSlug.total;
+}
+
 // Buttons condition
 const showPublishButton = computed(() => {
   if (!props.publishSupport) {
@@ -322,7 +345,13 @@ const showCancelPublishButton = computed(() => {
               :label="$t('core.post.settings.fields.slug.label')"
               name="slug"
               type="text"
-              validation="required|length:0,100"
+              validation="required|length:0,100|slugUniqueValidation"
+              :validation-rules="{ slugUniqueValidation }"
+              :validation-messages="{
+                slugUniqueValidation: $t(
+                  'core.common.form.validation.slug_unique'
+                ),
+              }"
               :help="$t('core.post.settings.fields.slug.help')"
             >
               <template #suffix>
