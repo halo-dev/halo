@@ -135,6 +135,9 @@ public class DefaultController<R> implements Controller {
             return;
         }
         this.started = true;
+        if (synchronizer != null) {
+            synchronizer.start();
+        }
         log.info("Starting controller {}", name);
         IntStream.range(0, getWorkerCount())
             .mapToObj(i -> new Worker())
@@ -162,9 +165,6 @@ public class DefaultController<R> implements Controller {
         @Override
         public void run() {
             log.info("Controller worker {} started", this.name);
-            if (synchronizer != null) {
-                synchronizer.start();
-            }
             while (!isDisposed() && !Thread.currentThread().isInterrupted()) {
                 try {
                     var entry = queue.take();
