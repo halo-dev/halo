@@ -1,7 +1,9 @@
 package run.halo.app.theme.finders;
 
+import java.util.Map;
 import org.springframework.lang.NonNull;
 import reactor.core.publisher.Mono;
+import run.halo.app.core.extension.User;
 import run.halo.app.core.extension.content.Post;
 import run.halo.app.extension.ListOptions;
 import run.halo.app.extension.ListResult;
@@ -23,12 +25,34 @@ public interface PostPublicQueryService {
     Mono<ListResult<ListedPostVo>> list(ListOptions listOptions, PageRequest page);
 
     /**
+     * Lists public posts by the given list options and page request with pre-fetched user cache.
+     * This method optimizes performance by avoiding N+1 queries for user data.
+     *
+     * @param listOptions additional list options
+     * @param page page request must not be null
+     * @param userCache map of username to User for pre-fetched user data
+     * @return a list of listed post vo
+     */
+    Mono<ListResult<ListedPostVo>> list(ListOptions listOptions, PageRequest page, 
+        Map<String, User> userCache);
+
+    /**
      * Converts post to listed post vo.
      *
      * @param post post must not be null
      * @return listed post vo
      */
     Mono<ListedPostVo> convertToListedVo(@NonNull Post post);
+
+    /**
+     * Converts post to listed post vo with pre-fetched user cache.
+     * This method optimizes performance by avoiding individual user queries.
+     *
+     * @param post post must not be null
+     * @param userCache map of username to User for pre-fetched user data
+     * @return listed post vo
+     */
+    Mono<ListedPostVo> convertToListedVo(@NonNull Post post, Map<String, User> userCache);
 
     /**
      * Converts {@link Post} to post vo and populate post content by the given snapshot name.

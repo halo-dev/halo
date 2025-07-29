@@ -33,4 +33,13 @@ public interface UserService {
 
     Mono<User> enable(String username);
 
+    /**
+     * Gets multiple users by usernames in a single batch operation.
+     * For non-existent users, returns ghost user instead.
+     *
+     * @param usernames list of usernames to fetch
+     * @return flux of users, with ghost user for non-existent usernames
+     */
+    Flux<User> getUsersOrGhostByNames(Set<String> usernames);
+
 }

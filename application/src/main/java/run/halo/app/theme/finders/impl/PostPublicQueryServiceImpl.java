@@ -1,7 +1,12 @@
 package run.halo.app.theme.finders.impl;
 
 import java.util.List;
+import java.util.Map;
+import java.util.Objects;
+import java.util.Set;
 import java.util.function.Function;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 import lombok.RequiredArgsConstructor;
 import org.springframework.lang.NonNull;
 import org.springframework.stereotype.Component;
@@ -14,6 +19,7 @@ import run.halo.app.content.PostService;
 import run.halo.app.core.counter.CounterService;
 import run.halo.app.core.counter.MeterUtils;
 import run.halo.app.core.extension.content.Post;
+import run.halo.app.core.extension.User;
 import run.halo.app.extension.ListOptions;
 import run.halo.app.extension.ListResult;
 import run.halo.app.extension.PageRequest;
@@ -25,6 +31,7 @@ import run.halo.app.theme.finders.ContributorFinder;
 import run.halo.app.theme.finders.PostPublicQueryService;
 import run.halo.app.theme.finders.TagFinder;
 import run.halo.app.theme.finders.vo.ContentVo;
+import run.halo.app.theme.finders.vo.ContributorVo;
 import run.halo.app.theme.finders.vo.ListedPostVo;
 import run.halo.app.theme.finders.vo.PostVo;
 import run.halo.app.theme.finders.vo.StatsVo;
@@ -66,8 +73,53 @@ public class PostPublicQueryServiceImpl implements PostPublicQueryService {
                 return option;
             })
             .flatMap(listOptions -> client.listBy(Post.class, listOptions, page))
+            .flatMap(list -> {
+                var posts = list.get().collect(Collectors.toList());
+                
+                // Optimize by pre-fetching all required users in a single batch
+                return collectAllUsernames(posts)
+                    .flatMap(usernames -> {
+                        if (usernames.isEmpty()) {
+                            return Mono.just(Map.<String, User>of());
+                        }
+                        return contributorFinder.getUserService().getUsersOrGhostByNames(usernames)
+                            .collectMap(user -> user.getMetadata().getName());
+                    })
+                    .flatMap(userCache -> 
+                        Flux.fromIterable(posts)
+                            .flatMapSequential(post -> convertToListedVo(post, userCache)
+                                .flatMap(postVo -> populateStats(postVo)
+                                    .doOnNext(postVo::setStats).thenReturn(postVo)
+                                )
+                            )
+                            .collectList()
+                            .map(postVos -> new ListResult<>(list.getPage(), list.getSize(), list.getTotal(),
+                                postVos)
+                            )
+                    );
+            })
+            .defaultIfEmpty(ListResult.emptyResult());
+    }
+
+    @Override
+    public Mono<ListResult<ListedPostVo>> list(ListOptions queryOptions, PageRequest page, 
+            Map<String, User> userCache) {
+        return postPredicateResolver.getListOptions()
+            .map(option -> {
+                var fieldSelector = queryOptions.getFieldSelector();
+                if (fieldSelector != null) {
+                    option.setFieldSelector(option.getFieldSelector()
+                        .andQuery(fieldSelector.query()));
+                }
+                var labelSelector = queryOptions.getLabelSelector();
+                if (labelSelector != null) {
+                    option.setLabelSelector(option.getLabelSelector().and(labelSelector));
+                }
+                return option;
+            })
+            .flatMap(listOptions -> client.listBy(Post.class, listOptions, page))
             .flatMap(list -> Flux.fromStream(list.get())
-                .flatMapSequential(post -> convertToListedVo(post)
+                .flatMapSequential(post -> convertToListedVo(post, userCache)
                     .flatMap(postVo -> populateStats(postVo)
                         .doOnNext(postVo::setStats).thenReturn(postVo)
                     )
@@ -187,5 +239,82 @@ public class PostPublicQueryServiceImpl implements PostPublicQueryService {
                 .build()
             )
             .defaultIfEmpty(StatsVo.empty());
+    }
+
+    /**
+     * Collects all unique usernames from a list of posts (owners and contributors).
+     */
+    private Mono<Set<String>> collectAllUsernames(List<Post> posts) {
+        return Mono.fromSupplier(() -> {
+            Set<String> usernames = posts.stream()
+                .flatMap(post -> {
+                    Stream<String> ownerStream = Stream.ofNullable(post.getSpec().getOwner());
+                    Stream<String> contributorStream = post.getStatus().getContributors() != null
+                        ? post.getStatus().getContributors().stream()
+                        : Stream.empty();
+                    return Stream.concat(ownerStream, contributorStream);
+                })
+                .filter(username -> username != null && !username.trim().isEmpty())
+                .collect(Collectors.toSet());
+            return usernames;
+        });
+    }
+
+    @Override
+    public Mono<ListedPostVo> convertToListedVo(@NonNull Post post, Map<String, User> userCache) {
+        Assert.notNull(post, "Post must not be null");
+        ListedPostVo postVo = ListedPostVo.from(post);
+        postVo.setCategories(List.of());
+        postVo.setTags(List.of());
+        postVo.setContributors(List.of());
+
+        return Mono.just(postVo)
+            .flatMap(lp -> populateStats(postVo)
+                .doOnNext(lp::setStats)
+                .thenReturn(lp)
+            )
+            .flatMap(p -> {
+                String owner = p.getSpec().getOwner();
+                User user = userCache.get(owner);
+                if (user != null) {
+                    var contributorVo = ContributorVo.from(user);
+                    p.setOwner(contributorVo);
+                }
+                return Mono.just(p);
+            })
+            .flatMap(p -> {
+                List<String> tagNames = p.getSpec().getTags();
+                if (CollectionUtils.isEmpty(tagNames)) {
+                    return Mono.just(p);
+                }
+                return tagFinder.getByNames(tagNames)
+                    .collectList()
+                    .doOnNext(p::setTags)
+                    .thenReturn(p);
+            })
+            .flatMap(p -> {
+                List<String> categoryNames = p.getSpec().getCategories();
+                if (CollectionUtils.isEmpty(categoryNames)) {
+                    return Mono.just(p);
+                }
+                return categoryFinder.getByNames(categoryNames)
+                    .collectList()
+                    .doOnNext(p::setCategories)
+                    .thenReturn(p);
+            })
+            .flatMap(p -> {
+                List<String> contributorNames = p.getStatus().getContributors();
+                if (CollectionUtils.isEmpty(contributorNames)) {
+                    return Mono.just(p);
+                }
+                List<ContributorVo> contributors = contributorNames.stream()
+                    .map(userCache::get)
+                    .filter(Objects::nonNull)
+                    .map(ContributorVo::from)
+                    .collect(Collectors.toList());
+                p.setContributors(contributors);
+                return Mono.just(p);
+            })
+            .defaultIfEmpty(postVo);
     }
 }
