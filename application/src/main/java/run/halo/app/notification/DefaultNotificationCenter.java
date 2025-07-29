@@ -11,7 +11,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
-import reactor.core.scheduler.Schedulers;
 import run.halo.app.core.extension.User;
 import run.halo.app.core.extension.notification.Notification;
 import run.halo.app.core.extension.notification.NotifierDescriptor;
@@ -52,7 +51,6 @@ public class DefaultNotificationCenter implements NotificationCenter {
                 log.debug("Dispatching notification to subscriber [{}] for reason [{}]",
                     subscriber, reason.getMetadata().getName());
             })
-            .publishOn(Schedulers.boundedElastic())
             .flatMap(subscriber -> dispatchNotification(reason, subscriber))
             .then();
     }
