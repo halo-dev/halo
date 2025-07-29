@@ -91,7 +91,7 @@ class DefaultControllerTest {
 
             controller.new Worker().run();
 
-            verify(synchronizer, times(1)).start();
+            verify(synchronizer, never()).start();
             verify(queue, times(2)).take();
             verify(queue, times(0)).add(any());
             verify(queue, times(1)).done(any());
@@ -109,7 +109,7 @@ class DefaultControllerTest {
 
             controller.new Worker().run();
 
-            verify(synchronizer, times(1)).start();
+            verify(synchronizer, never()).start();
             verify(queue, times(2)).take();
             verify(queue, times(1)).done(any());
             verify(queue, times(1)).add(argThat(de ->
@@ -129,7 +129,7 @@ class DefaultControllerTest {
 
             controller.new Worker().run();
 
-            verify(synchronizer, times(1)).start();
+            verify(synchronizer, never()).start();
             verify(queue, times(2)).take();
             verify(queue, times(1)).done(any());
             verify(queue, times(1)).add(argThat(de ->
@@ -150,7 +150,7 @@ class DefaultControllerTest {
 
             controller.new Worker().run();
 
-            verify(synchronizer).start();
+            verify(synchronizer, never()).start();
             verify(queue, times(2)).take();
             verify(queue).done(any());
             verify(queue).add(argThat(de ->
@@ -171,7 +171,7 @@ class DefaultControllerTest {
 
             controller.new Worker().run();
 
-            verify(synchronizer).start();
+            verify(synchronizer, never()).start();
             verify(queue, times(2)).take();
             verify(queue).done(any());
 
@@ -190,7 +190,7 @@ class DefaultControllerTest {
 
             controller.new Worker().run();
 
-            verify(synchronizer, times(1)).start();
+            verify(synchronizer, never()).start();
             verify(queue, times(2)).take();
             verify(queue, times(1)).done(any());
             verify(queue, times(1)).add(argThat(de ->
@@ -211,7 +211,7 @@ class DefaultControllerTest {
 
             controller.new Worker().run();
 
-            verify(synchronizer, times(1)).start();
+            verify(synchronizer, never()).start();
             verify(queue, times(2)).take();
             verify(queue, times(1)).done(any());
             verify(queue, times(1)).add(argThat(de ->
@@ -262,6 +262,7 @@ class DefaultControllerTest {
         assertTrue(controller.isStarted());
         assertFalse(controller.isDisposed());
 
+        verify(synchronizer).start();
         verify(executor).execute(any(Runnable.class));
     }
 
