@@ -1142,22 +1142,20 @@ core:
         title: Grant permission
       enable:
         title: Enable
-        description: Are you sure you want to enable this user?
+        description: >-
+          Are you sure you want to enable this user? Once enabled, the user will be able to log back into the system.
       enable_in_batch:
         title: Enable
         description: >-
-          Are you sure you want to enable the selected users? They will be able 
-          to log in again after being enabled.
+          Are you sure you want to enable the selected users? Once enabled, these users will be able to log back into the system.
       disable:
         title: Disable
         description: >-
-          Are you sure you want to disable this user? This user will not be able
-          to log in after being disabled
+          Are you sure you want to disable this user? Once disabled, the user will no longer be able to log in.
       disable_in_batch:
         title: Disable
         description: >-
-          Are you sure you want to disable the selected users? They will no longer 
-          be able to log in after being disabled.
+          Are you sure you want to disable the selected users? Once disabled, these users will no longer be able to log in.
     filters:
       role:
         label: Role
@@ -1981,8 +1979,6 @@ core:
       unknown_error: Unknown error
       disable_success: Disabled successfully
       enable_success: Enabled successfully
-      no_users_to_enable: All selected users are already enabled
-      no_users_to_disable: All selected users are already disabled
     dialog:
       titles:
         tip: Tip

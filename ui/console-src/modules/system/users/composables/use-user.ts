@@ -64,12 +64,16 @@ export function useUserEnableDisable() {
       enable: {
         title: t("core.user.operations.enable.title"),
         description: t("core.user.operations.enable.description"),
-        value: false,
+        request: (name: string) =>
+          consoleApiClient.user.enableUser({ username: name }),
+        message: t("core.common.toast.enable_success"),
       },
       disable: {
         title: t("core.user.operations.disable.title"),
         description: t("core.user.operations.disable.description"),
-        value: true,
+        request: (name: string) =>
+          consoleApiClient.user.disableUser({ username: name }),
+        message: t("core.common.toast.disable_success"),
       },
     };
 
@@ -83,17 +87,9 @@ export function useUserEnableDisable() {
       cancelText: t("core.common.buttons.cancel"),
       onConfirm: async () => {
         try {
-          if (operation == "enable") {
-            await consoleApiClient.user.enableUser({
-              username: name,
-            });
-          } else {
-            await consoleApiClient.user.disableUser({
-              username: name,
-            });
-          }
+          await operationConfig.request(name);
 
-          Toast.success(t("core.common.toast.operation_success"));
+          Toast.success(operationConfig.message);
           onSuccess?.();
         } catch (e) {
           console.error("Failed to enable or disable user", e);
