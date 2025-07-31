@@ -138,70 +138,56 @@ const handleDeleteInBatch = async () => {
   });
 };
 
-const handleUserBatchOperation = async ({
-  filterCondition,
-  apiMethod,
-  successMessageKey,
-  emptyMessageKey,
-}) => {
-  const filteredUserNames = selectedUserNames.value.filter((name) => {
-    if (name === userStore.currentUser?.metadata.name) return false;
-    const user = users.value?.find((u) => u.user.metadata.name === name);
-    return user && filterCondition(user.user);
-  });
-
-  if (!filteredUserNames.length) {
-    Toast.info(t(emptyMessageKey));
-    return;
-  }
-
-  const chunks = chunk(filteredUserNames, 5);
-  for (const chunk of chunks) {
-    await Promise.all(chunk.map((name) => apiMethod(name)));
-  }
-
-  await refetch();
-  selectedUserNames.value.length = 0;
-  Toast.success(t(successMessageKey));
-};
-
-const handleEnableInBatch = async () => {
-  Dialog.warning({
-    title: t("core.user.operations.enable_in_batch.title"),
-    description: t("core.user.operations.enable_in_batch.description"),
-    confirmType: "primary",
-    confirmText: t("core.common.buttons.confirm"),
-    cancelText: t("core.common.buttons.cancel"),
-    onConfirm: async () => {
-      await handleUserBatchOperation({
-        filterCondition: (user) => !!user.spec.disabled,
-        apiMethod: (name) =>
-          consoleApiClient.user.enableUser({ username: name }),
-        successMessageKey: "core.common.toast.enable_success",
-        emptyMessageKey: "core.common.toast.no_users_to_enable",
-      });
+function handleEnableOrDisableInBatch(operation: "enable" | "disable") {
+  const operations = {
+    enable: {
+      title: t("core.user.operations.enable_in_batch.title"),
+      description: t("core.user.operations.enable_in_batch.description"),
+      request: (name: string) =>
+        consoleApiClient.user.enableUser({ username: name }),
+      condition: (user: User) => user.spec.disabled,
+      message: t("core.common.toast.enable_success"),
     },
-  });
-};
+    disable: {
+      title: t("core.user.operations.disable_in_batch.title"),
+      description: t("core.user.operations.disable_in_batch.description"),
+      request: (name: string) =>
+        consoleApiClient.user.disableUser({ username: name }),
+      condition: (user: User) => !user.spec.disabled,
+      message: t("core.common.toast.disable_success"),
+    },
+  };
 
-const handleDisableInBatch = async () => {
+  const operationConfig = operations[operation];
+
   Dialog.warning({
-    title: t("core.user.operations.disable_in_batch.title"),
-    description: t("core.user.operations.disable_in_batch.description"),
+    title: operationConfig.title,
+    description: operationConfig.description,
     confirmType: "danger",
     confirmText: t("core.common.buttons.confirm"),
     cancelText: t("core.common.buttons.cancel"),
     onConfirm: async () => {
-      await handleUserBatchOperation({
-        filterCondition: (user) => !user.spec.disabled,
-        apiMethod: (name) =>
-          consoleApiClient.user.disableUser({ username: name }),
-        successMessageKey: "core.common.toast.disable_success",
-        emptyMessageKey: "core.common.toast.no_users_to_disable",
+      const filteredUserNames = selectedUserNames.value.filter((name) => {
+        if (name === userStore.currentUser?.metadata.name) return false;
+        const user = users.value?.find((u) => u.user.metadata.name === name);
+        return user && operationConfig.condition(user.user);
       });
+
+      const chunks = chunk(filteredUserNames, 5);
+
+      for (const chunk of chunks) {
+        await Promise.all(chunk.map((name) => operationConfig.request(name)));
+      }
+
+      await refetch();
+
+      selectedUserNames.value.length = 0;
+      checkedAll.value = false;
+
+      Toast.success(operationConfig.message);
     },
   });
-};
+}
 
 watch(selectedUserNames, (newValue) => {
   checkedAll.value =
@@ -308,10 +294,10 @@ function onCreationModalClose() {
             <div class="flex w-full flex-1 items-center sm:w-auto">
               <SearchInput v-if="!selectedUserNames.length" v-model="keyword" />
               <VSpace v-else>
-                <VButton type="secondary" @click="handleDisableInBatch">
+                <VButton @click="handleEnableOrDisableInBatch('disable')">
                   {{ $t("core.common.buttons.disable") }}
                 </VButton>
-                <VButton type="secondary" @click="handleEnableInBatch">
+                <VButton @click="handleEnableOrDisableInBatch('enable')">
                   {{ $t("core.common.buttons.enable") }}
                 </VButton>
                 <VButton type="danger" @click="handleDeleteInBatch">
