@@ -35,4 +35,9 @@ public class ContributorFinderImpl implements ContributorFinder {
         return Flux.fromIterable(names)
             .flatMapSequential(this::getContributor);
     }
+
+    @Override
+    public UserService getUserService() {
+        return userService;
+    }
 }

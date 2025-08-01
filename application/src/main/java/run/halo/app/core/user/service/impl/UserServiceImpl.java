@@ -2,6 +2,7 @@ package run.halo.app.core.user.service.impl;
 
 import static run.halo.app.extension.ExtensionUtil.defaultSort;
 import static run.halo.app.extension.index.query.QueryFactory.equal;
+import static run.halo.app.extension.index.query.QueryFactory.in;
 
 import java.time.Clock;
 import java.time.Duration;
@@ -314,6 +315,32 @@ public class UserServiceImpl implements UserService {
             .filter(user -> Boolean.TRUE.equals(user.getSpec().getDisabled()))
             .doOnNext(user -> user.getSpec().setDisabled(false))
             .flatMap(client::update);
+    }
+
+    @Override
+    public Flux<User> getUsersOrGhostByNames(Set<String> usernames) {
+        if (usernames == null || usernames.isEmpty()) {
+            return Flux.empty();
+        }
+        
+        // Use listAll with FieldSelector to get users by names in a single query
+        var listOptions = ListOptions.builder()
+            .fieldQuery(in("metadata.name", usernames))
+            .build();
+        
+        return client.listAll(User.class, listOptions, defaultSort())
+            .collectMap(user -> user.getMetadata().getName())
+            .flatMapMany(userMap -> Flux.fromIterable(usernames)
+                .flatMapSequential(username -> {
+                    User user = userMap.get(username);
+                    if (user != null) {
+                        return Mono.just(user);
+                    } else {
+                        // Return ghost user for missing users, similar to getUserOrGhost
+                        return client.fetch(User.class, GHOST_USER_NAME);
+                    }
+                })
+            );
     }
 
     void publishPasswordChangedEvent(String username) {
