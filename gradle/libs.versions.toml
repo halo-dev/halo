@@ -41,7 +41,7 @@ therapi = ['therapi-runtime-javadoc', 'therapi-runtime-javadoc-scribe']
 [plugins]
 spring-boot = 'org.springframework.boot:3.5.4'
 spring-dependency-management = 'io.spring.dependency-management:1.1.7'
-git-properties = 'com.gorylenko.gradle-git-properties:2.5.0'
+git-properties = 'com.gorylenko.gradle-git-properties:2.5.2'
 undercouch-download = 'de.undercouch.download:5.6.0'
 lombok = 'io.freefair.lombok:8.14'
 checksum = 'org.gradle.crypto.checksum:1.4.0'
