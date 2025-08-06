@@ -5,6 +5,7 @@ import static run.halo.app.extension.index.query.QueryFactory.equal;
 
 import java.time.Clock;
 import java.time.Duration;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Objects;
@@ -38,6 +39,7 @@ import run.halo.app.extension.ListOptions;
 import run.halo.app.extension.Metadata;
 import run.halo.app.extension.ReactiveExtensionClient;
 import run.halo.app.extension.exception.ExtensionNotFoundException;
+import run.halo.app.extension.index.query.QueryFactory;
 import run.halo.app.extension.router.selector.FieldSelector;
 import run.halo.app.infra.SystemConfigurableEnvironmentFetcher;
 import run.halo.app.infra.SystemSetting;
@@ -53,8 +55,6 @@ import run.halo.app.security.device.DeviceService;
 @Service
 @RequiredArgsConstructor
 public class UserServiceImpl implements UserService {
-
-    public static final String GHOST_USER_NAME = "ghost";
 
     private final ReactiveExtensionClient client;
 
@@ -90,6 +90,19 @@ public class UserServiceImpl implements UserService {
     public Mono<User> getUserOrGhost(String username) {
         return client.fetch(User.class, username)
             .switchIfEmpty(Mono.defer(() -> client.get(User.class, GHOST_USER_NAME)));
+    }
+
+    @Override
+    public Flux<User> getUsersOrGhosts(Collection<String> names) {
+        if (CollectionUtils.isEmpty(names)) {
+            return Flux.empty();
+        }
+        var nameSet = new HashSet<>(names);
+        nameSet.add(GHOST_USER_NAME);
+        var options = ListOptions.builder()
+            .andQuery(QueryFactory.in("metadata.name", nameSet))
+            .build();
+        return client.listAll(User.class, options, defaultSort());
     }
 
     @Override

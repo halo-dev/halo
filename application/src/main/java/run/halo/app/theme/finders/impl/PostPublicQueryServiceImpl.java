@@ -1,18 +1,23 @@
 package run.halo.app.theme.finders.impl;
 
+import static java.util.Objects.requireNonNullElse;
+import static java.util.Objects.requireNonNullElseGet;
+import static run.halo.app.core.counter.MeterUtils.nameOf;
+import static run.halo.app.core.user.service.UserService.GHOST_USER_NAME;
+
+import java.util.HashSet;
 import java.util.List;
+import java.util.Objects;
 import java.util.function.Function;
 import lombok.RequiredArgsConstructor;
 import org.springframework.lang.NonNull;
 import org.springframework.stereotype.Component;
 import org.springframework.util.Assert;
 import org.springframework.util.CollectionUtils;
-import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import run.halo.app.content.ContentWrapper;
 import run.halo.app.content.PostService;
 import run.halo.app.core.counter.CounterService;
-import run.halo.app.core.counter.MeterUtils;
 import run.halo.app.core.extension.content.Post;
 import run.halo.app.extension.ListOptions;
 import run.halo.app.extension.ListResult;
@@ -25,6 +30,7 @@ import run.halo.app.theme.finders.ContributorFinder;
 import run.halo.app.theme.finders.PostPublicQueryService;
 import run.halo.app.theme.finders.TagFinder;
 import run.halo.app.theme.finders.vo.ContentVo;
+import run.halo.app.theme.finders.vo.ContributorVo;
 import run.halo.app.theme.finders.vo.ListedPostVo;
 import run.halo.app.theme.finders.vo.PostVo;
 import run.halo.app.theme.finders.vo.StatsVo;
@@ -66,15 +72,11 @@ public class PostPublicQueryServiceImpl implements PostPublicQueryService {
                 return option;
             })
             .flatMap(listOptions -> client.listBy(Post.class, listOptions, page))
-            .flatMap(list -> Flux.fromStream(list.get())
-                .flatMapSequential(post -> convertToListedVo(post)
-                    .flatMap(postVo -> populateStats(postVo)
-                        .doOnNext(postVo::setStats).thenReturn(postVo)
+            .flatMap(list -> convertToListedVos(list.getItems())
+                .map(
+                    postVos -> new ListResult<>(
+                        list.getPage(), list.getSize(), list.getTotal(), postVos
                     )
-                )
-                .collectList()
-                .map(postVos -> new ListResult<>(list.getPage(), list.getSize(), list.getTotal(),
-                    postVos)
                 )
             )
             .defaultIfEmpty(ListResult.emptyResult());
@@ -129,6 +131,97 @@ public class PostPublicQueryServiceImpl implements PostPublicQueryService {
     }
 
     @Override
+    public Mono<List<ListedPostVo>> convertToListedVos(List<Post> posts) {
+        var counterNames = new HashSet<String>(posts.size());
+        var userNames = new HashSet<String>();
+        var tagNames = new HashSet<String>();
+        var categoryNames = new HashSet<String>();
+        posts.forEach(post -> {
+            counterNames.add(nameOf(Post.class, post.getMetadata().getName()));
+            var spec = post.getSpec();
+            userNames.add(spec.getOwner());
+            var status = post.getStatus();
+            if (status != null && status.getContributors() != null) {
+                userNames.addAll(status.getContributors());
+            }
+            if (spec.getTags() != null) {
+                tagNames.addAll(spec.getTags());
+            }
+            if (spec.getCategories() != null) {
+                categoryNames.addAll(spec.getCategories());
+            }
+        });
+
+        var getCounters = counterService.getByNames(counterNames)
+            .collectMap(counter -> counter.getMetadata().getName());
+        var getContributors = contributorFinder.getContributors(userNames)
+            .collectMap(ContributorVo::getName);
+        var getTags = tagFinder.getByNames(tagNames)
+            .collectMap(tagVo -> tagVo.getMetadata().getName());
+        var getCategories = categoryFinder.getByNames(categoryNames)
+            .collectMap(categoryVo -> categoryVo.getMetadata().getName());
+
+        return Mono.zip(getCounters, getContributors, getTags, getCategories)
+            .map(tuple -> {
+                var counters = tuple.getT1();
+                var contributors = tuple.getT2();
+                var tags = tuple.getT3();
+                var categories = tuple.getT4();
+                return posts.stream()
+                    .map(post -> {
+                        var vo = ListedPostVo.from(post);
+                        vo.setCategories(List.of());
+                        vo.setTags(List.of());
+                        vo.setContributors(List.of());
+
+                        var spec = post.getSpec();
+                        var status = post.getStatus();
+                        var ghost = requireNonNullElseGet(
+                            contributors.get(GHOST_USER_NAME), ContributorVo::ghost
+                        );
+                        vo.setOwner(requireNonNullElse(contributors.get(spec.getOwner()), ghost));
+                        if (status != null && !CollectionUtils.isEmpty(status.getContributors())) {
+                            vo.setContributors(status.getContributors()
+                                .stream()
+                                .map(name -> requireNonNullElse(contributors.get(name), ghost))
+                                .toList());
+                        }
+
+                        if (!CollectionUtils.isEmpty(spec.getTags())) {
+                            vo.setTags(spec.getTags()
+                                .stream()
+                                .map(tags::get)
+                                .filter(Objects::nonNull)
+                                .toList());
+                        }
+                        if (!CollectionUtils.isEmpty(spec.getCategories())) {
+                            vo.setCategories(spec.getCategories()
+                                .stream()
+                                .map(categories::get)
+                                .filter(Objects::nonNull)
+                                .toList());
+                        }
+
+                        var counterName = nameOf(Post.class, post.getMetadata().getName());
+                        var counter = counters.get(counterName);
+                        if (counter != null) {
+                            vo.setStats(StatsVo.builder()
+                                .visit(counter.getVisit())
+                                .upvote(counter.getUpvote())
+                                .comment(counter.getApprovedComment())
+                                .build()
+                            );
+                        } else {
+                            vo.setStats(StatsVo.empty());
+                        }
+
+                        return vo;
+                    })
+                    .toList();
+            });
+    }
+
+    @Override
     public Mono<PostVo> convertToVo(Post post, String snapshotName) {
         final String baseSnapshotName = post.getSpec().getBaseSnapshot();
         return convertToListedVo(post)
@@ -177,7 +270,7 @@ public class PostPublicQueryServiceImpl implements PostPublicQueryService {
     }
 
     private <T extends ListedPostVo> Mono<StatsVo> populateStats(T postVo) {
-        return counterService.getByName(MeterUtils.nameOf(Post.class, postVo.getMetadata()
+        return counterService.getByName(nameOf(Post.class, postVo.getMetadata()
                 .getName())
             )
             .map(counter -> StatsVo.builder()
