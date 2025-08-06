@@ -1,5 +1,6 @@
 package run.halo.app.theme.finders;
 
+import java.util.List;
 import org.springframework.lang.NonNull;
 import reactor.core.publisher.Mono;
 import run.halo.app.core.extension.content.Post;
@@ -29,6 +30,8 @@ public interface PostPublicQueryService {
      * @return listed post vo
      */
     Mono<ListedPostVo> convertToListedVo(@NonNull Post post);
+
+    Mono<List<ListedPostVo>> convertToListedVos(List<Post> posts);
 
     /**
      * Converts {@link Post} to post vo and populate post content by the given snapshot name.

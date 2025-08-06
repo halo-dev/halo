@@ -4,6 +4,8 @@ import lombok.Builder;
 import lombok.ToString;
 import lombok.Value;
 import run.halo.app.core.extension.User;
+import run.halo.app.core.user.service.UserService;
+import run.halo.app.extension.Metadata;
 import run.halo.app.extension.MetadataOperator;
 
 /**
@@ -44,6 +46,24 @@ public class ContributorVo implements ExtensionVoOperator {
             .bio(user.getSpec().getBio())
             .permalink(permalink)
             .metadata(user.getMetadata())
+            .build();
+    }
+
+    /**
+     * Create a ghost contributor.
+     *
+     * @return a ghost contributor value object
+     */
+    public static ContributorVo ghost() {
+        var metadata = new Metadata();
+        metadata.setName(UserService.GHOST_USER_NAME);
+        return builder()
+            .name("ghost")
+            .displayName("Ghost")
+            // .avatar("/images/ghost.png")
+            .bio("A ghost user.")
+            .permalink("/authors/ghost")
+            .metadata(metadata)
             .build();
     }
 }

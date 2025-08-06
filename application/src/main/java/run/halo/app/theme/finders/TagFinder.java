@@ -1,5 +1,6 @@
 package run.halo.app.theme.finders;
 
+import java.util.Collection;
 import java.util.List;
 import org.springframework.lang.Nullable;
 import reactor.core.publisher.Flux;
@@ -18,7 +19,7 @@ public interface TagFinder {
 
     Mono<TagVo> getByName(String name);
 
-    Flux<TagVo> getByNames(List<String> names);
+    Flux<TagVo> getByNames(Collection<String> names);
 
     Mono<ListResult<TagVo>> list(@Nullable Integer page, @Nullable Integer size);
 
