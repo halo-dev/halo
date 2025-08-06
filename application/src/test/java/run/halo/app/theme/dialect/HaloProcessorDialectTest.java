@@ -90,6 +90,7 @@ class HaloProcessorDialectTest {
         map.put("templateGlobalHeadProcessor", new TemplateGlobalHeadProcessor(fetcher));
         map.put("faviconHeadProcessor", new DefaultFaviconHeadProcessor(fetcher));
         map.put("globalSeoProcessor", new GlobalSeoProcessor(fetcher));
+        map.put("indexSeoProcessor", new IndexSeoProcessor(fetcher));
 
         CodeInjection codeInjection = new CodeInjection();
         codeInjection.setContentHead("<meta name=\"content-head-test\" content=\"test\" />");
@@ -233,8 +234,9 @@ class HaloProcessorDialectTest {
     }
 
     @Test
-    void seoWithKeywordsAndDescription() {
-        final Context context = getContext();
+    void indexSeoWithKeywordsAndDescription() {
+        Context context = getContext();
+        context.setVariable(ModelConst.TEMPLATE_ID, DefaultTemplateEnum.INDEX.getValue());
         Seo seo = new Seo();
         seo.setKeywords("K1, K2, K3");
         seo.setDescription("This is a description.");
@@ -252,9 +254,9 @@ class HaloProcessorDialectTest {
               <head>
                 <meta charset="UTF-8" />
                 <title>Seo Test</title>
-              <meta name="keywords" content="K1, K2, K3" />
+              <meta name="global-head-test" content="test" />
+            <meta name="keywords" content="K1, K2, K3" />
             <meta name="description" content="This is a description." />
-            <meta name="global-head-test" content="test" />
             <link rel="icon" href="favicon.ico" />
             </head>
               <body>
