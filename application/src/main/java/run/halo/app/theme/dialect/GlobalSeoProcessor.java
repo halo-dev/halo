@@ -2,7 +2,6 @@ package run.halo.app.theme.dialect;
 
 import lombok.AllArgsConstructor;
 import org.apache.commons.lang3.BooleanUtils;
-import org.apache.commons.lang3.StringUtils;
 import org.springframework.core.Ordered;
 import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
@@ -35,24 +34,12 @@ public class GlobalSeoProcessor implements TemplateHeadProcessor {
             .map(seo -> {
                 boolean blockSpiders = BooleanUtils.isTrue(seo.getBlockSpiders());
                 IModelFactory modelFactory = context.getModelFactory();
-                if (blockSpiders) {
-                    String noIndexMeta = "<meta name=\"robots\" content=\"noindex\" />\n";
-                    model.add(modelFactory.createText(noIndexMeta));
-                    return model;
+                if (!blockSpiders) {
+                    return Mono.empty();
                 }
 
-                String keywords = seo.getKeywords();
-                if (StringUtils.isNotBlank(keywords)) {
-                    String keywordsMeta =
-                        "<meta name=\"keywords\" content=\"" + keywords + "\" />\n";
-                    model.add(modelFactory.createText(keywordsMeta));
-                }
-
-                if (StringUtils.isNotBlank(seo.getDescription())) {
-                    String descriptionMeta =
-                        "<meta name=\"description\" content=\"" + seo.getDescription() + "\" />\n";
-                    model.add(modelFactory.createText(descriptionMeta));
-                }
+                String noIndexMeta = "<meta name=\"robots\" content=\"noindex\" />\n";
+                model.add(modelFactory.createText(noIndexMeta));
                 return model;
             })
             .then();

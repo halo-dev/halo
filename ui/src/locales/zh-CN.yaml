@@ -354,7 +354,7 @@ core:
           label: 名称
         slug:
           label: 别名
-          help: 通常用于生成分类的固定链接
+          help: 通常用于生成标签的固定链接
           refresh_message: 根据名称重新生成别名
         color:
           label: 颜色
@@ -389,7 +389,7 @@ core:
           label: 名称
         slug:
           label: 别名
-          help: 通常用于生成标签的固定链接
+          help: 通常用于生成分类的固定链接
           refresh_message: 根据名称重新生成别名
         template:
           label: 自定义模板
@@ -399,7 +399,7 @@ core:
           help: 需要主题适配以支持
         description:
           label: 描述
-          help: 需要主题适配以支持
+          help: 描述会自动添加到页面用于 SEO 的描述标签中，其他显示用途需要主题适配
         prevent_parent_post_cascade_query:
           label: 阻止文章级联查询
           help: 阻止父级分类在级联文章查询中包含此分类及其子分类
