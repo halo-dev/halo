@@ -1,5 +1,6 @@
 package run.halo.app.core.user.service;
 
+import java.util.Collection;
 import java.util.Set;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
@@ -7,9 +8,13 @@ import run.halo.app.core.extension.User;
 
 public interface UserService {
 
+    String GHOST_USER_NAME = "ghost";
+
     Mono<User> getUser(String username);
 
     Mono<User> getUserOrGhost(String username);
+
+    Flux<User> getUsersOrGhosts(Collection<String> names);
 
     Mono<User> updatePassword(String username, String newPassword);
 

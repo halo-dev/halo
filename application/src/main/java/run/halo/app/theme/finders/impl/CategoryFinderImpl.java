@@ -19,15 +19,18 @@ import org.apache.commons.lang3.StringUtils;
 import org.springframework.data.domain.Sort;
 import org.springframework.lang.Nullable;
 import org.springframework.util.Assert;
+import org.springframework.util.CollectionUtils;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import run.halo.app.content.CategoryService;
 import run.halo.app.core.extension.content.Category;
+import run.halo.app.extension.ExtensionUtil;
 import run.halo.app.extension.ListOptions;
 import run.halo.app.extension.ListResult;
 import run.halo.app.extension.Metadata;
 import run.halo.app.extension.PageRequestImpl;
 import run.halo.app.extension.ReactiveExtensionClient;
+import run.halo.app.extension.index.query.QueryFactory;
 import run.halo.app.extension.router.selector.FieldSelector;
 import run.halo.app.theme.finders.CategoryFinder;
 import run.halo.app.theme.finders.Finder;
@@ -54,12 +57,15 @@ public class CategoryFinderImpl implements CategoryFinder {
     }
 
     @Override
-    public Flux<CategoryVo> getByNames(List<String> names) {
-        if (names == null) {
+    public Flux<CategoryVo> getByNames(Collection<String> names) {
+        if (CollectionUtils.isEmpty(names)) {
             return Flux.empty();
         }
-        return Flux.fromIterable(names)
-            .flatMap(this::getByName);
+        var options = ListOptions.builder()
+            .andQuery(QueryFactory.in("metadata.name", names))
+            .build();
+        return client.listAll(Category.class, options, ExtensionUtil.defaultSort())
+            .map(CategoryVo::from);
     }
 
     static Sort defaultSort() {
