@@ -113,10 +113,12 @@
         </div>
         <ul class="pill-items">
             <li th:each="provider : ${socialAuthProviders}">
-                <a th:href="${provider.spec.authenticationUrl}">
-                    <img th:src="${provider.spec.logo}" th:alt="|${provider.spec.displayName}'s icon|" />
-                    <span th:text="${provider.spec.displayName}"></span>
-                </a>
+                <form th:action="|/login/social/${provider.metadata.name}?remember-me=true|" method="post">
+                    <button type="submit">
+                        <img th:src="${provider.spec.logo}" th:alt="|${provider.spec.displayName}'s icon|" />
+                        <span th:text="${provider.spec.displayName}"></span>
+                    </button>
+                </form>
             </li>
         </ul>
     </th:block>
