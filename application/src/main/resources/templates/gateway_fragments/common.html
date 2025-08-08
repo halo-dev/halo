@@ -113,13 +113,35 @@
         </div>
         <ul class="pill-items">
             <li th:each="provider : ${socialAuthProviders}">
-                <a th:href="${provider.spec.authenticationUrl}">
-                    <img th:src="${provider.spec.logo}" th:alt="|${provider.spec.displayName}'s icon|" />
-                    <span th:text="${provider.spec.displayName}"></span>
-                </a>
+                <form
+                    class="social-auth-provider-form"
+                    th:action="|/login/social/${provider.metadata.name}?remember-me=false|"
+                    method="post"
+                >
+                    <button type="submit">
+                        <img th:src="${provider.spec.logo}" th:alt="|${provider.spec.displayName}'s icon|" />
+                        <span th:text="${provider.spec.displayName}"></span>
+                    </button>
+                </form>
             </li>
         </ul>
     </th:block>
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            const rememberMeCheckbox = document.getElementById("remember-me");
+            const socialAuthProviders = document.querySelectorAll(".social-auth-provider-form");
+            
+            rememberMeCheckbox.addEventListener("change", function (e) {
+                const rememberMe = e.target.checked;
+                
+                socialAuthProviders.forEach((form) => {
+                    const url = new URL(form.action, window.location.origin);
+                    url.searchParams.set("remember-me", rememberMe ? "true" : "false");
+                    form.action = url.pathname + url.search;
+                });
+            });
+        });
+    </script>
 </div>
 
 <div th:remove="tag" th:fragment="passwordResetMethods">
