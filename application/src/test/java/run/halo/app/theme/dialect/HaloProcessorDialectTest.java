@@ -1,6 +1,7 @@
 package run.halo.app.theme.dialect;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.lenient;
 import static org.mockito.Mockito.mock;
@@ -39,6 +40,7 @@ import run.halo.app.infra.SystemSetting;
 import run.halo.app.infra.SystemSetting.CodeInjection;
 import run.halo.app.infra.SystemSetting.Seo;
 import run.halo.app.plugin.extensionpoint.ExtensionGetter;
+import run.halo.app.theme.Constant;
 import run.halo.app.theme.DefaultTemplateEnum;
 import run.halo.app.theme.finders.PostFinder;
 import run.halo.app.theme.finders.SinglePageFinder;
@@ -90,6 +92,7 @@ class HaloProcessorDialectTest {
         map.put("templateGlobalHeadProcessor", new TemplateGlobalHeadProcessor(fetcher));
         map.put("faviconHeadProcessor", new DefaultFaviconHeadProcessor(fetcher));
         map.put("globalSeoProcessor", new GlobalSeoProcessor(fetcher));
+        map.put("indexSeoProcessor", new IndexSeoProcessor(fetcher));
 
         CodeInjection codeInjection = new CodeInjection();
         codeInjection.setContentHead("<meta name=\"content-head-test\" content=\"test\" />");
@@ -145,7 +148,7 @@ class HaloProcessorDialectTest {
             <div class="footer">
               <footer>hello this is global footer.</footer>
             </div>
-                        
+            
               </body>
             </html>
             """);
@@ -196,10 +199,23 @@ class HaloProcessorDialectTest {
             <div class="footer">
               <footer>hello this is global footer.</footer>
             </div>
-                       
+            
               </body>
             </html>
             """);
+    }
+
+    @Test
+    void shouldSetMetaDescriptionIfContainingMetaDescriptionVariable() {
+        var context = getContext();
+        context.setVariable(Constant.META_DESCRIPTION_VARIABLE_NAME, "Fake description");
+        when(fetcher.fetch(Seo.GROUP, Seo.class)).thenReturn(Mono.empty());
+        when(fetcher.fetch(SystemSetting.Basic.GROUP, SystemSetting.Basic.class))
+            .thenReturn(Mono.empty());
+        var result = templateEngine.process("seo", context);
+        assertTrue(result.contains("""
+            <meta name="description" content="Fake description"/>\
+            """));
     }
 
     @Test
@@ -221,7 +237,7 @@ class HaloProcessorDialectTest {
               <head>
                 <meta charset="UTF-8" />
                 <title>Seo Test</title>
-              <meta name="robots" content="noindex" />
+              <meta name="robots" content="noindex"/>\
             <meta name="global-head-test" content="test" />
             <link rel="icon" href="favicon.ico" />
             </head>
@@ -233,8 +249,9 @@ class HaloProcessorDialectTest {
     }
 
     @Test
-    void seoWithKeywordsAndDescription() {
-        final Context context = getContext();
+    void indexSeoWithKeywordsAndDescription() {
+        Context context = getContext();
+        context.setVariable(ModelConst.TEMPLATE_ID, DefaultTemplateEnum.INDEX.getValue());
         Seo seo = new Seo();
         seo.setKeywords("K1, K2, K3");
         seo.setDescription("This is a description.");
@@ -252,9 +269,9 @@ class HaloProcessorDialectTest {
               <head>
                 <meta charset="UTF-8" />
                 <title>Seo Test</title>
-              <meta name="keywords" content="K1, K2, K3" />
+              <meta name="global-head-test" content="test" />
+            <meta name="keywords" content="K1, K2, K3" />
             <meta name="description" content="This is a description." />
-            <meta name="global-head-test" content="test" />
             <link rel="icon" href="favicon.ico" />
             </head>
               <body>

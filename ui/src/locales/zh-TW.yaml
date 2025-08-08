@@ -339,7 +339,7 @@ core:
           label: 名稱
         slug:
           label: 別名
-          help: 通常用於生成分類的固定連結
+          help: 通常用於生成標籤的固定連結
           refresh_message: 根據名稱重新生成別名
         color:
           label: 顏色
@@ -374,7 +374,7 @@ core:
           label: 名稱
         slug:
           label: 別名
-          help: 通常用於生成標籤的固定連結
+          help: 通常用於生成分類的固定連結
           refresh_message: 根據名稱重新生成別名
         template:
           label: 自定義模板
@@ -384,7 +384,7 @@ core:
           help: 需要主題適配以支持
         description:
           label: 描述
-          help: 需要主題適配以支持
+          help: 描述會自動添加到頁面用於 SEO 的描述標籤中，其他顯示用途需要主題適配
         prevent_parent_post_cascade_query:
           label: 防止父級聯查詢
           help: 阻止父級分類在級聯文章查詢中包含此分類及其子分類

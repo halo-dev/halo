@@ -1,12 +1,14 @@
 package run.halo.app.theme.dialect;
 
+import static run.halo.app.theme.Constant.META_DESCRIPTION_VARIABLE_NAME;
+
+import java.util.LinkedHashMap;
 import lombok.AllArgsConstructor;
-import org.apache.commons.lang3.BooleanUtils;
-import org.apache.commons.lang3.StringUtils;
 import org.springframework.core.Ordered;
 import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
 import org.thymeleaf.context.ITemplateContext;
+import org.thymeleaf.model.AttributeValueQuotes;
 import org.thymeleaf.model.IModel;
 import org.thymeleaf.model.IModelFactory;
 import org.thymeleaf.processor.element.IElementModelStructureHandler;
@@ -24,7 +26,7 @@ import run.halo.app.infra.SystemSetting;
 @Order(Ordered.HIGHEST_PRECEDENCE + 1)
 @Component
 @AllArgsConstructor
-public class GlobalSeoProcessor implements TemplateHeadProcessor {
+class GlobalSeoProcessor implements TemplateHeadProcessor {
 
     private final SystemConfigurableEnvironmentFetcher environmentFetcher;
 
@@ -32,28 +34,37 @@ public class GlobalSeoProcessor implements TemplateHeadProcessor {
     public Mono<Void> process(ITemplateContext context, IModel model,
         IElementModelStructureHandler structureHandler) {
         return environmentFetcher.fetch(SystemSetting.Seo.GROUP, SystemSetting.Seo.class)
-            .map(seo -> {
-                boolean blockSpiders = BooleanUtils.isTrue(seo.getBlockSpiders());
+            .switchIfEmpty(Mono.fromSupplier(SystemSetting.Seo::new))
+            .doOnNext(seo -> {
                 IModelFactory modelFactory = context.getModelFactory();
-                if (blockSpiders) {
-                    String noIndexMeta = "<meta name=\"robots\" content=\"noindex\" />\n";
-                    model.add(modelFactory.createText(noIndexMeta));
-                    return model;
+                if (Boolean.TRUE.equals(seo.getBlockSpiders())) {
+                    var attributes = LinkedHashMap.<String, String>newLinkedHashMap(2);
+                    attributes.put("name", "robots");
+                    attributes.put("content", "noindex");
+                    var metaTag = modelFactory.createStandaloneElementTag(
+                        "meta",
+                        attributes,
+                        AttributeValueQuotes.DOUBLE,
+                        false,
+                        true
+                    );
+                    model.add(metaTag);
+                    return;
                 }
-
-                String keywords = seo.getKeywords();
-                if (StringUtils.isNotBlank(keywords)) {
-                    String keywordsMeta =
-                        "<meta name=\"keywords\" content=\"" + keywords + "\" />\n";
-                    model.add(modelFactory.createText(keywordsMeta));
+                var seoMetaDescription = context.getVariable(META_DESCRIPTION_VARIABLE_NAME);
+                if (seoMetaDescription instanceof String description && !description.isBlank()) {
+                    var attributes = LinkedHashMap.<String, String>newLinkedHashMap(2);
+                    attributes.put("name", "description");
+                    attributes.put("content", description);
+                    var metaTag = modelFactory.createStandaloneElementTag(
+                        "meta",
+                        attributes,
+                        AttributeValueQuotes.DOUBLE,
+                        false,
+                        true
+                    );
+                    model.add(metaTag);
                 }
-
-                if (StringUtils.isNotBlank(seo.getDescription())) {
-                    String descriptionMeta =
-                        "<meta name=\"description\" content=\"" + seo.getDescription() + "\" />\n";
-                    model.add(modelFactory.createText(descriptionMeta));
-                }
-                return model;
             })
             .then();
     }
