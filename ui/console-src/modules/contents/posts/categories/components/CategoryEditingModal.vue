@@ -192,16 +192,20 @@ async function slugUniqueValidation(node: FormKitNode) {
 
   const fieldSelector = [`spec.slug=${value}`];
 
-  if (props.category) {
-    fieldSelector.push(`metadata.name!=${props.category.metadata.name}`);
-  }
-
   const { data: categoriesWithSameSlug } =
     await coreApiClient.content.category.listCategory({
       fieldSelector,
     });
 
-  return !categoriesWithSameSlug.total;
+  let { items } = categoriesWithSameSlug || {};
+
+  if (isUpdateMode) {
+    items = items.filter(
+      (item) => item.metadata.name !== formState.value.metadata.name
+    );
+  }
+
+  return !items.length;
 }
 </script>
 <template>

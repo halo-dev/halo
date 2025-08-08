@@ -77,16 +77,18 @@ async function slugUniqueValidation(node: FormKitNode) {
 
   const fieldSelector = [`spec.slug=${value}`];
 
-  if (props.name) {
-    fieldSelector.push(`metadata.name!=${props.name}`);
-  }
-
   const { data: postsWithSameSlug } =
     await publicApiClient.content.post.queryPosts({
       fieldSelector,
     });
 
-  return !postsWithSameSlug.total;
+  let { items } = postsWithSameSlug || {};
+
+  if (props.name) {
+    items = items.filter((item) => item.metadata.name !== props.name);
+  }
+
+  return !items.length;
 }
 
 const isScheduledPublish = computed(() => {

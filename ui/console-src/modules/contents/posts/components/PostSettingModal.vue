@@ -268,17 +268,21 @@ async function slugUniqueValidation(node: FormKitNode) {
 
   const fieldSelector = [`spec.slug=${value}`];
 
-  if (isUpdateMode.value) {
-    fieldSelector.push(`metadata.name!=${formState.value.metadata.name}`);
-  }
-
   const { data: postsWithSameSlug } = await coreApiClient.content.post.listPost(
     {
       fieldSelector,
     }
   );
 
-  return !postsWithSameSlug.total;
+  let { items } = postsWithSameSlug || {};
+
+  if (isUpdateMode.value) {
+    items = items.filter(
+      (item) => item.metadata.name !== formState.value.metadata.name
+    );
+  }
+
+  return !items.length;
 }
 
 // Buttons condition
