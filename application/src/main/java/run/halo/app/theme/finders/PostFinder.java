@@ -36,6 +36,8 @@ public interface PostFinder {
 
     Flux<ListedPostVo> listAll();
 
+    Flux<ListedPostVo> random(Integer limit);
+
     /**
      * Lists posts by query params.
      *
