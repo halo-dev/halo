@@ -27,7 +27,7 @@ class OperatorTest {
             new TestCase("name=", Equals, null),
             new TestCase("name=value", Equals,
                 new SelectorCriteria("name", Equals, Set.of("value"))),
-            new TestCase("name=v", Equals, 
+            new TestCase("name=v", Equals,
                 new SelectorCriteria("name", Equals, Set.of("v"))),
 
             new TestCase("", NotEquals, null),
@@ -45,6 +45,10 @@ class OperatorTest {
             new TestCase("name", NotExist, null),
             new TestCase("na!me", NotExist, null),
             new TestCase("name!", NotExist, null),
+            new TestCase("name!=1", NotEquals,
+                new SelectorCriteria("name", NotEquals, Set.of("1"))),
+            new TestCase("name!=12", NotEquals,
+                new SelectorCriteria("name", NotEquals, Set.of("12"))),
 
             new TestCase("name", Exist, new SelectorCriteria("name", Exist, Set.of())),
             new TestCase("", Exist, null),
@@ -61,4 +65,5 @@ class OperatorTest {
             assertEquals(testCase.expected(), testCase.converter().convert(testCase.source()));
         });
     }
+
 }
