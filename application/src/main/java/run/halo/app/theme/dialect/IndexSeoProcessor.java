@@ -20,7 +20,7 @@ import run.halo.app.theme.router.ModelConst;
  */
 @Component
 @AllArgsConstructor
-public class IndexSeoProcessor implements TemplateHeadProcessor {
+class IndexSeoProcessor implements TemplateHeadProcessor {
 
     private final SystemConfigurableEnvironmentFetcher environmentFetcher;
 

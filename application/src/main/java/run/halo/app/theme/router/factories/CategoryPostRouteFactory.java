@@ -27,6 +27,7 @@ import run.halo.app.infra.SystemConfigurableEnvironmentFetcher;
 import run.halo.app.infra.SystemSetting;
 import run.halo.app.infra.exception.NotFoundException;
 import run.halo.app.infra.utils.PathUtils;
+import run.halo.app.theme.Constant;
 import run.halo.app.theme.DefaultTemplateEnum;
 import run.halo.app.theme.ViewNameResolver;
 import run.halo.app.theme.finders.PostFinder;
@@ -75,6 +76,10 @@ public class CategoryPostRouteFactory implements RouteFactory {
                     model.put("posts",
                         postListByCategoryName(categoryVo.getMetadata().getName(), request));
                     model.put("category", categoryVo);
+                    model.put(
+                        Constant.META_DESCRIPTION_VARIABLE_NAME,
+                        categoryVo.getSpec().getDescription()
+                    );
                     String template = categoryVo.getSpec().getTemplate();
                     return viewNameResolver.resolveViewNameOrDefault(request, template,
                             DefaultTemplateEnum.CATEGORY.getValue())

@@ -1,11 +1,14 @@
 package run.halo.app.theme.dialect;
 
+import static run.halo.app.theme.Constant.META_DESCRIPTION_VARIABLE_NAME;
+
+import java.util.Map;
 import lombok.AllArgsConstructor;
-import org.apache.commons.lang3.BooleanUtils;
 import org.springframework.core.Ordered;
 import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
 import org.thymeleaf.context.ITemplateContext;
+import org.thymeleaf.model.AttributeValueQuotes;
 import org.thymeleaf.model.IModel;
 import org.thymeleaf.model.IModelFactory;
 import org.thymeleaf.processor.element.IElementModelStructureHandler;
@@ -23,7 +26,7 @@ import run.halo.app.infra.SystemSetting;
 @Order(Ordered.HIGHEST_PRECEDENCE + 1)
 @Component
 @AllArgsConstructor
-public class GlobalSeoProcessor implements TemplateHeadProcessor {
+class GlobalSeoProcessor implements TemplateHeadProcessor {
 
     private final SystemConfigurableEnvironmentFetcher environmentFetcher;
 
@@ -31,16 +34,37 @@ public class GlobalSeoProcessor implements TemplateHeadProcessor {
     public Mono<Void> process(ITemplateContext context, IModel model,
         IElementModelStructureHandler structureHandler) {
         return environmentFetcher.fetch(SystemSetting.Seo.GROUP, SystemSetting.Seo.class)
-            .map(seo -> {
-                boolean blockSpiders = BooleanUtils.isTrue(seo.getBlockSpiders());
+            .switchIfEmpty(Mono.fromSupplier(SystemSetting.Seo::new))
+            .doOnNext(seo -> {
                 IModelFactory modelFactory = context.getModelFactory();
-                if (!blockSpiders) {
-                    return Mono.empty();
+                if (Boolean.TRUE.equals(seo.getBlockSpiders())) {
+                    var metaTag = modelFactory.createStandaloneElementTag(
+                        "meta",
+                        Map.of(
+                            "name", "robots",
+                            "content", "noindex"
+                        ),
+                        AttributeValueQuotes.DOUBLE,
+                        false,
+                        true
+                    );
+                    model.add(metaTag);
+                    return;
                 }
-
-                String noIndexMeta = "<meta name=\"robots\" content=\"noindex\" />\n";
-                model.add(modelFactory.createText(noIndexMeta));
-                return model;
+                var seoMetaDescription = context.getVariable(META_DESCRIPTION_VARIABLE_NAME);
+                if (seoMetaDescription instanceof String description && !description.isBlank()) {
+                    var metaTag = modelFactory.createStandaloneElementTag(
+                        "meta",
+                        Map.of(
+                            "name", "description",
+                            "content", description
+                        ),
+                        AttributeValueQuotes.DOUBLE,
+                        false,
+                        true
+                    );
+                    model.add(metaTag);
+                }
             })
             .then();
     }
