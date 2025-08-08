@@ -1,6 +1,7 @@
 package run.halo.app.theme.dialect;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.lenient;
 import static org.mockito.Mockito.mock;
@@ -39,6 +40,7 @@ import run.halo.app.infra.SystemSetting;
 import run.halo.app.infra.SystemSetting.CodeInjection;
 import run.halo.app.infra.SystemSetting.Seo;
 import run.halo.app.plugin.extensionpoint.ExtensionGetter;
+import run.halo.app.theme.Constant;
 import run.halo.app.theme.DefaultTemplateEnum;
 import run.halo.app.theme.finders.PostFinder;
 import run.halo.app.theme.finders.SinglePageFinder;
@@ -146,7 +148,7 @@ class HaloProcessorDialectTest {
             <div class="footer">
               <footer>hello this is global footer.</footer>
             </div>
-                        
+            
               </body>
             </html>
             """);
@@ -197,10 +199,23 @@ class HaloProcessorDialectTest {
             <div class="footer">
               <footer>hello this is global footer.</footer>
             </div>
-                       
+            
               </body>
             </html>
             """);
+    }
+
+    @Test
+    void shouldSetMetaDescriptionIfContainingMetaDescriptionVariable() {
+        var context = getContext();
+        context.setVariable(Constant.META_DESCRIPTION_VARIABLE_NAME, "Fake description");
+        when(fetcher.fetch(Seo.GROUP, Seo.class)).thenReturn(Mono.empty());
+        when(fetcher.fetch(SystemSetting.Basic.GROUP, SystemSetting.Basic.class))
+            .thenReturn(Mono.empty());
+        var result = templateEngine.process("seo", context);
+        assertTrue(result.contains("""
+            <meta name="description" content="Fake description"/>\
+            """));
     }
 
     @Test
@@ -222,7 +237,7 @@ class HaloProcessorDialectTest {
               <head>
                 <meta charset="UTF-8" />
                 <title>Seo Test</title>
-              <meta name="robots" content="noindex" />
+              <meta name="robots" content="noindex"/>\
             <meta name="global-head-test" content="test" />
             <link rel="icon" href="favicon.ico" />
             </head>

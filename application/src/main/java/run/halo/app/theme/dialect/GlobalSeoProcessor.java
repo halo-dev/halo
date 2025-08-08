@@ -2,7 +2,7 @@ package run.halo.app.theme.dialect;
 
 import static run.halo.app.theme.Constant.META_DESCRIPTION_VARIABLE_NAME;
 
-import java.util.Map;
+import java.util.LinkedHashMap;
 import lombok.AllArgsConstructor;
 import org.springframework.core.Ordered;
 import org.springframework.core.annotation.Order;
@@ -38,12 +38,12 @@ class GlobalSeoProcessor implements TemplateHeadProcessor {
             .doOnNext(seo -> {
                 IModelFactory modelFactory = context.getModelFactory();
                 if (Boolean.TRUE.equals(seo.getBlockSpiders())) {
+                    var attributes = LinkedHashMap.<String, String>newLinkedHashMap(2);
+                    attributes.put("name", "robots");
+                    attributes.put("content", "noindex");
                     var metaTag = modelFactory.createStandaloneElementTag(
                         "meta",
-                        Map.of(
-                            "name", "robots",
-                            "content", "noindex"
-                        ),
+                        attributes,
                         AttributeValueQuotes.DOUBLE,
                         false,
                         true
@@ -53,12 +53,12 @@ class GlobalSeoProcessor implements TemplateHeadProcessor {
                 }
                 var seoMetaDescription = context.getVariable(META_DESCRIPTION_VARIABLE_NAME);
                 if (seoMetaDescription instanceof String description && !description.isBlank()) {
+                    var attributes = LinkedHashMap.<String, String>newLinkedHashMap(2);
+                    attributes.put("name", "description");
+                    attributes.put("content", description);
                     var metaTag = modelFactory.createStandaloneElementTag(
                         "meta",
-                        Map.of(
-                            "name", "description",
-                            "content", description
-                        ),
+                        attributes,
                         AttributeValueQuotes.DOUBLE,
                         false,
                         true
