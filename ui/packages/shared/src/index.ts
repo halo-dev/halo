@@ -1,6 +1,7 @@
 export * from "./core/plugins";
 export * from "./states/attachment-selector";
 export * from "./states/backup";
+export * from "./states/comment-editor";
 export * from "./states/comment-subject-ref";
 export * from "./states/editor";
 export * from "./states/entity";

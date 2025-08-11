@@ -7,17 +7,15 @@ import { onMounted, ref, watch } from "vue";
 
 const props = withDefaults(
   defineProps<{
-    required?: boolean;
     autoFocus?: boolean;
   }>(),
   {
-    required: true,
     autoFocus: true,
   }
 );
 
 const emit = defineEmits<{
-  (e: "update", value: string): void;
+  (event: "update", value: { content: string; characterCount: number }): void;
 }>();
 
 const emojiPickerRef = ref<HTMLElement | null>(null);
@@ -56,7 +54,10 @@ onMounted(() => {
 watch(
   () => raw.value,
   (value) => {
-    emit("update", value);
+    emit("update", {
+      content: value,
+      characterCount: value.length,
+    });
   }
 );
 </script>
@@ -69,7 +70,6 @@ watch(
     :validation-label="$t('core.comment.reply_modal.fields.content.label')"
     :rows="6"
     value=""
-    :validation="['length:0,1024', required ? 'required' : ''].join('|')"
   ></FormKit>
   <div class="flex w-full justify-end sm:max-w-lg">
     <VDropdown :classes="['!p-0']" @show="handleCreateEmojiPicker">

@@ -3,6 +3,7 @@ import HasPermission from "@/components/permission/HasPermission.vue";
 import { formatDatetime, relativeTimeTo } from "@/utils/date";
 import CommentDetailModal from "@console/modules/contents/comments/components/CommentDetailModal.vue";
 import OwnerButton from "@console/modules/contents/comments/components/OwnerButton.vue";
+import { useContentProviderExtensionPoint } from "@console/modules/contents/comments/composables/use-content-provider-extension-point";
 import { useSubjectRef } from "@console/modules/contents/comments/composables/use-subject-ref";
 import { coreApiClient, type ListedComment } from "@halo-dev/api-client";
 import {
@@ -63,6 +64,8 @@ const handleDelete = async () => {
     },
   });
 };
+
+const { data: contentProvider } = useContentProviderExtensionPoint();
 </script>
 
 <template>
@@ -100,10 +103,10 @@ const handleDelete = async () => {
                 <IconExternalLinkLine class="h-3.5 w-3.5" />
               </a>
             </div>
-            <pre
-              class="line-clamp-4 whitespace-pre-wrap break-words text-sm text-gray-900"
-              >{{ comment?.comment?.spec.content }}</pre
-            >
+            <component
+              :is="contentProvider?.component"
+              :content="comment?.comment?.spec.content"
+            />
             <HasPermission :permissions="['system:comments:manage']">
               <div class="flex items-center gap-3 text-xs">
                 <span

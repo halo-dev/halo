@@ -19,9 +19,10 @@ import { useQueryClient } from "@tanstack/vue-query";
 import { useUserAgent } from "@uc/modules/profile/tabs/composables/use-user-agent";
 import { computed, ref, useTemplateRef } from "vue";
 import { useI18n } from "vue-i18n";
+import { useContentProviderExtensionPoint } from "../composables/use-content-provider-extension-point";
 import { useSubjectRef } from "../composables/use-subject-ref";
+import CommentEditor from "./CommentEditor.vue";
 import OwnerButton from "./OwnerButton.vue";
-import ReplyFormItems from "./ReplyFormItems.vue";
 
 const props = withDefaults(
   defineProps<{
@@ -48,10 +49,19 @@ const creationTime = computed(() => {
   );
 });
 
-const newReply = ref("");
+const editorContent = ref("");
+const editorCharacterCount = ref(0);
+
+function onCommentEditorUpdate(value: {
+  content: string;
+  characterCount: number;
+}) {
+  editorContent.value = value.content;
+  editorCharacterCount.value = value.characterCount;
+}
 
 async function handleApprove() {
-  if (!newReply.value) {
+  if (!editorCharacterCount.value) {
     await coreApiClient.content.comment.patchComment({
       name: props.comment.comment.metadata.name,
       jsonPatchInner: [
@@ -71,8 +81,8 @@ async function handleApprove() {
     await consoleApiClient.content.comment.createReply({
       name: props.comment?.comment.metadata.name as string,
       replyRequest: {
-        raw: newReply.value,
-        content: newReply.value,
+        raw: editorContent.value,
+        content: editorContent.value,
         allowNotification: true,
         quoteReply: undefined,
       },
@@ -88,6 +98,8 @@ const { subjectRefResult } = useSubjectRef(props.comment);
 const websiteOfAnonymous = computed(() => {
   return props.comment.comment.spec.owner.annotations?.["website"];
 });
+
+const { data: contentProvider } = useContentProviderExtensionPoint();
 </script>
 <template>
   <VModal
@@ -165,20 +177,17 @@ const websiteOfAnonymous = computed(() => {
         <VDescriptionItem
           :label="$t('core.comment.comment_detail_modal.fields.content')"
         >
-          <pre class="whitespace-pre-wrap break-words text-sm text-gray-900">{{
-            comment.comment.spec.content
-          }}</pre>
+          <component
+            :is="contentProvider?.component"
+            :content="comment.comment.spec.content"
+          />
         </VDescriptionItem>
         <HasPermission :permissions="['system:comments:manage']">
           <VDescriptionItem
             v-if="!comment.comment.spec.approved"
             :label="$t('core.comment.detail_modal.fields.new_reply')"
           >
-            <ReplyFormItems
-              :required="false"
-              :auto-focus="false"
-              @update="newReply = $event"
-            />
+            <CommentEditor @update="onCommentEditorUpdate" />
           </VDescriptionItem>
         </HasPermission>
       </VDescription>
@@ -192,7 +201,7 @@ const websiteOfAnonymous = computed(() => {
             @click="handleApprove"
           >
             {{
-              newReply
+              editorCharacterCount > 0
                 ? $t("core.comment.operations.reply_and_approve.button")
                 : $t("core.comment.operations.approve.button")
             }}
