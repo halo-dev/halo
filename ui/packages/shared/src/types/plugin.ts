@@ -2,7 +2,7 @@ import type { BackupTab } from "@/states/backup";
 import type {
   CommentContentProvider,
   CommentEditorProvider,
-} from "@/states/comment-editor";
+} from "@/states/comment";
 import type { CommentSubjectRefProvider } from "@/states/comment-subject-ref";
 import type { EntityFieldItem } from "@/states/entity";
 import type { OperationItem } from "@/states/operation";
