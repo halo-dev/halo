@@ -88,7 +88,6 @@ export function createViteConfig(options: Options) {
               "vue-grid-layout",
               "transliteration",
               "vue-draggable-plus",
-              "emoji-mart",
               "colorjs.io",
               "overlayscrollbars",
               "overlayscrollbars-vue",

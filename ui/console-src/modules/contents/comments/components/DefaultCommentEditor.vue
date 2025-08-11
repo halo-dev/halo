@@ -2,7 +2,6 @@
 import { setFocus } from "@/formkit/utils/focus";
 import i18n from "@emoji-mart/data/i18n/zh.json";
 import { IconMotionLine, VDropdown } from "@halo-dev/components";
-import { Picker } from "emoji-mart";
 import { onMounted, ref, watch } from "vue";
 
 const props = withDefaults(
@@ -25,6 +24,7 @@ const handleCreateEmojiPicker = async () => {
     return;
   }
 
+  const { Picker } = await import("emoji-mart");
   const data = await import("@emoji-mart/data");
 
   const emojiPicker = new Picker({
