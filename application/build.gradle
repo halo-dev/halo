@@ -81,7 +81,14 @@ tasks.named('jar') {
 }
 
 dependencies {
-    implementation project(':api')
+    implementation(project(':api')) {
+        exclude group: 'org.thymeleaf', module: 'thymeleaf-spring6'
+    }
+    implementation 'org.thymeleaf:thymeleaf'
+    // Fix https://github.com/halo-dev/halo/issues/7289
+    // Build from https://github.com/halo-dev/thymeleaf/commit/097a51cbaae114c87973e5de4ae9b88115976221
+    implementation files('libs/thymeleaf-spring6-3.1.4-rc.1+halo.2.21.6.jar')
+
     annotationProcessor platform(project(':platform:application'))
 
     annotationProcessor "org.springframework.boot:spring-boot-configuration-processor"
