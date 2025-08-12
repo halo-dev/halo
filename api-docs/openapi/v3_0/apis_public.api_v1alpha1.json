@@ -1455,6 +1455,10 @@
             "minLength": 1,
             "type": "string"
           },
+          "hidden": {
+            "type": "boolean",
+            "default": false
+          },
           "owner": {
             "$ref": "#/components/schemas/CommentEmailOwner"
           },
@@ -2825,6 +2829,10 @@
           "content": {
             "minLength": 1,
             "type": "string"
+          },
+          "hidden": {
+            "type": "boolean",
+            "default": false
           },
           "owner": {
             "$ref": "#/components/schemas/CommentEmailOwner"

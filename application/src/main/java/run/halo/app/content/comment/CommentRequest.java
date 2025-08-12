@@ -32,6 +32,9 @@ public class CommentRequest {
     @Schema(defaultValue = "false")
     private Boolean allowNotification;
 
+    @Schema(defaultValue = "false")
+    private Boolean hidden;
+
     /**
      * Converts {@link CommentRequest} to {@link Comment}.
      *
@@ -48,6 +51,7 @@ public class CommentRequest {
         spec.setRaw(raw);
         spec.setContent(content);
         spec.setAllowNotification(allowNotification);
+        spec.setHidden(hidden);
 
         if (owner != null) {
             spec.setOwner(owner.toCommentOwner());
