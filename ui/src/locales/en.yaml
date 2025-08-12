@@ -73,6 +73,7 @@ core:
           comments: "{comments} Comments"
           empty:
             title: No published posts
+          comments-with-pending: " ({count} pending comments)"
         notification:
           title: Notifications
           empty:
@@ -238,6 +239,7 @@ core:
         pinned: Pinned
         schedule_publish:
           tooltip: Schedule publish
+        comments-with-pending: " ({count} pending comments)"
     settings:
       title: Settings
       groups:
@@ -404,7 +406,10 @@ core:
           help: Theme adaptation is required to support
         description:
           label: Description
-          help: "The description will be automatically added to the page's meta description tag for SEO; other display purposes require theme adaptation"
+          help: >-
+            The description will be automatically added to the page's meta
+            description tag for SEO; other display purposes require theme
+            adaptation
         prevent_parent_post_cascade_query:
           label: Prevent Parent Post Cascade Query
           help: >-
@@ -473,6 +478,7 @@ core:
       fields:
         visits: "{visits} Visits"
         comments: "{comments} Comments"
+        comments-with-pending: " ({count} pending comments)"
     settings:
       title: Settings
       groups:
@@ -1143,19 +1149,23 @@ core:
       enable:
         title: Enable
         description: >-
-          Are you sure you want to enable this user? Once enabled, the user will be able to log back into the system.
+          Are you sure you want to enable this user? Once enabled, the user will
+          be able to log back into the system.
       enable_in_batch:
         title: Enable
         description: >-
-          Are you sure you want to enable the selected users? Once enabled, these users will be able to log back into the system.
+          Are you sure you want to enable the selected users? Once enabled,
+          these users will be able to log back into the system.
       disable:
         title: Disable
         description: >-
-          Are you sure you want to disable this user? Once disabled, the user will no longer be able to log in.
+          Are you sure you want to disable this user? Once disabled, the user
+          will no longer be able to log in.
       disable_in_batch:
         title: Disable
         description: >-
-          Are you sure you want to disable the selected users? Once disabled, these users will no longer be able to log in.
+          Are you sure you want to disable the selected users? Once disabled,
+          these users will no longer be able to log in.
     filters:
       role:
         label: Role

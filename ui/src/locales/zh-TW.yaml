@@ -67,6 +67,7 @@ core:
           comments: 留言 {comments}
           empty:
             title: 沒有已發布文章
+          comments-with-pending: " ({count} 條待審核)"
         notification:
           title: 通知
           empty:
@@ -224,6 +225,7 @@ core:
         pinned: 已置頂
         schedule_publish:
           tooltip: 定時發佈
+        comments-with-pending: ({count} 條待審核)
     settings:
       title: 文章設置
       groups:
@@ -436,6 +438,7 @@ core:
       fields:
         visits: 訪問量 {visits}
         comments: 留言 {comments}
+        comments-with-pending: " ({count} 條待審核)"
     settings:
       title: 頁面設置
       groups:

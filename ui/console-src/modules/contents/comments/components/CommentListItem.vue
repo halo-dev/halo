@@ -275,7 +275,9 @@ const { data: contentProvider } = useContentProviderExtensionPoint();
   />
   <VEntity :is-selected="isSelected">
     <template
-      v-if="currentUserHasPermission(['system:comments:manage'])"
+      v-if="
+        currentUserHasPermission(['system:comments:manage']) && $slots.checkbox
+      "
       #checkbox
     >
       <slot name="checkbox" />
