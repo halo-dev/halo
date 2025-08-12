@@ -24,7 +24,9 @@ public abstract class AbstractCommentService {
     protected final ReactiveExtensionClient client;
     protected final UserService userService;
     protected final CounterService counterService;
-    private final Safelist safelist = Safelist.relaxed();
+    private final Safelist safelist = Safelist.relaxed()
+        .addTags("s") // Allow <s> tag, which is used for strikethrough
+        .addAttributes("code", "class"); // Allow <code> tag's class attribute, for syntax highlighting
 
     protected Mono<User> fetchCurrentUser() {
         return ReactiveSecurityContextHolder.getContext()
