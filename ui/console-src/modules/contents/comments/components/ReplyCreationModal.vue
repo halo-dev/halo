@@ -68,6 +68,7 @@ function onUpdate(value: { content: string; characterCount: number }) {
     :title="$t('core.comment.reply_modal.title')"
     :width="600"
     :mount-to-body="true"
+    :centered="false"
     @close="emit('close')"
   >
     <div>
