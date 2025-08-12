@@ -5,7 +5,7 @@ import { consoleApiClient } from "@halo-dev/api-client";
 import { Toast, VButton, VModal, VSpace } from "@halo-dev/components";
 import { ref } from "vue";
 import { useI18n } from "vue-i18n";
-import ReplyFormItems from "./ReplyFormItems.vue";
+import CommentEditor from "./CommentEditor.vue";
 
 const { t } = useI18n();
 
@@ -27,16 +27,18 @@ const emit = defineEmits<{
 
 const modal = ref<InstanceType<typeof VModal> | null>(null);
 const isSubmitting = ref(false);
+const characterCount = ref(0);
+const content = ref("");
 
-const onSubmit = async (data: { raw: string }) => {
+const handleSubmit = async () => {
   try {
     isSubmitting.value = true;
 
     await consoleApiClient.content.comment.createReply({
       name: props.comment?.comment.metadata.name as string,
       replyRequest: {
-        raw: data.raw,
-        content: data.raw,
+        raw: content.value,
+        content: content.value,
         allowNotification: true,
         quoteReply: props.reply?.reply.metadata.name,
       },
@@ -53,35 +55,33 @@ const onSubmit = async (data: { raw: string }) => {
     isSubmitting.value = false;
   }
 };
+
+function onUpdate(value: { content: string; characterCount: number }) {
+  content.value = value.content;
+  characterCount.value = value.characterCount;
+}
 </script>
 
 <template>
   <VModal
     ref="modal"
     :title="$t('core.comment.reply_modal.title')"
-    :width="500"
+    :width="600"
     :mount-to-body="true"
+    :centered="false"
     @close="emit('close')"
   >
-    <FormKit
-      id="create-reply-form"
-      name="create-reply-form"
-      type="form"
-      :config="{ validationVisibility: 'submit' }"
-      :classes="{
-        form: '!divide-none',
-      }"
-      @submit="onSubmit"
-    >
-      <ReplyFormItems />
-    </FormKit>
+    <div>
+      <CommentEditor :auto-focus="true" @update="onUpdate" />
+    </div>
     <template #footer>
       <VSpace>
         <SubmitButton
           :loading="isSubmitting"
           type="secondary"
           :text="$t('core.common.buttons.submit')"
-          @submit="$formkit.submit('create-reply-form')"
+          :disabled="characterCount === 0"
+          @submit="handleSubmit"
         >
         </SubmitButton>
         <VButton @click="modal?.close()">

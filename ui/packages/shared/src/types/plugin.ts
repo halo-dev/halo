@@ -1,4 +1,8 @@
 import type { BackupTab } from "@/states/backup";
+import type {
+  CommentContentProvider,
+  CommentEditorProvider,
+} from "@/states/comment";
 import type { CommentSubjectRefProvider } from "@/states/comment-subject-ref";
 import type { EntityFieldItem } from "@/states/entity";
 import type { OperationItem } from "@/states/operation";
@@ -49,6 +53,14 @@ export interface ExtensionPoint {
     | Promise<AnyExtension[]>;
 
   "comment:subject-ref:create"?: () => CommentSubjectRefProvider[];
+
+  "comment:editor:replace"?: () =>
+    | CommentEditorProvider
+    | Promise<CommentEditorProvider>;
+
+  "comment:list-item:content:replace"?: () =>
+    | CommentContentProvider
+    | Promise<CommentContentProvider>;
 
   "backup:tabs:create"?: () => BackupTab[] | Promise<BackupTab[]>;
 
