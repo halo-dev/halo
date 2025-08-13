@@ -231,7 +231,9 @@ function handleMarkAllAsRead() {
             </Transition>
           </OverlayScrollbarsComponent>
         </div>
-        <div class="col-span-12 sm:col-span-6 lg:col-span-7 xl:col-span-9">
+        <div
+          class="col-span-12 overflow-auto sm:col-span-6 lg:col-span-7 xl:col-span-9"
+        >
           <NotificationContent :notification="selectedNotification" />
         </div>
       </div>

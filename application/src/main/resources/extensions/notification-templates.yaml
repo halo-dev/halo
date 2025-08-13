@@ -25,7 +25,7 @@ spec:
             <a th:href="${postUrl}" target="_blank" th:text="|《${postTitle}》|"></a>
             <span>，以下是评论的具体内容：</span>
           </p>
-          <pre class="content" th:text="${content}"></pre>
+          <div class="content" th:utext="${content}"></div>
         </div>
         <div></div>
       </div>
@@ -58,7 +58,7 @@ spec:
             <a th:href="${pageUrl}" target="_blank" th:text="|《${pageTitle}》|"></a>
             <span>，以下是评论的具体内容：</span>
           </p>
-          <pre class="content" th:text="${content}"></pre>
+          <div class="content" th:utext="${content}"></div>
         </div>
         <div></div>
       </div>
@@ -87,15 +87,18 @@ spec:
         </div>
         <div class="body">
           <p>
-            <span th:text="${replier}"></span> 在评论
+            <span th:text="${replier}"></span> 在
             <a
               th:href="${commentSubjectUrl}"
               target="_blank"
-              th:text="|”${isQuoteReply ? quoteContent : commentContent}”|"
+              th:text="|《${commentSubjectTitle}》|"
             ></a>
-            <span>中回复了你，以下是回复的具体内容：</span>
+            <span>中回复了你。</span>
           </p>
-          <pre class="content" th:text="${content}"></pre>
+          <p>你的评论：</p>
+          <div class="content" th:utext="${isQuoteReply ? quoteContent : commentContent}"></div>
+          <p>回复的内容：</p>
+          <div class="content" th:utext="${content}"></div>
         </div>
         <div></div>
       </div>
