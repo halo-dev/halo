@@ -13,7 +13,16 @@ export default function useCommentsFetch(
   subjectRefKey?: Ref<string | undefined>
 ) {
   return useQuery<ListedCommentList>({
-    queryKey: [queryKey, page, size, approved, sort, user, keyword],
+    queryKey: [
+      queryKey,
+      page,
+      size,
+      approved,
+      sort,
+      user,
+      keyword,
+      subjectRefKey,
+    ],
     queryFn: async () => {
       const fieldSelectorMap: Record<string, string | boolean | undefined> = {
         "spec.approved": approved.value,
