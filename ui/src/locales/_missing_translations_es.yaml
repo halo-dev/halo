@@ -33,6 +33,7 @@ core:
         recent_published:
           empty:
             title: No published posts
+          comments-with-pending: " ({count} pending comments)"
         notification:
           title: Notifications
           empty:
@@ -116,6 +117,7 @@ core:
       fields:
         schedule_publish:
           tooltip: Schedule publish
+        comments-with-pending: ({count} pending comments)
     settings:
       fields:
         publish_time:
@@ -175,6 +177,10 @@ core:
       fields:
         prevent_parent_post_cascade_query: Prevent parent category from including this category and its subcategories in cascade post queries
         hide_from_list: This category is hidden, This category and its subcategories, as well as its posts, will not be displayed in the front-end list. You need to actively visit the category archive page
+  page:
+    list:
+      fields:
+        comments-with-pending: " ({count} pending comments)"
   page_editor:
     actions:
       snapshots: Snapshots
@@ -375,10 +381,16 @@ core:
     operations:
       enable:
         title: Enable
-        description: Are you sure you want to enable this user?
+        description: Are you sure you want to enable this user? Once enabled, the user will be able to log back into the system.
+      enable_in_batch:
+        title: Enable
+        description: Are you sure you want to enable the selected users? Once enabled, these users will be able to log back into the system.
       disable:
         title: Disable
-        description: Are you sure you want to disable this user? This user will not be able to log in after being disabled
+        description: Are you sure you want to disable this user? Once disabled, the user will no longer be able to log in.
+      disable_in_batch:
+        title: Disable
+        description: Are you sure you want to disable the selected users? Once disabled, these users will no longer be able to log in.
     grant_permission_modal:
       roles_preview:
         all: The currently selected role contains all permissions
