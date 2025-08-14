@@ -117,7 +117,7 @@ core:
       fields:
         schedule_publish:
           tooltip: Schedule publish
-        comments-with-pending: ({count} pending comments)
+        comments-with-pending: " ({count} pending comments)"
     settings:
       fields:
         publish_time:
@@ -710,6 +710,9 @@ core:
           operations:
             replace:
               button: Replace
+            transfer:
+              button: Save locally
+              tooltip: This resource is detected as an external resource. Click this button to save it to the attachment library.
       toolbox:
         show_hide_sidebar: Show/Hide Sidebar
       title_placeholder: Please enter the title

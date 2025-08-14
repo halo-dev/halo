@@ -1665,6 +1665,9 @@ core:
           operations:
             replace:
               button: 替换
+            transfer:
+              button: 转存
+              tooltip: 检测到此资源为外部资源，点击此按钮以转存到附件库
       toolbox:
         attachment: 选择附件
         show_hide_sidebar: 显示 / 隐藏侧边栏

@@ -1800,6 +1800,11 @@ core:
           operations:
             replace:
               button: Replace
+            transfer:
+              button: Save locally
+              tooltip: >-
+                This resource is detected as an external resource. Click this
+                button to save it to the attachment library.
       toolbox:
         attachment: Attachment
         show_hide_sidebar: Show/Hide Sidebar
