@@ -29,6 +29,10 @@ export const Upload = Extension.create({
             }
 
             const types = event.clipboardData.types;
+            // Only process when a single file is pasted.
+            if (types.length > 1) {
+              return false;
+            }
 
             if (!containsFileClipboardIdentifier(types)) {
               return false;
