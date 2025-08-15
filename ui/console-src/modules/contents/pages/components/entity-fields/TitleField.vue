@@ -1,5 +1,6 @@
 <script lang="ts" setup>
 import { singlePageLabels } from "@/constants/labels";
+import SubjectQueryCommentListModal from "@console/modules/contents/comments/components/SubjectQueryCommentListModal.vue";
 import type { ListedSinglePage } from "@halo-dev/api-client";
 import {
   IconExternalLinkLine,
@@ -7,7 +8,8 @@ import {
   VSpace,
   VStatusDot,
 } from "@halo-dev/components";
-import { computed } from "vue";
+import { computed, ref } from "vue";
+import { useI18n } from "vue-i18n";
 
 const props = withDefaults(
   defineProps<{
@@ -16,12 +18,38 @@ const props = withDefaults(
   {}
 );
 
+const { t } = useI18n();
+
 const externalUrl = computed(() => {
   const { metadata, status } = props.singlePage.page;
   if (metadata.labels?.[singlePageLabels.PUBLISHED] === "true") {
     return status?.permalink;
   }
   return `/preview/singlepages/${metadata.name}`;
+});
+
+const commentSubjectRefKey = `content.halo.run/SinglePage/${props.singlePage.page.metadata.name}`;
+const commentListVisible = ref(false);
+
+const commentText = computed(() => {
+  const { totalComment, approvedComment } = props.singlePage.stats || {};
+
+  let text = t("core.page.list.fields.comments", {
+    comments: totalComment || 0,
+  });
+
+  if (!totalComment || !approvedComment) {
+    return text;
+  }
+
+  const pendingComments = totalComment - approvedComment;
+
+  if (pendingComments > 0) {
+    text += t("core.page.list.fields.comments-with-pending", {
+      count: pendingComments,
+    });
+  }
+  return text;
 });
 </script>
 
@@ -66,15 +94,20 @@ const externalUrl = computed(() => {
               })
             }}
           </span>
-          <span class="text-xs text-gray-500">
-            {{
-              $t("core.page.list.fields.comments", {
-                comments: singlePage.stats.totalComment || 0,
-              })
-            }}
+          <span
+            class="cursor-pointer text-xs text-gray-500 hover:text-gray-900 hover:underline"
+            @click="commentListVisible = true"
+          >
+            {{ commentText }}
           </span>
         </VSpace>
       </div>
+
+      <SubjectQueryCommentListModal
+        v-if="commentListVisible"
+        :subject-ref-key="commentSubjectRefKey"
+        @close="commentListVisible = false"
+      />
     </template>
   </VEntityField>
 </template>

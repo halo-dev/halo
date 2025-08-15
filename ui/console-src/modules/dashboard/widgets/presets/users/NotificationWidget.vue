@@ -14,6 +14,7 @@ import {
 } from "@halo-dev/components";
 import { useQuery } from "@tanstack/vue-query";
 import { OverlayScrollbarsComponent } from "overlayscrollbars-vue";
+import sanitize from "sanitize-html";
 
 const { currentUser } = useUserStore();
 
@@ -81,7 +82,12 @@ function handleRouteToNotification(notification: Notification) {
           <template #start>
             <VEntityField
               :title="notification.spec?.title"
-              :description="notification.spec?.rawContent"
+              :description="
+                sanitize(notification.spec?.htmlContent || '', {
+                  allowedTags: [],
+                  allowedAttributes: {},
+                })
+              "
               @click="handleRouteToNotification(notification)"
             />
           </template>

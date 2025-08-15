@@ -1,6 +1,7 @@
 <script lang="ts" setup>
 import type { Notification } from "@halo-dev/api-client";
 import { OverlayScrollbarsComponent } from "overlayscrollbars-vue";
+import sanitize from "sanitize-html";
 import { computed } from "vue";
 
 const props = withDefaults(
@@ -10,34 +11,28 @@ const props = withDefaults(
   { notification: undefined }
 );
 
-const htmlContent = computed(() => {
-  const styles = `
-  <style>
-    html {
-        font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans", sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
-        font-size: 0.875rem;
-        line-height: 1.25rem;
-    }
-  </style>
-  `;
-
-  if (!props.notification?.spec?.htmlContent) {
-    return "";
-  }
-
-  return styles + props.notification?.spec?.htmlContent;
+const content = computed(() => {
+  return sanitize(props.notification?.spec?.htmlContent || "");
 });
 </script>
 
 <template>
-  <div class="h-full w-full overflow-auto">
-    <OverlayScrollbarsComponent
-      element="div"
-      :options="{ scrollbars: { autoHide: 'scroll' } }"
-      class="h-full w-full"
-      defer
-    >
-      <iframe class="h-full w-full p-2" :srcdoc="htmlContent"></iframe>
-    </OverlayScrollbarsComponent>
-  </div>
+  <OverlayScrollbarsComponent
+    element="div"
+    :options="{ scrollbars: { autoHide: 'scroll' } }"
+    class="h-full w-full"
+    defer
+  >
+    <div class="markdown-body h-full w-full p-2 text-sm" v-html="content"></div>
+  </OverlayScrollbarsComponent>
 </template>
+
+<style scoped lang="scss">
+.markdown-body :deep(ul) {
+  list-style: disc !important;
+}
+
+.markdown-body :deep(ol) {
+  list-style: decimal !important;
+}
+</style>

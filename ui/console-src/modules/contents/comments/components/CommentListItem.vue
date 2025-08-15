@@ -27,6 +27,7 @@ import { useQuery, useQueryClient } from "@tanstack/vue-query";
 import { computed, markRaw, provide, ref, type Ref, toRefs } from "vue";
 import { useI18n } from "vue-i18n";
 import { useCommentLastReadTimeMutate } from "../composables/use-comment-last-readtime-mutate";
+import { useContentProviderExtensionPoint } from "../composables/use-content-provider-extension-point";
 import { useSubjectRef } from "../composables/use-subject-ref";
 import CommentDetailModal from "./CommentDetailModal.vue";
 import OwnerButton from "./OwnerButton.vue";
@@ -257,6 +258,8 @@ const { operationItems } = useOperationItemExtensionPoint<ListedComment>(
     },
   ])
 );
+
+const { data: contentProvider } = useContentProviderExtensionPoint();
 </script>
 
 <template>
@@ -272,7 +275,9 @@ const { operationItems } = useOperationItemExtensionPoint<ListedComment>(
   />
   <VEntity :is-selected="isSelected">
     <template
-      v-if="currentUserHasPermission(['system:comments:manage'])"
+      v-if="
+        currentUserHasPermission(['system:comments:manage']) && $slots.checkbox
+      "
       #checkbox
     >
       <slot name="checkbox" />
@@ -305,10 +310,10 @@ const { operationItems } = useOperationItemExtensionPoint<ListedComment>(
                 <IconExternalLinkLine class="h-3.5 w-3.5" />
               </a>
             </div>
-            <pre
-              class="whitespace-pre-wrap break-words text-sm text-gray-900"
-              >{{ comment?.comment?.spec.content }}</pre
-            >
+            <component
+              :is="contentProvider?.component"
+              :content="comment?.comment?.spec.content"
+            />
             <div class="flex items-center gap-3 text-xs">
               <span
                 class="cursor-pointer select-none text-gray-700 hover:text-gray-900"

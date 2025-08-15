@@ -21,6 +21,7 @@ import { useQueryClient } from "@tanstack/vue-query";
 import { computed, inject, markRaw, ref, type Ref, toRefs } from "vue";
 import { useI18n } from "vue-i18n";
 import { useCommentLastReadTimeMutate } from "../composables/use-comment-last-readtime-mutate";
+import { useContentProviderExtensionPoint } from "../composables/use-content-provider-extension-point";
 import OwnerButton from "./OwnerButton.vue";
 import ReplyCreationModal from "./ReplyCreationModal.vue";
 import ReplyDetailModal from "./ReplyDetailModal.vue";
@@ -193,6 +194,8 @@ const { operationItems } = useOperationItemExtensionPoint<ListedReply>(
     },
   ])
 );
+
+const { data: contentProvider } = useContentProviderExtensionPoint();
 </script>
 
 <template>
@@ -227,18 +230,21 @@ const { operationItems } = useOperationItemExtensionPoint<ListedReply>(
                 {{ $t("core.comment.text.replied_below") }}
               </span>
             </div>
-            <pre
-              class="whitespace-pre-wrap break-words text-sm text-gray-900"
-            ><a
-                  v-if="quoteReply"
-                  class="mr-1 inline-flex flex-row items-center gap-1 rounded bg-slate-100 px-1 py-0.5 text-xs font-medium text-slate-700 hover:bg-slate-200 hover:text-slate-800 hover:underline"
-                  href="javascript:void(0)"
-                  @mouseenter="handleShowQuoteReply(true)"
-                  @mouseleave="handleShowQuoteReply(false)"
-                >
-                  <IconReplyLine />
-                  <span>{{ quoteReply.owner.displayName }}</span>
-                </a><br v-if="quoteReply" />{{ reply?.reply.spec.content }}</pre>
+            <div>
+              <a
+                v-if="quoteReply"
+                class="mr-1 inline-flex flex-row items-center gap-1 rounded bg-slate-100 px-1 py-0.5 text-xs font-medium text-slate-700 hover:bg-slate-200 hover:text-slate-800 hover:underline"
+                href="javascript:void(0)"
+                @mouseenter="handleShowQuoteReply(true)"
+                @mouseleave="handleShowQuoteReply(false)"
+              >
+                <IconReplyLine />
+                <span>{{ quoteReply.owner.displayName }}</span> </a
+              ><br v-if="quoteReply" /><component
+                :is="contentProvider?.component"
+                :content="reply?.reply.spec.content"
+              />
+            </div>
             <HasPermission :permissions="['system:comments:manage']">
               <div class="flex items-center gap-3 text-xs">
                 <span

@@ -18,11 +18,13 @@ import {
 } from "@halo-dev/components";
 import { useQueryClient } from "@tanstack/vue-query";
 import { useUserAgent } from "@uc/modules/profile/tabs/composables/use-user-agent";
+import sanitizeHtml from "sanitize-html";
 import { computed, ref, useTemplateRef } from "vue";
 import { useI18n } from "vue-i18n";
+import { useContentProviderExtensionPoint } from "../composables/use-content-provider-extension-point";
 import { useSubjectRef } from "../composables/use-subject-ref";
+import CommentEditor from "./CommentEditor.vue";
 import OwnerButton from "./OwnerButton.vue";
-import ReplyFormItems from "./ReplyFormItems.vue";
 
 const props = withDefaults(
   defineProps<{
@@ -53,10 +55,19 @@ const creationTime = computed(() => {
   );
 });
 
-const newReply = ref("");
+const editorContent = ref("");
+const editorCharacterCount = ref(0);
+
+function onCommentEditorUpdate(value: {
+  content: string;
+  characterCount: number;
+}) {
+  editorContent.value = value.content;
+  editorCharacterCount.value = value.characterCount;
+}
 
 async function handleApprove() {
-  if (!newReply.value) {
+  if (!editorCharacterCount.value) {
     await coreApiClient.content.reply.patchReply({
       name: props.reply.reply.metadata.name,
       jsonPatchInner: [
@@ -76,8 +87,8 @@ async function handleApprove() {
     await consoleApiClient.content.comment.createReply({
       name: props.comment?.comment.metadata.name as string,
       replyRequest: {
-        raw: newReply.value,
-        content: newReply.value,
+        raw: editorContent.value,
+        content: editorContent.value,
         allowNotification: true,
         quoteReply: props.reply.reply.metadata.name,
       },
@@ -95,6 +106,8 @@ const { subjectRefResult } = useSubjectRef(props.comment);
 const websiteOfAnonymous = computed(() => {
   return props.reply.reply.spec.owner.annotations?.["website"];
 });
+
+const { data: contentProvider } = useContentProviderExtensionPoint();
 </script>
 <template>
   <VModal
@@ -173,34 +186,40 @@ const websiteOfAnonymous = computed(() => {
           :label="$t('core.comment.reply_detail_modal.fields.original_comment')"
         >
           <OwnerButton :owner="comment.owner" />
-          <pre
-            class="mt-2 whitespace-pre-wrap break-words text-sm text-gray-900"
-            >{{ comment.comment.spec.content }}</pre
-          >
+          <div class="mt-2">
+            <component
+              :is="contentProvider?.component"
+              :content="comment.comment.spec.content"
+            />
+          </div>
         </VDescriptionItem>
         <VDescriptionItem
           :label="$t('core.comment.reply_detail_modal.fields.content')"
         >
-          <pre
-            class="whitespace-pre-wrap break-words text-sm text-gray-900"
-          ><span
-                  v-if="quoteReply"
-                  v-tooltip="`${quoteReply.owner.displayName}: ${quoteReply.reply.spec.content}`"
-                  class="mr-1 inline-flex cursor-pointer flex-row items-center gap-1 rounded bg-slate-100 px-1 py-0.5 text-xs font-medium text-slate-700 hover:bg-slate-200 hover:text-slate-800 hover:underline"
-                >
-                  <IconReplyLine />
-                  <span>{{ quoteReply.owner.displayName }}</span>
-                </span><br v-if="quoteReply" />{{ reply?.reply.spec.content }}</pre>
+          <div>
+            <span
+              v-if="quoteReply"
+              v-tooltip="{
+                content: sanitizeHtml(
+                  `${quoteReply.owner.displayName}: ${quoteReply.reply.spec.content}`
+                ),
+                html: true,
+              }"
+              class="mr-1 inline-flex cursor-pointer flex-row items-center gap-1 rounded bg-slate-100 px-1 py-0.5 text-xs font-medium text-slate-700 hover:bg-slate-200 hover:text-slate-800 hover:underline"
+            >
+              <IconReplyLine />
+              <span>{{ quoteReply.owner.displayName }}</span> </span
+            ><br v-if="quoteReply" /><component
+              :is="contentProvider?.component"
+              :content="reply?.reply.spec.content"
+            />
+          </div>
         </VDescriptionItem>
         <VDescriptionItem
           v-if="!reply.reply.spec.approved"
           :label="$t('core.comment.detail_modal.fields.new_reply')"
         >
-          <ReplyFormItems
-            :required="false"
-            :auto-focus="false"
-            @update="newReply = $event"
-          />
+          <CommentEditor @update="onCommentEditorUpdate" />
         </VDescriptionItem>
       </VDescription>
     </div>
@@ -212,7 +231,7 @@ const websiteOfAnonymous = computed(() => {
           @click="handleApprove"
         >
           {{
-            newReply
+            editorCharacterCount > 0
               ? $t("core.comment.operations.reply_and_approve.button")
               : $t("core.comment.operations.approve.button")
           }}

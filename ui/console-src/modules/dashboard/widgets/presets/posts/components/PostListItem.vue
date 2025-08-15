@@ -1,6 +1,7 @@
 <script lang="ts" setup>
 import { postLabels } from "@/constants/labels";
 import { formatDatetime, relativeTimeTo } from "@/utils/date";
+import SubjectQueryCommentListModal from "@console/modules/contents/comments/components/SubjectQueryCommentListModal.vue";
 import type { ListedPost } from "@halo-dev/api-client";
 import {
   IconExternalLinkLine,
@@ -9,7 +10,10 @@ import {
   VSpace,
   VTag,
 } from "@halo-dev/components";
-import { computed } from "vue";
+import { computed, ref } from "vue";
+import { useI18n } from "vue-i18n";
+
+const { t } = useI18n();
 
 const props = defineProps<{
   post: ListedPost;
@@ -33,6 +37,33 @@ const datetime = computed(() => {
     props.post.post.metadata.creationTimestamp
   );
 });
+
+const commentSubjectRefKey = `content.halo.run/Post/${props.post.post.metadata.name}`;
+const commentListVisible = ref(false);
+
+const commentText = computed(() => {
+  const { totalComment, approvedComment } = props.post.stats || {};
+
+  let text = t("core.dashboard.widgets.presets.recent_published.comments", {
+    comments: totalComment || 0,
+  });
+
+  if (!totalComment || !approvedComment) {
+    return text;
+  }
+
+  const pendingComments = totalComment - approvedComment;
+
+  if (pendingComments > 0) {
+    text += t(
+      "core.dashboard.widgets.presets.recent_published.comments-with-pending",
+      {
+        count: pendingComments,
+      }
+    );
+  }
+  return text;
+});
 </script>
 
 <template>
@@ -54,14 +85,18 @@ const datetime = computed(() => {
                 })
               }}
             </span>
-            <span class="text-xs text-gray-500">
-              {{
-                $t("core.dashboard.widgets.presets.recent_published.comments", {
-                  comments: post.stats.totalComment || 0,
-                })
-              }}
+            <span
+              class="cursor-pointer text-xs text-gray-500 hover:text-gray-900 hover:underline"
+              @click="commentListVisible = true"
+            >
+              {{ commentText }}
             </span>
           </VSpace>
+          <SubjectQueryCommentListModal
+            v-if="commentListVisible"
+            :subject-ref-key="commentSubjectRefKey"
+            @close="commentListVisible = false"
+          />
         </template>
         <template #extra>
           <VSpace>
