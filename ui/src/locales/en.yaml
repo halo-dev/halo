@@ -1805,6 +1805,10 @@ core:
               tooltip: >-
                 This resource is detected as an external resource. Click this
                 button to save it to the attachment library.
+            transfer_in_batch:
+              description: >-
+                External link detected. Would you like to automatically upload
+                it to the attachment library?
       toolbox:
         attachment: Attachment
         show_hide_sidebar: Show/Hide Sidebar

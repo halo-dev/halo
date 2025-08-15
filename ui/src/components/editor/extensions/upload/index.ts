@@ -1,3 +1,5 @@
+import { i18n } from "@/locales";
+import { Dialog } from "@halo-dev/components";
 import {
   CoreEditor,
   Extension,
@@ -35,9 +37,17 @@ export const Upload = Extension.create({
 
             const externalNodes = getAllExternalNodes(slice);
             if (externalNodes.length > 0) {
-              if (confirm("检测到具有外部链接，是否需要自动上传到附件库？")) {
-                batchUploadExternalLink(editor, externalNodes);
-              }
+              Dialog.info({
+                title: i18n.global.t("core.common.text.tip"),
+                description: i18n.global.t(
+                  "core.components.default_editor.extensions.upload.operations.transfer_in_batch.description"
+                ),
+                confirmText: i18n.global.t("core.common.buttons.confirm"),
+                cancelText: i18n.global.t("core.common.buttons.cancel"),
+                onConfirm() {
+                  batchUploadExternalLink(editor, externalNodes);
+                },
+              });
             }
 
             const types = event.clipboardData.types;
@@ -58,20 +68,13 @@ export const Upload = Extension.create({
 
             return false;
           },
-          handleDrop: (view, event, slice) => {
+          handleDrop: (view, event) => {
             if (view.props.editable && !view.props.editable(view.state)) {
               return false;
             }
 
             if (!event.dataTransfer) {
               return false;
-            }
-
-            const externalNodes = getAllExternalNodes(slice);
-            if (externalNodes.length > 0) {
-              if (confirm("检测到具有外部链接，是否需要自动上传到附件库？")) {
-                batchUploadExternalLink(editor, externalNodes);
-              }
             }
 
             const hasFiles = event.dataTransfer.files.length > 0;
