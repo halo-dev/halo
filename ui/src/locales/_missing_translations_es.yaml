@@ -117,7 +117,7 @@ core:
       fields:
         schedule_publish:
           tooltip: Schedule publish
-        comments-with-pending: ({count} pending comments)
+        comments-with-pending: " ({count} pending comments)"
     settings:
       fields:
         publish_time:
@@ -197,6 +197,10 @@ core:
         button: Reply and approve
       cancel_approve:
         button: Cancel approve
+    reply_modal:
+      fields:
+        hidden:
+          label: Private reply
     detail_modal:
       fields:
         owner: Commentator

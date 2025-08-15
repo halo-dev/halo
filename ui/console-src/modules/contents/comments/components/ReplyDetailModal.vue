@@ -57,6 +57,7 @@ const creationTime = computed(() => {
 
 const editorContent = ref("");
 const editorCharacterCount = ref(0);
+const hidden = ref(false);
 
 function onCommentEditorUpdate(value: {
   content: string;
@@ -91,6 +92,7 @@ async function handleApprove() {
         content: editorContent.value,
         allowNotification: true,
         quoteReply: props.reply.reply.metadata.name,
+        hidden: hidden.value,
       },
     });
   }
@@ -220,6 +222,13 @@ const { data: contentProvider } = useContentProviderExtensionPoint();
           :label="$t('core.comment.detail_modal.fields.new_reply')"
         >
           <CommentEditor @update="onCommentEditorUpdate" />
+          <div class="mt-4">
+            <FormKit
+              v-model="hidden"
+              type="checkbox"
+              :label="$t('core.comment.reply_modal.fields.hidden.label')"
+            ></FormKit>
+          </div>
         </VDescriptionItem>
       </VDescription>
     </div>

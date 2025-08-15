@@ -29,6 +29,7 @@ const modal = ref<InstanceType<typeof VModal> | null>(null);
 const isSubmitting = ref(false);
 const characterCount = ref(0);
 const content = ref("");
+const hidden = ref(false);
 
 const handleSubmit = async () => {
   try {
@@ -41,6 +42,7 @@ const handleSubmit = async () => {
         content: content.value,
         allowNotification: true,
         quoteReply: props.reply?.reply.metadata.name,
+        hidden: hidden.value,
       },
     });
 
@@ -73,6 +75,13 @@ function onUpdate(value: { content: string; characterCount: number }) {
   >
     <div>
       <CommentEditor :auto-focus="true" @update="onUpdate" />
+      <div class="mt-4">
+        <FormKit
+          v-model="hidden"
+          type="checkbox"
+          :label="$t('core.comment.reply_modal.fields.hidden.label')"
+        ></FormKit>
+      </div>
     </div>
     <template #footer>
       <VSpace>

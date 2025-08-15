@@ -604,6 +604,8 @@ core:
       fields:
         content:
           label: Content
+        hidden:
+          label: Private reply
       operations:
         submit:
           toast_success: Reply successfully

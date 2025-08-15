@@ -570,6 +570,8 @@ core:
       fields:
         content:
           label: 内容
+        hidden:
+          label: 私密回复
       operations:
         submit:
           toast_success: 回复成功
