@@ -1,28 +1,20 @@
 import { useRoleStore } from "@/stores/role";
 import { hasPermission } from "@/utils/permission";
 import type { MenuGroupType, MenuItemType } from "@halo-dev/console-shared";
+import { useQuery } from "@tanstack/vue-query";
 import { sortBy } from "lodash-es";
-import { onMounted, ref, type Ref } from "vue";
+import { ref, watch } from "vue";
 import {
   useRouter,
   type RouteRecordNormalized,
   type RouteRecordRaw,
 } from "vue-router";
 
-interface useRouteMenuGeneratorReturn {
-  menus: Ref<MenuGroupType[]>;
-  minimenus: Ref<MenuItemType[]>;
-}
-
-export function useRouteMenuGenerator(
-  menuGroups: MenuGroupType[]
-): useRouteMenuGeneratorReturn {
+export function useRouteMenuGenerator(menuGroups: MenuGroupType[]) {
   const router = useRouter();
 
-  const menus = ref<MenuGroupType[]>([] as MenuGroupType[]);
-  const minimenus = ref<MenuItemType[]>([] as MenuItemType[]);
-
   const roleStore = useRoleStore();
+
   const { uiPermissions } = roleStore.permissions;
 
   function flattenRoutes(route: RouteRecordNormalized | RouteRecordRaw) {
@@ -60,142 +52,168 @@ export function useRouteMenuGenerator(
     return hasPermission(uiPermissions, meta.permissions as string[], true);
   }
 
-  const generateMenus = async () => {
-    const allRoutes = router.getRoutes();
+  const { data, isLoading: isDataLoading } = useQuery({
+    queryKey: ["core:sidebar:menus"],
+    queryFn: async () => {
+      const allRoutes = router.getRoutes();
 
-    // Filter routes based on permissions (async)
-    const validRoutePromises = allRoutes.map(async (route) => {
-      const isValid = await isRouteValid(route);
-      return isValid ? route : null;
-    });
+      // Filter routes based on permissions (async)
+      const validRoutePromises = allRoutes.map(async (route) => {
+        const isValid = await isRouteValid(route);
+        return isValid ? route : null;
+      });
 
-    // Wait for all permission checks to complete
-    const validRoutes = (await Promise.all(validRoutePromises)).filter(
-      Boolean
-    ) as RouteRecordNormalized[];
+      // Wait for all permission checks to complete
+      const validRoutes = (await Promise.all(validRoutePromises)).filter(
+        Boolean
+      ) as RouteRecordNormalized[];
 
-    // Sort the valid routes
-    let currentRoutes = sortBy<RouteRecordNormalized>(validRoutes, [
-      (route: RouteRecordRaw) => !route.meta?.core,
-      (route: RouteRecordRaw) => route.meta?.menu?.priority || 0,
-    ]);
+      // Sort the valid routes
+      let currentRoutes = sortBy<RouteRecordNormalized>(validRoutes, [
+        (route: RouteRecordRaw) => !route.meta?.core,
+        (route: RouteRecordRaw) => route.meta?.menu?.priority || 0,
+      ]);
 
-    // Flatten and filter child routes
-    for (const route of currentRoutes) {
-      if (route.children.length) {
-        const routesMap = new Map(
-          currentRoutes.map((route) => [route.name, route])
-        );
+      // Flatten and filter child routes
+      for (const route of currentRoutes) {
+        if (route.children.length) {
+          const routesMap = new Map(
+            currentRoutes.map((route) => [route.name, route])
+          );
 
-        const childRoutesPromises = route.children
-          .flatMap((child) => flattenRoutes(child))
-          .map(async (flattenedChild) => {
-            const validRoute = routesMap.get(flattenedChild.name);
-            if (validRoute && (await isRouteValid(validRoute))) {
-              return validRoute;
-            }
-            return null;
+          const childRoutesPromises = route.children
+            .flatMap((child) => flattenRoutes(child))
+            .map(async (flattenedChild) => {
+              const validRoute = routesMap.get(flattenedChild.name);
+              if (validRoute && (await isRouteValid(validRoute))) {
+                return validRoute;
+              }
+              return null;
+            });
+
+          // Wait for all child permission checks to complete
+          const flattenedAndValidChildren = (
+            await Promise.all(childRoutesPromises)
+          ).filter(Boolean) as RouteRecordNormalized[]; // filters out falsy values
+
+          // Sorting the routes
+          // @ts-ignore children must be RouteRecordRaw[], but it is RouteRecordNormalized[]
+          route.children = sortBy(flattenedAndValidChildren, [
+            (route) => !route?.meta?.core,
+            (route) => route?.meta?.menu?.priority || 0,
+          ]);
+        }
+      }
+
+      // Remove duplicate routes
+      const allChildren = currentRoutes.flatMap((route) => route.children);
+
+      currentRoutes = currentRoutes.filter(
+        (route) => !allChildren.find((child) => child.name === route.name)
+      );
+
+      // group by menu.group
+      const groupedMenus = currentRoutes.reduce((acc, route) => {
+        const { menu } = route.meta;
+        if (!menu) {
+          return acc;
+        }
+        const group = acc.find((item) => item.id === menu.group);
+        const childRoute = route.children;
+
+        const menuChildren: MenuItemType[] = childRoute
+          .map((child) => {
+            if (!child.meta?.menu) return;
+            return {
+              name: child.meta.menu.name,
+              path: child.path,
+              icon: child.meta.menu.icon,
+              mobile: child.meta.menu.mobile,
+            };
+          })
+          .filter(Boolean) as MenuItemType[];
+
+        if (group) {
+          group.items?.push({
+            name: menu.name,
+            path: route.path,
+            icon: menu.icon,
+            mobile: menu.mobile,
+            children: menuChildren,
           });
-
-        // Wait for all child permission checks to complete
-        const flattenedAndValidChildren = (
-          await Promise.all(childRoutesPromises)
-        ).filter(Boolean) as RouteRecordNormalized[]; // filters out falsy values
-
-        // Sorting the routes
-        // @ts-ignore children must be RouteRecordRaw[], but it is RouteRecordNormalized[]
-        route.children = sortBy(flattenedAndValidChildren, [
-          (route) => !route?.meta?.core,
-          (route) => route?.meta?.menu?.priority || 0,
-        ]);
-      }
-    }
-
-    // Remove duplicate routes
-    const allChildren = currentRoutes.flatMap((route) => route.children);
-    currentRoutes = currentRoutes.filter(
-      (route) => !allChildren.find((child) => child.name === route.name)
-    );
-
-    // group by menu.group
-    menus.value = currentRoutes.reduce((acc, route) => {
-      const { menu } = route.meta;
-      if (!menu) {
-        return acc;
-      }
-      const group = acc.find((item) => item.id === menu.group);
-      const childRoute = route.children;
-
-      const menuChildren: MenuItemType[] = childRoute
-        .map((child) => {
-          if (!child.meta?.menu) return;
-          return {
-            name: child.meta.menu.name,
-            path: child.path,
-            icon: child.meta.menu.icon,
-            mobile: child.meta.menu.mobile,
-          };
-        })
-        .filter(Boolean) as MenuItemType[];
-
-      if (group) {
-        group.items?.push({
-          name: menu.name,
-          path: route.path,
-          icon: menu.icon,
-          mobile: menu.mobile,
-          children: menuChildren,
-        });
-      } else {
-        const menuGroup = menuGroups.find((item) => item.id === menu.group);
-        let name = "";
-        if (!menuGroup) {
-          name = menu.group || "";
-        } else if (menuGroup.name) {
-          name = menuGroup.name;
-        }
-        acc.push({
-          id: menuGroup?.id || menu.group || "",
-          name: name,
-          priority: menuGroup?.priority || 0,
-          items: [
-            {
-              name: menu.name,
-              path: route.path,
-              icon: menu.icon,
-              mobile: menu.mobile,
-              children: menuChildren,
-            },
-          ],
-        });
-      }
-      return acc;
-    }, [] as MenuGroupType[]);
-
-    // sort by menu.priority
-    menus.value = sortBy(menus.value, [
-      (menu: MenuGroupType) => {
-        return menuGroups.findIndex((item) => item.id === menu.id) < 0;
-      },
-      (menu: MenuGroupType) => menu.priority || 0,
-    ]);
-
-    minimenus.value = menus.value
-      .reduce((acc, group) => {
-        if (group?.items) {
-          acc.push(...group.items);
+        } else {
+          const menuGroup = menuGroups.find((item) => item.id === menu.group);
+          let name = "";
+          if (!menuGroup) {
+            name = menu.group || "";
+          } else if (menuGroup.name) {
+            name = menuGroup.name;
+          }
+          acc.push({
+            id: menuGroup?.id || menu.group || "",
+            name: name,
+            priority: menuGroup?.priority || 0,
+            items: [
+              {
+                name: menu.name,
+                path: route.path,
+                icon: menu.icon,
+                mobile: menu.mobile,
+                children: menuChildren,
+              },
+            ],
+          });
         }
         return acc;
-      }, [] as MenuItemType[])
-      .filter((item) => item.mobile);
-  };
+      }, [] as MenuGroupType[]);
 
-  onMounted(() => {
-    void generateMenus();
+      // sort by menu.priority
+      const menus = sortBy(groupedMenus, [
+        (menu: MenuGroupType) => {
+          return menuGroups.findIndex((item) => item.id === menu.id) < 0;
+        },
+        (menu: MenuGroupType) => menu.priority || 0,
+      ]);
+
+      const minimenus = menus
+        .reduce((acc, group) => {
+          if (group?.items) {
+            acc.push(...group.items);
+          }
+          return acc;
+        }, [] as MenuItemType[])
+        .filter((item) => item.mobile);
+
+      return {
+        menus,
+        minimenus,
+      };
+    },
   });
 
+  const isLoading = ref(false);
+
+  // Make loading more user-friendly
+  watch(
+    () => isDataLoading.value,
+    (value) => {
+      let delayLoadingTimer: ReturnType<typeof setTimeout> | undefined;
+      if (value) {
+        delayLoadingTimer = setTimeout(() => {
+          isLoading.value = isDataLoading.value;
+        }, 200);
+      } else {
+        clearTimeout(delayLoadingTimer);
+        isLoading.value = false;
+      }
+    },
+    {
+      immediate: true,
+    }
+  );
+
   return {
-    menus,
-    minimenus,
+    data,
+    isLoading,
   };
 }
