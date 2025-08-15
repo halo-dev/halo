@@ -1,9 +1,11 @@
 <script lang="ts" setup>
+import HasPermission from "@/components/permission/HasPermission.vue";
 import { IconImageAddLine, VButton } from "@halo-dev/components";
 import { type NodeViewProps } from "@halo-dev/richtext-editor";
 import { computed, onMounted, ref } from "vue";
 import { EditorLinkObtain } from "../../components";
 import InlineBlockBox from "../../components/InlineBlockBox.vue";
+import { useExternalAssetsTransfer } from "../../composables/use-attachment";
 import { type AttachmentAttr } from "../../utils/attachment";
 import { fileToBase64 } from "../../utils/upload";
 import Image from "./index";
@@ -143,6 +145,9 @@ onMounted(() => {
     document.documentElement.removeEventListener("mouseup", stopDrag, false);
   }
 });
+
+const { isExternalAsset, transferring, handleTransfer } =
+  useExternalAssetsTransfer(src, handleSetExternalLink);
 </script>
 
 <template>
@@ -171,8 +176,29 @@ onMounted(() => {
 
         <div
           v-if="src"
-          class="absolute left-0 top-0 hidden h-1/4 w-full cursor-pointer justify-end bg-gradient-to-b from-gray-300 to-transparent p-2 ease-in-out group-hover:flex"
+          class="absolute left-0 top-0 hidden h-1/4 w-full cursor-pointer justify-end gap-2 bg-gradient-to-b from-gray-300 to-transparent p-2 ease-in-out group-hover:flex"
         >
+          <HasPermission :permissions="['uc:attachments:manage']">
+            <VButton
+              v-if="isExternalAsset"
+              v-tooltip="
+                $t(
+                  'core.components.default_editor.extensions.upload.operations.transfer.tooltip'
+                )
+              "
+              :loading="transferring"
+              size="sm"
+              ghost
+              @click="handleTransfer"
+            >
+              {{
+                $t(
+                  "core.components.default_editor.extensions.upload.operations.transfer.button"
+                )
+              }}
+            </VButton>
+          </HasPermission>
+
           <VButton size="sm" type="secondary" @click="handleResetInit">
             {{
               $t(
