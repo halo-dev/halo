@@ -99,7 +99,10 @@ public class CommentServiceImpl extends AbstractCommentService implements Commen
                     comment.getSpec().setCreationTime(Instant.now());
                 }
 
-                comment.getSpec().setHidden(false);
+                if (comment.getSpec().getHidden() == null) {
+                    comment.getSpec().setHidden(false);
+                }
+
                 return Mono.just(comment);
             })
             .flatMap(populatedComment -> Mono.when(populateOwner(populatedComment),

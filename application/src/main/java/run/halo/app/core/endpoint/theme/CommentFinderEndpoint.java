@@ -176,8 +176,6 @@ public class CommentFinderEndpoint implements CustomEndpoint {
                 Reply reply = replyRequest.toReply();
                 reply.getSpec().setIpAddress(IpAddressUtils.getIpAddress(request));
                 reply.getSpec().setUserAgent(HaloUtils.userAgentFrom(request));
-                // fix gh-2951
-                reply.getSpec().setHidden(false);
                 return environmentFetcher.fetchComment()
                     .map(commentSetting -> {
                         if (isFalse(commentSetting.getEnable())) {
@@ -191,6 +189,11 @@ public class CommentFinderEndpoint implements CustomEndpoint {
                         }
                         reply.getSpec()
                             .setApproved(isFalse(commentSetting.getRequireReviewForNew()));
+
+                        if (reply.getSpec().getHidden() == null) {
+                            reply.getSpec().setHidden(false);
+                        }
+
                         return reply;
                     })
                     .defaultIfEmpty(reply);
