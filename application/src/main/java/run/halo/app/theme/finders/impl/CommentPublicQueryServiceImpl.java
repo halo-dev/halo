@@ -262,7 +262,7 @@ public class CommentPublicQueryServiceImpl implements CommentPublicQueryService 
         return ReactiveSecurityContextHolder.getContext()
             .map(SecurityContext::getAuthentication)
             .map(Authentication::getName)
-            .defaultIfEmpty(AnonymousUserConst.PRINCIPAL)
+            .filter(name -> !AnonymousUserConst.isAnonymousUser(name))
             .zipWith(
                 userService.hasSufficientRoles(Set.of(COMMENT_VIEW_PERMISSION))
                     .defaultIfEmpty(false),
@@ -279,6 +279,10 @@ public class CommentPublicQueryServiceImpl implements CommentPublicQueryService 
                     }
                     return builder;
                 }
+            )
+            .switchIfEmpty(Mono.fromSupplier(() -> ListOptions.builder()
+                .andQuery(equal("spec.hidden", BooleanUtils.FALSE))
+                .andQuery(equal("spec.approved", BooleanUtils.TRUE)))
             );
     }
 
