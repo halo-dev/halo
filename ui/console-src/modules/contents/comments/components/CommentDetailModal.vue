@@ -14,6 +14,7 @@ import {
   VDescriptionItem,
   VModal,
   VSpace,
+  VTag,
 } from "@halo-dev/components";
 import { useQueryClient } from "@tanstack/vue-query";
 import { useUserAgent } from "@uc/modules/profile/tabs/composables/use-user-agent";
@@ -179,6 +180,11 @@ const { data: contentProvider } = useContentProviderExtensionPoint();
         <VDescriptionItem
           :label="$t('core.comment.comment_detail_modal.fields.content')"
         >
+          <div v-if="comment.comment.spec.hidden" class="mb-2">
+            <VTag>
+              {{ $t("core.comment.list.fields.private") }}
+            </VTag>
+          </div>
           <component
             :is="contentProvider?.component"
             :content="comment.comment.spec.content"

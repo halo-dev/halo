@@ -197,6 +197,9 @@ core:
         button: Reply and approve
       cancel_approve:
         button: Cancel approve
+    list:
+      fields:
+        private: Private
     reply_modal:
       fields:
         hidden:
