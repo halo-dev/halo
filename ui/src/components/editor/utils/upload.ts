@@ -1,7 +1,7 @@
 // image drag and paste upload
 import { usePermission } from "@/utils/permission";
-import type { Attachment } from "@halo-dev/api-client";
-import { CoreEditor } from "@halo-dev/richtext-editor";
+import { ucApiClient, type Attachment } from "@halo-dev/api-client";
+import { CoreEditor, PMNode } from "@halo-dev/richtext-editor";
 import type { AxiosRequestConfig } from "axios";
 import ExtensionAudio from "../extensions/audio";
 import Image from "../extensions/image";
@@ -146,4 +146,56 @@ export function fileToBase64(file: File): Promise<string> {
 export function containsFileClipboardIdentifier(types: readonly string[]) {
   const fileTypes = ["files", "application/x-moz-file", "public.file-url"];
   return types.some((type) => fileTypes.includes(type.toLowerCase()));
+}
+
+export async function batchUploadExternalLink(
+  editor: CoreEditor,
+  nodes: { node: PMNode; pos: number; index: number; parent: PMNode | null }[]
+) {
+  const promises = nodes.map((node) => uploadExternalLink(editor, node));
+  await Promise.all(promises);
+}
+
+export async function uploadExternalLink(
+  editor: CoreEditor,
+  nodeWithPos: {
+    node: PMNode;
+    pos: number;
+    index: number;
+    parent: PMNode | null;
+  }
+) {
+  const { node, pos } = nodeWithPos;
+  const { src } = node.attrs;
+  if (!isExternalAsset(src)) {
+    return;
+  }
+
+  const { data } =
+    await ucApiClient.storage.attachment.externalTransferAttachment1({
+      ucUploadFromUrlRequest: {
+        url: src,
+      },
+      waitForPermalink: true,
+    });
+
+  const url = data.status?.permalink;
+  const name = data.spec.displayName;
+  const tr = editor.view.state.tr;
+  tr.setNodeMarkup(pos, node.type, {
+    ...node.attrs,
+    src: url,
+    name,
+  });
+  editor.view.dispatch(tr);
+}
+
+export function isExternalAsset(src: string) {
+  if (src?.startsWith("/")) {
+    return false;
+  }
+
+  const currentOrigin = window.location.origin;
+
+  return !src?.startsWith(currentOrigin);
 }
