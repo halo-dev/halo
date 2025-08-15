@@ -24,7 +24,9 @@ declare module "vue-router" {
     title?: string;
     description?: string;
     searchable?: boolean;
-    permissions?: string[];
+    permissions?:
+      | string[]
+      | ((uiPermissions: string[]) => boolean | Promise<boolean>);
     core?: boolean;
     hideFooter?: boolean;
     menu?: {
