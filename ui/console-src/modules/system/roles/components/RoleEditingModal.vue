@@ -4,6 +4,7 @@ import { useRoleForm, useRoleTemplateSelection } from "@/composables/use-role";
 import { rbacAnnotations } from "@/constants/annotations";
 import { pluginLabels, roleLabels } from "@/constants/labels";
 import { setFocus } from "@/formkit/utils/focus";
+import { resolveDeepDependencies } from "@/utils/role";
 import type { Role } from "@halo-dev/api-client";
 import { coreApiClient } from "@halo-dev/api-client";
 import { VButton, VModal, VSpace } from "@halo-dev/components";
@@ -61,11 +62,9 @@ onMounted(() => {
 
   if (props.role) {
     formState.value = cloneDeep(props.role);
-    const dependencies =
-      props.role.metadata.annotations?.[rbacAnnotations.DEPENDENCIES];
-    if (dependencies) {
-      selectedRoleTemplates.value = new Set(JSON.parse(dependencies));
-    }
+    selectedRoleTemplates.value = new Set<string>(
+      resolveDeepDependencies(props.role, roleTemplates.value || [])
+    );
   }
 });
 
@@ -74,13 +73,8 @@ const editingModalTitle = props.role
   : t("core.role.editing_modal.titles.create");
 
 const handleCreateOrUpdateRole = async () => {
-  try {
-    await handleCreateOrUpdate();
-
-    modal.value?.close();
-  } catch (e) {
-    console.error(e);
-  }
+  await handleCreateOrUpdate();
+  modal.value?.close();
 };
 </script>
 <template>
@@ -196,7 +190,10 @@ const handleCreateOrUpdateRole = async () => {
               </dt>
               <dd class="text-sm text-gray-900">
                 <ul class="space-y-2">
-                  <li v-for="(roleTemplate, index) in group.roles" :key="index">
+                  <li
+                    v-for="roleTemplate in group.roles"
+                    :key="roleTemplate.metadata.name"
+                  >
                     <label
                       class="inline-flex w-full cursor-pointer flex-row items-center gap-4 rounded-base border p-5 hover:border-primary"
                     >
