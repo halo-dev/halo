@@ -35,41 +35,72 @@ export function useRouteMenuGenerator(
     return routes;
   }
 
-  function isRouteValid(route?: RouteRecordNormalized) {
+  async function isRouteValid(route?: RouteRecordNormalized) {
     if (!route) return false;
     const { meta } = route;
     if (!meta?.menu) return false;
-    return (
-      !meta.permissions || hasPermission(uiPermissions, meta.permissions, true)
-    );
+
+    // If permissions doesn't exist or is empty
+    if (!meta.permissions) return true;
+
+    // Check if permissions is a function
+    if (typeof meta.permissions === "function") {
+      try {
+        return await meta.permissions(uiPermissions);
+      } catch (e) {
+        console.error(
+          `Error checking permissions for route ${String(route.name)}:`,
+          e
+        );
+        return false;
+      }
+    }
+
+    // Default behavior for array of permissions
+    return hasPermission(uiPermissions, meta.permissions as string[], true);
   }
 
-  const generateMenus = () => {
-    // Filter and sort routes based on menu and permissions
-    let currentRoutes = sortBy<RouteRecordNormalized>(
-      router.getRoutes().filter((route) => isRouteValid(route)),
-      [
-        (route: RouteRecordRaw) => !route.meta?.core,
-        (route: RouteRecordRaw) => route.meta?.menu?.priority || 0,
-      ]
-    );
+  const generateMenus = async () => {
+    const allRoutes = router.getRoutes();
+
+    // Filter routes based on permissions (async)
+    const validRoutePromises = allRoutes.map(async (route) => {
+      const isValid = await isRouteValid(route);
+      return isValid ? route : null;
+    });
+
+    // Wait for all permission checks to complete
+    const validRoutes = (await Promise.all(validRoutePromises)).filter(
+      Boolean
+    ) as RouteRecordNormalized[];
+
+    // Sort the valid routes
+    let currentRoutes = sortBy<RouteRecordNormalized>(validRoutes, [
+      (route: RouteRecordRaw) => !route.meta?.core,
+      (route: RouteRecordRaw) => route.meta?.menu?.priority || 0,
+    ]);
 
     // Flatten and filter child routes
-    currentRoutes.forEach((route) => {
+    for (const route of currentRoutes) {
       if (route.children.length) {
         const routesMap = new Map(
           currentRoutes.map((route) => [route.name, route])
         );
 
-        const flattenedAndValidChildren = route.children
+        const childRoutesPromises = route.children
           .flatMap((child) => flattenRoutes(child))
-          .map((flattenedChild) => {
+          .map(async (flattenedChild) => {
             const validRoute = routesMap.get(flattenedChild.name);
-            if (validRoute && isRouteValid(validRoute)) {
+            if (validRoute && (await isRouteValid(validRoute))) {
               return validRoute;
             }
-          })
-          .filter(Boolean); // filters out falsy values
+            return null;
+          });
+
+        // Wait for all child permission checks to complete
+        const flattenedAndValidChildren = (
+          await Promise.all(childRoutesPromises)
+        ).filter(Boolean) as RouteRecordNormalized[]; // filters out falsy values
 
         // Sorting the routes
         // @ts-ignore children must be RouteRecordRaw[], but it is RouteRecordNormalized[]
@@ -78,7 +109,7 @@ export function useRouteMenuGenerator(
           (route) => route?.meta?.menu?.priority || 0,
         ]);
       }
-    });
+    }
 
     // Remove duplicate routes
     const allChildren = currentRoutes.flatMap((route) => route.children);
@@ -159,7 +190,9 @@ export function useRouteMenuGenerator(
       .filter((item) => item.mobile);
   };
 
-  onMounted(generateMenus);
+  onMounted(() => {
+    void generateMenus();
+  });
 
   return {
     menus,
