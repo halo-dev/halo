@@ -26,6 +26,9 @@ public class ReplyRequest {
     @Schema(defaultValue = "false")
     private Boolean allowNotification;
 
+    @Schema(defaultValue = "false")
+    private Boolean hidden;
+
     private CommentEmailOwner owner;
 
     private String quoteReply;
@@ -45,6 +48,7 @@ public class ReplyRequest {
         spec.setRaw(raw);
         spec.setContent(content);
         spec.setAllowNotification(allowNotification);
+        spec.setHidden(hidden);
         spec.setQuoteReply(quoteReply);
 
         if (owner != null) {

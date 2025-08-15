@@ -595,6 +595,7 @@ core:
         reply_count: "{count} Replies"
         has_new_replies: New replies
         pending_review: Pending review
+        private: Private
     subject_refs:
       post: Post
       page: Page
@@ -604,6 +605,8 @@ core:
       fields:
         content:
           label: Content
+        hidden:
+          label: Private reply
       operations:
         submit:
           toast_success: Reply successfully

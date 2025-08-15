@@ -40,6 +40,12 @@ export interface CommentRequest {
     'content': string;
     /**
      * 
+     * @type {boolean}
+     * @memberof CommentRequest
+     */
+    'hidden'?: boolean;
+    /**
+     * 
      * @type {CommentEmailOwner}
      * @memberof CommentRequest
      */

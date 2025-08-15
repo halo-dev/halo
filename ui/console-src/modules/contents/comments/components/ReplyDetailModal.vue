@@ -15,6 +15,7 @@ import {
   VDescriptionItem,
   VModal,
   VSpace,
+  VTag,
 } from "@halo-dev/components";
 import { useQueryClient } from "@tanstack/vue-query";
 import { useUserAgent } from "@uc/modules/profile/tabs/composables/use-user-agent";
@@ -57,6 +58,7 @@ const creationTime = computed(() => {
 
 const editorContent = ref("");
 const editorCharacterCount = ref(0);
+const hidden = ref(false);
 
 function onCommentEditorUpdate(value: {
   content: string;
@@ -91,6 +93,7 @@ async function handleApprove() {
         content: editorContent.value,
         allowNotification: true,
         quoteReply: props.reply.reply.metadata.name,
+        hidden: hidden.value,
       },
     });
   }
@@ -185,17 +188,25 @@ const { data: contentProvider } = useContentProviderExtensionPoint();
         <VDescriptionItem
           :label="$t('core.comment.reply_detail_modal.fields.original_comment')"
         >
-          <OwnerButton :owner="comment.owner" />
-          <div class="mt-2">
-            <component
-              :is="contentProvider?.component"
-              :content="comment.comment.spec.content"
-            />
+          <div class="mb-2 flex items-center gap-2">
+            <OwnerButton :owner="comment.owner" />
+            <VTag v-if="comment.comment.spec.hidden">
+              {{ $t("core.comment.list.fields.private") }}
+            </VTag>
           </div>
+          <component
+            :is="contentProvider?.component"
+            :content="comment.comment.spec.content"
+          />
         </VDescriptionItem>
         <VDescriptionItem
           :label="$t('core.comment.reply_detail_modal.fields.content')"
         >
+          <div v-if="reply.reply.spec.hidden" class="mb-2">
+            <VTag>
+              {{ $t("core.comment.list.fields.private") }}
+            </VTag>
+          </div>
           <div>
             <span
               v-if="quoteReply"
@@ -220,6 +231,13 @@ const { data: contentProvider } = useContentProviderExtensionPoint();
           :label="$t('core.comment.detail_modal.fields.new_reply')"
         >
           <CommentEditor @update="onCommentEditorUpdate" />
+          <div class="mt-4">
+            <FormKit
+              v-model="hidden"
+              type="checkbox"
+              :label="$t('core.comment.reply_modal.fields.hidden.label')"
+            ></FormKit>
+          </div>
         </VDescriptionItem>
       </VDescription>
     </div>

@@ -37,6 +37,12 @@ export interface ReplyRequest {
     'content': string;
     /**
      * 
+     * @type {boolean}
+     * @memberof ReplyRequest
+     */
+    'hidden'?: boolean;
+    /**
+     * 
      * @type {CommentEmailOwner}
      * @memberof ReplyRequest
      */

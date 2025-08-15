@@ -3597,7 +3597,7 @@
     },
     "/apis/api.console.halo.run/v1alpha1/posts/{name}/unpublish": {
       "put": {
-        "description": "Publish a post.",
+        "description": "UnPublish a post.",
         "operationId": "UnpublishPost",
         "parameters": [
           {
@@ -16462,6 +16462,10 @@
             "minLength": 1,
             "type": "string"
           },
+          "hidden": {
+            "type": "boolean",
+            "default": false
+          },
           "owner": {
             "$ref": "#/components/schemas/CommentEmailOwner"
           },
@@ -21327,6 +21331,10 @@
           "content": {
             "minLength": 1,
             "type": "string"
+          },
+          "hidden": {
+            "type": "boolean",
+            "default": false
           },
           "owner": {
             "$ref": "#/components/schemas/CommentEmailOwner"

@@ -561,6 +561,7 @@ core:
         reply_count: "{count} 条回复"
         has_new_replies: 有新的回复
         pending_review: 待审核
+        private: 私密
     subject_refs:
       post: 文章
       page: 页面
@@ -570,6 +571,8 @@ core:
       fields:
         content:
           label: 内容
+        hidden:
+          label: 私密回复
       operations:
         submit:
           toast_success: 回复成功

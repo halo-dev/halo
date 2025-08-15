@@ -14,6 +14,7 @@ import {
   VDescriptionItem,
   VModal,
   VSpace,
+  VTag,
 } from "@halo-dev/components";
 import { useQueryClient } from "@tanstack/vue-query";
 import { useUserAgent } from "@uc/modules/profile/tabs/composables/use-user-agent";
@@ -51,6 +52,7 @@ const creationTime = computed(() => {
 
 const editorContent = ref("");
 const editorCharacterCount = ref(0);
+const hidden = ref(false);
 
 function onCommentEditorUpdate(value: {
   content: string;
@@ -85,6 +87,7 @@ async function handleApprove() {
         content: editorContent.value,
         allowNotification: true,
         quoteReply: undefined,
+        hidden: hidden.value,
       },
     });
   }
@@ -177,6 +180,11 @@ const { data: contentProvider } = useContentProviderExtensionPoint();
         <VDescriptionItem
           :label="$t('core.comment.comment_detail_modal.fields.content')"
         >
+          <div v-if="comment.comment.spec.hidden" class="mb-2">
+            <VTag>
+              {{ $t("core.comment.list.fields.private") }}
+            </VTag>
+          </div>
           <component
             :is="contentProvider?.component"
             :content="comment.comment.spec.content"
@@ -188,6 +196,13 @@ const { data: contentProvider } = useContentProviderExtensionPoint();
             :label="$t('core.comment.detail_modal.fields.new_reply')"
           >
             <CommentEditor @update="onCommentEditorUpdate" />
+            <div class="mt-4">
+              <FormKit
+                v-model="hidden"
+                type="checkbox"
+                :label="$t('core.comment.reply_modal.fields.hidden.label')"
+              ></FormKit>
+            </div>
           </VDescriptionItem>
         </HasPermission>
       </VDescription>
