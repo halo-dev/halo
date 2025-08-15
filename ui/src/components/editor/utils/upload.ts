@@ -3,6 +3,7 @@ import { usePermission } from "@/utils/permission";
 import { ucApiClient, type Attachment } from "@halo-dev/api-client";
 import { CoreEditor, PMNode } from "@halo-dev/richtext-editor";
 import type { AxiosRequestConfig } from "axios";
+import { chunk } from "lodash-es";
 import ExtensionAudio from "../extensions/audio";
 import Image from "../extensions/image";
 import ExtensionVideo from "../extensions/video";
@@ -152,8 +153,13 @@ export async function batchUploadExternalLink(
   editor: CoreEditor,
   nodes: { node: PMNode; pos: number; index: number; parent: PMNode | null }[]
 ) {
-  const promises = nodes.map((node) => uploadExternalLink(editor, node));
-  await Promise.all(promises);
+  const chunks = chunk(nodes, 5);
+
+  for (const chunkNodes of chunks) {
+    await Promise.all(
+      chunkNodes.map((node) => uploadExternalLink(editor, node))
+    );
+  }
 }
 
 export async function uploadExternalLink(
@@ -167,27 +173,32 @@ export async function uploadExternalLink(
 ) {
   const { node, pos } = nodeWithPos;
   const { src } = node.attrs;
+
   if (!isExternalAsset(src)) {
     return;
   }
 
-  const { data } =
-    await ucApiClient.storage.attachment.externalTransferAttachment1({
-      ucUploadFromUrlRequest: {
-        url: src,
-      },
-      waitForPermalink: true,
-    });
+  try {
+    const { data } =
+      await ucApiClient.storage.attachment.externalTransferAttachment1({
+        ucUploadFromUrlRequest: {
+          url: src,
+        },
+        waitForPermalink: true,
+      });
 
-  const url = data.status?.permalink;
-  const name = data.spec.displayName;
-  const tr = editor.view.state.tr;
-  tr.setNodeMarkup(pos, node.type, {
-    ...node.attrs,
-    src: url,
-    name,
-  });
-  editor.view.dispatch(tr);
+    const url = data.status?.permalink;
+    const name = data.spec.displayName;
+    const tr = editor.view.state.tr;
+    tr.setNodeMarkup(pos, node.type, {
+      ...node.attrs,
+      src: url,
+      name,
+    });
+    editor.view.dispatch(tr);
+  } catch (error) {
+    console.error("Failed to upload external link:", error);
+  }
 }
 
 export function isExternalAsset(src: string) {

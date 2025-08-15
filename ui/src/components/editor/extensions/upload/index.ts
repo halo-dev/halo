@@ -1,5 +1,5 @@
 import { i18n } from "@/locales";
-import { Dialog } from "@halo-dev/components";
+import { Dialog, Toast } from "@halo-dev/components";
 import {
   CoreEditor,
   Extension,
@@ -44,8 +44,12 @@ export const Upload = Extension.create({
                 ),
                 confirmText: i18n.global.t("core.common.buttons.confirm"),
                 cancelText: i18n.global.t("core.common.buttons.cancel"),
-                onConfirm() {
-                  batchUploadExternalLink(editor, externalNodes);
+                async onConfirm() {
+                  await batchUploadExternalLink(editor, externalNodes);
+
+                  Toast.success(
+                    i18n.global.t("core.common.toast.save_success")
+                  );
                 },
               });
             }
