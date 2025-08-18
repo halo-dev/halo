@@ -11,6 +11,7 @@ import static run.halo.app.extension.index.query.QueryFactory.or;
 
 import com.google.common.hash.Hashing;
 import java.util.HashMap;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 import java.util.function.Function;
@@ -23,7 +24,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.ReactiveSecurityContextHolder;
 import org.springframework.security.core.context.SecurityContext;
 import org.springframework.stereotype.Component;
-import org.springframework.util.Assert;
+import org.springframework.web.server.ServerWebInputException;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import run.halo.app.content.comment.OwnerInfo;
@@ -34,6 +35,7 @@ import run.halo.app.core.extension.content.Comment;
 import run.halo.app.core.extension.content.Reply;
 import run.halo.app.core.user.service.UserService;
 import run.halo.app.extension.AbstractExtension;
+import run.halo.app.extension.ExtensionUtil;
 import run.halo.app.extension.ListOptions;
 import run.halo.app.extension.ListResult;
 import run.halo.app.extension.PageRequest;
@@ -125,7 +127,9 @@ public class CommentPublicQueryServiceImpl implements CommentPublicQueryService 
 
     @Override
     public Mono<ListResult<ReplyVo>> listReply(String commentName, PageRequest pageParam) {
-        return populateReplyListOptions(commentName)
+        // check comment
+        return client.get(Comment.class, commentName)
+            .flatMap(this::populateReplyListOptions)
             .flatMap(listOptions -> {
                 var pageRequest = Optional.ofNullable(pageParam)
                     .map(page -> page.withSort(page.getSort().and(defaultReplySort())))
@@ -247,9 +251,8 @@ public class CommentPublicQueryServiceImpl implements CommentPublicQueryService 
     }
 
     private Mono<ListOptions> populateCommentListOptions(@Nullable Ref ref) {
-        return populateVisibleListOptions()
+        return populateVisibleListOptions(null)
             .doOnNext(builder -> {
-                builder.andQuery(isNull("metadata.deletionTimestamp"));
                 if (ref != null) {
                     builder.andQuery(
                         equal("spec.subjectRef", Comment.toSubjectRefKey(ref)));
@@ -258,43 +261,61 @@ public class CommentPublicQueryServiceImpl implements CommentPublicQueryService 
             .map(ListOptions.ListOptionsBuilder::build);
     }
 
-    private Mono<ListOptions.ListOptionsBuilder> populateVisibleListOptions() {
+    private Mono<ListOptions.ListOptionsBuilder> populateVisibleListOptions(
+        @Nullable Comment comment) {
+
         return ReactiveSecurityContextHolder.getContext()
             .map(SecurityContext::getAuthentication)
             .map(Authentication::getName)
-            .filter(name -> !AnonymousUserConst.isAnonymousUser(name))
-            .zipWith(
-                userService.hasSufficientRoles(Set.of(COMMENT_VIEW_PERMISSION))
-                    .defaultIfEmpty(false),
-                (username, hasViewPermission) -> {
-                    var builder = ListOptions.builder();
-                    if (!hasViewPermission) {
-                        builder.andQuery(or(
-                            equal("spec.owner", ownerIdentity(User.KIND, username)),
-                            and(
-                                equal("spec.hidden", BooleanUtils.FALSE),
-                                equal("spec.approved", BooleanUtils.TRUE)
-                            )
-                        ));
+            .defaultIfEmpty(AnonymousUserConst.PRINCIPAL)
+            .zipWith(userService.hasSufficientRoles(Set.of(COMMENT_VIEW_PERMISSION))
+                .defaultIfEmpty(false))
+            .flatMap(tuple2 -> {
+                var username = tuple2.getT1();
+                var hasViewPermission = tuple2.getT2();
+                if (comment != null) {
+                    var commentHidden = Boolean.TRUE.equals(comment.getSpec().getHidden());
+                    var owner = comment.getSpec().getOwner();
+                    boolean isOwner = owner != null && Objects.equals(
+                        ownerIdentity(owner.getKind(), owner.getName()),
+                        ownerIdentity(User.KIND, username)
+                    );
+                    boolean hasPermission = (!commentHidden) || (hasViewPermission || isOwner);
+                    if (ExtensionUtil.isDeleted(comment) || !hasPermission) {
+                        return Mono.error(
+                            new ServerWebInputException(
+                                "The comment was not found, hidden or deleted.")
+                        );
                     }
-                    return builder;
                 }
-            )
-            .switchIfEmpty(Mono.fromSupplier(() -> ListOptions.builder()
-                .andQuery(equal("spec.hidden", BooleanUtils.FALSE))
-                .andQuery(equal("spec.approved", BooleanUtils.TRUE)))
-            );
+
+                var builder = ListOptions.builder();
+                builder.andQuery(isNull("metadata.deletionTimestamp"));
+                var visibleQuery = and(
+                    equal("spec.hidden", BooleanUtils.FALSE),
+                    equal("spec.approved", BooleanUtils.TRUE)
+                );
+                var isAnonymous = AnonymousUserConst.isAnonymousUser(username);
+                if (isAnonymous) {
+                    builder.andQuery(visibleQuery);
+                } else if (!hasViewPermission) {
+                    builder.andQuery(or(
+                        equal("spec.owner", ownerIdentity(User.KIND, username)),
+                        visibleQuery
+                    ));
+                }
+                // View all replies if the user is not an anonymous user and has view permission.
+                return Mono.just(builder);
+            });
     }
 
-    private Mono<ListOptions> populateReplyListOptions(String commentName) {
-        Assert.hasText(commentName, "The commentName must not be blank");
+    private Mono<ListOptions> populateReplyListOptions(Comment comment) {
         // The comment name must be equal to the comment name of the reply
         // is approved and not hidden
-        return populateVisibleListOptions()
-            .doOnNext(builder -> {
-                builder.andQuery(equal("spec.commentName", commentName))
-                    .andQuery(isNull("metadata.deletionTimestamp"));
-            })
+        return populateVisibleListOptions(comment)
+            .doOnNext(builder ->
+                builder.andQuery(equal("spec.commentName", comment.getMetadata().getName()))
+            )
             .map(ListOptions.ListOptionsBuilder::build);
     }
 
