@@ -717,6 +717,11 @@ core:
           operations:
             replace:
               button: Replace
+            transfer:
+              button: Save locally
+              tooltip: This resource is detected as an external resource. Click this button to save it to the attachment library.
+            transfer_in_batch:
+              description: External link detected. Would you like to automatically upload it to the attachment library?
       toolbox:
         show_hide_sidebar: Show/Hide Sidebar
       title_placeholder: Please enter the title

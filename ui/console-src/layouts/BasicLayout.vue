@@ -1,5 +1,6 @@
 <script lang="ts" setup>
 import GlobalSearchModal from "@/components/global-search/GlobalSearchModal.vue";
+import MenuLoading from "@/components/menu/MenuLoading.vue";
 import { RoutesMenu } from "@/components/menu/RoutesMenu";
 import { useRouteMenuGenerator } from "@/composables/use-route-menu-generator";
 import MobileMenu from "@/layouts/MobileMenu.vue";
@@ -29,7 +30,7 @@ useEventListener(document, "keydown", (e: KeyboardEvent) => {
   }
 });
 
-const { menus, minimenus } = useRouteMenuGenerator(coreMenuGroups);
+const { data, isLoading } = useRouteMenuGenerator(coreMenuGroups);
 
 // aside scroll
 const navbarScroller = ref();
@@ -95,7 +96,8 @@ onMounted(() => {
             </div>
           </div>
         </div>
-        <RoutesMenu :menus="menus" />
+        <MenuLoading v-if="isLoading" />
+        <RoutesMenu v-else :menus="data?.menus || []" />
       </div>
       <div class="sidebar__profile">
         <UserProfileBanner platform="console" />
@@ -112,7 +114,11 @@ onMounted(() => {
         </RouterLink>
       </footer>
     </main>
-    <MobileMenu :menus="menus" :minimenus="minimenus" platform="console" />
+    <MobileMenu
+      :menus="data?.menus || []"
+      :minimenus="data?.minimenus || []"
+      platform="console"
+    />
   </div>
   <GlobalSearchModal
     v-if="globalSearchVisible"

@@ -28,7 +28,9 @@ public abstract class AbstractCommentService {
         // Allow <s> tag, which is used for strikethrough
         .addTags("s")
         // Allow <code> tag's class attribute, for syntax highlighting
-        .addAttributes("code", "class");
+        .addAttributes("code", "class")
+        // Allow <a> tag's target attribute
+        .addAttributes("a", "target");
 
     protected Mono<User> fetchCurrentUser() {
         return ReactiveSecurityContextHolder.getContext()

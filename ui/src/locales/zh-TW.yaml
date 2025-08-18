@@ -1653,6 +1653,11 @@ core:
           operations:
             replace:
               button: 替換
+            transfer:
+              button: 轉存
+              tooltip: 偵測到此資源為外部資源，點擊此按鈕以轉存到附件庫
+            transfer_in_batch:
+              description: 檢測到具有外部連結，是否需要自動上傳到附件庫？
       toolbox:
         attachment: 選擇附件
         show_hide_sidebar: 顯示 / 隱藏側邊欄

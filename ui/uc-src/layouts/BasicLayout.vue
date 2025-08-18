@@ -1,4 +1,5 @@
 <script lang="ts" setup>
+import MenuLoading from "@/components/menu/MenuLoading.vue";
 import { RoutesMenu } from "@/components/menu/RoutesMenu";
 import { useRouteMenuGenerator } from "@/composables/use-route-menu-generator";
 import MobileMenu from "@/layouts/MobileMenu.vue";
@@ -15,7 +16,7 @@ import IconLogo from "~icons/core/logo?width=5rem&height=2rem";
 
 const route = useRoute();
 
-const { menus, minimenus } = useRouteMenuGenerator(coreMenuGroups);
+const { data, isLoading } = useRouteMenuGenerator(coreMenuGroups);
 
 // aside scroll
 const navbarScroller = ref();
@@ -68,7 +69,8 @@ onMounted(() => {
         </a>
       </div>
       <div ref="navbarScroller" class="sidebar__content">
-        <RoutesMenu :menus="menus" />
+        <MenuLoading v-if="isLoading" />
+        <RoutesMenu :menus="data?.menus || []" />
       </div>
       <div class="sidebar__profile">
         <UserProfileBanner platform="uc" />
@@ -89,7 +91,11 @@ onMounted(() => {
         </a>
       </footer>
     </main>
-    <MobileMenu :menus="menus" :minimenus="minimenus" platform="uc" />
+    <MobileMenu
+      :menus="data?.menus || []"
+      :minimenus="data?.minimenus || []"
+      platform="uc"
+    />
   </div>
 </template>
 
