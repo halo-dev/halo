@@ -22,6 +22,14 @@ public interface UserService {
 
     Mono<User> grantRoles(String username, Set<String> roles);
 
+    /**
+     * Check if the user has sufficient roles.
+     *
+     * @param roles roles to check
+     * @return a Mono that emits true if the user has all the roles, false otherwise
+     */
+    Mono<Boolean> hasSufficientRoles(Collection<String> roles);
+
     Mono<User> signUp(SignUpData signUpData);
 
     Mono<User> createUser(User user, Set<String> roles);

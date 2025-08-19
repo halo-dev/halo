@@ -15,6 +15,7 @@ import {
   VEntity,
   VEntityField,
   VStatusDot,
+  VTag,
 } from "@halo-dev/components";
 import type { OperationItem } from "@halo-dev/console-shared";
 import { useQueryClient } from "@tanstack/vue-query";
@@ -226,6 +227,9 @@ const { data: contentProvider } = useContentProviderExtensionPoint();
                 :owner="reply?.owner"
                 @click="detailModalVisible = true"
               />
+              <VTag v-if="comment.comment.spec.hidden">
+                {{ $t("core.comment.list.fields.private") }}
+              </VTag>
               <span class="whitespace-nowrap text-sm text-gray-900">
                 {{ $t("core.comment.text.replied_below") }}
               </span>

@@ -595,6 +595,7 @@ core:
         reply_count: "{count} Replies"
         has_new_replies: New replies
         pending_review: Pending review
+        private: Private
     subject_refs:
       post: Post
       page: Page

@@ -15,6 +15,7 @@ import {
   VDescriptionItem,
   VModal,
   VSpace,
+  VTag,
 } from "@halo-dev/components";
 import { useQueryClient } from "@tanstack/vue-query";
 import { useUserAgent } from "@uc/modules/profile/tabs/composables/use-user-agent";
@@ -185,17 +186,25 @@ const { data: contentProvider } = useContentProviderExtensionPoint();
         <VDescriptionItem
           :label="$t('core.comment.reply_detail_modal.fields.original_comment')"
         >
-          <OwnerButton :owner="comment.owner" />
-          <div class="mt-2">
-            <component
-              :is="contentProvider?.component"
-              :content="comment.comment.spec.content"
-            />
+          <div class="mb-2 flex items-center gap-2">
+            <OwnerButton :owner="comment.owner" />
+            <VTag v-if="comment.comment.spec.hidden">
+              {{ $t("core.comment.list.fields.private") }}
+            </VTag>
           </div>
+          <component
+            :is="contentProvider?.component"
+            :content="comment.comment.spec.content"
+          />
         </VDescriptionItem>
         <VDescriptionItem
           :label="$t('core.comment.reply_detail_modal.fields.content')"
         >
+          <div v-if="reply.reply.spec.hidden" class="mb-2">
+            <VTag>
+              {{ $t("core.comment.list.fields.private") }}
+            </VTag>
+          </div>
           <div>
             <span
               v-if="quoteReply"

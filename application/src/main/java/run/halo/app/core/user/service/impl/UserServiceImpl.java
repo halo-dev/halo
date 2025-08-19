@@ -14,6 +14,8 @@ import java.util.Set;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.dao.OptimisticLockingFailureException;
+import org.springframework.security.core.context.ReactiveSecurityContextHolder;
+import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.ReactiveTransactionManager;
@@ -50,6 +52,7 @@ import run.halo.app.infra.exception.EmailVerificationFailed;
 import run.halo.app.infra.exception.UnsatisfiedAttributeValueException;
 import run.halo.app.infra.exception.UserNotFoundException;
 import run.halo.app.plugin.extensionpoint.ExtensionGetter;
+import run.halo.app.security.authorization.AuthorityUtils;
 import run.halo.app.security.device.DeviceService;
 
 @Service
@@ -181,6 +184,15 @@ public class UserServiceImpl implements UserService {
                         return client.update(user);
                     }));
             });
+    }
+
+    @Override
+    public Mono<Boolean> hasSufficientRoles(Collection<String> roles) {
+        return ReactiveSecurityContextHolder.getContext()
+            .map(SecurityContext::getAuthentication)
+            .map(a -> AuthorityUtils.authoritiesToRoles(a.getAuthorities()))
+            .flatMap(userRoles -> roleService.contains(userRoles, roles))
+            .defaultIfEmpty(false);
     }
 
     @Override

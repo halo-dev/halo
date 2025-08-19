@@ -546,6 +546,7 @@ core:
         reply_count: "{count} 條回覆"
         has_new_replies: 有新的回覆
         pending_review: 待審核
+        private: 私密
     subject_refs:
       post: 文章
       page: 頁面
