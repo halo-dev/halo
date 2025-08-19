@@ -48,11 +48,7 @@ const commentText = computed(() => {
     comments: totalComment || 0,
   });
 
-  if (!totalComment || !approvedComment) {
-    return text;
-  }
-
-  const pendingComments = totalComment - approvedComment;
+  const pendingComments = (totalComment || 0) - (approvedComment || 0);
 
   if (pendingComments > 0) {
     text += t(
