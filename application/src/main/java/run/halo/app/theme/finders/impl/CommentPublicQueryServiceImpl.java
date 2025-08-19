@@ -263,7 +263,6 @@ public class CommentPublicQueryServiceImpl implements CommentPublicQueryService 
 
     private Mono<ListOptions.ListOptionsBuilder> populateVisibleListOptions(
         @Nullable Comment comment) {
-
         return ReactiveSecurityContextHolder.getContext()
             .map(SecurityContext::getAuthentication)
             .map(Authentication::getName)
@@ -273,19 +272,21 @@ public class CommentPublicQueryServiceImpl implements CommentPublicQueryService 
             .flatMap(tuple2 -> {
                 var username = tuple2.getT1();
                 var hasViewPermission = tuple2.getT2();
+                var commentHidden = false;
+                var isCommentOwner = false;
                 if (comment != null) {
-                    var commentHidden = Boolean.TRUE.equals(comment.getSpec().getHidden());
+                    commentHidden = Boolean.TRUE.equals(comment.getSpec().getHidden());
                     var owner = comment.getSpec().getOwner();
-                    boolean isOwner = owner != null && Objects.equals(
+                    isCommentOwner = owner != null && Objects.equals(
                         ownerIdentity(owner.getKind(), owner.getName()),
                         ownerIdentity(User.KIND, username)
                     );
-                    boolean hasPermission = (!commentHidden) || (hasViewPermission || isOwner);
+                    boolean hasPermission =
+                        (!commentHidden) || (hasViewPermission || isCommentOwner);
                     if (ExtensionUtil.isDeleted(comment) || !hasPermission) {
-                        return Mono.error(
-                            new ServerWebInputException(
-                                "The comment was not found, hidden or deleted.")
-                        );
+                        return Mono.error(new ServerWebInputException(
+                            "The comment was not found, hidden or deleted."
+                        ));
                     }
                 }
 
@@ -295,16 +296,18 @@ public class CommentPublicQueryServiceImpl implements CommentPublicQueryService 
                     equal("spec.hidden", BooleanUtils.FALSE),
                     equal("spec.approved", BooleanUtils.TRUE)
                 );
+
                 var isAnonymous = AnonymousUserConst.isAnonymousUser(username);
                 if (isAnonymous) {
                     builder.andQuery(visibleQuery);
-                } else if (!hasViewPermission) {
+                } else if (!(hasViewPermission || (commentHidden && isCommentOwner))) {
                     builder.andQuery(or(
                         equal("spec.owner", ownerIdentity(User.KIND, username)),
                         visibleQuery
                     ));
                 }
-                // View all replies if the user is not an anonymous user and has view permission.
+                // View all replies if the user is not an anonymous user, has view permission
+                // or is the comment owner.
                 return Mono.just(builder);
             });
     }
