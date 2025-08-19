@@ -556,8 +556,6 @@ core:
       fields:
         content:
           label: 內容
-        hidden:
-          label: 私密回覆
       operations:
         submit:
           toast_success: 回覆成功
