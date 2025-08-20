@@ -1,13 +1,19 @@
 package run.halo.app.extension;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.DeserializationFeature;
+import com.fasterxml.jackson.databind.json.JsonMapper;
 import java.lang.reflect.ParameterizedType;
 import java.util.List;
 import java.util.Optional;
 import org.junit.jupiter.api.Test;
+import org.skyscreamer.jsonassert.JSONAssert;
 
 class ListResultTest {
 
@@ -61,6 +67,66 @@ class ListResultTest {
 
         listResult = new ListResult<>(1, 10, 1, List.of("A"));
         assertEquals(Optional.of("A"), ListResult.first(listResult));
+    }
+
+    @Test
+    void serializationTest() throws JsonProcessingException {
+        var result = new ListResult<>(1, 10, 100, List.of("a", "b", "c"));
+        var json = JsonMapper.builder()
+            .build()
+            .writeValueAsString(result);
+        JSONAssert.assertEquals("""
+            {
+              "page": 1,
+              "size": 10,
+              "total": 100,
+              "items": [
+                "a",
+                "b",
+                "c"
+              ],
+              "first": true,
+              "last": false,
+              "hasNext": true,
+              "hasPrevious": false,
+              "totalPages": 10
+            }
+            """, json, true);
+    }
+
+    @Test
+    void deserializationTest() throws JsonProcessingException {
+        var json = """
+            {
+              "page": 2,
+              "size": 10,
+              "total": 100,
+              "items": [
+                "a",
+                "b",
+                "c"
+              ],
+              "first": false,
+              "last": false,
+              "hasNext": true,
+              "hasPrevious": true,
+              "totalPages": 10
+            }
+            """;
+        var result = JsonMapper.builder()
+            .disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES)
+            .build()
+            .readValue(json, new TypeReference<ListResult<String>>() {
+            });
+        assertEquals(2, result.getPage());
+        assertEquals(100, result.getTotal());
+        assertEquals(10, result.getTotalPages());
+        assertEquals(10, result.getSize());
+        assertFalse(result.isFirst());
+        assertFalse(result.isLast());
+        assertTrue(result.hasNext());
+        assertTrue(result.hasPrevious());
+        assertEquals(List.of("a", "b", "c"), result.getItems());
     }
 
     private void assertSubList(List<Integer> list) {
