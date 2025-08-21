@@ -2,6 +2,7 @@ package run.halo.app.extension;
 
 import static io.swagger.v3.oas.annotations.media.Schema.RequiredMode.REQUIRED;
 
+import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import io.swagger.v3.oas.annotations.media.Schema;
 import java.util.ArrayList;
@@ -32,7 +33,12 @@ public class ListResult<T> implements Iterable<T>, Supplier<Stream<T>> {
     @Schema(description = "A chunk of items.", requiredMode = REQUIRED)
     private final List<T> items;
 
-    public ListResult(int page, int size, long total, List<T> items) {
+    @JsonCreator
+    public ListResult(
+        @JsonProperty("page") int page,
+        @JsonProperty("size") int size,
+        @JsonProperty("total") long total,
+        @JsonProperty("items") List<T> items) {
         Assert.isTrue(total >= 0, "Total elements must be greater than or equal to 0");
         if (page < 0) {
             page = 0;
