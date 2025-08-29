@@ -1,5 +1,6 @@
 package run.halo.app.plugin;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertInstanceOf;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.mockito.Mockito.mock;
@@ -38,6 +39,8 @@ class DefaultPluginApplicationContextFactoryTest {
         when(pw.getPlugin()).thenReturn(sp);
         when(pluginManager.getPlugin("fake-plugin")).thenReturn(pw);
         var context = factory.create("fake-plugin");
+
+        assertEquals(pw.getPluginClassLoader(), Thread.currentThread().getContextClassLoader());
 
         assertInstanceOf(PluginApplicationContext.class, context);
         assertNotNull(context.getBeanProvider(SearchService.class).getIfUnique());
