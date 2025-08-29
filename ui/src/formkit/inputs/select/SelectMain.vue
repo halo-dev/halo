@@ -737,8 +737,18 @@ const handleSearch = async (value: string, event?: Event) => {
   }
 };
 
+const hasNextPage = computed(() => {
+  const totalPages = Math.ceil(total.value / size.value);
+  return (
+    hasMoreOptions.value &&
+    !isFetchingMore.value &&
+    !isLoading.value &&
+    page.value < totalPages
+  );
+});
+
 const handleNextPage = async () => {
-  if (!hasMoreOptions.value || isFetchingMore.value || isLoading.value) {
+  if (!hasNextPage.value) {
     return;
   }
   isFetchingMore.value = true;
