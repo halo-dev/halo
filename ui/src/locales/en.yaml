@@ -42,6 +42,7 @@ core:
         profile: Profile
         notification: Notifications
         posts: Posts
+        issues: Issues
     operations:
       console:
         tooltip: Console
@@ -2066,6 +2067,34 @@ core:
     setting_modal:
       title: Post settings
     title: My posts
+  uc_issue:
+    title: My Issues
+  issue:
+    empty:
+      title: No issues found
+      message: You haven't created any issues yet, or try other filter conditions.
+    filters:
+      status:
+        items:
+          open: Open
+          in_progress: In Progress
+          resolved: Resolved
+          closed: Closed
+    status:
+      open: Open
+      in_progress: In Progress
+      resolved: Resolved
+      closed: Closed
+    priority:
+      low: Low
+      medium: Medium
+      high: High
+      critical: Critical
+    type:
+      bug: Bug
+      feature_request: Feature Request
+      improvement: Improvement
+      question: Question
   tool:
     title: Tools
     empty:
