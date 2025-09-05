@@ -10,10 +10,13 @@ const { t } = useI18n();
 
 const props = withDefaults(
   defineProps<{
-    policyName: string;
-    groupName: string;
+    policyName?: string;
+    groupName?: string;
   }>(),
-  {}
+  {
+    policyName: undefined,
+    groupName: undefined,
+  }
 );
 
 onMounted(() => {
@@ -25,6 +28,10 @@ const downloading = ref(false);
 async function onSubmit(data: { url: string }) {
   try {
     downloading.value = true;
+
+    if (!props.policyName) {
+      throw new Error("Policy name is required");
+    }
 
     await consoleApiClient.storage.attachment.externalTransferAttachment({
       uploadFromUrlRequest: {
