@@ -413,7 +413,14 @@ const viewType = useLocalStorage("attachment-selector-view-type", "grid");
       :size-options="[60, 120, 200]"
     />
   </div>
-  <AttachmentUploadModal v-if="uploadVisible" @close="onUploadModalClose" />
+  <AttachmentUploadModal
+    v-if="uploadVisible"
+    :initial-group-name="
+      selectedGroup === 'ungrouped' ? undefined : selectedGroup
+    "
+    :initial-policy-name="selectedPolicy"
+    @close="onUploadModalClose"
+  />
   <AttachmentDetailModal
     v-if="selectedAttachment"
     :mount-to-body="true"

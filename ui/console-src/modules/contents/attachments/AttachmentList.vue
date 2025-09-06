@@ -249,7 +249,14 @@ const thumbnailsVisible = ref(false);
       </span>
     </template>
   </AttachmentDetailModal>
-  <AttachmentUploadModal v-if="uploadVisible" @close="onUploadModalClose" />
+  <AttachmentUploadModal
+    v-if="uploadVisible"
+    :initial-group-name="
+      selectedGroup === 'ungrouped' ? undefined : selectedGroup
+    "
+    :initial-policy-name="selectedPolicy"
+    @close="onUploadModalClose"
+  />
   <AttachmentPoliciesModal
     v-if="policyVisible"
     @close="policyVisible = false"

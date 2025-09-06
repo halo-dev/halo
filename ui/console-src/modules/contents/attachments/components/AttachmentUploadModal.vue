@@ -9,7 +9,6 @@ import {
   VTabItem,
   VTabs,
 } from "@halo-dev/components";
-import { useLocalStorage } from "@vueuse/core";
 import { onMounted, ref } from "vue";
 import { useFetchAttachmentGroup } from "../composables/use-attachment-group";
 import {
@@ -22,6 +21,11 @@ import AttachmentPolicyBadge from "./AttachmentPolicyBadge.vue";
 import AttachmentPolicyEditingModal from "./AttachmentPolicyEditingModal.vue";
 import UploadFromUrl from "./UploadFromUrl.vue";
 
+const { initialPolicyName, initialGroupName } = defineProps<{
+  initialPolicyName?: string;
+  initialGroupName?: string;
+}>();
+
 const emit = defineEmits<{
   (event: "close"): void;
 }>();
@@ -31,8 +35,8 @@ const { policies, handleFetchPolicies } = useFetchAttachmentPolicy();
 const { policyTemplates } = useFetchAttachmentPolicyTemplate();
 
 const modal = ref<InstanceType<typeof VModal> | null>(null);
-const selectedGroupName = useLocalStorage("attachment-upload-group", "");
-const selectedPolicyName = useLocalStorage("attachment-upload-policy", "");
+const selectedGroupName = ref(initialGroupName || "");
+const selectedPolicyName = ref(initialPolicyName);
 const policyEditingModal = ref(false);
 const groupEditingModal = ref(false);
 const policyTemplateNameToCreate = ref();
