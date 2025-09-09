@@ -60,6 +60,8 @@ dependencies {
     api 'org.springframework.security:spring-security-oauth2-client'
     api 'org.springframework.security:spring-security-oauth2-resource-server'
 
+    api 'io.micrometer:context-propagation'
+
     // Cache
     api "org.springframework.boot:spring-boot-starter-cache"
     api "com.github.ben-manes.caffeine:caffeine"
