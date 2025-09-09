@@ -22,6 +22,7 @@ import static org.mockito.Mockito.when;
 import static run.halo.app.extension.GroupVersionKind.fromExtension;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Set;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
@@ -46,6 +47,7 @@ import run.halo.app.core.user.service.RoleService;
 import run.halo.app.core.user.service.SignUpData;
 import run.halo.app.core.user.service.UserPostCreatingHandler;
 import run.halo.app.core.user.service.UserPreCreatingHandler;
+import run.halo.app.core.user.service.UserService;
 import run.halo.app.event.user.PasswordChangedEvent;
 import run.halo.app.extension.ListOptions;
 import run.halo.app.extension.Metadata;
@@ -106,6 +108,19 @@ class UserServiceImplTest {
             .verifyComplete();
 
         verify(client, times(1)).get(eq(User.class), eq("faker"));
+    }
+
+    @Test
+    void shouldGetGhostsIfUsersContainDeleted() {
+        var fakeUser1 = createUser("fake-user1", "fake-password");
+        var fakeUser2 = createUser("fake-user2", "fake-password");
+        var ghost = createUser(UserService.GHOST_USER_NAME, "fake-password");
+        when(client.listAll(eq(User.class), any(ListOptions.class), any(Sort.class)))
+            .thenReturn(Flux.just(fakeUser1, fakeUser2, ghost));
+        userService.getUsersOrGhosts(List.of("fake-user1", "deleted-user", "fake-user2"))
+            .as(StepVerifier::create)
+            .expectNext(fakeUser1, ghost, fakeUser2)
+            .verifyComplete();
     }
 
     @Test
@@ -228,14 +243,18 @@ class UserServiceImplTest {
 
     }
 
-    User createUser(String password) {
+    User createUser(String username, String password) {
         var user = new User();
         Metadata metadata = new Metadata();
-        metadata.setName("fake-user");
+        metadata.setName(username);
         user.setMetadata(metadata);
         user.setSpec(new User.UserSpec());
         user.getSpec().setPassword(password);
         return user;
+    }
+
+    User createUser(String password) {
+        return createUser("fake-user", password);
     }
 
     @Nested
@@ -496,4 +515,5 @@ class UserServiceImplTest {
             .expectNext(true)
             .verifyComplete();
     }
+
 }

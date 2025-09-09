@@ -105,7 +105,15 @@ public class UserServiceImpl implements UserService {
         var options = ListOptions.builder()
             .andQuery(QueryFactory.in("metadata.name", nameSet))
             .build();
-        return client.listAll(User.class, options, defaultSort());
+        return client.listAll(User.class, options, defaultSort())
+            .collectMap(u -> u.getMetadata().getName())
+            .map(map -> {
+                var ghost = map.get(GHOST_USER_NAME);
+                return names.stream()
+                    .map(name -> map.getOrDefault(name, ghost))
+                    .toList();
+            })
+            .flatMapMany(Flux::fromIterable);
     }
 
     @Override
