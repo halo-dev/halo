@@ -36,7 +36,8 @@
     "test:unit:coverage": "vitest run --environment jsdom --coverage",
     "test:unit:ui": "vitest --environment jsdom --watch --ui",
     "test:unit:watch": "vitest --environment jsdom --watch",
-    "typecheck": "vue-tsc --noEmit -p tsconfig.app.json --composite false"
+    "typecheck": "vue-tsc --noEmit -p tsconfig.app.json --composite false",
+    "prepublishOnly": "pnpm run build"
   },
   "dependencies": {
     "@ckpack/vue-color": "^1.5.0",
