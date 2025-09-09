@@ -21,7 +21,8 @@
     "lint": "eslint . --max-warnings=0 -f html -o build/lint-result/index.html",
     "prettier": "prettier . --write",
     "typecheck:packages": "pnpm --parallel -r run typecheck",
-    "test:unit:packages": "pnpm --parallel -r run test:unit"
+    "test:unit:packages": "pnpm --parallel -r run test:unit",
+    "publish:packages": "pnpm -r publish --access public --no-git-checks"
   },
   "lint-staged": {
     "**/*": "prettier --write --ignore-unknown",

@@ -47,7 +47,8 @@
     "test:unit:coverage": "vitest run --coverage",
     "test:unit:ui": "vitest --watch --ui",
     "test:unit:watch": "vitest --watch",
-    "typecheck": "vue-tsc --noEmit -p tsconfig.app.json --composite false"
+    "typecheck": "vue-tsc --noEmit -p tsconfig.app.json --composite false",
+    "prepublishOnly": "pnpm run build"
   },
   "dependencies": {
     "floating-vue": "^5.2.2"

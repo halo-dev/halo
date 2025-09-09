@@ -30,7 +30,8 @@
   "scripts": {
     "build": "tsdown",
     "dev": "tsdown --watch",
-    "typecheck": "tsc --noEmit -p tsconfig.app.json --composite false"
+    "typecheck": "tsc --noEmit -p tsconfig.app.json --composite false",
+    "prepublishOnly": "pnpm run build"
   },
   "dependencies": {
     "@halo-dev/api-client": "workspace:*"
