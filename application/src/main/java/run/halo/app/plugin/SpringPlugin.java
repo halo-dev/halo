@@ -27,9 +27,11 @@ public class SpringPlugin extends Plugin {
     public void start() {
         log.info("Preparing starting plugin {}", pluginContext.getName());
         var pluginId = pluginContext.getName();
+        var previous = Thread.currentThread().getContextClassLoader();
         try {
             // initialize context
             this.context = contextFactory.create(pluginId);
+            Thread.currentThread().setContextClassLoader(this.context.getClassLoader());
             log.info("Application context {} for plugin {} is created", this.context, pluginId);
 
             var pluginOpt = context.getBeanProvider(Plugin.class)
@@ -55,13 +57,17 @@ public class SpringPlugin extends Plugin {
             this.stop();
             // propagate exception to invoker.
             throw t;
+        } finally {
+            Thread.currentThread().setContextClassLoader(previous);
         }
     }
 
     @Override
     public void stop() {
+        var previous = Thread.currentThread().getContextClassLoader();
         try {
             if (context != null) {
+                Thread.currentThread().setContextClassLoader(context.getClassLoader());
                 log.info("Before publishing plugin stopping event for plugin {}",
                     pluginContext.getName());
                 context.publishEvent(new SpringPluginStoppingEvent(this, this));
@@ -74,6 +80,7 @@ public class SpringPlugin extends Plugin {
                 log.info("Stopped {} for plugin {}", this.delegate, pluginContext.getName());
             }
         } finally {
+            Thread.currentThread().setContextClassLoader(previous);
             if (context instanceof ConfigurableApplicationContext configurableContext) {
                 log.info("Closing plugin context for plugin {}", pluginContext.getName());
                 configurableContext.close();
