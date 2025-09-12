@@ -1,3 +1,4 @@
+import { createAutoHeightTextareaPlugin } from "@formkit/addons";
 import { en, zh } from "@formkit/i18n";
 import { group as nativeGroup, select as nativeSelect } from "@formkit/inputs";
 import { generateClasses } from "@formkit/themes";
@@ -44,6 +45,7 @@ const config: DefaultConfigOptions = {
     passwordPreventAutocomplete,
     requiredAsterisk,
     autoScrollToErrors,
+    createAutoHeightTextareaPlugin(),
   ],
   inputs: {
     attachment,

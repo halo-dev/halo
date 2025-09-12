@@ -353,6 +353,8 @@ async function slugUniqueValidation(node: FormKitNode) {
                 $t('core.post_category.editing_modal.fields.description.label')
               "
               type="textarea"
+              auto-height
+              :max-auto-height="200"
               validation="length:0,200"
             ></FormKit>
           </div>
