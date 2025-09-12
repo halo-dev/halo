@@ -370,7 +370,8 @@ async function slugUniqueValidation(node: FormKitNode) {
               :label="$t('core.page.settings.fields.raw_excerpt.label')"
               type="textarea"
               validation="length:0,1024"
-              :rows="5"
+              auto-height
+              :max-auto-height="200"
             ></FormKit>
           </div>
         </div>

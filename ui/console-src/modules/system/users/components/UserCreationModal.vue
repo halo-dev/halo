@@ -130,6 +130,8 @@ const handleCreateUser = async () => {
         :label="$t('core.user.editing_modal.fields.bio.label')"
         type="textarea"
         name="bio"
+        auto-height
+        :max-auto-height="200"
         validation="length:0,2048"
       ></FormKit>
     </FormKit>
