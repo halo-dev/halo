@@ -81,7 +81,8 @@ jobs:
         run: gh release upload ${{ github.event.release.tag_name }} application/build/libs/*
 
   build-and-publish-container-image-with-buildpacks:
-    if: always() && (github.event_name == 'push' || github.event_name == 'release')
+    needs: build
+    if: always() && needs.build.result == 'success' && (github.event_name == 'push' || github.event_name == 'release')
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
