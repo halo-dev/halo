@@ -242,11 +242,11 @@ tasks.register('publishToDockerHub', BootBuildImage) {
 }
 
 tasks.register('publishToFit2Cloud', BootBuildImage) {
-    imageName = "registry.fit2cloud.com/${name}:${tagName}"
+    imageName = "registry.fit2cloud.com/halo/${name}:${tagName}"
     description = 'Build and publish the Docker image to Fit2Cloud Container Registry.'
     publish = StringUtils.hasText(System.getenv('F2C_TOKEN'))
     if (!isRelease) {
-        tags = ["registry.fit2cloud.com/${name}:main".toString()]
+        tags = ["registry.fit2cloud.com/halo/${name}:main".toString()]
     }
     docker {
         publishRegistry {
