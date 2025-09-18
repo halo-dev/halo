@@ -213,7 +213,7 @@ tasks.register('publishToGhcr', BootBuildImage) {
     imageName = "ghcr.io/halo/${name}:${tagName}"
     publish = StringUtils.hasText(System.getenv('GHCR_TOKEN'))
     if (!isRelease) {
-        tags = ["ghcr.io/halo/${name}:main".toString()]
+        tags = ["ghcr.io/halo/${name}:cnb-main".toString()]
     }
     docker {
         publishRegistry {
@@ -230,7 +230,7 @@ tasks.register('publishToDockerHub', BootBuildImage) {
     imageName = "halohub/${name}:${tagName}"
     publish = StringUtils.hasText(System.getenv('DOCKER_TOKEN'))
     if (!isRelease) {
-        tags = ["halohub/${name}:main".toString()]
+        tags = ["halohub/${name}:cnb-main".toString()]
     }
     docker {
         publishRegistry {
@@ -241,24 +241,8 @@ tasks.register('publishToDockerHub', BootBuildImage) {
     archiveFile = tasks.named('bootJar', BootJar).get().archiveFile
 }
 
-tasks.register('publishToFit2Cloud', BootBuildImage) {
-    imageName = "registry.fit2cloud.com/halo/${name}:${tagName}"
-    description = 'Build and publish the Docker image to Fit2Cloud Container Registry.'
-    publish = StringUtils.hasText(System.getenv('F2C_TOKEN'))
-    if (!isRelease) {
-        tags = ["registry.fit2cloud.com/halo/${name}:main".toString()]
-    }
-    docker {
-        publishRegistry {
-            username = System.getenv("F2C_USERNAME")
-            password = System.getenv("F2C_TOKEN")
-        }
-    }
-    archiveFile = tasks.named('bootJar', BootJar).get().archiveFile
-}
-
 tasks.register('publishToAllRegistries') {
     group = 'publishing'
     description = 'Build and publish the Docker image to all configured registries.'
-    dependsOn tasks.named('publishToGhcr'), tasks.named('publishToDockerHub'), tasks.named('publishToFit2Cloud')
+    dependsOn tasks.named('publishToGhcr'), tasks.named('publishToDockerHub')
 }
