@@ -208,10 +208,10 @@ if (!isRelease) {
 tasks.register('publishToGhcr', BootBuildImage) {
     group = 'publishing'
     description = 'Build and publish the Docker image to GitHub Container Registry.'
-    imageName = "ghcr.io/halo/${name}:${tagName}"
+    imageName = "ghcr.io/halo-dev/${name}:${tagName}"
     publish = StringUtils.hasText(System.getenv('GHCR_TOKEN'))
     if (!isRelease) {
-        tags = ["ghcr.io/halo/${name}:cnb-main".toString()]
+        tags = ["ghcr.io/halo-dev/${name}:cnb-main".toString()]
     }
     docker {
         publishRegistry {
