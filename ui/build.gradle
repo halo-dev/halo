@@ -1,5 +1,6 @@
 plugins {
   id 'idea'
+  id 'base'
   alias(libs.plugins.node)
   alias(libs.plugins.openapi.generator)
 }
@@ -16,24 +17,29 @@ idea {
   }
 }
 
-tasks.register('clean', Delete) {
+tasks.named('clean') {
+  dependsOn tasks.named('doClean')
+}
+
+tasks.register('doClean', Delete) {
   delete layout.buildDirectory
   delete fileTree('packages') {
     include '*/dist/**'
   }
 }
 
-tasks.register('build', PnpmTask) {
-  dependsOn tasks.named('check'), tasks.named('buildPackages')
+tasks.named('assemble') {
+  dependsOn tasks.named('doBuild')
+}
+
+tasks.register('doBuild', PnpmTask) {
+  dependsOn tasks.named('buildPackages')
   pnpmCommand = ['run', 'build']
   inputs.files(fileTree(layout.projectDirectory) {
     include 'console-src/**', 'uc-src/**', 'src/**', 'public/**', '*.js', '*.json', '*.yaml', 'index.html'
     exclude '**/node_modules/**', '**/build/**', '**/dist/**'
   })
   outputs.dir(layout.buildDirectory.dir('dist'))
-  configure {
-    shouldRunAfter tasks.named('clean')
-  }
 }
 
 tasks.register('buildPackages', PnpmTask) {
@@ -64,7 +70,7 @@ tasks.register('typecheck', PnpmTask) {
   pnpmCommand = ['run', 'typecheck']
 }
 
-tasks.register('check') {
+tasks.named('check') {
   dependsOn tasks.named('lint'), tasks.named('typecheck'), tasks.named('test')
 }
 
