@@ -6,7 +6,6 @@ import GzipPlugin from "rollup-plugin-gzip";
 import Icons from "unplugin-icons/vite";
 import { fileURLToPath } from "url";
 import { defineConfig, type Plugin } from "vite";
-import { VitePWA } from "vite-plugin-pwa";
 import { setupLibraryExternal } from "./library-external";
 
 interface Options {
@@ -33,15 +32,6 @@ export const sharedPlugins = [
         logo: () => fs.readFileSync("./src/assets/logo.svg", "utf-8"),
       },
     },
-  }),
-  VitePWA({
-    manifest: {
-      name: "Halo",
-      short_name: "Halo",
-      description: "Web Client For Halo",
-      theme_color: "#fff",
-    },
-    disable: true,
   }),
 ];
 
