@@ -178,7 +178,8 @@ const publishTimeHelp = computed(() => {
             :label="$t('core.post.settings.fields.raw_excerpt.label')"
             name="excerptRaw"
             type="textarea"
-            :rows="5"
+            auto-height
+            :max-auto-height="200"
             validation="length:0,1024"
           ></FormKit>
         </div>
