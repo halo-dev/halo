@@ -220,9 +220,15 @@ const handlePublish = async () => {
       });
 
       if (returnToView.value && permalink) {
+        handleClearCache(routeQueryName.value);
         window.location.href = permalink;
-      } else {
+        return;
+      }
+
+      if (router.options.history.state.back === null) {
         router.push({ name: "SinglePages" });
+      } else {
+        router.back();
       }
     } else {
       formState.value.page.spec.publish = true;
@@ -237,7 +243,7 @@ const handlePublish = async () => {
     }
 
     Toast.success(t("core.common.toast.publish_success"));
-    handleClearCache(routeQueryName.value as string);
+    handleClearCache(routeQueryName.value);
   } catch (error) {
     console.error("Failed to publish single page", error);
     Toast.error(t("core.common.toast.publish_failed_and_retry"));
