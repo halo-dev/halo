@@ -63,6 +63,7 @@ import {
   IconFolder,
   IconLink,
   IconUserFollow,
+  VLoading,
   VTabItem,
   VTabs,
 } from "@halo-dev/components";
@@ -75,6 +76,7 @@ import {
   defineAsyncComponent,
   inject,
   markRaw,
+  nextTick,
   onBeforeUnmount,
   onMounted,
   ref,
@@ -412,6 +414,8 @@ const presetExtensions = [
   }),
 ];
 
+const isInitialized = ref(false);
+
 onMounted(async () => {
   const extensionsFromPlugins: Extensions = [];
 
@@ -451,11 +455,14 @@ onMounted(async () => {
       debounceOnUpdate();
     },
     onCreate() {
-      if (editor.value?.isEmpty && !props.title) {
-        editorTitleRef.value.focus();
-      } else {
-        editor.value?.commands.focus();
-      }
+      isInitialized.value = true;
+      nextTick(() => {
+        if (editor.value?.isEmpty && !props.title) {
+          editorTitleRef.value.focus();
+        } else {
+          editor.value?.commands.focus();
+        }
+      });
     },
   });
 });
@@ -501,7 +508,8 @@ function handleFocusEditor(event) {
 </script>
 
 <template>
-  <div>
+  <VLoading v-if="!isInitialized" />
+  <div v-else>
     <AttachmentSelectorModal
       v-bind="attachmentOptions"
       v-model:visible="attachmentSelectorModal"
