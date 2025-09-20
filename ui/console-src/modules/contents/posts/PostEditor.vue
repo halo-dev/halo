@@ -262,9 +262,15 @@ const handlePublish = async () => {
       });
 
       if (returnToView.value === "true" && permalink) {
+        handleClearCache(name.value);
         window.location.href = permalink;
-      } else {
+        return;
+      }
+
+      if (router.options.history.state.back === null) {
         router.push({ name: "Posts" });
+      } else {
+        router.back();
       }
     } else {
       const { data } = await consoleApiClient.content.post.draftPost({
