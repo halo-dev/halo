@@ -80,6 +80,33 @@ jobs:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: gh release upload ${{ github.event.release.tag_name }} application/build/libs/*
 
+  build-and-publish-container-image-with-buildpacks:
+    needs: build
+    if: always() && needs.build.result == 'success' && (github.event_name == 'push' || github.event_name == 'release')
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Setup Environment
+        uses: ./.github/actions/setup-env
+      - name: Reset version of Halo
+        if: github.event_name == 'release'
+        shell: bash
+        run: |
+          # Set the version with tag name when releasing
+          version=${{ github.event.release.tag_name }}
+          version=${version#v}
+          sed -i "s/version=.*-SNAPSHOT$/version=$version/1" gradle.properties
+      - name: Publish To Container Registries
+        env:
+          DOCKER_USERNAME: ${{ secrets.DOCKER_USERNAME }}
+          DOCKER_TOKEN: ${{ secrets.DOCKER_TOKEN }}
+          F2C_USERNAME: ${{ secrets.F2C_REGISTRY_USER }}
+          F2C_TOKEN: ${{ secrets.F2C_REGISTRY_TOKEN }}
+          GHCR_USERNAME: ${{ github.repository_owner }}
+          GHCR_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run:
+          ./gradlew publishToAllRegistries -Prelease=${{ github.event_name == 'release' && 'true' || 'false' }}
+
   docker-build-and-push:
     if: always() && needs.build.result == 'success' && (github.event_name == 'push' || github.event_name == 'release')
     runs-on: ubuntu-latest

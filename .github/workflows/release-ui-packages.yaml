@@ -18,6 +18,6 @@ jobs:
           fetch-depth: 0
       - name: Setup Environment
         uses: ./.github/actions/setup-env
-      - run: pnpm install
+      - run: ./gradlew pnpmInstall
       - name: Publish to NPM
         run: cd ui && pnpm run publish:packages

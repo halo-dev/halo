@@ -1,5 +1,8 @@
 import de.undercouch.gradle.tasks.download.Download
 import org.gradle.crypto.checksum.Checksum
+import org.springframework.boot.gradle.tasks.bundling.BootBuildImage
+import org.springframework.boot.gradle.tasks.bundling.BootJar
+import org.springframework.util.StringUtils
 
 plugins {
     id "checkstyle"
@@ -14,6 +17,7 @@ plugins {
     alias(libs.plugins.checksum)
     alias(libs.plugins.springdoc.openapi)
     alias(libs.plugins.versions)
+    alias(libs.plugins.grgit)
 }
 
 group = 'run.halo.app'
@@ -117,9 +121,7 @@ tasks.register('createChecksums', Checksum) {
 tasks.register('copyUiDist', Copy) {
     from project(':ui').layout.buildDirectory.dir('dist')
     into layout.buildDirectory.dir('resources/main')
-    configure {
-        mustRunAfter project(':ui').tasks.named('build')
-    }
+    dependsOn ':ui:doBuild'
 }
 
 tasks.named('processResources', ProcessResources) {
@@ -144,10 +146,10 @@ tasks.named('jacocoTestReport', JacocoReport) {
 }
 
 ext.presetPluginUrls = [
-        'https://github.com/halo-dev/plugin-comment-widget/releases/download/v3.0.0/plugin-comment-widget-3.0.0.jar'  : 'plugin-comment-widget.jar',
-        'https://github.com/halo-dev/plugin-search-widget/releases/download/v1.7.0/plugin-search-widget-1.7.0.jar'    : 'plugin-search-widget.jar',
-        'https://github.com/halo-dev/plugin-sitemap/releases/download/v1.1.2/plugin-sitemap-1.1.2.jar'                : 'plugin-sitemap.jar',
-        'https://github.com/halo-dev/plugin-feed/releases/download/v1.5.0/plugin-feed-1.5.0.jar'                      : 'plugin-feed.jar',
+        'https://github.com/halo-dev/plugin-comment-widget/releases/download/v3.0.0/plugin-comment-widget-3.0.0.jar'           : 'plugin-comment-widget.jar',
+        'https://github.com/halo-dev/plugin-search-widget/releases/download/v1.7.0/plugin-search-widget-1.7.0.jar'             : 'plugin-search-widget.jar',
+        'https://github.com/halo-dev/plugin-sitemap/releases/download/v1.1.2/plugin-sitemap-1.1.2.jar'                         : 'plugin-sitemap.jar',
+        'https://github.com/halo-dev/plugin-feed/releases/download/v1.5.0/plugin-feed-1.5.0.jar'                               : 'plugin-feed.jar',
 
         // Currently, plugin-app-store is not open source, so we need to download it from the official website.
         // Please see https://github.com/halo-dev/plugin-app-store/issues/55
@@ -193,4 +195,52 @@ tasks.named('generateOpenApiDocs') {
     outputs.upToDateWhen {
         false
     }
+}
+
+def name = 'halo'
+def tagName = "${project.version}-cnb"
+def isRelease = Objects.equals(project.findProperty('release'), 'true')
+if (!isRelease) {
+    name = 'halo-dev'
+    tagName = "cnb-sha-${grgit.head().abbreviatedId}"
+}
+
+tasks.register('publishToGhcr', BootBuildImage) {
+    group = 'publishing'
+    description = 'Build and publish the Docker image to GitHub Container Registry.'
+    imageName = "ghcr.io/halo-dev/${name}:${tagName}"
+    publish = StringUtils.hasText(System.getenv('GHCR_TOKEN'))
+    if (!isRelease) {
+        tags = ["ghcr.io/halo-dev/${name}:cnb-main".toString()]
+    }
+    docker {
+        publishRegistry {
+            username = System.getenv('GHCR_USERNAME')
+            password = System.getenv('GHCR_TOKEN')
+        }
+    }
+    archiveFile = tasks.named('bootJar', BootJar).get().archiveFile
+}
+
+tasks.register('publishToDockerHub', BootBuildImage) {
+    group = 'publishing'
+    description = 'Build and publish the Docker image to Docker Hub.'
+    imageName = "halohub/${name}:${tagName}"
+    publish = StringUtils.hasText(System.getenv('DOCKER_TOKEN'))
+    if (!isRelease) {
+        tags = ["halohub/${name}:cnb-main".toString()]
+    }
+    docker {
+        publishRegistry {
+            username = System.getenv("DOCKER_USERNAME")
+            password = System.getenv("DOCKER_TOKEN")
+        }
+    }
+    archiveFile = tasks.named('bootJar', BootJar).get().archiveFile
+}
+
+tasks.register('publishToAllRegistries') {
+    group = 'publishing'
+    description = 'Build and publish the Docker image to all configured registries.'
+    dependsOn tasks.named('publishToGhcr'), tasks.named('publishToDockerHub')
 }

@@ -54,6 +54,7 @@
     "@codemirror/state": "^6.1.4",
     "@codemirror/view": "^6.5.1",
     "@emoji-mart/data": "^1.2.1",
+    "@formkit/addons": "^1.5.9",
     "@formkit/core": "^1.5.9",
     "@formkit/drag-and-drop": "^0.1.6",
     "@formkit/i18n": "^1.5.9",

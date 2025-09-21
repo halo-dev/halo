@@ -39,7 +39,7 @@ apache = ['apache-commons-lang3', 'apache-tika-core']
 therapi = ['therapi-runtime-javadoc', 'therapi-runtime-javadoc-scribe']
 
 [plugins]
-spring-boot = 'org.springframework.boot:3.5.5'
+spring-boot = 'org.springframework.boot:3.5.6'
 spring-dependency-management = 'io.spring.dependency-management:1.1.7'
 git-properties = 'com.gorylenko.gradle-git-properties:2.5.2'
 undercouch-download = 'de.undercouch.download:5.6.0'
@@ -49,3 +49,4 @@ node = 'com.github.node-gradle.node:7.1.0'
 openapi-generator = 'org.openapi.generator:7.12.0'
 springdoc-openapi = 'org.springdoc.openapi-gradle-plugin:1.9.0'
 versions = 'com.github.ben-manes.versions:0.52.0'
+grgit = 'org.ajoberstar.grgit:5.3.3'

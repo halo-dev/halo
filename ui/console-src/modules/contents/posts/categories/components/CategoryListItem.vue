@@ -86,7 +86,7 @@ const handleOpenCreateByParentModal = () => {
   <div
     class="group relative flex w-full items-center justify-between px-4 py-3 hover:bg-gray-50"
   >
-    <div>
+    <div class="min-w-0 flex-1 shrink">
       <div
         v-permission="['system:posts:manage']"
         class="drag-element absolute inset-y-0 left-0 hidden w-3.5 cursor-move items-center bg-gray-100 transition-all hover:bg-gray-200 group-hover:flex"
@@ -110,7 +110,7 @@ const handleOpenCreateByParentModal = () => {
         </a>
       </div>
     </div>
-    <div class="flex items-center gap-6">
+    <div class="flex flex-none items-center gap-6">
       <VStatusDot
         v-if="categoryTreeNode.metadata.deletionTimestamp"
         v-tooltip="$t('core.common.status.deleting')"
