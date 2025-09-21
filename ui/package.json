@@ -169,7 +169,6 @@
     "vite-plugin-dts": "^4.5.4",
     "vite-plugin-externals": "^0.6.2",
     "vite-plugin-html": "^3.2.2",
-    "vite-plugin-pwa": "^0.20.0",
     "vite-plugin-static-copy": "^1.0.6",
     "vitest": "^3.2.4",
     "vue-tsc": "^2.2.10"
