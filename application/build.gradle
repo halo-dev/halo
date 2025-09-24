@@ -198,11 +198,12 @@ tasks.named('generateOpenApiDocs') {
 }
 
 def name = 'halo'
+def branchName = grgit.branch.current().name.replaceAll("/", "-")
 def tagName = "${project.version}-cnb"
 def isRelease = Objects.equals(project.findProperty('release'), 'true')
 if (!isRelease) {
     name = 'halo-dev'
-    tagName = "cnb-sha-${grgit.head().abbreviatedId}"
+    tagName = "sha-${grgit.head().abbreviatedId}-cnb"
 }
 
 tasks.register('publishToGhcr', BootBuildImage) {
@@ -211,7 +212,7 @@ tasks.register('publishToGhcr', BootBuildImage) {
     imageName = "ghcr.io/halo-dev/${name}:${tagName}"
     publish = StringUtils.hasText(System.getenv('GHCR_TOKEN'))
     if (!isRelease) {
-        tags = ["ghcr.io/halo-dev/${name}:cnb-main".toString()]
+        tags = ["ghcr.io/halo-dev/${name}:${branchName}-cnb".toString()]
     }
     docker {
         publishRegistry {
@@ -228,7 +229,7 @@ tasks.register('publishToDockerHub', BootBuildImage) {
     imageName = "halohub/${name}:${tagName}"
     publish = StringUtils.hasText(System.getenv('DOCKER_TOKEN'))
     if (!isRelease) {
-        tags = ["halohub/${name}:cnb-main".toString()]
+        tags = ["halohub/${name}:${branchName}-cnb".toString()]
     }
     docker {
         publishRegistry {
