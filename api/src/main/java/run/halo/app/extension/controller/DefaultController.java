@@ -188,6 +188,8 @@ public class DefaultController<R> implements Controller {
                             log.warn("Optimistic locking failure when reconciling request: {}/{}",
                                 this.name, entry.getEntry());
                         } else if (t instanceof RequeueException re) {
+                            log.warn("{}: Requeue {} due to {}",
+                                this.name, entry.getEntry(), re.getMessage());
                             result = re.getResult();
                         } else {
                             log.error("Reconciler in " + this.name

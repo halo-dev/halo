@@ -40,5 +40,7 @@ public class PathPrefixPredicateTest {
     void urlTest() {
         URI uri = URI.create("https:///path");
         System.out.println(uri);
+        System.out.println(uri.getPath());
+        System.out.println(URI.create("/"));
     }
 }

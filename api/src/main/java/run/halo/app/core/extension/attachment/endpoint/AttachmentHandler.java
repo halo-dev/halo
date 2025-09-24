@@ -2,12 +2,15 @@ package run.halo.app.core.extension.attachment.endpoint;
 
 import java.net.URI;
 import java.time.Duration;
+import java.util.Map;
 import org.pf4j.ExtensionPoint;
 import org.springframework.http.codec.multipart.FilePart;
 import reactor.core.publisher.Mono;
+import run.halo.app.core.attachment.ThumbnailSize;
 import run.halo.app.core.extension.attachment.Attachment;
 import run.halo.app.core.extension.attachment.Policy;
 import run.halo.app.extension.ConfigMap;
+import run.halo.app.extension.exception.NotImplementedException;
 
 public interface AttachmentHandler extends ExtensionPoint {
 
@@ -51,6 +54,24 @@ public interface AttachmentHandler extends ExtensionPoint {
         Policy policy,
         ConfigMap configMap) {
         return Mono.empty();
+    }
+
+    /**
+     * Gets thumbnail links for given attachment.
+     * The default implementation will raise NotImplementedException.
+     *
+     * @param attachment the attachment
+     * @param policy the policy
+     * @param configMap the config map
+     * @return a map of thumbnail sizes to their respective URIs
+     */
+    default Mono<Map<ThumbnailSize, URI>> getThumbnailLinks(Attachment attachment,
+        Policy policy,
+        ConfigMap configMap) {
+        return Mono.error(new NotImplementedException(
+            "getThumbnailLinks method is not implemented for " + attachment.getMetadata().getName()
+                + ", please try to upgrade the corresponding plugin"
+        ));
     }
 
     interface UploadContext {

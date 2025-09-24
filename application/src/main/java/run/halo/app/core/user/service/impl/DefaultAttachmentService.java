@@ -4,6 +4,7 @@ import java.net.URI;
 import java.net.URL;
 import java.nio.file.Paths;
 import java.time.Duration;
+import java.util.Map;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Consumer;
 import java.util.function.Function;
@@ -24,6 +25,7 @@ import org.springframework.web.server.ServerErrorException;
 import org.springframework.web.server.ServerWebInputException;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
+import run.halo.app.core.attachment.ThumbnailSize;
 import run.halo.app.core.extension.attachment.Attachment;
 import run.halo.app.core.extension.attachment.Policy;
 import run.halo.app.core.extension.attachment.endpoint.AttachmentHandler;
@@ -137,6 +139,19 @@ public class DefaultAttachmentService implements AttachmentService {
                     .next()
                 )
             );
+    }
+
+    @Override
+    public Mono<Map<ThumbnailSize, URI>> getThumbnailLinks(Attachment attachment) {
+        return client.get(Policy.class, attachment.getSpec().getPolicyName())
+            .zipWhen(policy -> client.get(ConfigMap.class, policy.getSpec().getConfigMapName()))
+            .flatMap(tuple2 -> {
+                var policy = tuple2.getT1();
+                var configMap = tuple2.getT2();
+                return extensionGetter.getExtensions(AttachmentHandler.class)
+                    .concatMap(handler -> handler.getThumbnailLinks(attachment, policy, configMap))
+                    .next();
+            });
     }
 
     @Override
