@@ -45,6 +45,7 @@ import reactor.core.scheduler.Schedulers;
 import reactor.util.retry.Retry;
 import run.halo.app.core.attachment.AttachmentRootGetter;
 import run.halo.app.core.attachment.ThumbnailSize;
+import run.halo.app.core.attachment.ThumbnailUtils;
 import run.halo.app.core.extension.attachment.Attachment;
 import run.halo.app.core.extension.attachment.Attachment.AttachmentSpec;
 import run.halo.app.core.extension.attachment.Constant;
@@ -310,6 +311,11 @@ class LocalAttachmentUploadHandler implements AttachmentHandler {
             || !StringUtils.hasText(attachment.getStatus().getPermalink())) {
             return Mono.just(Map.of());
         }
+        var mediaType = MediaType.parseMediaType(attachment.getSpec().getMediaType());
+        if (!ThumbnailUtils.isSupportedImage(mediaType)) {
+            return Mono.just(Map.of());
+        }
+
         var thumbnails = Arrays.stream(ThumbnailSize.values())
             .collect(Collectors.toMap(t -> t, t -> {
                 var permalink = URI.create(attachment.getStatus().getPermalink());

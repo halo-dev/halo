@@ -10,7 +10,6 @@ import run.halo.app.core.attachment.ThumbnailSize;
 import run.halo.app.core.extension.attachment.Attachment;
 import run.halo.app.core.extension.attachment.Policy;
 import run.halo.app.extension.ConfigMap;
-import run.halo.app.extension.exception.NotImplementedException;
 
 public interface AttachmentHandler extends ExtensionPoint {
 
@@ -58,7 +57,6 @@ public interface AttachmentHandler extends ExtensionPoint {
 
     /**
      * Gets thumbnail links for given attachment.
-     * The default implementation will raise NotImplementedException.
      *
      * @param attachment the attachment
      * @param policy the policy
@@ -68,10 +66,7 @@ public interface AttachmentHandler extends ExtensionPoint {
     default Mono<Map<ThumbnailSize, URI>> getThumbnailLinks(Attachment attachment,
         Policy policy,
         ConfigMap configMap) {
-        return Mono.error(new NotImplementedException(
-            "getThumbnailLinks method is not implemented for " + attachment.getMetadata().getName()
-                + ", please try to upgrade the corresponding plugin"
-        ));
+        return Mono.empty();
     }
 
     interface UploadContext {

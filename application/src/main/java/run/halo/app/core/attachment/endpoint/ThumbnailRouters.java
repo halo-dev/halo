@@ -1,19 +1,15 @@
 package run.halo.app.core.attachment.endpoint;
 
-import static java.nio.file.StandardOpenOption.CREATE;
 import static java.nio.file.StandardOpenOption.READ;
-import static java.nio.file.StandardOpenOption.TRUNCATE_EXISTING;
-import static java.nio.file.StandardOpenOption.WRITE;
-import static org.imgscalr.Scalr.Method.AUTOMATIC;
-import static org.imgscalr.Scalr.Mode.FIT_TO_WIDTH;
 
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import javax.imageio.ImageIO;
 import lombok.extern.slf4j.Slf4j;
+import net.coobird.thumbnailator.Thumbnails;
+import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang3.StringUtils;
-import org.imgscalr.Scalr;
 import org.springframework.context.annotation.Bean;
 import org.springframework.core.io.FileSystemResource;
 import org.springframework.stereotype.Component;
@@ -26,6 +22,7 @@ import reactor.core.scheduler.Scheduler;
 import reactor.core.scheduler.Schedulers;
 import run.halo.app.core.attachment.AttachmentRootGetter;
 import run.halo.app.core.attachment.ThumbnailSize;
+import run.halo.app.core.attachment.ThumbnailUtils;
 
 @Slf4j
 @Component
@@ -54,28 +51,40 @@ class ThumbnailRouters {
             .GET("/thumbnails/w{width}/upload/{*filename}", serverRequest -> {
                 var width = serverRequest.pathVariable("width");
                 String originalFilename = serverRequest.pathVariable("filename");
-                var fileName = StringUtils.removeStart(originalFilename, "/");
-                if (StringUtils.isBlank(fileName)) {
+                var filename = StringUtils.removeStart(originalFilename, "/");
+                if (StringUtils.isBlank(filename)) {
                     log.trace("Filename is blank");
-                    return Mono.error(new NoResourceFoundException(fileName));
+                    return Mono.error(new NoResourceFoundException(filename));
                 }
                 var size = ThumbnailSize.fromWidth(width);
                 // try to resolve the thumbnail
                 // build thumbnail path
                 var thumbnailPath = thumbnailRoot.resolve("w" + size.getWidth())
-                    .resolve(fileName);
+                    .resolve(filename);
                 var thumbnailResource = new FileSystemResource(thumbnailPath);
                 if (thumbnailResource.isReadable()) {
                     return ServerResponse.ok().bodyValue(thumbnailResource);
                 }
+
+                var uploadPath = uploadRoot.resolve(filename);
+                var fileSuffix = FilenameUtils.getExtension(filename);
+                if (!ThumbnailUtils.isSupportedImage(fileSuffix)) {
+                    log.warn("File suffix {} is not supported for thumbnail generation, return "
+                        + "original file", fileSuffix);
+                    // return the original file
+                    thumbnailResource = new FileSystemResource(uploadPath);
+                    if (!thumbnailResource.isReadable()) {
+                        return Mono.error(new NoResourceFoundException(filename));
+                    }
+                    return ServerResponse.ok().bodyValue(thumbnailResource);
+                }
+
                 // generate for the attachment
                 return Mono.fromCallable(
-                        () -> {
-                            var uploadPath = uploadRoot.resolve(fileName);
-                            return generateThumbnail(uploadPath, thumbnailPath, size);
-                        })
+                        () -> generateThumbnail(uploadPath, thumbnailPath, size)
+                    )
                     .subscribeOn(this.thumbnailGeneratingScheduler)
-                    .switchIfEmpty(Mono.error(() -> new NoResourceFoundException(fileName)))
+                    .switchIfEmpty(Mono.error(() -> new NoResourceFoundException(filename)))
                     .map(FileSystemResource::new)
                     .flatMap(resource -> ServerResponse.ok().bodyValue(resource));
             })
@@ -100,16 +109,12 @@ class ThumbnailRouters {
                 log.debug("Generating thumbnail for path: {}, target: {}, size: {}",
                     attachmentPath, thumbnailPath, size);
             }
-            var formatName = getFormatName(attachmentPath);
-            if (formatName == null) {
-                log.info("Cannot determine image format for path: {}", attachmentPath);
-                return null;
-            }
             try (
                 var inputStream = Files.newInputStream(attachmentPath, READ);
             ) {
                 var bufferedImage = ImageIO.read(inputStream);
                 if (bufferedImage == null) {
+                    // indicate that it's not an image or unsupported image format
                     return null;
                 }
                 if (bufferedImage.getWidth() <= size.getWidth()) {
@@ -118,38 +123,26 @@ class ThumbnailRouters {
                     Files.copy(attachmentPath, thumbnailPath);
                     return thumbnailPath;
                 }
-                // TODO Handle image orientation
-                var thumbnailBufferedImage =
-                    Scalr.resize(bufferedImage, AUTOMATIC, FIT_TO_WIDTH, size.getWidth());
                 Files.createDirectories(thumbnailPath.getParent());
-                try (var outputStream =
-                         Files.newOutputStream(thumbnailPath, CREATE, TRUNCATE_EXISTING, WRITE)
-                ) {
-                    ImageIO.write(thumbnailBufferedImage, formatName, outputStream);
-                }
+                Thumbnails.of(bufferedImage)
+                    .width(size.getWidth())
+                    .toFile(thumbnailPath.toFile());
                 log.info("Generated thumbnail for path: {}, target: {}, size: {}",
                     attachmentPath, thumbnailPath, size);
                 return thumbnailPath;
             } catch (IOException e) {
                 log.warn("Failed to generate thumbnail for path: {}", attachmentPath, e);
-                return null;
+                // delete the possibly created file
+                try {
+                    Files.deleteIfExists(thumbnailPath);
+                } catch (IOException ex) {
+                    // ignore this error
+                    log.warn("Failed to delete possibly created thumbnail file: {}",
+                        thumbnailPath, ex);
+                }
+                // return the original attachment path
+                return attachmentPath;
             }
-        }
-    }
-
-    private String getFormatName(Path imagePath) {
-        try (var imageInputStream = ImageIO.createImageInputStream(
-            Files.newInputStream(imagePath))
-        ) {
-            var readers = ImageIO.getImageReaders(imageInputStream);
-            if (!readers.hasNext()) {
-                return null;
-            }
-            var reader = readers.next();
-            return reader.getFormatName();
-        } catch (IOException e) {
-            log.warn("Failed to get image format for path: {}", imagePath, e);
-            return null;
         }
     }
 

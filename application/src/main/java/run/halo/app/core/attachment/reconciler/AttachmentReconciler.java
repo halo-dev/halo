@@ -23,7 +23,6 @@ import run.halo.app.extension.controller.ControllerBuilder;
 import run.halo.app.extension.controller.Reconciler;
 import run.halo.app.extension.controller.Reconciler.Request;
 import run.halo.app.extension.controller.RequeueException;
-import run.halo.app.extension.exception.NotImplementedException;
 
 @Slf4j
 @Component
@@ -66,12 +65,6 @@ public class AttachmentReconciler implements Reconciler<Request> {
                     .stream()
                     .collect(Collectors.toMap(Enum::name, k -> map.get(k).toASCIIString()))
                 )
-                .onErrorMap(NotImplementedException.class,
-                    e -> new RequeueException(new Result(true, null),
-                        "Attachment handler does not implement thumbnail generation, requeue "
-                            + "the "
-                            + "request"
-                    ))
                 .blockOptional(Duration.ofSeconds(10))
                 .orElseThrow(() -> new RequeueException(new Result(true, null), """
                     Attachment handler is unavailable for getting thumbnails links, \
