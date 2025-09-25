@@ -27,7 +27,7 @@
   "lint-staged": {
     "**/*": "prettier --write --ignore-unknown",
     "*.{ts,mts,tsx,vue}": [
-      "eslint --fix --max-warnings=0"
+      "eslint --fix --max-warnings=0 --no-warn-ignored"
     ]
   },
   "browserslist": [
