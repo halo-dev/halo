@@ -78,6 +78,12 @@ class ThumbnailImgTagPostProcessor implements ElementTagPostProcessor {
             }
         }
 
+        var path = imageUri.getPath();
+        if (!path.startsWith("/upload/")) {
+            log.debug("Skip processing img tag with non-upload path: {}", path);
+            return Mono.empty();
+        }
+
         var fileSuffix = FilenameUtils.getExtension(imageUri.getPath());
         if (!ThumbnailUtils.isSupportedImage(fileSuffix)) {
             log.debug("Skip processing img tag with unsupported image suffix: {}", fileSuffix);
@@ -90,14 +96,13 @@ class ThumbnailImgTagPostProcessor implements ElementTagPostProcessor {
             log.debug("Skip processing img tag because the image is not supported: {}", imageUri);
             return Mono.empty();
         }
-        var modelFactory = context.getModelFactory();
-        tag = modelFactory.setAttribute(tag, "size", """
-            (max-width: 400px) 400px, \
-            (max-width: 800px) 800px, \
-            (max-width: 1200px) 1200px, \
-            (max-width: 1600px) 1600px\
-            """);
 
+        var modelFactory = context.getModelFactory();
+        if (!tag.hasAttribute("sizes")) {
+            tag = modelFactory.setAttribute(tag, "sizes", """
+                (min-width: 1024px) 33vw, (min-width: 600px) 50vw, 100vw\
+                """);
+        }
         var srcset = thumbnails.keySet().stream()
             .map(size -> {
                 var uri = thumbnails.get(size);

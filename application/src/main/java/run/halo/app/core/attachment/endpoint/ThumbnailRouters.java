@@ -7,6 +7,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import javax.imageio.ImageIO;
 import lombok.extern.slf4j.Slf4j;
+import net.coobird.thumbnailator.ThumbnailParameter;
 import net.coobird.thumbnailator.Thumbnails;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -126,6 +127,7 @@ class ThumbnailRouters {
                 Files.createDirectories(thumbnailPath.getParent());
                 Thumbnails.of(bufferedImage)
                     .width(size.getWidth())
+                    .imageType(ThumbnailParameter.DEFAULT_IMAGE_TYPE)
                     .toFile(thumbnailPath.toFile());
                 log.info("Generated thumbnail for path: {}, target: {}, size: {}",
                     attachmentPath, thumbnailPath, size);
