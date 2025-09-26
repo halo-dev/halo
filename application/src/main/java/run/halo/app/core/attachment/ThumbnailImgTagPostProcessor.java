@@ -100,7 +100,7 @@ class ThumbnailImgTagPostProcessor implements ElementTagPostProcessor {
         var modelFactory = context.getModelFactory();
         if (!tag.hasAttribute("sizes")) {
             tag = modelFactory.setAttribute(tag, "sizes", """
-                (min-width: 1024px) 33vw, (min-width: 600px) 50vw, 100vw\
+                (min-width: 800px) 800px, 100vw\
                 """);
         }
         var srcset = thumbnails.keySet().stream()
