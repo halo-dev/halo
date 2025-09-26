@@ -21,7 +21,6 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.atomic.AtomicReference;
-import java.util.stream.Collectors;
 import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.RandomStringUtils;
@@ -311,20 +310,8 @@ class LocalAttachmentUploadHandler implements AttachmentHandler {
             || !StringUtils.hasText(attachment.getStatus().getPermalink())) {
             return Mono.just(Map.of());
         }
-        var mediaType = MediaType.parseMediaType(attachment.getSpec().getMediaType());
-        if (!ThumbnailUtils.isSupportedImage(mediaType)) {
-            return Mono.just(Map.of());
-        }
-
-        var thumbnails = Arrays.stream(ThumbnailSize.values())
-            .collect(Collectors.toMap(t -> t, t -> {
-                var permalink = URI.create(attachment.getStatus().getPermalink());
-                var prefix = "/thumbnails/w" + t.getWidth();
-                return UriComponentsBuilder.fromUri(permalink)
-                    .replacePath(prefix + permalink.getPath())
-                    .build()
-                    .toUri();
-            }));
+        var permalinkUri = URI.create(attachment.getStatus().getPermalink());
+        var thumbnails = ThumbnailUtils.buildSrcsetMap(permalinkUri);
         return Mono.just(thumbnails);
     }
 

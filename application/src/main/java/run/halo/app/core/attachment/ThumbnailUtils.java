@@ -1,9 +1,14 @@
 package run.halo.app.core.attachment;
 
+import java.net.URI;
+import java.util.Arrays;
+import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
+import org.apache.commons.io.FilenameUtils;
 import org.springframework.http.MediaType;
 import org.springframework.util.MimeType;
+import org.springframework.web.util.UriComponentsBuilder;
 
 public enum ThumbnailUtils {
     ;
@@ -32,5 +37,26 @@ public enum ThumbnailUtils {
     public static boolean isSupportedImage(MimeType mimeType) {
         return SUPPORTED_IMAGE_MIME_TYPES.stream()
             .anyMatch(supported -> supported.isCompatibleWith(mimeType));
+    }
+
+    /**
+     * Build a map of thumbnail size to its corresponding URI based on the given permalink.
+     *
+     * @param permalink permalink of the attachment in local storage
+     * @return a map where the key is the thumbnail size and the value is the URI of the thumbnail
+     */
+    public static Map<ThumbnailSize, URI> buildSrcsetMap(URI permalink) {
+        var fileSuffix = FilenameUtils.getExtension(permalink.getPath());
+        if (!isSupportedImage(fileSuffix)) {
+            return Map.of();
+        }
+        return Arrays.stream(ThumbnailSize.values())
+            .collect(Collectors.toMap(t -> t, t -> {
+                var prefix = "/thumbnails/w" + t.getWidth();
+                return UriComponentsBuilder.fromUri(permalink)
+                    .replacePath(prefix + permalink.getPath())
+                    .build()
+                    .toUri();
+            }));
     }
 }

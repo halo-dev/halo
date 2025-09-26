@@ -1,5 +1,6 @@
 package run.halo.app.core.attachment;
 
+import java.util.Optional;
 import lombok.Getter;
 
 @Getter
@@ -39,5 +40,14 @@ public enum ThumbnailSize {
             }
         }
         throw new IllegalArgumentException("No such thumbnail size: " + name);
+    }
+
+    public static Optional<ThumbnailSize> optionalValueOf(String name) {
+        for (ThumbnailSize value : values()) {
+            if (value.name().equalsIgnoreCase(name)) {
+                return Optional.of(value);
+            }
+        }
+        return Optional.empty();
     }
 }
