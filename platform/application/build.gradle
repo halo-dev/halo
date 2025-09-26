@@ -32,6 +32,7 @@ dependencies {
         api libs.bundles.resilience4j
         api libs.twofactor.auth
         api libs.imgscalr.lib
+        api libs.thumbnailator
         api libs.metadata.extractor
         api "org.springframework.integration:spring-integration-core"
         api "org.thymeleaf.extras:thymeleaf-extras-springsecurity6"

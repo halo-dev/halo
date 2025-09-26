@@ -18,7 +18,6 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.data.domain.Sort;
-import org.springframework.stereotype.Component;
 import run.halo.app.core.attachment.AttachmentRootGetter;
 import run.halo.app.core.attachment.AttachmentUtils;
 import run.halo.app.core.attachment.LocalThumbnailService;
@@ -36,7 +35,7 @@ import run.halo.app.extension.controller.Reconciler;
 import run.halo.app.infra.ExternalLinkProcessor;
 
 @Slf4j
-@Component
+// @Component
 @RequiredArgsConstructor
 public class LocalThumbnailsReconciler implements Reconciler<Reconciler.Request> {
     private final LocalThumbnailService localThumbnailService;

@@ -15,6 +15,7 @@ import java.nio.file.Path;
 import java.time.Clock;
 import java.time.Duration;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
@@ -42,6 +43,8 @@ import reactor.core.publisher.SynchronousSink;
 import reactor.core.scheduler.Schedulers;
 import reactor.util.retry.Retry;
 import run.halo.app.core.attachment.AttachmentRootGetter;
+import run.halo.app.core.attachment.ThumbnailSize;
+import run.halo.app.core.attachment.ThumbnailUtils;
 import run.halo.app.core.extension.attachment.Attachment;
 import run.halo.app.core.extension.attachment.Attachment.AttachmentSpec;
 import run.halo.app.core.extension.attachment.Constant;
@@ -240,6 +243,25 @@ class LocalAttachmentUploadHandler implements AttachmentHandler {
                             } else {
                                 log.info("{} was not exist", attachment);
                             }
+                            // TODO Delete thumbnails if present
+                            var thumbnailsRoot = attachmentsRoot.resolve("thumbnails");
+                            var relativeAttachmentPath =
+                                attachmentsRoot.resolve("upload").relativize(attachmentPath);
+                            log.info("Clean up thumbnails for {}", localRelativePath);
+                            Arrays.stream(ThumbnailSize.values())
+                                .forEach(thumbnailSize -> {
+                                    var thumbnailPath =
+                                        thumbnailsRoot.resolve("w" + thumbnailSize.getWidth())
+                                            .resolve(relativeAttachmentPath);
+                                    try {
+                                        Files.deleteIfExists(thumbnailPath);
+                                        log.info("Deleted thumbnail {}", thumbnailPath);
+                                    } catch (IOException e) {
+                                        // ignore the exception to continue deleting other
+                                        // thumbnails
+                                        log.warn("Cannot delete thumbnail {}", thumbnailPath, e);
+                                    }
+                                });
                         } catch (IOException e) {
                             throw Exceptions.propagate(e);
                         }
@@ -276,6 +298,21 @@ class LocalAttachmentUploadHandler implements AttachmentHandler {
         ConfigMap configMap,
         Duration ttl) {
         return getPermalink(attachment, policy, configMap);
+    }
+
+    @Override
+    public Mono<Map<ThumbnailSize, URI>> getThumbnailLinks(Attachment attachment, Policy policy,
+        ConfigMap configMap) {
+        if (!this.shouldHandle(policy)) {
+            return Mono.empty();
+        }
+        if (attachment.getStatus() == null
+            || !StringUtils.hasText(attachment.getStatus().getPermalink())) {
+            return Mono.just(Map.of());
+        }
+        var permalinkUri = URI.create(attachment.getStatus().getPermalink());
+        var thumbnails = ThumbnailUtils.buildSrcsetMap(permalinkUri);
+        return Mono.just(thumbnails);
     }
 
     private boolean shouldHandle(Policy policy) {
