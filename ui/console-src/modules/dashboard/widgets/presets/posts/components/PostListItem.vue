@@ -104,7 +104,7 @@ const commentText = computed(() => {
               target="_blank"
               :href="previewUrl"
               :title="previewUrl"
-              class="hidden text-gray-600 transition-all hover:text-gray-900 group-hover:inline-block"
+              class="text-gray-600 opacity-0 transition-all hover:text-gray-900 group-hover:opacity-100"
             >
               <IconExternalLinkLine class="h-3.5 w-3.5" />
             </a>
