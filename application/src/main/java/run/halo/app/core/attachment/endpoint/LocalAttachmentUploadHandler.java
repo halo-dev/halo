@@ -283,18 +283,27 @@ class LocalAttachmentUploadHandler implements AttachmentHandler {
         return Mono.just(doGetThumbnailLinks(attachment));
     }
 
-    private Optional<URI> doGetPermalink(Attachment attachment) {
+    protected Optional<URI> doGetPermalink(Attachment attachment) {
         var annotations = attachment.getMetadata().getAnnotations();
         if (annotations == null
             || !annotations.containsKey(Constant.URI_ANNO_KEY)) {
             return Optional.empty();
         }
         var uriStr = annotations.get(Constant.URI_ANNO_KEY);
-        var uri = UriComponentsBuilder.fromUri(externalUrl.get())
-            // The URI has been encoded before, so there is no need to encode it again.
-            .path(uriStr)
-            .build(true)
-            .toUri();
+        URI uri;
+        try {
+            uri = UriComponentsBuilder.fromUri(externalUrl.get())
+                // The URI has been encoded before, so there is no need to encode it again.
+                .path(uriStr)
+                .build(true)
+                .toUri();
+        } catch (IllegalArgumentException e) {
+            // The URI may not be encoded, so we need to build with encoding.
+            uri = UriComponentsBuilder.fromUri(externalUrl.get())
+                .path(uriStr)
+                .build()
+                .toUri();
+        }
         return Optional.of(uri);
     }
 
