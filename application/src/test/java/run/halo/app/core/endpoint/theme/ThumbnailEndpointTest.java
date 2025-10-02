@@ -1,6 +1,5 @@
 package run.halo.app.core.endpoint.theme;
 
-import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 
 import java.net.URI;
@@ -13,6 +12,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.test.web.reactive.server.WebTestClient;
 import reactor.core.publisher.Mono;
 import run.halo.app.core.attachment.ThumbnailService;
+import run.halo.app.core.attachment.ThumbnailSize;
 
 /**
  * Tests for {@link ThumbnailEndpoint}.
@@ -39,13 +39,12 @@ class ThumbnailEndpointTest {
 
     @Test
     void thumbnailUriNotAccessible() {
-        when(thumbnailService.get(any(), any()))
-            .thenReturn(Mono.just(URI.create("/thumbnail-not-found.png")));
+        when(thumbnailService.get(URI.create("/myavatar.png"), ThumbnailSize.L))
+            .thenReturn(Mono.empty());
         webClient.get()
             .uri("/thumbnails/-/via-uri?size=l&uri=/myavatar.png")
             .exchange()
-            .expectAll(responseSpec -> responseSpec.expectHeader().location("/myavatar.png"))
-            .expectStatus()
-            .is3xxRedirection();
+            .expectHeader().location("/myavatar.png")
+            .expectStatus().is3xxRedirection();
     }
 }

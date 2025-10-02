@@ -18,6 +18,7 @@ import run.halo.app.extension.GVK;
 @EqualsAndHashCode(callSuper = true)
 @GVK(group = "storage.halo.run", version = "v1alpha1", kind = "LocalThumbnail",
     plural = "localthumbnails", singular = "localthumbnail")
+@Deprecated(forRemoval = true, since = "2.22.0")
 public class LocalThumbnail extends AbstractExtension {
     public static final String UNIQUE_IMAGE_AND_SIZE_INDEX = "uniqueImageAndSize";
     public static final String REQUEST_TO_GENERATE_ANNO = "storage.halo.run/request-to-generate";

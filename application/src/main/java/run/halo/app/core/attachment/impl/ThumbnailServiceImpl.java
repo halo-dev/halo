@@ -1,162 +1,116 @@
 package run.halo.app.core.attachment.impl;
 
-import static run.halo.app.extension.index.query.QueryFactory.equal;
-import static run.halo.app.extension.index.query.QueryFactory.startsWith;
-
-import java.net.MalformedURLException;
+import com.github.benmanes.caffeine.cache.Cache;
+import com.github.benmanes.caffeine.cache.Caffeine;
 import java.net.URI;
-import java.net.URL;
+import java.util.Collections;
+import java.util.HashMap;
 import java.util.Map;
-import java.util.Optional;
-import java.util.concurrent.ConcurrentHashMap;
-import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.data.domain.Sort;
+import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Component;
-import org.springframework.util.Assert;
+import org.springframework.util.CollectionUtils;
+import org.springframework.util.StringUtils;
 import reactor.core.publisher.Mono;
-import run.halo.app.core.attachment.AttachmentUtils;
-import run.halo.app.core.attachment.LocalThumbnailService;
-import run.halo.app.core.attachment.ThumbnailProvider;
-import run.halo.app.core.attachment.ThumbnailProvider.ThumbnailContext;
+import run.halo.app.core.attachment.AttachmentChangedEvent;
 import run.halo.app.core.attachment.ThumbnailService;
-import run.halo.app.core.attachment.ThumbnailSigner;
 import run.halo.app.core.attachment.ThumbnailSize;
-import run.halo.app.core.attachment.extension.Thumbnail;
+import run.halo.app.core.extension.attachment.Attachment;
+import run.halo.app.extension.ExtensionUtil;
 import run.halo.app.extension.ListOptions;
-import run.halo.app.extension.ListResult;
-import run.halo.app.extension.Metadata;
-import run.halo.app.extension.PageRequestImpl;
 import run.halo.app.extension.ReactiveExtensionClient;
-import run.halo.app.infra.ExternalLinkProcessor;
-import run.halo.app.plugin.extensionpoint.ExtensionGetter;
+import run.halo.app.extension.index.query.QueryFactory;
 
+/**
+ * Implementation of {@link ThumbnailService}.
+ *
+ * <p>
+ * Caches thumbnail links in memory for better performance.
+ *
+ * @author johnniang
+ * @since 2.22.0
+ */
 @Slf4j
 @Component
-@RequiredArgsConstructor
-public class ThumbnailServiceImpl implements ThumbnailService {
-    private final ExtensionGetter extensionGetter;
+class ThumbnailServiceImpl implements ThumbnailService {
+
+    private static final Map<ThumbnailSize, URI> EMPTY_THUMBNAILS = Map.of();
+
+    private final Cache<String, Map<ThumbnailSize, URI>> thumbnailCache;
+
     private final ReactiveExtensionClient client;
-    private final ExternalLinkProcessor externalLinkProcessor;
-    private final ThumbnailProvider thumbnailProvider;
-    private final LocalThumbnailService localThumbnailService;
-    private final Map<CacheKey, Mono<URI>> ongoingTasks = new ConcurrentHashMap<>();
 
-    @Override
-    public Mono<URI> generate(URI imageUri, ThumbnailSize size) {
-        var cacheKey = new CacheKey(imageUri, size);
-        // Combine caching to implement more elegant deduplication logic, ensure that only
-        // one thread executes the logic of create at the same time, and there is no global lock
-        // restriction
-        return ongoingTasks.computeIfAbsent(cacheKey, k -> doGenerate(imageUri, size)
-            // In the case of concurrency, doGenerate must return the same instance
-            .doFinally(signalType -> ongoingTasks.remove(cacheKey))
-            .cache()
-        );
-    }
-
-    record CacheKey(URI imageUri, ThumbnailSize size) {
-    }
-
-    private Mono<URI> doGenerate(URI imageUri, ThumbnailSize size) {
-        var imageUrlOpt = toImageUrl(imageUri);
-        if (imageUrlOpt.isEmpty()) {
-            return Mono.empty();
-        }
-        var imageUrl = imageUrlOpt.get();
-        return fetchThumbnail(imageUri, size)
-            .map(thumbnail -> URI.create(thumbnail.getSpec().getThumbnailUri()))
-            .switchIfEmpty(Mono.defer(() -> create(imageUrl, size)))
-            .onErrorResume(Throwable.class, e -> {
-                log.warn("Failed to generate thumbnail for image: {}", imageUrl, e);
-                return Mono.just(URI.create(imageUrl.toString()));
-            });
-    }
-
-    @Override
-    public Mono<URI> get(URI imageUri, ThumbnailSize size) {
-        return fetchThumbnail(imageUri, size)
-            .map(thumbnail -> URI.create(thumbnail.getSpec().getThumbnailUri()))
-            .defaultIfEmpty(imageUri);
-    }
-
-    @Override
-    public Mono<Void> delete(URI imageUri) {
-        Assert.notNull(imageUri, "Image uri must not be null");
-        Mono<Void> deleteMono;
-        if (imageUri.isAbsolute()) {
-            deleteMono = thumbnailProvider.delete(AttachmentUtils.toUrl(imageUri));
-        } else {
-            // Local thumbnails maybe a relative path, so we need to process it.
-            deleteMono = localThumbnailService.delete(imageUri);
-        }
-        return deleteMono.then(deleteThumbnailRecord(imageUri));
-    }
-
-    private Mono<Void> deleteThumbnailRecord(URI imageUri) {
-        var imageHash = signatureFor(imageUri);
-        var listOptions = ListOptions.builder()
-            .fieldQuery(startsWith(Thumbnail.ID_INDEX, Thumbnail.idIndexFunc(imageHash, "")))
+    public ThumbnailServiceImpl(ReactiveExtensionClient client) {
+        this.client = client;
+        this.thumbnailCache = Caffeine.newBuilder()
+            // TODO make it configurable
+            .maximumSize(10_000)
             .build();
-        return client.listAll(Thumbnail.class, listOptions, Sort.unsorted())
-            .flatMap(client::delete)
-            .then();
     }
 
-    Optional<URL> toImageUrl(URI imageUri) {
-        try {
-            if (imageUri.isAbsolute()) {
-                return Optional.of(imageUri.toURL());
+    @EventListener
+    void handleAttachmentChangedEvent(AttachmentChangedEvent event) {
+        updateCache(event.getAttachment());
+    }
+
+    void updateCache(Attachment attachment) {
+        if (attachment.getStatus() == null) {
+            return;
+        }
+        var permalink = attachment.getStatus().getPermalink();
+        if (!StringUtils.hasText(permalink)) {
+            return;
+        }
+        if (ExtensionUtil.isDeleted(attachment)) {
+            thumbnailCache.invalidate(permalink);
+            return;
+        }
+        var thumbnails = attachment.getStatus().getThumbnails();
+        if (CollectionUtils.isEmpty(thumbnails)) {
+            thumbnailCache.put(permalink, EMPTY_THUMBNAILS);
+            return;
+        }
+        Map<ThumbnailSize, URI> validThumbnails = new HashMap<>();
+        thumbnails.forEach((key, value) -> {
+            var size = ThumbnailSize.optionalValueOf(key);
+            if (size.isPresent() && StringUtils.hasText(value)) {
+                validThumbnails.put(size.get(), URI.create(value));
             }
-            var url = new URL(externalLinkProcessor.processLink(imageUri.toString()));
-            return Optional.of(url);
-        } catch (MalformedURLException e) {
-            // Ignore
+        });
+        if (validThumbnails.isEmpty()) {
+            thumbnailCache.put(permalink, EMPTY_THUMBNAILS);
+        } else {
+            thumbnailCache.put(permalink, Collections.unmodifiableMap(validThumbnails));
         }
-        return Optional.empty();
     }
 
-    protected Mono<URI> create(URL imageUrl, ThumbnailSize size) {
-        var context = ThumbnailContext.builder()
-            .imageUrl(imageUrl)
-            .size(size)
+    @Override
+    public Mono<URI> get(URI permalink, ThumbnailSize size) {
+        return get(permalink).mapNotNull(thumbnails -> thumbnails.get(size));
+    }
+
+    @Override
+    public Mono<Map<ThumbnailSize, URI>> get(URI permalink) {
+        var permalinkString = permalink.toASCIIString();
+        var thumbnails = thumbnailCache.getIfPresent(permalinkString);
+        if (thumbnails != null) {
+            return Mono.just(thumbnails);
+        }
+        // query from attachments
+        var listOptions = ListOptions.builder()
+            .andQuery(QueryFactory.equal("status.permalink", permalinkString))
             .build();
-        var imageUri =
-            localThumbnailService.ensureInSiteUriIsRelative(URI.create(imageUrl.toString()));
-        return extensionGetter.getEnabledExtensions(ThumbnailProvider.class)
-            .filterWhen(provider -> provider.supports(context))
+        return client.listAll(Attachment.class, listOptions, ExtensionUtil.defaultSort())
             .next()
-            .flatMap(provider -> provider.generate(context))
-            .flatMap(uri -> {
-                var thumb = new Thumbnail();
-                thumb.setMetadata(new Metadata());
-                thumb.getMetadata().setGenerateName("thumb-");
-                thumb.setSpec(new Thumbnail.Spec()
-                    .setSize(size)
-                    .setThumbnailUri(uri.toASCIIString())
-                    .setImageUri(imageUri.toASCIIString())
-                    .setImageSignature(signatureFor(imageUri))
-                );
-                // double check
-                return fetchThumbnail(imageUri, size)
-                    .map(thumbnail -> URI.create(thumbnail.getSpec().getThumbnailUri()))
-                    .switchIfEmpty(Mono.defer(() -> client.create(thumb)
-                        .thenReturn(uri))
-                    );
-            });
+            // Here we allow concurrent updates
+            .doOnNext(this::updateCache)
+            .mapNotNull(attachment -> this.thumbnailCache.getIfPresent(permalinkString))
+            .switchIfEmpty(Mono.fromSupplier(() -> {
+                // No attachment or no thumbnails, cache empty map to avoid cache miss again and
+                // again.
+                this.thumbnailCache.put(permalinkString, EMPTY_THUMBNAILS);
+                return EMPTY_THUMBNAILS;
+            }));
     }
 
-    private String signatureFor(URI imageUri) {
-        var uri = localThumbnailService.ensureInSiteUriIsRelative(imageUri);
-        return ThumbnailSigner.generateSignature(uri);
-    }
-
-    Mono<Thumbnail> fetchThumbnail(URI imageUri, ThumbnailSize size) {
-        var imageHash = signatureFor(imageUri);
-        var id = Thumbnail.idIndexFunc(imageHash, size.name());
-        return client.listBy(Thumbnail.class, ListOptions.builder()
-                .fieldQuery(equal(Thumbnail.ID_INDEX, id))
-                .build(), PageRequestImpl.ofSize(1))
-            .flatMap(result -> Mono.justOrEmpty(ListResult.first(result)));
-    }
 }

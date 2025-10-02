@@ -7,6 +7,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.params.provider.Arguments.arguments;
 import static org.mockito.Mockito.when;
 
+import java.net.URI;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Path;
 import java.time.Clock;
@@ -34,6 +35,7 @@ import run.halo.app.core.extension.attachment.Attachment;
 import run.halo.app.core.extension.attachment.Policy;
 import run.halo.app.core.extension.attachment.endpoint.UploadOption;
 import run.halo.app.extension.ConfigMap;
+import run.halo.app.infra.ExternalUrlSupplier;
 
 @ExtendWith(MockitoExtension.class)
 class LocalAttachmentUploadHandlerTest {
@@ -44,6 +46,9 @@ class LocalAttachmentUploadHandlerTest {
     @Mock
     AttachmentRootGetter attachmentRootGetter;
 
+    @Mock
+    ExternalUrlSupplier externalUrlSupplier;
+
     @TempDir
     Path tempDir;
 
@@ -52,6 +57,7 @@ class LocalAttachmentUploadHandlerTest {
     @BeforeEach
     void setUp() {
         uploadHandler.setClock(clock);
+        when(externalUrlSupplier.get()).thenReturn(URI.create("/"));
     }
 
     public static Stream<Arguments> testUploadWithRenameStrategy() {
@@ -195,8 +201,13 @@ class LocalAttachmentUploadHandlerTest {
         when(attachmentRootGetter.get()).thenReturn(tempDir);
         uploadHandler.upload(uploadOption)
             .as(StepVerifier::create)
-            .assertNext(assertion)
+            .assertNext(attachment -> {
+                assertion.accept(attachment);
+                assertNotNull(attachment.getStatus().getPermalink());
+                assertNotNull(attachment.getStatus().getThumbnails());
+            })
             .verifyComplete();
+
     }
 
 }

@@ -3,6 +3,7 @@ package run.halo.app.core.extension.service;
 import java.net.URI;
 import java.net.URL;
 import java.time.Duration;
+import java.util.Map;
 import java.util.function.Consumer;
 import org.springframework.core.io.buffer.DataBuffer;
 import org.springframework.http.MediaType;
@@ -11,6 +12,7 @@ import org.springframework.lang.NonNull;
 import org.springframework.lang.Nullable;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
+import run.halo.app.core.attachment.ThumbnailSize;
 import run.halo.app.core.extension.attachment.Attachment;
 
 /**
@@ -91,6 +93,8 @@ public interface AttachmentService {
      * shared URL is equal to permalink.
      */
     Mono<URI> getSharedURL(Attachment attachment, Duration ttl);
+
+    Mono<Map<ThumbnailSize, URI>> getThumbnailLinks(Attachment attachment);
 
     /**
      * Transfer external links to attachments.

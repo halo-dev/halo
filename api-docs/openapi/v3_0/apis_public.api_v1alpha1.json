@@ -1159,12 +1159,18 @@
             }
           },
           {
-            "description": "The size of the thumbnail,available values are s,m,l,xl",
+            "description": "The size of the thumbnail",
             "in": "query",
             "name": "size",
             "required": true,
             "schema": {
-              "type": "string"
+              "type": "string",
+              "enum": [
+                "S",
+                "M",
+                "L",
+                "XL"
+              ]
             }
           }
         ],
@@ -2613,12 +2619,12 @@
           },
           "visible": {
             "type": "string",
-            "default": "PUBLIC",
             "enum": [
               "PUBLIC",
               "INTERNAL",
               "PRIVATE"
-            ]
+            ],
+            "default": "PUBLIC"
           }
         }
       },
@@ -3191,12 +3197,12 @@
           },
           "visible": {
             "type": "string",
-            "default": "PUBLIC",
             "enum": [
               "PUBLIC",
               "INTERNAL",
               "PRIVATE"
-            ]
+            ],
+            "default": "PUBLIC"
           }
         }
       },
