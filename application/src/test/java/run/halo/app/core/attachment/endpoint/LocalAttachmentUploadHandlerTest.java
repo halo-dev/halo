@@ -17,6 +17,7 @@ import java.util.Map;
 import java.util.function.Consumer;
 import java.util.stream.Stream;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.api.io.TempDir;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -32,9 +33,11 @@ import reactor.core.publisher.Flux;
 import reactor.test.StepVerifier;
 import run.halo.app.core.attachment.AttachmentRootGetter;
 import run.halo.app.core.extension.attachment.Attachment;
+import run.halo.app.core.extension.attachment.Constant;
 import run.halo.app.core.extension.attachment.Policy;
 import run.halo.app.core.extension.attachment.endpoint.UploadOption;
 import run.halo.app.extension.ConfigMap;
+import run.halo.app.extension.Metadata;
 import run.halo.app.infra.ExternalUrlSupplier;
 
 @ExtendWith(MockitoExtension.class)
@@ -208,6 +211,18 @@ class LocalAttachmentUploadHandlerTest {
             })
             .verifyComplete();
 
+    }
+
+    @Test
+    void shouldGetPermalinkWhenUriContainsIllegalChars() {
+        var attachment = new Attachment();
+        attachment.setMetadata(new Metadata());
+        attachment.getMetadata().setAnnotations(Map.of(
+            Constant.URI_ANNO_KEY, "/path/with space.png"
+        ));
+        var permalink = uploadHandler.doGetPermalink(attachment);
+        assertTrue(permalink.isPresent());
+        assertEquals("/path/with%20space.png", permalink.get().toASCIIString());
     }
 
 }
