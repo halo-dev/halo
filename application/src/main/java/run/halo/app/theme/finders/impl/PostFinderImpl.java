@@ -11,8 +11,8 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-import java.util.Random;
 import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import org.apache.commons.lang3.BooleanUtils;
@@ -301,25 +301,21 @@ public class PostFinderImpl implements PostFinder {
 
     @Override
     public Flux<ListedPostVo> random(Integer limit) {
-
-        return postPredicateResolver.getListOptions()
-            .flatMapMany(listOptions -> client.listAll(Post.class, listOptions, Sort.unsorted()))
-            .collectList()
-            .defaultIfEmpty(Collections.emptyList())
-            .flatMapMany(posts -> Flux.fromIterable(shufflePostList(posts).stream().limit(limit).collect(Collectors.toList())))
-            .flatMapSequential(postPublicQueryService::convertToListedVo);
+        return postPredicateResolver.getListOptions().flatMapMany(listOptions -> {
+            long total = client.indexedQueryEngine()
+                .retrieve(Post.GVK, listOptions, PageRequestImpl.ofSize(1)).getTotal();
+            return Flux.fromIterable(
+                    shufflePostList(IntStream.rangeClosed(1, (int) total).boxed().toList()).subList(0,
+                        limit == null || limit < 0 ? 0 : Math.min(limit, (int) total)
+                    ))
+                .flatMapSequential(pageNum -> client.listBy(Post.class, listOptions,
+                    PageRequestImpl.of(pageNum, 1)).flatMapIterable(ListResult::getItems));
+        }).flatMapSequential(postPublicQueryService::convertToListedVo);
     }
 
-    private List<Post> shufflePostList(List<Post> list){
-        List<Post> shuffledList = new ArrayList<>(list);
-        Random random = new Random();
-        for(int i= shuffledList.size() - 1; i > 0; i--) {
-            int index = random.nextInt(i + 1);
-            // 交换元素
-            Post temp = shuffledList.get(index);
-            shuffledList.set(index, shuffledList.get(i));
-            shuffledList.set(i, temp);
-        }
+    private <T> List<T> shufflePostList(List<T> list) {
+        List<T> shuffledList = new ArrayList<>(list);
+        Collections.shuffle(shuffledList);
         return shuffledList;
     }
 
