@@ -600,7 +600,6 @@ core:
         ungrouped: 未分组
     actions:
       storage_policies: 存储策略
-      thumbnails: 缩略图
     empty:
       title: 当前分组没有附件
       message: 当前分组没有附件，你可以尝试刷新或者上传附件
@@ -660,6 +659,7 @@ core:
         video_not_support: 当前浏览器不支持该视频播放
         audio_not_support: 当前浏览器不支持该音频播放
         not_support: 此文件不支持预览
+        not_support_thumbnail: 此图片不支持生成缩略图
     group_editing_modal:
       titles:
         create: 新增附件分组
@@ -737,21 +737,6 @@ core:
     permalink_list:
       relative: 相对路径
       absolute: 完整路径
-    thumbnails_modal:
-      title: 缩略图记录
-      empty:
-        title: 没有缩略图记录
-        message: 当前没有缩略图记录，缩略图会在上传图片附件后自动生成。
-      operations:
-        retry_all_failed:
-          button: 重试所有失败记录
-          tips_empty: 没有失败记录
-          tips_success: 重试所有失败记录成功
-    thumbnails:
-      phase:
-        pending: 等待生成
-        succeeded: 生成成功
-        failed: 生成失败
   uc_attachment:
     empty:
       title: 当前没有附件

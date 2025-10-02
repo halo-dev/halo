@@ -2,9 +2,11 @@ package run.halo.app.core.extension.attachment.endpoint;
 
 import java.net.URI;
 import java.time.Duration;
+import java.util.Map;
 import org.pf4j.ExtensionPoint;
 import org.springframework.http.codec.multipart.FilePart;
 import reactor.core.publisher.Mono;
+import run.halo.app.core.attachment.ThumbnailSize;
 import run.halo.app.core.extension.attachment.Attachment;
 import run.halo.app.core.extension.attachment.Policy;
 import run.halo.app.extension.ConfigMap;
@@ -48,6 +50,20 @@ public interface AttachmentHandler extends ExtensionPoint {
      * @return permalink representing a unique attachment. Might be relative URL.
      */
     default Mono<URI> getPermalink(Attachment attachment,
+        Policy policy,
+        ConfigMap configMap) {
+        return Mono.empty();
+    }
+
+    /**
+     * Gets thumbnail links for given attachment.
+     *
+     * @param attachment the attachment
+     * @param policy the policy
+     * @param configMap the config map
+     * @return a map of thumbnail sizes to their respective URIs
+     */
+    default Mono<Map<ThumbnailSize, URI>> getThumbnailLinks(Attachment attachment,
         Policy policy,
         ConfigMap configMap) {
         return Mono.empty();

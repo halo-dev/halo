@@ -4,7 +4,11 @@ import { formatDatetime, relativeTimeTo } from "@/utils/date";
 import { usePermission } from "@/utils/permission";
 import { generateThumbnailUrl } from "@/utils/thumbnail";
 import type { ListedPost, Post } from "@halo-dev/api-client";
-import { consoleApiClient, coreApiClient } from "@halo-dev/api-client";
+import {
+  consoleApiClient,
+  coreApiClient,
+  GetThumbnailByUriSizeEnum,
+} from "@halo-dev/api-client";
 import {
   Dialog,
   IconAddCircle,
@@ -325,7 +329,12 @@ watch(
                   >
                     <img
                       class="h-full w-full object-cover"
-                      :src="generateThumbnailUrl(post.post.spec.cover, 's')"
+                      :src="
+                        generateThumbnailUrl(
+                          post.post.spec.cover,
+                          GetThumbnailByUriSizeEnum.S
+                        )
+                      "
                     />
                   </div>
                 </template>

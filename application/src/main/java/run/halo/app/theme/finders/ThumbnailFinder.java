@@ -13,6 +13,7 @@ public interface ThumbnailFinder {
     /**
      * Generate thumbnail uri from given image uri and size.
      *
+     * @param uri URI of the original image, must be encoded
      * @param size the size of thumbnail to generate
      * @return the generated thumbnail url
      */

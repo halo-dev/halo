@@ -12,6 +12,7 @@ import {
   ExtensionColumn,
   ExtensionColumns,
   ExtensionCommands,
+  ExtensionDetails,
   ExtensionDocument,
   ExtensionDraggable,
   ExtensionDropcursor,
@@ -44,7 +45,6 @@ import {
   ExtensionTrailingNode,
   ExtensionUnderline,
   ExtensionVideo,
-  ExtensionDetails,
   RichTextEditor,
   useEditor,
 } from "../index";

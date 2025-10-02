@@ -200,10 +200,6 @@ core:
     list:
       fields:
         private: Private
-    reply_modal:
-      fields:
-        hidden:
-          label: Private reply
     detail_modal:
       fields:
         owner: Commentator
@@ -221,8 +217,6 @@ core:
         original_comment: Original comment
         content: Reply content
   attachment:
-    actions:
-      thumbnails: Thumbnails
     filters:
       sort:
         items:
@@ -231,6 +225,8 @@ core:
     detail_modal:
       fields:
         thumbnails: Thumbnails
+      preview:
+        not_support_thumbnail: This image does not support generating thumbnails.
     permalink_list:
       relative: Relative path
       absolute: Absolute path
@@ -250,21 +246,6 @@ core:
             label: URL
         toast:
           success: Downloaded successfully
-    thumbnails_modal:
-      title: Thumbnail records
-      empty:
-        title: No thumbnail records
-        message: There are currently no thumbnail records, thumbnails will be automatically generated after uploading image attachments.
-      operations:
-        retry_all_failed:
-          button: Retry all failed records
-          tips_empty: No failed thumbnail records
-          tips_success: All failed records retried successfully
-    thumbnails:
-      phase:
-        pending: Pending
-        succeeded: Succeeded
-        failed: Failed
   uc_attachment:
     empty:
       title: There are no attachments.

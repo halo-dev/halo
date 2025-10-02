@@ -1,14 +1,8 @@
 <script lang="ts" setup>
-import { storageAnnotations } from "@/constants/annotations";
 import {
-  coreApiClient,
-  LocalThumbnailSpecSizeEnum,
-  LocalThumbnailStatusPhaseEnum,
+  GetThumbnailByUriSizeEnum,
   type Attachment,
 } from "@halo-dev/api-client";
-import { VLoading } from "@halo-dev/components";
-import { useQuery } from "@tanstack/vue-query";
-import sha256 from "crypto-js/sha256";
 import { computed, toRefs } from "vue";
 import AttachmentSingleThumbnailItem from "./AttachmentSingleThumbnailItem.vue";
 
@@ -23,53 +17,36 @@ const props = withDefaults(
 
 const { attachment } = toRefs(props);
 
-const imageSignature = computed(() => {
-  const uri = attachment.value?.metadata.annotations?.[storageAnnotations.URI];
-  if (!uri) {
-    return undefined;
-  }
-  return sha256(uri);
-});
-
-const sizeOrder: Record<LocalThumbnailSpecSizeEnum, number> = {
+const sizeOrder: Record<GetThumbnailByUriSizeEnum, number> = {
   XL: 4,
   L: 3,
   M: 2,
   S: 1,
 };
 
-const { data: thumbnails, isLoading } = useQuery({
-  queryKey: ["core:attachments:thumbnails", attachment, imageSignature],
-  queryFn: async () => {
-    const { data } =
-      await coreApiClient.storage.localThumbnail.listLocalThumbnail({
-        fieldSelector: [`spec.imageSignature=${imageSignature.value}`],
-      });
-
-    return data.items.sort((a, b) => {
-      const aSize = a.spec.size as keyof typeof sizeOrder;
-      const bSize = b.spec.size as keyof typeof sizeOrder;
-      return (sizeOrder[bSize] || 0) - (sizeOrder[aSize] || 0);
-    });
-  },
-  enabled: computed(() => !!imageSignature.value),
-  refetchInterval: (data) => {
-    const hasAbnormalData = data?.some(
-      (thumbnail) =>
-        thumbnail.status.phase !== LocalThumbnailStatusPhaseEnum.Succeeded
-    );
-
-    return hasAbnormalData ? 1000 : false;
-  },
+const thumbnails = computed(() => {
+  return Object.entries(attachment.value?.status?.thumbnails || {})
+    .sort(
+      ([sizeA], [sizeB]) =>
+        (sizeOrder[sizeB as GetThumbnailByUriSizeEnum] || 0) -
+        (sizeOrder[sizeA as GetThumbnailByUriSizeEnum] || 0)
+    )
+    .map(([size, permalink]) => ({
+      size: size as GetThumbnailByUriSizeEnum,
+      permalink,
+    }));
 });
 </script>
 <template>
-  <VLoading v-if="isLoading" />
-  <ul v-else class="flex flex-col space-y-2">
+  <ul v-if="thumbnails.length" class="flex flex-col space-y-2">
     <AttachmentSingleThumbnailItem
       v-for="thumbnail in thumbnails"
-      :key="thumbnail.metadata.name"
-      :thumbnail="thumbnail"
+      :key="thumbnail.size"
+      :size="thumbnail.size"
+      :permalink="thumbnail.permalink"
     />
   </ul>
+  <span v-else>
+    {{ $t("core.attachment.detail_modal.preview.not_support_thumbnail") }}
+  </span>
 </template>

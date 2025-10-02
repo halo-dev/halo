@@ -13,18 +13,16 @@ import run.halo.app.theme.finders.ThumbnailFinder;
 @Finder("thumbnail")
 @RequiredArgsConstructor
 public class ThumbnailFinderImpl implements ThumbnailFinder {
+
     private final ThumbnailService thumbnailService;
 
     @Override
     public Mono<String> gen(String uriStr, String size) {
-        return Mono.fromSupplier(() -> URI.create(uriStr))
+        return Mono.fromCallable(() -> URI.create(uriStr))
             .flatMap(uri -> thumbnailService.get(uri, ThumbnailSize.fromName(size)))
-            .map(URI::toString)
-            .onErrorResume(Throwable.class, e -> {
-                log.debug("Failed to generate thumbnail for [{}], error: [{}]", uriStr,
-                    e.getMessage());
-                return Mono.just(uriStr);
-            })
+            .map(URI::toASCIIString)
+            .onErrorComplete(IllegalArgumentException.class)
             .defaultIfEmpty(uriStr);
     }
+
 }

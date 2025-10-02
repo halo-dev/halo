@@ -232,16 +232,15 @@ const showDisplayNameForm = ref(false);
             >
               <AttachmentPermalinkList :attachment="attachment" />
             </VDescriptionItem>
-            <HasPermission
-              v-if="!!attachment?.status?.thumbnails"
-              :permissions="['*']"
+            <VDescriptionItem
+              v-if="
+                isImage(attachment?.spec.mediaType) &&
+                !!attachment?.status?.thumbnails
+              "
+              :label="$t('core.attachment.detail_modal.fields.thumbnails')"
             >
-              <VDescriptionItem
-                :label="$t('core.attachment.detail_modal.fields.thumbnails')"
-              >
-                <AttachmentSingleThumbnailList :attachment="attachment" />
-              </VDescriptionItem>
-            </HasPermission>
+              <AttachmentSingleThumbnailList :attachment="attachment" />
+            </VDescriptionItem>
           </VDescription>
         </div>
       </div>

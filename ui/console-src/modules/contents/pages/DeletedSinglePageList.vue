@@ -4,7 +4,11 @@ import { formatDatetime, relativeTimeTo } from "@/utils/date";
 import { usePermission } from "@/utils/permission";
 import { generateThumbnailUrl } from "@/utils/thumbnail";
 import type { ListedSinglePage, SinglePage } from "@halo-dev/api-client";
-import { consoleApiClient, coreApiClient } from "@halo-dev/api-client";
+import {
+  consoleApiClient,
+  coreApiClient,
+  GetThumbnailByUriSizeEnum,
+} from "@halo-dev/api-client";
 import {
   Dialog,
   IconAddCircle,
@@ -315,7 +319,10 @@ watch(
                     <img
                       class="h-full w-full object-cover"
                       :src="
-                        generateThumbnailUrl(singlePage.page.spec.cover, 's')
+                        generateThumbnailUrl(
+                          singlePage.page.spec.cover,
+                          GetThumbnailByUriSizeEnum.S
+                        )
                       "
                     />
                   </div>

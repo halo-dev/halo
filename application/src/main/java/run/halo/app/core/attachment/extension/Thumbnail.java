@@ -14,6 +14,7 @@ import run.halo.app.extension.GVK;
 @EqualsAndHashCode(callSuper = true)
 @GVK(group = "storage.halo.run", version = "v1alpha1", kind = "Thumbnail",
     plural = "thumbnails", singular = "thumbnail")
+@Deprecated(forRemoval = true, since = "2.22.0")
 public class Thumbnail extends AbstractExtension {
 
     public static final String ID_INDEX = "thumbnail-id";
