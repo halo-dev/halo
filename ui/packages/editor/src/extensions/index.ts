@@ -10,6 +10,7 @@ import ExtensionBold from "./bold";
 import ExtensionBulletList from "./bullet-list";
 import ExtensionCode from "./code";
 import ExtensionColor from "./color";
+import ExtensionDetails from "./details";
 import ExtensionFontSize from "./font-size";
 import ExtensionHeading from "./heading";
 import ExtensionHighlight from "./highlight";
@@ -26,7 +27,6 @@ import ExtensionTable from "./table";
 import ExtensionTaskList from "./task-list";
 import ExtensionTextAlign from "./text-align";
 import ExtensionUnderline from "./underline";
-import ExtensionDetails from "./details";
 
 // Custom extensions
 import {
@@ -124,6 +124,7 @@ export {
   ExtensionColumn,
   ExtensionColumns,
   ExtensionCommands,
+  ExtensionDetails,
   ExtensionDocument,
   ExtensionDraggable,
   ExtensionDropcursor,
@@ -158,7 +159,6 @@ export {
   ExtensionTrailingNode,
   ExtensionUnderline,
   ExtensionVideo,
-  ExtensionDetails,
   RangeSelection,
 };
 

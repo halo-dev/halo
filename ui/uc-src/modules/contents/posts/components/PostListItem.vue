@@ -7,7 +7,7 @@ import { formatDatetime, relativeTimeTo } from "@/utils/date";
 import { generateThumbnailUrl } from "@/utils/thumbnail";
 import PostTag from "@console/modules/contents/posts/tags/components/PostTag.vue";
 import type { ListedPost } from "@halo-dev/api-client";
-import { ucApiClient } from "@halo-dev/api-client";
+import { GetThumbnailByUriSizeEnum, ucApiClient } from "@halo-dev/api-client";
 import {
   Dialog,
   IconExternalLinkLine,
@@ -127,7 +127,12 @@ function handleDelete() {
           <div class="aspect-h-2 aspect-w-3 w-20 overflow-hidden rounded-md">
             <img
               class="h-full w-full object-cover"
-              :src="generateThumbnailUrl(post.post.spec.cover, 's')"
+              :src="
+                generateThumbnailUrl(
+                  post.post.spec.cover,
+                  GetThumbnailByUriSizeEnum.S
+                )
+              "
             />
           </div>
         </template>

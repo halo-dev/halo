@@ -631,7 +631,6 @@ core:
         ungrouped: Ungrouped
     actions:
       storage_policies: Storage Policies
-      thumbnails: Thumbnails
     empty:
       title: There are no attachments in the current group.
       message: >-
@@ -693,6 +692,7 @@ core:
         video_not_support: The current browser does not support video playback.
         audio_not_support: The current browser does not support audio playback.
         not_support: This file does not support preview.
+        not_support_thumbnail: This image does not support generating thumbnails.
     permalink_list:
       relative: Relative path
       absolute: Absolute path
@@ -780,23 +780,6 @@ core:
       operations:
         select:
           result: ({count} items selected)
-    thumbnails_modal:
-      title: Thumbnail records
-      empty:
-        title: No thumbnail records
-        message: >-
-          There are currently no thumbnail records, thumbnails will be
-          automatically generated after uploading image attachments.
-      operations:
-        retry_all_failed:
-          button: Retry all failed records
-          tips_empty: No failed thumbnail records
-          tips_success: All failed records retried successfully
-    thumbnails:
-      phase:
-        pending: Pending
-        succeeded: Succeeded
-        failed: Failed
   uc_attachment:
     empty:
       title: There are no attachments.

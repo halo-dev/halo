@@ -33,11 +33,3 @@ export enum patAnnotations {
 export enum secretAnnotations {
   DESCRIPTION = "secret.halo.run/description",
 }
-
-// storage
-export enum storageAnnotations {
-  URI = "storage.halo.run/uri",
-
-  // Frontend custom annotations, for retry operation
-  RETRY_TIMESTAMP = "storage.halo.run/retry-timestamp",
-}

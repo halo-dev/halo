@@ -33,14 +33,12 @@ import { useRouteQuery } from "@vueuse/router";
 import type { Ref } from "vue";
 import { computed, onMounted, provide, ref, watch } from "vue";
 import { useI18n } from "vue-i18n";
-import RiMultiImageLine from "~icons/ri/multi-image-line";
 import AttachmentDetailModal from "./components/AttachmentDetailModal.vue";
 import AttachmentError from "./components/AttachmentError.vue";
 import AttachmentGroupList from "./components/AttachmentGroupList.vue";
 import AttachmentListItem from "./components/AttachmentListItem.vue";
 import AttachmentLoading from "./components/AttachmentLoading.vue";
 import AttachmentPoliciesModal from "./components/AttachmentPoliciesModal.vue";
-import AttachmentThumbnailsModal from "./components/AttachmentThumbnailsModal.vue";
 import AttachmentUploadModal from "./components/AttachmentUploadModal.vue";
 import { useAttachmentControl } from "./composables/use-attachment";
 import { useFetchAttachmentGroup } from "./composables/use-attachment-group";
@@ -230,9 +228,6 @@ watch(
     }
   }
 );
-
-// Thumbnails modal
-const thumbnailsVisible = ref(false);
 </script>
 <template>
   <AttachmentDetailModal
@@ -261,23 +256,11 @@ const thumbnailsVisible = ref(false);
     v-if="policyVisible"
     @close="policyVisible = false"
   />
-  <AttachmentThumbnailsModal
-    v-if="thumbnailsVisible"
-    @close="thumbnailsVisible = false"
-  />
   <VPageHeader :title="$t('core.attachment.title')">
     <template #icon>
       <IconFolder />
     </template>
     <template #actions>
-      <HasPermission :permissions="['*']">
-        <VButton size="sm" @click="thumbnailsVisible = true">
-          <template #icon>
-            <RiMultiImageLine />
-          </template>
-          {{ $t("core.attachment.actions.thumbnails") }}
-        </VButton>
-      </HasPermission>
       <VButton
         v-permission="['system:attachments:manage']"
         size="sm"

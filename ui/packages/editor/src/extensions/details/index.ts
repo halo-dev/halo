@@ -1,11 +1,11 @@
+import ToolbarItem from "@/components/toolbar/ToolbarItem.vue";
+import { i18n } from "@/locales";
+import type { Editor, Range } from "@/tiptap/vue-3";
 import type { ExtensionOptions } from "@/types";
 import TiptapDetails, { type DetailsOptions } from "@tiptap/extension-details";
 import TiptapDetailsContent from "@tiptap/extension-details-content";
 import TiptapDetailsSummary from "@tiptap/extension-details-summary";
-import type { Editor, Range } from "@/tiptap/vue-3";
 import { markRaw } from "vue";
-import ToolbarItem from "@/components/toolbar/ToolbarItem.vue";
-import { i18n } from "@/locales";
 import MdiExpandHorizontal from "~icons/mdi/expand-horizontal";
 
 const getRenderContainer = (node: HTMLElement) => {
