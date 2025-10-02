@@ -1,8 +1,11 @@
 package run.halo.app.infra;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.ArgumentMatchers.isA;
 import static org.mockito.Mockito.lenient;
+import static org.mockito.Mockito.verify;
 
 import java.util.LinkedHashMap;
 import org.json.JSONException;
@@ -13,11 +16,13 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.skyscreamer.jsonassert.JSONAssert;
+import org.springframework.context.ApplicationEventPublisher;
 import reactor.core.publisher.Mono;
 import reactor.test.StepVerifier;
 import run.halo.app.extension.ConfigMap;
 import run.halo.app.extension.Metadata;
 import run.halo.app.extension.ReactiveExtensionClient;
+import run.halo.app.extension.controller.Reconciler;
 import run.halo.app.infra.utils.JsonUtils;
 
 /**
@@ -32,6 +37,9 @@ class SystemConfigurableEnvironmentFetcherTest {
     @Mock
     private ReactiveExtensionClient client;
 
+    @Mock
+    ApplicationEventPublisher eventPublisher;
+
     @InjectMocks
     private SystemConfigurableEnvironmentFetcher environmentFetcher;
 
@@ -41,6 +49,13 @@ class SystemConfigurableEnvironmentFetcherTest {
             .thenReturn(Mono.just(systemDefault()));
         lenient().when(client.fetch(eq(ConfigMap.class), eq("system")))
             .thenReturn(Mono.just(system()));
+    }
+
+    @Test
+    void shouldPublishSystemConfigChangedEvent() {
+        var result = environmentFetcher.reconcile(new Reconciler.Request("system"));
+        assertTrue(result == null || !result.reEnqueue());
+        verify(eventPublisher).publishEvent(isA(SystemConfigChangedEvent.class));
     }
 
     @Test

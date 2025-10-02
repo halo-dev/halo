@@ -2,6 +2,7 @@ package run.halo.app.security.preauth;
 
 import static org.springframework.web.reactive.function.server.RequestPredicates.path;
 
+import java.net.URI;
 import java.util.Base64;
 import java.util.Map;
 import java.util.Objects;
@@ -10,6 +11,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.springframework.context.annotation.Bean;
 import org.springframework.core.Ordered;
 import org.springframework.core.annotation.Order;
+import org.springframework.http.HttpStatus;
 import org.springframework.security.web.server.savedrequest.ServerRequestCache;
 import org.springframework.stereotype.Component;
 import org.springframework.web.reactive.function.server.RouterFunction;
@@ -114,6 +116,24 @@ class PreAuthLoginEndpoint {
                         // TODO Add more models here
                     ))
                 ));
+            })
+            .POST("/social/{authProviderName}", request -> {
+                var authProviderName = request.pathVariable("authProviderName");
+                return authProviderService.getEnabledProviders()
+                    .filter(ap -> Objects.equals(authProviderName, ap.getMetadata().getName()))
+                    .filter(ap -> !AuthProvider.AuthType.FORM.equals(ap.getSpec().getAuthType()))
+                    .next()
+                    .switchIfEmpty(Mono.error(() -> new ServerWebInputException(
+                        "Auth provider " + authProviderName + " not found or not enabled."
+                    )))
+                    .flatMap(ap -> {
+                        var authenticationUrl = ap.getSpec().getAuthenticationUrl();
+                        return rememberMeRequestCache.saveRememberMe(request.exchange())
+                            .then(Mono.defer(() -> ServerResponse.status(HttpStatus.FOUND)
+                                .location(URI.create(authenticationUrl))
+                                .build()
+                            ));
+                    });
             })
             .before(HaloUtils.noCache())
             .build());

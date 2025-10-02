@@ -75,41 +75,17 @@ const handleChange = () => {
 </template>
 <style lang="scss">
 .switch-wrapper {
-  @apply inline-flex
-  box-border;
+  @apply box-border inline-flex;
 
   .switch-inner {
-    @apply relative
-    inline-flex
-    flex-shrink-0
-    h-6
-    w-11
-    border-2
-    border-transparent
-    rounded-full
-    cursor-pointer
-    transition-colors
-    ease-in-out
-    duration-200;
+    @apply relative inline-flex h-6 w-11 flex-shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out;
 
     &.switch-disabled {
-      @apply opacity-60
-      cursor-not-allowed;
+      @apply cursor-not-allowed opacity-60;
     }
 
     .switch-indicator {
-      @apply pointer-events-none
-      inline-block
-      h-5
-      w-5
-      rounded-full
-      bg-white
-      shadow
-      transform
-      ring-0
-      transition
-      ease-in-out
-      duration-200;
+      @apply pointer-events-none inline-block h-5 w-5 transform rounded-full bg-white shadow ring-0 transition duration-200 ease-in-out;
     }
   }
 }

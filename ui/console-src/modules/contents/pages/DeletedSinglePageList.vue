@@ -1,9 +1,14 @@
 <script lang="ts" setup>
 import PostContributorList from "@/components/user/PostContributorList.vue";
-import { formatDatetime } from "@/utils/date";
+import { formatDatetime, relativeTimeTo } from "@/utils/date";
 import { usePermission } from "@/utils/permission";
+import { generateThumbnailUrl } from "@/utils/thumbnail";
 import type { ListedSinglePage, SinglePage } from "@halo-dev/api-client";
-import { consoleApiClient, coreApiClient } from "@halo-dev/api-client";
+import {
+  consoleApiClient,
+  coreApiClient,
+  GetThumbnailByUriSizeEnum,
+} from "@halo-dev/api-client";
 import {
   Dialog,
   IconAddCircle,
@@ -204,24 +209,22 @@ watch(
 <template>
   <VPageHeader :title="$t('core.deleted_page.title')">
     <template #icon>
-      <IconDeleteBin class="mr-2 self-center text-green-600" />
+      <IconDeleteBin class="text-green-600" />
     </template>
     <template #actions>
-      <VSpace>
-        <VButton :route="{ name: 'SinglePages' }" size="sm">
-          {{ $t("core.common.buttons.back") }}
-        </VButton>
-        <VButton
-          v-permission="['system:singlepages:manage']"
-          :route="{ name: 'SinglePageEditor' }"
-          type="secondary"
-        >
-          <template #icon>
-            <IconAddCircle class="h-full w-full" />
-          </template>
-          {{ $t("core.common.buttons.new") }}
-        </VButton>
-      </VSpace>
+      <VButton :route="{ name: 'SinglePages' }" size="sm">
+        {{ $t("core.common.buttons.back") }}
+      </VButton>
+      <VButton
+        v-permission="['system:singlepages:manage']"
+        :route="{ name: 'SinglePageEditor' }"
+        type="secondary"
+      >
+        <template #icon>
+          <IconAddCircle />
+        </template>
+        {{ $t("core.common.buttons.new") }}
+      </VButton>
     </template>
   </VPageHeader>
   <div class="m-0 md:m-4">
@@ -308,7 +311,27 @@ watch(
               />
             </template>
             <template #start>
-              <VEntityField :title="singlePage.page.spec.title">
+              <VEntityField v-if="singlePage.page.spec.cover">
+                <template #description>
+                  <div
+                    class="aspect-h-2 aspect-w-3 w-20 overflow-hidden rounded-md"
+                  >
+                    <img
+                      class="h-full w-full object-cover"
+                      :src="
+                        generateThumbnailUrl(
+                          singlePage.page.spec.cover,
+                          GetThumbnailByUriSizeEnum.S
+                        )
+                      "
+                    />
+                  </div>
+                </template>
+              </VEntityField>
+              <VEntityField
+                :title="singlePage.page.spec.title"
+                max-width="30rem"
+              >
                 <template #description>
                   <VSpace>
                     <span class="text-xs text-gray-500">
@@ -356,12 +379,11 @@ watch(
                   />
                 </template>
               </VEntityField>
-              <VEntityField>
-                <template #description>
-                  <span class="truncate text-xs tabular-nums text-gray-500">
-                    {{ formatDatetime(singlePage.page.spec.publishTime) }}
-                  </span>
-                </template>
+              <VEntityField
+                v-if="singlePage.page.spec.publishTime"
+                v-tooltip="formatDatetime(singlePage.page.spec.publishTime)"
+                :description="relativeTimeTo(singlePage.page.spec.publishTime)"
+              >
               </VEntityField>
             </template>
             <template

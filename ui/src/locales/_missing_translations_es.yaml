@@ -2,6 +2,7 @@ core:
   sidebar:
     menu:
       items:
+        home: Home
         tools: Tools
     operations:
       logout:
@@ -24,13 +25,76 @@ core:
       aggregate_role: Aggregate Role
   dashboard:
     widgets:
+      common_form:
+        fields:
+          enable_animation:
+            label: Enable animation
       presets:
         recent_published:
-          publishTime: Publish Time {publishTime}
+          empty:
+            title: No published posts
+          comments-with-pending: " ({count} pending comments)"
         notification:
           title: Notifications
           empty:
             title: No unread notifications
+        quickaction:
+          config:
+            fields:
+              enabled_items:
+                label: Enabled Items
+        pending_comments:
+          title: Pending Comments
+          empty:
+            title: No pending comments
+        iframe:
+          title: Iframe
+          empty:
+            title: Please enter the URL in the configuration
+          config:
+            fields:
+              title:
+                label: Title
+        stack:
+          title: Widget Stack
+          operations:
+            add_widget:
+              button: Add Widget
+          config_modal:
+            title: Widget Stack Config
+            fields:
+              auto_play:
+                label: Auto play
+              auto_play_interval:
+                label: Auto play interval
+              widgets:
+                label: Widgets
+            toast:
+              nest_warning: You cannot add a stack widget to a stack widget
+  dashboard_designer:
+    title: Edit Dashboard
+    actions:
+      add_widget: Add Widget
+    widgets_modal:
+      title: Widgets
+    config_modal:
+      title: Widget Config
+    breakpoints:
+      lg: Desktop
+      md: Tablet (Horizontal)
+      sm: Tablet
+      xs: Mobile
+    operations:
+      back:
+        title: Layout not saved
+        description: The current layout has not been saved, if you leave, the current layout will be lost, do you want to continue?
+        confirm_text: Leave
+      change_breakpoint:
+        tips_not_saved: Please save the current layout first
+      copy_from_layout:
+        button: Copy from layout
+      open_widgets_hub:
+        button: Widgets Hub
   post:
     operations:
       publish_in_batch:
@@ -53,6 +117,7 @@ core:
       fields:
         schedule_publish:
           tooltip: Schedule publish
+        comments-with-pending: " ({count} pending comments)"
     settings:
       fields:
         publish_time:
@@ -112,21 +177,75 @@ core:
       fields:
         prevent_parent_post_cascade_query: Prevent parent category from including this category and its subcategories in cascade post queries
         hide_from_list: This category is hidden, This category and its subcategories, as well as its posts, will not be displayed in the front-end list. You need to actively visit the category archive page
+  page:
+    list:
+      fields:
+        comments-with-pending: " ({count} pending comments)"
   page_editor:
     actions:
       snapshots: Snapshots
+  comment:
+    text:
+      commented_on: commented on
+      replied_below: "replied:"
+    operations:
+      review:
+        button: Review
+      approve:
+        button: Approve
+      reply_and_approve:
+        button: Reply and approve
+      cancel_approve:
+        button: Cancel approve
+    list:
+      fields:
+        private: Private
+    detail_modal:
+      fields:
+        owner: Commentator
+        creation_time: Comment time
+        commented_on: Commented on
+        new_reply: New reply
+        user_agent: User agent
+    comment_detail_modal:
+      title: Comment detail
+      fields:
+        content: Comment content
+    reply_detail_modal:
+      title: Reply detail
+      fields:
+        original_comment: Original comment
+        content: Reply content
   attachment:
     filters:
       sort:
         items:
           display_name_asc: Ascending order by display name
           display_name_desc: Descending order by display name
+    detail_modal:
+      fields:
+        thumbnails: Thumbnails
+      preview:
+        not_support_thumbnail: This image does not support generating thumbnails.
+    permalink_list:
+      relative: Relative path
+      absolute: Absolute path
     group_editing_modal:
       toast:
         group_name_exists: Group name already exists
     policy_editing_modal:
       toast:
         policy_name_exists: Storage policy name already exists
+    upload_modal:
+      upload_options:
+        local_upload: Upload
+        download: Download from url
+      download_form:
+        fields:
+          url:
+            label: URL
+        toast:
+          success: Downloaded successfully
   uc_attachment:
     empty:
       title: There are no attachments.
@@ -222,6 +341,7 @@ core:
         repo: Source Repository
         load_location: Storage Location
         issues: Issues feedback
+        creation_time: Installation Time
       operations:
         view_conditions:
           button: View recent conditions
@@ -249,10 +369,16 @@ core:
     operations:
       enable:
         title: Enable
-        description: Are you sure you want to enable this user?
+        description: Are you sure you want to enable this user? Once enabled, the user will be able to log back into the system.
+      enable_in_batch:
+        title: Enable
+        description: Are you sure you want to enable the selected users? Once enabled, these users will be able to log back into the system.
       disable:
         title: Disable
-        description: Are you sure you want to disable this user? This user will not be able to log in after being disabled
+        description: Are you sure you want to disable this user? Once disabled, the user will no longer be able to log in.
+      disable_in_batch:
+        title: Disable
+        description: Are you sure you want to disable the selected users? Once disabled, these users will no longer be able to log in.
     grant_permission_modal:
       roles_preview:
         all: The currently selected role contains all permissions
@@ -505,6 +631,13 @@ core:
     fields:
       activated_theme: Activated theme
       enabled_plugins: Enabled plugins
+    external_url_form:
+      operations:
+        save:
+          title: Modify external url
+          description: Modifying the external access address requires restarting the Halo service. It will automatically restart after the modification is completed. Do you want to continue?
+      tips:
+        restarting: Modification completed, waiting for restart...
   backup:
     operations:
       remote_download:
@@ -565,6 +698,11 @@ core:
           operations:
             replace:
               button: Replace
+            transfer:
+              button: Save locally
+              tooltip: This resource is detected as an external resource. Click this button to save it to the attachment library.
+            transfer_in_batch:
+              description: External link detected. Would you like to automatically upload it to the attachment library?
       toolbox:
         show_hide_sidebar: Show/Hide Sidebar
       title_placeholder: Please enter the title
@@ -644,6 +782,7 @@ core:
       disable: Disable
       enable: Enable
       continue: Continue
+      retry: Retry
     toast:
       disable_success: Disabled successfully
       enable_success: Enabled successfully
@@ -656,6 +795,11 @@ core:
       starting_up: Starting
     text:
       system_protection: System protection
+      all: All
+      detail: Detail
+    form:
+      validation:
+        slug_unique: The current slug already exists
   uc_post:
     creation_modal:
       title: Create post

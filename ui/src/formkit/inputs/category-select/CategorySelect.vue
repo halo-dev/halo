@@ -12,6 +12,7 @@ import { coreApiClient } from "@halo-dev/api-client";
 import { IconArrowRight } from "@halo-dev/components";
 import { onClickOutside } from "@vueuse/core";
 import Fuse from "fuse.js";
+import ShortUniqueId from "short-unique-id";
 import { slugify } from "transliteration";
 import { computed, provide, ref, watch, type PropType, type Ref } from "vue";
 import CategoryListItem from "./components/CategoryListItem.vue";
@@ -212,16 +213,30 @@ const scrollToSelected = () => {
   }
 };
 
+const uid = new ShortUniqueId();
+
 const handleCreateCategory = async () => {
   if (!currentUserHasPermission(["system:posts:manage"])) {
     return;
+  }
+
+  let slug = slugify(text.value, { trim: true });
+
+  // Check if slug is unique, if not, add -1 to the slug
+  const { data: categoriesWithSameSlug } =
+    await coreApiClient.content.category.listCategory({
+      fieldSelector: [`spec.slug=${slug}`],
+    });
+
+  if (categoriesWithSameSlug.total) {
+    slug = `${slug}-${uid.randomUUID(8)}`;
   }
 
   const { data } = await coreApiClient.content.category.createCategory({
     category: {
       spec: {
         displayName: text.value,
-        slug: slugify(text.value, { trim: true }),
+        slug,
         description: "",
         cover: "",
         template: "",

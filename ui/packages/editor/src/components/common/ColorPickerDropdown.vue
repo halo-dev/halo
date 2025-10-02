@@ -87,7 +87,7 @@ function onColorChange(color: Payload) {
           v-for="item in getColors()"
           :key="item.color"
           :style="{ backgroundColor: item.color }"
-          class="h-5 w-5 rounded-sm cursor-pointer hover:ring-1 ring-offset-1 ring-gray-300"
+          class="h-5 w-5 cursor-pointer rounded-sm ring-gray-300 ring-offset-1 hover:ring-1"
           :title="item.name"
           @click="handleSetColor(item.color)"
         ></div>
@@ -96,7 +96,7 @@ function onColorChange(color: Payload) {
       <VDropdown placement="right">
         <div class="p-1">
           <div
-            class="flex items-center rounded cursor-pointer hover:bg-gray-100 p-1 justify-between"
+            class="flex cursor-pointer items-center justify-between rounded p-1 hover:bg-gray-100"
           >
             <div class="inline-flex items-center gap-2">
               <MdiPalette />

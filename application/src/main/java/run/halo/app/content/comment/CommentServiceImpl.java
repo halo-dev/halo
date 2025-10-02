@@ -13,6 +13,7 @@ import org.springframework.data.domain.Sort;
 import org.springframework.lang.NonNull;
 import org.springframework.stereotype.Component;
 import org.springframework.util.Assert;
+import org.springframework.web.server.ServerWebInputException;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import reactor.util.retry.Retry;
@@ -68,6 +69,13 @@ public class CommentServiceImpl extends AbstractCommentService implements Commen
 
     @Override
     public Mono<Comment> create(Comment comment) {
+        if (comment.getSpec() == null
+            || comment.getSpec().getContent() == null
+            || !isSafeHtml(comment.getSpec().getContent())) {
+            return Mono.error(new ServerWebInputException("""
+                The content of comment must not be empty or contains unsafe HTML.\
+                """));
+        }
         return environmentFetcher.fetchComment()
             .flatMap(commentSetting -> {
                 if (Boolean.FALSE.equals(commentSetting.getEnable())) {
@@ -99,7 +107,10 @@ public class CommentServiceImpl extends AbstractCommentService implements Commen
                     comment.getSpec().setCreationTime(Instant.now());
                 }
 
-                comment.getSpec().setHidden(false);
+                if (comment.getSpec().getHidden() == null) {
+                    comment.getSpec().setHidden(false);
+                }
+
                 return Mono.just(comment);
             })
             .flatMap(populatedComment -> Mono.when(populateOwner(populatedComment),

@@ -30,6 +30,7 @@ class GapCursorSelection extends Selection {
     return other instanceof GapCursorSelection && other.head == this.head;
   }
 
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   toJSON(): any {
     return { type: "node-gap-cursor", pos: this.head };
   }
@@ -38,6 +39,7 @@ class GapCursorSelection extends Selection {
     return this.start;
   }
 
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   static fromJSON(doc: PMNode, json: any): GapCursorSelection {
     if (typeof json.pos != "number") {
       throw new RangeError("Invalid input for GapCursorSelection.fromJSON");
@@ -144,6 +146,7 @@ class GapCursorSelection extends Selection {
 }
 
 GapCursorSelection.prototype.visible = false;
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 (GapCursorSelection as any).findFrom = GapCursorSelection.findGapCursorFrom;
 
 Selection.jsonID("node-gap-cursor", GapCursorSelection);

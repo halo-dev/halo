@@ -12,6 +12,7 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.concurrent.atomic.AtomicReference;
 import org.apache.commons.lang3.StringUtils;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.core.convert.ConversionService;
 import org.springframework.lang.NonNull;
 import org.springframework.stereotype.Component;
@@ -39,12 +40,15 @@ import run.halo.app.infra.utils.JsonUtils;
 public class SystemConfigurableEnvironmentFetcher implements Reconciler<Reconciler.Request> {
     private final ReactiveExtensionClient extensionClient;
     private final ConversionService conversionService;
+    private final ApplicationEventPublisher eventPublisher;
     private final AtomicReference<ConfigMap> configMapCache = new AtomicReference<>();
 
     public SystemConfigurableEnvironmentFetcher(ReactiveExtensionClient extensionClient,
-        ConversionService conversionService) {
+        ConversionService conversionService,
+        ApplicationEventPublisher eventPublisher) {
         this.extensionClient = extensionClient;
         this.conversionService = conversionService;
+        this.eventPublisher = eventPublisher;
     }
 
     public <T> Mono<T> fetch(String key, Class<T> type) {
@@ -172,6 +176,7 @@ public class SystemConfigurableEnvironmentFetcher implements Reconciler<Reconcil
             .switchIfEmpty(Mono.error(new IllegalStateException("System configMap not found.")))
             .doOnNext(configMapCache::set)
             .block();
+        eventPublisher.publishEvent(new SystemConfigChangedEvent(this));
         return Result.doNotRetry();
     }
 

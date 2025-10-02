@@ -11,6 +11,7 @@ import { hasPermission } from "@/utils/permission";
 import { consoleApiClient } from "@halo-dev/api-client";
 import router from "@uc/router";
 import { setupCoreModules, setupPluginModules } from "@uc/setup/setupModules";
+import "core-js/es/object/has-own";
 import { createPinia } from "pinia";
 import { createApp, type DirectiveBinding } from "vue";
 import App from "./App.vue";
@@ -42,7 +43,7 @@ async function loadUserPermissions() {
       const { value } = binding;
       const { any, enable } = binding.modifiers;
 
-      if (hasPermission(uiPermissions, value, any)) {
+      if (hasPermission(uiPermissions, value, any ?? false)) {
         return;
       }
 

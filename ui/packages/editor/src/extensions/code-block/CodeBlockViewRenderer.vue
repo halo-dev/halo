@@ -97,19 +97,19 @@ const handleCopyCode = () => {
 <template>
   <node-view-wrapper
     as="div"
-    class="code-node border-[1px] rounded mt-3 overflow-hidden"
+    class="code-node mt-3 overflow-hidden rounded border-[1px]"
   >
     <div
       contenteditable="false"
-      class="bg-neutral-100 border-b-[1px] border-b-gray-100 py-1 flex items-center justify-between"
+      class="flex items-center justify-between border-b-[1px] border-b-gray-100 bg-neutral-100 py-1"
     >
       <div
-        class="flex-1 flex items-center pl-3"
+        class="flex flex-1 items-center pl-3"
         @click.self="collapsed ? (collapsed = false) : null"
       >
-        <div class="pr-3 flex items-center">
+        <div class="flex items-center pr-3">
           <div
-            class="w-8 h-8 cursor-pointer rounded flex items-center justify-center hover:bg-zinc-200"
+            class="flex h-8 w-8 cursor-pointer items-center justify-center rounded hover:bg-zinc-200"
             @click.stop="collapsed = !collapsed"
           >
             <RiArrowRightSFill v-if="collapsed" />
@@ -134,19 +134,19 @@ const handleCopyCode = () => {
         >
         </CodeBlockSelect>
       </div>
-      <div class="pr-3 flex items-center">
+      <div class="flex items-center pr-3">
         <div
           v-tooltip="
             ready
               ? i18n.global.t('editor.common.codeblock.copy_code')
               : i18n.global.t('editor.common.codeblock.copy_code_success')
           "
-          class="w-8 h-8 cursor-pointer rounded flex items-center justify-center"
+          class="flex h-8 w-8 cursor-pointer items-center justify-center rounded"
           :class="{ 'hover:bg-zinc-200': ready }"
           @click="handleCopyCode"
         >
-          <IconCheckboxCircle v-if="!ready" class="w-4 h-4 text-green-500" />
-          <BxBxsCopy v-else class="w-4 h-4 text-gray-500" />
+          <IconCheckboxCircle v-if="!ready" class="h-4 w-4 text-green-500" />
+          <BxBxsCopy v-else class="h-4 w-4 text-gray-500" />
         </div>
       </div>
     </div>

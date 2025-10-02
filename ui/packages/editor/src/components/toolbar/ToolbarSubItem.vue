@@ -28,15 +28,15 @@ const action = () => {
   <div
     :class="[
       { '!bg-gray-100': isActive },
-      { 'cursor-not-allowed opacity-70 ': disabled },
+      { 'cursor-not-allowed opacity-70': disabled },
       { 'hover:bg-gray-100': !disabled },
     ]"
-    class="flex flex-row items-center rounded gap-3 py-1 px-1.5 group cursor-pointer"
+    class="group flex cursor-pointer flex-row items-center gap-3 rounded px-1.5 py-1"
     @click="action"
   >
     <component
       :is="icon"
-      class="bg-gray-100 p-1.5 rounded w-7 h-7"
+      class="h-7 w-7 rounded bg-gray-100 p-1.5"
       :class="[
         { '!bg-white': isActive },
         { 'group-hover:bg-white': !disabled },
@@ -45,7 +45,7 @@ const action = () => {
     <span
       class="text-sm text-gray-600"
       :class="[
-        { '!text-gray-900 !font-medium': isActive },
+        { '!font-medium !text-gray-900': isActive },
         { 'group-hover:font-medium group-hover:text-gray-900': !disabled },
       ]"
     >

@@ -1,6 +1,7 @@
 <script lang="ts" setup>
 import UserFilterDropdown from "@/components/filter/UserFilterDropdown.vue";
 import LazyImage from "@/components/image/LazyImage.vue";
+import HasPermission from "@/components/permission/HasPermission.vue";
 import LazyVideo from "@/components/video/LazyVideo.vue";
 import { isImage } from "@/utils/image";
 import type { Attachment, Group } from "@halo-dev/api-client";
@@ -99,7 +100,7 @@ function handleClearFilters() {
 const {
   attachments,
   selectedAttachment,
-  selectedAttachments,
+  selectedAttachmentNames,
   checkedAll,
   isLoading,
   isFetching,
@@ -128,13 +129,13 @@ const {
   size: size,
 });
 
-provide<Ref<Set<Attachment>>>("selectedAttachments", selectedAttachments);
+provide<Ref<Set<string>>>("selectedAttachmentNames", selectedAttachmentNames);
 
 const handleMove = async (group: Group) => {
   try {
-    const promises = Array.from(selectedAttachments.value).map((attachment) => {
+    const promises = Array.from(selectedAttachmentNames.value).map((name) => {
       return coreApiClient.storage.attachment.patchAttachment({
-        name: attachment.metadata.name,
+        name,
         jsonPatchInner: [
           {
             op: "add",
@@ -146,7 +147,7 @@ const handleMove = async (group: Group) => {
     });
 
     await Promise.all(promises);
-    selectedAttachments.value.clear();
+    selectedAttachmentNames.value.clear();
 
     Toast.success(t("core.attachment.operations.move.toast_success"));
   } catch (e) {
@@ -161,13 +162,13 @@ const handleClickItem = (attachment: Attachment) => {
     return;
   }
 
-  if (selectedAttachments.value.size > 0) {
+  if (selectedAttachmentNames.value.size > 0) {
     handleSelect(attachment);
     return;
   }
 
   selectedAttachment.value = attachment;
-  selectedAttachments.value.clear();
+  selectedAttachmentNames.value.clear();
   detailVisible.value = true;
 };
 
@@ -243,38 +244,43 @@ watch(
       </span>
     </template>
   </AttachmentDetailModal>
-  <AttachmentUploadModal v-if="uploadVisible" @close="onUploadModalClose" />
+  <AttachmentUploadModal
+    v-if="uploadVisible"
+    :initial-group-name="
+      selectedGroup === 'ungrouped' ? undefined : selectedGroup
+    "
+    :initial-policy-name="selectedPolicy"
+    @close="onUploadModalClose"
+  />
   <AttachmentPoliciesModal
     v-if="policyVisible"
     @close="policyVisible = false"
   />
   <VPageHeader :title="$t('core.attachment.title')">
     <template #icon>
-      <IconFolder class="mr-2 self-center" />
+      <IconFolder />
     </template>
     <template #actions>
-      <VSpace>
-        <VButton
-          v-permission="['system:attachments:manage']"
-          size="sm"
-          @click="policyVisible = true"
-        >
-          <template #icon>
-            <IconDatabase2Line class="h-full w-full" />
-          </template>
-          {{ $t("core.attachment.actions.storage_policies") }}
-        </VButton>
-        <VButton
-          v-permission="['system:attachments:manage']"
-          type="secondary"
-          @click="uploadVisible = true"
-        >
-          <template #icon>
-            <IconUpload class="h-full w-full" />
-          </template>
-          {{ $t("core.common.buttons.upload") }}
-        </VButton>
-      </VSpace>
+      <VButton
+        v-permission="['system:attachments:manage']"
+        size="sm"
+        @click="policyVisible = true"
+      >
+        <template #icon>
+          <IconDatabase2Line />
+        </template>
+        {{ $t("core.attachment.actions.storage_policies") }}
+      </VButton>
+      <VButton
+        v-permission="['system:attachments:manage']"
+        type="secondary"
+        @click="uploadVisible = true"
+      >
+        <template #icon>
+          <IconUpload />
+        </template>
+        {{ $t("core.common.buttons.upload") }}
+      </VButton>
     </template>
   </VPageHeader>
 
@@ -299,14 +305,14 @@ watch(
                 </div>
                 <div class="flex w-full flex-1 items-center sm:w-auto">
                   <SearchInput
-                    v-if="!selectedAttachments.size"
+                    v-if="!selectedAttachmentNames.size"
                     v-model="keyword"
                   />
                   <VSpace v-else>
                     <VButton type="danger" @click="handleDeleteInBatch">
                       {{ $t("core.common.buttons.delete") }}
                     </VButton>
-                    <VButton @click="selectedAttachments.clear()">
+                    <VButton @click="selectedAttachmentNames.clear()">
                       {{
                         $t("core.attachment.operations.deselect_items.button")
                       }}
@@ -475,7 +481,7 @@ watch(
                     @click="uploadVisible = true"
                   >
                     <template #icon>
-                      <IconUpload class="h-full w-full" />
+                      <IconUpload />
                     </template>
                     {{ $t("core.attachment.empty.actions.upload") }}
                   </VButton>
@@ -560,12 +566,18 @@ watch(
                     <div
                       v-if="!attachment.metadata.deletionTimestamp"
                       v-permission="['system:attachments:manage']"
-                      :class="{ '!flex': selectedAttachments.has(attachment) }"
+                      :class="{
+                        '!flex': selectedAttachmentNames.has(
+                          attachment.metadata.name
+                        ),
+                      }"
                       class="absolute left-0 top-0 hidden h-1/3 w-full cursor-pointer justify-end bg-gradient-to-b from-gray-300 to-transparent ease-in-out group-hover:flex"
                     >
                       <IconCheckboxFill
                         :class="{
-                          '!text-primary': selectedAttachments.has(attachment),
+                          '!text-primary': selectedAttachmentNames.has(
+                            attachment.metadata.name
+                          ),
                         }"
                         class="mr-1 mt-1 h-6 w-6 cursor-pointer text-white transition-all hover:text-primary"
                         @click.stop="handleSelect(attachment)"

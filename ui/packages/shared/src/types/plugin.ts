@@ -1,4 +1,8 @@
 import type { BackupTab } from "@/states/backup";
+import type {
+  CommentContentProvider,
+  CommentEditorProvider,
+} from "@/states/comment";
 import type { CommentSubjectRefProvider } from "@/states/comment-subject-ref";
 import type { EntityFieldItem } from "@/states/entity";
 import type { OperationItem } from "@/states/operation";
@@ -8,21 +12,27 @@ import type { UserProfileTab, UserTab } from "@/states/user-tab";
 import type {
   Attachment,
   Backup,
+  ListedComment,
   ListedPost,
+  ListedReply,
+  ListedSinglePage,
   Plugin,
   Theme,
-  ListedComment,
-  ListedReply,
 } from "@halo-dev/api-client";
 import type { AnyExtension } from "@halo-dev/richtext-editor";
 import type { Component, Ref } from "vue";
 import type { RouteRecordName, RouteRecordRaw } from "vue-router";
-import type { EditorProvider, PluginTab } from "..";
+import type {
+  DashboardWidgetDefinition,
+  DashboardWidgetQuickActionItem,
+  EditorProvider,
+  PluginTab,
+} from "..";
 import type { AttachmentSelectProvider } from "../states/attachment-selector";
 import type { FunctionalPage } from "../states/pages";
 
 export interface RouteRecordAppend {
-  parentName: RouteRecordName;
+  parentName: NonNullable<RouteRecordName>;
   route: RouteRecordRaw;
 }
 
@@ -44,6 +54,14 @@ export interface ExtensionPoint {
 
   "comment:subject-ref:create"?: () => CommentSubjectRefProvider[];
 
+  "comment:editor:replace"?: () =>
+    | CommentEditorProvider
+    | Promise<CommentEditorProvider>;
+
+  "comment:list-item:content:replace"?: () =>
+    | CommentContentProvider
+    | Promise<CommentContentProvider>;
+
   "backup:tabs:create"?: () => BackupTab[] | Promise<BackupTab[]>;
 
   "plugin:installation:tabs:create"?: () =>
@@ -53,6 +71,10 @@ export interface ExtensionPoint {
   "post:list-item:operation:create"?: (
     post: Ref<ListedPost>
   ) => OperationItem<ListedPost>[];
+
+  "single-page:list-item:operation:create"?: (
+    singlePage: Ref<ListedSinglePage>
+  ) => OperationItem<ListedSinglePage>[];
 
   "comment:list-item:operation:create"?: (
     comment: Ref<ListedComment>
@@ -78,6 +100,10 @@ export interface ExtensionPoint {
 
   "post:list-item:field:create"?: (post: Ref<ListedPost>) => EntityFieldItem[];
 
+  "single-page:list-item:field:create"?: (
+    singlePage: Ref<ListedSinglePage>
+  ) => EntityFieldItem[];
+
   "theme:list:tabs:create"?: () => ThemeListTab[] | Promise<ThemeListTab[]>;
 
   "theme:list-item:operation:create"?: (
@@ -89,6 +115,14 @@ export interface ExtensionPoint {
   "uc:user:profile:tabs:create"?: () =>
     | UserProfileTab[]
     | Promise<UserProfileTab[]>;
+
+  "console:dashboard:widgets:create"?: () =>
+    | DashboardWidgetDefinition[]
+    | Promise<DashboardWidgetDefinition[]>;
+
+  "console:dashboard:widgets:internal:quick-action:item:create"?: () =>
+    | DashboardWidgetQuickActionItem[]
+    | Promise<DashboardWidgetQuickActionItem[]>;
 }
 
 export interface PluginModule {

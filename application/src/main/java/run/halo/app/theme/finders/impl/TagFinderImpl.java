@@ -1,5 +1,6 @@
 package run.halo.app.theme.finders.impl;
 
+import java.util.Collection;
 import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -9,11 +10,13 @@ import org.springframework.util.CollectionUtils;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import run.halo.app.core.extension.content.Tag;
+import run.halo.app.extension.ExtensionUtil;
 import run.halo.app.extension.ListOptions;
 import run.halo.app.extension.ListResult;
 import run.halo.app.extension.PageRequest;
 import run.halo.app.extension.PageRequestImpl;
 import run.halo.app.extension.ReactiveExtensionClient;
+import run.halo.app.extension.index.query.QueryFactory;
 import run.halo.app.theme.finders.Finder;
 import run.halo.app.theme.finders.TagFinder;
 import run.halo.app.theme.finders.vo.TagVo;
@@ -43,9 +46,15 @@ public class TagFinderImpl implements TagFinder {
     }
 
     @Override
-    public Flux<TagVo> getByNames(List<String> names) {
-        return Flux.fromIterable(names)
-            .flatMapSequential(this::getByName);
+    public Flux<TagVo> getByNames(Collection<String> names) {
+        if (CollectionUtils.isEmpty(names)) {
+            return Flux.empty();
+        }
+        var options = ListOptions.builder()
+            .andQuery(QueryFactory.in("metadata.name", names))
+            .build();
+        return client.listAll(Tag.class, options, ExtensionUtil.defaultSort())
+            .map(TagVo::from);
     }
 
     @Override

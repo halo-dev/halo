@@ -29,12 +29,12 @@ import {
   Toast,
   VButton,
   VPageHeader,
-  VSpace,
 } from "@halo-dev/components";
 import type { EditorProvider } from "@halo-dev/console-shared";
 import { useLocalStorage } from "@vueuse/core";
 import { useRouteQuery } from "@vueuse/router";
 import type { AxiosRequestConfig } from "axios";
+import ShortUniqueId from "short-unique-id";
 import {
   computed,
   nextTick,
@@ -49,6 +49,8 @@ import { useI18n } from "vue-i18n";
 import { useRouter } from "vue-router";
 import PostSettingModal from "./components/PostSettingModal.vue";
 import { usePostUpdateMutate } from "./composables/use-post-update-mutate";
+
+const uid = new ShortUniqueId();
 
 const router = useRouter();
 const { t } = useI18n();
@@ -152,6 +154,21 @@ provide<ComputedRef<string | undefined>>(
   computed(() => formState.value.post.status?.permalink)
 );
 
+// Slug generation
+const { handleGenerateSlug } = useSlugify(
+  computed(() => formState.value.post.spec.title),
+  computed({
+    get() {
+      return formState.value.post.spec.slug;
+    },
+    set(value) {
+      formState.value.post.spec.slug = value;
+    },
+  }),
+  computed(() => !isUpdateMode.value),
+  FormType.POST
+);
+
 const handleSave = async (options?: { mute?: boolean }) => {
   try {
     if (!options?.mute) {
@@ -161,10 +178,6 @@ const handleSave = async (options?: { mute?: boolean }) => {
     // Set default title and slug
     if (!formState.value.post.spec.title) {
       formState.value.post.spec.title = t("core.post_editor.untitled");
-    }
-
-    if (!formState.value.post.spec.slug) {
-      formState.value.post.spec.slug = new Date().getTime().toString();
     }
 
     if (isUpdateMode.value) {
@@ -186,6 +199,21 @@ const handleSave = async (options?: { mute?: boolean }) => {
     } else {
       // Clear new post content cache
       handleClearCache();
+
+      if (!formState.value.post.spec.slug) {
+        handleGenerateSlug(true);
+      }
+
+      // fixme: check if slug is unique
+      // Finally, we need to check if the slug is unique in the database
+      const { data: postsWithSameSlug } =
+        await coreApiClient.content.post.listPost({
+          fieldSelector: [`spec.slug=${formState.value.post.spec.slug}`],
+        });
+
+      if (postsWithSameSlug.total) {
+        formState.value.post.spec.slug = `${formState.value.post.spec.slug}-${uid.randomUUID(8)}`;
+      }
 
       const { data } = await consoleApiClient.content.post.draftPost({
         postRequest: formState.value,
@@ -234,9 +262,15 @@ const handlePublish = async () => {
       });
 
       if (returnToView.value === "true" && permalink) {
+        handleClearCache(name.value);
         window.location.href = permalink;
-      } else {
+        return;
+      }
+
+      if (router.options.history.state.back === null) {
         router.push({ name: "Posts" });
+      } else {
+        router.back();
       }
     } else {
       const { data } = await consoleApiClient.content.post.draftPost({
@@ -466,21 +500,6 @@ async function handleUploadImage(file: File, options?: AxiosRequestConfig) {
   );
   return data;
 }
-
-// Slug generation
-useSlugify(
-  computed(() => formState.value.post.spec.title),
-  computed({
-    get() {
-      return formState.value.post.spec.slug;
-    },
-    set(value) {
-      formState.value.post.spec.slug = value;
-    },
-  }),
-  computed(() => !isUpdateMode.value),
-  FormType.POST
-);
 </script>
 
 <template>
@@ -503,68 +522,64 @@ useSlugify(
 
   <VPageHeader :title="$t('core.post.title')">
     <template #icon>
-      <IconBookRead class="mr-2 self-center" />
+      <IconBookRead />
     </template>
     <template #actions>
-      <VSpace>
-        <EditorProviderSelector
-          v-if="editorProviders.length > 1"
-          :provider="currentEditorProvider"
-          :allow-forced-select="!isUpdateMode"
-          @select="handleChangeEditorProvider"
-        />
-        <VButton
-          v-if="isUpdateMode"
-          size="sm"
-          type="default"
-          @click="
-            $router.push({ name: 'PostSnapshots', query: { name: name } })
-          "
-        >
-          <template #icon>
-            <IconHistoryLine class="h-full w-full" />
-          </template>
-          {{ $t("core.post_editor.actions.snapshots") }}
-        </VButton>
-        <VButton
-          size="sm"
-          type="default"
-          :loading="previewPending"
-          @click="handlePreview"
-        >
-          <template #icon>
-            <IconEye class="h-full w-full" />
-          </template>
-          {{ $t("core.common.buttons.preview") }}
-        </VButton>
-        <VButton :loading="saving" size="sm" type="default" @click="handleSave">
-          <template #icon>
-            <IconSave class="h-full w-full" />
-          </template>
-          {{ $t("core.common.buttons.save") }}
-        </VButton>
-        <VButton
-          v-if="isUpdateMode"
-          size="sm"
-          type="default"
-          @click="handleOpenSettingModal"
-        >
-          <template #icon>
-            <IconSettings class="h-full w-full" />
-          </template>
-          {{ $t("core.common.buttons.setting") }}
-        </VButton>
-        <VButton
-          type="secondary"
-          :loading="publishing"
-          @click="handlePublishClick"
-        >
-          <template #icon>
-            <IconSendPlaneFill class="h-full w-full" />
-          </template>
-          {{ $t("core.common.buttons.publish") }}
-        </VButton>
-      </VSpace>
+      <EditorProviderSelector
+        v-if="editorProviders.length > 1"
+        :provider="currentEditorProvider"
+        :allow-forced-select="!isUpdateMode"
+        @select="handleChangeEditorProvider"
+      />
+      <VButton
+        v-if="isUpdateMode"
+        size="sm"
+        type="default"
+        @click="$router.push({ name: 'PostSnapshots', query: { name: name } })"
+      >
+        <template #icon>
+          <IconHistoryLine />
+        </template>
+        {{ $t("core.post_editor.actions.snapshots") }}
+      </VButton>
+      <VButton
+        size="sm"
+        type="default"
+        :loading="previewPending"
+        @click="handlePreview"
+      >
+        <template #icon>
+          <IconEye />
+        </template>
+        {{ $t("core.common.buttons.preview") }}
+      </VButton>
+      <VButton :loading="saving" size="sm" type="default" @click="handleSave">
+        <template #icon>
+          <IconSave />
+        </template>
+        {{ $t("core.common.buttons.save") }}
+      </VButton>
+      <VButton
+        v-if="isUpdateMode"
+        size="sm"
+        type="default"
+        @click="handleOpenSettingModal"
+      >
+        <template #icon>
+          <IconSettings />
+        </template>
+        {{ $t("core.common.buttons.setting") }}
+      </VButton>
+      <VButton
+        type="secondary"
+        :loading="publishing"
+        @click="handlePublishClick"
+      >
+        <template #icon>
+          <IconSendPlaneFill />
+        </template>
+        {{ $t("core.common.buttons.publish") }}
+      </VButton>
     </template>
   </VPageHeader>
   <div class="editor border-t" style="height: calc(100vh - 3.5rem)">

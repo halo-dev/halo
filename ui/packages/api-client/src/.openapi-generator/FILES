@@ -42,6 +42,7 @@ api/personal-access-token-v1alpha1-uc-api.ts
 api/plugin-v1alpha1-api.ts
 api/plugin-v1alpha1-console-api.ts
 api/plugin-v1alpha1-public-api.ts
+api/policy-alpha1-console-api.ts
 api/policy-template-v1alpha1-api.ts
 api/policy-v1alpha1-api.ts
 api/post-v1alpha1-api.ts
@@ -77,6 +78,7 @@ api/thumbnail-v1alpha1-public-api.ts
 api/two-factor-auth-v1alpha1-uc-api.ts
 api/user-connection-v1alpha1-api.ts
 api/user-connection-v1alpha1-uc-api.ts
+api/user-preference-v1alpha1-uc-api.ts
 api/user-v1alpha1-api.ts
 api/user-v1alpha1-console-api.ts
 base.ts
@@ -320,6 +322,7 @@ models/thumbnail.ts
 models/totp-auth-link-response.ts
 models/totp-request.ts
 models/two-factor-auth-settings.ts
+models/uc-upload-from-url-request.ts
 models/uc-upload-request-form-data.ts
 models/upgrade-from-uri-request.ts
 models/upload-from-url-request.ts

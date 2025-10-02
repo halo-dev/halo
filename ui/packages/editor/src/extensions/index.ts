@@ -10,6 +10,7 @@ import ExtensionBold from "./bold";
 import ExtensionBulletList from "./bullet-list";
 import ExtensionCode from "./code";
 import ExtensionColor from "./color";
+import ExtensionDetails from "./details";
 import ExtensionFontSize from "./font-size";
 import ExtensionHeading from "./heading";
 import ExtensionHighlight from "./highlight";
@@ -28,11 +29,11 @@ import ExtensionTextAlign from "./text-align";
 import ExtensionUnderline from "./underline";
 
 // Custom extensions
-import ExtensionTextStyle from "@/extensions/text-style";
 import {
   ExtensionCodeBlock,
   type ExtensionCodeBlockOptions,
 } from "@/extensions/code-block";
+import ExtensionTextStyle from "@/extensions/text-style";
 import { ExtensionCommands } from "../extensions/commands-menu";
 import ExtensionAudio from "./audio";
 import ExtensionClearFormat from "./clear-format";
@@ -107,9 +108,11 @@ const allExtensions = [
   ExtensionClearFormat,
   ExtensionFormatBrush,
   ExtensionRangeSelection,
+  ExtensionDetails,
 ];
 
 export {
+  allExtensions,
   ExtensionAudio,
   ExtensionBlockquote,
   ExtensionBold,
@@ -121,6 +124,7 @@ export {
   ExtensionColumn,
   ExtensionColumns,
   ExtensionCommands,
+  ExtensionDetails,
   ExtensionDocument,
   ExtensionDraggable,
   ExtensionDropcursor,
@@ -156,7 +160,6 @@ export {
   ExtensionUnderline,
   ExtensionVideo,
   RangeSelection,
-  allExtensions,
 };
 
 export type { ExtensionCodeBlockOptions };

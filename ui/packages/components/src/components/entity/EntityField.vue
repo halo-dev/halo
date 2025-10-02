@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import { computed } from "vue";
+import { computed, type CSSProperties } from "vue";
 import type { RouteLocationRaw } from "vue-router";
 
 const props = withDefaults(
@@ -8,12 +8,14 @@ const props = withDefaults(
     description?: string;
     route?: RouteLocationRaw;
     width?: string | number;
+    maxWidth?: string | number;
   }>(),
   {
     title: undefined,
     description: undefined,
     route: undefined,
     width: undefined,
+    maxWidth: undefined,
   }
 );
 
@@ -22,16 +24,19 @@ const emit = defineEmits<{
 }>();
 
 const wrapperStyles = computed(() => {
+  const styles: CSSProperties = {};
   if (props.width) {
-    const width =
-      typeof props.width === "string" ? props.width : `${props.width}px`;
-    return {
-      width,
-      maxWidth: width,
-    };
+    styles.width = getWidthStyleValue(props.width);
   }
-  return {};
+  if (props.maxWidth) {
+    styles.maxWidth = getWidthStyleValue(props.maxWidth);
+  }
+  return styles;
 });
+
+function getWidthStyleValue(value: string | number) {
+  return typeof value === "string" ? value : `${value}px`;
+}
 </script>
 
 <template>
@@ -73,21 +78,21 @@ const wrapperStyles = computed(() => {
 
 <style lang="scss">
 .entity-field-wrapper {
-  @apply inline-flex flex-col gap-1 max-w-xs;
+  @apply inline-flex max-w-xs flex-col gap-1;
 
   .entity-field-title-body {
-    @apply inline-flex items-center flex-row;
+    @apply inline-flex flex-row items-center whitespace-nowrap;
 
     .entity-field-title {
-      @apply truncate text-sm font-medium text-gray-900 mr-2;
+      @apply mr-2 truncate text-sm font-medium text-gray-900;
     }
   }
 
   .entity-field-description-body {
-    @apply inline-flex items-center;
+    @apply inline-flex items-center whitespace-nowrap;
 
     .entity-field-description {
-      @apply text-xs text-gray-500 truncate;
+      @apply truncate text-xs text-gray-500;
     }
   }
 }

@@ -207,7 +207,7 @@ const handleDelete = async (role: Role) => {
 
   <VPageHeader :title="$t('core.role.title')">
     <template #icon>
-      <IconShieldUser class="mr-2 self-center" />
+      <IconShieldUser />
     </template>
     <template #actions>
       <VButton
@@ -216,7 +216,7 @@ const handleDelete = async (role: Role) => {
         @click="editingModal = true"
       >
         <template #icon>
-          <IconAddCircle class="h-full w-full" />
+          <IconAddCircle />
         </template>
         {{ $t("core.common.buttons.new") }}
       </VButton>

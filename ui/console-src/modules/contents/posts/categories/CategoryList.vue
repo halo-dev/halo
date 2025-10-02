@@ -24,7 +24,6 @@ const { categories, categoriesTree, isLoading, handleFetchCategories } =
   usePostCategory();
 
 const batchUpdating = ref(false);
-const isDragging = ref(false);
 
 async function handleUpdateInBatch() {
   const categoriesTreeToUpdate = resetCategoriesTreePriority(
@@ -56,7 +55,6 @@ async function handleUpdateInBatch() {
   } finally {
     await handleFetchCategories();
     batchUpdating.value = false;
-    isDragging.value = false;
   }
 }
 </script>
@@ -64,7 +62,7 @@ async function handleUpdateInBatch() {
   <CategoryEditingModal v-if="creationModal" @close="creationModal = false" />
   <VPageHeader :title="$t('core.post_category.title')">
     <template #icon>
-      <IconBookRead class="mr-2 self-center" />
+      <IconBookRead />
     </template>
 
     <template #actions>
@@ -74,7 +72,7 @@ async function handleUpdateInBatch() {
         @click="creationModal = true"
       >
         <template #icon>
-          <IconAddCircle class="h-full w-full" />
+          <IconAddCircle />
         </template>
         {{ $t("core.common.buttons.new") }}
       </VButton>
@@ -116,7 +114,7 @@ async function handleUpdateInBatch() {
                 @click="creationModal = true"
               >
                 <template #icon>
-                  <IconAddCircle class="h-full w-full" />
+                  <IconAddCircle />
                 </template>
                 {{ $t("core.common.buttons.new") }}
               </VButton>
@@ -130,16 +128,15 @@ async function handleUpdateInBatch() {
           :class="{
             'cursor-progress opacity-60': batchUpdating,
           }"
+          :disable-drag="batchUpdating"
           trigger-class="drag-element"
           :indent="40"
           @after-drop="handleUpdateInBatch"
-          @before-drag-start="isDragging = true"
         >
           <template #default="{ node, stat }">
             <CategoryListItem
               :category-tree-node="node"
               :is-child-level="stat.level > 1"
-              :is-dragging="isDragging"
             />
           </template>
         </Draggable>

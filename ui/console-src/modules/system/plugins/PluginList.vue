@@ -159,33 +159,31 @@ onMounted(() => {
 
   <VPageHeader :title="$t('core.plugin.title')">
     <template #icon>
-      <IconPlug class="mr-2 self-center" />
+      <IconPlug />
     </template>
     <template #actions>
-      <VSpace>
-        <HasPermission :permissions="['*']">
-          <VButton
-            size="sm"
-            @click="$router.push({ name: 'PluginExtensionPointSettings' })"
-          >
-            <template #icon>
-              <IconSettings class="h-full w-full" />
-            </template>
-            {{ $t("core.plugin.actions.extension-point-settings") }}
-          </VButton>
-        </HasPermission>
-
+      <HasPermission :permissions="['*']">
         <VButton
-          v-permission="['system:plugins:manage']"
-          type="secondary"
-          @click="pluginInstallationModalVisible = true"
+          size="sm"
+          @click="$router.push({ name: 'PluginExtensionPointSettings' })"
         >
           <template #icon>
-            <IconAddCircle class="h-full w-full" />
+            <IconSettings />
           </template>
-          {{ $t("core.common.buttons.install") }}
+          {{ $t("core.plugin.actions.extension-point-settings") }}
         </VButton>
-      </VSpace>
+      </HasPermission>
+
+      <VButton
+        v-permission="['system:plugins:manage']"
+        type="secondary"
+        @click="pluginInstallationModalVisible = true"
+      >
+        <template #icon>
+          <IconAddCircle />
+        </template>
+        {{ $t("core.common.buttons.install") }}
+      </VButton>
     </template>
   </VPageHeader>
 
@@ -314,7 +312,7 @@ onMounted(() => {
                 @click="pluginInstallationModalVisible = true"
               >
                 <template #icon>
-                  <IconAddCircle class="h-full w-full" />
+                  <IconAddCircle />
                 </template>
                 {{ $t("core.plugin.empty.actions.install") }}
               </VButton>

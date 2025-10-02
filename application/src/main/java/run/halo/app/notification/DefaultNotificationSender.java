@@ -11,6 +11,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.SmartLifecycle;
 import org.springframework.stereotype.Component;
 import reactor.core.publisher.Mono;
+import reactor.core.scheduler.Schedulers;
 import run.halo.app.extension.ReactiveExtensionClient;
 import run.halo.app.extension.controller.Controller;
 import run.halo.app.extension.controller.ControllerBuilder;
@@ -32,6 +33,7 @@ import run.halo.app.plugin.extensionpoint.ExtensionGetter;
 public class DefaultNotificationSender
     implements NotificationSender, Reconciler<DefaultNotificationSender.QueueItem>,
     SmartLifecycle {
+    private static final Duration TIMEOUT = Duration.ofSeconds(30);
     private final ReactiveExtensionClient client;
     private final ExtensionGetter extensionGetter;
 
@@ -56,11 +58,14 @@ public class DefaultNotificationSender
     @Override
     public Mono<Void> sendNotification(String notifierExtensionName, NotificationContext context) {
         return selectNotifier(notifierExtensionName)
-            .doOnNext(notifier -> {
-                var item = new QueueItem(UUID.randomUUID().toString(),
-                    () -> notifier.notify(context).block(), 0);
-                requestQueue.addImmediately(item);
-            })
+            .flatMap(notifier -> Mono.fromRunnable(
+                    () -> {
+                        var item = new QueueItem(UUID.randomUUID().toString(),
+                            () -> notifier.notify(context).block(TIMEOUT), 0);
+                        requestQueue.addImmediately(item);
+                    })
+                .subscribeOn(Schedulers.boundedElastic())
+            )
             .then();
     }
 
@@ -84,7 +89,7 @@ public class DefaultNotificationSender
         log.debug("Executing send notification task, [{}] remaining to-do tasks",
             requestQueue.size());
         request.setTimes(request.getTimes() + 1);
-        request.getTask().execute();
+        request.getTask().run();
         return Result.doNotRetry();
     }
 
@@ -120,8 +125,8 @@ public class DefaultNotificationSender
 
     /**
      * <p>Queue item for {@link #requestQueue}.</p>
-     * <p>It holds a {@link SendNotificationTask} and a {@link #times} field.</p>
-     * <p>{@link SendNotificationTask} used to send email when consuming.</p>
+     * <p>It holds a {@link Runnable} and a {@link #times} field.</p>
+     * <p>{@link Runnable} used to send email when consuming.</p>
      * <p>{@link #times} will be used to record the number of
      * times the task has been executed, if retry three times on failure, it will be discarded.</p>
      * <p>It also holds a {@link #id} field, which is used to identify the item. queue item with
@@ -136,15 +141,11 @@ public class DefaultNotificationSender
         @EqualsAndHashCode.Include
         private final String id;
 
-        private final SendNotificationTask task;
+        private final Runnable task;
 
         @Setter
         private int times;
     }
 
-    @FunctionalInterface
-    interface SendNotificationTask {
-        void execute();
-    }
 }
 

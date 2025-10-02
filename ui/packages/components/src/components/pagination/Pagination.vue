@@ -135,22 +135,22 @@ const next = () => {
 
 <style lang="scss">
 .pagination {
-  @apply bg-white flex items-center flex-1 gap-2;
+  @apply flex flex-1 items-center gap-2 bg-white;
 
   &__total {
-    @apply hidden sm:block text-sm text-gray-500;
+    @apply hidden text-sm text-gray-500 sm:block;
   }
 
   &__controller {
-    @apply flex items-center gap-2 flex-1 justify-end;
+    @apply flex flex-1 items-center justify-end gap-2;
   }
 
   &__nav {
-    @apply relative z-0 inline-flex rounded-base shadow-sm -space-x-px;
+    @apply relative z-0 inline-flex -space-x-px rounded-base shadow-sm;
   }
 
   &__btn {
-    @apply relative h-8 outline-none inline-flex items-center px-2 py-1.5 rounded-base border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50 cursor-pointer disabled:cursor-not-allowed;
+    @apply relative inline-flex h-8 cursor-pointer items-center rounded-base border border-gray-300 bg-white px-2 py-1.5 text-sm font-medium text-gray-500 outline-none hover:bg-gray-50 disabled:cursor-not-allowed;
 
     &--prev {
       @apply rounded-r-none;
@@ -166,7 +166,7 @@ const next = () => {
   }
 
   &__select {
-    @apply h-8 border outline-none rounded-base pr-10 border-solid px-2 text-gray-800 text-sm border-gray-300 focus:border-primary;
+    @apply h-8 rounded-base border border-solid border-gray-300 px-2 pr-10 text-sm text-gray-800 outline-none focus:border-primary;
   }
 
   &__select-label {

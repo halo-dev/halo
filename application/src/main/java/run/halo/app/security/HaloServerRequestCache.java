@@ -106,7 +106,8 @@ public class HaloServerRequestCache extends WebSessionServerRequestCache {
         var get = pathMatchers(HttpMethod.GET, "/**");
         var notFavicon = new NegatedServerWebExchangeMatcher(
             pathMatchers(
-                "/favicon.*", "/login/**", "/signup/**", "/password-reset/**", "/challenges/**"
+                "/favicon.*", "/login/**", "/signup/**", "/password-reset/**", "/challenges/**",
+                "/oauth2/**", "/social/**"
             ));
         var html = new MediaTypeServerWebExchangeMatcher(MediaType.TEXT_HTML);
         html.setIgnoredMediaTypes(Collections.singleton(MediaType.ALL));

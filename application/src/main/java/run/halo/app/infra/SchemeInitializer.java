@@ -651,6 +651,16 @@ class SchemeInitializer implements SmartLifecycle {
                 .setIndexFunc(simpleAttribute(LocalThumbnail.class,
                     thumbnail -> thumbnail.getSpec().getThumbSignature())
                 ));
+            indexSpec.add(new IndexSpec()
+                .setName("status.phase")
+                .setIndexFunc(
+                    simpleAttribute(LocalThumbnail.class,
+                        thumbnail -> Optional.of(thumbnail.getStatus())
+                        .map(LocalThumbnail.Status::getPhase)
+                        .map(LocalThumbnail.Phase::name)
+                        .orElse(null))
+                )
+            );
         });
         // metrics.halo.run
         schemeManager.register(Counter.class);

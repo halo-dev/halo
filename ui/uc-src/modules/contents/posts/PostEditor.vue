@@ -12,7 +12,7 @@ import { usePermission } from "@/utils/permission";
 import { useSaveKeybinding } from "@console/composables/use-save-keybinding";
 import useSlugify from "@console/composables/use-slugify";
 import type { Content, Post, Snapshot } from "@halo-dev/api-client";
-import { ucApiClient } from "@halo-dev/api-client";
+import { publicApiClient, ucApiClient } from "@halo-dev/api-client";
 import {
   Dialog,
   IconBookRead,
@@ -22,7 +22,6 @@ import {
   Toast,
   VButton,
   VPageHeader,
-  VSpace,
 } from "@halo-dev/components";
 import type { EditorProvider } from "@halo-dev/console-shared";
 import { useMutation } from "@tanstack/vue-query";
@@ -30,12 +29,15 @@ import { usePostUpdateMutate } from "@uc/modules/contents/posts/composables/use-
 import { useLocalStorage } from "@vueuse/core";
 import { useRouteQuery } from "@vueuse/router";
 import { AxiosError, type AxiosRequestConfig } from "axios";
+import ShortUniqueId from "short-unique-id";
 import type { ComputedRef } from "vue";
 import { computed, nextTick, onMounted, provide, ref, toRef, watch } from "vue";
 import { useI18n } from "vue-i18n";
 import { useRouter } from "vue-router";
 import PostCreationModal from "./components/PostCreationModal.vue";
 import PostSettingEditModal from "./components/PostSettingEditModal.vue";
+
+const uid = new ShortUniqueId();
 
 const router = useRouter();
 const { t } = useI18n();
@@ -87,6 +89,10 @@ watch(
   (newValue, oldValue) => {
     isTitleChanged.value = newValue !== oldValue;
   }
+);
+
+const isUpdateMode = computed(
+  () => !!formState.value.metadata.creationTimestamp
 );
 
 // provide some data to editor
@@ -178,6 +184,21 @@ useAutoSaveContent(currentCache, toRef(content.value, "raw"), async () => {
     handleCreate();
   }
 });
+
+// Slug generation
+const { handleGenerateSlug } = useSlugify(
+  computed(() => formState.value.spec.title),
+  computed({
+    get() {
+      return formState.value.spec.slug;
+    },
+    set(value) {
+      formState.value.spec.slug = value;
+    },
+  }),
+  computed(() => !isUpdateMode.value),
+  FormType.POST
+);
 
 async function getLatestPost() {
   if (!name.value) {
@@ -284,8 +305,20 @@ async function handleCreate() {
   if (!formState.value.spec.title) {
     formState.value.spec.title = t("core.post_editor.untitled");
   }
+
   if (!formState.value.spec.slug) {
-    formState.value.spec.slug = new Date().getTime().toString();
+    handleGenerateSlug(true);
+  }
+
+  // fixme: check if slug is unique
+  // Finally, we need to check if the slug is unique in the database
+  const { data: postsWithSameSlug } =
+    await publicApiClient.content.post.queryPosts({
+      fieldSelector: [`spec.slug=${formState.value.spec.slug}`],
+    });
+
+  if (postsWithSameSlug.total) {
+    formState.value.spec.slug = `${formState.value.spec.slug}-${uid.randomUUID(8)}`;
   }
 
   const { data: createdPost } = await ucApiClient.content.post.createMyPost({
@@ -304,9 +337,6 @@ async function onCreatePostSuccess(data: Post) {
 }
 
 // Save post
-const isUpdateMode = computed(
-  () => !!formState.value.metadata.creationTimestamp
-);
 
 const { mutateAsync: postUpdateMutate } = usePostUpdateMutate();
 
@@ -447,71 +477,54 @@ async function handleUploadImage(file: File, options?: AxiosRequestConfig) {
 
 // Keep session alive
 useSessionKeepAlive();
-
-// Slug generation
-useSlugify(
-  computed(() => formState.value.spec.title),
-  computed({
-    get() {
-      return formState.value.spec.slug;
-    },
-    set(value) {
-      formState.value.spec.slug = value;
-    },
-  }),
-  computed(() => !isUpdateMode.value),
-  FormType.POST
-);
 </script>
 
 <template>
   <VPageHeader :title="$t('core.post.title')">
     <template #icon>
-      <IconBookRead class="mr-2 self-center" />
+      <IconBookRead />
     </template>
     <template #actions>
-      <VSpace>
-        <EditorProviderSelector
-          v-if="editorProviders.length > 1"
-          :provider="currentEditorProvider"
-          :allow-forced-select="!isUpdateMode"
-          @select="handleChangeEditorProvider"
-        />
+      <EditorProviderSelector
+        v-if="editorProviders.length > 1"
+        :provider="currentEditorProvider"
+        :allow-forced-select="!isUpdateMode"
+        @select="handleChangeEditorProvider"
+      />
+      <VButton
+        size="sm"
+        type="default"
+        :loading="isSaving && !isPublishing"
+        @click="handleSaveClick"
+      >
+        <template #icon>
+          <IconSave />
+        </template>
+        {{ $t("core.common.buttons.save") }}
+      </VButton>
+      <VButton
+        v-if="isUpdateMode"
+        size="sm"
+        type="default"
+        @click="handleOpenPostSettingEditModal"
+      >
+        <template #icon>
+          <IconSettings />
+        </template>
+        {{ $t("core.common.buttons.setting") }}
+      </VButton>
+      <HasPermission :permissions="['uc:posts:publish']">
         <VButton
-          size="sm"
-          type="default"
-          :loading="isSaving && !isPublishing"
-          @click="handleSaveClick"
+          :loading="isPublishing"
+          type="secondary"
+          @click="handlePublishClick"
         >
           <template #icon>
-            <IconSave class="h-full w-full" />
+            <IconSendPlaneFill />
           </template>
-          {{ $t("core.common.buttons.save") }}
+          {{ $t("core.common.buttons.publish") }}
         </VButton>
-        <VButton
-          v-if="isUpdateMode"
-          size="sm"
-          type="default"
-          @click="handleOpenPostSettingEditModal"
-        >
-          <template #icon>
-            <IconSettings class="h-full w-full" />
-          </template>
-          {{ $t("core.common.buttons.setting") }}
-        </VButton>
-        <HasPermission :permissions="['uc:posts:publish']">
-          <VButton
-            :loading="isPublishing"
-            type="secondary"
-            @click="handlePublishClick"
-          >
-            <template #icon>
-              <IconSendPlaneFill class="h-full w-full" />
-            </template>
-            {{ $t("core.common.buttons.publish") }}
-          </VButton>
-        </HasPermission>
-      </VSpace>
+      </HasPermission>
     </template>
   </VPageHeader>
   <div class="editor border-t" style="height: calc(100vh - 3.5rem)">

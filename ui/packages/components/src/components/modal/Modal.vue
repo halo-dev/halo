@@ -187,38 +187,15 @@ watch(
 
 <style lang="scss">
 .modal-wrapper {
-  @apply fixed
-  left-0
-  h-full
-  w-full
-  flex
-  flex-row
-  items-start
-  justify-center
-  top-0
-  py-10;
+  @apply fixed left-0 top-0 flex h-full w-full flex-row items-start justify-center py-10;
   z-index: 2000;
 
   .modal-layer {
-    @apply flex-none
-    absolute
-    top-0
-    left-0
-    h-full
-    w-full
-    transition-opacity
-    bg-gray-500
-    bg-opacity-75;
+    @apply absolute left-0 top-0 h-full w-full flex-none bg-gray-500 bg-opacity-75 transition-opacity;
   }
 
   .modal-content {
-    @apply flex
-    flex-col
-    relative
-    bg-white
-    items-stretch
-    shadow-xl
-    rounded-base;
+    @apply relative flex flex-col items-stretch rounded-base bg-white shadow-xl;
     width: calc(100vw - 20px);
     max-height: calc(100vh - 5rem);
 
@@ -227,43 +204,23 @@ watch(
     }
 
     .modal-header {
-      @apply flex
-      justify-between
-      border-b
-      items-center
-      select-none;
+      @apply flex select-none items-center justify-between border-b;
       padding: 10px 16px;
 
       .modal-header-title {
-        @apply text-base
-        font-medium;
+        @apply truncate text-base font-medium;
       }
 
       .modal-header-actions {
-        @apply flex
-        flex-row
-        gap-2;
+        @apply flex flex-row gap-2;
         span {
-          @apply cursor-pointer 
-          rounded-full 
-          w-7 
-          h-7 
-          inline-flex 
-          items-center 
-          justify-center 
-          hover:bg-gray-100
-          select-none
-          text-gray-600
-          hover:text-gray-900
-          group-hover:hidden;
+          @apply inline-flex h-7 w-7 cursor-pointer select-none items-center justify-center rounded-full text-gray-600 hover:bg-gray-100 hover:text-gray-900 group-hover:hidden;
         }
       }
     }
 
     .modal-body {
-      @apply overflow-y-hidden
-      overflow-x-hidden
-      flex-1;
+      @apply flex-1 overflow-x-hidden overflow-y-hidden;
       word-wrap: break-word;
       padding: 12px 16px;
     }
@@ -275,7 +232,7 @@ watch(
   }
 
   &.modal-wrapper-centered {
-    @apply py-0 items-center;
+    @apply items-center py-0;
     .modal-content {
       max-height: calc(100vh - 20px) !important;
     }

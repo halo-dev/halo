@@ -1,7 +1,7 @@
 <script lang="ts" setup>
 import UserFilterDropdown from "@/components/filter/UserFilterDropdown.vue";
 import type { ListedComment } from "@halo-dev/api-client";
-import { consoleApiClient, coreApiClient } from "@halo-dev/api-client";
+import { coreApiClient } from "@halo-dev/api-client";
 import {
   Dialog,
   IconMessage,
@@ -16,16 +16,16 @@ import {
   VPagination,
   VSpace,
 } from "@halo-dev/components";
-import { useQuery } from "@tanstack/vue-query";
 import { useRouteQuery } from "@vueuse/router";
+import { chunk } from "lodash-es";
 import { computed, ref, watch } from "vue";
 import { useI18n } from "vue-i18n";
 import CommentListItem from "./components/CommentListItem.vue";
+import useCommentsFetch from "./composables/use-comments-fetch";
 
 const { t } = useI18n();
 
 const checkAll = ref(false);
-const selectedComment = ref<ListedComment>();
 const selectedCommentNames = ref<string[]>([]);
 
 const keyword = useRouteQuery<string>("keyword", "");
@@ -72,58 +72,21 @@ const page = useRouteQuery<number>("page", 1, {
 const size = useRouteQuery<number>("size", 20, {
   transform: Number,
 });
-const total = ref(0);
 
 const {
   data: comments,
   isLoading,
   isFetching,
   refetch,
-} = useQuery<ListedComment[]>({
-  queryKey: [
-    "comments",
-    page,
-    size,
-    selectedApprovedStatus,
-    selectedSort,
-    selectedUser,
-    keyword,
-  ],
-  queryFn: async () => {
-    const fieldSelectorMap: Record<string, string | boolean | undefined> = {
-      "spec.approved": selectedApprovedStatus.value,
-    };
-
-    const fieldSelector = Object.entries(fieldSelectorMap)
-      .map(([key, value]) => {
-        if (value !== undefined) {
-          return `${key}=${value}`;
-        }
-      })
-      .filter(Boolean) as string[];
-
-    const { data } = await consoleApiClient.content.comment.listComments({
-      fieldSelector,
-      page: page.value,
-      size: size.value,
-      sort: [selectedSort.value].filter(Boolean) as string[],
-      keyword: keyword.value,
-      ownerName: selectedUser.value,
-      // TODO: email users are not supported at the moment.
-      ownerKind: selectedUser.value ? "User" : undefined,
-    });
-
-    total.value = data.total;
-
-    return data.items;
-  },
-  refetchInterval(data) {
-    const hasDeletingData = data?.some(
-      (comment) => !!comment.comment.metadata.deletionTimestamp
-    );
-    return hasDeletingData ? 1000 : false;
-  },
-});
+} = useCommentsFetch(
+  "core:comments",
+  page,
+  size,
+  selectedApprovedStatus,
+  selectedSort,
+  selectedUser,
+  keyword
+);
 
 // Selection
 const handleCheckAllChange = (e: Event) => {
@@ -131,7 +94,7 @@ const handleCheckAllChange = (e: Event) => {
 
   if (checked) {
     selectedCommentNames.value =
-      comments.value?.map((comment) => {
+      comments.value?.items.map((comment) => {
         return comment.comment.metadata.name;
       }) || [];
   } else {
@@ -139,18 +102,14 @@ const handleCheckAllChange = (e: Event) => {
   }
 };
 
-const checkSelection = (comment: ListedComment) => {
-  return (
-    comment.comment.metadata.name ===
-      selectedComment.value?.comment.metadata.name ||
-    selectedCommentNames.value.includes(comment.comment.metadata.name)
-  );
+const isSelection = (comment: ListedComment) => {
+  return selectedCommentNames.value.includes(comment.comment.metadata.name);
 };
 
 watch(
   () => selectedCommentNames.value,
   (newValue) => {
-    checkAll.value = newValue.length === comments.value?.length;
+    checkAll.value = newValue.length === comments.value?.items.length;
   }
 );
 
@@ -165,12 +124,18 @@ const handleDeleteInBatch = async () => {
     cancelText: t("core.common.buttons.cancel"),
     onConfirm: async () => {
       try {
-        const promises = selectedCommentNames.value.map((name) => {
-          return coreApiClient.content.comment.deleteComment({
-            name,
-          });
-        });
-        await Promise.all(promises);
+        const commentChunk = chunk(selectedCommentNames.value, 5);
+
+        for (const item of commentChunk) {
+          await Promise.all(
+            item.map((name) => {
+              return coreApiClient.content.comment.deleteComment({
+                name,
+              });
+            })
+          );
+        }
+
         selectedCommentNames.value = [];
 
         Toast.success(t("core.common.toast.delete_success"));
@@ -190,7 +155,7 @@ const handleApproveInBatch = async () => {
     cancelText: t("core.common.buttons.cancel"),
     onConfirm: async () => {
       try {
-        const commentsToUpdate = comments.value?.filter((comment) => {
+        const commentsToUpdate = comments.value?.items.filter((comment) => {
           return (
             selectedCommentNames.value.includes(
               comment.comment.metadata.name
@@ -198,25 +163,34 @@ const handleApproveInBatch = async () => {
           );
         });
 
-        const promises = commentsToUpdate?.map((comment) => {
-          return coreApiClient.content.comment.patchComment({
-            name: comment.comment.metadata.name,
-            jsonPatchInner: [
-              {
-                op: "add",
-                path: "/spec/approved",
-                value: true,
-              },
-              {
-                op: "add",
-                path: "/spec/approvedTime",
-                // TODO: 暂时由前端设置发布时间。see https://github.com/halo-dev/halo/pull/2746
-                value: new Date().toISOString(),
-              },
-            ],
-          });
-        });
-        await Promise.all(promises || []);
+        if (!commentsToUpdate?.length) {
+          return;
+        }
+
+        const commentChunk = chunk(commentsToUpdate, 5);
+
+        for (const item of commentChunk) {
+          await Promise.all(
+            item.map((comment) => {
+              return coreApiClient.content.comment.patchComment({
+                name: comment.comment.metadata.name,
+                jsonPatchInner: [
+                  {
+                    op: "add",
+                    path: "/spec/approved",
+                    value: true,
+                  },
+                  {
+                    op: "add",
+                    path: "/spec/approvedTime",
+                    value: new Date().toISOString(),
+                  },
+                ],
+              });
+            })
+          );
+        }
+
         selectedCommentNames.value = [];
 
         Toast.success(t("core.common.toast.operation_success"));
@@ -232,7 +206,7 @@ const handleApproveInBatch = async () => {
 <template>
   <VPageHeader :title="$t('core.comment.title')">
     <template #icon>
-      <IconMessage class="mr-2 self-center" />
+      <IconMessage />
     </template>
   </VPageHeader>
 
@@ -359,7 +333,7 @@ const handleApproveInBatch = async () => {
         </div>
       </template>
       <VLoading v-if="isLoading" />
-      <Transition v-else-if="!comments?.length" appear name="fade">
+      <Transition v-else-if="!comments?.items.length" appear name="fade">
         <VEmpty
           :message="$t('core.comment.empty.message')"
           :title="$t('core.comment.empty.title')"
@@ -374,10 +348,10 @@ const handleApproveInBatch = async () => {
       <Transition v-else appear name="fade">
         <VEntityContainer>
           <CommentListItem
-            v-for="comment in comments"
+            v-for="comment in comments.items"
             :key="comment.comment.metadata.name"
             :comment="comment"
-            :is-selected="checkSelection(comment)"
+            :is-selected="isSelection(comment)"
           >
             <template #checkbox>
               <input
@@ -398,9 +372,11 @@ const handleApproveInBatch = async () => {
           :page-label="$t('core.components.pagination.page_label')"
           :size-label="$t('core.components.pagination.size_label')"
           :total-label="
-            $t('core.components.pagination.total_label', { total: total })
+            $t('core.components.pagination.total_label', {
+              total: comments?.total || 0,
+            })
           "
-          :total="total"
+          :total="comments?.total || 0"
           :size-options="[20, 30, 50, 100]"
         />
       </template>

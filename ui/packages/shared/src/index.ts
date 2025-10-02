@@ -1,6 +1,7 @@
 export * from "./core/plugins";
 export * from "./states/attachment-selector";
 export * from "./states/backup";
+export * from "./states/comment";
 export * from "./states/comment-subject-ref";
 export * from "./states/editor";
 export * from "./states/entity";
@@ -12,3 +13,4 @@ export * from "./states/theme-list-tabs";
 export * from "./states/user-tab";
 export * from "./types/menus";
 export * from "./types/plugin";
+export * from "./types/widget";

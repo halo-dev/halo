@@ -3,6 +3,8 @@ plugins {
     id 'signing'
 }
 
+def internalRepo = layout.buildDirectory.dir('repos/internal')
+
 publishing {
     publications.register('mavenJava', MavenPublication) {
         pom {
@@ -29,19 +31,39 @@ publishing {
     }
 
     repositories {
-        mavenLocal()
-        if (project.hasProperty("release")) {
-            maven {
-                name = 'ossrh'
-                def releasesRepoUrl = 'https://s01.oss.sonatype.org/service/local/staging/deploy/maven2/'
-                def snapshotsRepoUrl = 'https://s01.oss.sonatype.org/content/repositories/snapshots/'
-                url = version.endsWith('-SNAPSHOT') ? snapshotsRepoUrl : releasesRepoUrl
-                credentials(PasswordCredentials)
-            }
+        maven {
+            name = 'internal'
+            url = internalRepo
         }
     }
 }
 
 signing {
     sign publishing.publications.mavenJava
+}
+
+tasks.register('createBundle', Zip) {
+    group = PublishingPlugin.PUBLISH_TASK_GROUP
+    dependsOn tasks.named('publishAllPublicationsToInternalRepository')
+    from(internalRepo)
+    archiveBaseName = "${project.group}.${project.name}"
+}
+
+tasks.register('uploadBundle', UploadBundleTask) {
+    group = PublishingPlugin.PUBLISH_TASK_GROUP
+    credentials = providers.credentials(PasswordCredentials, "portal")
+    bundleFile = tasks.named('createBundle', Zip).map { it.archiveFile }.get()
+}
+
+tasks.register('cleanInternalRepo', Delete) {
+    group = PublishingPlugin.PUBLISH_TASK_GROUP
+    delete internalRepo
+}
+
+tasks.named('publishAllPublicationsToInternalRepository') {
+    dependsOn tasks.named('cleanInternalRepo')
+}
+
+tasks.named('publish') {
+    dependsOn tasks.named('uploadBundle')
 }

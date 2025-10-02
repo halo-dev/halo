@@ -99,12 +99,17 @@ spec:
           name: blockSpiders
           label: "屏蔽搜索引擎"
           value: false
+          help: "为所有页面添加 <meta name=\"robots\" content=\"noindex\" /> 标签，阻止搜索引擎索引，但不是所有搜索引擎都会遵守"
         - $formkit: textarea
           name: keywords
           label: "站点关键词"
+          help: "目前主流搜索引擎已经不再使用此字段，所以通常不建议设置，此选项可能在未来版本中被移除"
+          auto-height: true
         - $formkit: textarea
           name: description
           label: "站点描述"
+          help: "仅对首页生效，其他页面将根据页面类型自动生成描述"
+          auto-height: true
     - group: user
       label: 用户设置
       formSchema:

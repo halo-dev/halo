@@ -4,12 +4,15 @@
     "vite.config.ts",
     "vite.uc.config.ts",
     "vitest.config.*",
+    "eslint.config.ts",
+    "tailwind.config.ts",
     "src/vite/library-external.ts",
     "src/vite/config-builder.ts"
   ],
   "compilerOptions": {
     "composite": true,
     "module": "ESNext",
+    "moduleResolution": "bundler",
     "types": ["node"]
   }
 }

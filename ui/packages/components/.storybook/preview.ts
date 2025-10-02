@@ -1,7 +1,7 @@
 import type { Preview } from "@storybook/vue3";
 
-import "../src/styles/tailwind.css";
 import "overlayscrollbars/overlayscrollbars.css";
+import "../src/styles/tailwind.css";
 
 const preview: Preview = {
   parameters: {

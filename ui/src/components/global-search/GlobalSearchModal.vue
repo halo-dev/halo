@@ -10,8 +10,6 @@ import {
   IconPalette,
   IconSettings,
   IconUserSettings,
-  VEntity,
-  VEntityField,
   VModal,
 } from "@halo-dev/components";
 import { useEventListener } from "@vueuse/core";
@@ -79,23 +77,27 @@ const handleBuildSearchIndex = () => {
   });
 
   if (currentUserHasPermission(["system:users:view"])) {
-    coreApiClient.user.listUser().then((response) => {
-      response.data.items.forEach((user) => {
-        fuse.add({
-          title: user.spec.displayName,
-          icon: {
-            component: markRaw(IconUserSettings),
-          },
-          group: t("core.components.global_search.groups.user"),
-          route: {
-            name: "UserDetail",
-            params: {
-              name: user.metadata.name,
+    coreApiClient.user
+      .listUser({
+        labelSelector: ["!halo.run/hidden-user"],
+      })
+      .then((response) => {
+        response.data.items.forEach((user) => {
+          fuse.add({
+            title: user.spec.displayName,
+            icon: {
+              component: markRaw(IconUserSettings),
             },
-          },
+            group: t("core.components.global_search.groups.user"),
+            route: {
+              name: "UserDetail",
+              params: {
+                name: user.metadata.name,
+              },
+            },
+          });
         });
       });
-    });
   }
 
   if (currentUserHasPermission(["system:plugins:view"])) {
@@ -369,7 +371,7 @@ useEventListener("keydown", handleKeydown);
       </div>
       <ul
         v-if="searchResults.length > 0"
-        class="box-border flex h-full w-full flex-col gap-0.5"
+        class="box-border flex h-full w-full flex-col gap-1"
         role="list"
       >
         <li
@@ -378,33 +380,29 @@ useEventListener("keydown", handleKeydown);
           :key="itemIndex"
           @click="handleRoute(item)"
         >
-          <VEntity
-            class="rounded-md px-2 py-2.5 hover:bg-gray-100"
+          <div
+            class="flex cursor-pointer items-center rounded-md px-2 py-2.5 hover:bg-gray-100"
             :class="{ 'bg-gray-100': selectedIndex === itemIndex }"
           >
-            <template #start>
-              <VEntityField>
-                <template #description>
-                  <div class="h-5 w-5 rounded border p-0.5">
-                    <component
-                      :is="item.icon.component"
-                      v-if="'component' in item.icon"
-                      class="h-full w-full"
-                    />
-                    <img
-                      v-if="'src' in item.icon"
-                      :src="item.icon.src"
-                      class="h-full w-full object-cover"
-                    />
-                  </div>
-                </template>
-              </VEntityField>
-              <VEntityField :title="item.title"></VEntityField>
-            </template>
-            <template #end>
-              <VEntityField :description="item.group"></VEntityField>
-            </template>
-          </VEntity>
+            <div class="inline-flex flex-1 items-center gap-3">
+              <div class="h-5 w-5 rounded border p-0.5">
+                <component
+                  :is="item.icon.component"
+                  v-if="'component' in item.icon"
+                  class="h-full w-full"
+                />
+                <img
+                  v-if="'src' in item.icon"
+                  :src="item.icon.src"
+                  class="h-full w-full object-cover"
+                />
+              </div>
+              <span class="text-sm font-medium">{{ item.title }}</span>
+            </div>
+            <div class="flex-none flex-shrink-0 text-xs text-gray-500">
+              {{ item.group }}
+            </div>
+          </div>
         </li>
       </ul>
     </div>

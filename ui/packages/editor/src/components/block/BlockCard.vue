@@ -41,7 +41,7 @@ function handleInsertNewLine() {
       <slot name="content"></slot>
     </div>
     <div
-      class="invisible group-hover:visible pb-2 absolute -top-12 right-0"
+      class="invisible absolute -top-12 right-0 pb-2 group-hover:visible"
       :class="{ '!visible': selected }"
     >
       <div class="editor-block__actions">
@@ -77,12 +77,11 @@ function handleInsertNewLine() {
   @apply relative my-9;
 
   &__content {
-    @apply transition-all
-    rounded;
+    @apply rounded transition-all;
   }
 
   &__actions {
-    @apply p-1 flex flex-row rounded-lg border gap-0.5 items-center bg-gray-100 h-11 shadow-lg;
+    @apply flex h-11 flex-row items-center gap-0.5 rounded-lg border bg-gray-100 p-1 shadow-lg;
   }
 
   &:hover & {

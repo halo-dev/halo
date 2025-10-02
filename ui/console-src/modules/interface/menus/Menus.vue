@@ -45,7 +45,6 @@ const selectedMenu = ref<Menu>();
 const selectedMenuItem = ref<MenuItem>();
 const selectedParentMenuItem = ref<MenuItem>();
 const menuItemEditingModal = ref();
-const isDragging = ref(false);
 
 const {
   data: menuItems,
@@ -162,7 +161,6 @@ async function handleUpdateInBatch() {
     await queryClient.invalidateQueries({ queryKey: ["menus"] });
     await refetch();
     batchUpdating.value = false;
-    isDragging.value = false;
   }
 }
 
@@ -246,7 +244,7 @@ function getMenuItemRefDisplayName(menuItem: MenuTreeItem) {
   />
   <VPageHeader :title="$t('core.menu.title')">
     <template #icon>
-      <IconListSettings class="mr-2 self-center" />
+      <IconListSettings />
     </template>
   </VPageHeader>
   <div class="m-0 md:m-4">
@@ -254,7 +252,7 @@ function getMenuItemRefDisplayName(menuItem: MenuTreeItem) {
       <div class="w-96 flex-none">
         <MenuList v-model:selected-menu="selectedMenu" />
       </div>
-      <div class="flex-1">
+      <div class="min-w-0 flex-1 shrink">
         <VCard :body-class="['!p-0']">
           <template #header>
             <div class="block w-full bg-gray-50 px-4 py-3">
@@ -298,7 +296,7 @@ function getMenuItemRefDisplayName(menuItem: MenuTreeItem) {
                     @click="menuItemEditingModal = true"
                   >
                     <template #icon>
-                      <IconAddCircle class="h-full w-full" />
+                      <IconAddCircle />
                     </template>
                     {{ $t("core.common.buttons.new") }}
                   </VButton>
@@ -312,26 +310,23 @@ function getMenuItemRefDisplayName(menuItem: MenuTreeItem) {
               :class="{
                 'cursor-progress opacity-60': batchUpdating,
               }"
+              :disable-drag="batchUpdating"
               trigger-class="drag-element"
               :indent="40"
               @after-drop="handleUpdateInBatch"
-              @before-drag-start="isDragging = true"
             >
               <template #default="{ node }">
                 <div
-                  class="px-4 py-3 hover:bg-gray-50 w-full group items-center flex justify-between relative"
+                  class="group relative flex w-full items-center justify-between px-4 py-3 hover:bg-gray-50"
                 >
-                  <div>
+                  <div class="min-w-0 flex-1 shrink">
                     <div
                       v-permission="['system:menus:manage']"
                       class="drag-element absolute inset-y-0 left-0 hidden w-3.5 cursor-move items-center bg-gray-100 transition-all hover:bg-gray-200 group-hover:flex"
-                      :class="{
-                        '!hidden': isDragging,
-                      }"
                     >
                       <IconList class="h-3.5 w-3.5" />
                     </div>
-                    <div class="gap-1 flex flex-col">
+                    <div class="flex flex-col gap-1">
                       <div class="inline-flex items-center gap-2">
                         <span
                           class="truncate text-sm font-medium text-gray-900"
@@ -353,7 +348,7 @@ function getMenuItemRefDisplayName(menuItem: MenuTreeItem) {
                       </a>
                     </div>
                   </div>
-                  <div class="flex items-center gap-6">
+                  <div class="flex flex-none items-center gap-6">
                     <VStatusDot
                       v-if="node.metadata.deletionTimestamp"
                       v-tooltip="$t('core.common.status.deleting')"

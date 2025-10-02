@@ -213,7 +213,7 @@ public class PostEndpoint implements CustomEndpoint {
             )
             .PUT("posts/{name}/unpublish", this::unpublishPost,
                 builder -> builder.operationId("UnpublishPost")
-                    .description("Publish a post.")
+                    .description("UnPublish a post.")
                     .tag(tag)
                     .parameter(parameterBuilder().name("name")
                         .in(ParameterIn.PATH)

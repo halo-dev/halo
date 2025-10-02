@@ -345,7 +345,7 @@ export class SearchAndReplacePluginState {
    */
   getFullText(doc: PMNode): TextNodesWithPosition[] {
     const textNodesWithPosition: TextNodesWithPosition[] = [];
-    doc.descendants((node, pos, parent, index) => {
+    doc.descendants((node, pos, _parent, index) => {
       if (node.isText) {
         textNodesWithPosition.push({
           text: `${node.text}`,

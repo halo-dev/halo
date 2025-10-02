@@ -70,6 +70,7 @@ public class DefaultPluginApplicationContextFactory implements PluginApplication
         var pluginWrapper = pluginManager.getPlugin(pluginId);
         var classLoader = pluginWrapper.getPluginClassLoader();
 
+
         /*
          * Manually creating a BeanFactory and setting the plugin's ClassLoader is necessary
          * to ensure that conditional annotations (e.g., @ConditionalOnClass) within the plugin
@@ -182,7 +183,19 @@ public class DefaultPluginApplicationContextFactory implements PluginApplication
 
         log.debug("Refreshing application context for plugin {}", pluginId);
         sw.start("Refresh");
-        context.refresh();
+
+        // Set the context ClassLoader to the plugin ClassLoader to ensure that
+        // any class loading operations performed by the context (e.g., initializing
+        // bean definitions, loading class resources during static initialization)
+        // use the correct ClassLoader.
+        var previous = Thread.currentThread().getContextClassLoader();
+        try {
+            Thread.currentThread().setContextClassLoader(classLoader);
+            context.refresh();
+        } finally {
+            // reset the class loader to previous one to prevent resource leak
+            Thread.currentThread().setContextClassLoader(previous);
+        }
         sw.stop();
         log.debug("Refreshed application context for plugin {}", pluginId);
         if (log.isDebugEnabled()) {

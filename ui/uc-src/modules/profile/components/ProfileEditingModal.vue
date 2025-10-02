@@ -143,6 +143,8 @@ async function onEmailVerifyModalClose() {
               v-model="formState.spec.bio"
               :label="$t('core.uc_profile.editing_modal.fields.bio.label')"
               type="textarea"
+              auto-height
+              :max-auto-height="200"
               name="bio"
               validation="length:0,2048"
             ></FormKit>

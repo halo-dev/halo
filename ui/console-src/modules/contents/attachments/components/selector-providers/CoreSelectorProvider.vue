@@ -69,6 +69,7 @@ const {
   total,
   selectedAttachment,
   selectedAttachments,
+  selectedAttachmentNames,
   handleFetchAttachments,
   handleSelect,
   handleSelectPrevious,
@@ -105,7 +106,6 @@ function handleClearFilters() {
 }
 
 const uploadVisible = ref(false);
-const detailVisible = ref(false);
 
 watchEffect(() => {
   emit("update:selected", Array.from(selectedAttachments.value));
@@ -113,7 +113,6 @@ watchEffect(() => {
 
 const handleOpenDetail = (attachment: Attachment) => {
   selectedAttachment.value = attachment;
-  detailVisible.value = true;
 };
 
 const isDisabled = (attachment: Attachment) => {
@@ -124,7 +123,7 @@ const isDisabled = (attachment: Attachment) => {
 
   if (
     props.max !== undefined &&
-    props.max <= selectedAttachments.value.size &&
+    props.max <= selectedAttachmentNames.value.size &&
     !isChecked(attachment)
   ) {
     return true;
@@ -139,7 +138,6 @@ function onUploadModalClose() {
 }
 
 function onDetailModalClose() {
-  detailVisible.value = false;
   selectedAttachment.value = undefined;
 }
 
@@ -267,7 +265,7 @@ const viewType = useLocalStorage("attachment-selector-view-type", "grid");
     <div class="mb-5">
       <VButton @click="uploadVisible = true">
         <template #icon>
-          <IconUpload class="h-full w-full" />
+          <IconUpload />
         </template>
         {{ $t("core.common.buttons.upload") }}
       </VButton>
@@ -288,7 +286,7 @@ const viewType = useLocalStorage("attachment-selector-view-type", "grid");
         </VButton>
         <VButton type="secondary" @click="uploadVisible = true">
           <template #icon>
-            <IconUpload class="h-full w-full" />
+            <IconUpload />
           </template>
           {{ $t("core.attachment.empty.actions.upload") }}
         </VButton>
@@ -359,7 +357,7 @@ const viewType = useLocalStorage("attachment-selector-view-type", "grid");
             </p>
 
             <div
-              :class="{ '!flex': selectedAttachments.has(attachment) }"
+              :class="{ '!flex': isChecked(attachment) }"
               class="absolute left-0 top-0 hidden h-1/3 w-full justify-end bg-gradient-to-b from-gray-300 to-transparent ease-in-out group-hover:flex"
             >
               <IconEye
@@ -368,7 +366,7 @@ const viewType = useLocalStorage("attachment-selector-view-type", "grid");
               />
               <IconCheckboxFill
                 :class="{
-                  '!text-primary': selectedAttachments.has(attachment),
+                  '!text-primary': isChecked(attachment),
                 }"
                 class="mr-1 mt-1 h-6 w-6 cursor-pointer text-white transition-all hover:text-primary"
               />
@@ -415,16 +413,23 @@ const viewType = useLocalStorage("attachment-selector-view-type", "grid");
       :size-options="[60, 120, 200]"
     />
   </div>
-  <AttachmentUploadModal v-if="uploadVisible" @close="onUploadModalClose" />
+  <AttachmentUploadModal
+    v-if="uploadVisible"
+    :initial-group-name="
+      selectedGroup === 'ungrouped' ? undefined : selectedGroup
+    "
+    :initial-policy-name="selectedPolicy"
+    @close="onUploadModalClose"
+  />
   <AttachmentDetailModal
-    v-if="detailVisible"
+    v-if="selectedAttachment"
     :mount-to-body="true"
     :name="selectedAttachment?.metadata.name"
     @close="onDetailModalClose"
   >
     <template #actions>
       <span
-        v-if="selectedAttachment && selectedAttachments.has(selectedAttachment)"
+        v-if="isChecked(selectedAttachment)"
         @click="handleSelect(selectedAttachment)"
       >
         <IconCheckboxFill />

@@ -63,12 +63,12 @@ onMounted(async () => {
 <template>
   <VPageHeader :title="$t('core.backup.title')">
     <template #icon>
-      <IconServerLine class="mr-2 self-center" />
+      <IconServerLine />
     </template>
     <template #actions>
       <VButton type="secondary" @click="handleCreate">
         <template #icon>
-          <IconAddCircle class="h-full w-full" />
+          <IconAddCircle />
         </template>
         {{ $t("core.backup.operations.create.button") }}
       </VButton>

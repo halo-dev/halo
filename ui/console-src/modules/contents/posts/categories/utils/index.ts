@@ -118,7 +118,6 @@ export function convertCategoryTreeToCategory(
 ): Category {
   const childNames = categoryTree.children.map((child) => child.metadata.name);
 
-  // eslint-disable-next-line
   const { children: _, ...categoryWithoutChildren } = categoryTree;
 
   return {

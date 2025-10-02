@@ -4,14 +4,8 @@ import { definePlugin } from "@halo-dev/console-shared";
 import { markRaw } from "vue";
 import UserDetail from "./UserDetail.vue";
 import UserList from "./UserList.vue";
-import NotificationWidget from "./widgets/NotificationWidget.vue";
-import UserStatsWidget from "./widgets/UserStatsWidget.vue";
 
 export default definePlugin({
-  components: {
-    UserStatsWidget,
-    NotificationWidget,
-  },
   routes: [
     {
       path: "/users",

@@ -1,6 +1,6 @@
 {
   "extends": "@tsconfig/node18/tsconfig.json",
-  "include": ["vite.config.*", "vitest.config.*"],
+  "include": ["tsdown.config.ts"],
   "compilerOptions": {
     "composite": true,
     "module": "ESNext",

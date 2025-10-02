@@ -1,5 +1,6 @@
 <script lang="ts" setup>
 import { postLabels } from "@/constants/labels";
+import SubjectQueryCommentListModal from "@console/modules/contents/comments/components/SubjectQueryCommentListModal.vue";
 import type { ListedPost } from "@halo-dev/api-client";
 import {
   IconExternalLinkLine,
@@ -7,7 +8,8 @@ import {
   VSpace,
   VStatusDot,
 } from "@halo-dev/components";
-import { computed } from "vue";
+import { computed, ref } from "vue";
+import { useI18n } from "vue-i18n";
 import PostTag from "../../tags/components/PostTag.vue";
 
 const props = withDefaults(
@@ -17,12 +19,34 @@ const props = withDefaults(
   {}
 );
 
+const { t } = useI18n();
+
 const externalUrl = computed(() => {
   const { status, metadata } = props.post.post;
   if (metadata.labels?.[postLabels.PUBLISHED] === "true") {
     return status?.permalink;
   }
   return `/preview/posts/${metadata.name}`;
+});
+
+const commentSubjectRefKey = `content.halo.run/Post/${props.post.post.metadata.name}`;
+const commentListVisible = ref(false);
+
+const commentText = computed(() => {
+  const { totalComment, approvedComment } = props.post.stats || {};
+
+  let text = t("core.post.list.fields.comments", {
+    comments: totalComment || 0,
+  });
+
+  const pendingComments = (totalComment || 0) - (approvedComment || 0);
+
+  if (pendingComments > 0) {
+    text += t("core.post.list.fields.comments-with-pending", {
+      count: pendingComments,
+    });
+  }
+  return text;
 });
 </script>
 
@@ -33,7 +57,7 @@ const externalUrl = computed(() => {
       name: 'PostEditor',
       query: { name: post.post.metadata.name },
     }"
-    width="27rem"
+    max-width="30rem"
   >
     <template #extra>
       <VSpace>
@@ -51,7 +75,7 @@ const externalUrl = computed(() => {
         <a
           target="_blank"
           :href="externalUrl"
-          class="hidden text-gray-600 transition-all hover:text-gray-900 group-hover:inline-block"
+          class="text-gray-600 opacity-0 transition-all hover:text-gray-900 group-hover:opacity-100"
         >
           <IconExternalLinkLine class="h-3.5 w-3.5" />
         </a>
@@ -83,12 +107,11 @@ const externalUrl = computed(() => {
               })
             }}
           </span>
-          <span class="text-xs text-gray-500">
-            {{
-              $t("core.post.list.fields.comments", {
-                comments: post.stats.totalComment || 0,
-              })
-            }}
+          <span
+            class="cursor-pointer text-xs text-gray-500 hover:text-gray-900 hover:underline"
+            @click="commentListVisible = true"
+          >
+            {{ commentText }}
           </span>
           <span v-if="post.post.spec.pinned" class="text-xs text-gray-500">
             {{ $t("core.post.list.fields.pinned") }}
@@ -103,6 +126,12 @@ const externalUrl = computed(() => {
           ></PostTag>
         </VSpace>
       </div>
+
+      <SubjectQueryCommentListModal
+        v-if="commentListVisible"
+        :subject-ref-key="commentSubjectRefKey"
+        @close="commentListVisible = false"
+      />
     </template>
   </VEntityField>
 </template>

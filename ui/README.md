@@ -16,18 +16,18 @@
 <a href="https://gitpod.io/#https://github.com/halo-dev/console"><img alt="Gitpod ready-to-code" src="https://img.shields.io/badge/Gitpod-ready--to--code-blue?logo=gitpod&style=flat-square"/></a>
 </p>
 
-------------------------------
+---
 
 当前仓库已经将 `halo-admin` 改为了 `console`。但对于 Halo 1.x 版本，依旧保持 halo-admin 的概念。
 
 ## 开发环境运行
 
 ```bash
-npm install -g pnpm@9
+npm install -g pnpm@10
 ```
 
 ```bash
-pnpm install 
+pnpm install
 ```
 
 ```bash

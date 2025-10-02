@@ -281,28 +281,26 @@ watch(selectedPageNames, (newValue) => {
 
   <VPageHeader :title="$t('core.page.title')">
     <template #icon>
-      <IconPages class="mr-2 self-center" />
+      <IconPages />
     </template>
     <template #actions>
-      <VSpace>
-        <VButton
-          v-permission="['system:singlepages:view']"
-          :route="{ name: 'DeletedSinglePages' }"
-          size="sm"
-        >
-          {{ $t("core.page.actions.recycle_bin") }}
-        </VButton>
-        <VButton
-          v-permission="['system:singlepages:manage']"
-          :route="{ name: 'SinglePageEditor' }"
-          type="secondary"
-        >
-          <template #icon>
-            <IconAddCircle class="h-full w-full" />
-          </template>
-          {{ $t("core.common.buttons.new") }}
-        </VButton>
-      </VSpace>
+      <VButton
+        v-permission="['system:singlepages:view']"
+        :route="{ name: 'DeletedSinglePages' }"
+        size="sm"
+      >
+        {{ $t("core.page.actions.recycle_bin") }}
+      </VButton>
+      <VButton
+        v-permission="['system:singlepages:manage']"
+        :route="{ name: 'SinglePageEditor' }"
+        type="secondary"
+      >
+        <template #icon>
+          <IconAddCircle />
+        </template>
+        {{ $t("core.common.buttons.new") }}
+      </VButton>
     </template>
   </VPageHeader>
 
@@ -436,7 +434,7 @@ watch(selectedPageNames, (newValue) => {
                 type="secondary"
               >
                 <template #icon>
-                  <IconAddCircle class="h-full w-full" />
+                  <IconAddCircle />
                 </template>
                 {{ $t("core.common.buttons.new") }}
               </VButton>

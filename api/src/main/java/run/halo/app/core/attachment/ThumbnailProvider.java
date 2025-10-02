@@ -6,7 +6,16 @@ import lombok.Builder;
 import lombok.Data;
 import org.pf4j.ExtensionPoint;
 import reactor.core.publisher.Mono;
+import run.halo.app.core.extension.attachment.endpoint.AttachmentHandler;
 
+/**
+ * Thumbnail provider extension.
+ *
+ * @since 2.22.0
+ * @deprecated Use {@link AttachmentHandler} instead. We are planing to remove this extension
+ * point in future release.
+ */
+@Deprecated(forRemoval = true, since = "2.22.0")
 public interface ThumbnailProvider extends ExtensionPoint {
 
     /**

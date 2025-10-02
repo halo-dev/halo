@@ -2,7 +2,7 @@
   "openapi": "3.0.1",
   "info": {
     "title": "Halo",
-    "version": "2.21.0-SNAPSHOT"
+    "version": "2.22.0-SNAPSHOT"
   },
   "servers": [
     {
@@ -1464,7 +1464,7 @@
     },
     "/apis/api.console.halo.run/v1alpha1/posts/{name}/unpublish": {
       "put": {
-        "description": "Publish a post.",
+        "description": "UnPublish a post.",
         "operationId": "UnpublishPost",
         "parameters": [
           {
@@ -3284,6 +3284,89 @@
           "UserV1alpha1Console"
         ]
       }
+    },
+    "/apis/console.api.storage.halo.run/v1alpha1/policies/{name}/configs/{group}": {
+      "get": {
+        "description": "Get policy config by group",
+        "operationId": "getPolicyConfigByGroup",
+        "parameters": [
+          {
+            "description": "Name of the policy",
+            "in": "path",
+            "name": "name",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "description": "Name of the group",
+            "in": "path",
+            "name": "group",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "default": {
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/JsonNode"
+                }
+              }
+            },
+            "description": "default response"
+          }
+        },
+        "tags": [
+          "PolicyAlpha1Console"
+        ]
+      },
+      "put": {
+        "description": "Update policy config by group",
+        "operationId": "updatePolicyConfigByGroup",
+        "parameters": [
+          {
+            "description": "Name of the policy",
+            "in": "path",
+            "name": "name",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "description": "Name of the group",
+            "in": "path",
+            "name": "group",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/JsonNode"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "204": {
+            "description": "No Content"
+          }
+        },
+        "tags": [
+          "PolicyAlpha1Console"
+        ]
+      }
     }
   },
   "components": {
@@ -3784,6 +3867,10 @@
           "content": {
             "minLength": 1,
             "type": "string"
+          },
+          "hidden": {
+            "type": "boolean",
+            "default": false
           },
           "owner": {
             "$ref": "#/components/schemas/CommentEmailOwner"
@@ -4325,6 +4412,9 @@
             "format": "uri"
           }
         }
+      },
+      "JsonNode": {
+        "type": "object"
       },
       "JsonPatch": {
         "minItems": 1,
@@ -5385,12 +5475,12 @@
           },
           "visible": {
             "type": "string",
-            "default": "PUBLIC",
             "enum": [
               "PUBLIC",
               "INTERNAL",
               "PRIVATE"
-            ]
+            ],
+            "default": "PUBLIC"
           }
         }
       },
@@ -5556,6 +5646,10 @@
           "content": {
             "minLength": 1,
             "type": "string"
+          },
+          "hidden": {
+            "type": "boolean",
+            "default": false
           },
           "owner": {
             "$ref": "#/components/schemas/CommentEmailOwner"
@@ -5921,12 +6015,12 @@
           },
           "visible": {
             "type": "string",
-            "default": "PUBLIC",
             "enum": [
               "PUBLIC",
               "INTERNAL",
               "PRIVATE"
-            ]
+            ],
+            "default": "PUBLIC"
           }
         }
       },
@@ -6382,13 +6476,16 @@
         "type": "object",
         "properties": {
           "filename": {
-            "type": "string"
+            "type": "string",
+            "description": "Custom file name"
           },
           "groupName": {
-            "type": "string"
+            "type": "string",
+            "description": "The name of the group to which the attachment belongs"
           },
           "policyName": {
-            "type": "string"
+            "type": "string",
+            "description": "Storage policy name"
           },
           "url": {
             "type": "string",

@@ -1,9 +1,14 @@
 <script lang="ts" setup>
 import PostContributorList from "@/components/user/PostContributorList.vue";
-import { formatDatetime } from "@/utils/date";
+import { formatDatetime, relativeTimeTo } from "@/utils/date";
 import { usePermission } from "@/utils/permission";
+import { generateThumbnailUrl } from "@/utils/thumbnail";
 import type { ListedPost, Post } from "@halo-dev/api-client";
-import { consoleApiClient, coreApiClient } from "@halo-dev/api-client";
+import {
+  consoleApiClient,
+  coreApiClient,
+  GetThumbnailByUriSizeEnum,
+} from "@halo-dev/api-client";
 import {
   Dialog,
   IconAddCircle,
@@ -214,24 +219,22 @@ watch(
 <template>
   <VPageHeader :title="$t('core.deleted_post.title')">
     <template #icon>
-      <IconDeleteBin class="mr-2 self-center text-green-600" />
+      <IconDeleteBin class="text-green-600" />
     </template>
     <template #actions>
-      <VSpace>
-        <VButton :route="{ name: 'Posts' }" size="sm">
-          {{ $t("core.common.buttons.back") }}
-        </VButton>
-        <VButton
-          v-permission="['system:posts:manage']"
-          :route="{ name: 'PostEditor' }"
-          type="secondary"
-        >
-          <template #icon>
-            <IconAddCircle class="h-full w-full" />
-          </template>
-          {{ $t("core.common.buttons.new") }}
-        </VButton>
-      </VSpace>
+      <VButton :route="{ name: 'Posts' }" size="sm">
+        {{ $t("core.common.buttons.back") }}
+      </VButton>
+      <VButton
+        v-permission="['system:posts:manage']"
+        :route="{ name: 'PostEditor' }"
+        type="secondary"
+      >
+        <template #icon>
+          <IconAddCircle />
+        </template>
+        {{ $t("core.common.buttons.new") }}
+      </VButton>
     </template>
   </VPageHeader>
 
@@ -319,7 +322,24 @@ watch(
               />
             </template>
             <template #start>
-              <VEntityField :title="post.post.spec.title" width="27rem">
+              <VEntityField v-if="post.post.spec.cover">
+                <template #description>
+                  <div
+                    class="aspect-h-2 aspect-w-3 w-20 overflow-hidden rounded-md"
+                  >
+                    <img
+                      class="h-full w-full object-cover"
+                      :src="
+                        generateThumbnailUrl(
+                          post.post.spec.cover,
+                          GetThumbnailByUriSizeEnum.S
+                        )
+                      "
+                    />
+                  </div>
+                </template>
+              </VEntityField>
+              <VEntityField :title="post.post.spec.title" max-width="30rem">
                 <template #description>
                   <div class="flex flex-col gap-1.5">
                     <VSpace class="flex-wrap !gap-y-1">
@@ -390,12 +410,11 @@ watch(
                   />
                 </template>
               </VEntityField>
-              <VEntityField>
-                <template #description>
-                  <span class="truncate text-xs tabular-nums text-gray-500">
-                    {{ formatDatetime(post.post.spec.publishTime) }}
-                  </span>
-                </template>
+              <VEntityField
+                v-if="post.post.spec.publishTime"
+                v-tooltip="formatDatetime(post.post.spec.publishTime)"
+                :description="relativeTimeTo(post.post.spec.publishTime)"
+              >
               </VEntityField>
             </template>
             <template

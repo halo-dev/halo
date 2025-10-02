@@ -7,7 +7,7 @@ import type { Role } from "@halo-dev/api-client";
 import type { RouteLocationNormalized, Router } from "vue-router";
 
 export function setupPermissionGuard(router: Router) {
-  router.beforeEach((to, _, next) => {
+  router.beforeEach(async (to, _, next) => {
     const userStore = useUserStore();
     const roleStore = useRoleStore();
 
@@ -16,7 +16,7 @@ export function setupPermissionGuard(router: Router) {
       return;
     }
 
-    if (checkRoutePermissions(to, roleStore.permissions.uiPermissions)) {
+    if (await checkRoutePermissions(to, roleStore.permissions.uiPermissions)) {
       next();
     } else {
       next({ name: "Forbidden" });
@@ -38,17 +38,31 @@ function isConsoleAccessDisallowed(currentRoles?: Role[]): boolean {
   );
 }
 
-function checkRoutePermissions(
+async function checkRoutePermissions(
   to: RouteLocationNormalized,
   uiPermissions: string[]
-): boolean {
+): Promise<boolean> {
   const { meta } = to;
-  if (meta?.permissions) {
-    return hasPermission(
-      Array.from(uiPermissions),
-      meta.permissions as string[],
-      true
-    );
+
+  if (!meta?.permissions) {
+    return true;
   }
-  return true;
+
+  if (typeof meta.permissions === "function") {
+    try {
+      return await meta.permissions(uiPermissions);
+    } catch (e) {
+      console.error(
+        `Error checking permissions for route ${String(to.name)}:`,
+        e
+      );
+      return false;
+    }
+  }
+
+  return hasPermission(
+    Array.from(uiPermissions),
+    meta.permissions as string[],
+    true
+  );
 }

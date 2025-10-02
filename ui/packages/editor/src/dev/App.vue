@@ -12,6 +12,7 @@ import {
   ExtensionColumn,
   ExtensionColumns,
   ExtensionCommands,
+  ExtensionDetails,
   ExtensionDocument,
   ExtensionDraggable,
   ExtensionDropcursor,
@@ -113,6 +114,9 @@ const editor = useEditor({
     ExtensionClearFormat,
     ExtensionFormatBrush,
     ExtensionRangeSelection,
+    ExtensionDetails.configure({
+      persist: true,
+    }),
   ],
   parseOptions: {
     preserveWhitespace: true,

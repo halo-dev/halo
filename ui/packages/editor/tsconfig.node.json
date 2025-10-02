@@ -1,6 +1,10 @@
 {
   "extends": "@tsconfig/node18/tsconfig.json",
-  "include": ["vite.config.*"],
+  "include": [
+    "vite.config.*",
+    "tailwind.config.ts",
+    "../../tailwind.config.ts"
+  ],
   "compilerOptions": {
     "composite": true,
     "module": "ESNext",

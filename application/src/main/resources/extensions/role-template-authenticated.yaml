@@ -32,6 +32,9 @@ rules:
   - apiGroups: [ "uc.api.auth.halo.run" ]
     resources: [ "user-connections/disconnect" ]
     verbs: [ "update" ]
+  - apiGroups: [ "uc.api.halo.run" ]
+    resources: [ "user-preferences" ]
+    verbs: [ "get", "update" ]
 ---
 apiVersion: v1alpha1
 kind: "Role"

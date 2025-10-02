@@ -31,10 +31,7 @@ core:
     title: Panel de control
     actions:
       setting: Configuración
-      done: Hecho
-      add_widget: Agregar Widget
     widgets:
-      modal_title: Widgets
       groups:
         post: Publicación
         page: Página
@@ -50,8 +47,8 @@ core:
           title: Publicaciones Recientes
           visits: "{visits} Visitas"
           comments: "{comments} Comentarios"
-        quicklink:
-          title: Enlace Rápido
+        quickaction:
+          title: Acción Rápida
           actions:
             user_center:
               title: Perfil de Usuario
@@ -367,8 +364,6 @@ core:
         title: ¿Estás seguro de que deseas aprobar todas las respuestas a este comentario para su revisión?
       delete_reply:
         title: ¿Estás seguro de que deseas eliminar esta respuesta?
-      approve_reply:
-        button: Aprobar
       reply:
         button: Responder
     filters:

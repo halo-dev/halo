@@ -21,10 +21,10 @@ class DefaultNotificationSenderTest {
         void equalsTest() {
             var item1 =
                 new DefaultNotificationSender.QueueItem("1",
-                    mock(DefaultNotificationSender.SendNotificationTask.class), 0);
+                    mock(Runnable.class), 0);
             var item2 =
                 new DefaultNotificationSender.QueueItem("1",
-                    mock(DefaultNotificationSender.SendNotificationTask.class), 1);
+                    mock(Runnable.class), 1);
 
             assertThat(item1).isEqualTo(item2);
         }

@@ -54,6 +54,7 @@ function updateColumns(
   table: HTMLElement,
   cellMinWidth: number,
   overrideCol?: number,
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   overrideValue?: any
 ) {
   let totalWidth = 0;

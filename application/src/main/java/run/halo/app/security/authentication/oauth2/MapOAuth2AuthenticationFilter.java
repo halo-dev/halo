@@ -23,6 +23,7 @@ import org.springframework.web.server.WebFilter;
 import org.springframework.web.server.WebFilterChain;
 import reactor.core.publisher.Mono;
 import run.halo.app.core.user.service.UserConnectionService;
+import run.halo.app.security.LoginHandlerEnhancer;
 
 /**
  * A filter to map OAuth2 authentication to authenticated user.
@@ -47,6 +48,8 @@ class MapOAuth2AuthenticationFilter implements WebFilter {
 
     private final ServerLogoutHandler logoutHandler;
 
+    private final LoginHandlerEnhancer loginHandlerEnhancer;
+
     private final ServerRedirectStrategy redirectStrategy = new DefaultServerRedirectStrategy();
 
     @Setter
@@ -56,10 +59,12 @@ class MapOAuth2AuthenticationFilter implements WebFilter {
     public MapOAuth2AuthenticationFilter(
         ServerSecurityContextRepository securityContextRepository,
         UserConnectionService connectionService,
-        ReactiveUserDetailsService userDetailsService) {
+        ReactiveUserDetailsService userDetailsService,
+        LoginHandlerEnhancer loginHandlerEnhancer) {
         this.connectionService = connectionService;
         this.securityContextRepository = securityContextRepository;
         this.userDetailsService = userDetailsService;
+        this.loginHandlerEnhancer = loginHandlerEnhancer;
         var logoutHandler = new SecurityContextServerLogoutHandler();
         logoutHandler.setSecurityContextRepository(securityContextRepository);
         this.logoutHandler = logoutHandler;
@@ -116,7 +121,10 @@ class MapOAuth2AuthenticationFilter implements WebFilter {
                         .map(userDetails -> authenticated(userDetails, oauth2Token))
                         .flatMap(haloOAuth2Token -> {
                             var securityContext = new SecurityContextImpl(haloOAuth2Token);
-                            return securityContextRepository.save(exchange, securityContext);
+                            return securityContextRepository.save(exchange, securityContext)
+                                .then(
+                                    loginHandlerEnhancer.onLoginSuccess(exchange, haloOAuth2Token)
+                                );
                             // because this happens after the filter, there is no need to
                             // write SecurityContext to the context
                         });

@@ -2,7 +2,7 @@
   "openapi": "3.0.1",
   "info": {
     "title": "Halo",
-    "version": "2.21.0-SNAPSHOT"
+    "version": "2.22.0-SNAPSHOT"
   },
   "servers": [
     {
@@ -1159,12 +1159,18 @@
             }
           },
           {
-            "description": "The size of the thumbnail,available values are s,m,l,xl",
+            "description": "The size of the thumbnail",
             "in": "query",
             "name": "size",
             "required": true,
             "schema": {
-              "type": "string"
+              "type": "string",
+              "enum": [
+                "S",
+                "M",
+                "L",
+                "XL"
+              ]
             }
           }
         ],
@@ -1454,6 +1460,10 @@
           "content": {
             "minLength": 1,
             "type": "string"
+          },
+          "hidden": {
+            "type": "boolean",
+            "default": false
           },
           "owner": {
             "$ref": "#/components/schemas/CommentEmailOwner"
@@ -2609,12 +2619,12 @@
           },
           "visible": {
             "type": "string",
-            "default": "PUBLIC",
             "enum": [
               "PUBLIC",
               "INTERNAL",
               "PRIVATE"
-            ]
+            ],
+            "default": "PUBLIC"
           }
         }
       },
@@ -2825,6 +2835,10 @@
           "content": {
             "minLength": 1,
             "type": "string"
+          },
+          "hidden": {
+            "type": "boolean",
+            "default": false
           },
           "owner": {
             "$ref": "#/components/schemas/CommentEmailOwner"
@@ -3183,12 +3197,12 @@
           },
           "visible": {
             "type": "string",
-            "default": "PUBLIC",
             "enum": [
               "PUBLIC",
               "INTERNAL",
               "PRIVATE"
-            ]
+            ],
+            "default": "PUBLIC"
           }
         }
       },

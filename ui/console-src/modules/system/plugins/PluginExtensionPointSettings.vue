@@ -48,7 +48,7 @@ watch(
 <template>
   <VPageHeader :title="$t('core.plugin.extension-settings.title')">
     <template #icon>
-      <IconSettings class="mr-2 self-center" />
+      <IconSettings />
     </template>
     <template #actions>
       <VButton size="sm" @click="$router.back()">

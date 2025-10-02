@@ -1,33 +1,32 @@
 package run.halo.app.core.attachment;
 
 import java.net.URI;
+import java.util.Map;
 import reactor.core.publisher.Mono;
-import run.halo.app.infra.ExternalLinkProcessor;
 
+/**
+ * Service for managing thumbnails.
+ *
+ * @author johnniang
+ * @since 2.22.0
+ */
 public interface ThumbnailService {
 
     /**
-     * Generate thumbnail by the given image uri and size.
-     * <p>if the imageUri is not absolute, it will be processed by {@link ExternalLinkProcessor}
-     * .</p>
-     * <p>if externalUrl is not configured, it will return empty.</p>
+     * Get the thumbnail link for the given image URI and size.
      *
-     * @param imageUri image uri to generate thumbnail
-     * @param size thumbnail size to generate
-     * @return generated thumbnail uri if success, otherwise empty.
+     * @param permalink the permalink of the image
+     * @param size the size of the thumbnail
+     * @return the thumbnail link
      */
-    Mono<URI> generate(URI imageUri, ThumbnailSize size);
+    Mono<URI> get(URI permalink, ThumbnailSize size);
 
     /**
-     * <p>Get thumbnail by the given image uri and size.</p>
-     * <p>It depends on the {@link #generate(URI, ThumbnailSize)} method, currently the thumbnail
-     * generation is limited to the attachment service, that is, the thumbnail is strongly
-     * associated with the attachment.</p>
+     * Get all thumbnail links for the given image URI.
      *
-     * @return if thumbnail exists, return the thumbnail uri, otherwise return the original image
-     * uri
+     * @param permalink the permalink of the image
+     * @return the map of thumbnail size to thumbnail link
      */
-    Mono<URI> get(URI imageUri, ThumbnailSize size);
+    Mono<Map<ThumbnailSize, URI>> get(URI permalink);
 
-    Mono<Void> delete(URI imageUri);
 }

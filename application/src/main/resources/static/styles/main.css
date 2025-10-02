@@ -293,7 +293,15 @@
     overflow: hidden;
 }
 
-.pill-items li a {
+.pill-items li button {
+    all: unset;
+    cursor: pointer;
+    width: 100%;
+    height: 100%;
+}
+
+.pill-items li a,
+.pill-items li button {
     gap: var(--spacing-sm);
     font-size: var(--text-sm);
     color: #1f2937;
@@ -313,7 +321,7 @@
     background: #f3f4f6;
 }
 
-.pill-items li:hover a {
+.pill-items li:hover {
     color: #111827;
 }
 

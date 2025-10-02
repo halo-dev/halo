@@ -1,6 +1,7 @@
 <script lang="ts" setup>
 import AttachmentPermalinkList from "@/components/attachment/AttachmentPermalinkList.vue";
 import LazyImage from "@/components/image/LazyImage.vue";
+import HasPermission from "@/components/permission/HasPermission.vue";
 import { formatDatetime } from "@/utils/date";
 import { isImage } from "@/utils/image";
 import { coreApiClient } from "@halo-dev/api-client";
@@ -16,6 +17,7 @@ import {
 import { useQuery } from "@tanstack/vue-query";
 import prettyBytes from "pretty-bytes";
 import { computed, ref, toRefs, useTemplateRef } from "vue";
+import AttachmentSingleThumbnailList from "./AttachmentSingleThumbnailList.vue";
 import DisplayNameEditForm from "./DisplayNameEditForm.vue";
 
 const props = withDefaults(
@@ -229,6 +231,15 @@ const showDisplayNameForm = ref(false);
               :label="$t('core.attachment.detail_modal.fields.permalink')"
             >
               <AttachmentPermalinkList :attachment="attachment" />
+            </VDescriptionItem>
+            <VDescriptionItem
+              v-if="
+                isImage(attachment?.spec.mediaType) &&
+                !!attachment?.status?.thumbnails
+              "
+              :label="$t('core.attachment.detail_modal.fields.thumbnails')"
+            >
+              <AttachmentSingleThumbnailList :attachment="attachment" />
             </VDescriptionItem>
           </VDescription>
         </div>

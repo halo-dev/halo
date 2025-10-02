@@ -39,7 +39,7 @@ const creationModal = ref(false);
   <div v-if="pats?.length" class="my-5 flex justify-end">
     <VButton type="secondary" @click="creationModal = true">
       <template #icon>
-        <IconAddCircle class="h-full w-full" />
+        <IconAddCircle />
       </template>
       {{ $t("core.common.buttons.new") }}
     </VButton>
@@ -59,7 +59,7 @@ const creationModal = ref(false);
           </VButton>
           <VButton type="secondary" @click="creationModal = true">
             <template #icon>
-              <IconAddCircle class="h-full w-full" />
+              <IconAddCircle />
             </template>
             {{ $t("core.common.buttons.new") }}
           </VButton>
@@ -69,7 +69,7 @@ const creationModal = ref(false);
   </Transition>
 
   <Transition v-else appear name="fade">
-    <div class="rounded-base border overflow-hidden">
+    <div class="overflow-hidden rounded-base border">
       <VEntityContainer>
         <PersonalAccessTokenListItem
           v-for="token in pats"

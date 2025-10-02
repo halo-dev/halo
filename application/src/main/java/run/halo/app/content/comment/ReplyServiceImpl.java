@@ -17,6 +17,7 @@ import org.springframework.dao.OptimisticLockingFailureException;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.util.Assert;
+import org.springframework.web.server.ServerWebInputException;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import reactor.util.retry.Retry;
@@ -52,11 +53,18 @@ public class ReplyServiceImpl extends AbstractCommentService implements ReplySer
 
     @Override
     public Mono<Reply> create(String commentName, Reply reply) {
+        if (reply.getSpec() == null
+            || reply.getSpec().getContent() == null
+            || !isSafeHtml(reply.getSpec().getContent())) {
+            return Mono.error(new ServerWebInputException("""
+                The content of reply must not be empty or contains unsafe HTML.\
+                """));
+        }
         return client.get(Comment.class, commentName)
             .flatMap(this::approveComment)
             .filter(comment -> isTrue(comment.getSpec().getApproved()))
             .switchIfEmpty(Mono.error(requestRestrictedExceptionSupplier))
-            .flatMap(comment -> prepareReply(commentName, reply))
+            .flatMap(comment -> prepareReply(comment, reply))
             .flatMap(this::doCreateReply);
     }
 
@@ -68,6 +76,9 @@ public class ReplyServiceImpl extends AbstractCommentService implements ReplySer
         return approveReply(quotedReply)
             .filter(reply -> isTrue(reply.getSpec().getApproved()))
             .switchIfEmpty(Mono.error(requestRestrictedExceptionSupplier))
+            .doOnNext(approvedQuoteReply -> prepared.getSpec()
+                .setHidden(approvedQuoteReply.getSpec().getHidden())
+            )
             .flatMap(approvedQuoteReply -> client.create(prepared));
     }
 
@@ -123,8 +134,9 @@ public class ReplyServiceImpl extends AbstractCommentService implements ReplySer
                 .filter(OptimisticLockingFailureException.class::isInstance));
     }
 
-    private Mono<Reply> prepareReply(String commentName, Reply reply) {
-        reply.getSpec().setCommentName(commentName);
+    private Mono<Reply> prepareReply(Comment comment, Reply reply) {
+        reply.getSpec().setCommentName(comment.getMetadata().getName());
+        reply.getSpec().setHidden(comment.getSpec().getHidden());
         if (reply.getSpec().getTop() == null) {
             reply.getSpec().setTop(false);
         }

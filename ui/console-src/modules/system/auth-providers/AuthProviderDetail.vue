@@ -166,7 +166,6 @@ const description = computed(() => {
       <VAvatar
         :src="authProvider?.spec.logo"
         :alt="authProvider?.spec.displayName"
-        class="mr-2"
         size="sm"
       />
     </template>

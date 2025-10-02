@@ -6,7 +6,7 @@ import { toDatetimeLocal, toISOString } from "@/utils/date";
 import { randomUUID } from "@/utils/id";
 import useSlugify from "@console/composables/use-slugify";
 import { useThemeCustomTemplates } from "@console/modules/interface/themes/composables/use-theme";
-import { submitForm } from "@formkit/core";
+import { submitForm, type FormKitNode } from "@formkit/core";
 import type { SinglePage } from "@halo-dev/api-client";
 import { coreApiClient } from "@halo-dev/api-client";
 import {
@@ -266,6 +266,28 @@ const { handleGenerateSlug } = useSlugify(
   computed(() => !isUpdateMode),
   FormType.SINGLE_PAGE
 );
+
+// fixme: check if slug is unique
+// Finally, we need to check if the slug is unique in the database
+async function slugUniqueValidation(node: FormKitNode) {
+  const value = node.value;
+  if (!value) {
+    return true;
+  }
+
+  const fieldSelector = [`spec.slug=${value}`];
+
+  if (isUpdateMode) {
+    fieldSelector.push(`metadata.name!=${formState.value.metadata.name}`);
+  }
+
+  const { data: pagesWithSameSlug } =
+    await coreApiClient.content.singlePage.listSinglePage({
+      fieldSelector,
+    });
+
+  return !pagesWithSameSlug.total;
+}
 </script>
 
 <template>
@@ -309,7 +331,13 @@ const { handleGenerateSlug } = useSlugify(
               :label="$t('core.page.settings.fields.slug.label')"
               name="slug"
               type="text"
-              validation="required|length:0,100"
+              validation="required|length:0,100|slugUniqueValidation"
+              :validation-rules="{ slugUniqueValidation }"
+              :validation-messages="{
+                slugUniqueValidation: $t(
+                  'core.common.form.validation.slug_unique'
+                ),
+              }"
               :help="$t('core.page.settings.fields.slug.help')"
             >
               <template #suffix>
@@ -342,7 +370,8 @@ const { handleGenerateSlug } = useSlugify(
               :label="$t('core.page.settings.fields.raw_excerpt.label')"
               type="textarea"
               validation="length:0,1024"
-              :rows="5"
+              auto-height
+              :max-auto-height="200"
             ></FormKit>
           </div>
         </div>
@@ -468,6 +497,7 @@ const { handleGenerateSlug } = useSlugify(
           "
           :loading="publishCanceling"
           type="danger"
+          ghost
           @click="handleUnpublish()"
         >
           {{ $t("core.common.buttons.cancel_publish") }}

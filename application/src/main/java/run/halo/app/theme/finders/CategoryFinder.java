@@ -1,6 +1,6 @@
 package run.halo.app.theme.finders;
 
-import java.util.List;
+import java.util.Collection;
 import org.springframework.lang.Nullable;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
@@ -19,7 +19,7 @@ public interface CategoryFinder {
 
     Mono<CategoryVo> getByName(String name);
 
-    Flux<CategoryVo> getByNames(List<String> names);
+    Flux<CategoryVo> getByNames(Collection<String> names);
 
     Mono<ListResult<CategoryVo>> list(@Nullable Integer page, @Nullable Integer size);
 

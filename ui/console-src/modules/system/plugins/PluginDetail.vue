@@ -26,7 +26,6 @@ provide<Ref<Setting | undefined>>("setting", setting);
         v-if="plugin"
         :src="plugin.status?.logo"
         :alt="plugin.spec.displayName"
-        class="mr-2"
         size="sm"
       />
     </template>

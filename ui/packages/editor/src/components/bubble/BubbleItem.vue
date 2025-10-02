@@ -55,14 +55,14 @@ const handleBubbleItemClick = (editor: Editor) => {
       }"
       :class="{ 'bg-gray-200 !text-black': isActive({ editor }) }"
       :title="title"
-      class="text-gray-600 text-lg hover:bg-gray-100 p-2 rounded-md"
+      class="rounded-md p-2 text-lg text-gray-600 hover:bg-gray-100"
       @click="handleBubbleItemClick(editor)"
     >
-      <component :is="icon" :style="iconStyle" class="w-5 h-5" />
+      <component :is="icon" :style="iconStyle" class="h-5 w-5" />
     </button>
     <template #popper>
       <div
-        class="relative rounded-md bg-white overflow-hidden shadow w-96 p-1 max-h-72 overflow-y-auto"
+        class="relative max-h-72 w-96 overflow-hidden overflow-y-auto rounded-md bg-white p-1 shadow"
       >
         <KeepAlive>
           <component :is="componentRef" v-bind="props"></component>

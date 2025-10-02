@@ -22,6 +22,18 @@ java {
     toolchain {
         languageVersion = JavaLanguageVersion.of(21)
     }
+    withJavadocJar()
+    withSourcesJar()
+}
+
+jar {
+    manifest {
+        attributes(
+                'Implementation-Title': project.name,
+                'Implementation-Version': project.version,
+                'Implementation-Vendor': 'Halo Project',
+        )
+    }
 }
 
 repositories {
@@ -35,7 +47,6 @@ dependencies {
     annotationProcessor platform(project(':platform:application'))
 
     api 'org.springframework.boot:spring-boot-starter-actuator'
-    api 'org.springframework.boot:spring-boot-starter-data-jpa'
     api 'org.springframework.boot:spring-boot-starter-mail'
     api 'org.springframework.boot:spring-boot-starter-thymeleaf'
     api 'org.springframework.boot:spring-boot-starter-webflux'
@@ -48,6 +59,8 @@ dependencies {
     api 'org.springframework.security:spring-security-oauth2-jose'
     api 'org.springframework.security:spring-security-oauth2-client'
     api 'org.springframework.security:spring-security-oauth2-resource-server'
+
+    api 'io.micrometer:context-propagation'
 
     // Cache
     api "org.springframework.boot:spring-boot-starter-cache"
@@ -76,6 +89,7 @@ dependencies {
     api "org.thymeleaf.extras:thymeleaf-extras-springsecurity6"
     api 'org.apache.tika:tika-core'
     api "org.imgscalr:imgscalr-lib"
+    api 'net.coobird:thumbnailator'
     api 'com.drewnoakes:metadata-extractor'
 
     api "io.github.resilience4j:resilience4j-spring-boot3"
@@ -97,11 +111,6 @@ dependencies {
     testImplementation 'io.projectreactor:reactor-test'
 
     testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
-}
-
-java {
-    withSourcesJar()
-    withJavadocJar()
 }
 
 publishing {
