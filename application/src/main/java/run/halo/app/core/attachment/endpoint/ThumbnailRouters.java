@@ -149,8 +149,7 @@ class ThumbnailRouters {
     private Mono<Resource> generateThumbnail(
         String filename, Path attachmentPath, Path thumbnailPath, ThumbnailSize size
     ) {
-        return Mono.fromFuture(() -> inProgress.computeIfAbsent(filename,
-                    f ->
+        return Mono.fromFuture(() -> inProgress.computeIfAbsent(filename, f ->
                         CompletableFuture.supplyAsync(() -> generateThumbnail(
                                     attachmentPath, thumbnailPath, size
                                 ),
@@ -160,8 +159,10 @@ class ThumbnailRouters {
                                 DEFAULT_GENERATION_TIMEOUT_SECONDS,
                                 TimeUnit.SECONDS
                             )
-                            .whenComplete((p, t) -> inProgress.remove(filename))
-                ),
+                    )
+                    // Remove the entry from the map when the task is complete outside the
+                    // computeIfAbsent to prevent the recursive update
+                    .whenComplete((p, t) -> inProgress.remove(filename)),
                 // We don't want to cancel the thumbnail generation task
                 // when some requests are cancelled
                 true
