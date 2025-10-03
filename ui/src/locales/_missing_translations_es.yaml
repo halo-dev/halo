@@ -234,6 +234,9 @@ core:
       toast:
         group_name_exists: Group name already exists
     policy_editing_modal:
+      fields:
+        config:
+          label: Policy configuration
       toast:
         policy_name_exists: Storage policy name already exists
     upload_modal:

@@ -112,9 +112,8 @@ const isSubmitting = ref(false);
 
 const handleSave = async (data: {
   displayName: string;
-  [key: string]: unknown;
+  config: Record<string, unknown>;
 }) => {
-  console.log(data);
   try {
     isSubmitting.value = true;
     if (isUpdateMode.value) {
@@ -125,18 +124,18 @@ const handleSave = async (data: {
       await consoleApiClient.storage.policy.updatePolicyConfigByGroup({
         name: policy.value.metadata.name,
         group: CONFIG_MAP_GROUP,
-        body: data,
+        body: data.config,
       });
 
-      await coreApiClient.storage.policy.updatePolicy({
+      await coreApiClient.storage.policy.patchPolicy({
         name: policy.value.metadata.name,
-        policy: {
-          ...policy.value,
-          spec: {
-            ...policy.value.spec,
-            displayName: data.displayName,
+        jsonPatchInner: [
+          {
+            op: "add",
+            path: "/spec/displayName",
+            value: data.displayName,
           },
-        },
+        ],
       });
     } else {
       const { data: policies } =
@@ -157,7 +156,7 @@ const handleSave = async (data: {
         await coreApiClient.configMap.createConfigMap({
           configMap: {
             data: {
-              [CONFIG_MAP_GROUP]: JSON.stringify(data),
+              [CONFIG_MAP_GROUP]: JSON.stringify(data.config || {}),
             },
             apiVersion: "v1alpha1",
             kind: "ConfigMap",
@@ -207,16 +206,14 @@ const modalTitle = props.policy
     ref="modal"
     mount-to-body
     :title="modalTitle"
-    :width="600"
+    :width="650"
     @close="emit('close')"
   >
     <div>
       <VLoading v-if="isLoading" />
       <template v-else>
         <FormKit
-          v-if="formSchema && configMapGroupData"
           id="attachment-policy-form"
-          :value="toRaw(configMapGroupData) || {}"
           name="attachment-policy-form"
           :preserve="true"
           type="form"
@@ -235,10 +232,20 @@ const modalTitle = props.policy
             name="displayName"
             validation="required|length:0,50"
           ></FormKit>
-          <FormKitSchema
-            :schema="toRaw(formSchema)"
-            :data="toRaw(configMapGroupData) || {}"
-          />
+          <FormKit
+            v-if="formSchema && configMapGroupData"
+            :value="toRaw(configMapGroupData) || {}"
+            type="group"
+            name="config"
+            :label="
+              $t('core.attachment.policy_editing_modal.fields.config.label')
+            "
+          >
+            <FormKitSchema
+              :schema="toRaw(formSchema)"
+              :data="toRaw(configMapGroupData) || {}"
+            />
+          </FormKit>
         </FormKit>
       </template>
     </div>

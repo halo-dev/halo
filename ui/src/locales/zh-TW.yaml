@@ -689,6 +689,8 @@ core:
       fields:
         display_name:
           label: 名稱
+        config:
+          label: 策略配置
       toast:
         policy_name_exists: 儲存策略名稱已存在
     upload_modal:
