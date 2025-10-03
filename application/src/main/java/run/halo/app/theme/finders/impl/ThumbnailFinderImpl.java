@@ -4,8 +4,8 @@ import java.net.URI;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import reactor.core.publisher.Mono;
-import run.halo.app.core.attachment.thumbnail.ThumbnailService;
 import run.halo.app.core.attachment.ThumbnailSize;
+import run.halo.app.core.attachment.thumbnail.ThumbnailService;
 import run.halo.app.theme.finders.Finder;
 import run.halo.app.theme.finders.ThumbnailFinder;
 
