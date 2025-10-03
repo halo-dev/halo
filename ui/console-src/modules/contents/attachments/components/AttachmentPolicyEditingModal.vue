@@ -1,8 +1,9 @@
 <script lang="ts" setup>
 import SubmitButton from "@/components/button/SubmitButton.vue";
+import { attachmentPolicyLabels } from "@/constants/labels";
 import { setFocus } from "@/formkit/utils/focus";
 import type { FormKitSchemaCondition, FormKitSchemaNode } from "@formkit/core";
-import type { Policy } from "@halo-dev/api-client";
+import type { JsonPatchInner, Policy } from "@halo-dev/api-client";
 import { consoleApiClient, coreApiClient } from "@halo-dev/api-client";
 import { Toast, VButton, VLoading, VModal, VSpace } from "@halo-dev/components";
 import { useQuery } from "@tanstack/vue-query";
@@ -112,6 +113,7 @@ const isSubmitting = ref(false);
 
 const handleSave = async (data: {
   displayName: string;
+  hidden: string;
   config: Record<string, unknown>;
 }) => {
   try {
@@ -127,15 +129,33 @@ const handleSave = async (data: {
         body: data.config,
       });
 
+      const jsonPatchInner: JsonPatchInner[] = [
+        {
+          op: "add",
+          path: "/spec/displayName",
+          value: data.displayName,
+        },
+      ];
+
+      if (policy.value.metadata.labels) {
+        jsonPatchInner.push({
+          op: "add",
+          path: `/metadata/labels/${attachmentPolicyLabels.HIDDEN_WITH_JSON_PATCH}`,
+          value: data.hidden,
+        });
+      } else {
+        jsonPatchInner.push({
+          op: "add",
+          path: `/metadata/labels`,
+          value: {
+            [attachmentPolicyLabels.HIDDEN]: data.hidden,
+          },
+        });
+      }
+
       await coreApiClient.storage.policy.patchPolicy({
         name: policy.value.metadata.name,
-        jsonPatchInner: [
-          {
-            op: "add",
-            path: "/spec/displayName",
-            value: data.displayName,
-          },
-        ],
+        jsonPatchInner: jsonPatchInner,
       });
     } else {
       const { data: policies } =
@@ -179,6 +199,9 @@ const handleSave = async (data: {
           metadata: {
             name: "",
             generateName: "attachment-policy-",
+            labels: {
+              [attachmentPolicyLabels.HIDDEN]: data.hidden,
+            },
           },
         },
       });
@@ -231,6 +254,22 @@ const modalTitle = props.policy
             type="text"
             name="displayName"
             validation="required|length:0,50"
+          ></FormKit>
+          <FormKit
+            name="hidden"
+            :value="
+              policy?.metadata.labels?.[attachmentPolicyLabels.HIDDEN] ||
+              'false'
+            "
+            type="checkbox"
+            :label="
+              $t('core.attachment.policy_editing_modal.fields.hidden.label')
+            "
+            :help="
+              $t('core.attachment.policy_editing_modal.fields.hidden.help')
+            "
+            on-value="true"
+            off-value="false"
           ></FormKit>
           <FormKit
             v-if="formSchema && configMapGroupData"

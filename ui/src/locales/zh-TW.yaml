@@ -691,6 +691,9 @@ core:
           label: 名稱
         config:
           label: 策略配置
+        hidden:
+          label: 在上傳介面隱藏
+          help: 開啟後，會在上傳介面隱藏該儲存策略
       toast:
         policy_name_exists: 儲存策略名稱已存在
     upload_modal:

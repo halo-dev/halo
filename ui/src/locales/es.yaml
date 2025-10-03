@@ -504,6 +504,9 @@ core:
       fields:
         display_name:
           label: Nombre para Mostrar
+        hidden:
+          label: Hide in upload interface
+          help: When enabled, this storage policy will be hidden in the upload interface
     upload_modal:
       title: Cargar adjunto
       filters:
