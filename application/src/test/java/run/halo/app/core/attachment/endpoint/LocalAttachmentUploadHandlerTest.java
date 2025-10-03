@@ -5,6 +5,8 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.params.provider.Arguments.arguments;
+import static org.mockito.Mockito.lenient;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import java.net.URI;
@@ -25,6 +27,7 @@ import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.core.io.buffer.DataBuffer;
 import org.springframework.core.io.buffer.DefaultDataBufferFactory;
@@ -32,9 +35,11 @@ import org.springframework.http.MediaType;
 import reactor.core.publisher.Flux;
 import reactor.test.StepVerifier;
 import run.halo.app.core.attachment.AttachmentRootGetter;
+import run.halo.app.core.attachment.thumbnail.LocalThumbnailService;
 import run.halo.app.core.extension.attachment.Attachment;
 import run.halo.app.core.extension.attachment.Constant;
 import run.halo.app.core.extension.attachment.Policy;
+import run.halo.app.core.extension.attachment.endpoint.AttachmentHandler;
 import run.halo.app.core.extension.attachment.endpoint.UploadOption;
 import run.halo.app.extension.ConfigMap;
 import run.halo.app.extension.Metadata;
@@ -52,15 +57,18 @@ class LocalAttachmentUploadHandlerTest {
     @Mock
     ExternalUrlSupplier externalUrlSupplier;
 
+    @Mock
+    LocalThumbnailService localThumbnailService;
+
     @TempDir
-    Path tempDir;
+    Path attachmentRoot;
 
     static Clock clock = Clock.fixed(Instant.now(), ZoneId.systemDefault());
 
     @BeforeEach
     void setUp() {
         uploadHandler.setClock(clock);
-        when(externalUrlSupplier.get()).thenReturn(URI.create("/"));
+        lenient().when(externalUrlSupplier.get()).thenReturn(URI.create("/"));
     }
 
     public static Stream<Arguments> testUploadWithRenameStrategy() {
@@ -201,7 +209,7 @@ class LocalAttachmentUploadHandlerTest {
         var uploadOption =
             UploadOption.from("halo.png", content, MediaType.IMAGE_PNG, policy, configMap);
 
-        when(attachmentRootGetter.get()).thenReturn(tempDir);
+        when(attachmentRootGetter.get()).thenReturn(attachmentRoot);
         uploadHandler.upload(uploadOption)
             .as(StepVerifier::create)
             .assertNext(attachment -> {
@@ -225,4 +233,40 @@ class LocalAttachmentUploadHandlerTest {
         assertEquals("/path/with%20space.png", permalink.get().toASCIIString());
     }
 
+    @Test
+    void shouldDeleteWithThumbnails() {
+        var deleteContext = Mockito.mock(AttachmentHandler.DeleteContext.class);
+        when(deleteContext.policy()).thenReturn(createPolicy("local"));
+        var attachment =
+            createAttachment(Map.of(Constant.LOCAL_REL_PATH_ANNO_KEY, "path/to/file.png"));
+        when(deleteContext.attachment()).thenReturn(attachment);
+        when(attachmentRootGetter.get()).thenReturn(attachmentRoot);
+        uploadHandler.delete(deleteContext)
+            .as(StepVerifier::create)
+            .expectNext(attachment)
+            .verifyComplete();
+
+        verify(this.localThumbnailService).delete(attachmentRoot
+            .resolve("path")
+            .resolve("to")
+            .resolve("file.png")
+        );
+    }
+
+    Attachment createAttachment(Map<String, String> annotations) {
+        var attachment = new Attachment();
+        attachment.setMetadata(new Metadata());
+        attachment.getMetadata().setName("fake-attachment");
+        attachment.getMetadata().setAnnotations(annotations);
+        return attachment;
+    }
+
+    Policy createPolicy(String templateName) {
+        var policy = new Policy();
+        policy.setMetadata(new Metadata());
+        policy.getMetadata().setName("fake-policy");
+        policy.setSpec(new Policy.PolicySpec());
+        policy.getSpec().setTemplateName(templateName);
+        return policy;
+    }
 }

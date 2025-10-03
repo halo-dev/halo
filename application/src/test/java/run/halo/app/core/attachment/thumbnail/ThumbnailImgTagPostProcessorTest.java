@@ -1,4 +1,4 @@
-package run.halo.app.core.attachment;
+package run.halo.app.core.attachment.thumbnail;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -20,6 +20,7 @@ import org.thymeleaf.model.AttributeValueQuotes;
 import org.thymeleaf.model.IModelFactory;
 import reactor.core.publisher.Mono;
 import reactor.test.StepVerifier;
+import run.halo.app.core.attachment.ThumbnailSize;
 
 @ExtendWith(MockitoExtension.class)
 class ThumbnailImgTagPostProcessorTest {

@@ -1,4 +1,4 @@
-package run.halo.app.core.attachment;
+package run.halo.app.core.attachment.thumbnail;
 
 import static org.thymeleaf.templatemode.TemplateMode.HTML;
 

@@ -15,7 +15,6 @@ import java.nio.file.Path;
 import java.time.Clock;
 import java.time.Duration;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
@@ -44,7 +43,8 @@ import reactor.core.scheduler.Schedulers;
 import reactor.util.retry.Retry;
 import run.halo.app.core.attachment.AttachmentRootGetter;
 import run.halo.app.core.attachment.ThumbnailSize;
-import run.halo.app.core.attachment.ThumbnailUtils;
+import run.halo.app.core.attachment.thumbnail.LocalThumbnailService;
+import run.halo.app.core.attachment.thumbnail.ThumbnailUtils;
 import run.halo.app.core.extension.attachment.Attachment;
 import run.halo.app.core.extension.attachment.Attachment.AttachmentSpec;
 import run.halo.app.core.extension.attachment.Constant;
@@ -67,18 +67,21 @@ class LocalAttachmentUploadHandler implements AttachmentHandler {
 
     private static final String UPLOAD_PATH = "upload";
 
-    private static final String THUMBNAILS_PATH = "thumbnails";
-
     private final AttachmentRootGetter attachmentDirGetter;
 
     private final ExternalUrlSupplier externalUrl;
 
+    private final LocalThumbnailService localThumbnailService;
+
     private Clock clock = Clock.systemUTC();
 
-    public LocalAttachmentUploadHandler(AttachmentRootGetter attachmentDirGetter,
-        ExternalUrlSupplier externalUrl) {
+    public LocalAttachmentUploadHandler(
+        AttachmentRootGetter attachmentDirGetter,
+        ExternalUrlSupplier externalUrl,
+        LocalThumbnailService localThumbnailService) {
         this.attachmentDirGetter = attachmentDirGetter;
         this.externalUrl = externalUrl;
+        this.localThumbnailService = localThumbnailService;
     }
 
     /**
@@ -328,24 +331,7 @@ class LocalAttachmentUploadHandler implements AttachmentHandler {
     }
 
     private void deleteThumbnails(Path attachmentPath) {
-        var attachmentsRoot = attachmentDirGetter.get();
-        var thumbnailsRoot = attachmentsRoot.resolve(THUMBNAILS_PATH);
-        var relativeAttachmentPath =
-            attachmentsRoot.resolve(UPLOAD_PATH).relativize(attachmentPath);
-        log.info("Cleaning up thumbnails for {}", relativeAttachmentPath);
-        Arrays.stream(ThumbnailSize.values())
-            .forEach(thumbnailSize -> {
-                var thumbnailPath = thumbnailsRoot.resolve("w" + thumbnailSize.getWidth())
-                    .resolve(relativeAttachmentPath);
-                try {
-                    Files.deleteIfExists(thumbnailPath);
-                    log.info("Deleted thumbnail {}", thumbnailPath);
-                } catch (IOException e) {
-                    // ignore the exception to continue deleting other
-                    // thumbnails
-                    log.warn("Cannot delete thumbnail {}", thumbnailPath, e);
-                }
-            });
+        this.localThumbnailService.delete(attachmentPath);
     }
 
     private boolean shouldHandle(Policy policy) {
