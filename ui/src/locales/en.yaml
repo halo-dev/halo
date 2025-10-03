@@ -752,6 +752,11 @@ core:
           label: Display name
         config:
           label: Policy configuration
+        hidden:
+          label: Hide on upload screen
+          help: >-
+            If enabled, this storage policy will not be visible on the upload
+            screen
       toast:
         policy_name_exists: Storage policy name already exists
     upload_modal:
