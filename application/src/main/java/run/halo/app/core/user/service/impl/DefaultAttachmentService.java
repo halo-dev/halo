@@ -26,7 +26,7 @@ import org.springframework.web.server.ServerWebInputException;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import run.halo.app.core.attachment.ThumbnailSize;
-import run.halo.app.core.attachment.ThumbnailUtils;
+import run.halo.app.core.attachment.thumbnail.ThumbnailUtils;
 import run.halo.app.core.extension.attachment.Attachment;
 import run.halo.app.core.extension.attachment.Policy;
 import run.halo.app.core.extension.attachment.endpoint.AttachmentHandler;

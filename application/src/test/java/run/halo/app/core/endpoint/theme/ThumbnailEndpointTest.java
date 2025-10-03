@@ -11,8 +11,8 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.test.web.reactive.server.WebTestClient;
 import reactor.core.publisher.Mono;
-import run.halo.app.core.attachment.ThumbnailService;
 import run.halo.app.core.attachment.ThumbnailSize;
+import run.halo.app.core.attachment.thumbnail.ThumbnailService;
 
 /**
  * Tests for {@link ThumbnailEndpoint}.

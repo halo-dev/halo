@@ -1,8 +1,9 @@
-package run.halo.app.core.attachment;
+package run.halo.app.core.attachment.thumbnail;
 
 import java.net.URI;
 import java.util.Map;
 import reactor.core.publisher.Mono;
+import run.halo.app.core.attachment.ThumbnailSize;
 
 /**
  * Service for managing thumbnails.

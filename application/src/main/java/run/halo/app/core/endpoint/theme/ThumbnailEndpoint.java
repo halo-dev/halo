@@ -18,8 +18,8 @@ import org.springframework.web.reactive.function.server.ServerRequest;
 import org.springframework.web.reactive.function.server.ServerResponse;
 import org.springframework.web.server.ServerWebInputException;
 import reactor.core.publisher.Mono;
-import run.halo.app.core.attachment.ThumbnailService;
 import run.halo.app.core.attachment.ThumbnailSize;
+import run.halo.app.core.attachment.thumbnail.ThumbnailService;
 import run.halo.app.core.extension.endpoint.CustomEndpoint;
 import run.halo.app.extension.GroupVersion;
 
