@@ -11,6 +11,7 @@ import java.util.Objects;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.boot.autoconfigure.web.WebProperties;
 import org.springframework.boot.autoconfigure.web.reactive.WebFluxRegistrations;
+import org.springframework.cache.concurrent.ConcurrentMapCache;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -32,11 +33,15 @@ import org.springframework.web.reactive.config.WebFluxConfigurer;
 import org.springframework.web.reactive.function.server.RouterFunction;
 import org.springframework.web.reactive.function.server.RouterFunctions;
 import org.springframework.web.reactive.function.server.ServerResponse;
+import org.springframework.web.reactive.resource.CachingResourceResolver;
 import org.springframework.web.reactive.resource.EncodedResourceResolver;
 import org.springframework.web.reactive.resource.PathResourceResolver;
 import org.springframework.web.reactive.result.method.annotation.RequestMappingHandlerAdapter;
 import org.springframework.web.reactive.result.view.ViewResolutionResultHandler;
 import org.springframework.web.reactive.result.view.ViewResolver;
+import run.halo.app.core.attachment.AttachmentRootGetter;
+import run.halo.app.core.attachment.thumbnail.LocalThumbnailService;
+import run.halo.app.core.attachment.thumbnail.ThumbnailResourceTransformer;
 import run.halo.app.core.endpoint.WebSocketHandlerMapping;
 import run.halo.app.core.endpoint.console.CustomEndpointsBuilder;
 import run.halo.app.core.extension.endpoint.CustomEndpoint;
@@ -61,14 +66,22 @@ public class WebFluxConfig implements WebFluxConfigurer {
 
     private final ApplicationContext applicationContext;
 
+    private final LocalThumbnailService localThumbnailService;
+
+    private final AttachmentRootGetter attachmentRootGetter;
+
     public WebFluxConfig(ObjectMapper objectMapper,
         HaloProperties haloProp,
         WebProperties webProperties,
-        ApplicationContext applicationContext) {
+        ApplicationContext applicationContext,
+        LocalThumbnailService localThumbnailService,
+        AttachmentRootGetter attachmentRootGetter) {
         this.objectMapper = objectMapper;
         this.haloProp = haloProp;
         this.resourceProperties = webProperties.getResources();
         this.applicationContext = applicationContext;
+        this.localThumbnailService = localThumbnailService;
+        this.attachmentRootGetter = attachmentRootGetter;
     }
 
     @Bean
@@ -157,7 +170,7 @@ public class WebFluxConfig implements WebFluxConfigurer {
 
     @Override
     public void addResourceHandlers(ResourceHandlerRegistry registry) {
-        var attachmentsRoot = haloProp.getWorkDir().resolve("attachments");
+        var attachmentsRoot = attachmentRootGetter.get();
         var cacheControl = resourceProperties.getCache()
             .getCachecontrol()
             .toHttpCacheControl();
@@ -206,7 +219,11 @@ public class WebFluxConfig implements WebFluxConfigurer {
                 checkDirectoryTraversal(attachmentsRoot, path);
                 registration.addResourceLocations(FILE_URL_PREFIX + path + "/");
             }
+            if (registration != uploadRegistration) {
+                applyThumbnailChain(registration);
+            }
         }
+        applyThumbnailChain(uploadRegistration);
 
         var haloStaticPath = haloProp.getWorkDir().resolve("static");
         registry.addResourceHandler("/**")
@@ -217,6 +234,16 @@ public class WebFluxConfig implements WebFluxConfigurer {
             .resourceChain(true)
             .addResolver(new EncodedResourceResolver())
             .addResolver(new PathResourceResolver());
+    }
+
+    private void applyThumbnailChain(ResourceHandlerRegistration registration) {
+        registration.resourceChain(false)
+            .addResolver(
+                new CachingResourceResolver(new ConcurrentMapCache("halo-resource-chain-cache"))
+            )
+            .addTransformer(
+                new ThumbnailResourceTransformer(localThumbnailService)
+            );
     }
 
 

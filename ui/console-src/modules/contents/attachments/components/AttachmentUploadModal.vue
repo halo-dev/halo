@@ -1,4 +1,5 @@
 <script lang="ts" setup>
+import { attachmentPolicyLabels } from "@/constants/labels";
 import type { PolicyTemplate } from "@halo-dev/api-client";
 import {
   IconAddCircle,
@@ -9,7 +10,7 @@ import {
   VTabItem,
   VTabs,
 } from "@halo-dev/components";
-import { onMounted, ref } from "vue";
+import { computed, onMounted, ref } from "vue";
 import { useFetchAttachmentGroup } from "../composables/use-attachment-group";
 import {
   useFetchAttachmentPolicy,
@@ -30,10 +31,6 @@ const emit = defineEmits<{
   (event: "close"): void;
 }>();
 
-const { groups, handleFetchGroups } = useFetchAttachmentGroup();
-const { policies, handleFetchPolicies } = useFetchAttachmentPolicy();
-const { policyTemplates } = useFetchAttachmentPolicyTemplate();
-
 const modal = ref<InstanceType<typeof VModal> | null>(null);
 const selectedGroupName = ref(initialGroupName || "");
 const selectedPolicyName = ref(initialPolicyName);
@@ -41,10 +38,23 @@ const policyEditingModal = ref(false);
 const groupEditingModal = ref(false);
 const policyTemplateNameToCreate = ref();
 
+const { groups, handleFetchGroups } = useFetchAttachmentGroup();
+const { policyTemplates } = useFetchAttachmentPolicyTemplate();
+const { policies: allPolicies, handleFetchPolicies } =
+  useFetchAttachmentPolicy();
+
+const policies = computed(() => {
+  return allPolicies.value?.filter((policy) => {
+    return policy.metadata.labels?.[attachmentPolicyLabels.HIDDEN] !== "true";
+  });
+});
+
 onMounted(() => {
-  if (!selectedPolicyName.value) {
-    selectedPolicyName.value = policies.value?.[0].metadata.name;
-  }
+  const initialPolicy = policies.value?.find(
+    (p) => p.metadata.name === initialPolicyName
+  );
+  selectedPolicyName.value =
+    initialPolicy?.metadata.name || policies.value?.[0]?.metadata.name;
 });
 
 const handleOpenCreateNewPolicyModal = async (

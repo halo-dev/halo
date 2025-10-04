@@ -1,4 +1,4 @@
-package run.halo.app.core.attachment;
+package run.halo.app.core.attachment.thumbnail;
 
 import java.net.URI;
 import java.util.Arrays;
@@ -8,7 +8,9 @@ import java.util.stream.Collectors;
 import org.apache.commons.io.FilenameUtils;
 import org.springframework.http.MediaType;
 import org.springframework.util.MimeType;
+import org.springframework.util.StringUtils;
 import org.springframework.web.util.UriComponentsBuilder;
+import run.halo.app.core.attachment.ThumbnailSize;
 
 public enum ThumbnailUtils {
     ;
@@ -31,6 +33,9 @@ public enum ThumbnailUtils {
      * @return true if the file suffix is supported, false otherwise
      */
     public static boolean isSupportedImage(String fileSuffix) {
+        if (!StringUtils.hasText(fileSuffix)) {
+            return false;
+        }
         return SUPPORTED_IMAGE_SUFFIXES.contains(fileSuffix.toLowerCase());
     }
 

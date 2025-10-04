@@ -704,6 +704,11 @@ core:
       fields:
         display_name:
           label: 名称
+        config:
+          label: 策略配置
+        hidden:
+          label: 在上传界面隐藏
+          help: 开启后，会在上传界面隐藏该存储策略
       toast:
         policy_name_exists: 存储策略名称已存在
     upload_modal:

@@ -13,7 +13,7 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import reactor.core.publisher.Mono;
 import reactor.test.StepVerifier;
-import run.halo.app.core.attachment.ThumbnailService;
+import run.halo.app.core.attachment.thumbnail.ThumbnailService;
 
 /**
  * Tests for {@link ThumbnailFinderImpl}.

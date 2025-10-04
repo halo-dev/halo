@@ -1,4 +1,4 @@
-package run.halo.app.core.attachment.impl;
+package run.halo.app.core.attachment.thumbnail;
 
 import static org.mockito.ArgumentMatchers.isA;
 import static org.mockito.ArgumentMatchers.same;
@@ -22,13 +22,13 @@ import run.halo.app.extension.Metadata;
 import run.halo.app.extension.ReactiveExtensionClient;
 
 @ExtendWith(MockitoExtension.class)
-class ThumbnailServiceImplTest {
+class DefaultThumbnailServiceTest {
 
     @Mock
     ReactiveExtensionClient client;
 
     @InjectMocks
-    ThumbnailServiceImpl thumbnailService;
+    DefaultThumbnailService thumbnailService;
 
     @Test
     void shouldGetEmptyThumbnailIfNoAttachmentsFound() {

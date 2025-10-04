@@ -1,4 +1,4 @@
-package run.halo.app.core.attachment.impl;
+package run.halo.app.core.attachment.thumbnail;
 
 import com.github.benmanes.caffeine.cache.Cache;
 import com.github.benmanes.caffeine.cache.Caffeine;
@@ -13,7 +13,6 @@ import org.springframework.util.CollectionUtils;
 import org.springframework.util.StringUtils;
 import reactor.core.publisher.Mono;
 import run.halo.app.core.attachment.AttachmentChangedEvent;
-import run.halo.app.core.attachment.ThumbnailService;
 import run.halo.app.core.attachment.ThumbnailSize;
 import run.halo.app.core.extension.attachment.Attachment;
 import run.halo.app.extension.ExtensionUtil;
@@ -32,7 +31,7 @@ import run.halo.app.extension.index.query.QueryFactory;
  */
 @Slf4j
 @Component
-class ThumbnailServiceImpl implements ThumbnailService {
+class DefaultThumbnailService implements ThumbnailService {
 
     private static final Map<ThumbnailSize, URI> EMPTY_THUMBNAILS = Map.of();
 
@@ -40,7 +39,7 @@ class ThumbnailServiceImpl implements ThumbnailService {
 
     private final ReactiveExtensionClient client;
 
-    public ThumbnailServiceImpl(ReactiveExtensionClient client) {
+    public DefaultThumbnailService(ReactiveExtensionClient client) {
         this.client = client;
         this.thumbnailCache = Caffeine.newBuilder()
             // TODO make it configurable
