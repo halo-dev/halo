@@ -5,11 +5,14 @@ import static run.halo.app.extension.index.query.QueryFactory.equal;
 import static run.halo.app.extension.index.query.QueryFactory.in;
 import static run.halo.app.extension.index.query.QueryFactory.notEqual;
 
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import org.apache.commons.lang3.BooleanUtils;
@@ -294,6 +297,26 @@ public class PostFinderImpl implements PostFinder {
             .collectList()
             .flatMap(postPublicQueryService::convertToListedVos)
             .flatMapMany(Flux::fromIterable);
+    }
+
+    @Override
+    public Flux<ListedPostVo> random(Integer limit) {
+        return postPredicateResolver.getListOptions().flatMapMany(listOptions -> {
+            long total = client.indexedQueryEngine()
+                .retrieve(Post.GVK, listOptions, PageRequestImpl.ofSize(1)).getTotal();
+            return Flux.fromIterable(
+                    shufflePostList(IntStream.rangeClosed(1, (int) total).boxed().toList()).subList(0,
+                        limit == null || limit < 0 ? 0 : Math.min(limit, (int) total)
+                    ))
+                .flatMapSequential(pageNum -> client.listBy(Post.class, listOptions,
+                    PageRequestImpl.of(pageNum, 1)).flatMapIterable(ListResult::getItems));
+        }).flatMapSequential(postPublicQueryService::convertToListedVo);
+    }
+
+    private <T> List<T> shufflePostList(List<T> list) {
+        List<T> shuffledList = new ArrayList<>(list);
+        Collections.shuffle(shuffledList);
+        return shuffledList;
     }
 
     static int pageNullSafe(Integer page) {
