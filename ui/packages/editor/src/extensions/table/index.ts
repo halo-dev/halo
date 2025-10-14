@@ -225,7 +225,7 @@ const Table = TiptapTable.extend<ExtensionOptions & TableOptions>({
       allowTableNodeSelection: false,
       getToolboxItems({ editor }: { editor: Editor }) {
         return {
-          priority: 15,
+          priority: 40,
           component: markRaw(ToolboxItem),
           props: {
             editor,

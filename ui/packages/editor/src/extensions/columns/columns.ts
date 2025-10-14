@@ -188,7 +188,7 @@ const Columns = Node.create({
       getToolboxItems({ editor }: { editor: Editor }) {
         return [
           {
-            priority: 50,
+            priority: 70,
             component: markRaw(ToolboxItem),
             props: {
               editor,
