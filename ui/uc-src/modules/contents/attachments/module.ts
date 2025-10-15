@@ -1,8 +1,10 @@
 import { definePlugin } from "@halo-dev/console-shared";
-import AttachmentSelectorModal from "./components/AttachmentSelectorModal.vue";
+import { defineAsyncComponent } from "vue";
 
 export default definePlugin({
   components: {
-    AttachmentSelectorModal,
+    AttachmentSelectorModal: defineAsyncComponent(
+      () => import("./components/AttachmentSelectorModal.vue")
+    ),
   },
 });
