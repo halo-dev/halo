@@ -323,7 +323,7 @@ export default TiptapCodeBlock.extend<ExtensionCodeBlockOptions>({
       getToolboxItems({ editor }: { editor: Editor }) {
         return [
           {
-            priority: 50,
+            priority: 60,
             component: markRaw(ToolboxItem),
             props: {
               editor,

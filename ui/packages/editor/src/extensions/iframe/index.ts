@@ -243,7 +243,7 @@ const Iframe = Node.create<ExtensionOptions>({
       getToolboxItems({ editor }: { editor: Editor }) {
         return [
           {
-            priority: 40,
+            priority: 50,
             component: markRaw(ToolboxItem),
             props: {
               editor,
