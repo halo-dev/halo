@@ -44,9 +44,21 @@ const { policies: allPolicies, handleFetchPolicies } =
   useFetchAttachmentPolicy();
 
 const policies = computed(() => {
-  return allPolicies.value?.filter((policy) => {
-    return policy.metadata.labels?.[attachmentPolicyLabels.HIDDEN] !== "true";
-  });
+  return allPolicies.value
+    ?.filter((policy) => {
+      return policy.metadata.labels?.[attachmentPolicyLabels.HIDDEN] !== "true";
+    })
+    .sort((a, b) => {
+      const priorityA = parseInt(
+        a.metadata.labels?.[attachmentPolicyLabels.PRIORITY] || "0",
+        10
+      );
+      const priorityB = parseInt(
+        b.metadata.labels?.[attachmentPolicyLabels.PRIORITY] || "0",
+        10
+      );
+      return priorityB - priorityA;
+    });
 });
 
 onMounted(() => {

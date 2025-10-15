@@ -757,6 +757,11 @@ core:
           help: >-
             If enabled, this storage policy will not be visible on the upload
             screen
+        priority:
+          label: Display priority on upload screen
+          help: >-
+            Set the display priority on the upload screen. The higher the
+            number, the closer it appears to the top of the list
       toast:
         policy_name_exists: Storage policy name already exists
     upload_modal:

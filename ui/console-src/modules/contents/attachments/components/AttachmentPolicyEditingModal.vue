@@ -114,6 +114,7 @@ const isSubmitting = ref(false);
 const handleSave = async (data: {
   displayName: string;
   hidden: string;
+  priority: string;
   config: Record<string, unknown>;
 }) => {
   try {
@@ -143,12 +144,18 @@ const handleSave = async (data: {
           path: `/metadata/labels/${attachmentPolicyLabels.HIDDEN_WITH_JSON_PATCH}`,
           value: data.hidden,
         });
+        jsonPatchInner.push({
+          op: "add",
+          path: `/metadata/labels/${attachmentPolicyLabels.PRIORITY_WITH_JSON_PATCH}`,
+          value: data.priority || "0",
+        });
       } else {
         jsonPatchInner.push({
           op: "add",
           path: `/metadata/labels`,
           value: {
             [attachmentPolicyLabels.HIDDEN]: data.hidden,
+            [attachmentPolicyLabels.PRIORITY]: data.priority || "0",
           },
         });
       }
@@ -237,6 +244,7 @@ const modalTitle = props.policy
       <template v-else>
         <FormKit
           id="attachment-policy-form"
+          v-slot="{ value }"
           name="attachment-policy-form"
           :preserve="true"
           type="form"
@@ -270,6 +278,18 @@ const modalTitle = props.policy
             "
             on-value="true"
             off-value="false"
+          ></FormKit>
+          <FormKit
+            v-if="value?.hidden === 'false'"
+            name="priority"
+            :value="policy?.metadata.labels?.[attachmentPolicyLabels.PRIORITY]"
+            type="number"
+            :label="
+              $t('core.attachment.policy_editing_modal.fields.priority.label')
+            "
+            :help="
+              $t('core.attachment.policy_editing_modal.fields.priority.help')
+            "
           ></FormKit>
           <FormKit
             v-if="formSchema && configMapGroupData"

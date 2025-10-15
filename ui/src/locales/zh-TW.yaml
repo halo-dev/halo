@@ -694,6 +694,9 @@ core:
         hidden:
           label: 在上傳介面隱藏
           help: 開啟後，會在上傳介面隱藏該儲存策略
+        priority:
+          label: 上傳介面顯示優先權
+          help: 設置在上傳界面的顯示優先權，數字越大，排序越靠前
       toast:
         policy_name_exists: 儲存策略名稱已存在
     upload_modal:

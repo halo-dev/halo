@@ -34,4 +34,6 @@ export enum attachmentPolicyLabels {
   // Used for ui display only
   HIDDEN = "storage.halo.run/policy-hidden-in-upload-ui",
   HIDDEN_WITH_JSON_PATCH = "storage.halo.run~1policy-hidden-in-upload-ui",
+  PRIORITY = "storage.halo.run/policy-priority-in-upload-ui",
+  PRIORITY_WITH_JSON_PATCH = "storage.halo.run~1policy-priority-in-upload-ui",
 }
