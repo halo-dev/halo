@@ -1650,6 +1650,14 @@ core:
         attachment: 選擇附件
         show_hide_sidebar: 顯示 / 隱藏側邊欄
       title_placeholder: 請輸入標題
+      cover:
+        options:
+          add: 添加封面圖
+          change: 更換
+          upload: 上傳
+          attachment: 從附件庫選擇
+        toast:
+          upload_failed: "上傳封面圖失敗: {message}"
     global_search:
       placeholder: 輸入關鍵字以搜尋
       no_results: 沒有搜尋結果

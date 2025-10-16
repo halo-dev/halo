@@ -69,6 +69,7 @@ import {
   IconImageAddLine,
   IconLink,
   IconUserFollow,
+  Toast,
   VButton,
   VDropdown,
   VDropdownItem,
@@ -559,6 +560,15 @@ onCoverInputChange((files) => {
     })
     .then((attachment) => {
       emit("update:cover", attachment.status?.permalink);
+    })
+    .catch((e: Error) => {
+      Toast.error(
+        t("core.components.default_editor.cover.toast.upload_failed", {
+          message: e.message,
+        })
+      );
+    })
+    .finally(() => {
       uploadProgress.value = 0;
     });
 });
@@ -598,7 +608,7 @@ onCoverInputChange((files) => {
               class="flex flex-col items-center justify-center bg-black/50 text-white"
             >
               <VLoading class="!py-3" />
-              <span>{{ uploadProgress }}%</span>
+              <span class="text-sm">{{ uploadProgress }}%</span>
             </div>
             <HasPermission
               :permissions="[
@@ -614,19 +624,29 @@ onCoverInputChange((files) => {
                     <template #icon>
                       <IconExchange />
                     </template>
-                    Change Cover
+                    {{
+                      $t("core.components.default_editor.cover.options.change")
+                    }}
                   </VButton>
                   <template #popper>
                     <HasPermission :permissions="['uc:attachments:manage']">
                       <VDropdownItem @click="openCoverInputDialog()">
-                        Upload
+                        {{
+                          $t(
+                            "core.components.default_editor.cover.options.upload"
+                          )
+                        }}
                       </VDropdownItem>
                     </HasPermission>
                     <VDropdownItem @click="coverSelectorModalVisible = true">
-                      Select from attachment library
+                      {{
+                        $t(
+                          "core.components.default_editor.cover.options.attachment"
+                        )
+                      }}
                     </VDropdownItem>
                     <VDropdownItem @click="emit('update:cover', undefined)">
-                      Remove
+                      {{ $t("core.common.buttons.delete") }}
                     </VDropdownItem>
                   </template>
                 </VDropdown>
@@ -648,16 +668,24 @@ onCoverInputChange((files) => {
                   <template #icon>
                     <IconImageAddLine />
                   </template>
-                  Add Cover
+                  {{ $t("core.components.default_editor.cover.options.add") }}
                 </VButton>
                 <template #popper>
                   <HasPermission :permissions="['uc:attachments:manage']">
                     <VDropdownItem @click="openCoverInputDialog()">
-                      Upload
+                      {{
+                        $t(
+                          "core.components.default_editor.cover.options.upload"
+                        )
+                      }}
                     </VDropdownItem>
                   </HasPermission>
                   <VDropdownItem @click="coverSelectorModalVisible = true">
-                    Select from attachment library
+                    {{
+                      $t(
+                        "core.components.default_editor.cover.options.attachment"
+                      )
+                    }}
                   </VDropdownItem>
                 </template>
               </VDropdown>
