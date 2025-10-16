@@ -56,20 +56,29 @@ import { i18n } from "@/locales";
 import { usePluginModuleStore } from "@/stores/plugin";
 import { formatDatetime } from "@/utils/date";
 import { usePermission } from "@/utils/permission";
-import type { Attachment } from "@halo-dev/api-client";
+import { generateThumbnailUrl } from "@/utils/thumbnail";
+import {
+  GetThumbnailByUriSizeEnum,
+  type Attachment,
+} from "@halo-dev/api-client";
 import {
   IconCalendar,
   IconCharacterRecognition,
+  IconExchange,
   IconFolder,
+  IconImageAddLine,
   IconLink,
   IconUserFollow,
+  VButton,
+  VDropdown,
+  VDropdownItem,
   VLoading,
   VTabItem,
   VTabs,
 } from "@halo-dev/components";
 import type { AttachmentLike } from "@halo-dev/console-shared";
 import ExtensionCharacterCount from "@tiptap/extension-character-count";
-import { useDebounceFn, useLocalStorage } from "@vueuse/core";
+import { useDebounceFn, useFileDialog, useLocalStorage } from "@vueuse/core";
 import type { AxiosRequestConfig } from "axios";
 import { OverlayScrollbarsComponent } from "overlayscrollbars-vue";
 import {
@@ -110,6 +119,7 @@ const props = withDefaults(
     title?: string;
     raw?: string;
     content: string;
+    cover?: string;
     uploadImage?: (
       file: File,
       options?: AxiosRequestConfig
@@ -119,6 +129,7 @@ const props = withDefaults(
     title: "",
     raw: "",
     content: "",
+    cover: undefined,
     uploadImage: undefined,
   }
 );
@@ -128,6 +139,7 @@ const emit = defineEmits<{
   (event: "update:raw", value: string): void;
   (event: "update:content", value: string): void;
   (event: "update", value: string): void;
+  (event: "update:cover", value: string | undefined): void;
 }>();
 
 const owner = inject<ComputedRef<string | undefined>>("owner");
@@ -505,6 +517,50 @@ function handleFocusEditor(event) {
   }
   editor.value?.commands.focus("start");
 }
+
+// Cover
+const coverSelectorModalVisible = ref(false);
+
+function onCoverSelect(attachments: AttachmentLike[]) {
+  const attachment = attachments[0];
+  if (!attachment) {
+    return;
+  }
+  if (typeof attachment === "string") {
+    emit("update:cover", attachment);
+  } else if ("url" in attachment) {
+    emit("update:cover", attachment.url);
+  } else {
+    emit("update:cover", attachment.status?.permalink);
+  }
+}
+
+const { onChange: onCoverInputChange, open: openCoverInputDialog } =
+  useFileDialog({
+    accept: "image/*", // Set to accept only image files
+    multiple: false,
+  });
+
+const uploadProgress = ref(0);
+
+onCoverInputChange((files) => {
+  const file = files?.[0];
+  if (!file) {
+    return;
+  }
+  props
+    .uploadImage?.(file, {
+      onUploadProgress: (progress) => {
+        uploadProgress.value = Math.round(
+          (progress.loaded * 100) / (progress.total || 1)
+        );
+      },
+    })
+    .then((attachment) => {
+      emit("update:cover", attachment.status?.permalink);
+      uploadProgress.value = 0;
+    });
+});
 </script>
 
 <template>
@@ -516,17 +572,93 @@ function handleFocusEditor(event) {
       @select="onAttachmentSelect"
       @close="handleCloseAttachmentSelectorModal"
     />
+    <!-- For cover image -->
+    <AttachmentSelectorModal
+      v-model:visible="coverSelectorModalVisible"
+      :min="1"
+      :max="1"
+      :accepts="['image/*']"
+      @select="onCoverSelect"
+    />
     <RichTextEditor v-if="editor" :editor="editor" :locale="currentLocale">
       <template #content>
-        <input
-          ref="editorTitleRef"
-          :value="title"
-          type="text"
-          :placeholder="$t('core.components.default_editor.title_placeholder')"
-          class="w-full border-x-0 !border-b border-t-0 !border-solid !border-gray-100 p-0 !py-2 text-4xl font-semibold leading-none placeholder:text-gray-300"
-          @input="onTitleInput"
-          @keydown.enter="handleFocusEditor"
-        />
+        <div class="group">
+          <div
+            v-if="cover || uploadProgress"
+            class="group/cover aspect-h-7 aspect-w-16 overflow-hidden rounded-lg"
+          >
+            <img
+              v-if="cover"
+              :src="generateThumbnailUrl(cover, GetThumbnailByUriSizeEnum.Xl)"
+              class="size-full object-cover"
+            />
+            <div
+              v-if="uploadProgress"
+              class="flex flex-col items-center justify-center bg-black/50 text-white"
+            >
+              <VLoading class="!py-3" />
+              <span>{{ uploadProgress }}%</span>
+            </div>
+            <div
+              class="!bottom-2 !left-auto !right-2 !top-auto !size-auto opacity-0 shadow-lg transition-opacity group-hover/cover:opacity-100"
+            >
+              <VDropdown>
+                <VButton type="secondary" size="sm">
+                  <template #icon>
+                    <IconExchange />
+                  </template>
+                  Change Cover
+                </VButton>
+                <template #popper>
+                  <VDropdownItem @click="openCoverInputDialog()">
+                    Upload
+                  </VDropdownItem>
+                  <VDropdownItem @click="coverSelectorModalVisible = true">
+                    Select from attachment library
+                  </VDropdownItem>
+                  <VDropdownItem @click="emit('update:cover')">
+                    Remove
+                  </VDropdownItem>
+                </template>
+              </VDropdown>
+            </div>
+          </div>
+          <div
+            class="mt-2 opacity-0"
+            :class="{
+              'group-hover:opacity-100': !cover,
+              'pointer-events-none': cover,
+            }"
+          >
+            <VDropdown class="!inline-flex">
+              <VButton size="xs">
+                <template #icon>
+                  <IconImageAddLine />
+                </template>
+                Add Cover
+              </VButton>
+              <template #popper>
+                <VDropdownItem @click="openCoverInputDialog()">
+                  Upload
+                </VDropdownItem>
+                <VDropdownItem @click="coverSelectorModalVisible = true">
+                  Select from attachment library
+                </VDropdownItem>
+              </template>
+            </VDropdown>
+          </div>
+          <input
+            ref="editorTitleRef"
+            :value="title"
+            type="text"
+            :placeholder="
+              $t('core.components.default_editor.title_placeholder')
+            "
+            class="w-full border-x-0 !border-b border-t-0 !border-solid !border-gray-100 p-0 !py-2 text-4xl font-semibold leading-none placeholder:text-gray-300"
+            @input="onTitleInput"
+            @keydown.enter="handleFocusEditor"
+          />
+        </div>
       </template>
       <template v-if="showSidebar" #extra>
         <OverlayScrollbarsComponent
