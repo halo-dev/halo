@@ -101,6 +101,7 @@ import MdiFormatHeader4 from "~icons/mdi/format-header-4";
 import MdiFormatHeader5 from "~icons/mdi/format-header-5";
 import MdiFormatHeader6 from "~icons/mdi/format-header-6";
 import RiLayoutRightLine from "~icons/ri/layout-right-line";
+import HasPermission from "../permission/HasPermission.vue";
 import { useAttachmentSelect } from "./composables/use-attachment";
 import { useExtension } from "./composables/use-extension";
 import {
@@ -599,54 +600,69 @@ onCoverInputChange((files) => {
               <VLoading class="!py-3" />
               <span>{{ uploadProgress }}%</span>
             </div>
-            <div
-              class="!bottom-2 !left-auto !right-2 !top-auto !size-auto opacity-0 shadow-lg transition-opacity group-hover/cover:opacity-100"
+            <HasPermission
+              :permissions="[
+                'system:attachments:view',
+                'uc:attachments:manage',
+              ]"
             >
-              <VDropdown>
-                <VButton type="secondary" size="sm">
-                  <template #icon>
-                    <IconExchange />
+              <div
+                class="!bottom-2 !left-auto !right-2 !top-auto !size-auto opacity-0 shadow-lg transition-opacity group-hover/cover:opacity-100"
+              >
+                <VDropdown>
+                  <VButton type="secondary" size="sm">
+                    <template #icon>
+                      <IconExchange />
+                    </template>
+                    Change Cover
+                  </VButton>
+                  <template #popper>
+                    <HasPermission :permissions="['uc:attachments:manage']">
+                      <VDropdownItem @click="openCoverInputDialog()">
+                        Upload
+                      </VDropdownItem>
+                    </HasPermission>
+                    <VDropdownItem @click="coverSelectorModalVisible = true">
+                      Select from attachment library
+                    </VDropdownItem>
+                    <VDropdownItem @click="emit('update:cover', undefined)">
+                      Remove
+                    </VDropdownItem>
                   </template>
-                  Change Cover
+                </VDropdown>
+              </div>
+            </HasPermission>
+          </div>
+          <HasPermission
+            :permissions="['system:attachments:view', 'uc:attachments:manage']"
+          >
+            <div
+              class="mt-2 opacity-0"
+              :class="{
+                'group-hover:opacity-100': !cover,
+                'pointer-events-none': cover,
+              }"
+            >
+              <VDropdown class="!inline-flex">
+                <VButton size="xs">
+                  <template #icon>
+                    <IconImageAddLine />
+                  </template>
+                  Add Cover
                 </VButton>
                 <template #popper>
-                  <VDropdownItem @click="openCoverInputDialog()">
-                    Upload
-                  </VDropdownItem>
+                  <HasPermission :permissions="['uc:attachments:manage']">
+                    <VDropdownItem @click="openCoverInputDialog()">
+                      Upload
+                    </VDropdownItem>
+                  </HasPermission>
                   <VDropdownItem @click="coverSelectorModalVisible = true">
                     Select from attachment library
-                  </VDropdownItem>
-                  <VDropdownItem @click="emit('update:cover')">
-                    Remove
                   </VDropdownItem>
                 </template>
               </VDropdown>
             </div>
-          </div>
-          <div
-            class="mt-2 opacity-0"
-            :class="{
-              'group-hover:opacity-100': !cover,
-              'pointer-events-none': cover,
-            }"
-          >
-            <VDropdown class="!inline-flex">
-              <VButton size="xs">
-                <template #icon>
-                  <IconImageAddLine />
-                </template>
-                Add Cover
-              </VButton>
-              <template #popper>
-                <VDropdownItem @click="openCoverInputDialog()">
-                  Upload
-                </VDropdownItem>
-                <VDropdownItem @click="coverSelectorModalVisible = true">
-                  Select from attachment library
-                </VDropdownItem>
-              </template>
-            </VDropdown>
-          </div>
+          </HasPermission>
           <input
             ref="editorTitleRef"
             :value="title"

@@ -31,7 +31,7 @@ import {
   VPageHeader,
 } from "@halo-dev/components";
 import type { EditorProvider } from "@halo-dev/console-shared";
-import { useLocalStorage, watchDeep } from "@vueuse/core";
+import { useLocalStorage } from "@vueuse/core";
 import { useRouteQuery } from "@vueuse/router";
 import type { AxiosRequestConfig } from "axios";
 import { isEqual } from "lodash-es";
@@ -43,6 +43,7 @@ import {
   provide,
   ref,
   toRef,
+  watch,
   type ComputedRef,
 } from "vue";
 import { useI18n } from "vue-i18n";
@@ -129,7 +130,7 @@ const saving = ref(false);
 const publishing = ref(false);
 
 const needsUpdatePost = ref(false);
-watchDeep(
+watch(
   [
     () => formState.value.post.spec.title,
     () => formState.value.post.spec.cover,
