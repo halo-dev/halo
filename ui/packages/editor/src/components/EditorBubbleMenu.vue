@@ -51,22 +51,26 @@ const getBubbleMenuFromExtensions = (): NodeBubbleMenuType[] => {
     }
 
     const extendsBubbleMenus = extendsBubbleMap.get(bubbleMenu.pluginKey) ?? [];
-    return mergeBubbleMenuItems(bubbleMenu, extendsBubbleMenus);
+    return mergeBubbleMenu(bubbleMenu, extendsBubbleMenus);
   });
 };
 
 /**
- * Merge bubble menu items
+ * Merge bubble menu
  *
  * If the item has a key, it will be overwritten if it exists in the extendsBubbleMenus.
  * If the item does not have a key, it will be appended to the end of the items.
  * If the extendsBubbleMenus has a key, but it is not found in the items, it will be appended to the end of the items.
  *
+ * For shouldShow: all shouldShow functions from the original and extended bubble menus will be merged.
+ * The merged bubble menu will only be shown if all shouldShow functions return true.
+ * If a shouldShow is not defined, it defaults to true.
+ *
  * @param bubbleMenu - The bubble menu to merge.
  * @param extendsBubbleMenus - The extends bubble menus to merge.
  * @returns The merged bubble menu.
  */
-const mergeBubbleMenuItems = (
+const mergeBubbleMenu = (
   bubbleMenu: NodeBubbleMenuType,
   extendsBubbleMenus: NodeBubbleMenuType[]
 ): NodeBubbleMenuType => {
@@ -97,9 +101,25 @@ const mergeBubbleMenuItems = (
   });
 
   const mergedItems = [...Array.from(keyedItems.values()), ...nonKeyedItems];
+
+  const shouldShowFunctions = [
+    bubbleMenu.shouldShow,
+    ...extendsBubbleMenus.map((menu) => menu.shouldShow),
+  ].filter((fn) => fn !== undefined);
+
+  const mergedShouldShow =
+    shouldShowFunctions.length > 0
+      ? (
+          props: Parameters<NonNullable<NodeBubbleMenuType["shouldShow"]>>[0]
+        ) => {
+          return shouldShowFunctions.every((fn) => (fn ? fn(props) : true));
+        }
+      : undefined;
+
   return {
     ...bubbleMenu,
     items: sortBubbleMenuItems(mergedItems),
+    shouldShow: mergedShouldShow,
   };
 };
 
