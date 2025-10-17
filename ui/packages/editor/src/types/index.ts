@@ -92,7 +92,6 @@ export interface NodeBubbleMenuType extends BubbleMenuProps {
   items?: BubbleItemType[];
   extendsKey?: string | PluginKey;
 }
-
 export interface BubbleItemType {
   priority: number;
   component?: Component;
@@ -104,8 +103,9 @@ export interface BubbleItemType {
     iconStyle?: string;
     title?: string;
     action?: ({ editor }: { editor: Editor }) => Component | boolean | void;
-  };
+  } & Record<string, unknown>;
 }
+
 export interface ToolboxItemType {
   priority: number;
   component: Component;
