@@ -18,12 +18,14 @@ import lombok.extern.slf4j.Slf4j;
 import net.coobird.thumbnailator.ThumbnailParameter;
 import net.coobird.thumbnailator.Thumbnails;
 import org.springframework.beans.factory.DisposableBean;
-import org.springframework.core.io.FileSystemResource;
+import org.springframework.core.io.PathResource;
 import org.springframework.core.io.Resource;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Mono;
 import run.halo.app.core.attachment.AttachmentRootGetter;
 import run.halo.app.core.attachment.ThumbnailSize;
+import run.halo.app.infra.properties.AttachmentProperties;
+import run.halo.app.infra.properties.HaloProperties;
 
 /**
  * Default implementation of {@link LocalThumbnailService} that generates thumbnails using
@@ -53,10 +55,18 @@ class DefaultLocalThumbnailService implements LocalThumbnailService, DisposableB
      */
     private final ConcurrentMap<Path, CompletableFuture<Path>> inProgress;
 
-    public DefaultLocalThumbnailService(AttachmentRootGetter attachmentRootGetter) {
+    private final AttachmentProperties.ThumbnailProperties thumbnailProperties;
+
+    public DefaultLocalThumbnailService(AttachmentRootGetter attachmentRootGetter,
+        HaloProperties haloProperties) {
         this.attachmentRootGetter = attachmentRootGetter;
+        this.thumbnailProperties = haloProperties.getAttachment().getThumbnail();
+        var concurrentThreads = this.thumbnailProperties.getConcurrentThreads();
+        if (concurrentThreads == null || concurrentThreads < 1) {
+            concurrentThreads = DEFAULT_GENERATION_CONCURRENT_THREADS;
+        }
         this.executorService =
-            Executors.newFixedThreadPool(DEFAULT_GENERATION_CONCURRENT_THREADS, Thread.ofPlatform()
+            Executors.newFixedThreadPool(concurrentThreads, Thread.ofPlatform()
                 .daemon()
                 .name("thumbnail-generator-", 0)
                 .factory());
@@ -74,6 +84,9 @@ class DefaultLocalThumbnailService implements LocalThumbnailService, DisposableB
 
     @Override
     public Mono<Resource> generate(Path source, ThumbnailSize size) {
+        if (thumbnailProperties.isDisabled()) {
+            return Mono.just(new PathResource(source));
+        }
         return Mono.fromFuture(() -> inProgress.computeIfAbsent(source, f ->
                         CompletableFuture.supplyAsync(() -> generateThumbnail(
                                     source, size
@@ -90,7 +103,7 @@ class DefaultLocalThumbnailService implements LocalThumbnailService, DisposableB
                 // when some requests are cancelled
                 true
             )
-            .map(FileSystemResource::new);
+            .map(PathResource::new);
     }
 
     @Override
