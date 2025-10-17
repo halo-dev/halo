@@ -8,6 +8,7 @@ import {
   mergeAttributes,
   VueNodeViewRenderer,
   type Editor,
+  type Range,
 } from "@/tiptap/vue-3";
 import type { ExtensionOptions, NodeBubbleMenuType } from "@/types";
 import { deleteNode } from "@/utils";
@@ -126,6 +127,25 @@ const Image = TiptapImage.extend<ExtensionOptions & ImageOptions>({
             },
           },
         ];
+      },
+      getCommandMenuItems() {
+        return {
+          priority: 95,
+          icon: markRaw(MdiFileImageBox),
+          title: "editor.extensions.commands_menu.image",
+          keywords: ["image", "tupian"],
+          command: ({ editor, range }: { editor: Editor; range: Range }) => {
+            editor
+              .chain()
+              .focus()
+              .deleteRange(range)
+              .insertContent([
+                { type: "image", attrs: { src: "" } },
+                { type: "paragraph", content: "" },
+              ])
+              .run();
+          },
+        };
       },
       getBubbleMenu({ editor }: { editor: Editor }): NodeBubbleMenuType {
         return {
