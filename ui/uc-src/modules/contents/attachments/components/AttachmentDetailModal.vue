@@ -12,7 +12,7 @@ import {
   VSpace,
 } from "@halo-dev/components";
 import prettyBytes from "pretty-bytes";
-import { ref, useTemplateRef } from "vue";
+import { useTemplateRef } from "vue";
 
 withDefaults(
   defineProps<{
@@ -29,7 +29,6 @@ const emit = defineEmits<{
 }>();
 
 const modal = useTemplateRef<InstanceType<typeof VModal> | null>("modal");
-const onlyPreview = ref(false);
 </script>
 <template>
   <VModal
@@ -51,107 +50,94 @@ const onlyPreview = ref(false);
     </template>
     <div>
       <div class="overflow-hidden bg-white">
-        <div
-          v-if="onlyPreview && isImage(attachment?.spec.mediaType)"
-          class="flex justify-center p-4"
-        >
-          <img
-            v-tooltip.bottom="
-              $t('core.uc_attachment.detail_modal.preview.click_to_exit')
-            "
-            :alt="attachment?.spec.displayName"
-            :src="attachment?.status?.permalink"
-            class="w-auto transform-gpu cursor-pointer rounded"
-            @click="onlyPreview = !onlyPreview"
-          />
-        </div>
-        <div v-else>
-          <VDescription>
-            <VDescriptionItem
-              :label="$t('core.uc_attachment.detail_modal.fields.preview')"
+        <VDescription>
+          <VDescriptionItem
+            :label="$t('core.uc_attachment.detail_modal.fields.preview')"
+          >
+            <a
+              v-if="isImage(attachment?.spec.mediaType)"
+              target="_blank"
+              :href="attachment.status?.permalink"
             >
-              <div
-                v-if="isImage(attachment?.spec.mediaType)"
-                @click="onlyPreview = !onlyPreview"
+              <LazyImage
+                v-tooltip="{
+                  content: attachment?.status?.permalink,
+                  placement: 'bottom',
+                }"
+                :alt="attachment?.spec.displayName"
+                :src="
+                  attachment?.status?.thumbnails?.M ||
+                  attachment?.status?.permalink
+                "
+                classes="max-w-full cursor-pointer rounded"
               >
-                <LazyImage
-                  :alt="attachment?.spec.displayName"
-                  :src="
-                    attachment?.status?.thumbnails?.M ||
-                    attachment?.status?.permalink
-                  "
-                  classes="max-w-full cursor-pointer rounded sm:max-w-[50%]"
-                >
-                  <template #loading>
-                    <span class="text-gray-400">
-                      {{ $t("core.common.status.loading") }}...
-                    </span>
-                  </template>
-                  <template #error>
-                    <span class="text-red-400">
-                      {{ $t("core.common.status.loading_error") }}
-                    </span>
-                  </template>
-                </LazyImage>
-              </div>
-              <div v-else-if="attachment?.spec.mediaType?.startsWith('video/')">
-                <video
-                  :src="attachment.status?.permalink"
-                  controls
-                  class="max-w-full rounded sm:max-w-[50%]"
-                >
-                  {{
-                    $t(
-                      "core.uc_attachment.detail_modal.preview.video_not_support"
-                    )
-                  }}
-                </video>
-              </div>
-              <div v-else-if="attachment?.spec.mediaType?.startsWith('audio/')">
-                <audio :src="attachment.status?.permalink" controls>
-                  {{
-                    $t(
-                      "core.uc_attachment.detail_modal.preview.audio_not_support"
-                    )
-                  }}
-                </audio>
-              </div>
-              <span v-else>
-                {{ $t("core.uc_attachment.detail_modal.preview.not_support") }}
-              </span>
-            </VDescriptionItem>
-            <VDescriptionItem
-              :label="$t('core.uc_attachment.detail_modal.fields.display_name')"
-            >
-              <span>
-                {{ attachment?.spec.displayName }}
-              </span>
-            </VDescriptionItem>
-            <VDescriptionItem
-              :label="$t('core.uc_attachment.detail_modal.fields.media_type')"
-              :content="attachment?.spec.mediaType"
-            />
-            <VDescriptionItem
-              :label="$t('core.uc_attachment.detail_modal.fields.size')"
-              :content="prettyBytes(attachment?.spec.size || 0)"
-            />
-            <VDescriptionItem
-              :label="$t('core.uc_attachment.detail_modal.fields.owner')"
-              :content="attachment?.spec.ownerName"
-            />
-            <VDescriptionItem
-              :label="
-                $t('core.uc_attachment.detail_modal.fields.creation_time')
-              "
-              :content="formatDatetime(attachment?.metadata.creationTimestamp)"
-            />
-            <VDescriptionItem
-              :label="$t('core.uc_attachment.detail_modal.fields.permalink')"
-            >
-              <AttachmentPermalinkList :attachment="attachment" />
-            </VDescriptionItem>
-          </VDescription>
-        </div>
+                <template #loading>
+                  <span class="text-gray-400">
+                    {{ $t("core.common.status.loading") }}...
+                  </span>
+                </template>
+                <template #error>
+                  <span class="text-red-400">
+                    {{ $t("core.common.status.loading_error") }}
+                  </span>
+                </template>
+              </LazyImage>
+            </a>
+            <div v-else-if="attachment?.spec.mediaType?.startsWith('video/')">
+              <video
+                :src="attachment.status?.permalink"
+                controls
+                class="max-w-full rounded sm:max-w-[50%]"
+              >
+                {{
+                  $t(
+                    "core.uc_attachment.detail_modal.preview.video_not_support"
+                  )
+                }}
+              </video>
+            </div>
+            <div v-else-if="attachment?.spec.mediaType?.startsWith('audio/')">
+              <audio :src="attachment.status?.permalink" controls>
+                {{
+                  $t(
+                    "core.uc_attachment.detail_modal.preview.audio_not_support"
+                  )
+                }}
+              </audio>
+            </div>
+            <span v-else>
+              {{ $t("core.uc_attachment.detail_modal.preview.not_support") }}
+            </span>
+          </VDescriptionItem>
+          <VDescriptionItem
+            :label="$t('core.uc_attachment.detail_modal.fields.display_name')"
+          >
+            <span>
+              {{ attachment?.spec.displayName }}
+            </span>
+          </VDescriptionItem>
+          <VDescriptionItem
+            :label="$t('core.uc_attachment.detail_modal.fields.media_type')"
+            :content="attachment?.spec.mediaType"
+          />
+          <VDescriptionItem
+            :label="$t('core.uc_attachment.detail_modal.fields.size')"
+            :content="prettyBytes(attachment?.spec.size || 0)"
+          />
+          <VDescriptionItem
+            :label="$t('core.uc_attachment.detail_modal.fields.owner')"
+            :content="attachment?.spec.ownerName"
+          />
+          <VDescriptionItem
+            :label="$t('core.uc_attachment.detail_modal.fields.creation_time')"
+            :content="formatDatetime(attachment?.metadata.creationTimestamp)"
+          />
+          <VDescriptionItem
+            :label="$t('core.uc_attachment.detail_modal.fields.permalink')"
+          >
+            <AttachmentPermalinkList :attachment="attachment" />
+          </VDescriptionItem>
+        </VDescription>
       </div>
     </div>
 

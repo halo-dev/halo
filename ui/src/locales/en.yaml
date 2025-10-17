@@ -688,7 +688,6 @@ core:
         permalink: Permalink
         thumbnails: Thumbnails
       preview:
-        click_to_exit: Click to exit preview
         video_not_support: The current browser does not support video playback.
         audio_not_support: The current browser does not support audio playback.
         not_support: This file does not support preview.
