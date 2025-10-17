@@ -1,7 +1,7 @@
 import { i18n } from "@/locales";
 import { Dialog, Toast } from "@halo-dev/components";
 import {
-  CoreEditor,
+  Editor,
   Extension,
   Plugin,
   PluginKey,
@@ -20,7 +20,7 @@ export const Upload = Extension.create({
   name: "upload",
 
   addProseMirrorPlugins() {
-    const { editor }: { editor: CoreEditor } = this;
+    const { editor }: { editor: Editor } = this;
 
     return [
       new Plugin({

@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { i18n } from "@/locales";
-import type { Editor } from "@/tiptap/vue-3";
+import type { Editor } from "@/tiptap";
 import { isAllowedUri } from "@/utils/is-allowed-uri";
 import { computed, type Component } from "vue";
 import Iframe from "./index";

@@ -1,15 +1,16 @@
 import { BlockActionSeparator, ToolboxItem } from "@/components";
 import { i18n } from "@/locales";
 import {
-  CoreEditor,
+  Editor,
   findParentNode,
   isActive,
   isNodeActive,
   mergeAttributes,
-  type Editor,
+  posToDOMRect,
   type Range,
 } from "@/tiptap";
 import {
+  PluginKey,
   TextSelection,
   type DOMOutputSpec,
   type EditorState,
@@ -18,8 +19,9 @@ import {
   type ViewMutationRecord,
 } from "@/tiptap/pm";
 import type { ExtensionOptions, NodeBubbleMenuType } from "@/types";
-import TiptapTable, {
+import {
   createColGroup,
+  Table as TiptapTable,
   type TableOptions,
 } from "@tiptap/extension-table";
 import { markRaw } from "vue";
@@ -106,7 +108,7 @@ function updateColumns(
   }
 }
 
-let editor: CoreEditor | undefined = undefined;
+let editor: Editor | undefined = undefined;
 
 class TableView implements NodeView {
   node: ProseMirrorNode;
@@ -207,6 +209,8 @@ class TableView implements NodeView {
   }
 }
 
+export const TABLE_BUBBLE_MENU_KEY = new PluginKey("tableBubbleMenu");
+
 const Table = TiptapTable.extend<ExtensionOptions & TableOptions>({
   allowGapCursor: true,
 
@@ -258,26 +262,33 @@ const Table = TiptapTable.extend<ExtensionOptions & TableOptions>({
       },
       getBubbleMenu({ editor }): NodeBubbleMenuType {
         return {
-          pluginKey: "tableBubbleMenu",
+          pluginKey: TABLE_BUBBLE_MENU_KEY,
           shouldShow: ({ state }: { state: EditorState }): boolean => {
             return isActive(state, Table.name);
           },
-          getRenderContainer(node) {
-            let container = node;
-            if (container.nodeName === "#text") {
-              container = node.parentElement as HTMLElement;
-            }
-            while (
-              container &&
-              container.classList &&
-              !container.classList.contains("tableWrapper")
-            ) {
-              container = container.parentElement as HTMLElement;
-            }
-            return container;
+          options: {
+            placement: "bottom-start",
           },
-          tippyOptions: {
-            offset: [26, 0],
+          getReferencedVirtualElement() {
+            const editor = this.editor;
+            if (!editor) {
+              return null;
+            }
+            const parentNode = findParentNode(
+              (node) => node.type.name === Table.name
+            )(editor.state.selection);
+            if (parentNode) {
+              const domRect = posToDOMRect(
+                editor.view,
+                parentNode.start,
+                parentNode.start + parentNode.node.nodeSize - 2
+              );
+              return {
+                getBoundingClientRect: () => domRect,
+                getClientRects: () => [domRect],
+              };
+            }
+            return null;
           },
           items: [
             {

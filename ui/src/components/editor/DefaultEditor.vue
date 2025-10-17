@@ -6,6 +6,7 @@ import {
   ExtensionBlockquote,
   ExtensionBold,
   ExtensionBulletList,
+  ExtensionCharacterCount,
   ExtensionClearFormat,
   ExtensionCode,
   ExtensionCodeBlock,
@@ -49,6 +50,7 @@ import {
   RichTextEditor,
   ToolbarItem,
   ToolboxItem,
+  VueEditor,
   type Extensions,
 } from "@halo-dev/richtext-editor";
 // ui custom extension
@@ -68,7 +70,6 @@ import {
   VTabs,
 } from "@halo-dev/components";
 import type { AttachmentLike } from "@halo-dev/console-shared";
-import ExtensionCharacterCount from "@tiptap/extension-character-count";
 import { useDebounceFn, useLocalStorage } from "@vueuse/core";
 import type { AxiosRequestConfig } from "axios";
 import { OverlayScrollbarsComponent } from "overlayscrollbars-vue";
@@ -168,7 +169,7 @@ const headingNodes = ref<HeadingNode[]>();
 const selectedHeadingNode = ref<HeadingNode>();
 const extraActiveId = ref("toc");
 
-const editor = shallowRef<Editor>();
+const editor = shallowRef<VueEditor>();
 const editorTitleRef = ref();
 
 const { pluginModules } = usePluginModuleStore();
@@ -445,7 +446,7 @@ onMounted(async () => {
     ...extensionsFromPlugins,
   ]);
 
-  editor.value = new Editor({
+  editor.value = new VueEditor({
     content: props.raw,
     extensions,
     parseOptions: {

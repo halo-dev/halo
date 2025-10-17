@@ -1,5 +1,5 @@
 import { i18n } from "@/locales";
-import type { Editor } from "@/tiptap/vue-3";
+import type { Editor } from "@/tiptap";
 import type { ExtensionOptions } from "@/types";
 import type { HighlightOptions } from "@tiptap/extension-highlight";
 import TiptapHighlight from "@tiptap/extension-highlight";
@@ -7,7 +7,9 @@ import { markRaw } from "vue";
 import MdiFormatColorHighlight from "~icons/mdi/format-color-highlight";
 import HighlightToolbarItem from "./HighlightToolbarItem.vue";
 
-const Highlight = TiptapHighlight.extend<ExtensionOptions & HighlightOptions>({
+const Highlight = TiptapHighlight.extend<
+  ExtensionOptions & Partial<HighlightOptions>
+>({
   addOptions() {
     return {
       ...this.parent?.(),

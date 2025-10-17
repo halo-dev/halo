@@ -28,7 +28,7 @@ const loop = computed(() => {
 });
 
 function handleSetFocus() {
-  props.editor.commands.setNodeSelection(props.getPos());
+  props.editor.commands.setNodeSelection(props.getPos() ?? 0);
 }
 
 const inputRef = ref();

@@ -1,13 +1,12 @@
 import ToolbarItem from "@/components/toolbar/ToolbarItem.vue";
 import { i18n } from "@/locales";
-import type { Editor } from "@/tiptap/vue-3";
+import type { Editor } from "@/tiptap";
 import type { ExtensionOptions } from "@/types";
-import type { ItalicOptions } from "@tiptap/extension-italic";
 import TiptapItalic from "@tiptap/extension-italic";
 import { markRaw } from "vue";
 import MdiFormatItalic from "~icons/mdi/format-italic";
 
-const Italic = TiptapItalic.extend<ExtensionOptions & ItalicOptions>({
+const Italic = TiptapItalic.extend<ExtensionOptions>({
   addOptions() {
     return {
       ...this.parent?.(),

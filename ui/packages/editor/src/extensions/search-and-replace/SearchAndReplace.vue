@@ -1,6 +1,7 @@
 <script setup lang="ts" name="BubbleMenu">
 import { i18n } from "@/locales";
-import type { Editor, PluginKey } from "@/tiptap";
+import type { Editor } from "@/tiptap";
+import { PluginKey } from "@/tiptap/pm";
 import { computed, nextTick, ref, watch, type PropType } from "vue";
 import LucideReplace from "~icons/lucide/replace";
 import LucideReplaceAll from "~icons/lucide/replace-all";

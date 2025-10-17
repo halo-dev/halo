@@ -37,7 +37,7 @@ const href = computed({
 });
 
 function handleSetFocus() {
-  props.editor.commands.setNodeSelection(props.getPos());
+  props.editor.commands.setNodeSelection(props.getPos() || 0);
 }
 
 const aspectRatio = ref<number>(0);
@@ -81,7 +81,7 @@ onMounted(() => {
     props.editor
       .chain()
       .updateAttributes(Image.name, { width, height })
-      .setNodeSelection(props.getPos())
+      .setNodeSelection(props.getPos() || 0)
       .focus()
       .run();
   }

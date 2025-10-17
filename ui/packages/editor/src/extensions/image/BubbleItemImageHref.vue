@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { ExtensionImage, ExtensionLink } from "@/extensions";
 import { i18n } from "@/locales";
-import type { Editor } from "@/tiptap/vue-3";
+import type { Editor } from "@/tiptap";
 import { computed, type Component } from "vue";
 
 const props = defineProps<{

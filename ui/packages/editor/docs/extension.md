@@ -278,12 +278,14 @@ interface BubbleMenuProps {
 export interface NodeBubbleMenuType extends BubbleMenuProps {
   component?: Component;                                           // 不使用默认的样式，与 items 二选一
   items?: BubbleItemType[];                                       // 悬浮菜单子项，使用默认的形式进行，与 items 二选一
+  extendsKey?: string | PluginKey;                                 // 用于扩展已有悬浮菜单的 key，如果未提供，则会被视为一个新的悬浮菜单
 }
 
 // 悬浮菜单子项
 export interface BubbleItemType {
   priority: number;                                                // 优先级，数字越小优先级越大，越靠前
   component?: Component;                                           // 完全自定义子项样式
+  key?: string;                                                    // 子项的唯一标识，通常用于扩展悬浮菜单时仅保留唯一的子项。
   props?: {                                                        // 子项属性，可选
     isActive?: ({ editor }: { editor: Editor }) => boolean;         // 当前功能是否已经处于活动状态
     visible?: ({ editor }: { editor: Editor }) => boolean;         // 是否显示当前子项

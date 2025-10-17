@@ -1,6 +1,6 @@
 import ToolbarItemVue from "@/components/toolbar/ToolbarItem.vue";
 import { i18n } from "@/locales";
-import type { Editor } from "@/tiptap/vue-3";
+import type { Editor } from "@/tiptap";
 import type { ExtensionOptions } from "@/types";
 import type { BlockquoteOptions } from "@tiptap/extension-blockquote";
 import TiptapBlockquote from "@tiptap/extension-blockquote";
@@ -8,7 +8,7 @@ import { markRaw } from "vue";
 import MdiFormatQuoteOpen from "~icons/mdi/format-quote-open";
 
 const Blockquote = TiptapBlockquote.extend<
-  ExtensionOptions & BlockquoteOptions
+  ExtensionOptions & Partial<BlockquoteOptions>
 >({
   addOptions() {
     return {
