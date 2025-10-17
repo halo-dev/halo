@@ -29,9 +29,7 @@ springdoc-openapi = 'org.springdoc:springdoc-openapi-starter-webflux-ui:2.8.9'
 openapi-schema-validator = 'org.openapi4j:openapi-schema-validator:1.0.7'
 bouncycastle-bcpkix = 'org.bouncycastle:bcpkix-jdk18on:1.81'
 twofactor-auth = 'com.j256.two-factor-auth:two-factor-auth:1.3'
-imgscalr-lib = 'org.imgscalr:imgscalr-lib:4.2'
-thumbnailator = 'net.coobird:thumbnailator:0.4.20'
-metadata-extractor = 'com.drewnoakes:metadata-extractor:2.19.0'
+thumbnailator = 'net.coobird:thumbnailator:0.4.21'
 
 [bundles]
 lucene = ['lucene-core', 'lucene-queryparser', 'lucene-highlighter', 'lucene-backward-codecs', 'lucene-analyzers-common']
