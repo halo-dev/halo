@@ -709,6 +709,14 @@ core:
       toolbox:
         show_hide_sidebar: Show/Hide Sidebar
       title_placeholder: Please enter the title
+      cover:
+        options:
+          add: Add Cover
+          change: Change Cover
+          upload: Upload
+          attachment: Select from attachment library
+        toast:
+          upload_failed: "Failed to upload cover image: {message}"
     user_avatar:
       title: Avatar
       toast_upload_failed: Failed to upload avatar

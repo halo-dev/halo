@@ -1665,6 +1665,14 @@ core:
         attachment: 选择附件
         show_hide_sidebar: 显示 / 隐藏侧边栏
       title_placeholder: 请输入标题
+      cover:
+        options:
+          add: 添加封面图
+          change: 更换
+          upload: 上传
+          attachment: 从附件库选择
+        toast:
+          upload_failed: "上传封面失败: {message}"
     global_search:
       placeholder: 输入关键词以搜索
       no_results: 没有搜索结果

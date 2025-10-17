@@ -34,6 +34,7 @@ import type { EditorProvider } from "@halo-dev/console-shared";
 import { useLocalStorage } from "@vueuse/core";
 import { useRouteQuery } from "@vueuse/router";
 import type { AxiosRequestConfig } from "axios";
+import { isEqual } from "lodash-es";
 import ShortUniqueId from "short-unique-id";
 import {
   computed,
@@ -128,11 +129,14 @@ const settingModal = ref(false);
 const saving = ref(false);
 const publishing = ref(false);
 
-const isTitleChanged = ref(false);
+const needsUpdatePost = ref(false);
 watch(
-  () => formState.value.post.spec.title,
-  (newValue, oldValue) => {
-    isTitleChanged.value = newValue !== oldValue;
+  [
+    () => formState.value.post.spec.title,
+    () => formState.value.post.spec.cover,
+  ],
+  (value, oldValue) => {
+    needsUpdatePost.value = !isEqual(value, oldValue);
   }
 );
 
@@ -181,8 +185,7 @@ const handleSave = async (options?: { mute?: boolean }) => {
     }
 
     if (isUpdateMode.value) {
-      // Save post title
-      if (isTitleChanged.value) {
+      if (needsUpdatePost.value) {
         formState.value.post = (
           await postUpdateMutate(formState.value.post)
         ).data;
@@ -195,7 +198,7 @@ const handleSave = async (options?: { mute?: boolean }) => {
 
       formState.value.post = data;
 
-      isTitleChanged.value = false;
+      needsUpdatePost.value = false;
     } else {
       // Clear new post content cache
       handleClearCache();
@@ -246,7 +249,7 @@ const handlePublish = async () => {
       const { name: postName } = formState.value.post.metadata;
       const { permalink } = formState.value.post.status || {};
 
-      if (isTitleChanged.value) {
+      if (needsUpdatePost.value) {
         formState.value.post = (
           await postUpdateMutate(formState.value.post)
         ).data;
@@ -366,26 +369,7 @@ const handleFetchContent = async () => {
 };
 
 const handleOpenSettingModal = async () => {
-  if (isTitleChanged.value) {
-    await coreApiClient.content.post.patchPost({
-      name: formState.value.post.metadata.name,
-      jsonPatchInner: [
-        {
-          op: "add",
-          path: "/spec/title",
-          value:
-            formState.value.post.spec.title || t("core.post_editor.untitled"),
-        },
-      ],
-    });
-    isTitleChanged.value = false;
-  }
-
-  const { data: latestPost } = await coreApiClient.content.post.getPost({
-    name: formState.value.post.metadata.name,
-  });
-  formState.value.post = latestPost;
-
+  await handleSave({ mute: true });
   settingModal.value = true;
 };
 
@@ -589,6 +573,7 @@ async function handleUploadImage(file: File, options?: AxiosRequestConfig) {
       v-model:raw="formState.content.raw"
       v-model:content="formState.content.content"
       v-model:title="formState.post.spec.title"
+      v-model:cover="formState.post.spec.cover"
       :upload-image="handleUploadImage"
       class="h-full"
       @update="handleSetContentCache"
