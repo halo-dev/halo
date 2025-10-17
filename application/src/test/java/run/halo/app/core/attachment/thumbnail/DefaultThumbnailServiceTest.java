@@ -45,6 +45,24 @@ class DefaultThumbnailServiceTest {
     }
 
     @Test
+    void shouldGetThumbnailDirectlyIfPermalinkContainsSpecialChars() {
+        thumbnailService.get(URI.create("/images/中文.png"), ThumbnailSize.M)
+            .as(StepVerifier::create)
+            .expectNext(URI.create("/images/%E4%B8%AD%E6%96%87.png?width=800"))
+            .verifyComplete();
+
+        thumbnailService.get(URI.create("/images/space%20space.png"), ThumbnailSize.M)
+            .as(StepVerifier::create)
+            .expectNext(URI.create("/images/space%20space.png?width=800"))
+            .verifyComplete();
+
+        thumbnailService.get(URI.create("/images/percent%2f.png"), ThumbnailSize.M)
+            .as(StepVerifier::create)
+            .expectNext(URI.create("/images/percent%2f.png?width=800"))
+            .verifyComplete();
+    }
+
+    @Test
     void shouldGetThumbnailDirectlyIfPermalinkIsInSite() throws MalformedURLException {
         when(externalUrlSupplier.getRaw()).thenReturn(URI.create("https://www.halo.run").toURL());
         thumbnailService.get(URI.create("https://www.halo.run/images/fake.png"), ThumbnailSize.M)

@@ -47,7 +47,7 @@ public enum ThumbnailUtils {
     /**
      * Build a map of thumbnail size to its corresponding URI based on the given permalink.
      *
-     * @param permalink permalink of the attachment in local storage
+     * @param permalink permalink of the attachment in local storage. Make sure it's encoded.
      * @return a map where the key is the thumbnail size and the value is the URI of the thumbnail
      */
     public static Map<ThumbnailSize, URI> buildSrcsetMap(URI permalink) {

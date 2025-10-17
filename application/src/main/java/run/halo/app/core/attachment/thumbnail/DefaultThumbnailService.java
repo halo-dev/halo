@@ -97,9 +97,10 @@ class DefaultThumbnailService implements ThumbnailService {
 
     @Override
     public Mono<Map<ThumbnailSize, URI>> get(URI permalink) {
-        if (!permalink.isAbsolute()) {
+        var encodedPermalink = URI.create(permalink.toASCIIString());
+        if (!encodedPermalink.isAbsolute()) {
             // build permalinks
-            return Mono.just(ThumbnailUtils.buildSrcsetMap(permalink));
+            return Mono.just(ThumbnailUtils.buildSrcsetMap(encodedPermalink));
         }
         // TODO Optimize concurrent requests for the same permalink
         return Mono.deferContextual(contextView -> {
@@ -108,10 +109,10 @@ class DefaultThumbnailService implements ThumbnailService {
                 .orElseGet(externalUrlSupplier::getRaw);
             // check if the permalink is from local site
             if (externalUrl != null
-                && Objects.equals(externalUrl.getAuthority(), permalink.getAuthority())) {
-                return Mono.just(ThumbnailUtils.buildSrcsetMap(permalink));
+                && Objects.equals(externalUrl.getAuthority(), encodedPermalink.getAuthority())) {
+                return Mono.just(ThumbnailUtils.buildSrcsetMap(encodedPermalink));
             }
-            var permalinkString = permalink.toASCIIString();
+            var permalinkString = encodedPermalink.toASCIIString();
             var thumbnails = thumbnailCache.getIfPresent(permalinkString);
             if (thumbnails != null) {
                 return Mono.just(thumbnails);
