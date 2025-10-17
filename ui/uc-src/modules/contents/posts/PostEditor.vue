@@ -29,6 +29,7 @@ import { usePostUpdateMutate } from "@uc/modules/contents/posts/composables/use-
 import { useLocalStorage } from "@vueuse/core";
 import { useRouteQuery } from "@vueuse/router";
 import { AxiosError, type AxiosRequestConfig } from "axios";
+import { isEqual } from "lodash-es";
 import ShortUniqueId from "short-unique-id";
 import type { ComputedRef } from "vue";
 import { computed, nextTick, onMounted, provide, ref, toRef, watch } from "vue";
@@ -83,11 +84,11 @@ const content = ref<Content>({
 });
 const snapshot = ref<Snapshot>();
 
-const isTitleChanged = ref(false);
+const needsUpdatePost = ref(false);
 watch(
-  () => formState.value.spec.title,
-  (newValue, oldValue) => {
-    isTitleChanged.value = newValue !== oldValue;
+  [() => formState.value.spec.title, () => formState.value.spec.cover],
+  (value, oldValue) => {
+    needsUpdatePost.value = !isEqual(value, oldValue);
   }
 );
 
@@ -347,13 +348,13 @@ const { mutateAsync: handleSave, isLoading: isSaving } = useMutation({
   },
   mutationFn: async () => {
     // Update title
-    if (isTitleChanged.value) {
+    if (needsUpdatePost.value) {
       const { data: updatedPost } = await postUpdateMutate({
         postToUpdate: formState.value,
       });
 
       formState.value = updatedPost;
-      isTitleChanged.value = false;
+      needsUpdatePost.value = false;
     }
 
     // Snapshot always exists in update mode
@@ -534,6 +535,7 @@ useSessionKeepAlive();
       v-model:raw="content.raw"
       v-model:content="content.content"
       v-model:title="formState.spec.title"
+      v-model:cover="formState.spec.cover"
       :upload-image="handleUploadImage"
       class="h-full"
       @update="handleSetContentCache"
