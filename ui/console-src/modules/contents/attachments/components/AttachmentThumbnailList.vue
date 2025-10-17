@@ -43,7 +43,9 @@ const thumbnails = computed(() => {
 const activeId = ref(thumbnails.value?.[0]?.size);
 
 const wrapper = useTemplateRef<HTMLDivElement | null>("wrapper");
-const isWrapperVisible = useElementVisibility(wrapper);
+const isWrapperVisible = useElementVisibility(wrapper, {
+  once: true,
+});
 </script>
 <template>
   <div v-if="thumbnails.length" ref="wrapper">
