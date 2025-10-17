@@ -1,15 +1,15 @@
 package run.halo.app.core.attachment.thumbnail;
 
-import static org.mockito.ArgumentMatchers.any;
+import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.ArgumentMatchers.isA;
 import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.spy;
-import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import java.io.IOException;
 import java.nio.file.Path;
-import java.util.Optional;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -83,6 +83,31 @@ class ThumbnailResourceTransformerTest {
     }
 
     @Test
+    void shouldReturnSourceIfEmptyGeneration() throws IOException {
+        var exchange = MockServerWebExchange.builder(
+                MockServerHttpRequest.get("/halo.png").queryParam("width", "400").build())
+            .build();
+        var attachmentRoot = Path.of("attachments").toAbsolutePath();
+        var sourcePath = attachmentRoot.resolve("upload").resolve("halo.png");
+        when(this.resource.isFile()).thenReturn(true);
+        when(this.resource.getFilename()).thenReturn(sourcePath.getFileName().toString());
+        when(this.resource.getURI()).thenReturn(sourcePath.toUri());
+        thumbnailResourceTransformer = spy(thumbnailResourceTransformer);
+
+        when(localThumbnailService.generate(sourcePath, ThumbnailSize.S)).thenReturn(Mono.empty());
+
+        when(this.transformerChain.transform(eq(exchange), isA(Resource.class)))
+            .thenAnswer(invocation -> Mono.just(invocation.getArgument(1)));
+
+        thumbnailResourceTransformer.transform(exchange, this.resource, this.transformerChain)
+            .as(StepVerifier::create)
+            .assertNext(resource -> assertDoesNotThrow(
+                () -> assertEquals(sourcePath.toUri(), resource.getURI())
+            ))
+            .verifyComplete();
+    }
+
+    @Test
     void shouldReturnIfThumbnailExists() throws IOException {
         var exchange = MockServerWebExchange.builder(
                 MockServerHttpRequest.get("/halo.png").queryParam("width", "400").build())
@@ -90,57 +115,10 @@ class ThumbnailResourceTransformerTest {
 
         var attachmentRoot = Path.of("attachments").toAbsolutePath();
         var sourcePath = attachmentRoot.resolve("upload").resolve("halo.png");
-        var thumbnailPath = attachmentRoot.resolve("thumbnails")
-            .resolve("w400")
-            .resolve("upload")
-            .resolve("halo.png");
-        when(this.localThumbnailService.resolveThumbnailPath(sourcePath, ThumbnailSize.S))
-            .thenReturn(Optional.of(thumbnailPath));
         when(this.resource.isFile()).thenReturn(true);
         when(this.resource.getFilename()).thenReturn(sourcePath.getFileName().toString());
         when(this.resource.getURI()).thenReturn(sourcePath.toUri());
         thumbnailResourceTransformer = spy(thumbnailResourceTransformer);
-
-        var thumbnailResource = mock(Resource.class);
-        when(thumbnailResource.isReadable()).thenReturn(true);
-        when(thumbnailResourceTransformer.createThumbnailResource(thumbnailPath))
-            .thenReturn(thumbnailResource);
-
-        when(this.transformerChain.transform(exchange, thumbnailResource))
-            .thenReturn(Mono.just(thumbnailResource));
-
-        thumbnailResourceTransformer.transform(exchange, this.resource, this.transformerChain)
-            .as(StepVerifier::create)
-            .expectNext(thumbnailResource)
-            .verifyComplete();
-
-        verify(this.localThumbnailService, never())
-            .generate(any(Path.class), any(ThumbnailSize.class));
-    }
-
-    @Test
-    void shouldGenerateIfThumbnailNotExists() throws IOException {
-        var exchange = MockServerWebExchange.builder(
-                MockServerHttpRequest.get("/halo.png").queryParam("width", "400").build())
-            .build();
-
-        var attachmentRoot = Path.of("attachments").toAbsolutePath();
-        var sourcePath = attachmentRoot.resolve("upload").resolve("halo.png");
-        var thumbnailPath = attachmentRoot.resolve("thumbnails")
-            .resolve("w400")
-            .resolve("upload")
-            .resolve("halo.png");
-        when(this.localThumbnailService.resolveThumbnailPath(sourcePath, ThumbnailSize.S))
-            .thenReturn(Optional.of(thumbnailPath));
-        when(this.resource.isFile()).thenReturn(true);
-        when(this.resource.getFilename()).thenReturn(sourcePath.getFileName().toString());
-        when(this.resource.getURI()).thenReturn(sourcePath.toUri());
-        thumbnailResourceTransformer = spy(thumbnailResourceTransformer);
-
-        var thumbnailResource = mock(Resource.class);
-        when(thumbnailResource.isReadable()).thenReturn(false);
-        when(thumbnailResourceTransformer.createThumbnailResource(thumbnailPath))
-            .thenReturn(thumbnailResource);
 
         var generatedResource = mock(Resource.class);
         when(this.localThumbnailService.generate(sourcePath, ThumbnailSize.S))
