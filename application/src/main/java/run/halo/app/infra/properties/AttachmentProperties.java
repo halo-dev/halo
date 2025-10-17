@@ -1,7 +1,9 @@
 package run.halo.app.infra.properties;
 
 import jakarta.validation.Valid;
+import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.Min;
+import jakarta.validation.constraints.PositiveOrZero;
 import java.util.LinkedList;
 import java.util.List;
 import lombok.Data;
@@ -29,6 +31,13 @@ public class AttachmentProperties {
          */
         @Min(1)
         private Integer concurrentThreads;
+
+        /**
+         * The quality of generated thumbnails, value between 0.0 and 1.0.
+         */
+        @PositiveOrZero
+        @Max(1)
+        private Double quality;
 
     }
 

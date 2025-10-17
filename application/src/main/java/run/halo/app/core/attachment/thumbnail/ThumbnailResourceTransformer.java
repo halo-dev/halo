@@ -42,32 +42,12 @@ public class ThumbnailResourceTransformer implements ResourceTransformer {
         var size = ThumbnailSize.fromWidth(width);
         try {
             var source = Path.of(resource.getURI());
-
-            var thumbnailPath = localThumbnailService.resolveThumbnailPath(source, size);
-            if (thumbnailPath.isEmpty()) {
-                return transformerChain.transform(exchange, resource);
-            }
-
-            var thumbnailResource = createThumbnailResource(thumbnailPath.get());
-            if (thumbnailResource.isReadable()) {
-                log.trace("Thumbnail already exists: {}", thumbnailPath);
-                return transformerChain.transform(exchange, thumbnailResource);
-            }
             return localThumbnailService.generate(source, size)
+                .switchIfEmpty(Mono.fromSupplier(() -> new PathResource(source)))
                 .flatMap(transformed -> transformerChain.transform(exchange, transformed));
         } catch (IOException e) {
             return Mono.error(e);
         }
-    }
-
-    /**
-     * Creates a {@link Resource} for the given thumbnail path. Mainly for testing purpose.
-     *
-     * @param thumbnailPath the thumbnail path
-     * @return the created resource
-     */
-    Resource createThumbnailResource(Path thumbnailPath) {
-        return new PathResource(thumbnailPath);
     }
 
 }

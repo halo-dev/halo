@@ -17,6 +17,7 @@ import java.util.concurrent.TimeUnit;
 import lombok.extern.slf4j.Slf4j;
 import net.coobird.thumbnailator.ThumbnailParameter;
 import net.coobird.thumbnailator.Thumbnails;
+import net.coobird.thumbnailator.resizers.configurations.Rendering;
 import org.springframework.beans.factory.DisposableBean;
 import org.springframework.core.io.PathResource;
 import org.springframework.core.io.Resource;
@@ -85,11 +86,22 @@ class DefaultLocalThumbnailService implements LocalThumbnailService, DisposableB
     @Override
     public Mono<Resource> generate(Path source, ThumbnailSize size) {
         if (thumbnailProperties.isDisabled()) {
-            return Mono.just(new PathResource(source));
+            return Mono.empty();
         }
-        return Mono.fromFuture(() -> inProgress.computeIfAbsent(source, f ->
+        var optionalThumbnailPath = resolveThumbnailPath(source, size);
+        if (optionalThumbnailPath.isEmpty()) {
+            log.warn("Failed to resolve thumbnail path for source: {}, size: {}", source, size);
+            return Mono.empty();
+        }
+        var thumbnailPath = optionalThumbnailPath.get();
+        var thumbnailResource = new PathResource(thumbnailPath);
+        if (thumbnailResource.isReadable()) {
+            log.trace("Thumbnail already exists: {}", thumbnailPath);
+            return Mono.just(thumbnailResource);
+        }
+        return Mono.fromFuture(() -> inProgress.computeIfAbsent(thumbnailPath, f ->
                         CompletableFuture.supplyAsync(() -> generateThumbnail(
-                                    source, size
+                                    source, thumbnailPath, size
                                 ),
                                 this.executorService
                             )
@@ -98,7 +110,7 @@ class DefaultLocalThumbnailService implements LocalThumbnailService, DisposableB
                                 TimeUnit.SECONDS
                             )
                     )
-                    .whenComplete((p, t) -> inProgress.remove(source)),
+                    .whenComplete((p, t) -> inProgress.remove(thumbnailPath)),
                 // We don't want to cancel the thumbnail generation task
                 // when some requests are cancelled
                 true
@@ -126,14 +138,17 @@ class DefaultLocalThumbnailService implements LocalThumbnailService, DisposableB
         });
     }
 
-    @Override
-    public Optional<Path> resolveThumbnailPath(Path source, ThumbnailSize size) {
+    Optional<Path> resolveThumbnailPath(Path source, ThumbnailSize size) {
         var attachmentRoot = this.attachmentRootGetter.get();
         Path relativize;
         try {
             relativize = attachmentRoot.relativize(source);
         } catch (IllegalArgumentException e) {
             // The source path is not under the attachment root
+            if (log.isDebugEnabled()) {
+                log.warn("Failed to resolve thumbnail path for source: {}, size: {}",
+                    source, size, e);
+            }
             return Optional.empty();
         }
         var thumbnailPath = attachmentRoot.resolve(THUMBNAIL_ROOT)
@@ -142,17 +157,13 @@ class DefaultLocalThumbnailService implements LocalThumbnailService, DisposableB
         return Optional.of(thumbnailPath);
     }
 
-    private Path generateThumbnail(Path sourcePath, ThumbnailSize size) {
+    private Path generateThumbnail(Path sourcePath, Path thumbnailPath, ThumbnailSize size) {
         if (!Files.exists(sourcePath)) {
             log.trace("Attachment path does not exist: {}", sourcePath);
             return null;
         }
-        var optionalThumbnailPath = resolveThumbnailPath(sourcePath, size);
-        if (optionalThumbnailPath.isEmpty()) {
-            log.warn("Failed to resolve thumbnail path for source: {}, size: {}", sourcePath, size);
-            return null;
-        }
-        var thumbnailPath = optionalThumbnailPath.get();
+
+        // Double check if the thumbnail already exists
         if (Files.exists(thumbnailPath)) {
             return thumbnailPath;
         }
@@ -166,13 +177,16 @@ class DefaultLocalThumbnailService implements LocalThumbnailService, DisposableB
             // Pass InputStream or File here.
             // See https://github.com/coobird/thumbnailator/issues/159#issuecomment-694978197
             // for more.
-            Thumbnails.of(inputStream)
+            var builder = Thumbnails.of(inputStream)
                 .width(size.getWidth())
                 .imageType(ThumbnailParameter.DEFAULT_IMAGE_TYPE)
-                .useExifOrientation(true)
-                .toFile(thumbnailPath.toFile());
-            log.info(
-                "Generated thumbnail for path: {}, target: {}, size: {}",
+                .rendering(Rendering.SPEED)
+                .useExifOrientation(true);
+            if (thumbnailProperties.getQuality() != null) {
+                builder.outputQuality(thumbnailProperties.getQuality());
+            }
+            builder.toFile(thumbnailPath.toFile());
+            log.info("Generated thumbnail for path: {}, target: {}, size: {}",
                 sourcePath, thumbnailPath, size);
 
             // check size of thumbnails
@@ -180,8 +194,7 @@ class DefaultLocalThumbnailService implements LocalThumbnailService, DisposableB
             var thumbnailFileSize = Files.size(thumbnailPath);
             if (attachmentFileSize < thumbnailFileSize) {
                 Files.copy(sourcePath, thumbnailPath, REPLACE_EXISTING);
-                log.info(
-                    """
+                log.info("""
                         Replaced thumbnail with original file since it's smaller, \
                         path: {}, size: {} < {}\
                         """,
@@ -200,7 +213,7 @@ class DefaultLocalThumbnailService implements LocalThumbnailService, DisposableB
                     thumbnailPath, ex);
             }
             // return the original attachment path
-            return sourcePath;
+            return null;
         }
     }
 

@@ -104,13 +104,6 @@ class DefaultLocalThumbnailServiceTest {
         when(thumbnailProperties.isDisabled()).thenReturn(true);
         this.generator.generate(source, ThumbnailSize.S)
             .as(StepVerifier::create)
-            .assertNext(resource -> {
-                try {
-                    assertEquals(resource.getFile(), source.toFile());
-                } catch (IOException e) {
-                    throw new RuntimeException(e);
-                }
-            })
             .verifyComplete();
     }
 }
