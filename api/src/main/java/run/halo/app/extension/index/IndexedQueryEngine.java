@@ -17,6 +17,7 @@ import run.halo.app.extension.PageRequest;
  * @author guqing
  * @since 2.12.0
  */
+@Deprecated(forRemoval = true, since = "2.22.0")
 public interface IndexedQueryEngine {
 
     /**

@@ -4,8 +4,8 @@ import static org.apache.commons.lang3.ObjectUtils.defaultIfNull;
 import static run.halo.app.extension.ExtensionUtil.addFinalizers;
 import static run.halo.app.extension.ExtensionUtil.isDeleted;
 import static run.halo.app.extension.ExtensionUtil.removeFinalizers;
+import static run.halo.app.extension.index.query.Queries.equal;
 import static run.halo.app.extension.index.query.QueryFactory.and;
-import static run.halo.app.extension.index.query.QueryFactory.equal;
 import static run.halo.app.extension.index.query.QueryFactory.isNull;
 
 import java.time.Instant;

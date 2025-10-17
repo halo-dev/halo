@@ -1,12 +1,12 @@
 package run.halo.app.extension.router.selector;
 
 import java.util.Objects;
-import org.springframework.lang.NonNull;
+import org.springframework.lang.Nullable;
 import org.springframework.util.Assert;
 import run.halo.app.extension.index.query.Query;
 import run.halo.app.extension.index.query.QueryFactory;
 
-public record FieldSelector(@NonNull Query query) {
+public record FieldSelector(@Nullable Query query) {
     public FieldSelector(Query query) {
         this.query = Objects.requireNonNullElseGet(query, QueryFactory::all);
     }

@@ -25,7 +25,6 @@ import run.halo.app.extension.ExtensionStoreUtil;
 import run.halo.app.extension.Metadata;
 import run.halo.app.extension.ReactiveExtensionClient;
 import run.halo.app.extension.SchemeManager;
-import run.halo.app.extension.index.IndexerFactory;
 import run.halo.app.extension.store.ReactiveExtensionStoreClient;
 
 /**
@@ -55,17 +54,13 @@ class CategoryPostCountUpdaterTest {
         @Autowired
         private ReactiveExtensionStoreClient storeClient;
 
-        @Autowired
-        private IndexerFactory indexerFactory;
-
         private CategoryPostCountUpdater.CategoryPostCountService categoryPostCountService;
 
         Mono<Extension> deleteImmediately(Extension extension) {
             var name = extension.getMetadata().getName();
             var scheme = schemeManager.get(extension.getClass());
             // un-index
-            var indexer = indexerFactory.getIndexer(extension.groupVersionKind());
-            indexer.unIndexRecord(extension.getMetadata().getName());
+            // TODO Fixme
 
             // delete from db
             var storeName = ExtensionStoreUtil.buildStoreName(scheme, name);

@@ -1,7 +1,7 @@
 package run.halo.app.content.comment;
 
 import static org.springdoc.core.fn.builders.parameter.Builder.parameterBuilder;
-import static run.halo.app.extension.index.query.QueryFactory.equal;
+import static run.halo.app.extension.index.query.Queries.equal;
 import static run.halo.app.extension.router.selector.SelectorUtil.labelAndFieldSelectorToListOptions;
 
 import io.swagger.v3.oas.annotations.enums.ParameterIn;

@@ -1,9 +1,9 @@
 package run.halo.app.theme.finders.impl;
 
+import static run.halo.app.extension.index.query.Queries.equal;
+import static run.halo.app.extension.index.query.Queries.in;
+import static run.halo.app.extension.index.query.Queries.notEqual;
 import static run.halo.app.extension.index.query.QueryFactory.and;
-import static run.halo.app.extension.index.query.QueryFactory.equal;
-import static run.halo.app.extension.index.query.QueryFactory.in;
-import static run.halo.app.extension.index.query.QueryFactory.notEqual;
 
 import java.util.Comparator;
 import java.util.List;
@@ -119,18 +119,18 @@ public class PostFinderImpl implements PostFinder {
 
     @Override
     public Mono<NavigationPostVo> cursor(String currentName) {
+        // TODO Refine this feature
         return postPredicateResolver.getListOptions()
             .map(listOptions -> ListOptions.builder(listOptions)
                 // Exclude hidden posts
                 .andQuery(notHiddenPostQuery())
                 .build()
             )
-            .flatMap(postListOption -> {
-                var postNames = client.indexedQueryEngine()
-                    .retrieve(Post.GVK, postListOption,
-                        PageRequestImpl.ofSize(0).withSort(defaultSort())
-                    )
-                    .getItems();
+            .flatMap(listOptions -> client.listNamesBy(Post.class, listOptions,
+                PageRequestImpl.ofSize(1).withSort(defaultSort()))
+            )
+            .flatMap(listResult -> {
+                var postNames = listResult.getItems();
                 var previousNextPair = findPostNavigation(postNames, currentName);
                 String previousPostName = previousNextPair.prev();
                 String nextPostName = previousNextPair.next();

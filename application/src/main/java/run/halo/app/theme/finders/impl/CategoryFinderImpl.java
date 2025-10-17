@@ -1,6 +1,6 @@
 package run.halo.app.theme.finders.impl;
 
-import static run.halo.app.extension.index.query.QueryFactory.notEqual;
+import static run.halo.app.extension.index.query.Queries.notEqual;
 
 import java.time.Instant;
 import java.util.ArrayList;

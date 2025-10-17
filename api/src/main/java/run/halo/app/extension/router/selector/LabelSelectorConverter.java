@@ -6,6 +6,8 @@ import java.util.Set;
 import org.springframework.core.convert.converter.Converter;
 import org.springframework.lang.NonNull;
 import org.springframework.util.CollectionUtils;
+import run.halo.app.extension.index.query.EqualityMatcher;
+import run.halo.app.extension.index.query.SetMatcher;
 
 public class LabelSelectorConverter implements Converter<SelectorCriteria, SelectorMatcher> {
 

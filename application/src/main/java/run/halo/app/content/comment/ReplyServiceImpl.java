@@ -1,8 +1,8 @@
 package run.halo.app.content.comment;
 
 import static org.apache.commons.lang3.BooleanUtils.isTrue;
+import static run.halo.app.extension.index.query.Queries.equal;
 import static run.halo.app.extension.index.query.QueryFactory.and;
-import static run.halo.app.extension.index.query.QueryFactory.equal;
 import static run.halo.app.extension.index.query.QueryFactory.isNull;
 
 import java.time.Duration;

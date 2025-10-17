@@ -7,6 +7,7 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.isA;
+import static org.mockito.ArgumentMatchers.same;
 import static org.mockito.Mockito.verify;
 
 import org.junit.jupiter.api.Test;
@@ -18,13 +19,13 @@ import org.springframework.context.ApplicationEventPublisher;
 import run.halo.app.extension.event.SchemeAddedEvent;
 import run.halo.app.extension.event.SchemeRemovedEvent;
 import run.halo.app.extension.exception.SchemeNotFoundException;
-import run.halo.app.extension.index.IndexSpecRegistry;
+import run.halo.app.extension.index.IndicesManager;
 
 @ExtendWith(MockitoExtension.class)
 class DefaultSchemeManagerTest {
 
     @Mock
-    private IndexSpecRegistry indexSpecRegistry;
+    IndicesManager indicesManager;
 
     @Mock
     ApplicationEventPublisher eventPublisher;
@@ -80,7 +81,7 @@ class DefaultSchemeManagerTest {
         schemeManager.register(FakeExtension.class);
 
         verify(eventPublisher).publishEvent(isA(SchemeAddedEvent.class));
-        verify(indexSpecRegistry).indexFor(any(Scheme.class));
+        verify(indicesManager).add(same(FakeExtension.class), any());
     }
 
     @Test
@@ -92,7 +93,7 @@ class DefaultSchemeManagerTest {
 
         verify(eventPublisher).publishEvent(isA(SchemeAddedEvent.class));
         verify(eventPublisher).publishEvent(isA(SchemeRemovedEvent.class));
-        verify(indexSpecRegistry).indexFor(any(Scheme.class));
+        verify(indicesManager).add(same(FakeExtension.class), any());
     }
 
     @Test

@@ -11,6 +11,7 @@ import org.springframework.boot.convert.ApplicationConversionService;
 import org.springframework.core.convert.ConversionService;
 import org.springframework.util.MultiValueMap;
 import org.springframework.util.StringUtils;
+import run.halo.app.extension.PageRequestImpl;
 
 public interface IListRequest {
 
@@ -52,7 +53,7 @@ public interface IListRequest {
             if (StringUtils.hasText(size)) {
                 return conversionService.convert(size, Integer.class);
             }
-            return 0;
+            return PageRequestImpl.MAX_SIZE;
         }
 
         @Override

@@ -3,10 +3,13 @@ package run.halo.app.extension.store;
 import java.util.Comparator;
 import java.util.List;
 import java.util.function.ToIntFunction;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.dao.DuplicateKeyException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Component;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
@@ -32,6 +35,18 @@ public class ReactiveExtensionStoreClientImpl implements ReactiveExtensionStoreC
             .collectList()
             .zipWith(this.repository.countByNameStartingWith(prefix))
             .map(p -> new PageImpl<>(p.getT1(), pageable, p.getT2()));
+    }
+
+    @Override
+    public Flux<ExtensionStore> listBy(String prefix, String nameCursor, int limit) {
+        var page = PageRequest.ofSize(limit).withSort(Sort.Direction.ASC, "name");
+        if (StringUtils.isBlank(nameCursor)) {
+            return this.repository.findAllByNameStartingWith(prefix, page);
+        }
+        var cursor = StringUtils.prependIfMissing(nameCursor, prefix);
+        return this.repository.findAllByNameStartingWithAndNameGreaterThan(
+            prefix, cursor, page
+        );
     }
 
     @Override
