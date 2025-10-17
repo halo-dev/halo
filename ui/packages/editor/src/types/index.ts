@@ -73,7 +73,7 @@ export interface BubbleMenuOptions {
 export interface BubbleMenuProps {
   pluginKey?: string | PluginKey;
   editor?: Editor;
-  shouldShow: (props: {
+  shouldShow?: (props: {
     editor: Editor;
     element: HTMLElement;
     view: EditorView;

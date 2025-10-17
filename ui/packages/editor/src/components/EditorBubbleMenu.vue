@@ -130,7 +130,7 @@ const shouldShow = (
     v-for="(bubbleMenu, index) in getBubbleMenuFromExtensions()"
     :key="index"
     :plugin-key="bubbleMenu?.pluginKey"
-    :should-show="(prop) => shouldShow(prop, bubbleMenu)"
+    :should-show="(prop) => shouldShow(prop, bubbleMenu) ?? false"
     :editor="editor"
     :options="{
       ...(bubbleMenu.options as any),
