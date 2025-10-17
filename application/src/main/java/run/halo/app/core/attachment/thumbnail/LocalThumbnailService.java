@@ -1,7 +1,6 @@
 package run.halo.app.core.attachment.thumbnail;
 
 import java.nio.file.Path;
-import java.util.Optional;
 import org.springframework.core.io.Resource;
 import reactor.core.publisher.Mono;
 import run.halo.app.core.attachment.ThumbnailSize;
@@ -15,7 +14,8 @@ import run.halo.app.core.attachment.ThumbnailSize;
 public interface LocalThumbnailService {
 
     /**
-     * Generates thumbnail for the source image.
+     * Generates thumbnail for the source image. If the thumbnail already exists, it will return the
+     * existing one.
      *
      * @param source the source image path
      * @param size the thumbnail size
@@ -29,15 +29,5 @@ public interface LocalThumbnailService {
      * @param source the source image path
      */
     void delete(Path source);
-
-    /**
-     * Resolves the thumbnail path for the given source image and thumbnail size. Mainly for
-     * preflight check.
-     *
-     * @param source the source image path
-     * @param size the thumbnail size
-     * @return the resolved thumbnail path
-     */
-    Optional<Path> resolveThumbnailPath(Path source, ThumbnailSize size);
 
 }
