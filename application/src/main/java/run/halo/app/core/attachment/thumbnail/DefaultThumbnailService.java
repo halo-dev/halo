@@ -6,11 +6,13 @@ import java.net.URI;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Objects;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Component;
 import org.springframework.util.CollectionUtils;
 import org.springframework.util.StringUtils;
+import org.springframework.web.filter.reactive.ServerWebExchangeContextFilter;
 import reactor.core.publisher.Mono;
 import run.halo.app.core.attachment.AttachmentChangedEvent;
 import run.halo.app.core.attachment.ThumbnailSize;
@@ -19,6 +21,7 @@ import run.halo.app.extension.ExtensionUtil;
 import run.halo.app.extension.ListOptions;
 import run.halo.app.extension.ReactiveExtensionClient;
 import run.halo.app.extension.index.query.QueryFactory;
+import run.halo.app.infra.ExternalUrlSupplier;
 
 /**
  * Implementation of {@link ThumbnailService}.
@@ -39,8 +42,12 @@ class DefaultThumbnailService implements ThumbnailService {
 
     private final ReactiveExtensionClient client;
 
-    public DefaultThumbnailService(ReactiveExtensionClient client) {
+    private final ExternalUrlSupplier externalUrlSupplier;
+
+    public DefaultThumbnailService(ReactiveExtensionClient client,
+        ExternalUrlSupplier externalUrlSupplier) {
         this.client = client;
+        this.externalUrlSupplier = externalUrlSupplier;
         this.thumbnailCache = Caffeine.newBuilder()
             // TODO make it configurable
             .maximumSize(10_000)
@@ -90,26 +97,41 @@ class DefaultThumbnailService implements ThumbnailService {
 
     @Override
     public Mono<Map<ThumbnailSize, URI>> get(URI permalink) {
-        var permalinkString = permalink.toASCIIString();
-        var thumbnails = thumbnailCache.getIfPresent(permalinkString);
-        if (thumbnails != null) {
-            return Mono.just(thumbnails);
+        if (!permalink.isAbsolute()) {
+            // build permalinks
+            return Mono.just(ThumbnailUtils.buildSrcsetMap(permalink));
         }
-        // query from attachments
-        var listOptions = ListOptions.builder()
-            .andQuery(QueryFactory.equal("status.permalink", permalinkString))
-            .build();
-        return client.listAll(Attachment.class, listOptions, ExtensionUtil.defaultSort())
-            .next()
-            // Here we allow concurrent updates
-            .doOnNext(this::updateCache)
-            .mapNotNull(attachment -> this.thumbnailCache.getIfPresent(permalinkString))
-            .switchIfEmpty(Mono.fromSupplier(() -> {
-                // No attachment or no thumbnails, cache empty map to avoid cache miss again and
-                // again.
-                this.thumbnailCache.put(permalinkString, EMPTY_THUMBNAILS);
-                return EMPTY_THUMBNAILS;
-            }));
+        // TODO Optimize concurrent requests for the same permalink
+        return Mono.deferContextual(contextView -> {
+            var externalUrl = ServerWebExchangeContextFilter.getExchange(contextView)
+                .map(exchange -> externalUrlSupplier.getURL(exchange.getRequest()))
+                .orElseGet(externalUrlSupplier::getRaw);
+            // check if the permalink is from local site
+            if (externalUrl != null
+                && Objects.equals(externalUrl.getAuthority(), permalink.getAuthority())) {
+                return Mono.just(ThumbnailUtils.buildSrcsetMap(permalink));
+            }
+            var permalinkString = permalink.toASCIIString();
+            var thumbnails = thumbnailCache.getIfPresent(permalinkString);
+            if (thumbnails != null) {
+                return Mono.just(thumbnails);
+            }
+            // query from attachments
+            var listOptions = ListOptions.builder()
+                .andQuery(QueryFactory.equal("status.permalink", permalinkString))
+                .build();
+            return client.listAll(Attachment.class, listOptions, ExtensionUtil.defaultSort())
+                .next()
+                // Here we allow concurrent updates
+                .doOnNext(this::updateCache)
+                .mapNotNull(attachment -> this.thumbnailCache.getIfPresent(permalinkString))
+                .switchIfEmpty(Mono.fromSupplier(() -> {
+                    // No attachment or no thumbnails, cache empty map to avoid cache miss again and
+                    // again.
+                    this.thumbnailCache.put(permalinkString, EMPTY_THUMBNAILS);
+                    return EMPTY_THUMBNAILS;
+                }));
+        });
     }
 
 }
