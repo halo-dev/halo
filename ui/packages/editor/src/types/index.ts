@@ -2,8 +2,8 @@ import type {
   Editor,
   EditorState,
   EditorView,
-  Node,
   PluginKey,
+  PMNode,
   Range,
   ResolvedPos,
   Selection,
@@ -152,7 +152,7 @@ export interface CommandMenuItemType {
 
 export interface DragSelectionNodeType {
   $pos?: ResolvedPos;
-  node?: Node;
+  node?: PMNode;
   el: HTMLElement;
   nodeOffset?: number;
   dragDomOffset?: {
@@ -181,7 +181,7 @@ export interface DraggableItemType {
     event: DragEvent;
     slice: Slice;
     insertPos: number;
-    node: Node;
+    node: PMNode;
     selection: Selection;
   }) => boolean | void;
   // allow drag-and-drop query propagation downward

@@ -6,11 +6,17 @@ import {
   isActive,
   mergeAttributes,
   PluginKey,
+  PMNode,
   VueNodeViewRenderer,
   type Editor,
+  type Range,
 } from "@/tiptap";
 import type { EditorState } from "@/tiptap/pm";
-import type { ExtensionOptions, NodeBubbleMenuType } from "@/types";
+import type {
+  DragSelectionNodeType,
+  ExtensionOptions,
+  NodeBubbleMenuType,
+} from "@/types";
 import { deleteNode } from "@/utils";
 import type { ImageOptions } from "@tiptap/extension-image";
 import TiptapImage from "@tiptap/extension-image";
@@ -130,6 +136,25 @@ const Image = TiptapImage.extend<ExtensionOptions & Partial<ImageOptions>>({
           },
         ];
       },
+      getCommandMenuItems() {
+        return {
+          priority: 95,
+          icon: markRaw(MdiFileImageBox),
+          title: "editor.extensions.commands_menu.image",
+          keywords: ["image", "tupian"],
+          command: ({ editor, range }: { editor: Editor; range: Range }) => {
+            editor
+              .chain()
+              .focus()
+              .deleteRange(range)
+              .insertContent([
+                { type: "image", attrs: { src: "" } },
+                { type: "paragraph", content: "" },
+              ])
+              .run();
+          },
+        };
+      },
       getBubbleMenu({ editor }: { editor: Editor }): NodeBubbleMenuType {
         return {
           pluginKey: IMAGE_BUBBLE_MENU_KEY,
@@ -239,7 +264,7 @@ const Image = TiptapImage.extend<ExtensionOptions & Partial<ImageOptions>>({
       },
       getDraggable() {
         return {
-          getRenderContainer({ dom, view }) {
+          getRenderContainer({ dom, view }): DragSelectionNodeType {
             let container = dom;
             while (container && container.tagName !== "P") {
               container = container.parentElement as HTMLElement;
@@ -248,7 +273,7 @@ const Image = TiptapImage.extend<ExtensionOptions & Partial<ImageOptions>>({
               container = container.firstElementChild
                 ?.firstElementChild as HTMLElement;
             }
-            let node;
+            let node: PMNode | undefined;
             if (container.firstElementChild) {
               const pos = view.posAtDOM(container.firstElementChild, 0);
               const $pos = view.state.doc.resolve(pos);

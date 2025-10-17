@@ -46,7 +46,7 @@ export function createViteConfig(options: Options) {
   return defineConfig({
     base,
     experimental: {
-      enableNativePlugin: isProduction,
+      enableNativePlugin: true,
     },
     plugins: [
       ...sharedPlugins,

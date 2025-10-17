@@ -1,13 +1,14 @@
 import BasicLayout from "@console/layouts/BasicLayout.vue";
 import { IconFolder } from "@halo-dev/components";
 import { definePlugin } from "@halo-dev/console-shared";
-import { markRaw } from "vue";
+import { defineAsyncComponent, markRaw } from "vue";
 import AttachmentList from "./AttachmentList.vue";
-import AttachmentSelectorModal from "./components/AttachmentSelectorModal.vue";
 
 export default definePlugin({
   components: {
-    AttachmentSelectorModal,
+    AttachmentSelectorModal: defineAsyncComponent(
+      () => import("./components/AttachmentSelectorModal.vue")
+    ),
   },
   routes: [
     {
