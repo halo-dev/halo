@@ -9,6 +9,8 @@ import lombok.Data;
 import lombok.experimental.Accessors;
 import org.springframework.lang.NonNull;
 import org.springframework.util.Assert;
+import run.halo.app.extension.index.query.EqualityMatcher;
+import run.halo.app.extension.index.query.SetMatcher;
 
 @Data
 @Accessors(chain = true)

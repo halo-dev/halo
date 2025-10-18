@@ -17,7 +17,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.context.ApplicationEventPublisher;
 import run.halo.app.extension.exception.ExtensionConvertException;
 import run.halo.app.extension.exception.SchemaViolationException;
-import run.halo.app.extension.index.IndexSpecRegistry;
+import run.halo.app.extension.index.IndexEngine;
 import run.halo.app.extension.store.ExtensionStore;
 
 @ExtendWith(MockitoExtension.class)
@@ -36,9 +36,9 @@ class JsonExtensionConverterTest {
     void setUp() {
         localeDefault = Locale.getDefault();
         Locale.setDefault(Locale.ENGLISH);
-        var indexSpecRegistry = mock(IndexSpecRegistry.class);
+        var indexEngine = mock(IndexEngine.class);
 
-        var schemeManager = new DefaultSchemeManager(indexSpecRegistry, eventPublisher);
+        var schemeManager = new DefaultSchemeManager(indexEngine, eventPublisher);
         converter = new JSONExtensionConverter(schemeManager);
         objectMapper = converter.getObjectMapper();
 

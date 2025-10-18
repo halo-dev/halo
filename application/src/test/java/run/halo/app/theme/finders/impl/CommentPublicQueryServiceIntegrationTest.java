@@ -32,7 +32,6 @@ import run.halo.app.extension.ListOptions;
 import run.halo.app.extension.ReactiveExtensionClient;
 import run.halo.app.extension.Ref;
 import run.halo.app.extension.SchemeManager;
-import run.halo.app.extension.index.IndexerFactory;
 import run.halo.app.extension.store.ReactiveExtensionStoreClient;
 import run.halo.app.infra.AnonymousUserConst;
 import run.halo.app.infra.exception.DuplicateNameException;
@@ -51,15 +50,11 @@ class CommentPublicQueryServiceIntegrationTest {
     @Autowired
     private ReactiveExtensionStoreClient storeClient;
 
-    @Autowired
-    private IndexerFactory indexerFactory;
-
     Mono<Extension> deleteImmediately(Extension extension) {
         var name = extension.getMetadata().getName();
         var scheme = schemeManager.get(extension.getClass());
         // un-index
-        var indexer = indexerFactory.getIndexer(extension.groupVersionKind());
-        indexer.unIndexRecord(extension.getMetadata().getName());
+        // TODO Fixme
 
         // delete from db
         var storeName = ExtensionStoreUtil.buildStoreName(scheme, name);

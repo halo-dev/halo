@@ -59,6 +59,8 @@ import run.halo.app.extension.MetadataUtil;
 import run.halo.app.extension.SchemeManager;
 import run.halo.app.extension.Secret;
 import run.halo.app.extension.index.IndexSpec;
+import run.halo.app.extension.index.MultiValueIndexSpec;
+import run.halo.app.extension.index.SingleValueIndexSpec;
 import run.halo.app.infra.utils.JsonUtils;
 import run.halo.app.migration.Backup;
 import run.halo.app.plugin.extensionpoint.ExtensionDefinition;
@@ -83,49 +85,44 @@ class SchemeInitializer implements SmartLifecycle {
         }
         running = true;
         schemeManager.register(Role.class, is -> {
-            is.add(new IndexSpec()
-                .setName("labels.aggregateToRoles")
-                .setIndexFunc(multiValueAttribute(Role.class,
-                    role -> Optional.ofNullable(role.getMetadata().getLabels())
-                        .map(labels -> labels.keySet()
-                            .stream()
-                            .filter(key -> key.startsWith(ROLE_AGGREGATE_LABEL_PREFIX))
-                            .filter(key -> Boolean.parseBoolean(labels.get(key)))
-                            .map(
-                                key -> StringUtils.removeStart(key, ROLE_AGGREGATE_LABEL_PREFIX)
+            is.add(
+                MultiValueIndexSpec.<Role, String>builder("labels.aggregateToRoles", String.class)
+                    .indexFunc(
+                        role -> Optional.ofNullable(role.getMetadata().getLabels())
+                            .map(labels -> labels.keySet()
+                                .stream()
+                                .filter(key -> key.startsWith(ROLE_AGGREGATE_LABEL_PREFIX))
+                                .filter(key -> Boolean.parseBoolean(labels.get(key)))
+                                .map(
+                                    key -> StringUtils.removeStart(key, ROLE_AGGREGATE_LABEL_PREFIX)
+                                )
+                                .collect(Collectors.toSet())
                             )
-                            .collect(Collectors.toSet())
-                        )
-                        .orElseGet(Set::of)))
+                            .orElseGet(Set::of)
+                    )
             );
         });
 
         // plugin.halo.run
         schemeManager.register(Plugin.class, is -> {
-            is.add(new IndexSpec()
-                .setName("spec.displayName")
-                .setIndexFunc(
-                    simpleAttribute(Plugin.class, plugin -> Optional.ofNullable(plugin.getSpec())
-                        .map(Plugin.PluginSpec::getDisplayName)
-                        .orElse(null))
+            is.add(SingleValueIndexSpec.<Plugin, String>builder("spec.displayName", String.class)
+                .indexFunc(plugin -> Optional.ofNullable(plugin.getSpec())
+                    .map(Plugin.PluginSpec::getDisplayName)
+                    .orElse(null)
                 )
             );
-            is.add(new IndexSpec()
-                .setName("spec.description")
-                .setIndexFunc(
-                    simpleAttribute(Plugin.class, plugin -> Optional.ofNullable(plugin.getSpec())
-                        .map(Plugin.PluginSpec::getDescription)
-                        .orElse(null))
+            is.add(SingleValueIndexSpec.<Plugin, String>builder("spec.description", String.class)
+                .indexFunc(plugin -> Optional.ofNullable(plugin.getSpec())
+                    .map(Plugin.PluginSpec::getDescription)
+                    .orElse(null)
                 )
             );
-            is.add(new IndexSpec()
-                .setName("spec.enabled")
-                .setIndexFunc(
-                    simpleAttribute(Plugin.class, plugin -> Optional.ofNullable(plugin.getSpec())
-                        .map(Plugin.PluginSpec::getEnabled)
-                        .map(Object::toString)
-                        .orElse(Boolean.FALSE.toString()))
+            is.add(SingleValueIndexSpec.<Plugin, Boolean>builder("spec.enabled", Boolean.class)
+                .indexFunc(plugin -> Optional.ofNullable(plugin.getSpec())
+                    .map(Plugin.PluginSpec::getEnabled)
+                    .orElse(false)
                 )
+                .nullable(false)
             );
         });
         schemeManager.register(ExtensionPointDefinition.class, indexSpecs -> {
@@ -270,13 +267,12 @@ class SchemeInitializer implements SmartLifecycle {
                     var lastModifyTime = post.getStatus().getLastModifyTime();
                     return lastModifyTime == null ? null : lastModifyTime.toString();
                 })));
-            indexSpecs.add(new IndexSpec()
-                .setName("status.hideFromList")
-                .setIndexFunc(simpleAttribute(Post.class, post -> {
-                    var hidden = post.getStatus().getHideFromList();
-                    // only index when hidden is true
-                    return (hidden == null || !hidden) ? null : BooleanUtils.TRUE;
-                }))
+            indexSpecs.add(
+                SingleValueIndexSpec.<Post, Boolean>builder("status.hideFromList", Boolean.class)
+                    .indexFunc(post -> Optional.ofNullable(post.getStatus())
+                        .map(Post.PostStatus::getHideFromList)
+                        .orElse(false)
+                    )
             );
             indexSpecs.add(new IndexSpec()
                 .setName(Post.REQUIRE_SYNC_ON_STARTUP_INDEX_NAME)
@@ -656,9 +652,9 @@ class SchemeInitializer implements SmartLifecycle {
                 .setIndexFunc(
                     simpleAttribute(LocalThumbnail.class,
                         thumbnail -> Optional.of(thumbnail.getStatus())
-                        .map(LocalThumbnail.Status::getPhase)
-                        .map(LocalThumbnail.Phase::name)
-                        .orElse(null))
+                            .map(LocalThumbnail.Status::getPhase)
+                            .map(LocalThumbnail.Phase::name)
+                            .orElse(null))
                 )
             );
         });

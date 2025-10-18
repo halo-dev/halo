@@ -179,7 +179,7 @@ public class DefaultRoleService implements RoleService {
 
                 return Flux.fromIterable(dependencies)
                     .filter(dep -> !visited.contains(dep))
-                    .collect(Collectors.toSet())
+                    .collect(Collectors.<String>toSet())
                     .flatMapMany(deps -> listRoles(deps, additionalListOptions));
             })
             .concatWith(Flux.defer(() -> listAggregatedRoles(visited, additionalListOptions)));

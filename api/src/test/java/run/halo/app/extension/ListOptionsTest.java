@@ -1,7 +1,7 @@
 package run.halo.app.extension;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static run.halo.app.extension.index.query.QueryFactory.equal;
+import static run.halo.app.extension.index.query.Queries.equal;
 
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;

@@ -5,28 +5,29 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.function.Consumer;
 import org.springframework.lang.NonNull;
+import org.springframework.lang.Nullable;
 import run.halo.app.extension.exception.SchemeNotFoundException;
 import run.halo.app.extension.index.IndexSpecs;
 
 public interface SchemeManager {
 
-    void register(@NonNull Scheme scheme);
-
-    void register(@NonNull Scheme scheme, Consumer<IndexSpecs> specsConsumer);
-
     /**
      * Registers an Extension using its type.
      *
      * @param type is Extension type.
-     * @param <T> Extension class.
+     * @param <E> Extension class.
      */
-    default <T extends Extension> void register(Class<T> type) {
-        register(Scheme.buildFromType(type));
+    default <E extends Extension> void register(Class<E> type) {
+        register(type, null);
     }
 
-    default <T extends Extension> void register(Class<T> type, Consumer<IndexSpecs> specsConsumer) {
-        register(Scheme.buildFromType(type), specsConsumer);
+    default void register(Scheme scheme) {
+        register(scheme.type(), null);
     }
+
+    <E extends Extension> void register(
+        Class<E> type, @Nullable Consumer<IndexSpecs<E>> specsConsumer
+    );
 
     void unregister(@NonNull Scheme scheme);
 

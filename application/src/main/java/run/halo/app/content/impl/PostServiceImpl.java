@@ -1,6 +1,6 @@
 package run.halo.app.content.impl;
 
-import static run.halo.app.extension.index.query.QueryFactory.in;
+import static run.halo.app.extension.index.query.Queries.in;
 
 import java.time.Duration;
 import java.time.Instant;
@@ -17,6 +17,7 @@ import org.springframework.data.domain.Sort;
 import org.springframework.lang.NonNull;
 import org.springframework.stereotype.Component;
 import org.springframework.util.Assert;
+import org.springframework.util.CollectionUtils;
 import org.springframework.web.server.ServerWebInputException;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
@@ -155,7 +156,7 @@ public class PostServiceImpl extends AbstractContentService implements PostServi
     }
 
     private Flux<Tag> listTags(List<String> tagNames) {
-        if (tagNames == null) {
+        if (CollectionUtils.isEmpty(tagNames)) {
             return Flux.empty();
         }
         var listOptions = new ListOptions();
@@ -165,7 +166,7 @@ public class PostServiceImpl extends AbstractContentService implements PostServi
 
     @Override
     public Flux<Category> listCategories(List<String> categoryNames) {
-        if (categoryNames == null) {
+        if (CollectionUtils.isEmpty(categoryNames)) {
             return Flux.empty();
         }
         ToIntFunction<Category> comparator =
@@ -177,7 +178,7 @@ public class PostServiceImpl extends AbstractContentService implements PostServi
     }
 
     private Flux<Contributor> listContributors(List<String> usernames) {
-        if (usernames == null) {
+        if (CollectionUtils.isEmpty(usernames)) {
             return Flux.empty();
         }
         return Flux.fromIterable(usernames)

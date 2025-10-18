@@ -1,7 +1,7 @@
 package run.halo.app.notification;
 
+import static run.halo.app.extension.index.query.Queries.equal;
 import static run.halo.app.extension.index.query.QueryFactory.and;
-import static run.halo.app.extension.index.query.QueryFactory.equal;
 import static run.halo.app.extension.router.selector.SelectorUtil.labelAndFieldSelectorToListOptions;
 
 import org.apache.commons.lang3.StringUtils;

@@ -38,13 +38,12 @@ public class DefaultExtensionMatcher implements ExtensionMatcher {
         }
         var listOptions = new ListOptions();
         listOptions.setLabelSelector(labelSelector);
-        var fieldQuery = QueryFactory.all();
+        var fieldQuery = QueryFactory.equal("metadata.name", extension.getMetadata().getName());
         if (hasFieldSelector()) {
             fieldQuery = QueryFactory.and(fieldQuery, fieldSelector.query());
         }
         listOptions.setFieldSelector(new FieldSelector(fieldQuery));
-        return client.indexedQueryEngine().retrieve(getGvk(),
-            listOptions, PageRequestImpl.ofSize(1)).getTotal() > 0;
+        return client.countBy(extension.getClass(), listOptions) > 0;
     }
 
     boolean hasFieldSelector() {

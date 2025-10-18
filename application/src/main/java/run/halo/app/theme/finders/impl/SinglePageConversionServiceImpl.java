@@ -5,7 +5,7 @@ import static org.springframework.data.domain.Sort.Order.desc;
 import static run.halo.app.core.extension.content.Post.VisibleEnum.PUBLIC;
 import static run.halo.app.core.extension.content.SinglePage.PUBLISHED_LABEL;
 import static run.halo.app.extension.ExtensionUtil.notDeleting;
-import static run.halo.app.extension.index.query.QueryFactory.equal;
+import static run.halo.app.extension.index.query.Queries.equal;
 
 import java.util.List;
 import java.util.function.Function;

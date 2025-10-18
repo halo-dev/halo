@@ -301,7 +301,7 @@ public class PluginReconciler implements Reconciler<Request> {
                 .lastTransitionTime(clock.instant())
                 .build());
             status.setPhase(Plugin.Phase.UNKNOWN);
-            return Result.requeue(Duration.ofSeconds(1));
+            return Result.requeue(Duration.ofSeconds(5));
         }
 
         PluginState pluginState;
@@ -737,6 +737,7 @@ public class PluginReconciler implements Reconciler<Request> {
     public Controller setupWith(ControllerBuilder builder) {
         return builder
             .extension(new Plugin())
+            .syncAllOnStart(true)
             .build();
     }
 
