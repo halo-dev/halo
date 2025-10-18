@@ -6,8 +6,7 @@ import {
   type Attachment,
 } from "@halo-dev/api-client";
 import { VTabbar } from "@halo-dev/components";
-import { useElementVisibility } from "@vueuse/core";
-import { computed, ref, toRefs, useTemplateRef } from "vue";
+import { computed, ref, toRefs } from "vue";
 
 const props = withDefaults(
   defineProps<{
@@ -41,14 +40,9 @@ const thumbnails = computed(() => {
 });
 
 const activeId = ref(thumbnails.value?.[0]?.size);
-
-const wrapper = useTemplateRef<HTMLDivElement | null>("wrapper");
-const isWrapperVisible = useElementVisibility(wrapper, {
-  once: true,
-});
 </script>
 <template>
-  <div v-if="thumbnails.length" ref="wrapper">
+  <div v-if="thumbnails.length">
     <VTabbar
       v-model:active-id="activeId"
       :items="
@@ -59,7 +53,7 @@ const isWrapperVisible = useElementVisibility(wrapper, {
       "
       type="outline"
     ></VTabbar>
-    <div v-if="isWrapperVisible" class="mt-3">
+    <div class="mt-3">
       <a
         v-for="thumbnail in thumbnails"
         :key="thumbnail.permalink"
