@@ -2,24 +2,22 @@ import ToolbarItem from "@/components/toolbar/ToolbarItem.vue";
 import ToolbarSubItem from "@/components/toolbar/ToolbarSubItem.vue";
 import { i18n } from "@/locales";
 import {
-  CoreEditor,
+  Editor,
   EditorState,
   ResolvedPos,
   TextSelection,
   isActive,
   type Dispatch,
-  type Editor,
 } from "@/tiptap";
 import type { ExtensionOptions, ToolbarItemType } from "@/types";
 import { deleteNodeByPos } from "@/utils";
-import { isListActive } from "@/utils/isListActive";
-import { isEmpty } from "@/utils/isNodeEmpty";
-import type { ParagraphOptions } from "@tiptap/extension-paragraph";
+import { isListActive } from "@/utils/is-list-active";
+import { isEmpty } from "@/utils/is-node-empty";
 import TiptapParagraph from "@tiptap/extension-paragraph";
 import { markRaw } from "vue";
 import TablerLineHeight from "~icons/tabler/line-height";
 
-const Paragraph = TiptapParagraph.extend<ExtensionOptions & ParagraphOptions>({
+const Paragraph = TiptapParagraph.extend<ExtensionOptions>({
   addAttributes() {
     return {
       lineHeight: {
@@ -99,7 +97,7 @@ const Paragraph = TiptapParagraph.extend<ExtensionOptions & ParagraphOptions>({
 
   addKeyboardShortcuts() {
     return {
-      Backspace: ({ editor }: { editor: CoreEditor }) => {
+      Backspace: ({ editor }: { editor: Editor }) => {
         const { state, view } = editor;
         const { selection } = state;
         if (isListActive(editor) || !isActive(state, Paragraph.name)) {

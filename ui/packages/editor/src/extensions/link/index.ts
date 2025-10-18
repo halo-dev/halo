@@ -1,8 +1,7 @@
 import type { ExtensionOptions } from "@/types";
-import type { LinkOptions } from "@tiptap/extension-link";
-import TiptapLink from "@tiptap/extension-link";
+import TiptapLink, { type LinkOptions } from "@tiptap/extension-link";
 
-const Link = TiptapLink.extend<ExtensionOptions & LinkOptions>({
+const Link = TiptapLink.extend<ExtensionOptions & Partial<LinkOptions>>({
   addOptions() {
     return {
       ...this.parent?.(),

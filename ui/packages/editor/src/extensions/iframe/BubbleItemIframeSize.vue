@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { BlockActionInput, BlockActionSeparator } from "@/components";
 import { i18n } from "@/locales";
-import type { Editor } from "@/tiptap/vue-3";
+import type { Editor } from "@/tiptap";
 import { computed } from "vue";
 import Iframe from "./index";
 

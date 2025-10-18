@@ -135,7 +135,7 @@ onMounted(() => {
     props.editor
       .chain()
       .updateAttributes(Image.name, { width, height })
-      .setNodeSelection(props.getPos())
+      .setNodeSelection(props.getPos() || 0)
       .focus()
       .run();
   }

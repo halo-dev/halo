@@ -1,6 +1,5 @@
 export * from "@tiptap/pm/changeset";
 export * from "@tiptap/pm/collab";
-export * from "@tiptap/pm/commands";
 export * from "@tiptap/pm/dropcursor";
 export * from "@tiptap/pm/gapcursor";
 export * from "@tiptap/pm/history";

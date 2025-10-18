@@ -3,10 +3,10 @@ import {
   listHelpers,
   ListKeymap,
   type ListKeymapOptions,
-} from "@tiptap/extension-list-keymap";
+} from "@tiptap/extension-list";
 
 /**
- *  Optimize the listKeymap extension until the issue with @tiptap/extension-list-keymap is resolved.
+ *  Optimize the listKeymap extension until the issue with @tiptap/extension-list is resolved.
  *  https://github.com/ueberdosis/tiptap/issues/4395
  */
 const ExtensionListKeymap = ListKeymap.extend<ListKeymapOptions>({

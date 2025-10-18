@@ -2,12 +2,17 @@ import ToolbarItem from "@/components/toolbar/ToolbarItem.vue";
 import ToolbarSubItem from "@/components/toolbar/ToolbarSubItem.vue";
 import TiptapParagraph from "@/extensions/paragraph";
 import { i18n } from "@/locales";
-import { AttrStep, Plugin, PluginKey } from "@/tiptap";
-import { mergeAttributes, type Editor, type Range } from "@/tiptap/vue-3";
+import {
+  AttrStep,
+  mergeAttributes,
+  Plugin,
+  PluginKey,
+  type Editor,
+  type Range,
+} from "@/tiptap";
 import type { ExtensionOptions } from "@/types";
 import { generateAnchorId } from "@/utils";
-import type { HeadingOptions } from "@tiptap/extension-heading";
-import TiptapHeading from "@tiptap/extension-heading";
+import TiptapHeading, { type HeadingOptions } from "@tiptap/extension-heading";
 import { markRaw } from "vue";
 import MdiFormatHeader1 from "~icons/mdi/format-header-1";
 import MdiFormatHeader2 from "~icons/mdi/format-header-2";
@@ -31,7 +36,7 @@ const Blockquote = TiptapHeading.extend<ExtensionOptions & HeadingOptions>({
 
   addOptions() {
     return {
-      ...this.parent?.(),
+      ...this.parent!(),
       getToolbarItems({ editor }: { editor: Editor }) {
         return {
           priority: 30,

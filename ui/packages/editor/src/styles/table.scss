@@ -19,7 +19,6 @@
           pointer-events: none;
           top: 0;
           width: 8px;
-          z-index: 2;
           margin-top: 27px;
         }
       }
@@ -34,7 +33,6 @@
           pointer-events: none;
           top: 0;
           width: 8px;
-          z-index: 2;
           margin-top: 27px;
         }
       }
@@ -99,7 +97,6 @@
         padding: 12px 8px;
         text-align: left;
         min-width: 100px;
-        z-index: 1;
 
         > * {
           margin-top: 0;
@@ -121,7 +118,6 @@
           left: -1px;
           top: -1px;
           bottom: 0px;
-          z-index: 12;
           display: inline-block;
           pointer-events: none;
         }
@@ -318,7 +314,6 @@
       bottom: -2px;
       width: 4px;
       background-color: $tableResizeHandleBgColor;
-      z-index: 1;
       cursor: col-resize;
     }
   }

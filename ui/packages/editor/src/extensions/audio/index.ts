@@ -2,16 +2,17 @@ import { BlockActionSeparator } from "@/components";
 import MdiDeleteForeverOutline from "@/components/icon/MdiDeleteForeverOutline.vue";
 import ToolboxItemVue from "@/components/toolbox/ToolboxItem.vue";
 import { i18n } from "@/locales";
-import type { EditorState } from "@/tiptap/pm";
 import {
   Editor,
   Node,
+  PluginKey,
   VueNodeViewRenderer,
   isActive,
   mergeAttributes,
   nodeInputRule,
   type Range,
-} from "@/tiptap/vue-3";
+} from "@/tiptap";
+import type { EditorState } from "@/tiptap/pm";
 import type { ExtensionOptions, NodeBubbleMenuType } from "@/types";
 import { deleteNode } from "@/utils";
 import { markRaw } from "vue";
@@ -32,6 +33,8 @@ declare module "@/tiptap" {
     };
   }
 }
+
+export const AUDIO_BUBBLE_MENU_KEY = new PluginKey("audioBubbleMenu");
 
 const Audio = Node.create<ExtensionOptions>({
   name: "audio",
@@ -173,7 +176,7 @@ const Audio = Node.create<ExtensionOptions>({
       },
       getBubbleMenu({ editor }: { editor: Editor }): NodeBubbleMenuType {
         return {
-          pluginKey: "audioBubbleMenu",
+          pluginKey: AUDIO_BUBBLE_MENU_KEY,
           shouldShow: ({ state }: { state: EditorState }) => {
             return isActive(state, Audio.name);
           },

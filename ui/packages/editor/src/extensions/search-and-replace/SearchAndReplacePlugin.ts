@@ -1,10 +1,11 @@
-import type { PMNode, Selection } from "@/tiptap";
+import type { PMNode } from "@/tiptap";
 import {
   Decoration,
   DecorationSet,
   EditorView,
   Plugin,
   PluginKey,
+  Selection,
   Transaction,
 } from "@/tiptap/pm";
 import { Editor } from "@/tiptap/vue-3";
@@ -40,7 +41,7 @@ export class SearchAndReplacePluginView {
   }
 
   update() {
-    const { parentElement: editorParentElement } = this.editor.options.element;
+    const editorParentElement = this.editor.options.element as HTMLElement;
     if (!this.init && editorParentElement) {
       editorParentElement.insertAdjacentElement(
         "afterbegin",
