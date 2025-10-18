@@ -2,6 +2,7 @@ package run.halo.app.infra.utils;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.net.URI;
 import java.nio.charset.StandardCharsets;
 import java.time.Instant;
 import java.time.ZoneId;
@@ -14,6 +15,7 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.util.Assert;
 import org.springframework.util.StreamUtils;
 import org.springframework.web.reactive.function.server.ServerRequest;
+import org.springframework.web.util.UriComponentsBuilder;
 import run.halo.app.theme.router.ModelConst;
 
 /**
@@ -95,4 +97,27 @@ public class HaloUtils {
             return request;
         };
     }
+
+    /**
+     * Safely convert string to URI. This method will assume the input string is already encoded.
+     * If failed, it will try to encode the string.
+     *
+     * @param uri the uri string
+     * @return the uri
+     */
+    public static URI safeToUri(String uri) {
+        try {
+            return UriComponentsBuilder.fromUriString(uri)
+                .build(true)
+                .encode()
+                .toUri();
+        } catch (IllegalArgumentException ignored) {
+            // Try to build with encoding
+            return UriComponentsBuilder.fromUriString(uri)
+                .build()
+                .encode()
+                .toUri();
+        }
+    }
+
 }

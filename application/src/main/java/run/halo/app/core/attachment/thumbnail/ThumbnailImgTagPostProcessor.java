@@ -9,13 +9,13 @@ import java.util.stream.Collectors;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
-import org.springframework.web.util.UriComponentsBuilder;
 import org.thymeleaf.context.ITemplateContext;
 import org.thymeleaf.engine.ElementNames;
 import org.thymeleaf.model.IAttribute;
 import org.thymeleaf.model.IProcessableElementTag;
 import org.thymeleaf.processor.element.MatchingElementName;
 import reactor.core.publisher.Mono;
+import run.halo.app.infra.utils.HaloUtils;
 import run.halo.app.theme.dialect.ElementTagPostProcessor;
 
 @Slf4j
@@ -53,11 +53,7 @@ class ThumbnailImgTagPostProcessor implements ElementTagPostProcessor {
             .map(IAttribute::getValue)
             .filter(StringUtils::hasText)
             .map(String::trim)
-            .map(str -> UriComponentsBuilder.fromUriString(str)
-                .build()
-                .encode()
-                .toUri()
-            );
+            .map(HaloUtils::safeToUri);
         if (srcValue.isEmpty()) {
             log.debug("Skip processing img tag without src attribute");
             return Mono.empty();

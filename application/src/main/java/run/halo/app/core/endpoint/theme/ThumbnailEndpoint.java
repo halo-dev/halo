@@ -16,12 +16,12 @@ import org.springframework.web.reactive.function.server.RouterFunction;
 import org.springframework.web.reactive.function.server.ServerRequest;
 import org.springframework.web.reactive.function.server.ServerResponse;
 import org.springframework.web.server.ServerWebInputException;
-import org.springframework.web.util.UriComponentsBuilder;
 import reactor.core.publisher.Mono;
 import run.halo.app.core.attachment.ThumbnailSize;
 import run.halo.app.core.attachment.thumbnail.ThumbnailService;
 import run.halo.app.core.extension.endpoint.CustomEndpoint;
 import run.halo.app.extension.GroupVersion;
+import run.halo.app.infra.utils.HaloUtils;
 
 /**
  * Thumbnail endpoint for thumbnail resource access.
@@ -82,11 +82,7 @@ public class ThumbnailEndpoint implements CustomEndpoint {
     private Mono<ServerResponse> getThumbnailByUri(ServerRequest request) {
         var uri = request.queryParam("uri")
             .filter(StringUtils::isNotBlank)
-            .map(uriString -> UriComponentsBuilder.fromUriString(uriString)
-                .build()
-                .encode()
-                .toUri()
-            );
+            .map(HaloUtils::safeToUri);
         if (uri.isEmpty()) {
             return Mono.error(
                 new ServerWebInputException("Required parameter 'uri' is missing or invalid")
