@@ -4,7 +4,6 @@ import static org.springdoc.core.fn.builders.apiresponse.Builder.responseBuilder
 import static org.springdoc.core.fn.builders.parameter.Builder.parameterBuilder;
 
 import io.swagger.v3.oas.annotations.enums.ParameterIn;
-import java.net.URI;
 import java.util.Arrays;
 import lombok.RequiredArgsConstructor;
 import org.apache.commons.lang3.StringUtils;
@@ -17,6 +16,7 @@ import org.springframework.web.reactive.function.server.RouterFunction;
 import org.springframework.web.reactive.function.server.ServerRequest;
 import org.springframework.web.reactive.function.server.ServerResponse;
 import org.springframework.web.server.ServerWebInputException;
+import org.springframework.web.util.UriComponentsBuilder;
 import reactor.core.publisher.Mono;
 import run.halo.app.core.attachment.ThumbnailSize;
 import run.halo.app.core.attachment.thumbnail.ThumbnailService;
@@ -82,7 +82,11 @@ public class ThumbnailEndpoint implements CustomEndpoint {
     private Mono<ServerResponse> getThumbnailByUri(ServerRequest request) {
         var uri = request.queryParam("uri")
             .filter(StringUtils::isNotBlank)
-            .map(URI::create);
+            .map(uriString -> UriComponentsBuilder.fromUriString(uriString)
+                .build()
+                .encode()
+                .toUri()
+            );
         if (uri.isEmpty()) {
             return Mono.error(
                 new ServerWebInputException("Required parameter 'uri' is missing or invalid")
