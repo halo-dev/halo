@@ -655,7 +655,6 @@ core:
         permalink: 链接
         thumbnails: 缩略图
       preview:
-        click_to_exit: 点击退出预览
         video_not_support: 当前浏览器不支持该视频播放
         audio_not_support: 当前浏览器不支持该音频播放
         not_support: 此文件不支持预览

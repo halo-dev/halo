@@ -458,7 +458,6 @@ core:
         creation_time: Hora de Creación
         permalink: Enlace Permanente
       preview:
-        click_to_exit: Haz clic para salir de la vista previa
         video_not_support: El navegador actual no admite la reproducción de video.
         audio_not_support: El navegador actual no admite la reproducción de audio.
         not_support: Este archivo no admite la vista previa.
