@@ -34,6 +34,7 @@ public class AuthProviderReconciler implements Reconciler<Reconciler.Request> {
     public Controller setupWith(ControllerBuilder builder) {
         return builder
             .extension(new AuthProvider())
+            .syncAllOnStart(true)
             .build();
     }
 

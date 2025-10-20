@@ -76,6 +76,7 @@ public class ThemeReconciler implements Reconciler<Request> {
     public Controller setupWith(ControllerBuilder builder) {
         return builder
             .extension(new Theme())
+            .syncAllOnStart(true)
             .build();
     }
 
