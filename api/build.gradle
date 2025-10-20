@@ -1,4 +1,5 @@
 plugins {
+    id 'checkstyle'
     id 'java-library'
     id 'halo.publish'
     id 'jacoco'
@@ -24,6 +25,12 @@ java {
     }
     withJavadocJar()
     withSourcesJar()
+}
+
+checkstyle {
+    toolVersion = libs.versions.checkstyle.get()
+    showViolations = false
+    ignoreFailures = false
 }
 
 jar {

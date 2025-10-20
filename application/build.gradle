@@ -5,7 +5,7 @@ import org.springframework.boot.gradle.tasks.bundling.BootJar
 import org.springframework.util.StringUtils
 
 plugins {
-    id "checkstyle"
+    id 'checkstyle'
     id 'java'
     id 'idea'
     id 'jacoco'
@@ -40,7 +40,7 @@ idea {
 }
 
 checkstyle {
-    toolVersion = "9.3"
+    toolVersion = libs.versions.checkstyle.get()
     showViolations = false
     ignoreFailures = false
 }

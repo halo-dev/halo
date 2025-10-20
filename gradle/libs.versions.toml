@@ -2,6 +2,7 @@
 lucene = '10.3.0'
 resilience4j = '2.3.0'
 therapi = '0.15.0'
+checkstyle = "12.1.0"
 
 [libraries]
 lucene-core = { module = 'org.apache.lucene:lucene-core', version.ref = 'lucene' }
