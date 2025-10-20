@@ -5,7 +5,14 @@ import type {
   AttachmentLike,
   AttachmentSelectProvider,
 } from "@halo-dev/console-shared";
-import { computed, markRaw, onMounted, ref } from "vue";
+import {
+  computed,
+  markRaw,
+  onMounted,
+  ref,
+  shallowRef,
+  useTemplateRef,
+} from "vue";
 import { useI18n } from "vue-i18n";
 import CoreSelectorProvider from "./selector-providers/CoreSelectorProvider.vue";
 
@@ -13,13 +20,11 @@ const { t } = useI18n();
 
 const props = withDefaults(
   defineProps<{
-    visible: boolean;
     accepts?: string[];
     min?: number;
     max?: number;
   }>(),
   {
-    visible: false,
     accepts: () => ["*/*"],
     min: undefined,
     max: undefined,
@@ -27,14 +32,14 @@ const props = withDefaults(
 );
 
 const emit = defineEmits<{
-  (event: "update:visible", visible: boolean): void;
   (event: "close"): void;
   (event: "select", attachments: AttachmentLike[]): void;
 }>();
 
+const modal = useTemplateRef<InstanceType<typeof VModal> | null>("modal");
 const selected = ref<AttachmentLike[]>([] as AttachmentLike[]);
 
-const attachmentSelectProviders = ref<AttachmentSelectProvider[]>([
+const attachmentSelectProviders = shallowRef<AttachmentSelectProvider[]>([
   {
     id: "core",
     label: t("core.uc_attachment.select_modal.providers.default.label"),
@@ -56,7 +61,10 @@ onMounted(async () => {
       }
 
       const providers = await callbackFunction();
-      attachmentSelectProviders.value.push(...providers);
+      attachmentSelectProviders.value = [
+        ...attachmentSelectProviders.value,
+        ...providers,
+      ].flat();
     } catch (error) {
       console.error(`Error processing plugin module:`, pluginModule, error);
     }
@@ -64,13 +72,6 @@ onMounted(async () => {
 });
 
 const activeId = ref(attachmentSelectProviders.value[0].id);
-
-const onVisibleChange = (visible: boolean) => {
-  emit("update:visible", visible);
-  if (!visible) {
-    emit("close");
-  }
-};
 
 const onChangeProvider = (providerId: string) => {
   const provider = attachmentSelectProviders.value.find(
@@ -86,7 +87,7 @@ const onChangeProvider = (providerId: string) => {
 
 const handleConfirm = () => {
   emit("select", Array.from(selected.value));
-  onVisibleChange(false);
+  modal.value?.close();
 };
 
 const confirmDisabled = computed(() => {
@@ -105,13 +106,13 @@ const confirmCountMessage = computed(() => {
 </script>
 <template>
   <VModal
-    :visible="visible"
+    ref="modal"
     :width="1240"
     :mount-to-body="true"
     :layer-closable="true"
     :title="$t('core.uc_attachment.select_modal.title')"
     height="calc(100vh - 20px)"
-    @update:visible="onVisibleChange"
+    @close="emit('close')"
   >
     <VTabbar
       v-model:active-id="activeId"
@@ -125,10 +126,10 @@ const confirmCountMessage = computed(() => {
       type="outline"
     ></VTabbar>
 
-    <div v-if="visible" class="mt-2">
+    <div class="mt-2">
       <template
-        v-for="(provider, index) in attachmentSelectProviders"
-        :key="index"
+        v-for="provider in attachmentSelectProviders"
+        :key="provider.id"
       >
         <Suspense>
           <component
@@ -162,7 +163,7 @@ const confirmCountMessage = computed(() => {
             }}
           </span>
         </VButton>
-        <VButton @click="onVisibleChange(false)">
+        <VButton @click="modal?.close()">
           {{ $t("core.common.buttons.cancel") }}
         </VButton>
       </VSpace>
