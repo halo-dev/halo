@@ -16,6 +16,7 @@ import org.springframework.util.Assert;
 import org.springframework.util.StreamUtils;
 import org.springframework.web.reactive.function.server.ServerRequest;
 import org.springframework.web.util.UriComponentsBuilder;
+import org.springframework.web.util.UriUtils;
 import run.halo.app.theme.router.ModelConst;
 
 /**
@@ -106,18 +107,12 @@ public class HaloUtils {
      * @return the uri
      */
     public static URI safeToUri(String uri) {
-        try {
-            return UriComponentsBuilder.fromUriString(uri)
-                .build(true)
-                .encode()
-                .toUri();
-        } catch (IllegalArgumentException ignored) {
-            // Try to build with encoding
-            return UriComponentsBuilder.fromUriString(uri)
-                .build()
-                .encode()
-                .toUri();
-        }
+        // try to decode first
+        var decodedUri = UriUtils.decode(uri, StandardCharsets.UTF_8);
+        return UriComponentsBuilder.fromUriString(decodedUri)
+            .build(false)
+            .encode()
+            .toUri();
     }
 
 }
