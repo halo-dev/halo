@@ -6,6 +6,7 @@ import {
   onMounted,
   provide,
   ref,
+  shallowRef,
   watch,
   type Ref,
 } from "vue";
@@ -69,7 +70,7 @@ const initialTabs: ThemeTab[] = [
   },
 ];
 
-const tabs = ref<ThemeTab[]>(cloneDeep(initialTabs));
+const tabs = shallowRef<ThemeTab[]>(initialTabs);
 const selectedTheme = ref<Theme>();
 const themesModal = ref(false);
 const previewModal = ref(false);

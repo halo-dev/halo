@@ -4,7 +4,7 @@ import { coreApiClient } from "@halo-dev/api-client";
 import { VTabbar } from "@halo-dev/components";
 import { useQuery } from "@tanstack/vue-query";
 import type { Component, ComputedRef, Raw } from "vue";
-import { computed, markRaw, provide, ref } from "vue";
+import { computed, markRaw, provide, ref, shallowRef } from "vue";
 import NotificationSetting from "./NotificationSetting.vue";
 
 interface Tab {
@@ -13,7 +13,7 @@ interface Tab {
   component: Raw<Component>;
 }
 
-const tabs = ref<Tab[]>();
+const tabs = shallowRef<Tab[]>();
 
 const activeTab = ref();
 

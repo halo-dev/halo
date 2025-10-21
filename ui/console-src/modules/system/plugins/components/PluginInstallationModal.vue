@@ -12,6 +12,7 @@ import {
   onMounted,
   provide,
   ref,
+  shallowRef,
   toRefs,
   type Ref,
 } from "vue";
@@ -40,7 +41,7 @@ provide<Ref<Plugin | undefined>>("pluginToUpgrade", pluginToUpgrade);
 
 const modal = ref<InstanceType<typeof VModal> | null>(null);
 
-const tabs = ref<PluginInstallationTab[]>([
+const tabs = shallowRef<PluginInstallationTab[]>([
   {
     id: "local",
     label: t("core.plugin.upload_modal.tabs.local"),

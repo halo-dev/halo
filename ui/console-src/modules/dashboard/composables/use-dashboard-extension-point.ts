@@ -1,13 +1,13 @@
 import { usePluginModuleStore } from "@/stores/plugin";
 import type { DashboardWidgetDefinition } from "@halo-dev/console-shared";
-import { onMounted, ref } from "vue";
+import { onMounted, shallowRef } from "vue";
 
 const EXTENSION_POINT_NAME = "console:dashboard:widgets:create";
 
 export function useDashboardExtensionPoint() {
   const { pluginModuleMap } = usePluginModuleStore();
 
-  const widgetDefinitions = ref<DashboardWidgetDefinition[]>([]);
+  const widgetDefinitions = shallowRef<DashboardWidgetDefinition[]>([]);
 
   onMounted(async () => {
     const finalDefinitions: DashboardWidgetDefinition[] = [];
