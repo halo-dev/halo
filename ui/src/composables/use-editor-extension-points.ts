@@ -2,7 +2,7 @@ import Logo from "@/assets/logo.png";
 import DefaultEditor from "@/components/editor/DefaultEditor.vue";
 import { usePluginModuleStore } from "@/stores/plugin";
 import type { EditorProvider } from "@halo-dev/console-shared";
-import { markRaw, ref, type Ref } from "vue";
+import { markRaw, shallowRef, type Ref } from "vue";
 import { useI18n } from "vue-i18n";
 
 interface useEditorExtensionPointsReturn {
@@ -15,7 +15,7 @@ export function useEditorExtensionPoints(): useEditorExtensionPointsReturn {
   const { pluginModules } = usePluginModuleStore();
   const { t } = useI18n();
 
-  const editorProviders = ref<EditorProvider[]>([
+  const editorProviders = shallowRef<EditorProvider[]>([
     {
       name: "default",
       displayName: t("core.plugin.extension_points.editor.providers.default"),
@@ -37,7 +37,7 @@ export function useEditorExtensionPoints(): useEditorExtensionPointsReturn {
 
         const pluginProviders = await callbackFunction();
 
-        editorProviders.value.push(...pluginProviders);
+        editorProviders.value = [...editorProviders.value, ...pluginProviders];
       } catch (error) {
         console.error(`Error processing plugin module:`, pluginModule, error);
       }
