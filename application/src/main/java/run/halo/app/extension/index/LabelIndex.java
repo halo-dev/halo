@@ -120,6 +120,7 @@ class LabelIndex<E extends Extension> implements LabelIndexQuery, Index<E, Strin
             .distinct()
             .map(labelValue -> new LabelEntry(labelKey, labelValue))
             .map(index::get)
+            .filter(Objects::nonNull)
             .flatMap(Set::stream)
             .collect(Collectors.toSet());
     }

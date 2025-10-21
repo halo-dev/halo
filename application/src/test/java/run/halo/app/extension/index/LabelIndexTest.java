@@ -142,10 +142,10 @@ class LabelIndexTest {
 
         @Test
         void inAndNotInQuery() {
-            var inResult = index.in("k1", List.of("v1", "v3"));
+            var inResult = index.in("k1", List.of("v1", "v3", "non-existent"));
             assertEquals(Set.of("f1", "f3"), inResult);
 
-            var notInResult = index.notIn("k1", List.of("v1"));
+            var notInResult = index.notIn("k1", List.of("v1", "non-existent"));
             assertEquals(Set.of("f2", "f3"), notInResult);
         }
     }
