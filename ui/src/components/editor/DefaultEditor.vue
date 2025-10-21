@@ -203,7 +203,7 @@ const AttachmentSelectorModal = defineAsyncComponent({
   },
 });
 
-const attachmentSelectorModal = ref(false);
+const attachmentSelectorModalVisible = ref(false);
 const { onAttachmentSelect, attachmentResult } = useAttachmentSelect();
 
 const initAttachmentOptions = {
@@ -218,8 +218,9 @@ const attachmentOptions = ref<{
   max?: number;
 }>(initAttachmentOptions);
 
-const handleCloseAttachmentSelectorModal = () => {
+const onAttachmentSelectorModalClose = () => {
   attachmentOptions.value = initAttachmentOptions;
+  attachmentSelectorModalVisible.value = false;
 };
 
 const { filterDuplicateExtensions } = useExtension();
@@ -347,7 +348,7 @@ const presetExtensions = [
           if (options) {
             attachmentOptions.value = options;
           }
-          attachmentSelectorModal.value = true;
+          attachmentSelectorModalVisible.value = true;
           attachmentResult.updateAttachment = (
             attachments: AttachmentLike[]
           ) => {
@@ -578,18 +579,19 @@ onCoverInputChange((files) => {
   <VLoading v-if="!isInitialized" />
   <div v-else>
     <AttachmentSelectorModal
+      v-if="attachmentSelectorModalVisible"
       v-bind="attachmentOptions"
-      v-model:visible="attachmentSelectorModal"
       @select="onAttachmentSelect"
-      @close="handleCloseAttachmentSelectorModal"
+      @close="onAttachmentSelectorModalClose"
     />
     <!-- For cover image -->
     <AttachmentSelectorModal
-      v-model:visible="coverSelectorModalVisible"
+      v-if="coverSelectorModalVisible"
       :min="1"
       :max="1"
       :accepts="['image/*']"
       @select="onCoverSelect"
+      @close="coverSelectorModalVisible = false"
     />
     <RichTextEditor v-if="editor" :editor="editor" :locale="currentLocale">
       <template #content>
@@ -702,6 +704,7 @@ onCoverInputChange((files) => {
             @input="onTitleInput"
             @keydown.enter="handleFocusEditor"
           />
+          <slot name="content" />
         </div>
       </template>
       <template v-if="showSidebar" #extra>
