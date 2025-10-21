@@ -121,7 +121,6 @@ const handleCopyCode = () => {
           class="w-48"
           :container="editor.options.element"
           :options="languageOptions"
-          @select="editor.commands.focus()"
         >
         </CodeBlockSelect>
         <CodeBlockSelect
