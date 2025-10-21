@@ -1,5 +1,5 @@
 import {
-  CoreEditor,
+  Editor,
   Extension,
   isList,
   type CommandProps,
@@ -7,7 +7,8 @@ import {
   type KeyboardShortcutCommand,
 } from "@/tiptap";
 import { TextSelection, Transaction } from "@/tiptap/pm";
-import { isListActive } from "@/utils/isListActive";
+import type { ExtensionOptions } from "@/types";
+import { isListActive } from "@/utils/is-list-active";
 
 declare module "@/tiptap" {
   interface Commands<ReturnType> {
@@ -28,7 +29,7 @@ type IndentOptions = {
   HTMLAttributes: Record<string, any>;
   firstLineIndent: boolean;
 };
-const Indent = Extension.create<IndentOptions, never>({
+const Indent = Extension.create<IndentOptions & ExtensionOptions>({
   name: "indent",
   priority: 10000,
 
@@ -247,7 +248,7 @@ const isTextIndent = (tr: Transaction, currNodePos: number) => {
   return false;
 };
 
-const isFilterActive = (editor: CoreEditor) => {
+const isFilterActive = (editor: Editor) => {
   return editor.isActive("table") || editor.isActive("columns");
 };
 

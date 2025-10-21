@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import type { Editor } from "@/tiptap/vue-3";
+import type { Editor } from "@/tiptap";
 import { Dropdown as VDropdown, vTooltip } from "floating-vue";
 import { ref, type Component } from "vue";
 
@@ -11,7 +11,7 @@ const props = withDefaults(
     icon?: Component;
     iconStyle?: string;
     title?: string;
-    action?: ({ editor }: { editor: Editor }) => Component | void;
+    action?: ({ editor }: { editor: Editor }) => Component | boolean | void;
   }>(),
   {
     isActive: () => false,

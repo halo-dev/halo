@@ -1,29 +1,23 @@
 import {
   Extension,
+  posToDOMRect,
   VueRenderer,
   type AnyExtension,
   type Editor,
   type Range,
-} from "@/tiptap/vue-3";
+} from "@/tiptap";
 import type { CommandMenuItemType } from "@/types";
+import { computePosition, flip, shift } from "@floating-ui/dom";
 import Suggestion from "@tiptap/suggestion";
-import type { Instance } from "tippy.js";
-import tippy from "tippy.js";
 import CommandsView from "./CommandsView.vue";
 
 export default Extension.create({
   name: "commands-menu",
 
-  addProseMirrorPlugins() {
-    const commandMenuItems = getToolbarItemsFromExtensions(
-      this.editor as Editor
-    );
-
-    return [
-      Suggestion({
-        editor: this.editor,
+  addOptions() {
+    return {
+      suggestion: {
         char: "/",
-        // @ts-ignore
         command: ({
           editor,
           range,
@@ -35,6 +29,17 @@ export default Extension.create({
         }) => {
           props.command({ editor, range });
         },
+      },
+    };
+  },
+
+  addProseMirrorPlugins() {
+    const commandMenuItems = getToolbarItemsFromExtensions(this.editor);
+
+    return [
+      Suggestion({
+        editor: this.editor,
+        ...this.options.suggestion,
         items: ({ query }: { query: string }) => {
           return commandMenuItems.filter((item) =>
             [...item.keywords, item.title].some((keyword) =>
@@ -43,50 +48,58 @@ export default Extension.create({
           );
         },
         render: () => {
-          let component: VueRenderer;
-          let popup: Instance[];
-
+          let component: VueRenderer | null = null;
           return {
-            // eslint-disable-next-line @typescript-eslint/no-explicit-any
-            onStart: (props: Record<string, any>) => {
+            onStart: (props) => {
               component = new VueRenderer(CommandsView, {
                 props,
                 editor: props.editor,
               });
-
               if (!props.clientRect) {
                 return;
               }
+              if (!component.element) {
+                return;
+              }
+              if (!(component.element instanceof HTMLElement)) {
+                return;
+              }
+              component.element.style.position = "absolute";
 
-              popup = tippy("body", {
-                getReferenceClientRect: props.clientRect,
-                appendTo: () => document.body,
-                content: component.element as Element,
-                showOnCreate: true,
-                interactive: true,
-                trigger: "manual",
-                placement: "bottom-start",
-              });
+              document.body.appendChild(component.element);
+
+              updatePosition(props.editor, component.element);
             },
 
-            // eslint-disable-next-line @typescript-eslint/no-explicit-any
-            onUpdate(props: Record<string, any>) {
+            onUpdate(props) {
+              if (!component) {
+                return;
+              }
+              if (!component.element) {
+                return;
+              }
+              if (!(component.element instanceof HTMLElement)) {
+                return;
+              }
               component.updateProps(props);
 
               if (!props.clientRect) {
                 return;
               }
 
-              popup[0].setProps({
-                getReferenceClientRect: props.clientRect,
-              });
+              updatePosition(props.editor, component.element);
             },
 
-            // eslint-disable-next-line @typescript-eslint/no-explicit-any
-            onKeyDown(props: Record<string, any>) {
+            onKeyDown(props) {
+              if (!component) {
+                return false;
+              }
               if (props.event.key === "Escape") {
-                popup[0].hide();
-
+                if (!component.element) {
+                  return false;
+                }
+                component.destroy();
+                component.element.remove();
                 return true;
               }
 
@@ -94,8 +107,14 @@ export default Extension.create({
             },
 
             onExit() {
-              popup[0].destroy();
+              if (!component) {
+                return;
+              }
+              if (!component.element) {
+                return;
+              }
               component.destroy();
+              component.element.remove();
             },
           };
         },
@@ -104,7 +123,28 @@ export default Extension.create({
   },
 });
 
-function getToolbarItemsFromExtensions(editor: Editor) {
+const updatePosition = (editor: Editor, element: HTMLElement) => {
+  const virtualElement = {
+    getBoundingClientRect: () =>
+      posToDOMRect(
+        editor.view,
+        editor.state.selection.from,
+        editor.state.selection.to
+      ),
+  };
+
+  computePosition(virtualElement, element, {
+    placement: "bottom-start",
+    strategy: "absolute",
+    middleware: [shift(), flip()],
+  }).then(({ x, y, strategy }) => {
+    element.style.position = strategy;
+    element.style.left = `${x}px`;
+    element.style.top = `${y}px`;
+  });
+};
+
+const getToolbarItemsFromExtensions = (editor: Editor) => {
   const extensionManager = editor?.extensionManager;
   return extensionManager.extensions
     .reduce((acc: CommandMenuItemType[], extension: AnyExtension) => {
@@ -123,4 +163,4 @@ function getToolbarItemsFromExtensions(editor: Editor) {
       return [...acc, items];
     }, [])
     .sort((a, b) => a.priority - b.priority);
-}
+};

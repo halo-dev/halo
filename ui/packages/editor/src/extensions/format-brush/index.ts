@@ -1,6 +1,6 @@
 import ToolbarItem from "@/components/toolbar/ToolbarItem.vue";
 import { i18n } from "@/locales";
-import { CoreEditor, Extension, Plugin, PluginKey } from "@/tiptap";
+import { Editor, Extension, Plugin, PluginKey } from "@/tiptap";
 import { markRaw } from "vue";
 import MdiBrushVariant from "~icons/mdi/brush-variant";
 import { getMarksByFirstTextNode, setMarks } from "./util";
@@ -27,7 +27,7 @@ const formatBrush = Extension.create<any, FormatBrushStore>({
   addOptions() {
     return {
       ...this.parent?.(),
-      getToolbarItems({ editor }: { editor: CoreEditor }) {
+      getToolbarItems({ editor }: { editor: Editor }) {
         const formatBrush =
           editor.view.dom.classList.contains("format-brush-mode");
         return {
