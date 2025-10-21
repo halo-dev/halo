@@ -12,26 +12,24 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.ConcurrentMap;
 import java.util.function.Predicate;
+import java.util.stream.StreamSupport;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.context.event.EventListener;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.util.Predicates;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.ReactiveTransactionManager;
 import org.springframework.transaction.reactive.TransactionalOperator;
+import org.springframework.util.Assert;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
+import reactor.core.scheduler.Scheduler;
 import reactor.core.scheduler.Schedulers;
 import reactor.util.retry.Retry;
-import run.halo.app.extension.event.IndexerBuiltEvent;
-import run.halo.app.extension.event.SchemeRemovedEvent;
 import run.halo.app.extension.exception.ExtensionNotFoundException;
+import run.halo.app.extension.index.IndexEngine;
 import run.halo.app.extension.index.IndexedQueryEngine;
-import run.halo.app.extension.index.IndexerFactory;
 import run.halo.app.extension.store.ReactiveExtensionStoreClient;
 
 @Slf4j
@@ -50,29 +48,32 @@ public class ReactiveExtensionClientImpl implements ReactiveExtensionClient {
 
     private final ObjectMapper objectMapper;
 
-    private final IndexerFactory indexerFactory;
+    private final IndexEngine indexEngine;
 
-    private final IndexedQueryEngine indexedQueryEngine;
-
-    /**
-     * The indexer building state map, the key is the group kind, and the value indicates whether
-     * the indexer is built.
-     */
-    private final ConcurrentMap<GroupKind, Boolean> indexerBuiltMap = new ConcurrentHashMap<>();
+    private Scheduler scheduler;
 
     private TransactionalOperator transactionalOperator;
 
     public ReactiveExtensionClientImpl(ReactiveExtensionStoreClient client,
         ExtensionConverter converter, SchemeManager schemeManager, ObjectMapper objectMapper,
-        IndexerFactory indexerFactory, IndexedQueryEngine indexedQueryEngine,
+        IndexEngine indexEngine,
         ReactiveTransactionManager reactiveTransactionManager) {
         this.client = client;
         this.converter = converter;
         this.schemeManager = schemeManager;
         this.objectMapper = objectMapper;
-        this.indexerFactory = indexerFactory;
-        this.indexedQueryEngine = indexedQueryEngine;
+        this.indexEngine = indexEngine;
         this.transactionalOperator = TransactionalOperator.create(reactiveTransactionManager);
+        this.scheduler = Schedulers.boundedElastic();
+    }
+
+    /**
+     * Only for test.
+     *
+     * @param scheduler the scheduler to set
+     */
+    void setScheduler(Scheduler scheduler) {
+        this.scheduler = scheduler;
     }
 
     /**
@@ -123,23 +124,26 @@ public class ReactiveExtensionClientImpl implements ReactiveExtensionClient {
                 return Sort.unsorted();
             });
         var scheme = schemeManager.get(type);
-        return Mono.fromSupplier(
-                () -> indexedQueryEngine.retrieveAll(scheme.groupVersionKind(), options,
-                    nullSafeSort))
-            .doOnSuccess(objectKeys -> {
-                if (log.isDebugEnabled()) {
-                    if (objectKeys.size() > 500) {
-                        log.warn("The number of objects retrieved by listAll is too large ({}) "
-                                + "and it is recommended to use paging query.",
-                            objectKeys.size());
-                    }
-                }
-            })
+
+        return Mono.fromCallable(
+                () -> indexEngine.retrieveAll(scheme.type(), options, nullSafeSort)
+            )
+            .subscribeOn(this.scheduler)
             .flatMapMany(objectKeys -> {
-                var storeNames = objectKeys.stream()
+                var storeNames = StreamSupport.stream(objectKeys.spliterator(), false)
                     .map(objectKey -> ExtensionStoreUtil.buildStoreName(scheme, objectKey))
                     .toList();
-                final long startTimeMs = System.currentTimeMillis();
+                if (log.isDebugEnabled()) {
+                    if (storeNames.size() > 500) {
+                        log.warn("""
+                                The number of objects retrieved by listAll is too large ({}) \
+                                and it is recommended to use paging query.\
+                                """,
+                            storeNames.size()
+                        );
+                    }
+                }
+                long startTimeMs = System.currentTimeMillis();
                 return client.listByNames(storeNames)
                     .map(extensionStore -> converter.convertFrom(type, extensionStore))
                     .doOnComplete(() -> log.debug(
@@ -150,14 +154,33 @@ public class ReactiveExtensionClientImpl implements ReactiveExtensionClient {
     }
 
     @Override
+    public <E extends Extension> Flux<String> listAllNames(
+        Class<E> type, ListOptions options, Sort sort
+    ) {
+        var scheme = schemeManager.get(type);
+        return Mono.fromCallable(() -> indexEngine.retrieveAll(scheme.type(), options, sort))
+            .subscribeOn(this.scheduler)
+            .flatMapMany(Flux::fromIterable);
+    }
+
+    @Override
+    public <E extends Extension> Flux<String> listTopNames(
+        Class<E> type, ListOptions options, Sort sort, int topN
+    ) {
+        var scheme = schemeManager.get(type);
+        return Mono.fromCallable(() -> indexEngine.retrieveTopN(scheme.type(), options, sort, topN))
+            .subscribeOn(this.scheduler)
+            .flatMapMany(Flux::fromIterable);
+    }
+
+    @Override
     public <E extends Extension> Mono<ListResult<E>> listBy(Class<E> type, ListOptions options,
         PageRequest page) {
         var scheme = schemeManager.get(type);
-        return Mono.fromSupplier(
-                () -> indexedQueryEngine.retrieve(scheme.groupVersionKind(), options, page)
-            )
-            .flatMap(objectKeys -> {
-                var storeNames = objectKeys.get()
+        return Mono.fromCallable(() -> indexEngine.retrieve(scheme.type(), options, page))
+            .subscribeOn(this.scheduler)
+            .flatMap(listResult -> {
+                var storeNames = listResult.get()
                     .map(objectKey -> ExtensionStoreUtil.buildStoreName(scheme, objectKey))
                     .toList();
                 final long startTimeMs = System.currentTimeMillis();
@@ -168,10 +191,26 @@ public class ReactiveExtensionClientImpl implements ReactiveExtensionClient {
                         scheme.groupVersionKind(), System.currentTimeMillis() - startTimeMs)
                     )
                     .collectList()
-                    .map(result -> new ListResult<>(page.getPageNumber(), page.getPageSize(),
-                        objectKeys.getTotal(), result));
+                    .map(items -> new ListResult<>(page.getPageNumber(), page.getPageSize(),
+                        listResult.getTotal(), items)
+                    );
             })
             .defaultIfEmpty(ListResult.emptyResult());
+    }
+
+    @Override
+    public <E extends Extension> Mono<ListResult<String>> listNamesBy(Class<E> type,
+        ListOptions options, PageRequest pageable) {
+        var scheme = schemeManager.get(type);
+        return Mono.fromCallable(() -> indexEngine.retrieve(scheme.type(), options, pageable))
+            .subscribeOn(this.scheduler);
+    }
+
+    @Override
+    public <E extends Extension> Mono<Long> countBy(Class<E> type, ListOptions options) {
+        var scheme = schemeManager.get(type);
+        return Mono.fromCallable(() -> indexEngine.count(scheme.type(), options))
+            .subscribeOn(this.scheduler);
     }
 
     @Override
@@ -214,12 +253,10 @@ public class ReactiveExtensionClientImpl implements ReactiveExtensionClient {
             .switchIfEmpty(Mono.error(() -> new ExtensionNotFoundException(gvk, name)));
     }
 
-
     @Override
     public <E extends Extension> Mono<E> create(E extension) {
         return Mono.fromCallable(
                 () -> {
-                    checkClientWritable(extension);
                     var metadata = extension.getMetadata();
                     // those fields should be managed by halo.
                     metadata.setCreationTimestamp(Instant.now());
@@ -245,7 +282,7 @@ public class ReactiveExtensionClientImpl implements ReactiveExtensionClient {
                 })
             // the method secureStrong() may invoke blocking SecureRandom, so we need to subscribe
             // on boundedElastic thread pool.
-            .subscribeOn(Schedulers.boundedElastic())
+            .subscribeOn(this.scheduler)
             .flatMap(extStore -> doCreate(extension, extStore.getName(), extStore.getData())
                 .doOnNext(created -> watchers.onAdd(convertToRealExtension(created)))
             )
@@ -258,7 +295,6 @@ public class ReactiveExtensionClientImpl implements ReactiveExtensionClient {
 
     @Override
     public <E extends Extension> Mono<E> update(E extension) {
-        checkClientWritable(extension);
         // Refactor the atomic reference if we have a better solution.
         return getLatest(extension).flatMap(old -> {
             var oldJsonExt = new JsonExtension(objectMapper, old);
@@ -308,7 +344,8 @@ public class ReactiveExtensionClientImpl implements ReactiveExtensionClient {
 
     @Override
     public <E extends Extension> Mono<E> delete(E extension) {
-        checkClientWritable(extension);
+        // make sure the version is not null, or it will cause extension insertion.
+        Assert.notNull(extension.getMetadata().getVersion(), "Extension version must not be null");
         // set deletionTimestamp
         extension.getMetadata().setDeletionTimestamp(Instant.now());
         var extensionStore = converter.convertTo(extension);
@@ -319,7 +356,23 @@ public class ReactiveExtensionClientImpl implements ReactiveExtensionClient {
 
     @Override
     public IndexedQueryEngine indexedQueryEngine() {
-        return this.indexedQueryEngine;
+        return new IndexedQueryEngine() {
+            @Override
+            public ListResult<String> retrieve(GroupVersionKind gvk, ListOptions options,
+                PageRequest page) {
+                var scheme = schemeManager.get(gvk);
+                return indexEngine.retrieve(scheme.type(), options, page);
+            }
+
+            @Override
+            public List<String> retrieveAll(GroupVersionKind gvk, ListOptions options, Sort sort) {
+                var scheme = schemeManager.get(gvk);
+                return StreamSupport.stream(
+                        indexEngine.retrieveAll(scheme.type(), options, sort).spliterator(), false
+                    )
+                    .toList();
+            }
+        };
     }
 
     /**
@@ -363,12 +416,14 @@ public class ReactiveExtensionClientImpl implements ReactiveExtensionClient {
     @SuppressWarnings("unchecked")
     <E extends Extension> Mono<E> doCreate(E oldExtension, String name, byte[] data) {
         return Mono.defer(() -> {
-            var gvk = oldExtension.groupVersionKind();
             var type = (Class<E>) oldExtension.getClass();
-            var indexer = indexerFactory.getIndexer(gvk);
             return client.create(name, data)
                 .map(created -> converter.convertFrom(type, created))
-                .doOnNext(extension -> indexer.indexRecord(convertToRealExtension(extension)))
+                .flatMap(extension -> Mono.fromRunnable(
+                        () -> this.indexEngine.insert(List.of(convertToRealExtension(extension))))
+                    .subscribeOn(this.scheduler)
+                    .thenReturn(extension)
+                )
                 .as(transactionalOperator::transactional);
         });
     }
@@ -380,10 +435,13 @@ public class ReactiveExtensionClientImpl implements ReactiveExtensionClient {
     <E extends Extension> Mono<E> doUpdate(E oldExtension, String name, Long version, byte[] data) {
         return Mono.defer(() -> {
             var type = (Class<E>) oldExtension.getClass();
-            var indexer = indexerFactory.getIndexer(oldExtension.groupVersionKind());
             return client.update(name, version, data)
                 .map(updated -> converter.convertFrom(type, updated))
-                .doOnNext(extension -> indexer.updateRecord(convertToRealExtension(extension)))
+                .flatMap(extension -> Mono.fromRunnable(
+                        () -> this.indexEngine.update(List.of(convertToRealExtension(extension))))
+                    .subscribeOn(this.scheduler)
+                    .thenReturn(extension)
+                )
                 .as(transactionalOperator::transactional);
         });
     }
@@ -398,28 +456,6 @@ public class ReactiveExtensionClientImpl implements ReactiveExtensionClient {
             realExtension = jsonExtension.getObjectMapper().convertValue(jsonExtension, realType);
         }
         return realExtension;
-    }
-
-    /**
-     * If the extension is being updated, we should the index is not building index for the
-     * extension, otherwise the {@link IllegalStateException} will be thrown.
-     */
-    private <E extends Extension> void checkClientWritable(E extension) {
-        var built = indexerBuiltMap.get(extension.groupVersionKind().groupKind());
-        if (built == null || !built) {
-            throw new IllegalStateException("Index is building for " + extension.groupVersionKind()
-                + ", please wait for a moment and try again.");
-        }
-    }
-
-    @EventListener
-    void onIndexerBuiltEvent(IndexerBuiltEvent event) {
-        this.indexerBuiltMap.put(event.getScheme().groupVersionKind().groupKind(), true);
-    }
-
-    @EventListener
-    void onSchemeRemovedEvent(SchemeRemovedEvent event) {
-        this.indexerBuiltMap.remove(event.getScheme().groupVersionKind().groupKind());
     }
 
     @Override

@@ -1,6 +1,6 @@
 package run.halo.app.plugin;
 
-import static run.halo.app.extension.index.query.QueryFactory.equal;
+import static run.halo.app.extension.index.query.Queries.equal;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
@@ -196,6 +196,16 @@ public class DefaultReactiveSettingFetcher
 
     @Override
     public Controller setupWith(ControllerBuilder builder) {
+        if (StringUtils.isBlank(configMapName)) {
+            // Disable the controller if the config map name is not set
+            return builder
+                .extension(new ConfigMap())
+                .syncAllOnStart(false)
+                .onAddMatcher(extension -> false)
+                .onUpdateMatcher(extension -> false)
+                .onDeleteMatcher(extension -> false)
+                .build();
+        }
         ExtensionMatcher matcher =
             extension -> Objects.equals(extension.getMetadata().getName(), configMapName);
         return builder

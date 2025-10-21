@@ -10,10 +10,10 @@ import static org.springdoc.core.fn.builders.requestbody.Builder.requestBodyBuil
 import static org.springdoc.core.fn.builders.schema.Builder.schemaBuilder;
 import static org.springframework.web.reactive.function.server.RequestPredicates.contentType;
 import static run.halo.app.extension.ListResult.generateGenericClass;
-import static run.halo.app.extension.index.query.QueryFactory.contains;
-import static run.halo.app.extension.index.query.QueryFactory.equal;
-import static run.halo.app.extension.index.query.QueryFactory.in;
-import static run.halo.app.extension.index.query.QueryFactory.or;
+import static run.halo.app.extension.index.query.Queries.contains;
+import static run.halo.app.extension.index.query.Queries.equal;
+import static run.halo.app.extension.index.query.Queries.in;
+import static run.halo.app.extension.index.query.Queries.or;
 import static run.halo.app.extension.router.selector.SelectorUtil.labelAndFieldSelectorToListOptions;
 import static run.halo.app.security.authorization.AuthorityUtils.authoritiesToRoles;
 
@@ -689,8 +689,10 @@ public class UserEndpoint implements CustomEndpoint {
     public static class UserPermission {
         @Schema(requiredMode = REQUIRED)
         private List<Role> roles;
+
         @Schema(requiredMode = REQUIRED)
         private List<Role> permissions;
+
         @Schema(requiredMode = REQUIRED)
         private List<String> uiPermissions;
 

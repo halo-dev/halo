@@ -4,6 +4,8 @@ import static java.nio.charset.StandardCharsets.UTF_8;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -27,6 +29,8 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.core.io.buffer.DataBufferUtils;
 import org.springframework.core.io.buffer.DefaultDataBufferFactory;
+import org.springframework.transaction.ReactiveTransaction;
+import org.springframework.transaction.ReactiveTransactionManager;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import reactor.test.StepVerifier;
@@ -50,6 +54,9 @@ class MigrationServiceImplTest {
 
     @Mock
     BackupRootGetter backupRoot;
+
+    @Mock
+    ReactiveTransactionManager txManager;
 
     @InjectMocks
     MigrationServiceImpl migrationService;
@@ -122,6 +129,10 @@ class MigrationServiceImplTest {
         when(haloProperties.getWorkDir()).thenReturn(workdir);
         when(repository.deleteAll()).thenReturn(Mono.empty());
         when(repository.saveAll(List.of(expectStore))).thenReturn(Flux.empty());
+
+        var tx = mock(ReactiveTransaction.class);
+        when(txManager.getReactiveTransaction(any())).thenReturn(Mono.just(tx));
+        when(txManager.commit(tx)).thenReturn(Mono.empty());
 
         var content = DataBufferUtils.read(backupFile,
             DefaultDataBufferFactory.sharedInstance,

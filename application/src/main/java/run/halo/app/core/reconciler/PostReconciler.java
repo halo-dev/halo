@@ -9,8 +9,8 @@ import static run.halo.app.extension.ExtensionUtil.addFinalizers;
 import static run.halo.app.extension.ExtensionUtil.removeFinalizers;
 import static run.halo.app.extension.MetadataUtil.nullSafeAnnotations;
 import static run.halo.app.extension.MetadataUtil.nullSafeLabels;
-import static run.halo.app.extension.index.query.QueryFactory.equal;
-import static run.halo.app.extension.index.query.QueryFactory.in;
+import static run.halo.app.extension.index.query.Queries.equal;
+import static run.halo.app.extension.index.query.Queries.in;
 
 import com.google.common.hash.Hashing;
 import java.time.Duration;
@@ -63,7 +63,7 @@ import run.halo.app.extension.controller.Controller;
 import run.halo.app.extension.controller.ControllerBuilder;
 import run.halo.app.extension.controller.Reconciler;
 import run.halo.app.extension.controller.RequeueException;
-import run.halo.app.extension.index.query.QueryFactory;
+import run.halo.app.extension.index.query.Queries;
 import run.halo.app.extension.router.selector.FieldSelector;
 import run.halo.app.infra.Condition;
 import run.halo.app.infra.ConditionStatus;
@@ -448,7 +448,7 @@ public class PostReconciler implements Reconciler<Reconciler.Request> {
     List<Snapshot> listSnapshots(Ref ref) {
         var snapshotListOptions = new ListOptions();
         snapshotListOptions.setFieldSelector(FieldSelector.of(
-            QueryFactory.equal("spec.subjectRef", Snapshot.toSubjectRefKey(ref))));
+            Queries.equal("spec.subjectRef", Snapshot.toSubjectRefKey(ref))));
         return client.listAll(Snapshot.class, snapshotListOptions, Sort.unsorted());
     }
 }

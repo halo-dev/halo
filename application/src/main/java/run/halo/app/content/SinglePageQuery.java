@@ -3,9 +3,10 @@ package run.halo.app.content;
 import static org.springdoc.core.fn.builders.parameter.Builder.parameterBuilder;
 import static run.halo.app.core.extension.content.Post.PostPhase.PENDING_APPROVAL;
 import static run.halo.app.core.extension.content.SinglePage.PUBLISHED_LABEL;
-import static run.halo.app.extension.index.query.QueryFactory.equal;
-import static run.halo.app.extension.index.query.QueryFactory.in;
-import static run.halo.app.extension.index.query.QueryFactory.or;
+import static run.halo.app.extension.index.query.Queries.contains;
+import static run.halo.app.extension.index.query.Queries.equal;
+import static run.halo.app.extension.index.query.Queries.in;
+import static run.halo.app.extension.index.query.Queries.or;
 import static run.halo.app.extension.router.QueryParamBuildUtil.sortParameter;
 
 import io.swagger.v3.oas.annotations.enums.ParameterIn;
@@ -17,7 +18,6 @@ import org.springframework.web.reactive.function.server.ServerRequest;
 import run.halo.app.core.extension.content.Post;
 import run.halo.app.core.extension.content.SinglePage;
 import run.halo.app.extension.ListOptions;
-import run.halo.app.extension.index.query.QueryFactory;
 import run.halo.app.extension.router.IListRequest;
 import run.halo.app.extension.router.SortableRequest;
 
@@ -40,9 +40,9 @@ public class SinglePageQuery extends SortableRequest {
         Optional.ofNullable(queryParams.getFirst("keyword"))
             .filter(StringUtils::isNotBlank)
             .ifPresent(keyword -> builder.andQuery(or(
-                QueryFactory.contains("spec.title", keyword),
-                QueryFactory.contains("spec.slug", keyword),
-                QueryFactory.contains("status.excerpt", keyword)
+                contains("spec.title", keyword),
+                contains("spec.slug", keyword),
+                contains("status.excerpt", keyword)
             )));
 
         Optional.ofNullable(queryParams.getFirst("publishPhase"))

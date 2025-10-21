@@ -1,19 +1,15 @@
 package run.halo.app.infra;
 
-import static org.apache.commons.lang3.BooleanUtils.isTrue;
-import static org.apache.commons.lang3.BooleanUtils.toStringTrueFalse;
-import static org.apache.commons.lang3.ObjectUtils.defaultIfNull;
+import static java.util.Objects.requireNonNullElse;
 import static run.halo.app.core.extension.Role.ROLE_AGGREGATE_LABEL_PREFIX;
-import static run.halo.app.extension.index.IndexAttributeFactory.multiValueAttribute;
+import static run.halo.app.core.extension.content.Comment.CommentOwner.ownerIdentity;
 import static run.halo.app.extension.index.IndexAttributeFactory.simpleAttribute;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import java.time.Instant;
-import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
-import org.apache.commons.lang3.BooleanUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.context.SmartLifecycle;
 import org.springframework.stereotype.Component;
@@ -37,28 +33,42 @@ import run.halo.app.core.extension.User;
 import run.halo.app.core.extension.UserConnection;
 import run.halo.app.core.extension.UserConnection.UserConnectionSpec;
 import run.halo.app.core.extension.attachment.Attachment;
+import run.halo.app.core.extension.attachment.Attachment.AttachmentSpec;
+import run.halo.app.core.extension.attachment.Attachment.AttachmentStatus;
 import run.halo.app.core.extension.attachment.Group;
 import run.halo.app.core.extension.attachment.Policy;
 import run.halo.app.core.extension.attachment.PolicyTemplate;
 import run.halo.app.core.extension.content.Category;
+import run.halo.app.core.extension.content.Category.CategorySpec;
 import run.halo.app.core.extension.content.Comment;
+import run.halo.app.core.extension.content.Comment.CommentSpec;
+import run.halo.app.core.extension.content.Comment.CommentStatus;
 import run.halo.app.core.extension.content.Post;
+import run.halo.app.core.extension.content.Post.PostSpec;
+import run.halo.app.core.extension.content.Post.PostStatus;
+import run.halo.app.core.extension.content.Post.VisibleEnum;
 import run.halo.app.core.extension.content.Reply;
+import run.halo.app.core.extension.content.Reply.ReplySpec;
 import run.halo.app.core.extension.content.SinglePage;
+import run.halo.app.core.extension.content.SinglePage.SinglePageSpec;
 import run.halo.app.core.extension.content.Snapshot;
 import run.halo.app.core.extension.content.Tag;
+import run.halo.app.core.extension.content.Tag.TagSpec;
+import run.halo.app.core.extension.content.Tag.TagStatus;
 import run.halo.app.core.extension.notification.Notification;
+import run.halo.app.core.extension.notification.Notification.NotificationSpec;
 import run.halo.app.core.extension.notification.NotificationTemplate;
 import run.halo.app.core.extension.notification.NotifierDescriptor;
 import run.halo.app.core.extension.notification.Reason;
 import run.halo.app.core.extension.notification.ReasonType;
 import run.halo.app.core.extension.notification.Subscription;
+import run.halo.app.core.extension.notification.Subscription.InterestReason;
 import run.halo.app.extension.ConfigMap;
 import run.halo.app.extension.MetadataOperator;
-import run.halo.app.extension.MetadataUtil;
 import run.halo.app.extension.SchemeManager;
 import run.halo.app.extension.Secret;
 import run.halo.app.extension.index.IndexSpec;
+import run.halo.app.extension.index.IndexSpecs;
 import run.halo.app.infra.utils.JsonUtils;
 import run.halo.app.migration.Backup;
 import run.halo.app.plugin.extensionpoint.ExtensionDefinition;
@@ -83,111 +93,89 @@ class SchemeInitializer implements SmartLifecycle {
         }
         running = true;
         schemeManager.register(Role.class, is -> {
-            is.add(new IndexSpec()
-                .setName("labels.aggregateToRoles")
-                .setIndexFunc(multiValueAttribute(Role.class,
-                    role -> Optional.ofNullable(role.getMetadata().getLabels())
-                        .map(labels -> labels.keySet()
-                            .stream()
-                            .filter(key -> key.startsWith(ROLE_AGGREGATE_LABEL_PREFIX))
-                            .filter(key -> Boolean.parseBoolean(labels.get(key)))
-                            .map(
-                                key -> StringUtils.removeStart(key, ROLE_AGGREGATE_LABEL_PREFIX)
-                            )
-                            .collect(Collectors.toSet())
-                        )
-                        .orElseGet(Set::of)))
+            is.add(IndexSpecs.<Role, String>multi("labels.aggregateToRoles", String.class)
+                .indexFunc(role -> Optional.ofNullable(role.getMetadata().getLabels()).map(
+                    labels -> labels.keySet().stream()
+                        .filter(key -> key.startsWith(ROLE_AGGREGATE_LABEL_PREFIX))
+                        .filter(key -> Boolean.parseBoolean(labels.get(key)))
+                        .map(key -> StringUtils.removeStart(key, ROLE_AGGREGATE_LABEL_PREFIX))
+                        .collect(Collectors.toSet())).orElseGet(Set::of)
+                )
             );
         });
 
         // plugin.halo.run
         schemeManager.register(Plugin.class, is -> {
-            is.add(new IndexSpec()
-                .setName("spec.displayName")
-                .setIndexFunc(
-                    simpleAttribute(Plugin.class, plugin -> Optional.ofNullable(plugin.getSpec())
+            is.add(IndexSpecs.<Plugin, String>single("spec.displayName", String.class)
+                .indexFunc(plugin ->
+                    Optional.ofNullable(plugin.getSpec())
                         .map(Plugin.PluginSpec::getDisplayName)
-                        .orElse(null))
+                        .orElse(null)
                 )
             );
-            is.add(new IndexSpec()
-                .setName("spec.description")
-                .setIndexFunc(
-                    simpleAttribute(Plugin.class, plugin -> Optional.ofNullable(plugin.getSpec())
-                        .map(Plugin.PluginSpec::getDescription)
-                        .orElse(null))
+            is.add(IndexSpecs.<Plugin, String>single("spec.description", String.class)
+                .indexFunc(plugin -> Optional.ofNullable(plugin.getSpec())
+                    .map(Plugin.PluginSpec::getDescription)
+                    .orElse(null)
                 )
             );
-            is.add(new IndexSpec()
-                .setName("spec.enabled")
-                .setIndexFunc(
-                    simpleAttribute(Plugin.class, plugin -> Optional.ofNullable(plugin.getSpec())
-                        .map(Plugin.PluginSpec::getEnabled)
-                        .map(Object::toString)
-                        .orElse(Boolean.FALSE.toString()))
+            is.add(IndexSpecs.<Plugin, Boolean>single("spec.enabled", Boolean.class)
+                .indexFunc(plugin -> Optional.ofNullable(plugin.getSpec())
+                    .map(Plugin.PluginSpec::getEnabled)
+                    .orElse(false)
                 )
+                .nullable(false)
             );
         });
         schemeManager.register(ExtensionPointDefinition.class, indexSpecs -> {
-            indexSpecs.add(new IndexSpec()
-                .setName("spec.className")
-                .setIndexFunc(simpleAttribute(ExtensionPointDefinition.class,
-                    definition -> definition.getSpec().getClassName())
-                ));
+            indexSpecs.add(IndexSpecs.<ExtensionPointDefinition, String>single(
+                        "spec.className", String.class
+                    )
+                    .indexFunc(definition -> definition.getSpec().getClassName())
+            );
         });
         schemeManager.register(ExtensionDefinition.class, indexSpecs -> {
-            indexSpecs.add(new IndexSpec()
-                .setName("spec.extensionPointName")
-                .setIndexFunc(simpleAttribute(ExtensionDefinition.class,
-                    definition -> definition.getSpec().getExtensionPointName())
-                ));
-        });
-
-        schemeManager.register(RoleBinding.class, is -> {
-            is.add(new IndexSpec()
-                .setName("roleRef.name")
-                .setIndexFunc(simpleAttribute(RoleBinding.class,
-                    roleBinding -> roleBinding.getRoleRef().getName())
-                )
+            indexSpecs.add(IndexSpecs.<ExtensionDefinition, String>single(
+                        "spec.extensionPointName", String.class
+                    )
+                    .indexFunc(definition -> definition.getSpec().getExtensionPointName())
             );
-            is.add(new IndexSpec()
-                .setName("subjects")
-                .setIndexFunc(multiValueAttribute(RoleBinding.class,
-                    roleBinding -> roleBinding.getSubjects().stream()
-                        .map(RoleBinding.Subject::toString)
-                        .collect(Collectors.toSet()))
+        });
+        schemeManager.register(RoleBinding.class, is -> {
+            is.add(IndexSpecs.<RoleBinding, String>single("roleRef.name", String.class)
+                .indexFunc(roleBinding -> roleBinding.getRoleRef().getName())
+            );
+            is.add(IndexSpecs.<RoleBinding, String>multi("subjects", String.class)
+                .indexFunc(roleBinding -> roleBinding.getSubjects().stream()
+                    .map(RoleBinding.Subject::toString)
+                    .collect(Collectors.toSet())
                 )
             );
         });
         schemeManager.register(User.class, indexSpecs -> {
-            indexSpecs.add(new IndexSpec()
-                .setName("spec.displayName")
-                .setIndexFunc(
-                    simpleAttribute(User.class, user -> user.getSpec().getDisplayName())));
-            indexSpecs.add(new IndexSpec()
-                .setName("spec.email")
-                .setIndexFunc(simpleAttribute(User.class, user -> {
-                    var email = user.getSpec().getEmail();
-                    return StringUtils.isBlank(email) ? null : email;
-                })));
-            indexSpecs.add(new IndexSpec()
-                .setName(User.USER_RELATED_ROLES_INDEX)
-                .setIndexFunc(multiValueAttribute(User.class, user ->
-                    Optional.ofNullable(user.getMetadata())
+            indexSpecs.add(IndexSpecs.<User, String>single("spec.displayName", String.class)
+                .indexFunc(user -> user.getSpec().getDisplayName())
+            );
+            indexSpecs.add(IndexSpecs.<User, String>single("spec.email", String.class)
+                .indexFunc(user -> user.getSpec().getEmail())
+            );
+            indexSpecs.add(IndexSpecs.<User, String>multi(
+                        User.USER_RELATED_ROLES_INDEX, String.class
+                    )
+                    .indexFunc(user -> Optional.ofNullable(user.getMetadata())
                         .map(MetadataOperator::getAnnotations)
                         .map(annotations -> annotations.get(User.ROLE_NAMES_ANNO))
                         .filter(StringUtils::isNotBlank)
-                        .map(rolesJson -> JsonUtils.jsonToObject(rolesJson,
-                            new TypeReference<Set<String>>() {
+                        .map(rolesJson -> JsonUtils.jsonToObject(
+                            rolesJson, new TypeReference<Set<String>>() {
                             })
                         )
-                        .orElseGet(Set::of))));
-            indexSpecs.add(new IndexSpec()
-                .setName("spec.disabled")
-                .setIndexFunc(simpleAttribute(User.class, user ->
-                    Objects.requireNonNullElse(user.getSpec().getDisabled(), Boolean.FALSE)
-                        .toString())
-                )
+                        .orElseGet(Set::of)
+                    )
+            );
+            indexSpecs.add(IndexSpecs.<User, Boolean>single("spec.disabled", Boolean.class)
+                .indexFunc(user -> requireNonNullElse(user.getSpec().getDisabled(), Boolean.FALSE))
+                .nullable(false)
             );
         });
         schemeManager.register(ReverseProxy.class);
@@ -199,376 +187,415 @@ class SchemeInitializer implements SmartLifecycle {
         schemeManager.register(Menu.class);
         schemeManager.register(MenuItem.class);
         schemeManager.register(Post.class, indexSpecs -> {
-            indexSpecs.add(new IndexSpec()
-                .setName("spec.title")
-                .setIndexFunc(simpleAttribute(Post.class, post -> post.getSpec().getTitle())));
-            indexSpecs.add(new IndexSpec()
-                .setName("spec.slug")
-                // Compatible with old data, hoping to set it to true in the future
-                .setUnique(false)
-                .setIndexFunc(simpleAttribute(Post.class, post -> post.getSpec().getSlug())));
-            indexSpecs.add(new IndexSpec()
-                .setName("spec.publishTime")
-                .setIndexFunc(simpleAttribute(Post.class, post -> {
-                    var publishTime = post.getSpec().getPublishTime();
-                    return publishTime == null ? null : publishTime.toString();
-                })));
-            indexSpecs.add(new IndexSpec()
-                .setName("spec.owner")
-                .setIndexFunc(simpleAttribute(Post.class, post -> post.getSpec().getOwner())));
-            indexSpecs.add(new IndexSpec()
-                .setName("spec.deleted")
-                .setIndexFunc(simpleAttribute(Post.class, post -> {
-                    var deleted = post.getSpec().getDeleted();
-                    return deleted == null ? "false" : deleted.toString();
-                })));
-            indexSpecs.add(new IndexSpec()
-                .setName("spec.pinned")
-                .setIndexFunc(simpleAttribute(Post.class, post -> {
-                    var pinned = post.getSpec().getPinned();
-                    return pinned == null ? "false" : pinned.toString();
-                })));
-            indexSpecs.add(new IndexSpec()
-                .setName("spec.priority")
-                .setIndexFunc(simpleAttribute(Post.class, post -> {
-                    var priority = post.getSpec().getPriority();
-                    return priority == null ? "0" : priority.toString();
-                })));
-            indexSpecs.add(new IndexSpec()
-                .setName("spec.visible")
-                .setIndexFunc(
-                    simpleAttribute(Post.class, post -> post.getSpec().getVisible().name())));
-            indexSpecs.add(new IndexSpec()
-                .setName("spec.tags")
-                .setIndexFunc(multiValueAttribute(Post.class, post -> {
-                    var tags = post.getSpec().getTags();
-                    return tags == null ? Set.of() : Set.copyOf(tags);
-                })));
-            indexSpecs.add(new IndexSpec()
-                .setName("spec.categories")
-                .setIndexFunc(multiValueAttribute(Post.class, post -> {
-                    var categories = post.getSpec().getCategories();
-                    return categories == null ? Set.of() : Set.copyOf(categories);
-                })));
-            indexSpecs.add(new IndexSpec()
-                .setName("status.contributors")
-                .setIndexFunc(multiValueAttribute(Post.class, post -> {
-                    var contributors = post.getStatusOrDefault().getContributors();
-                    return contributors == null ? Set.of() : Set.copyOf(contributors);
-                })));
-            indexSpecs.add(new IndexSpec()
-                .setName("status.phase")
-                .setIndexFunc(
-                    simpleAttribute(Post.class, post -> post.getStatusOrDefault().getPhase())));
-            indexSpecs.add(new IndexSpec()
-                .setName("status.excerpt")
-                .setIndexFunc(
-                    simpleAttribute(Post.class, post -> post.getStatusOrDefault().getExcerpt())));
-            indexSpecs.add(new IndexSpec()
-                .setName("status.lastModifyTime")
-                .setIndexFunc(simpleAttribute(Post.class, post -> {
-                    var lastModifyTime = post.getStatus().getLastModifyTime();
-                    return lastModifyTime == null ? null : lastModifyTime.toString();
-                })));
-            indexSpecs.add(new IndexSpec()
-                .setName("status.hideFromList")
-                .setIndexFunc(simpleAttribute(Post.class, post -> {
-                    var hidden = post.getStatus().getHideFromList();
-                    // only index when hidden is true
-                    return (hidden == null || !hidden) ? null : BooleanUtils.TRUE;
-                }))
+            indexSpecs.add(IndexSpecs.<Post, String>single("spec.title", String.class)
+                .indexFunc(post -> Optional.ofNullable(post.getSpec())
+                    .map(PostSpec::getTitle)
+                    .orElse(null)
+                )
             );
-            indexSpecs.add(new IndexSpec()
-                .setName(Post.REQUIRE_SYNC_ON_STARTUP_INDEX_NAME)
-                .setIndexFunc(simpleAttribute(Post.class, post -> {
-                    var version = post.getMetadata().getVersion();
-                    var observedVersion = post.getStatusOrDefault().getObservedVersion();
-                    if (observedVersion == null || observedVersion < version) {
-                        return BooleanUtils.TRUE;
-                    }
-                    // do not care about the false case so return null to avoid indexing
-                    return null;
-                })));
 
-            indexSpecs.add(new IndexSpec()
-                .setName("stats.visit")
-                .setIndexFunc(simpleAttribute(Post.class, post -> {
-                    var annotations = MetadataUtil.nullSafeAnnotations(post);
-                    var statsStr = annotations.get(Post.STATS_ANNO);
-                    if (StringUtils.isBlank(statsStr)) {
-                        return "0";
-                    }
-                    var stats = JsonUtils.jsonToObject(statsStr, Stats.class);
-                    return defaultIfNull(stats.getVisit(), 0).toString();
-                })));
+            indexSpecs.add(IndexSpecs.<Post, String>single("spec.slug", String.class)
+                .indexFunc(post -> Optional.ofNullable(post.getSpec())
+                    .map(PostSpec::getSlug)
+                    .orElse(null)
+                )
+            );
 
-            indexSpecs.add(new IndexSpec()
-                .setName("stats.totalComment")
-                .setIndexFunc(simpleAttribute(Post.class, post -> {
-                    var annotations = MetadataUtil.nullSafeAnnotations(post);
-                    var statsStr = annotations.get(Post.STATS_ANNO);
-                    if (StringUtils.isBlank(statsStr)) {
-                        return "0";
-                    }
-                    var stats = JsonUtils.jsonToObject(statsStr, Stats.class);
-                    return defaultIfNull(stats.getTotalComment(), 0).toString();
-                })));
+            indexSpecs.add(IndexSpecs.<Post, Instant>single("spec.publishTime", Instant.class)
+                .indexFunc(post -> Optional.ofNullable(post.getSpec())
+                    .map(PostSpec::getPublishTime)
+                    .orElse(null)
+                )
+            );
+            indexSpecs.add(IndexSpecs.<Post, String>single("spec.owner", String.class)
+                .indexFunc(post -> Optional.ofNullable(post.getSpec())
+                    .map(PostSpec::getOwner)
+                    .orElse(null)
+                )
+            );
+            indexSpecs.add(IndexSpecs.<Post, Boolean>single("spec.deleted", Boolean.class)
+                .indexFunc(post -> Optional.ofNullable(post.getSpec())
+                    .map(PostSpec::getDeleted)
+                    .orElse(false)
+                ).nullable(false)
+            );
+            indexSpecs.add(IndexSpecs.<Post, Boolean>single("spec.pinned", Boolean.class)
+                .indexFunc(post ->
+                    Optional.ofNullable(post.getSpec())
+                        .map(PostSpec::getPinned)
+                        .orElse(false)
+                )
+                .nullable(false)
+            );
+            indexSpecs.add(IndexSpecs.<Post, Integer>single("spec.priority", Integer.class)
+                .indexFunc(post -> Optional.ofNullable(post.getSpec())
+                    .map(PostSpec::getPriority)
+                    .orElse(0)
+                )
+                .nullable(false)
+            );
+            indexSpecs.add(IndexSpecs.<Post, VisibleEnum>single("spec.visible", VisibleEnum.class)
+                .indexFunc(post -> Optional.ofNullable(post.getSpec())
+                    .map(PostSpec::getVisible)
+                    .orElse(null)
+                )
+            );
+            indexSpecs.add(IndexSpecs.<Post, String>multi("spec.tags", String.class)
+                .indexFunc(
+                    post -> Optional.ofNullable(post.getSpec())
+                        .map(PostSpec::getTags)
+                        .map(Set::copyOf)
+                        .orElse(Set.of())
+                )
+            );
+            indexSpecs.add(IndexSpecs.<Post, String>multi("spec.categories", String.class)
+                .indexFunc(post -> Optional.ofNullable(post.getSpec())
+                    .map(PostSpec::getCategories)
+                    .map(Set::copyOf)
+                    .orElse(Set.of())
+                )
+            );
+            indexSpecs.add(IndexSpecs.<Post, String>multi("status.contributors", String.class)
+                .indexFunc(post -> Optional.ofNullable(post.getStatus())
+                    .map(PostStatus::getContributors)
+                    .map(Set::copyOf).orElse(Set.of())
+                )
+            );
+            indexSpecs.add(IndexSpecs.<Post, String>single("status.phase", String.class)
+                .indexFunc(post -> Optional.ofNullable(post.getStatus())
+                    .map(PostStatus::getPhase)
+                    .orElse(null)
+                )
+            );
+            indexSpecs.add(IndexSpecs.<Post, String>single("status.excerpt", String.class)
+                .indexFunc(post -> Optional.ofNullable(post.getStatus())
+                    .map(PostStatus::getExcerpt)
+                    .orElse(null)
+                )
+            );
+            indexSpecs.add(IndexSpecs.<Post, Instant>single("status.lastModifyTime", Instant.class)
+                .indexFunc(post -> Optional.ofNullable(post.getStatus())
+                    .map(PostStatus::getLastModifyTime)
+                    .orElse(null)
+                )
+            );
+            indexSpecs.add(IndexSpecs.<Post, Boolean>single("status.hideFromList", Boolean.class)
+                .indexFunc(post -> Optional.ofNullable(post.getStatus())
+                    .map(Post.PostStatus::getHideFromList)
+                    .orElse(false)
+                )
+            );
+            indexSpecs.add(IndexSpecs.<Post, Boolean>single(
+                        Post.REQUIRE_SYNC_ON_STARTUP_INDEX_NAME, Boolean.class
+                    )
+                    .indexFunc(post -> {
+                        var version = post.getMetadata().getVersion();
+                        var status = post.getStatus();
+                        if (status == null) {
+                            return true;
+                        }
+                        var observedVersion = status.getObservedVersion();
+                        return observedVersion == null || observedVersion < version;
+                        // do not care about the false case so return null to avoid indexing
+                    })
+            );
+            indexSpecs.add(IndexSpecs.<Post, Long>single("stats.visit", Long.class)
+                .indexFunc(post -> Optional.ofNullable(post.getMetadata().getAnnotations())
+                    .map(a -> a.get(Post.STATS_ANNO))
+                    .filter(StringUtils::isNotBlank)
+                    .map(json -> JsonUtils.jsonToObject(json, Stats.class))
+                    .map(Stats::getVisit)
+                    .map(i -> (long) i)
+                    .orElse(0L)
+                )
+                .nullable(false)
+            );
+            indexSpecs.add(IndexSpecs.<Post, Long>single("stats.totalComment", Long.class)
+                .indexFunc(post -> Optional.ofNullable(post.getMetadata().getAnnotations())
+                    .map(a -> a.get(Post.STATS_ANNO))
+                    .filter(StringUtils::isNotBlank)
+                    .map(json -> JsonUtils.jsonToObject(json, Stats.class))
+                    .map(Stats::getTotalComment)
+                    .map(i -> (long) i)
+                    .orElse(0L)
+                )
+                .nullable(false)
+            );
         });
         schemeManager.register(Category.class, indexSpecs -> {
-            indexSpecs.add(new IndexSpec()
-                .setName("spec.slug")
-                .setIndexFunc(
-                    simpleAttribute(Category.class, category -> category.getSpec().getSlug()))
+            indexSpecs.add(IndexSpecs.<Category, String>single("spec.slug", String.class)
+                .indexFunc(category -> Optional.ofNullable(category.getSpec())
+                    .map(CategorySpec::getSlug)
+                    .orElse(null)
+                )
             );
-            indexSpecs.add(new IndexSpec()
-                .setName("spec.priority")
-                .setIndexFunc(simpleAttribute(Category.class,
-                    category -> defaultIfNull(category.getSpec().getPriority(), 0).toString())));
-            indexSpecs.add(new IndexSpec()
-                .setName("spec.children")
-                .setIndexFunc(multiValueAttribute(Category.class, category -> {
-                    var children = category.getSpec().getChildren();
-                    return children == null ? Set.of() : Set.copyOf(children);
-                }))
+            indexSpecs.add(IndexSpecs.<Category, Integer>single("spec.priority", Integer.class)
+                .indexFunc(category -> Optional.ofNullable(category.getSpec())
+                    .map(CategorySpec::getPriority)
+                    .orElse(0)
+                )
             );
-            indexSpecs.add(new IndexSpec()
-                .setName("spec.hideFromList")
-                .setIndexFunc(simpleAttribute(Category.class,
-                    category -> toStringTrueFalse(isTrue(category.getSpec().isHideFromList()))
-                ))
+            indexSpecs.add(IndexSpecs.<Category, String>multi("spec.children", String.class)
+                .indexFunc(category -> Optional.ofNullable(category.getSpec())
+                    .map(CategorySpec::getChildren)
+                    .map(Set::copyOf)
+                    .orElse(Set.of())
+                )
+            );
+            indexSpecs.add(IndexSpecs.<Category, Boolean>single("spec.hideFromList", Boolean.class)
+                .indexFunc(category -> Optional.ofNullable(category.getSpec())
+                    .map(CategorySpec::isHideFromList)
+                    .orElse(false)
+                )
             );
         });
         schemeManager.register(Tag.class, indexSpecs -> {
-            indexSpecs.add(new IndexSpec()
-                .setName("spec.displayName")
-                .setIndexFunc(simpleAttribute(Tag.class, tag -> tag.getSpec().getDisplayName())));
-            indexSpecs.add(new IndexSpec()
-                .setName("spec.slug")
-                .setIndexFunc(simpleAttribute(Tag.class, tag -> tag.getSpec().getSlug()))
+            indexSpecs.add(IndexSpecs.<Tag, String>single("spec.displayName", String.class)
+                .indexFunc(tag -> Optional.ofNullable(tag.getSpec())
+                    .map(TagSpec::getDisplayName)
+                    .orElse(null)
+                )
             );
-            indexSpecs.add(new IndexSpec()
-                .setName("status.postCount")
-                .setIndexFunc(simpleAttribute(Tag.class,
-                    tag -> defaultIfNull(tag.getStatus().getPostCount(), 0).toString()))
+            indexSpecs.add(IndexSpecs.<Tag, String>single("spec.slug", String.class)
+                .indexFunc(
+                    tag -> Optional.ofNullable(tag.getSpec())
+                        .map(TagSpec::getSlug)
+                        .orElse(null)
+                )
             );
-            indexSpecs.add(new IndexSpec()
-                .setName(Tag.REQUIRE_SYNC_ON_STARTUP_INDEX_NAME)
-                .setIndexFunc(simpleAttribute(Tag.class, tag -> {
-                    var version = tag.getMetadata().getVersion();
-                    var observedVersion = tag.getStatusOrDefault().getObservedVersion();
-                    if (observedVersion == null || observedVersion < version) {
-                        return BooleanUtils.TRUE;
-                    }
-                    // do not care about the false case so return null to avoid indexing
-                    return null;
-                })));
+            indexSpecs.add(IndexSpecs.<Tag, Integer>single("status.postCount", Integer.class)
+                .indexFunc(tag -> Optional.ofNullable(tag.getStatus())
+                    .map(TagStatus::getPostCount)
+                    .orElse(0)
+                )
+            );
+            indexSpecs.add(IndexSpecs.<Tag, Boolean>single(
+                        Tag.REQUIRE_SYNC_ON_STARTUP_INDEX_NAME, Boolean.class
+                    )
+                    .indexFunc(tag -> {
+                        var version = tag.getMetadata().getVersion();
+                        var status = tag.getStatus();
+                        if (status == null) {
+                            return true;
+                        }
+                        var observedVersion = status.getObservedVersion();
+                        return observedVersion == null || observedVersion < version;
+                        // do not care about the false case so return null to avoid indexing
+                    })
+            );
         });
         schemeManager.register(Snapshot.class, indexSpecs -> {
-            indexSpecs.add(new IndexSpec()
-                .setName("spec.subjectRef")
-                .setIndexFunc(simpleAttribute(Snapshot.class,
-                    snapshot -> Snapshot.toSubjectRefKey(snapshot.getSpec().getSubjectRef()))
+            indexSpecs.add(IndexSpecs.<Snapshot, String>single("spec.subjectRef", String.class)
+                .indexFunc(snapshot -> Optional.ofNullable(snapshot.getSpec())
+                    .map(Snapshot.SnapShotSpec::getSubjectRef)
+                    .map(Snapshot::toSubjectRefKey)
+                    .orElse(null)
                 )
             );
         });
         schemeManager.register(Comment.class, indexSpecs -> {
-            indexSpecs.add(new IndexSpec()
-                .setName("spec.creationTime")
-                .setIndexFunc(simpleAttribute(Comment.class,
-                    comment -> defaultIfNull(comment.getSpec().getCreationTime(),
-                        comment.getMetadata().getCreationTimestamp()).toString())
-                ));
-            indexSpecs.add(new IndexSpec()
-                .setName("spec.approved")
-                .setIndexFunc(simpleAttribute(Comment.class,
-                    comment -> toStringTrueFalse(isTrue(comment.getSpec().getApproved())))
-                ));
-            indexSpecs.add(new IndexSpec()
-                .setName("spec.owner")
-                .setIndexFunc(simpleAttribute(Comment.class, comment -> {
-                    var owner = comment.getSpec().getOwner();
-                    return Comment.CommentOwner.ownerIdentity(owner.getKind(), owner.getName());
-                })));
-            indexSpecs.add(new IndexSpec()
-                .setName("spec.subjectRef")
-                .setIndexFunc(simpleAttribute(Comment.class,
-                    comment -> Comment.toSubjectRefKey(comment.getSpec().getSubjectRef()))
-                ));
-            indexSpecs.add(new IndexSpec()
-                .setName("spec.top")
-                .setIndexFunc(simpleAttribute(Comment.class,
-                    comment -> toStringTrueFalse(isTrue(comment.getSpec().getTop())))
-                ));
-            indexSpecs.add(new IndexSpec()
-                .setName("spec.hidden")
-                .setIndexFunc(simpleAttribute(Comment.class,
-                    comment -> toStringTrueFalse(isTrue(comment.getSpec().getHidden())))
-                ));
-            indexSpecs.add(new IndexSpec()
-                .setName("spec.priority")
-                .setIndexFunc(simpleAttribute(Comment.class,
-                    comment -> {
-                        var isTop = comment.getSpec().getTop();
-                        // only top comments have priority
-                        if (!isTop) {
-                            return "0";
+            indexSpecs.add(IndexSpecs.<Comment, Instant>single("spec.creationTime", Instant.class)
+                .indexFunc(comment -> Optional.ofNullable(comment.getSpec())
+                    .map(CommentSpec::getCreationTime)
+                    .orElseGet(() -> comment.getMetadata().getCreationTimestamp())
+                )
+                .nullable(false)
+            );
+            indexSpecs.add(IndexSpecs.<Comment, Boolean>single("spec.approved", Boolean.class)
+                .indexFunc(comment -> Optional.ofNullable(comment.getSpec())
+                    .map(CommentSpec::getApproved)
+                    .orElse(false)
+                )
+                .nullable(false)
+            );
+            indexSpecs.add(IndexSpecs.<Comment, String>single("spec.owner", String.class)
+                .indexFunc(comment -> Optional.ofNullable(comment.getSpec())
+                    .map(CommentSpec::getOwner)
+                    .map(owner -> ownerIdentity(owner.getKind(), owner.getName()))
+                    .orElse(null)
+                )
+                .nullable(true)
+            );
+            indexSpecs.add(IndexSpecs.<Comment, String>single("spec.subjectRef", String.class)
+                .indexFunc(comment -> Optional.ofNullable(comment.getSpec())
+                    .map(CommentSpec::getSubjectRef)
+                    .map(Comment::toSubjectRefKey)
+                    .orElse(null)
+                )
+                .nullable(true)
+            );
+            indexSpecs.add(IndexSpecs.<Comment, Boolean>single("spec.top", Boolean.class)
+                .indexFunc(comment -> Optional.ofNullable(comment.getSpec())
+                    .map(CommentSpec::getTop)
+                    .orElse(false)
+                )
+                .nullable(false)
+            );
+            indexSpecs.add(IndexSpecs.<Comment, Boolean>single("spec.hidden", Boolean.class)
+                .indexFunc(comment -> Optional.ofNullable(comment.getSpec())
+                    .map(CommentSpec::getHidden)
+                    .orElse(false)
+                )
+                .nullable(false)
+            );
+            indexSpecs.add(IndexSpecs.<Comment, Integer>single("spec.priority", Integer.class)
+                .indexFunc(comment -> Optional.ofNullable(comment.getSpec())
+                    .filter(spec -> Boolean.TRUE.equals(spec.getTop()))
+                    .map(Comment.BaseCommentSpec::getPriority)
+                    .orElse(0)
+                )
+                .nullable(false)
+            );
+            indexSpecs.add(IndexSpecs.<Comment, String>single("spec.raw", String.class)
+                .indexFunc(comment -> Optional.ofNullable(comment.getSpec())
+                    .map(CommentSpec::getRaw)
+                    .orElse(null)
+                )
+            );
+            indexSpecs.add(IndexSpecs.<Comment, Instant>single(
+                        "status.lastReplyTime", Instant.class
+                    )
+                    .indexFunc(comment -> Optional.ofNullable(comment.getStatus())
+                        .map(CommentStatus::getLastReplyTime)
+                        .orElse(null)
+                    )
+            );
+
+            indexSpecs.add(IndexSpecs.<Comment, Integer>single("status.replyCount", Integer.class)
+                .indexFunc(comment -> Optional.ofNullable(comment.getStatus())
+                    .map(CommentStatus::getReplyCount)
+                    .orElse(0)
+                )
+            );
+            indexSpecs.add(IndexSpecs.<Comment, Boolean>single(
+                        Comment.REQUIRE_SYNC_ON_STARTUP_INDEX_NAME, Boolean.class
+                    )
+                    .indexFunc(comment -> {
+                        var version = comment.getMetadata().getVersion();
+                        var status = comment.getStatus();
+                        if (status == null) {
+                            return true;
                         }
-                        return defaultIfNull(comment.getSpec().getPriority(), 0).toString();
+                        var observedVersion = status.getObservedVersion();
+                        return observedVersion == null || observedVersion < version;
+                        // do not care about the false case so return null to avoid indexing
                     })
-                ));
-            indexSpecs.add(new IndexSpec()
-                .setName("spec.raw")
-                .setIndexFunc(simpleAttribute(Comment.class,
-                    comment -> comment.getSpec().getRaw())
-                ));
-            indexSpecs.add(new IndexSpec()
-                .setName("status.lastReplyTime")
-                .setIndexFunc(simpleAttribute(Comment.class, comment -> {
-                    var lastReplyTime = comment.getStatusOrDefault().getLastReplyTime();
-                    return defaultIfNull(lastReplyTime,
-                        comment.getSpec().getCreationTime()).toString();
-                })));
-            indexSpecs.add(new IndexSpec()
-                .setName("status.replyCount")
-                .setIndexFunc(simpleAttribute(Comment.class, comment -> {
-                    var replyCount = comment.getStatusOrDefault().getReplyCount();
-                    return defaultIfNull(replyCount, 0).toString();
-                })));
-            indexSpecs.add(new IndexSpec()
-                .setName(Comment.REQUIRE_SYNC_ON_STARTUP_INDEX_NAME)
-                .setIndexFunc(simpleAttribute(Comment.class, comment -> {
-                    var version = comment.getMetadata().getVersion();
-                    var observedVersion = comment.getStatusOrDefault().getObservedVersion();
-                    if (observedVersion == null || observedVersion < version) {
-                        return BooleanUtils.TRUE;
-                    }
-                    // do not care about the false case so return null to avoid indexing
-                    return null;
-                })));
+            );
         });
         schemeManager.register(Reply.class, indexSpecs -> {
-            indexSpecs.add(new IndexSpec()
-                .setName("spec.creationTime")
-                .setIndexFunc(simpleAttribute(Reply.class,
-                    reply -> defaultIfNull(reply.getSpec().getCreationTime(),
-                        reply.getMetadata().getCreationTimestamp()).toString())
-                ));
-            indexSpecs.add(new IndexSpec()
-                .setName("spec.commentName")
-                .setIndexFunc(simpleAttribute(Reply.class,
-                    reply -> reply.getSpec().getCommentName())
-                ));
-            indexSpecs.add(new IndexSpec()
-                .setName("spec.hidden")
-                .setIndexFunc(simpleAttribute(Reply.class,
-                    reply -> toStringTrueFalse(isTrue(reply.getSpec().getHidden())))
-                ));
-            indexSpecs.add(new IndexSpec()
-                .setName("spec.approved")
-                .setIndexFunc(simpleAttribute(Reply.class,
-                    reply -> toStringTrueFalse(isTrue(reply.getSpec().getApproved())))
-                ));
-            indexSpecs.add(new IndexSpec()
-                .setName("spec.owner")
-                .setIndexFunc(simpleAttribute(Reply.class, reply -> {
-                    var owner = reply.getSpec().getOwner();
-                    return Comment.CommentOwner.ownerIdentity(owner.getKind(), owner.getName());
-                })));
-            indexSpecs.add(new IndexSpec()
-                .setName(Reply.REQUIRE_SYNC_ON_STARTUP_INDEX_NAME)
-                .setIndexFunc(simpleAttribute(Reply.class, reply -> {
-                    var version = reply.getMetadata().getVersion();
-                    var observedVersion = reply.getStatus().getObservedVersion();
-                    if (observedVersion == null || observedVersion < version) {
-                        return BooleanUtils.TRUE;
-                    }
-                    // do not care about the false case so return null to avoid indexing
-                    return null;
-                })));
+            indexSpecs.add(IndexSpecs.<Reply, Instant>single("spec.creationTime", Instant.class)
+                .indexFunc(reply -> Optional.ofNullable(reply.getSpec())
+                    .map(ReplySpec::getCreationTime)
+                    .orElse(reply.getMetadata().getCreationTimestamp())
+                )
+            );
+            indexSpecs.add(IndexSpecs.<Reply, String>single("spec.commentName", String.class)
+                .indexFunc(reply -> Optional.ofNullable(reply.getSpec())
+                    .map(ReplySpec::getCommentName)
+                    .orElse(null)
+                )
+            );
+            indexSpecs.add(IndexSpecs.<Reply, Boolean>single("spec.hidden", Boolean.class)
+                .indexFunc(reply -> Optional.ofNullable(reply.getSpec())
+                    .map(ReplySpec::getHidden)
+                    .orElse(false)
+                )
+                .nullable(false)
+            );
+            indexSpecs.add(IndexSpecs.<Reply, Boolean>single("spec.approved", Boolean.class)
+                .indexFunc(reply -> Optional.ofNullable(reply.getSpec())
+                    .map(ReplySpec::getApproved)
+                    .orElse(false)
+                )
+                .nullable(false)
+            );
+            indexSpecs.add(IndexSpecs.<Reply, String>single("spec.owner", String.class)
+                .indexFunc(reply -> Optional.ofNullable(reply.getSpec())
+                    .map(ReplySpec::getOwner)
+                    .map(owner -> ownerIdentity(owner.getKind(), owner.getName()))
+                    .orElse(null)
+                )
+            );
+            indexSpecs.add(IndexSpecs.<Reply, Boolean>single(
+                        Reply.REQUIRE_SYNC_ON_STARTUP_INDEX_NAME, Boolean.class
+                    )
+                    .indexFunc(reply -> {
+                        var version = reply.getMetadata().getVersion();
+                        var status = reply.getStatus();
+                        if (status == null) {
+                            return true;
+                        }
+                        var observedVersion = status.getObservedVersion();
+                        return observedVersion == null || observedVersion < version;
+                        // do not care about the false case so return null to avoid indexing
+                    })
+            );
         });
         schemeManager.register(SinglePage.class, is -> {
-            is.add(new IndexSpec()
-                .setName("spec.publishTime")
-                .setIndexFunc(
-                    simpleAttribute(SinglePage.class, page -> Optional.ofNullable(page.getSpec())
-                        .map(SinglePage.SinglePageSpec::getPublishTime)
-                        .map(Instant::toString)
-                        .orElse(null))
+            is.add(IndexSpecs.<SinglePage, Instant>single("spec.publishTime", Instant.class)
+                .indexFunc(page -> Optional.ofNullable(page.getSpec())
+                    .map(SinglePageSpec::getPublishTime)
+                    .orElse(null)
                 )
             );
-            is.add(new IndexSpec()
-                .setName("spec.title")
-                .setIndexFunc(
-                    simpleAttribute(SinglePage.class, page -> Optional.ofNullable(page.getSpec())
-                        .map(SinglePage.SinglePageSpec::getTitle)
-                        .orElse(null))
+            is.add(IndexSpecs.<SinglePage, String>single("spec.title", String.class)
+                .indexFunc(page -> Optional.ofNullable(page.getSpec())
+                    .map(SinglePageSpec::getTitle)
+                    .orElse(null)
                 )
             );
-            is.add(new IndexSpec()
-                .setName("spec.slug")
-                .setUnique(false)
-                .setIndexFunc(
-                    simpleAttribute(SinglePage.class, page -> Optional.ofNullable(page.getSpec())
-                        .map(SinglePage.SinglePageSpec::getSlug)
-                        .orElse(null))
+            is.add(IndexSpecs.<SinglePage, String>single("spec.slug", String.class)
+                .indexFunc(page -> Optional.ofNullable(page.getSpec())
+                    .map(SinglePageSpec::getSlug)
+                    .orElse(null)
                 )
             );
-            is.add(new IndexSpec()
-                .setName("spec.deleted")
-                .setIndexFunc(simpleAttribute(SinglePage.class, page -> {
-                    var deleted = defaultIfNull(page.getSpec().getDeleted(), false);
-                    return String.valueOf(deleted);
-                }))
+            is.add(IndexSpecs.<SinglePage, Boolean>single("spec.deleted", Boolean.class)
+                .indexFunc(page -> Optional.ofNullable(page.getSpec())
+                    .map(SinglePageSpec::getDeleted)
+                    .orElse(false)
+                )
+                .nullable(false)
             );
-            is.add(new IndexSpec()
-                .setName("spec.visible")
-                .setIndexFunc(
-                    simpleAttribute(SinglePage.class, page -> Optional.ofNullable(page.getSpec())
-                        .map(SinglePage.SinglePageSpec::getVisible)
-                        .map(Post.VisibleEnum::name)
-                        .orElse(null))
+            is.add(IndexSpecs.<SinglePage, VisibleEnum>single("spec.visible", VisibleEnum.class)
+                .indexFunc(page -> Optional.ofNullable(page.getSpec())
+                    .map(SinglePageSpec::getVisible)
+                    .orElse(null)
                 )
             );
-            is.add(new IndexSpec()
-                .setName("spec.pinned")
-                .setIndexFunc(
-                    simpleAttribute(SinglePage.class, page -> Optional.ofNullable(page.getSpec())
-                        .map(SinglePage.SinglePageSpec::getPinned)
-                        .map(Object::toString)
-                        .orElse(Boolean.FALSE.toString())))
+            is.add(IndexSpecs.<SinglePage, Boolean>single("spec.pinned", Boolean.class)
+                .indexFunc(page -> Optional.ofNullable(page.getSpec())
+                    .map(SinglePageSpec::getPinned)
+                    .orElse(false)
+                )
+                .nullable(false)
             );
-            is.add(new IndexSpec()
-                .setName("spec.priority")
-                .setIndexFunc(simpleAttribute(SinglePage.class,
-                    page -> Optional.ofNullable(page.getSpec())
-                        .map(SinglePage.SinglePageSpec::getPriority)
-                        .map(Object::toString)
-                        .orElse(Integer.toString(0)))
+
+            is.add(IndexSpecs.<SinglePage, Integer>single("spec.priority", Integer.class)
+                .indexFunc(page -> Optional.ofNullable(page.getSpec())
+                    .map(SinglePageSpec::getPriority)
+                    .orElse(0)
+                )
+                .nullable(false)
+            );
+
+            is.add(IndexSpecs.<SinglePage, String>single("status.excerpt", String.class)
+                .indexFunc(page -> Optional.ofNullable(page.getStatus())
+                    .map(SinglePage.SinglePageStatus::getExcerpt)
+                    .orElse(null)
                 )
             );
-            is.add(new IndexSpec()
-                .setName("status.excerpt")
-                .setIndexFunc(
-                    simpleAttribute(SinglePage.class, page -> Optional.ofNullable(page.getStatus())
-                        .map(SinglePage.SinglePageStatus::getExcerpt)
-                        .orElse(null))
+            is.add(IndexSpecs.<SinglePage, String>single("status.phase", String.class)
+                .indexFunc(page -> Optional.ofNullable(page.getStatus())
+                    .map(SinglePage.SinglePageStatus::getPhase)
+                    .orElse(null)
                 )
             );
-            is.add(new IndexSpec()
-                .setName("status.phase")
-                .setIndexFunc(
-                    simpleAttribute(SinglePage.class, page -> Optional.ofNullable(page.getStatus())
-                        .map(SinglePage.SinglePageStatus::getPhase)
-                        .orElse(null))
-                )
-            );
-            is.add(new IndexSpec()
-                .setName("status.contributors")
-                .setIndexFunc(multiValueAttribute(SinglePage.class,
-                    page -> Optional.ofNullable(page.getStatus())
-                        .map(SinglePage.SinglePageStatus::getContributors)
-                        .map(Set::copyOf)
-                        .orElse(null))
+            is.add(IndexSpecs.<SinglePage, String>multi("status.contributors", String.class)
+                .indexFunc(page -> Optional.ofNullable(page.getStatus())
+                    .map(SinglePage.SinglePageStatus::getContributors)
+                    .map(Set::copyOf)
+                    .orElse(Set.of())
                 )
             );
         });
@@ -576,49 +603,47 @@ class SchemeInitializer implements SmartLifecycle {
         schemeManager.register(Group.class);
         schemeManager.register(Policy.class);
         schemeManager.register(Attachment.class, indexSpecs -> {
-            indexSpecs.add(new IndexSpec()
-                .setName("spec.displayName")
-                .setIndexFunc(simpleAttribute(Attachment.class,
-                    attachment -> attachment.getSpec().getDisplayName()))
+            indexSpecs.add(IndexSpecs.<Attachment, String>single("spec.displayName", String.class)
+                .indexFunc(attachment -> Optional.ofNullable(attachment.getSpec())
+                    .map(AttachmentSpec::getDisplayName)
+                    .orElse(null)
+                )
             );
-            indexSpecs.add(new IndexSpec()
-                .setName("spec.policyName")
-                .setIndexFunc(simpleAttribute(Attachment.class,
-                    attachment -> attachment.getSpec().getPolicyName()))
+            indexSpecs.add(IndexSpecs.<Attachment, String>single("spec.policyName", String.class)
+                .indexFunc(attachment -> Optional.ofNullable(attachment.getSpec())
+                    .map(AttachmentSpec::getPolicyName)
+                    .orElse(null)
+                )
             );
-            indexSpecs.add(new IndexSpec()
-                .setName("spec.groupName")
-                .setIndexFunc(simpleAttribute(Attachment.class, attachment -> {
-                    var group = attachment.getSpec().getGroupName();
-                    return StringUtils.isBlank(group) ? null : group;
-                }))
+            indexSpecs.add(IndexSpecs.<Attachment, String>single("spec.groupName", String.class)
+                .indexFunc(attachment -> Optional.ofNullable(attachment.getSpec())
+                    .map(AttachmentSpec::getGroupName)
+                    .orElse(null)
+                )
             );
-            indexSpecs.add(new IndexSpec()
-                .setName("spec.mediaType")
-                .setIndexFunc(simpleAttribute(Attachment.class, attachment -> {
-                    var mediaType = attachment.getSpec().getMediaType();
-                    return StringUtils.isBlank(mediaType) ? null : mediaType;
-                }))
+            indexSpecs.add(IndexSpecs.<Attachment, String>single("spec.mediaType", String.class)
+                .indexFunc(attachment -> Optional.ofNullable(attachment.getSpec())
+                    .map(AttachmentSpec::getMediaType)
+                    .orElse(null)
+                )
             );
-            indexSpecs.add(new IndexSpec()
-                .setName("spec.ownerName")
-                .setIndexFunc(simpleAttribute(Attachment.class,
-                    attachment -> attachment.getSpec().getOwnerName()))
+            indexSpecs.add(IndexSpecs.<Attachment, String>single("spec.ownerName", String.class)
+                .indexFunc(attachment -> Optional.ofNullable(attachment.getSpec())
+                    .map(AttachmentSpec::getOwnerName)
+                    .orElse(null)
+                )
             );
-            indexSpecs.add(new IndexSpec()
-                .setName("spec.size")
-                .setIndexFunc(simpleAttribute(Attachment.class,
-                    attachment -> {
-                        var size = attachment.getSpec().getSize();
-                        return size != null ? size.toString() : null;
-                    }))
+            indexSpecs.add(IndexSpecs.<Attachment, Long>single("spec.size", Long.class)
+                .indexFunc(attachment -> Optional.ofNullable(attachment.getSpec())
+                    .map(AttachmentSpec::getSize)
+                    .orElse(null)
+                )
             );
-            indexSpecs.add(new IndexSpec()
-                .setName("status.permalink")
-                .setIndexFunc(simpleAttribute(Attachment.class, attachment -> {
-                    var status = attachment.getStatus();
-                    return status == null ? null : status.getPermalink();
-                }))
+            indexSpecs.add(IndexSpecs.<Attachment, String>single("status.permalink", String.class)
+                .indexFunc(attachment -> Optional.ofNullable(attachment.getStatus())
+                    .map(AttachmentStatus::getPermalink)
+                    .orElse(null)
+                )
             );
         });
         schemeManager.register(PolicyTemplate.class);
@@ -627,8 +652,7 @@ class SchemeInitializer implements SmartLifecycle {
                 // see run.halo.app.core.attachment.ThumbnailMigration
                 // .setUnique(true)
                 .setName(Thumbnail.ID_INDEX)
-                .setIndexFunc(simpleAttribute(Thumbnail.class, Thumbnail::idIndexFunc))
-            );
+                .setIndexFunc(simpleAttribute(Thumbnail.class, Thumbnail::idIndexFunc)));
         });
         schemeManager.register(LocalThumbnail.class, indexSpec -> {
             // make sure image and size are unique
@@ -636,84 +660,75 @@ class SchemeInitializer implements SmartLifecycle {
                 // see run.halo.app.core.attachment.ThumbnailMigration
                 // .setUnique(true)
                 .setName(LocalThumbnail.UNIQUE_IMAGE_AND_SIZE_INDEX)
-                .setIndexFunc(simpleAttribute(LocalThumbnail.class,
-                    LocalThumbnail::uniqueImageAndSize)
+                .setIndexFunc(
+                    simpleAttribute(LocalThumbnail.class, LocalThumbnail::uniqueImageAndSize)
                 )
             );
-            indexSpec.add(new IndexSpec()
-                .setName("spec.imageSignature")
+            indexSpec.add(new IndexSpec().setName("spec.imageSignature")
                 .setIndexFunc(simpleAttribute(LocalThumbnail.class,
                     thumbnail -> thumbnail.getSpec().getImageSignature())
-                ));
-            indexSpec.add(new IndexSpec()
-                .setName("spec.thumbSignature")
-                .setUnique(true)
-                .setIndexFunc(simpleAttribute(LocalThumbnail.class,
-                    thumbnail -> thumbnail.getSpec().getThumbSignature())
-                ));
-            indexSpec.add(new IndexSpec()
-                .setName("status.phase")
-                .setIndexFunc(
-                    simpleAttribute(LocalThumbnail.class,
-                        thumbnail -> Optional.of(thumbnail.getStatus())
-                        .map(LocalThumbnail.Status::getPhase)
-                        .map(LocalThumbnail.Phase::name)
-                        .orElse(null))
                 )
             );
+            indexSpec.add(new IndexSpec().setName("spec.thumbSignature").setUnique(true)
+                .setIndexFunc(simpleAttribute(LocalThumbnail.class,
+                    thumbnail -> thumbnail.getSpec().getThumbSignature())
+                )
+            );
+            indexSpec.add(new IndexSpec().setName("status.phase").setIndexFunc(
+                simpleAttribute(LocalThumbnail.class,
+                    thumbnail -> Optional.of(thumbnail.getStatus())
+                        .map(LocalThumbnail.Status::getPhase)
+                        .map(LocalThumbnail.Phase::name)
+                        .orElse(null)
+                )
+            ));
         });
         // metrics.halo.run
         schemeManager.register(Counter.class);
         // auth.halo.run
         schemeManager.register(AuthProvider.class);
         schemeManager.register(UserConnection.class, is -> {
-            is.add(new IndexSpec()
-                .setName("spec.username")
-                .setIndexFunc(simpleAttribute(UserConnection.class,
-                    connection -> Optional.ofNullable(connection.getSpec())
-                        .map(UserConnectionSpec::getUsername)
-                        .orElse(null)
-                )));
-            is.add(new IndexSpec()
-                .setName("spec.registrationId")
-                .setIndexFunc(simpleAttribute(UserConnection.class,
-                    connection -> Optional.ofNullable(connection.getSpec())
-                        .map(UserConnectionSpec::getRegistrationId)
-                        .orElse(null)
-                ))
+            is.add(IndexSpecs.<UserConnection, String>single("spec.username", String.class)
+                .indexFunc(connection -> Optional.ofNullable(connection.getSpec())
+                    .map(UserConnectionSpec::getUsername)
+                    .orElse(null)
+                )
             );
-            is.add(new IndexSpec()
-                .setName("spec.providerUserId")
-                .setIndexFunc(simpleAttribute(UserConnection.class,
-                    connection -> Optional.ofNullable(connection.getSpec())
-                        .map(UserConnectionSpec::getProviderUserId)
-                        .orElse(null)
-                ))
+            is.add(IndexSpecs.<UserConnection, String>single("spec.registrationId", String.class)
+                .indexFunc(connection -> Optional.ofNullable(connection.getSpec())
+                    .map(UserConnectionSpec::getRegistrationId)
+                    .orElse(null)
+                )
+            );
+            is.add(IndexSpecs.<UserConnection, String>single("spec.providerUserId", String.class)
+                .indexFunc(connection -> Optional.ofNullable(connection.getSpec())
+                    .map(UserConnectionSpec::getProviderUserId)
+                    .orElse(null)
+                )
             );
         });
 
         // security.halo.run
         schemeManager.register(PersonalAccessToken.class);
         schemeManager.register(RememberMeToken.class, indexSpecs -> {
-            indexSpecs.add(new IndexSpec()
-                .setName("spec.series")
-                .setUnique(true)
-                .setIndexFunc(simpleAttribute(RememberMeToken.class,
-                    token -> token.getSpec().getSeries())
+            indexSpecs.add(IndexSpecs.<RememberMeToken, String>single("spec.series", String.class)
+                .indexFunc(token -> Optional.ofNullable(token.getSpec())
+                    .map(RememberMeToken.Spec::getSeries)
+                    .orElse(null)
                 )
             );
-            indexSpecs.add(new IndexSpec()
-                .setName("spec.username")
-                .setIndexFunc(simpleAttribute(RememberMeToken.class,
-                    token -> token.getSpec().getUsername())
+            indexSpecs.add(IndexSpecs.<RememberMeToken, String>single("spec.username", String.class)
+                .indexFunc(token -> Optional.ofNullable(token.getSpec())
+                    .map(RememberMeToken.Spec::getUsername)
+                    .orElse(null)
                 )
             );
         });
         schemeManager.register(Device.class, indexSpecs -> {
-            indexSpecs.add(new IndexSpec()
-                .setName("spec.principalName")
-                .setIndexFunc(simpleAttribute(Device.class,
-                    device -> device.getSpec().getPrincipalName())
+            indexSpecs.add(IndexSpecs.<Device, String>single("spec.principalName", String.class)
+                .indexFunc(device -> Optional.ofNullable(device.getSpec())
+                    .map(Device.Spec::getPrincipalName)
+                    .orElse(null)
                 )
             );
         });
@@ -725,50 +740,68 @@ class SchemeInitializer implements SmartLifecycle {
         schemeManager.register(ReasonType.class);
         schemeManager.register(Reason.class);
         schemeManager.register(NotificationTemplate.class, indexSpecs -> {
-            indexSpecs.add(new IndexSpec()
-                .setName("spec.reasonSelector.reasonType")
-                .setIndexFunc(simpleAttribute(NotificationTemplate.class,
-                    template -> template.getSpec().getReasonSelector().getReasonType()))
+            indexSpecs.add(
+                IndexSpecs.<NotificationTemplate, String>single("spec.reasonSelector.reasonType",
+                    String.class).indexFunc(template -> Optional.ofNullable(template.getSpec())
+                    .map(NotificationTemplate.Spec::getReasonSelector)
+                    .map(NotificationTemplate.ReasonSelector::getReasonType)
+                    .orElse(null)
+                )
             );
         });
         schemeManager.register(Subscription.class, indexSpecs -> {
-            indexSpecs.add(new IndexSpec()
-                .setName("spec.reason.reasonType")
-                .setIndexFunc(simpleAttribute(Subscription.class,
-                    subscription -> subscription.getSpec().getReason().getReasonType()))
+            indexSpecs.add(
+                IndexSpecs.<Subscription, String>single("spec.reason.reasonType", String.class)
+                    .indexFunc(
+                        sub -> Optional.ofNullable(sub.getSpec()).map(Subscription.Spec::getReason)
+                            .map(InterestReason::getReasonType)
+                            .orElse(null)
+                    )
             );
-            indexSpecs.add(new IndexSpec()
-                .setName("spec.reason.subject")
-                .setIndexFunc(simpleAttribute(Subscription.class,
-                    subscription -> subscription.getSpec().getReason().getSubject().toString()))
+            indexSpecs.add(
+                IndexSpecs.<Subscription, String>single("spec.reason.subject", String.class)
+                    .indexFunc(sub -> Optional.ofNullable(sub.getSpec())
+                        .map(Subscription.Spec::getReason)
+                        .map(InterestReason::getSubject)
+                        .map(Object::toString)
+                        .orElse(null)
+                    )
             );
-            indexSpecs.add(new IndexSpec()
-                .setName("spec.reason.expression")
-                .setIndexFunc(simpleAttribute(Subscription.class,
-                    subscription -> subscription.getSpec().getReason().getExpression()))
+            indexSpecs.add(
+                IndexSpecs.<Subscription, String>single("spec.reason.expression", String.class)
+                    .indexFunc(sub -> Optional.ofNullable(sub.getSpec())
+                        .map(Subscription.Spec::getReason)
+                        .map(InterestReason::getExpression)
+                        .orElse(null)
+                    )
             );
-            indexSpecs.add(new IndexSpec()
-                .setName("spec.subscriber")
-                .setIndexFunc(simpleAttribute(Subscription.class,
-                    subscription -> subscription.getSpec().getSubscriber().toString()))
+            indexSpecs.add(IndexSpecs.<Subscription, String>single("spec.subscriber", String.class)
+                .indexFunc(sub -> Optional.ofNullable(sub.getSpec())
+                    .map(Subscription.Spec::getSubscriber)
+                    .map(Object::toString)
+                    .orElse(null)
+                )
             );
         });
         schemeManager.register(NotifierDescriptor.class);
         schemeManager.register(Notification.class, indexSpecs -> {
-            indexSpecs.add(new IndexSpec()
-                .setName("spec.unread")
-                .setIndexFunc(simpleAttribute(Notification.class,
-                    notification -> String.valueOf(notification.getSpec().isUnread())))
+            indexSpecs.add(IndexSpecs.<Notification, Boolean>single("spec.unread", Boolean.class)
+                .indexFunc(notification -> Optional.ofNullable(notification.getSpec())
+                    .map(NotificationSpec::isUnread)
+                    .orElse(false)
+                )
             );
-            indexSpecs.add(new IndexSpec()
-                .setName("spec.reason")
-                .setIndexFunc(simpleAttribute(Notification.class,
-                    notification -> notification.getSpec().getReason()))
+            indexSpecs.add(IndexSpecs.<Notification, String>single("spec.reason", String.class)
+                .indexFunc(notification -> Optional.ofNullable(notification.getSpec())
+                    .map(NotificationSpec::getReason)
+                    .orElse(null)
+                )
             );
-            indexSpecs.add(new IndexSpec()
-                .setName("spec.recipient")
-                .setIndexFunc(simpleAttribute(Notification.class,
-                    notification -> notification.getSpec().getRecipient()))
+            indexSpecs.add(IndexSpecs.<Notification, String>single("spec.recipient", String.class)
+                .indexFunc(notification -> Optional.ofNullable(notification.getSpec())
+                    .map(NotificationSpec::getRecipient)
+                    .orElse(null)
+                )
             );
         });
     }

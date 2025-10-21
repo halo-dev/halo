@@ -2,52 +2,38 @@ package run.halo.app.extension;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.lenient;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.io.IOException;
-import java.util.Locale;
-import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.context.ApplicationEventPublisher;
 import run.halo.app.extension.exception.ExtensionConvertException;
 import run.halo.app.extension.exception.SchemaViolationException;
-import run.halo.app.extension.index.IndexSpecRegistry;
 import run.halo.app.extension.store.ExtensionStore;
 
 @ExtendWith(MockitoExtension.class)
 class JsonExtensionConverterTest {
 
+    @InjectMocks
     JSONExtensionConverter converter;
 
-    ObjectMapper objectMapper;
-
-    Locale localeDefault;
-
     @Mock
-    ApplicationEventPublisher eventPublisher;
+    SchemeManager schemeManager;
+
+    ObjectMapper objectMapper = Unstructured.OBJECT_MAPPER;
 
     @BeforeEach
     void setUp() {
-        localeDefault = Locale.getDefault();
-        Locale.setDefault(Locale.ENGLISH);
-        var indexSpecRegistry = mock(IndexSpecRegistry.class);
+        converter.setObjectMapper(objectMapper);
 
-        var schemeManager = new DefaultSchemeManager(indexSpecRegistry, eventPublisher);
-        converter = new JSONExtensionConverter(schemeManager);
-        objectMapper = converter.getObjectMapper();
-
-        schemeManager.register(FakeExtension.class);
-    }
-
-    @AfterEach
-    void cleanUp() {
-        Locale.setDefault(localeDefault);
+        var scheme = Scheme.buildFromType(FakeExtension.class);
+        lenient().when(schemeManager.get(scheme.groupVersionKind())).thenReturn(scheme);
     }
 
     @Test

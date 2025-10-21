@@ -1,9 +1,7 @@
 package run.halo.app.content;
 
 import static org.apache.commons.lang3.ObjectUtils.defaultIfNull;
-import static run.halo.app.extension.index.query.QueryFactory.and;
-import static run.halo.app.extension.index.query.QueryFactory.equal;
-import static run.halo.app.extension.index.query.QueryFactory.isNull;
+import static run.halo.app.extension.index.query.Queries.equal;
 
 import com.google.common.collect.Sets;
 import java.util.Collection;
@@ -22,7 +20,8 @@ import run.halo.app.extension.ExtensionClient;
 import run.halo.app.extension.ListOptions;
 import run.halo.app.extension.MetadataUtil;
 import run.halo.app.extension.PageRequestImpl;
-import run.halo.app.extension.index.query.Query;
+import run.halo.app.extension.index.query.Condition;
+import run.halo.app.extension.index.query.Queries;
 import run.halo.app.extension.router.selector.FieldSelector;
 import run.halo.app.extension.router.selector.LabelSelector;
 import run.halo.app.infra.utils.JsonUtils;
@@ -102,9 +101,8 @@ public class CategoryPostCountUpdater
 
         private int countVisiblePosts(String categoryName) {
             var postListOptions = new ListOptions();
-            var fieldQuery = and(basePostQuery(categoryName),
-                equal("spec.visible", Post.VisibleEnum.PUBLIC.name())
-            );
+            var fieldQuery = basePostQuery(categoryName)
+                .and(equal("spec.visible", Post.VisibleEnum.PUBLIC.name()));
             var labelSelector = LabelSelector.builder()
                 .eq(Post.PUBLISHED_LABEL, BooleanUtils.TRUE)
                 .build();
@@ -114,11 +112,10 @@ public class CategoryPostCountUpdater
                 .getTotal();
         }
 
-        private static Query basePostQuery(String categoryName) {
-            return and(isNull("metadata.deletionTimestamp"),
-                equal("spec.deleted", BooleanUtils.FALSE),
-                equal("spec.categories", categoryName)
-            );
+        private static Condition basePostQuery(String categoryName) {
+            return Queries.isNull("metadata.deletionTimestamp")
+                .and(equal("spec.deleted", BooleanUtils.FALSE))
+                .and(equal("spec.categories", categoryName));
         }
     }
 

@@ -25,7 +25,6 @@ import run.halo.app.extension.ExtensionStoreUtil;
 import run.halo.app.extension.PageRequestImpl;
 import run.halo.app.extension.ReactiveExtensionClient;
 import run.halo.app.extension.SchemeManager;
-import run.halo.app.extension.index.IndexerFactory;
 import run.halo.app.extension.store.ReactiveExtensionStoreClient;
 import run.halo.app.infra.utils.JsonUtils;
 
@@ -62,18 +61,12 @@ class ReplyServiceImplIntegrationTest {
         @Autowired
         private ReactiveExtensionStoreClient storeClient;
 
-        @Autowired
-        private IndexerFactory indexerFactory;
-
         @MockitoSpyBean
         private ReplyServiceImpl replyService;
 
         Mono<Extension> deleteImmediately(Extension extension) {
             var name = extension.getMetadata().getName();
             var scheme = schemeManager.get(extension.getClass());
-            // un-index
-            var indexer = indexerFactory.getIndexer(extension.groupVersionKind());
-            indexer.unIndexRecord(extension.getMetadata().getName());
 
             // delete from db
             var storeName = ExtensionStoreUtil.buildStoreName(scheme, name);

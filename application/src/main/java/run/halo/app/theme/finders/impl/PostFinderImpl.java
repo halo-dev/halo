@@ -1,9 +1,8 @@
 package run.halo.app.theme.finders.impl;
 
-import static run.halo.app.extension.index.query.QueryFactory.and;
-import static run.halo.app.extension.index.query.QueryFactory.equal;
-import static run.halo.app.extension.index.query.QueryFactory.in;
-import static run.halo.app.extension.index.query.QueryFactory.notEqual;
+import static run.halo.app.extension.index.query.Queries.equal;
+import static run.halo.app.extension.index.query.Queries.in;
+import static run.halo.app.extension.index.query.Queries.notEqual;
 
 import java.util.Comparator;
 import java.util.List;
@@ -29,8 +28,8 @@ import run.halo.app.extension.PageRequest;
 import run.halo.app.extension.PageRequestImpl;
 import run.halo.app.extension.ReactiveExtensionClient;
 import run.halo.app.extension.exception.ExtensionNotFoundException;
-import run.halo.app.extension.index.query.Query;
-import run.halo.app.extension.index.query.QueryFactory;
+import run.halo.app.extension.index.query.Condition;
+import run.halo.app.extension.index.query.Queries;
 import run.halo.app.extension.router.selector.FieldSelector;
 import run.halo.app.extension.router.selector.LabelSelector;
 import run.halo.app.infra.utils.HaloUtils;
@@ -119,18 +118,18 @@ public class PostFinderImpl implements PostFinder {
 
     @Override
     public Mono<NavigationPostVo> cursor(String currentName) {
+        // TODO Refine this feature
         return postPredicateResolver.getListOptions()
             .map(listOptions -> ListOptions.builder(listOptions)
                 // Exclude hidden posts
                 .andQuery(notHiddenPostQuery())
                 .build()
             )
-            .flatMap(postListOption -> {
-                var postNames = client.indexedQueryEngine()
-                    .retrieve(Post.GVK, postListOption,
-                        PageRequestImpl.ofSize(0).withSort(defaultSort())
-                    )
-                    .getItems();
+            .flatMap(listOptions -> client.listNamesBy(Post.class, listOptions,
+                PageRequestImpl.ofSize(1).withSort(defaultSort()))
+            )
+            .flatMap(listResult -> {
+                var postNames = listResult.getItems();
                 var previousNextPair = findPostNavigation(postNames, currentName);
                 String previousPostName = previousNextPair.prev();
                 String nextPostName = previousNextPair.next();
@@ -147,7 +146,7 @@ public class PostFinderImpl implements PostFinder {
             .defaultIfEmpty(NavigationPostVo.empty());
     }
 
-    private static Query notHiddenPostQuery() {
+    private static Condition notHiddenPostQuery() {
         return notEqual("status.hideFromList", BooleanUtils.TRUE);
     }
 
@@ -207,9 +206,9 @@ public class PostFinderImpl implements PostFinder {
 
     @Override
     public Mono<ListResult<ListedPostVo>> listByTag(Integer page, Integer size, String tag) {
-        var fieldQuery = QueryFactory.all();
+        var fieldQuery = Queries.empty();
         if (StringUtils.isNotBlank(tag)) {
-            fieldQuery = and(fieldQuery, equal("spec.tags", tag));
+            fieldQuery = fieldQuery.and(equal("spec.tags", tag));
         }
         var listOptions = new ListOptions();
         listOptions.setFieldSelector(FieldSelector.of(fieldQuery));
@@ -218,9 +217,9 @@ public class PostFinderImpl implements PostFinder {
 
     @Override
     public Mono<ListResult<ListedPostVo>> listByOwner(Integer page, Integer size, String owner) {
-        var fieldQuery = QueryFactory.all();
+        var fieldQuery = Queries.empty();
         if (StringUtils.isNotBlank(owner)) {
-            fieldQuery = and(fieldQuery, equal("spec.owner", owner));
+            fieldQuery = fieldQuery.and(equal("spec.owner", owner));
         }
         var listOptions = new ListOptions();
         listOptions.setFieldSelector(FieldSelector.of(fieldQuery));

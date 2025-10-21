@@ -1,8 +1,8 @@
 package run.halo.app.core.user.service.impl;
 
 import static run.halo.app.extension.ExtensionUtil.defaultSort;
-import static run.halo.app.extension.index.query.QueryFactory.and;
-import static run.halo.app.extension.index.query.QueryFactory.equal;
+import static run.halo.app.extension.index.query.Queries.and;
+import static run.halo.app.extension.index.query.Queries.equal;
 
 import java.time.Clock;
 import java.util.HashMap;

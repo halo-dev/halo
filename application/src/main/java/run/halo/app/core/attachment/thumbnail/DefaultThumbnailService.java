@@ -20,7 +20,7 @@ import run.halo.app.core.extension.attachment.Attachment;
 import run.halo.app.extension.ExtensionUtil;
 import run.halo.app.extension.ListOptions;
 import run.halo.app.extension.ReactiveExtensionClient;
-import run.halo.app.extension.index.query.QueryFactory;
+import run.halo.app.extension.index.query.Queries;
 import run.halo.app.infra.ExternalUrlSupplier;
 
 /**
@@ -119,7 +119,7 @@ class DefaultThumbnailService implements ThumbnailService {
             }
             // query from attachments
             var listOptions = ListOptions.builder()
-                .andQuery(QueryFactory.equal("status.permalink", permalinkString))
+                .andQuery(Queries.equal("status.permalink", permalinkString))
                 .build();
             return client.listAll(Attachment.class, listOptions, ExtensionUtil.defaultSort())
                 .next()

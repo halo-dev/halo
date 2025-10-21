@@ -40,7 +40,7 @@ import run.halo.app.extension.Ref;
 import run.halo.app.extension.controller.Controller;
 import run.halo.app.extension.controller.ControllerBuilder;
 import run.halo.app.extension.controller.Reconciler;
-import run.halo.app.extension.index.query.QueryFactory;
+import run.halo.app.extension.index.query.Queries;
 import run.halo.app.extension.router.selector.FieldSelector;
 import run.halo.app.infra.Condition;
 import run.halo.app.infra.ConditionList;
@@ -419,7 +419,7 @@ public class SinglePageReconciler implements Reconciler<Reconciler.Request> {
     List<Snapshot> listSnapshots(Ref ref) {
         var snapshotListOptions = new ListOptions();
         snapshotListOptions.setFieldSelector(FieldSelector.of(
-            QueryFactory.equal("spec.subjectRef", Snapshot.toSubjectRefKey(ref))));
+            Queries.equal("spec.subjectRef", Snapshot.toSubjectRefKey(ref))));
         return client.listAll(Snapshot.class, snapshotListOptions, Sort.unsorted());
     }
 }

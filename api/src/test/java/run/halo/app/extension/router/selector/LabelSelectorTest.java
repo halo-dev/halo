@@ -19,6 +19,8 @@ class LabelSelectorTest {
             .in("b", "v2", "v3")
             .build();
         assertThat(labelSelector.toString())
-            .isEqualTo("a equal v1, b IN (v2, v3)");
+            .isEqualTo("""
+                (metadata.labels['a'] = 'v1' AND metadata.labels['b'] IN ('v2', 'v3'))\
+                """);
     }
 }

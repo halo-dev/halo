@@ -3,7 +3,7 @@ package run.halo.app.security.device;
 import static run.halo.app.extension.ExtensionUtil.addFinalizers;
 import static run.halo.app.extension.ExtensionUtil.isDeleted;
 import static run.halo.app.extension.ExtensionUtil.removeFinalizers;
-import static run.halo.app.extension.index.query.QueryFactory.equal;
+import static run.halo.app.extension.index.query.Queries.equal;
 
 import java.util.Set;
 import lombok.RequiredArgsConstructor;

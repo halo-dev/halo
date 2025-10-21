@@ -1,6 +1,6 @@
 package run.halo.app.core.reconciler;
 
-import static run.halo.app.extension.index.query.QueryFactory.startsWith;
+import static run.halo.app.extension.index.query.Queries.startsWith;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.ApplicationEventPublisher;

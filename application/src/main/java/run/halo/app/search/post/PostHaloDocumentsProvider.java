@@ -7,7 +7,7 @@ import run.halo.app.content.ContentWrapper;
 import run.halo.app.content.PostService;
 import run.halo.app.core.extension.content.Post;
 import run.halo.app.extension.ListOptions;
-import run.halo.app.extension.index.query.QueryFactory;
+import run.halo.app.extension.index.query.Queries;
 import run.halo.app.extension.router.selector.FieldSelector;
 import run.halo.app.infra.ReactiveExtensionPaginatedOperator;
 import run.halo.app.search.HaloDocument;
@@ -32,7 +32,7 @@ public class PostHaloDocumentsProvider implements HaloDocumentsProvider {
     public Flux<HaloDocument> fetchAll() {
         // make sure the posts are published, public visible and not deleted.
         var options = new ListOptions();
-        var noteDeleted = QueryFactory.isNull("metadata.deletionTimestamp");
+        var noteDeleted = Queries.isNull("metadata.deletionTimestamp");
         options.setFieldSelector(FieldSelector.of(noteDeleted));
         // get content
         return paginatedOperator.list(Post.class, options)
