@@ -64,6 +64,8 @@ nbdist/
 
 ### VSCode
 .vscode
+!.vscode/settings.json
+!.vscode/extensions.json
 
 ### Local file
 application-local.yml
@@ -76,3 +78,27 @@ application-local.properties
 application/src/main/resources/console/
 application/src/main/resources/uc/
 application/src/main/resources/presets/
+
+### Node
+node_modules
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+lerna-debug.log*
+
+### Frontend
+dist
+histoire-dist
+coverage
+*.local
+
+### Cypress
+/cypress/videos/
+/cypress/screenshots/
+
+### Frontend build
+!src/build
+storybook-static
+tsconfig.tsbuildinfo
+.tgz
