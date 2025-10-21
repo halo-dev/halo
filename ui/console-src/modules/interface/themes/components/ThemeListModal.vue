@@ -13,6 +13,7 @@ import {
   onMounted,
   provide,
   ref,
+  shallowRef,
   watch,
   type Ref,
 } from "vue";
@@ -34,7 +35,7 @@ const emit = defineEmits<{
 
 const modal = ref<InstanceType<typeof VModal> | null>(null);
 
-const tabs = ref<ThemeListTab[]>([
+const tabs = shallowRef<ThemeListTab[]>([
   {
     id: "installed",
     label: t("core.theme.list_modal.tabs.installed"),

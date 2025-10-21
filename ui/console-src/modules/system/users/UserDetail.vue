@@ -24,7 +24,7 @@ import {
   onMounted,
   provide,
   ref,
-  toRaw,
+  shallowRef,
   type Ref,
 } from "vue";
 import { useI18n } from "vue-i18n";
@@ -60,7 +60,7 @@ const {
   enabled: computed(() => !!params.name),
 });
 
-const tabs = ref<UserTab[]>([
+const tabs = shallowRef<UserTab[]>([
   {
     id: "detail",
     label: t("core.user.detail.tabs.detail"),
@@ -83,7 +83,9 @@ onMounted(async () => {
 
       const providers = await callbackFunction();
 
-      tabs.value.push(...providers);
+      tabs.value = [...tabs.value, ...providers].sort(
+        (a, b) => a.priority - b.priority
+      );
     } catch (error) {
       console.error(`Error processing plugin module:`, pluginModule, error);
     }
@@ -97,12 +99,10 @@ const activeTab = useRouteQuery<string>("tab", tabs.value[0].id, {
 provide<Ref<string>>("activeTab", activeTab);
 
 const tabbarItems = computed(() => {
-  return toRaw(tabs)
-    .value.sort((a, b) => a.priority - b.priority)
-    .map((tab) => ({
-      id: tab.id,
-      label: tab.label,
-    }));
+  return tabs.value.map((tab) => ({
+    id: tab.id,
+    label: tab.label,
+  }));
 });
 
 const handleDelete = async (user: User) => {

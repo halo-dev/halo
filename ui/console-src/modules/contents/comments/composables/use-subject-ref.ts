@@ -9,13 +9,13 @@ import type {
   CommentSubjectRefProvider,
   CommentSubjectRefResult,
 } from "@halo-dev/console-shared";
-import { computed, onMounted, ref } from "vue";
+import { computed, onMounted, shallowRef } from "vue";
 import { useI18n } from "vue-i18n";
 
 export function useSubjectRef(comment: ListedComment) {
   const { t } = useI18n();
 
-  const SubjectRefProviders = ref<CommentSubjectRefProvider[]>([
+  const SubjectRefProviders = shallowRef<CommentSubjectRefProvider[]>([
     {
       kind: "Post",
       group: "content.halo.run",
@@ -67,7 +67,7 @@ export function useSubjectRef(comment: ListedComment) {
 
       const providers = callbackFunction();
 
-      SubjectRefProviders.value.push(...providers);
+      SubjectRefProviders.value = [...SubjectRefProviders.value, ...providers];
     }
   });
 

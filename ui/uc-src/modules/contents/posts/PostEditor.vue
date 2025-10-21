@@ -32,7 +32,16 @@ import { AxiosError, type AxiosRequestConfig } from "axios";
 import { isEqual } from "lodash-es";
 import ShortUniqueId from "short-unique-id";
 import type { ComputedRef } from "vue";
-import { computed, nextTick, onMounted, provide, ref, toRef, watch } from "vue";
+import {
+  computed,
+  nextTick,
+  onMounted,
+  provide,
+  ref,
+  shallowRef,
+  toRef,
+  watch,
+} from "vue";
 import { useI18n } from "vue-i18n";
 import { useRouter } from "vue-router";
 import PostCreationModal from "./components/PostCreationModal.vue";
@@ -112,7 +121,7 @@ provide<ComputedRef<string | undefined>>(
 
 // Editor providers
 const { editorProviders, fetchEditorProviders } = useEditorExtensionPoints();
-const currentEditorProvider = ref<EditorProvider>();
+const currentEditorProvider = shallowRef<EditorProvider>();
 const storedEditorProviderName = useLocalStorage("editor-provider-name", "");
 
 const handleChangeEditorProvider = async (provider: EditorProvider) => {
