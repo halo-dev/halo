@@ -1,8 +1,6 @@
 <script lang="ts" setup>
 import PostContributorList from "@/components/user/PostContributorList.vue";
-import { formatDatetime, relativeTimeTo } from "@/utils/date";
 import { usePermission } from "@/utils/permission";
-import { generateThumbnailUrl } from "@/utils/thumbnail";
 import type { ListedPost, Post } from "@halo-dev/api-client";
 import {
   consoleApiClient,
@@ -28,6 +26,7 @@ import {
   VSpace,
   VStatusDot,
 } from "@halo-dev/components";
+import { utils } from "@halo-dev/console-shared";
 import { useQuery } from "@tanstack/vue-query";
 import { chunk } from "lodash-es";
 import { ref, watch } from "vue";
@@ -330,7 +329,7 @@ watch(
                     <img
                       class="h-full w-full object-cover"
                       :src="
-                        generateThumbnailUrl(
+                        utils.attachment.getThumbnailUrl(
                           post.post.spec.cover,
                           GetThumbnailByUriSizeEnum.S
                         )
@@ -412,8 +411,8 @@ watch(
               </VEntityField>
               <VEntityField
                 v-if="post.post.spec.publishTime"
-                v-tooltip="formatDatetime(post.post.spec.publishTime)"
-                :description="relativeTimeTo(post.post.spec.publishTime)"
+                v-tooltip="utils.date.format(post.post.spec.publishTime)"
+                :description="utils.date.timeAgo(post.post.spec.publishTime)"
               >
               </VEntityField>
             </template>

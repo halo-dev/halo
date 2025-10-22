@@ -4,10 +4,10 @@ import { useRoleTemplateSelection } from "@/composables/use-role";
 import { patAnnotations, rbacAnnotations } from "@/constants/annotations";
 import { roleLabels } from "@/constants/labels";
 import { useRoleStore } from "@/stores/role";
-import { toISOString } from "@/utils/date";
 import type { PatSpec, PersonalAccessToken } from "@halo-dev/api-client";
 import { ucApiClient } from "@halo-dev/api-client";
 import { Dialog, Toast, VButton, VModal, VSpace } from "@halo-dev/components";
+import { utils } from "@halo-dev/console-shared";
 import { useMutation, useQueryClient } from "@tanstack/vue-query";
 import { useClipboard } from "@vueuse/core";
 import { computed, ref } from "vue";
@@ -65,7 +65,7 @@ const { mutate, isLoading } = useMutation({
   mutationKey: ["pat-creation"],
   mutationFn: async () => {
     if (formState.value.spec?.expiresAt) {
-      formState.value.spec.expiresAt = toISOString(
+      formState.value.spec.expiresAt = utils.date.toISOString(
         formState.value.spec.expiresAt
       );
     }

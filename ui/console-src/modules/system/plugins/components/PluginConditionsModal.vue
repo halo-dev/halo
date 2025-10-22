@@ -1,7 +1,7 @@
 <script lang="ts" setup>
-import { formatDatetime, relativeTimeTo } from "@/utils/date";
 import type { Plugin } from "@halo-dev/api-client";
 import { VButton, VModal } from "@halo-dev/components";
+import { utils } from "@halo-dev/console-shared";
 import { ref } from "vue";
 
 withDefaults(defineProps<{ plugin: Plugin }>(), {});
@@ -75,10 +75,10 @@ const modal = ref();
             <pre>{{ condition.message || "-" }}</pre>
           </td>
           <td
-            v-tooltip="formatDatetime(condition.lastTransitionTime)"
+            v-tooltip="utils.date.format(condition.lastTransitionTime)"
             class="whitespace-nowrap px-4 py-3 text-sm text-gray-500"
           >
-            {{ relativeTimeTo(condition.lastTransitionTime) }}
+            {{ utils.date.timeAgo(condition.lastTransitionTime) }}
           </td>
         </tr>
       </tbody>

@@ -21,6 +21,7 @@ import {
   setupPluginModules,
 } from "@console/setup/setupModules";
 import { useThemeStore } from "@console/stores/theme";
+import { utils } from "@halo-dev/console-shared";
 import "core-js/es/object/has-own";
 
 const app = createApp(App);
@@ -81,6 +82,7 @@ async function initApp() {
 
     // set locale
     i18n.global.locale.value = getCookie("language") || getBrowserLanguage();
+    utils.date.setLocale(i18n.global.locale.value);
 
     const globalInfoStore = useGlobalInfoStore();
     await globalInfoStore.fetchGlobalInfo();

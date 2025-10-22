@@ -1,6 +1,5 @@
 <script lang="ts" setup>
 import { SYSTEM_PROTECTION } from "@/constants/finalizers";
-import { formatDatetime } from "@/utils/date";
 import type { Policy, PolicyTemplate } from "@halo-dev/api-client";
 import { consoleApiClient, coreApiClient } from "@halo-dev/api-client";
 import {
@@ -19,6 +18,7 @@ import {
   VStatusDot,
   VTag,
 } from "@halo-dev/components";
+import { utils } from "@halo-dev/console-shared";
 import { ref } from "vue";
 import { useI18n } from "vue-i18n";
 import {
@@ -189,7 +189,7 @@ function getPolicyTemplateDisplayName(templateName: string) {
           <VEntityField>
             <template #description>
               <span class="truncate text-xs tabular-nums text-gray-500">
-                {{ formatDatetime(policy.metadata.creationTimestamp) }}
+                {{ utils.date.format(policy.metadata.creationTimestamp) }}
               </span>
             </template>
           </VEntityField>

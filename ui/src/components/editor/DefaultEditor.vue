@@ -56,9 +56,7 @@ import {
 // ui custom extension
 import { i18n } from "@/locales";
 import { usePluginModuleStore } from "@/stores/plugin";
-import { formatDatetime } from "@/utils/date";
 import { usePermission } from "@/utils/permission";
-import { generateThumbnailUrl } from "@/utils/thumbnail";
 import {
   GetThumbnailByUriSizeEnum,
   type Attachment,
@@ -79,7 +77,7 @@ import {
   VTabItem,
   VTabs,
 } from "@halo-dev/components";
-import type { AttachmentLike } from "@halo-dev/console-shared";
+import { utils, type AttachmentLike } from "@halo-dev/console-shared";
 import { useDebounceFn, useFileDialog, useLocalStorage } from "@vueuse/core";
 import type { AxiosRequestConfig } from "axios";
 import { OverlayScrollbarsComponent } from "overlayscrollbars-vue";
@@ -603,7 +601,12 @@ onCoverInputChange((files) => {
           >
             <img
               v-if="cover"
-              :src="generateThumbnailUrl(cover, GetThumbnailByUriSizeEnum.Xl)"
+              :src="
+                utils.attachment.getThumbnailUrl(
+                  cover,
+                  GetThumbnailByUriSizeEnum.Xl
+                )
+              "
               class="size-full object-cover"
             />
             <div
@@ -833,7 +836,7 @@ onCoverInputChange((files) => {
                     </div>
                     <div class="text-base font-medium text-gray-900">
                       {{
-                        formatDatetime(publishTime) ||
+                        utils.date.format(publishTime) ||
                         $t(
                           "core.components.default_editor.tabs.detail.fields.draft"
                         )

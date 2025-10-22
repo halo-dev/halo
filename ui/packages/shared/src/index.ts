@@ -14,3 +14,4 @@ export * from "./states/user-tab";
 export * from "./types/menus";
 export * from "./types/plugin";
 export * from "./types/widget";
+export * from "./utils";

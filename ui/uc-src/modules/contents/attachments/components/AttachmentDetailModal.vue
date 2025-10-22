@@ -1,7 +1,6 @@
 <script lang="ts" setup>
 import AttachmentPermalinkList from "@/components/attachment/AttachmentPermalinkList.vue";
 import LazyImage from "@/components/image/LazyImage.vue";
-import { formatDatetime } from "@/utils/date";
 import { isImage } from "@/utils/image";
 import { type Attachment } from "@halo-dev/api-client";
 import {
@@ -11,6 +10,7 @@ import {
   VModal,
   VSpace,
 } from "@halo-dev/components";
+import { utils } from "@halo-dev/console-shared";
 import prettyBytes from "pretty-bytes";
 import { useTemplateRef } from "vue";
 
@@ -130,7 +130,7 @@ const modal = useTemplateRef<InstanceType<typeof VModal> | null>("modal");
           />
           <VDescriptionItem
             :label="$t('core.uc_attachment.detail_modal.fields.creation_time')"
-            :content="formatDatetime(attachment?.metadata.creationTimestamp)"
+            :content="utils.date.format(attachment?.metadata.creationTimestamp)"
           />
           <VDescriptionItem
             :label="$t('core.uc_attachment.detail_modal.fields.permalink')"

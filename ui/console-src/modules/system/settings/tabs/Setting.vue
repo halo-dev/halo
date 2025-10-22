@@ -6,6 +6,7 @@ import type { FormKitSchemaCondition, FormKitSchemaNode } from "@formkit/core";
 import type { Setting } from "@halo-dev/api-client";
 import { consoleApiClient } from "@halo-dev/api-client";
 import { Toast, VButton, VLoading } from "@halo-dev/components";
+import { utils } from "@halo-dev/console-shared";
 import { useQuery, useQueryClient } from "@tanstack/vue-query";
 import { computed, inject, ref, toRaw, type Ref } from "vue";
 import { useI18n } from "vue-i18n";
@@ -58,6 +59,7 @@ const handleSaveConfigMap = async (data: Record<string, unknown>) => {
       const language = data.language;
       locale.value = language as string;
       document.cookie = `language=${language}; path=/; SameSite=Lax; Secure`;
+      utils.date.setLocale(locale.value);
     }
 
     Toast.success(t("core.common.toast.save_success"));

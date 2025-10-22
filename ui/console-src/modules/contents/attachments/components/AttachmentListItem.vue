@@ -1,6 +1,5 @@
 <script lang="ts" setup>
 import EntityDropdownItems from "@/components/entity/EntityDropdownItems.vue";
-import { formatDatetime } from "@/utils/date";
 import { usePermission } from "@/utils/permission";
 import { useOperationItemExtensionPoint } from "@console/composables/use-operation-extension-points";
 import type { Attachment } from "@halo-dev/api-client";
@@ -15,7 +14,7 @@ import {
   VSpace,
   VStatusDot,
 } from "@halo-dev/components";
-import type { OperationItem } from "@halo-dev/console-shared";
+import { utils, type OperationItem } from "@halo-dev/console-shared";
 import { useQueryClient } from "@tanstack/vue-query";
 import prettyBytes from "pretty-bytes";
 import type { Ref } from "vue";
@@ -208,7 +207,7 @@ const { operationItems } = useOperationItemExtensionPoint<Attachment>(
       <VEntityField>
         <template #description>
           <span class="truncate text-xs tabular-nums text-gray-500">
-            {{ formatDatetime(attachment.metadata.creationTimestamp) }}
+            {{ utils.date.format(attachment.metadata.creationTimestamp) }}
           </span>
         </template>
       </VEntityField>

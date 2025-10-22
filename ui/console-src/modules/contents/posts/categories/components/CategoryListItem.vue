@@ -1,5 +1,4 @@
 <script setup lang="ts">
-import { formatDatetime } from "@/utils/date";
 import { usePermission } from "@/utils/permission";
 import { coreApiClient, type Category } from "@halo-dev/api-client";
 import {
@@ -12,6 +11,7 @@ import {
   VDropdownItem,
   VStatusDot,
 } from "@halo-dev/components";
+import { utils } from "@halo-dev/console-shared";
 import "@he-tree/vue/style/default.css";
 import { useQueryClient } from "@tanstack/vue-query";
 import { ref } from "vue";
@@ -137,7 +137,7 @@ const handleOpenCreateByParentModal = () => {
         }}
       </span>
       <span class="truncate text-xs tabular-nums text-gray-500">
-        {{ formatDatetime(categoryTreeNode.metadata.creationTimestamp) }}
+        {{ utils.date.format(categoryTreeNode.metadata.creationTimestamp) }}
       </span>
       <VDropdown v-if="currentUserHasPermission(['system:posts:manage'])">
         <div

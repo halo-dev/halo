@@ -1,5 +1,4 @@
 <script lang="ts" setup>
-import { formatDatetime } from "@/utils/date";
 import type { UserDevice } from "@halo-dev/api-client";
 import {
   VButton,
@@ -8,6 +7,7 @@ import {
   VModal,
   VSpace,
 } from "@halo-dev/components";
+import { utils } from "@halo-dev/console-shared";
 import { ref } from "vue";
 import { useUserAgent } from "../composables/use-user-agent";
 import { useUserDevice } from "../composables/use-user-device";
@@ -59,14 +59,14 @@ const { handleRevoke } = useUserDevice(props.device);
         :label="
           $t('core.uc_profile.device.detail_modal.fields.creation_timestamp')
         "
-        :content="formatDatetime(device.device.metadata.creationTimestamp)"
+        :content="utils.date.format(device.device.metadata.creationTimestamp)"
       />
       <VDescriptionItem
         class="!px-4"
         :label="
           $t('core.uc_profile.device.detail_modal.fields.last_accessed_times')
         "
-        :content="formatDatetime(device.device.spec.lastAccessedTime)"
+        :content="utils.date.format(device.device.spec.lastAccessedTime)"
       />
       <VDescriptionItem
         class="!px-4"
@@ -75,7 +75,7 @@ const { handleRevoke } = useUserDevice(props.device);
             'core.uc_profile.device.detail_modal.fields.last_authenticated_time'
           )
         "
-        :content="formatDatetime(device.device.spec.lastAuthenticatedTime)"
+        :content="utils.date.format(device.device.spec.lastAuthenticatedTime)"
       />
     </VDescription>
     <template #footer>

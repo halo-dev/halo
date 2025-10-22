@@ -1,5 +1,4 @@
 <script setup lang="ts">
-import { formatDatetime, relativeTimeTo } from "@/utils/date";
 import {
   consoleApiClient,
   coreApiClient,
@@ -17,6 +16,7 @@ import {
   VSpace,
   VTag,
 } from "@halo-dev/components";
+import { utils } from "@halo-dev/console-shared";
 import { useQueryClient } from "@tanstack/vue-query";
 import { useUserAgent } from "@uc/modules/profile/tabs/composables/use-user-agent";
 import sanitizeHtml from "sanitize-html";
@@ -158,8 +158,8 @@ const { data: contentProvider } = useContentProviderExtensionPoint();
         <VDescriptionItem
           :label="$t('core.comment.detail_modal.fields.creation_time')"
         >
-          <span v-tooltip="formatDatetime(creationTime)">
-            {{ relativeTimeTo(creationTime) }}
+          <span v-tooltip="utils.date.format(creationTime)">
+            {{ utils.date.timeAgo(creationTime) }}
           </span>
         </VDescriptionItem>
         <VDescriptionItem

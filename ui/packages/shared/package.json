@@ -1,5 +1,6 @@
 {
   "name": "@halo-dev/console-shared",
+  "type": "module",
   "version": "2.21.0",
   "description": "",
   "keywords": [],
@@ -18,12 +19,12 @@
     "url": "https://github.com/halo-dev"
   },
   "exports": {
-    ".": "./dist/index.mjs",
+    ".": "./dist/index.js",
     "./package.json": "./package.json"
   },
-  "main": "./dist/index.mjs",
-  "module": "./dist/index.mjs",
-  "types": "./dist/index.d.mts",
+  "main": "./dist/index.js",
+  "module": "./dist/index.js",
+  "types": "./dist/index.d.ts",
   "files": [
     "dist"
   ],

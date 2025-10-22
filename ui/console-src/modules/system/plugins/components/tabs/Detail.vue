@@ -1,7 +1,6 @@
 <script lang="ts" setup>
 import { rbacAnnotations } from "@/constants/annotations";
 import { pluginLabels, roleLabels } from "@/constants/labels";
-import { formatDatetime } from "@/utils/date";
 import { usePermission } from "@/utils/permission";
 import {
   PluginStatusPhaseEnum,
@@ -16,6 +15,7 @@ import {
   VDescriptionItem,
   VSwitch,
 } from "@halo-dev/components";
+import { utils } from "@halo-dev/console-shared";
 import { useQuery } from "@tanstack/vue-query";
 import type { Ref } from "vue";
 import { computed, inject, ref } from "vue";
@@ -275,11 +275,11 @@ const lastCondition = computed(() => {
         </VDescriptionItem>
         <VDescriptionItem
           :label="$t('core.plugin.detail.fields.creation_time')"
-          :content="formatDatetime(plugin?.metadata.creationTimestamp)"
+          :content="utils.date.format(plugin?.metadata.creationTimestamp)"
         />
         <VDescriptionItem
           :label="$t('core.plugin.detail.fields.last_starttime')"
-          :content="formatDatetime(plugin?.status?.lastStartTime)"
+          :content="utils.date.format(plugin?.status?.lastStartTime)"
         />
         <VDescriptionItem
           :label="$t('core.plugin.detail.fields.load_location')"

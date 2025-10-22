@@ -9,6 +9,7 @@ import { useUserStore } from "@/stores/user";
 import { getCookie } from "@/utils/cookie";
 import { hasPermission } from "@/utils/permission";
 import { consoleApiClient } from "@halo-dev/api-client";
+import { utils } from "@halo-dev/console-shared";
 import router from "@uc/router";
 import { setupCoreModules, setupPluginModules } from "@uc/setup/setupModules";
 import "core-js/es/object/has-own";
@@ -69,6 +70,7 @@ async function initApp() {
 
     // set locale
     i18n.global.locale.value = getCookie("language") || getBrowserLanguage();
+    utils.date.setLocale(i18n.global.locale.value);
 
     const globalInfoStore = useGlobalInfoStore();
     await globalInfoStore.fetchGlobalInfo();

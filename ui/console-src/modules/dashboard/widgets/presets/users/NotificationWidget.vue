@@ -1,6 +1,5 @@
 <script lang="ts" setup>
 import { useUserStore } from "@/stores/user";
-import { relativeTimeTo } from "@/utils/date";
 import WidgetCard from "@console/modules/dashboard/components/WidgetCard.vue";
 import type { Notification } from "@halo-dev/api-client";
 import { ucApiClient } from "@halo-dev/api-client";
@@ -12,6 +11,7 @@ import {
   VEntityField,
   VLoading,
 } from "@halo-dev/components";
+import { utils } from "@halo-dev/console-shared";
 import { useQuery } from "@tanstack/vue-query";
 import { OverlayScrollbarsComponent } from "overlayscrollbars-vue";
 import sanitize from "sanitize-html";
@@ -95,7 +95,9 @@ function handleRouteToNotification(notification: Notification) {
             <VEntityField>
               <template #description>
                 <span class="truncate text-xs tabular-nums text-gray-500">
-                  {{ relativeTimeTo(notification.metadata.creationTimestamp) }}
+                  {{
+                    utils.date.timeAgo(notification.metadata.creationTimestamp)
+                  }}
                 </span>
               </template>
             </VEntityField>

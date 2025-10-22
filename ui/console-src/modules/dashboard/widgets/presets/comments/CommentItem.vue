@@ -1,6 +1,5 @@
 <script setup lang="ts">
 import HasPermission from "@/components/permission/HasPermission.vue";
-import { formatDatetime, relativeTimeTo } from "@/utils/date";
 import CommentDetailModal from "@console/modules/contents/comments/components/CommentDetailModal.vue";
 import OwnerButton from "@console/modules/contents/comments/components/OwnerButton.vue";
 import { useContentProviderExtensionPoint } from "@console/modules/contents/comments/composables/use-content-provider-extension-point";
@@ -14,6 +13,7 @@ import {
   VEntityField,
   VStatusDot,
 } from "@halo-dev/components";
+import { utils } from "@halo-dev/console-shared";
 import { useQueryClient } from "@tanstack/vue-query";
 import { computed, ref } from "vue";
 import { useI18n } from "vue-i18n";
@@ -147,8 +147,8 @@ const { data: contentProvider } = useContentProviderExtensionPoint();
         </template>
       </VEntityField>
       <VEntityField
-        v-tooltip="formatDatetime(creationTime)"
-        :description="relativeTimeTo(creationTime)"
+        v-tooltip="utils.date.format(creationTime)"
+        :description="utils.date.timeAgo(creationTime)"
       />
     </template>
   </VEntity>

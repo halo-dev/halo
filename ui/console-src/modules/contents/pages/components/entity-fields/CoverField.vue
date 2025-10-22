@@ -1,10 +1,10 @@
 <script lang="ts" setup>
-import { generateThumbnailUrl } from "@/utils/thumbnail";
 import {
   GetThumbnailByUriSizeEnum,
   type ListedSinglePage,
 } from "@halo-dev/api-client";
 import { VEntityField } from "@halo-dev/components";
+import { utils } from "@halo-dev/console-shared";
 
 withDefaults(
   defineProps<{
@@ -21,7 +21,7 @@ withDefaults(
         <img
           class="h-full w-full object-cover"
           :src="
-            generateThumbnailUrl(
+            utils.attachment.getThumbnailUrl(
               singlePage.page.spec.cover,
               GetThumbnailByUriSizeEnum.S
             )

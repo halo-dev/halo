@@ -1,7 +1,6 @@
 <script setup lang="ts">
 import { rbacAnnotations } from "@/constants/annotations";
 import { useUserStore } from "@/stores/user";
-import { formatDatetime } from "@/utils/date";
 import { usePermission } from "@/utils/permission";
 import { coreApiClient, type ListedUser } from "@halo-dev/api-client";
 import {
@@ -16,6 +15,7 @@ import {
   VStatusDot,
   VTag,
 } from "@halo-dev/components";
+import { utils } from "@halo-dev/console-shared";
 import { useQueryClient } from "@tanstack/vue-query";
 import { storeToRefs } from "pinia";
 import { ref } from "vue";
@@ -166,7 +166,7 @@ const { handleEnableOrDisableUser } = useUserEnableDisable();
       <VEntityField>
         <template #description>
           <span class="truncate text-xs tabular-nums text-gray-500">
-            {{ formatDatetime(user.user.metadata.creationTimestamp) }}
+            {{ utils.date.format(user.user.metadata.creationTimestamp) }}
           </span>
         </template>
       </VEntityField>

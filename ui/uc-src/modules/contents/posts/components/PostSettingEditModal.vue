@@ -1,7 +1,7 @@
 <script lang="ts" setup>
-import { toDatetimeLocal } from "@/utils/date";
 import type { Post } from "@halo-dev/api-client";
 import { Toast, VButton, VModal, VSpace } from "@halo-dev/components";
+import { utils } from "@halo-dev/console-shared";
 import { usePostUpdateMutate } from "@uc/modules/contents/posts/composables/use-post-update-mutate";
 import { ref } from "vue";
 import { useI18n } from "vue-i18n";
@@ -74,7 +74,7 @@ async function onSubmit(data: PostFormState) {
         visible: post.spec.visible,
         pinned: post.spec.pinned,
         publishTime: post.spec.publishTime
-          ? toDatetimeLocal(post.spec.publishTime)
+          ? utils.date.toDatetimeLocal(post.spec.publishTime)
           : undefined,
         excerptAutoGenerate: post.spec.excerpt.autoGenerate,
         excerptRaw: post.spec.excerpt.raw,

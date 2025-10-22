@@ -1,7 +1,6 @@
 <script lang="ts" setup>
 import H2WarningAlert from "@/components/alerts/H2WarningAlert.vue";
 import type { Info, Startup } from "@/types";
-import { formatDatetime } from "@/utils/date";
 import { usePermission } from "@/utils/permission";
 import { useGlobalInfoFetch } from "@console/composables/use-global-info";
 import { useThemeStore } from "@console/stores/theme";
@@ -19,6 +18,7 @@ import {
   VPageHeader,
   VTag,
 } from "@halo-dev/components";
+import { utils } from "@halo-dev/console-shared";
 import { useQuery } from "@tanstack/vue-query";
 import { useClipboard } from "@vueuse/core";
 import axios from "axios";
@@ -91,7 +91,7 @@ const handleCopy = () => {
     },
     {
       label: t("core.overview.fields.start_time"),
-      value: formatDatetime(startup.value?.timeline.startTime) || "",
+      value: utils.date.format(startup.value?.timeline.startTime) || "",
     },
     {
       label: t("core.overview.fields.version"),
@@ -99,7 +99,7 @@ const handleCopy = () => {
     },
     {
       label: t("core.overview.fields.build_time"),
-      value: formatDatetime(info.value?.build?.time) || "",
+      value: utils.date.format(info.value?.build?.time) || "",
     },
     {
       label: "Git Commit",
@@ -177,7 +177,7 @@ const handleDownloadLogfile = () => {
       const downloadElement = document.createElement("a");
       const href = window.URL.createObjectURL(blob);
       downloadElement.href = href;
-      downloadElement.download = `halo-log-${formatDatetime(new Date())}.log`;
+      downloadElement.download = `halo-log-${utils.date.format(new Date())}.log`;
       document.body.appendChild(downloadElement);
       downloadElement.click();
       document.body.removeChild(downloadElement);
@@ -225,7 +225,7 @@ const handleDownloadLogfile = () => {
             <VDescriptionItem
               v-if="startup?.timeline.startTime"
               :label="$t('core.overview.fields.start_time')"
-              :content="formatDatetime(startup?.timeline.startTime)"
+              :content="utils.date.format(startup?.timeline.startTime)"
             />
             <VDescriptionItem
               v-if="themeStore.activatedTheme"
@@ -304,7 +304,7 @@ const handleDownloadLogfile = () => {
             <VDescriptionItem
               v-if="info.build"
               :label="$t('core.overview.fields.build_time')"
-              :content="formatDatetime(info.build.time)"
+              :content="utils.date.format(info.build.time)"
             />
             <VDescriptionItem v-if="info.git" label="Git Commit">
               <a
