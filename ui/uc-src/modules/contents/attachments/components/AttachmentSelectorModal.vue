@@ -1,8 +1,18 @@
 <script lang="ts" setup>
 import { usePluginModuleStore } from "@/stores/plugin";
 import { VButton, VModal, VSpace, VTabbar } from "@halo-dev/components";
-import type { AttachmentLike, AttachmentSelectProvider } from "@halo-dev/console-shared";
-import { computed, markRaw, onMounted, ref, shallowRef, useTemplateRef } from "vue";
+import type {
+  AttachmentLike,
+  AttachmentSelectProvider,
+} from "@halo-dev/console-shared";
+import {
+  computed,
+  markRaw,
+  onMounted,
+  ref,
+  shallowRef,
+  useTemplateRef,
+} from "vue";
 import { useI18n } from "vue-i18n";
 import CoreSelectorProvider from "./selector-providers/CoreSelectorProvider.vue";
 
@@ -43,14 +53,18 @@ const { pluginModules } = usePluginModuleStore();
 onMounted(async () => {
   for (const pluginModule of pluginModules) {
     try {
-      const callbackFunction = pluginModule?.extensionPoints?.["attachment:selector:create"];
+      const callbackFunction =
+        pluginModule?.extensionPoints?.["attachment:selector:create"];
 
       if (typeof callbackFunction !== "function") {
         continue;
       }
 
       const providers = await callbackFunction();
-      attachmentSelectProviders.value = [...attachmentSelectProviders.value, ...providers].flat();
+      attachmentSelectProviders.value = [
+        ...attachmentSelectProviders.value,
+        ...providers,
+      ].flat();
     } catch (error) {
       console.error(`Error processing plugin module:`, pluginModule, error);
     }
@@ -60,7 +74,9 @@ onMounted(async () => {
 const activeId = ref(attachmentSelectProviders.value[0].id);
 
 const onChangeProvider = (providerId: string) => {
-  const provider = attachmentSelectProviders.value.find((provider) => provider.id === providerId);
+  const provider = attachmentSelectProviders.value.find(
+    (provider) => provider.id === providerId
+  );
 
   if (!provider) {
     return;
@@ -111,7 +127,10 @@ const confirmCountMessage = computed(() => {
     ></VTabbar>
 
     <div class="mt-2">
-      <template v-for="provider in attachmentSelectProviders" :key="provider.id">
+      <template
+        v-for="provider in attachmentSelectProviders"
+        :key="provider.id"
+      >
         <Suspense>
           <component
             :is="provider.component"
@@ -130,7 +149,11 @@ const confirmCountMessage = computed(() => {
     </div>
     <template #footer>
       <VSpace>
-        <VButton type="secondary" :disabled="confirmDisabled" @click="handleConfirm">
+        <VButton
+          type="secondary"
+          :disabled="confirmDisabled"
+          @click="handleConfirm"
+        >
           {{ $t("core.common.buttons.confirm") }}
           <span v-if="selected.length || props.min || props.max">
             {{

@@ -1,4 +1,12 @@
-import { Extension, PluginKey, posToDOMRect, VueRenderer, type AnyExtension, type Editor, type Range } from "@/tiptap";
+import {
+  Extension,
+  PluginKey,
+  posToDOMRect,
+  VueRenderer,
+  type AnyExtension,
+  type Editor,
+  type Range,
+} from "@/tiptap";
 import type { CommandMenuItemType } from "@/types";
 import { computePosition, flip, shift } from "@floating-ui/dom";
 import Suggestion, { type SuggestionOptions } from "@tiptap/suggestion";
@@ -12,12 +20,22 @@ export default Extension.create({
 
     const suggestionPlugin: SuggestionOptions = {
       editor: this.editor,
-      command: ({ editor, range, props }: { editor: Editor; range: Range; props: CommandMenuItemType }) => {
+      command: ({
+        editor,
+        range,
+        props,
+      }: {
+        editor: Editor;
+        range: Range;
+        props: CommandMenuItemType;
+      }) => {
         props.command({ editor, range });
       },
       items: ({ query }: { query: string }) => {
         return commandMenuItems.filter((item) =>
-          [...item.keywords, item.title].some((keyword) => keyword.includes(query))
+          [...item.keywords, item.title].some((keyword) =>
+            keyword.includes(query)
+          )
         );
       },
       render: () => {
@@ -110,7 +128,12 @@ export default Extension.create({
 
 const updatePosition = (editor: Editor, element: HTMLElement) => {
   const virtualElement = {
-    getBoundingClientRect: () => posToDOMRect(editor.view, editor.state.selection.from, editor.state.selection.to),
+    getBoundingClientRect: () =>
+      posToDOMRect(
+        editor.view,
+        editor.state.selection.from,
+        editor.state.selection.to
+      ),
   };
 
   computePosition(virtualElement, element, {

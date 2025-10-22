@@ -13,7 +13,8 @@ export function useDashboardExtensionPoint() {
     const finalDefinitions: DashboardWidgetDefinition[] = [];
     for (const [name, module] of Object.entries(pluginModuleMap)) {
       try {
-        const callbackFunction = module?.extensionPoints?.[EXTENSION_POINT_NAME];
+        const callbackFunction =
+          module?.extensionPoints?.[EXTENSION_POINT_NAME];
 
         if (typeof callbackFunction !== "function") {
           continue;

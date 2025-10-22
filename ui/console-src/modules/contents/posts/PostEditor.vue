@@ -13,7 +13,11 @@ import { useContentSnapshot } from "@console/composables/use-content-snapshot";
 import { useSaveKeybinding } from "@console/composables/use-save-keybinding";
 import useSlugify from "@console/composables/use-slugify";
 import type { Post, PostRequest } from "@halo-dev/api-client";
-import { consoleApiClient, coreApiClient, ucApiClient } from "@halo-dev/api-client";
+import {
+  consoleApiClient,
+  coreApiClient,
+  ucApiClient,
+} from "@halo-dev/api-client";
 import {
   Dialog,
   IconBookRead,
@@ -32,7 +36,17 @@ import { useRouteQuery } from "@vueuse/router";
 import type { AxiosRequestConfig } from "axios";
 import { isEqual } from "lodash-es";
 import ShortUniqueId from "short-unique-id";
-import { computed, nextTick, onMounted, provide, ref, shallowRef, toRef, watch, type ComputedRef } from "vue";
+import {
+  computed,
+  nextTick,
+  onMounted,
+  provide,
+  ref,
+  shallowRef,
+  toRef,
+  watch,
+  type ComputedRef,
+} from "vue";
 import { useI18n } from "vue-i18n";
 import { useRouter } from "vue-router";
 import PostSettingModal from "./components/PostSettingModal.vue";
@@ -117,9 +131,15 @@ const saving = ref(false);
 const publishing = ref(false);
 
 const needsUpdatePost = ref(false);
-watch([() => formState.value.post.spec.title, () => formState.value.post.spec.cover], (value, oldValue) => {
-  needsUpdatePost.value = !isEqual(value, oldValue);
-});
+watch(
+  [
+    () => formState.value.post.spec.title,
+    () => formState.value.post.spec.cover,
+  ],
+  (value, oldValue) => {
+    needsUpdatePost.value = !isEqual(value, oldValue);
+  }
+);
 
 const isUpdateMode = computed(() => {
   return !!formState.value.post.metadata.creationTimestamp;
@@ -167,7 +187,9 @@ const handleSave = async (options?: { mute?: boolean }) => {
 
     if (isUpdateMode.value) {
       if (needsUpdatePost.value) {
-        formState.value.post = (await postUpdateMutate(formState.value.post)).data;
+        formState.value.post = (
+          await postUpdateMutate(formState.value.post)
+        ).data;
       }
 
       const { data } = await consoleApiClient.content.post.updatePostContent({
@@ -188,9 +210,10 @@ const handleSave = async (options?: { mute?: boolean }) => {
 
       // fixme: check if slug is unique
       // Finally, we need to check if the slug is unique in the database
-      const { data: postsWithSameSlug } = await coreApiClient.content.post.listPost({
-        fieldSelector: [`spec.slug=${formState.value.post.spec.slug}`],
-      });
+      const { data: postsWithSameSlug } =
+        await coreApiClient.content.post.listPost({
+          fieldSelector: [`spec.slug=${formState.value.post.spec.slug}`],
+        });
 
       if (postsWithSameSlug.total) {
         formState.value.post.spec.slug = `${formState.value.post.spec.slug}-${uid.randomUUID(8)}`;
@@ -228,7 +251,9 @@ const handlePublish = async () => {
       const { permalink } = formState.value.post.status || {};
 
       if (needsUpdatePost.value) {
-        formState.value.post = (await postUpdateMutate(formState.value.post)).data;
+        formState.value.post = (
+          await postUpdateMutate(formState.value.post)
+        ).data;
       }
 
       await consoleApiClient.content.post.updatePostContent({
@@ -301,12 +326,19 @@ const handleFetchContent = async () => {
   // get editor provider
   if (!currentEditorProvider.value) {
     const preferredEditor = editorProviders.value.find(
-      (provider) => provider.name === formState.value.post.metadata.annotations?.[contentAnnotations.PREFERRED_EDITOR]
+      (provider) =>
+        provider.name ===
+        formState.value.post.metadata.annotations?.[
+          contentAnnotations.PREFERRED_EDITOR
+        ]
     );
 
     const provider =
       preferredEditor ||
-      editorProviders.value.find((provider) => provider.rawType.toLowerCase() === data.rawType?.toLowerCase());
+      editorProviders.value.find(
+        (provider) =>
+          provider.rawType.toLowerCase() === data.rawType?.toLowerCase()
+      );
 
     if (provider) {
       currentEditorProvider.value = provider;
@@ -378,8 +410,9 @@ onMounted(async () => {
   } else {
     // Set default editor
     const provider =
-      editorProviders.value.find((provider) => provider.name === storedEditorProviderName.value) ||
-      editorProviders.value[0];
+      editorProviders.value.find(
+        (provider) => provider.name === storedEditorProviderName.value
+      ) || editorProviders.value[0];
 
     if (provider) {
       currentEditorProvider.value = provider;
@@ -400,7 +433,12 @@ const headSnapshot = computed(() => {
 const { version, handleFetchSnapshot } = useContentSnapshot(headSnapshot);
 
 // Post content cache
-const { currentCache, handleSetContentCache, handleResetCache, handleClearCache } = useContentCache(
+const {
+  currentCache,
+  handleSetContentCache,
+  handleResetCache,
+  handleClearCache,
+} = useContentCache(
   "post-content-cache",
   name,
   toRef(formState.value.content, "raw"),
@@ -489,7 +527,12 @@ async function handleUploadImage(file: File, options?: AxiosRequestConfig) {
         </template>
         {{ $t("core.post_editor.actions.snapshots") }}
       </VButton>
-      <VButton size="sm" type="default" :loading="previewPending" @click="handlePreview">
+      <VButton
+        size="sm"
+        type="default"
+        :loading="previewPending"
+        @click="handlePreview"
+      >
         <template #icon>
           <IconEye />
         </template>
@@ -501,13 +544,22 @@ async function handleUploadImage(file: File, options?: AxiosRequestConfig) {
         </template>
         {{ $t("core.common.buttons.save") }}
       </VButton>
-      <VButton v-if="isUpdateMode" size="sm" type="default" @click="handleOpenSettingModal">
+      <VButton
+        v-if="isUpdateMode"
+        size="sm"
+        type="default"
+        @click="handleOpenSettingModal"
+      >
         <template #icon>
           <IconSettings />
         </template>
         {{ $t("core.common.buttons.setting") }}
       </VButton>
-      <VButton type="secondary" :loading="publishing" @click="handlePublishClick">
+      <VButton
+        type="secondary"
+        :loading="publishing"
+        @click="handlePublishClick"
+      >
         <template #icon>
           <IconSendPlaneFill />
         </template>

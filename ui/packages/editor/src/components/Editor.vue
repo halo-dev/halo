@@ -42,9 +42,16 @@ watch(
           <slot name="content" />
         </div>
 
-        <editor-content :editor="editor" :style="contentStyles" class="editor-content markdown-body relative" />
+        <editor-content
+          :editor="editor"
+          :style="contentStyles"
+          class="editor-content markdown-body relative"
+        />
       </div>
-      <div v-if="$slots.extra" class="hidden h-full w-72 flex-none flex-shrink-0 sm:!block">
+      <div
+        v-if="$slots.extra"
+        class="hidden h-full w-72 flex-none flex-shrink-0 sm:!block"
+      >
         <slot name="extra"></slot>
       </div>
     </div>

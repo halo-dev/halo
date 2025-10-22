@@ -28,7 +28,8 @@ export function useEditorExtensionPoints(): useEditorExtensionPointsReturn {
   async function fetchEditorProviders() {
     for (const pluginModule of pluginModules) {
       try {
-        const callbackFunction = pluginModule?.extensionPoints?.["editor:create"];
+        const callbackFunction =
+          pluginModule?.extensionPoints?.["editor:create"];
 
         if (typeof callbackFunction !== "function") {
           continue;

@@ -58,7 +58,9 @@ function getToolboxItemsFromExtensions() {
 }
 </script>
 <template>
-  <div class="editor-header space-x-1 overflow-auto border-b bg-white px-1 py-1 text-center shadow-sm">
+  <div
+    class="editor-header space-x-1 overflow-auto border-b bg-white px-1 py-1 text-center shadow-sm"
+  >
     <div class="inline-flex h-full items-center">
       <VDropdown :triggers="['click']" :popper-triggers="['click']">
         <template #default="{ shown }">
@@ -85,10 +87,23 @@ function getToolboxItemsFromExtensions() {
         </template>
       </VDropdown>
       <div class="!mx-1 h-5 w-[1px] bg-gray-100"></div>
-      <div v-for="(item, index) in getToolbarItemsFromExtensions()" :key="index">
-        <component :is="item.component" v-if="!item.children?.length" v-bind="item.props" tabindex="-1" />
+      <div
+        v-for="(item, index) in getToolbarItemsFromExtensions()"
+        :key="index"
+      >
+        <component
+          :is="item.component"
+          v-if="!item.children?.length"
+          v-bind="item.props"
+          tabindex="-1"
+        />
         <template v-else>
-          <VDropdown class="inline-flex" tabindex="-1" :triggers="['click']" :popper-triggers="['click']">
+          <VDropdown
+            class="inline-flex"
+            tabindex="-1"
+            :triggers="['click']"
+            :popper-triggers="['click']"
+          >
             <template #default="{ shown }">
               <component
                 :is="item.component"

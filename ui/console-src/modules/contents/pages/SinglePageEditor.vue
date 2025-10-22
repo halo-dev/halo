@@ -11,7 +11,11 @@ import { usePermission } from "@/utils/permission";
 import { useContentSnapshot } from "@console/composables/use-content-snapshot";
 import { useSaveKeybinding } from "@console/composables/use-save-keybinding";
 import type { SinglePage, SinglePageRequest } from "@halo-dev/api-client";
-import { consoleApiClient, coreApiClient, ucApiClient } from "@halo-dev/api-client";
+import {
+  consoleApiClient,
+  coreApiClient,
+  ucApiClient,
+} from "@halo-dev/api-client";
 import {
   Dialog,
   IconEye,
@@ -29,7 +33,17 @@ import { useLocalStorage } from "@vueuse/core";
 import { useRouteQuery } from "@vueuse/router";
 import type { AxiosRequestConfig } from "axios";
 import { isEqual } from "lodash-es";
-import { computed, nextTick, onMounted, provide, ref, shallowRef, toRef, watch, type ComputedRef } from "vue";
+import {
+  computed,
+  nextTick,
+  onMounted,
+  provide,
+  ref,
+  shallowRef,
+  toRef,
+  watch,
+  type ComputedRef,
+} from "vue";
 import { useI18n } from "vue-i18n";
 import { useRouter } from "vue-router";
 import SinglePageSettingModal from "./components/SinglePageSettingModal.vue";
@@ -99,9 +113,15 @@ const publishing = ref(false);
 const settingModal = ref(false);
 
 const needsUpdatePage = ref(false);
-watch([() => formState.value.page.spec.title, () => formState.value.page.spec.cover], (value, oldValue) => {
-  needsUpdatePage.value = !isEqual(value, oldValue);
-});
+watch(
+  [
+    () => formState.value.page.spec.title,
+    () => formState.value.page.spec.cover,
+  ],
+  (value, oldValue) => {
+    needsUpdatePage.value = !isEqual(value, oldValue);
+  }
+);
 
 const isUpdateMode = computed(() => {
   return !!formState.value.page.metadata.creationTimestamp;
@@ -140,13 +160,16 @@ const handleSave = async (options?: { mute?: boolean }) => {
 
     if (isUpdateMode.value) {
       if (needsUpdatePage.value) {
-        formState.value.page = (await singlePageUpdateMutate(formState.value.page)).data;
+        formState.value.page = (
+          await singlePageUpdateMutate(formState.value.page)
+        ).data;
       }
 
-      const { data } = await consoleApiClient.content.singlePage.updateSinglePageContent({
-        name: formState.value.page.metadata.name,
-        content: formState.value.content,
-      });
+      const { data } =
+        await consoleApiClient.content.singlePage.updateSinglePageContent({
+          name: formState.value.page.metadata.name,
+          content: formState.value.content,
+        });
 
       formState.value.page = data;
       needsUpdatePage.value = false;
@@ -154,9 +177,10 @@ const handleSave = async (options?: { mute?: boolean }) => {
       // Clear new page content cache
       handleClearCache();
 
-      const { data } = await consoleApiClient.content.singlePage.draftSinglePage({
-        singlePageRequest: formState.value,
-      });
+      const { data } =
+        await consoleApiClient.content.singlePage.draftSinglePage({
+          singlePageRequest: formState.value,
+        });
       formState.value.page = data;
       routeQueryName.value = data.metadata.name;
     }
@@ -187,7 +211,9 @@ const handlePublish = async () => {
       const { permalink } = formState.value.page.status || {};
 
       if (needsUpdatePage.value) {
-        formState.value.page = (await singlePageUpdateMutate(formState.value.page)).data;
+        formState.value.page = (
+          await singlePageUpdateMutate(formState.value.page)
+        ).data;
       }
 
       await consoleApiClient.content.singlePage.updateSinglePageContent({
@@ -245,20 +271,28 @@ const handleFetchContent = async () => {
   if (!formState.value.page.spec.headSnapshot) {
     return;
   }
-  const { data } = await consoleApiClient.content.singlePage.fetchSinglePageHeadContent({
-    name: formState.value.page.metadata.name,
-  });
+  const { data } =
+    await consoleApiClient.content.singlePage.fetchSinglePageHeadContent({
+      name: formState.value.page.metadata.name,
+    });
 
   formState.value.content = Object.assign(formState.value.content, data);
 
   // get editor provider
   if (!currentEditorProvider.value) {
     const preferredEditor = editorProviders.value.find(
-      (provider) => provider.name === formState.value.page.metadata.annotations?.[contentAnnotations.PREFERRED_EDITOR]
+      (provider) =>
+        provider.name ===
+        formState.value.page.metadata.annotations?.[
+          contentAnnotations.PREFERRED_EDITOR
+        ]
     );
     const provider =
       preferredEditor ||
-      editorProviders.value.find((provider) => provider.rawType.toLowerCase() === data.rawType?.toLowerCase());
+      editorProviders.value.find(
+        (provider) =>
+          provider.rawType.toLowerCase() === data.rawType?.toLowerCase()
+      );
     if (provider) {
       currentEditorProvider.value = provider;
       formState.value.page.metadata.annotations = {
@@ -314,9 +348,10 @@ onMounted(async () => {
   await fetchEditorProviders();
 
   if (routeQueryName.value) {
-    const { data: singlePage } = await coreApiClient.content.singlePage.getSinglePage({
-      name: routeQueryName.value,
-    });
+    const { data: singlePage } =
+      await coreApiClient.content.singlePage.getSinglePage({
+        name: routeQueryName.value,
+      });
     formState.value.page = singlePage;
 
     // fetch single page content
@@ -324,8 +359,9 @@ onMounted(async () => {
   } else {
     // Set default editor
     const provider =
-      editorProviders.value.find((provider) => provider.name === storedEditorProviderName.value) ||
-      editorProviders.value[0];
+      editorProviders.value.find(
+        (provider) => provider.name === storedEditorProviderName.value
+      ) || editorProviders.value[0];
     if (provider) {
       currentEditorProvider.value = provider;
       formState.value.content.rawType = provider.rawType;
@@ -345,7 +381,12 @@ const headSnapshot = computed(() => {
 const { version, handleFetchSnapshot } = useContentSnapshot(headSnapshot);
 
 // SinglePage content cache
-const { currentCache, handleSetContentCache, handleResetCache, handleClearCache } = useContentCache(
+const {
+  currentCache,
+  handleSetContentCache,
+  handleResetCache,
+  handleClearCache,
+} = useContentCache(
   "singlePage-content-cache",
   routeQueryName,
   toRef(formState.value.content, "raw"),
@@ -439,7 +480,12 @@ async function handleUploadImage(file: File, options?: AxiosRequestConfig) {
         </template>
         {{ $t("core.page_editor.actions.snapshots") }}
       </VButton>
-      <VButton size="sm" type="default" :loading="previewPending" @click="handlePreview">
+      <VButton
+        size="sm"
+        type="default"
+        :loading="previewPending"
+        @click="handlePreview"
+      >
         <template #icon>
           <IconEye />
         </template>
@@ -451,13 +497,22 @@ async function handleUploadImage(file: File, options?: AxiosRequestConfig) {
         </template>
         {{ $t("core.common.buttons.save") }}
       </VButton>
-      <VButton v-if="isUpdateMode" size="sm" type="default" @click="handleOpenSettingModal">
+      <VButton
+        v-if="isUpdateMode"
+        size="sm"
+        type="default"
+        @click="handleOpenSettingModal"
+      >
         <template #icon>
           <IconSettings />
         </template>
         {{ $t("core.common.buttons.setting") }}
       </VButton>
-      <VButton type="secondary" :loading="publishing" @click="handlePublishClick">
+      <VButton
+        type="secondary"
+        :loading="publishing"
+        @click="handlePublishClick"
+      >
         <template #icon>
           <IconSendPlaneFill />
         </template>

@@ -1,5 +1,11 @@
 <script lang="ts" setup>
-import { Editor, EditorState, EditorView, PluginKey, VueEditor } from "@/tiptap";
+import {
+  Editor,
+  EditorState,
+  EditorView,
+  PluginKey,
+  VueEditor,
+} from "@/tiptap";
 import type { BubbleItemType, NodeBubbleMenuType } from "@/types";
 import { BubbleMenu } from "@tiptap/vue-3/menus";
 import { type PropType } from "vue";
@@ -14,7 +20,8 @@ const props = defineProps({
 
 const getBubbleMenuFromExtensions = (): NodeBubbleMenuType[] => {
   const extensionManager = props.editor?.extensionManager;
-  const extendsBubbleMap: Map<string | PluginKey, NodeBubbleMenuType[]> = new Map();
+  const extendsBubbleMap: Map<string | PluginKey, NodeBubbleMenuType[]> =
+    new Map();
   const bubbleMenus: NodeBubbleMenuType[] = [];
   for (const extension of extensionManager.extensions) {
     const { getBubbleMenu } = extension.options;
@@ -101,13 +108,16 @@ const mergeBubbleMenu = (
 
   const mergedItems = [...Array.from(keyedItems.values()), ...nonKeyedItems];
 
-  const shouldShowFunctions = [bubbleMenu.shouldShow, ...extendsBubbleMenus.map((menu) => menu.shouldShow)].filter(
-    (fn) => fn !== undefined
-  );
+  const shouldShowFunctions = [
+    bubbleMenu.shouldShow,
+    ...extendsBubbleMenus.map((menu) => menu.shouldShow),
+  ].filter((fn) => fn !== undefined);
 
   const mergedShouldShow =
     shouldShowFunctions.length > 0
-      ? (props: Parameters<NonNullable<NodeBubbleMenuType["shouldShow"]>>[0]) => {
+      ? (
+          props: Parameters<NonNullable<NodeBubbleMenuType["shouldShow"]>>[0]
+        ) => {
           return shouldShowFunctions.every((fn) => (fn ? fn(props) : true));
         }
       : undefined;
@@ -154,11 +164,20 @@ const shouldShow = (
     :update-delay="0"
     :get-referenced-virtual-element="bubbleMenu.getReferencedVirtualElement"
   >
-    <div class="bubble-menu flex items-center space-x-1 rounded-md border bg-white p-1 shadow">
+    <div
+      class="bubble-menu flex items-center space-x-1 rounded-md border bg-white p-1 shadow"
+    >
       <template v-if="bubbleMenu.items">
-        <template v-for="(item, itemIndex) in bubbleMenu.items" :key="itemIndex">
+        <template
+          v-for="(item, itemIndex) in bubbleMenu.items"
+          :key="itemIndex"
+        >
           <template v-if="item.component">
-            <component :is="item.component" v-bind="item.props" :editor="editor" />
+            <component
+              :is="item.component"
+              v-bind="item.props"
+              :editor="editor"
+            />
           </template>
           <bubble-item v-else :editor="editor" v-bind="item.props" />
         </template>

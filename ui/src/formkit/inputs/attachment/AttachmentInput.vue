@@ -19,9 +19,13 @@ const attachmentSelectorModalVisible = ref(false);
 const AttachmentSelectorModal = defineAsyncComponent({
   loader: () => {
     if (currentUserHasPermission(["system:attachments:view"])) {
-      return import("@console/modules/contents/attachments/components/AttachmentSelectorModal.vue");
+      return import(
+        "@console/modules/contents/attachments/components/AttachmentSelectorModal.vue"
+      );
     }
-    return import("@uc/modules/contents/attachments/components/AttachmentSelectorModal.vue");
+    return import(
+      "@uc/modules/contents/attachments/components/AttachmentSelectorModal.vue"
+    );
   },
 });
 
@@ -60,7 +64,9 @@ const onAttachmentSelect = (attachments: AttachmentLike[]) => {
     @input="onInput"
   />
 
-  <HasPermission :permissions="['uc:attachments:manage', 'system:attachments:view']">
+  <HasPermission
+    :permissions="['uc:attachments:manage', 'system:attachments:view']"
+  >
     <div
       class="group flex h-full cursor-pointer items-center border-l px-3 transition-all hover:bg-gray-100"
       @click="attachmentSelectorModalVisible = true"

@@ -6,7 +6,12 @@ import { provide, shallowRef, type Ref } from "vue";
 import { usePermission } from "@/utils/permission";
 import type { Setting, SettingForm } from "@halo-dev/api-client";
 import { coreApiClient } from "@halo-dev/api-client";
-import { IconSettings, VCard, VPageHeader, VTabbar } from "@halo-dev/components";
+import {
+  IconSettings,
+  VCard,
+  VPageHeader,
+  VTabbar,
+} from "@halo-dev/components";
 import { useQuery } from "@tanstack/vue-query";
 import { useRouteQuery } from "@vueuse/router";
 import type { Component, Raw } from "vue";
