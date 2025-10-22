@@ -1,5 +1,4 @@
 <script lang="ts" setup>
-import { formatDatetime, relativeTimeTo } from "@/utils/date";
 import type { UserDevice } from "@halo-dev/api-client";
 import {
   VDropdownDivider,
@@ -9,6 +8,7 @@ import {
   VStatusDot,
   VTag,
 } from "@halo-dev/components";
+import { utils } from "@halo-dev/console-shared";
 import { computed, markRaw, ref, type Component, type Raw } from "vue";
 import RiComputerLine from "~icons/ri/computer-line";
 import RiSmartphoneLine from "~icons/ri/smartphone-line";
@@ -88,12 +88,12 @@ const detailModal = ref(false);
       <VEntityField v-if="device.device.spec.lastAccessedTime">
         <template #description>
           <span
-            v-tooltip="formatDatetime(device.device.spec.lastAccessedTime)"
+            v-tooltip="utils.date.format(device.device.spec.lastAccessedTime)"
             class="truncate text-xs tabular-nums text-gray-500"
           >
             {{
               $t("core.uc_profile.device.list.fields.last_accessed_time", {
-                time: relativeTimeTo(device.device.spec.lastAccessedTime),
+                time: utils.date.timeAgo(device.device.spec.lastAccessedTime),
               })
             }}
           </span>

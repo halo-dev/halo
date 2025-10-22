@@ -1,11 +1,11 @@
 <script lang="ts" setup>
 import LazyImage from "@/components/image/LazyImage.vue";
-import { THUMBNAIL_WIDTH_MAP } from "@/utils/thumbnail";
 import {
   GetThumbnailByUriSizeEnum,
   type Attachment,
 } from "@halo-dev/api-client";
 import { VTabbar } from "@halo-dev/components";
+import { THUMBNAIL_WIDTH_MAP } from "@halo-dev/console-shared";
 import { computed, ref, toRefs } from "vue";
 
 const props = withDefaults(

@@ -1,11 +1,11 @@
 <script lang="ts" setup>
 import HasPermission from "@/components/permission/HasPermission.vue";
 import { FormType } from "@/types/slug";
-import { formatDatetime, toISOString } from "@/utils/date";
 import useSlugify from "@console/composables/use-slugify";
 import type { FormKitNode } from "@formkit/core";
 import { publicApiClient } from "@halo-dev/api-client";
 import { IconRefreshLine } from "@halo-dev/components";
+import { utils } from "@halo-dev/console-shared";
 import { computed, ref } from "vue";
 import { useI18n } from "vue-i18n";
 import type { PostFormState } from "../types";
@@ -48,7 +48,9 @@ const emit = defineEmits<{
 function onSubmit(data: PostFormState) {
   emit("submit", {
     ...data,
-    publishTime: data.publishTime ? toISOString(data.publishTime) : undefined,
+    publishTime: data.publishTime
+      ? utils.date.toISOString(data.publishTime)
+      : undefined,
   });
 }
 
@@ -97,7 +99,7 @@ const isScheduledPublish = computed(() => {
 const publishTimeHelp = computed(() => {
   return isScheduledPublish.value
     ? t("core.post.settings.fields.publish_time.help.schedule_publish", {
-        datetime: formatDatetime(internalFormState.value.publishTime),
+        datetime: utils.date.format(internalFormState.value.publishTime),
       })
     : "";
 });

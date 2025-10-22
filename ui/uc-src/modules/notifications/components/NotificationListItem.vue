@@ -1,9 +1,9 @@
 <script lang="ts" setup>
 import { useUserStore } from "@/stores/user";
-import { relativeTimeTo } from "@/utils/date";
 import type { Notification } from "@halo-dev/api-client";
 import { ucApiClient } from "@halo-dev/api-client";
 import { Dialog, Toast, VStatusDot } from "@halo-dev/components";
+import { utils } from "@halo-dev/console-shared";
 import { useMutation, useQueryClient } from "@tanstack/vue-query";
 import sanitize from "sanitize-html";
 import { computed, ref, watch } from "vue";
@@ -115,7 +115,7 @@ const content = computed(() => {
     </div>
     <div class="flex h-6 items-end justify-between">
       <div class="text-xs text-gray-600">
-        {{ relativeTimeTo(notification.metadata.creationTimestamp) }}
+        {{ utils.date.timeAgo(notification.metadata.creationTimestamp) }}
       </div>
       <div class="hidden space-x-2 group-hover:block">
         <span

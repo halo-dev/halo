@@ -1,8 +1,8 @@
 <script setup lang="ts">
-import { relativeTimeTo } from "@/utils/date";
 import type { ListedSnapshotDto, SinglePage } from "@halo-dev/api-client";
 import { consoleApiClient } from "@halo-dev/api-client";
 import { Dialog, Toast, VButton, VStatusDot, VTag } from "@halo-dev/components";
+import { utils } from "@halo-dev/console-shared";
 import { useQueryClient } from "@tanstack/vue-query";
 import { computed } from "vue";
 import { useI18n } from "vue-i18n";
@@ -102,7 +102,7 @@ const isBase = computed(() => {
           'font-semibold': isSelected,
         }"
       >
-        {{ relativeTimeTo(snapshot.metadata.creationTimestamp) }}
+        {{ utils.date.timeAgo(snapshot.metadata.creationTimestamp) }}
       </div>
       <div class="inline-flex flex-none items-center space-x-3">
         <VTag v-if="isReleased" theme="primary">

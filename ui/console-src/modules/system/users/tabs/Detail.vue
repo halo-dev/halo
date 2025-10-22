@@ -1,6 +1,5 @@
 <script lang="ts" setup>
 import { rbacAnnotations } from "@/constants/annotations";
-import { formatDatetime } from "@/utils/date";
 import type { DetailedUser } from "@halo-dev/api-client";
 import {
   IconInformation,
@@ -9,6 +8,7 @@ import {
   VSpace,
   VTag,
 } from "@halo-dev/components";
+import { utils } from "@halo-dev/console-shared";
 import RiVerifiedBadgeLine from "~icons/ri/verified-badge-line";
 
 withDefaults(defineProps<{ user?: DetailedUser }>(), {
@@ -80,7 +80,7 @@ withDefaults(defineProps<{ user?: DetailedUser }>(), {
       />
       <VDescriptionItem
         :label="$t('core.user.detail.fields.creation_time')"
-        :content="formatDatetime(user?.user.metadata?.creationTimestamp)"
+        :content="utils.date.format(user?.user.metadata?.creationTimestamp)"
         class="!px-2"
       />
     </VDescription>

@@ -1,5 +1,4 @@
 <script lang="ts" setup>
-import { formatDatetime } from "@/utils/date";
 import { usePermission } from "@/utils/permission";
 import type { Attachment } from "@halo-dev/api-client";
 import {
@@ -8,6 +7,7 @@ import {
   VSpace,
   VStatusDot,
 } from "@halo-dev/components";
+import { utils } from "@halo-dev/console-shared";
 import prettyBytes from "pretty-bytes";
 import { computed, toRefs } from "vue";
 import { useFetchAttachmentPolicy } from "../../../composables/use-attachment-policy";
@@ -91,7 +91,7 @@ const policyDisplayName = computed(() => {
       <VEntityField>
         <template #description>
           <span class="truncate text-xs tabular-nums text-gray-500">
-            {{ formatDatetime(attachment.metadata.creationTimestamp) }}
+            {{ utils.date.format(attachment.metadata.creationTimestamp) }}
           </span>
         </template>
       </VEntityField>

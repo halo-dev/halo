@@ -1,5 +1,4 @@
 <script lang="ts" setup>
-import { formatDatetime, relativeTimeTo } from "@/utils/date";
 import type { PersonalAccessToken } from "@halo-dev/api-client";
 import { ucApiClient } from "@halo-dev/api-client";
 import {
@@ -11,6 +10,7 @@ import {
   VEntityField,
   VStatusDot,
 } from "@halo-dev/components";
+import { utils } from "@halo-dev/console-shared";
 import { useQueryClient } from "@tanstack/vue-query";
 import { computed } from "vue";
 import { useI18n } from "vue-i18n";
@@ -108,11 +108,11 @@ const statusTheme = computed(() => {
           <div class="truncate text-xs tabular-nums text-gray-500">
             <span
               v-if="token.spec?.expiresAt"
-              v-tooltip="formatDatetime(token.spec.expiresAt)"
+              v-tooltip="utils.date.format(token.spec.expiresAt)"
             >
               {{
                 $t("core.uc_profile.pat.list.fields.expiresAt.dynamic", {
-                  expiresAt: relativeTimeTo(token.spec?.expiresAt),
+                  expiresAt: utils.date.timeAgo(token.spec?.expiresAt),
                 })
               }}
             </span>
@@ -128,7 +128,7 @@ const statusTheme = computed(() => {
         </template>
       </VEntityField>
       <VEntityField
-        :description="formatDatetime(token.metadata.creationTimestamp)"
+        :description="utils.date.format(token.metadata.creationTimestamp)"
       ></VEntityField>
     </template>
     <template #dropdownItems>

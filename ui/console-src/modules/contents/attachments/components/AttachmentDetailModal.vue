@@ -2,7 +2,6 @@
 import AttachmentPermalinkList from "@/components/attachment/AttachmentPermalinkList.vue";
 import LazyImage from "@/components/image/LazyImage.vue";
 import HasPermission from "@/components/permission/HasPermission.vue";
-import { formatDatetime } from "@/utils/date";
 import { isImage } from "@/utils/image";
 import { coreApiClient } from "@halo-dev/api-client";
 import {
@@ -14,6 +13,7 @@ import {
   VModal,
   VSpace,
 } from "@halo-dev/components";
+import { utils } from "@halo-dev/console-shared";
 import { useQuery } from "@tanstack/vue-query";
 import prettyBytes from "pretty-bytes";
 import { computed, ref, toRefs, useTemplateRef } from "vue";
@@ -214,7 +214,7 @@ const showDisplayNameForm = ref(false);
           />
           <VDescriptionItem
             :label="$t('core.attachment.detail_modal.fields.creation_time')"
-            :content="formatDatetime(attachment?.metadata.creationTimestamp)"
+            :content="utils.date.format(attachment?.metadata.creationTimestamp)"
           />
           <VDescriptionItem
             :label="$t('core.attachment.detail_modal.fields.permalink')"

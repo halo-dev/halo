@@ -1,5 +1,4 @@
 <script lang="ts" setup>
-import { formatDatetime } from "@/utils/date";
 import type { Attachment } from "@halo-dev/api-client";
 import {
   VEntity,
@@ -7,6 +6,7 @@ import {
   VSpace,
   VStatusDot,
 } from "@halo-dev/components";
+import { utils } from "@halo-dev/console-shared";
 import prettyBytes from "pretty-bytes";
 import { toRefs } from "vue";
 
@@ -74,7 +74,7 @@ const emit = defineEmits<{
       <VEntityField>
         <template #description>
           <span class="truncate text-xs tabular-nums text-gray-500">
-            {{ formatDatetime(attachment.metadata.creationTimestamp) }}
+            {{ utils.date.format(attachment.metadata.creationTimestamp) }}
           </span>
         </template>
       </VEntityField>

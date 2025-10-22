@@ -1,5 +1,4 @@
 <script lang="ts" setup>
-import { formatDatetime } from "@/utils/date";
 import type { BackupFile } from "@halo-dev/api-client";
 import { consoleApiClient } from "@halo-dev/api-client";
 import {
@@ -15,6 +14,7 @@ import {
   VTabItem,
   VTabs,
 } from "@halo-dev/components";
+import { utils } from "@halo-dev/console-shared";
 import { useMutation, useQuery } from "@tanstack/vue-query";
 import axios from "axios";
 import prettyBytes from "pretty-bytes";
@@ -203,7 +203,7 @@ useQuery({
                 <VEntityField v-if="backupFile.lastModifiedTime">
                   <template #description>
                     <span class="truncate text-xs tabular-nums text-gray-500">
-                      {{ formatDatetime(backupFile.lastModifiedTime) }}
+                      {{ utils.date.format(backupFile.lastModifiedTime) }}
                     </span>
                   </template>
                 </VEntityField>

@@ -3,8 +3,6 @@ import StatusDotField from "@/components/entity-fields/StatusDotField.vue";
 import HasPermission from "@/components/permission/HasPermission.vue";
 import PostContributorList from "@/components/user/PostContributorList.vue";
 import { postLabels } from "@/constants/labels";
-import { formatDatetime, relativeTimeTo } from "@/utils/date";
-import { generateThumbnailUrl } from "@/utils/thumbnail";
 import PostTag from "@console/modules/contents/posts/tags/components/PostTag.vue";
 import type { ListedPost } from "@halo-dev/api-client";
 import { GetThumbnailByUriSizeEnum, ucApiClient } from "@halo-dev/api-client";
@@ -22,6 +20,7 @@ import {
   VSpace,
   VStatusDot,
 } from "@halo-dev/components";
+import { utils } from "@halo-dev/console-shared";
 import { useQueryClient } from "@tanstack/vue-query";
 import { computed } from "vue";
 import { useI18n } from "vue-i18n";
@@ -128,7 +127,7 @@ function handleDelete() {
             <img
               class="h-full w-full object-cover"
               :src="
-                generateThumbnailUrl(
+                utils.attachment.getThumbnailUrl(
                   post.post.spec.cover,
                   GetThumbnailByUriSizeEnum.S
                 )
@@ -255,10 +254,10 @@ function handleDelete() {
         <template #description>
           <div class="inline-flex items-center space-x-2">
             <span
-              v-tooltip="formatDatetime(post.post.spec.publishTime)"
+              v-tooltip="utils.date.format(post.post.spec.publishTime)"
               class="entity-field-description"
             >
-              {{ relativeTimeTo(post.post.spec.publishTime) }}
+              {{ utils.date.timeAgo(post.post.spec.publishTime) }}
             </span>
             <IconTimerLine
               v-if="
