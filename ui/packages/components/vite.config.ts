@@ -1,8 +1,8 @@
-import { fileURLToPath, URL } from "url";
+import { fileURLToPath, URL } from "node:url";
 
 import Vue from "@vitejs/plugin-vue";
 import VueJsx from "@vitejs/plugin-vue-jsx";
-import path from "path";
+import path from "node:path";
 import Icons from "unplugin-icons/vite";
 import { defineConfig, type Plugin } from "vite";
 import Dts from "vite-plugin-dts";
