@@ -282,15 +282,14 @@ public class ReactiveExtensionClientImpl implements ReactiveExtensionClient {
                 })
             // the method secureStrong() may invoke blocking SecureRandom, so we need to subscribe
             // on boundedElastic thread pool.
-            .subscribeOn(this.scheduler)
-            .flatMap(extStore -> doCreate(extension, extStore.getName(), extStore.getData())
-                .doOnNext(created -> watchers.onAdd(convertToRealExtension(created)))
-            )
+            .flatMap(extStore -> doCreate(extension, extStore.getName(), extStore.getData()))
+            .doOnNext(created -> watchers.onAdd(convertToRealExtension(created)))
             .retryWhen(Retry.backoff(3, Duration.ofMillis(100))
                 // retry when generateName is set
                 .filter(t -> t instanceof DataIntegrityViolationException
                     && hasText(extension.getMetadata().getGenerateName()))
-            );
+            )
+            .subscribeOn(this.scheduler);
     }
 
     @Override
@@ -319,13 +318,14 @@ public class ReactiveExtensionClientImpl implements ReactiveExtensionClient {
                 isOnlyStatusChanged(oldJsonExt.getInternal(), newJsonExt.getInternal());
 
             var store = this.converter.convertTo(newJsonExt);
-            var updated = doUpdate(extension, store.getName(), store.getVersion(), store.getData());
+            var doUpdate =
+                doUpdate(extension, store.getName(), store.getVersion(), store.getData());
             if (!onlyStatusChanged) {
-                updated = updated.doOnNext(ext -> watchers.onUpdate(convertToRealExtension(old),
+                doUpdate = doUpdate.doOnNext(ext -> watchers.onUpdate(convertToRealExtension(old),
                     convertToRealExtension(ext))
                 );
             }
-            return updated;
+            return doUpdate.subscribeOn(this.scheduler);
         });
     }
 
@@ -348,10 +348,10 @@ public class ReactiveExtensionClientImpl implements ReactiveExtensionClient {
         Assert.notNull(extension.getMetadata().getVersion(), "Extension version must not be null");
         // set deletionTimestamp
         extension.getMetadata().setDeletionTimestamp(Instant.now());
-        var extensionStore = converter.convertTo(extension);
-        return doUpdate(extension, extensionStore.getName(),
-            extensionStore.getVersion(), extensionStore.getData()
-        ).doOnNext(updated -> watchers.onDelete(convertToRealExtension(extension)));
+        var es = converter.convertTo(extension);
+        return doUpdate(extension, es.getName(), es.getVersion(), es.getData())
+            .doOnNext(updated -> watchers.onDelete(convertToRealExtension(extension)))
+            .subscribeOn(this.scheduler);
     }
 
     @Override
@@ -376,42 +376,13 @@ public class ReactiveExtensionClientImpl implements ReactiveExtensionClient {
     }
 
     /**
-     * <p>Note of transactional:</p>
-     * <p>doSomething does not have a transaction, but methodOne and methodTwo have their own
-     * transactions.</p>
-     * <p>If methodTwo fails and throws an exception, the transaction in methodTwo will be rolled
-     * back, but the transaction in methodOne will not.</p>
-     * <pre>
-     * public void doSomething() {
-     *     // with manual transaction
-     *     methodOne();
-     *     // with manual transaction
-     *     methodTwo();
-     * }
-     * </pre>
-     * <p>If doSomething is annotated with &#64;Transactional, both methodOne and methodTwo will be
-     * executed within the same transaction context.</p>
-     * <p>If methodTwo fails and throws an exception, the entire transaction will be rolled back,
-     * including any changes made by methodOne.</p>
-     * <p>This ensures that all operations within the doSomething method either succeed or fail
-     * together.</p>
-     * <p>This example advises against adding transaction annotations to the outer method that
-     * invokes {@link #update(Extension)} or {@link #create(Extension)}, as doing so could
-     * undermine the intended transactional integrity of this method.</p>
+     * Create extension in store and update index. Please make sure subscribe on proper scheduler.
      *
-     * <p>Note another point:</p>
-     * After executing the {@code client.create(name, data)} method, an attempt is made to
-     * indexRecord. However, indexRecord might fail due to duplicate keys in the unique index,
-     * causing the index creation to fail. In such cases, the data created by {@code client
-     * .create(name, data)} should be rolled back to maintain consistency between the index and
-     * the data.
-     * <p><b>Until a better solution is found for this consistency problem, do not remove the
-     * manual transaction here.</b></p>
-     * <pre>
-     * client.create(name, data)
-     *  .doOnNext(extension -> indexer.indexRecord(convertToRealExtension(extension)))
-     *  .as(transactionalOperator::transactional);
-     * </pre>
+     * @param oldExtension the extension to create
+     * @param name the name of the extension
+     * @param data the data of the extension
+     * @param <E> the type of the extension
+     * @return the created extension
      */
     @SuppressWarnings("unchecked")
     <E extends Extension> Mono<E> doCreate(E oldExtension, String name, byte[] data) {
@@ -421,7 +392,6 @@ public class ReactiveExtensionClientImpl implements ReactiveExtensionClient {
                 .map(created -> converter.convertFrom(type, created))
                 .flatMap(extension -> Mono.fromRunnable(
                         () -> this.indexEngine.insert(List.of(convertToRealExtension(extension))))
-                    .subscribeOn(this.scheduler)
                     .thenReturn(extension)
                 )
                 .as(transactionalOperator::transactional);
@@ -429,7 +399,14 @@ public class ReactiveExtensionClientImpl implements ReactiveExtensionClient {
     }
 
     /**
-     * see also {@link #doCreate(Extension, String, byte[])}.
+     * Update extension in store and update index. Please make sure subscribe on proper scheduler.
+     *
+     * @param oldExtension the extension to update
+     * @param name the name of the extension
+     * @param version the version of the extension
+     * @param data the data of the extension
+     * @param <E> the type of the extension
+     * @return the updated extension
      */
     @SuppressWarnings("unchecked")
     <E extends Extension> Mono<E> doUpdate(E oldExtension, String name, Long version, byte[] data) {
@@ -439,7 +416,6 @@ public class ReactiveExtensionClientImpl implements ReactiveExtensionClient {
                 .map(updated -> converter.convertFrom(type, updated))
                 .flatMap(extension -> Mono.fromRunnable(
                         () -> this.indexEngine.update(List.of(convertToRealExtension(extension))))
-                    .subscribeOn(this.scheduler)
                     .thenReturn(extension)
                 )
                 .as(transactionalOperator::transactional);
