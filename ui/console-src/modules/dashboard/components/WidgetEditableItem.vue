@@ -1,9 +1,9 @@
 <script setup lang="ts">
-import { usePermission } from "@/utils/permission";
 import { IconCloseCircle, IconSettings } from "@halo-dev/components";
-import type {
-  DashboardWidget,
-  DashboardWidgetDefinition,
+import {
+  utils,
+  type DashboardWidget,
+  type DashboardWidgetDefinition,
 } from "@halo-dev/console-shared";
 import { computed, inject, ref, type ComputedRef } from "vue";
 import ActionButton from "./ActionButton.vue";
@@ -17,8 +17,6 @@ const emit = defineEmits<{
   (e: "remove"): void;
   (e: "update", item: DashboardWidget): void;
 }>();
-
-const { currentUserHasPermission } = usePermission();
 
 const availableWidgetDefinitions = inject<
   ComputedRef<DashboardWidgetDefinition[]>
@@ -42,7 +40,7 @@ function handleSaveConfig(config: Record<string, unknown>) {
 </script>
 <template>
   <grid-item
-    v-if="currentUserHasPermission(item.permissions)"
+    v-if="utils.permission.has(item.permissions || [])"
     :key="item.i"
     class="group/grid-item"
     :h="item.h"

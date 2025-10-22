@@ -1,5 +1,4 @@
 <script lang="ts" setup>
-import { usePermission } from "@/utils/permission";
 import { useThemeStore } from "@console/stores/theme";
 import { consoleApiClient, coreApiClient } from "@halo-dev/api-client";
 import {
@@ -12,6 +11,7 @@ import {
   IconUserSettings,
   VModal,
 } from "@halo-dev/components";
+import { utils } from "@halo-dev/console-shared";
 import { useEventListener } from "@vueuse/core";
 import Fuse from "fuse.js";
 import { storeToRefs } from "pinia";
@@ -23,7 +23,6 @@ const router = useRouter();
 const route = useRoute();
 const { t } = useI18n();
 
-const { currentUserHasPermission } = usePermission();
 const { activatedTheme } = storeToRefs(useThemeStore());
 
 const emit = defineEmits<{
@@ -76,7 +75,7 @@ const handleBuildSearchIndex = () => {
     });
   });
 
-  if (currentUserHasPermission(["system:users:view"])) {
+  if (utils.permission.has(["system:users:view"])) {
     coreApiClient.user
       .listUser({
         labelSelector: ["!halo.run/hidden-user"],
@@ -100,7 +99,7 @@ const handleBuildSearchIndex = () => {
       });
   }
 
-  if (currentUserHasPermission(["system:plugins:view"])) {
+  if (utils.permission.has(["system:plugins:view"])) {
     coreApiClient.plugin.plugin.listPlugin().then((response) => {
       response.data.items.forEach((plugin) => {
         fuse.add({
@@ -120,7 +119,7 @@ const handleBuildSearchIndex = () => {
     });
   }
 
-  if (currentUserHasPermission(["system:posts:view"])) {
+  if (utils.permission.has(["system:posts:view"])) {
     coreApiClient.content.post.listPost().then((response) => {
       response.data.items.forEach((post) => {
         fuse.add({
@@ -184,7 +183,7 @@ const handleBuildSearchIndex = () => {
       });
   }
 
-  if (currentUserHasPermission(["system:singlepages:view"])) {
+  if (utils.permission.has(["system:singlepages:view"])) {
     coreApiClient.content.singlePage.listSinglePage().then((response) => {
       response.data.items.forEach((singlePage) => {
         fuse.add({
@@ -204,7 +203,7 @@ const handleBuildSearchIndex = () => {
     });
   }
 
-  if (currentUserHasPermission(["system:attachments:view"])) {
+  if (utils.permission.has(["system:attachments:view"])) {
     coreApiClient.storage.attachment.listAttachment().then((response) => {
       response.data.items.forEach((attachment) => {
         fuse.add({
@@ -225,8 +224,10 @@ const handleBuildSearchIndex = () => {
   }
 
   if (
-    currentUserHasPermission(["system:settings:view"]) &&
-    currentUserHasPermission(["system:configmaps:view"])
+    utils.permission.has(
+      ["system:settings:view", "system:configmaps:view"],
+      false
+    )
   ) {
     coreApiClient.setting.getSetting({ name: "system" }).then((response) => {
       response.data.spec.forms.forEach((form) => {
@@ -247,7 +248,7 @@ const handleBuildSearchIndex = () => {
     });
   }
 
-  if (currentUserHasPermission(["system:themes:view"])) {
+  if (utils.permission.has(["system:themes:view"])) {
     consoleApiClient.theme.theme
       .fetchThemeSetting({ name: "-" })
       .then(({ data: themeSettings }) => {

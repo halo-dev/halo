@@ -2,7 +2,6 @@
 import EntityFieldItems from "@/components/entity-fields/EntityFieldItems.vue";
 import StatusDotField from "@/components/entity-fields/StatusDotField.vue";
 import EntityDropdownItems from "@/components/entity/EntityDropdownItems.vue";
-import { usePermission } from "@/utils/permission";
 import { useEntityFieldItemExtensionPoint } from "@console/composables/use-entity-extension-points";
 import { useOperationItemExtensionPoint } from "@console/composables/use-operation-extension-points";
 import type { ListedSinglePage, SinglePage } from "@halo-dev/api-client";
@@ -14,7 +13,11 @@ import {
   VDropdownItem,
   VEntity,
 } from "@halo-dev/components";
-import type { EntityFieldItem, OperationItem } from "@halo-dev/console-shared";
+import {
+  utils,
+  type EntityFieldItem,
+  type OperationItem,
+} from "@halo-dev/console-shared";
 import { useQueryClient } from "@tanstack/vue-query";
 import type { Ref } from "vue";
 import { computed, inject, markRaw, ref, toRefs } from "vue";
@@ -27,7 +30,6 @@ import PublishTimeField from "./entity-fields/PublishTimeField.vue";
 import TitleField from "./entity-fields/TitleField.vue";
 import VisibleField from "./entity-fields/VisibleField.vue";
 
-const { currentUserHasPermission } = usePermission();
 const { t } = useI18n();
 const queryClient = useQueryClient();
 const router = useRouter();
@@ -189,7 +191,7 @@ const { operationItems } = useOperationItemExtensionPoint<ListedSinglePage>(
 <template>
   <VEntity :is-selected="isSelected">
     <template
-      v-if="currentUserHasPermission(['system:singlepages:manage'])"
+      v-if="utils.permission.has(['system:singlepages:manage'])"
       #checkbox
     >
       <input
@@ -205,7 +207,7 @@ const { operationItems } = useOperationItemExtensionPoint<ListedSinglePage>(
       <EntityFieldItems :fields="endFields" />
     </template>
     <template
-      v-if="currentUserHasPermission(['system:singlepages:manage'])"
+      v-if="utils.permission.has(['system:singlepages:manage'])"
       #dropdownItems
     >
       <EntityDropdownItems

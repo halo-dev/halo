@@ -1,10 +1,10 @@
 <script setup lang="ts">
-import { usePermission } from "@/utils/permission";
 import { VButton, VModal, VTabbar } from "@halo-dev/components";
-import type { DashboardWidgetDefinition } from "@halo-dev/console-shared";
+import {
+  utils,
+  type DashboardWidgetDefinition,
+} from "@halo-dev/console-shared";
 import { computed, inject, ref, useTemplateRef, type ComputedRef } from "vue";
-
-const { currentUserHasPermission } = usePermission();
 
 const emit = defineEmits<{
   (event: "close"): void;
@@ -96,7 +96,7 @@ const groupWidgetDefinitionsKeys = computed(() => {
           <div
             v-if="
               (activeId === '' || item.group === activeId) &&
-              currentUserHasPermission(item.permissions)
+              utils.permission.has(item.permissions || [])
             "
             :style="{
               width: `${item.defaultSize.w * 100}px`,

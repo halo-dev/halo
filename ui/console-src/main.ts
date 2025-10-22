@@ -15,7 +15,6 @@ import { useGlobalInfoStore } from "@/stores/global-info";
 import { useRoleStore } from "@/stores/role";
 import { useUserStore } from "@/stores/user";
 import { getCookie } from "@/utils/cookie";
-import { hasPermission } from "@/utils/permission";
 import {
   setupCoreModules,
   setupPluginModules,
@@ -42,16 +41,17 @@ async function loadUserPermissions() {
   roleStore.$patch({
     permissions: currentPermissions,
   });
+
+  // Set permissions in shared utils
+  utils.permission.setUserPermissions(currentPermissions.uiPermissions);
+
   app.directive(
     "permission",
     (el: HTMLElement, binding: DirectiveBinding<string[]>) => {
-      const uiPermissions = Array.from<string>(
-        currentPermissions.uiPermissions
-      );
       const { value } = binding;
       const { any, enable } = binding.modifiers;
 
-      if (hasPermission(uiPermissions, value, any ?? false)) {
+      if (utils.permission.has(value, any ?? false)) {
         return;
       }
 

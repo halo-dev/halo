@@ -1,5 +1,4 @@
 <script lang="ts" setup>
-import { usePermission } from "@/utils/permission";
 import type { Attachment } from "@halo-dev/api-client";
 import {
   VEntity,
@@ -11,8 +10,6 @@ import { utils } from "@halo-dev/console-shared";
 import prettyBytes from "pretty-bytes";
 import { computed, toRefs } from "vue";
 import { useFetchAttachmentPolicy } from "../../../composables/use-attachment-policy";
-
-const { currentUserHasPermission } = usePermission();
 
 const props = withDefaults(
   defineProps<{
@@ -42,7 +39,7 @@ const policyDisplayName = computed(() => {
 <template>
   <VEntity :is-selected="isSelected">
     <template
-      v-if="currentUserHasPermission(['system:attachments:manage'])"
+      v-if="utils.permission.has(['system:attachments:manage'])"
       #checkbox
     >
       <slot name="checkbox" />

@@ -1,6 +1,5 @@
 <script lang="ts" setup>
 import PostContributorList from "@/components/user/PostContributorList.vue";
-import { usePermission } from "@/utils/permission";
 import type { ListedPost, Post } from "@halo-dev/api-client";
 import {
   consoleApiClient,
@@ -33,7 +32,6 @@ import { ref, watch } from "vue";
 import { useI18n } from "vue-i18n";
 import PostTag from "./tags/components/PostTag.vue";
 
-const { currentUserHasPermission } = usePermission();
 const { t } = useI18n();
 
 const checkedAll = ref(false);
@@ -310,7 +308,7 @@ watch(
             :is-selected="checkSelection(post.post)"
           >
             <template
-              v-if="currentUserHasPermission(['system:posts:manage'])"
+              v-if="utils.permission.has(['system:posts:manage'])"
               #checkbox
             >
               <input
@@ -417,7 +415,7 @@ watch(
               </VEntityField>
             </template>
             <template
-              v-if="currentUserHasPermission(['system:posts:manage'])"
+              v-if="utils.permission.has(['system:posts:manage'])"
               #dropdownItems
             >
               <VDropdownItem

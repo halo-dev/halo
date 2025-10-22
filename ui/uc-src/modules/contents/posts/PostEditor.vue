@@ -8,7 +8,6 @@ import { useSessionKeepAlive } from "@/composables/use-session-keep-alive";
 import { contentAnnotations } from "@/constants/annotations";
 import { FormType } from "@/types/slug";
 import { randomUUID } from "@/utils/id";
-import { usePermission } from "@/utils/permission";
 import { useSaveKeybinding } from "@console/composables/use-save-keybinding";
 import useSlugify from "@console/composables/use-slugify";
 import type { Content, Post, Snapshot } from "@halo-dev/api-client";
@@ -23,7 +22,7 @@ import {
   VButton,
   VPageHeader,
 } from "@halo-dev/components";
-import type { EditorProvider } from "@halo-dev/console-shared";
+import { utils, type EditorProvider } from "@halo-dev/console-shared";
 import { useMutation } from "@tanstack/vue-query";
 import { usePostUpdateMutate } from "@uc/modules/contents/posts/composables/use-post-update-mutate";
 import { useLocalStorage } from "@vueuse/core";
@@ -51,7 +50,6 @@ const uid = new ShortUniqueId();
 
 const router = useRouter();
 const { t } = useI18n();
-const { currentUserHasPermission } = usePermission();
 
 const formState = ref<Post>({
   apiVersion: "content.halo.run/v1alpha1",
@@ -470,7 +468,7 @@ function onUpdatePostSuccess(data: Post) {
 
 // Upload image
 async function handleUploadImage(file: File, options?: AxiosRequestConfig) {
-  if (!currentUserHasPermission(["uc:attachments:manage"])) {
+  if (!utils.permission.has(["uc:attachments:manage"])) {
     return;
   }
 

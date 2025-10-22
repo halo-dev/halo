@@ -1,6 +1,4 @@
 <script lang="ts" setup>
-import { useRoleStore } from "@/stores/role";
-import { hasPermission } from "@/utils/permission";
 import {
   IconToolsFill,
   VButton,
@@ -11,14 +9,12 @@ import {
   VEntityField,
   VPageHeader,
 } from "@halo-dev/components";
+import { utils } from "@halo-dev/console-shared";
 import { onMounted, ref } from "vue";
 import type { RouteRecordRaw } from "vue-router";
 import { useRouter } from "vue-router";
 
 const router = useRouter();
-const roleStore = useRoleStore();
-
-const { uiPermissions } = roleStore.permissions;
 const routes = ref<RouteRecordRaw[]>([]);
 
 async function isRouteValid(route?: RouteRecordRaw) {
@@ -32,7 +28,9 @@ async function isRouteValid(route?: RouteRecordRaw) {
   // Check if permissions is a function
   if (typeof meta.permissions === "function") {
     try {
-      return await meta.permissions(uiPermissions);
+      return await meta.permissions(
+        utils.permission.getUserPermissions() || []
+      );
     } catch (e) {
       console.error(
         `Error checking permissions for route ${String(route.name)}:`,
@@ -43,7 +41,7 @@ async function isRouteValid(route?: RouteRecordRaw) {
   }
 
   // Default behavior for array of permissions
-  return hasPermission(uiPermissions, meta.permissions as string[], true);
+  return utils.permission.has(meta?.permissions as string[], true);
 }
 
 // Use async function to set routes
