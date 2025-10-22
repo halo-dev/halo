@@ -5,7 +5,7 @@ import {
   BlockActionSeparator,
 } from "@/components";
 import { i18n } from "@/locales";
-import type { Editor } from "@/tiptap/vue-3";
+import type { Editor } from "@/tiptap";
 import { computed, type Component } from "vue";
 import MdiBackupRestore from "~icons/mdi/backup-restore";
 import MdiImageSizeSelectActual from "~icons/mdi/image-size-select-actual";

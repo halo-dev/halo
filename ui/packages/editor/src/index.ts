@@ -17,4 +17,12 @@ export * from "./components";
 export * from "./extensions";
 export * from "./tiptap";
 export * from "./types";
-export * from "./utils";
+export {
+  deleteNode,
+  deleteNodeByPos,
+  generateAnchor,
+  generateAnchorId,
+  isAllowedUri,
+  isEmpty,
+  isListActive,
+} from "./utils";

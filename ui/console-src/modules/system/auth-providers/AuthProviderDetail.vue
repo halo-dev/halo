@@ -13,14 +13,14 @@ import {
   VTabbar,
 } from "@halo-dev/components";
 import { useQuery } from "@tanstack/vue-query";
-import { computed, ref, toRaw } from "vue";
+import { computed, ref, shallowRef, toRaw } from "vue";
 import { useI18n } from "vue-i18n";
 import { useRoute } from "vue-router";
 
 const route = useRoute();
 const { t } = useI18n();
 
-const tabs = ref<{ id: string; label: string }[]>([
+const tabs = shallowRef<{ id: string; label: string }[]>([
   {
     id: "detail",
     label: t("core.identity_authentication.tabs.detail"),
@@ -39,10 +39,13 @@ const { data: authProvider } = useQuery<AuthProvider>({
   },
   onSuccess(data) {
     if (data.spec.settingRef?.name) {
-      tabs.value.push({
-        id: "setting",
-        label: t("core.identity_authentication.tabs.setting"),
-      });
+      tabs.value = [
+        ...tabs.value,
+        {
+          id: "setting",
+          label: t("core.identity_authentication.tabs.setting"),
+        },
+      ];
     }
   },
   enabled: computed(() => !!route.params.name),

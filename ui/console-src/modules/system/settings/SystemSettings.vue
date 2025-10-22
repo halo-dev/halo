@@ -1,6 +1,6 @@
 <script lang="ts" setup>
 // core libs
-import { provide, ref, type Ref } from "vue";
+import { provide, shallowRef, type Ref } from "vue";
 
 // components
 import { usePermission } from "@/utils/permission";
@@ -29,7 +29,7 @@ interface Tab {
   component: Raw<Component>;
 }
 
-const tabs = ref<Tab[]>([
+const tabs = shallowRef<Tab[]>([
   {
     id: "loading",
     label: t("core.common.status.loading"),
@@ -65,11 +65,14 @@ const { data: setting } = useQuery({
 
       // TODO: use integrations center to refactor this
       if (currentUserHasPermission(["system:notifier:configuration"])) {
-        tabs.value.push({
-          id: "notification",
-          label: "通知设置",
-          component: markRaw(NotificationsTab),
-        });
+        tabs.value = [
+          ...tabs.value,
+          {
+            id: "notification",
+            label: "通知设置",
+            component: markRaw(NotificationsTab),
+          },
+        ];
       }
     }
   },

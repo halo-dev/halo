@@ -14,7 +14,7 @@ const props = defineProps({
   },
 });
 
-const attachmentSelectorModal = ref(false);
+const attachmentSelectorModalVisible = ref(false);
 
 const AttachmentSelectorModal = defineAsyncComponent({
   loader: () => {
@@ -69,17 +69,18 @@ const onAttachmentSelect = (attachments: AttachmentLike[]) => {
   >
     <div
       class="group flex h-full cursor-pointer items-center border-l px-3 transition-all hover:bg-gray-100"
-      @click="attachmentSelectorModal = true"
+      @click="attachmentSelectorModalVisible = true"
     >
       <IconFolder class="h-4 w-4 text-gray-500 group-hover:text-gray-700" />
     </div>
   </HasPermission>
 
   <AttachmentSelectorModal
-    v-model:visible="attachmentSelectorModal"
+    v-if="attachmentSelectorModalVisible"
     :accepts="context.accepts as string[]"
     :min="1"
     :max="1"
     @select="onAttachmentSelect"
+    @close="attachmentSelectorModalVisible = false"
   />
 </template>

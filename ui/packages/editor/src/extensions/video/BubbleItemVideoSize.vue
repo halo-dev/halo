@@ -1,7 +1,7 @@
 <script lang="ts" setup>
 import { BlockActionInput } from "@/components";
 import { i18n } from "@/locales";
-import type { Editor } from "@/tiptap/vue-3";
+import type { Editor } from "@/tiptap";
 import { computed, type Component } from "vue";
 import Video from "./index";
 const props = defineProps<{

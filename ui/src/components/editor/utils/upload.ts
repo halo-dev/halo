@@ -1,7 +1,7 @@
 // image drag and paste upload
 import { usePermission } from "@/utils/permission";
 import { ucApiClient, type Attachment } from "@halo-dev/api-client";
-import { CoreEditor, PMNode } from "@halo-dev/richtext-editor";
+import { Editor, PMNode } from "@halo-dev/richtext-editor";
 import type { AxiosRequestConfig } from "axios";
 import { chunk } from "lodash-es";
 import ExtensionAudio from "../extensions/audio";
@@ -10,7 +10,7 @@ import ExtensionVideo from "../extensions/video";
 
 export interface FileProps {
   file: File;
-  editor: CoreEditor;
+  editor: Editor;
 }
 
 /**
@@ -150,7 +150,7 @@ export function containsFileClipboardIdentifier(types: readonly string[]) {
 }
 
 export async function batchUploadExternalLink(
-  editor: CoreEditor,
+  editor: Editor,
   nodes: { node: PMNode; pos: number; index: number; parent: PMNode | null }[]
 ) {
   const chunks = chunk(nodes, 5);
@@ -163,7 +163,7 @@ export async function batchUploadExternalLink(
 }
 
 export async function uploadExternalLink(
-  editor: CoreEditor,
+  editor: Editor,
   nodeWithPos: {
     node: PMNode;
     pos: number;

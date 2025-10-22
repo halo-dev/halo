@@ -2,7 +2,7 @@
 import { ToolbarItem } from "@/components";
 import ColorPickerDropdown from "@/components/common/ColorPickerDropdown.vue";
 import { i18n } from "@/locales";
-import type { Editor } from "@/tiptap/vue-3";
+import type { Editor } from "@/tiptap";
 import type { Component } from "vue";
 import MdiFormatColorMarkerCancel from "~icons/mdi/format-color-marker-cancel";
 

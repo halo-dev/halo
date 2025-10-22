@@ -23,7 +23,7 @@ import {
   type Command,
 } from "@/tiptap/pm";
 import { deleteNodeByPos } from "@/utils";
-import { isEmpty } from "@/utils/isNodeEmpty";
+import { isEmpty } from "@/utils/is-node-empty";
 import GapCursorSelection from "./gap-cursor-selection";
 
 declare module "@tiptap/core" {

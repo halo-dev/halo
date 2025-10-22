@@ -18,7 +18,7 @@ import {
   onMounted,
   provide,
   ref,
-  toRaw,
+  shallowRef,
   type Ref,
 } from "vue";
 import { useI18n } from "vue-i18n";
@@ -49,7 +49,7 @@ const {
 
 provide<Ref<DetailedUser | undefined>>("user", user);
 
-const tabs = ref<UserProfileTab[]>([
+const tabs = shallowRef<UserProfileTab[]>([
   {
     id: "detail",
     label: t("core.uc_profile.tabs.detail"),
@@ -96,7 +96,9 @@ onMounted(async () => {
 
       const providers = await callbackFunction();
 
-      tabs.value.push(...providers);
+      tabs.value = [...tabs.value, ...providers].sort(
+        (a, b) => a.priority - b.priority
+      );
     } catch (error) {
       console.error(`Error processing plugin module:`, pluginModule, error);
     }
@@ -104,12 +106,10 @@ onMounted(async () => {
 });
 
 const tabbarItems = computed(() => {
-  return toRaw(tabs)
-    .value.sort((a, b) => a.priority - b.priority)
-    .map((tab) => ({
-      id: tab.id,
-      label: tab.label,
-    }));
+  return tabs.value.map((tab) => ({
+    id: tab.id,
+    label: tab.label,
+  }));
 });
 
 const activeTab = useRouteQuery<string>("tab", tabs.value[0].id, {

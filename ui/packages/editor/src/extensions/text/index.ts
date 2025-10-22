@@ -3,7 +3,7 @@ import HighlightBubbleItem from "@/extensions/highlight/HighlightBubbleItem.vue"
 import LinkBubbleButton from "@/extensions/link/LinkBubbleButton.vue";
 import { RangeSelection } from "@/extensions/range-selection";
 import { i18n } from "@/locales";
-import type { EditorState } from "@/tiptap/pm";
+import { PluginKey, type EditorState } from "@/tiptap/pm";
 import { isActive, isTextSelection } from "@/tiptap/vue-3";
 import type { ExtensionOptions, NodeBubbleMenuType } from "@/types";
 import { Text as TiptapText } from "@tiptap/extension-text";
@@ -28,13 +28,15 @@ const OTHER_BUBBLE_MENU_TYPES = [
   "codeBlock",
 ];
 
+export const TEXT_BUBBLE_MENU_KEY = new PluginKey("textBubbleMenu");
+
 const Text = TiptapText.extend<ExtensionOptions>({
   addOptions() {
     return {
       ...this.parent?.(),
       getBubbleMenu(): NodeBubbleMenuType {
         return {
-          pluginKey: "textBubbleMenu",
+          pluginKey: TEXT_BUBBLE_MENU_KEY,
           shouldShow: ({ state, from, to }) => {
             const { doc, selection } = state as EditorState;
             const { empty } = selection;
@@ -66,10 +68,6 @@ const Text = TiptapText.extend<ExtensionOptions>({
 
             return true;
           },
-          tippyOptions: {
-            fixed: false,
-          },
-          defaultAnimation: false,
           items: [
             {
               priority: 10,

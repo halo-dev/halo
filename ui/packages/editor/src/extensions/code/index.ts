@@ -1,13 +1,13 @@
 import ToolbarItem from "@/components/toolbar/ToolbarItem.vue";
 import { i18n } from "@/locales";
-import type { Editor } from "@/tiptap/vue-3";
+import type { Editor } from "@/tiptap";
 import type { ExtensionOptions } from "@/types";
 import type { CodeOptions } from "@tiptap/extension-code";
 import TiptapCode from "@tiptap/extension-code";
 import { markRaw } from "vue";
 import MdiCodeTags from "~icons/mdi/code-tags";
 
-const Code = TiptapCode.extend<ExtensionOptions & CodeOptions>({
+const Code = TiptapCode.extend<ExtensionOptions & Partial<CodeOptions>>({
   exitable: true,
   addOptions() {
     return {

@@ -1,7 +1,7 @@
 import { ToolbarItem, ToolbarSubItem } from "@/components";
-import TextStyle from "@/extensions/text-style";
 import { i18n } from "@/locales";
-import { Extension, type Editor } from "@/tiptap/vue-3";
+import { type Editor } from "@/tiptap/vue-3";
+import { FontSize as TiptapFontSize } from "@tiptap/extension-text-style";
 import { markRaw } from "vue";
 import MdiFormatSize from "~icons/mdi/format-size";
 
@@ -9,16 +9,7 @@ export type FontSizeOptions = {
   types: string[];
 };
 
-declare module "@/tiptap" {
-  interface Commands<ReturnType> {
-    fontSize: {
-      setFontSize: (size: number) => ReturnType;
-      unsetFontSize: () => ReturnType;
-    };
-  }
-}
-
-const FontSize = Extension.create<FontSizeOptions>({
+const FontSize = TiptapFontSize.extend<FontSizeOptions>({
   name: "fontSize",
 
   addOptions() {
@@ -53,8 +44,13 @@ const FontSize = Extension.create<FontSizeOptions>({
                     editor,
                     isActive: false,
                     title: `${size} px`,
-                    action: () =>
-                      editor.chain().focus().setFontSize(size).run(),
+                    action: () => {
+                      return editor
+                        .chain()
+                        .focus()
+                        .setFontSize(`${size}px`)
+                        .run();
+                    },
                   },
                 };
               }
@@ -63,54 +59,6 @@ const FontSize = Extension.create<FontSizeOptions>({
         };
       },
     };
-  },
-
-  addGlobalAttributes() {
-    return [
-      {
-        types: this.options.types,
-        attributes: {
-          fontSize: {
-            default: null,
-            parseHTML: (element) => {
-              return element.style.fontSize || "";
-            },
-            renderHTML: (attributes) => {
-              if (!attributes.fontSize) {
-                return attributes;
-              }
-
-              return {
-                style: `font-size: ${attributes.fontSize
-                  .toString()
-                  .replace("px", "")}px`,
-              };
-            },
-          },
-        },
-      },
-    ];
-  },
-
-  addCommands() {
-    return {
-      setFontSize:
-        (size) =>
-        ({ chain }) => {
-          return chain().setMark("textStyle", { fontSize: size }).run();
-        },
-      unsetFontSize:
-        () =>
-        ({ chain }) => {
-          return chain()
-            .setMark("textStyle", { fontSize: null })
-            .removeEmptyTextStyle()
-            .run();
-        },
-    };
-  },
-  addExtensions() {
-    return [TextStyle];
   },
 });
 

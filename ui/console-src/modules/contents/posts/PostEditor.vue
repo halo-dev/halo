@@ -42,6 +42,7 @@ import {
   onMounted,
   provide,
   ref,
+  shallowRef,
   toRef,
   watch,
   type ComputedRef,
@@ -60,7 +61,7 @@ const { currentUserHasPermission } = usePermission();
 
 // Editor providers
 const { editorProviders, fetchEditorProviders } = useEditorExtensionPoints();
-const currentEditorProvider = ref<EditorProvider>();
+const currentEditorProvider = shallowRef<EditorProvider>();
 const storedEditorProviderName = useLocalStorage("editor-provider-name", "");
 
 const handleChangeEditorProvider = async (provider: EditorProvider) => {

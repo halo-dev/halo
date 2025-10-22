@@ -1,14 +1,12 @@
 import ToolbarItem from "@/components/toolbar/ToolbarItem.vue";
 import { i18n } from "@/locales";
-import type { Editor, Range } from "@/tiptap/vue-3";
+import type { Editor, Range } from "@/tiptap";
 import type { ExtensionOptions } from "@/types";
-import ExtensionTaskItem from "@tiptap/extension-task-item";
-import type { TaskListOptions } from "@tiptap/extension-task-list";
-import TiptapTaskList from "@tiptap/extension-task-list";
+import { TaskItem, TaskList as TiptapTaskList } from "@tiptap/extension-list";
 import { markRaw } from "vue";
 import MdiFormatListCheckbox from "~icons/mdi/format-list-checkbox";
 
-const TaskList = TiptapTaskList.extend<ExtensionOptions & TaskListOptions>({
+const TaskList = TiptapTaskList.extend<ExtensionOptions>({
   addOptions() {
     return {
       ...this.parent?.(),
@@ -55,7 +53,7 @@ const TaskList = TiptapTaskList.extend<ExtensionOptions & TaskListOptions>({
     };
   },
   addExtensions() {
-    return [ExtensionTaskItem];
+    return [TaskItem];
   },
 });
 

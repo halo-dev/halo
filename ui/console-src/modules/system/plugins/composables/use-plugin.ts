@@ -12,7 +12,7 @@ import type { PluginTab } from "@halo-dev/console-shared";
 import { useMutation, useQuery } from "@tanstack/vue-query";
 import { useRouteQuery } from "@vueuse/router";
 import type { ComputedRef, Ref } from "vue";
-import { computed, markRaw, ref } from "vue";
+import { computed, markRaw, ref, shallowRef } from "vue";
 import { useI18n } from "vue-i18n";
 import DetailTab from "../components/tabs/Detail.vue";
 import SettingTab from "../components/tabs/Setting.vue";
@@ -292,7 +292,7 @@ export function usePluginDetailTabs(
     },
   ];
 
-  const tabs = ref<PluginTab[]>(initialTabs);
+  const tabs = shallowRef<PluginTab[]>(initialTabs);
   const activeTab = recordsActiveTab
     ? useRouteQuery<string>("tab", tabs.value[0].id)
     : ref(tabs.value[0].id);

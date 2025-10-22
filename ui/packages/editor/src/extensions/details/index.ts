@@ -1,12 +1,24 @@
+import MdiDeleteForeverOutline from "@/components/icon/MdiDeleteForeverOutline.vue";
 import ToolbarItem from "@/components/toolbar/ToolbarItem.vue";
 import { i18n } from "@/locales";
-import type { Editor, Range } from "@/tiptap/vue-3";
+import {
+  EditorState,
+  findParentNode,
+  isActive,
+  PluginKey,
+  posToDOMRect,
+  type Editor,
+  type Range,
+} from "@/tiptap";
 import type { ExtensionOptions } from "@/types";
+import { deleteNode } from "@/utils";
 import TiptapDetails, { type DetailsOptions } from "@tiptap/extension-details";
 import TiptapDetailsContent from "@tiptap/extension-details-content";
 import TiptapDetailsSummary from "@tiptap/extension-details-summary";
 import { markRaw } from "vue";
 import MdiExpandHorizontal from "~icons/mdi/expand-horizontal";
+
+export const DETAILS_BUBBLE_MENU_KEY = new PluginKey("detailsBubbleMenu");
 
 const getRenderContainer = (node: HTMLElement) => {
   let container = node;
@@ -20,7 +32,9 @@ const getRenderContainer = (node: HTMLElement) => {
   return container;
 };
 
-const Details = TiptapDetails.extend<ExtensionOptions & DetailsOptions>({
+const Details = TiptapDetails.extend<
+  ExtensionOptions & Partial<DetailsOptions>
+>({
   addOptions() {
     return {
       ...this.parent?.(),
@@ -66,6 +80,49 @@ const Details = TiptapDetails.extend<ExtensionOptions & DetailsOptions>({
               }
             },
           },
+        };
+      },
+      getBubbleMenu() {
+        return {
+          pluginKey: DETAILS_BUBBLE_MENU_KEY,
+          shouldShow: ({ state }: { state: EditorState }): boolean => {
+            return isActive(state, Details.name);
+          },
+          options: {
+            placement: "top-start",
+          },
+          getReferencedVirtualElement() {
+            const editor = this.editor;
+            if (!editor) {
+              return null;
+            }
+            const parentNode = findParentNode(
+              (node) => node.type.name === Details.name
+            )(editor.state.selection);
+            if (parentNode) {
+              const domRect = posToDOMRect(
+                editor.view,
+                parentNode.pos,
+                parentNode.pos + parentNode.node.nodeSize
+              );
+              return {
+                getBoundingClientRect: () => domRect,
+                getClientRects: () => [domRect],
+              };
+            }
+            return null;
+          },
+          items: [
+            {
+              priority: 10,
+              props: {
+                icon: markRaw(MdiDeleteForeverOutline),
+                title: i18n.global.t("editor.common.button.delete"),
+                action: ({ editor }: { editor: Editor }): boolean =>
+                  deleteNode(Details.name, editor),
+              },
+            },
+          ],
         };
       },
       getDraggable() {
