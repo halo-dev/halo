@@ -1,3 +1,5 @@
+root=true
+
 [*]
 charset = utf-8
 end_of_line = lf
@@ -511,11 +513,3 @@ ij_yaml_keep_line_breaks = true
 
 [*.md]
 indent_size = 2
-
-[*.{js,jsx,mjs,cjs,ts,tsx,mts,cts,vue,css,scss,sass,less,styl}]
-indent_style = space
-indent_size = 2
-end_of_line = lf
-charset = utf-8
-trim_trailing_whitespace = false
-insert_final_newline = true

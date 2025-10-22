@@ -19,7 +19,7 @@
     "test:unit:coverage": "vitest run --coverage",
     "typecheck": "vue-tsc --noEmit -p tsconfig.app.json --composite false && pnpm run typecheck:packages",
     "lint": "eslint . --max-warnings=0 -f html -o build/lint-result/index.html",
-    "prettier": "prettier . --write",
+    "prettier": "prettier . --write --ignore-path ../.gitignore --ignore-path ./.prettierignore",
     "typecheck:packages": "pnpm --parallel -r run typecheck",
     "test:unit:packages": "pnpm --parallel -r run test:unit",
     "publish:packages": "pnpm -r publish --access public --no-git-checks"
