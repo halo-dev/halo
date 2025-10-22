@@ -1,13 +1,13 @@
 <script lang="ts" setup>
 import { i18n } from "@/locales";
-import { Editor, EditorContent } from "@/tiptap/vue-3";
+import { EditorContent, VueEditor } from "@/tiptap";
 import { watch, type CSSProperties, type PropType } from "vue";
 import EditorBubbleMenu from "./EditorBubbleMenu.vue";
 import EditorHeader from "./EditorHeader.vue";
 
 const props = defineProps({
   editor: {
-    type: Object as PropType<Editor>,
+    type: Object as PropType<VueEditor>,
     required: true,
   },
   contentStyles: {

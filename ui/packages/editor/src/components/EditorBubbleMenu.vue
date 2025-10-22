@@ -1,52 +1,147 @@
 <script lang="ts" setup>
-import BubbleItem from "@/components/bubble/BubbleItem.vue";
-import BubbleMenu from "@/components/bubble/BubbleMenu.vue";
-import type { EditorState, EditorView } from "@/tiptap/pm";
-import type { AnyExtension, Editor } from "@/tiptap/vue-3";
-import type { NodeBubbleMenuType } from "@/types";
-import type { PropType } from "vue";
+import {
+  Editor,
+  EditorState,
+  EditorView,
+  PluginKey,
+  VueEditor,
+} from "@/tiptap";
+import type { BubbleItemType, NodeBubbleMenuType } from "@/types";
+import { BubbleMenu } from "@tiptap/vue-3/menus";
+import { type PropType } from "vue";
+import BubbleItem from "./BubbleItem.vue";
 
 const props = defineProps({
   editor: {
-    type: Object as PropType<Editor>,
+    type: Object as PropType<VueEditor>,
     required: true,
   },
 });
 
-const getBubbleMenuFromExtensions = () => {
+const getBubbleMenuFromExtensions = (): NodeBubbleMenuType[] => {
   const extensionManager = props.editor?.extensionManager;
-  return extensionManager.extensions
-    .map((extension: AnyExtension) => {
-      const { getBubbleMenu } = extension.options;
+  const extendsBubbleMap: Map<string | PluginKey, NodeBubbleMenuType[]> =
+    new Map();
+  const bubbleMenus: NodeBubbleMenuType[] = [];
+  for (const extension of extensionManager.extensions) {
+    const { getBubbleMenu } = extension.options;
 
-      if (!getBubbleMenu) {
-        return null;
+    if (!getBubbleMenu) {
+      continue;
+    }
+
+    const nodeBubbleMenu = getBubbleMenu({
+      editor: props.editor,
+    }) as NodeBubbleMenuType;
+
+    if (nodeBubbleMenu.extendsKey) {
+      if (!extendsBubbleMap.has(nodeBubbleMenu.extendsKey)) {
+        extendsBubbleMap.set(nodeBubbleMenu.extendsKey, []);
       }
+      extendsBubbleMap.get(nodeBubbleMenu.extendsKey)?.push(nodeBubbleMenu);
+      continue;
+    }
 
-      const nodeBubbleMenu = getBubbleMenu({
-        editor: props.editor,
-      }) as NodeBubbleMenuType;
+    bubbleMenus.push(nodeBubbleMenu);
+  }
 
-      if (nodeBubbleMenu.items) {
-        nodeBubbleMenu.items = nodeBubbleMenu.items.sort(
-          (a, b) => a.priority - b.priority
-        );
-      }
+  return bubbleMenus.map<NodeBubbleMenuType>((bubbleMenu) => {
+    if (!bubbleMenu.pluginKey) {
+      bubbleMenu.items = sortBubbleMenuItems(bubbleMenu.items);
+      return bubbleMenu;
+    }
 
-      return nodeBubbleMenu;
-    })
-    .filter(Boolean) as NodeBubbleMenuType[];
+    if (!extendsBubbleMap.has(bubbleMenu.pluginKey)) {
+      bubbleMenu.items = sortBubbleMenuItems(bubbleMenu.items);
+      return bubbleMenu;
+    }
+
+    const extendsBubbleMenus = extendsBubbleMap.get(bubbleMenu.pluginKey) ?? [];
+    return mergeBubbleMenu(bubbleMenu, extendsBubbleMenus);
+  });
+};
+
+/**
+ * Merge bubble menu
+ *
+ * If the item has a key, it will be overwritten if it exists in the extendsBubbleMenus.
+ * If the item does not have a key, it will be appended to the end of the items.
+ * If the extendsBubbleMenus has a key, but it is not found in the items, it will be appended to the end of the items.
+ *
+ * For shouldShow: all shouldShow functions from the original and extended bubble menus will be merged.
+ * The merged bubble menu will only be shown if all shouldShow functions return true.
+ * If a shouldShow is not defined, it defaults to true.
+ *
+ * @param bubbleMenu - The bubble menu to merge.
+ * @param extendsBubbleMenus - The extends bubble menus to merge.
+ * @returns The merged bubble menu.
+ */
+const mergeBubbleMenu = (
+  bubbleMenu: NodeBubbleMenuType,
+  extendsBubbleMenus: NodeBubbleMenuType[]
+): NodeBubbleMenuType => {
+  const items = bubbleMenu.items ?? [];
+  const extendsItems =
+    extendsBubbleMenus
+      .map((extendsBubbleMenu) => extendsBubbleMenu.items)
+      .filter((item) => item !== undefined)
+      .flat() ?? [];
+
+  const keyedItems = new Map<string, BubbleItemType>();
+  const nonKeyedItems: BubbleItemType[] = [];
+
+  items.forEach((item) => {
+    if (item.key) {
+      keyedItems.set(item.key, item);
+    } else {
+      nonKeyedItems.push(item);
+    }
+  });
+
+  extendsItems.forEach((item) => {
+    if (item.key) {
+      keyedItems.set(item.key, item);
+    } else {
+      nonKeyedItems.push(item);
+    }
+  });
+
+  const mergedItems = [...Array.from(keyedItems.values()), ...nonKeyedItems];
+
+  const shouldShowFunctions = [
+    bubbleMenu.shouldShow,
+    ...extendsBubbleMenus.map((menu) => menu.shouldShow),
+  ].filter((fn) => fn !== undefined);
+
+  const mergedShouldShow =
+    shouldShowFunctions.length > 0
+      ? (
+          props: Parameters<NonNullable<NodeBubbleMenuType["shouldShow"]>>[0]
+        ) => {
+          return shouldShowFunctions.every((fn) => (fn ? fn(props) : true));
+        }
+      : undefined;
+
+  return {
+    ...bubbleMenu,
+    items: sortBubbleMenuItems(mergedItems),
+    shouldShow: mergedShouldShow,
+  };
+};
+
+const sortBubbleMenuItems = (items: BubbleItemType[] | undefined) => {
+  return items?.sort((a, b) => a.priority - b.priority);
 };
 
 const shouldShow = (
   props: {
     editor: Editor;
+    element: HTMLElement;
+    view: EditorView;
     state: EditorState;
-    node?: HTMLElement;
-    view?: EditorView;
     oldState?: EditorState;
-    from?: number;
-    to?: number;
+    from: number;
+    to: number;
   },
   bubbleMenu: NodeBubbleMenuType
 ) => {
@@ -61,14 +156,13 @@ const shouldShow = (
     v-for="(bubbleMenu, index) in getBubbleMenuFromExtensions()"
     :key="index"
     :plugin-key="bubbleMenu?.pluginKey"
-    :should-show="(prop) => shouldShow(prop, bubbleMenu)"
+    :should-show="(prop) => shouldShow(prop, bubbleMenu) ?? false"
     :editor="editor"
-    :tippy-options="{
-      maxWidth: '100%',
-      ...bubbleMenu.tippyOptions,
+    :options="{
+      ...(bubbleMenu.options as any),
     }"
-    :get-render-container="bubbleMenu.getRenderContainer"
-    :default-animation="bubbleMenu.defaultAnimation"
+    :update-delay="0"
+    :get-referenced-virtual-element="bubbleMenu.getReferencedVirtualElement"
   >
     <div
       class="bubble-menu flex items-center space-x-1 rounded-md border bg-white p-1 shadow"

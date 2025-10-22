@@ -1,16 +1,23 @@
 import { BlockActionSeparator, ToolboxItem } from "@/components";
 import MdiDeleteForeverOutline from "@/components/icon/MdiDeleteForeverOutline.vue";
 import { i18n } from "@/locales";
-import type { NodeType, Schema } from "@/tiptap/pm";
-import { EditorState, Node as PMNode, TextSelection } from "@/tiptap/pm";
 import {
   Editor,
-  Node,
   findParentNode,
   isActive,
   mergeAttributes,
+  Node,
+  posToDOMRect,
   type Range,
-} from "@/tiptap/vue-3";
+} from "@/tiptap";
+import type { NodeType, Schema } from "@/tiptap/pm";
+import {
+  EditorState,
+  PluginKey,
+  Node as PMNode,
+  TextSelection,
+} from "@/tiptap/pm";
+import type { ExtensionOptions } from "@/types";
 import { deleteNode } from "@/utils";
 import { markRaw } from "vue";
 import MdiCollage from "~icons/mdi/collage";
@@ -29,6 +36,8 @@ declare module "@/tiptap" {
     };
   }
 }
+
+export const COLUMNS_BUBBLE_MENU_KEY = new PluginKey("columnsBubbleMenu");
 
 const createColumns = (schema: Schema, colsCount: number) => {
   const types = getColumnsNodeTypes(schema);
@@ -170,7 +179,13 @@ const gotoCol = (state: EditorState, dispatch: any, type: GotoColType) => {
   return false;
 };
 
-const Columns = Node.create({
+export interface ColumnsOptions {
+  HTMLAttributes: {
+    class: string;
+  };
+}
+
+const Columns = Node.create<ExtensionOptions & ColumnsOptions>({
   name: "columns",
   group: "block",
   priority: 10,
@@ -227,24 +242,33 @@ const Columns = Node.create({
       },
       getBubbleMenu() {
         return {
-          pluginKey: "columnsBubbleMenu",
-          shouldShow: ({ state }: { state: EditorState }) => {
+          pluginKey: COLUMNS_BUBBLE_MENU_KEY,
+          shouldShow: ({ state }: { state: EditorState }): boolean => {
             return isActive(state, Columns.name);
           },
-          getRenderContainer: (node: HTMLElement) => {
-            let container = node;
-            // 文本节点
-            if (container.nodeName === "#text") {
-              container = node.parentElement as HTMLElement;
+          options: {
+            placement: "bottom-start",
+          },
+          getReferencedVirtualElement() {
+            const editor = this.editor;
+            if (!editor) {
+              return null;
             }
-            while (
-              container &&
-              container.classList &&
-              !container.classList.contains("column")
-            ) {
-              container = container.parentElement as HTMLElement;
+            const parentNode = findParentNode(
+              (node) => node.type.name === Column.name
+            )(editor.state.selection);
+            if (parentNode) {
+              const domRect = posToDOMRect(
+                editor.view,
+                parentNode.pos,
+                parentNode.pos + parentNode.node.nodeSize
+              );
+              return {
+                getBoundingClientRect: () => domRect,
+                getClientRects: () => [domRect],
+              };
             }
-            return container;
+            return null;
           },
           items: [
             {

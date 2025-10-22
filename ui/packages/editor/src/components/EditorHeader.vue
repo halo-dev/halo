@@ -1,12 +1,12 @@
 <script lang="ts" setup>
-import { Editor, type AnyExtension } from "@/tiptap/vue-3";
+import { type AnyExtension, VueEditor } from "@/tiptap";
 import type { ToolbarItemType, ToolboxItemType } from "@/types";
 import { Dropdown as VDropdown } from "floating-vue";
 import MdiPlusCircle from "~icons/mdi/plus-circle";
 
 const props = defineProps({
   editor: {
-    type: Editor,
+    type: VueEditor,
     required: true,
   },
 });

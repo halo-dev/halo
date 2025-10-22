@@ -1,16 +1,15 @@
 import ToolbarItem from "@/components/toolbar/ToolbarItem.vue";
 import { i18n } from "@/locales";
-import type { Editor, Range } from "@/tiptap/vue-3";
+import type { Editor, Range } from "@/tiptap";
 import type { ExtensionOptions } from "@/types";
-import type { BulletListOptions } from "@tiptap/extension-bullet-list";
-import TiptapBulletList from "@tiptap/extension-bullet-list";
-import ExtensionListItem from "@tiptap/extension-list-item";
+import {
+  ListItem,
+  BulletList as TiptapBulletList,
+} from "@tiptap/extension-list";
 import { markRaw } from "vue";
 import MdiFormatListBulleted from "~icons/mdi/format-list-bulleted";
 
-const BulletList = TiptapBulletList.extend<
-  ExtensionOptions & BulletListOptions
->({
+const BulletList = TiptapBulletList.extend<ExtensionOptions>({
   addOptions() {
     return {
       ...this.parent?.(),
@@ -57,7 +56,7 @@ const BulletList = TiptapBulletList.extend<
     };
   },
   addExtensions() {
-    return [ExtensionListItem];
+    return [ListItem];
   },
 });
 

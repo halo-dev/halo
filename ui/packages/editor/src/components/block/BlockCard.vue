@@ -1,7 +1,7 @@
 <script lang="ts" setup>
 import MdiDeleteForeverOutline from "@/components/icon/MdiDeleteForeverOutline.vue";
 import { i18n } from "@/locales";
-import type { Editor } from "@/tiptap/vue-3";
+import type { Editor } from "@/tiptap";
 import MdiArrowULeftBottom from "~icons/mdi/arrow-u-left-bottom";
 import BlockActionButton from "./BlockActionButton.vue";
 import BlockActionSeparator from "./BlockActionSeparator.vue";

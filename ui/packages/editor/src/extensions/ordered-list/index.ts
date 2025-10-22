@@ -1,16 +1,15 @@
 import ToolbarItem from "@/components/toolbar/ToolbarItem.vue";
 import { i18n } from "@/locales";
-import type { Editor, Range } from "@/tiptap/vue-3";
+import type { Editor, Range } from "@/tiptap";
 import type { ExtensionOptions } from "@/types";
-import ExtensionListItem from "@tiptap/extension-list-item";
-import type { OrderedListOptions } from "@tiptap/extension-ordered-list";
-import TiptapOrderedList from "@tiptap/extension-ordered-list";
+import {
+  ListItem,
+  OrderedList as TiptapOrderedList,
+} from "@tiptap/extension-list";
 import { markRaw } from "vue";
 import MdiFormatListNumbered from "~icons/mdi/format-list-numbered";
 
-const OrderedList = TiptapOrderedList.extend<
-  ExtensionOptions & OrderedListOptions
->({
+const OrderedList = TiptapOrderedList.extend<ExtensionOptions>({
   addOptions() {
     return {
       ...this.parent?.(),
@@ -58,7 +57,7 @@ const OrderedList = TiptapOrderedList.extend<
     };
   },
   addExtensions() {
-    return [ExtensionListItem];
+    return [ListItem];
   },
 });
 

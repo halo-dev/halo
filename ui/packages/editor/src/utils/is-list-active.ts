@@ -1,6 +1,6 @@
 import {
   callOrReturn,
-  CoreEditor,
+  Editor,
   getExtensionField,
   isActive,
   type NodeConfig,
@@ -16,7 +16,7 @@ import {
  * const isActive = isListActive(editor.state);
  * ```
  **/
-export const isListActive = (editor: CoreEditor) => {
+export const isListActive = (editor: Editor) => {
   const extensions = editor.extensionManager.extensions;
   const listExtensions = extensions.filter((extension) => {
     const context = {

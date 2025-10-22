@@ -1,15 +1,12 @@
 import ToolbarItem from "@/components/toolbar/ToolbarItem.vue";
 import { i18n } from "@/locales";
-import type { Editor } from "@/tiptap/vue-3";
+import type { Editor } from "@/tiptap";
 import type { ExtensionOptions } from "@/types";
-import type { SubscriptExtensionOptions } from "@tiptap/extension-subscript";
 import TiptapSubscript from "@tiptap/extension-subscript";
 import { markRaw } from "vue";
 import MdiFormatSubscript from "~icons/mdi/format-subscript";
 
-const Subscript = TiptapSubscript.extend<
-  ExtensionOptions & SubscriptExtensionOptions
->({
+const Subscript = TiptapSubscript.extend<ExtensionOptions>({
   addOptions() {
     return {
       ...this.parent?.(),
