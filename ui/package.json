@@ -41,7 +41,7 @@
     "trailingComma": "es5"
   },
   "resolutions": {
-    "axios": "^1.7.9"
+    "axios": "^1.12.2"
   },
   "dependencies": {
     "@codemirror/commands": "^6.1.2",
@@ -86,7 +86,7 @@
     "@vueuse/integrations": "^12.8.2",
     "@vueuse/router": "^12.8.2",
     "@vueuse/shared": "^12.8.2",
-    "axios": "^1.7.9",
+    "axios": "^1.12.2",
     "codemirror": "^6.0.1",
     "colorjs.io": "^0.4.3",
     "core-js": "^3.43.0",

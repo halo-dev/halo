@@ -51,6 +51,6 @@
     "rimraf": "^5.0.7"
   },
   "peerDependencies": {
-    "axios": "^1.7.x"
+    "axios": "^1.12.*"
   }
 }
