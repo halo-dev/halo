@@ -4,6 +4,8 @@ import {
   defineConfigWithVueTs,
   vueTsConfigs,
 } from "@vue/eslint-config-typescript";
+import { Linter } from "eslint";
+import eslintPluginUnicorn from "eslint-plugin-unicorn";
 import pluginVue from "eslint-plugin-vue";
 
 export default defineConfigWithVueTs(
@@ -23,6 +25,9 @@ export default defineConfigWithVueTs(
   {
     name: "app/base",
     files: ["**/*.{ts,mts,tsx,vue}"],
+    plugins: {
+      unicorn: eslintPluginUnicorn,
+    },
     rules: {
       "vue/multi-word-component-names": 0,
       "@typescript-eslint/ban-ts-comment": 0,
@@ -39,6 +44,7 @@ export default defineConfigWithVueTs(
           ignoreRestSiblings: true,
         },
       ],
+      "unicorn/prefer-node-protocol": "warn",
     },
   },
 
@@ -56,4 +62,4 @@ export default defineConfigWithVueTs(
   },
 
   skipFormatting
-);
+) as Linter.Config;
