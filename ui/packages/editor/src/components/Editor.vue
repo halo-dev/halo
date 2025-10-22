@@ -1,13 +1,13 @@
 <script lang="ts" setup>
 import { i18n } from "@/locales";
-import { Editor, EditorContent } from "@/tiptap/vue-3";
+import { EditorContent, VueEditor } from "@/tiptap";
 import { watch, type CSSProperties, type PropType } from "vue";
 import EditorBubbleMenu from "./EditorBubbleMenu.vue";
 import EditorHeader from "./EditorHeader.vue";
 
 const props = defineProps({
   editor: {
-    type: Object as PropType<Editor>,
+    type: Object as PropType<VueEditor>,
     required: true,
   },
   contentStyles: {
@@ -42,16 +42,9 @@ watch(
           <slot name="content" />
         </div>
 
-        <editor-content
-          :editor="editor"
-          :style="contentStyles"
-          class="editor-content markdown-body relative"
-        />
+        <editor-content :editor="editor" :style="contentStyles" class="editor-content markdown-body relative" />
       </div>
-      <div
-        v-if="$slots.extra"
-        class="hidden h-full w-72 flex-none flex-shrink-0 sm:!block"
-      >
+      <div v-if="$slots.extra" class="hidden h-full w-72 flex-none flex-shrink-0 sm:!block">
         <slot name="extra"></slot>
       </div>
     </div>
