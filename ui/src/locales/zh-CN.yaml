@@ -1451,8 +1451,8 @@ core:
     fields:
       external_url: 外部访问地址
       start_time: 启动时间
-      timezone: 系统时区
-      locale: 系统语言
+      timezone: 操作系统时区
+      locale: 操作系统语言
       version: 版本
       build_time: 构建时间
       database: 数据库

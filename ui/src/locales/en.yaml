@@ -1565,8 +1565,8 @@ core:
     fields:
       external_url: External url
       start_time: Start time
-      timezone: System Timezone
-      locale: System Locale
+      timezone: Operating system Timezone
+      locale: Operating system Locale
       version: Version
       build_time: Build time
       database: Database
