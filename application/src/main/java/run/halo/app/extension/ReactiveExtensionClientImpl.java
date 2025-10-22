@@ -280,16 +280,22 @@ public class ReactiveExtensionClientImpl implements ReactiveExtensionClient {
                     extension.setMetadata(metadata);
                     return converter.convertTo(extension);
                 })
+            .subscribeOn(this.scheduler)
             // the method secureStrong() may invoke blocking SecureRandom, so we need to subscribe
             // on boundedElastic thread pool.
             .flatMap(extStore -> doCreate(extension, extStore.getName(), extStore.getData()))
-            .doOnNext(created -> watchers.onAdd(convertToRealExtension(created)))
+            .flatMap(created -> Mono.fromCallable(
+                    () -> {
+                        watchers.onAdd(convertToRealExtension(created));
+                        return created;
+                    })
+                .subscribeOn(this.scheduler)
+            )
             .retryWhen(Retry.backoff(3, Duration.ofMillis(100))
                 // retry when generateName is set
                 .filter(t -> t instanceof DataIntegrityViolationException
                     && hasText(extension.getMetadata().getGenerateName()))
-            )
-            .subscribeOn(this.scheduler);
+            );
     }
 
     @Override
@@ -321,11 +327,16 @@ public class ReactiveExtensionClientImpl implements ReactiveExtensionClient {
             var doUpdate =
                 doUpdate(extension, store.getName(), store.getVersion(), store.getData());
             if (!onlyStatusChanged) {
-                doUpdate = doUpdate.doOnNext(ext -> watchers.onUpdate(convertToRealExtension(old),
-                    convertToRealExtension(ext))
+                doUpdate = doUpdate.flatMap(updated -> Mono.fromCallable(
+                        () -> {
+                            watchers.onUpdate(convertToRealExtension(old),
+                                convertToRealExtension(updated));
+                            return updated;
+                        })
+                    .subscribeOn(this.scheduler)
                 );
             }
-            return doUpdate.subscribeOn(this.scheduler);
+            return doUpdate;
         });
     }
 
@@ -350,8 +361,13 @@ public class ReactiveExtensionClientImpl implements ReactiveExtensionClient {
         extension.getMetadata().setDeletionTimestamp(Instant.now());
         var es = converter.convertTo(extension);
         return doUpdate(extension, es.getName(), es.getVersion(), es.getData())
-            .doOnNext(updated -> watchers.onDelete(convertToRealExtension(extension)))
-            .subscribeOn(this.scheduler);
+            .flatMap(deleted -> Mono.fromCallable(
+                    () -> {
+                        watchers.onDelete(convertToRealExtension(extension));
+                        return deleted;
+                    })
+                .subscribeOn(this.scheduler)
+            );
     }
 
     @Override
@@ -390,9 +406,12 @@ public class ReactiveExtensionClientImpl implements ReactiveExtensionClient {
             var type = (Class<E>) oldExtension.getClass();
             return client.create(name, data)
                 .map(created -> converter.convertFrom(type, created))
-                .flatMap(extension -> Mono.fromRunnable(
-                        () -> this.indexEngine.insert(List.of(convertToRealExtension(extension))))
-                    .thenReturn(extension)
+                .flatMap(extension -> Mono.fromCallable(
+                        () -> {
+                            this.indexEngine.insert(List.of(convertToRealExtension(extension)));
+                            return extension;
+                        })
+                    .subscribeOn(this.scheduler)
                 )
                 .as(transactionalOperator::transactional);
         });
@@ -414,9 +433,12 @@ public class ReactiveExtensionClientImpl implements ReactiveExtensionClient {
             var type = (Class<E>) oldExtension.getClass();
             return client.update(name, version, data)
                 .map(updated -> converter.convertFrom(type, updated))
-                .flatMap(extension -> Mono.fromRunnable(
-                        () -> this.indexEngine.update(List.of(convertToRealExtension(extension))))
-                    .thenReturn(extension)
+                .flatMap(extension -> Mono.fromCallable(
+                        () -> {
+                            this.indexEngine.update(List.of(convertToRealExtension(extension)));
+                            return extension;
+                        })
+                    .subscribeOn(this.scheduler)
                 )
                 .as(transactionalOperator::transactional);
         });
