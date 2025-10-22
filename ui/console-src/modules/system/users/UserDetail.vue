@@ -18,15 +18,7 @@ import {
 import type { UserTab } from "@halo-dev/console-shared";
 import { useQuery, useQueryClient } from "@tanstack/vue-query";
 import { useRouteQuery } from "@vueuse/router";
-import {
-  computed,
-  markRaw,
-  onMounted,
-  provide,
-  ref,
-  toRaw,
-  type Ref,
-} from "vue";
+import { computed, markRaw, onMounted, provide, ref, shallowRef, type Ref } from "vue";
 import { useI18n } from "vue-i18n";
 import { useRoute, useRouter } from "vue-router";
 import GrantPermissionModal from "./components/GrantPermissionModal.vue";
@@ -60,7 +52,7 @@ const {
   enabled: computed(() => !!params.name),
 });
 
-const tabs = ref<UserTab[]>([
+const tabs = shallowRef<UserTab[]>([
   {
     id: "detail",
     label: t("core.user.detail.tabs.detail"),
@@ -75,15 +67,14 @@ const { pluginModules } = usePluginModuleStore();
 onMounted(async () => {
   for (const pluginModule of pluginModules) {
     try {
-      const callbackFunction =
-        pluginModule?.extensionPoints?.["user:detail:tabs:create"];
+      const callbackFunction = pluginModule?.extensionPoints?.["user:detail:tabs:create"];
       if (typeof callbackFunction !== "function") {
         continue;
       }
 
       const providers = await callbackFunction();
 
-      tabs.value.push(...providers);
+      tabs.value = [...tabs.value, ...providers].sort((a, b) => a.priority - b.priority);
     } catch (error) {
       console.error(`Error processing plugin module:`, pluginModule, error);
     }
@@ -97,12 +88,10 @@ const activeTab = useRouteQuery<string>("tab", tabs.value[0].id, {
 provide<Ref<string>>("activeTab", activeTab);
 
 const tabbarItems = computed(() => {
-  return toRaw(tabs)
-    .value.sort((a, b) => a.priority - b.priority)
-    .map((tab) => ({
-      id: tab.id,
-      label: tab.label,
-    }));
+  return tabs.value.map((tab) => ({
+    id: tab.id,
+    label: tab.label,
+  }));
 });
 
 const handleDelete = async (user: User) => {
@@ -142,23 +131,11 @@ function onGrantPermissionModalClose() {
 const { handleEnableOrDisableUser } = useUserEnableDisable();
 </script>
 <template>
-  <UserEditingModal
-    v-if="editingModal && user?.user"
-    :user="user?.user"
-    @close="editingModal = false"
-  />
+  <UserEditingModal v-if="editingModal && user?.user" :user="user?.user" @close="editingModal = false" />
 
-  <UserPasswordChangeModal
-    v-if="passwordChangeModal"
-    :user="user?.user"
-    @close="onPasswordChangeModalClose"
-  />
+  <UserPasswordChangeModal v-if="passwordChangeModal" :user="user?.user" @close="onPasswordChangeModalClose" />
 
-  <GrantPermissionModal
-    v-if="grantPermissionModal"
-    :user="user?.user"
-    @close="onGrantPermissionModalClose"
-  />
+  <GrantPermissionModal v-if="grantPermissionModal" :user="user?.user" @close="onGrantPermissionModalClose" />
 
   <header class="bg-white">
     <div class="p-4">
@@ -176,9 +153,7 @@ const { handleEnableOrDisableUser } = useUserEnableDisable();
                 {{ $t("core.user.fields.disabled") }}
               </VTag>
             </div>
-            <span v-if="!isLoading" class="text-sm text-gray-600">
-              @{{ user?.user.metadata.name }}
-            </span>
+            <span v-if="!isLoading" class="text-sm text-gray-600"> @{{ user?.user.metadata.name }} </span>
           </div>
         </div>
         <div class="inline-flex items-center gap-2">
@@ -206,14 +181,9 @@ const { handleEnableOrDisableUser } = useUserEnableDisable();
               >
                 {{ $t("core.user.detail.actions.grant_permission.title") }}
               </VDropdownItem>
-              <VDropdownDivider
-                v-if="currentUser?.metadata.name !== user?.user.metadata.name"
-              />
+              <VDropdownDivider v-if="currentUser?.metadata.name !== user?.user.metadata.name" />
               <VDropdownItem
-                v-if="
-                  !!user &&
-                  currentUser?.metadata.name !== user?.user.metadata.name
-                "
+                v-if="!!user && currentUser?.metadata.name !== user?.user.metadata.name"
                 type="danger"
                 @click="
                   handleEnableOrDisableUser({
@@ -234,10 +204,7 @@ const { handleEnableOrDisableUser } = useUserEnableDisable();
                 }}
               </VDropdownItem>
               <VDropdownItem
-                v-if="
-                  user &&
-                  currentUser?.metadata.name !== user?.user.metadata.name
-                "
+                v-if="user && currentUser?.metadata.name !== user?.user.metadata.name"
                 type="danger"
                 @click="handleDelete(user.user)"
               >
@@ -250,19 +217,10 @@ const { handleEnableOrDisableUser } = useUserEnableDisable();
     </div>
   </header>
   <section class="bg-white p-4">
-    <VTabbar
-      v-model:active-id="activeTab"
-      :items="tabbarItems"
-      class="w-full"
-      type="outline"
-    ></VTabbar>
+    <VTabbar v-model:active-id="activeTab" :items="tabbarItems" class="w-full" type="outline"></VTabbar>
     <div class="mt-2">
       <template v-for="tab in tabs" :key="tab.id">
-        <component
-          :is="tab.component"
-          v-if="activeTab === tab.id"
-          :user="user"
-        />
+        <component :is="tab.component" v-if="activeTab === tab.id" :user="user" />
       </template>
     </div>
   </section>

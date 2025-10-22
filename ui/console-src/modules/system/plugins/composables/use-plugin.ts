@@ -12,7 +12,7 @@ import type { PluginTab } from "@halo-dev/console-shared";
 import { useMutation, useQuery } from "@tanstack/vue-query";
 import { useRouteQuery } from "@vueuse/router";
 import type { ComputedRef, Ref } from "vue";
-import { computed, markRaw, ref } from "vue";
+import { computed, markRaw, ref, shallowRef } from "vue";
 import { useI18n } from "vue-i18n";
 import DetailTab from "../components/tabs/Detail.vue";
 import SettingTab from "../components/tabs/Setting.vue";
@@ -26,16 +26,11 @@ interface usePluginLifeCycleReturn {
   uninstall: (deleteExtensions?: boolean) => void;
 }
 
-export function usePluginLifeCycle(
-  plugin?: Ref<Plugin | undefined>
-): usePluginLifeCycleReturn {
+export function usePluginLifeCycle(plugin?: Ref<Plugin | undefined>): usePluginLifeCycleReturn {
   const { t } = useI18n();
 
   const isStarted = computed(() => {
-    return (
-      plugin?.value?.status?.phase === PluginStatusPhaseEnum.Started &&
-      plugin.value?.spec.enabled
-    );
+    return plugin?.value?.status?.phase === PluginStatusPhaseEnum.Started && plugin.value?.spec.enabled;
   });
 
   const getStatusDotState = () => {
@@ -58,23 +53,14 @@ export function usePluginLifeCycle(
 
     const { phase } = plugin.value.status || {};
 
-    if (
-      phase === PluginStatusPhaseEnum.Failed ||
-      phase === PluginStatusPhaseEnum.Disabling
-    ) {
+    if (phase === PluginStatusPhaseEnum.Failed || phase === PluginStatusPhaseEnum.Disabling) {
       const lastCondition = plugin.value.status?.conditions?.[0];
 
-      return (
-        [lastCondition?.reason, lastCondition?.message]
-          .filter(Boolean)
-          .join(": ") || "Unknown"
-      );
+      return [lastCondition?.reason, lastCondition?.message].filter(Boolean).join(": ") || "Unknown";
     }
 
     // Starting up
-    if (
-      phase !== (PluginStatusPhaseEnum.Started || PluginStatusPhaseEnum.Failed)
-    ) {
+    if (phase !== (PluginStatusPhaseEnum.Started || PluginStatusPhaseEnum.Failed)) {
       return t("core.common.status.starting_up");
     }
   };
@@ -118,9 +104,7 @@ export function usePluginLifeCycle(
       }`,
       confirmType: "danger",
       confirmText: `${
-        enabled
-          ? t("core.plugin.operations.uninstall_when_enabled.confirm_text")
-          : t("core.common.buttons.uninstall")
+        enabled ? t("core.plugin.operations.uninstall_when_enabled.confirm_text") : t("core.common.buttons.uninstall")
       }`,
       cancelText: t("core.common.buttons.cancel"),
       onConfirm: async () => {
@@ -192,9 +176,7 @@ export function usePluginBatchOperations(names: Ref<string[]>) {
     Dialog.warning({
       title: `${
         deleteExtensions
-          ? t(
-              "core.plugin.operations.uninstall_and_delete_config_in_batch.title"
-            )
+          ? t("core.plugin.operations.uninstall_and_delete_config_in_batch.title")
           : t("core.plugin.operations.uninstall_in_batch.title")
       }`,
       description: t("core.common.dialog.descriptions.cannot_be_recovered"),
@@ -209,10 +191,9 @@ export function usePluginBatchOperations(names: Ref<string[]>) {
             });
 
             if (deleteExtensions) {
-              const { data: plugin } =
-                await coreApiClient.plugin.plugin.getPlugin({
-                  name: names.value[i],
-                });
+              const { data: plugin } = await coreApiClient.plugin.plugin.getPlugin({
+                name: names.value[i],
+              });
 
               const { settingName, configMapName } = plugin.spec;
 
@@ -277,10 +258,7 @@ export function usePluginBatchOperations(names: Ref<string[]>) {
   return { handleUninstallInBatch, handleChangeStatusInBatch };
 }
 
-export function usePluginDetailTabs(
-  pluginName: Ref<string | undefined>,
-  recordsActiveTab: boolean
-) {
+export function usePluginDetailTabs(pluginName: Ref<string | undefined>, recordsActiveTab: boolean) {
   const { currentUserHasPermission } = usePermission();
   const { t } = useI18n();
 
@@ -292,10 +270,8 @@ export function usePluginDetailTabs(
     },
   ];
 
-  const tabs = ref<PluginTab[]>(initialTabs);
-  const activeTab = recordsActiveTab
-    ? useRouteQuery<string>("tab", tabs.value[0].id)
-    : ref(tabs.value[0].id);
+  const tabs = shallowRef<PluginTab[]>(initialTabs);
+  const activeTab = recordsActiveTab ? useRouteQuery<string>("tab", tabs.value[0].id) : ref(tabs.value[0].id);
 
   const { data: plugin } = useQuery({
     queryKey: ["plugin", pluginName],
@@ -306,10 +282,7 @@ export function usePluginDetailTabs(
       return data;
     },
     async onSuccess(data) {
-      if (
-        !data.spec.settingName ||
-        !currentUserHasPermission(["system:plugins:manage"])
-      ) {
+      if (!data.spec.settingName || !currentUserHasPermission(["system:plugins:manage"])) {
         tabs.value = [...initialTabs, ...(await getTabsFromExtensions())];
       }
     },
@@ -324,11 +297,7 @@ export function usePluginDetailTabs(
       return data;
     },
     enabled: computed(() => {
-      return (
-        !!plugin.value &&
-        !!plugin.value.spec.settingName &&
-        currentUserHasPermission(["system:plugins:manage"])
-      );
+      return !!plugin.value && !!plugin.value.spec.settingName && currentUserHasPermission(["system:plugins:manage"]);
     }),
     async onSuccess(data) {
       if (data) {
@@ -357,8 +326,7 @@ export function usePluginDetailTabs(
       return [];
     }
 
-    const callbackFunction =
-      currentPluginModule?.extensionPoints?.["plugin:self:tabs:create"];
+    const callbackFunction = currentPluginModule?.extensionPoints?.["plugin:self:tabs:create"];
 
     if (typeof callbackFunction !== "function") {
       return [];

@@ -3,24 +3,11 @@ import UserAvatar from "@/components/user-avatar/UserAvatar.vue";
 import { usePluginModuleStore } from "@/stores/plugin";
 import type { DetailedUser } from "@halo-dev/api-client";
 import { consoleApiClient } from "@halo-dev/api-client";
-import {
-  VButton,
-  VDropdown,
-  VDropdownItem,
-  VTabbar,
-} from "@halo-dev/components";
+import { VButton, VDropdown, VDropdownItem, VTabbar } from "@halo-dev/components";
 import type { UserProfileTab } from "@halo-dev/console-shared";
 import { useQuery } from "@tanstack/vue-query";
 import { useRouteQuery } from "@vueuse/router";
-import {
-  computed,
-  markRaw,
-  onMounted,
-  provide,
-  ref,
-  toRaw,
-  type Ref,
-} from "vue";
+import { computed, markRaw, onMounted, provide, ref, shallowRef, type Ref } from "vue";
 import { useI18n } from "vue-i18n";
 import PasswordChangeModal from "./components/PasswordChangeModal.vue";
 import ProfileEditingModal from "./components/ProfileEditingModal.vue";
@@ -49,7 +36,7 @@ const {
 
 provide<Ref<DetailedUser | undefined>>("user", user);
 
-const tabs = ref<UserProfileTab[]>([
+const tabs = shallowRef<UserProfileTab[]>([
   {
     id: "detail",
     label: t("core.uc_profile.tabs.detail"),
@@ -88,15 +75,14 @@ const { pluginModules } = usePluginModuleStore();
 onMounted(async () => {
   for (const pluginModule of pluginModules) {
     try {
-      const callbackFunction =
-        pluginModule?.extensionPoints?.["uc:user:profile:tabs:create"];
+      const callbackFunction = pluginModule?.extensionPoints?.["uc:user:profile:tabs:create"];
       if (typeof callbackFunction !== "function") {
         continue;
       }
 
       const providers = await callbackFunction();
 
-      tabs.value.push(...providers);
+      tabs.value = [...tabs.value, ...providers].sort((a, b) => a.priority - b.priority);
     } catch (error) {
       console.error(`Error processing plugin module:`, pluginModule, error);
     }
@@ -104,12 +90,10 @@ onMounted(async () => {
 });
 
 const tabbarItems = computed(() => {
-  return toRaw(tabs)
-    .value.sort((a, b) => a.priority - b.priority)
-    .map((tab) => ({
-      id: tab.id,
-      label: tab.label,
-    }));
+  return tabs.value.map((tab) => ({
+    id: tab.id,
+    label: tab.label,
+  }));
 });
 
 const activeTab = useRouteQuery<string>("tab", tabs.value[0].id, {
@@ -124,11 +108,7 @@ function onPasswordChangeModalClose() {
 <template>
   <ProfileEditingModal v-if="editingModal" @close="editingModal = false" />
 
-  <PasswordChangeModal
-    v-if="passwordChangeModal"
-    :user="user?.user"
-    @close="onPasswordChangeModalClose"
-  />
+  <PasswordChangeModal v-if="passwordChangeModal" :user="user?.user" @close="onPasswordChangeModalClose" />
 
   <header class="bg-white">
     <div class="p-4">
@@ -141,9 +121,7 @@ function onPasswordChangeModalClose() {
             <h1 class="truncate text-lg font-bold text-gray-900">
               {{ user?.user.spec.displayName }}
             </h1>
-            <span v-if="!isLoading" class="text-sm text-gray-600">
-              @{{ user?.user.metadata.name }}
-            </span>
+            <span v-if="!isLoading" class="text-sm text-gray-600"> @{{ user?.user.metadata.name }} </span>
           </div>
         </div>
         <div>
@@ -165,19 +143,10 @@ function onPasswordChangeModalClose() {
     </div>
   </header>
   <section class="bg-white p-4">
-    <VTabbar
-      v-model:active-id="activeTab"
-      :items="tabbarItems"
-      class="w-full"
-      type="outline"
-    ></VTabbar>
+    <VTabbar v-model:active-id="activeTab" :items="tabbarItems" class="w-full" type="outline"></VTabbar>
     <div class="mt-2">
       <template v-for="tab in tabs" :key="tab.id">
-        <component
-          :is="tab.component"
-          v-if="activeTab === tab.id"
-          :user="user"
-        />
+        <component :is="tab.component" v-if="activeTab === tab.id" :user="user" />
       </template>
     </div>
   </section>

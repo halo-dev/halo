@@ -1,14 +1,6 @@
 <script lang="ts" setup>
 // core libs
-import {
-  computed,
-  nextTick,
-  onMounted,
-  provide,
-  ref,
-  watch,
-  type Ref,
-} from "vue";
+import { computed, nextTick, onMounted, provide, ref, shallowRef, watch, type Ref } from "vue";
 import { useRoute, useRouter } from "vue-router";
 
 // libs
@@ -69,7 +61,7 @@ const initialTabs: ThemeTab[] = [
   },
 ];
 
-const tabs = ref<ThemeTab[]>(cloneDeep(initialTabs));
+const tabs = shallowRef<ThemeTab[]>(initialTabs);
 const selectedTheme = ref<Theme>();
 const themesModal = ref(false);
 const previewModal = ref(false);
@@ -77,8 +69,7 @@ const activeTab = ref(tabs.value[0].id);
 provide<Ref<string>>("activeTab", activeTab);
 provide<Ref<boolean>>("themesModal", themesModal);
 
-const { loading, isActivated, handleActiveTheme } =
-  useThemeLifeCycle(selectedTheme);
+const { loading, isActivated, handleActiveTheme } = useThemeLifeCycle(selectedTheme);
 
 provide<Ref<Theme | undefined>>("selectedTheme", selectedTheme);
 
@@ -136,10 +127,7 @@ const handleTabChange = (id: string | number) => {
 const handleTriggerTabChange = () => {
   if (route.name === "ThemeSetting") {
     const tab = tabs.value.find((tab) => {
-      return (
-        tab.route.name === route.name &&
-        tab.route.params?.group === route.params.group
-      );
+      return tab.route.name === route.name && tab.route.params?.group === route.params.group;
     });
     if (tab) {
       activeTab.value = tab.id;
@@ -255,10 +243,7 @@ onMounted(() => {
             ></VTabbar>
           </template>
           <div class="rounded-b-base bg-white">
-            <RouterView
-              :key="`${selectedTheme?.metadata.name}-${activeTab}`"
-              v-slot="{ Component }"
-            >
+            <RouterView :key="`${selectedTheme?.metadata.name}-${activeTab}`" v-slot="{ Component }">
               <template v-if="Component">
                 <Suspense>
                   <component :is="Component"></component>
@@ -273,15 +258,7 @@ onMounted(() => {
       </div>
     </div>
 
-    <ThemeListModal
-      v-if="themesModal"
-      @close="themesModal = false"
-      @select="onSelectTheme"
-    />
-    <ThemePreviewModal
-      v-if="previewModal"
-      :theme="selectedTheme"
-      @close="previewModal = false"
-    />
+    <ThemeListModal v-if="themesModal" @close="themesModal = false" @select="onSelectTheme" />
+    <ThemePreviewModal v-if="previewModal" :theme="selectedTheme" @close="previewModal = false" />
   </BasicLayout>
 </template>

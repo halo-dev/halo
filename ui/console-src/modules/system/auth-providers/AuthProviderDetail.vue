@@ -13,14 +13,14 @@ import {
   VTabbar,
 } from "@halo-dev/components";
 import { useQuery } from "@tanstack/vue-query";
-import { computed, ref, toRaw } from "vue";
+import { computed, ref, shallowRef, toRaw } from "vue";
 import { useI18n } from "vue-i18n";
 import { useRoute } from "vue-router";
 
 const route = useRoute();
 const { t } = useI18n();
 
-const tabs = ref<{ id: string; label: string }[]>([
+const tabs = shallowRef<{ id: string; label: string }[]>([
   {
     id: "detail",
     label: t("core.identity_authentication.tabs.detail"),
@@ -39,10 +39,13 @@ const { data: authProvider } = useQuery<AuthProvider>({
   },
   onSuccess(data) {
     if (data.spec.settingRef?.name) {
-      tabs.value.push({
-        id: "setting",
-        label: t("core.identity_authentication.tabs.setting"),
-      });
+      tabs.value = [
+        ...tabs.value,
+        {
+          id: "setting",
+          label: t("core.identity_authentication.tabs.setting"),
+        },
+      ];
     }
   },
   enabled: computed(() => !!route.params.name),
@@ -50,15 +53,10 @@ const { data: authProvider } = useQuery<AuthProvider>({
 
 // setting
 const saving = ref(false);
-const group = computed(
-  () => authProvider.value?.spec.settingRef?.group as string
-);
+const group = computed(() => authProvider.value?.spec.settingRef?.group as string);
 
 const { data: setting, refetch: handleFetchSettings } = useQuery<Setting>({
-  queryKey: [
-    "auth-provider-setting",
-    authProvider.value?.spec.settingRef?.name,
-  ],
+  queryKey: ["auth-provider-setting", authProvider.value?.spec.settingRef?.name],
   queryFn: async () => {
     const { data } = await coreApiClient.setting.getSetting(
       {
@@ -74,10 +72,7 @@ const { data: setting, refetch: handleFetchSettings } = useQuery<Setting>({
 });
 
 const { data: configMap, refetch: handleFetchConfigMap } = useQuery({
-  queryKey: [
-    "auth-provider-configMap",
-    authProvider.value?.spec.configMapRef?.name,
-  ],
+  queryKey: ["auth-provider-configMap", authProvider.value?.spec.configMapRef?.name],
   queryFn: async () => {
     const { data } = await coreApiClient.configMap.getConfigMap(
       {
@@ -106,16 +101,10 @@ const { data: configMap, refetch: handleFetchConfigMap } = useQuery({
 
     await handleFetchConfigMap();
   },
-  enabled: computed(
-    () => !!authProvider.value?.spec.configMapRef?.name && !!setting.value
-  ),
+  enabled: computed(() => !!authProvider.value?.spec.configMapRef?.name && !!setting.value),
 });
 
-const { configMapFormData, formSchema, convertToSave } = useSettingFormConvert(
-  setting,
-  configMap,
-  group
-);
+const { configMapFormData, formSchema, convertToSave } = useSettingFormConvert(setting, configMap, group);
 
 const handleSaveConfigMap = async () => {
   saving.value = true;
@@ -163,73 +152,42 @@ const description = computed(() => {
 <template>
   <VPageHeader :title="displayName">
     <template #icon>
-      <VAvatar
-        :src="authProvider?.spec.logo"
-        :alt="authProvider?.spec.displayName"
-        size="sm"
-      />
+      <VAvatar :src="authProvider?.spec.logo" :alt="authProvider?.spec.displayName" size="sm" />
     </template>
   </VPageHeader>
 
   <div class="m-0 md:m-4">
     <VCard :body-class="['!p-0']">
       <template #header>
-        <VTabbar
-          v-model:active-id="activeTab"
-          :items="tabs"
-          class="w-full !rounded-none"
-          type="outline"
-        ></VTabbar>
+        <VTabbar v-model:active-id="activeTab" :items="tabs" class="w-full !rounded-none" type="outline"></VTabbar>
       </template>
       <div class="bg-white">
         <div v-if="activeTab === 'detail'">
           <VDescription>
             <VDescriptionItem
-              :label="
-                $t('core.identity_authentication.detail.fields.display_name')
-              "
+              :label="$t('core.identity_authentication.detail.fields.display_name')"
               :content="displayName"
             />
             <VDescriptionItem
-              :label="
-                $t('core.identity_authentication.detail.fields.description')
-              "
+              :label="$t('core.identity_authentication.detail.fields.description')"
               :content="description"
             />
-            <VDescriptionItem
-              :label="$t('core.identity_authentication.detail.fields.website')"
-            >
-              <a
-                v-if="authProvider?.spec.website"
-                :href="authProvider?.spec.website"
-                target="_blank"
-              >
+            <VDescriptionItem :label="$t('core.identity_authentication.detail.fields.website')">
+              <a v-if="authProvider?.spec.website" :href="authProvider?.spec.website" target="_blank">
                 {{ authProvider.spec.website }}
               </a>
               <span v-else>
                 {{ $t("core.common.text.none") }}
               </span>
             </VDescriptionItem>
-            <VDescriptionItem
-              :label="
-                $t('core.identity_authentication.detail.fields.help_page')
-              "
-            >
-              <a
-                v-if="authProvider?.spec.helpPage"
-                :href="authProvider?.spec.helpPage"
-                target="_blank"
-              >
+            <VDescriptionItem :label="$t('core.identity_authentication.detail.fields.help_page')">
+              <a v-if="authProvider?.spec.helpPage" :href="authProvider?.spec.helpPage" target="_blank">
                 {{ authProvider.spec.helpPage }}
               </a>
               <span v-else>{{ $t("core.common.text.none") }}</span>
             </VDescriptionItem>
             <VDescriptionItem
-              :label="
-                $t(
-                  'core.identity_authentication.detail.fields.authentication_url'
-                )
-              "
+              :label="$t('core.identity_authentication.detail.fields.authentication_url')"
               :content="authProvider?.spec.authenticationUrl"
             />
           </VDescription>
@@ -246,19 +204,12 @@ const description = computed(() => {
               type="form"
               @submit="handleSaveConfigMap"
             >
-              <FormKitSchema
-                :schema="toRaw(formSchema)"
-                :data="configMapFormData[group]"
-              />
+              <FormKitSchema :schema="toRaw(formSchema)" :data="configMapFormData[group]" />
             </FormKit>
           </div>
           <div class="pt-5">
             <div class="flex justify-start">
-              <VButton
-                :loading="saving"
-                type="secondary"
-                @click="$formkit.submit(group || '')"
-              >
+              <VButton :loading="saving" type="secondary" @click="$formkit.submit(group || '')">
                 {{ $t("core.common.buttons.save") }}
               </VButton>
             </div>

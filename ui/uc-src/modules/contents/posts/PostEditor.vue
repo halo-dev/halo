@@ -32,7 +32,7 @@ import { AxiosError, type AxiosRequestConfig } from "axios";
 import { isEqual } from "lodash-es";
 import ShortUniqueId from "short-unique-id";
 import type { ComputedRef } from "vue";
-import { computed, nextTick, onMounted, provide, ref, toRef, watch } from "vue";
+import { computed, nextTick, onMounted, provide, ref, shallowRef, toRef, watch } from "vue";
 import { useI18n } from "vue-i18n";
 import { useRouter } from "vue-router";
 import PostCreationModal from "./components/PostCreationModal.vue";
@@ -85,16 +85,11 @@ const content = ref<Content>({
 const snapshot = ref<Snapshot>();
 
 const needsUpdatePost = ref(false);
-watch(
-  [() => formState.value.spec.title, () => formState.value.spec.cover],
-  (value, oldValue) => {
-    needsUpdatePost.value = !isEqual(value, oldValue);
-  }
-);
+watch([() => formState.value.spec.title, () => formState.value.spec.cover], (value, oldValue) => {
+  needsUpdatePost.value = !isEqual(value, oldValue);
+});
 
-const isUpdateMode = computed(
-  () => !!formState.value.metadata.creationTimestamp
-);
+const isUpdateMode = computed(() => !!formState.value.metadata.creationTimestamp);
 
 // provide some data to editor
 provide<ComputedRef<string | undefined>>(
@@ -112,7 +107,7 @@ provide<ComputedRef<string | undefined>>(
 
 // Editor providers
 const { editorProviders, fetchEditorProviders } = useEditorExtensionPoints();
-const currentEditorProvider = ref<EditorProvider>();
+const currentEditorProvider = shallowRef<EditorProvider>();
 const storedEditorProviderName = useLocalStorage("editor-provider-name", "");
 
 const handleChangeEditorProvider = async (provider: EditorProvider) => {
@@ -145,9 +140,8 @@ onMounted(async () => {
 
   // New post, set default editor
   const provider =
-    editorProviders.value.find(
-      (provider) => provider.name === storedEditorProviderName.value
-    ) || editorProviders.value[0];
+    editorProviders.value.find((provider) => provider.name === storedEditorProviderName.value) ||
+    editorProviders.value[0];
 
   if (provider) {
     currentEditorProvider.value = provider;
@@ -162,12 +156,7 @@ onMounted(async () => {
 const snapshotVersion = computed(() => snapshot.value?.metadata.version || 0);
 
 // Post content cache
-const {
-  currentCache,
-  handleSetContentCache,
-  handleResetCache,
-  handleClearCache,
-} = useContentCache(
+const { currentCache, handleSetContentCache, handleResetCache, handleClearCache } = useContentCache(
   "post-content-cache",
   name,
   toRef(content.value, "raw"),
@@ -227,10 +216,8 @@ async function handleFetchContent() {
     patched: true,
   });
 
-  const {
-    [contentAnnotations.PATCHED_CONTENT]: patchedContent,
-    [contentAnnotations.PATCHED_RAW]: patchedRaw,
-  } = data.metadata.annotations || {};
+  const { [contentAnnotations.PATCHED_CONTENT]: patchedContent, [contentAnnotations.PATCHED_RAW]: patchedRaw } =
+    data.metadata.annotations || {};
 
   const { rawType } = data.spec || {};
 
@@ -250,19 +237,13 @@ async function handleFetchContent() {
 }
 
 async function handleSetEditorProviderFromRemote() {
-  const { [contentAnnotations.PREFERRED_EDITOR]: preferredEditorName } =
-    formState.value.metadata.annotations || {};
+  const { [contentAnnotations.PREFERRED_EDITOR]: preferredEditorName } = formState.value.metadata.annotations || {};
 
-  const preferredEditor = editorProviders.value.find(
-    (provider) => provider.name === preferredEditorName
-  );
+  const preferredEditor = editorProviders.value.find((provider) => provider.name === preferredEditorName);
 
   const provider =
     preferredEditor ||
-    editorProviders.value.find(
-      (provider) =>
-        provider.rawType.toLowerCase() === content.value.rawType?.toLowerCase()
-    );
+    editorProviders.value.find((provider) => provider.rawType.toLowerCase() === content.value.rawType?.toLowerCase());
 
   if (provider) {
     currentEditorProvider.value = provider;
@@ -313,10 +294,9 @@ async function handleCreate() {
 
   // fixme: check if slug is unique
   // Finally, we need to check if the slug is unique in the database
-  const { data: postsWithSameSlug } =
-    await publicApiClient.content.post.queryPosts({
-      fieldSelector: [`spec.slug=${formState.value.spec.slug}`],
-    });
+  const { data: postsWithSameSlug } = await publicApiClient.content.post.queryPosts({
+    fieldSelector: [`spec.slug=${formState.value.spec.slug}`],
+  });
 
   if (postsWithSameSlug.total) {
     formState.value.spec.slug = `${formState.value.spec.slug}-${uid.randomUUID(8)}`;
@@ -492,34 +472,20 @@ useSessionKeepAlive();
         :allow-forced-select="!isUpdateMode"
         @select="handleChangeEditorProvider"
       />
-      <VButton
-        size="sm"
-        type="default"
-        :loading="isSaving && !isPublishing"
-        @click="handleSaveClick"
-      >
+      <VButton size="sm" type="default" :loading="isSaving && !isPublishing" @click="handleSaveClick">
         <template #icon>
           <IconSave />
         </template>
         {{ $t("core.common.buttons.save") }}
       </VButton>
-      <VButton
-        v-if="isUpdateMode"
-        size="sm"
-        type="default"
-        @click="handleOpenPostSettingEditModal"
-      >
+      <VButton v-if="isUpdateMode" size="sm" type="default" @click="handleOpenPostSettingEditModal">
         <template #icon>
           <IconSettings />
         </template>
         {{ $t("core.common.buttons.setting") }}
       </VButton>
       <HasPermission :permissions="['uc:posts:publish']">
-        <VButton
-          :loading="isPublishing"
-          type="secondary"
-          @click="handlePublishClick"
-        >
+        <VButton :loading="isPublishing" type="secondary" @click="handlePublishClick">
           <template #icon>
             <IconSendPlaneFill />
           </template>

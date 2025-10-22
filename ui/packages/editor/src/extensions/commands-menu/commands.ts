@@ -1,123 +1,108 @@
-import {
-  Extension,
-  posToDOMRect,
-  VueRenderer,
-  type AnyExtension,
-  type Editor,
-  type Range,
-} from "@/tiptap";
+import { Extension, PluginKey, posToDOMRect, VueRenderer, type AnyExtension, type Editor, type Range } from "@/tiptap";
 import type { CommandMenuItemType } from "@/types";
 import { computePosition, flip, shift } from "@floating-ui/dom";
-import Suggestion from "@tiptap/suggestion";
+import Suggestion, { type SuggestionOptions } from "@tiptap/suggestion";
 import CommandsView from "./CommandsView.vue";
 
 export default Extension.create({
   name: "commands-menu",
 
-  addOptions() {
-    return {
-      suggestion: {
-        char: "/",
-        command: ({
-          editor,
-          range,
-          props,
-        }: {
-          editor: Editor;
-          range: Range;
-          props: CommandMenuItemType;
-        }) => {
-          props.command({ editor, range });
-        },
-      },
-    };
-  },
-
   addProseMirrorPlugins() {
     const commandMenuItems = getToolbarItemsFromExtensions(this.editor);
 
-    return [
-      Suggestion({
-        editor: this.editor,
-        ...this.options.suggestion,
-        items: ({ query }: { query: string }) => {
-          return commandMenuItems.filter((item) =>
-            [...item.keywords, item.title].some((keyword) =>
-              keyword.includes(query)
-            )
-          );
-        },
-        render: () => {
-          let component: VueRenderer | null = null;
-          return {
-            onStart: (props) => {
-              component = new VueRenderer(CommandsView, {
-                props,
-                editor: props.editor,
-              });
-              if (!props.clientRect) {
-                return;
-              }
+    const suggestionPlugin: SuggestionOptions = {
+      editor: this.editor,
+      command: ({ editor, range, props }: { editor: Editor; range: Range; props: CommandMenuItemType }) => {
+        props.command({ editor, range });
+      },
+      items: ({ query }: { query: string }) => {
+        return commandMenuItems.filter((item) =>
+          [...item.keywords, item.title].some((keyword) => keyword.includes(query))
+        );
+      },
+      render: () => {
+        let component: VueRenderer | null = null;
+        return {
+          onStart: (props) => {
+            component = new VueRenderer(CommandsView, {
+              props,
+              editor: props.editor,
+            });
+            if (!props.clientRect) {
+              return;
+            }
+            if (!component.element) {
+              return;
+            }
+            if (!(component.element instanceof HTMLElement)) {
+              return;
+            }
+            component.element.style.position = "absolute";
+
+            document.body.appendChild(component.element);
+
+            updatePosition(props.editor, component.element);
+          },
+
+          onUpdate(props) {
+            if (!component) {
+              return;
+            }
+            if (!component.element) {
+              return;
+            }
+            if (!(component.element instanceof HTMLElement)) {
+              return;
+            }
+            component.updateProps(props);
+
+            if (!props.clientRect) {
+              return;
+            }
+
+            updatePosition(props.editor, component.element);
+          },
+
+          onKeyDown(props) {
+            if (!component) {
+              return false;
+            }
+            if (props.event.key === "Escape") {
               if (!component.element) {
-                return;
-              }
-              if (!(component.element instanceof HTMLElement)) {
-                return;
-              }
-              component.element.style.position = "absolute";
-
-              document.body.appendChild(component.element);
-
-              updatePosition(props.editor, component.element);
-            },
-
-            onUpdate(props) {
-              if (!component) {
-                return;
-              }
-              if (!component.element) {
-                return;
-              }
-              if (!(component.element instanceof HTMLElement)) {
-                return;
-              }
-              component.updateProps(props);
-
-              if (!props.clientRect) {
-                return;
-              }
-
-              updatePosition(props.editor, component.element);
-            },
-
-            onKeyDown(props) {
-              if (!component) {
                 return false;
-              }
-              if (props.event.key === "Escape") {
-                if (!component.element) {
-                  return false;
-                }
-                component.destroy();
-                component.element.remove();
-                return true;
-              }
-
-              return component.ref?.onKeyDown(props);
-            },
-
-            onExit() {
-              if (!component) {
-                return;
-              }
-              if (!component.element) {
-                return;
               }
               component.destroy();
               component.element.remove();
-            },
-          };
-        },
+              return true;
+            }
+
+            return component.ref?.onKeyDown(props);
+          },
+
+          onExit() {
+            if (!component) {
+              return;
+            }
+            if (!component.element) {
+              return;
+            }
+            component.destroy();
+            component.element.remove();
+          },
+        };
+      },
+    };
+
+    return [
+      Suggestion({
+        pluginKey: new PluginKey("commands-menu-english"),
+        char: "/",
+        ...suggestionPlugin,
+      }),
+      Suggestion({
+        pluginKey: new PluginKey("commands-menu-chinese"),
+        char: "、",
+        ...suggestionPlugin,
       }),
     ];
   },
@@ -125,12 +110,7 @@ export default Extension.create({
 
 const updatePosition = (editor: Editor, element: HTMLElement) => {
   const virtualElement = {
-    getBoundingClientRect: () =>
-      posToDOMRect(
-        editor.view,
-        editor.state.selection.from,
-        editor.state.selection.to
-      ),
+    getBoundingClientRect: () => posToDOMRect(editor.view, editor.state.selection.from, editor.state.selection.to),
   };
 
   computePosition(virtualElement, element, {

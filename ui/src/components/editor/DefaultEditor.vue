@@ -59,10 +59,7 @@ import { usePluginModuleStore } from "@/stores/plugin";
 import { formatDatetime } from "@/utils/date";
 import { usePermission } from "@/utils/permission";
 import { generateThumbnailUrl } from "@/utils/thumbnail";
-import {
-  GetThumbnailByUriSizeEnum,
-  type Attachment,
-} from "@halo-dev/api-client";
+import { GetThumbnailByUriSizeEnum, type Attachment } from "@halo-dev/api-client";
 import {
   IconCalendar,
   IconCharacterRecognition,
@@ -106,12 +103,7 @@ import RiLayoutRightLine from "~icons/ri/layout-right-line";
 import HasPermission from "../permission/HasPermission.vue";
 import { useAttachmentSelect } from "./composables/use-attachment";
 import { useExtension } from "./composables/use-extension";
-import {
-  UiExtensionAudio,
-  UiExtensionImage,
-  UiExtensionUpload,
-  UiExtensionVideo,
-} from "./extensions";
+import { UiExtensionAudio, UiExtensionImage, UiExtensionUpload, UiExtensionVideo } from "./extensions";
 import { getContents } from "./utils/attachment";
 
 const { t } = useI18n();
@@ -123,10 +115,7 @@ const props = withDefaults(
     raw?: string;
     content: string;
     cover?: string;
-    uploadImage?: (
-      file: File,
-      options?: AxiosRequestConfig
-    ) => Promise<Attachment>;
+    uploadImage?: (file: File, options?: AxiosRequestConfig) => Promise<Attachment>;
   }>(),
   {
     title: "",
@@ -194,17 +183,13 @@ const showSidebar = useLocalStorage("halo:editor:show-sidebar", true);
 const AttachmentSelectorModal = defineAsyncComponent({
   loader: () => {
     if (currentUserHasPermission(["system:attachments:manage"])) {
-      return import(
-        "@console/modules/contents/attachments/components/AttachmentSelectorModal.vue"
-      );
+      return import("@console/modules/contents/attachments/components/AttachmentSelectorModal.vue");
     }
-    return import(
-      "@uc/modules/contents/attachments/components/AttachmentSelectorModal.vue"
-    );
+    return import("@uc/modules/contents/attachments/components/AttachmentSelectorModal.vue");
   },
 });
 
-const attachmentSelectorModal = ref(false);
+const attachmentSelectorModalVisible = ref(false);
 const { onAttachmentSelect, attachmentResult } = useAttachmentSelect();
 
 const initAttachmentOptions = {
@@ -219,8 +204,9 @@ const attachmentOptions = ref<{
   max?: number;
 }>(initAttachmentOptions);
 
-const handleCloseAttachmentSelectorModal = () => {
+const onAttachmentSelectorModalClose = () => {
   attachmentOptions.value = initAttachmentOptions;
+  attachmentSelectorModalVisible.value = false;
 };
 
 const { filterDuplicateExtensions } = useExtension();
@@ -268,9 +254,7 @@ const presetExtensions = [
   ExtensionSubscript,
   ExtensionSuperscript,
   ExtensionPlaceholder.configure({
-    placeholder: t(
-      "core.components.default_editor.extensions.placeholder.options.placeholder"
-    ),
+    placeholder: t("core.components.default_editor.extensions.placeholder.options.placeholder"),
   }),
   ExtensionHighlight,
   ExtensionCommands,
@@ -305,12 +289,7 @@ const presetExtensions = [
     name: "custom-attachment-extension",
     addOptions() {
       // If user has no permission to view attachments, return
-      if (
-        !currentUserHasPermission([
-          "system:attachments:manage",
-          "uc:attachments:manage",
-        ])
-      ) {
+      if (!currentUserHasPermission(["system:attachments:manage", "uc:attachments:manage"])) {
         return this;
       }
 
@@ -323,16 +302,10 @@ const presetExtensions = [
               props: {
                 editor,
                 icon: markRaw(IconFolder),
-                title: i18n.global.t(
-                  "core.components.default_editor.toolbox.attachment"
-                ),
+                title: i18n.global.t("core.components.default_editor.toolbox.attachment"),
                 action: () => {
                   editor.commands.openAttachmentSelector((attachment) => {
-                    editor
-                      .chain()
-                      .focus()
-                      .insertContent(getContents(attachment))
-                      .run();
+                    editor.chain().focus().insertContent(getContents(attachment)).run();
                   });
                   return true;
                 },
@@ -348,10 +321,8 @@ const presetExtensions = [
           if (options) {
             attachmentOptions.value = options;
           }
-          attachmentSelectorModal.value = true;
-          attachmentResult.updateAttachment = (
-            attachments: AttachmentLike[]
-          ) => {
+          attachmentSelectorModalVisible.value = true;
+          attachmentResult.updateAttachment = (attachments: AttachmentLike[]) => {
             callback(attachments);
           };
           return true;
@@ -371,9 +342,7 @@ const presetExtensions = [
               editor,
               isActive: showSidebar.value,
               icon: markRaw(RiLayoutRightLine),
-              title: i18n.global.t(
-                "core.components.default_editor.toolbox.show_hide_sidebar"
-              ),
+              title: i18n.global.t("core.components.default_editor.toolbox.show_hide_sidebar"),
               action: () => {
                 showSidebar.value = !showSidebar.value;
               },
@@ -435,8 +404,7 @@ onMounted(async () => {
   const extensionsFromPlugins: Extensions = [];
 
   for (const pluginModule of pluginModules) {
-    const callbackFunction =
-      pluginModule?.extensionPoints?.["default:editor:extension:create"];
+    const callbackFunction = pluginModule?.extensionPoints?.["default:editor:extension:create"];
 
     if (typeof callbackFunction !== "function") {
       continue;
@@ -455,10 +423,7 @@ onMounted(async () => {
     emit("update", html);
   }, 250);
 
-  const extensions = filterDuplicateExtensions([
-    ...presetExtensions,
-    ...extensionsFromPlugins,
-  ]);
+  const extensions = filterDuplicateExtensions([...presetExtensions, ...extensionsFromPlugins]);
 
   editor.value = new VueEditor({
     content: props.raw,
@@ -504,11 +469,7 @@ watch(
 );
 
 // fixme: temporary solution
-const currentLocale = i18n.global.locale.value as
-  | "zh-CN"
-  | "en"
-  | "zh"
-  | "en-US";
+const currentLocale = i18n.global.locale.value as "zh-CN" | "en" | "zh" | "en-US";
 
 function onTitleInput(event: Event) {
   emit("update:title", (event.target as HTMLInputElement).value);
@@ -538,11 +499,10 @@ function onCoverSelect(attachments: AttachmentLike[]) {
   }
 }
 
-const { onChange: onCoverInputChange, open: openCoverInputDialog } =
-  useFileDialog({
-    accept: "image/*", // Set to accept only image files
-    multiple: false,
-  });
+const { onChange: onCoverInputChange, open: openCoverInputDialog } = useFileDialog({
+  accept: "image/*", // Set to accept only image files
+  multiple: false,
+});
 
 const uploadProgress = ref(0);
 
@@ -554,9 +514,7 @@ onCoverInputChange((files) => {
   props
     .uploadImage?.(file, {
       onUploadProgress: (progress) => {
-        uploadProgress.value = Math.round(
-          (progress.loaded * 100) / (progress.total || 1)
-        );
+        uploadProgress.value = Math.round((progress.loaded * 100) / (progress.total || 1));
       },
     })
     .then((attachment) => {
@@ -579,44 +537,34 @@ onCoverInputChange((files) => {
   <VLoading v-if="!isInitialized" />
   <div v-else>
     <AttachmentSelectorModal
+      v-if="attachmentSelectorModalVisible"
       v-bind="attachmentOptions"
-      v-model:visible="attachmentSelectorModal"
       @select="onAttachmentSelect"
-      @close="handleCloseAttachmentSelectorModal"
+      @close="onAttachmentSelectorModalClose"
     />
     <!-- For cover image -->
     <AttachmentSelectorModal
-      v-model:visible="coverSelectorModalVisible"
+      v-if="coverSelectorModalVisible"
       :min="1"
       :max="1"
       :accepts="['image/*']"
       @select="onCoverSelect"
+      @close="coverSelectorModalVisible = false"
     />
     <RichTextEditor v-if="editor" :editor="editor" :locale="currentLocale">
       <template #content>
         <div class="group">
-          <div
-            v-if="cover || uploadProgress"
-            class="group/cover aspect-h-7 aspect-w-16 overflow-hidden rounded-lg"
-          >
+          <div v-if="cover || uploadProgress" class="group/cover aspect-h-7 aspect-w-16 overflow-hidden rounded-lg">
             <img
               v-if="cover"
               :src="generateThumbnailUrl(cover, GetThumbnailByUriSizeEnum.Xl)"
               class="size-full object-cover"
             />
-            <div
-              v-if="uploadProgress"
-              class="flex flex-col items-center justify-center bg-black/50 text-white"
-            >
+            <div v-if="uploadProgress" class="flex flex-col items-center justify-center bg-black/50 text-white">
               <VLoading class="!py-3" />
               <span class="text-sm">{{ uploadProgress }}%</span>
             </div>
-            <HasPermission
-              :permissions="[
-                'system:attachments:view',
-                'uc:attachments:manage',
-              ]"
-            >
+            <HasPermission :permissions="['system:attachments:view', 'uc:attachments:manage']">
               <div
                 class="!bottom-2 !left-auto !right-2 !top-auto !size-auto opacity-0 shadow-lg transition-opacity group-hover/cover:opacity-100"
               >
@@ -625,26 +573,16 @@ onCoverInputChange((files) => {
                     <template #icon>
                       <IconExchange />
                     </template>
-                    {{
-                      $t("core.components.default_editor.cover.options.change")
-                    }}
+                    {{ $t("core.components.default_editor.cover.options.change") }}
                   </VButton>
                   <template #popper>
                     <HasPermission :permissions="['uc:attachments:manage']">
                       <VDropdownItem @click="openCoverInputDialog()">
-                        {{
-                          $t(
-                            "core.components.default_editor.cover.options.upload"
-                          )
-                        }}
+                        {{ $t("core.components.default_editor.cover.options.upload") }}
                       </VDropdownItem>
                     </HasPermission>
                     <VDropdownItem @click="coverSelectorModalVisible = true">
-                      {{
-                        $t(
-                          "core.components.default_editor.cover.options.attachment"
-                        )
-                      }}
+                      {{ $t("core.components.default_editor.cover.options.attachment") }}
                     </VDropdownItem>
                     <VDropdownItem @click="emit('update:cover', undefined)">
                       {{ $t("core.common.buttons.delete") }}
@@ -654,9 +592,7 @@ onCoverInputChange((files) => {
               </div>
             </HasPermission>
           </div>
-          <HasPermission
-            :permissions="['system:attachments:view', 'uc:attachments:manage']"
-          >
+          <HasPermission :permissions="['system:attachments:view', 'uc:attachments:manage']">
             <div
               class="mt-2 opacity-0"
               :class="{
@@ -674,19 +610,11 @@ onCoverInputChange((files) => {
                 <template #popper>
                   <HasPermission :permissions="['uc:attachments:manage']">
                     <VDropdownItem @click="openCoverInputDialog()">
-                      {{
-                        $t(
-                          "core.components.default_editor.cover.options.upload"
-                        )
-                      }}
+                      {{ $t("core.components.default_editor.cover.options.upload") }}
                     </VDropdownItem>
                   </HasPermission>
                   <VDropdownItem @click="coverSelectorModalVisible = true">
-                    {{
-                      $t(
-                        "core.components.default_editor.cover.options.attachment"
-                      )
-                    }}
+                    {{ $t("core.components.default_editor.cover.options.attachment") }}
                   </VDropdownItem>
                 </template>
               </VDropdown>
@@ -696,13 +624,12 @@ onCoverInputChange((files) => {
             ref="editorTitleRef"
             :value="title"
             type="text"
-            :placeholder="
-              $t('core.components.default_editor.title_placeholder')
-            "
+            :placeholder="$t('core.components.default_editor.title_placeholder')"
             class="w-full border-x-0 !border-b border-t-0 !border-solid !border-gray-100 p-0 !py-2 text-4xl font-semibold leading-none placeholder:text-gray-300"
             @input="onTitleInput"
             @keydown.enter="handleFocusEditor"
           />
+          <slot name="content" />
         </div>
       </template>
       <template v-if="showSidebar" #extra>
@@ -713,18 +640,13 @@ onCoverInputChange((files) => {
           defer
         >
           <VTabs v-model:active-id="extraActiveId" type="outline">
-            <VTabItem
-              id="toc"
-              :label="$t('core.components.default_editor.tabs.toc.title')"
-            >
+            <VTabItem id="toc" :label="$t('core.components.default_editor.tabs.toc.title')">
               <div class="p-1 pt-0">
                 <ul v-if="headingNodes?.length" class="space-y-1">
                   <li
                     v-for="(node, index) in headingNodes"
                     :key="index"
-                    :class="[
-                      { 'bg-gray-100': node.id === selectedHeadingNode?.id },
-                    ]"
+                    :class="[{ 'bg-gray-100': node.id === selectedHeadingNode?.id }]"
                     class="group cursor-pointer truncate rounded-base px-1.5 py-1 text-sm text-gray-600 hover:bg-gray-100 hover:text-gray-900"
                     @click="handleSelectHeadingNode(node)"
                   >
@@ -754,29 +676,18 @@ onCoverInputChange((files) => {
                 </div>
               </div>
             </VTabItem>
-            <VTabItem
-              id="information"
-              :label="$t('core.components.default_editor.tabs.detail.title')"
-            >
+            <VTabItem id="information" :label="$t('core.components.default_editor.tabs.detail.title')">
               <div class="flex flex-col gap-2 p-1 pt-0">
                 <div class="grid grid-cols-2 gap-2">
                   <div
                     class="group flex cursor-pointer flex-col gap-y-5 rounded-md bg-gray-100 px-1.5 py-1 transition-all"
                   >
                     <div class="flex items-center justify-between">
-                      <div
-                        class="text-sm text-gray-500 group-hover:text-gray-900"
-                      >
-                        {{
-                          $t(
-                            "core.components.default_editor.tabs.detail.fields.character_count"
-                          )
-                        }}
+                      <div class="text-sm text-gray-500 group-hover:text-gray-900">
+                        {{ $t("core.components.default_editor.tabs.detail.fields.character_count") }}
                       </div>
                       <div class="rounded bg-gray-200 p-0.5">
-                        <IconCharacterRecognition
-                          class="h-4 w-4 text-gray-600 group-hover:text-gray-900"
-                        />
+                        <IconCharacterRecognition class="h-4 w-4 text-gray-600 group-hover:text-gray-900" />
                       </div>
                     </div>
                     <div class="text-base font-medium text-gray-900">
@@ -787,19 +698,11 @@ onCoverInputChange((files) => {
                     class="group flex cursor-pointer flex-col gap-y-5 rounded-md bg-gray-100 px-1.5 py-1 transition-all"
                   >
                     <div class="flex items-center justify-between">
-                      <div
-                        class="text-sm text-gray-500 group-hover:text-gray-900"
-                      >
-                        {{
-                          $t(
-                            "core.components.default_editor.tabs.detail.fields.word_count"
-                          )
-                        }}
+                      <div class="text-sm text-gray-500 group-hover:text-gray-900">
+                        {{ $t("core.components.default_editor.tabs.detail.fields.word_count") }}
                       </div>
                       <div class="rounded bg-gray-200 p-0.5">
-                        <IconCharacterRecognition
-                          class="h-4 w-4 text-gray-600 group-hover:text-gray-900"
-                        />
+                        <IconCharacterRecognition class="h-4 w-4 text-gray-600 group-hover:text-gray-900" />
                       </div>
                     </div>
                     <div class="text-base font-medium text-gray-900">
@@ -813,28 +716,15 @@ onCoverInputChange((files) => {
                     class="group flex cursor-pointer flex-col gap-y-5 rounded-md bg-gray-100 px-1.5 py-1 transition-all"
                   >
                     <div class="flex items-center justify-between">
-                      <div
-                        class="text-sm text-gray-500 group-hover:text-gray-900"
-                      >
-                        {{
-                          $t(
-                            "core.components.default_editor.tabs.detail.fields.publish_time"
-                          )
-                        }}
+                      <div class="text-sm text-gray-500 group-hover:text-gray-900">
+                        {{ $t("core.components.default_editor.tabs.detail.fields.publish_time") }}
                       </div>
                       <div class="rounded bg-gray-200 p-0.5">
-                        <IconCalendar
-                          class="h-4 w-4 text-gray-600 group-hover:text-gray-900"
-                        />
+                        <IconCalendar class="h-4 w-4 text-gray-600 group-hover:text-gray-900" />
                       </div>
                     </div>
                     <div class="text-base font-medium text-gray-900">
-                      {{
-                        formatDatetime(publishTime) ||
-                        $t(
-                          "core.components.default_editor.tabs.detail.fields.draft"
-                        )
-                      }}
+                      {{ formatDatetime(publishTime) || $t("core.components.default_editor.tabs.detail.fields.draft") }}
                     </div>
                   </div>
                 </div>
@@ -843,19 +733,11 @@ onCoverInputChange((files) => {
                     class="group flex cursor-pointer flex-col gap-y-5 rounded-md bg-gray-100 px-1.5 py-1 transition-all"
                   >
                     <div class="flex items-center justify-between">
-                      <div
-                        class="text-sm text-gray-500 group-hover:text-gray-900"
-                      >
-                        {{
-                          $t(
-                            "core.components.default_editor.tabs.detail.fields.owner"
-                          )
-                        }}
+                      <div class="text-sm text-gray-500 group-hover:text-gray-900">
+                        {{ $t("core.components.default_editor.tabs.detail.fields.owner") }}
                       </div>
                       <div class="rounded bg-gray-200 p-0.5">
-                        <IconUserFollow
-                          class="h-4 w-4 text-gray-600 group-hover:text-gray-900"
-                        />
+                        <IconUserFollow class="h-4 w-4 text-gray-600 group-hover:text-gray-900" />
                       </div>
                     </div>
                     <div class="text-base font-medium text-gray-900">
@@ -868,19 +750,11 @@ onCoverInputChange((files) => {
                     class="group flex cursor-pointer flex-col gap-y-5 rounded-md bg-gray-100 px-1.5 py-1 transition-all"
                   >
                     <div class="flex items-center justify-between">
-                      <div
-                        class="text-sm text-gray-500 group-hover:text-gray-900"
-                      >
-                        {{
-                          $t(
-                            "core.components.default_editor.tabs.detail.fields.permalink"
-                          )
-                        }}
+                      <div class="text-sm text-gray-500 group-hover:text-gray-900">
+                        {{ $t("core.components.default_editor.tabs.detail.fields.permalink") }}
                       </div>
                       <div class="rounded bg-gray-200 p-0.5">
-                        <IconLink
-                          class="h-4 w-4 text-gray-600 group-hover:text-gray-900"
-                        />
+                        <IconLink class="h-4 w-4 text-gray-600 group-hover:text-gray-900" />
                       </div>
                     </div>
                     <div>

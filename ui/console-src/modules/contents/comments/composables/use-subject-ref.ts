@@ -1,21 +1,13 @@
 import { usePluginModuleStore } from "@/stores/plugin";
-import type {
-  Extension,
-  ListedComment,
-  Post,
-  SinglePage,
-} from "@halo-dev/api-client";
-import type {
-  CommentSubjectRefProvider,
-  CommentSubjectRefResult,
-} from "@halo-dev/console-shared";
-import { computed, onMounted, ref } from "vue";
+import type { Extension, ListedComment, Post, SinglePage } from "@halo-dev/api-client";
+import type { CommentSubjectRefProvider, CommentSubjectRefResult } from "@halo-dev/console-shared";
+import { computed, onMounted, shallowRef } from "vue";
 import { useI18n } from "vue-i18n";
 
 export function useSubjectRef(comment: ListedComment) {
   const { t } = useI18n();
 
-  const SubjectRefProviders = ref<CommentSubjectRefProvider[]>([
+  const SubjectRefProviders = shallowRef<CommentSubjectRefProvider[]>([
     {
       kind: "Post",
       group: "content.halo.run",
@@ -58,8 +50,7 @@ export function useSubjectRef(comment: ListedComment) {
 
   onMounted(() => {
     for (const pluginModule of pluginModules) {
-      const callbackFunction =
-        pluginModule?.extensionPoints?.["comment:subject-ref:create"];
+      const callbackFunction = pluginModule?.extensionPoints?.["comment:subject-ref:create"];
 
       if (typeof callbackFunction !== "function") {
         continue;
@@ -67,7 +58,7 @@ export function useSubjectRef(comment: ListedComment) {
 
       const providers = callbackFunction();
 
-      SubjectRefProviders.value.push(...providers);
+      SubjectRefProviders.value = [...SubjectRefProviders.value, ...providers];
     }
   });
 
@@ -80,9 +71,7 @@ export function useSubjectRef(comment: ListedComment) {
       };
     }
     const subjectRef = SubjectRefProviders.value.find(
-      (provider) =>
-        provider.kind === subject.kind &&
-        subject.apiVersion.startsWith(provider.group)
+      (provider) => provider.kind === subject.kind && subject.apiVersion.startsWith(provider.group)
     );
     if (!subjectRef) {
       return {

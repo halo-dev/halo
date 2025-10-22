@@ -5,16 +5,7 @@ import type { Plugin } from "@halo-dev/api-client";
 import { VButton, VModal, VTabbar } from "@halo-dev/components";
 import type { PluginInstallationTab } from "@halo-dev/console-shared";
 import { useRouteQuery } from "@vueuse/router";
-import {
-  computed,
-  markRaw,
-  nextTick,
-  onMounted,
-  provide,
-  ref,
-  toRefs,
-  type Ref,
-} from "vue";
+import { computed, markRaw, nextTick, onMounted, provide, ref, shallowRef, toRefs, type Ref } from "vue";
 import { useI18n } from "vue-i18n";
 import LocalUpload from "./installation-tabs/LocalUpload.vue";
 import RemoteDownload from "./installation-tabs/RemoteDownload.vue";
@@ -40,7 +31,7 @@ provide<Ref<Plugin | undefined>>("pluginToUpgrade", pluginToUpgrade);
 
 const modal = ref<InstanceType<typeof VModal> | null>(null);
 
-const tabs = ref<PluginInstallationTab[]>([
+const tabs = shallowRef<PluginInstallationTab[]>([
   {
     id: "local",
     label: t("core.plugin.upload_modal.tabs.local"),
@@ -66,9 +57,7 @@ const modalTitle = computed(() => {
 });
 
 // handle remote download url from route
-const routeRemoteDownloadUrl = useRouteQuery<string | null>(
-  "remote-download-url"
-);
+const routeRemoteDownloadUrl = useRouteQuery<string | null>("remote-download-url");
 
 onMounted(() => {
   if (routeRemoteDownloadUrl.value) {
@@ -83,8 +72,7 @@ const { pluginModules } = usePluginModuleStore();
 onMounted(async () => {
   for (const pluginModule of pluginModules) {
     try {
-      const callbackFunction =
-        pluginModule?.extensionPoints?.["plugin:installation:tabs:create"];
+      const callbackFunction = pluginModule?.extensionPoints?.["plugin:installation:tabs:create"];
 
       if (typeof callbackFunction !== "function") {
         continue;
@@ -129,12 +117,7 @@ onMounted(async () => {
     />
     <div class="mt-2">
       <template v-for="tab in tabs" :key="tab.id">
-        <component
-          :is="tab.component"
-          v-bind="tab.props"
-          v-if="tab.id === activeTabId"
-          @close-modal="modal?.close()"
-        />
+        <component :is="tab.component" v-bind="tab.props" v-if="tab.id === activeTabId" @close-modal="modal?.close()" />
       </template>
     </div>
     <template #footer>

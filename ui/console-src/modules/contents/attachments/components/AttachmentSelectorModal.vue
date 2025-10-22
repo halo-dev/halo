@@ -1,11 +1,8 @@
 <script lang="ts" setup>
 import { usePluginModuleStore } from "@/stores/plugin";
 import { VButton, VModal, VSpace, VTabbar } from "@halo-dev/components";
-import type {
-  AttachmentLike,
-  AttachmentSelectProvider,
-} from "@halo-dev/console-shared";
-import { computed, markRaw, onMounted, ref } from "vue";
+import type { AttachmentLike, AttachmentSelectProvider } from "@halo-dev/console-shared";
+import { computed, markRaw, onMounted, ref, shallowRef, useTemplateRef } from "vue";
 import { useI18n } from "vue-i18n";
 import CoreSelectorProvider from "./selector-providers/CoreSelectorProvider.vue";
 
@@ -13,13 +10,11 @@ const { t } = useI18n();
 
 const props = withDefaults(
   defineProps<{
-    visible: boolean;
     accepts?: string[];
     min?: number;
     max?: number;
   }>(),
   {
-    visible: false,
     accepts: () => ["*/*"],
     min: undefined,
     max: undefined,
@@ -27,14 +22,14 @@ const props = withDefaults(
 );
 
 const emit = defineEmits<{
-  (event: "update:visible", visible: boolean): void;
   (event: "close"): void;
   (event: "select", attachments: AttachmentLike[]): void;
 }>();
 
 const selected = ref<AttachmentLike[]>([] as AttachmentLike[]);
+const modal = useTemplateRef<InstanceType<typeof VModal> | null>("modal");
 
-const attachmentSelectProviders = ref<AttachmentSelectProvider[]>([
+const attachmentSelectProviders = shallowRef<AttachmentSelectProvider[]>([
   {
     id: "core",
     label: t("core.attachment.select_modal.providers.default.label"),
@@ -48,15 +43,14 @@ const { pluginModules } = usePluginModuleStore();
 onMounted(async () => {
   for (const pluginModule of pluginModules) {
     try {
-      const callbackFunction =
-        pluginModule?.extensionPoints?.["attachment:selector:create"];
+      const callbackFunction = pluginModule?.extensionPoints?.["attachment:selector:create"];
 
       if (typeof callbackFunction !== "function") {
         continue;
       }
 
       const providers = await callbackFunction();
-      attachmentSelectProviders.value.push(...providers);
+      attachmentSelectProviders.value = [...attachmentSelectProviders.value, ...providers].flat();
     } catch (error) {
       console.error(`Error processing plugin module:`, pluginModule, error);
     }
@@ -65,17 +59,8 @@ onMounted(async () => {
 
 const activeId = ref(attachmentSelectProviders.value[0].id);
 
-const onVisibleChange = (visible: boolean) => {
-  emit("update:visible", visible);
-  if (!visible) {
-    emit("close");
-  }
-};
-
 const onChangeProvider = (providerId: string) => {
-  const provider = attachmentSelectProviders.value.find(
-    (provider) => provider.id === providerId
-  );
+  const provider = attachmentSelectProviders.value.find((provider) => provider.id === providerId);
 
   if (!provider) {
     return;
@@ -86,7 +71,7 @@ const onChangeProvider = (providerId: string) => {
 
 const handleConfirm = () => {
   emit("select", Array.from(selected.value));
-  onVisibleChange(false);
+  modal.value?.close();
 };
 
 const confirmDisabled = computed(() => {
@@ -105,13 +90,13 @@ const confirmCountMessage = computed(() => {
 </script>
 <template>
   <VModal
-    :visible="visible"
+    ref="modal"
     :width="1240"
     :mount-to-body="true"
     :layer-closable="true"
     :title="$t('core.attachment.select_modal.title')"
     height="calc(100vh - 20px)"
-    @update:visible="onVisibleChange"
+    @close="emit('close')"
   >
     <VTabbar
       v-model:active-id="activeId"
@@ -125,11 +110,8 @@ const confirmCountMessage = computed(() => {
       type="outline"
     ></VTabbar>
 
-    <div v-if="visible" class="mt-2">
-      <template
-        v-for="(provider, index) in attachmentSelectProviders"
-        :key="index"
-      >
+    <div class="mt-2">
+      <template v-for="provider in attachmentSelectProviders" :key="provider.id">
         <Suspense>
           <component
             :is="provider.component"
@@ -148,11 +130,7 @@ const confirmCountMessage = computed(() => {
     </div>
     <template #footer>
       <VSpace>
-        <VButton
-          type="secondary"
-          :disabled="confirmDisabled"
-          @click="handleConfirm"
-        >
+        <VButton type="secondary" :disabled="confirmDisabled" @click="handleConfirm">
           {{ $t("core.common.buttons.confirm") }}
           <span v-if="selected.length || props.min || props.max">
             {{
@@ -162,7 +140,7 @@ const confirmCountMessage = computed(() => {
             }}
           </span>
         </VButton>
-        <VButton @click="onVisibleChange(false)">
+        <VButton @click="modal?.close()">
           {{ $t("core.common.buttons.cancel") }}
         </VButton>
       </VSpace>

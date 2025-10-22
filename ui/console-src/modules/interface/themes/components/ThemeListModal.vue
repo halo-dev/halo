@@ -5,17 +5,7 @@ import type { Theme } from "@halo-dev/api-client";
 import { VButton, VModal, VTabbar } from "@halo-dev/components";
 import type { ThemeListTab } from "@halo-dev/console-shared";
 import { useRouteQuery } from "@vueuse/router";
-import {
-  computed,
-  inject,
-  markRaw,
-  nextTick,
-  onMounted,
-  provide,
-  ref,
-  watch,
-  type Ref,
-} from "vue";
+import { computed, inject, markRaw, nextTick, onMounted, provide, ref, shallowRef, watch, type Ref } from "vue";
 import { useI18n } from "vue-i18n";
 import InstalledThemes from "./list-tabs/InstalledThemes.vue";
 import LocalUpload from "./list-tabs/LocalUpload.vue";
@@ -34,7 +24,7 @@ const emit = defineEmits<{
 
 const modal = ref<InstanceType<typeof VModal> | null>(null);
 
-const tabs = ref<ThemeListTab[]>([
+const tabs = shallowRef<ThemeListTab[]>([
   {
     id: "installed",
     label: t("core.theme.list_modal.tabs.installed"),
@@ -98,8 +88,7 @@ onMounted(async () => {
 
   for (const pluginModule of pluginModules) {
     try {
-      const callbackFunction =
-        pluginModule?.extensionPoints?.["theme:list:tabs:create"];
+      const callbackFunction = pluginModule?.extensionPoints?.["theme:list:tabs:create"];
 
       if (typeof callbackFunction !== "function") {
         continue;
@@ -125,13 +114,7 @@ onMounted(async () => {
 });
 </script>
 <template>
-  <VModal
-    ref="modal"
-    :width="920"
-    height="calc(100vh - 20px)"
-    :title="modalTitle"
-    @close="emit('close')"
-  >
+  <VModal ref="modal" :width="920" height="calc(100vh - 20px)" :title="modalTitle" @close="emit('close')">
     <VTabbar
       v-model:active-id="activeTabId"
       :items="
@@ -144,11 +127,7 @@ onMounted(async () => {
 
     <div class="mt-2">
       <template v-for="tab in tabs" :key="tab.id">
-        <component
-          :is="tab.component"
-          v-bind="tab.props"
-          v-if="tab.id === activeTabId"
-        />
+        <component :is="tab.component" v-bind="tab.props" v-if="tab.id === activeTabId" />
       </template>
     </div>
 

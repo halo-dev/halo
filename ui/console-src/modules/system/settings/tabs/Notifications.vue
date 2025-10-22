@@ -4,7 +4,7 @@ import { coreApiClient } from "@halo-dev/api-client";
 import { VTabbar } from "@halo-dev/components";
 import { useQuery } from "@tanstack/vue-query";
 import type { Component, ComputedRef, Raw } from "vue";
-import { computed, markRaw, provide, ref } from "vue";
+import { computed, markRaw, provide, ref, shallowRef } from "vue";
 import NotificationSetting from "./NotificationSetting.vue";
 
 interface Tab {
@@ -13,15 +13,14 @@ interface Tab {
   component: Raw<Component>;
 }
 
-const tabs = ref<Tab[]>();
+const tabs = shallowRef<Tab[]>();
 
 const activeTab = ref();
 
 const { data: notifierDescriptors } = useQuery({
   queryKey: ["notifier-descriptors"],
   queryFn: async () => {
-    const { data } =
-      await coreApiClient.notification.notifierDescriptor.listNotifierDescriptor();
+    const { data } = await coreApiClient.notification.notifierDescriptor.listNotifierDescriptor();
     return data.items;
   },
   onSuccess(data) {
@@ -42,15 +41,10 @@ const { data: notifierDescriptors } = useQuery({
 });
 
 const notifierDescriptor = computed(() => {
-  return notifierDescriptors.value?.find(
-    (item) => item.metadata.name === activeTab.value
-  );
+  return notifierDescriptors.value?.find((item) => item.metadata.name === activeTab.value);
 });
 
-provide<ComputedRef<NotifierDescriptor | undefined>>(
-  "notifierDescriptor",
-  notifierDescriptor
-);
+provide<ComputedRef<NotifierDescriptor | undefined>>("notifierDescriptor", notifierDescriptor);
 </script>
 
 <template>
