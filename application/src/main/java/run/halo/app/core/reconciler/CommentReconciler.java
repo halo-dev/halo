@@ -4,9 +4,9 @@ import static org.apache.commons.lang3.ObjectUtils.defaultIfNull;
 import static run.halo.app.extension.ExtensionUtil.addFinalizers;
 import static run.halo.app.extension.ExtensionUtil.isDeleted;
 import static run.halo.app.extension.ExtensionUtil.removeFinalizers;
-import static run.halo.app.extension.index.query.QueryFactory.and;
-import static run.halo.app.extension.index.query.QueryFactory.equal;
-import static run.halo.app.extension.index.query.QueryFactory.isNull;
+import static run.halo.app.extension.index.query.Queries.and;
+import static run.halo.app.extension.index.query.Queries.equal;
+import static run.halo.app.extension.index.query.Queries.isNull;
 
 import java.time.Instant;
 import java.util.Map;
@@ -35,7 +35,7 @@ import run.halo.app.extension.SchemeManager;
 import run.halo.app.extension.controller.Controller;
 import run.halo.app.extension.controller.ControllerBuilder;
 import run.halo.app.extension.controller.Reconciler;
-import run.halo.app.extension.index.query.Query;
+import run.halo.app.extension.index.query.Condition;
 import run.halo.app.extension.router.selector.FieldSelector;
 
 /**
@@ -173,7 +173,7 @@ public class CommentReconciler implements Reconciler<Reconciler.Request> {
             .getTotal();
     }
 
-    private static Query getBaseQuery(Ref commentSubjectRef) {
+    private static Condition getBaseQuery(Ref commentSubjectRef) {
         return and(equal("spec.subjectRef", Comment.toSubjectRefKey(commentSubjectRef)),
             isNull("metadata.deletionTimestamp"));
     }

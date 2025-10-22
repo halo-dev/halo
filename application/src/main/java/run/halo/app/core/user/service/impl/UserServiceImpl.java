@@ -1,7 +1,7 @@
 package run.halo.app.core.user.service.impl;
 
 import static run.halo.app.extension.ExtensionUtil.defaultSort;
-import static run.halo.app.extension.index.query.QueryFactory.equal;
+import static run.halo.app.extension.index.query.Queries.equal;
 
 import java.time.Clock;
 import java.time.Duration;
@@ -41,7 +41,7 @@ import run.halo.app.extension.ListOptions;
 import run.halo.app.extension.Metadata;
 import run.halo.app.extension.ReactiveExtensionClient;
 import run.halo.app.extension.exception.ExtensionNotFoundException;
-import run.halo.app.extension.index.query.QueryFactory;
+import run.halo.app.extension.index.query.Queries;
 import run.halo.app.extension.router.selector.FieldSelector;
 import run.halo.app.infra.SystemConfigurableEnvironmentFetcher;
 import run.halo.app.infra.SystemSetting;
@@ -103,7 +103,7 @@ public class UserServiceImpl implements UserService {
         var nameSet = new HashSet<>(names);
         nameSet.add(GHOST_USER_NAME);
         var options = ListOptions.builder()
-            .andQuery(QueryFactory.in("metadata.name", nameSet))
+            .andQuery(Queries.in("metadata.name", nameSet))
             .build();
         return client.listAll(User.class, options, defaultSort())
             .collectMap(u -> u.getMetadata().getName())

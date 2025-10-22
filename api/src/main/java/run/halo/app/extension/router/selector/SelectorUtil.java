@@ -4,7 +4,7 @@ import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 import run.halo.app.extension.ListOptions;
-import run.halo.app.extension.index.query.QueryFactory;
+import run.halo.app.extension.index.query.Condition;
 
 public final class SelectorUtil {
 
@@ -23,7 +23,7 @@ public final class SelectorUtil {
         var selectorConverter = new SelectorConverter();
 
         var labelConverter = new LabelSelectorConverter();
-        var labelMatchers = Optional.ofNullable(labelSelectorTerms)
+        var labelConditions = Optional.ofNullable(labelSelectorTerms)
             .map(selectors -> selectors.stream()
                 .map(selectorConverter::convert)
                 .filter(Objects::nonNull)
@@ -32,18 +32,19 @@ public final class SelectorUtil {
             .orElse(List.of());
 
         var fieldConverter = new FieldSelectorConverter();
-        var fieldQuery = Optional.ofNullable(fieldSelectorTerms)
+        var fieldCondition = Optional.ofNullable(fieldSelectorTerms)
             .map(selectors -> selectors.stream()
                 .map(selectorConverter::convert)
                 .filter(Objects::nonNull)
                 .map(fieldConverter::convert)
-                .toList()
+                .reduce(Condition::and)
+                .orElse(null)
             )
-            .orElse(List.of());
+            .orElse(null);
         var listOptions = new ListOptions();
-        listOptions.setLabelSelector(new LabelSelector().setMatchers(labelMatchers));
-        if (!fieldQuery.isEmpty()) {
-            listOptions.setFieldSelector(FieldSelector.of(QueryFactory.and(fieldQuery)));
+        listOptions.setLabelSelector(new LabelSelector().setConditions(labelConditions));
+        if (fieldCondition != null) {
+            listOptions.setFieldSelector(FieldSelector.of(fieldCondition));
         } else {
             listOptions.setFieldSelector(FieldSelector.all());
         }

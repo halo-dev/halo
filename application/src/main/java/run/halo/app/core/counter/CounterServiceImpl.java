@@ -9,7 +9,7 @@ import run.halo.app.core.extension.Counter;
 import run.halo.app.extension.ExtensionUtil;
 import run.halo.app.extension.ListOptions;
 import run.halo.app.extension.ReactiveExtensionClient;
-import run.halo.app.extension.index.query.QueryFactory;
+import run.halo.app.extension.index.query.Queries;
 
 /**
  * Counter service implementation.
@@ -37,7 +37,7 @@ public class CounterServiceImpl implements CounterService {
             return Flux.empty();
         }
         var options = ListOptions.builder()
-            .andQuery(QueryFactory.in("metadata.name", names))
+            .andQuery(Queries.in("metadata.name", names))
             .build();
         return client.listAll(Counter.class, options, ExtensionUtil.defaultSort());
     }

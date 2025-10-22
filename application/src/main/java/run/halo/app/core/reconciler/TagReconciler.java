@@ -2,7 +2,7 @@ package run.halo.app.core.reconciler;
 
 import static run.halo.app.extension.ExtensionUtil.addFinalizers;
 import static run.halo.app.extension.ExtensionUtil.removeFinalizers;
-import static run.halo.app.extension.index.query.QueryFactory.equal;
+import static run.halo.app.extension.index.query.Queries.equal;
 
 import java.util.Map;
 import java.util.Set;

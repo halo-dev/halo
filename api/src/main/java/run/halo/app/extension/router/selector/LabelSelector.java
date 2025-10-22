@@ -1,38 +1,31 @@
 package run.halo.app.extension.router.selector;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
-import java.util.Map;
-import java.util.function.Predicate;
-import java.util.stream.Collectors;
 import lombok.Data;
 import lombok.experimental.Accessors;
-import org.springframework.lang.NonNull;
-import org.springframework.util.Assert;
+import org.springframework.util.CollectionUtils;
+import run.halo.app.extension.index.query.Condition;
+import run.halo.app.extension.index.query.LabelCondition;
+import run.halo.app.extension.index.query.Queries;
 
 @Data
 @Accessors(chain = true)
-public class LabelSelector implements Predicate<Map<String, String>> {
-    private List<SelectorMatcher> matchers;
+public class LabelSelector {
 
-    @Override
-    public boolean test(@NonNull Map<String, String> labels) {
-        Assert.notNull(labels, "Labels must not be null");
-        if (matchers == null || matchers.isEmpty()) {
-            return true;
-        }
-        return matchers.stream()
-            .allMatch(matcher -> matcher.test(labels.get(matcher.getKey())));
-    }
+    private List<LabelCondition> conditions;
 
     @Override
     public String toString() {
-        if (matchers == null || matchers.isEmpty()) {
-            return "";
+        if (CollectionUtils.isEmpty(conditions)) {
+            return Condition.empty().toString();
         }
-        return matchers.stream()
-            .map(SelectorMatcher::toString)
-            .collect(Collectors.joining(", "));
+        return conditions.stream()
+            .map(c -> (Condition) c)
+            .reduce(Condition::and)
+            .orElseGet(Condition::empty)
+            .toString();
     }
 
     /**
@@ -44,10 +37,10 @@ public class LabelSelector implements Predicate<Map<String, String>> {
      */
     public LabelSelector and(LabelSelector other) {
         var labelSelector = new LabelSelector();
-        var matchers = new ArrayList<SelectorMatcher>();
-        matchers.addAll(this.matchers);
-        matchers.addAll(other.matchers);
-        labelSelector.setMatchers(matchers);
+        var newConditions = new ArrayList<LabelCondition>();
+        newConditions.addAll(this.conditions);
+        newConditions.addAll(other.conditions);
+        labelSelector.setConditions(newConditions);
         return labelSelector;
     }
 
@@ -56,7 +49,7 @@ public class LabelSelector implements Predicate<Map<String, String>> {
     }
 
     public static class LabelSelectorBuilder<T extends LabelSelectorBuilder<T>> {
-        private final List<SelectorMatcher> matchers = new ArrayList<>();
+        private final List<LabelCondition> conditions = new ArrayList<>();
 
         public LabelSelectorBuilder() {
         }
@@ -64,9 +57,9 @@ public class LabelSelector implements Predicate<Map<String, String>> {
         /**
          * Create a new label selector builder with the given matchers.
          */
-        public LabelSelectorBuilder(List<SelectorMatcher> givenMatchers) {
-            if (givenMatchers != null) {
-                matchers.addAll(givenMatchers);
+        public LabelSelectorBuilder(List<LabelCondition> conditions) {
+            if (conditions != null) {
+                this.conditions.addAll(conditions);
             }
         }
 
@@ -76,32 +69,32 @@ public class LabelSelector implements Predicate<Map<String, String>> {
         }
 
         public T eq(String key, String value) {
-            matchers.add(EqualityMatcher.equal(key, value));
+            conditions.add(Queries.labelEqual(key, value));
             return self();
         }
 
         public T notEq(String key, String value) {
-            matchers.add(EqualityMatcher.notEqual(key, value));
+            conditions.add(Queries.labelEqual(key, value).not());
             return self();
         }
 
         public T in(String key, String... values) {
-            matchers.add(SetMatcher.in(key, values));
+            conditions.add(Queries.labelIn(key, Arrays.asList(values)));
             return self();
         }
 
         public T notIn(String key, String... values) {
-            matchers.add(SetMatcher.notIn(key, values));
+            conditions.add(Queries.labelIn(key, Arrays.asList(values)).not());
             return self();
         }
 
         public T exists(String key) {
-            matchers.add(SetMatcher.exists(key));
+            conditions.add(Queries.labelExists(key));
             return self();
         }
 
         public T notExists(String key) {
-            matchers.add(SetMatcher.notExists(key));
+            conditions.add(Queries.labelExists(key).not());
             return self();
         }
 
@@ -110,7 +103,7 @@ public class LabelSelector implements Predicate<Map<String, String>> {
          */
         public LabelSelector build() {
             var labelSelector = new LabelSelector();
-            labelSelector.setMatchers(matchers);
+            labelSelector.setConditions(conditions);
             return labelSelector;
         }
     }

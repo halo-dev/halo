@@ -28,7 +28,7 @@ import run.halo.app.core.extension.Device;
 import run.halo.app.extension.ListOptions;
 import run.halo.app.extension.Metadata;
 import run.halo.app.extension.ReactiveExtensionClient;
-import run.halo.app.extension.index.query.QueryFactory;
+import run.halo.app.extension.index.query.Queries;
 import run.halo.app.security.authentication.rememberme.PersistentRememberMeTokenRepository;
 
 @Slf4j
@@ -138,7 +138,7 @@ public class DeviceServiceImpl implements DeviceService {
     @Override
     public Mono<Void> revoke(String username) {
         var listOptions = ListOptions.builder()
-            .andQuery(QueryFactory.equal("spec.principalName", username))
+            .andQuery(Queries.equal("spec.principalName", username))
             .build();
         return client.listAll(Device.class, listOptions, defaultSort())
             .flatMap(this::removeRememberMeToken)

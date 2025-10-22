@@ -23,7 +23,7 @@ import run.halo.app.extension.ListOptions;
 import run.halo.app.extension.controller.Controller;
 import run.halo.app.extension.controller.ControllerBuilder;
 import run.halo.app.extension.controller.Reconciler;
-import run.halo.app.extension.index.query.QueryFactory;
+import run.halo.app.extension.index.query.Queries;
 
 /**
  * Reconciler for {@link Category}.
@@ -126,7 +126,7 @@ public class CategoryReconciler implements Reconciler<Reconciler.Request> {
 
     private void updateCategoryForPost(String categoryName) {
         var posts = client.listAll(Post.class, ListOptions.builder()
-            .fieldQuery(QueryFactory.equal("spec.categories", categoryName))
+            .fieldQuery(Queries.equal("spec.categories", categoryName))
             .build(), Sort.by("metadata.creationTimestamp", "metadata.name")
         );
         for (Post post : posts) {

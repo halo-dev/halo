@@ -2,8 +2,8 @@ package run.halo.app.content.comment;
 
 import static org.springdoc.core.fn.builders.parameter.Builder.parameterBuilder;
 import static org.springframework.data.domain.Sort.Order.desc;
-import static run.halo.app.extension.index.query.QueryFactory.contains;
-import static run.halo.app.extension.index.query.QueryFactory.equal;
+import static run.halo.app.extension.index.query.Queries.contains;
+import static run.halo.app.extension.index.query.Queries.equal;
 
 import io.swagger.v3.oas.annotations.enums.ParameterIn;
 import java.util.Optional;

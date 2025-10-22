@@ -2,10 +2,14 @@ package run.halo.app.extension;
 
 import static org.apache.commons.lang3.ObjectUtils.defaultIfNull;
 
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Sort;
 import org.springframework.util.Assert;
 
+@Slf4j
 public class PageRequestImpl implements PageRequest {
+
+    public static final int MAX_SIZE = 1_000;
 
     private final int pageNumber;
     private final int pageSize;
@@ -16,8 +20,13 @@ public class PageRequestImpl implements PageRequest {
         if (pageNumber < 1) {
             pageNumber = 1;
         }
-        if (pageSize < 0) {
-            pageSize = 0;
+        if (pageSize <= 0) {
+            log.warn("Page size must be greater than 0, reset to default {}", MAX_SIZE);
+            pageSize = MAX_SIZE;
+        }
+        if (pageSize > 1000) {
+            log.warn("Page size must not be greater than {}, reset to {}", MAX_SIZE, MAX_SIZE);
+            pageSize = MAX_SIZE;
         }
         this.pageNumber = pageNumber;
         this.pageSize = pageSize;

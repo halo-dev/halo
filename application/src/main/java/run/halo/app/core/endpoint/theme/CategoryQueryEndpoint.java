@@ -20,7 +20,7 @@ import run.halo.app.core.extension.endpoint.CustomEndpoint;
 import run.halo.app.extension.GroupVersion;
 import run.halo.app.extension.ListResult;
 import run.halo.app.extension.ReactiveExtensionClient;
-import run.halo.app.extension.index.query.QueryFactory;
+import run.halo.app.extension.index.query.Queries;
 import run.halo.app.extension.router.SortableRequest;
 import run.halo.app.theme.finders.PostPublicQueryService;
 import run.halo.app.theme.finders.vo.CategoryVo;
@@ -93,7 +93,7 @@ public class CategoryQueryEndpoint implements CustomEndpoint {
         final var query = new PostPublicQuery(request.exchange());
         var listOptions = query.toListOptions();
         var newFieldSelector = listOptions.getFieldSelector()
-            .andQuery(QueryFactory.equal("spec.categories", name));
+            .andQuery(Queries.equal("spec.categories", name));
         listOptions.setFieldSelector(newFieldSelector);
         return postPublicQueryService.list(listOptions, query.toPageRequest())
             .flatMap(result -> ServerResponse.ok()

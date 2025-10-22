@@ -1,43 +1,25 @@
 package run.halo.app.extension.index.query;
 
-import com.google.common.collect.Sets;
-import java.util.Collection;
-import java.util.NavigableSet;
-import java.util.stream.Collectors;
+import org.jetbrains.annotations.NotNull;
 
-public class And extends LogicalQuery {
-
-    /**
-     * Creates a new And query with the given child queries.
-     *
-     * @param childQueries The child queries
-     */
-    public And(Collection<Query> childQueries) {
-        super(childQueries);
-        if (this.size < 2) {
-            throw new IllegalStateException(
-                "An 'And' query cannot have fewer than 2 child queries, " + childQueries.size()
-                    + " were supplied");
-        }
-    }
+/**
+ * This condition is only for backward compatibility.
+ *
+ * @param left left condition
+ * @param right right condition
+ * @deprecated Use {@link Condition#and(Condition)} instead.
+ */
+@Deprecated(forRemoval = true, since = "2.22.0")
+public record And(Condition left, Condition right) implements Condition {
 
     @Override
-    public NavigableSet<String> matches(QueryIndexView indexView) {
-        NavigableSet<String> resultSet = null;
-        for (Query query : childQueries) {
-            NavigableSet<String> currentResult = query.matches(indexView);
-            if (resultSet == null) {
-                resultSet = Sets.newTreeSet(currentResult);
-            } else {
-                resultSet.retainAll(currentResult);
-            }
-        }
-        return resultSet == null ? Sets.newTreeSet() : resultSet;
+    public Condition not() {
+        return left.not().or(right.not());
     }
 
+    @NotNull
     @Override
     public String toString() {
-        return "(" + childQueries.stream().map(Query::toString)
-            .collect(Collectors.joining(" AND ")) + ")";
+        return "(" + left + " AND " + right + ")";
     }
 }

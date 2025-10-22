@@ -20,6 +20,7 @@ import org.openapi4j.schema.validator.ValidationData;
 import org.openapi4j.schema.validator.v3.SchemaValidator;
 import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Component;
+import org.springframework.util.Assert;
 import reactor.core.Exceptions;
 import run.halo.app.extension.event.SchemeRemovedEvent;
 import run.halo.app.extension.exception.ExtensionConvertException;
@@ -33,10 +34,10 @@ import run.halo.app.extension.store.ExtensionStore;
  */
 @Slf4j
 @Component
-public class JSONExtensionConverter implements ExtensionConverter {
+class JSONExtensionConverter implements ExtensionConverter {
 
     @Getter
-    public final ObjectMapper objectMapper;
+    public ObjectMapper objectMapper;
 
     private final SchemeManager schemeManager;
 
@@ -44,7 +45,17 @@ public class JSONExtensionConverter implements ExtensionConverter {
 
     public JSONExtensionConverter(SchemeManager schemeManager) {
         this.schemeManager = schemeManager;
-        this.objectMapper = OBJECT_MAPPER;
+        setObjectMapper(OBJECT_MAPPER);
+    }
+
+    /**
+     * Sets ObjectMapper.
+     *
+     * @param objectMapper the object mapper, must not be null
+     */
+    void setObjectMapper(ObjectMapper objectMapper) {
+        Assert.notNull(objectMapper, "ObjectMapper must not be null");
+        this.objectMapper = objectMapper;
     }
 
     @Override

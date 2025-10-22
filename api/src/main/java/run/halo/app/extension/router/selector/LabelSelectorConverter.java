@@ -6,38 +6,38 @@ import java.util.Set;
 import org.springframework.core.convert.converter.Converter;
 import org.springframework.lang.NonNull;
 import org.springframework.util.CollectionUtils;
+import run.halo.app.extension.index.query.LabelCondition;
+import run.halo.app.extension.index.query.Queries;
 
-public class LabelSelectorConverter implements Converter<SelectorCriteria, SelectorMatcher> {
+public class LabelSelectorConverter implements Converter<SelectorCriteria, LabelCondition> {
 
     @NonNull
     @Override
-    public SelectorMatcher convert(@NonNull SelectorCriteria criteria) {
+    public LabelCondition convert(@NonNull SelectorCriteria criteria) {
         switch (criteria.operator()) {
             case Equals -> {
-                return EqualityMatcher.equal(criteria.key(), getSingleValue(criteria));
+                return Queries.labelEqual(criteria.key(), getSingleValue(criteria));
             }
             case NotEquals -> {
-                return EqualityMatcher.notEqual(criteria.key(), getSingleValue(criteria));
+                return Queries.labelEqual(criteria.key(), getSingleValue(criteria)).not();
             }
             case NotExist -> {
-                return SetMatcher.notExists(criteria.key());
+                return Queries.labelExists(criteria.key()).not();
             }
             case Exist -> {
-                return SetMatcher.exists(criteria.key());
+                return Queries.labelExists(criteria.key());
             }
             case IN -> {
-                var valueArr =
-                    defaultIfNull(criteria.values(), Set.<String>of()).toArray(new String[0]);
-                return SetMatcher.in(criteria.key(), valueArr);
+                return Queries.labelIn(criteria.key(), defaultIfNull(criteria.values(), Set.of()));
             }
-            default -> throw new IllegalArgumentException(
-                "Unsupported operator: " + criteria.operator());
+            default ->
+                throw new IllegalArgumentException("Unsupported operator: " + criteria.operator());
         }
     }
 
     String getSingleValue(SelectorCriteria criteria) {
         if (CollectionUtils.isEmpty(criteria.values())) {
-            return null;
+            throw new IllegalArgumentException("No value present for label key: " + criteria.key());
         }
         return criteria.values().iterator().next();
     }
