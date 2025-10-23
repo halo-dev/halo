@@ -1,8 +1,8 @@
 <script lang="ts" setup>
 import { useAppTitle } from "@/composables/use-title";
 import { i18n } from "@/locales";
-import { useGlobalInfoStore } from "@/stores/global-info";
 import type { FormKitConfig } from "@formkit/core";
+import { stores } from "@halo-dev/console-shared";
 import { useFavicon } from "@vueuse/core";
 import type { OverlayScrollbars } from "overlayscrollbars";
 import {
@@ -15,7 +15,7 @@ import { RouterView } from "vue-router";
 
 useAppTitle();
 
-const { globalInfo } = storeToRefs(useGlobalInfoStore());
+const { globalInfo } = storeToRefs(stores.globalInfo());
 
 // Favicon
 const defaultFavicon = "/console/favicon.ico";

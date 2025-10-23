@@ -1,6 +1,5 @@
 <script lang="ts" setup>
-import { usePermission } from "@/utils/permission";
-import type { EntityFieldItem } from "@halo-dev/console-shared";
+import { utils, type EntityFieldItem } from "@halo-dev/console-shared";
 
 withDefaults(
   defineProps<{
@@ -8,8 +7,6 @@ withDefaults(
   }>(),
   {}
 );
-
-const { currentUserHasPermission } = usePermission();
 </script>
 
 <template>
@@ -20,7 +17,7 @@ const { currentUserHasPermission } = usePermission();
     <component
       :is="field.component"
       v-bind="field.props"
-      v-if="!field.hidden && currentUserHasPermission(field.permissions)"
+      v-if="!field.hidden && utils.permission.has(field.permissions || [])"
     />
   </template>
 </template>

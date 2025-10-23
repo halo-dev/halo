@@ -7,19 +7,17 @@ import static run.halo.app.extension.index.query.Queries.equal;
 import java.util.Map;
 import java.util.Set;
 import lombok.RequiredArgsConstructor;
-import org.apache.commons.lang3.BooleanUtils;
 import org.springframework.stereotype.Component;
 import run.halo.app.content.permalinks.TagPermalinkPolicy;
 import run.halo.app.core.extension.content.Constant;
 import run.halo.app.core.extension.content.Tag;
-import run.halo.app.extension.DefaultExtensionMatcher;
 import run.halo.app.extension.ExtensionClient;
 import run.halo.app.extension.ExtensionUtil;
+import run.halo.app.extension.ListOptions;
 import run.halo.app.extension.MetadataUtil;
 import run.halo.app.extension.controller.Controller;
 import run.halo.app.extension.controller.ControllerBuilder;
 import run.halo.app.extension.controller.Reconciler;
-import run.halo.app.extension.router.selector.FieldSelector;
 
 /**
  * Reconciler for {@link Tag}.
@@ -75,12 +73,9 @@ public class TagReconciler implements Reconciler<Reconciler.Request> {
     public Controller setupWith(ControllerBuilder builder) {
         return builder
             .extension(new Tag())
-            .onAddMatcher(DefaultExtensionMatcher.builder(client, Tag.GVK)
-                .fieldSelector(FieldSelector.of(
-                    equal(Tag.REQUIRE_SYNC_ON_STARTUP_INDEX_NAME, BooleanUtils.TRUE))
-                )
-                .build()
-            )
+            .syncAllListOptions(ListOptions.builder()
+                .andQuery(equal(Tag.REQUIRE_SYNC_ON_STARTUP_INDEX_NAME, true))
+                .build())
             .build();
     }
 }

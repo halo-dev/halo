@@ -1,7 +1,6 @@
-import { useGlobalInfoStore } from "@/stores/global-info";
 import { ucApiClient } from "@halo-dev/api-client";
 import { Toast } from "@halo-dev/components";
-import type { AttachmentLike } from "@halo-dev/console-shared";
+import { stores, type AttachmentLike } from "@halo-dev/console-shared";
 import { computed, ref, type Ref } from "vue";
 import { useI18n } from "vue-i18n";
 import type { AttachmentAttr } from "../utils/attachment";
@@ -35,7 +34,7 @@ export function useExternalAssetsTransfer(
   src: Ref<string | undefined>,
   callback: (attachment: AttachmentAttr) => void
 ) {
-  const { globalInfo } = useGlobalInfoStore();
+  const { globalInfo } = stores.globalInfo();
   const { t } = useI18n();
 
   const isExternalAsset = computed(() => {

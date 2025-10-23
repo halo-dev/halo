@@ -1,5 +1,4 @@
 <script setup lang="ts">
-import { usePermission } from "@/utils/permission";
 import { coreApiClient, type Category } from "@halo-dev/api-client";
 import {
   Dialog,
@@ -20,7 +19,6 @@ import GridiconsLinkBreak from "~icons/gridicons/link-break";
 import { convertCategoryTreeToCategory, type CategoryTreeNode } from "../utils";
 import CategoryEditingModal from "./CategoryEditingModal.vue";
 
-const { currentUserHasPermission } = usePermission();
 const { t } = useI18n();
 const queryClient = useQueryClient();
 
@@ -139,7 +137,7 @@ const handleOpenCreateByParentModal = () => {
       <span class="truncate text-xs tabular-nums text-gray-500">
         {{ utils.date.format(categoryTreeNode.metadata.creationTimestamp) }}
       </span>
-      <VDropdown v-if="currentUserHasPermission(['system:posts:manage'])">
+      <VDropdown v-if="utils.permission.has(['system:posts:manage'])">
         <div
           class="cursor-pointer rounded p-1 transition-all hover:text-blue-600 group-hover:bg-gray-200/60"
           @click.stop

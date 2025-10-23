@@ -3,13 +3,10 @@ import { setupApiClient } from "@/setup/setupApiClient";
 import { setupComponents } from "@/setup/setupComponents";
 import "@/setup/setupStyles";
 import { setupVueQuery } from "@/setup/setupVueQuery";
-import { useGlobalInfoStore } from "@/stores/global-info";
 import { useRoleStore } from "@/stores/role";
-import { useUserStore } from "@/stores/user";
 import { getCookie } from "@/utils/cookie";
-import { hasPermission } from "@/utils/permission";
 import { consoleApiClient } from "@halo-dev/api-client";
-import { utils } from "@halo-dev/console-shared";
+import { stores, utils } from "@halo-dev/console-shared";
 import router from "@uc/router";
 import { setupCoreModules, setupPluginModules } from "@uc/setup/setupModules";
 import "core-js/es/object/has-own";
@@ -35,23 +32,20 @@ async function loadUserPermissions() {
   roleStore.$patch({
     permissions: currentPermissions,
   });
+
+  // Set permissions in shared utils
+  utils.permission.setUserPermissions(currentPermissions.uiPermissions);
+
   app.directive(
     "permission",
     (el: HTMLElement, binding: DirectiveBinding<string[]>) => {
-      const uiPermissions = Array.from<string>(
-        currentPermissions.uiPermissions
-      );
       const { value } = binding;
-      const { any, enable } = binding.modifiers;
+      const { any } = binding.modifiers;
 
-      if (hasPermission(uiPermissions, value, any ?? false)) {
+      if (utils.permission.has(value, any ?? false)) {
         return;
       }
 
-      if (enable) {
-        //TODO
-        return;
-      }
       el?.remove?.();
     }
   );
@@ -65,17 +59,17 @@ async function initApp() {
   try {
     setupCoreModules(app);
 
-    const userStore = useUserStore();
-    await userStore.fetchCurrentUser();
+    const currentUserStore = stores.currentUser();
+    await currentUserStore.fetchCurrentUser();
 
     // set locale
     i18n.global.locale.value = getCookie("language") || getBrowserLanguage();
     utils.date.setLocale(i18n.global.locale.value);
 
-    const globalInfoStore = useGlobalInfoStore();
+    const globalInfoStore = stores.globalInfo();
     await globalInfoStore.fetchGlobalInfo();
 
-    if (userStore.isAnonymous) {
+    if (currentUserStore.isAnonymous) {
       return;
     }
 

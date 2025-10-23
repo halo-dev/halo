@@ -1,12 +1,11 @@
 <script lang="ts" setup>
 import HasPermission from "@/components/permission/HasPermission.vue";
 import StickyBlock from "@/components/sticky-block/StickyBlock.vue";
-import { useGlobalInfoStore } from "@/stores/global-info";
 import type { FormKitSchemaCondition, FormKitSchemaNode } from "@formkit/core";
 import type { Setting } from "@halo-dev/api-client";
 import { consoleApiClient } from "@halo-dev/api-client";
 import { Toast, VButton, VLoading } from "@halo-dev/components";
-import { utils } from "@halo-dev/console-shared";
+import { stores, utils } from "@halo-dev/console-shared";
 import { useQuery, useQueryClient } from "@tanstack/vue-query";
 import { computed, inject, ref, toRaw, type Ref } from "vue";
 import { useI18n } from "vue-i18n";
@@ -53,7 +52,7 @@ const handleSaveConfigMap = async (data: Record<string, unknown>) => {
       queryKey: ["core:system:configMap:group-data"],
     });
 
-    await useGlobalInfoStore().fetchGlobalInfo();
+    await stores.globalInfo().fetchGlobalInfo();
 
     if (group.value === "basic") {
       const language = data.language;

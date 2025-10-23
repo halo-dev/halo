@@ -1,9 +1,8 @@
 <script lang="ts" setup>
 import { usePluginModuleStore } from "@/stores/plugin";
-import { usePermission } from "@/utils/permission";
 import type { Theme } from "@halo-dev/api-client";
 import { VButton, VModal, VTabbar } from "@halo-dev/components";
-import type { ThemeListTab } from "@halo-dev/console-shared";
+import { utils, type ThemeListTab } from "@halo-dev/console-shared";
 import { useRouteQuery } from "@vueuse/router";
 import {
   computed,
@@ -24,7 +23,6 @@ import NotInstalledThemes from "./list-tabs/NotInstalledThemes.vue";
 import RemoteDownload from "./list-tabs/RemoteDownload.vue";
 
 const { t } = useI18n();
-const { currentUserHasPermission } = usePermission();
 
 const selectedTheme = inject<Ref<Theme | undefined>>("selectedTheme", ref());
 
@@ -110,7 +108,7 @@ onMounted(async () => {
 
       tabsFromPlugins.push(
         ...items.filter((item) => {
-          return currentUserHasPermission(item.permissions);
+          return utils.permission.has(item.permissions || []);
         })
       );
     } catch (error) {

@@ -1,5 +1,4 @@
 <script lang="ts" setup>
-import { usePermission } from "@/utils/permission";
 import { useOperationItemExtensionPoint } from "@console/composables/use-operation-extension-points";
 import type { Theme } from "@halo-dev/api-client";
 import { consoleApiClient, coreApiClient } from "@halo-dev/api-client";
@@ -13,7 +12,7 @@ import {
   VStatusDot,
   VTag,
 } from "@halo-dev/components";
-import type { OperationItem } from "@halo-dev/console-shared";
+import { utils, type OperationItem } from "@halo-dev/console-shared";
 import { useQueryClient } from "@tanstack/vue-query";
 import { computed, inject, markRaw, ref, toRefs, type Ref } from "vue";
 import { useI18n } from "vue-i18n";
@@ -21,7 +20,6 @@ import { useThemeLifeCycle } from "../composables/use-theme";
 import MoreOperationItem from "./operation/MoreOperationItem.vue";
 import UninstallOperationItem from "./operation/UninstallOperationItem.vue";
 
-const { currentUserHasPermission } = usePermission();
 const { t } = useI18n();
 const queryClient = useQueryClient();
 
@@ -231,7 +229,7 @@ const { operationItems } = useOperationItemExtensionPoint<Theme>(
                 <component
                   :is="item.component"
                   v-if="
-                    !item.hidden && currentUserHasPermission(item.permissions)
+                    !item.hidden && utils.permission.has(item.permissions || [])
                   "
                   :key="`${theme.metadata.name}-${item.label}-${item.priority}`"
                   v-bind="item.props"
@@ -243,7 +241,7 @@ const { operationItems } = useOperationItemExtensionPoint<Theme>(
               <template v-else>
                 <VDropdown
                   v-if="
-                    !item.hidden && currentUserHasPermission(item.permissions)
+                    !item.hidden && utils.permission.has(item.permissions || [])
                   "
                   :key="`${theme.metadata.name}-${item.label}-${item.priority}`"
                 >
@@ -260,7 +258,7 @@ const { operationItems } = useOperationItemExtensionPoint<Theme>(
                         :is="childItem.component"
                         v-if="
                           !childItem.hidden &&
-                          currentUserHasPermission(childItem.permissions)
+                          utils.permission.has(childItem.permissions || [])
                         "
                         :key="`${theme.metadata.name}-${childItem.label}-${childItem.priority}`"
                         v-bind="childItem.props"
@@ -275,9 +273,7 @@ const { operationItems } = useOperationItemExtensionPoint<Theme>(
             </template>
           </VSpace>
           <VButton
-            v-if="
-              !installed && currentUserHasPermission(['system:themes:manage'])
-            "
+            v-if="!installed && utils.permission.has(['system:themes:manage'])"
             size="sm"
             :loading="creating"
             @click="handleCreateTheme"

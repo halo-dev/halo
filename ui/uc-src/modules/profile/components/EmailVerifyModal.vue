@@ -1,8 +1,8 @@
 <script lang="ts" setup>
-import { useUserStore } from "@/stores/user";
 import type { VerifyCodeRequest } from "@halo-dev/api-client";
 import { consoleApiClient } from "@halo-dev/api-client";
 import { Toast, VButton, VModal, VSpace } from "@halo-dev/components";
+import { stores } from "@halo-dev/console-shared";
 import { useMutation, useQueryClient } from "@tanstack/vue-query";
 import { useIntervalFn } from "@vueuse/shared";
 import { computed, ref } from "vue";
@@ -11,7 +11,7 @@ import { useI18n } from "vue-i18n";
 const queryClient = useQueryClient();
 const { t } = useI18n();
 
-const { currentUser, fetchCurrentUser } = useUserStore();
+const { currentUser, fetchCurrentUser } = stores.currentUser();
 
 const emit = defineEmits<{
   (event: "close"): void;
@@ -35,7 +35,7 @@ const { pause, resume, isActive } = useIntervalFn(
   }
 );
 
-const email = ref(currentUser?.spec.email);
+const email = ref(currentUser?.user?.spec.email);
 
 const { mutate: sendVerifyCode, isLoading: isSending } = useMutation({
   mutationKey: ["send-verify-code"],
@@ -106,7 +106,7 @@ function handleVerify({ password, code }: VerifyCodeRequest) {
   <VModal
     ref="modal"
     :title="
-      currentUser?.spec.emailVerified
+      currentUser?.user.spec.emailVerified
         ? $t('core.uc_profile.email_verify_modal.titles.modify')
         : $t('core.uc_profile.email_verify_modal.titles.verify')
     "
@@ -122,7 +122,7 @@ function handleVerify({ password, code }: VerifyCodeRequest) {
         v-model="email"
         type="email"
         :label="
-          currentUser?.spec.emailVerified
+          currentUser?.user.spec.emailVerified
             ? $t('core.uc_profile.email_verify_modal.fields.new_email.label')
             : $t('core.uc_profile.email_verify_modal.fields.email.label')
         "

@@ -1,7 +1,6 @@
 <script lang="ts" setup>
 import { rbacAnnotations } from "@/constants/annotations";
 import { SUPER_ROLE_NAME } from "@/constants/constants";
-import { useUserStore } from "@/stores/user";
 import {
   Dialog,
   IconAccountCircleLine,
@@ -13,6 +12,7 @@ import {
   VDropdown,
   VTag,
 } from "@halo-dev/components";
+import { stores } from "@halo-dev/console-shared";
 import { storeToRefs } from "pinia";
 import { computed } from "vue";
 import { useI18n } from "vue-i18n";
@@ -22,9 +22,9 @@ const props = defineProps<{
 }>();
 
 const { t } = useI18n();
-const userStore = useUserStore();
+const userStore = stores.currentUser();
 
-const { currentRoles, currentUser } = storeToRefs(userStore);
+const { currentUser } = storeToRefs(userStore);
 
 const handleLogout = () => {
   Dialog.warning({
@@ -40,12 +40,14 @@ const handleLogout = () => {
 
 const disallowAccessConsole = computed(() => {
   if (
-    currentRoles?.value?.some((role) => role.metadata.name === SUPER_ROLE_NAME)
+    currentUser.value?.roles.some(
+      (role) => role.metadata.name === SUPER_ROLE_NAME
+    )
   ) {
     return false;
   }
 
-  const hasDisallowAccessConsoleRole = currentRoles?.value?.some((role) => {
+  const hasDisallowAccessConsoleRole = currentUser.value?.roles.some((role) => {
     return (
       role.metadata.annotations?.[rbacAnnotations.DISALLOW_ACCESS_CONSOLE] ===
       "true"
@@ -88,27 +90,30 @@ const actions = computed(() => {
 </script>
 <template>
   <div class="user-profile">
-    <div v-if="currentUser?.spec.avatar" class="user-profile__avatar">
+    <div v-if="currentUser?.user.spec.avatar" class="user-profile__avatar">
       <VAvatar
-        :src="currentUser?.spec.avatar"
-        :alt="currentUser?.spec.displayName"
+        :src="currentUser?.user.spec.avatar"
+        :alt="currentUser?.user.spec.displayName"
         size="sm"
         circle
       ></VAvatar>
     </div>
     <div class="user-profile__info">
-      <div class="user-profile__name" :title="currentUser?.spec.displayName">
-        {{ currentUser?.spec.displayName }}
+      <div
+        class="user-profile__name"
+        :title="currentUser?.user.spec.displayName"
+      >
+        {{ currentUser?.user.spec.displayName }}
       </div>
-      <div v-if="currentRoles?.length" class="user-profile__roles">
-        <VTag v-if="currentRoles.length === 1">
+      <div v-if="currentUser?.roles.length" class="user-profile__roles">
+        <VTag v-if="currentUser.roles.length === 1">
           <template #leftIcon>
             <IconShieldUser />
           </template>
           {{
-            currentRoles[0].metadata.annotations?.[
+            currentUser.roles[0].metadata.annotations?.[
               rbacAnnotations.DISPLAY_NAME
-            ] || currentRoles[0].metadata.name
+            ] || currentUser.roles[0].metadata.name
           }}
         </VTag>
         <VDropdown v-else :triggers="['click']">
@@ -128,7 +133,7 @@ const actions = computed(() => {
               </h2>
               <div class="user-profile__roles-list">
                 <VTag
-                  v-for="role in currentRoles"
+                  v-for="role in currentUser.roles"
                   :key="role.metadata.name"
                   class="user-profile__role-tag"
                 >

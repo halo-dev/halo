@@ -1,12 +1,14 @@
-import { useRoleStore } from "@/stores/role";
-import { hasPermission } from "@/utils/permission";
+import { utils } from "@halo-dev/console-shared";
 import type { RouteLocationNormalized, Router } from "vue-router";
 
 export function setupPermissionGuard(router: Router) {
   router.beforeEach(async (to, _from, next) => {
-    const roleStore = useRoleStore();
-    const { uiPermissions } = roleStore.permissions;
-    if (await checkRoutePermissions(to, uiPermissions)) {
+    if (
+      await checkRoutePermissions(
+        to,
+        utils.permission.getUserPermissions() || []
+      )
+    ) {
       next();
     } else {
       next({ name: "Forbidden" });
@@ -36,9 +38,5 @@ async function checkRoutePermissions(
     }
   }
 
-  return hasPermission(
-    Array.from(uiPermissions),
-    meta.permissions as string[],
-    true
-  );
+  return utils.permission.has(meta.permissions as string[]);
 }

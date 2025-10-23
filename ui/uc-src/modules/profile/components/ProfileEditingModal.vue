@@ -1,26 +1,19 @@
 <script lang="ts" setup>
-// core libs
+import SubmitButton from "@/components/button/SubmitButton.vue";
+import { setFocus } from "@/formkit/utils/focus";
 import type { User } from "@halo-dev/api-client";
 import { consoleApiClient } from "@halo-dev/api-client";
-import { onMounted, ref } from "vue";
-
-// components
-import SubmitButton from "@/components/button/SubmitButton.vue";
 import { Toast, VButton, VModal, VSpace } from "@halo-dev/components";
-
-// libs
-import { cloneDeep } from "lodash-es";
-
-// hooks
-import { setFocus } from "@/formkit/utils/focus";
-import { useUserStore } from "@/stores/user";
+import { stores } from "@halo-dev/console-shared";
 import { useQueryClient } from "@tanstack/vue-query";
+import { cloneDeep } from "lodash-es";
+import { onMounted, ref } from "vue";
 import { useI18n } from "vue-i18n";
 import EmailVerifyModal from "./EmailVerifyModal.vue";
 
 const { t } = useI18n();
 const queryClient = useQueryClient();
-const userStore = useUserStore();
+const currentUserStore = stores.currentUser();
 
 const emit = defineEmits<{
   (event: "close"): void;
@@ -28,7 +21,7 @@ const emit = defineEmits<{
 
 const modal = ref<InstanceType<typeof VModal> | null>(null);
 const formState = ref<User>(
-  cloneDeep(userStore.currentUser) || {
+  cloneDeep(currentUserStore.currentUser?.user) || {
     spec: {
       displayName: "",
       email: "",
@@ -67,7 +60,7 @@ const handleUpdateUser = async () => {
     console.error("Failed to update profile", e);
   } finally {
     isSubmitting.value = false;
-    userStore.fetchCurrentUser();
+    currentUserStore.fetchCurrentUser();
   }
 };
 
@@ -76,8 +69,9 @@ const emailVerifyModal = ref(false);
 
 async function onEmailVerifyModalClose() {
   emailVerifyModal.value = false;
-  await userStore.fetchCurrentUser();
-  if (userStore.currentUser) formState.value = cloneDeep(userStore.currentUser);
+  await currentUserStore.fetchCurrentUser();
+  if (currentUserStore.currentUser)
+    formState.value = cloneDeep(currentUserStore.currentUser.user);
 }
 </script>
 <template>

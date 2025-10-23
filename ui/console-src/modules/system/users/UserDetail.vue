@@ -1,8 +1,6 @@
 <script lang="ts" setup>
 import UserAvatar from "@/components/user-avatar/UserAvatar.vue";
 import { usePluginModuleStore } from "@/stores/plugin";
-import { useUserStore } from "@/stores/user";
-import { usePermission } from "@/utils/permission";
 import type { User } from "@halo-dev/api-client";
 import { consoleApiClient, coreApiClient } from "@halo-dev/api-client";
 import {
@@ -15,7 +13,7 @@ import {
   VTabbar,
   VTag,
 } from "@halo-dev/components";
-import type { UserTab } from "@halo-dev/console-shared";
+import { stores, utils, type UserTab } from "@halo-dev/console-shared";
 import { useQuery, useQueryClient } from "@tanstack/vue-query";
 import { useRouteQuery } from "@vueuse/router";
 import {
@@ -36,9 +34,8 @@ import { useUserEnableDisable } from "./composables/use-user";
 import DetailTab from "./tabs/Detail.vue";
 
 const queryClient = useQueryClient();
-const { currentUserHasPermission } = usePermission();
 const { t } = useI18n();
-const { currentUser } = useUserStore();
+const { currentUser } = stores.currentUser();
 
 const editingModal = ref(false);
 const passwordChangeModal = ref(false);
@@ -183,13 +180,13 @@ const { handleEnableOrDisableUser } = useUserEnableDisable();
         </div>
         <div class="inline-flex items-center gap-2">
           <VButton
-            v-if="currentUser?.metadata.name === user?.user.metadata.name"
+            v-if="currentUser?.user.metadata.name === user?.user.metadata.name"
             type="primary"
             @click="handleRouteToUC"
           >
             {{ $t("core.user.detail.actions.profile.title") }}
           </VButton>
-          <VDropdown v-if="currentUserHasPermission(['system:users:manage'])">
+          <VDropdown v-if="utils.permission.has(['system:users:manage'])">
             <VButton type="default">
               {{ $t("core.common.buttons.edit") }}
             </VButton>
@@ -201,18 +198,22 @@ const { handleEnableOrDisableUser } = useUserEnableDisable();
                 {{ $t("core.user.detail.actions.change_password.title") }}
               </VDropdownItem>
               <VDropdownItem
-                v-if="currentUser?.metadata.name !== user?.user.metadata.name"
+                v-if="
+                  currentUser?.user.metadata.name !== user?.user.metadata.name
+                "
                 @click="grantPermissionModal = true"
               >
                 {{ $t("core.user.detail.actions.grant_permission.title") }}
               </VDropdownItem>
               <VDropdownDivider
-                v-if="currentUser?.metadata.name !== user?.user.metadata.name"
+                v-if="
+                  currentUser?.user.metadata.name !== user?.user.metadata.name
+                "
               />
               <VDropdownItem
                 v-if="
                   !!user &&
-                  currentUser?.metadata.name !== user?.user.metadata.name
+                  currentUser?.user.metadata.name !== user?.user.metadata.name
                 "
                 type="danger"
                 @click="
@@ -236,7 +237,7 @@ const { handleEnableOrDisableUser } = useUserEnableDisable();
               <VDropdownItem
                 v-if="
                   user &&
-                  currentUser?.metadata.name !== user?.user.metadata.name
+                  currentUser?.user.metadata.name !== user?.user.metadata.name
                 "
                 type="danger"
                 @click="handleDelete(user.user)"

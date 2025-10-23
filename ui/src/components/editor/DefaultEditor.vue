@@ -55,7 +55,6 @@ import {
 // ui custom extension
 import { i18n } from "@/locales";
 import { usePluginModuleStore } from "@/stores/plugin";
-import { usePermission } from "@/utils/permission";
 import {
   GetThumbnailByUriSizeEnum,
   type Attachment,
@@ -112,7 +111,6 @@ import {
 import { getContents } from "./utils/attachment";
 
 const { t } = useI18n();
-const { currentUserHasPermission } = usePermission();
 
 const props = withDefaults(
   defineProps<{
@@ -190,7 +188,7 @@ const showSidebar = useLocalStorage("halo:editor:show-sidebar", true);
 // Attachments
 const AttachmentSelectorModal = defineAsyncComponent({
   loader: () => {
-    if (currentUserHasPermission(["system:attachments:manage"])) {
+    if (utils.permission.has(["system:attachments:manage"])) {
       return import(
         "@console/modules/contents/attachments/components/AttachmentSelectorModal.vue"
       );
@@ -304,7 +302,7 @@ const presetExtensions = [
     addOptions() {
       // If user has no permission to view attachments, return
       if (
-        !currentUserHasPermission([
+        !utils.permission.has([
           "system:attachments:manage",
           "uc:attachments:manage",
         ])

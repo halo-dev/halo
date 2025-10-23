@@ -1,6 +1,8 @@
-import { useRoleStore } from "@/stores/role";
-import { hasPermission } from "@/utils/permission";
-import type { MenuGroupType, MenuItemType } from "@halo-dev/console-shared";
+import {
+  utils,
+  type MenuGroupType,
+  type MenuItemType,
+} from "@halo-dev/console-shared";
 import { useQuery } from "@tanstack/vue-query";
 import { sortBy } from "lodash-es";
 import { ref, watch } from "vue";
@@ -12,10 +14,6 @@ import {
 
 export function useRouteMenuGenerator(menuGroups: MenuGroupType[]) {
   const router = useRouter();
-
-  const roleStore = useRoleStore();
-
-  const { uiPermissions } = roleStore.permissions;
 
   function flattenRoutes(route: RouteRecordNormalized | RouteRecordRaw) {
     let routes: (RouteRecordNormalized | RouteRecordRaw)[] = [route];
@@ -38,7 +36,9 @@ export function useRouteMenuGenerator(menuGroups: MenuGroupType[]) {
     // Check if permissions is a function
     if (typeof meta.permissions === "function") {
       try {
-        return await meta.permissions(uiPermissions);
+        return await meta.permissions(
+          utils.permission.getUserPermissions() || []
+        );
       } catch (e) {
         console.error(
           `Error checking permissions for route ${String(route.name)}:`,
@@ -49,7 +49,7 @@ export function useRouteMenuGenerator(menuGroups: MenuGroupType[]) {
     }
 
     // Default behavior for array of permissions
-    return hasPermission(uiPermissions, meta.permissions as string[], true);
+    return utils.permission.has(meta.permissions as string[], true);
   }
 
   const { data, isLoading: isDataLoading } = useQuery({
