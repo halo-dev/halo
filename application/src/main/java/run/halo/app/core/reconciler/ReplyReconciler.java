@@ -6,7 +6,6 @@ import static run.halo.app.extension.index.query.Queries.equal;
 
 import java.util.Set;
 import lombok.AllArgsConstructor;
-import org.apache.commons.lang3.BooleanUtils;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Component;
 import run.halo.app.content.comment.ReplyNotificationSubscriptionHelper;
@@ -14,12 +13,11 @@ import run.halo.app.core.extension.content.Reply;
 import run.halo.app.event.post.ReplyChangedEvent;
 import run.halo.app.event.post.ReplyCreatedEvent;
 import run.halo.app.event.post.ReplyDeletedEvent;
-import run.halo.app.extension.DefaultExtensionMatcher;
 import run.halo.app.extension.ExtensionClient;
+import run.halo.app.extension.ListOptions;
 import run.halo.app.extension.controller.Controller;
 import run.halo.app.extension.controller.ControllerBuilder;
 import run.halo.app.extension.controller.Reconciler;
-import run.halo.app.extension.router.selector.FieldSelector;
 
 /**
  * Reconciler for {@link Reply}.
@@ -87,12 +85,9 @@ public class ReplyReconciler implements Reconciler<Reconciler.Request> {
         var extension = new Reply();
         return builder
             .extension(extension)
-            .onAddMatcher(DefaultExtensionMatcher.builder(client, extension.groupVersionKind())
-                .fieldSelector(FieldSelector.of(
-                    equal(Reply.REQUIRE_SYNC_ON_STARTUP_INDEX_NAME, BooleanUtils.TRUE))
-                )
-                .build()
-            )
+            .syncAllListOptions(ListOptions.builder()
+                .andQuery(equal(Reply.REQUIRE_SYNC_ON_STARTUP_INDEX_NAME, true))
+                .build())
             .build();
     }
 }
