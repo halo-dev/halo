@@ -9,7 +9,6 @@ import static run.halo.app.extension.ExtensionUtil.addFinalizers;
 import static run.halo.app.extension.ExtensionUtil.removeFinalizers;
 import static run.halo.app.extension.MetadataUtil.nullSafeAnnotations;
 import static run.halo.app.extension.MetadataUtil.nullSafeLabels;
-import static run.halo.app.extension.index.query.Queries.equal;
 import static run.halo.app.extension.index.query.Queries.in;
 
 import com.google.common.hash.Hashing;
@@ -53,7 +52,6 @@ import run.halo.app.event.post.PostPublishedEvent;
 import run.halo.app.event.post.PostUnpublishedEvent;
 import run.halo.app.event.post.PostUpdatedEvent;
 import run.halo.app.event.post.PostVisibleChangedEvent;
-import run.halo.app.extension.DefaultExtensionMatcher;
 import run.halo.app.extension.ExtensionClient;
 import run.halo.app.extension.ExtensionOperator;
 import run.halo.app.extension.ListOptions;
@@ -253,12 +251,9 @@ public class PostReconciler implements Reconciler<Reconciler.Request> {
     public Controller setupWith(ControllerBuilder builder) {
         return builder
             .extension(new Post())
-            .onAddMatcher(DefaultExtensionMatcher.builder(client, Post.GVK)
-                .fieldSelector(FieldSelector.of(
-                    equal(Post.REQUIRE_SYNC_ON_STARTUP_INDEX_NAME, TRUE))
-                )
-                .build()
-            )
+            .syncAllListOptions(ListOptions.builder()
+                .andQuery(Queries.equal(Post.REQUIRE_SYNC_ON_STARTUP_INDEX_NAME, true))
+                .build())
             .build();
     }
 

@@ -43,8 +43,9 @@ class RequestSynchronizerTest {
 
     @Test
     void shouldStartCorrectlyWhenSyncingAllOnStart() {
-        when(client.listAllNames(eq(FakeExtension.class), isA(ListOptions.class), isA(Sort.class)))
-            .thenReturn(List.of("fake-01", "fake-02"));
+        when(client.listTopNames(
+            eq(FakeExtension.class), isA(ListOptions.class), isA(Sort.class), any(Integer.class))
+        ).thenReturn(List.of("fake-01", "fake-02"));
 
         synchronizer.start();
 
