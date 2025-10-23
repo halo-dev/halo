@@ -1,5 +1,4 @@
 <script lang="ts" setup>
-import { usePermission } from "@/utils/permission";
 import type { Menu, MenuItem } from "@halo-dev/api-client";
 import { coreApiClient } from "@halo-dev/api-client";
 import {
@@ -20,6 +19,7 @@ import {
   VStatusDot,
   VTag,
 } from "@halo-dev/components";
+import { utils } from "@halo-dev/console-shared";
 import { Draggable } from "@he-tree/vue";
 import "@he-tree/vue/style/default.css";
 import { useQuery, useQueryClient } from "@tanstack/vue-query";
@@ -38,7 +38,6 @@ import {
 
 const { t } = useI18n();
 const queryClient = useQueryClient();
-const { currentUserHasPermission } = usePermission();
 
 const menuTreeItems = ref<MenuTreeItem[]>([] as MenuTreeItem[]);
 const selectedMenu = ref<Menu>();
@@ -356,7 +355,7 @@ function getMenuItemRefDisplayName(menuItem: MenuTreeItem) {
                       animate
                     />
                     <VDropdown
-                      v-if="currentUserHasPermission(['system:menus:manage'])"
+                      v-if="utils.permission.has(['system:menus:manage'])"
                     >
                       <div
                         class="cursor-pointer rounded p-1 transition-all hover:text-blue-600 group-hover:bg-gray-200/60"

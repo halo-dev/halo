@@ -9,12 +9,11 @@ import run.halo.app.core.counter.MeterUtils;
 import run.halo.app.core.extension.Counter;
 import run.halo.app.core.extension.content.Post;
 import run.halo.app.event.post.PostStatsChangedEvent;
-import run.halo.app.extension.DefaultExtensionMatcher;
 import run.halo.app.extension.ExtensionClient;
+import run.halo.app.extension.ListOptions;
 import run.halo.app.extension.controller.Controller;
 import run.halo.app.extension.controller.ControllerBuilder;
 import run.halo.app.extension.controller.Reconciler;
-import run.halo.app.extension.router.selector.FieldSelector;
 
 @Component
 @RequiredArgsConstructor
@@ -39,10 +38,8 @@ public class PostCounterReconciler implements Reconciler<Reconciler.Request> {
         var extension = new Counter();
         return builder
             .extension(extension)
-            .onAddMatcher(DefaultExtensionMatcher.builder(client, extension.groupVersionKind())
-                .fieldSelector(FieldSelector.of(
-                    startsWith("metadata.name", MeterUtils.nameOf(Post.class, "")))
-                )
+            .syncAllListOptions(ListOptions.builder()
+                .andQuery(startsWith("metadata.name", MeterUtils.nameOf(Post.class, "")))
                 .build())
             .build();
     }

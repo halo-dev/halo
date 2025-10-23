@@ -1,22 +1,24 @@
 import { rbacAnnotations } from "@/constants/annotations";
 import { SUPER_ROLE_NAME } from "@/constants/constants";
-import { useRoleStore } from "@/stores/role";
-import { hasPermission } from "@/utils/permission";
 import type { Role } from "@halo-dev/api-client";
-import { stores } from "@halo-dev/console-shared";
+import { stores, utils } from "@halo-dev/console-shared";
 import type { RouteLocationNormalized, Router } from "vue-router";
 
 export function setupPermissionGuard(router: Router) {
   router.beforeEach(async (to, _, next) => {
     const currentUserStore = stores.currentUser();
-    const roleStore = useRoleStore();
 
     if (isConsoleAccessDisallowed(currentUserStore.currentUser?.roles)) {
       window.location.href = "/uc";
       return;
     }
 
-    if (await checkRoutePermissions(to, roleStore.permissions.uiPermissions)) {
+    if (
+      await checkRoutePermissions(
+        to,
+        utils.permission.getUserPermissions() || []
+      )
+    ) {
       next();
     } else {
       next({ name: "Forbidden" });
@@ -60,9 +62,5 @@ async function checkRoutePermissions(
     }
   }
 
-  return hasPermission(
-    Array.from(uiPermissions),
-    meta.permissions as string[],
-    true
-  );
+  return utils.permission.has(meta.permissions as string[]);
 }

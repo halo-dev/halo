@@ -1,7 +1,6 @@
 <script lang="ts" setup>
 import { rbacAnnotations } from "@/constants/annotations";
 import { pluginLabels, roleLabels } from "@/constants/labels";
-import { usePermission } from "@/utils/permission";
 import {
   PluginStatusPhaseEnum,
   coreApiClient,
@@ -21,8 +20,6 @@ import type { Ref } from "vue";
 import { computed, inject, ref } from "vue";
 import { usePluginLifeCycle } from "../../composables/use-plugin";
 import PluginConditionsModal from "../PluginConditionsModal.vue";
-
-const { currentUserHasPermission } = usePermission();
 
 const plugin = inject<Ref<Plugin | undefined>>("plugin");
 const { changeStatus, changingStatus } = usePluginLifeCycle(plugin);
@@ -51,7 +48,7 @@ const { data: pluginRoleTemplates } = useQuery({
   enabled: computed(
     () =>
       !!plugin?.value?.metadata.name &&
-      currentUserHasPermission(["system:roles:view"])
+      utils.permission.has(["system:roles:view"])
   ),
 });
 

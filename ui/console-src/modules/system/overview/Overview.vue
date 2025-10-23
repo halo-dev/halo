@@ -1,6 +1,5 @@
 <script lang="ts" setup>
 import H2WarningAlert from "@/components/alerts/H2WarningAlert.vue";
-import { usePermission } from "@/utils/permission";
 import { useThemeStore } from "@console/stores/theme";
 import type { Plugin } from "@halo-dev/api-client";
 import { consoleApiClient } from "@halo-dev/api-client";
@@ -28,7 +27,6 @@ import ExternalUrlItem from "./components/ExternalUrlItem.vue";
 
 const { t } = useI18n();
 const themeStore = useThemeStore();
-const { currentUserHasPermission } = usePermission();
 
 const { data: info } = useQuery<Info>({
   queryKey: ["system-info"],
@@ -65,7 +63,7 @@ const { data: plugins, isLoading: isPluginsLoading } = useQuery<Plugin[]>({
 
     return data.items;
   },
-  enabled: computed(() => currentUserHasPermission(["system:plugins:view"])),
+  enabled: computed(() => utils.permission.has(["system:plugins:view"])),
 });
 
 // copy system information to clipboard

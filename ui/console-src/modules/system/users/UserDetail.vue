@@ -1,7 +1,6 @@
 <script lang="ts" setup>
 import UserAvatar from "@/components/user-avatar/UserAvatar.vue";
 import { usePluginModuleStore } from "@/stores/plugin";
-import { usePermission } from "@/utils/permission";
 import type { User } from "@halo-dev/api-client";
 import { consoleApiClient, coreApiClient } from "@halo-dev/api-client";
 import {
@@ -14,7 +13,7 @@ import {
   VTabbar,
   VTag,
 } from "@halo-dev/components";
-import { stores, type UserTab } from "@halo-dev/console-shared";
+import { stores, utils, type UserTab } from "@halo-dev/console-shared";
 import { useQuery, useQueryClient } from "@tanstack/vue-query";
 import { useRouteQuery } from "@vueuse/router";
 import {
@@ -35,7 +34,6 @@ import { useUserEnableDisable } from "./composables/use-user";
 import DetailTab from "./tabs/Detail.vue";
 
 const queryClient = useQueryClient();
-const { currentUserHasPermission } = usePermission();
 const { t } = useI18n();
 const { currentUser } = stores.currentUser();
 
@@ -188,7 +186,7 @@ const { handleEnableOrDisableUser } = useUserEnableDisable();
           >
             {{ $t("core.user.detail.actions.profile.title") }}
           </VButton>
-          <VDropdown v-if="currentUserHasPermission(['system:users:manage'])">
+          <VDropdown v-if="utils.permission.has(['system:users:manage'])">
             <VButton type="default">
               {{ $t("core.common.buttons.edit") }}
             </VButton>

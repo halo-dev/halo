@@ -1,6 +1,5 @@
 <script lang="ts" setup>
 import HasPermission from "@/components/permission/HasPermission.vue";
-import { usePermission } from "@/utils/permission";
 import PostTag from "@console/modules/contents/posts/tags/components/PostTag.vue";
 import { usePostTag } from "@console/modules/contents/posts/tags/composables/use-post-tag";
 import type { FormKitFrameworkContext } from "@formkit/core";
@@ -11,13 +10,12 @@ import {
   IconCheckboxCircle,
   IconClose,
 } from "@halo-dev/components";
+import { utils } from "@halo-dev/console-shared";
 import { onClickOutside } from "@vueuse/core";
 import Fuse from "fuse.js";
 import ShortUniqueId from "short-unique-id";
 import { slugify } from "transliteration";
 import { computed, ref, watch, type PropType } from "vue";
-
-const { currentUserHasPermission } = usePermission();
 
 const props = defineProps({
   context: {
@@ -195,7 +193,7 @@ const scrollToSelected = () => {
 const uid = new ShortUniqueId();
 
 const handleCreateTag = async () => {
-  if (!currentUserHasPermission(["system:posts:manage"])) {
+  if (!utils.permission.has(["system:posts:manage"])) {
     return;
   }
 

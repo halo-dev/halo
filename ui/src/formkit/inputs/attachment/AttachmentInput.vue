@@ -1,11 +1,8 @@
 <script lang="ts" setup>
-import { usePermission } from "@/utils/permission";
 import type { FormKitFrameworkContext } from "@formkit/core";
 import { IconFolder } from "@halo-dev/components";
-import type { AttachmentLike } from "@halo-dev/console-shared";
+import { utils, type AttachmentLike } from "@halo-dev/console-shared";
 import { defineAsyncComponent, ref, type PropType } from "vue";
-
-const { currentUserHasPermission } = usePermission();
 
 const props = defineProps({
   context: {
@@ -18,7 +15,7 @@ const attachmentSelectorModalVisible = ref(false);
 
 const AttachmentSelectorModal = defineAsyncComponent({
   loader: () => {
-    if (currentUserHasPermission(["system:attachments:view"])) {
+    if (utils.permission.has(["system:attachments:view"])) {
       return import(
         "@console/modules/contents/attachments/components/AttachmentSelectorModal.vue"
       );

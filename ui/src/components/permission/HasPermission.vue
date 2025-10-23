@@ -1,16 +1,17 @@
 <script lang="ts" setup>
-import { usePermission } from "@/utils/permission";
+import { utils } from "@halo-dev/console-shared";
 
 withDefaults(
   defineProps<{
     permissions: string[];
+    any?: boolean;
   }>(),
-  {}
+  {
+    any: true,
+  }
 );
-
-const { currentUserHasPermission } = usePermission();
 </script>
 
 <template>
-  <slot v-if="currentUserHasPermission(permissions)" />
+  <slot v-if="utils.permission.has(permissions, any)" />
 </template>

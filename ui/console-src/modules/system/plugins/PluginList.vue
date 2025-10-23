@@ -1,5 +1,4 @@
 <script lang="ts" setup>
-import { usePermission } from "@/utils/permission";
 import {
   PluginStatusPhaseEnum,
   consoleApiClient,
@@ -21,6 +20,7 @@ import {
   VPageHeader,
   VSpace,
 } from "@halo-dev/components";
+import { utils } from "@halo-dev/console-shared";
 import { useQuery } from "@tanstack/vue-query";
 import { useRouteQuery } from "@vueuse/router";
 import type { Ref } from "vue";
@@ -31,7 +31,6 @@ import PluginListItem from "./components/PluginListItem.vue";
 import { usePluginBatchOperations } from "./composables/use-plugin";
 
 const { t } = useI18n();
-const { currentUserHasPermission } = usePermission();
 
 const pluginInstallationModalVisible = ref(false);
 
@@ -152,7 +151,7 @@ onMounted(() => {
   <PluginInstallationModal
     v-if="
       pluginInstallationModalVisible &&
-      currentUserHasPermission(['system:plugins:manage'])
+      utils.permission.has(['system:plugins:manage'])
     "
     @close="pluginInstallationModalVisible = false"
   />

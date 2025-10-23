@@ -1,7 +1,6 @@
 <script lang="ts" setup>
 import EntityDropdownItems from "@/components/entity/EntityDropdownItems.vue";
 import HasPermission from "@/components/permission/HasPermission.vue";
-import { usePermission } from "@/utils/permission";
 import { useOperationItemExtensionPoint } from "@console/composables/use-operation-extension-points";
 import type { ListedComment, ListedReply } from "@halo-dev/api-client";
 import { coreApiClient } from "@halo-dev/api-client";
@@ -26,7 +25,6 @@ import OwnerButton from "./OwnerButton.vue";
 import ReplyCreationModal from "./ReplyCreationModal.vue";
 import ReplyDetailModal from "./ReplyDetailModal.vue";
 
-const { currentUserHasPermission } = usePermission();
 const { t } = useI18n();
 const queryClient = useQueryClient();
 
@@ -287,7 +285,7 @@ const { data: contentProvider } = useContentProviderExtensionPoint();
       />
     </template>
     <template
-      v-if="currentUserHasPermission(['system:comments:manage'])"
+      v-if="utils.permission.has(['system:comments:manage'])"
       #dropdownItems
     >
       <EntityDropdownItems :dropdown-items="operationItems" :item="reply" />
