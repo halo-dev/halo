@@ -42,16 +42,12 @@ async function loadUserPermissions() {
     "permission",
     (el: HTMLElement, binding: DirectiveBinding<string[]>) => {
       const { value } = binding;
-      const { any, enable } = binding.modifiers;
+      const { any } = binding.modifiers;
 
       if (utils.permission.has(value, any ?? false)) {
         return;
       }
 
-      if (enable) {
-        //TODO
-        return;
-      }
       el?.remove?.();
     }
   );
