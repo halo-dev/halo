@@ -1,7 +1,6 @@
 <script lang="ts" setup>
 import { useFetchRole } from "@/composables/use-role";
 import { rbacAnnotations } from "@/constants/annotations";
-import { useUserStore } from "@/stores/user";
 import type { ListedUser, User } from "@halo-dev/api-client";
 import { consoleApiClient, coreApiClient } from "@halo-dev/api-client";
 import {
@@ -21,7 +20,7 @@ import {
   VPagination,
   VSpace,
 } from "@halo-dev/components";
-import { utils } from "@halo-dev/console-shared";
+import { stores, utils } from "@halo-dev/console-shared";
 import { useQuery } from "@tanstack/vue-query";
 import { useRouteQuery } from "@vueuse/router";
 import { chunk } from "lodash-es";
@@ -38,7 +37,7 @@ const creationModal = ref<boolean>(false);
 const selectedUserNames = ref<string[]>([]);
 const keyword = useRouteQuery<string>("keyword", "");
 
-const userStore = useUserStore();
+const { currentUser } = stores.currentUser();
 
 const ANONYMOUSUSER_NAME = "anonymousUser";
 const DELETEDUSER_NAME = "ghost";
@@ -121,7 +120,7 @@ const handleDeleteInBatch = async () => {
     cancelText: t("core.common.buttons.cancel"),
     onConfirm: async () => {
       const userNamesToDelete = selectedUserNames.value.filter(
-        (name) => name != userStore.currentUser?.metadata.name
+        (name) => name != currentUser?.user.metadata.name
       );
       await Promise.all(
         userNamesToDelete.map((name) => {
@@ -167,7 +166,7 @@ function handleEnableOrDisableInBatch(operation: "enable" | "disable") {
     cancelText: t("core.common.buttons.cancel"),
     onConfirm: async () => {
       const filteredUserNames = selectedUserNames.value.filter((name) => {
-        if (name === userStore.currentUser?.metadata.name) return false;
+        if (name === currentUser?.user.metadata.name) return false;
         const user = users.value?.find((u) => u.user.metadata.name === name);
         return user && operationConfig.condition(user.user);
       });
@@ -192,7 +191,7 @@ watch(selectedUserNames, (newValue) => {
   checkedAll.value =
     newValue.length ===
     users.value?.filter(
-      (user) => user.user.metadata.name !== userStore.currentUser?.metadata.name
+      (user) => user.user.metadata.name !== currentUser?.user.metadata.name
     ).length;
 });
 
@@ -207,9 +206,7 @@ const handleCheckAllChange = (e: Event) => {
     selectedUserNames.value =
       users.value
         ?.filter((user) => {
-          return (
-            user.user.metadata.name !== userStore.currentUser?.metadata.name
-          );
+          return user.user.metadata.name !== currentUser?.user.metadata.name;
         })
         .map((user) => {
           return user.user.metadata.name;
@@ -408,8 +405,7 @@ function onCreationModalClose() {
                 name="user-checkbox"
                 type="checkbox"
                 :disabled="
-                  user.user.metadata.name ===
-                  userStore.currentUser?.metadata.name
+                  user.user.metadata.name === currentUser?.user.metadata.name
                 "
               />
             </template>

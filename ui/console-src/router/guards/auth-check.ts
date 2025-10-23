@@ -1,13 +1,13 @@
-import { useUserStore } from "@/stores/user";
+import { stores } from "@halo-dev/console-shared";
 import type { Router } from "vue-router";
 
 const whiteList = ["Setup"];
 
 export function setupAuthCheckGuard(router: Router) {
   router.beforeEach((to, _, next) => {
-    const userStore = useUserStore();
+    const currentUserStore = stores.currentUser();
 
-    if (userStore.isAnonymous) {
+    if (currentUserStore.isAnonymous) {
       if (whiteList.includes(to.name as string)) {
         next();
         return;

@@ -1,5 +1,4 @@
 <script lang="ts" setup>
-import { useUserStore } from "@/stores/user";
 import WidgetCard from "@console/modules/dashboard/components/WidgetCard.vue";
 import type { Notification } from "@halo-dev/api-client";
 import { ucApiClient } from "@halo-dev/api-client";
@@ -11,12 +10,12 @@ import {
   VEntityField,
   VLoading,
 } from "@halo-dev/components";
-import { utils } from "@halo-dev/console-shared";
+import { stores, utils } from "@halo-dev/console-shared";
 import { useQuery } from "@tanstack/vue-query";
 import { OverlayScrollbarsComponent } from "overlayscrollbars-vue";
 import sanitize from "sanitize-html";
 
-const { currentUser } = useUserStore();
+const { currentUser } = stores.currentUser();
 
 const {
   data: notifications,
@@ -28,7 +27,7 @@ const {
   queryFn: async () => {
     const { data } =
       await ucApiClient.notification.notification.listUserNotifications({
-        username: currentUser?.metadata.name as string,
+        username: currentUser?.user.metadata.name as string,
         page: 1,
         size: 20,
         fieldSelector: ["spec.unread=true"],

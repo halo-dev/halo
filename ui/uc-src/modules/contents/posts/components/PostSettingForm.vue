@@ -1,11 +1,10 @@
 <script lang="ts" setup>
 import HasPermission from "@/components/permission/HasPermission.vue";
-import { FormType } from "@/types/slug";
 import useSlugify from "@console/composables/use-slugify";
 import type { FormKitNode } from "@formkit/core";
 import { publicApiClient } from "@halo-dev/api-client";
 import { IconRefreshLine } from "@halo-dev/components";
-import { utils } from "@halo-dev/console-shared";
+import { FormType, utils } from "@halo-dev/console-shared";
 import { computed, ref } from "vue";
 import { useI18n } from "vue-i18n";
 import type { PostFormState } from "../types";

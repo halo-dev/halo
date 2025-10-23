@@ -1,6 +1,5 @@
-import { useGlobalInfoStore } from "@/stores/global-info";
-import { FormType } from "@/types/slug";
 import { randomUUID } from "@/utils/id";
+import { FormType, stores } from "@halo-dev/console-shared";
 import ShortUniqueId from "short-unique-id";
 import { slugify } from "transliteration";
 import { computed, watch, type Ref } from "vue";
@@ -24,7 +23,7 @@ export default function useSlugify(
   auto: Ref<boolean>,
   formType: FormType
 ) {
-  const globalInfoStore = useGlobalInfoStore();
+  const globalInfoStore = stores.globalInfo();
 
   const currentStrategy = computed(
     () =>

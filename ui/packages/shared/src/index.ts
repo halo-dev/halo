@@ -11,6 +11,7 @@ export * from "./states/plugin-installation-tabs";
 export * from "./states/plugin-tab";
 export * from "./states/theme-list-tabs";
 export * from "./states/user-tab";
+export * from "./stores";
 export * from "./types/menus";
 export * from "./types/plugin";
 export * from "./types/widget";

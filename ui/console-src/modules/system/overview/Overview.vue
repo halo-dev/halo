@@ -1,7 +1,5 @@
 <script lang="ts" setup>
 import H2WarningAlert from "@/components/alerts/H2WarningAlert.vue";
-import type { Info, Startup } from "@/types";
-import { useGlobalInfoFetch } from "@console/composables/use-global-info";
 import { useThemeStore } from "@console/stores/theme";
 import type { Plugin } from "@halo-dev/api-client";
 import { consoleApiClient } from "@halo-dev/api-client";
@@ -17,10 +15,12 @@ import {
   VPageHeader,
   VTag,
 } from "@halo-dev/components";
-import { utils } from "@halo-dev/console-shared";
+import type { Info, Startup } from "@halo-dev/console-shared";
+import { stores, utils } from "@halo-dev/console-shared";
 import { useQuery } from "@tanstack/vue-query";
 import { useClipboard } from "@vueuse/core";
 import axios from "axios";
+import { storeToRefs } from "pinia";
 import { computed } from "vue";
 import { useI18n } from "vue-i18n";
 import ExternalUrlItem from "./components/ExternalUrlItem.vue";
@@ -39,7 +39,7 @@ const { data: info } = useQuery<Info>({
   retry: 0,
 });
 
-const { globalInfo } = useGlobalInfoFetch();
+const { globalInfo } = storeToRefs(stores.globalInfo());
 
 const { data: startup } = useQuery<Startup>({
   queryKey: ["system-startup-info"],
