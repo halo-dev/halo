@@ -687,6 +687,8 @@ core:
         creation_time: Creation time
         permalink: Permalink
         thumbnails: Thumbnails
+      display_name_form:
+        help: Custom attachment name, only for display in the management interface, does not affect the file name and access link itself
       preview:
         video_not_support: The current browser does not support video playback.
         audio_not_support: The current browser does not support audio playback.
@@ -1565,8 +1567,8 @@ core:
     fields:
       external_url: External url
       start_time: Start time
-      timezone: System Timezone
-      locale: System Locale
+      timezone: Operating system Timezone
+      locale: Operating system Locale
       version: Version
       build_time: Build time
       database: Database

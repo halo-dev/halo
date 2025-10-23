@@ -647,13 +647,15 @@ core:
         preview: 预览
         storage_policy: 存储策略
         group: 所在分组
-        display_name: 文件名称
+        display_name: 附件名称
         media_type: 文件类型
         size: 文件大小
         owner: 上传者
         creation_time: 上传时间
         permalink: 链接
         thumbnails: 缩略图
+      display_name_form:
+        help: 自定义附件名称，仅用于管理界面显示，不会影响文件本身名称以及访问链接
       preview:
         video_not_support: 当前浏览器不支持该视频播放
         audio_not_support: 当前浏览器不支持该音频播放
@@ -1451,8 +1453,8 @@ core:
     fields:
       external_url: 外部访问地址
       start_time: 启动时间
-      timezone: 系统时区
-      locale: 系统语言
+      timezone: 操作系统时区
+      locale: 操作系统语言
       version: 版本
       build_time: 构建时间
       database: 数据库
