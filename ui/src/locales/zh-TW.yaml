@@ -632,13 +632,15 @@ core:
         preview: 預覽
         storage_policy: 存儲策略
         group: 所在分組
-        display_name: 文件名稱
+        display_name: 附件名稱
         media_type: 文件類型
         size: 文件大小
         owner: 上傳者
         creation_time: 上傳時間
         permalink: 連結
         thumbnails: 縮略圖
+      display_name_form:
+        help: 自定義附件名稱，僅用於管理介面顯示，不會影響文件本身名稱以及訪問連結
       preview:
         video_not_support: 當前瀏覽器不支援該影片播放
         audio_not_support: 當前瀏覽器不支援該音頻播放
