@@ -11,9 +11,7 @@ import "@/setup/setupStyles";
 // core modules
 import { setupApiClient } from "@/setup/setupApiClient";
 import { setupVueQuery } from "@/setup/setupVueQuery";
-import { useGlobalInfoStore } from "@/stores/global-info";
 import { useRoleStore } from "@/stores/role";
-import { useUserStore } from "@/stores/user";
 import { getCookie } from "@/utils/cookie";
 import { hasPermission } from "@/utils/permission";
 import {
@@ -21,7 +19,7 @@ import {
   setupPluginModules,
 } from "@console/setup/setupModules";
 import { useThemeStore } from "@console/stores/theme";
-import { utils } from "@halo-dev/console-shared";
+import { stores, utils } from "@halo-dev/console-shared";
 import "core-js/es/object/has-own";
 
 const app = createApp(App);
@@ -77,17 +75,17 @@ async function initApp() {
   try {
     setupCoreModules(app);
 
-    const userStore = useUserStore();
-    await userStore.fetchCurrentUser();
+    const currentUserStore = stores.currentUser();
+    await currentUserStore.fetchCurrentUser();
 
     // set locale
     i18n.global.locale.value = getCookie("language") || getBrowserLanguage();
     utils.date.setLocale(i18n.global.locale.value);
 
-    const globalInfoStore = useGlobalInfoStore();
+    const globalInfoStore = stores.globalInfo();
     await globalInfoStore.fetchGlobalInfo();
 
-    if (userStore.isAnonymous) {
+    if (currentUserStore.isAnonymous) {
       return;
     }
 

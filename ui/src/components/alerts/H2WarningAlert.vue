@@ -1,6 +1,6 @@
 <script lang="ts" setup>
-import type { Info } from "@/types";
 import { VAlert } from "@halo-dev/components";
+import type { Info } from "@halo-dev/console-shared";
 import { useQuery } from "@tanstack/vue-query";
 import axios from "axios";
 

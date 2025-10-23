@@ -1,8 +1,8 @@
 <script lang="ts" setup>
-import { useGlobalInfoStore } from "@/stores/global-info";
 import { matchMediaType } from "@/utils/media-type";
 import type { Attachment } from "@halo-dev/api-client";
 import { Toast, VButton, VTabbar } from "@halo-dev/components";
+import { stores } from "@halo-dev/console-shared";
 import { useClipboard } from "@vueuse/core";
 import { computed, ref, toRefs } from "vue";
 import { useI18n } from "vue-i18n";
@@ -20,7 +20,7 @@ const { attachment } = toRefs(props);
 
 const { copy } = useClipboard({ legacy: true });
 const { t } = useI18n();
-const { globalInfo } = useGlobalInfoStore();
+const { globalInfo } = stores.globalInfo();
 
 const activeId = ref<"relative" | "absolute">("relative");
 

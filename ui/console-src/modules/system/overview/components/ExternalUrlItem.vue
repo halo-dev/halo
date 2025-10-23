@@ -1,14 +1,15 @@
 <script setup lang="ts">
-import { useGlobalInfoFetch } from "@console/composables/use-global-info";
 import {
   IconRiPencilFill,
   VAlert,
   VDescriptionItem,
 } from "@halo-dev/components";
+import { stores } from "@halo-dev/console-shared";
+import { storeToRefs } from "pinia";
 import { computed, ref } from "vue";
 import ExternalUrlForm from "./ExternalUrlForm.vue";
 
-const { globalInfo } = useGlobalInfoFetch();
+const { globalInfo } = storeToRefs(stores.globalInfo());
 
 const isExternalUrlValid = computed(() => {
   if (!globalInfo.value) {

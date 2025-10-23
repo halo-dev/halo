@@ -2,7 +2,6 @@
 import SubmitButton from "@/components/button/SubmitButton.vue";
 import AnnotationsForm from "@/components/form/AnnotationsForm.vue";
 import { setFocus } from "@/formkit/utils/focus";
-import { FormType } from "@/types/slug";
 import useSlugify from "@console/composables/use-slugify";
 import { reset, submitForm, type FormKitNode } from "@formkit/core";
 import type { Tag } from "@halo-dev/api-client";
@@ -16,6 +15,7 @@ import {
   VModal,
   VSpace,
 } from "@halo-dev/components";
+import { FormType } from "@halo-dev/console-shared";
 import { cloneDeep } from "lodash-es";
 import { computed, nextTick, onMounted, ref, watch } from "vue";
 import { useI18n } from "vue-i18n";

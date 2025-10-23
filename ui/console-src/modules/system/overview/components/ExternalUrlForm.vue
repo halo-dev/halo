@@ -1,17 +1,18 @@
 <script setup lang="ts">
 import { setFocus } from "@/formkit/utils/focus";
-import { useGlobalInfoFetch } from "@console/composables/use-global-info";
 import { consoleApiClient } from "@halo-dev/api-client";
 import { Dialog, Toast, VButton, VLoading, VSpace } from "@halo-dev/components";
+import { stores } from "@halo-dev/console-shared";
 import { useQuery } from "@tanstack/vue-query";
 import axios from "axios";
+import { storeToRefs } from "pinia";
 import { computed, onMounted, ref } from "vue";
 import { useI18n } from "vue-i18n";
 
 const BASIC_GROUP = "basic";
 
 const { t } = useI18n();
-const { globalInfo } = useGlobalInfoFetch();
+const { globalInfo } = storeToRefs(stores.globalInfo());
 
 const emit = defineEmits<{
   (event: "close"): void;

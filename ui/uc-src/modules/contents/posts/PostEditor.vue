@@ -6,7 +6,6 @@ import { useContentCache } from "@/composables/use-content-cache";
 import { useEditorExtensionPoints } from "@/composables/use-editor-extension-points";
 import { useSessionKeepAlive } from "@/composables/use-session-keep-alive";
 import { contentAnnotations } from "@/constants/annotations";
-import { FormType } from "@/types/slug";
 import { randomUUID } from "@/utils/id";
 import { usePermission } from "@/utils/permission";
 import { useSaveKeybinding } from "@console/composables/use-save-keybinding";
@@ -24,6 +23,7 @@ import {
   VPageHeader,
 } from "@halo-dev/components";
 import type { EditorProvider } from "@halo-dev/console-shared";
+import { FormType } from "@halo-dev/console-shared";
 import { useMutation } from "@tanstack/vue-query";
 import { usePostUpdateMutate } from "@uc/modules/contents/posts/composables/use-post-update-mutate";
 import { useLocalStorage } from "@vueuse/core";

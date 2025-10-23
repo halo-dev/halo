@@ -1,5 +1,4 @@
 <script lang="ts" setup>
-import { useUserStore } from "@/stores/user";
 import { ucApiClient } from "@halo-dev/api-client";
 import {
   Dialog,
@@ -14,6 +13,7 @@ import {
   VPageHeader,
   VTabbar,
 } from "@halo-dev/components";
+import { stores } from "@halo-dev/console-shared";
 import { useQuery, useQueryClient } from "@tanstack/vue-query";
 import { useRouteQuery } from "@vueuse/router";
 import { chunk } from "lodash-es";
@@ -25,7 +25,7 @@ import NotificationListItem from "./components/NotificationListItem.vue";
 
 const queryClient = useQueryClient();
 const { t } = useI18n();
-const { currentUser } = useUserStore();
+const { currentUser } = stores.currentUser();
 
 const activeTab = useRouteQuery("tab", "unread");
 
@@ -39,7 +39,7 @@ const {
   queryFn: async () => {
     const { data } =
       await ucApiClient.notification.notification.listUserNotifications({
-        username: currentUser?.metadata.name as string,
+        username: currentUser?.user.metadata.name as string,
         fieldSelector: [`spec.unread=${activeTab.value === "unread"}`],
       });
 
@@ -85,7 +85,7 @@ function handleDeleteNotifications() {
         await Promise.all(
           chunk.map((notification) =>
             ucApiClient.notification.notification.deleteSpecifiedNotification({
-              username: currentUser.metadata.name,
+              username: currentUser.user.metadata.name,
               name: notification.metadata.name,
             })
           )
@@ -121,7 +121,7 @@ function handleMarkAllAsRead() {
       );
 
       await ucApiClient.notification.notification.markNotificationsAsRead({
-        username: currentUser.metadata.name,
+        username: currentUser.user.metadata.name,
         markSpecifiedRequest: {
           names,
         },

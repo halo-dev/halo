@@ -1,6 +1,7 @@
 const GLOBALS = {
   vue: "Vue",
   "vue-router": "VueRouter",
+  pinia: "Pinia",
   "@vueuse/core": "VueUse",
   "@vueuse/components": "VueUse",
   "@vueuse/router": "VueUse",
