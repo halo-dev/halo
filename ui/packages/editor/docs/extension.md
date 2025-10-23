@@ -28,8 +28,12 @@ export interface ExtensionOptions {
     editor: Editor;
   }) => ToolboxItemType | ToolboxItemType[];
 
-  // 拖拽扩展
-  getDraggable?: ({ editor }: { editor: Editor }) => DraggableItemType | boolean;
+  // 拖拽菜单扩展
+  getDraggableMenuItems?: ({
+    editor,
+  }: {
+    editor: Editor;
+  }) => DragButtonType | DragButtonType[];
 }
 ```
 
@@ -342,105 +346,122 @@ addOptions() {
 }
 ```
 
-## 5. 拖拽功能扩展
+## 5. 拖拽菜单扩展
 
-拖拽功能的扩展，可用于支持当前块元素的拖拽功能。
+拖拽菜单扩展主要用于拖拽的菜单功能扩展，例如转换为、复制、剪切、删除等操作。
 
-在 <https://github.com/halo-sigs/richtext-editor/pull/48> 中，我们实现了对所有元素的拖拽功能，如果需要让当前扩展支持拖拽，只需要在具体的 Tiptap Extension 中的 `addOptions` 中定义 `getDraggable` 函数，并让其返回 true 即可。如：
+在 <https://github.com/halo-dev/halo/pull/7861> 中，我们重构了对编辑器拖拽区域的扩展，并且支持了对拖拽菜单的扩展。如果需要对拖拽菜单进行扩展，只需要在具体的 Tiptap Extension 中的 `addOptions` 中定义 `getDraggableMenuItems` 函数即可，如：
 
 ```ts
 {
   addOptions() {
     return {
       ...this.parent?.(),
-      getDraggable() {
-        return true;
+      getDraggableMenuItems({ editor }: { editor: Editor }) {
+        return []
       },
     };
   },
 }
 ```
 
-其中 `getDraggable` 即为为当前扩展增加可拖拽的功能。其返回类型为：
+并且，拖拽菜单最多支持两级菜单嵌套， 如果想扩展已有的一级菜单，为其二级菜单增加内容，则只需将二级菜单的 `parentKey` 设置为一级菜单的 `key`。如：
 
 ```ts
-// 拖拽扩展
-getDraggable?: ({ editor }: { editor: Editor }) => DraggableItemType | boolean;
-
-export interface DraggableItemType {
-  getRenderContainer?: ({               // 拖拽按钮计算偏移位置的基准 DOM
-    dom,
-    view,
-  }: {
-    dom: HTMLElement;
-    view: EditorView;
-  }) => DragSelectionNodeType;
-  handleDrop?: ({                       // 完成拖拽功能之后的处理。返回 true 则会阻止拖拽的发生
-    view,
-    event,
-    slice,
-    insertPos,
-    node,
-    selection,
-  }: {
-    view: EditorView;
-    event: DragEvent;
-    slice: Slice;
-    insertPos: number;
-    node: Node;
-    selection: Selection;
-  }) => boolean | void;
-  allowPropagationDownward?: boolean;   // 是否允许拖拽事件向内部传播，
-}
-
-export interface DragSelectionNodeType {
-  $pos?: ResolvedPos;
-  node?: Node;
-  el: HTMLElement;
-  nodeOffset?: number;
-  dragDomOffset?: {
-    x?: number;
-    y?: number;
-  };
+{
+  addOptions() {
+    return {
+      ...this.parent?.(),
+      getDraggableMenuItems({ editor }: { editor: Editor }) {
+        return {
+          parentKey: CONVERT_TO_KEY,
+          children: {
+            items: [
+              {
+                priority: 10,
+                icon: markRaw(MdiFormatParagraph),
+                title: i18n.global.t("editor.common.heading.paragraph"),
+                action: ({ editor }: { editor: Editor }) =>
+                  editor.chain().focus().setParagraph().run(),
+              },
+            ],
+          },
+        }
+      },
+    };
+  },
 }
 ```
 
-> 拖拽会从父 Node 节点开始触发，直到找到一个实现 `getDraggable` 的扩展，如果没有找到，则不会触发拖拽事件。父 Node 可以通过 `allowPropagationDownward` 来控制是否允许拖拽事件向内部传播。如果 `allowPropagationDownward` 设置为 true，则会继续向内部寻找实现 `getDraggable` 的扩展，如果没有找到，则触发父 Node 的 `getDraggable` 实现，否则继续进行传播。
-
-如下为 [`Iframe`](../packages/editor/src/extensions/iframe/index.ts) 扩展中对于 `getDraggable` 拖拽功能的扩展示例：
+下面为 `getDraggableMenuItems` 的返回类型：
 
 ```ts
-addOptions() {
-  return {
-    ...this.parent?.(),
-    getDraggable() {
-      return {
-        getRenderContainer({ dom, view }) {
-          let container = dom;
-          while (
-            container.parentElement &&
-            container.parentElement.tagName !== "P"
-          ) {
-            container = container.parentElement;
-          }
-          if (container) {
-            container = container.firstElementChild
-              ?.firstElementChild as HTMLElement;
-          }
-          let node;
-          if (container.firstElementChild) {
-            const pos = view.posAtDOM(container.firstElementChild, 0);
-            const $pos = view.state.doc.resolve(pos);
-            node = $pos.node();
-          }
 
-          return {
-            node: node,
-            el: container as HTMLElement,
-          };
-        },
-      };
-    },
-  }
+// 拖拽菜单扩展
+getDraggableMenuItems?: ({
+    editor,
+  }: {
+    editor: Editor;
+  }) => DragButtonType | DragButtonType[];
+
+// 拖拽菜单项目属性
+export interface DragButtonItemProps {
+  priority?: number;                                      // 优先级，数字越小优先级越大，越靠前
+  title?: string | (() => string);                        // 标题
+  icon?: Component;                                       // 图标
+  key?: string;                                           // 唯一标识，如果同级菜单项设置了同样的 key，则会被合并为一个菜单项。
+  action?: ({                                             // 点击菜单后的操作，如果返回 Component，则会将其包含在子菜单中。
+                                                          // 可以通过调用 close 方法可以在操作完成后关闭拖拽菜单，或者当返回为 true 或 undefined 时，会自动关闭拖拽菜单，如果返回 false，则不会关闭拖拽菜单。
+    editor,
+    node,
+    pos,
+    close,
+  }: {
+    editor: Editor;
+    node: PMNode | null;
+    pos: number;
+    close: () => void;
+  }) => Component | boolean | void | Promise<Component | boolean | void>;
+  iconStyle?: string;                                       // 图标自定义样式
+  class?: string;                                           // 自定义样式
+  visible?: ({                                              // 是否显示当前菜单项，默认为 true
+    editor,
+    node,
+    pos,
+  }: {
+    editor: Editor;
+    node: PMNode | null;
+    pos: number;
+  }) => boolean;
+  isActive?: ({                                             // 当前菜单项是否处于活动状态，默认为 false
+    editor,
+    node,
+    pos,
+  }: {
+    editor: Editor;
+    node: PMNode | null;
+    pos: number;
+  }) => boolean;
+  disabled?: ({                                                // 是否禁用当前菜单项，默认为 false
+    editor,
+    node,
+    pos,
+  }: {
+    editor: Editor;
+    node: PMNode | null;
+    pos: number;
+  }) => boolean;
+  keyboard?: string;                                            // 快捷键，遵循 https://tiptap.dev/docs/editor/core-concepts/keyboard-shortcuts
+  component?: Component;                                        // 自定义组件，如果提供了该属性，则不会显示默认的菜单项，而是会显示自定义组件，并且将所有 props 传递给自定义组件。
+  [key: string]: any;                                           // 其他自定义属性，将会传递给自定义组件。
+}
+
+// 一级菜单项
+export interface DragButtonType extends DragButtonItemProps {
+  parentKey?: string;                                             // 父级菜单项的唯一标识，如果提供了该属性，则视为扩展目标菜单项的二级菜单。
+  children?: {                                                    // 子菜单项，如果提供了该属性，则视为扩展目标菜单项的二级菜单。
+    component?: Component;                                        // 自定义组件，如果提供了该属性，则不会显示默认的子菜单项，而是会显示自定义组件，并且将所有 props 传递给自定义组件。
+    items?: DragButtonItemProps[];                                // 子菜单项列表，如果提供了该属性，则视为扩展目标菜单项的二级菜单。
+  };
 }
 ```

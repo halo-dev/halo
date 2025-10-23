@@ -6,8 +6,6 @@ import type {
   PMNode,
   Range,
   ResolvedPos,
-  Selection,
-  Slice,
 } from "@/tiptap";
 import type {
   arrow,
@@ -68,6 +66,73 @@ export interface BubbleMenuOptions {
    * @type {HTMLElement | Window}
    */
   scrollTarget?: HTMLElement | Window;
+}
+
+export interface DragButtonItemProps {
+  priority?: number;
+  title?:
+    | string
+    | (({
+        editor,
+        node,
+        pos,
+      }: {
+        editor: Editor;
+        node: PMNode | null;
+        pos: number;
+      }) => string);
+  icon?: Component;
+  key?: string;
+  action?: ({
+    editor,
+    node,
+    pos,
+    close,
+  }: {
+    editor: Editor;
+    node: PMNode | null;
+    pos: number;
+    close: () => void;
+  }) => Component | boolean | void | Promise<Component | boolean | void>;
+  iconStyle?: string;
+  class?: string;
+  visible?: ({
+    editor,
+    node,
+    pos,
+  }: {
+    editor: Editor;
+    node: PMNode | null;
+    pos: number;
+  }) => boolean;
+  isActive?: ({
+    editor,
+    node,
+    pos,
+  }: {
+    editor: Editor;
+    node: PMNode | null;
+    pos: number;
+  }) => boolean;
+  disabled?: ({
+    editor,
+    node,
+    pos,
+  }: {
+    editor: Editor;
+    node: PMNode | null;
+    pos: number;
+  }) => boolean;
+  keyboard?: string;
+  component?: Component;
+  [key: string]: unknown;
+}
+export interface DragButtonType extends DragButtonItemProps {
+  parentKey?: string;
+  children?: {
+    component?: Component;
+    items?: DragButtonItemProps[];
+  };
 }
 
 export interface BubbleMenuProps {
@@ -135,11 +200,11 @@ export interface ExtensionOptions {
     editor: Editor;
   }) => ToolboxItemType | ToolboxItemType[];
 
-  getDraggable?: ({
+  getDraggableMenuItems?: ({
     editor,
   }: {
     editor: Editor;
-  }) => DraggableItemType | boolean;
+  }) => DragButtonType | DragButtonType[];
 }
 
 export interface CommandMenuItemType {
@@ -159,31 +224,4 @@ export interface DragSelectionNodeType {
     x?: number;
     y?: number;
   };
-}
-
-export interface DraggableItemType {
-  getRenderContainer?: ({
-    dom,
-    view,
-  }: {
-    dom: HTMLElement;
-    view: EditorView;
-  }) => DragSelectionNodeType;
-  handleDrop?: ({
-    view,
-    event,
-    slice,
-    insertPos,
-    node,
-    selection,
-  }: {
-    view: EditorView;
-    event: DragEvent;
-    slice: Slice;
-    insertPos: number;
-    node: PMNode;
-    selection: Selection;
-  }) => boolean | void;
-  // allow drag-and-drop query propagation downward
-  allowPropagationDownward?: boolean;
 }

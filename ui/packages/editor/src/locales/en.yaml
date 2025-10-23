@@ -1,4 +1,13 @@
 editor:
+  drag:
+    button:
+      insert_block: Insert block
+      drag_handle: Drag handle
+    menu:
+      convert_to: Convert to
+      copy: Copy
+      cut: Cut
+      delete: Delete
   menus:
     undo: Undo
     redo: Redo
