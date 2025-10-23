@@ -1,7 +1,6 @@
 <script setup lang="ts">
 import { rbacAnnotations } from "@/constants/annotations";
 import { useUserStore } from "@/stores/user";
-import { usePermission } from "@/utils/permission";
 import { coreApiClient, type ListedUser } from "@halo-dev/api-client";
 import {
   Dialog,
@@ -34,7 +33,6 @@ const props = withDefaults(
 );
 
 const queryClient = useQueryClient();
-const { currentUserHasPermission } = usePermission();
 const { t } = useI18n();
 const { currentUser } = storeToRefs(useUserStore());
 
@@ -172,7 +170,7 @@ const { handleEnableOrDisableUser } = useUserEnableDisable();
       </VEntityField>
     </template>
     <template
-      v-if="currentUserHasPermission(['system:users:manage'])"
+      v-if="utils.permission.has(['system:users:manage'])"
       #dropdownItems
     >
       <VDropdownItem @click="editingModal = true">

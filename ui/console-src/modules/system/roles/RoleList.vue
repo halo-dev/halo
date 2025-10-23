@@ -2,7 +2,6 @@
 import { rbacAnnotations } from "@/constants/annotations";
 import { SUPER_ROLE_NAME } from "@/constants/constants";
 import { roleLabels } from "@/constants/labels";
-import { usePermission } from "@/utils/permission";
 import { resolveDeepDependencies } from "@/utils/role";
 import type { Role, RoleList } from "@halo-dev/api-client";
 import { coreApiClient } from "@halo-dev/api-client";
@@ -29,7 +28,6 @@ import { computed, ref } from "vue";
 import { useI18n } from "vue-i18n";
 import RoleEditingModal from "./components/RoleEditingModal.vue";
 
-const { currentUserHasPermission } = usePermission();
 const { t } = useI18n();
 
 const editingModal = ref<boolean>(false);
@@ -284,7 +282,7 @@ const handleDelete = async (role: Role) => {
               </VEntityField>
             </template>
             <template
-              v-if="currentUserHasPermission(['system:roles:manage'])"
+              v-if="utils.permission.has(['system:roles:manage'])"
               #dropdownItems
             >
               <VDropdownItem

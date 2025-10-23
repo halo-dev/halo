@@ -1,5 +1,4 @@
 <script lang="ts" setup>
-import { usePermission } from "@/utils/permission";
 import {
   PluginStatusPhaseEnum,
   consoleApiClient,
@@ -23,7 +22,11 @@ import EntityDropdownItems from "@/components/entity/EntityDropdownItems.vue";
 import { useEntityFieldItemExtensionPoint } from "@console/composables/use-entity-extension-points";
 import { useOperationItemExtensionPoint } from "@console/composables/use-operation-extension-points";
 import PluginInstallationModal from "@console/modules/system/plugins/components/PluginInstallationModal.vue";
-import type { EntityFieldItem, OperationItem } from "@halo-dev/console-shared";
+import {
+  utils,
+  type EntityFieldItem,
+  type OperationItem,
+} from "@halo-dev/console-shared";
 import { useI18n } from "vue-i18n";
 import { useRouter } from "vue-router";
 import AuthorField from "./entity-fields/AuthorField.vue";
@@ -31,7 +34,6 @@ import LogoField from "./entity-fields/LogoField.vue";
 import ReloadField from "./entity-fields/ReloadField.vue";
 import SwitchField from "./entity-fields/SwitchField.vue";
 
-const { currentUserHasPermission } = usePermission();
 const { t } = useI18n();
 const router = useRouter();
 
@@ -242,10 +244,7 @@ const { startFields, endFields } = useEntityFieldItemExtensionPoint<Plugin>(
 </script>
 <template>
   <VEntity :is-selected="isSelected">
-    <template
-      v-if="currentUserHasPermission(['system:plugins:manage'])"
-      #checkbox
-    >
+    <template v-if="utils.permission.has(['system:plugins:manage'])" #checkbox>
       <input
         v-model="selectedNames"
         :value="plugin.metadata.name"
@@ -260,7 +259,7 @@ const { startFields, endFields } = useEntityFieldItemExtensionPoint<Plugin>(
       <EntityFieldItems :fields="endFields" />
     </template>
     <template
-      v-if="currentUserHasPermission(['system:plugins:manage'])"
+      v-if="utils.permission.has(['system:plugins:manage'])"
       #dropdownItems
     >
       <EntityDropdownItems :dropdown-items="operationItems" :item="plugin" />
@@ -270,7 +269,7 @@ const { startFields, endFields } = useEntityFieldItemExtensionPoint<Plugin>(
   <PluginInstallationModal
     v-if="
       pluginUpgradeModalVisible &&
-      currentUserHasPermission(['system:plugins:manage'])
+      utils.permission.has(['system:plugins:manage'])
     "
     :plugin-to-upgrade="plugin"
     @close="pluginUpgradeModalVisible = false"

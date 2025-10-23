@@ -2,7 +2,6 @@
 import { useFetchRole } from "@/composables/use-role";
 import { rbacAnnotations } from "@/constants/annotations";
 import { useUserStore } from "@/stores/user";
-import { usePermission } from "@/utils/permission";
 import type { ListedUser, User } from "@halo-dev/api-client";
 import { consoleApiClient, coreApiClient } from "@halo-dev/api-client";
 import {
@@ -22,6 +21,7 @@ import {
   VPagination,
   VSpace,
 } from "@halo-dev/components";
+import { utils } from "@halo-dev/console-shared";
 import { useQuery } from "@tanstack/vue-query";
 import { useRouteQuery } from "@vueuse/router";
 import { chunk } from "lodash-es";
@@ -30,7 +30,6 @@ import { useI18n } from "vue-i18n";
 import UserCreationModal from "./components/UserCreationModal.vue";
 import UserListItem from "./components/UserListItem.vue";
 
-const { currentUserHasPermission } = usePermission();
 const { t } = useI18n();
 
 const checkedAll = ref(false);
@@ -400,7 +399,7 @@ function onCreationModalClose() {
             :is-selected="checkSelection(user.user)"
           >
             <template
-              v-if="currentUserHasPermission(['system:users:manage'])"
+              v-if="utils.permission.has(['system:users:manage'])"
               #checkbox
             >
               <input

@@ -1,7 +1,7 @@
 <script lang="ts" setup>
-import { usePermission } from "@/utils/permission";
 import type { Contributor } from "@halo-dev/api-client";
 import { VAvatar, VAvatarGroup } from "@halo-dev/components";
+import { utils } from "@halo-dev/console-shared";
 import { computed } from "vue";
 import { useRouter } from "vue-router";
 
@@ -18,7 +18,6 @@ const props = withDefaults(
 );
 
 const router = useRouter();
-const { currentUserHasPermission } = usePermission();
 
 const contributorsWithoutOwner = computed(() =>
   props.contributors.filter(
@@ -28,7 +27,7 @@ const contributorsWithoutOwner = computed(() =>
 
 function handleRouteToUserDetail(contributor: Contributor) {
   if (
-    !currentUserHasPermission(["system:users:view"]) ||
+    !utils.permission.has(["system:users:view"]) ||
     !props.allowViewUserDetail
   ) {
     return;

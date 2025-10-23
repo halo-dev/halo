@@ -1,5 +1,4 @@
 <script lang="ts" setup>
-import { usePermission } from "@/utils/permission";
 import type { Menu } from "@halo-dev/api-client";
 import { consoleApiClient, coreApiClient } from "@halo-dev/api-client";
 import {
@@ -16,6 +15,7 @@ import {
   VStatusDot,
   VTag,
 } from "@halo-dev/components";
+import { utils } from "@halo-dev/console-shared";
 import { useQuery } from "@tanstack/vue-query";
 import { useRouteQuery } from "@vueuse/router";
 import { onMounted, ref } from "vue";
@@ -26,7 +26,6 @@ interface SystemMenuConfig {
   primary: string;
 }
 
-const { currentUserHasPermission } = usePermission();
 const { t } = useI18n();
 
 const props = withDefaults(
@@ -223,7 +222,7 @@ const handleSetPrimaryMenu = async (menu: Menu) => {
             </VEntityField>
           </template>
           <template
-            v-if="currentUserHasPermission(['system:menus:manage'])"
+            v-if="utils.permission.has(['system:menus:manage'])"
             #dropdownItems
           >
             <VDropdownItem
@@ -246,7 +245,7 @@ const handleSetPrimaryMenu = async (menu: Menu) => {
         </VEntity>
       </VEntityContainer>
     </Transition>
-    <template v-if="currentUserHasPermission(['system:menus:manage'])" #footer>
+    <template v-if="utils.permission.has(['system:menus:manage'])" #footer>
       <VButton block type="secondary" @click="handleOpenEditingModal()">
         {{ $t("core.common.buttons.new") }}
       </VButton>

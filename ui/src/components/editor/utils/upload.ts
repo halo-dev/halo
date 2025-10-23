@@ -1,6 +1,6 @@
 // image drag and paste upload
-import { usePermission } from "@/utils/permission";
 import { ucApiClient, type Attachment } from "@halo-dev/api-client";
+import { utils } from "@halo-dev/console-shared";
 import { Editor, PMNode } from "@halo-dev/richtext-editor";
 import type { AxiosRequestConfig } from "axios";
 import { chunk } from "lodash-es";
@@ -20,13 +20,11 @@ export interface FileProps {
  * @returns {boolean} - True if a file is handled, otherwise false
  */
 export const handleFileEvent = ({ file, editor }: FileProps) => {
-  const { currentUserHasPermission } = usePermission();
-
   if (!file) {
     return false;
   }
 
-  if (!currentUserHasPermission(["uc:attachments:manage"])) {
+  if (!utils.permission.has(["uc:attachments:manage"])) {
     return false;
   }
 

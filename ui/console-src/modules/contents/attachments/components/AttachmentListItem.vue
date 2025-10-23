@@ -1,6 +1,5 @@
 <script lang="ts" setup>
 import EntityDropdownItems from "@/components/entity/EntityDropdownItems.vue";
-import { usePermission } from "@/utils/permission";
 import { useOperationItemExtensionPoint } from "@console/composables/use-operation-extension-points";
 import type { Attachment } from "@halo-dev/api-client";
 import { coreApiClient } from "@halo-dev/api-client";
@@ -22,7 +21,6 @@ import { computed, inject, markRaw, ref, toRefs } from "vue";
 import { useI18n } from "vue-i18n";
 import { useFetchAttachmentPolicy } from "../composables/use-attachment-policy";
 
-const { currentUserHasPermission } = usePermission();
 const { t } = useI18n();
 const queryClient = useQueryClient();
 
@@ -135,7 +133,7 @@ const { operationItems } = useOperationItemExtensionPoint<Attachment>(
 <template>
   <VEntity :is-selected="isSelected">
     <template
-      v-if="currentUserHasPermission(['system:attachments:manage'])"
+      v-if="utils.permission.has(['system:attachments:manage'])"
       #checkbox
     >
       <input
@@ -186,7 +184,7 @@ const { operationItems } = useOperationItemExtensionPoint<Attachment>(
             }"
             class="text-xs text-gray-500"
             :class="{
-              'pointer-events-none': !currentUserHasPermission([
+              'pointer-events-none': !utils.permission.has([
                 'system:users:view',
               ]),
             }"

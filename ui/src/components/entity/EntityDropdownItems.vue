@@ -1,9 +1,6 @@
 <script setup lang="ts" generic="T">
-import { usePermission } from "@/utils/permission";
 import { VDropdown } from "@halo-dev/components";
-import type { OperationItem } from "@halo-dev/console-shared";
-
-const { currentUserHasPermission } = usePermission();
+import { utils, type OperationItem } from "@halo-dev/console-shared";
 
 const props = withDefaults(
   defineProps<{
@@ -28,7 +25,7 @@ function action(dropdownItem: OperationItem<T>) {
     <template
       v-if="
         !dropdownItem.hidden &&
-        currentUserHasPermission(dropdownItem.permissions)
+        utils.permission.has(dropdownItem.permissions || [])
       "
     >
       <VDropdown
@@ -49,7 +46,7 @@ function action(dropdownItem: OperationItem<T>) {
               :is="childItem.component"
               v-if="
                 !childItem.hidden &&
-                currentUserHasPermission(childItem.permissions)
+                utils.permission.has(childItem.permissions || [])
               "
               v-bind="childItem.props"
               :key="`dropdown-child-item-${childIndex}`"

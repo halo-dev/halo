@@ -1,5 +1,4 @@
 import { usePluginModuleStore } from "@/stores/plugin";
-import { usePermission } from "@/utils/permission";
 import {
   PluginStatusPhaseEnum,
   consoleApiClient,
@@ -8,7 +7,7 @@ import {
   type SettingForm,
 } from "@halo-dev/api-client";
 import { Dialog, Toast } from "@halo-dev/components";
-import type { PluginTab } from "@halo-dev/console-shared";
+import { utils, type PluginTab } from "@halo-dev/console-shared";
 import { useMutation, useQuery } from "@tanstack/vue-query";
 import { useRouteQuery } from "@vueuse/router";
 import type { ComputedRef, Ref } from "vue";
@@ -281,7 +280,6 @@ export function usePluginDetailTabs(
   pluginName: Ref<string | undefined>,
   recordsActiveTab: boolean
 ) {
-  const { currentUserHasPermission } = usePermission();
   const { t } = useI18n();
 
   const initialTabs = [
@@ -308,7 +306,7 @@ export function usePluginDetailTabs(
     async onSuccess(data) {
       if (
         !data.spec.settingName ||
-        !currentUserHasPermission(["system:plugins:manage"])
+        !utils.permission.has(["system:plugins:manage"])
       ) {
         tabs.value = [...initialTabs, ...(await getTabsFromExtensions())];
       }
@@ -327,7 +325,7 @@ export function usePluginDetailTabs(
       return (
         !!plugin.value &&
         !!plugin.value.spec.settingName &&
-        currentUserHasPermission(["system:plugins:manage"])
+        utils.permission.has(["system:plugins:manage"])
       );
     }),
     async onSuccess(data) {
@@ -367,7 +365,7 @@ export function usePluginDetailTabs(
     const pluginTabs = await callbackFunction();
 
     return pluginTabs.filter((tab) => {
-      return currentUserHasPermission(tab.permissions);
+      return utils.permission.has(tab.permissions || []);
     });
   }
 

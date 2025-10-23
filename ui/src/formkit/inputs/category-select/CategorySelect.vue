@@ -1,6 +1,5 @@
 <script lang="ts" setup>
 import HasPermission from "@/components/permission/HasPermission.vue";
-import { usePermission } from "@/utils/permission";
 import { usePostCategory } from "@console/modules/contents/posts/categories/composables/use-post-category";
 import {
   convertTreeToCategories,
@@ -10,6 +9,7 @@ import type { FormKitFrameworkContext } from "@formkit/core";
 import type { Category } from "@halo-dev/api-client";
 import { coreApiClient } from "@halo-dev/api-client";
 import { IconArrowRight } from "@halo-dev/components";
+import { utils } from "@halo-dev/console-shared";
 import { onClickOutside } from "@vueuse/core";
 import Fuse from "fuse.js";
 import ShortUniqueId from "short-unique-id";
@@ -18,8 +18,6 @@ import { computed, provide, ref, watch, type PropType, type Ref } from "vue";
 import CategoryListItem from "./components/CategoryListItem.vue";
 import CategoryTag from "./components/CategoryTag.vue";
 import SearchResultListItem from "./components/SearchResultListItem.vue";
-
-const { currentUserHasPermission } = usePermission();
 
 const props = defineProps({
   context: {
@@ -216,7 +214,7 @@ const scrollToSelected = () => {
 const uid = new ShortUniqueId();
 
 const handleCreateCategory = async () => {
-  if (!currentUserHasPermission(["system:posts:manage"])) {
+  if (!utils.permission.has(["system:posts:manage"])) {
     return;
   }
 

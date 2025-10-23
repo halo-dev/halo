@@ -1,9 +1,8 @@
 <script lang="ts" setup>
 import { usePluginModuleStore } from "@/stores/plugin";
-import { usePermission } from "@/utils/permission";
 import type { Plugin } from "@halo-dev/api-client";
 import { VButton, VModal, VTabbar } from "@halo-dev/components";
-import type { PluginInstallationTab } from "@halo-dev/console-shared";
+import { utils, type PluginInstallationTab } from "@halo-dev/console-shared";
 import { useRouteQuery } from "@vueuse/router";
 import {
   computed,
@@ -21,7 +20,6 @@ import LocalUpload from "./installation-tabs/LocalUpload.vue";
 import RemoteDownload from "./installation-tabs/RemoteDownload.vue";
 
 const { t } = useI18n();
-const { currentUserHasPermission } = usePermission();
 
 const props = withDefaults(
   defineProps<{
@@ -95,7 +93,7 @@ onMounted(async () => {
 
       tabs.value.push(
         ...items.filter((item) => {
-          return currentUserHasPermission(item.permissions);
+          return utils.permission.has(item.permissions || []);
         })
       );
     } catch (error) {

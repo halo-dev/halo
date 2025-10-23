@@ -1,27 +1,5 @@
 <script lang="ts" setup>
-// core libs
-import {
-  computed,
-  nextTick,
-  onMounted,
-  provide,
-  ref,
-  shallowRef,
-  watch,
-  type Ref,
-} from "vue";
-import { useRoute, useRouter } from "vue-router";
-
-// libs
-import { cloneDeep } from "lodash-es";
-
-// hooks
-import { useThemeLifeCycle } from "../composables/use-theme";
-// types
 import BasicLayout from "@console/layouts/BasicLayout.vue";
-
-// components
-import { usePermission } from "@/utils/permission";
 import { useThemeStore } from "@console/stores/theme";
 import type { Setting, SettingForm, Theme } from "@halo-dev/api-client";
 import { consoleApiClient } from "@halo-dev/api-client";
@@ -39,14 +17,27 @@ import {
   VSpace,
   VTabbar,
 } from "@halo-dev/components";
+import { utils } from "@halo-dev/console-shared";
 import { useQuery } from "@tanstack/vue-query";
 import { useRouteQuery } from "@vueuse/router";
+import { cloneDeep } from "lodash-es";
 import { storeToRefs } from "pinia";
+import {
+  computed,
+  nextTick,
+  onMounted,
+  provide,
+  ref,
+  shallowRef,
+  watch,
+  type Ref,
+} from "vue";
 import { useI18n } from "vue-i18n";
+import { useRoute, useRouter } from "vue-router";
 import ThemeListModal from "../components/ThemeListModal.vue";
 import ThemePreviewModal from "../components/preview/ThemePreviewModal.vue";
+import { useThemeLifeCycle } from "../composables/use-theme";
 
-const { currentUserHasPermission } = usePermission();
 const { t } = useI18n();
 const route = useRoute();
 const router = useRouter();
@@ -95,7 +86,7 @@ const { data: setting } = useQuery<Setting>({
     return (
       !!selectedTheme.value &&
       !!selectedTheme.value.spec.settingName &&
-      currentUserHasPermission(["system:themes:view"])
+      utils.permission.has(["system:themes:view"])
     );
   }),
   async onSuccess(data) {
