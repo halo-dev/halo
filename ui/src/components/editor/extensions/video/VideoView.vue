@@ -38,7 +38,7 @@ const initialization = computed(() => {
 
 const editorLinkObtain = ref();
 
-const handleSetExternalLink = (attachment: AttachmentSimple) => {
+const handleSetExternalLink = (attachment?: AttachmentSimple) => {
   if (!attachment) return;
   props.updateAttributes({
     src: attachment.url,
