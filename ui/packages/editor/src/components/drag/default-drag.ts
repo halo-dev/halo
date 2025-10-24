@@ -2,6 +2,7 @@ import { i18n } from "@/locales";
 import type { DragButtonType } from "@/types";
 import { copySelectionToClipboard } from "@/utils";
 
+import { isActive } from "@tiptap/core";
 import { markRaw } from "vue";
 import MdiContentCut from "~icons/mdi/content-cut";
 import MdiDeleteForeverOutline from "~icons/mdi/delete-forever-outline";
@@ -21,6 +22,12 @@ const defaultDragItems: DragButtonType[] = [
     title: () => i18n.global.t("editor.drag.menu.convert_to"),
     key: CONVERT_TO_KEY,
     icon: markRaw(RiLoopLeftFill),
+    visible: ({ editor }) => {
+      if (isActive(editor.state, "table")) {
+        return false;
+      }
+      return true;
+    },
     children: {
       items: [
         // Internal sub-nodes are implemented by various extensions, such as the Header extension
@@ -30,6 +37,12 @@ const defaultDragItems: DragButtonType[] = [
   {
     priority: 700,
     component: markRaw(BlockActionHorizontalSeparator),
+    visible: ({ editor }) => {
+      if (isActive(editor.state, "table")) {
+        return false;
+      }
+      return true;
+    },
   },
   {
     priority: 710,
