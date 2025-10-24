@@ -35,7 +35,7 @@ public class ControllerBuilder {
 
     private final ExtensionClient client;
 
-    private boolean syncAllOnStart = true;
+    private boolean syncAllOnStart = false;
 
     private int workerCount = 1;
 

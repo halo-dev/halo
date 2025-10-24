@@ -128,6 +128,7 @@ public class BackupReconciler implements Reconciler<Request> {
     public Controller setupWith(ControllerBuilder builder) {
         return builder
             .extension(new Backup())
+            .syncAllOnStart(true)
             .build();
     }
 }

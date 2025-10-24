@@ -54,6 +54,8 @@ class LocalThumbnailsReconciler implements Reconciler<Reconciler.Request> {
     public Controller setupWith(ControllerBuilder builder) {
         return builder
             .extension(new LocalThumbnail())
+            // Only for deletion
+            .syncAllOnStart(true)
             .build();
     }
 
