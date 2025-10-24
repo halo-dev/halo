@@ -234,7 +234,7 @@ const Blockquote = TiptapHeading.extend<ExtensionOptions & HeadingOptions>({
       },
       getDraggableMenuItems() {
         return {
-          parentKey: CONVERT_TO_KEY,
+          extendsKey: CONVERT_TO_KEY,
           children: {
             items: [
               {

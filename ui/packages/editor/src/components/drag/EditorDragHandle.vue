@@ -1,6 +1,12 @@
 <script lang="ts" setup>
 import { i18n } from "@/locales";
-import { NodeSelection, PMNode, TextSelection, VueEditor } from "@/tiptap";
+import {
+  Editor,
+  NodeSelection,
+  PMNode,
+  TextSelection,
+  VueEditor,
+} from "@/tiptap";
 import type {
   DragButtonItemProps,
   DragButtonType,
@@ -85,7 +91,7 @@ const handleMenuHide = () => {
 const dragMenuItems = computed(() => {
   const extensionManager = editor?.extensionManager;
   const rootDragButtonItems: DragButtonType[] = [...defaultDragItems];
-  const subDragButtonItems: DragButtonType[] = [];
+  const extendsDragButtonItems: DragButtonType[] = [];
   for (const extension of extensionManager.extensions) {
     const { getDraggableMenuItems } = extension.options as ExtensionOptions;
     if (!getDraggableMenuItems) {
@@ -99,8 +105,8 @@ const dragMenuItems = computed(() => {
     for (const item of Array.isArray(dragButtonItems)
       ? dragButtonItems
       : [dragButtonItems]) {
-      if (item.parentKey && item.parentKey.trim() !== "") {
-        subDragButtonItems.push(item);
+      if (item.extendsKey && item.extendsKey.trim() !== "") {
+        extendsDragButtonItems.push(item);
         continue;
       }
       rootDragButtonItems.push(item);
@@ -109,79 +115,54 @@ const dragMenuItems = computed(() => {
 
   const mergedDragButtonItems = mergeDragButtonItems(
     rootDragButtonItems,
-    subDragButtonItems
+    extendsDragButtonItems
   );
+
   return sortDragButtonItems(mergedDragButtonItems);
 });
 
 /**
- * Merge rootDragButtonItems and subDragButtonItems, returning an array containing all drag button items.
+ * Merges root and extension drag button items into a unified array.
  *
- * Sub drag button items may be used as submenus of root drag button items.
- * When the parentKey in a sub drag button matches the key in root drag button items,
- * the sub drag button will be used as a submenu of the root drag button item.
- * However, root drag button items may already have submenus. In this case, merge based on the key
- * of the corresponding submenu in the sub drag button:
- * 1. If it has a key and there is a corresponding submenu in root drag button items,
- *    replace the corresponding submenu item in root drag button items
- * 2. If it has a key but there is no corresponding submenu in root drag button items,
- *    append it to the submenu of root drag button items
- * 3. If it has a key but root drag button items currently have no submenu,
- *    append it to root drag button items
- * 4. If it has no key, directly append it to the corresponding submenu item in root drag button items
+ * Extension items can extend root items by matching their `extendsKey` property to a root item's `key`.
+ * When merging, the following rules apply:
+ * 1. Extension items with matching `extendsKey` are merged into their parent root item's children
+ * 2. If an extension child has a `key` matching an existing child, it replaces that child
+ * 3. If an extension child has a unique `key`, it's appended to the parent's children
+ * 4. Extension children without a `key` are always appended
  *
- * @param rootDragButtonItems - The root drag button items.
- * @param subDragButtonItems - The sub drag button items.
- * @returns The merged drag button items.
+ * @param rootDragButtonItems - Base drag button items from default configuration
+ * @param extendsDragButtonItems - Extension drag button items from plugins
+ * @returns Merged and deduplicated drag button items
  */
 const mergeDragButtonItems = (
   rootDragButtonItems: DragButtonType[],
-  subDragButtonItems: DragButtonType[]
+  extendsDragButtonItems: DragButtonType[]
 ): DragButtonType[] => {
   const mergedDragButtonItems: DragButtonType[] = [];
-  const subDragButtonItemsMap: Map<string, DragButtonItemProps[]> = new Map();
-  for (const subDragButtonItem of subDragButtonItems) {
-    if (subDragButtonItem.parentKey) {
-      if (!subDragButtonItemsMap.has(subDragButtonItem.parentKey)) {
-        subDragButtonItemsMap.set(subDragButtonItem.parentKey, []);
+  const extendsDragButtonItemsMap: Map<string, DragButtonItemProps[]> =
+    new Map();
+  for (const extendsDragButton of extendsDragButtonItems) {
+    if (extendsDragButton.extendsKey) {
+      if (!extendsDragButtonItemsMap.has(extendsDragButton.extendsKey)) {
+        extendsDragButtonItemsMap.set(extendsDragButton.extendsKey, []);
       }
-      const items = subDragButtonItem.children?.items ?? [];
-      const mapItems: DragButtonItemProps[] =
-        subDragButtonItemsMap.get(subDragButtonItem.parentKey) ?? [];
-      subDragButtonItemsMap.set(subDragButtonItem.parentKey, [
-        ...mapItems,
-        ...items,
+      const originalItems: DragButtonItemProps[] =
+        extendsDragButtonItemsMap.get(extendsDragButton.extendsKey) ?? [];
+      extendsDragButtonItemsMap.set(extendsDragButton.extendsKey, [
+        ...originalItems,
+        extendsDragButton,
       ]);
     }
   }
 
   for (const rootDragButtonItem of rootDragButtonItems) {
     const rootKey = rootDragButtonItem.key;
-    if (!rootKey) {
-      mergedDragButtonItems.push(rootDragButtonItem);
-      continue;
-    }
-
-    if (subDragButtonItemsMap.has(rootKey)) {
-      const subDragButtonItems = subDragButtonItemsMap.get(rootKey);
-      if (subDragButtonItems && subDragButtonItems.length > 0) {
-        const items = [
-          ...(rootDragButtonItem.children?.items ?? []),
-          ...subDragButtonItems,
-        ].filter((item, index, self) => {
-          if (item.key) {
-            return self.findIndex((t) => t.key === item.key) === index;
-          }
-          return true;
-        });
-        mergedDragButtonItems.push({
-          ...rootDragButtonItem,
-          children: {
-            ...rootDragButtonItem.children,
-            items: sortDragButtonItems(items),
-          },
-        });
-        continue;
+    if (rootKey) {
+      const extendsDragButtonItems =
+        extendsDragButtonItemsMap.get(rootKey) ?? [];
+      for (const extendsDragButton of extendsDragButtonItems) {
+        mergeRootDragButtonItemsProps(rootDragButtonItem, extendsDragButton);
       }
     }
 
@@ -191,6 +172,229 @@ const mergeDragButtonItems = (
   return mergedDragButtonItems;
 };
 
+/**
+ * Merges properties from an extension drag button into a root drag button item.
+ *
+ * Property merge behavior:
+ * - `visible`: AND logic - item visible only if all functions return true (default: true)
+ * - `isActive`: OR logic - item active if any function returns true (default: false)
+ * - `disabled`: OR logic - item disabled if any function returns true (default: false)
+ * - `action`: Extension action executes first, falls back to root action if undefined
+ * - `children`: Recursively merged with deduplication by `key`
+ *
+ * @param rootDragButtonItem - Root drag button item to be extended
+ * @param extendsDragButton - Extension drag button providing additional behavior
+ */
+const mergeRootDragButtonItemsProps = (
+  rootDragButtonItem: DragButtonType,
+  extendsDragButton: DragButtonType
+) => {
+  mergeRootDragButtonVisibleProps(rootDragButtonItem, extendsDragButton);
+  mergeRootDragButtonIsActiveProps(rootDragButtonItem, extendsDragButton);
+  mergeRootDragButtonDisabledProps(rootDragButtonItem, extendsDragButton);
+  mergeRootDragButtonActionProps(rootDragButtonItem, extendsDragButton);
+  mergeRootDragButtonItemsChildrenProps(rootDragButtonItem, extendsDragButton);
+  return rootDragButtonItem;
+};
+
+/**
+ * Recursively merges children items from extension into root drag button.
+ * Performs deduplication by `key` and recursively merges nested extensions.
+ *
+ * @param rootDragButtonItem - Root drag button item to modify
+ * @param extendsDragButtonItem - Extension providing additional children
+ */
+const mergeRootDragButtonItemsChildrenProps = (
+  rootDragButtonItem: DragButtonType,
+  extendsDragButtonItem: DragButtonType
+) => {
+  const extendsChildrenItems = extendsDragButtonItem.children?.items ?? [];
+  if (extendsChildrenItems.length === 0) {
+    return;
+  }
+
+  const items = [
+    ...(rootDragButtonItem.children?.items ?? []),
+    ...extendsChildrenItems,
+  ].filter((item, index, self) => {
+    if (item.key) {
+      return self.findIndex((t) => t.key === item.key) === index;
+    }
+    return true;
+  });
+
+  const originalItems = items.filter((item) => {
+    return item.extendsKey === undefined;
+  });
+  const extendsItems = items.filter((item) => {
+    return item.extendsKey && item.extendsKey.trim() !== "";
+  });
+
+  const mergedItems = mergeDragButtonItems(originalItems, extendsItems);
+
+  rootDragButtonItem.children = {
+    ...rootDragButtonItem.children,
+    items: sortDragButtonItems(mergedItems),
+  };
+};
+
+/**
+ * Merges `disabled` property handlers with OR logic.
+ * The merged item is disabled if either extension or root handler returns true.
+ *
+ * @param rootDragButtonItem - Root drag button item to modify
+ * @param extendsDragButton - Extension providing additional disabled conditions
+ */
+const mergeRootDragButtonDisabledProps = (
+  rootDragButtonItem: DragButtonType,
+  extendsDragButton: DragButtonType
+) => {
+  const { disabled: extendsDisabled } = extendsDragButton;
+  const { disabled: rootDisabled } = rootDragButtonItem;
+  rootDragButtonItem.disabled = ({
+    editor,
+    node,
+    pos,
+  }: {
+    editor: Editor;
+    node: PMNode | null;
+    pos: number;
+  }) => {
+    if (extendsDisabled) {
+      const extendsDisabledResult = extendsDisabled({ editor, node, pos });
+      if (extendsDisabledResult === true) {
+        return true;
+      }
+    }
+    if (rootDisabled) {
+      return rootDisabled({ editor, node, pos });
+    }
+    return false;
+  };
+};
+
+/**
+ * Merges `isActive` property handlers with OR logic.
+ * The merged item is active if either extension or root handler returns true.
+ *
+ * @param rootDragButtonItem - Root drag button item to modify
+ * @param extendsDragButton - Extension providing additional active state conditions
+ */
+const mergeRootDragButtonIsActiveProps = (
+  rootDragButtonItem: DragButtonType,
+  extendsDragButton: DragButtonType
+) => {
+  const { isActive: extendsIsActive } = extendsDragButton;
+  const { isActive: rootIsActive } = rootDragButtonItem;
+  rootDragButtonItem.isActive = ({
+    editor,
+    node,
+    pos,
+  }: {
+    editor: Editor;
+    node: PMNode | null;
+    pos: number;
+  }) => {
+    if (extendsIsActive) {
+      const extendsIsActiveResult = extendsIsActive({ editor, node, pos });
+      if (extendsIsActiveResult === true) {
+        return true;
+      }
+    }
+    if (rootIsActive) {
+      return rootIsActive({ editor, node, pos });
+    }
+    return false;
+  };
+};
+
+/**
+ * Merges `action` property handlers with fallback behavior.
+ * Extension action executes first; if it returns undefined, falls back to root action.
+ *
+ * @param rootDragButtonItem - Root drag button item to modify
+ * @param extendsDragButton - Extension providing action override
+ */
+const mergeRootDragButtonActionProps = (
+  rootDragButtonItem: DragButtonType,
+  extendsDragButton: DragButtonType
+) => {
+  const { action: extendsAction } = extendsDragButton;
+  const { action: rootAction } = rootDragButtonItem;
+  if (!extendsAction && !rootAction) {
+    return;
+  }
+  rootDragButtonItem.action = async ({
+    editor,
+    node,
+    pos,
+    close,
+  }: {
+    editor: Editor;
+    node: PMNode | null;
+    pos: number;
+    close: () => void;
+  }) => {
+    if (extendsAction) {
+      const extendsActionResult = await extendsAction({
+        editor,
+        node,
+        pos,
+        close,
+      });
+
+      if (extendsActionResult !== undefined) {
+        return extendsActionResult;
+      }
+    }
+    if (rootAction) {
+      return rootAction({ editor, node, pos, close });
+    }
+    return undefined;
+  };
+};
+
+/**
+ * Merges `visible` property handlers with AND logic.
+ * The merged item is visible only when both extension and root handlers return true.
+ *
+ * @param rootDragButtonItem - Root drag button item to modify
+ * @param extendsDragButton - Extension providing additional visibility conditions
+ */
+const mergeRootDragButtonVisibleProps = (
+  rootDragButtonItem: DragButtonType,
+  extendsDragButton: DragButtonType
+) => {
+  const { visible: extendsVisible } = extendsDragButton;
+  const { visible: rootVisible } = rootDragButtonItem;
+  rootDragButtonItem.visible = ({
+    editor,
+    node,
+    pos,
+  }: {
+    editor: Editor;
+    node: PMNode | null;
+    pos: number;
+  }) => {
+    if (extendsVisible) {
+      const extendsVisibleResult = extendsVisible({ editor, node, pos });
+      if (extendsVisibleResult === false) {
+        return false;
+      }
+    }
+    if (rootVisible) {
+      return rootVisible({ editor, node, pos });
+    }
+    return true;
+  };
+};
+
+/**
+ * Sorts drag button items by priority in ascending order.
+ *
+ * @param items - Drag button items to sort
+ * @returns Sorted items by priority (lower priority values appear first)
+ */
 const sortDragButtonItems = (items: DragButtonType[]): DragButtonType[] => {
   return sortBy(items, "priority");
 };

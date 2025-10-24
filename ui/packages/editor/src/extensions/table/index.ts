@@ -1,4 +1,5 @@
 import { BlockActionSeparator, ToolboxItem } from "@/components";
+import { CONVERT_TO_KEY } from "@/components/drag/default-drag";
 import { i18n } from "@/locales";
 import {
   Editor,
@@ -406,6 +407,17 @@ const Table = TiptapTable.extend<ExtensionOptions & TableOptions>({
               },
             },
           ],
+        };
+      },
+      getDraggableMenuItems() {
+        return {
+          extendsKey: CONVERT_TO_KEY,
+          visible({ editor }) {
+            if (isActive(editor.state, "table")) {
+              return false;
+            }
+            return true;
+          },
         };
       },
     };

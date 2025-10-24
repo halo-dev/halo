@@ -69,6 +69,7 @@ export interface BubbleMenuOptions {
 }
 
 export interface DragButtonItemProps {
+  extendsKey?: string;
   priority?: number;
   title?:
     | string
@@ -128,7 +129,6 @@ export interface DragButtonItemProps {
   [key: string]: unknown;
 }
 export interface DragButtonType extends DragButtonItemProps {
-  parentKey?: string;
   children?: {
     component?: Component;
     items?: DragButtonItemProps[];
