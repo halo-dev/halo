@@ -1,7 +1,9 @@
-import type { AttachmentLike } from "@halo-dev/console-shared";
+import { utils, type AttachmentLike } from "@halo-dev/console-shared";
 import type { Content } from "@halo-dev/richtext-editor";
 
-export function getContents(attachments: AttachmentLike[]): Content[] {
+export function convertToMediaContents(
+  attachments: AttachmentLike[]
+): Content[] {
   return attachments
     .map((attachment) => {
       if (typeof attachment === "string") {
@@ -13,83 +15,54 @@ export function getContents(attachments: AttachmentLike[]): Content[] {
         };
       }
 
-      if ("url" in attachment) {
+      const attachmentSimple = utils.attachment.convertToSimple(attachment);
+
+      if (!attachmentSimple) {
+        return;
+      }
+
+      const { mediaType, alt, url } = attachmentSimple;
+
+      if (mediaType?.startsWith("image/")) {
         return {
           type: "image",
           attrs: {
-            src: attachment.url,
-            alt: attachment.type,
+            src: url,
+            alt,
           },
         };
       }
 
-      if ("spec" in attachment) {
-        const { mediaType, displayName } = attachment.spec;
-        const { permalink } = attachment.status || {};
-        if (mediaType?.startsWith("image/")) {
-          return {
-            type: "image",
-            attrs: {
-              src: permalink,
-              alt: displayName,
-            },
-          };
-        }
-
-        if (mediaType?.startsWith("video/")) {
-          return {
-            type: "video",
-            attrs: {
-              src: permalink,
-            },
-          };
-        }
-
-        if (mediaType?.startsWith("audio/")) {
-          return {
-            type: "audio",
-            attrs: {
-              src: permalink,
-            },
-          };
-        }
-
+      if (mediaType?.startsWith("video/")) {
         return {
-          type: "text",
-          marks: [
-            {
-              type: "link",
-              attrs: {
-                href: permalink,
-              },
-            },
-          ],
-          text: displayName,
+          type: "video",
+          attrs: {
+            src: url,
+          },
         };
       }
+
+      if (mediaType?.startsWith("audio/")) {
+        return {
+          type: "audio",
+          attrs: {
+            src: url,
+          },
+        };
+      }
+
+      return {
+        type: "text",
+        marks: [
+          {
+            type: "link",
+            attrs: {
+              href: url,
+            },
+          },
+        ],
+        text: alt || url,
+      };
     })
     .filter(Boolean) as Content[];
-}
-
-export interface AttachmentAttr {
-  url?: string;
-  name?: string;
-}
-
-export function getAttachmentUrl(attachment: AttachmentLike): AttachmentAttr {
-  let permalink: string | undefined = undefined;
-  let displayName: string | undefined = undefined;
-  if (typeof attachment === "string") {
-    permalink = attachment;
-  } else if ("url" in attachment) {
-    permalink = attachment.url;
-  } else if ("spec" in attachment) {
-    permalink = attachment.status?.permalink;
-    displayName = attachment.spec.displayName;
-  }
-
-  return {
-    url: permalink,
-    name: displayName,
-  };
 }

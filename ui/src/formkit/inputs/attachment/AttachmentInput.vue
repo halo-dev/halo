@@ -31,21 +31,11 @@ const onInput = (e: Event) => {
 };
 
 const onAttachmentSelect = (attachments: AttachmentLike[]) => {
-  const urls: (string | undefined)[] = attachments.map((attachment) => {
-    if (typeof attachment === "string") {
-      return attachment;
-    }
-    if ("url" in attachment) {
-      return attachment.url;
-    }
-    if ("spec" in attachment) {
-      return attachment.status?.permalink;
-    }
-  });
-
-  if (urls.length) {
-    props.context.node.input(urls[0]);
+  if (!attachments.length) {
+    return;
   }
+  const attachment = attachments[0];
+  props.context.node.input(utils.attachment.getUrl(attachment));
 };
 </script>
 
