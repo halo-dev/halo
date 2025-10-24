@@ -109,7 +109,7 @@ import {
   UiExtensionUpload,
   UiExtensionVideo,
 } from "./extensions";
-import { getContents } from "./utils/attachment";
+import { convertToMediaContents } from "./utils/attachment";
 
 const { t } = useI18n();
 
@@ -328,7 +328,7 @@ const presetExtensions = [
                     editor
                       .chain()
                       .focus()
-                      .insertContent(getContents(attachment))
+                      .insertContent(convertToMediaContents(attachment))
                       .run();
                   });
                   return true;
@@ -526,13 +526,7 @@ function onCoverSelect(attachments: AttachmentLike[]) {
   if (!attachment) {
     return;
   }
-  if (typeof attachment === "string") {
-    emit("update:cover", attachment);
-  } else if ("url" in attachment) {
-    emit("update:cover", attachment.url);
-  } else {
-    emit("update:cover", attachment.status?.permalink);
-  }
+  emit("update:cover", utils.attachment.getUrl(attachment));
 }
 
 const { onChange: onCoverInputChange, open: openCoverInputDialog } =
