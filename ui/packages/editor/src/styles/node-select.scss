@@ -1,9 +1,26 @@
 .halo-rich-text-editor {
   $editorNodeCardBorderSelected: rgba(47, 142, 244);
+  $editorNodeCardBgSelected: rgba(47, 142, 244, 0.1);
 
   .has-node-selected {
     &.code-node {
       border-color: $editorNodeCardBorderSelected;
+    }
+  }
+
+  .ProseMirror-selectednode {
+    background-color: $editorNodeCardBgSelected;
+    border-radius: 4px;
+
+    & {
+      &.code-node,
+      img,
+      iframe,
+      video,
+      audio {
+        border-color: $editorNodeCardBorderSelected;
+        background-color: transparent;
+      }
     }
   }
 }

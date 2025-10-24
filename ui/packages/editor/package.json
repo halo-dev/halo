@@ -52,6 +52,7 @@
     "@tiptap/extension-details-content": "^2.26.2",
     "@tiptap/extension-details-summary": "^2.26.2",
     "@tiptap/extension-document": "^3.7.2",
+    "@tiptap/extension-drag-handle-vue-3": "^3.7.2",
     "@tiptap/extension-hard-break": "^3.7.2",
     "@tiptap/extension-heading": "^3.7.2",
     "@tiptap/extension-highlight": "^3.7.2",

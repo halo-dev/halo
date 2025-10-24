@@ -1,3 +1,4 @@
+import { CONVERT_TO_KEY } from "@/components/drag/default-drag";
 import ToolbarItem from "@/components/toolbar/ToolbarItem.vue";
 import ToolbarSubItem from "@/components/toolbar/ToolbarSubItem.vue";
 import TiptapParagraph from "@/extensions/paragraph";
@@ -231,49 +232,61 @@ const Blockquote = TiptapHeading.extend<ExtensionOptions & HeadingOptions>({
           },
         ];
       },
-      getDraggable() {
+      getDraggableMenuItems() {
         return {
-          getRenderContainer({ dom }: { dom: HTMLElement }) {
-            const tagNames = ["H1", "H2", "H3", "H4", "H5", "H6"];
-            let container = dom;
-            while (container && !tagNames.includes(container.tagName)) {
-              container = container.parentElement as HTMLElement;
-            }
-            if (!container) {
-              return {
-                el: dom,
-              };
-            }
-            let y;
-            switch (container?.tagName) {
-              case "H1":
-                y = 10;
-                break;
-              case "H2":
-                y = 2;
-                break;
-              case "H3":
-                y = 0;
-                break;
-              case "H4":
-                y = -3;
-                break;
-              case "H5":
-                y = -5;
-                break;
-              case "H6":
-                y = -5;
-                break;
-              default:
-                y = 0;
-                break;
-            }
-            return {
-              el: container,
-              dragDomOffset: {
-                y: y,
+          extendsKey: CONVERT_TO_KEY,
+          children: {
+            items: [
+              {
+                priority: 10,
+                icon: markRaw(MdiFormatParagraph),
+                title: i18n.global.t("editor.common.heading.paragraph"),
+                action: ({ editor }: { editor: Editor }) =>
+                  editor.chain().focus().setParagraph().run(),
               },
-            };
+              {
+                priority: 20,
+                icon: markRaw(MdiFormatHeader1),
+                title: i18n.global.t("editor.common.heading.header1"),
+                action: ({ editor }: { editor: Editor }) =>
+                  editor.chain().focus().setHeading({ level: 1 }).run(),
+              },
+              {
+                priority: 30,
+                icon: markRaw(MdiFormatHeader2),
+                title: i18n.global.t("editor.common.heading.header2"),
+                action: ({ editor }: { editor: Editor }) =>
+                  editor.chain().focus().setHeading({ level: 2 }).run(),
+              },
+              {
+                priority: 40,
+                icon: markRaw(MdiFormatHeader3),
+                title: i18n.global.t("editor.common.heading.header3"),
+                action: ({ editor }: { editor: Editor }) =>
+                  editor.chain().focus().setHeading({ level: 3 }).run(),
+              },
+              {
+                priority: 50,
+                icon: markRaw(MdiFormatHeader4),
+                title: i18n.global.t("editor.common.heading.header4"),
+                action: ({ editor }: { editor: Editor }) =>
+                  editor.chain().focus().setHeading({ level: 4 }).run(),
+              },
+              {
+                priority: 60,
+                icon: markRaw(MdiFormatHeader5),
+                title: i18n.global.t("editor.common.heading.header5"),
+                action: ({ editor }: { editor: Editor }) =>
+                  editor.chain().focus().setHeading({ level: 5 }).run(),
+              },
+              {
+                priority: 70,
+                icon: markRaw(MdiFormatHeader6),
+                title: i18n.global.t("editor.common.heading.header6"),
+                action: ({ editor }: { editor: Editor }) =>
+                  editor.chain().focus().setHeading({ level: 6 }).run(),
+              },
+            ],
           },
         };
       },

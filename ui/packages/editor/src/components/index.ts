@@ -4,6 +4,9 @@ export * from "./block";
 // toolbar
 export * from "./toolbar";
 
+// drag
+export * from "./drag";
+
 // toolbox
 export * from "./toolbox";
 

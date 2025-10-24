@@ -76,22 +76,6 @@ const updateIndent = (tr: Transaction, type: IndentType): Transaction => {
   return tr;
 };
 
-const getRenderContainer = (node: HTMLElement) => {
-  let container = node;
-  // 文本节点
-  if (container.nodeName === "#text") {
-    container = node.parentElement as HTMLElement;
-  }
-  while (
-    container &&
-    container.classList &&
-    !container.classList.contains("code-node")
-  ) {
-    container = container.parentElement as HTMLElement;
-  }
-  return container;
-};
-
 export interface Option {
   label: string;
   value: string;
@@ -385,15 +369,6 @@ export const CodeBlockExtension = TiptapCodeBlock.extend<
               },
             },
           ],
-        };
-      },
-      getDraggable() {
-        return {
-          getRenderContainer({ dom }: { dom: HTMLElement }) {
-            return {
-              el: getRenderContainer(dom),
-            };
-          },
         };
       },
     };

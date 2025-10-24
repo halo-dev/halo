@@ -40,7 +40,6 @@
 
     .tableWrapper {
       position: relative;
-      margin: 0.5em 0px;
       overflow-x: auto;
       overflow-y: hidden;
       cursor: default;
@@ -65,8 +64,8 @@
       border-collapse: collapse;
       border-radius: 4px;
       overflow: initial;
-      padding-left: 26px;
-      padding-top: 26px;
+      padding-left: 12px;
+      padding-top: 12px;
 
       box-sizing: border-box;
 

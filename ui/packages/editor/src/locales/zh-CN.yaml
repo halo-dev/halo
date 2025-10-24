@@ -1,4 +1,13 @@
 editor:
+  drag:
+    button:
+      insert_block: 插入块
+      drag_handle: 按住拖动
+    menu:
+      convert_to: 转化为
+      copy: 复制
+      cut: 剪切
+      delete: 删除
   menus:
     undo: 撤销
     redo: 恢复
