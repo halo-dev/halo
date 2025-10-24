@@ -61,13 +61,11 @@ onUnmounted(() => {
   window.removeEventListener("keydown", handleKeyDown);
 });
 
-const setItemRef = (
-  key: string,
-  ref: InstanceType<typeof EditorDragButtonItem>
-) => {
-  if (ref) {
-    itemRefs.value.set(key, ref);
-  } else {
+const setItemRef = (key: string, ref: unknown) => {
+  if (ref && typeof ref === "object" && "triggerClick" in ref) {
+    itemRefs.value.set(key, ref as InstanceType<typeof EditorDragButtonItem>);
+  }
+  if (!ref) {
     itemRefs.value.delete(key);
   }
 };
