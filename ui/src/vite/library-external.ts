@@ -121,7 +121,7 @@ export const setupLibraryExternal = (
       "vue-router": "VueRouter",
       pinia: "Pinia",
       axios: "axios",
-      "@halo-dev/shared": "HaloConsoleShared",
+      "@halo-dev/console-shared": "HaloConsoleShared",
       "@halo-dev/components": "HaloComponents",
       "@vueuse/core": "VueUse",
       "@vueuse/components": "VueUse",
