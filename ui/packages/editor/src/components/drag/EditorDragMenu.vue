@@ -25,6 +25,7 @@ const props = defineProps({
   class: {
     type: String,
     required: false,
+    default: "",
   },
 });
 
@@ -60,7 +61,10 @@ onUnmounted(() => {
   window.removeEventListener("keydown", handleKeyDown);
 });
 
-const setItemRef = (key: string, ref: any) => {
+const setItemRef = (
+  key: string,
+  ref: InstanceType<typeof EditorDragButtonItem>
+) => {
   if (ref) {
     itemRefs.value.set(key, ref);
   } else {
@@ -79,11 +83,11 @@ const setItemRef = (key: string, ref: any) => {
     <div class="flex flex-col gap-0.5 px-2 py-1">
       <EditorDragButtonItem
         v-for="(item, index) in items"
+        :key="item.key || String(index)"
         :ref="(el) => setItemRef(item.key || String(index), el)"
         :editor="editor"
         :node="node"
         :pos="pos"
-        :key="item.key || String(index)"
         v-bind="item"
         @close="emit('close')"
       />

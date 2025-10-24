@@ -1,6 +1,6 @@
 import { i18n } from "@/locales";
 import type { DragButtonType } from "@/types";
-import { copySelectionToClipboard } from "@/utils";
+import { copySelectionToClipboard, deleteNode } from "@/utils";
 
 import { isActive } from "@tiptap/core";
 import { markRaw } from "vue";
@@ -92,7 +92,7 @@ const defaultDragItems: DragButtonType[] = [
     keyboard: "Delete",
     action: ({ editor, node }) => {
       if (node) {
-        editor.commands.deleteSelection();
+        deleteNode(node?.type.name, editor);
       }
     },
   },

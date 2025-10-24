@@ -64,7 +64,7 @@ const handleNodeChange = ({
 const handleMenuShow = () => {
   const { tr } = editor.state;
   tr.setMeta("lockDragHandle", true);
-  if (currentPos.value) {
+  if (currentPos.value !== undefined) {
     const $pos = tr.doc.resolve(currentPos.value);
     tr.setSelection(new NodeSelection($pos));
   }

@@ -23,7 +23,7 @@ export async function copySelectionToClipboard(
         });
         await navigator.clipboard.write([clipboardItem]);
         return true;
-      } catch (error) {
+      } catch {
         await navigator.clipboard.writeText(text);
         return true;
       }
