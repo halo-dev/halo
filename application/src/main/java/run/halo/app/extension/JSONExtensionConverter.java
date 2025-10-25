@@ -1,9 +1,7 @@
 package run.halo.app.extension;
 
 import static run.halo.app.extension.ExtensionStoreUtil.buildStoreName;
-import static run.halo.app.extension.Unstructured.OBJECT_MAPPER;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -25,7 +23,9 @@ import reactor.core.Exceptions;
 import run.halo.app.extension.event.SchemeRemovedEvent;
 import run.halo.app.extension.exception.ExtensionConvertException;
 import run.halo.app.extension.exception.SchemaViolationException;
-import run.halo.app.extension.store.ExtensionStore;
+import run.halo.app.extension.store.Extensions;
+import tools.jackson.core.JacksonException;
+import tools.jackson.databind.json.JsonMapper;
 
 /**
  * JSON implementation of ExtensionConverter.
@@ -37,7 +37,7 @@ import run.halo.app.extension.store.ExtensionStore;
 class JSONExtensionConverter implements ExtensionConverter {
 
     @Getter
-    public ObjectMapper objectMapper;
+    public JsonMapper jsonMapper;
 
     private final SchemeManager schemeManager;
 
@@ -45,33 +45,33 @@ class JSONExtensionConverter implements ExtensionConverter {
 
     public JSONExtensionConverter(SchemeManager schemeManager) {
         this.schemeManager = schemeManager;
-        setObjectMapper(OBJECT_MAPPER);
+        setJsonMapper(Unstructured.jsonMapper());
     }
 
     /**
      * Sets ObjectMapper.
      *
-     * @param objectMapper the object mapper, must not be null
+     * @param jsonMapper the object mapper, must not be null
      */
-    void setObjectMapper(ObjectMapper objectMapper) {
-        Assert.notNull(objectMapper, "ObjectMapper must not be null");
-        this.objectMapper = objectMapper;
+    void setJsonMapper(JsonMapper jsonMapper) {
+        Assert.notNull(jsonMapper, "ObjectMapper must not be null");
+        this.jsonMapper = jsonMapper;
     }
 
     @Override
-    public <E extends Extension> ExtensionStore convertTo(E extension) {
+    public <E extends Extension> Extensions convertTo(E extension) {
         var gvk = extension.groupVersionKind();
         var scheme = schemeManager.get(gvk);
 
         try {
             var convertedExtension = Optional.of(extension)
                 .map(item -> scheme.type().isAssignableFrom(item.getClass()) ? item
-                    : objectMapper.convertValue(item, scheme.type())
+                    : jsonMapper.convertValue(item, scheme.type())
                 )
                 .orElseThrow();
             var validation = new ValidationData<>(extension);
 
-            var extensionJsonNode = objectMapper.valueToTree(convertedExtension);
+            var extensionJsonNode = Unstructured.OBJECT_MAPPER.valueToTree(convertedExtension);
             var validator = getValidator(scheme);
             validator.validate(extensionJsonNode, validation);
             if (!validation.isValid()) {
@@ -83,8 +83,8 @@ class JSONExtensionConverter implements ExtensionConverter {
 
             var version = extension.getMetadata().getVersion();
             var storeName = buildStoreName(scheme, extension.getMetadata().getName());
-            var data = objectMapper.writeValueAsBytes(extensionJsonNode);
-            return new ExtensionStore(storeName, data, version);
+            var data = jsonMapper.writeValueAsBytes(convertedExtension);
+            return new Extensions(storeName, data, version);
         } catch (IOException e) {
             throw new ExtensionConvertException("Failed write Extension as bytes", e);
         } catch (ResolutionException e) {
@@ -93,14 +93,13 @@ class JSONExtensionConverter implements ExtensionConverter {
     }
 
     @Override
-    public <E extends Extension> E convertFrom(Class<E> type, ExtensionStore extensionStore) {
+    public <E extends Extension> E convertFrom(Class<E> type, Extensions extensions) {
         try {
-            var extension = objectMapper.readValue(extensionStore.getData(), type);
-            extension.getMetadata().setVersion(extensionStore.getVersion());
+            var extension = jsonMapper.readValue(extensions.getData(), type);
+            extension.getMetadata().setVersion(extensions.getVersion());
             return extension;
-        } catch (IOException e) {
-            throw new ExtensionConvertException("Failed to read Extension " + type + " from bytes",
-                e);
+        } catch (JacksonException e) {
+            throw new ExtensionConvertException("Failed to convert Extension from store", e);
         }
     }
 

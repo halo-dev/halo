@@ -59,6 +59,9 @@ dependencies {
     api 'org.springframework.boot:spring-boot-starter-webflux'
     api 'org.springframework.boot:spring-boot-starter-validation'
     api 'org.springframework.boot:spring-boot-starter-data-r2dbc'
+    api 'org.springframework.boot:spring-boot-integration'
+    api 'org.springframework.boot:spring-boot-jackson2'
+    api 'org.springframework.boot:spring-boot-session'
     api 'org.springframework.session:spring-session-core'
 
     // Spring Security

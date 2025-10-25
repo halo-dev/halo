@@ -32,7 +32,7 @@ import org.springdoc.core.fn.builders.content.Builder;
 import org.springdoc.webflux.core.fn.SpringdocRouteBuilder;
 import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.beans.factory.config.PlaceholderConfigurerSupport;
-import org.springframework.boot.autoconfigure.r2dbc.R2dbcConnectionDetails;
+import org.springframework.boot.r2dbc.autoconfigure.R2dbcConnectionDetails;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.context.annotation.Bean;
 import org.springframework.core.Ordered;

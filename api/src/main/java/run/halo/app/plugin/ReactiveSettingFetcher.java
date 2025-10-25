@@ -1,9 +1,9 @@
 package run.halo.app.plugin;
 
-import com.fasterxml.jackson.databind.JsonNode;
 import java.util.Map;
 import org.springframework.lang.NonNull;
 import reactor.core.publisher.Mono;
+import tools.jackson.databind.JsonNode;
 
 /**
  * The {@link ReactiveSettingFetcher} to help plugin fetch own setting configuration.

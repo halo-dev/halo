@@ -17,6 +17,7 @@ import org.mockito.ArgumentCaptor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
+import org.mockito.junit.jupiter.MockitoExtension;
 import org.skyscreamer.jsonassert.JSONAssert;
 import org.springframework.http.server.reactive.ServerHttpRequest;
 import org.springframework.mock.web.reactive.function.server.MockServerRequest;
@@ -55,7 +56,7 @@ import run.halo.app.security.authorization.AuthorityUtils;
  * @author guqing
  * @since 2.0.0
  */
-@ExtendWith(SpringExtension.class)
+@ExtendWith({SpringExtension.class, MockitoExtension.class})
 class CommentServiceImplTest {
 
     @Mock

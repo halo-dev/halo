@@ -1,6 +1,7 @@
 package run.halo.app.infra.utils;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import java.util.Map;
 import org.json.JSONException;
@@ -32,20 +33,35 @@ class SettingUtilsTest {
     @Test
     void mergePatch() throws JSONException {
         Map<String, String> defaultValue =
-            Map.of("comment", "{\"enable\":true,\"requireReviewForNew\":true}",
-                "basic", "{\"title\":\"guqing's blog\"}",
-                "authProvider", "{\"github\":{\"clientId\":\"fake-client-id\"}}");
+            Map.of("comment", """
+                    {"enable":true,"requireReviewForNew":true}\
+                    """,
+                "basic", """
+                    {"title":"guqing's blog"}\
+                    """,
+                "authProvider", """
+                    {"github":{"clientId":"fake-client-id"}}\
+                    """);
         Map<String, String> modified = Map.of("comment",
-            "{\"enable\":true,\"requireReviewForNew\":true,\"systemUserOnly\":false}",
-            "basic", "{\"title\":\"guqing's blog\", \"subtitle\": \"fake-sub-title\"}");
+            """
+                {"enable":true,"requireReviewForNew":true,"systemUserOnly":false}\
+                """,
+            "basic", """
+                {"title":"guqing's blog", "subtitle": "fake-sub-title"}\
+                """);
 
         Map<String, String> result = SettingUtils.mergePatch(modified, defaultValue);
         Map<String, String> excepted = Map.of("comment",
-            "{\"enable\":true,\"requireReviewForNew\":true,\"systemUserOnly\":false}",
-            "basic", "{\"title\":\"guqing's blog\",\"subtitle\":\"fake-sub-title\"}",
-            "authProvider", "{\"github\":{\"clientId\":\"fake-client-id\"}}");
-        JSONAssert.assertEquals(JsonUtils.objectToJson(excepted), JsonUtils.objectToJson(result),
-            true);
+            """
+                {"enable":true,"requireReviewForNew":true,"systemUserOnly":false}\
+                """,
+            "basic", """
+                {"title":"guqing's blog","subtitle":"fake-sub-title"}\
+                """,
+            "authProvider", """
+                {"github":{"clientId":"fake-client-id"}}\
+                """);
+        assertEquals(SettingUtils.mapToJsonNode(excepted), SettingUtils.mapToJsonNode(result));
     }
 
     @Test

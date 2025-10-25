@@ -78,11 +78,18 @@ class SystemConfigurableEnvironmentFetcherTest {
 
     String expectedJson() {
         String routeRules =
-            "{\\\"categories\\\":\\\"topics\\\",\\\"archives\\\":\\\"archives-new\\\","
-                + "\\\"post\\\":\\\"/archives-new/{slug}\\\"}";
-        String fakeArray = "{\\\"select\\\":[{\\\"label\\\":\\\"Hello\\\","
-            + "\\\"value\\\":\\\"hello\\\"},{\\\"label\\\":\\\"Awesome\\\","
-            + "\\\"value\\\":\\\"awesome\\\"}]}";
+            """
+                {\
+                \\"categories\\":\\"topics\\",\\"archives\\":\\"archives-new\\",\
+                \\"post\\":\\"/archives-new/{slug}\\",\
+                \\"tags\\":null\
+                }\
+                """;
+        String fakeArray = """
+            {\\"select\\":[{\\"label\\":\\"Hello\\",\
+            \\"value\\":\\"hello\\"},{\\"label\\":\\"Awesome\\",\
+            \\"value\\":\\"awesome\\"}]}\
+            """;
         return """
             {
                 "data": {
@@ -95,7 +102,7 @@ class SystemConfigurableEnvironmentFetcherTest {
                 "metadata": {
                     "name": "system"
                 }
-            }
+            }\
             """.formatted(routeRules, fakeArray);
     }
 

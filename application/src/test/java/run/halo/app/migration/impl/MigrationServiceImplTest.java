@@ -35,8 +35,8 @@ import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import reactor.test.StepVerifier;
 import run.halo.app.extension.Metadata;
-import run.halo.app.extension.store.ExtensionStore;
 import run.halo.app.extension.store.ExtensionStoreRepository;
+import run.halo.app.extension.store.Extensions;
 import run.halo.app.infra.BackupRootGetter;
 import run.halo.app.infra.exception.NotFoundException;
 import run.halo.app.infra.properties.HaloProperties;
@@ -105,7 +105,7 @@ class MigrationServiceImplTest {
 
         var objectMapper = migrationService.getObjectMapper();
         var gotExtensionStores = objectMapper.readValue(extensionsFile.toFile(),
-            new TypeReference<List<ExtensionStore>>() {
+            new TypeReference<List<Extensions>>() {
             });
         assertEquals(gotExtensionStores, extensionStores);
         assertEquals("halo", Files.readString(workdir.resolve("fake-file")));
@@ -295,8 +295,8 @@ class MigrationServiceImplTest {
         return backup;
     }
 
-    ExtensionStore createExtensionStore(String name, String data) {
-        var store = new ExtensionStore();
+    Extensions createExtensionStore(String name, String data) {
+        var store = new Extensions();
         store.setName(name);
         store.setData(data.getBytes(UTF_8));
         store.setVersion(1024L);

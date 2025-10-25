@@ -1,11 +1,11 @@
 package run.halo.app.infra.exception.handlers;
 
 import org.springframework.beans.factory.ObjectProvider;
-import org.springframework.boot.autoconfigure.web.ServerProperties;
 import org.springframework.boot.autoconfigure.web.WebProperties;
-import org.springframework.boot.autoconfigure.web.reactive.error.ErrorWebFluxAutoConfiguration;
-import org.springframework.boot.web.reactive.error.ErrorAttributes;
-import org.springframework.boot.web.reactive.error.ErrorWebExceptionHandler;
+import org.springframework.boot.web.server.autoconfigure.ServerProperties;
+import org.springframework.boot.webflux.autoconfigure.error.ErrorWebFluxAutoConfiguration;
+import org.springframework.boot.webflux.error.ErrorAttributes;
+import org.springframework.boot.webflux.error.ErrorWebExceptionHandler;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.MessageSource;
 import org.springframework.context.annotation.Bean;
@@ -19,9 +19,7 @@ import org.springframework.web.reactive.result.view.ViewResolver;
  * {@link org.springframework.web.server.WebExceptionHandler}.
  * <br/>
  * <br/>
- * See
- * {@link org.springframework.boot.autoconfigure.web.reactive.error.ErrorWebFluxAutoConfiguration}
- * for more.
+ * See {@link ErrorWebFluxAutoConfiguration} for more.
  *
  * @author guqing
  * @author johnniang
@@ -32,7 +30,7 @@ public class HaloErrorConfiguration {
 
     /**
      * This bean will replace ErrorWebExceptionHandler defined at
-     * {@link ErrorWebFluxAutoConfiguration#errorWebExceptionHandler}.
+     * {@link ErrorWebFluxAutoConfiguration#errorWebExceptionHandler(ErrorAttributes, WebProperties, ObjectProvider, ServerCodecConfigurer, ApplicationContext)} }.
      */
     @Bean
     @Order(-1)
@@ -55,7 +53,7 @@ public class HaloErrorConfiguration {
 
     /**
      * This bean will replace ErrorAttributes defined at
-     * {@link ErrorWebFluxAutoConfiguration#errorAttributes}.
+     * {@link ErrorWebFluxAutoConfiguration#errorAttributes()}.
      */
     @Bean
     ErrorAttributes errorAttributes(MessageSource messageSource) {

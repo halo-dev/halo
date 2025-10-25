@@ -1,8 +1,8 @@
 package run.halo.app.plugin;
 
-import com.fasterxml.jackson.databind.JsonNode;
 import java.util.Map;
 import java.util.Optional;
+import tools.jackson.databind.JsonNode;
 
 /**
  * SettingFetcher must be a class instead of an interface due to backward compatibility.

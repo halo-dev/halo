@@ -6,6 +6,8 @@ import static run.halo.app.core.extension.Role.GROUP;
 import static run.halo.app.core.extension.Role.KIND;
 import static run.halo.app.core.extension.Role.VERSION;
 
+import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import io.swagger.v3.oas.annotations.media.Schema;
 import java.util.List;
 import lombok.Data;
@@ -102,9 +104,13 @@ public class Role extends AbstractExtension {
             this(null, null, null, null, null);
         }
 
-        public PolicyRule(String[] apiGroups, String[] resources,
-            String[] resourceNames,
-            String[] nonResourceURLs, String[] verbs) {
+        @JsonCreator
+        public PolicyRule(
+            @JsonProperty("apiGroups") String[] apiGroups,
+            @JsonProperty("resources") String[] resources,
+            @JsonProperty("resourceNames") String[] resourceNames,
+            @JsonProperty("nonResourceURLs") String[] nonResourceURLs,
+            @JsonProperty("verbs") String[] verbs) {
             this.apiGroups = nullElseEmpty(apiGroups);
             this.resources = nullElseEmpty(resources);
             this.resourceNames = nullElseEmpty(resourceNames);

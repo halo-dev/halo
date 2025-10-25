@@ -3,19 +3,20 @@ package run.halo.app.extension;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.lenient;
+import static org.mockito.Mockito.when;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import java.io.IOException;
+import java.util.ArrayList;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import run.halo.app.core.extension.Role;
 import run.halo.app.extension.exception.ExtensionConvertException;
 import run.halo.app.extension.exception.SchemaViolationException;
-import run.halo.app.extension.store.ExtensionStore;
+import run.halo.app.extension.store.Extensions;
+import tools.jackson.databind.json.JsonMapper;
 
 @ExtendWith(MockitoExtension.class)
 class JsonExtensionConverterTest {
@@ -26,19 +27,46 @@ class JsonExtensionConverterTest {
     @Mock
     SchemeManager schemeManager;
 
-    ObjectMapper objectMapper = Unstructured.OBJECT_MAPPER;
+    JsonMapper objectMapper = Unstructured.jsonMapper();
 
     @BeforeEach
     void setUp() {
-        converter.setObjectMapper(objectMapper);
+        converter.setJsonMapper(objectMapper);
 
         var scheme = Scheme.buildFromType(FakeExtension.class);
         lenient().when(schemeManager.get(scheme.groupVersionKind())).thenReturn(scheme);
     }
 
     @Test
-    void convertTo() throws IOException {
+    void convertToFromUnstructured() {
+        var scheme = Scheme.buildFromType(Role.class);
+        when(schemeManager.get(scheme.groupVersionKind())).thenReturn(scheme);
+        var role = new Role();
+        role.setMetadata(new Metadata());
+        role.getMetadata().setName("super-role");
+        role.getMetadata().setVersion(10L);
+        role.setRules(new ArrayList<>());
+        role.getRules().add(new Role.PolicyRule(
+            new String[] {"fake.api.halo.run"},
+            new String[] {"fakes"},
+            new String[] {"fake"},
+            new String[] {},
+            new String[] {"get"}
+        ));
+
+        var unstructured = Unstructured.jsonMapper().convertValue(role, Unstructured.class);
+
+        var extensionStore = converter.convertTo(unstructured);
+        assertEquals("/registry/roles/super-role", extensionStore.getName());
+        assertEquals(10L, extensionStore.getVersion());
+        assertEquals(role, objectMapper.readValue(extensionStore.getData(), Role.class));
+    }
+
+    @Test
+    void convertTo() {
         var fake = createFakeExtension("fake", 10L);
+        fake.setStatus(new FakeExtension.FakeStatus());
+        fake.getStatus().setState("running");
 
         var extensionStore = converter.convertTo(fake);
 
@@ -48,10 +76,10 @@ class JsonExtensionConverterTest {
     }
 
     @Test
-    void convertFrom() throws JsonProcessingException {
+    void convertFrom() {
         var fake = createFakeExtension("fake", 20L);
 
-        var store = new ExtensionStore();
+        var store = new Extensions();
         store.setName("/registry/fake.halo.run/fakes/fake");
         store.setVersion(20L);
         store.setData(objectMapper.writeValueAsBytes(fake));
@@ -62,7 +90,7 @@ class JsonExtensionConverterTest {
 
     @Test
     void shouldThrowConvertExceptionWhenDataIsInvalid() {
-        var store = new ExtensionStore();
+        var store = new Extensions();
         store.setName("/registry/fake.halo.run/fakes/fake");
         store.setVersion(20L);
         store.setData("{".getBytes());

@@ -14,7 +14,6 @@ import org.springdoc.core.fn.builders.schema.Builder;
 import org.springdoc.webflux.core.fn.SpringdocRouteBuilder;
 import org.springframework.dao.OptimisticLockingFailureException;
 import org.springframework.http.MediaType;
-import org.springframework.retry.RetryException;
 import org.springframework.stereotype.Component;
 import org.springframework.web.reactive.function.server.RouterFunction;
 import org.springframework.web.reactive.function.server.ServerRequest;
@@ -315,22 +314,21 @@ public class SinglePageEndpoint implements CustomEndpoint {
                     return Mono.just(post);
                 }
                 return client.fetch(SinglePage.class, name)
-                    .map(latest -> {
+                    .flatMap(latest -> {
                         String latestReleasedSnapshotName =
                             MetadataUtil.nullSafeAnnotations(latest)
                                 .get(Post.LAST_RELEASED_SNAPSHOT_ANNO);
                         if (StringUtils.equals(latestReleasedSnapshotName,
                             latest.getSpec().getReleaseSnapshot())) {
-                            return latest;
+                            return Mono.just(latest);
                         }
-                        throw new RetryException("SinglePage publishing status is not as expected");
+                        return Mono.error(new IllegalStateException(
+                            "SinglePage publishing status is not as expected"
+                        ));
                     })
                     .retryWhen(Retry.fixedDelay(10, Duration.ofMillis(100))
-                        .filter(t -> t instanceof RetryException))
-                    .doOnError(IllegalStateException.class, err -> {
-                        log.error("Failed to publish single page [{}]", name, err);
-                        throw new IllegalStateException("Publishing wait timeout.");
-                    });
+                        .filter(IllegalStateException.class::isInstance)
+                    );
             })
             .flatMap(page -> ServerResponse.ok().bodyValue(page));
     }

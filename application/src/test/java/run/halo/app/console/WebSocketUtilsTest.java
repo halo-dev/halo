@@ -22,6 +22,14 @@ class WebSocketUtilsTest {
         }
 
         @Test
+        void shouldBeWebSocketIfHeaderValueIsCaseInsensitive() {
+            var headers = new HttpHeaders();
+            headers.add("ConnecTion", "upGRADE");
+            headers.add("UPgrade", "WEBSOCKET");
+            assertTrue(WebSocketUtils.isWebSocketUpgrade(headers));
+        }
+
+        @Test
         void shouldNotBeWebSocketIfHeaderValuesAreIncorrect() {
             var headers = new HttpHeaders();
             headers.add("Connection", "keep-alive");

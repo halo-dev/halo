@@ -4,7 +4,7 @@ import static run.halo.app.infra.exception.Exceptions.createErrorResponse;
 
 import java.util.Map;
 import org.springframework.boot.web.error.ErrorAttributeOptions;
-import org.springframework.boot.web.reactive.error.DefaultErrorAttributes;
+import org.springframework.boot.webflux.error.DefaultErrorAttributes;
 import org.springframework.context.MessageSource;
 import org.springframework.web.reactive.function.server.ServerRequest;
 

@@ -39,7 +39,7 @@ apache = ['apache-commons-lang3', 'apache-tika-core']
 therapi = ['therapi-runtime-javadoc', 'therapi-runtime-javadoc-scribe']
 
 [plugins]
-spring-boot = 'org.springframework.boot:3.5.6'
+spring-boot = 'org.springframework.boot:4.0.0-RC1'
 spring-dependency-management = 'io.spring.dependency-management:1.1.7'
 git-properties = 'com.gorylenko.gradle-git-properties:2.5.2'
 undercouch-download = 'de.undercouch.download:5.6.0'

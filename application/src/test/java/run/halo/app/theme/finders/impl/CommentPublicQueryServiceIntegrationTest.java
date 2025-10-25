@@ -2,8 +2,6 @@ package run.halo.app.theme.finders.impl;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.node.ObjectNode;
 import java.time.Instant;
 import java.util.HashMap;
 import java.util.List;
@@ -36,6 +34,8 @@ import run.halo.app.extension.store.ReactiveExtensionStoreClient;
 import run.halo.app.infra.AnonymousUserConst;
 import run.halo.app.infra.exception.DuplicateNameException;
 import run.halo.app.infra.utils.JsonUtils;
+import tools.jackson.databind.JsonNode;
+import tools.jackson.databind.node.ObjectNode;
 
 @DirtiesContext
 @SpringBootTest

@@ -9,9 +9,9 @@ import reactor.core.publisher.Mono;
 
 public interface ReactiveExtensionStoreClient {
 
-    Flux<ExtensionStore> listByNamePrefix(String prefix);
+    Flux<Extensions> listByNamePrefix(String prefix);
 
-    Mono<Page<ExtensionStore>> listByNamePrefix(String prefix, Pageable pageable);
+    Mono<Page<Extensions>> listByNamePrefix(String prefix, Pageable pageable);
 
     /**
      * List stores by name prefix, after the given cursor name, and limit the result size.
@@ -21,7 +21,7 @@ public interface ReactiveExtensionStoreClient {
      * @param limit the max result size
      * @return a flux of extension stores
      */
-    Flux<ExtensionStore> listBy(String prefix, @Nullable String nameCursor, int limit);
+    Flux<Extensions> listBy(String prefix, @Nullable String nameCursor, int limit);
 
     Mono<Long> countByNamePrefix(String prefix);
 
@@ -31,14 +31,14 @@ public interface ReactiveExtensionStoreClient {
      * @param names store names to list
      * @return a flux of extension stores
      */
-    Flux<ExtensionStore> listByNames(List<String> names);
+    Flux<Extensions> listByNames(List<String> names);
 
-    Mono<ExtensionStore> fetchByName(String name);
+    Mono<Extensions> fetchByName(String name);
 
-    Mono<ExtensionStore> create(String name, byte[] data);
+    Mono<Extensions> create(String name, byte[] data);
 
-    Mono<ExtensionStore> update(String name, Long version, byte[] data);
+    Mono<Extensions> update(String name, Long version, byte[] data);
 
-    Mono<ExtensionStore> delete(String name, Long version);
+    Mono<Extensions> delete(String name, Long version);
 
 }

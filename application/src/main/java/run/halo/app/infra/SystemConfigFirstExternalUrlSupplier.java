@@ -7,7 +7,7 @@ import java.net.URL;
 import java.time.Duration;
 import java.util.Optional;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.boot.autoconfigure.web.reactive.WebFluxProperties;
+import org.springframework.boot.webflux.autoconfigure.WebFluxProperties;
 import org.springframework.context.event.EventListener;
 import org.springframework.http.HttpRequest;
 import org.springframework.lang.Nullable;
