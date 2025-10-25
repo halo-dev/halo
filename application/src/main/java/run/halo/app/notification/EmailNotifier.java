@@ -1,6 +1,5 @@
 package run.halo.app.notification;
 
-import com.fasterxml.jackson.databind.JsonNode;
 import java.util.concurrent.atomic.AtomicReference;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
@@ -38,9 +37,9 @@ public class EmailNotifier implements ReactiveNotifier {
 
     @Override
     public Mono<Void> notify(NotificationContext context) {
-        JsonNode senderConfig = context.getSenderConfig();
+        var senderConfig = context.getSenderConfig();
         var emailSenderConfig =
-            JsonUtils.DEFAULT_JSON_MAPPER.convertValue(senderConfig, EmailSenderConfig.class);
+            JsonUtils.jsonMapper().convertValue(senderConfig, EmailSenderConfig.class);
 
         if (!emailSenderConfig.isEnable()) {
             log.debug("Email notifier is disabled, skip sending email.");

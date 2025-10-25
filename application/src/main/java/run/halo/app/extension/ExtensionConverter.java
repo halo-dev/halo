@@ -1,6 +1,6 @@
 package run.halo.app.extension;
 
-import run.halo.app.extension.store.ExtensionStore;
+import run.halo.app.extension.store.Extensions;
 
 /**
  * ExtensionConverter contains bidirectional conversions between Extension and ExtensionStore.
@@ -16,16 +16,16 @@ public interface ExtensionConverter {
      * @param <E> is Extension type.
      * @return an ExtensionStore.
      */
-    <E extends Extension> ExtensionStore convertTo(E extension);
+    <E extends Extension> Extensions convertTo(E extension);
 
     /**
      * Converts Extension from ExtensionStore.
      *
      * @param type is Extension type.
-     * @param extensionStore is an ExtensionStore
+     * @param extensions is an ExtensionStore
      * @param <E> is Extension type.
      * @return an Extension
      */
-    <E extends Extension> E convertFrom(Class<E> type, ExtensionStore extensionStore);
+    <E extends Extension> E convertFrom(Class<E> type, Extensions extensions);
 
 }

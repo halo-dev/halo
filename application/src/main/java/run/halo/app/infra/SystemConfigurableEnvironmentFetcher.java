@@ -2,16 +2,12 @@ package run.halo.app.infra;
 
 import static run.halo.app.extension.index.query.Queries.equal;
 
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.node.JsonNodeFactory;
-import com.github.fge.jsonpatch.JsonPatchException;
-import com.github.fge.jsonpatch.mergepatch.JsonMergePatch;
+import com.fasterxml.jackson.annotation.Nulls;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.concurrent.atomic.AtomicReference;
-import org.apache.commons.lang3.StringUtils;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.core.convert.ConversionService;
 import org.springframework.lang.NonNull;
@@ -24,8 +20,8 @@ import run.halo.app.extension.ReactiveExtensionClient;
 import run.halo.app.extension.controller.Controller;
 import run.halo.app.extension.controller.ControllerBuilder;
 import run.halo.app.extension.controller.Reconciler;
-import run.halo.app.infra.utils.JsonParseException;
-import run.halo.app.infra.utils.JsonUtils;
+import tools.jackson.databind.json.JsonMapper;
+import tools.jackson.databind.node.ArrayNode;
 
 /**
  * A fetcher that fetches the system configuration from the extension client.
@@ -43,6 +39,11 @@ public class SystemConfigurableEnvironmentFetcher implements Reconciler<Reconcil
     private final ApplicationEventPublisher eventPublisher;
     private final AtomicReference<ConfigMap> configMapCache = new AtomicReference<>();
 
+    private final JsonMapper jsonMapper = JsonMapper.builder()
+        .withConfigOverride(ArrayNode.class, override -> override.setMergeable(false))
+        .changeDefaultNullHandling(value -> value.withValueNulls(Nulls.SKIP, Nulls.SKIP))
+        .build();
+
     public SystemConfigurableEnvironmentFetcher(ReactiveExtensionClient extensionClient,
         ConversionService conversionService,
         ApplicationEventPublisher eventPublisher) {
@@ -59,7 +60,7 @@ public class SystemConfigurableEnvironmentFetcher implements Reconciler<Reconcil
                 if (conversionService.canConvert(String.class, type)) {
                     return conversionService.convert(stringValue, type);
                 }
-                return JsonUtils.jsonToObject(stringValue, type);
+                return jsonMapper.readValue(stringValue, type);
             });
     }
 
@@ -150,23 +151,12 @@ public class SystemConfigurableEnvironmentFetcher implements Reconciler<Reconcil
     }
 
     private String mergeRemappingFunction(String dataV, String defaultV) {
-        JsonNode dataJsonValue = nullSafeToJsonNode(dataV);
-        // original
-        JsonNode defaultJsonValue = nullSafeToJsonNode(defaultV);
-        try {
-            // patch
-            JsonMergePatch jsonMergePatch = JsonMergePatch.fromJson(dataJsonValue);
-            // apply patch to original
-            JsonNode patchedNode = jsonMergePatch.apply(defaultJsonValue);
-            return JsonUtils.objectToJson(patchedNode);
-        } catch (JsonPatchException e) {
-            throw new JsonParseException(e);
-        }
-    }
-
-    private JsonNode nullSafeToJsonNode(String json) {
-        return StringUtils.isBlank(json) ? JsonNodeFactory.instance.nullNode()
-            : JsonUtils.jsonToObject(json, JsonNode.class);
+        var mapper = jsonMapper;
+        var existing = mapper.readTree(defaultV);
+        var patched = mapper
+            .readerForUpdating(existing)
+            .readTree(dataV);
+        return mapper.writeValueAsString(patched);
     }
 
     @Override

@@ -1,6 +1,5 @@
 package run.halo.app.core.user.service.impl;
 
-import com.fasterxml.jackson.databind.node.ObjectNode;
 import java.time.Duration;
 import lombok.RequiredArgsConstructor;
 import org.springframework.dao.OptimisticLockingFailureException;
@@ -14,6 +13,7 @@ import run.halo.app.extension.ConfigMap;
 import run.halo.app.extension.Metadata;
 import run.halo.app.extension.ReactiveExtensionClient;
 import run.halo.app.infra.utils.SettingUtils;
+import tools.jackson.databind.node.ObjectNode;
 
 /**
  * {@link Setting} related {@link ConfigMap} service implementation.

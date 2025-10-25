@@ -16,7 +16,6 @@ import org.springframework.security.web.server.util.matcher.NegatedServerWebExch
 import org.springframework.security.web.server.util.matcher.ServerWebExchangeMatcher;
 import org.springframework.security.web.server.util.matcher.ServerWebExchangeMatchers;
 import org.springframework.stereotype.Component;
-import reactor.core.publisher.Mono;
 import run.halo.app.core.user.service.RoleService;
 import run.halo.app.security.authentication.SecurityConfigurer;
 
@@ -91,8 +90,8 @@ class AuthorizationExchangeConfigurers {
                 // we only need to check the authentication is authenticated
                 // because we treat anonymous user as authenticated
                 authentication.map(Authentication::isAuthenticated)
+                    .defaultIfEmpty(false)
                     .map(AuthorizationDecision::new)
-                    .switchIfEmpty(Mono.fromSupplier(() -> new AuthorizationDecision(false)))
             )
         );
     }

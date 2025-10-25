@@ -24,42 +24,42 @@ public class ExtensionStoreClientJPAImpl implements ExtensionStoreClient {
     }
 
     @Override
-    public List<ExtensionStore> listByNamePrefix(String prefix) {
+    public List<Extensions> listByNamePrefix(String prefix) {
         return storeClient.listByNamePrefix(prefix).collectList().block(TIMEOUT);
     }
 
     @Override
-    public Page<ExtensionStore> listByNamePrefix(String prefix, Pageable pageable) {
+    public Page<Extensions> listByNamePrefix(String prefix, Pageable pageable) {
         return storeClient.listByNamePrefix(prefix, pageable).block(TIMEOUT);
     }
 
     @Override
-    public List<ExtensionStore> listBy(String prefix, String nameCursor, int limit) {
+    public List<Extensions> listBy(String prefix, String nameCursor, int limit) {
         return storeClient.listBy(prefix, nameCursor, limit).collectList().block(TIMEOUT);
     }
 
     @Override
-    public List<ExtensionStore> listByNames(List<String> names) {
+    public List<Extensions> listByNames(List<String> names) {
         return storeClient.listByNames(names).collectList().block(TIMEOUT);
     }
 
     @Override
-    public Optional<ExtensionStore> fetchByName(String name) {
+    public Optional<Extensions> fetchByName(String name) {
         return storeClient.fetchByName(name).blockOptional(TIMEOUT);
     }
 
     @Override
-    public ExtensionStore create(String name, byte[] data) {
+    public Extensions create(String name, byte[] data) {
         return storeClient.create(name, data).block(TIMEOUT);
     }
 
     @Override
-    public ExtensionStore update(String name, Long version, byte[] data) {
+    public Extensions update(String name, Long version, byte[] data) {
         return storeClient.update(name, version, data).block(TIMEOUT);
     }
 
     @Override
-    public ExtensionStore delete(String name, Long version) {
+    public Extensions delete(String name, Long version) {
         return storeClient.delete(name, version).block(TIMEOUT);
     }
 }

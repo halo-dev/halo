@@ -21,9 +21,6 @@ import static org.mockito.Mockito.when;
 import static run.halo.app.extension.GroupVersionKind.fromAPIVersionAndKind;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.json.JsonMapper;
-import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import java.util.List;
 import java.util.Map;
 import org.junit.jupiter.api.BeforeEach;
@@ -33,7 +30,6 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.transaction.ReactiveTransactionManager;
@@ -44,8 +40,9 @@ import reactor.core.publisher.Mono;
 import reactor.test.StepVerifier;
 import run.halo.app.extension.exception.SchemeNotFoundException;
 import run.halo.app.extension.index.IndexEngine;
-import run.halo.app.extension.store.ExtensionStore;
+import run.halo.app.extension.store.Extensions;
 import run.halo.app.extension.store.ReactiveExtensionStoreClient;
+import run.halo.app.infra.utils.JsonUtils;
 
 @ExtendWith(MockitoExtension.class)
 class ReactiveExtensionClientTest {
@@ -63,11 +60,6 @@ class ReactiveExtensionClientTest {
 
     @Mock
     ReactiveTransactionManager reactiveTransactionManager;
-
-    @Spy
-    ObjectMapper objectMapper = JsonMapper.builder()
-        .addModule(new JavaTimeModule())
-        .build();
 
     @Mock
     IndexEngine indexEngine;
@@ -99,12 +91,12 @@ class ReactiveExtensionClientTest {
         return fake;
     }
 
-    ExtensionStore createExtensionStore(String name) {
+    Extensions createExtensionStore(String name) {
         return createExtensionStore(name, null);
     }
 
-    ExtensionStore createExtensionStore(String name, Long version) {
-        var extensionStore = new ExtensionStore();
+    Extensions createExtensionStore(String name, Long version) {
+        var extensionStore = new Extensions();
         extensionStore.setName(name);
         extensionStore.setVersion(version);
         extensionStore.setData("fake data".getBytes());
@@ -449,7 +441,6 @@ class ReactiveExtensionClientTest {
             .verifyComplete();
 
         verify(storeClient).fetchByName(storeName);
-        verify(converter).convertTo(isA(JsonExtension.class));
         verify(converter, times(2)).convertFrom(same(FakeExtension.class), any());
         verify(storeClient)
             .update(eq("/registry/fake.halo.run/fakes/fake"), eq(2L), any());
@@ -477,17 +468,18 @@ class ReactiveExtensionClientTest {
     }
 
     @Test
-    void shouldNotUpdateIfUnstructuredNotChange() throws JsonProcessingException {
+    void shouldNotUpdateIfUnstructuredNotChange() {
         var storeName = "/registry/fake.halo.run/fakes/fake";
         var extensionStore = createExtensionStore(storeName, 2L);
         when(storeClient.fetchByName(storeName)).thenReturn(
             Mono.just(extensionStore));
 
-        var fakeJson = objectMapper.writeValueAsString(createFakeExtension("fake", 2L));
-        var oldFakeJson = objectMapper.writeValueAsString(createFakeExtension("fake", 2L));
+        var jsonMapper = Unstructured.jsonMapper();
+        var fakeJson = jsonMapper.writeValueAsString(createFakeExtension("fake", 2L));
+        var oldFakeJson = jsonMapper.writeValueAsString(createFakeExtension("fake", 2L));
 
-        var fake = objectMapper.readValue(fakeJson, Unstructured.class);
-        var oldFake = objectMapper.readValue(oldFakeJson, Unstructured.class);
+        var fake = jsonMapper.readValue(fakeJson, Unstructured.class);
+        var oldFake = jsonMapper.readValue(oldFakeJson, Unstructured.class);
         oldFake.getMetadata().setVersion(2L);
 
         when(converter.convertFrom(Unstructured.class, extensionStore)).thenReturn(oldFake);
@@ -528,7 +520,6 @@ class ReactiveExtensionClientTest {
             .verifyComplete();
 
         verify(storeClient).fetchByName(storeName);
-        verify(converter).convertTo(isA(JsonExtension.class));
         verify(converter, times(2)).convertFrom(same(FakeExtension.class), any());
         verify(storeClient)
             .update(eq("/registry/fake.halo.run/fakes/fake"), eq(2L), any());
@@ -560,7 +551,6 @@ class ReactiveExtensionClientTest {
             .verifyComplete();
 
         verify(storeClient).fetchByName(name);
-        verify(converter).convertTo(isA(JsonExtension.class));
         verify(converter, times(2)).convertFrom(same(Unstructured.class), any());
         verify(storeClient)
             .update(eq("/registry/fake.halo.run/fakes/fake"), eq(12345L), any());
@@ -592,7 +582,7 @@ class ReactiveExtensionClientTest {
             Mono.just(createExtensionStore(storeName)));
 
         var fake = createFakeExtension("fake", 1L);
-        var expectedJsonExt = objectMapper.convertValue(fake, JsonExtension.class);
+        var expectedJsonExt = JsonUtils.jsonMapper().convertValue(fake, JsonExtension.class);
 
         when(converter.convertFrom(JsonExtension.class, createExtensionStore(storeName)))
             .thenReturn(expectedJsonExt);
@@ -663,7 +653,7 @@ class ReactiveExtensionClientTest {
             var name = "/registry/fake.halo.run/fakes/fake";
             var extensionStore = createExtensionStore(name);
             var fake = createFakeExtension("fake", 1L);
-            var unstructured = Unstructured.OBJECT_MAPPER.convertValue(fake, Unstructured.class);
+            var unstructured = Unstructured.jsonMapper().convertValue(fake, Unstructured.class);
 
             when(converter.convertTo(unstructured)).thenReturn(extensionStore);
             when(converter.convertFrom(Unstructured.class, extensionStore))
@@ -687,8 +677,8 @@ class ReactiveExtensionClientTest {
             var oldFake = createFakeExtension("fake", 1L);
             var fake = createFakeExtension("fake", 2L);
             var oldUnstructured =
-                Unstructured.OBJECT_MAPPER.convertValue(oldFake, Unstructured.class);
-            var unstructured = Unstructured.OBJECT_MAPPER.convertValue(fake, Unstructured.class);
+                Unstructured.jsonMapper().convertValue(oldFake, Unstructured.class);
+            var unstructured = Unstructured.jsonMapper().convertValue(fake, Unstructured.class);
 
             when(storeClient.fetchByName(name))
                 .thenReturn(Mono.just(oldExtensionStore));
@@ -696,7 +686,7 @@ class ReactiveExtensionClientTest {
                 .thenReturn(oldUnstructured);
             when(converter.convertFrom(Unstructured.class, extensionStore))
                 .thenReturn(unstructured);
-            when(converter.convertTo(isA(JsonExtension.class))).thenReturn(extensionStore);
+            when(converter.convertTo(isA(Unstructured.class))).thenReturn(extensionStore);
             when(storeClient.update(eq(name), eq(2L), any(byte[].class)))
                 .thenReturn(Mono.just(extensionStore));
             doNothing().when(watcher).onUpdate(isA(FakeExtension.class), isA(FakeExtension.class));
@@ -713,7 +703,7 @@ class ReactiveExtensionClientTest {
 
             var extensionStore = createExtensionStore(name, 1L);
             var fake = createFakeExtension("fake", 1L);
-            var unstructured = Unstructured.OBJECT_MAPPER.convertValue(fake, Unstructured.class);
+            var unstructured = Unstructured.jsonMapper().convertValue(fake, Unstructured.class);
 
             when(converter.convertFrom(Unstructured.class, extensionStore))
                 .thenReturn(unstructured);

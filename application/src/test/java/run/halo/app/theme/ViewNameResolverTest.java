@@ -16,7 +16,8 @@ import org.junit.jupiter.api.io.TempDir;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
-import org.springframework.boot.autoconfigure.thymeleaf.ThymeleafProperties;
+import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.boot.thymeleaf.autoconfigure.ThymeleafProperties;
 import org.springframework.http.HttpMethod;
 import org.springframework.mock.web.reactive.function.server.MockServerRequest;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
@@ -30,7 +31,7 @@ import reactor.test.StepVerifier;
  * @author guqing
  * @since 2.0.0
  */
-@ExtendWith(SpringExtension.class)
+@ExtendWith({SpringExtension.class, MockitoExtension.class})
 class ViewNameResolverTest {
 
     @Mock

@@ -1,9 +1,9 @@
 package run.halo.app.notification;
 
-import com.fasterxml.jackson.databind.node.ObjectNode;
 import java.time.Instant;
 import lombok.Builder;
 import lombok.Data;
+import tools.jackson.databind.node.ObjectNode;
 
 @Data
 public class NotificationContext {

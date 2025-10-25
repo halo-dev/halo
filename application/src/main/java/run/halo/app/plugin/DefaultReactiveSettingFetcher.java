@@ -2,9 +2,6 @@ package run.halo.app.plugin;
 
 import static run.halo.app.extension.index.query.Queries.equal;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Objects;
@@ -28,6 +25,9 @@ import run.halo.app.extension.controller.Controller;
 import run.halo.app.extension.controller.ControllerBuilder;
 import run.halo.app.extension.controller.Reconciler;
 import run.halo.app.infra.utils.JsonUtils;
+import tools.jackson.core.JacksonException;
+import tools.jackson.databind.JsonNode;
+import tools.jackson.databind.node.JsonNodeFactory;
 
 /**
  * A default implementation of {@link ReactiveSettingFetcher}.
@@ -129,8 +129,8 @@ public class DefaultReactiveSettingFetcher
             return JsonNodeFactory.instance.missingNode();
         }
         try {
-            return JsonUtils.DEFAULT_JSON_MAPPER.readTree(json);
-        } catch (JsonProcessingException e) {
+            return JsonUtils.jsonMapper().readTree(json);
+        } catch (JacksonException e) {
             // ignore
             log.error("Failed to parse plugin [{}] config json: [{}]", pluginName, json, e);
         }
@@ -139,7 +139,7 @@ public class DefaultReactiveSettingFetcher
 
     private <T> T convertValue(JsonNode jsonNode, Class<T> clazz) {
         try {
-            return JsonUtils.DEFAULT_JSON_MAPPER.convertValue(jsonNode, clazz);
+            return JsonUtils.jsonMapper().convertValue(jsonNode, clazz);
         } catch (IllegalArgumentException e) {
             // ignore
             log.error("Failed to convert plugin [{}] configMap [{}] to class [{}]",

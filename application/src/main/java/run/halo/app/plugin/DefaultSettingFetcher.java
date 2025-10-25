@@ -1,11 +1,11 @@
 package run.halo.app.plugin;
 
-import com.fasterxml.jackson.databind.JsonNode;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 import org.springframework.lang.NonNull;
 import run.halo.app.extension.ConfigMap;
+import tools.jackson.databind.JsonNode;
 
 /**
  * <p>A value fetcher for plugin form configuration.</p>

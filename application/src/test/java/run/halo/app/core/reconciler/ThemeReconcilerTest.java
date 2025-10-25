@@ -1,7 +1,6 @@
 package run.halo.app.core.reconciler;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.AssertionsForClassTypes.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.lenient;
@@ -19,6 +18,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import org.json.JSONException;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -29,9 +29,10 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.mockito.stubbing.Answer;
 import org.skyscreamer.jsonassert.JSONAssert;
-import org.springframework.retry.RetryException;
+import org.springframework.core.retry.RetryException;
 import org.springframework.util.FileSystemUtils;
 import org.springframework.util.ResourceUtils;
+import reactor.core.Exceptions;
 import reactor.core.publisher.Mono;
 import run.halo.app.core.extension.AnnotationSetting;
 import run.halo.app.core.extension.Setting;
@@ -173,9 +174,9 @@ class ThemeReconcilerTest {
         Path testWorkDir = tempDirectory.resolve("reconcile-delete");
         when(themeRoot.get()).thenReturn(testWorkDir);
 
-        final ThemeReconciler themeReconciler =
-            new ThemeReconciler(extensionClient, themeRoot, systemVersionSupplier,
-                templateEngineManager);
+        final ThemeReconciler themeReconciler = new ThemeReconciler(
+            extensionClient, themeRoot, systemVersionSupplier, templateEngineManager
+        );
 
         final int[] retryFlags = {0};
         when(extensionClient.fetch(eq(Setting.class), eq("theme-test-setting")))
@@ -185,15 +186,14 @@ class ThemeReconcilerTest {
                 if (retryFlags[0] < 2) {
                     return Optional.of(new Setting());
                 }
-                throw new RetryException("retry exception.");
+                throw new RuntimeException("retry exception.");
             });
 
         String settingName = theme.getSpec().getSettingName();
-        assertThatThrownBy(
-            () -> themeReconciler.reconcile(new Reconciler.Request(theme.getMetadata().getName())))
-            .isInstanceOf(RetryException.class)
-            .hasMessage("retry exception.");
-
+        var e = Assertions.assertThrows(RuntimeException.class, () ->
+            themeReconciler.reconcile(new Reconciler.Request(theme.getMetadata().getName()))
+        );
+        Assertions.assertInstanceOf(RetryException.class, Exceptions.unwrap(e));
         verify(extensionClient, times(2)).fetch(eq(Setting.class), eq(settingName));
     }
 

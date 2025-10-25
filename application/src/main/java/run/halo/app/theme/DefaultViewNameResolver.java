@@ -3,7 +3,7 @@ package run.halo.app.theme;
 import java.nio.file.Files;
 import lombok.AllArgsConstructor;
 import org.apache.commons.lang3.StringUtils;
-import org.springframework.boot.autoconfigure.thymeleaf.ThymeleafProperties;
+import org.springframework.boot.thymeleaf.autoconfigure.ThymeleafProperties;
 import org.springframework.stereotype.Component;
 import org.springframework.util.Assert;
 import org.springframework.web.reactive.function.server.ServerRequest;

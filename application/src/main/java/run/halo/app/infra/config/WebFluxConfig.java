@@ -5,12 +5,11 @@ import static org.springframework.web.reactive.function.server.RequestPredicates
 import static org.springframework.web.reactive.function.server.RequestPredicates.path;
 import static run.halo.app.infra.utils.FileUtils.checkDirectoryTraversal;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import java.util.List;
 import java.util.Objects;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.boot.autoconfigure.web.WebProperties;
-import org.springframework.boot.autoconfigure.web.reactive.WebFluxRegistrations;
+import org.springframework.boot.webflux.autoconfigure.WebFluxRegistrations;
 import org.springframework.cache.concurrent.ConcurrentMapCache;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Bean;
@@ -22,8 +21,6 @@ import org.springframework.http.MediaType;
 import org.springframework.http.codec.CodecConfigurer;
 import org.springframework.http.codec.HttpMessageWriter;
 import org.springframework.http.codec.ServerCodecConfigurer;
-import org.springframework.http.codec.json.Jackson2JsonDecoder;
-import org.springframework.http.codec.json.Jackson2JsonEncoder;
 import org.springframework.lang.NonNull;
 import org.springframework.web.filter.reactive.ServerWebExchangeContextFilter;
 import org.springframework.web.filter.reactive.UrlHandlerFilter;
@@ -54,11 +51,12 @@ import run.halo.app.infra.webfilter.AdditionalWebFilterChainProxy;
 import run.halo.app.infra.webfilter.LocaleChangeWebFilter;
 import run.halo.app.plugin.extensionpoint.ExtensionGetter;
 import run.halo.app.theme.UserLocaleRequestAttributeWriteFilter;
+import tools.jackson.databind.json.JsonMapper;
 
 @Configuration
 public class WebFluxConfig implements WebFluxConfigurer {
 
-    private final ObjectMapper objectMapper;
+    private final JsonMapper jsonMapper;
 
     private final HaloProperties haloProp;
 
@@ -70,13 +68,13 @@ public class WebFluxConfig implements WebFluxConfigurer {
 
     private final AttachmentRootGetter attachmentRootGetter;
 
-    public WebFluxConfig(ObjectMapper objectMapper,
+    public WebFluxConfig(JsonMapper jsonMapper,
         HaloProperties haloProp,
         WebProperties webProperties,
         ApplicationContext applicationContext,
         LocalThumbnailService localThumbnailService,
         AttachmentRootGetter attachmentRootGetter) {
-        this.objectMapper = objectMapper;
+        this.jsonMapper = jsonMapper;
         this.haloProp = haloProp;
         this.resourceProperties = webProperties.getResources();
         this.applicationContext = applicationContext;
@@ -120,8 +118,8 @@ public class WebFluxConfig implements WebFluxConfigurer {
         // we need to customize the Jackson2Json[Decoder][Encoder] here to serialize and
         // deserialize special types, e.g.: Instant, LocalDateTime. So we use ObjectMapper
         // created by outside.
-        configurer.defaultCodecs().jackson2JsonDecoder(new Jackson2JsonDecoder(objectMapper));
-        configurer.defaultCodecs().jackson2JsonEncoder(new Jackson2JsonEncoder(objectMapper));
+        // configurer.defaultCodecs().jacksonJsonEncoder(new JacksonJsonEncoder(jsonMapper));
+        // configurer.defaultCodecs().jacksonJsonDecoder(new JacksonJsonDecoder(jsonMapper));
     }
 
     @Bean

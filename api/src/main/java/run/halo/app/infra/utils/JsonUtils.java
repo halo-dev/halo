@@ -1,29 +1,50 @@
 package run.halo.app.infra.utils;
 
+import static com.fasterxml.jackson.annotation.JsonInclude.Include.NON_NULL;
+
 import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import io.swagger.v3.core.util.Json;
 import java.util.Map;
 import org.springframework.lang.NonNull;
 import org.springframework.util.Assert;
+import tools.jackson.core.JacksonException;
+import tools.jackson.core.type.TypeReference;
+import tools.jackson.databind.json.JsonMapper;
 
 /**
  * Json utilities.
  *
  * @author guqing
- * @see JavaTimeModule
  * @since 2.0.0
  */
 public class JsonUtils {
+
+    /**
+     * @deprecated Use {@link #jsonMapper()} instead.
+     */
+    @Deprecated(forRemoval = true, since = "2.22.0")
     public static final ObjectMapper DEFAULT_JSON_MAPPER = Json.mapper();
+
+    private static final JsonMapper JSON_MAPPER = JsonMapper.builder()
+        .changeDefaultPropertyInclusion(
+            value -> value.withValueInclusion(NON_NULL).withContentInclusion(NON_NULL)
+        )
+        .build();
 
     private JsonUtils() {
     }
 
+    /**
+     * @deprecated Use {@link #jsonMapper()} instead.
+     */
+    @Deprecated(forRemoval = true, since = "2.22.0")
     public static ObjectMapper mapper() {
         return DEFAULT_JSON_MAPPER;
+    }
+
+    public static JsonMapper jsonMapper() {
+        return JSON_MAPPER;
     }
 
     /**
@@ -36,7 +57,7 @@ public class JsonUtils {
      */
     @NonNull
     public static <T> T mapToObject(@NonNull Map<String, ?> sourceMap, @NonNull Class<T> type) {
-        return DEFAULT_JSON_MAPPER.convertValue(sourceMap, type);
+        return JSON_MAPPER.convertValue(sourceMap, type);
     }
 
     /**
@@ -49,8 +70,8 @@ public class JsonUtils {
     public static String objectToJson(@NonNull Object source) {
         Assert.notNull(source, "Source object must not be null");
         try {
-            return DEFAULT_JSON_MAPPER.writeValueAsString(source);
-        } catch (JsonProcessingException e) {
+            return JSON_MAPPER.writeValueAsString(source);
+        } catch (JacksonException e) {
             throw new JsonParseException(e);
         }
     }
@@ -64,11 +85,7 @@ public class JsonUtils {
      * @return converted object
      */
     public static <T> T jsonToObject(String json, Class<T> toValueType) {
-        try {
-            return DEFAULT_JSON_MAPPER.readValue(json, toValueType);
-        } catch (Exception e) {
-            throw new JsonParseException(e);
-        }
+        return JSON_MAPPER.readValue(json, toValueType);
     }
 
     /**
@@ -80,9 +97,22 @@ public class JsonUtils {
      * @return converted object
      */
     public static <T> T jsonToObject(String json, TypeReference<T> typeReference) {
+        return JSON_MAPPER.readValue(json, typeReference);
+    }
+
+    /**
+     * Method to deserialize JSON content from given JSON content String.
+     *
+     * @param json json content
+     * @param typeReference type reference to convert
+     * @param <T> real type to convert
+     * @return converted object
+     */
+    public static <T> T jsonToObject(String json,
+        com.fasterxml.jackson.core.type.TypeReference<T> typeReference) {
         try {
-            return DEFAULT_JSON_MAPPER.readValue(json, typeReference);
-        } catch (Exception e) {
+            return mapper().readValue(json, typeReference);
+        } catch (JsonProcessingException e) {
             throw new JsonParseException(e);
         }
     }
@@ -96,10 +126,6 @@ public class JsonUtils {
      */
     @SuppressWarnings("unchecked")
     public static <T> T deepCopy(T source) {
-        try {
-            return (T) DEFAULT_JSON_MAPPER.readValue(objectToJson(source), source.getClass());
-        } catch (JsonProcessingException e) {
-            throw new JsonParseException(e);
-        }
+        return (T) JSON_MAPPER.readValue(objectToJson(source), source.getClass());
     }
 }

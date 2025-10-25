@@ -1,7 +1,7 @@
 package run.halo.app.notification;
 
-import com.fasterxml.jackson.databind.node.ObjectNode;
 import reactor.core.publisher.Mono;
+import tools.jackson.databind.node.ObjectNode;
 
 /**
  * <p>{@link NotifierConfigStore} to store notifier config.</p>

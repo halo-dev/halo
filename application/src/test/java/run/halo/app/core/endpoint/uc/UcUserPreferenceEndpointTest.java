@@ -11,11 +11,6 @@ import static org.springframework.security.test.web.reactive.server.SecurityMock
 import static org.springframework.security.test.web.reactive.server.SecurityMockServerConfigurers.mockUser;
 import static org.springframework.security.test.web.reactive.server.SecurityMockServerConfigurers.springSecurity;
 
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.json.JsonMapper;
-import com.fasterxml.jackson.databind.node.NullNode;
-import com.fasterxml.jackson.databind.node.ObjectNode;
 import java.util.HashMap;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -32,6 +27,11 @@ import reactor.core.publisher.Mono;
 import run.halo.app.extension.ConfigMap;
 import run.halo.app.extension.Metadata;
 import run.halo.app.extension.ReactiveExtensionClient;
+import tools.jackson.databind.JsonNode;
+import tools.jackson.databind.ObjectMapper;
+import tools.jackson.databind.json.JsonMapper;
+import tools.jackson.databind.node.NullNode;
+import tools.jackson.databind.node.ObjectNode;
 
 @ExtendWith(MockitoExtension.class)
 class UcUserPreferenceEndpointTest {
@@ -45,12 +45,13 @@ class UcUserPreferenceEndpointTest {
     ReactiveExtensionClient client;
 
     @Spy
-    ObjectMapper mapper = JsonMapper.builder().build();
+    ObjectMapper mapper = JsonMapper.shared();
 
     @BeforeEach
     void setUp() {
         webClient = WebTestClient.bindToRouterFunction(endpoint.endpoint())
             .apply(springSecurity())
+            .configureClient()
             .build();
     }
 

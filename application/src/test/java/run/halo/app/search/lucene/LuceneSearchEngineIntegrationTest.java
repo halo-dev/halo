@@ -10,12 +10,13 @@ import java.util.List;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.opentest4j.AssertionFailedError;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.web.reactive.AutoConfigureWebTestClient;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.webtestclient.AutoConfigureWebTestClient;
+import org.springframework.core.retry.RetryException;
+import org.springframework.core.retry.RetryPolicy;
+import org.springframework.core.retry.RetryTemplate;
 import org.springframework.dao.OptimisticLockingFailureException;
-import org.springframework.retry.support.RetryTemplateBuilder;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.web.reactive.server.WebTestClient;
@@ -60,7 +61,7 @@ public class LuceneSearchEngineIntegrationTest {
 
     @Test
     @WithMockUser(username = "admin", roles = AnonymousUserConst.Role)
-    void shouldSearchPostAfterPostPublished() {
+    void shouldSearchPostAfterPostPublished() throws RetryException {
         var postName = "first-post";
         assertNoResult(1);
         createPost(postName);
@@ -81,17 +82,19 @@ public class LuceneSearchEngineIntegrationTest {
         assertNoResult(5);
     }
 
-    void assertHasResult(int maxAttempts) {
-        var retryTemplate = new RetryTemplateBuilder()
-            .exponentialBackoff(Duration.ofMillis(200), 2.0, Duration.ofSeconds(10))
-            .maxAttempts(maxAttempts)
-            .retryOn(AssertionFailedError.class)
-            .build();
+    void assertHasResult(int maxAttempts) throws RetryException {
         var option = new SearchOption();
         option.setKeyword("halo");
         option.setHighlightPreTag("<my-tag>");
         option.setHighlightPostTag("</my-tag>");
-        retryTemplate.execute(context -> {
+        var retryTemplate = new RetryTemplate(RetryPolicy.builder()
+            .multiplier(2)
+            .delay(Duration.ofMillis(200))
+            .maxDelay(Duration.ofSeconds(10))
+            .maxAttempts(maxAttempts)
+            .predicate(AssertionError.class::isInstance)
+            .build());
+        retryTemplate.execute(() -> {
             webClient.post().uri("/apis/api.halo.run/v1alpha1/indices/-/search")
                 .bodyValue(option)
                 .exchange()
@@ -112,13 +115,7 @@ public class LuceneSearchEngineIntegrationTest {
         });
     }
 
-    void assertNoResult(int maxAttempts) {
-        var retryTemplate = new RetryTemplateBuilder()
-            .exponentialBackoff(Duration.ofMillis(200), 2.0, Duration.ofSeconds(10))
-            .maxAttempts(maxAttempts)
-            .retryOn(AssertionFailedError.class)
-            .build();
-
+    void assertNoResult(int maxAttempts) throws RetryException {
         var option = new SearchOption();
         option.setKeyword("halo");
         option.setHighlightPreTag("<my-tag>");
@@ -126,7 +123,13 @@ public class LuceneSearchEngineIntegrationTest {
         option.setIncludeTagNames(List.of("search"));
         option.setIncludeCategoryNames(List.of("halo"));
         option.setIncludeOwnerNames(List.of("admin"));
-        retryTemplate.execute(context -> {
+        var retryTemplate = new RetryTemplate(RetryPolicy.builder()
+            .maxAttempts(maxAttempts)
+            .delay(Duration.ofMillis(200))
+            .maxDelay(Duration.ofSeconds(10))
+            .multiplier(2.0)
+            .build());
+        retryTemplate.execute(() -> {
             webClient.post().uri("/apis/api.halo.run/v1alpha1/indices/-/search")
                 .bodyValue(option)
                 .exchange()

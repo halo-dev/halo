@@ -2,20 +2,22 @@ package run.halo.app.extension.router;
 
 import static run.halo.app.extension.router.ExtensionRouterFunctionFactory.PathPatternGenerator.buildExtensionPathPattern;
 
-import com.fasterxml.jackson.databind.node.ObjectNode;
+import com.fasterxml.jackson.databind.JsonNode;
 import com.github.fge.jsonpatch.JsonPatch;
 import com.github.fge.jsonpatch.JsonPatchException;
 import java.util.List;
+import java.util.Map;
+import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.MediaType;
 import org.springframework.web.reactive.function.server.ServerRequest;
 import org.springframework.web.reactive.function.server.ServerResponse;
 import org.springframework.web.server.ServerWebInputException;
 import org.springframework.web.server.UnsupportedMediaTypeStatusException;
 import reactor.core.publisher.Mono;
-import run.halo.app.extension.JsonExtension;
 import run.halo.app.extension.ReactiveExtensionClient;
 import run.halo.app.extension.Scheme;
 import run.halo.app.extension.router.ExtensionRouterFunctionFactory.PatchHandler;
+import run.halo.app.infra.utils.JsonUtils;
 
 /**
  * Handler for patching extension.
@@ -53,22 +55,26 @@ public class ExtensionPatchHandler implements PatchHandler {
             );
         }
 
-        return request.bodyToMono(JsonPatch.class)
+        return request.bodyToMono(new ParameterizedTypeReference<List<Map<?, ?>>>() {
+            })
+            // we have to use the old mapper to convert the map to JsonPatch
+            .map(maps -> JsonUtils.mapper().convertValue(maps, JsonPatch.class))
             .switchIfEmpty(Mono.error(() -> new ServerWebInputException("Request body required.")))
-            .flatMap(jsonPatch -> client.getJsonExtension(scheme.groupVersionKind(), name)
-                .flatMap(jsonExtension -> {
+            .flatMap(jsonPatch -> client.get(scheme.type(), name)
+                .flatMap(extension -> {
+                    var mapper = JsonUtils.mapper();
+                    var jsonNode = mapper.convertValue(extension, JsonNode.class);
+                    JsonNode patchedNode;
                     try {
-                        // apply the patch
-                        var appliedJsonNode =
-                            (ObjectNode) jsonPatch.apply(jsonExtension.getInternal());
-                        var patchedExtension =
-                            new JsonExtension(jsonExtension.getObjectMapper(), appliedJsonNode);
-                        // update the patched extension
-                        return client.update(patchedExtension);
+                        patchedNode = jsonPatch.apply(jsonNode);
                     } catch (JsonPatchException e) {
                         return Mono.error(e);
                     }
-                }))
+                    var patchedExtension =
+                        mapper.convertValue(patchedNode, extension.getClass());
+                    return client.update(patchedExtension);
+                })
+            )
             .flatMap(updated -> ServerResponse.ok().bodyValue(updated));
     }
 

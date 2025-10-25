@@ -11,8 +11,8 @@ import org.springframework.data.relational.core.mapping.Table;
  * @author johnniang
  */
 @Data
-@Table(name = "extensions")
-public class ExtensionStore {
+@Table
+public class Extensions {
 
     /**
      * Extension store name, which is globally unique.
@@ -32,20 +32,20 @@ public class ExtensionStore {
     @Version
     private Long version;
 
-    public ExtensionStore() {
+    public Extensions() {
     }
 
-    public ExtensionStore(String name, byte[] data) {
+    public Extensions(String name, byte[] data) {
         this.name = name;
         this.data = data;
     }
 
-    public ExtensionStore(String name, Long version) {
+    public Extensions(String name, Long version) {
         this.name = name;
         this.version = version;
     }
 
-    public ExtensionStore(String name, byte[] data, Long version) {
+    public Extensions(String name, byte[] data, Long version) {
         this.name = name;
         this.data = data;
         this.version = version;

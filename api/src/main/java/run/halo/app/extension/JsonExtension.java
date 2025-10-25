@@ -1,24 +1,24 @@
 package run.halo.app.extension;
 
-import com.fasterxml.jackson.core.JsonGenerator;
-import com.fasterxml.jackson.core.JsonParser;
-import com.fasterxml.jackson.core.type.TypeReference;
-import com.fasterxml.jackson.databind.DeserializationContext;
-import com.fasterxml.jackson.databind.JsonDeserializer;
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.JsonSerializer;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.SerializerProvider;
-import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
-import com.fasterxml.jackson.databind.annotation.JsonSerialize;
-import com.fasterxml.jackson.databind.node.LongNode;
-import com.fasterxml.jackson.databind.node.ObjectNode;
-import com.fasterxml.jackson.databind.node.TextNode;
-import java.io.IOException;
 import java.time.Instant;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
+import tools.jackson.core.JacksonException;
+import tools.jackson.core.JsonGenerator;
+import tools.jackson.core.JsonParser;
+import tools.jackson.core.type.TypeReference;
+import tools.jackson.databind.DeserializationContext;
+import tools.jackson.databind.MapperFeature;
+import tools.jackson.databind.SerializationContext;
+import tools.jackson.databind.ValueDeserializer;
+import tools.jackson.databind.ValueSerializer;
+import tools.jackson.databind.annotation.JsonDeserialize;
+import tools.jackson.databind.annotation.JsonSerialize;
+import tools.jackson.databind.json.JsonMapper;
+import tools.jackson.databind.node.LongNode;
+import tools.jackson.databind.node.ObjectNode;
+import tools.jackson.databind.node.StringNode;
 
 /**
  * JsonExtension is representation an extension using ObjectNode. This extension is preparing for
@@ -30,21 +30,22 @@ import java.util.Set;
 @JsonDeserialize(using = JsonExtension.ObjectNodeExtensionDeSerializer.class)
 public class JsonExtension implements Extension {
 
-    private final ObjectMapper objectMapper;
+    private static final JsonMapper JSON_MAPPER = JsonMapper.builder()
+        .enable(MapperFeature.ACCEPT_CASE_INSENSITIVE_ENUMS)
+        .build();
 
     private final ObjectNode objectNode;
 
-    public JsonExtension(ObjectMapper objectMapper) {
-        this(objectMapper, objectMapper.createObjectNode());
+    public JsonExtension() {
+        this(JSON_MAPPER.createObjectNode());
     }
 
-    public JsonExtension(ObjectMapper objectMapper, ObjectNode objectNode) {
-        this.objectMapper = objectMapper;
+    public JsonExtension(ObjectNode objectNode) {
         this.objectNode = objectNode;
     }
 
-    public JsonExtension(ObjectMapper objectMapper, Extension e) {
-        this(objectMapper, (ObjectNode) objectMapper.valueToTree(e));
+    public JsonExtension(Extension e) {
+        this((ObjectNode) JSON_MAPPER.valueToTree(e));
     }
 
     @Override
@@ -59,47 +60,46 @@ public class JsonExtension implements Extension {
     @Override
     public String getApiVersion() {
         var apiVersionNode = objectNode.get("apiVersion");
-        return apiVersionNode == null ? null : apiVersionNode.asText();
+        return apiVersionNode == null ? null : apiVersionNode.asString();
     }
 
     @Override
     public String getKind() {
-        return objectNode.get("kind").asText();
+        return objectNode.get("kind").asString();
     }
 
     @Override
     public void setApiVersion(String apiVersion) {
-        objectNode.set("apiVersion", new TextNode(apiVersion));
+        objectNode.set("apiVersion", new StringNode(apiVersion));
     }
 
     @Override
     public void setKind(String kind) {
-        objectNode.set("kind", new TextNode(kind));
+        objectNode.set("kind", new StringNode(kind));
     }
 
     @Override
     public void setMetadata(MetadataOperator metadata) {
-        objectNode.set("metadata", objectMapper.valueToTree(metadata));
+        objectNode.set("metadata", JSON_MAPPER.valueToTree(metadata));
     }
 
-    public static class ObjectNodeExtensionSerializer extends JsonSerializer<JsonExtension> {
+    public static class ObjectNodeExtensionSerializer extends ValueSerializer<JsonExtension> {
 
         @Override
         public void serialize(JsonExtension value, JsonGenerator gen,
-            SerializerProvider serializers) throws IOException {
+            SerializationContext ctxt) throws JacksonException {
             gen.writeTree(value.objectNode);
         }
     }
 
     public static class ObjectNodeExtensionDeSerializer
-        extends JsonDeserializer<JsonExtension> {
+        extends ValueDeserializer<JsonExtension> {
 
         @Override
         public JsonExtension deserialize(JsonParser p, DeserializationContext ctxt)
-            throws IOException {
-            var mapper = (ObjectMapper) p.getCodec();
-            var treeNode = mapper.readTree(p);
-            return new JsonExtension(mapper, (ObjectNode) treeNode);
+            throws JacksonException {
+            var treeNode = p.readValueAsTree();
+            return new JsonExtension((ObjectNode) treeNode);
         }
     }
 
@@ -117,12 +117,12 @@ public class JsonExtension implements Extension {
      *
      * @return object mapper
      */
-    public ObjectMapper getObjectMapper() {
-        return objectMapper;
+    public static JsonMapper getJsonMapper() {
+        return JSON_MAPPER;
     }
 
     public MetadataOperator getMetadataOrCreate() {
-        var metadataNode = objectMapper.createObjectNode();
+        var metadataNode = JSON_MAPPER.createObjectNode();
         objectNode.set("metadata", metadataNode);
         return new ObjectNodeMetadata(metadataNode);
     }
@@ -155,76 +155,76 @@ public class JsonExtension implements Extension {
         @Override
         public String getName() {
             var nameNode = objectNode.get("name");
-            return objectMapper.convertValue(nameNode, String.class);
+            return JSON_MAPPER.convertValue(nameNode, String.class);
         }
 
         @Override
         public String getGenerateName() {
             var generateNameNode = objectNode.get("generateName");
-            return objectMapper.convertValue(generateNameNode, String.class);
+            return JSON_MAPPER.convertValue(generateNameNode, String.class);
         }
 
         @Override
         public Map<String, String> getLabels() {
             var labelsNode = objectNode.get("labels");
-            return objectMapper.convertValue(labelsNode, new TypeReference<>() {
+            return JSON_MAPPER.convertValue(labelsNode, new TypeReference<>() {
             });
         }
 
         @Override
         public Map<String, String> getAnnotations() {
             var annotationsNode = objectNode.get("annotations");
-            return objectMapper.convertValue(annotationsNode, new TypeReference<>() {
+            return JSON_MAPPER.convertValue(annotationsNode, new TypeReference<>() {
             });
         }
 
         @Override
         public Long getVersion() {
-            JsonNode versionNode = objectNode.get("version");
-            return objectMapper.convertValue(versionNode, Long.class);
+            var versionNode = objectNode.get("version");
+            return JSON_MAPPER.convertValue(versionNode, Long.class);
         }
 
         @Override
         public Instant getCreationTimestamp() {
-            return objectMapper.convertValue(objectNode.get("creationTimestamp"), Instant.class);
+            return JSON_MAPPER.convertValue(objectNode.get("creationTimestamp"), Instant.class);
         }
 
         @Override
         public Instant getDeletionTimestamp() {
-            return objectMapper.convertValue(objectNode.get("deletionTimestamp"), Instant.class);
+            return JSON_MAPPER.convertValue(objectNode.get("deletionTimestamp"), Instant.class);
         }
 
         @Override
         public Set<String> getFinalizers() {
-            return objectMapper.convertValue(objectNode.get("finalizers"), new TypeReference<>() {
+            return JSON_MAPPER.convertValue(objectNode.get("finalizers"), new TypeReference<>() {
             });
         }
 
         @Override
         public void setName(String name) {
             if (name != null) {
-                objectNode.set("name", TextNode.valueOf(name));
+                objectNode.set("name", StringNode.valueOf(name));
             }
         }
 
         @Override
         public void setGenerateName(String generateName) {
             if (generateName != null) {
-                objectNode.set("generateName", TextNode.valueOf(generateName));
+                objectNode.set("generateName", StringNode.valueOf(generateName));
             }
         }
 
         @Override
         public void setLabels(Map<String, String> labels) {
             if (labels != null) {
-                objectNode.set("labels", objectMapper.valueToTree(labels));
+                objectNode.set("labels", JSON_MAPPER.valueToTree(labels));
             }
         }
 
         @Override
         public void setAnnotations(Map<String, String> annotations) {
             if (annotations != null) {
-                objectNode.set("annotations", objectMapper.valueToTree(annotations));
+                objectNode.set("annotations", JSON_MAPPER.valueToTree(annotations));
             }
         }
 
@@ -238,21 +238,21 @@ public class JsonExtension implements Extension {
         @Override
         public void setCreationTimestamp(Instant creationTimestamp) {
             if (creationTimestamp != null) {
-                objectNode.set("creationTimestamp", objectMapper.valueToTree(creationTimestamp));
+                objectNode.set("creationTimestamp", JSON_MAPPER.valueToTree(creationTimestamp));
             }
         }
 
         @Override
         public void setDeletionTimestamp(Instant deletionTimestamp) {
             if (deletionTimestamp != null) {
-                objectNode.set("deletionTimestamp", objectMapper.valueToTree(deletionTimestamp));
+                objectNode.set("deletionTimestamp", JSON_MAPPER.valueToTree(deletionTimestamp));
             }
         }
 
         @Override
         public void setFinalizers(Set<String> finalizers) {
             if (finalizers != null) {
-                objectNode.set("finalizers", objectMapper.valueToTree(finalizers));
+                objectNode.set("finalizers", JSON_MAPPER.valueToTree(finalizers));
             }
         }
 

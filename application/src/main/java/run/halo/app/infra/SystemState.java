@@ -1,8 +1,5 @@
 package run.halo.app.infra;
 
-import com.fasterxml.jackson.databind.JsonNode;
-import com.github.fge.jsonpatch.JsonPatchException;
-import com.github.fge.jsonpatch.mergepatch.JsonMergePatch;
 import java.time.Duration;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
@@ -16,8 +13,8 @@ import reactor.util.retry.Retry;
 import run.halo.app.extension.ConfigMap;
 import run.halo.app.extension.Metadata;
 import run.halo.app.extension.ReactiveExtensionClient;
-import run.halo.app.infra.utils.JsonParseException;
 import run.halo.app.infra.utils.JsonUtils;
+import tools.jackson.databind.JsonNode;
 
 /**
  * A model for system state deserialize from {@link run.halo.app.extension.ConfigMap}
@@ -60,20 +57,15 @@ public class SystemState {
             data = new LinkedHashMap<>();
             configMap.setData(data);
         }
-        JsonNode modifiedJson = JsonUtils.mapper()
+        var mapper = JsonUtils.jsonMapper();
+        JsonNode modifiedJson = mapper
             .convertValue(systemState, JsonNode.class);
         // original
         JsonNode sourceJson =
             JsonUtils.jsonToObject(data.getOrDefault(GROUP, emptyJsonObject()), JsonNode.class);
-        try {
-            // patch
-            JsonMergePatch jsonMergePatch = JsonMergePatch.fromJson(modifiedJson);
-            // apply patch to original
-            JsonNode patchedNode = jsonMergePatch.apply(sourceJson);
-            data.put(GROUP, JsonUtils.objectToJson(patchedNode));
-        } catch (JsonPatchException e) {
-            throw new JsonParseException(e);
-        }
+        var patched = mapper.readerForUpdating(sourceJson)
+            .readValue(modifiedJson);
+        data.put(GROUP, mapper.writeValueAsString(patched));
     }
 
     /**

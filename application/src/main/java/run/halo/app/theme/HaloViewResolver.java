@@ -4,12 +4,13 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Optional;
 import org.attoparser.ParseException;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.autoconfigure.thymeleaf.ThymeleafProperties;
 import org.springframework.boot.context.properties.PropertyMapper;
+import org.springframework.boot.thymeleaf.autoconfigure.ThymeleafProperties;
 import org.springframework.context.ApplicationContext;
 import org.springframework.core.Ordered;
 import org.springframework.http.MediaType;
@@ -57,24 +58,24 @@ public class HaloViewResolver extends ThymeleafReactiveViewResolver implements I
         setViewClass(HaloView.class);
         var map = PropertyMapper.get();
         map.from(thymeleafProperties::getEncoding)
-            .whenNonNull()
+            .when(Objects::nonNull)
             .to(this::setDefaultCharset);
         map.from(thymeleafProperties::getExcludedViewNames)
-            .whenNonNull()
+            .when(Objects::nonNull)
             .to(this::setExcludedViewNames);
         map.from(thymeleafProperties::getViewNames)
-            .whenNonNull()
+            .when(Objects::nonNull)
             .to(this::setViewNames);
 
         var reactive = thymeleafProperties.getReactive();
         map.from(reactive::getMediaTypes)
-            .whenNonNull()
+            .when(Objects::nonNull)
             .to(this::setSupportedMediaTypes);
         map.from(reactive::getFullModeViewNames)
-            .whenNonNull()
+            .when(Objects::nonNull)
             .to(this::setFullModeViewNames);
         map.from(reactive::getChunkedModeViewNames)
-            .whenNonNull()
+            .when(Objects::nonNull)
             .to(this::setChunkedModeViewNames);
         map.from(reactive::getMaxChunkSize)
             .asInt(DataSize::toBytes)

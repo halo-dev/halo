@@ -38,8 +38,8 @@ import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import reactor.core.scheduler.Scheduler;
 import reactor.core.scheduler.Schedulers;
-import run.halo.app.extension.store.ExtensionStore;
 import run.halo.app.extension.store.ExtensionStoreRepository;
+import run.halo.app.extension.store.Extensions;
 import run.halo.app.infra.BackupRootGetter;
 import run.halo.app.infra.exception.NotFoundException;
 import run.halo.app.infra.properties.HaloProperties;
@@ -246,10 +246,10 @@ public class MigrationServiceImpl implements MigrationService, InitializingBean 
         if (Files.notExists(extensionsPath)) {
             return Mono.error(new ServerWebInputException("Extensions data file not found."));
         }
-        var reader = objectMapper.readerFor(ExtensionStore.class);
-        return Mono.<Void, MappingIterator<ExtensionStore>>using(
+        var reader = objectMapper.readerFor(Extensions.class);
+        return Mono.<Void, MappingIterator<Extensions>>using(
                 () -> reader.readValues(extensionsPath.toFile()),
-                itr -> Flux.<ExtensionStore>create(
+                itr -> Flux.<Extensions>create(
                         sink -> {
                             while (itr.hasNext()) {
                                 sink.next(itr.next());
@@ -311,7 +311,7 @@ public class MigrationServiceImpl implements MigrationService, InitializingBean 
     private Mono<Void> backupExtensions(Path baseDir) {
         return Mono.fromCallable(() -> Files.createFile(baseDir.resolve("extensions.data")))
             .flatMap(extensionsPath -> Mono.using(
-                () -> objectMapper.writerFor(ExtensionStore.class)
+                () -> objectMapper.writerFor(Extensions.class)
                     .writeValuesAsArray(extensionsPath.toFile()),
                 seqWriter -> repository.findAll()
                     .doOnNext(extensionStore -> {

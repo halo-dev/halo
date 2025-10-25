@@ -1,13 +1,5 @@
 package run.halo.app.infra.utils;
 
-import static org.apache.commons.lang3.ObjectUtils.defaultIfNull;
-
-import com.fasterxml.jackson.core.JacksonException;
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.node.JsonNodeFactory;
-import com.fasterxml.jackson.databind.node.ObjectNode;
-import com.github.fge.jsonpatch.JsonPatchException;
-import com.github.fge.jsonpatch.mergepatch.JsonMergePatch;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -21,6 +13,10 @@ import run.halo.app.core.extension.Setting;
 import run.halo.app.extension.ConfigMap;
 import run.halo.app.extension.ExtensionClient;
 import run.halo.app.extension.Metadata;
+import tools.jackson.core.JacksonException;
+import tools.jackson.databind.JsonNode;
+import tools.jackson.databind.node.JsonNodeFactory;
+import tools.jackson.databind.node.ObjectNode;
 
 @UtilityClass
 public class SettingUtils {
@@ -43,11 +39,11 @@ public class SettingUtils {
         for (Setting.SettingForm form : forms) {
             String group = form.getGroup();
             Map<String, JsonNode> groupValue = form.getFormSchema().stream()
-                .map(o -> JsonUtils.DEFAULT_JSON_MAPPER.convertValue(o, JsonNode.class))
+                .map(o -> JsonUtils.jsonMapper().convertValue(o, JsonNode.class))
                 .filter(jsonNode -> jsonNode.isObject() && jsonNode.has(NAME_FIELD)
                     && jsonNode.has(VALUE_FIELD))
                 .map(jsonNode -> {
-                    String name = jsonNode.get(NAME_FIELD).asText();
+                    String name = jsonNode.get(NAME_FIELD).asString();
                     JsonNode value = jsonNode.get(VALUE_FIELD);
                     return Map.entry(name, value);
                 })
@@ -75,7 +71,8 @@ public class SettingUtils {
                 final var source = SettingUtils.settingDefinedDefaultValueMap(setting);
                 client.fetch(ConfigMap.class, configMapName)
                     .ifPresentOrElse(configMap -> {
-                        Map<String, String> modified = defaultIfNull(configMap.getData(), Map.of());
+                        Map<String, String> modified =
+                            Objects.requireNonNullElse(configMap.getData(), Map.of());
                         final var oldData = JsonUtils.deepCopy(modified);
 
                         Map<String, String> merged = SettingUtils.mergePatch(modified, source);
@@ -113,18 +110,10 @@ public class SettingUtils {
      */
     public static Map<String, String> mergePatch(Map<String, String> modified,
         Map<String, String> source) {
-        JsonNode modifiedJson = mapToJsonNode(modified);
-        // original
-        JsonNode sourceJson = mapToJsonNode(source);
-        try {
-            // patch
-            JsonMergePatch jsonMergePatch = JsonMergePatch.fromJson(modifiedJson);
-            // apply patch to original
-            JsonNode patchedNode = jsonMergePatch.apply(sourceJson);
-            return jsonNodeToStringMap(patchedNode);
-        } catch (JsonPatchException e) {
-            throw new JsonParseException(e);
-        }
+        var existingNode = mapToJsonNode(source);
+        var modifiedNode = mapToJsonNode(modified);
+        var or = JsonUtils.jsonMapper().readerForUpdating(existingNode);
+        return jsonNodeToStringMap(or.readValue(modifiedNode));
     }
 
     /**
@@ -146,17 +135,20 @@ public class SettingUtils {
      * @param node JsonNode object
      * @return {@link ConfigMap#getData()}
      */
-    public static Map<String, String> settingConfigJsonToMap(ObjectNode node) {
+    public static Map<String, String> settingConfigJsonToMap(
+        tools.jackson.databind.node.ObjectNode node) {
         return jsonNodeToStringMap(node);
     }
 
     ObjectNode mapToJsonNode(Map<String, String> map) {
-        ObjectNode objectNode = JsonNodeFactory.instance.objectNode();
+        var objectNode = JsonUtils.jsonMapper().createObjectNode();
         map.forEach((k, v) -> {
-            if (isJson(v)) {
-                JsonNode value = JsonUtils.jsonToObject(v, JsonNode.class);
+            try {
+                var value = JsonUtils.jsonMapper().readTree(v);
                 objectNode.set(k, value);
                 return;
+            } catch (JacksonException ignored) {
+                // ignored this error
             }
             objectNode.put(k, v);
         });
@@ -165,29 +157,27 @@ public class SettingUtils {
 
     Map<String, String> jsonNodeToStringMap(JsonNode node) {
         Map<String, String> stringMap = new LinkedHashMap<>();
-        node.fields().forEachRemaining(entry -> {
-            String k = entry.getKey();
-            JsonNode v = entry.getValue();
+        node.forEachEntry((k, v) -> {
             if (v == null || v.isNull() || v.isMissingNode()) {
                 stringMap.put(k, null);
                 return;
             }
-            if (v.isTextual()) {
-                stringMap.put(k, v.asText());
+            if (v.isString()) {
+                stringMap.put(k, v.asString());
                 return;
             }
-            if (v.isContainerNode()) {
+            if (v.isContainer()) {
                 stringMap.put(k, JsonUtils.objectToJson(v));
                 return;
             }
-            stringMap.put(k, v.asText());
+            stringMap.put(k, v.asString());
         });
         return stringMap;
     }
 
     boolean isJson(String jsonString) {
         try {
-            JsonUtils.DEFAULT_JSON_MAPPER.readTree(jsonString);
+            JsonUtils.jsonMapper().readTree(jsonString);
             return true;
         } catch (JacksonException e) {
             return false;

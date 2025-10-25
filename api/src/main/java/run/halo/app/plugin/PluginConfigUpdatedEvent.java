@@ -1,12 +1,12 @@
 package run.halo.app.plugin;
 
-import com.fasterxml.jackson.databind.JsonNode;
 import java.util.Map;
 import lombok.Builder;
 import lombok.Getter;
 import org.springframework.context.ApplicationEvent;
 import run.halo.app.core.extension.Plugin;
 import run.halo.app.extension.ConfigMap;
+import tools.jackson.databind.JsonNode;
 
 /**
  * <p>Event that is triggered when the {@link ConfigMap } represented by
@@ -19,7 +19,9 @@ import run.halo.app.extension.ConfigMap;
  */
 @Getter
 public class PluginConfigUpdatedEvent extends ApplicationEvent {
+
     private final Map<String, JsonNode> oldConfig;
+
     private final Map<String, JsonNode> newConfig;
 
     @Builder
@@ -29,4 +31,5 @@ public class PluginConfigUpdatedEvent extends ApplicationEvent {
         this.oldConfig = oldConfig;
         this.newConfig = newConfig;
     }
+
 }

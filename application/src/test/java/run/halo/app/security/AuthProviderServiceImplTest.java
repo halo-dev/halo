@@ -16,6 +16,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
 import org.skyscreamer.jsonassert.JSONAssert;
 import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.data.domain.Sort;
@@ -40,7 +41,7 @@ import run.halo.app.infra.utils.JsonUtils;
  * @author guqing
  * @since 2.4.0
  */
-@ExtendWith(SpringExtension.class)
+@ExtendWith({SpringExtension.class, MockitoExtension.class})
 class AuthProviderServiceImplTest {
 
     @Mock

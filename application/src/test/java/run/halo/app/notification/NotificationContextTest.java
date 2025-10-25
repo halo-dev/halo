@@ -2,10 +2,10 @@ package run.halo.app.notification;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.node.ObjectNode;
 import java.time.Instant;
 import org.junit.jupiter.api.Test;
+import run.halo.app.infra.utils.JsonUtils;
+import tools.jackson.databind.node.ObjectNode;
 
 /**
  * Tests for {@link NotificationContext}.
@@ -40,7 +40,7 @@ class NotificationContextTest {
         message.setTimestamp(Instant.now());
 
         // Create a test receiver config
-        ObjectMapper mapper = new ObjectMapper();
+        var mapper = JsonUtils.jsonMapper();
         ObjectNode receiverConfig = mapper.createObjectNode();
         receiverConfig.put("key", "value");
 

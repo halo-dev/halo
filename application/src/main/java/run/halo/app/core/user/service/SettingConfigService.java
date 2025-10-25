@@ -1,9 +1,9 @@
 package run.halo.app.core.user.service;
 
-import com.fasterxml.jackson.databind.node.ObjectNode;
 import reactor.core.publisher.Mono;
 import run.halo.app.core.extension.Setting;
 import run.halo.app.extension.ConfigMap;
+import tools.jackson.databind.node.ObjectNode;
 
 /**
  * {@link Setting} related {@link ConfigMap} service.

@@ -2,15 +2,11 @@ package run.halo.app.extension.router;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertInstanceOf;
-import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.assertArg;
+import static org.mockito.ArgumentMatchers.isA;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-import com.fasterxml.jackson.databind.node.JsonNodeFactory;
-import com.github.fge.jackson.jsonpointer.JsonPointer;
-import com.github.fge.jsonpatch.AddOperation;
-import com.github.fge.jsonpatch.JsonPatch;
 import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
@@ -25,7 +21,6 @@ import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.codec.HttpMessageReader;
-import org.springframework.http.converter.json.Jackson2ObjectMapperBuilder;
 import org.springframework.mock.http.server.reactive.MockServerHttpRequest;
 import org.springframework.mock.web.server.MockServerWebExchange;
 import org.springframework.test.web.reactive.server.WebTestClient;
@@ -36,7 +31,6 @@ import org.springframework.web.reactive.function.server.ServerResponse;
 import org.springframework.web.server.ServerWebExchange;
 import reactor.core.publisher.Mono;
 import run.halo.app.extension.FakeExtension;
-import run.halo.app.extension.JsonExtension;
 import run.halo.app.extension.Metadata;
 import run.halo.app.extension.ReactiveExtensionClient;
 import run.halo.app.extension.Scheme;
@@ -104,34 +98,30 @@ class ExtensionRouterFunctionFactoryTest {
             var metadata = new Metadata();
             metadata.setName("my-fake");
             fake.setMetadata(metadata);
-            var mapper = Jackson2ObjectMapperBuilder.json().build();
-            var jsonExt = mapper.convertValue(fake, JsonExtension.class);
+            when(client.get(FakeExtension.class, "my-fake"))
+                .thenReturn(Mono.just(fake));
 
-            when(client.getJsonExtension(scheme.groupVersionKind(), "my-fake"))
-                .thenReturn(Mono.just(jsonExt));
-
+            var updatedExt = new FakeExtension();
+            updatedExt.setMetadata(fake.getMetadata());
             var status = new FakeExtension.FakeStatus();
             status.setState("running");
-            fake.setStatus(status);
-            var updatedExt = mapper.convertValue(fake, JsonExtension.class);
-            when(client.update(any(JsonExtension.class))).thenReturn(Mono.just(updatedExt));
+            updatedExt.setStatus(status);
+            when(client.update(isA(FakeExtension.class))).thenReturn(Mono.just(updatedExt));
 
-            var stateNode = JsonNodeFactory.instance.textNode("running");
-            var jsonPatch = new JsonPatch(List.of(
-                new AddOperation(JsonPointer.of("status", "state"), stateNode)
-            ));
             webClient.method(HttpMethod.PATCH)
                 .uri("/apis/fake.halo.run/v1alpha1/fakes/my-fake")
                 .header(HttpHeaders.CONTENT_TYPE, "application/json-patch+json")
-                .bodyValue(jsonPatch)
+                .bodyValue("""
+                    [
+                      { "op": "add", "path": "/status/state", "value": "running" }
+                    ]\
+                    """)
                 .exchange()
                 .expectStatus().isOk()
-                .expectBody(JsonExtension.class).isEqualTo(updatedExt);
+                .expectBody(FakeExtension.class).isEqualTo(updatedExt);
 
-            verify(client).<JsonExtension>update(assertArg(ext -> {
-                var state = ext.getInternal().get("status").get("state")
-                    .asText();
-                assertEquals("running", state);
+            verify(client).<FakeExtension>update(assertArg(ext -> {
+                assertEquals("running", ext.getStatus().getState());
             }));
         }
     }

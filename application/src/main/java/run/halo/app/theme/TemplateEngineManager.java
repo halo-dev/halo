@@ -2,7 +2,7 @@ package run.halo.app.theme;
 
 import lombok.NonNull;
 import org.springframework.beans.factory.ObjectProvider;
-import org.springframework.boot.autoconfigure.thymeleaf.ThymeleafProperties;
+import org.springframework.boot.thymeleaf.autoconfigure.ThymeleafProperties;
 import org.springframework.stereotype.Component;
 import org.springframework.util.ConcurrentLruCache;
 import org.thymeleaf.dialect.IDialect;
