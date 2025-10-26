@@ -35,6 +35,8 @@ docker run -d --name halo -p 8090:8090 -v ~/.halo2:/root/.halo2 halohub/halo:2.2
 
 或者点击下方按钮使用 [Gitpod](https://gitpod.io/) 或 [ClawCloud Run](https://template.us-west-1.run.claw.cloud/deploy?templateName=halo) 启动一个体验环境：
 
+[![Deploy on Hostinger](https://assets.hostinger.com/vps/deploy.svg)](https://www.hostinger.com/vps/docker-hosting?compose_url=docker-compose-url)
+
 [![Open in Gitpod](https://gitpod.io/button/open-in-gitpod.svg)](https://gitpod.io/#https://github.com/halo-sigs/gitpod-demo)
 
 [![Run on ClawCloud](https://raw.githubusercontent.com/ClawCloud/Run-Template/refs/heads/main/Run-on-ClawCloud.svg)](https://template.us-west-1.run.claw.cloud/deploy?templateName=halo)
