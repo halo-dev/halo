@@ -36,14 +36,7 @@ const pluginInstallationModalVisible = ref(false);
 
 const keyword = useRouteQuery<string>("keyword", "");
 
-const selectedEnabledValue = useRouteQuery<
-  string | undefined,
-  boolean | undefined
->("enabled", undefined, {
-  transform: (value) => {
-    return value ? value === "true" : undefined;
-  },
-});
+const selectedEnabledValue = useRouteQuery<string | undefined>("enabled");
 const selectedSortValue = useRouteQuery<string | undefined>("sort");
 
 const hasFilters = computed(() => {
@@ -64,7 +57,9 @@ const { data, isLoading, isFetching, refetch } = useQuery<Plugin[]>({
       page: 0,
       size: 0,
       keyword: keyword.value,
-      enabled: selectedEnabledValue.value,
+      enabled: selectedEnabledValue.value
+        ? JSON.parse(selectedEnabledValue.value)
+        : undefined,
       sort: [selectedSortValue.value].filter(Boolean) as string[],
     });
 
@@ -251,11 +246,11 @@ onMounted(() => {
                   },
                   {
                     label: t('core.plugin.filters.status.items.active'),
-                    value: true,
+                    value: 'true',
                   },
                   {
                     label: t('core.plugin.filters.status.items.inactive'),
-                    value: false,
+                    value: 'false',
                   },
                 ]"
               />

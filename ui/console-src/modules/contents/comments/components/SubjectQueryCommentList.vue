@@ -87,11 +87,11 @@ function handleClearFilters() {
             },
             {
               label: $t('core.comment.filters.status.items.approved'),
-              value: true,
+              value: 'true',
             },
             {
               label: $t('core.comment.filters.status.items.pending_review'),
-              value: false,
+              value: 'false',
             },
           ]"
         />
