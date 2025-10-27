@@ -30,7 +30,9 @@ public class HaloErrorConfiguration {
 
     /**
      * This bean will replace ErrorWebExceptionHandler defined at
-     * {@link ErrorWebFluxAutoConfiguration#errorWebExceptionHandler(ErrorAttributes, WebProperties, ObjectProvider, ServerCodecConfigurer, ApplicationContext)} }.
+     * {@link ErrorWebFluxAutoConfiguration#errorWebExceptionHandler(
+     *ErrorAttributes, WebProperties, ObjectProvider, ServerCodecConfigurer, ApplicationContext
+     *)} }.
      */
     @Bean
     @Order(-1)
