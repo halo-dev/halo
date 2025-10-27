@@ -6,7 +6,7 @@ export default function useCommentsFetch(
   queryKey: string,
   page: Ref<number>,
   size: Ref<number>,
-  approved: Ref<boolean | undefined>,
+  approved: Ref<string | undefined>,
   sort: Ref<string | undefined>,
   user: Ref<string | undefined>,
   keyword: Ref<string | undefined>,

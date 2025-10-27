@@ -29,14 +29,7 @@ const checkAll = ref(false);
 const selectedCommentNames = ref<string[]>([]);
 
 const keyword = useRouteQuery<string>("keyword", "");
-const selectedApprovedStatus = useRouteQuery<
-  string | undefined,
-  boolean | undefined
->("approved", undefined, {
-  transform: (value) => {
-    return value ? value === "true" : undefined;
-  },
-});
+const selectedApprovedStatus = useRouteQuery("approved");
 const selectedSort = useRouteQuery<string | undefined>("sort");
 const selectedUser = useRouteQuery<string | undefined>("user");
 
@@ -259,13 +252,13 @@ const handleApproveInBatch = async () => {
                   },
                   {
                     label: t('core.comment.filters.status.items.approved'),
-                    value: true,
+                    value: 'true',
                   },
                   {
                     label: t(
                       'core.comment.filters.status.items.pending_review'
                     ),
-                    value: false,
+                    value: 'false',
                   },
                 ]"
               />
