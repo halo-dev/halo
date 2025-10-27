@@ -29,7 +29,7 @@ const checkAll = ref(false);
 const selectedCommentNames = ref<string[]>([]);
 
 const keyword = useRouteQuery<string>("keyword", "");
-const selectedApprovedStatus = useRouteQuery("approved");
+const selectedApprovedStatus = useRouteQuery<string | undefined>("approved");
 const selectedSort = useRouteQuery<string | undefined>("sort");
 const selectedUser = useRouteQuery<string | undefined>("user");
 
