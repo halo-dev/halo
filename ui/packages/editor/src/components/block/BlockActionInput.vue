@@ -33,6 +33,6 @@ const value = computed({
 
 <style lang="scss">
 .editor-block__actions-input {
-  @apply block w-32 rounded-md border border-gray-300 bg-gray-50 px-2 py-1 text-sm text-gray-900 hover:bg-gray-100 focus:border-blue-500 focus:ring-blue-500;
+  @apply block w-32 rounded-md border !border-solid border-gray-300 bg-gray-50 px-2 py-1 text-sm text-gray-900 hover:bg-gray-100 focus:border-blue-500 focus:ring-blue-500;
 }
 </style>

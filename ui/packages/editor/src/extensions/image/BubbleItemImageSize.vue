@@ -6,7 +6,7 @@ import {
 } from "@/components";
 import { i18n } from "@/locales";
 import type { Editor } from "@/tiptap";
-import { computed, type Component } from "vue";
+import { computed, onMounted, type Component } from "vue";
 import MdiBackupRestore from "~icons/mdi/backup-restore";
 import MdiImageSizeSelectActual from "~icons/mdi/image-size-select-actual";
 import MdiImageSizeSelectLarge from "~icons/mdi/image-size-select-large";
@@ -40,6 +40,36 @@ const height = computed({
   },
 });
 
+function getImageElement(): HTMLImageElement | null {
+  const { view, state } = props.editor;
+  const { from } = state.selection;
+
+  let domNode = view.nodeDOM(from);
+  if (!domNode && from > 0) {
+    const $pos = state.doc.resolve(from);
+    if ($pos.parent) {
+      domNode = view.domAtPos(from).node as HTMLElement;
+    }
+  }
+
+  if (domNode instanceof HTMLElement) {
+    let img = domNode.querySelector("img");
+    if (img) return img;
+
+    if (domNode.tagName === "IMG") {
+      return domNode as HTMLImageElement;
+    }
+
+    const parent = domNode.parentElement;
+    if (parent) {
+      img = parent.querySelector("img");
+      if (img) return img;
+    }
+  }
+
+  return null;
+}
+
 function handleSetSize(width?: string, height?: string) {
   props.editor
     .chain()
@@ -48,6 +78,65 @@ function handleSetSize(width?: string, height?: string) {
     .focus()
     .run();
 }
+
+function getImageSizePercentage(
+  percentage: number
+): { width: number; height: number } | undefined {
+  const imgElement = getImageElement();
+
+  if (!imgElement || !imgElement.complete) {
+    return {
+      width: 0,
+      height: 0,
+    };
+  }
+
+  const naturalWidth = imgElement.naturalWidth;
+  const naturalHeight = imgElement.naturalHeight;
+
+  if (naturalWidth && naturalHeight) {
+    const calculatedWidth = Math.round(naturalWidth * (percentage / 100));
+    const calculatedHeight = Math.round(naturalHeight * (percentage / 100));
+    return {
+      width: calculatedWidth,
+      height: calculatedHeight,
+    };
+  }
+}
+
+function handleSetSizeByPercentage(percentage: number) {
+  const size = getImageSizePercentage(percentage);
+  if (size) {
+    handleSetSize(`${size.width}px`, `${size.height}px`);
+  }
+}
+
+function convertPercentageToPixels() {
+  const attrs = props.editor.getAttributes(Image.name);
+  const currentWidth = attrs.width;
+
+  const isWidthPercentage =
+    currentWidth &&
+    typeof currentWidth === "string" &&
+    currentWidth.includes("%");
+
+  if (!isWidthPercentage) {
+    return;
+  }
+
+  handleSetSizeByPercentage(parseInt(currentWidth));
+}
+
+onMounted(() => {
+  const imgElement = getImageElement();
+  if (imgElement && imgElement.complete) {
+    convertPercentageToPixels();
+  } else {
+    imgElement?.addEventListener("load", convertPercentageToPixels, {
+      once: true,
+    });
+  }
+});
 </script>
 
 <template>
@@ -65,8 +154,8 @@ function handleSetSize(width?: string, height?: string) {
 
   <BlockActionButton
     :tooltip="i18n.global.t('editor.extensions.image.small_size')"
-    :selected="editor.getAttributes(Image.name).width === '25%'"
-    @click="handleSetSize('25%', 'auto')"
+    :is-active="width === `${getImageSizePercentage(25)?.width}px`"
+    @click="handleSetSizeByPercentage(25)"
   >
     <template #icon>
       <MdiImageSizeSelectSmall />
@@ -75,8 +164,8 @@ function handleSetSize(width?: string, height?: string) {
 
   <BlockActionButton
     :tooltip="i18n.global.t('editor.extensions.image.medium_size')"
-    :selected="editor.getAttributes(Image.name).width === '50%'"
-    @click="handleSetSize('50%', 'auto')"
+    :is-active="width === `${getImageSizePercentage(50)?.width}px`"
+    @click="handleSetSizeByPercentage(50)"
   >
     <template #icon>
       <MdiImageSizeSelectLarge />
@@ -85,8 +174,8 @@ function handleSetSize(width?: string, height?: string) {
 
   <BlockActionButton
     :tooltip="i18n.global.t('editor.extensions.image.large_size')"
-    :selected="editor.getAttributes(Image.name).width === '100%'"
-    @click="handleSetSize('100%', '100%')"
+    :is-active="width === `${getImageSizePercentage(100)?.width}px`"
+    @click="handleSetSizeByPercentage(100)"
   >
     <template #icon>
       <MdiImageSizeSelectActual />

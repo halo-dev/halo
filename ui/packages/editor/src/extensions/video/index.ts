@@ -4,15 +4,16 @@ import ToolboxItem from "@/components/toolbox/ToolboxItem.vue";
 import { i18n } from "@/locales";
 import {
   Editor,
-  Node,
-  PluginKey,
-  VueNodeViewRenderer,
+  findParentNode,
   isActive,
   mergeAttributes,
+  Node,
   nodeInputRule,
+  PluginKey,
+  VueNodeViewRenderer,
+  type EditorState,
   type Range,
 } from "@/tiptap";
-import type { EditorState } from "@/tiptap/pm";
 import type { ExtensionOptions, NodeBubbleMenuType } from "@/types";
 import { deleteNode } from "@/utils";
 import { markRaw } from "vue";
@@ -49,13 +50,9 @@ const Video = Node.create<ExtensionOptions>({
   name: "video",
   fakeSelection: true,
 
-  inline() {
-    return true;
-  },
+  inline: false,
 
-  group() {
-    return "inline";
-  },
+  group: "block",
 
   addAttributes() {
     return {
@@ -191,7 +188,11 @@ const Video = Node.create<ExtensionOptions>({
               .focus()
               .deleteRange(range)
               .insertContent([
-                { type: "video", attrs: { src: "" } },
+                {
+                  type: "figure",
+                  attrs: { contentType: "video" },
+                  content: [{ type: "video", attrs: { src: "" } }],
+                },
                 { type: "paragraph", content: "" },
               ])
               .run();
@@ -211,7 +212,13 @@ const Video = Node.create<ExtensionOptions>({
                 editor
                   .chain()
                   .focus()
-                  .insertContent([{ type: "video", attrs: { src: "" } }])
+                  .insertContent([
+                    {
+                      type: "figure",
+                      attrs: { contentType: "video" },
+                      content: [{ type: "video", attrs: { src: "" } }],
+                    },
+                  ])
                   .run();
               },
             },
@@ -417,7 +424,11 @@ const Video = Node.create<ExtensionOptions>({
                 icon: markRaw(MdiDeleteForeverOutline),
                 title: i18n.global.t("editor.common.button.delete"),
                 action: ({ editor }) => {
-                  deleteNode(Video.name, editor);
+                  const figureParent = findParentNode(
+                    (node) => node.type.name === "figure"
+                  )(editor.state.selection);
+
+                  deleteNode(figureParent ? "figure" : Video.name, editor);
                 },
               },
             },

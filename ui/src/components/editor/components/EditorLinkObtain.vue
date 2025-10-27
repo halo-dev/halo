@@ -217,7 +217,7 @@ defineExpose({
             <template #popper>
               <input
                 v-model="externalLink"
-                class="block w-full rounded-md border border-gray-300 bg-gray-50 px-2 py-1.5 text-sm text-gray-900 hover:bg-gray-100"
+                class="block w-full rounded-md border !border-solid border-gray-300 bg-gray-50 px-2 py-1.5 text-sm text-gray-900 hover:bg-gray-100"
                 :placeholder="
                   i18n.global.t(
                     'core.components.default_editor.extensions.upload.permalink.placeholder'

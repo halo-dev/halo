@@ -1,0 +1,62 @@
+figure {
+  display: flex !important;
+  flex-direction: column;
+  margin: 0 !important;
+  margin-top: 0.5rem !important;
+  max-width: 100%;
+
+  img,
+  video,
+  audio {
+    display: block;
+    max-width: 100%;
+    height: auto;
+  }
+
+  figcaption {
+    display: block;
+    width: var(--media-width, 100%);
+    max-width: 100%;
+    padding: 0.5rem;
+    font-size: 0.875rem;
+    color: #6b7280;
+    text-align: center;
+    font-style: italic;
+    min-height: 1.5rem;
+    border-radius: 0.25rem;
+    transition: all 0.2s ease;
+    cursor: text;
+    box-sizing: border-box;
+    position: relative;
+
+    &[data-empty="true"]::before {
+      content: attr(data-placeholder);
+      color: #9ca3af;
+      pointer-events: none;
+      position: absolute;
+      left: 50%;
+      top: 50%;
+      transform: translate(-50%, -50%);
+    }
+
+    &:focus {
+      outline: none;
+      background-color: #f3f4f6;
+      border: 1px solid #d1d5db;
+    }
+
+    &:hover {
+      background-color: #f9fafb;
+    }
+
+    &:not([data-empty="true"]) {
+      background-color: transparent;
+    }
+  }
+
+  &.ProseMirror-selectednode {
+    figcaption {
+      background-color: #f3f4f6;
+    }
+  }
+}

@@ -4,12 +4,13 @@ import ToolboxItemVue from "@/components/toolbox/ToolboxItem.vue";
 import { i18n } from "@/locales";
 import {
   Editor,
-  Node,
-  PluginKey,
-  VueNodeViewRenderer,
+  findParentNode,
   isActive,
   mergeAttributes,
+  Node,
   nodeInputRule,
+  PluginKey,
+  VueNodeViewRenderer,
   type Range,
 } from "@/tiptap";
 import type { EditorState } from "@/tiptap/pm";
@@ -40,13 +41,9 @@ const Audio = Node.create<ExtensionOptions>({
   name: "audio",
   fakeSelection: true,
 
-  inline() {
-    return true;
-  },
+  inline: false,
 
-  group() {
-    return "inline";
-  },
+  group: "block",
 
   addAttributes() {
     return {
@@ -149,7 +146,11 @@ const Audio = Node.create<ExtensionOptions>({
               .focus()
               .deleteRange(range)
               .insertContent([
-                { type: "audio", attrs: { src: "" } },
+                {
+                  type: "figure",
+                  attrs: { contentType: "audio" },
+                  content: [{ type: "audio", attrs: { src: "" } }],
+                },
                 { type: "paragraph", content: "" },
               ])
               .run();
@@ -168,7 +169,13 @@ const Audio = Node.create<ExtensionOptions>({
               editor
                 .chain()
                 .focus()
-                .insertContent([{ type: "audio", attrs: { src: "" } }])
+                .insertContent([
+                  {
+                    type: "figure",
+                    attrs: { contentType: "audio" },
+                    content: [{ type: "audio", attrs: { src: "" } }],
+                  },
+                ])
                 .run();
             },
           },
@@ -269,7 +276,10 @@ const Audio = Node.create<ExtensionOptions>({
                 icon: markRaw(MdiDeleteForeverOutline),
                 title: i18n.global.t("editor.common.button.delete"),
                 action: ({ editor }) => {
-                  deleteNode(Audio.name, editor);
+                  const figureParent = findParentNode(
+                    (node) => node.type.name === "figure"
+                  )(editor.state.selection);
+                  deleteNode(figureParent ? "figure" : Audio.name, editor);
                 },
               },
             },

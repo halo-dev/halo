@@ -5,10 +5,14 @@ withDefaults(
   defineProps<{
     tooltip?: string;
     selected?: boolean;
+    disabled?: boolean;
+    isActive?: boolean;
   }>(),
   {
     tooltip: undefined,
     selected: false,
+    disabled: false,
+    isActive: false,
   }
 );
 </script>
@@ -19,7 +23,9 @@ withDefaults(
     class="editor-block__actions-button"
     :class="{
       'editor-block__actions-button--selected': selected,
+      'editor-block__actions-button--active': isActive,
     }"
+    :disabled="disabled"
   >
     <slot name="icon" />
   </div>
@@ -30,6 +36,10 @@ withDefaults(
   @apply cursor-pointer rounded-md bg-gray-50 p-1.5 hover:bg-gray-200;
 
   &--selected {
+    @apply bg-gray-200;
+  }
+
+  &--active {
     @apply bg-gray-200;
   }
 }

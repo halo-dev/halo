@@ -27,6 +27,8 @@ editor:
       table: Table
       no_results: No results
       placeholder: Enter / to select input type
+    figure_caption:
+      empty_placeholder: Add description
     link:
       add_link: Add link
       edit_link: Edit link
@@ -54,6 +56,8 @@ editor:
       edit_link: Edit link
       edit_alt: Edit alt
       edit_href: Edit the image hyperlink
+      edit_caption: Image description
+      image_load_error: Image load failed
     video:
       disable_controls: Hide controls
       enable_controls: Show controls
