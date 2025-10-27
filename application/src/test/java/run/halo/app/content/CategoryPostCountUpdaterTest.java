@@ -12,7 +12,6 @@ import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.retry.RetryException;
 import org.springframework.test.context.bean.override.mockito.MockitoSpyBean;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
@@ -57,9 +56,9 @@ class CategoryPostCountUpdaterTest {
         return reactiveClient.fetch(scheme.type(), name)
             .flatMap(reactiveClient::delete)
             .flatMap(deleting -> reactiveClient.fetch(scheme.type(), name)
-                .flatMap(e -> Mono.error(new RetryException("Extension still exists")))
+                .flatMap(e -> Mono.error(new IllegalStateException("Extension still exists")))
                 .retryWhen(Retry.backoff(10, Duration.ofMillis(100))
-                    .filter(RetryException.class::isInstance)
+                    .filter(IllegalStateException.class::isInstance)
                 )
                 .thenReturn(deleting)
             );

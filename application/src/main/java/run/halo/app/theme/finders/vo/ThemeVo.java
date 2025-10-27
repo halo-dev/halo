@@ -1,12 +1,12 @@
 package run.halo.app.theme.finders.vo;
 
-import com.fasterxml.jackson.databind.JsonNode;
 import lombok.Builder;
 import lombok.ToString;
 import lombok.Value;
 import lombok.With;
 import run.halo.app.core.extension.Theme;
 import run.halo.app.extension.MetadataOperator;
+import tools.jackson.databind.JsonNode;
 
 /**
  * A value object for {@link Theme}.

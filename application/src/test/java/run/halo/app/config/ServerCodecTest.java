@@ -11,9 +11,9 @@ import java.time.LocalDateTime;
 import java.util.Map;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.web.reactive.AutoConfigureWebTestClient;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.context.TestConfiguration;
+import org.springframework.boot.webtestclient.AutoConfigureWebTestClient;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Import;
 import org.springframework.core.ParameterizedTypeReference;
@@ -61,8 +61,7 @@ class ServerCodecTest {
             .expectStatus().isOk()
             .expectHeader().contentType(MediaType.APPLICATION_JSON)
             .expectBody(new ParameterizedTypeReference<Map<String, Instant>>() {
-            }).isEqualTo(Map.of("now", Instant.parse(INSTANT)))
-        ;
+            }).isEqualTo(Map.of("now", Instant.parse(INSTANT)));
     }
 
     @TestConfiguration(proxyBeanMethods = false)
@@ -86,8 +85,10 @@ class ServerCodecTest {
             };
             return route().POST("/fake/api/time/report",
                     contentType(MediaType.APPLICATION_JSON).and(accept(MediaType.APPLICATION_JSON)),
-                    request -> ServerResponse.ok()
-                        .body(request.bodyToMono(type), type))
+                    request -> request.bodyToMono(type)
+                        .flatMap(data -> {
+                            return ServerResponse.ok().bodyValue(data);
+                        }))
                 .build();
         }
     }

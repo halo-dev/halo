@@ -28,7 +28,6 @@ import org.springframework.core.io.buffer.DataBuffer;
 import org.springframework.core.io.buffer.DataBufferUtils;
 import org.springframework.core.io.buffer.DefaultDataBufferFactory;
 import org.springframework.dao.OptimisticLockingFailureException;
-import org.springframework.retry.RetryException;
 import org.springframework.stereotype.Service;
 import org.springframework.util.Assert;
 import org.springframework.util.ResourceUtils;
@@ -307,9 +306,10 @@ public class ThemeServiceImpl implements ThemeService {
             .flatMap(setting -> client.delete(setting)
                 .flatMap(deleted -> client.fetch(Setting.class, settingName)
                     .flatMap(s -> Mono.error(
-                        () -> new RetryException("Re-check if the setting is deleted.")))
+                        () -> new IllegalStateException("Re-check if the setting is deleted.")))
                     .retryWhen(Retry.fixedDelay(10, Duration.ofMillis(100))
-                        .filter(t -> t instanceof RetryException))
+                        .filter(IllegalStateException.class::isInstance)
+                    )
                 )
             )
             .then();
@@ -324,11 +324,12 @@ public class ThemeServiceImpl implements ThemeService {
             .flatMap(annotationSetting -> client.delete(annotationSetting)
                 .flatMap(deleted -> client.fetch(AnnotationSetting.class,
                         annotationSetting.getMetadata().getName())
-                    .doOnNext(latest -> {
-                        throw new RetryException("AnnotationSetting is not deleted yet.");
-                    })
+                    .flatMap(latest -> Mono.error(
+                        new IllegalStateException("AnnotationSetting is not deleted yet.")
+                    ))
                     .retryWhen(Retry.fixedDelay(10, Duration.ofMillis(100))
-                        .filter(t -> t instanceof RetryException))
+                        .filter(IllegalStateException.class::isInstance)
+                    )
                 )
             )
             .then();
@@ -357,13 +358,17 @@ public class ThemeServiceImpl implements ThemeService {
 
     Mono<Void> waitForThemeDeleted(String themeName) {
         return client.fetch(Theme.class, themeName)
-            .doOnNext(theme -> {
-                throw new RetryException("Re-check if the theme is deleted successfully");
+            .flatMap(theme -> {
+                return Mono.error(new IllegalStateException(
+                    "Re-check if the theme is deleted successfully"
+                ));
             })
             .retryWhen(Retry.fixedDelay(20, Duration.ofMillis(100))
-                .filter(t -> t instanceof RetryException)
+                .filter(IllegalStateException.class::isInstance)
                 .onRetryExhaustedThrow((spec, signal) ->
-                    new ServerErrorException("Wait timeout for theme deleted", null)))
+                    new ServerErrorException("Wait timeout for theme deleted", null)
+                )
+            )
             .then();
     }
 

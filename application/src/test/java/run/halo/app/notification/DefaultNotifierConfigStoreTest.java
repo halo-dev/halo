@@ -13,8 +13,6 @@ import static run.halo.app.notification.DefaultNotifierConfigStore.RECEIVER_KEY;
 import static run.halo.app.notification.DefaultNotifierConfigStore.SECRET_NAME;
 import static run.halo.app.notification.DefaultNotifierConfigStore.SENDER_KEY;
 
-import com.fasterxml.jackson.databind.node.JsonNodeFactory;
-import com.fasterxml.jackson.databind.node.ObjectNode;
 import java.util.Map;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -27,6 +25,8 @@ import run.halo.app.extension.MetadataUtil;
 import run.halo.app.extension.ReactiveExtensionClient;
 import run.halo.app.extension.Secret;
 import run.halo.app.infra.utils.JsonUtils;
+import tools.jackson.databind.node.JsonNodeFactory;
+import tools.jackson.databind.node.ObjectNode;
 
 /**
  * Tests for {@link DefaultNotifierConfigStore}.

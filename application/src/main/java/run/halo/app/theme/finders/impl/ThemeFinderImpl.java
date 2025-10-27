@@ -1,6 +1,5 @@
 package run.halo.app.theme.finders.impl;
 
-import com.fasterxml.jackson.databind.JsonNode;
 import java.util.HashMap;
 import java.util.Map;
 import org.apache.commons.lang3.StringUtils;
@@ -14,6 +13,7 @@ import run.halo.app.infra.utils.JsonUtils;
 import run.halo.app.theme.finders.Finder;
 import run.halo.app.theme.finders.ThemeFinder;
 import run.halo.app.theme.finders.vo.ThemeVo;
+import tools.jackson.databind.JsonNode;
 
 /**
  * A default implementation for {@link ThemeFinder}.

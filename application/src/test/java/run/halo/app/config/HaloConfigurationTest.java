@@ -4,6 +4,8 @@ import static org.junit.jupiter.api.Assertions.assertInstanceOf;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
 
+import java.time.Instant;
+import java.util.Map;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.ObjectProvider;
@@ -12,8 +14,16 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.annotation.DirtiesContext;
 import run.halo.app.search.SearchEngine;
 import run.halo.app.search.lucene.LuceneSearchEngine;
+import tools.jackson.databind.json.JsonMapper;
 
 class HaloConfigurationTest {
+
+    @Test
+    void instantSerialize() {
+        var json = JsonMapper.builder()
+            .build().writeValueAsString(Map.of("now", Instant.now()));
+        System.out.println(json);
+    }
 
     @Nested
     @SpringBootTest

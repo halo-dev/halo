@@ -3,12 +3,9 @@ package run.halo.app.extension;
 import static org.apache.commons.lang3.RandomStringUtils.secure;
 import static org.springframework.util.StringUtils.hasText;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.node.ObjectNode;
 import java.time.Duration;
 import java.time.Instant;
 import java.util.Comparator;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
@@ -31,6 +28,7 @@ import run.halo.app.extension.exception.ExtensionNotFoundException;
 import run.halo.app.extension.index.IndexEngine;
 import run.halo.app.extension.index.IndexedQueryEngine;
 import run.halo.app.extension.store.ReactiveExtensionStoreClient;
+import tools.jackson.databind.node.ObjectNode;
 
 @Slf4j
 @Component
@@ -46,8 +44,6 @@ public class ReactiveExtensionClientImpl implements ReactiveExtensionClient {
 
     private final Watcher.WatcherComposite watchers = new Watcher.WatcherComposite();
 
-    private final ObjectMapper objectMapper;
-
     private final IndexEngine indexEngine;
 
     private Scheduler scheduler;
@@ -55,13 +51,13 @@ public class ReactiveExtensionClientImpl implements ReactiveExtensionClient {
     private TransactionalOperator transactionalOperator;
 
     public ReactiveExtensionClientImpl(ReactiveExtensionStoreClient client,
-        ExtensionConverter converter, SchemeManager schemeManager, ObjectMapper objectMapper,
+        ExtensionConverter converter,
+        SchemeManager schemeManager,
         IndexEngine indexEngine,
         ReactiveTransactionManager reactiveTransactionManager) {
         this.client = client;
         this.converter = converter;
         this.schemeManager = schemeManager;
-        this.objectMapper = objectMapper;
         this.indexEngine = indexEngine;
         this.transactionalOperator = TransactionalOperator.create(reactiveTransactionManager);
         this.scheduler = Schedulers.boundedElastic();
@@ -300,16 +296,17 @@ public class ReactiveExtensionClientImpl implements ReactiveExtensionClient {
 
     @Override
     public <E extends Extension> Mono<E> update(E extension) {
+        // try to convert to real type
         // Refactor the atomic reference if we have a better solution.
         return getLatest(extension).flatMap(old -> {
-            var oldJsonExt = new JsonExtension(objectMapper, old);
-            var newJsonExt = new JsonExtension(objectMapper, extension);
-            // reset some mandatory fields
+            // reset immutable fields
+            extension.getMetadata().setCreationTimestamp(old.getMetadata().getCreationTimestamp());
+            extension.getMetadata().setGenerateName(old.getMetadata().getGenerateName());
+
+            var oldJsonExt = new JsonExtension(old);
+            var newJsonExt = new JsonExtension(extension);
             var oldMetadata = oldJsonExt.getMetadata();
             var newMetadata = newJsonExt.getMetadata();
-            newMetadata.setCreationTimestamp(oldMetadata.getCreationTimestamp());
-            newMetadata.setGenerateName(oldMetadata.getGenerateName());
-
             // If the extension is an unstructured, the version type may be integer instead of long.
             // reset metadata.version for long type.
             oldMetadata.setVersion(oldMetadata.getVersion());
@@ -323,7 +320,7 @@ public class ReactiveExtensionClientImpl implements ReactiveExtensionClient {
             var onlyStatusChanged =
                 isOnlyStatusChanged(oldJsonExt.getInternal(), newJsonExt.getInternal());
 
-            var store = this.converter.convertTo(newJsonExt);
+            var store = this.converter.convertTo(extension);
             var doUpdate =
                 doUpdate(extension, store.getName(), store.getVersion(), store.getData());
             if (!onlyStatusChanged) {
@@ -449,9 +446,9 @@ public class ReactiveExtensionClientImpl implements ReactiveExtensionClient {
         var realType = schemeManager.get(gvk).type();
         Extension realExtension = extension;
         if (extension instanceof Unstructured) {
-            realExtension = Unstructured.OBJECT_MAPPER.convertValue(extension, realType);
+            realExtension = Unstructured.jsonMapper().convertValue(extension, realType);
         } else if (extension instanceof JsonExtension jsonExtension) {
-            realExtension = jsonExtension.getObjectMapper().convertValue(jsonExtension, realType);
+            realExtension = JsonExtension.getJsonMapper().convertValue(jsonExtension, realType);
         }
         return realExtension;
     }
@@ -465,23 +462,11 @@ public class ReactiveExtensionClientImpl implements ReactiveExtensionClient {
         if (Objects.equals(oldNode, newNode)) {
             return false;
         }
-        // WARNING!!!
-        // Do not edit the ObjectNode
-        var oldFields = new HashSet<String>();
-        var newFields = new HashSet<String>();
-        oldNode.fieldNames().forEachRemaining(oldFields::add);
-        newNode.fieldNames().forEachRemaining(newFields::add);
-        oldFields.remove("status");
-        newFields.remove("status");
-        if (!Objects.equals(oldFields, newFields)) {
-            return false;
-        }
-        for (var field : oldFields) {
-            if (!Objects.equals(oldNode.get(field), newNode.get(field))) {
-                return false;
-            }
-        }
-        return true;
+        var oldCopy = oldNode.deepCopy();
+        var newCopy = newNode.deepCopy();
+        oldCopy.remove("status");
+        newCopy.remove("status");
+        return Objects.equals(oldCopy, newCopy);
     }
 
 }

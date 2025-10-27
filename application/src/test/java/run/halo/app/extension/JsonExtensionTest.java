@@ -4,40 +4,31 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.json.JsonMapper;
-import com.fasterxml.jackson.databind.node.TextNode;
-import org.json.JSONException;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.skyscreamer.jsonassert.JSONAssert;
+import tools.jackson.databind.json.JsonMapper;
+import tools.jackson.databind.node.StringNode;
 
 class JsonExtensionTest {
 
-    ObjectMapper objectMapper;
-
-    @BeforeEach
-    void setUp() {
-        objectMapper = JsonMapper.builder().build();
-    }
+    JsonMapper objectMapper = JsonMapper.shared();
 
     @Test
-    void serializeEmptyExt() throws JsonProcessingException, JSONException {
-        var ext = new JsonExtension(objectMapper);
+    void serializeEmptyExt() {
+        var ext = new JsonExtension();
         var json = objectMapper.writeValueAsString(ext);
         JSONAssert.assertEquals("{}", json, true);
     }
 
     @Test
-    void serializeExt() throws JsonProcessingException, JSONException {
-        var ext = new JsonExtension(objectMapper);
+    void serializeExt() {
+        var ext = new JsonExtension();
         ext.setApiVersion("fake.halo.run/v1alpha");
         ext.setKind("Fake");
         var metadata = ext.getMetadataOrCreate();
         metadata.setName("fake-name");
 
-        ext.getInternal().set("data", TextNode.valueOf("halo"));
+        ext.getInternal().set("data", StringNode.valueOf("halo"));
 
         JSONAssert.assertEquals("""
             {
@@ -51,7 +42,7 @@ class JsonExtensionTest {
     }
 
     @Test
-    void deserialize() throws JsonProcessingException {
+    void deserialize() {
         var json = """
             {
               "apiVersion": "fake.halo.run/v1alpha1",

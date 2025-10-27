@@ -2,8 +2,6 @@ package run.halo.app.notification;
 
 import static run.halo.app.extension.MetadataUtil.SYSTEM_FINALIZER;
 
-import com.fasterxml.jackson.databind.node.JsonNodeFactory;
-import com.fasterxml.jackson.databind.node.ObjectNode;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
@@ -15,6 +13,8 @@ import run.halo.app.extension.Metadata;
 import run.halo.app.extension.ReactiveExtensionClient;
 import run.halo.app.extension.Secret;
 import run.halo.app.infra.utils.JsonUtils;
+import tools.jackson.databind.node.JsonNodeFactory;
+import tools.jackson.databind.node.ObjectNode;
 
 /**
  * A default implementation of {@link NotifierConfigStore}.

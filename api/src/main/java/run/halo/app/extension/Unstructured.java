@@ -8,8 +8,6 @@ import com.fasterxml.jackson.databind.JsonSerializer;
 import com.fasterxml.jackson.databind.MapperFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializerProvider;
-import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
-import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import io.swagger.v3.core.util.Json;
 import java.io.IOException;
 import java.time.Instant;
@@ -24,6 +22,13 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 import org.springframework.lang.NonNull;
+import tools.jackson.core.JacksonException;
+import tools.jackson.databind.SerializationContext;
+import tools.jackson.databind.ValueDeserializer;
+import tools.jackson.databind.ValueSerializer;
+import tools.jackson.databind.annotation.JsonDeserialize;
+import tools.jackson.databind.annotation.JsonSerialize;
+import tools.jackson.databind.json.JsonMapper;
 
 /**
  * Unstructured is a generic Extension, which wraps ObjectNode to maintain the Extension data, like
@@ -31,17 +36,31 @@ import org.springframework.lang.NonNull;
  *
  * @author johnniang
  */
-@JsonSerialize(using = Unstructured.UnstructuredSerializer.class)
-@JsonDeserialize(using = Unstructured.UnstructuredDeserializer.class)
+@JsonSerialize(using = Unstructured.UnstructuredValueSerializer.class)
+@JsonDeserialize(using = Unstructured.UnstructuredValueDeserializer.class)
+@com.fasterxml.jackson.databind.annotation.JsonSerialize(
+    using = Unstructured.UnstructuredSerializer.class
+)
+@com.fasterxml.jackson.databind.annotation.JsonDeserialize(
+    using = Unstructured.UnstructuredDeserializer.class
+)
 @SuppressWarnings("rawtypes")
 public class Unstructured implements Extension {
 
+    /**
+     * @deprecated Use {@link #jsonMapper()} instead.
+     */
     @SuppressWarnings("deprecation")
+    @Deprecated(forRemoval = true, since = "2.22.0")
     public static final ObjectMapper OBJECT_MAPPER = Json.mapper()
         // We don't want to change the default mapper
         // so we copy a new one and configure it
         .copy()
         .enable(MapperFeature.ACCEPT_CASE_INSENSITIVE_ENUMS);
+
+    private static final JsonMapper JSON_MAPPER = JsonMapper.builder()
+        .enable(tools.jackson.databind.MapperFeature.ACCEPT_CASE_INSENSITIVE_ENUMS)
+        .build();
 
     private final Map data;
 
@@ -51,6 +70,10 @@ public class Unstructured implements Extension {
 
     public Unstructured(Map data) {
         this.data = data;
+    }
+
+    public static JsonMapper jsonMapper() {
+        return JSON_MAPPER;
     }
 
     public Map getData() {
@@ -192,7 +215,7 @@ public class Unstructured implements Extension {
     @Override
     @SuppressWarnings("unchecked")
     public void setMetadata(MetadataOperator metadata) {
-        Map metadataMap = OBJECT_MAPPER.convertValue(metadata, Map.class);
+        Map metadataMap = JSON_MAPPER.convertValue(metadata, Map.class);
         data.put("metadata", metadataMap);
     }
 
@@ -282,6 +305,15 @@ public class Unstructured implements Extension {
 
     }
 
+    public static class UnstructuredValueSerializer extends ValueSerializer<Unstructured> {
+
+        @Override
+        public void serialize(Unstructured value, tools.jackson.core.JsonGenerator gen,
+            SerializationContext ctxt) throws JacksonException {
+            gen.writePOJO(value.data);
+        }
+    }
+
     public static class UnstructuredDeserializer extends JsonDeserializer<Unstructured> {
 
         @Override
@@ -290,6 +322,17 @@ public class Unstructured implements Extension {
             Map data = p.getCodec().readValue(p, Map.class);
             return new Unstructured(data);
         }
+    }
+
+    public static class UnstructuredValueDeserializer extends ValueDeserializer<Unstructured> {
+
+        @Override
+        public Unstructured deserialize(tools.jackson.core.JsonParser p,
+            tools.jackson.databind.DeserializationContext ctxt) throws JacksonException {
+            var map = p.readValueAs(Map.class);
+            return new Unstructured(map);
+        }
+
     }
 
     @Override
