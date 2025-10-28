@@ -330,6 +330,9 @@ core:
         license: License
         issues: Issues feedback
   plugin:
+    list:
+      fields:
+        builtin: Built-in
     operations:
       uninstall_in_batch:
         title: Uninstall the selected plugins

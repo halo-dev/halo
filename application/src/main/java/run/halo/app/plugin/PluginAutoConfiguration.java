@@ -2,7 +2,9 @@ package run.halo.app.plugin;
 
 import static run.halo.app.plugin.resources.BundleResourceUtils.getJsBundleResource;
 
+import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.net.URISyntaxException;
 import java.time.Instant;
 import lombok.extern.slf4j.Slf4j;
 import org.pf4j.PluginManager;
@@ -46,7 +48,7 @@ public class PluginAutoConfiguration {
     public SpringPluginManager pluginManager(ApplicationContext context,
         SystemVersionSupplier systemVersionSupplier,
         PluginProperties pluginProperties,
-        PluginsRootGetter pluginsRootGetter) {
+        PluginsRootGetter pluginsRootGetter) throws FileNotFoundException, URISyntaxException {
         return new HaloPluginManager(
             context, pluginProperties, systemVersionSupplier, pluginsRootGetter
         );

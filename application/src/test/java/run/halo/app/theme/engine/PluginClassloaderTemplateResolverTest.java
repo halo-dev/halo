@@ -7,7 +7,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import run.halo.app.plugin.HaloPluginManager;
+import org.pf4j.PluginManager;
 
 /**
  * Tests for {@link PluginClassloaderTemplateResolver}.
@@ -19,7 +19,7 @@ import run.halo.app.plugin.HaloPluginManager;
 class PluginClassloaderTemplateResolverTest {
 
     @Mock
-    private HaloPluginManager haloPluginManager;
+    private PluginManager haloPluginManager;
 
     @InjectMocks
     private PluginClassloaderTemplateResolver templateResolver;
