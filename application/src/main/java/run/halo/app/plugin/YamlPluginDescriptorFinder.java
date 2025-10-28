@@ -22,7 +22,7 @@ import run.halo.app.core.extension.Plugin;
  * @since 2.0.0
  */
 @Slf4j
-public class YamlPluginDescriptorFinder implements PluginDescriptorFinder {
+class YamlPluginDescriptorFinder implements PluginDescriptorFinder {
 
     private final YamlPluginFinder yamlPluginFinder;
 
@@ -44,19 +44,18 @@ public class YamlPluginDescriptorFinder implements PluginDescriptorFinder {
     }
 
     public static PluginDescriptor convert(Plugin plugin) {
-        String pluginId = plugin.getMetadata().getName();
-        Plugin.PluginSpec spec = plugin.getSpec();
-        Plugin.PluginAuthor author = spec.getAuthor();
-        String provider = (author == null ? StringUtils.EMPTY : author.getName());
+        var pluginId = plugin.getMetadata().getName();
+        var spec = plugin.getSpec();
+        var author = spec.getAuthor();
+        var provider = (author == null ? StringUtils.EMPTY : author.getName());
 
-        DefaultPluginDescriptor defaultPluginDescriptor =
-            new DefaultPluginDescriptor(pluginId,
-                spec.getDescription(),
-                BasePlugin.class.getName(),
-                spec.getVersion(),
-                spec.getRequires(),
-                provider,
-                joinLicense(spec.getLicense()));
+        var defaultPluginDescriptor = new DefaultPluginDescriptor(pluginId,
+            spec.getDescription(),
+            BasePlugin.class.getName(),
+            spec.getVersion(),
+            spec.getRequires(),
+            provider,
+            joinLicense(spec.getLicense()));
         // add dependencies
         spec.getPluginDependencies().forEach((pluginDepName, versionRequire) -> {
             PluginDependency dependency =
