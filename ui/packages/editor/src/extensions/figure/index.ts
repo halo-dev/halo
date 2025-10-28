@@ -6,6 +6,7 @@ import {
   type CommandProps,
 } from "@/tiptap";
 import type { ExtensionOptions } from "@/types";
+import Paragraph from "../paragraph";
 import FigureCaption from "./figure-caption";
 
 declare module "@/tiptap" {
@@ -29,6 +30,7 @@ const Figure = Node.create<ExtensionOptions & FigureOptions>({
   group: "block",
   content: "block+ figureCaption?",
   isolating: true,
+  priority: 10000,
 
   addOptions() {
     return {
@@ -91,6 +93,38 @@ const Figure = Node.create<ExtensionOptions & FigureOptions>({
     return [FigureCaption];
   },
 
+  addKeyboardShortcuts() {
+    return {
+      Backspace: ({ editor }) => {
+        const { state } = editor;
+        const { selection, doc } = state;
+        const { $from, empty } = selection;
+        if (!empty || $from.parentOffset !== 0) {
+          return false;
+        }
+
+        const beforePos = $from.before($from.depth);
+        if (beforePos <= 0) {
+          return false;
+        }
+
+        const beforeResolve = doc.resolve(beforePos - 1);
+        const nodeBefore = beforeResolve.nodeBefore;
+
+        if (!nodeBefore || nodeBefore.type.name !== FigureCaption.name) {
+          return false;
+        }
+
+        const figureNode = doc.nodeAt(beforePos);
+        console.log(figureNode);
+        const figurePos = beforePos - nodeBefore.nodeSize;
+        editor.chain().deleteRange({ from: figurePos, to: beforePos }).run();
+
+        return true;
+      },
+    };
+  },
+
   addProseMirrorPlugins() {
     return [
       new Plugin({
@@ -102,31 +136,40 @@ const Figure = Node.create<ExtensionOptions & FigureOptions>({
           }
 
           const tr = newState.tr;
-          let modified = false;
+          const nodesToDelete: { pos: number; size: number }[] = [];
 
           newState.doc.descendants((node, pos) => {
-            if (node.type.name !== Figure.name) {
+            if (node.type.name !== this.name) {
               return;
             }
 
-            let hasMediaNode = false;
+            let hasValidContent = false;
+
             node.forEach((child) => {
               if (
-                child.type.name === "image" ||
-                child.type.name === "video" ||
-                child.type.name === "audio"
+                child.type.name !== Paragraph.name ||
+                child.childCount > 0 ||
+                child.textContent.trim().length > 0
               ) {
-                hasMediaNode = true;
+                hasValidContent = true;
               }
             });
 
-            if (!hasMediaNode) {
-              tr.delete(pos, pos + node.nodeSize);
-              modified = true;
+            if (!hasValidContent) {
+              nodesToDelete.push({
+                pos: pos,
+                size: node.nodeSize,
+              });
             }
           });
 
-          return modified ? tr : null;
+          nodesToDelete
+            .sort((a, b) => b.pos - a.pos)
+            .forEach(({ pos, size }) => {
+              tr.delete(pos, pos + size);
+            });
+
+          return nodesToDelete.length > 0 ? tr : null;
         },
       }),
     ];

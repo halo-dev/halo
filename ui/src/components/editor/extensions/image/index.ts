@@ -32,7 +32,7 @@ const Image = ExtensionImage.extend<
     return {
       ...this.parent?.(),
       width: {
-        default: "100%",
+        default: undefined,
         parseHTML: (element) => {
           const width =
             element.getAttribute("width") || element.style.width || null;
@@ -45,7 +45,7 @@ const Image = ExtensionImage.extend<
         },
       },
       height: {
-        default: "100%",
+        default: undefined,
         parseHTML: (element) => {
           const height =
             element.getAttribute("height") || element.style.height || null;

@@ -41,7 +41,7 @@ onMounted(() => {
 </script>
 
 <template>
-  <node-view-wrapper as="div">
+  <node-view-wrapper as="div" class="flex">
     <div
       class="relative inline-block h-full w-full overflow-hidden text-center transition-all"
       :class="{

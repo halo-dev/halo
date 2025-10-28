@@ -18,6 +18,7 @@ import {
   ExtensionDocument,
   ExtensionDraggable,
   ExtensionDropcursor,
+  ExtensionFigure,
   ExtensionFontSize,
   ExtensionFormatBrush,
   ExtensionGapcursor,
@@ -283,6 +284,7 @@ const presetExtensions = [
   ExtensionFontSize,
   ExtensionColor,
   ExtensionIndent,
+  ExtensionFigure,
   Extension.create({
     name: "custom-heading-extension",
     addGlobalAttributes() {

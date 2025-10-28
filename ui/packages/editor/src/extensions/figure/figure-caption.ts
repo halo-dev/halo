@@ -1,21 +1,19 @@
 import { i18n } from "@/locales";
-import { isActive, mergeAttributes, Node, Plugin, PluginKey } from "@/tiptap";
+import {
+  isActive,
+  mergeAttributes,
+  Node,
+  Plugin,
+  PluginKey,
+  TextSelection,
+} from "@/tiptap";
 
 const FigureCaption = Node.create({
   name: "figureCaption",
   content: "inline*",
   inline: false,
   group: "block",
-
-  addOptions() {
-    return {
-      HTMLAttributes: {
-        "data-placeholder": i18n.global.t(
-          "editor.extensions.figure_caption.empty_placeholder"
-        ),
-      },
-    };
-  },
+  priority: 101,
 
   addAttributes() {
     return {
@@ -24,7 +22,11 @@ const FigureCaption = Node.create({
         parseHTML: (element) => element.getAttribute("data-placeholder"),
         renderHTML: (attributes) => {
           return {
-            "data-placeholder": attributes["data-placeholder"],
+            "data-placeholder":
+              attributes.dataPlaceholder ||
+              i18n.global.t(
+                "editor.extensions.figure_caption.empty_placeholder"
+              ),
           };
         },
       },
@@ -43,7 +45,7 @@ const FigureCaption = Node.create({
         renderHTML: (attributes) => {
           if (!attributes.width) return {};
           return {
-            style: `width: ${attributes.width}; max-width: 100%;`,
+            style: `width: ${attributes.width}; max-width: 100%; text-align: center;`,
           };
         },
       },
@@ -63,6 +65,44 @@ const FigureCaption = Node.create({
           return true;
         }
         return false;
+      },
+      Enter: ({ editor }) => {
+        const { state } = editor;
+        const { selection } = state;
+        const { $from } = selection;
+
+        let inCaption = false;
+        let figureDepth = -1;
+        for (let depth = $from.depth; depth > 0; depth--) {
+          const node = $from.node(depth);
+          if (node.type.name === this.name) {
+            inCaption = true;
+            figureDepth = depth - 1;
+            break;
+          }
+        }
+
+        if (!inCaption) {
+          return false;
+        }
+
+        const figureNode = $from.node(figureDepth);
+        const figurePos = $from.before(figureDepth);
+        const afterFigurePos = figurePos + figureNode.nodeSize;
+
+        editor
+          .chain()
+          .command(({ tr }) => {
+            const paragraph = tr.doc.type.schema.nodes.paragraph.create();
+            tr.insert(afterFigurePos, paragraph);
+            tr.setSelection(
+              TextSelection.near(tr.doc.resolve(afterFigurePos + 1))
+            );
+            return true;
+          })
+          .run();
+
+        return true;
       },
     };
   },
@@ -156,9 +196,7 @@ const FigureCaption = Node.create({
   renderHTML({ HTMLAttributes }) {
     return [
       "figcaption",
-      mergeAttributes(this.options.HTMLAttributes, HTMLAttributes, {
-        "data-placeholder": HTMLAttributes["data-placeholder"],
-      }),
+      mergeAttributes(this.options.HTMLAttributes, HTMLAttributes),
       0,
     ];
   },

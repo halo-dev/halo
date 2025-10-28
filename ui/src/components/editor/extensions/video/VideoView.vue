@@ -1,11 +1,10 @@
 <script lang="ts" setup>
 import HasPermission from "@/components/permission/HasPermission.vue";
 import { VButton } from "@halo-dev/components";
-import type { NodeViewProps } from "@halo-dev/richtext-editor";
+import { NodeViewWrapper, type NodeViewProps } from "@halo-dev/richtext-editor";
 import { computed, ref } from "vue";
 import RiVideoAddLine from "~icons/ri/video-add-line";
 import { EditorLinkObtain } from "../../components";
-import InlineBlockBox from "../../components/InlineBlockBox.vue";
 import { useExternalAssetsTransfer } from "../../composables/use-attachment";
 import type { AttachmentAttr } from "../../utils/attachment";
 
@@ -76,7 +75,7 @@ const { isExternalAsset, transferring, handleTransfer } =
 </script>
 
 <template>
-  <InlineBlockBox>
+  <node-view-wrapper as="div" class="flex">
     <div
       class="relative inline-block h-full max-w-full overflow-hidden rounded-md text-center transition-all"
       :class="{
@@ -222,5 +221,5 @@ const { isExternalAsset, transferring, handleTransfer } =
         </EditorLinkObtain>
       </div>
     </div>
-  </InlineBlockBox>
+  </node-view-wrapper>
 </template>

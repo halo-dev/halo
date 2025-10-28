@@ -108,7 +108,7 @@ function setupResizeListener() {
       }
 
       const newWidth = Math.max(
-        100,
+        1,
         Math.min(
           startWidth + e.clientX - startX,
           props.editor.view.dom?.clientWidth || 0

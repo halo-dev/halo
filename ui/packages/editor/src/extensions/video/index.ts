@@ -71,9 +71,9 @@ const Video = Node.create<ExtensionOptions>({
         },
       },
       width: {
-        default: "100%",
+        default: undefined,
         parseHTML: (element) => {
-          return element.getAttribute("width");
+          return element.getAttribute("width") || element.style.width || null;
         },
         renderHTML(attributes) {
           return {
@@ -82,9 +82,9 @@ const Video = Node.create<ExtensionOptions>({
         },
       },
       height: {
-        default: "auto",
+        default: undefined,
         parseHTML: (element) => {
-          return element.getAttribute("height");
+          return element.getAttribute("height") || element.style.height || null;
         },
         renderHTML: (attributes) => {
           return {
@@ -169,9 +169,6 @@ const Video = Node.create<ExtensionOptions>({
       nodeInputRule({
         find: /^\$video\$$/,
         type: this.type,
-        getAttributes: () => {
-          return { width: "100%" };
-        },
       }),
     ];
   },
@@ -311,6 +308,9 @@ const Video = Node.create<ExtensionOptions>({
           pluginKey: VIDEO_BUBBLE_MENU_KEY,
           shouldShow: ({ state }: { state: EditorState }) => {
             return isActive(state, Video.name);
+          },
+          options: {
+            placement: "top-start",
           },
           items: [
             {

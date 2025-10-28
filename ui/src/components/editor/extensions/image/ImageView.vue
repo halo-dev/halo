@@ -1,10 +1,9 @@
 <script lang="ts" setup>
 import HasPermission from "@/components/permission/HasPermission.vue";
 import { IconImageAddLine, VButton } from "@halo-dev/components";
-import { type NodeViewProps } from "@halo-dev/richtext-editor";
-import { computed, onMounted, ref } from "vue";
+import { NodeViewWrapper, type NodeViewProps } from "@halo-dev/richtext-editor";
+import { computed, onMounted, onUnmounted, ref, watch } from "vue";
 import { EditorLinkObtain } from "../../components";
-import InlineBlockBox from "../../components/InlineBlockBox.vue";
 import { useExternalAssetsTransfer } from "../../composables/use-attachment";
 import { type AttachmentAttr } from "../../utils/attachment";
 import { fileToBase64 } from "../../utils/upload";
@@ -102,6 +101,7 @@ const handleResetInit = () => {
 
 const aspectRatio = ref<number>(0);
 const resizeRef = ref<HTMLDivElement>();
+const inputRef = ref<HTMLInputElement>();
 
 function onImageLoaded() {
   if (!resizeRef.value) return;
@@ -110,39 +110,137 @@ function onImageLoaded() {
     resizeRef.value.clientWidth / resizeRef.value.clientHeight;
 }
 
-onMounted(() => {
-  if (!resizeRef.value) return;
+let cleanupResize: (() => void) | null = null;
+const resizeHandleRef = ref<HTMLDivElement>();
 
+function setupResizeListener() {
+  if (!resizeHandleRef.value) {
+    return;
+  }
+
+  if (cleanupResize) {
+    cleanupResize();
+  }
+
+  const handleElement = resizeHandleRef.value;
   let startX: number, startWidth: number;
+  let rafId: number | null = null;
 
-  resizeRef.value.addEventListener("mousedown", function (e) {
+  function handleMouseDown(e: MouseEvent) {
+    if (e.button !== 0) {
+      return;
+    }
+
+    e.preventDefault();
+    e.stopPropagation();
     startX = e.clientX;
     startWidth = resizeRef.value?.clientWidth || 1;
     document.documentElement.addEventListener("mousemove", doDrag, false);
     document.documentElement.addEventListener("mouseup", stopDrag, false);
-  });
+    document.documentElement.addEventListener(
+      "contextmenu",
+      handleContextMenu,
+      false
+    );
+    document.documentElement.addEventListener("mouseleave", stopDrag, false);
+    window.addEventListener("blur", stopDrag, false);
+  }
 
   function doDrag(e: MouseEvent) {
-    if (!resizeRef.value) return;
+    if (!resizeRef.value) {
+      return;
+    }
 
-    const newWidth = Math.min(
-      startWidth + e.clientX - startX,
-      resizeRef.value.parentElement?.clientWidth || 0
-    );
+    if (rafId !== null) {
+      cancelAnimationFrame(rafId);
+    }
 
-    const width = newWidth.toFixed(0) + "px";
-    const height = (newWidth / aspectRatio.value).toFixed(0) + "px";
-    props.editor
-      .chain()
-      .updateAttributes(Image.name, { width, height })
-      .setNodeSelection(props.getPos() || 0)
-      .focus()
-      .run();
+    rafId = requestAnimationFrame(() => {
+      if (!resizeRef.value) {
+        return;
+      }
+
+      const newWidth = Math.max(
+        1,
+        Math.min(
+          startWidth + e.clientX - startX,
+          props.editor.view.dom?.clientWidth || 0
+        )
+      );
+
+      const width = newWidth.toFixed(0) + "px";
+      const height =
+        aspectRatio.value > 0
+          ? (newWidth / aspectRatio.value).toFixed(0) + "px"
+          : "auto";
+
+      props.editor
+        .chain()
+        .updateAttributes(Image.name, { width, height })
+        .setNodeSelection(props.getPos() || 0)
+        .focus()
+        .run();
+    });
+  }
+
+  function handleContextMenu(e: MouseEvent) {
+    e.preventDefault();
+    stopDrag();
   }
 
   function stopDrag() {
+    if (rafId !== null) {
+      cancelAnimationFrame(rafId);
+      rafId = null;
+    }
     document.documentElement.removeEventListener("mousemove", doDrag, false);
     document.documentElement.removeEventListener("mouseup", stopDrag, false);
+    document.documentElement.removeEventListener(
+      "contextmenu",
+      handleContextMenu,
+      false
+    );
+    document.documentElement.removeEventListener("mouseleave", stopDrag, false);
+    window.removeEventListener("blur", stopDrag, false);
+  }
+
+  handleElement.addEventListener("mousedown", handleMouseDown);
+
+  cleanupResize = () => {
+    handleElement.removeEventListener("mousedown", handleMouseDown);
+    document.documentElement.removeEventListener("mousemove", doDrag, false);
+    document.documentElement.removeEventListener("mouseup", stopDrag, false);
+    document.documentElement.removeEventListener(
+      "contextmenu",
+      handleContextMenu,
+      false
+    );
+    document.documentElement.removeEventListener("mouseleave", stopDrag, false);
+    window.removeEventListener("blur", stopDrag, false);
+    if (rafId !== null) {
+      cancelAnimationFrame(rafId);
+    }
+    cleanupResize = null;
+  };
+}
+
+onMounted(() => {
+  if (!src.value) {
+    inputRef.value?.focus();
+    return;
+  }
+  setupResizeListener();
+});
+
+onUnmounted(() => {
+  if (cleanupResize) {
+    cleanupResize();
+  }
+});
+
+watch([src, resizeHandleRef], () => {
+  if (src.value && resizeHandleRef.value) {
+    setupResizeListener();
   }
 });
 
@@ -151,13 +249,12 @@ const { isExternalAsset, transferring, handleTransfer } =
 </script>
 
 <template>
-  <InlineBlockBox>
+  <node-view-wrapper as="div" class="flex">
     <div
       ref="resizeRef"
-      class="group relative inline-block max-w-full overflow-hidden rounded-md text-center"
+      class="resize-container group relative inline-block max-w-full overflow-hidden rounded-md text-center"
       :class="{
         'rounded ring-2': selected,
-        'resize-x': !initialization,
       }"
       :style="{
         width: initialization ? '100%' : node.attrs.width,
@@ -170,13 +267,21 @@ const { isExternalAsset, transferring, handleTransfer } =
           :title="node.attrs.title"
           :alt="alt"
           :href="href"
-          class="h-full w-full"
+          :width="node.attrs.width"
+          class="max-w-full rounded-md"
           @load="onImageLoaded"
         />
 
         <div
+          v-if="selected"
+          ref="resizeHandleRef"
+          class="resizer-handler resizer-br"
+          title="拖拽调整大小"
+        ></div>
+
+        <div
           v-if="src"
-          class="absolute left-0 top-0 hidden h-1/4 w-full cursor-pointer justify-end gap-2 bg-gradient-to-b from-gray-300 to-transparent p-2 ease-in-out group-hover:flex"
+          class="absolute left-0 top-0 hidden h-1/4 w-full cursor-pointer justify-end gap-2 rounded-md bg-gradient-to-b from-gray-300 to-transparent p-2 ease-in-out group-hover:flex"
         >
           <HasPermission :permissions="['uc:attachments:manage']">
             <VButton
@@ -300,5 +405,5 @@ const { isExternalAsset, transferring, handleTransfer } =
         </EditorLinkObtain>
       </div>
     </div>
-  </InlineBlockBox>
+  </node-view-wrapper>
 </template>

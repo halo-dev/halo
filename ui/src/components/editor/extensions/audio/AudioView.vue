@@ -1,11 +1,10 @@
 <script lang="ts" setup>
 import HasPermission from "@/components/permission/HasPermission.vue";
 import { VButton } from "@halo-dev/components";
-import type { NodeViewProps } from "@halo-dev/richtext-editor";
+import { NodeViewWrapper, type NodeViewProps } from "@halo-dev/richtext-editor";
 import { computed, ref } from "vue";
 import RiFileMusicLine from "~icons/ri/file-music-line";
 import { EditorLinkObtain } from "../../components";
-import InlineBlockBox from "../../components/InlineBlockBox.vue";
 import { useExternalAssetsTransfer } from "../../composables/use-attachment";
 import type { AttachmentAttr } from "../../utils/attachment";
 
@@ -72,7 +71,7 @@ const { isExternalAsset, transferring, handleTransfer } =
 </script>
 
 <template>
-  <InlineBlockBox>
+  <node-view-wrapper as="div" class="flex">
     <div
       class="relative inline-block h-full max-w-full overflow-hidden rounded-md text-center transition-all"
       :class="{
@@ -97,7 +96,7 @@ const { isExternalAsset, transferring, handleTransfer } =
         ></audio>
         <div
           v-if="src"
-          class="absolute left-0 top-0 hidden h-1/4 w-full cursor-pointer justify-end gap-2 bg-gradient-to-b from-gray-300 to-transparent p-2 ease-in-out group-hover:flex"
+          class="absolute left-0 top-0 hidden h-1/4 w-full cursor-pointer justify-end gap-2 rounded-md bg-gradient-to-b from-gray-300 to-transparent p-2 ease-in-out group-hover:flex"
         >
           <HasPermission :permissions="['uc:attachments:manage']">
             <VButton
@@ -218,5 +217,5 @@ const { isExternalAsset, transferring, handleTransfer } =
         </EditorLinkObtain>
       </div>
     </div>
-  </InlineBlockBox>
+  </node-view-wrapper>
 </template>
