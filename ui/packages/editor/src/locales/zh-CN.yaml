@@ -68,6 +68,7 @@ editor:
       small_size: 小尺寸
       medium_size: 中尺寸
       large_size: 大尺寸
+      edit_caption: 视频描述
     highlight:
       unset: 移除高亮颜色
     columns:

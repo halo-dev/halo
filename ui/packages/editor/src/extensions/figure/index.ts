@@ -1,4 +1,10 @@
-import { mergeAttributes, Node, type CommandProps } from "@/tiptap";
+import {
+  mergeAttributes,
+  Node,
+  Plugin,
+  PluginKey,
+  type CommandProps,
+} from "@/tiptap";
 import type { ExtensionOptions } from "@/types";
 import FigureCaption from "./figure-caption";
 
@@ -83,6 +89,47 @@ const Figure = Node.create<ExtensionOptions & FigureOptions>({
 
   addExtensions() {
     return [FigureCaption];
+  },
+
+  addProseMirrorPlugins() {
+    return [
+      new Plugin({
+        key: new PluginKey("figureAutoDelete"),
+        appendTransaction: (transactions, _oldState, newState) => {
+          const docChanged = transactions.some((tr) => tr.docChanged);
+          if (!docChanged) {
+            return null;
+          }
+
+          const tr = newState.tr;
+          let modified = false;
+
+          newState.doc.descendants((node, pos) => {
+            if (node.type.name !== Figure.name) {
+              return;
+            }
+
+            let hasMediaNode = false;
+            node.forEach((child) => {
+              if (
+                child.type.name === "image" ||
+                child.type.name === "video" ||
+                child.type.name === "audio"
+              ) {
+                hasMediaNode = true;
+              }
+            });
+
+            if (!hasMediaNode) {
+              tr.delete(pos, pos + node.nodeSize);
+              modified = true;
+            }
+          });
+
+          return modified ? tr : null;
+        },
+      }),
+    ];
   },
 
   addCommands() {

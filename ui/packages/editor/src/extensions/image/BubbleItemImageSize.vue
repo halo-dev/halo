@@ -54,8 +54,9 @@ function getImageElement(): HTMLImageElement | null {
 
   if (domNode instanceof HTMLElement) {
     let img = domNode.querySelector("img");
-    if (img) return img;
-
+    if (img) {
+      return img;
+    }
     if (domNode.tagName === "IMG") {
       return domNode as HTMLImageElement;
     }
@@ -63,7 +64,9 @@ function getImageElement(): HTMLImageElement | null {
     const parent = domNode.parentElement;
     if (parent) {
       img = parent.querySelector("img");
-      if (img) return img;
+      if (img) {
+        return img;
+      }
     }
   }
 
@@ -129,32 +132,67 @@ function convertPercentageToPixels() {
 
 onMounted(() => {
   const imgElement = getImageElement();
-  if (imgElement && imgElement.complete) {
-    convertPercentageToPixels();
-  } else {
-    imgElement?.addEventListener("load", convertPercentageToPixels, {
-      once: true,
-    });
+  if (!imgElement) {
+    return;
   }
+
+  if (imgElement.complete) {
+    convertPercentageToPixels();
+    return;
+  }
+
+  let timeoutId: ReturnType<typeof setTimeout> | null = null;
+
+  const handleLoad = () => {
+    if (timeoutId) {
+      clearTimeout(timeoutId);
+    }
+    convertPercentageToPixels();
+  };
+
+  const handleError = () => {
+    if (timeoutId) {
+      clearTimeout(timeoutId);
+    }
+  };
+
+  imgElement.addEventListener("load", handleLoad, {
+    once: true,
+  });
+
+  imgElement.addEventListener("error", handleError, {
+    once: true,
+  });
+
+  timeoutId = setTimeout(() => {
+    imgElement.removeEventListener("load", handleLoad);
+    imgElement.removeEventListener("error", handleError);
+  }, 10000);
 });
 </script>
 
 <template>
   <BlockActionInput
     v-model.lazy.trim="width"
+    :visible="visible?.({ editor: props.editor })"
     :tooltip="i18n.global.t('editor.common.tooltip.custom_width_input')"
   />
 
   <BlockActionInput
     v-model.lazy.trim="height"
+    :visible="visible?.({ editor: props.editor })"
     :tooltip="i18n.global.t('editor.common.tooltip.custom_height_input')"
   />
 
-  <BlockActionSeparator />
+  <BlockActionSeparator
+    v-if="visible?.({ editor: props.editor })"
+    :editor="props.editor"
+  />
 
   <BlockActionButton
     :tooltip="i18n.global.t('editor.extensions.image.small_size')"
     :is-active="width === `${getImageSizePercentage(25)?.width}px`"
+    :visible="visible?.({ editor: props.editor })"
     @click="handleSetSizeByPercentage(25)"
   >
     <template #icon>
@@ -165,6 +203,7 @@ onMounted(() => {
   <BlockActionButton
     :tooltip="i18n.global.t('editor.extensions.image.medium_size')"
     :is-active="width === `${getImageSizePercentage(50)?.width}px`"
+    :visible="visible?.({ editor: props.editor })"
     @click="handleSetSizeByPercentage(50)"
   >
     <template #icon>
@@ -175,6 +214,7 @@ onMounted(() => {
   <BlockActionButton
     :tooltip="i18n.global.t('editor.extensions.image.large_size')"
     :is-active="width === `${getImageSizePercentage(100)?.width}px`"
+    :visible="visible?.({ editor: props.editor })"
     @click="handleSetSizeByPercentage(100)"
   >
     <template #icon>
@@ -184,6 +224,7 @@ onMounted(() => {
 
   <BlockActionButton
     :tooltip="i18n.global.t('editor.extensions.image.restore_size')"
+    :visible="visible?.({ editor: props.editor })"
     @click="handleSetSize(undefined, undefined)"
   >
     <template #icon>
@@ -191,5 +232,5 @@ onMounted(() => {
     </template>
   </BlockActionButton>
 
-  <BlockActionSeparator />
+  <BlockActionSeparator v-if="visible?.({ editor: props.editor })" />
 </template>

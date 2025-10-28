@@ -18,6 +18,7 @@ import type { ExtensionOptions, NodeBubbleMenuType } from "@/types";
 import { deleteNode } from "@/utils";
 import type { ImageOptions } from "@tiptap/extension-image";
 import TiptapImage from "@tiptap/extension-image";
+import { isEmpty } from "lodash-es";
 import { markRaw } from "vue";
 import LucideCaptions from "~icons/lucide/captions";
 import MdiFileImageBox from "~icons/mdi/file-image-box";
@@ -27,6 +28,7 @@ import MdiFormatAlignLeft from "~icons/mdi/format-align-left";
 import MdiFormatAlignRight from "~icons/mdi/format-align-right";
 import MdiLink from "~icons/mdi/link";
 import MdiLinkVariant from "~icons/mdi/link-variant";
+import MdiShare from "~icons/mdi/share";
 import MdiTextBoxEditOutline from "~icons/mdi/text-box-edit-outline";
 import Figure from "../figure";
 import FigureCaption from "../figure/figure-caption";
@@ -51,6 +53,12 @@ const Image = TiptapImage.extend<ExtensionOptions & Partial<ImageOptions>>({
   addAttributes() {
     return {
       ...this.parent?.(),
+      src: {
+        default: null,
+        parseHTML: (element) => {
+          return element.getAttribute("src");
+        },
+      },
       width: {
         default: undefined,
         parseHTML: (element) => {
@@ -99,9 +107,7 @@ const Image = TiptapImage.extend<ExtensionOptions & Partial<ImageOptions>>({
   parseHTML() {
     return [
       {
-        tag: this.options.allowBase64
-          ? "img[src]"
-          : 'img[src]:not([src^="data:"])',
+        tag: this.options.allowBase64 ? "img" : 'img:not([src^="data:"])',
       },
     ];
   },
@@ -179,6 +185,7 @@ const Image = TiptapImage.extend<ExtensionOptions & Partial<ImageOptions>>({
       }),
     ];
   },
+
   addOptions() {
     return {
       ...this.parent?.(),
@@ -244,10 +251,18 @@ const Image = TiptapImage.extend<ExtensionOptions & Partial<ImageOptions>>({
             {
               priority: 10,
               component: markRaw(BubbleItemImageSize),
+              props: {
+                visible({ editor }) {
+                  return !isEmpty(editor.getAttributes(Image.name).src);
+                },
+              },
             },
             {
               priority: 20,
               props: {
+                visible({ editor }) {
+                  return !isEmpty(editor.getAttributes(Image.name).src);
+                },
                 isActive: () => {
                   const figureParent = findParentNode(
                     (node) => node.type.name === Figure.name
@@ -264,6 +279,9 @@ const Image = TiptapImage.extend<ExtensionOptions & Partial<ImageOptions>>({
             {
               priority: 30,
               props: {
+                visible({ editor }) {
+                  return !isEmpty(editor.getAttributes(Image.name).src);
+                },
                 isActive: () => {
                   const figureParent = findParentNode(
                     (node) => node.type.name === Figure.name
@@ -280,6 +298,9 @@ const Image = TiptapImage.extend<ExtensionOptions & Partial<ImageOptions>>({
             {
               priority: 40,
               props: {
+                visible({ editor }) {
+                  return !isEmpty(editor.getAttributes(Image.name).src);
+                },
                 isActive: () => {
                   const figureParent = findParentNode(
                     (node) => node.type.name === Figure.name
@@ -296,6 +317,9 @@ const Image = TiptapImage.extend<ExtensionOptions & Partial<ImageOptions>>({
             {
               priority: 50,
               props: {
+                visible({ editor }) {
+                  return !isEmpty(editor.getAttributes(Image.name).src);
+                },
                 isActive: () => {
                   const figureParent = findParentNode(
                     (node) => node.type.name === Figure.name
@@ -312,6 +336,11 @@ const Image = TiptapImage.extend<ExtensionOptions & Partial<ImageOptions>>({
             {
               priority: 60,
               component: markRaw(BlockActionSeparator),
+              props: {
+                visible({ editor }) {
+                  return !isEmpty(editor.getAttributes(Image.name).src);
+                },
+              },
             },
             {
               priority: 70,
@@ -326,6 +355,22 @@ const Image = TiptapImage.extend<ExtensionOptions & Partial<ImageOptions>>({
             {
               priority: 80,
               props: {
+                visible({ editor }) {
+                  return !isEmpty(editor.getAttributes(Image.name).src);
+                },
+                icon: markRaw(MdiShare),
+                title: i18n.global.t("editor.common.tooltip.open_link"),
+                action: () => {
+                  window.open(editor.getAttributes(Image.name).src, "_blank");
+                },
+              },
+            },
+            {
+              priority: 90,
+              props: {
+                visible({ editor }) {
+                  return !isEmpty(editor.getAttributes(Image.name).src);
+                },
                 icon: markRaw(MdiTextBoxEditOutline),
                 title: i18n.global.t("editor.extensions.image.edit_alt"),
                 action: () => {
@@ -334,8 +379,11 @@ const Image = TiptapImage.extend<ExtensionOptions & Partial<ImageOptions>>({
               },
             },
             {
-              priority: 90,
+              priority: 100,
               props: {
+                visible({ editor }) {
+                  return !isEmpty(editor.getAttributes(Image.name).src);
+                },
                 icon: markRaw(MdiLink),
                 title: i18n.global.t("editor.extensions.image.edit_href"),
                 action: () => {
@@ -343,9 +391,13 @@ const Image = TiptapImage.extend<ExtensionOptions & Partial<ImageOptions>>({
                 },
               },
             },
+
             {
-              priority: 100,
+              priority: 110,
               props: {
+                visible({ editor }) {
+                  return !isEmpty(editor.getAttributes(Image.name).src);
+                },
                 icon: markRaw(LucideCaptions),
                 title: i18n.global.t("editor.extensions.image.edit_caption"),
                 action: ({ editor }) => {
@@ -388,11 +440,11 @@ const Image = TiptapImage.extend<ExtensionOptions & Partial<ImageOptions>>({
               },
             },
             {
-              priority: 110,
+              priority: 120,
               component: markRaw(BlockActionSeparator),
             },
             {
-              priority: 120,
+              priority: 130,
               props: {
                 icon: markRaw(MdiDeleteForeverOutline),
                 title: i18n.global.t("editor.common.button.delete"),

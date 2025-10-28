@@ -37,11 +37,14 @@ onMounted(() => {
 </script>
 
 <template>
-  <node-view-wrapper as="div" class="inline-block w-full">
+  <node-view-wrapper as="div" class="flex">
     <div
-      class="relative inline-block h-full w-full overflow-hidden text-center transition-all"
+      class="relative inline-block h-full w-full max-w-full overflow-hidden text-center transition-all"
+      :class="{
+        'rounded ring-2': selected,
+      }"
     >
-      <div v-if="!src" class="p-1.5">
+      <div v-if="!src" class="p-0.5">
         <input
           ref="inputRef"
           v-model.lazy="src"

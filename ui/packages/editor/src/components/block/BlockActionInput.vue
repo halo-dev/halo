@@ -6,10 +6,12 @@ const props = withDefaults(
   defineProps<{
     tooltip?: string;
     modelValue?: string;
+    visible?: boolean;
   }>(),
   {
     modelValue: "",
     tooltip: undefined,
+    visible: true,
   }
 );
 
@@ -25,6 +27,7 @@ const value = computed({
 
 <template>
   <input
+    v-if="visible"
     v-model.lazy.trim="value"
     v-tooltip="tooltip"
     class="editor-block__actions-input"

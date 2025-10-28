@@ -7,18 +7,21 @@ withDefaults(
     selected?: boolean;
     disabled?: boolean;
     isActive?: boolean;
+    visible?: boolean;
   }>(),
   {
     tooltip: undefined,
     selected: false,
     disabled: false,
     isActive: false,
+    visible: true,
   }
 );
 </script>
 
 <template>
   <div
+    v-if="visible"
     v-tooltip="tooltip"
     class="editor-block__actions-button"
     :class="{

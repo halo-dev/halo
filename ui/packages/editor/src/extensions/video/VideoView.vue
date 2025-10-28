@@ -41,11 +41,11 @@ onMounted(() => {
 </script>
 
 <template>
-  <node-view-wrapper as="div" class="inline-block w-full">
+  <node-view-wrapper as="div">
     <div
-      class="relative inline-block h-full max-w-full overflow-hidden text-center transition-all"
-      :style="{
-        width: node.attrs.width,
+      class="relative inline-block h-full w-full overflow-hidden text-center transition-all"
+      :class="{
+        'rounded ring-2': selected,
       }"
     >
       <div v-if="!src" class="p-1.5">

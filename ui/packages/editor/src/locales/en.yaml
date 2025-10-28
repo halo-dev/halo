@@ -68,6 +68,7 @@ editor:
       small_size: Small size
       medium_size: Medium size
       large_size: Large size
+      edit_caption: Video description
     highlight:
       unset: Unset
     columns:

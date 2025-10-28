@@ -16,6 +16,7 @@ import {
 import type { EditorState } from "@/tiptap/pm";
 import type { ExtensionOptions, NodeBubbleMenuType } from "@/types";
 import { deleteNode } from "@/utils";
+import { isEmpty } from "lodash-es";
 import { markRaw } from "vue";
 import MdiLinkVariant from "~icons/mdi/link-variant";
 import MdiMotionPlay from "~icons/mdi/motion-play";
@@ -191,6 +192,9 @@ const Audio = Node.create<ExtensionOptions>({
             {
               priority: 10,
               props: {
+                visible({ editor }) {
+                  return !isEmpty(editor.getAttributes(Audio.name).src);
+                },
                 isActive: () => {
                   return editor.getAttributes(Audio.name).autoplay;
                 },
@@ -219,6 +223,9 @@ const Audio = Node.create<ExtensionOptions>({
             {
               priority: 20,
               props: {
+                visible({ editor }) {
+                  return !isEmpty(editor.getAttributes(Audio.name).src);
+                },
                 isActive: () => {
                   return editor.getAttributes(Audio.name).loop;
                 },
@@ -245,6 +252,11 @@ const Audio = Node.create<ExtensionOptions>({
             {
               priority: 30,
               component: markRaw(BlockActionSeparator),
+              props: {
+                visible({ editor }) {
+                  return !isEmpty(editor.getAttributes(Audio.name).src);
+                },
+              },
             },
             {
               priority: 40,
@@ -259,6 +271,9 @@ const Audio = Node.create<ExtensionOptions>({
             {
               priority: 50,
               props: {
+                visible({ editor }) {
+                  return !isEmpty(editor.getAttributes(Audio.name).src);
+                },
                 icon: markRaw(MdiShare),
                 title: i18n.global.t("editor.common.tooltip.open_link"),
                 action: () => {

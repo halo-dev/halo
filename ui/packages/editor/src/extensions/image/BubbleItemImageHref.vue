@@ -39,6 +39,7 @@ const target = computed({
 
 <template>
   <input
+    v-if="visible?.({ editor: props.editor })"
     v-model.lazy="href"
     :placeholder="i18n.global.t('editor.common.placeholder.alt_href')"
     class="block w-full rounded-md border !border-solid border-gray-300 bg-gray-50 px-2 py-1.5 text-sm text-gray-900 hover:bg-gray-100 focus:border-blue-500 focus:ring-blue-500"

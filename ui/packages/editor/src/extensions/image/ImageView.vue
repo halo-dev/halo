@@ -193,8 +193,14 @@ watch([src, resizeHandleRef], () => {
 </script>
 
 <template>
-  <node-view-wrapper as="div">
-    <div v-if="!src" class="w-full p-1.5">
+  <node-view-wrapper as="div" class="flex">
+    <div
+      v-if="!src"
+      class="w-full p-0.5"
+      :class="{
+        'rounded ring-2': selected,
+      }"
+    >
       <input
         ref="inputRef"
         v-model.lazy="src"
@@ -226,7 +232,7 @@ watch([src, resizeHandleRef], () => {
       />
       <div
         v-else
-        class="flex h-full w-full items-center justify-center bg-gray-100 text-gray-400"
+        class="flex h-full w-full items-center justify-center overflow-hidden rounded-md bg-gray-100 p-1.5 text-gray-400"
       >
         <span>{{
           i18n.global.t("editor.extensions.image.image_load_error")
