@@ -1,4 +1,11 @@
 <script lang="ts" setup>
+import EntityFieldItems from "@/components/entity-fields/EntityFieldItems.vue";
+import StatusDotField from "@/components/entity-fields/StatusDotField.vue";
+import EntityDropdownItems from "@/components/entity/EntityDropdownItems.vue";
+import { pluginLabels } from "@/constants/labels";
+import { useEntityFieldItemExtensionPoint } from "@console/composables/use-entity-extension-points";
+import { useOperationItemExtensionPoint } from "@console/composables/use-operation-extension-points";
+import PluginInstallationModal from "@console/modules/system/plugins/components/PluginInstallationModal.vue";
 import {
   PluginStatusPhaseEnum,
   consoleApiClient,
@@ -12,27 +19,21 @@ import {
   VEntity,
   VEntityField,
 } from "@halo-dev/components";
-import type { Ref } from "vue";
-import { computed, inject, markRaw, ref, toRefs } from "vue";
-import { usePluginLifeCycle } from "../composables/use-plugin";
-
-import EntityFieldItems from "@/components/entity-fields/EntityFieldItems.vue";
-import StatusDotField from "@/components/entity-fields/StatusDotField.vue";
-import EntityDropdownItems from "@/components/entity/EntityDropdownItems.vue";
-import { useEntityFieldItemExtensionPoint } from "@console/composables/use-entity-extension-points";
-import { useOperationItemExtensionPoint } from "@console/composables/use-operation-extension-points";
-import PluginInstallationModal from "@console/modules/system/plugins/components/PluginInstallationModal.vue";
 import {
   utils,
   type EntityFieldItem,
   type OperationItem,
 } from "@halo-dev/console-shared";
+import type { Ref } from "vue";
+import { computed, inject, markRaw, ref, toRefs } from "vue";
 import { useI18n } from "vue-i18n";
 import { useRouter } from "vue-router";
+import { usePluginLifeCycle } from "../composables/use-plugin";
 import AuthorField from "./entity-fields/AuthorField.vue";
 import LogoField from "./entity-fields/LogoField.vue";
 import ReloadField from "./entity-fields/ReloadField.vue";
 import SwitchField from "./entity-fields/SwitchField.vue";
+import TitleField from "./entity-fields/TitleField.vue";
 
 const { t } = useI18n();
 const router = useRouter();
@@ -103,6 +104,9 @@ const { operationItems } = useOperationItemExtensionPoint<Plugin>(
       action: () => {
         pluginUpgradeModalVisible.value = true;
       },
+      // System reserved plugins cannot be upgraded
+      hidden:
+        plugin.value.metadata.labels?.[pluginLabels.SYSTEM_RESERVED] === "true",
     },
     {
       priority: 30,
@@ -135,6 +139,9 @@ const { operationItems } = useOperationItemExtensionPoint<Plugin>(
           action: () => uninstall(true),
         },
       ],
+      // System reserved plugins cannot be uninstalled
+      hidden:
+        plugin.value.metadata.labels?.[pluginLabels.SYSTEM_RESERVED] === "true",
     },
     {
       priority: 50,
@@ -172,14 +179,9 @@ const { startFields, endFields } = useEntityFieldItemExtensionPoint<Plugin>(
       {
         position: "start",
         priority: 20,
-        component: markRaw(VEntityField),
+        component: markRaw(TitleField),
         props: {
-          title: props.plugin.spec.displayName,
-          description: props.plugin.spec.description,
-          route: {
-            name: "PluginDetail",
-            params: { name: props.plugin.metadata.name },
-          },
+          plugin: props.plugin,
         },
       },
       {

@@ -1009,6 +1009,9 @@ core:
     title: Plugins
     tabs:
       detail: Detail
+    list:
+      fields:
+        system_reserved: System Reserved
     empty:
       title: There are no installed plugins currently.
       message: >-
