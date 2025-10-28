@@ -6,7 +6,6 @@ export * from "./states/comment-subject-ref";
 export * from "./states/editor";
 export * from "./states/entity";
 export * from "./states/operation";
-export * from "./states/pages";
 export * from "./states/plugin-installation-tabs";
 export * from "./states/plugin-tab";
 export * from "./states/theme-list-tabs";
