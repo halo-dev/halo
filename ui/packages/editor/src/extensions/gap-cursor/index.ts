@@ -54,7 +54,7 @@ declare module "@tiptap/core" {
  *  - Tab key
  */
 const GapCursor = Extension.create({
-  priority: 9999,
+  priority: 900,
   name: "gapCursor",
 
   addProseMirrorPlugins() {
@@ -113,12 +113,16 @@ const GapCursor = Extension.create({
             Backspace: (state, dispatch) => {
               const { selection, tr } = state;
               if (
-                isActive(state, "paragraph") &&
-                isEmpty(state.selection.$from.parent) &&
                 selection instanceof TextSelection &&
+                isActive(state, "paragraph") &&
+                isEmpty(selection.$from.parent) &&
                 selection.empty
               ) {
                 const { $from } = selection;
+                const beforePos = $from.before($from.depth);
+                if (beforePos === 0) {
+                  return true;
+                }
                 deleteNodeByPos($from)(tr);
                 if (dispatch) {
                   const $found = arrowGapCursor(-1, "left", state)(tr);
@@ -136,6 +140,11 @@ const GapCursor = Extension.create({
 
               const { isStart, $from } = selection;
               const nodeOffset = state.doc.childBefore($from.pos);
+
+              if (!nodeOffset || nodeOffset.index === undefined) {
+                return false;
+              }
+
               const index = nodeOffset.index;
               const pos = state.doc.resolve(0).posAtIndex(index);
 

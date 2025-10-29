@@ -26,3 +26,5 @@ export {
   isEmpty,
   isListActive,
 } from "./utils";
+
+export { useExtension } from "./composables/use-extension";

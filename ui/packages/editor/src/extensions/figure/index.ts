@@ -32,8 +32,9 @@ const Figure = Node.create<ExtensionOptions & FigureOptions>({
   content: "block+ figureCaption?",
   isolating: true,
   fakeSelection: true,
-  // The current priority must be at least consistent with the paragraph to enable the backspace shortcut.
-  priority: 1000,
+  // Priority must be higher than paragraph (1000) and code-block to ensure
+  // the Backspace shortcut handles figure selection correctly.
+  priority: 1100,
 
   addOptions() {
     return {
@@ -106,6 +107,10 @@ const Figure = Node.create<ExtensionOptions & FigureOptions>({
           return false;
         }
 
+        if ($from.parent.type.name !== Paragraph.name) {
+          return false;
+        }
+
         const beforePos = $from.before($from.depth);
         if (beforePos <= 0) {
           return false;
@@ -133,7 +138,6 @@ const Figure = Node.create<ExtensionOptions & FigureOptions>({
           }
           depth--;
         }
-
         return false;
       },
     };
@@ -148,7 +152,6 @@ const Figure = Node.create<ExtensionOptions & FigureOptions>({
           if (!docChanged) {
             return null;
           }
-
           const tr = newState.tr;
           const nodesToDelete: { pos: number; size: number }[] = [];
 

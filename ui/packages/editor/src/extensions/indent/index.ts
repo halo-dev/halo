@@ -31,7 +31,7 @@ type IndentOptions = {
 };
 const Indent = Extension.create<IndentOptions & ExtensionOptions>({
   name: "indent",
-  priority: 10000,
+  priority: 800,
 
   addOptions() {
     return {
@@ -136,7 +136,6 @@ const Indent = Extension.create<IndentOptions & ExtensionOptions>({
             return getOutdent(false)({ editor });
           }
         }
-
         return false;
       },
     };
