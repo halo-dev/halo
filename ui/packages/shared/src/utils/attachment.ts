@@ -1,7 +1,4 @@
-import type {
-  AttachmentLike,
-  AttachmentSimple,
-} from "@/states/attachment-selector";
+import type { AttachmentLike, AttachmentSimple } from "@/plugin";
 import type { GetThumbnailByUriSizeEnum } from "@halo-dev/api-client";
 
 /**
