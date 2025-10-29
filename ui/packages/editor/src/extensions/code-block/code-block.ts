@@ -168,7 +168,7 @@ export const CodeBlockExtension = TiptapCodeBlock.extend<
   allowGapCursor: true,
   // It needs to have a higher priority than range-selection,
   // otherwise the Mod-a shortcut key will be overridden.
-  priority: 1100,
+  priority: 900,
 
   fakeSelection: true,
 
