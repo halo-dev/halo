@@ -7,6 +7,7 @@ import {
 } from "@/tiptap";
 import type { ExtensionOptions } from "@/types";
 import Paragraph from "../paragraph";
+import { RangeSelection } from "../range-selection";
 import FigureCaption from "./figure-caption";
 
 declare module "@/tiptap" {
@@ -30,7 +31,9 @@ const Figure = Node.create<ExtensionOptions & FigureOptions>({
   group: "block",
   content: "block+ figureCaption?",
   isolating: true,
-  priority: 10000,
+  fakeSelection: true,
+  // The current priority must be at least consistent with the paragraph to enable the backspace shortcut.
+  priority: 1000,
 
   addOptions() {
     return {
@@ -114,13 +117,24 @@ const Figure = Node.create<ExtensionOptions & FigureOptions>({
         if (!nodeBefore || nodeBefore.type.name !== FigureCaption.name) {
           return false;
         }
+        let depth = beforeResolve.depth;
+        while (depth > 0) {
+          const node = beforeResolve.node(depth);
+          if (node.type.name === this.name) {
+            const figurePos = beforeResolve.before(depth);
+            const rangeSelection = RangeSelection.create(
+              doc,
+              figurePos,
+              figurePos + node.nodeSize
+            );
+            const tr = state.tr.setSelection(rangeSelection);
+            editor.view.dispatch(tr);
+            return true;
+          }
+          depth--;
+        }
 
-        const figureNode = doc.nodeAt(beforePos);
-        console.log(figureNode);
-        const figurePos = beforePos - nodeBefore.nodeSize;
-        editor.chain().deleteRange({ from: figurePos, to: beforePos }).run();
-
-        return true;
+        return false;
       },
     };
   },

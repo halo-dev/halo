@@ -13,7 +13,7 @@ const FigureCaption = Node.create({
   content: "inline*",
   inline: false,
   group: "block",
-  priority: 101,
+  priority: 1001,
 
   addAttributes() {
     return {
