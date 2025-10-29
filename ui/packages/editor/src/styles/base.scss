@@ -77,7 +77,15 @@
 
       ul,
       ol {
-        list-style-type: revert-layer;
+        padding-left: 1.5em;
+      }
+
+      ul {
+        list-style-type: disc;
+      }
+
+      ol {
+        list-style-type: decimal;
       }
 
       code br {
