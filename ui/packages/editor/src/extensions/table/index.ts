@@ -103,8 +103,8 @@ function updateColumns(
     table.style.width = `${totalWidth}px`;
     table.style.minWidth = "";
   } else {
-    table.style.width = "";
-    table.style.minWidth = `${totalWidth}px`;
+    table.style.width = "100%";
+    table.style.minWidth = "";
   }
 }
 
@@ -589,7 +589,7 @@ const Table = TiptapTable.extend<ExtensionOptions & TableOptions>({
   },
 
   renderHTML({ node, HTMLAttributes }) {
-    const { colgroup, tableWidth, tableMinWidth } = createColGroup(
+    const { colgroup, tableWidth } = createColGroup(
       node,
       this.options.cellMinWidth
     );
@@ -600,9 +600,7 @@ const Table = TiptapTable.extend<ExtensionOptions & TableOptions>({
       [
         "table",
         mergeAttributes(this.options.HTMLAttributes, HTMLAttributes, {
-          style: tableWidth
-            ? `width: ${tableWidth}`
-            : `minWidth: ${tableMinWidth}`,
+          style: tableWidth ? `width: ${tableWidth}` : `width: 100%`,
         }),
         colgroup,
         ["tbody", 0],
