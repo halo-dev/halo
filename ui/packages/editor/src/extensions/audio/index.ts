@@ -276,22 +276,6 @@ const Audio = Node.create<ExtensionOptions>({
           ],
         };
       },
-      getDraggable() {
-        return {
-          getRenderContainer({ dom }) {
-            let container = dom;
-            while (
-              container &&
-              !container.hasAttribute("data-node-view-wrapper")
-            ) {
-              container = container.parentElement as HTMLElement;
-            }
-            return {
-              el: container,
-            };
-          },
-        };
-      },
     };
   },
 });

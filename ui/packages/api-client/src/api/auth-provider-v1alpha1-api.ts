@@ -20,16 +20,15 @@ import globalAxios from 'axios';
 // @ts-ignore
 import { DUMMY_BASE_URL, assertParamExists, setApiKeyToObject, setBasicAuthToObject, setBearerAuthToObject, setOAuthToObject, setSearchParams, serializeDataIfNeeded, toPathString, createRequestFunction } from '../common';
 // @ts-ignore
-import { BASE_PATH, COLLECTION_FORMATS, RequestArgs, BaseAPI, RequiredError, operationServerMap } from '../base';
+import { BASE_PATH, COLLECTION_FORMATS, type RequestArgs, BaseAPI, RequiredError, operationServerMap } from '../base';
 // @ts-ignore
-import { AuthProvider } from '../models';
+import type { AuthProvider } from '../models';
 // @ts-ignore
-import { AuthProviderList } from '../models';
+import type { AuthProviderList } from '../models';
 // @ts-ignore
-import { JsonPatchInner } from '../models';
+import type { JsonPatchInner } from '../models';
 /**
  * AuthProviderV1alpha1Api - axios parameter creator
- * @export
  */
 export const AuthProviderV1alpha1ApiAxiosParamCreator = function (configuration?: Configuration) {
     return {
@@ -313,7 +312,6 @@ export const AuthProviderV1alpha1ApiAxiosParamCreator = function (configuration?
 
 /**
  * AuthProviderV1alpha1Api - functional programming interface
- * @export
  */
 export const AuthProviderV1alpha1ApiFp = function(configuration?: Configuration) {
     const localVarAxiosParamCreator = AuthProviderV1alpha1ApiAxiosParamCreator(configuration)
@@ -401,7 +399,6 @@ export const AuthProviderV1alpha1ApiFp = function(configuration?: Configuration)
 
 /**
  * AuthProviderV1alpha1Api - factory interface
- * @export
  */
 export const AuthProviderV1alpha1ApiFactory = function (configuration?: Configuration, basePath?: string, axios?: AxiosInstance) {
     const localVarFp = AuthProviderV1alpha1ApiFp(configuration)
@@ -465,135 +462,93 @@ export const AuthProviderV1alpha1ApiFactory = function (configuration?: Configur
 
 /**
  * Request parameters for createAuthProvider operation in AuthProviderV1alpha1Api.
- * @export
- * @interface AuthProviderV1alpha1ApiCreateAuthProviderRequest
  */
 export interface AuthProviderV1alpha1ApiCreateAuthProviderRequest {
     /**
      * Fresh authprovider
-     * @type {AuthProvider}
-     * @memberof AuthProviderV1alpha1ApiCreateAuthProvider
      */
     readonly authProvider?: AuthProvider
 }
 
 /**
  * Request parameters for deleteAuthProvider operation in AuthProviderV1alpha1Api.
- * @export
- * @interface AuthProviderV1alpha1ApiDeleteAuthProviderRequest
  */
 export interface AuthProviderV1alpha1ApiDeleteAuthProviderRequest {
     /**
      * Name of authprovider
-     * @type {string}
-     * @memberof AuthProviderV1alpha1ApiDeleteAuthProvider
      */
     readonly name: string
 }
 
 /**
  * Request parameters for getAuthProvider operation in AuthProviderV1alpha1Api.
- * @export
- * @interface AuthProviderV1alpha1ApiGetAuthProviderRequest
  */
 export interface AuthProviderV1alpha1ApiGetAuthProviderRequest {
     /**
      * Name of authprovider
-     * @type {string}
-     * @memberof AuthProviderV1alpha1ApiGetAuthProvider
      */
     readonly name: string
 }
 
 /**
  * Request parameters for listAuthProvider operation in AuthProviderV1alpha1Api.
- * @export
- * @interface AuthProviderV1alpha1ApiListAuthProviderRequest
  */
 export interface AuthProviderV1alpha1ApiListAuthProviderRequest {
     /**
      * Page number. Default is 0.
-     * @type {number}
-     * @memberof AuthProviderV1alpha1ApiListAuthProvider
      */
     readonly page?: number
 
     /**
      * Size number. Default is 0.
-     * @type {number}
-     * @memberof AuthProviderV1alpha1ApiListAuthProvider
      */
     readonly size?: number
 
     /**
      * Label selector. e.g.: hidden!&#x3D;true
-     * @type {Array<string>}
-     * @memberof AuthProviderV1alpha1ApiListAuthProvider
      */
     readonly labelSelector?: Array<string>
 
     /**
      * Field selector. e.g.: metadata.name&#x3D;&#x3D;halo
-     * @type {Array<string>}
-     * @memberof AuthProviderV1alpha1ApiListAuthProvider
      */
     readonly fieldSelector?: Array<string>
 
     /**
      * Sorting criteria in the format: property,(asc|desc). Default sort order is ascending. Multiple sort criteria are supported.
-     * @type {Array<string>}
-     * @memberof AuthProviderV1alpha1ApiListAuthProvider
      */
     readonly sort?: Array<string>
 }
 
 /**
  * Request parameters for patchAuthProvider operation in AuthProviderV1alpha1Api.
- * @export
- * @interface AuthProviderV1alpha1ApiPatchAuthProviderRequest
  */
 export interface AuthProviderV1alpha1ApiPatchAuthProviderRequest {
     /**
      * Name of authprovider
-     * @type {string}
-     * @memberof AuthProviderV1alpha1ApiPatchAuthProvider
      */
     readonly name: string
 
-    /**
-     * 
-     * @type {Array<JsonPatchInner>}
-     * @memberof AuthProviderV1alpha1ApiPatchAuthProvider
-     */
     readonly jsonPatchInner?: Array<JsonPatchInner>
 }
 
 /**
  * Request parameters for updateAuthProvider operation in AuthProviderV1alpha1Api.
- * @export
- * @interface AuthProviderV1alpha1ApiUpdateAuthProviderRequest
  */
 export interface AuthProviderV1alpha1ApiUpdateAuthProviderRequest {
     /**
      * Name of authprovider
-     * @type {string}
-     * @memberof AuthProviderV1alpha1ApiUpdateAuthProvider
      */
     readonly name: string
 
     /**
      * Updated authprovider
-     * @type {AuthProvider}
-     * @memberof AuthProviderV1alpha1ApiUpdateAuthProvider
      */
     readonly authProvider?: AuthProvider
 }
 
 /**
  * AuthProviderV1alpha1Api - object-oriented interface
- * @export
- * @class AuthProviderV1alpha1Api
- * @extends {BaseAPI}
  */
 export class AuthProviderV1alpha1Api extends BaseAPI {
     /**
@@ -601,7 +556,6 @@ export class AuthProviderV1alpha1Api extends BaseAPI {
      * @param {AuthProviderV1alpha1ApiCreateAuthProviderRequest} requestParameters Request parameters.
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
-     * @memberof AuthProviderV1alpha1Api
      */
     public createAuthProvider(requestParameters: AuthProviderV1alpha1ApiCreateAuthProviderRequest = {}, options?: RawAxiosRequestConfig) {
         return AuthProviderV1alpha1ApiFp(this.configuration).createAuthProvider(requestParameters.authProvider, options).then((request) => request(this.axios, this.basePath));
@@ -612,7 +566,6 @@ export class AuthProviderV1alpha1Api extends BaseAPI {
      * @param {AuthProviderV1alpha1ApiDeleteAuthProviderRequest} requestParameters Request parameters.
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
-     * @memberof AuthProviderV1alpha1Api
      */
     public deleteAuthProvider(requestParameters: AuthProviderV1alpha1ApiDeleteAuthProviderRequest, options?: RawAxiosRequestConfig) {
         return AuthProviderV1alpha1ApiFp(this.configuration).deleteAuthProvider(requestParameters.name, options).then((request) => request(this.axios, this.basePath));
@@ -623,7 +576,6 @@ export class AuthProviderV1alpha1Api extends BaseAPI {
      * @param {AuthProviderV1alpha1ApiGetAuthProviderRequest} requestParameters Request parameters.
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
-     * @memberof AuthProviderV1alpha1Api
      */
     public getAuthProvider(requestParameters: AuthProviderV1alpha1ApiGetAuthProviderRequest, options?: RawAxiosRequestConfig) {
         return AuthProviderV1alpha1ApiFp(this.configuration).getAuthProvider(requestParameters.name, options).then((request) => request(this.axios, this.basePath));
@@ -634,7 +586,6 @@ export class AuthProviderV1alpha1Api extends BaseAPI {
      * @param {AuthProviderV1alpha1ApiListAuthProviderRequest} requestParameters Request parameters.
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
-     * @memberof AuthProviderV1alpha1Api
      */
     public listAuthProvider(requestParameters: AuthProviderV1alpha1ApiListAuthProviderRequest = {}, options?: RawAxiosRequestConfig) {
         return AuthProviderV1alpha1ApiFp(this.configuration).listAuthProvider(requestParameters.page, requestParameters.size, requestParameters.labelSelector, requestParameters.fieldSelector, requestParameters.sort, options).then((request) => request(this.axios, this.basePath));
@@ -645,7 +596,6 @@ export class AuthProviderV1alpha1Api extends BaseAPI {
      * @param {AuthProviderV1alpha1ApiPatchAuthProviderRequest} requestParameters Request parameters.
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
-     * @memberof AuthProviderV1alpha1Api
      */
     public patchAuthProvider(requestParameters: AuthProviderV1alpha1ApiPatchAuthProviderRequest, options?: RawAxiosRequestConfig) {
         return AuthProviderV1alpha1ApiFp(this.configuration).patchAuthProvider(requestParameters.name, requestParameters.jsonPatchInner, options).then((request) => request(this.axios, this.basePath));
@@ -656,7 +606,6 @@ export class AuthProviderV1alpha1Api extends BaseAPI {
      * @param {AuthProviderV1alpha1ApiUpdateAuthProviderRequest} requestParameters Request parameters.
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
-     * @memberof AuthProviderV1alpha1Api
      */
     public updateAuthProvider(requestParameters: AuthProviderV1alpha1ApiUpdateAuthProviderRequest, options?: RawAxiosRequestConfig) {
         return AuthProviderV1alpha1ApiFp(this.configuration).updateAuthProvider(requestParameters.name, requestParameters.authProvider, options).then((request) => request(this.axios, this.basePath));

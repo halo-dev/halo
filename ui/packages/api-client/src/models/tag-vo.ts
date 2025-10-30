@@ -15,43 +15,21 @@
 
 // May contain unused imports in some cases
 // @ts-ignore
-import { Metadata } from './metadata';
+import type { Metadata } from './metadata';
 // May contain unused imports in some cases
 // @ts-ignore
-import { TagSpec } from './tag-spec';
+import type { TagSpec } from './tag-spec';
 // May contain unused imports in some cases
 // @ts-ignore
-import { TagStatus } from './tag-status';
+import type { TagStatus } from './tag-status';
 
 /**
  * A value object for {@link Tag Tag}.
- * @export
- * @interface TagVo
  */
 export interface TagVo {
-    /**
-     * 
-     * @type {Metadata}
-     * @memberof TagVo
-     */
     'metadata': Metadata;
-    /**
-     * 
-     * @type {number}
-     * @memberof TagVo
-     */
     'postCount'?: number;
-    /**
-     * 
-     * @type {TagSpec}
-     * @memberof TagVo
-     */
     'spec'?: TagSpec;
-    /**
-     * 
-     * @type {TagStatus}
-     * @memberof TagVo
-     */
     'status'?: TagStatus;
 }
 

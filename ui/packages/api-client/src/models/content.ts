@@ -14,29 +14,9 @@
 
 
 
-/**
- * 
- * @export
- * @interface Content
- */
 export interface Content {
-    /**
-     * 
-     * @type {string}
-     * @memberof Content
-     */
     'content'?: string;
-    /**
-     * 
-     * @type {string}
-     * @memberof Content
-     */
     'raw'?: string;
-    /**
-     * 
-     * @type {string}
-     * @memberof Content
-     */
     'rawType'?: string;
 }
 

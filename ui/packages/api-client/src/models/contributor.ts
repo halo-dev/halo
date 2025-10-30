@@ -16,27 +16,10 @@
 
 /**
  * Contributor from user.
- * @export
- * @interface Contributor
  */
 export interface Contributor {
-    /**
-     * 
-     * @type {string}
-     * @memberof Contributor
-     */
     'avatar'?: string;
-    /**
-     * 
-     * @type {string}
-     * @memberof Contributor
-     */
     'displayName'?: string;
-    /**
-     * 
-     * @type {string}
-     * @memberof Contributor
-     */
     'name'?: string;
 }
 

@@ -14,16 +14,9 @@
 
 
 
-/**
- * 
- * @export
- * @interface GroupSpec
- */
 export interface GroupSpec {
     /**
      * Display name of group
-     * @type {string}
-     * @memberof GroupSpec
      */
     'displayName': string;
 }

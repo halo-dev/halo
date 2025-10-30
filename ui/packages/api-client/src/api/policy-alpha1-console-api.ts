@@ -20,10 +20,9 @@ import globalAxios from 'axios';
 // @ts-ignore
 import { DUMMY_BASE_URL, assertParamExists, setApiKeyToObject, setBasicAuthToObject, setBearerAuthToObject, setOAuthToObject, setSearchParams, serializeDataIfNeeded, toPathString, createRequestFunction } from '../common';
 // @ts-ignore
-import { BASE_PATH, COLLECTION_FORMATS, RequestArgs, BaseAPI, RequiredError, operationServerMap } from '../base';
+import { BASE_PATH, COLLECTION_FORMATS, type RequestArgs, BaseAPI, RequiredError, operationServerMap } from '../base';
 /**
  * PolicyAlpha1ConsoleApi - axios parameter creator
- * @export
  */
 export const PolicyAlpha1ConsoleApiAxiosParamCreator = function (configuration?: Configuration) {
     return {
@@ -128,7 +127,6 @@ export const PolicyAlpha1ConsoleApiAxiosParamCreator = function (configuration?:
 
 /**
  * PolicyAlpha1ConsoleApi - functional programming interface
- * @export
  */
 export const PolicyAlpha1ConsoleApiFp = function(configuration?: Configuration) {
     const localVarAxiosParamCreator = PolicyAlpha1ConsoleApiAxiosParamCreator(configuration)
@@ -165,7 +163,6 @@ export const PolicyAlpha1ConsoleApiFp = function(configuration?: Configuration) 
 
 /**
  * PolicyAlpha1ConsoleApi - factory interface
- * @export
  */
 export const PolicyAlpha1ConsoleApiFactory = function (configuration?: Configuration, basePath?: string, axios?: AxiosInstance) {
     const localVarFp = PolicyAlpha1ConsoleApiFp(configuration)
@@ -193,58 +190,38 @@ export const PolicyAlpha1ConsoleApiFactory = function (configuration?: Configura
 
 /**
  * Request parameters for getPolicyConfigByGroup operation in PolicyAlpha1ConsoleApi.
- * @export
- * @interface PolicyAlpha1ConsoleApiGetPolicyConfigByGroupRequest
  */
 export interface PolicyAlpha1ConsoleApiGetPolicyConfigByGroupRequest {
     /**
      * Name of the policy
-     * @type {string}
-     * @memberof PolicyAlpha1ConsoleApiGetPolicyConfigByGroup
      */
     readonly name: string
 
     /**
      * Name of the group
-     * @type {string}
-     * @memberof PolicyAlpha1ConsoleApiGetPolicyConfigByGroup
      */
     readonly group: string
 }
 
 /**
  * Request parameters for updatePolicyConfigByGroup operation in PolicyAlpha1ConsoleApi.
- * @export
- * @interface PolicyAlpha1ConsoleApiUpdatePolicyConfigByGroupRequest
  */
 export interface PolicyAlpha1ConsoleApiUpdatePolicyConfigByGroupRequest {
     /**
      * Name of the policy
-     * @type {string}
-     * @memberof PolicyAlpha1ConsoleApiUpdatePolicyConfigByGroup
      */
     readonly name: string
 
     /**
      * Name of the group
-     * @type {string}
-     * @memberof PolicyAlpha1ConsoleApiUpdatePolicyConfigByGroup
      */
     readonly group: string
 
-    /**
-     * 
-     * @type {object}
-     * @memberof PolicyAlpha1ConsoleApiUpdatePolicyConfigByGroup
-     */
     readonly body: object
 }
 
 /**
  * PolicyAlpha1ConsoleApi - object-oriented interface
- * @export
- * @class PolicyAlpha1ConsoleApi
- * @extends {BaseAPI}
  */
 export class PolicyAlpha1ConsoleApi extends BaseAPI {
     /**
@@ -252,7 +229,6 @@ export class PolicyAlpha1ConsoleApi extends BaseAPI {
      * @param {PolicyAlpha1ConsoleApiGetPolicyConfigByGroupRequest} requestParameters Request parameters.
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
-     * @memberof PolicyAlpha1ConsoleApi
      */
     public getPolicyConfigByGroup(requestParameters: PolicyAlpha1ConsoleApiGetPolicyConfigByGroupRequest, options?: RawAxiosRequestConfig) {
         return PolicyAlpha1ConsoleApiFp(this.configuration).getPolicyConfigByGroup(requestParameters.name, requestParameters.group, options).then((request) => request(this.axios, this.basePath));
@@ -263,7 +239,6 @@ export class PolicyAlpha1ConsoleApi extends BaseAPI {
      * @param {PolicyAlpha1ConsoleApiUpdatePolicyConfigByGroupRequest} requestParameters Request parameters.
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
-     * @memberof PolicyAlpha1ConsoleApi
      */
     public updatePolicyConfigByGroup(requestParameters: PolicyAlpha1ConsoleApiUpdatePolicyConfigByGroupRequest, options?: RawAxiosRequestConfig) {
         return PolicyAlpha1ConsoleApiFp(this.configuration).updatePolicyConfigByGroup(requestParameters.name, requestParameters.group, requestParameters.body, options).then((request) => request(this.axios, this.basePath));

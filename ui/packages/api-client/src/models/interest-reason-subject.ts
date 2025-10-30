@@ -16,26 +16,12 @@
 
 /**
  * The subject name of reason type to be interested in
- * @export
- * @interface InterestReasonSubject
  */
 export interface InterestReasonSubject {
-    /**
-     * 
-     * @type {string}
-     * @memberof InterestReasonSubject
-     */
     'apiVersion': string;
-    /**
-     * 
-     * @type {string}
-     * @memberof InterestReasonSubject
-     */
     'kind': string;
     /**
      * if name is not specified, it presents all subjects of the specified reason type and custom resources
-     * @type {string}
-     * @memberof InterestReasonSubject
      */
     'name'?: string;
 }

@@ -14,23 +14,8 @@
 
 
 
-/**
- * 
- * @export
- * @interface SettingRef
- */
 export interface SettingRef {
-    /**
-     * 
-     * @type {string}
-     * @memberof SettingRef
-     */
     'group': string;
-    /**
-     * 
-     * @type {string}
-     * @memberof SettingRef
-     */
     'name': string;
 }
 

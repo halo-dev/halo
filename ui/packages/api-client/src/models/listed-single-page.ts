@@ -15,43 +15,21 @@
 
 // May contain unused imports in some cases
 // @ts-ignore
-import { Contributor } from './contributor';
+import type { Contributor } from './contributor';
 // May contain unused imports in some cases
 // @ts-ignore
-import { SinglePage } from './single-page';
+import type { SinglePage } from './single-page';
 // May contain unused imports in some cases
 // @ts-ignore
-import { Stats } from './stats';
+import type { Stats } from './stats';
 
 /**
  * A chunk of items.
- * @export
- * @interface ListedSinglePage
  */
 export interface ListedSinglePage {
-    /**
-     * 
-     * @type {Array<Contributor>}
-     * @memberof ListedSinglePage
-     */
     'contributors': Array<Contributor>;
-    /**
-     * 
-     * @type {Contributor}
-     * @memberof ListedSinglePage
-     */
     'owner': Contributor;
-    /**
-     * 
-     * @type {SinglePage}
-     * @memberof ListedSinglePage
-     */
     'page': SinglePage;
-    /**
-     * 
-     * @type {Stats}
-     * @memberof ListedSinglePage
-     */
     'stats': Stats;
 }
 

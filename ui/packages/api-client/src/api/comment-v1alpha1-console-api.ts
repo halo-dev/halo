@@ -20,20 +20,19 @@ import globalAxios from 'axios';
 // @ts-ignore
 import { DUMMY_BASE_URL, assertParamExists, setApiKeyToObject, setBasicAuthToObject, setBearerAuthToObject, setOAuthToObject, setSearchParams, serializeDataIfNeeded, toPathString, createRequestFunction } from '../common';
 // @ts-ignore
-import { BASE_PATH, COLLECTION_FORMATS, RequestArgs, BaseAPI, RequiredError, operationServerMap } from '../base';
+import { BASE_PATH, COLLECTION_FORMATS, type RequestArgs, BaseAPI, RequiredError, operationServerMap } from '../base';
 // @ts-ignore
-import { Comment } from '../models';
+import type { Comment } from '../models';
 // @ts-ignore
-import { CommentRequest } from '../models';
+import type { CommentRequest } from '../models';
 // @ts-ignore
-import { ListedCommentList } from '../models';
+import type { ListedCommentList } from '../models';
 // @ts-ignore
-import { Reply } from '../models';
+import type { Reply } from '../models';
 // @ts-ignore
-import { ReplyRequest } from '../models';
+import type { ReplyRequest } from '../models';
 /**
  * CommentV1alpha1ConsoleApi - axios parameter creator
- * @export
  */
 export const CommentV1alpha1ConsoleApiAxiosParamCreator = function (configuration?: Configuration) {
     return {
@@ -209,7 +208,6 @@ export const CommentV1alpha1ConsoleApiAxiosParamCreator = function (configuratio
 
 /**
  * CommentV1alpha1ConsoleApi - functional programming interface
- * @export
  */
 export const CommentV1alpha1ConsoleApiFp = function(configuration?: Configuration) {
     const localVarAxiosParamCreator = CommentV1alpha1ConsoleApiAxiosParamCreator(configuration)
@@ -263,7 +261,6 @@ export const CommentV1alpha1ConsoleApiFp = function(configuration?: Configuratio
 
 /**
  * CommentV1alpha1ConsoleApi - factory interface
- * @export
  */
 export const CommentV1alpha1ConsoleApiFactory = function (configuration?: Configuration, basePath?: string, axios?: AxiosInstance) {
     const localVarFp = CommentV1alpha1ConsoleApiFp(configuration)
@@ -300,107 +297,67 @@ export const CommentV1alpha1ConsoleApiFactory = function (configuration?: Config
 
 /**
  * Request parameters for createComment operation in CommentV1alpha1ConsoleApi.
- * @export
- * @interface CommentV1alpha1ConsoleApiCreateCommentRequest
  */
 export interface CommentV1alpha1ConsoleApiCreateCommentRequest {
-    /**
-     * 
-     * @type {CommentRequest}
-     * @memberof CommentV1alpha1ConsoleApiCreateComment
-     */
     readonly commentRequest: CommentRequest
 }
 
 /**
  * Request parameters for createReply operation in CommentV1alpha1ConsoleApi.
- * @export
- * @interface CommentV1alpha1ConsoleApiCreateReplyRequest
  */
 export interface CommentV1alpha1ConsoleApiCreateReplyRequest {
-    /**
-     * 
-     * @type {string}
-     * @memberof CommentV1alpha1ConsoleApiCreateReply
-     */
     readonly name: string
 
-    /**
-     * 
-     * @type {ReplyRequest}
-     * @memberof CommentV1alpha1ConsoleApiCreateReply
-     */
     readonly replyRequest: ReplyRequest
 }
 
 /**
  * Request parameters for listComments operation in CommentV1alpha1ConsoleApi.
- * @export
- * @interface CommentV1alpha1ConsoleApiListCommentsRequest
  */
 export interface CommentV1alpha1ConsoleApiListCommentsRequest {
     /**
      * Page number. Default is 0.
-     * @type {number}
-     * @memberof CommentV1alpha1ConsoleApiListComments
      */
     readonly page?: number
 
     /**
      * Size number. Default is 0.
-     * @type {number}
-     * @memberof CommentV1alpha1ConsoleApiListComments
      */
     readonly size?: number
 
     /**
      * Label selector. e.g.: hidden!&#x3D;true
-     * @type {Array<string>}
-     * @memberof CommentV1alpha1ConsoleApiListComments
      */
     readonly labelSelector?: Array<string>
 
     /**
      * Field selector. e.g.: metadata.name&#x3D;&#x3D;halo
-     * @type {Array<string>}
-     * @memberof CommentV1alpha1ConsoleApiListComments
      */
     readonly fieldSelector?: Array<string>
 
     /**
      * Sorting criteria in the format: property,(asc|desc). Default sort order is ascending. Multiple sort criteria are supported.
-     * @type {Array<string>}
-     * @memberof CommentV1alpha1ConsoleApiListComments
      */
     readonly sort?: Array<string>
 
     /**
      * Comments filtered by keyword.
-     * @type {string}
-     * @memberof CommentV1alpha1ConsoleApiListComments
      */
     readonly keyword?: string
 
     /**
      * Commenter kind.
-     * @type {string}
-     * @memberof CommentV1alpha1ConsoleApiListComments
      */
     readonly ownerKind?: string
 
     /**
      * Commenter name.
-     * @type {string}
-     * @memberof CommentV1alpha1ConsoleApiListComments
      */
     readonly ownerName?: string
 }
 
 /**
  * CommentV1alpha1ConsoleApi - object-oriented interface
- * @export
- * @class CommentV1alpha1ConsoleApi
- * @extends {BaseAPI}
  */
 export class CommentV1alpha1ConsoleApi extends BaseAPI {
     /**
@@ -408,7 +365,6 @@ export class CommentV1alpha1ConsoleApi extends BaseAPI {
      * @param {CommentV1alpha1ConsoleApiCreateCommentRequest} requestParameters Request parameters.
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
-     * @memberof CommentV1alpha1ConsoleApi
      */
     public createComment(requestParameters: CommentV1alpha1ConsoleApiCreateCommentRequest, options?: RawAxiosRequestConfig) {
         return CommentV1alpha1ConsoleApiFp(this.configuration).createComment(requestParameters.commentRequest, options).then((request) => request(this.axios, this.basePath));
@@ -419,7 +375,6 @@ export class CommentV1alpha1ConsoleApi extends BaseAPI {
      * @param {CommentV1alpha1ConsoleApiCreateReplyRequest} requestParameters Request parameters.
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
-     * @memberof CommentV1alpha1ConsoleApi
      */
     public createReply(requestParameters: CommentV1alpha1ConsoleApiCreateReplyRequest, options?: RawAxiosRequestConfig) {
         return CommentV1alpha1ConsoleApiFp(this.configuration).createReply(requestParameters.name, requestParameters.replyRequest, options).then((request) => request(this.axios, this.basePath));
@@ -430,7 +385,6 @@ export class CommentV1alpha1ConsoleApi extends BaseAPI {
      * @param {CommentV1alpha1ConsoleApiListCommentsRequest} requestParameters Request parameters.
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
-     * @memberof CommentV1alpha1ConsoleApi
      */
     public listComments(requestParameters: CommentV1alpha1ConsoleApiListCommentsRequest = {}, options?: RawAxiosRequestConfig) {
         return CommentV1alpha1ConsoleApiFp(this.configuration).listComments(requestParameters.page, requestParameters.size, requestParameters.labelSelector, requestParameters.fieldSelector, requestParameters.sort, requestParameters.keyword, requestParameters.ownerKind, requestParameters.ownerName, options).then((request) => request(this.axios, this.basePath));

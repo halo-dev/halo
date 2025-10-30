@@ -20,16 +20,15 @@ import globalAxios from 'axios';
 // @ts-ignore
 import { DUMMY_BASE_URL, assertParamExists, setApiKeyToObject, setBasicAuthToObject, setBearerAuthToObject, setOAuthToObject, setSearchParams, serializeDataIfNeeded, toPathString, createRequestFunction } from '../common';
 // @ts-ignore
-import { BASE_PATH, COLLECTION_FORMATS, RequestArgs, BaseAPI, RequiredError, operationServerMap } from '../base';
+import { BASE_PATH, COLLECTION_FORMATS, type RequestArgs, BaseAPI, RequiredError, operationServerMap } from '../base';
 // @ts-ignore
-import { JsonPatchInner } from '../models';
+import type { JsonPatchInner } from '../models';
 // @ts-ignore
-import { RememberMeToken } from '../models';
+import type { RememberMeToken } from '../models';
 // @ts-ignore
-import { RememberMeTokenList } from '../models';
+import type { RememberMeTokenList } from '../models';
 /**
  * RememberMeTokenV1alpha1Api - axios parameter creator
- * @export
  */
 export const RememberMeTokenV1alpha1ApiAxiosParamCreator = function (configuration?: Configuration) {
     return {
@@ -313,7 +312,6 @@ export const RememberMeTokenV1alpha1ApiAxiosParamCreator = function (configurati
 
 /**
  * RememberMeTokenV1alpha1Api - functional programming interface
- * @export
  */
 export const RememberMeTokenV1alpha1ApiFp = function(configuration?: Configuration) {
     const localVarAxiosParamCreator = RememberMeTokenV1alpha1ApiAxiosParamCreator(configuration)
@@ -401,7 +399,6 @@ export const RememberMeTokenV1alpha1ApiFp = function(configuration?: Configurati
 
 /**
  * RememberMeTokenV1alpha1Api - factory interface
- * @export
  */
 export const RememberMeTokenV1alpha1ApiFactory = function (configuration?: Configuration, basePath?: string, axios?: AxiosInstance) {
     const localVarFp = RememberMeTokenV1alpha1ApiFp(configuration)
@@ -465,135 +462,93 @@ export const RememberMeTokenV1alpha1ApiFactory = function (configuration?: Confi
 
 /**
  * Request parameters for createRememberMeToken operation in RememberMeTokenV1alpha1Api.
- * @export
- * @interface RememberMeTokenV1alpha1ApiCreateRememberMeTokenRequest
  */
 export interface RememberMeTokenV1alpha1ApiCreateRememberMeTokenRequest {
     /**
      * Fresh remembermetoken
-     * @type {RememberMeToken}
-     * @memberof RememberMeTokenV1alpha1ApiCreateRememberMeToken
      */
     readonly rememberMeToken?: RememberMeToken
 }
 
 /**
  * Request parameters for deleteRememberMeToken operation in RememberMeTokenV1alpha1Api.
- * @export
- * @interface RememberMeTokenV1alpha1ApiDeleteRememberMeTokenRequest
  */
 export interface RememberMeTokenV1alpha1ApiDeleteRememberMeTokenRequest {
     /**
      * Name of remembermetoken
-     * @type {string}
-     * @memberof RememberMeTokenV1alpha1ApiDeleteRememberMeToken
      */
     readonly name: string
 }
 
 /**
  * Request parameters for getRememberMeToken operation in RememberMeTokenV1alpha1Api.
- * @export
- * @interface RememberMeTokenV1alpha1ApiGetRememberMeTokenRequest
  */
 export interface RememberMeTokenV1alpha1ApiGetRememberMeTokenRequest {
     /**
      * Name of remembermetoken
-     * @type {string}
-     * @memberof RememberMeTokenV1alpha1ApiGetRememberMeToken
      */
     readonly name: string
 }
 
 /**
  * Request parameters for listRememberMeToken operation in RememberMeTokenV1alpha1Api.
- * @export
- * @interface RememberMeTokenV1alpha1ApiListRememberMeTokenRequest
  */
 export interface RememberMeTokenV1alpha1ApiListRememberMeTokenRequest {
     /**
      * Page number. Default is 0.
-     * @type {number}
-     * @memberof RememberMeTokenV1alpha1ApiListRememberMeToken
      */
     readonly page?: number
 
     /**
      * Size number. Default is 0.
-     * @type {number}
-     * @memberof RememberMeTokenV1alpha1ApiListRememberMeToken
      */
     readonly size?: number
 
     /**
      * Label selector. e.g.: hidden!&#x3D;true
-     * @type {Array<string>}
-     * @memberof RememberMeTokenV1alpha1ApiListRememberMeToken
      */
     readonly labelSelector?: Array<string>
 
     /**
      * Field selector. e.g.: metadata.name&#x3D;&#x3D;halo
-     * @type {Array<string>}
-     * @memberof RememberMeTokenV1alpha1ApiListRememberMeToken
      */
     readonly fieldSelector?: Array<string>
 
     /**
      * Sorting criteria in the format: property,(asc|desc). Default sort order is ascending. Multiple sort criteria are supported.
-     * @type {Array<string>}
-     * @memberof RememberMeTokenV1alpha1ApiListRememberMeToken
      */
     readonly sort?: Array<string>
 }
 
 /**
  * Request parameters for patchRememberMeToken operation in RememberMeTokenV1alpha1Api.
- * @export
- * @interface RememberMeTokenV1alpha1ApiPatchRememberMeTokenRequest
  */
 export interface RememberMeTokenV1alpha1ApiPatchRememberMeTokenRequest {
     /**
      * Name of remembermetoken
-     * @type {string}
-     * @memberof RememberMeTokenV1alpha1ApiPatchRememberMeToken
      */
     readonly name: string
 
-    /**
-     * 
-     * @type {Array<JsonPatchInner>}
-     * @memberof RememberMeTokenV1alpha1ApiPatchRememberMeToken
-     */
     readonly jsonPatchInner?: Array<JsonPatchInner>
 }
 
 /**
  * Request parameters for updateRememberMeToken operation in RememberMeTokenV1alpha1Api.
- * @export
- * @interface RememberMeTokenV1alpha1ApiUpdateRememberMeTokenRequest
  */
 export interface RememberMeTokenV1alpha1ApiUpdateRememberMeTokenRequest {
     /**
      * Name of remembermetoken
-     * @type {string}
-     * @memberof RememberMeTokenV1alpha1ApiUpdateRememberMeToken
      */
     readonly name: string
 
     /**
      * Updated remembermetoken
-     * @type {RememberMeToken}
-     * @memberof RememberMeTokenV1alpha1ApiUpdateRememberMeToken
      */
     readonly rememberMeToken?: RememberMeToken
 }
 
 /**
  * RememberMeTokenV1alpha1Api - object-oriented interface
- * @export
- * @class RememberMeTokenV1alpha1Api
- * @extends {BaseAPI}
  */
 export class RememberMeTokenV1alpha1Api extends BaseAPI {
     /**
@@ -601,7 +556,6 @@ export class RememberMeTokenV1alpha1Api extends BaseAPI {
      * @param {RememberMeTokenV1alpha1ApiCreateRememberMeTokenRequest} requestParameters Request parameters.
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
-     * @memberof RememberMeTokenV1alpha1Api
      */
     public createRememberMeToken(requestParameters: RememberMeTokenV1alpha1ApiCreateRememberMeTokenRequest = {}, options?: RawAxiosRequestConfig) {
         return RememberMeTokenV1alpha1ApiFp(this.configuration).createRememberMeToken(requestParameters.rememberMeToken, options).then((request) => request(this.axios, this.basePath));
@@ -612,7 +566,6 @@ export class RememberMeTokenV1alpha1Api extends BaseAPI {
      * @param {RememberMeTokenV1alpha1ApiDeleteRememberMeTokenRequest} requestParameters Request parameters.
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
-     * @memberof RememberMeTokenV1alpha1Api
      */
     public deleteRememberMeToken(requestParameters: RememberMeTokenV1alpha1ApiDeleteRememberMeTokenRequest, options?: RawAxiosRequestConfig) {
         return RememberMeTokenV1alpha1ApiFp(this.configuration).deleteRememberMeToken(requestParameters.name, options).then((request) => request(this.axios, this.basePath));
@@ -623,7 +576,6 @@ export class RememberMeTokenV1alpha1Api extends BaseAPI {
      * @param {RememberMeTokenV1alpha1ApiGetRememberMeTokenRequest} requestParameters Request parameters.
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
-     * @memberof RememberMeTokenV1alpha1Api
      */
     public getRememberMeToken(requestParameters: RememberMeTokenV1alpha1ApiGetRememberMeTokenRequest, options?: RawAxiosRequestConfig) {
         return RememberMeTokenV1alpha1ApiFp(this.configuration).getRememberMeToken(requestParameters.name, options).then((request) => request(this.axios, this.basePath));
@@ -634,7 +586,6 @@ export class RememberMeTokenV1alpha1Api extends BaseAPI {
      * @param {RememberMeTokenV1alpha1ApiListRememberMeTokenRequest} requestParameters Request parameters.
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
-     * @memberof RememberMeTokenV1alpha1Api
      */
     public listRememberMeToken(requestParameters: RememberMeTokenV1alpha1ApiListRememberMeTokenRequest = {}, options?: RawAxiosRequestConfig) {
         return RememberMeTokenV1alpha1ApiFp(this.configuration).listRememberMeToken(requestParameters.page, requestParameters.size, requestParameters.labelSelector, requestParameters.fieldSelector, requestParameters.sort, options).then((request) => request(this.axios, this.basePath));
@@ -645,7 +596,6 @@ export class RememberMeTokenV1alpha1Api extends BaseAPI {
      * @param {RememberMeTokenV1alpha1ApiPatchRememberMeTokenRequest} requestParameters Request parameters.
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
-     * @memberof RememberMeTokenV1alpha1Api
      */
     public patchRememberMeToken(requestParameters: RememberMeTokenV1alpha1ApiPatchRememberMeTokenRequest, options?: RawAxiosRequestConfig) {
         return RememberMeTokenV1alpha1ApiFp(this.configuration).patchRememberMeToken(requestParameters.name, requestParameters.jsonPatchInner, options).then((request) => request(this.axios, this.basePath));
@@ -656,7 +606,6 @@ export class RememberMeTokenV1alpha1Api extends BaseAPI {
      * @param {RememberMeTokenV1alpha1ApiUpdateRememberMeTokenRequest} requestParameters Request parameters.
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
-     * @memberof RememberMeTokenV1alpha1Api
      */
     public updateRememberMeToken(requestParameters: RememberMeTokenV1alpha1ApiUpdateRememberMeTokenRequest, options?: RawAxiosRequestConfig) {
         return RememberMeTokenV1alpha1ApiFp(this.configuration).updateRememberMeToken(requestParameters.name, requestParameters.rememberMeToken, options).then((request) => request(this.axios, this.basePath));

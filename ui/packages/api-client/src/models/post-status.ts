@@ -15,73 +15,21 @@
 
 // May contain unused imports in some cases
 // @ts-ignore
-import { Condition } from './condition';
+import type { Condition } from './condition';
 
-/**
- * 
- * @export
- * @interface PostStatus
- */
 export interface PostStatus {
-    /**
-     * 
-     * @type {number}
-     * @memberof PostStatus
-     */
     'commentsCount'?: number;
-    /**
-     * 
-     * @type {Array<Condition>}
-     * @memberof PostStatus
-     */
     'conditions'?: Array<Condition>;
-    /**
-     * 
-     * @type {Array<string>}
-     * @memberof PostStatus
-     */
     'contributors'?: Array<string>;
-    /**
-     * 
-     * @type {string}
-     * @memberof PostStatus
-     */
     'excerpt'?: string;
     /**
      * see {@link Category.CategorySpec#isHideFromList Category.CategorySpec#isHideFromList()}.
-     * @type {boolean}
-     * @memberof PostStatus
      */
     'hideFromList'?: boolean;
-    /**
-     * 
-     * @type {boolean}
-     * @memberof PostStatus
-     */
     'inProgress'?: boolean;
-    /**
-     * 
-     * @type {string}
-     * @memberof PostStatus
-     */
     'lastModifyTime'?: string;
-    /**
-     * 
-     * @type {number}
-     * @memberof PostStatus
-     */
     'observedVersion'?: number;
-    /**
-     * 
-     * @type {string}
-     * @memberof PostStatus
-     */
     'permalink'?: string;
-    /**
-     * 
-     * @type {string}
-     * @memberof PostStatus
-     */
     'phase'?: string;
 }
 

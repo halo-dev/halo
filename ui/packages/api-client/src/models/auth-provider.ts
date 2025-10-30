@@ -15,40 +15,18 @@
 
 // May contain unused imports in some cases
 // @ts-ignore
-import { AuthProviderSpec } from './auth-provider-spec';
+import type { AuthProviderSpec } from './auth-provider-spec';
 // May contain unused imports in some cases
 // @ts-ignore
-import { Metadata } from './metadata';
+import type { Metadata } from './metadata';
 
 /**
  * Auth provider extension.
- * @export
- * @interface AuthProvider
  */
 export interface AuthProvider {
-    /**
-     * 
-     * @type {string}
-     * @memberof AuthProvider
-     */
     'apiVersion': string;
-    /**
-     * 
-     * @type {string}
-     * @memberof AuthProvider
-     */
     'kind': string;
-    /**
-     * 
-     * @type {Metadata}
-     * @memberof AuthProvider
-     */
     'metadata': Metadata;
-    /**
-     * 
-     * @type {AuthProviderSpec}
-     * @memberof AuthProvider
-     */
     'spec': AuthProviderSpec;
 }
 

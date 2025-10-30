@@ -20,24 +20,23 @@ import globalAxios from 'axios';
 // @ts-ignore
 import { DUMMY_BASE_URL, assertParamExists, setApiKeyToObject, setBasicAuthToObject, setBearerAuthToObject, setOAuthToObject, setSearchParams, serializeDataIfNeeded, toPathString, createRequestFunction } from '../common';
 // @ts-ignore
-import { BASE_PATH, COLLECTION_FORMATS, RequestArgs, BaseAPI, RequiredError, operationServerMap } from '../base';
+import { BASE_PATH, COLLECTION_FORMATS, type RequestArgs, BaseAPI, RequiredError, operationServerMap } from '../base';
 // @ts-ignore
-import { Content } from '../models';
+import type { Content } from '../models';
 // @ts-ignore
-import { ContentWrapper } from '../models';
+import type { ContentWrapper } from '../models';
 // @ts-ignore
-import { ListedPostList } from '../models';
+import type { ListedPostList } from '../models';
 // @ts-ignore
-import { ListedSnapshotDto } from '../models';
+import type { ListedSnapshotDto } from '../models';
 // @ts-ignore
-import { Post } from '../models';
+import type { Post } from '../models';
 // @ts-ignore
-import { PostRequest } from '../models';
+import type { PostRequest } from '../models';
 // @ts-ignore
-import { RevertSnapshotForPostParam } from '../models';
+import type { RevertSnapshotForPostParam } from '../models';
 /**
  * PostV1alpha1ConsoleApi - axios parameter creator
- * @export
  */
 export const PostV1alpha1ConsoleApiAxiosParamCreator = function (configuration?: Configuration) {
     return {
@@ -659,7 +658,6 @@ export const PostV1alpha1ConsoleApiAxiosParamCreator = function (configuration?:
 
 /**
  * PostV1alpha1ConsoleApi - functional programming interface
- * @export
  */
 export const PostV1alpha1ConsoleApiFp = function(configuration?: Configuration) {
     const localVarAxiosParamCreator = PostV1alpha1ConsoleApiAxiosParamCreator(configuration)
@@ -839,7 +837,6 @@ export const PostV1alpha1ConsoleApiFp = function(configuration?: Configuration) 
 
 /**
  * PostV1alpha1ConsoleApi - factory interface
- * @export
  */
 export const PostV1alpha1ConsoleApiFactory = function (configuration?: Configuration, basePath?: string, axios?: AxiosInstance) {
     const localVarFp = PostV1alpha1ConsoleApiFp(configuration)
@@ -966,289 +963,152 @@ export const PostV1alpha1ConsoleApiFactory = function (configuration?: Configura
 
 /**
  * Request parameters for deletePostContent operation in PostV1alpha1ConsoleApi.
- * @export
- * @interface PostV1alpha1ConsoleApiDeletePostContentRequest
  */
 export interface PostV1alpha1ConsoleApiDeletePostContentRequest {
-    /**
-     * 
-     * @type {string}
-     * @memberof PostV1alpha1ConsoleApiDeletePostContent
-     */
     readonly name: string
 
-    /**
-     * 
-     * @type {string}
-     * @memberof PostV1alpha1ConsoleApiDeletePostContent
-     */
     readonly snapshotName: string
 }
 
 /**
  * Request parameters for draftPost operation in PostV1alpha1ConsoleApi.
- * @export
- * @interface PostV1alpha1ConsoleApiDraftPostRequest
  */
 export interface PostV1alpha1ConsoleApiDraftPostRequest {
-    /**
-     * 
-     * @type {PostRequest}
-     * @memberof PostV1alpha1ConsoleApiDraftPost
-     */
     readonly postRequest: PostRequest
 }
 
 /**
  * Request parameters for fetchPostContent operation in PostV1alpha1ConsoleApi.
- * @export
- * @interface PostV1alpha1ConsoleApiFetchPostContentRequest
  */
 export interface PostV1alpha1ConsoleApiFetchPostContentRequest {
-    /**
-     * 
-     * @type {string}
-     * @memberof PostV1alpha1ConsoleApiFetchPostContent
-     */
     readonly name: string
 
-    /**
-     * 
-     * @type {string}
-     * @memberof PostV1alpha1ConsoleApiFetchPostContent
-     */
     readonly snapshotName: string
 }
 
 /**
  * Request parameters for fetchPostHeadContent operation in PostV1alpha1ConsoleApi.
- * @export
- * @interface PostV1alpha1ConsoleApiFetchPostHeadContentRequest
  */
 export interface PostV1alpha1ConsoleApiFetchPostHeadContentRequest {
-    /**
-     * 
-     * @type {string}
-     * @memberof PostV1alpha1ConsoleApiFetchPostHeadContent
-     */
     readonly name: string
 }
 
 /**
  * Request parameters for fetchPostReleaseContent operation in PostV1alpha1ConsoleApi.
- * @export
- * @interface PostV1alpha1ConsoleApiFetchPostReleaseContentRequest
  */
 export interface PostV1alpha1ConsoleApiFetchPostReleaseContentRequest {
-    /**
-     * 
-     * @type {string}
-     * @memberof PostV1alpha1ConsoleApiFetchPostReleaseContent
-     */
     readonly name: string
 }
 
 /**
  * Request parameters for listPostSnapshots operation in PostV1alpha1ConsoleApi.
- * @export
- * @interface PostV1alpha1ConsoleApiListPostSnapshotsRequest
  */
 export interface PostV1alpha1ConsoleApiListPostSnapshotsRequest {
-    /**
-     * 
-     * @type {string}
-     * @memberof PostV1alpha1ConsoleApiListPostSnapshots
-     */
     readonly name: string
 }
 
 /**
  * Request parameters for listPosts operation in PostV1alpha1ConsoleApi.
- * @export
- * @interface PostV1alpha1ConsoleApiListPostsRequest
  */
 export interface PostV1alpha1ConsoleApiListPostsRequest {
     /**
      * Page number. Default is 0.
-     * @type {number}
-     * @memberof PostV1alpha1ConsoleApiListPosts
      */
     readonly page?: number
 
     /**
      * Size number. Default is 0.
-     * @type {number}
-     * @memberof PostV1alpha1ConsoleApiListPosts
      */
     readonly size?: number
 
     /**
      * Label selector. e.g.: hidden!&#x3D;true
-     * @type {Array<string>}
-     * @memberof PostV1alpha1ConsoleApiListPosts
      */
     readonly labelSelector?: Array<string>
 
     /**
      * Field selector. e.g.: metadata.name&#x3D;&#x3D;halo
-     * @type {Array<string>}
-     * @memberof PostV1alpha1ConsoleApiListPosts
      */
     readonly fieldSelector?: Array<string>
 
     /**
      * Sorting criteria in the format: property,(asc|desc). Default sort order is ascending. Multiple sort criteria are supported.
-     * @type {Array<string>}
-     * @memberof PostV1alpha1ConsoleApiListPosts
      */
     readonly sort?: Array<string>
 
     /**
      * Posts filtered by publish phase.
-     * @type {'DRAFT' | 'PENDING_APPROVAL' | 'PUBLISHED' | 'FAILED'}
-     * @memberof PostV1alpha1ConsoleApiListPosts
      */
     readonly publishPhase?: ListPostsPublishPhaseEnum
 
     /**
      * Posts filtered by keyword.
-     * @type {string}
-     * @memberof PostV1alpha1ConsoleApiListPosts
      */
     readonly keyword?: string
 
     /**
      * Posts filtered by category including sub-categories.
-     * @type {string}
-     * @memberof PostV1alpha1ConsoleApiListPosts
      */
     readonly categoryWithChildren?: string
 }
 
 /**
  * Request parameters for publishPost operation in PostV1alpha1ConsoleApi.
- * @export
- * @interface PostV1alpha1ConsoleApiPublishPostRequest
  */
 export interface PostV1alpha1ConsoleApiPublishPostRequest {
-    /**
-     * 
-     * @type {string}
-     * @memberof PostV1alpha1ConsoleApiPublishPost
-     */
     readonly name: string
 
     /**
      * Head snapshot name of content.
-     * @type {string}
-     * @memberof PostV1alpha1ConsoleApiPublishPost
      */
     readonly headSnapshot?: string
 
-    /**
-     * 
-     * @type {boolean}
-     * @memberof PostV1alpha1ConsoleApiPublishPost
-     */
     readonly async?: boolean
 }
 
 /**
  * Request parameters for recyclePost operation in PostV1alpha1ConsoleApi.
- * @export
- * @interface PostV1alpha1ConsoleApiRecyclePostRequest
  */
 export interface PostV1alpha1ConsoleApiRecyclePostRequest {
-    /**
-     * 
-     * @type {string}
-     * @memberof PostV1alpha1ConsoleApiRecyclePost
-     */
     readonly name: string
 }
 
 /**
  * Request parameters for revertToSpecifiedSnapshotForPost operation in PostV1alpha1ConsoleApi.
- * @export
- * @interface PostV1alpha1ConsoleApiRevertToSpecifiedSnapshotForPostRequest
  */
 export interface PostV1alpha1ConsoleApiRevertToSpecifiedSnapshotForPostRequest {
-    /**
-     * 
-     * @type {string}
-     * @memberof PostV1alpha1ConsoleApiRevertToSpecifiedSnapshotForPost
-     */
     readonly name: string
 
-    /**
-     * 
-     * @type {RevertSnapshotForPostParam}
-     * @memberof PostV1alpha1ConsoleApiRevertToSpecifiedSnapshotForPost
-     */
     readonly revertSnapshotForPostParam: RevertSnapshotForPostParam
 }
 
 /**
  * Request parameters for unpublishPost operation in PostV1alpha1ConsoleApi.
- * @export
- * @interface PostV1alpha1ConsoleApiUnpublishPostRequest
  */
 export interface PostV1alpha1ConsoleApiUnpublishPostRequest {
-    /**
-     * 
-     * @type {string}
-     * @memberof PostV1alpha1ConsoleApiUnpublishPost
-     */
     readonly name: string
 }
 
 /**
  * Request parameters for updateDraftPost operation in PostV1alpha1ConsoleApi.
- * @export
- * @interface PostV1alpha1ConsoleApiUpdateDraftPostRequest
  */
 export interface PostV1alpha1ConsoleApiUpdateDraftPostRequest {
-    /**
-     * 
-     * @type {string}
-     * @memberof PostV1alpha1ConsoleApiUpdateDraftPost
-     */
     readonly name: string
 
-    /**
-     * 
-     * @type {PostRequest}
-     * @memberof PostV1alpha1ConsoleApiUpdateDraftPost
-     */
     readonly postRequest: PostRequest
 }
 
 /**
  * Request parameters for updatePostContent operation in PostV1alpha1ConsoleApi.
- * @export
- * @interface PostV1alpha1ConsoleApiUpdatePostContentRequest
  */
 export interface PostV1alpha1ConsoleApiUpdatePostContentRequest {
-    /**
-     * 
-     * @type {string}
-     * @memberof PostV1alpha1ConsoleApiUpdatePostContent
-     */
     readonly name: string
 
-    /**
-     * 
-     * @type {Content}
-     * @memberof PostV1alpha1ConsoleApiUpdatePostContent
-     */
     readonly content: Content
 }
 
 /**
  * PostV1alpha1ConsoleApi - object-oriented interface
- * @export
- * @class PostV1alpha1ConsoleApi
- * @extends {BaseAPI}
  */
 export class PostV1alpha1ConsoleApi extends BaseAPI {
     /**
@@ -1256,7 +1116,6 @@ export class PostV1alpha1ConsoleApi extends BaseAPI {
      * @param {PostV1alpha1ConsoleApiDeletePostContentRequest} requestParameters Request parameters.
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
-     * @memberof PostV1alpha1ConsoleApi
      */
     public deletePostContent(requestParameters: PostV1alpha1ConsoleApiDeletePostContentRequest, options?: RawAxiosRequestConfig) {
         return PostV1alpha1ConsoleApiFp(this.configuration).deletePostContent(requestParameters.name, requestParameters.snapshotName, options).then((request) => request(this.axios, this.basePath));
@@ -1267,7 +1126,6 @@ export class PostV1alpha1ConsoleApi extends BaseAPI {
      * @param {PostV1alpha1ConsoleApiDraftPostRequest} requestParameters Request parameters.
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
-     * @memberof PostV1alpha1ConsoleApi
      */
     public draftPost(requestParameters: PostV1alpha1ConsoleApiDraftPostRequest, options?: RawAxiosRequestConfig) {
         return PostV1alpha1ConsoleApiFp(this.configuration).draftPost(requestParameters.postRequest, options).then((request) => request(this.axios, this.basePath));
@@ -1278,7 +1136,6 @@ export class PostV1alpha1ConsoleApi extends BaseAPI {
      * @param {PostV1alpha1ConsoleApiFetchPostContentRequest} requestParameters Request parameters.
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
-     * @memberof PostV1alpha1ConsoleApi
      */
     public fetchPostContent(requestParameters: PostV1alpha1ConsoleApiFetchPostContentRequest, options?: RawAxiosRequestConfig) {
         return PostV1alpha1ConsoleApiFp(this.configuration).fetchPostContent(requestParameters.name, requestParameters.snapshotName, options).then((request) => request(this.axios, this.basePath));
@@ -1289,7 +1146,6 @@ export class PostV1alpha1ConsoleApi extends BaseAPI {
      * @param {PostV1alpha1ConsoleApiFetchPostHeadContentRequest} requestParameters Request parameters.
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
-     * @memberof PostV1alpha1ConsoleApi
      */
     public fetchPostHeadContent(requestParameters: PostV1alpha1ConsoleApiFetchPostHeadContentRequest, options?: RawAxiosRequestConfig) {
         return PostV1alpha1ConsoleApiFp(this.configuration).fetchPostHeadContent(requestParameters.name, options).then((request) => request(this.axios, this.basePath));
@@ -1300,7 +1156,6 @@ export class PostV1alpha1ConsoleApi extends BaseAPI {
      * @param {PostV1alpha1ConsoleApiFetchPostReleaseContentRequest} requestParameters Request parameters.
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
-     * @memberof PostV1alpha1ConsoleApi
      */
     public fetchPostReleaseContent(requestParameters: PostV1alpha1ConsoleApiFetchPostReleaseContentRequest, options?: RawAxiosRequestConfig) {
         return PostV1alpha1ConsoleApiFp(this.configuration).fetchPostReleaseContent(requestParameters.name, options).then((request) => request(this.axios, this.basePath));
@@ -1311,7 +1166,6 @@ export class PostV1alpha1ConsoleApi extends BaseAPI {
      * @param {PostV1alpha1ConsoleApiListPostSnapshotsRequest} requestParameters Request parameters.
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
-     * @memberof PostV1alpha1ConsoleApi
      */
     public listPostSnapshots(requestParameters: PostV1alpha1ConsoleApiListPostSnapshotsRequest, options?: RawAxiosRequestConfig) {
         return PostV1alpha1ConsoleApiFp(this.configuration).listPostSnapshots(requestParameters.name, options).then((request) => request(this.axios, this.basePath));
@@ -1322,7 +1176,6 @@ export class PostV1alpha1ConsoleApi extends BaseAPI {
      * @param {PostV1alpha1ConsoleApiListPostsRequest} requestParameters Request parameters.
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
-     * @memberof PostV1alpha1ConsoleApi
      */
     public listPosts(requestParameters: PostV1alpha1ConsoleApiListPostsRequest = {}, options?: RawAxiosRequestConfig) {
         return PostV1alpha1ConsoleApiFp(this.configuration).listPosts(requestParameters.page, requestParameters.size, requestParameters.labelSelector, requestParameters.fieldSelector, requestParameters.sort, requestParameters.publishPhase, requestParameters.keyword, requestParameters.categoryWithChildren, options).then((request) => request(this.axios, this.basePath));
@@ -1333,7 +1186,6 @@ export class PostV1alpha1ConsoleApi extends BaseAPI {
      * @param {PostV1alpha1ConsoleApiPublishPostRequest} requestParameters Request parameters.
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
-     * @memberof PostV1alpha1ConsoleApi
      */
     public publishPost(requestParameters: PostV1alpha1ConsoleApiPublishPostRequest, options?: RawAxiosRequestConfig) {
         return PostV1alpha1ConsoleApiFp(this.configuration).publishPost(requestParameters.name, requestParameters.headSnapshot, requestParameters.async, options).then((request) => request(this.axios, this.basePath));
@@ -1344,7 +1196,6 @@ export class PostV1alpha1ConsoleApi extends BaseAPI {
      * @param {PostV1alpha1ConsoleApiRecyclePostRequest} requestParameters Request parameters.
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
-     * @memberof PostV1alpha1ConsoleApi
      */
     public recyclePost(requestParameters: PostV1alpha1ConsoleApiRecyclePostRequest, options?: RawAxiosRequestConfig) {
         return PostV1alpha1ConsoleApiFp(this.configuration).recyclePost(requestParameters.name, options).then((request) => request(this.axios, this.basePath));
@@ -1355,7 +1206,6 @@ export class PostV1alpha1ConsoleApi extends BaseAPI {
      * @param {PostV1alpha1ConsoleApiRevertToSpecifiedSnapshotForPostRequest} requestParameters Request parameters.
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
-     * @memberof PostV1alpha1ConsoleApi
      */
     public revertToSpecifiedSnapshotForPost(requestParameters: PostV1alpha1ConsoleApiRevertToSpecifiedSnapshotForPostRequest, options?: RawAxiosRequestConfig) {
         return PostV1alpha1ConsoleApiFp(this.configuration).revertToSpecifiedSnapshotForPost(requestParameters.name, requestParameters.revertSnapshotForPostParam, options).then((request) => request(this.axios, this.basePath));
@@ -1366,7 +1216,6 @@ export class PostV1alpha1ConsoleApi extends BaseAPI {
      * @param {PostV1alpha1ConsoleApiUnpublishPostRequest} requestParameters Request parameters.
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
-     * @memberof PostV1alpha1ConsoleApi
      */
     public unpublishPost(requestParameters: PostV1alpha1ConsoleApiUnpublishPostRequest, options?: RawAxiosRequestConfig) {
         return PostV1alpha1ConsoleApiFp(this.configuration).unpublishPost(requestParameters.name, options).then((request) => request(this.axios, this.basePath));
@@ -1377,7 +1226,6 @@ export class PostV1alpha1ConsoleApi extends BaseAPI {
      * @param {PostV1alpha1ConsoleApiUpdateDraftPostRequest} requestParameters Request parameters.
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
-     * @memberof PostV1alpha1ConsoleApi
      */
     public updateDraftPost(requestParameters: PostV1alpha1ConsoleApiUpdateDraftPostRequest, options?: RawAxiosRequestConfig) {
         return PostV1alpha1ConsoleApiFp(this.configuration).updateDraftPost(requestParameters.name, requestParameters.postRequest, options).then((request) => request(this.axios, this.basePath));
@@ -1388,16 +1236,12 @@ export class PostV1alpha1ConsoleApi extends BaseAPI {
      * @param {PostV1alpha1ConsoleApiUpdatePostContentRequest} requestParameters Request parameters.
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
-     * @memberof PostV1alpha1ConsoleApi
      */
     public updatePostContent(requestParameters: PostV1alpha1ConsoleApiUpdatePostContentRequest, options?: RawAxiosRequestConfig) {
         return PostV1alpha1ConsoleApiFp(this.configuration).updatePostContent(requestParameters.name, requestParameters.content, options).then((request) => request(this.axios, this.basePath));
     }
 }
 
-/**
- * @export
- */
 export const ListPostsPublishPhaseEnum = {
     Draft: 'DRAFT',
     PendingApproval: 'PENDING_APPROVAL',

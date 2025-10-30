@@ -14,22 +14,10 @@
 
 
 
-/**
- * 
- * @export
- * @interface RemoveOperation
- */
 export interface RemoveOperation {
-    /**
-     * 
-     * @type {string}
-     * @memberof RemoveOperation
-     */
     'op': RemoveOperationOpEnum;
     /**
      * A JSON Pointer path pointing to the location to move/copy from.
-     * @type {string}
-     * @memberof RemoveOperation
      */
     'path': string;
 }

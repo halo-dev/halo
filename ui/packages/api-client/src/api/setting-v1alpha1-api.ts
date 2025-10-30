@@ -20,16 +20,15 @@ import globalAxios from 'axios';
 // @ts-ignore
 import { DUMMY_BASE_URL, assertParamExists, setApiKeyToObject, setBasicAuthToObject, setBearerAuthToObject, setOAuthToObject, setSearchParams, serializeDataIfNeeded, toPathString, createRequestFunction } from '../common';
 // @ts-ignore
-import { BASE_PATH, COLLECTION_FORMATS, RequestArgs, BaseAPI, RequiredError, operationServerMap } from '../base';
+import { BASE_PATH, COLLECTION_FORMATS, type RequestArgs, BaseAPI, RequiredError, operationServerMap } from '../base';
 // @ts-ignore
-import { JsonPatchInner } from '../models';
+import type { JsonPatchInner } from '../models';
 // @ts-ignore
-import { Setting } from '../models';
+import type { Setting } from '../models';
 // @ts-ignore
-import { SettingList } from '../models';
+import type { SettingList } from '../models';
 /**
  * SettingV1alpha1Api - axios parameter creator
- * @export
  */
 export const SettingV1alpha1ApiAxiosParamCreator = function (configuration?: Configuration) {
     return {
@@ -313,7 +312,6 @@ export const SettingV1alpha1ApiAxiosParamCreator = function (configuration?: Con
 
 /**
  * SettingV1alpha1Api - functional programming interface
- * @export
  */
 export const SettingV1alpha1ApiFp = function(configuration?: Configuration) {
     const localVarAxiosParamCreator = SettingV1alpha1ApiAxiosParamCreator(configuration)
@@ -401,7 +399,6 @@ export const SettingV1alpha1ApiFp = function(configuration?: Configuration) {
 
 /**
  * SettingV1alpha1Api - factory interface
- * @export
  */
 export const SettingV1alpha1ApiFactory = function (configuration?: Configuration, basePath?: string, axios?: AxiosInstance) {
     const localVarFp = SettingV1alpha1ApiFp(configuration)
@@ -465,135 +462,93 @@ export const SettingV1alpha1ApiFactory = function (configuration?: Configuration
 
 /**
  * Request parameters for createSetting operation in SettingV1alpha1Api.
- * @export
- * @interface SettingV1alpha1ApiCreateSettingRequest
  */
 export interface SettingV1alpha1ApiCreateSettingRequest {
     /**
      * Fresh setting
-     * @type {Setting}
-     * @memberof SettingV1alpha1ApiCreateSetting
      */
     readonly setting?: Setting
 }
 
 /**
  * Request parameters for deleteSetting operation in SettingV1alpha1Api.
- * @export
- * @interface SettingV1alpha1ApiDeleteSettingRequest
  */
 export interface SettingV1alpha1ApiDeleteSettingRequest {
     /**
      * Name of setting
-     * @type {string}
-     * @memberof SettingV1alpha1ApiDeleteSetting
      */
     readonly name: string
 }
 
 /**
  * Request parameters for getSetting operation in SettingV1alpha1Api.
- * @export
- * @interface SettingV1alpha1ApiGetSettingRequest
  */
 export interface SettingV1alpha1ApiGetSettingRequest {
     /**
      * Name of setting
-     * @type {string}
-     * @memberof SettingV1alpha1ApiGetSetting
      */
     readonly name: string
 }
 
 /**
  * Request parameters for listSetting operation in SettingV1alpha1Api.
- * @export
- * @interface SettingV1alpha1ApiListSettingRequest
  */
 export interface SettingV1alpha1ApiListSettingRequest {
     /**
      * Page number. Default is 0.
-     * @type {number}
-     * @memberof SettingV1alpha1ApiListSetting
      */
     readonly page?: number
 
     /**
      * Size number. Default is 0.
-     * @type {number}
-     * @memberof SettingV1alpha1ApiListSetting
      */
     readonly size?: number
 
     /**
      * Label selector. e.g.: hidden!&#x3D;true
-     * @type {Array<string>}
-     * @memberof SettingV1alpha1ApiListSetting
      */
     readonly labelSelector?: Array<string>
 
     /**
      * Field selector. e.g.: metadata.name&#x3D;&#x3D;halo
-     * @type {Array<string>}
-     * @memberof SettingV1alpha1ApiListSetting
      */
     readonly fieldSelector?: Array<string>
 
     /**
      * Sorting criteria in the format: property,(asc|desc). Default sort order is ascending. Multiple sort criteria are supported.
-     * @type {Array<string>}
-     * @memberof SettingV1alpha1ApiListSetting
      */
     readonly sort?: Array<string>
 }
 
 /**
  * Request parameters for patchSetting operation in SettingV1alpha1Api.
- * @export
- * @interface SettingV1alpha1ApiPatchSettingRequest
  */
 export interface SettingV1alpha1ApiPatchSettingRequest {
     /**
      * Name of setting
-     * @type {string}
-     * @memberof SettingV1alpha1ApiPatchSetting
      */
     readonly name: string
 
-    /**
-     * 
-     * @type {Array<JsonPatchInner>}
-     * @memberof SettingV1alpha1ApiPatchSetting
-     */
     readonly jsonPatchInner?: Array<JsonPatchInner>
 }
 
 /**
  * Request parameters for updateSetting operation in SettingV1alpha1Api.
- * @export
- * @interface SettingV1alpha1ApiUpdateSettingRequest
  */
 export interface SettingV1alpha1ApiUpdateSettingRequest {
     /**
      * Name of setting
-     * @type {string}
-     * @memberof SettingV1alpha1ApiUpdateSetting
      */
     readonly name: string
 
     /**
      * Updated setting
-     * @type {Setting}
-     * @memberof SettingV1alpha1ApiUpdateSetting
      */
     readonly setting?: Setting
 }
 
 /**
  * SettingV1alpha1Api - object-oriented interface
- * @export
- * @class SettingV1alpha1Api
- * @extends {BaseAPI}
  */
 export class SettingV1alpha1Api extends BaseAPI {
     /**
@@ -601,7 +556,6 @@ export class SettingV1alpha1Api extends BaseAPI {
      * @param {SettingV1alpha1ApiCreateSettingRequest} requestParameters Request parameters.
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
-     * @memberof SettingV1alpha1Api
      */
     public createSetting(requestParameters: SettingV1alpha1ApiCreateSettingRequest = {}, options?: RawAxiosRequestConfig) {
         return SettingV1alpha1ApiFp(this.configuration).createSetting(requestParameters.setting, options).then((request) => request(this.axios, this.basePath));
@@ -612,7 +566,6 @@ export class SettingV1alpha1Api extends BaseAPI {
      * @param {SettingV1alpha1ApiDeleteSettingRequest} requestParameters Request parameters.
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
-     * @memberof SettingV1alpha1Api
      */
     public deleteSetting(requestParameters: SettingV1alpha1ApiDeleteSettingRequest, options?: RawAxiosRequestConfig) {
         return SettingV1alpha1ApiFp(this.configuration).deleteSetting(requestParameters.name, options).then((request) => request(this.axios, this.basePath));
@@ -623,7 +576,6 @@ export class SettingV1alpha1Api extends BaseAPI {
      * @param {SettingV1alpha1ApiGetSettingRequest} requestParameters Request parameters.
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
-     * @memberof SettingV1alpha1Api
      */
     public getSetting(requestParameters: SettingV1alpha1ApiGetSettingRequest, options?: RawAxiosRequestConfig) {
         return SettingV1alpha1ApiFp(this.configuration).getSetting(requestParameters.name, options).then((request) => request(this.axios, this.basePath));
@@ -634,7 +586,6 @@ export class SettingV1alpha1Api extends BaseAPI {
      * @param {SettingV1alpha1ApiListSettingRequest} requestParameters Request parameters.
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
-     * @memberof SettingV1alpha1Api
      */
     public listSetting(requestParameters: SettingV1alpha1ApiListSettingRequest = {}, options?: RawAxiosRequestConfig) {
         return SettingV1alpha1ApiFp(this.configuration).listSetting(requestParameters.page, requestParameters.size, requestParameters.labelSelector, requestParameters.fieldSelector, requestParameters.sort, options).then((request) => request(this.axios, this.basePath));
@@ -645,7 +596,6 @@ export class SettingV1alpha1Api extends BaseAPI {
      * @param {SettingV1alpha1ApiPatchSettingRequest} requestParameters Request parameters.
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
-     * @memberof SettingV1alpha1Api
      */
     public patchSetting(requestParameters: SettingV1alpha1ApiPatchSettingRequest, options?: RawAxiosRequestConfig) {
         return SettingV1alpha1ApiFp(this.configuration).patchSetting(requestParameters.name, requestParameters.jsonPatchInner, options).then((request) => request(this.axios, this.basePath));
@@ -656,7 +606,6 @@ export class SettingV1alpha1Api extends BaseAPI {
      * @param {SettingV1alpha1ApiUpdateSettingRequest} requestParameters Request parameters.
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
-     * @memberof SettingV1alpha1Api
      */
     public updateSetting(requestParameters: SettingV1alpha1ApiUpdateSettingRequest, options?: RawAxiosRequestConfig) {
         return SettingV1alpha1ApiFp(this.configuration).updateSetting(requestParameters.name, requestParameters.setting, options).then((request) => request(this.axios, this.basePath));

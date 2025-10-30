@@ -15,40 +15,15 @@
 
 // May contain unused imports in some cases
 // @ts-ignore
-import { Metadata } from './metadata';
+import type { Metadata } from './metadata';
 // May contain unused imports in some cases
 // @ts-ignore
-import { PatSpec } from './pat-spec';
+import type { PatSpec } from './pat-spec';
 
-/**
- * 
- * @export
- * @interface PersonalAccessToken
- */
 export interface PersonalAccessToken {
-    /**
-     * 
-     * @type {string}
-     * @memberof PersonalAccessToken
-     */
     'apiVersion': string;
-    /**
-     * 
-     * @type {string}
-     * @memberof PersonalAccessToken
-     */
     'kind': string;
-    /**
-     * 
-     * @type {Metadata}
-     * @memberof PersonalAccessToken
-     */
     'metadata': Metadata;
-    /**
-     * 
-     * @type {PatSpec}
-     * @memberof PersonalAccessToken
-     */
     'spec'?: PatSpec;
 }
 

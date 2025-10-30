@@ -14,23 +14,8 @@
 
 
 
-/**
- * 
- * @export
- * @interface FileReverseProxyProvider
- */
 export interface FileReverseProxyProvider {
-    /**
-     * 
-     * @type {string}
-     * @memberof FileReverseProxyProvider
-     */
     'directory'?: string;
-    /**
-     * 
-     * @type {string}
-     * @memberof FileReverseProxyProvider
-     */
     'filename'?: string;
 }
 

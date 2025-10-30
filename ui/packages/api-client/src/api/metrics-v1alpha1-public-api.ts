@@ -20,14 +20,13 @@ import globalAxios from 'axios';
 // @ts-ignore
 import { DUMMY_BASE_URL, assertParamExists, setApiKeyToObject, setBasicAuthToObject, setBearerAuthToObject, setOAuthToObject, setSearchParams, serializeDataIfNeeded, toPathString, createRequestFunction } from '../common';
 // @ts-ignore
-import { BASE_PATH, COLLECTION_FORMATS, RequestArgs, BaseAPI, RequiredError, operationServerMap } from '../base';
+import { BASE_PATH, COLLECTION_FORMATS, type RequestArgs, BaseAPI, RequiredError, operationServerMap } from '../base';
 // @ts-ignore
-import { CounterRequest } from '../models';
+import type { CounterRequest } from '../models';
 // @ts-ignore
-import { VoteRequest } from '../models';
+import type { VoteRequest } from '../models';
 /**
  * MetricsV1alpha1PublicApi - axios parameter creator
- * @export
  */
 export const MetricsV1alpha1PublicApiAxiosParamCreator = function (configuration?: Configuration) {
     return {
@@ -165,7 +164,6 @@ export const MetricsV1alpha1PublicApiAxiosParamCreator = function (configuration
 
 /**
  * MetricsV1alpha1PublicApi - functional programming interface
- * @export
  */
 export const MetricsV1alpha1PublicApiFp = function(configuration?: Configuration) {
     const localVarAxiosParamCreator = MetricsV1alpha1PublicApiAxiosParamCreator(configuration)
@@ -211,7 +209,6 @@ export const MetricsV1alpha1PublicApiFp = function(configuration?: Configuration
 
 /**
  * MetricsV1alpha1PublicApi - factory interface
- * @export
  */
 export const MetricsV1alpha1PublicApiFactory = function (configuration?: Configuration, basePath?: string, axios?: AxiosInstance) {
     const localVarFp = MetricsV1alpha1PublicApiFp(configuration)
@@ -248,51 +245,27 @@ export const MetricsV1alpha1PublicApiFactory = function (configuration?: Configu
 
 /**
  * Request parameters for count operation in MetricsV1alpha1PublicApi.
- * @export
- * @interface MetricsV1alpha1PublicApiCountRequest
  */
 export interface MetricsV1alpha1PublicApiCountRequest {
-    /**
-     * 
-     * @type {CounterRequest}
-     * @memberof MetricsV1alpha1PublicApiCount
-     */
     readonly counterRequest: CounterRequest
 }
 
 /**
  * Request parameters for downvote operation in MetricsV1alpha1PublicApi.
- * @export
- * @interface MetricsV1alpha1PublicApiDownvoteRequest
  */
 export interface MetricsV1alpha1PublicApiDownvoteRequest {
-    /**
-     * 
-     * @type {VoteRequest}
-     * @memberof MetricsV1alpha1PublicApiDownvote
-     */
     readonly voteRequest: VoteRequest
 }
 
 /**
  * Request parameters for upvote operation in MetricsV1alpha1PublicApi.
- * @export
- * @interface MetricsV1alpha1PublicApiUpvoteRequest
  */
 export interface MetricsV1alpha1PublicApiUpvoteRequest {
-    /**
-     * 
-     * @type {VoteRequest}
-     * @memberof MetricsV1alpha1PublicApiUpvote
-     */
     readonly voteRequest: VoteRequest
 }
 
 /**
  * MetricsV1alpha1PublicApi - object-oriented interface
- * @export
- * @class MetricsV1alpha1PublicApi
- * @extends {BaseAPI}
  */
 export class MetricsV1alpha1PublicApi extends BaseAPI {
     /**
@@ -300,7 +273,6 @@ export class MetricsV1alpha1PublicApi extends BaseAPI {
      * @param {MetricsV1alpha1PublicApiCountRequest} requestParameters Request parameters.
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
-     * @memberof MetricsV1alpha1PublicApi
      */
     public count(requestParameters: MetricsV1alpha1PublicApiCountRequest, options?: RawAxiosRequestConfig) {
         return MetricsV1alpha1PublicApiFp(this.configuration).count(requestParameters.counterRequest, options).then((request) => request(this.axios, this.basePath));
@@ -311,7 +283,6 @@ export class MetricsV1alpha1PublicApi extends BaseAPI {
      * @param {MetricsV1alpha1PublicApiDownvoteRequest} requestParameters Request parameters.
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
-     * @memberof MetricsV1alpha1PublicApi
      */
     public downvote(requestParameters: MetricsV1alpha1PublicApiDownvoteRequest, options?: RawAxiosRequestConfig) {
         return MetricsV1alpha1PublicApiFp(this.configuration).downvote(requestParameters.voteRequest, options).then((request) => request(this.axios, this.basePath));
@@ -322,7 +293,6 @@ export class MetricsV1alpha1PublicApi extends BaseAPI {
      * @param {MetricsV1alpha1PublicApiUpvoteRequest} requestParameters Request parameters.
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
-     * @memberof MetricsV1alpha1PublicApi
      */
     public upvote(requestParameters: MetricsV1alpha1PublicApiUpvoteRequest, options?: RawAxiosRequestConfig) {
         return MetricsV1alpha1PublicApiFp(this.configuration).upvote(requestParameters.voteRequest, options).then((request) => request(this.axios, this.basePath));

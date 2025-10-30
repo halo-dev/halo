@@ -14,29 +14,9 @@
 
 
 
-/**
- * 
- * @export
- * @interface NotifierInfo
- */
 export interface NotifierInfo {
-    /**
-     * 
-     * @type {string}
-     * @memberof NotifierInfo
-     */
     'description'?: string;
-    /**
-     * 
-     * @type {string}
-     * @memberof NotifierInfo
-     */
     'displayName'?: string;
-    /**
-     * 
-     * @type {string}
-     * @memberof NotifierInfo
-     */
     'name'?: string;
 }
 

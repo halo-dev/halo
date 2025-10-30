@@ -23,6 +23,8 @@ export {
   generateAnchor,
   generateAnchorId,
   isAllowedUri,
+  isBlockEmpty,
   isEmpty,
   isListActive,
+  isNodeContentEmpty,
 } from "./utils";

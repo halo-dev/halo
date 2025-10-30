@@ -322,23 +322,6 @@ const Columns = Node.create<ExtensionOptions & ColumnsOptions>({
           ],
         };
       },
-      getDraggable() {
-        return {
-          getRenderContainer({ dom }: { dom: HTMLElement }) {
-            let container = dom;
-            while (container && !container.classList.contains("columns")) {
-              container = container.parentElement as HTMLElement;
-            }
-            return {
-              el: container,
-              dragDomOffset: {
-                y: -5,
-              },
-            };
-          },
-          allowPropagationDownward: true,
-        };
-      },
     };
   },
 

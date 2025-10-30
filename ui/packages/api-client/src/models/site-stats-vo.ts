@@ -16,39 +16,12 @@
 
 /**
  * A value object for site stats.
- * @export
- * @interface SiteStatsVo
  */
 export interface SiteStatsVo {
-    /**
-     * 
-     * @type {number}
-     * @memberof SiteStatsVo
-     */
     'category'?: number;
-    /**
-     * 
-     * @type {number}
-     * @memberof SiteStatsVo
-     */
     'comment'?: number;
-    /**
-     * 
-     * @type {number}
-     * @memberof SiteStatsVo
-     */
     'post'?: number;
-    /**
-     * 
-     * @type {number}
-     * @memberof SiteStatsVo
-     */
     'upvote'?: number;
-    /**
-     * 
-     * @type {number}
-     * @memberof SiteStatsVo
-     */
     'visit'?: number;
 }
 

@@ -15,37 +15,15 @@
 
 // May contain unused imports in some cases
 // @ts-ignore
-import { Metadata } from './metadata';
+import type { Metadata } from './metadata';
 
 /**
  * <p>ConfigMap holds configuration data to consume.</p>
- * @export
- * @interface ConfigMap
  */
 export interface ConfigMap {
-    /**
-     * 
-     * @type {string}
-     * @memberof ConfigMap
-     */
     'apiVersion': string;
-    /**
-     * 
-     * @type {{ [key: string]: string; }}
-     * @memberof ConfigMap
-     */
     'data'?: { [key: string]: string; };
-    /**
-     * 
-     * @type {string}
-     * @memberof ConfigMap
-     */
     'kind': string;
-    /**
-     * 
-     * @type {Metadata}
-     * @memberof ConfigMap
-     */
     'metadata': Metadata;
 }
 

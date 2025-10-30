@@ -20,12 +20,11 @@ import globalAxios from 'axios';
 // @ts-ignore
 import { DUMMY_BASE_URL, assertParamExists, setApiKeyToObject, setBasicAuthToObject, setBearerAuthToObject, setOAuthToObject, setSearchParams, serializeDataIfNeeded, toPathString, createRequestFunction } from '../common';
 // @ts-ignore
-import { BASE_PATH, COLLECTION_FORMATS, RequestArgs, BaseAPI, RequiredError, operationServerMap } from '../base';
+import { BASE_PATH, COLLECTION_FORMATS, type RequestArgs, BaseAPI, RequiredError, operationServerMap } from '../base';
 // @ts-ignore
-import { UserDevice } from '../models';
+import type { UserDevice } from '../models';
 /**
  * DeviceV1alpha1UcApi - axios parameter creator
- * @export
  */
 export const DeviceV1alpha1UcApiAxiosParamCreator = function (configuration?: Configuration) {
     return {
@@ -112,7 +111,6 @@ export const DeviceV1alpha1UcApiAxiosParamCreator = function (configuration?: Co
 
 /**
  * DeviceV1alpha1UcApi - functional programming interface
- * @export
  */
 export const DeviceV1alpha1UcApiFp = function(configuration?: Configuration) {
     const localVarAxiosParamCreator = DeviceV1alpha1UcApiAxiosParamCreator(configuration)
@@ -145,7 +143,6 @@ export const DeviceV1alpha1UcApiFp = function(configuration?: Configuration) {
 
 /**
  * DeviceV1alpha1UcApi - factory interface
- * @export
  */
 export const DeviceV1alpha1UcApiFactory = function (configuration?: Configuration, basePath?: string, axios?: AxiosInstance) {
     const localVarFp = DeviceV1alpha1UcApiFp(configuration)
@@ -172,30 +169,22 @@ export const DeviceV1alpha1UcApiFactory = function (configuration?: Configuratio
 
 /**
  * Request parameters for revokeDevice operation in DeviceV1alpha1UcApi.
- * @export
- * @interface DeviceV1alpha1UcApiRevokeDeviceRequest
  */
 export interface DeviceV1alpha1UcApiRevokeDeviceRequest {
     /**
      * Device ID
-     * @type {string}
-     * @memberof DeviceV1alpha1UcApiRevokeDevice
      */
     readonly deviceId: string
 }
 
 /**
  * DeviceV1alpha1UcApi - object-oriented interface
- * @export
- * @class DeviceV1alpha1UcApi
- * @extends {BaseAPI}
  */
 export class DeviceV1alpha1UcApi extends BaseAPI {
     /**
      * List all user devices
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
-     * @memberof DeviceV1alpha1UcApi
      */
     public listDevices(options?: RawAxiosRequestConfig) {
         return DeviceV1alpha1UcApiFp(this.configuration).listDevices(options).then((request) => request(this.axios, this.basePath));
@@ -206,7 +195,6 @@ export class DeviceV1alpha1UcApi extends BaseAPI {
      * @param {DeviceV1alpha1UcApiRevokeDeviceRequest} requestParameters Request parameters.
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
-     * @memberof DeviceV1alpha1UcApi
      */
     public revokeDevice(requestParameters: DeviceV1alpha1UcApiRevokeDeviceRequest, options?: RawAxiosRequestConfig) {
         return DeviceV1alpha1UcApiFp(this.configuration).revokeDevice(requestParameters.deviceId, options).then((request) => request(this.axios, this.basePath));

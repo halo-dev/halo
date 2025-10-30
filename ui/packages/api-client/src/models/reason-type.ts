@@ -15,40 +15,18 @@
 
 // May contain unused imports in some cases
 // @ts-ignore
-import { Metadata } from './metadata';
+import type { Metadata } from './metadata';
 // May contain unused imports in some cases
 // @ts-ignore
-import { ReasonTypeSpec } from './reason-type-spec';
+import type { ReasonTypeSpec } from './reason-type-spec';
 
 /**
  * <p>{@link ReasonType ReasonType} is a custom extension that defines a type of reason.</p>  <p>One {@link ReasonType ReasonType} can have multiple {@link Reason Reason}s to notify.</p>
- * @export
- * @interface ReasonType
  */
 export interface ReasonType {
-    /**
-     * 
-     * @type {string}
-     * @memberof ReasonType
-     */
     'apiVersion': string;
-    /**
-     * 
-     * @type {string}
-     * @memberof ReasonType
-     */
     'kind': string;
-    /**
-     * 
-     * @type {Metadata}
-     * @memberof ReasonType
-     */
     'metadata': Metadata;
-    /**
-     * 
-     * @type {ReasonTypeSpec}
-     * @memberof ReasonType
-     */
     'spec'?: ReasonTypeSpec;
 }
 
