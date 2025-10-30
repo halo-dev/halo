@@ -20,26 +20,25 @@ import globalAxios from 'axios';
 // @ts-ignore
 import { DUMMY_BASE_URL, assertParamExists, setApiKeyToObject, setBasicAuthToObject, setBearerAuthToObject, setOAuthToObject, setSearchParams, serializeDataIfNeeded, toPathString, createRequestFunction } from '../common';
 // @ts-ignore
-import { BASE_PATH, COLLECTION_FORMATS, RequestArgs, BaseAPI, RequiredError, operationServerMap } from '../base';
+import { BASE_PATH, COLLECTION_FORMATS, type RequestArgs, BaseAPI, RequiredError, operationServerMap } from '../base';
 // @ts-ignore
-import { Content } from '../models';
+import type { Content } from '../models';
 // @ts-ignore
-import { ContentWrapper } from '../models';
+import type { ContentWrapper } from '../models';
 // @ts-ignore
-import { ListedSinglePageList } from '../models';
+import type { ListedSinglePageList } from '../models';
 // @ts-ignore
-import { ListedSnapshotDto } from '../models';
+import type { ListedSnapshotDto } from '../models';
 // @ts-ignore
-import { Post } from '../models';
+import type { Post } from '../models';
 // @ts-ignore
-import { RevertSnapshotForSingleParam } from '../models';
+import type { RevertSnapshotForSingleParam } from '../models';
 // @ts-ignore
-import { SinglePage } from '../models';
+import type { SinglePage } from '../models';
 // @ts-ignore
-import { SinglePageRequest } from '../models';
+import type { SinglePageRequest } from '../models';
 /**
  * SinglePageV1alpha1ConsoleApi - axios parameter creator
- * @export
  */
 export const SinglePageV1alpha1ConsoleApiAxiosParamCreator = function (configuration?: Configuration) {
     return {
@@ -574,7 +573,6 @@ export const SinglePageV1alpha1ConsoleApiAxiosParamCreator = function (configura
 
 /**
  * SinglePageV1alpha1ConsoleApi - functional programming interface
- * @export
  */
 export const SinglePageV1alpha1ConsoleApiFp = function(configuration?: Configuration) {
     const localVarAxiosParamCreator = SinglePageV1alpha1ConsoleApiAxiosParamCreator(configuration)
@@ -729,7 +727,6 @@ export const SinglePageV1alpha1ConsoleApiFp = function(configuration?: Configura
 
 /**
  * SinglePageV1alpha1ConsoleApi - factory interface
- * @export
  */
 export const SinglePageV1alpha1ConsoleApiFactory = function (configuration?: Configuration, basePath?: string, axios?: AxiosInstance) {
     const localVarFp = SinglePageV1alpha1ConsoleApiFp(configuration)
@@ -838,254 +835,136 @@ export const SinglePageV1alpha1ConsoleApiFactory = function (configuration?: Con
 
 /**
  * Request parameters for deleteSinglePageContent operation in SinglePageV1alpha1ConsoleApi.
- * @export
- * @interface SinglePageV1alpha1ConsoleApiDeleteSinglePageContentRequest
  */
 export interface SinglePageV1alpha1ConsoleApiDeleteSinglePageContentRequest {
-    /**
-     * 
-     * @type {string}
-     * @memberof SinglePageV1alpha1ConsoleApiDeleteSinglePageContent
-     */
     readonly name: string
 
-    /**
-     * 
-     * @type {string}
-     * @memberof SinglePageV1alpha1ConsoleApiDeleteSinglePageContent
-     */
     readonly snapshotName: string
 }
 
 /**
  * Request parameters for draftSinglePage operation in SinglePageV1alpha1ConsoleApi.
- * @export
- * @interface SinglePageV1alpha1ConsoleApiDraftSinglePageRequest
  */
 export interface SinglePageV1alpha1ConsoleApiDraftSinglePageRequest {
-    /**
-     * 
-     * @type {SinglePageRequest}
-     * @memberof SinglePageV1alpha1ConsoleApiDraftSinglePage
-     */
     readonly singlePageRequest: SinglePageRequest
 }
 
 /**
  * Request parameters for fetchSinglePageContent operation in SinglePageV1alpha1ConsoleApi.
- * @export
- * @interface SinglePageV1alpha1ConsoleApiFetchSinglePageContentRequest
  */
 export interface SinglePageV1alpha1ConsoleApiFetchSinglePageContentRequest {
-    /**
-     * 
-     * @type {string}
-     * @memberof SinglePageV1alpha1ConsoleApiFetchSinglePageContent
-     */
     readonly name: string
 
-    /**
-     * 
-     * @type {string}
-     * @memberof SinglePageV1alpha1ConsoleApiFetchSinglePageContent
-     */
     readonly snapshotName: string
 }
 
 /**
  * Request parameters for fetchSinglePageHeadContent operation in SinglePageV1alpha1ConsoleApi.
- * @export
- * @interface SinglePageV1alpha1ConsoleApiFetchSinglePageHeadContentRequest
  */
 export interface SinglePageV1alpha1ConsoleApiFetchSinglePageHeadContentRequest {
-    /**
-     * 
-     * @type {string}
-     * @memberof SinglePageV1alpha1ConsoleApiFetchSinglePageHeadContent
-     */
     readonly name: string
 }
 
 /**
  * Request parameters for fetchSinglePageReleaseContent operation in SinglePageV1alpha1ConsoleApi.
- * @export
- * @interface SinglePageV1alpha1ConsoleApiFetchSinglePageReleaseContentRequest
  */
 export interface SinglePageV1alpha1ConsoleApiFetchSinglePageReleaseContentRequest {
-    /**
-     * 
-     * @type {string}
-     * @memberof SinglePageV1alpha1ConsoleApiFetchSinglePageReleaseContent
-     */
     readonly name: string
 }
 
 /**
  * Request parameters for listSinglePageSnapshots operation in SinglePageV1alpha1ConsoleApi.
- * @export
- * @interface SinglePageV1alpha1ConsoleApiListSinglePageSnapshotsRequest
  */
 export interface SinglePageV1alpha1ConsoleApiListSinglePageSnapshotsRequest {
-    /**
-     * 
-     * @type {string}
-     * @memberof SinglePageV1alpha1ConsoleApiListSinglePageSnapshots
-     */
     readonly name: string
 }
 
 /**
  * Request parameters for listSinglePages operation in SinglePageV1alpha1ConsoleApi.
- * @export
- * @interface SinglePageV1alpha1ConsoleApiListSinglePagesRequest
  */
 export interface SinglePageV1alpha1ConsoleApiListSinglePagesRequest {
     /**
      * Page number. Default is 0.
-     * @type {number}
-     * @memberof SinglePageV1alpha1ConsoleApiListSinglePages
      */
     readonly page?: number
 
     /**
      * Size number. Default is 0.
-     * @type {number}
-     * @memberof SinglePageV1alpha1ConsoleApiListSinglePages
      */
     readonly size?: number
 
     /**
      * Label selector. e.g.: hidden!&#x3D;true
-     * @type {Array<string>}
-     * @memberof SinglePageV1alpha1ConsoleApiListSinglePages
      */
     readonly labelSelector?: Array<string>
 
     /**
      * Field selector. e.g.: metadata.name&#x3D;&#x3D;halo
-     * @type {Array<string>}
-     * @memberof SinglePageV1alpha1ConsoleApiListSinglePages
      */
     readonly fieldSelector?: Array<string>
 
     /**
      * Sorting criteria in the format: property,(asc|desc). Default sort order is ascending. Multiple sort criteria are supported.
-     * @type {Array<string>}
-     * @memberof SinglePageV1alpha1ConsoleApiListSinglePages
      */
     readonly sort?: Array<string>
 
     /**
      * SinglePages filtered by contributor.
-     * @type {Array<string>}
-     * @memberof SinglePageV1alpha1ConsoleApiListSinglePages
      */
     readonly contributor?: Array<string>
 
     /**
      * SinglePages filtered by publish phase.
-     * @type {'DRAFT' | 'PENDING_APPROVAL' | 'PUBLISHED' | 'FAILED'}
-     * @memberof SinglePageV1alpha1ConsoleApiListSinglePages
      */
     readonly publishPhase?: ListSinglePagesPublishPhaseEnum
 
     /**
      * SinglePages filtered by visibility.
-     * @type {'PUBLIC' | 'INTERNAL' | 'PRIVATE'}
-     * @memberof SinglePageV1alpha1ConsoleApiListSinglePages
      */
     readonly visible?: ListSinglePagesVisibleEnum
 
     /**
      * SinglePages filtered by keyword.
-     * @type {string}
-     * @memberof SinglePageV1alpha1ConsoleApiListSinglePages
      */
     readonly keyword?: string
 }
 
 /**
  * Request parameters for publishSinglePage operation in SinglePageV1alpha1ConsoleApi.
- * @export
- * @interface SinglePageV1alpha1ConsoleApiPublishSinglePageRequest
  */
 export interface SinglePageV1alpha1ConsoleApiPublishSinglePageRequest {
-    /**
-     * 
-     * @type {string}
-     * @memberof SinglePageV1alpha1ConsoleApiPublishSinglePage
-     */
     readonly name: string
 }
 
 /**
  * Request parameters for revertToSpecifiedSnapshotForSinglePage operation in SinglePageV1alpha1ConsoleApi.
- * @export
- * @interface SinglePageV1alpha1ConsoleApiRevertToSpecifiedSnapshotForSinglePageRequest
  */
 export interface SinglePageV1alpha1ConsoleApiRevertToSpecifiedSnapshotForSinglePageRequest {
-    /**
-     * 
-     * @type {string}
-     * @memberof SinglePageV1alpha1ConsoleApiRevertToSpecifiedSnapshotForSinglePage
-     */
     readonly name: string
 
-    /**
-     * 
-     * @type {RevertSnapshotForSingleParam}
-     * @memberof SinglePageV1alpha1ConsoleApiRevertToSpecifiedSnapshotForSinglePage
-     */
     readonly revertSnapshotForSingleParam: RevertSnapshotForSingleParam
 }
 
 /**
  * Request parameters for updateDraftSinglePage operation in SinglePageV1alpha1ConsoleApi.
- * @export
- * @interface SinglePageV1alpha1ConsoleApiUpdateDraftSinglePageRequest
  */
 export interface SinglePageV1alpha1ConsoleApiUpdateDraftSinglePageRequest {
-    /**
-     * 
-     * @type {string}
-     * @memberof SinglePageV1alpha1ConsoleApiUpdateDraftSinglePage
-     */
     readonly name: string
 
-    /**
-     * 
-     * @type {SinglePageRequest}
-     * @memberof SinglePageV1alpha1ConsoleApiUpdateDraftSinglePage
-     */
     readonly singlePageRequest: SinglePageRequest
 }
 
 /**
  * Request parameters for updateSinglePageContent operation in SinglePageV1alpha1ConsoleApi.
- * @export
- * @interface SinglePageV1alpha1ConsoleApiUpdateSinglePageContentRequest
  */
 export interface SinglePageV1alpha1ConsoleApiUpdateSinglePageContentRequest {
-    /**
-     * 
-     * @type {string}
-     * @memberof SinglePageV1alpha1ConsoleApiUpdateSinglePageContent
-     */
     readonly name: string
 
-    /**
-     * 
-     * @type {Content}
-     * @memberof SinglePageV1alpha1ConsoleApiUpdateSinglePageContent
-     */
     readonly content: Content
 }
 
 /**
  * SinglePageV1alpha1ConsoleApi - object-oriented interface
- * @export
- * @class SinglePageV1alpha1ConsoleApi
- * @extends {BaseAPI}
  */
 export class SinglePageV1alpha1ConsoleApi extends BaseAPI {
     /**
@@ -1093,7 +972,6 @@ export class SinglePageV1alpha1ConsoleApi extends BaseAPI {
      * @param {SinglePageV1alpha1ConsoleApiDeleteSinglePageContentRequest} requestParameters Request parameters.
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
-     * @memberof SinglePageV1alpha1ConsoleApi
      */
     public deleteSinglePageContent(requestParameters: SinglePageV1alpha1ConsoleApiDeleteSinglePageContentRequest, options?: RawAxiosRequestConfig) {
         return SinglePageV1alpha1ConsoleApiFp(this.configuration).deleteSinglePageContent(requestParameters.name, requestParameters.snapshotName, options).then((request) => request(this.axios, this.basePath));
@@ -1104,7 +982,6 @@ export class SinglePageV1alpha1ConsoleApi extends BaseAPI {
      * @param {SinglePageV1alpha1ConsoleApiDraftSinglePageRequest} requestParameters Request parameters.
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
-     * @memberof SinglePageV1alpha1ConsoleApi
      */
     public draftSinglePage(requestParameters: SinglePageV1alpha1ConsoleApiDraftSinglePageRequest, options?: RawAxiosRequestConfig) {
         return SinglePageV1alpha1ConsoleApiFp(this.configuration).draftSinglePage(requestParameters.singlePageRequest, options).then((request) => request(this.axios, this.basePath));
@@ -1115,7 +992,6 @@ export class SinglePageV1alpha1ConsoleApi extends BaseAPI {
      * @param {SinglePageV1alpha1ConsoleApiFetchSinglePageContentRequest} requestParameters Request parameters.
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
-     * @memberof SinglePageV1alpha1ConsoleApi
      */
     public fetchSinglePageContent(requestParameters: SinglePageV1alpha1ConsoleApiFetchSinglePageContentRequest, options?: RawAxiosRequestConfig) {
         return SinglePageV1alpha1ConsoleApiFp(this.configuration).fetchSinglePageContent(requestParameters.name, requestParameters.snapshotName, options).then((request) => request(this.axios, this.basePath));
@@ -1126,7 +1002,6 @@ export class SinglePageV1alpha1ConsoleApi extends BaseAPI {
      * @param {SinglePageV1alpha1ConsoleApiFetchSinglePageHeadContentRequest} requestParameters Request parameters.
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
-     * @memberof SinglePageV1alpha1ConsoleApi
      */
     public fetchSinglePageHeadContent(requestParameters: SinglePageV1alpha1ConsoleApiFetchSinglePageHeadContentRequest, options?: RawAxiosRequestConfig) {
         return SinglePageV1alpha1ConsoleApiFp(this.configuration).fetchSinglePageHeadContent(requestParameters.name, options).then((request) => request(this.axios, this.basePath));
@@ -1137,7 +1012,6 @@ export class SinglePageV1alpha1ConsoleApi extends BaseAPI {
      * @param {SinglePageV1alpha1ConsoleApiFetchSinglePageReleaseContentRequest} requestParameters Request parameters.
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
-     * @memberof SinglePageV1alpha1ConsoleApi
      */
     public fetchSinglePageReleaseContent(requestParameters: SinglePageV1alpha1ConsoleApiFetchSinglePageReleaseContentRequest, options?: RawAxiosRequestConfig) {
         return SinglePageV1alpha1ConsoleApiFp(this.configuration).fetchSinglePageReleaseContent(requestParameters.name, options).then((request) => request(this.axios, this.basePath));
@@ -1148,7 +1022,6 @@ export class SinglePageV1alpha1ConsoleApi extends BaseAPI {
      * @param {SinglePageV1alpha1ConsoleApiListSinglePageSnapshotsRequest} requestParameters Request parameters.
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
-     * @memberof SinglePageV1alpha1ConsoleApi
      */
     public listSinglePageSnapshots(requestParameters: SinglePageV1alpha1ConsoleApiListSinglePageSnapshotsRequest, options?: RawAxiosRequestConfig) {
         return SinglePageV1alpha1ConsoleApiFp(this.configuration).listSinglePageSnapshots(requestParameters.name, options).then((request) => request(this.axios, this.basePath));
@@ -1159,7 +1032,6 @@ export class SinglePageV1alpha1ConsoleApi extends BaseAPI {
      * @param {SinglePageV1alpha1ConsoleApiListSinglePagesRequest} requestParameters Request parameters.
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
-     * @memberof SinglePageV1alpha1ConsoleApi
      */
     public listSinglePages(requestParameters: SinglePageV1alpha1ConsoleApiListSinglePagesRequest = {}, options?: RawAxiosRequestConfig) {
         return SinglePageV1alpha1ConsoleApiFp(this.configuration).listSinglePages(requestParameters.page, requestParameters.size, requestParameters.labelSelector, requestParameters.fieldSelector, requestParameters.sort, requestParameters.contributor, requestParameters.publishPhase, requestParameters.visible, requestParameters.keyword, options).then((request) => request(this.axios, this.basePath));
@@ -1170,7 +1042,6 @@ export class SinglePageV1alpha1ConsoleApi extends BaseAPI {
      * @param {SinglePageV1alpha1ConsoleApiPublishSinglePageRequest} requestParameters Request parameters.
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
-     * @memberof SinglePageV1alpha1ConsoleApi
      */
     public publishSinglePage(requestParameters: SinglePageV1alpha1ConsoleApiPublishSinglePageRequest, options?: RawAxiosRequestConfig) {
         return SinglePageV1alpha1ConsoleApiFp(this.configuration).publishSinglePage(requestParameters.name, options).then((request) => request(this.axios, this.basePath));
@@ -1181,7 +1052,6 @@ export class SinglePageV1alpha1ConsoleApi extends BaseAPI {
      * @param {SinglePageV1alpha1ConsoleApiRevertToSpecifiedSnapshotForSinglePageRequest} requestParameters Request parameters.
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
-     * @memberof SinglePageV1alpha1ConsoleApi
      */
     public revertToSpecifiedSnapshotForSinglePage(requestParameters: SinglePageV1alpha1ConsoleApiRevertToSpecifiedSnapshotForSinglePageRequest, options?: RawAxiosRequestConfig) {
         return SinglePageV1alpha1ConsoleApiFp(this.configuration).revertToSpecifiedSnapshotForSinglePage(requestParameters.name, requestParameters.revertSnapshotForSingleParam, options).then((request) => request(this.axios, this.basePath));
@@ -1192,7 +1062,6 @@ export class SinglePageV1alpha1ConsoleApi extends BaseAPI {
      * @param {SinglePageV1alpha1ConsoleApiUpdateDraftSinglePageRequest} requestParameters Request parameters.
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
-     * @memberof SinglePageV1alpha1ConsoleApi
      */
     public updateDraftSinglePage(requestParameters: SinglePageV1alpha1ConsoleApiUpdateDraftSinglePageRequest, options?: RawAxiosRequestConfig) {
         return SinglePageV1alpha1ConsoleApiFp(this.configuration).updateDraftSinglePage(requestParameters.name, requestParameters.singlePageRequest, options).then((request) => request(this.axios, this.basePath));
@@ -1203,16 +1072,12 @@ export class SinglePageV1alpha1ConsoleApi extends BaseAPI {
      * @param {SinglePageV1alpha1ConsoleApiUpdateSinglePageContentRequest} requestParameters Request parameters.
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
-     * @memberof SinglePageV1alpha1ConsoleApi
      */
     public updateSinglePageContent(requestParameters: SinglePageV1alpha1ConsoleApiUpdateSinglePageContentRequest, options?: RawAxiosRequestConfig) {
         return SinglePageV1alpha1ConsoleApiFp(this.configuration).updateSinglePageContent(requestParameters.name, requestParameters.content, options).then((request) => request(this.axios, this.basePath));
     }
 }
 
-/**
- * @export
- */
 export const ListSinglePagesPublishPhaseEnum = {
     Draft: 'DRAFT',
     PendingApproval: 'PENDING_APPROVAL',
@@ -1220,9 +1085,6 @@ export const ListSinglePagesPublishPhaseEnum = {
     Failed: 'FAILED'
 } as const;
 export type ListSinglePagesPublishPhaseEnum = typeof ListSinglePagesPublishPhaseEnum[keyof typeof ListSinglePagesPublishPhaseEnum];
-/**
- * @export
- */
 export const ListSinglePagesVisibleEnum = {
     Public: 'PUBLIC',
     Internal: 'INTERNAL',

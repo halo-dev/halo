@@ -1,6 +1,7 @@
 package run.halo.app.theme;
 
 import lombok.NonNull;
+import org.pf4j.PluginManager;
 import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.boot.autoconfigure.thymeleaf.ThymeleafProperties;
 import org.springframework.stereotype.Component;
@@ -13,7 +14,6 @@ import org.thymeleaf.templateresolver.FileTemplateResolver;
 import org.thymeleaf.templateresolver.ITemplateResolver;
 import reactor.core.publisher.Mono;
 import run.halo.app.infra.ExternalUrlSupplier;
-import run.halo.app.plugin.HaloPluginManager;
 import run.halo.app.theme.dialect.HaloProcessorDialect;
 import run.halo.app.theme.engine.HaloTemplateEngine;
 import run.halo.app.theme.engine.PluginClassloaderTemplateResolver;
@@ -43,7 +43,7 @@ public class TemplateEngineManager {
 
     private final ExternalUrlSupplier externalUrlSupplier;
 
-    private final HaloPluginManager haloPluginManager;
+    private final PluginManager pluginManager;
 
     private final ObjectProvider<ITemplateResolver> templateResolvers;
 
@@ -53,11 +53,11 @@ public class TemplateEngineManager {
 
     public TemplateEngineManager(ThymeleafProperties thymeleafProperties,
         ExternalUrlSupplier externalUrlSupplier,
-        HaloPluginManager haloPluginManager, ObjectProvider<ITemplateResolver> templateResolvers,
+        PluginManager pluginManager, ObjectProvider<ITemplateResolver> templateResolvers,
         ObjectProvider<IDialect> dialects, ThemeResolver themeResolver) {
         this.thymeleafProperties = thymeleafProperties;
         this.externalUrlSupplier = externalUrlSupplier;
-        this.haloPluginManager = haloPluginManager;
+        this.pluginManager = pluginManager;
         this.templateResolvers = templateResolvers;
         this.dialects = dialects;
         this.themeResolver = themeResolver;
@@ -126,7 +126,7 @@ public class TemplateEngineManager {
 
     @NonNull
     private PluginClassloaderTemplateResolver createPluginClassloaderTemplateResolver() {
-        var pluginTemplateResolver = new PluginClassloaderTemplateResolver(haloPluginManager);
+        var pluginTemplateResolver = new PluginClassloaderTemplateResolver(pluginManager);
         pluginTemplateResolver.setPrefix(thymeleafProperties.getPrefix());
         pluginTemplateResolver.setSuffix(thymeleafProperties.getSuffix());
         pluginTemplateResolver.setTemplateMode(thymeleafProperties.getMode());

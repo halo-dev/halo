@@ -20,16 +20,15 @@ import globalAxios from 'axios';
 // @ts-ignore
 import { DUMMY_BASE_URL, assertParamExists, setApiKeyToObject, setBasicAuthToObject, setBearerAuthToObject, setOAuthToObject, setSearchParams, serializeDataIfNeeded, toPathString, createRequestFunction } from '../common';
 // @ts-ignore
-import { BASE_PATH, COLLECTION_FORMATS, RequestArgs, BaseAPI, RequiredError, operationServerMap } from '../base';
+import { BASE_PATH, COLLECTION_FORMATS, type RequestArgs, BaseAPI, RequiredError, operationServerMap } from '../base';
 // @ts-ignore
-import { Comment } from '../models';
+import type { Comment } from '../models';
 // @ts-ignore
-import { CommentList } from '../models';
+import type { CommentList } from '../models';
 // @ts-ignore
-import { JsonPatchInner } from '../models';
+import type { JsonPatchInner } from '../models';
 /**
  * CommentV1alpha1Api - axios parameter creator
- * @export
  */
 export const CommentV1alpha1ApiAxiosParamCreator = function (configuration?: Configuration) {
     return {
@@ -313,7 +312,6 @@ export const CommentV1alpha1ApiAxiosParamCreator = function (configuration?: Con
 
 /**
  * CommentV1alpha1Api - functional programming interface
- * @export
  */
 export const CommentV1alpha1ApiFp = function(configuration?: Configuration) {
     const localVarAxiosParamCreator = CommentV1alpha1ApiAxiosParamCreator(configuration)
@@ -401,7 +399,6 @@ export const CommentV1alpha1ApiFp = function(configuration?: Configuration) {
 
 /**
  * CommentV1alpha1Api - factory interface
- * @export
  */
 export const CommentV1alpha1ApiFactory = function (configuration?: Configuration, basePath?: string, axios?: AxiosInstance) {
     const localVarFp = CommentV1alpha1ApiFp(configuration)
@@ -465,135 +462,93 @@ export const CommentV1alpha1ApiFactory = function (configuration?: Configuration
 
 /**
  * Request parameters for createComment operation in CommentV1alpha1Api.
- * @export
- * @interface CommentV1alpha1ApiCreateCommentRequest
  */
 export interface CommentV1alpha1ApiCreateCommentRequest {
     /**
      * Fresh comment
-     * @type {Comment}
-     * @memberof CommentV1alpha1ApiCreateComment
      */
     readonly comment?: Comment
 }
 
 /**
  * Request parameters for deleteComment operation in CommentV1alpha1Api.
- * @export
- * @interface CommentV1alpha1ApiDeleteCommentRequest
  */
 export interface CommentV1alpha1ApiDeleteCommentRequest {
     /**
      * Name of comment
-     * @type {string}
-     * @memberof CommentV1alpha1ApiDeleteComment
      */
     readonly name: string
 }
 
 /**
  * Request parameters for getComment operation in CommentV1alpha1Api.
- * @export
- * @interface CommentV1alpha1ApiGetCommentRequest
  */
 export interface CommentV1alpha1ApiGetCommentRequest {
     /**
      * Name of comment
-     * @type {string}
-     * @memberof CommentV1alpha1ApiGetComment
      */
     readonly name: string
 }
 
 /**
  * Request parameters for listComment operation in CommentV1alpha1Api.
- * @export
- * @interface CommentV1alpha1ApiListCommentRequest
  */
 export interface CommentV1alpha1ApiListCommentRequest {
     /**
      * Page number. Default is 0.
-     * @type {number}
-     * @memberof CommentV1alpha1ApiListComment
      */
     readonly page?: number
 
     /**
      * Size number. Default is 0.
-     * @type {number}
-     * @memberof CommentV1alpha1ApiListComment
      */
     readonly size?: number
 
     /**
      * Label selector. e.g.: hidden!&#x3D;true
-     * @type {Array<string>}
-     * @memberof CommentV1alpha1ApiListComment
      */
     readonly labelSelector?: Array<string>
 
     /**
      * Field selector. e.g.: metadata.name&#x3D;&#x3D;halo
-     * @type {Array<string>}
-     * @memberof CommentV1alpha1ApiListComment
      */
     readonly fieldSelector?: Array<string>
 
     /**
      * Sorting criteria in the format: property,(asc|desc). Default sort order is ascending. Multiple sort criteria are supported.
-     * @type {Array<string>}
-     * @memberof CommentV1alpha1ApiListComment
      */
     readonly sort?: Array<string>
 }
 
 /**
  * Request parameters for patchComment operation in CommentV1alpha1Api.
- * @export
- * @interface CommentV1alpha1ApiPatchCommentRequest
  */
 export interface CommentV1alpha1ApiPatchCommentRequest {
     /**
      * Name of comment
-     * @type {string}
-     * @memberof CommentV1alpha1ApiPatchComment
      */
     readonly name: string
 
-    /**
-     * 
-     * @type {Array<JsonPatchInner>}
-     * @memberof CommentV1alpha1ApiPatchComment
-     */
     readonly jsonPatchInner?: Array<JsonPatchInner>
 }
 
 /**
  * Request parameters for updateComment operation in CommentV1alpha1Api.
- * @export
- * @interface CommentV1alpha1ApiUpdateCommentRequest
  */
 export interface CommentV1alpha1ApiUpdateCommentRequest {
     /**
      * Name of comment
-     * @type {string}
-     * @memberof CommentV1alpha1ApiUpdateComment
      */
     readonly name: string
 
     /**
      * Updated comment
-     * @type {Comment}
-     * @memberof CommentV1alpha1ApiUpdateComment
      */
     readonly comment?: Comment
 }
 
 /**
  * CommentV1alpha1Api - object-oriented interface
- * @export
- * @class CommentV1alpha1Api
- * @extends {BaseAPI}
  */
 export class CommentV1alpha1Api extends BaseAPI {
     /**
@@ -601,7 +556,6 @@ export class CommentV1alpha1Api extends BaseAPI {
      * @param {CommentV1alpha1ApiCreateCommentRequest} requestParameters Request parameters.
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
-     * @memberof CommentV1alpha1Api
      */
     public createComment(requestParameters: CommentV1alpha1ApiCreateCommentRequest = {}, options?: RawAxiosRequestConfig) {
         return CommentV1alpha1ApiFp(this.configuration).createComment(requestParameters.comment, options).then((request) => request(this.axios, this.basePath));
@@ -612,7 +566,6 @@ export class CommentV1alpha1Api extends BaseAPI {
      * @param {CommentV1alpha1ApiDeleteCommentRequest} requestParameters Request parameters.
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
-     * @memberof CommentV1alpha1Api
      */
     public deleteComment(requestParameters: CommentV1alpha1ApiDeleteCommentRequest, options?: RawAxiosRequestConfig) {
         return CommentV1alpha1ApiFp(this.configuration).deleteComment(requestParameters.name, options).then((request) => request(this.axios, this.basePath));
@@ -623,7 +576,6 @@ export class CommentV1alpha1Api extends BaseAPI {
      * @param {CommentV1alpha1ApiGetCommentRequest} requestParameters Request parameters.
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
-     * @memberof CommentV1alpha1Api
      */
     public getComment(requestParameters: CommentV1alpha1ApiGetCommentRequest, options?: RawAxiosRequestConfig) {
         return CommentV1alpha1ApiFp(this.configuration).getComment(requestParameters.name, options).then((request) => request(this.axios, this.basePath));
@@ -634,7 +586,6 @@ export class CommentV1alpha1Api extends BaseAPI {
      * @param {CommentV1alpha1ApiListCommentRequest} requestParameters Request parameters.
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
-     * @memberof CommentV1alpha1Api
      */
     public listComment(requestParameters: CommentV1alpha1ApiListCommentRequest = {}, options?: RawAxiosRequestConfig) {
         return CommentV1alpha1ApiFp(this.configuration).listComment(requestParameters.page, requestParameters.size, requestParameters.labelSelector, requestParameters.fieldSelector, requestParameters.sort, options).then((request) => request(this.axios, this.basePath));
@@ -645,7 +596,6 @@ export class CommentV1alpha1Api extends BaseAPI {
      * @param {CommentV1alpha1ApiPatchCommentRequest} requestParameters Request parameters.
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
-     * @memberof CommentV1alpha1Api
      */
     public patchComment(requestParameters: CommentV1alpha1ApiPatchCommentRequest, options?: RawAxiosRequestConfig) {
         return CommentV1alpha1ApiFp(this.configuration).patchComment(requestParameters.name, requestParameters.jsonPatchInner, options).then((request) => request(this.axios, this.basePath));
@@ -656,7 +606,6 @@ export class CommentV1alpha1Api extends BaseAPI {
      * @param {CommentV1alpha1ApiUpdateCommentRequest} requestParameters Request parameters.
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
-     * @memberof CommentV1alpha1Api
      */
     public updateComment(requestParameters: CommentV1alpha1ApiUpdateCommentRequest, options?: RawAxiosRequestConfig) {
         return CommentV1alpha1ApiFp(this.configuration).updateComment(requestParameters.name, requestParameters.comment, options).then((request) => request(this.axios, this.basePath));

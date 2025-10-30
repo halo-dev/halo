@@ -1033,6 +1033,9 @@ core:
             button: 使用
     actions:
       extension-point-settings: 擴展配置
+    list:
+      fields:
+        system_reserved: 系統保留
   user:
     title: 用戶
     actions:

@@ -5,6 +5,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.List;
 import lombok.extern.slf4j.Slf4j;
+import org.jspecify.annotations.NonNull;
 import org.pf4j.DevelopmentPluginClasspath;
 import org.pf4j.PluginRuntimeException;
 import org.pf4j.util.FileUtils;
@@ -47,7 +48,7 @@ import run.halo.app.infra.utils.YamlUnstructuredLoader;
  * @since 2.0.0
  */
 @Slf4j
-public class YamlPluginFinder {
+public class YamlPluginFinder implements PluginFinder {
     static final DevelopmentPluginClasspath PLUGIN_CLASSPATH = new DevelopmentPluginClasspath();
     public static final String DEFAULT_PROPERTIES_FILE_NAME = "plugin.yaml";
     private final String propertiesFileName;
@@ -60,7 +61,9 @@ public class YamlPluginFinder {
         this.propertiesFileName = propertiesFileName;
     }
 
-    public Plugin find(Path pluginPath) {
+    @Override
+    @NonNull
+    public Plugin find(@NonNull Path pluginPath) {
         Plugin plugin = readPluginDescriptor(pluginPath);
         if (plugin.getStatus() == null) {
             Plugin.PluginStatus pluginStatus = new Plugin.PluginStatus();

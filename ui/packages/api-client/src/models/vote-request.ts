@@ -14,29 +14,9 @@
 
 
 
-/**
- * 
- * @export
- * @interface VoteRequest
- */
 export interface VoteRequest {
-    /**
-     * 
-     * @type {string}
-     * @memberof VoteRequest
-     */
     'group'?: string;
-    /**
-     * 
-     * @type {string}
-     * @memberof VoteRequest
-     */
     'name'?: string;
-    /**
-     * 
-     * @type {string}
-     * @memberof VoteRequest
-     */
     'plural'?: string;
 }
 

@@ -14,28 +14,14 @@
 
 
 
-/**
- * 
- * @export
- * @interface ReplaceOperation
- */
 export interface ReplaceOperation {
-    /**
-     * 
-     * @type {string}
-     * @memberof ReplaceOperation
-     */
     'op': ReplaceOperationOpEnum;
     /**
      * A JSON Pointer path pointing to the location to move/copy from.
-     * @type {string}
-     * @memberof ReplaceOperation
      */
     'path': string;
     /**
      * Value can be any JSON value
-     * @type {any}
-     * @memberof ReplaceOperation
      */
     'value': any;
 }

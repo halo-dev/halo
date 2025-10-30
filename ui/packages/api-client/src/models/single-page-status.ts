@@ -15,73 +15,21 @@
 
 // May contain unused imports in some cases
 // @ts-ignore
-import { Condition } from './condition';
+import type { Condition } from './condition';
 
-/**
- * 
- * @export
- * @interface SinglePageStatus
- */
 export interface SinglePageStatus {
-    /**
-     * 
-     * @type {number}
-     * @memberof SinglePageStatus
-     */
     'commentsCount'?: number;
-    /**
-     * 
-     * @type {Array<Condition>}
-     * @memberof SinglePageStatus
-     */
     'conditions'?: Array<Condition>;
-    /**
-     * 
-     * @type {Array<string>}
-     * @memberof SinglePageStatus
-     */
     'contributors'?: Array<string>;
-    /**
-     * 
-     * @type {string}
-     * @memberof SinglePageStatus
-     */
     'excerpt'?: string;
     /**
      * see {@link Category.CategorySpec#isHideFromList Category.CategorySpec#isHideFromList()}.
-     * @type {boolean}
-     * @memberof SinglePageStatus
      */
     'hideFromList'?: boolean;
-    /**
-     * 
-     * @type {boolean}
-     * @memberof SinglePageStatus
-     */
     'inProgress'?: boolean;
-    /**
-     * 
-     * @type {string}
-     * @memberof SinglePageStatus
-     */
     'lastModifyTime'?: string;
-    /**
-     * 
-     * @type {number}
-     * @memberof SinglePageStatus
-     */
     'observedVersion'?: number;
-    /**
-     * 
-     * @type {string}
-     * @memberof SinglePageStatus
-     */
     'permalink'?: string;
-    /**
-     * 
-     * @type {string}
-     * @memberof SinglePageStatus
-     */
     'phase'?: string;
 }
 

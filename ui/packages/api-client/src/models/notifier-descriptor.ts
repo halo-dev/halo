@@ -15,40 +15,18 @@
 
 // May contain unused imports in some cases
 // @ts-ignore
-import { Metadata } from './metadata';
+import type { Metadata } from './metadata';
 // May contain unused imports in some cases
 // @ts-ignore
-import { NotifierDescriptorSpec } from './notifier-descriptor-spec';
+import type { NotifierDescriptorSpec } from './notifier-descriptor-spec';
 
 /**
  * <p>{@link NotifierDescriptor NotifierDescriptor} is a custom extension that defines a notifier.</p>  <p>It describes the notifier\'s name, description, and the extension name of the notifier to  let the user know what the notifier is and what it can do in the UI and also let the  <code>NotificationCenter</code> know how to load the notifier and prepare the notifier\'s settings.</p>
- * @export
- * @interface NotifierDescriptor
  */
 export interface NotifierDescriptor {
-    /**
-     * 
-     * @type {string}
-     * @memberof NotifierDescriptor
-     */
     'apiVersion': string;
-    /**
-     * 
-     * @type {string}
-     * @memberof NotifierDescriptor
-     */
     'kind': string;
-    /**
-     * 
-     * @type {Metadata}
-     * @memberof NotifierDescriptor
-     */
     'metadata': Metadata;
-    /**
-     * 
-     * @type {NotifierDescriptorSpec}
-     * @memberof NotifierDescriptor
-     */
     'spec'?: NotifierDescriptorSpec;
 }
 

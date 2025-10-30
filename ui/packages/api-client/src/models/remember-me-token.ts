@@ -15,40 +15,15 @@
 
 // May contain unused imports in some cases
 // @ts-ignore
-import { Metadata } from './metadata';
+import type { Metadata } from './metadata';
 // May contain unused imports in some cases
 // @ts-ignore
-import { RememberMeTokenSpec } from './remember-me-token-spec';
+import type { RememberMeTokenSpec } from './remember-me-token-spec';
 
-/**
- * 
- * @export
- * @interface RememberMeToken
- */
 export interface RememberMeToken {
-    /**
-     * 
-     * @type {string}
-     * @memberof RememberMeToken
-     */
     'apiVersion': string;
-    /**
-     * 
-     * @type {string}
-     * @memberof RememberMeToken
-     */
     'kind': string;
-    /**
-     * 
-     * @type {Metadata}
-     * @memberof RememberMeToken
-     */
     'metadata': Metadata;
-    /**
-     * 
-     * @type {RememberMeTokenSpec}
-     * @memberof RememberMeToken
-     */
     'spec': RememberMeTokenSpec;
 }
 

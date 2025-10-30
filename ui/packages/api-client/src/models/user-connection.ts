@@ -15,40 +15,18 @@
 
 // May contain unused imports in some cases
 // @ts-ignore
-import { Metadata } from './metadata';
+import type { Metadata } from './metadata';
 // May contain unused imports in some cases
 // @ts-ignore
-import { UserConnectionSpec } from './user-connection-spec';
+import type { UserConnectionSpec } from './user-connection-spec';
 
 /**
  * User connection extension.
- * @export
- * @interface UserConnection
  */
 export interface UserConnection {
-    /**
-     * 
-     * @type {string}
-     * @memberof UserConnection
-     */
     'apiVersion': string;
-    /**
-     * 
-     * @type {string}
-     * @memberof UserConnection
-     */
     'kind': string;
-    /**
-     * 
-     * @type {Metadata}
-     * @memberof UserConnection
-     */
     'metadata': Metadata;
-    /**
-     * 
-     * @type {UserConnectionSpec}
-     * @memberof UserConnection
-     */
     'spec': UserConnectionSpec;
 }
 

@@ -14,17 +14,7 @@
 
 
 
-/**
- * 
- * @export
- * @interface RevertSnapshotForSingleParam
- */
 export interface RevertSnapshotForSingleParam {
-    /**
-     * 
-     * @type {string}
-     * @memberof RevertSnapshotForSingleParam
-     */
     'snapshotName': string;
 }
 

@@ -16,99 +16,22 @@
 
 /**
  * A listed value object for {@link run.halo.app.core.extension.AuthProvider run.halo.app.core.extension.AuthProvider}.
- * @export
- * @interface ListedAuthProvider
  */
 export interface ListedAuthProvider {
-    /**
-     * 
-     * @type {string}
-     * @memberof ListedAuthProvider
-     */
     'authType'?: ListedAuthProviderAuthTypeEnum;
-    /**
-     * 
-     * @type {string}
-     * @memberof ListedAuthProvider
-     */
     'authenticationUrl'?: string;
-    /**
-     * 
-     * @type {string}
-     * @memberof ListedAuthProvider
-     */
     'bindingUrl'?: string;
-    /**
-     * 
-     * @type {string}
-     * @memberof ListedAuthProvider
-     */
     'description'?: string;
-    /**
-     * 
-     * @type {string}
-     * @memberof ListedAuthProvider
-     */
     'displayName': string;
-    /**
-     * 
-     * @type {boolean}
-     * @memberof ListedAuthProvider
-     */
     'enabled'?: boolean;
-    /**
-     * 
-     * @type {string}
-     * @memberof ListedAuthProvider
-     */
     'helpPage'?: string;
-    /**
-     * 
-     * @type {boolean}
-     * @memberof ListedAuthProvider
-     */
     'isBound'?: boolean;
-    /**
-     * 
-     * @type {string}
-     * @memberof ListedAuthProvider
-     */
     'logo'?: string;
-    /**
-     * 
-     * @type {string}
-     * @memberof ListedAuthProvider
-     */
     'name': string;
-    /**
-     * 
-     * @type {number}
-     * @memberof ListedAuthProvider
-     */
     'priority'?: number;
-    /**
-     * 
-     * @type {boolean}
-     * @memberof ListedAuthProvider
-     */
     'privileged'?: boolean;
-    /**
-     * 
-     * @type {boolean}
-     * @memberof ListedAuthProvider
-     */
     'supportsBinding'?: boolean;
-    /**
-     * 
-     * @type {string}
-     * @memberof ListedAuthProvider
-     */
     'unbindingUrl'?: string;
-    /**
-     * 
-     * @type {string}
-     * @memberof ListedAuthProvider
-     */
     'website'?: string;
 }
 

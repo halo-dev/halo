@@ -20,16 +20,15 @@ import globalAxios from 'axios';
 // @ts-ignore
 import { DUMMY_BASE_URL, assertParamExists, setApiKeyToObject, setBasicAuthToObject, setBearerAuthToObject, setOAuthToObject, setSearchParams, serializeDataIfNeeded, toPathString, createRequestFunction } from '../common';
 // @ts-ignore
-import { BASE_PATH, COLLECTION_FORMATS, RequestArgs, BaseAPI, RequiredError, operationServerMap } from '../base';
+import { BASE_PATH, COLLECTION_FORMATS, type RequestArgs, BaseAPI, RequiredError, operationServerMap } from '../base';
 // @ts-ignore
-import { JsonPatchInner } from '../models';
+import type { JsonPatchInner } from '../models';
 // @ts-ignore
-import { LocalThumbnail } from '../models';
+import type { LocalThumbnail } from '../models';
 // @ts-ignore
-import { LocalThumbnailList } from '../models';
+import type { LocalThumbnailList } from '../models';
 /**
  * LocalThumbnailV1alpha1Api - axios parameter creator
- * @export
  */
 export const LocalThumbnailV1alpha1ApiAxiosParamCreator = function (configuration?: Configuration) {
     return {
@@ -313,7 +312,6 @@ export const LocalThumbnailV1alpha1ApiAxiosParamCreator = function (configuratio
 
 /**
  * LocalThumbnailV1alpha1Api - functional programming interface
- * @export
  */
 export const LocalThumbnailV1alpha1ApiFp = function(configuration?: Configuration) {
     const localVarAxiosParamCreator = LocalThumbnailV1alpha1ApiAxiosParamCreator(configuration)
@@ -401,7 +399,6 @@ export const LocalThumbnailV1alpha1ApiFp = function(configuration?: Configuratio
 
 /**
  * LocalThumbnailV1alpha1Api - factory interface
- * @export
  */
 export const LocalThumbnailV1alpha1ApiFactory = function (configuration?: Configuration, basePath?: string, axios?: AxiosInstance) {
     const localVarFp = LocalThumbnailV1alpha1ApiFp(configuration)
@@ -465,135 +462,93 @@ export const LocalThumbnailV1alpha1ApiFactory = function (configuration?: Config
 
 /**
  * Request parameters for createLocalThumbnail operation in LocalThumbnailV1alpha1Api.
- * @export
- * @interface LocalThumbnailV1alpha1ApiCreateLocalThumbnailRequest
  */
 export interface LocalThumbnailV1alpha1ApiCreateLocalThumbnailRequest {
     /**
      * Fresh localthumbnail
-     * @type {LocalThumbnail}
-     * @memberof LocalThumbnailV1alpha1ApiCreateLocalThumbnail
      */
     readonly localThumbnail?: LocalThumbnail
 }
 
 /**
  * Request parameters for deleteLocalThumbnail operation in LocalThumbnailV1alpha1Api.
- * @export
- * @interface LocalThumbnailV1alpha1ApiDeleteLocalThumbnailRequest
  */
 export interface LocalThumbnailV1alpha1ApiDeleteLocalThumbnailRequest {
     /**
      * Name of localthumbnail
-     * @type {string}
-     * @memberof LocalThumbnailV1alpha1ApiDeleteLocalThumbnail
      */
     readonly name: string
 }
 
 /**
  * Request parameters for getLocalThumbnail operation in LocalThumbnailV1alpha1Api.
- * @export
- * @interface LocalThumbnailV1alpha1ApiGetLocalThumbnailRequest
  */
 export interface LocalThumbnailV1alpha1ApiGetLocalThumbnailRequest {
     /**
      * Name of localthumbnail
-     * @type {string}
-     * @memberof LocalThumbnailV1alpha1ApiGetLocalThumbnail
      */
     readonly name: string
 }
 
 /**
  * Request parameters for listLocalThumbnail operation in LocalThumbnailV1alpha1Api.
- * @export
- * @interface LocalThumbnailV1alpha1ApiListLocalThumbnailRequest
  */
 export interface LocalThumbnailV1alpha1ApiListLocalThumbnailRequest {
     /**
      * Page number. Default is 0.
-     * @type {number}
-     * @memberof LocalThumbnailV1alpha1ApiListLocalThumbnail
      */
     readonly page?: number
 
     /**
      * Size number. Default is 0.
-     * @type {number}
-     * @memberof LocalThumbnailV1alpha1ApiListLocalThumbnail
      */
     readonly size?: number
 
     /**
      * Label selector. e.g.: hidden!&#x3D;true
-     * @type {Array<string>}
-     * @memberof LocalThumbnailV1alpha1ApiListLocalThumbnail
      */
     readonly labelSelector?: Array<string>
 
     /**
      * Field selector. e.g.: metadata.name&#x3D;&#x3D;halo
-     * @type {Array<string>}
-     * @memberof LocalThumbnailV1alpha1ApiListLocalThumbnail
      */
     readonly fieldSelector?: Array<string>
 
     /**
      * Sorting criteria in the format: property,(asc|desc). Default sort order is ascending. Multiple sort criteria are supported.
-     * @type {Array<string>}
-     * @memberof LocalThumbnailV1alpha1ApiListLocalThumbnail
      */
     readonly sort?: Array<string>
 }
 
 /**
  * Request parameters for patchLocalThumbnail operation in LocalThumbnailV1alpha1Api.
- * @export
- * @interface LocalThumbnailV1alpha1ApiPatchLocalThumbnailRequest
  */
 export interface LocalThumbnailV1alpha1ApiPatchLocalThumbnailRequest {
     /**
      * Name of localthumbnail
-     * @type {string}
-     * @memberof LocalThumbnailV1alpha1ApiPatchLocalThumbnail
      */
     readonly name: string
 
-    /**
-     * 
-     * @type {Array<JsonPatchInner>}
-     * @memberof LocalThumbnailV1alpha1ApiPatchLocalThumbnail
-     */
     readonly jsonPatchInner?: Array<JsonPatchInner>
 }
 
 /**
  * Request parameters for updateLocalThumbnail operation in LocalThumbnailV1alpha1Api.
- * @export
- * @interface LocalThumbnailV1alpha1ApiUpdateLocalThumbnailRequest
  */
 export interface LocalThumbnailV1alpha1ApiUpdateLocalThumbnailRequest {
     /**
      * Name of localthumbnail
-     * @type {string}
-     * @memberof LocalThumbnailV1alpha1ApiUpdateLocalThumbnail
      */
     readonly name: string
 
     /**
      * Updated localthumbnail
-     * @type {LocalThumbnail}
-     * @memberof LocalThumbnailV1alpha1ApiUpdateLocalThumbnail
      */
     readonly localThumbnail?: LocalThumbnail
 }
 
 /**
  * LocalThumbnailV1alpha1Api - object-oriented interface
- * @export
- * @class LocalThumbnailV1alpha1Api
- * @extends {BaseAPI}
  */
 export class LocalThumbnailV1alpha1Api extends BaseAPI {
     /**
@@ -601,7 +556,6 @@ export class LocalThumbnailV1alpha1Api extends BaseAPI {
      * @param {LocalThumbnailV1alpha1ApiCreateLocalThumbnailRequest} requestParameters Request parameters.
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
-     * @memberof LocalThumbnailV1alpha1Api
      */
     public createLocalThumbnail(requestParameters: LocalThumbnailV1alpha1ApiCreateLocalThumbnailRequest = {}, options?: RawAxiosRequestConfig) {
         return LocalThumbnailV1alpha1ApiFp(this.configuration).createLocalThumbnail(requestParameters.localThumbnail, options).then((request) => request(this.axios, this.basePath));
@@ -612,7 +566,6 @@ export class LocalThumbnailV1alpha1Api extends BaseAPI {
      * @param {LocalThumbnailV1alpha1ApiDeleteLocalThumbnailRequest} requestParameters Request parameters.
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
-     * @memberof LocalThumbnailV1alpha1Api
      */
     public deleteLocalThumbnail(requestParameters: LocalThumbnailV1alpha1ApiDeleteLocalThumbnailRequest, options?: RawAxiosRequestConfig) {
         return LocalThumbnailV1alpha1ApiFp(this.configuration).deleteLocalThumbnail(requestParameters.name, options).then((request) => request(this.axios, this.basePath));
@@ -623,7 +576,6 @@ export class LocalThumbnailV1alpha1Api extends BaseAPI {
      * @param {LocalThumbnailV1alpha1ApiGetLocalThumbnailRequest} requestParameters Request parameters.
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
-     * @memberof LocalThumbnailV1alpha1Api
      */
     public getLocalThumbnail(requestParameters: LocalThumbnailV1alpha1ApiGetLocalThumbnailRequest, options?: RawAxiosRequestConfig) {
         return LocalThumbnailV1alpha1ApiFp(this.configuration).getLocalThumbnail(requestParameters.name, options).then((request) => request(this.axios, this.basePath));
@@ -634,7 +586,6 @@ export class LocalThumbnailV1alpha1Api extends BaseAPI {
      * @param {LocalThumbnailV1alpha1ApiListLocalThumbnailRequest} requestParameters Request parameters.
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
-     * @memberof LocalThumbnailV1alpha1Api
      */
     public listLocalThumbnail(requestParameters: LocalThumbnailV1alpha1ApiListLocalThumbnailRequest = {}, options?: RawAxiosRequestConfig) {
         return LocalThumbnailV1alpha1ApiFp(this.configuration).listLocalThumbnail(requestParameters.page, requestParameters.size, requestParameters.labelSelector, requestParameters.fieldSelector, requestParameters.sort, options).then((request) => request(this.axios, this.basePath));
@@ -645,7 +596,6 @@ export class LocalThumbnailV1alpha1Api extends BaseAPI {
      * @param {LocalThumbnailV1alpha1ApiPatchLocalThumbnailRequest} requestParameters Request parameters.
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
-     * @memberof LocalThumbnailV1alpha1Api
      */
     public patchLocalThumbnail(requestParameters: LocalThumbnailV1alpha1ApiPatchLocalThumbnailRequest, options?: RawAxiosRequestConfig) {
         return LocalThumbnailV1alpha1ApiFp(this.configuration).patchLocalThumbnail(requestParameters.name, requestParameters.jsonPatchInner, options).then((request) => request(this.axios, this.basePath));
@@ -656,7 +606,6 @@ export class LocalThumbnailV1alpha1Api extends BaseAPI {
      * @param {LocalThumbnailV1alpha1ApiUpdateLocalThumbnailRequest} requestParameters Request parameters.
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
-     * @memberof LocalThumbnailV1alpha1Api
      */
     public updateLocalThumbnail(requestParameters: LocalThumbnailV1alpha1ApiUpdateLocalThumbnailRequest, options?: RawAxiosRequestConfig) {
         return LocalThumbnailV1alpha1ApiFp(this.configuration).updateLocalThumbnail(requestParameters.name, requestParameters.localThumbnail, options).then((request) => request(this.axios, this.basePath));

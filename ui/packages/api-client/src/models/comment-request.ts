@@ -15,52 +15,20 @@
 
 // May contain unused imports in some cases
 // @ts-ignore
-import { CommentEmailOwner } from './comment-email-owner';
+import type { CommentEmailOwner } from './comment-email-owner';
 // May contain unused imports in some cases
 // @ts-ignore
-import { Ref } from './ref';
+import type { Ref } from './ref';
 
 /**
  * Request parameter object for {@link Comment Comment}.
- * @export
- * @interface CommentRequest
  */
 export interface CommentRequest {
-    /**
-     * 
-     * @type {boolean}
-     * @memberof CommentRequest
-     */
     'allowNotification'?: boolean;
-    /**
-     * 
-     * @type {string}
-     * @memberof CommentRequest
-     */
     'content': string;
-    /**
-     * 
-     * @type {boolean}
-     * @memberof CommentRequest
-     */
     'hidden'?: boolean;
-    /**
-     * 
-     * @type {CommentEmailOwner}
-     * @memberof CommentRequest
-     */
     'owner'?: CommentEmailOwner;
-    /**
-     * 
-     * @type {string}
-     * @memberof CommentRequest
-     */
     'raw': string;
-    /**
-     * 
-     * @type {Ref}
-     * @memberof CommentRequest
-     */
     'subjectRef': Ref;
 }
 

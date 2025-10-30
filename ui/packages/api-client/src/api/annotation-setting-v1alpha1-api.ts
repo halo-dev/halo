@@ -20,16 +20,15 @@ import globalAxios from 'axios';
 // @ts-ignore
 import { DUMMY_BASE_URL, assertParamExists, setApiKeyToObject, setBasicAuthToObject, setBearerAuthToObject, setOAuthToObject, setSearchParams, serializeDataIfNeeded, toPathString, createRequestFunction } from '../common';
 // @ts-ignore
-import { BASE_PATH, COLLECTION_FORMATS, RequestArgs, BaseAPI, RequiredError, operationServerMap } from '../base';
+import { BASE_PATH, COLLECTION_FORMATS, type RequestArgs, BaseAPI, RequiredError, operationServerMap } from '../base';
 // @ts-ignore
-import { AnnotationSetting } from '../models';
+import type { AnnotationSetting } from '../models';
 // @ts-ignore
-import { AnnotationSettingList } from '../models';
+import type { AnnotationSettingList } from '../models';
 // @ts-ignore
-import { JsonPatchInner } from '../models';
+import type { JsonPatchInner } from '../models';
 /**
  * AnnotationSettingV1alpha1Api - axios parameter creator
- * @export
  */
 export const AnnotationSettingV1alpha1ApiAxiosParamCreator = function (configuration?: Configuration) {
     return {
@@ -313,7 +312,6 @@ export const AnnotationSettingV1alpha1ApiAxiosParamCreator = function (configura
 
 /**
  * AnnotationSettingV1alpha1Api - functional programming interface
- * @export
  */
 export const AnnotationSettingV1alpha1ApiFp = function(configuration?: Configuration) {
     const localVarAxiosParamCreator = AnnotationSettingV1alpha1ApiAxiosParamCreator(configuration)
@@ -401,7 +399,6 @@ export const AnnotationSettingV1alpha1ApiFp = function(configuration?: Configura
 
 /**
  * AnnotationSettingV1alpha1Api - factory interface
- * @export
  */
 export const AnnotationSettingV1alpha1ApiFactory = function (configuration?: Configuration, basePath?: string, axios?: AxiosInstance) {
     const localVarFp = AnnotationSettingV1alpha1ApiFp(configuration)
@@ -465,135 +462,93 @@ export const AnnotationSettingV1alpha1ApiFactory = function (configuration?: Con
 
 /**
  * Request parameters for createAnnotationSetting operation in AnnotationSettingV1alpha1Api.
- * @export
- * @interface AnnotationSettingV1alpha1ApiCreateAnnotationSettingRequest
  */
 export interface AnnotationSettingV1alpha1ApiCreateAnnotationSettingRequest {
     /**
      * Fresh annotationsetting
-     * @type {AnnotationSetting}
-     * @memberof AnnotationSettingV1alpha1ApiCreateAnnotationSetting
      */
     readonly annotationSetting?: AnnotationSetting
 }
 
 /**
  * Request parameters for deleteAnnotationSetting operation in AnnotationSettingV1alpha1Api.
- * @export
- * @interface AnnotationSettingV1alpha1ApiDeleteAnnotationSettingRequest
  */
 export interface AnnotationSettingV1alpha1ApiDeleteAnnotationSettingRequest {
     /**
      * Name of annotationsetting
-     * @type {string}
-     * @memberof AnnotationSettingV1alpha1ApiDeleteAnnotationSetting
      */
     readonly name: string
 }
 
 /**
  * Request parameters for getAnnotationSetting operation in AnnotationSettingV1alpha1Api.
- * @export
- * @interface AnnotationSettingV1alpha1ApiGetAnnotationSettingRequest
  */
 export interface AnnotationSettingV1alpha1ApiGetAnnotationSettingRequest {
     /**
      * Name of annotationsetting
-     * @type {string}
-     * @memberof AnnotationSettingV1alpha1ApiGetAnnotationSetting
      */
     readonly name: string
 }
 
 /**
  * Request parameters for listAnnotationSetting operation in AnnotationSettingV1alpha1Api.
- * @export
- * @interface AnnotationSettingV1alpha1ApiListAnnotationSettingRequest
  */
 export interface AnnotationSettingV1alpha1ApiListAnnotationSettingRequest {
     /**
      * Page number. Default is 0.
-     * @type {number}
-     * @memberof AnnotationSettingV1alpha1ApiListAnnotationSetting
      */
     readonly page?: number
 
     /**
      * Size number. Default is 0.
-     * @type {number}
-     * @memberof AnnotationSettingV1alpha1ApiListAnnotationSetting
      */
     readonly size?: number
 
     /**
      * Label selector. e.g.: hidden!&#x3D;true
-     * @type {Array<string>}
-     * @memberof AnnotationSettingV1alpha1ApiListAnnotationSetting
      */
     readonly labelSelector?: Array<string>
 
     /**
      * Field selector. e.g.: metadata.name&#x3D;&#x3D;halo
-     * @type {Array<string>}
-     * @memberof AnnotationSettingV1alpha1ApiListAnnotationSetting
      */
     readonly fieldSelector?: Array<string>
 
     /**
      * Sorting criteria in the format: property,(asc|desc). Default sort order is ascending. Multiple sort criteria are supported.
-     * @type {Array<string>}
-     * @memberof AnnotationSettingV1alpha1ApiListAnnotationSetting
      */
     readonly sort?: Array<string>
 }
 
 /**
  * Request parameters for patchAnnotationSetting operation in AnnotationSettingV1alpha1Api.
- * @export
- * @interface AnnotationSettingV1alpha1ApiPatchAnnotationSettingRequest
  */
 export interface AnnotationSettingV1alpha1ApiPatchAnnotationSettingRequest {
     /**
      * Name of annotationsetting
-     * @type {string}
-     * @memberof AnnotationSettingV1alpha1ApiPatchAnnotationSetting
      */
     readonly name: string
 
-    /**
-     * 
-     * @type {Array<JsonPatchInner>}
-     * @memberof AnnotationSettingV1alpha1ApiPatchAnnotationSetting
-     */
     readonly jsonPatchInner?: Array<JsonPatchInner>
 }
 
 /**
  * Request parameters for updateAnnotationSetting operation in AnnotationSettingV1alpha1Api.
- * @export
- * @interface AnnotationSettingV1alpha1ApiUpdateAnnotationSettingRequest
  */
 export interface AnnotationSettingV1alpha1ApiUpdateAnnotationSettingRequest {
     /**
      * Name of annotationsetting
-     * @type {string}
-     * @memberof AnnotationSettingV1alpha1ApiUpdateAnnotationSetting
      */
     readonly name: string
 
     /**
      * Updated annotationsetting
-     * @type {AnnotationSetting}
-     * @memberof AnnotationSettingV1alpha1ApiUpdateAnnotationSetting
      */
     readonly annotationSetting?: AnnotationSetting
 }
 
 /**
  * AnnotationSettingV1alpha1Api - object-oriented interface
- * @export
- * @class AnnotationSettingV1alpha1Api
- * @extends {BaseAPI}
  */
 export class AnnotationSettingV1alpha1Api extends BaseAPI {
     /**
@@ -601,7 +556,6 @@ export class AnnotationSettingV1alpha1Api extends BaseAPI {
      * @param {AnnotationSettingV1alpha1ApiCreateAnnotationSettingRequest} requestParameters Request parameters.
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
-     * @memberof AnnotationSettingV1alpha1Api
      */
     public createAnnotationSetting(requestParameters: AnnotationSettingV1alpha1ApiCreateAnnotationSettingRequest = {}, options?: RawAxiosRequestConfig) {
         return AnnotationSettingV1alpha1ApiFp(this.configuration).createAnnotationSetting(requestParameters.annotationSetting, options).then((request) => request(this.axios, this.basePath));
@@ -612,7 +566,6 @@ export class AnnotationSettingV1alpha1Api extends BaseAPI {
      * @param {AnnotationSettingV1alpha1ApiDeleteAnnotationSettingRequest} requestParameters Request parameters.
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
-     * @memberof AnnotationSettingV1alpha1Api
      */
     public deleteAnnotationSetting(requestParameters: AnnotationSettingV1alpha1ApiDeleteAnnotationSettingRequest, options?: RawAxiosRequestConfig) {
         return AnnotationSettingV1alpha1ApiFp(this.configuration).deleteAnnotationSetting(requestParameters.name, options).then((request) => request(this.axios, this.basePath));
@@ -623,7 +576,6 @@ export class AnnotationSettingV1alpha1Api extends BaseAPI {
      * @param {AnnotationSettingV1alpha1ApiGetAnnotationSettingRequest} requestParameters Request parameters.
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
-     * @memberof AnnotationSettingV1alpha1Api
      */
     public getAnnotationSetting(requestParameters: AnnotationSettingV1alpha1ApiGetAnnotationSettingRequest, options?: RawAxiosRequestConfig) {
         return AnnotationSettingV1alpha1ApiFp(this.configuration).getAnnotationSetting(requestParameters.name, options).then((request) => request(this.axios, this.basePath));
@@ -634,7 +586,6 @@ export class AnnotationSettingV1alpha1Api extends BaseAPI {
      * @param {AnnotationSettingV1alpha1ApiListAnnotationSettingRequest} requestParameters Request parameters.
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
-     * @memberof AnnotationSettingV1alpha1Api
      */
     public listAnnotationSetting(requestParameters: AnnotationSettingV1alpha1ApiListAnnotationSettingRequest = {}, options?: RawAxiosRequestConfig) {
         return AnnotationSettingV1alpha1ApiFp(this.configuration).listAnnotationSetting(requestParameters.page, requestParameters.size, requestParameters.labelSelector, requestParameters.fieldSelector, requestParameters.sort, options).then((request) => request(this.axios, this.basePath));
@@ -645,7 +596,6 @@ export class AnnotationSettingV1alpha1Api extends BaseAPI {
      * @param {AnnotationSettingV1alpha1ApiPatchAnnotationSettingRequest} requestParameters Request parameters.
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
-     * @memberof AnnotationSettingV1alpha1Api
      */
     public patchAnnotationSetting(requestParameters: AnnotationSettingV1alpha1ApiPatchAnnotationSettingRequest, options?: RawAxiosRequestConfig) {
         return AnnotationSettingV1alpha1ApiFp(this.configuration).patchAnnotationSetting(requestParameters.name, requestParameters.jsonPatchInner, options).then((request) => request(this.axios, this.basePath));
@@ -656,7 +606,6 @@ export class AnnotationSettingV1alpha1Api extends BaseAPI {
      * @param {AnnotationSettingV1alpha1ApiUpdateAnnotationSettingRequest} requestParameters Request parameters.
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
-     * @memberof AnnotationSettingV1alpha1Api
      */
     public updateAnnotationSetting(requestParameters: AnnotationSettingV1alpha1ApiUpdateAnnotationSettingRequest, options?: RawAxiosRequestConfig) {
         return AnnotationSettingV1alpha1ApiFp(this.configuration).updateAnnotationSetting(requestParameters.name, requestParameters.annotationSetting, options).then((request) => request(this.axios, this.basePath));

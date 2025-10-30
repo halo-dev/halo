@@ -14,35 +14,10 @@
 
 
 
-/**
- * 
- * @export
- * @interface TagStatus
- */
 export interface TagStatus {
-    /**
-     * 
-     * @type {number}
-     * @memberof TagStatus
-     */
     'observedVersion'?: number;
-    /**
-     * 
-     * @type {string}
-     * @memberof TagStatus
-     */
     'permalink'?: string;
-    /**
-     * 
-     * @type {number}
-     * @memberof TagStatus
-     */
     'postCount'?: number;
-    /**
-     * 
-     * @type {number}
-     * @memberof TagStatus
-     */
     'visiblePostCount'?: number;
 }
 

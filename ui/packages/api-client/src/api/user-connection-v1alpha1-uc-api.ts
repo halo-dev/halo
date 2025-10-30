@@ -20,12 +20,11 @@ import globalAxios from 'axios';
 // @ts-ignore
 import { DUMMY_BASE_URL, assertParamExists, setApiKeyToObject, setBasicAuthToObject, setBearerAuthToObject, setOAuthToObject, setSearchParams, serializeDataIfNeeded, toPathString, createRequestFunction } from '../common';
 // @ts-ignore
-import { BASE_PATH, COLLECTION_FORMATS, RequestArgs, BaseAPI, RequiredError, operationServerMap } from '../base';
+import { BASE_PATH, COLLECTION_FORMATS, type RequestArgs, BaseAPI, RequiredError, operationServerMap } from '../base';
 // @ts-ignore
-import { UserConnection } from '../models';
+import type { UserConnection } from '../models';
 /**
  * UserConnectionV1alpha1UcApi - axios parameter creator
- * @export
  */
 export const UserConnectionV1alpha1UcApiAxiosParamCreator = function (configuration?: Configuration) {
     return {
@@ -75,7 +74,6 @@ export const UserConnectionV1alpha1UcApiAxiosParamCreator = function (configurat
 
 /**
  * UserConnectionV1alpha1UcApi - functional programming interface
- * @export
  */
 export const UserConnectionV1alpha1UcApiFp = function(configuration?: Configuration) {
     const localVarAxiosParamCreator = UserConnectionV1alpha1UcApiAxiosParamCreator(configuration)
@@ -97,7 +95,6 @@ export const UserConnectionV1alpha1UcApiFp = function(configuration?: Configurat
 
 /**
  * UserConnectionV1alpha1UcApi - factory interface
- * @export
  */
 export const UserConnectionV1alpha1UcApiFactory = function (configuration?: Configuration, basePath?: string, axios?: AxiosInstance) {
     const localVarFp = UserConnectionV1alpha1UcApiFp(configuration)
@@ -116,23 +113,16 @@ export const UserConnectionV1alpha1UcApiFactory = function (configuration?: Conf
 
 /**
  * Request parameters for disconnectMyConnection operation in UserConnectionV1alpha1UcApi.
- * @export
- * @interface UserConnectionV1alpha1UcApiDisconnectMyConnectionRequest
  */
 export interface UserConnectionV1alpha1UcApiDisconnectMyConnectionRequest {
     /**
      * The registration ID of the third-party platform.
-     * @type {string}
-     * @memberof UserConnectionV1alpha1UcApiDisconnectMyConnection
      */
     readonly registerId: string
 }
 
 /**
  * UserConnectionV1alpha1UcApi - object-oriented interface
- * @export
- * @class UserConnectionV1alpha1UcApi
- * @extends {BaseAPI}
  */
 export class UserConnectionV1alpha1UcApi extends BaseAPI {
     /**
@@ -140,7 +130,6 @@ export class UserConnectionV1alpha1UcApi extends BaseAPI {
      * @param {UserConnectionV1alpha1UcApiDisconnectMyConnectionRequest} requestParameters Request parameters.
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
-     * @memberof UserConnectionV1alpha1UcApi
      */
     public disconnectMyConnection(requestParameters: UserConnectionV1alpha1UcApiDisconnectMyConnectionRequest, options?: RawAxiosRequestConfig) {
         return UserConnectionV1alpha1UcApiFp(this.configuration).disconnectMyConnection(requestParameters.registerId, options).then((request) => request(this.axios, this.basePath));

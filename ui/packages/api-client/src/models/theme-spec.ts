@@ -15,97 +15,27 @@
 
 // May contain unused imports in some cases
 // @ts-ignore
-import { Author } from './author';
+import type { Author } from './author';
 // May contain unused imports in some cases
 // @ts-ignore
-import { CustomTemplates } from './custom-templates';
+import type { CustomTemplates } from './custom-templates';
 // May contain unused imports in some cases
 // @ts-ignore
-import { License } from './license';
+import type { License } from './license';
 
-/**
- * 
- * @export
- * @interface ThemeSpec
- */
 export interface ThemeSpec {
-    /**
-     * 
-     * @type {Author}
-     * @memberof ThemeSpec
-     */
     'author': Author;
-    /**
-     * 
-     * @type {string}
-     * @memberof ThemeSpec
-     */
     'configMapName'?: string;
-    /**
-     * 
-     * @type {CustomTemplates}
-     * @memberof ThemeSpec
-     */
     'customTemplates'?: CustomTemplates;
-    /**
-     * 
-     * @type {string}
-     * @memberof ThemeSpec
-     */
     'description'?: string;
-    /**
-     * 
-     * @type {string}
-     * @memberof ThemeSpec
-     */
     'displayName': string;
-    /**
-     * 
-     * @type {string}
-     * @memberof ThemeSpec
-     */
     'homepage'?: string;
-    /**
-     * 
-     * @type {string}
-     * @memberof ThemeSpec
-     */
     'issues'?: string;
-    /**
-     * 
-     * @type {Array<License>}
-     * @memberof ThemeSpec
-     */
     'license'?: Array<License>;
-    /**
-     * 
-     * @type {string}
-     * @memberof ThemeSpec
-     */
     'logo'?: string;
-    /**
-     * 
-     * @type {string}
-     * @memberof ThemeSpec
-     */
     'repo'?: string;
-    /**
-     * 
-     * @type {string}
-     * @memberof ThemeSpec
-     */
     'requires'?: string;
-    /**
-     * 
-     * @type {string}
-     * @memberof ThemeSpec
-     */
     'settingName'?: string;
-    /**
-     * 
-     * @type {string}
-     * @memberof ThemeSpec
-     */
     'version'?: string;
 }
 

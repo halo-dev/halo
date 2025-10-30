@@ -15,28 +15,16 @@
 
 // May contain unused imports in some cases
 // @ts-ignore
-import { ContentUpdateParam } from './content-update-param';
+import type { ContentUpdateParam } from './content-update-param';
 // May contain unused imports in some cases
 // @ts-ignore
-import { Post } from './post';
+import type { Post } from './post';
 
 /**
  * Post and content data for creating and updating post.
- * @export
- * @interface PostRequest
  */
 export interface PostRequest {
-    /**
-     * 
-     * @type {ContentUpdateParam}
-     * @memberof PostRequest
-     */
     'content'?: ContentUpdateParam;
-    /**
-     * 
-     * @type {Post}
-     * @memberof PostRequest
-     */
     'post': Post;
 }
 

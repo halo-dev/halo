@@ -20,10 +20,9 @@ import globalAxios from 'axios';
 // @ts-ignore
 import { DUMMY_BASE_URL, assertParamExists, setApiKeyToObject, setBasicAuthToObject, setBearerAuthToObject, setOAuthToObject, setSearchParams, serializeDataIfNeeded, toPathString, createRequestFunction } from '../common';
 // @ts-ignore
-import { BASE_PATH, COLLECTION_FORMATS, RequestArgs, BaseAPI, RequiredError, operationServerMap } from '../base';
+import { BASE_PATH, COLLECTION_FORMATS, type RequestArgs, BaseAPI, RequiredError, operationServerMap } from '../base';
 /**
  * ThumbnailV1alpha1PublicApi - axios parameter creator
- * @export
  */
 export const ThumbnailV1alpha1PublicApiAxiosParamCreator = function (configuration?: Configuration) {
     return {
@@ -31,10 +30,11 @@ export const ThumbnailV1alpha1PublicApiAxiosParamCreator = function (configurati
          * Get thumbnail by URI
          * @param {string} uri The URI of the image
          * @param {GetThumbnailByUriSizeEnum} size The size of the thumbnail
+         * @param {GetThumbnailByUriWidthEnum} [width] The width of the thumbnail, if \&#39;size\&#39; is not provided, this parameter will be used to determine the size
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        getThumbnailByUri: async (uri: string, size: GetThumbnailByUriSizeEnum, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+        getThumbnailByUri: async (uri: string, size: GetThumbnailByUriSizeEnum, width?: GetThumbnailByUriWidthEnum, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
             // verify required parameter 'uri' is not null or undefined
             assertParamExists('getThumbnailByUri', 'uri', uri)
             // verify required parameter 'size' is not null or undefined
@@ -67,6 +67,10 @@ export const ThumbnailV1alpha1PublicApiAxiosParamCreator = function (configurati
                 localVarQueryParameter['size'] = size;
             }
 
+            if (width !== undefined) {
+                localVarQueryParameter['width'] = width;
+            }
+
 
     
             setSearchParams(localVarUrlObj, localVarQueryParameter);
@@ -83,7 +87,6 @@ export const ThumbnailV1alpha1PublicApiAxiosParamCreator = function (configurati
 
 /**
  * ThumbnailV1alpha1PublicApi - functional programming interface
- * @export
  */
 export const ThumbnailV1alpha1PublicApiFp = function(configuration?: Configuration) {
     const localVarAxiosParamCreator = ThumbnailV1alpha1PublicApiAxiosParamCreator(configuration)
@@ -92,11 +95,12 @@ export const ThumbnailV1alpha1PublicApiFp = function(configuration?: Configurati
          * Get thumbnail by URI
          * @param {string} uri The URI of the image
          * @param {GetThumbnailByUriSizeEnum} size The size of the thumbnail
+         * @param {GetThumbnailByUriWidthEnum} [width] The width of the thumbnail, if \&#39;size\&#39; is not provided, this parameter will be used to determine the size
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async getThumbnailByUri(uri: string, size: GetThumbnailByUriSizeEnum, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<File>> {
-            const localVarAxiosArgs = await localVarAxiosParamCreator.getThumbnailByUri(uri, size, options);
+        async getThumbnailByUri(uri: string, size: GetThumbnailByUriSizeEnum, width?: GetThumbnailByUriWidthEnum, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<File>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.getThumbnailByUri(uri, size, width, options);
             const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
             const localVarOperationServerBasePath = operationServerMap['ThumbnailV1alpha1PublicApi.getThumbnailByUri']?.[localVarOperationServerIndex]?.url;
             return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
@@ -106,7 +110,6 @@ export const ThumbnailV1alpha1PublicApiFp = function(configuration?: Configurati
 
 /**
  * ThumbnailV1alpha1PublicApi - factory interface
- * @export
  */
 export const ThumbnailV1alpha1PublicApiFactory = function (configuration?: Configuration, basePath?: string, axios?: AxiosInstance) {
     const localVarFp = ThumbnailV1alpha1PublicApiFp(configuration)
@@ -118,37 +121,33 @@ export const ThumbnailV1alpha1PublicApiFactory = function (configuration?: Confi
          * @throws {RequiredError}
          */
         getThumbnailByUri(requestParameters: ThumbnailV1alpha1PublicApiGetThumbnailByUriRequest, options?: RawAxiosRequestConfig): AxiosPromise<File> {
-            return localVarFp.getThumbnailByUri(requestParameters.uri, requestParameters.size, options).then((request) => request(axios, basePath));
+            return localVarFp.getThumbnailByUri(requestParameters.uri, requestParameters.size, requestParameters.width, options).then((request) => request(axios, basePath));
         },
     };
 };
 
 /**
  * Request parameters for getThumbnailByUri operation in ThumbnailV1alpha1PublicApi.
- * @export
- * @interface ThumbnailV1alpha1PublicApiGetThumbnailByUriRequest
  */
 export interface ThumbnailV1alpha1PublicApiGetThumbnailByUriRequest {
     /**
      * The URI of the image
-     * @type {string}
-     * @memberof ThumbnailV1alpha1PublicApiGetThumbnailByUri
      */
     readonly uri: string
 
     /**
      * The size of the thumbnail
-     * @type {'S' | 'M' | 'L' | 'XL'}
-     * @memberof ThumbnailV1alpha1PublicApiGetThumbnailByUri
      */
     readonly size: GetThumbnailByUriSizeEnum
+
+    /**
+     * The width of the thumbnail, if \&#39;size\&#39; is not provided, this parameter will be used to determine the size
+     */
+    readonly width?: GetThumbnailByUriWidthEnum
 }
 
 /**
  * ThumbnailV1alpha1PublicApi - object-oriented interface
- * @export
- * @class ThumbnailV1alpha1PublicApi
- * @extends {BaseAPI}
  */
 export class ThumbnailV1alpha1PublicApi extends BaseAPI {
     /**
@@ -156,16 +155,12 @@ export class ThumbnailV1alpha1PublicApi extends BaseAPI {
      * @param {ThumbnailV1alpha1PublicApiGetThumbnailByUriRequest} requestParameters Request parameters.
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
-     * @memberof ThumbnailV1alpha1PublicApi
      */
     public getThumbnailByUri(requestParameters: ThumbnailV1alpha1PublicApiGetThumbnailByUriRequest, options?: RawAxiosRequestConfig) {
-        return ThumbnailV1alpha1PublicApiFp(this.configuration).getThumbnailByUri(requestParameters.uri, requestParameters.size, options).then((request) => request(this.axios, this.basePath));
+        return ThumbnailV1alpha1PublicApiFp(this.configuration).getThumbnailByUri(requestParameters.uri, requestParameters.size, requestParameters.width, options).then((request) => request(this.axios, this.basePath));
     }
 }
 
-/**
- * @export
- */
 export const GetThumbnailByUriSizeEnum = {
     S: 'S',
     M: 'M',
@@ -173,3 +168,10 @@ export const GetThumbnailByUriSizeEnum = {
     Xl: 'XL'
 } as const;
 export type GetThumbnailByUriSizeEnum = typeof GetThumbnailByUriSizeEnum[keyof typeof GetThumbnailByUriSizeEnum];
+export const GetThumbnailByUriWidthEnum = {
+    NUMBER_400: 400,
+    NUMBER_800: 800,
+    NUMBER_1200: 1200,
+    NUMBER_1600: 1600
+} as const;
+export type GetThumbnailByUriWidthEnum = typeof GetThumbnailByUriWidthEnum[keyof typeof GetThumbnailByUriWidthEnum];

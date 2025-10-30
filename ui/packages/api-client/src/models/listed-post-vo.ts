@@ -15,79 +15,37 @@
 
 // May contain unused imports in some cases
 // @ts-ignore
-import { CategoryVo } from './category-vo';
+import type { CategoryVo } from './category-vo';
 // May contain unused imports in some cases
 // @ts-ignore
-import { ContributorVo } from './contributor-vo';
+import type { ContributorVo } from './contributor-vo';
 // May contain unused imports in some cases
 // @ts-ignore
-import { Metadata } from './metadata';
+import type { Metadata } from './metadata';
 // May contain unused imports in some cases
 // @ts-ignore
-import { PostSpec } from './post-spec';
+import type { PostSpec } from './post-spec';
 // May contain unused imports in some cases
 // @ts-ignore
-import { PostStatus } from './post-status';
+import type { PostStatus } from './post-status';
 // May contain unused imports in some cases
 // @ts-ignore
-import { StatsVo } from './stats-vo';
+import type { StatsVo } from './stats-vo';
 // May contain unused imports in some cases
 // @ts-ignore
-import { TagVo } from './tag-vo';
+import type { TagVo } from './tag-vo';
 
 /**
  * A value object for {@link Post Post}.
- * @export
- * @interface ListedPostVo
  */
 export interface ListedPostVo {
-    /**
-     * 
-     * @type {Array<CategoryVo>}
-     * @memberof ListedPostVo
-     */
     'categories'?: Array<CategoryVo>;
-    /**
-     * 
-     * @type {Array<ContributorVo>}
-     * @memberof ListedPostVo
-     */
     'contributors'?: Array<ContributorVo>;
-    /**
-     * 
-     * @type {Metadata}
-     * @memberof ListedPostVo
-     */
     'metadata': Metadata;
-    /**
-     * 
-     * @type {ContributorVo}
-     * @memberof ListedPostVo
-     */
     'owner'?: ContributorVo;
-    /**
-     * 
-     * @type {PostSpec}
-     * @memberof ListedPostVo
-     */
     'spec'?: PostSpec;
-    /**
-     * 
-     * @type {StatsVo}
-     * @memberof ListedPostVo
-     */
     'stats'?: StatsVo;
-    /**
-     * 
-     * @type {PostStatus}
-     * @memberof ListedPostVo
-     */
     'status'?: PostStatus;
-    /**
-     * 
-     * @type {Array<TagVo>}
-     * @memberof ListedPostVo
-     */
     'tags'?: Array<TagVo>;
 }
 

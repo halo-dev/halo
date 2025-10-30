@@ -15,34 +15,14 @@
 
 // May contain unused imports in some cases
 // @ts-ignore
-import { NotifierInfo } from './notifier-info';
+import type { NotifierInfo } from './notifier-info';
 // May contain unused imports in some cases
 // @ts-ignore
-import { ReasonTypeInfo } from './reason-type-info';
+import type { ReasonTypeInfo } from './reason-type-info';
 
-/**
- * 
- * @export
- * @interface ReasonTypeNotifierMatrix
- */
 export interface ReasonTypeNotifierMatrix {
-    /**
-     * 
-     * @type {Array<NotifierInfo>}
-     * @memberof ReasonTypeNotifierMatrix
-     */
     'notifiers'?: Array<NotifierInfo>;
-    /**
-     * 
-     * @type {Array<ReasonTypeInfo>}
-     * @memberof ReasonTypeNotifierMatrix
-     */
     'reasonTypes'?: Array<ReasonTypeInfo>;
-    /**
-     * 
-     * @type {Array<Array<boolean>>}
-     * @memberof ReasonTypeNotifierMatrix
-     */
     'stateMatrix'?: Array<Array<boolean>>;
 }
 

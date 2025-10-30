@@ -20,12 +20,11 @@ import globalAxios from 'axios';
 // @ts-ignore
 import { DUMMY_BASE_URL, assertParamExists, setApiKeyToObject, setBasicAuthToObject, setBearerAuthToObject, setOAuthToObject, setSearchParams, serializeDataIfNeeded, toPathString, createRequestFunction } from '../common';
 // @ts-ignore
-import { BASE_PATH, COLLECTION_FORMATS, RequestArgs, BaseAPI, RequiredError, operationServerMap } from '../base';
+import { BASE_PATH, COLLECTION_FORMATS, type RequestArgs, BaseAPI, RequiredError, operationServerMap } from '../base';
 // @ts-ignore
-import { SiteStatsVo } from '../models';
+import type { SiteStatsVo } from '../models';
 /**
  * SystemV1alpha1PublicApi - axios parameter creator
- * @export
  */
 export const SystemV1alpha1PublicApiAxiosParamCreator = function (configuration?: Configuration) {
     return {
@@ -108,7 +107,6 @@ export const SystemV1alpha1PublicApiAxiosParamCreator = function (configuration?
 
 /**
  * SystemV1alpha1PublicApi - functional programming interface
- * @export
  */
 export const SystemV1alpha1PublicApiFp = function(configuration?: Configuration) {
     const localVarAxiosParamCreator = SystemV1alpha1PublicApiAxiosParamCreator(configuration)
@@ -140,7 +138,6 @@ export const SystemV1alpha1PublicApiFp = function(configuration?: Configuration)
 
 /**
  * SystemV1alpha1PublicApi - factory interface
- * @export
  */
 export const SystemV1alpha1PublicApiFactory = function (configuration?: Configuration, basePath?: string, axios?: AxiosInstance) {
     const localVarFp = SystemV1alpha1PublicApiFp(configuration)
@@ -166,16 +163,12 @@ export const SystemV1alpha1PublicApiFactory = function (configuration?: Configur
 
 /**
  * SystemV1alpha1PublicApi - object-oriented interface
- * @export
- * @class SystemV1alpha1PublicApi
- * @extends {BaseAPI}
  */
 export class SystemV1alpha1PublicApi extends BaseAPI {
     /**
      * Jump to setup page
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
-     * @memberof SystemV1alpha1PublicApi
      */
     public jumpToSetupPage(options?: RawAxiosRequestConfig) {
         return SystemV1alpha1PublicApiFp(this.configuration).jumpToSetupPage(options).then((request) => request(this.axios, this.basePath));
@@ -185,7 +178,6 @@ export class SystemV1alpha1PublicApi extends BaseAPI {
      * Gets site stats
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
-     * @memberof SystemV1alpha1PublicApi
      */
     public queryStats(options?: RawAxiosRequestConfig) {
         return SystemV1alpha1PublicApiFp(this.configuration).queryStats(options).then((request) => request(this.axios, this.basePath));

@@ -20,6 +20,7 @@ import static run.halo.app.plugin.PluginConst.RUNTIME_MODE_ANNO;
 import java.io.IOException;
 import java.net.URL;
 import java.net.URLClassLoader;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.time.Clock;
@@ -115,9 +116,10 @@ class PluginReconcilerTest {
         Path tempPath;
 
         @BeforeEach
-        void setUp() {
+        void setUp() throws IOException {
             lenient().when(pluginService.getRequiredDependencies(any(), any()))
                 .thenReturn(List.of());
+            Files.createFile(tempPath.resolve("fake-plugin-1.2.3.jar"));
         }
 
         @Test

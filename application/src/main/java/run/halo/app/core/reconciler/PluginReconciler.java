@@ -19,6 +19,7 @@ import java.io.StringWriter;
 import java.net.MalformedURLException;
 import java.net.URISyntaxException;
 import java.net.URL;
+import java.nio.file.FileSystemNotFoundException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -323,11 +324,11 @@ public class PluginReconciler implements Reconciler<Request> {
         }
         if (!PluginState.STARTED.equals(pluginState)) {
             conditions.addAndEvictFIFO(Condition.builder()
-                    .type(ConditionType.READY)
-                    .status(ConditionStatus.FALSE)
-                    .reason(ConditionReason.START_ERROR)
-                    .message("Failed to start plugin " + pluginName + "(" + pluginState + ").")
-                    .lastTransitionTime(clock.instant())
+                .type(ConditionType.READY)
+                .status(ConditionStatus.FALSE)
+                .reason(ConditionReason.START_ERROR)
+                .message("Failed to start plugin " + pluginName + "(" + pluginState + ").")
+                .lastTransitionTime(clock.instant())
                 .build());
             status.setPhase(Plugin.Phase.FAILED);
             return Result.doNotRetry();
@@ -688,18 +689,25 @@ public class PluginReconciler implements Reconciler<Request> {
             }
         } else {
             // reset annotation PLUGIN_PATH in non-dev mode
-            pluginPathAnno = generateFileName(plugin);
-            annotations.put(PLUGIN_PATH, pluginPathAnno);
-            var pluginPath = Paths.get(pluginPathAnno);
-            var pluginsRoot = getPluginsRoot();
-            if (pluginPath.isAbsolute()) {
-                if (pluginPath.startsWith(pluginsRoot)) {
-                    // ensure the plugin path is a relative path.
-                    annotations.put(PLUGIN_PATH, pluginsRoot.relativize(pluginPath).toString());
-                }
-            } else {
-                pluginPath = pluginsRoot.resolve(pluginPath);
+            var pluginFilename = generateFileName(plugin);
+            var pluginRoot = pluginManager.getPluginsRoots().stream()
+                .filter(root -> Files.exists(root.resolve(pluginFilename)))
+                .findFirst()
+                .orElse(null);
+            if (pluginRoot == null) {
+                var condition = Condition.builder()
+                    .type(ConditionType.INITIALIZED)
+                    .status(ConditionStatus.FALSE)
+                    .reason(ConditionReason.INVALID_PLUGIN_PATH)
+                    .message("Cannot find plugin file " + pluginFilename + " in plugins roots.")
+                    .lastTransitionTime(clock.instant())
+                    .build();
+                status.getConditions().addAndEvictFIFO(condition);
+                status.setPhase(Plugin.Phase.UNKNOWN);
+                return Result.doNotRetry();
             }
+            var pluginPath = pluginRoot.resolve(pluginFilename);
+            annotations.put(PLUGIN_PATH, pluginRoot.relativize(pluginPath).toString());
 
             // delete old load location if changed.
             var oldLoadLocation = status.getLoadLocation();
@@ -716,6 +724,10 @@ public class PluginReconciler implements Reconciler<Request> {
                     }
                 } catch (IOException e) {
                     log.warn("Failed to delete old plugin file {} for plugin {}",
+                        oldLoadLocation, pluginName, e);
+                } catch (FileSystemNotFoundException e) {
+                    log.warn(
+                        "Failed to delete old plugin file {} for plugin {}: File system not found.",
                         oldLoadLocation, pluginName, e);
                 }
             }
@@ -767,13 +779,6 @@ public class PluginReconciler implements Reconciler<Request> {
                 client.update(reverseProxy);
             }, () -> client.create(reverseProxy));
         return null;
-    }
-
-    private Path getPluginsRoot() {
-        return pluginManager.getPluginsRoots().stream()
-            .findFirst()
-            .orElseThrow(
-                () -> new IllegalStateException("pluginsRoots have not been initialized, yet."));
     }
 
     private boolean isInDevEnvironment() {

@@ -14,22 +14,10 @@
 
 
 
-/**
- * 
- * @export
- * @interface BackupSpec
- */
 export interface BackupSpec {
-    /**
-     * 
-     * @type {string}
-     * @memberof BackupSpec
-     */
     'expiresAt'?: string;
     /**
      * Backup file format. Currently, only zip format is supported.
-     * @type {string}
-     * @memberof BackupSpec
      */
     'format'?: string;
 }
