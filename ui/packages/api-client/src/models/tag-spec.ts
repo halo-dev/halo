@@ -14,35 +14,13 @@
 
 
 
-/**
- * 
- * @export
- * @interface TagSpec
- */
 export interface TagSpec {
     /**
      * Color regex explanation.  <pre>  ^                 # start of the line  #                 # start with a number sign `#`  (                 # start of (group 1)    [a-fA-F0-9]{6}  # support z-f, A-F and 0-9, with a length of 6    |               # or    [a-fA-F0-9]{3}  # support z-f, A-F and 0-9, with a length of 3  )                 # end of (group 1)  $                 # end of the line  </pre>
-     * @type {string}
-     * @memberof TagSpec
      */
     'color'?: string;
-    /**
-     * 
-     * @type {string}
-     * @memberof TagSpec
-     */
     'cover'?: string;
-    /**
-     * 
-     * @type {string}
-     * @memberof TagSpec
-     */
     'displayName': string;
-    /**
-     * 
-     * @type {string}
-     * @memberof TagSpec
-     */
     'slug': string;
 }
 

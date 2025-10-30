@@ -14,28 +14,14 @@
 
 
 
-/**
- * 
- * @export
- * @interface AddOperation
- */
 export interface AddOperation {
-    /**
-     * 
-     * @type {string}
-     * @memberof AddOperation
-     */
     'op': AddOperationOpEnum;
     /**
      * A JSON Pointer path pointing to the location to move/copy from.
-     * @type {string}
-     * @memberof AddOperation
      */
     'path': string;
     /**
      * Value can be any JSON value
-     * @type {any}
-     * @memberof AddOperation
      */
     'value': any;
 }

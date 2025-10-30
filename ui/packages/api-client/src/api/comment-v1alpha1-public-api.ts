@@ -20,24 +20,23 @@ import globalAxios from 'axios';
 // @ts-ignore
 import { DUMMY_BASE_URL, assertParamExists, setApiKeyToObject, setBasicAuthToObject, setBearerAuthToObject, setOAuthToObject, setSearchParams, serializeDataIfNeeded, toPathString, createRequestFunction } from '../common';
 // @ts-ignore
-import { BASE_PATH, COLLECTION_FORMATS, RequestArgs, BaseAPI, RequiredError, operationServerMap } from '../base';
+import { BASE_PATH, COLLECTION_FORMATS, type RequestArgs, BaseAPI, RequiredError, operationServerMap } from '../base';
 // @ts-ignore
-import { Comment } from '../models';
+import type { Comment } from '../models';
 // @ts-ignore
-import { CommentRequest } from '../models';
+import type { CommentRequest } from '../models';
 // @ts-ignore
-import { CommentVoList } from '../models';
+import type { CommentVoList } from '../models';
 // @ts-ignore
-import { CommentWithReplyVoList } from '../models';
+import type { CommentWithReplyVoList } from '../models';
 // @ts-ignore
-import { Reply } from '../models';
+import type { Reply } from '../models';
 // @ts-ignore
-import { ReplyRequest } from '../models';
+import type { ReplyRequest } from '../models';
 // @ts-ignore
-import { ReplyVoList } from '../models';
+import type { ReplyVoList } from '../models';
 /**
  * CommentV1alpha1PublicApi - axios parameter creator
- * @export
  */
 export const CommentV1alpha1PublicApiAxiosParamCreator = function (configuration?: Configuration) {
     return {
@@ -316,7 +315,6 @@ export const CommentV1alpha1PublicApiAxiosParamCreator = function (configuration
 
 /**
  * CommentV1alpha1PublicApi - functional programming interface
- * @export
  */
 export const CommentV1alpha1PublicApiFp = function(configuration?: Configuration) {
     const localVarAxiosParamCreator = CommentV1alpha1PublicApiAxiosParamCreator(configuration)
@@ -397,7 +395,6 @@ export const CommentV1alpha1PublicApiFp = function(configuration?: Configuration
 
 /**
  * CommentV1alpha1PublicApi - factory interface
- * @export
  */
 export const CommentV1alpha1PublicApiFactory = function (configuration?: Configuration, basePath?: string, axios?: AxiosInstance) {
     const localVarFp = CommentV1alpha1PublicApiFp(configuration)
@@ -452,156 +449,96 @@ export const CommentV1alpha1PublicApiFactory = function (configuration?: Configu
 
 /**
  * Request parameters for createComment1 operation in CommentV1alpha1PublicApi.
- * @export
- * @interface CommentV1alpha1PublicApiCreateComment1Request
  */
 export interface CommentV1alpha1PublicApiCreateComment1Request {
-    /**
-     * 
-     * @type {CommentRequest}
-     * @memberof CommentV1alpha1PublicApiCreateComment1
-     */
     readonly commentRequest: CommentRequest
 }
 
 /**
  * Request parameters for createReply1 operation in CommentV1alpha1PublicApi.
- * @export
- * @interface CommentV1alpha1PublicApiCreateReply1Request
  */
 export interface CommentV1alpha1PublicApiCreateReply1Request {
-    /**
-     * 
-     * @type {string}
-     * @memberof CommentV1alpha1PublicApiCreateReply1
-     */
     readonly name: string
 
-    /**
-     * 
-     * @type {ReplyRequest}
-     * @memberof CommentV1alpha1PublicApiCreateReply1
-     */
     readonly replyRequest: ReplyRequest
 }
 
 /**
  * Request parameters for getComment operation in CommentV1alpha1PublicApi.
- * @export
- * @interface CommentV1alpha1PublicApiGetCommentRequest
  */
 export interface CommentV1alpha1PublicApiGetCommentRequest {
-    /**
-     * 
-     * @type {string}
-     * @memberof CommentV1alpha1PublicApiGetComment
-     */
     readonly name: string
 }
 
 /**
  * Request parameters for listCommentReplies operation in CommentV1alpha1PublicApi.
- * @export
- * @interface CommentV1alpha1PublicApiListCommentRepliesRequest
  */
 export interface CommentV1alpha1PublicApiListCommentRepliesRequest {
-    /**
-     * 
-     * @type {string}
-     * @memberof CommentV1alpha1PublicApiListCommentReplies
-     */
     readonly name: string
 
     /**
      * Page number. Default is 0.
-     * @type {number}
-     * @memberof CommentV1alpha1PublicApiListCommentReplies
      */
     readonly page?: number
 
     /**
      * Size number. Default is 0.
-     * @type {number}
-     * @memberof CommentV1alpha1PublicApiListCommentReplies
      */
     readonly size?: number
 }
 
 /**
  * Request parameters for listComments1 operation in CommentV1alpha1PublicApi.
- * @export
- * @interface CommentV1alpha1PublicApiListComments1Request
  */
 export interface CommentV1alpha1PublicApiListComments1Request {
     /**
      * The comment subject version.
-     * @type {string}
-     * @memberof CommentV1alpha1PublicApiListComments1
      */
     readonly version: string
 
     /**
      * The comment subject kind.
-     * @type {string}
-     * @memberof CommentV1alpha1PublicApiListComments1
      */
     readonly kind: string
 
     /**
      * The comment subject name.
-     * @type {string}
-     * @memberof CommentV1alpha1PublicApiListComments1
      */
     readonly name: string
 
     /**
      * Page number. Default is 0.
-     * @type {number}
-     * @memberof CommentV1alpha1PublicApiListComments1
      */
     readonly page?: number
 
     /**
      * Size number. Default is 0.
-     * @type {number}
-     * @memberof CommentV1alpha1PublicApiListComments1
      */
     readonly size?: number
 
     /**
      * Sorting criteria in the format: property,(asc|desc). Default sort order is ascending. Multiple sort criteria are supported.
-     * @type {Array<string>}
-     * @memberof CommentV1alpha1PublicApiListComments1
      */
     readonly sort?: Array<string>
 
     /**
      * The comment subject group.
-     * @type {string}
-     * @memberof CommentV1alpha1PublicApiListComments1
      */
     readonly group?: string
 
     /**
      * Whether to include replies. Default is false.
-     * @type {boolean}
-     * @memberof CommentV1alpha1PublicApiListComments1
      */
     readonly withReplies?: boolean
 
     /**
      * Reply size of the comment, default is 10, only works when withReplies is true.
-     * @type {number}
-     * @memberof CommentV1alpha1PublicApiListComments1
      */
     readonly replySize?: number
 }
 
 /**
  * CommentV1alpha1PublicApi - object-oriented interface
- * @export
- * @class CommentV1alpha1PublicApi
- * @extends {BaseAPI}
  */
 export class CommentV1alpha1PublicApi extends BaseAPI {
     /**
@@ -609,7 +546,6 @@ export class CommentV1alpha1PublicApi extends BaseAPI {
      * @param {CommentV1alpha1PublicApiCreateComment1Request} requestParameters Request parameters.
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
-     * @memberof CommentV1alpha1PublicApi
      */
     public createComment1(requestParameters: CommentV1alpha1PublicApiCreateComment1Request, options?: RawAxiosRequestConfig) {
         return CommentV1alpha1PublicApiFp(this.configuration).createComment1(requestParameters.commentRequest, options).then((request) => request(this.axios, this.basePath));
@@ -620,7 +556,6 @@ export class CommentV1alpha1PublicApi extends BaseAPI {
      * @param {CommentV1alpha1PublicApiCreateReply1Request} requestParameters Request parameters.
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
-     * @memberof CommentV1alpha1PublicApi
      */
     public createReply1(requestParameters: CommentV1alpha1PublicApiCreateReply1Request, options?: RawAxiosRequestConfig) {
         return CommentV1alpha1PublicApiFp(this.configuration).createReply1(requestParameters.name, requestParameters.replyRequest, options).then((request) => request(this.axios, this.basePath));
@@ -631,7 +566,6 @@ export class CommentV1alpha1PublicApi extends BaseAPI {
      * @param {CommentV1alpha1PublicApiGetCommentRequest} requestParameters Request parameters.
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
-     * @memberof CommentV1alpha1PublicApi
      */
     public getComment(requestParameters: CommentV1alpha1PublicApiGetCommentRequest, options?: RawAxiosRequestConfig) {
         return CommentV1alpha1PublicApiFp(this.configuration).getComment(requestParameters.name, options).then((request) => request(this.axios, this.basePath));
@@ -642,7 +576,6 @@ export class CommentV1alpha1PublicApi extends BaseAPI {
      * @param {CommentV1alpha1PublicApiListCommentRepliesRequest} requestParameters Request parameters.
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
-     * @memberof CommentV1alpha1PublicApi
      */
     public listCommentReplies(requestParameters: CommentV1alpha1PublicApiListCommentRepliesRequest, options?: RawAxiosRequestConfig) {
         return CommentV1alpha1PublicApiFp(this.configuration).listCommentReplies(requestParameters.name, requestParameters.page, requestParameters.size, options).then((request) => request(this.axios, this.basePath));
@@ -653,7 +586,6 @@ export class CommentV1alpha1PublicApi extends BaseAPI {
      * @param {CommentV1alpha1PublicApiListComments1Request} requestParameters Request parameters.
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
-     * @memberof CommentV1alpha1PublicApi
      */
     public listComments1(requestParameters: CommentV1alpha1PublicApiListComments1Request, options?: RawAxiosRequestConfig) {
         return CommentV1alpha1PublicApiFp(this.configuration).listComments1(requestParameters.version, requestParameters.kind, requestParameters.name, requestParameters.page, requestParameters.size, requestParameters.sort, requestParameters.group, requestParameters.withReplies, requestParameters.replySize, options).then((request) => request(this.axios, this.basePath));

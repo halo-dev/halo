@@ -15,70 +15,33 @@
 
 // May contain unused imports in some cases
 // @ts-ignore
-import { ContentVo } from './content-vo';
+import type { ContentVo } from './content-vo';
 // May contain unused imports in some cases
 // @ts-ignore
-import { ContributorVo } from './contributor-vo';
+import type { ContributorVo } from './contributor-vo';
 // May contain unused imports in some cases
 // @ts-ignore
-import { Metadata } from './metadata';
+import type { Metadata } from './metadata';
 // May contain unused imports in some cases
 // @ts-ignore
-import { SinglePageSpec } from './single-page-spec';
+import type { SinglePageSpec } from './single-page-spec';
 // May contain unused imports in some cases
 // @ts-ignore
-import { SinglePageStatus } from './single-page-status';
+import type { SinglePageStatus } from './single-page-status';
 // May contain unused imports in some cases
 // @ts-ignore
-import { StatsVo } from './stats-vo';
+import type { StatsVo } from './stats-vo';
 
 /**
  * A value object for {@link SinglePage SinglePage}.
- * @export
- * @interface SinglePageVo
  */
 export interface SinglePageVo {
-    /**
-     * 
-     * @type {ContentVo}
-     * @memberof SinglePageVo
-     */
     'content'?: ContentVo;
-    /**
-     * 
-     * @type {Array<ContributorVo>}
-     * @memberof SinglePageVo
-     */
     'contributors'?: Array<ContributorVo>;
-    /**
-     * 
-     * @type {Metadata}
-     * @memberof SinglePageVo
-     */
     'metadata': Metadata;
-    /**
-     * 
-     * @type {ContributorVo}
-     * @memberof SinglePageVo
-     */
     'owner'?: ContributorVo;
-    /**
-     * 
-     * @type {SinglePageSpec}
-     * @memberof SinglePageVo
-     */
     'spec'?: SinglePageSpec;
-    /**
-     * 
-     * @type {StatsVo}
-     * @memberof SinglePageVo
-     */
     'stats'?: StatsVo;
-    /**
-     * 
-     * @type {SinglePageStatus}
-     * @memberof SinglePageVo
-     */
     'status'?: SinglePageStatus;
 }
 

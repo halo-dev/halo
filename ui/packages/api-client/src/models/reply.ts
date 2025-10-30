@@ -15,49 +15,19 @@
 
 // May contain unused imports in some cases
 // @ts-ignore
-import { Metadata } from './metadata';
+import type { Metadata } from './metadata';
 // May contain unused imports in some cases
 // @ts-ignore
-import { ReplySpec } from './reply-spec';
+import type { ReplySpec } from './reply-spec';
 // May contain unused imports in some cases
 // @ts-ignore
-import { ReplyStatus } from './reply-status';
+import type { ReplyStatus } from './reply-status';
 
-/**
- * 
- * @export
- * @interface Reply
- */
 export interface Reply {
-    /**
-     * 
-     * @type {string}
-     * @memberof Reply
-     */
     'apiVersion': string;
-    /**
-     * 
-     * @type {string}
-     * @memberof Reply
-     */
     'kind': string;
-    /**
-     * 
-     * @type {Metadata}
-     * @memberof Reply
-     */
     'metadata': Metadata;
-    /**
-     * 
-     * @type {ReplySpec}
-     * @memberof Reply
-     */
     'spec': ReplySpec;
-    /**
-     * 
-     * @type {ReplyStatus}
-     * @memberof Reply
-     */
     'status': ReplyStatus;
 }
 

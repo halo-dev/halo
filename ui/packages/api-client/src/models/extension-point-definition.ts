@@ -15,40 +15,18 @@
 
 // May contain unused imports in some cases
 // @ts-ignore
-import { ExtensionPointSpec } from './extension-point-spec';
+import type { ExtensionPointSpec } from './extension-point-spec';
 // May contain unused imports in some cases
 // @ts-ignore
-import { Metadata } from './metadata';
+import type { Metadata } from './metadata';
 
 /**
  * Extension point definition.  An {@link ExtensionPointDefinition ExtensionPointDefinition} is a concept used in <code>Halo</code> to allow for the  dynamic extension of system. It defines a location within <code>Halo</code> where  additional functionality can be added through the use of plugins or extensions.
- * @export
- * @interface ExtensionPointDefinition
  */
 export interface ExtensionPointDefinition {
-    /**
-     * 
-     * @type {string}
-     * @memberof ExtensionPointDefinition
-     */
     'apiVersion': string;
-    /**
-     * 
-     * @type {string}
-     * @memberof ExtensionPointDefinition
-     */
     'kind': string;
-    /**
-     * 
-     * @type {Metadata}
-     * @memberof ExtensionPointDefinition
-     */
     'metadata': Metadata;
-    /**
-     * 
-     * @type {ExtensionPointSpec}
-     * @memberof ExtensionPointDefinition
-     */
     'spec': ExtensionPointSpec;
 }
 

@@ -14,23 +14,8 @@
 
 
 
-/**
- * 
- * @export
- * @interface ReasonTypeNotifierRequest
- */
 export interface ReasonTypeNotifierRequest {
-    /**
-     * 
-     * @type {Array<string>}
-     * @memberof ReasonTypeNotifierRequest
-     */
     'notifiers'?: Array<string>;
-    /**
-     * 
-     * @type {string}
-     * @memberof ReasonTypeNotifierRequest
-     */
     'reasonType'?: string;
 }
 

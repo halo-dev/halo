@@ -20,18 +20,17 @@ import globalAxios from 'axios';
 // @ts-ignore
 import { DUMMY_BASE_URL, assertParamExists, setApiKeyToObject, setBasicAuthToObject, setBearerAuthToObject, setOAuthToObject, setSearchParams, serializeDataIfNeeded, toPathString, createRequestFunction } from '../common';
 // @ts-ignore
-import { BASE_PATH, COLLECTION_FORMATS, RequestArgs, BaseAPI, RequiredError, operationServerMap } from '../base';
+import { BASE_PATH, COLLECTION_FORMATS, type RequestArgs, BaseAPI, RequiredError, operationServerMap } from '../base';
 // @ts-ignore
-import { PasswordRequest } from '../models';
+import type { PasswordRequest } from '../models';
 // @ts-ignore
-import { TotpAuthLinkResponse } from '../models';
+import type { TotpAuthLinkResponse } from '../models';
 // @ts-ignore
-import { TotpRequest } from '../models';
+import type { TotpRequest } from '../models';
 // @ts-ignore
-import { TwoFactorAuthSettings } from '../models';
+import type { TwoFactorAuthSettings } from '../models';
 /**
  * TwoFactorAuthV1alpha1UcApi - axios parameter creator
- * @export
  */
 export const TwoFactorAuthV1alpha1UcApiAxiosParamCreator = function (configuration?: Configuration) {
     return {
@@ -278,7 +277,6 @@ export const TwoFactorAuthV1alpha1UcApiAxiosParamCreator = function (configurati
 
 /**
  * TwoFactorAuthV1alpha1UcApi - functional programming interface
- * @export
  */
 export const TwoFactorAuthV1alpha1UcApiFp = function(configuration?: Configuration) {
     const localVarAxiosParamCreator = TwoFactorAuthV1alpha1UcApiAxiosParamCreator(configuration)
@@ -358,7 +356,6 @@ export const TwoFactorAuthV1alpha1UcApiFp = function(configuration?: Configurati
 
 /**
  * TwoFactorAuthV1alpha1UcApi - factory interface
- * @export
  */
 export const TwoFactorAuthV1alpha1UcApiFactory = function (configuration?: Configuration, basePath?: string, axios?: AxiosInstance) {
     const localVarFp = TwoFactorAuthV1alpha1UcApiFp(configuration)
@@ -420,65 +417,34 @@ export const TwoFactorAuthV1alpha1UcApiFactory = function (configuration?: Confi
 
 /**
  * Request parameters for configurerTotp operation in TwoFactorAuthV1alpha1UcApi.
- * @export
- * @interface TwoFactorAuthV1alpha1UcApiConfigurerTotpRequest
  */
 export interface TwoFactorAuthV1alpha1UcApiConfigurerTotpRequest {
-    /**
-     * 
-     * @type {TotpRequest}
-     * @memberof TwoFactorAuthV1alpha1UcApiConfigurerTotp
-     */
     readonly totpRequest?: TotpRequest
 }
 
 /**
  * Request parameters for deleteTotp operation in TwoFactorAuthV1alpha1UcApi.
- * @export
- * @interface TwoFactorAuthV1alpha1UcApiDeleteTotpRequest
  */
 export interface TwoFactorAuthV1alpha1UcApiDeleteTotpRequest {
-    /**
-     * 
-     * @type {PasswordRequest}
-     * @memberof TwoFactorAuthV1alpha1UcApiDeleteTotp
-     */
     readonly passwordRequest?: PasswordRequest
 }
 
 /**
  * Request parameters for disableTwoFactor operation in TwoFactorAuthV1alpha1UcApi.
- * @export
- * @interface TwoFactorAuthV1alpha1UcApiDisableTwoFactorRequest
  */
 export interface TwoFactorAuthV1alpha1UcApiDisableTwoFactorRequest {
-    /**
-     * 
-     * @type {PasswordRequest}
-     * @memberof TwoFactorAuthV1alpha1UcApiDisableTwoFactor
-     */
     readonly passwordRequest?: PasswordRequest
 }
 
 /**
  * Request parameters for enableTwoFactor operation in TwoFactorAuthV1alpha1UcApi.
- * @export
- * @interface TwoFactorAuthV1alpha1UcApiEnableTwoFactorRequest
  */
 export interface TwoFactorAuthV1alpha1UcApiEnableTwoFactorRequest {
-    /**
-     * 
-     * @type {PasswordRequest}
-     * @memberof TwoFactorAuthV1alpha1UcApiEnableTwoFactor
-     */
     readonly passwordRequest?: PasswordRequest
 }
 
 /**
  * TwoFactorAuthV1alpha1UcApi - object-oriented interface
- * @export
- * @class TwoFactorAuthV1alpha1UcApi
- * @extends {BaseAPI}
  */
 export class TwoFactorAuthV1alpha1UcApi extends BaseAPI {
     /**
@@ -486,7 +452,6 @@ export class TwoFactorAuthV1alpha1UcApi extends BaseAPI {
      * @param {TwoFactorAuthV1alpha1UcApiConfigurerTotpRequest} requestParameters Request parameters.
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
-     * @memberof TwoFactorAuthV1alpha1UcApi
      */
     public configurerTotp(requestParameters: TwoFactorAuthV1alpha1UcApiConfigurerTotpRequest = {}, options?: RawAxiosRequestConfig) {
         return TwoFactorAuthV1alpha1UcApiFp(this.configuration).configurerTotp(requestParameters.totpRequest, options).then((request) => request(this.axios, this.basePath));
@@ -497,7 +462,6 @@ export class TwoFactorAuthV1alpha1UcApi extends BaseAPI {
      * @param {TwoFactorAuthV1alpha1UcApiDeleteTotpRequest} requestParameters Request parameters.
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
-     * @memberof TwoFactorAuthV1alpha1UcApi
      */
     public deleteTotp(requestParameters: TwoFactorAuthV1alpha1UcApiDeleteTotpRequest = {}, options?: RawAxiosRequestConfig) {
         return TwoFactorAuthV1alpha1UcApiFp(this.configuration).deleteTotp(requestParameters.passwordRequest, options).then((request) => request(this.axios, this.basePath));
@@ -508,7 +472,6 @@ export class TwoFactorAuthV1alpha1UcApi extends BaseAPI {
      * @param {TwoFactorAuthV1alpha1UcApiDisableTwoFactorRequest} requestParameters Request parameters.
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
-     * @memberof TwoFactorAuthV1alpha1UcApi
      */
     public disableTwoFactor(requestParameters: TwoFactorAuthV1alpha1UcApiDisableTwoFactorRequest = {}, options?: RawAxiosRequestConfig) {
         return TwoFactorAuthV1alpha1UcApiFp(this.configuration).disableTwoFactor(requestParameters.passwordRequest, options).then((request) => request(this.axios, this.basePath));
@@ -519,7 +482,6 @@ export class TwoFactorAuthV1alpha1UcApi extends BaseAPI {
      * @param {TwoFactorAuthV1alpha1UcApiEnableTwoFactorRequest} requestParameters Request parameters.
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
-     * @memberof TwoFactorAuthV1alpha1UcApi
      */
     public enableTwoFactor(requestParameters: TwoFactorAuthV1alpha1UcApiEnableTwoFactorRequest = {}, options?: RawAxiosRequestConfig) {
         return TwoFactorAuthV1alpha1UcApiFp(this.configuration).enableTwoFactor(requestParameters.passwordRequest, options).then((request) => request(this.axios, this.basePath));
@@ -529,7 +491,6 @@ export class TwoFactorAuthV1alpha1UcApi extends BaseAPI {
      * Get TOTP auth link, including secret
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
-     * @memberof TwoFactorAuthV1alpha1UcApi
      */
     public getTotpAuthLink(options?: RawAxiosRequestConfig) {
         return TwoFactorAuthV1alpha1UcApiFp(this.configuration).getTotpAuthLink(options).then((request) => request(this.axios, this.basePath));
@@ -539,7 +500,6 @@ export class TwoFactorAuthV1alpha1UcApi extends BaseAPI {
      * Get Two-factor authentication settings.
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
-     * @memberof TwoFactorAuthV1alpha1UcApi
      */
     public getTwoFactorAuthenticationSettings(options?: RawAxiosRequestConfig) {
         return TwoFactorAuthV1alpha1UcApiFp(this.configuration).getTwoFactorAuthenticationSettings(options).then((request) => request(this.axios, this.basePath));

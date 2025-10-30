@@ -14,47 +14,12 @@
 
 
 
-/**
- * 
- * @export
- * @interface DashboardStats
- */
 export interface DashboardStats {
-    /**
-     * 
-     * @type {number}
-     * @memberof DashboardStats
-     */
     'approvedComments'?: number;
-    /**
-     * 
-     * @type {number}
-     * @memberof DashboardStats
-     */
     'comments'?: number;
-    /**
-     * 
-     * @type {number}
-     * @memberof DashboardStats
-     */
     'posts'?: number;
-    /**
-     * 
-     * @type {number}
-     * @memberof DashboardStats
-     */
     'upvotes'?: number;
-    /**
-     * 
-     * @type {number}
-     * @memberof DashboardStats
-     */
     'users'?: number;
-    /**
-     * 
-     * @type {number}
-     * @memberof DashboardStats
-     */
     'visits'?: number;
 }
 

@@ -16,32 +16,22 @@
 
 /**
  * <p>The creator info of the comment.</p>  This {@link CommentEmailOwner CommentEmailOwner} is only applicable to the user who is allowed to comment  without logging in.
- * @export
- * @interface CommentEmailOwner
  */
 export interface CommentEmailOwner {
     /**
      * avatar for comment owner
-     * @type {string}
-     * @memberof CommentEmailOwner
      */
     'avatar'?: string;
     /**
      * display name for comment owner
-     * @type {string}
-     * @memberof CommentEmailOwner
      */
     'displayName'?: string;
     /**
      * email for comment owner
-     * @type {string}
-     * @memberof CommentEmailOwner
      */
     'email'?: string;
     /**
      * website for comment owner
-     * @type {string}
-     * @memberof CommentEmailOwner
      */
     'website'?: string;
 }

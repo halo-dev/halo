@@ -15,49 +15,22 @@
 
 // May contain unused imports in some cases
 // @ts-ignore
-import { Metadata } from './metadata';
+import type { Metadata } from './metadata';
 // May contain unused imports in some cases
 // @ts-ignore
-import { UserSpec } from './user-spec';
+import type { UserSpec } from './user-spec';
 // May contain unused imports in some cases
 // @ts-ignore
-import { UserStatus } from './user-status';
+import type { UserStatus } from './user-status';
 
 /**
  * The extension represents user details of Halo.
- * @export
- * @interface User
  */
 export interface User {
-    /**
-     * 
-     * @type {string}
-     * @memberof User
-     */
     'apiVersion': string;
-    /**
-     * 
-     * @type {string}
-     * @memberof User
-     */
     'kind': string;
-    /**
-     * 
-     * @type {Metadata}
-     * @memberof User
-     */
     'metadata': Metadata;
-    /**
-     * 
-     * @type {UserSpec}
-     * @memberof User
-     */
     'spec': UserSpec;
-    /**
-     * 
-     * @type {UserStatus}
-     * @memberof User
-     */
     'status'?: UserStatus;
 }
 

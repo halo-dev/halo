@@ -20,16 +20,15 @@ import globalAxios from 'axios';
 // @ts-ignore
 import { DUMMY_BASE_URL, assertParamExists, setApiKeyToObject, setBasicAuthToObject, setBearerAuthToObject, setOAuthToObject, setSearchParams, serializeDataIfNeeded, toPathString, createRequestFunction } from '../common';
 // @ts-ignore
-import { BASE_PATH, COLLECTION_FORMATS, RequestArgs, BaseAPI, RequiredError, operationServerMap } from '../base';
+import { BASE_PATH, COLLECTION_FORMATS, type RequestArgs, BaseAPI, RequiredError, operationServerMap } from '../base';
 // @ts-ignore
-import { JsonPatchInner } from '../models';
+import type { JsonPatchInner } from '../models';
 // @ts-ignore
-import { Theme } from '../models';
+import type { Theme } from '../models';
 // @ts-ignore
-import { ThemeList } from '../models';
+import type { ThemeList } from '../models';
 /**
  * ThemeV1alpha1Api - axios parameter creator
- * @export
  */
 export const ThemeV1alpha1ApiAxiosParamCreator = function (configuration?: Configuration) {
     return {
@@ -313,7 +312,6 @@ export const ThemeV1alpha1ApiAxiosParamCreator = function (configuration?: Confi
 
 /**
  * ThemeV1alpha1Api - functional programming interface
- * @export
  */
 export const ThemeV1alpha1ApiFp = function(configuration?: Configuration) {
     const localVarAxiosParamCreator = ThemeV1alpha1ApiAxiosParamCreator(configuration)
@@ -401,7 +399,6 @@ export const ThemeV1alpha1ApiFp = function(configuration?: Configuration) {
 
 /**
  * ThemeV1alpha1Api - factory interface
- * @export
  */
 export const ThemeV1alpha1ApiFactory = function (configuration?: Configuration, basePath?: string, axios?: AxiosInstance) {
     const localVarFp = ThemeV1alpha1ApiFp(configuration)
@@ -465,135 +462,93 @@ export const ThemeV1alpha1ApiFactory = function (configuration?: Configuration, 
 
 /**
  * Request parameters for createTheme operation in ThemeV1alpha1Api.
- * @export
- * @interface ThemeV1alpha1ApiCreateThemeRequest
  */
 export interface ThemeV1alpha1ApiCreateThemeRequest {
     /**
      * Fresh theme
-     * @type {Theme}
-     * @memberof ThemeV1alpha1ApiCreateTheme
      */
     readonly theme?: Theme
 }
 
 /**
  * Request parameters for deleteTheme operation in ThemeV1alpha1Api.
- * @export
- * @interface ThemeV1alpha1ApiDeleteThemeRequest
  */
 export interface ThemeV1alpha1ApiDeleteThemeRequest {
     /**
      * Name of theme
-     * @type {string}
-     * @memberof ThemeV1alpha1ApiDeleteTheme
      */
     readonly name: string
 }
 
 /**
  * Request parameters for getTheme operation in ThemeV1alpha1Api.
- * @export
- * @interface ThemeV1alpha1ApiGetThemeRequest
  */
 export interface ThemeV1alpha1ApiGetThemeRequest {
     /**
      * Name of theme
-     * @type {string}
-     * @memberof ThemeV1alpha1ApiGetTheme
      */
     readonly name: string
 }
 
 /**
  * Request parameters for listTheme operation in ThemeV1alpha1Api.
- * @export
- * @interface ThemeV1alpha1ApiListThemeRequest
  */
 export interface ThemeV1alpha1ApiListThemeRequest {
     /**
      * Page number. Default is 0.
-     * @type {number}
-     * @memberof ThemeV1alpha1ApiListTheme
      */
     readonly page?: number
 
     /**
      * Size number. Default is 0.
-     * @type {number}
-     * @memberof ThemeV1alpha1ApiListTheme
      */
     readonly size?: number
 
     /**
      * Label selector. e.g.: hidden!&#x3D;true
-     * @type {Array<string>}
-     * @memberof ThemeV1alpha1ApiListTheme
      */
     readonly labelSelector?: Array<string>
 
     /**
      * Field selector. e.g.: metadata.name&#x3D;&#x3D;halo
-     * @type {Array<string>}
-     * @memberof ThemeV1alpha1ApiListTheme
      */
     readonly fieldSelector?: Array<string>
 
     /**
      * Sorting criteria in the format: property,(asc|desc). Default sort order is ascending. Multiple sort criteria are supported.
-     * @type {Array<string>}
-     * @memberof ThemeV1alpha1ApiListTheme
      */
     readonly sort?: Array<string>
 }
 
 /**
  * Request parameters for patchTheme operation in ThemeV1alpha1Api.
- * @export
- * @interface ThemeV1alpha1ApiPatchThemeRequest
  */
 export interface ThemeV1alpha1ApiPatchThemeRequest {
     /**
      * Name of theme
-     * @type {string}
-     * @memberof ThemeV1alpha1ApiPatchTheme
      */
     readonly name: string
 
-    /**
-     * 
-     * @type {Array<JsonPatchInner>}
-     * @memberof ThemeV1alpha1ApiPatchTheme
-     */
     readonly jsonPatchInner?: Array<JsonPatchInner>
 }
 
 /**
  * Request parameters for updateTheme operation in ThemeV1alpha1Api.
- * @export
- * @interface ThemeV1alpha1ApiUpdateThemeRequest
  */
 export interface ThemeV1alpha1ApiUpdateThemeRequest {
     /**
      * Name of theme
-     * @type {string}
-     * @memberof ThemeV1alpha1ApiUpdateTheme
      */
     readonly name: string
 
     /**
      * Updated theme
-     * @type {Theme}
-     * @memberof ThemeV1alpha1ApiUpdateTheme
      */
     readonly theme?: Theme
 }
 
 /**
  * ThemeV1alpha1Api - object-oriented interface
- * @export
- * @class ThemeV1alpha1Api
- * @extends {BaseAPI}
  */
 export class ThemeV1alpha1Api extends BaseAPI {
     /**
@@ -601,7 +556,6 @@ export class ThemeV1alpha1Api extends BaseAPI {
      * @param {ThemeV1alpha1ApiCreateThemeRequest} requestParameters Request parameters.
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
-     * @memberof ThemeV1alpha1Api
      */
     public createTheme(requestParameters: ThemeV1alpha1ApiCreateThemeRequest = {}, options?: RawAxiosRequestConfig) {
         return ThemeV1alpha1ApiFp(this.configuration).createTheme(requestParameters.theme, options).then((request) => request(this.axios, this.basePath));
@@ -612,7 +566,6 @@ export class ThemeV1alpha1Api extends BaseAPI {
      * @param {ThemeV1alpha1ApiDeleteThemeRequest} requestParameters Request parameters.
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
-     * @memberof ThemeV1alpha1Api
      */
     public deleteTheme(requestParameters: ThemeV1alpha1ApiDeleteThemeRequest, options?: RawAxiosRequestConfig) {
         return ThemeV1alpha1ApiFp(this.configuration).deleteTheme(requestParameters.name, options).then((request) => request(this.axios, this.basePath));
@@ -623,7 +576,6 @@ export class ThemeV1alpha1Api extends BaseAPI {
      * @param {ThemeV1alpha1ApiGetThemeRequest} requestParameters Request parameters.
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
-     * @memberof ThemeV1alpha1Api
      */
     public getTheme(requestParameters: ThemeV1alpha1ApiGetThemeRequest, options?: RawAxiosRequestConfig) {
         return ThemeV1alpha1ApiFp(this.configuration).getTheme(requestParameters.name, options).then((request) => request(this.axios, this.basePath));
@@ -634,7 +586,6 @@ export class ThemeV1alpha1Api extends BaseAPI {
      * @param {ThemeV1alpha1ApiListThemeRequest} requestParameters Request parameters.
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
-     * @memberof ThemeV1alpha1Api
      */
     public listTheme(requestParameters: ThemeV1alpha1ApiListThemeRequest = {}, options?: RawAxiosRequestConfig) {
         return ThemeV1alpha1ApiFp(this.configuration).listTheme(requestParameters.page, requestParameters.size, requestParameters.labelSelector, requestParameters.fieldSelector, requestParameters.sort, options).then((request) => request(this.axios, this.basePath));
@@ -645,7 +596,6 @@ export class ThemeV1alpha1Api extends BaseAPI {
      * @param {ThemeV1alpha1ApiPatchThemeRequest} requestParameters Request parameters.
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
-     * @memberof ThemeV1alpha1Api
      */
     public patchTheme(requestParameters: ThemeV1alpha1ApiPatchThemeRequest, options?: RawAxiosRequestConfig) {
         return ThemeV1alpha1ApiFp(this.configuration).patchTheme(requestParameters.name, requestParameters.jsonPatchInner, options).then((request) => request(this.axios, this.basePath));
@@ -656,7 +606,6 @@ export class ThemeV1alpha1Api extends BaseAPI {
      * @param {ThemeV1alpha1ApiUpdateThemeRequest} requestParameters Request parameters.
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
-     * @memberof ThemeV1alpha1Api
      */
     public updateTheme(requestParameters: ThemeV1alpha1ApiUpdateThemeRequest, options?: RawAxiosRequestConfig) {
         return ThemeV1alpha1ApiFp(this.configuration).updateTheme(requestParameters.name, requestParameters.theme, options).then((request) => request(this.axios, this.basePath));

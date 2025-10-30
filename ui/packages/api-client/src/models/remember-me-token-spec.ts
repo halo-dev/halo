@@ -14,35 +14,10 @@
 
 
 
-/**
- * 
- * @export
- * @interface RememberMeTokenSpec
- */
 export interface RememberMeTokenSpec {
-    /**
-     * 
-     * @type {string}
-     * @memberof RememberMeTokenSpec
-     */
     'lastUsed'?: string;
-    /**
-     * 
-     * @type {string}
-     * @memberof RememberMeTokenSpec
-     */
     'series': string;
-    /**
-     * 
-     * @type {string}
-     * @memberof RememberMeTokenSpec
-     */
     'tokenValue': string;
-    /**
-     * 
-     * @type {string}
-     * @memberof RememberMeTokenSpec
-     */
     'username': string;
 }
 

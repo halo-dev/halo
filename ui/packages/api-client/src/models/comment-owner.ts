@@ -14,35 +14,10 @@
 
 
 
-/**
- * 
- * @export
- * @interface CommentOwner
- */
 export interface CommentOwner {
-    /**
-     * 
-     * @type {{ [key: string]: string; }}
-     * @memberof CommentOwner
-     */
     'annotations'?: { [key: string]: string; };
-    /**
-     * 
-     * @type {string}
-     * @memberof CommentOwner
-     */
     'displayName'?: string;
-    /**
-     * 
-     * @type {string}
-     * @memberof CommentOwner
-     */
     'kind': string;
-    /**
-     * 
-     * @type {string}
-     * @memberof CommentOwner
-     */
     'name': string;
 }
 

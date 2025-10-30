@@ -14,17 +14,7 @@
 
 
 
-/**
- * 
- * @export
- * @interface GrantRequest
- */
 export interface GrantRequest {
-    /**
-     * 
-     * @type {Array<string>}
-     * @memberof GrantRequest
-     */
     'roles'?: Array<string>;
 }
 

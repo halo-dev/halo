@@ -20,16 +20,15 @@ import globalAxios from 'axios';
 // @ts-ignore
 import { DUMMY_BASE_URL, assertParamExists, setApiKeyToObject, setBasicAuthToObject, setBearerAuthToObject, setOAuthToObject, setSearchParams, serializeDataIfNeeded, toPathString, createRequestFunction } from '../common';
 // @ts-ignore
-import { BASE_PATH, COLLECTION_FORMATS, RequestArgs, BaseAPI, RequiredError, operationServerMap } from '../base';
+import { BASE_PATH, COLLECTION_FORMATS, type RequestArgs, BaseAPI, RequiredError, operationServerMap } from '../base';
 // @ts-ignore
-import { JsonPatchInner } from '../models';
+import type { JsonPatchInner } from '../models';
 // @ts-ignore
-import { Notification } from '../models';
+import type { Notification } from '../models';
 // @ts-ignore
-import { NotificationList } from '../models';
+import type { NotificationList } from '../models';
 /**
  * NotificationV1alpha1Api - axios parameter creator
- * @export
  */
 export const NotificationV1alpha1ApiAxiosParamCreator = function (configuration?: Configuration) {
     return {
@@ -313,7 +312,6 @@ export const NotificationV1alpha1ApiAxiosParamCreator = function (configuration?
 
 /**
  * NotificationV1alpha1Api - functional programming interface
- * @export
  */
 export const NotificationV1alpha1ApiFp = function(configuration?: Configuration) {
     const localVarAxiosParamCreator = NotificationV1alpha1ApiAxiosParamCreator(configuration)
@@ -401,7 +399,6 @@ export const NotificationV1alpha1ApiFp = function(configuration?: Configuration)
 
 /**
  * NotificationV1alpha1Api - factory interface
- * @export
  */
 export const NotificationV1alpha1ApiFactory = function (configuration?: Configuration, basePath?: string, axios?: AxiosInstance) {
     const localVarFp = NotificationV1alpha1ApiFp(configuration)
@@ -465,135 +462,93 @@ export const NotificationV1alpha1ApiFactory = function (configuration?: Configur
 
 /**
  * Request parameters for createNotification operation in NotificationV1alpha1Api.
- * @export
- * @interface NotificationV1alpha1ApiCreateNotificationRequest
  */
 export interface NotificationV1alpha1ApiCreateNotificationRequest {
     /**
      * Fresh notification
-     * @type {Notification}
-     * @memberof NotificationV1alpha1ApiCreateNotification
      */
     readonly notification?: Notification
 }
 
 /**
  * Request parameters for deleteNotification operation in NotificationV1alpha1Api.
- * @export
- * @interface NotificationV1alpha1ApiDeleteNotificationRequest
  */
 export interface NotificationV1alpha1ApiDeleteNotificationRequest {
     /**
      * Name of notification
-     * @type {string}
-     * @memberof NotificationV1alpha1ApiDeleteNotification
      */
     readonly name: string
 }
 
 /**
  * Request parameters for getNotification operation in NotificationV1alpha1Api.
- * @export
- * @interface NotificationV1alpha1ApiGetNotificationRequest
  */
 export interface NotificationV1alpha1ApiGetNotificationRequest {
     /**
      * Name of notification
-     * @type {string}
-     * @memberof NotificationV1alpha1ApiGetNotification
      */
     readonly name: string
 }
 
 /**
  * Request parameters for listNotification operation in NotificationV1alpha1Api.
- * @export
- * @interface NotificationV1alpha1ApiListNotificationRequest
  */
 export interface NotificationV1alpha1ApiListNotificationRequest {
     /**
      * Page number. Default is 0.
-     * @type {number}
-     * @memberof NotificationV1alpha1ApiListNotification
      */
     readonly page?: number
 
     /**
      * Size number. Default is 0.
-     * @type {number}
-     * @memberof NotificationV1alpha1ApiListNotification
      */
     readonly size?: number
 
     /**
      * Label selector. e.g.: hidden!&#x3D;true
-     * @type {Array<string>}
-     * @memberof NotificationV1alpha1ApiListNotification
      */
     readonly labelSelector?: Array<string>
 
     /**
      * Field selector. e.g.: metadata.name&#x3D;&#x3D;halo
-     * @type {Array<string>}
-     * @memberof NotificationV1alpha1ApiListNotification
      */
     readonly fieldSelector?: Array<string>
 
     /**
      * Sorting criteria in the format: property,(asc|desc). Default sort order is ascending. Multiple sort criteria are supported.
-     * @type {Array<string>}
-     * @memberof NotificationV1alpha1ApiListNotification
      */
     readonly sort?: Array<string>
 }
 
 /**
  * Request parameters for patchNotification operation in NotificationV1alpha1Api.
- * @export
- * @interface NotificationV1alpha1ApiPatchNotificationRequest
  */
 export interface NotificationV1alpha1ApiPatchNotificationRequest {
     /**
      * Name of notification
-     * @type {string}
-     * @memberof NotificationV1alpha1ApiPatchNotification
      */
     readonly name: string
 
-    /**
-     * 
-     * @type {Array<JsonPatchInner>}
-     * @memberof NotificationV1alpha1ApiPatchNotification
-     */
     readonly jsonPatchInner?: Array<JsonPatchInner>
 }
 
 /**
  * Request parameters for updateNotification operation in NotificationV1alpha1Api.
- * @export
- * @interface NotificationV1alpha1ApiUpdateNotificationRequest
  */
 export interface NotificationV1alpha1ApiUpdateNotificationRequest {
     /**
      * Name of notification
-     * @type {string}
-     * @memberof NotificationV1alpha1ApiUpdateNotification
      */
     readonly name: string
 
     /**
      * Updated notification
-     * @type {Notification}
-     * @memberof NotificationV1alpha1ApiUpdateNotification
      */
     readonly notification?: Notification
 }
 
 /**
  * NotificationV1alpha1Api - object-oriented interface
- * @export
- * @class NotificationV1alpha1Api
- * @extends {BaseAPI}
  */
 export class NotificationV1alpha1Api extends BaseAPI {
     /**
@@ -601,7 +556,6 @@ export class NotificationV1alpha1Api extends BaseAPI {
      * @param {NotificationV1alpha1ApiCreateNotificationRequest} requestParameters Request parameters.
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
-     * @memberof NotificationV1alpha1Api
      */
     public createNotification(requestParameters: NotificationV1alpha1ApiCreateNotificationRequest = {}, options?: RawAxiosRequestConfig) {
         return NotificationV1alpha1ApiFp(this.configuration).createNotification(requestParameters.notification, options).then((request) => request(this.axios, this.basePath));
@@ -612,7 +566,6 @@ export class NotificationV1alpha1Api extends BaseAPI {
      * @param {NotificationV1alpha1ApiDeleteNotificationRequest} requestParameters Request parameters.
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
-     * @memberof NotificationV1alpha1Api
      */
     public deleteNotification(requestParameters: NotificationV1alpha1ApiDeleteNotificationRequest, options?: RawAxiosRequestConfig) {
         return NotificationV1alpha1ApiFp(this.configuration).deleteNotification(requestParameters.name, options).then((request) => request(this.axios, this.basePath));
@@ -623,7 +576,6 @@ export class NotificationV1alpha1Api extends BaseAPI {
      * @param {NotificationV1alpha1ApiGetNotificationRequest} requestParameters Request parameters.
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
-     * @memberof NotificationV1alpha1Api
      */
     public getNotification(requestParameters: NotificationV1alpha1ApiGetNotificationRequest, options?: RawAxiosRequestConfig) {
         return NotificationV1alpha1ApiFp(this.configuration).getNotification(requestParameters.name, options).then((request) => request(this.axios, this.basePath));
@@ -634,7 +586,6 @@ export class NotificationV1alpha1Api extends BaseAPI {
      * @param {NotificationV1alpha1ApiListNotificationRequest} requestParameters Request parameters.
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
-     * @memberof NotificationV1alpha1Api
      */
     public listNotification(requestParameters: NotificationV1alpha1ApiListNotificationRequest = {}, options?: RawAxiosRequestConfig) {
         return NotificationV1alpha1ApiFp(this.configuration).listNotification(requestParameters.page, requestParameters.size, requestParameters.labelSelector, requestParameters.fieldSelector, requestParameters.sort, options).then((request) => request(this.axios, this.basePath));
@@ -645,7 +596,6 @@ export class NotificationV1alpha1Api extends BaseAPI {
      * @param {NotificationV1alpha1ApiPatchNotificationRequest} requestParameters Request parameters.
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
-     * @memberof NotificationV1alpha1Api
      */
     public patchNotification(requestParameters: NotificationV1alpha1ApiPatchNotificationRequest, options?: RawAxiosRequestConfig) {
         return NotificationV1alpha1ApiFp(this.configuration).patchNotification(requestParameters.name, requestParameters.jsonPatchInner, options).then((request) => request(this.axios, this.basePath));
@@ -656,7 +606,6 @@ export class NotificationV1alpha1Api extends BaseAPI {
      * @param {NotificationV1alpha1ApiUpdateNotificationRequest} requestParameters Request parameters.
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
-     * @memberof NotificationV1alpha1Api
      */
     public updateNotification(requestParameters: NotificationV1alpha1ApiUpdateNotificationRequest, options?: RawAxiosRequestConfig) {
         return NotificationV1alpha1ApiFp(this.configuration).updateNotification(requestParameters.name, requestParameters.notification, options).then((request) => request(this.axios, this.basePath));

@@ -15,31 +15,11 @@
 
 // May contain unused imports in some cases
 // @ts-ignore
-import { Device } from './device';
+import type { Device } from './device';
 
-/**
- * 
- * @export
- * @interface UserDevice
- */
 export interface UserDevice {
-    /**
-     * 
-     * @type {boolean}
-     * @memberof UserDevice
-     */
     'active': boolean;
-    /**
-     * 
-     * @type {boolean}
-     * @memberof UserDevice
-     */
     'currentDevice': boolean;
-    /**
-     * 
-     * @type {Device}
-     * @memberof UserDevice
-     */
     'device': Device;
 }
 

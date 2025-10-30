@@ -14,53 +14,19 @@
 
 
 
-/**
- * 
- * @export
- * @interface NotificationSpec
- */
 export interface NotificationSpec {
-    /**
-     * 
-     * @type {string}
-     * @memberof NotificationSpec
-     */
     'htmlContent': string;
-    /**
-     * 
-     * @type {string}
-     * @memberof NotificationSpec
-     */
     'lastReadAt'?: string;
-    /**
-     * 
-     * @type {string}
-     * @memberof NotificationSpec
-     */
     'rawContent': string;
     /**
      * The name of reason
-     * @type {string}
-     * @memberof NotificationSpec
      */
     'reason': string;
     /**
      * The name of user
-     * @type {string}
-     * @memberof NotificationSpec
      */
     'recipient': string;
-    /**
-     * 
-     * @type {string}
-     * @memberof NotificationSpec
-     */
     'title': string;
-    /**
-     * 
-     * @type {boolean}
-     * @memberof NotificationSpec
-     */
     'unread'?: boolean;
 }
 

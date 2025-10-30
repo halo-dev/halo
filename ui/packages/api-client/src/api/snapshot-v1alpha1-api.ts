@@ -20,16 +20,15 @@ import globalAxios from 'axios';
 // @ts-ignore
 import { DUMMY_BASE_URL, assertParamExists, setApiKeyToObject, setBasicAuthToObject, setBearerAuthToObject, setOAuthToObject, setSearchParams, serializeDataIfNeeded, toPathString, createRequestFunction } from '../common';
 // @ts-ignore
-import { BASE_PATH, COLLECTION_FORMATS, RequestArgs, BaseAPI, RequiredError, operationServerMap } from '../base';
+import { BASE_PATH, COLLECTION_FORMATS, type RequestArgs, BaseAPI, RequiredError, operationServerMap } from '../base';
 // @ts-ignore
-import { JsonPatchInner } from '../models';
+import type { JsonPatchInner } from '../models';
 // @ts-ignore
-import { Snapshot } from '../models';
+import type { Snapshot } from '../models';
 // @ts-ignore
-import { SnapshotList } from '../models';
+import type { SnapshotList } from '../models';
 /**
  * SnapshotV1alpha1Api - axios parameter creator
- * @export
  */
 export const SnapshotV1alpha1ApiAxiosParamCreator = function (configuration?: Configuration) {
     return {
@@ -313,7 +312,6 @@ export const SnapshotV1alpha1ApiAxiosParamCreator = function (configuration?: Co
 
 /**
  * SnapshotV1alpha1Api - functional programming interface
- * @export
  */
 export const SnapshotV1alpha1ApiFp = function(configuration?: Configuration) {
     const localVarAxiosParamCreator = SnapshotV1alpha1ApiAxiosParamCreator(configuration)
@@ -401,7 +399,6 @@ export const SnapshotV1alpha1ApiFp = function(configuration?: Configuration) {
 
 /**
  * SnapshotV1alpha1Api - factory interface
- * @export
  */
 export const SnapshotV1alpha1ApiFactory = function (configuration?: Configuration, basePath?: string, axios?: AxiosInstance) {
     const localVarFp = SnapshotV1alpha1ApiFp(configuration)
@@ -465,135 +462,93 @@ export const SnapshotV1alpha1ApiFactory = function (configuration?: Configuratio
 
 /**
  * Request parameters for createSnapshot operation in SnapshotV1alpha1Api.
- * @export
- * @interface SnapshotV1alpha1ApiCreateSnapshotRequest
  */
 export interface SnapshotV1alpha1ApiCreateSnapshotRequest {
     /**
      * Fresh snapshot
-     * @type {Snapshot}
-     * @memberof SnapshotV1alpha1ApiCreateSnapshot
      */
     readonly snapshot?: Snapshot
 }
 
 /**
  * Request parameters for deleteSnapshot operation in SnapshotV1alpha1Api.
- * @export
- * @interface SnapshotV1alpha1ApiDeleteSnapshotRequest
  */
 export interface SnapshotV1alpha1ApiDeleteSnapshotRequest {
     /**
      * Name of snapshot
-     * @type {string}
-     * @memberof SnapshotV1alpha1ApiDeleteSnapshot
      */
     readonly name: string
 }
 
 /**
  * Request parameters for getSnapshot operation in SnapshotV1alpha1Api.
- * @export
- * @interface SnapshotV1alpha1ApiGetSnapshotRequest
  */
 export interface SnapshotV1alpha1ApiGetSnapshotRequest {
     /**
      * Name of snapshot
-     * @type {string}
-     * @memberof SnapshotV1alpha1ApiGetSnapshot
      */
     readonly name: string
 }
 
 /**
  * Request parameters for listSnapshot operation in SnapshotV1alpha1Api.
- * @export
- * @interface SnapshotV1alpha1ApiListSnapshotRequest
  */
 export interface SnapshotV1alpha1ApiListSnapshotRequest {
     /**
      * Page number. Default is 0.
-     * @type {number}
-     * @memberof SnapshotV1alpha1ApiListSnapshot
      */
     readonly page?: number
 
     /**
      * Size number. Default is 0.
-     * @type {number}
-     * @memberof SnapshotV1alpha1ApiListSnapshot
      */
     readonly size?: number
 
     /**
      * Label selector. e.g.: hidden!&#x3D;true
-     * @type {Array<string>}
-     * @memberof SnapshotV1alpha1ApiListSnapshot
      */
     readonly labelSelector?: Array<string>
 
     /**
      * Field selector. e.g.: metadata.name&#x3D;&#x3D;halo
-     * @type {Array<string>}
-     * @memberof SnapshotV1alpha1ApiListSnapshot
      */
     readonly fieldSelector?: Array<string>
 
     /**
      * Sorting criteria in the format: property,(asc|desc). Default sort order is ascending. Multiple sort criteria are supported.
-     * @type {Array<string>}
-     * @memberof SnapshotV1alpha1ApiListSnapshot
      */
     readonly sort?: Array<string>
 }
 
 /**
  * Request parameters for patchSnapshot operation in SnapshotV1alpha1Api.
- * @export
- * @interface SnapshotV1alpha1ApiPatchSnapshotRequest
  */
 export interface SnapshotV1alpha1ApiPatchSnapshotRequest {
     /**
      * Name of snapshot
-     * @type {string}
-     * @memberof SnapshotV1alpha1ApiPatchSnapshot
      */
     readonly name: string
 
-    /**
-     * 
-     * @type {Array<JsonPatchInner>}
-     * @memberof SnapshotV1alpha1ApiPatchSnapshot
-     */
     readonly jsonPatchInner?: Array<JsonPatchInner>
 }
 
 /**
  * Request parameters for updateSnapshot operation in SnapshotV1alpha1Api.
- * @export
- * @interface SnapshotV1alpha1ApiUpdateSnapshotRequest
  */
 export interface SnapshotV1alpha1ApiUpdateSnapshotRequest {
     /**
      * Name of snapshot
-     * @type {string}
-     * @memberof SnapshotV1alpha1ApiUpdateSnapshot
      */
     readonly name: string
 
     /**
      * Updated snapshot
-     * @type {Snapshot}
-     * @memberof SnapshotV1alpha1ApiUpdateSnapshot
      */
     readonly snapshot?: Snapshot
 }
 
 /**
  * SnapshotV1alpha1Api - object-oriented interface
- * @export
- * @class SnapshotV1alpha1Api
- * @extends {BaseAPI}
  */
 export class SnapshotV1alpha1Api extends BaseAPI {
     /**
@@ -601,7 +556,6 @@ export class SnapshotV1alpha1Api extends BaseAPI {
      * @param {SnapshotV1alpha1ApiCreateSnapshotRequest} requestParameters Request parameters.
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
-     * @memberof SnapshotV1alpha1Api
      */
     public createSnapshot(requestParameters: SnapshotV1alpha1ApiCreateSnapshotRequest = {}, options?: RawAxiosRequestConfig) {
         return SnapshotV1alpha1ApiFp(this.configuration).createSnapshot(requestParameters.snapshot, options).then((request) => request(this.axios, this.basePath));
@@ -612,7 +566,6 @@ export class SnapshotV1alpha1Api extends BaseAPI {
      * @param {SnapshotV1alpha1ApiDeleteSnapshotRequest} requestParameters Request parameters.
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
-     * @memberof SnapshotV1alpha1Api
      */
     public deleteSnapshot(requestParameters: SnapshotV1alpha1ApiDeleteSnapshotRequest, options?: RawAxiosRequestConfig) {
         return SnapshotV1alpha1ApiFp(this.configuration).deleteSnapshot(requestParameters.name, options).then((request) => request(this.axios, this.basePath));
@@ -623,7 +576,6 @@ export class SnapshotV1alpha1Api extends BaseAPI {
      * @param {SnapshotV1alpha1ApiGetSnapshotRequest} requestParameters Request parameters.
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
-     * @memberof SnapshotV1alpha1Api
      */
     public getSnapshot(requestParameters: SnapshotV1alpha1ApiGetSnapshotRequest, options?: RawAxiosRequestConfig) {
         return SnapshotV1alpha1ApiFp(this.configuration).getSnapshot(requestParameters.name, options).then((request) => request(this.axios, this.basePath));
@@ -634,7 +586,6 @@ export class SnapshotV1alpha1Api extends BaseAPI {
      * @param {SnapshotV1alpha1ApiListSnapshotRequest} requestParameters Request parameters.
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
-     * @memberof SnapshotV1alpha1Api
      */
     public listSnapshot(requestParameters: SnapshotV1alpha1ApiListSnapshotRequest = {}, options?: RawAxiosRequestConfig) {
         return SnapshotV1alpha1ApiFp(this.configuration).listSnapshot(requestParameters.page, requestParameters.size, requestParameters.labelSelector, requestParameters.fieldSelector, requestParameters.sort, options).then((request) => request(this.axios, this.basePath));
@@ -645,7 +596,6 @@ export class SnapshotV1alpha1Api extends BaseAPI {
      * @param {SnapshotV1alpha1ApiPatchSnapshotRequest} requestParameters Request parameters.
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
-     * @memberof SnapshotV1alpha1Api
      */
     public patchSnapshot(requestParameters: SnapshotV1alpha1ApiPatchSnapshotRequest, options?: RawAxiosRequestConfig) {
         return SnapshotV1alpha1ApiFp(this.configuration).patchSnapshot(requestParameters.name, requestParameters.jsonPatchInner, options).then((request) => request(this.axios, this.basePath));
@@ -656,7 +606,6 @@ export class SnapshotV1alpha1Api extends BaseAPI {
      * @param {SnapshotV1alpha1ApiUpdateSnapshotRequest} requestParameters Request parameters.
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
-     * @memberof SnapshotV1alpha1Api
      */
     public updateSnapshot(requestParameters: SnapshotV1alpha1ApiUpdateSnapshotRequest, options?: RawAxiosRequestConfig) {
         return SnapshotV1alpha1ApiFp(this.configuration).updateSnapshot(requestParameters.name, requestParameters.snapshot, options).then((request) => request(this.axios, this.basePath));

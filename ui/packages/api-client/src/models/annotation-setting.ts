@@ -15,40 +15,15 @@
 
 // May contain unused imports in some cases
 // @ts-ignore
-import { AnnotationSettingSpec } from './annotation-setting-spec';
+import type { AnnotationSettingSpec } from './annotation-setting-spec';
 // May contain unused imports in some cases
 // @ts-ignore
-import { Metadata } from './metadata';
+import type { Metadata } from './metadata';
 
-/**
- * 
- * @export
- * @interface AnnotationSetting
- */
 export interface AnnotationSetting {
-    /**
-     * 
-     * @type {string}
-     * @memberof AnnotationSetting
-     */
     'apiVersion': string;
-    /**
-     * 
-     * @type {string}
-     * @memberof AnnotationSetting
-     */
     'kind': string;
-    /**
-     * 
-     * @type {Metadata}
-     * @memberof AnnotationSetting
-     */
     'metadata': Metadata;
-    /**
-     * 
-     * @type {AnnotationSettingSpec}
-     * @memberof AnnotationSetting
-     */
     'spec': AnnotationSettingSpec;
 }
 

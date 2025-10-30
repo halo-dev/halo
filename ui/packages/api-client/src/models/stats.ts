@@ -16,33 +16,11 @@
 
 /**
  * Stats value object.
- * @export
- * @interface Stats
  */
 export interface Stats {
-    /**
-     * 
-     * @type {number}
-     * @memberof Stats
-     */
     'approvedComment'?: number;
-    /**
-     * 
-     * @type {number}
-     * @memberof Stats
-     */
     'totalComment'?: number;
-    /**
-     * 
-     * @type {number}
-     * @memberof Stats
-     */
     'upvote'?: number;
-    /**
-     * 
-     * @type {number}
-     * @memberof Stats
-     */
     'visit'?: number;
 }
 

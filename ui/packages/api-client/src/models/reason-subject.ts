@@ -14,41 +14,11 @@
 
 
 
-/**
- * 
- * @export
- * @interface ReasonSubject
- */
 export interface ReasonSubject {
-    /**
-     * 
-     * @type {string}
-     * @memberof ReasonSubject
-     */
     'apiVersion': string;
-    /**
-     * 
-     * @type {string}
-     * @memberof ReasonSubject
-     */
     'kind': string;
-    /**
-     * 
-     * @type {string}
-     * @memberof ReasonSubject
-     */
     'name': string;
-    /**
-     * 
-     * @type {string}
-     * @memberof ReasonSubject
-     */
     'title': string;
-    /**
-     * 
-     * @type {string}
-     * @memberof ReasonSubject
-     */
     'url'?: string;
 }
 

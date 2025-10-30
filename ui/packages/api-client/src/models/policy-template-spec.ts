@@ -14,23 +14,8 @@
 
 
 
-/**
- * 
- * @export
- * @interface PolicyTemplateSpec
- */
 export interface PolicyTemplateSpec {
-    /**
-     * 
-     * @type {string}
-     * @memberof PolicyTemplateSpec
-     */
     'displayName'?: string;
-    /**
-     * 
-     * @type {string}
-     * @memberof PolicyTemplateSpec
-     */
     'settingName': string;
 }
 

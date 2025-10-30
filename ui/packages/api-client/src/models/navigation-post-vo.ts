@@ -15,31 +15,14 @@
 
 // May contain unused imports in some cases
 // @ts-ignore
-import { PostVo } from './post-vo';
+import type { PostVo } from './post-vo';
 
 /**
  * Post navigation vo to hold previous and next item.
- * @export
- * @interface NavigationPostVo
  */
 export interface NavigationPostVo {
-    /**
-     * 
-     * @type {PostVo}
-     * @memberof NavigationPostVo
-     */
     'current'?: PostVo;
-    /**
-     * 
-     * @type {PostVo}
-     * @memberof NavigationPostVo
-     */
     'next'?: PostVo;
-    /**
-     * 
-     * @type {PostVo}
-     * @memberof NavigationPostVo
-     */
     'previous'?: PostVo;
 }
 

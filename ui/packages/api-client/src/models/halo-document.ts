@@ -16,104 +16,70 @@
 
 /**
  * Document for search.
- * @export
- * @interface HaloDocument
  */
 export interface HaloDocument {
     /**
      * Custom metadata. Make sure the map is serializable.
-     * @type {{ [key: string]: string; }}
-     * @memberof HaloDocument
      */
     'annotations'?: { [key: string]: string; };
     /**
      * Document categories. The item in the list is the category metadata name.
-     * @type {Array<string>}
-     * @memberof HaloDocument
      */
     'categories'?: Array<string>;
     /**
      * Document content. Safety content, without HTML tag.
-     * @type {string}
-     * @memberof HaloDocument
      */
     'content': string;
     /**
      * Document creation timestamp.
-     * @type {string}
-     * @memberof HaloDocument
      */
     'creationTimestamp'?: string;
     /**
      * Document description.
-     * @type {string}
-     * @memberof HaloDocument
      */
     'description'?: string;
     /**
      * Whether the document is exposed to the public.
-     * @type {boolean}
-     * @memberof HaloDocument
      */
     'exposed'?: boolean;
     /**
      * Document ID. It should be unique globally.
-     * @type {string}
-     * @memberof HaloDocument
      */
     'id': string;
     /**
      * Metadata name of the corresponding extension.
-     * @type {string}
-     * @memberof HaloDocument
      */
     'metadataName': string;
     /**
      * Document owner metadata name.
-     * @type {string}
-     * @memberof HaloDocument
      */
     'ownerName': string;
     /**
      * Document permalink.
-     * @type {string}
-     * @memberof HaloDocument
      */
     'permalink': string;
     /**
      * Whether the document is published.
-     * @type {boolean}
-     * @memberof HaloDocument
      */
     'published'?: boolean;
     /**
      * Whether the document is recycled.
-     * @type {boolean}
-     * @memberof HaloDocument
      */
     'recycled'?: boolean;
     /**
      * Document tags. The item in the list is the tag metadata name.
-     * @type {Array<string>}
-     * @memberof HaloDocument
      */
     'tags'?: Array<string>;
     /**
      * Document title.
-     * @type {string}
-     * @memberof HaloDocument
      */
     'title': string;
     /**
      * Document type. e.g.: post.content.halo.run, singlepage.content.halo.run, moment.moment  .halo.run, doc.doc.halo.run.
-     * @type {string}
-     * @memberof HaloDocument
      */
     'type': string;
     /**
      * Document update timestamp.
-     * @type {string}
-     * @memberof HaloDocument
      */
     'updateTimestamp'?: string;
 }

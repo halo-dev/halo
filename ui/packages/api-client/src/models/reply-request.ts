@@ -15,49 +15,17 @@
 
 // May contain unused imports in some cases
 // @ts-ignore
-import { CommentEmailOwner } from './comment-email-owner';
+import type { CommentEmailOwner } from './comment-email-owner';
 
 /**
  * A request parameter object for {@link Reply Reply}.
- * @export
- * @interface ReplyRequest
  */
 export interface ReplyRequest {
-    /**
-     * 
-     * @type {boolean}
-     * @memberof ReplyRequest
-     */
     'allowNotification'?: boolean;
-    /**
-     * 
-     * @type {string}
-     * @memberof ReplyRequest
-     */
     'content': string;
-    /**
-     * 
-     * @type {boolean}
-     * @memberof ReplyRequest
-     */
     'hidden'?: boolean;
-    /**
-     * 
-     * @type {CommentEmailOwner}
-     * @memberof ReplyRequest
-     */
     'owner'?: CommentEmailOwner;
-    /**
-     * 
-     * @type {string}
-     * @memberof ReplyRequest
-     */
     'quoteReply'?: string;
-    /**
-     * 
-     * @type {string}
-     * @memberof ReplyRequest
-     */
     'raw': string;
 }
 

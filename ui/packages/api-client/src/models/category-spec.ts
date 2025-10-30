@@ -14,71 +14,25 @@
 
 
 
-/**
- * 
- * @export
- * @interface CategorySpec
- */
 export interface CategorySpec {
-    /**
-     * 
-     * @type {Array<string>}
-     * @memberof CategorySpec
-     */
     'children'?: Array<string>;
-    /**
-     * 
-     * @type {string}
-     * @memberof CategorySpec
-     */
     'cover'?: string;
-    /**
-     * 
-     * @type {string}
-     * @memberof CategorySpec
-     */
     'description'?: string;
-    /**
-     * 
-     * @type {string}
-     * @memberof CategorySpec
-     */
     'displayName': string;
     /**
      * <p>Whether to hide the category from the category list.</p>  <p>When set to true, the category including its subcategories and related posts will  not be displayed in the category list, but it can still be accessed by permalink.</p>  <p>Limitation: It only takes effect on the theme-side categorized list and it only  allows to be set to true on the first level(root node) of categories.</p>
-     * @type {boolean}
-     * @memberof CategorySpec
      */
     'hideFromList'?: boolean;
     /**
      * <p>Used to specify the template for the posts associated with the category.</p>  <p>The priority is not as high as that of the post.</p>  <p>If the post also specifies a template, the post\'s template will prevail.</p>
-     * @type {string}
-     * @memberof CategorySpec
      */
     'postTemplate'?: string;
     /**
      * <p>if a category is queried for related posts, the default behavior is to  query all posts under the category including its subcategories, but if this field is  set to true, cascade query behavior will be terminated here.</p>  <p>For example, if a category has subcategories A and B, and A has subcategories C and  D and C marked this field as true, when querying posts under A category,all posts under A  and B will be queried, but C and D will not be queried.</p>
-     * @type {boolean}
-     * @memberof CategorySpec
      */
     'preventParentPostCascadeQuery'?: boolean;
-    /**
-     * 
-     * @type {number}
-     * @memberof CategorySpec
-     */
     'priority': number;
-    /**
-     * 
-     * @type {string}
-     * @memberof CategorySpec
-     */
     'slug': string;
-    /**
-     * 
-     * @type {string}
-     * @memberof CategorySpec
-     */
     'template'?: string;
 }
 

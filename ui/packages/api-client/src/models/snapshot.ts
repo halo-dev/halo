@@ -15,40 +15,15 @@
 
 // May contain unused imports in some cases
 // @ts-ignore
-import { Metadata } from './metadata';
+import type { Metadata } from './metadata';
 // May contain unused imports in some cases
 // @ts-ignore
-import { SnapShotSpec } from './snap-shot-spec';
+import type { SnapShotSpec } from './snap-shot-spec';
 
-/**
- * 
- * @export
- * @interface Snapshot
- */
 export interface Snapshot {
-    /**
-     * 
-     * @type {string}
-     * @memberof Snapshot
-     */
     'apiVersion': string;
-    /**
-     * 
-     * @type {string}
-     * @memberof Snapshot
-     */
     'kind': string;
-    /**
-     * 
-     * @type {Metadata}
-     * @memberof Snapshot
-     */
     'metadata': Metadata;
-    /**
-     * 
-     * @type {SnapShotSpec}
-     * @memberof Snapshot
-     */
     'spec': SnapShotSpec;
 }
 

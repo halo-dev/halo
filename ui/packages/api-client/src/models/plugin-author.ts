@@ -14,23 +14,8 @@
 
 
 
-/**
- * 
- * @export
- * @interface PluginAuthor
- */
 export interface PluginAuthor {
-    /**
-     * 
-     * @type {string}
-     * @memberof PluginAuthor
-     */
     'name': string;
-    /**
-     * 
-     * @type {string}
-     * @memberof PluginAuthor
-     */
     'website'?: string;
 }
 

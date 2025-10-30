@@ -20,16 +20,15 @@ import globalAxios from 'axios';
 // @ts-ignore
 import { DUMMY_BASE_URL, assertParamExists, setApiKeyToObject, setBasicAuthToObject, setBearerAuthToObject, setOAuthToObject, setSearchParams, serializeDataIfNeeded, toPathString, createRequestFunction } from '../common';
 // @ts-ignore
-import { BASE_PATH, COLLECTION_FORMATS, RequestArgs, BaseAPI, RequiredError, operationServerMap } from '../base';
+import { BASE_PATH, COLLECTION_FORMATS, type RequestArgs, BaseAPI, RequiredError, operationServerMap } from '../base';
 // @ts-ignore
-import { JsonPatchInner } from '../models';
+import type { JsonPatchInner } from '../models';
 // @ts-ignore
-import { Thumbnail } from '../models';
+import type { Thumbnail } from '../models';
 // @ts-ignore
-import { ThumbnailList } from '../models';
+import type { ThumbnailList } from '../models';
 /**
  * ThumbnailV1alpha1Api - axios parameter creator
- * @export
  */
 export const ThumbnailV1alpha1ApiAxiosParamCreator = function (configuration?: Configuration) {
     return {
@@ -313,7 +312,6 @@ export const ThumbnailV1alpha1ApiAxiosParamCreator = function (configuration?: C
 
 /**
  * ThumbnailV1alpha1Api - functional programming interface
- * @export
  */
 export const ThumbnailV1alpha1ApiFp = function(configuration?: Configuration) {
     const localVarAxiosParamCreator = ThumbnailV1alpha1ApiAxiosParamCreator(configuration)
@@ -401,7 +399,6 @@ export const ThumbnailV1alpha1ApiFp = function(configuration?: Configuration) {
 
 /**
  * ThumbnailV1alpha1Api - factory interface
- * @export
  */
 export const ThumbnailV1alpha1ApiFactory = function (configuration?: Configuration, basePath?: string, axios?: AxiosInstance) {
     const localVarFp = ThumbnailV1alpha1ApiFp(configuration)
@@ -465,135 +462,93 @@ export const ThumbnailV1alpha1ApiFactory = function (configuration?: Configurati
 
 /**
  * Request parameters for createThumbnail operation in ThumbnailV1alpha1Api.
- * @export
- * @interface ThumbnailV1alpha1ApiCreateThumbnailRequest
  */
 export interface ThumbnailV1alpha1ApiCreateThumbnailRequest {
     /**
      * Fresh thumbnail
-     * @type {Thumbnail}
-     * @memberof ThumbnailV1alpha1ApiCreateThumbnail
      */
     readonly thumbnail?: Thumbnail
 }
 
 /**
  * Request parameters for deleteThumbnail operation in ThumbnailV1alpha1Api.
- * @export
- * @interface ThumbnailV1alpha1ApiDeleteThumbnailRequest
  */
 export interface ThumbnailV1alpha1ApiDeleteThumbnailRequest {
     /**
      * Name of thumbnail
-     * @type {string}
-     * @memberof ThumbnailV1alpha1ApiDeleteThumbnail
      */
     readonly name: string
 }
 
 /**
  * Request parameters for getThumbnail operation in ThumbnailV1alpha1Api.
- * @export
- * @interface ThumbnailV1alpha1ApiGetThumbnailRequest
  */
 export interface ThumbnailV1alpha1ApiGetThumbnailRequest {
     /**
      * Name of thumbnail
-     * @type {string}
-     * @memberof ThumbnailV1alpha1ApiGetThumbnail
      */
     readonly name: string
 }
 
 /**
  * Request parameters for listThumbnail operation in ThumbnailV1alpha1Api.
- * @export
- * @interface ThumbnailV1alpha1ApiListThumbnailRequest
  */
 export interface ThumbnailV1alpha1ApiListThumbnailRequest {
     /**
      * Page number. Default is 0.
-     * @type {number}
-     * @memberof ThumbnailV1alpha1ApiListThumbnail
      */
     readonly page?: number
 
     /**
      * Size number. Default is 0.
-     * @type {number}
-     * @memberof ThumbnailV1alpha1ApiListThumbnail
      */
     readonly size?: number
 
     /**
      * Label selector. e.g.: hidden!&#x3D;true
-     * @type {Array<string>}
-     * @memberof ThumbnailV1alpha1ApiListThumbnail
      */
     readonly labelSelector?: Array<string>
 
     /**
      * Field selector. e.g.: metadata.name&#x3D;&#x3D;halo
-     * @type {Array<string>}
-     * @memberof ThumbnailV1alpha1ApiListThumbnail
      */
     readonly fieldSelector?: Array<string>
 
     /**
      * Sorting criteria in the format: property,(asc|desc). Default sort order is ascending. Multiple sort criteria are supported.
-     * @type {Array<string>}
-     * @memberof ThumbnailV1alpha1ApiListThumbnail
      */
     readonly sort?: Array<string>
 }
 
 /**
  * Request parameters for patchThumbnail operation in ThumbnailV1alpha1Api.
- * @export
- * @interface ThumbnailV1alpha1ApiPatchThumbnailRequest
  */
 export interface ThumbnailV1alpha1ApiPatchThumbnailRequest {
     /**
      * Name of thumbnail
-     * @type {string}
-     * @memberof ThumbnailV1alpha1ApiPatchThumbnail
      */
     readonly name: string
 
-    /**
-     * 
-     * @type {Array<JsonPatchInner>}
-     * @memberof ThumbnailV1alpha1ApiPatchThumbnail
-     */
     readonly jsonPatchInner?: Array<JsonPatchInner>
 }
 
 /**
  * Request parameters for updateThumbnail operation in ThumbnailV1alpha1Api.
- * @export
- * @interface ThumbnailV1alpha1ApiUpdateThumbnailRequest
  */
 export interface ThumbnailV1alpha1ApiUpdateThumbnailRequest {
     /**
      * Name of thumbnail
-     * @type {string}
-     * @memberof ThumbnailV1alpha1ApiUpdateThumbnail
      */
     readonly name: string
 
     /**
      * Updated thumbnail
-     * @type {Thumbnail}
-     * @memberof ThumbnailV1alpha1ApiUpdateThumbnail
      */
     readonly thumbnail?: Thumbnail
 }
 
 /**
  * ThumbnailV1alpha1Api - object-oriented interface
- * @export
- * @class ThumbnailV1alpha1Api
- * @extends {BaseAPI}
  */
 export class ThumbnailV1alpha1Api extends BaseAPI {
     /**
@@ -601,7 +556,6 @@ export class ThumbnailV1alpha1Api extends BaseAPI {
      * @param {ThumbnailV1alpha1ApiCreateThumbnailRequest} requestParameters Request parameters.
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
-     * @memberof ThumbnailV1alpha1Api
      */
     public createThumbnail(requestParameters: ThumbnailV1alpha1ApiCreateThumbnailRequest = {}, options?: RawAxiosRequestConfig) {
         return ThumbnailV1alpha1ApiFp(this.configuration).createThumbnail(requestParameters.thumbnail, options).then((request) => request(this.axios, this.basePath));
@@ -612,7 +566,6 @@ export class ThumbnailV1alpha1Api extends BaseAPI {
      * @param {ThumbnailV1alpha1ApiDeleteThumbnailRequest} requestParameters Request parameters.
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
-     * @memberof ThumbnailV1alpha1Api
      */
     public deleteThumbnail(requestParameters: ThumbnailV1alpha1ApiDeleteThumbnailRequest, options?: RawAxiosRequestConfig) {
         return ThumbnailV1alpha1ApiFp(this.configuration).deleteThumbnail(requestParameters.name, options).then((request) => request(this.axios, this.basePath));
@@ -623,7 +576,6 @@ export class ThumbnailV1alpha1Api extends BaseAPI {
      * @param {ThumbnailV1alpha1ApiGetThumbnailRequest} requestParameters Request parameters.
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
-     * @memberof ThumbnailV1alpha1Api
      */
     public getThumbnail(requestParameters: ThumbnailV1alpha1ApiGetThumbnailRequest, options?: RawAxiosRequestConfig) {
         return ThumbnailV1alpha1ApiFp(this.configuration).getThumbnail(requestParameters.name, options).then((request) => request(this.axios, this.basePath));
@@ -634,7 +586,6 @@ export class ThumbnailV1alpha1Api extends BaseAPI {
      * @param {ThumbnailV1alpha1ApiListThumbnailRequest} requestParameters Request parameters.
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
-     * @memberof ThumbnailV1alpha1Api
      */
     public listThumbnail(requestParameters: ThumbnailV1alpha1ApiListThumbnailRequest = {}, options?: RawAxiosRequestConfig) {
         return ThumbnailV1alpha1ApiFp(this.configuration).listThumbnail(requestParameters.page, requestParameters.size, requestParameters.labelSelector, requestParameters.fieldSelector, requestParameters.sort, options).then((request) => request(this.axios, this.basePath));
@@ -645,7 +596,6 @@ export class ThumbnailV1alpha1Api extends BaseAPI {
      * @param {ThumbnailV1alpha1ApiPatchThumbnailRequest} requestParameters Request parameters.
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
-     * @memberof ThumbnailV1alpha1Api
      */
     public patchThumbnail(requestParameters: ThumbnailV1alpha1ApiPatchThumbnailRequest, options?: RawAxiosRequestConfig) {
         return ThumbnailV1alpha1ApiFp(this.configuration).patchThumbnail(requestParameters.name, requestParameters.jsonPatchInner, options).then((request) => request(this.axios, this.basePath));
@@ -656,7 +606,6 @@ export class ThumbnailV1alpha1Api extends BaseAPI {
      * @param {ThumbnailV1alpha1ApiUpdateThumbnailRequest} requestParameters Request parameters.
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
-     * @memberof ThumbnailV1alpha1Api
      */
     public updateThumbnail(requestParameters: ThumbnailV1alpha1ApiUpdateThumbnailRequest, options?: RawAxiosRequestConfig) {
         return ThumbnailV1alpha1ApiFp(this.configuration).updateThumbnail(requestParameters.name, requestParameters.thumbnail, options).then((request) => request(this.axios, this.basePath));
