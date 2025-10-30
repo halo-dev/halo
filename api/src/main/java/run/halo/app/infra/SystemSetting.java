@@ -87,7 +87,7 @@ public class SystemSetting {
         String defaultRole;
         String avatarPolicy;
         String ucAttachmentPolicy;
-        List<String> restrictedUsernames;
+        String protectedUsernames;
     }
 
     @Data

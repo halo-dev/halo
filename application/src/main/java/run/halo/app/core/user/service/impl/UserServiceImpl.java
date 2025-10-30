@@ -5,9 +5,11 @@ import static run.halo.app.extension.index.query.Queries.equal;
 
 import java.time.Clock;
 import java.time.Duration;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
@@ -211,7 +213,17 @@ public class UserServiceImpl implements UserService {
             .switchIfEmpty(Mono.error(() -> new ServerWebInputException(
                 "The registration is not allowed by the administrator."
             )))
-            .filter(setting -> setting.getRestrictedUsernames() == null || !setting.getRestrictedUsernames().contains(signUpData.getUsername()))
+            .filter(setting -> {
+                String protectedUsernamesStr = setting.getProtectedUsernames();
+                if (protectedUsernamesStr == null || protectedUsernamesStr.trim().isEmpty()) {
+                    return true;
+                }
+                List<String> protectedList = Arrays.stream(protectedUsernamesStr.split(","))
+                        .map(String::trim)
+                        .filter(name -> !name.isEmpty())
+                        .toList();
+                return !protectedList.contains(signUpData.getUsername());
+            })
             .switchIfEmpty(Mono.error(RestrictedNameException::new))
             .filter(setting -> StringUtils.hasText(setting.getDefaultRole()))
             .switchIfEmpty(Mono.error(() -> new ServerWebInputException(
