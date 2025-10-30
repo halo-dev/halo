@@ -6,6 +6,7 @@ import {
   type CommandProps,
 } from "@/tiptap";
 import type { ExtensionOptions } from "@/types";
+import { isEmpty } from "lodash-es";
 import Paragraph from "../paragraph";
 import { RangeSelection } from "../range-selection";
 import FigureCaption from "./figure-caption";
@@ -67,8 +68,12 @@ const Figure = Node.create<ExtensionOptions & FigureOptions>({
           return null;
         },
         renderHTML: (attributes) => {
+          const alignItems = attributes.alignItems;
+          if (isEmpty(alignItems)) {
+            return {};
+          }
           return {
-            style: `align-items: ${attributes.alignItems};`,
+            style: `align-items: ${alignItems};`,
           };
         },
       },
@@ -83,11 +88,11 @@ const Figure = Node.create<ExtensionOptions & FigureOptions>({
     ];
   },
 
-  renderHTML({ node, HTMLAttributes }) {
+  renderHTML({ HTMLAttributes }) {
     return [
       "figure",
       mergeAttributes(this.options.HTMLAttributes, HTMLAttributes, {
-        style: `display: flex; flex-direction: column; align-items: ${node.attrs.alignItems};`,
+        style: `display: flex; flex-direction: column;`,
       }),
       0,
     ];
