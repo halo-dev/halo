@@ -6,17 +6,12 @@ import {
   isActive,
   mergeAttributes,
   PluginKey,
-  PMNode,
   VueNodeViewRenderer,
   type Editor,
   type Range,
 } from "@/tiptap";
 import type { EditorState } from "@/tiptap/pm";
-import type {
-  DragSelectionNodeType,
-  ExtensionOptions,
-  NodeBubbleMenuType,
-} from "@/types";
+import type { ExtensionOptions, NodeBubbleMenuType } from "@/types";
 import { deleteNode } from "@/utils";
 import type { ImageOptions } from "@tiptap/extension-image";
 import TiptapImage from "@tiptap/extension-image";
@@ -260,34 +255,6 @@ const Image = TiptapImage.extend<ExtensionOptions & Partial<ImageOptions>>({
               },
             },
           ],
-        };
-      },
-      getDraggable() {
-        return {
-          getRenderContainer({ dom, view }): DragSelectionNodeType {
-            let container = dom;
-            while (container && container.tagName !== "P") {
-              container = container.parentElement as HTMLElement;
-            }
-            if (container) {
-              container = container.firstElementChild
-                ?.firstElementChild as HTMLElement;
-            }
-            let node: PMNode | undefined;
-            if (container.firstElementChild) {
-              const pos = view.posAtDOM(container.firstElementChild, 0);
-              const $pos = view.state.doc.resolve(pos);
-              node = $pos.node();
-            }
-
-            return {
-              node: node,
-              el: container as HTMLElement,
-              dragDomOffset: {
-                y: -5,
-              },
-            };
-          },
         };
       },
     };

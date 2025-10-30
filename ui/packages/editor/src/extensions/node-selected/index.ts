@@ -1,7 +1,10 @@
-import { Extension } from "@/tiptap/vue-3";
-
-import { Decoration, DecorationSet, Plugin, PluginKey } from "@/tiptap/pm";
-
+import {
+  Decoration,
+  DecorationSet,
+  Extension,
+  Plugin,
+  PluginKey,
+} from "@/tiptap";
 export interface NodeSelectedOptions {
   className: string;
 }
@@ -18,11 +21,10 @@ const NodeSelected = Extension.create<NodeSelectedOptions>({
   addProseMirrorPlugins() {
     return [
       new Plugin({
-        key: new PluginKey("nodeSelected"),
+        key: new PluginKey("nodeSelectedByAttr"),
         props: {
-          decorations: ({ doc, selection }) => {
+          decorations: ({ doc }) => {
             const { isEditable, isFocused } = this.editor;
-            const { anchor } = selection;
             const decorations: Decoration[] = [];
 
             if (!isEditable || !isFocused) {
@@ -34,10 +36,8 @@ const NodeSelected = Extension.create<NodeSelectedOptions>({
                 return false;
               }
 
-              const isCurrent =
-                anchor >= pos && anchor <= pos + node.nodeSize - 1;
-
-              if (!isCurrent) {
+              const isSelected = node.attrs.selected;
+              if (!isSelected) {
                 return false;
               }
 
