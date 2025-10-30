@@ -12,7 +12,7 @@ import type {
   DragButtonType,
   ExtensionOptions,
 } from "@/types";
-import { isEmpty } from "@/utils";
+import { isBlockEmpty } from "@/utils";
 import { offset } from "@floating-ui/dom";
 import { DragHandle } from "@tiptap/extension-drag-handle-vue-3";
 import { Dropdown as VDropdown, vTooltip } from "floating-vue";
@@ -38,21 +38,24 @@ const isEmptyNode = computed(() => {
   if (!currentNode.value) {
     return false;
   }
-  return isEmpty(currentNode.value);
+  return isBlockEmpty(currentNode.value);
 });
 
 const handleInsertBlock = () => {
   if (isEmptyNode.value) {
     editor.chain().insertContent("/").focus().run();
   } else {
-    editor
-      .chain()
-      .insertContentAt(
-        currentPos.value + (currentNode.value?.nodeSize ?? 0),
-        "/"
-      )
-      .focus()
-      .run();
+    const insertPos = currentPos.value + (currentNode.value?.nodeSize ?? 0);
+    editor.commands.insertContentAt(
+      insertPos,
+      [{ type: "paragraph", content: [{ type: "text", text: "/" }] }],
+      {
+        updateSelection: true,
+      }
+    );
+    editor.commands.focus(insertPos + 2, {
+      scrollIntoView: true,
+    });
   }
 };
 
