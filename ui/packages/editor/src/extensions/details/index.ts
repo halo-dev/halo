@@ -12,9 +12,11 @@ import {
 } from "@/tiptap";
 import type { ExtensionOptions } from "@/types";
 import { deleteNode } from "@/utils";
-import TiptapDetails, { type DetailsOptions } from "@tiptap/extension-details";
-import TiptapDetailsContent from "@tiptap/extension-details-content";
-import TiptapDetailsSummary from "@tiptap/extension-details-summary";
+import TiptapDetails, {
+  DetailsContent,
+  DetailsSummary,
+  type DetailsOptions,
+} from "@tiptap/extension-details";
 import { markRaw } from "vue";
 import MdiExpandHorizontal from "~icons/mdi/expand-horizontal";
 
@@ -116,7 +118,7 @@ const Details = TiptapDetails.extend<
     };
   },
   addExtensions() {
-    return [TiptapDetailsSummary, TiptapDetailsContent];
+    return [DetailsSummary, DetailsContent];
   },
 });
 
