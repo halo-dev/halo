@@ -125,6 +125,17 @@ spec:
           if: "$get(allowRegistration).value === true"
           help: "需要确保已经正确配置邮件通知器"
           value: false
+        - $formkit: list
+          name: restrictedUsernames
+          label: "限制注册的用户名"
+          if: "$get(allowRegistration).value === true"
+          help: 限制注册的用户名，例如：系统保留用户名(admin、root、system、test等)
+          itemType: string
+          value: []
+          children:
+            - $formkit: text
+              index: "$index"
+              validation: required
         - $formkit: roleSelect
           name: defaultRole
           label: "默认角色"

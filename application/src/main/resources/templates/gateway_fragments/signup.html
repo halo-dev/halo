@@ -22,6 +22,11 @@
             <span th:text="#{form.error.duplicateUsername}"></span>
         </strong>
     </div>
+    <div class="alert alert-error" role="alert" th:if="${error == 'restricted-username'}">
+        <strong>
+            <span th:text="#{form.error.restrictedUsername}"></span>
+        </strong>
+    </div>
     <div class="form-item-group">
         <div class="form-item">
             <label for="username" th:text="#{form.username.label}"></label>

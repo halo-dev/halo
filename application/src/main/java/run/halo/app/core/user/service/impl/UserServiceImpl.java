@@ -49,6 +49,7 @@ import run.halo.app.infra.ValidationUtils;
 import run.halo.app.infra.exception.DuplicateNameException;
 import run.halo.app.infra.exception.EmailAlreadyTakenException;
 import run.halo.app.infra.exception.EmailVerificationFailed;
+import run.halo.app.infra.exception.RestrictedNameException;
 import run.halo.app.infra.exception.UnsatisfiedAttributeValueException;
 import run.halo.app.infra.exception.UserNotFoundException;
 import run.halo.app.plugin.extensionpoint.ExtensionGetter;
@@ -210,6 +211,8 @@ public class UserServiceImpl implements UserService {
             .switchIfEmpty(Mono.error(() -> new ServerWebInputException(
                 "The registration is not allowed by the administrator."
             )))
+            .filter(setting -> setting.getRestrictedUsernames() == null || !setting.getRestrictedUsernames().contains(signUpData.getUsername()))
+            .switchIfEmpty(Mono.error(RestrictedNameException::new))
             .filter(setting -> StringUtils.hasText(setting.getDefaultRole()))
             .switchIfEmpty(Mono.error(() -> new ServerWebInputException(
                 "The default role is not configured by the administrator."
