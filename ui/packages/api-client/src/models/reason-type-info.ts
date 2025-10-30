@@ -14,35 +14,10 @@
 
 
 
-/**
- * 
- * @export
- * @interface ReasonTypeInfo
- */
 export interface ReasonTypeInfo {
-    /**
-     * 
-     * @type {string}
-     * @memberof ReasonTypeInfo
-     */
     'description'?: string;
-    /**
-     * 
-     * @type {string}
-     * @memberof ReasonTypeInfo
-     */
     'displayName'?: string;
-    /**
-     * 
-     * @type {string}
-     * @memberof ReasonTypeInfo
-     */
     'name'?: string;
-    /**
-     * 
-     * @type {Array<string>}
-     * @memberof ReasonTypeInfo
-     */
     'uiPermissions'?: Array<string>;
 }
 

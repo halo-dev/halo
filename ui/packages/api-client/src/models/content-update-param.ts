@@ -14,35 +14,10 @@
 
 
 
-/**
- * 
- * @export
- * @interface ContentUpdateParam
- */
 export interface ContentUpdateParam {
-    /**
-     * 
-     * @type {string}
-     * @memberof ContentUpdateParam
-     */
     'content'?: string;
-    /**
-     * 
-     * @type {string}
-     * @memberof ContentUpdateParam
-     */
     'raw'?: string;
-    /**
-     * 
-     * @type {string}
-     * @memberof ContentUpdateParam
-     */
     'rawType'?: string;
-    /**
-     * 
-     * @type {number}
-     * @memberof ContentUpdateParam
-     */
     'version'?: number;
 }
 

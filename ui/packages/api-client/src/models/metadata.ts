@@ -16,56 +16,35 @@
 
 /**
  * Metadata of Extension.
- * @export
- * @interface Metadata
  */
 export interface Metadata {
     /**
      * Annotations are like key-value format.
-     * @type {{ [key: string]: string; }}
-     * @memberof Metadata
      */
     'annotations'?: { [key: string]: string; };
     /**
      * Creation timestamp of the Extension.
-     * @type {string}
-     * @memberof Metadata
      */
     'creationTimestamp'?: string | null;
     /**
      * Deletion timestamp of the Extension.
-     * @type {string}
-     * @memberof Metadata
      */
     'deletionTimestamp'?: string | null;
-    /**
-     * 
-     * @type {Array<string>}
-     * @memberof Metadata
-     */
-    'finalizers'?: Array<string> | null;
+    'finalizers'?: Array<string | null> | null;
     /**
      * The name field will be generated automatically according to the given generateName field
-     * @type {string}
-     * @memberof Metadata
      */
     'generateName'?: string;
     /**
      * Labels are like key-value format.
-     * @type {{ [key: string]: string; }}
-     * @memberof Metadata
      */
     'labels'?: { [key: string]: string; };
     /**
      * Metadata name
-     * @type {string}
-     * @memberof Metadata
      */
     'name': string;
     /**
      * Current version of the Extension. It will be bumped up every update.
-     * @type {number}
-     * @memberof Metadata
      */
     'version'?: number | null;
 }

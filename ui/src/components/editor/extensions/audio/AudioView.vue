@@ -2,11 +2,11 @@
 import HasPermission from "@/components/permission/HasPermission.vue";
 import { VButton } from "@halo-dev/components";
 import { NodeViewWrapper, type NodeViewProps } from "@halo-dev/richtext-editor";
+import type { AttachmentSimple } from "packages/shared/dist";
 import { computed, ref } from "vue";
 import RiFileMusicLine from "~icons/ri/file-music-line";
 import { EditorLinkObtain } from "../../components";
 import { useExternalAssetsTransfer } from "../../composables/use-attachment";
-import type { AttachmentAttr } from "../../utils/attachment";
 
 const props = defineProps<NodeViewProps>();
 
@@ -33,7 +33,8 @@ const initialization = computed(() => {
 
 const editorLinkObtain = ref();
 
-const handleSetExternalLink = (attachment: AttachmentAttr) => {
+const handleSetExternalLink = (attachment?: AttachmentSimple) => {
+  if (!attachment) return;
   props.updateAttributes({
     src: attachment.url,
   });

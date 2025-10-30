@@ -20,12 +20,11 @@ import globalAxios from 'axios';
 // @ts-ignore
 import { DUMMY_BASE_URL, assertParamExists, setApiKeyToObject, setBasicAuthToObject, setBearerAuthToObject, setOAuthToObject, setSearchParams, serializeDataIfNeeded, toPathString, createRequestFunction } from '../common';
 // @ts-ignore
-import { BASE_PATH, COLLECTION_FORMATS, RequestArgs, BaseAPI, RequiredError, operationServerMap } from '../base';
+import { BASE_PATH, COLLECTION_FORMATS, type RequestArgs, BaseAPI, RequiredError, operationServerMap } from '../base';
 // @ts-ignore
-import { ListedReplyList } from '../models';
+import type { ListedReplyList } from '../models';
 /**
  * ReplyV1alpha1ConsoleApi - axios parameter creator
- * @export
  */
 export const ReplyV1alpha1ConsoleApiAxiosParamCreator = function (configuration?: Configuration) {
     return {
@@ -103,7 +102,6 @@ export const ReplyV1alpha1ConsoleApiAxiosParamCreator = function (configuration?
 
 /**
  * ReplyV1alpha1ConsoleApi - functional programming interface
- * @export
  */
 export const ReplyV1alpha1ConsoleApiFp = function(configuration?: Configuration) {
     const localVarAxiosParamCreator = ReplyV1alpha1ConsoleApiAxiosParamCreator(configuration)
@@ -130,7 +128,6 @@ export const ReplyV1alpha1ConsoleApiFp = function(configuration?: Configuration)
 
 /**
  * ReplyV1alpha1ConsoleApi - factory interface
- * @export
  */
 export const ReplyV1alpha1ConsoleApiFactory = function (configuration?: Configuration, basePath?: string, axios?: AxiosInstance) {
     const localVarFp = ReplyV1alpha1ConsoleApiFp(configuration)
@@ -149,58 +146,41 @@ export const ReplyV1alpha1ConsoleApiFactory = function (configuration?: Configur
 
 /**
  * Request parameters for listReplies operation in ReplyV1alpha1ConsoleApi.
- * @export
- * @interface ReplyV1alpha1ConsoleApiListRepliesRequest
  */
 export interface ReplyV1alpha1ConsoleApiListRepliesRequest {
     /**
      * Replies filtered by commentName.
-     * @type {string}
-     * @memberof ReplyV1alpha1ConsoleApiListReplies
      */
     readonly commentName: string
 
     /**
      * Page number. Default is 0.
-     * @type {number}
-     * @memberof ReplyV1alpha1ConsoleApiListReplies
      */
     readonly page?: number
 
     /**
      * Size number. Default is 0.
-     * @type {number}
-     * @memberof ReplyV1alpha1ConsoleApiListReplies
      */
     readonly size?: number
 
     /**
      * Label selector. e.g.: hidden!&#x3D;true
-     * @type {Array<string>}
-     * @memberof ReplyV1alpha1ConsoleApiListReplies
      */
     readonly labelSelector?: Array<string>
 
     /**
      * Field selector. e.g.: metadata.name&#x3D;&#x3D;halo
-     * @type {Array<string>}
-     * @memberof ReplyV1alpha1ConsoleApiListReplies
      */
     readonly fieldSelector?: Array<string>
 
     /**
      * Sorting criteria in the format: property,(asc|desc). Default sort order is ascending. Multiple sort criteria are supported.
-     * @type {Array<string>}
-     * @memberof ReplyV1alpha1ConsoleApiListReplies
      */
     readonly sort?: Array<string>
 }
 
 /**
  * ReplyV1alpha1ConsoleApi - object-oriented interface
- * @export
- * @class ReplyV1alpha1ConsoleApi
- * @extends {BaseAPI}
  */
 export class ReplyV1alpha1ConsoleApi extends BaseAPI {
     /**
@@ -208,7 +188,6 @@ export class ReplyV1alpha1ConsoleApi extends BaseAPI {
      * @param {ReplyV1alpha1ConsoleApiListRepliesRequest} requestParameters Request parameters.
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
-     * @memberof ReplyV1alpha1ConsoleApi
      */
     public listReplies(requestParameters: ReplyV1alpha1ConsoleApiListRepliesRequest, options?: RawAxiosRequestConfig) {
         return ReplyV1alpha1ConsoleApiFp(this.configuration).listReplies(requestParameters.commentName, requestParameters.page, requestParameters.size, requestParameters.labelSelector, requestParameters.fieldSelector, requestParameters.sort, options).then((request) => request(this.axios, this.basePath));

@@ -15,49 +15,19 @@
 
 // May contain unused imports in some cases
 // @ts-ignore
-import { Metadata } from './metadata';
+import type { Metadata } from './metadata';
 // May contain unused imports in some cases
 // @ts-ignore
-import { TagSpec } from './tag-spec';
+import type { TagSpec } from './tag-spec';
 // May contain unused imports in some cases
 // @ts-ignore
-import { TagStatus } from './tag-status';
+import type { TagStatus } from './tag-status';
 
-/**
- * 
- * @export
- * @interface Tag
- */
 export interface Tag {
-    /**
-     * 
-     * @type {string}
-     * @memberof Tag
-     */
     'apiVersion': string;
-    /**
-     * 
-     * @type {string}
-     * @memberof Tag
-     */
     'kind': string;
-    /**
-     * 
-     * @type {Metadata}
-     * @memberof Tag
-     */
     'metadata': Metadata;
-    /**
-     * 
-     * @type {TagSpec}
-     * @memberof Tag
-     */
     'spec': TagSpec;
-    /**
-     * 
-     * @type {TagStatus}
-     * @memberof Tag
-     */
     'status'?: TagStatus;
 }
 

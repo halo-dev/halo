@@ -6,6 +6,7 @@ import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import org.apache.commons.lang3.StringUtils;
+import org.pf4j.PluginManager;
 import org.pf4j.PluginState;
 import org.springframework.core.io.DefaultResourceLoader;
 import org.springframework.lang.Nullable;
@@ -13,7 +14,6 @@ import org.thymeleaf.IEngineConfiguration;
 import org.thymeleaf.spring6.templateresource.SpringResourceTemplateResource;
 import org.thymeleaf.templateresolver.AbstractConfigurableTemplateResolver;
 import org.thymeleaf.templateresource.ITemplateResource;
-import run.halo.app.plugin.HaloPluginManager;
 
 /**
  * Plugin classloader template resolver to resolve template by plugin classloader.
@@ -23,18 +23,18 @@ import run.halo.app.plugin.HaloPluginManager;
  */
 public class PluginClassloaderTemplateResolver extends AbstractConfigurableTemplateResolver {
 
-    private final HaloPluginManager haloPluginManager;
+    private final PluginManager haloPluginManager;
     static final Pattern PLUGIN_TEMPLATE_PATTERN =
         Pattern.compile("plugin:([A-Za-z0-9\\-.]+):(.+)");
 
     /**
      * Create a new plugin classloader template resolver, not cacheable.
      *
-     * @param haloPluginManager plugin manager must not be null
+     * @param pluginManager plugin manager must not be null
      */
-    public PluginClassloaderTemplateResolver(HaloPluginManager haloPluginManager) {
+    public PluginClassloaderTemplateResolver(PluginManager pluginManager) {
         super();
-        this.haloPluginManager = haloPluginManager;
+        this.haloPluginManager = pluginManager;
         setCacheable(false);
     }
 

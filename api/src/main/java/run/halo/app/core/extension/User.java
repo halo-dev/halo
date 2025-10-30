@@ -7,7 +7,6 @@ import static run.halo.app.core.extension.User.VERSION;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import java.time.Instant;
-import java.util.List;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.ToString;
@@ -87,30 +86,7 @@ public class User extends AbstractExtension {
     @Data
     public static class UserStatus {
 
-        private Instant lastLoginAt;
-
         private String permalink;
-
-        private List<LoginHistory> loginHistories;
-
-    }
-
-    @Data
-    public static class LoginHistory {
-
-        @Schema(requiredMode = REQUIRED)
-        private Instant loginAt;
-
-        @Schema(requiredMode = REQUIRED)
-        private String sourceIp;
-
-        @Schema(requiredMode = REQUIRED)
-        private String userAgent;
-
-        @Schema(requiredMode = REQUIRED)
-        private Boolean successful;
-
-        private String reason;
 
     }
 

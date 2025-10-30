@@ -14,9 +14,9 @@ import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.pf4j.DefaultVersionManager;
 import org.pf4j.PluginDescriptor;
+import org.pf4j.PluginManager;
 import org.pf4j.PluginState;
 import org.pf4j.PluginWrapper;
-import run.halo.app.plugin.HaloPluginManager;
 
 /**
  * Tests for {@link PluginFinderImpl}.
@@ -26,8 +26,9 @@ import run.halo.app.plugin.HaloPluginManager;
  */
 @ExtendWith(MockitoExtension.class)
 class PluginFinderImplTest {
+
     @Mock
-    private HaloPluginManager haloPluginManager;
+    private PluginManager haloPluginManager;
 
     @InjectMocks
     private PluginFinderImpl pluginFinder;

@@ -14,10 +14,10 @@ import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.pf4j.PluginClassLoader;
+import org.pf4j.PluginManager;
 import org.pf4j.PluginWrapper;
 import org.springframework.core.io.Resource;
 import run.halo.app.infra.exception.AccessDeniedException;
-import run.halo.app.plugin.HaloPluginManager;
 
 /**
  * Tests for {@link BundleResourceUtils}.
@@ -29,7 +29,7 @@ import run.halo.app.plugin.HaloPluginManager;
 class BundleResourceUtilsTest {
 
     @Mock
-    private HaloPluginManager pluginManager;
+    private PluginManager pluginManager;
 
     @BeforeEach
     void setUp() throws MalformedURLException {

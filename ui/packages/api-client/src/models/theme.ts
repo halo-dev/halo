@@ -15,49 +15,22 @@
 
 // May contain unused imports in some cases
 // @ts-ignore
-import { Metadata } from './metadata';
+import type { Metadata } from './metadata';
 // May contain unused imports in some cases
 // @ts-ignore
-import { ThemeSpec } from './theme-spec';
+import type { ThemeSpec } from './theme-spec';
 // May contain unused imports in some cases
 // @ts-ignore
-import { ThemeStatus } from './theme-status';
+import type { ThemeStatus } from './theme-status';
 
 /**
  * <p>Theme extension.</p>
- * @export
- * @interface Theme
  */
 export interface Theme {
-    /**
-     * 
-     * @type {string}
-     * @memberof Theme
-     */
     'apiVersion': string;
-    /**
-     * 
-     * @type {string}
-     * @memberof Theme
-     */
     'kind': string;
-    /**
-     * 
-     * @type {Metadata}
-     * @memberof Theme
-     */
     'metadata': Metadata;
-    /**
-     * 
-     * @type {ThemeSpec}
-     * @memberof Theme
-     */
     'spec': ThemeSpec;
-    /**
-     * 
-     * @type {ThemeStatus}
-     * @memberof Theme
-     */
     'status'?: ThemeStatus;
 }
 

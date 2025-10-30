@@ -2,10 +2,10 @@
 import HasPermission from "@/components/permission/HasPermission.vue";
 import { IconImageAddLine, VButton } from "@halo-dev/components";
 import { NodeViewWrapper, type NodeViewProps } from "@halo-dev/richtext-editor";
+import type { AttachmentSimple } from "packages/shared/dist";
 import { computed, onMounted, onUnmounted, ref, watch } from "vue";
 import { EditorLinkObtain } from "../../components";
 import { useExternalAssetsTransfer } from "../../composables/use-attachment";
-import { type AttachmentAttr } from "../../utils/attachment";
 import { fileToBase64 } from "../../utils/upload";
 import Image from "./index";
 
@@ -58,10 +58,11 @@ const handleUploadReady = async (file: File) => {
   retryFlag.value = false;
 };
 
-const handleSetExternalLink = (attachment: AttachmentAttr) => {
+const handleSetExternalLink = (attachment?: AttachmentSimple) => {
+  if (!attachment) return;
   props.updateAttributes({
     src: attachment.url,
-    alt: attachment.name,
+    alt: attachment.alt,
   });
 };
 

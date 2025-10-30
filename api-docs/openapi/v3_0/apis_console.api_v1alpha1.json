@@ -4236,27 +4236,27 @@
         "properties": {
           "approvedComments": {
             "type": "integer",
-            "format": "int32"
+            "format": "int64"
           },
           "comments": {
             "type": "integer",
-            "format": "int32"
+            "format": "int64"
           },
           "posts": {
             "type": "integer",
-            "format": "int32"
+            "format": "int64"
           },
           "upvotes": {
             "type": "integer",
-            "format": "int32"
+            "format": "int64"
           },
           "users": {
             "type": "integer",
-            "format": "int32"
+            "format": "int64"
           },
           "visits": {
             "type": "integer",
-            "format": "int32"
+            "format": "int64"
           }
         }
       },
@@ -4912,33 +4912,6 @@
         },
         "description": "A chunk of items."
       },
-      "LoginHistory": {
-        "required": [
-          "loginAt",
-          "sourceIp",
-          "successful",
-          "userAgent"
-        ],
-        "type": "object",
-        "properties": {
-          "loginAt": {
-            "type": "string",
-            "format": "date-time"
-          },
-          "reason": {
-            "type": "string"
-          },
-          "sourceIp": {
-            "type": "string"
-          },
-          "successful": {
-            "type": "boolean"
-          },
-          "userAgent": {
-            "type": "string"
-          }
-        }
-      },
       "Metadata": {
         "required": [
           "name"
@@ -5475,12 +5448,12 @@
           },
           "visible": {
             "type": "string",
+            "default": "PUBLIC",
             "enum": [
               "PUBLIC",
               "INTERNAL",
               "PRIVATE"
-            ],
-            "default": "PUBLIC"
+            ]
           }
         }
       },
@@ -6015,12 +5988,12 @@
           },
           "visible": {
             "type": "string",
+            "default": "PUBLIC",
             "enum": [
               "PUBLIC",
               "INTERNAL",
               "PRIVATE"
-            ],
-            "default": "PUBLIC"
+            ]
           }
         }
       },
@@ -6657,16 +6630,6 @@
       "UserStatus": {
         "type": "object",
         "properties": {
-          "lastLoginAt": {
-            "type": "string",
-            "format": "date-time"
-          },
-          "loginHistories": {
-            "type": "array",
-            "items": {
-              "$ref": "#/components/schemas/LoginHistory"
-            }
-          },
           "permalink": {
             "type": "string"
           }

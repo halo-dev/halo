@@ -1172,6 +1172,20 @@
                 "XL"
               ]
             }
+          },
+          {
+            "description": "The width of the thumbnail, if \u0027size\u0027 is not provided, this parameter will be used to determine the size",
+            "in": "query",
+            "name": "width",
+            "schema": {
+              "type": "integer",
+              "enum": [
+                "400",
+                "800",
+                "1200",
+                "1600"
+              ]
+            }
           }
         ],
         "responses": {
@@ -2619,12 +2633,12 @@
           },
           "visible": {
             "type": "string",
+            "default": "PUBLIC",
             "enum": [
               "PUBLIC",
               "INTERNAL",
               "PRIVATE"
-            ],
-            "default": "PUBLIC"
+            ]
           }
         }
       },
@@ -3197,12 +3211,12 @@
           },
           "visible": {
             "type": "string",
+            "default": "PUBLIC",
             "enum": [
               "PUBLIC",
               "INTERNAL",
               "PRIVATE"
-            ],
-            "default": "PUBLIC"
+            ]
           }
         }
       },

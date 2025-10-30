@@ -20,12 +20,11 @@ import globalAxios from 'axios';
 // @ts-ignore
 import { DUMMY_BASE_URL, assertParamExists, setApiKeyToObject, setBasicAuthToObject, setBearerAuthToObject, setOAuthToObject, setSearchParams, serializeDataIfNeeded, toPathString, createRequestFunction } from '../common';
 // @ts-ignore
-import { BASE_PATH, COLLECTION_FORMATS, RequestArgs, BaseAPI, RequiredError, operationServerMap } from '../base';
+import { BASE_PATH, COLLECTION_FORMATS, type RequestArgs, BaseAPI, RequiredError, operationServerMap } from '../base';
 // @ts-ignore
-import { DashboardStats } from '../models';
+import type { DashboardStats } from '../models';
 /**
  * SystemV1alpha1ConsoleApi - axios parameter creator
- * @export
  */
 export const SystemV1alpha1ConsoleApiAxiosParamCreator = function (configuration?: Configuration) {
     return {
@@ -71,7 +70,6 @@ export const SystemV1alpha1ConsoleApiAxiosParamCreator = function (configuration
 
 /**
  * SystemV1alpha1ConsoleApi - functional programming interface
- * @export
  */
 export const SystemV1alpha1ConsoleApiFp = function(configuration?: Configuration) {
     const localVarAxiosParamCreator = SystemV1alpha1ConsoleApiAxiosParamCreator(configuration)
@@ -92,7 +90,6 @@ export const SystemV1alpha1ConsoleApiFp = function(configuration?: Configuration
 
 /**
  * SystemV1alpha1ConsoleApi - factory interface
- * @export
  */
 export const SystemV1alpha1ConsoleApiFactory = function (configuration?: Configuration, basePath?: string, axios?: AxiosInstance) {
     const localVarFp = SystemV1alpha1ConsoleApiFp(configuration)
@@ -110,16 +107,12 @@ export const SystemV1alpha1ConsoleApiFactory = function (configuration?: Configu
 
 /**
  * SystemV1alpha1ConsoleApi - object-oriented interface
- * @export
- * @class SystemV1alpha1ConsoleApi
- * @extends {BaseAPI}
  */
 export class SystemV1alpha1ConsoleApi extends BaseAPI {
     /**
      * Get stats.
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
-     * @memberof SystemV1alpha1ConsoleApi
      */
     public getStats(options?: RawAxiosRequestConfig) {
         return SystemV1alpha1ConsoleApiFp(this.configuration).getStats(options).then((request) => request(this.axios, this.basePath));

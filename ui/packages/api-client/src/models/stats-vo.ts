@@ -16,27 +16,10 @@
 
 /**
  * Stats value object.
- * @export
- * @interface StatsVo
  */
 export interface StatsVo {
-    /**
-     * 
-     * @type {number}
-     * @memberof StatsVo
-     */
     'comment'?: number;
-    /**
-     * 
-     * @type {number}
-     * @memberof StatsVo
-     */
     'upvote'?: number;
-    /**
-     * 
-     * @type {number}
-     * @memberof StatsVo
-     */
     'visit'?: number;
 }
 

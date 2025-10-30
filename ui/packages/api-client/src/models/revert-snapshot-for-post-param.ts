@@ -14,17 +14,7 @@
 
 
 
-/**
- * 
- * @export
- * @interface RevertSnapshotForPostParam
- */
 export interface RevertSnapshotForPostParam {
-    /**
-     * 
-     * @type {string}
-     * @memberof RevertSnapshotForPostParam
-     */
     'snapshotName': string;
 }
 

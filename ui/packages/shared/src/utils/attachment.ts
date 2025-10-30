@@ -1,3 +1,4 @@
+import type { AttachmentLike, AttachmentSimple } from "@/plugin";
 import type { GetThumbnailByUriSizeEnum } from "@halo-dev/api-client";
 
 /**
@@ -63,5 +64,101 @@ export class AttachmentUtils {
     return `/apis/api.storage.halo.run/v1alpha1/thumbnails/-/via-uri?uri=${encodeURIComponent(
       url
     )}&width=${width}`;
+  }
+
+  /**
+   * Extracts the URL from an attachment-like object
+   *
+   * @param attachment - The attachment object (can be a string URL, Attachment object, or AttachmentSimple)
+   * @returns The URL string extracted from the attachment
+   * @throws {Error} When the attachment type is invalid or unrecognized
+   *
+   * @remarks
+   * This method handles three types of attachments:
+   * 1. String: Returns the string directly as URL
+   * 2. Attachment object (with "spec"): Returns the permalink from status
+   * 3. AttachmentSimple (with "url"): Returns the url property
+   *
+   * @example
+   * ```ts
+   * import { utils } from "@halo-dev/console-shared"
+   *
+   * // String URL
+   * utils.attachment.getUrl("https://example.com/image.jpg");
+   * // Returns: "https://example.com/image.jpg"
+   *
+   * // Attachment object
+   * utils.attachment.getUrl(attachmentObject);
+   * // Returns: attachmentObject.status?.permalink
+   *
+   * // AttachmentSimple object
+   * utils.attachment.getUrl({ url: "https://example.com/image.jpg" });
+   * // Returns: "https://example.com/image.jpg"
+   * ```
+   */
+  getUrl(attachment: AttachmentLike) {
+    if (typeof attachment === "string") {
+      return attachment;
+    }
+    if ("spec" in attachment) {
+      return attachment.status?.permalink;
+    }
+    if ("url" in attachment) {
+      return attachment.url;
+    }
+    throw new Error("Invalid attachment");
+  }
+
+  /**
+   * Converts an attachment-like object to a simplified attachment format
+   *
+   * @param attachment - The attachment object to convert (can be a string URL, Attachment object, or AttachmentSimple)
+   * @returns A simplified attachment object with url, alt, and mediaType properties, or undefined
+   * @throws {Error} When the attachment type is invalid or unrecognized
+   *
+   * @remarks
+   * This method normalizes different attachment formats into a consistent AttachmentSimple structure:
+   * 1. String: Converts to object with only url property
+   * 2. Attachment object (with "spec"): Extracts permalink, displayName, and mediaType
+   * 3. AttachmentSimple (with "url"): Returns as-is since it's already in the correct format
+   *
+   * @example
+   * ```ts
+   * import { utils } from "@halo-dev/console-shared"
+   *
+   * // String URL
+   * utils.attachment.convertToSimple("https://example.com/image.jpg");
+   * // Returns: { url: "https://example.com/image.jpg" }
+   *
+   * // Attachment object
+   * utils.attachment.convertToSimple(attachmentObject);
+   * // Returns: {
+   * //   url: attachmentObject.status?.permalink || "",
+   * //   alt: attachmentObject.spec.displayName,
+   * //   mediaType: attachmentObject.spec.mediaType
+   * // }
+   *
+   * // AttachmentSimple object
+   * utils.attachment.convertToSimple({ url: "https://example.com/image.jpg", alt: "Image" });
+   * // Returns: { url: "https://example.com/image.jpg", alt: "Image" }
+   * ```
+   */
+  convertToSimple(attachment: AttachmentLike): AttachmentSimple | undefined {
+    if (typeof attachment === "string") {
+      return {
+        url: attachment,
+      };
+    }
+    if ("spec" in attachment) {
+      return {
+        url: attachment.status?.permalink || "",
+        alt: attachment.spec.displayName,
+        mediaType: attachment.spec.mediaType,
+      };
+    }
+    if ("url" in attachment) {
+      return attachment;
+    }
+    throw new Error("Invalid attachment");
   }
 }

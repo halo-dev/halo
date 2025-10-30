@@ -20,16 +20,15 @@ import globalAxios from 'axios';
 // @ts-ignore
 import { DUMMY_BASE_URL, assertParamExists, setApiKeyToObject, setBasicAuthToObject, setBearerAuthToObject, setOAuthToObject, setSearchParams, serializeDataIfNeeded, toPathString, createRequestFunction } from '../common';
 // @ts-ignore
-import { BASE_PATH, COLLECTION_FORMATS, RequestArgs, BaseAPI, RequiredError, operationServerMap } from '../base';
+import { BASE_PATH, COLLECTION_FORMATS, type RequestArgs, BaseAPI, RequiredError, operationServerMap } from '../base';
 // @ts-ignore
-import { JsonPatchInner } from '../models';
+import type { JsonPatchInner } from '../models';
 // @ts-ignore
-import { Role } from '../models';
+import type { Role } from '../models';
 // @ts-ignore
-import { RoleList } from '../models';
+import type { RoleList } from '../models';
 /**
  * RoleV1alpha1Api - axios parameter creator
- * @export
  */
 export const RoleV1alpha1ApiAxiosParamCreator = function (configuration?: Configuration) {
     return {
@@ -313,7 +312,6 @@ export const RoleV1alpha1ApiAxiosParamCreator = function (configuration?: Config
 
 /**
  * RoleV1alpha1Api - functional programming interface
- * @export
  */
 export const RoleV1alpha1ApiFp = function(configuration?: Configuration) {
     const localVarAxiosParamCreator = RoleV1alpha1ApiAxiosParamCreator(configuration)
@@ -401,7 +399,6 @@ export const RoleV1alpha1ApiFp = function(configuration?: Configuration) {
 
 /**
  * RoleV1alpha1Api - factory interface
- * @export
  */
 export const RoleV1alpha1ApiFactory = function (configuration?: Configuration, basePath?: string, axios?: AxiosInstance) {
     const localVarFp = RoleV1alpha1ApiFp(configuration)
@@ -465,135 +462,93 @@ export const RoleV1alpha1ApiFactory = function (configuration?: Configuration, b
 
 /**
  * Request parameters for createRole operation in RoleV1alpha1Api.
- * @export
- * @interface RoleV1alpha1ApiCreateRoleRequest
  */
 export interface RoleV1alpha1ApiCreateRoleRequest {
     /**
      * Fresh role
-     * @type {Role}
-     * @memberof RoleV1alpha1ApiCreateRole
      */
     readonly role?: Role
 }
 
 /**
  * Request parameters for deleteRole operation in RoleV1alpha1Api.
- * @export
- * @interface RoleV1alpha1ApiDeleteRoleRequest
  */
 export interface RoleV1alpha1ApiDeleteRoleRequest {
     /**
      * Name of role
-     * @type {string}
-     * @memberof RoleV1alpha1ApiDeleteRole
      */
     readonly name: string
 }
 
 /**
  * Request parameters for getRole operation in RoleV1alpha1Api.
- * @export
- * @interface RoleV1alpha1ApiGetRoleRequest
  */
 export interface RoleV1alpha1ApiGetRoleRequest {
     /**
      * Name of role
-     * @type {string}
-     * @memberof RoleV1alpha1ApiGetRole
      */
     readonly name: string
 }
 
 /**
  * Request parameters for listRole operation in RoleV1alpha1Api.
- * @export
- * @interface RoleV1alpha1ApiListRoleRequest
  */
 export interface RoleV1alpha1ApiListRoleRequest {
     /**
      * Page number. Default is 0.
-     * @type {number}
-     * @memberof RoleV1alpha1ApiListRole
      */
     readonly page?: number
 
     /**
      * Size number. Default is 0.
-     * @type {number}
-     * @memberof RoleV1alpha1ApiListRole
      */
     readonly size?: number
 
     /**
      * Label selector. e.g.: hidden!&#x3D;true
-     * @type {Array<string>}
-     * @memberof RoleV1alpha1ApiListRole
      */
     readonly labelSelector?: Array<string>
 
     /**
      * Field selector. e.g.: metadata.name&#x3D;&#x3D;halo
-     * @type {Array<string>}
-     * @memberof RoleV1alpha1ApiListRole
      */
     readonly fieldSelector?: Array<string>
 
     /**
      * Sorting criteria in the format: property,(asc|desc). Default sort order is ascending. Multiple sort criteria are supported.
-     * @type {Array<string>}
-     * @memberof RoleV1alpha1ApiListRole
      */
     readonly sort?: Array<string>
 }
 
 /**
  * Request parameters for patchRole operation in RoleV1alpha1Api.
- * @export
- * @interface RoleV1alpha1ApiPatchRoleRequest
  */
 export interface RoleV1alpha1ApiPatchRoleRequest {
     /**
      * Name of role
-     * @type {string}
-     * @memberof RoleV1alpha1ApiPatchRole
      */
     readonly name: string
 
-    /**
-     * 
-     * @type {Array<JsonPatchInner>}
-     * @memberof RoleV1alpha1ApiPatchRole
-     */
     readonly jsonPatchInner?: Array<JsonPatchInner>
 }
 
 /**
  * Request parameters for updateRole operation in RoleV1alpha1Api.
- * @export
- * @interface RoleV1alpha1ApiUpdateRoleRequest
  */
 export interface RoleV1alpha1ApiUpdateRoleRequest {
     /**
      * Name of role
-     * @type {string}
-     * @memberof RoleV1alpha1ApiUpdateRole
      */
     readonly name: string
 
     /**
      * Updated role
-     * @type {Role}
-     * @memberof RoleV1alpha1ApiUpdateRole
      */
     readonly role?: Role
 }
 
 /**
  * RoleV1alpha1Api - object-oriented interface
- * @export
- * @class RoleV1alpha1Api
- * @extends {BaseAPI}
  */
 export class RoleV1alpha1Api extends BaseAPI {
     /**
@@ -601,7 +556,6 @@ export class RoleV1alpha1Api extends BaseAPI {
      * @param {RoleV1alpha1ApiCreateRoleRequest} requestParameters Request parameters.
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
-     * @memberof RoleV1alpha1Api
      */
     public createRole(requestParameters: RoleV1alpha1ApiCreateRoleRequest = {}, options?: RawAxiosRequestConfig) {
         return RoleV1alpha1ApiFp(this.configuration).createRole(requestParameters.role, options).then((request) => request(this.axios, this.basePath));
@@ -612,7 +566,6 @@ export class RoleV1alpha1Api extends BaseAPI {
      * @param {RoleV1alpha1ApiDeleteRoleRequest} requestParameters Request parameters.
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
-     * @memberof RoleV1alpha1Api
      */
     public deleteRole(requestParameters: RoleV1alpha1ApiDeleteRoleRequest, options?: RawAxiosRequestConfig) {
         return RoleV1alpha1ApiFp(this.configuration).deleteRole(requestParameters.name, options).then((request) => request(this.axios, this.basePath));
@@ -623,7 +576,6 @@ export class RoleV1alpha1Api extends BaseAPI {
      * @param {RoleV1alpha1ApiGetRoleRequest} requestParameters Request parameters.
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
-     * @memberof RoleV1alpha1Api
      */
     public getRole(requestParameters: RoleV1alpha1ApiGetRoleRequest, options?: RawAxiosRequestConfig) {
         return RoleV1alpha1ApiFp(this.configuration).getRole(requestParameters.name, options).then((request) => request(this.axios, this.basePath));
@@ -634,7 +586,6 @@ export class RoleV1alpha1Api extends BaseAPI {
      * @param {RoleV1alpha1ApiListRoleRequest} requestParameters Request parameters.
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
-     * @memberof RoleV1alpha1Api
      */
     public listRole(requestParameters: RoleV1alpha1ApiListRoleRequest = {}, options?: RawAxiosRequestConfig) {
         return RoleV1alpha1ApiFp(this.configuration).listRole(requestParameters.page, requestParameters.size, requestParameters.labelSelector, requestParameters.fieldSelector, requestParameters.sort, options).then((request) => request(this.axios, this.basePath));
@@ -645,7 +596,6 @@ export class RoleV1alpha1Api extends BaseAPI {
      * @param {RoleV1alpha1ApiPatchRoleRequest} requestParameters Request parameters.
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
-     * @memberof RoleV1alpha1Api
      */
     public patchRole(requestParameters: RoleV1alpha1ApiPatchRoleRequest, options?: RawAxiosRequestConfig) {
         return RoleV1alpha1ApiFp(this.configuration).patchRole(requestParameters.name, requestParameters.jsonPatchInner, options).then((request) => request(this.axios, this.basePath));
@@ -656,7 +606,6 @@ export class RoleV1alpha1Api extends BaseAPI {
      * @param {RoleV1alpha1ApiUpdateRoleRequest} requestParameters Request parameters.
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
-     * @memberof RoleV1alpha1Api
      */
     public updateRole(requestParameters: RoleV1alpha1ApiUpdateRoleRequest, options?: RawAxiosRequestConfig) {
         return RoleV1alpha1ApiFp(this.configuration).updateRole(requestParameters.name, requestParameters.role, options).then((request) => request(this.axios, this.basePath));
