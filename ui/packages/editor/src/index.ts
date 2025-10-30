@@ -23,8 +23,10 @@ export {
   generateAnchor,
   generateAnchorId,
   isAllowedUri,
+  isBlockEmpty,
   isEmpty,
   isListActive,
+  isNodeContentEmpty,
 } from "./utils";
 
 export { useExtension } from "./composables/use-extension";

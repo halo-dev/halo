@@ -1,7 +1,7 @@
 import type { Node } from "@tiptap/pm/model";
 
 export const isEmpty = (node: Node) => {
-  return isNodeDefault(node) || isParagraphEmpty(node);
+  return isNodeDefault(node) || isNodeContentEmpty(node);
 };
 
 export const isNodeDefault = (node: Node) => {
@@ -10,14 +10,37 @@ export const isNodeDefault = (node: Node) => {
   return JSON.stringify(defaultContent) === JSON.stringify(content);
 };
 
+export const isNodeContentEmpty = (node: Node) => {
+  if (node.isTextblock) {
+    return node.textContent.length === 0;
+  }
+
+  if (node.childCount === 0) {
+    return true;
+  }
+
+  let allChildrenEmpty = true;
+  node.forEach((child) => {
+    if (!isEmpty(child)) {
+      allChildrenEmpty = false;
+    }
+  });
+
+  return allChildrenEmpty;
+};
+
 export const isParagraphEmpty = (node: Node) => {
   if (node.type.name !== "paragraph") {
     return false;
   }
 
-  if (node.childCount > 0) {
+  return node.textContent.length === 0;
+};
+
+export const isBlockEmpty = (node: Node) => {
+  if (!node.isTextblock) {
     return false;
   }
 
-  return node.textContent.length === 0;
+  return isParagraphEmpty(node);
 };

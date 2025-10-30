@@ -43,7 +43,6 @@ import {
   ExtensionColumn,
   ExtensionColumns,
 } from "./columns";
-import ExtensionDraggable from "./draggable";
 import ExtensionFormatBrush from "./format-brush";
 import ExtensionGapcursor from "./gap-cursor";
 import ExtensionIframe, { IFRAME_BUBBLE_MENU_KEY } from "./iframe";
@@ -138,7 +137,6 @@ export {
   ExtensionCommands,
   ExtensionDetails,
   ExtensionDocument,
-  ExtensionDraggable,
   Dropcursor as ExtensionDropcursor,
   ExtensionFigure,
   ExtensionFontSize,

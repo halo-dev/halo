@@ -16,7 +16,6 @@ import {
   ExtensionCommands,
   ExtensionDetails,
   ExtensionDocument,
-  ExtensionDraggable,
   ExtensionDropcursor,
   ExtensionFigure,
   ExtensionFontSize,
@@ -382,7 +381,6 @@ const presetExtensions = [
       };
     },
   }),
-  ExtensionDraggable,
   ExtensionColumns,
   ExtensionColumn,
   ExtensionNodeSelected,
