@@ -11441,33 +11441,6 @@
           }
         }
       },
-      "LoginHistory": {
-        "required": [
-          "loginAt",
-          "sourceIp",
-          "successful",
-          "userAgent"
-        ],
-        "type": "object",
-        "properties": {
-          "loginAt": {
-            "type": "string",
-            "format": "date-time"
-          },
-          "reason": {
-            "type": "string"
-          },
-          "sourceIp": {
-            "type": "string"
-          },
-          "successful": {
-            "type": "boolean"
-          },
-          "userAgent": {
-            "type": "string"
-          }
-        }
-      },
       "Menu": {
         "required": [
           "apiVersion",
@@ -12903,12 +12876,12 @@
           },
           "visible": {
             "type": "string",
+            "default": "PUBLIC",
             "enum": [
               "PUBLIC",
               "INTERNAL",
               "PRIVATE"
-            ],
-            "default": "PUBLIC"
+            ]
           }
         }
       },
@@ -14281,12 +14254,12 @@
           },
           "visible": {
             "type": "string",
+            "default": "PUBLIC",
             "enum": [
               "PUBLIC",
               "INTERNAL",
               "PRIVATE"
-            ],
-            "default": "PUBLIC"
+            ]
           }
         }
       },
@@ -15323,16 +15296,6 @@
       "UserStatus": {
         "type": "object",
         "properties": {
-          "lastLoginAt": {
-            "type": "string",
-            "format": "date-time"
-          },
-          "loginHistories": {
-            "type": "array",
-            "items": {
-              "$ref": "#/components/schemas/LoginHistory"
-            }
-          },
           "permalink": {
             "type": "string"
           }

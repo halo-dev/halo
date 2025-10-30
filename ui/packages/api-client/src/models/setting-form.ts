@@ -14,29 +14,9 @@
 
 
 
-/**
- * 
- * @export
- * @interface SettingForm
- */
 export interface SettingForm {
-    /**
-     * 
-     * @type {Array<object>}
-     * @memberof SettingForm
-     */
     'formSchema': Array<object>;
-    /**
-     * 
-     * @type {string}
-     * @memberof SettingForm
-     */
     'group': string;
-    /**
-     * 
-     * @type {string}
-     * @memberof SettingForm
-     */
     'label'?: string;
 }
 

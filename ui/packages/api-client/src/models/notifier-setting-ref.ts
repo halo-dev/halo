@@ -14,23 +14,8 @@
 
 
 
-/**
- * 
- * @export
- * @interface NotifierSettingRef
- */
 export interface NotifierSettingRef {
-    /**
-     * 
-     * @type {string}
-     * @memberof NotifierSettingRef
-     */
     'group': string;
-    /**
-     * 
-     * @type {string}
-     * @memberof NotifierSettingRef
-     */
     'name': string;
 }
 

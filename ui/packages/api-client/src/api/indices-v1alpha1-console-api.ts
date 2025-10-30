@@ -20,10 +20,9 @@ import globalAxios from 'axios';
 // @ts-ignore
 import { DUMMY_BASE_URL, assertParamExists, setApiKeyToObject, setBasicAuthToObject, setBearerAuthToObject, setOAuthToObject, setSearchParams, serializeDataIfNeeded, toPathString, createRequestFunction } from '../common';
 // @ts-ignore
-import { BASE_PATH, COLLECTION_FORMATS, RequestArgs, BaseAPI, RequiredError, operationServerMap } from '../base';
+import { BASE_PATH, COLLECTION_FORMATS, type RequestArgs, BaseAPI, RequiredError, operationServerMap } from '../base';
 /**
  * IndicesV1alpha1ConsoleApi - axios parameter creator
- * @export
  */
 export const IndicesV1alpha1ConsoleApiAxiosParamCreator = function (configuration?: Configuration) {
     return {
@@ -69,7 +68,6 @@ export const IndicesV1alpha1ConsoleApiAxiosParamCreator = function (configuratio
 
 /**
  * IndicesV1alpha1ConsoleApi - functional programming interface
- * @export
  */
 export const IndicesV1alpha1ConsoleApiFp = function(configuration?: Configuration) {
     const localVarAxiosParamCreator = IndicesV1alpha1ConsoleApiAxiosParamCreator(configuration)
@@ -90,7 +88,6 @@ export const IndicesV1alpha1ConsoleApiFp = function(configuration?: Configuratio
 
 /**
  * IndicesV1alpha1ConsoleApi - factory interface
- * @export
  */
 export const IndicesV1alpha1ConsoleApiFactory = function (configuration?: Configuration, basePath?: string, axios?: AxiosInstance) {
     const localVarFp = IndicesV1alpha1ConsoleApiFp(configuration)
@@ -108,16 +105,12 @@ export const IndicesV1alpha1ConsoleApiFactory = function (configuration?: Config
 
 /**
  * IndicesV1alpha1ConsoleApi - object-oriented interface
- * @export
- * @class IndicesV1alpha1ConsoleApi
- * @extends {BaseAPI}
  */
 export class IndicesV1alpha1ConsoleApi extends BaseAPI {
     /**
      * Rebuild all indices
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
-     * @memberof IndicesV1alpha1ConsoleApi
      */
     public rebuildAllIndices(options?: RawAxiosRequestConfig) {
         return IndicesV1alpha1ConsoleApiFp(this.configuration).rebuildAllIndices(options).then((request) => request(this.axios, this.basePath));

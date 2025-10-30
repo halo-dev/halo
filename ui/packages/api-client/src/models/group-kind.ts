@@ -16,20 +16,14 @@
 
 /**
  * GroupKind contains group and kind data only.
- * @export
- * @interface GroupKind
  */
 export interface GroupKind {
     /**
      * is group name of Extension.
-     * @type {string}
-     * @memberof GroupKind
      */
     'group'?: string;
     /**
      * is kind name of Extension.
-     * @type {string}
-     * @memberof GroupKind
      */
     'kind'?: string;
 }

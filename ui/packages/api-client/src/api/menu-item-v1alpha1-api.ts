@@ -20,16 +20,15 @@ import globalAxios from 'axios';
 // @ts-ignore
 import { DUMMY_BASE_URL, assertParamExists, setApiKeyToObject, setBasicAuthToObject, setBearerAuthToObject, setOAuthToObject, setSearchParams, serializeDataIfNeeded, toPathString, createRequestFunction } from '../common';
 // @ts-ignore
-import { BASE_PATH, COLLECTION_FORMATS, RequestArgs, BaseAPI, RequiredError, operationServerMap } from '../base';
+import { BASE_PATH, COLLECTION_FORMATS, type RequestArgs, BaseAPI, RequiredError, operationServerMap } from '../base';
 // @ts-ignore
-import { JsonPatchInner } from '../models';
+import type { JsonPatchInner } from '../models';
 // @ts-ignore
-import { MenuItem } from '../models';
+import type { MenuItem } from '../models';
 // @ts-ignore
-import { MenuItemList } from '../models';
+import type { MenuItemList } from '../models';
 /**
  * MenuItemV1alpha1Api - axios parameter creator
- * @export
  */
 export const MenuItemV1alpha1ApiAxiosParamCreator = function (configuration?: Configuration) {
     return {
@@ -313,7 +312,6 @@ export const MenuItemV1alpha1ApiAxiosParamCreator = function (configuration?: Co
 
 /**
  * MenuItemV1alpha1Api - functional programming interface
- * @export
  */
 export const MenuItemV1alpha1ApiFp = function(configuration?: Configuration) {
     const localVarAxiosParamCreator = MenuItemV1alpha1ApiAxiosParamCreator(configuration)
@@ -401,7 +399,6 @@ export const MenuItemV1alpha1ApiFp = function(configuration?: Configuration) {
 
 /**
  * MenuItemV1alpha1Api - factory interface
- * @export
  */
 export const MenuItemV1alpha1ApiFactory = function (configuration?: Configuration, basePath?: string, axios?: AxiosInstance) {
     const localVarFp = MenuItemV1alpha1ApiFp(configuration)
@@ -465,135 +462,93 @@ export const MenuItemV1alpha1ApiFactory = function (configuration?: Configuratio
 
 /**
  * Request parameters for createMenuItem operation in MenuItemV1alpha1Api.
- * @export
- * @interface MenuItemV1alpha1ApiCreateMenuItemRequest
  */
 export interface MenuItemV1alpha1ApiCreateMenuItemRequest {
     /**
      * Fresh menuitem
-     * @type {MenuItem}
-     * @memberof MenuItemV1alpha1ApiCreateMenuItem
      */
     readonly menuItem?: MenuItem
 }
 
 /**
  * Request parameters for deleteMenuItem operation in MenuItemV1alpha1Api.
- * @export
- * @interface MenuItemV1alpha1ApiDeleteMenuItemRequest
  */
 export interface MenuItemV1alpha1ApiDeleteMenuItemRequest {
     /**
      * Name of menuitem
-     * @type {string}
-     * @memberof MenuItemV1alpha1ApiDeleteMenuItem
      */
     readonly name: string
 }
 
 /**
  * Request parameters for getMenuItem operation in MenuItemV1alpha1Api.
- * @export
- * @interface MenuItemV1alpha1ApiGetMenuItemRequest
  */
 export interface MenuItemV1alpha1ApiGetMenuItemRequest {
     /**
      * Name of menuitem
-     * @type {string}
-     * @memberof MenuItemV1alpha1ApiGetMenuItem
      */
     readonly name: string
 }
 
 /**
  * Request parameters for listMenuItem operation in MenuItemV1alpha1Api.
- * @export
- * @interface MenuItemV1alpha1ApiListMenuItemRequest
  */
 export interface MenuItemV1alpha1ApiListMenuItemRequest {
     /**
      * Page number. Default is 0.
-     * @type {number}
-     * @memberof MenuItemV1alpha1ApiListMenuItem
      */
     readonly page?: number
 
     /**
      * Size number. Default is 0.
-     * @type {number}
-     * @memberof MenuItemV1alpha1ApiListMenuItem
      */
     readonly size?: number
 
     /**
      * Label selector. e.g.: hidden!&#x3D;true
-     * @type {Array<string>}
-     * @memberof MenuItemV1alpha1ApiListMenuItem
      */
     readonly labelSelector?: Array<string>
 
     /**
      * Field selector. e.g.: metadata.name&#x3D;&#x3D;halo
-     * @type {Array<string>}
-     * @memberof MenuItemV1alpha1ApiListMenuItem
      */
     readonly fieldSelector?: Array<string>
 
     /**
      * Sorting criteria in the format: property,(asc|desc). Default sort order is ascending. Multiple sort criteria are supported.
-     * @type {Array<string>}
-     * @memberof MenuItemV1alpha1ApiListMenuItem
      */
     readonly sort?: Array<string>
 }
 
 /**
  * Request parameters for patchMenuItem operation in MenuItemV1alpha1Api.
- * @export
- * @interface MenuItemV1alpha1ApiPatchMenuItemRequest
  */
 export interface MenuItemV1alpha1ApiPatchMenuItemRequest {
     /**
      * Name of menuitem
-     * @type {string}
-     * @memberof MenuItemV1alpha1ApiPatchMenuItem
      */
     readonly name: string
 
-    /**
-     * 
-     * @type {Array<JsonPatchInner>}
-     * @memberof MenuItemV1alpha1ApiPatchMenuItem
-     */
     readonly jsonPatchInner?: Array<JsonPatchInner>
 }
 
 /**
  * Request parameters for updateMenuItem operation in MenuItemV1alpha1Api.
- * @export
- * @interface MenuItemV1alpha1ApiUpdateMenuItemRequest
  */
 export interface MenuItemV1alpha1ApiUpdateMenuItemRequest {
     /**
      * Name of menuitem
-     * @type {string}
-     * @memberof MenuItemV1alpha1ApiUpdateMenuItem
      */
     readonly name: string
 
     /**
      * Updated menuitem
-     * @type {MenuItem}
-     * @memberof MenuItemV1alpha1ApiUpdateMenuItem
      */
     readonly menuItem?: MenuItem
 }
 
 /**
  * MenuItemV1alpha1Api - object-oriented interface
- * @export
- * @class MenuItemV1alpha1Api
- * @extends {BaseAPI}
  */
 export class MenuItemV1alpha1Api extends BaseAPI {
     /**
@@ -601,7 +556,6 @@ export class MenuItemV1alpha1Api extends BaseAPI {
      * @param {MenuItemV1alpha1ApiCreateMenuItemRequest} requestParameters Request parameters.
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
-     * @memberof MenuItemV1alpha1Api
      */
     public createMenuItem(requestParameters: MenuItemV1alpha1ApiCreateMenuItemRequest = {}, options?: RawAxiosRequestConfig) {
         return MenuItemV1alpha1ApiFp(this.configuration).createMenuItem(requestParameters.menuItem, options).then((request) => request(this.axios, this.basePath));
@@ -612,7 +566,6 @@ export class MenuItemV1alpha1Api extends BaseAPI {
      * @param {MenuItemV1alpha1ApiDeleteMenuItemRequest} requestParameters Request parameters.
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
-     * @memberof MenuItemV1alpha1Api
      */
     public deleteMenuItem(requestParameters: MenuItemV1alpha1ApiDeleteMenuItemRequest, options?: RawAxiosRequestConfig) {
         return MenuItemV1alpha1ApiFp(this.configuration).deleteMenuItem(requestParameters.name, options).then((request) => request(this.axios, this.basePath));
@@ -623,7 +576,6 @@ export class MenuItemV1alpha1Api extends BaseAPI {
      * @param {MenuItemV1alpha1ApiGetMenuItemRequest} requestParameters Request parameters.
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
-     * @memberof MenuItemV1alpha1Api
      */
     public getMenuItem(requestParameters: MenuItemV1alpha1ApiGetMenuItemRequest, options?: RawAxiosRequestConfig) {
         return MenuItemV1alpha1ApiFp(this.configuration).getMenuItem(requestParameters.name, options).then((request) => request(this.axios, this.basePath));
@@ -634,7 +586,6 @@ export class MenuItemV1alpha1Api extends BaseAPI {
      * @param {MenuItemV1alpha1ApiListMenuItemRequest} requestParameters Request parameters.
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
-     * @memberof MenuItemV1alpha1Api
      */
     public listMenuItem(requestParameters: MenuItemV1alpha1ApiListMenuItemRequest = {}, options?: RawAxiosRequestConfig) {
         return MenuItemV1alpha1ApiFp(this.configuration).listMenuItem(requestParameters.page, requestParameters.size, requestParameters.labelSelector, requestParameters.fieldSelector, requestParameters.sort, options).then((request) => request(this.axios, this.basePath));
@@ -645,7 +596,6 @@ export class MenuItemV1alpha1Api extends BaseAPI {
      * @param {MenuItemV1alpha1ApiPatchMenuItemRequest} requestParameters Request parameters.
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
-     * @memberof MenuItemV1alpha1Api
      */
     public patchMenuItem(requestParameters: MenuItemV1alpha1ApiPatchMenuItemRequest, options?: RawAxiosRequestConfig) {
         return MenuItemV1alpha1ApiFp(this.configuration).patchMenuItem(requestParameters.name, requestParameters.jsonPatchInner, options).then((request) => request(this.axios, this.basePath));
@@ -656,7 +606,6 @@ export class MenuItemV1alpha1Api extends BaseAPI {
      * @param {MenuItemV1alpha1ApiUpdateMenuItemRequest} requestParameters Request parameters.
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
-     * @memberof MenuItemV1alpha1Api
      */
     public updateMenuItem(requestParameters: MenuItemV1alpha1ApiUpdateMenuItemRequest, options?: RawAxiosRequestConfig) {
         return MenuItemV1alpha1ApiFp(this.configuration).updateMenuItem(requestParameters.name, requestParameters.menuItem, options).then((request) => request(this.axios, this.basePath));

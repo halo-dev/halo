@@ -20,16 +20,15 @@ import globalAxios from 'axios';
 // @ts-ignore
 import { DUMMY_BASE_URL, assertParamExists, setApiKeyToObject, setBasicAuthToObject, setBearerAuthToObject, setOAuthToObject, setSearchParams, serializeDataIfNeeded, toPathString, createRequestFunction } from '../common';
 // @ts-ignore
-import { BASE_PATH, COLLECTION_FORMATS, RequestArgs, BaseAPI, RequiredError, operationServerMap } from '../base';
+import { BASE_PATH, COLLECTION_FORMATS, type RequestArgs, BaseAPI, RequiredError, operationServerMap } from '../base';
 // @ts-ignore
-import { Attachment } from '../models';
+import type { Attachment } from '../models';
 // @ts-ignore
-import { AttachmentList } from '../models';
+import type { AttachmentList } from '../models';
 // @ts-ignore
-import { JsonPatchInner } from '../models';
+import type { JsonPatchInner } from '../models';
 /**
  * AttachmentV1alpha1Api - axios parameter creator
- * @export
  */
 export const AttachmentV1alpha1ApiAxiosParamCreator = function (configuration?: Configuration) {
     return {
@@ -313,7 +312,6 @@ export const AttachmentV1alpha1ApiAxiosParamCreator = function (configuration?: 
 
 /**
  * AttachmentV1alpha1Api - functional programming interface
- * @export
  */
 export const AttachmentV1alpha1ApiFp = function(configuration?: Configuration) {
     const localVarAxiosParamCreator = AttachmentV1alpha1ApiAxiosParamCreator(configuration)
@@ -401,7 +399,6 @@ export const AttachmentV1alpha1ApiFp = function(configuration?: Configuration) {
 
 /**
  * AttachmentV1alpha1Api - factory interface
- * @export
  */
 export const AttachmentV1alpha1ApiFactory = function (configuration?: Configuration, basePath?: string, axios?: AxiosInstance) {
     const localVarFp = AttachmentV1alpha1ApiFp(configuration)
@@ -465,135 +462,93 @@ export const AttachmentV1alpha1ApiFactory = function (configuration?: Configurat
 
 /**
  * Request parameters for createAttachment operation in AttachmentV1alpha1Api.
- * @export
- * @interface AttachmentV1alpha1ApiCreateAttachmentRequest
  */
 export interface AttachmentV1alpha1ApiCreateAttachmentRequest {
     /**
      * Fresh attachment
-     * @type {Attachment}
-     * @memberof AttachmentV1alpha1ApiCreateAttachment
      */
     readonly attachment?: Attachment
 }
 
 /**
  * Request parameters for deleteAttachment operation in AttachmentV1alpha1Api.
- * @export
- * @interface AttachmentV1alpha1ApiDeleteAttachmentRequest
  */
 export interface AttachmentV1alpha1ApiDeleteAttachmentRequest {
     /**
      * Name of attachment
-     * @type {string}
-     * @memberof AttachmentV1alpha1ApiDeleteAttachment
      */
     readonly name: string
 }
 
 /**
  * Request parameters for getAttachment operation in AttachmentV1alpha1Api.
- * @export
- * @interface AttachmentV1alpha1ApiGetAttachmentRequest
  */
 export interface AttachmentV1alpha1ApiGetAttachmentRequest {
     /**
      * Name of attachment
-     * @type {string}
-     * @memberof AttachmentV1alpha1ApiGetAttachment
      */
     readonly name: string
 }
 
 /**
  * Request parameters for listAttachment operation in AttachmentV1alpha1Api.
- * @export
- * @interface AttachmentV1alpha1ApiListAttachmentRequest
  */
 export interface AttachmentV1alpha1ApiListAttachmentRequest {
     /**
      * Page number. Default is 0.
-     * @type {number}
-     * @memberof AttachmentV1alpha1ApiListAttachment
      */
     readonly page?: number
 
     /**
      * Size number. Default is 0.
-     * @type {number}
-     * @memberof AttachmentV1alpha1ApiListAttachment
      */
     readonly size?: number
 
     /**
      * Label selector. e.g.: hidden!&#x3D;true
-     * @type {Array<string>}
-     * @memberof AttachmentV1alpha1ApiListAttachment
      */
     readonly labelSelector?: Array<string>
 
     /**
      * Field selector. e.g.: metadata.name&#x3D;&#x3D;halo
-     * @type {Array<string>}
-     * @memberof AttachmentV1alpha1ApiListAttachment
      */
     readonly fieldSelector?: Array<string>
 
     /**
      * Sorting criteria in the format: property,(asc|desc). Default sort order is ascending. Multiple sort criteria are supported.
-     * @type {Array<string>}
-     * @memberof AttachmentV1alpha1ApiListAttachment
      */
     readonly sort?: Array<string>
 }
 
 /**
  * Request parameters for patchAttachment operation in AttachmentV1alpha1Api.
- * @export
- * @interface AttachmentV1alpha1ApiPatchAttachmentRequest
  */
 export interface AttachmentV1alpha1ApiPatchAttachmentRequest {
     /**
      * Name of attachment
-     * @type {string}
-     * @memberof AttachmentV1alpha1ApiPatchAttachment
      */
     readonly name: string
 
-    /**
-     * 
-     * @type {Array<JsonPatchInner>}
-     * @memberof AttachmentV1alpha1ApiPatchAttachment
-     */
     readonly jsonPatchInner?: Array<JsonPatchInner>
 }
 
 /**
  * Request parameters for updateAttachment operation in AttachmentV1alpha1Api.
- * @export
- * @interface AttachmentV1alpha1ApiUpdateAttachmentRequest
  */
 export interface AttachmentV1alpha1ApiUpdateAttachmentRequest {
     /**
      * Name of attachment
-     * @type {string}
-     * @memberof AttachmentV1alpha1ApiUpdateAttachment
      */
     readonly name: string
 
     /**
      * Updated attachment
-     * @type {Attachment}
-     * @memberof AttachmentV1alpha1ApiUpdateAttachment
      */
     readonly attachment?: Attachment
 }
 
 /**
  * AttachmentV1alpha1Api - object-oriented interface
- * @export
- * @class AttachmentV1alpha1Api
- * @extends {BaseAPI}
  */
 export class AttachmentV1alpha1Api extends BaseAPI {
     /**
@@ -601,7 +556,6 @@ export class AttachmentV1alpha1Api extends BaseAPI {
      * @param {AttachmentV1alpha1ApiCreateAttachmentRequest} requestParameters Request parameters.
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
-     * @memberof AttachmentV1alpha1Api
      */
     public createAttachment(requestParameters: AttachmentV1alpha1ApiCreateAttachmentRequest = {}, options?: RawAxiosRequestConfig) {
         return AttachmentV1alpha1ApiFp(this.configuration).createAttachment(requestParameters.attachment, options).then((request) => request(this.axios, this.basePath));
@@ -612,7 +566,6 @@ export class AttachmentV1alpha1Api extends BaseAPI {
      * @param {AttachmentV1alpha1ApiDeleteAttachmentRequest} requestParameters Request parameters.
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
-     * @memberof AttachmentV1alpha1Api
      */
     public deleteAttachment(requestParameters: AttachmentV1alpha1ApiDeleteAttachmentRequest, options?: RawAxiosRequestConfig) {
         return AttachmentV1alpha1ApiFp(this.configuration).deleteAttachment(requestParameters.name, options).then((request) => request(this.axios, this.basePath));
@@ -623,7 +576,6 @@ export class AttachmentV1alpha1Api extends BaseAPI {
      * @param {AttachmentV1alpha1ApiGetAttachmentRequest} requestParameters Request parameters.
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
-     * @memberof AttachmentV1alpha1Api
      */
     public getAttachment(requestParameters: AttachmentV1alpha1ApiGetAttachmentRequest, options?: RawAxiosRequestConfig) {
         return AttachmentV1alpha1ApiFp(this.configuration).getAttachment(requestParameters.name, options).then((request) => request(this.axios, this.basePath));
@@ -634,7 +586,6 @@ export class AttachmentV1alpha1Api extends BaseAPI {
      * @param {AttachmentV1alpha1ApiListAttachmentRequest} requestParameters Request parameters.
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
-     * @memberof AttachmentV1alpha1Api
      */
     public listAttachment(requestParameters: AttachmentV1alpha1ApiListAttachmentRequest = {}, options?: RawAxiosRequestConfig) {
         return AttachmentV1alpha1ApiFp(this.configuration).listAttachment(requestParameters.page, requestParameters.size, requestParameters.labelSelector, requestParameters.fieldSelector, requestParameters.sort, options).then((request) => request(this.axios, this.basePath));
@@ -645,7 +596,6 @@ export class AttachmentV1alpha1Api extends BaseAPI {
      * @param {AttachmentV1alpha1ApiPatchAttachmentRequest} requestParameters Request parameters.
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
-     * @memberof AttachmentV1alpha1Api
      */
     public patchAttachment(requestParameters: AttachmentV1alpha1ApiPatchAttachmentRequest, options?: RawAxiosRequestConfig) {
         return AttachmentV1alpha1ApiFp(this.configuration).patchAttachment(requestParameters.name, requestParameters.jsonPatchInner, options).then((request) => request(this.axios, this.basePath));
@@ -656,7 +606,6 @@ export class AttachmentV1alpha1Api extends BaseAPI {
      * @param {AttachmentV1alpha1ApiUpdateAttachmentRequest} requestParameters Request parameters.
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
-     * @memberof AttachmentV1alpha1Api
      */
     public updateAttachment(requestParameters: AttachmentV1alpha1ApiUpdateAttachmentRequest, options?: RawAxiosRequestConfig) {
         return AttachmentV1alpha1ApiFp(this.configuration).updateAttachment(requestParameters.name, requestParameters.attachment, options).then((request) => request(this.axios, this.basePath));

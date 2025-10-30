@@ -16,26 +16,18 @@
 
 /**
  * RoleRef contains information that points to the role being used.
- * @export
- * @interface RoleRef
  */
 export interface RoleRef {
     /**
      * APIGroup is the group for the resource being referenced.
-     * @type {string}
-     * @memberof RoleRef
      */
     'apiGroup'?: string;
     /**
      * Kind is the type of resource being referenced.
-     * @type {string}
-     * @memberof RoleRef
      */
     'kind'?: string;
     /**
      * Name is the name of resource being referenced.
-     * @type {string}
-     * @memberof RoleRef
      */
     'name'?: string;
 }

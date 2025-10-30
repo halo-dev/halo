@@ -20,14 +20,13 @@ import globalAxios from 'axios';
 // @ts-ignore
 import { DUMMY_BASE_URL, assertParamExists, setApiKeyToObject, setBasicAuthToObject, setBearerAuthToObject, setOAuthToObject, setSearchParams, serializeDataIfNeeded, toPathString, createRequestFunction } from '../common';
 // @ts-ignore
-import { BASE_PATH, COLLECTION_FORMATS, RequestArgs, BaseAPI, RequiredError, operationServerMap } from '../base';
+import { BASE_PATH, COLLECTION_FORMATS, type RequestArgs, BaseAPI, RequiredError, operationServerMap } from '../base';
 // @ts-ignore
-import { SearchOption } from '../models';
+import type { SearchOption } from '../models';
 // @ts-ignore
-import { SearchResult } from '../models';
+import type { SearchResult } from '../models';
 /**
  * IndexV1alpha1PublicApi - axios parameter creator
- * @export
  */
 export const IndexV1alpha1PublicApiAxiosParamCreator = function (configuration?: Configuration) {
     return {
@@ -77,7 +76,6 @@ export const IndexV1alpha1PublicApiAxiosParamCreator = function (configuration?:
 
 /**
  * IndexV1alpha1PublicApi - functional programming interface
- * @export
  */
 export const IndexV1alpha1PublicApiFp = function(configuration?: Configuration) {
     const localVarAxiosParamCreator = IndexV1alpha1PublicApiAxiosParamCreator(configuration)
@@ -99,7 +97,6 @@ export const IndexV1alpha1PublicApiFp = function(configuration?: Configuration) 
 
 /**
  * IndexV1alpha1PublicApi - factory interface
- * @export
  */
 export const IndexV1alpha1PublicApiFactory = function (configuration?: Configuration, basePath?: string, axios?: AxiosInstance) {
     const localVarFp = IndexV1alpha1PublicApiFp(configuration)
@@ -118,23 +115,16 @@ export const IndexV1alpha1PublicApiFactory = function (configuration?: Configura
 
 /**
  * Request parameters for indicesSearch operation in IndexV1alpha1PublicApi.
- * @export
- * @interface IndexV1alpha1PublicApiIndicesSearchRequest
  */
 export interface IndexV1alpha1PublicApiIndicesSearchRequest {
     /**
      * Please note that the \&quot;filterPublished\&quot;, \&quot;filterExposed\&quot; and \&quot;filterRecycled\&quot; fields are ignored in this endpoint.
-     * @type {SearchOption}
-     * @memberof IndexV1alpha1PublicApiIndicesSearch
      */
     readonly searchOption?: SearchOption
 }
 
 /**
  * IndexV1alpha1PublicApi - object-oriented interface
- * @export
- * @class IndexV1alpha1PublicApi
- * @extends {BaseAPI}
  */
 export class IndexV1alpha1PublicApi extends BaseAPI {
     /**
@@ -142,7 +132,6 @@ export class IndexV1alpha1PublicApi extends BaseAPI {
      * @param {IndexV1alpha1PublicApiIndicesSearchRequest} requestParameters Request parameters.
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
-     * @memberof IndexV1alpha1PublicApi
      */
     public indicesSearch(requestParameters: IndexV1alpha1PublicApiIndicesSearchRequest = {}, options?: RawAxiosRequestConfig) {
         return IndexV1alpha1PublicApiFp(this.configuration).indicesSearch(requestParameters.searchOption, options).then((request) => request(this.axios, this.basePath));

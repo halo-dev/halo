@@ -15,37 +15,20 @@
 
 // May contain unused imports in some cases
 // @ts-ignore
-import { CommentStats } from './comment-stats';
+import type { CommentStats } from './comment-stats';
 // May contain unused imports in some cases
 // @ts-ignore
-import { OwnerInfo } from './owner-info';
+import type { OwnerInfo } from './owner-info';
 // May contain unused imports in some cases
 // @ts-ignore
-import { Reply } from './reply';
+import type { Reply } from './reply';
 
 /**
  * A chunk of items.
- * @export
- * @interface ListedReply
  */
 export interface ListedReply {
-    /**
-     * 
-     * @type {OwnerInfo}
-     * @memberof ListedReply
-     */
     'owner': OwnerInfo;
-    /**
-     * 
-     * @type {Reply}
-     * @memberof ListedReply
-     */
     'reply': Reply;
-    /**
-     * 
-     * @type {CommentStats}
-     * @memberof ListedReply
-     */
     'stats': CommentStats;
 }
 

@@ -16,32 +16,22 @@
 
 /**
  * Extension reference object. The name is mandatory
- * @export
- * @interface Ref
  */
 export interface Ref {
     /**
      * Extension group
-     * @type {string}
-     * @memberof Ref
      */
     'group'?: string;
     /**
      * Extension kind
-     * @type {string}
-     * @memberof Ref
      */
     'kind'?: string;
     /**
      * Extension name. This field is mandatory
-     * @type {string}
-     * @memberof Ref
      */
     'name': string;
     /**
      * Extension version
-     * @type {string}
-     * @memberof Ref
      */
     'version'?: string;
 }

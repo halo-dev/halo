@@ -15,43 +15,21 @@
 
 // May contain unused imports in some cases
 // @ts-ignore
-import { CategorySpec } from './category-spec';
+import type { CategorySpec } from './category-spec';
 // May contain unused imports in some cases
 // @ts-ignore
-import { CategoryStatus } from './category-status';
+import type { CategoryStatus } from './category-status';
 // May contain unused imports in some cases
 // @ts-ignore
-import { Metadata } from './metadata';
+import type { Metadata } from './metadata';
 
 /**
  * A value object for {@link Category Category}.
- * @export
- * @interface CategoryVo
  */
 export interface CategoryVo {
-    /**
-     * 
-     * @type {Metadata}
-     * @memberof CategoryVo
-     */
     'metadata': Metadata;
-    /**
-     * 
-     * @type {number}
-     * @memberof CategoryVo
-     */
     'postCount'?: number;
-    /**
-     * 
-     * @type {CategorySpec}
-     * @memberof CategoryVo
-     */
     'spec'?: CategorySpec;
-    /**
-     * 
-     * @type {CategoryStatus}
-     * @memberof CategoryVo
-     */
     'status'?: CategoryStatus;
 }
 

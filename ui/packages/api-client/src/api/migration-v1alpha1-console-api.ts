@@ -20,12 +20,11 @@ import globalAxios from 'axios';
 // @ts-ignore
 import { DUMMY_BASE_URL, assertParamExists, setApiKeyToObject, setBasicAuthToObject, setBearerAuthToObject, setOAuthToObject, setSearchParams, serializeDataIfNeeded, toPathString, createRequestFunction } from '../common';
 // @ts-ignore
-import { BASE_PATH, COLLECTION_FORMATS, RequestArgs, BaseAPI, RequiredError, operationServerMap } from '../base';
+import { BASE_PATH, COLLECTION_FORMATS, type RequestArgs, BaseAPI, RequiredError, operationServerMap } from '../base';
 // @ts-ignore
-import { BackupFile } from '../models';
+import type { BackupFile } from '../models';
 /**
  * MigrationV1alpha1ConsoleApi - axios parameter creator
- * @export
  */
 export const MigrationV1alpha1ConsoleApiAxiosParamCreator = function (configuration?: Configuration) {
     return {
@@ -177,7 +176,6 @@ export const MigrationV1alpha1ConsoleApiAxiosParamCreator = function (configurat
 
 /**
  * MigrationV1alpha1ConsoleApi - functional programming interface
- * @export
  */
 export const MigrationV1alpha1ConsoleApiFp = function(configuration?: Configuration) {
     const localVarAxiosParamCreator = MigrationV1alpha1ConsoleApiAxiosParamCreator(configuration)
@@ -226,7 +224,6 @@ export const MigrationV1alpha1ConsoleApiFp = function(configuration?: Configurat
 
 /**
  * MigrationV1alpha1ConsoleApi - factory interface
- * @export
  */
 export const MigrationV1alpha1ConsoleApiFactory = function (configuration?: Configuration, basePath?: string, axios?: AxiosInstance) {
     const localVarFp = MigrationV1alpha1ConsoleApiFp(configuration)
@@ -262,65 +259,43 @@ export const MigrationV1alpha1ConsoleApiFactory = function (configuration?: Conf
 
 /**
  * Request parameters for downloadBackups operation in MigrationV1alpha1ConsoleApi.
- * @export
- * @interface MigrationV1alpha1ConsoleApiDownloadBackupsRequest
  */
 export interface MigrationV1alpha1ConsoleApiDownloadBackupsRequest {
     /**
      * Backup name.
-     * @type {string}
-     * @memberof MigrationV1alpha1ConsoleApiDownloadBackups
      */
     readonly name: string
 
     /**
      * Backup filename.
-     * @type {string}
-     * @memberof MigrationV1alpha1ConsoleApiDownloadBackups
      */
     readonly filename: string
 }
 
 /**
  * Request parameters for restoreBackup operation in MigrationV1alpha1ConsoleApi.
- * @export
- * @interface MigrationV1alpha1ConsoleApiRestoreBackupRequest
  */
 export interface MigrationV1alpha1ConsoleApiRestoreBackupRequest {
     /**
      * Backup metadata name.
-     * @type {string}
-     * @memberof MigrationV1alpha1ConsoleApiRestoreBackup
      */
     readonly backupName?: string
 
     /**
      * Remote backup HTTP URL.
-     * @type {string}
-     * @memberof MigrationV1alpha1ConsoleApiRestoreBackup
      */
     readonly downloadUrl?: string
 
-    /**
-     * 
-     * @type {File}
-     * @memberof MigrationV1alpha1ConsoleApiRestoreBackup
-     */
     readonly file?: File
 
     /**
      * Filename of backup file in backups root.
-     * @type {string}
-     * @memberof MigrationV1alpha1ConsoleApiRestoreBackup
      */
     readonly filename?: string
 }
 
 /**
  * MigrationV1alpha1ConsoleApi - object-oriented interface
- * @export
- * @class MigrationV1alpha1ConsoleApi
- * @extends {BaseAPI}
  */
 export class MigrationV1alpha1ConsoleApi extends BaseAPI {
     /**
@@ -328,7 +303,6 @@ export class MigrationV1alpha1ConsoleApi extends BaseAPI {
      * @param {MigrationV1alpha1ConsoleApiDownloadBackupsRequest} requestParameters Request parameters.
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
-     * @memberof MigrationV1alpha1ConsoleApi
      */
     public downloadBackups(requestParameters: MigrationV1alpha1ConsoleApiDownloadBackupsRequest, options?: RawAxiosRequestConfig) {
         return MigrationV1alpha1ConsoleApiFp(this.configuration).downloadBackups(requestParameters.name, requestParameters.filename, options).then((request) => request(this.axios, this.basePath));
@@ -338,7 +312,6 @@ export class MigrationV1alpha1ConsoleApi extends BaseAPI {
      * Get backup files from backup root.
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
-     * @memberof MigrationV1alpha1ConsoleApi
      */
     public getBackupFiles(options?: RawAxiosRequestConfig) {
         return MigrationV1alpha1ConsoleApiFp(this.configuration).getBackupFiles(options).then((request) => request(this.axios, this.basePath));
@@ -349,7 +322,6 @@ export class MigrationV1alpha1ConsoleApi extends BaseAPI {
      * @param {MigrationV1alpha1ConsoleApiRestoreBackupRequest} requestParameters Request parameters.
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
-     * @memberof MigrationV1alpha1ConsoleApi
      */
     public restoreBackup(requestParameters: MigrationV1alpha1ConsoleApiRestoreBackupRequest = {}, options?: RawAxiosRequestConfig) {
         return MigrationV1alpha1ConsoleApiFp(this.configuration).restoreBackup(requestParameters.backupName, requestParameters.downloadUrl, requestParameters.file, requestParameters.filename, options).then((request) => request(this.axios, this.basePath));

@@ -6692,6 +6692,20 @@
                 "XL"
               ]
             }
+          },
+          {
+            "description": "The width of the thumbnail, if \u0027size\u0027 is not provided, this parameter will be used to determine the size",
+            "in": "query",
+            "name": "width",
+            "schema": {
+              "type": "integer",
+              "enum": [
+                "400",
+                "800",
+                "1200",
+                "1600"
+              ]
+            }
           }
         ],
         "responses": {
@@ -17244,27 +17258,27 @@
         "properties": {
           "approvedComments": {
             "type": "integer",
-            "format": "int32"
+            "format": "int64"
           },
           "comments": {
             "type": "integer",
-            "format": "int32"
+            "format": "int64"
           },
           "posts": {
             "type": "integer",
-            "format": "int32"
+            "format": "int64"
           },
           "upvotes": {
             "type": "integer",
-            "format": "int32"
+            "format": "int64"
           },
           "users": {
             "type": "integer",
-            "format": "int32"
+            "format": "int64"
           },
           "visits": {
             "type": "integer",
-            "format": "int32"
+            "format": "int64"
           }
         }
       },
@@ -18944,33 +18958,6 @@
           }
         }
       },
-      "LoginHistory": {
-        "required": [
-          "loginAt",
-          "sourceIp",
-          "successful",
-          "userAgent"
-        ],
-        "type": "object",
-        "properties": {
-          "loginAt": {
-            "type": "string",
-            "format": "date-time"
-          },
-          "reason": {
-            "type": "string"
-          },
-          "sourceIp": {
-            "type": "string"
-          },
-          "successful": {
-            "type": "boolean"
-          },
-          "userAgent": {
-            "type": "string"
-          }
-        }
-      },
       "MarkSpecifiedRequest": {
         "type": "object",
         "properties": {
@@ -20593,12 +20580,12 @@
           },
           "visible": {
             "type": "string",
+            "default": "PUBLIC",
             "enum": [
               "PUBLIC",
               "INTERNAL",
               "PRIVATE"
-            ],
-            "default": "PUBLIC"
+            ]
           }
         }
       },
@@ -22369,12 +22356,12 @@
           },
           "visible": {
             "type": "string",
+            "default": "PUBLIC",
             "enum": [
               "PUBLIC",
               "INTERNAL",
               "PRIVATE"
-            ],
-            "default": "PUBLIC"
+            ]
           }
         }
       },
@@ -23850,16 +23837,6 @@
       "UserStatus": {
         "type": "object",
         "properties": {
-          "lastLoginAt": {
-            "type": "string",
-            "format": "date-time"
-          },
-          "loginHistories": {
-            "type": "array",
-            "items": {
-              "$ref": "#/components/schemas/LoginHistory"
-            }
-          },
           "permalink": {
             "type": "string"
           }

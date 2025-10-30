@@ -14,22 +14,13 @@
 
 
 
-/**
- * 
- * @export
- * @interface MenuSpec
- */
 export interface MenuSpec {
     /**
      * The display name of the menu.
-     * @type {string}
-     * @memberof MenuSpec
      */
     'displayName': string;
     /**
      * Menu items of this menu.
-     * @type {Array<string>}
-     * @memberof MenuSpec
      */
     'menuItems'?: Array<string>;
 }

@@ -14,53 +14,13 @@
 
 
 
-/**
- * 
- * @export
- * @interface DeviceSpec
- */
 export interface DeviceSpec {
-    /**
-     * 
-     * @type {string}
-     * @memberof DeviceSpec
-     */
     'ipAddress': string;
-    /**
-     * 
-     * @type {string}
-     * @memberof DeviceSpec
-     */
     'lastAccessedTime'?: string;
-    /**
-     * 
-     * @type {string}
-     * @memberof DeviceSpec
-     */
     'lastAuthenticatedTime'?: string;
-    /**
-     * 
-     * @type {string}
-     * @memberof DeviceSpec
-     */
     'principalName': string;
-    /**
-     * 
-     * @type {string}
-     * @memberof DeviceSpec
-     */
     'rememberMeSeriesId'?: string;
-    /**
-     * 
-     * @type {string}
-     * @memberof DeviceSpec
-     */
     'sessionId': string;
-    /**
-     * 
-     * @type {string}
-     * @memberof DeviceSpec
-     */
     'userAgent'?: string;
 }
 

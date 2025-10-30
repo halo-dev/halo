@@ -15,49 +15,22 @@
 
 // May contain unused imports in some cases
 // @ts-ignore
-import { Metadata } from './metadata';
+import type { Metadata } from './metadata';
 // May contain unused imports in some cases
 // @ts-ignore
-import { PostSpec } from './post-spec';
+import type { PostSpec } from './post-spec';
 // May contain unused imports in some cases
 // @ts-ignore
-import { PostStatus } from './post-status';
+import type { PostStatus } from './post-status';
 
 /**
  * <p>Post extension.</p>
- * @export
- * @interface Post
  */
 export interface Post {
-    /**
-     * 
-     * @type {string}
-     * @memberof Post
-     */
     'apiVersion': string;
-    /**
-     * 
-     * @type {string}
-     * @memberof Post
-     */
     'kind': string;
-    /**
-     * 
-     * @type {Metadata}
-     * @memberof Post
-     */
     'metadata': Metadata;
-    /**
-     * 
-     * @type {PostSpec}
-     * @memberof Post
-     */
     'spec': PostSpec;
-    /**
-     * 
-     * @type {PostStatus}
-     * @memberof Post
-     */
     'status'?: PostStatus;
 }
 

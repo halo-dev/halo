@@ -20,16 +20,15 @@ import globalAxios from 'axios';
 // @ts-ignore
 import { DUMMY_BASE_URL, assertParamExists, setApiKeyToObject, setBasicAuthToObject, setBearerAuthToObject, setOAuthToObject, setSearchParams, serializeDataIfNeeded, toPathString, createRequestFunction } from '../common';
 // @ts-ignore
-import { BASE_PATH, COLLECTION_FORMATS, RequestArgs, BaseAPI, RequiredError, operationServerMap } from '../base';
+import { BASE_PATH, COLLECTION_FORMATS, type RequestArgs, BaseAPI, RequiredError, operationServerMap } from '../base';
 // @ts-ignore
-import { Backup } from '../models';
+import type { Backup } from '../models';
 // @ts-ignore
-import { BackupList } from '../models';
+import type { BackupList } from '../models';
 // @ts-ignore
-import { JsonPatchInner } from '../models';
+import type { JsonPatchInner } from '../models';
 /**
  * BackupV1alpha1Api - axios parameter creator
- * @export
  */
 export const BackupV1alpha1ApiAxiosParamCreator = function (configuration?: Configuration) {
     return {
@@ -313,7 +312,6 @@ export const BackupV1alpha1ApiAxiosParamCreator = function (configuration?: Conf
 
 /**
  * BackupV1alpha1Api - functional programming interface
- * @export
  */
 export const BackupV1alpha1ApiFp = function(configuration?: Configuration) {
     const localVarAxiosParamCreator = BackupV1alpha1ApiAxiosParamCreator(configuration)
@@ -401,7 +399,6 @@ export const BackupV1alpha1ApiFp = function(configuration?: Configuration) {
 
 /**
  * BackupV1alpha1Api - factory interface
- * @export
  */
 export const BackupV1alpha1ApiFactory = function (configuration?: Configuration, basePath?: string, axios?: AxiosInstance) {
     const localVarFp = BackupV1alpha1ApiFp(configuration)
@@ -465,135 +462,93 @@ export const BackupV1alpha1ApiFactory = function (configuration?: Configuration,
 
 /**
  * Request parameters for createBackup operation in BackupV1alpha1Api.
- * @export
- * @interface BackupV1alpha1ApiCreateBackupRequest
  */
 export interface BackupV1alpha1ApiCreateBackupRequest {
     /**
      * Fresh backup
-     * @type {Backup}
-     * @memberof BackupV1alpha1ApiCreateBackup
      */
     readonly backup?: Backup
 }
 
 /**
  * Request parameters for deleteBackup operation in BackupV1alpha1Api.
- * @export
- * @interface BackupV1alpha1ApiDeleteBackupRequest
  */
 export interface BackupV1alpha1ApiDeleteBackupRequest {
     /**
      * Name of backup
-     * @type {string}
-     * @memberof BackupV1alpha1ApiDeleteBackup
      */
     readonly name: string
 }
 
 /**
  * Request parameters for getBackup operation in BackupV1alpha1Api.
- * @export
- * @interface BackupV1alpha1ApiGetBackupRequest
  */
 export interface BackupV1alpha1ApiGetBackupRequest {
     /**
      * Name of backup
-     * @type {string}
-     * @memberof BackupV1alpha1ApiGetBackup
      */
     readonly name: string
 }
 
 /**
  * Request parameters for listBackup operation in BackupV1alpha1Api.
- * @export
- * @interface BackupV1alpha1ApiListBackupRequest
  */
 export interface BackupV1alpha1ApiListBackupRequest {
     /**
      * Page number. Default is 0.
-     * @type {number}
-     * @memberof BackupV1alpha1ApiListBackup
      */
     readonly page?: number
 
     /**
      * Size number. Default is 0.
-     * @type {number}
-     * @memberof BackupV1alpha1ApiListBackup
      */
     readonly size?: number
 
     /**
      * Label selector. e.g.: hidden!&#x3D;true
-     * @type {Array<string>}
-     * @memberof BackupV1alpha1ApiListBackup
      */
     readonly labelSelector?: Array<string>
 
     /**
      * Field selector. e.g.: metadata.name&#x3D;&#x3D;halo
-     * @type {Array<string>}
-     * @memberof BackupV1alpha1ApiListBackup
      */
     readonly fieldSelector?: Array<string>
 
     /**
      * Sorting criteria in the format: property,(asc|desc). Default sort order is ascending. Multiple sort criteria are supported.
-     * @type {Array<string>}
-     * @memberof BackupV1alpha1ApiListBackup
      */
     readonly sort?: Array<string>
 }
 
 /**
  * Request parameters for patchBackup operation in BackupV1alpha1Api.
- * @export
- * @interface BackupV1alpha1ApiPatchBackupRequest
  */
 export interface BackupV1alpha1ApiPatchBackupRequest {
     /**
      * Name of backup
-     * @type {string}
-     * @memberof BackupV1alpha1ApiPatchBackup
      */
     readonly name: string
 
-    /**
-     * 
-     * @type {Array<JsonPatchInner>}
-     * @memberof BackupV1alpha1ApiPatchBackup
-     */
     readonly jsonPatchInner?: Array<JsonPatchInner>
 }
 
 /**
  * Request parameters for updateBackup operation in BackupV1alpha1Api.
- * @export
- * @interface BackupV1alpha1ApiUpdateBackupRequest
  */
 export interface BackupV1alpha1ApiUpdateBackupRequest {
     /**
      * Name of backup
-     * @type {string}
-     * @memberof BackupV1alpha1ApiUpdateBackup
      */
     readonly name: string
 
     /**
      * Updated backup
-     * @type {Backup}
-     * @memberof BackupV1alpha1ApiUpdateBackup
      */
     readonly backup?: Backup
 }
 
 /**
  * BackupV1alpha1Api - object-oriented interface
- * @export
- * @class BackupV1alpha1Api
- * @extends {BaseAPI}
  */
 export class BackupV1alpha1Api extends BaseAPI {
     /**
@@ -601,7 +556,6 @@ export class BackupV1alpha1Api extends BaseAPI {
      * @param {BackupV1alpha1ApiCreateBackupRequest} requestParameters Request parameters.
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
-     * @memberof BackupV1alpha1Api
      */
     public createBackup(requestParameters: BackupV1alpha1ApiCreateBackupRequest = {}, options?: RawAxiosRequestConfig) {
         return BackupV1alpha1ApiFp(this.configuration).createBackup(requestParameters.backup, options).then((request) => request(this.axios, this.basePath));
@@ -612,7 +566,6 @@ export class BackupV1alpha1Api extends BaseAPI {
      * @param {BackupV1alpha1ApiDeleteBackupRequest} requestParameters Request parameters.
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
-     * @memberof BackupV1alpha1Api
      */
     public deleteBackup(requestParameters: BackupV1alpha1ApiDeleteBackupRequest, options?: RawAxiosRequestConfig) {
         return BackupV1alpha1ApiFp(this.configuration).deleteBackup(requestParameters.name, options).then((request) => request(this.axios, this.basePath));
@@ -623,7 +576,6 @@ export class BackupV1alpha1Api extends BaseAPI {
      * @param {BackupV1alpha1ApiGetBackupRequest} requestParameters Request parameters.
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
-     * @memberof BackupV1alpha1Api
      */
     public getBackup(requestParameters: BackupV1alpha1ApiGetBackupRequest, options?: RawAxiosRequestConfig) {
         return BackupV1alpha1ApiFp(this.configuration).getBackup(requestParameters.name, options).then((request) => request(this.axios, this.basePath));
@@ -634,7 +586,6 @@ export class BackupV1alpha1Api extends BaseAPI {
      * @param {BackupV1alpha1ApiListBackupRequest} requestParameters Request parameters.
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
-     * @memberof BackupV1alpha1Api
      */
     public listBackup(requestParameters: BackupV1alpha1ApiListBackupRequest = {}, options?: RawAxiosRequestConfig) {
         return BackupV1alpha1ApiFp(this.configuration).listBackup(requestParameters.page, requestParameters.size, requestParameters.labelSelector, requestParameters.fieldSelector, requestParameters.sort, options).then((request) => request(this.axios, this.basePath));
@@ -645,7 +596,6 @@ export class BackupV1alpha1Api extends BaseAPI {
      * @param {BackupV1alpha1ApiPatchBackupRequest} requestParameters Request parameters.
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
-     * @memberof BackupV1alpha1Api
      */
     public patchBackup(requestParameters: BackupV1alpha1ApiPatchBackupRequest, options?: RawAxiosRequestConfig) {
         return BackupV1alpha1ApiFp(this.configuration).patchBackup(requestParameters.name, requestParameters.jsonPatchInner, options).then((request) => request(this.axios, this.basePath));
@@ -656,7 +606,6 @@ export class BackupV1alpha1Api extends BaseAPI {
      * @param {BackupV1alpha1ApiUpdateBackupRequest} requestParameters Request parameters.
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
-     * @memberof BackupV1alpha1Api
      */
     public updateBackup(requestParameters: BackupV1alpha1ApiUpdateBackupRequest, options?: RawAxiosRequestConfig) {
         return BackupV1alpha1ApiFp(this.configuration).updateBackup(requestParameters.name, requestParameters.backup, options).then((request) => request(this.axios, this.basePath));

@@ -15,49 +15,19 @@
 
 // May contain unused imports in some cases
 // @ts-ignore
-import { AttachmentSpec } from './attachment-spec';
+import type { AttachmentSpec } from './attachment-spec';
 // May contain unused imports in some cases
 // @ts-ignore
-import { AttachmentStatus } from './attachment-status';
+import type { AttachmentStatus } from './attachment-status';
 // May contain unused imports in some cases
 // @ts-ignore
-import { Metadata } from './metadata';
+import type { Metadata } from './metadata';
 
-/**
- * 
- * @export
- * @interface Attachment
- */
 export interface Attachment {
-    /**
-     * 
-     * @type {string}
-     * @memberof Attachment
-     */
     'apiVersion': string;
-    /**
-     * 
-     * @type {string}
-     * @memberof Attachment
-     */
     'kind': string;
-    /**
-     * 
-     * @type {Metadata}
-     * @memberof Attachment
-     */
     'metadata': Metadata;
-    /**
-     * 
-     * @type {AttachmentSpec}
-     * @memberof Attachment
-     */
     'spec': AttachmentSpec;
-    /**
-     * 
-     * @type {AttachmentStatus}
-     * @memberof Attachment
-     */
     'status'?: AttachmentStatus;
 }
 

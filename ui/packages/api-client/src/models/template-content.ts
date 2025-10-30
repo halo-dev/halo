@@ -14,29 +14,9 @@
 
 
 
-/**
- * 
- * @export
- * @interface TemplateContent
- */
 export interface TemplateContent {
-    /**
-     * 
-     * @type {string}
-     * @memberof TemplateContent
-     */
     'htmlBody'?: string;
-    /**
-     * 
-     * @type {string}
-     * @memberof TemplateContent
-     */
     'rawBody'?: string;
-    /**
-     * 
-     * @type {string}
-     * @memberof TemplateContent
-     */
     'title': string;
 }
 

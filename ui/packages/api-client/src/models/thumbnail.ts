@@ -15,40 +15,15 @@
 
 // May contain unused imports in some cases
 // @ts-ignore
-import { Metadata } from './metadata';
+import type { Metadata } from './metadata';
 // May contain unused imports in some cases
 // @ts-ignore
-import { ThumbnailSpec } from './thumbnail-spec';
+import type { ThumbnailSpec } from './thumbnail-spec';
 
-/**
- * 
- * @export
- * @interface Thumbnail
- */
 export interface Thumbnail {
-    /**
-     * 
-     * @type {string}
-     * @memberof Thumbnail
-     */
     'apiVersion': string;
-    /**
-     * 
-     * @type {string}
-     * @memberof Thumbnail
-     */
     'kind': string;
-    /**
-     * 
-     * @type {Metadata}
-     * @memberof Thumbnail
-     */
     'metadata': Metadata;
-    /**
-     * 
-     * @type {ThumbnailSpec}
-     * @memberof Thumbnail
-     */
     'spec': ThumbnailSpec;
 }
 

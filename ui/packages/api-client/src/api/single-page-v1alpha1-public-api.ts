@@ -20,14 +20,13 @@ import globalAxios from 'axios';
 // @ts-ignore
 import { DUMMY_BASE_URL, assertParamExists, setApiKeyToObject, setBasicAuthToObject, setBearerAuthToObject, setOAuthToObject, setSearchParams, serializeDataIfNeeded, toPathString, createRequestFunction } from '../common';
 // @ts-ignore
-import { BASE_PATH, COLLECTION_FORMATS, RequestArgs, BaseAPI, RequiredError, operationServerMap } from '../base';
+import { BASE_PATH, COLLECTION_FORMATS, type RequestArgs, BaseAPI, RequiredError, operationServerMap } from '../base';
 // @ts-ignore
-import { ListedSinglePageVoList } from '../models';
+import type { ListedSinglePageVoList } from '../models';
 // @ts-ignore
-import { SinglePageVo } from '../models';
+import type { SinglePageVo } from '../models';
 /**
  * SinglePageV1alpha1PublicApi - axios parameter creator
- * @export
  */
 export const SinglePageV1alpha1PublicApiAxiosParamCreator = function (configuration?: Configuration) {
     return {
@@ -139,7 +138,6 @@ export const SinglePageV1alpha1PublicApiAxiosParamCreator = function (configurat
 
 /**
  * SinglePageV1alpha1PublicApi - functional programming interface
- * @export
  */
 export const SinglePageV1alpha1PublicApiFp = function(configuration?: Configuration) {
     const localVarAxiosParamCreator = SinglePageV1alpha1PublicApiAxiosParamCreator(configuration)
@@ -177,7 +175,6 @@ export const SinglePageV1alpha1PublicApiFp = function(configuration?: Configurat
 
 /**
  * SinglePageV1alpha1PublicApi - factory interface
- * @export
  */
 export const SinglePageV1alpha1PublicApiFactory = function (configuration?: Configuration, basePath?: string, axios?: AxiosInstance) {
     const localVarFp = SinglePageV1alpha1PublicApiFp(configuration)
@@ -205,65 +202,46 @@ export const SinglePageV1alpha1PublicApiFactory = function (configuration?: Conf
 
 /**
  * Request parameters for querySinglePageByName operation in SinglePageV1alpha1PublicApi.
- * @export
- * @interface SinglePageV1alpha1PublicApiQuerySinglePageByNameRequest
  */
 export interface SinglePageV1alpha1PublicApiQuerySinglePageByNameRequest {
     /**
      * SinglePage name
-     * @type {string}
-     * @memberof SinglePageV1alpha1PublicApiQuerySinglePageByName
      */
     readonly name: string
 }
 
 /**
  * Request parameters for querySinglePages operation in SinglePageV1alpha1PublicApi.
- * @export
- * @interface SinglePageV1alpha1PublicApiQuerySinglePagesRequest
  */
 export interface SinglePageV1alpha1PublicApiQuerySinglePagesRequest {
     /**
      * Page number. Default is 0.
-     * @type {number}
-     * @memberof SinglePageV1alpha1PublicApiQuerySinglePages
      */
     readonly page?: number
 
     /**
      * Size number. Default is 0.
-     * @type {number}
-     * @memberof SinglePageV1alpha1PublicApiQuerySinglePages
      */
     readonly size?: number
 
     /**
      * Label selector. e.g.: hidden!&#x3D;true
-     * @type {Array<string>}
-     * @memberof SinglePageV1alpha1PublicApiQuerySinglePages
      */
     readonly labelSelector?: Array<string>
 
     /**
      * Field selector. e.g.: metadata.name&#x3D;&#x3D;halo
-     * @type {Array<string>}
-     * @memberof SinglePageV1alpha1PublicApiQuerySinglePages
      */
     readonly fieldSelector?: Array<string>
 
     /**
      * Sorting criteria in the format: property,(asc|desc). Default sort order is ascending. Multiple sort criteria are supported.
-     * @type {Array<string>}
-     * @memberof SinglePageV1alpha1PublicApiQuerySinglePages
      */
     readonly sort?: Array<string>
 }
 
 /**
  * SinglePageV1alpha1PublicApi - object-oriented interface
- * @export
- * @class SinglePageV1alpha1PublicApi
- * @extends {BaseAPI}
  */
 export class SinglePageV1alpha1PublicApi extends BaseAPI {
     /**
@@ -271,7 +249,6 @@ export class SinglePageV1alpha1PublicApi extends BaseAPI {
      * @param {SinglePageV1alpha1PublicApiQuerySinglePageByNameRequest} requestParameters Request parameters.
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
-     * @memberof SinglePageV1alpha1PublicApi
      */
     public querySinglePageByName(requestParameters: SinglePageV1alpha1PublicApiQuerySinglePageByNameRequest, options?: RawAxiosRequestConfig) {
         return SinglePageV1alpha1PublicApiFp(this.configuration).querySinglePageByName(requestParameters.name, options).then((request) => request(this.axios, this.basePath));
@@ -282,7 +259,6 @@ export class SinglePageV1alpha1PublicApi extends BaseAPI {
      * @param {SinglePageV1alpha1PublicApiQuerySinglePagesRequest} requestParameters Request parameters.
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
-     * @memberof SinglePageV1alpha1PublicApi
      */
     public querySinglePages(requestParameters: SinglePageV1alpha1PublicApiQuerySinglePagesRequest = {}, options?: RawAxiosRequestConfig) {
         return SinglePageV1alpha1PublicApiFp(this.configuration).querySinglePages(requestParameters.page, requestParameters.size, requestParameters.labelSelector, requestParameters.fieldSelector, requestParameters.sort, options).then((request) => request(this.axios, this.basePath));

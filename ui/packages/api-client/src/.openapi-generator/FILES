@@ -191,7 +191,6 @@ models/local-thumbnail-list.ts
 models/local-thumbnail-spec.ts
 models/local-thumbnail-status.ts
 models/local-thumbnail.ts
-models/login-history.ts
 models/mark-specified-request.ts
 models/menu-item-list.ts
 models/menu-item-spec.ts

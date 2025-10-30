@@ -20,16 +20,15 @@ import globalAxios from 'axios';
 // @ts-ignore
 import { DUMMY_BASE_URL, assertParamExists, setApiKeyToObject, setBasicAuthToObject, setBearerAuthToObject, setOAuthToObject, setSearchParams, serializeDataIfNeeded, toPathString, createRequestFunction } from '../common';
 // @ts-ignore
-import { BASE_PATH, COLLECTION_FORMATS, RequestArgs, BaseAPI, RequiredError, operationServerMap } from '../base';
+import { BASE_PATH, COLLECTION_FORMATS, type RequestArgs, BaseAPI, RequiredError, operationServerMap } from '../base';
 // @ts-ignore
-import { JsonPatchInner } from '../models';
+import type { JsonPatchInner } from '../models';
 // @ts-ignore
-import { Secret } from '../models';
+import type { Secret } from '../models';
 // @ts-ignore
-import { SecretList } from '../models';
+import type { SecretList } from '../models';
 /**
  * SecretV1alpha1Api - axios parameter creator
- * @export
  */
 export const SecretV1alpha1ApiAxiosParamCreator = function (configuration?: Configuration) {
     return {
@@ -313,7 +312,6 @@ export const SecretV1alpha1ApiAxiosParamCreator = function (configuration?: Conf
 
 /**
  * SecretV1alpha1Api - functional programming interface
- * @export
  */
 export const SecretV1alpha1ApiFp = function(configuration?: Configuration) {
     const localVarAxiosParamCreator = SecretV1alpha1ApiAxiosParamCreator(configuration)
@@ -401,7 +399,6 @@ export const SecretV1alpha1ApiFp = function(configuration?: Configuration) {
 
 /**
  * SecretV1alpha1Api - factory interface
- * @export
  */
 export const SecretV1alpha1ApiFactory = function (configuration?: Configuration, basePath?: string, axios?: AxiosInstance) {
     const localVarFp = SecretV1alpha1ApiFp(configuration)
@@ -465,135 +462,93 @@ export const SecretV1alpha1ApiFactory = function (configuration?: Configuration,
 
 /**
  * Request parameters for createSecret operation in SecretV1alpha1Api.
- * @export
- * @interface SecretV1alpha1ApiCreateSecretRequest
  */
 export interface SecretV1alpha1ApiCreateSecretRequest {
     /**
      * Fresh secret
-     * @type {Secret}
-     * @memberof SecretV1alpha1ApiCreateSecret
      */
     readonly secret?: Secret
 }
 
 /**
  * Request parameters for deleteSecret operation in SecretV1alpha1Api.
- * @export
- * @interface SecretV1alpha1ApiDeleteSecretRequest
  */
 export interface SecretV1alpha1ApiDeleteSecretRequest {
     /**
      * Name of secret
-     * @type {string}
-     * @memberof SecretV1alpha1ApiDeleteSecret
      */
     readonly name: string
 }
 
 /**
  * Request parameters for getSecret operation in SecretV1alpha1Api.
- * @export
- * @interface SecretV1alpha1ApiGetSecretRequest
  */
 export interface SecretV1alpha1ApiGetSecretRequest {
     /**
      * Name of secret
-     * @type {string}
-     * @memberof SecretV1alpha1ApiGetSecret
      */
     readonly name: string
 }
 
 /**
  * Request parameters for listSecret operation in SecretV1alpha1Api.
- * @export
- * @interface SecretV1alpha1ApiListSecretRequest
  */
 export interface SecretV1alpha1ApiListSecretRequest {
     /**
      * Page number. Default is 0.
-     * @type {number}
-     * @memberof SecretV1alpha1ApiListSecret
      */
     readonly page?: number
 
     /**
      * Size number. Default is 0.
-     * @type {number}
-     * @memberof SecretV1alpha1ApiListSecret
      */
     readonly size?: number
 
     /**
      * Label selector. e.g.: hidden!&#x3D;true
-     * @type {Array<string>}
-     * @memberof SecretV1alpha1ApiListSecret
      */
     readonly labelSelector?: Array<string>
 
     /**
      * Field selector. e.g.: metadata.name&#x3D;&#x3D;halo
-     * @type {Array<string>}
-     * @memberof SecretV1alpha1ApiListSecret
      */
     readonly fieldSelector?: Array<string>
 
     /**
      * Sorting criteria in the format: property,(asc|desc). Default sort order is ascending. Multiple sort criteria are supported.
-     * @type {Array<string>}
-     * @memberof SecretV1alpha1ApiListSecret
      */
     readonly sort?: Array<string>
 }
 
 /**
  * Request parameters for patchSecret operation in SecretV1alpha1Api.
- * @export
- * @interface SecretV1alpha1ApiPatchSecretRequest
  */
 export interface SecretV1alpha1ApiPatchSecretRequest {
     /**
      * Name of secret
-     * @type {string}
-     * @memberof SecretV1alpha1ApiPatchSecret
      */
     readonly name: string
 
-    /**
-     * 
-     * @type {Array<JsonPatchInner>}
-     * @memberof SecretV1alpha1ApiPatchSecret
-     */
     readonly jsonPatchInner?: Array<JsonPatchInner>
 }
 
 /**
  * Request parameters for updateSecret operation in SecretV1alpha1Api.
- * @export
- * @interface SecretV1alpha1ApiUpdateSecretRequest
  */
 export interface SecretV1alpha1ApiUpdateSecretRequest {
     /**
      * Name of secret
-     * @type {string}
-     * @memberof SecretV1alpha1ApiUpdateSecret
      */
     readonly name: string
 
     /**
      * Updated secret
-     * @type {Secret}
-     * @memberof SecretV1alpha1ApiUpdateSecret
      */
     readonly secret?: Secret
 }
 
 /**
  * SecretV1alpha1Api - object-oriented interface
- * @export
- * @class SecretV1alpha1Api
- * @extends {BaseAPI}
  */
 export class SecretV1alpha1Api extends BaseAPI {
     /**
@@ -601,7 +556,6 @@ export class SecretV1alpha1Api extends BaseAPI {
      * @param {SecretV1alpha1ApiCreateSecretRequest} requestParameters Request parameters.
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
-     * @memberof SecretV1alpha1Api
      */
     public createSecret(requestParameters: SecretV1alpha1ApiCreateSecretRequest = {}, options?: RawAxiosRequestConfig) {
         return SecretV1alpha1ApiFp(this.configuration).createSecret(requestParameters.secret, options).then((request) => request(this.axios, this.basePath));
@@ -612,7 +566,6 @@ export class SecretV1alpha1Api extends BaseAPI {
      * @param {SecretV1alpha1ApiDeleteSecretRequest} requestParameters Request parameters.
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
-     * @memberof SecretV1alpha1Api
      */
     public deleteSecret(requestParameters: SecretV1alpha1ApiDeleteSecretRequest, options?: RawAxiosRequestConfig) {
         return SecretV1alpha1ApiFp(this.configuration).deleteSecret(requestParameters.name, options).then((request) => request(this.axios, this.basePath));
@@ -623,7 +576,6 @@ export class SecretV1alpha1Api extends BaseAPI {
      * @param {SecretV1alpha1ApiGetSecretRequest} requestParameters Request parameters.
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
-     * @memberof SecretV1alpha1Api
      */
     public getSecret(requestParameters: SecretV1alpha1ApiGetSecretRequest, options?: RawAxiosRequestConfig) {
         return SecretV1alpha1ApiFp(this.configuration).getSecret(requestParameters.name, options).then((request) => request(this.axios, this.basePath));
@@ -634,7 +586,6 @@ export class SecretV1alpha1Api extends BaseAPI {
      * @param {SecretV1alpha1ApiListSecretRequest} requestParameters Request parameters.
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
-     * @memberof SecretV1alpha1Api
      */
     public listSecret(requestParameters: SecretV1alpha1ApiListSecretRequest = {}, options?: RawAxiosRequestConfig) {
         return SecretV1alpha1ApiFp(this.configuration).listSecret(requestParameters.page, requestParameters.size, requestParameters.labelSelector, requestParameters.fieldSelector, requestParameters.sort, options).then((request) => request(this.axios, this.basePath));
@@ -645,7 +596,6 @@ export class SecretV1alpha1Api extends BaseAPI {
      * @param {SecretV1alpha1ApiPatchSecretRequest} requestParameters Request parameters.
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
-     * @memberof SecretV1alpha1Api
      */
     public patchSecret(requestParameters: SecretV1alpha1ApiPatchSecretRequest, options?: RawAxiosRequestConfig) {
         return SecretV1alpha1ApiFp(this.configuration).patchSecret(requestParameters.name, requestParameters.jsonPatchInner, options).then((request) => request(this.axios, this.basePath));
@@ -656,7 +606,6 @@ export class SecretV1alpha1Api extends BaseAPI {
      * @param {SecretV1alpha1ApiUpdateSecretRequest} requestParameters Request parameters.
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
-     * @memberof SecretV1alpha1Api
      */
     public updateSecret(requestParameters: SecretV1alpha1ApiUpdateSecretRequest, options?: RawAxiosRequestConfig) {
         return SecretV1alpha1ApiFp(this.configuration).updateSecret(requestParameters.name, requestParameters.secret, options).then((request) => request(this.axios, this.basePath));

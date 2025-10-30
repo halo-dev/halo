@@ -20,16 +20,15 @@ import globalAxios from 'axios';
 // @ts-ignore
 import { DUMMY_BASE_URL, assertParamExists, setApiKeyToObject, setBasicAuthToObject, setBearerAuthToObject, setOAuthToObject, setSearchParams, serializeDataIfNeeded, toPathString, createRequestFunction } from '../common';
 // @ts-ignore
-import { BASE_PATH, COLLECTION_FORMATS, RequestArgs, BaseAPI, RequiredError, operationServerMap } from '../base';
+import { BASE_PATH, COLLECTION_FORMATS, type RequestArgs, BaseAPI, RequiredError, operationServerMap } from '../base';
 // @ts-ignore
-import { JsonPatchInner } from '../models';
+import type { JsonPatchInner } from '../models';
 // @ts-ignore
-import { NotifierDescriptor } from '../models';
+import type { NotifierDescriptor } from '../models';
 // @ts-ignore
-import { NotifierDescriptorList } from '../models';
+import type { NotifierDescriptorList } from '../models';
 /**
  * NotifierDescriptorV1alpha1Api - axios parameter creator
- * @export
  */
 export const NotifierDescriptorV1alpha1ApiAxiosParamCreator = function (configuration?: Configuration) {
     return {
@@ -313,7 +312,6 @@ export const NotifierDescriptorV1alpha1ApiAxiosParamCreator = function (configur
 
 /**
  * NotifierDescriptorV1alpha1Api - functional programming interface
- * @export
  */
 export const NotifierDescriptorV1alpha1ApiFp = function(configuration?: Configuration) {
     const localVarAxiosParamCreator = NotifierDescriptorV1alpha1ApiAxiosParamCreator(configuration)
@@ -401,7 +399,6 @@ export const NotifierDescriptorV1alpha1ApiFp = function(configuration?: Configur
 
 /**
  * NotifierDescriptorV1alpha1Api - factory interface
- * @export
  */
 export const NotifierDescriptorV1alpha1ApiFactory = function (configuration?: Configuration, basePath?: string, axios?: AxiosInstance) {
     const localVarFp = NotifierDescriptorV1alpha1ApiFp(configuration)
@@ -465,135 +462,93 @@ export const NotifierDescriptorV1alpha1ApiFactory = function (configuration?: Co
 
 /**
  * Request parameters for createNotifierDescriptor operation in NotifierDescriptorV1alpha1Api.
- * @export
- * @interface NotifierDescriptorV1alpha1ApiCreateNotifierDescriptorRequest
  */
 export interface NotifierDescriptorV1alpha1ApiCreateNotifierDescriptorRequest {
     /**
      * Fresh notifierDescriptor
-     * @type {NotifierDescriptor}
-     * @memberof NotifierDescriptorV1alpha1ApiCreateNotifierDescriptor
      */
     readonly notifierDescriptor?: NotifierDescriptor
 }
 
 /**
  * Request parameters for deleteNotifierDescriptor operation in NotifierDescriptorV1alpha1Api.
- * @export
- * @interface NotifierDescriptorV1alpha1ApiDeleteNotifierDescriptorRequest
  */
 export interface NotifierDescriptorV1alpha1ApiDeleteNotifierDescriptorRequest {
     /**
      * Name of notifierDescriptor
-     * @type {string}
-     * @memberof NotifierDescriptorV1alpha1ApiDeleteNotifierDescriptor
      */
     readonly name: string
 }
 
 /**
  * Request parameters for getNotifierDescriptor operation in NotifierDescriptorV1alpha1Api.
- * @export
- * @interface NotifierDescriptorV1alpha1ApiGetNotifierDescriptorRequest
  */
 export interface NotifierDescriptorV1alpha1ApiGetNotifierDescriptorRequest {
     /**
      * Name of notifierDescriptor
-     * @type {string}
-     * @memberof NotifierDescriptorV1alpha1ApiGetNotifierDescriptor
      */
     readonly name: string
 }
 
 /**
  * Request parameters for listNotifierDescriptor operation in NotifierDescriptorV1alpha1Api.
- * @export
- * @interface NotifierDescriptorV1alpha1ApiListNotifierDescriptorRequest
  */
 export interface NotifierDescriptorV1alpha1ApiListNotifierDescriptorRequest {
     /**
      * Page number. Default is 0.
-     * @type {number}
-     * @memberof NotifierDescriptorV1alpha1ApiListNotifierDescriptor
      */
     readonly page?: number
 
     /**
      * Size number. Default is 0.
-     * @type {number}
-     * @memberof NotifierDescriptorV1alpha1ApiListNotifierDescriptor
      */
     readonly size?: number
 
     /**
      * Label selector. e.g.: hidden!&#x3D;true
-     * @type {Array<string>}
-     * @memberof NotifierDescriptorV1alpha1ApiListNotifierDescriptor
      */
     readonly labelSelector?: Array<string>
 
     /**
      * Field selector. e.g.: metadata.name&#x3D;&#x3D;halo
-     * @type {Array<string>}
-     * @memberof NotifierDescriptorV1alpha1ApiListNotifierDescriptor
      */
     readonly fieldSelector?: Array<string>
 
     /**
      * Sorting criteria in the format: property,(asc|desc). Default sort order is ascending. Multiple sort criteria are supported.
-     * @type {Array<string>}
-     * @memberof NotifierDescriptorV1alpha1ApiListNotifierDescriptor
      */
     readonly sort?: Array<string>
 }
 
 /**
  * Request parameters for patchNotifierDescriptor operation in NotifierDescriptorV1alpha1Api.
- * @export
- * @interface NotifierDescriptorV1alpha1ApiPatchNotifierDescriptorRequest
  */
 export interface NotifierDescriptorV1alpha1ApiPatchNotifierDescriptorRequest {
     /**
      * Name of notifierDescriptor
-     * @type {string}
-     * @memberof NotifierDescriptorV1alpha1ApiPatchNotifierDescriptor
      */
     readonly name: string
 
-    /**
-     * 
-     * @type {Array<JsonPatchInner>}
-     * @memberof NotifierDescriptorV1alpha1ApiPatchNotifierDescriptor
-     */
     readonly jsonPatchInner?: Array<JsonPatchInner>
 }
 
 /**
  * Request parameters for updateNotifierDescriptor operation in NotifierDescriptorV1alpha1Api.
- * @export
- * @interface NotifierDescriptorV1alpha1ApiUpdateNotifierDescriptorRequest
  */
 export interface NotifierDescriptorV1alpha1ApiUpdateNotifierDescriptorRequest {
     /**
      * Name of notifierDescriptor
-     * @type {string}
-     * @memberof NotifierDescriptorV1alpha1ApiUpdateNotifierDescriptor
      */
     readonly name: string
 
     /**
      * Updated notifierDescriptor
-     * @type {NotifierDescriptor}
-     * @memberof NotifierDescriptorV1alpha1ApiUpdateNotifierDescriptor
      */
     readonly notifierDescriptor?: NotifierDescriptor
 }
 
 /**
  * NotifierDescriptorV1alpha1Api - object-oriented interface
- * @export
- * @class NotifierDescriptorV1alpha1Api
- * @extends {BaseAPI}
  */
 export class NotifierDescriptorV1alpha1Api extends BaseAPI {
     /**
@@ -601,7 +556,6 @@ export class NotifierDescriptorV1alpha1Api extends BaseAPI {
      * @param {NotifierDescriptorV1alpha1ApiCreateNotifierDescriptorRequest} requestParameters Request parameters.
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
-     * @memberof NotifierDescriptorV1alpha1Api
      */
     public createNotifierDescriptor(requestParameters: NotifierDescriptorV1alpha1ApiCreateNotifierDescriptorRequest = {}, options?: RawAxiosRequestConfig) {
         return NotifierDescriptorV1alpha1ApiFp(this.configuration).createNotifierDescriptor(requestParameters.notifierDescriptor, options).then((request) => request(this.axios, this.basePath));
@@ -612,7 +566,6 @@ export class NotifierDescriptorV1alpha1Api extends BaseAPI {
      * @param {NotifierDescriptorV1alpha1ApiDeleteNotifierDescriptorRequest} requestParameters Request parameters.
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
-     * @memberof NotifierDescriptorV1alpha1Api
      */
     public deleteNotifierDescriptor(requestParameters: NotifierDescriptorV1alpha1ApiDeleteNotifierDescriptorRequest, options?: RawAxiosRequestConfig) {
         return NotifierDescriptorV1alpha1ApiFp(this.configuration).deleteNotifierDescriptor(requestParameters.name, options).then((request) => request(this.axios, this.basePath));
@@ -623,7 +576,6 @@ export class NotifierDescriptorV1alpha1Api extends BaseAPI {
      * @param {NotifierDescriptorV1alpha1ApiGetNotifierDescriptorRequest} requestParameters Request parameters.
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
-     * @memberof NotifierDescriptorV1alpha1Api
      */
     public getNotifierDescriptor(requestParameters: NotifierDescriptorV1alpha1ApiGetNotifierDescriptorRequest, options?: RawAxiosRequestConfig) {
         return NotifierDescriptorV1alpha1ApiFp(this.configuration).getNotifierDescriptor(requestParameters.name, options).then((request) => request(this.axios, this.basePath));
@@ -634,7 +586,6 @@ export class NotifierDescriptorV1alpha1Api extends BaseAPI {
      * @param {NotifierDescriptorV1alpha1ApiListNotifierDescriptorRequest} requestParameters Request parameters.
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
-     * @memberof NotifierDescriptorV1alpha1Api
      */
     public listNotifierDescriptor(requestParameters: NotifierDescriptorV1alpha1ApiListNotifierDescriptorRequest = {}, options?: RawAxiosRequestConfig) {
         return NotifierDescriptorV1alpha1ApiFp(this.configuration).listNotifierDescriptor(requestParameters.page, requestParameters.size, requestParameters.labelSelector, requestParameters.fieldSelector, requestParameters.sort, options).then((request) => request(this.axios, this.basePath));
@@ -645,7 +596,6 @@ export class NotifierDescriptorV1alpha1Api extends BaseAPI {
      * @param {NotifierDescriptorV1alpha1ApiPatchNotifierDescriptorRequest} requestParameters Request parameters.
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
-     * @memberof NotifierDescriptorV1alpha1Api
      */
     public patchNotifierDescriptor(requestParameters: NotifierDescriptorV1alpha1ApiPatchNotifierDescriptorRequest, options?: RawAxiosRequestConfig) {
         return NotifierDescriptorV1alpha1ApiFp(this.configuration).patchNotifierDescriptor(requestParameters.name, requestParameters.jsonPatchInner, options).then((request) => request(this.axios, this.basePath));
@@ -656,7 +606,6 @@ export class NotifierDescriptorV1alpha1Api extends BaseAPI {
      * @param {NotifierDescriptorV1alpha1ApiUpdateNotifierDescriptorRequest} requestParameters Request parameters.
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
-     * @memberof NotifierDescriptorV1alpha1Api
      */
     public updateNotifierDescriptor(requestParameters: NotifierDescriptorV1alpha1ApiUpdateNotifierDescriptorRequest, options?: RawAxiosRequestConfig) {
         return NotifierDescriptorV1alpha1ApiFp(this.configuration).updateNotifierDescriptor(requestParameters.name, requestParameters.notifierDescriptor, options).then((request) => request(this.axios, this.basePath));
