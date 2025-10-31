@@ -13,6 +13,8 @@ import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
+import java.util.stream.Collectors;
+
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.dao.OptimisticLockingFailureException;
@@ -213,17 +215,7 @@ public class UserServiceImpl implements UserService {
             .switchIfEmpty(Mono.error(() -> new ServerWebInputException(
                 "The registration is not allowed by the administrator."
             )))
-            .filter(setting -> {
-                String protectedUsernamesStr = setting.getProtectedUsernames();
-                if (protectedUsernamesStr == null || protectedUsernamesStr.trim().isEmpty()) {
-                    return true;
-                }
-                List<String> protectedList = Arrays.stream(protectedUsernamesStr.split(","))
-                        .map(String::trim)
-                        .filter(name -> !name.isEmpty())
-                        .toList();
-                return !protectedList.contains(signUpData.getUsername());
-            })
+            .filter(setting -> isUsernameAllowed(setting, signUpData.getUsername()))
             .switchIfEmpty(Mono.error(RestrictedNameException::new))
             .filter(setting -> StringUtils.hasText(setting.getDefaultRole()))
             .switchIfEmpty(Mono.error(() -> new ServerWebInputException(
@@ -366,5 +358,19 @@ public class UserServiceImpl implements UserService {
 
     void publishPasswordChangedEvent(String username) {
         eventPublisher.publishEvent(new PasswordChangedEvent(this, username));
+    }
+
+    private boolean isUsernameAllowed(SystemSetting.User setting, String username) {
+        String protectedUsernamesStr = setting.getProtectedUsernames();
+        if (protectedUsernamesStr == null || protectedUsernamesStr.trim().isEmpty()) {
+            return true;
+        }
+        Set<String> protectedLowerSet = Arrays.stream(protectedUsernamesStr.split(","))
+                .map(String::trim)
+                .filter(n -> !n.isEmpty())
+                .distinct()
+                .map(String::toLowerCase)
+                .collect(Collectors.toUnmodifiableSet());
+        return !protectedLowerSet.contains(username.toLowerCase());
     }
 }
