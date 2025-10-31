@@ -44,6 +44,7 @@ import {
 } from "./columns";
 import ExtensionFormatBrush from "./format-brush";
 import ExtensionGapcursor from "./gap-cursor";
+import ExtensionGallery, { GALLERY_BUBBLE_MENU_KEY } from "./gallery";
 import ExtensionIframe, { IFRAME_BUBBLE_MENU_KEY } from "./iframe";
 import ExtensionImage, { IMAGE_BUBBLE_MENU_KEY } from "./image";
 import ExtensionIndent from "./indent";
@@ -76,6 +77,7 @@ const allExtensions = [
   ExtensionStrike,
   ExtensionText,
   ExtensionImage,
+  ExtensionGallery,
   ExtensionTaskList,
   ExtensionHighlight,
   ExtensionColor,
@@ -121,6 +123,7 @@ export {
   CODE_BLOCK_BUBBLE_MENU_KEY,
   COLUMNS_BUBBLE_MENU_KEY,
   DETAILS_BUBBLE_MENU_KEY,
+  GALLERY_BUBBLE_MENU_KEY,
   ExtensionAudio,
   ExtensionBlockquote,
   ExtensionBold,
@@ -138,6 +141,7 @@ export {
   Dropcursor as ExtensionDropcursor,
   ExtensionFontSize,
   ExtensionFormatBrush,
+  ExtensionGallery,
   ExtensionGapcursor,
   ExtensionHardBreak,
   ExtensionHeading,

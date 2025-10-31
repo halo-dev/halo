@@ -34,6 +34,7 @@ editor:
       video: Video
       audio: Audio
       table: Table
+      gallery: Gallery
       no_results: No results
       placeholder: Enter / to select input type
     link:
@@ -99,6 +100,10 @@ editor:
         cancel: Cancel Format Brush
     details:
       command_item: Details
+    gallery:
+      title: Gallery
+      add_image: Add image
+      empty_prompt: Click to select images or drag images here
   components:
     color_picker:
       more_color: More
@@ -149,6 +154,8 @@ editor:
       edit_link: Edit link
       refresh: Refresh
       restore_default: Restore default
+      add: Add
+      cancel: Cancel
     text:
       default: Default
     line_height: Line height

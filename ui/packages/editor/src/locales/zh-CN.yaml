@@ -34,6 +34,7 @@ editor:
       video: 视频
       audio: 音频
       table: 表格
+      gallery: 画廊
       no_results: 没有搜索结果
       placeholder: 输入 / 以选择输入类型
     link:
@@ -99,6 +100,10 @@ editor:
         cancel: 取消格式刷
     details:
       command_item: 折叠内容
+    gallery:
+      title: 画廊
+      add_image: 添加图片
+      empty_prompt: 点击选择图片或拖拽图片到这里
   components:
     color_picker:
       more_color: 更多颜色
@@ -149,6 +154,8 @@ editor:
       edit_link: 修改链接
       refresh: 刷新
       restore_default: 恢复为默认
+      add: 添加
+      cancel: 取消
     text:
       default: 默认
     line_height: 行高
