@@ -212,7 +212,7 @@ class TableView implements NodeView {
 
 export const TABLE_BUBBLE_MENU_KEY = new PluginKey("tableBubbleMenu");
 
-const Table = TiptapTable.extend<ExtensionOptions & TableOptions>({
+const Table = TiptapTable.extend<ExtensionOptions & Partial<TableOptions>>({
   allowGapCursor: true,
 
   addExtensions() {
@@ -554,7 +554,7 @@ const Table = TiptapTable.extend<ExtensionOptions & TableOptions>({
   renderHTML({ node, HTMLAttributes }) {
     const { colgroup, tableWidth, tableMinWidth } = createColGroup(
       node,
-      this.options.cellMinWidth
+      this.options.cellMinWidth ?? 25
     );
 
     const table: DOMOutputSpec = [
@@ -562,11 +562,15 @@ const Table = TiptapTable.extend<ExtensionOptions & TableOptions>({
       { style: "overflow-x: auto; overflow-y: hidden;" },
       [
         "table",
-        mergeAttributes(this.options.HTMLAttributes, HTMLAttributes, {
-          style: tableWidth
-            ? `width: ${tableWidth}`
-            : `minWidth: ${tableMinWidth}`,
-        }),
+        mergeAttributes(
+          this.options.HTMLAttributes ?? {},
+          HTMLAttributes ?? {},
+          {
+            style: tableWidth
+              ? `width: ${tableWidth}`
+              : `minWidth: ${tableMinWidth}`,
+          }
+        ),
         colgroup,
         ["tbody", 0],
       ],
