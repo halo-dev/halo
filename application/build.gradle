@@ -200,12 +200,17 @@ tasks.named('generateOpenApiDocs') {
 }
 
 def name = 'halo'
-def branchName = grgit.branch.current().name.replaceAll("/", "-")
+def branchName = providers.provider {
+    grgit.branch.current().name.replaceAll("/", "-")
+}.get()
+def abbreviatedId = providers.provider {
+    grgit.head().abbreviatedId
+}.get()
 def tagName = "${project.version}-cnb"
 def isRelease = Objects.equals(project.findProperty('release'), 'true')
 if (!isRelease) {
     name = 'halo-dev'
-    tagName = "sha-${grgit.head().abbreviatedId}-cnb"
+    tagName = "sha-${abbreviatedId}-cnb"
 }
 
 tasks.register('publishToGhcr', BootBuildImage) {
