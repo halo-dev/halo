@@ -13,7 +13,6 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
-
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.dao.OptimisticLockingFailureException;
@@ -365,10 +364,10 @@ public class UserServiceImpl implements UserService {
             return true;
         }
         Set<String> protectedLowerSet = Arrays.stream(protectedUsernamesStr.split(","))
-                .map(String::trim)
-                .filter(n -> !n.isEmpty())
-                .map(String::toLowerCase)
-                .collect(Collectors.toUnmodifiableSet());
+            .map(String::trim)
+            .filter(n -> !n.isEmpty())
+            .map(String::toLowerCase)
+            .collect(Collectors.toUnmodifiableSet());
         return !protectedLowerSet.contains(username.toLowerCase());
     }
 }
