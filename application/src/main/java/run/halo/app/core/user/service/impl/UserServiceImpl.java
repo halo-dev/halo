@@ -368,7 +368,6 @@ public class UserServiceImpl implements UserService {
                 .map(String::trim)
                 .filter(n -> !n.isEmpty())
                 .map(String::toLowerCase)
-                .distinct()
                 .collect(Collectors.toUnmodifiableSet());
         return !protectedLowerSet.contains(username.toLowerCase());
     }
