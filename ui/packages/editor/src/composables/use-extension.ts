@@ -1,10 +1,10 @@
-import { randomUUID } from "@/utils/id";
 import {
   getExtensionField,
   type AnyConfig,
   type AnyExtension,
   type Extensions,
-} from "@halo-dev/richtext-editor";
+} from "@/tiptap";
+import { randomUUID } from "@/utils/id";
 
 export function useExtension() {
   const filterDuplicateExtensions = (extensions: Extensions | undefined) => {

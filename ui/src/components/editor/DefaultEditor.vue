@@ -17,6 +17,7 @@ import {
   ExtensionDetails,
   ExtensionDocument,
   ExtensionDropcursor,
+  ExtensionFigure,
   ExtensionFontSize,
   ExtensionFormatBrush,
   ExtensionGapcursor,
@@ -49,6 +50,7 @@ import {
   RichTextEditor,
   ToolbarItem,
   ToolboxItem,
+  useExtension,
   VueEditor,
   type Extensions,
 } from "@halo-dev/richtext-editor";
@@ -101,7 +103,6 @@ import MdiFormatHeader6 from "~icons/mdi/format-header-6";
 import RiLayoutRightLine from "~icons/ri/layout-right-line";
 import HasPermission from "../permission/HasPermission.vue";
 import { useAttachmentSelect } from "./composables/use-attachment";
-import { useExtension } from "./composables/use-extension";
 import {
   UiExtensionAudio,
   UiExtensionImage,
@@ -282,6 +283,7 @@ const presetExtensions = [
   ExtensionFontSize,
   ExtensionColor,
   ExtensionIndent,
+  ExtensionFigure,
   Extension.create({
     name: "custom-heading-extension",
     addGlobalAttributes() {

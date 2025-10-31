@@ -150,9 +150,10 @@ export const CodeBlockExtension = TiptapCodeBlock.extend<
     Partial<CodeBlockOptions>
 >({
   allowGapCursor: true,
-  // It needs to have a higher priority than range-selection,
+  // It needs to have a higher priority than range-selection (100),
   // otherwise the Mod-a shortcut key will be overridden.
-  priority: 110,
+  // But it should be lower than paragraph (1000) to avoid Backspace issues.
+  priority: 101,
 
   fakeSelection: true,
 

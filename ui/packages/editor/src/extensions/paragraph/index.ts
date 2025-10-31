@@ -98,6 +98,10 @@ const Paragraph = TiptapParagraph.extend<ExtensionOptions>({
         }
 
         const beforePos = $from.before($from.depth);
+        if (beforePos === 0) {
+          return true;
+        }
+
         if (isEmpty($from.parent)) {
           return deleteCurrentNodeAndSetSelection(
             $from,
@@ -105,10 +109,6 @@ const Paragraph = TiptapParagraph.extend<ExtensionOptions>({
             state,
             view.dispatch
           );
-        }
-
-        if (beforePos === 0) {
-          return false;
         }
 
         return handleDeletePreviousNode($from, beforePos, state, view.dispatch);

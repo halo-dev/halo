@@ -28,3 +28,5 @@ export {
   isListActive,
   isNodeContentEmpty,
 } from "./utils";
+
+export { useExtension } from "./composables/use-extension";
