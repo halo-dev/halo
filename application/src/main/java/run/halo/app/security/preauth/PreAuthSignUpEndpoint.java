@@ -35,6 +35,7 @@ import run.halo.app.infra.exception.EmailAlreadyTakenException;
 import run.halo.app.infra.exception.EmailVerificationFailed;
 import run.halo.app.infra.exception.RateLimitExceededException;
 import run.halo.app.infra.exception.RequestBodyValidationException;
+import run.halo.app.infra.exception.RestrictedNameException;
 import run.halo.app.infra.utils.HaloUtils;
 import run.halo.app.infra.utils.IpAddressUtils;
 
@@ -126,6 +127,9 @@ class PreAuthSignUpEndpoint {
                             )
                             .doOnError(DuplicateNameException.class,
                                 e -> model.put("error", "duplicate-username")
+                            )
+                            .doOnError(RestrictedNameException.class,
+                                e -> model.put("error", "restricted-username")
                             )
                             .onErrorResume(e -> ServerResponse.ok().render("signup", model));
                     })
