@@ -54,19 +54,23 @@ const handleUploadClick = () => {
     </button>
     <template #popper>
       <div
-        class="w-48 space-y-1 overflow-hidden rounded-md bg-white p-1 shadow-lg"
+        class="w-24 space-y-1 overflow-hidden rounded-md bg-white p-1 shadow-lg"
       >
         <button
           class="flex w-full items-center rounded px-3 py-2 text-left text-sm text-gray-700 hover:bg-gray-100"
           @click="handleUploadClick"
         >
-          上传新文件
+          {{ $t("core.common.buttons.upload") }}
         </button>
         <button
           class="flex w-full items-center rounded px-3 py-2 text-left text-sm text-gray-700 hover:bg-gray-100"
           @click="handleAttachmentSelector"
         >
-          从附件库中选择
+          {{
+            $t(
+              "core.components.default_editor.extensions.upload.attachment.title"
+            )
+          }}
         </button>
       </div>
     </template>

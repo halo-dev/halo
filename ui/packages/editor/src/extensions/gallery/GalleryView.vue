@@ -180,7 +180,7 @@ const groups = computed(() => {
               >
                 <ProiconsDelete class="h-4 w-4" />
                 <div
-                  class="text-2xs dark:bg-grey-900 invisible absolute -top-8 left-1/2 z-[1000] flex -translate-x-1/2 items-center gap-1 whitespace-nowrap rounded-md bg-black px-[1rem] py-1 font-sans font-medium text-white group-hover:visible"
+                  class="text-2xs dark:bg-grey-900 invisible absolute -top-8 left-1/2 z-50 flex -translate-x-1/2 items-center gap-1 whitespace-nowrap rounded-md bg-black px-4 py-1 font-sans font-medium text-white group-hover:visible"
                 >
                   <span>{{
                     i18n.global.t("editor.common.button.delete")
