@@ -2,7 +2,7 @@
 import HasPermission from "@/components/permission/HasPermission.vue";
 import { VButton, VSpace } from "@halo-dev/components";
 import { NodeViewWrapper, type NodeViewProps } from "@halo-dev/richtext-editor";
-import { computed, ref } from "vue";
+import { computed } from "vue";
 import ProiconsDelete from "~icons/proicons/delete";
 import type { GalleryImage } from "./index";
 import {
@@ -23,7 +23,6 @@ const images = computed({
   },
 });
 
-const isDragging = ref(false);
 const { openFileDialog } = useUploadGalleryImage(props.editor);
 
 const openAttachmentSelector = useAttachmentSelector(
@@ -41,29 +40,6 @@ function removeImage(index: number) {
   const newImages = [...images.value];
   newImages.splice(index, 1);
   images.value = newImages;
-}
-
-function handleDragOver(event: DragEvent) {
-  event.preventDefault();
-  event.stopPropagation();
-  isDragging.value = true;
-}
-
-function handleDragLeave(event: DragEvent) {
-  event.preventDefault();
-  event.stopPropagation();
-  isDragging.value = false;
-}
-
-function handleDrop(event: DragEvent) {
-  event.preventDefault();
-  event.stopPropagation();
-  isDragging.value = false;
-
-  const files = event.dataTransfer?.files;
-  if (files && files.length > 0) {
-    handleFiles(Array.from(files));
-  }
 }
 
 function handleImageLoad(event: Event, index: number) {
@@ -129,18 +105,11 @@ const groups = computed(() => {
         </HasPermission>
       </VSpace>
     </div>
-    <div
-      v-else
-      class="relative"
-      @dragover="handleDragOver"
-      @dragleave="handleDragLeave"
-      @drop="handleDrop"
-    >
+    <div v-else class="relative grid gap-2">
       <div
         v-for="(group, groupIndex) in groups"
         :key="groupIndex"
         class="flex flex-row justify-center gap-2"
-        :class="{ 'mt-2': groupIndex > 0 }"
       >
         <div
           v-for="(image, imgIndex) in group"
