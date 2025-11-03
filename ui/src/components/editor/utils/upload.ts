@@ -3,7 +3,7 @@ import { ucApiClient, type Attachment } from "@halo-dev/api-client";
 import { utils } from "@halo-dev/console-shared";
 import { Editor, PMNode } from "@halo-dev/richtext-editor";
 import type { AxiosRequestConfig } from "axios";
-import { chunk } from "lodash-es";
+import { chunk } from "es-toolkit";
 import ExtensionAudio from "../extensions/audio";
 import Image from "../extensions/image";
 import ExtensionVideo from "../extensions/video";

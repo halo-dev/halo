@@ -11,7 +11,7 @@ import {
   VSpace,
 } from "@halo-dev/components";
 import type { DashboardWidgetDefinition } from "@halo-dev/console-shared";
-import { cloneDeep } from "lodash-es";
+import { cloneDeep } from "es-toolkit";
 import { onMounted, ref, toRaw, useTemplateRef } from "vue";
 import { useI18n } from "vue-i18n";
 import WidgetEditableItem from "./components/WidgetEditableItem.vue";

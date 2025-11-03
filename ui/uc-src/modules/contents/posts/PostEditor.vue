@@ -28,7 +28,7 @@ import { usePostUpdateMutate } from "@uc/modules/contents/posts/composables/use-
 import { useLocalStorage } from "@vueuse/core";
 import { useRouteQuery } from "@vueuse/router";
 import { AxiosError, type AxiosRequestConfig } from "axios";
-import { isEqual } from "lodash-es";
+import { isEqual } from "es-toolkit";
 import ShortUniqueId from "short-unique-id";
 import type { ComputedRef } from "vue";
 import {

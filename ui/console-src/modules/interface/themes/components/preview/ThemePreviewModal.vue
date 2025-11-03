@@ -20,7 +20,8 @@ import {
   VTabbar,
 } from "@halo-dev/components";
 import { useQuery, useQueryClient } from "@tanstack/vue-query";
-import { cloneDeep, set } from "lodash-es";
+import { cloneDeep } from "es-toolkit";
+import { set } from "es-toolkit/compat";
 import { OverlayScrollbarsComponent } from "overlayscrollbars-vue";
 import { storeToRefs } from "pinia";
 import { computed, markRaw, onMounted, ref, toRaw } from "vue";

@@ -21,7 +21,7 @@ import type {
 } from "@halo-dev/console-shared";
 import { useQueryClient } from "@tanstack/vue-query";
 import { useEventListener } from "@vueuse/core";
-import { cloneDeep, isEqual } from "lodash-es";
+import { cloneDeep, isEqual } from "es-toolkit";
 import {
   computed,
   defineComponent,
