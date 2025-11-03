@@ -144,29 +144,22 @@ tasks.named('jacocoTestReport', JacocoReport) {
     }
 }
 
-ext.presetPluginUrls = [
-        'https://github.com/halo-dev/plugin-comment-widget/releases/download/v3.0.0/plugin-comment-widget-3.0.0.jar'           : 'plugin-comment-widget.jar',
-        'https://github.com/halo-dev/plugin-search-widget/releases/download/v1.7.0/plugin-search-widget-1.7.0.jar'             : 'plugin-search-widget.jar',
-        'https://github.com/halo-dev/plugin-sitemap/releases/download/v1.1.2/plugin-sitemap-1.1.2.jar'                         : 'plugin-sitemap.jar',
-        'https://github.com/halo-dev/plugin-feed/releases/download/v1.5.0/plugin-feed-1.5.0.jar'                               : 'plugin-feed.jar',
-        'https://github.com/halo-sigs/plugin-shiki/releases/download/v1.0.1/plugin-shiki-1.0.1.jar'                            : 'plugin-shiki.jar',
-        'https://github.com/halo-sigs/plugin-editor-hyperlink-card/releases/download/v1.5.2/plugin-editor-hyperlink-card-1.5.2.jar': 'plugin-editor-hyperlink-card.jar',
-
-        // Currently, plugin-app-store is not open source, so we need to download it from the official website.
-        // Please see https://github.com/halo-dev/plugin-app-store/issues/55
-        // https://www.halo.run/store/apps/app-VYJbF
-        'https://www.halo.run/store/apps/app-VYJbF/releases/download/app-release-uadbam6p/assets/app-release-uadbam6p-kwbir0ge': 'appstore.jar',
-]
-
 tasks.register('downloadPluginPresets', Download) {
-    doFirst {
-        delete 'src/main/resources/presets/plugins'
-    }
+    def presetPluginUrls = [
+            'https://github.com/halo-dev/plugin-comment-widget/releases/download/v3.0.0/plugin-comment-widget-3.0.0.jar'               : 'plugin-comment-widget.jar',
+            'https://github.com/halo-dev/plugin-search-widget/releases/download/v1.7.0/plugin-search-widget-1.7.0.jar'                 : 'plugin-search-widget.jar',
+            'https://github.com/halo-dev/plugin-sitemap/releases/download/v1.1.2/plugin-sitemap-1.1.2.jar'                             : 'plugin-sitemap.jar',
+            'https://github.com/halo-dev/plugin-feed/releases/download/v1.5.0/plugin-feed-1.5.0.jar'                                   : 'plugin-feed.jar',
+            'https://github.com/halo-sigs/plugin-shiki/releases/download/v1.0.1/plugin-shiki-1.0.1.jar'                                : 'plugin-shiki.jar',
+            'https://github.com/halo-sigs/plugin-editor-hyperlink-card/releases/download/v1.5.2/plugin-editor-hyperlink-card-1.5.2.jar': 'plugin-editor-hyperlink-card.jar',
 
+            // Currently, plugin-app-store is not open source, so we need to download it from the official website.
+            // Please see https://github.com/halo-dev/plugin-app-store/issues/55
+            // https://www.halo.run/store/apps/app-VYJbF
+            'https://www.halo.run/store/apps/app-VYJbF/releases/download/app-release-uadbam6p/assets/app-release-uadbam6p-kwbir0ge'    : 'appstore.jar',
+    ]
     src presetPluginUrls.keySet()
-
-    dest 'src/main/resources/presets/plugins'
-
+    dest layout.buildDirectory.dir('resources/main/presets/plugins')
     eachFile { f ->
         f.name = presetPluginUrls[f.sourceURL.toString()]
     }
