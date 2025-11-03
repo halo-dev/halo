@@ -5,12 +5,14 @@ import static run.halo.app.extension.index.query.Queries.equal;
 
 import java.time.Clock;
 import java.time.Duration;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
+import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.dao.OptimisticLockingFailureException;
@@ -49,6 +51,7 @@ import run.halo.app.infra.ValidationUtils;
 import run.halo.app.infra.exception.DuplicateNameException;
 import run.halo.app.infra.exception.EmailAlreadyTakenException;
 import run.halo.app.infra.exception.EmailVerificationFailed;
+import run.halo.app.infra.exception.RestrictedNameException;
 import run.halo.app.infra.exception.UnsatisfiedAttributeValueException;
 import run.halo.app.infra.exception.UserNotFoundException;
 import run.halo.app.plugin.extensionpoint.ExtensionGetter;
@@ -210,6 +213,8 @@ public class UserServiceImpl implements UserService {
             .switchIfEmpty(Mono.error(() -> new ServerWebInputException(
                 "The registration is not allowed by the administrator."
             )))
+            .filter(setting -> isUsernameAllowed(setting, signUpData.getUsername()))
+            .switchIfEmpty(Mono.error(RestrictedNameException::new))
             .filter(setting -> StringUtils.hasText(setting.getDefaultRole()))
             .switchIfEmpty(Mono.error(() -> new ServerWebInputException(
                 "The default role is not configured by the administrator."
@@ -351,5 +356,18 @@ public class UserServiceImpl implements UserService {
 
     void publishPasswordChangedEvent(String username) {
         eventPublisher.publishEvent(new PasswordChangedEvent(this, username));
+    }
+
+    private boolean isUsernameAllowed(SystemSetting.User setting, String username) {
+        String protectedUsernamesStr = setting.getProtectedUsernames();
+        if (protectedUsernamesStr == null || protectedUsernamesStr.trim().isEmpty()) {
+            return true;
+        }
+        Set<String> protectedLowerSet = Arrays.stream(protectedUsernamesStr.split(","))
+            .map(String::trim)
+            .filter(n -> !n.isEmpty())
+            .map(String::toLowerCase)
+            .collect(Collectors.toUnmodifiableSet());
+        return !protectedLowerSet.contains(username.toLowerCase());
     }
 }
