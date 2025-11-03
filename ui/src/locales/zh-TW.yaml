@@ -1646,6 +1646,8 @@ core:
             title: 輸入連結
             placeholder: 輸入連結，按回車確定
           operations:
+            remove:
+              button: 刪除
             replace:
               button: 替換
             transfer:

@@ -104,6 +104,7 @@ import { useAttachmentSelect } from "./composables/use-attachment";
 import { useExtension } from "./composables/use-extension";
 import {
   UiExtensionAudio,
+  UiExtensionGallery,
   UiExtensionImage,
   UiExtensionUpload,
   UiExtensionVideo,
@@ -247,6 +248,10 @@ const presetExtensions = [
     HTMLAttributes: {
       loading: "lazy",
     },
+    uploadImage: props.uploadImage,
+  }),
+  UiExtensionGallery.configure({
+    allowBase64: false,
     uploadImage: props.uploadImage,
   }),
   ExtensionTaskList,

@@ -104,6 +104,7 @@ editor:
       title: 画廊
       add_image: 添加图片
       empty_prompt: 点击选择图片或拖拽图片到这里
+      group_size: 每行图片数
   components:
     color_picker:
       more_color: 更多颜色

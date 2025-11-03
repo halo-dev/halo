@@ -43,8 +43,8 @@ import {
   ExtensionColumns,
 } from "./columns";
 import ExtensionFormatBrush from "./format-brush";
-import ExtensionGapcursor from "./gap-cursor";
 import ExtensionGallery, { GALLERY_BUBBLE_MENU_KEY } from "./gallery";
+import ExtensionGapcursor from "./gap-cursor";
 import ExtensionIframe, { IFRAME_BUBBLE_MENU_KEY } from "./iframe";
 import ExtensionImage, { IMAGE_BUBBLE_MENU_KEY } from "./image";
 import ExtensionIndent from "./indent";
@@ -123,7 +123,6 @@ export {
   CODE_BLOCK_BUBBLE_MENU_KEY,
   COLUMNS_BUBBLE_MENU_KEY,
   DETAILS_BUBBLE_MENU_KEY,
-  GALLERY_BUBBLE_MENU_KEY,
   ExtensionAudio,
   ExtensionBlockquote,
   ExtensionBold,
@@ -171,6 +170,7 @@ export {
   ExtensionTrailingNode,
   ExtensionUnderline,
   ExtensionVideo,
+  GALLERY_BUBBLE_MENU_KEY,
   IFRAME_BUBBLE_MENU_KEY,
   IMAGE_BUBBLE_MENU_KEY,
   RangeSelection,

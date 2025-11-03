@@ -17,6 +17,7 @@ import { markRaw } from "vue";
 import MdiImageMultiple from "~icons/mdi/image-multiple";
 import MdiImagePlus from "~icons/mdi/image-plus";
 import BubbleItemAddImage from "./BubbleItemAddImage.vue";
+import BubbleItemGroupSize from "./BubbleItemGroupSize.vue";
 import GalleryView from "./GalleryView.vue";
 
 declare module "@/tiptap" {
@@ -27,9 +28,23 @@ declare module "@/tiptap" {
   }
 }
 
+export type GalleryOptions = {
+  groupSize?: number;
+};
+
+export type GalleryImage = {
+  src: string;
+  aspectRatio: number;
+};
+
 export const GALLERY_BUBBLE_MENU_KEY = new PluginKey("galleryBubbleMenu");
 
-const Gallery = Node.create<ExtensionOptions>({
+const Gallery = Node.create<
+  ExtensionOptions & GalleryOptions,
+  {
+    images: GalleryImage[];
+  }
+>({
   name: "gallery",
 
   group: "block",
@@ -47,8 +62,18 @@ const Gallery = Node.create<ExtensionOptions>({
       images: {
         default: [],
         parseHTML: (element) => {
-          const imgElements = element.querySelectorAll("img");
-          return Array.from(imgElements).map((img) => img.getAttribute("src"));
+          return Array.from(element.querySelectorAll("img")).map((img) => {
+            return {
+              src: img.getAttribute("src") || "",
+              aspectRatio: Number(img.getAttribute("data-aspect-ratio")) || 0,
+            };
+          });
+        },
+      },
+      groupSize: {
+        default: 3,
+        parseHTML: (element) => {
+          return Number(element.getAttribute("data-group-size")) || 3;
         },
       },
     };
@@ -63,19 +88,50 @@ const Gallery = Node.create<ExtensionOptions>({
   },
 
   renderHTML({ node }) {
-    const images = node.attrs.images || [];
-    const imageElements = images.map((src: string) => [
-      "img",
-      { src, class: "gallery-image" },
+    const images: GalleryImage[] = node.attrs.images || [];
+    const groupSize = node.attrs.groupSize || this.options?.groupSize || 3;
+    const imageGroups: GalleryImage[][] = images.reduce(
+      (acc: GalleryImage[][], image: GalleryImage, index: number) => {
+        const groupIndex = Math.floor(index / groupSize);
+        acc[groupIndex] = acc[groupIndex] || [];
+        acc[groupIndex].push(image);
+        return acc;
+      },
+      []
+    );
+    const imageGroupElements = imageGroups.map((items: GalleryImage[]) => [
+      "div",
+      {
+        "data-type": "gallery-group",
+        style:
+          "display: flex; flex-direction: row; justify-content: center; gap: 0.5rem;",
+      },
+      ...items.map((image: GalleryImage) => {
+        return [
+          "div",
+          {
+            style: `flex: ${image.aspectRatio} 1 0%`,
+            "data-aspect-ratio": image.aspectRatio.toString(),
+          },
+          [
+            "img",
+            {
+              src: image.src,
+              "data-type": "gallery-image",
+              style: "width: 100%; height: 100%",
+            },
+          ],
+        ];
+      }),
     ]);
 
     return [
       "div",
       {
         "data-type": "gallery",
-        class: "gallery-container",
+        "data-group-size": groupSize.toString(),
       },
-      ["div", { class: "gallery-grid" }, ...imageElements],
+      ["div", { style: "display: grid; gap: 0.5rem;" }, ...imageGroupElements],
     ];
   },
 
@@ -131,7 +187,7 @@ const Gallery = Node.create<ExtensionOptions>({
           },
         };
       },
-      getBubbleMenu({ editor }: { editor: Editor }): NodeBubbleMenuType {
+      getBubbleMenu(): NodeBubbleMenuType {
         return {
           pluginKey: GALLERY_BUBBLE_MENU_KEY,
           shouldShow: ({ state }: { state: EditorState }): boolean => {
@@ -144,6 +200,7 @@ const Gallery = Node.create<ExtensionOptions>({
             {
               priority: 10,
               component: markRaw(BubbleItemAddImage),
+              key: "add-image",
               props: {
                 icon: markRaw(MdiImagePlus),
                 title: i18n.global.t("editor.extensions.gallery.add_image"),
@@ -155,6 +212,10 @@ const Gallery = Node.create<ExtensionOptions>({
             },
             {
               priority: 30,
+              component: markRaw(BubbleItemGroupSize),
+            },
+            {
+              priority: 40,
               props: {
                 icon: markRaw(MdiDeleteForeverOutline),
                 title: i18n.global.t("editor.common.button.delete"),

@@ -32,7 +32,10 @@ onChange((files) => {
     props.editor
       .chain()
       .updateAttributes(Gallery.name, {
-        images: [...currentImages, ...newBlobUrls],
+        images: [
+          ...currentImages,
+          ...newBlobUrls.map((url) => ({ src: url, aspectRatio: 1 })),
+        ],
       })
       .setNodeSelection(props.editor.state.selection.from)
       .focus()
@@ -51,7 +54,7 @@ onMounted(() => {
   <button
     :title="title"
     class="rounded-md p-2 text-lg text-gray-600 hover:bg-gray-100"
-    @click="props?.action({ editor })"
+    @click="() => openFileDialog()"
   >
     <component :is="icon" :style="iconStyle" class="h-5 w-5" />
   </button>

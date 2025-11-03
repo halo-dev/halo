@@ -104,6 +104,7 @@ editor:
       title: Gallery
       add_image: Add image
       empty_prompt: Click to select images or drag images here
+      group_size: Images per row
   components:
     color_picker:
       more_color: More

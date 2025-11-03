@@ -1,12 +1,14 @@
 <script lang="ts" setup>
-import { i18n } from "@/locales";
-import type { NodeViewProps } from "@/tiptap/vue-3";
-import { NodeViewWrapper } from "@/tiptap/vue-3";
-import { useFileDialog } from "@vueuse/core";
+import HasPermission from "@/components/permission/HasPermission.vue";
+import { VButton, VSpace } from "@halo-dev/components";
+import { NodeViewWrapper, type NodeViewProps } from "@halo-dev/richtext-editor";
 import { computed, ref } from "vue";
-import ClarityImageGalleryLine from "~icons/clarity/image-gallery-line";
 import ProiconsDelete from "~icons/proicons/delete";
-import type { GalleryImage } from ".";
+import type { GalleryImage } from "./index";
+import {
+  useAttachmentSelector,
+  useUploadGalleryImage,
+} from "./useGalleryImages";
 
 const props = defineProps<NodeViewProps>();
 
@@ -22,44 +24,21 @@ const images = computed({
 });
 
 const isDragging = ref(false);
+const { openFileDialog } = useUploadGalleryImage(props.editor);
 
-const { open: openFileDialog, onChange } = useFileDialog({
-  accept: "image/*",
-  multiple: true,
-  reset: true,
-});
-
-onChange((selectedFiles) => {
-  if (selectedFiles) {
-    handleFiles(Array.from(selectedFiles));
+const openAttachmentSelector = useAttachmentSelector(
+  props.editor,
+  (newImages) => {
+    images.value = [...images.value, ...newImages];
   }
-});
+);
 
 function handleSetFocus() {
   props.editor.commands.setNodeSelection(props.getPos() || 0);
 }
 
-function handleFiles(files: File[]) {
-  const imageFiles = files.filter((file) => file.type.startsWith("image/"));
-  const newBlobUrls = imageFiles.map((file) => URL.createObjectURL(file));
-  const newImages = newBlobUrls.map((url) => {
-    return {
-      src: url,
-      aspectRatio: 0,
-    };
-  });
-  images.value = [...images.value, ...newImages];
-}
-
 function removeImage(index: number) {
   const newImages = [...images.value];
-  const image = newImages[index];
-  const removedUrl = image.src;
-
-  if (removedUrl.startsWith("blob:")) {
-    URL.revokeObjectURL(removedUrl);
-  }
-
   newImages.splice(index, 1);
   images.value = newImages;
 }
@@ -120,6 +99,7 @@ const groups = computed(() => {
 <template>
   <node-view-wrapper
     as="div"
+    class="p-0.5"
     :class="{
       'rounded ring-2': selected,
     }"
@@ -129,24 +109,29 @@ const groups = computed(() => {
       v-if="images.length === 0"
       class="relative flex h-full items-center justify-center rounded-md border border-gray-200 bg-gray-50 before:pb-[62.5%]"
     >
-      <div
-        class="group flex cursor-pointer select-none flex-col items-center justify-center p-20"
-        @click.stop="openFileDialog()"
-        @dragover="handleDragOver"
-        @dragleave="handleDragLeave"
-        @drop="handleDrop"
-      >
-        <ClarityImageGalleryLine class="h-16 w-16 text-gray-400" />
-        <p
-          class="mt-4 flex font-sans text-sm font-normal text-gray-600 opacity-80 transition-all group-hover:opacity-100"
+      <VSpace>
+        <HasPermission :permissions="['uc:attachments:manage']">
+          <VButton @click="openFileDialog()">
+            {{ $t("core.common.buttons.upload") }}
+          </VButton>
+        </HasPermission>
+
+        <HasPermission
+          :permissions="['system:attachments:view', 'uc:attachments:manage']"
         >
-          {{ i18n.global.t("editor.extensions.gallery.empty_prompt") }}
-        </p>
-      </div>
+          <VButton @click="openAttachmentSelector">
+            {{
+              $t(
+                "core.components.default_editor.extensions.upload.attachment.title"
+              )
+            }}
+          </VButton>
+        </HasPermission>
+      </VSpace>
     </div>
     <div
       v-else
-      class="relative grid gap-2"
+      class="relative"
       @dragover="handleDragOver"
       @dragleave="handleDragLeave"
       @drop="handleDrop"
@@ -155,6 +140,7 @@ const groups = computed(() => {
         v-for="(group, groupIndex) in groups"
         :key="groupIndex"
         class="flex flex-row justify-center gap-2"
+        :class="{ 'mt-2': groupIndex > 0 }"
       >
         <div
           v-for="(image, imgIndex) in group"
@@ -182,9 +168,13 @@ const groups = computed(() => {
                 <div
                   class="text-2xs dark:bg-grey-900 invisible absolute -top-8 left-1/2 z-[1000] flex -translate-x-1/2 items-center gap-1 whitespace-nowrap rounded-md bg-black px-[1rem] py-1 font-sans font-medium text-white group-hover:visible"
                 >
-                  <span>{{
-                    i18n.global.t("editor.common.button.delete")
-                  }}</span>
+                  <span>
+                    {{
+                      $t(
+                        "core.components.default_editor.extensions.upload.operations.remove.button"
+                      )
+                    }}</span
+                  >
                 </div>
               </button>
             </div>
