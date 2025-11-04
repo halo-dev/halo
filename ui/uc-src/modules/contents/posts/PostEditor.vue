@@ -6,7 +6,6 @@ import { useContentCache } from "@/composables/use-content-cache";
 import { useEditorExtensionPoints } from "@/composables/use-editor-extension-points";
 import { useSessionKeepAlive } from "@/composables/use-session-keep-alive";
 import { contentAnnotations } from "@/constants/annotations";
-import { randomUUID } from "@/utils/id";
 import { useSaveKeybinding } from "@console/composables/use-save-keybinding";
 import useSlugify from "@console/composables/use-slugify";
 import type { Content, Post, Snapshot } from "@halo-dev/api-client";
@@ -56,7 +55,7 @@ const formState = ref<Post>({
   kind: "Post",
   metadata: {
     annotations: {},
-    name: randomUUID(),
+    name: utils.id.uuid(),
   },
   spec: {
     allowComment: true,

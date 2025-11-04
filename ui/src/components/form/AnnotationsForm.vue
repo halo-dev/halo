@@ -1,4 +1,5 @@
 <script lang="ts" setup>
+import { useThemeStore } from "@console/stores/theme";
 import {
   reset,
   submitForm,
@@ -6,14 +7,11 @@ import {
   type FormKitSchemaDefinition,
   type FormKitSchemaNode,
 } from "@formkit/core";
-
-import { IconArrowRight } from "@halo-dev/components";
-
-import { randomUUID } from "@/utils/id";
-import { useThemeStore } from "@console/stores/theme";
 import { getValidationMessages } from "@formkit/validation";
 import type { AnnotationSetting } from "@halo-dev/api-client";
 import { coreApiClient } from "@halo-dev/api-client";
+import { IconArrowRight } from "@halo-dev/components";
+import { utils } from "@halo-dev/console-shared";
 import { cloneDeep } from "lodash-es";
 import { computed, nextTick, onMounted, ref, watch } from "vue";
 
@@ -69,8 +67,8 @@ const handleFetchAnnotationSettings = async () => {
   }
 };
 
-const specFormId = `${randomUUID()}-specForm`;
-const customFormId = `${randomUUID()}-customForm`;
+const specFormId = `${utils.id.uuid()}-specForm`;
+const customFormId = `${utils.id.uuid()}-customForm`;
 const annotations = ref<{
   [key: string]: string;
 }>({});

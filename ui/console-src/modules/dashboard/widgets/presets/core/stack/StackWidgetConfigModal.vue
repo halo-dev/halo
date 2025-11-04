@@ -1,5 +1,4 @@
 <script setup lang="ts">
-import { randomUUID } from "@/utils/id";
 import ActionButton from "@console/modules/dashboard/components/ActionButton.vue";
 import WidgetHubModal from "@console/modules/dashboard/components/WidgetHubModal.vue";
 import {
@@ -10,7 +9,10 @@ import {
   VModal,
   VSpace,
 } from "@halo-dev/components";
-import type { DashboardWidgetDefinition } from "@halo-dev/console-shared";
+import {
+  utils,
+  type DashboardWidgetDefinition,
+} from "@halo-dev/console-shared";
 import { cloneDeep } from "lodash-es";
 import { onMounted, ref, toRaw, useTemplateRef } from "vue";
 import { useI18n } from "vue-i18n";
@@ -49,7 +51,7 @@ function handleAddWidget(widgetDefinition: DashboardWidgetDefinition) {
   widgets.value = [
     ...(widgets.value || []),
     {
-      i: randomUUID(),
+      i: utils.id.uuid(),
       id: widgetDefinition.id,
       config: widgetDefinition.defaultConfig,
     },
