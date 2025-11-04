@@ -4,6 +4,7 @@ import type { FormKitSchemaCondition, FormKitSchemaNode } from "@formkit/core";
 import type { Plugin, Setting } from "@halo-dev/api-client";
 import { consoleApiClient } from "@halo-dev/api-client";
 import { Toast, VButton } from "@halo-dev/components";
+import { events } from "@halo-dev/console-shared";
 import { useQuery, useQueryClient } from "@tanstack/vue-query";
 import { cloneDeep, set } from "lodash-es";
 import { computed, inject, ref, toRaw, type Ref } from "vue";
@@ -65,6 +66,12 @@ const handleSaveConfigMap = async (data: object) => {
   queryClient.invalidateQueries({ queryKey: ["core:plugin:configMap:data"] });
 
   saving.value = false;
+
+  // Push a custom event to notify other components to refresh data
+  events.emit("core:plugin:configMap:updated", {
+    pluginName: plugin.value.metadata.name,
+    group: group.value,
+  });
 };
 </script>
 <template>
