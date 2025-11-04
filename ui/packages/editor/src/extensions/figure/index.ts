@@ -30,7 +30,7 @@ export interface FigureOptions {
 const Figure = Node.create<ExtensionOptions & FigureOptions>({
   name: "figure",
   group: "block",
-  content: "block+? figureCaption?",
+  content: "block? figureCaption?",
   isolating: true,
   fakeSelection: true,
   // Priority must be higher than paragraph (1000) and code-block to ensure

@@ -45,12 +45,12 @@ import {
   ExtensionTextAlign,
   ExtensionTrailingNode,
   ExtensionUnderline,
+  filterDuplicateExtensions,
   Plugin,
   PluginKey,
   RichTextEditor,
   ToolbarItem,
   ToolboxItem,
-  useExtension,
   VueEditor,
   type Extensions,
 } from "@halo-dev/richtext-editor";
@@ -219,8 +219,6 @@ const onAttachmentSelectorModalClose = () => {
   attachmentOptions.value = initAttachmentOptions;
   attachmentSelectorModalVisible.value = false;
 };
-
-const { filterDuplicateExtensions } = useExtension();
 
 const presetExtensions = [
   ExtensionBlockquote,

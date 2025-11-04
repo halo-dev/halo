@@ -20,6 +20,7 @@ export * from "./types";
 export {
   deleteNode,
   deleteNodeByPos,
+  filterDuplicateExtensions,
   generateAnchor,
   generateAnchorId,
   isAllowedUri,
@@ -28,5 +29,3 @@ export {
   isListActive,
   isNodeContentEmpty,
 } from "./utils";
-
-export { useExtension } from "./composables/use-extension";

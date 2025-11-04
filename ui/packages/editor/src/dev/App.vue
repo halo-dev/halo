@@ -32,7 +32,6 @@ import {
   ExtensionListKeymap,
   ExtensionNodeSelected,
   ExtensionOrderedList,
-  ExtensionParagraph,
   ExtensionPlaceholder,
   ExtensionRangeSelection,
   ExtensionSearchAndReplace,
@@ -47,15 +46,14 @@ import {
   ExtensionTrailingNode,
   ExtensionUnderline,
   ExtensionVideo,
+  filterDuplicateExtensions,
   RichTextEditor,
   useEditor,
-  useExtension,
 } from "../index";
 
 const content = useLocalStorage("content", "");
 
 const extensions = [
-  ExtensionParagraph,
   ExtensionBlockquote,
   ExtensionBold,
   ExtensionBulletList,
@@ -122,7 +120,7 @@ const extensions = [
   ExtensionFigure,
 ];
 
-const { filterDuplicateExtensions } = useExtension();
+console.log("=============== app", filterDuplicateExtensions(extensions));
 
 const editor = useEditor({
   content: content.value,
