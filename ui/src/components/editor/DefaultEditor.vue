@@ -33,6 +33,7 @@ import {
   ExtensionListKeymap,
   ExtensionNodeSelected,
   ExtensionOrderedList,
+  ExtensionParagraph,
   ExtensionPlaceholder,
   ExtensionRangeSelection,
   ExtensionSearchAndReplace,
@@ -221,6 +222,7 @@ const onAttachmentSelectorModalClose = () => {
 };
 
 const presetExtensions = [
+  ExtensionParagraph,
   ExtensionBlockquote,
   ExtensionBold,
   ExtensionBulletList,

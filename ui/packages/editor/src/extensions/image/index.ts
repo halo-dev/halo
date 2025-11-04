@@ -232,7 +232,6 @@ const Image = TiptapImage.extend<ExtensionOptions & Partial<ImageOptions>>({
                   attrs: { contentType: "image" },
                   content: [{ type: "image" }],
                 },
-                { type: "paragraph", content: "" },
               ])
               .run();
           },
@@ -417,7 +416,6 @@ const Image = TiptapImage.extend<ExtensionOptions & Partial<ImageOptions>>({
                       captionPos = pos + offset + 1;
                     }
                   });
-
                   if (captionPos !== -1) {
                     editor.chain().focus().setTextSelection(captionPos).run();
                     return;

@@ -30,12 +30,11 @@ export interface FigureOptions {
 const Figure = Node.create<ExtensionOptions & FigureOptions>({
   name: "figure",
   group: "block",
-  content: "block? figureCaption?",
+  content: "(image|video|audio)? figureCaption?",
   isolating: true,
   fakeSelection: true,
   // Priority must be higher than paragraph (1000) and code-block to ensure
   // the Backspace shortcut handles figure selection correctly.
-  priority: 1100,
 
   addOptions() {
     return {

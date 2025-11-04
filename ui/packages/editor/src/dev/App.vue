@@ -120,8 +120,6 @@ const extensions = [
   ExtensionFigure,
 ];
 
-console.log("=============== app", filterDuplicateExtensions(extensions));
-
 const editor = useEditor({
   content: content.value,
   extensions: filterDuplicateExtensions(extensions),

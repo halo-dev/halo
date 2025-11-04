@@ -10,7 +10,7 @@ import {
 
 const FigureCaption = Node.create({
   name: "figureCaption",
-  content: "inline*",
+  content: "text*",
   inline: false,
   group: "block",
 
