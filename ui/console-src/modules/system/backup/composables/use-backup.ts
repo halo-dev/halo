@@ -1,7 +1,7 @@
 import { BackupStatusPhaseEnum, coreApiClient } from "@halo-dev/api-client";
 import { Dialog, Toast } from "@halo-dev/components";
+import { utils } from "@halo-dev/console-shared";
 import { useQuery, useQueryClient } from "@tanstack/vue-query";
-import dayjs from "dayjs";
 import { useI18n } from "vue-i18n";
 
 export function useBackupFetch() {
@@ -58,7 +58,7 @@ export function useBackup() {
               name: "",
             },
             spec: {
-              expiresAt: dayjs().add(7, "day").toISOString(),
+              expiresAt: utils.date.dayjs().add(7, "day").toISOString(),
             },
           },
         });
