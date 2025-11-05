@@ -22,28 +22,22 @@ const props = defineProps<{
   action?: ({ editor }: { editor: Editor }) => void;
 }>();
 
-const width = computed({
+const size = computed({
   get: () => {
-    return props.editor.getAttributes(Image.name).width;
+    return {
+      width: props.editor.getAttributes(Image.name).width,
+      height: props.editor.getAttributes(Image.name).height,
+    };
   },
-  set: (value: string) => {
-    handleSetSize(value, height.value);
+  set: (size: { width?: string; height?: string }) => {
+    handleSetSize(size);
   },
 });
 
-const height = computed({
-  get: () => {
-    return props.editor.getAttributes(Image.name).height;
-  },
-  set: (value: string) => {
-    handleSetSize(width.value, value);
-  },
-});
-
-function handleSetSize(width?: string, height?: string) {
+function handleSetSize(size: { width?: string; height?: string }) {
   props.editor
     .chain()
-    .updateAttributes(Image.name, { width, height })
+    .updateAttributes(Image.name, size)
     .setNodeSelection(props.editor.state.selection.from)
     .focus()
     .run();
@@ -52,21 +46,27 @@ function handleSetSize(width?: string, height?: string) {
 
 <template>
   <BlockActionInput
-    v-model.lazy.trim="width"
+    v-model.lazy.trim="size.width"
+    :visible="visible?.({ editor: props.editor })"
     :tooltip="i18n.global.t('editor.common.tooltip.custom_width_input')"
   />
 
   <BlockActionInput
-    v-model.lazy.trim="height"
+    v-model.lazy.trim="size.height"
+    :visible="visible?.({ editor: props.editor })"
     :tooltip="i18n.global.t('editor.common.tooltip.custom_height_input')"
   />
 
-  <BlockActionSeparator />
+  <BlockActionSeparator
+    v-if="visible?.({ editor: props.editor })"
+    :editor="props.editor"
+  />
 
   <BlockActionButton
     :tooltip="i18n.global.t('editor.extensions.image.small_size')"
-    :selected="editor.getAttributes(Image.name).width === '25%'"
-    @click="handleSetSize('25%', 'auto')"
+    :is-active="size.width === `25%`"
+    :visible="visible?.({ editor: props.editor })"
+    @click="handleSetSize({ width: '25%', height: 'auto' })"
   >
     <template #icon>
       <MdiImageSizeSelectSmall />
@@ -75,8 +75,9 @@ function handleSetSize(width?: string, height?: string) {
 
   <BlockActionButton
     :tooltip="i18n.global.t('editor.extensions.image.medium_size')"
-    :selected="editor.getAttributes(Image.name).width === '50%'"
-    @click="handleSetSize('50%', 'auto')"
+    :is-active="size.width === `50%`"
+    :visible="visible?.({ editor: props.editor })"
+    @click="handleSetSize({ width: '50%', height: 'auto' })"
   >
     <template #icon>
       <MdiImageSizeSelectLarge />
@@ -85,8 +86,9 @@ function handleSetSize(width?: string, height?: string) {
 
   <BlockActionButton
     :tooltip="i18n.global.t('editor.extensions.image.large_size')"
-    :selected="editor.getAttributes(Image.name).width === '100%'"
-    @click="handleSetSize('100%', '100%')"
+    :is-active="size.width === `100%`"
+    :visible="visible?.({ editor: props.editor })"
+    @click="handleSetSize({ width: '100%', height: 'auto' })"
   >
     <template #icon>
       <MdiImageSizeSelectActual />
@@ -95,12 +97,13 @@ function handleSetSize(width?: string, height?: string) {
 
   <BlockActionButton
     :tooltip="i18n.global.t('editor.extensions.image.restore_size')"
-    @click="handleSetSize(undefined, undefined)"
+    :visible="visible?.({ editor: props.editor })"
+    @click="handleSetSize({ width: undefined, height: undefined })"
   >
     <template #icon>
       <MdiBackupRestore />
     </template>
   </BlockActionButton>
 
-  <BlockActionSeparator />
+  <BlockActionSeparator v-if="visible?.({ editor: props.editor })" />
 </template>

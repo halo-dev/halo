@@ -2,11 +2,10 @@
 import HasPermission from "@/components/permission/HasPermission.vue";
 import { VButton } from "@halo-dev/components";
 import type { AttachmentSimple } from "@halo-dev/console-shared";
-import type { NodeViewProps } from "@halo-dev/richtext-editor";
+import { NodeViewWrapper, type NodeViewProps } from "@halo-dev/richtext-editor";
 import { computed, ref } from "vue";
 import RiVideoAddLine from "~icons/ri/video-add-line";
 import { EditorLinkObtain } from "../../components";
-import InlineBlockBox from "../../components/InlineBlockBox.vue";
 import { useExternalAssetsTransfer } from "../../composables/use-attachment";
 
 const props = defineProps<NodeViewProps>();
@@ -74,10 +73,21 @@ const handleResetInit = () => {
 
 const { isExternalAsset, transferring, handleTransfer } =
   useExternalAssetsTransfer(src, handleSetExternalLink);
+
+const isPercentageWidth = computed(() => {
+  return props.node?.attrs.width?.includes("%");
+});
 </script>
 
 <template>
-  <InlineBlockBox>
+  <node-view-wrapper
+    as="div"
+    class="w-full"
+    :class="{
+      'w-fit': !isPercentageWidth && src,
+      flex: isPercentageWidth,
+    }"
+  >
     <div
       class="relative inline-block h-full max-w-full overflow-hidden rounded-md text-center transition-all"
       :class="{
@@ -85,6 +95,7 @@ const { isExternalAsset, transferring, handleTransfer } =
       }"
       :style="{
         width: initialization ? '100%' : node.attrs.width,
+        height: initialization ? '100%' : node.attrs.height,
       }"
     >
       <div v-if="src" class="group relative">
@@ -97,8 +108,8 @@ const { isExternalAsset, transferring, handleTransfer } =
           preload="metadata"
           class="m-0 rounded-md"
           :style="{
-            width: node.attrs.width,
-            height: node.attrs.height,
+            width: isPercentageWidth ? '100%' : node.attrs.width,
+            height: isPercentageWidth ? '100%' : node.attrs.height,
           }"
         ></video>
         <div
@@ -223,5 +234,5 @@ const { isExternalAsset, transferring, handleTransfer } =
         </EditorLinkObtain>
       </div>
     </div>
-  </InlineBlockBox>
+  </node-view-wrapper>
 </template>

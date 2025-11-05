@@ -10,6 +10,7 @@ import ExtensionBulletList from "./bullet-list";
 import ExtensionCode from "./code";
 import ExtensionColor from "./color";
 import ExtensionDetails, { DETAILS_BUBBLE_MENU_KEY } from "./details";
+import ExtensionFigure from "./figure";
 import ExtensionFontSize from "./font-size";
 import ExtensionHeading from "./heading";
 import ExtensionHighlight from "./highlight";
@@ -75,6 +76,7 @@ const allExtensions = [
   ExtensionOrderedList,
   ExtensionStrike,
   ExtensionText,
+  ExtensionFigure,
   ExtensionImage,
   ExtensionTaskList,
   ExtensionHighlight,
@@ -136,6 +138,7 @@ export {
   ExtensionDetails,
   ExtensionDocument,
   Dropcursor as ExtensionDropcursor,
+  ExtensionFigure,
   ExtensionFontSize,
   ExtensionFormatBrush,
   ExtensionGapcursor,
