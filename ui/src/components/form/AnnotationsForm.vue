@@ -14,7 +14,7 @@ import { useThemeStore } from "@console/stores/theme";
 import { getValidationMessages } from "@formkit/validation";
 import type { AnnotationSetting } from "@halo-dev/api-client";
 import { coreApiClient } from "@halo-dev/api-client";
-import { cloneDeep } from "lodash-es";
+import { cloneDeep } from "es-toolkit";
 import { computed, nextTick, onMounted, ref, watch } from "vue";
 
 const themeStore = useThemeStore();

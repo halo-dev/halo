@@ -33,7 +33,7 @@ import { FormType, utils } from "@halo-dev/console-shared";
 import { useLocalStorage } from "@vueuse/core";
 import { useRouteQuery } from "@vueuse/router";
 import type { AxiosRequestConfig } from "axios";
-import { isEqual } from "lodash-es";
+import { isEqual } from "es-toolkit";
 import ShortUniqueId from "short-unique-id";
 import {
   computed,

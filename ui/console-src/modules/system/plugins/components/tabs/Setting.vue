@@ -6,7 +6,8 @@ import { consoleApiClient } from "@halo-dev/api-client";
 import { Toast, VButton } from "@halo-dev/components";
 import { events } from "@halo-dev/console-shared";
 import { useQuery, useQueryClient } from "@tanstack/vue-query";
-import { cloneDeep, set } from "lodash-es";
+import { cloneDeep } from "es-toolkit";
+import { set } from "es-toolkit/compat";
 import { computed, inject, ref, toRaw, type Ref } from "vue";
 import { useI18n } from "vue-i18n";
 

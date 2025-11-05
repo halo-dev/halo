@@ -74,7 +74,7 @@ export function createViteConfig(options: Options) {
         output: {
           advancedChunks: {
             groups: [
-              "lodash-es",
+              "es-toolkit",
               "vue-grid-layout",
               "transliteration",
               "vue-draggable-plus",

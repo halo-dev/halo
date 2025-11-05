@@ -16,7 +16,7 @@ import {
   VSpace,
 } from "@halo-dev/components";
 import { FormType } from "@halo-dev/console-shared";
-import { cloneDeep } from "lodash-es";
+import { cloneDeep } from "es-toolkit";
 import { computed, nextTick, onMounted, ref, watch } from "vue";
 import { useI18n } from "vue-i18n";
 

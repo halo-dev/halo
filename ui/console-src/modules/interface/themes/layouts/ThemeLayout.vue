@@ -20,7 +20,7 @@ import {
 import { utils } from "@halo-dev/console-shared";
 import { useQuery } from "@tanstack/vue-query";
 import { useRouteQuery } from "@vueuse/router";
-import { cloneDeep } from "lodash-es";
+import { cloneDeep } from "es-toolkit";
 import { storeToRefs } from "pinia";
 import {
   computed,

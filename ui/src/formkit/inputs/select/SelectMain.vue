@@ -4,7 +4,9 @@ import { axiosInstance } from "@halo-dev/api-client";
 import { useDebounceFn } from "@vueuse/core";
 import { useFuse } from "@vueuse/integrations/useFuse";
 import type { AxiosRequestConfig } from "axios";
-import { get, has, type PropertyPath } from "lodash-es";
+import { get, has } from "es-toolkit/compat";
+// TODO: remove lodash-es dependency in the future
+import { type PropertyPath } from "lodash-es";
 import {
   computed,
   onMounted,
