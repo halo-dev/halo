@@ -12,8 +12,8 @@ spring:
       enabled: detect
   r2dbc:
     url: r2dbc:h2:file:///${halo.work-dir}/db/halo-next?MODE=MySQL&DB_CLOSE_ON_EXIT=FALSE
-    username: admin
-    password: 123456
+    username: root
+    password: root
   sql:
     init:
       mode: always
