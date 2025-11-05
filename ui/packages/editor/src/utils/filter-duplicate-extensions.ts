@@ -4,7 +4,7 @@ import {
   type AnyExtension,
   type Extensions,
 } from "@/tiptap";
-import { utils } from "@halo-dev/console-shared";
+import { v7 as uuidv7 } from "uuid";
 
 export const filterDuplicateExtensions = (
   extensions: Extensions | undefined
@@ -19,7 +19,7 @@ export const filterDuplicateExtensions = (
       console.warn(
         `Extension name is missing for Extension, type: ${extension.type}.`
       );
-      const key = utils.id.uuid();
+      const key = uuidv7();
       map.set(key, extension);
       return;
     }
