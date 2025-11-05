@@ -6,7 +6,6 @@ import { useContentCache } from "@/composables/use-content-cache";
 import { useEditorExtensionPoints } from "@/composables/use-editor-extension-points";
 import { useSessionKeepAlive } from "@/composables/use-session-keep-alive";
 import { contentAnnotations } from "@/constants/annotations";
-import { randomUUID } from "@/utils/id";
 import { useContentSnapshot } from "@console/composables/use-content-snapshot";
 import { useSaveKeybinding } from "@console/composables/use-save-keybinding";
 import useSlugify from "@console/composables/use-slugify";
@@ -33,7 +32,7 @@ import { FormType, utils } from "@halo-dev/console-shared";
 import { useLocalStorage } from "@vueuse/core";
 import { useRouteQuery } from "@vueuse/router";
 import type { AxiosRequestConfig } from "axios";
-import { isEqual } from "lodash-es";
+import { isEqual } from "es-toolkit";
 import ShortUniqueId from "short-unique-id";
 import {
   computed,
@@ -114,7 +113,7 @@ const formState = ref<PostRequestWithContent>({
     apiVersion: "content.halo.run/v1alpha1",
     kind: "Post",
     metadata: {
-      name: randomUUID(),
+      name: utils.id.uuid(),
       annotations: {},
     },
   },

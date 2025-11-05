@@ -35,10 +35,14 @@
     "prepublishOnly": "pnpm run build"
   },
   "dependencies": {
-    "@halo-dev/api-client": "workspace:*"
+    "@halo-dev/api-client": "workspace:*",
+    "mitt": "^3.0.1"
   },
   "peerDependencies": {
     "vue": "^3.5.16",
     "vue-router": "^4.5.1"
+  },
+  "devDependencies": {
+    "uuid": "^13.0.0"
   }
 }

@@ -94,6 +94,7 @@
     "crypto-js": "^4.2.0",
     "dayjs": "^1.11.7",
     "emoji-mart": "^5.6.0",
+    "es-toolkit": "^1.41.0",
     "floating-vue": "^5.2.2",
     "fuse.js": "^6.6.2",
     "lodash-es": "^4.17.21",

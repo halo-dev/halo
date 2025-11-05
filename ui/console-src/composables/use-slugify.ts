@@ -1,5 +1,4 @@
-import { randomUUID } from "@/utils/id";
-import { FormType, stores } from "@halo-dev/console-shared";
+import { FormType, stores, utils } from "@halo-dev/console-shared";
 import ShortUniqueId from "short-unique-id";
 import { slugify } from "transliteration";
 import { computed, watch, type Ref } from "vue";
@@ -11,7 +10,7 @@ type SlugStrategy = (value?: string) => string;
 const strategies: Record<string, SlugStrategy> = {
   generateByTitle: (value?: string) => slugify(value || "", { trim: true }),
   shortUUID: () => uid.randomUUID(8),
-  UUID: () => randomUUID(),
+  UUID: () => utils.id.uuid(),
   timestamp: () => new Date().getTime().toString(),
 };
 

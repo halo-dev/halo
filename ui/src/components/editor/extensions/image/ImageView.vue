@@ -1,8 +1,8 @@
 <script lang="ts" setup>
 import HasPermission from "@/components/permission/HasPermission.vue";
 import { IconImageAddLine, VButton } from "@halo-dev/components";
+import type { AttachmentSimple } from "@halo-dev/console-shared";
 import { NodeViewWrapper, type NodeViewProps } from "@halo-dev/richtext-editor";
-import type { AttachmentSimple } from "packages/shared/dist";
 import { computed, onMounted, onUnmounted, ref, watch } from "vue";
 import { EditorLinkObtain } from "../../components";
 import { useExternalAssetsTransfer } from "../../composables/use-attachment";

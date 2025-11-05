@@ -17,7 +17,7 @@ import {
   VSpace,
 } from "@halo-dev/components";
 import { useRouteQuery } from "@vueuse/router";
-import { chunk } from "lodash-es";
+import { chunk } from "es-toolkit";
 import { computed, ref, watch } from "vue";
 import { useI18n } from "vue-i18n";
 import CommentListItem from "./components/CommentListItem.vue";

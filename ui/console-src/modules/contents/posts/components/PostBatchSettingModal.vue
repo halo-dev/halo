@@ -6,7 +6,7 @@ import {
 } from "@halo-dev/api-client";
 import { Toast, VButton, VModal, VSpace } from "@halo-dev/components";
 import { useMutation, useQueryClient } from "@tanstack/vue-query";
-import { chunk } from "lodash-es";
+import { chunk } from "es-toolkit";
 import { ref } from "vue";
 import { useI18n } from "vue-i18n";
 

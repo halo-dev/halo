@@ -1,5 +1,4 @@
 <script lang="ts" setup>
-import { randomUUID } from "@/utils/id";
 import { ucApiClient } from "@halo-dev/api-client";
 import {
   Dialog,
@@ -15,13 +14,14 @@ import {
   VDropdownItem,
   VTabbar,
 } from "@halo-dev/components";
-import type {
-  DashboardWidget,
-  DashboardWidgetDefinition,
+import {
+  utils,
+  type DashboardWidget,
+  type DashboardWidgetDefinition,
 } from "@halo-dev/console-shared";
 import { useQueryClient } from "@tanstack/vue-query";
 import { useEventListener } from "@vueuse/core";
-import { cloneDeep, isEqual } from "lodash-es";
+import { cloneDeep, isEqual } from "es-toolkit";
 import {
   computed,
   defineComponent,
@@ -194,7 +194,7 @@ function handleAddWidget(widgetDefinition: DashboardWidgetDefinition) {
   }, 0);
 
   const newWidget: DashboardWidget = {
-    i: randomUUID(),
+    i: utils.id.uuid(),
     x: 0,
     y: maxY + 1,
     w: widgetDefinition.defaultSize.w,
@@ -313,7 +313,7 @@ function handleCopyFromLayout(breakpoint: string) {
     ...layout.value,
     ...layoutToCopy.map((widget, index) => ({
       ...widget,
-      i: randomUUID(),
+      i: utils.id.uuid(),
       y: maxY + index + 1,
     })),
   ];
