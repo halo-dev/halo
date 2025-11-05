@@ -443,7 +443,8 @@ const Video = Node.create<ExtensionOptions>({
                   );
                 },
                 icon: markRaw(MdiImageSizeSelectSmall),
-                action: () => handleSetSizePercentage(editor, 25),
+                action: () =>
+                  handleSetSize(editor, { width: "25%", height: "auto" }),
                 title: i18n.global.t("editor.extensions.video.small_size"),
               },
             },
@@ -461,7 +462,8 @@ const Video = Node.create<ExtensionOptions>({
                   );
                 },
                 icon: markRaw(MdiImageSizeSelectLarge),
-                action: () => handleSetSizePercentage(editor, 50),
+                action: () =>
+                  handleSetSize(editor, { width: "50%", height: "auto" }),
                 title: i18n.global.t("editor.extensions.video.medium_size"),
               },
             },
@@ -479,7 +481,8 @@ const Video = Node.create<ExtensionOptions>({
                   );
                 },
                 icon: markRaw(MdiImageSizeSelectActual),
-                action: () => handleSetSizePercentage(editor, 100),
+                action: () =>
+                  handleSetSize(editor, { width: "100%", height: "auto" }),
                 title: i18n.global.t("editor.extensions.video.large_size"),
               },
             },
@@ -723,21 +726,13 @@ export const getVideoSizePercentage = (
   return { width: newWidth, height: newHeight };
 };
 
-export const handleSetSizePercentage = (
+export const handleSetSize = (
   editor: Editor,
-  width: number,
-  videoElement?: HTMLVideoElement | null
+  size: { width?: string; height?: string }
 ) => {
-  const size = getVideoSizePercentage(editor, width, videoElement);
-  if (!size) {
-    return;
-  }
   editor
     .chain()
-    .updateAttributes(Video.name, {
-      width: `${size.width}px`,
-      height: `${size.height}px`,
-    })
+    .updateAttributes(Video.name, size)
     .setNodeSelection(editor.state.selection.from)
     .focus()
     .run();

@@ -34,14 +34,29 @@ onMounted(() => {
     inputRef.value.focus();
   }
 });
+
+const isPercentageWidth = computed(() => {
+  return props.node?.attrs.width?.includes("%");
+});
 </script>
 
 <template>
-  <node-view-wrapper as="div" class="flex">
+  <node-view-wrapper
+    as="div"
+    class="w-full"
+    :class="{
+      'w-fit': !isPercentageWidth && src,
+      flex: isPercentageWidth,
+    }"
+  >
     <div
       class="relative inline-block h-full w-full max-w-full overflow-hidden text-center transition-all"
       :class="{
         'rounded ring-2': selected,
+      }"
+      :style="{
+        width: !src ? '100%' : node.attrs.width,
+        height: !src ? '100%' : node.attrs.height,
       }"
     >
       <div v-if="!src" class="p-0.5">
@@ -60,6 +75,10 @@ onMounted(() => {
         :autoplay="autoplay"
         :loop="loop"
         :src="node!.attrs.src"
+        :style="{
+          width: isPercentageWidth ? '100%' : node.attrs.width,
+          height: isPercentageWidth ? '100%' : node.attrs.height,
+        }"
         @mouseenter="handleSetFocus"
       ></audio>
     </div>

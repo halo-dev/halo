@@ -190,10 +190,21 @@ watch([src, resizeHandleRef], () => {
     setupResizeListener();
   }
 });
+
+const isPercentageWidth = computed(() => {
+  return props.node?.attrs.width?.includes("%");
+});
 </script>
 
 <template>
-  <node-view-wrapper as="div" class="flex">
+  <node-view-wrapper
+    as="div"
+    class="w-full"
+    :class="{
+      'w-fit': !isPercentageWidth && src,
+      flex: isPercentageWidth,
+    }"
+  >
     <div
       v-if="!src"
       class="w-full p-0.5"
@@ -218,6 +229,10 @@ watch([src, resizeHandleRef], () => {
         'rounded ring-2': selected,
         'ring-red-500': imageLoadError,
       }"
+      :style="{
+        width: !src ? '100%' : node.attrs.width,
+        height: !src ? '100%' : node.attrs.height,
+      }"
     >
       <img
         v-if="!imageLoadError"
@@ -225,7 +240,8 @@ watch([src, resizeHandleRef], () => {
         :title="node.attrs.title"
         :alt="alt"
         :href="href"
-        :width="node.attrs.width"
+        :width="isPercentageWidth ? '100%' : node.attrs.width"
+        :height="isPercentageWidth ? '100%' : node.attrs.height"
         class="max-w-full rounded-md"
         @load="onImageLoaded"
         @error="onImageError"

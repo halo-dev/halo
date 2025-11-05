@@ -73,10 +73,21 @@ const handleResetInit = () => {
 
 const { isExternalAsset, transferring, handleTransfer } =
   useExternalAssetsTransfer(src, handleSetExternalLink);
+
+const isPercentageWidth = computed(() => {
+  return props.node?.attrs.width?.includes("%");
+});
 </script>
 
 <template>
-  <node-view-wrapper as="div" class="flex">
+  <node-view-wrapper
+    as="div"
+    class="w-full"
+    :class="{
+      'w-fit': !isPercentageWidth && src,
+      flex: isPercentageWidth,
+    }"
+  >
     <div
       class="relative inline-block h-full max-w-full overflow-hidden rounded-md text-center transition-all"
       :class="{
@@ -84,6 +95,7 @@ const { isExternalAsset, transferring, handleTransfer } =
       }"
       :style="{
         width: initialization ? '100%' : node.attrs.width,
+        height: initialization ? '100%' : node.attrs.height,
       }"
     >
       <div v-if="src" class="group relative">
@@ -96,8 +108,8 @@ const { isExternalAsset, transferring, handleTransfer } =
           preload="metadata"
           class="m-0 rounded-md"
           :style="{
-            width: node.attrs.width,
-            height: node.attrs.height,
+            width: isPercentageWidth ? '100%' : node.attrs.width,
+            height: isPercentageWidth ? '100%' : node.attrs.height,
           }"
         ></video>
         <div

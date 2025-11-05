@@ -32,7 +32,6 @@ const Figure = Node.create<ExtensionOptions & FigureOptions>({
   group: "block",
   content: "(image|video|audio)? figureCaption?",
   isolating: true,
-  fakeSelection: true,
   // Priority must be higher than paragraph (1000) and code-block to ensure
   // the Backspace shortcut handles figure selection correctly.
 
