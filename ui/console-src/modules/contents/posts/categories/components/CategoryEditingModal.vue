@@ -16,7 +16,7 @@ import {
 } from "@halo-dev/components";
 import { FormType } from "@halo-dev/console-shared";
 import { useQueryClient } from "@tanstack/vue-query";
-import { cloneDeep } from "lodash-es";
+import { cloneDeep } from "es-toolkit";
 import { computed, nextTick, onMounted, ref } from "vue";
 import { useI18n } from "vue-i18n";
 

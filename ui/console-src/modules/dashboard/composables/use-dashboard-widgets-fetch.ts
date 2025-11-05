@@ -4,7 +4,7 @@ import type {
   DashboardWidget,
 } from "@halo-dev/console-shared";
 import { useQuery } from "@tanstack/vue-query";
-import { cloneDeep } from "lodash-es";
+import { cloneDeep } from "es-toolkit";
 import { computed, ref, type Ref } from "vue";
 import { DefaultResponsiveLayouts } from "../widgets/defaults";
 

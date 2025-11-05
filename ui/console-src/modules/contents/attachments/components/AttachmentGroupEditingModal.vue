@@ -4,7 +4,7 @@ import { setFocus } from "@/formkit/utils/focus";
 import type { Group } from "@halo-dev/api-client";
 import { coreApiClient } from "@halo-dev/api-client";
 import { Toast, VButton, VModal, VSpace } from "@halo-dev/components";
-import { cloneDeep } from "lodash-es";
+import { cloneDeep } from "es-toolkit";
 import { onMounted, ref } from "vue";
 import { useI18n } from "vue-i18n";
 

@@ -4,7 +4,7 @@ import {
   type MenuItemType,
 } from "@halo-dev/console-shared";
 import { useQuery } from "@tanstack/vue-query";
-import { sortBy } from "lodash-es";
+import { sortBy } from "es-toolkit";
 import { ref, watch } from "vue";
 import {
   useRouter,

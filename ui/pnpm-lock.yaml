@@ -165,6 +165,9 @@ importers:
       emoji-mart:
         specifier: ^5.6.0
         version: 5.6.0
+      es-toolkit:
+        specifier: ^1.41.0
+        version: 1.41.0
       floating-vue:
         specifier: ^5.2.2
         version: 5.2.2(vue@3.5.16(typescript@5.8.3))
@@ -586,6 +589,9 @@ importers:
       '@halo-dev/api-client':
         specifier: workspace:*
         version: link:../api-client
+      mitt:
+        specifier: ^3.0.1
+        version: 3.0.1
       vue:
         specifier: ^3.5.16
         version: 3.5.16(typescript@5.8.3)
@@ -6036,6 +6042,9 @@ packages:
   es-to-primitive@1.2.1:
     resolution: {integrity: sha512-QCOllgZJtaUo9miYBcLChTUaHNjJF3PYs1VidD7AwiEj1kYxKeQTctLAezAOH5ZKRH0g2IgPn6KwB4IT8iRpvA==}
     engines: {node: '>= 0.4'}
+
+  es-toolkit@1.41.0:
+    resolution: {integrity: sha512-bDd3oRmbVgqZCJS6WmeQieOrzpl3URcWBUVDXxOELlUW2FuW+0glPOz1n0KnRie+PdyvUZcXz2sOn00c6pPRIA==}
 
   esbuild-plugin-alias@0.2.1:
     resolution: {integrity: sha512-jyfL/pwPqaFXyKnj8lP8iLk6Z0m099uXR45aSN8Av1XD4vhvQutxxPzgA2bTcAwQpa1zCXDcWOlhFgyP3GKqhQ==}
@@ -17298,6 +17307,8 @@ snapshots:
       is-callable: 1.2.7
       is-date-object: 1.0.5
       is-symbol: 1.0.4
+
+  es-toolkit@1.41.0: {}
 
   esbuild-plugin-alias@0.2.1: {}
 

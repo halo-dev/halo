@@ -5,6 +5,7 @@ export default defineConfig({
   entry: ["./src/index.ts"],
   format: ["esm", "iife"],
   external: ["vue", "vue-router", "pinia", "@halo-dev/api-client"],
+  noExternal: ["mitt"],
   outputOptions: {
     globals: {
       vue: "Vue",

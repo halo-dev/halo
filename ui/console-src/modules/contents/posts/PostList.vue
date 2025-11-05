@@ -24,7 +24,7 @@ import {
 } from "@halo-dev/components";
 import { useQuery } from "@tanstack/vue-query";
 import { useRouteQuery } from "@vueuse/router";
-import { chunk } from "lodash-es";
+import { chunk } from "es-toolkit";
 import type { Ref } from "vue";
 import { computed, provide, ref, watch } from "vue";
 import { useI18n } from "vue-i18n";

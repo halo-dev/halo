@@ -3,7 +3,7 @@ import type { Theme } from "@halo-dev/api-client";
 import { consoleApiClient } from "@halo-dev/api-client";
 import { Dialog, Toast } from "@halo-dev/components";
 import { useFileDialog } from "@vueuse/core";
-import { merge } from "lodash-es";
+import { merge } from "es-toolkit";
 import { storeToRefs } from "pinia";
 import type { ComputedRef, Ref } from "vue";
 import { computed, ref } from "vue";

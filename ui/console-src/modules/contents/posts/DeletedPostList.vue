@@ -27,7 +27,7 @@ import {
 } from "@halo-dev/components";
 import { utils } from "@halo-dev/console-shared";
 import { useQuery } from "@tanstack/vue-query";
-import { chunk } from "lodash-es";
+import { chunk } from "es-toolkit";
 import { ref, watch } from "vue";
 import { useI18n } from "vue-i18n";
 import PostTag from "./tags/components/PostTag.vue";

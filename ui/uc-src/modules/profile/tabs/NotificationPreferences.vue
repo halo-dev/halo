@@ -7,7 +7,7 @@ import type {
 import { ucApiClient } from "@halo-dev/api-client";
 import { VLoading, VSwitch } from "@halo-dev/components";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/vue-query";
-import { cloneDeep } from "lodash-es";
+import { cloneDeep } from "es-toolkit";
 import { computed } from "vue";
 
 const props = withDefaults(defineProps<{ user?: DetailedUser }>(), {

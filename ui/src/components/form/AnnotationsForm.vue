@@ -12,7 +12,7 @@ import type { AnnotationSetting } from "@halo-dev/api-client";
 import { coreApiClient } from "@halo-dev/api-client";
 import { IconArrowRight } from "@halo-dev/components";
 import { utils } from "@halo-dev/console-shared";
-import { cloneDeep } from "lodash-es";
+import { cloneDeep } from "es-toolkit";
 import { computed, nextTick, onMounted, ref, watch } from "vue";
 
 const themeStore = useThemeStore();
