@@ -1,7 +1,6 @@
 <script lang="ts" setup>
 import AnnotationsForm from "@/components/form/AnnotationsForm.vue";
 import { postLabels } from "@/constants/labels";
-import { randomUUID } from "@/utils/id";
 import useSlugify from "@console/composables/use-slugify";
 import { useThemeCustomTemplates } from "@console/modules/interface/themes/composables/use-theme";
 import { submitForm, type FormKitNode } from "@formkit/core";
@@ -66,7 +65,7 @@ const formState = ref<Post>({
   apiVersion: "content.halo.run/v1alpha1",
   kind: "Post",
   metadata: {
-    name: randomUUID(),
+    name: utils.id.uuid(),
   },
 });
 const isSubmitting = ref(false);

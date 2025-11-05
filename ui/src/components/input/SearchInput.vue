@@ -1,7 +1,7 @@
 <script lang="ts" setup>
-import { randomUUID } from "@/utils/id";
 import { getNode, reset } from "@formkit/core";
 import { IconCloseCircle } from "@halo-dev/components";
+import { utils } from "@halo-dev/console-shared";
 
 withDefaults(
   defineProps<{
@@ -17,7 +17,7 @@ const emit = defineEmits<{
   (event: "update:modelValue", modelValue: string): void;
 }>();
 
-const id = `search-input-${randomUUID()}`;
+const id = `search-input-${utils.id.uuid()}`;
 
 function handleReset() {
   emit("update:modelValue", "");

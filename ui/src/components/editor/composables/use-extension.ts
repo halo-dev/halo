@@ -1,4 +1,4 @@
-import { randomUUID } from "@/utils/id";
+import { utils } from "@halo-dev/console-shared";
 import {
   getExtensionField,
   type AnyConfig,
@@ -18,7 +18,7 @@ export function useExtension() {
         console.warn(
           `Extension name is missing for Extension, type: ${extension.type}.`
         );
-        const key = randomUUID().toString();
+        const key = utils.id.uuid();
         map.set(key, extension);
         return;
       }

@@ -1,7 +1,6 @@
 <script lang="ts" setup>
 import AnnotationsForm from "@/components/form/AnnotationsForm.vue";
 import { singlePageLabels } from "@/constants/labels";
-import { randomUUID } from "@/utils/id";
 import useSlugify from "@console/composables/use-slugify";
 import { useThemeCustomTemplates } from "@console/modules/interface/themes/composables/use-theme";
 import { submitForm, type FormKitNode } from "@formkit/core";
@@ -63,7 +62,7 @@ const formState = ref<SinglePage>({
   apiVersion: "content.halo.run/v1alpha1",
   kind: "SinglePage",
   metadata: {
-    name: randomUUID(),
+    name: utils.id.uuid(),
   },
 });
 const modal = ref<InstanceType<typeof VModal> | null>(null);

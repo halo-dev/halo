@@ -6,7 +6,6 @@ import { useContentCache } from "@/composables/use-content-cache";
 import { useEditorExtensionPoints } from "@/composables/use-editor-extension-points";
 import { useSessionKeepAlive } from "@/composables/use-session-keep-alive";
 import { contentAnnotations } from "@/constants/annotations";
-import { randomUUID } from "@/utils/id";
 import { useContentSnapshot } from "@console/composables/use-content-snapshot";
 import { useSaveKeybinding } from "@console/composables/use-save-keybinding";
 import type { SinglePage, SinglePageRequest } from "@halo-dev/api-client";
@@ -96,7 +95,7 @@ const formState = ref<SinglePageRequest>({
     apiVersion: "content.halo.run/v1alpha1",
     kind: "SinglePage",
     metadata: {
-      name: randomUUID(),
+      name: utils.id.uuid(),
       annotations: {},
     },
   },
