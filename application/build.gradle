@@ -17,7 +17,6 @@ plugins {
     alias(libs.plugins.checksum)
     alias(libs.plugins.springdoc.openapi)
     alias(libs.plugins.versions)
-    alias(libs.plugins.grgit)
 }
 
 group = 'run.halo.app'
@@ -145,29 +144,22 @@ tasks.named('jacocoTestReport', JacocoReport) {
     }
 }
 
-ext.presetPluginUrls = [
-        'https://github.com/halo-dev/plugin-comment-widget/releases/download/v3.0.0/plugin-comment-widget-3.0.0.jar'           : 'plugin-comment-widget.jar',
-        'https://github.com/halo-dev/plugin-search-widget/releases/download/v1.7.0/plugin-search-widget-1.7.0.jar'             : 'plugin-search-widget.jar',
-        'https://github.com/halo-dev/plugin-sitemap/releases/download/v1.1.2/plugin-sitemap-1.1.2.jar'                         : 'plugin-sitemap.jar',
-        'https://github.com/halo-dev/plugin-feed/releases/download/v1.5.0/plugin-feed-1.5.0.jar'                               : 'plugin-feed.jar',
-        'https://github.com/halo-sigs/plugin-shiki/releases/download/v1.0.1/plugin-shiki-1.0.1.jar'                            : 'plugin-shiki.jar',
-        'https://github.com/halo-sigs/plugin-editor-hyperlink-card/releases/download/v1.5.2/plugin-editor-hyperlink-card-1.5.2.jar': 'plugin-editor-hyperlink-card.jar',
-
-        // Currently, plugin-app-store is not open source, so we need to download it from the official website.
-        // Please see https://github.com/halo-dev/plugin-app-store/issues/55
-        // https://www.halo.run/store/apps/app-VYJbF
-        'https://www.halo.run/store/apps/app-VYJbF/releases/download/app-release-uadbam6p/assets/app-release-uadbam6p-kwbir0ge': 'appstore.jar',
-]
-
 tasks.register('downloadPluginPresets', Download) {
-    doFirst {
-        delete 'src/main/resources/presets/plugins'
-    }
+    def presetPluginUrls = [
+            'https://github.com/halo-dev/plugin-comment-widget/releases/download/v3.0.0/plugin-comment-widget-3.0.0.jar'               : 'plugin-comment-widget.jar',
+            'https://github.com/halo-dev/plugin-search-widget/releases/download/v1.7.0/plugin-search-widget-1.7.0.jar'                 : 'plugin-search-widget.jar',
+            'https://github.com/halo-dev/plugin-sitemap/releases/download/v1.1.2/plugin-sitemap-1.1.2.jar'                             : 'plugin-sitemap.jar',
+            'https://github.com/halo-dev/plugin-feed/releases/download/v1.5.0/plugin-feed-1.5.0.jar'                                   : 'plugin-feed.jar',
+            'https://github.com/halo-sigs/plugin-shiki/releases/download/v1.0.1/plugin-shiki-1.0.1.jar'                                : 'plugin-shiki.jar',
+            'https://github.com/halo-sigs/plugin-editor-hyperlink-card/releases/download/v1.5.2/plugin-editor-hyperlink-card-1.5.2.jar': 'plugin-editor-hyperlink-card.jar',
 
+            // Currently, plugin-app-store is not open source, so we need to download it from the official website.
+            // Please see https://github.com/halo-dev/plugin-app-store/issues/55
+            // https://www.halo.run/store/apps/app-VYJbF
+            'https://www.halo.run/store/apps/app-VYJbF/releases/download/app-release-uadbam6p/assets/app-release-uadbam6p-kwbir0ge'    : 'appstore.jar',
+    ]
     src presetPluginUrls.keySet()
-
-    dest 'src/main/resources/presets/plugins'
-
+    dest layout.buildDirectory.dir('resources/main/presets/plugins')
     eachFile { f ->
         f.name = presetPluginUrls[f.sourceURL.toString()]
     }
@@ -199,47 +191,60 @@ tasks.named('generateOpenApiDocs') {
     }
 }
 
-def name = 'halo'
-def branchName = grgit.branch.current().name.replaceAll("/", "-")
-def tagName = "${project.version}-cnb"
-def isRelease = Objects.equals(project.findProperty('release'), 'true')
-if (!isRelease) {
-    name = 'halo-dev'
-    tagName = "sha-${grgit.head().abbreviatedId}-cnb"
+def branchProvider = providers.exec { commandLine 'git', 'rev-parse', '--abbrev-ref', 'HEAD' }
+        .standardOutput
+        .asText
+        .map { it.trim().replaceAll("/", "-") }
+def abbreviatedIdProvider = providers.exec { commandLine 'git', 'rev-parse', '--short', 'HEAD' }
+        .standardOutput
+        .asText
+        .map { it.trim() }
+
+def isRelease = project.hasProperty('release') && Boolean.parseBoolean(project.property('release').toString())
+def repoProvider = providers.provider { isRelease ? 'halo' : 'halo-dev' }
+def tagProvider = providers.provider {
+    isRelease ? "${project.version}-cnb" : abbreviatedIdProvider.map { "sha-${it}-cnb" }.get()
 }
+def branchTagProvider = branchProvider.map { "${it}-cnb" }
+def archiveFileProvider = tasks.named('bootJar', BootJar).<RegularFile> flatMap { it.archiveFile }
 
 tasks.register('publishToGhcr', BootBuildImage) {
+    def ghcrUserProvider = providers.environmentVariable('GHCR_USERNAME')
+    def ghcrTokenProvider = providers.environmentVariable('GHCR_TOKEN')
+
     group = 'publishing'
     description = 'Build and publish the Docker image to GitHub Container Registry.'
-    imageName = "ghcr.io/halo-dev/${name}:${tagName}"
-    publish = StringUtils.hasText(System.getenv('GHCR_TOKEN'))
+    imageName = "ghcr.io/halo-dev/${repoProvider.get()}:${tagProvider.get()}"
+    publish = ghcrTokenProvider.map { StringUtils.hasText(it) }.orElse(false)
     if (!isRelease) {
-        tags = ["ghcr.io/halo-dev/${name}:${branchName}-cnb".toString()]
+        tags.add("ghcr.io/halo-dev/${repoProvider.get()}:${branchTagProvider.get()}")
     }
     docker {
         publishRegistry {
-            username = System.getenv('GHCR_USERNAME')
-            password = System.getenv('GHCR_TOKEN')
+            username = ghcrUserProvider
+            password = ghcrTokenProvider
         }
     }
-    archiveFile = tasks.named('bootJar', BootJar).get().archiveFile
+    archiveFile.set(archiveFileProvider)
 }
 
 tasks.register('publishToDockerHub', BootBuildImage) {
+    def dockerUserProvider = providers.environmentVariable('DOCKER_USERNAME')
+    def dockerTokenProvider = providers.environmentVariable('DOCKER_TOKEN')
     group = 'publishing'
     description = 'Build and publish the Docker image to Docker Hub.'
-    imageName = "halohub/${name}:${tagName}"
-    publish = StringUtils.hasText(System.getenv('DOCKER_TOKEN'))
+    imageName = "halohub/${repoProvider.get()}:${tagProvider.get()}"
+    publish = dockerTokenProvider.map { StringUtils.hasText(it) }.orElse(false)
     if (!isRelease) {
-        tags = ["halohub/${name}:${branchName}-cnb".toString()]
+        tags.add("halohub/${repoProvider.get()}:${branchTagProvider.get()}")
     }
     docker {
         publishRegistry {
-            username = System.getenv("DOCKER_USERNAME")
-            password = System.getenv("DOCKER_TOKEN")
+            username = dockerUserProvider
+            password = dockerTokenProvider
         }
     }
-    archiveFile = tasks.named('bootJar', BootJar).get().archiveFile
+    archiveFile.set(archiveFileProvider)
 }
 
 tasks.register('publishToAllRegistries') {
