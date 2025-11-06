@@ -102,6 +102,24 @@ class FileTypeDetectUtilsTest {
     }
 
     @Test
+    void detectFileExtensionsTest() throws MimeTypeException {
+        var extensions = FileTypeDetectUtils.detectFileExtensions("application/x-x509-key; format=pem");
+        assertThat(extensions).isEmpty();
+
+        extensions = FileTypeDetectUtils.detectFileExtensions("text/plain");
+        assertThat(extensions).contains(".text");
+
+        extensions = FileTypeDetectUtils.detectFileExtensions("application/zip");
+        assertThat(extensions).contains(".zipx");
+
+        extensions = FileTypeDetectUtils.detectFileExtensions("image/bmp");
+        assertThat(extensions).contains(".dib");
+
+        extensions = FileTypeDetectUtils.detectFileExtensions("image/jpeg");
+        assertThat(extensions).contains(".jpeg");
+    }
+
+    @Test
     void getFileExtensionTest() {
         var ext = FileTypeDetectUtils.getFileExtension("BMP+HTML+JAR.html");
         assertThat(ext).isEqualTo(".html");
