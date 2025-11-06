@@ -1,15 +1,8 @@
 import { stores } from "@halo-dev/console-shared";
 import type { Router } from "vue-router";
 
-const whiteList = ["ResetPassword"];
-
 export function setupAuthCheckGuard(router: Router) {
-  router.beforeEach((to, _from, next) => {
-    if (whiteList.includes(to.name as string)) {
-      next();
-      return;
-    }
-
+  router.beforeEach((_to, _from, next) => {
     const currentUserStore = stores.currentUser();
 
     if (currentUserStore.isAnonymous) {
