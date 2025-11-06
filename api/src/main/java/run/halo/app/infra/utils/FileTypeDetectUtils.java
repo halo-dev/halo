@@ -3,6 +3,7 @@ package run.halo.app.infra.utils;
 import java.io.BufferedInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.List;
 import lombok.experimental.UtilityClass;
 import org.apache.tika.detect.DefaultDetector;
 import org.apache.tika.detect.Detector;
@@ -56,6 +57,12 @@ public class FileTypeDetectUtils {
         return mimeTypes.forName(mimeType).getExtension();
     }
 
+    public static List<String> detectFileExtensions(String mimeType) throws MimeTypeException {
+        //这里新增一个方法，不直接修改detectFileExtension，以防有其他软件使用了该API
+        MimeTypes mimeTypes = MimeTypes.getDefaultMimeTypes();
+        return mimeTypes.forName(mimeType).getExtensions();
+    }
+
     /**
      * <p>Get file extension from file name.</p>
      * <p>The obtained file extension is in lowercase and includes the dot, such as ".jpg".</p>
@@ -86,8 +93,13 @@ public class FileTypeDetectUtils {
         Assert.notNull(fileName, "The fileName must not be null");
         String fileExtension = getFileExtension(fileName);
         try {
-            String detectedExtByMime = detectFileExtension(mimeType);
-            return detectedExtByMime.equalsIgnoreCase(fileExtension);
+            List<String> detectedExtByMime = detectFileExtensions(mimeType);
+            for (String ext : detectedExtByMime) {
+                if (ext.equalsIgnoreCase(fileExtension)) {
+                    return true;
+                }
+            }
+            return false;
         } catch (MimeTypeException e) {
             return false;
         }
